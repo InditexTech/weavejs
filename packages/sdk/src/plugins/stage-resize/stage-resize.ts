@@ -1,0 +1,38 @@
+import { WeavePlugin } from "@/plugins/plugin";
+
+export class WeaveStageResizePlugin extends WeavePlugin {
+  getLayerName = undefined;
+  initLayer = undefined;
+  render: undefined;
+
+  registersLayers() {
+    return false;
+  }
+
+  getName() {
+    return "weaveStageResize";
+  }
+
+  init() {
+    const stage = this.instance.getStage();
+
+    window.addEventListener("resize", () => {
+      const containerParent = stage.container().parentNode;
+
+      if (containerParent) {
+        const containerBoundBox = stage.container().getBoundingClientRect();
+
+        const containerWidth = containerBoundBox.width;
+        const containerHeight = containerBoundBox.height;
+        stage.width(containerWidth);
+        stage.height(containerHeight);
+
+        const plugins = this.instance.getPlugins();
+        for (const pluginId of Object.keys(plugins)) {
+          const pluginInstance = plugins[pluginId];
+          pluginInstance.render?.();
+        }
+      }
+    });
+  }
+}

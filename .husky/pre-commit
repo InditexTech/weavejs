@@ -1,0 +1,7 @@
+#!/usr/bin/env sh
+cd code
+if [ "${SKIP_HOOKS}" != "true" ]
+then
+  npm run git:pre-commit
+  git update-index --again
+fi

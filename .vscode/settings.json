@@ -1,0 +1,19 @@
+{
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": "explicit"
+  },
+  "eslint.validate": [
+    "javascript"
+  ],
+  "cSpell.words": [
+    "Canvory",
+    "Collab",
+    "dragmove",
+    "Emittery",
+    "Konva",
+    "Pantone",
+    "Serializablerams",
+    "syncedstore",
+    "weavejs"
+  ]
+}
