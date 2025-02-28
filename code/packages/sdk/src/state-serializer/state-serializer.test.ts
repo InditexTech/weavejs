@@ -197,7 +197,7 @@ describe("state-serializer", () => {
     };
 
     expect(() => stateSerializer.deserialize(element)).toThrowError(
-      "Deserialization error: element type must be lowercase string",
+      "Deserialization error: element type must be string received [10]",
     );
   });
 });
