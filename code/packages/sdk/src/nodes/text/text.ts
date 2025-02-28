@@ -48,7 +48,7 @@ export class WeaveTextNode extends WeaveNode {
       ...props,
     });
 
-    const selectionPlugin = this.instance.getPlugin<WeaveNodesSelectionPlugin>("weaveNodesSelection");
+    const selectionPlugin = this.instance.getPlugin<WeaveNodesSelectionPlugin>("nodesSelection");
 
     selectionPlugin?.getTransformer().on("dblclick dbltap", (e) => {
       e.evt.preventDefault();
@@ -87,10 +87,12 @@ export class WeaveTextNode extends WeaveNode {
     });
 
     text.on("mouseenter", () => {
+      const stage = this.instance.getStage();
       stage.container().style.cursor = "pointer";
     });
 
     text.on("mouseleave", () => {
+      const stage = this.instance.getStage();
       stage.container().style.cursor = "default";
     });
 
@@ -120,10 +122,8 @@ export class WeaveTextNode extends WeaveNode {
   }
 
   updateInstance(nodeInstance: WeaveElementInstance, nextProps: WeaveElementAttributes) {
-    const nodeInstanceZIndex = nodeInstance.zIndex();
     nodeInstance.setAttrs({
       ...nextProps,
-      zIndex: nodeInstanceZIndex,
     });
   }
 
@@ -258,7 +258,7 @@ export class WeaveTextNode extends WeaveNode {
       textArea.remove();
       textNode.visible(true);
 
-      const selectionPlugin = this.instance.getPlugin<WeaveNodesSelectionPlugin>("weaveNodesSelection");
+      const selectionPlugin = this.instance.getPlugin<WeaveNodesSelectionPlugin>("nodesSelection");
       if (selectionPlugin) {
         const tr = selectionPlugin.getTransformer();
         selectionPlugin.setSelectedNodes([textNode]);
@@ -269,6 +269,7 @@ export class WeaveTextNode extends WeaveNode {
       this.editing = false;
       stage.container().tabIndex = 1;
       stage.container().click();
+      stage.container().focus();
     }
   }
 
@@ -279,7 +280,7 @@ export class WeaveTextNode extends WeaveNode {
 
     textNode.visible(false);
 
-    const selectionPlugin = this.instance.getPlugin<WeaveNodesSelectionPlugin>("weaveNodesSelection");
+    const selectionPlugin = this.instance.getPlugin<WeaveNodesSelectionPlugin>("nodesSelection");
     if (selectionPlugin) {
       const tr = selectionPlugin.getTransformer();
       tr.hide();

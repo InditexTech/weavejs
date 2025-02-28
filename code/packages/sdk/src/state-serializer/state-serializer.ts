@@ -44,7 +44,7 @@ export class WeaveStateSerializer {
     const { key, type, props } = element as WeaveStateElement;
 
     if (typeof type !== "string") {
-      throw new Error("Deserialization error: element type must be lowercase string");
+      throw new Error(`Deserialization error: element type must be string received [${type}]`);
     }
 
     const { children, ...restProps } = props;

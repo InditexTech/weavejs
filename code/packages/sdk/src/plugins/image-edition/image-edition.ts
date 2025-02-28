@@ -23,7 +23,7 @@ export class WeaveImageEditionPlugin extends WeavePlugin {
   }
 
   getName() {
-    return "weaveImageEdition";
+    return "imageEdition";
   }
 
   private getLayer() {
@@ -64,7 +64,7 @@ export class WeaveImageEditionPlugin extends WeavePlugin {
 
     const imageParams = this.actualImage.getAttrs();
 
-    const selectionPlugin = this.instance.getPlugin<WeaveNodesSelectionPlugin>("weaveNodesSelection");
+    const selectionPlugin = this.instance.getPlugin<WeaveNodesSelectionPlugin>("nodesSelection");
     if (selectionPlugin) {
       const tr = selectionPlugin.getTransformer();
       selectionPlugin.setSelectedNodes([]);
@@ -72,7 +72,7 @@ export class WeaveImageEditionPlugin extends WeavePlugin {
       tr.forceUpdate();
     }
 
-    const panningPlugin = this.instance.getPlugin<WeaveStagePanningPlugin>("weaveStagePanning");
+    const panningPlugin = this.instance.getPlugin<WeaveStagePanningPlugin>("stagePanning");
     if (panningPlugin) {
       panningPlugin.setEnabled(false);
     }
@@ -355,7 +355,7 @@ export class WeaveImageEditionPlugin extends WeavePlugin {
 
     const imageGroup = mainLayer?.findOne(`#${imageParams.id}`) as Konva.Group | undefined;
 
-    const selectionPlugin = this.instance.getPlugin<WeaveNodesSelectionPlugin>("weaveNodesSelection");
+    const selectionPlugin = this.instance.getPlugin<WeaveNodesSelectionPlugin>("nodesSelection");
     if (imageGroup && selectionPlugin) {
       const tr = selectionPlugin.getTransformer();
       selectionPlugin.setSelectedNodes([imageGroup]);
@@ -363,7 +363,7 @@ export class WeaveImageEditionPlugin extends WeavePlugin {
       tr.forceUpdate();
     }
 
-    const panningPlugin = this.instance.getPlugin<WeaveStagePanningPlugin>("weaveStagePanning");
+    const panningPlugin = this.instance.getPlugin<WeaveStagePanningPlugin>("stagePanning");
     if (panningPlugin) {
       panningPlugin.setEnabled(true);
     }
@@ -406,12 +406,12 @@ export class WeaveImageEditionPlugin extends WeavePlugin {
 
   render() {
     const stage = this.instance.getStage();
-    const mainLayer = this.instance.getMainLayer();
+    const editorLayer = this.getLayer();
 
-    mainLayer?.destroyChildren();
+    editorLayer?.destroyChildren();
 
-    mainLayer?.scaleX(1 / stage.scaleX());
-    mainLayer?.scaleY(1 / stage.scaleX());
+    editorLayer?.scaleX(1 / stage.scaleX());
+    editorLayer?.scaleY(1 / stage.scaleX());
 
     if (this.editing) {
       this.start();

@@ -1,21 +1,47 @@
 import { isEqual } from "lodash";
 import Konva from "konva";
 import { DefaultEventPriority } from "./constants";
-import { WeaveElementInstance, WeaveElementAttributes, WeaveReconcilerConfig } from "@/types";
+import { WeaveElementInstance, WeaveElementAttributes } from "@/types";
 import { Weave } from "@/weave";
+import { Logger } from "pino";
 
 export class WeaveReconciler {
   private instance: Weave;
-  private config!: WeaveReconcilerConfig;
+  private logger: Logger;
 
-  constructor(instance: Weave, config: WeaveReconcilerConfig) {
+  constructor(instance: Weave) {
     this.instance = instance;
-    this.config = config;
+    this.logger = this.instance.getChildLogger("reconciler");
+  }
+
+  addNode(parentInstance: WeaveElementInstance, child: WeaveElementInstance) {
+    const parentAttrs = parentInstance.getAttrs();
+
+    const childInitialZIndex = child.getAttrs().initialZIndex;
+
+    if (parentInstance instanceof Konva.Stage && child instanceof Konva.Layer) {
+      parentInstance.add(child);
+    }
+    if (parentInstance instanceof Konva.Layer) {
+      parentInstance.add(child);
+    }
+    if (parentInstance instanceof Konva.Group && typeof parentAttrs.containerId !== "undefined") {
+      const realParent = parentInstance.findOne(`#${parentAttrs.containerId}`) as Konva.Group | undefined;
+      realParent?.add(child);
+    }
+    if (parentInstance instanceof Konva.Group && typeof parentAttrs.containerId === "undefined") {
+      parentInstance.add(child);
+    }
+
+    if (childInitialZIndex) {
+      child.zIndex(childInitialZIndex);
+    }
   }
 
   getConfig() {
-    const debug = this.config.debug ?? false;
     const weaveInstance = this.instance;
+    const logger = this.logger;
+    const addNode = this.addNode;
 
     return {
       noTimeout: -1,
@@ -27,103 +53,101 @@ export class WeaveReconciler {
       getCurrentEventPriority() {
         return DefaultEventPriority;
       },
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       getInstanceFromNode(node: any) {
-        debug && console.log("getInstanceFromNode", node);
+        logger.debug({ node }, "getInstanceFromNode");
         return null;
       },
       beforeActiveInstanceBlur() {
-        debug && console.log("beforeActiveInstanceBlur");
+        logger.debug("beforeActiveInstanceBlur");
       },
       afterActiveInstanceBlur() {
-        debug && console.log("afterActiveInstanceBlur");
+        logger.debug("afterActiveInstanceBlur");
       },
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       prepareScopeUpdate(scopeInstance: any, instance: any) {
-        debug && console.log("prepareScopeUpdate", scopeInstance, instance);
+        logger.debug({ scopeInstance, instance }, "prepareScopeUpdate");
       },
       getInstanceFromScope(scopeInstance: any) {
-        debug && console.log("getInstanceFromScope", scopeInstance);
+        logger.debug({ scopeInstance }, "getInstanceFromScope");
         return null;
       },
       getRootHostContext(rootContainer: Weave) {
-        debug && console.log("getRootHostContext", rootContainer);
+        logger.debug({ rootContainer }, "getRootHostContext");
         return rootContainer;
       },
       prepareForCommit(containerInfo: Weave) {
-        debug && console.log("prepareForCommit", containerInfo);
+        logger.debug({ containerInfo }, "prepareForCommit");
         return null;
       },
       scheduleTimeout(fn: (...args: unknown[]) => unknown, delay?: number) {
-        debug && console.log("preparescheduleTimeoutPortalMount", fn, delay);
+        logger.debug({ fn, delay }, "scheduleTimeout");
         return setTimeout(fn, delay);
       },
       cancelTimeout(id: NodeJS.Timeout | undefined) {
-        debug && console.log("cancelTimeout", id);
+        logger.debug({ id }, "cancelTimeout");
         if (id) {
           clearTimeout(id);
         }
       },
       preparePortalMount(containerInfo: Weave) {
-        debug && console.log("preparePortalMount", containerInfo);
+        logger.debug({ containerInfo }, "preparePortalMount");
       },
       resetAfterCommit(containerInfo: Weave) {
-        debug && console.log("resetAfterCommit", containerInfo);
+        logger.debug({ containerInfo }, "resetAfterCommit");
       },
       createTextInstance(text: string, rootContainer: Weave, hostContext: Weave) {
-        debug && console.log("createTextInstance", text, rootContainer, hostContext);
+        logger.debug({ text, rootContainer, hostContext }, "createTextInstance");
         return null;
       },
       getChildHostContext(parentHostContext: Weave, type: string, rootContainer: Weave) {
-        debug && console.log("getChildHostContext", parentHostContext, type, rootContainer);
+        logger.debug({ parentHostContext, type, rootContainer }, "getChildHostContext");
         return parentHostContext;
       },
       shouldSetTextContent(type: string, props: WeaveElementAttributes) {
-        debug && console.log("shouldSetTextContext", type, props);
+        logger.debug({ type, props }, "shouldSetTextContext");
         return false;
       },
       createInstance(type: string, props: WeaveElementAttributes, rootContainer: Weave, hostContext: Weave) {
-        debug && console.log("createInstance", type, props, rootContainer, hostContext);
+        logger.debug({ type, props, rootContainer, hostContext }, "createInstance");
         const handler = rootContainer.getNodeHandler(type);
 
         if (!handler) {
           return undefined;
         }
 
-        return handler.createInstance(props);
+        const newProps = { ...props };
+        delete newProps.zIndex;
+        newProps.initialZIndex = props.zIndex;
+
+        return handler.createInstance(newProps);
       },
       detachDeletedInstance(node: WeaveElementInstance) {
-        debug && console.log("detachDeletedInstance", node);
+        logger.debug({ node }, "detachDeletedInstance");
       },
       getPublicInstance(instance: WeaveElementInstance) {
-        debug && console.log("getPublicInstance", instance);
+        logger.debug({ instance }, "getPublicInstance");
         return instance;
       },
       appendInitialChild(parentInstance: WeaveElementInstance, child: WeaveElementInstance) {
-        debug && console.log("appendInitialChild", parentInstance, child);
-        if (parentInstance instanceof Konva.Stage && child instanceof Konva.Layer) {
-          parentInstance.add(child);
-        }
-        if (parentInstance instanceof Konva.Layer && child instanceof Konva.Shape) {
-          parentInstance.add(child);
-        }
-        if (parentInstance instanceof Konva.Group && child instanceof Konva.Shape) {
-          parentInstance.add(child);
-        }
+        logger.debug({ parentInstance, child }, "appendInitialChild");
+        addNode(parentInstance, child);
       },
       appendChildToContainer(container: Weave, child: WeaveElementInstance) {
-        debug && console.log("appendChildToContainer", container, child);
+        logger.debug({ container, child }, "appendChildToContainer");
         if (child instanceof Konva.Stage) {
-          container.setStage(child);
+          container.getStageManager().setStage(child);
         }
       },
       insertInContainerBefore(container: Weave, child: WeaveElementInstance) {
-        debug && console.log("insertInContainerBefore", container, child);
+        logger.debug({ container, child }, "insertInContainerBefore");
       },
       insertBefore(
         parentInstance: WeaveElementInstance,
         child: WeaveElementInstance,
         beforeChild: WeaveElementInstance,
       ) {
-        debug && console.log("insertBefore ", parentInstance, child, beforeChild);
+        logger.debug({ parentInstance, child, beforeChild }, "insertBefore ");
         if (parentInstance instanceof Konva.Layer) {
           parentInstance.add(child);
           const beforeChildZIndex = beforeChild.zIndex();
@@ -136,16 +160,11 @@ export class WeaveReconciler {
         }
       },
       appendChild(parentInstance: WeaveElementInstance, child: WeaveElementInstance) {
-        debug && console.log("appendChild", parentInstance, child);
-        if (parentInstance instanceof Konva.Layer) {
-          parentInstance.add(child);
-        }
-        if (parentInstance instanceof Konva.Group) {
-          parentInstance.add(child);
-        }
+        logger.debug({ parentInstance, child }, "appendChild");
+        addNode(parentInstance, child);
       },
       finalizeInitialChildren() {
-        debug && console.log("finalizeInitialChildren");
+        logger.debug("finalizeInitialChildren");
         return false;
       },
       prepareUpdate(
@@ -156,33 +175,36 @@ export class WeaveReconciler {
         rootContainer: Weave,
         hostContext: Weave,
       ) {
-        debug && console.log("clearContainer", instance, type, oldProps, newProps, rootContainer, hostContext);
-        return null;
+        logger.debug({ instance, type, oldProps, newProps, rootContainer, hostContext }, "clearContainer");
+        return {};
       },
       clearContainer(container: Weave) {
-        debug && console.log("clearContainer", container);
+        logger.debug({ container }, "clearContainer");
       },
       setCurrentUpdatePriority() {
-        debug && console.log("setCurrentUpdatePriority");
+        logger.debug("setCurrentUpdatePriority");
       },
       getCurrentUpdatePriority() {
-        debug && console.log("getCurrentUpdatePriority");
+        logger.debug("getCurrentUpdatePriority");
         return 1;
       },
       resolveUpdatePriority() {
-        debug && console.log("resolveUpdatePriority");
+        logger.debug("resolveUpdatePriority");
         return 1;
       },
       maySuspendCommit() {
-        debug && console.log("maySuspendCommit");
+        logger.debug("maySuspendCommit");
       },
       commitUpdate(
         instance: WeaveElementInstance,
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/naming-convention
+        _: any,
         type: string,
         prevProps: WeaveElementAttributes,
         nextProps: WeaveElementAttributes,
       ) {
-        debug && console.log("commitUpdate", instance, type, prevProps, nextProps);
+        logger.debug({ instance, type, prevProps, nextProps }, "commitUpdate");
+
         if (instance instanceof Weave) {
           return;
         }
@@ -195,13 +217,18 @@ export class WeaveReconciler {
           }
 
           handler.updateInstance(instance, nextProps);
+
+          const childZIndex = nextProps.zIndex;
+          if (childZIndex) {
+            instance.zIndex(childZIndex);
+          }
         }
       },
       removeChildFromContainer() {
-        debug && console.log("removeChildFromContainer");
+        logger.debug("removeChildFromContainer");
       },
       removeChild(_: WeaveElementInstance, child: WeaveElementInstance) {
-        debug && console.log("removeChild", child);
+        logger.debug({ child }, "removeChild");
         child.destroy();
       },
     };

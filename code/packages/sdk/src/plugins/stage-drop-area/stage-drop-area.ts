@@ -20,7 +20,7 @@ export class WeaveStageDropAreaPlugin extends WeavePlugin {
   }
 
   getName() {
-    return "weaveStageDropArea";
+    return "stageDropArea";
   }
 
   init() {

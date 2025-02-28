@@ -35,7 +35,7 @@ export class WeavePenToolAction extends WeaveAction {
   }
 
   getName(): string {
-    return "weavePenTool";
+    return "penTool";
   }
 
   private setupEvents() {
@@ -86,7 +86,7 @@ export class WeavePenToolAction extends WeaveAction {
   private addLine() {
     const stage = this.instance.getStage();
 
-    const selectionPlugin = this.instance.getPlugin<WeaveNodesSelectionPlugin>("weaveNodesSelection");
+    const selectionPlugin = this.instance.getPlugin<WeaveNodesSelectionPlugin>("nodesSelection");
     if (selectionPlugin) {
       const tr = selectionPlugin.getTransformer();
       tr.hide();
@@ -104,56 +104,48 @@ export class WeavePenToolAction extends WeaveAction {
   }
 
   private handleAdding() {
-    const { mousePoint, container, groupId } = this.getMousePointer();
+    const { mousePoint, container } = this.instance.getMousePointer();
 
     this.clickPoint = mousePoint;
     this.container = container;
 
     this.tempMainLine = new Konva.Line({
-      x: this.clickPoint.x,
-      y: this.clickPoint.y,
+      x: this.clickPoint?.x ?? 0,
+      y: this.clickPoint?.y ?? 0,
       points: [0, 0],
       stroke: "blue",
       strokeWidth: 1,
       opacity: 1,
-      groupId,
-      isSelectable: false,
     });
     container?.add(this.tempMainLine);
 
     this.tempPoint = new Konva.Circle({
-      x: this.clickPoint.x,
-      y: this.clickPoint.y,
+      x: this.clickPoint?.x ?? 0,
+      y: this.clickPoint?.y ?? 0,
       radius: 5,
       stroke: "black",
       strokeWidth: 1,
       fill: "rgba(0,0,0,0.25)",
-      groupId,
-      isSelectable: false,
     });
     container?.add(this.tempPoint);
 
     this.tempLine = new Konva.Line({
-      x: this.clickPoint.x,
-      y: this.clickPoint.y,
+      x: this.clickPoint?.x ?? 0,
+      y: this.clickPoint?.y ?? 0,
       points: [0, 0],
       stroke: "black",
       strokeWidth: 1,
       opacity: 0.5,
-      groupId,
-      isSelectable: false,
     });
     container?.add(this.tempLine);
 
     this.tempNextPoint = new Konva.Circle({
-      x: this.clickPoint.x,
-      y: this.clickPoint.y,
+      x: this.clickPoint?.x ?? 0,
+      y: this.clickPoint?.y ?? 0,
       radius: 5,
       stroke: "black",
       strokeWidth: 1,
       fill: "rgba(0,0,0,0.25)",
-      groupId,
-      isSelectable: false,
     });
     container?.add(this.tempNextPoint);
 
@@ -162,7 +154,7 @@ export class WeavePenToolAction extends WeaveAction {
 
   private handleSettingSize() {
     if (this.lineId && this.container && this.tempMainLine && this.tempPoint && this.tempNextPoint && this.tempLine) {
-      const { mousePoint } = this.getMousePointerContainer(this.container);
+      const { mousePoint } = this.instance.getMousePointerRelativeToContainer(this.container);
 
       const newPoints = [...this.tempMainLine.points()];
       newPoints.push(mousePoint.x - this.tempMainLine.x());
@@ -198,7 +190,7 @@ export class WeavePenToolAction extends WeaveAction {
     }
 
     if (this.lineId && this.container && this.tempLine && this.tempNextPoint) {
-      const { mousePoint } = this.getMousePointerContainer(this.container);
+      const { mousePoint } = this.instance.getMousePointerRelativeToContainer(this.container);
 
       this.tempLine.setAttrs({
         points: [
@@ -262,7 +254,6 @@ export class WeavePenToolAction extends WeaveAction {
         }
       }
 
-      const lineAttrs = this.tempMainLine.getAttrs();
       const lineX = this.tempMainLine.x();
       const lineY = this.tempMainLine.y();
 
@@ -278,14 +269,11 @@ export class WeavePenToolAction extends WeaveAction {
         strokeWidth: 1,
         hitStrokeWidth: 10,
         draggable: true,
-        groupId: lineAttrs.groupId,
-        zIndex: this.container?.getChildren().length ?? 0,
-        isSelectable: true,
       });
 
-      this.instance.addNode(node);
+      this.instance.addNode(node, this.container?.getAttrs().id);
 
-      const selectionPlugin = this.instance.getPlugin<WeaveNodesSelectionPlugin>("weaveNodesSelection");
+      const selectionPlugin = this.instance.getPlugin<WeaveNodesSelectionPlugin>("nodesSelection");
       if (selectionPlugin) {
         const tr = selectionPlugin.getTransformer();
         tr.show();

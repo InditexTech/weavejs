@@ -1,5 +1,7 @@
 import path from "path";
 import { type PluginOption } from "vite";
+import removeAttr from "react-remove-attr";
+import react from "@vitejs/plugin-react";
 import { defineConfig } from "vitest/config";
 import dts from "vite-plugin-dts";
 import { compression } from "vite-plugin-compression2";
@@ -14,12 +16,23 @@ export default defineConfig(({ mode }) => {
     build: {
       lib: {
         entry: "./src/index.ts",
-        name: "websockets-store",
+        name: "react",
         formats: ["es"],
-        fileName: "websockets-store",
+        fileName: "react",
       },
       rollupOptions: {
-        external: ["@weavejs/sdk", "yjs", "@syncedstore/core", /konva.*/],
+        external: [
+          "react",
+          "react-dom",
+          "@types/react",
+          "@types/react-dom",
+          "@weavejs/sdk",
+          "@weavejs/store-websockets",
+          "@weavejs/store-azure-web-pubsub",
+          "yjs",
+          "@syncedstore/core",
+          /konva.*/,
+        ],
       },
     },
 
@@ -29,16 +42,23 @@ export default defineConfig(({ mode }) => {
       },
     },
 
-    plugins: [dts({ rollupTypes: true }) as PluginOption & { name: string }, inProdMode && compression()],
+    plugins: [
+      inProdMode &&
+        removeAttr({
+          extensions: ["tsx"],
+          attributes: ["data-testid"],
+        }),
+      react() as PluginOption,
+      dts({ rollupTypes: true }) as PluginOption,
+      inProdMode && compression(),
+    ],
 
     define: {
-      ["process.env.NODE_ENV"]: JSON.stringify(process.env.NODE_ENV),
+      ["process.env.NODE_ENV"]: JSON.stringify("development"),
     },
 
     test: {
-      globals: false,
-
-      // environment: "jsdom",
+      environment: "jsdom",
 
       environmentOptions: {
         url: "http://localhost",
@@ -49,11 +69,10 @@ export default defineConfig(({ mode }) => {
       include: ["**/*.test.ts"],
       exclude: ["**/node_modules/**"],
 
-      reporters: ["default", "json", "vitest-sonar-reporter"],
+      reporters: ["default", "json"],
       outputFile: {
         json: "reports/test-report/test-report.json",
         html: "reports/test-report/test-report.html",
-        ["vitest-sonar-reporter"]: "reports/vite-sonar/sonar-report.xml",
       },
 
       coverage: {

@@ -25,7 +25,7 @@ export class WeaveTextToolAction extends WeaveAction {
   }
 
   getName(): string {
-    return "weaveTextTool";
+    return "textTool";
   }
 
   private setupEvents() {
@@ -58,7 +58,7 @@ export class WeaveTextToolAction extends WeaveAction {
   private addText() {
     const stage = this.instance.getStage();
 
-    const selectionPlugin = this.instance.getPlugin<WeaveNodesSelectionPlugin>("weaveNodesSelection");
+    const selectionPlugin = this.instance.getPlugin<WeaveNodesSelectionPlugin>("nodesSelection");
     if (selectionPlugin) {
       const tr = selectionPlugin.getTransformer();
       tr.hide();
@@ -73,7 +73,7 @@ export class WeaveTextToolAction extends WeaveAction {
   private handleAdding() {
     const mainLayer = this.instance.getMainLayer();
 
-    const { mousePoint, container, groupId, zIndex } = this.getMousePointer();
+    const { mousePoint, container } = this.instance.getMousePointer();
 
     this.clickPoint = mousePoint;
     this.container = container;
@@ -83,8 +83,8 @@ export class WeaveTextToolAction extends WeaveAction {
     const nodeHandler = this.instance.getNodeHandler("text");
 
     const node = nodeHandler.createNode(textId, {
-      x: this.clickPoint.x,
-      y: this.clickPoint.y,
+      x: this.clickPoint?.x ?? 0,
+      y: this.clickPoint?.y ?? 0,
       text: "Your text here...",
       width: 300,
       fontSize: 20,
@@ -97,12 +97,9 @@ export class WeaveTextToolAction extends WeaveAction {
       verticalAlign: "top",
       opacity: 1,
       draggable: true,
-      isSelectable: false,
-      groupId,
-      zIndex,
     });
 
-    this.instance.addNode(node);
+    this.instance.addNode(node, this.container?.getAttrs().id);
 
     setTimeout(() => {
       const textNode = mainLayer?.findOne(`#${textId}`) as Konva.Text | undefined;
@@ -135,7 +132,7 @@ export class WeaveTextToolAction extends WeaveAction {
 
     stage.container().style.cursor = "default";
 
-    const selectionPlugin = this.instance.getPlugin<WeaveNodesSelectionPlugin>("weaveNodesSelection");
+    const selectionPlugin = this.instance.getPlugin<WeaveNodesSelectionPlugin>("nodesSelection");
     if (selectionPlugin) {
       const tr = selectionPlugin.getTransformer();
       tr.show();

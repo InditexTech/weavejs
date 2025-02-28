@@ -27,7 +27,7 @@ export class WeaveUsersPointersPlugin extends WeavePlugin {
   }
 
   getName() {
-    return "weaveUsersPointers";
+    return "usersPointers";
   }
 
   getLayerName(): string {

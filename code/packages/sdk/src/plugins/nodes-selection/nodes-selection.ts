@@ -10,6 +10,7 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
   private active: boolean;
   private selecting: boolean;
   private initialized: boolean;
+  private enabled: boolean;
   private callbacks: WeaveNodesSelectionPluginCallbacks;
   render: undefined;
 
@@ -20,6 +21,7 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
     this.active = true;
     this.selecting = false;
     this.initialized = false;
+    this.enabled = true;
   }
 
   registersLayers() {
@@ -27,7 +29,7 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
   }
 
   getName() {
-    return "weaveNodesSelection";
+    return "nodesSelection";
   }
 
   getLayerName(): string {
@@ -58,6 +60,7 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
     selectionLayer?.add(selectionRectangle);
 
     const tr = new Konva.Transformer({
+      id: "selectionTransformer",
       rotationSnaps: [0, 45, 90, 135, 180, 225, 270, 315, 360],
       rotationSnapTolerance: 3,
       ignoreStroke: true,
@@ -74,14 +77,15 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
 
     this.initialized = true;
 
+    this.instance.on("onRender", () => {
+      this.triggerSelectedNodesEvent();
+    });
+
     this.instance.on("onActiveActionChange", (activeAction: string | undefined) => {
       if (typeof activeAction !== "undefined") {
         this.active = false;
         return;
       }
-
-      // stage.container().tabIndex = 1;
-      // stage.container().focus();
 
       this.active = true;
     });
@@ -135,6 +139,7 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
         });
         this.instance.removeNodes(mappedSelectedNodes);
         this.tr.nodes([]);
+        this.triggerSelectedNodesEvent();
         return;
       }
     });
@@ -217,6 +222,8 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
 
       e.evt.preventDefault();
 
+      this.tr.nodes([]);
+
       this.selectionRectangle.visible(false);
       const shapes = stage.find((node: Konva.Node) => {
         return ["Shape", "Group"].includes(node.getType()) && typeof node.getAttrs().id !== "undefined";
@@ -226,7 +233,7 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
 
       const selectedNodes = new Set<Konva.Node>();
       for (const node of selected) {
-        selectedNodes.add(this.instance.getNodeRecursive(node as Konva.Node));
+        selectedNodes.add(this.instance.getInstanceRecursive(node as Konva.Node));
       }
 
       this.tr.nodes([...selectedNodes]);
@@ -237,13 +244,17 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
     });
 
     stage.on("click tap", (e) => {
+      if (!this.enabled) {
+        return;
+      }
+
       let selectedGroup: Konva.Node | undefined = undefined;
       const mousePos = stage.getPointerPosition();
 
       if (mousePos) {
         const inter = stage.getIntersection(mousePos);
         if (inter) {
-          selectedGroup = this.instance.getNodeRecursive(inter);
+          selectedGroup = this.instance.getInstanceRecursive(inter);
         }
       }
 
@@ -282,6 +293,7 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
         // if no key pressed and the node is not selected
         // select just one
         this.tr.nodes([nodeToAdd]);
+        this.tr.show();
         areNodesSelected = true;
       } else if (metaPressed && isSelected) {
         // if we pressed keys and node was selected
@@ -325,5 +337,13 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
     for (const node of selectedNodes) {
       node.destroy();
     }
+  }
+
+  isEnabled() {
+    return this.enabled;
+  }
+
+  setEnabled(enabled: boolean) {
+    this.enabled = enabled;
   }
 }

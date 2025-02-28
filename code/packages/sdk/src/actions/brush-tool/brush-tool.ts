@@ -26,7 +26,7 @@ export class WeaveBrushToolAction extends WeaveAction {
   }
 
   getName(): string {
-    return "weaveBrushTool";
+    return "brushTool";
   }
 
   private setupEvents() {
@@ -84,21 +84,18 @@ export class WeaveBrushToolAction extends WeaveAction {
   }
 
   private handleStartStroke() {
-    const { mousePoint, container, groupId, zIndex } = this.getMousePointer();
+    const { mousePoint, container } = this.instance.getMousePointer();
 
     this.clickPoint = mousePoint;
     this.container = container;
 
     this.tempStroke = new Konva.Line({
-      x: this.clickPoint.x,
-      y: this.clickPoint.y,
+      x: this.clickPoint?.x ?? 0,
+      y: this.clickPoint?.y ?? 0,
       points: [0, 0],
       stroke: "blue",
       strokeWidth: 1,
       opacity: 1,
-      groupId,
-      zIndex,
-      isSelectable: false,
     });
     container?.add(this.tempStroke);
 
@@ -129,8 +126,6 @@ export class WeaveBrushToolAction extends WeaveAction {
         }
       }
 
-      const strokeAttrs = this.tempStroke.getAttrs();
-
       const nodeHandler = this.instance.getNodeHandler("line");
 
       const node = nodeHandler.createNode(uuidv4(), {
@@ -141,12 +136,9 @@ export class WeaveBrushToolAction extends WeaveAction {
         strokeWidth: 1,
         hitStrokeWidth: 10,
         draggable: true,
-        groupId: strokeAttrs.groupId,
-        zIndex: strokeAttrs.zIndex,
-        isSelectable: true,
       });
 
-      this.instance.addNode(node);
+      this.instance.addNode(node, this.container?.getAttrs().id);
 
       this.tempStroke.destroy();
       this.tempStroke = undefined;
@@ -165,7 +157,7 @@ export class WeaveBrushToolAction extends WeaveAction {
     }
 
     if (this.tempStroke && this.container) {
-      const { mousePoint } = this.getMousePointerContainer(this.container);
+      const { mousePoint } = this.instance.getMousePointerRelativeToContainer(this.container);
 
       this.tempStroke.points([
         ...this.tempStroke.points(),
@@ -184,7 +176,7 @@ export class WeaveBrushToolAction extends WeaveAction {
       this.setupEvents();
     }
 
-    const selectionPlugin = this.instance.getPlugin<WeaveNodesSelectionPlugin>("weaveNodesSelection");
+    const selectionPlugin = this.instance.getPlugin<WeaveNodesSelectionPlugin>("nodesSelection");
     if (selectionPlugin) {
       const tr = selectionPlugin.getTransformer();
       tr.hide();
@@ -211,7 +203,7 @@ export class WeaveBrushToolAction extends WeaveAction {
       this.tempStroke.destroy();
     }
 
-    const selectionPlugin = this.instance.getPlugin<WeaveNodesSelectionPlugin>("weaveNodesSelection");
+    const selectionPlugin = this.instance.getPlugin<WeaveNodesSelectionPlugin>("nodesSelection");
     if (selectionPlugin) {
       const tr = selectionPlugin.getTransformer();
       tr.show();

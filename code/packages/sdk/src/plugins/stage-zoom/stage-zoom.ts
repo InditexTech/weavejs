@@ -36,7 +36,7 @@ export class WeaveStageZoomPlugin extends WeavePlugin {
   }
 
   getName() {
-    return "weaveStageZoom";
+    return "stageZoom";
   }
 
   init() {
@@ -192,7 +192,7 @@ export class WeaveStageZoomPlugin extends WeavePlugin {
   fitToSelection() {
     const stage = this.instance.getStage();
 
-    const selectionPlugin = this.instance.getPlugin<WeaveNodesSelectionPlugin>("weaveNodesSelection");
+    const selectionPlugin = this.instance.getPlugin<WeaveNodesSelectionPlugin>("nodesSelection");
     const nodes = selectionPlugin.getTransformer().getNodes();
 
     if (nodes.length === 0) {

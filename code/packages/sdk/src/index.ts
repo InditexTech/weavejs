@@ -39,6 +39,10 @@ export * from "./actions/text-tool/types";
 export { WeaveImageToolAction } from "./actions/image-tool/image-tool";
 export * from "./actions/image-tool/constants";
 export * from "./actions/image-tool/types";
+export { WeaveExportStageToolAction } from "./actions/export-stage-tool/export-stage-tool";
+export * from "./actions/export-stage-tool/types";
+export { WeaveExportNodeToolAction } from "./actions/export-node-tool/export-node-tool";
+export * from "./actions/export-node-tool/types";
 
 // Provided Plugins
 export { WeaveStageGridPlugin } from "./plugins/stage-grid/stage-grid";
@@ -55,12 +59,12 @@ export { WeaveConnectedUsersPlugin } from "./plugins/connected-users/connected-u
 export * from "./plugins/connected-users/types";
 export { WeaveUsersPointersPlugin } from "./plugins/users-pointers/users-pointers";
 export * from "./plugins/users-pointers/types";
-export { WeaveStageContextMenuPlugin } from "./plugins/stage-context-menu/stage-context-menu";
-export * from "./plugins/stage-context-menu/types";
+export { WeaveContextMenuPlugin } from "./plugins/context-menu/context-menu";
+export * from "./plugins/context-menu/types";
 export { WeaveImageEditionPlugin } from "./plugins/image-edition/image-edition";
 export * from "./plugins/image-edition/constants";
 export { WeaveStageDropAreaPlugin } from "./plugins/stage-drop-area/stage-drop-area";
 export * from "./plugins/stage-drop-area/types";
-// export { WeaveCopyPasteNodesPlugin } from "./plugins/copy-paste-nodes/copy-paste-nodes";
-// export * from "./plugins/copy-paste-nodes/constants";
-// export * from "./plugins/copy-paste-nodes/types";
+export { WeaveCopyPasteNodesPlugin } from "./plugins/copy-paste-nodes/copy-paste-nodes";
+export * from "./plugins/copy-paste-nodes/constants";
+export * from "./plugins/copy-paste-nodes/types";

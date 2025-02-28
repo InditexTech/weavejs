@@ -1,15 +1,20 @@
 import { Weave } from "@/weave";
-import { WeaveAwarenessChange, WeaveState } from "@/types";
+import { WeaveAwarenessChange, WeaveState, WeaveUndoRedoChange } from "@/types";
 import { MappedTypeDescription } from "@syncedstore/core/types/doc";
-import { syncedStore, getYjsDoc } from "@syncedstore/core";
-import { Doc } from "yjs";
+import { observeDeep, syncedStore, getYjsDoc, getYjsValue } from "@syncedstore/core";
+import { Doc, AbstractType, UndoManager } from "yjs";
+import { Logger } from "pino";
 
 export abstract class WeaveStore {
   protected instance!: Weave;
   protected name!: string;
+  protected supportsUndoManager!: boolean;
+
   private state!: MappedTypeDescription<WeaveState>;
   private latestState: WeaveState;
   private document: Doc;
+  private logger!: Logger;
+  private undoManager!: UndoManager;
 
   constructor() {
     this.latestState = {
@@ -29,11 +34,19 @@ export abstract class WeaveStore {
   }
 
   getName(): string {
-    return "storeName";
+    return this.name;
+  }
+
+  getLogger() {
+    return this.logger;
   }
 
   register(instance: Weave) {
     this.instance = instance;
+    this.logger = this.instance.getChildLogger(this.getName());
+
+    this.instance.getMainLogger().info(`Store with name [${this.getName()}] registered`);
+
     return this;
   }
 
@@ -61,6 +74,87 @@ export abstract class WeaveStore {
     return JSON.parse(JSON.stringify(this.state, undefined, 2)) as WeaveState;
   }
 
+  setup() {
+    const config = this.instance.getConfiguration();
+
+    if (this.supportsUndoManager) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const weaveStateValues = getYjsValue(this.getState().weave) as AbstractType<any>;
+
+      if (weaveStateValues) {
+        this.undoManager = new UndoManager([weaveStateValues], {
+          captureTimeout: 250,
+          captureTransaction: (tran) => tran.beforeState.size !== 0,
+        });
+
+        this.undoManager.on("stack-item-added", () => {
+          const change: WeaveUndoRedoChange = {
+            canUndo: this.undoManager.canUndo(),
+            canRedo: this.undoManager.canRedo(),
+            redoStackLength: this.undoManager.redoStack.length,
+            undoStackLength: this.undoManager.undoStack.length,
+          };
+
+          config.callbacks?.onUndoManagerStatusChange?.(change);
+          this.instance.emitEvent("onUndoManagerStatusChange", change);
+        });
+
+        this.undoManager.on("stack-item-popped", () => {
+          const change: WeaveUndoRedoChange = {
+            canUndo: this.undoManager.canUndo(),
+            canRedo: this.undoManager.canRedo(),
+            redoStackLength: this.undoManager.redoStack.length,
+            undoStackLength: this.undoManager.undoStack.length,
+          };
+
+          config.callbacks?.onUndoManagerStatusChange?.(change);
+          this.instance.emitEvent("onUndoManagerStatusChange", change);
+        });
+      }
+    }
+
+    observeDeep(this.getState(), () => {
+      const newState = JSON.parse(JSON.stringify(this.getState()));
+      config.callbacks?.onStateChange?.(newState);
+      this.instance.emitEvent("onStateChange", newState);
+      this.instance.render();
+    });
+
+    this.instance.getStageManager().setupStage();
+  }
+
+  canUndoStateStep() {
+    if (!this.supportsUndoManager) {
+      throw new Error("Undo manager not supported");
+    }
+
+    return this.undoManager.canUndo();
+  }
+
+  canRedoStateStep() {
+    if (!this.supportsUndoManager) {
+      throw new Error("Undo manager not supported");
+    }
+
+    return this.undoManager.canRedo();
+  }
+
+  undoStateStep() {
+    if (!this.supportsUndoManager) {
+      throw new Error("Undo manager not supported");
+    }
+
+    this.undoManager.undo();
+  }
+
+  redoStateStep() {
+    if (!this.supportsUndoManager) {
+      throw new Error("Undo manager not supported");
+    }
+
+    this.undoManager.redo();
+  }
+
   abstract connect(): void;
 
   abstract disconnect(): void;
@@ -68,12 +162,4 @@ export abstract class WeaveStore {
   abstract onAwarenessChange<K extends string, T>(callback: (changes: WeaveAwarenessChange<K, T>[]) => void): void;
 
   abstract setAwarenessInfo(field: string, value: unknown): void;
-
-  abstract canUndoStateStep(): boolean;
-
-  abstract canRedoStateStep(): boolean;
-
-  abstract undoStateStep(): void;
-
-  abstract redoStateStep(): void;
 }

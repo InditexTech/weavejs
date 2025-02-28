@@ -19,7 +19,7 @@ export default defineConfig(({ mode }) => {
         fileName: "sdk",
       },
       rollupOptions: {
-        external: ["yjs", "@syncedstore/core", /konva.*/],
+        external: ["react", "@types/react", "yjs", "@syncedstore/core", /konva.*/],
       },
     },
 
@@ -32,7 +32,7 @@ export default defineConfig(({ mode }) => {
     plugins: [dts({ rollupTypes: true }) as PluginOption & { name: string }, inProdMode && compression()],
 
     define: {
-      ["process.env.NODE_ENV"]: JSON.stringify("development"),
+      ["process.env.NODE_ENV"]: JSON.stringify(process.env.NODE_ENV),
     },
 
     test: {

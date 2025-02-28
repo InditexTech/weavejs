@@ -5,11 +5,11 @@ export class WeaveZoomInToolAction extends WeaveAction {
   cleanup = undefined;
 
   getName(): string {
-    return "weaveZoomInTool";
+    return "zoomInTool";
   }
 
   private getStageZoomPlugin() {
-    return this.instance.getPlugin<WeaveStageZoomPlugin>("weaveStageZoom");
+    return this.instance.getPlugin<WeaveStageZoomPlugin>("stageZoom");
   }
 
   init() {

@@ -10,7 +10,7 @@ export class WeaveStageResizePlugin extends WeavePlugin {
   }
 
   getName() {
-    return "weaveStageResize";
+    return "stageResize";
   }
 
   init() {

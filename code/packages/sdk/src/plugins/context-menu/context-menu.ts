@@ -1,14 +1,10 @@
 import { WeavePlugin } from "@/plugins/plugin";
-import {
-  WeaveNodeSelectionStructure,
-  WeaveStageContextMenuPluginCallbacks,
-  WeaveStageContextMenuPluginOptions,
-} from "./types";
-import { WeaveElementInstance } from "@/types";
+import { WeaveStageContextMenuPluginCallbacks, WeaveStageContextMenuPluginOptions } from "./types";
+import { WeaveElementInstance, WeaveSelection } from "@/types";
 import { Vector2d } from "konva/lib/types";
 import { WeaveNodesSelectionPlugin } from "../nodes-selection/nodes-selection";
 
-export class WeaveStageContextMenuPlugin extends WeavePlugin {
+export class WeaveContextMenuPlugin extends WeavePlugin {
   private config: WeaveStageContextMenuPluginOptions;
   private callbacks: WeaveStageContextMenuPluginCallbacks;
   getLayerName = undefined;
@@ -27,7 +23,7 @@ export class WeaveStageContextMenuPlugin extends WeavePlugin {
   }
 
   getName() {
-    return "weaveStageContextMenu";
+    return "contextMenu";
   }
 
   init() {
@@ -37,7 +33,7 @@ export class WeaveStageContextMenuPlugin extends WeavePlugin {
   private initEvents() {
     const stage = this.instance.getStage();
 
-    const selectionPlugin = this.instance.getPlugin<WeaveNodesSelectionPlugin>("weaveNodesSelection");
+    const selectionPlugin = this.instance.getPlugin<WeaveNodesSelectionPlugin>("nodesSelection");
 
     stage.on("contextmenu", (e) => {
       e.evt.preventDefault();
@@ -62,7 +58,7 @@ export class WeaveStageContextMenuPlugin extends WeavePlugin {
         return;
       }
 
-      let nodes: WeaveNodeSelectionStructure[] = [];
+      let nodes: WeaveSelection[] = [];
 
       if (clickOnTransformer) {
         const transformer = selectionPlugin.getTransformer();
@@ -72,7 +68,7 @@ export class WeaveStageContextMenuPlugin extends WeavePlugin {
           .map((node) => {
             const nodeHandler = this.instance.getNodeHandler(node.getAttrs().nodeType);
 
-            return { konvaNode: node, node: nodeHandler.toNode(node as WeaveElementInstance) };
+            return { instance: node as WeaveElementInstance, node: nodeHandler.toNode(node as WeaveElementInstance) };
           })
           .filter((node) => node !== undefined);
       }

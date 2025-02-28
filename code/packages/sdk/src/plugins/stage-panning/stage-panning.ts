@@ -17,7 +17,7 @@ export class WeaveStagePanningPlugin extends WeavePlugin {
   }
 
   getName() {
-    return "weaveStagePanning";
+    return "stagePanning";
   }
 
   init() {

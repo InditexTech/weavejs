@@ -1,0 +1,23 @@
+{
+  "env": {
+    "es2022": true,
+    "browser": true
+  },
+  "parser": "@typescript-eslint/parser",
+  "parserOptions": {
+    "ecmaVersion": 2022,
+    "sourceType": "module",
+    "ecmaFeatures": {
+      "jsx": true
+    }
+  },
+  "extends": ["@inditex/eslint-config/typescript", "@inditex/eslint-config/react-ts"],
+  "globals": {
+    "JSX": "readonly",
+    "window": "readonly",
+    "document": "readonly"
+  },
+  "rules": {
+    "@typescript-eslint/no-explicit-any": "warn"
+  }
+}

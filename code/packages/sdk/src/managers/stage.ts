@@ -1,0 +1,114 @@
+import Konva from "konva";
+import { Logger } from "pino";
+import { Weave } from "@/weave";
+import { WEAVE_NODE_LAYER_ID } from "@/constants";
+
+export class WeaveStageManager {
+  private instance: Weave;
+  private logger: Logger;
+  private stage!: Konva.Stage;
+  private config!: Konva.StageConfig;
+
+  constructor(instance: Weave, config: Konva.StageConfig) {
+    this.instance = instance;
+    this.config = config;
+    this.logger = this.instance.getChildLogger("stage-manager");
+    this.logger.debug({ config }, "Stage manager created");
+  }
+
+  getConfiguration() {
+    return this.config;
+  }
+
+  setStage(stage: Konva.Stage) {
+    this.stage = stage;
+  }
+
+  getStage() {
+    return this.stage;
+  }
+
+  getMainLayer() {
+    const stage = this.getStage();
+    return stage.findOne(`#${WEAVE_NODE_LAYER_ID}`) as Konva.Layer | undefined;
+  }
+
+  setupStage() {
+    const stageConfig = this.instance.getStageConfiguration();
+    const state = this.instance.getStore().getState();
+
+    state.weave.key = "stage";
+    state.weave.type = "stage";
+    state.weave.props = {
+      id: "stage",
+      type: "stage",
+      container: stageConfig?.container ?? "weave",
+      width: stageConfig?.width,
+      height: stageConfig?.height,
+      children: [
+        {
+          key: "gridLayer",
+          type: "layer",
+          props: {
+            id: "gridLayer",
+            children: [],
+          },
+        },
+        {
+          key: "mainLayer",
+          type: "layer",
+          props: {
+            id: "mainLayer",
+            children: [],
+          },
+        },
+        {
+          key: "selectionLayer",
+          type: "layer",
+          props: {
+            id: "selectionLayer",
+            children: [],
+          },
+        },
+        {
+          key: "usersPointersLayer",
+          type: "layer",
+          props: {
+            id: "usersPointersLayer",
+            children: [],
+          },
+        },
+        {
+          key: "utilityLayer",
+          type: "layer",
+          props: {
+            id: "utilityLayer",
+            children: [],
+          },
+        },
+      ],
+    };
+  }
+
+  getInstanceRecursive(instance: Konva.Node, filterInstanceType: string[] = []): Konva.Node {
+    const attributes = instance.getAttrs();
+
+    if (
+      instance.getParent() &&
+      instance.getParent()?.getAttrs().nodeType &&
+      !["stage", "layer", ...filterInstanceType].includes(instance.getParent()?.getAttrs().nodeType)
+    ) {
+      return this.getInstanceRecursive(instance.getParent() as Konva.Node);
+    }
+
+    if (attributes.id === "mainLayer") {
+      return this.instance.getMainLayer() as Konva.Node;
+    }
+
+    if (attributes.id === "stage") {
+      return this.instance.getMainLayer() as Konva.Node;
+    }
+
+    return instance;
+  }
+}

@@ -1,5 +1,5 @@
 import Konva from "konva";
-import { WeaveElementAttributes, WeaveElementInstance } from "@/types";
+import { WeaveElementAttributes, WeaveElementInstance, WeaveStateElement } from "@/types";
 import { WeaveNode } from "../node";
 
 export const WEAVE_LAYER_NODE_TYPE = "layer";
@@ -29,10 +29,8 @@ export class WeaveLayerNode extends WeaveNode {
   }
 
   updateInstance(nodeInstance: WeaveElementInstance, nextProps: WeaveElementAttributes) {
-    const nodeInstanceZIndex = nodeInstance.zIndex();
     nodeInstance.setAttrs({
       ...nextProps,
-      zIndex: nodeInstanceZIndex,
     });
   }
 
@@ -43,6 +41,13 @@ export class WeaveLayerNode extends WeaveNode {
   toNode(instance: WeaveElementInstance) {
     const attrs = instance.getAttrs();
 
+    const childrenMapped: WeaveStateElement[] = [];
+    const children: WeaveElementInstance[] = [...(instance as Konva.Group).getChildren()];
+    for (const node of children) {
+      const handler = this.instance.getNodeHandler(node.getAttr("nodeType"));
+      childrenMapped.push(handler.toNode(node));
+    }
+
     return {
       key: attrs.id ?? "",
       type: attrs.nodeType,
@@ -50,7 +55,7 @@ export class WeaveLayerNode extends WeaveNode {
         ...attrs,
         id: attrs.id ?? "",
         nodeType: attrs.nodeType,
-        children: [],
+        children: childrenMapped,
       },
     };
   }

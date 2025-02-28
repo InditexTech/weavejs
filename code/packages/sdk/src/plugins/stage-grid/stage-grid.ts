@@ -20,7 +20,7 @@ export class WeaveStageGridPlugin extends WeavePlugin {
   }
 
   getName() {
-    return "weaveStageGrid";
+    return "stageGrid";
   }
 
   getLayerName() {

@@ -2,10 +2,10 @@ import Konva from "konva";
 import { WeaveElementAttributes, WeaveElementInstance } from "@/types";
 import { WeaveNode } from "../node";
 
-export const WEAVE_LAYER_RECTANGLE = "rectangle";
+export const WEAVE_RECTANGLE_NODE_TYPE = "rectangle";
 
 export class WeaveRectangleNode extends WeaveNode {
-  protected nodeType = WEAVE_LAYER_RECTANGLE;
+  protected nodeType = WEAVE_RECTANGLE_NODE_TYPE;
 
   createNode(key: string, props: WeaveElementAttributes) {
     return {
@@ -21,36 +21,46 @@ export class WeaveRectangleNode extends WeaveNode {
   }
 
   createInstance(props: WeaveElementAttributes) {
-    const stage = this.instance.getStage();
-
     const rect = new Konva.Rect({
       ...props,
     });
 
-    rect.on("dragmove", () => {
+    rect.on("transform", () => {
       this.instance.updateNode(this.toNode(rect));
     });
 
-    rect.on("dragend", () => {
+    rect.on("dragmove", (e) => {
       this.instance.updateNode(this.toNode(rect));
+      e.cancelBubble = true;
     });
 
-    rect.on("mouseenter", () => {
-      stage.container().style.cursor = "pointer";
+    rect.on("dragend", (e) => {
+      this.instance.updateNode(this.toNode(rect));
+      e.cancelBubble = true;
     });
 
-    rect.on("mouseleave", () => {
-      stage.container().style.cursor = "default";
+    rect.on("mouseenter", (e) => {
+      if (!this.instance.getActiveAction()) {
+        const stage = this.instance.getStage();
+        stage.container().style.cursor = "pointer";
+        e.cancelBubble = true;
+      }
+    });
+
+    rect.on("mouseleave", (e) => {
+      if (!this.instance.getActiveAction()) {
+        const stage = this.instance.getStage();
+        stage.container().style.cursor = "default";
+        e.cancelBubble = true;
+      }
     });
 
     return rect;
   }
 
   updateInstance(nodeInstance: WeaveElementInstance, nextProps: WeaveElementAttributes) {
-    const nodeInstanceZIndex = nodeInstance.zIndex();
     nodeInstance.setAttrs({
       ...nextProps,
-      zIndex: nodeInstanceZIndex,
     });
   }
 

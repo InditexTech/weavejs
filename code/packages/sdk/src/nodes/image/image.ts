@@ -34,8 +34,6 @@ export class WeaveImageNode extends WeaveNode {
   }
 
   createInstance(props: WeaveElementAttributes) {
-    const stage = this.instance.getStage();
-
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const imageProperties: any = props.imageProperties;
     const imageProps = props as ImageProps;
@@ -50,6 +48,7 @@ export class WeaveImageNode extends WeaveNode {
     const internalImageProps = {
       ...props,
     };
+    delete internalImageProps.nodeType;
     delete internalImageProps.imageProperties;
     delete internalImageProps.imageURL;
     delete internalImageProps.zIndex;
@@ -61,7 +60,6 @@ export class WeaveImageNode extends WeaveNode {
 
     const imagePlaceholder = new Konva.Rect({
       ...groupImageProps,
-      groupId: id,
       id: `${id}-placeholder`,
       x: 0,
       y: 0,
@@ -75,7 +73,6 @@ export class WeaveImageNode extends WeaveNode {
       strokeWidth: 1,
       draggable: false,
       visible: true,
-      isSelectable: false,
     });
 
     image.add(imagePlaceholder);
@@ -83,7 +80,6 @@ export class WeaveImageNode extends WeaveNode {
     const internalImage = new Konva.Image({
       ...internalImageProps,
       ...imageProperties,
-      groupId: id,
       id: `${id}-image`,
       x: 0,
       y: 0,
@@ -94,7 +90,6 @@ export class WeaveImageNode extends WeaveNode {
       height: 0,
       draggable: false,
       visible: false,
-      isSelectable: false,
     });
 
     image.add(internalImage);
@@ -104,32 +99,18 @@ export class WeaveImageNode extends WeaveNode {
     });
 
     image.on("mouseenter", (e) => {
-      e.evt.preventDefault();
-
-      const activeAction = this.instance.getActiveAction();
-      if (typeof activeAction !== "undefined") {
-        return;
-      }
-
-      if (image.getAttrs().isSelectable) {
-        stage.container().style.cursor = "pointer";
-      }
+      const stage = this.instance.getStage();
+      stage.container().style.cursor = "pointer";
+      e.cancelBubble = true;
     });
 
     image.on("mouseleave", (e) => {
-      e.evt.preventDefault();
-
-      const activeAction = this.instance.getActiveAction();
-      if (typeof activeAction !== "undefined") {
-        return;
-      }
-
-      if (image.getAttrs().isSelectable) {
-        stage.container().style.cursor = "default";
-      }
+      const stage = this.instance.getStage();
+      stage.container().style.cursor = "default";
+      e.cancelBubble = true;
     });
 
-    const selectionPlugin = this.instance.getPlugin<WeaveNodesSelectionPlugin>("weaveNodesSelection");
+    const selectionPlugin = this.instance.getPlugin<WeaveNodesSelectionPlugin>("nodesSelection");
 
     selectionPlugin?.getTransformer().on("dblclick dbltap", (e) => {
       e.evt.preventDefault();
@@ -147,12 +128,14 @@ export class WeaveImageNode extends WeaveNode {
       imageEditionPlugin.start();
     });
 
-    image.on("dragmove", () => {
+    image.on("dragmove", (e) => {
       this.instance.updateNode(this.toNode(image));
+      e.cancelBubble = true;
     });
 
-    image.on("dragend", () => {
+    image.on("dragend", (e) => {
       this.instance.updateNode(this.toNode(image));
+      e.cancelBubble = true;
     });
 
     const imageActionTool = this.getImageToolAction();
@@ -192,10 +175,8 @@ export class WeaveImageNode extends WeaveNode {
     const id = nodeInstance.getAttrs().id;
     const node = nodeInstance as Konva.Group;
 
-    const nodeInstanceZIndex = nodeInstance.zIndex();
     nodeInstance.setAttrs({
       ...nextProps,
-      zIndex: nodeInstanceZIndex,
     });
 
     const imagePlaceholder = node.findOne(`#${id}-placeholder`) as Konva.Rect | undefined;
@@ -203,11 +184,18 @@ export class WeaveImageNode extends WeaveNode {
 
     const nodeAttrs = node.getAttrs();
 
+    const internalImageProps = {
+      ...nodeAttrs,
+    };
+    delete internalImageProps.nodeType;
+    delete internalImageProps.imageProperties;
+    delete internalImageProps.imageURL;
+    delete internalImageProps.zIndex;
+
     if (!this.imageLoaded) {
       imagePlaceholder?.setAttrs({
+        ...internalImageProps,
         ...(nodeAttrs.imageProperties ?? {}),
-        ...nodeAttrs,
-        groupId: id,
         id: `${id}-placeholder`,
         x: 0,
         y: 0,
@@ -220,12 +208,10 @@ export class WeaveImageNode extends WeaveNode {
         strokeWidth: 1,
         draggable: false,
         zIndex: 0,
-        isSelectable: false,
       });
       internalImage?.setAttrs({
+        ...internalImageProps,
         ...(nodeAttrs.imageProperties ?? {}),
-        ...nodeAttrs,
-        groupId: id,
         id: `${id}-image`,
         x: 0,
         y: 0,
@@ -235,14 +221,12 @@ export class WeaveImageNode extends WeaveNode {
         visible: false,
         draggable: false,
         zIndex: 1,
-        isSelectable: false,
       });
     }
     if (this.imageLoaded) {
       imagePlaceholder?.setAttrs({
+        ...internalImageProps,
         ...(nodeAttrs.imageProperties ?? {}),
-        ...nodeAttrs,
-        groupId: id,
         id: `${id}-placeholder`,
         x: 0,
         y: 0,
@@ -255,12 +239,10 @@ export class WeaveImageNode extends WeaveNode {
         strokeWidth: 1,
         draggable: false,
         zIndex: 0,
-        isSelectable: false,
       });
       internalImage?.setAttrs({
+        ...internalImageProps,
         ...(nodeAttrs.imageProperties ?? {}),
-        ...nodeAttrs,
-        groupId: id,
         id: `${id}-image`,
         x: 0,
         y: 0,
@@ -270,11 +252,10 @@ export class WeaveImageNode extends WeaveNode {
         visible: true,
         draggable: false,
         zIndex: 1,
-        isSelectable: false,
       });
     }
 
-    const selectionPlugin = this.instance.getPlugin<WeaveNodesSelectionPlugin>("weaveNodesSelection");
+    const selectionPlugin = this.instance.getPlugin<WeaveNodesSelectionPlugin>("nodesSelection");
     if (selectionPlugin) {
       const tr = selectionPlugin.getTransformer();
       tr.forceUpdate();
@@ -347,7 +328,7 @@ export class WeaveImageNode extends WeaveNode {
   }
 
   private getImageToolAction() {
-    const imageToolAction = this.instance.getActionHandler<WeaveImageToolAction>("weaveImageTool");
+    const imageToolAction = this.instance.getActionHandler<WeaveImageToolAction>("imageTool");
     if (!imageToolAction) {
       throw new Error("Image Tool action not found");
     }
@@ -355,7 +336,7 @@ export class WeaveImageNode extends WeaveNode {
   }
 
   private getImageEditionPlugin() {
-    const imageEditionPlugin = this.instance.getPlugin<WeaveImageEditionPlugin>("weaveImageEdition");
+    const imageEditionPlugin = this.instance.getPlugin<WeaveImageEditionPlugin>("imageEdition");
     if (!imageEditionPlugin) {
       throw new Error("Image edition plugin not found");
     }

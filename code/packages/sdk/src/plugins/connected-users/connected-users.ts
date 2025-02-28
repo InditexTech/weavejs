@@ -28,7 +28,7 @@ export class WeaveConnectedUsersPlugin extends WeavePlugin {
   }
 
   getName() {
-    return "weaveConnectedUsers";
+    return "connectedUsers";
   }
 
   init() {

@@ -30,11 +30,7 @@ export class WeaveStageNode extends WeaveNode {
     return stage;
   }
 
-  updateInstance(nodeInstance: WeaveElementInstance, nextProps: WeaveElementAttributes) {
-    nodeInstance.setAttrs({
-      ...nextProps,
-    });
-  }
+  updateInstance() {}
 
   removeInstance(nodeInstance: WeaveElementInstance) {
     nodeInstance.destroy();

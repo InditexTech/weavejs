@@ -34,7 +34,7 @@ export class WeaveImageToolAction extends WeaveAction {
   }
 
   getName(): string {
-    return "weaveImageTool";
+    return "imageTool";
   }
 
   getPreloadedImage(imageId: string): HTMLImageElement | undefined {
@@ -42,9 +42,9 @@ export class WeaveImageToolAction extends WeaveAction {
   }
 
   init() {
-    this.instance.listenEvent("onStageDrop", () => {
+    this.instance.addEventListener("onStageDrop", () => {
       if (window.weaveDragImageURL) {
-        this.instance.triggerAction("weaveImageTool", {
+        this.instance.triggerAction("imageTool", {
           imageURL: window.weaveDragImageURL,
         });
       }
@@ -115,7 +115,7 @@ export class WeaveImageToolAction extends WeaveAction {
   }
 
   private addImageNode() {
-    const selectionPlugin = this.instance.getPlugin<WeaveNodesSelectionPlugin>("weaveNodesSelection");
+    const selectionPlugin = this.instance.getPlugin<WeaveNodesSelectionPlugin>("nodesSelection");
     if (selectionPlugin) {
       const tr = selectionPlugin.getTransformer();
       tr.hide();
@@ -137,7 +137,6 @@ export class WeaveImageToolAction extends WeaveAction {
         fill: "#CCCCCCCC",
         stroke: "#000000FF",
         strokeWidth: 1,
-        isSelectable: false,
       });
 
       mainLayer?.add(this.area);
@@ -148,7 +147,7 @@ export class WeaveImageToolAction extends WeaveAction {
   }
 
   private addImage() {
-    const selectionPlugin = this.instance.getPlugin<WeaveNodesSelectionPlugin>("weaveNodesSelection");
+    const selectionPlugin = this.instance.getPlugin<WeaveNodesSelectionPlugin>("nodesSelection");
     if (selectionPlugin) {
       const tr = selectionPlugin.getTransformer();
       tr.hide();
@@ -161,7 +160,7 @@ export class WeaveImageToolAction extends WeaveAction {
 
   private handleAdding() {
     if (this.imageId && this.imageURL && this.preloadImgs[this.imageId]) {
-      const { mousePoint, container, groupId, zIndex } = this.getMousePointer();
+      const { mousePoint, container } = this.instance.getMousePointer();
 
       this.clickPoint = mousePoint;
       this.container = container;
@@ -169,8 +168,8 @@ export class WeaveImageToolAction extends WeaveAction {
       const nodeHandler = this.instance.getNodeHandler("image");
 
       const node = nodeHandler.createNode(this.imageId, {
-        x: this.clickPoint.x,
-        y: this.clickPoint.y,
+        x: this.clickPoint?.x ?? 0,
+        y: this.clickPoint?.y ?? 0,
         width: this.preloadImgs[this.imageId].width,
         height: this.preloadImgs[this.imageId].height,
         opacity: 1,
@@ -182,12 +181,9 @@ export class WeaveImageToolAction extends WeaveAction {
           width: this.preloadImgs[this.imageId].width,
           height: this.preloadImgs[this.imageId].height,
         },
-        groupId,
-        zIndex,
-        isSelectable: true,
       });
 
-      this.instance.addNode(node);
+      this.instance.addNode(node, this.container?.getAttrs().id);
 
       this.setState(IMAGE_TOOL_STATE.FINISHED);
     }
@@ -215,7 +211,7 @@ export class WeaveImageToolAction extends WeaveAction {
   }
 
   cleanup() {
-    const selectionPlugin = this.instance.getPlugin<WeaveNodesSelectionPlugin>("weaveNodesSelection");
+    const selectionPlugin = this.instance.getPlugin<WeaveNodesSelectionPlugin>("nodesSelection");
     if (selectionPlugin) {
       const tr = selectionPlugin.getTransformer();
       tr.show();

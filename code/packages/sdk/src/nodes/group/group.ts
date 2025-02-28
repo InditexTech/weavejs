@@ -1,5 +1,5 @@
 import Konva from "konva";
-import { WeaveElementAttributes, WeaveElementInstance } from "@/types";
+import { WeaveElementAttributes, WeaveElementInstance, WeaveStateElement } from "@/types";
 import { WeaveNode } from "../node";
 
 export const WEAVE_GROUP_NODE_TYPE = "group";
@@ -21,10 +21,12 @@ export class WeaveGroupNode extends WeaveNode {
   }
 
   createInstance(props: WeaveElementAttributes) {
-    const stage = this.instance.getStage();
-
     const group = new Konva.Group({
       ...props,
+    });
+
+    group.on("transform", () => {
+      this.instance.updateNode(this.toNode(group));
     });
 
     group.on("dragmove", () => {
@@ -36,10 +38,12 @@ export class WeaveGroupNode extends WeaveNode {
     });
 
     group.on("mouseenter", () => {
+      const stage = this.instance.getStage();
       stage.container().style.cursor = "pointer";
     });
 
     group.on("mouseleave", () => {
+      const stage = this.instance.getStage();
       stage.container().style.cursor = "default";
     });
 
@@ -47,10 +51,8 @@ export class WeaveGroupNode extends WeaveNode {
   }
 
   updateInstance(nodeInstance: WeaveElementInstance, nextProps: WeaveElementAttributes) {
-    const nodeInstanceZIndex = nodeInstance.zIndex();
     nodeInstance.setAttrs({
       ...nextProps,
-      zIndex: nodeInstanceZIndex,
     });
   }
 
@@ -61,6 +63,13 @@ export class WeaveGroupNode extends WeaveNode {
   toNode(instance: WeaveElementInstance) {
     const attrs = instance.getAttrs();
 
+    const childrenMapped: WeaveStateElement[] = [];
+    const children: WeaveElementInstance[] = [...(instance as Konva.Group).getChildren()];
+    for (const node of children) {
+      const handler = this.instance.getNodeHandler(node.getAttr("nodeType"));
+      childrenMapped.push(handler.toNode(node));
+    }
+
     return {
       key: attrs.id ?? "",
       type: attrs.nodeType,
@@ -68,7 +77,7 @@ export class WeaveGroupNode extends WeaveNode {
         ...attrs,
         id: attrs.id ?? "",
         nodeType: attrs.nodeType,
-        children: [],
+        children: childrenMapped,
       },
     };
   }

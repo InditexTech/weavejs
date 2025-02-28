@@ -5,11 +5,11 @@ export class WeaveFitToScreenToolAction extends WeaveAction {
   cleanup = undefined;
 
   getName(): string {
-    return "weaveFitToScreenTool";
+    return "fitToScreenTool";
   }
 
   private getStageZoomPlugin() {
-    return this.instance.getPlugin<WeaveStageZoomPlugin>("weaveStageZoom");
+    return this.instance.getPlugin<WeaveStageZoomPlugin>("stageZoom");
   }
 
   init() {

@@ -21,10 +21,12 @@ export class WeaveLineNode extends WeaveNode {
   }
 
   createInstance(props: WeaveElementAttributes) {
-    const stage = this.instance.getStage();
-
     const line = new Konva.Line({
       ...props,
+    });
+
+    line.on("transform", () => {
+      this.instance.updateNode(this.toNode(line));
     });
 
     line.on("dragmove", () => {
@@ -36,10 +38,12 @@ export class WeaveLineNode extends WeaveNode {
     });
 
     line.on("mouseenter", () => {
+      const stage = this.instance.getStage();
       stage.container().style.cursor = "pointer";
     });
 
     line.on("mouseleave", () => {
+      const stage = this.instance.getStage();
       stage.container().style.cursor = "default";
     });
 
@@ -47,10 +51,8 @@ export class WeaveLineNode extends WeaveNode {
   }
 
   updateInstance(nodeInstance: WeaveElementInstance, nextProps: WeaveElementAttributes) {
-    const nodeInstanceZIndex = nodeInstance.zIndex();
     nodeInstance.setAttrs({
       ...nextProps,
-      zIndex: nodeInstanceZIndex,
     });
   }
 

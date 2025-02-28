@@ -1,476 +1,333 @@
-import { isEmpty } from "lodash";
-// import { isEmpty, orderBy } from "lodash";
 import Emittery from "emittery";
 import Konva from "konva";
-// import { v4 as uuidv4 } from "uuid";
-import { WeaveConfig, NodeSerializable, WeaveStateElement, WeaveState } from "@/types";
+import { Vector2d } from "konva/lib/types";
+import { Logger } from "pino";
+import {
+  WeaveConfig,
+  WeaveStateElement,
+  WeaveState,
+  WeaveElementInstance,
+  WeavePosition,
+  WeaveExportNodeOptions,
+} from "./types";
 import { WeaveStore } from "./stores/store";
 import { WeaveNode } from "./nodes/node";
 import { WeaveAction } from "./actions/action";
 import { WeavePlugin } from "./plugins/plugin";
-// import { WEAVE_NODE_LAYER_ID } from "./plugins/nodes-layer/constants";
-import { GroupSerializable } from "./types";
-// import { Vector2d } from "konva/lib/types";
 import { WeaveReconciler } from "./reconciler/reconciler";
 import { WeaveStateSerializer } from "./state-serializer/state-serializer";
 import { WeaveRenderer } from "./renderer/renderer";
-import { WEAVE_NODE_LAYER_ID } from "./constants";
+import { WeaveGroupsManager } from "./managers/groups";
+import { WeaveLogger } from "./logger/logger";
+import { WeaveTargetingManager } from "./managers/targeting";
+import { WeaveCloningManager } from "./managers/cloning";
+import { WeaveFontsManager } from "./managers/fonts";
+import { WeaveZIndexManager } from "./managers/zindex";
+import { WeaveStateManager } from "./managers/state";
+import { WeaveRegisterManager } from "./managers/register";
+import { WeaveSetupManager } from "./managers/setup";
+import { WeaveStageManager } from "./managers/stage";
+import { WeaveActionsManager } from "./managers/actions";
+import { WeaveStoreManager } from "./managers/store";
+import { WeaveExportManager } from "./managers/export";
 
 export class Weave extends Emittery {
   private config: WeaveConfig;
-  private stage!: Konva.Stage;
-  private stageConfig: Konva.StageConfig;
-  private store!: WeaveStore;
-  private nodesHandlers: Record<string, WeaveNode> = {};
-  private actionsHandlers: Record<string, WeaveAction> = {};
-  private activeAction: string | undefined = undefined;
-  private plugins: Record<string, WeavePlugin> = {};
+  private logger: WeaveLogger;
+  private moduleLogger: Logger;
   private reconciler: WeaveReconciler;
   private stateSerializer: WeaveStateSerializer;
   private renderer: WeaveRenderer;
 
+  private setupManager: WeaveSetupManager;
+  private registerManager: WeaveRegisterManager;
+  private stateManager: WeaveStateManager;
+  private storeManager: WeaveStoreManager;
+  private stageManager: WeaveStageManager;
+  private groupsManager: WeaveGroupsManager;
+  private targetingManager: WeaveTargetingManager;
+  private cloningManager: WeaveCloningManager;
+  private fontsManager: WeaveFontsManager;
+  private zIndexManager: WeaveZIndexManager;
+  private actionsManager: WeaveActionsManager;
+  private exportManager: WeaveExportManager;
+
   constructor(weaveConfig: WeaveConfig, stageConfig: Konva.StageConfig) {
     super();
+
+    // Save in memory the configuration provided
     this.config = weaveConfig;
+    // Setup the logger
+    this.logger = new WeaveLogger(
+      this.config?.logger ?? {
+        disabled: false,
+        level: "error",
+      },
+    );
+    // Setup a child logger for this module
+    this.moduleLogger = this.logger.getChildLogger("main");
 
-    if (this.config.nodes) {
-      for (const node of this.config.nodes) {
-        this.registerNodeHandler(node);
-      }
-    }
-
-    if (this.config.plugins) {
-      for (const plugin of this.config.plugins) {
-        this.registerPlugin(plugin);
-      }
-    }
-
-    if (this.config.actions) {
-      for (const action of this.config.actions) {
-        this.registerActionHandler(action);
-      }
-    }
-
+    // Instantiate the state serializer
     this.stateSerializer = new WeaveStateSerializer();
-    this.reconciler = new WeaveReconciler(this, { debug: false });
+    // Instantiate the reconciler
+    this.reconciler = new WeaveReconciler(this);
+    // Instantiate the renderer
     this.renderer = new WeaveRenderer(this, this.reconciler, this.stateSerializer);
 
-    this.stageConfig = stageConfig;
+    // Instantiate the managers
+    this.setupManager = new WeaveSetupManager(this);
+    this.registerManager = new WeaveRegisterManager(this);
+    this.storeManager = new WeaveStoreManager(this);
+    this.stateManager = new WeaveStateManager(this);
+    this.stageManager = new WeaveStageManager(this, stageConfig);
+    this.groupsManager = new WeaveGroupsManager(this);
+    this.targetingManager = new WeaveTargetingManager(this);
+    this.cloningManager = new WeaveCloningManager(this);
+    this.fontsManager = new WeaveFontsManager(this);
+    this.zIndexManager = new WeaveZIndexManager(this);
+    this.exportManager = new WeaveExportManager(this);
+    this.actionsManager = new WeaveActionsManager(this);
 
-    window.weave = this;
+    // Setup the instance on the weave global variable
+    if (!window.weave) {
+      window.weave = this;
+    }
+
+    // Render welcome log to console
+    this.setupManager.welcomeLog();
   }
 
-  setup() {
-    this.config.store.register(this);
-    this.store = this.config.store.register(this);
-    this.store.connect();
-  }
+  // INSTANCE MANAGEMENT METHODS
 
-  start() {
+  private startRenderer() {
+    // Initialize the renderer
     this.renderer.init();
+    // Perform the first render of the instance
     this.renderer.render(() => {
-      this.setupPlugins();
-      this.setupActions();
-      // this.config?.callbacks?.isStarted?.();
+      // Setup the plugins and actions that needed the first render to work
+      this.setupManager.setupPlugins();
+      this.setupManager.setupActions();
+
+      // Emit the onStart event
+      this.config?.callbacks?.onStart?.();
+      this.emitEvent("onStart", {});
+
+      this.moduleLogger.info("Instance started");
     });
   }
 
-  private setupPlugins() {
-    for (const plugin of Object.keys(this.plugins)) {
-      const pluginInstance = this.plugins[plugin];
-      pluginInstance.init?.();
-    }
+  setStore(store: WeaveStore) {
+    this.storeManager.registerStore(store);
   }
 
-  protected renderPlugins() {
-    for (const pluginId of Object.keys(this.plugins)) {
-      const pluginInstance = this.plugins[pluginId];
-      pluginInstance.render?.();
-    }
-  }
+  start() {
+    this.moduleLogger.info("Start instance");
 
-  // private initStage(stageConfig: Konva.StageConfig): Konva.Stage {
-  //   const stage = new Konva.Stage(stageConfig);
+    // Setup fonts loaded listener in order to start the renderer
+    this.addEventListener("weaveFontsLoaded", () => {
+      this.setupManager.setupLog();
+      this.startRenderer();
+    });
 
-  //   stage.container().style.cursor = "default";
+    // Start loading the fonts, this operation is asynchronous
+    this.fontsManager.loadFonts();
 
-  //   return stage;
-  // }
+    // Register all the nodes, plugins and actions that come from the configuration
+    this.registerManager.registerNodesHandlers();
+    this.registerManager.registerPlugins();
+    this.registerManager.registerActionsHandlers();
 
-  // private initLayers() {
-  //   for (const pluginId of Object.keys(this.plugins)) {
-  //     const pluginInstance = this.plugins[pluginId];
-  //     pluginInstance.initLayer?.();
-  //   }
-  // }
+    // Register the store
+    this.storeManager.registerStore(this.config.store);
 
-  private setupActions() {
-    for (const actionId of Object.keys(this.actionsHandlers)) {
-      const actionInstance = this.actionsHandlers[actionId];
-      actionInstance.init?.();
-    }
-  }
-
-  emitEvent<T>(event: string, payload: T) {
-    this.emit(event, payload);
-  }
-
-  listenEvent<T>(event: string, callback: (payload: T) => void) {
-    this.on(event, callback);
-  }
-
-  getPlugins() {
-    return this.plugins;
-  }
-
-  getNodesHandlers() {
-    return this.nodesHandlers;
-  }
-
-  getActionsHandlers() {
-    return this.actionsHandlers;
-  }
-
-  getStore<T extends WeaveStore>() {
-    return this.store as T;
-  }
-
-  setStage(stage: Konva.Stage) {
-    this.stage = stage;
-  }
-
-  getStage() {
-    return this.stage;
+    // Setup and connect to the store
+    const store = this.storeManager.getStore();
+    store.setup();
+    store.connect();
   }
 
   destroy() {
-    this.stage.destroy();
-  }
+    this.moduleLogger.info(`Destroying the instance`);
 
-  registerStore(store: WeaveStore) {
-    store.register(this);
-  }
+    // disconnect from the store
+    const store = this.storeManager.getStore();
+    store.disconnect();
 
-  registerNodeHandler(node: WeaveNode) {
-    const nodeType = node.getNodeType();
-    if (this.nodesHandlers[nodeType]) {
-      throw new Error(`Node with type ${nodeType} already exists`);
-    }
-
-    node.register(this);
-    this.nodesHandlers[nodeType] = node;
-  }
-
-  registerPlugin(plugin: WeavePlugin) {
-    const pluginName = plugin.getName();
-    if (this.plugins[pluginName]) {
-      throw new Error(`Plugin with name ${pluginName} already exists`);
-    }
-
-    plugin.register(this);
-    this.plugins[pluginName] = plugin;
-  }
-
-  registerActionHandler(action: WeaveAction) {
-    const actionName = action.getName();
-    if (this.actionsHandlers[actionName]) {
-      throw new Error(`Action with name ${actionName} already exists`);
-    }
-
-    action.register(this);
-    this.actionsHandlers[actionName] = action;
-  }
-
-  getPlugin<T extends WeavePlugin>(pluginName: string) {
-    if (!this.plugins[pluginName]) {
-      throw new Error(`Plugin ${pluginName} not found`);
-    }
-    return this.plugins[pluginName] as T;
-  }
-
-  getActionHandler<T extends WeaveAction>(actionName: string) {
-    if (!this.actionsHandlers[actionName]) {
-      throw new Error(`Action ${actionName} not found`);
-    }
-    return this.actionsHandlers[actionName] as T;
-  }
-
-  getActiveAction() {
-    return this.activeAction;
-  }
-
-  getMainLayer() {
+    // destroy the stage from memory
     const stage = this.getStage();
-    return stage.findOne(`#${WEAVE_NODE_LAYER_ID}`) as Konva.Layer | undefined;
+    if (stage) {
+      stage.destroy();
+    }
+
+    this.moduleLogger.info(`Instance destroyed`);
   }
 
-  // moveUp(node: NodeSerializable) {
-  //   const stage = this.getStage();
-
-  //   const konvaNode = stage.findOne(`#${node.id}`) as Konva.Group | Konva.Shape | undefined;
-  //   if (konvaNode) {
-  //     konvaNode.moveUp();
-  //     this.updateNodeZIndex(konvaNode);
-  //   }
-  // }
-
-  // moveDown(node: NodeSerializable) {
-  //   const stage = this.getStage();
-
-  //   const konvaNode = stage.findOne(`#${node.id}`) as Konva.Group | Konva.Shape | undefined;
-  //   if (konvaNode) {
-  //     konvaNode.moveDown();
-  //     this.updateNodeZIndex(konvaNode);
-  //   }
-  // }
-
-  // sendToBack(node: NodeSerializable) {
-  //   const stage = this.getStage();
-
-  //   const konvaNode = stage.findOne(`#${node.id}`) as Konva.Group | Konva.Shape | undefined;
-  //   if (konvaNode) {
-  //     konvaNode.moveToBottom();
-  //     this.updateNodeZIndex(konvaNode);
-  //   }
-  // }
-
-  // bringToFront(node: NodeSerializable) {
-  //   const stage = this.getStage();
-
-  //   const konvaNode = stage.findOne(`#${node.id}`) as Konva.Group | Konva.Shape | undefined;
-  //   if (konvaNode) {
-  //     konvaNode.moveToTop();
-  //     this.updateNodeZIndex(konvaNode);
-  //   }
-  // }
-
-  getStageConfiguration() {
-    return this.stageConfig;
-  }
+  // CONFIGURATION
 
   getConfiguration() {
     return this.config;
   }
 
-  cancelAction(actionName: string) {
-    if (!this.actionsHandlers[actionName]) {
-      throw new Error(`Action ${actionName} not found`);
-    }
+  // EVENTS METHODS
 
-    this.activeAction = undefined;
-    this.actionsHandlers[actionName].cleanup?.();
+  emitEvent<T>(event: string, payload: T) {
+    this.moduleLogger.debug({ payload }, `Emitted event [${event}]`);
+    this.emit(event, payload);
+  }
 
-    this.config.callbacks?.onActiveActionChange?.(this.activeAction);
-    this.emit("onActiveActionChange", this.activeAction);
+  addEventListener<T>(event: string, callback: (payload: T) => void) {
+    this.moduleLogger.debug(`Listening event [${event}]`);
+    this.on(event, callback);
+  }
+
+  removeEventListener<T>(event: string, callback: (payload: T) => void) {
+    this.moduleLogger.debug(`Removing listening to event [${event}]`);
+    this.off(event, callback);
+  }
+
+  // LOGGING MANAGEMENT METHODS PROXIES
+
+  getLogger() {
+    return this.logger;
+  }
+
+  getMainLogger() {
+    return this.moduleLogger;
+  }
+
+  getChildLogger(name: string) {
+    return this.logger.getChildLogger(name);
+  }
+
+  // STAGE MANAGEMENT METHODS PROXIES
+
+  getStageManager() {
+    return this.stageManager;
+  }
+
+  getStage() {
+    return this.stageManager.getStage();
+  }
+
+  getMainLayer() {
+    return this.stageManager.getMainLayer();
+  }
+
+  setStage(stage: Konva.Stage) {
+    this.stageManager.setStage(stage);
+  }
+
+  getStageConfiguration() {
+    return this.stageManager.getConfiguration();
+  }
+
+  getInstanceRecursive(instance: Konva.Node, filterInstanceType: string[] = []): Konva.Node {
+    return this.stageManager.getInstanceRecursive(instance, filterInstanceType);
+  }
+
+  // REGISTERS MANAGEMENT METHODS PROXIES
+
+  getRegisterManager() {
+    return this.registerManager;
+  }
+
+  getPlugins() {
+    return this.registerManager.getPlugins();
+  }
+
+  getPlugin<T extends WeavePlugin>(pluginName: string) {
+    return this.registerManager.getPlugin(pluginName) as T;
+  }
+
+  getNodesHandlers() {
+    return this.registerManager.getNodesHandlers();
+  }
+
+  getNodeHandler<T extends WeaveNode>(nodeType: string) {
+    return this.registerManager.getNodeHandler(nodeType) as T;
+  }
+
+  getActionsHandlers() {
+    return this.registerManager.getActionsHandlers();
+  }
+
+  getActionHandler<T extends WeaveAction>(actionName: string) {
+    return this.registerManager.getActionHandler(actionName) as T;
+  }
+
+  getStore<T extends WeaveStore>() {
+    return this.storeManager.getStore() as T;
+  }
+
+  registerPlugin(plugin: WeavePlugin) {
+    this.registerManager.registerPlugin(plugin);
+  }
+
+  registerNodeHandler(node: WeaveNode) {
+    this.registerManager.registerNodeHandler(node);
+  }
+
+  registerActionHandler(action: WeaveAction) {
+    this.registerManager.registerActionHandler(action);
+  }
+
+  registerStore(store: WeaveStore) {
+    this.storeManager.registerStore(store);
+  }
+
+  // ACTIONS MANAGEMENT METHODS PROXIES
+
+  getActiveAction() {
+    return this.actionsManager.getActiveAction();
   }
 
   triggerAction<T>(actionName: string, params?: T) {
-    if (!this.actionsHandlers[actionName]) {
-      throw new Error(`Action ${actionName} not found`);
-    }
-
-    if (typeof this.activeAction !== "undefined") {
-      this.cancelAction(this.activeAction);
-    }
-
-    this.activeAction = actionName;
-    this.actionsHandlers[actionName].trigger(this.cancelActionCallback(actionName), params);
-    this.config.callbacks?.onActiveActionChange?.(this.activeAction);
-    this.emit("onActiveActionChange", this.activeAction);
+    this.actionsManager.triggerAction<T>(actionName, params);
   }
 
-  getNodeRecursive(node: Konva.Node): Konva.Node {
-    const stage = this.getStage();
-    const attributes = node.getAttrs();
-
-    if (attributes.isSelectable) {
-      return node;
-    }
-
-    const groupId = attributes.groupId;
-    const parent = stage.findOne(`#${groupId}`) as Konva.Node | undefined;
-    if (parent && typeof parent.getAttrs().groupId !== "undefined") {
-      return this.getNodeRecursive(parent);
-    }
-
-    if (parent && typeof parent.getAttrs().groupId === "undefined") {
-      return parent;
-    }
-
-    return node;
+  cancelAction(actionName: string) {
+    this.actionsManager.cancelAction(actionName);
   }
 
-  protected cancelActionCallback(actionName: string) {
-    return () => {
-      this.cancelAction(actionName);
-    };
-  }
-
-  allKonvaNodesInSameParent(nodes: (Konva.Group | Konva.Shape)[]) {
-    if (nodes.length === 0) {
-      return { allInSame: false, parentId: undefined };
-    }
-
-    let allInSame = true;
-    const nodeAttrs = nodes[0].getAttrs();
-    const parentId = nodeAttrs.groupId;
-    for (const node of nodes) {
-      const nodeAttrs = node.getAttrs();
-      if (nodeAttrs.groupId !== parentId) {
-        allInSame = false;
-        break;
-      }
-    }
-
-    return { allInSame, parentId };
-  }
-
-  allNodesInSameParent(nodes: (GroupSerializable | NodeSerializable)[]) {
-    if (nodes.length === 0) {
-      return { allInSame: false, parentId: undefined };
-    }
-
-    let allInSame = true;
-    const parentId = nodes[0].groupId;
-    for (const node of nodes) {
-      if (node.groupId !== parentId) {
-        allInSame = false;
-        break;
-      }
-    }
-
-    return { allInSame, parentId };
-  }
-
-  // NEW
-
-  getNodeHandler(nodeType: string) {
-    if (!this.nodesHandlers[nodeType]) {
-      throw new Error(`A node handler for kind [${nodeType}] is not registered.`);
-    }
-
-    return this.nodesHandlers[nodeType];
-  }
+  // STATE MANAGEMENT METHODS PROXIES
 
   update(newState: WeaveState) {
     this.getStore().setState(newState);
-    this.renderer.render();
+    this.renderer.render(() => {
+      this.config.callbacks?.onRender?.();
+      this.emitEvent("onRender", {});
+    });
   }
 
   render() {
-    this.renderer.render();
-    // this.renderer.render(() => {
-    //   this.config.callbacks?.onRender?.();
-    // });
+    this.renderer.render(() => {
+      this.config.callbacks?.onRender?.();
+      this.emitEvent("onRender", {});
+    });
   }
 
   findNodeById(tree: WeaveStateElement, key: string, parent: WeaveStateElement | null = null, index = -1) {
-    let found: { node: WeaveStateElement | null; parent: WeaveStateElement | null; index: number } = {
-      node: null,
-      parent,
-      index,
-    };
+    return this.stateManager.findNodeById(tree, key, parent, index);
+  }
 
-    if (tree.key === key) {
-      return { node: tree, parent, index };
-    }
-
-    if (Array.isArray(tree.props.children) && tree.props.children.length > 0) {
-      tree.props.children.some((child, index) => {
-        found = this.findNodeById(child, key, tree, index);
-        return found.node;
-      });
-    }
-
-    return found;
+  findNodesByType(tree: WeaveStateElement, nodeType: string): WeaveStateElement[] {
+    return this.stateManager.findNodesByType(tree, nodeType);
   }
 
   getNode(nodeKey: string) {
-    const state = this.getStore().getState().weave;
-
-    if (isEmpty(state)) {
-      return { node: null, parent: null, index: -1 };
-    }
-
-    return this.findNodeById(state as WeaveStateElement, nodeKey);
+    return this.stateManager.getNode(nodeKey);
   }
 
-  addNode(node: WeaveStateElement, parentId = "mainLayer", doRender = true) {
-    const state = this.getStore().getState();
-
-    if (isEmpty(state.weave)) {
-      return;
-    }
-
-    const { node: nodeState } = this.findNodeById(state.weave as WeaveStateElement, node.key);
-    if (nodeState) {
-      console.warn(`Node with key [${node.key}] already exists`);
-      return;
-    }
-
-    const { node: parent } = this.findNodeById(state.weave as WeaveStateElement, parentId);
-    if (!parent) {
-      console.warn(`Container with key [${parentId}] doesn't exists`);
-      return;
-    }
-
-    if (!parent.props.children) {
-      parent.props.children = [];
-    }
-
-    parent.props.children.push(node);
-
-    doRender && this.render();
+  addNode(node: WeaveStateElement, parentId = "mainLayer", index: number | undefined = undefined, doRender = true) {
+    this.stateManager.addNode(node, parentId, index, doRender);
   }
 
   updateNode(node: WeaveStateElement, doRender = true) {
-    const state = this.getStore().getState();
-
-    if (isEmpty(state.weave)) {
-      return;
-    }
-
-    const { node: nodeState } = this.findNodeById(state.weave as WeaveStateElement, node.key);
-    if (!nodeState) {
-      console.warn(`Node with key [${node.key}] doesn't exists`);
-      return;
-    }
-
-    const nodeNew = JSON.parse(JSON.stringify({ ...nodeState.props, ...node.props }));
-
-    nodeState.props = {
-      ...nodeNew,
-    };
-
-    doRender && this.render();
+    this.stateManager.updateNode(node, doRender);
   }
 
   removeNode(node: WeaveStateElement, doRender = true) {
-    const state = this.getStore().getState();
-
-    if (isEmpty(state.weave)) {
-      return;
-    }
-
-    const { node: nodeState, parent: parentState } = this.findNodeById(state.weave as WeaveStateElement, node.key);
-
-    if (!nodeState) {
-      console.warn(`Element with key [${node.key}] doesn't exists`);
-      return;
-    }
-
-    if (parentState) {
-      if (!parentState.props.children) {
-        parentState.props.children = [];
-      }
-
-      const elementIndex = parentState.props.children.findIndex((actNode) => actNode.key === node.key);
-      if (elementIndex !== -1) {
-        parentState.props.children.splice(elementIndex, 1);
-      }
-    }
-
-    doRender && this.render();
+    this.stateManager.removeNode(node, doRender);
   }
 
   removeNodes(nodes: WeaveStateElement[], doRender = true) {
@@ -479,5 +336,73 @@ export class Weave extends Emittery {
     }
 
     doRender && this.render();
+  }
+
+  moveNode(node: WeaveStateElement, position: WeavePosition, doRender = true) {
+    this.stateManager.moveNode(node, position, doRender);
+  }
+
+  // ZINDEX MANAGEMENT METHODS PROXIES
+
+  moveUp(node: WeaveElementInstance) {
+    this.zIndexManager.moveUp(node);
+  }
+
+  moveDown(node: WeaveElementInstance) {
+    this.zIndexManager.moveDown(node);
+  }
+
+  sendToBack(node: WeaveElementInstance) {
+    this.zIndexManager.sendToBack(node);
+  }
+
+  bringToFront(node: WeaveElementInstance) {
+    this.zIndexManager.bringToFront(node);
+  }
+
+  // GROUP MANAGEMENT METHODS PROXIES
+
+  group(nodes: WeaveStateElement[]) {
+    this.groupsManager.group(nodes);
+  }
+
+  unGroup(group: WeaveStateElement) {
+    this.groupsManager.unGroup(group);
+  }
+
+  // TARGETING MANAGEMENT METHODS PROXIES
+
+  getMousePointer(point?: Vector2d) {
+    return this.targetingManager.getMousePointer(point);
+  }
+
+  getMousePointerRelativeToContainer(container: Konva.Group | Konva.Layer) {
+    return this.targetingManager.getMousePointerRelativeToContainer(container);
+  }
+
+  // CLONING MANAGEMENT METHODS PROXIES
+
+  cloneNodes(
+    instancesToClone: Konva.Node[],
+    targetContainer: Konva.Layer | Konva.Group | undefined,
+    onPoint: Vector2d,
+  ) {
+    this.cloningManager.cloneNodes(instancesToClone, targetContainer, onPoint);
+  }
+
+  // FONTS MANAGEMENT METHODS PROXIES
+
+  getFonts() {
+    return this.fontsManager.getFonts();
+  }
+
+  // EXPORT MANAGEMENT METHODS PROXIES
+
+  public async exportStage(options: WeaveExportNodeOptions): Promise<HTMLImageElement> {
+    return await this.exportManager.exportStage(options);
+  }
+
+  public async exportNode(node: WeaveElementInstance, options: WeaveExportNodeOptions): Promise<HTMLImageElement> {
+    return await this.exportManager.exportNode(node, options);
   }
 }

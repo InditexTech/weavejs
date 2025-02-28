@@ -6,15 +6,15 @@ export class WeaveFitToSelectionToolAction extends WeaveAction {
   cleanup = undefined;
 
   getName(): string {
-    return "weaveFitToSelectionTool";
+    return "fitToSelectionTool";
   }
 
   private getNodesSelectionPlugin() {
-    return this.instance.getPlugin<WeaveNodesSelectionPlugin>("weaveNodesSelection");
+    return this.instance.getPlugin<WeaveNodesSelectionPlugin>("nodesSelection");
   }
 
   private getStageZoomPlugin() {
-    return this.instance.getPlugin<WeaveStageZoomPlugin>("weaveStageZoom");
+    return this.instance.getPlugin<WeaveStageZoomPlugin>("stageZoom");
   }
 
   init() {
