@@ -23,7 +23,6 @@
     "isolatedModules": true,
     "moduleDetection": "force",
     "noEmit": true,
-    "jsx": "react-jsx",
 
     /* Linting */
     "strict": true,
@@ -31,5 +30,5 @@
     "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true
   },
-  "include": ["src/**/*", "src/**/*.json", "package.json"]
+  "include": ["src/**/*", "src/**/*.json", "package.json", "src/.ts"]
 }

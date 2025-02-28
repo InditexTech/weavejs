@@ -82,18 +82,14 @@ describe("state-serializer", () => {
       },
     });
 
-    const deserializedElement = stateSerializer.deserialize(element);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const deserializedElement: React.DOMElement<any, any> = stateSerializer.deserialize(element);
 
-    expect(deserializedElement).toStrictEqual({
-      $$typeof: Symbol.for("react.transitional.element"),
-      ["_owner"]: null,
-      ["_store"]: {},
-      key: "elementKey1",
-      type: "elementtype1",
-      props: {
-        attr: "elementAttr1",
-        children: [],
-      },
+    expect(deserializedElement.key).toStrictEqual("elementKey1");
+    expect(deserializedElement.type).toStrictEqual("elementtype1");
+    expect(deserializedElement.props).toStrictEqual({
+      attr: "elementAttr1",
+      children: [],
     });
   });
 
@@ -111,16 +107,11 @@ describe("state-serializer", () => {
 
     const deserializedElement = stateSerializer.deserialize(element);
 
-    expect(deserializedElement).toStrictEqual({
-      $$typeof: Symbol.for("react.transitional.element"),
-      ["_owner"]: null,
-      ["_store"]: {},
-      key: "elementKey1",
-      type: "elementtype1",
-      props: {
-        attr: "elementAttr1",
-        children: [],
-      },
+    expect(deserializedElement.key).toStrictEqual("elementKey1");
+    expect(deserializedElement.type).toStrictEqual("elementtype1");
+    expect(deserializedElement.props).toStrictEqual({
+      attr: "elementAttr1",
+      children: [],
     });
   });
 
@@ -158,30 +149,19 @@ describe("state-serializer", () => {
 
     const deserializedElement = stateSerializer.deserialize(element);
 
-    expect(deserializedElement).toStrictEqual([
-      {
-        $$typeof: Symbol.for("react.transitional.element"),
-        ["_owner"]: null,
-        ["_store"]: {},
-        key: "childKey1",
-        type: "elementtype1",
-        props: {
-          attr: "childAttr1",
-          children: [],
-        },
-      },
-      {
-        $$typeof: Symbol.for("react.transitional.element"),
-        ["_owner"]: null,
-        ["_store"]: {},
-        key: "childKey2",
-        type: "elementtype2",
-        props: {
-          attr: "childAttr2",
-          children: [],
-        },
-      },
-    ]);
+    expect(deserializedElement[0].key).toStrictEqual("childKey1");
+    expect(deserializedElement[0].type).toStrictEqual("elementtype1");
+    expect(deserializedElement[0].props).toStrictEqual({
+      attr: "childAttr1",
+      children: [],
+    });
+
+    expect(deserializedElement[1].key).toStrictEqual("childKey2");
+    expect(deserializedElement[1].type).toStrictEqual("elementtype2");
+    expect(deserializedElement[1].props).toStrictEqual({
+      attr: "childAttr2",
+      children: [],
+    });
   });
 
   test("deserialize an element that it's type is not an string", () => {

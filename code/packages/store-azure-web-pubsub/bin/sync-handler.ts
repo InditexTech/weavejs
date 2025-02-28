@@ -1,7 +1,6 @@
 import { fileURLToPath } from "node:url";
 import path from "node:path";
 import fs from "node:fs/promises";
-import { fromUint8Array, toUint8Array } from "js-base64";
 import { encodeStateAsUpdate, applyUpdate, Doc } from "yjs";
 import { WebPubSubServiceClient } from "@azure/web-pubsub";
 import { WebPubSubEventHandler } from "@azure/web-pubsub-express";
