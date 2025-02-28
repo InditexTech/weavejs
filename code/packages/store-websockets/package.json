@@ -1,0 +1,65 @@
+{
+  "name": "@weavejs/store-websockets",
+  "version": "0.1.0-SNAPSHOT",
+  "type": "module",
+  "license": "MIT",
+  "main": "dist/store-websockets.js",
+  "types": "dist/store-websockets.d.ts",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build:snapshot": "vite build --mode=development --sourcemap --emptyOutDir",
+    "build": "vite build --mode=production --minify --emptyOutDir",
+    "bump:snapshot": "npm version $npm_package_version.$(date \"+%s\")",
+    "bundle:analyze": "vite-bundle-visualizer",
+    "check": "echo \"Monorepo test script\" && exit 0",
+    "dev": "vite build --watch",
+    "dev:server": "HOST=localhost PORT=1234 npx y-websocket",
+    "dist:tag": "npm dist-tag add \"$(jq -r .name package.json)@$(jq -r .version package.json)\" \"$PR_TAG\" --registry=\"$NPM_PUBLISHING_REGISTRY\" --verbose",
+    "format": "npm run lint -- --quiet --fix --fix-type layout",
+    "link": "npm link",
+    "lint:fix": "npm run lint -- --fix",
+    "lint": "eslint ./src",
+    "publish:snapshot": "npm publish",
+    "release:perform": "npm publish",
+    "release:prepare": "npm run verify",
+    "test": "vitest --passWithNoTests",
+    "types:check": "tsc --noEmit",
+    "verify": "npm run lint && npm run test && npm run build",
+    "version:development": "npm version $(npm version minor)-SNAPSHOT",
+    "version:release": "npm version $RELEASE_VERSION -m \"[npm-scripts] prepare release $RELEASE_VERSION\" --tag-version-prefix \"\""
+  },
+  "devDependencies": {
+    "@inditex/eslint-config": "1.7.0",
+    "@typescript-eslint/eslint-plugin": "7.8.0",
+    "@typescript-eslint/parser": "7.13.1",
+    "@vitest/coverage-v8": "1.6.0",
+    "@vitest/ui": "1.6.0",
+    "eslint": "8.57.1",
+    "globals": "15.14.0",
+    "typescript-eslint": "8.22.0",
+    "vite": "5.2.9",
+    "vite-bundle-visualizer": "1.1.0",
+    "vite-plugin-compression2": "1.0.0",
+    "vite-plugin-dts": "4.0.3",
+    "vitest": "1.6.0",
+    "vitest-sonar-reporter": "2.0.0",
+    "y-websocket": "2.1.0"
+  },
+  "peerDependencies": {
+    "@syncedstore/core": ">= 0.6.0",
+    "@weavejs/sdk": "0.1.0-SNAPSHOT",
+    "konva": ">= 9.3.18",
+    "yjs": ">= 13.6.23"
+  },
+  "engines": {
+    "node": "^18.12 || ^20.11 || ^22.11",
+    "npm": ">= 8.19.x"
+  },
+  "nx": {
+    "implicitDependencies": [
+      "@weavejs/sdk"
+    ]
+  }
+}

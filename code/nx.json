@@ -1,0 +1,37 @@
+{
+  "$schema": "./node_modules/nx/schemas/nx-schema.json",
+  "targetDefaults": {
+    "build": {
+      "dependsOn": ["^build"]
+    },
+    "check": {
+      "dependsOn": ["^check"],
+      "cache": true
+    },
+    "lint": {
+      "dependsOn": ["^lint"],
+      "cache": true
+    },
+    "lint:fix": {
+      "dependsOn": ["^lint:fix"],
+      "cache": true
+    },
+    "publish:snapshot": {
+      "dependsOn": ["^publish:snapshot"],
+      "cache": true
+    },
+    "release:prepare": {
+      "dependsOn": ["^release:prepare"],
+      "cache": true
+    },
+    "release:perform": {
+      "dependsOn": ["^release:perform"],
+      "cache": true
+    },
+    "verify": {
+      "dependsOn": ["^verify"],
+      "cache": true
+    }
+  },
+  "defaultBase": "main"
+}
