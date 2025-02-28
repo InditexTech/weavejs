@@ -40,6 +40,7 @@
     "eslint": "8.57.1",
     "eslint-plugin-react": "7.34.1",
     "eslint-plugin-react-hooks": "4.6.2",
+    "jsdom": "^26.0.0",
     "react-remove-attr": "0.0.6",
     "typescript-eslint": "8.22.0",
     "vite": "5.2.9",
@@ -52,10 +53,10 @@
     "zustand": "5.0.3"
   },
   "peerDependencies": {
-    "@weavejs/sdk": "0.1.0-SNAPSHOT",
-    "konva": ">= 9.3.18",
     "@types/react": ">= 18.3.1 && < 19",
     "@types/react-dom": ">= 18.3.0 && < 19",
+    "@weavejs/sdk": "0.1.0-SNAPSHOT",
+    "konva": ">= 9.3.18",
     "react": ">= 18.2.0 && < 19",
     "react-dom": ">= 18.2.0 && < 19"
   },
