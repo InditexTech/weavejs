@@ -33,63 +33,6 @@ export class WeaveStageManager {
     return stage.findOne(`#${WEAVE_NODE_LAYER_ID}`) as Konva.Layer | undefined;
   }
 
-  setupStage() {
-    const stageConfig = this.instance.getStageConfiguration();
-    const state = this.instance.getStore().getState();
-
-    state.weave.key = "stage";
-    state.weave.type = "stage";
-    state.weave.props = {
-      id: "stage",
-      type: "stage",
-      container: stageConfig?.container ?? "weave",
-      width: stageConfig?.width,
-      height: stageConfig?.height,
-      children: [
-        {
-          key: "gridLayer",
-          type: "layer",
-          props: {
-            id: "gridLayer",
-            children: [],
-          },
-        },
-        {
-          key: "mainLayer",
-          type: "layer",
-          props: {
-            id: "mainLayer",
-            children: [],
-          },
-        },
-        {
-          key: "selectionLayer",
-          type: "layer",
-          props: {
-            id: "selectionLayer",
-            children: [],
-          },
-        },
-        {
-          key: "usersPointersLayer",
-          type: "layer",
-          props: {
-            id: "usersPointersLayer",
-            children: [],
-          },
-        },
-        {
-          key: "utilityLayer",
-          type: "layer",
-          props: {
-            id: "utilityLayer",
-            children: [],
-          },
-        },
-      ],
-    };
-  }
-
   getInstanceRecursive(instance: Konva.Node, filterInstanceType: string[] = []): Konva.Node {
     const attributes = instance.getAttrs();
 

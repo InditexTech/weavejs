@@ -120,6 +120,12 @@ export class WeaveReconciler {
         delete newProps.zIndex;
         newProps.initialZIndex = props.zIndex;
 
+        if (type === "stage") {
+          newProps.container = rootContainer.getStageConfiguration().container;
+          newProps.width = rootContainer.getStageConfiguration().width;
+          newProps.height = rootContainer.getStageConfiguration().height;
+        }
+
         return handler.createInstance(newProps);
       },
       detachDeletedInstance(node: WeaveElementInstance) {
