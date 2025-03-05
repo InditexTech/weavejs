@@ -185,6 +185,8 @@ export class WeaveStoreAzureWebPubSubSyncHost {
           break;
       }
     } catch (err) {
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
       this.doc.emit("error", [err]);
     }
   }
@@ -198,6 +200,8 @@ export class WeaveStoreAzureWebPubSubSyncHost {
       // const messageType = decoding.readVarUint(decoder); // skip the message type
       awarenessProtocol.applyAwarenessUpdate(this._awareness, decoding.readVarUint8Array(decoder), undefined);
     } catch (err) {
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
       this.doc.emit("error", [err]);
     }
   }
