@@ -11,5 +11,6 @@ export type WeaveStoreAzureWebPubsubOptions = {
 };
 
 export type WeaveStoreAzureWebPubsubStoreCallbacks = {
+  onFetchConnectionUrl?: (payload: { loading: boolean; error: Error | null }) => void;
   onConnectionStatusChange?: (status: WeaveStoreAzureWebPubsubConnectionStatus) => void;
 };
