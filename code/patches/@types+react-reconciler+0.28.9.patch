@@ -1,12 +1,13 @@
 diff --git a/node_modules/@types/react-reconciler/index.d.ts b/node_modules/@types/react-reconciler/index.d.ts
-index b33d462..8d5b286 100644
+index b33d462..8180425 100644
 --- a/node_modules/@types/react-reconciler/index.d.ts
 +++ b/node_modules/@types/react-reconciler/index.d.ts
-@@ -385,7 +385,6 @@ declare namespace ReactReconciler {
+@@ -385,7 +385,7 @@ declare namespace ReactReconciler {
           */
          commitUpdate?(
              instance: Instance,
 -            updatePayload: UpdatePayload,
++            UpdatePayload: UpdatePayload,
              type: Type,
              prevProps: Props,
              nextProps: Props,

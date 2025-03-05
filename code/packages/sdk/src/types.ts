@@ -24,7 +24,7 @@ export type WeaveUndoRedoChange = {
 
 export type WeaveCallbacks = {
   onRender?: () => void;
-  onStart?: () => void;
+  onInstanceStatus?: (status: WeaveStatus) => void;
   onActiveActionChange?: (actionName: string | undefined) => void;
   onStateChange?: (state: WeaveState) => void;
   onUndoManagerStatusChange?: (undoManagerStatus: WeaveUndoRedoChange) => void;
