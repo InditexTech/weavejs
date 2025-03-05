@@ -3,11 +3,11 @@ import express, { Router } from "express";
 import { WebPubSubServiceClient, AzureKeyCredential } from "@azure/web-pubsub";
 import SyncHandler from "./sync-handler";
 
-const port = process.env.WEAVER_AZURE_WEB_PUBSUB_PORT || 1234;
+const port = process.env.WEAVE_AZURE_WEB_PUBSUB_PORT || 1234;
 
-const endpoint = process.env.WEAVER_AZURE_WEB_PUBSUB_ENDPOINT;
-const key = process.env.WEAVER_AZURE_WEB_PUBSUB_KEY;
-const hubName = process.env.WEAVER_AZURE_WEB_PUBSUB_HUB_NAME;
+const endpoint = process.env.WEAVE_AZURE_WEB_PUBSUB_ENDPOINT;
+const key = process.env.WEAVE_AZURE_WEB_PUBSUB_KEY;
+const hubName = process.env.WEAVE_AZURE_WEB_PUBSUB_HUB_NAME;
 
 if (!endpoint || !key || !hubName) {
   throw new Error("Missing required environment variables");

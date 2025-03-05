@@ -2,7 +2,7 @@ import * as Y from "yjs";
 import ws from "ws";
 import { WebPubSubServiceClient } from "@azure/web-pubsub";
 import { WebPubSubEventHandler } from "@azure/web-pubsub-express";
-import * as YAzureWebPubSub from "./../src/host";
+import { WeaveStoreAzureWebPubSubSyncHost } from "./../src/host";
 import { persistRoomStateToFile, getRoomStateFromFile } from "./utils";
 import { initState } from "./init-state";
 
@@ -10,7 +10,7 @@ export default class SyncHandler extends WebPubSubEventHandler {
   // eslint-disable-next-line @typescript-eslint/naming-convention
   private _client: WebPubSubServiceClient;
   // eslint-disable-next-line @typescript-eslint/naming-convention
-  private _connections: Map<string, YAzureWebPubSub.WebPubSubSyncHost> = new Map();
+  private _connections: Map<string, WeaveStoreAzureWebPubSubSyncHost> = new Map();
   // eslint-disable-next-line @typescript-eslint/naming-convention
   private _store_persistence: Map<string, NodeJS.Timeout> = new Map();
 
@@ -25,14 +25,14 @@ export default class SyncHandler extends WebPubSubEventHandler {
     return new Y.Doc();
   }
 
-  setupRoomPersistence(roomId: string, connection: YAzureWebPubSub.WebPubSubSyncHost) {
+  setupRoomPersistence(roomId: string, connection: WeaveStoreAzureWebPubSubSyncHost) {
     if (!this._store_persistence.has(roomId)) {
       const intervalId = setInterval(
         async () => {
           const actualState = Y.encodeStateAsUpdate(connection.doc);
           persistRoomStateToFile(`${roomId}.room`, actualState);
         },
-        parseInt(process.env.WEAVER_AZURE_WEB_PUBSUB_STATE_SYNC_FREQUENCY_SEG ?? "10") * 1000,
+        parseInt(process.env.WEAVE_AZURE_WEB_PUBSUB_STATE_SYNC_FREQUENCY_SEG ?? "10") * 1000,
       );
 
       this._store_persistence.set(roomId, intervalId);
@@ -52,7 +52,7 @@ export default class SyncHandler extends WebPubSubEventHandler {
         initState(doc);
       }
 
-      const connection = new YAzureWebPubSub.WebPubSubSyncHost(this._client, roomId, doc, {
+      const connection = new WeaveStoreAzureWebPubSubSyncHost(this._client, roomId, doc, {
         // eslint-disable-next-line @typescript-eslint/naming-convention
         WebSocketPolyfill: ws.WebSocket,
       });
