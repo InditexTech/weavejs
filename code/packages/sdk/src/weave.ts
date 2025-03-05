@@ -9,6 +9,7 @@ import {
   WeaveElementInstance,
   WeavePosition,
   WeaveExportNodeOptions,
+  WeaveStatus,
 } from "./types";
 import { WeaveStore } from "./stores/store";
 import { WeaveNode } from "./nodes/node";
@@ -30,6 +31,7 @@ import { WeaveStageManager } from "./managers/stage";
 import { WeaveActionsManager } from "./managers/actions";
 import { WeaveStoreManager } from "./managers/store";
 import { WeaveExportManager } from "./managers/export";
+import { WEAVE_INSTANCE_STATUS } from "./constants";
 
 export class Weave extends Emittery {
   private config: WeaveConfig;
@@ -39,6 +41,7 @@ export class Weave extends Emittery {
   private stateSerializer: WeaveStateSerializer;
   private renderer: WeaveRenderer;
 
+  private status: WeaveStatus = WEAVE_INSTANCE_STATUS.IDLE;
   private setupManager: WeaveSetupManager;
   private registerManager: WeaveRegisterManager;
   private stateManager: WeaveStateManager;
@@ -98,39 +101,38 @@ export class Weave extends Emittery {
   }
 
   // INSTANCE MANAGEMENT METHODS
-
-  private startRenderer() {
+  setupRenderer() {
     // Initialize the renderer
     this.renderer.init();
+
     // Perform the first render of the instance
     this.renderer.render(() => {
       // Setup the plugins and actions that needed the first render to work
       this.setupManager.setupPlugins();
       this.setupManager.setupActions();
 
-      // Emit the onStart event
-      this.config?.callbacks?.onStart?.();
-      this.emitEvent("onStart", {});
-
       this.moduleLogger.info("Instance started");
     });
+  }
+
+  setStatus(status: WeaveStatus) {
+    this.status = status;
+  }
+
+  getStatus() {
+    return this.status;
   }
 
   setStore(store: WeaveStore) {
     this.storeManager.registerStore(store);
   }
 
-  start() {
+  async start() {
     this.moduleLogger.info("Start instance");
 
-    // Setup fonts loaded listener in order to start the renderer
-    this.addEventListener("weaveFontsLoaded", () => {
-      this.setupManager.setupLog();
-      this.startRenderer();
-    });
-
-    // Start loading the fonts, this operation is asynchronous
-    this.fontsManager.loadFonts();
+    this.status = WEAVE_INSTANCE_STATUS.STARTING;
+    this.getConfiguration().callbacks?.onInstanceStatus?.(this.status);
+    this.emitEvent("onInstanceStatus", this.status);
 
     // Register all the nodes, plugins and actions that come from the configuration
     this.registerManager.registerNodesHandlers();
@@ -140,14 +142,30 @@ export class Weave extends Emittery {
     // Register the store
     this.storeManager.registerStore(this.config.store);
 
+    this.status = WEAVE_INSTANCE_STATUS.LOADING_FONTS;
+    this.getConfiguration().callbacks?.onInstanceStatus?.(this.status);
+    this.emitEvent("onInstanceStatus", this.status);
+
+    // Start loading the fonts, this operation is asynchronous
+    await this.fontsManager.loadFonts();
+    this.setupManager.setupLog();
+
     // Setup and connect to the store
     const store = this.storeManager.getStore();
     store.setup();
     store.connect();
+
+    this.status = WEAVE_INSTANCE_STATUS.RUNNING;
+    this.getConfiguration().callbacks?.onInstanceStatus?.(this.status);
+    this.emitEvent("onInstanceStatus", this.status);
   }
 
   destroy() {
     this.moduleLogger.info(`Destroying the instance`);
+
+    this.status = WEAVE_INSTANCE_STATUS.IDLE;
+    this.getConfiguration().callbacks?.onInstanceStatus?.(this.status);
+    this.emitEvent("onInstanceStatus", this.status);
 
     // disconnect from the store
     const store = this.storeManager.getStore();

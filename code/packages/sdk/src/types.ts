@@ -1,5 +1,5 @@
 import Konva from "konva";
-import { STATE_ACTIONS, WEAVE_EXPORT_FORMATS, WEAVE_NODE_POSITION } from "./constants";
+import { STATE_ACTIONS, WEAVE_EXPORT_FORMATS, WEAVE_INSTANCE_STATUS, WEAVE_NODE_POSITION } from "./constants";
 import { WeaveNode } from "./nodes/node";
 import { WeaveAction } from "./actions/action";
 import { WeavePlugin } from "./plugins/plugin";
@@ -29,6 +29,9 @@ export type WeaveCallbacks = {
   onStateChange?: (state: WeaveState) => void;
   onUndoManagerStatusChange?: (undoManagerStatus: WeaveUndoRedoChange) => void;
 };
+
+export type WeaveStatusKeys = keyof typeof WEAVE_INSTANCE_STATUS;
+export type WeaveStatus = (typeof WEAVE_INSTANCE_STATUS)[WeaveStatusKeys];
 
 export type WeaveConfig = {
   store: WeaveStore;
