@@ -1,0 +1,254 @@
+---
+name: code-npm-release
+run-name: "Release labeled ${{ inputs.RELEASE_TYPE || 'in PR' }}"
+
+concurrency: code-release-${{ github.ref }}
+
+on:
+  pull_request:
+    types: [closed]
+    branches: ['main', 'main-*']
+    paths: ['code/**', '.github/workflows/code**']
+  workflow_dispatch:
+    inputs:
+      BASELINE:
+        description: 'Baseline branch'
+        required: true
+        default: 'main'
+      RELEASE_TYPE:
+        description: 'Release type to use'
+        required: true
+        default: 'release-type/minor'
+        type: choice
+        options:
+          - 'release-type/hotfix'
+          - 'release-type/multi-hotfix'
+          - 'release-type/major'
+          - 'release-type/minor'
+          - 'release-type/patch'
+
+jobs:
+  release:
+    name: Release
+    if: github.event_name == 'workflow_dispatch'
+      || (github.event.pull_request.merged == true && !contains(join(github.event.pull_request.labels.*.name, ', '), 'skip-release')
+      && (contains(join(github.event.pull_request.labels.*.name, ', '), 'release-type')
+      || vars.DEVELOPMENT_FLOW == 'trunk-based-development' ))
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Get input parameters
+        run: |
+          if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
+            RELEASE_LABELS="${{ github.event.inputs.RELEASE_TYPE }}"
+          else
+            RELEASE_LABELS="${{ join(github.event.pull_request.labels.*.name, ', ') }}"
+            if [[ $RELEASE_LABELS != *release-type/* ]]; then
+              RELEASE_LABELS="$RELEASE_LABELS, release-type/minor"
+            fi
+          fi
+          echo "RELEASE_LABELS=$RELEASE_LABELS" >> "$GITHUB_ENV"
+          BASELINE_BRANCH=${{ github.event.inputs.BASELINE || github.ref }}
+          echo "BASELINE_BRANCH=${BASELINE_BRANCH#refs/heads/}" >> "$GITHUB_ENV"
+
+      - name: Checkout merge commit
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ env.BASELINE_BRANCH }}
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Check if CHANGELOG.md has changes
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          if git diff --quiet HEAD^ HEAD -- code/CHANGELOG.md; then
+            echo "::error title={No CHANGELOG.md changes}::{No CHANGELOG.md changes were found. Update the UNRELEASED section with the new changes.}"
+            gh pr comment ${{ github.event.number }} --body "
+          ### :x: No changes in the \`CHANGELOG.md\` file
+          No changes were found in the \`CHANGELOG.md\` file. Please, update the UNRELEASED section, listing the new changes that applies to this release."
+            exit 1
+          fi
+
+      - name: NPM / Setup Dependencies Cache
+        uses: actions/cache@v4
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-
+      
+      - name: Setup asdf Cache
+        id: asdf-cache
+        uses: actions/cache@v4
+        continue-on-error: true
+        with:
+          path: ~/.asdf/data
+          key: ${{ runner.os }}-asdf-${{ hashFiles('**/.tool-versions') }}
+          restore-keys: |
+            ${{ runner.os }}-asdf-
+
+      - name: Save tool-versions content
+        run: |
+          {
+            echo "TOOL_VERSIONS<<EOF"
+            cat code/.tool-versions
+            echo "EOF"
+          } >> "$GITHUB_ENV"
+
+      - name: Setup asdf environment
+        uses: asdf-vm/actions/install@v3
+          # https://github.com/asdf-vm/actions/issues/356
+        if: steps.asdf-cache.outputs.cache-hit != 'true'
+        with:
+          tool_versions: ${{ env.TOOL_VERSIONS }}
+
+      - name: NPM / Set npmrc
+        env:
+          NPM_AUTH: ${{ secrets.NPM_PUBLISH_TOKEN }}
+          NPM_REGISTRY: "https://registry.npmjs.org/"
+        run: |
+          echo "registry=${NPM_REGISTRY}" >> /home/runner/.npmrc
+          echo "@testing-env-org:registry=${NPM_REGISTRY}" >> /home/runner/.npmrc
+          echo "//registry.npmjs.org/:_authToken=${NPM_AUTH}" >> /home/runner/.npmrc
+          echo "always-auth=true" >> /home/runner/.npmrc
+
+      - name: NPM / Create Cache Folders
+        run: |
+          mkdir -p "$HOME"/.npm
+          mkdir -p "$HOME"/.asdf/data
+
+      - name: Setup patch release type version
+        if: contains(env.RELEASE_LABELS, 'release-type/hotfix')
+          || contains(env.RELEASE_LABELS, 'release-type/multi-hotfix')
+          || contains(env.RELEASE_LABELS, 'release-type/patch')
+        run: echo "RELEASE_VERSION=patch" >> "$GITHUB_ENV"
+
+      - name: Setup minor release type version
+        if: contains(env.RELEASE_LABELS, 'release-type/minor')
+        run: echo "RELEASE_VERSION=minor" >> "$GITHUB_ENV"
+
+      - name: Setup minor release type version when no label set and TBD
+        if: ${{ !contains(env.RELEASE_LABELS, 'release-type') && vars.DEVELOPMENT_FLOW == 'trunk-based-development' }}
+        run: echo "RELEASE_VERSION=minor" >> "$GITHUB_ENV"
+
+      - name: Setup major release type version
+        if: contains(env.RELEASE_LABELS, 'release-type/major')
+        run: echo "RELEASE_VERSION=major" >> "$GITHUB_ENV"
+
+      - name: Prepare committer information and set GPG key
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SCM_COMMITTER_PGP_KEY: ${{ secrets.CI_GPG_SECRET_KEY }}
+        run: |
+          git config --global credential.helper store
+          cat <<EOT >> ~/.git-credentials
+          https://ci-user:$GITHUB_TOKEN@github.com
+          EOT
+
+          echo "$SCM_COMMITTER_PGP_KEY" | gpg --batch --import
+          git config user.name "InditexTech CI"
+          git config user.email "oso@inditex.com"
+
+      - name: Update CHANGELOG.md
+        id: update-changelog
+        uses: release-flow/keep-a-changelog-action@v3.0.0
+        with:
+          command: bump
+          version: ${{ env.RELEASE_VERSION }}
+          changelog: code/CHANGELOG.md
+          fail-on-empty-release-notes: false
+          keep-unreleased-section: true
+          tag-prefix: ""
+
+      - name: NPM / Prepare release
+        working-directory: code
+        env:
+          RELEASE_VERSION: ${{ steps.update-changelog.outputs.version }}
+        run: |
+            npm run version:release
+            npm run release:prepare
+
+      - name: Release / Commit and Tag
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        working-directory: code
+        run: |
+          git commit -i CHANGELOG.md -m "chore: Update CHANGELOG with ${{ steps.update-changelog.outputs.version }} version" --no-verify
+          git commit -i package.json package-lock.json -m "[npm-scripts] Release ${{ steps.update-changelog.outputs.version }}" --no-verify
+          git tag ${{ steps.update-changelog.outputs.version }}
+          git push --atomic --no-verify origin HEAD ${{ steps.update-changelog.outputs.version }}
+
+      - name: NPM / Release Perform - Distribution Platform
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_PUBLISH_TOKEN }}
+        working-directory: code
+        run: |
+          npm run release:perform
+
+      - name: NPM / Set next development version
+        working-directory: code
+        run: |
+            npm run version:development
+
+      - name: Next Development Iteration / Commit Changes
+        env:
+          GITHUB_TOKEN: ${{ secrets.GH_TOKEN_PUSH }}
+        working-directory: code
+        run: |
+          git commit -i package.json package-lock.json -m "[npm-scripts] prepare for next development iteration" --no-verify
+          git push --no-verify origin HEAD
+
+      - name: Next Development Iteration / Create Sync Branch PR into Develop
+        id: sync-branch-pr
+        continue-on-error: true
+        if: ${{ vars.DEVELOPMENT_FLOW != 'trunk-based-development' }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          DEVELOP=${BASELINE_BRANCH/main/develop}
+          echo "DEVELOP=$DEVELOP" >> "$GITHUB_OUTPUT"
+          # Avoid creating sync PR if the corresponding development branch does not exist
+          if [[ -z $(git ls-remote --heads origin "$DEVELOP") ]]; then
+            echo "The '$DEVELOP' branch does not exist in remote. Skipping the creation of sync PR"
+          else
+            git checkout -b "automated/sync-release-${{ steps.update-changelog.outputs.version }}-to-$DEVELOP"
+            git push --no-verify -u origin HEAD
+            gh pr create --base "$DEVELOP" \
+              --title "Sync release ${{ steps.update-changelog.outputs.version }} to $DEVELOP" \
+              --body "**Automated Pull Request**"
+          fi
+
+      - name: Github Release / Create
+        uses: ncipollo/release-action@2c591bcc8ecdcd2db72b97d6147f871fcd833ba5
+        id: github-release
+        continue-on-error: true
+        with:
+          name: ${{ steps.update-changelog.outputs.version }}
+          tag: ${{ steps.update-changelog.outputs.version }}
+          token: ${{ secrets.GITHUB_TOKEN }}
+          body: |
+            Check out the [changelog](code/CHANGELOG.md) for version ${{ steps.update-changelog.outputs.version }}
+
+      - name: Comment in PR / Sync PR creation failed
+        if: ${{ vars.DEVELOPMENT_FLOW != 'trunk-based-development' }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          DEVELOP=${BASELINE_BRANCH/main/develop}
+          git remote set-url origin "https://x-access-token:$GITHUB_TOKEN@github.com/$GITHUB_REPOSITORY"
+          # shellcheck disable=SC2140
+          if ! git ls-remote --exit-code --heads origin automated/sync-release-"${{ steps.update-changelog.outputs.version }}"-to-"$DEVELOP"; then
+            gh pr comment "${{ github.event.number }}" --body "An error occurred creating the \`sync\` branch that synchronizes the \`$BASELINE_BRANCH\` and \`$DEVELOP\` branches.
+            Please create a branch from \`$BASELINE_BRANCH\` (e.g. \`internal/sync-$BASELINE_BRANCH-with-$DEVELOP\`) and then create a pull request against \`$DEVELOP\` to finish the release process."
+          fi
+
+      - name: Comment in PR / Release creation failed
+        if: ${{ steps.github-release.outcome == 'failure' }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: >
+          gh pr comment ${{ github.event.number }} --body "An error occurred creating the Github Release.
+          Don't panic! Your artifacts were successfully uploaded to the Distribution Platform and the new release tag was created.
+          You can manually complete the release by creating it in the [releases](https://github.com/${{ github.repository }}/releases)
+          page."

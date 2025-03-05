@@ -1,0 +1,13 @@
+---
+name: code-PR-verify-fallback
+
+on:
+  pull_request:
+
+jobs:
+  unit-tests:
+    if: 'false'
+    name: Code / Verify
+    runs-on: ubuntu-24.04
+    steps:
+      - run: 'echo "No Code / Verify required"'

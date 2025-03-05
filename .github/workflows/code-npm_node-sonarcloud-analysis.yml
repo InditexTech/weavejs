@@ -1,0 +1,119 @@
+---
+name: code-npm-sonarcloud-analysis
+run-name: Sonarcloud analysis on ${{ github.base_ref || github.ref_name }} branch
+
+concurrency:
+  group: sonarcloud-${{ github.ref }}
+  cancel-in-progress: true
+
+on:
+  workflow_dispatch:
+  pull_request:
+    types: [closed]
+    branches: ['develop', 'develop-*', 'main', 'main-*']
+    paths: ['code/**', '.github/workflows/code-*-sonarcloud-analysis.yml']
+  release:
+    types:
+      - published
+
+env:
+  MAVEN_OPTS: "-Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn"
+
+jobs:
+  unit-tests:
+    name: SonarCloud / Unit Tests
+    timeout-minutes: 30
+    if: ${{ ((github.event.pull_request.merged == true && (vars.DEVELOPMENT_FLOW != 'trunk-based-development' && (github.base_ref == 'develop' || startsWith(github.base_ref, 'develop-'))) ||
+        (vars.DEVELOPMENT_FLOW == 'trunk-based-development' && (github.base_ref == 'main' || startsWith(github.base_ref, 'main-')))) ||
+        github.event_name == 'workflow_dispatch' ||
+        github.event_name == 'release')
+        && vars.IS_INDITEXTECH_REPO == 'true' }}
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: NPM / Setup Dependencies Cache
+        uses: actions/cache@v4
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-
+    
+      - name: Setup asdf Cache
+        uses: actions/cache@v4
+        continue-on-error: true
+        id: asdf-cache
+        with:
+          path: ~/.asdf/data
+          key: ${{ runner.os }}-asdf-${{ hashFiles('**/.tool-versions') }}
+          restore-keys: |
+            ${{ runner.os }}-asdf-
+
+      - name: Save tool-versions content
+        run: |
+          {
+            echo "TOOL_VERSIONS<<EOF"
+            cat code/.tool-versions
+            echo "EOF"
+          } >> "$GITHUB_ENV"
+
+      - name: NPM / Setup asdf tools
+        uses: asdf-vm/actions/install@v3
+        # https://github.com/asdf-vm/actions/issues/356
+        if: steps.asdf-cache.outputs.cache-hit != 'true'
+        with:
+          tool_versions: ${{ env.TOOL_VERSIONS }}
+
+      - name: NPM / Create Cache Folders
+        run: |
+          mkdir -p "$HOME"/.npm
+          mkdir -p "$HOME"/.asdf/data
+
+      - name: NPM / Run unit tests with release event
+        if: github.event_name == 'release'
+        working-directory: code
+        run: |
+          npm run verify
+
+      - name: Store project information
+        id: version
+        run: |
+          echo "app-version=$(jq ".version" code/package.json)" >> "$GITHUB_OUTPUT"
+          echo "app-name=$(yq -oy '.name' code/package.json)" >> "$GITHUB_OUTPUT"
+          echo "github-repository=$(echo $GITHUB_REPOSITORY | cut -d'/' -f2)" >> "$GITHUB_OUTPUT"
+
+      - name: SonarCloud / Run SonarCloud action with release event
+        if: ${{ github.event_name == 'release' }}
+        uses: sonarsource/sonarqube-scan-action@v4
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        with:
+          projectBaseDir: code
+          args: >
+            -Dsonar.projectKey=InditexTech_${{ steps.version.outputs.github-repository }}
+            -Dsonar.projectName=${{ steps.version.outputs.app-name }}
+            -Dsonar.projectVersion=${{ github.event.release.tag_name }}
+            -Dsonar.branch.name="release/${{ github.event.release.tag_name }}"
+            -Dsonar.host.url="https://sonarcloud.io/"
+            -Dsonar.organization=inditextech
+
+      - name: SonarCloud / Run SonarCloud action
+        if: ${{ github.event_name != 'release' }}
+        uses: sonarsource/sonarqube-scan-action@v4
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        with:
+          projectBaseDir: code
+          args: >
+            -Dsonar.projectKey=InditexTech_${{ steps.version.outputs.github-repository }}
+            -Dsonar.projectName=${{ steps.version.outputs.app-name }}
+            -Dsonar.projectVersion=${{ steps.version.outputs.app-version }}
+            -Dsonar.branch.name=${{ github.base_ref || github.ref_name }}
+            -Dsonar.host.url="https://sonarcloud.io/"
+            -Dsonar.organization=inditextech
