@@ -1,9 +1,11 @@
 import {
   Weave,
+  WEAVE_INSTANCE_STATUS,
   WeaveConnectedUsersChanged,
   WeaveSelection,
   WeaveState,
   WeaveStateElement,
+  WeaveStatus,
   WeaveToPasteNode,
 } from "@weavejs/sdk";
 import { WeaveStoreWebsocketsConnectionStatus } from "@weavejs/store-websockets";
@@ -12,9 +14,12 @@ import { create } from "zustand";
 interface WeaveRuntimeState {
   instance: Weave | null;
   appState: WeaveState;
-  started: boolean;
+  status: WeaveStatus;
   connection: {
     status: WeaveStoreWebsocketsConnectionStatus;
+  };
+  room: {
+    loaded: boolean;
   };
   users: WeaveConnectedUsersChanged;
   undoRedo: {
@@ -40,9 +45,10 @@ interface WeaveRuntimeState {
     actual: string | undefined;
   };
   setInstance: (newInstance: Weave) => void;
-  setStarted: (newStarted: boolean) => void;
+  setStatus: (newStatus: WeaveStatus) => void;
   setAppState: (newAppState: WeaveState) => void;
   setConnectionStatus: (newConnectionStatus: WeaveStoreWebsocketsConnectionStatus) => void;
+  setRoomLoaded: (newStatus: boolean) => void;
   setUsers: (newUsers: WeaveConnectedUsersChanged) => void;
   setCanUndo: (newCanUndo: boolean) => void;
   setCanRedo: (newCanRedo: boolean) => void;
@@ -60,7 +66,10 @@ interface WeaveRuntimeState {
 export const useWeave = create<WeaveRuntimeState>()((set) => ({
   instance: null,
   appState: { weave: {} },
-  started: false,
+  status: WEAVE_INSTANCE_STATUS.IDLE,
+  room: {
+    loaded: false,
+  },
   connection: {
     status: "disconnected",
   },
@@ -93,10 +102,11 @@ export const useWeave = create<WeaveRuntimeState>()((set) => ({
     actual: undefined,
   },
   setInstance: (newInstance) => set((state) => ({ ...state, instance: newInstance })),
-  setStarted: (newStarted) => set((state) => ({ ...state, started: newStarted })),
+  setStatus: (newStatus) => set((state) => ({ ...state, status: newStatus })),
   setAppState: (newAppState) => set((state) => ({ ...state, appState: newAppState })),
   setConnectionStatus: (newConnectionStatus) =>
     set((state) => ({ ...state, connection: { ...state.connection, status: newConnectionStatus } })),
+  setRoomLoaded: (newStatus) => set((state) => ({ ...state, room: { ...state.room, loaded: newStatus } })),
   setUsers: (newUsers) => set((state) => ({ ...state, users: newUsers })),
   setCanUndo: (newCanUndo) => set((state) => ({ ...state, undoRedo: { ...state.undoRedo, canUndo: newCanUndo } })),
   setCanRedo: (newCanRedo) => set((state) => ({ ...state, undoRedo: { ...state.undoRedo, canRedo: newCanRedo } })),
