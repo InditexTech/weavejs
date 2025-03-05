@@ -26,12 +26,11 @@
     "release:prepare": "npm run verify",
     "test": "vitest --passWithNoTests",
     "types:check": "tsc --noEmit",
-    "verify": "npm run lint && npm run test && npm run build",
+    "verify": "npm run test && npm run build",
     "version:development": "npm version $(npm version minor)-SNAPSHOT",
     "version:release": "npm version $RELEASE_VERSION -m \"[npm-scripts] prepare release $RELEASE_VERSION\" --tag-version-prefix \"\""
   },
   "devDependencies": {
-    "@inditex/eslint-config": "1.7.0",
     "@typescript-eslint/eslint-plugin": "7.8.0",
     "@typescript-eslint/parser": "7.13.1",
     "@vitest/coverage-v8": "1.6.0",
