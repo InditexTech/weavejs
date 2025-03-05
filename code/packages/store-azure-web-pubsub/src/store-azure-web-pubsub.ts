@@ -1,5 +1,5 @@
 import { WeaveAwarenessChange, WeaveStore } from "@weavejs/sdk";
-import { WebPubSubSyncClient } from "y-azure-webpubsub-client";
+import { WebPubSubSyncClient } from "./client";
 import { WEAVER_STORE_AZURE_WEB_PUBSUB, WEAVER_STORE_AZURE_WEB_PUBSUB_CONNECTION_STATUS } from "./constants";
 import { WeaveStoreAzureWebPubsubOptions } from "./types";
 
