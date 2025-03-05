@@ -48,9 +48,7 @@
     "y-websocket": "2.1.0"
   },
   "peerDependencies": {
-    "@syncedstore/core": ">= 0.6.0",
     "@weavejs/sdk": "0.1.0-SNAPSHOT",
-    "konva": ">= 9.3.18",
     "yjs": ">= 13.6.23"
   },
   "engines": {

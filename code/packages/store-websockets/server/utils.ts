@@ -24,15 +24,10 @@ const CALLBACK_DEBOUNCE_MAXWAIT = parseInt(process.env.CALLBACK_DEBOUNCE_MAXWAIT
 
 const wsReadyStateConnecting = 0;
 const wsReadyStateOpen = 1;
-const wsReadyStateClosing = 2 // eslint-disable-line
-const wsReadyStateClosed = 3 // eslint-disable-line
 
 // disable gc when using snapshots!
 const gcEnabled = process.env.GC !== "false" && process.env.GC !== "0";
 
-/**
- * @type {Map<string,WSSharedDoc>}
- */
 export const docs = new Map();
 
 const persistenceMap: Map<string, NodeJS.Timeout> = new Map();
@@ -40,13 +35,7 @@ const messageSync = 0;
 const messageAwareness = 1;
 // const messageAuth = 2
 
-/**
- * @param {Uint8Array} update
- * @param {any} _origin
- * @param {WSSharedDoc} doc
- * @param {any} _tr
- */
-const updateHandler = (update, _origin, doc, _tr) => {
+const updateHandler = (update, _origin, doc: any) => {
   const encoder = encoding.createEncoder();
   encoding.writeVarUint(encoder, messageSync);
   syncProtocol.writeUpdate(encoder, update);
@@ -54,17 +43,8 @@ const updateHandler = (update, _origin, doc, _tr) => {
   doc.conns.forEach((_, conn) => send(doc, conn, message));
 };
 
-/**
- * @type {(ydoc: Y.Doc) => Promise<void>}
- */
-let contentInitializor = (_ydoc) => Promise.resolve();
+let contentInitializor = () => Promise.resolve();
 
-/**
- * This function is called once every time a Yjs document is created. You can
- * use it to pull data from an external source or initialize content.
- *
- * @param {(ydoc: Y.Doc) => Promise<void>} f
- */
 export const setContentInitializor = (f) => {
   contentInitializor = f;
 };
@@ -184,7 +164,6 @@ const messageListener = (conn, doc, message) => {
     }
   } catch (err) {
     console.error(err);
-    // @ts-ignore
     doc.emit("error", [err]);
   }
 };
@@ -198,7 +177,6 @@ const closeConn = (doc, conn) => {
     /**
      * @type {Set<number>}
      */
-    // @ts-ignore
     const controlledIds = doc.conns.get(conn);
     doc.conns.delete(conn);
     if (persistenceMap.has(doc.name)) {

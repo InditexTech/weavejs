@@ -1,5 +1,5 @@
 import * as Y from "yjs";
-import ws from "ws";
+import WebSocket from "ws";
 import { WebPubSubServiceClient } from "@azure/web-pubsub";
 import { WebPubSubEventHandler } from "@azure/web-pubsub-express";
 import { WeaveStoreAzureWebPubSubSyncHost } from "./../src/host";
@@ -54,7 +54,7 @@ export default class SyncHandler extends WebPubSubEventHandler {
 
       const connection = new WeaveStoreAzureWebPubSubSyncHost(this._client, roomId, doc, {
         // eslint-disable-next-line @typescript-eslint/naming-convention
-        WebSocketPolyfill: ws.WebSocket,
+        WebSocketPolyfill: WebSocket,
       });
       connection.start();
 
