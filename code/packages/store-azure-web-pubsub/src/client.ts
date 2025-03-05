@@ -43,7 +43,7 @@ export interface Message {
 type MessageHandler = (
   encoder: encoding.Encoder,
   decoder: decoding.Decoder,
-  client: WebPubSubSyncClient,
+  client: WeaveStoreAzureWebPubSubSyncClient,
   emitSynced: boolean,
   messageType: number,
 ) => void;
@@ -77,7 +77,11 @@ messageHandlers[messageAwareness] = (_, decoder, client) => {
   awarenessProtocol.applyAwarenessUpdate(client.awareness, decoding.readVarUint8Array(decoder), client);
 };
 
-const readMessage = (client: WebPubSubSyncClient, buf: Uint8Array, emitSynced: boolean): encoding.Encoder => {
+const readMessage = (
+  client: WeaveStoreAzureWebPubSubSyncClient,
+  buf: Uint8Array,
+  emitSynced: boolean,
+): encoding.Encoder => {
   const decoder = decoding.createDecoder(buf);
   const encoder = encoding.createEncoder();
   const messageType = decoding.readVarUint(decoder);
@@ -90,7 +94,7 @@ const readMessage = (client: WebPubSubSyncClient, buf: Uint8Array, emitSynced: b
   return encoder;
 };
 
-export class WebPubSubSyncClient extends Emittery {
+export class WeaveStoreAzureWebPubSubSyncClient extends Emittery {
   public doc: Doc;
   public topic: string;
 
@@ -324,7 +328,7 @@ export class WebPubSubSyncClient extends Emittery {
   }
 }
 
-function joinGroup(client: WebPubSubSyncClient, group: string) {
+function joinGroup(client: WeaveStoreAzureWebPubSubSyncClient, group: string) {
   client.ws?.send(
     JSON.stringify({
       type: MessageType.JoinGroup,
@@ -333,7 +337,7 @@ function joinGroup(client: WebPubSubSyncClient, group: string) {
   );
 }
 
-function sendToControlGroup(client: WebPubSubSyncClient, group: string, type: string, u8: Uint8Array) {
+function sendToControlGroup(client: WeaveStoreAzureWebPubSubSyncClient, group: string, type: string, u8: Uint8Array) {
   client.ws?.send(
     JSON.stringify({
       type: MessageType.SendToGroup,

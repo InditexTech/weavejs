@@ -40,7 +40,7 @@ export interface WebPubSubHostOptions {
   WebSocketPolyfill: any;
 }
 
-export class WebPubSubSyncHost {
+export class WeaveStoreAzureWebPubSubSyncHost {
   public doc: Doc;
   public topic: string;
 

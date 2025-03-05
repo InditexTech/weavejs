@@ -330,7 +330,7 @@ function setupRoomPersistence(roomId: string, doc: Y.Doc) {
         const actualState = Y.encodeStateAsUpdate(doc);
         persistRoomStateToFile(`${roomId}.room`, actualState);
       },
-      parseInt(process.env.WEAVER_WEBSOCKETS_STATE_SYNC_FREQUENCY_SEG ?? "10") * 1000,
+      parseInt(process.env.WEAVE_WEBSOCKETS_STATE_SYNC_FREQUENCY_SEG ?? "10") * 1000,
     );
 
     persistenceMap.set(roomId, intervalId);
