@@ -25,3 +25,4 @@ node_modules
 *.iml
 *.bck
 /.npmrc
+.vscode
