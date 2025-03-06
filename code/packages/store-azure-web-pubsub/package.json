@@ -1,5 +1,5 @@
 {
-  "name": "@weavejs/store-azure-web-pubsub",
+  "name": "@inditextech/weavejs-store-azure-web-pubsub",
   "version": "0.1.0-SNAPSHOT",
   "type": "module",
   "license": "MIT",
@@ -68,7 +68,7 @@
   },
   "nx": {
     "implicitDependencies": [
-      "@weavejs/sdk"
+      "@inditextech/weavejs-sdk"
     ]
   }
 }
