@@ -8,3 +8,5 @@ eslint-report.json
 
 .nx/cache
 .nx/workspace-data
+
+.npmrc

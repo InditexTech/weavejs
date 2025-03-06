@@ -103,6 +103,7 @@ export type WeaveSelection = {
 
 // AWARENESS
 export type WeaveAwarenessChange<K extends string, T> = {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   [key in K]: T;
 };
 

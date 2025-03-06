@@ -195,7 +195,9 @@ export class WeaveRectangleToolAction extends WeaveAction {
       const tr = selectionPlugin.getTransformer();
       tr.show();
       const node = stage.findOne(`#${this.rectId}`);
-      node && selectionPlugin.setSelectedNodes([node]);
+      if (node) {
+        selectionPlugin.setSelectedNodes([node]);
+      }
     }
 
     this.rectId = null;
