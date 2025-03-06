@@ -1,3 +1,4 @@
+import { isEmpty } from "lodash";
 import { Weave } from "@/weave";
 import { WeaveAwarenessChange, WeaveState, WeaveUndoRedoChange } from "@/types";
 import { MappedTypeDescription } from "@syncedstore/core/types/doc";
@@ -15,17 +16,11 @@ export abstract class WeaveStore {
   private document: Doc;
   private logger!: Logger;
   private undoManager!: UndoManager;
+  private isRoomLoaded: boolean = false;
 
   constructor() {
     this.latestState = {
-      weave: {
-        key: "stage",
-        type: "stage",
-        props: {
-          id: "stage",
-          children: [],
-        },
-      },
+      weave: {},
     };
     this.state = syncedStore<WeaveState>({
       weave: {},
@@ -77,6 +72,9 @@ export abstract class WeaveStore {
   setup() {
     const config = this.instance.getConfiguration();
 
+    config.callbacks?.onRoomLoaded?.(this.isRoomLoaded);
+    this.instance.emitEvent("onRoomLoaded", this.isRoomLoaded);
+
     if (this.supportsUndoManager) {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const weaveStateValues = getYjsValue(this.getState().weave) as AbstractType<any>;
@@ -115,12 +113,21 @@ export abstract class WeaveStore {
 
     observeDeep(this.getState(), () => {
       const newState = JSON.parse(JSON.stringify(this.getState()));
+
       config.callbacks?.onStateChange?.(newState);
       this.instance.emitEvent("onStateChange", newState);
-      this.instance.render();
-    });
 
-    this.instance.getStageManager().setupStage();
+      if (!this.isRoomLoaded && !isEmpty(this.state.weave)) {
+        this.instance.setupRenderer();
+        this.isRoomLoaded = true;
+
+        config.callbacks?.onRoomLoaded?.(this.isRoomLoaded);
+        this.instance.emitEvent("onRoomLoaded", this.isRoomLoaded);
+      }
+      if (this.isRoomLoaded && !isEmpty(this.state.weave)) {
+        this.instance.render();
+      }
+    });
   }
 
   canUndoStateStep() {

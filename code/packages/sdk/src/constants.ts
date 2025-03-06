@@ -1,5 +1,12 @@
 export const WEAVE_NODE_LAYER_ID = "mainLayer";
 
+export const WEAVE_INSTANCE_STATUS = {
+  ["IDLE"]: "idle",
+  ["STARTING"]: "starting",
+  ["LOADING_FONTS"]: "loadingFonts",
+  ["RUNNING"]: "running",
+} as const;
+
 export const WEAVE_NODE_POSITION = {
   ["UP"]: "up",
   ["DOWN"]: "down",

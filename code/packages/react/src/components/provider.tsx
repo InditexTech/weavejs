@@ -23,20 +23,12 @@ import {
   WeaveCallbacks,
   WeaveUndoRedoChange,
   WeaveStore,
+  WeaveStatus,
 } from "@weavejs/sdk";
-// import {
-//   WeaveStoreWebsocketsConnectionStatus,
-//   WeaveStoreWebsockets,
-//   WeaveStoreWebsocketsCallbacks,
-// } from "@weavejs/store-websockets";
 import { useWeave } from "./store";
 
 type WeaveProviderType = {
   containerId: string;
-  // roomId: string;
-  // connection: {
-  //   serverUrl: string;
-  // };
   getUser: () => WeaveUser;
   fonts?: WeaveFont[];
   store: WeaveStore;
@@ -47,14 +39,11 @@ type WeaveProviderType = {
   customActions?: WeaveAction[];
   customPlugins?: WeavePlugin[];
   callbacks?: WeaveCallbacks;
-  // storeCallbacks?: WeaveStoreWebsocketsCallbacks;
   children: React.ReactNode;
 };
 
 export const WeaveProvider = ({
   containerId,
-  // connection: { serverUrl },
-  // roomId,
   getUser,
   store,
   nodes = [],
@@ -63,15 +52,14 @@ export const WeaveProvider = ({
   customPlugins = [],
   fonts = [],
   callbacks = {},
-  // storeCallbacks = {},
   children,
 }: Readonly<WeaveProviderType>) => {
   const selectedNodes = useWeave((state) => state.selection.nodes);
 
   const setInstance = useWeave((state) => state.setInstance);
   const setAppState = useWeave((state) => state.setAppState);
-  const setStarted = useWeave((state) => state.setStarted);
-  // const setConnectionStatus = useWeave((state) => state.setConnectionStatus);
+  const setStatus = useWeave((state) => state.setStatus);
+  const setRoomLoaded = useWeave((state) => state.setRoomLoaded);
   const setUsers = useWeave((state) => state.setUsers);
   const setCanUndo = useWeave((state) => state.setCanUndo);
   const setCanRedo = useWeave((state) => state.setCanRedo);
@@ -85,13 +73,28 @@ export const WeaveProvider = ({
   const setActualAction = useWeave((state) => state.setActualAction);
   const setCopiedNodes = useWeave((state) => state.setCopiedNodes);
 
-  const { onStart, onStateChange, onUndoManagerStatusChange, onActiveActionChange, ...restCallbacks } = callbacks;
-  // const { onConnectionStatusChange } = storeCallbacks;
+  const {
+    onInstanceStatus,
+    onRoomLoaded,
+    onStateChange,
+    onUndoManagerStatusChange,
+    onActiveActionChange,
+    ...restCallbacks
+  } = callbacks;
 
-  const onStartHandler = React.useCallback(
-    () => {
-      setStarted(true);
-      onStart?.();
+  const onInstanceStatusHandler = React.useCallback(
+    (status: WeaveStatus) => {
+      setStatus(status);
+      onInstanceStatus?.(status);
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [],
+  );
+
+  const onRoomLoadedHandler = React.useCallback(
+    (status: boolean) => {
+      setRoomLoaded(status);
+      onRoomLoaded?.(status);
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [],
@@ -105,15 +108,6 @@ export const WeaveProvider = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [selectedNodes],
   );
-
-  // const onConnectionStatusChangeHandler = React.useCallback(
-  //   (status: WeaveStoreWebsocketsConnectionStatus) => {
-  //     setConnectionStatus(status);
-  //     onConnectionStatusChange?.(status);
-  //   },
-  //   // eslint-disable-next-line react-hooks/exhaustive-deps
-  //   [],
-  // );
 
   const onUndoManagerStatusChangeHandler = React.useCallback(
     (undoManagerStatus: WeaveUndoRedoChange) => {
@@ -149,116 +143,113 @@ export const WeaveProvider = ({
 
   React.useEffect(() => {
     let weaveInstance: Weave | null = null;
-    const weaveEle = document.getElementById(containerId);
-    const weaveEleClientRect = weaveEle?.getBoundingClientRect();
 
-    if (weaveEle) {
-      // Defining instance nodes
-      const instanceNodes: WeaveNode[] = [];
-      if (nodes.length > 0) {
-        for (const node of nodes) {
-          instanceNodes.push(node);
+    async function initWeave() {
+      const weaveEle = document.getElementById(containerId);
+      const weaveEleClientRect = weaveEle?.getBoundingClientRect();
+
+      if (weaveEle) {
+        // Defining instance nodes
+        const instanceNodes: WeaveNode[] = [];
+        if (nodes.length > 0) {
+          for (const node of nodes) {
+            instanceNodes.push(node);
+          }
         }
-      }
 
-      // Defining instance plugins
-      const instanceActions: WeaveAction[] = [];
-      if (actions.length > 0) {
-        for (const action of actions) {
-          instanceActions.push(action);
+        // Defining instance plugins
+        const instanceActions: WeaveAction[] = [];
+        if (actions.length > 0) {
+          for (const action of actions) {
+            instanceActions.push(action);
+          }
         }
-      }
 
-      // Defining instance plugins
-      const instancePlugins: WeavePlugin[] = [];
-      if (plugins.length > 0) {
-        for (const plugin of plugins) {
-          instancePlugins.push(plugin);
+        // Defining instance plugins
+        const instancePlugins: WeavePlugin[] = [];
+        if (plugins.length > 0) {
+          for (const plugin of plugins) {
+            instancePlugins.push(plugin);
+          }
+        } else {
+          instancePlugins.push(new WeaveStageGridPlugin({ gridSize: 50 }));
+          instancePlugins.push(new WeaveStagePanningPlugin());
+          instancePlugins.push(new WeaveStageResizePlugin());
+          instancePlugins.push(
+            new WeaveStageZoomPlugin({
+              onZoomChange: (zoomInfo: WeaveStageZoomChanged) => {
+                setZoom(zoomInfo.scale);
+                setCanZoomIn(zoomInfo.canZoomIn);
+                setCanZoomOut(zoomInfo.canZoomOut);
+              },
+            }),
+          );
+          instancePlugins.push(
+            new WeaveNodesSelectionPlugin({
+              onNodesChange,
+            }),
+          );
+          instancePlugins.push(new WeaveImageEditionPlugin());
+          instancePlugins.push(new WeaveStageDropAreaPlugin());
+          instancePlugins.push(
+            new WeaveConnectedUsersPlugin({
+              onConnectedUsersChanged: (users: WeaveConnectedUsersChanged) => {
+                setUsers(users);
+              },
+              getUser,
+            }),
+          );
+          instancePlugins.push(
+            new WeaveUsersPointersPlugin({
+              getUser,
+            }),
+          );
+          instancePlugins.push(
+            new WeaveCopyPasteNodesPlugin({
+              onCanCopyChange: (actCanCopy: boolean) => {
+                setCanCopy(actCanCopy);
+              },
+              onCanPasteChange: (actCanPaste, nodes) => {
+                setCanPaste(actCanPaste);
+                setCopiedNodes(nodes);
+              },
+            }),
+          );
         }
-      } else {
-        instancePlugins.push(new WeaveStageGridPlugin({ gridSize: 50 }));
-        instancePlugins.push(new WeaveStagePanningPlugin());
-        instancePlugins.push(new WeaveStageResizePlugin());
-        instancePlugins.push(
-          new WeaveStageZoomPlugin({
-            onZoomChange: (zoomInfo: WeaveStageZoomChanged) => {
-              setZoom(zoomInfo.scale);
-              setCanZoomIn(zoomInfo.canZoomIn);
-              setCanZoomOut(zoomInfo.canZoomOut);
-            },
-          }),
-        );
-        instancePlugins.push(
-          new WeaveNodesSelectionPlugin({
-            onNodesChange,
-          }),
-        );
-        instancePlugins.push(new WeaveImageEditionPlugin());
-        instancePlugins.push(new WeaveStageDropAreaPlugin());
-        instancePlugins.push(
-          new WeaveConnectedUsersPlugin({
-            onConnectedUsersChanged: (users: WeaveConnectedUsersChanged) => {
-              setUsers(users);
-            },
-            getUser,
-          }),
-        );
-        instancePlugins.push(
-          new WeaveUsersPointersPlugin({
-            getUser,
-          }),
-        );
-        instancePlugins.push(
-          new WeaveCopyPasteNodesPlugin({
-            onCanCopyChange: (actCanCopy: boolean) => {
-              setCanCopy(actCanCopy);
-            },
-            onCanPasteChange: (actCanPaste, nodes) => {
-              setCanPaste(actCanPaste);
-              setCopiedNodes(nodes);
-            },
-          }),
-        );
-      }
 
-      weaveInstance = new Weave(
-        {
-          store,
-          // : new WeaveStoreWebsockets({
-          //   roomId,
-          //   wsOptions: {
-          //     serverUrl,
-          //   },
-          //   callbacks: {
-          //     onConnectionStatusChange: onConnectionStatusChangeHandler,
-          //   },
-          // }),
-          nodes,
-          actions,
-          plugins: [...instancePlugins, ...customPlugins],
-          fonts,
-          callbacks: {
-            ...restCallbacks,
-            onStart: onStartHandler,
-            onStateChange: onStateChangeHandler,
-            onUndoManagerStatusChange: onUndoManagerStatusChangeHandler,
-            onActiveActionChange: onActiveActionChangeHandler,
+        weaveInstance = new Weave(
+          {
+            store,
+            nodes,
+            actions,
+            plugins: [...instancePlugins, ...customPlugins],
+            fonts,
+            callbacks: {
+              ...restCallbacks,
+              onInstanceStatus: onInstanceStatusHandler,
+              onRoomLoaded: onRoomLoadedHandler,
+              onStateChange: onStateChangeHandler,
+              onUndoManagerStatusChange: onUndoManagerStatusChangeHandler,
+              onActiveActionChange: onActiveActionChangeHandler,
+            },
+            logger: {
+              level: "info",
+            },
           },
-          logger: {
-            level: "info",
+          {
+            container: containerId,
+            width: weaveEleClientRect?.width ?? 1920,
+            height: weaveEleClientRect?.height ?? 1080,
           },
-        },
-        {
-          container: containerId,
-          width: weaveEleClientRect?.width ?? 1920,
-          height: weaveEleClientRect?.height ?? 1080,
-        },
-      );
+        );
 
-      weaveInstance.start();
+        setInstance(weaveInstance);
 
-      setInstance(weaveInstance);
+        await weaveInstance.start();
+      }
     }
+
+    initWeave();
 
     return () => {
       if (weaveInstance) {

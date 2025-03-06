@@ -68,6 +68,7 @@ export class WeaveReconciler {
       prepareScopeUpdate(scopeInstance: any, instance: any) {
         logger.debug({ scopeInstance, instance }, "prepareScopeUpdate");
       },
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       getInstanceFromScope(scopeInstance: any) {
         logger.debug({ scopeInstance }, "getInstanceFromScope");
         return null;
@@ -119,6 +120,12 @@ export class WeaveReconciler {
         const newProps = { ...props };
         delete newProps.zIndex;
         newProps.initialZIndex = props.zIndex;
+
+        if (type === "stage") {
+          newProps.container = rootContainer.getStageConfiguration().container;
+          newProps.width = rootContainer.getStageConfiguration().width;
+          newProps.height = rootContainer.getStageConfiguration().height;
+        }
 
         return handler.createInstance(newProps);
       },
