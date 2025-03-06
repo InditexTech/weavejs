@@ -1,61 +1,27 @@
-*target*
-*node_modules*
-*.jar
-*.war
-*.ear
-*.class
-
-# yarn
-yarn.lock
-
-# macOS
+# System
 .DS_Store
 
-# eclipse specific git ignore
-*.pydevproject
-.project
-.metadata
-bin/**
-tmp/**
-tmp/**/*
-*.tmp
-*.bak
+# IDE config
+/.idea
+
+# VSCode
+/.vscode
+
+# Generated
+/.jshintignore
+/.jshintrc
+/dist
+npm-debug.log
+node_modules
+
+# Typings
+*.ts
+
+# Temporary Files and Backups
 *.swp
-*~.nib
-local.properties
-.classpath
-.settings/
-.loadpath
-.factorypath
+*.*~
+*yarn-error.log*
 
-# External tool builders
-.externalToolBuilders/
-
-# Locally stored "Eclipse launch configurations"
-*.launch
-
-# STS (Spring Tool Suite)
-.springBeans
-
-#Clover
-.clover/
-
-# IntelliJ
-.idea
 *.iml
-
-# yarn specific
-**/src/main/frontend/dist/**
-
-fake-pom.xml
-code/cachepaascli.yml
-code/info.yml
-code/mergedValidations.yml
-databaseChanges.json
-databaseChangesQueries.txt
-Dockerfile
-jmeter-repo
-code/info.before_check.yml
-code/info.after_check.yml
-code/src/test/resources/compose/trafficparrot_mappings/proto/**
-*.pyc
+*.bck
+/.npmrc
