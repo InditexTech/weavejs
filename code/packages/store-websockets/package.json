@@ -47,7 +47,7 @@
     "y-websocket": "2.1.0"
   },
   "peerDependencies": {
-    "@weavejs/sdk": "0.1.0-SNAPSHOT",
+    "@inditextech/weavejs-sdk": "0.1.0-SNAPSHOT",
     "yjs": ">= 13.6.23"
   },
   "engines": {

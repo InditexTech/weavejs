@@ -10,7 +10,8 @@
   "main": "index.js",
   "scripts": {
     "build": "nx run-many -t build",
-    "bump:snapshot": "npm ci && lerna version --no-git-tag-version --no-push --force-publish --yes $npm_package_version.$(date \"+%s\")",
+    "bump:snapshot": "npm ci && nx release version $npm_package_version.$(date \"+%s\")",
+    "changelog:generate": "nx release changelog --git-tag=false --git-commit=false --verbose --dry-run $RELEASE_VERSION",
     "check": "nx run-many -t check",
     "cleanup": "rm package-lock.json && npkill -D -y",
     "dist:tag": "nx run-many -t dist:tag",
@@ -30,8 +31,8 @@
     "reset": "nx reset",
     "test": "nx run-many -t test",
     "verify": "npm ci && nx run-many -t verify",
-    "version:development": "export BUMP_DEVELOP_VERSION=$(npm version $(npm version minor)-SNAPSHOT) && lerna version $BUMP_DEVELOP_VERSION --no-git-tag-version --no-push --force-publish --exact --yes && npm version $(npm version minor)-SNAPSHOT",
-    "version:release": "npm ci && lerna version --no-git-tag-version --no-push --force-publish --exact --yes $RELEASE_VERSION && npm version $RELEASE_VERSION"
+    "version:development": "export BUMP_DEVELOP_VERSION=$(npm version $(npm version minor)-SNAPSHOT) && nx release version --git-tag=false --git-commit=false $BUMP_DEVELOP_VERSION && npm version $(npm version minor)-SNAPSHOT",
+    "version:release": "npm ci && nx release version --git-tag=false --git-commit=false $RELEASE_VERSION && npm version $RELEASE_VERSION"
   },
   "keywords": [
     "weave",
@@ -49,15 +50,24 @@
   "devDependencies": {
     "@commitlint/cli": "19.4.0",
     "@commitlint/config-conventional": "19.2.2",
+    "@nx/js": "19.8.5",
+    "@swc-node/register": "1.10.9",
+    "@swc/core": "1.11.7",
+    "@swc/helpers": "0.5.15",
     "husky": "9.1.4",
-    "lerna": "8.1.8",
     "npkill": "0.12.2",
     "nx": "19.5.7",
-    "patch-package": "^8.0.0",
+    "patch-package": "8.0.0",
+    "prettier": "2.8.8",
     "typescript": "5.7.3"
   },
   "engines": {
     "node": ">= 20.11.x",
     "npm": ">= 10.2.x"
-  }
+  },
+  "overrides": {
+    "rimraf": "6.0.1"
+  },
+  "repository": "github:InditexTech/weavejs",
+  "dependencies": {}
 }

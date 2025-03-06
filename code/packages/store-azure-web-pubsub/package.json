@@ -60,7 +60,7 @@
     "y-protocols": "^1.0.6"
   },
   "peerDependencies": {
-    "@weavejs/sdk": "0.1.0-SNAPSHOT"
+    "@inditextech/weavejs-sdk": "0.1.0-SNAPSHOT"
   },
   "engines": {
     "node": "^18.12 || ^20.11 || ^22.11",
