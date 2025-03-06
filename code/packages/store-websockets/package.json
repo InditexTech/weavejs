@@ -15,7 +15,7 @@
     "bundle:analyze": "vite-bundle-visualizer",
     "check": "echo \"Monorepo test script\" && exit 0",
     "dev": "vite build --watch",
-    "dev:server": "HOST=localhost PORT=1234 npx y-websocket",
+    "dev:server": "tsx --env-file=.env ./server/server.ts",
     "dist:tag": "npm dist-tag add \"$(jq -r .name package.json)@$(jq -r .version package.json)\" \"$PR_TAG\" --registry=\"$NPM_PUBLISHING_REGISTRY\" --verbose",
     "format": "npm run lint -- --quiet --fix --fix-type layout",
     "link": "npm link",
@@ -48,9 +48,7 @@
     "y-websocket": "2.1.0"
   },
   "peerDependencies": {
-    "@syncedstore/core": ">= 0.6.0",
     "@weavejs/sdk": "0.1.0-SNAPSHOT",
-    "konva": ">= 9.3.18",
     "yjs": ">= 13.6.23"
   },
   "engines": {

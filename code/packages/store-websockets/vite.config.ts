@@ -19,7 +19,7 @@ export default defineConfig(({ mode }) => {
         fileName: "store-websockets",
       },
       rollupOptions: {
-        external: ["@weavejs/sdk", "yjs", "@syncedstore/core", /konva.*/],
+        external: ["@weavejs/sdk", "yjs"],
       },
     },
 

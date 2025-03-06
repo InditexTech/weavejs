@@ -12,7 +12,6 @@
     "baseUrl": "./",
     "paths": {
       "@/*": ["./src/*"],
-      "@syncedstore/core/types/doc": ["./../../node_modules/@syncedstore/core/types/doc"]
     },
 
     /* Bundler mode */

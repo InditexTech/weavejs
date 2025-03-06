@@ -26,4 +26,5 @@ vite.config.ts*
 *.sln
 *.sw?
 
-rooms
+.env*
+server/rooms

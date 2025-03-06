@@ -1,13 +1,13 @@
 import { WeaveAwarenessChange, WeaveStore } from "@weavejs/sdk";
-import { WebPubSubSyncClient } from "y-azure-webpubsub-client";
-import { WEAVER_STORE_AZURE_WEB_PUBSUB, WEAVER_STORE_AZURE_WEB_PUBSUB_CONNECTION_STATUS } from "./constants";
+import { WeaveStoreAzureWebPubSubSyncClient } from "./client";
+import { WEAVE_STORE_AZURE_WEB_PUBSUB } from "./constants";
 import { WeaveStoreAzureWebPubsubOptions } from "./types";
 
 export class WeaveStoreAzureWebPubsub extends WeaveStore {
   private config: WeaveStoreAzureWebPubsubOptions;
   private roomId: string;
-  protected provider!: WebPubSubSyncClient;
-  protected name = WEAVER_STORE_AZURE_WEB_PUBSUB;
+  protected provider!: WeaveStoreAzureWebPubSubSyncClient;
+  protected name = WEAVE_STORE_AZURE_WEB_PUBSUB;
   protected supportsUndoManager = true;
 
   constructor(options: WeaveStoreAzureWebPubsubOptions) {
@@ -24,29 +24,35 @@ export class WeaveStoreAzureWebPubsub extends WeaveStore {
   private init() {
     const { url } = this.config;
 
-    this.provider = new WebPubSubSyncClient(`${url}?id=${this.roomId}`, this.roomId, this.getDocument());
-
-    this.provider.ws?.addEventListener("open", (event) => {
-      console.log(event);
-      this.config.callbacks?.onConnectionStatusChange?.(WEAVER_STORE_AZURE_WEB_PUBSUB_CONNECTION_STATUS.CONNECTED);
-      this.instance.emitEvent("onConnectionStatusChange", WEAVER_STORE_AZURE_WEB_PUBSUB_CONNECTION_STATUS.CONNECTED);
+    this.provider = new WeaveStoreAzureWebPubSubSyncClient(url, this.roomId, this.getDocument(), {
+      resyncInterval: 0,
+      tokenProvider: null,
     });
 
-    this.provider.ws?.addEventListener("close", (event) => {
-      console.log(event);
-      this.config.callbacks?.onConnectionStatusChange?.(WEAVER_STORE_AZURE_WEB_PUBSUB_CONNECTION_STATUS.DISCONNECTED);
-      this.instance.emitEvent("onConnectionStatusChange", WEAVER_STORE_AZURE_WEB_PUBSUB_CONNECTION_STATUS.DISCONNECTED);
+    this.provider.on("status", (status) => {
+      this.config.callbacks?.onConnectionStatusChange?.(status);
+      this.instance.emitEvent("onConnectionStatusChange", status);
     });
   }
 
-  connect() {
-    this.config.callbacks?.onConnectionStatusChange?.(WEAVER_STORE_AZURE_WEB_PUBSUB_CONNECTION_STATUS.DISCONNECTED);
-    this.instance.emitEvent("onConnectionStatusChange", WEAVER_STORE_AZURE_WEB_PUBSUB_CONNECTION_STATUS.DISCONNECTED);
+  async connect() {
+    let error: Error | null = null;
+    try {
+      this.config.callbacks?.onFetchConnectionUrl?.({ loading: true, error: null });
+      this.instance.emitEvent("onFetchConnectionUrl", { loading: true, error: null });
 
-    this.provider.start();
+      await this.provider.fetchConnectionUrl();
+    } catch (ex) {
+      error = ex as Error;
+    } finally {
+      this.config.callbacks?.onFetchConnectionUrl?.({ loading: false, error });
+      this.instance.emitEvent("onFetchConnectionUrl", { loading: false, error });
+    }
+
+    await this.provider.start();
   }
 
-  disconnect() {
+  async disconnect() {
     this.provider.stop();
   }
 
