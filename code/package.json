@@ -1,5 +1,5 @@
 {
-  "name": "@weavejs/main",
+  "name": "@inditextech/weavejs",
   "version": "0.1.0-SNAPSHOT",
   "description": "Weave.js framework",
   "private": true,
@@ -27,6 +27,7 @@
     "release:perform": "nx run-many -t release:perform -- --verbose --registry $NPM_PUBLISHING_REGISTRY --unsafe-perm",
     "release:prepare": "nx run-many -t release:prepare",
     "release": "nx run-many -t release",
+    "reset": "nx reset",
     "test": "nx run-many -t test",
     "verify": "npm ci && nx run-many -t verify",
     "version:development": "export BUMP_DEVELOP_VERSION=$(npm version $(npm version minor)-SNAPSHOT) && lerna version $BUMP_DEVELOP_VERSION --no-git-tag-version --no-push --force-publish --exact --yes && npm version $(npm version minor)-SNAPSHOT",
