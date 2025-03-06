@@ -8,9 +8,6 @@
   "files": [
     "dist"
   ],
-  "bin": {
-    "store-azure-web-pubsub": "./bin/server.cjs"
-  },
   "scripts": {
     "build:snapshot": "vite build --mode=development --sourcemap --emptyOutDir",
     "build": "vite build --mode=production --minify --emptyOutDir",
@@ -37,11 +34,10 @@
   "devDependencies": {
     "@azure/web-pubsub": "1.1.4",
     "@azure/web-pubsub-express": "^1.0.6",
-    "@inditex/eslint-config": "1.7.0",
     "@types/uuid": "^10.0.0",
     "@types/ws": "^8.18.0",
-    "@typescript-eslint/eslint-plugin": "7.8.0",
-    "@typescript-eslint/parser": "7.13.1",
+    "@typescript-eslint/eslint-plugin": "8.26.0",
+    "@typescript-eslint/parser": "8.26.0",
     "@vitest/coverage-v8": "1.6.0",
     "@vitest/ui": "1.6.0",
     "buffer": "^6.0.3",
@@ -64,8 +60,7 @@
     "y-protocols": "^1.0.6"
   },
   "peerDependencies": {
-    "@weavejs/sdk": "0.1.0-SNAPSHOT",
-    "yjs": ">= 13.6.23"
+    "@weavejs/sdk": "0.1.0-SNAPSHOT"
   },
   "engines": {
     "node": "^18.12 || ^20.11 || ^22.11",

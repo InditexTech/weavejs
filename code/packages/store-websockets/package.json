@@ -31,9 +31,8 @@
     "version:release": "npm version $RELEASE_VERSION -m \"[npm-scripts] prepare release $RELEASE_VERSION\" --tag-version-prefix \"\""
   },
   "devDependencies": {
-    "@inditex/eslint-config": "1.7.0",
-    "@typescript-eslint/eslint-plugin": "7.8.0",
-    "@typescript-eslint/parser": "7.13.1",
+    "@typescript-eslint/eslint-plugin": "8.26.0",
+    "@typescript-eslint/parser": "8.26.0",
     "@vitest/coverage-v8": "1.6.0",
     "@vitest/ui": "1.6.0",
     "eslint": "8.57.1",

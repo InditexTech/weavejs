@@ -5,7 +5,7 @@ import * as awarenessProtocol from "y-protocols/awareness";
 
 import { WebPubSubServiceClient } from "@azure/web-pubsub";
 import { WebSocket } from "ws";
-import { Doc } from "yjs";
+import * as Y from "yjs";
 
 const messageSync = 0;
 const messageAwareness = 1;
@@ -41,7 +41,7 @@ export interface WebPubSubHostOptions {
 }
 
 export class WeaveStoreAzureWebPubSubSyncHost {
-  public doc: Doc;
+  public doc: Y.Doc;
   public topic: string;
 
   private _client: WebPubSubServiceClient;
@@ -53,7 +53,7 @@ export class WeaveStoreAzureWebPubSubSyncHost {
   constructor(
     client: WebPubSubServiceClient,
     topic: string,
-    doc: Doc,
+    doc: Y.Doc,
     { WebSocketPolyfill = WebSocket }: WebPubSubHostOptions,
   ) {
     this.doc = doc;

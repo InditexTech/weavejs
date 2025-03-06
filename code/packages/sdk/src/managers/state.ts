@@ -137,7 +137,9 @@ export class WeaveStateManager {
       parent.props.children.push(finalNode);
     }
 
-    doRender && this.instance.render();
+    if (doRender) {
+      this.instance.render();
+    }
   }
 
   updateNode(node: WeaveStateElement, doRender = true) {
@@ -162,7 +164,9 @@ export class WeaveStateManager {
       ...nodeNew,
     };
 
-    doRender && this.instance.render();
+    if (doRender) {
+      this.instance.render();
+    }
   }
 
   removeNode(node: WeaveStateElement, doRender = true) {
@@ -188,7 +192,9 @@ export class WeaveStateManager {
       parentState.props.children = filteredChildren;
     }
 
-    doRender && this.instance.render();
+    if (doRender) {
+      this.instance.render();
+    }
   }
 
   removeNodes(nodes: WeaveStateElement[], doRender = true) {
@@ -196,7 +202,9 @@ export class WeaveStateManager {
       this.removeNode(node, false);
     }
 
-    doRender && this.instance.render();
+    if (doRender) {
+      this.instance.render();
+    }
   }
 
   moveNode(node: WeaveStateElement, position: WeavePosition, doRender = true) {
@@ -253,7 +261,9 @@ export class WeaveStateManager {
 
       nodeParent.props.children = nodeParentNewChildren;
 
-      doRender && this.instance.render();
+      if (doRender) {
+        this.instance.render();
+      }
     }
   }
 }

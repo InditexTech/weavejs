@@ -3,6 +3,11 @@
     "es2022": true,
     "browser": true
   },
+  "extends": [
+      "eslint:recommended",
+      "plugin:@typescript-eslint/recommended",
+      "plugin:react/recommended",
+  ],
   "parser": "@typescript-eslint/parser",
   "parserOptions": {
     "ecmaVersion": 2022,
@@ -11,7 +16,9 @@
       "jsx": true
     }
   },
-  "extends": ["@inditex/eslint-config/typescript", "@inditex/eslint-config/react-ts"],
+  "plugins": [
+    "react-hooks"
+  ],
   "globals": {
     "JSX": "readonly",
     "window": "readonly",
