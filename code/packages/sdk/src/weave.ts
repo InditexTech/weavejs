@@ -353,7 +353,9 @@ export class Weave extends Emittery {
       this.removeNode(node, false);
     }
 
-    doRender && this.render();
+    if (doRender) {
+      this.render();
+    }
   }
 
   moveNode(node: WeaveStateElement, position: WeavePosition, doRender = true) {

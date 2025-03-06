@@ -278,7 +278,9 @@ export class WeavePenToolAction extends WeaveAction {
         const tr = selectionPlugin.getTransformer();
         tr.show();
         const node = stage.findOne(`#${this.lineId}`);
-        node && selectionPlugin.setSelectedNodes([node]);
+        if (node) {
+          selectionPlugin.setSelectedNodes([node]);
+        }
       }
     }
 
