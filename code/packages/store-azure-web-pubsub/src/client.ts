@@ -1,7 +1,7 @@
 import Emittery from "emittery";
 import { Buffer } from "buffer";
 import { v4 as uuidv4 } from "uuid";
-import { Doc } from "yjs";
+import { Doc } from "@weavejs/sdk";
 import ReconnectingWebSocket from "reconnecting-websocket";
 
 import * as encoding from "lib0/encoding";
@@ -103,15 +103,18 @@ export class WeaveStoreAzureWebPubSubSyncClient extends Emittery {
   private _connectionUrl: string | null;
   private _status: "connected" | "connecting" | "disconnected";
   private _wsConnected: boolean;
-  private _wsLastMessageReceived: number;
+  // private _wsLastMessageReceived: number;
   private _synced: boolean;
   private _resyncInterval;
   private _uuid: string;
   private _awareness: awarenessProtocol.Awareness;
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   private _updateHandler: (update: any, origin: any) => void;
   private _awarenessUpdateHandler: (
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     { added, updated, removed }: { added: any; updated: any; removed: any },
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     origin: any,
   ) => void;
 
@@ -145,7 +148,7 @@ export class WeaveStoreAzureWebPubSubSyncClient extends Emittery {
 
     this._synced = false;
     this._ws = null;
-    this._wsLastMessageReceived = 0;
+    // this._wsLastMessageReceived = 0;
 
     const awareness = new awarenessProtocol.Awareness(doc);
     this._awareness = awareness;
@@ -231,6 +234,7 @@ export class WeaveStoreAzureWebPubSubSyncClient extends Emittery {
         const data = (await res.json()) as { url: string };
         this._connectionUrl = data.url;
       }
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (err) {
       throw new Error(`Failed to fetch connection url from: ${this._url}`);
     }
@@ -272,7 +276,7 @@ export class WeaveStoreAzureWebPubSubSyncClient extends Emittery {
       }
 
       const buf = Buffer.from(messageData.c, "base64");
-      this._wsLastMessageReceived = Date.now();
+      // this._wsLastMessageReceived = Date.now();
       const encoder = readMessage(this, buf, true);
       if (encoding.length(encoder) > 1) {
         sendToControlGroup(this, this.topic, MessageDataType.Sync, encoding.toUint8Array(encoder));
@@ -299,7 +303,7 @@ export class WeaveStoreAzureWebPubSubSyncClient extends Emittery {
     };
 
     websocket.onopen = () => {
-      this._wsLastMessageReceived = Date.now();
+      // this._wsLastMessageReceived = Date.now();
       this._wsConnected = true;
       this._status = "connected";
       this.emit("status", this._status);
