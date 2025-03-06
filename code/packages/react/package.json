@@ -1,5 +1,5 @@
 {
-  "name": "@weavejs/react",
+  "name": "@inditextech/weavejs-react",
   "version": "0.1.0-SNAPSHOT",
   "type": "module",
   "license": "MIT",
@@ -65,7 +65,7 @@
   },
   "nx": {
     "implicitDependencies": [
-      "@weavejs/sdk"
+      "@inditextech/weavejs-sdk"
     ]
   }
 }

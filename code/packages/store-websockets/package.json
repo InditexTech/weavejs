@@ -1,5 +1,5 @@
 {
-  "name": "@weavejs/store-websockets",
+  "name": "@inditextech/weavejs-store-websockets",
   "version": "0.1.0-SNAPSHOT",
   "type": "module",
   "license": "MIT",
@@ -56,7 +56,7 @@
   },
   "nx": {
     "implicitDependencies": [
-      "@weavejs/sdk"
+      "@inditextech/weavejs-sdk"
     ]
   }
 }
