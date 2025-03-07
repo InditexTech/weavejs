@@ -9,7 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- [#15](https://github.com/InditexTech/weavejs/issues/15) Avoid use weave.js packages internally as peer-dependencies
+- [#15](https://github.com/InditexTech/weavejs/issues/15) Avoid use weave.js packages internally as peer-dependencies and setup author and maintainers properties on packages
 
 ## [0.1.0] - 2025-03-07
 
