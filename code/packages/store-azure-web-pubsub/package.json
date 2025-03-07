@@ -1,6 +1,6 @@
 {
   "name": "@inditextech/weavejs-store-azure-web-pubsub",
-  "version": "0.1.0-SNAPSHOT",
+  "version": "0.1.0",
   "type": "module",
   "license": "MIT",
   "main": "dist/store-azure-web-pubsub.js",

@@ -1,6 +1,6 @@
 {
   "name": "@inditextech/weavejs-store-websockets",
-  "version": "0.1.0-SNAPSHOT",
+  "version": "0.1.0",
   "type": "module",
   "license": "MIT",
   "main": "dist/store-websockets.js",

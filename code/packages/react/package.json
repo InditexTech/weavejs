@@ -1,6 +1,6 @@
 {
   "name": "@inditextech/weavejs-react",
-  "version": "0.1.0-SNAPSHOT",
+  "version": "0.1.0",
   "type": "module",
   "license": "MIT",
   "main": "dist/react.js",
