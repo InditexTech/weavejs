@@ -43,11 +43,11 @@
     "vite-plugin-compression2": "1.0.0",
     "vite-plugin-dts": "4.0.3",
     "vitest": "1.6.0",
-    "vitest-sonar-reporter": "2.0.0",
-    "y-websocket": "2.1.0"
+    "vitest-sonar-reporter": "2.0.0"
   },
   "peerDependencies": {
     "@inditextech/weavejs-sdk": "0.1.0-SNAPSHOT",
+    "y-websocket": ">= 2.1.0",
     "yjs": ">= 13.6.23"
   },
   "engines": {
