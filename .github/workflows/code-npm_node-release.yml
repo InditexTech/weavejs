@@ -104,7 +104,7 @@ jobs:
 
       - name: NPM / Set npmrc
         env:
-          NPM_AUTH: ${{ secrets.NPM_PUBLISH_TOKEN }}
+          NPM_AUTH: ${{ secrets.NPM_TOKEN }}
           NPM_REGISTRY: "https://registry.npmjs.org/"
         run: |
           echo "registry=${NPM_REGISTRY}" >> /home/runner/.npmrc
@@ -181,7 +181,7 @@ jobs:
       - name: NPM / Release Perform - Distribution Platform
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_PUBLISH_TOKEN }}
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
         working-directory: code
         run: |
           npm run release:perform
