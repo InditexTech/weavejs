@@ -11,7 +11,7 @@
 
 ## Where does it run?
 
-`ubuntu-20.04` GitHub infrastructure.
+`ubuntu-24.04` GitHub infrastructure.
 
 ## Versions used
 
