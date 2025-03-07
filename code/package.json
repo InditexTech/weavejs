@@ -11,7 +11,6 @@
   "scripts": {
     "build": "nx run-many -t build",
     "bump:snapshot": "npm ci && nx release version $npm_package_version.$(date \"+%s\")",
-    "changelog:generate": "nx release changelog --git-tag=false --git-commit=false --verbose --dry-run $RELEASE_VERSION",
     "check": "nx run-many -t check",
     "cleanup": "rm package-lock.json && npkill -D -y",
     "dist:tag": "nx run-many -t dist:tag",
