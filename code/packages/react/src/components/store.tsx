@@ -7,8 +7,8 @@ import {
   WeaveStateElement,
   WeaveStatus,
   WeaveToPasteNode,
-} from "@weavejs/sdk";
-import { WeaveStoreWebsocketsConnectionStatus } from "@weavejs/store-websockets";
+} from "@inditextech/weavejs-sdk";
+import { WeaveStoreWebsocketsConnectionStatus } from "@inditextech/weavejs-store-websockets";
 import { create } from "zustand";
 
 interface WeaveRuntimeState {
