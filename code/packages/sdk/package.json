@@ -2,7 +2,14 @@
   "name": "@inditextech/weavejs-sdk",
   "version": "0.2.0-SNAPSHOT",
   "type": "module",
-  "license": "MIT",
+  "license": "Apache-2.0",
+  "author": "Jesus Manuel Piñeiro Cid <jesusmpc@inditex.com>",
+  "maintainers": [
+    {
+      "name": "Jesus Manuel Piñeiro Cid",
+      "email": "jesusmpc@inditex.com"
+    }
+  ],
   "main": "dist/sdk.js",
   "types": "dist/sdk.d.ts",
   "files": [
