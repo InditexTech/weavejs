@@ -108,7 +108,7 @@ jobs:
           NPM_REGISTRY: "https://registry.npmjs.org/"
         run: |
           echo "registry=${NPM_REGISTRY}" >> /home/runner/.npmrc
-          echo "@testing-env-org:registry=${NPM_REGISTRY}" >> /home/runner/.npmrc
+          echo "@inditextech:registry=${NPM_REGISTRY}" >> /home/runner/.npmrc
           echo "//registry.npmjs.org/:_authToken=${NPM_AUTH}" >> /home/runner/.npmrc
           echo "always-auth=true" >> /home/runner/.npmrc
 
