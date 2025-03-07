@@ -24,7 +24,7 @@ import {
   WeaveUndoRedoChange,
   WeaveStore,
   WeaveStatus,
-} from "@weavejs/sdk";
+} from "@inditextech/weavejs-sdk";
 import { useWeave } from "./store";
 
 type WeaveProviderType = {

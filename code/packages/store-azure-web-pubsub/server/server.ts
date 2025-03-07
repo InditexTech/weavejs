@@ -3,7 +3,7 @@ import express, { Router } from "express";
 import { WebPubSubServiceClient, AzureKeyCredential } from "@azure/web-pubsub";
 import SyncHandler from "./sync-handler";
 
-const port = process.env.WEAVE_AZURE_WEB_PUBSUB_PORT || 1234;
+const port = process.env.WEAVE_AZURE_WEB_PUBSUB_PORT || 3001;
 
 const endpoint = process.env.WEAVE_AZURE_WEB_PUBSUB_ENDPOINT;
 const key = process.env.WEAVE_AZURE_WEB_PUBSUB_KEY;
@@ -29,9 +29,9 @@ app.use(cors(corsOptions));
 const router = new Router();
 
 router.use(syncHandler.getMiddleware());
-router.get(`/:roomId/connect`, (req, res) => syncHandler.clientConnect(req, res));
+router.get(`/rooms/:roomId/connect`, (req, res) => syncHandler.clientConnect(req, res));
 
-app.use(`/${hubName}`, router);
+app.use(`/api/v1/${hubName}`, router);
 
 app.listen(port, "0.0.0.0", () => {
   // eslint-disable-next-line no-console
@@ -39,5 +39,5 @@ app.listen(port, "0.0.0.0", () => {
   // eslint-disable-next-line no-console
   console.log("Client endpoints:");
   // eslint-disable-next-line no-console
-  console.log(`- Connection\nhttp://localhost:${port}/${hubName}/{roomId}/connect`);
+  console.log(`- Connection\nhttp://localhost:${port}/api/v1/${hubName}/{roomId}/connect`);
 });

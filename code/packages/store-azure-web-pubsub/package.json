@@ -22,7 +22,7 @@
     "lint:fix": "npm run lint -- --fix",
     "lint": "eslint ./src",
     "publish:snapshot": "npm publish",
-    "release:perform": "npm publish",
+    "release:perform": "npm publish --access public",
     "release:prepare": "npm run verify",
     "start": "tsx ./bin/server.ts",
     "test": "vitest --passWithNoTests",
@@ -57,10 +57,11 @@
     "vite-plugin-dts": "4.0.3",
     "vitest": "1.6.0",
     "vitest-sonar-reporter": "2.0.0",
-    "y-protocols": "^1.0.6"
+    "ws": "^8.18.1"
   },
   "peerDependencies": {
-    "@inditextech/weavejs-sdk": "0.1.0-SNAPSHOT"
+    "@inditextech/weavejs-sdk": "0.1.0-SNAPSHOT",
+    "y-protocols": ">= 1.0.6"
   },
   "engines": {
     "node": "^18.12 || ^20.11 || ^22.11",

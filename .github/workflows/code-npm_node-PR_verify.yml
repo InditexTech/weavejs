@@ -1,0 +1,99 @@
+---
+name: code-npm-PR-verify
+
+concurrency:
+  group: code-PR-verify-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+on:
+  pull_request:
+    paths:
+      - 'code/**'
+      - '.github/workflows/code*'
+
+
+jobs:
+  unit-tests:
+    name: Code / Verify
+    timeout-minutes: 60
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout / Branch Head
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: ${{ github.event.pull_request.head.sha }}
+
+      - name: NPM / Setup Dependencies Cache
+        uses: actions/cache@v4
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-
+
+      - name: asdf / Setup Dependencies Cache
+        uses: actions/cache@v4
+        id: asdf-cache
+        with:
+          path: ~/.asdf/data
+          key: ${{ runner.os }}-asdf-${{ hashFiles('**/.tool-versions') }}
+          restore-keys: |
+            ${{ runner.os }}-asdf-
+
+      - name: Save tool-versions content
+        run: |
+          {
+            echo "TOOL_VERSIONS<<EOF"
+            cat code/.tool-versions
+            echo "EOF"
+          } >> "$GITHUB_ENV"
+
+      - name: NPM / Setup asdf environment
+        uses: asdf-vm/actions/install@v3
+        # https://github.com/asdf-vm/actions/issues/356
+        if: steps.asdf-cache.outputs.cache-hit != 'true'
+        with:
+          tool_versions: ${{ env.TOOL_VERSIONS }}
+
+      - name: NPM / Create Cache Folders
+        run: |
+          mkdir -p "$HOME"/.npm
+          mkdir -p "$HOME"/.asdf/data
+
+      - name: NPM / Verify
+        working-directory: code
+        run: |
+          npm run verify
+
+      - name: Store project information
+        id: version
+        run: |
+          echo "app-version=$(jq ".version" code/package.json)" >> "$GITHUB_OUTPUT"
+          echo "app-name=$(yq -oy '.name' code/package.json)" >> "$GITHUB_OUTPUT"
+          echo "github-repository=$(echo $GITHUB_REPOSITORY | cut -d'/' -f2)" >> "$GITHUB_OUTPUT"
+
+      - name: SonarCloud / Run SonarCloud action
+        if: ${{ vars.IS_INDITEXTECH_REPO == 'true' }}
+        uses: sonarsource/sonarqube-scan-action@v4
+        env:
+          PR_HEAD_REF: ${{ github.head_ref }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        with:
+          projectBaseDir: code
+          args: >
+            -Dsonar.projectKey=InditexTech_${{ steps.version.outputs.github-repository }}
+            -Dsonar.projectName=${{ steps.version.outputs.app-name }}
+            -Dsonar.projectVersion=${{ steps.version.outputs.app-version }}
+            -Dsonar.host.url="https://sonarcloud.io/"
+            -Dsonar.organization=inditextech
+            -Dsonar.pullrequest.key=${{ github.event.pull_request.number }}
+            -Dsonar.pullrequest.branch="$PR_HEAD_REF"
+            -Dsonar.pullrequest.base=${{ github.base_ref }}
+            -Dsonar.scm.revision=${{ github.event.pull_request.head.sha }}
+            -Dsonar.qualitygate.wait=true
+            -Dsonar.qualitygate.timeout=300
+            -Dsonar.pullrequest.provider=GitHub
+            -Dsonar.pullrequest.github.repository=${{ github.repository }}
+            -Dsonar.pullrequest.github.summary_comment=true

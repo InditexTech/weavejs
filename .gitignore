@@ -1,1 +1,28 @@
+# System
+.DS_Store
+
+# IDE config
+/.idea
+
+# VSCode
+/.vscode
+
+# Generated
+/.jshintignore
+/.jshintrc
+/dist
+npm-debug.log
+node_modules
+
+# Typings
+*.ts
+
+# Temporary Files and Backups
+*.swp
+*.*~
+*yarn-error.log*
+
+*.iml
+*.bck
+/.npmrc
 .vscode

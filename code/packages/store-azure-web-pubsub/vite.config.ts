@@ -19,7 +19,7 @@ export default defineConfig(({ mode }) => {
         fileName: "store-azure-web-pubsub",
       },
       rollupOptions: {
-        external: ["@weavejs/sdk", "yjs"],
+        external: ["@inditextech/weavejs-sdk", "yjs"],
       },
     },
 

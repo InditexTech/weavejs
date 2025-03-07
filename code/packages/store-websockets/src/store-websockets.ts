@@ -1,4 +1,4 @@
-import { WeaveAwarenessChange, WeaveStore } from "@weavejs/sdk";
+import { WeaveAwarenessChange, WeaveStore } from "@inditextech/weavejs-sdk";
 import { WebsocketProvider } from "y-websocket";
 import { WEAVE_STORE_WEBSOCKETS } from "./constants";
 import { WeaveStoreWebsocketsConnectionStatus, WeaveStoreWebsocketsOptions } from "./types";

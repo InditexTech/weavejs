@@ -1,4 +1,4 @@
-import { WeaveAwarenessChange, WeaveStore } from "@weavejs/sdk";
+import { WeaveAwarenessChange, WeaveStore } from "@inditextech/weavejs-sdk";
 import { WeaveStoreAzureWebPubSubSyncClient } from "./client";
 import { WEAVE_STORE_AZURE_WEB_PUBSUB } from "./constants";
 import { WeaveStoreAzureWebPubsubOptions } from "./types";
