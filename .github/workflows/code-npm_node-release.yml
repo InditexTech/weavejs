@@ -108,7 +108,7 @@ jobs:
           NPM_REGISTRY: "https://registry.npmjs.org/"
         run: |
           echo "registry=${NPM_REGISTRY}" >> /home/runner/.npmrc
-          echo "@testing-env-org:registry=${NPM_REGISTRY}" >> /home/runner/.npmrc
+          echo "@inditextech:registry=${NPM_REGISTRY}" >> /home/runner/.npmrc
           echo "//registry.npmjs.org/:_authToken=${NPM_AUTH}" >> /home/runner/.npmrc
           echo "always-auth=true" >> /home/runner/.npmrc
 
@@ -249,6 +249,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: >
           gh pr comment ${{ github.event.number }} --body "An error occurred creating the Github Release.
-          Don't panic! Your artifacts were successfully uploaded to the Distribution Platform and the new release tag was created.
+          Don't panic! Your artifacts were successfully uploaded to the InditexTech npmjs registry and the new release tag was created.
           You can manually complete the release by creating it in the [releases](https://github.com/${{ github.repository }}/releases)
           page."

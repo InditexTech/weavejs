@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- [#5](https://github.com/InditexTech/weavejs/issues/5) Add workflows for OSS projects
 - [#12](https://github.com/InditexTech/weavejs/issues/12) Automatic changelog generation
 - [#10](https://github.com/InditexTech/weavejs/issues/10) Fix packages names to be on @inditextech scope
 - [#8](https://github.com/InditexTech/weavejs/issues/8) ESLint OSS rules
