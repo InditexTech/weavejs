@@ -3,7 +3,7 @@ import express, { Router } from "express";
 import { WebPubSubServiceClient, AzureKeyCredential } from "@azure/web-pubsub";
 import SyncHandler from "./sync-handler";
 
-const port = process.env.WEAVE_AZURE_WEB_PUBSUB_PORT || 3001;
+const port = process.env.WEAVE_AZURE_WEB_PUBSUB_PORT || 8081;
 
 const endpoint = process.env.WEAVE_AZURE_WEB_PUBSUB_ENDPOINT;
 const key = process.env.WEAVE_AZURE_WEB_PUBSUB_KEY;

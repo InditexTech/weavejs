@@ -64,22 +64,20 @@ export class WeaveStoreAzureWebPubSubSyncHost {
     this._polyfill = WebSocketPolyfill;
 
     // register awareness controller
-    const awareness = new awarenessProtocol.Awareness(doc);
-    awareness.setLocalState(null);
+    this._awareness = new awarenessProtocol.Awareness(this.doc);
+    this._awareness.setLocalState(null);
 
     // const awarenessChangeHandler = ({ added, updated, removed }, conn) => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const awarenessChangeHandler = ({ added, updated, removed }: { added: any; updated: any; removed: any }) => {
+    const awarenessUpdateHandler = ({ added, updated, removed }: { added: any; updated: any; removed: any }) => {
       const changedClients = added.concat(updated, removed);
       const encoder = encoding.createEncoder();
       encoding.writeVarUint(encoder, messageAwareness);
-      encoding.writeVarUint8Array(encoder, awarenessProtocol.encodeAwarenessUpdate(awareness, changedClients));
+      encoding.writeVarUint8Array(encoder, awarenessProtocol.encodeAwarenessUpdate(this._awareness, changedClients));
       const u8 = encoding.toUint8Array(encoder);
       this.broadcast(this.topic, u8);
     };
-    awareness.on("update", awarenessChangeHandler);
-
-    this._awareness = awareness;
+    this._awareness.on("update", awarenessUpdateHandler);
 
     // register update handler
     const updateHandler = (update: Uint8Array) => {
@@ -197,7 +195,7 @@ export class WeaveStoreAzureWebPubSubSyncHost {
     try {
       const buf = Buffer.from(data.c, "base64");
       const decoder = decoding.createDecoder(buf);
-      // const messageType = decoding.readVarUint(decoder); // skip the message type
+      decoding.readVarUint(decoder); // skip the message type
       awarenessProtocol.applyAwarenessUpdate(this._awareness, decoding.readVarUint8Array(decoder), undefined);
     } catch (err) {
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
