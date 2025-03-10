@@ -7,25 +7,25 @@ concurrency: code-release-${{ github.ref }}
 on:
   pull_request:
     types: [closed]
-    branches: ['main', 'main-*']
-    paths: ['code/**', '.github/workflows/code**']
+    branches: ["main", "main-*"]
+    paths: ["code/**", ".github/workflows/code**"]
   workflow_dispatch:
     inputs:
       BASELINE:
-        description: 'Baseline branch'
+        description: "Baseline branch"
         required: true
-        default: 'main'
+        default: "main"
       RELEASE_TYPE:
-        description: 'Release type to use'
+        description: "Release type to use"
         required: true
-        default: 'release-type/minor'
+        default: "release-type/minor"
         type: choice
         options:
-          - 'release-type/hotfix'
-          - 'release-type/multi-hotfix'
-          - 'release-type/major'
-          - 'release-type/minor'
-          - 'release-type/patch'
+          - "release-type/hotfix"
+          - "release-type/multi-hotfix"
+          - "release-type/major"
+          - "release-type/minor"
+          - "release-type/patch"
 
 jobs:
   release:
@@ -76,7 +76,7 @@ jobs:
           key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
           restore-keys: |
             ${{ runner.os }}-node-
-      
+
       - name: Setup asdf Cache
         id: asdf-cache
         uses: actions/cache@v4
@@ -96,7 +96,8 @@ jobs:
           } >> "$GITHUB_ENV"
 
       - name: Setup asdf environment
-        uses: asdf-vm/actions/install@v3
+        uses:
+          asdf-vm/actions/install@v3
           # https://github.com/asdf-vm/actions/issues/356
         if: steps.asdf-cache.outputs.cache-hit != 'true'
         with:
@@ -165,8 +166,16 @@ jobs:
         env:
           RELEASE_VERSION: ${{ steps.update-changelog.outputs.version }}
         run: |
-            npm run version:release
-            npm run release:prepare
+          npm run version:release
+          npm run release:prepare
+
+      - name: NPM / Release Perform - Distribution Platform
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        working-directory: code
+        run: |
+          npm run release:perform
 
       - name: Release / Commit and Tag
         env:
@@ -178,18 +187,10 @@ jobs:
           git tag ${{ steps.update-changelog.outputs.version }}
           git push --atomic --no-verify origin HEAD ${{ steps.update-changelog.outputs.version }}
 
-      - name: NPM / Release Perform - Distribution Platform
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-        working-directory: code
-        run: |
-          npm run release:perform
-
       - name: NPM / Set next development version
         working-directory: code
         run: |
-            npm run version:development
+          npm run version:development
 
       - name: Next Development Iteration / Commit Changes
         env:
