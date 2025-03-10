@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- [#15](https://github.com/InditexTech/weavejs/issues/19) Fix awareness not working on store-azure-web-pubsub
+
 ## [0.1.1] - 2025-03-07
 
 ### Added
@@ -24,7 +28,5 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - [#2](https://github.com/InditexTech/weavejs/issues/2) Improve rendering handling
 
 [Unreleased]: https://github.com/InditexTech/weavejs/compare/0.1.1...HEAD
-
 [0.1.1]: https://github.com/InditexTech/weavejs/compare/0.1.0...0.1.1
-
 [0.1.0]: https://github.com/InditexTech/weavejs/releases/tag/0.1.0
