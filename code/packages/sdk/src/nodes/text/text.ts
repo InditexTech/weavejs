@@ -42,20 +42,18 @@ export class WeaveTextNode extends WeaveNode {
   }
 
   createInstance(props: WeaveElementAttributes) {
-    const stage = this.instance.getStage();
-
     const text = new Konva.Text({
       ...props,
     });
 
-    const selectionPlugin = this.instance.getPlugin<WeaveNodesSelectionPlugin>("nodesSelection");
-
-    selectionPlugin?.getTransformer().on("dblclick dbltap", (e) => {
-      e.evt.preventDefault();
-
+    text.on("dblclick", (evt) => {
+      evt.cancelBubble = true;
+  
       if (this.editing) {
         return;
       }
+
+      const stage = this.instance.getStage();
 
       const mousePos = stage.getPointerPosition();
       if (mousePos) {
@@ -94,26 +92,6 @@ export class WeaveTextNode extends WeaveNode {
     text.on("mouseleave", () => {
       const stage = this.instance.getStage();
       stage.container().style.cursor = "default";
-    });
-
-    stage.on("mousemove", () => {
-      if (!this.editing) {
-        return;
-      }
-
-      const textArea = document.getElementById(text.id()) as HTMLTextAreaElement | null;
-
-      if (textArea) {
-        const textPosition = text.absolutePosition();
-
-        const areaPosition: Vector2d = {
-          x: stage.container().offsetLeft + textPosition.x,
-          y: stage.container().offsetTop + textPosition.y,
-        };
-
-        textArea.style.top = areaPosition.y + "px";
-        textArea.style.left = areaPosition.x + "px";
-      }
     });
 
     text.setAttr("triggerEditMode", this.triggerEditMode.bind(this));

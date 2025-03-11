@@ -150,6 +150,9 @@ export class Weave extends Emittery {
     await this.fontsManager.loadFonts();
     this.setupManager.setupLog();
 
+    // Setup stage
+    // this.stageManager.initStage();
+
     // Setup and connect to the store
     const store = this.storeManager.getStore();
     store.setup();
