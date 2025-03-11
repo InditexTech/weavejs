@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.2.1] - 2025-03-11
+
 ### Fixed
 
 - [#24](https://github.com/InditexTech/weavejs/issues/24) Bug when loading rooms with text or images
@@ -33,7 +35,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - [#8](https://github.com/InditexTech/weavejs/issues/8) ESLint OSS rules
 - [#2](https://github.com/InditexTech/weavejs/issues/2) Improve rendering handling
 
-[Unreleased]: https://github.com/InditexTech/weavejs/compare/0.2.0...HEAD
+[Unreleased]: https://github.com/InditexTech/weavejs/compare/0.2.1...HEAD
+
+[0.2.1]: https://github.com/InditexTech/weavejs/compare/0.2.0...0.2.1
+
 [0.2.0]: https://github.com/InditexTech/weavejs/compare/0.1.1...0.2.0
+
 [0.1.1]: https://github.com/InditexTech/weavejs/compare/0.1.0...0.1.1
+
 [0.1.0]: https://github.com/InditexTech/weavejs/releases/tag/0.1.0
