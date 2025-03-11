@@ -110,11 +110,9 @@ export class WeaveImageNode extends WeaveNode {
       e.cancelBubble = true;
     });
 
-    const selectionPlugin = this.instance.getPlugin<WeaveNodesSelectionPlugin>("nodesSelection");
-
-    selectionPlugin?.getTransformer().on("dblclick dbltap", (e) => {
-      e.evt.preventDefault();
-
+    image.on("dblclick", (evt) => {
+      evt.cancelBubble = true;
+  
       if (this.editing) {
         return;
       }

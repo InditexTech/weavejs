@@ -73,6 +73,15 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
     this.tr = tr;
     this.selectionRectangle = selectionRectangle;
 
+    this.tr.on("dblclick", (evt) => {
+      evt.cancelBubble = true;
+      
+      if (this.tr.getNodes().length === 1) {
+        const node = this.tr.getNodes()[0];
+        node.fire("dblclick");
+      }
+    });
+
     this.initEvents();
 
     this.initialized = true;
