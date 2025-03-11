@@ -296,7 +296,6 @@ export class WeaveStoreAzureWebPubSubSyncClient extends Emittery {
     };
 
     websocket.onclose = () => {
-      console.log("WS onclose");
       this._ws = null;
       if (this._wsConnected) {
         this._status = "disconnected";
@@ -312,12 +311,10 @@ export class WeaveStoreAzureWebPubSubSyncClient extends Emittery {
     };
 
     websocket.onerror = (err) => {
-      console.log("WS onerror");
       console.error(err);
     };
 
     websocket.onopen = () => {
-      console.log("WS onopen");
       // this._wsLastMessageReceived = Date.now();
       this._wsConnected = true;
       this._status = "connected";

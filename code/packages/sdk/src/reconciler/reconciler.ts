@@ -122,8 +122,6 @@ export class WeaveReconciler {
         newProps.initialZIndex = props.zIndex;
 
         if (type === "stage") {
-          // console.log("CONT", newProps, weaveInstance.getStage());
-          // return weaveInstance.getStage();
           newProps.container = rootContainer.getStageConfiguration().container;
           newProps.width = rootContainer.getStageConfiguration().width;
           newProps.height = rootContainer.getStageConfiguration().height;
