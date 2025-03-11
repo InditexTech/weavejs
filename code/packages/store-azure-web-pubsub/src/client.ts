@@ -223,6 +223,16 @@ export class WeaveStoreAzureWebPubSubSyncClient extends Emittery {
 
   stop() {
     if (this._ws !== null) {
+      const encoder = encoding.createEncoder()
+      encoding.writeVarUint(encoder, messageAwareness)
+      encoding.writeVarUint8Array(
+        encoder,
+        awarenessProtocol.encodeAwarenessUpdate(this.awareness, [
+          this.doc.clientID
+        ], new Map())
+      )
+      const u8 = encoding.toUint8Array(encoder);
+      sendToControlGroup(this, this.topic, MessageDataType.Awareness, u8);
       this._ws.close();
     }
   }
@@ -233,6 +243,8 @@ export class WeaveStoreAzureWebPubSubSyncClient extends Emittery {
       if (res.ok) {
         const data = (await res.json()) as { url: string };
         this._connectionUrl = data.url;
+      } else {
+        throw new Error(`Failed to fetch connection url from: ${this._url}`);
       }
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (err) {
@@ -284,6 +296,7 @@ export class WeaveStoreAzureWebPubSubSyncClient extends Emittery {
     };
 
     websocket.onclose = () => {
+      console.log("WS onclose");
       this._ws = null;
       if (this._wsConnected) {
         this._status = "disconnected";
@@ -299,10 +312,12 @@ export class WeaveStoreAzureWebPubSubSyncClient extends Emittery {
     };
 
     websocket.onerror = (err) => {
+      console.log("WS onerror");
       console.error(err);
     };
 
     websocket.onopen = () => {
+      console.log("WS onopen");
       // this._wsLastMessageReceived = Date.now();
       this._wsConnected = true;
       this._status = "connected";

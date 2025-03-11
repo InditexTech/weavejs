@@ -25,7 +25,7 @@ export class WeaveStoreAzureWebPubsub extends WeaveStore {
     const { url } = this.config;
 
     this.provider = new WeaveStoreAzureWebPubSubSyncClient(url, this.roomId, this.getDocument(), {
-      resyncInterval: 0,
+      resyncInterval: 1000,
       tokenProvider: null,
     });
 
@@ -53,7 +53,7 @@ export class WeaveStoreAzureWebPubsub extends WeaveStore {
   }
 
   async disconnect() {
-    this.provider.stop();
+    this.provider.destroy();
   }
 
   setAwarenessInfo(field: string, value: unknown) {
