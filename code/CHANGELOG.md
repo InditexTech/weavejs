@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
 - [#26](https://github.com/InditexTech/weavejs/issues/26) Improve awareness and disconnection of user for store-azure-web-pubsub
 
 ## [0.2.1] - 2025-03-11
