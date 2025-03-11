@@ -117,6 +117,8 @@ export class WeaveUsersPointersPlugin extends WeavePlugin {
   private renderPointers() {
     const pointersLayer = this.getLayer();
 
+    pointersLayer?.clear();
+
     for (const userPointerKey of Object.keys(this.usersPointers)) {
       const userPointer = this.usersPointers[userPointerKey];
 

@@ -223,6 +223,16 @@ export class WeaveStoreAzureWebPubSubSyncClient extends Emittery {
 
   stop() {
     if (this._ws !== null) {
+      const encoder = encoding.createEncoder()
+      encoding.writeVarUint(encoder, messageAwareness)
+      encoding.writeVarUint8Array(
+        encoder,
+        awarenessProtocol.encodeAwarenessUpdate(this.awareness, [
+          this.doc.clientID
+        ], new Map())
+      )
+      const u8 = encoding.toUint8Array(encoder);
+      sendToControlGroup(this, this.topic, MessageDataType.Awareness, u8);
       this._ws.close();
     }
   }
@@ -233,6 +243,8 @@ export class WeaveStoreAzureWebPubSubSyncClient extends Emittery {
       if (res.ok) {
         const data = (await res.json()) as { url: string };
         this._connectionUrl = data.url;
+      } else {
+        throw new Error(`Failed to fetch connection url from: ${this._url}`);
       }
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (err) {
