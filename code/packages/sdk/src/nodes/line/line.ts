@@ -1,8 +1,8 @@
-import Konva from "konva";
-import { WeaveElementAttributes, WeaveElementInstance } from "@/types";
-import { WeaveNode } from "../node";
+import Konva from 'konva';
+import { WeaveElementAttributes, WeaveElementInstance } from '@/types';
+import { WeaveNode } from '../node';
 
-export const WEAVE_LINE_NODE_TYPE = "line";
+export const WEAVE_LINE_NODE_TYPE = 'line';
 
 export class WeaveLineNode extends WeaveNode {
   protected nodeType = WEAVE_LINE_NODE_TYPE;
@@ -25,32 +25,15 @@ export class WeaveLineNode extends WeaveNode {
       ...props,
     });
 
-    line.on("transform", () => {
-      this.instance.updateNode(this.toNode(line));
-    });
-
-    line.on("dragmove", () => {
-      this.instance.updateNode(this.toNode(line));
-    });
-
-    line.on("dragend", () => {
-      this.instance.updateNode(this.toNode(line));
-    });
-
-    line.on("mouseenter", () => {
-      const stage = this.instance.getStage();
-      stage.container().style.cursor = "pointer";
-    });
-
-    line.on("mouseleave", () => {
-      const stage = this.instance.getStage();
-      stage.container().style.cursor = "default";
-    });
+    this.setupDefaultNodeEvents(line);
 
     return line;
   }
 
-  updateInstance(nodeInstance: WeaveElementInstance, nextProps: WeaveElementAttributes) {
+  updateInstance(
+    nodeInstance: WeaveElementInstance,
+    nextProps: WeaveElementAttributes
+  ) {
     nodeInstance.setAttrs({
       ...nextProps,
     });
@@ -63,12 +46,15 @@ export class WeaveLineNode extends WeaveNode {
   toNode(instance: WeaveElementInstance) {
     const attrs = instance.getAttrs();
 
+    const cleanedAttrs = { ...attrs };
+    delete cleanedAttrs.draggable;
+
     return {
-      key: attrs.id ?? "",
+      key: attrs.id ?? '',
       type: attrs.nodeType,
       props: {
-        ...attrs,
-        id: attrs.id ?? "",
+        ...cleanedAttrs,
+        id: attrs.id ?? '',
         nodeType: attrs.nodeType,
         children: [],
       },

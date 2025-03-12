@@ -1,8 +1,8 @@
-import Konva from "konva";
-import { WeaveElementAttributes, WeaveElementInstance } from "@/types";
-import { WeaveNode } from "../node";
+import Konva from 'konva';
+import { WeaveElementAttributes, WeaveElementInstance } from '@/types';
+import { WeaveNode } from '../node';
 
-export const WEAVE_RECTANGLE_NODE_TYPE = "rectangle";
+export const WEAVE_RECTANGLE_NODE_TYPE = 'rectangle';
 
 export class WeaveRectangleNode extends WeaveNode {
   protected nodeType = WEAVE_RECTANGLE_NODE_TYPE;
@@ -21,44 +21,19 @@ export class WeaveRectangleNode extends WeaveNode {
   }
 
   createInstance(props: WeaveElementAttributes) {
-    const rect = new Konva.Rect({
+    const rectangle = new Konva.Rect({
       ...props,
     });
 
-    rect.on("transform", () => {
-      this.instance.updateNode(this.toNode(rect));
-    });
+    this.setupDefaultNodeEvents(rectangle);
 
-    rect.on("dragmove", (e) => {
-      this.instance.updateNode(this.toNode(rect));
-      e.cancelBubble = true;
-    });
-
-    rect.on("dragend", (e) => {
-      this.instance.updateNode(this.toNode(rect));
-      e.cancelBubble = true;
-    });
-
-    rect.on("mouseenter", (e) => {
-      if (!this.instance.getActiveAction()) {
-        const stage = this.instance.getStage();
-        stage.container().style.cursor = "pointer";
-        e.cancelBubble = true;
-      }
-    });
-
-    rect.on("mouseleave", (e) => {
-      if (!this.instance.getActiveAction()) {
-        const stage = this.instance.getStage();
-        stage.container().style.cursor = "default";
-        e.cancelBubble = true;
-      }
-    });
-
-    return rect;
+    return rectangle;
   }
 
-  updateInstance(nodeInstance: WeaveElementInstance, nextProps: WeaveElementAttributes) {
+  updateInstance(
+    nodeInstance: WeaveElementInstance,
+    nextProps: WeaveElementAttributes
+  ) {
     nodeInstance.setAttrs({
       ...nextProps,
     });
@@ -71,12 +46,15 @@ export class WeaveRectangleNode extends WeaveNode {
   toNode(instance: WeaveElementInstance) {
     const attrs = instance.getAttrs();
 
+    const cleanedAttrs = { ...attrs };
+    delete cleanedAttrs.draggable;
+
     return {
-      key: attrs.id ?? "",
+      key: attrs.id ?? '',
       type: attrs.nodeType,
       props: {
-        ...attrs,
-        id: attrs.id ?? "",
+        ...cleanedAttrs,
+        id: attrs.id ?? '',
         nodeType: attrs.nodeType,
         children: [],
       },

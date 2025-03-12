@@ -1,8 +1,12 @@
-import Konva from "konva";
-import { WeaveElementAttributes, WeaveElementInstance, WeaveStateElement } from "@/types";
-import { WeaveNode } from "../node";
+import Konva from 'konva';
+import {
+  WeaveElementAttributes,
+  WeaveElementInstance,
+  WeaveStateElement,
+} from '@/types';
+import { WeaveNode } from '../node';
 
-export const WEAVE_GROUP_NODE_TYPE = "group";
+export const WEAVE_GROUP_NODE_TYPE = 'group';
 
 export class WeaveGroupNode extends WeaveNode {
   protected nodeType = WEAVE_GROUP_NODE_TYPE;
@@ -25,32 +29,15 @@ export class WeaveGroupNode extends WeaveNode {
       ...props,
     });
 
-    group.on("transform", () => {
-      this.instance.updateNode(this.toNode(group));
-    });
-
-    group.on("dragmove", () => {
-      this.instance.updateNode(this.toNode(group));
-    });
-
-    group.on("dragend", () => {
-      this.instance.updateNode(this.toNode(group));
-    });
-
-    group.on("mouseenter", () => {
-      const stage = this.instance.getStage();
-      stage.container().style.cursor = "pointer";
-    });
-
-    group.on("mouseleave", () => {
-      const stage = this.instance.getStage();
-      stage.container().style.cursor = "default";
-    });
+    this.setupDefaultNodeEvents(group);
 
     return group;
   }
 
-  updateInstance(nodeInstance: WeaveElementInstance, nextProps: WeaveElementAttributes) {
+  updateInstance(
+    nodeInstance: WeaveElementInstance,
+    nextProps: WeaveElementAttributes
+  ) {
     nodeInstance.setAttrs({
       ...nextProps,
     });
@@ -64,18 +51,20 @@ export class WeaveGroupNode extends WeaveNode {
     const attrs = instance.getAttrs();
 
     const childrenMapped: WeaveStateElement[] = [];
-    const children: WeaveElementInstance[] = [...(instance as Konva.Group).getChildren()];
+    const children: WeaveElementInstance[] = [
+      ...(instance as Konva.Group).getChildren(),
+    ];
     for (const node of children) {
-      const handler = this.instance.getNodeHandler(node.getAttr("nodeType"));
+      const handler = this.instance.getNodeHandler(node.getAttr('nodeType'));
       childrenMapped.push(handler.toNode(node));
     }
 
     return {
-      key: attrs.id ?? "",
+      key: attrs.id ?? '',
       type: attrs.nodeType,
       props: {
         ...attrs,
-        id: attrs.id ?? "",
+        id: attrs.id ?? '',
         nodeType: attrs.nodeType,
         children: childrenMapped,
       },

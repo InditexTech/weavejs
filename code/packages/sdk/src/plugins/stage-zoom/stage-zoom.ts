@@ -1,7 +1,10 @@
-import { WeavePlugin } from "@/plugins/plugin";
-import { WeaveStageZoomOnZoomChangeCallback, WeaveStageZoomPluginParams } from "./types";
-import Konva from "konva";
-import { WeaveNodesSelectionPlugin } from "../nodes-selection/nodes-selection";
+import { WeavePlugin } from '@/plugins/plugin';
+import {
+  WeaveStageZoomOnZoomChangeCallback,
+  WeaveStageZoomPluginParams,
+} from './types';
+import Konva from 'konva';
+import { WeaveNodesSelectionPlugin } from '../nodes-selection/nodes-selection';
 
 export class WeaveStageZoomPlugin extends WeavePlugin {
   getLayerName = undefined;
@@ -10,14 +13,18 @@ export class WeaveStageZoomPlugin extends WeavePlugin {
   private zoomSteps: number[];
   private actualScale: number;
   private actualStep: number;
-  private padding: number = 50;
+  private padding: number = 100;
   defaultStep: number;
   private onZoomChangeCb: WeaveStageZoomOnZoomChangeCallback | undefined;
 
   constructor(params: WeaveStageZoomPluginParams) {
     super();
 
-    const { zoomSteps = [0.1, 0.25, 0.5, 1, 2, 4, 8], defaultZoom = 1, onZoomChange } = params;
+    const {
+      zoomSteps = [0.1, 0.25, 0.5, 1, 2, 4, 8],
+      defaultZoom = 1,
+      onZoomChange,
+    } = params;
 
     this.zoomSteps = zoomSteps;
 
@@ -36,7 +43,7 @@ export class WeaveStageZoomPlugin extends WeavePlugin {
   }
 
   getName() {
-    return "stageZoom";
+    return 'stageZoom';
   }
 
   init() {
@@ -95,7 +102,9 @@ export class WeaveStageZoomPlugin extends WeavePlugin {
   }
 
   canZoomOut() {
-    const actualZoomIsStep = this.zoomSteps.findIndex((scale) => scale === this.actualScale);
+    const actualZoomIsStep = this.zoomSteps.findIndex(
+      (scale) => scale === this.actualScale
+    );
     if (actualZoomIsStep === -1) {
       this.actualStep = this.findClosestStepIndex();
     }
@@ -104,7 +113,9 @@ export class WeaveStageZoomPlugin extends WeavePlugin {
   }
 
   canZoomIn() {
-    const actualZoomIsStep = this.zoomSteps.findIndex((scale) => scale === this.actualScale);
+    const actualZoomIsStep = this.zoomSteps.findIndex(
+      (scale) => scale === this.actualScale
+    );
     if (actualZoomIsStep === -1) {
       this.actualStep = this.findClosestStepIndex();
     }
@@ -138,7 +149,9 @@ export class WeaveStageZoomPlugin extends WeavePlugin {
       return;
     }
 
-    const actualZoomIsStep = this.zoomSteps.findIndex((scale) => scale === this.actualScale);
+    const actualZoomIsStep = this.zoomSteps.findIndex(
+      (scale) => scale === this.actualScale
+    );
     if (actualZoomIsStep === -1) {
       this.actualStep = this.findClosestStepIndex();
     } else {
@@ -153,7 +166,9 @@ export class WeaveStageZoomPlugin extends WeavePlugin {
       return;
     }
 
-    const actualZoomIsStep = this.zoomSteps.findIndex((scale) => scale === this.actualScale);
+    const actualZoomIsStep = this.zoomSteps.findIndex(
+      (scale) => scale === this.actualScale
+    );
     if (actualZoomIsStep === -1) {
       this.actualStep = this.findClosestStepIndex();
     } else {
@@ -177,7 +192,7 @@ export class WeaveStageZoomPlugin extends WeavePlugin {
       const box = mainLayer.getClientRect({ relativeTo: stage });
       const scale = Math.min(
         stage.width() / (box.width + this.padding * 2),
-        stage.height() / (box.height + this.padding * 2),
+        stage.height() / (box.height + this.padding * 2)
       );
 
       stage.setAttrs({
@@ -192,17 +207,20 @@ export class WeaveStageZoomPlugin extends WeavePlugin {
   fitToSelection() {
     const stage = this.instance.getStage();
 
-    const selectionPlugin = this.instance.getPlugin<WeaveNodesSelectionPlugin>("nodesSelection");
+    const selectionPlugin =
+      this.instance.getPlugin<WeaveNodesSelectionPlugin>('nodesSelection');
     const nodes = selectionPlugin.getTransformer().getNodes();
 
     if (nodes.length === 0) {
       return;
     }
 
-    let zoomTransformer = stage.findOne("#zoomTransformer") as Konva.Transformer | undefined;
+    let zoomTransformer = stage.findOne('#zoomTransformer') as
+      | Konva.Transformer
+      | undefined;
     if (!zoomTransformer) {
       zoomTransformer = new Konva.Transformer({
-        id: "zoomTransformer",
+        id: 'zoomTransformer',
         clearBeforeDraw: true,
         resizeEnabled: false,
         ignoreStroke: true,
@@ -226,12 +244,14 @@ export class WeaveStageZoomPlugin extends WeavePlugin {
     const box = zoomTransformer.__getNodeRect();
     const scale = Math.min(
       stage.width() / (zoomTransformer.width() + this.padding * 2),
-      stage.height() / (zoomTransformer.height() + this.padding * 2),
+      stage.height() / (zoomTransformer.height() + this.padding * 2)
     );
 
     stage.setAttrs({
       x: -box.x * scale + (stage.width() - zoomTransformer.width() * scale) / 2,
-      y: -box.y * scale + (stage.height() - zoomTransformer.height() * scale) / 2,
+      y:
+        -box.y * scale +
+        (stage.height() - zoomTransformer.height() * scale) / 2,
     });
 
     this.setZoom(scale, false);
