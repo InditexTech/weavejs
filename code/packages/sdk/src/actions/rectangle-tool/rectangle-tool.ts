@@ -1,10 +1,10 @@
-import { v4 as uuidv4 } from "uuid";
-import { WeaveAction } from "@/actions/action";
-import { Vector2d } from "konva/lib/types";
-import { WeaveRectangleToolActionState } from "./types";
-import { RECTANGLE_TOOL_STATE } from "./constants";
-import { WeaveNodesSelectionPlugin } from "@/plugins/nodes-selection/nodes-selection";
-import Konva from "konva";
+import { v4 as uuidv4 } from 'uuid';
+import { WeaveAction } from '@/actions/action';
+import { Vector2d } from 'konva/lib/types';
+import { WeaveRectangleToolActionState } from './types';
+import { RECTANGLE_TOOL_STATE } from './constants';
+import { WeaveNodesSelectionPlugin } from '@/plugins/nodes-selection/nodes-selection';
+import Konva from 'konva';
 
 export class WeaveRectangleToolAction extends WeaveAction {
   protected initialized: boolean = false;
@@ -27,24 +27,24 @@ export class WeaveRectangleToolAction extends WeaveAction {
   }
 
   getName(): string {
-    return "rectangleTool";
+    return 'rectangleTool';
   }
 
   private setupEvents() {
     const stage = this.instance.getStage();
 
-    stage.container().addEventListener("keydown", (e) => {
-      if (e.key === "Enter") {
+    stage.container().addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
         this.cancelAction();
         return;
       }
-      if (e.key === "Escape") {
+      if (e.key === 'Escape') {
         this.cancelAction();
         return;
       }
     });
 
-    stage.on("click tap", (e) => {
+    stage.on('click tap', (e) => {
       e.evt.preventDefault();
 
       if (this.state === RECTANGLE_TOOL_STATE.IDLE) {
@@ -62,7 +62,7 @@ export class WeaveRectangleToolAction extends WeaveAction {
       }
     });
 
-    stage.on("mousemove", (e) => {
+    stage.on('mousemove', (e) => {
       e.evt.preventDefault();
 
       this.handleMovement();
@@ -78,13 +78,7 @@ export class WeaveRectangleToolAction extends WeaveAction {
   private addRectangle() {
     const stage = this.instance.getStage();
 
-    const selectionPlugin = this.instance.getPlugin<WeaveNodesSelectionPlugin>("nodesSelection");
-    if (selectionPlugin) {
-      const tr = selectionPlugin.getTransformer();
-      tr.hide();
-    }
-
-    stage.container().style.cursor = "crosshair";
+    stage.container().style.cursor = 'crosshair';
     stage.container().focus();
 
     this.rectId = null;
@@ -107,10 +101,9 @@ export class WeaveRectangleToolAction extends WeaveAction {
       width: 0,
       height: 0,
       opacity: 1,
-      fill: "#FF0000FF",
-      stroke: "#000000FF",
+      fill: '#FF0000FF',
+      stroke: '#000000FF',
       strokeWidth: 1,
-      draggable: true,
     });
 
     this.instance.getMainLayer()?.add(this.rectangle);
@@ -120,12 +113,14 @@ export class WeaveRectangleToolAction extends WeaveAction {
 
   private handleSettingSize() {
     if (this.rectId && this.clickPoint && this.container && this.rectangle) {
-      const { mousePoint } = this.instance.getMousePointerRelativeToContainer(this.container);
+      const { mousePoint } = this.instance.getMousePointerRelativeToContainer(
+        this.container
+      );
 
       const deltaX = mousePoint.x - this.clickPoint?.x;
       const deltaY = mousePoint.y - this.clickPoint?.y;
 
-      const nodeHandler = this.instance.getNodeHandler("rectangle");
+      const nodeHandler = this.instance.getNodeHandler('rectangle');
 
       const node = nodeHandler.createNode(this.rectId, {
         x: deltaX < 0 ? this.clickPoint.x + deltaX : this.clickPoint.x,
@@ -133,8 +128,8 @@ export class WeaveRectangleToolAction extends WeaveAction {
         width: Math.abs(deltaX),
         height: Math.abs(deltaY),
         opacity: 1,
-        fill: "#FF0000FF",
-        stroke: "#000000FF",
+        fill: '#FF0000FF',
+        stroke: '#000000FF',
         strokeWidth: 1,
         draggable: true,
       });
@@ -155,7 +150,9 @@ export class WeaveRectangleToolAction extends WeaveAction {
     }
 
     if (this.rectId && this.container && this.clickPoint && this.rectangle) {
-      const { mousePoint } = this.instance.getMousePointerRelativeToContainer(this.container);
+      const { mousePoint } = this.instance.getMousePointerRelativeToContainer(
+        this.container
+      );
 
       const deltaX = mousePoint.x - this.clickPoint?.x;
       const deltaY = mousePoint.y - this.clickPoint?.y;
@@ -169,7 +166,7 @@ export class WeaveRectangleToolAction extends WeaveAction {
 
   trigger(cancelAction: () => void) {
     if (!this.instance) {
-      throw new Error("Instance not defined");
+      throw new Error('Instance not defined');
     }
 
     if (!this.initialized) {
@@ -188,16 +185,16 @@ export class WeaveRectangleToolAction extends WeaveAction {
   cleanup() {
     const stage = this.instance.getStage();
 
-    stage.container().style.cursor = "default";
+    stage.container().style.cursor = 'default';
 
-    const selectionPlugin = this.instance.getPlugin<WeaveNodesSelectionPlugin>("nodesSelection");
+    const selectionPlugin =
+      this.instance.getPlugin<WeaveNodesSelectionPlugin>('nodesSelection');
     if (selectionPlugin) {
-      const tr = selectionPlugin.getTransformer();
-      tr.show();
       const node = stage.findOne(`#${this.rectId}`);
       if (node) {
         selectionPlugin.setSelectedNodes([node]);
       }
+      this.instance.triggerAction('selectionTool');
     }
 
     this.rectId = null;

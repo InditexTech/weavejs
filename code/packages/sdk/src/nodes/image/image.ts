@@ -1,12 +1,12 @@
-import Konva from "konva";
-import { WeaveElementAttributes, WeaveElementInstance } from "@/types";
-import { WeaveNode } from "../node";
-import { ImageProps } from "./types";
-import { WeaveNodesSelectionPlugin } from "@/plugins/nodes-selection/nodes-selection";
-import { WeaveImageEditionPlugin } from "@/plugins/image-edition/image-edition";
-import { WeaveImageToolAction } from "@/actions/image-tool/image-tool";
+import Konva from 'konva';
+import { WeaveElementAttributes, WeaveElementInstance } from '@/types';
+import { WeaveNode } from '../node';
+import { ImageProps } from './types';
+import { WeaveNodesSelectionPlugin } from '@/plugins/nodes-selection/nodes-selection';
+import { WeaveImageEditionPlugin } from '@/plugins/image-edition/image-edition';
+import { WeaveImageToolAction } from '@/actions/image-tool/image-tool';
 
-export const WEAVE_IMAGE_NODE_TYPE = "image";
+export const WEAVE_IMAGE_NODE_TYPE = 'image';
 
 export class WeaveImageNode extends WeaveNode {
   protected nodeType = WEAVE_IMAGE_NODE_TYPE;
@@ -68,8 +68,8 @@ export class WeaveImageNode extends WeaveNode {
       rotation: 0,
       width: imageProps.width ?? 0,
       height: imageProps.height ?? 0,
-      fill: "#CCCCCC66",
-      stroke: "#CCCCCCFF",
+      fill: '#CCCCCC66',
+      stroke: '#CCCCCCFF',
       strokeWidth: 1,
       draggable: false,
       visible: true,
@@ -94,46 +94,26 @@ export class WeaveImageNode extends WeaveNode {
 
     image.add(internalImage);
 
-    image.on("transform", () => {
-      this.instance.updateNode(this.toNode(image));
-    });
+    this.setupDefaultNodeEvents(image);
 
-    image.on("mouseenter", (e) => {
-      const stage = this.instance.getStage();
-      stage.container().style.cursor = "pointer";
-      e.cancelBubble = true;
-    });
-
-    image.on("mouseleave", (e) => {
-      const stage = this.instance.getStage();
-      stage.container().style.cursor = "default";
-      e.cancelBubble = true;
-    });
-
-    image.on("dblclick", (evt) => {
+    image.on('dblclick', (evt) => {
       evt.cancelBubble = true;
-  
+
       if (this.editing) {
         return;
       }
 
-      if (!internalImage.getAttr("image")) {
+      if (!internalImage.getAttr('image')) {
+        return;
+      }
+
+      if (!(this.isSelecting() && !this.isNodeSelected(image))) {
         return;
       }
 
       const imageEditionPlugin = this.getImageEditionPlugin();
       imageEditionPlugin.setImage(image);
       imageEditionPlugin.start();
-    });
-
-    image.on("dragmove", (e) => {
-      this.instance.updateNode(this.toNode(image));
-      e.cancelBubble = true;
-    });
-
-    image.on("dragend", (e) => {
-      this.instance.updateNode(this.toNode(image));
-      e.cancelBubble = true;
     });
 
     const imageActionTool = this.getImageToolAction();
@@ -153,9 +133,12 @@ export class WeaveImageNode extends WeaveNode {
 
       this.imageLoaded = true;
 
-      image.setAttr("width", image.width() ? image.width() : preloadImg.width);
-      image.setAttr("height", image.height() ? image.height() : preloadImg.height);
-      image.setAttr("imageInfo", {
+      image.setAttr('width', image.width() ? image.width() : preloadImg.width);
+      image.setAttr(
+        'height',
+        image.height() ? image.height() : preloadImg.height
+      );
+      image.setAttr('imageInfo', {
         width: preloadImg.width,
         height: preloadImg.height,
       });
@@ -164,12 +147,15 @@ export class WeaveImageNode extends WeaveNode {
       this.loadImage(imageProps, image);
     }
 
-    image.setAttr("imageURL", imageProps.imageURL);
+    image.setAttr('imageURL', imageProps.imageURL);
 
     return image;
   }
 
-  updateInstance(nodeInstance: WeaveElementInstance, nextProps: WeaveElementAttributes) {
+  updateInstance(
+    nodeInstance: WeaveElementInstance,
+    nextProps: WeaveElementAttributes
+  ) {
     const id = nodeInstance.getAttrs().id;
     const node = nodeInstance as Konva.Group;
 
@@ -177,8 +163,12 @@ export class WeaveImageNode extends WeaveNode {
       ...nextProps,
     });
 
-    const imagePlaceholder = node.findOne(`#${id}-placeholder`) as Konva.Rect | undefined;
-    const internalImage = node.findOne(`#${id}-image`) as Konva.Image | undefined;
+    const imagePlaceholder = node.findOne(`#${id}-placeholder`) as
+      | Konva.Rect
+      | undefined;
+    const internalImage = node.findOne(`#${id}-image`) as
+      | Konva.Image
+      | undefined;
 
     const nodeAttrs = node.getAttrs();
 
@@ -201,8 +191,8 @@ export class WeaveImageNode extends WeaveNode {
         scaleY: 1,
         rotation: 0,
         visible: true,
-        fill: "#CCCCCC66",
-        stroke: "#CCCCCCFF",
+        fill: '#CCCCCC66',
+        stroke: '#CCCCCCFF',
         strokeWidth: 1,
         draggable: false,
         zIndex: 0,
@@ -232,8 +222,8 @@ export class WeaveImageNode extends WeaveNode {
         scaleY: 1,
         rotation: 0,
         visible: false,
-        fill: "#CCCCCC66",
-        stroke: "#CCCCCCFF",
+        fill: '#CCCCCC66',
+        stroke: '#CCCCCCFF',
         strokeWidth: 1,
         draggable: false,
         zIndex: 0,
@@ -253,7 +243,8 @@ export class WeaveImageNode extends WeaveNode {
       });
     }
 
-    const selectionPlugin = this.instance.getPlugin<WeaveNodesSelectionPlugin>("nodesSelection");
+    const selectionPlugin =
+      this.instance.getPlugin<WeaveNodesSelectionPlugin>('nodesSelection');
     if (selectionPlugin) {
       const tr = selectionPlugin.getTransformer();
       tr.forceUpdate();
@@ -268,12 +259,15 @@ export class WeaveImageNode extends WeaveNode {
   toNode(instance: WeaveElementInstance) {
     const attrs = instance.getAttrs();
 
+    const cleanedAttrs = { ...attrs };
+    delete cleanedAttrs.draggable;
+
     return {
-      key: attrs.id ?? "",
+      key: attrs.id ?? '',
       type: attrs.nodeType,
       props: {
-        ...attrs,
-        id: attrs.id ?? "",
+        ...cleanedAttrs,
+        id: attrs.id ?? '',
         nodeType: attrs.nodeType,
         children: [],
       },
@@ -283,12 +277,16 @@ export class WeaveImageNode extends WeaveNode {
   private loadImage(params: WeaveElementAttributes, image: Konva.Group) {
     const imageProps = params as ImageProps;
 
-    const imagePlaceholder = image.findOne(`#${imageProps.id}-placeholder`) as Konva.Rect | undefined;
-    const internalImage = image.findOne(`#${imageProps.id}-image`) as Konva.Image | undefined;
+    const imagePlaceholder = image.findOne(`#${imageProps.id}-placeholder`) as
+      | Konva.Rect
+      | undefined;
+    const internalImage = image.findOne(`#${imageProps.id}-image`) as
+      | Konva.Image
+      | undefined;
 
     const imageObj = new Image();
     imageObj.onerror = (error) => {
-      console.error("Error loading image", error);
+      console.error('Error loading image', error);
       imagePlaceholder?.setAttrs({
         visible: true,
       });
@@ -311,9 +309,15 @@ export class WeaveImageNode extends WeaveNode {
 
       this.imageLoaded = true;
 
-      image.setAttr("width", imageProps.width ? imageProps.width : imageObj.width);
-      image.setAttr("height", imageProps.height ? imageProps.height : imageObj.height);
-      image.setAttr("imageInfo", {
+      image.setAttr(
+        'width',
+        imageProps.width ? imageProps.width : imageObj.width
+      );
+      image.setAttr(
+        'height',
+        imageProps.height ? imageProps.height : imageObj.height
+      );
+      image.setAttr('imageInfo', {
         width: imageObj.width,
         height: imageObj.height,
       });
@@ -326,17 +330,19 @@ export class WeaveImageNode extends WeaveNode {
   }
 
   private getImageToolAction() {
-    const imageToolAction = this.instance.getActionHandler<WeaveImageToolAction>("imageTool");
+    const imageToolAction =
+      this.instance.getActionHandler<WeaveImageToolAction>('imageTool');
     if (!imageToolAction) {
-      throw new Error("Image Tool action not found");
+      throw new Error('Image Tool action not found');
     }
     return imageToolAction;
   }
 
   private getImageEditionPlugin() {
-    const imageEditionPlugin = this.instance.getPlugin<WeaveImageEditionPlugin>("imageEdition");
+    const imageEditionPlugin =
+      this.instance.getPlugin<WeaveImageEditionPlugin>('imageEdition');
     if (!imageEditionPlugin) {
-      throw new Error("Image edition plugin not found");
+      throw new Error('Image edition plugin not found');
     }
     return imageEditionPlugin;
   }

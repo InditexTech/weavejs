@@ -1,6 +1,13 @@
-import { Weave } from "@/weave";
-import { WeaveElementAttributes, WeaveElementInstance, WeaveStateElement } from "@/types";
-import { Logger } from "pino";
+import { Weave } from '@/weave';
+import {
+  WeaveElementAttributes,
+  WeaveElementInstance,
+  WeaveStateElement,
+} from '@/types';
+import { Logger } from 'pino';
+import { WeaveNodesSelectionPlugin } from '@/plugins/nodes-selection/nodes-selection';
+import Konva from 'konva';
+import { WeaveNodesSelectionChangeCallback } from '@/plugins/nodes-selection/types';
 
 export abstract class WeaveNode {
   protected instance!: Weave;
@@ -10,7 +17,9 @@ export abstract class WeaveNode {
   register(instance: Weave) {
     this.instance = instance;
     this.logger = this.instance.getChildLogger(this.getNodeType());
-    this.instance.getChildLogger("node").debug(`Node with type [${this.getNodeType()}] registered`);
+    this.instance
+      .getChildLogger('node')
+      .debug(`Node with type [${this.getNodeType()}] registered`);
 
     return this;
   }
@@ -23,11 +32,91 @@ export abstract class WeaveNode {
     return this.logger;
   }
 
-  abstract createNode(id: string, props: WeaveElementAttributes): WeaveStateElement;
+  getSelectionPlugin() {
+    const selectionPlugin =
+      this.instance.getPlugin<WeaveNodesSelectionPlugin>('nodesSelection');
+    return selectionPlugin;
+  }
+
+  isSelecting() {
+    return this.instance.getActiveAction() === 'selectionTool';
+  }
+
+  isNodeSelected(ele: Konva.Node) {
+    const selectionPlugin =
+      this.instance.getPlugin<WeaveNodesSelectionPlugin>('nodesSelection');
+
+    let selected: boolean = false;
+    if (
+      selectionPlugin.getSelectedNodes().length === 1 &&
+      selectionPlugin.getSelectedNodes()[0].getAttrs().id === ele.getAttrs().id
+    ) {
+      selected = true;
+    }
+
+    return selected;
+  }
+
+  setupDefaultNodeEvents(node: Konva.Node) {
+    this.instance.addEventListener<WeaveNodesSelectionChangeCallback>(
+      'onNodesChange',
+      () => {
+        if (this.isSelecting() && this.isNodeSelected(node)) {
+          node.draggable(true);
+          return;
+        }
+
+        node.draggable(false);
+      }
+    );
+
+    node.on('transform', (e) => {
+      if (this.isSelecting() && this.isNodeSelected(node)) {
+        this.instance.updateNode(this.toNode(node as WeaveElementInstance));
+        e.cancelBubble = true;
+      }
+    });
+
+    node.on('dragmove', (e) => {
+      if (this.isSelecting() && this.isNodeSelected(node)) {
+        this.instance.updateNode(this.toNode(node as WeaveElementInstance));
+        e.cancelBubble = true;
+      }
+    });
+
+    node.on('dragend', (e) => {
+      if (this.isSelecting() && this.isNodeSelected(node)) {
+        this.instance.updateNode(this.toNode(node as WeaveElementInstance));
+        e.cancelBubble = true;
+      }
+    });
+
+    node.on('mouseenter', (e) => {
+      if (this.isSelecting() && !this.isNodeSelected(node)) {
+        const stage = this.instance.getStage();
+        stage.container().style.cursor = 'pointer';
+        e.cancelBubble = true;
+      }
+    });
+
+    node.on('mouseleave', (e) => {
+      const stage = this.instance.getStage();
+      stage.container().style.cursor = 'default';
+      e.cancelBubble = true;
+    });
+  }
+
+  abstract createNode(
+    id: string,
+    props: WeaveElementAttributes
+  ): WeaveStateElement;
 
   abstract createInstance(props: WeaveElementAttributes): WeaveElementInstance;
 
-  abstract updateInstance(instance: WeaveElementInstance, nextProps: WeaveElementAttributes): void;
+  abstract updateInstance(
+    instance: WeaveElementInstance,
+    nextProps: WeaveElementAttributes
+  ): void;
 
   abstract removeInstance(instance: WeaveElementInstance): void;
 
