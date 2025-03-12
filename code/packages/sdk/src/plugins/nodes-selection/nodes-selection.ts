@@ -174,13 +174,6 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
     });
 
     stage.on('mousedown touchstart', (e) => {
-      console.log(
-        'Select mousedown',
-        this.initialized,
-        this.active,
-        this.selecting
-      );
-
       if (!this.initialized) {
         return;
       }
@@ -212,13 +205,6 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
     });
 
     stage.on('mousemove touchmove', (e) => {
-      console.log(
-        'Select mousemove',
-        this.initialized,
-        this.active,
-        this.selecting
-      );
-
       if (!this.initialized) {
         return;
       }
@@ -231,7 +217,6 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
       if (!this.selecting) {
         return;
       }
-      console.log('AQUI2');
 
       e.evt.preventDefault();
 
@@ -250,13 +235,6 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
     });
 
     stage.on('mouseup touchend', (e) => {
-      console.log(
-        'Select mouseup',
-        this.initialized,
-        this.active,
-        this.selecting
-      );
-
       if (!this.initialized) {
         return;
       }
@@ -316,8 +294,6 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
         }
       }
 
-      console.log('click', selectedGroup);
-
       if (!this.initialized) {
         return;
       }
@@ -347,8 +323,6 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
         selectedGroup && !(selectedGroup.getAttrs().active ?? false)
           ? selectedGroup
           : e.target;
-
-      console.log('nodeToAdd', nodeToAdd);
 
       if (!nodeToAdd.getAttrs().nodeType) {
         return;
