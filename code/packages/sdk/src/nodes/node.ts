@@ -100,9 +100,11 @@ export abstract class WeaveNode {
     });
 
     node.on('mouseleave', (e) => {
-      const stage = this.instance.getStage();
-      stage.container().style.cursor = 'default';
-      e.cancelBubble = true;
+      if (this.isSelecting() && !this.isNodeSelected(node)) {
+        const stage = this.instance.getStage();
+        stage.container().style.cursor = 'default';
+        e.cancelBubble = true;
+      }
     });
   }
 

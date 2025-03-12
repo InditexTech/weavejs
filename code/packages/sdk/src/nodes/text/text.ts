@@ -253,6 +253,7 @@ export class WeaveTextNode extends WeaveNode {
         selectionPlugin.setSelectedNodes([textNode]);
         tr.show();
         tr.forceUpdate();
+        this.instance.triggerAction('selectionTool');
       }
 
       this.editing = false;

@@ -5,14 +5,16 @@ import { WeaveRectangleToolActionState } from './types';
 import { RECTANGLE_TOOL_STATE } from './constants';
 import { WeaveNodesSelectionPlugin } from '@/plugins/nodes-selection/nodes-selection';
 import Konva from 'konva';
+import { WeaveElementInstance } from '@/types';
 
 export class WeaveRectangleToolAction extends WeaveAction {
   protected initialized: boolean = false;
   protected state: WeaveRectangleToolActionState;
   protected rectId: string | null;
+  protected creating: boolean;
+  protected moved: boolean;
   protected clickPoint: Vector2d | null;
   protected container!: Konva.Group | Konva.Layer | undefined;
-  protected rectangle!: Konva.Rect | undefined;
   protected cancelAction!: () => void;
   init = undefined;
 
@@ -22,6 +24,8 @@ export class WeaveRectangleToolAction extends WeaveAction {
     this.initialized = false;
     this.state = RECTANGLE_TOOL_STATE.IDLE;
     this.rectId = null;
+    this.creating = false;
+    this.moved = false;
     this.container = undefined;
     this.clickPoint = null;
   }
@@ -44,28 +48,34 @@ export class WeaveRectangleToolAction extends WeaveAction {
       }
     });
 
-    stage.on('click tap', (e) => {
+    stage.on('mousedown', (e) => {
       e.evt.preventDefault();
 
-      if (this.state === RECTANGLE_TOOL_STATE.IDLE) {
-        return;
-      }
-
       if (this.state === RECTANGLE_TOOL_STATE.ADDING) {
-        this.handleAdding();
-        return;
-      }
+        this.creating = true;
 
-      if (this.state === RECTANGLE_TOOL_STATE.DEFINING_SIZE) {
-        this.handleSettingSize();
-        return;
+        this.handleAdding();
       }
     });
 
     stage.on('mousemove', (e) => {
       e.evt.preventDefault();
 
-      this.handleMovement();
+      if (this.state === RECTANGLE_TOOL_STATE.DEFINING_SIZE) {
+        this.moved = true;
+
+        this.handleMovement();
+      }
+    });
+
+    stage.on('mouseup', (e) => {
+      e.evt.preventDefault();
+
+      if (this.state === RECTANGLE_TOOL_STATE.DEFINING_SIZE) {
+        this.creating = false;
+
+        this.handleSettingSize();
+      }
     });
 
     this.initialized = true;
@@ -81,7 +91,6 @@ export class WeaveRectangleToolAction extends WeaveAction {
     stage.container().style.cursor = 'crosshair';
     stage.container().focus();
 
-    this.rectId = null;
     this.clickPoint = null;
     this.setState(RECTANGLE_TOOL_STATE.ADDING);
   }
@@ -94,25 +103,29 @@ export class WeaveRectangleToolAction extends WeaveAction {
 
     this.rectId = uuidv4();
 
-    this.rectangle = new Konva.Rect({
-      id: this.rectId,
+    const nodeHandler = this.instance.getNodeHandler('rectangle');
+
+    const node = nodeHandler.createNode(this.rectId, {
       x: this.clickPoint?.x ?? 0,
       y: this.clickPoint?.y ?? 0,
       width: 0,
       height: 0,
       opacity: 1,
-      fill: '#FF0000FF',
+      fill: '#71717aFF',
       stroke: '#000000FF',
       strokeWidth: 1,
+      draggable: true,
     });
 
-    this.instance.getMainLayer()?.add(this.rectangle);
+    this.instance.addNode(node, this.container?.getAttrs().id);
 
     this.setState(RECTANGLE_TOOL_STATE.DEFINING_SIZE);
   }
 
   private handleSettingSize() {
-    if (this.rectId && this.clickPoint && this.container && this.rectangle) {
+    const rectangle = this.instance.getStage().findOne(`#${this.rectId}`);
+
+    if (this.rectId && this.clickPoint && this.container && rectangle) {
       const { mousePoint } = this.instance.getMousePointerRelativeToContainer(
         this.container
       );
@@ -122,26 +135,19 @@ export class WeaveRectangleToolAction extends WeaveAction {
 
       const nodeHandler = this.instance.getNodeHandler('rectangle');
 
-      const node = nodeHandler.createNode(this.rectId, {
-        x: deltaX < 0 ? this.clickPoint.x + deltaX : this.clickPoint.x,
-        y: deltaY < 0 ? this.clickPoint.y + deltaY : this.clickPoint.y,
-        width: Math.abs(deltaX),
-        height: Math.abs(deltaY),
-        opacity: 1,
-        fill: '#FF0000FF',
-        stroke: '#000000FF',
-        strokeWidth: 1,
-        draggable: true,
+      rectangle.setAttrs({
+        x: this.moved ? rectangle.getAttrs().x : this.clickPoint.x,
+        y: this.moved ? rectangle.getAttrs().y : this.clickPoint.y,
+        width: this.moved ? Math.abs(deltaX) : 100,
+        height: this.moved ? Math.abs(deltaY) : 100,
       });
 
-      this.instance.addNode(node, this.container?.getAttrs().id);
-
-      this.rectangle?.destroy();
+      this.instance.updateNode(
+        nodeHandler.toNode(rectangle as WeaveElementInstance)
+      );
     }
 
-    this.setState(RECTANGLE_TOOL_STATE.ADDED);
-
-    this.cancelAction?.();
+    this.addRectangle();
   }
 
   private handleMovement() {
@@ -149,7 +155,9 @@ export class WeaveRectangleToolAction extends WeaveAction {
       return;
     }
 
-    if (this.rectId && this.container && this.clickPoint && this.rectangle) {
+    const rectangle = this.instance.getStage().findOne(`#${this.rectId}`);
+
+    if (this.rectId && this.container && this.clickPoint && rectangle) {
       const { mousePoint } = this.instance.getMousePointerRelativeToContainer(
         this.container
       );
@@ -157,10 +165,16 @@ export class WeaveRectangleToolAction extends WeaveAction {
       const deltaX = mousePoint.x - this.clickPoint?.x;
       const deltaY = mousePoint.y - this.clickPoint?.y;
 
-      this.rectangle.setAttrs({
+      const nodeHandler = this.instance.getNodeHandler('rectangle');
+
+      rectangle.setAttrs({
         width: deltaX,
         height: deltaY,
       });
+
+      this.instance.updateNode(
+        nodeHandler.toNode(rectangle as WeaveElementInstance)
+      );
     }
   }
 
@@ -198,8 +212,9 @@ export class WeaveRectangleToolAction extends WeaveAction {
     }
 
     this.rectId = null;
+    this.creating = false;
+    this.moved = false;
     this.container = undefined;
-    this.rectangle = undefined;
     this.clickPoint = null;
     this.setState(RECTANGLE_TOOL_STATE.IDLE);
   }

@@ -1,5 +1,5 @@
-import { Weave } from "@/weave";
-import { Logger } from "pino";
+import { Weave } from '@/weave';
+import { Logger } from 'pino';
 
 export abstract class WeaveAction {
   protected instance!: Weave;
@@ -17,7 +17,9 @@ export abstract class WeaveAction {
   register(instance: Weave) {
     this.instance = instance;
     this.logger = this.instance.getChildLogger(this.getName());
-    this.instance.getChildLogger("action").debug(`Action handler with name [${this.getName()}] registered`);
+    this.instance
+      .getChildLogger('action')
+      .debug(`Action handler with name [${this.getName()}] registered`);
 
     return this;
   }

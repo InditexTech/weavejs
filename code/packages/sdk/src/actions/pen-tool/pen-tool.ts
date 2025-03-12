@@ -1,20 +1,21 @@
-import { v4 as uuidv4 } from "uuid";
-import { WeaveAction } from "@/actions/action";
-import { Vector2d } from "konva/lib/types";
-import { WeavePenToolActionState } from "./types";
-import { PEN_TOOL_STATE } from "./constants";
-import Konva from "konva";
-import { WeaveNodesSelectionPlugin } from "@/plugins/nodes-selection/nodes-selection";
+import { v4 as uuidv4 } from 'uuid';
+import { WeaveAction } from '@/actions/action';
+import { Vector2d } from 'konva/lib/types';
+import { WeavePenToolActionState } from './types';
+import { PEN_TOOL_STATE } from './constants';
+import Konva from 'konva';
+import { WeaveNodesSelectionPlugin } from '@/plugins/nodes-selection/nodes-selection';
+import { WeaveElementInstance } from '@/types';
 
 export class WeavePenToolAction extends WeaveAction {
   protected initialized: boolean = false;
   protected initialCursor: string | null = null;
   protected state: WeavePenToolActionState;
   protected lineId: string | null;
+  protected tempLineId: string | null;
   protected container: Konva.Layer | Konva.Group | undefined;
+  protected measureContainer: Konva.Layer | Konva.Group | undefined;
   protected clickPoint: Vector2d | null;
-  protected tempMainLine: Konva.Line | undefined;
-  protected tempLine: Konva.Line | undefined;
   protected tempPoint: Konva.Circle | undefined;
   protected tempNextPoint: Konva.Circle | undefined;
   protected cancelAction!: () => void;
@@ -26,33 +27,33 @@ export class WeavePenToolAction extends WeaveAction {
     this.initialized = false;
     this.state = PEN_TOOL_STATE.IDLE;
     this.lineId = null;
+    this.tempLineId = null;
     this.container = undefined;
+    this.measureContainer = undefined;
     this.clickPoint = null;
-    this.tempMainLine = undefined;
-    this.tempLine = undefined;
     this.tempPoint = undefined;
     this.tempNextPoint = undefined;
   }
 
   getName(): string {
-    return "penTool";
+    return 'penTool';
   }
 
   private setupEvents() {
     const stage = this.instance.getStage();
 
-    stage.container().addEventListener("keydown", (e) => {
-      if (e.key === "Enter") {
+    stage.container().addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
         this.cancelAction();
         return;
       }
-      if (e.key === "Escape") {
+      if (e.key === 'Escape') {
         this.cancelAction();
         return;
       }
     });
 
-    stage.on("click tap", (e) => {
+    stage.on('click tap', (e) => {
       e.evt.preventDefault();
 
       if (this.state === PEN_TOOL_STATE.IDLE) {
@@ -70,7 +71,7 @@ export class WeavePenToolAction extends WeaveAction {
       }
     });
 
-    stage.on("mousemove", (e) => {
+    stage.on('mousemove', (e) => {
       e.evt.preventDefault();
 
       this.handleMovement();
@@ -86,17 +87,8 @@ export class WeavePenToolAction extends WeaveAction {
   private addLine() {
     const stage = this.instance.getStage();
 
-    const selectionPlugin = this.instance.getPlugin<WeaveNodesSelectionPlugin>("nodesSelection");
-    if (selectionPlugin) {
-      const tr = selectionPlugin.getTransformer();
-      tr.hide();
-    }
+    stage.container().style.cursor = 'crosshair';
 
-    stage.container().style.cursor = "crosshair";
-
-    this.lineId = uuidv4();
-    this.tempMainLine = undefined;
-    this.tempLine = undefined;
     this.tempPoint = undefined;
     this.tempNextPoint = undefined;
     this.clickPoint = null;
@@ -104,65 +96,96 @@ export class WeavePenToolAction extends WeaveAction {
   }
 
   private handleAdding() {
-    const { mousePoint, container } = this.instance.getMousePointer();
+    const { mousePoint, container, measureContainer } =
+      this.instance.getMousePointer();
 
     this.clickPoint = mousePoint;
     this.container = container;
+    this.measureContainer = measureContainer;
 
-    this.tempMainLine = new Konva.Line({
+    this.lineId = uuidv4();
+    this.tempLineId = uuidv4();
+
+    const nodeHandler = this.instance.getNodeHandler('line');
+
+    const node = nodeHandler.createNode(this.lineId, {
       x: this.clickPoint?.x ?? 0,
       y: this.clickPoint?.y ?? 0,
       points: [0, 0],
-      stroke: "blue",
+      stroke: '#000000ff',
       strokeWidth: 1,
       opacity: 1,
     });
-    container?.add(this.tempMainLine);
+
+    this.instance.addNode(node, this.container?.getAttrs().id);
 
     this.tempPoint = new Konva.Circle({
       x: this.clickPoint?.x ?? 0,
       y: this.clickPoint?.y ?? 0,
       radius: 5,
-      stroke: "black",
+      stroke: '#000000ff',
       strokeWidth: 1,
-      fill: "rgba(0,0,0,0.25)",
+      fill: 'rgba(0,0,0,0.25)',
     });
-    container?.add(this.tempPoint);
+    this.measureContainer?.add(this.tempPoint);
 
-    this.tempLine = new Konva.Line({
+    const tempLine = nodeHandler.createNode(this.tempLineId, {
       x: this.clickPoint?.x ?? 0,
       y: this.clickPoint?.y ?? 0,
       points: [0, 0],
-      stroke: "black",
+      stroke: '#60a5faff',
       strokeWidth: 1,
       opacity: 0.5,
     });
-    container?.add(this.tempLine);
+
+    this.instance.addNode(tempLine, this.container?.getAttrs().id);
 
     this.tempNextPoint = new Konva.Circle({
       x: this.clickPoint?.x ?? 0,
       y: this.clickPoint?.y ?? 0,
       radius: 5,
-      stroke: "black",
+      stroke: '#000000ff',
       strokeWidth: 1,
-      fill: "rgba(0,0,0,0.25)",
+      fill: 'rgba(0,0,0,0.25)',
     });
-    container?.add(this.tempNextPoint);
+    this.measureContainer?.add(this.tempNextPoint);
 
     this.setState(PEN_TOOL_STATE.DEFINING_SIZE);
   }
 
   private handleSettingSize() {
-    if (this.lineId && this.container && this.tempMainLine && this.tempPoint && this.tempNextPoint && this.tempLine) {
-      const { mousePoint } = this.instance.getMousePointerRelativeToContainer(this.container);
+    const tempLine = this.instance.getStage().findOne(`#${this.tempLineId}`) as
+      | Konva.Line
+      | undefined;
 
-      const newPoints = [...this.tempMainLine.points()];
-      newPoints.push(mousePoint.x - this.tempMainLine.x());
-      newPoints.push(mousePoint.y - this.tempMainLine.y());
-      this.tempMainLine.setAttrs({
+    const tempMainLine = this.instance.getStage().findOne(`#${this.lineId}`) as
+      | Konva.Line
+      | undefined;
+
+    if (
+      this.lineId &&
+      this.tempPoint &&
+      this.tempNextPoint &&
+      this.measureContainer &&
+      tempMainLine &&
+      tempLine
+    ) {
+      const { mousePoint } = this.instance.getMousePointerRelativeToContainer(
+        this.measureContainer
+      );
+
+      const newPoints = [...tempMainLine.points()];
+      newPoints.push(mousePoint.x - tempMainLine.x());
+      newPoints.push(mousePoint.y - tempMainLine.y());
+      tempMainLine.setAttrs({
         points: newPoints,
       });
-      this.tempMainLine.draw();
+
+      const nodeHandler = this.instance.getNodeHandler('line');
+
+      this.instance.updateNode(
+        nodeHandler.toNode(tempMainLine as WeaveElementInstance)
+      );
 
       this.tempPoint.setAttrs({
         x: mousePoint.x,
@@ -174,11 +197,15 @@ export class WeavePenToolAction extends WeaveAction {
         y: mousePoint.y,
       });
 
-      this.tempLine.setAttrs({
+      tempLine.setAttrs({
         x: mousePoint.x,
         y: mousePoint.y,
         points: [0, 0],
       });
+
+      this.instance.updateNode(
+        nodeHandler.toNode(tempLine as WeaveElementInstance)
+      );
     }
 
     this.setState(PEN_TOOL_STATE.DEFINING_SIZE);
@@ -189,17 +216,35 @@ export class WeavePenToolAction extends WeaveAction {
       return;
     }
 
-    if (this.lineId && this.container && this.tempLine && this.tempNextPoint) {
-      const { mousePoint } = this.instance.getMousePointerRelativeToContainer(this.container);
+    const tempLine = this.instance.getStage().findOne(`#${this.tempLineId}`) as
+      | Konva.Line
+      | undefined;
 
-      this.tempLine.setAttrs({
+    if (
+      this.lineId &&
+      this.measureContainer &&
+      this.tempNextPoint &&
+      tempLine
+    ) {
+      const { mousePoint } = this.instance.getMousePointerRelativeToContainer(
+        this.measureContainer
+      );
+
+      tempLine.setAttrs({
         points: [
-          this.tempLine.points()[0],
-          this.tempLine.points()[1],
-          mousePoint.x - this.tempLine.x(),
-          mousePoint.y - this.tempLine.y(),
+          tempLine.points()[0],
+          tempLine.points()[1],
+          mousePoint.x - tempLine.x(),
+          mousePoint.y - tempLine.y(),
         ],
       });
+
+      const nodeHandler = this.instance.getNodeHandler('line');
+
+      this.instance.updateNode(
+        nodeHandler.toNode(tempLine as WeaveElementInstance)
+      );
+
       this.tempNextPoint.setAttrs({
         x: mousePoint.x,
         y: mousePoint.y,
@@ -209,7 +254,7 @@ export class WeavePenToolAction extends WeaveAction {
 
   trigger(cancelAction: () => void) {
     if (!this.instance) {
-      throw new Error("Instance not defined");
+      throw new Error('Instance not defined');
     }
 
     if (!this.initialized) {
@@ -229,69 +274,65 @@ export class WeavePenToolAction extends WeaveAction {
   cleanup() {
     const stage = this.instance.getStage();
 
-    this.tempLine?.destroy();
     this.tempPoint?.destroy();
     this.tempNextPoint?.destroy();
 
-    if (this.lineId && this.tempMainLine && this.tempMainLine.points().length >= 4) {
-      const origin = { x: Infinity, y: Infinity };
-      for (const [index, point] of this.tempMainLine.points().entries()) {
-        if (index % 2 === 0 && point < origin.x) {
-          origin.x = point;
-        }
-        if (index % 1 === 0 && point < origin.y) {
-          origin.y = point;
-        }
-      }
+    const tempLine = this.instance.getStage().findOne(`#${this.tempLineId}`) as
+      | Konva.Line
+      | undefined;
 
-      const newPoints = [];
-      for (const [index, point] of this.tempMainLine.points().entries()) {
-        if (index % 2 === 0) {
-          newPoints.push(point - origin.x);
-        }
-        if (index % 2 === 1) {
-          newPoints.push(point - origin.y);
-        }
-      }
+    const tempMainLine = this.instance.getStage().findOne(`#${this.lineId}`) as
+      | Konva.Line
+      | undefined;
 
-      const lineX = this.tempMainLine.x();
-      const lineY = this.tempMainLine.y();
+    if (tempLine) {
+      const nodeHandler = this.instance.getNodeHandler('line');
+      this.instance.removeNode(
+        nodeHandler.toNode(tempLine as WeaveElementInstance)
+      );
+    }
 
-      this.tempMainLine.destroy();
+    if (this.lineId && tempMainLine && tempMainLine.points().length < 4) {
+      const nodeHandler = this.instance.getNodeHandler('line');
+      this.instance.removeNode(
+        nodeHandler.toNode(tempMainLine as WeaveElementInstance)
+      );
+    }
 
-      const nodeHandler = this.instance.getNodeHandler("line");
+    if (this.lineId && tempMainLine && tempMainLine.points().length >= 4) {
+      const nodeHandler = this.instance.getNodeHandler('line');
+      this.instance.updateNode(
+        nodeHandler.toNode(tempMainLine as WeaveElementInstance)
+      );
 
-      const node = nodeHandler.createNode(this.lineId, {
-        x: lineX + origin.x,
-        y: lineY + origin.y,
-        points: newPoints,
-        stroke: "#000000FF",
+      tempMainLine.setAttrs({
+        stroke: '#000000ff',
         strokeWidth: 1,
         hitStrokeWidth: 10,
-        draggable: true,
       });
 
-      this.instance.addNode(node, this.container?.getAttrs().id);
+      this.instance.updateNode(
+        nodeHandler.toNode(tempMainLine as WeaveElementInstance)
+      );
 
-      const selectionPlugin = this.instance.getPlugin<WeaveNodesSelectionPlugin>("nodesSelection");
+      const selectionPlugin =
+        this.instance.getPlugin<WeaveNodesSelectionPlugin>('nodesSelection');
       if (selectionPlugin) {
-        const tr = selectionPlugin.getTransformer();
-        tr.show();
         const node = stage.findOne(`#${this.lineId}`);
         if (node) {
           selectionPlugin.setSelectedNodes([node]);
         }
+        this.instance.triggerAction('selectionTool');
       }
     }
 
-    stage.container().style.cursor = "default";
+    stage.container().style.cursor = 'default';
 
     this.initialCursor = null;
-    this.tempMainLine = undefined;
     this.tempPoint = undefined;
     this.tempNextPoint = undefined;
-    this.tempLine = undefined;
     this.lineId = null;
+    this.tempLineId = null;
     this.container = undefined;
     this.clickPoint = null;
     this.setState(PEN_TOOL_STATE.IDLE);
