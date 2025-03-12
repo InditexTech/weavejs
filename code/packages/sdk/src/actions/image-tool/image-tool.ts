@@ -1,10 +1,15 @@
-import { v4 as uuidv4 } from "uuid";
-import { WeaveAction } from "@/actions/action";
-import { Vector2d } from "konva/lib/types";
-import { WeaveImageToolActionTriggerParams, WeaveImageToolActionCallbacks, WeaveImageToolActionState } from "./types";
-import { IMAGE_TOOL_STATE } from "./constants";
-import { WeaveNodesSelectionPlugin } from "@/plugins/nodes-selection/nodes-selection";
-import Konva from "konva";
+import { v4 as uuidv4 } from 'uuid';
+import { WeaveAction } from '@/actions/action';
+import { Vector2d } from 'konva/lib/types';
+import {
+  WeaveImageToolActionTriggerParams,
+  WeaveImageToolActionCallbacks,
+  WeaveImageToolActionState,
+} from './types';
+import { IMAGE_TOOL_STATE } from './constants';
+import { WeaveNodesSelectionPlugin } from '@/plugins/nodes-selection/nodes-selection';
+import Konva from 'konva';
+import { WeaveElementInstance } from '@/types';
 
 export class WeaveImageToolAction extends WeaveAction {
   private callbacks: WeaveImageToolActionCallbacks;
@@ -12,10 +17,10 @@ export class WeaveImageToolAction extends WeaveAction {
   protected initialCursor: string | null = null;
   protected state: WeaveImageToolActionState;
   protected imageId: string | null;
+  protected tempImageId: string | null;
   protected container: Konva.Layer | Konva.Group | undefined;
   protected imageURL: string | null;
   protected preloadImgs: Record<string, HTMLImageElement>;
-  protected area: Konva.Rect | undefined;
   protected clickPoint: Vector2d | null;
   protected cancelAction!: () => void;
 
@@ -26,15 +31,15 @@ export class WeaveImageToolAction extends WeaveAction {
     this.initialized = false;
     this.state = IMAGE_TOOL_STATE.IDLE;
     this.imageId = null;
+    this.tempImageId = null;
     this.container = undefined;
     this.imageURL = null;
-    this.area = undefined;
     this.preloadImgs = {};
     this.clickPoint = null;
   }
 
   getName(): string {
-    return "imageTool";
+    return 'imageTool';
   }
 
   getPreloadedImage(imageId: string): HTMLImageElement | undefined {
@@ -42,9 +47,9 @@ export class WeaveImageToolAction extends WeaveAction {
   }
 
   init() {
-    this.instance.addEventListener("onStageDrop", () => {
+    this.instance.addEventListener('onStageDrop', () => {
       if (window.weaveDragImageURL) {
-        this.instance.triggerAction("imageTool", {
+        this.instance.triggerAction('imageTool', {
           imageURL: window.weaveDragImageURL,
         });
       }
@@ -54,14 +59,14 @@ export class WeaveImageToolAction extends WeaveAction {
   private setupEvents() {
     const stage = this.instance.getStage();
 
-    stage.container().addEventListener("keydown", (e) => {
-      if (e.key === "Escape") {
+    stage.container().addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
         this.cancelAction();
       }
       e.preventDefault();
     });
 
-    stage.on("click tap", (e) => {
+    stage.on('click tap', (e) => {
       e.evt.preventDefault();
 
       if (this.state === IMAGE_TOOL_STATE.IDLE) {
@@ -78,13 +83,22 @@ export class WeaveImageToolAction extends WeaveAction {
       }
     });
 
-    stage.on("mousemove", (e) => {
+    stage.on('mousemove', (e) => {
       e.evt.preventDefault();
 
-      if (this.state === IMAGE_TOOL_STATE.ADDING && this.area) {
+      const tempImage = this.instance
+        .getStage()
+        .findOne(`#${this.tempImageId}`);
+
+      if (this.state === IMAGE_TOOL_STATE.ADDING && tempImage) {
         const mousePos = stage.getRelativePointerPosition();
-        this.area.x(mousePos?.x ?? 0);
-        this.area.y(mousePos?.y ?? 0);
+        tempImage.x(mousePos?.x ?? 0);
+        tempImage.y(mousePos?.y ?? 0);
+
+        const nodeHandler = this.instance.getNodeHandler('rectangle');
+        this.instance.updateNode(
+          nodeHandler.toNode(tempImage as WeaveElementInstance)
+        );
       }
     });
 
@@ -105,7 +119,7 @@ export class WeaveImageToolAction extends WeaveAction {
       this.addImageNode();
     };
     this.preloadImgs[this.imageId].onerror = () => {
-      this.callbacks?.onImageLoadEnd?.(new Error("Error loading image"));
+      this.callbacks?.onImageLoadEnd?.(new Error('Error loading image'));
       this.cancelAction();
     };
 
@@ -115,31 +129,36 @@ export class WeaveImageToolAction extends WeaveAction {
   }
 
   private addImageNode() {
-    const selectionPlugin = this.instance.getPlugin<WeaveNodesSelectionPlugin>("nodesSelection");
+    const selectionPlugin =
+      this.instance.getPlugin<WeaveNodesSelectionPlugin>('nodesSelection');
     if (selectionPlugin) {
       const tr = selectionPlugin.getTransformer();
       tr.hide();
     }
 
     const stage = this.instance.getStage();
-    const mainLayer = this.instance.getMainLayer();
 
-    stage.container().style.cursor = "crosshair";
+    stage.container().style.cursor = 'crosshair';
     stage.container().focus();
 
     if (this.imageId) {
       const mousePos = stage.getRelativePointerPosition();
-      this.area = new Konva.Rect({
+
+      const nodeHandler = this.instance.getNodeHandler('rectangle');
+
+      this.tempImageId = uuidv4();
+
+      const node = nodeHandler.createNode(this.tempImageId, {
         x: mousePos?.x ?? 0,
         y: mousePos?.y ?? 0,
         width: this.preloadImgs[this.imageId].width,
         height: this.preloadImgs[this.imageId].height,
-        fill: "#CCCCCCCC",
-        stroke: "#000000FF",
+        fill: '#ccccccff',
+        stroke: '#000000ff',
         strokeWidth: 1,
       });
 
-      mainLayer?.add(this.area);
+      this.instance.addNode(node, this.container?.getAttrs().id);
     }
 
     this.clickPoint = null;
@@ -147,25 +166,26 @@ export class WeaveImageToolAction extends WeaveAction {
   }
 
   private addImage() {
-    const selectionPlugin = this.instance.getPlugin<WeaveNodesSelectionPlugin>("nodesSelection");
-    if (selectionPlugin) {
-      const tr = selectionPlugin.getTransformer();
-      tr.hide();
-    }
-
     this.callbacks?.onUploadImage(this.loadImage.bind(this));
 
     this.setState(IMAGE_TOOL_STATE.UPLOADING);
   }
 
   private handleAdding() {
-    if (this.imageId && this.imageURL && this.preloadImgs[this.imageId]) {
+    const tempImage = this.instance.getStage().findOne(`#${this.tempImageId}`);
+
+    if (
+      this.imageId &&
+      this.imageURL &&
+      this.preloadImgs[this.imageId] &&
+      tempImage
+    ) {
       const { mousePoint, container } = this.instance.getMousePointer();
 
       this.clickPoint = mousePoint;
       this.container = container;
 
-      const nodeHandler = this.instance.getNodeHandler("image");
+      const nodeHandler = this.instance.getNodeHandler('image');
 
       const node = nodeHandler.createNode(this.imageId, {
         x: this.clickPoint?.x ?? 0,
@@ -174,7 +194,7 @@ export class WeaveImageToolAction extends WeaveAction {
         height: this.preloadImgs[this.imageId].height,
         opacity: 1,
         imageURL: this.imageURL,
-        stroke: "#000000FF",
+        stroke: '#000000ff',
         strokeWidth: 0,
         draggable: true,
         imageInfo: {
@@ -185,15 +205,23 @@ export class WeaveImageToolAction extends WeaveAction {
 
       this.instance.addNode(node, this.container?.getAttrs().id);
 
+      const rectangleNodeHandler = this.instance.getNodeHandler('rectangle');
+      this.instance.removeNode(
+        rectangleNodeHandler.toNode(tempImage as WeaveElementInstance)
+      );
+
       this.setState(IMAGE_TOOL_STATE.FINISHED);
     }
 
     this.cancelAction();
   }
 
-  trigger(cancelAction: () => void, params?: WeaveImageToolActionTriggerParams) {
+  trigger(
+    cancelAction: () => void,
+    params?: WeaveImageToolActionTriggerParams
+  ) {
     if (!this.instance) {
-      throw new Error("Instance not defined");
+      throw new Error('Instance not defined');
     }
 
     if (!this.initialized) {
@@ -211,25 +239,33 @@ export class WeaveImageToolAction extends WeaveAction {
   }
 
   cleanup() {
-    const selectionPlugin = this.instance.getPlugin<WeaveNodesSelectionPlugin>("nodesSelection");
-    if (selectionPlugin) {
-      const tr = selectionPlugin.getTransformer();
-      tr.show();
-    }
-
     const stage = this.instance.getStage();
 
-    stage.container().style.cursor = "default";
+    const tempImage = this.instance.getStage().findOne(`#${this.tempImageId}`);
+    if (tempImage) {
+      const nodeHandler = this.instance.getNodeHandler('rectangle');
+      this.instance.removeNode(
+        nodeHandler.toNode(tempImage as WeaveElementInstance)
+      );
+    }
+
+    const selectionPlugin =
+      this.instance.getPlugin<WeaveNodesSelectionPlugin>('nodesSelection');
+    if (selectionPlugin) {
+      const node = stage.findOne(`#${this.imageId}`);
+      if (node) {
+        selectionPlugin.setSelectedNodes([node]);
+      }
+      this.instance.triggerAction('selectionTool');
+    }
+
+    stage.container().style.cursor = 'default';
 
     this.initialCursor = null;
     this.imageId = null;
     this.container = undefined;
     this.imageURL = null;
     this.clickPoint = null;
-    if (this.area) {
-      this.area.destroy();
-      this.area = undefined;
-    }
     this.setState(IMAGE_TOOL_STATE.IDLE);
   }
 }

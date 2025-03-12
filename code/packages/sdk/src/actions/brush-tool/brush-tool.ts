@@ -1,17 +1,19 @@
-import { v4 as uuidv4 } from "uuid";
-import { WeaveAction } from "@/actions/action";
-import { Vector2d } from "konva/lib/types";
-import { WeaveBrushToolActionState } from "./types";
-import { BRUSH_TOOL_STATE } from "./constants";
-import Konva from "konva";
-import { WeaveNodesSelectionPlugin } from "@/plugins/nodes-selection/nodes-selection";
+import { v4 as uuidv4 } from 'uuid';
+import { WeaveAction } from '@/actions/action';
+import { Vector2d } from 'konva/lib/types';
+import { WeaveBrushToolActionState } from './types';
+import { BRUSH_TOOL_STATE } from './constants';
+import Konva from 'konva';
+import { WeaveNodesSelectionPlugin } from '@/plugins/nodes-selection/nodes-selection';
+import { WeaveElementInstance } from '@/types';
 
 export class WeaveBrushToolAction extends WeaveAction {
   protected initialized: boolean = false;
   protected state: WeaveBrushToolActionState;
   protected clickPoint: Vector2d | null;
-  protected tempStroke: Konva.Line | undefined;
+  protected strokeId: string | null;
   protected container: Konva.Layer | Konva.Group | undefined;
+  protected measureContainer: Konva.Layer | Konva.Group | undefined;
   protected cancelAction!: () => void;
   init = undefined;
 
@@ -20,13 +22,14 @@ export class WeaveBrushToolAction extends WeaveAction {
 
     this.initialized = false;
     this.state = BRUSH_TOOL_STATE.INACTIVE;
+    this.strokeId = null;
     this.clickPoint = null;
     this.container = undefined;
-    this.tempStroke = undefined;
+    this.measureContainer = undefined;
   }
 
   getName(): string {
-    return "brushTool";
+    return 'brushTool';
   }
 
   private setupEvents() {
@@ -35,15 +38,15 @@ export class WeaveBrushToolAction extends WeaveAction {
     stage.container().tabIndex = 1;
     stage.container().focus();
 
-    stage.container().addEventListener("keydown", (e) => {
-      if (e.key === "Escape") {
+    stage.container().addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
         e.stopPropagation();
         this.cancelAction();
         return;
       }
     });
 
-    stage.on("mousedown touchstart", (e) => {
+    stage.on('mousedown touchstart', (e) => {
       if (this.state !== BRUSH_TOOL_STATE.IDLE) {
         return;
       }
@@ -54,7 +57,7 @@ export class WeaveBrushToolAction extends WeaveAction {
       e.evt.stopPropagation();
     });
 
-    stage.on("mousemove touchmove", (e) => {
+    stage.on('mousemove touchmove', (e) => {
       if (this.state !== BRUSH_TOOL_STATE.DEFINE_STROKE) {
         return;
       }
@@ -65,7 +68,7 @@ export class WeaveBrushToolAction extends WeaveAction {
       e.evt.stopPropagation();
     });
 
-    stage.on("mouseup touchend", (e) => {
+    stage.on('mouseup touchend', (e) => {
       if (this.state !== BRUSH_TOOL_STATE.DEFINE_STROKE) {
         return;
       }
@@ -84,20 +87,27 @@ export class WeaveBrushToolAction extends WeaveAction {
   }
 
   private handleStartStroke() {
-    const { mousePoint, container } = this.instance.getMousePointer();
+    const { mousePoint, container, measureContainer } =
+      this.instance.getMousePointer();
 
     this.clickPoint = mousePoint;
     this.container = container;
+    this.measureContainer = measureContainer;
 
-    this.tempStroke = new Konva.Line({
+    this.strokeId = uuidv4();
+
+    const nodeHandler = this.instance.getNodeHandler('line');
+
+    const node = nodeHandler.createNode(this.strokeId, {
       x: this.clickPoint?.x ?? 0,
       y: this.clickPoint?.y ?? 0,
       points: [0, 0],
-      stroke: "blue",
+      stroke: '#60a5faff',
       strokeWidth: 1,
       opacity: 1,
     });
-    container?.add(this.tempStroke);
+
+    this.instance.addNode(node, this.container?.getAttrs().id);
 
     this.setState(BRUSH_TOOL_STATE.DEFINE_STROKE);
   }
@@ -105,43 +115,23 @@ export class WeaveBrushToolAction extends WeaveAction {
   private handleEndStroke() {
     const stage = this.instance.getStage();
 
-    if (this.tempStroke) {
-      const origin = { x: Infinity, y: Infinity };
-      for (const [index, point] of this.tempStroke.points().entries()) {
-        if (index % 2 === 0 && point < origin.x) {
-          origin.x = point;
-        }
-        if (index % 1 === 0 && point < origin.y) {
-          origin.y = point;
-        }
-      }
+    const tempStroke = this.instance.getStage().findOne(`#${this.strokeId}`) as
+      | Konva.Line
+      | undefined;
 
-      const newPoints = [];
-      for (const [index, point] of this.tempStroke.points().entries()) {
-        if (index % 2 === 0) {
-          newPoints.push(point - origin.x);
-        }
-        if (index % 2 === 1) {
-          newPoints.push(point - origin.y);
-        }
-      }
+    if (tempStroke) {
+      const nodeHandler = this.instance.getNodeHandler('line');
 
-      const nodeHandler = this.instance.getNodeHandler("line");
-
-      const node = nodeHandler.createNode(uuidv4(), {
-        x: this.tempStroke.x() + origin.x,
-        y: this.tempStroke.y() + origin.y,
-        points: newPoints,
-        stroke: "#000000FF",
+      tempStroke.setAttrs({
+        stroke: '#000000ff',
         strokeWidth: 1,
         hitStrokeWidth: 10,
-        draggable: true,
       });
 
-      this.instance.addNode(node, this.container?.getAttrs().id);
+      this.instance.updateNode(
+        nodeHandler.toNode(tempStroke as WeaveElementInstance)
+      );
 
-      this.tempStroke.destroy();
-      this.tempStroke = undefined;
       this.clickPoint = null;
 
       stage.container().tabIndex = 1;
@@ -156,27 +146,40 @@ export class WeaveBrushToolAction extends WeaveAction {
       return;
     }
 
-    if (this.tempStroke && this.container) {
-      const { mousePoint } = this.instance.getMousePointerRelativeToContainer(this.container);
+    const tempStroke = this.instance.getStage().findOne(`#${this.strokeId}`) as
+      | Konva.Line
+      | undefined;
 
-      this.tempStroke.points([
-        ...this.tempStroke.points(),
-        mousePoint.x - this.tempStroke.x(),
-        mousePoint.y - this.tempStroke.y(),
+    if (this.measureContainer && tempStroke) {
+      const { mousePoint } = this.instance.getMousePointerRelativeToContainer(
+        this.measureContainer
+      );
+
+      tempStroke.points([
+        ...tempStroke.points(),
+        mousePoint.x - tempStroke.x(),
+        mousePoint.y - tempStroke.y(),
       ]);
+
+      const nodeHandler = this.instance.getNodeHandler('line');
+
+      this.instance.updateNode(
+        nodeHandler.toNode(tempStroke as WeaveElementInstance)
+      );
     }
   }
 
   trigger(cancel: () => void) {
     if (!this.instance) {
-      throw new Error("Instance not defined");
+      throw new Error('Instance not defined');
     }
 
     if (!this.initialized) {
       this.setupEvents();
     }
 
-    const selectionPlugin = this.instance.getPlugin<WeaveNodesSelectionPlugin>("nodesSelection");
+    const selectionPlugin =
+      this.instance.getPlugin<WeaveNodesSelectionPlugin>('nodesSelection');
     if (selectionPlugin) {
       const tr = selectionPlugin.getTransformer();
       tr.hide();
@@ -191,26 +194,24 @@ export class WeaveBrushToolAction extends WeaveAction {
 
     this.setState(BRUSH_TOOL_STATE.IDLE);
 
-    stage.container().style.cursor = "crosshair";
+    stage.container().style.cursor = 'crosshair';
   }
 
   cleanup() {
     const stage = this.instance.getStage();
 
-    stage.container().style.cursor = "default";
+    stage.container().style.cursor = 'default';
 
-    if (this.tempStroke) {
-      this.tempStroke.destroy();
-    }
-
-    const selectionPlugin = this.instance.getPlugin<WeaveNodesSelectionPlugin>("nodesSelection");
+    const selectionPlugin =
+      this.instance.getPlugin<WeaveNodesSelectionPlugin>('nodesSelection');
     if (selectionPlugin) {
-      const tr = selectionPlugin.getTransformer();
-      tr.show();
-      selectionPlugin.setSelectedNodes([]);
+      const node = stage.findOne(`#${this.strokeId}`);
+      if (node) {
+        selectionPlugin.setSelectedNodes([node]);
+      }
+      this.instance.triggerAction('selectionTool');
     }
 
-    this.tempStroke = undefined;
     this.clickPoint = null;
     this.setState(BRUSH_TOOL_STATE.INACTIVE);
   }
