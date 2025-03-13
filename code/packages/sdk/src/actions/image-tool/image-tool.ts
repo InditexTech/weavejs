@@ -105,6 +105,7 @@ export class WeaveImageToolAction extends WeaveAction {
         const mousePos = stage.getRelativePointerPosition();
         tempImage.setAttrs({
           ...this.props,
+          name: undefined,
           x: mousePos?.x ?? 0,
           y: mousePos?.y ?? 0,
           fill: '#ccccccff',
@@ -265,6 +266,7 @@ export class WeaveImageToolAction extends WeaveAction {
       if (tempImage) {
         tempImage.setAttrs({
           ...this.props,
+          name: undefined,
           fill: '#ccccccff',
           stroke: '#000000ff',
           strokeWidth: 1,

@@ -1,0 +1,37 @@
+import { GUIDE_ORIENTATION, NODE_SNAP } from './constants';
+
+export type NodeSnapKeys = keyof typeof NODE_SNAP;
+export type NodeSnap = (typeof NODE_SNAP)[NodeSnapKeys];
+
+export type NodeSnappingEdge = {
+  guide: number;
+  offset: number;
+  snap: NodeSnap;
+};
+
+export type NodeSnappingEdges = {
+  vertical: NodeSnappingEdge[];
+  horizontal: NodeSnappingEdge[];
+};
+
+export type LineGuideStop = {
+  vertical: number[];
+  horizontal: number[];
+};
+
+export type LineGuide = {
+  lineGuide: number;
+  diff: number;
+  snap: NodeSnap;
+  offset: number;
+};
+
+export type GuideOrientationKeys = keyof typeof GUIDE_ORIENTATION;
+export type GuideOrientation = (typeof GUIDE_ORIENTATION)[GuideOrientationKeys];
+
+export type Guide = {
+  lineGuide: number;
+  offset: number;
+  orientation: GuideOrientation;
+  snap: NodeSnap;
+};

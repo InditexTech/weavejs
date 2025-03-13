@@ -27,6 +27,7 @@ export class WeaveGroupNode extends WeaveNode {
   createInstance(props: WeaveElementAttributes) {
     const group = new Konva.Group({
       ...props,
+      name: 'node',
     });
 
     this.setupDefaultNodeEvents(group);
