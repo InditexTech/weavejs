@@ -1,10 +1,30 @@
+import { WeaveElementAttributes } from '@/types';
 import { Weave } from '@/weave';
 import { Logger } from 'pino';
+import { WeaveActionCallbacks } from './types';
 
 export abstract class WeaveAction {
   protected instance!: Weave;
   protected name!: string;
+  props!: WeaveElementAttributes;
+  protected callbacks: WeaveActionCallbacks | undefined;
   private logger!: Logger;
+
+  constructor(callbacks?: WeaveActionCallbacks) {
+    this.callbacks = callbacks;
+    return new Proxy<this>(this, {
+      set: (
+        target: WeaveAction,
+        key: keyof WeaveAction,
+        value: keyof typeof WeaveAction
+      ) => {
+        Reflect.set(target, key, value);
+        this.internalUpdate?.();
+        this.callbacks?.onPropsChange?.(this.props);
+        return true;
+      },
+    });
+  }
 
   getName(): string {
     return this.name;
@@ -24,9 +44,22 @@ export abstract class WeaveAction {
     return this;
   }
 
+  updateProps(props: WeaveElementAttributes) {
+    this.props = {
+      ...this.props,
+      ...props,
+    };
+  }
+
+  getProps() {
+    return this.props;
+  }
+
   abstract init?(): void;
 
   abstract trigger(cancelAction: () => void, params?: unknown): void;
+
+  abstract internalUpdate?(): void;
 
   abstract cleanup?(): void;
 }

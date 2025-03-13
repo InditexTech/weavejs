@@ -1,7 +1,11 @@
-import { WeaveExportNodeOptions } from "@/types";
-import { WeaveAction } from "../action";
-import { WeaveExportStageActionParams } from "./types";
-import { WEAVE_EXPORT_BACKGROUND_COLOR, WEAVE_EXPORT_FILE_FORMAT, WEAVE_EXPORT_FORMATS } from "@/constants";
+import { WeaveExportNodeOptions } from '@/types';
+import { WeaveAction } from '../action';
+import { WeaveExportStageActionParams } from './types';
+import {
+  WEAVE_EXPORT_BACKGROUND_COLOR,
+  WEAVE_EXPORT_FILE_FORMAT,
+  WEAVE_EXPORT_FORMATS,
+} from '@/constants';
 
 export class WeaveExportStageToolAction extends WeaveAction {
   protected cancelAction!: () => void;
@@ -13,26 +17,32 @@ export class WeaveExportStageToolAction extends WeaveAction {
     quality: 1,
   };
   private options!: WeaveExportNodeOptions;
+  internalUpdate = undefined;
   init = undefined;
 
   getName(): string {
-    return "exportStageTool";
+    return 'exportStageTool';
   }
 
   private async exportStage() {
     const img = await this.instance.exportStage(this.options);
 
-    const link = document.createElement("a");
+    const link = document.createElement('a');
     link.href = img.src;
-    link.download = `stage${WEAVE_EXPORT_FILE_FORMAT[this.options.format ?? WEAVE_EXPORT_FORMATS.PNG]}`;
+    link.download = `stage${
+      WEAVE_EXPORT_FILE_FORMAT[this.options.format ?? WEAVE_EXPORT_FORMATS.PNG]
+    }`;
     link.click();
 
     this.cancelAction?.();
   }
 
-  async trigger(cancelAction: () => void, { options }: WeaveExportStageActionParams) {
+  async trigger(
+    cancelAction: () => void,
+    { options }: WeaveExportStageActionParams
+  ) {
     if (!this.instance) {
-      throw new Error("Instance not defined");
+      throw new Error('Instance not defined');
     }
 
     const stage = this.instance.getStage();

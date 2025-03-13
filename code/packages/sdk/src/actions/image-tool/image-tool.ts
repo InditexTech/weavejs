@@ -12,7 +12,7 @@ import Konva from 'konva';
 import { WeaveElementInstance } from '@/types';
 
 export class WeaveImageToolAction extends WeaveAction {
-  private callbacks: WeaveImageToolActionCallbacks;
+  private imageCallbacks: WeaveImageToolActionCallbacks;
   protected initialized: boolean = false;
   protected initialCursor: string | null = null;
   protected state: WeaveImageToolActionState;
@@ -23,11 +23,13 @@ export class WeaveImageToolAction extends WeaveAction {
   protected preloadImgs: Record<string, HTMLImageElement>;
   protected clickPoint: Vector2d | null;
   protected cancelAction!: () => void;
+  update = undefined;
 
-  constructor(callbacks: WeaveImageToolActionCallbacks) {
-    super();
+  constructor(imageCallbacks: WeaveImageToolActionCallbacks) {
+    const { onPropsChange, ...restCallbacks } = imageCallbacks;
+    super({ onPropsChange });
 
-    this.callbacks = callbacks;
+    this.imageCallbacks = restCallbacks;
     this.initialized = false;
     this.state = IMAGE_TOOL_STATE.IDLE;
     this.imageId = null;
@@ -44,6 +46,15 @@ export class WeaveImageToolAction extends WeaveAction {
 
   getPreloadedImage(imageId: string): HTMLImageElement | undefined {
     return this.preloadImgs?.[imageId];
+  }
+
+  initProps() {
+    return {
+      width: 100,
+      height: 100,
+      scaleX: 1,
+      scaleY: 1,
+    };
   }
 
   init() {
@@ -92,8 +103,14 @@ export class WeaveImageToolAction extends WeaveAction {
 
       if (this.state === IMAGE_TOOL_STATE.ADDING && tempImage) {
         const mousePos = stage.getRelativePointerPosition();
-        tempImage.x(mousePos?.x ?? 0);
-        tempImage.y(mousePos?.y ?? 0);
+        tempImage.setAttrs({
+          ...this.props,
+          x: mousePos?.x ?? 0,
+          y: mousePos?.y ?? 0,
+          fill: '#ccccccff',
+          stroke: '#000000ff',
+          strokeWidth: 1,
+        });
 
         const nodeHandler = this.instance.getNodeHandler('rectangle');
         this.instance.updateNode(
@@ -115,27 +132,27 @@ export class WeaveImageToolAction extends WeaveAction {
 
     this.preloadImgs[this.imageId] = new Image();
     this.preloadImgs[this.imageId].onload = () => {
-      this.callbacks?.onImageLoadEnd?.();
+      this.imageCallbacks?.onImageLoadEnd?.();
+
+      if (this.imageId) {
+        this.props = {
+          ...this.props,
+          width: this.preloadImgs[this.imageId].width,
+          height: this.preloadImgs[this.imageId].height,
+        };
+      }
       this.addImageNode();
     };
     this.preloadImgs[this.imageId].onerror = () => {
-      this.callbacks?.onImageLoadEnd?.(new Error('Error loading image'));
+      this.imageCallbacks?.onImageLoadEnd?.(new Error('Error loading image'));
       this.cancelAction();
     };
 
     this.preloadImgs[this.imageId].src = imageURL;
-
-    this.callbacks?.onImageLoadStart?.();
+    this.imageCallbacks?.onImageLoadStart?.();
   }
 
   private addImageNode() {
-    const selectionPlugin =
-      this.instance.getPlugin<WeaveNodesSelectionPlugin>('nodesSelection');
-    if (selectionPlugin) {
-      const tr = selectionPlugin.getTransformer();
-      tr.hide();
-    }
-
     const stage = this.instance.getStage();
 
     stage.container().style.cursor = 'crosshair';
@@ -149,6 +166,7 @@ export class WeaveImageToolAction extends WeaveAction {
       this.tempImageId = uuidv4();
 
       const node = nodeHandler.createNode(this.tempImageId, {
+        ...this.props,
         x: mousePos?.x ?? 0,
         y: mousePos?.y ?? 0,
         width: this.preloadImgs[this.imageId].width,
@@ -166,7 +184,7 @@ export class WeaveImageToolAction extends WeaveAction {
   }
 
   private addImage() {
-    this.callbacks?.onUploadImage(this.loadImage.bind(this));
+    this.imageCallbacks?.onUploadImage(this.loadImage.bind(this));
 
     this.setState(IMAGE_TOOL_STATE.UPLOADING);
   }
@@ -188,15 +206,13 @@ export class WeaveImageToolAction extends WeaveAction {
       const nodeHandler = this.instance.getNodeHandler('image');
 
       const node = nodeHandler.createNode(this.imageId, {
+        ...this.props,
         x: this.clickPoint?.x ?? 0,
         y: this.clickPoint?.y ?? 0,
-        width: this.preloadImgs[this.imageId].width,
-        height: this.preloadImgs[this.imageId].height,
         opacity: 1,
         imageURL: this.imageURL,
         stroke: '#000000ff',
         strokeWidth: 0,
-        draggable: true,
         imageInfo: {
           width: this.preloadImgs[this.imageId].width,
           height: this.preloadImgs[this.imageId].height,
@@ -235,7 +251,32 @@ export class WeaveImageToolAction extends WeaveAction {
       return;
     }
 
+    this.props = this.initProps();
     this.addImage();
+  }
+
+  internalUpdate() {
+    const stage = this.instance?.getStage();
+    if (stage) {
+      const tempImage = this.instance
+        .getStage()
+        .findOne(`#${this.tempImageId}`);
+
+      if (tempImage) {
+        tempImage.setAttrs({
+          ...this.props,
+          fill: '#ccccccff',
+          stroke: '#000000ff',
+          strokeWidth: 1,
+        });
+
+        const nodeHandler = this.instance.getNodeHandler('rectangle');
+
+        this.instance.updateNode(
+          nodeHandler.toNode(tempImage as WeaveElementInstance)
+        );
+      }
+    }
   }
 
   cleanup() {
