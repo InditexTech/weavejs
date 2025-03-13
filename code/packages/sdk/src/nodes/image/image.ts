@@ -2,7 +2,7 @@ import Konva from 'konva';
 import { WeaveElementAttributes, WeaveElementInstance } from '@/types';
 import { WeaveNode } from '../node';
 import { ImageProps } from './types';
-import { WeaveNodesSelectionPlugin } from '@/plugins/nodes-selection/nodes-selection';
+// import { WeaveNodesSelectionPlugin } from '@/plugins/nodes-selection/nodes-selection';
 import { WeaveImageEditionPlugin } from '@/plugins/image-edition/image-edition';
 import { WeaveImageToolAction } from '@/actions/image-tool/image-tool';
 
@@ -56,6 +56,7 @@ export class WeaveImageNode extends WeaveNode {
     const image = new Konva.Group({
       ...groupImageProps,
       id,
+      name: 'node',
     });
 
     const imagePlaceholder = new Konva.Rect({
@@ -183,6 +184,7 @@ export class WeaveImageNode extends WeaveNode {
       imagePlaceholder?.setAttrs({
         ...internalImageProps,
         ...(nodeAttrs.imageProperties ?? {}),
+        name: undefined,
         id: `${id}-placeholder`,
         x: 0,
         y: 0,
@@ -198,6 +200,7 @@ export class WeaveImageNode extends WeaveNode {
       internalImage?.setAttrs({
         ...internalImageProps,
         ...(nodeAttrs.imageProperties ?? {}),
+        name: undefined,
         id: `${id}-image`,
         x: 0,
         y: 0,
@@ -210,24 +213,25 @@ export class WeaveImageNode extends WeaveNode {
       });
     }
     if (this.imageLoaded) {
-      imagePlaceholder?.setAttrs({
-        ...internalImageProps,
-        ...(nodeAttrs.imageProperties ?? {}),
-        id: `${id}-placeholder`,
-        x: 0,
-        y: 0,
-        scaleX: 1,
-        scaleY: 1,
-        rotation: 0,
-        visible: false,
-        fill: '#ccccccff',
-        strokeWidth: 0,
-        draggable: false,
-        zIndex: 0,
-      });
+      // imagePlaceholder?.setAttrs({
+      //   ...internalImageProps,
+      //   ...(nodeAttrs.imageProperties ?? {}),
+      //   id: `${id}-placeholder`,
+      //   x: 0,
+      //   y: 0,
+      //   scaleX: 1,
+      //   scaleY: 1,
+      //   rotation: 0,
+      //   visible: false,
+      //   fill: '#ccccccff',
+      //   strokeWidth: 0,
+      //   draggable: false,
+      //   zIndex: 0,
+      // });
       internalImage?.setAttrs({
         ...internalImageProps,
         ...(nodeAttrs.imageProperties ?? {}),
+        name: undefined,
         id: `${id}-image`,
         x: 0,
         y: 0,
@@ -236,16 +240,8 @@ export class WeaveImageNode extends WeaveNode {
         rotation: 0,
         visible: true,
         draggable: false,
-        zIndex: 1,
+        zIndex: 0,
       });
-    }
-
-    const selectionPlugin =
-      this.instance.getPlugin<WeaveNodesSelectionPlugin>('nodesSelection');
-    if (selectionPlugin) {
-      const tr = selectionPlugin.getTransformer();
-      tr.forceUpdate();
-      tr.draw();
     }
   }
 
@@ -274,6 +270,9 @@ export class WeaveImageNode extends WeaveNode {
   private loadImage(params: WeaveElementAttributes, image: Konva.Group) {
     const imageProps = params as ImageProps;
 
+    const imageGroup = image.findOne(`#${imageProps.id}`) as
+      | Konva.Group
+      | undefined;
     const imagePlaceholder = image.findOne(`#${imageProps.id}-placeholder`) as
       | Konva.Rect
       | undefined;
@@ -292,17 +291,23 @@ export class WeaveImageNode extends WeaveNode {
       });
     };
     imageObj.onload = () => {
-      imagePlaceholder?.setAttrs({
+      imageGroup?.setAttrs({
         width: imageProps.width ? imageProps.width : imageObj.width,
         height: imageProps.height ? imageProps.height : imageObj.height,
-        visible: false,
       });
+      imagePlaceholder?.destroy();
+      // imagePlaceholder?.setAttrs({
+      //   width: imageProps.width ? imageProps.width : imageObj.width,
+      //   height: imageProps.height ? imageProps.height : imageObj.height,
+      //   visible: false,
+      // });
       internalImage?.setAttrs({
         width: imageProps.width ? imageProps.width : imageObj.width,
         height: imageProps.height ? imageProps.height : imageObj.height,
         image: imageObj,
         visible: true,
       });
+      internalImage?.zIndex(0);
 
       this.imageLoaded = true;
 

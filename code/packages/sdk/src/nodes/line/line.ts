@@ -23,6 +23,7 @@ export class WeaveLineNode extends WeaveNode {
   createInstance(props: WeaveElementAttributes) {
     const line = new Konva.Line({
       ...props,
+      name: 'node',
     });
 
     this.setupDefaultNodeEvents(line);

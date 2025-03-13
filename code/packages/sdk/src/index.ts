@@ -73,3 +73,6 @@ export * from './plugins/stage-drop-area/types';
 export { WeaveCopyPasteNodesPlugin } from './plugins/copy-paste-nodes/copy-paste-nodes';
 export * from './plugins/copy-paste-nodes/constants';
 export * from './plugins/copy-paste-nodes/types';
+export { WeaveNodesSnappingPlugin } from './plugins/nodes-snapping/nodes-snapping';
+export * from './plugins/nodes-snapping/constants';
+export * from './plugins/nodes-snapping/types';

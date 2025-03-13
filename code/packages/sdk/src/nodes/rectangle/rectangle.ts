@@ -23,6 +23,7 @@ export class WeaveRectangleNode extends WeaveNode {
   createInstance(props: WeaveElementAttributes) {
     const rectangle = new Konva.Rect({
       ...props,
+      name: 'node',
     });
 
     this.setupDefaultNodeEvents(rectangle);

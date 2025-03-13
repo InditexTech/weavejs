@@ -1,8 +1,8 @@
-import Konva from "konva";
-import { Line } from "konva/lib/shapes/Line";
-import { WeavePlugin } from "@/plugins/plugin";
-import { WEAVE_GRID_LAYER_ID } from "./constants";
-import { WeaveStageGridPluginParams } from "./types";
+import Konva from 'konva';
+import { Line } from 'konva/lib/shapes/Line';
+import { WeavePlugin } from '@/plugins/plugin';
+import { WEAVE_GRID_LAYER_ID } from './constants';
+import { WeaveStageGridPluginParams } from './types';
 
 export class WeaveStageGridPlugin extends WeavePlugin {
   private gridSize: number;
@@ -20,7 +20,7 @@ export class WeaveStageGridPlugin extends WeavePlugin {
   }
 
   getName() {
-    return "stageGrid";
+    return 'stageGrid';
   }
 
   getLayerName() {
@@ -42,7 +42,7 @@ export class WeaveStageGridPlugin extends WeavePlugin {
   private initEvents() {
     const stage = this.instance.getStage();
 
-    stage.on("wheel", (e) => {
+    stage.on('wheel', (e) => {
       e.evt.preventDefault();
       this.render();
     });
@@ -50,7 +50,9 @@ export class WeaveStageGridPlugin extends WeavePlugin {
 
   getLayer() {
     const stage = this.instance.getStage();
-    const layer = stage.findOne(`#${WEAVE_GRID_LAYER_ID}`) as Konva.Layer | undefined;
+    const layer = stage.findOne(`#${WEAVE_GRID_LAYER_ID}`) as
+      | Konva.Layer
+      | undefined;
     return layer;
   }
 
@@ -69,10 +71,18 @@ export class WeaveStageGridPlugin extends WeavePlugin {
 
     const delta = 2 * size;
 
-    const startPageX = Math.ceil((stage.x() + delta) / stage.scaleX() / size) * size;
-    const startPageY = Math.ceil((stage.y() + delta) / stage.scaleY() / size) * size;
-    const endPageX = Math.floor((stage.x() + stage.width() + 4 * delta) / stage.scaleX() / size) * size;
-    const endPageY = Math.floor((stage.y() + stage.height() + 4 * delta) / stage.scaleY() / size) * size;
+    const startPageX =
+      Math.ceil((stage.x() + delta) / stage.scaleX() / size) * size;
+    const startPageY =
+      Math.ceil((stage.y() + delta) / stage.scaleY() / size) * size;
+    const endPageX =
+      Math.floor(
+        (stage.x() + stage.width() + 4 * delta) / stage.scaleX() / size
+      ) * size;
+    const endPageY =
+      Math.floor(
+        (stage.y() + stage.height() + 4 * delta) / stage.scaleY() / size
+      ) * size;
     const numRows = Math.round((endPageY - startPageY) / size);
     const numCols = Math.round((endPageX - startPageX) / size);
 
@@ -87,9 +97,9 @@ export class WeaveStageGridPlugin extends WeavePlugin {
             (stage.width() - stage.x() + 2 * delta) / stage.scaleX(),
             canvasY,
           ],
-          stroke: "rgba(0, 0, 0, 0.2)",
+          stroke: 'rgba(0, 0, 0, 0.2)',
           strokeWidth: 0.5,
-        }),
+        })
       );
     }
 
@@ -104,9 +114,9 @@ export class WeaveStageGridPlugin extends WeavePlugin {
             canvasX,
             (stage.height() - stage.y() + 2 * delta) / stage.scaleY(),
           ],
-          stroke: "rgba(0, 0, 0, 0.2)",
+          stroke: 'rgba(0, 0, 0, 0.2)',
           strokeWidth: 0.5,
-        }),
+        })
       );
     }
   }

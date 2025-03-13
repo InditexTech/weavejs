@@ -44,6 +44,7 @@ export class WeaveTextNode extends WeaveNode {
   createInstance(props: WeaveElementAttributes) {
     const text = new Konva.Text({
       ...props,
+      name: 'node',
     });
 
     this.setupDefaultNodeEvents(text);
