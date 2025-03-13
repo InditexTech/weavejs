@@ -1,9 +1,15 @@
-import http from "http";
-import * as number from "lib0/number";
+import http from 'http';
+import * as number from 'lib0/number';
 
-const CALLBACK_URL = process.env.CALLBACK_URL ? new URL(process.env.CALLBACK_URL) : null;
-const CALLBACK_TIMEOUT = number.parseInt(process.env.CALLBACK_TIMEOUT || "5000");
-const CALLBACK_OBJECTS = process.env.CALLBACK_OBJECTS ? JSON.parse(process.env.CALLBACK_OBJECTS) : {};
+const CALLBACK_URL = process.env.CALLBACK_URL
+  ? new URL(process.env.CALLBACK_URL)
+  : null;
+const CALLBACK_TIMEOUT = number.parseInt(
+  process.env.CALLBACK_TIMEOUT || '5000'
+);
+const CALLBACK_OBJECTS = process.env.CALLBACK_OBJECTS
+  ? JSON.parse(process.env.CALLBACK_OBJECTS)
+  : {};
 
 export const isCallbackSet = !!CALLBACK_URL;
 
@@ -26,7 +32,9 @@ export const callbackHandler = (update, origin, doc) => {
       content: getContent(sharedObjectName, sharedObjectType, doc).toJSON(),
     };
   });
-  CALLBACK_URL && callbackRequest(CALLBACK_URL, CALLBACK_TIMEOUT, dataToSend);
+  if (CALLBACK_URL) {
+    callbackRequest(CALLBACK_URL, CALLBACK_TIMEOUT, dataToSend);
+  }
 };
 
 /**
@@ -41,19 +49,19 @@ export const callbackRequest = (url, timeout, data) => {
     port: url.port,
     path: url.pathname,
     timeout,
-    method: "POST",
+    method: 'POST',
     headers: {
-      "Content-Type": "application/json",
-      "Content-Length": Buffer.byteLength(data),
+      'Content-Type': 'application/json',
+      'Content-Length': Buffer.byteLength(data),
     },
   };
   const req = http.request(options);
-  req.on("timeout", () => {
-    console.warn("Callback request timed out.");
+  req.on('timeout', () => {
+    console.warn('Callback request timed out.');
     req.abort();
   });
-  req.on("error", (e) => {
-    console.error("Callback request error.", e);
+  req.on('error', (e) => {
+    console.error('Callback request error.', e);
     req.abort();
   });
   req.write(data);
@@ -67,15 +75,15 @@ export const callbackRequest = (url, timeout, data) => {
  */
 const getContent = (objName, objType, doc) => {
   switch (objType) {
-    case "Array":
+    case 'Array':
       return doc.getArray(objName);
-    case "Map":
+    case 'Map':
       return doc.getMap(objName);
-    case "Text":
+    case 'Text':
       return doc.getText(objName);
-    case "XmlFragment":
+    case 'XmlFragment':
       return doc.getXmlFragment(objName);
-    case "XmlElement":
+    case 'XmlElement':
       return doc.getXmlElement(objName);
     default:
       return {};

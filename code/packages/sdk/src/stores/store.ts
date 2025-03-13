@@ -1,15 +1,22 @@
-import { isEmpty } from "lodash";
-import { Weave } from "@/weave";
-import { WeaveAwarenessChange, WeaveState, WeaveUndoRedoChange } from "@/types";
-import { MappedTypeDescription } from "@syncedstore/core/types/doc";
-import { observeDeep, syncedStore, getYjsDoc, getYjsValue } from "@syncedstore/core";
-import { Doc, AbstractType, UndoManager } from "yjs";
-import { Logger } from "pino";
+import { isEmpty } from 'lodash';
+import { Weave } from '@/weave';
+import { WeaveAwarenessChange, WeaveState, WeaveUndoRedoChange } from '@/types';
+import { MappedTypeDescription } from '@syncedstore/core/types/doc';
+import {
+  observeDeep,
+  syncedStore,
+  getYjsDoc,
+  getYjsValue,
+} from '@syncedstore/core';
+import { Doc, AbstractType, UndoManager } from 'yjs';
+import { Logger } from 'pino';
+import { WeaveStoreOptions } from './types';
 
 export abstract class WeaveStore {
   protected instance!: Weave;
   protected name!: string;
   protected supportsUndoManager!: boolean;
+  protected config!: WeaveStoreOptions;
 
   private state!: MappedTypeDescription<WeaveState>;
   private latestState: WeaveState;
@@ -18,7 +25,8 @@ export abstract class WeaveStore {
   private undoManager!: UndoManager;
   private isRoomLoaded: boolean = false;
 
-  constructor() {
+  constructor(config: WeaveStoreOptions) {
+    this.config = config;
     this.latestState = {
       weave: {},
     };
@@ -40,9 +48,15 @@ export abstract class WeaveStore {
     this.instance = instance;
     this.logger = this.instance.getChildLogger(this.getName());
 
-    this.instance.getMainLogger().info(`Store with name [${this.getName()}] registered`);
+    this.instance
+      .getMainLogger()
+      .info(`Store with name [${this.getName()}] registered`);
 
     return this;
+  }
+
+  getUser() {
+    return this.config.getUser();
   }
 
   setState(state: WeaveState) {
@@ -73,19 +87,22 @@ export abstract class WeaveStore {
     const config = this.instance.getConfiguration();
 
     config.callbacks?.onRoomLoaded?.(this.isRoomLoaded);
-    this.instance.emitEvent("onRoomLoaded", this.isRoomLoaded);
+    this.instance.emitEvent('onRoomLoaded', this.isRoomLoaded);
 
     if (this.supportsUndoManager) {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const weaveStateValues = getYjsValue(this.getState().weave) as AbstractType<any>;
+      const weaveStateValues = getYjsValue(
+        this.getState().weave
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      ) as AbstractType<any>;
 
       if (weaveStateValues) {
         this.undoManager = new UndoManager([weaveStateValues], {
           captureTimeout: 250,
-          captureTransaction: (tran) => tran.beforeState.size !== 0,
+          trackedOrigins: new Set([this.config.getUser().name]),
+          ...this.config?.undoManagerOptions,
         });
 
-        this.undoManager.on("stack-item-added", () => {
+        this.undoManager.on('stack-item-added', () => {
           const change: WeaveUndoRedoChange = {
             canUndo: this.undoManager.canUndo(),
             canRedo: this.undoManager.canRedo(),
@@ -94,10 +111,10 @@ export abstract class WeaveStore {
           };
 
           config.callbacks?.onUndoManagerStatusChange?.(change);
-          this.instance.emitEvent("onUndoManagerStatusChange", change);
+          this.instance.emitEvent('onUndoManagerStatusChange', change);
         });
 
-        this.undoManager.on("stack-item-popped", () => {
+        this.undoManager.on('stack-item-popped', () => {
           const change: WeaveUndoRedoChange = {
             canUndo: this.undoManager.canUndo(),
             canRedo: this.undoManager.canRedo(),
@@ -106,7 +123,7 @@ export abstract class WeaveStore {
           };
 
           config.callbacks?.onUndoManagerStatusChange?.(change);
-          this.instance.emitEvent("onUndoManagerStatusChange", change);
+          this.instance.emitEvent('onUndoManagerStatusChange', change);
         });
       }
     }
@@ -115,14 +132,14 @@ export abstract class WeaveStore {
       const newState = JSON.parse(JSON.stringify(this.getState()));
 
       config.callbacks?.onStateChange?.(newState);
-      this.instance.emitEvent("onStateChange", newState);
+      this.instance.emitEvent('onStateChange', newState);
 
       if (!this.isRoomLoaded && !isEmpty(this.state.weave)) {
         this.instance.setupRenderer();
         this.isRoomLoaded = true;
 
         config.callbacks?.onRoomLoaded?.(this.isRoomLoaded);
-        this.instance.emitEvent("onRoomLoaded", this.isRoomLoaded);
+        this.instance.emitEvent('onRoomLoaded', this.isRoomLoaded);
       }
       if (this.isRoomLoaded && !isEmpty(this.state.weave)) {
         this.instance.render();
@@ -132,7 +149,7 @@ export abstract class WeaveStore {
 
   canUndoStateStep() {
     if (!this.supportsUndoManager) {
-      throw new Error("Undo manager not supported");
+      throw new Error('Undo manager not supported');
     }
 
     return this.undoManager.canUndo();
@@ -140,7 +157,7 @@ export abstract class WeaveStore {
 
   canRedoStateStep() {
     if (!this.supportsUndoManager) {
-      throw new Error("Undo manager not supported");
+      throw new Error('Undo manager not supported');
     }
 
     return this.undoManager.canRedo();
@@ -148,7 +165,7 @@ export abstract class WeaveStore {
 
   undoStateStep() {
     if (!this.supportsUndoManager) {
-      throw new Error("Undo manager not supported");
+      throw new Error('Undo manager not supported');
     }
 
     this.undoManager.undo();
@@ -156,7 +173,7 @@ export abstract class WeaveStore {
 
   redoStateStep() {
     if (!this.supportsUndoManager) {
-      throw new Error("Undo manager not supported");
+      throw new Error('Undo manager not supported');
     }
 
     this.undoManager.redo();
@@ -166,7 +183,9 @@ export abstract class WeaveStore {
 
   abstract disconnect(): void;
 
-  abstract onAwarenessChange<K extends string, T>(callback: (changes: WeaveAwarenessChange<K, T>[]) => void): void;
+  abstract onAwarenessChange<K extends string, T>(
+    callback: (changes: WeaveAwarenessChange<K, T>[]) => void
+  ): void;
 
   abstract setAwarenessInfo(field: string, value: unknown): void;
 }

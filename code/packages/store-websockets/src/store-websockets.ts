@@ -1,21 +1,31 @@
-import { WeaveAwarenessChange, WeaveStore } from "@inditextech/weavejs-sdk";
-import { WebsocketProvider } from "y-websocket";
-import { WEAVE_STORE_WEBSOCKETS } from "./constants";
-import { WeaveStoreWebsocketsConnectionStatus, WeaveStoreWebsocketsOptions } from "./types";
+import {
+  WeaveAwarenessChange,
+  WeaveStore,
+  WeaveStoreOptions,
+} from '@inditextech/weavejs-sdk';
+import { WebsocketProvider } from 'y-websocket';
+import { WEAVE_STORE_WEBSOCKETS } from './constants';
+import {
+  WeaveStoreWebsocketsConnectionStatus,
+  WeaveStoreWebsocketsOptions,
+} from './types';
 
 export class WeaveStoreWebsockets extends WeaveStore {
-  private config: WeaveStoreWebsocketsOptions;
+  private websocketOptions: WeaveStoreWebsocketsOptions;
   private roomId: string;
   protected provider!: WebsocketProvider;
   protected name = WEAVE_STORE_WEBSOCKETS;
   protected supportsUndoManager = true;
 
-  constructor(options: WeaveStoreWebsocketsOptions) {
-    super();
+  constructor(
+    storeOptions: WeaveStoreOptions,
+    websocketOptions: WeaveStoreWebsocketsOptions
+  ) {
+    super(storeOptions);
 
-    const { roomId } = options;
+    const { roomId } = websocketOptions;
 
-    this.config = options;
+    this.websocketOptions = websocketOptions;
     this.roomId = roomId;
 
     this.init();
@@ -24,17 +34,25 @@ export class WeaveStoreWebsockets extends WeaveStore {
   private init() {
     const {
       wsOptions: { serverUrl },
-    } = this.config;
+    } = this.websocketOptions;
 
-    this.provider = new WebsocketProvider(serverUrl, this.roomId, this.getDocument(), {
-      connect: false,
-      disableBc: true,
-    });
+    this.provider = new WebsocketProvider(
+      serverUrl,
+      this.roomId,
+      this.getDocument(),
+      {
+        connect: false,
+        disableBc: true,
+      }
+    );
 
-    this.provider.on("status", ({ status }: { status: WeaveStoreWebsocketsConnectionStatus }) => {
-      this.config.callbacks?.onConnectionStatusChange?.(status);
-      this.instance.emitEvent("onConnectionStatusChange", status);
-    });
+    this.provider.on(
+      'status',
+      ({ status }: { status: WeaveStoreWebsocketsConnectionStatus }) => {
+        this.websocketOptions.callbacks?.onConnectionStatusChange?.(status);
+        this.instance.emitEvent('onConnectionStatusChange', status);
+      }
+    );
   }
 
   connect() {
@@ -50,9 +68,11 @@ export class WeaveStoreWebsockets extends WeaveStore {
     awareness.setLocalStateField(field, value);
   }
 
-  onAwarenessChange<K extends string, T>(callback: (changes: WeaveAwarenessChange<K, T>[]) => void): void {
+  onAwarenessChange<K extends string, T>(
+    callback: (changes: WeaveAwarenessChange<K, T>[]) => void
+  ): void {
     const awareness = this.provider.awareness;
-    awareness.on("change", () => {
+    awareness.on('change', () => {
       const values = Array.from(awareness.getStates().values());
       values.splice(awareness.clientID, 1);
       callback(values as WeaveAwarenessChange<K, T>[]);
