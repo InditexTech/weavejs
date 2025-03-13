@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.7.1] - 2025-03-13
+
 ### Fixed
 
 - [#36](https://github.com/InditexTech/weavejs/issues/36) Fix add scope to undoManager
@@ -31,7 +33,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [0.4.0] - 2025-03-12
 
-### Added
+\### Added
 
 - [#28](https://github.com/InditexTech/weavejs/issues/28) Add an action to allow interactions
 
@@ -69,13 +71,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - [#8](https://github.com/InditexTech/weavejs/issues/8) ESLint OSS rules
 - [#2](https://github.com/InditexTech/weavejs/issues/2) Improve rendering handling
 
-[Unreleased]: https://github.com/InditexTech/weavejs/compare/0.7.0...HEAD
+[Unreleased]: https://github.com/InditexTech/weavejs/compare/0.7.1...HEAD
+
+[0.7.1]: https://github.com/InditexTech/weavejs/compare/0.7.0...0.7.1
+
 [0.7.0]: https://github.com/InditexTech/weavejs/compare/0.6.0...0.7.0
+
 [0.6.0]: https://github.com/InditexTech/weavejs/compare/0.5.0...0.6.0
+
 [0.5.0]: https://github.com/InditexTech/weavejs/compare/0.4.0...0.5.0
+
 [0.4.0]: https://github.com/InditexTech/weavejs/compare/0.3.0...0.4.0
+
 [0.3.0]: https://github.com/InditexTech/weavejs/compare/0.2.1...0.3.0
+
 [0.2.1]: https://github.com/InditexTech/weavejs/compare/0.2.0...0.2.1
+
 [0.2.0]: https://github.com/InditexTech/weavejs/compare/0.1.1...0.2.0
+
 [0.1.1]: https://github.com/InditexTech/weavejs/compare/0.1.0...0.1.1
+
 [0.1.0]: https://github.com/InditexTech/weavejs/releases/tag/0.1.0
