@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- [#32](https://github.com/InditexTech/weavejs/issues/32) Define an API to allow elements to set properties previous to create the element
+
 ## [0.5.0] - 2025-03-12
 
 ### Added
@@ -54,17 +58,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - [#2](https://github.com/InditexTech/weavejs/issues/2) Improve rendering handling
 
 [Unreleased]: https://github.com/InditexTech/weavejs/compare/0.5.0...HEAD
-
 [0.5.0]: https://github.com/InditexTech/weavejs/compare/0.4.0...0.5.0
-
 [0.4.0]: https://github.com/InditexTech/weavejs/compare/0.3.0...0.4.0
-
 [0.3.0]: https://github.com/InditexTech/weavejs/compare/0.2.1...0.3.0
-
 [0.2.1]: https://github.com/InditexTech/weavejs/compare/0.2.0...0.2.1
-
 [0.2.0]: https://github.com/InditexTech/weavejs/compare/0.1.1...0.2.0
-
 [0.1.1]: https://github.com/InditexTech/weavejs/compare/0.1.0...0.1.1
-
 [0.1.0]: https://github.com/InditexTech/weavejs/releases/tag/0.1.0

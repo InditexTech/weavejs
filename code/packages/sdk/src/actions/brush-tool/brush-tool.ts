@@ -1,7 +1,7 @@
 import { v4 as uuidv4 } from 'uuid';
 import { WeaveAction } from '@/actions/action';
 import { Vector2d } from 'konva/lib/types';
-import { WeaveBrushToolActionState } from './types';
+import { WeaveBrushToolActionState, WeaveBrushToolCallbacks } from './types';
 import { BRUSH_TOOL_STATE } from './constants';
 import Konva from 'konva';
 import { WeaveNodesSelectionPlugin } from '@/plugins/nodes-selection/nodes-selection';
@@ -15,10 +15,11 @@ export class WeaveBrushToolAction extends WeaveAction {
   protected container: Konva.Layer | Konva.Group | undefined;
   protected measureContainer: Konva.Layer | Konva.Group | undefined;
   protected cancelAction!: () => void;
+  internalUpdate = undefined;
   init = undefined;
 
-  constructor() {
-    super();
+  constructor(callbacks: WeaveBrushToolCallbacks) {
+    super(callbacks);
 
     this.initialized = false;
     this.state = BRUSH_TOOL_STATE.INACTIVE;
@@ -26,10 +27,19 @@ export class WeaveBrushToolAction extends WeaveAction {
     this.clickPoint = null;
     this.container = undefined;
     this.measureContainer = undefined;
+    this.props = this.initProps();
   }
 
   getName(): string {
     return 'brushTool';
+  }
+
+  initProps() {
+    return {
+      stroke: '#000000ff',
+      strokeWidth: 1,
+      opacity: 1,
+    };
   }
 
   private setupEvents() {
@@ -99,12 +109,10 @@ export class WeaveBrushToolAction extends WeaveAction {
     const nodeHandler = this.instance.getNodeHandler('line');
 
     const node = nodeHandler.createNode(this.strokeId, {
+      ...this.props,
       x: this.clickPoint?.x ?? 0,
       y: this.clickPoint?.y ?? 0,
       points: [0, 0],
-      stroke: '#60a5faff',
-      strokeWidth: 1,
-      opacity: 1,
     });
 
     this.instance.addNode(node, this.container?.getAttrs().id);
@@ -123,8 +131,7 @@ export class WeaveBrushToolAction extends WeaveAction {
       const nodeHandler = this.instance.getNodeHandler('line');
 
       tempStroke.setAttrs({
-        stroke: '#000000ff',
-        strokeWidth: 1,
+        ...this.props,
         hitStrokeWidth: 10,
       });
 
@@ -192,6 +199,7 @@ export class WeaveBrushToolAction extends WeaveAction {
 
     this.cancelAction = cancel;
 
+    this.props = this.initProps();
     this.setState(BRUSH_TOOL_STATE.IDLE);
 
     stage.container().style.cursor = 'crosshair';

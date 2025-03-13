@@ -1,12 +1,13 @@
 import { WeaveAction } from '@/actions/action';
 import { WeaveSelectionToolActionState } from './types';
-import { SELECTION_TOOL_STATE } from './constants';
+import { SELECTION_TOOL_ACTION_NAME, SELECTION_TOOL_STATE } from './constants';
 import { WeaveNodesSelectionPlugin } from '@/plugins/nodes-selection/nodes-selection';
 
 export class WeaveSelectionToolAction extends WeaveAction {
   protected initialized: boolean = false;
   protected state: WeaveSelectionToolActionState;
   protected cancelAction!: () => void;
+  internalUpdate = undefined;
   init = undefined;
 
   constructor() {
@@ -17,7 +18,7 @@ export class WeaveSelectionToolAction extends WeaveAction {
   }
 
   getName(): string {
-    return 'selectionTool';
+    return SELECTION_TOOL_ACTION_NAME;
   }
 
   private setupEvents() {

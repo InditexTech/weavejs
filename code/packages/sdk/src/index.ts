@@ -2,6 +2,7 @@ export { Weave } from './weave';
 export { WeaveStore } from './stores/store';
 export { WeaveNode } from './nodes/node';
 export { WeaveAction } from './actions/action';
+export * from './actions/types';
 export { WeavePlugin } from './plugins/plugin';
 export * from './utils';
 export { sendEvent } from './events';

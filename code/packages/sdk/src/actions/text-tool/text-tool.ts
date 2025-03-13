@@ -14,7 +14,8 @@ export class WeaveTextToolAction extends WeaveAction {
   protected container: Konva.Layer | Konva.Group | undefined;
   protected clickPoint: Vector2d | null;
   protected cancelAction!: () => void;
-  init: undefined;
+  internalUpdate = undefined;
+  init = undefined;
 
   constructor() {
     super();
@@ -32,6 +33,13 @@ export class WeaveTextToolAction extends WeaveAction {
 
   private setupEvents() {
     const stage = this.instance.getStage();
+
+    stage.container().addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        this.cancelAction();
+        return;
+      }
+    });
 
     stage.on('click tap', (e) => {
       e.evt.preventDefault();

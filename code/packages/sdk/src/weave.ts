@@ -1,7 +1,7 @@
-import Emittery from "emittery";
-import Konva from "konva";
-import { Vector2d } from "konva/lib/types";
-import { Logger } from "pino";
+import Emittery from 'emittery';
+import Konva from 'konva';
+import { Vector2d } from 'konva/lib/types';
+import { Logger } from 'pino';
 import {
   WeaveConfig,
   WeaveStateElement,
@@ -10,28 +10,29 @@ import {
   WeavePosition,
   WeaveExportNodeOptions,
   WeaveStatus,
-} from "./types";
-import { WeaveStore } from "./stores/store";
-import { WeaveNode } from "./nodes/node";
-import { WeaveAction } from "./actions/action";
-import { WeavePlugin } from "./plugins/plugin";
-import { WeaveReconciler } from "./reconciler/reconciler";
-import { WeaveStateSerializer } from "./state-serializer/state-serializer";
-import { WeaveRenderer } from "./renderer/renderer";
-import { WeaveGroupsManager } from "./managers/groups";
-import { WeaveLogger } from "./logger/logger";
-import { WeaveTargetingManager } from "./managers/targeting";
-import { WeaveCloningManager } from "./managers/cloning";
-import { WeaveFontsManager } from "./managers/fonts";
-import { WeaveZIndexManager } from "./managers/zindex";
-import { WeaveStateManager } from "./managers/state";
-import { WeaveRegisterManager } from "./managers/register";
-import { WeaveSetupManager } from "./managers/setup";
-import { WeaveStageManager } from "./managers/stage";
-import { WeaveActionsManager } from "./managers/actions";
-import { WeaveStoreManager } from "./managers/store";
-import { WeaveExportManager } from "./managers/export";
-import { WEAVE_INSTANCE_STATUS } from "./constants";
+  WeaveElementAttributes,
+} from './types';
+import { WeaveStore } from './stores/store';
+import { WeaveNode } from './nodes/node';
+import { WeaveAction } from './actions/action';
+import { WeavePlugin } from './plugins/plugin';
+import { WeaveReconciler } from './reconciler/reconciler';
+import { WeaveStateSerializer } from './state-serializer/state-serializer';
+import { WeaveRenderer } from './renderer/renderer';
+import { WeaveGroupsManager } from './managers/groups';
+import { WeaveLogger } from './logger/logger';
+import { WeaveTargetingManager } from './managers/targeting';
+import { WeaveCloningManager } from './managers/cloning';
+import { WeaveFontsManager } from './managers/fonts';
+import { WeaveZIndexManager } from './managers/zindex';
+import { WeaveStateManager } from './managers/state';
+import { WeaveRegisterManager } from './managers/register';
+import { WeaveSetupManager } from './managers/setup';
+import { WeaveStageManager } from './managers/stage';
+import { WeaveActionsManager } from './managers/actions';
+import { WeaveStoreManager } from './managers/store';
+import { WeaveExportManager } from './managers/export';
+import { WEAVE_INSTANCE_STATUS } from './constants';
 
 export class Weave extends Emittery {
   private config: WeaveConfig;
@@ -64,18 +65,22 @@ export class Weave extends Emittery {
     this.logger = new WeaveLogger(
       this.config?.logger ?? {
         disabled: false,
-        level: "error",
-      },
+        level: 'error',
+      }
     );
     // Setup a child logger for this module
-    this.moduleLogger = this.logger.getChildLogger("main");
+    this.moduleLogger = this.logger.getChildLogger('main');
 
     // Instantiate the state serializer
     this.stateSerializer = new WeaveStateSerializer();
     // Instantiate the reconciler
     this.reconciler = new WeaveReconciler(this);
     // Instantiate the renderer
-    this.renderer = new WeaveRenderer(this, this.reconciler, this.stateSerializer);
+    this.renderer = new WeaveRenderer(
+      this,
+      this.reconciler,
+      this.stateSerializer
+    );
 
     // Instantiate the managers
     this.setupManager = new WeaveSetupManager(this);
@@ -111,7 +116,7 @@ export class Weave extends Emittery {
       this.setupManager.setupPlugins();
       this.setupManager.setupActions();
 
-      this.moduleLogger.info("Instance started");
+      this.moduleLogger.info('Instance started');
     });
   }
 
@@ -128,11 +133,11 @@ export class Weave extends Emittery {
   }
 
   async start() {
-    this.moduleLogger.info("Start instance");
+    this.moduleLogger.info('Start instance');
 
     this.status = WEAVE_INSTANCE_STATUS.STARTING;
     this.getConfiguration().callbacks?.onInstanceStatus?.(this.status);
-    this.emitEvent("onInstanceStatus", this.status);
+    this.emitEvent('onInstanceStatus', this.status);
 
     // Register all the nodes, plugins and actions that come from the configuration
     this.registerManager.registerNodesHandlers();
@@ -144,7 +149,7 @@ export class Weave extends Emittery {
 
     this.status = WEAVE_INSTANCE_STATUS.LOADING_FONTS;
     this.getConfiguration().callbacks?.onInstanceStatus?.(this.status);
-    this.emitEvent("onInstanceStatus", this.status);
+    this.emitEvent('onInstanceStatus', this.status);
 
     // Start loading the fonts, this operation is asynchronous
     await this.fontsManager.loadFonts();
@@ -160,7 +165,7 @@ export class Weave extends Emittery {
 
     this.status = WEAVE_INSTANCE_STATUS.RUNNING;
     this.getConfiguration().callbacks?.onInstanceStatus?.(this.status);
-    this.emitEvent("onInstanceStatus", this.status);
+    this.emitEvent('onInstanceStatus', this.status);
   }
 
   destroy() {
@@ -168,7 +173,7 @@ export class Weave extends Emittery {
 
     this.status = WEAVE_INSTANCE_STATUS.IDLE;
     this.getConfiguration().callbacks?.onInstanceStatus?.(this.status);
-    this.emitEvent("onInstanceStatus", this.status);
+    this.emitEvent('onInstanceStatus', this.status);
 
     // disconnect from the store
     const store = this.storeManager.getStore();
@@ -242,7 +247,10 @@ export class Weave extends Emittery {
     return this.stageManager.getConfiguration();
   }
 
-  getInstanceRecursive(instance: Konva.Node, filterInstanceType: string[] = []): Konva.Node {
+  getInstanceRecursive(
+    instance: Konva.Node,
+    filterInstanceType: string[] = []
+  ): Konva.Node {
     return this.stageManager.getInstanceRecursive(instance, filterInstanceType);
   }
 
@@ -306,6 +314,14 @@ export class Weave extends Emittery {
     this.actionsManager.triggerAction<T>(actionName, params);
   }
 
+  getPropsAction(actionName: string) {
+    return this.actionsManager.getPropsAction(actionName);
+  }
+
+  updatePropsAction(actionName: string, params: WeaveElementAttributes) {
+    this.actionsManager.updatePropsAction(actionName, params);
+  }
+
   cancelAction(actionName: string) {
     this.actionsManager.cancelAction(actionName);
   }
@@ -316,22 +332,30 @@ export class Weave extends Emittery {
     this.getStore().setState(newState);
     this.renderer.render(() => {
       this.config.callbacks?.onRender?.();
-      this.emitEvent("onRender", {});
+      this.emitEvent('onRender', {});
     });
   }
 
   render() {
     this.renderer.render(() => {
       this.config.callbacks?.onRender?.();
-      this.emitEvent("onRender", {});
+      this.emitEvent('onRender', {});
     });
   }
 
-  findNodeById(tree: WeaveStateElement, key: string, parent: WeaveStateElement | null = null, index = -1) {
+  findNodeById(
+    tree: WeaveStateElement,
+    key: string,
+    parent: WeaveStateElement | null = null,
+    index = -1
+  ) {
     return this.stateManager.findNodeById(tree, key, parent, index);
   }
 
-  findNodesByType(tree: WeaveStateElement, nodeType: string): WeaveStateElement[] {
+  findNodesByType(
+    tree: WeaveStateElement,
+    nodeType: string
+  ): WeaveStateElement[] {
     return this.stateManager.findNodesByType(tree, nodeType);
   }
 
@@ -339,7 +363,12 @@ export class Weave extends Emittery {
     return this.stateManager.getNode(nodeKey);
   }
 
-  addNode(node: WeaveStateElement, parentId = "mainLayer", index: number | undefined = undefined, doRender = true) {
+  addNode(
+    node: WeaveStateElement,
+    parentId = 'mainLayer',
+    index: number | undefined = undefined,
+    doRender = true
+  ) {
     this.stateManager.addNode(node, parentId, index, doRender);
   }
 
@@ -408,7 +437,7 @@ export class Weave extends Emittery {
   cloneNodes(
     instancesToClone: Konva.Node[],
     targetContainer: Konva.Layer | Konva.Group | undefined,
-    onPoint: Vector2d,
+    onPoint: Vector2d
   ) {
     this.cloningManager.cloneNodes(instancesToClone, targetContainer, onPoint);
   }
@@ -421,11 +450,16 @@ export class Weave extends Emittery {
 
   // EXPORT MANAGEMENT METHODS PROXIES
 
-  public async exportStage(options: WeaveExportNodeOptions): Promise<HTMLImageElement> {
+  public async exportStage(
+    options: WeaveExportNodeOptions
+  ): Promise<HTMLImageElement> {
     return await this.exportManager.exportStage(options);
   }
 
-  public async exportNode(node: WeaveElementInstance, options: WeaveExportNodeOptions): Promise<HTMLImageElement> {
+  public async exportNode(
+    node: WeaveElementInstance,
+    options: WeaveExportNodeOptions
+  ): Promise<HTMLImageElement> {
     return await this.exportManager.exportNode(node, options);
   }
 }

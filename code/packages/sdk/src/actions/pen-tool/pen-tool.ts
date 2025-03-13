@@ -1,7 +1,7 @@
 import { v4 as uuidv4 } from 'uuid';
 import { WeaveAction } from '@/actions/action';
 import { Vector2d } from 'konva/lib/types';
-import { WeavePenToolActionState } from './types';
+import { WeavePenToolActionState, WeavePenToolCallbacks } from './types';
 import { PEN_TOOL_STATE } from './constants';
 import Konva from 'konva';
 import { WeaveNodesSelectionPlugin } from '@/plugins/nodes-selection/nodes-selection';
@@ -19,10 +19,11 @@ export class WeavePenToolAction extends WeaveAction {
   protected tempPoint: Konva.Circle | undefined;
   protected tempNextPoint: Konva.Circle | undefined;
   protected cancelAction!: () => void;
-  init: undefined;
+  internalUpdate = undefined;
+  init = undefined;
 
-  constructor() {
-    super();
+  constructor(callbacks: WeavePenToolCallbacks) {
+    super(callbacks);
 
     this.initialized = false;
     this.state = PEN_TOOL_STATE.IDLE;
@@ -33,10 +34,19 @@ export class WeavePenToolAction extends WeaveAction {
     this.clickPoint = null;
     this.tempPoint = undefined;
     this.tempNextPoint = undefined;
+    this.props = this.initProps();
   }
 
   getName(): string {
     return 'penTool';
+  }
+
+  initProps() {
+    return {
+      stroke: '#000000ff',
+      strokeWidth: 1,
+      opacity: 1,
+    };
   }
 
   private setupEvents() {
@@ -109,12 +119,10 @@ export class WeavePenToolAction extends WeaveAction {
     const nodeHandler = this.instance.getNodeHandler('line');
 
     const node = nodeHandler.createNode(this.lineId, {
+      ...this.props,
       x: this.clickPoint?.x ?? 0,
       y: this.clickPoint?.y ?? 0,
       points: [0, 0],
-      stroke: '#000000ff',
-      strokeWidth: 1,
-      opacity: 1,
     });
 
     this.instance.addNode(node, this.container?.getAttrs().id);
@@ -130,12 +138,10 @@ export class WeavePenToolAction extends WeaveAction {
     this.measureContainer?.add(this.tempPoint);
 
     const tempLine = nodeHandler.createNode(this.tempLineId, {
+      ...this.props,
       x: this.clickPoint?.x ?? 0,
       y: this.clickPoint?.y ?? 0,
       points: [0, 0],
-      stroke: '#60a5faff',
-      strokeWidth: 1,
-      opacity: 0.5,
     });
 
     this.instance.addNode(tempLine, this.container?.getAttrs().id);
@@ -178,6 +184,7 @@ export class WeavePenToolAction extends WeaveAction {
       newPoints.push(mousePoint.x - tempMainLine.x());
       newPoints.push(mousePoint.y - tempMainLine.y());
       tempMainLine.setAttrs({
+        ...this.props,
         points: newPoints,
       });
 
@@ -198,6 +205,7 @@ export class WeavePenToolAction extends WeaveAction {
       });
 
       tempLine.setAttrs({
+        ...this.props,
         x: mousePoint.x,
         y: mousePoint.y,
         points: [0, 0],
@@ -231,6 +239,7 @@ export class WeavePenToolAction extends WeaveAction {
       );
 
       tempLine.setAttrs({
+        ...this.props,
         points: [
           tempLine.points()[0],
           tempLine.points()[1],
@@ -268,6 +277,7 @@ export class WeavePenToolAction extends WeaveAction {
 
     this.cancelAction = cancelAction;
 
+    this.props = this.initProps();
     this.addLine();
   }
 
@@ -301,12 +311,9 @@ export class WeavePenToolAction extends WeaveAction {
 
     if (this.lineId && tempMainLine && tempMainLine.points().length >= 4) {
       const nodeHandler = this.instance.getNodeHandler('line');
-      this.instance.updateNode(
-        nodeHandler.toNode(tempMainLine as WeaveElementInstance)
-      );
 
       tempMainLine.setAttrs({
-        stroke: '#000000ff',
+        ...this.props,
         strokeWidth: 1,
         hitStrokeWidth: 10,
       });

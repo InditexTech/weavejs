@@ -1,21 +1,24 @@
-import { WeaveAction } from "@/actions/action";
-import { WeaveStageZoomPlugin } from "@/plugins/stage-zoom/stage-zoom";
+import { WeaveAction } from '@/actions/action';
+import { WeaveStageZoomPlugin } from '@/plugins/stage-zoom/stage-zoom';
 
 export class WeaveZoomInToolAction extends WeaveAction {
+  internalUpdate = undefined;
   cleanup = undefined;
 
   getName(): string {
-    return "zoomInTool";
+    return 'zoomInTool';
   }
 
   private getStageZoomPlugin() {
-    return this.instance.getPlugin<WeaveStageZoomPlugin>("stageZoom");
+    return this.instance.getPlugin<WeaveStageZoomPlugin>('stageZoom');
   }
 
   init() {
     const stageZoomPlugin = this.getStageZoomPlugin();
     if (!stageZoomPlugin) {
-      throw new Error("WeaveZoomInToolAction requires the WeaveStageZoomPlugin to be loaded");
+      throw new Error(
+        'WeaveZoomInToolAction requires the WeaveStageZoomPlugin to be loaded'
+      );
     }
   }
 
