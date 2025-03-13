@@ -1,52 +1,76 @@
-import { WeaveAwarenessChange, WeaveStore } from "@inditextech/weavejs-sdk";
-import { WeaveStoreAzureWebPubSubSyncClient } from "./client";
-import { WEAVE_STORE_AZURE_WEB_PUBSUB } from "./constants";
-import { WeaveStoreAzureWebPubsubOptions } from "./types";
+import {
+  WeaveAwarenessChange,
+  WeaveStore,
+  WeaveStoreOptions,
+} from '@inditextech/weavejs-sdk';
+import { WeaveStoreAzureWebPubSubSyncClient } from './client';
+import { WEAVE_STORE_AZURE_WEB_PUBSUB } from './constants';
+import { WeaveStoreAzureWebPubsubOptions } from './types';
 
 export class WeaveStoreAzureWebPubsub extends WeaveStore {
-  private config: WeaveStoreAzureWebPubsubOptions;
+  private azureWebPubsubOptions: WeaveStoreAzureWebPubsubOptions;
   private roomId: string;
   protected provider!: WeaveStoreAzureWebPubSubSyncClient;
   protected name = WEAVE_STORE_AZURE_WEB_PUBSUB;
   protected supportsUndoManager = true;
 
-  constructor(options: WeaveStoreAzureWebPubsubOptions) {
-    super();
+  constructor(
+    storeOptions: WeaveStoreOptions,
+    azureWebPubsubOptions: WeaveStoreAzureWebPubsubOptions
+  ) {
+    super(storeOptions);
 
-    const { roomId } = options;
+    const { roomId } = azureWebPubsubOptions;
 
-    this.config = options;
+    this.azureWebPubsubOptions = azureWebPubsubOptions;
     this.roomId = roomId;
 
     this.init();
   }
 
   private init() {
-    const { url } = this.config;
+    const { url } = this.azureWebPubsubOptions;
 
-    this.provider = new WeaveStoreAzureWebPubSubSyncClient(url, this.roomId, this.getDocument(), {
-      resyncInterval: 1000,
-      tokenProvider: null,
-    });
+    this.provider = new WeaveStoreAzureWebPubSubSyncClient(
+      url,
+      this.roomId,
+      this.getDocument(),
+      {
+        resyncInterval: 1000,
+        tokenProvider: null,
+      }
+    );
 
-    this.provider.on("status", (status) => {
-      this.config.callbacks?.onConnectionStatusChange?.(status);
-      this.instance.emitEvent("onConnectionStatusChange", status);
+    this.provider.on('status', (status) => {
+      this.azureWebPubsubOptions.callbacks?.onConnectionStatusChange?.(status);
+      this.instance.emitEvent('onConnectionStatusChange', status);
     });
   }
 
   async connect() {
     let error: Error | null = null;
     try {
-      this.config.callbacks?.onFetchConnectionUrl?.({ loading: true, error: null });
-      this.instance.emitEvent("onFetchConnectionUrl", { loading: true, error: null });
+      this.azureWebPubsubOptions.callbacks?.onFetchConnectionUrl?.({
+        loading: true,
+        error: null,
+      });
+      this.instance.emitEvent('onFetchConnectionUrl', {
+        loading: true,
+        error: null,
+      });
 
       await this.provider.fetchConnectionUrl();
     } catch (ex) {
       error = ex as Error;
     } finally {
-      this.config.callbacks?.onFetchConnectionUrl?.({ loading: false, error });
-      this.instance.emitEvent("onFetchConnectionUrl", { loading: false, error });
+      this.azureWebPubsubOptions.callbacks?.onFetchConnectionUrl?.({
+        loading: false,
+        error,
+      });
+      this.instance.emitEvent('onFetchConnectionUrl', {
+        loading: false,
+        error,
+      });
     }
 
     await this.provider.start();
@@ -61,9 +85,11 @@ export class WeaveStoreAzureWebPubsub extends WeaveStore {
     awareness.setLocalStateField(field, value);
   }
 
-  onAwarenessChange<K extends string, T>(callback: (changes: WeaveAwarenessChange<K, T>[]) => void): void {
+  onAwarenessChange<K extends string, T>(
+    callback: (changes: WeaveAwarenessChange<K, T>[]) => void
+  ): void {
     const awareness = this.provider.awareness;
-    awareness.on("change", () => {
+    awareness.on('change', () => {
       const values = Array.from(awareness.getStates().values());
       values.splice(awareness.clientID, 1);
       callback(values as WeaveAwarenessChange<K, T>[]);
