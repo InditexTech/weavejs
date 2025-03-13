@@ -102,6 +102,8 @@ export abstract class WeaveStore {
           ...this.config?.undoManagerOptions,
         });
 
+        this.undoManager.addTrackedOrigin(this.config.getUser().name);
+
         this.undoManager.on('stack-item-added', () => {
           const change: WeaveUndoRedoChange = {
             canUndo: this.undoManager.canUndo(),
