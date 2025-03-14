@@ -20,6 +20,8 @@ export { WeaveTextNode } from './nodes/text/text';
 export * from './nodes/text/types';
 export { WeaveImageNode } from './nodes/image/image';
 export * from './nodes/image/types';
+export { WeaveFrameNode } from './nodes/frame/frame';
+export * from './nodes/frame/constants';
 
 // Provided Actions
 export { WeaveZoomOutToolAction } from './actions/zoom-out-tool/zoom-out-tool';
@@ -44,6 +46,9 @@ export * from './actions/text-tool/types';
 export { WeaveImageToolAction } from './actions/image-tool/image-tool';
 export * from './actions/image-tool/constants';
 export * from './actions/image-tool/types';
+export { WeaveFrameToolAction } from './actions/frame-tool/frame-tool';
+export * from './actions/frame-tool/constants';
+export * from './actions/frame-tool/types';
 export { WeaveExportStageToolAction } from './actions/export-stage-tool/export-stage-tool';
 export * from './actions/export-stage-tool/types';
 export { WeaveExportNodeToolAction } from './actions/export-node-tool/export-node-tool';

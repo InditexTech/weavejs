@@ -49,8 +49,11 @@ export class WeaveBrushToolAction extends WeaveAction {
     stage.container().focus();
 
     stage.container().addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        this.cancelAction();
+        return;
+      }
       if (e.key === 'Escape') {
-        e.stopPropagation();
         this.cancelAction();
         return;
       }

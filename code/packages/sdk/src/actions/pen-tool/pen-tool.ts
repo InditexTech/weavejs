@@ -321,16 +321,16 @@ export class WeavePenToolAction extends WeaveAction {
       this.instance.updateNode(
         nodeHandler.toNode(tempMainLine as WeaveElementInstance)
       );
+    }
 
-      const selectionPlugin =
-        this.instance.getPlugin<WeaveNodesSelectionPlugin>('nodesSelection');
-      if (selectionPlugin) {
-        const node = stage.findOne(`#${this.lineId}`);
-        if (node) {
-          selectionPlugin.setSelectedNodes([node]);
-        }
-        this.instance.triggerAction('selectionTool');
+    const selectionPlugin =
+      this.instance.getPlugin<WeaveNodesSelectionPlugin>('nodesSelection');
+    if (selectionPlugin) {
+      const node = stage.findOne(`#${this.lineId}`);
+      if (node) {
+        selectionPlugin.setSelectedNodes([node]);
       }
+      this.instance.triggerAction('selectionTool');
     }
 
     stage.container().style.cursor = 'default';
