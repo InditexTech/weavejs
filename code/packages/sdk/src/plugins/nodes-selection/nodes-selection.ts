@@ -384,10 +384,10 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
   }
 
   setEnabled(enabled: boolean) {
-    if (!enabled) {
-      this.tr.nodes([]);
-      this.triggerSelectedNodesEvent();
-    }
+    // if (!enabled) {
+    //   this.tr.nodes([]);
+    //   this.triggerSelectedNodesEvent();
+    // }
     this.enabled = enabled;
   }
 }
