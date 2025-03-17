@@ -31,43 +31,45 @@ export class WeaveNodesSnappingPlugin extends WeavePlugin {
 
     if (mainLayer) {
       stage.on('dragmove', (e) => {
-        const actualTarget: Konva.Transformer =
-          e.target as unknown as Konva.Transformer;
-        const node: Konva.Node = actualTarget.getNodes()[0];
+        if (e.target instanceof Konva.Transformer) {
+          const actualTarget: Konva.Transformer =
+            e.target as unknown as Konva.Transformer;
+          const node: Konva.Node = actualTarget.getNodes()[0];
 
-        // clear all previous lines on the screen
-        mainLayer.find(`.${GUIDE_LINE_NAME}`).forEach((l) => l.destroy());
+          // clear all previous lines on the screen
+          mainLayer.find(`.${GUIDE_LINE_NAME}`).forEach((l) => l.destroy());
 
-        // find possible snapping lines
-        const lineGuideStops = this.getLineGuideStops(node);
-        // find snapping points of current object
-        const itemBounds = this.getObjectSnappingEdges(node);
+          // find possible snapping lines
+          const lineGuideStops = this.getLineGuideStops(node);
+          // find snapping points of current object
+          const itemBounds = this.getObjectSnappingEdges(node);
 
-        // now find where can we snap current object
-        const guides = this.getGuides(lineGuideStops, itemBounds);
+          // now find where can we snap current object
+          const guides = this.getGuides(lineGuideStops, itemBounds);
 
-        // do nothing of no snapping
-        if (!guides.length) {
-          return;
-        }
-
-        this.drawGuides(guides);
-
-        const absPos = node.absolutePosition();
-        // now force object position
-        guides.forEach((lg) => {
-          switch (lg.orientation) {
-            case GUIDE_ORIENTATION.VERTICAL: {
-              absPos.x = lg.lineGuide + lg.offset;
-              break;
-            }
-            case GUIDE_ORIENTATION.HORIZONTAL: {
-              absPos.y = lg.lineGuide + lg.offset;
-              break;
-            }
+          // do nothing of no snapping
+          if (!guides.length) {
+            return;
           }
-        });
-        node.absolutePosition(absPos);
+
+          this.drawGuides(guides);
+
+          const absPos = node.absolutePosition();
+          // now force object position
+          guides.forEach((lg) => {
+            switch (lg.orientation) {
+              case GUIDE_ORIENTATION.VERTICAL: {
+                absPos.x = lg.lineGuide + lg.offset;
+                break;
+              }
+              case GUIDE_ORIENTATION.HORIZONTAL: {
+                absPos.y = lg.lineGuide + lg.offset;
+                break;
+              }
+            }
+          });
+          node.absolutePosition(absPos);
+        }
       });
 
       stage.on('dragend', () => {

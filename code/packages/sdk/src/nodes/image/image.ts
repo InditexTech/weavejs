@@ -48,7 +48,7 @@ export class WeaveImageNode extends WeaveNode {
     const internalImageProps = {
       ...props,
     };
-    delete internalImageProps.nodeType;
+    // delete internalImageProps.nodeType;
     delete internalImageProps.imageProperties;
     delete internalImageProps.imageURL;
     delete internalImageProps.zIndex;

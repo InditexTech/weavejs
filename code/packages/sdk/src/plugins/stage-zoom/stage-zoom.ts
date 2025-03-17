@@ -211,8 +211,6 @@ export class WeaveStageZoomPlugin extends WeavePlugin {
       this.instance.getPlugin<WeaveNodesSelectionPlugin>('nodesSelection');
     const nodes = selectionPlugin.getTransformer().getNodes();
 
-    console.log('NODES?', selectionPlugin.getTransformer(), nodes);
-
     if (nodes.length === 0) {
       return;
     }
