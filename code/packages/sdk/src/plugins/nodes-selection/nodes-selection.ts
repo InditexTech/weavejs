@@ -8,6 +8,7 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
   private tr!: Konva.Transformer;
   private selectionRectangle!: Konva.Rect;
   private active: boolean;
+  private cameFromSelectingMultiple: boolean;
   private selecting: boolean;
   private initialized: boolean;
   private enabled: boolean;
@@ -19,6 +20,7 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
 
     this.callbacks = callbacks;
     this.active = false;
+    this.cameFromSelectingMultiple = false;
     this.selecting = false;
     this.initialized = false;
     this.enabled = false;
@@ -51,8 +53,9 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
     stage.container().focus();
 
     const selectionRectangle = new Konva.Rect({
-      fill: 'rgba(0,0,255,0.25)',
-      stroke: 'blue',
+      fill: 'rgba(147, 197, 253, 0.25)',
+      stroke: '#1e40afff',
+      dash: [12, 4],
       visible: false,
       // disable events to not interrupt with events
       listening: false,
@@ -67,6 +70,23 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
       flipEnabled: false,
       useSingleNodeRotation: true,
       shouldOverdrawWholeArea: true,
+      anchorStyleFunc: (anchor) => {
+        anchor.stroke('#27272aff');
+        anchor.cornerRadius(12);
+        if (anchor.hasName('top-center') || anchor.hasName('bottom-center')) {
+          anchor.height(8);
+          anchor.offsetY(4);
+          anchor.width(32);
+          anchor.offsetX(16);
+        }
+        if (anchor.hasName('middle-left') || anchor.hasName('middle-right')) {
+          anchor.height(32);
+          anchor.offsetY(16);
+          anchor.width(8);
+          anchor.offsetX(4);
+        }
+      },
+      borderStroke: '#1e40afff',
     });
     selectionLayer?.add(tr);
 
@@ -186,7 +206,12 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
         return;
       }
 
-      if (!(e.target instanceof Konva.Stage)) {
+      const selectedGroup = this.instance.getInstanceRecursive(e.target);
+
+      if (
+        !(e.target instanceof Konva.Stage) &&
+        !(selectedGroup && selectedGroup.getAttrs().nodeType === 'frame')
+      ) {
         return;
       }
 
@@ -202,6 +227,10 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
       this.selectionRectangle.width(0);
       this.selectionRectangle.height(0);
       this.selecting = true;
+
+      if (!(e.target instanceof Konva.Stage)) {
+        this.cameFromSelectingMultiple = true;
+      }
     });
 
     stage.on('mousemove touchmove', (e) => {
@@ -215,6 +244,7 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
 
       // do nothing if we didn't start selection
       if (!this.selecting) {
+        this.cameFromSelectingMultiple = false;
         return;
       }
 
@@ -246,6 +276,7 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
       this.selecting = false;
 
       if (!this.selectionRectangle.visible()) {
+        this.cameFromSelectingMultiple = false;
         return;
       }
 
@@ -261,16 +292,67 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
         );
       });
       const box = this.selectionRectangle.getClientRect();
-      const selected = shapes.filter((shape) =>
-        Konva.Util.haveIntersection(box, shape.getClientRect())
-      );
+      const selected = shapes.filter((shape) => {
+        const parent = this.instance.getInstanceRecursive(
+          shape.getParent() as Konva.Node
+        );
+        if (
+          shape.getAttrs().nodeType &&
+          shape.getAttrs().nodeType === 'frame'
+        ) {
+          const frameBox = shape.getClientRect();
+          const isContained =
+            frameBox.x >= box.x &&
+            frameBox.y >= box.y &&
+            frameBox.x + frameBox.width <= box.x + box.width &&
+            frameBox.y + frameBox.height <= box.y + box.height;
+          return isContained;
+        }
+        if (
+          shape.getAttrs().nodeType &&
+          shape?.getAttrs().nodeType === 'group' &&
+          ['layer', 'frame'].includes(parent?.getAttrs().nodeType)
+        ) {
+          return (
+            shape.getAttrs().nodeType &&
+            Konva.Util.haveIntersection(box, shape.getClientRect())
+          );
+        }
+        if (
+          shape.getAttrs().nodeType &&
+          shape.getAttrs().nodeType !== 'group' &&
+          ['layer', 'frame'].includes(parent?.getAttrs().nodeType)
+        ) {
+          return (
+            shape.getAttrs().nodeType &&
+            Konva.Util.haveIntersection(box, shape.getClientRect())
+          );
+        }
+        return false;
+      });
 
       const selectedNodes = new Set<Konva.Node>();
-      for (const node of selected) {
-        selectedNodes.add(
-          this.instance.getInstanceRecursive(node as Konva.Node)
+      const framesNodes = selected.filter(
+        (shape) => shape.getAttrs().nodeType === 'frame'
+      );
+      const framesNodesIds = selected.map((shape) => shape.getAttrs().id);
+      const otherNodes = selected.filter(
+        (shape) => shape.getAttrs().nodeType !== 'frame'
+      );
+
+      otherNodes.forEach((node) => {
+        const parent = this.instance.getInstanceRecursive(
+          node.getParent() as Konva.Node
         );
-      }
+        if (!framesNodesIds.includes(parent?.getAttrs().id)) {
+          selectedNodes.add(node);
+        }
+      });
+
+      framesNodes.forEach((node: Konva.Node) => {
+        const frameNode: Konva.Group = node as Konva.Group;
+        selectedNodes.add(frameNode);
+      });
 
       this.tr.nodes([...selectedNodes]);
       this.triggerSelectedNodesEvent();
@@ -281,6 +363,11 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
 
     stage.on('click tap', (e) => {
       if (!this.enabled) {
+        return;
+      }
+
+      if (this.cameFromSelectingMultiple) {
+        this.cameFromSelectingMultiple = false;
         return;
       }
 
@@ -319,10 +406,33 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
       const isSelected = this.tr.nodes().indexOf(e.target) >= 0;
       let areNodesSelected = false;
 
-      const nodeToAdd =
+      let nodeToAdd =
         selectedGroup && !(selectedGroup.getAttrs().active ?? false)
           ? selectedGroup
           : e.target;
+
+      // Check if clicked on transformer
+      if (nodeToAdd.getParent() instanceof Konva.Transformer) {
+        const intersections = stage.getAllIntersections(mousePos);
+        const nodesIntersected = intersections.filter(
+          (ele) => ele.getAttrs().nodeType
+        );
+
+        let targetNode = null;
+        if (nodesIntersected.length > 0) {
+          targetNode = this.instance.getInstanceRecursive(
+            nodesIntersected[nodesIntersected.length - 1]
+          );
+        }
+
+        // Check if transformer has a frame selected
+        if (targetNode && targetNode.getAttrs().nodeType) {
+          this.tr.nodes([]);
+          this.triggerSelectedNodesEvent();
+
+          nodeToAdd = targetNode;
+        }
+      }
 
       if (!nodeToAdd.getAttrs().nodeType) {
         return;
@@ -384,10 +494,6 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
   }
 
   setEnabled(enabled: boolean) {
-    // if (!enabled) {
-    //   this.tr.nodes([]);
-    //   this.triggerSelectedNodesEvent();
-    // }
     this.enabled = enabled;
   }
 }

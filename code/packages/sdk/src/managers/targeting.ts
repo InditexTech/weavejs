@@ -29,11 +29,30 @@ export class WeaveTargetingManager {
       const node = this.instance.getInstanceRecursive(intersectedNode, [
         'group',
       ]);
+      let nodeParent = null;
+      if (node.getParent()) {
+        nodeParent = this.instance.getInstanceRecursive(
+          node.getParent() as Konva.Node,
+          ['group']
+        );
+      }
+
       if (node && node instanceof Konva.Group && node.getAttrs().containerId) {
         measureContainer = (node as Konva.Group).findOne(
           `#${node.getAttrs().containerId}`
         ) as Konva.Group;
         container = node;
+      }
+
+      if (
+        nodeParent &&
+        nodeParent instanceof Konva.Group &&
+        nodeParent.getAttrs().containerId
+      ) {
+        measureContainer = (nodeParent as Konva.Group).findOne(
+          `#${nodeParent.getAttrs().containerId}`
+        ) as Konva.Group;
+        container = nodeParent;
       }
     }
 

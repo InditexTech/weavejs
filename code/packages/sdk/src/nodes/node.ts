@@ -13,6 +13,7 @@ export abstract class WeaveNode {
   protected instance!: Weave;
   protected nodeType!: string;
   private logger!: Logger;
+  protected previousPointer!: string | null;
 
   register(instance: Weave) {
     this.instance = instance;
@@ -58,6 +59,8 @@ export abstract class WeaveNode {
   }
 
   setupDefaultNodeEvents(node: Konva.Node) {
+    this.previousPointer = null;
+
     this.instance.addEventListener<WeaveNodesSelectionChangeCallback>(
       'onNodesChange',
       () => {
@@ -91,18 +94,24 @@ export abstract class WeaveNode {
       }
     });
 
+    this.previousPointer = null;
+
     node.on('mouseenter', (e) => {
-      if (this.isSelecting() && !this.isNodeSelected(node)) {
+      const realNode = this.instance.getInstanceRecursive(node);
+      if (this.isSelecting() && !this.isNodeSelected(realNode)) {
         const stage = this.instance.getStage();
+        this.previousPointer = stage.container().style.cursor;
         stage.container().style.cursor = 'pointer';
         e.cancelBubble = true;
       }
     });
 
     node.on('mouseleave', (e) => {
-      if (this.isSelecting() && !this.isNodeSelected(node)) {
+      const realNode = this.instance.getInstanceRecursive(node);
+      if (this.isSelecting() && !this.isNodeSelected(realNode)) {
         const stage = this.instance.getStage();
-        stage.container().style.cursor = 'default';
+        stage.container().style.cursor = this.previousPointer ?? 'default';
+        this.previousPointer = null;
         e.cancelBubble = true;
       }
     });
