@@ -1,4 +1,4 @@
-import React from "react";
+import React from 'react';
 import {
   Weave,
   WeaveStageGridPlugin,
@@ -10,7 +10,6 @@ import {
   WeaveConnectedUsersPlugin,
   WeaveConnectedUsersChanged,
   WeaveUsersPointersPlugin,
-  WeaveImageEditionPlugin,
   WeaveStageDropAreaPlugin,
   WeaveCopyPasteNodesPlugin,
   WeaveState,
@@ -24,8 +23,8 @@ import {
   WeaveUndoRedoChange,
   WeaveStore,
   WeaveStatus,
-} from "@inditextech/weavejs-sdk";
-import { useWeave } from "./store";
+} from '@inditextech/weavejs-sdk';
+import { useWeave } from './store';
 
 type WeaveProviderType = {
   containerId: string;
@@ -88,7 +87,7 @@ export const WeaveProvider = ({
       onInstanceStatus?.(status);
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [],
+    []
   );
 
   const onRoomLoadedHandler = React.useCallback(
@@ -97,7 +96,7 @@ export const WeaveProvider = ({
       onRoomLoaded?.(status);
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [],
+    []
   );
 
   const onStateChangeHandler = React.useCallback(
@@ -106,7 +105,7 @@ export const WeaveProvider = ({
       onStateChange?.(state);
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [selectedNodes],
+    [selectedNodes]
   );
 
   const onUndoManagerStatusChangeHandler = React.useCallback(
@@ -117,7 +116,7 @@ export const WeaveProvider = ({
       onUndoManagerStatusChange?.(undoManagerStatus);
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [],
+    []
   );
 
   const onActiveActionChangeHandler = React.useCallback(
@@ -126,7 +125,7 @@ export const WeaveProvider = ({
       onActiveActionChange?.(status);
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [selectedNodes],
+    [selectedNodes]
   );
 
   const onNodesChange = React.useCallback((nodes: WeaveSelection[]) => {
@@ -182,14 +181,13 @@ export const WeaveProvider = ({
                 setCanZoomIn(zoomInfo.canZoomIn);
                 setCanZoomOut(zoomInfo.canZoomOut);
               },
-            }),
+            })
           );
           instancePlugins.push(
             new WeaveNodesSelectionPlugin({
               onNodesChange,
-            }),
+            })
           );
-          instancePlugins.push(new WeaveImageEditionPlugin());
           instancePlugins.push(new WeaveStageDropAreaPlugin());
           instancePlugins.push(
             new WeaveConnectedUsersPlugin({
@@ -197,12 +195,12 @@ export const WeaveProvider = ({
                 setUsers(users);
               },
               getUser,
-            }),
+            })
           );
           instancePlugins.push(
             new WeaveUsersPointersPlugin({
               getUser,
-            }),
+            })
           );
           instancePlugins.push(
             new WeaveCopyPasteNodesPlugin({
@@ -213,7 +211,7 @@ export const WeaveProvider = ({
                 setCanPaste(actCanPaste);
                 setCopiedNodes(nodes);
               },
-            }),
+            })
           );
         }
 
@@ -233,14 +231,14 @@ export const WeaveProvider = ({
               onActiveActionChange: onActiveActionChangeHandler,
             },
             logger: {
-              level: "info",
+              level: 'info',
             },
           },
           {
             container: containerId,
             width: weaveEleClientRect?.width ?? 1920,
             height: weaveEleClientRect?.height ?? 1080,
-          },
+          }
         );
 
         setInstance(weaveInstance);

@@ -67,6 +67,5 @@
   "overrides": {
     "rimraf": "6.0.1"
   },
-  "repository": "github:InditexTech/weavejs",
-  "dependencies": {}
+  "repository": "github:InditexTech/weavejs"
 }

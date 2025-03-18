@@ -63,6 +63,7 @@ export class WeaveImageToolAction extends WeaveAction {
         this.instance.triggerAction('imageTool', {
           imageURL: window.weaveDragImageURL,
         });
+        window.weaveDragImageURL = undefined;
       }
     });
   }
@@ -254,6 +255,8 @@ export class WeaveImageToolAction extends WeaveAction {
 
     this.props = this.initProps();
     this.addImage();
+
+    return { finishUploadCallback: this.loadImage.bind(this) };
   }
 
   internalUpdate() {

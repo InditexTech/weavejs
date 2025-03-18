@@ -59,6 +59,8 @@ export class Weave extends Emittery {
   constructor(weaveConfig: WeaveConfig, stageConfig: Konva.StageConfig) {
     super();
 
+    Konva.showWarnings = false;
+
     // Save in memory the configuration provided
     this.config = weaveConfig;
     // Setup the logger
@@ -310,8 +312,8 @@ export class Weave extends Emittery {
     return this.actionsManager.getActiveAction();
   }
 
-  triggerAction<T>(actionName: string, params?: T) {
-    this.actionsManager.triggerAction<T>(actionName, params);
+  triggerAction<T>(actionName: string, params?: T): unknown {
+    return this.actionsManager.triggerAction<T>(actionName, params);
   }
 
   getPropsAction(actionName: string) {

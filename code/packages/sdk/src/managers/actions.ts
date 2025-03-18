@@ -32,13 +32,15 @@ export class WeaveActionsManager {
     }
 
     this.activeAction = actionName;
-    actionsHandlers[actionName].trigger(
+    const payload = actionsHandlers[actionName].trigger(
       this.cancelActionCallback(actionName),
       params
     );
 
     config.callbacks?.onActiveActionChange?.(this.activeAction);
     this.instance.emitEvent('onActiveActionChange', this.activeAction);
+
+    return payload;
   }
 
   updatePropsAction(actionName: string, props: WeaveElementAttributes) {
