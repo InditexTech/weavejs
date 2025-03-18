@@ -5,12 +5,14 @@ import { GUIDE_LINE_NAME, GUIDE_ORIENTATION, NODE_SNAP } from './constants';
 
 export class WeaveNodesSnappingPlugin extends WeavePlugin {
   private guideLineOffset: number;
+  private enabled: boolean;
   render: undefined;
 
   constructor() {
     super();
 
     this.guideLineOffset = 10;
+    this.enabled = true;
   }
 
   registersLayers() {
@@ -25,12 +27,20 @@ export class WeaveNodesSnappingPlugin extends WeavePlugin {
     this.initEvents();
   }
 
+  setEnabled(enabled: boolean) {
+    this.enabled = enabled;
+  }
+
   private initEvents() {
     const stage = this.instance.getStage();
     const mainLayer = this.instance.getMainLayer();
 
     if (mainLayer) {
       stage.on('dragmove', (e) => {
+        if (!this.enabled) {
+          return;
+        }
+
         if (e.target instanceof Konva.Transformer) {
           const actualTarget: Konva.Transformer =
             e.target as unknown as Konva.Transformer;
@@ -73,6 +83,10 @@ export class WeaveNodesSnappingPlugin extends WeavePlugin {
       });
 
       stage.on('dragend', () => {
+        if (!this.enabled) {
+          return;
+        }
+
         // clear all previous lines on the screen
         mainLayer.find(`.${GUIDE_LINE_NAME}`).forEach((l) => l.destroy());
       });

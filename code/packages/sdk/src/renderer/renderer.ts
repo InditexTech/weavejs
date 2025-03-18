@@ -1,19 +1,29 @@
-import ReactReconciler, { Reconciler } from "react-reconciler";
-import { Weave } from "@/weave";
-import { WeaveStateSerializer } from "@/state-serializer/state-serializer";
-import { WeaveReconciler } from "@/reconciler/reconciler";
-import { WeaveElementInstance } from "@/types";
+import ReactReconciler, { Reconciler } from 'react-reconciler';
+import { Weave } from '@/weave';
+import { WeaveStateSerializer } from '@/state-serializer/state-serializer';
+import { WeaveReconciler } from '@/reconciler/reconciler';
+import { WeaveElementInstance } from '@/types';
 
 export class WeaveRenderer {
   private instance: Weave;
   private reconciler: WeaveReconciler;
   private serializer: WeaveStateSerializer;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  private renderer: Reconciler<Weave, any, null, WeaveElementInstance, WeaveElementInstance> | null;
+  private renderer: Reconciler<
+    Weave,
+    any,
+    null,
+    WeaveElementInstance,
+    WeaveElementInstance
+  > | null;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   private root: any;
 
-  constructor(instance: Weave, reconciler: WeaveReconciler, serializer: WeaveStateSerializer) {
+  constructor(
+    instance: Weave,
+    reconciler: WeaveReconciler,
+    serializer: WeaveStateSerializer
+  ) {
     this.instance = instance;
     this.reconciler = reconciler;
     this.serializer = serializer;
@@ -29,11 +39,11 @@ export class WeaveRenderer {
       null,
       true,
       null,
-      "",
+      '',
       (error: Error) => {
         console.error(error);
       },
-      null,
+      null
     );
 
     this.root.onUncaughtError = function (error: Error) {
@@ -42,9 +52,15 @@ export class WeaveRenderer {
   }
 
   render(callback?: () => void) {
-    const actualState = JSON.parse(JSON.stringify(this.instance.getStore().getState()));
+    const actualState = JSON.parse(
+      JSON.stringify(this.instance.getStore().getState())
+    );
 
-    if (!actualState?.weave?.key || !actualState?.weave?.type || !actualState?.weave?.props) {
+    if (
+      !actualState?.weave?.key ||
+      !actualState?.weave?.type ||
+      !actualState?.weave?.props
+    ) {
       return;
     }
 

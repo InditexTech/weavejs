@@ -2,22 +2,21 @@ import Konva from 'konva';
 import { WeaveElementAttributes, WeaveElementInstance } from '@/types';
 import { WeaveNode } from '../node';
 import { ImageProps } from './types';
-// import { WeaveNodesSelectionPlugin } from '@/plugins/nodes-selection/nodes-selection';
-import { WeaveImageEditionPlugin } from '@/plugins/image-edition/image-edition';
 import { WeaveImageToolAction } from '@/actions/image-tool/image-tool';
+import { WeaveImageClip } from './clip';
 
 export const WEAVE_IMAGE_NODE_TYPE = 'image';
 
 export class WeaveImageNode extends WeaveNode {
   protected nodeType = WEAVE_IMAGE_NODE_TYPE;
   private imageLoaded: boolean;
-  private editing: boolean;
+  cropping: boolean;
 
   constructor() {
     super();
 
     this.imageLoaded = false;
-    this.editing = false;
+    this.cropping = false;
   }
 
   createNode(key: string, props: WeaveElementAttributes) {
@@ -94,12 +93,20 @@ export class WeaveImageNode extends WeaveNode {
 
     image.add(internalImage);
 
+    const clipGroup = new Konva.Group({
+      x: 0,
+      y: 0,
+      visible: false,
+    });
+
+    image.add(clipGroup);
+
     this.setupDefaultNodeEvents(image);
 
     image.on('dblclick', (evt) => {
       evt.cancelBubble = true;
 
-      if (this.editing) {
+      if (this.cropping) {
         return;
       }
 
@@ -107,13 +114,21 @@ export class WeaveImageNode extends WeaveNode {
         return;
       }
 
-      if (!(this.isSelecting() && !this.isNodeSelected(image))) {
+      if (!(this.isSelecting() && this.isNodeSelected(image))) {
         return;
       }
 
-      const imageEditionPlugin = this.getImageEditionPlugin();
-      imageEditionPlugin.setImage(image);
-      imageEditionPlugin.start();
+      this.cropping = true;
+
+      const imageClip = new WeaveImageClip(
+        this.instance,
+        this,
+        image,
+        internalImage,
+        clipGroup
+      );
+
+      imageClip.show();
     });
 
     const imageActionTool = this.getImageToolAction();
@@ -338,14 +353,5 @@ export class WeaveImageNode extends WeaveNode {
       throw new Error('Image Tool action not found');
     }
     return imageToolAction;
-  }
-
-  private getImageEditionPlugin() {
-    const imageEditionPlugin =
-      this.instance.getPlugin<WeaveImageEditionPlugin>('imageEdition');
-    if (!imageEditionPlugin) {
-      throw new Error('Image edition plugin not found');
-    }
-    return imageEditionPlugin;
   }
 }

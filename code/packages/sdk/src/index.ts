@@ -71,8 +71,6 @@ export { WeaveUsersPointersPlugin } from './plugins/users-pointers/users-pointer
 export * from './plugins/users-pointers/types';
 export { WeaveContextMenuPlugin } from './plugins/context-menu/context-menu';
 export * from './plugins/context-menu/types';
-export { WeaveImageEditionPlugin } from './plugins/image-edition/image-edition';
-export * from './plugins/image-edition/constants';
 export { WeaveStageDropAreaPlugin } from './plugins/stage-drop-area/stage-drop-area';
 export * from './plugins/stage-drop-area/types';
 export { WeaveCopyPasteNodesPlugin } from './plugins/copy-paste-nodes/copy-paste-nodes';

@@ -57,7 +57,7 @@ export abstract class WeaveAction {
 
   abstract init?(): void;
 
-  abstract trigger(cancelAction: () => void, params?: unknown): void;
+  abstract trigger(cancelAction: () => void, params?: unknown): unknown;
 
   abstract internalUpdate?(): void;
 
