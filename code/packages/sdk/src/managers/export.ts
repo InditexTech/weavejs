@@ -1,9 +1,12 @@
-import { Logger } from "pino";
-import { Weave } from "@/weave";
-import { v4 as uuidv4 } from "uuid";
-import { WeaveElementInstance, WeaveExportNodeOptions } from "@/types";
-import Konva from "konva";
-import { WEAVE_EXPORT_BACKGROUND_COLOR, WEAVE_EXPORT_FORMATS } from "@/constants";
+import { Logger } from 'pino';
+import { Weave } from '@/weave';
+import { v4 as uuidv4 } from 'uuid';
+import { WeaveElementInstance, WeaveExportNodeOptions } from '@/types';
+import Konva from 'konva';
+import {
+  WEAVE_EXPORT_BACKGROUND_COLOR,
+  WEAVE_EXPORT_FORMATS,
+} from '@/constants';
 
 export class WeaveExportManager {
   private instance: Weave;
@@ -11,8 +14,8 @@ export class WeaveExportManager {
 
   constructor(instance: Weave) {
     this.instance = instance;
-    this.logger = this.instance.getChildLogger("export-manager");
-    this.logger.debug("Export manager created");
+    this.logger = this.instance.getChildLogger('export-manager');
+    this.logger.debug('Export manager created');
   }
 
   exportStage(options: WeaveExportNodeOptions): Promise<HTMLImageElement> {
@@ -34,7 +37,10 @@ export class WeaveExportManager {
 
       if (mainLayer) {
         const box = mainLayer.getClientRect({ relativeTo: stage });
-        const scale = Math.min(stage.width() / (box.width + padding * 2), stage.height() / (box.height + padding * 2));
+        const scale = Math.min(
+          stage.width() / (box.width + padding * 2),
+          stage.height() / (box.height + padding * 2)
+        );
 
         stage.setAttrs({
           x: -box.x * scale + (stage.width() - box.width * scale) / 2,
@@ -96,7 +102,10 @@ export class WeaveExportManager {
     });
   }
 
-  exportNode(node: WeaveElementInstance, options: WeaveExportNodeOptions): Promise<HTMLImageElement> {
+  exportNode(
+    node: WeaveElementInstance,
+    options: WeaveExportNodeOptions
+  ): Promise<HTMLImageElement> {
     return new Promise((resolve) => {
       const {
         format = WEAVE_EXPORT_FORMATS.PNG,
@@ -105,16 +114,20 @@ export class WeaveExportManager {
         backgroundColor = WEAVE_EXPORT_BACKGROUND_COLOR,
       } = options;
 
-      const stage = this.instance.getStage();
+      // const stage = this.instance.getStage();
       const mainLayer = this.instance.getMainLayer();
 
       if (mainLayer) {
-        const group = new Konva.Group();
+        const clonedNode = node.clone({ id: uuidv4() });
+
+        const group = new Konva.Group({
+          x: clonedNode.getAbsolutePosition().x,
+          y: clonedNode.getAbsolutePosition().y,
+          visible: false,
+        });
         mainLayer.add(group);
 
-        const clonedNode = node.clone({ id: uuidv4() });
-        const nodeAbsolutePosition = clonedNode.getAbsolutePosition();
-        const nodeClientRect = clonedNode.getClientRect({ relativeTo: stage });
+        const nodeClientRect = clonedNode.getClientRect();
 
         const background = new Konva.Rect({
           x: 0,
@@ -128,18 +141,15 @@ export class WeaveExportManager {
         background.zIndex(0);
 
         clonedNode.moveTo(group);
-        clonedNode.setAbsolutePosition({
-          x: nodeAbsolutePosition.x - nodeClientRect.x + padding,
-          y: nodeAbsolutePosition.y - nodeClientRect.y + padding,
+        clonedNode.setPosition({
+          x: padding,
+          y: padding,
         });
         clonedNode.zIndex(1);
 
+        group.visible(true);
         group.toImage({
           mimeType: format,
-          x: group.x(),
-          y: group.y(),
-          width: nodeClientRect.width + 2 * padding,
-          height: nodeClientRect.height + 2 * padding,
           pixelRatio,
           quality: options.quality ?? 1,
           callback: (img) => {

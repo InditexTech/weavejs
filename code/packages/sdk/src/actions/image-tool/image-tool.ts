@@ -107,8 +107,8 @@ export class WeaveImageToolAction extends WeaveAction {
         tempImage.setAttrs({
           ...this.props,
           name: undefined,
-          x: mousePos?.x ?? 0,
-          y: mousePos?.y ?? 0,
+          x: (mousePos?.x ?? 0) + 5,
+          y: (mousePos?.y ?? 0) + 5,
           fill: '#ccccccff',
           stroke: '#000000ff',
           strokeWidth: 1,
@@ -129,6 +129,11 @@ export class WeaveImageToolAction extends WeaveAction {
   }
 
   private loadImage(imageURL: string) {
+    const stage = this.instance.getStage();
+
+    stage.container().style.cursor = 'crosshair';
+    stage.container().focus();
+
     this.imageId = uuidv4();
     this.imageURL = imageURL;
 
@@ -169,8 +174,8 @@ export class WeaveImageToolAction extends WeaveAction {
 
       const node = nodeHandler.createNode(this.tempImageId, {
         ...this.props,
-        x: mousePos?.x ?? 0,
-        y: mousePos?.y ?? 0,
+        x: (mousePos?.x ?? 0) + 5,
+        y: (mousePos?.y ?? 0) + 5,
         width: this.preloadImgs[this.imageId].width,
         height: this.preloadImgs[this.imageId].height,
         fill: '#ccccccff',

@@ -52,6 +52,7 @@ export class WeaveFrameNode extends WeaveNode {
 
     const background = new Konva.Rect({
       id: `${id}-bg`,
+      nodeId: id,
       x: strokeWidth,
       y: titleHeight + strokeWidth,
       width: frameWidth,

@@ -29,6 +29,7 @@ export class WeaveTargetingManager {
       const node = this.instance.getInstanceRecursive(intersectedNode, [
         'group',
       ]);
+
       let nodeParent = null;
       if (node.getParent()) {
         nodeParent = this.instance.getInstanceRecursive(

@@ -1,10 +1,13 @@
-import { WeavePlugin } from "@/plugins/plugin";
-import Konva from "konva";
-import { NodeSerializable } from "@/types";
-import { COPY_PASTE_NODES_PLUGIN_STATE } from "./constants";
-import { WeaveNodesSelectionPlugin } from "../nodes-selection/nodes-selection";
-import { WeaveNodesSelectionChangeCallback } from "../nodes-selection/types";
-import { WeaveCopyPasteNodesPluginCallbacks, WeaveCopyPasteNodesPluginState } from "./types";
+import { WeavePlugin } from '@/plugins/plugin';
+import Konva from 'konva';
+import { NodeSerializable } from '@/types';
+import { COPY_PASTE_NODES_PLUGIN_STATE } from './constants';
+import { WeaveNodesSelectionPlugin } from '../nodes-selection/nodes-selection';
+import { WeaveNodesSelectionChangeCallback } from '../nodes-selection/types';
+import {
+  WeaveCopyPasteNodesPluginCallbacks,
+  WeaveCopyPasteNodesPluginState,
+} from './types';
 
 export class WeaveCopyPasteNodesPlugin extends WeavePlugin {
   protected selectedElements: (Konva.Group | Konva.Shape)[];
@@ -27,7 +30,7 @@ export class WeaveCopyPasteNodesPlugin extends WeavePlugin {
   }
 
   getName() {
-    return "copyPasteNodes";
+    return 'copyPasteNodes';
   }
 
   init() {
@@ -37,23 +40,23 @@ export class WeaveCopyPasteNodesPlugin extends WeavePlugin {
   private initEvents() {
     const stage = this.instance.getStage();
 
-    stage.container().addEventListener("keydown", (e) => {
-      if (e.key === "Escape") {
+    stage.container().addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
         this.cancel();
         return;
       }
 
-      if (e.key === "c" && (e.metaKey || e.ctrlKey)) {
+      if (e.key === 'c' && (e.metaKey || e.ctrlKey)) {
         this.performCopy();
         return;
       }
-      if (e.key === "v" && (e.metaKey || e.ctrlKey)) {
+      if (e.key === 'v' && (e.metaKey || e.ctrlKey)) {
         this.performPaste();
         return;
       }
     });
 
-    stage.on("click tap", (e) => {
+    stage.on('click tap', (e) => {
       e.evt.preventDefault();
 
       if (this.state === COPY_PASTE_NODES_PLUGIN_STATE.IDLE) {
@@ -66,14 +69,23 @@ export class WeaveCopyPasteNodesPlugin extends WeavePlugin {
       }
     });
 
-    this.instance.addEventListener<WeaveNodesSelectionChangeCallback>("onNodesChange", () => {
-      this.callbacks?.onCanCopyChange?.(this.canCopy());
-      this.callbacks?.onCanPasteChange?.(this.canPaste(), this.mapToPasteNodes());
-    });
+    this.instance.addEventListener<WeaveNodesSelectionChangeCallback>(
+      'onNodesChange',
+      () => {
+        this.callbacks?.onCanCopyChange?.(this.canCopy());
+        this.callbacks?.onCanPasteChange?.(
+          this.canPaste(),
+          this.mapToPasteNodes()
+        );
+      }
+    );
   }
 
   private mapToPasteNodes() {
-    return this.selectedElements.map((node) => ({ konvaNode: node, node: node.getAttrs() as NodeSerializable }));
+    return this.selectedElements.map((node) => ({
+      konvaNode: node,
+      node: node.getAttrs() as NodeSerializable,
+    }));
   }
 
   private setState(state: WeaveCopyPasteNodesPluginState) {
@@ -96,7 +108,7 @@ export class WeaveCopyPasteNodesPlugin extends WeavePlugin {
 
     const stage = this.instance.getStage();
 
-    stage.container().style.cursor = "default";
+    stage.container().style.cursor = 'default';
     stage.container().focus();
 
     this.setState(COPY_PASTE_NODES_PLUGIN_STATE.IDLE);
@@ -123,7 +135,7 @@ export class WeaveCopyPasteNodesPlugin extends WeavePlugin {
       return;
     }
 
-    stage.container().style.cursor = "crosshair";
+    stage.container().style.cursor = 'crosshair';
     stage.container().focus();
 
     this.setState(COPY_PASTE_NODES_PLUGIN_STATE.PASTING);
@@ -144,7 +156,10 @@ export class WeaveCopyPasteNodesPlugin extends WeavePlugin {
   canCopy() {
     const nodesSelectionPlugin = this.getNodesSelectionPlugin();
     const selectedNodes = nodesSelectionPlugin.getSelectedNodes();
-    return this.state === COPY_PASTE_NODES_PLUGIN_STATE.IDLE && selectedNodes.length > 0;
+    return (
+      this.state === COPY_PASTE_NODES_PLUGIN_STATE.IDLE &&
+      selectedNodes.length > 0
+    );
   }
 
   canPaste() {
@@ -154,7 +169,7 @@ export class WeaveCopyPasteNodesPlugin extends WeavePlugin {
   private cancel() {
     const stage = this.instance.getStage();
 
-    stage.container().style.cursor = "default";
+    stage.container().style.cursor = 'default';
     stage.container().focus();
 
     this.selectedElements = [];
@@ -165,9 +180,10 @@ export class WeaveCopyPasteNodesPlugin extends WeavePlugin {
   }
 
   private getNodesSelectionPlugin() {
-    const nodesSelectionPlugin = this.instance.getPlugin<WeaveNodesSelectionPlugin>("nodesSelection");
+    const nodesSelectionPlugin =
+      this.instance.getPlugin<WeaveNodesSelectionPlugin>('nodesSelection');
     if (!nodesSelectionPlugin) {
-      throw new Error("Nodes selection plugin not found");
+      throw new Error('Nodes selection plugin not found');
     }
     return nodesSelectionPlugin;
   }
