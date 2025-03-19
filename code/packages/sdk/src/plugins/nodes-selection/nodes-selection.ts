@@ -479,7 +479,7 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
   }
 
   getSelectedNodes() {
-    return this.tr.getNodes() as (Konva.Group | Konva.Shape)[];
+    return this.tr.nodes() as (Konva.Group | Konva.Shape)[];
   }
 
   removeSelectedNodes() {
@@ -495,5 +495,17 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
 
   setEnabled(enabled: boolean) {
     this.enabled = enabled;
+  }
+
+  selectAll() {
+    const mainLayer = this.instance.getMainLayer();
+    if (mainLayer) {
+      const nodes = mainLayer.getChildren();
+      this.tr.nodes(nodes);
+    }
+  }
+
+  selectNone() {
+    this.tr.nodes([]);
   }
 }

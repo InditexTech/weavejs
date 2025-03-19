@@ -65,5 +65,7 @@ export class WeaveExportNodeToolAction extends WeaveAction {
     stage.container().tabIndex = 0;
     stage.container().click();
     stage.container().focus();
+
+    this.instance.triggerAction('selectionTool');
   }
 }
