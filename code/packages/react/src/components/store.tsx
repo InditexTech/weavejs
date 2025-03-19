@@ -7,9 +7,9 @@ import {
   WeaveStateElement,
   WeaveStatus,
   WeaveToPasteNode,
-} from "@inditextech/weavejs-sdk";
-import { WeaveStoreWebsocketsConnectionStatus } from "@inditextech/weavejs-store-websockets";
-import { create } from "zustand";
+} from '@inditextech/weavejs-sdk';
+import { WeaveStoreWebsocketsConnectionStatus } from '@inditextech/weavejs-store-websockets';
+import { create } from 'zustand';
 
 interface WeaveRuntimeState {
   instance: Weave | null;
@@ -32,6 +32,7 @@ interface WeaveRuntimeState {
     canZoomOut: boolean;
   };
   copyPaste: {
+    blobToPaste: Blob | null;
     canCopy: boolean;
     canPaste: boolean;
     copiedNodes: WeaveToPasteNode[];
@@ -47,7 +48,9 @@ interface WeaveRuntimeState {
   setInstance: (newInstance: Weave) => void;
   setStatus: (newStatus: WeaveStatus) => void;
   setAppState: (newAppState: WeaveState) => void;
-  setConnectionStatus: (newConnectionStatus: WeaveStoreWebsocketsConnectionStatus) => void;
+  setConnectionStatus: (
+    newConnectionStatus: WeaveStoreWebsocketsConnectionStatus
+  ) => void;
   setRoomLoaded: (newStatus: boolean) => void;
   setUsers: (newUsers: WeaveConnectedUsersChanged) => void;
   setCanUndo: (newCanUndo: boolean) => void;
@@ -55,6 +58,7 @@ interface WeaveRuntimeState {
   setZoom: (newZoom: number) => void;
   setCanZoomIn: (newCanZoomIn: boolean) => void;
   setCanZoomOut: (newCanZoomOut: boolean) => void;
+  setBlobToPaste: (newBlobToPaste: Blob | null) => void;
   setCanCopy: (newCanCopy: boolean) => void;
   setCanPaste: (newCanPaste: boolean) => void;
   setCopiedNodes: (newCopiedNodes: WeaveToPasteNode[]) => void;
@@ -71,7 +75,7 @@ export const useWeave = create<WeaveRuntimeState>()((set) => ({
     loaded: false,
   },
   connection: {
-    status: "disconnected",
+    status: 'disconnected',
   },
   users: {},
   undoRedo: {
@@ -84,6 +88,7 @@ export const useWeave = create<WeaveRuntimeState>()((set) => ({
     canZoomOut: false,
   },
   copyPaste: {
+    blobToPaste: null,
     canCopy: false,
     canPaste: false,
     copiedNodes: [],
@@ -101,29 +106,78 @@ export const useWeave = create<WeaveRuntimeState>()((set) => ({
     active: false,
     actual: undefined,
   },
-  setInstance: (newInstance) => set((state) => ({ ...state, instance: newInstance })),
+  setInstance: (newInstance) =>
+    set((state) => ({ ...state, instance: newInstance })),
   setStatus: (newStatus) => set((state) => ({ ...state, status: newStatus })),
-  setAppState: (newAppState) => set((state) => ({ ...state, appState: newAppState })),
+  setAppState: (newAppState) =>
+    set((state) => ({ ...state, appState: newAppState })),
   setConnectionStatus: (newConnectionStatus) =>
-    set((state) => ({ ...state, connection: { ...state.connection, status: newConnectionStatus } })),
-  setRoomLoaded: (newStatus) => set((state) => ({ ...state, room: { ...state.room, loaded: newStatus } })),
+    set((state) => ({
+      ...state,
+      connection: { ...state.connection, status: newConnectionStatus },
+    })),
+  setRoomLoaded: (newStatus) =>
+    set((state) => ({ ...state, room: { ...state.room, loaded: newStatus } })),
   setUsers: (newUsers) => set((state) => ({ ...state, users: newUsers })),
-  setCanUndo: (newCanUndo) => set((state) => ({ ...state, undoRedo: { ...state.undoRedo, canUndo: newCanUndo } })),
-  setCanRedo: (newCanRedo) => set((state) => ({ ...state, undoRedo: { ...state.undoRedo, canRedo: newCanRedo } })),
-  setZoom: (newZoom) => set((state) => ({ ...state, zoom: { ...state.zoom, value: newZoom } })),
-  setCanZoomIn: (newCanZoomIn) => set((state) => ({ ...state, zoom: { ...state.zoom, canZoomIn: newCanZoomIn } })),
-  setCanZoomOut: (newCanZoomOut) => set((state) => ({ ...state, zoom: { ...state.zoom, canZoomOut: newCanZoomOut } })),
-  setCanCopy: (newCanCopy) => set((state) => ({ ...state, copyPaste: { ...state.copyPaste, canCopy: newCanCopy } })),
+  setCanUndo: (newCanUndo) =>
+    set((state) => ({
+      ...state,
+      undoRedo: { ...state.undoRedo, canUndo: newCanUndo },
+    })),
+  setCanRedo: (newCanRedo) =>
+    set((state) => ({
+      ...state,
+      undoRedo: { ...state.undoRedo, canRedo: newCanRedo },
+    })),
+  setZoom: (newZoom) =>
+    set((state) => ({ ...state, zoom: { ...state.zoom, value: newZoom } })),
+  setCanZoomIn: (newCanZoomIn) =>
+    set((state) => ({
+      ...state,
+      zoom: { ...state.zoom, canZoomIn: newCanZoomIn },
+    })),
+  setCanZoomOut: (newCanZoomOut) =>
+    set((state) => ({
+      ...state,
+      zoom: { ...state.zoom, canZoomOut: newCanZoomOut },
+    })),
+  setBlobToPaste: (newBlobToPaste) =>
+    set((state) => ({
+      ...state,
+      copyPaste: { ...state.copyPaste, blobToPaste: newBlobToPaste },
+    })),
+  setCanCopy: (newCanCopy) =>
+    set((state) => ({
+      ...state,
+      copyPaste: { ...state.copyPaste, canCopy: newCanCopy },
+    })),
   setCanPaste: (newCanPaste) =>
-    set((state) => ({ ...state, copyPaste: { ...state.copyPaste, canPaste: newCanPaste } })),
+    set((state) => ({
+      ...state,
+      copyPaste: { ...state.copyPaste, canPaste: newCanPaste },
+    })),
   setCopiedNodes: (newCopiedNodes) =>
-    set((state) => ({ ...state, copyPaste: { ...state.copyPaste, copiedNodes: newCopiedNodes } })),
+    set((state) => ({
+      ...state,
+      copyPaste: { ...state.copyPaste, copiedNodes: newCopiedNodes },
+    })),
   setSelectedNodes: (newSelectedNodes) =>
-    set((state) => ({ ...state, selection: { ...state.selection, nodes: newSelectedNodes } })),
-  setNode: (newNode) => set((state) => ({ ...state, selection: { ...state.selection, node: newNode } })),
+    set((state) => ({
+      ...state,
+      selection: { ...state.selection, nodes: newSelectedNodes },
+    })),
+  setNode: (newNode) =>
+    set((state) => ({
+      ...state,
+      selection: { ...state.selection, node: newNode },
+    })),
   setActualAction: (newActualAction) =>
     set((state) => ({
       ...state,
-      actions: { ...state.actions, active: typeof newActualAction !== "undefined", actual: newActualAction },
+      actions: {
+        ...state.actions,
+        active: typeof newActualAction !== 'undefined',
+        actual: newActualAction,
+      },
     })),
 }));
