@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.12.0] - 2025-03-19
+
 ### Added
 
 - [#46](https://github.com/InditexTech/weavejs/issues/46) Added select all and unselect all to nodes selection plugin, added toggle state to hide users pointers and improve export nodes and stage tools.
@@ -99,18 +101,34 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - [#8](https://github.com/InditexTech/weavejs/issues/8) ESLint OSS rules
 - [#2](https://github.com/InditexTech/weavejs/issues/2) Improve rendering handling
 
-[Unreleased]: https://github.com/InditexTech/weavejs/compare/0.11.0...HEAD
+[Unreleased]: https://github.com/InditexTech/weavejs/compare/0.12.0...HEAD
+
+[0.12.0]: https://github.com/InditexTech/weavejs/compare/0.11.0...0.12.0
+
 [0.11.0]: https://github.com/InditexTech/weavejs/compare/0.10.0...0.11.0
+
 [0.10.0]: https://github.com/InditexTech/weavejs/compare/0.9.0...0.10.0
+
 [0.9.0]: https://github.com/InditexTech/weavejs/compare/0.8.0...0.9.0
+
 [0.8.0]: https://github.com/InditexTech/weavejs/compare/0.7.1...0.8.0
+
 [0.7.1]: https://github.com/InditexTech/weavejs/compare/0.7.0...0.7.1
+
 [0.7.0]: https://github.com/InditexTech/weavejs/compare/0.6.0...0.7.0
+
 [0.6.0]: https://github.com/InditexTech/weavejs/compare/0.5.0...0.6.0
+
 [0.5.0]: https://github.com/InditexTech/weavejs/compare/0.4.0...0.5.0
+
 [0.4.0]: https://github.com/InditexTech/weavejs/compare/0.3.0...0.4.0
+
 [0.3.0]: https://github.com/InditexTech/weavejs/compare/0.2.1...0.3.0
+
 [0.2.1]: https://github.com/InditexTech/weavejs/compare/0.2.0...0.2.1
+
 [0.2.0]: https://github.com/InditexTech/weavejs/compare/0.1.1...0.2.0
+
 [0.1.1]: https://github.com/InditexTech/weavejs/compare/0.1.0...0.1.1
+
 [0.1.0]: https://github.com/InditexTech/weavejs/releases/tag/0.1.0
