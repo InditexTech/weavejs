@@ -65,6 +65,7 @@ export const WeaveProvider = ({
   const setZoom = useWeave((state) => state.setZoom);
   const setCanZoomIn = useWeave((state) => state.setCanZoomIn);
   const setCanZoomOut = useWeave((state) => state.setCanZoomOut);
+  const setBlobToPaste = useWeave((state) => state.setBlobToPaste);
   const setCanCopy = useWeave((state) => state.setCanCopy);
   const setCanPaste = useWeave((state) => state.setCanPaste);
   const setSelectedNodes = useWeave((state) => state.setSelectedNodes);
@@ -210,6 +211,9 @@ export const WeaveProvider = ({
               onCanPasteChange: (actCanPaste, nodes) => {
                 setCanPaste(actCanPaste);
                 setCopiedNodes(nodes);
+              },
+              onPasteExternalImage: (blob) => {
+                setBlobToPaste(blob);
               },
             })
           );

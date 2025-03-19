@@ -8,6 +8,7 @@ import { Logger } from 'pino';
 import { WeaveNodesSelectionPlugin } from '@/plugins/nodes-selection/nodes-selection';
 import Konva from 'konva';
 import { WeaveNodesSelectionChangeCallback } from '@/plugins/nodes-selection/types';
+import { WeaveCopyPasteNodesPlugin } from '@/plugins/copy-paste-nodes/copy-paste-nodes';
 
 export abstract class WeaveNode {
   protected instance!: Weave;
@@ -41,6 +42,12 @@ export abstract class WeaveNode {
 
   isSelecting() {
     return this.instance.getActiveAction() === 'selectionTool';
+  }
+
+  isPasting() {
+    const copyPastePlugin =
+      this.instance.getPlugin<WeaveCopyPasteNodesPlugin>('copyPasteNodes');
+    return copyPastePlugin.isPasting();
   }
 
   isNodeSelected(ele: Konva.Node) {
@@ -98,7 +105,11 @@ export abstract class WeaveNode {
 
     node.on('mouseenter', (e) => {
       const realNode = this.instance.getInstanceRecursive(node);
-      if (this.isSelecting() && !this.isNodeSelected(realNode)) {
+      if (
+        this.isSelecting() &&
+        !this.isNodeSelected(realNode) &&
+        !this.isPasting()
+      ) {
         const stage = this.instance.getStage();
         this.previousPointer = stage.container().style.cursor;
         stage.container().style.cursor = 'pointer';
@@ -108,7 +119,11 @@ export abstract class WeaveNode {
 
     node.on('mouseleave', (e) => {
       const realNode = this.instance.getInstanceRecursive(node);
-      if (this.isSelecting() && !this.isNodeSelected(realNode)) {
+      if (
+        this.isSelecting() &&
+        !this.isNodeSelected(realNode) &&
+        !this.isPasting()
+      ) {
         const stage = this.instance.getStage();
         stage.container().style.cursor = this.previousPointer ?? 'default';
         this.previousPointer = null;

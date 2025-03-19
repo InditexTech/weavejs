@@ -1,6 +1,11 @@
 import { WeavePlugin } from '@/plugins/plugin';
+import { v4 as uuidv4 } from 'uuid';
 import Konva from 'konva';
-import { NodeSerializable } from '@/types';
+import {
+  NodeSerializable,
+  WeaveElementInstance,
+  WeaveStateElement,
+} from '@/types';
 import { COPY_PASTE_NODES_PLUGIN_STATE } from './constants';
 import { WeaveNodesSelectionPlugin } from '../nodes-selection/nodes-selection';
 import { WeaveNodesSelectionChangeCallback } from '../nodes-selection/types';
@@ -39,6 +44,55 @@ export class WeaveCopyPasteNodesPlugin extends WeavePlugin {
 
   private initEvents() {
     const stage = this.instance.getStage();
+
+    document.onpaste = async (event) => {
+      console.log('ON PASTE', event);
+
+      const items = event.clipboardData?.items;
+      if (!items) {
+        return;
+      }
+
+      try {
+        const object = JSON.parse(await navigator.clipboard.readText());
+        if (object.weave) {
+          // TODO: Handle paste for single item, select where to put it
+          for (const element of Object.keys(object.weave)) {
+            const node = object.weave[element];
+            const newNodeId = uuidv4();
+            node.key = newNodeId;
+            node.props.id = newNodeId;
+            node.props.x = 0;
+            node.props.y = 0;
+            this.instance.addNode(node);
+          }
+        }
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars, no-empty
+      } catch (ex) {}
+
+      try {
+        const items = await navigator.clipboard.read();
+        for (const item of items) {
+          console.log({ item });
+          if (item.types.includes('image/png')) {
+            const pngImage = await item.getType('image/png');
+            this.callbacks?.onPasteExternalImage?.(pngImage);
+            break;
+          }
+          if (item.types.includes('image/jpeg')) {
+            const jpegImage = await item.getType('image/jpeg');
+            this.callbacks?.onPasteExternalImage?.(jpegImage);
+            break;
+          }
+          if (item.types.includes('image/gif')) {
+            const gifImage = await item.getType('image/gif');
+            this.callbacks?.onPasteExternalImage?.(gifImage);
+            break;
+          }
+        }
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars, no-empty
+      } catch (ex) {}
+    };
 
     stage.container().addEventListener('keydown', (e) => {
       if (e.key === 'Escape') {
@@ -102,7 +156,7 @@ export class WeaveCopyPasteNodesPlugin extends WeavePlugin {
     this.cancel();
   }
 
-  private performCopy() {
+  private async performCopy() {
     this.callbacks?.onCanCopyChange?.(this.canCopy());
     this.callbacks?.onCanPasteChange?.(this.canPaste(), this.mapToPasteNodes());
 
@@ -120,6 +174,21 @@ export class WeaveCopyPasteNodesPlugin extends WeavePlugin {
     }
 
     this.selectedElements = selectedNodes;
+
+    const copyClipboard: { weave: Record<string, WeaveStateElement> } = {
+      weave: {},
+    };
+    for (const node of this.selectedElements) {
+      const nodeHandler = this.instance.getNodeHandler(
+        node.getAttrs().nodeType
+      );
+      const nodeJson = nodeHandler.toNode(node as WeaveElementInstance);
+      copyClipboard.weave[node.getAttrs().id ?? ''] = nodeJson;
+    }
+
+    console.log('CP', { copyClipboard, json: JSON.stringify(copyClipboard) });
+
+    await navigator.clipboard.writeText(JSON.stringify(copyClipboard));
 
     this.callbacks?.onCanCopyChange?.(this.canCopy());
     this.callbacks?.onCanPasteChange?.(this.canPaste(), this.mapToPasteNodes());
@@ -141,8 +210,8 @@ export class WeaveCopyPasteNodesPlugin extends WeavePlugin {
     this.setState(COPY_PASTE_NODES_PLUGIN_STATE.PASTING);
   }
 
-  copy() {
-    this.performCopy();
+  async copy() {
+    await this.performCopy();
   }
 
   paste() {
@@ -151,6 +220,10 @@ export class WeaveCopyPasteNodesPlugin extends WeavePlugin {
 
   getSelectedNodes() {
     return this.mapToPasteNodes();
+  }
+
+  isPasting() {
+    return this.state === COPY_PASTE_NODES_PLUGIN_STATE.PASTING;
   }
 
   canCopy() {
