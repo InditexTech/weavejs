@@ -1,38 +1,41 @@
-import path from "path";
-import { type PluginOption } from "vite";
-import { defineConfig } from "vitest/config";
-import dts from "vite-plugin-dts";
-import { compression } from "vite-plugin-compression2";
+import path from 'path';
+import { type PluginOption } from 'vite';
+import { defineConfig } from 'vitest/config';
+import dts from 'vite-plugin-dts';
+import { compression } from 'vite-plugin-compression2';
 
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => {
   process.env.NODE_ENV = mode; // Make sure NODE_ENV matches mode when building
 
-  const inProdMode = mode === "production";
+  const inProdMode = mode === 'production';
 
   return {
     build: {
       lib: {
-        entry: "./src/index.ts",
-        name: "store-websockets",
-        formats: ["es"],
-        fileName: "store-websockets",
+        entry: './src/index.ts',
+        name: 'store-websockets',
+        formats: ['es', 'cjs'],
+        fileName: 'store-websockets',
       },
       rollupOptions: {
-        external: ["@inditextech/weavejs-sdk", "yjs"],
+        external: ['@inditextech/weavejs-sdk', 'yjs'],
       },
     },
 
     resolve: {
       alias: {
-        ["@"]: path.resolve(__dirname, "./src"),
+        ['@']: path.resolve(__dirname, './src'),
       },
     },
 
-    plugins: [dts({ rollupTypes: true }) as PluginOption & { name: string }, inProdMode && compression()],
+    plugins: [
+      dts({ rollupTypes: true }) as PluginOption & { name: string },
+      inProdMode && compression(),
+    ],
 
     define: {
-      ["process.env.NODE_ENV"]: JSON.stringify(process.env.NODE_ENV),
+      ['process.env.NODE_ENV']: JSON.stringify(process.env.NODE_ENV),
     },
 
     test: {
@@ -41,27 +44,27 @@ export default defineConfig(({ mode }) => {
       // environment: "jsdom",
 
       environmentOptions: {
-        url: "http://localhost",
+        url: 'http://localhost',
       },
 
-      setupFiles: path.resolve(__dirname, "vitest.setup.ts"),
+      setupFiles: path.resolve(__dirname, 'vitest.setup.ts'),
 
-      include: ["**/*.test.ts"],
-      exclude: ["**/node_modules/**"],
+      include: ['**/*.test.ts'],
+      exclude: ['**/node_modules/**'],
 
-      reporters: ["default", "json", "vitest-sonar-reporter"],
+      reporters: ['default', 'json', 'vitest-sonar-reporter'],
       outputFile: {
-        json: "reports/test-report/test-report.json",
-        html: "reports/test-report/test-report.html",
-        ["vitest-sonar-reporter"]: "reports/vite-sonar/sonar-report.xml",
+        json: 'reports/test-report/test-report.json',
+        html: 'reports/test-report/test-report.html',
+        ['vitest-sonar-reporter']: 'reports/vite-sonar/sonar-report.xml',
       },
 
       coverage: {
-        provider: "v8",
-        include: ["src/**/*"],
-        exclude: ["**/__tests__/*", "**/*.test.ts", "**/*.d.ts"],
-        reporter: ["text", "html", "lcov"],
-        reportsDirectory: "reports/vite-coverage",
+        provider: 'v8',
+        include: ['src/**/*'],
+        exclude: ['**/__tests__/*', '**/*.test.ts', '**/*.d.ts'],
+        reporter: ['text', 'html', 'lcov'],
+        reportsDirectory: 'reports/vite-coverage',
         enabled: false,
       },
     },

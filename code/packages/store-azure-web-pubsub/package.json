@@ -10,7 +10,10 @@
       "email": "jesusmpc@inditex.com"
     }
   ],
-  "main": "dist/store-azure-web-pubsub.js",
+  "exports": {
+    "import": "./dist/store-azure-web-pubsub.js",
+    "require": "./dist/store-azure-web-pubsub.cjs"
+  },
   "types": "dist/store-azure-web-pubsub.d.ts",
   "files": [
     "dist"

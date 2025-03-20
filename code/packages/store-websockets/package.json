@@ -10,7 +10,10 @@
       "email": "jesusmpc@inditex.com"
     }
   ],
-  "main": "dist/store-websockets.js",
+  "exports": {
+    "import": "./dist/store-websockets.js",
+    "require": "./dist/store-websockets.cjs"
+  },
   "types": "dist/store-websockets.d.ts",
   "files": [
     "dist"

@@ -107,8 +107,8 @@ export class WeaveImageToolAction extends WeaveAction {
         tempImage.setAttrs({
           ...this.props,
           name: undefined,
-          x: (mousePos?.x ?? 0) + 5,
-          y: (mousePos?.y ?? 0) + 5,
+          x: (mousePos?.x ?? 0) + 2,
+          y: (mousePos?.y ?? 0) + 2,
           fill: '#ccccccff',
           stroke: '#000000ff',
           strokeWidth: 1,
@@ -138,7 +138,14 @@ export class WeaveImageToolAction extends WeaveAction {
     this.imageURL = imageURL;
 
     this.preloadImgs[this.imageId] = new Image();
+    this.preloadImgs[this.imageId].onclose = () => {
+      console.log('close');
+    };
+    this.preloadImgs[this.imageId].onerror = (error) => {
+      console.error(error);
+    };
     this.preloadImgs[this.imageId].onload = () => {
+      console.log('loaded');
       this.imageCallbacks?.onImageLoadEnd?.();
 
       if (this.imageId) {
@@ -291,6 +298,10 @@ export class WeaveImageToolAction extends WeaveAction {
 
   cleanup() {
     const stage = this.instance.getStage();
+
+    if (this.imageId) {
+      delete this.preloadImgs[this.imageId];
+    }
 
     const tempImage = this.instance.getStage().findOne(`#${this.tempImageId}`);
     if (tempImage) {

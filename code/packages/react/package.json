@@ -10,7 +10,10 @@
       "email": "jesusmpc@inditex.com"
     }
   ],
-  "main": "dist/react.js",
+  "exports": {
+    "import": "./dist/react.js",
+    "require": "./dist/react.cjs"
+  },
   "types": "dist/react.d.ts",
   "files": [
     "dist"
