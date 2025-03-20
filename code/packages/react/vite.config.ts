@@ -17,7 +17,7 @@ export default defineConfig(({ mode }) => {
       lib: {
         entry: './src/index.ts',
         name: 'react',
-        formats: ['es'],
+        formats: ['es', 'cjs'],
         fileName: 'react',
       },
       rollupOptions: {

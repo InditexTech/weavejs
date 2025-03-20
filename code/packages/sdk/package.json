@@ -10,7 +10,10 @@
       "email": "jesusmpc@inditex.com"
     }
   ],
-  "main": "dist/sdk.js",
+  "exports": {
+    "import": "./dist/sdk.js",
+    "require": "./dist/sdk.cjs"
+  },
   "types": "dist/sdk.d.ts",
   "files": [
     "dist"
