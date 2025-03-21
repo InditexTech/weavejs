@@ -5,7 +5,7 @@ import {
 } from '@inditextech/weavejs-sdk';
 import { WeaveStoreAzureWebPubSubSyncClient } from './client';
 import { WEAVE_STORE_AZURE_WEB_PUBSUB } from './constants';
-import { WeaveStoreAzureWebPubsubOptions } from './types';
+import { FetchClient, WeaveStoreAzureWebPubsubOptions } from './types';
 
 export class WeaveStoreAzureWebPubsub extends WeaveStore {
   private azureWebPubsubOptions: WeaveStoreAzureWebPubsubOptions;
@@ -47,7 +47,7 @@ export class WeaveStoreAzureWebPubsub extends WeaveStore {
     });
   }
 
-  async connect(fetchOptions?: RequestInit) {
+  async connect(fetchClient?: FetchClient) {
     let error: Error | null = null;
     try {
       this.azureWebPubsubOptions.callbacks?.onFetchConnectionUrl?.({
@@ -59,7 +59,7 @@ export class WeaveStoreAzureWebPubsub extends WeaveStore {
         error: null,
       });
 
-      await this.provider.fetchConnectionUrl(fetchOptions);
+      await this.provider.fetchConnectionUrl(fetchClient);
     } catch (ex) {
       error = ex as Error;
     } finally {

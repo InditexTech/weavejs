@@ -8,6 +8,7 @@ import * as encoding from 'lib0/encoding';
 import * as decoding from 'lib0/decoding';
 import * as syncProtocol from 'y-protocols/sync';
 import * as awarenessProtocol from 'y-protocols/awareness';
+import { FetchClient } from './types';
 
 const messageSyncStep1 = 0;
 const messageAwareness = 1;
@@ -279,13 +280,9 @@ export class WeaveStoreAzureWebPubSubSyncClient extends Emittery {
     }
   }
 
-  async fetchConnectionUrl(
-    fetchOptions: RequestInit = {
-      credentials: 'include',
-    }
-  ) {
+  async fetchConnectionUrl(fetchClient: FetchClient = fetch) {
     try {
-      const res = await fetch(this._url, fetchOptions);
+      const res = await fetchClient(this._url);
       if (res.ok) {
         const data = (await res.json()) as { url: string };
         this._connectionUrl = data.url;
