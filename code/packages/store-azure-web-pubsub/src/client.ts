@@ -279,11 +279,13 @@ export class WeaveStoreAzureWebPubSubSyncClient extends Emittery {
     }
   }
 
-  async fetchConnectionUrl() {
+  async fetchConnectionUrl(
+    fetchOptions: RequestInit = {
+      credentials: 'include',
+    }
+  ) {
     try {
-      const res = await fetch(this._url, {
-        credentials: 'include',
-      });
+      const res = await fetch(this._url, fetchOptions);
       if (res.ok) {
         const data = (await res.json()) as { url: string };
         this._connectionUrl = data.url;
