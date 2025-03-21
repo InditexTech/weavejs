@@ -9,7 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
-- [#60](https://github.com/InditexTech/weavejs/issues/60) Missing params on store-azure-web-pubsub client
+- [#60](https://github.com/InditexTech/weavejs/issues/60) Missing params propagation on store-azure-web-pubsub client
 
 ## [0.16.2] - 2025-03-21
 
