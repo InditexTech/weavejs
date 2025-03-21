@@ -20,3 +20,8 @@ export type WeaveStoreAzureWebPubsubStoreCallbacks = {
     status: WeaveStoreAzureWebPubsubConnectionStatus
   ) => void;
 };
+
+export type FetchClient = (
+  input: string | URL | globalThis.Request,
+  init?: RequestInit
+) => Promise<Response>;
