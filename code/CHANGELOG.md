@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- [#60](https://github.com/InditexTech/weavejs/issues/60) Missing params on store-azure-web-pubsub client
+
 ## [0.16.2] - 2025-03-21
 
 ### Added
@@ -138,45 +142,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - [#2](https://github.com/InditexTech/weavejs/issues/2) Improve rendering handling
 
 [Unreleased]: https://github.com/InditexTech/weavejs/compare/0.16.2...HEAD
-
 [0.16.2]: https://github.com/InditexTech/weavejs/compare/0.16.1...0.16.2
-
 [0.16.1]: https://github.com/InditexTech/weavejs/compare/0.16.0...0.16.1
-
 [0.16.0]: https://github.com/InditexTech/weavejs/compare/0.15.0...0.16.0
-
 [0.15.0]: https://github.com/InditexTech/weavejs/compare/0.14.0...0.15.0
-
 [0.14.0]: https://github.com/InditexTech/weavejs/compare/0.13.0...0.14.0
-
 [0.13.0]: https://github.com/InditexTech/weavejs/compare/0.12.0...0.13.0
-
 [0.12.0]: https://github.com/InditexTech/weavejs/compare/0.11.0...0.12.0
-
 [0.11.0]: https://github.com/InditexTech/weavejs/compare/0.10.0...0.11.0
-
 [0.10.0]: https://github.com/InditexTech/weavejs/compare/0.9.0...0.10.0
-
 [0.9.0]: https://github.com/InditexTech/weavejs/compare/0.8.0...0.9.0
-
 [0.8.0]: https://github.com/InditexTech/weavejs/compare/0.7.1...0.8.0
-
 [0.7.1]: https://github.com/InditexTech/weavejs/compare/0.7.0...0.7.1
-
 [0.7.0]: https://github.com/InditexTech/weavejs/compare/0.6.0...0.7.0
-
 [0.6.0]: https://github.com/InditexTech/weavejs/compare/0.5.0...0.6.0
-
 [0.5.0]: https://github.com/InditexTech/weavejs/compare/0.4.0...0.5.0
-
 [0.4.0]: https://github.com/InditexTech/weavejs/compare/0.3.0...0.4.0
-
 [0.3.0]: https://github.com/InditexTech/weavejs/compare/0.2.1...0.3.0
-
 [0.2.1]: https://github.com/InditexTech/weavejs/compare/0.2.0...0.2.1
-
 [0.2.0]: https://github.com/InditexTech/weavejs/compare/0.1.1...0.2.0
-
 [0.1.1]: https://github.com/InditexTech/weavejs/compare/0.1.0...0.1.1
-
 [0.1.0]: https://github.com/InditexTech/weavejs/releases/tag/0.1.0

@@ -8,6 +8,7 @@ export type WeaveStoreAzureWebPubsubConnectionStatus =
 export type WeaveStoreAzureWebPubsubOptions = {
   roomId: string;
   url: string;
+  fetchClient?: FetchClient;
   callbacks?: WeaveStoreAzureWebPubsubStoreCallbacks;
 };
 
