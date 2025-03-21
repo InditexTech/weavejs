@@ -1,6 +1,6 @@
 {
   "name": "@inditextech/weavejs-react",
-  "version": "0.16.1",
+  "version": "0.17.0-SNAPSHOT",
   "type": "module",
   "license": "Apache-2.0",
   "author": "Jesus Manuel Piñeiro Cid <jesusmpc@inditex.com>",
@@ -41,7 +41,7 @@
     "version:release": "npm version $RELEASE_VERSION -m \"[npm-scripts] prepare release $RELEASE_VERSION\" --tag-version-prefix \"\""
   },
   "devDependencies": {
-    "@inditextech/weavejs-sdk": "0.16.1",
+    "@inditextech/weavejs-sdk": "0.17.0-SNAPSHOT",
     "@typescript-eslint/eslint-plugin": "8.26.0",
     "@typescript-eslint/parser": "8.26.0",
     "@vitejs/plugin-react": "4.3.4",
