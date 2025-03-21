@@ -47,7 +47,7 @@ export class WeaveStoreAzureWebPubsub extends WeaveStore {
     });
   }
 
-  async connect() {
+  async connect(fetchOptions?: RequestInit) {
     let error: Error | null = null;
     try {
       this.azureWebPubsubOptions.callbacks?.onFetchConnectionUrl?.({
@@ -59,7 +59,7 @@ export class WeaveStoreAzureWebPubsub extends WeaveStore {
         error: null,
       });
 
-      await this.provider.fetchConnectionUrl();
+      await this.provider.fetchConnectionUrl(fetchOptions);
     } catch (ex) {
       error = ex as Error;
     } finally {
