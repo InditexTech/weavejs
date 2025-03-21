@@ -1,30 +1,30 @@
-import Emittery from "emittery";
-import { Buffer } from "buffer";
-import { v4 as uuidv4 } from "uuid";
-import { Doc } from "yjs";
-import ReconnectingWebSocket from "reconnecting-websocket";
+import Emittery from 'emittery';
+import { Buffer } from 'buffer';
+import { v4 as uuidv4 } from 'uuid';
+import { Doc } from 'yjs';
+import ReconnectingWebSocket from 'reconnecting-websocket';
 
-import * as encoding from "lib0/encoding";
-import * as decoding from "lib0/decoding";
-import * as syncProtocol from "y-protocols/sync";
-import * as awarenessProtocol from "y-protocols/awareness";
+import * as encoding from 'lib0/encoding';
+import * as decoding from 'lib0/decoding';
+import * as syncProtocol from 'y-protocols/sync';
+import * as awarenessProtocol from 'y-protocols/awareness';
 
 const messageSyncStep1 = 0;
 const messageAwareness = 1;
 const messageQueryAwareness = 3;
 
-const AzureWebPubSubJsonProtocol = "json.webpubsub.azure.v1";
+const AzureWebPubSubJsonProtocol = 'json.webpubsub.azure.v1';
 
 export enum MessageType {
-  System = "system",
-  JoinGroup = "joinGroup",
-  SendToGroup = "sendToGroup",
+  System = 'system',
+  JoinGroup = 'joinGroup',
+  SendToGroup = 'sendToGroup',
 }
 
 export enum MessageDataType {
-  Init = "init",
-  Sync = "sync",
-  Awareness = "awareness",
+  Init = 'init',
+  Sync = 'sync',
+  Awareness = 'awareness',
 }
 
 export interface MessageData {
@@ -45,7 +45,7 @@ type MessageHandler = (
   decoder: decoding.Decoder,
   client: WeaveStoreAzureWebPubSubSyncClient,
   emitSynced: boolean,
-  messageType: number,
+  messageType: number
 ) => void;
 
 export interface ClientOptions {
@@ -55,10 +55,25 @@ export interface ClientOptions {
 
 const messageHandlers: MessageHandler[] = [];
 
-messageHandlers[messageSyncStep1] = (encoder, decoder, client, emitSynced, messageType) => {
+messageHandlers[messageSyncStep1] = (
+  encoder,
+  decoder,
+  client,
+  emitSynced,
+  messageType
+) => {
   encoding.writeVarUint(encoder, messageType);
-  const syncMessageType = syncProtocol.readSyncMessage(decoder, encoder, client.doc, client);
-  if (emitSynced && syncMessageType === syncProtocol.messageYjsSyncStep2 && !client.synced) {
+  const syncMessageType = syncProtocol.readSyncMessage(
+    decoder,
+    encoder,
+    client.doc,
+    client
+  );
+  if (
+    emitSynced &&
+    syncMessageType === syncProtocol.messageYjsSyncStep2 &&
+    !client.synced
+  ) {
     client.synced = true;
   }
 };
@@ -68,19 +83,26 @@ messageHandlers[messageQueryAwareness] = (encoder, _, client) => {
   encoding.writeVarUint(encoder, messageAwareness);
   encoding.writeVarUint8Array(
     encoder,
-    awarenessProtocol.encodeAwarenessUpdate(client.awareness, Array.from(client.awareness.getStates().keys())),
+    awarenessProtocol.encodeAwarenessUpdate(
+      client.awareness,
+      Array.from(client.awareness.getStates().keys())
+    )
   );
 };
 
 // messageHandlers[messageAwareness] = (encoder, decoder, client, emitSynced, messageType) => {
 messageHandlers[messageAwareness] = (_, decoder, client) => {
-  awarenessProtocol.applyAwarenessUpdate(client.awareness, decoding.readVarUint8Array(decoder), client);
+  awarenessProtocol.applyAwarenessUpdate(
+    client.awareness,
+    decoding.readVarUint8Array(decoder),
+    client
+  );
 };
 
 const readMessage = (
   client: WeaveStoreAzureWebPubSubSyncClient,
   buf: Uint8Array,
-  emitSynced: boolean,
+  emitSynced: boolean
 ): encoding.Encoder => {
   const decoder = decoding.createDecoder(buf);
   const encoder = encoding.createEncoder();
@@ -101,7 +123,7 @@ export class WeaveStoreAzureWebPubSubSyncClient extends Emittery {
   private _ws: ReconnectingWebSocket | null;
   private _url: string;
   private _connectionUrl: string | null;
-  private _status: "connected" | "connecting" | "disconnected";
+  private _status: 'connected' | 'connecting' | 'disconnected';
   private _wsConnected: boolean;
   // private _wsLastMessageReceived: number;
   private _synced: boolean;
@@ -115,7 +137,7 @@ export class WeaveStoreAzureWebPubSubSyncClient extends Emittery {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     { added, updated, removed }: { added: any; updated: any; removed: any },
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    origin: any,
+    origin: any
   ) => void;
 
   /**
@@ -132,7 +154,7 @@ export class WeaveStoreAzureWebPubSubSyncClient extends Emittery {
     options: ClientOptions = {
       resyncInterval: 15 * 1000,
       tokenProvider: null,
-    },
+    }
   ) {
     super();
 
@@ -143,7 +165,7 @@ export class WeaveStoreAzureWebPubSubSyncClient extends Emittery {
     this._connectionUrl = null;
     this._uuid = uuidv4();
 
-    this._status = "disconnected";
+    this._status = 'disconnected';
     this._wsConnected = false;
 
     this._synced = false;
@@ -162,7 +184,12 @@ export class WeaveStoreAzureWebPubSubSyncClient extends Emittery {
           const encoder = encoding.createEncoder();
           encoding.writeVarUint(encoder, messageSyncStep1);
           syncProtocol.writeSyncStep1(encoder, doc);
-          sendToControlGroup(this, topic, MessageDataType.Sync, encoding.toUint8Array(encoder));
+          sendToControlGroup(
+            this,
+            topic,
+            MessageDataType.Sync,
+            encoding.toUint8Array(encoder)
+          );
         }
       }, options.resyncInterval);
     }
@@ -174,10 +201,15 @@ export class WeaveStoreAzureWebPubSubSyncClient extends Emittery {
         const encoder = encoding.createEncoder();
         encoding.writeVarUint(encoder, messageSyncStep1);
         syncProtocol.writeUpdate(encoder, update);
-        sendToControlGroup(this, topic, MessageDataType.Sync, encoding.toUint8Array(encoder));
+        sendToControlGroup(
+          this,
+          topic,
+          MessageDataType.Sync,
+          encoding.toUint8Array(encoder)
+        );
       }
     };
-    this.doc.on("update", this._updateHandler);
+    this.doc.on('update', this._updateHandler);
 
     // register awareness update handler
     // this._awarenessUpdateHandler = ({ added, updated, removed }, origin) => {
@@ -185,10 +217,18 @@ export class WeaveStoreAzureWebPubSubSyncClient extends Emittery {
       const changedClients = added.concat(updated).concat(removed);
       const encoder = encoding.createEncoder();
       encoding.writeVarUint(encoder, messageAwareness);
-      encoding.writeVarUint8Array(encoder, awarenessProtocol.encodeAwarenessUpdate(awareness, changedClients));
-      sendToControlGroup(this, topic, MessageDataType.Awareness, encoding.toUint8Array(encoder));
+      encoding.writeVarUint8Array(
+        encoder,
+        awarenessProtocol.encodeAwarenessUpdate(awareness, changedClients)
+      );
+      sendToControlGroup(
+        this,
+        topic,
+        MessageDataType.Awareness,
+        encoding.toUint8Array(encoder)
+      );
     };
-    awareness.on("update", this._awarenessUpdateHandler);
+    awareness.on('update', this._awarenessUpdateHandler);
   }
 
   get awareness(): awarenessProtocol.Awareness {
@@ -218,19 +258,21 @@ export class WeaveStoreAzureWebPubSubSyncClient extends Emittery {
       clearInterval(this._resyncInterval);
     }
     this.stop();
-    this.doc.off("update", this._updateHandler);
+    this.doc.off('update', this._updateHandler);
   }
 
   stop() {
     if (this._ws !== null) {
-      const encoder = encoding.createEncoder()
-      encoding.writeVarUint(encoder, messageAwareness)
+      const encoder = encoding.createEncoder();
+      encoding.writeVarUint(encoder, messageAwareness);
       encoding.writeVarUint8Array(
         encoder,
-        awarenessProtocol.encodeAwarenessUpdate(this.awareness, [
-          this.doc.clientID
-        ], new Map())
-      )
+        awarenessProtocol.encodeAwarenessUpdate(
+          this.awareness,
+          [this.doc.clientID],
+          new Map()
+        )
+      );
       const u8 = encoding.toUint8Array(encoder);
       sendToControlGroup(this, this.topic, MessageDataType.Awareness, u8);
       this._ws.close();
@@ -239,14 +281,16 @@ export class WeaveStoreAzureWebPubSubSyncClient extends Emittery {
 
   async fetchConnectionUrl() {
     try {
-      const res = await fetch(this._url);
+      const res = await fetch(this._url, {
+        credentials: 'include',
+      });
       if (res.ok) {
         const data = (await res.json()) as { url: string };
         this._connectionUrl = data.url;
       } else {
         throw new Error(`Failed to fetch connection url from: ${this._url}`);
       }
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (err) {
       throw new Error(`Failed to fetch connection url from: ${this._url}`);
     }
@@ -261,14 +305,17 @@ export class WeaveStoreAzureWebPubSubSyncClient extends Emittery {
       return;
     }
 
-    const websocket = new ReconnectingWebSocket(this._connectionUrl, AzureWebPubSubJsonProtocol);
-    websocket.binaryType = "arraybuffer";
+    const websocket = new ReconnectingWebSocket(
+      this._connectionUrl,
+      AzureWebPubSubJsonProtocol
+    );
+    websocket.binaryType = 'arraybuffer';
     this._ws = websocket;
     this._wsConnected = false;
     this.synced = false;
 
-    this._status = "connecting";
-    this.emit("status", this._status);
+    this._status = 'connecting';
+    this.emit('status', this._status);
 
     websocket.onmessage = (event) => {
       if (event.data === null) {
@@ -287,25 +334,32 @@ export class WeaveStoreAzureWebPubSubSyncClient extends Emittery {
         return;
       }
 
-      const buf = Buffer.from(messageData.c, "base64");
+      const buf = Buffer.from(messageData.c, 'base64');
       // this._wsLastMessageReceived = Date.now();
       const encoder = readMessage(this, buf, true);
       if (encoding.length(encoder) > 1) {
-        sendToControlGroup(this, this.topic, MessageDataType.Sync, encoding.toUint8Array(encoder));
+        sendToControlGroup(
+          this,
+          this.topic,
+          MessageDataType.Sync,
+          encoding.toUint8Array(encoder)
+        );
       }
     };
 
     websocket.onclose = () => {
       this._ws = null;
       if (this._wsConnected) {
-        this._status = "disconnected";
-        this.emit("status", this._status);
+        this._status = 'disconnected';
+        this.emit('status', this._status);
         this._wsConnected = false;
         this.synced = false;
         awarenessProtocol.removeAwarenessStates(
           this.awareness,
-          Array.from(this.awareness.getStates().keys()).filter((x) => x !== this.doc.clientID),
-          this,
+          Array.from(this.awareness.getStates().keys()).filter(
+            (x) => x !== this.doc.clientID
+          ),
+          this
         );
       }
     };
@@ -317,8 +371,8 @@ export class WeaveStoreAzureWebPubSubSyncClient extends Emittery {
     websocket.onopen = () => {
       // this._wsLastMessageReceived = Date.now();
       this._wsConnected = true;
-      this._status = "connected";
-      this.emit("status", this._status);
+      this._status = 'connected';
+      this.emit('status', this._status);
 
       joinGroup(this, this.topic);
 
@@ -335,7 +389,9 @@ export class WeaveStoreAzureWebPubSubSyncClient extends Emittery {
         encoding.writeVarUint(encoderAwarenessState, messageAwareness);
         encoding.writeVarUint8Array(
           encoderAwarenessState,
-          awarenessProtocol.encodeAwarenessUpdate(this.awareness, [this.doc.clientID]),
+          awarenessProtocol.encodeAwarenessUpdate(this.awareness, [
+            this.doc.clientID,
+          ])
         );
         const u8 = encoding.toUint8Array(encoder);
         sendToControlGroup(this, this.topic, MessageDataType.Awareness, u8);
@@ -349,11 +405,16 @@ function joinGroup(client: WeaveStoreAzureWebPubSubSyncClient, group: string) {
     JSON.stringify({
       type: MessageType.JoinGroup,
       group,
-    }),
+    })
   );
 }
 
-function sendToControlGroup(client: WeaveStoreAzureWebPubSubSyncClient, group: string, type: string, u8: Uint8Array) {
+function sendToControlGroup(
+  client: WeaveStoreAzureWebPubSubSyncClient,
+  group: string,
+  type: string,
+  u8: Uint8Array
+) {
   client.ws?.send(
     JSON.stringify({
       type: MessageType.SendToGroup,
@@ -361,8 +422,8 @@ function sendToControlGroup(client: WeaveStoreAzureWebPubSubSyncClient, group: s
       data: {
         t: type,
         f: client.id,
-        c: Buffer.from(u8).toString("base64"),
+        c: Buffer.from(u8).toString('base64'),
       },
-    }),
+    })
   );
 }
