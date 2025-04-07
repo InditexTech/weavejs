@@ -65,7 +65,6 @@
     "vite-plugin-compression2": "1.0.0",
     "vite-plugin-dts": "4.0.3",
     "vitest": "1.6.0",
-    "vitest-canvas-mock": "0.3.3",
     "vitest-sonar-reporter": "2.0.0",
     "yjs-types": "0.0.1"
   },

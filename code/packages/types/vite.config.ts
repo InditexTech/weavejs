@@ -1,6 +1,5 @@
 import path from 'path';
 import { type PluginOption } from 'vite';
-import removeAttr from 'react-remove-attr';
 import { defineConfig } from 'vitest/config';
 import dts from 'vite-plugin-dts';
 import { compression } from 'vite-plugin-compression2';
@@ -28,11 +27,6 @@ export default defineConfig(({ mode }) => {
     },
 
     plugins: [
-      inProdMode &&
-        removeAttr({
-          extensions: ['tsx'],
-          attributes: ['data-testid'],
-        }),
       dts({ rollupTypes: true }) as PluginOption,
       inProdMode && compression(),
     ],
@@ -42,7 +36,9 @@ export default defineConfig(({ mode }) => {
     },
 
     test: {
-      environment: 'jsdom',
+      globals: false,
+
+      // environment: 'jsdom',
 
       environmentOptions: {
         url: 'http://localhost',
