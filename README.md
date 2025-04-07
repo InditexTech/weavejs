@@ -1,3 +1,9 @@
+<!--
+SPDX-FileCopyrightText: 2025 2025 INDUSTRIA DE DISEÑO TEXTIL S.A. (INDITEX S.A.)
+
+SPDX-License-Identifier: Apache-2.0
+-->
+
 <!-- Improved compatibility of back to top link: See: https://github.com/othneildrew/Best-README-Template/pull/73 -->
 <a id="readme-top"></a>
 <!--
@@ -143,7 +149,10 @@ Don't forget to give the project a star! Thanks again!
 <!-- LICENSE -->
 ## License
 
-Distributed under the MIT. See `LICENSE.txt` for more information.
+This project is licensed under the terms of the [Apache-2.0](LICENSE) license.
+
+© 2025 INDUSTRIA DE DISEÑO TEXTIL S.A. (INDITEX S.A.)
+
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
