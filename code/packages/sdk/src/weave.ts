@@ -11,7 +11,8 @@ import {
   WeaveExportNodeOptions,
   WeaveStatus,
   WeaveElementAttributes,
-} from './types';
+  WEAVE_INSTANCE_STATUS,
+} from '@inditextech/weavejs-types';
 import { WeaveStore } from './stores/store';
 import { WeaveNode } from './nodes/node';
 import { WeaveAction } from './actions/action';
@@ -32,7 +33,6 @@ import { WeaveStageManager } from './managers/stage';
 import { WeaveActionsManager } from './managers/actions';
 import { WeaveStoreManager } from './managers/store';
 import { WeaveExportManager } from './managers/export';
-import { WEAVE_INSTANCE_STATUS } from './constants';
 
 export class Weave extends Emittery {
   private config: WeaveConfig;
@@ -147,7 +147,7 @@ export class Weave extends Emittery {
     this.registerManager.registerActionsHandlers();
 
     // Register the store
-    this.storeManager.registerStore(this.config.store);
+    this.storeManager.registerStore(this.config.store as WeaveStore);
 
     this.status = WEAVE_INSTANCE_STATUS.LOADING_FONTS;
     this.getConfiguration().callbacks?.onInstanceStatus?.(this.status);

@@ -1,6 +1,6 @@
 import Konva from 'konva';
 import { COPY_PASTE_NODES_PLUGIN_STATE } from './constants';
-import { NodeSerializable } from '@/types';
+import { NodeSerializable } from '@inditextech/weavejs-types';
 
 export type WeaveCopyPasteNodesPluginStateKeys =
   keyof typeof COPY_PASTE_NODES_PLUGIN_STATE;

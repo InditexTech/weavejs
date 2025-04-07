@@ -1,4 +1,4 @@
-import { WeaveExportNodeOptions } from "@/types";
+import { WeaveExportNodeOptions } from '@inditextech/weavejs-types';
 
 export type WeaveExportStageActionParams = {
   options?: WeaveExportNodeOptions;

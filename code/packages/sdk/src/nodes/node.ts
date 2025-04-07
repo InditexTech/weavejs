@@ -3,14 +3,15 @@ import {
   WeaveElementAttributes,
   WeaveElementInstance,
   WeaveStateElement,
-} from '@/types';
+  WeaveNodeBase,
+} from '@inditextech/weavejs-types';
 import { Logger } from 'pino';
 import { WeaveNodesSelectionPlugin } from '@/plugins/nodes-selection/nodes-selection';
 import Konva from 'konva';
 import { WeaveNodesSelectionChangeCallback } from '@/plugins/nodes-selection/types';
 import { WeaveCopyPasteNodesPlugin } from '@/plugins/copy-paste-nodes/copy-paste-nodes';
 
-export abstract class WeaveNode {
+export abstract class WeaveNode implements WeaveNodeBase {
   protected instance!: Weave;
   protected nodeType!: string;
   private logger!: Logger;

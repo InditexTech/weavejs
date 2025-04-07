@@ -3,7 +3,7 @@ import { Vector2d } from 'konva/lib/types';
 import { FRAME_TOOL_ACTION_NAME, FRAME_TOOL_STATE } from './constants';
 import Konva from 'konva';
 import { WeaveAction } from '../action';
-import { WEAVE_NODE_LAYER_ID } from '@/constants';
+import { WEAVE_NODE_LAYER_ID } from '@inditextech/weavejs-types';
 import { WeaveNodesSelectionPlugin } from '@/plugins/nodes-selection/nodes-selection';
 import {
   WeaveFrameToolActionState,

@@ -9,7 +9,7 @@ import {
 import { IMAGE_TOOL_STATE } from './constants';
 import { WeaveNodesSelectionPlugin } from '@/plugins/nodes-selection/nodes-selection';
 import Konva from 'konva';
-import { WeaveElementInstance } from '@/types';
+import { WeaveElementInstance } from '@inditextech/weavejs-types';
 
 export class WeaveImageToolAction extends WeaveAction {
   private imageCallbacks: WeaveImageToolActionCallbacks;

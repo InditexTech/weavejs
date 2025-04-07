@@ -1,8 +1,11 @@
-import Konva from "konva";
-import { WeaveElementAttributes, WeaveElementInstance } from "@/types";
-import { WeaveNode } from "../node";
+import Konva from 'konva';
+import {
+  WeaveElementAttributes,
+  WeaveElementInstance,
+} from '@inditextech/weavejs-types';
+import { WeaveNode } from '../node';
 
-export const WEAVE_STAGE_NODE_TYPE = "stage";
+export const WEAVE_STAGE_NODE_TYPE = 'stage';
 
 export class WeaveStageNode extends WeaveNode {
   protected nodeType = WEAVE_STAGE_NODE_TYPE;
@@ -40,11 +43,11 @@ export class WeaveStageNode extends WeaveNode {
     const attrs = instance.getAttrs();
 
     return {
-      key: attrs.id ?? "",
+      key: attrs.id ?? '',
       type: attrs.nodeType,
       props: {
         ...attrs,
-        id: attrs.id ?? "",
+        id: attrs.id ?? '',
         nodeType: attrs.nodeType,
         children: [],
       },

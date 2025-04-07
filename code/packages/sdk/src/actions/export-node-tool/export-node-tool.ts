@@ -1,10 +1,11 @@
-import { WeaveExportNodeActionParams } from './types';
 import {
+  WeaveExportNodeOptions,
+  WeaveElementInstance,
   WEAVE_EXPORT_BACKGROUND_COLOR,
   WEAVE_EXPORT_FILE_FORMAT,
   WEAVE_EXPORT_FORMATS,
-} from '@/constants';
-import { WeaveExportNodeOptions, WeaveElementInstance } from '@/types';
+} from '@inditextech/weavejs-types';
+import { WeaveExportNodeActionParams } from './types';
 import { WeaveAction } from '../action';
 
 export class WeaveExportNodeToolAction extends WeaveAction {

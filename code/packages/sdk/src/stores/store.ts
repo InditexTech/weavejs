@@ -1,6 +1,12 @@
 import { isEmpty } from 'lodash';
 import { Weave } from '@/weave';
-import { WeaveAwarenessChange, WeaveState, WeaveUndoRedoChange } from '@/types';
+import {
+  WeaveAwarenessChange,
+  WeaveState,
+  WeaveStoreBase,
+  WeaveUndoRedoChange,
+  WeaveStoreOptions,
+} from '@inditextech/weavejs-types';
 import { MappedTypeDescription } from '@syncedstore/core/types/doc';
 import {
   observeDeep,
@@ -10,9 +16,8 @@ import {
 } from '@syncedstore/core';
 import { Doc, AbstractType, UndoManager } from 'yjs';
 import { Logger } from 'pino';
-import { WeaveStoreOptions } from './types';
 
-export abstract class WeaveStore {
+export abstract class WeaveStore implements WeaveStoreBase {
   protected instance!: Weave;
   protected name!: string;
   protected supportsUndoManager!: boolean;

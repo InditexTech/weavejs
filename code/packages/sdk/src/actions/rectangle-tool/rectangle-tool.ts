@@ -1,14 +1,14 @@
 import { v4 as uuidv4 } from 'uuid';
-import { WeaveAction } from '@/actions/action';
+import Konva from 'konva';
 import { Vector2d } from 'konva/lib/types';
+import { WeaveElementInstance } from '@inditextech/weavejs-types';
+import { WeaveAction } from '@/actions/action';
 import {
   WeaveRectangleToolActionState,
   WeaveRectangleToolCallbacks,
 } from './types';
 import { RECTANGLE_TOOL_ACTION_NAME, RECTANGLE_TOOL_STATE } from './constants';
 import { WeaveNodesSelectionPlugin } from '@/plugins/nodes-selection/nodes-selection';
-import Konva from 'konva';
-import { WeaveElementInstance } from '@/types';
 import { SELECTION_TOOL_ACTION_NAME } from '../selection-tool/constants';
 
 export class WeaveRectangleToolAction extends WeaveAction {

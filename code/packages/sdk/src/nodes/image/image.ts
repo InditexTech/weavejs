@@ -1,5 +1,8 @@
 import Konva from 'konva';
-import { WeaveElementAttributes, WeaveElementInstance } from '@/types';
+import {
+  WeaveElementAttributes,
+  WeaveElementInstance,
+} from '@inditextech/weavejs-types';
 import { WeaveNode } from '../node';
 import { ImageProps } from './types';
 import { WeaveImageToolAction } from '@/actions/image-tool/image-tool';

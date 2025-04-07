@@ -1,4 +1,4 @@
-import { WeaveElementAttributes } from '@/types';
+import { WeaveElementAttributes } from '@inditextech/weavejs-types';
 import { Weave } from '@/weave';
 import { Logger } from 'pino';
 import { WeaveActionCallbacks } from './types';

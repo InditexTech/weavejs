@@ -1,8 +1,12 @@
-import Konva from "konva";
-import { WeaveElementAttributes, WeaveElementInstance, WeaveStateElement } from "@/types";
-import { WeaveNode } from "../node";
+import Konva from 'konva';
+import {
+  WeaveElementAttributes,
+  WeaveElementInstance,
+  WeaveStateElement,
+} from '@inditextech/weavejs-types';
+import { WeaveNode } from '../node';
 
-export const WEAVE_LAYER_NODE_TYPE = "layer";
+export const WEAVE_LAYER_NODE_TYPE = 'layer';
 
 export class WeaveLayerNode extends WeaveNode {
   protected nodeType = WEAVE_LAYER_NODE_TYPE;
@@ -28,7 +32,10 @@ export class WeaveLayerNode extends WeaveNode {
     return layer;
   }
 
-  updateInstance(nodeInstance: WeaveElementInstance, nextProps: WeaveElementAttributes) {
+  updateInstance(
+    nodeInstance: WeaveElementInstance,
+    nextProps: WeaveElementAttributes
+  ) {
     nodeInstance.setAttrs({
       ...nextProps,
     });
@@ -42,18 +49,20 @@ export class WeaveLayerNode extends WeaveNode {
     const attrs = instance.getAttrs();
 
     const childrenMapped: WeaveStateElement[] = [];
-    const children: WeaveElementInstance[] = [...(instance as Konva.Group).getChildren()];
+    const children: WeaveElementInstance[] = [
+      ...(instance as Konva.Group).getChildren(),
+    ];
     for (const node of children) {
-      const handler = this.instance.getNodeHandler(node.getAttr("nodeType"));
+      const handler = this.instance.getNodeHandler(node.getAttr('nodeType'));
       childrenMapped.push(handler.toNode(node));
     }
 
     return {
-      key: attrs.id ?? "",
+      key: attrs.id ?? '',
       type: attrs.nodeType,
       props: {
         ...attrs,
-        id: attrs.id ?? "",
+        id: attrs.id ?? '',
         nodeType: attrs.nodeType,
         children: childrenMapped,
       },

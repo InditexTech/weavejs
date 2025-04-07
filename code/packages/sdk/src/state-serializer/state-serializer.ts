@@ -1,14 +1,17 @@
-import React from "react";
-import { WeaveStateElement } from "@/types";
-import { isEmpty } from "lodash";
+import React from 'react';
+import { WeaveStateElement } from '@inditextech/weavejs-types';
+import { isEmpty } from 'lodash';
 
 export class WeaveStateSerializer {
   serialize(element: React.ReactNode) {
-    const replacer = (key: string, value: string | number | boolean | WeaveStateElement[]) => {
+    const replacer = (
+      key: string,
+      value: string | number | boolean | WeaveStateElement[]
+    ) => {
       switch (key) {
-        case "_owner":
-        case "_store":
-        case "ref":
+        case '_owner':
+        case '_store':
+        case 'ref':
           return;
         default:
           return value;
@@ -19,14 +22,14 @@ export class WeaveStateSerializer {
   }
 
   deserialize(data: unknown) {
-    if (typeof data === "string") {
+    if (typeof data === 'string') {
       data = JSON.parse(data);
     }
     if (data instanceof Object) {
       const toDeserialize = data as WeaveStateElement;
       return this.deserializeElement(toDeserialize);
     }
-    throw new Error("Deserialization error: incorrect data type");
+    throw new Error('Deserialization error: incorrect data type');
   }
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -43,8 +46,10 @@ export class WeaveStateSerializer {
 
     const { key, type, props } = element as WeaveStateElement;
 
-    if (typeof type !== "string") {
-      throw new Error(`Deserialization error: element type must be string received [${type}]`);
+    if (typeof type !== 'string') {
+      throw new Error(
+        `Deserialization error: element type must be string received [${type}]`
+      );
     }
 
     const { children, ...restProps } = props;
@@ -54,6 +59,10 @@ export class WeaveStateSerializer {
       childrenNodes = this.deserializeElement(children);
     }
 
-    return React.createElement(type.toLowerCase(), { ...restProps, key: key as string }, childrenNodes);
+    return React.createElement(
+      type.toLowerCase(),
+      { ...restProps, key: key as string },
+      childrenNodes
+    );
   }
 }

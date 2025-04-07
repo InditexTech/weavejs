@@ -1,6 +1,6 @@
 import { Logger } from 'pino';
 import { Weave } from '@/weave';
-import { WeaveElementAttributes } from '@/types';
+import { WeaveElementAttributes } from '@inditextech/weavejs-types';
 
 export class WeaveActionsManager {
   private instance: Weave;

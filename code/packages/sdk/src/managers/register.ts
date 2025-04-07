@@ -1,8 +1,8 @@
-import { Weave } from "@/weave";
-import { Logger } from "pino";
-import { WeavePlugin } from "@/plugins/plugin";
-import { WeaveNode } from "@/nodes/node";
-import { WeaveAction } from "@/actions/action";
+import { Weave } from '@/weave';
+import { Logger } from 'pino';
+import { WeavePlugin } from '@/plugins/plugin';
+import { WeaveNode } from '@/nodes/node';
+import { WeaveAction } from '@/actions/action';
 
 export class WeaveRegisterManager {
   private instance: Weave;
@@ -13,8 +13,8 @@ export class WeaveRegisterManager {
 
   constructor(instance: Weave) {
     this.instance = instance;
-    this.logger = this.instance.getChildLogger("register-manager");
-    this.logger.debug("Register manager created");
+    this.logger = this.instance.getChildLogger('register-manager');
+    this.logger.debug('Register manager created');
   }
 
   getPlugins() {
@@ -61,7 +61,7 @@ export class WeaveRegisterManager {
     const config = this.instance.getConfiguration();
     if (config.plugins) {
       for (const plugin of config.plugins) {
-        this.registerPlugin(plugin);
+        this.registerPlugin(plugin as WeavePlugin);
       }
     }
 
@@ -84,7 +84,7 @@ export class WeaveRegisterManager {
     const config = this.instance.getConfiguration();
     if (config.nodes) {
       for (const node of config.nodes) {
-        this.registerNodeHandler(node);
+        this.registerNodeHandler(node as WeaveNode);
       }
     }
 
@@ -107,7 +107,7 @@ export class WeaveRegisterManager {
     const config = this.instance.getConfiguration();
     if (config.actions) {
       for (const action of config.actions) {
-        this.registerActionHandler(action);
+        this.registerActionHandler(action as WeaveAction);
       }
     }
 

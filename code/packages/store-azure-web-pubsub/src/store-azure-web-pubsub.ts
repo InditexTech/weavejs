@@ -1,8 +1,8 @@
+import { WeaveStore } from '@inditextech/weavejs-sdk';
 import {
   WeaveAwarenessChange,
-  WeaveStore,
   WeaveStoreOptions,
-} from '@inditextech/weavejs-sdk';
+} from '@inditextech/weavejs-types';
 import { WeaveStoreAzureWebPubSubSyncClient } from './client';
 import { WEAVE_STORE_AZURE_WEB_PUBSUB } from './constants';
 import { WeaveStoreAzureWebPubsubOptions } from './types';

@@ -1,5 +1,5 @@
 import Konva from 'konva';
-import { WeaveElementInstance } from '@/types';
+import { WeaveElementInstance } from '@inditextech/weavejs-types';
 import { WeaveNodesSelectionPlugin } from '@/plugins/nodes-selection/nodes-selection';
 import { Weave } from '@/weave';
 import { WeaveImageNode } from './image';

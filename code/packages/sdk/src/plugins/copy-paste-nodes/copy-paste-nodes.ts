@@ -5,7 +5,7 @@ import {
   NodeSerializable,
   WeaveElementInstance,
   WeaveStateElement,
-} from '@/types';
+} from '@inditextech/weavejs-types';
 import { COPY_PASTE_NODES_PLUGIN_STATE } from './constants';
 import { WeaveNodesSelectionPlugin } from '../nodes-selection/nodes-selection';
 import { WeaveNodesSelectionChangeCallback } from '../nodes-selection/types';

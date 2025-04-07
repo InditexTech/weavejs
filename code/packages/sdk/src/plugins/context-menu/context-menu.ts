@@ -1,8 +1,14 @@
-import { WeavePlugin } from "@/plugins/plugin";
-import { WeaveStageContextMenuPluginCallbacks, WeaveStageContextMenuPluginOptions } from "./types";
-import { WeaveElementInstance, WeaveSelection } from "@/types";
-import { Vector2d } from "konva/lib/types";
-import { WeaveNodesSelectionPlugin } from "../nodes-selection/nodes-selection";
+import { WeavePlugin } from '@/plugins/plugin';
+import {
+  WeaveStageContextMenuPluginCallbacks,
+  WeaveStageContextMenuPluginOptions,
+} from './types';
+import {
+  WeaveElementInstance,
+  WeaveSelection,
+} from '@inditextech/weavejs-types';
+import { Vector2d } from 'konva/lib/types';
+import { WeaveNodesSelectionPlugin } from '../nodes-selection/nodes-selection';
 
 export class WeaveContextMenuPlugin extends WeavePlugin {
   private config: WeaveStageContextMenuPluginOptions;
@@ -11,7 +17,10 @@ export class WeaveContextMenuPlugin extends WeavePlugin {
   initLayer = undefined;
   render: undefined;
 
-  constructor(options: WeaveStageContextMenuPluginOptions, callbacks: WeaveStageContextMenuPluginCallbacks) {
+  constructor(
+    options: WeaveStageContextMenuPluginOptions,
+    callbacks: WeaveStageContextMenuPluginCallbacks
+  ) {
     super();
 
     this.config = options;
@@ -23,7 +32,7 @@ export class WeaveContextMenuPlugin extends WeavePlugin {
   }
 
   getName() {
-    return "contextMenu";
+    return 'contextMenu';
   }
 
   init() {
@@ -33,9 +42,10 @@ export class WeaveContextMenuPlugin extends WeavePlugin {
   private initEvents() {
     const stage = this.instance.getStage();
 
-    const selectionPlugin = this.instance.getPlugin<WeaveNodesSelectionPlugin>("nodesSelection");
+    const selectionPlugin =
+      this.instance.getPlugin<WeaveNodesSelectionPlugin>('nodesSelection');
 
-    stage.on("contextmenu", (e) => {
+    stage.on('contextmenu', (e) => {
       e.evt.preventDefault();
 
       let clickOnTransformer = false;
@@ -66,9 +76,14 @@ export class WeaveContextMenuPlugin extends WeavePlugin {
         nodes = transformer
           .getNodes()
           .map((node) => {
-            const nodeHandler = this.instance.getNodeHandler(node.getAttrs().nodeType);
+            const nodeHandler = this.instance.getNodeHandler(
+              node.getAttrs().nodeType
+            );
 
-            return { instance: node as WeaveElementInstance, node: nodeHandler.toNode(node as WeaveElementInstance) };
+            return {
+              instance: node as WeaveElementInstance,
+              node: nodeHandler.toNode(node as WeaveElementInstance),
+            };
           })
           .filter((node) => node !== undefined);
       }

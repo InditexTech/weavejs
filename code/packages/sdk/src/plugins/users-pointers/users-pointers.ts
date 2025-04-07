@@ -1,5 +1,5 @@
 import _ from 'lodash';
-import { WeaveAwarenessChange, WeaveUser } from '@/types';
+import { WeaveAwarenessChange, WeaveUser } from '@inditextech/weavejs-types';
 import {
   WeaveUserPointer,
   WeaveUserPointerKey,

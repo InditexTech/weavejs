@@ -1,9 +1,12 @@
 import { isEmpty } from 'lodash';
 import { Weave } from '@/weave';
 import { Logger } from 'pino';
-import { WeavePosition, WeaveStateElement } from '@/types';
+import {
+  WeavePosition,
+  WeaveStateElement,
+  WEAVE_NODE_POSITION,
+} from '@inditextech/weavejs-types';
 import Konva from 'konva';
-import { WEAVE_NODE_POSITION } from '@/constants';
 
 export class WeaveStateManager {
   private instance: Weave;
