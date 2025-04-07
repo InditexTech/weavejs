@@ -10,6 +10,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - [#68](https://github.com/InditexTech/weavejs/issues/68) Pan the stage with the mouse
+- [#71](https://github.com/InditexTech/weavejs/issues/71) Grid plugin, define two types: lines and dots
+- [#72](https://github.com/InditexTech/weavejs/issues/72) API to enable or disable plugins
 
 ## [0.18.0] - 2025-04-07
 
