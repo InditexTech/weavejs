@@ -1,25 +1,25 @@
-import * as decoding from "lib0/decoding";
-import * as encoding from "lib0/encoding";
-import * as syncProtocol from "y-protocols/sync";
-import * as awarenessProtocol from "y-protocols/awareness";
+import * as decoding from 'lib0/decoding';
+import * as encoding from 'lib0/encoding';
+import * as syncProtocol from 'y-protocols/sync';
+import * as awarenessProtocol from 'y-protocols/awareness';
 
-import { WebPubSubServiceClient } from "@azure/web-pubsub";
-import { WebSocket } from "ws";
-import * as Y from "yjs";
+import { WebPubSubServiceClient } from '@azure/web-pubsub';
+import { WebSocket } from 'ws';
+import * as Y from 'yjs';
 
 const messageSync = 0;
 const messageAwareness = 1;
 
 export enum MessageType {
-  System = "system",
-  JoinGroup = "joinGroup",
-  SendToGroup = "sendToGroup",
+  System = 'system',
+  JoinGroup = 'joinGroup',
+  SendToGroup = 'sendToGroup',
 }
 
 export enum MessageDataType {
-  Init = "init",
-  Sync = "sync",
-  Awareness = "awareness",
+  Init = 'init',
+  Sync = 'sync',
+  Awareness = 'awareness',
 }
 
 export interface MessageData {
@@ -34,9 +34,10 @@ export interface Message {
   group: string;
   data: MessageData;
 }
-const HostUserId = "host";
+const HostUserId = 'host';
 
 export interface WebPubSubHostOptions {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   WebSocketPolyfill: any;
 }
 
@@ -45,7 +46,9 @@ export class WeaveStoreAzureWebPubSubSyncHost {
   public topic: string;
 
   private _client: WebPubSubServiceClient;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   private _polyfill: any;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   private _conn: any;
 
   private _awareness: awarenessProtocol.Awareness;
@@ -54,7 +57,7 @@ export class WeaveStoreAzureWebPubSubSyncHost {
     client: WebPubSubServiceClient,
     topic: string,
     doc: Y.Doc,
-    { WebSocketPolyfill = WebSocket }: WebPubSubHostOptions,
+    { WebSocketPolyfill = WebSocket }: WebPubSubHostOptions
   ) {
     this.doc = doc;
     this.topic = topic;
@@ -68,16 +71,29 @@ export class WeaveStoreAzureWebPubSubSyncHost {
     this._awareness.setLocalState(null);
 
     // const awarenessChangeHandler = ({ added, updated, removed }, conn) => {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const awarenessUpdateHandler = ({ added, updated, removed }: { added: any; updated: any; removed: any }) => {
+    const awarenessUpdateHandler = ({
+      added,
+      updated,
+      removed,
+    }: {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      added: any;
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      updated: any;
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      removed: any;
+    }) => {
       const changedClients = added.concat(updated, removed);
       const encoder = encoding.createEncoder();
       encoding.writeVarUint(encoder, messageAwareness);
-      encoding.writeVarUint8Array(encoder, awarenessProtocol.encodeAwarenessUpdate(this._awareness, changedClients));
+      encoding.writeVarUint8Array(
+        encoder,
+        awarenessProtocol.encodeAwarenessUpdate(this._awareness, changedClients)
+      );
       const u8 = encoding.toUint8Array(encoder);
       this.broadcast(this.topic, u8);
     };
-    this._awareness.on("update", awarenessUpdateHandler);
+    this._awareness.on('update', awarenessUpdateHandler);
 
     // register update handler
     const updateHandler = (update: Uint8Array) => {
@@ -87,7 +103,7 @@ export class WeaveStoreAzureWebPubSubSyncHost {
       const u8 = encoding.toUint8Array(encoder);
       this.broadcast(this.topic, u8);
     };
-    doc.on("update", updateHandler);
+    doc.on('update', updateHandler);
   }
 
   get awareness() {
@@ -96,7 +112,7 @@ export class WeaveStoreAzureWebPubSubSyncHost {
 
   async start() {
     const url = await this.negotiate(this.topic);
-    const conn = new this._polyfill(url, "json.webpubsub.azure.v1");
+    const conn = new this._polyfill(url, 'json.webpubsub.azure.v1');
 
     const group = this.topic;
 
@@ -104,7 +120,7 @@ export class WeaveStoreAzureWebPubSubSyncHost {
     conn.onmessage = (e: any) => {
       const event: Message = JSON.parse(e.data.toString());
 
-      if (event.type === "message" && event.from === "group") {
+      if (event.type === 'message' && event.from === 'group') {
         switch (event.data.t) {
           case MessageDataType.Init:
             this.onClientInit(group, event.data);
@@ -125,7 +141,7 @@ export class WeaveStoreAzureWebPubSubSyncHost {
         JSON.stringify({
           type: MessageType.JoinGroup,
           group: `${group}.host`,
-        }),
+        })
       );
     };
 
@@ -139,9 +155,9 @@ export class WeaveStoreAzureWebPubSubSyncHost {
         group,
         noEcho: true,
         data: {
-          c: Buffer.from(u8).toString("base64"),
+          c: Buffer.from(u8).toString('base64'),
         },
-      }),
+      })
     );
   }
 
@@ -153,9 +169,9 @@ export class WeaveStoreAzureWebPubSubSyncHost {
         noEcho: true,
         data: {
           t: to,
-          c: Buffer.from(u8).toString("base64"),
+          c: Buffer.from(u8).toString('base64'),
         },
-      }),
+      })
     );
   }
 
@@ -169,7 +185,7 @@ export class WeaveStoreAzureWebPubSubSyncHost {
 
   private onClientSync(group: string, data: MessageData) {
     try {
-      const buf = Buffer.from(data.c, "base64");
+      const buf = Buffer.from(data.c, 'base64');
       const encoder = encoding.createEncoder();
       const decoder = decoding.createDecoder(buf);
       const messageType = decoding.readVarUint(decoder);
@@ -185,7 +201,7 @@ export class WeaveStoreAzureWebPubSubSyncHost {
     } catch (err) {
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore
-      this.doc.emit("error", [err]);
+      this.doc.emit('error', [err]);
     }
   }
 
@@ -193,14 +209,18 @@ export class WeaveStoreAzureWebPubSubSyncHost {
   // eslint-disable-next-line @typescript-eslint/naming-convention
   private onAwareness(_: string, data: MessageData) {
     try {
-      const buf = Buffer.from(data.c, "base64");
+      const buf = Buffer.from(data.c, 'base64');
       const decoder = decoding.createDecoder(buf);
       decoding.readVarUint(decoder); // skip the message type
-      awarenessProtocol.applyAwarenessUpdate(this._awareness, decoding.readVarUint8Array(decoder), undefined);
+      awarenessProtocol.applyAwarenessUpdate(
+        this._awareness,
+        decoding.readVarUint8Array(decoder),
+        undefined
+      );
     } catch (err) {
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore
-      this.doc.emit("error", [err]);
+      this.doc.emit('error', [err]);
     }
   }
 

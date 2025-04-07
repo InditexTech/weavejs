@@ -56,8 +56,8 @@ export class WeaveLogger {
     });
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   private log(
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     method: any,
     level: string,
     o: object,
