@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.20.0] - 2025-04-07
+
 ## [0.19.0] - 2025-04-07
 
 ### Added
@@ -163,7 +165,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - [#8](https://github.com/InditexTech/weavejs/issues/8) ESLint OSS rules
 - [#2](https://github.com/InditexTech/weavejs/issues/2) Improve rendering handling
 
-[Unreleased]: https://github.com/InditexTech/weavejs/compare/0.19.0...HEAD
+[Unreleased]: https://github.com/InditexTech/weavejs/compare/0.20.0...HEAD
+
+[0.20.0]: https://github.com/InditexTech/weavejs/compare/0.19.0...0.20.0
 
 [0.19.0]: https://github.com/InditexTech/weavejs/compare/0.18.0...0.19.0
 
