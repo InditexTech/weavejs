@@ -1,13 +1,15 @@
 import {
   Weave,
-  WEAVE_INSTANCE_STATUS,
   WeaveConnectedUsersChanged,
+  WeaveToPasteNode,
+} from '@inditextech/weavejs-sdk';
+import {
+  WEAVE_INSTANCE_STATUS,
   WeaveSelection,
   WeaveState,
   WeaveStateElement,
   WeaveStatus,
-  WeaveToPasteNode,
-} from '@inditextech/weavejs-sdk';
+} from '@inditextech/weavejs-types';
 import { WeaveStoreWebsocketsConnectionStatus } from '@inditextech/weavejs-store-websockets';
 import { create } from 'zustand';
 

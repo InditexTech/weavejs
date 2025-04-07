@@ -1,7 +1,9 @@
-import { Weave } from "@/weave";
-import { Logger } from "pino";
-import { WeaveElementInstance } from "@/types";
-import { WEAVE_NODE_POSITION } from "@/constants";
+import { Weave } from '@/weave';
+import { Logger } from 'pino';
+import {
+  WeaveElementInstance,
+  WEAVE_NODE_POSITION,
+} from '@inditextech/weavejs-types';
 
 export class WeaveZIndexManager {
   private instance: Weave;
@@ -9,12 +11,16 @@ export class WeaveZIndexManager {
 
   constructor(instance: Weave) {
     this.instance = instance;
-    this.logger = this.instance.getChildLogger("zindex-manager");
-    this.logger.debug("zIndex manager created");
+    this.logger = this.instance.getChildLogger('zindex-manager');
+    this.logger.debug('zIndex manager created');
   }
 
   moveUp(instance: WeaveElementInstance) {
-    this.logger.debug(`Moving instance with id [${instance.getAttrs().id}], up one step of z-index`);
+    this.logger.debug(
+      `Moving instance with id [${
+        instance.getAttrs().id
+      }], up one step of z-index`
+    );
 
     instance.moveUp();
 
@@ -24,7 +30,11 @@ export class WeaveZIndexManager {
   }
 
   moveDown(instance: WeaveElementInstance) {
-    this.logger.debug(`Moving instance with id [${instance.getAttrs().id}], down one step of z-index`);
+    this.logger.debug(
+      `Moving instance with id [${
+        instance.getAttrs().id
+      }], down one step of z-index`
+    );
 
     instance.moveDown();
 
@@ -34,7 +44,11 @@ export class WeaveZIndexManager {
   }
 
   sendToBack(instance: WeaveElementInstance) {
-    this.logger.debug(`Moving instance with id [${instance.getAttrs().id}], to bottom of z-index`);
+    this.logger.debug(
+      `Moving instance with id [${
+        instance.getAttrs().id
+      }], to bottom of z-index`
+    );
 
     instance.moveToBottom();
 
@@ -44,7 +58,9 @@ export class WeaveZIndexManager {
   }
 
   bringToFront(instance: WeaveElementInstance) {
-    this.logger.debug(`Moving instance with id [${instance.getAttrs().id}], to top of z-index`);
+    this.logger.debug(
+      `Moving instance with id [${instance.getAttrs().id}], to top of z-index`
+    );
 
     instance.moveToTop();
 

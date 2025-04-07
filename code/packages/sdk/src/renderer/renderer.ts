@@ -2,7 +2,7 @@ import ReactReconciler, { Reconciler } from 'react-reconciler';
 import { Weave } from '@/weave';
 import { WeaveStateSerializer } from '@/state-serializer/state-serializer';
 import { WeaveReconciler } from '@/reconciler/reconciler';
-import { WeaveElementInstance } from '@/types';
+import { WeaveElementInstance } from '@inditextech/weavejs-types';
 
 export class WeaveRenderer {
   private instance: Weave;
@@ -11,6 +11,7 @@ export class WeaveRenderer {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   private renderer: Reconciler<
     Weave,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     any,
     null,
     WeaveElementInstance,

@@ -1,5 +1,8 @@
 import Konva from 'konva';
-import { WeaveElementAttributes, WeaveElementInstance } from '@/types';
+import {
+  WeaveElementAttributes,
+  WeaveElementInstance,
+} from '@inditextech/weavejs-types';
 import { WeaveNode } from '../node';
 
 export const WEAVE_RECTANGLE_NODE_TYPE = 'rectangle';

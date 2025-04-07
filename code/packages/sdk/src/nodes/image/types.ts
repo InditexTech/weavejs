@@ -1,4 +1,4 @@
-import { WeaveElementAttributes } from "@/types";
+import { WeaveElementAttributes } from '@inditextech/weavejs-types';
 
 export type ImageProps = WeaveElementAttributes & {
   id: string;

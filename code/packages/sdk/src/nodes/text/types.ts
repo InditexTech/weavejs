@@ -1,8 +1,8 @@
-import Konva from "konva";
-import { NodeSerializable } from "@/types";
+import Konva from 'konva';
+import { NodeSerializable } from '@inditextech/weavejs-types';
 
 export type TextSerializable = Konva.TextConfig &
   NodeSerializable & {
-    type: "text";
+    type: 'text';
     id: string;
   };

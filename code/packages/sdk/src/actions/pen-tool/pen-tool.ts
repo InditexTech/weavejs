@@ -1,11 +1,11 @@
 import { v4 as uuidv4 } from 'uuid';
-import { WeaveAction } from '@/actions/action';
+import Konva from 'konva';
 import { Vector2d } from 'konva/lib/types';
+import { WeaveElementInstance } from '@inditextech/weavejs-types';
+import { WeaveAction } from '@/actions/action';
 import { WeavePenToolActionState, WeavePenToolCallbacks } from './types';
 import { PEN_TOOL_STATE } from './constants';
-import Konva from 'konva';
 import { WeaveNodesSelectionPlugin } from '@/plugins/nodes-selection/nodes-selection';
-import { WeaveElementInstance } from '@/types';
 
 export class WeavePenToolAction extends WeaveAction {
   protected initialized: boolean = false;

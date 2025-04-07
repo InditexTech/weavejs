@@ -1,5 +1,5 @@
-import { Weave } from "@/weave";
-import { Logger } from "pino";
+import { Weave } from '@/weave';
+import { Logger } from 'pino';
 
 export abstract class WeavePlugin {
   protected instance!: Weave;
@@ -9,7 +9,9 @@ export abstract class WeavePlugin {
   register(instance: Weave) {
     this.instance = instance;
     this.logger = this.instance.getChildLogger(this.getName());
-    this.instance.getChildLogger("plugin").debug(`Plugin with name [${this.getName()}] registered`);
+    this.instance
+      .getChildLogger('plugin')
+      .debug(`Plugin with name [${this.getName()}] registered`);
 
     return this;
   }

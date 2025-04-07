@@ -12,18 +12,20 @@ import {
   WeaveUsersPointersPlugin,
   WeaveStageDropAreaPlugin,
   WeaveCopyPasteNodesPlugin,
-  WeaveState,
-  WeaveSelection,
   WeaveNode,
   WeaveAction,
   WeavePlugin,
+  WeaveStore,
+} from '@inditextech/weavejs-sdk';
+import {
+  WeaveState,
+  WeaveSelection,
   WeaveUser,
   WeaveFont,
   WeaveCallbacks,
   WeaveUndoRedoChange,
-  WeaveStore,
   WeaveStatus,
-} from '@inditextech/weavejs-sdk';
+} from '@inditextech/weavejs-types';
 import { useWeave } from './store';
 
 type WeaveProviderType = {

@@ -1,7 +1,7 @@
-import FontFaceObserver from "fontfaceobserver";
-import { Logger } from "pino";
-import { Weave } from "@/weave";
-import { WeaveFont } from "@/types";
+import FontFaceObserver from 'fontfaceobserver';
+import { Logger } from 'pino';
+import { WeaveFont } from '@inditextech/weavejs-types';
+import { Weave } from '@/weave';
 
 export class WeaveFontsManager {
   private instance: Weave;
@@ -10,8 +10,8 @@ export class WeaveFontsManager {
 
   constructor(instance: Weave) {
     this.instance = instance;
-    this.logger = this.instance.getChildLogger("fonts-manager");
-    this.logger.debug("Fonts manager created");
+    this.logger = this.instance.getChildLogger('fonts-manager');
+    this.logger.debug('Fonts manager created');
   }
 
   async loadFont(font: WeaveFont, fontFamily: FontFaceObserver): Promise<void> {
@@ -32,7 +32,7 @@ export class WeaveFontsManager {
   }
 
   async loadFonts() {
-    this.logger.info("Loading fonts");
+    this.logger.info('Loading fonts');
 
     if (this.instance.getConfiguration().fonts) {
       const fontPromises = [];
@@ -44,9 +44,9 @@ export class WeaveFontsManager {
       await Promise.allSettled(fontPromises);
     }
 
-    this.logger.info("Fonts loaded");
+    this.logger.info('Fonts loaded');
 
-    this.instance.emitEvent("weaveFontsLoaded", {});
+    this.instance.emitEvent('weaveFontsLoaded', {});
   }
 
   getFonts() {

@@ -1,4 +1,4 @@
-import { WeaveSelection, NodeSerializable } from '@/types';
+import { WeaveSelection, NodeSerializable } from '@inditextech/weavejs-types';
 import Konva from 'konva';
 import { WeavePlugin } from '@/plugins/plugin';
 import { WEAVE_NODES_SELECTION_LAYER_ID } from './constants';

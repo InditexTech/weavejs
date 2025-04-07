@@ -44,7 +44,7 @@
   "devDependencies": {
     "@azure/web-pubsub": "1.1.4",
     "@azure/web-pubsub-express": "^1.0.6",
-    "@inditextech/weavejs-sdk": "0.17.0-SNAPSHOT",
+    "@inditextech/weavejs-types": "0.17.0-SNAPSHOT",
     "@types/uuid": "^10.0.0",
     "@types/ws": "^8.18.0",
     "@typescript-eslint/eslint-plugin": "8.26.0",
@@ -77,7 +77,7 @@
   },
   "nx": {
     "implicitDependencies": [
-      "@inditextech/weavejs-sdk"
+      "@inditextech/weavejs-types"
     ]
   }
 }

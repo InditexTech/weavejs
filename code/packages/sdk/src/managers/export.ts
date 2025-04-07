@@ -1,12 +1,13 @@
 import { Logger } from 'pino';
 import { Weave } from '@/weave';
 import { v4 as uuidv4 } from 'uuid';
-import { WeaveElementInstance, WeaveExportNodeOptions } from '@/types';
-import Konva from 'konva';
 import {
+  WeaveElementInstance,
+  WeaveExportNodeOptions,
   WEAVE_EXPORT_BACKGROUND_COLOR,
   WEAVE_EXPORT_FORMATS,
-} from '@/constants';
+} from '@inditextech/weavejs-types';
+import Konva from 'konva';
 
 export class WeaveExportManager {
   private instance: Weave;

@@ -1,5 +1,5 @@
-import { WeaveUser } from "@/types";
-import { WEAVE_USER_POINTER_KEY } from "./constants";
+import { WeaveUser } from '@inditextech/weavejs-types';
+import { WEAVE_USER_POINTER_KEY } from './constants';
 
 export type WeaveUsersPointersPluginParams = {
   getUser?: () => WeaveUser;
