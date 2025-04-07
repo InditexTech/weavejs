@@ -42,6 +42,11 @@ export class WeaveStageGridPlugin extends WeavePlugin {
   private initEvents() {
     const stage = this.instance.getStage();
 
+    stage.on('mousemove', (e) => {
+      e.evt.preventDefault();
+      this.render();
+    });
+
     stage.on('wheel', (e) => {
       e.evt.preventDefault();
       this.render();
