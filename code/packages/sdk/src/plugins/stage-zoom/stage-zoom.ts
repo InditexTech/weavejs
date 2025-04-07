@@ -102,6 +102,10 @@ export class WeaveStageZoomPlugin extends WeavePlugin {
   }
 
   canZoomOut() {
+    if (!this.enabled) {
+      return false;
+    }
+
     const actualZoomIsStep = this.zoomSteps.findIndex(
       (scale) => scale === this.actualScale
     );
@@ -113,6 +117,10 @@ export class WeaveStageZoomPlugin extends WeavePlugin {
   }
 
   canZoomIn() {
+    if (!this.enabled) {
+      return false;
+    }
+
     const actualZoomIsStep = this.zoomSteps.findIndex(
       (scale) => scale === this.actualScale
     );
@@ -124,6 +132,10 @@ export class WeaveStageZoomPlugin extends WeavePlugin {
   }
 
   zoomToStep(step: number) {
+    if (!this.enabled) {
+      return;
+    }
+
     if (step < 0 || step >= this.zoomSteps.length) {
       throw new Error(`Defined step ${step} is out of bounds`);
     }
@@ -145,6 +157,10 @@ export class WeaveStageZoomPlugin extends WeavePlugin {
   }
 
   zoomIn() {
+    if (!this.enabled) {
+      return;
+    }
+
     if (!this.canZoomIn()) {
       return;
     }
@@ -162,6 +178,10 @@ export class WeaveStageZoomPlugin extends WeavePlugin {
   }
 
   zoomOut() {
+    if (!this.enabled) {
+      return;
+    }
+
     if (!this.canZoomOut()) {
       return;
     }
@@ -179,6 +199,10 @@ export class WeaveStageZoomPlugin extends WeavePlugin {
   }
 
   fitToScreen() {
+    if (!this.enabled) {
+      return;
+    }
+
     const mainLayer = this.instance.getMainLayer();
 
     if (mainLayer?.getChildren().length === 0) {
@@ -205,6 +229,10 @@ export class WeaveStageZoomPlugin extends WeavePlugin {
   }
 
   fitToSelection() {
+    if (!this.enabled) {
+      return;
+    }
+
     const stage = this.instance.getStage();
 
     const selectionPlugin =
@@ -257,5 +285,13 @@ export class WeaveStageZoomPlugin extends WeavePlugin {
     this.setZoom(scale, false);
 
     zoomTransformer.destroy();
+  }
+
+  enable() {
+    this.enabled = true;
+  }
+
+  disable() {
+    this.enabled = false;
   }
 }

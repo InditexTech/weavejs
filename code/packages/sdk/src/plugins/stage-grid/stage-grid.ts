@@ -1,10 +1,12 @@
 import Konva from 'konva';
 import { Line } from 'konva/lib/shapes/Line';
 import { WeavePlugin } from '@/plugins/plugin';
-import { WEAVE_GRID_LAYER_ID } from './constants';
-import { WeaveStageGridPluginParams } from './types';
+import { WEAVE_GRID_LAYER_ID, WEAVE_GRID_TYPES } from './constants';
+import { WeaveStageGridPluginParams, WeaveStageGridType } from './types';
+import { Circle } from 'konva/lib/shapes/Circle';
 
 export class WeaveStageGridPlugin extends WeavePlugin {
+  private type: WeaveStageGridType = 'lines';
   private gridSize: number;
 
   constructor(params: WeaveStageGridPluginParams) {
@@ -62,8 +64,6 @@ export class WeaveStageGridPlugin extends WeavePlugin {
   }
 
   private renderGrid() {
-    const stage = this.instance.getStage();
-
     const layer = this.getLayer();
 
     if (!layer) {
@@ -71,6 +71,32 @@ export class WeaveStageGridPlugin extends WeavePlugin {
     }
 
     layer.destroyChildren();
+
+    if (!this.enabled) {
+      return;
+    }
+
+    switch (this.type) {
+      case WEAVE_GRID_TYPES.LINES:
+        this.renderGridLines();
+        break;
+      case WEAVE_GRID_TYPES.DOTS:
+        this.renderGridDots();
+        break;
+      default:
+        this.renderGridLines();
+        break;
+    }
+  }
+
+  private renderGridLines() {
+    const layer = this.getLayer();
+
+    if (!layer) {
+      return;
+    }
+
+    const stage = this.instance.getStage();
 
     const size = stage.width() / this.gridSize;
 
@@ -126,7 +152,75 @@ export class WeaveStageGridPlugin extends WeavePlugin {
     }
   }
 
+  private renderGridDots() {
+    const layer = this.getLayer();
+
+    if (!layer) {
+      return;
+    }
+
+    const stage = this.instance.getStage();
+
+    const size = stage.width() / this.gridSize;
+
+    const delta = 2 * size;
+
+    const startPageX =
+      Math.ceil((stage.x() + delta) / stage.scaleX() / size) * size;
+    const startPageY =
+      Math.ceil((stage.y() + delta) / stage.scaleY() / size) * size;
+    const endPageX =
+      Math.floor(
+        (stage.x() + stage.width() + 4 * delta) / stage.scaleX() / size
+      ) * size;
+    const endPageY =
+      Math.floor(
+        (stage.y() + stage.height() + 4 * delta) / stage.scaleY() / size
+      ) * size;
+    const numRows = Math.round((endPageY - startPageY) / size);
+    const numCols = Math.round((endPageX - startPageX) / size);
+
+    for (let row = 0; row <= numRows; row++) {
+      const pageY = row * size + startPageY;
+      const canvasY = pageY - 2 * startPageY;
+
+      for (let col = 0; col <= numCols; col++) {
+        const pageX = col * size + startPageX;
+        const canvasX = pageX - 2 * startPageX;
+
+        layer.add(
+          new Circle({
+            x: canvasX,
+            y: canvasY,
+            radius: 1,
+            fill: 'rgba(0, 0, 0, 0.2)',
+            stroke: 'rgba(0, 0, 0, 0.2)',
+            strokeWidth: 0,
+          })
+        );
+      }
+    }
+  }
+
   render() {
     this.renderGrid();
+  }
+
+  enable() {
+    this.enabled = true;
+    this.getLayer()?.show();
+  }
+
+  disable() {
+    this.enabled = false;
+    this.getLayer()?.hide();
+  }
+
+  getType() {
+    return this.type;
+  }
+
+  setType(type: WeaveStageGridType) {
+    this.type = type;
   }
 }

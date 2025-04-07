@@ -1,7 +1,6 @@
 import { WeavePlugin } from '@/plugins/plugin';
 
 export class WeaveStagePanningPlugin extends WeavePlugin {
-  private enabled: boolean;
   private isMouseMiddleButtonPressed: boolean;
   private isSpaceKeyPressed: boolean;
   protected previousPointer!: string | null;
@@ -127,11 +126,11 @@ export class WeaveStagePanningPlugin extends WeavePlugin {
     });
   }
 
-  getEnabled() {
-    return this.enabled;
+  enable() {
+    this.enabled = true;
   }
 
-  setEnabled(enabled: boolean) {
-    this.enabled = enabled;
+  disable() {
+    this.enabled = false;
   }
 }

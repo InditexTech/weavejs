@@ -11,7 +11,6 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
   private cameFromSelectingMultiple: boolean;
   private selecting: boolean;
   private initialized: boolean;
-  private enabled: boolean;
   private callbacks: WeaveNodesSelectionPluginCallbacks;
   render: undefined;
 
@@ -489,14 +488,6 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
     }
   }
 
-  isEnabled() {
-    return this.enabled;
-  }
-
-  setEnabled(enabled: boolean) {
-    this.enabled = enabled;
-  }
-
   selectAll() {
     const mainLayer = this.instance.getMainLayer();
     if (mainLayer) {
@@ -507,5 +498,15 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
 
   selectNone() {
     this.tr.nodes([]);
+  }
+
+  enable() {
+    this.getLayer()?.show();
+    this.enabled = true;
+  }
+
+  disable() {
+    this.getLayer()?.hide();
+    this.enabled = false;
   }
 }

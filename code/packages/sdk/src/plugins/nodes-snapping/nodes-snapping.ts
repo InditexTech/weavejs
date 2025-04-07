@@ -5,7 +5,6 @@ import { GUIDE_LINE_NAME, GUIDE_ORIENTATION, NODE_SNAP } from './constants';
 
 export class WeaveNodesSnappingPlugin extends WeavePlugin {
   private guideLineOffset: number;
-  private enabled: boolean;
   render: undefined;
 
   constructor() {
@@ -263,5 +262,13 @@ export class WeaveNodesSnappingPlugin extends WeavePlugin {
         }
       });
     }
+  }
+
+  enable() {
+    this.enabled = true;
+  }
+
+  disable() {
+    this.enabled = false;
   }
 }

@@ -48,6 +48,10 @@ export class WeaveContextMenuPlugin extends WeavePlugin {
     stage.on('contextmenu', (e) => {
       e.evt.preventDefault();
 
+      if (!this.enabled) {
+        return;
+      }
+
       let clickOnTransformer = false;
       if (selectionPlugin) {
         const transformer = selectionPlugin.getTransformer();
@@ -102,5 +106,13 @@ export class WeaveContextMenuPlugin extends WeavePlugin {
         }
       }
     });
+  }
+
+  enable() {
+    this.enabled = true;
+  }
+
+  disable() {
+    this.enabled = false;
   }
 }

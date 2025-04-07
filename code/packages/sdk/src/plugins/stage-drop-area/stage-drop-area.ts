@@ -1,8 +1,7 @@
-import { WeavePlugin } from "@/plugins/plugin";
-import { WeaveStageDropAreaPluginCallbacks } from "./types";
+import { WeavePlugin } from '@/plugins/plugin';
+import { WeaveStageDropAreaPluginCallbacks } from './types';
 
 export class WeaveStageDropAreaPlugin extends WeavePlugin {
-  private enabled: boolean;
   private callbacks?: WeaveStageDropAreaPluginCallbacks;
   getLayerName = undefined;
   initLayer = undefined;
@@ -20,7 +19,7 @@ export class WeaveStageDropAreaPlugin extends WeavePlugin {
   }
 
   getName() {
-    return "stageDropArea";
+    return 'stageDropArea';
   }
 
   init() {
@@ -30,25 +29,25 @@ export class WeaveStageDropAreaPlugin extends WeavePlugin {
   private initEvents() {
     const stage = this.instance.getStage();
 
-    stage.container().addEventListener("dragover", (e) => {
+    stage.container().addEventListener('dragover', (e) => {
       e.preventDefault();
       e.stopPropagation();
     });
 
-    stage.container().addEventListener("drop", (e) => {
+    stage.container().addEventListener('drop', (e) => {
       e.preventDefault();
       e.stopPropagation();
 
       this.callbacks?.onStageDrop?.(e);
-      this.instance.emitEvent("onStageDrop", e);
+      this.instance.emitEvent('onStageDrop', e);
     });
   }
 
-  getEnabled() {
-    return this.enabled;
+  enable() {
+    this.enabled = true;
   }
 
-  setEnabled(enabled: boolean) {
-    this.enabled = enabled;
+  disable() {
+    this.enabled = false;
   }
 }
