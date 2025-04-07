@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2025 2025 INDUSTRIA DE DISEÑO TEXTIL S.A. (INDITEX S.A.)
+//
+// SPDX-License-Identifier: Apache-2.0
+
 import { WeaveUser } from '@inditextech/weavejs-types';
 import { WEAVE_CONNECTED_USER_INFO_KEY } from './constants';
 
