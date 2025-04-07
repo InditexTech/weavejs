@@ -42,13 +42,13 @@ export class WeaveImageClip {
     const nodeSnappingPlugin =
       this.instance.getPlugin<WeaveNodesSelectionPlugin>('nodesSnapping');
     if (nodeSnappingPlugin) {
-      nodeSnappingPlugin.setEnabled(false);
+      this.instance.disablePlugin('nodesSnapping');
     }
 
     const selectionPlugin =
       this.instance.getPlugin<WeaveNodesSelectionPlugin>('nodesSelection');
     if (selectionPlugin) {
-      selectionPlugin.setEnabled(false);
+      this.instance.disablePlugin('nodesSelection');
       selectionPlugin.getTransformer().nodes([]);
       selectionPlugin.getTransformer().hide();
     }
@@ -142,13 +142,13 @@ export class WeaveImageClip {
     const nodeSnappingPlugin =
       this.instance.getPlugin<WeaveNodesSelectionPlugin>('nodesSnapping');
     if (nodeSnappingPlugin) {
-      nodeSnappingPlugin.setEnabled(true);
+      this.instance.enablePlugin('nodesSnapping');
     }
 
     const selectionPlugin =
       this.instance.getPlugin<WeaveNodesSelectionPlugin>('nodesSelection');
     if (selectionPlugin) {
-      selectionPlugin.setEnabled(true);
+      this.instance.enablePlugin('nodesSelection');
       const selectionTransformer = selectionPlugin.getTransformer();
       selectionTransformer.nodes([this.image]);
       selectionTransformer.show();

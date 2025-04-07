@@ -36,7 +36,7 @@ export class WeaveSelectionToolAction extends WeaveAction {
       this.instance.getPlugin<WeaveNodesSelectionPlugin>('nodesSelection');
     if (selectionPlugin) {
       const tr = selectionPlugin.getTransformer();
-      selectionPlugin.setEnabled(true);
+      this.instance.enablePlugin('nodesSelection');
       tr.show();
     }
 
@@ -73,7 +73,7 @@ export class WeaveSelectionToolAction extends WeaveAction {
       this.instance.getPlugin<WeaveNodesSelectionPlugin>('nodesSelection');
     if (selectionPlugin) {
       const tr = selectionPlugin.getTransformer();
-      selectionPlugin.setEnabled(false);
+      this.instance.disablePlugin('nodesSelection');
       tr.hide();
     }
 

@@ -1,4 +1,4 @@
-import { WeavePlugin } from "@/plugins/plugin";
+import { WeavePlugin } from '@/plugins/plugin';
 
 export class WeaveStageResizePlugin extends WeavePlugin {
   getLayerName = undefined;
@@ -10,14 +10,18 @@ export class WeaveStageResizePlugin extends WeavePlugin {
   }
 
   getName() {
-    return "stageResize";
+    return 'stageResize';
   }
 
   init() {
     const stage = this.instance.getStage();
 
-    window.addEventListener("resize", () => {
+    window.addEventListener('resize', () => {
       const containerParent = stage.container().parentNode;
+
+      if (!this.enabled) {
+        return;
+      }
 
       if (containerParent) {
         const containerBoundBox = stage.container().getBoundingClientRect();
@@ -34,5 +38,13 @@ export class WeaveStageResizePlugin extends WeavePlugin {
         }
       }
     });
+  }
+
+  enable() {
+    this.enabled = true;
+  }
+
+  disable() {
+    this.enabled = false;
   }
 }

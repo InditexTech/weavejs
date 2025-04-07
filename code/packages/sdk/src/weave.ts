@@ -33,6 +33,7 @@ import { WeaveStageManager } from './managers/stage';
 import { WeaveActionsManager } from './managers/actions';
 import { WeaveStoreManager } from './managers/store';
 import { WeaveExportManager } from './managers/export';
+import { WeavePluginsManager } from './managers/plugins';
 
 export class Weave extends Emittery {
   private config: WeaveConfig;
@@ -53,6 +54,7 @@ export class Weave extends Emittery {
   private cloningManager: WeaveCloningManager;
   private fontsManager: WeaveFontsManager;
   private zIndexManager: WeaveZIndexManager;
+  private pluginsManager: WeavePluginsManager;
   private actionsManager: WeaveActionsManager;
   private exportManager: WeaveExportManager;
 
@@ -97,6 +99,7 @@ export class Weave extends Emittery {
     this.zIndexManager = new WeaveZIndexManager(this);
     this.exportManager = new WeaveExportManager(this);
     this.actionsManager = new WeaveActionsManager(this);
+    this.pluginsManager = new WeavePluginsManager(this);
 
     // Setup the instance on the weave global variable
     if (!window.weave) {
@@ -304,6 +307,19 @@ export class Weave extends Emittery {
 
   registerStore(store: WeaveStore) {
     this.storeManager.registerStore(store);
+  }
+
+  // PLUGINS MANAGEMENT METHODS PROXIES
+  public isPluginEnabled(pluginName: string) {
+    return this.pluginsManager.isEnabled(pluginName);
+  }
+
+  public enablePlugin(pluginName: string) {
+    this.pluginsManager.enable(pluginName);
+  }
+
+  public disablePlugin(pluginName: string) {
+    this.pluginsManager.disable(pluginName);
   }
 
   // ACTIONS MANAGEMENT METHODS PROXIES

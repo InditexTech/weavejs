@@ -308,11 +308,7 @@ export class WeaveImageNode extends WeaveNode {
         visible: false,
       });
     };
-    imageObj.onended = () => {
-      console.log('ended load image');
-    };
     imageObj.onload = () => {
-      console.log('image loaded');
       imageGroup?.setAttrs({
         width: imageProps.width ? imageProps.width : imageObj.width,
         height: imageProps.height ? imageProps.height : imageObj.height,

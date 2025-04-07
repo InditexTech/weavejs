@@ -147,6 +147,10 @@ export class WeaveUsersPointersPlugin extends WeavePlugin {
 
     pointersLayer?.clear();
 
+    if (!this.enabled) {
+      return;
+    }
+
     if (this.renderCursors) {
       for (const userPointerKey of Object.keys(this.usersPointers)) {
         const userPointer = this.usersPointers[userPointerKey];
@@ -221,11 +225,19 @@ export class WeaveUsersPointersPlugin extends WeavePlugin {
 
   toggleRenderCursors() {
     this.renderCursors = !this.renderCursors;
-    // this.renderPointers();
   }
 
   setRenderCursors(render: boolean) {
     this.renderCursors = render;
-    // this.renderPointers();
+  }
+
+  enable() {
+    this.getLayer()?.show();
+    this.enabled = true;
+  }
+
+  disable() {
+    this.getLayer()?.hide();
+    this.enabled = false;
   }
 }

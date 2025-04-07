@@ -49,6 +49,12 @@ export class WeaveConnectedUsersPlugin extends WeavePlugin {
       (
         changes: WeaveAwarenessChange<WeaveConnectedUserInfoKey, WeaveUser>[]
       ) => {
+        if (!this.enabled) {
+          this.connectedUsers = {};
+          this.onConnectedUsersChanged?.({});
+          return;
+        }
+
         const newConnectedUsers: Record<string, WeaveUser> = {};
         for (const change of changes) {
           if (!change[WEAVE_CONNECTED_USER_INFO_KEY]) {
@@ -68,5 +74,13 @@ export class WeaveConnectedUsersPlugin extends WeavePlugin {
         this.connectedUsers = newConnectedUsers;
       }
     );
+  }
+
+  enable() {
+    this.enabled = true;
+  }
+
+  disable() {
+    this.enabled = false;
   }
 }

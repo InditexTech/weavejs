@@ -46,7 +46,9 @@ export class WeaveCopyPasteNodesPlugin extends WeavePlugin {
     const stage = this.instance.getStage();
 
     document.onpaste = async (event) => {
-      console.log('ON PASTE', event);
+      if (!this.enabled) {
+        return;
+      }
 
       const items = event.clipboardData?.items;
       if (!items) {
@@ -73,7 +75,6 @@ export class WeaveCopyPasteNodesPlugin extends WeavePlugin {
       try {
         const items = await navigator.clipboard.read();
         for (const item of items) {
-          console.log({ item });
           if (item.types.includes('image/png')) {
             const pngImage = await item.getType('image/png');
             this.callbacks?.onPasteExternalImage?.(pngImage);
@@ -157,6 +158,10 @@ export class WeaveCopyPasteNodesPlugin extends WeavePlugin {
   }
 
   private async performCopy() {
+    if (!this.enabled) {
+      return;
+    }
+
     this.callbacks?.onCanCopyChange?.(this.canCopy());
     this.callbacks?.onCanPasteChange?.(this.canPaste(), this.mapToPasteNodes());
 
@@ -186,8 +191,6 @@ export class WeaveCopyPasteNodesPlugin extends WeavePlugin {
       copyClipboard.weave[node.getAttrs().id ?? ''] = nodeJson;
     }
 
-    console.log('CP', { copyClipboard, json: JSON.stringify(copyClipboard) });
-
     await navigator.clipboard.writeText(JSON.stringify(copyClipboard));
 
     this.callbacks?.onCanCopyChange?.(this.canCopy());
@@ -195,6 +198,10 @@ export class WeaveCopyPasteNodesPlugin extends WeavePlugin {
   }
 
   private performPaste() {
+    if (!this.enabled) {
+      return;
+    }
+
     this.callbacks?.onCanCopyChange?.(this.canCopy());
     this.callbacks?.onCanPasteChange?.(this.canPaste(), this.mapToPasteNodes());
 
@@ -227,6 +234,10 @@ export class WeaveCopyPasteNodesPlugin extends WeavePlugin {
   }
 
   canCopy() {
+    if (!this.enabled) {
+      return false;
+    }
+
     const nodesSelectionPlugin = this.getNodesSelectionPlugin();
     const selectedNodes = nodesSelectionPlugin.getSelectedNodes();
     return (
@@ -236,6 +247,10 @@ export class WeaveCopyPasteNodesPlugin extends WeavePlugin {
   }
 
   canPaste() {
+    if (!this.enabled) {
+      return false;
+    }
+
     return this.selectedElements.length > 0;
   }
 
@@ -259,5 +274,13 @@ export class WeaveCopyPasteNodesPlugin extends WeavePlugin {
       throw new Error('Nodes selection plugin not found');
     }
     return nodesSelectionPlugin;
+  }
+
+  enable() {
+    this.enabled = true;
+  }
+
+  disable() {
+    this.enabled = false;
   }
 }

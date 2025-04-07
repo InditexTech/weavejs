@@ -138,14 +138,10 @@ export class WeaveImageToolAction extends WeaveAction {
     this.imageURL = imageURL;
 
     this.preloadImgs[this.imageId] = new Image();
-    this.preloadImgs[this.imageId].onclose = () => {
-      console.log('close');
-    };
     this.preloadImgs[this.imageId].onerror = (error) => {
       console.error(error);
     };
     this.preloadImgs[this.imageId].onload = () => {
-      console.log('loaded');
       this.imageCallbacks?.onImageLoadEnd?.();
 
       if (this.imageId) {

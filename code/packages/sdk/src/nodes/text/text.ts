@@ -183,7 +183,6 @@ export class WeaveTextNode extends WeaveNode {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const handleKeyDown = (e: any) => {
       if (textArea && textNode) {
-        console.log('keydown', e);
         // hide on enter
         // but don't hide on shift + enter
         if (e.key === 'Enter' && !e.shiftKey) {
@@ -195,7 +194,6 @@ export class WeaveTextNode extends WeaveNode {
         }
         if (e.key === 'Enter' && e.shiftKey) {
           if (textArea && textNode) {
-            console.log('AQUIIIIIIII');
             try {
               textNode.text(textArea.value);
               textArea.style.width =
@@ -224,7 +222,6 @@ export class WeaveTextNode extends WeaveNode {
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const handleKeyUp = (e: any) => {
-      console.log('keyup', e);
       textNode.text(textArea.value);
       if (textArea && textNode) {
         // textNode.text(textArea.value);
@@ -271,8 +268,6 @@ export class WeaveTextNode extends WeaveNode {
   private removeTextAreaDOM(textNode: Konva.Text) {
     const stage = this.instance.getStage();
 
-    console.log('REMOVE');
-
     window.weaveTextEditing = false;
 
     const textArea = document.getElementById(
@@ -288,7 +283,7 @@ export class WeaveTextNode extends WeaveNode {
     const selectionPlugin =
       this.instance.getPlugin<WeaveNodesSelectionPlugin>('nodesSelection');
     if (selectionPlugin) {
-      selectionPlugin.setEnabled(true);
+      this.instance.enablePlugin('nodesSelection');
       const tr = selectionPlugin.getTransformer();
       if (tr) {
         tr.nodes([textNode]);
@@ -315,7 +310,7 @@ export class WeaveTextNode extends WeaveNode {
       this.instance.getPlugin<WeaveNodesSelectionPlugin>('nodesSelection');
     if (selectionPlugin) {
       const tr = selectionPlugin.getTransformer();
-      selectionPlugin.setEnabled(false);
+      this.instance.disablePlugin('nodesSelection');
       tr.hide();
     }
 
