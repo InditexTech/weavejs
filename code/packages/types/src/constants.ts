@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2025 2025 INDUSTRIA DE DISEÑO TEXTIL S.A. (INDITEX S.A.)
+//
+// SPDX-License-Identifier: Apache-2.0
+
 export const WEAVE_NODE_LAYER_ID = 'mainLayer';
 
 export const WEAVE_INSTANCE_STATUS = {

@@ -1,0 +1,33 @@
+version = 1
+SPDX-PackageName = "weavejs"
+SPDX-PackageSupplier = "2025 INDUSTRIA DE DISEÑO TEXTIL S.A. (INDITEX S.A.)"
+SPDX-PackageDownloadLocation = "https://github.com/InditexTech/weavejs"
+
+[[annotations]]
+path = [
+    # root level licensing
+    ".github/**",
+    "images/**",
+    "REUSE.toml",
+    "repolinter.json",
+
+    # repeated files licensing
+    "**/.gitignore",
+    "**/tsconfig.json",
+    "**/package*.json",
+    "**/.eslintrc",
+
+    # code/ directory licensing
+    "code/.husky/**",
+    "code/.prettierignore",
+    "code/.prettierrc",
+    "code/.tool-versions",
+    "code/lerna.json",
+    "code/nx.json",
+    "code/tsconfig.base.json",
+
+    # code/patches/ directory licensing
+    "code/patches/**"
+]
+SPDX-FileCopyrightText = "2025 INDUSTRIA DE DISEÑO TEXTIL S.A. (INDITEX S.A.)"
+SPDX-License-Identifier = "Apache-2.0"

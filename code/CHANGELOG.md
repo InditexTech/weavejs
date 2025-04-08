@@ -1,3 +1,9 @@
+<!--
+SPDX-FileCopyrightText: 2025 2025 INDUSTRIA DE DISEÑO TEXTIL S.A. (INDITEX S.A.)
+
+SPDX-License-Identifier: Apache-2.0
+-->
+
 # Changelog
 
 All notable changes to this project will be documented in this file.
