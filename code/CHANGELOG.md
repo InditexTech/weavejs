@@ -9,6 +9,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [0.20.0] - 2025-04-07
 
+- [#74](https://github.com/InditexTech/weavejs/issues/74) Improve grid plugin performance
+
 ### Added
 
 - [#71](https://github.com/InditexTech/weavejs/issues/71) Grid plugin, define two types: lines and dots
