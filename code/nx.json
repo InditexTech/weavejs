@@ -28,6 +28,10 @@
       "dependsOn": ["^release:perform"],
       "cache": true
     },
+    "test": {
+      "dependsOn": ["^test"],
+      "cache": true
+    },
     "verify": {
       "dependsOn": ["^verify"],
       "cache": true

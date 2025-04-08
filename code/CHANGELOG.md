@@ -13,6 +13,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- [#74](https://github.com/InditexTech/weavejs/issues/74) Improve grid plugin performance
+
 ## [0.20.0] - 2025-04-07
 
 ### Added

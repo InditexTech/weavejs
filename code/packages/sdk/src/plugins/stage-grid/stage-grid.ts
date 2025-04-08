@@ -16,7 +16,7 @@ export class WeaveStageGridPlugin extends WeavePlugin {
   constructor(params: WeaveStageGridPluginParams) {
     super();
 
-    const { gridSize = 50 } = params;
+    const { gridSize = 100 } = params;
 
     this.gridSize = gridSize;
   }
@@ -36,7 +36,10 @@ export class WeaveStageGridPlugin extends WeavePlugin {
   initLayer() {
     const stage = this.instance.getStage();
 
-    const layer = new Konva.Layer({ id: this.getLayerName() });
+    const layer = new Konva.Layer({
+      id: this.getLayerName(),
+      listening: false,
+    });
     stage.add(layer);
   }
 
@@ -48,7 +51,7 @@ export class WeaveStageGridPlugin extends WeavePlugin {
   private initEvents() {
     const stage = this.instance.getStage();
 
-    stage.on('mousemove', (e) => {
+    stage.on('mousemove touchmove', (e) => {
       e.evt.preventDefault();
       this.render();
     });
@@ -102,7 +105,7 @@ export class WeaveStageGridPlugin extends WeavePlugin {
 
     const stage = this.instance.getStage();
 
-    const size = stage.width() / this.gridSize;
+    const size = stage.width() / (this.gridSize * stage.scaleX());
 
     const delta = 2 * size;
 
@@ -124,6 +127,7 @@ export class WeaveStageGridPlugin extends WeavePlugin {
     for (let row = 0; row <= numRows; row++) {
       const pageY = row * size + startPageY;
       const canvasY = pageY - 2 * startPageY;
+
       layer.add(
         new Line({
           points: [
@@ -132,8 +136,9 @@ export class WeaveStageGridPlugin extends WeavePlugin {
             (stage.width() - stage.x() + 2 * delta) / stage.scaleX(),
             canvasY,
           ],
-          stroke: 'rgba(0, 0, 0, 0.2)',
-          strokeWidth: 0.5,
+          stroke: '#cccccc',
+          strokeWidth: 1.5 / stage.scaleX(),
+          listening: false,
         })
       );
     }
@@ -141,6 +146,7 @@ export class WeaveStageGridPlugin extends WeavePlugin {
     for (let col = 0; col <= numCols; col++) {
       const pageX = col * size + startPageX;
       const canvasX = pageX - 2 * startPageX;
+
       layer.add(
         new Line({
           points: [
@@ -149,8 +155,9 @@ export class WeaveStageGridPlugin extends WeavePlugin {
             canvasX,
             (stage.height() - stage.y() + 2 * delta) / stage.scaleY(),
           ],
-          stroke: 'rgba(0, 0, 0, 0.2)',
-          strokeWidth: 0.5,
+          stroke: '#cccccc',
+          strokeWidth: 1.5 / stage.scaleX(),
+          listening: false,
         })
       );
     }
@@ -165,7 +172,7 @@ export class WeaveStageGridPlugin extends WeavePlugin {
 
     const stage = this.instance.getStage();
 
-    const size = stage.width() / this.gridSize;
+    const size = stage.width() / (this.gridSize * stage.scaleX());
 
     const delta = 2 * size;
 
@@ -196,10 +203,11 @@ export class WeaveStageGridPlugin extends WeavePlugin {
           new Circle({
             x: canvasX,
             y: canvasY,
-            radius: 1,
-            fill: 'rgba(0, 0, 0, 0.2)',
-            stroke: 'rgba(0, 0, 0, 0.2)',
+            radius: 1.5 / stage.scaleX(),
+            fill: '#cccccc',
+            stroke: '#cccccc',
             strokeWidth: 0,
+            listening: false,
           })
         );
       }
@@ -213,11 +221,13 @@ export class WeaveStageGridPlugin extends WeavePlugin {
   enable() {
     this.enabled = true;
     this.getLayer()?.show();
+    this.render();
   }
 
   disable() {
     this.enabled = false;
     this.getLayer()?.hide();
+    this.render();
   }
 
   getType() {
