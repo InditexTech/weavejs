@@ -2,8 +2,10 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-export type WeaveStageDropCallback = (event: Event) => void;
+export type WeaveStageDropCallback = (event: DragEvent) => void;
+export type WeaveStageDropUploadFileCallback = (event: File) => Promise<void>;
 
 export type WeaveStageDropAreaPluginCallbacks = {
   onStageDrop?: WeaveStageDropCallback;
+  doUploadFile?: WeaveStageDropUploadFileCallback;
 };

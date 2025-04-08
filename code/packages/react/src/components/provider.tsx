@@ -195,7 +195,13 @@ export const WeaveProvider = ({
               onNodesChange,
             })
           );
-          instancePlugins.push(new WeaveStageDropAreaPlugin());
+          instancePlugins.push(
+            new WeaveStageDropAreaPlugin({
+              onStageDrop: (e) => {
+                callbacks?.onDrop?.(e);
+              },
+            })
+          );
           instancePlugins.push(
             new WeaveConnectedUsersPlugin({
               onConnectedUsersChanged: (users: WeaveConnectedUsersChanged) => {

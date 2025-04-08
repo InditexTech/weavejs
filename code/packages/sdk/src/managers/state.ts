@@ -149,7 +149,10 @@ export class WeaveStateManager {
           return;
         }
 
-        if (!parent.props.children) {
+        if (
+          !parent.props.children ||
+          typeof parent.props.children === 'undefined'
+        ) {
           parent.props.children = [];
         }
 
