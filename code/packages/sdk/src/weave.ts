@@ -4,6 +4,7 @@
 
 import Emittery from 'emittery';
 import Konva from 'konva';
+import { v4 as uuidv4 } from 'uuid';
 import { Vector2d } from 'konva/lib/types';
 import { Logger } from 'pino';
 import {
@@ -40,6 +41,7 @@ import { WeaveExportManager } from './managers/export';
 import { WeavePluginsManager } from './managers/plugins';
 
 export class Weave extends Emittery {
+  private id: string;
   private config: WeaveConfig;
   private logger: WeaveLogger;
   private moduleLogger: Logger;
@@ -66,6 +68,9 @@ export class Weave extends Emittery {
     super();
 
     Konva.showWarnings = false;
+
+    // Setup instance id
+    this.id = uuidv4();
 
     // Save in memory the configuration provided
     this.config = weaveConfig;
@@ -195,6 +200,10 @@ export class Weave extends Emittery {
     }
 
     this.moduleLogger.info(`Instance destroyed`);
+  }
+
+  getId() {
+    return this.id;
   }
 
   // CONFIGURATION
@@ -455,6 +464,10 @@ export class Weave extends Emittery {
   }
 
   // CLONING MANAGEMENT METHODS PROXIES
+
+  nodesToGroupSerialized(instancesToClone: Konva.Node[]) {
+    return this.cloningManager.nodesToGroupSerialized(instancesToClone);
+  }
 
   cloneNodes(
     instancesToClone: Konva.Node[],
