@@ -72,7 +72,7 @@ export class WeaveContextMenuPlugin extends WeavePlugin {
         }
       }
 
-      if (e.target === stage && !clickOnTransformer) {
+      if (e.target !== stage && !clickOnTransformer) {
         return;
       }
 
@@ -96,18 +96,16 @@ export class WeaveContextMenuPlugin extends WeavePlugin {
           .filter((node) => node !== undefined);
       }
 
-      if (nodes.length > 0) {
-        const containerRect = stage.container().getBoundingClientRect();
-        const pointerPos = stage.getPointerPosition();
+      const containerRect = stage.container().getBoundingClientRect();
+      const pointerPos = stage.getPointerPosition();
 
-        if (containerRect && pointerPos) {
-          const point: Vector2d = {
-            x: containerRect.left + pointerPos.x + (this.config.xOffset ?? 4),
-            y: containerRect.top + pointerPos.y + (this.config.yOffset ?? 4),
-          };
+      if (containerRect && pointerPos) {
+        const point: Vector2d = {
+          x: containerRect.left + pointerPos.x + (this.config.xOffset ?? 4),
+          y: containerRect.top + pointerPos.y + (this.config.yOffset ?? 4),
+        };
 
-          this.callbacks.onNodeMenu?.(this.instance, nodes, point);
-        }
+        this.callbacks.onNodeMenu?.(this.instance, nodes, point);
       }
     });
   }

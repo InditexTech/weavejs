@@ -15,6 +15,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- [#77](https://github.com/InditexTech/weavejs/issues/77) Copy/paste between rooms in different tabs
 - [#76](https://github.com/InditexTech/weavejs/issues/76) Drag & Drop images from local computer
 
 ## [0.20.1] - 2025-04-08

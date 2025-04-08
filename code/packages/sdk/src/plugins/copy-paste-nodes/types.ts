@@ -4,7 +4,11 @@
 
 import Konva from 'konva';
 import { COPY_PASTE_NODES_PLUGIN_STATE } from './constants';
-import { NodeSerializable } from '@inditextech/weavejs-types';
+import {
+  NodeSerializable,
+  WeaveStateElement,
+} from '@inditextech/weavejs-types';
+import { Vector2d } from 'konva/lib/types';
 
 export type WeaveCopyPasteNodesPluginStateKeys =
   keyof typeof COPY_PASTE_NODES_PLUGIN_STATE;
@@ -18,14 +22,18 @@ export type WeaveCopyPasteNodesCanPasteChangeCallback = (
   canPaste: boolean,
   nodes: WeaveToPasteNode[]
 ) => void;
-export type WeaveCopyPasteNodesOnPasteExternalImageCallback = (
-  blob: Blob
+export type WeaveCopyPasteNodesOnPasteExternalCallback = (
+  item: ClipboardItem
 ) => void;
 
 export type WeaveCopyPasteNodesPluginCallbacks = {
-  onCanCopyChange?: WeaveCopyPasteNodesCanCopyChangeCallback;
-  onCanPasteChange?: WeaveCopyPasteNodesCanPasteChangeCallback;
-  onPasteExternalImage?: WeaveCopyPasteNodesOnPasteExternalImageCallback;
+  onPasteExternal?: WeaveCopyPasteNodesOnPasteExternalCallback;
+};
+
+export type WeavePasteModel = {
+  weaveInstanceId: string;
+  weave: Record<string, WeaveStateElement>;
+  weaveMinPoint: Vector2d;
 };
 
 export type WeaveToPasteNode = {

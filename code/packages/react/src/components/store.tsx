@@ -2,11 +2,7 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-import {
-  Weave,
-  WeaveConnectedUsersChanged,
-  WeaveToPasteNode,
-} from '@inditextech/weavejs-sdk';
+import { Weave, WeaveConnectedUsersChanged } from '@inditextech/weavejs-sdk';
 import {
   WEAVE_INSTANCE_STATUS,
   WeaveSelection,
@@ -37,12 +33,6 @@ interface WeaveRuntimeState {
     canZoomIn: boolean;
     canZoomOut: boolean;
   };
-  copyPaste: {
-    blobToPaste: Blob | null;
-    canCopy: boolean;
-    canPaste: boolean;
-    copiedNodes: WeaveToPasteNode[];
-  };
   selection: {
     nodes: WeaveSelection[];
     node: WeaveStateElement | undefined;
@@ -64,10 +54,6 @@ interface WeaveRuntimeState {
   setZoom: (newZoom: number) => void;
   setCanZoomIn: (newCanZoomIn: boolean) => void;
   setCanZoomOut: (newCanZoomOut: boolean) => void;
-  setBlobToPaste: (newBlobToPaste: Blob | null) => void;
-  setCanCopy: (newCanCopy: boolean) => void;
-  setCanPaste: (newCanPaste: boolean) => void;
-  setCopiedNodes: (newCopiedNodes: WeaveToPasteNode[]) => void;
   setSelectedNodes: (newSelectedNodes: WeaveSelection[]) => void;
   setNode: (newNode: WeaveStateElement | undefined) => void;
   setActualAction: (newActualAction: string | undefined) => void;
@@ -92,12 +78,6 @@ export const useWeave = create<WeaveRuntimeState>()((set) => ({
     value: 1,
     canZoomIn: false,
     canZoomOut: false,
-  },
-  copyPaste: {
-    blobToPaste: null,
-    canCopy: false,
-    canPaste: false,
-    copiedNodes: [],
   },
   contextMenu: {
     show: false,
@@ -146,26 +126,6 @@ export const useWeave = create<WeaveRuntimeState>()((set) => ({
     set((state) => ({
       ...state,
       zoom: { ...state.zoom, canZoomOut: newCanZoomOut },
-    })),
-  setBlobToPaste: (newBlobToPaste) =>
-    set((state) => ({
-      ...state,
-      copyPaste: { ...state.copyPaste, blobToPaste: newBlobToPaste },
-    })),
-  setCanCopy: (newCanCopy) =>
-    set((state) => ({
-      ...state,
-      copyPaste: { ...state.copyPaste, canCopy: newCanCopy },
-    })),
-  setCanPaste: (newCanPaste) =>
-    set((state) => ({
-      ...state,
-      copyPaste: { ...state.copyPaste, canPaste: newCanPaste },
-    })),
-  setCopiedNodes: (newCopiedNodes) =>
-    set((state) => ({
-      ...state,
-      copyPaste: { ...state.copyPaste, copiedNodes: newCopiedNodes },
     })),
   setSelectedNodes: (newSelectedNodes) =>
     set((state) => ({

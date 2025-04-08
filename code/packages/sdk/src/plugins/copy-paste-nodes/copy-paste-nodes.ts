@@ -4,24 +4,23 @@
 
 import { WeavePlugin } from '@/plugins/plugin';
 import { v4 as uuidv4 } from 'uuid';
-import Konva from 'konva';
 import {
   NodeSerializable,
-  WeaveElementInstance,
   WeaveStateElement,
 } from '@inditextech/weavejs-types';
 import { COPY_PASTE_NODES_PLUGIN_STATE } from './constants';
 import { WeaveNodesSelectionPlugin } from '../nodes-selection/nodes-selection';
-import { WeaveNodesSelectionChangeCallback } from '../nodes-selection/types';
 import {
   WeaveCopyPasteNodesPluginCallbacks,
   WeaveCopyPasteNodesPluginState,
+  WeavePasteModel,
 } from './types';
+import { Vector2d } from 'konva/lib/types';
 
 export class WeaveCopyPasteNodesPlugin extends WeavePlugin {
-  protected selectedElements: (Konva.Group | Konva.Shape)[];
   protected state: WeaveCopyPasteNodesPluginState;
   private callbacks: WeaveCopyPasteNodesPluginCallbacks | undefined;
+  private toPaste: WeavePasteModel | undefined;
   getLayerName: undefined;
   initLayer: undefined;
   render: undefined;
@@ -31,7 +30,6 @@ export class WeaveCopyPasteNodesPlugin extends WeavePlugin {
 
     this.callbacks = callbacks;
     this.state = COPY_PASTE_NODES_PLUGIN_STATE.IDLE;
-    this.selectedElements = [];
   }
 
   registersLayers() {
@@ -46,8 +44,24 @@ export class WeaveCopyPasteNodesPlugin extends WeavePlugin {
     this.initEvents();
   }
 
+  private async readClipboardData() {
+    const object = JSON.parse(await navigator.clipboard.readText());
+    if (object.weave && object.weaveMinPoint) {
+      this.toPaste = {
+        weaveInstanceId: object.weaveInstanceId,
+        weave: object.weave,
+        weaveMinPoint: object.weaveMinPoint,
+      };
+    }
+  }
+
   private initEvents() {
     const stage = this.instance.getStage();
+
+    document.oncopy = async () => {
+      this.performCopy();
+      return;
+    };
 
     document.onpaste = async (event) => {
       if (!this.enabled) {
@@ -60,40 +74,17 @@ export class WeaveCopyPasteNodesPlugin extends WeavePlugin {
       }
 
       try {
-        const object = JSON.parse(await navigator.clipboard.readText());
-        if (object.weave) {
-          // TODO: Handle paste for single item, select where to put it
-          for (const element of Object.keys(object.weave)) {
-            const node = object.weave[element];
-            const newNodeId = uuidv4();
-            node.key = newNodeId;
-            node.props.id = newNodeId;
-            node.props.x = 0;
-            node.props.y = 0;
-            this.instance.addNode(node);
-          }
-        }
+        await this.readClipboardData();
+        this.performPaste();
         // eslint-disable-next-line @typescript-eslint/no-unused-vars, no-empty
       } catch (ex) {}
 
       try {
         const items = await navigator.clipboard.read();
-        for (const item of items) {
-          if (item.types.includes('image/png')) {
-            const pngImage = await item.getType('image/png');
-            this.callbacks?.onPasteExternalImage?.(pngImage);
-            break;
-          }
-          if (item.types.includes('image/jpeg')) {
-            const jpegImage = await item.getType('image/jpeg');
-            this.callbacks?.onPasteExternalImage?.(jpegImage);
-            break;
-          }
-          if (item.types.includes('image/gif')) {
-            const gifImage = await item.getType('image/gif');
-            this.callbacks?.onPasteExternalImage?.(gifImage);
-            break;
-          }
+        if (items && items.length === 1) {
+          const item = items[0];
+          this.callbacks?.onPasteExternal?.(item);
+          this.instance.emitEvent('onPasteExternal', item);
         }
         // eslint-disable-next-line @typescript-eslint/no-unused-vars, no-empty
       } catch (ex) {}
@@ -102,15 +93,6 @@ export class WeaveCopyPasteNodesPlugin extends WeavePlugin {
     stage.container().addEventListener('keydown', (e) => {
       if (e.key === 'Escape') {
         this.cancel();
-        return;
-      }
-
-      if (e.key === 'c' && (e.metaKey || e.ctrlKey)) {
-        this.performCopy();
-        return;
-      }
-      if (e.key === 'v' && (e.metaKey || e.ctrlKey)) {
-        this.performPaste();
         return;
       }
     });
@@ -127,21 +109,13 @@ export class WeaveCopyPasteNodesPlugin extends WeavePlugin {
         return;
       }
     });
-
-    this.instance.addEventListener<WeaveNodesSelectionChangeCallback>(
-      'onNodesChange',
-      () => {
-        this.callbacks?.onCanCopyChange?.(this.canCopy());
-        this.callbacks?.onCanPasteChange?.(
-          this.canPaste(),
-          this.mapToPasteNodes()
-        );
-      }
-    );
   }
 
   private mapToPasteNodes() {
-    return this.selectedElements.map((node) => ({
+    const nodesSelectionPlugin = this.getNodesSelectionPlugin();
+    const selectedNodes = nodesSelectionPlugin.getSelectedNodes();
+
+    return selectedNodes.map((node) => ({
       konvaNode: node,
       node: node.getAttrs() as NodeSerializable,
     }));
@@ -152,11 +126,23 @@ export class WeaveCopyPasteNodesPlugin extends WeavePlugin {
   }
 
   private handlePaste() {
-    const { mousePoint, container } = this.instance.getMousePointer();
+    if (this.toPaste) {
+      const { mousePoint, container } = this.instance.getMousePointer();
 
-    this.instance.cloneNodes(this.selectedElements, container, mousePoint);
+      for (const element of Object.keys(this.toPaste.weave)) {
+        const node = this.toPaste.weave[element];
+        const newNodeId = uuidv4();
+        node.key = newNodeId;
+        node.props.id = newNodeId;
+        node.props.x =
+          mousePoint.x + (node.props.x - this.toPaste.weaveMinPoint.x);
+        node.props.y =
+          mousePoint.y + (node.props.y - this.toPaste.weaveMinPoint.y);
+        this.instance.addNode(node, container?.getAttr('id'));
+      }
 
-    this.selectedElements = [];
+      this.toPaste = undefined;
+    }
 
     this.cancel();
   }
@@ -165,9 +151,6 @@ export class WeaveCopyPasteNodesPlugin extends WeavePlugin {
     if (!this.enabled) {
       return;
     }
-
-    this.callbacks?.onCanCopyChange?.(this.canCopy());
-    this.callbacks?.onCanPasteChange?.(this.canPaste(), this.mapToPasteNodes());
 
     const stage = this.instance.getStage();
 
@@ -182,23 +165,30 @@ export class WeaveCopyPasteNodesPlugin extends WeavePlugin {
       return;
     }
 
-    this.selectedElements = selectedNodes;
-
-    const copyClipboard: { weave: Record<string, WeaveStateElement> } = {
+    const copyClipboard: {
+      weaveInstanceId: string;
+      weave: Record<string, WeaveStateElement>;
+      weaveMinPoint: Vector2d;
+    } = {
+      weaveInstanceId: this.instance.getId(),
       weave: {},
+      weaveMinPoint: { x: 0, y: 0 },
     };
-    for (const node of this.selectedElements) {
-      const nodeHandler = this.instance.getNodeHandler(
-        node.getAttrs().nodeType
-      );
-      const nodeJson = nodeHandler.toNode(node as WeaveElementInstance);
-      copyClipboard.weave[node.getAttrs().id ?? ''] = nodeJson;
+
+    const result = this.instance.nodesToGroupSerialized(selectedNodes);
+    console.log({
+      selectedNodes,
+      serializedNodes: result?.serializedNodes,
+      minPoint: result?.minPoint,
+    });
+    if (result && result.serializedNodes && result.serializedNodes.length > 0) {
+      copyClipboard.weaveMinPoint = result.minPoint;
+      for (const serializedNode of result.serializedNodes) {
+        copyClipboard.weave[serializedNode.key ?? ''] = serializedNode;
+      }
+
+      await navigator.clipboard.writeText(JSON.stringify(copyClipboard));
     }
-
-    await navigator.clipboard.writeText(JSON.stringify(copyClipboard));
-
-    this.callbacks?.onCanCopyChange?.(this.canCopy());
-    this.callbacks?.onCanPasteChange?.(this.canPaste(), this.mapToPasteNodes());
   }
 
   private performPaste() {
@@ -206,26 +196,20 @@ export class WeaveCopyPasteNodesPlugin extends WeavePlugin {
       return;
     }
 
-    this.callbacks?.onCanCopyChange?.(this.canCopy());
-    this.callbacks?.onCanPasteChange?.(this.canPaste(), this.mapToPasteNodes());
-
     const stage = this.instance.getStage();
-
-    if (this.selectedElements.length === 0) {
-      return;
-    }
 
     stage.container().style.cursor = 'crosshair';
     stage.container().focus();
 
-    this.setState(COPY_PASTE_NODES_PLUGIN_STATE.PASTING);
+    this.state = COPY_PASTE_NODES_PLUGIN_STATE.PASTING;
   }
 
   async copy() {
     await this.performCopy();
   }
 
-  paste() {
+  async paste() {
+    await this.readClipboardData();
     this.performPaste();
   }
 
@@ -237,38 +221,14 @@ export class WeaveCopyPasteNodesPlugin extends WeavePlugin {
     return this.state === COPY_PASTE_NODES_PLUGIN_STATE.PASTING;
   }
 
-  canCopy() {
-    if (!this.enabled) {
-      return false;
-    }
-
-    const nodesSelectionPlugin = this.getNodesSelectionPlugin();
-    const selectedNodes = nodesSelectionPlugin.getSelectedNodes();
-    return (
-      this.state === COPY_PASTE_NODES_PLUGIN_STATE.IDLE &&
-      selectedNodes.length > 0
-    );
-  }
-
-  canPaste() {
-    if (!this.enabled) {
-      return false;
-    }
-
-    return this.selectedElements.length > 0;
-  }
-
   private cancel() {
     const stage = this.instance.getStage();
 
     stage.container().style.cursor = 'default';
     stage.container().focus();
 
-    this.selectedElements = [];
+    this.toPaste = undefined;
     this.setState(COPY_PASTE_NODES_PLUGIN_STATE.IDLE);
-
-    this.callbacks?.onCanCopyChange?.(this.canCopy());
-    this.callbacks?.onCanPasteChange?.(this.canPaste(), this.mapToPasteNodes());
   }
 
   private getNodesSelectionPlugin() {

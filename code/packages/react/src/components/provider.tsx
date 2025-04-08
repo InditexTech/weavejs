@@ -71,13 +71,9 @@ export const WeaveProvider = ({
   const setZoom = useWeave((state) => state.setZoom);
   const setCanZoomIn = useWeave((state) => state.setCanZoomIn);
   const setCanZoomOut = useWeave((state) => state.setCanZoomOut);
-  const setBlobToPaste = useWeave((state) => state.setBlobToPaste);
-  const setCanCopy = useWeave((state) => state.setCanCopy);
-  const setCanPaste = useWeave((state) => state.setCanPaste);
   const setSelectedNodes = useWeave((state) => state.setSelectedNodes);
   const setNode = useWeave((state) => state.setNode);
   const setActualAction = useWeave((state) => state.setActualAction);
-  const setCopiedNodes = useWeave((state) => state.setCopiedNodes);
 
   const {
     onInstanceStatus,
@@ -195,13 +191,7 @@ export const WeaveProvider = ({
               onNodesChange,
             })
           );
-          instancePlugins.push(
-            new WeaveStageDropAreaPlugin({
-              onStageDrop: (e) => {
-                callbacks?.onDrop?.(e);
-              },
-            })
-          );
+          instancePlugins.push(new WeaveStageDropAreaPlugin({}));
           instancePlugins.push(
             new WeaveConnectedUsersPlugin({
               onConnectedUsersChanged: (users: WeaveConnectedUsersChanged) => {
@@ -215,20 +205,7 @@ export const WeaveProvider = ({
               getUser,
             })
           );
-          instancePlugins.push(
-            new WeaveCopyPasteNodesPlugin({
-              onCanCopyChange: (actCanCopy: boolean) => {
-                setCanCopy(actCanCopy);
-              },
-              onCanPasteChange: (actCanPaste, nodes) => {
-                setCanPaste(actCanPaste);
-                setCopiedNodes(nodes);
-              },
-              onPasteExternalImage: (blob) => {
-                setBlobToPaste(blob);
-              },
-            })
-          );
+          instancePlugins.push(new WeaveCopyPasteNodesPlugin({}));
         }
 
         weaveInstance = new Weave(
