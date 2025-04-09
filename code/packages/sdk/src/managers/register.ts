@@ -74,12 +74,6 @@ export class WeaveRegisterManager {
 
   registerPlugin(plugin: WeavePlugin) {
     const pluginName = plugin.getName();
-    if (this.plugins[pluginName]) {
-      const msg = `Plugin with name [${pluginName}] already exists`;
-      this.logger.error(msg);
-      throw new Error(msg);
-    }
-
     plugin.register(this.instance);
     this.plugins[pluginName] = plugin;
   }

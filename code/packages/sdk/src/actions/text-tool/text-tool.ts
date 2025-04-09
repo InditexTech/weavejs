@@ -58,7 +58,7 @@ export class WeaveTextToolAction extends WeaveAction {
       }
     });
 
-    stage.on('mousemove', (e) => {
+    stage.on('mousemove touchmove', (e) => {
       e.evt.preventDefault();
     });
 

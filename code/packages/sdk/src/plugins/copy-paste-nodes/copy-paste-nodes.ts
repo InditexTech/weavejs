@@ -44,15 +44,54 @@ export class WeaveCopyPasteNodesPlugin extends WeavePlugin {
     this.initEvents();
   }
 
-  private async readClipboardData() {
-    const object = JSON.parse(await navigator.clipboard.readText());
-    if (object.weave && object.weaveMinPoint) {
-      this.toPaste = {
-        weaveInstanceId: object.weaveInstanceId,
-        weave: object.weave,
-        weaveMinPoint: object.weaveMinPoint,
-      };
-    }
+  private readClipboardData() {
+    return new Promise<void>((resolve, reject) => {
+      setTimeout(async () => {
+        if (typeof navigator.clipboard === 'undefined') {
+          return reject(new Error('Clipboard API not supported'));
+        }
+
+        navigator.clipboard
+          .readText()
+          .then((text) => {
+            try {
+              const object = JSON.parse(text);
+              if (object.weave && object.weaveMinPoint) {
+                this.toPaste = {
+                  weaveInstanceId: object.weaveInstanceId,
+                  weave: object.weave,
+                  weaveMinPoint: object.weaveMinPoint,
+                };
+              }
+              resolve();
+            } catch (ex) {
+              reject(ex);
+            }
+          })
+          .catch((error) => {
+            reject(error);
+          });
+      });
+    });
+  }
+
+  private writeClipboardData(data: string) {
+    return new Promise<void>((resolve, reject) => {
+      setTimeout(async () => {
+        if (typeof navigator.clipboard === 'undefined') {
+          return reject(new Error('Clipboard API not supported'));
+        }
+
+        navigator.clipboard
+          .writeText(data)
+          .then(() => {
+            resolve();
+          })
+          .catch((error) => {
+            reject(error);
+          });
+      });
+    });
   }
 
   private initEvents() {
@@ -77,17 +116,24 @@ export class WeaveCopyPasteNodesPlugin extends WeavePlugin {
         await this.readClipboardData();
         this.performPaste();
         // eslint-disable-next-line @typescript-eslint/no-unused-vars, no-empty
-      } catch (ex) {}
+      } catch (ex) {
+        this.callbacks?.onPaste?.(ex as Error);
+        this.instance.emitEvent('onPaste', ex as Error);
+      }
 
       try {
         const items = await navigator.clipboard.read();
         if (items && items.length === 1) {
           const item = items[0];
+
           this.callbacks?.onPasteExternal?.(item);
           this.instance.emitEvent('onPasteExternal', item);
         }
         // eslint-disable-next-line @typescript-eslint/no-unused-vars, no-empty
-      } catch (ex) {}
+      } catch (ex) {
+        this.callbacks?.onPaste?.(ex as Error);
+        this.instance.emitEvent('onPaste', ex as Error);
+      }
     };
 
     stage.container().addEventListener('keydown', (e) => {
@@ -139,6 +185,9 @@ export class WeaveCopyPasteNodesPlugin extends WeavePlugin {
         node.props.y =
           mousePoint.y + (node.props.y - this.toPaste.weaveMinPoint.y);
         this.instance.addNode(node, container?.getAttr('id'));
+
+        this.callbacks?.onPaste?.();
+        this.instance.emitEvent('onPaste', undefined);
       }
 
       this.toPaste = undefined;
@@ -176,18 +225,20 @@ export class WeaveCopyPasteNodesPlugin extends WeavePlugin {
     };
 
     const result = this.instance.nodesToGroupSerialized(selectedNodes);
-    console.log({
-      selectedNodes,
-      serializedNodes: result?.serializedNodes,
-      minPoint: result?.minPoint,
-    });
     if (result && result.serializedNodes && result.serializedNodes.length > 0) {
       copyClipboard.weaveMinPoint = result.minPoint;
       for (const serializedNode of result.serializedNodes) {
         copyClipboard.weave[serializedNode.key ?? ''] = serializedNode;
       }
 
-      await navigator.clipboard.writeText(JSON.stringify(copyClipboard));
+      try {
+        await this.writeClipboardData(JSON.stringify(copyClipboard));
+        this.callbacks?.onCopy?.();
+        this.instance.emitEvent('onCopy', undefined);
+      } catch (ex) {
+        this.callbacks?.onCopy?.(ex as Error);
+        this.instance.emitEvent('onCopy', ex as Error);
+      }
     }
   }
 

@@ -26,9 +26,16 @@ export * from './nodes/frame/constants';
 
 // Provided Actions
 export { WeaveZoomOutToolAction } from './actions/zoom-out-tool/zoom-out-tool';
+export * from './actions/zoom-out-tool/types';
 export { WeaveZoomInToolAction } from './actions/zoom-in-tool/zoom-in-tool';
+export * from './actions/zoom-in-tool/types';
 export { WeaveFitToScreenToolAction } from './actions/fit-to-screen-tool/fit-to-screen-tool';
+export * from './actions/fit-to-screen-tool/types';
 export { WeaveFitToSelectionToolAction } from './actions/fit-to-selection-tool/fit-to-selection-tool';
+export * from './actions/fit-to-selection-tool/types';
+export { WeaveMoveToolAction } from './actions/move-tool/move-tool';
+export * from './actions/move-tool/constants';
+export * from './actions/move-tool/types';
 export { WeaveSelectionToolAction } from './actions/selection-tool/selection-tool';
 export * from './actions/selection-tool/constants';
 export * from './actions/selection-tool/types';

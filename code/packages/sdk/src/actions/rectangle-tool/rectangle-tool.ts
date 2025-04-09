@@ -69,7 +69,7 @@ export class WeaveRectangleToolAction extends WeaveAction {
       }
     });
 
-    stage.on('mousedown', (e) => {
+    stage.on('mousedown touchstart', (e) => {
       e.evt.preventDefault();
 
       if (this.state === RECTANGLE_TOOL_STATE.ADDING) {
@@ -79,7 +79,7 @@ export class WeaveRectangleToolAction extends WeaveAction {
       }
     });
 
-    stage.on('mousemove', (e) => {
+    stage.on('mousemove touchmove', (e) => {
       e.evt.preventDefault();
 
       if (this.state === RECTANGLE_TOOL_STATE.DEFINING_SIZE) {
@@ -89,7 +89,7 @@ export class WeaveRectangleToolAction extends WeaveAction {
       }
     });
 
-    stage.on('mouseup', (e) => {
+    stage.on('mouseup touchend', (e) => {
       e.evt.preventDefault();
 
       if (this.state === RECTANGLE_TOOL_STATE.DEFINING_SIZE) {

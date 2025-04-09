@@ -7,6 +7,7 @@ import Konva from 'konva';
 import { WeavePlugin } from '@/plugins/plugin';
 import { WEAVE_NODES_SELECTION_LAYER_ID } from './constants';
 import { WeaveNodesSelectionPluginCallbacks } from './types';
+import { WeaveContextMenuPlugin } from '../context-menu/context-menu';
 
 export class WeaveNodesSelectionPlugin extends WeavePlugin {
   private tr!: Konva.Transformer;
@@ -58,7 +59,8 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
     const selectionRectangle = new Konva.Rect({
       fill: 'rgba(147, 197, 253, 0.25)',
       stroke: '#1e40afff',
-      dash: [12, 4],
+      strokeWidth: 1 * stage.scaleX(),
+      dash: [12 * stage.scaleX(), 4 * stage.scaleX()],
       visible: false,
       // disable events to not interrupt with events
       listening: false,
@@ -108,7 +110,7 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
     this.tr = tr;
     this.selectionRectangle = selectionRectangle;
 
-    this.tr.on('dblclick', (evt) => {
+    this.tr.on('dblclick dbltap', (evt) => {
       evt.cancelBubble = true;
 
       if (this.tr.getNodes().length === 1) {
@@ -205,7 +207,7 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
         return;
       }
 
-      if (e.evt.button !== 0) {
+      if (e.evt.button && e.evt.button !== 0) {
         return;
       }
 
@@ -227,6 +229,8 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
       x2 = intStage.getRelativePointerPosition()?.x ?? 0;
       y2 = intStage.getRelativePointerPosition()?.y ?? 0;
 
+      this.selectionRectangle.strokeWidth(1 / stage.scaleX());
+      this.selectionRectangle.dash([12 / stage.scaleX(), 4 / stage.scaleX()]);
       this.selectionRectangle.width(0);
       this.selectionRectangle.height(0);
       this.selecting = true;
@@ -369,6 +373,10 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
         return;
       }
 
+      const contextMenuPlugin = this.instance.getPlugin('contextMenu') as
+        | WeaveContextMenuPlugin
+        | undefined;
+
       if (this.cameFromSelectingMultiple) {
         this.cameFromSelectingMultiple = false;
         return;
@@ -388,7 +396,7 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
         return;
       }
 
-      if (e.evt.button !== 0) {
+      if (e.evt.button && e.evt.button !== 0) {
         return;
       }
 
@@ -401,6 +409,13 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
       if (e.target instanceof Konva.Stage && !selectedGroup) {
         this.tr.nodes([]);
         this.triggerSelectedNodesEvent();
+
+        // Check if context menu is triggered on this same event
+        if (contextMenuPlugin && !contextMenuPlugin.isTapHold()) {
+          this.callbacks?.onStageSelection?.();
+          this.instance.emitEvent('onStageSelection', undefined);
+        }
+
         return;
       }
 

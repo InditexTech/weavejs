@@ -10,14 +10,20 @@ import { WeaveStageGridPluginParams, WeaveStageGridType } from './types';
 import { Circle } from 'konva/lib/shapes/Circle';
 
 export class WeaveStageGridPlugin extends WeavePlugin {
+  private isMouseMiddleButtonPressed: boolean;
+  private isSpaceKeyPressed: boolean;
   private type: WeaveStageGridType = 'lines';
+  private gridColor: string = 'rgba(0,0,0,0.2)';
+  private originColor: string = 'rgba(255,0,0,0.2)';
   private gridSize: number;
 
   constructor(params: WeaveStageGridPluginParams) {
     super();
 
-    const { gridSize = 100 } = params;
+    const { gridSize = 50 } = params;
 
+    this.isMouseMiddleButtonPressed = false;
+    this.isSpaceKeyPressed = false;
     this.gridSize = gridSize;
   }
 
@@ -51,13 +57,66 @@ export class WeaveStageGridPlugin extends WeavePlugin {
   private initEvents() {
     const stage = this.instance.getStage();
 
-    stage.on('mousemove touchmove', (e) => {
+    stage.container().addEventListener('keydown', (e) => {
+      if (e.code === 'Space') {
+        this.isSpaceKeyPressed = true;
+      }
+    });
+
+    stage.container().addEventListener('keyup', (e) => {
+      if (e.code === 'Space') {
+        this.isSpaceKeyPressed = false;
+      }
+    });
+
+    stage.on('mousedown', (e) => {
+      if (e && (e.evt.button == 2 || e.evt.buttons == 4)) {
+        this.isMouseMiddleButtonPressed = true;
+        e.cancelBubble = true;
+      }
+    });
+
+    stage.on('mouseup', (e) => {
+      if (e && (e.evt.button == 1 || e.evt.buttons == 0)) {
+        this.isMouseMiddleButtonPressed = false;
+        e.cancelBubble = true;
+      }
+    });
+
+    stage.on('mousemove', (e) => {
       e.evt.preventDefault();
+
+      if (
+        !this.enabled ||
+        !(this.isSpaceKeyPressed || this.isMouseMiddleButtonPressed)
+      ) {
+        return;
+      }
+
+      this.render();
+    });
+
+    stage.on('touchmove', (e) => {
+      e.evt.preventDefault();
+
+      if (!this.enabled) {
+        return;
+      }
+
       this.render();
     });
 
     stage.on('wheel', (e) => {
       e.evt.preventDefault();
+
+      if (
+        !this.enabled ||
+        this.isSpaceKeyPressed ||
+        this.isMouseMiddleButtonPressed
+      ) {
+        return;
+      }
+
       this.render();
     });
   }
@@ -96,6 +155,10 @@ export class WeaveStageGridPlugin extends WeavePlugin {
     }
   }
 
+  private round(number: number, step: number) {
+    return Math.round(number / step) * step;
+  }
+
   private renderGridLines() {
     const layer = this.getLayer();
 
@@ -105,58 +168,75 @@ export class WeaveStageGridPlugin extends WeavePlugin {
 
     const stage = this.instance.getStage();
 
-    const size = stage.width() / (this.gridSize * stage.scaleX());
+    const stageXRound = this.round(stage.x(), this.gridSize) * -1;
 
-    const delta = 2 * size;
+    const pointsX = [];
+    for (
+      let i = stageXRound;
+      i < stageXRound + stage.width();
+      i += this.gridSize
+    ) {
+      pointsX.push(i / stage.scaleX());
+    }
 
-    const startPageX =
-      Math.ceil((stage.x() + delta) / stage.scaleX() / size) * size;
-    const startPageY =
-      Math.ceil((stage.y() + delta) / stage.scaleY() / size) * size;
-    const endPageX =
-      Math.floor(
-        (stage.x() + stage.width() + 4 * delta) / stage.scaleX() / size
-      ) * size;
-    const endPageY =
-      Math.floor(
-        (stage.y() + stage.height() + 4 * delta) / stage.scaleY() / size
-      ) * size;
-    const numRows = Math.round((endPageY - startPageY) / size);
-    const numCols = Math.round((endPageX - startPageX) / size);
+    const stageYRound = this.round(stage.y(), this.gridSize) * -1;
 
-    for (let row = 0; row <= numRows; row++) {
-      const pageY = row * size + startPageY;
-      const canvasY = pageY - 2 * startPageY;
+    const pointsY = [];
+    for (
+      let i = stageYRound;
+      i < stageYRound + stage.height();
+      i += this.gridSize
+    ) {
+      pointsY.push(i / stage.scaleY());
+    }
+
+    for (let index = 0; index < pointsX.length; index++) {
+      const point = pointsX[index];
+
+      let color = this.gridColor;
+      if (point === 0) {
+        color = this.originColor;
+      }
 
       layer.add(
         new Line({
           points: [
-            (-stage.x() - 2 * delta) / stage.scaleX(),
-            canvasY,
-            (stage.width() - stage.x() + 2 * delta) / stage.scaleX(),
-            canvasY,
+            point,
+            (-stage.y() - 2 * this.gridSize) / stage.scaleY(),
+            point,
+            (stage.height() - stage.y() + 2 * this.gridSize) / stage.scaleY(),
           ],
-          stroke: '#cccccc',
-          strokeWidth: 1.5 / stage.scaleX(),
+          stroke: color,
+          strokeWidth:
+            (point % (10 * (this.gridSize / stage.scaleX())) === 0
+              ? 2.5
+              : 0.5) / stage.scaleX(),
           listening: false,
         })
       );
     }
 
-    for (let col = 0; col <= numCols; col++) {
-      const pageX = col * size + startPageX;
-      const canvasX = pageX - 2 * startPageX;
+    for (let index = 0; index < pointsY.length; index++) {
+      const point = pointsY[index];
+
+      let color = this.gridColor;
+      if (point === 0) {
+        color = this.originColor;
+      }
 
       layer.add(
         new Line({
           points: [
-            canvasX,
-            (-stage.y() - 2 * delta) / stage.scaleY(),
-            canvasX,
-            (stage.height() - stage.y() + 2 * delta) / stage.scaleY(),
+            (-stage.x() - 2 * this.gridSize) / stage.scaleX(),
+            point,
+            (stage.width() - stage.x() + 2 * this.gridSize) / stage.scaleX(),
+            point,
           ],
-          stroke: '#cccccc',
-          strokeWidth: 1.5 / stage.scaleX(),
+          stroke: color,
+          strokeWidth:
+            (point % (10 * (this.gridSize / stage.scaleY())) === 0
+              ? 2.5
+              : 0.5) / stage.scaleX(),
           listening: false,
         })
       );
@@ -172,40 +252,46 @@ export class WeaveStageGridPlugin extends WeavePlugin {
 
     const stage = this.instance.getStage();
 
-    const size = stage.width() / (this.gridSize * stage.scaleX());
+    const stageXRound = this.round(stage.x(), this.gridSize) * -1;
 
-    const delta = 2 * size;
+    const pointsX = [];
+    for (
+      let i = stageXRound;
+      i < stageXRound + stage.width();
+      i += this.gridSize
+    ) {
+      pointsX.push(i / stage.scaleX());
+    }
 
-    const startPageX =
-      Math.ceil((stage.x() + delta) / stage.scaleX() / size) * size;
-    const startPageY =
-      Math.ceil((stage.y() + delta) / stage.scaleY() / size) * size;
-    const endPageX =
-      Math.floor(
-        (stage.x() + stage.width() + 4 * delta) / stage.scaleX() / size
-      ) * size;
-    const endPageY =
-      Math.floor(
-        (stage.y() + stage.height() + 4 * delta) / stage.scaleY() / size
-      ) * size;
-    const numRows = Math.round((endPageY - startPageY) / size);
-    const numCols = Math.round((endPageX - startPageX) / size);
+    const stageYRound = this.round(stage.y(), this.gridSize) * -1;
 
-    for (let row = 0; row <= numRows; row++) {
-      const pageY = row * size + startPageY;
-      const canvasY = pageY - 2 * startPageY;
+    const pointsY = [];
+    for (
+      let i = stageYRound;
+      i < stageYRound + stage.height();
+      i += this.gridSize
+    ) {
+      pointsY.push(i / stage.scaleY());
+    }
 
-      for (let col = 0; col <= numCols; col++) {
-        const pageX = col * size + startPageX;
-        const canvasX = pageX - 2 * startPageX;
+    for (let indexX = 0; indexX < pointsX.length; indexX++) {
+      const pointX = pointsX[indexX];
+
+      for (let indexY = 0; indexY < pointsY.length; indexY++) {
+        const pointY = pointsY[indexY];
+
+        let color = this.gridColor;
+        if (pointX === 0 || pointY === 0) {
+          color = this.originColor;
+        }
 
         layer.add(
           new Circle({
-            x: canvasX,
-            y: canvasY,
-            radius: 1.5 / stage.scaleX(),
-            fill: '#cccccc',
-            stroke: '#cccccc',
+            x: pointX,
+            y: pointY,
+            radius: (pointX === 0 || pointY === 0 ? 2.5 : 1.5) / stage.scaleX(),
+            fill: color,
+            stroke: color,
             strokeWidth: 0,
             listening: false,
           })
@@ -236,5 +322,6 @@ export class WeaveStageGridPlugin extends WeavePlugin {
 
   setType(type: WeaveStageGridType) {
     this.type = type;
+    this.render();
   }
 }

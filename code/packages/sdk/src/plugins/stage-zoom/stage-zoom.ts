@@ -94,14 +94,17 @@ export class WeaveStageZoomPlugin extends WeavePlugin {
         pluginInstance.render?.();
       }
 
-      this.onZoomChangeCb?.({
+      const callbackParams = {
         scale,
         zoomSteps: this.zoomSteps,
         actualStep: this.actualStep,
         onDefaultStep: this.actualStep === this.defaultStep,
         canZoomIn: this.canZoomIn(),
         canZoomOut: this.canZoomOut(),
-      });
+      };
+
+      this.onZoomChangeCb?.(callbackParams);
+      this.instance.emitEvent('onZoomChange', callbackParams);
     }
   }
 

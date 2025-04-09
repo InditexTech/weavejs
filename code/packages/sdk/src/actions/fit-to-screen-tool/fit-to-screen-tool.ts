@@ -4,10 +4,12 @@
 
 import { WeaveAction } from '@/actions/action';
 import { WeaveStageZoomPlugin } from '@/plugins/stage-zoom/stage-zoom';
+import { WeaveFitToScreenToolActionParams } from './types';
 
 export class WeaveFitToScreenToolAction extends WeaveAction {
+  protected previousAction!: string;
+  protected cancelAction!: () => void;
   internalUpdate = undefined;
-  cleanup = undefined;
 
   getName(): string {
     return 'fitToScreenTool';
@@ -26,9 +28,22 @@ export class WeaveFitToScreenToolAction extends WeaveAction {
     }
   }
 
-  trigger(cancelAction: () => void) {
+  trigger(cancelAction: () => void, params: WeaveFitToScreenToolActionParams) {
     const stageZoomPlugin = this.getStageZoomPlugin();
+
     stageZoomPlugin.fitToScreen();
-    cancelAction();
+
+    this.previousAction = params.previousAction;
+    this.cancelAction = cancelAction;
+
+    this.cancelAction();
+  }
+
+  cleanup() {
+    const stage = this.instance.getStage();
+
+    this.instance.triggerAction(this.previousAction);
+
+    stage.container().style.cursor = 'default';
   }
 }

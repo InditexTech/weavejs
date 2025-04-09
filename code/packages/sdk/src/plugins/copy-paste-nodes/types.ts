@@ -22,11 +22,15 @@ export type WeaveCopyPasteNodesCanPasteChangeCallback = (
   canPaste: boolean,
   nodes: WeaveToPasteNode[]
 ) => void;
+export type WeaveCopyPasteNodesOnCopyCallback = (error?: Error) => void;
+export type WeaveCopyPasteNodesOnPasteCallback = (error?: Error) => void;
 export type WeaveCopyPasteNodesOnPasteExternalCallback = (
   item: ClipboardItem
 ) => void;
 
 export type WeaveCopyPasteNodesPluginCallbacks = {
+  onCopy?: WeaveCopyPasteNodesOnCopyCallback;
+  onPaste?: WeaveCopyPasteNodesOnPasteCallback;
   onPasteExternal?: WeaveCopyPasteNodesOnPasteExternalCallback;
 };
 

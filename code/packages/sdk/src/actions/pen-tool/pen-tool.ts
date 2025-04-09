@@ -67,6 +67,11 @@ export class WeavePenToolAction extends WeaveAction {
       }
     });
 
+    stage.on('dblclick dbltap', (e) => {
+      e.evt.preventDefault();
+      this.cancelAction();
+    });
+
     stage.on('click tap', (e) => {
       e.evt.preventDefault();
 
@@ -85,7 +90,7 @@ export class WeavePenToolAction extends WeaveAction {
       }
     });
 
-    stage.on('mousemove', (e) => {
+    stage.on('mousemove touchmove', (e) => {
       e.evt.preventDefault();
 
       this.handleMovement();
@@ -110,6 +115,7 @@ export class WeavePenToolAction extends WeaveAction {
   }
 
   private handleAdding() {
+    const stage = this.instance.getStage();
     const { mousePoint, container, measureContainer } =
       this.instance.getMousePointer();
 
@@ -134,10 +140,10 @@ export class WeavePenToolAction extends WeaveAction {
     this.tempPoint = new Konva.Circle({
       x: this.clickPoint?.x ?? 0,
       y: this.clickPoint?.y ?? 0,
-      radius: 5,
-      stroke: '#000000ff',
-      strokeWidth: 1,
-      fill: 'rgba(0,0,0,0.25)',
+      radius: 5 / stage.scaleX(),
+      stroke: '#cccccc',
+      strokeWidth: 0,
+      fill: '#cccccc',
     });
     this.measureContainer?.add(this.tempPoint);
 
@@ -153,10 +159,10 @@ export class WeavePenToolAction extends WeaveAction {
     this.tempNextPoint = new Konva.Circle({
       x: this.clickPoint?.x ?? 0,
       y: this.clickPoint?.y ?? 0,
-      radius: 5,
-      stroke: '#000000ff',
-      strokeWidth: 1,
-      fill: 'rgba(0,0,0,0.25)',
+      radius: 5 / stage.scaleX(),
+      stroke: '#cccccc',
+      strokeWidth: 0,
+      fill: '#cccccc',
     });
     this.measureContainer?.add(this.tempNextPoint);
 
@@ -319,7 +325,7 @@ export class WeavePenToolAction extends WeaveAction {
       tempMainLine.setAttrs({
         ...this.props,
         strokeWidth: 1,
-        hitStrokeWidth: 10,
+        hitStrokeWidth: 16,
       });
 
       this.instance.updateNode(

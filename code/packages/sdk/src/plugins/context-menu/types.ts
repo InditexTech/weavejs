@@ -14,7 +14,8 @@ export type WeaveStageContextMenuPluginOptions = {
 export type WeaveOnNodeMenuCallback = (
   instance: Weave,
   selection: WeaveSelection[],
-  point: Vector2d
+  point: Vector2d,
+  visible: boolean
 ) => void;
 
 export type WeaveStageContextMenuPluginCallbacks = {

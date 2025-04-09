@@ -49,6 +49,10 @@ export class WeaveNodesSnappingPlugin extends WeavePlugin {
             e.target as unknown as Konva.Transformer;
           const node: Konva.Node = actualTarget.getNodes()[0];
 
+          if (typeof node === 'undefined') {
+            return;
+          }
+
           // clear all previous lines on the screen
           mainLayer.find(`.${GUIDE_LINE_NAME}`).forEach((l) => l.destroy());
 
@@ -232,6 +236,7 @@ export class WeaveNodesSnappingPlugin extends WeavePlugin {
   }
 
   drawGuides(guides: Guide[]) {
+    const stage = this.instance.getStage();
     const mainLayer = this.instance.getMainLayer();
 
     if (mainLayer) {
@@ -240,9 +245,9 @@ export class WeaveNodesSnappingPlugin extends WeavePlugin {
           const line = new Konva.Line({
             points: [-6000, 0, 6000, 0],
             stroke: 'rgb(0, 161, 255)',
-            strokeWidth: 1,
+            strokeWidth: 1 / stage.scaleX(),
             name: GUIDE_LINE_NAME,
-            dash: [4, 6],
+            dash: [4 / stage.scaleX(), 6 / stage.scaleX()],
           });
           mainLayer.add(line);
           line.absolutePosition({
@@ -254,9 +259,9 @@ export class WeaveNodesSnappingPlugin extends WeavePlugin {
           const line = new Konva.Line({
             points: [0, -6000, 0, 6000],
             stroke: 'rgb(0, 161, 255)',
-            strokeWidth: 1,
+            strokeWidth: 1 / stage.scaleX(),
             name: GUIDE_LINE_NAME,
-            dash: [4, 6],
+            dash: [4 / stage.scaleX(), 6 / stage.scaleX()],
           });
           mainLayer.add(line);
           line.absolutePosition({
