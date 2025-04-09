@@ -1,6 +1,6 @@
 {
   "name": "@inditextech/weavejs-types",
-  "version": "0.22.0",
+  "version": "0.23.0-SNAPSHOT",
   "type": "module",
   "license": "Apache-2.0",
   "author": "Jesus Manuel Piñeiro Cid <jesusmpc@inditex.com>",
