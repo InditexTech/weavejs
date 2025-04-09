@@ -39,6 +39,7 @@ import { WeaveActionsManager } from './managers/actions';
 import { WeaveStoreManager } from './managers/store';
 import { WeaveExportManager } from './managers/export';
 import { WeavePluginsManager } from './managers/plugins';
+import { WeaveNodesSelectionPlugin } from './plugins/nodes-selection/nodes-selection';
 
 export class Weave extends Emittery {
   private id: string;
@@ -409,11 +410,23 @@ export class Weave extends Emittery {
 
   removeNode(node: WeaveStateElement, doRender = true) {
     this.stateManager.removeNode(node, doRender);
+
+    const selectionPlugin =
+      this.getPlugin<WeaveNodesSelectionPlugin>('nodesSelection');
+    if (selectionPlugin) {
+      selectionPlugin.setSelectedNodes([]);
+    }
   }
 
   removeNodes(nodes: WeaveStateElement[], doRender = true) {
     for (const node of nodes) {
       this.removeNode(node, false);
+    }
+
+    const selectionPlugin =
+      this.getPlugin<WeaveNodesSelectionPlugin>('nodesSelection');
+    if (selectionPlugin) {
+      selectionPlugin.setSelectedNodes([]);
     }
 
     if (doRender) {

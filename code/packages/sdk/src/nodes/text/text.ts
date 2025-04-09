@@ -56,7 +56,7 @@ export class WeaveTextNode extends WeaveNode {
 
     this.setupDefaultNodeEvents(text);
 
-    text.on('dblclick', (evt) => {
+    text.on('dblclick dbltap', (evt) => {
       evt.cancelBubble = true;
 
       if (this.editing) {
@@ -252,6 +252,7 @@ export class WeaveTextNode extends WeaveNode {
         textArea.removeEventListener('keydown', handleKeyDown);
         textArea.removeEventListener('keyup', handleKeyUp);
         window.removeEventListener('click', handleOutsideClick);
+        window.removeEventListener('touchstart', handleOutsideClick);
       }
       if (e && e.target !== textArea && textArea.value !== '') {
         textNode.text(textArea.value);
@@ -261,11 +262,13 @@ export class WeaveTextNode extends WeaveNode {
         textArea.removeEventListener('keydown', handleKeyDown);
         textArea.removeEventListener('keyup', handleKeyUp);
         window.removeEventListener('click', handleOutsideClick);
+        window.removeEventListener('touchstart', handleOutsideClick);
       }
     };
 
     setTimeout(() => {
       window.addEventListener('click', handleOutsideClick);
+      window.addEventListener('touchstart', handleOutsideClick);
     });
   }
 

@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-import { WeavePlugin } from "@/plugins/plugin";
+import { WeavePlugin } from '@/plugins/plugin';
 
 export class WeaveStagePanningPlugin extends WeavePlugin {
   private isMouseMiddleButtonPressed: boolean;
@@ -107,6 +107,46 @@ export class WeaveStagePanningPlugin extends WeavePlugin {
         !this.enabled ||
         !(this.isSpaceKeyPressed || this.isMouseMiddleButtonPressed)
       ) {
+        return;
+      }
+
+      stage.x(stage.x() - deltaX);
+      stage.y(stage.y() - deltaY);
+    });
+
+    stage.on('touchstart', (e) => {
+      e.evt.preventDefault();
+
+      const mousePos = stage.getPointerPosition();
+
+      previousMouseX = mousePos?.x ?? 0;
+      previousMouseY = mousePos?.y ?? 0;
+    });
+
+    stage.on('touchmove', (e) => {
+      e.evt.preventDefault();
+
+      const activeAction = this.instance.getActiveAction();
+      if (activeAction !== 'moveTool') {
+        return;
+      }
+
+      const mousePos = stage.getPointerPosition();
+
+      if (previousMouseX === Infinity) {
+        previousMouseX = mousePos?.x ?? 0;
+      }
+      if (previousMouseY === Infinity) {
+        previousMouseY = mousePos?.y ?? 0;
+      }
+
+      const deltaX = previousMouseX - (mousePos?.x ?? 0);
+      const deltaY = previousMouseY - (mousePos?.y ?? 0);
+
+      previousMouseX = mousePos?.x ?? 0;
+      previousMouseY = mousePos?.y ?? 0;
+
+      if (!this.enabled) {
         return;
       }
 

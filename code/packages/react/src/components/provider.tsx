@@ -174,7 +174,7 @@ export const WeaveProvider = ({
             instancePlugins.push(plugin);
           }
         } else {
-          instancePlugins.push(new WeaveStageGridPlugin({ gridSize: 50 }));
+          instancePlugins.push(new WeaveStageGridPlugin({}));
           instancePlugins.push(new WeaveStagePanningPlugin());
           instancePlugins.push(new WeaveStageResizePlugin());
           instancePlugins.push(

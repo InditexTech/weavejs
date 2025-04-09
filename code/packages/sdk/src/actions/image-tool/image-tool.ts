@@ -99,7 +99,7 @@ export class WeaveImageToolAction extends WeaveAction {
       }
     });
 
-    stage.on('mousemove', (e) => {
+    stage.on('mousemove touchmove', (e) => {
       e.evt.preventDefault();
 
       const tempImage = this.instance

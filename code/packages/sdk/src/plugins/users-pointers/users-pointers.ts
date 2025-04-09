@@ -25,6 +25,13 @@ export class WeaveUsersPointersPlugin extends WeavePlugin {
   private usersPointersTimers: Record<string, NodeJS.Timeout>;
   private getUser: () => WeaveUser;
   private renderCursors: boolean;
+  private userPointerCircleRadius: number = 4;
+  private userPointerSeparation: number = 8;
+  private userPointerCircleStrokeWidth: number = 1;
+  private userPointerNameFontSize: number = 10;
+  private userPointerBackgroundCornerRadius: number = 4;
+  private userPointerBackgroundPaddingX: number = 4;
+  private userPointerBackgroundPaddingY: number = 8;
   render: undefined;
 
   constructor(params: WeaveUsersPointersPluginParams) {
@@ -100,6 +107,21 @@ export class WeaveUsersPointersPlugin extends WeavePlugin {
       }
     );
 
+    stage.on('dragmove', (e) => {
+      e.evt.preventDefault();
+
+      const userInfo = this.getUser();
+      const mousePos = stage.getRelativePointerPosition();
+
+      if (mousePos) {
+        store.setAwarenessInfo(WEAVE_USER_POINTER_KEY, {
+          user: userInfo.name,
+          x: mousePos.x,
+          y: mousePos.y,
+        });
+      }
+    });
+
     stage.on('pointermove', (e) => {
       e.evt.preventDefault();
       const userInfo = this.getUser();
@@ -112,6 +134,10 @@ export class WeaveUsersPointersPlugin extends WeavePlugin {
           y: mousePos.y,
         });
       }
+    });
+
+    this.instance.addEventListener('onZoomChange', () => {
+      this.renderPointers();
     });
   }
 
@@ -131,11 +157,11 @@ export class WeaveUsersPointersPlugin extends WeavePlugin {
   private setUserMovementTimer(userPointer: WeaveUserPointer) {
     const pointersLayer = this.getLayer();
 
-    if (this.usersPointersTimers[userPointer.user]) {
-      clearTimeout(this.usersPointersTimers[userPointer.user]);
+    if (this.usersPointersTimers[`${userPointer.user}-opacity`]) {
+      clearTimeout(this.usersPointersTimers[`${userPointer.user}-opacity`]);
     }
 
-    this.usersPointersTimers[userPointer.user] = setTimeout(() => {
+    this.usersPointersTimers[`${userPointer.user}-opacity`] = setTimeout(() => {
       const userPointerNode = pointersLayer?.findOne(`#${userPointer.user}`) as
         | Konva.Group
         | undefined;
@@ -144,9 +170,25 @@ export class WeaveUsersPointersPlugin extends WeavePlugin {
         userPointerNode.opacity(0.5);
       }
     }, 5000);
+
+    if (this.usersPointersTimers[`${userPointer.user}-destroy`]) {
+      clearTimeout(this.usersPointersTimers[`${userPointer.user}-destroy`]);
+    }
+
+    this.usersPointersTimers[`${userPointer.user}-destroy`] = setTimeout(() => {
+      const userPointerNode = pointersLayer?.findOne(`#${userPointer.user}`) as
+        | Konva.Group
+        | undefined;
+
+      if (userPointerNode) {
+        userPointerNode.destroy();
+      }
+    }, 30000);
   }
 
   private renderPointers() {
+    const stage = this.instance.getStage();
+
     const pointersLayer = this.getLayer();
 
     pointersLayer?.clear();
@@ -173,27 +215,56 @@ export class WeaveUsersPointersPlugin extends WeavePlugin {
           });
 
           const userPointNode = new Konva.Circle({
+            id: 'userPoint',
             x: 0,
             y: 0,
-            radius: 4,
+            radius: this.userPointerCircleRadius / stage.scaleX(),
             fill: this.stringToColour(userPointer.actualPos.user),
             stroke: 'black',
-            strokeWidth: 1,
+            strokeWidth: this.userPointerCircleStrokeWidth / stage.scaleX(),
+            listening: false,
           });
 
           const userNameNode = new Konva.Text({
-            x: 12,
-            y: -3,
-            height: userPointNode.height(),
+            id: 'userPointName',
+            x:
+              (this.userPointerSeparation +
+                this.userPointerBackgroundPaddingX) /
+              stage.scaleX(),
+            y: 0 / stage.scaleX(),
+            height: (userPointNode.height() * 2) / stage.scaleX(),
             text: userPointer.actualPos.user,
-            fontSize: 12,
+            fontSize: this.userPointerNameFontSize / stage.scaleX(),
             fontFamily: 'NotoSansMono, monospace',
             fill: 'black',
             align: 'left',
             verticalAlign: 'middle',
+            listening: false,
+          });
+
+          const userNameBackground = new Konva.Rect({
+            id: 'userPointRect',
+            x: this.userPointerSeparation / stage.scaleX(),
+            y: -this.userPointerBackgroundPaddingY / stage.scaleX(),
+            width:
+              (userNameNode.width() + this.userPointerBackgroundPaddingX * 2) /
+              stage.scaleX(),
+            height:
+              (userNameNode.height() + this.userPointerBackgroundPaddingY * 2) /
+              stage.scaleX(),
+            cornerRadius:
+              this.userPointerBackgroundCornerRadius / stage.scaleX(),
+            fill: 'rgba(0,0,0,0.2)',
+            strokeWidth: 0,
+            listening: false,
+          });
+
+          userPointNode.setAttrs({
+            y: userNameBackground.y() + userNameBackground.height() / 2,
           });
 
           userPointerNode.add(userPointNode);
+          userPointerNode.add(userNameBackground);
           userPointerNode.add(userNameNode);
 
           pointersLayer?.add(userPointerNode);
@@ -211,6 +282,45 @@ export class WeaveUsersPointersPlugin extends WeavePlugin {
           y: userPointer.actualPos.y,
         };
         const hasChanged = !_.isEqual(actualPos, oldPos);
+
+        // UPDATE TO SCALE
+        const userPointNode = userPointerNode.getChildren(
+          (node) => node.getAttrs().id === 'userPoint'
+        );
+        userPointNode[0]?.setAttrs({
+          radius: this.userPointerCircleRadius / stage.scaleX(),
+          strokeWidth: this.userPointerCircleStrokeWidth / stage.scaleX(),
+        });
+        const userPointNodeText = userPointerNode.getChildren(
+          (node) => node.getAttrs().id === 'userPointName'
+        );
+        userPointNodeText[0]?.setAttrs({
+          x:
+            (this.userPointerSeparation + this.userPointerBackgroundPaddingX) /
+            stage.scaleX(),
+          y: 0 / stage.scaleX(),
+          height: userPointNode[0]?.height(),
+          fontSize: this.userPointerNameFontSize / stage.scaleX(),
+        });
+        const userPointNodeBackground = userPointerNode.getChildren(
+          (node) => node.getAttrs().id === 'userPointRect'
+        );
+        userPointNodeBackground[0]?.setAttrs({
+          x: this.userPointerSeparation / stage.scaleX(),
+          y: -this.userPointerBackgroundPaddingY / stage.scaleX(),
+          cornerRadius: this.userPointerBackgroundCornerRadius / stage.scaleX(),
+          width:
+            userPointNodeText[0]?.width() +
+            this.userPointerBackgroundPaddingX * 2,
+          height:
+            userPointNodeText[0]?.height() +
+            this.userPointerBackgroundPaddingY * 2,
+        });
+        userPointNode[0]?.setAttrs({
+          y:
+            userPointNodeBackground[0]?.y() +
+            userPointNodeBackground[0]?.height() / 2,
+        });
 
         if (hasChanged) {
           userPointerNode.setAttrs({

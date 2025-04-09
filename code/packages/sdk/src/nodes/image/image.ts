@@ -110,7 +110,7 @@ export class WeaveImageNode extends WeaveNode {
 
     this.setupDefaultNodeEvents(image);
 
-    image.on('dblclick', (evt) => {
+    image.on('dblclick dbltap', (evt) => {
       evt.cancelBubble = true;
 
       if (this.cropping) {
@@ -235,21 +235,6 @@ export class WeaveImageNode extends WeaveNode {
       });
     }
     if (this.imageLoaded) {
-      // imagePlaceholder?.setAttrs({
-      //   ...internalImageProps,
-      //   ...(nodeAttrs.imageProperties ?? {}),
-      //   id: `${id}-placeholder`,
-      //   x: 0,
-      //   y: 0,
-      //   scaleX: 1,
-      //   scaleY: 1,
-      //   rotation: 0,
-      //   visible: false,
-      //   fill: '#ccccccff',
-      //   strokeWidth: 0,
-      //   draggable: false,
-      //   zIndex: 0,
-      // });
       internalImage?.setAttrs({
         ...internalImageProps,
         ...(nodeAttrs.imageProperties ?? {}),

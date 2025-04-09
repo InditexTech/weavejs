@@ -4,10 +4,12 @@
 
 import { WeaveAction } from '@/actions/action';
 import { WeaveStageZoomPlugin } from '@/plugins/stage-zoom/stage-zoom';
+import { WeaveZoomOutToolActionParams } from './types';
 
 export class WeaveZoomOutToolAction extends WeaveAction {
+  protected previousAction!: string;
+  protected cancelAction!: () => void;
   internalUpdate = undefined;
-  cleanup = undefined;
 
   getName(): string {
     return 'zoomOutTool';
@@ -26,7 +28,7 @@ export class WeaveZoomOutToolAction extends WeaveAction {
     }
   }
 
-  trigger(cancelAction: () => void) {
+  trigger(cancelAction: () => void, params: WeaveZoomOutToolActionParams) {
     const stageZoomPlugin = this.getStageZoomPlugin();
 
     if (!stageZoomPlugin.canZoomOut()) {
@@ -34,6 +36,18 @@ export class WeaveZoomOutToolAction extends WeaveAction {
     }
 
     stageZoomPlugin.zoomOut();
-    cancelAction();
+
+    this.previousAction = params.previousAction;
+    this.cancelAction = cancelAction;
+
+    this.cancelAction();
+  }
+
+  cleanup() {
+    const stage = this.instance.getStage();
+
+    this.instance.triggerAction(this.previousAction);
+
+    stage.container().style.cursor = 'default';
   }
 }
