@@ -1,6 +1,6 @@
 ---
 name: docs-npm-release
-run-name: "Release Docs labeled ${{ inputs.RELEASE_TYPE || 'in PR' }}"
+run-name: "Release Docs${{ github.event_name == 'workflow_dispatch' && ' manually dispatched' || ' from PR' }}"
 
 concurrency: docs-release-${{ github.ref }}
 
@@ -15,6 +15,10 @@ on:
         description: "Baseline branch"
         required: true
         default: "main"
+      RELEASE_LABELS:
+        description: "Release labels (comma separated list)"
+        required: true
+        default: ""
 
 jobs:
   release:
@@ -110,26 +114,23 @@ jobs:
         working-directory: docs
         env:
           RELEASE_VERSION: ${{ steps.update-changelog.outputs.version }}
+          GIT_CREDENTIALS: https://x-access-token:${{ secrets.GH_TOKEN_READER }}@github.com
         run: |
           npm run version:release
           npm run release:prepare
-
-      - name: NPM / Release Perform - Github Pages
-        env:
-          GIT_CREDENTIALS: https://x-access-token:${{ secrets.GH_TOKEN_READER }}@github.com
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-        working-directory: docs
-        run: |
-          npm run release:perform
 
       - name: Release / Commit and Tag
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         working-directory: docs
         run: |
+          git pull --tags
           git commit -i CHANGELOG.md -m "chore: Update CHANGELOG with ${{ steps.update-changelog.outputs.version }} version" --no-verify
           git commit -i package.json package-lock.json -m "[npm-scripts] Release ${{ steps.update-changelog.outputs.version }}" --no-verify
+          if git tag -l "docs/${{ steps.update-changelog.outputs.version }}"; then
+            git tag -d docs/${{ steps.update-changelog.outputs.version }};
+            git push --delete origin docs/${{ steps.update-changelog.outputs.version }};
+          fi
           git tag docs/${{ steps.update-changelog.outputs.version }}
           git push --atomic --no-verify origin HEAD ${{ steps.update-changelog.outputs.version }}
 
@@ -198,3 +199,9 @@ jobs:
           gh pr comment ${{ github.event.number }} --body "An error occurred creating the Github Docs Release.
           You can manually complete the docs release by creating it in the [releases](https://github.com/${{ github.repository }}/releases)
           page."
+
+      - name: Trigger / Publish job
+        if: contains(github.event.inputs.RELEASE_LABELS, 'no-publish') == false
+        uses: inditex/gha-workflowdispatch@v1
+        with:
+          workflow: docs-npm_node-publish.yml
