@@ -61,6 +61,8 @@ jobs:
           mkdir -p "$HOME"/.asdf/data
 
       - name: NPM / Verify
-        working-directory: docs
+        working-directory:
+        env:
+          GITHUB_TOKEN: ${{ secrets.GH_TOKEN_READER }}
         run: |
           npm run verify
