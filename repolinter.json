@@ -56,7 +56,7 @@
       "rule": {
         "type": "file-existence",
         "options": {
-          "globsAny": ["{code/}CHANGELOG*"],
+          "globsAny": ["code/CHANGELOG*"],
           "nocase": true
         }
       }
