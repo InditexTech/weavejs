@@ -27,7 +27,7 @@ jobs:
         uses: actions/cache@v4
         with:
           path: ~/.npm
-          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+          key: ${{ runner.os }}-node-${{ hashFiles('code/package-lock.json') }}
           restore-keys: |
             ${{ runner.os }}-node-
 
@@ -36,7 +36,7 @@ jobs:
         id: asdf-cache
         with:
           path: ~/.asdf/data
-          key: ${{ runner.os }}-asdf-${{ hashFiles('**/.tool-versions') }}
+          key: ${{ runner.os }}-asdf-${{ hashFiles('code/.tool-versions') }}
           restore-keys: |
             ${{ runner.os }}-asdf-
 
