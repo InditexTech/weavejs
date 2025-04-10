@@ -8,9 +8,8 @@ concurrency:
 on:
   pull_request:
     paths:
-      - 'code/**'
-      - '.github/workflows/code*'
-
+      - "code/**"
+      - ".github/workflows/code*"
 
 jobs:
   unit-tests:
