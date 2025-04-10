@@ -11,6 +11,7 @@
     "dev": "concurrently \"npm run antora:dev\" \"npm run live-server:dev\"",
     "live-server:dev": "live-server --mount=\"/:./build/site\"",
     "package:version": "echo $npm_package_version",
+    "release:prepare": "npm run build",
     "test": "echo \"Error: no test specified\" && exit 1",
     "verify": "npm ci && npm run build",
     "version:development": "export BUMP_DEVELOP_VERSION=$(npm version $(npm version minor)) && nx release version --git-tag=false --git-commit=false $BUMP_DEVELOP_VERSION && npm version $(npm version minor)",
