@@ -2,7 +2,9 @@
 name: docs-npm-publish
 run-name: "Deploy docs to GH-Pages"
 
-on: workflow_call
+on:
+  workflow_call:
+  workflow_dispatch:
 
 # Sets permissions of the GITHUB_TOKEN to allow deployment to GitHub Pages
 permissions:
