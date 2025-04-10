@@ -44,7 +44,7 @@ jobs:
         run: |
           {
             echo "TOOL_VERSIONS<<EOF"
-            cat docs/.tool-versions
+            cat code/.tool-versions
             echo "EOF"
           } >> "$GITHUB_ENV"
 
