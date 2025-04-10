@@ -108,7 +108,7 @@ jobs:
           mkdir -p "$HOME"/.asdf/data
 
       - name: GitHub / Download artifact
-        if: ${{ github.event.inputs.TRIGGER_ID == '' }}
+        if: ${{ github.event.inputs.TRIGGER_ID != '' }}
         id: artifact-download-step
         uses: actions/download-artifact@v4
         with:
@@ -117,7 +117,7 @@ jobs:
           path: docs/build/site
 
       - name: NPM / Build
-        if: ${{ github.event.inputs.TRIGGER_ID != '' }}
+        if: ${{ github.event.inputs.TRIGGER_ID == '' }}
         working-directory: docs
         env:
           GIT_CREDENTIALS: https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com
