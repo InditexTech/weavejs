@@ -1,13 +1,13 @@
 {
   "name": "docs",
-  "version": "0.2.0-prerelease",
+  "version": "0.1.0-prerelease",
   "description": "",
   "main": "index.js",
   "scripts": {
     "cleanup": "rm package-lock.json && npkill -D -y",
     "antora": "antora",
     "antora:dev": "nodemon -e adoc,yml --watch src --watch antora-playbook.local.yml --exec antora antora-playbook.local.yml",
-    "build": "antora antora-playbook.yml --clean",
+    "build": "antora antora-playbook.yml",
     "dev": "concurrently \"npm run antora:dev\" \"npm run live-server:dev\"",
     "live-server:dev": "live-server --mount=\"/:./build/site\"",
     "publish": "gh-pages -d build/site",
