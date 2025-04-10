@@ -1,0 +1,12 @@
+.turbo
+node_modules
+test-report.json
+dist
+coverage
+public
+eslint-report.json
+
+.nx/cache
+.nx/workspace-data
+
+.npmrc
