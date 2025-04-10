@@ -1,6 +1,6 @@
 ---
 name: docs-npm-release
-run-name: "Release docs labeled ${{ inputs.RELEASE_TYPE || 'in PR' }}"
+run-name: "Release Docs labeled ${{ inputs.RELEASE_TYPE || 'in PR' }}"
 
 concurrency: docs-release-${{ github.ref }}
 
@@ -15,17 +15,6 @@ on:
         description: "Baseline branch"
         required: true
         default: "main"
-      RELEASE_TYPE:
-        description: "Release type to use"
-        required: true
-        default: "release-type/minor"
-        type: choice
-        options:
-          - "release-type/hotfix"
-          - "release-type/multi-hotfix"
-          - "release-type/major"
-          - "release-type/minor"
-          - "release-type/patch"
 
 jobs:
   release:
@@ -38,15 +27,6 @@ jobs:
     steps:
       - name: Get input parameters
         run: |
-          if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
-            RELEASE_LABELS="${{ github.event.inputs.RELEASE_TYPE }}"
-          else
-            RELEASE_LABELS="${{ join(github.event.pull_request.labels.*.name, ', ') }}"
-            if [[ $RELEASE_LABELS != *release-type/* ]]; then
-              RELEASE_LABELS="$RELEASE_LABELS, release-type/minor"
-            fi
-          fi
-          echo "RELEASE_LABELS=$RELEASE_LABELS" >> "$GITHUB_ENV"
           BASELINE_BRANCH=${{ github.event.inputs.BASELINE || github.ref }}
           echo "BASELINE_BRANCH=${BASELINE_BRANCH#refs/heads/}" >> "$GITHUB_ENV"
 
@@ -105,24 +85,6 @@ jobs:
         run: |
           mkdir -p "$HOME"/.npm
           mkdir -p "$HOME"/.asdf/data
-
-      - name: Setup patch release type version
-        if: contains(env.RELEASE_LABELS, 'release-type/hotfix')
-          || contains(env.RELEASE_LABELS, 'release-type/multi-hotfix')
-          || contains(env.RELEASE_LABELS, 'release-type/patch')
-        run: echo "RELEASE_VERSION=patch" >> "$GITHUB_ENV"
-
-      - name: Setup minor release type version
-        if: contains(env.RELEASE_LABELS, 'release-type/minor')
-        run: echo "RELEASE_VERSION=minor" >> "$GITHUB_ENV"
-
-      - name: Setup minor release type version when no label set and TBD
-        if: ${{ !contains(env.RELEASE_LABELS, 'release-type') && vars.DEVELOPMENT_FLOW == 'trunk-based-development' }}
-        run: echo "RELEASE_VERSION=minor" >> "$GITHUB_ENV"
-
-      - name: Setup major release type version
-        if: contains(env.RELEASE_LABELS, 'release-type/major')
-        run: echo "RELEASE_VERSION=major" >> "$GITHUB_ENV"
 
       - name: Prepare committer information and set GPG key
         env:
