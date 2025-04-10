@@ -100,13 +100,13 @@ jobs:
           git config user.email "oso@inditex.com"
 
       - name: NPM / Get release version
+        id: update-changelog
         working-directory: docs
         run: |
           echo "version=$(cat .release)" >> "$GITHUB_OUTPUT"
           echo "RELEASE_VERSION=$(cat .release)" >> "$GITHUB_ENV"
 
       - name: NPM / Prepare release
-        id: update-changelog
         working-directory: docs
         env:
           RELEASE_VERSION: ${{ steps.update-changelog.outputs.version }}

@@ -10,7 +10,6 @@
     "build": "antora antora-playbook.yml --clean",
     "dev": "concurrently \"npm run antora:dev\" \"npm run live-server:dev\"",
     "live-server:dev": "live-server --mount=\"/:./build/site\"",
-    "package:version": "npm version ",
     "publish": "gh-pages -d build/site",
     "release:prepare": "npm run build",
     "test": "echo \"Error: no test specified\" && exit 1",
