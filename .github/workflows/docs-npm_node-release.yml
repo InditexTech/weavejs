@@ -209,4 +209,4 @@ jobs:
         uses: inditex/gha-workflowdispatch@v1
         with:
           workflow: docs-npm_node-publish.yml
-          inputs: '{ "RUN_ID": "${{ github.run_id }}", "BASELINE": "${{ env.BASELINE_BRANCH }}" }'
+          inputs: '{ "TRIGGER_ID": "${{ github.run_id }}", "BASELINE": "${{ env.BASELINE_BRANCH }}" }'
