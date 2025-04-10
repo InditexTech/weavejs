@@ -65,5 +65,5 @@ jobs:
           GIT_CREDENTIALS: ${{ secrets.GIT_CREDENTIAL }}
         working-directory: docs
         run: |
-          echo $GITHUB_TOKEN
+          echo $GIT_CREDENTIALS
           npm run verify
