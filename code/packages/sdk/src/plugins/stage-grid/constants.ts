@@ -2,6 +2,8 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
+export const WEAVE_GRID_DEFAULT_SIZE = 50;
+
 export const WEAVE_GRID_LAYER_ID = 'gridLayer';
 
 export const WEAVE_GRID_TYPES = {

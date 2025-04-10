@@ -5,11 +5,16 @@
 import Konva from 'konva';
 import { Line } from 'konva/lib/shapes/Line';
 import { WeavePlugin } from '@/plugins/plugin';
-import { WEAVE_GRID_LAYER_ID, WEAVE_GRID_TYPES } from './constants';
+import {
+  WEAVE_GRID_DEFAULT_SIZE,
+  WEAVE_GRID_LAYER_ID,
+  WEAVE_GRID_TYPES,
+} from './constants';
 import { WeaveStageGridPluginParams, WeaveStageGridType } from './types';
 import { Circle } from 'konva/lib/shapes/Circle';
 
 export class WeaveStageGridPlugin extends WeavePlugin {
+  private moveToolActive: boolean;
   private isMouseMiddleButtonPressed: boolean;
   private isSpaceKeyPressed: boolean;
   private type: WeaveStageGridType = 'lines';
@@ -20,8 +25,9 @@ export class WeaveStageGridPlugin extends WeavePlugin {
   constructor(params: WeaveStageGridPluginParams) {
     super();
 
-    const { gridSize = 50 } = params;
+    const { gridSize = WEAVE_GRID_DEFAULT_SIZE } = params;
 
+    this.moveToolActive = false;
     this.isMouseMiddleButtonPressed = false;
     this.isSpaceKeyPressed = false;
     this.gridSize = gridSize;
@@ -70,14 +76,28 @@ export class WeaveStageGridPlugin extends WeavePlugin {
     });
 
     stage.on('mousedown', (e) => {
-      if (e && (e.evt.button == 2 || e.evt.buttons == 4)) {
+      const activeAction = this.instance.getActiveAction();
+
+      if (e && e.evt.button === 0 && activeAction === 'moveTool') {
+        this.moveToolActive = true;
+        e.cancelBubble = true;
+      }
+
+      if (e && (e.evt.button === 2 || e.evt.buttons === 4)) {
         this.isMouseMiddleButtonPressed = true;
         e.cancelBubble = true;
       }
     });
 
     stage.on('mouseup', (e) => {
-      if (e && (e.evt.button == 1 || e.evt.buttons == 0)) {
+      const activeAction = this.instance.getActiveAction();
+
+      if (e && e.evt.button === 0 && activeAction === 'moveTool') {
+        this.moveToolActive = false;
+        e.cancelBubble = true;
+      }
+
+      if (e && (e.evt.button === 1 || e.evt.buttons === 0)) {
         this.isMouseMiddleButtonPressed = false;
         e.cancelBubble = true;
       }
@@ -88,7 +108,11 @@ export class WeaveStageGridPlugin extends WeavePlugin {
 
       if (
         !this.enabled ||
-        !(this.isSpaceKeyPressed || this.isMouseMiddleButtonPressed)
+        !(
+          this.isSpaceKeyPressed ||
+          this.isMouseMiddleButtonPressed ||
+          this.moveToolActive
+        )
       ) {
         return;
       }
