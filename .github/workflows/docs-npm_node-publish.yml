@@ -1,0 +1,103 @@
+# Simple workflow for deploying static content to GitHub Pages
+name: docs-npm-publish
+run-name: "Deploy docs to GH-Pages"
+
+on:
+  # Runs on pushes targeting the default branch
+  push:
+    branches: ["main"]
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+# Sets permissions of the GITHUB_TOKEN to allow deployment to GitHub Pages
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Allow only one concurrent deployment, skipping runs queued between the run in-progress and latest queued.
+# However, do NOT cancel in-progress runs as we want to allow these production deployments to complete.
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
+jobs:
+  # Single deploy job since we're just deploying
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Pages
+        uses: actions/configure-pages@v5
+
+      - name: NPM / Setup Dependencies Cache
+        uses: actions/cache@v4
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-node-${{ hashFiles('docs/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-
+
+      - name: Setup asdf Cache
+        id: asdf-cache
+        uses: actions/cache@v4
+        continue-on-error: true
+        with:
+          path: ~/.asdf/data
+          key: ${{ runner.os }}-asdf-${{ hashFiles('docs/.tool-versions') }}
+          restore-keys: |
+            ${{ runner.os }}-asdf-
+
+      - name: Save tool-versions content
+        run: |
+          {
+            echo "TOOL_VERSIONS<<EOF"
+            cat docs/.tool-versions
+            echo "EOF"
+          } >> "$GITHUB_ENV"
+
+      - name: Setup asdf environment
+        uses:
+          asdf-vm/actions/install@v3
+          # https://github.com/asdf-vm/actions/issues/356
+        if: steps.asdf-cache.outputs.cache-hit != 'true'
+        with:
+          tool_versions: ${{ env.TOOL_VERSIONS }}
+
+      - name: NPM / Set npmrc
+        env:
+          NPM_AUTH: ${{ secrets.NPM_TOKEN }}
+          NPM_REGISTRY: "https://registry.npmjs.org/"
+        run: |
+          echo "registry=${NPM_REGISTRY}" >> /home/runner/.npmrc
+          echo "@inditextech:registry=${NPM_REGISTRY}" >> /home/runner/.npmrc
+          echo "//registry.npmjs.org/:_authToken=${NPM_AUTH}" >> /home/runner/.npmrc
+          echo "always-auth=true" >> /home/runner/.npmrc
+
+      - name: NPM / Create Cache Folders
+        run: |
+          mkdir -p "$HOME"/.npm
+          mkdir -p "$HOME"/.asdf/data
+
+      - name: NPM / Build
+        working-directory: docs
+        env:
+          GIT_CREDENTIALS: https://x-access-token:${{ secrets.GH_TOKEN_READER }}@github.com
+        run: |
+          npm run verify
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          # Upload entire repository
+          path: "./docs/build/site"
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

@@ -200,8 +200,7 @@ jobs:
           You can manually complete the docs release by creating it in the [releases](https://github.com/${{ github.repository }}/releases)
           page."
 
-      - name: Trigger / Publish job
-        if: contains(github.event.inputs.RELEASE_LABELS, 'no-publish') == false
+      - name: Trigger / Publish Docs
         uses: inditex/gha-workflowdispatch@v1
         with:
           workflow: docs-npm_node-publish.yml
