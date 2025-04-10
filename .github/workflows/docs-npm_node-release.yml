@@ -122,7 +122,7 @@ jobs:
         run: |
           git pull --tags
           git commit -i package.json package-lock.json -m "[npm-scripts] Release ${{ steps.update-changelog.outputs.version }}" --no-verify
-          if git tag -l "docs/${{ steps.update-changelog.outputs.version }}"; then
+          if git rev-parse "docs/${{ steps.update-changelog.outputs.version }}" >/dev/null 2>&1; then
             git tag -d docs/${{ steps.update-changelog.outputs.version }};
             git push --delete origin docs/${{ steps.update-changelog.outputs.version }};
           fi
