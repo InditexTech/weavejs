@@ -62,8 +62,8 @@ jobs:
 
       - name: NPM / Verify
         env:
-          GIT_CREDENTIALS: ${{ secrets.GIT_CREDENTIAL }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         working-directory: docs
         run: |
-          echo $GIT_CREDENTIALS
+          echo $GITHUB_TOKEN
           npm run verify
