@@ -121,7 +121,6 @@ jobs:
         working-directory: docs
         run: |
           git pull --tags
-          git commit -i CHANGELOG.md -m "chore: Update CHANGELOG with ${{ steps.update-changelog.outputs.version }} version" --no-verify
           git commit -i package.json package-lock.json -m "[npm-scripts] Release ${{ steps.update-changelog.outputs.version }}" --no-verify
           if git tag -l "docs/${{ steps.update-changelog.outputs.version }}"; then
             git tag -d docs/${{ steps.update-changelog.outputs.version }};
