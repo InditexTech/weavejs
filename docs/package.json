@@ -14,7 +14,7 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "verify": "npm ci && npm run build",
     "version:development": "export BUMP_DEVELOP_VERSION=$(npm version $(npm version minor)) && nx release version --git-tag=false --git-commit=false $BUMP_DEVELOP_VERSION && npm version $(npm version minor)",
-    "version:release": "&& npm version $RELEASE_VERSION"
+    "version:release": "npm ci && npm version $RELEASE_VERSION"
   },
   "keywords": [],
   "author": "",
