@@ -2,10 +2,6 @@ site:
   title: Weave.js
   start_page: weavejs::index.adoc
 content:
-  tags:
-    - docs/v*
-  branches:
-    - main
   sources:
     - url: ./..
       start_path: docs/src

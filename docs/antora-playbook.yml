@@ -3,7 +3,7 @@ site:
   start_page: weavejs::index.adoc
 content:
   tags:
-    - docs/v*
+    - docs/*
   branches:
     - main
   sources:
@@ -12,7 +12,7 @@ content:
       edit_url: "{web_url}/edit/develop/{path}"
       version:
         main: prerelease
-        docs/v(*): $1
+        docs/(*): $1
 ui:
   bundle:
     url: ./ui-bundle.zip
