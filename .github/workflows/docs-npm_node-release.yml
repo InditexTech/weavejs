@@ -15,10 +15,6 @@ on:
         description: "Baseline branch"
         required: true
         default: "main"
-      RELEASE_LABELS:
-        description: "Release labels (comma separated list)"
-        required: true
-        default: ""
 
 jobs:
   release:
