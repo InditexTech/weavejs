@@ -16,6 +16,9 @@ on:
         required: true
         default: "main"
 
+env:
+  DOCS_SITE_URL: https://stunning-enigma-169l5kv.pages.github.io
+
 jobs:
   release:
     name: Docs release
@@ -115,6 +118,13 @@ jobs:
           npm run version:release
           npm run release:prepare
 
+      - name: GitHub / Upload artifact
+        id: artifact-upload-step
+        uses: actions/upload-artifact@v4
+        with:
+          name: weavejs-docs
+          path: docs/build/site
+
       - name: Release / Commit and Tag
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -127,7 +137,7 @@ jobs:
             git push --delete origin docs/${{ steps.update-changelog.outputs.version }};
           fi
           git tag docs/${{ steps.update-changelog.outputs.version }}
-          git push --atomic --no-verify origin HEAD ${{ steps.update-changelog.outputs.version }}
+          git push --atomic --no-verify origin HEAD docs/${{ steps.update-changelog.outputs.version }}
 
       - name: NPM / Set next development version
         working-directory: docs
@@ -167,11 +177,11 @@ jobs:
         id: github-release
         continue-on-error: true
         with:
-          name: ${{ steps.update-changelog.outputs.version }}
-          tag: ${{ steps.update-changelog.outputs.version }}
+          name: docs/${{ steps.update-changelog.outputs.version }}
+          tag: docs/${{ steps.update-changelog.outputs.version }}
           token: ${{ secrets.GITHUB_TOKEN }}
           body: |
-            Check out the [changelog](docs/CHANGELOG.md) for version ${{ steps.update-changelog.outputs.version }}
+            Check out the documentation [here]($DOCS_SITE_URL/weavejs/index.html)
 
       - name: Comment in PR / Sync PR creation failed
         if: ${{ vars.DEVELOPMENT_FLOW != 'trunk-based-development' }}
@@ -199,3 +209,4 @@ jobs:
         uses: inditex/gha-workflowdispatch@v1
         with:
           workflow: docs-npm_node-publish.yml
+          inputs: '{ "RUN_ID": "${{ github.run_id }}"", "BASELINE": "${{ env.BASELINE_BRANCH }}" } }'
