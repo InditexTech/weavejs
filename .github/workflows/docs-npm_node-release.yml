@@ -118,13 +118,6 @@ jobs:
           npm run version:release
           npm run release:prepare
 
-      - name: GitHub / Upload artifact
-        id: artifact-upload-step
-        uses: actions/upload-artifact@v4
-        with:
-          name: weavejs-docs
-          path: docs/build/site
-
       - name: Release / Commit and Tag
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -209,4 +202,4 @@ jobs:
         uses: inditex/gha-workflowdispatch@v1
         with:
           workflow: docs-npm_node-publish.yml
-          inputs: '{ "TRIGGER_ID": "${{ github.run_id }}", "BASELINE": "${{ env.BASELINE_BRANCH }}" }'
+          inputs: '{ "BASELINE": "${{ env.BASELINE_BRANCH }}" }'
