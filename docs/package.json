@@ -1,0 +1,26 @@
+{
+  "name": "docs",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "cleanup": "rm package-lock.json && npkill -D -y",
+    "antora": "antora",
+    "antora:dev": "nodemon -e adoc,yml --watch src --watch antora-playbook.local.yml --exec antora antora-playbook.local.yml",
+    "build": "antora antora-playbook.yml --clean",
+    "dev": "concurrently \"npm run antora:dev\" \"npm run live-server:dev\"",
+    "live-server:dev": "live-server --mount=\"/:./build/site\"",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "verify": "npm ci && npm run build"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "antora": "3.1.10",
+    "concurrently": "^9.1.2",
+    "live-server": "^1.2.2",
+    "nodemon": "^3.1.9",
+    "npkill": "^0.12.2"
+  }
+}

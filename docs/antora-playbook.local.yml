@@ -1,0 +1,19 @@
+site:
+  title: Weave.js
+  start_page: weavejs::index.adoc
+content:
+  tags:
+    - docs/v*
+  branches:
+    - main
+  sources:
+    - url: ./..
+      start_path: docs/src
+      branches: HEAD
+      edit_url: "{web_url}/edit/develop/{path}"
+      version:
+        (*): prerelease
+ui:
+  bundle:
+    url: ./ui-bundle.zip
+    snapshot: true

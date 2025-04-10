@@ -1,0 +1,69 @@
+---
+name: docs-npm-PR-verify
+
+concurrency:
+  group: docs-PR-verify-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+on:
+  pull_request:
+    paths:
+      - "docs/**"
+      - ".github/workflows/docs*"
+
+jobs:
+  unit-tests:
+    name: Docs / Verify
+    timeout-minutes: 60
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout / Branch Head
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: ${{ github.event.pull_request.head.sha }}
+
+      - name: NPM / Setup Dependencies Cache
+        uses: actions/cache@v4
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-node-${{ hashFiles('docs/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-
+
+      - name: asdf / Setup Dependencies Cache
+        uses: actions/cache@v4
+        id: asdf-cache
+        with:
+          path: ~/.asdf/data
+          key: ${{ runner.os }}-asdf-${{ hashFiles('docs/.tool-versions') }}
+          restore-keys: |
+            ${{ runner.os }}-asdf-
+
+      - name: Save tool-versions content
+        run: |
+          {
+            echo "TOOL_VERSIONS<<EOF"
+            cat docs/.tool-versions
+            echo "EOF"
+          } >> "$GITHUB_ENV"
+
+      - name: NPM / Setup asdf environment
+        uses: asdf-vm/actions/install@v3
+        # https://github.com/asdf-vm/actions/issues/356
+        if: steps.asdf-cache.outputs.cache-hit != 'true'
+        with:
+          tool_versions: ${{ env.TOOL_VERSIONS }}
+
+      - name: NPM / Create Cache Folders
+        run: |
+          mkdir -p "$HOME"/.npm
+          mkdir -p "$HOME"/.asdf/data
+
+      - name: NPM / Verify
+        env:
+          GIT_CREDENTIALS: https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com
+        working-directory: docs
+        run: |
+          echo $GIT_CREDENTIALS
+          npm run verify

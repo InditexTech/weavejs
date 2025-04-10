@@ -1,14 +1,14 @@
 ---
-name: code-npm-release
-run-name: "Release labeled ${{ inputs.RELEASE_TYPE || 'in PR' }}"
+name: docs-npm-release
+run-name: "Release docs labeled ${{ inputs.RELEASE_TYPE || 'in PR' }}"
 
-concurrency: code-release-${{ github.ref }}
+concurrency: docs-release-${{ github.ref }}
 
 on:
   pull_request:
     types: [closed]
     branches: ["main", "main-*"]
-    paths: ["code/**", ".github/workflows/code**"]
+    paths: ["docs/**", ".github/workflows/docs**"]
   workflow_dispatch:
     inputs:
       BASELINE:
@@ -29,7 +29,7 @@ on:
 
 jobs:
   release:
-    name: Release
+    name: Docs release
     if: github.event_name == 'workflow_dispatch'
       || (github.event.pull_request.merged == true && !contains(join(github.event.pull_request.labels.*.name, ', '), 'skip-release')
       && (contains(join(github.event.pull_request.labels.*.name, ', '), 'release-type')
@@ -73,7 +73,7 @@ jobs:
         uses: actions/cache@v4
         with:
           path: ~/.npm
-          key: ${{ runner.os }}-node-${{ hashFiles('code/package-lock.json') }}
+          key: ${{ runner.os }}-node-${{ hashFiles('docs/package-lock.json') }}
           restore-keys: |
             ${{ runner.os }}-node-
 
@@ -83,7 +83,7 @@ jobs:
         continue-on-error: true
         with:
           path: ~/.asdf/data
-          key: ${{ runner.os }}-asdf-${{ hashFiles('code/.tool-versions') }}
+          key: ${{ runner.os }}-asdf-${{ hashFiles('docs/.tool-versions') }}
           restore-keys: |
             ${{ runner.os }}-asdf-
 
@@ -91,7 +91,7 @@ jobs:
         run: |
           {
             echo "TOOL_VERSIONS<<EOF"
-            cat code/.tool-versions
+            cat docs/.tool-versions
             echo "EOF"
           } >> "$GITHUB_ENV"
 
