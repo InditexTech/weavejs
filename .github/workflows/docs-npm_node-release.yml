@@ -102,8 +102,8 @@ jobs:
       - name: NPM / Get release version
         working-directory: docs
         run: |
-          echo "version=$(npm run package:version --silent)" >> "$GITHUB_OUTPUT"
-          echo "RELEASE_VERSION=$(npm run package:version --silent)" >> "$GITHUB_ENV"
+          echo "version=$(cat .release)" >> "$GITHUB_OUTPUT"
+          echo "RELEASE_VERSION=$(cat .release)" >> "$GITHUB_ENV"
 
       - name: NPM / Prepare release
         id: update-changelog

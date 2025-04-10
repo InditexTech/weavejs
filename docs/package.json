@@ -1,6 +1,6 @@
 {
   "name": "docs",
-  "version": "0.1.0",
+  "version": "0.1.0-prerelease",
   "description": "",
   "main": "index.js",
   "scripts": {
@@ -10,12 +10,12 @@
     "build": "antora antora-playbook.yml --clean",
     "dev": "concurrently \"npm run antora:dev\" \"npm run live-server:dev\"",
     "live-server:dev": "live-server --mount=\"/:./build/site\"",
-    "package:version": "echo $npm_package_version",
+    "package:version": "npm version ",
     "publish": "gh-pages -d build/site",
     "release:prepare": "npm run build",
     "test": "echo \"Error: no test specified\" && exit 1",
     "verify": "npm ci && npm run build",
-    "version:development": "export BUMP_DEVELOP_VERSION=$(npm version $(npm version minor)) && nx release version --git-tag=false --git-commit=false $BUMP_DEVELOP_VERSION && npm version $(npm version minor)",
+    "version:development": "export BUMP_DEVELOP_VERSION=$(npm version $(npm version minor)-prerelease)",
     "version:release": "npm ci && npm version $RELEASE_VERSION"
   },
   "keywords": [],
