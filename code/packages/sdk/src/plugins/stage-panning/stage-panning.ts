@@ -5,6 +5,7 @@
 import { WeavePlugin } from '@/plugins/plugin';
 
 export class WeaveStagePanningPlugin extends WeavePlugin {
+  private moveToolActive: boolean;
   private isMouseMiddleButtonPressed: boolean;
   private isSpaceKeyPressed: boolean;
   protected previousPointer!: string | null;
@@ -16,6 +17,7 @@ export class WeaveStagePanningPlugin extends WeavePlugin {
     super();
 
     this.enabled = true;
+    this.moveToolActive = false;
     this.isMouseMiddleButtonPressed = false;
     this.isSpaceKeyPressed = false;
     this.previousPointer = null;
@@ -35,15 +37,15 @@ export class WeaveStagePanningPlugin extends WeavePlugin {
 
   private enableMove() {
     const stage = this.instance.getStage();
-    if (stage.container().style.cursor !== 'move') {
+    if (stage.container().style.cursor !== 'grabbing') {
       this.previousPointer = stage.container().style.cursor;
-      stage.container().style.cursor = 'move';
+      stage.container().style.cursor = 'grabbing';
     }
   }
 
   private disableMove() {
     const stage = this.instance.getStage();
-    if (stage.container().style.cursor === 'move') {
+    if (stage.container().style.cursor === 'grabbing') {
       stage.container().style.cursor = this.previousPointer ?? 'default';
       this.previousPointer = null;
     }
@@ -70,16 +72,40 @@ export class WeaveStagePanningPlugin extends WeavePlugin {
     });
 
     stage.on('mousedown', (e) => {
-      if (e && (e.evt.button == 2 || e.evt.buttons == 4)) {
+      const activeAction = this.instance.getActiveAction();
+
+      let enableMove = false;
+      if (e && e.evt.button === 0 && activeAction === 'moveTool') {
+        this.moveToolActive = true;
+        enableMove = true;
+      }
+
+      if (e && (e.evt.button === 2 || e.evt.buttons === 4)) {
         this.isMouseMiddleButtonPressed = true;
+        enableMove = true;
+      }
+
+      if (enableMove) {
         this.enableMove();
         e.cancelBubble = true;
       }
     });
 
     stage.on('mouseup', (e) => {
-      if (e && (e.evt.button == 1 || e.evt.buttons == 0)) {
+      const activeAction = this.instance.getActiveAction();
+
+      let disableMove = false;
+      if (e && e.evt.button === 0 && activeAction === 'moveTool') {
+        this.moveToolActive = false;
+        disableMove = true;
+      }
+
+      if (e && (e.evt.button === 1 || e.evt.buttons === 0)) {
         this.isMouseMiddleButtonPressed = false;
+        disableMove = true;
+      }
+
+      if (disableMove) {
         this.disableMove();
         e.cancelBubble = true;
       }
@@ -105,7 +131,11 @@ export class WeaveStagePanningPlugin extends WeavePlugin {
 
       if (
         !this.enabled ||
-        !(this.isSpaceKeyPressed || this.isMouseMiddleButtonPressed)
+        !(
+          this.isSpaceKeyPressed ||
+          this.isMouseMiddleButtonPressed ||
+          this.moveToolActive
+        )
       ) {
         return;
       }

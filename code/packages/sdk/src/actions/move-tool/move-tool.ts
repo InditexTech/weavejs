@@ -36,7 +36,7 @@ export class WeaveMoveToolAction extends WeaveAction {
   private setMoving() {
     const stage = this.instance.getStage();
 
-    stage.container().style.cursor = 'default';
+    stage.container().style.cursor = 'grab';
     stage.container().focus();
 
     this.setState(MOVE_TOOL_STATE.MOVING);
