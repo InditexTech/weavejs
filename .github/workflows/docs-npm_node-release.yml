@@ -57,18 +57,6 @@ jobs:
           fetch-depth: 0
           persist-credentials: false
 
-      - name: Check if CHANGELOG.md has changes
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          if git diff --quiet HEAD^ HEAD -- code/CHANGELOG.md; then
-            echo "::error title={No CHANGELOG.md changes}::{No CHANGELOG.md changes were found. Update the UNRELEASED section with the new changes.}"
-            gh pr comment ${{ github.event.number }} --body "
-          ### :x: No changes in the \`CHANGELOG.md\` file
-          No changes were found in the \`CHANGELOG.md\` file. Please, update the UNRELEASED section, listing the new changes that applies to this release."
-            exit 1
-          fi
-
       - name: NPM / Setup Dependencies Cache
         uses: actions/cache@v4
         with:
@@ -150,52 +138,49 @@ jobs:
           git config user.name "InditexTech CI"
           git config user.email "oso@inditex.com"
 
-      - name: Update CHANGELOG.md
-        id: update-changelog
-        uses: release-flow/keep-a-changelog-action@v3.0.0
-        with:
-          command: bump
-          version: ${{ env.RELEASE_VERSION }}
-          changelog: code/CHANGELOG.md
-          fail-on-empty-release-notes: false
-          keep-unreleased-section: true
-          tag-prefix: ""
+      - name: NPM / Get release version
+        working-directory: docs
+        run: |
+          echo "version=$(npm run package:version --silent)" >> "$GITHUB_OUTPUT"
+          echo "RELEASE_VERSION=$(npm run package:version --silent)" >> "$GITHUB_ENV"
 
       - name: NPM / Prepare release
-        working-directory: code
+        id: update-changelog
+        working-directory: docs
         env:
           RELEASE_VERSION: ${{ steps.update-changelog.outputs.version }}
         run: |
           npm run version:release
           npm run release:prepare
 
-      - name: NPM / Release Perform - Distribution Platform
+      - name: NPM / Release Perform - Github Pages
         env:
+          GIT_CREDENTIALS: https://x-access-token:${{ secrets.GH_TOKEN_READER }}@github.com
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-        working-directory: code
+        working-directory: docs
         run: |
           npm run release:perform
 
       - name: Release / Commit and Tag
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        working-directory: code
+        working-directory: docs
         run: |
           git commit -i CHANGELOG.md -m "chore: Update CHANGELOG with ${{ steps.update-changelog.outputs.version }} version" --no-verify
           git commit -i package.json package-lock.json -m "[npm-scripts] Release ${{ steps.update-changelog.outputs.version }}" --no-verify
-          git tag ${{ steps.update-changelog.outputs.version }}
+          git tag docs/${{ steps.update-changelog.outputs.version }}
           git push --atomic --no-verify origin HEAD ${{ steps.update-changelog.outputs.version }}
 
       - name: NPM / Set next development version
-        working-directory: code
+        working-directory: docs
         run: |
           npm run version:development
 
       - name: Next Development Iteration / Commit Changes
         env:
           GITHUB_TOKEN: ${{ secrets.GH_TOKEN_PUSH }}
-        working-directory: code
+        working-directory: docs
         run: |
           git commit -i package.json package-lock.json -m "[npm-scripts] prepare for next development iteration" --no-verify
           git push --no-verify origin HEAD
@@ -213,10 +198,10 @@ jobs:
           if [[ -z $(git ls-remote --heads origin "$DEVELOP") ]]; then
             echo "The '$DEVELOP' branch does not exist in remote. Skipping the creation of sync PR"
           else
-            git checkout -b "automated/sync-release-${{ steps.update-changelog.outputs.version }}-to-$DEVELOP"
+            git checkout -b "automated/sync-docs-release-${{ steps.update-changelog.outputs.version }}-to-$DEVELOP"
             git push --no-verify -u origin HEAD
             gh pr create --base "$DEVELOP" \
-              --title "Sync release ${{ steps.update-changelog.outputs.version }} to $DEVELOP" \
+              --title "Sync docs release ${{ steps.update-changelog.outputs.version }} to $DEVELOP" \
               --body "**Automated Pull Request**"
           fi
 
@@ -229,7 +214,7 @@ jobs:
           tag: ${{ steps.update-changelog.outputs.version }}
           token: ${{ secrets.GITHUB_TOKEN }}
           body: |
-            Check out the [changelog](code/CHANGELOG.md) for version ${{ steps.update-changelog.outputs.version }}
+            Check out the [changelog](docs/CHANGELOG.md) for version ${{ steps.update-changelog.outputs.version }}
 
       - name: Comment in PR / Sync PR creation failed
         if: ${{ vars.DEVELOPMENT_FLOW != 'trunk-based-development' }}
@@ -239,17 +224,16 @@ jobs:
           DEVELOP=${BASELINE_BRANCH/main/develop}
           git remote set-url origin "https://x-access-token:$GITHUB_TOKEN@github.com/$GITHUB_REPOSITORY"
           # shellcheck disable=SC2140
-          if ! git ls-remote --exit-code --heads origin automated/sync-release-"${{ steps.update-changelog.outputs.version }}"-to-"$DEVELOP"; then
+          if ! git ls-remote --exit-code --heads origin automated/sync-docs-release-"${{ steps.update-changelog.outputs.version }}"-to-"$DEVELOP"; then
             gh pr comment "${{ github.event.number }}" --body "An error occurred creating the \`sync\` branch that synchronizes the \`$BASELINE_BRANCH\` and \`$DEVELOP\` branches.
             Please create a branch from \`$BASELINE_BRANCH\` (e.g. \`internal/sync-$BASELINE_BRANCH-with-$DEVELOP\`) and then create a pull request against \`$DEVELOP\` to finish the release process."
           fi
 
-      - name: Comment in PR / Release creation failed
+      - name: Comment in PR / Release docs creation failed
         if: ${{ steps.github-release.outcome == 'failure' }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: >
-          gh pr comment ${{ github.event.number }} --body "An error occurred creating the Github Release.
-          Don't panic! Your artifacts were successfully uploaded to the InditexTech npmjs registry and the new release tag was created.
-          You can manually complete the release by creating it in the [releases](https://github.com/${{ github.repository }}/releases)
+          gh pr comment ${{ github.event.number }} --body "An error occurred creating the Github Docs Release.
+          You can manually complete the docs release by creating it in the [releases](https://github.com/${{ github.repository }}/releases)
           page."
