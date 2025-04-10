@@ -154,7 +154,7 @@
       "rule": {
         "type": "file-starts-with",
         "options": {
-          "globsAll": ["./**/*.py"],
+          "globsAll": ["./**/*.ts", "./**/*.tsx"],
           "lineCount": 5,
           "patterns": ["Copyright", "License"],
           "flags": "i"
