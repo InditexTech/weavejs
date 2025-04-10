@@ -1,0 +1,46 @@
+{
+  "name": "@antora/site-publisher",
+  "version": "3.1.10",
+  "description": "An alias for the @antora/file-publisher package.",
+  "license": "MPL-2.0",
+  "author": "OpenDevise Inc. (https://opendevise.com)",
+  "contributors": [
+    "Dan Allen <dan@opendevise.com>",
+    "Sarah White <sarah@opendevise.com>"
+  ],
+  "homepage": "https://antora.org",
+  "repository": {
+    "type": "git",
+    "url": "git+https://gitlab.com/antora/antora.git"
+  },
+  "bugs": {
+    "url": "https://gitlab.com/antora/antora/issues"
+  },
+  "main": "lib/index.js",
+  "exports": {
+    ".": "./lib/index.js"
+  },
+  "dependencies": {
+    "@antora/file-publisher": "3.1.10"
+  },
+  "engines": {
+    "node": ">=16.0.0"
+  },
+  "files": [
+    "lib/"
+  ],
+  "keywords": [
+    "antora",
+    "antora-component",
+    "publisher",
+    "files",
+    "documentation",
+    "static site",
+    "web publishing"
+  ],
+  "scripts": {
+    "test": "_mocha",
+    "prepublishOnly": "npx -y downdoc --prepublish",
+    "postpublish": "npx -y downdoc --postpublish"
+  }
+}

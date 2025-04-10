@@ -1,0 +1,3 @@
+= New Page
+
+You've found a new page.

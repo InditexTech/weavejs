@@ -1,0 +1,14 @@
+site:
+  title: Weave.js Documentation
+  start_page: weavejs::index.adoc
+content:
+  sources:
+    - url: .
+      branches: HEAD
+    - url: https://github.com/InditexTech/weavejs.git
+      branches: [v2.0, v1.0]
+      start_path: docs
+ui:
+  bundle:
+    url: https://gitlab.com/antora/antora-ui-default/-/jobs/artifacts/HEAD/raw/build/ui-bundle.zip?job=bundle-stable
+    snapshot: true

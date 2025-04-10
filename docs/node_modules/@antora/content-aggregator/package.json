@@ -1,0 +1,71 @@
+{
+  "name": "@antora/content-aggregator",
+  "version": "3.1.10",
+  "description": "Fetches and aggregates content from distributed sources for use in an Antora documentation pipeline.",
+  "license": "MPL-2.0",
+  "author": "OpenDevise Inc. (https://opendevise.com)",
+  "contributors": [
+    "Dan Allen <dan@opendevise.com>",
+    "Sarah White <sarah@opendevise.com>",
+    "Hubert SABLONNIÈRE <hubert.sablonniere@gmail.com>",
+    "Balachandran Sivakumar <balachandran@balachandran.org>"
+  ],
+  "homepage": "https://antora.org",
+  "repository": {
+    "type": "git",
+    "url": "git+https://gitlab.com/antora/antora.git"
+  },
+  "bugs": {
+    "url": "https://gitlab.com/antora/antora/issues"
+  },
+  "main": "lib/index.js",
+  "exports": {
+    ".": "./lib/index.js",
+    "./git": "./lib/git.js",
+    "./git/http-plugin": "./lib/git-plugin-http.js",
+    "./lib/git-plugin-http": "./lib/git-plugin-http.js",
+    "./package.json": "./package.json"
+  },
+  "imports": {
+    "#compute-origin": "./lib/compute-origin.js",
+    "#constants": "./lib/constants.js"
+  },
+  "dependencies": {
+    "@antora/expand-path-helper": "~3.0",
+    "@antora/logger": "3.1.10",
+    "@antora/user-require-helper": "~3.0",
+    "braces": "~3.0",
+    "cache-directory": "~2.0",
+    "fast-glob": "~3.3",
+    "hpagent": "~1.2",
+    "isomorphic-git": "~1.25",
+    "js-yaml": "~4.1",
+    "multi-progress": "~4.0",
+    "picomatch": "~4.0",
+    "progress": "~2.0",
+    "should-proxy": "~1.0",
+    "simple-get": "~4.0",
+    "vinyl": "~3.0"
+  },
+  "engines": {
+    "node": ">=16.0.0"
+  },
+  "files": [
+    "lib/"
+  ],
+  "keywords": [
+    "antora",
+    "antora-component",
+    "git",
+    "isomorphic-git",
+    "content",
+    "documentation",
+    "static site",
+    "web publishing"
+  ],
+  "scripts": {
+    "test": "_mocha",
+    "prepublishOnly": "npx -y downdoc --prepublish",
+    "postpublish": "npx -y downdoc --postpublish"
+  }
+}
