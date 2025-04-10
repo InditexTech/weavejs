@@ -88,7 +88,7 @@ jobs:
       - name: NPM / Build
         working-directory: docs
         env:
-          GIT_CREDENTIALS: https://x-access-token:${{ secrets.GH_TOKEN_READER }}@github.com
+          GIT_CREDENTIALS: https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com
         run: |
           npm run verify
 

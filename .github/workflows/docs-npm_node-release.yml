@@ -114,7 +114,7 @@ jobs:
         working-directory: docs
         env:
           RELEASE_VERSION: ${{ steps.update-changelog.outputs.version }}
-          GIT_CREDENTIALS: https://x-access-token:${{ secrets.GH_TOKEN_READER }}@github.com
+          GIT_CREDENTIALS: https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com
         run: |
           npm run version:release
           npm run release:prepare
