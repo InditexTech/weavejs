@@ -20,9 +20,8 @@ jobs:
   release:
     name: Docs release
     if: github.event_name == 'workflow_dispatch'
-      || (github.event.pull_request.merged == true && !contains(join(github.event.pull_request.labels.*.name, ', '), 'skip-release')
-      && (contains(join(github.event.pull_request.labels.*.name, ', '), 'release-type')
-      || vars.DEVELOPMENT_FLOW == 'trunk-based-development' ))
+      || (github.event.pull_request.merged == true && !contains(join(github.event.pull_request.labels.*.name, ', '), 'skip-docs-release')
+      || vars.DEVELOPMENT_FLOW == 'trunk-based-development')
     runs-on: ubuntu-24.04
     steps:
       - name: Get input parameters
