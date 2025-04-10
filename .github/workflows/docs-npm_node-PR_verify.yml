@@ -65,5 +65,4 @@ jobs:
           GIT_CREDENTIALS: https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com
         working-directory: docs
         run: |
-          echo $GIT_CREDENTIALS
           npm run verify

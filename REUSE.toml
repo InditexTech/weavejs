@@ -26,6 +26,9 @@ path = [
     "code/nx.json",
     "code/tsconfig.base.json",
 
+    # docs/ directory licensing
+    "docs/**",
+
     # code/patches/ directory licensing
     "code/patches/**"
 ]
