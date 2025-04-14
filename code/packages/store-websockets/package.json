@@ -31,7 +31,7 @@
     "bundle:analyze": "vite-bundle-visualizer",
     "check": "echo \"Monorepo test script\" && exit 0",
     "dev": "vite build --watch",
-    "dev:server": "tsx --env-file=.env ./server/server.ts",
+    "dev:server": "tsx --env-file=.env ./dev-server/server.ts",
     "dist:tag": "npm dist-tag add \"$(jq -r .name package.json)@$(jq -r .version package.json)\" \"$PR_TAG\" --registry=\"$NPM_PUBLISHING_REGISTRY\" --verbose",
     "format": "npm run lint -- --quiet --fix --fix-type layout",
     "link": "npm link",

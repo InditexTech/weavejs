@@ -16,9 +16,6 @@ export default defineConfig(({ mode }) => {
 
   return {
     build: {
-      ssr: {
-        noExternal: true,
-      },
       lib: {
         entry: {
           client: './src/index.client.ts',
