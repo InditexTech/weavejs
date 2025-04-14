@@ -16,14 +16,6 @@ export default defineConfig(({ mode }) => {
 
   return {
     build: {
-      ssr: {
-        noExternal: [
-          '@azure/web-pubsub',
-          '@azure/web-pubsub-express',
-          'emittery',
-          'reconnecting-websocket',
-        ],
-      },
       lib: {
         entry: {
           client: './src/index.client.ts',
@@ -37,6 +29,8 @@ export default defineConfig(({ mode }) => {
       },
       rollupOptions: {
         external: [
+          '@azure/web-pubsub',
+          '@azure/web-pubsub-express',
           '@inditextech/weavejs-sdk',
           'crypto',
           'express',

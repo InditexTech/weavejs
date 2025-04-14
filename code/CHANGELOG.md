@@ -15,6 +15,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- [#105](https://github.com/InditexTech/weavejs/issues/105) Fix store packages external depdendencies
+
+## [0.24.3] - 2025-04-14
+
+### Added
+
 - [#103](https://github.com/InditexTech/weavejs/issues/103) Fix externalized dependencies on store packages
 
 ## [0.24.2] - 2025-04-14
@@ -222,7 +228,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - [#8](https://github.com/InditexTech/weavejs/issues/8) ESLint OSS rules
 - [#2](https://github.com/InditexTech/weavejs/issues/2) Improve rendering handling
 
-[Unreleased]: https://github.com/InditexTech/weavejs/compare/0.24.2...HEAD
+[Unreleased]: https://github.com/InditexTech/weavejs/compare/0.24.3...HEAD
+[0.24.3]: https://github.com/InditexTech/weavejs/compare/0.24.2...0.24.3
 [0.24.2]: https://github.com/InditexTech/weavejs/compare/0.24.1...0.24.2
 [0.24.1]: https://github.com/InditexTech/weavejs/compare/0.24.0...0.24.1
 [0.24.0]: https://github.com/InditexTech/weavejs/compare/0.23.0...0.24.0
