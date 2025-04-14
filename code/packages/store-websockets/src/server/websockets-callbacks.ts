@@ -4,6 +4,7 @@
 
 import http from 'http';
 import * as number from 'lib0/number';
+import { WSSharedDoc } from './websockets-utils';
 
 const CALLBACK_URL = process.env.CALLBACK_URL
   ? new URL(process.env.CALLBACK_URL)
@@ -17,14 +18,15 @@ const CALLBACK_OBJECTS = process.env.CALLBACK_OBJECTS
 
 export const isCallbackSet = !!CALLBACK_URL;
 
-/**
- * @param {Uint8Array} update
- * @param {any} origin
- * @param {import('./utils.cjs').WSSharedDoc} doc
- */
-export const callbackHandler = (update, origin, doc) => {
+export const callbackHandler = (
+  _update: Uint8Array,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  _origin: any,
+  doc: WSSharedDoc
+) => {
   const room = doc.name;
-  const dataToSend = {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const dataToSend: { room: string; data: any } = {
     room,
     data: {},
   };
@@ -41,12 +43,8 @@ export const callbackHandler = (update, origin, doc) => {
   }
 };
 
-/**
- * @param {URL} url
- * @param {number} timeout
- * @param {Object} data
- */
-export const callbackRequest = (url, timeout, data) => {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export const callbackRequest = (url: URL, timeout: number, data: any) => {
   data = JSON.stringify(data);
   const options = {
     hostname: url.hostname,
@@ -72,12 +70,12 @@ export const callbackRequest = (url, timeout, data) => {
   req.end();
 };
 
-/**
- * @param {string} objName
- * @param {string} objType
- * @param {import('./utils.cjs').WSSharedDoc} doc
- */
-const getContent = (objName, objType, doc) => {
+const getContent = (
+  objName: string,
+  objType: string,
+  doc: WSSharedDoc
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+): any => {
   switch (objType) {
     case 'Array':
       return doc.getArray(objName);

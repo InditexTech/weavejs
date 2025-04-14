@@ -7,12 +7,12 @@ import {
   WeaveAwarenessChange,
   WeaveStoreOptions,
 } from '@inditextech/weavejs-types';
-import { WebsocketProvider } from 'y-websocket';
 import { WEAVE_STORE_WEBSOCKETS } from './constants';
 import {
   WeaveStoreWebsocketsConnectionStatus,
   WeaveStoreWebsocketsOptions,
 } from './types';
+import { WebsocketProvider } from 'y-websocket';
 
 export class WeaveStoreWebsockets extends WeaveStore {
   private websocketOptions: WeaveStoreWebsocketsOptions;

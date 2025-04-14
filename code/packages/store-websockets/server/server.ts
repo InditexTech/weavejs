@@ -2,37 +2,77 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-import { WebSocketServer } from "ws";
-import http from "http";
-import * as number from "lib0/number";
-import { setupWSConnection } from "./utils";
+import { fileURLToPath } from 'url';
+import path from 'path';
+import fs from 'fs/promises';
+import http from 'http';
+import * as number from 'lib0/number';
+import { WeaveWebsocketsServer } from '../src';
 
-const wss = new WebSocketServer({ noServer: true });
+// eslint-disable-next-line @typescript-eslint/naming-convention
+const __filename = fileURLToPath(import.meta.url);
+// eslint-disable-next-line @typescript-eslint/naming-convention
+const __dirname = path.dirname(__filename);
 
-const host = process.env.HOST || "localhost";
-const port = number.parseInt(process.env.PORT || "1234");
+const VALID_ROOM_WEBSOCKET_URL = /\/sync\/rooms\/(.*)/;
+
+const host = process.env.HOST || 'localhost';
+const port = number.parseInt(process.env.PORT || '1234');
 
 const server = http.createServer((_request, response) => {
-  response.writeHead(200, { "Content-Type": "text/plain" });
-  response.end("okay");
+  response.writeHead(200, { 'Content-Type': 'text/plain' });
+  response.end('okay');
 });
 
-wss.on("connection", setupWSConnection);
+const wss = new WeaveWebsocketsServer({
+  performUpgrade: async (request) => {
+    return VALID_ROOM_WEBSOCKET_URL.test(request.url ?? '');
+  },
+  extractRoomId: (request) => {
+    const match = request.url?.match(VALID_ROOM_WEBSOCKET_URL);
+    if (match) {
+      return match[1];
+    }
+    return undefined;
+  },
+  fetchRoom: async (docName: string) => {
+    try {
+      const roomsFolder = path.join(__dirname, 'rooms');
+      const roomsFile = path.join(roomsFolder, docName);
+      return await fs.readFile(roomsFile);
+    } catch (e) {
+      return null;
+    }
+  },
+  persistRoom: async (
+    docName: string,
+    actualState: Uint8Array<ArrayBufferLike>
+  ) => {
+    try {
+      const roomsFolder = path.join(__dirname, 'rooms');
 
-server.on("upgrade", (request, socket, head) => {
-  // You may check auth of request here..
-  // Call `wss.HandleUpgrade` *after* you checked whether the client has access
-  // (e.g. by checking cookies, or url parameters).
-  // See https://github.com/websockets/ws#client-authentication
-  wss.handleUpgrade(
-    request,
-    socket,
-    head,
-    /** @param {any} ws */ (ws) => {
-      wss.emit("connection", ws, request);
-    },
-  );
+      let folderExists = false;
+      try {
+        await fs.access(roomsFolder);
+        folderExists = true;
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      } catch (e) {
+        folderExists = false;
+      }
+
+      if (!folderExists) {
+        await fs.mkdir(roomsFolder, { recursive: true });
+      }
+
+      const roomsFile = path.join(roomsFolder, docName);
+      await fs.writeFile(roomsFile, actualState);
+    } catch (ex) {
+      console.error(ex);
+    }
+  },
 });
+
+wss.handleUpgrade(server);
 
 server.listen(port, host, () => {
   // eslint-disable-next-line no-console

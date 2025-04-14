@@ -132,6 +132,10 @@ export class Weave extends Emittery {
       this.setupManager.setupActions();
 
       this.moduleLogger.info('Instance started');
+
+      this.status = WEAVE_INSTANCE_STATUS.RUNNING;
+      this.getConfiguration().callbacks?.onInstanceStatus?.(this.status);
+      this.emitEvent('onInstanceStatus', this.status);
     });
   }
 
@@ -171,16 +175,12 @@ export class Weave extends Emittery {
     this.setupManager.setupLog();
 
     // Setup stage
-    // this.stageManager.initStage();
+    this.stageManager.initStage();
 
     // Setup and connect to the store
     const store = this.storeManager.getStore();
     store.setup();
     store.connect();
-
-    this.status = WEAVE_INSTANCE_STATUS.RUNNING;
-    this.getConfiguration().callbacks?.onInstanceStatus?.(this.status);
-    this.emitEvent('onInstanceStatus', this.status);
   }
 
   destroy() {

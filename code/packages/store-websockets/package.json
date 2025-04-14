@@ -43,6 +43,8 @@
   "devDependencies": {
     "@inditextech/weavejs-sdk": "0.24.0-SNAPSHOT",
     "@inditextech/weavejs-types": "0.24.0-SNAPSHOT",
+    "@types/lodash.debounce": "^4.0.9",
+    "@types/ws": "^8.18.1",
     "@typescript-eslint/eslint-plugin": "8.26.0",
     "@typescript-eslint/parser": "8.26.0",
     "@vitest/coverage-v8": "1.6.0",
@@ -55,7 +57,8 @@
     "vite-plugin-compression2": "1.0.0",
     "vite-plugin-dts": "4.0.3",
     "vitest": "1.6.0",
-    "vitest-sonar-reporter": "2.0.0"
+    "vitest-sonar-reporter": "2.0.0",
+    "ws": "^8.18.1"
   },
   "peerDependencies": {
     "y-websocket": ">= 2.1.0",
