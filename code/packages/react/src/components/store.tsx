@@ -10,7 +10,6 @@ import {
   WeaveStateElement,
   WeaveStatus,
 } from '@inditextech/weavejs-types';
-import { WeaveStoreWebsocketsConnectionStatus } from '@inditextech/weavejs-store-websockets';
 import { create } from 'zustand';
 
 interface WeaveRuntimeState {
@@ -18,7 +17,7 @@ interface WeaveRuntimeState {
   appState: WeaveState;
   status: WeaveStatus;
   connection: {
-    status: WeaveStoreWebsocketsConnectionStatus;
+    status: string;
   };
   room: {
     loaded: boolean;
@@ -44,9 +43,7 @@ interface WeaveRuntimeState {
   setInstance: (newInstance: Weave) => void;
   setStatus: (newStatus: WeaveStatus) => void;
   setAppState: (newAppState: WeaveState) => void;
-  setConnectionStatus: (
-    newConnectionStatus: WeaveStoreWebsocketsConnectionStatus
-  ) => void;
+  setConnectionStatus: (newConnectionStatus: string) => void;
   setRoomLoaded: (newStatus: boolean) => void;
   setUsers: (newUsers: WeaveConnectedUsersChanged) => void;
   setCanUndo: (newCanUndo: boolean) => void;

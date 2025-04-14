@@ -6,7 +6,7 @@ import { fileURLToPath } from 'url';
 import path from 'path';
 import fs from 'fs/promises';
 import express from 'express';
-import { WeaveWebsocketsServer } from '../src';
+import { WeaveWebsocketsServer } from '../src/index.server';
 
 // eslint-disable-next-line @typescript-eslint/naming-convention
 const __filename = fileURLToPath(import.meta.url);
