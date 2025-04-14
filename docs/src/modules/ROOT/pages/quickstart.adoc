@@ -29,8 +29,6 @@ For a more detail on how to setup **Weave.js** on separated artifacts, check our
 - https://github.com/InditexTech/weavejs-backend[Backend repo]
 ====
 
-=== Step 1: Create a new Next.js application
-
 To create a new Next.js application, run the following command:
 
 [source,shell]
@@ -57,7 +55,9 @@ Some images will fail to load, this is because _Next.js_ images URLs changed and
 this later on.
 ====
 
-=== Step 2: Setup the _Next.js_ custom server
+== Backend side
+
+=== Setup a custom server
 
 In order to have frontend and backend on the same artifact we need to customize the _Next.js_ server to include
 the necessary **Weave.js** backend logic. For this to work we need to setup
@@ -121,7 +121,7 @@ Now test that the _Next.js_ project keeps starting with the new custom server co
 npm run dev
 ----
 
-=== Step 3: Install the Weave.js backend dependencies
+=== Install Weave.js dependencies
 
 Now that you're located on your project folder let's now install the **Weave.js** backend dependencies:
 
@@ -130,19 +130,21 @@ Now that you're located on your project folder let's now install the **Weave.js*
 npm install @inditextech/weavejs-sdk @inditextech/weavejs-react @inditextech/weavejs-store-websockets @inditextech/weavejs-types
 ----
 
-=== Step 4: Setup the Weave.js backend logic
+=== Setup Weave.js backend logic
 
 TODO
 
-=== Step 5: Install the Weave.js frontend dependencies
+== Frontend side
+
+=== Install Weave.js dependencies
 
 TODO
 
-=== Step 6: Setup the Weave.js frontend
+=== Setup Weave.js frontend logic
 
 TODO
 
-=== Run the project
+== Run the project
 
 TODO
 
