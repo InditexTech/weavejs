@@ -1,6 +1,6 @@
 {
   "name": "@inditextech/weavejs-store-websockets",
-  "version": "0.24.3",
+  "version": "0.25.0-SNAPSHOT",
   "type": "module",
   "license": "Apache-2.0",
   "author": "Jesus Manuel Piñeiro Cid <jesusmpc@inditex.com>",
@@ -47,8 +47,8 @@
     "version:release": "npm version $RELEASE_VERSION -m \"[npm-scripts] prepare release $RELEASE_VERSION\" --tag-version-prefix \"\""
   },
   "devDependencies": {
-    "@inditextech/weavejs-sdk": "0.24.3",
-    "@inditextech/weavejs-types": "0.24.3",
+    "@inditextech/weavejs-sdk": "0.25.0-SNAPSHOT",
+    "@inditextech/weavejs-types": "0.25.0-SNAPSHOT",
     "@types/express": "^5.0.1",
     "@types/lodash.debounce": "^4.0.9",
     "@types/ws": "^8.18.1",
