@@ -43,6 +43,7 @@
   "devDependencies": {
     "@inditextech/weavejs-sdk": "0.24.0-SNAPSHOT",
     "@inditextech/weavejs-types": "0.24.0-SNAPSHOT",
+    "@types/express": "^5.0.1",
     "@types/lodash.debounce": "^4.0.9",
     "@types/ws": "^8.18.1",
     "@typescript-eslint/eslint-plugin": "8.26.0",
@@ -50,6 +51,7 @@
     "@vitest/coverage-v8": "1.6.0",
     "@vitest/ui": "1.6.0",
     "eslint": "8.57.1",
+    "express": "^5.1.0",
     "globals": "15.14.0",
     "typescript-eslint": "8.22.0",
     "vite": "5.2.9",

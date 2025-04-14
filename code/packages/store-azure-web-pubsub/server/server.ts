@@ -2,25 +2,71 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-import cors from "cors";
-import express, { Router } from "express";
-import { WebPubSubServiceClient, AzureKeyCredential } from "@azure/web-pubsub";
-import SyncHandler from "./sync-handler";
+import { fileURLToPath } from 'url';
+import path from 'path';
+import fs from 'fs/promises';
+import cors from 'cors';
+import express, { Router } from 'express';
+import { WeaveAzureWebPubsubServer } from '../src/index';
 
-const port = process.env.WEAVE_AZURE_WEB_PUBSUB_PORT || 8081;
+// eslint-disable-next-line @typescript-eslint/naming-convention
+const __filename = fileURLToPath(import.meta.url);
+// eslint-disable-next-line @typescript-eslint/naming-convention
+const __dirname = path.dirname(__filename);
+
+const host = process.env.WEAVE_AZURE_WEB_PUBSUB_HOST || 'localhost';
+const port = parseInt(process.env.WEAVE_AZURE_WEB_PUBSUB_PORT || '1234');
 
 const endpoint = process.env.WEAVE_AZURE_WEB_PUBSUB_ENDPOINT;
 const key = process.env.WEAVE_AZURE_WEB_PUBSUB_KEY;
 const hubName = process.env.WEAVE_AZURE_WEB_PUBSUB_HUB_NAME;
 
 if (!endpoint || !key || !hubName) {
-  throw new Error("Missing required environment variables");
+  throw new Error('Missing required environment variables');
 }
 
-const credentials = new AzureKeyCredential(key ?? "");
+const azureWebPubsubServer = new WeaveAzureWebPubsubServer({
+  pubsubConfig: {
+    endpoint,
+    key,
+    hubName,
+  },
+  fetchRoom: async (docName: string) => {
+    try {
+      const roomsFolder = path.join(__dirname, 'rooms');
+      const roomsFile = path.join(roomsFolder, docName);
+      return await fs.readFile(roomsFile);
+    } catch (e) {
+      return null;
+    }
+  },
+  persistRoom: async (
+    docName: string,
+    actualState: Uint8Array<ArrayBufferLike>
+  ) => {
+    try {
+      const roomsFolder = path.join(__dirname, 'rooms');
 
-const syncClient: WebPubSubServiceClient = new WebPubSubServiceClient(endpoint, credentials, hubName);
-const syncHandler = new SyncHandler(hubName, `/api/webpubsub/hubs/${hubName}`, syncClient);
+      let folderExists = false;
+      try {
+        await fs.access(roomsFolder);
+        folderExists = true;
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      } catch (e) {
+        folderExists = false;
+      }
+
+      if (!folderExists) {
+        await fs.mkdir(roomsFolder, { recursive: true });
+      }
+
+      const roomsFile = path.join(roomsFolder, docName);
+      await fs.writeFile(roomsFile, actualState);
+    } catch (ex) {
+      console.error(ex);
+    }
+  },
+});
 
 const app = express();
 
@@ -30,18 +76,22 @@ const corsOptions = {
 
 app.use(cors(corsOptions));
 
-const router = new Router();
+const router = Router();
 
-router.use(syncHandler.getMiddleware());
-router.get(`/rooms/:roomId/connect`, (req, res) => syncHandler.clientConnect(req, res));
+router.use(azureWebPubsubServer.getMiddleware());
+router.get(`/rooms/:roomId/connect`, async (req, res) => {
+  const roomId = req.params.roomId;
+  const url = await azureWebPubsubServer.clientConnect(roomId);
+  res.json({ url });
+});
 
 app.use(`/api/v1/${hubName}`, router);
 
-app.listen(port, "0.0.0.0", () => {
+app.listen(port, host, (err: Error | undefined) => {
+  if (err) throw err;
+
   // eslint-disable-next-line no-console
-  console.log(`Server started @ http://0.0.0.0:${port}\n`);
+  console.log(`Server started @ http://${host}:${port}\n`);
   // eslint-disable-next-line no-console
-  console.log("Client endpoints:");
-  // eslint-disable-next-line no-console
-  console.log(`- Connection\nhttp://localhost:${port}/api/v1/${hubName}/{roomId}/connect`);
+  console.log(`Connection endpoint: /api/v1/${hubName}/{roomId}/connect`);
 });
