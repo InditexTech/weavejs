@@ -1,6 +1,6 @@
 {
   "name": "@inditextech/weavejs-store-azure-web-pubsub",
-  "version": "0.24.0",
+  "version": "0.25.0-SNAPSHOT",
   "type": "module",
   "license": "Apache-2.0",
   "author": "Jesus Manuel Piñeiro Cid <jesusmpc@inditex.com>",
@@ -44,8 +44,8 @@
   "devDependencies": {
     "@azure/web-pubsub": "1.1.4",
     "@azure/web-pubsub-express": "^1.0.6",
-    "@inditextech/weavejs-sdk": "0.24.0",
-    "@inditextech/weavejs-types": "0.24.0",
+    "@inditextech/weavejs-sdk": "0.25.0-SNAPSHOT",
+    "@inditextech/weavejs-types": "0.25.0-SNAPSHOT",
     "@types/express": "^5.0.1",
     "@types/uuid": "^10.0.0",
     "@types/ws": "^8.18.0",
