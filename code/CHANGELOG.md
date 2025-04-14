@@ -16,6 +16,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - [#95](https://github.com/InditexTech/weavejs/issues/95) Refactor server part for websockets store
+- [#97](https://github.com/InditexTech/weavejs/issues/97) Refactor server part for Azure web pubsub store
 
 ## [0.23.0] - 2025-04-10
 

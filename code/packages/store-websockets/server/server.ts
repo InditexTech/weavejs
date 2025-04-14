@@ -5,8 +5,7 @@
 import { fileURLToPath } from 'url';
 import path from 'path';
 import fs from 'fs/promises';
-import http from 'http';
-import * as number from 'lib0/number';
+import express from 'express';
 import { WeaveWebsocketsServer } from '../src';
 
 // eslint-disable-next-line @typescript-eslint/naming-convention
@@ -17,11 +16,15 @@ const __dirname = path.dirname(__filename);
 const VALID_ROOM_WEBSOCKET_URL = /\/sync\/rooms\/(.*)/;
 
 const host = process.env.HOST || 'localhost';
-const port = number.parseInt(process.env.PORT || '1234');
+const port = parseInt(process.env.PORT || '1234');
 
-const server = http.createServer((_request, response) => {
-  response.writeHead(200, { 'Content-Type': 'text/plain' });
-  response.end('okay');
+const app = express();
+
+const server = app.listen(port, host, (err: Error | undefined) => {
+  if (err) throw err;
+
+  // eslint-disable-next-line no-console
+  console.log(`Server started: http://${host}:${port}\n`);
 });
 
 const wss = new WeaveWebsocketsServer({
@@ -73,8 +76,3 @@ const wss = new WeaveWebsocketsServer({
 });
 
 wss.handleUpgrade(server);
-
-server.listen(port, host, () => {
-  // eslint-disable-next-line no-console
-  console.log(`Server started @ http://0.0.0.0:${port}\n`);
-});
