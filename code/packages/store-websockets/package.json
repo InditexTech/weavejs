@@ -11,8 +11,14 @@
     }
   ],
   "exports": {
-    "import": "./dist/store-websockets.js",
-    "require": "./dist/store-websockets.cjs"
+    "./client": {
+      "import": "./dist/client.js",
+      "require": "./dist/client.cjs"
+    },
+    "./server": {
+      "import": "./dist/server.js",
+      "require": "./dist/server.cjs"
+    }
   },
   "types": "dist/store-websockets.d.ts",
   "files": [

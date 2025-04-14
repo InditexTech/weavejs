@@ -7,7 +7,7 @@ import path from 'path';
 import fs from 'fs/promises';
 import cors from 'cors';
 import express, { Router } from 'express';
-import { WeaveAzureWebPubsubServer } from '../src/index';
+import { WeaveAzureWebPubsubServer } from '../src/index.server';
 
 // eslint-disable-next-line @typescript-eslint/naming-convention
 const __filename = fileURLToPath(import.meta.url);

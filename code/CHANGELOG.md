@@ -13,6 +13,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.24.1] - 2025-04-14
+
+### Added
+
+- [#99](https://github.com/InditexTech/weavejs/issues/99) Fix proxyPolicy is not supported in browser environment on `@inditextech/weavejs-store-azure-web-pubsub` package
+
 ## [0.24.0] - 2025-04-14
 
 ### Added
@@ -206,7 +212,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - [#8](https://github.com/InditexTech/weavejs/issues/8) ESLint OSS rules
 - [#2](https://github.com/InditexTech/weavejs/issues/2) Improve rendering handling
 
-[Unreleased]: https://github.com/InditexTech/weavejs/compare/0.24.0...HEAD
+[Unreleased]: https://github.com/InditexTech/weavejs/compare/0.24.1...HEAD
+
+[0.24.1]: https://github.com/InditexTech/weavejs/compare/0.24.0...0.24.1
 
 [0.24.0]: https://github.com/InditexTech/weavejs/compare/0.23.0...0.24.0
 
