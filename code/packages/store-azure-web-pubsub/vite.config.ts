@@ -16,7 +16,14 @@ export default defineConfig(({ mode }) => {
 
   return {
     build: {
-      ssr: true,
+      ssr: {
+        noExternal: [
+          '@azure/web-pubsub',
+          '@azure/web-pubsub-express',
+          'emittery',
+          'reconnecting-websocket',
+        ],
+      },
       lib: {
         entry: {
           client: './src/index.client.ts',
