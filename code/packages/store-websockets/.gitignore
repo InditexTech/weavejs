@@ -27,4 +27,4 @@ vite.config.ts*
 *.sw?
 
 .env*
-server/rooms
+dev-server/rooms
