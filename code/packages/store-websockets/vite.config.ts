@@ -23,7 +23,7 @@ export default defineConfig(({ mode }) => {
         fileName: 'store-websockets',
       },
       rollupOptions: {
-        external: ['@inditextech/weavejs-sdk', 'yjs'],
+        external: ['http', '@inditextech/weavejs-sdk', 'yjs', 'ws'],
       },
     },
 
