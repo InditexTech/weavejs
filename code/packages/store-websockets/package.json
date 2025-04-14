@@ -1,6 +1,6 @@
 {
   "name": "@inditextech/weavejs-store-websockets",
-  "version": "0.24.0-SNAPSHOT",
+  "version": "0.25.0-SNAPSHOT",
   "type": "module",
   "license": "Apache-2.0",
   "author": "Jesus Manuel Piñeiro Cid <jesusmpc@inditex.com>",
@@ -41,13 +41,17 @@
     "version:release": "npm version $RELEASE_VERSION -m \"[npm-scripts] prepare release $RELEASE_VERSION\" --tag-version-prefix \"\""
   },
   "devDependencies": {
-    "@inditextech/weavejs-sdk": "0.24.0-SNAPSHOT",
-    "@inditextech/weavejs-types": "0.24.0-SNAPSHOT",
+    "@inditextech/weavejs-sdk": "0.25.0-SNAPSHOT",
+    "@inditextech/weavejs-types": "0.25.0-SNAPSHOT",
+    "@types/express": "^5.0.1",
+    "@types/lodash.debounce": "^4.0.9",
+    "@types/ws": "^8.18.1",
     "@typescript-eslint/eslint-plugin": "8.26.0",
     "@typescript-eslint/parser": "8.26.0",
     "@vitest/coverage-v8": "1.6.0",
     "@vitest/ui": "1.6.0",
     "eslint": "8.57.1",
+    "express": "^5.1.0",
     "globals": "15.14.0",
     "typescript-eslint": "8.22.0",
     "vite": "5.2.9",
@@ -55,7 +59,8 @@
     "vite-plugin-compression2": "1.0.0",
     "vite-plugin-dts": "4.0.3",
     "vitest": "1.6.0",
-    "vitest-sonar-reporter": "2.0.0"
+    "vitest-sonar-reporter": "2.0.0",
+    "ws": "^8.18.1"
   },
   "peerDependencies": {
     "y-websocket": ">= 2.1.0",

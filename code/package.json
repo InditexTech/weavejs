@@ -1,8 +1,7 @@
 {
   "name": "@inditextech/weavejs",
-  "version": "0.24.0-SNAPSHOT",
+  "version": "0.25.0-SNAPSHOT",
   "description": "Weave.js framework",
-  "private": true,
   "packageManager": "npm@10.2.4",
   "workspaces": [
     "packages/*"
@@ -45,7 +44,14 @@
     "yjs",
     "sync"
   ],
-  "license": "UNLICENSED",
+  "author": "Jesus Manuel Piñeiro Cid <jesusmpc@inditex.com>",
+  "maintainers": [
+    {
+      "name": "Jesus Manuel Piñeiro Cid",
+      "email": "jesusmpc@inditex.com"
+    }
+  ],
+  "license": "Apache-2.0",
   "devDependencies": {
     "@commitlint/cli": "19.4.0",
     "@commitlint/config-conventional": "19.2.2",
