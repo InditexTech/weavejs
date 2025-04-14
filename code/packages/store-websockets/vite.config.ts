@@ -16,11 +16,17 @@ export default defineConfig(({ mode }) => {
 
   return {
     build: {
+      ssr: true,
       lib: {
-        entry: './src/index.ts',
-        name: 'store-websockets',
+        entry: {
+          client: './src/index.client.ts',
+          server: './src/index.server.ts',
+        },
         formats: ['es', 'cjs'],
-        fileName: 'store-websockets',
+        fileName: (format, entryName) => {
+          const extension = format === 'es' ? 'js' : 'cjs';
+          return `${entryName}.${extension}`;
+        },
       },
       rollupOptions: {
         external: ['@inditextech/weavejs-sdk', 'express', 'http', 'yjs', 'ws'],
