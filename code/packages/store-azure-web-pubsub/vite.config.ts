@@ -16,11 +16,17 @@ export default defineConfig(({ mode }) => {
 
   return {
     build: {
+      ssr: true,
       lib: {
-        entry: './src/index.ts',
-        name: 'store-azure-web-pubsub',
+        entry: {
+          client: './src/index.client.ts',
+          server: './src/index.server.ts',
+        },
         formats: ['es', 'cjs'],
-        fileName: 'store-azure-web-pubsub',
+        fileName: (format, entryName) => {
+          const extension = format === 'es' ? 'js' : 'cjs';
+          return `${entryName}.${extension}`;
+        },
       },
       rollupOptions: {
         external: [

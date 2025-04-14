@@ -11,8 +11,14 @@
     }
   ],
   "exports": {
-    "import": "./dist/store-azure-web-pubsub.js",
-    "require": "./dist/store-azure-web-pubsub.cjs"
+    "./client": {
+      "import": "./dist/client.js",
+      "require": "./dist/client.cjs"
+    },
+    "./server": {
+      "import": "./dist/server.js",
+      "require": "./dist/server.cjs"
+    }
   },
   "types": "dist/store-azure-web-pubsub.d.ts",
   "files": [
