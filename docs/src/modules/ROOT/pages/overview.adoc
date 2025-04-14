@@ -2,12 +2,100 @@
 
 == What's Weave.js?
 
-TODO
+**Weave.js** is an opinionated JavaScript library purpose-built for developing visual collaborative tools
+on top of the HTML5 canvas. It provides a structured and extensible foundation for building real-time,
+multi-user interfaces such as whiteboards, diagram editors, visual programming environments, and other
+interactive graphical tools.
+
+At its core, **Weave.js** embraces a plugin-based architecture, allowing developers to easily extend and
+customize behaviors, nodes (rendering logic), tools and actions without compromising performance or maintainability.
+The library offers an end-to-end (front and backend) solution with high-level abstractions for managing:
+
+- Canvas rendering
+- Real-time state synchronization
+- User interactions
+
+Significantly reducing the complexity typically involved in building such applications from scratch.
+
+**Weave.js** is intentionally opinionated in its design choices, promoting best practices and consistency
+in architecture, while still offering flexibility for customization. This makes it especially well-suited
+for teams and projects aiming to deliver rich, collaborative visual experiences with minimal boilerplate
+and maximal control.
 
 == How does it work?
 
-TODO
+**Weave.js** is built on a modern, modular architecture that integrates best-in-class open-source libraries
+to simplify the development of visual collaborative tools.
+
+Our goal is to abstract all the complexity of real-time collaboration and canvas rendering, so developers
+can focus on _building features_, not _infrastructure_.
+
+Here’s a look at the top-notch core OSO libraries that power **Weave.js**:
+
+=== Konva.js
+
+We use https://konvajs.org/docs/overview.html[_Konva.js_] to manage the HTML5 canvas rendering workflow.
+Its high-level abstraction over the HTML5 canvas API that simplifies the process of creating and manipulating
+shapes, groups, and layers which are the canvas building blocks.
+
+=== React Reconciler
+
+We use a custom https://github.com/facebook/react/tree/main/packages/react-reconciler[_React Reconciler_]
+to bridge React’s component model state with the Konva rendering layer. This integration allows developers
+to declaratively manage the canvas node tree, while benefiting from efficient, incremental updates and
+the React's renderer life-cycle optimizations.
+
+=== Yjs
+
+For real-time collaboration, we use https://yjs.dev[_Yjs_], a https://github.com/yjs/yjs/blob/master/README.md#Yjs-CRDT-Algorithm[CRDT]-based framework that ensures
+consistency across distributed clients. It handles network conflicts automatically and guarantees that all
+users stay in sync, even during offline or concurrent edits.
+
+=== SyncedStore
+
+We use https://syncedstore.org/docs[_SyncedStore_], an API for _Yjs_, to provide a developer-friendly
+abstraction layer. It offers a simple, reactive API that makes working with shared state feel like building
+a regular single-user app—while seamlessly handling all the multiplayer complexity under the hood.
+
+Together, these technologies form the backbone of **Weave.js**: a cohesive system that enables developers
+to build scalable, collaborative canvas tools with minimal friction. Whether you're building a live whiteboard,
+a flowchart editor, or a visual programming interface, Weave.js provides the infrastructure you need—without
+reinventing the wheel.
 
 == Common project architecture
 
-TODO
+A standard **Weave.js** project follows a frontend-backend architecture designed to support real-time,
+collaborative experiences with efficient state synchronization and persistence.
+
+== Frontend artifact
+
+The frontend artifact is built with modern web frameworks (commonly React, Vue, etc.) and uses the **Weave.js**
+library to create the visual collaborative interface. It handles:
+
+- **Canvas rendering** engine via _Konva.js_ elements and the _React Reconciler_ life-cycle.
+- **User interaction and tooling**, via our plugin system, enabling custom drawing tools, components,
+and UI logic.
+- Real-time collaboration, through integration with _Yjs_ and _SyncedStore_, which provides reactive shared
+state synced across users.
+
+== Backend artifact
+
+The backend provides infrastructure for:
+
+- Persistence of the shared-state.
+- Real-time sync of the shared-state and awareness events among clients
+
+=== Persistence of the shared-state
+
+Normally is handled by the developer, _Yjs_ provides an easy API to access the shared-state and persist it in a custom way.
+For example in our showcase we save ir on binary files on https://azure.microsoft.com/es-es/products/storage/blobs[_Azure Blob Storage]_.
+And we also recover it for there.
+
+=== Real-time sync of the shared-state
+
+This is done using one of **Weave.js’s** supported store providers (based on _Yjs_):
+
+- **Websockets store provider**, which uses websockets as transport.
+- **Azure Web PubSub store provider**, which uses https://azure.microsoft.com/en-us/products/web-pubsub[_Azure Web PubSub_] as transport.
+
+Developers can also write a store with their custom transport.

@@ -2,12 +2,150 @@
 
 == System requirements
 
-TODO
+Before you begin, make sure your system meets the following requirements:
+
+- https://nodejs.org/es/download[_Node.js_] 18.18 or later.
+- macOS, Windows (WSL), or Linux.
+
+You can install **Weave.js** on top of any UI framework, such as Next.js, React, Angular, or Vue.
 
 == Installation
 
+To simplify this guide we'll give an overview of how to setup ** Weave.js** on top of a
+https://nextjs.org/docs[_Next.js_] application.
+
+Take into consideration that we will use _Next.js_ version
+14, as of this day **Weave.js** is not compatible with React 19, which is the version of React that ships
+with the latest version (v15 when writing this document) of _Next.js_.
+
+[NOTE]
+====
+The usage of _Next.js_ on the quickstart allow us to have the frontend and backend on the same artifact,
+thus simplifies the quickstart process.
+
+For a more detail on how to setup **Weave.js** on separated artifacts, check our showcase artifacts implementations:
+
+- https://github.com/InditexTech/weavejs-frontend[Frontend repo]
+- https://github.com/InditexTech/weavejs-backend[Backend repo]
+====
+
+=== Step 1: Create a new Next.js application
+
+To create a new Next.js application, run the following command:
+
+[source,shell]
+----
+npx create-next-app@next-14
+----
+
+When prompted, accept all the default values. The command will create a folder with your project name will proceed
+to install the required dependencies.
+
+Navigate to the project folder and start the development server:
+
+[source,shell]
+----
+cd my-project
+npm run dev
+----
+
+You should be able now to open your _Next.js_ base app on a browser by navigating to: `http://localhost:3000`.
+
+[NOTE]
+====
+Some images will fail to load, this is because _Next.js_ images URLs changed and are not available. We will flexibility
+this later on.
+====
+
+=== Step 2: Setup the _Next.js_ custom server
+
+In order to have frontend and backend on the same artifact we need to customize the _Next.js_ server to include
+the necessary **Weave.js** backend logic. For this to work we need to setup
+https://nextjs.org/docs/14/pages/building-your-application/configuring/custom-server[custom server] on _Next.js_.
+
+[IMPORTANT]
+====
+For production environments, you should consider using a separate backend server to handle the **Weave.js**
+backend logic.
+====
+
+First install the necessary dependencies for the custom server:
+
+[source,shell]
+----
+npm install cross-env express
+npm install -D ts-node nodemon @types/express
+----
+
+Now lets setup the TypeScript configuration for the server part by creating a `tsconfig.server.json` file on
+the root of your project with the following content:
+
+[source,json]
+----
+include::ROOT:example$tsconfig.server.json[]
+----
+
+Now lets setup the transpilation of the server par files from TypeScript to JavaScript. First create a
+`nodemon.json` file on the root of your project with the following content:
+
+[source,json]
+----
+include::ROOT:example$nodemon.json[]
+----
+
+Finally lets create the custom server logic, create a file `server.ts` on the root of your project with the
+following content:
+
+[source,typescript]
+----
+include::ROOT:example$server.ts[]
+----
+
+Then change the `dev`, `build` and `start` scripts on your `package.json` to use the custom server:
+
+[source,json]
+----
+{
+  "scripts": {
+    "dev": "nodemon",
+    "build": "next build && tsc --project tsconfig.server.json",
+    "start": "cross-env NODE_ENV=production node dist/server.js"
+  }
+}
+----
+
+Now test that the _Next.js_ project keeps starting with the new custom server configuration, just run:
+
+[source,shell]
+----
+npm run dev
+----
+
+=== Step 3: Install the Weave.js backend dependencies
+
+Now that you're located on your project folder let's now install the **Weave.js** backend dependencies:
+
+[source,shell]
+----
+npm install @inditextech/weavejs-sdk @inditextech/weavejs-react @inditextech/weavejs-store-websockets @inditextech/weavejs-types
+----
+
+=== Step 4: Setup the Weave.js backend logic
+
 TODO
 
-== Run the application
+=== Step 5: Install the Weave.js frontend dependencies
+
+TODO
+
+=== Step 6: Setup the Weave.js frontend
+
+TODO
+
+=== Run the project
+
+TODO
+
+== Next Steps
 
 TODO

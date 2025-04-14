@@ -1,7 +1,7 @@
 {
   "name": "docs",
-  "version": "0.2.0-prerelease",
-  "description": "",
+  "version": "0.1.0-prerelease",
+  "description": "Weave.js documentation site",
   "main": "index.js",
   "scripts": {
     "cleanup": "rm package-lock.json && npkill -D -y",
@@ -17,9 +17,21 @@
     "version:development": "export BUMP_DEVELOP_VERSION=$(npm version $(npm version minor)-prerelease)",
     "version:release": "npm ci && npm version $RELEASE_VERSION"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
+  "keywords": [
+    "weave",
+    "weave.js",
+    "collab",
+    "collaboration",
+    "canvas",
+    "framework",
+    "sdk",
+    "react",
+    "yjs",
+    "sync",
+    "documentation"
+  ],
+  "author": "Jesus Manuel Piñeiro Cid <jesusmpc@inditex.com>",
+  "license": "Apache-2.0",
   "devDependencies": {
     "antora": "3.1.10",
     "concurrently": "^9.1.2",
