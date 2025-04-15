@@ -1,5 +1,4 @@
 name: weavejs
-version: ~
 title: Weave.js Docs
 nav:
   - modules/ROOT/nav.adoc

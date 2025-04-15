@@ -1,6 +1,6 @@
 {
   "name": "@inditextech/weavejs-sdk",
-  "version": "0.24.0-SNAPSHOT",
+  "version": "0.25.0-SNAPSHOT",
   "type": "module",
   "license": "Apache-2.0",
   "author": "Jesus Manuel Piñeiro Cid <jesusmpc@inditex.com>",
@@ -41,7 +41,7 @@
     "version:release": "npm version $RELEASE_VERSION -m \"[npm-scripts] prepare release $RELEASE_VERSION\" --tag-version-prefix \"\""
   },
   "devDependencies": {
-    "@inditextech/weavejs-types": "0.24.0-SNAPSHOT",
+    "@inditextech/weavejs-types": "0.25.0-SNAPSHOT",
     "@types/fontfaceobserver": "2.1.3",
     "@types/lodash": "4.17.15",
     "@types/react-reconciler": "0.28.9",

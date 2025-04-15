@@ -4,8 +4,8 @@ site:
 content:
   sources:
     - url: ./..
-      start_path: docs/src
       branches: HEAD
+      start_path: docs/src
       edit_url: "{web_url}/edit/develop/{path}"
       version:
         (*): prerelease

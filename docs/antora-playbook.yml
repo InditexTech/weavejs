@@ -13,6 +13,10 @@ content:
       version:
         main: prerelease
         docs/(*): $1
+runtime:
+  log:
+    format: pretty
+    level: all
 ui:
   bundle:
     url: ./ui-bundle.zip

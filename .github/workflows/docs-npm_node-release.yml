@@ -16,6 +16,9 @@ on:
         required: true
         default: "main"
 
+env:
+  DOCS_SITE_URL: https://stunning-enigma-169l5kv.pages.github.io
+
 jobs:
   release:
     name: Docs release
@@ -100,13 +103,13 @@ jobs:
           git config user.email "oso@inditex.com"
 
       - name: NPM / Get release version
+        id: update-changelog
         working-directory: docs
         run: |
-          echo "version=$(npm run package:version --silent)" >> "$GITHUB_OUTPUT"
-          echo "RELEASE_VERSION=$(npm run package:version --silent)" >> "$GITHUB_ENV"
+          echo "version=$(cat .release)" >> "$GITHUB_OUTPUT"
+          echo "RELEASE_VERSION=$(cat .release)" >> "$GITHUB_ENV"
 
       - name: NPM / Prepare release
-        id: update-changelog
         working-directory: docs
         env:
           RELEASE_VERSION: ${{ steps.update-changelog.outputs.version }}
@@ -122,12 +125,12 @@ jobs:
         run: |
           git pull --tags
           git commit -i package.json package-lock.json -m "[npm-scripts] Release ${{ steps.update-changelog.outputs.version }}" --no-verify
-          if git tag -l "docs/${{ steps.update-changelog.outputs.version }}"; then
+          if git rev-parse "docs/${{ steps.update-changelog.outputs.version }}" >/dev/null 2>&1; then
             git tag -d docs/${{ steps.update-changelog.outputs.version }};
             git push --delete origin docs/${{ steps.update-changelog.outputs.version }};
           fi
           git tag docs/${{ steps.update-changelog.outputs.version }}
-          git push --atomic --no-verify origin HEAD ${{ steps.update-changelog.outputs.version }}
+          git push --atomic --no-verify origin HEAD docs/${{ steps.update-changelog.outputs.version }}
 
       - name: NPM / Set next development version
         working-directory: docs
@@ -167,11 +170,11 @@ jobs:
         id: github-release
         continue-on-error: true
         with:
-          name: ${{ steps.update-changelog.outputs.version }}
-          tag: ${{ steps.update-changelog.outputs.version }}
+          name: docs/${{ steps.update-changelog.outputs.version }}
+          tag: docs/${{ steps.update-changelog.outputs.version }}
           token: ${{ secrets.GITHUB_TOKEN }}
           body: |
-            Check out the [changelog](docs/CHANGELOG.md) for version ${{ steps.update-changelog.outputs.version }}
+            Check out the documentation [here]($DOCS_SITE_URL/weavejs/index.html)
 
       - name: Comment in PR / Sync PR creation failed
         if: ${{ vars.DEVELOPMENT_FLOW != 'trunk-based-development' }}
@@ -199,3 +202,4 @@ jobs:
         uses: inditex/gha-workflowdispatch@v1
         with:
           workflow: docs-npm_node-publish.yml
+          inputs: '{ "BASELINE": "${{ env.BASELINE_BRANCH }}" }'

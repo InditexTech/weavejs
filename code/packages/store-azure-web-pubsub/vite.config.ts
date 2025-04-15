@@ -17,13 +17,32 @@ export default defineConfig(({ mode }) => {
   return {
     build: {
       lib: {
-        entry: './src/index.ts',
-        name: 'store-azure-web-pubsub',
+        entry: {
+          client: './src/index.client.ts',
+          server: './src/index.server.ts',
+        },
         formats: ['es', 'cjs'],
-        fileName: 'store-azure-web-pubsub',
+        fileName: (format, entryName) => {
+          const extension = format === 'es' ? 'js' : 'cjs';
+          return `${entryName}.${extension}`;
+        },
       },
       rollupOptions: {
-        external: ['@inditextech/weavejs-sdk', 'yjs'],
+        external: [
+          '@azure/web-pubsub',
+          '@azure/web-pubsub-express',
+          '@inditextech/weavejs-sdk',
+          'crypto',
+          'express',
+          'node:stream',
+          'stream',
+          'node:url',
+          'url',
+          'node:util',
+          'util',
+          'yjs',
+          'ws',
+        ],
       },
     },
 

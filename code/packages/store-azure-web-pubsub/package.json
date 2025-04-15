@@ -1,6 +1,6 @@
 {
   "name": "@inditextech/weavejs-store-azure-web-pubsub",
-  "version": "0.24.0-SNAPSHOT",
+  "version": "0.25.0-SNAPSHOT",
   "type": "module",
   "license": "Apache-2.0",
   "author": "Jesus Manuel Piñeiro Cid <jesusmpc@inditex.com>",
@@ -11,8 +11,14 @@
     }
   ],
   "exports": {
-    "import": "./dist/store-azure-web-pubsub.js",
-    "require": "./dist/store-azure-web-pubsub.cjs"
+    "./client": {
+      "import": "./dist/client.js",
+      "require": "./dist/client.cjs"
+    },
+    "./server": {
+      "import": "./dist/server.js",
+      "require": "./dist/server.cjs"
+    }
   },
   "types": "dist/store-azure-web-pubsub.d.ts",
   "files": [
@@ -25,7 +31,7 @@
     "bundle:analyze": "vite-bundle-visualizer",
     "check": "echo \"Monorepo test script\" && exit 0",
     "dev": "vite build --watch",
-    "dev:server": "tsx --env-file=.env ./server/server.ts",
+    "dev:server": "tsx --env-file=.env ./dev-server/server.ts",
     "dist:tag": "npm dist-tag add \"$(jq -r .name package.json)@$(jq -r .version package.json)\" \"$PR_TAG\" --registry=\"$NPM_PUBLISHING_REGISTRY\" --verbose",
     "format": "npm run lint -- --quiet --fix --fix-type layout",
     "link": "npm link",
@@ -44,8 +50,9 @@
   "devDependencies": {
     "@azure/web-pubsub": "1.1.4",
     "@azure/web-pubsub-express": "^1.0.6",
-    "@inditextech/weavejs-sdk": "0.24.0-SNAPSHOT",
-    "@inditextech/weavejs-types": "0.24.0-SNAPSHOT",
+    "@inditextech/weavejs-sdk": "0.25.0-SNAPSHOT",
+    "@inditextech/weavejs-types": "0.25.0-SNAPSHOT",
+    "@types/express": "^5.0.1",
     "@types/uuid": "^10.0.0",
     "@types/ws": "^8.18.0",
     "@typescript-eslint/eslint-plugin": "8.26.0",
@@ -54,8 +61,9 @@
     "@vitest/ui": "1.6.0",
     "buffer": "^6.0.3",
     "cors": "^2.8.5",
+    "emittery": "1.1.0",
     "eslint": "8.57.1",
-    "express": "^4.21.2",
+    "express": "^5.1.0",
     "globals": "15.14.0",
     "js-base64": "^3.7.7",
     "lib0": "^0.2.49",
@@ -69,8 +77,10 @@
     "vite-plugin-dts": "4.0.3",
     "vitest": "1.6.0",
     "vitest-sonar-reporter": "2.0.0",
-    "ws": "^8.18.1",
-    "y-protocols": "1.0.6"
+    "ws": "^8.18.1"
+  },
+  "peerDependencies": {
+    "yjs": ">= 13.6.23"
   },
   "engines": {
     "node": "^18.12 || ^20.11 || ^22.11",

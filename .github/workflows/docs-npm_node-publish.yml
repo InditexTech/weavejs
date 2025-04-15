@@ -3,12 +3,19 @@ name: docs-npm-publish
 run-name: "Deploy docs to GH-Pages"
 
 on:
-  # Runs on pushes targeting the default branch
-  push:
-    branches: ["main"]
-
-  # Allows you to run this workflow manually from the Actions tab
+  workflow_call:
+    inputs:
+      BASELINE:
+        type: string
+        description: "Baseline branch"
+        required: true
   workflow_dispatch:
+    inputs:
+      BASELINE:
+        type: string
+        description: "Baseline branch"
+        required: true
+        default: "main"
 
 # Sets permissions of the GITHUB_TOKEN to allow deployment to GitHub Pages
 permissions:
@@ -30,8 +37,15 @@ jobs:
       url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
     steps:
+      - name: Get input parameters
+        run: |
+          BASELINE_BRANCH=${{ github.event.inputs.BASELINE || github.ref }}
+          echo "BASELINE_BRANCH=${BASELINE_BRANCH#refs/heads/}" >> "$GITHUB_ENV"
+
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          ref: ${{ env.BASELINE_BRANCH }}
 
       - name: Setup Pages
         uses: actions/configure-pages@v5

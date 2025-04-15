@@ -2,6 +2,6 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-export { WeaveStoreWebsockets } from "./store-websockets";
-export * from "./constants";
-export * from "./types";
+export { WeaveStoreWebsockets } from './store-websockets';
+export * from './constants';
+export * from './types';
