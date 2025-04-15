@@ -1,4 +1,6 @@
-name: Repolinter verification
+name: OSS Compliance
+permissions:
+  contents: read
 
 on:
   pull_request:
@@ -24,8 +26,22 @@ jobs:
         run: |
           echo "Installing Repo Linter"
           npm install -g repolinter@v0.11.2
-
+          
           echo "Executing Repo Linter"
           repolinter --rulesetFile repolinter.json --dryRun .
-
+          
           echo "Repo Linter execution completed"
+
+
+  reuse-compliance:
+    name: REUSE Compliance
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
+        with:
+          fetch-depth: 0
+          ref: ${{ github.event.pull_request.head.sha }}
+
+      - name: REUSE Compliance Check
+        uses: fsfe/reuse-action@bb774aa972c2a89ff34781233d275075cbddf542 # v5

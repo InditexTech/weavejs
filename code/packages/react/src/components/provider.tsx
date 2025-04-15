@@ -59,6 +59,7 @@ export const WeaveProvider = ({
   callbacks = {},
   children,
 }: Readonly<WeaveProviderType>) => {
+  const weaveInstanceRef = React.useRef<Weave | null>(null);
   const selectedNodes = useWeave((state) => state.selection.nodes);
 
   const setInstance = useWeave((state) => state.setInstance);
@@ -144,13 +145,11 @@ export const WeaveProvider = ({
   }, []);
 
   React.useEffect(() => {
-    let weaveInstance: Weave | null = null;
-
     async function initWeave() {
       const weaveEle = document.getElementById(containerId);
       const weaveEleClientRect = weaveEle?.getBoundingClientRect();
 
-      if (weaveEle) {
+      if (weaveEle && !weaveInstanceRef.current) {
         // Defining instance nodes
         const instanceNodes: WeaveNode[] = [];
         if (nodes.length > 0) {
@@ -208,7 +207,7 @@ export const WeaveProvider = ({
           instancePlugins.push(new WeaveCopyPasteNodesPlugin({}));
         }
 
-        weaveInstance = new Weave(
+        weaveInstanceRef.current = new Weave(
           {
             store,
             nodes,
@@ -234,19 +233,12 @@ export const WeaveProvider = ({
           }
         );
 
-        setInstance(weaveInstance);
-
-        await weaveInstance.start();
+        setInstance(weaveInstanceRef.current);
+        weaveInstanceRef.current.start();
       }
     }
 
     initWeave();
-
-    return () => {
-      if (weaveInstance) {
-        weaveInstance.destroy();
-      }
-    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
