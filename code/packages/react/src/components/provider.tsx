@@ -36,7 +36,7 @@ type WeaveProviderType = {
   containerId: string;
   getUser: () => WeaveUser;
   fonts?: WeaveFont[];
-  getStore: () => WeaveStore | null;
+  store: WeaveStore;
   nodes?: WeaveNode[];
   actions?: WeaveAction[];
   plugins?: WeavePlugin[];
@@ -50,7 +50,7 @@ type WeaveProviderType = {
 export const WeaveProvider = ({
   containerId,
   getUser,
-  getStore,
+  store,
   nodes = [],
   actions = [],
   plugins = [],
@@ -60,7 +60,6 @@ export const WeaveProvider = ({
   children,
 }: Readonly<WeaveProviderType>) => {
   const weaveInstanceRef = React.useRef<Weave | null>(null);
-  const weaveStoreInstanceRef = React.useRef<WeaveStore | null>(null);
   const selectedNodes = useWeave((state) => state.selection.nodes);
 
   const setInstance = useWeave((state) => state.setInstance);
@@ -150,15 +149,7 @@ export const WeaveProvider = ({
       const weaveEle = document.getElementById(containerId);
       const weaveEleClientRect = weaveEle?.getBoundingClientRect();
 
-      if (!weaveStoreInstanceRef.current) {
-        weaveStoreInstanceRef.current = getStore();
-      }
-
-      if (
-        weaveEle &&
-        !weaveInstanceRef.current &&
-        weaveStoreInstanceRef.current
-      ) {
+      if (weaveEle && !weaveInstanceRef.current) {
         // Defining instance nodes
         const instanceNodes: WeaveNode[] = [];
         if (nodes.length > 0) {
@@ -218,7 +209,7 @@ export const WeaveProvider = ({
 
         weaveInstanceRef.current = new Weave(
           {
-            store: weaveStoreInstanceRef.current,
+            store,
             nodes,
             actions,
             plugins: [...instancePlugins, ...customPlugins],
