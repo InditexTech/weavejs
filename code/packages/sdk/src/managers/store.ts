@@ -2,9 +2,9 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-import { Logger } from "pino";
-import { Weave } from "@/weave";
-import { WeaveStore } from "@/stores/store";
+import { Logger } from 'pino';
+import { Weave } from '@/weave';
+import { WeaveStore } from '@/stores/store';
 
 export class WeaveStoreManager {
   private instance: Weave;
@@ -13,8 +13,8 @@ export class WeaveStoreManager {
 
   constructor(instance: Weave) {
     this.instance = instance;
-    this.logger = this.instance.getChildLogger("store-manager");
-    this.logger.debug("Store manager created");
+    this.logger = this.instance.getChildLogger('store-manager');
+    this.logger.debug('Store manager created');
   }
 
   getStore<T extends WeaveStore>() {
@@ -22,8 +22,8 @@ export class WeaveStoreManager {
   }
 
   registerStore(store: WeaveStore) {
-    if (this.store) {
-      const msg = `Store already exists`;
+    if (typeof this.store !== 'undefined') {
+      const msg = `Store already registered`;
       this.logger.error(msg);
       throw new Error(msg);
     }

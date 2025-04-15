@@ -40,7 +40,7 @@ interface WeaveRuntimeState {
     active: boolean;
     actual: string | undefined;
   };
-  setInstance: (newInstance: Weave) => void;
+  setInstance: (newInstance: Weave | null) => void;
   setStatus: (newStatus: WeaveStatus) => void;
   setAppState: (newAppState: WeaveState) => void;
   setConnectionStatus: (newConnectionStatus: string) => void;
