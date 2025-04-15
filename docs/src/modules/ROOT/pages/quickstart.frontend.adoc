@@ -1,0 +1,72 @@
+= Frontend
+
+The minimal setup for a collaborative applications needs to define two pages:
+
+- One that allow to indicate the room name or ID and username to use to join a collaboration room.
+Lets call this page from now on the **Enter Room** page.
+- A second one that will handle the UI for the collaboration room once joined.
+Lets call this page from now on the **Room** page.
+
+In this sections we'll see how to setup the frontend side of the application by building
+the necessary logic for the **Enter Room** and **Room** pages.
+
+== Overview
+
+To setup **Weave.js** frontend over our _Next.js_ project (on a single artifact), we need
+to fully complete this checklist:
+
+* [ ] Install the **Weave.js** frontend dependencies.
+* [ ] Setup a global state store to handle the UI.
+* [ ] Setup the **Enter Room** page.
+* [ ] Setup the **Room** page.
+
+== Step 4.1. Install the Weave.js frontend dependencies
+
+Located on your project folder, let's now install the **Weave.js** frontend dependencies:
+
+[source,shell]
+----
+npm install boring-avatars lucide-react @inditextech/weavejs-react
+----
+
+[sidebar]
+--
+This command will install:
+
+- `boring-avatars` is a tiny lib that generates custom SVG avatars.
+- `lucide-react` is an implementation of the https://lucide.dev/[lucide icon library] for https://lucide.dev/guide/packages/lucide-react[React].
+- **Weave.js** `@inditextech/weavejs-react` React helper library. It abstract all the **Weave.js**
+instantiation and lifecycle to an API compatible with React.
+--
+
+== Step 4.2. Setup a global state store for the UI
+
+Let's start by creating a global state store to handle the UI state, we will use
+https://zustand.docs.pmnd.rs/getting-started/introduction[zustand] for this.
+
+- First install the https://zustand.docs.pmnd.rs/getting-started/introduction[zustand] dependency:
++
+[source,shell]
+----
+npm install zustand
+----
++
+- Create a `store/store.ts` file on the `src` folder of your project and set it's
+content to this:
++
+[source,typescript]
+----
+include::ROOT:example$store/store.ts[]
+----
+
+== Step 4.3. Setup the **Enter Room** page
+
+Now we have a working global state store for the UI, let's setup the xref:ROOT:quickstart.frontend.enter-room.adoc[**Enter Room** page].
+
+== Step 4.4. Setup the **Room** page
+
+Now that we have setup the **Enter Room** page, let's setup the xref:ROOT:quickstart.frontend.room.adoc[**Room** page].
+
+== Next Steps
+
+TODO

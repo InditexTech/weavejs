@@ -1,153 +1,159 @@
 = Quickstart
 
-== System requirements
-
-Before you begin, make sure your system meets the following requirements:
-
-- https://nodejs.org/es/download[_Node.js_] 18.18 or later.
-- macOS, Windows (WSL), or Linux.
-
-You can install **Weave.js** on top of any UI framework, such as Next.js, React, Angular, or Vue.
-
-== Installation
-
-To simplify this guide we'll give an overview of how to setup ** Weave.js** on top of a
-https://nextjs.org/docs[_Next.js_] application.
-
-Take into consideration that we will use _Next.js_ version
-14, as of this day **Weave.js** is not compatible with React 19, which is the version of React that ships
-with the latest version (v15 when writing this document) of _Next.js_.
+Lets integrate ** Weave.js** on top of a https://nextjs.org/docs[_Next.js_] application.
 
 [NOTE]
 ====
-The usage of _Next.js_ on the quickstart allow us to have the frontend and backend on the same artifact,
-thus simplifies the quickstart process.
+The usage of _Next.js_ on the quickstart allow us to have the frontend and backend
+on the same artifact, thus simplifies the quickstart process. Also is one of the most understand
+frameworks built on top of React.
 
-For a more detail on how to setup **Weave.js** on separated artifacts, check our showcase artifacts implementations:
+For a detailed code on how to setup **Weave.js** on separated artifacts, check our
+showcase artifacts implementations repositories:
 
-- https://github.com/InditexTech/weavejs-frontend[Frontend repo]
-- https://github.com/InditexTech/weavejs-backend[Backend repo]
+- https://github.com/InditexTech/weavejs-backend[Backend]
+- https://github.com/InditexTech/weavejs-frontend[Frontend]
 ====
 
-To create a new Next.js application, run the following command:
+[IMPORTANT]
+====
+Take into consideration that we will use _Next.js_ version 14, as today **Weave.js**
+is not compatible with React 19, which is the version of React that ships with the
+latest version (v15 when writing this document) of _Next.js_.
+====
+
+== Overview
+
+In order to have a **Weave.js** project running, we need to fully complete this
+checklist:
+
+* [ ] Install Next.js
+* [ ] Install the Weave.js SDK
+* [ ] Setup the backend
+* [ ] Setup the frontend
+* [ ] Run the project
+
+Are you ready? Lets get started!.
+
+== Step 1. Install Next.js
+
+Lets start our journey by creating a new Next.js application, just run the
+following command:
 
 [source,shell]
 ----
 npx create-next-app@next-14
 ----
 
-When prompted, accept all the default values. The command will create a folder with your project name will proceed
-to install the required dependencies.
-
-Navigate to the project folder and start the development server:
-
-[source,shell]
-----
-cd my-project
-npm run dev
-----
-
-You should be able now to open your _Next.js_ base app on a browser by navigating to: `http://localhost:3000`.
+When prompted, accept all the default values.
 
 [NOTE]
 ====
-Some images will fail to load, this is because _Next.js_ images URLs changed and are not available. We will flexibility
-this later on.
+The command will create a folder with your project name will proceed to install
+the required dependencies.
 ====
 
-== Backend side
-
-=== Setup a custom server
-
-In order to have frontend and backend on the same artifact we need to customize the _Next.js_ server to include
-the necessary **Weave.js** backend logic. For this to work we need to setup
-https://nextjs.org/docs/14/pages/building-your-application/configuring/custom-server[custom server] on _Next.js_.
-
-[IMPORTANT]
-====
-For production environments, you should consider using a separate backend server to handle the **Weave.js**
-backend logic.
-====
-
-First install the necessary dependencies for the custom server:
-
-[source,shell]
-----
-npm install cross-env express
-npm install -D ts-node nodemon @types/express
-----
-
-Now lets setup the TypeScript configuration for the server part by creating a `tsconfig.server.json` file on
-the root of your project with the following content:
-
-[source,json]
-----
-include::ROOT:example$tsconfig.server.json[]
-----
-
-Now lets setup the transpilation of the server par files from TypeScript to JavaScript. First create a
-`nodemon.json` file on the root of your project with the following content:
-
-[source,json]
-----
-include::ROOT:example$nodemon.json[]
-----
-
-Finally lets create the custom server logic, create a file `server.ts` on the root of your project with the
-following content:
-
-[source,typescript]
-----
-include::ROOT:example$server.ts[]
-----
-
-Then change the `dev`, `build` and `start` scripts on your `package.json` to use the custom server:
-
-[source,json]
-----
-{
-  "scripts": {
-    "dev": "nodemon",
-    "build": "next build && tsc --project tsconfig.server.json",
-    "start": "cross-env NODE_ENV=production node dist/server.js"
-  }
-}
-----
-
-Now test that the _Next.js_ project keeps starting with the new custom server configuration, just run:
+When finished, navigate to the project folder and start the development server
+by running the following command:
 
 [source,shell]
 ----
 npm run dev
 ----
 
-=== Install Weave.js dependencies
+You should be able now to open your _Next.js_ base app on a browser by navigating
+to http://localhost:3000.
 
-Now that you're located on your project folder let's now install the **Weave.js** backend dependencies:
+[NOTE]
+====
+You will notice that some images will fail to load, this is because _Next.js_
+images URLs changed and are not available. To fix this is up to Next.js maintainers
+and not us, we'll ignore it for now as it doesn't affect Us.
+====
+
+== Step 2. Install Weave.js SDK
+
+Located on your root project folder, install the **Weave.js** SDK by
+executing the following command:
 
 [source,shell]
 ----
-npm install @inditextech/weavejs-sdk @inditextech/weavejs-react @inditextech/weavejs-store-websockets @inditextech/weavejs-types
+npm install @inditextech/weavejs-sdk @inditextech/weavejs-types
 ----
 
-=== Setup Weave.js backend logic
+[sidebar]
+--
+This command will install:
 
-TODO
+- **Weave.js** `@inditextech/weavejs-sdk` main SDK library, this library provides the
+xref:sdk:weave.adoc[Weave] class, that instantiated provides an API to handle all **Weave.js**
+related tasks.
+- **Weave.js** `@inditextech/weavejs-types` xref:types:index.adoc[types definitions] for TypeScript, as we're using it.
+--
 
-== Frontend side
+== Step 3. Setup the backend side
 
-=== Install Weave.js dependencies
+Now that the main dependencies are installed, lets first work with the backend side.
 
-TODO
+In this step we'll xref:ROOT:quickstart.backend.adoc[setup the backend side] of the application.
 
-=== Setup Weave.js frontend logic
+== Step 4. Setup the frontend side
 
-TODO
+After the backend side is setup, the application also needs a frontend side where
+users will visually collaborate.
 
-== Run the project
+In this step we'll xref:ROOT:quickstart.frontend.adoc[setup the frontend side] of the application.
 
-TODO
+== Step 5. Run the project
 
-== Next Steps
+If your completed all the previous steps, you should have a working project, so lets
+run the project with the following command:
 
-TODO
+[source,shell]
+----
+npm run dev
+----
+
+On a browser navigate to http://localhost:3000, remember, this is the `Enter Room`
+page. On it, just type a _room name_ and your _username_, then click on the `Enter`
+button to join the room.
+
+The application should navigate to http://localhost:3000/room/{roomName}, where
+`{roomName}` is the name of the room you entered. On the `Room` page, you first should
+notice a loader, once loaded you should be able to:
+
+- See the collaborative canvas.
+- Handle the canvas zoom and pan.
+- Create a simple node like a xref:nodes:rectangle.adoc[Rectangle] on it.
+
+Try to open another tab with other _username_ on the same _room name_, you should be
+able to see the changes made by the other user.
+
+Congratulations! You have a working **Weave.js** application.
+
+== Next steps
+
+Now that you've completed the quickstart, you're ready to dive deeper into **Weave.js** and unlock its
+full potential. Here are some of our recommended next steps:
+
+=== Explore the Architecture
+
+To better understand **Weave.js** xref:ROOT:architecture.adoc[architecture] and to learn
+how to build modular and interactive tools, learn how **Weave.js** is structured under
+the hood and get familiar with core concepts like:
+
+- xref:nodes:index.adoc[Nodes],
+- xref:plugins:index.adoc[Plugins],
+- and xref:actions:index.adoc[Actions].
+
+=== Learn with the Tutorials
+
+Check out a growing collection of xref:tutorials:index.adoc[hands-on tutorials] covering
+real-world use cases: from custom nodes, actions or plugins, to the integrating collaborative features
+provided by **Weave.js**.
+
+=== Review the API Reference
+
+Dive into the xref:ROOT:api-reference.adoc[API documentation] to explore all available methods, utilities,
+and configuration options. This is your go-to resource as you start building more advanced features.
+

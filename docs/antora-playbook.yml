@@ -13,6 +13,9 @@ content:
       version:
         main: prerelease
         docs/(*): $1
+asciidoc:
+  attributes:
+    source-highlighter: ~
 runtime:
   log:
     format: pretty

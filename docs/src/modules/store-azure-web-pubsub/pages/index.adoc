@@ -1,0 +1,5 @@
+= `@inditextech/weavejs-store-azure-web-pubsub`
+
+== Guides summary
+
+TODO

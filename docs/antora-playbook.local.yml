@@ -9,6 +9,9 @@ content:
       edit_url: "{web_url}/edit/develop/{path}"
       version:
         (*): prerelease
+asciidoc:
+  attributes:
+    source-highlighter: ~
 ui:
   bundle:
     url: ./ui-bundle.zip
