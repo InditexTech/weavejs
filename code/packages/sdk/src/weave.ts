@@ -183,25 +183,28 @@ export class Weave extends Emittery {
     store.connect();
   }
 
-  destroy() {
-    this.moduleLogger.info(`Destroying the instance`);
+  // destroy() {
+  //   this.moduleLogger.info(`Destroying the instance`);
 
-    this.status = WEAVE_INSTANCE_STATUS.IDLE;
-    this.getConfiguration().callbacks?.onInstanceStatus?.(this.status);
-    this.emitEvent('onInstanceStatus', this.status);
+  //   // clear listeners
+  //   this.clearListeners();
 
-    // disconnect from the store
-    const store = this.storeManager.getStore();
-    store.disconnect();
+  //   this.status = WEAVE_INSTANCE_STATUS.IDLE;
+  //   this.getConfiguration().callbacks?.onInstanceStatus?.(this.status);
+  //   this.emitEvent('onInstanceStatus', this.status);
 
-    // destroy the stage from memory
-    const stage = this.getStage();
-    if (stage) {
-      stage.destroy();
-    }
+  //   // disconnect from the store
+  //   const store = this.storeManager.getStore();
+  //   store.disconnect();
 
-    this.moduleLogger.info(`Instance destroyed`);
-  }
+  //   // destroy the stage from memory
+  //   const stage = this.getStage();
+  //   if (stage) {
+  //     stage.destroy();
+  //   }
+
+  //   this.moduleLogger.info(`Instance destroyed`);
+  // }
 
   getId() {
     return this.id;
