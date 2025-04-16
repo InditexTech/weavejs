@@ -5,13 +5,13 @@ content:
   tags:
     - docs/*
   branches:
-    - main
+    - documentation/GH-93-documentation-first-vers
   sources:
     - url: https://github.com/InditexTech/weavejs.git
       start_path: docs/src
       edit_url: "{web_url}/edit/develop/{path}"
       version:
-        main: prerelease
+        documentation/GH-93-documentation-first-vers: prerelease
         docs/(*): $1
 asciidoc:
   attributes:
