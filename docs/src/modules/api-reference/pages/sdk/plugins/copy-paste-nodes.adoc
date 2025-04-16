@@ -27,9 +27,9 @@ new WeaveCopyPasteNodesPlugin(config?: WeaveCopyPasteNodesPluginCallbacks);
 [source,typescript]
 ----
 type WeaveCopyPasteNodesPluginCallbacks = {
-  onCopy?: WeaveCopyPasteNodesOnCopyCallback;
-  onPaste?: WeaveCopyPasteNodesOnPasteCallback;
-  onPasteExternal?: WeaveCopyPasteNodesOnPasteExternalCallback;
+  onCopy?: WeaveCopyPasteNodesOnCopyCallback; // <1>
+  onPaste?: WeaveCopyPasteNodesOnPasteCallback; // <2>
+  onPasteExternal?: WeaveCopyPasteNodesOnPasteExternalCallback; // <3>
 };
 ----
 <1> `onCopy` (optional): A callback function that is called when the user copies a node.

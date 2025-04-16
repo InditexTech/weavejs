@@ -18,10 +18,10 @@ npm install @inditextech/weavejs-sdk
 
 This is the main **Weave.js** package. The SDK provides:
 
-- The xref:sdk:weave.adoc[Weave] class, which provides an API to interact with the SDK.
+- The xref:api-reference:sdk/weave.adoc[Weave] class, which provides an API to interact with the SDK.
 Here you can find all the necessary functionality for the frontend side.
-- All the xref:nodes:index.adoc[Nodes], xref:plugins:index.adoc[Plugins] and
-xref:actions:index.adoc[Actions] maintained by **Weave.js** team.
+- All the xref:architecture:nodes.adoc[Nodes], xref:architecture:plugins.adoc[Plugins] and
+xref:architecture:actions.adoc[Actions] maintained by **Weave.js** team.
 
 [NOTE]
 ====
@@ -39,9 +39,9 @@ A helper library that helps integrate with React. Provides:
 
 * A global state store defined using https://zustand.docs.pmnd.rs/getting-started/introduction[Zustand]
 to manage the **Weave.js** instance state.
-* A provider component named xref:react:weave-provider.adoc[WeaveProvider] to setup
+* A provider component named xref:api-reference:react/weave-provider.adoc[WeaveProvider] to setup
 and instantiate the **Weave.js** instance.
-* A hook named xref:react:use-weave.adoc[useWeave] hook to access the **Weave.js**
+* A hook named xref:api-reference:react/use-weave.adoc[useWeave] hook to access the **Weave.js**
 instance.
 
 == Store providers
@@ -58,8 +58,8 @@ npm install @inditextech/weavejs-store-azure-web-pubsub
 
 Provides the necessary APIs:
 
-* xref:store-azure-web-pubsub:client.adoc[Client API]
-* xref:store-azure-web-pubsub:server.adoc[Server API]
+* xref:api-reference:stores/azure-web-pubsub/client.adoc[Client API]
+* xref:api-reference:stores/azure-web-pubsub/server.adoc[Server API]
 
 To setup a **Weave.js** store that uses https://azure.microsoft.com/en-us/products/web-pubsub[_Azure Web PubSub_]
 as transport.
@@ -75,8 +75,8 @@ npm install @inditextech/weavejs-store-websockets
 
 Provides the necessary APIs:
 
-* xref:store-websockets:client.adoc[Client API]
-* xref:store-websockets:server.adoc[Server API] 
+* xref:api-reference:stores/websockets/client.adoc[Client API]
+* xref:api-reference:stores/websockets/server.adoc[Server API] 
 
 To setup a **Weave.js** store that uses https://developer.mozilla.org/en-US/docs/Web/API/WebSockets_API[_Websockets API_]
 as transport.
@@ -88,5 +88,5 @@ as transport.
 npm install @inditextech/weavejs-types
 ----
 
-A package with all xref:types:index.adoc[types definitions] necessary to
+A package with all xref:api-reference:types/index.adoc[types definitions] necessary to
 support TypeScript.

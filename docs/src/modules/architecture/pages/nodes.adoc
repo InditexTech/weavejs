@@ -48,7 +48,7 @@ shape of this JSON object is:
 
 [source,typescript]
 ----
-include::nodes:example$declarative-form.json[]
+include::architecture:example$declarative-form.json[]
 ----
 <1> *key*: [string] an unique string that identifies the node instance in all the nodes hierarchy.
 <2> *type*: [string] an string that defines the node type, i.e. `rectangle` for a Rectangle node. 
