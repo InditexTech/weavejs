@@ -1,0 +1,29 @@
+= Group node
+
+The Group node is a container for organizing multiple nodes into a single, movable
+and transformable unit. Based on Konva’s https://konvajs.org/api/Konva.Group.html[Group],
+it allows you to nest shapes or other groups together, enabling you to apply
+transformations like positioning, scaling, rotation,or selection as one unified object.
+
+Groups are useful for structuring complex UIs, building reusable components, or
+enabling drag-and-drop behavior across multiple elements. They help keep your canvas
+scene organized and easier to manipulate programmatically.
+
+== Import
+
+[source,typescript]
+----
+import { WeaveGroupNode } from "@inditextech/weavejs-sdk";
+----
+
+== Instantiation
+
+[source,typescript]
+----
+new WeaveGroupNode();
+----
+
+== Properties
+
+This **Node** propagate all the properties of a Konva.js
+https://konvajs.org/api/Konva.Group.html[Group] element.

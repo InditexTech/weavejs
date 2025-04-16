@@ -1,0 +1,86 @@
+= WeaveBrushToolAction
+
+The **WeaveBrushToolAction** action enables users to paint freeform strokes on the canvas,
+similar to a digital brush. Unlike the xref:api-reference:sdk/actions/pen-tool.adoc[WeavePenToolAction],
+which focuses on clean vector lines, the **WeaveBrushToolAction** emphasizes style, thickness,
+and expressive drawing, creating Line Nodes with a more natural, hand-drawn feel.
+
+It’s ideal for sketching, highlighting, or adding visual flair to collaborative sessions.
+
+When active the user:
+
+* **Click-press** or **Touch-press** on the canvas, to define a brush line.
+
+Then the freeform line is added to the canvas as a fully functional node—ready.
+This action integrates seamlessly with **Weave.js's** real-time state system,
+ensuring the new element appears instantly for all connected users.
+
+== Import
+
+[source,typescript]
+----
+import { WeaveBrushToolAction } from "@inditextech/weavejs-sdk";
+----
+
+== Instantiation
+
+[source,typescript]
+----
+new WeaveBrushToolAction(config?: WeaveBrushToolCallbacks);
+----
+
+== Configuration
+
+[source,typescript]
+----
+type WeaveBrushToolCallbacks = {
+  onPropsChange?: WeaveActionPropsChangeCallback; // <1>
+}
+----
+<1> `onPropsChange` (optional): A callback function that is called when the properties
+of the action change. The callback receives an object as parameter with the
+
+== Methods
+
+=== updateProps
+
+[source,typescript]
+----
+updateProps(props: WeaveElementAttributes): void;
+----
+
+Update the properties of the action. Ideal for setting properties of the freeform line,
+like its color, stroke size, etc.
+
+== Events
+
+If the keys kbd:[Enter] or kbd:[Esc] are pressed, the action is cancelled.
+
+On touch devices, select again the xref:api-reference:sdk/actions/selection-tool.adoc[Selection Tool]
+to finish or cancel the action.
+
+== TypeScript Types
+
+[source,typescript]
+----
+type WeaveActionPropsChangeCallback = (
+  props: WeaveElementAttributes
+) => void;
+
+type WeaveElementAttributes = {
+  [key: string]: any;
+  id?: string;
+  nodeType?: string;
+  children?: WeaveStateElement[];
+};
+
+type WeaveStateElement = {
+  key: string;
+  type: string;
+  props: WeaveElementAttributes;
+};
+
+type WeaveBrushToolCallbacks = {
+  onPropsChange?: WeaveActionPropsChangeCallback;
+}
+----

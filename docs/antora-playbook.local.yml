@@ -11,6 +11,7 @@ content:
         (*): prerelease
 asciidoc:
   attributes:
+    experimental: ""
     source-highlighter: ~
 ui:
   bundle:

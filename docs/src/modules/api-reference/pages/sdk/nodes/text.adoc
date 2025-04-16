@@ -1,0 +1,28 @@
+= Text node
+
+The Text node is used to display editable or static text on the canvas. Based on
+Konva’s https://konvajs.org/api/Konva.Text.html[Text] shape, it supports rich styling
+options including font size, family, color, alignment, and line height.
+
+Text Nodes are essential for labels, annotations, or any UI elements that require
+readable content. They can be fully interactive—allowing selection, dragging, and
+inline editing.
+
+== Import
+
+[source,typescript]
+----
+import { WeaveTextNode } from "@inditextech/weavejs-sdk";
+----
+
+== Instantiation
+
+[source,typescript]
+----
+new WeaveTextNode();
+----
+
+== Properties
+
+This **Node** propagate all the properties of a Konva.js
+https://konvajs.org/api/Konva.Text.html[Text] element.

@@ -1,0 +1,34 @@
+= WeaveNodesSnappingPlugin
+
+The **WeaveNodesSnappingPlugin** plugin adds smart alignment assistance by enabling
+nodes to snap to guides or other nodes as they are moved or resized. It helps
+users place elements with precision, improving layout consistency and visual structure.
+
+It’s especially useful in design tools, diagram editors, and any interface where
+visual alignment matters.
+
+== Import
+
+[source,typescript]
+----
+import { WeaveNodesSnappingPlugin } from "@inditextech/weavejs-sdk";
+----
+
+== Instantiation
+
+[source,typescript]
+----
+new WeaveNodesSnappingPlugin();
+----
+
+== Configuration
+
+None
+
+== Methods
+
+None
+
+== TypeScript Types
+
+None

@@ -1,0 +1,84 @@
+= Plugins
+
+Plugins are the modular pieces that extend and enhance the functionality of **Weave.js**.
+They allow you to add behavior to the canvas: like selection, zooming, snapping, panning,
+keyboard shortcuts, and more, without modifying the core system.
+
+Plugins are designed to be lightweight, composable, and easy to integrate, making it simple
+to build rich, interactive experiences. Whether you're enabling multi-selection, managing
+drag-and-drop, or integrating custom logic, Plugins are how you supercharge your canvas with
+reusable, context-aware features.
+
+**Weave.js** includes a set of built-in plugins, but you can also create your own to tailor
+functionality to your specific application needs.
+
+== Plugin lifecycle
+
+**Weave.js** plugin lifecycle is pretty simple:
+
+. Weave instance is started.
+. Plugins are registered, the `getName` method is used to identify the plugin.
+. On the rendering cycle:
+.. After the first render, the `init` method of every plugins is called.
+.. On subsequent renders, the `render` method is called.
+
+Also, decoupled from the lifecycle:
+
+* When an user wants to disable the plugin, the `disable` method is called.
+* When an user wants to enable the plugin, the `enable` method is called.
+
+== How to build a Plugin?
+
+In **Weave.js** a Plugin is a class that extends the
+https://github.com/InditexTech/weavejs/blob/main/code/packages/sdk/src/plugins/plugin.ts[WeavePlugin]
+abstract class, and implements a set of methods that define the Plugin behavior.
+
+You can access **Weave.js** main instance via `this.instance`.
+
+=== getName
+
+[source,typescript]
+----
+getName(): string
+----
+
+The `getName` method returns the name of the plugin, used as an identifier
+on the Weave instance.
+
+=== init
+
+[source,typescript]
+----
+abstract init?(): void;
+----
+
+The `init` method is optional, and is called after the first render of the
+Weave instance. It's a good place to initialize the plugin state, events, etc.
+
+=== render
+
+[source,typescript]
+----
+abstract render?(): void;
+----
+
+The `render` method is optional, and is called on every render of the Weave
+instance. It's a good place to update the plugin and render it's changes.
+
+=== enable
+
+[source,typescript]
+----
+abstract enable(): void;
+----
+
+The `enable` method is called when the user wants to enable the plugin.
+
+=== disable
+
+[source,typescript]
+----
+abstract disable(): void;
+----
+
+The `enable` method is called when the user wants to disable the plugin.

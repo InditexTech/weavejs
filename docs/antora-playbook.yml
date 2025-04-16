@@ -15,6 +15,7 @@ content:
         docs/(*): $1
 asciidoc:
   attributes:
+    experimental: ""
     source-highlighter: ~
 runtime:
   log:

@@ -1,3 +1,0 @@
-= Show the users pointers
-
-TODO

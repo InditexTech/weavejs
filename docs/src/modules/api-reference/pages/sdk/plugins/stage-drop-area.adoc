@@ -1,0 +1,57 @@
+= WeaveStageDropAreaPlugin
+
+The **WeaveStageDropAreaPlugin** plugin enables drag-and-drop support on the canvas,
+allowing users to drop elements—such as shapes, files, or custom components—directly
+onto the Stage. It captures drop events, calculates drop positions, and can trigger
+custom Actions or workflows based on the dropped content.
+
+This plugin is ideal for building intuitive drag-to-create interfaces, asset import
+features, or external integrations (e.g., dropping images or nodes from a sidebar).
+It integrates smoothly with Weave.js's action system for precise and flexible drop
+handling.
+
+== Import
+
+[source,typescript]
+----
+import { WeaveStageDropAreaPlugin } from "@inditextech/weavejs-sdk";
+----
+
+== Instantiation
+
+[source,typescript]
+----
+new WeaveStageDropAreaPlugin(config?: WeaveStageDropAreaPluginCallbacks);
+----
+
+== Configuration
+
+[source,typescript]
+----
+{
+  onStageDrop?: WeaveStageDropCallback; // <1>
+  doUploadFile?: WeaveStageDropUploadFileCallback; // <2>
+}
+----
+<1> `onStageDrop` (optional): A callback function that is called when an element is dropped
+onto the Stage. The callback receives a `DragEvent` object as a parameter.
+<2> `doUploadFile` (optional): A callback function that is called when a file is dropped
+onto the Stage. The callback receives a `File` object as a parameter and should return a
+`Promise` that resolves when the file is uploaded.
+
+== Methods
+
+None
+
+== TypeScript Types
+
+[source,typescript]
+----
+type WeaveStageDropCallback = (event: DragEvent) => void;
+type WeaveStageDropUploadFileCallback = (event: File) => Promise<void>;
+
+type WeaveStageDropAreaPluginCallbacks = {
+  onStageDrop?: WeaveStageDropCallback;
+  doUploadFile?: WeaveStageDropUploadFileCallback;
+};
+----

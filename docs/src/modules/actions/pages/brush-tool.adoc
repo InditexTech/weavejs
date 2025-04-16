@@ -1,3 +1,0 @@
-= Brush tool
-
-TODO

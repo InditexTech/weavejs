@@ -1,0 +1,38 @@
+= WeaveMoveToolAction
+
+The **WeaveMoveToolAction** action allows users enable/disable the panning of Stage,
+when enabled the user can:
+
+* Via the **mouse**, pan while maintain pressed the main button and moving the mouse.
+* Via **touch**, on touch-support devices, pan while touch-drag.
+* Via the **mouse** + **keyboard**, by maintaining the kbd:[Space] key pressed and moving
+the mouse.
+
+If the user device, posses a **touchpad** device (i.e. Mac laptops), use the two-finger swipe
+gesture to pan without the need to enable the action.
+
+== Import
+
+[source,typescript]
+----
+import { WeaveMoveToolAction } from "@inditextech/weavejs-sdk";
+----
+
+== Instantiation
+
+[source,typescript]
+----
+new WeaveMoveToolAction();
+----
+
+== Configuration
+
+None
+
+== Methods
+
+None
+
+== TypeScript Types
+
+None

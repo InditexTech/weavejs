@@ -1,0 +1,90 @@
+= Actions
+
+Actions are the core mechanism for handling user-driven changes in **Weave.js**. Whether
+you're adding a node, moving elements, updating properties, or triggering a custom behavior,
+Actions provide a structured, trackable way to apply changes to the shared state.
+
+Actions help keep your application logic clean and consistent, and collaborative. In **Weave.js**,
+if something meaningful happens—it’s probably through an Action.
+
+**Weave.js** includes a set of built-in Actions, but you can also create your own to tailor
+functionality to your specific application needs. 
+
+== Action lifecycle
+
+**Weave.js** action lifecycle is pretty straight-forward:
+
+. Weave instance is started.
+. Actions are registered, the `getName` method is used to identify the action.
+. On the rendering cycle:
+.. After the first render, the `init` method of every action is called.
+. When an user want to trigger an action, the `trigger` function is called.
+. When the action finishes or the user cancel the action, the `cleanup` function is called. 
+
+== How to build an Action?
+
+In **Weave.js** a Plugin is a class that extends the
+https://github.com/InditexTech/weavejs/blob/main/code/packages/sdk/src/actions/action.ts[WeaveAction]
+abstract class, and implements a set of methods that define the Action behavior.
+
+You can access **Weave.js** main instance via `this.instance`.
+
+=== getName
+
+[source,typescript]
+----
+getName(): string
+----
+
+The `getName` method returns the name of the action, used as an identifier
+on the Weave instance.
+
+=== init
+
+[source,typescript]
+----
+abstract init?(): void;
+----
+
+The `init` method is optional, and is called after the first render of the
+Weave instance. It's a good place to initialize the action state, events, etc.
+
+=== trigger
+
+[source,typescript]
+----
+abstract trigger(cancelAction: () => void, params?: unknown): unknown;
+----
+
+When a user wants to call an action, the `trigger` method is called, it receives
+the following parameters:
+
+* `cancelAction: () => void`: a callback that we call when then user wants to cancel
+the action, or if the action itself finishes.
+* `params?: unknown`: an optional parameter that the user can pass to the action, dependencies
+on the action implementation.
+
+=== internalUpdate
+
+[source,typescript]
+----
+abstract internalUpdate?(): void;
+----
+
+An action instance is wrapped with the 
+https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Proxy[Proxy]
+object, which enables us to intercept the `get` and `set` operations on the action instance.
+
+The `internalUpdate` method is called when the for example the `props` property of the instance
+is updated (via get/set), allowing us to dynamically pass parameters to an action after this is
+triggered.
+
+=== cleanup
+
+[source,typescript]
+----
+abstract cleanup?(): void;
+----
+
+The `cleanup` method is called when the action finishes or the user cancel the action. It's a
+good place to clean up the action state, events, etc.

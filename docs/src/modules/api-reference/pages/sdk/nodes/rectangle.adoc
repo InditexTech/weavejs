@@ -1,0 +1,29 @@
+= Rectangle node
+
+The Rectangle node is a simple, versatile primitive shape used to render rectangular
+elements on the canvas. Built on top of Konva’s https://konvajs.org/api/Konva.Rect.html[Rect],
+it supports customizable properties such as position, size, fill color, stroke, corner radius,
+and more.
+
+Rectangle nodes are often used as building blocks for UI components, layout guides,
+or user-created nodes. They can also respond to interactions like dragging, resizing,
+or selection.
+
+== Import
+
+[source,typescript]
+----
+import { WeaveRectangleNode } from "@inditextech/weavejs-sdk";
+----
+
+== Instantiation
+
+[source,typescript]
+----
+new WeaveRectangleNode();
+----
+
+== Properties
+
+This **Node** propagate all the properties of a Konva.js
+https://konvajs.org/api/Konva.Rect.html[Rect] element.

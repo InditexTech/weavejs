@@ -1,5 +1,0 @@
-= `@inditextech/weavejs-store-websockets`
-
-== Guides summary
-
-TODO

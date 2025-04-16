@@ -1,0 +1,39 @@
+= WeaveFitToScreenToolAction
+
+The **WeaveFitToScreenToolAction** action automatically adjusts the zoom and position of
+the Stage to ensure all visible nodes fit neatly within the viewport. It's perfect for
+resetting the view, getting a quick overview of the entire workspace, or re-centering
+after navigation.
+
+When triggered finds the zoom level necessary to fit all the nodes of the canvas in the
+viewport and center on its.
+
+== Import
+
+[source,typescript]
+----
+import { WeaveFitToScreenToolAction } from "@inditextech/weavejs-sdk";
+----
+
+== Instantiation
+
+[source,typescript]
+----
+new WeaveFitToScreenToolAction();
+----
+
+== Configuration
+
+None
+
+== Methods
+
+None
+
+== Events
+
+None
+
+== TypeScript Types
+
+None

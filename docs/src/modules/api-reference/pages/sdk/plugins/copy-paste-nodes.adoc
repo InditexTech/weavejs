@@ -1,0 +1,59 @@
+= WeaveCopyPasteNodesPlugin
+
+The **WeaveCopyPasteNodesPlugin** plugin enables users to duplicate selected nodes
+using familiar keyboard shortcuts like Ctrl/Cmd + C and Ctrl/Cmd + V. It preserves
+node structure, styles, and metadata, allowing for quick reuse and layout iteration.
+
+This plugin supports multi-node copy & copy & paste between tabs. It integrates
+seamlessly with the selection and action systems, making it a natural part of the
+collaborative editing workflow.
+
+== Import
+
+[source,typescript]
+----
+import { WeaveCopyPasteNodesPlugin } from "@inditextech/weavejs-sdk";
+----
+
+== Instantiation
+
+[source,typescript]
+----
+new WeaveCopyPasteNodesPlugin(config?: WeaveCopyPasteNodesPluginCallbacks);
+----
+
+== Configuration
+
+[source,typescript]
+----
+type WeaveCopyPasteNodesPluginCallbacks = {
+  onCopy?: WeaveCopyPasteNodesOnCopyCallback;
+  onPaste?: WeaveCopyPasteNodesOnPasteCallback;
+  onPasteExternal?: WeaveCopyPasteNodesOnPasteExternalCallback;
+};
+----
+<1> `onCopy` (optional): A callback function that is called when the user copies a node.
+<2> `onPaste` (optional): A callback function that is called when the user pastes a node.
+<3> `onPasteExternal` (optional): A callback function that is called when the user pastes
+a node from an external source.
+
+== Methods
+
+None
+
+== TypeScript Types
+
+[source,typescript]
+----
+type WeaveCopyPasteNodesOnCopyCallback = (error?: Error) => void;
+type WeaveCopyPasteNodesOnPasteCallback = (error?: Error) => void;
+type WeaveCopyPasteNodesOnPasteExternalCallback = (
+  item: ClipboardItem
+) => void;
+
+type WeaveCopyPasteNodesPluginCallbacks = {
+  onCopy?: WeaveCopyPasteNodesOnCopyCallback;
+  onPaste?: WeaveCopyPasteNodesOnPasteCallback;
+  onPasteExternal?: WeaveCopyPasteNodesOnPasteExternalCallback;
+};
+----

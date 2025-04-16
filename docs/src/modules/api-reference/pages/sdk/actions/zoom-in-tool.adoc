@@ -1,0 +1,37 @@
+= WeaveZoomInToolAction
+
+The **WeaveZoomInToolAction** action allows users to incrementally zoom into the canvas,
+providing a closer view of detailed content. It adjusts the Stage’s scale smoothly and
+centers the zoom on the current viewport or a specific focal point.
+
+When triggered increases the zoom level of the canvas by one step.
+
+== Import
+
+[source,typescript]
+----
+import { WeaveZoomInToolAction } from "@inditextech/weavejs-sdk";
+----
+
+== Instantiation
+
+[source,typescript]
+----
+new WeaveZoomInToolAction();
+----
+
+== Configuration
+
+None
+
+== Methods
+
+None
+
+== Events
+
+None
+
+== TypeScript Types
+
+None

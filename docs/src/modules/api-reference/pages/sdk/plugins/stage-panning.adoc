@@ -1,0 +1,36 @@
+= WeaveStagePanningPlugin
+
+The **WeaveStagePanningPlugin** plugin enables users to navigate the canvas by dragging to move
+around the Stage. It enhances the user experience by allowing intuitive exploration
+of large or zoomed-in workspaces, especially in collaborative or diagram-heavy
+environments.
+
+This plugin handles input events like mouse drag or touch gestures, and smoothly
+updates the Stage’s position. It integrates seamlessly with other plugins like
+zoom, grid, and selection—ensuring fluid and natural canvas navigation.
+
+== Import
+
+[source,typescript]
+----
+import { WeaveStagePanningPlugin } from "@inditextech/weavejs-sdk";
+----
+
+== Instantiation
+
+[source,typescript]
+----
+new WeaveStagePanningPlugin();
+----
+
+== Configuration
+
+None
+
+== Methods
+
+None
+
+== TypeScript Types
+
+None

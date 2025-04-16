@@ -1,3 +1,0 @@
-= Nodes context menu
-
-TODO

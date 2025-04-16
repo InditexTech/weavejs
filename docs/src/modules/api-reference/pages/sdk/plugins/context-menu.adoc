@@ -1,0 +1,83 @@
+= WeaveContextMenuPlugin
+
+The **WeaveContextMenuPlugin** plugin adds custom right-click menus to the canvas,
+enabling users to access context-specific actions—like deleting nodes, duplicating
+elements, or triggering custom workflows. It enhances usability by offering quick
+access to relevant tools based on the current selection or interaction.
+
+Fully customizable and extensible, making it easy to tailor the experience to your
+application's needs.
+
+== Import
+
+[source,typescript]
+----
+import { WeaveContextMenuPlugin } from "@inditextech/weavejs-sdk";
+----
+
+== Instantiation
+
+[source,typescript]
+----
+new WeaveContextMenuPlugin(config?: WeaveStageContextMenuPluginOptions, callbacks: WeaveStageContextMenuPluginCallbacks);
+----
+
+== Configuration
+
+[source,typescript]
+----
+type WeaveStageContextMenuPluginOptions = {
+  xOffset?: number; // <1>
+  yOffset?: number; // <2>
+}
+
+type WeaveStageContextMenuPluginCallbacks = {
+  onNodeMenu: WeaveOnNodeMenuCallback; // <3>
+}
+----
+<1> `xOffset` (optional): The offset of the context menu from the x-axis. Defaults to `4`.
+<2> `yOffset` (optional): The offset of the context menu from the y-axis. Defaults to `4`.
+<3> `onNodeMenu`: A callback function that is called when the user right-clicks on a node.
+== Methods
+
+None
+
+== TypeScript Types
+
+[source,typescript]
+----
+type WeaveElementAttributes = {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  [key: string]: any;
+  id?: string;
+  nodeType?: string;
+  children?: WeaveStateElement[];
+};
+
+type WeaveStateElement = {
+  key: string;
+  type: string;
+  props: WeaveElementAttributes;
+};
+
+type WeaveSelection = {
+  instance: Konva.Shape | Konva.Group;
+  node: WeaveStateElement;
+};
+
+type WeaveStageContextMenuPluginOptions = {
+  xOffset?: number;
+  yOffset?: number;
+};
+
+type WeaveOnNodeMenuCallback = (
+  instance: Weave,
+  selection: WeaveSelection[],
+  point: Vector2d,
+  visible: boolean
+) => void;
+
+type WeaveStageContextMenuPluginCallbacks = {
+  onNodeMenu: WeaveOnNodeMenuCallback;
+};
+----

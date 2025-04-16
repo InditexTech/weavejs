@@ -1,0 +1,66 @@
+= WeaveStageGridPlugin
+
+The **WeaveStageGridPlugin** plugin adds a visual background grid to the canvas stage, helping
+users align and position elements more precisely. The grid can be rendered as lines
+or dots, and supports customizable spacing, color, and style.
+
+This plugin is especially useful for diagramming tools, design interfaces, or any
+application where spatial structure improves usability. It integrates seamlessly
+with zoom and pan behaviors to ensure the grid remains consistent and responsive
+during interactions.
+
+== Import
+
+[source,typescript]
+----
+import { WeaveStageGridPlugin } from "@inditextech/weavejs-sdk";
+----
+
+== Instantiation
+
+[source,typescript]
+----
+new WeaveStageGridPlugin(config?: WeaveStageGridPluginParams);
+----
+
+== Configuration
+
+[source,typescript]
+----
+type WeaveStageGridPluginParams = {
+  gridSize?: number; // <1>
+}
+----
+<1> `gridSize` (optional): The size of the grid cells, in pixels. Defaults to `50`.
+
+== Methods
+
+=== setType
+
+[source,typescript]
+----
+setType(type: WeaveStageGridType)
+----
+
+Defines the type of grid to render. The `type` parameter can be one of the following:
+
+* `lines`: Renders a grid of horizontal and vertical lines.
+* `dots`: Renders a grid of dots. 
+
+== TypeScript Types
+
+[source,typescript]
+----
+const WEAVE_GRID_TYPES = {
+  ['LINES']: 'lines',
+  ['DOTS']: 'dots',
+} as const;
+
+type WeaveStageGridTypeKeys = keyof typeof WEAVE_GRID_TYPES;
+type WeaveStageGridType =
+  (typeof WEAVE_GRID_TYPES)[WeaveStageGridTypeKeys];
+
+type WeaveStageGridPluginParams = {
+  gridSize?: number;
+};
+----
