@@ -1,0 +1,25 @@
+= Layer
+
+A Layer is an abstraction of a canvas element that can contain groups or shapes primitives.
+
+This node renders a Konva.js https://konvajs.org/api/Konva.Layer.html[Layer] element on a
+xref:nodes:stage.adoc[Stage].
+
+== Import
+
+[source,typescript]
+----
+import { WeaveLayerNode } from "@inditextech/weavejs-sdk";
+----
+
+== Instantiation
+
+[source,typescript]
+----
+new WeaveLayerNode();
+----
+
+== Properties
+
+This **Node** propagate all the properties of a Konva.js
+https://konvajs.org/api/Konva.Layer.html[Layer] element.

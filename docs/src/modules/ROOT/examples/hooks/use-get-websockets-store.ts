@@ -7,7 +7,7 @@ import {
 } from "@inditextech/weavejs-store-websockets/client";
 import React from "react";
 
-function useGetWsProvider({
+function useGetWebsocketsStore({
   loadedParams,
   getUser,
 }: {
@@ -25,7 +25,7 @@ function useGetWsProvider({
     []
   );
 
-  const wsProvider = React.useMemo(() => {
+  const websocketStore = React.useMemo(() => {
     if (loadedParams && room) {
       return new WeaveStoreWebsockets(
         {
@@ -49,7 +49,7 @@ function useGetWsProvider({
     return null;
   }, [getUser, loadedParams, onConnectionStatusChangeHandler, room]);
 
-  return wsProvider;
+  return websocketStore;
 }
 
-export default useGetWsProvider;
+export default useGetWebsocketsStore;

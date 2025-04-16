@@ -1,0 +1,26 @@
+= Line
+
+A Line is an abstraction of a line in a canvas, defined by an array of points and
+a tension.
+
+This node renders a Konva.js https://konvajs.org/api/Konva.Line.html[Line] element
+on a xref:nodes:layer.adoc[Layer] or a xref:nodes:group.adoc[Group].
+
+== Import
+
+[source,typescript]
+----
+import { WeaveLineNode } from "@inditextech/weavejs-sdk";
+----
+
+== Instantiation
+
+[source,typescript]
+----
+new WeaveLineNode();
+----
+
+== Properties
+
+This **Node** propagate all the properties of a Konva.js
+https://konvajs.org/api/Konva.Line.html[Line] element.

@@ -1,4 +1,4 @@
-= Streamlined Visual Collaborative Web Applications
+= Visual Collaborative Web Applications
 
 **Weave.js** is a modular JavaScript library that streamlines the development of
 visual collaborative web applications built with an HTML5 canvas. Designed with a
@@ -16,7 +16,7 @@ Ideal for building applications such as diagram editors, whiteboards, and design
 platforms, **Weave.js** provides the flexibility and scalability needed for modern,
 canvas-based collaborative tools.
 
-== Showcase
+== Live demo
 
 image::showcase.png[Image of the enter room page of the Weave.js showcase]
 

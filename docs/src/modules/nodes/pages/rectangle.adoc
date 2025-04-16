@@ -1,5 +1,25 @@
 = Rectangle
 
-== Guides summary
+A Rectangle is an abstraction of a canvas rect().
 
-TODO
+This node renders a Konva.js https://konvajs.org/api/Konva.Rect.html[Rect] element
+on a xref:nodes:layer.adoc[Layer] or a xref:nodes:group.adoc[Group].
+
+== Import
+
+[source,typescript]
+----
+import { WeaveRectangleNode } from "@inditextech/weavejs-sdk";
+----
+
+== Instantiation
+
+[source,typescript]
+----
+new WeaveRectangleNode();
+----
+
+== Properties
+
+This **Node** propagate all the properties of a Konva.js
+https://konvajs.org/api/Konva.Rect.html[Rect] element.

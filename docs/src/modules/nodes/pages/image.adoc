@@ -1,0 +1,25 @@
+= Image
+
+An Image is an abstraction to draw images on a canvas.
+
+This node renders a Konva.js https://konvajs.org/api/Konva.Image.html[Image] element
+on a xref:nodes:layer.adoc[Layer] or a xref:nodes:group.adoc[Group].
+
+== Import
+
+[source,typescript]
+----
+import { WeaveImageNode } from "@inditextech/weavejs-sdk";
+----
+
+== Instantiation
+
+[source,typescript]
+----
+new WeaveImageNode();
+----
+
+== Properties
+
+This **Node** propagate all the properties of a Konva.js
+https://konvajs.org/api/Konva.Image.html[Image] element.

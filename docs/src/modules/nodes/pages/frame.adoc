@@ -1,0 +1,30 @@
+= Frame
+
+A Frame is an abstraction to draw a container of Nodes. On a frame you can add any node
+except for:
+
+* A Frame itself
+* A xref:nodes:layer.adoc[Layer]
+* A xref:nodes:stage.adoc[Stage]
+
+Think of it as a canvas over a canvas.
+
+This node renders a Frame element on a xref:nodes:layer.adoc[Layer] or a xref:nodes:group.adoc[Group].
+
+== Import
+
+[source,typescript]
+----
+import { WeaveFrameNode } from "@inditextech/weavejs-sdk";
+----
+
+== Instantiation
+
+[source,typescript]
+----
+new WeaveFrameNode();
+----
+
+== Properties
+
+None.

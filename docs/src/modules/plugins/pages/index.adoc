@@ -1,5 +1,17 @@
 = Plugins
 
+Plugins are the modular pieces that extend and enhance the functionality of **Weave.js**.
+They allow you to add behavior to the canvas: like selection, zooming, snapping, panning,
+keyboard shortcuts, and more, without modifying the core system.
+
+Plugins are designed to be lightweight, composable, and easy to integrate, making it simple
+to build rich, interactive experiences. Whether you're enabling multi-selection, managing
+drag-and-drop, or integrating custom logic, Plugins are how you supercharge your canvas with
+reusable, context-aware features.
+
+**Weave.js** includes a set of built-in plugins, but you can also create your own to tailor
+functionality to your specific application needs.
+
 == Guides summary
 
 TODO

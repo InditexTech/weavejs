@@ -90,14 +90,14 @@ the following content:
 include::ROOT:example$hooks/use-handle-route-params.ts[]
 ----
 
-=== useGetWsProvider
+=== useGetWebsocketsStore
 
-On the `components/hooks` folder, create a file named `use-get-ws-provider.ts` with the following
+On the `components/hooks` folder, create a file named `use-get-websockets-store.ts` with the following
 content:
 
 [source,typescript]
 ----
-include::ROOT:example$hooks/use-get-ws-provider.ts[]
+include::ROOT:example$hooks/use-get-websockets-store.ts[]
 ----
 
 === useGetWeaveJsProps
@@ -249,3 +249,7 @@ include::ROOT:example$components/context-menu/context-menu.tsx[]
 ----
 
 Then uncomment all the commented lines on the `store/store.ts` file.
+
+== Next steps
+
+Let's now xref:ROOT:quickstart.adoc#_step_5_run_the_project[run the project] to test the full integration.

@@ -1,0 +1,25 @@
+= Stage
+
+A Stage is an abstraction that defines an area where canvases are rendered. Its used to
+contain multiple Layers.
+
+This node renders a Konva.js https://konvajs.org/api/Konva.Stage.html[Stage] element.
+
+== Import
+
+[source,typescript]
+----
+import { WeaveStageNode } from "@inditextech/weavejs-sdk";
+----
+
+== Instantiation
+
+[source,typescript]
+----
+new WeaveStageNode();
+----
+
+== Properties
+
+This **Node** propagate all the properties of a Konva.js
+https://konvajs.org/api/Konva.Stage.html[Stage] element.

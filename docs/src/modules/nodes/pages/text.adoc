@@ -1,0 +1,25 @@
+= Text
+
+A Text is an abstraction to draw text in a canvas.
+
+This node renders a Konva.js https://konvajs.org/api/Konva.Text.html[Text] element
+on a xref:nodes:layer.adoc[Layer] or a xref:nodes:group.adoc[Group].
+
+== Import
+
+[source,typescript]
+----
+import { WeaveTextNode } from "@inditextech/weavejs-sdk";
+----
+
+== Instantiation
+
+[source,typescript]
+----
+new WeaveTextNode();
+----
+
+== Properties
+
+This **Node** propagate all the properties of a Konva.js
+https://konvajs.org/api/Konva.Text.html[Text] element.

@@ -8,7 +8,7 @@ import { useWeave, WeaveProvider } from "@inditextech/weavejs-react";
 import { RoomLayout } from "./room.layout";
 import { RoomLoader } from "./room-loader";
 import useGetWeaveJSProps from "@/hooks/use-get-weave-js-props";
-import useGetWsProvider from "@/hooks/use-get-ws-provider";
+import useGetWebsocketsStore from "@/hooks/use-get-websockets-store";
 import useHandleRouteParams from "@/hooks/use-handle-route-params";
 
 const statusMap = {
@@ -48,7 +48,7 @@ export const Room = () => {
 
   const { fonts, nodes, customPlugins, actions } = useGetWeaveJSProps();
 
-  const wsStoreProvider = useGetWsProvider({
+  const websocketsStore = useGetWebsocketsStore({
     loadedParams,
     getUser,
   });
@@ -67,11 +67,11 @@ export const Room = () => {
           description={loadingDescription}
         />
       )}
-      {loadedParams && room && wsStoreProvider && (
+      {loadedParams && room && websocketsStore && (
         <WeaveProvider
           containerId="weave"
           getUser={getUser}
-          store={wsStoreProvider}
+          store={websocketsStore}
           fonts={fonts}
           nodes={nodes}
           actions={actions}

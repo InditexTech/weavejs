@@ -1,0 +1,26 @@
+= Group
+
+A Group is an abstraction of an element container. It can contain shapes primitives
+or other groups.
+
+This node renders a Konva.js https://konvajs.org/api/Konva.Group.html[Group] element
+on a xref:nodes:layer.adoc[Layer] or a xref:nodes:group.adoc[Group]
+
+== Import
+
+[source,typescript]
+----
+import { WeaveGroupNode } from "@inditextech/weavejs-sdk";
+----
+
+== Instantiation
+
+[source,typescript]
+----
+new WeaveGroupNode();
+----
+
+== Properties
+
+This **Node** propagate all the properties of a Konva.js
+https://konvajs.org/api/Konva.Group.html[Group] element.
