@@ -118,8 +118,8 @@ On a browser navigate to http://localhost:3000, remember, this is the `Enter Roo
 page. On it, just type a _room name_ and your _username_, then click on the `Enter`
 button to join the room.
 
-The application should navigate to http://localhost:3000/room/{roomName}, where
-`{roomName}` is the name of the room you entered. On the `Room` page, you first should
+The application should navigate to http://localhost:3000/room/<roomName>, where
+`<roomName>` is the name of the room you entered. On the `Room` page, you first should
 notice a loader, once loaded you should be able to:
 
 - See the collaborative canvas.
