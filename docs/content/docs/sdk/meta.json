@@ -1,0 +1,13 @@
+{
+  "title": "SDK",
+  "description": "The headless library",
+  "icon": "Package",
+  "root": true,
+  "pages": [
+    "---Introduction---",
+    "index",
+    "setup",
+    "---API Reference---",
+    "...api-reference"
+  ]
+}

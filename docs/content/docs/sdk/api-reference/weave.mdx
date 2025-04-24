@@ -1,0 +1,572 @@
+---
+title: Weave
+description: API reference for Weave class
+---
+
+import { TypeTable } from "fumadocs-ui/components/type-table";
+
+## Overview
+
+The WeaveStoreWebsockets class is a client-side store implementation in the Weave.js ecosystem
+that enables real-time collaboration using WebSockets. It connects to a compatible WebSocket
+server—such as [WeaveWebsocketsServer](/docs/store-websockets/api-reference/server/weave-websockets-server)
+to sync shared canvas state across all connected users.
+
+Built on top of Yjs and y-websocket, it acts as a bridge between the client-side Weave.js app and the
+remote backend, handling updates, awareness (presence), and document syncing with minimal setup.
+
+The Weave instance extends the [Emittery](https://www.npmjs.com/package/emittery) class.
+
+## Import
+
+```shell
+import { Weave } from "@inditextech/weavejs-sdk";
+```
+
+## Instantiation
+
+```ts
+const instance = new Weave(weaveConfig: WeaveConfig, stageConfig: Konva.StageConfig);
+```
+
+## Parameters
+
+<TypeTable
+  type={{
+    ["weaveConfig.store"]: {
+      required: true,
+      description:
+        "The store to use to handle the real-time shared-state events and communication",
+      type: "WeaveStoreBase",
+    },
+    ["weaveConfig.nodes"]: {
+      description:
+        "An array that defines the Nodes instances to be registered on the instance",
+      type: "WeaveNodeBase[]",
+    },
+    ["weaveConfig.plugins"]: {
+      description:
+        "An array that defines the Plugins instances to be registered on the instance",
+      type: "WeavePluginBase[]",
+    },
+    ["weaveConfig.actions"]: {
+      description:
+        "An array that defines the Actions instances to be registered on the instance",
+      type: "WeaveActionBase[]",
+    },
+    ["weaveConfig.fonts"]: {
+      description:
+        "An array that defines the Fonts to be registered and used on the instance",
+      type: "WeaveFont[]",
+    },
+    ["weaveConfig.callbacks"]: {
+      description: "Callbacks defined for the instance",
+      type: "WeaveCallbacks[]",
+    },
+    ["weaveConfig.logger"]: {
+      description: "Weave logger configuration",
+      type: "WeaveLoggerConfig",
+    },
+    ["stageConfig"]: {
+      required: true,
+      description:
+        "An object defining the properties of the stage for the underlying Konva instance",
+      type: "Konva.StageConfig",
+    },
+  }}
+/>
+
+## Methods
+
+### Instance management
+
+#### start
+
+```ts
+async start(): void
+```
+
+This method starts the Weave instance.
+
+#### getId
+
+```ts
+getId(): string
+```
+
+This method gets the id of the Weave instance.
+
+### Events
+
+#### emitEvent
+
+```ts
+emitEvent<T>(event: string, payload: T): void
+```
+
+This method emits an event that can be listen to.
+
+#### addEventListener
+
+```ts
+addEventListener<T>(event: string, callback: (payload: T) => void): void
+```
+
+This method listen to an specific event emitted by the Weave instance.
+
+#### removeEventListener
+
+```ts
+removeEventListener<T>(event: string, callback: (payload: T) => void): void
+```
+
+This method remove an specific event listener previously instantiated on the Weave instance.
+
+### Logging
+
+#### getMainLogger
+
+```ts
+getMainLogger(): Logger
+```
+
+This method get's the main logger child instance of the Weave instance.
+
+#### getChildLogger
+
+```ts
+getChildLogger(name: string): pino.Logger<never, boolean>
+```
+
+This method returns a new [Pino](https://www.npmjs.com/package/pino) child logger from the logging instance of the Weave instance.
+
+### Stage management
+
+#### getStage
+
+```ts
+getStage(): Stage
+```
+
+This method returns the current Stage of the Konva internals for the actual Weave instance.
+
+#### getMainLayer
+
+```ts
+getMainLayer(): Konva.Layer | undefined
+```
+
+This method returns the `mainLayer` Layer of the Konva internals for the actual Weave instance.
+
+#### getInstanceRecursive
+
+```ts
+getInstanceRecursive(
+  instance: Konva.Node,
+  filterInstanceType: string[] = []
+): Konva.Node
+```
+
+This method transverse the internal Konva instance nodes tree from the specified node instance,
+giving the ability to filter by an specific node. The found node is returned.
+
+### Actions management
+
+#### getActiveAction
+
+```ts
+getActiveAction(): string | undefined;
+```
+
+This method return the Action name of the active action, if no action is active `undefined` is returned.
+
+#### triggerAction
+
+```ts
+triggerAction<T>(actionName: string, params?: T): unknown
+```
+
+This method triggers a registered Action.
+
+#### getPropsAction
+
+```ts
+getPropsAction(actionName: string) {
+  return this.actionsManager.getPropsAction(actionName);
+}: WeaveElementAttributes
+```
+
+This method returns the current properties of a registered action.
+
+#### updatePropsAction
+
+```ts
+updatePropsAction(actionName: string, params: WeaveElementAttributes): void
+```
+
+This method updated the properties of a registered action.
+
+#### cancelAction
+
+```ts
+cancelAction(actionName: string): void
+```
+
+This method cancels the specified action if is active.
+
+### State management
+
+#### findNodeById
+
+```ts
+findNodeById(
+  tree: WeaveStateElement,
+  key: string,
+  parent: WeaveStateElement | null = null,
+  index = -1
+): {
+  node: WeaveStateElement | null;
+  parent: WeaveStateElement | null;
+  index: number;
+}
+```
+
+This method transverse the shared-state searching for a node with and id specified on the
+key property.
+
+#### findNodesByType
+
+```ts
+findNodesByType(
+  tree: WeaveStateElement,
+  nodeType: string
+): WeaveStateElement[]
+```
+
+This method transverse the shared-state searching for a node with an specific type.
+
+#### getNode
+
+```ts
+getNode(nodeKey: string): {
+  node: WeaveStateElement | null;
+  parent: WeaveStateElement | null;
+  index: number;
+}
+```
+
+This method gets a node by its key, the method returns the node, parent and index (relative)
+to its parent if found.
+
+#### addNode
+
+```ts
+addNode(
+  node: WeaveStateElement,
+  parentId = 'mainLayer',
+  index: number | undefined = undefined,
+  doRender = true
+): void
+```
+
+This method adds a node to the shared-state, at the specified layer (parentId, being
+the `mainLayer` the default layer to add).
+
+You can also specify in which index (children array order) to put the node, and if you
+need it to just update the shared-state without refreshing the rendering life-cycle.
+
+#### updateNode
+
+```ts
+updateNode(node: WeaveStateElement, doRender = true): void
+```
+
+This method updates a node on the shared-state.
+
+If you need it to just update the shared-state without refreshing the rendering life-cycle.
+
+#### removeNode
+
+```ts
+removeNode(node: WeaveStateElement, doRender = true): void
+```
+
+This method removes a node from the shared-state.
+
+If you need it to just update the shared-state without refreshing the rendering life-cycle.
+
+#### removeNodes
+
+```ts
+removeNodes(nodes: WeaveStateElement[], doRender = true): void
+```
+
+This method removes a list of nodes from the shared-state.
+
+#### moveNode
+
+```ts
+moveNode(node: WeaveStateElement, position: WeavePosition, doRender = true): void
+```
+
+This method moves the node position relative to its parent on the shared-state.
+
+If you need it to just update the shared-state without refreshing the rendering life-cycle.
+
+### Z-Index management
+
+#### moveUp
+
+```ts
+moveUp(node: WeaveElementInstance): void
+```
+
+This method moves up the node one position on the z-axis. This mean the node is more close to the user
+as other nodes behind it.
+
+#### moveDown
+
+```ts
+moveDown(node: WeaveElementInstance): void
+```
+
+This method moves down the node one position on the z-axis. This mean the node is further to the user
+as other nodes in front of it.
+
+#### sendToBack
+
+```ts
+sendToBack(node: WeaveElementInstance): void
+```
+
+This method moves down the node to the back of the z-axis, being the further node from the user perspective.
+
+#### bringToFront
+
+```ts
+bringToFront(node: WeaveElementInstance): void
+```
+
+This method brings up the node to the front of the z-axis, being the closest node from the user perspective.
+
+### Group management
+
+#### group
+
+```ts
+group(nodes: WeaveStateElement[]): void
+```
+
+This method groups the nodes defined in a single unit, now all transformations or selections are made to the
+whole group instead of the nodes that the group contains.
+
+#### unGroup
+
+```ts
+unGroup(group: WeaveStateElement): void
+```
+
+This method un-groups the nodes defined in a group, this destroys the groups and now all nodes
+can be selected again. The nodes maintain their position, rotation and scale when the group is destroyed.
+
+### Targeting management
+
+#### getMousePointer
+
+```ts
+getMousePointer(point?: Vector2d): {
+  mousePoint: Vector2d;
+  container: Layer | Group | undefined;
+  measureContainer: Layer | Group | undefined;
+}
+```
+
+This method get the mouse pointer position relative to the canvas and its container layer.
+Used normally when the user clicks on the canvas and we want to know the point clicked relative
+ti the canvas and not to the viewport.
+
+#### getMousePointerRelativeToContainer
+
+```ts
+getMousePointerRelativeToContainer(container: Konva.Group | Konva.Layer): {
+  mousePoint: {
+      x: number;
+      y: number;
+  };
+  container: Layer | Group;
+}
+```
+
+This method get the mouse pointer position relative to a container layer.
+Used normally when the user clicks on a container (Layer, Frame) and we want to know the point
+clicked relative relative to that container.
+
+### Clone nodes
+
+#### nodesToGroupSerialized
+
+```ts
+nodesToGroupSerialized(instancesToClone: Konva.Node[]): {
+  serializedNodes: WeaveStateElement[];
+  minPoint: Vector2d;
+} | undefined
+```
+
+This method maps a Konva node instances list to its serialized form (the one used on the
+shared-state). Also returns the minimum point for all the nodes on the list.
+
+#### cloneNodes
+
+```ts
+cloneNodes(
+  instancesToClone: Konva.Node[],
+  targetContainer: Konva.Layer | Konva.Group | undefined,
+  onPoint: Vector2d
+): void
+```
+
+This method clone the Konva nodes instances defined in the list to the target container defined
+on the point provided.
+
+### Fonts management
+
+#### getFonts
+
+```ts
+getFonts(): WeaveFont[]
+```
+
+This method return the Fonts available on the Weave instance.
+
+### Export management
+
+#### exportStage
+
+```ts
+exportStage(
+  options: WeaveExportNodeOptions
+): Promise<HTMLImageElement>
+```
+
+This method exports the whole stage (all nodes on the canvas) as
+an image. You can define the exportation options.
+
+#### exportNode
+
+```ts
+exportNode(
+  node: WeaveElementInstance,
+  options: WeaveExportNodeOptions
+): Promise<HTMLImageElement>
+```
+
+This method exports the specified node as an image. You can define the
+exportation options.
+
+## TypeScript types
+
+```ts
+export type WeaveFont = {
+  id: string;
+  name: string;
+};
+
+export type WeaveElementInstance = Konva.Layer | Konva.Group | Konva.Shape;
+
+export declare type WeaveElementAttributes = {
+  [key: string]: any;
+  id?: string;
+  nodeType?: string;
+  children?: WeaveStateElement[];
+};
+
+export declare type WeaveStateElement = {
+  key: string;
+  type: string;
+  props: WeaveElementAttributes;
+};
+
+export type WeaveState = {
+  weave:
+    | {
+        key: "stage";
+        type: "stage";
+        props: {
+          [key: string]: unknown;
+          id: "stage";
+          children: WeaveStateElement[];
+        };
+      }
+    | Record<string, WeaveStateElement>;
+};
+
+export declare type WeaveAwarenessChange<K extends string, T> = {
+  [key in K]: T;
+};
+
+export declare interface WeaveStoreBase {
+  connect(): void;
+  disconnect(): void;
+  onAwarenessChange<K extends string, T>(
+    callback: (changes: WeaveAwarenessChange<K, T>[]) => void
+  ): void;
+  setAwarenessInfo(field: string, value: unknown): void;
+}
+
+export declare interface WeaveNodeBase {
+  createNode(id: string, props: WeaveElementAttributes): WeaveStateElement;
+  createInstance(props: WeaveElementAttributes): WeaveElementInstance;
+  updateInstance(
+    instance: WeaveElementInstance,
+    nextProps: WeaveElementAttributes
+  ): void;
+  removeInstance(instance: WeaveElementInstance): void;
+  toNode(instance: WeaveElementInstance): WeaveStateElement;
+}
+
+export declare interface WeaveActionBase {
+  init?(): void;
+  trigger(cancelAction: () => void, params?: unknown): unknown;
+  internalUpdate?(): void;
+  cleanup?(): void;
+}
+
+export declare interface WeavePluginBase {
+  init?(): void;
+  render?(): void;
+  enable(): void;
+  disable(): void;
+  isEnabled(): boolean;
+}
+
+export type WeaveUndoRedoChange = {
+  canRedo: boolean;
+  canUndo: boolean;
+  redoStackLength: number;
+  undoStackLength: number;
+};
+
+export type WeaveCallbacks = {
+  onRender?: () => void;
+  onRoomLoaded?: (loaded: boolean) => void;
+  onInstanceStatus?: (status: WeaveStatus) => void;
+  onActiveActionChange?: (actionName: string | undefined) => void;
+  onStateChange?: (state: WeaveState) => void;
+  onUndoManagerStatusChange?: (undoManagerStatus: WeaveUndoRedoChange) => void;
+};
+
+export type WeaveLoggerConfig = {
+  disabled?: boolean;
+  level?: "debug" | "info" | "warn" | "error";
+};
+
+export declare type WeaveConfig = {
+  store: WeaveStoreBase;
+  nodes?: WeaveNodeBase[];
+  actions?: WeaveActionBase[];
+  plugins?: WeavePluginBase[];
+  fonts?: WeaveFont[];
+  callbacks?: WeaveCallbacks;
+  logger?: WeaveLoggerConfig;
+};
+```

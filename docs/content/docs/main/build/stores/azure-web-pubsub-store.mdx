@@ -1,0 +1,163 @@
+---
+title: Azure Web PubSub
+description: Store that uses Azure Web PubSub infrastructure as the transport layer
+---
+
+## Introduction
+
+The Azure Web PubSub Store is store for Weave.js that leverages [Azure Web PubSub](https://azure.microsoft.com/es-es/products/web-pubsub)
+as the transport layer. Built on top of Yjs, it uses Azure's scalable infrastructure
+to broadcast updates and sync shared state across all connected clients.
+
+This store is ideal for applications that need enterprise-grade reliability,
+scalability, and easy integration with other Azure services. It enables Weave.js apps
+to support seamless real-time collaboration with minimal setup and strong cloud support.
+
+It supports features like user presence, shared document syncing, and optional data persistence
+on the backend side.
+
+## Server frameworks supported
+
+On the server side we provide some utilities to setup the backend server.
+
+As today we support this server-side frameworks:
+
+- [Express](https://expressjs.com/)
+
+<Callout title="Other server frameworks">
+  For other server types, you can take a look at the code and build your own support.
+
+On our [roadmap](/docs/main/roadmap) we will inform when we will give support to other
+server frameworks.
+
+</Callout>
+
+## Usage
+
+Check the [Azure Web PubSub store](/docs/store-azure-web-pubsub) package API reference
+for an overview of how to use it both:
+
+- [Server-side](/docs/store-azure-web-pubsub#backend-side-usage) or
+- [Frontend-side](/docs/store-azure-web-pubsub#frontend-side-usage)
+
+## Server setup
+
+Setup the frontend is easy, you just need to follow this steps on your Express-based backend:
+
+<div className="fd-steps">
+
+<div className="[&_h3]:fd-step">
+ 
+### Install the WebSocket Store backend dependencies
+
+First lets install the necessary dependencies on the backend-side:
+
+```shell
+npm install canvas @azure/web-pubsub @azure/web-pubsub-express y-protocols yjs @inditextech/weavejs-store-azure-web-pubsub
+```
+
+</div>
+
+<div className="[&_h3]:fd-step">
+ 
+### Setup the server
+
+Then setup your server as needed, here you have an example of a simple server, where the persistence
+is handled on the file system:
+
+<include lang="ts" meta='title="server.ts"'>
+  ../../../examples/build/stores/azure-web-pubsub-server.ts
+</include>
+
+File explanation:
+
+- **`(1)`**: Import the Weave.js server dependencies.
+- **`(2)`**: Define the endpoint, key and hubName of the Azure Web PubSub instance where we will connect.
+- **`(3)`**: Instantiate the `WeaveAzureWebPubsubServer` class. Which returns the server utilities to handle
+  Azure Web PubSub connections.
+- **`(4)`**: Define the Azure Web Pubsub properties.
+- **`(5)`**: Define the `fetchRoom` function that handles the `get` part of the persistence, in this
+  case we fetch a binary file with the shared-state from the file system if exists.
+- **`(6)`**: Define the `persistRoom` function that handles the `set` part of the persistence, in this
+  case we save to a file on the file system the shared-state.
+- **`(7)`**: Setup the middleware that handles the Azure Web PubSub connections.
+- **`(8)`**: Setup a route that is responsible to call the `clientConnect` method of the server in order to
+  obtain a secure connection URL to the Azure Web PubSub Hub.
+- **`(9)`**: Setup the server routes.
+- **`(10)`**: Start the server.
+
+When an user tries to join a room, it calls the defined route with the room Id where he
+want to join, then the `WeaveAzureWebPubsubServer` using the `clientConnect` function, call the Azure Web PubSub
+Hub to extract a secure connection and this URL is passed as response to the client. Then the client connects to
+this URL and the server does the rest: persistence, handling the messages sent over the connection, etc.
+
+</div>
+
+</div>
+
+## Client setup
+
+Setup the frontend is easy, you just need to follow this steps:
+
+<div className="fd-steps">
+
+<div className="[&_h3]:fd-step">
+ 
+### Install the WebSocket Store frontend dependency
+
+First lets install the necessary dependencies for the frontend client:
+
+```shell
+npm install @inditextech/weavejs-store-azure-web-pubsub
+```
+
+</div>
+
+<div className="[&_h3]:fd-step">
+ 
+### Setup the client on the Weave instance
+
+Then you need to add the Azure Web PubSub store client to the Weave instance in order to handle
+the connection when the user tries to join a room. This is done:
+
+```ts
+import { WeaveStoreAzureWebPubsub } from "@inditextech/weavejs-store-azure-web-pubsub/client"; // (1)
+
+const roomId = "MyRoom"; // (2)
+
+const store = new WeaveStoreAzureWebPubsub( // (3)
+  {
+    getUser, // (4)
+    undoManagerOptions: {
+      captureTimeout: 500,
+    }, // (5)
+  },
+  {
+    roomId, // (6)
+    url: http://localhost:1234/api/v1/rooms/${roomId}/connect`, // (7)
+  }
+);
+
+const instance = new Weave(
+  {
+    ...
+    store, // (8)
+  },
+  ...
+);
+```
+
+Explanation:
+
+- **`(1)`**: Import the Weave.js client dependencies.
+- **`(2)`**: Define the room Id to connect to.
+- **`(3)`**: Instantiate the `WeaveStoreAzureWebPubsub` class. Which returns the Azure Web PubSub store client.
+- **`(4)`**: Define the `getUser` function that return the metadata of the user that wants to connect.
+- **`(5)`**: We customize the `captureTimeout` of the Undo-Redo manager of the store, to capture changes every 500ms.
+- **`(6)`**: We set the room Id where we want to connect to.
+- **`(7)`**: Define url where we want to connect and fetch the connection URL to the Azure Web PubSub.
+- **`(8)`**: Set the instantiated store to the Weave instance.
+
+</div>
+
+</div>

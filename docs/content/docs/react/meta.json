@@ -1,0 +1,13 @@
+{
+  "title": "React Helper",
+  "description": "Set of React components to help you integrate Weave.js",
+  "icon": "Puzzle",
+  "root": true,
+  "pages": [
+    "---Introduction---",
+    "index",
+    "setup",
+    "---API Reference---",
+    "...api-reference"
+  ]
+}

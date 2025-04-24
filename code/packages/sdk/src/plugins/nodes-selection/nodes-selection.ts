@@ -30,10 +30,6 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
     this.enabled = false;
   }
 
-  registersLayers() {
-    return true;
-  }
-
   getName() {
     return 'nodesSelection';
   }

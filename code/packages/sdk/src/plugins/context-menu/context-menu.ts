@@ -35,10 +35,6 @@ export class WeaveContextMenuPlugin extends WeavePlugin {
     this.callbacks = callbacks;
   }
 
-  registersLayers() {
-    return false;
-  }
-
   getName() {
     return 'contextMenu';
   }

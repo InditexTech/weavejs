@@ -1,0 +1,111 @@
+---
+title: Nodes
+description: Nodes maintained by Weave.js team
+---
+
+import { CpuIcon, Database } from "lucide-react";
+
+## Introduction
+
+Nodes are the core visual elements in Weave.js, they represent everything you see and
+interact with on the canvas. From simple shapes like rectangles and lines, to text, images,
+and complex containers like frames, Nodes are the building blocks of your collaborative
+interface.
+
+Each Node is based on Konva.js primitives and enhanced with interactive behavior, styling,
+and real-time sync capabilities. Nodes can be selected, moved, edited, grouped, and extended,
+making them flexible enough to power everything from diagram tools to whiteboards and custom UIs.
+
+In short, if it shows up on the canvas in Weave.js, it's probably a Node.
+
+## Available nodes
+
+Weave.js team maintain a set of **base nodes**, think of them as the minimal nodes to
+build visual collaborative applications. This are the nodes:
+
+### Structure
+
+<Cards>
+
+<Card href="/docs/main/build/nodes/stage" title='Stage'>
+
+The Stage node is the root canvas container in Weave.js. It serves as the entry point
+for rendering all other visual or layout Nodes and manages the overall coordinate system.
+
+</Card>
+
+<Card href="/docs/main/build/nodes/layer" title='Layer'>
+
+The Layer node is a logical container within the Stage. It allows you to separate visual
+elements, for example: background grids, interactive elements, or UI overlays, into
+distinct rendering layers.
+
+</Card>
+
+</Cards>
+
+### Grouping
+
+<Cards>
+
+<Card href="/docs/main/build/nodes/group" title='Group'>
+
+The Group node is a container for organizing multiple nodes into a single, movable
+and transformable unit. It allows you to nest shapes or other groups together, enabling
+you to apply transformations like positioning, scaling, rotation,or selection as one
+unified object.
+
+</Card>
+
+<Card href="/docs/main/build/nodes/frame" title='Frame'>
+
+The Frame node is a container-like visual element used to group and organize other
+nodes within a pre-defined boundary. It functions as a structured layout region, often
+used to represent panels, sections, or modular components on the canvas.
+
+</Card>
+
+</Cards>
+
+### Drawing
+
+<Cards>
+
+<Card href="/docs/main/build/nodes/rectangle" title='Rectangle'>
+
+The Rectangle node is a simple, versatile primitive shape used to render rectangular
+elements on the canvas. It supports customizable properties such as position, size, fill color, stroke, corner radius,
+and more.
+
+</Card>
+
+<Card href="/docs/main/build/nodes/line" title='Line'>
+
+The Line node represents a customizable straight or curved line on the canvas.
+It supports features like multiple points, stroke color, width, dash patterns, and
+smoothing options.
+
+</Card>
+
+<Card href="/docs/main/build/nodes/text" title='Text'>
+
+The Text node is used to display editable or static text on the canvas. It supports
+rich styling options including font size, family, color, alignment, and line height.
+
+</Card>
+
+<Card href="/docs/main/build/nodes/image" title='Image'>
+
+The Image Node allows you to render images directly onto the canvas. It supports
+properties like position, scale, opacity, and filters.
+
+</Card>
+
+</Cards>
+
+## Extensibility
+
+Developers can also build their own **custom nodes**, empowering this way their applications
+with new visual nodes with behavior closer to the needs of their applications.
+
+To create a custom node, follow this steps:

@@ -1,0 +1,78 @@
+---
+title: Frame Tool
+description: Canvas in canvas area
+---
+
+import { Accordion, Accordions } from "fumadocs-ui/components/accordion";
+
+## Introduction
+
+This action allows users to create frame nodes by clicking and position the frame on
+the canvas. A frame acts as a visual container for organizing other nodes, often used
+to group related content, define sections, or build modular layouts.
+
+## Dependencies
+
+This action needs also registered on the Weave instance the following:
+
+- [Frame](/docs/main/build/nodes/frame) node
+
+## Usage
+
+<Accordions>
+  <Accordion title="1. Import the action" id="import-action">
+    Start by importing the action with the following import:
+
+    ```ts
+    import { WeaveFrameToolAction } from "@inditextech/weavejs-sdk";
+    ```
+
+  </Accordion>
+  <Accordion title="2. Register the action" id="register-action">
+    Then register the action on the Weave class instance.
+
+    ```ts
+    const instance = new Weave({
+      ...
+      actions: [
+        ...,
+        new WeaveFrameToolAction(), // [!code ++]
+      ]
+    })
+    ```
+
+  </Accordion>
+  <Accordion title="3. Setup the action trigger" id="setup-action-trigger">
+    Setup on a button or any element on the UI the user can trigger, an action
+    to trigger the action. For example on a button on React:
+
+    ```tsx
+    import { useWeave } from "@inditextech/weavejs-react";
+
+    const MyFrameToolTriggerComponent = () => {
+      const instance = useWeave((state) => state.instance);
+
+      const triggerTool = React.useCallback(() => {
+        instance.triggerAction("frameTool");
+      }, [instance])
+
+      return (
+        <button onClick={triggerTool}>Frame Tool</button>
+      )
+    }
+    ```
+
+  </Accordion>
+  <Accordion title="4. Trigger the action" id="trigger-the-action">
+    Finally as an user trigger the UI element that launches the action.
+
+    When active the user:
+
+    - Clicks on an empty canvas space to add the frame.
+
+    Then the frame is added to the canvas as a fully functional node—ready.
+    This action integrates seamlessly with Weave.js's real-time state system,
+    ensuring the new element appears instantly for all connected users.
+
+  </Accordion>
+</Accordions>

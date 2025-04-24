@@ -46,10 +46,6 @@ export class WeaveUsersPointersPlugin extends WeavePlugin {
       getUser ?? (() => ({ name: 'Unknown', email: 'unknown@domain.com' }));
   }
 
-  registersLayers() {
-    return true;
-  }
-
   getName() {
     return 'usersPointers';
   }

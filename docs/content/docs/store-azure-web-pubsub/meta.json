@@ -1,0 +1,13 @@
+{
+  "title": "Azure Web Pubsub Store",
+  "description": "Store implementation using Azure Web Pubsub as transport",
+  "icon": "DatabaseZap",
+  "root": true,
+  "pages": [
+    "---Introduction---",
+    "index",
+    "setup",
+    "---API Reference---",
+    "...api-reference"
+  ]
+}

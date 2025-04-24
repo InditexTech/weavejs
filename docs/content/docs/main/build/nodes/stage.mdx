@@ -1,0 +1,50 @@
+---
+title: Stage
+description: Main node to structure the canvas elements
+---
+
+import { Accordion, Accordions } from "fumadocs-ui/components/accordion";
+
+The Stage node is the root canvas container in Weave.js. Based on Konva’s
+[Stage](https://konvajs.org/api/Konva.Stage.html), it serves as the entry point
+for rendering all other visual or layout Nodes and manages the overall coordinate system.
+
+All Nodes are rendered within the Stage, making it the central hub for your visual
+collaborative experience. It’s also where global behaviors—like grid rendering,
+selection, or snapping—are initialized and managed.
+
+## Usage
+
+<Callout title="Don't directly use">
+  We don't recommend to use this node directly. To define the application Stage,
+  use the stores `initialState` configuration property on server-side.
+</Callout>
+
+<Accordions>
+  <Accordion title="1. Import the node" id="import-node">
+    Start by importing the action with the following import:
+
+    ```ts
+    import { WeaveStageNode } from "@inditextech/weavejs-sdk";
+    ```
+
+  </Accordion>
+  <Accordion title="2. Register the node" id="register-node">
+    Then register the node on the Weave class instance.
+
+    ```ts
+    const instance = new Weave({
+      ...
+      nodes: [
+        ...,
+        new WeaveStageNode(), // [!code ++]
+      ]
+    })
+    ```
+
+  </Accordion>
+  <Accordion title="3. Use the node" id="use-the-node">
+    TODO
+
+  </Accordion>
+</Accordions>

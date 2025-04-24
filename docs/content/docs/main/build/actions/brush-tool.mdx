@@ -1,0 +1,83 @@
+---
+title: Brush Tool
+description: Paint freeform strokes on the canvas
+---
+
+import { Accordion, Accordions } from "fumadocs-ui/components/accordion";
+
+## Introduction
+
+This action enables users to paint freeform strokes on the canvas, similar to a
+digital brush. Unlike the [Pen Tool](/docs/main/build/actions/pen-tool) action,
+which focuses on clean vector lines, the **WeaveBrushToolAction** emphasizes style,
+thickness, and expressive drawing, creating Line Nodes with a more natural,
+hand-drawn feel.
+
+It’s ideal for sketching, highlighting, or adding visual flair to collaborative
+sessions.
+
+## Dependencies
+
+This action needs also registered on the Weave instance the following:
+
+- [Line](/docs/main/build/nodes/line) node
+
+## Usage
+
+<Accordions>
+  <Accordion title="1. Import the action" id="import-action">
+    Start by importing the action with the following import:
+
+    ```ts
+    import { WeaveBrushToolAction } from "@inditextech/weavejs-sdk";
+    ```
+
+  </Accordion>
+  <Accordion title="2. Register the action" id="register-action">
+    Then register the action on the Weave class instance.
+
+    ```ts
+    const instance = new Weave({
+      ...
+      actions: [
+        ...,
+        new WeaveBrushToolAction(), // [!code ++]
+      ]
+    })
+    ```
+
+  </Accordion>
+  <Accordion title="3. Setup the action trigger" id="setup-action-trigger">
+    Setup on a button or any element on the UI the user can trigger, an action
+    to trigger the action. For example on a button on React:
+
+    ```tsx
+    import { useWeave } from "@inditextech/weavejs-react";
+
+    const MyBrushToolTriggerComponent = () => {
+      const instance = useWeave((state) => state.instance);
+
+      const triggerTool = React.useCallback(() => {
+        instance.triggerAction("brushTool");
+      }, [instance])
+
+      return (
+        <button onClick={triggerTool}>Brush Tool</button>
+      )
+    }
+    ```
+
+  </Accordion>
+  <Accordion title="4. Trigger the action" id="trigger-the-action">
+    Finally as an user trigger the UI element that launches the action.
+
+    When active the user:
+
+    - **Click-press** or **Touch-press** on the canvas, to define a brush line.
+
+    Then the freeform line is added to the canvas as a fully functional node—ready.
+    This action integrates seamlessly with Weave.js's real-time state system,
+    ensuring the new element appears instantly for all connected users.
+
+  </Accordion>
+</Accordions>

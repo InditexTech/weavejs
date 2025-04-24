@@ -1,0 +1,132 @@
+---
+title: WeaveWebsocketsServer
+description: API reference for the WeaveWebsocketsServer class
+---
+
+import { TypeTable } from "fumadocs-ui/components/type-table";
+
+## Overview
+
+The WeaveWebsocketsServer is a server-side class in Weave.js WebSockets store that
+provides a real-time backend for collaborative applications using WebSockets as the transport
+layer and and Express as the server framework. Built on top of the Yjs ecosystem,
+it acts as a store provider that manages the shared-document state and synchronizes
+it across all connected clients.
+
+This class enables seamless collaboration by handling server-side:
+
+- Connection management via WebSocket clients
+- Document synchronization using CRDTs (through Yjs)
+- Broadcasting updates between users in real time
+- Support for awareness events
+- Support for persistence of the shared-state
+
+## Import
+
+```shell
+import { WeaveWebsocketsServer } from "@inditextech/weavejs-store-websockets/server";
+```
+
+## Instantiation
+
+```ts
+const websocketsServer = new WeaveWebsocketsServer(params: WeaveWebsocketsServerParams);
+```
+
+## Parameters
+
+<TypeTable
+  type={{
+    performUpgrade: {
+      required: true,
+      description:
+        "A function that receives as parameter the request and must return a boolean indicating if the request allows to perform the HTTP/1.1 protocol upgrade mechanism",
+      type: "PerformUpgrade",
+    },
+    extractRoomId: {
+      required: true,
+      description:
+        "A function that receives as parameter the request and must return the room id to connect to",
+      type: "ExtractRoomId",
+    },
+    persistRoom: {
+      description:
+        "Weave.js Store to use to handle the real-time communication",
+      type: "PersistRoom",
+    },
+    fetchRoom: {
+      description: "Child nodes to render",
+      type: "FetchRoom",
+    },
+    initialState: {
+      description: "Array of nodes to register and use by the instance",
+      type: "initialState",
+      default: "defaultInitialState",
+    },
+  }}
+/>
+
+## Methods
+
+### handleUpgrade
+
+```ts
+handleUpgrade(server: http.Server | https.Server)
+```
+
+This method needs the underlying server where request are made and need to apply the
+HTTP/1.1 protocol upgrade mechanism to switch from HTTP protocol to the WebSockets one.
+
+## TypeScript types
+
+```ts
+type PerformUpgrade = (req: IncomingMessage) => Promise<boolean>;
+
+type ExtractRoomId = (req: IncomingMessage) => string | undefined;
+
+type FetchInitialState = (doc: Y.Doc) => void;
+
+type PersistRoom = (
+  roomId: string,
+  actualState: Uint8Array<ArrayBufferLike>
+) => Promise<void>;
+
+type FetchRoom = (roomId: string) => Promise<Uint8Array | null>;
+
+type WeaveWebsocketsServerParams = {
+  initialState?: FetchInitialState;
+  performUpgrade: PerformUpgrade;
+  extractRoomId: ExtractRoomId;
+  persistRoom?: PersistRoom;
+  fetchRoom?: FetchRoom;
+};
+```
+
+## Shared-state initial value
+
+If not defined the `defaultInitialState` is used, which is nothing more than:
+
+<Mermaid
+  chart="
+flowchart TD;
+  Stage --> gridLayer;
+  Stage --> mainLayer;
+  Stage --> selectionLayer;
+  Stage --> usersPointersLayer;
+  Stage --> utilityLayer;"
+/>
+
+A [Stage](/docs/main/build/nodes/stage) node with 5 children [Layer](/docs/main/build/nodes/layer)
+nodes, in the specified order (bottom-to-top):
+
+- **gridLayer**: is the layer used by [WeaveStageGridPlugin](/docs/main/build/plugins/stage-grid)
+  to render the reference grid elements.
+- **mainLayer**: is the main layer where all the nodes added by the users live.
+- **selectionLayer**: is the layer used by [WeaveNodesSelectionPlugin](/docs/main/build/plugins/nodes-selection)
+  to render the selection overlay elements.
+- **usersPointersLayer**: is the layer used by [WeaveUsersPointersPlugin](/docs/main/build/plugins/users-pointers)
+  to render the users pointers overlay elements.
+- **utilityLayer**: is a wildcard layer defined that can be used by any plugin.
+
+Check out here the [code](https://github.com/InditexTech/weavejs/blob/main/code/packages/store-websockets/src/server/default-initial-state.ts)
+hat defines the `defaultInitialState` function.

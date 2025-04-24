@@ -1,0 +1,22 @@
+{
+  "title": "Framework",
+  "description": "The visual collaborative apps framework",
+  "icon": "Blocks",
+  "root": true,
+  "pages": [
+    "---Introduction---",
+    "index",
+    "what-is-weavejs",
+    "requirements",
+    "---Setup---",
+    "quickstart",
+    "manual-installation",
+    "---Build---",
+    "...build",
+    "---Additional Information---",
+    "release-notes",
+    "changelog",
+    "roadmap",
+    "contributing"
+  ]
+}

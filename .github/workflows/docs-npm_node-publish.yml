@@ -110,7 +110,7 @@ jobs:
         uses: actions/upload-pages-artifact@v3
         with:
           # Upload entire repository
-          path: "./docs/build/site"
+          path: "./docs/dist"
 
       - name: Deploy to GitHub Pages
         id: deployment

@@ -1,0 +1,53 @@
+---
+title: Nodes Snapping
+description: Allow to snap nodes to guides and to themselves
+---
+
+import { Accordion, Accordions } from "fumadocs-ui/components/accordion";
+
+## Introduction
+
+This plugin adds smart alignment assistance by enabling nodes to snap to guides or
+other nodes as they are moved or resized. It helps users place elements with
+precision, improving layout consistency and visual structure.
+
+It’s especially useful in design tools, diagram editors, and any interface where
+visual alignment matters.
+
+## Dependencies
+
+This plugin needs also registered on the Weave instance the following:
+
+- [Nodes selection](/docs/main/build/plugins/nodes-selection) plugin.
+
+## Usage
+
+<Accordions>
+  <Accordion title="1. Import the plugin" id="import-plugin">
+    Start by importing the action with the following import:
+
+    ```ts
+    import { WeaveNodesSnappingPlugin } from "@inditextech/weavejs-sdk";
+    ```
+
+  </Accordion>
+  <Accordion title="2. Register the plugin" id="register-plugin">
+    Then register the action on the Weave class instance.
+
+    ```ts
+    const instance = new Weave({
+      ...
+      plugins: [
+        ...,
+        new WeaveNodesSnappingPlugin(), // [!code ++]
+      ]
+    })
+    ```
+
+  </Accordion>
+  <Accordion title="3. Use the plugin" id="use-the-plugin">
+    The user now can snap the nodes when moved or resized relative to other nodes or
+    some guides like the center of the relative canvas.
+
+  </Accordion>
+</Accordions>

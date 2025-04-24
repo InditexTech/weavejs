@@ -1,0 +1,113 @@
+= WeaveImageToolAction
+
+The **WeaveImageToolAction** action allows users to add images to the canvas by
+selecting a file. Once added, the image is rendered as an Image Node, ready for
+positioning, resizing, and collaboration.
+
+This action supports various image formats: jpeg, gif & png. Ideal for visual
+references, diagrams, or creative content.
+
+When active the user:
+
+* Select the image to upload.
+* Image is uploaded to the developer storage of their choice.
+* Image URL must be proxied through the backend, to avoid cross-origin issues.
+* Once the image is uploaded, the user can click or touch on the canvas to place it.
+
+Then the image is added to the canvas as a fully functional node—ready.
+This action integrates seamlessly with **Weave.js's** real-time state system,
+ensuring the new element appears instantly for all connected users.
+
+== Import
+
+[source,typescript]
+----
+import { WeaveImageToolAction } from "@inditextech/weavejs-sdk";
+----
+
+== Instantiation
+
+[source,typescript]
+----
+new WeaveImageToolAction(config?: WeaveImageToolActionCallbacks);
+----
+
+== Configuration
+
+[source,typescript]
+----
+type WeaveActionCallbacks = {
+  onPropsChange?: WeaveActionPropsChangeCallback; // <1>
+};
+
+type WeaveImageToolActionCallbacks = WeaveActionCallbacks & {
+  onUploadImage: WeaveImageToolActionOnAddImageCallback; // <2>
+  onImageLoadStart?: WeaveImageToolActionOnStartLoadImageCallback; // <3>
+  onImageLoadEnd?: WeaveImageToolActionOnEndLoadImageCallback; // <4>
+};
+----
+<1> `onPropsChange` (optional): A callback function that is called when the properties
+of the action change. The callback receives an object as parameter with the
+<2> `onUploadImage`: A callback function that is called when an image needs to be uploaded.
+It receives a `finished` callback as parameter that must be called with the URL of the uploaded image.
+<3> `onImageLoadStart` (optional): A callback function that is called when the image load starts.
+<4> `onImageLoadEnd` (optional): A callback function that is called when the image load ends.
+
+== Methods
+
+=== updateProps
+
+[source,typescript]
+----
+updateProps(props: WeaveElementAttributes): void;
+----
+
+Update the properties of the action. Ideal for setting properties of the freeform line,
+like its color, stroke size, etc.
+
+== Events
+
+If the keys kbd:[Enter] or kbd:[Esc] are pressed, the action is cancelled.
+
+On touch devices, select again the xref:api-reference:sdk/actions/selection-tool.adoc[Selection Tool]
+to finish or cancel the action.
+
+== TypeScript Types
+
+[source,typescript]
+----
+type WeaveActionPropsChangeCallback = (
+  props: WeaveElementAttributes
+) => void;
+
+type WeaveElementAttributes = {
+  [key: string]: any;
+  id?: string;
+  nodeType?: string;
+  children?: WeaveStateElement[];
+};
+
+type WeaveStateElement = {
+  key: string;
+  type: string;
+  props: WeaveElementAttributes;
+};
+
+type WeaveActionCallbacks = {
+  onPropsChange?: WeaveActionPropsChangeCallback;
+};
+
+type WeaveImageToolActionOnAddImageCallback = (
+  finished: (imageURL: string) => void
+) => Promise<void>;
+type WeaveImageToolActionOnStartLoadImageCallback = () => void;
+type WeaveImageToolActionOnEndLoadImageCallback = (
+  error?: Error
+) => void;
+
+type WeaveImageToolActionCallbacks = WeaveActionCallbacks & {
+  onUploadImage: WeaveImageToolActionOnAddImageCallback;
+  onImageLoadStart?: WeaveImageToolActionOnStartLoadImageCallback;
+  onImageLoadEnd?: WeaveImageToolActionOnEndLoadImageCallback;
+};
+----

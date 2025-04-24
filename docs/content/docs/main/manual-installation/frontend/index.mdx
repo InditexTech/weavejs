@@ -1,0 +1,82 @@
+---
+title: Setup the Frontend side
+description: Learn how to setup the Backend side of a Weave.js app on Next.js
+---
+
+## Introduction
+
+The minimal setup for a collaborative applications needs to define two pages:
+
+- One that allow to indicate the room name or ID and username to use to join a collaboration room.
+  Lets call this page from now on the **Enter Room page**.
+- A second one that will handle the UI for the collaboration room once joined.
+  Lets call this page from now on the **Room page**.
+
+## Frontend setup
+
+To setup Weave.js frontend over our Next.js project (on a single artifact), we need
+to fully complete this steps:
+
+<div className="fd-steps">
+
+<div className="[&_h3]:fd-step">
+ 
+### Install the Weave.js frontend dependencies
+
+Located on your project folder, let's now install the **Weave.js** frontend dependencies:
+
+```shell
+npm install boring-avatars lucide-react @inditextech/weavejs-react
+```
+
+</div>
+
+<div className="[&_h3]:fd-step">
+ 
+### Setup a global state store for the UI
+
+Let's start by creating a global state store to handle the UI state, we will use
+[Zustand](https://zustand.docs.pmnd.rs/getting-started/introduction) for this.
+
+```shell
+npm install boring-avatars lucide-react @inditextech/weavejs-react
+```
+
+- First install the [Zustand](https://zustand.docs.pmnd.rs/getting-started/introduction) dependency:
+
+  ```shell
+  npm install zustand
+  ```
+
+- Create a `store/store.ts` file on the `src` folder of your project and set it's
+  content to this:
+
+  <include lang="ts" meta='title="store/store.ts"'>
+    ../../../examples/manual-installation/store/store.ts
+  </include>
+
+</div>
+
+<div className="[&_h3]:fd-step">
+ 
+### Setup the Enter Room page
+
+Now we have a working global state store for the UI, let's setup the
+[Enter Room page](/docs/main/manual-installation/frontend/enter-room-page).
+
+</div>
+
+<div className="[&_h3]:fd-step">
+ 
+### Setup the Room page
+
+Now that we have setup the Enter Room page, let's setup the
+[Room page](/docs/main/manual-installation/frontend/room-page).
+
+</div>
+
+</div>
+
+### Next steps
+
+Let's now [run the project](/docs/main/manual-installation#run-the-project).

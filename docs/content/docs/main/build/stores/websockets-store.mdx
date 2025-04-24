@@ -1,0 +1,38 @@
+---
+title: WebSockets
+description: Store that uses the WebSockets API as the transport layer
+---
+
+## Introduction
+
+The WebSocket Store is a store for Weave.js that uses the [WebSockets API](https://developer.mozilla.org/en-US/docs/Web/API/WebSockets_API)
+as the transport layer to enable real-time collaboration over the internet. Built on top of
+Yjs’s y-websocket provider, it connects all clients to a central server that manages updates
+and syncs shared state almost instantly.
+
+It supports features like user presence, shared document syncing, and optional data persistence
+on the backend side.
+
+## Server frameworks supported
+
+On the server side we provide some utilities to setup the backend server.
+
+As today we support this server-side frameworks:
+
+- [Express](https://expressjs.com/)
+
+<Callout title="Other server frameworks">
+  For other server types, you can take a look at the code and build your own support.
+
+On our [roadmap](/docs/main/roadmap) we will inform when we will give support to other
+server frameworks.
+
+</Callout>
+
+## Usage
+
+Check the [WebSocket store](/docs/store-websockets) package API reference for an overview
+of how to use it both:
+
+- [Server-side](/docs/store-websockets#backend-side-usage) or
+- [Frontend-side](/docs/store-websockets#frontend-side-usage)

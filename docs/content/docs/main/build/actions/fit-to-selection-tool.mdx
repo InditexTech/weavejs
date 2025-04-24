@@ -1,0 +1,74 @@
+---
+title: Fit to Selection Tool
+description: Set the zoom level so all the selected are entirely visible on the screen
+---
+
+import { Accordion, Accordions } from "fumadocs-ui/components/accordion";
+
+## Introduction
+
+This action automatically adjusts the zoom and position of the Stage to ensure all
+selected nodes fit neatly within the viewport. It's perfect for focus the view on a
+selection.
+
+## Dependencies
+
+This action needs also registered on the Weave instance the following:
+
+- [Stage zoom](/docs/main/build/plugins/stage-zoom) plugin
+
+## Usage
+
+<Accordions>
+  <Accordion title="1. Import the action" id="import-action">
+    Start by importing the action with the following import:
+
+    ```ts
+    import { WeaveFitToSelectionToolAction } from "@inditextech/weavejs-sdk";
+    ```
+
+  </Accordion>
+  <Accordion title="2.
+   Register the action" id="register-action">
+    Then register the action on the Weave class instance.
+
+    ```ts
+    const instance = new Weave({
+      ...
+      actions: [
+        ...,
+        new WeaveFitToSelectionToolAction(), // [!code ++]
+      ]
+    })
+    ```
+
+  </Accordion>
+  <Accordion title="3. Setup the action trigger" id="setup-action-trigger">
+    Setup on a button or any element on the UI the user can trigger, an action
+    to trigger the action. For example on a button on React:
+
+    ```tsx
+    import { useWeave } from "@inditextech/weavejs-react";
+
+    const MyFitToSelectionToolTriggerComponent = () => {
+      const instance = useWeave((state) => state.instance);
+
+      const triggerTool = React.useCallback(() => {
+        instance.triggerAction("fitToSelectionTool");
+      }, [instance])
+
+      return (
+        <button onClick={triggerTool}>Fit to Selection Tool</button>
+      )
+    }
+    ```
+
+  </Accordion>
+  <Accordion title="4. Trigger the action" id="trigger-the-action">
+    Finally as an user trigger the UI element that launches the action.
+
+    When triggered finds the zoom level necessary to fit all the selected nodes
+    in the viewport and center on them, so they can be entirely visible.
+
+  </Accordion>
+</Accordions>

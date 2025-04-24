@@ -1,0 +1,142 @@
+---
+title: Overview
+description: Getting started with Weave.js React Helper library API
+---
+
+The WebSocket Store is a store for Weave.js that uses the [WebSockets API](https://developer.mozilla.org/en-US/docs/Web/API/WebSockets_API)
+as the transport layer to enable real-time collaboration over the internet. Built on top of
+Yjs’s y-websocket provider, it connects all clients to a central server that manages updates
+and syncs shared state almost instantly.
+
+This store includes:
+
+- A class named **WeaveWebsocketsServer** that helps setup the backend on top of an
+  [Express](https://expressjs.com/) service.
+- A class named **WeaveStoreWebsockets** which is the client used on the frontend side to
+  connect to the store backend and provide all the support for the real-time management of the
+  shared-state.
+
+## Backend-side usage
+
+Setup the frontend is easy, you just need to follow this steps on your Express-based backend:
+
+<div className="fd-steps">
+
+<div className="[&_h3]:fd-step">
+ 
+### Install dependencies
+
+First lets install the necessary dependencies on the backend-side:
+
+```shell
+npm install canvas ws y-protocols yjs @inditextech/weavejs-store-websockets
+```
+
+</div>
+
+<div className="[&_h3]:fd-step">
+ 
+### Server setup
+
+Then setup your server as needed, here you have an example of a simple Express server,
+where we setup the **WeaveWebsocketsServer** class and the persistence is handled on the file system:
+
+<include lang="ts" meta='title="server.ts"'>
+  ../examples/build/stores/websockets-server.ts
+</include>
+
+File explanation:
+
+- **`(1)`**: Import the Weave.js server dependencies.
+- **`(2)`**: Extract the server when starting it.
+- **`(3)`**: Instantiate the `WeaveWebsocketsServer` class. Which returns the WebSockets server.
+- **`(4)`**: Define the `performUpgrade` function that returns a boolean if the provided URL
+  allows to trigger the HTTP/1.1 protocol upgrade mechanism (upgrades the connection from HTTP to Websocket),
+  you receive the request as parameter.
+- **`(5)`**: Define the `extractRoomId` function that return the room Id, you receive the request as
+  parameter.
+- **`(6)`**: Define the `fetchRoom` function that handles the `get` part of the persistence, in this
+  case we fetch a binary file with the shared-state from the file system if exists.
+- **`(7)`**: Define the `persistRoom` function that handles the `set` part of the persistence, in this
+  case we save to a file on the file system the shared-state.
+- **`(8)`**: Setup the server that can trigger the HTTP/1.1 protocol upgrade mechanism, in our case is the
+  Express server we extracted and started before.
+
+When an user tries to join a room, it calls the defined connection URL with the room Id where he
+want to join, then the `WeaveWebsocketsServer` validate that that URL with the `performUpgrade` function,
+if valid, it performs the HTTP/1.1 protocol upgrade, then a WebSocket connection is performed. Then the
+room Id is extracted using the `extractRoomId` function, and the server uses this information for the rest:
+persistence, handling the messages sent over the websockets connections, etc.
+
+</div>
+
+</div>
+
+## Frontend-side usage
+
+Setup the frontend is easy, you just need to follow this steps:
+
+<div className="fd-steps">
+
+<div className="[&_h3]:fd-step">
+ 
+### Install dependencies
+
+First lets install the necessary dependencies for the frontend client:
+
+```shell
+npm install @inditextech/weavejs-store-websockets
+```
+
+</div>
+
+<div className="[&_h3]:fd-step">
+ 
+### Setup the client on the Weave instance
+
+Then you need to add the WebSockets store client to the Weave instance in order to handle
+the connection when the user tries to join a room. This is done:
+
+```ts
+import { WeaveStoreWebsockets } from "@inditextech/weavejs-store-websockets/client"; // (1)
+
+const roomId = "MyRoom"; // (2)
+
+const store = new WeaveStoreWebsockets( // (3)
+  {
+    getUser, // (4)
+    undoManagerOptions: {
+      captureTimeout: 500,
+    }, // (5)
+  },
+  {
+    roomId, // (6)
+    wsOptions: {
+      serverUrl: "http://localhost:1234" // (7)
+    }
+  }
+);
+
+const instance = new Weave(
+  {
+    ...
+    store, // (8)
+  },
+  ...
+);
+```
+
+Explanation:
+
+- **`(1)`**: Import the Weave.js client dependencies.
+- **`(2)`**: Define the room Id to connect to.
+- **`(3)`**: Instantiate the `WeaveStoreWebsockets` class. Which returns the WebSockets store client.
+- **`(4)`**: Define the `getUser` function that return the metadata of the user that wants to connect.
+- **`(5)`**: We customize the `captureTimeout` of the Undo-Redo manager of the store, to capture changes every 500ms.
+- **`(6)`**: We set the room Id where we want to connect to.
+- **`(7)`**: Define server URL where we want to connect on the `serverUrl` parameter.
+- **`(8)`**: Set the instantiated store to the Weave instance.
+
+</div>
+
+</div>

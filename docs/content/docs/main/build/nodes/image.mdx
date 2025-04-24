@@ -1,0 +1,45 @@
+---
+title: Image
+description: Render images on the canvas
+---
+
+import { Accordion, Accordions } from "fumadocs-ui/components/accordion";
+
+The Image Node allows you to render images directly onto the canvas. Built on top
+of Konva’s [Image](https://konvajs.org/api/Konva.Image.html) shape, it supports
+properties like position, scale, opacity, and filters.
+
+Image nodes are perfect for adding visual references, icons, or user-uploaded media
+to your collaborative canvas. They supporting selection, resizing, and drag-and-drop—and
+and can be extended with plugins for features like cropping, masking, or annotations.
+
+## Usage
+
+<Accordions>
+  <Accordion title="1. Import the node" id="import-node">
+    Start by importing the action with the following import:
+
+    ```ts
+    import { WeaveImageNode } from "@inditextech/weavejs-sdk";
+    ```
+
+  </Accordion>
+  <Accordion title="2. Register the node" id="register-node">
+    Then register the node on the Weave class instance.
+
+    ```ts
+    const instance = new Weave({
+      ...
+      nodes: [
+        ...,
+        new WeaveImageNode(), // [!code ++]
+      ]
+    })
+    ```
+
+  </Accordion>
+  <Accordion title="3. Use the node" id="use-the-node">
+    TODO
+
+  </Accordion>
+</Accordions>

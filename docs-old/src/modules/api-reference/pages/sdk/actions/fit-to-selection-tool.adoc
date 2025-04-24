@@ -1,0 +1,38 @@
+= WeaveFitToSelectionToolAction
+
+The **WeaveFitToSelectionToolAction** action automatically adjusts the zoom and position of
+the Stage to ensure all selected nodes fit neatly within the viewport. It's perfect for
+focus the view on a selection.
+
+When triggered finds the zoom level necessary to fit all the selected nodes in the viewport
+and center on them, so they can be entirely visible.
+
+== Import
+
+[source,typescript]
+----
+import { WeaveFitToSelectionToolAction } from "@inditextech/weavejs-sdk";
+----
+
+== Instantiation
+
+[source,typescript]
+----
+new WeaveFitToSelectionToolAction();
+----
+
+== Configuration
+
+None
+
+== Methods
+
+None
+
+== Events
+
+None
+
+== TypeScript Types
+
+None

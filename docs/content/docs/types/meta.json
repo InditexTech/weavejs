@@ -1,0 +1,13 @@
+{
+  "title": "TypeScript Types definitions",
+  "description": "A package that contains the TypeScript types definitions for Weave.js",
+  "icon": "FileType",
+  "root": true,
+  "pages": [
+    "---Introduction---",
+    "index",
+    "setup",
+    "---API Reference---",
+    "...api-reference"
+  ]
+}

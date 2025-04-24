@@ -1,0 +1,99 @@
+---
+title: Overview
+description: Getting started with Weave.js
+---
+
+import { Accordion, Accordions } from "fumadocs-ui/components/accordion";
+import { CpuIcon, Database } from "lucide-react";
+import { Separator } from "@/components/separator";
+
+## Introduction
+
+Weave.js is a modular library that streamlines the **development of visual
+collaborative web applications** built on-top of an HTML5 canvas, designed with a
+robust architecture, **Weave.js** enables developers to extend functionality
+seamlessly.
+
+Ideal for building applications such as whiteboards, diagram editors and design
+platforms, Weave.js provides the flexibility and scalability needed for modern,
+canvas-based collaborative tools.
+
+<Callout title="Want to learn more?">
+  Read our in-depth [What is Weave.js](/docs/main/what-is-weavejs) introduction.
+</Callout>
+
+### Terminology
+
+**Canvas**: The [HTML5 Canvas](https://developer.mozilla.org/es/docs/Web/HTML/Reference/Elements/canvas)
+is a powerful web API that provides a drawing surface within the browser. It allows
+developers to render 2D graphics, such as shapes, images, animations, and visual interfaces, using JavaScript.
+
+Unlike HTML elements, canvas content is pixel-based and doesn’t retain a DOM structure,
+making it ideal for high-performance, dynamic visuals like games, design tools,
+and collaborative drawing apps—like those built with Weave.js.
+
+<Separator />
+
+**CRDT**: A CRDT (Conflict-free Replicated Data Type) is a data structure designed to
+automatically resolve conflicts in distributed systems, especially in real-time
+collaborative applications. It allows multiple users to update shared data
+simultaneously, and guarantees that all changes will merge consistently across
+devices—without requiring a central server or manual conflict resolution.
+
+CRDTs are the foundation of real-time sync in Weave.js (via [Yjs](https://yjs.dev)),
+making collaboration smooth, reliable, and resilient—even under network latency or
+disconnection.
+
+<Separator />
+
+Although not required, some basic knowledge of [Konva.js](https://konvajs.org/docs/overview.html)
+would be useful for further customizations.
+
+## Live showcase
+
+<div className="flex justify-center items-center *:max-w-[700px] bg-gradient-to-br from-fd-primary/10 rounded-xl border">
+  ![Enter room page of the Weave.js showcase](/images/showcase.png)
+</div>
+
+Check our [live whiteboard application](https://weavejs.cloud.inditex.com) built using:
+
+- [Next.js](https://nextjs.org/) for the frontend side
+- [Express](https://expressjs.com/) & [Node.js](https://nodejs.org/es) on the backend side
+
+Demonstrating the creation from scratch of a real-time, collaborative visual workspace
+application.
+
+## FAQ
+
+Some common questions you may encounter.
+
+<Accordions>
+  <Accordion
+    id="ui-frameworks-usage"
+    title="Can I use Weave.js with any UI framework?"
+  >
+    Yes, you can use Weave.js with any UI framework, but we recommend to use it with React.
+
+    Weave.js is framework-agnostic at its core, meaning the rendering and collaboration logic
+    can be integrated into different environments.
+
+    We provide and maintain a React utility to make the integration with React more seamlessly. If you're
+    using another framework (like Vue or Svelte), integration is possible, but may require additional
+    setup or custom wrappers not provided by this documentation.
+
+  </Accordion>
+  <Accordion
+    id="frontend-and-backend-single-artifact"
+    title="Can I deploy the frontend and backend on a single artifact?"
+  >
+    Yes, you can deploy both the frontend and backend of a Weave.js app as a single artifact.
+    This is a common approach, especially when using full-stack frameworks like Next.js, Express, or Vite
+    with a Node server.
+
+    You can bundle the frontend and serve it alongside the backend (e.g., a using a Weave.js store) from
+    the same server or deployment unit.
+
+    Nonetheless we recommend to use separate artifacts for the frontend and the backend.
+
+  </Accordion>
+</Accordions>

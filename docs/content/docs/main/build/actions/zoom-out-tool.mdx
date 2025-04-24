@@ -1,0 +1,72 @@
+---
+title: Zoom In Tool
+description: Decreases one step the stage zoom level
+---
+
+import { Accordion, Accordions } from "fumadocs-ui/components/accordion";
+
+## Introduction
+
+This action allows users to incrementally zoom out the canvas, providing a more
+general view of the content. It adjusts the Stage’s scale smoothly and centers the
+zoom on the current viewport or a specific focal point.
+
+## Dependencies
+
+This action needs also registered on the Weave instance the following:
+
+- [Stage zoom](/docs/main/build/plugins/stage-zoom) plugin
+
+## Usage
+
+<Accordions>
+  <Accordion title="1. Import the action" id="import-action">
+    Start by importing the action with the following import:
+
+    ```ts
+    import { WeaveZoomOutToolAction } from "@inditextech/weavejs-sdk";
+    ```
+
+  </Accordion>
+  <Accordion title="2. Register the action" id="register-action">
+    Then register the action on the Weave class instance.
+
+    ```ts
+    const instance = new Weave({
+      ...
+      actions: [
+        ...,
+        new WeaveZoomOutToolAction(), // [!code ++]
+      ]
+    })
+    ```
+
+  </Accordion>
+  <Accordion title="3. Setup the action trigger" id="setup-action-trigger">
+    Setup on a button or any element on the UI the user can trigger, an action
+    to trigger the action. For example on a button on React:
+
+    ```tsx
+    import { useWeave } from "@inditextech/weavejs-react";
+
+    const MyZoomOutToolTriggerComponent = () => {
+      const instance = useWeave((state) => state.instance);
+
+      const triggerTool = React.useCallback(() => {
+        instance.triggerAction("zoomOutTool");
+      }, [instance])
+
+      return (
+        <button onClick={triggerTool}>Zoom Out Tool</button>
+      )
+    }
+    ```
+
+  </Accordion>
+  <Accordion title="4. Trigger the action" id="trigger-the-action">
+    Finally as an user trigger the UI element that launches the action.
+
+    When triggered decreases the zoom level of the canvas by one step.
+
+  </Accordion>
+</Accordions>

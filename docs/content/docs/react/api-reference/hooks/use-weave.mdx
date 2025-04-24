@@ -1,0 +1,91 @@
+---
+title: useWeave
+description: API reference for the useWeave hook
+---
+
+import { TypeTable } from "fumadocs-ui/components/type-table";
+
+## Overview
+
+The useWeave hook is a core utility from the Weave.js React Helper library that gives you
+direct access to the Weave.js store context within your React components. It provides everything
+you access to Weave.js instance API.
+
+Remember that in order to use the useWeave hook you need to wrap your app (or part of it) with
+the [WeaveProvider](/docs/react/api-reference/providers/weave-provider).
+
+## Import
+
+```shell
+import { useWeave } from "@inditextech/weavejs-react";
+```
+
+## Store schema
+
+The store is based on [Zustand](https://zustand.docs.pmnd.rs/getting-started/introduction) state
+state management solution.
+
+Its schema or structure is the following:
+
+```ts
+interface WeaveRuntimeState {
+  instance: Weave | null;
+  appState: WeaveState;
+  status: WeaveStatus;
+  connection: {
+    status: string;
+  };
+  room: {
+    loaded: boolean;
+  };
+  users: WeaveConnectedUsersChanged;
+  undoRedo: {
+    canUndo: boolean;
+    canRedo: boolean;
+  };
+  zoom: {
+    value: number;
+    canZoomIn: boolean;
+    canZoomOut: boolean;
+  };
+  selection: {
+    nodes: WeaveSelection[];
+    node: WeaveStateElement | undefined;
+  };
+  actions: {
+    active: boolean;
+    actual: string | undefined;
+  };
+  setInstance: (newInstance: Weave | null) => void;
+  setStatus: (newStatus: WeaveStatus) => void;
+  setAppState: (newAppState: WeaveState) => void;
+  setConnectionStatus: (newConnectionStatus: string) => void;
+  setRoomLoaded: (newStatus: boolean) => void;
+  setUsers: (newUsers: WeaveConnectedUsersChanged) => void;
+  setCanUndo: (newCanUndo: boolean) => void;
+  setCanRedo: (newCanRedo: boolean) => void;
+  setZoom: (newZoom: number) => void;
+  setCanZoomIn: (newCanZoomIn: boolean) => void;
+  setCanZoomOut: (newCanZoomOut: boolean) => void;
+  setSelectedNodes: (newSelectedNodes: WeaveSelection[]) => void;
+  setNode: (newNode: WeaveStateElement | undefined) => void;
+  setActualAction: (newActualAction: string | undefined) => void;
+}
+```
+
+## Usage
+
+Being the store based on Zustand, usage is pretty straight-forward, we just
+instantiate the hook and we pass a function as parameter, that receives the state
+as parameter and from there we can reduce to the part of the state we need,
+like this:
+
+```tsx
+import { useWeave } from "@inditextech/weavejs-react";
+
+const MyComponent = () => {
+  const nodesSelected = useWeave((state) => state.selection.nodes);
+
+  return <div>{`Nodes selected: ${nodesSelected.length}`}</div>;
+};
+```

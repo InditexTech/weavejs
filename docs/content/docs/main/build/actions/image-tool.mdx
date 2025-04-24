@@ -1,0 +1,83 @@
+---
+title: Image Tool
+description: Add an image to the canvas
+---
+
+import { Accordion, Accordions } from "fumadocs-ui/components/accordion";
+
+## Introduction
+
+This action allows users to add images to the canvas by selecting a file. Once added,
+the image is rendered as an Image Node, ready for positioning, resizing, and collaboration.
+
+This action supports various image formats: jpeg, gif & png. Ideal for visual
+references, diagrams, or creative content.
+
+## Dependencies
+
+This action needs also registered on the Weave instance the following:
+
+- [Image](/docs/main/build/nodes/image) node
+
+## Usage
+
+<Accordions>
+  <Accordion title="1. Import the action" id="import-action">
+    Start by importing the action with the following import:
+
+    ```ts
+    import { WeaveImageToolAction } from "@inditextech/weavejs-sdk";
+    ```
+
+  </Accordion>
+  <Accordion title="2. Register the action" id="register-action">
+    Then register the action on the Weave class instance.
+
+    ```ts
+    const instance = new Weave({
+      ...
+      actions: [
+        ...,
+        new WeaveImageToolAction(), // [!code ++]
+      ]
+    })
+    ```
+
+  </Accordion>
+  <Accordion title="3. Setup the action trigger" id="setup-action-trigger">
+    Setup on a button or any element on the UI the user can trigger, an action
+    to trigger the action. For example on a button on React:
+
+    ```tsx
+    import { useWeave } from "@inditextech/weavejs-react";
+
+    const MyImageToolTriggerComponent = () => {
+      const instance = useWeave((state) => state.instance);
+
+      const triggerTool = React.useCallback(() => {
+        instance.triggerAction("imageTool");
+      }, [instance])
+
+      return (
+        <button onClick={triggerTool}>Image Tool</button>
+      )
+    }
+    ```
+
+  </Accordion>
+  <Accordion title="4. Trigger the action" id="trigger-the-action">
+    Finally as an user trigger the UI element that launches the action.
+
+    When active the user:
+
+    - Select the image to upload.
+    - Image is uploaded to the developer storage of their choice.
+    - Image URL must be proxied through the backend, to avoid cross-origin issues.
+    - Once the image is uploaded, the user can click or touch on the canvas to place it.
+
+    Then the image is added to the canvas as a fully functional node—ready.
+    This action integrates seamlessly with Weave.js's real-time state system,
+    ensuring the new element appears instantly for all connected users.
+
+  </Accordion>
+</Accordions>

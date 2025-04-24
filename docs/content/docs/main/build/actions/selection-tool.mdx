@@ -1,0 +1,73 @@
+---
+title: Selection Tool
+description: Activate the selection of canvas nodes
+---
+
+import { Accordion, Accordions } from "fumadocs-ui/components/accordion";
+
+## Introduction
+
+This action toggles the selection of nodes within the canvas on or off.
+
+## Dependencies
+
+This action needs also registered on the Weave instance the following:
+
+- [Nodes selection](/docs/main/build/plugins/nodes-selection) plugin
+
+## Usage
+
+<Accordions>
+  <Accordion title="1. Import the action" id="import-action">
+    Start by importing the action with the following import:
+
+    ```ts
+    import { WeaveSelectionToolAction } from "@inditextech/weavejs-sdk";
+    ```
+
+  </Accordion>
+  <Accordion title="2. Register the action" id="register-action">
+    Then register the action on the Weave class instance.
+
+    ```ts
+    const instance = new Weave({
+      ...
+      actions: [
+        ...,
+        new WeaveSelectionToolAction(), // [!code ++]
+      ]
+    })
+    ```
+
+  </Accordion>
+  <Accordion title="3. Setup the action trigger" id="setup-action-trigger">
+    Setup on a button or any element on the UI the user can trigger, an action
+    to trigger the action. For example on a button on React:
+
+    ```tsx
+    import { useWeave } from "@inditextech/weavejs-react";
+
+    const MySelectionToolTriggerComponent = () => {
+      const instance = useWeave((state) => state.instance);
+
+      const triggerTool = React.useCallback(() => {
+        instance.triggerAction("selectionTool");
+      }, [instance])
+
+      return (
+        <button onClick={triggerTool}>Selection Tool</button>
+      )
+    }
+    ```
+
+  </Accordion>
+  <Accordion title="4. Trigger the action" id="trigger-the-action">
+    Finally as an user trigger the UI element that launches the action.
+
+    When enabled, it allows users to interactively select nodes using the
+    [Nodes Selection](/docs/main/build/plugins/node-selection) plugin. This action
+    doesn’t handle selection logic itself—instead, it simply activates or deactivates
+    selection capabilities in the UI.
+
+  </Accordion>
+</Accordions>

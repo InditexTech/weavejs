@@ -18,10 +18,6 @@ export class WeaveStageDropAreaPlugin extends WeavePlugin {
     this.enabled = true;
   }
 
-  registersLayers() {
-    return false;
-  }
-
   getName() {
     return 'stageDropArea';
   }

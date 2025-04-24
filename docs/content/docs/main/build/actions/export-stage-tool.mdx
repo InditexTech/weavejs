@@ -1,0 +1,78 @@
+---
+title: Export Stage Tool
+description: Export the entire stage (all nodes) node as an image
+---
+
+import { Accordion, Accordions } from "fumadocs-ui/components/accordion";
+
+## Introduction
+
+This action allows users to capture and download the current canvas Stage view as an
+image file (jpeg, png or gif). It takes a snapshot of the entire Stage where are nodes
+are visible, preserving the visual state of nodes, styling, and layout.
+
+## Dependencies
+
+This action needs also registered on the Weave instance the following:
+
+- [Nodes selection](/docs/main/build/plugins/nodes-selection) plugin
+
+## Usage
+
+<Accordions>
+  <Accordion title="1. Import the action" id="import-action">
+    Start by importing the action with the following import:
+
+    ```ts
+    import { WeaveExportStageToolAction } from "@inditextech/weavejs-sdk";
+    ```
+
+  </Accordion>
+  <Accordion title="2. Register the action" id="register-action">
+    Then register the action on the Weave class instance.
+
+    ```ts
+    const instance = new Weave({
+      ...
+      actions: [
+        ...,
+        new WeaveExportStageToolAction(), // [!code ++]
+      ]
+    })
+    ```
+
+  </Accordion>
+  <Accordion title="3. Setup the action trigger" id="setup-action-trigger">
+    Setup on a button or any element on the UI the user can trigger, an action
+    to trigger the action. For example on a button on React:
+
+    ```tsx
+    import { useWeave } from "@inditextech/weavejs-react";
+
+    const MyExportStageToolTriggerComponent = () => {
+      const instance = useWeave((state) => state.instance);
+
+      const triggerTool = React.useCallback(() => {
+        instance.triggerAction("exportStageTool", {
+          options: {
+            padding: 20, // the exported stage image should have a 20px padding
+            pixelRatio: 2, // the exported stage image should have 2x resolution
+          }
+        });
+      }, [instance])
+
+      return (
+        <button onClick={triggerTool}>Export Stage Tool</button>
+      )
+    }
+    ```
+
+  </Accordion>
+  <Accordion title="4. Trigger the action" id="trigger-the-action">
+    Finally as an user trigger the UI element that launches the action.
+
+    When triggered fit all the nodes of the canvas in the viewport, center on its and then
+    proceed to generate an image from it. Allowing to download it.
+
+  </Accordion>
+</Accordions>
