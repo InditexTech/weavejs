@@ -1,0 +1,56 @@
+{
+  "name": "create-weavejs-frontend-app",
+  "version": "0.26.0-SNAPSHOT",
+  "description": "Create a new frontend artifact for a site with Weave.js",
+  "keywords": [
+    "NextJs",
+    "next",
+    "react",
+    "Weave.js"
+  ],
+  "homepage": "https://inditextech.github.io/weavejs",
+  "repository": "github:InditexTech/weavejs",
+  "license": "Apache-2.0",
+  "author": "Jesus Manuel Piñeiro Cid <jesusmpc@inditex.com>",
+  "type": "module",
+  "bin": "./dist/index.js",
+  "module": "./dist/create-app.js",
+  "types": "./dist/create-app.d.ts",
+  "files": [
+    "template/*",
+    "dist/*"
+  ],
+  "scripts": {
+    "build": "tsup",
+    "clean": "rimraf dist",
+    "dev": "tsup --watch",
+    "lint": "eslint .",
+    "postpublish": "echo \"Updating template repo\" && bash ./scripts/update-git-repo.sh",
+    "types:check": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@clack/prompts": "^0.10.1",
+    "cross-spawn": "^7.0.6",
+    "picocolors": "^1.1.1"
+  },
+  "devDependencies": {
+    "@types/cross-spawn": "^6.0.6",
+    "@types/node": "22.14.1",
+    "fast-glob": "^3.3.3"
+  },
+  "engines": {
+    "node": "^18.12 || ^20.11 || ^22.11"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "nx": {
+    "implicitDependencies": [
+      "@inditextech/weavejs-react",
+      "@inditextech/weavejs-sdk",
+      "@inditextech/weavejs-store-azure-web-pubsub",
+      "@inditextech/weavejs-store-websockets",
+      "@inditextech/weavejs-types"
+    ]
+  }
+}
