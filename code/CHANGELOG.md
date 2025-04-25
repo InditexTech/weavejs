@@ -13,6 +13,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- [#113](https://github.com/InditexTech/weavejs/issues/113) Fix CLI create-backend room connection controller issue on azure-web-pubsub flavor
+
 ## [0.1.0] - 2025-04-25
 
 ### Added
@@ -64,5 +68,4 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - [#18](https://github.com/InditexTech/weavejs/issues/18) Fix awareness not working on store-azure-web-pubsub
 
 [Unreleased]: https://github.com/InditexTech/weavejs/compare/0.1.0...HEAD
-
 [0.1.0]: https://github.com/InditexTech/weavejs/releases/tag/0.1.0
