@@ -4,7 +4,7 @@
 
 import FontFaceObserver from 'fontfaceobserver';
 import { Logger } from 'pino';
-import { WeaveFont } from '@inditextech/weavejs-types';
+import { WeaveFont } from '@inditextech/weave-types';
 import { Weave } from '@/weave';
 
 export class WeaveFontsManager {

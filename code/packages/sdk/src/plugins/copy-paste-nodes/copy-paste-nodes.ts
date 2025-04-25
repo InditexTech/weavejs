@@ -4,10 +4,7 @@
 
 import { WeavePlugin } from '@/plugins/plugin';
 import { v4 as uuidv4 } from 'uuid';
-import {
-  NodeSerializable,
-  WeaveStateElement,
-} from '@inditextech/weavejs-types';
+import { NodeSerializable, WeaveStateElement } from '@inditextech/weave-types';
 import { COPY_PASTE_NODES_PLUGIN_STATE } from './constants';
 import { WeaveNodesSelectionPlugin } from '../nodes-selection/nodes-selection';
 import {

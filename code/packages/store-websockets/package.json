@@ -1,9 +1,11 @@
 {
-  "name": "@inditextech/weavejs-store-websockets",
-  "version": "0.26.0-SNAPSHOT",
+  "name": "@inditextech/weave-store-websockets",
+  "version": "0.2.0-SNAPSHOT",
   "type": "module",
   "license": "Apache-2.0",
   "author": "Jesus Manuel Piñeiro Cid <jesusmpc@inditex.com>",
+  "homepage": "https://inditextech.github.io/weavejs",
+  "repository": "github:InditexTech/weavejs",
   "maintainers": [
     {
       "name": "Jesus Manuel Piñeiro Cid",
@@ -47,8 +49,8 @@
     "version:release": "npm version $RELEASE_VERSION -m \"[npm-scripts] prepare release $RELEASE_VERSION\" --tag-version-prefix \"\""
   },
   "devDependencies": {
-    "@inditextech/weavejs-sdk": "0.26.0-SNAPSHOT",
-    "@inditextech/weavejs-types": "0.26.0-SNAPSHOT",
+    "@inditextech/weave-sdk": "0.2.0-SNAPSHOT",
+    "@inditextech/weave-types": "0.2.0-SNAPSHOT",
     "@types/express": "^5.0.1",
     "@types/lodash.debounce": "^4.0.9",
     "@types/ws": "^8.18.1",
@@ -78,8 +80,8 @@
   },
   "nx": {
     "implicitDependencies": [
-      "@inditextech/weavejs-sdk",
-      "@inditextech/weavejs-types"
+      "@inditextech/weave-sdk",
+      "@inditextech/weave-types"
     ]
   }
 }

@@ -3,7 +3,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import React from 'react';
-import { WeaveStateElement } from '@inditextech/weavejs-types';
+import { WeaveStateElement } from '@inditextech/weave-types';
 import { isEmpty } from 'lodash';
 
 export class WeaveStateSerializer {

@@ -3,7 +3,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { v4 as uuidv4 } from 'uuid';
-import { WeaveElementInstance } from '@inditextech/weavejs-types';
+import { WeaveElementInstance } from '@inditextech/weave-types';
 import Konva from 'konva';
 import { Vector2d } from 'konva/lib/types';
 import { WeaveAction } from '@/actions/action';

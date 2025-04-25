@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-import { WeaveSelection } from '@inditextech/weavejs-types';
+import { WeaveSelection } from '@inditextech/weave-types';
 
 export type WeaveNodesSelectionChangeCallback = (
   nodes: WeaveSelection[]

@@ -1,9 +1,11 @@
 {
-  "name": "@inditextech/weavejs-types",
-  "version": "0.26.0-SNAPSHOT",
+  "name": "@inditextech/weave-types",
+  "version": "0.2.0-SNAPSHOT",
   "type": "module",
   "license": "Apache-2.0",
   "author": "Jesus Manuel Piñeiro Cid <jesusmpc@inditex.com>",
+  "homepage": "https://inditextech.github.io/weavejs",
+  "repository": "github:InditexTech/weavejs",
   "maintainers": [
     {
       "name": "Jesus Manuel Piñeiro Cid",

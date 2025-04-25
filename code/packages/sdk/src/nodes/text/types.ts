@@ -3,7 +3,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import Konva from 'konva';
-import { NodeSerializable } from '@inditextech/weavejs-types';
+import { NodeSerializable } from '@inditextech/weave-types';
 
 export type TextSerializable = Konva.TextConfig &
   NodeSerializable & {

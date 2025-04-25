@@ -3,7 +3,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import _ from 'lodash';
-import { WeaveAwarenessChange, WeaveUser } from '@inditextech/weavejs-types';
+import { WeaveAwarenessChange, WeaveUser } from '@inditextech/weave-types';
 import {
   WeaveUserPointer,
   WeaveUserPointerKey,

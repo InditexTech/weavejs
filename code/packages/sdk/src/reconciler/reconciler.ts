@@ -8,7 +8,7 @@ import { DefaultEventPriority } from './constants';
 import {
   WeaveElementInstance,
   WeaveElementAttributes,
-} from '@inditextech/weavejs-types';
+} from '@inditextech/weave-types';
 import { Weave } from '@/weave';
 import { Logger } from 'pino';
 

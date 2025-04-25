@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-import { WeaveElementAttributes } from '@inditextech/weavejs-types';
+import { WeaveElementAttributes } from '@inditextech/weave-types';
 
 export type ImageProps = WeaveElementAttributes & {
   id: string;
