@@ -19,7 +19,7 @@ writeFileSync(
   `export const versions = ${JSON.stringify(versions)}`
 );
 
-console.log('Create-Weavejs-Backend-App: versions.json updated');
+console.log('Create-Weavejs-Frontend-App: versions.json updated');
 
 export default defineConfig({
   entry: ['./src/index.ts', './src/create-app.ts'],

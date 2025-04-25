@@ -37,12 +37,12 @@ async function main(): Promise<void> {
           options: [
             {
               value: '+express+websockets',
-              label: 'Express.js + Weave.js Websockets Store',
+              label: 'Express.js: Weave.js Websockets Store',
               hint: 'recommended',
             },
             {
               value: '+express+azure-web-pubsub',
-              label: 'Express.js + Weave.js Azure Web PubSub Store',
+              label: 'Express.js: Weave.js Azure Web PubSub Store',
             },
           ],
         }),

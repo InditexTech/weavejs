@@ -7,7 +7,7 @@ import type { PackageManager } from './auto-install';
 import { autoInstall } from './auto-install';
 import { cwd, sourceDir } from './constants';
 
-export type Template = '+express+websockets' | '+express+azure-web-pubsub';
+export type Template = '+nextjs+websockets' | '+nextjs+azure-web-pubsub';
 
 export interface Options {
   outputDir: string;
@@ -39,22 +39,6 @@ export async function create(options: Options): Promise<void> {
     dest,
     defaultRename
   );
-
-  // update tsconfig.json for src dir
-  // if (isNext && options.useSrcDir) {
-  const tsconfigPath = path.join(dest, 'tsconfig.json');
-  const content = (await fs.readFile(tsconfigPath)).toString();
-
-  const config = JSON.parse(content);
-
-  if (config.compilerOptions?.paths) {
-    Object.assign(config.compilerOptions.paths, {
-      '@/*': ['./src/*'],
-    });
-  }
-
-  await fs.writeFile(tsconfigPath, JSON.stringify(config, null, 2));
-  // }
 
   const packageJson = createPackageJson(projectName, options);
   await fs.writeFile(
@@ -105,68 +89,94 @@ async function copy(
 }
 
 function createPackageJson(projectName: string, options: Options): object {
-  if (options.template === '+express+azure-web-pubsub') {
+  if (options.template === '+nextjs+azure-web-pubsub') {
     return {
       name: projectName,
-      type: 'module',
-      scripts: {
-        build:
-          'tsc && mkdir -p ./dist/public && mkdir -p ./dist/temp && cp -r ./public ./dist',
-        copyAssets:
-          'mkdir -p ./public && cp -r node_modules/@imgly/background-removal-node/dist/. public',
-        dev: 'nodemon --exec "tsx --env-file=.env src/server.ts"',
-        postinstall: 'npm run copyAssets',
-        start:
-          'node --experimental-specifier-resolution=node --env-file=.env --loader ts-node/esm dist/server.js',
-      },
+      version: '0.0.0',
       private: true,
+      scripts: {
+        build: 'next build',
+        dev: 'next dev --experimental-https',
+        lint: 'next lint',
+        start: 'next start',
+      },
       dependencies: {
+        ...pick(versionPkg.dependencies, [
+          '@hookform/resolvers',
+          '@next/env',
+          '@radix-ui/react-accordion',
+          '@radix-ui/react-avatar',
+          '@radix-ui/react-checkbox',
+          '@radix-ui/react-dialog',
+          '@radix-ui/react-dropdown-menu',
+          '@radix-ui/react-label',
+          '@radix-ui/react-popover',
+          '@radix-ui/react-scroll-area',
+          '@radix-ui/react-select',
+          '@radix-ui/react-slider',
+          '@radix-ui/react-slot',
+          '@radix-ui/react-tabs',
+          '@radix-ui/react-tooltip',
+          '@react-three/fiber',
+          '@react-three/postprocessing',
+          '@tanstack/react-query',
+          'boring-avatars',
+          'canvas',
+          'class-variance-authority',
+          'clsx',
+          'cmdk',
+          'color',
+          'framer-motion',
+          'konva',
+          'motion',
+          'next',
+          'next-themes',
+          'ogl',
+          'onnxruntime-web',
+          'pdf-lib',
+          'platform-detect',
+          'postprocessing',
+          'react',
+          'react-dom',
+          'react-hook-form',
+          'react-number-format',
+          'sharp',
+          'sonner',
+          'tailwind-merge',
+          'tailwindcss-animate',
+          'three',
+          'uuid',
+          'vaul',
+          'zod',
+          'zustand',
+        ]),
         ...pick(localVersions, [
+          '@inditextech/weavejs-react',
           '@inditextech/weavejs-types',
           '@inditextech/weavejs-sdk',
           '@inditextech/weavejs-store-azure-web-pubsub',
         ]),
-        ...pick(versionPkg.dependencies, [
-          '@imgly/background-removal-node',
-          'canvas',
-          'cors',
-          'dotenv',
-          'express',
-          'helmet',
-          'morgan',
-          'multer',
-          'pino',
-          'pino-http',
-          'pino-pretty',
-          'ts-node',
-          'uuid',
-          'ws',
-          'y-protocols',
-          'yjs',
-          'zod',
+      },
+      devDependencies: {
+        ...pick(versionPkg.devDependencies, [
+          '@eslint/eslintrc',
+          '@tailwindcss/postcss',
+          '@testing-library/dom',
+          '@testing-library/react',
+          '@types/node',
+          '@types/react',
+          '@types/react-dom',
+          '@vitejs/plugin-react',
+          'eslint',
+          'eslint-config-next',
+          'eslint-config-prettier',
+          'jsdom',
+          'lucide-react',
+          'tailwindcss',
+          'typescript',
+          'vite-tsconfig-paths',
         ]),
       },
-      devDependencies: pick(versionPkg.devDependencies, [
-        '@eslint/js',
-        '@types/cors',
-        '@types/express',
-        '@types/helmet',
-        '@types/morgan',
-        '@types/multer',
-        '@types/node',
-        '@types/ws',
-        '@typescript-eslint/eslint-plugin',
-        '@typescript-eslint/parser',
-        'eslint',
-        'globals',
-        'nodemon',
-        'prettier',
-        'prettier-eslint',
-        'tsconfig-paths',
-        'tsx',
-        'typescript',
-        'typescript-eslint',
-      ]),
     };
   }
 
@@ -175,38 +185,63 @@ function createPackageJson(projectName: string, options: Options): object {
     version: '0.0.0',
     private: true,
     scripts: {
-      build:
-        'tsc && mkdir -p ./dist/public && mkdir -p ./dist/temp && cp -r ./public ./dist',
-      copyAssets:
-        'mkdir -p ./public && cp -r node_modules/@imgly/background-removal-node/dist/. public',
-      dev: 'nodemon --exec "tsx --env-file=.env src/server.ts"',
-      postinstall: 'npm run copyAssets',
-      start:
-        'node --experimental-specifier-resolution=node --env-file=.env --loader ts-node/esm dist/server.js',
+      build: 'next build',
+      dev: 'next dev --experimental-https',
+      lint: 'next lint',
+      start: 'next start',
     },
     dependencies: {
       ...pick(versionPkg.dependencies, [
-        '@azure/web-pubsub',
-        '@azure/web-pubsub-express',
-        '@imgly/background-removal-node',
+        '@hookform/resolvers',
+        '@next/env',
+        '@radix-ui/react-accordion',
+        '@radix-ui/react-avatar',
+        '@radix-ui/react-checkbox',
+        '@radix-ui/react-dialog',
+        '@radix-ui/react-dropdown-menu',
+        '@radix-ui/react-label',
+        '@radix-ui/react-popover',
+        '@radix-ui/react-scroll-area',
+        '@radix-ui/react-select',
+        '@radix-ui/react-slider',
+        '@radix-ui/react-slot',
+        '@radix-ui/react-tabs',
+        '@radix-ui/react-tooltip',
+        '@react-three/fiber',
+        '@react-three/postprocessing',
+        '@tanstack/react-query',
+        'boring-avatars',
         'canvas',
-        'cors',
-        'dotenv',
-        'express',
-        'helmet',
-        'morgan',
-        'multer',
-        'pino',
-        'pino-http',
-        'pino-pretty',
-        'ts-node',
+        'class-variance-authority',
+        'clsx',
+        'cmdk',
+        'color',
+        'framer-motion',
+        'konva',
+        'motion',
+        'next',
+        'next-themes',
+        'ogl',
+        'onnxruntime-web',
+        'pdf-lib',
+        'platform-detect',
+        'postprocessing',
+        'react',
+        'react-dom',
+        'react-hook-form',
+        'react-number-format',
+        'sharp',
+        'sonner',
+        'tailwind-merge',
+        'tailwindcss-animate',
+        'three',
         'uuid',
-        'ws',
-        'y-protocols',
-        'yjs',
+        'vaul',
         'zod',
+        'zustand',
       ]),
       ...pick(localVersions, [
+        '@inditextech/weavejs-react',
         '@inditextech/weavejs-types',
         '@inditextech/weavejs-sdk',
         '@inditextech/weavejs-store-websockets',
@@ -214,25 +249,22 @@ function createPackageJson(projectName: string, options: Options): object {
     },
     devDependencies: {
       ...pick(versionPkg.devDependencies, [
-        '@eslint/js',
-        '@types/cors',
-        '@types/express',
-        '@types/helmet',
-        '@types/morgan',
-        '@types/multer',
+        '@eslint/eslintrc',
+        '@tailwindcss/postcss',
+        '@testing-library/dom',
+        '@testing-library/react',
         '@types/node',
-        '@types/ws',
-        '@typescript-eslint/eslint-plugin',
-        '@typescript-eslint/parser',
+        '@types/react',
+        '@types/react-dom',
+        '@vitejs/plugin-react',
         'eslint',
-        'globals',
-        'nodemon',
-        'prettier',
-        'prettier-eslint',
-        'tsconfig-paths',
-        'tsx',
+        'eslint-config-next',
+        'eslint-config-prettier',
+        'jsdom',
+        'lucide-react',
+        'tailwindcss',
         'typescript',
-        'typescript-eslint',
+        'vite-tsconfig-paths',
       ]),
     },
   };

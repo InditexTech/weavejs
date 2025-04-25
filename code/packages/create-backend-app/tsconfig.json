@@ -24,6 +24,8 @@
     "strictNullChecks": true
   },
   "exclude": [
+    "template/+express+websockets",
+    "template/+express+azure-web-pubsub",
     "node_modules",
     "template",
     "dist",

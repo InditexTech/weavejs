@@ -20,48 +20,32 @@ import { cwd } from './constants';
 const manager = getPackageManager();
 
 async function main(): Promise<void> {
-  intro(pc.bgCyan(pc.bold('Create Weave.js Backend Service')));
+  intro(pc.bgCyan(pc.bold('Create Weave.js Frontend App')));
 
   const options = await group(
     {
       name: () =>
         text({
           message: 'Project name',
-          placeholder: 'my-service',
-          defaultValue: 'my-service',
+          placeholder: 'my-app',
+          defaultValue: 'my-app',
         }),
       template: () =>
         select({
           message: 'Choose a template',
-          initialValue: '+express+websockets' as Template,
+          initialValue: '+nextjs+websockets' as Template,
           options: [
             {
-              value: '+express+websockets',
-              label: 'Express.js + Weave.js Websockets Store',
+              value: '+nextjs+websockets',
+              label: 'Next.js: Weave.js Websockets Store',
               hint: 'recommended',
             },
             {
-              value: '+express+azure-web-pubsub',
-              label: 'Express.js + Weave.js Azure Web PubSub Store',
+              value: '+nextjs+azure-web-pubsub',
+              label: 'Next.js: Weave.js Azure Web Pubsub Store',
             },
           ],
         }),
-      // src: (v) => {
-      //   if (!v.results.template?.startsWith('+next')) return;
-
-      //   return confirm({
-      //     message: 'Use `/src` directory?',
-      //     initialValue: false,
-      //   });
-      // },
-      // eslint: (v) => {
-      //   if (!v.results.template?.startsWith('+next')) return;
-
-      //   return confirm({
-      //     message: 'Add default ESLint configuration?',
-      //     initialValue: false,
-      //   });
-      // },
       installDeps: () =>
         confirm({
           message: `Do you want to install packages automatically? (detected as ${manager})`,
