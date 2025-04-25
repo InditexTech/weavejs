@@ -8,7 +8,7 @@ import {
   WeaveElementAttributes,
   WeaveElementInstance,
   WeaveStateElement,
-} from '@inditextech/weavejs-types';
+} from '@inditextech/weave-types';
 import { WEAVE_FRAME_NODE_TYPE } from './constants';
 
 export class WeaveFrameNode extends WeaveNode {

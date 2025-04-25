@@ -6,7 +6,7 @@ import ReactReconciler, { Reconciler } from 'react-reconciler';
 import { Weave } from '@/weave';
 import { WeaveStateSerializer } from '@/state-serializer/state-serializer';
 import { WeaveReconciler } from '@/reconciler/reconciler';
-import { WeaveElementInstance } from '@inditextech/weavejs-types';
+import { WeaveElementInstance } from '@inditextech/weave-types';
 
 export class WeaveRenderer {
   private instance: Weave;

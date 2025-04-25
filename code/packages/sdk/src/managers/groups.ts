@@ -8,7 +8,7 @@ import Konva from 'konva';
 import {
   WeaveStateElement,
   WEAVE_NODE_LAYER_ID,
-} from '@inditextech/weavejs-types';
+} from '@inditextech/weave-types';
 import { Weave } from '@/weave';
 import { Logger } from 'pino';
 import { WeaveNodesSelectionPlugin } from '@/plugins/nodes-selection/nodes-selection';

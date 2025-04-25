@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { WeaveStateElement } from '@inditextech/weavejs-types';
+import { WeaveStateElement } from '@inditextech/weave-types';
 import {
   Eye,
   EyeOff,
@@ -15,7 +15,7 @@ import {
 import { InputColor } from '../inputs/input-color';
 import { InputNumber } from '../inputs/input-number';
 import { ToggleIconButton } from '../toggle-icon-button';
-import { useWeave } from '@inditextech/weavejs-react';
+import { useWeave } from '@inditextech/weave-react';
 import { useCollaborationRoom } from '@/store/store';
 
 export function StrokeProperties() {

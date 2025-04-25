@@ -1,6 +1,6 @@
 import path from 'path';
 import fs from 'fs/promises';
-import { WeaveAzureWebPubsubServer } from '@inditextech/weavejs-store-azure-web-pubsub/server';
+import { WeaveAzureWebPubsubServer } from '@inditextech/weave-store-azure-web-pubsub/server';
 import { createFolder, existsFolder } from '@/utils';
 
 const endpoint = process.env.WEAVE_AZURE_WEB_PUBSUB_ENDPOINT;

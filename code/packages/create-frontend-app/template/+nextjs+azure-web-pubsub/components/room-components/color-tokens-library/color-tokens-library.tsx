@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { useWeave } from '@inditextech/weavejs-react';
+import { useWeave } from '@inditextech/weave-react';
 import { useCollaborationRoom } from '@/store/store';
 import { ColorToken } from './color-token';
 

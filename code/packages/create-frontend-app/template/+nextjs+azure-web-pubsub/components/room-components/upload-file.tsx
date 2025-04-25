@@ -2,7 +2,7 @@ import React from 'react';
 import { useCollaborationRoom } from '@/store/store';
 import { useMutation } from '@tanstack/react-query';
 import { postImage } from '@/api/post-image';
-import { useWeave } from '@inditextech/weavejs-react';
+import { useWeave } from '@inditextech/weave-react';
 
 export function UploadFile() {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any

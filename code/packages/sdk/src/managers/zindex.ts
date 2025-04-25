@@ -7,7 +7,7 @@ import { Logger } from 'pino';
 import {
   WeaveElementInstance,
   WEAVE_NODE_POSITION,
-} from '@inditextech/weavejs-types';
+} from '@inditextech/weave-types';
 
 export class WeaveZIndexManager {
   private instance: Weave;

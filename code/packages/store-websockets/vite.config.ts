@@ -28,7 +28,7 @@ export default defineConfig(({ mode }) => {
         },
       },
       rollupOptions: {
-        external: ['@inditextech/weavejs-sdk', 'express', 'http', 'yjs', 'ws'],
+        external: ['@inditextech/weave-sdk', 'express', 'http', 'yjs', 'ws'],
       },
     },
 

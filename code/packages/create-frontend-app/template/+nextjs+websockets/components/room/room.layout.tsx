@@ -1,17 +1,17 @@
-"use client";
+'use client';
 
-import React from "react";
-import { ContextMenuRender } from "@/components/room-components/context-menu";
-import { useCollaborationRoom } from "@/store/store";
-import { RoomInformationOverlay } from "@/components/room-components/overlay/room-information-overlay";
-import { RoomUsersOverlay } from "@/components/room-components/overlay/room-users-overlay";
-import { ToolsOverlay } from "@/components/room-components/overlay/tools-overlay";
-import { MultiuseOverlay } from "@/components/room-components/overlay/multiuse-overlay";
-import { useWeave } from "@inditextech/weavejs-react";
-import { WEAVE_INSTANCE_STATUS } from "@inditextech/weavejs-types";
-import { ZoomHandlerOverlay } from "../room-components/overlay/zoom-handler-overlay";
-import { Logo } from "../utils/logo";
-import { AnimatePresence, motion } from "framer-motion";
+import React from 'react';
+import { ContextMenuRender } from '@/components/room-components/context-menu';
+import { useCollaborationRoom } from '@/store/store';
+import { RoomInformationOverlay } from '@/components/room-components/overlay/room-information-overlay';
+import { RoomUsersOverlay } from '@/components/room-components/overlay/room-users-overlay';
+import { ToolsOverlay } from '@/components/room-components/overlay/tools-overlay';
+import { MultiuseOverlay } from '@/components/room-components/overlay/multiuse-overlay';
+import { useWeave } from '@inditextech/weave-react';
+import { WEAVE_INSTANCE_STATUS } from '@inditextech/weave-types';
+import { ZoomHandlerOverlay } from '../room-components/overlay/zoom-handler-overlay';
+import { Logo } from '../utils/logo';
+import { AnimatePresence, motion } from 'framer-motion';
 
 export const RoomLayout = () => {
   const status = useWeave((state) => state.status);
@@ -43,8 +43,8 @@ export const RoomLayout = () => {
         <motion.div
           animate={{
             filter: !(status === WEAVE_INSTANCE_STATUS.RUNNING && roomLoaded)
-              ? "blur(10px)"
-              : "blur(0px)",
+              ? 'blur(10px)'
+              : 'blur(0px)',
           }}
           transition={{
             duration: 0.5,

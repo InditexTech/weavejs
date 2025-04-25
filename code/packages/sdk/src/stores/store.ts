@@ -10,7 +10,7 @@ import {
   WeaveStoreBase,
   WeaveUndoRedoChange,
   WeaveStoreOptions,
-} from '@inditextech/weavejs-types';
+} from '@inditextech/weave-types';
 import { MappedTypeDescription } from '@syncedstore/core/types/doc';
 import {
   observeDeep,

@@ -122,9 +122,9 @@ function createPackageJson(projectName: string, options: Options): object {
       private: true,
       dependencies: {
         ...pick(localVersions, [
-          '@inditextech/weavejs-types',
-          '@inditextech/weavejs-sdk',
-          '@inditextech/weavejs-store-azure-web-pubsub',
+          '@inditextech/weave-types',
+          '@inditextech/weave-sdk',
+          '@inditextech/weave-store-azure-web-pubsub',
         ]),
         ...pick(versionPkg.dependencies, [
           '@imgly/background-removal-node',
@@ -207,9 +207,9 @@ function createPackageJson(projectName: string, options: Options): object {
         'zod',
       ]),
       ...pick(localVersions, [
-        '@inditextech/weavejs-types',
-        '@inditextech/weavejs-sdk',
-        '@inditextech/weavejs-store-websockets',
+        '@inditextech/weave-types',
+        '@inditextech/weave-sdk',
+        '@inditextech/weave-store-websockets',
       ]),
     },
     devDependencies: {

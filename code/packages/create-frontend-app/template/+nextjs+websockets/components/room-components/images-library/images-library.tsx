@@ -3,7 +3,7 @@
 import React from 'react';
 import { useInfiniteQuery, useMutation } from '@tanstack/react-query';
 import { ImagePlus, Trash } from 'lucide-react';
-import { useWeave } from '@inditextech/weavejs-react';
+import { useWeave } from '@inditextech/weave-react';
 import { useCollaborationRoom } from '@/store/store';
 import { getImages } from '@/api/get-images';
 import { postImage } from '@/api/post-image';

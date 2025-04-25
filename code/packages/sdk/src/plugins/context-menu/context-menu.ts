@@ -7,10 +7,7 @@ import {
   WeaveStageContextMenuPluginCallbacks,
   WeaveStageContextMenuPluginOptions,
 } from './types';
-import {
-  WeaveElementInstance,
-  WeaveSelection,
-} from '@inditextech/weavejs-types';
+import { WeaveElementInstance, WeaveSelection } from '@inditextech/weave-types';
 import { Vector2d } from 'konva/lib/types';
 import { WeaveNodesSelectionPlugin } from '../nodes-selection/nodes-selection';
 

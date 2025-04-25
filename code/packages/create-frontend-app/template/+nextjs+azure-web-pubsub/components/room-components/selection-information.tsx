@@ -1,7 +1,7 @@
-"use client";
+'use client';
 
-import React from "react";
-import { useWeave } from "@inditextech/weavejs-react";
+import React from 'react';
+import { useWeave } from '@inditextech/weave-react';
 
 export const SelectionInformation = () => {
   const instance = useWeave((state) => state.instance);
@@ -32,12 +32,14 @@ export const SelectionInformation = () => {
                 width: box.width * stage.scaleX(),
                 height: box.height * stage.scaleY(),
                 callback(img) {
-                  const containerNode = document.getElementById(`selection_${node.node.key}_image_container`);
+                  const containerNode = document.getElementById(
+                    `selection_${node.node.key}_image_container`
+                  );
                   if (containerNode) {
-                    containerNode.innerHTML = "";
-                    img.style.width = "100%";
-                    img.style.height = "100%";
-                    img.style.objectFit = "contain";
+                    containerNode.innerHTML = '';
+                    img.style.width = '100%';
+                    img.style.height = '100%';
+                    img.style.objectFit = 'contain';
                     containerNode.appendChild(img);
                   }
                 },
@@ -53,7 +55,9 @@ export const SelectionInformation = () => {
               >
                 <div className="w-full grid grid-cols-[1fr_50px] gap-1">
                   <div className="w-full h-full flex flex-col justify-center items-start">
-                    <div className="font-mono font-body-m-light w-full">{node.node.props.nodeType}</div>
+                    <div className="font-mono font-body-m-light w-full">
+                      {node.node.props.nodeType}
+                    </div>
                   </div>
                   <div
                     className="w-full h-[50px] border border-light-border-3 p-1"

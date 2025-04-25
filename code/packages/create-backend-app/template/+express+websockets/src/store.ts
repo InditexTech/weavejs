@@ -1,7 +1,7 @@
 import path from 'path';
 import fs from 'fs/promises';
 import http from 'http';
-import { WeaveWebsocketsServer } from '@inditextech/weavejs-store-websockets/server';
+import { WeaveWebsocketsServer } from '@inditextech/weave-store-websockets/server';
 import { createFolder, existsFolder } from '@/utils';
 
 const VALID_ROOM_WEBSOCKET_URL = /\/sync\/rooms\/(.*)/;
@@ -35,7 +35,7 @@ export const setupStore = (server: http.Server) => {
     },
     persistRoom: async (
       docName: string,
-      actualState: Uint8Array<ArrayBufferLike>,
+      actualState: Uint8Array<ArrayBufferLike>
     ) => {
       try {
         const roomsFolder = path.join(process.cwd(), 'rooms');

@@ -1,6 +1,6 @@
 {
-  "name": "@inditextech/weavejs-store-azure-web-pubsub",
-  "version": "1.1.0-SNAPSHOT",
+  "name": "@inditextech/weave-store-azure-web-pubsub",
+  "version": "0.1.0-SNAPSHOT",
   "type": "module",
   "license": "Apache-2.0",
   "author": "Jesus Manuel Piñeiro Cid <jesusmpc@inditex.com>",
@@ -52,8 +52,8 @@
   "devDependencies": {
     "@azure/web-pubsub": "1.1.4",
     "@azure/web-pubsub-express": "^1.0.6",
-    "@inditextech/weavejs-sdk": "1.1.0-SNAPSHOT",
-    "@inditextech/weavejs-types": "1.1.0-SNAPSHOT",
+    "@inditextech/weave-sdk": "0.1.0-SNAPSHOT",
+    "@inditextech/weave-types": "0.1.0-SNAPSHOT",
     "@types/express": "^5.0.1",
     "@types/uuid": "^10.0.0",
     "@types/ws": "^8.18.0",
@@ -90,8 +90,8 @@
   },
   "nx": {
     "implicitDependencies": [
-      "@inditextech/weavejs-sdk",
-      "@inditextech/weavejs-types"
+      "@inditextech/weave-sdk",
+      "@inditextech/weave-types"
     ]
   }
 }

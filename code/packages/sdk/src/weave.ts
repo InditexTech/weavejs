@@ -17,7 +17,7 @@ import {
   WeaveStatus,
   WeaveElementAttributes,
   WEAVE_INSTANCE_STATUS,
-} from '@inditextech/weavejs-types';
+} from '@inditextech/weave-types';
 import { WeaveStore } from './stores/store';
 import { WeaveNode } from './nodes/node';
 import { WeaveAction } from './actions/action';

@@ -4,7 +4,7 @@
 
 import { isEqual } from 'lodash';
 import pino, { Logger } from 'pino';
-import { WeaveLoggerConfig } from '@inditextech/weavejs-types';
+import { WeaveLoggerConfig } from '@inditextech/weave-types';
 
 export class WeaveLogger {
   private config: WeaveLoggerConfig;

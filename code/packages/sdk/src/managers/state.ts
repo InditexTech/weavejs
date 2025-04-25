@@ -9,7 +9,7 @@ import {
   WeavePosition,
   WeaveStateElement,
   WEAVE_NODE_POSITION,
-} from '@inditextech/weavejs-types';
+} from '@inditextech/weave-types';
 import Konva from 'konva';
 
 export class WeaveStateManager {

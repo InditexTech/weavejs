@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { useWeave } from '@inditextech/weavejs-react';
+import { useWeave } from '@inditextech/weave-react';
 import { useCollaborationRoom } from '@/store/store';
 import { useKeyDown } from '../hooks/use-key-down';
 import { SYSTEM_OS } from '@/lib/utils';
@@ -12,7 +12,7 @@ import {
   WeaveExportStageActionParams,
   WeaveNodesSelectionPlugin,
   WeaveUsersPointersPlugin,
-} from '@inditextech/weavejs-sdk';
+} from '@inditextech/weave-sdk';
 
 export function useKeyboardHandler() {
   const os = useGetOs();

@@ -4,7 +4,7 @@
 
 import { isEqual } from 'lodash';
 import { WeavePlugin } from '@/plugins/plugin';
-import { WeaveAwarenessChange, WeaveUser } from '@inditextech/weavejs-types';
+import { WeaveAwarenessChange, WeaveUser } from '@inditextech/weave-types';
 import {
   WeaveConnectedUsersChangeCallback,
   WeaveConnectedUsersPluginParams,

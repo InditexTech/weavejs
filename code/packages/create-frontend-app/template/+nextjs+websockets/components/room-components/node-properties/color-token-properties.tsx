@@ -1,8 +1,8 @@
 'use client';
 
 import React from 'react';
-import { WeaveStateElement } from '@inditextech/weavejs-types';
-import { useWeave } from '@inditextech/weavejs-react';
+import { WeaveStateElement } from '@inditextech/weave-types';
+import { useWeave } from '@inditextech/weave-react';
 import { useCollaborationRoom } from '@/store/store';
 import { InputColor } from '../inputs/input-color';
 

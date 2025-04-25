@@ -8,7 +8,7 @@ import {
   WeaveImageToolAction,
   WeavePenToolAction,
   WeaveRectangleToolAction,
-} from '@inditextech/weavejs-sdk';
+} from '@inditextech/weave-sdk';
 import { toast } from 'sonner';
 import { useCollaborationRoom } from '@/store/store';
 import {
