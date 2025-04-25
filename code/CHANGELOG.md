@@ -51,7 +51,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - [#12](https://github.com/InditexTech/weavejs/issues/12) Automatic changelog generation
 - [#10](https://github.com/InditexTech/weavejs/issues/10) Fix packages names to be on @inditextech scope
 - [#8](https://github.com/InditexTech/weavejs/issues/8) ESLint OSS rules
-- [#5](https://github.com/InditexTech/weavejs/issues/5) Add workflows for OSS projects
 - [#2](https://github.com/InditexTech/weavejs/issues/2) Improve rendering handling
 
 ### Fixed
