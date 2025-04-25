@@ -11,7 +11,6 @@ import { RoomLoader } from '../room-components/room-loader/room-loader';
 import { AnimatePresence } from 'framer-motion';
 import useGetWeaveJSProps from '../room-components/hooks/use-get-weave-js-props';
 import useGetWebsocketsProvider from '../room-components/hooks/use-get-websockets-provider';
-// import useGetAzureWebPubsubProvider from '../room-components/hooks/use-get-azure-web-pubsub-provider';
 import useHandleRouteParams from '../room-components/hooks/use-handle-route-params';
 import { UploadFile } from '../room-components/upload-file';
 

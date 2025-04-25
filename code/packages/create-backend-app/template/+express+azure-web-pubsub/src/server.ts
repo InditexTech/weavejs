@@ -14,15 +14,15 @@ if (!config) {
   process.exit(1);
 }
 
+// Setup the Azure Web Pubsub store
+setupStore();
+
 // Init application
 const app = setupApp();
 
 // Start server
 const server = app.listen(config.service.port, config.service.hostname, () => {
   logger.info(
-    `Server started: http://${config.service.hostname}:${config.service.port}`,
+    `Server started: http://${config.service.hostname}:${config.service.port}`
   );
 });
-
-// Setup the websockets store
-setupStore(server);

@@ -1,26 +1,36 @@
 import path from 'path';
 import fs from 'fs/promises';
-import http from 'http';
-import { WeaveWebsocketsServer } from '@inditextech/weavejs-store-websockets/server';
+import { WeaveAzureWebPubsubServer } from '@inditextech/weavejs-store-azure-web-pubsub/server';
 import { createFolder, existsFolder } from '@/utils';
 
-const VALID_ROOM_WEBSOCKET_URL = /\/sync\/rooms\/(.*)/;
+const endpoint = process.env.WEAVE_AZURE_WEB_PUBSUB_ENDPOINT;
+const key = process.env.WEAVE_AZURE_WEB_PUBSUB_KEY;
+const hubName = process.env.WEAVE_AZURE_WEB_PUBSUB_HUB_NAME;
 
-export const setupStore = (server: http.Server) => {
-  const wss = new WeaveWebsocketsServer({
-    performUpgrade: async (request: Request) => {
-      return VALID_ROOM_WEBSOCKET_URL.test(request.url ?? '');
-    },
-    extractRoomId: (request: Request) => {
-      const match = request.url?.match(VALID_ROOM_WEBSOCKET_URL);
-      if (match) {
-        return match[1];
-      }
-      return undefined;
+if (!endpoint || !key || !hubName) {
+  throw new Error('Missing required environment variables');
+}
+
+let azureWebPubsubServer: WeaveAzureWebPubsubServer | null = null;
+
+export const getAzureWebPubsubServer = () => {
+  if (!azureWebPubsubServer) {
+    throw new Error('Azure Web Pubsub server not initialized');
+  }
+
+  return azureWebPubsubServer;
+};
+
+export const setupStore = () => {
+  azureWebPubsubServer = new WeaveAzureWebPubsubServer({
+    pubsubConfig: {
+      endpoint,
+      key,
+      hubName,
     },
     fetchRoom: async (docName: string) => {
       try {
-        const roomsFolder = path.join(process.cwd(), 'rooms');
+        const roomsFolder = path.join(__dirname, 'rooms');
 
         if (!(await existsFolder(roomsFolder))) {
           await createFolder(roomsFolder);
@@ -35,10 +45,10 @@ export const setupStore = (server: http.Server) => {
     },
     persistRoom: async (
       docName: string,
-      actualState: Uint8Array<ArrayBufferLike>,
+      actualState: Uint8Array<ArrayBufferLike>
     ) => {
       try {
-        const roomsFolder = path.join(process.cwd(), 'rooms');
+        const roomsFolder = path.join(__dirname, 'rooms');
 
         if (!(await existsFolder(roomsFolder))) {
           await createFolder(roomsFolder);
@@ -64,6 +74,4 @@ export const setupStore = (server: http.Server) => {
       }
     },
   });
-
-  wss.handleUpgrade(server);
 };
