@@ -11,7 +11,7 @@ export const getRoomConnectController =
       return;
     }
 
-    const url = await getAzureWebPubsubServer.clientConnect(roomId);
+    const url = await getAzureWebPubsubServer().clientConnect(roomId);
 
     res.status(200).json({ url });
   };
