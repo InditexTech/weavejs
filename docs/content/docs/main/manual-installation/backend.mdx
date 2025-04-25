@@ -25,7 +25,7 @@ First lets install the **Weave.js** websocket store dependencies, on your root p
 execute the following command:
 
 ```shell
-npm install ws @inditextech/weavejs-store-websockets
+npm install ws @inditextech/weave-store-websockets
 ```
 
 </div>
@@ -138,11 +138,11 @@ and the console should have no errors at all.
 
 Now the Next.js custom server is completely setup, lets proceed to add the necessary Weave.js
 backend logic for that we will use the xref:api-reference:stores/websockets/index.adoc[Websockets store] library
-(`@inditextech/weavejs-store-websockets`). We just only need to:
+(`@inditextech/weave-store-websockets`). We just only need to:
 
 - Define how to handle the persistence of the shared-state.
 - Instantiate the xref:api-reference:stores/websockets/server.adoc#weave-websockets-server[WeaveWebsocketsServer] class from
-  the library `@inditextech/weavejs-store-websockets` and configure it.
+  the library `@inditextech/weave-store-websockets` and configure it.
 
 #### Setup the shared-state persistence handlers
 
@@ -165,7 +165,7 @@ File explanation:
 
 Finally lets setup the Weave.js store handler, in this case we'll setup the Websockets transport.
 
-On the custom server file `server.ts`, let's add the necessary logic to use the `@inditextech/weavejs-store-websockets`
+On the custom server file `server.ts`, let's add the necessary logic to use the `@inditextech/weave-store-websockets`
 store handler. You can replace the contents of `server.ts` with this content:
 
 <include lang="ts" meta='title="server.ts"'>

@@ -1,12 +1,8 @@
 "use client";
 
 import React from "react";
-import {
-  Square,
-  MousePointer,
-  Hand,
-} from "lucide-react";
-import { useWeave } from "@inditextech/weavejs-react";
+import { Square, MousePointer, Hand } from "lucide-react";
+import { useWeave } from "@inditextech/weave-react";
 import { ToolbarButton } from "./toolbar-button";
 import { Toolbar } from "./toolbar";
 import { useCollaborationRoom } from "@/store/store";
@@ -34,9 +30,7 @@ export function ToolsOverlay() {
   }
 
   return (
-    <div
-      className="pointer-events-none absolute top-[calc(50px+16px)] left-2 bottom-2 flex flex-col gap-2 justify-center items-center"
-    >
+    <div className="pointer-events-none absolute top-[calc(50px+16px)] left-2 bottom-2 flex flex-col gap-2 justify-center items-center">
       <Toolbar>
         <ToolbarButton
           icon={<Hand />}

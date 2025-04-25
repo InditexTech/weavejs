@@ -1,8 +1,8 @@
 "use client";
 
 import React from "react";
-import { WEAVE_INSTANCE_STATUS } from "@inditextech/weavejs-types";
-import { useWeave } from "@inditextech/weavejs-react";
+import { WEAVE_INSTANCE_STATUS } from "@inditextech/weave-types";
+import { useWeave } from "@inditextech/weave-react";
 import { useCollaborationRoom } from "@/store/store";
 import { ContextMenuRender } from "@/components/context-menu/context-menu";
 import { RoomInformationOverlay } from "@/components/overlays/room-information-overlay";
@@ -29,34 +29,36 @@ export const RoomLayout = () => {
   );
 
   React.useEffect(() => {
-    if (instance && status === WEAVE_INSTANCE_STATUS.RUNNING && actualAction !== "selectionTool") {
+    if (
+      instance &&
+      status === WEAVE_INSTANCE_STATUS.RUNNING &&
+      actualAction !== "selectionTool"
+    ) {
       instance.triggerAction("selectionTool");
     }
   }, [instance, status]);
 
   return (
     <div className="w-full h-full relative flex outline-transparent">
-        <div
-          className="w-full h-full"
-        >
-          <div id="weave" className="w-full h-full outline-transparent"></div>
-          {status === WEAVE_INSTANCE_STATUS.RUNNING && (
-            <>
-              <ContextMenuRender
-                show={contextMenuShow}
-                onChanged={(show: boolean) => {
-                  setContextMenuShow(show);
-                }}
-                position={contextMenuPosition}
-                options={contextMenuOptions}
-              />
-              <RoomInformationOverlay />
-              <RoomUsersOverlay />
-              <ToolsOverlay />
-              <ZoomHandlerOverlay />
-            </>
-          )}
-        </div>
+      <div className="w-full h-full">
+        <div id="weave" className="w-full h-full outline-transparent"></div>
+        {status === WEAVE_INSTANCE_STATUS.RUNNING && (
+          <>
+            <ContextMenuRender
+              show={contextMenuShow}
+              onChanged={(show: boolean) => {
+                setContextMenuShow(show);
+              }}
+              position={contextMenuPosition}
+              options={contextMenuOptions}
+            />
+            <RoomInformationOverlay />
+            <RoomUsersOverlay />
+            <ToolsOverlay />
+            <ZoomHandlerOverlay />
+          </>
+        )}
+      </div>
     </div>
   );
 };

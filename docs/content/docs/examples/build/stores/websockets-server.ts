@@ -2,7 +2,7 @@ import { fileURLToPath } from "url";
 import path from "path";
 import fs from "fs/promises";
 import express from "express";
-import { WeaveWebsocketsServer } from "@inditextech/weavejs-store-websockets/server"; // (1)
+import { WeaveWebsocketsServer } from "@inditextech/weave-store-websockets/server"; // (1)
 
 // eslint-disable-next-line @typescript-eslint/naming-convention
 const __filename = fileURLToPath(import.meta.url);

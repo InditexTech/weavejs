@@ -29,7 +29,7 @@ Setup the frontend is easy, you just need to follow this steps on your Express-b
 First lets install the necessary dependencies on the backend-side:
 
 ```shell
-npm install canvas ws y-protocols yjs @inditextech/weavejs-store-websockets
+npm install canvas ws y-protocols yjs @inditextech/weave-store-websockets
 ```
 
 </div>
@@ -85,7 +85,7 @@ Setup the frontend is easy, you just need to follow this steps:
 First lets install the necessary dependencies for the frontend client:
 
 ```shell
-npm install @inditextech/weavejs-store-websockets
+npm install @inditextech/weave-store-websockets
 ```
 
 </div>
@@ -98,7 +98,7 @@ Then you need to add the WebSockets store client to the Weave instance in order 
 the connection when the user tries to join a room. This is done:
 
 ```ts
-import { WeaveStoreWebsockets } from "@inditextech/weavejs-store-websockets/client"; // (1)
+import { WeaveStoreWebsockets } from "@inditextech/weave-store-websockets/client"; // (1)
 
 const roomId = "MyRoom"; // (2)
 

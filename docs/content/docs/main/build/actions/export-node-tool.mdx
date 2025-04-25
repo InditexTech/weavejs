@@ -23,7 +23,7 @@ This action needs also registered on the Weave instance the following:
     Start by importing the action with the following import:
 
     ```ts
-    import { WeaveExportNodeToolAction } from "@inditextech/weavejs-sdk";
+    import { WeaveExportNodeToolAction } from "@inditextech/weave-sdk";
     ```
 
   </Accordion>
@@ -46,7 +46,7 @@ This action needs also registered on the Weave instance the following:
     to trigger the action. For example on a button on React:
 
     ```tsx
-    import { useWeave } from "@inditextech/weavejs-react";
+    import { useWeave } from "@inditextech/weave-react";
 
     const MyExportNodeToolTriggerComponent = () => {
       const instance = useWeave((state) => state.instance);

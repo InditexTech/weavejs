@@ -5,7 +5,7 @@ import {
   CUSTOM_PLUGINS,
 } from "@/components/utils/constants";
 import useContextMenu from "./use-context-menu";
-import { WeaveCopyPasteNodesPlugin } from "@inditextech/weavejs-sdk";
+import { WeaveCopyPasteNodesPlugin } from "@inditextech/weave-sdk";
 
 function useGetWeaveJSProps() {
   const { contextMenu } = useContextMenu();
@@ -13,7 +13,11 @@ function useGetWeaveJSProps() {
   return {
     fonts: FONTS,
     nodes: NODES,
-    customPlugins: [...CUSTOM_PLUGINS, contextMenu, new WeaveCopyPasteNodesPlugin({})],
+    customPlugins: [
+      ...CUSTOM_PLUGINS,
+      contextMenu,
+      new WeaveCopyPasteNodesPlugin({}),
+    ],
     actions: ACTIONS,
   };
 }

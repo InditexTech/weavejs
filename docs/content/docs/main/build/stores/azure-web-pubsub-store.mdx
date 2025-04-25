@@ -53,7 +53,7 @@ Setup the frontend is easy, you just need to follow this steps on your Express-b
 First lets install the necessary dependencies on the backend-side:
 
 ```shell
-npm install canvas @azure/web-pubsub @azure/web-pubsub-express y-protocols yjs @inditextech/weavejs-store-azure-web-pubsub
+npm install canvas @azure/web-pubsub @azure/web-pubsub-express y-protocols yjs @inditextech/weave-store-azure-web-pubsub
 ```
 
 </div>
@@ -108,7 +108,7 @@ Setup the frontend is easy, you just need to follow this steps:
 First lets install the necessary dependencies for the frontend client:
 
 ```shell
-npm install @inditextech/weavejs-store-azure-web-pubsub
+npm install @inditextech/weave-store-azure-web-pubsub
 ```
 
 </div>
@@ -121,7 +121,7 @@ Then you need to add the Azure Web PubSub store client to the Weave instance in 
 the connection when the user tries to join a room. This is done:
 
 ```ts
-import { WeaveStoreAzureWebPubsub } from "@inditextech/weavejs-store-azure-web-pubsub/client"; // (1)
+import { WeaveStoreAzureWebPubsub } from "@inditextech/weave-store-azure-web-pubsub/client"; // (1)
 
 const roomId = "MyRoom"; // (2)
 

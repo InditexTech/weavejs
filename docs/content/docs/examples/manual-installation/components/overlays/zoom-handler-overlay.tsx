@@ -11,7 +11,7 @@ import {
   Undo,
   Redo,
 } from "lucide-react";
-import { useWeave } from "@inditextech/weavejs-react";
+import { useWeave } from "@inditextech/weave-react";
 import { useCollaborationRoom } from "@/store/store";
 
 export function ZoomHandlerOverlay() {
@@ -54,9 +54,7 @@ export function ZoomHandlerOverlay() {
   }
 
   return (
-    <div
-      className="pointer-events-none absolute bottom-2 left-2 right-2 flex gap- justify-between items-center"
-    >
+    <div className="pointer-events-none absolute bottom-2 left-2 right-2 flex gap- justify-between items-center">
       <div className="flex gap-2 justify-start items-center">
         <div className="bg-white border border-zinc-200 shadow-lg p-1 flex justify-between items-center">
           <div className="w-full grid grid-cols-[auto_1fr]">

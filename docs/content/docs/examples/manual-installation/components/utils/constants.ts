@@ -13,7 +13,7 @@ import {
   WeaveLayerNode,
   WeaveGroupNode,
   WeaveRectangleNode,
-} from "@inditextech/weavejs-sdk"; // (1)
+} from "@inditextech/weave-sdk"; // (1)
 
 const FONTS = [
   {

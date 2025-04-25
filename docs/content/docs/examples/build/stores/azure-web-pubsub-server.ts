@@ -3,7 +3,7 @@ import path from "path";
 import fs from "fs/promises";
 import cors from "cors";
 import express, { Router } from "express";
-import { WeaveAzureWebPubsubServer } from "@inditextech/weavejs-store-azure-web-pubsub/server"; // (1)
+import { WeaveAzureWebPubsubServer } from "@inditextech/weave-store-azure-web-pubsub/server"; // (1)
 
 // eslint-disable-next-line @typescript-eslint/naming-convention
 const __filename = fileURLToPath(import.meta.url);

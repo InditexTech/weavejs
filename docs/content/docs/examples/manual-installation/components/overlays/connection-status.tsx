@@ -2,7 +2,7 @@
 
 import React from "react";
 import { Cloud, CloudCog, CloudAlert } from "lucide-react";
-import { WEAVE_STORE_WEBSOCKETS_CONNECTION_STATUS } from "@inditextech/weavejs-store-websockets/client";
+import { WEAVE_STORE_WEBSOCKETS_CONNECTION_STATUS } from "@inditextech/weave-store-websockets/client";
 import { cn } from "@/lib/utils";
 
 type ConnectionStatusProps = {

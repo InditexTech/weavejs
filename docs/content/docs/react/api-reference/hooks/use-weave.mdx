@@ -17,7 +17,7 @@ the [WeaveProvider](/docs/react/api-reference/providers/weave-provider).
 ## Import
 
 ```shell
-import { useWeave } from "@inditextech/weavejs-react";
+import { useWeave } from "@inditextech/weave-react";
 ```
 
 ## Store schema
@@ -81,7 +81,7 @@ as parameter and from there we can reduce to the part of the state we need,
 like this:
 
 ```tsx
-import { useWeave } from "@inditextech/weavejs-react";
+import { useWeave } from "@inditextech/weave-react";
 
 const MyComponent = () => {
   const nodesSelected = useWeave((state) => state.selection.nodes);

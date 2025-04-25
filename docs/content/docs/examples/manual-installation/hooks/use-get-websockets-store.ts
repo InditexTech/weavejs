@@ -1,10 +1,10 @@
 import { useCollaborationRoom } from "@/store/store";
-import { useWeave } from "@inditextech/weavejs-react";
-import { WeaveUser } from "@inditextech/weavejs-types";
+import { useWeave } from "@inditextech/weave-react";
+import { WeaveUser } from "@inditextech/weave-types";
 import {
   WeaveStoreWebsockets,
   WeaveStoreWebsocketsConnectionStatus,
-} from "@inditextech/weavejs-store-websockets/client";
+} from "@inditextech/weave-store-websockets/client";
 import React from "react";
 
 function useGetWebsocketsStore({

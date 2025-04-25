@@ -1,7 +1,7 @@
 import { IncomingMessage } from "http"; // [!code ++]
 import express, { Request, Response } from "express";
 import next from "next";
-import { WeaveWebsocketsServer } from "@inditextech/weavejs-store-websockets/server"; // (1) [!code ++]
+import { WeaveWebsocketsServer } from "@inditextech/weave-store-websockets/server"; // (1) [!code ++]
 import { fetchRoom, persistRoom } from "./persistence"; // (2) [!code ++]
 
 const VALID_ROOM_WEBSOCKET_URL = /\/sync\/rooms\/(.*)/; // (3) [!code ++]
