@@ -18,8 +18,8 @@ path = [
     "**/.eslintrc",
 
     # code/ directory licensing
-    "code/create-backend-app/**",
-    "code/create-frontend-app/**",
+    "code/packages/create-backend-app/**",
+    "code/packages/create-frontend-app/**",
     "code/.husky/**",
     "code/.prettierignore",
     "code/.prettierrc",
