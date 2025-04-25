@@ -2,9 +2,9 @@
 
 import React from 'react';
 import { cn } from '@/lib/utils';
-import { WeaveStateElement } from '@inditextech/weavejs-types';
+import { WeaveStateElement } from '@inditextech/weave-types';
 import { InputNumber } from '../inputs/input-number';
-import { useWeave } from '@inditextech/weavejs-react';
+import { useWeave } from '@inditextech/weave-react';
 import { useCollaborationRoom } from '@/store/store';
 
 export function AppearanceProperties() {

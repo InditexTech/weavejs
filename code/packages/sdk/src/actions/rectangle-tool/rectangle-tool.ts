@@ -5,7 +5,7 @@
 import { v4 as uuidv4 } from 'uuid';
 import Konva from 'konva';
 import { Vector2d } from 'konva/lib/types';
-import { WeaveElementInstance } from '@inditextech/weavejs-types';
+import { WeaveElementInstance } from '@inditextech/weave-types';
 import { WeaveAction } from '@/actions/action';
 import {
   WeaveRectangleToolActionState,

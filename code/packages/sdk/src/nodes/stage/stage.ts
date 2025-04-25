@@ -6,7 +6,7 @@ import Konva from 'konva';
 import {
   WeaveElementAttributes,
   WeaveElementInstance,
-} from '@inditextech/weavejs-types';
+} from '@inditextech/weave-types';
 import { WeaveNode } from '../node';
 
 export const WEAVE_STAGE_NODE_TYPE = 'stage';

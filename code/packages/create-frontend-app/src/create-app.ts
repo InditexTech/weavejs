@@ -151,10 +151,10 @@ function createPackageJson(projectName: string, options: Options): object {
           'zustand',
         ]),
         ...pick(localVersions, [
-          '@inditextech/weavejs-react',
-          '@inditextech/weavejs-types',
-          '@inditextech/weavejs-sdk',
-          '@inditextech/weavejs-store-azure-web-pubsub',
+          '@inditextech/weave-react',
+          '@inditextech/weave-types',
+          '@inditextech/weave-sdk',
+          '@inditextech/weave-store-azure-web-pubsub',
         ]),
       },
       devDependencies: {
@@ -241,10 +241,10 @@ function createPackageJson(projectName: string, options: Options): object {
         'zustand',
       ]),
       ...pick(localVersions, [
-        '@inditextech/weavejs-react',
-        '@inditextech/weavejs-types',
-        '@inditextech/weavejs-sdk',
-        '@inditextech/weavejs-store-websockets',
+        '@inditextech/weave-react',
+        '@inditextech/weave-types',
+        '@inditextech/weave-sdk',
+        '@inditextech/weave-store-websockets',
       ]),
     },
     devDependencies: {

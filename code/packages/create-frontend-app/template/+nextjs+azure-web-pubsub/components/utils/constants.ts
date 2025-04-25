@@ -17,7 +17,7 @@ import {
   WeaveTextNode,
   WeaveImageNode,
   WeaveFrameNode,
-} from '@inditextech/weavejs-sdk';
+} from '@inditextech/weave-sdk';
 import { ColorTokenNode } from '@/components/nodes/color-token/color-token';
 import { AlignElementsToolAction } from '@/components/actions/align-elements-tool/align-elements-tool';
 

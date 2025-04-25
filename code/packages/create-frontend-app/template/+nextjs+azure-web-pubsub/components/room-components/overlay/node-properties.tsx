@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { useWeave } from '@inditextech/weavejs-react';
+import { useWeave } from '@inditextech/weave-react';
 import { useCollaborationRoom } from '@/store/store';
 import { PositionProperties } from './../node-properties/position-properties';
 import { SizeProperties } from './../node-properties/size-properties';

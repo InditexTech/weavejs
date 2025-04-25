@@ -6,7 +6,7 @@ import Konva from 'konva';
 import {
   WeaveElementAttributes,
   WeaveElementInstance,
-} from '@inditextech/weavejs-types';
+} from '@inditextech/weave-types';
 import { WeaveNode } from '@/nodes/node';
 import { Vector2d } from 'konva/lib/types';
 import { WeaveNodesSelectionPlugin } from '@/plugins/nodes-selection/nodes-selection';

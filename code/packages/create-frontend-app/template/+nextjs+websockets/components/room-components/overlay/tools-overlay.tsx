@@ -15,7 +15,7 @@ import {
   Hand,
   Tags,
 } from 'lucide-react';
-import { useWeave } from '@inditextech/weavejs-react';
+import { useWeave } from '@inditextech/weave-react';
 import { Toolbar } from '../toolbar/toolbar';
 import { motion } from 'framer-motion';
 import { leftElementVariants } from './variants';

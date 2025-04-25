@@ -1,10 +1,10 @@
 import { useCollaborationRoom } from '@/store/store';
-import { useWeave } from '@inditextech/weavejs-react';
-import { WeaveUser } from '@inditextech/weavejs-types';
+import { useWeave } from '@inditextech/weave-react';
+import { WeaveUser } from '@inditextech/weave-types';
 import {
   WeaveStoreAzureWebPubsub,
   WeaveStoreAzureWebPubsubConnectionStatus,
-} from '@inditextech/weavejs-store-azure-web-pubsub/client';
+} from '@inditextech/weave-store-azure-web-pubsub/client';
 import React from 'react';
 
 function useGetAzureWebPubsubProvider({

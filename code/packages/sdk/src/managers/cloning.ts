@@ -8,7 +8,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { Weave } from '@/weave';
 import { Vector2d } from 'konva/lib/types';
 import { Logger } from 'pino';
-import { WeaveStateElement } from '@inditextech/weavejs-types';
+import { WeaveStateElement } from '@inditextech/weave-types';
 
 export class WeaveCloningManager {
   private instance: Weave;

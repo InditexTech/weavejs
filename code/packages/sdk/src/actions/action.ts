@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-import { WeaveElementAttributes } from '@inditextech/weavejs-types';
+import { WeaveElementAttributes } from '@inditextech/weave-types';
 import { Weave } from '@/weave';
 import { Logger } from 'pino';
 import { WeaveActionCallbacks } from './types';

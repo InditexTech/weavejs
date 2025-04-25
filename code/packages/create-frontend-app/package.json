@@ -1,6 +1,6 @@
 {
-  "name": "create-weavejs-frontend-app",
-  "version": "1.1.0-SNAPSHOT",
+  "name": "create-weave-frontend-app",
+  "version": "0.1.0-SNAPSHOT",
   "description": "Create a new frontend artifact for a site with Weave.js",
   "keywords": [
     "NextJs",
@@ -55,11 +55,11 @@
   },
   "nx": {
     "implicitDependencies": [
-      "@inditextech/weavejs-react",
-      "@inditextech/weavejs-sdk",
-      "@inditextech/weavejs-store-azure-web-pubsub",
-      "@inditextech/weavejs-store-websockets",
-      "@inditextech/weavejs-types"
+      "@inditextech/weave-react",
+      "@inditextech/weave-sdk",
+      "@inditextech/weave-store-azure-web-pubsub",
+      "@inditextech/weave-store-websockets",
+      "@inditextech/weave-types"
     ]
   }
 }

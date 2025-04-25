@@ -5,7 +5,7 @@
 import Konva from 'konva';
 import { Logger } from 'pino';
 import { Weave } from '@/weave';
-import { WEAVE_NODE_LAYER_ID } from '@inditextech/weavejs-types';
+import { WEAVE_NODE_LAYER_ID } from '@inditextech/weave-types';
 
 export class WeaveStageManager {
   private instance: Weave;

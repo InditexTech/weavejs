@@ -20,7 +20,7 @@ import {
   WeaveAction,
   WeavePlugin,
   WeaveStore,
-} from '@inditextech/weavejs-sdk';
+} from '@inditextech/weave-sdk';
 import {
   WeaveState,
   WeaveSelection,
@@ -29,7 +29,7 @@ import {
   WeaveCallbacks,
   WeaveUndoRedoChange,
   WeaveStatus,
-} from '@inditextech/weavejs-types';
+} from '@inditextech/weave-types';
 import { useWeave } from './store';
 
 type WeaveProviderType = {

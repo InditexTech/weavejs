@@ -3,7 +3,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { Weave } from '@/weave';
-import { WeavePluginBase } from '@inditextech/weavejs-types';
+import { WeavePluginBase } from '@inditextech/weave-types';
 import { Logger } from 'pino';
 
 export abstract class WeavePlugin implements WeavePluginBase {

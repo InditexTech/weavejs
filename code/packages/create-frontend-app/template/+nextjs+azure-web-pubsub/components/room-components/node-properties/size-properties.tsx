@@ -1,10 +1,10 @@
-"use client";
+'use client';
 
-import React from "react";
-import { WeaveStateElement } from "@inditextech/weavejs-types";
-import { InputNumber } from "../inputs/input-number";
-import { useWeave } from "@inditextech/weavejs-react";
-import { useCollaborationRoom } from "@/store/store";
+import React from 'react';
+import { WeaveStateElement } from '@inditextech/weave-types';
+import { InputNumber } from '../inputs/input-number';
+import { useWeave } from '@inditextech/weave-react';
+import { useCollaborationRoom } from '@/store/store';
 
 export function SizeProperties() {
   const instance = useWeave((state) => state.instance);
@@ -25,16 +25,16 @@ export function SizeProperties() {
 
   React.useEffect(() => {
     if (!instance) return;
-    if (actualAction && nodePropertiesAction === "create") {
+    if (actualAction && nodePropertiesAction === 'create') {
       setActualNode({
-        key: "creating",
-        type: "undefined",
+        key: 'creating',
+        type: 'undefined',
         props: {
           ...nodeCreateProps,
         },
       });
     }
-    if (node && nodePropertiesAction === "update") {
+    if (node && nodePropertiesAction === 'update') {
       setActualNode(node);
     }
     if (!actualAction && !node) {
@@ -45,10 +45,10 @@ export function SizeProperties() {
   const updateElement = React.useCallback(
     (updatedNode: WeaveStateElement) => {
       if (!instance) return;
-      if (actualAction && nodePropertiesAction === "create") {
+      if (actualAction && nodePropertiesAction === 'create') {
         instance.updatePropsAction(actualAction, updatedNode.props);
       }
-      if (nodePropertiesAction === "update") {
+      if (nodePropertiesAction === 'update') {
         instance.updateNode(updatedNode);
       }
     },
@@ -63,7 +63,7 @@ export function SizeProperties() {
 
   if (
     actualAction &&
-    !["selectionTool", "rectangleTool", "imageTool"].includes(actualAction)
+    !['selectionTool', 'rectangleTool', 'imageTool'].includes(actualAction)
   ) {
     return null;
   }
@@ -107,7 +107,7 @@ export function SizeProperties() {
               }}
             />
           </div>
-          {["update"].includes(nodePropertiesAction) && (
+          {['update'].includes(nodePropertiesAction) && (
             <InputNumber
               label="Scale (%)"
               value={(actualNode.props.scaleX ?? 1) * 100}

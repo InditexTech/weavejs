@@ -1,4 +1,4 @@
-import { WeaveActionCallbacks } from '@inditextech/weavejs-sdk';
+import { WeaveActionCallbacks } from '@inditextech/weave-sdk';
 import { COLOR_TOKEN_TOOL_STATE } from './constants';
 
 export type ColorTokenToolActionStateKeys = keyof typeof COLOR_TOKEN_TOOL_STATE;

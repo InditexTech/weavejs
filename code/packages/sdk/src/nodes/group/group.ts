@@ -7,7 +7,7 @@ import {
   WeaveElementAttributes,
   WeaveElementInstance,
   WeaveStateElement,
-} from '@inditextech/weavejs-types';
+} from '@inditextech/weave-types';
 import { WeaveNode } from '../node';
 
 export const WEAVE_GROUP_NODE_TYPE = 'group';

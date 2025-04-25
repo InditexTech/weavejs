@@ -31,7 +31,7 @@ export default defineConfig(({ mode }) => {
         external: [
           '@azure/web-pubsub',
           '@azure/web-pubsub-express',
-          '@inditextech/weavejs-sdk',
+          '@inditextech/weave-sdk',
           'crypto',
           'express',
           'node:stream',

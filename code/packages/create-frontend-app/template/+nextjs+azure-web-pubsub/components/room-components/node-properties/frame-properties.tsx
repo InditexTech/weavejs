@@ -1,10 +1,10 @@
-"use client";
+'use client';
 
-import React from "react";
-import { WeaveStateElement } from "@inditextech/weavejs-types";
-import { useWeave } from "@inditextech/weavejs-react";
-import { useCollaborationRoom } from "@/store/store";
-import { InputText } from "../inputs/input-text";
+import React from 'react';
+import { WeaveStateElement } from '@inditextech/weave-types';
+import { useWeave } from '@inditextech/weave-react';
+import { useCollaborationRoom } from '@/store/store';
+import { InputText } from '../inputs/input-text';
 
 export function FrameProperties() {
   const instance = useWeave((state) => state.instance);
@@ -25,16 +25,16 @@ export function FrameProperties() {
 
   React.useEffect(() => {
     if (!instance) return;
-    if (actualAction && nodePropertiesAction === "create") {
+    if (actualAction && nodePropertiesAction === 'create') {
       setActualNode({
-        key: "creating",
-        type: "undefined",
+        key: 'creating',
+        type: 'undefined',
         props: {
           ...nodeCreateProps,
         },
       });
     }
-    if (node && nodePropertiesAction === "update") {
+    if (node && nodePropertiesAction === 'update') {
       setActualNode(node);
     }
     if (!actualAction && !node) {
@@ -45,10 +45,10 @@ export function FrameProperties() {
   const updateElement = React.useCallback(
     (updatedNode: WeaveStateElement) => {
       if (!instance) return;
-      if (actualAction && nodePropertiesAction === "create") {
+      if (actualAction && nodePropertiesAction === 'create') {
         instance.updatePropsAction(actualAction, updatedNode.props);
       }
-      if (nodePropertiesAction === "update") {
+      if (nodePropertiesAction === 'update') {
         instance.updateNode(updatedNode);
       }
     },
@@ -61,13 +61,13 @@ export function FrameProperties() {
 
   if (
     actualAction &&
-    ["selectionTool"].includes(actualAction) &&
-    !["frame"].includes(actualNode.type)
+    ['selectionTool'].includes(actualAction) &&
+    !['frame'].includes(actualNode.type)
   ) {
     return null;
   }
 
-  if (actualAction && !["selectionTool", "frameTool"].includes(actualAction))
+  if (actualAction && !['selectionTool', 'frameTool'].includes(actualAction))
     return null;
 
   return (
@@ -81,7 +81,7 @@ export function FrameProperties() {
         <div className="grid grid-cols-1 gap-3 w-full">
           <InputText
             label="Title"
-            value={`${actualNode.props.title ?? "Frame XXX"}`}
+            value={`${actualNode.props.title ?? 'Frame XXX'}`}
             onChange={(value) => {
               const updatedNode: WeaveStateElement = {
                 ...actualNode,

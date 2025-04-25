@@ -30,7 +30,7 @@ export default defineConfig(({ mode }) => {
           'react-dom',
           '@types/react',
           '@types/react-dom',
-          '@inditextech/weavejs-sdk',
+          '@inditextech/weave-sdk',
           'yjs',
           /@syncedstore\/core.*/,
           /konva.*/,

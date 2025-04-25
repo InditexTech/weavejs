@@ -1,20 +1,20 @@
-"use client";
+'use client';
 
-import React from "react";
-import { cn } from "@/lib/utils";
-import { useRouter } from "next/navigation";
-import { motion } from "framer-motion";
-import { useWeave } from "@inditextech/weavejs-react";
-import { useCollaborationRoom } from "@/store/store";
+import React from 'react';
+import { cn } from '@/lib/utils';
+import { useRouter } from 'next/navigation';
+import { motion } from 'framer-motion';
+import { useWeave } from '@inditextech/weave-react';
+import { useCollaborationRoom } from '@/store/store';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+} from '@/components/ui/dropdown-menu';
 
-import { Logo } from "@/components/utils/logo";
+import { Logo } from '@/components/utils/logo';
 import {
   Image as ImageIcon,
   LogOut,
@@ -25,16 +25,16 @@ import {
   Grid3X3Icon,
   GripIcon,
   CheckIcon,
-} from "lucide-react";
+} from 'lucide-react';
 import {
   WEAVE_GRID_TYPES,
   WeaveExportStageActionParams,
   WeaveStageGridPlugin,
   WeaveStageGridType,
-} from "@inditextech/weavejs-sdk";
-import { ConnectionStatus } from "../connection-status";
-import { topElementVariants } from "./variants";
-import { DropdownMenuLabel } from "@radix-ui/react-dropdown-menu";
+} from '@inditextech/weave-sdk';
+import { ConnectionStatus } from '../connection-status';
+import { topElementVariants } from './variants';
+import { DropdownMenuLabel } from '@radix-ui/react-dropdown-menu';
 
 export function RoomInformationOverlay() {
   const router = useRouter();
@@ -52,14 +52,14 @@ export function RoomInformationOverlay() {
   );
 
   const handleToggleGrid = React.useCallback(() => {
-    if (instance && instance.isPluginEnabled("stageGrid")) {
-      instance.disablePlugin("stageGrid");
-      setGridEnabled(instance.isPluginEnabled("stageGrid"));
+    if (instance && instance.isPluginEnabled('stageGrid')) {
+      instance.disablePlugin('stageGrid');
+      setGridEnabled(instance.isPluginEnabled('stageGrid'));
       return;
     }
-    if (instance && !instance.isPluginEnabled("stageGrid")) {
-      instance.enablePlugin("stageGrid");
-      setGridEnabled(instance.isPluginEnabled("stageGrid"));
+    if (instance && !instance.isPluginEnabled('stageGrid')) {
+      instance.enablePlugin('stageGrid');
+      setGridEnabled(instance.isPluginEnabled('stageGrid'));
       return;
     }
   }, [instance]);
@@ -67,7 +67,7 @@ export function RoomInformationOverlay() {
   const handleSetGridType = React.useCallback(
     (type: WeaveStageGridType) => {
       if (instance) {
-        (instance.getPlugin("stageGrid") as WeaveStageGridPlugin)?.setType(
+        (instance.getPlugin('stageGrid') as WeaveStageGridPlugin)?.setType(
           type
         );
         setGridType(type);
@@ -78,7 +78,7 @@ export function RoomInformationOverlay() {
 
   const handleExportToImage = React.useCallback(() => {
     if (instance) {
-      instance.triggerAction<WeaveExportStageActionParams>("exportStageTool", {
+      instance.triggerAction<WeaveExportStageActionParams>('exportStageTool', {
         options: {
           padding: 20,
           pixelRatio: 2,
@@ -89,14 +89,14 @@ export function RoomInformationOverlay() {
 
   React.useEffect(() => {
     if (instance) {
-      setGridEnabled(instance.isPluginEnabled("stageGrid"));
+      setGridEnabled(instance.isPluginEnabled('stageGrid'));
     }
   }, [instance]);
 
   React.useEffect(() => {
     if (instance) {
       const stageGridPlugin = instance.getPlugin(
-        "stageGrid"
+        'stageGrid'
       ) as WeaveStageGridPlugin;
       setGridType(stageGridPlugin?.getType());
     }
@@ -114,7 +114,7 @@ export function RoomInformationOverlay() {
   // }, [instance]);
 
   const handleExitRoom = React.useCallback(() => {
-    router.push("/");
+    router.push('/');
   }, [router]);
 
   if (!showUI) {
@@ -137,10 +137,10 @@ export function RoomInformationOverlay() {
           <DropdownMenu onOpenChange={(open: boolean) => setMenuOpen(open)}>
             <DropdownMenuTrigger
               className={cn(
-                "pointer-events-auto rounded-none cursor-pointer p-1 px-3 hover:bg-accent focus:outline-none",
+                'pointer-events-auto rounded-none cursor-pointer p-1 px-3 hover:bg-accent focus:outline-none',
                 {
-                  ["bg-accent"]: menuOpen,
-                  ["bg-white"]: !menuOpen,
+                  ['bg-accent']: menuOpen,
+                  ['bg-white']: !menuOpen,
                 }
               )}
             >

@@ -21,7 +21,7 @@ import {
   Redo,
   Projector,
 } from 'lucide-react';
-import { useWeave } from '@inditextech/weavejs-react';
+import { useWeave } from '@inditextech/weave-react';
 import { motion } from 'framer-motion';
 import { bottomElementVariants } from './variants';
 import { useCollaborationRoom } from '@/store/store';

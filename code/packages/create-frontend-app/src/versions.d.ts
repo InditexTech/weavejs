@@ -1,7 +1,7 @@
 export const versions: {
-  '@inditextech/weavejs-types': string;
-  '@inditextech/weavejs-sdk': string;
-  '@inditextech/weavejs-store-websockets': string;
-  '@inditextech/weavejs-store-azure-web-pubsub': string;
-  '@inditextech/weavejs-react': string;
+  '@inditextech/weave-types': string;
+  '@inditextech/weave-sdk': string;
+  '@inditextech/weave-store-websockets': string;
+  '@inditextech/weave-store-azure-web-pubsub': string;
+  '@inditextech/weave-react': string;
 };

@@ -10,7 +10,7 @@ import {
   WeaveExportNodeOptions,
   WEAVE_EXPORT_BACKGROUND_COLOR,
   WEAVE_EXPORT_FORMATS,
-} from '@inditextech/weavejs-types';
+} from '@inditextech/weave-types';
 import Konva from 'konva';
 
 export class WeaveExportManager {

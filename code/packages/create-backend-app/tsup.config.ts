@@ -7,11 +7,11 @@ import storeAzureWebPubsubPkg from '../store-azure-web-pubsub/package.json';
 import reactPkg from '../react/package.json';
 
 const versions = {
-  '@inditextech/weavejs-types': typesPkg.version,
-  '@inditextech/weavejs-sdk': sdkPkg.version,
-  '@inditextech/weavejs-store-websockets': storeWebsocketsPkg.version,
-  '@inditextech/weavejs-store-azure-web-pubsub': storeAzureWebPubsubPkg.version,
-  '@inditextech/weavejs-react': reactPkg.version,
+  '@inditextech/weave-types': typesPkg.version,
+  '@inditextech/weave-sdk': sdkPkg.version,
+  '@inditextech/weave-store-websockets': storeWebsocketsPkg.version,
+  '@inditextech/weave-store-azure-web-pubsub': storeAzureWebPubsubPkg.version,
+  '@inditextech/weave-react': reactPkg.version,
 };
 
 writeFileSync(

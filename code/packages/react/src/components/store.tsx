@@ -2,14 +2,14 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-import { Weave, WeaveConnectedUsersChanged } from '@inditextech/weavejs-sdk';
+import { Weave, WeaveConnectedUsersChanged } from '@inditextech/weave-sdk';
 import {
   WEAVE_INSTANCE_STATUS,
   WeaveSelection,
   WeaveState,
   WeaveStateElement,
   WeaveStatus,
-} from '@inditextech/weavejs-types';
+} from '@inditextech/weave-types';
 import { create } from 'zustand';
 
 interface WeaveRuntimeState {

@@ -1,24 +1,24 @@
-"use client";
+'use client';
 
-import React from "react";
-import Avatar from "boring-avatars";
-import { Avatar as AvatarUI, AvatarFallback } from "@/components/ui/avatar";
+import React from 'react';
+import Avatar from 'boring-avatars';
+import { Avatar as AvatarUI, AvatarFallback } from '@/components/ui/avatar';
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
-} from "@/components/ui/tooltip";
-import { useCollaborationRoom } from "@/store/store";
-import { ChevronDown } from "lucide-react";
+} from '@/components/ui/tooltip';
+import { useCollaborationRoom } from '@/store/store';
+import { ChevronDown } from 'lucide-react';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { useWeave } from "@inditextech/weavejs-react";
-import { cn } from "@/lib/utils";
+} from '@/components/ui/dropdown-menu';
+import { useWeave } from '@inditextech/weave-react';
+import { cn } from '@/lib/utils';
 
 export const ConnectedUsers = () => {
   const connectedUsers = useWeave((state) => state.users);
@@ -96,10 +96,10 @@ export const ConnectedUsers = () => {
                   >
                     <DropdownMenuTrigger
                       className={cn(
-                        " pointer-events-auto rounded-none cursor-pointer p-2 hover:bg-accent focus:outline-none",
+                        ' pointer-events-auto rounded-none cursor-pointer p-2 hover:bg-accent focus:outline-none',
                         {
-                          ["bg-accent"]: menuOpen,
-                          ["bg-white"]: !menuOpen,
+                          ['bg-accent']: menuOpen,
+                          ['bg-white']: !menuOpen,
                         }
                       )}
                     >

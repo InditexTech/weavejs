@@ -1,10 +1,10 @@
-import { PDFDocument } from "pdf-lib";
-import { WeaveSelection, WeaveStateElement } from "@inditextech/weavejs-types";
-import React from "react";
-import Konva from "konva";
-import { Checkbox } from "@/components/ui/checkbox";
-import { useCollaborationRoom } from "@/store/store";
-import { useWeave } from "@inditextech/weavejs-react";
+import { PDFDocument } from 'pdf-lib';
+import { WeaveSelection, WeaveStateElement } from '@inditextech/weave-types';
+import React from 'react';
+import Konva from 'konva';
+import { Checkbox } from '@/components/ui/checkbox';
+import { useCollaborationRoom } from '@/store/store';
+import { useWeave } from '@inditextech/weave-react';
 import {
   AlignStartHorizontal,
   Download,
@@ -15,10 +15,10 @@ import {
   StepBack,
   StepForward,
   XIcon,
-} from "lucide-react";
-import { toImageAsync } from "./utils";
-import { FrameImage } from "./frames-library.image";
-import { FramePresentationImage } from "./frames-library.presentation-image";
+} from 'lucide-react';
+import { toImageAsync } from './utils';
+import { FrameImage } from './frames-library.image';
+import { FramePresentationImage } from './frames-library.presentation-image';
 
 export const FramesLibrary = () => {
   const instance = useWeave((state) => state.instance);
@@ -42,7 +42,7 @@ export const FramesLibrary = () => {
     const stage = instance.getStage();
     const nodes = instance.findNodesByType(
       appState.weave as WeaveStateElement,
-      "frame"
+      'frame'
     );
 
     const frames: Konva.Node[] = [];
@@ -58,7 +58,7 @@ export const FramesLibrary = () => {
   const selectedNodesAllFrame = React.useMemo(() => {
     let allFrame = true;
     for (const node of selectedNodes) {
-      if (node.node.type !== "frame") {
+      if (node.node.type !== 'frame') {
         allFrame = false;
         break;
       }
@@ -72,7 +72,7 @@ export const FramesLibrary = () => {
     }
 
     instance.triggerAction<{ gap: number; nodes: WeaveSelection[] }>(
-      "alignElementsTool",
+      'alignElementsTool',
       {
         gap: 20,
         nodes: selectedNodes,
@@ -89,7 +89,7 @@ export const FramesLibrary = () => {
 
     let framesToRender = selectedFrames;
     if (framesToRender.length === 0) {
-      framesToRender = framesAvailable.map((e) => e.getAttrs().id ?? "");
+      framesToRender = framesAvailable.map((e) => e.getAttrs().id ?? '');
     }
 
     const pages: { title: string; image: string }[] = [];
@@ -123,9 +123,9 @@ export const FramesLibrary = () => {
 
     const pdfDataUri = await pdfDoc.saveAsBase64({ dataUri: true });
 
-    const link = document.createElement("a");
+    const link = document.createElement('a');
     link.href = pdfDataUri;
-    link.download = "test.pdf";
+    link.download = 'test.pdf';
     link.click();
   }, [instance, selectedFrames, framesAvailable]);
 
@@ -177,7 +177,7 @@ export const FramesLibrary = () => {
                 if (selectedFrames.length === 0) {
                   const frames = framesAvailable.map((frame) => {
                     const attrs = frame.getAttrs();
-                    return attrs.id ?? "";
+                    return attrs.id ?? '';
                   });
                   setSelectedFrames(frames);
                 } else {
@@ -224,10 +224,10 @@ export const FramesLibrary = () => {
                       onCheckedChange={() => {
                         setSelectedFrames((prev) => {
                           const newElements = new Set(prev);
-                          if (newElements.has(attrs.id ?? "")) {
-                            newElements.delete(attrs.id ?? "");
+                          if (newElements.has(attrs.id ?? '')) {
+                            newElements.delete(attrs.id ?? '');
                           } else {
-                            newElements.add(attrs.id ?? "");
+                            newElements.add(attrs.id ?? '');
                           }
                           return Array.from(newElements);
                         });
