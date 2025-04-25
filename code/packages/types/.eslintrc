@@ -4,9 +4,9 @@
     "browser": true
   },
   "extends": [
-      "eslint:recommended",
-      "plugin:@typescript-eslint/recommended",
-      "plugin:react/recommended",
+    "eslint:recommended",
+    "plugin:@typescript-eslint/recommended",
+    "plugin:react/recommended"
   ],
   "parser": "@typescript-eslint/parser",
   "parserOptions": {
@@ -16,9 +16,7 @@
       "jsx": true
     }
   },
-  "plugins": [
-    "react-hooks"
-  ],
+  "plugins": ["react-hooks"],
   "globals": {
     "JSX": "readonly",
     "window": "readonly",

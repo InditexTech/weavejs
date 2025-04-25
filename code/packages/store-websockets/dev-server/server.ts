@@ -43,7 +43,8 @@ const wss = new WeaveWebsocketsServer({
       const roomsFolder = path.join(__dirname, 'rooms');
       const roomsFile = path.join(roomsFolder, docName);
       return await fs.readFile(roomsFile);
-    } catch (e) {
+    } catch (ex) {
+      console.error(ex);
       return null;
     }
   },

@@ -1,0 +1,66 @@
+{
+  "name": "create-weavejs-backend-app",
+  "version": "0.26.0-SNAPSHOT",
+  "description": "Create a new backend artifact for site with Weave.js",
+  "keywords": [
+    "NextJs",
+    "next",
+    "react",
+    "Weave.js"
+  ],
+  "homepage": "https://inditextech.github.io/weavejs",
+  "repository": "github:InditexTech/weavejs",
+  "license": "Apache-2.0",
+  "author": "Jesus Manuel Piñeiro Cid <jesusmpc@inditex.com>",
+  "type": "module",
+  "bin": "./dist/index.js",
+  "module": "./dist/create-app.js",
+  "types": "./dist/create-app.d.ts",
+  "files": [
+    "template/*",
+    "dist/*"
+  ],
+  "scripts": {
+    "build": "tsup",
+    "bump:snapshot": "npm version $npm_package_version.$(date \"+%s\")",
+    "clean": "rimraf dist",
+    "dev": "tsup --watch",
+    "link": "npm link",
+    "lint:fix": "npm run lint -- --fix",
+    "lint": "eslint ./src",
+    "publish:snapshot": "npm publish",
+    "release:perform": "npm publish --access public",
+    "release:prepare": "npm run verify",
+    "test": "echo \"No tests defined\" && exit 0",
+    "types:check": "tsc --noEmit",
+    "verify": "npm run lint && npm run test && npm run build",
+    "version:development": "npm version $(npm version minor)-SNAPSHOT",
+    "version:release": "npm version $RELEASE_VERSION -m \"[npm-scripts] prepare release $RELEASE_VERSION\" --tag-version-prefix \"\""
+  },
+  "dependencies": {
+    "@clack/prompts": "^0.10.1",
+    "cross-spawn": "^7.0.6",
+    "picocolors": "^1.1.1"
+  },
+  "devDependencies": {
+    "@types/cross-spawn": "^6.0.6",
+    "@types/node": "22.14.1",
+    "fast-glob": "^3.3.3",
+    "tsup": "8.4.0"
+  },
+  "engines": {
+    "node": "^18.12 || ^20.11 || ^22.11"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "nx": {
+    "implicitDependencies": [
+      "@inditextech/weavejs-react",
+      "@inditextech/weavejs-sdk",
+      "@inditextech/weavejs-store-azure-web-pubsub",
+      "@inditextech/weavejs-store-websockets",
+      "@inditextech/weavejs-types"
+    ]
+  }
+}
