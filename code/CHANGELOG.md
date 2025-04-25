@@ -13,6 +13,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.0] - 2025-04-25
+
 ### Added
 
 - [#109](https://github.com/InditexTech/weavejs/issues/109) CLI to generate app from templates to quickstart an app
@@ -60,3 +62,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - [#36](https://github.com/InditexTech/weavejs/issues/36) Fix add scope to undoManager
 - [#24](https://github.com/InditexTech/weavejs/issues/24) Bug when loading rooms with text or images
 - [#18](https://github.com/InditexTech/weavejs/issues/18) Fix awareness not working on store-azure-web-pubsub
+
+[Unreleased]: https://github.com/InditexTech/weavejs/compare/0.1.0...HEAD
+
+[0.1.0]: https://github.com/InditexTech/weavejs/releases/tag/0.1.0
