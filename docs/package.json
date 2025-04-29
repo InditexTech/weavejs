@@ -41,8 +41,5 @@
     "postcss": "^8.5.3",
     "tailwindcss": "^4.1.4",
     "typescript": "^5.8.3"
-  },
-  "overrides": {
-    "rimraf": "6.0.1"
   }
 }
