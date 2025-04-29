@@ -1,0 +1,98 @@
+---
+title: WeaveProvider
+description: API reference for WeaveProvider component
+---
+
+import { TypeTable } from "fumadocs-ui/components/type-table";
+
+## Overview
+
+The WeaveProvider is a core component from the React Helper library that initializes and
+provides Weave.js context to your React application. It sets up the needed elements for real-time
+collaboration and canvas rendering:
+
+- Store
+- Nodes
+- Plugins
+- Actions
+- Fonts
+
+By wrapping your app (or part of it) with WeaveProvider, you can make use of the [useWeave](/docs/react/api-reference/hooks/use-weave)
+hook to access the API of the Weave instance.
+
+## Import
+
+```shell
+import { WeaveProvider } from "@inditextech/weave-react";
+```
+
+## Props
+
+<TypeTable
+  type={{
+    containerId: {
+      required: true,
+      description:
+        "The id of the container where Weave.js canvases will be created",
+      type: "string",
+    },
+    getUser: {
+      required: true,
+      description: "Function that",
+      type: "() => WeaveUser",
+    },
+    store: {
+      required: true,
+      description:
+        "Weave.js Store to use to handle the real-time communication",
+      type: "WeaveStore",
+    },
+    children: {
+      required: true,
+      description: "Child nodes to render",
+      type: "ReactNode",
+    },
+    nodes: {
+      description: "Array of nodes to register and use by the instance",
+      type: "WeaveNode[]",
+      default: "[]",
+    },
+    plugins: {
+      description: "Array of plugins to register and use by the instance",
+      type: "WeavePlugin[]",
+      default: "[]",
+    },
+    actions: {
+      description: "Array of actions to register and use by the instance",
+      type: "WeaveAction[]",
+      default: "[]",
+    },
+    customNodes: {
+      description: "Array of custom nodes to register and use by the instance",
+      type: "WeaveNode[]",
+      default: "[]",
+    },
+    customPlugins: {
+      description:
+        "Array of custom plugins to register and use by the instance",
+      type: "WeavePlugin[]",
+      default: "[]",
+    },
+    customActions: {
+      description:
+        "Array of custom actions to register and use by the instance",
+      type: "WeaveAction[]",
+      default: "[]",
+    },
+    fonts: {
+      description: "Array that define the fonts to use on the canvas",
+      type: "WeaveFont[]",
+      default: "[]",
+    },
+    callbacks: {
+      description: "Callbacks to provide to the instance",
+      type: "WeaveCallbacks",
+      default: "{}",
+    },
+  }}
+/>

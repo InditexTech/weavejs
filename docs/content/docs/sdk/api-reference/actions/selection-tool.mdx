@@ -1,0 +1,35 @@
+---
+title: WeaveSelectionToolAction
+description: Activate the selection of canvas nodes
+---
+
+import { TypeTable } from "fumadocs-ui/components/type-table";
+
+## Overview
+
+The [WeaveSelectionToolAction](https://github.com/InditexTech/weavejs/blob/main/code/packages/sdk/src/actions/selection-tool/selection-tool.ts)
+class that allows users to enter or exit selection mode. While it does not handle
+the selection logic itself, it activates the selection behavior managed by the
+[WeaveNodesSelectionPlugin](/docs/sdk/api-reference/plugins/nodes-selection),
+enabling users to click or drag to select nodes on the canvas.
+
+This tool acts as a toggle for interaction context, letting users switch between
+selection and other editing tools (e.g., draw, pan, or create).
+
+The class extends the [WeaveAction](/docs/sdk/api-reference/actions/action) class.
+
+## Name
+
+This action `name` property value is `selectionTool`.
+
+## Import
+
+```shell
+import { WeaveSelectionToolAction } from "@inditextech/weave-sdk";
+```
+
+## Instantiation
+
+```ts
+new WeaveSelectionToolAction(params: WeaveActionCallbacks);
+```

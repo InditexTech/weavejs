@@ -1,0 +1,145 @@
+---
+title: WeaveAzureWebPubsubServer
+description: API reference for the WeaveAzureWebPubsubServer class
+---
+
+import { TypeTable } from "fumadocs-ui/components/type-table";
+
+## Overview
+
+The WeaveAzureWebPubsubServer is a server-side class in the Weave.js Azure Web PubSub store
+that enables real-time collaboration using Azure Web PubSub as the transport layer. It serves
+as a store provider, handling the synchronization of shared document state across all clients
+connected to a specific room.
+
+Built on top of Yjs, this class leverages Azure's managed Web PubSub infrastructure to offer scalable,
+low-latency communication, with support for CRDT-based document syncing, user presence (awareness),
+and optional persistence of shared state.
+
+This class enables seamless collaboration by handling server-side:
+
+- Connection management via WebSocket clients
+- Document synchronization using CRDTs (through Yjs)
+- Broadcasting updates between users in real time
+- Support for awareness events
+- Support for persistence of the shared-state
+
+## Import
+
+```shell
+import { WeaveAzureWebPubsubServer } from "@inditextech/weave-store-azure-web-pubsub/server";
+```
+
+## Instantiation
+
+```ts
+const azureWebPubSubServer = new WeaveAzureWebPubsubServer(params: WeaveAzureWebPubsubServerParams);
+```
+
+## Parameters
+
+<TypeTable
+  type={{
+    pubsubConfig: {
+      required: true,
+      description:
+        "An object defining the Azure Web PubSub params: endpoint, access key and hub name",
+      type: "WeaveAzureWebPubsubConfig",
+    },
+    persistRoom: {
+      description:
+        "Weave.js Store to use to handle the real-time communication",
+      type: "PersistRoom",
+    },
+    fetchRoom: {
+      description: "Child nodes to render",
+      type: "FetchRoom",
+    },
+    initialState: {
+      description: "Array of nodes to register and use by the instance",
+      type: "initialState",
+      default: "defaultInitialState",
+    },
+  }}
+/>
+
+## Methods
+
+### getMiddleware
+
+```ts
+getMiddleware();
+```
+
+This method return the necessary middlewares that you need to attach to your Express
+server in order to manage the Azure Web PubSub connectivity.
+
+### clientConnect
+
+```ts
+clientConnect(roomId: string): Promise<string>
+```
+
+This method return a secure connection URL to use client-side to connect to the Azure
+Web PubSub infrastructure.
+
+Used
+
+## TypeScript types
+
+```ts
+type PerformUpgrade = (req: IncomingMessage) => Promise<boolean>;
+
+type ExtractRoomId = (req: IncomingMessage) => string | undefined;
+
+type FetchInitialState = (doc: Y.Doc) => void;
+
+type PersistRoom = (
+  roomId: string,
+  actualState: Uint8Array<ArrayBufferLike>
+) => Promise<void>;
+
+type FetchRoom = (roomId: string) => Promise<Uint8Array | null>;
+
+type WeaveAzureWebPubsubConfig = {
+  endpoint: string;
+  key: string;
+  hubName: string;
+};
+
+type WeaveAzureWebPubsubServerParams = {
+  initialState?: FetchInitialState;
+  pubsubConfig: WeaveAzureWebPubsubConfig;
+  persistRoom?: PersistRoom;
+  fetchRoom?: FetchRoom;
+};
+```
+
+## Shared-state initial value
+
+If not defined the `defaultInitialState` is used, which is nothing more than:
+
+<Mermaid
+  chart="
+flowchart TD;
+  Stage --> gridLayer;
+  Stage --> mainLayer;
+  Stage --> selectionLayer;
+  Stage --> usersPointersLayer;
+  Stage --> utilityLayer;"
+/>
+
+A [Stage](/docs/main/build/nodes/stage) node with 5 children [Layer](/docs/main/build/nodes/layer)
+nodes, in the specified order (bottom-to-top):
+
+- **gridLayer**: is the layer used by [WeaveStageGridPlugin](/docs/main/build/plugins/stage-grid)
+  to render the reference grid elements.
+- **mainLayer**: is the main layer where all the nodes added by the users live.
+- **selectionLayer**: is the layer used by [WeaveNodesSelectionPlugin](/docs/main/build/plugins/nodes-selection)
+  to render the selection overlay elements.
+- **usersPointersLayer**: is the layer used by [WeaveUsersPointersPlugin](/docs/main/build/plugins/users-pointers)
+  to render the users pointers overlay elements.
+- **utilityLayer**: is a wildcard layer defined that can be used by any plugin.
+
+Check out here the [code](https://github.com/InditexTech/weavejs/blob/main/code/packages/store-azure-web-pubsub/src/server/default-initial-state.ts)
+hat defines the `defaultInitialState` function.

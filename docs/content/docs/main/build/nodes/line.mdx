@@ -1,0 +1,46 @@
+---
+title: Line
+description: Draw a line on the canvas
+---
+
+import { Accordion, Accordions } from "fumadocs-ui/components/accordion";
+
+The Line node represents a customizable straight or curved line on the canvas.
+Built on top of Konva’s [Line](https://konvajs.org/api/Konva.Line.html), it supports
+features like multiple points, stroke color, width, dash patterns, and smoothing
+options.
+
+Line Nodes are ideal for drawing connectors, paths, or annotations between elements.
+They can be static or interactive, and are often used in diagramming tools,
+flow editors, and visual programming interfaces.
+
+## Usage
+
+<Accordions>
+  <Accordion title="1. Import the node" id="import-node">
+    Start by importing the action with the following import:
+
+    ```ts
+    import { WeaveLineNode } from "@inditextech/weave-sdk";
+    ```
+
+  </Accordion>
+  <Accordion title="2. Register the node" id="register-node">
+    Then register the node on the Weave class instance.
+
+    ```ts
+    const instance = new Weave({
+      ...
+      nodes: [
+        ...,
+        new WeaveLineNode(), // [!code ++]
+      ]
+    })
+    ```
+
+  </Accordion>
+  <Accordion title="3. Use the node" id="use-the-node">
+    TODO
+
+  </Accordion>
+</Accordions>

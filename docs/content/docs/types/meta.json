@@ -1,0 +1,13 @@
+{
+  "title": "TypeScript Types",
+  "description": "Package that contains the TypeScript types definitions",
+  "icon": "FileType",
+  "root": true,
+  "pages": [
+    "---Introduction---",
+    "index",
+    "setup",
+    "---API Reference---",
+    "...api-reference"
+  ]
+}

@@ -1,0 +1,78 @@
+---
+title: Rectangle Tool
+description: Add a rectangle to the canvas
+---
+
+import { Accordion, Accordions } from "fumadocs-ui/components/accordion";
+
+## Introduction
+
+This action enables users to create new rectangle nodes on the canvas.
+
+## Dependencies
+
+This action needs also registered on the Weave instance the following:
+
+- [Rectangle](/docs/main/build/nodes/rectangle) node
+
+## Usage
+
+<Accordions>
+  <Accordion title="1. Import the action" id="import-action">
+    Start by importing the action with the following import:
+
+    ```ts
+    import { WeaveRectangleToolAction } from "@inditextech/weave-sdk";
+    ```
+
+  </Accordion>
+  <Accordion title="2. Register the action" id="register-action">
+    Then register the action on the Weave class instance.
+
+    ```ts
+    const instance = new Weave({
+      ...
+      actions: [
+        ...,
+        new WeaveRectangleToolAction(), // [!code ++]
+      ]
+    })
+    ```
+
+  </Accordion>
+  <Accordion title="3. Setup the action trigger" id="setup-action-trigger">
+    Setup on a button or any element on the UI the user can trigger, an action
+    to trigger the action. For example on a button on React:
+
+    ```tsx
+    import { useWeave } from "@inditextech/weave-react";
+
+    const MyRectangleToolTriggerComponent = () => {
+      const instance = useWeave((state) => state.instance);
+
+      const triggerTool = React.useCallback(() => {
+        instance.triggerAction("rectangleTool");
+      }, [instance])
+
+      return (
+        <button onClick={triggerTool}>Rectangle Tool</button>
+      )
+    }
+    ```
+
+  </Accordion>
+  <Accordion title="4. Trigger the action" id="trigger-the-action">
+    Finally as an user trigger the UI element that launches the action.
+
+    When active the user can:
+
+    - **Click** on the canvas, it will create a rectangle with a default size.
+    - **Touch** on the canvas, it will create a rectangle with a default size.
+    - **Click & drag** to create a rectangle and define its size.
+
+    Once clicked or click-drag finishes, the rectangle is added to the canvas as a fully functional
+    node—ready. This action integrates seamlessly with Weave.js's real-time state system,
+    ensuring the new element appears instantly for all connected users.
+
+  </Accordion>
+</Accordions>

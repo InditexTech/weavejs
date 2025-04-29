@@ -1,0 +1,99 @@
+---
+title: WeaveStoreAzureWebPubsub
+description: API reference for WeaveStoreAzureWebPubsub class
+---
+
+import { TypeTable } from "fumadocs-ui/components/type-table";
+
+## Overview
+
+The WeaveStoreAzureWebPubsub class is a client-side store in the Weave.js Azure Web PubSub store
+that enables real-time collaboration via Azure Web PubSub. It connects to a backend powered by
+[WeaveAzureWebPubsubServer](/docs/store-azure-web-pubsub), using Yjs under the hood to handle
+conflict-free data syncing and user awareness.
+
+This store allows your Weave.js-based frontend application to join a collaborative session, share
+state with other users, and reflect live updates instantly—all while leveraging the scalability and
+reliability of Azure’s managed infrastructure.
+
+## Import
+
+```shell
+import { WeaveStoreAzureWebPubsub } from "@inditextech/weave-store-azure-web-pubsub/client";
+```
+
+## Instantiation
+
+```ts
+const store = new WeaveStoreAzureWebPubsub(storeOptions: WeaveStoreOptions, azureWebPubsubOptions: WeaveStoreAzureWebPubsubOptions);
+```
+
+## Parameters
+
+<TypeTable
+  type={{
+    ["storeOptions.getUser"]: {
+      required: true,
+      description:
+        "A function that returns a WeaveUser as definition of the metadata of the user that connects to a room",
+      type: "() => WeaveUser",
+    },
+    ["storeOptions.undoManagerOptions"]: {
+      description: "An object that defines the Undo-Redo manager options",
+      type: "WeaveUndoManagerOptions",
+    },
+    ["websocketOptions.roomId"]: {
+      required: true,
+      description: "Room id that we want to join",
+      type: "string",
+    },
+    ["websocketOptions.wsOptions"]: {
+      required: true,
+      description: "WebSocket underlying client properties",
+      type: "{ serverUrl: string; }",
+    },
+    ["websocketOptions.callbacks"]: {
+      description: "Callbacks defined for the instance",
+      type: "WeaveStoreWebsocketsCallbacks",
+      default: "{}",
+    },
+  }}
+/>
+
+## TypeScript types
+
+```ts
+type WeaveStoreWebsocketsConnectionStatusKeys =
+  keyof typeof WEAVE_STORE_WEBSOCKETS_CONNECTION_STATUS;
+type WeaveStoreWebsocketsConnectionStatus =
+  (typeof WEAVE_STORE_WEBSOCKETS_CONNECTION_STATUS)[WeaveStoreWebsocketsConnectionStatusKeys];
+
+type WeaveStoreWebsocketsCallbacks = {
+  onConnectionStatusChange?: (
+    status: WeaveStoreWebsocketsConnectionStatus
+  ) => void;
+};
+
+type WeaveUser = {
+  name: string;
+  email: string;
+};
+
+type WeaveUndoManagerOptions = {
+  captureTimeout?: number;
+  trackedOrigins?: Set<any>;
+};
+
+type WeaveStoreOptions = {
+  getUser: () => WeaveUser;
+  undoManagerOptions?: WeaveUndoManagerOptions;
+};
+
+type WeaveStoreWebsocketsOptions = {
+  roomId: string;
+  wsOptions: {
+    serverUrl: string;
+  };
+  callbacks?: WeaveStoreWebsocketsCallbacks;
+};
+```

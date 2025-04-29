@@ -1,0 +1,79 @@
+---
+title: WeaveStageZoomPlugin
+description: Activates support for zoom on the stage
+---
+
+import { TypeTable } from "fumadocs-ui/components/type-table";
+
+## Overview
+
+The [WeaveStageZoomPlugin](https://github.com/InditexTech/weavejs/blob/main/code/packages/sdk/src/plugins/stage-zoom/stage-zoom.ts)
+class that adds zooming capabilities to the canvas Stage. It allows users to zoom in and out using gestures like
+the mouse wheel, trackpad, or programmatic controls, enabling smooth navigation across large or detailed workspaces.
+
+Zooming makes it easier for users to focus on fine details or get a high-level overview of complex visual layouts
+during collaboration.
+
+The class extends the [WeavePlugin](/docs/sdk/api-reference/plugins/plugin) class
+
+## Name
+
+This plugin `name` property value is `stageZoom`.
+
+## Import
+
+```shell
+import { WeaveStageZoomPlugin } from "@inditextech/weave-sdk";
+```
+
+## Instantiation
+
+```ts
+new WeaveStageZoomPlugin(params: WeaveStageZoomPluginParams);
+```
+
+## TypeScript types
+
+```ts
+type WeaveStageZoomChanged = {
+  scale: number;
+  zoomSteps: number[];
+  actualStep: number;
+  onDefaultStep: boolean;
+  canZoomIn: boolean;
+  canZoomOut: boolean;
+};
+
+type WeaveStageZoomOnZoomChangeCallback = (
+  zoomInfo: WeaveStageZoomChanged
+) => void;
+
+type WeaveStageZoomPluginParams = {
+  zoomSteps?: number[];
+  defaultZoom?: number;
+  onZoomChange?: WeaveStageZoomOnZoomChangeCallback;
+};
+```
+
+## Parameters
+
+For `WeaveStageZoomPluginParams`:
+
+<TypeTable
+  type={{
+    ["zoomSteps"]: {
+      description: "An array that defines the zooming steps of the plugin.",
+      type: "number[]",
+      default: "[0.1, 0.25, 0.5, 1, 2, 4, 8]",
+    },
+    ["defaultZoom"]: {
+      description: "The default zoom when loading the stage (canvas).",
+      type: "number",
+      default: "1",
+    },
+    ["onZoomChange"]: {
+      description: "A callback that is called when the zoom changes.",
+      type: "number",
+    },
+  }}
+/>

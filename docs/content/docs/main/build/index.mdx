@@ -1,0 +1,83 @@
+---
+title: Overview
+description: Build your visual collaborative tool with Weave.js
+---
+
+import { SquareMousePointer, Blocks, Flame, Archive } from "lucide-react";
+
+## Introduction
+
+Weave.js is designed to help developers build visual collaborative UI applications,
+tools that are often complex by nature, involving canvas rendering, rich interactions, and
+dynamic real-time state management. To manage all this complexity, Weave.js is built
+around three core principles:
+
+- **Simple**: simplicity is at the heart of **Weave.js**. From its declarative API to its
+  plugin-friendly design, every part of the library is designed to reduce boilerplate
+  and make development a breeze. Whether you're rendering shapes or handling user interactions,
+  the goal is to keep things easy to reason about. _Focus on building features, not fighting
+  complexity_.
+- **Composable**: building complex UI interfaces requires a system that scales well.
+  In **Weave.js**, everything is designed with composition in mind. Our building blocks can be
+  combined, even among them, to create more sophisticated behaviors. _This approach encourages
+  reusability, modularity, and a clear separation of concerns_.
+- **Extendable**: no two collaborative tools are the same, and **Weave.js** embraces that
+  by being deeply extendable. This makes **Weave.js** adaptable to a wide range of use cases,
+  from whiteboards to diagramming tools to visual design platforms. _You can customize nearly
+  every aspect, from the canvas behavior, interaction models to rendering logic, without touching
+  the core_.
+
+## Building blocks
+
+A building block is typically a simple, well-defined unit—like a shape, a UI component, or a
+plugin—that does one thing well. You can mix and match these blocks to assemble more advanced
+features or entire applications. **Weave.js** provides a set of well-defined building blocks:
+
+<Cards>
+
+<Card href="/docs/main/build/nodes" icon={<SquareMousePointer className="text-purple-300" />} title='Nodes'>
+
+Nodes are the fundamental visual building blocks in Weave.js.
+
+They are primarily based on Konva.js primitives (shapes and groups) and represent everything
+rendered on the canvas.
+
+</Card>
+
+<Card href="/docs/main/build/plugins" icon={<Blocks className="text-blue-300" />} title='Plugins'>
+
+Plugins extend and enhance Weave.js's core functionality.
+
+Whether it's selection handling, canvas panning, zooming, or custom behaviors, plugins allow you to modular
+add or override features without cluttering the core logic.
+
+</Card>
+
+<Card href="/docs/main/build/actions" icon={<Flame className="text-green-300" />} title='Actions'>
+
+Actions are how user interactions are interpreted and executed within Weave.js.
+
+From adding new Nodes to the canvas to triggering selection or transformation, Actions provide a clean and
+consistent way to handle event-driven logic.
+
+</Card>
+
+<Card href="/docs/main/build/stores" icon={<Archive className="text-red-300" />} title='Stores'>
+
+Stores are responsible for managing the shared-state, persist it and the real-time communication between peers.
+
+A Store on the backend, manages the application's shared-state, real-time synchronization and
+persistence, on the frontend, a client is provided to connect to the backend.
+
+</Card>
+
+</Cards>
+
+## Example of building blocks
+
+- A **Node** like a rectangle or text element is a building block of the _visual canvas_.
+- A **Plugin** that handles zooming is a building block for _enhancing logic_.
+- An **Action** to add a Node to the canvas is a building block for _user workflows_.
+
+Just like LEGO pieces, these building blocks are designed to fit together, letting developers
+construct complex behavior without starting from scratch each time.

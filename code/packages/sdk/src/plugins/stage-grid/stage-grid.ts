@@ -33,10 +33,6 @@ export class WeaveStageGridPlugin extends WeavePlugin {
     this.gridSize = gridSize;
   }
 
-  registersLayers() {
-    return true;
-  }
-
   getName() {
     return 'stageGrid';
   }

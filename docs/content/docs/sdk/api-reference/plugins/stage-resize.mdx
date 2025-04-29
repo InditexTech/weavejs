@@ -1,0 +1,34 @@
+---
+title: WeaveStageResizePlugin
+description: Activates the stage resizing (responsive support)
+---
+
+import { TypeTable } from "fumadocs-ui/components/type-table";
+
+## Overview
+
+The [WeaveStageResizePlugin](https://github.com/InditexTech/weavejs/blob/main/code/packages/sdk/src/plugins/stage-resize/stage-resize.ts)
+class that enables the automatic resizing of the canvas Stage based on the size of its container
+or the browser window. It ensures that the canvas remains responsive, properly scaled, and fully
+usable across different screen sizes, layouts, or device types.
+
+This plugin is critical for maintaining a fluid and adaptive collaborative workspace, especially
+in dynamic web applications.
+
+The class extends the [WeavePlugin](/docs/sdk/api-reference/plugins/plugin) class
+
+## Name
+
+This plugin `name` property value is `stageResize`.
+
+## Import
+
+```shell
+import { WeaveStageResizePlugin } from "@inditextech/weave-sdk";
+```
+
+## Instantiation
+
+```ts
+new WeaveStageResizePlugin();
+```

@@ -29,10 +29,6 @@ export class WeaveCopyPasteNodesPlugin extends WeavePlugin {
     this.state = COPY_PASTE_NODES_PLUGIN_STATE.IDLE;
   }
 
-  registersLayers() {
-    return false;
-  }
-
   getName() {
     return 'copyPasteNodes';
   }

@@ -1,0 +1,73 @@
+---
+title: WeaveCopyPasteNodesPlugin
+description: Activate support to copy & paste the nodes
+---
+
+import { TypeTable } from "fumadocs-ui/components/type-table";
+
+## Overview
+
+The [WeaveCopyPasteNodesPlugin](https://github.com/InditexTech/weavejs/blob/main/code/packages/sdk/src/plugins/copy-paste-nodes/copy-paste-nodes.ts)
+class that enables copying and pasting nodes within the collaborative canvas environment. It provides
+users with familiar keyboard shortcuts (Ctrl/Cmd + C to copy and Ctrl/Cmd + V to paste), helping them
+duplicate nodes or selections easily while keeping all changes synchronized in real-time across
+connected users.
+
+This plugin improves productivity and usability, especially in complex design, diagramming, or
+whiteboard-style applications.
+
+The class extends the [WeavePlugin](/docs/sdk/api-reference/plugins/plugin) class
+
+## Name
+
+This plugin `name` property value is `copyPasteNodes`.
+
+## Import
+
+```shell
+import { WeaveCopyPasteNodesPlugin } from "@inditextech/weave-sdk";
+```
+
+## Instantiation
+
+```ts
+new WeaveCopyPasteNodesPlugin(callbacks?: WeaveCopyPasteNodesPluginCallbacks);
+```
+
+## TypeScript types
+
+```ts
+type WeaveCopyPasteNodesOnCopyCallback = (error?: Error) => void;
+type WeaveCopyPasteNodesOnPasteCallback = (error?: Error) => void;
+type WeaveCopyPasteNodesOnPasteExternalCallback = (item: ClipboardItem) => void;
+
+type WeaveCopyPasteNodesPluginCallbacks = {
+  onCopy?: WeaveCopyPasteNodesOnCopyCallback;
+  onPaste?: WeaveCopyPasteNodesOnPasteCallback;
+  onPasteExternal?: WeaveCopyPasteNodesOnPasteExternalCallback;
+};
+```
+
+## Parameters
+
+For `WeaveCopyPasteNodesPluginCallbacks`:
+
+<TypeTable
+  type={{
+    ["onCopy"]: {
+      description:
+        "A callback that is called when a copy operation is performed.",
+      type: "WeaveCopyPasteNodesOnCopyCallback",
+    },
+    ["onPaste"]: {
+      description:
+        "A callback that is called when a paste operation is performed.",
+      type: "WeaveCopyPasteNodesOnPasteCallback",
+    },
+    ["onPasteExternal"]: {
+      description:
+        "A callback that is called when someone is trying to paste something that is external to the tab.",
+      type: "WeaveCopyPasteNodesOnPasteExternalCallback",
+    },
+  }}
+/>

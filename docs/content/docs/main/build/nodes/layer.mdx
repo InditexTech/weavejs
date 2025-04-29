@@ -1,0 +1,51 @@
+---
+title: Layer
+description: Segment and order the Stage in layers
+---
+
+import { Accordion, Accordions } from "fumadocs-ui/components/accordion";
+
+The Layer node is a logical container within the Stage. Based on Konva’s
+[Layer](https://konvajs.org/api/Konva.Layer.html), it allows you to separate visual
+elements—for example, background grids, interactive elements, or UI overlays—into
+distinct rendering layers.
+
+Layers improve rendering control, enabling selective updates, independent z-index
+management, and cleaner composition of complex scenes. Nodes rendered within a Layer
+share the same coordinate space but can be managed and updated independently.
+
+## Usage
+
+<Callout title="Don't directly use">
+  We don't recommend to use this node directly. To define the application
+  Layers, use the stores `initialState` configuration property on server-side.
+</Callout>
+
+<Accordions>
+  <Accordion title="1. Import the node" id="import-node">
+    Start by importing the action with the following import:
+
+    ```ts
+    import { WeaveLayerNode } from "@inditextech/weave-sdk";
+    ```
+
+  </Accordion>
+  <Accordion title="2. Register the node" id="register-node">
+    Then register the node on the Weave class instance.
+
+    ```ts
+    const instance = new Weave({
+      ...
+      nodes: [
+        ...,
+        new WeaveLayerNode(), // [!code ++]
+      ]
+    })
+    ```
+
+  </Accordion>
+  <Accordion title="3. Use the node" id="use-the-node">
+    TODO
+
+  </Accordion>
+</Accordions>

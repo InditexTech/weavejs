@@ -1,0 +1,5 @@
+{
+  "title": "API Reference",
+  "description": "Set of React components to help you integrate Weave.js",
+  "pages": ["index", "providers", "hooks"]
+}

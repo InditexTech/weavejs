@@ -1,0 +1,113 @@
+---
+title: WeaveExportNodeToolAction
+description: Export the selected node as an image
+---
+
+import { TypeTable } from "fumadocs-ui/components/type-table";
+
+## Overview
+
+The [WeaveExportNodeToolAction](https://github.com/InditexTech/weavejs/blob/main/code/packages/sdk/src/actions/export-node-tool/export-node-tool.ts)
+class that allows users to export a specific node or group of nodes from the canvas as a standalone image file (e.g., PNG or JPEG).
+This action is especially useful when users want to extract visual components from the canvas for sharing, documentation, thumbnails,
+or reuse outside the app.
+
+It works by rendering the selected node(s) to an off-screen canvas, preserving their current visual appearance, and triggering a downloadable
+export.
+
+The class extends the [WeaveAction](/docs/sdk/api-reference/actions/action) class.
+
+## Name
+
+This action `name` property value is `exportNodeTool`.
+
+## Import
+
+```shell
+import { WeaveExportNodeToolAction } from "@inditextech/weave-sdk";
+```
+
+## Instantiation
+
+```ts
+new WeaveExportNodeToolAction(params: WeaveActionCallbacks);
+```
+
+## TypeScript types
+
+```ts
+const WEAVE_EXPORT_FORMATS: {
+  readonly PNG: "image/png";
+  readonly JPEG: "image/jpeg";
+};
+
+type WeaveExportNodeOptions = {
+  format?: typeof WEAVE_EXPORT_FORMATS.PNG;
+  padding?: number;
+  pixelRatio?: number;
+  backgroundColor?: string;
+  quality?: number;
+};
+
+type WeaveExportNodeActionParams = {
+  node: WeaveElementInstance;
+  options?: WeaveExportNodeOptions;
+};
+```
+
+## Trigger function params
+
+```ts
+trigger(cancelAction: () => void, params?: WeaveExportNodeActionParams): Promise<void>;
+```
+
+For `WeaveExportNodeActionParams`:
+
+<TypeTable
+  type={{
+    ["node"]: {
+      required: true,
+      description: "The node instance to export as image.",
+      type: "WeaveElementInstance",
+    },
+    ["options"]: {
+      description: "The exported image options.",
+      type: "WeaveExportNodeOptions",
+    },
+  }}
+/>
+
+For `WeaveExportNodeOptions`:
+
+<TypeTable
+  type={{
+    ["format"]: {
+      required: true,
+      description: "The format of the image to export.",
+      type: "WeaveExportFormat",
+      default: "WEAVE_EXPORT_FORMATS.PNG",
+    },
+    ["padding"]: {
+      description: "The padding to add to the image to export. In pixels.",
+      type: "number",
+      default: "0",
+    },
+    ["pixelRatio"]: {
+      description:
+        "The pixel ratio to use on the image to export. For example 2 on a image of 400x400 generates a image of 800x800 pixels.",
+      type: "number",
+      default: "1",
+    },
+    ["backgroundColor"]: {
+      description:
+        "The background color to use on the image to export. Is a CCS color value.",
+      type: "string",
+      default: "#FFFFFF",
+    },
+    ["quality"]: {
+      description: "The quality of the image to export. From 0 to 1.",
+      type: "number",
+      default: "1",
+    },
+  }}
+/>

@@ -1,0 +1,62 @@
+---
+title: WeaveZoomOutToolAction
+description: Tool to export the stage as an image
+---
+
+import { TypeTable } from "fumadocs-ui/components/type-table";
+
+## Overview
+
+The [WeaveZoomOutToolAction](https://github.com/InditexTech/weavejs/blob/main/code/packages/sdk/src/actions/zoom-out-tool/zoom-out-tool.ts)
+class that allows users to incrementally zoom out from the canvas Stage.
+It enables users to widen their view, making it easier to see more of the canvas
+at once and navigate large collaborative spaces efficiently.
+
+This action works in coordination with the [WeaveStageZoomPlugin](/docs/sdk/api-reference/plugins/stage-zoom)
+plugin and ensures a smooth zooming experience without disrupting the
+layout or collaboration session.
+
+The class extends the [WeaveAction](/docs/sdk/api-reference/actions/action) class.
+
+## Name
+
+This action `name` property value is `zoomOutTool`.
+
+## Import
+
+```shell
+import { WeaveZoomOutToolAction } from "@inditextech/weave-sdk";
+```
+
+## Instantiation
+
+```ts
+new WeaveZoomOutToolAction(params: WeaveActionCallbacks);
+```
+
+## TypeScript types
+
+```ts
+type WeaveZoomOutToolActionParams = {
+  previousAction: string;
+};
+```
+
+## Trigger function params
+
+```ts
+trigger(cancelAction: () => void, params?: WeaveZoomOutToolActionParams): void;
+```
+
+For `WeaveZoomOutToolActionParams`:
+
+<TypeTable
+  type={{
+    ["previousAction"]: {
+      required: true,
+      description:
+        "The action to trigger after the zoom-out action is completed.",
+      type: "string",
+    },
+  }}
+/>

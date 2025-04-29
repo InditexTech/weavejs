@@ -34,10 +34,6 @@ export class WeaveConnectedUsersPlugin extends WeavePlugin {
       getUser ?? (() => ({ name: 'Unknown', email: 'unknown@domain.com' }));
   }
 
-  registersLayers() {
-    return false;
-  }
-
   getName() {
     return 'connectedUsers';
   }

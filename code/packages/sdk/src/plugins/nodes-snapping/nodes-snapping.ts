@@ -18,10 +18,6 @@ export class WeaveNodesSnappingPlugin extends WeavePlugin {
     this.enabled = true;
   }
 
-  registersLayers() {
-    return true;
-  }
-
   getName() {
     return 'nodesSnapping';
   }

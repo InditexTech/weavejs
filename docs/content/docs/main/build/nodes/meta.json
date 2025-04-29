@@ -1,0 +1,13 @@
+{
+  "title": "Nodes",
+  "pages": [
+    "stage",
+    "layer",
+    "group",
+    "frame",
+    "rectangle",
+    "line",
+    "text",
+    "image"
+  ]
+}

@@ -1,0 +1,85 @@
+---
+title: WeaveNodesSelectionPlugin
+description: Activate support to select nodes on the canvas
+---
+
+import { TypeTable } from "fumadocs-ui/components/type-table";
+
+## Overview
+
+The [WeaveNodesSelectionPlugin](https://github.com/InditexTech/weavejs/blob/main/code/packages/sdk/src/plugins/nodes-selection/nodes-selection.ts)
+class that provides node selection capabilities on the canvas. It allows users to click to
+select individual nodes, multi-select with modifier keys, or drag-select multiple elements at once
+using a selection rectangle (marquee).
+
+Selection is a critical foundation for enabling further interactions like moving, grouping, deleting,
+copying, or applying bulk actions on nodes.
+
+The class extends the [WeavePlugin](/docs/sdk/api-reference/plugins/plugin) class
+
+## Name
+
+This plugin `name` property value is `nodesSelection`.
+
+## Import
+
+```shell
+import { WeaveNodesSelectionPlugin } from "@inditextech/weave-sdk";
+```
+
+## Instantiation
+
+```ts
+new WeaveNodesSelectionPlugin(callbacks: WeaveNodesSelectionPluginCallbacks);
+```
+
+## TypeScript types
+
+```ts
+type WeaveElementAttributes = {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  [key: string]: any;
+  id?: string;
+  nodeType?: string;
+  children?: WeaveStateElement[];
+};
+
+type WeaveStateElement = {
+  key: string;
+  type: string;
+  props: WeaveElementAttributes;
+};
+
+type WeaveSelection = {
+  instance: Konva.Shape | Konva.Group;
+  node: WeaveStateElement;
+};
+
+type WeaveNodesSelectionChangeCallback = (nodes: WeaveSelection[]) => void;
+type WeaveNodesSelectionStageSelectionCallback = () => void;
+
+type WeaveNodesSelectionPluginCallbacks = {
+  onNodesChange: WeaveNodesSelectionChangeCallback;
+  onStageSelection?: WeaveNodesSelectionStageSelectionCallback;
+};
+```
+
+## Parameters
+
+For `WeaveNodesSelectionPluginCallbacks`:
+
+<TypeTable
+  type={{
+    ["onNodesChange"]: {
+      required: true,
+      description:
+        "A callback that is called when the nodes selection changed.",
+      type: "WeaveNodesSelectionChangeCallback",
+    },
+    ["onStageSelection"]: {
+      description:
+        "A callback that is called when the user selects the stage, meaning that it selected nothing.",
+      type: "WeaveNodesSelectionStageSelectionCallback",
+    },
+  }}
+/>

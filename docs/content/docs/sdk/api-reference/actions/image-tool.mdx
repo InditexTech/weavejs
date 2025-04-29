@@ -1,0 +1,97 @@
+---
+title: WeaveImageToolAction
+description: Add an image to the canvas
+---
+
+import { TypeTable } from "fumadocs-ui/components/type-table";
+
+## Overview
+
+The [WeaveImageToolAction](https://github.com/InditexTech/weavejs/blob/main/code/packages/sdk/src/actions/image-tool/image-tool.ts)
+class that enables users to insert image nodes into the canvas. It provides
+an intuitive way to add visual content—either by selecting an image file, dragging
+and dropping, or integrating with an image picker—allowing users to enhance their
+collaborative workspace with rich media.
+
+Each interaction results in the creation of a [WeaveImageNode](/docs/sdk/api-reference/nodes/image),
+which can be resized, moved, and synchronized across all connected users.
+
+The class extends the [WeaveAction](/docs/sdk/api-reference/actions/action) class.
+
+## Name
+
+This action `name` property value is `imageTool`.
+
+## Import
+
+```shell
+import { WeaveImageToolAction } from "@inditextech/weave-sdk";
+```
+
+## Instantiation
+
+```ts
+new WeaveImageToolAction(params: WeaveImageToolActionCallbacks);
+```
+
+## TypeScript types
+
+```ts
+type WeaveImageToolActionOnAddImageCallback = (
+  finished: (imageURL: string) => void
+) => Promise<void>;
+type WeaveImageToolActionOnStartLoadImageCallback = () => void;
+type WeaveImageToolActionOnEndLoadImageCallback = (error?: Error) => void;
+
+type WeaveImageToolActionCallbacks = WeaveActionCallbacks & {
+  onUploadImage: WeaveImageToolActionOnAddImageCallback;
+  onImageLoadStart?: WeaveImageToolActionOnStartLoadImageCallback;
+  onImageLoadEnd?: WeaveImageToolActionOnEndLoadImageCallback;
+};
+
+type WeaveImageToolActionTriggerParams = {
+  imageURL?: string;
+};
+```
+
+## Parameters
+
+For `WeaveImageToolActionCallbacks`, all the properties of WeaveActionCallbacks and:
+
+<TypeTable
+  type={{
+    ["onUploadImage"]: {
+      required: true,
+      description:
+        "Callback that is called when a user tries to add an image to the canvas, this allows to upload the image to an external service (e.g. Azure Storage).",
+      type: "WeaveImageToolActionOnAddImageCallback",
+    },
+    ["onImageLoadStart"]: {
+      description:
+        "Callback called when an image load starts, an image is loaded after is uploaded.",
+      type: "WeaveImageToolActionOnStartLoadImageCallback",
+    },
+    ["onUploadImage"]: {
+      description: "Callback called when an image load ends.",
+      type: "WeaveImageToolActionOnEndLoadImageCallback",
+    },
+  }}
+/>
+
+## Trigger function params
+
+```ts
+trigger(cancelAction: () => void, params?: WeaveImageToolActionTriggerParams): void;
+```
+
+For `WeaveImageToolActionTriggerParams`:
+
+<TypeTable
+  type={{
+    ["imageURL"]: {
+      description:
+        "The URL of the image, if already uploaded to an external service. URL must the same as the application URL to avoid cross-origin issues. We recommend to proxy the images through the application.",
+      type: "string",
+    },
+  }}
+/>

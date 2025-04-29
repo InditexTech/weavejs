@@ -1,0 +1,167 @@
+---
+title: Overview
+description: Getting started with Weave.js React Helper library API
+---
+
+The React Helper Library is a companion package for Weave.js that provides a set of hooks,
+components, and utilities to simplify the integration of Weave.js in React-based applications.
+
+This helper library includes:
+
+- A **provider** component for initializing Weave.js instance.
+- A **hook** to access the initialized instance of a mounted provider.
+
+## Usage
+
+To use this library in a React project just follow this steps:
+
+<div className="fd-steps">
+
+<div className="[&_h3]:fd-step">
+ 
+### Install the dependencies on a React project
+
+First lets install the Weave dependencies for a React project:
+
+```shell
+npm install @inditextech/weave-types @inditextech/weave-sdk @inditextech/weave-react
+```
+
+</div>
+
+<div className="[&_h3]:fd-step">
+ 
+### Setup the provider
+
+Now on the React tree of our app lets instantiate the provider, for example:
+
+```tsx
+import {
+  WeaveStageNode,
+  WeaveLayerNode,
+  WeaveGroupNode,
+  WeaveRectangleNode,
+  WeaveLineNode,
+  WeaveTextNode,
+  WeaveImageNode,
+  WeaveFrameNode,
+  WeaveBrushToolAction,
+  WeaveFrameToolAction,
+  WeaveImageToolAction,
+  WeavePenToolAction,
+  WeaveRectangleToolAction,
+  WeaveMoveToolAction,
+  WeaveSelectionToolAction,
+  WeaveTextToolAction,
+  WeaveZoomOutToolAction,
+  WeaveZoomInToolAction,
+  WeaveExportNodeToolAction,
+  WeaveExportStageToolAction,
+  WeaveFitToScreenToolAction,
+  WeaveFitToSelectionToolAction,
+  WeaveNodesSnappingPlugin,
+  WeaveContextMenuPlugin,
+  WeaveCopyPasteNodesPlugin,
+} from "@inditextech/weave-sdk";
+import { WeaveProvider } from "@inditextech/weave-react";
+import { WeaveUser } from "@inditextech/weave-types";
+import { WeaveStoreWebsockets} from "@inditextech/weave-store-websockets/client";
+...
+
+const MyApp = () => {
+  const roomId = "MyRoom"; // (2)
+
+  const getUser = React.useCallback(() => {
+    return user as WeaveUser;
+  }, [user]);
+
+  // Define your store provider
+  const store = new WeaveStoreAzureWebPubsub(
+    {
+      getUser,
+      undoManagerOptions: {
+        captureTimeout: 500,
+      },
+    },
+    {
+      roomId,
+      url: "http://localhost:1234",
+    }
+  );
+
+  const { fonts, nodes, actions, plugins } = React.useMemo(() => {
+    // Define your fonts
+    const fonts = [
+      {
+        id: "Arial",
+        name: "Arial, sans-serif",
+      },
+      {
+        id: "Helvetica",
+        name: "Helvetica, sans-serif",
+      },
+      {
+        id: "TimesNewRoman",
+        name: "Times New Roman, serif",
+      }
+    ];
+
+    // Define which nodes you want to use
+    const nodes = [
+      new WeaveStageNode(),
+      new WeaveLayerNode(),
+      new WeaveGroupNode(),
+      new WeaveRectangleNode(),
+      new WeaveLineNode(),
+      new WeaveTextNode(),
+      new WeaveImageNode(),
+      new WeaveFrameNode(),
+    ];
+
+    const actions = [
+      new WeaveMoveToolAction(),
+      new WeaveSelectionToolAction(),
+      new WeaveRectangleToolAction(),
+      new WeavePenToolAction(),
+      new WeaveImageToolAction(config), // Setup the Image Tool callbacks
+      new WeaveTextToolAction(),
+      new WeaveFrameToolAction(),
+      new WeaveZoomOutToolAction(),
+      new WeaveZoomInToolAction(),
+      new WeaveFitToScreenToolAction(),
+      new WeaveFitToSelectionToolAction(),
+      new AlignElementsToolAction(),
+      new WeaveExportNodeToolAction(),
+      new WeaveExportStageToolAction(),
+    ];
+
+    const plugins = [
+      new WeaveNodesSnappingPlugin(),
+      new WeaveContextMenuPlugin(),
+      new WeaveCopyPasteNodesPlugin(),
+    ]
+
+    return { fonts, nodes, actions, plugins };
+  }, []);
+
+  return (
+    ...
+    <WeaveProvider
+    containerId="weave"
+      getUser={getUser}
+      store={wsStoreProvider}
+      fonts={fonts}
+      nodes={nodes}
+      actions={actions}
+      customPlugins={plugins}
+    >
+      <RoomLayout /> // Your room content or the enter room page, as children so we can access the Weave instance with the hook
+    </WeaveProvider>
+    ...
+  )
+}
+```
+
+</div>
+
+</div>

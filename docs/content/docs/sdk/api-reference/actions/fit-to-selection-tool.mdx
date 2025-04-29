@@ -1,0 +1,61 @@
+---
+title: WeaveFitToSelectionToolAction
+description: Set the zoom level so all the selected nodes are entirely visible on the screen
+---
+
+import { TypeTable } from "fumadocs-ui/components/type-table";
+
+## Overview
+
+The [WeaveFitToSelectionToolAction](https://github.com/InditexTech/weavejs/blob/main/code/packages/sdk/src/actions/fit-to-selection-tool/fit-to-selection-tool.ts)
+class that automatically zooms and pans the canvas to fit the currently selected nodes within
+the visible viewport. It helps users focus on specific elements of their work quickly, especially
+in large or complex canvases.
+
+This action is the “fit to selection” counterpart of the broader WeaveFitToScreenToolAction, offering
+precise control and workflow efficiency.
+
+The class extends the [WeaveAction](/docs/sdk/api-reference/actions/action) class.
+
+## Name
+
+This action `name` property value is `fitToSelectionTool`.
+
+## Import
+
+```shell
+import { WeaveFitToSelectionToolAction } from "@inditextech/weave-sdk";
+```
+
+## Instantiation
+
+```ts
+new WeaveFitToSelectionToolAction(params: WeaveActionCallbacks);
+```
+
+## TypeScript types
+
+```ts
+type WeaveFitToScreenToolActionParams = {
+  previousAction: string;
+};
+```
+
+## Trigger function params
+
+```ts
+trigger(cancelAction: () => void, params?: WeaveFitToSelectionToolActionParams): void;
+```
+
+For `WeaveFitToSelectionToolActionParams`:
+
+<TypeTable
+  type={{
+    ["previousAction"]: {
+      required: true,
+      description:
+        "The action to trigger after the fit-to-selection action is completed.",
+      type: "string",
+    },
+  }}
+/>

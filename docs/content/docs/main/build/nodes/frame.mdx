@@ -1,0 +1,51 @@
+---
+title: Frame
+description: Canvas-in-canvas element
+---
+
+import { Accordion, Accordions } from "fumadocs-ui/components/accordion";
+
+The Frame node is a container-like visual element used to group and organize other
+nodes within a pre-defined boundary. It functions as a structured layout region, often
+used to represent panels, sections, or modular components on the canvas.
+
+Built using a combination of primitive shapes, the Frame node can include a title,
+background, border, and optional interactive handles. It supports nesting of child
+Nodes, making it ideal for modular UIs, flow sections, or structured diagrams.
+
+## Usage
+
+<Accordions>
+  <Accordion title="1. Import the node" id="import-node">
+    Start by importing the action with the following import:
+
+    ```ts
+    import { WeaveFrameNode } from "@inditextech/weave-sdk";
+    ```
+
+  </Accordion>
+  <Accordion title="2. Register the node" id="register-node">
+    Then register the node on the Weave class instance.
+
+    ```ts
+    const instance = new Weave({
+      ...
+      nodes: [
+        ...,
+        new WeaveFrameNode(), // [!code ++]
+      ]
+    })
+    ```
+
+  </Accordion>
+  <Accordion title="3. Use the node" id="use-the-node">
+    On a frame you can add any node except for:
+
+    - A Frame itself
+    - A [Layer](/docs/main/build/nodes/layer)
+    - A [Stage](/docs/main/build/nodes/stage)
+
+    TODO
+
+  </Accordion>
+</Accordions>

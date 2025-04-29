@@ -1,0 +1,34 @@
+---
+title: WeaveStagePanningPlugin
+description: Activates the panning (move) of the stage
+---
+
+import { TypeTable } from "fumadocs-ui/components/type-table";
+
+## Overview
+
+The [WeaveStagePanningPlugin](https://github.com/InditexTech/weavejs/blob/main/code/packages/sdk/src/plugins/stage-panning/stage-panning.ts)
+class that enables panning the Stage by dragging the canvas background. It allows users
+to move across large workspaces easily, improving navigation and usability, especially
+in collaborative and zoomable environments.
+
+This plugin provides a smooth, intuitive drag-to-move experience, essential for exploring
+detailed or expansive canvases.
+
+The class extends the [WeavePlugin](/docs/sdk/api-reference/plugins/plugin) class
+
+## Name
+
+This plugin `name` property value is `stagePanning`.
+
+## Import
+
+```shell
+import { WeaveStagePanningPlugin } from "@inditextech/weave-sdk";
+```
+
+## Instantiation
+
+```ts
+new WeaveStagePanningPlugin();
+```

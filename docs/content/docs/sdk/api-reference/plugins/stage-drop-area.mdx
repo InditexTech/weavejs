@@ -1,0 +1,65 @@
+---
+title: WeaveStageDropAreaPlugin
+description: Activate support to drop elements on the canvas
+---
+
+import { TypeTable } from "fumadocs-ui/components/type-table";
+
+## Overview
+
+The [WeaveStageDropAreaPlugin](https://github.com/InditexTech/weavejs/blob/main/code/packages/sdk/src/plugins/stage-drop-area/stage-drop-area.ts)
+class that enables drag-and-drop support on the canvas Stage. It lets users drop files, assets, or custom
+elements directly onto the canvas, triggering configurable actions like creating new nodes, importing images,
+or inserting custom components.
+
+This plugin enhances usability by providing a natural, intuitive way for users to bring external content into
+a Weave.js collaborative environment.
+
+The class extends the [WeavePlugin](/docs/sdk/api-reference/plugins/plugin) class
+
+## Name
+
+This plugin `name` property value is `stageDropArea`.
+
+## Import
+
+```shell
+import { WeaveStageDropAreaPlugin } from "@inditextech/weave-sdk";
+```
+
+## Instantiation
+
+```ts
+new WeaveStageDropAreaPlugin(callbacks?: WeaveStageDropAreaPluginCallbacks);
+```
+
+## TypeScript types
+
+```ts
+type WeaveStageDropCallback = (event: DragEvent) => void;
+type WeaveStageDropUploadFileCallback = (event: File) => Promise<void>;
+
+type WeaveStageDropAreaPluginCallbacks = {
+  onStageDrop?: WeaveStageDropCallback;
+  doUploadFile?: WeaveStageDropUploadFileCallback;
+};
+```
+
+## Parameters
+
+For `WeaveStageDropAreaPluginCallbacks`:
+
+<TypeTable
+  type={{
+    ["onStageDrop"]: {
+      description:
+        "A callback that is called when an element is dropped on the stage (canvas).",
+      type: "WeaveStageDropCallback",
+    },
+    ["doUploadFile"]: {
+      description:
+        "A callback that is called when a file is needed to upload to an external environment.",
+      type: "WeaveStageDropUploadFileCallback",
+    },
+  }}
+/>

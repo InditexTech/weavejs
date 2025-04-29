@@ -1,0 +1,34 @@
+---
+title: WeaveMoveToolAction
+description: Activate the panning or movement of the canvas
+---
+
+import { TypeTable } from "fumadocs-ui/components/type-table";
+
+## Overview
+
+The [WeaveMoveToolAction](https://github.com/InditexTech/weavejs/blob/main/code/packages/sdk/src/actions/move-tool/move-tool.ts)
+class that enables users to pan (move) the entire canvas by dragging the background.
+It is specifically designed to allow easy navigation across large or zoomed-in canvases
+without altering the position of nodes or layers.
+
+This tool acts as a navigation aid, switching the canvas into a mode where dragging
+translates the viewport rather than interacting with individual elements.
+
+The class extends the [WeaveAction](/docs/sdk/api-reference/actions/action) class.
+
+## Name
+
+This action `name` property value is `moveTool`.
+
+## Import
+
+```shell
+import { WeaveMoveToolAction } from "@inditextech/weave-sdk";
+```
+
+## Instantiation
+
+```ts
+new WeaveMoveToolAction(params: WeaveActionCallbacks);
+```

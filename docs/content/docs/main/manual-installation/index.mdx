@@ -1,0 +1,150 @@
+---
+title: Manual Installation
+description: Add Weave.js manually to a Next.js project
+---
+
+import { Step, Steps } from "fumadocs-ui/components/steps";
+
+## Introduction
+
+Lets integrate Weave.js on a [Next.js](https://nextjs.org/docs) application manually.
+
+<Callout title="Why Next.js?" type="note">
+  The usage of Next.js on the quickstart allow us to have the frontend and backend
+  on the same artifact, thus simplifies the quickstart process. Also is one of the most understand
+  frameworks built on top of React.
+
+For a detailed code on how to setup Weave.js on separated artifacts, check our
+showcase artifacts implementations repositories: [Backend](https://github.com/InditexTech/weavejs-backend)
+and [Frontend](https://github.com/InditexTech/weavejs-frontend)
+
+</Callout>
+
+<Callout title="Next.js version used">
+  Take into consideration that we will use Next.js version 14, as today Weave.js
+  is not compatible with React 19, which is the version of React that ships with the
+  latest version (v15 when writing this document) of Next.js.
+
+</Callout>
+
+## Setup
+
+In order to have a Weave.js project running, we need to fully complete this
+steps:
+
+<div className="fd-steps">
+
+<div className="[&_h3]:fd-step">
+ 
+### Install Next.js
+
+Lets start our journey by creating a new Next.js application, just run the
+following command - when prompted, accept all the default values:
+
+```shell
+npx create-next-app@next-14
+```
+
+When finished, navigate to the project folder and start the development server
+by running the following command:
+
+```shell
+npm run dev
+```
+
+You should be able now to open your Next.js base app on a browser by navigating
+to http://localhost:3000.
+
+<Callout title="Failed to load images" type="warn">
+  You will notice that some images will fail to load, this is because Next.js
+  images URLs changed and are not available. To fix this is up to Next.js maintainers
+  and not us, we'll ignore it for now as it doesn't affect Us.
+
+</Callout>
+
+</div>
+
+<div className='[&_h3]:fd-step'>
+ 
+### Install Weave.js SDK
+
+Located on your root project folder, install the **Weave.js** SDK by
+executing the following command:
+
+```shell
+npm install @inditextech/weave-sdk @inditextech/weave-types
+```
+
+</div>
+
+<div className='[&_h3]:fd-step'>
+ 
+### Setup the Backend side
+
+Now that the main dependencies are installed, lets first work with the backend side.
+
+In this step we'll [setup the Backend side](/docs/main/manual-installation/backend) of the application.
+
+</div>
+
+<div className='[&_h3]:fd-step'>
+ 
+### Setup the Frontend side
+
+After the backend side is setup, the application also needs a frontend side where
+users will visually collaborate.
+
+In this step we'll [setup the Frontend side](/docs/main/manual-installation/frontend) of the application.
+
+</div>
+
+<div className='[&_h3]:fd-step'>
+ 
+### Run the project
+
+If your completed all the previous steps, you should have a working project, so lets
+run the project with the following command:
+
+```shell
+npm run dev
+```
+
+On a browser navigate to http://localhost:3000, remember, this is the **Enter Room
+page**. On it, just type a _room name_ and your _username_, then click on the `Enter`
+button to join the room.
+
+The application should navigate to http://localhost:3000/room/{roomName}, where
+`{roomName}` is the name of the room you entered. On the **Room page**, you first should
+notice a loader, once loaded you should be able to:
+
+- See the collaborative canvas.
+- Handle the canvas zoom and pan.
+- Create a simple node like a xref:api-reference:sdk/nodes/rectangle.adoc[Rectangle] on it.
+
+Try to open another tab with other _username_ on the same _room name_, you should be
+able to see the changes made by the other user.
+
+Congratulations! You have a working Weave.js application.
+
+</div>
+</div>
+
+## Next steps
+
+Now that you've completed the quickstart, you're ready to dive deeper into Weave.js and unlock its
+full potential. Here are some of our recommended next steps:
+
+### Explore the Architecture
+
+To better understand Weave.js [architecture](/docs/main/build) and to learn
+how to build modular and interactive tools, learn how Weave.js is structured under
+the hood and get familiar with core concepts like:
+
+- [Nodes](/docs/main/build/nodes),
+- [Plugins](/docs/main/build/plugins),
+- and [Actions](/docs/main/build/actions).
+
+### Review the API Reference
+
+Dive into [API reference](/docs/sdk) to explore all available methods, utilities,
+and configuration options. This is your go-to resource as you start building more advanced features.

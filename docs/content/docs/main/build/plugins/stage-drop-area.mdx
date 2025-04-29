@@ -1,0 +1,55 @@
+---
+title: Stage Drop Area
+description: Activate support to drop elements on the canvas
+---
+
+import { Accordion, Accordions } from "fumadocs-ui/components/accordion";
+
+## Introduction
+
+This plugin enables drag-and-drop support on the canvas, allowing users to drop
+elements—such as shapes, files, or custom components—directly onto the Stage. It
+captures drop events, calculates drop positions, and can trigger custom Actions or
+workflows based on the dropped content.
+
+This plugin is ideal for building intuitive drag-to-create interfaces, asset import
+features, or external integrations (e.g., dropping images or nodes from a sidebar).
+It integrates smoothly with Weave.js's action system for precise and flexible drop
+handling.
+
+## Usage
+
+<Accordions>
+  <Accordion title="1. Import the plugin" id="import-plugin">
+    Start by importing the action with the following import:
+
+    ```ts
+    import { WeaveStageDropAreaPlugin } from "@inditextech/weave-sdk";
+    ```
+
+  </Accordion>
+  <Accordion title="2. Register the plugin" id="register-plugin">
+    Then register the action on the Weave class instance.
+
+    ```ts
+    const instance = new Weave({
+      ...
+      plugins: [
+        ...,
+        new WeaveStageDropAreaPlugin({ // [!code ++]
+          onStageDrop, // callback that is called when an element is dropped on the stage [!code ++]
+          doUploadFile, // callback that is called when a file is dropped on the stage [!code ++]
+        }), // [!code ++]
+      ]
+    })
+    ```
+
+  </Accordion>
+  <Accordion title="3. Use the plugin" id="use-the-plugin">
+    Listen when the user drops an element or a file on the canvas, then react
+    accordingly.
+
+    TODO
+
+  </Accordion>
+</Accordions>

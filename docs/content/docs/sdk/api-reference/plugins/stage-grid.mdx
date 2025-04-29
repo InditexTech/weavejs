@@ -1,0 +1,56 @@
+---
+title: WeaveStageGridPlugin
+description: Renders a reference grid behind the nodes layer
+---
+
+import { TypeTable } from "fumadocs-ui/components/type-table";
+
+## Overview
+
+The [WeaveStageGridPlugin](https://github.com/InditexTech/weavejs/blob/main/code/packages/sdk/src/plugins/stage-grid/stage-grid.ts)
+class that renders a background grid on the canvas Stage. It provides visual guides that help users align, arrange,
+and position nodes more precisely, improving layout consistency and the overall user experience.
+
+The plugin can render grids as lines or dots, and it is highly configurable to match the needs of different visual
+collaborative tools, from whiteboards to complex design editors.
+
+The class extends the [WeavePlugin](/docs/sdk/api-reference/plugins/plugin) class
+
+## Name
+
+This plugin `name` property value is `stageGrid`.
+
+## Import
+
+```shell
+import { WeaveStageGridPlugin } from "@inditextech/weave-sdk";
+```
+
+## Instantiation
+
+```ts
+new WeaveStageGridPlugin(params: WeaveStageGridPluginParams);
+```
+
+## TypeScript types
+
+```ts
+type WeaveStageGridPluginParams = {
+  gridSize?: number;
+};
+```
+
+## Parameters
+
+For `WeaveStageGridPluginParams`:
+
+<TypeTable
+  type={{
+    ["gridSize"]: {
+      description:
+        "A number in pixels that define the size of the grid separation.",
+      type: "number",
+      default: "50",
+    },
+  }}
+/>

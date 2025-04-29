@@ -1,0 +1,276 @@
+---
+title: Actions
+description: Actions maintained by Weave.js team
+---
+
+## Introduction
+
+Actions are the core mechanism for handling user-driven changes in Weave.js. Whether
+you're adding a node, moving elements, updating properties, or triggering a custom behavior,
+Actions provide a structured, trackable way to apply changes to the shared state.
+
+Actions help keep your application logic clean and consistent, and collaborative. In Weave.js,
+if something meaningful happens—it’s probably through an Action.
+
+Weave.js includes a set of built-in Actions, but you can also create your own to tailor
+functionality to your specific application needs.
+
+## Action lifecycle
+
+Weave.js action lifecycle is pretty simple:
+
+<Mermaid
+  chart={`
+stateDiagram-v2
+  A: Weave instance is started
+  B: Actions are registered
+  C: getName() is called on each action
+  D: Rendering cycle begins
+  E: First render
+  F: init() is called on each action
+  [*] --> A
+  A --> B
+  state B {
+    C --> [*]
+  }
+  B --> D
+  state D {
+    E --> F
+    F --> [*]
+  }
+  D --> [*]`}
+/>
+
+<div className="fd-steps">
+
+<div className="[&_h3]:fd-step">
+
+### Weave instance is started
+
+</div>
+
+<div className="[&_h3]:fd-step">
+
+### Actions are registered
+
+The `getName` method is used to identify the action.
+
+</div>
+
+<div className="[&_h3]:fd-step">
+
+### Rendering cycle
+
+After the first render, the `init` method of every action is called.
+
+</div>
+</div>
+
+<Callout title="Decoupled from the lifecycle">
+
+The following methods are called outside the lifecycle:
+
+- When an user want to trigger an action, the `trigger` function is called.
+- When the action finishes or the user cancel the action, the `cleanup` function is called.
+
+</Callout>
+
+## Available actions
+
+Weave.js team maintain a set of **actions**, think of them as how the users interact with
+the canvas to build visual collaborative applications. This are the actions:
+
+### UX Tools
+
+<Cards>
+
+<Card href="/docs/main/build/actions/move-tool" title='Move Tool'>
+
+Allows users to enable/disable the panning of canvas. When enabled the user can pan the canvas
+at its will.
+
+</Card>
+
+<Card href="/docs/main/build/actions/selection-tool" title='Selection Tool'>
+
+Allows users to enable/disable the selection mode of the canvas. When enabled the users can
+select nodes, move then, resize them, etc.
+
+</Card>
+
+</Cards>
+
+### Nodes Tools
+
+<Cards>
+
+<Card href="/docs/main/build/actions/rectangle-tool" title='Rectangle Tool'>
+
+Enables users to create new rectangle nodes on the canvas.
+
+</Card>
+
+<Card href="/docs/main/build/actions/pen-tool" title='Pen Tool'>
+
+Enables users to create continuos lines on the canvas with N segments on the canvas.
+
+</Card>
+
+<Card href="/docs/main/build/actions/brush-tool" title='Brush Tool'>
+
+Enables users to paint freeform strokes on the canvas, similar to a digital brush.
+
+</Card>
+
+<Card href="/docs/main/build/actions/image-tool" title='Image Tool'>
+
+Enables users to add images to the canvas by selecting a file.
+
+</Card>
+
+<Card href="/docs/main/build/actions/text-tool" title='Text Tool'>
+
+Enables users to add new text nodes to the canvas by clicking or touching on it.
+
+</Card>
+
+</Cards>
+
+### Grouping Tools
+
+<Cards>
+
+<Card href="/docs/main/build/actions/frame-tool" title='Frame Tool'>
+
+Enables users to create frame nodes by clicking on the canvas.
+
+</Card>
+
+</Cards>
+
+### Zooming Tools
+
+<Cards>
+
+<Card href="/docs/main/build/actions/zoom-in-tool" title='Zoom In Tool'>
+
+Enables users to incrementally zoom into the canvas, providing a more detailed view of
+content.
+
+</Card>
+
+<Card href="/docs/main/build/actions/zoom-out-tool" title='Zoom Out Tool'>
+
+Enables users to incrementally zoom out the canvas, providing a more general view of
+content.
+
+</Card><Card href="/docs/main/build/actions/fit-to-screen-tool" title='Fit to Screen Tool'>
+
+Automatically adjusts the zoom and position of the canvas to ensure all visible nodes
+fit neatly within the viewport.
+
+</Card>
+
+<Card href="/docs/main/build/actions/fit-to-selection-tool" title='Fit to Selection Tool'>
+
+Automatically adjusts the zoom and position of the canvas to ensure all selected nodes
+fit neatly within the viewport.
+
+</Card>
+
+</Cards>
+
+### Export Tools
+
+<Cards>
+
+<Card href="/docs/main/build/actions/export-stage-tool" title='Export Stage Tool'>
+
+Automatically adjusts the zoom and position of the canvas to ensure all visible nodes
+fit neatly within the viewport, and then proceeds to export the viewport as an image.
+
+</Card>
+
+<Card href="/docs/main/build/actions/export-node-tool" title='Export Node Tool'>
+
+Automatically adjusts the zoom and position of the canvas to ensure all selected nodes
+fit neatly within the viewport, and then proceeds to export the viewport as an image.
+
+</Card>
+
+</Cards>
+
+## Extensibility
+
+Developers can also build their own **actions**, empowering this way their applications
+with new interactions closer to the needs of their applications.
+
+### Base class
+
+In Weave.js a Action is a class that extends the
+[WeaveAction](https://github.com/InditexTech/weavejs/blob/main/code/packages/sdk/src/actions/action.ts)
+abstract class, and implements a set of methods that define the Action behavior.
+
+<Callout title="Access the Weave instance">
+
+You can access Weave.js main instance via `this.instance`.
+
+</Callout>
+
+To build an action, create a class that extends the [WeaveAction](https://github.com/InditexTech/weavejs/blob/main/code/packages/sdk/src/actions/action.ts)
+abstract class, and implement the following methods:
+
+#### getName
+
+```ts
+getName(): string
+```
+
+The `getName` method returns the name of the action, used as an identifier
+on the Weave instance.
+
+#### init
+
+```ts
+init?(): void;
+```
+
+The `init` method is optional, and is called after the first render of the
+Weave instance. It's a good place to initialize the action state, events, etc.
+
+#### trigger
+
+```ts
+trigger(cancelAction: () => void, params?: unknown): unknown;
+```
+
+When a user wants to call an action, the `trigger` method is called, it receives
+the following parameters:
+
+- `cancelAction: () => void`: a callback that we call when then user wants to cancel
+  the action, or if the action itself finishes.
+- `params?: unknown`: an optional parameter that the user can pass to the action, dependencies
+  on the action implementation.
+
+#### internalUpdate
+
+```ts
+internalUpdate?(): void;
+```
+
+An action instance is wrapped with the
+[Proxy](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Proxy)
+object, which enables us to intercept the `get` and `set` operations on the action instance.
+
+The `internalUpdate` method is called when the for example the `props` property of the instance
+is updated (via get/set), allowing us to dynamically pass parameters to an action after this is
+triggered.
+
+#### cleanup
+
+```ts
+cleanup?(): void;
+```
+
+The `cleanup` method is called when the action finishes or the user cancel the action. It's a
+good place to clean up the action state, events, etc.

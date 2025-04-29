@@ -23,10 +23,6 @@ export class WeaveStagePanningPlugin extends WeavePlugin {
     this.previousPointer = null;
   }
 
-  registersLayers() {
-    return false;
-  }
-
   getName() {
     return 'stagePanning';
   }

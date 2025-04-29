@@ -1,0 +1,74 @@
+---
+title: Context Menu
+description: Trigger a contextual menu on the canvas
+---
+
+import { Accordion, Accordions } from "fumadocs-ui/components/accordion";
+
+## Introduction
+
+This plugin adds custom right-click menus to the canvas, enabling users to access
+context-specific actions—like deleting nodes, duplicating elements, or triggering
+custom workflows. It enhances usability by offering quick access to relevant tools
+based on the current selection or interaction.
+
+Fully customizable and extensible, making it easy to tailor the experience to your
+application's needs.
+
+## Dependencies
+
+This plugin needs also registered on the Weave instance the following:
+
+- [Nodes selection](/docs/main/build/plugins/nodes-selection) plugin.
+
+## Usage
+
+<Accordions>
+  <Accordion title="1. Import the plugin" id="import-plugin">
+    Start by importing the action with the following import:
+
+    ```ts
+    import { WeaveContextMenuPlugin } from "@inditextech/weave-sdk";
+    ```
+
+  </Accordion>
+  <Accordion title="2. Register the plugin" id="register-plugin">
+    Then register the action on the Weave class instance.
+
+    ```ts
+    const instance = new Weave({
+      ...
+      plugins: [
+        ...,
+        new WeaveContextMenuPlugin({ // [!code ++]
+          xOffset, // define the X offset of the click point  [!code ++]
+          yOffset, // define the Y offset of the click point [!code ++]
+          onNodeMenu, // callback to listen when the user right-click [!code ++]
+        }), // [!code ++]
+      ]
+    })
+    ```
+
+  </Accordion>
+  <Accordion title="3. Use the plugin" id="use-the-plugin">
+    Listen to changes when user right-clicked on the `onNodeMenu` callback, then
+    react accordingly. Something like this:
+    
+    ```ts
+    const instance = new Weave({
+      ...
+      plugins: [
+        ...,
+        new WeaveContextMenuPlugin({
+          onNodeMenu: ({ instance, selection, point, visible }) => {
+            // based on the selection, render the UI of your context menu (options)
+            // and then render it on the coordinates provided by point. Remember to
+            // handle the context menu screen overflow based on the point provided.
+          },
+          ...
+        }),
+      ]
+    })
+    ```
+  </Accordion>
+</Accordions>

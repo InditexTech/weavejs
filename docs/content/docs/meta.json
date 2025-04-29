@@ -1,0 +1,10 @@
+{
+  "pages": [
+    "main",
+    "sdk",
+    "react",
+    "store-websockets",
+    "store-azure-web-pubsub",
+    "types"
+  ]
+}

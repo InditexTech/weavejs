@@ -1,0 +1,67 @@
+---
+title: Copy & Paste Nodes
+description: Activate support to copy & paste the nodes
+---
+
+import { Accordion, Accordions } from "fumadocs-ui/components/accordion";
+
+## Introduction
+
+This plugin enables users to duplicate selected nodes using familiar keyboard
+shortcuts like Ctrl/Cmd + C and Ctrl/Cmd + V, or through options in a context-menu.
+It preserves node structure, styles, and metadata, allowing for quick reuse and
+layout iteration.
+
+Supports multi-node copy & copy & paste between tabs. It integrates
+seamlessly with the selection and action systems, making it a natural part of the
+collaborative editing workflow.
+
+## Dependencies
+
+This plugin needs also registered on the Weave instance the following:
+
+- [Nodes selection](/docs/main/build/plugins/nodes-selection) plugin.
+
+## Usage
+
+<Accordions>
+  <Accordion title="1. Import the plugin" id="import-plugin">
+    Start by importing the action with the following import:
+
+    ```ts
+    import { WeaveCopyPasteNodesPlugin } from "@inditextech/weave-sdk";
+    ```
+
+  </Accordion>
+  <Accordion title="2. Register the plugin" id="register-plugin">
+    Then register the action on the Weave class instance.
+
+    ```ts
+    const instance = new Weave({
+      ...
+      plugins: [
+        ...,
+        new WeaveCopyPasteNodesPlugin({ // [!code ++]
+          onCopy, // callback to listen when the user copies a node or nodes [!code ++]
+          onPaste, // callback to listen when the user paste a node or nodes [!code ++]
+          onPasteExternal, // TODO [!code ++]
+        }), // [!code ++]
+      ]
+    })
+    ```
+
+  </Accordion>
+  <Accordion title="3. Use the plugin" id="use-the-plugin">
+    Users now can copy & paste selected nodes to the actual canvas, or to other canvases
+    located on other tabs.
+    
+    Also depending on your needs:
+
+    - Listen to the `onCopy` callback to know when the user copies a node or nodes,
+      for example to showcase a toast for feedback.
+    - Listen to the `onPaste` callback to know when the user paste a node or nodes,
+      for example to showcase a toast for feedback.
+    - Listen to the `onPasteExternal` callback, TODO.
+
+  </Accordion>
+</Accordions>

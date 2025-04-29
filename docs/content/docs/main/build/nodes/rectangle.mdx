@@ -1,0 +1,46 @@
+---
+title: Rectangle
+description: Draw a rectangle on the canvas
+---
+
+import { Accordion, Accordions } from "fumadocs-ui/components/accordion";
+
+The Rectangle node is a simple, versatile primitive shape used to render rectangular
+elements on the canvas. Built on top of Konva’s [Rect](https://konvajs.org/api/Konva.Rect.html),
+it supports customizable properties such as position, size, fill color, stroke, corner radius,
+and more.
+
+Rectangle nodes are often used as building blocks for UI components, layout guides,
+or user-created nodes. They can also respond to interactions like dragging, resizing,
+or selection.
+
+## Usage
+
+<Accordions>
+  <Accordion title="1. Import the node" id="import-node">
+    Start by importing the action with the following import:
+
+    ```ts
+    import { WeaveRectangleNode } from "@inditextech/weave-sdk";
+    ```
+
+  </Accordion>
+  <Accordion title="2. Register the node" id="register-node">
+    Then register the node on the Weave class instance.
+
+    ```ts
+    const instance = new Weave({
+      ...
+      nodes: [
+        ...,
+        new WeaveRectangleNode(), // [!code ++]
+      ]
+    })
+    ```
+
+  </Accordion>
+  <Accordion title="3. Use the node" id="use-the-node">
+    TODO
+
+  </Accordion>
+</Accordions>

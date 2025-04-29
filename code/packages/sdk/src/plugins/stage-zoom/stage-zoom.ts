@@ -42,10 +42,6 @@ export class WeaveStageZoomPlugin extends WeavePlugin {
     this.onZoomChangeCb = onZoomChange;
   }
 
-  registersLayers() {
-    return false;
-  }
-
   getName() {
     return 'stageZoom';
   }

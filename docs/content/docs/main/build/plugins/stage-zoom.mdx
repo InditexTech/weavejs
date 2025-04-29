@@ -1,0 +1,68 @@
+---
+title: Stage Zoom
+description: Activates support for zoom on the stage
+---
+
+import { Accordion, Accordions } from "fumadocs-ui/components/accordion";
+
+## Introduction
+
+This plugin enables smooth zooming in and out of the canvas, allowing users to
+focus on details or get an overview of the entire workspace. It supports mouse wheel,
+trackpad gestures, and programmatic control, with customizable zoom levels.
+
+This plugin enhances navigation and usability in complex visual tools like
+whiteboards, diagrams, or design interfaces. It integrates seamlessly with the
+panning and resize plugins to provide a fully scalable and interactive canvas
+experience.
+
+## Dependencies
+
+This plugin needs also registered on the Weave instance the following:
+
+- [Nodes selection](/docs/main/build/plugins/nodes-selection) plugin.
+
+## Usage
+
+<Accordions>
+  <Accordion title="1. Import the plugin" id="import-plugin">
+    Start by importing the action with the following import:
+
+    ```ts
+    import { WeaveStageZoomPlugin } from "@inditextech/weave-sdk";
+    ```
+
+  </Accordion>
+  <Accordion title="2. Register the plugin" id="register-plugin">
+    Then register the action on the Weave class instance.
+
+    ```ts
+    const instance = new Weave({
+      ...
+      plugins: [
+        ...,
+        new WeaveStageZoomPlugin({ // [!code ++]
+          zoomSteps, // an array of zoom levels to snap to [!code ++]
+          defaultZoom, // the initial zoom level [!code ++]
+          onZoomChange, // callback that is called when the zoom level changes [!code ++]
+        }), // [!code ++]
+      ]
+    })
+    ```
+
+  </Accordion>
+  <Accordion title="3. Use the plugin" id="use-the-plugin">
+    Now the user, by triggering the actions:
+
+    - [Zoom in tool](/docs/main/build/actions/zoom-in-tool)
+    - [Zoom out tool](/docs/main/build/actions/zoom-out-tool)
+    - [Fit to screen tool](/docs/main/build/actions/fit-to-screen-tool)
+    - [Fit to selection tool](/docs/main/build/actions/fit-to-selection-tool)
+
+    Can change the zoom properties of the stage at its will.
+
+    Also if you need to react to zoom changes you can listen to changes on the `onZoomChange`callback,
+    and then react accordingly.
+
+  </Accordion>
+</Accordions>

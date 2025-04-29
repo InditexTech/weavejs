@@ -2,16 +2,12 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-import { WeavePlugin } from "@/plugins/plugin";
+import { WeavePlugin } from '@/plugins/plugin';
 
 export class WeaveStageResizePlugin extends WeavePlugin {
   getLayerName = undefined;
   initLayer = undefined;
   render: undefined;
-
-  registersLayers() {
-    return false;
-  }
 
   getName() {
     return 'stageResize';

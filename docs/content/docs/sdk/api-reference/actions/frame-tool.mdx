@@ -1,0 +1,63 @@
+---
+title: WeaveFrameToolAction
+description: Allows to add a canvas in canvas area
+---
+
+import { TypeTable } from "fumadocs-ui/components/type-table";
+
+## Overview
+
+The [WeaveFrameToolAction](https://github.com/InditexTech/weavejs/blob/main/code/packages/sdk/src/actions/frame-tool/frame-tool.ts)
+class that allows users to create a new Frame node by clicking and dragging on the canvas. A frame acts
+as a visual container for organizing other nodes and structuring the workspace—similar to sections, groups,
+or modules in visual editors.
+
+This action enables an intuitive, drag-to-create experience for defining new framed areas, which are immediately
+editable and collaborative.
+
+Each interaction results in the creation of a [WeaveFrameNode](/docs/sdk/api-reference/nodes/frame),
+which can be moved and synchronized across all connected users.
+
+The class extends the [WeaveAction](/docs/sdk/api-reference/actions/action) class.
+
+## Name
+
+This action `name` property value is `frameTool`.
+
+## Import
+
+```shell
+import { WeaveFrameToolAction } from "@inditextech/weave-sdk";
+```
+
+## Instantiation
+
+```ts
+new WeaveFrameToolAction(params: WeaveActionCallbacks);
+```
+
+## TypeScript types
+
+```ts
+type WeaveFrameToolActionTriggerParams = {
+  fontFamily?: string;
+};
+```
+
+## Trigger function params
+
+```ts
+trigger(cancelAction: () => void, params?: WeaveFrameToolActionTriggerParams): void;
+```
+
+For `WeaveFrameToolActionTriggerParams`:
+
+<TypeTable
+  type={{
+    ["fontFamily"]: {
+      description: "The font family to use on the Frame title.",
+      type: "string",
+      default: "Arial",
+    },
+  }}
+/>

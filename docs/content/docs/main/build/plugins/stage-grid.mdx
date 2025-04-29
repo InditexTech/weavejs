@@ -1,0 +1,48 @@
+---
+title: Stage Grid
+description: Renders a reference grid behind the nodes layer
+---
+
+import { Accordion, Accordions } from "fumadocs-ui/components/accordion";
+
+## Introduction
+
+This plugin adds a visual background grid to the canvas stage, helping users align
+and position elements more precisely. The grid can be rendered as lines or dots, and
+supports customizable spacing, color, and style.
+
+Is especially useful for diagramming tools, design interfaces, or any
+application where spatial structure improves usability. It integrates seamlessly
+with zoom and pan behaviors to ensure the grid remains consistent and responsive
+during interactions.
+
+## Usage
+
+<Accordions>
+  <Accordion title="1. Import the plugin" id="import-plugin">
+    Start by importing the action with the following import:
+
+    ```ts
+    import { WeaveStageGridPlugin } from "@inditextech/weave-sdk";
+    ```
+
+  </Accordion>
+  <Accordion title="2. Register the plugin" id="register-plugin">
+    Then register the action on the Weave class instance.
+
+    ```ts
+    const instance = new Weave({
+      ...
+      plugins: [
+        ...,
+        new WeaveStageGridPlugin(), // [!code ++]
+      ]
+    })
+    ```
+
+  </Accordion>
+  <Accordion title="3. Use the plugin" id="use-the-plugin">
+    The user now should be able to see the reference grid.
+
+  </Accordion>
+</Accordions>

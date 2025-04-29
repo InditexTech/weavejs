@@ -1,0 +1,45 @@
+---
+title: Text
+description: Draw & edit text on the canvas
+---
+
+import { Accordion, Accordions } from "fumadocs-ui/components/accordion";
+
+The Text node is used to display editable or static text on the canvas. Based on
+Konva’s [Text](https://konvajs.org/api/Konva.Text.html) shape, it supports rich styling
+options including font size, family, color, alignment, and line height.
+
+Text Nodes are essential for labels, annotations, or any UI elements that require
+readable content. They can be fully interactive—allowing selection, dragging, and
+inline editing.
+
+## Usage
+
+<Accordions>
+  <Accordion title="1. Import the node" id="import-node">
+    Start by importing the action with the following import:
+
+    ```ts
+    import { WeaveTextNode } from "@inditextech/weave-sdk";
+    ```
+
+  </Accordion>
+  <Accordion title="2. Register the node" id="register-node">
+    Then register the node on the Weave class instance.
+
+    ```ts
+    const instance = new Weave({
+      ...
+      nodes: [
+        ...,
+        new WeaveTextNode(), // [!code ++]
+      ]
+    })
+    ```
+
+  </Accordion>
+  <Accordion title="3. Use the node" id="use-the-node">
+    TODO
+
+  </Accordion>
+</Accordions>

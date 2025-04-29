@@ -1,0 +1,13 @@
+{
+  "title": "Websockets Store",
+  "description": "Store implementation using WebSockets as transport",
+  "icon": "DatabaseZap",
+  "root": true,
+  "pages": [
+    "---Introduction---",
+    "index",
+    "setup",
+    "---API Reference---",
+    "...api-reference"
+  ]
+}

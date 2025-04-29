@@ -1,0 +1,70 @@
+---
+title: Nodes Selection
+description: Activate support to select nodes on the canvas
+---
+
+import { Accordion, Accordions } from "fumadocs-ui/components/accordion";
+
+## Introduction
+
+This plugin enables users to select one or multiple nodes on the canvas through
+clicks (touch), shift-clicks, or drag-selection (marquee). It provides the foundation
+for interactions like moving, grouping, editing, or deleting elements.
+
+It handles selection state, visual highlighting, and integrates with other
+plugins (like keyboard shortcuts or transformation tools) to enable rich, interactive
+workflows. It’s essential for building intuitive, user-friendly collaborative
+interfaces.
+
+## Usage
+
+<Accordions>
+  <Accordion title="1. Import the plugin" id="import-plugin">
+    Start by importing the action with the following import:
+
+    ```ts
+    import { WeaveNodesSelectionPlugin } from "@inditextech/weave-sdk";
+    ```
+
+  </Accordion>
+  <Accordion title="2. Register the plugin" id="register-plugin">
+    Then register the action on the Weave class instance.
+
+    ```ts
+    const instance = new Weave({
+      ...
+      plugins: [
+        ...,
+        new WeaveNodesSelectionPlugin({ // [!code ++]
+          onNodesChange, // callback to listen to node selection changes [!code ++]
+          onStageSelection, // callback to listen when the user clicks or touches the canvas, no nodes are selected [!code ++]
+        }), // [!code ++]
+      ]
+    })
+    ```
+
+  </Accordion>
+  <Accordion title="3. Use the plugin" id="use-the-plugin">
+    Listen to changes to the selected nodes, then react accordingly. Something like
+    this:
+    
+    ```ts
+    const instance = new Weave({
+      ...
+      plugins: [
+        ...,
+        new WeaveContextMenuPlugin({
+          onNodesChange: (selectedNodes) => {
+            // based on the selection, act accordingly
+          },
+          onStageSelection: () => {
+            // if you need to do something when the user clicks on the stage
+            // no nodes are selected
+          }
+          ...
+        }),
+      ]
+    })
+    ```
+  </Accordion>
+</Accordions>

@@ -1,0 +1,34 @@
+---
+title: WeaveNodesSnappingPlugin
+description: Allow to snap nodes to guides and to themselves
+---
+
+import { TypeTable } from "fumadocs-ui/components/type-table";
+
+## Overview
+
+The [WeaveNodesSnappingPlugin](https://github.com/InditexTech/weavejs/blob/main/code/packages/sdk/src/plugins/nodes-snapping/nodes-snapping.ts)
+class that enables smart snapping behavior when users move or resize nodes. It helps align nodes with
+each other, grids, or guides automatically, improving layout precision and visual consistency across
+the canvas.
+
+Snapping provides users with subtle, intuitive assistance when organizing elements, making building
+clean and aligned interfaces much easier—especially in collaborative environments.
+
+The class extends the [WeavePlugin](/docs/sdk/api-reference/plugins/plugin) class
+
+## Name
+
+This plugin `name` property value is `nodesSnapping`.
+
+## Import
+
+```shell
+import { WeaveNodesSnappingPlugin } from "@inditextech/weave-sdk";
+```
+
+## Instantiation
+
+```ts
+new WeaveNodesSnappingPlugin();
+```

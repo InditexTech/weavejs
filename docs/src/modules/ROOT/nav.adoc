@@ -1,7 +1,0 @@
-* xref:overview.adoc[]
-* xref:quickstart.adoc[]
-* xref:guides.adoc[]
-** xref:guides/guide.1.adoc[]
-* xref:api-reference.adoc[]
-* xref:architecture.adoc[]
-* xref:community.adoc[]

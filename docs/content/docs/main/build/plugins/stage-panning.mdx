@@ -1,0 +1,55 @@
+---
+title: Stage Panning
+description: Activates the panning (move) of the stage
+---
+
+import { Accordion, Accordions } from "fumadocs-ui/components/accordion";
+
+## Introduction
+
+This plugin enables users to navigate the canvas by dragging to move around the
+Stage. It enhances the user experience by allowing intuitive exploration
+of large or zoomed-in workspaces, especially in collaborative or diagram-heavy
+environments.
+
+This plugin handles input events like mouse drag or touch gestures, and smoothly
+updates the Stage’s position. It integrates seamlessly with other plugins like
+zoom, grid, and selection—ensuring fluid and natural canvas navigation.
+
+## Dependencies
+
+This plugin needs also registered on the Weave instance the following:
+
+- [Move tool](/docs/main/build/plugins/move-tool) action.
+
+## Usage
+
+<Accordions>
+  <Accordion title="1. Import the plugin" id="import-plugin">
+    Start by importing the action with the following import:
+
+    ```ts
+    import { WeaveStagePanningPlugin } from "@inditextech/weave-sdk";
+    ```
+
+  </Accordion>
+  <Accordion title="2. Register the plugin" id="register-plugin">
+    Then register the action on the Weave class instance.
+
+    ```ts
+    const instance = new Weave({
+      ...
+      plugins: [
+        ...,
+        new WeaveStagePanningPlugin(), // [!code ++]
+      ]
+    })
+    ```
+
+  </Accordion>
+  <Accordion title="3. Use the plugin" id="use-the-plugin">
+    The user now, when toggle the [Move tool](/docs/main/build/actions/move-tool) action
+    should be able to pan the stage at its will.
+
+  </Accordion>
+</Accordions>

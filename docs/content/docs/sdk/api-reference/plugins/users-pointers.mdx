@@ -1,0 +1,60 @@
+---
+title: WeaveUsersPointersPlugin
+description: Showcase the position of the users mouse pointer on the canvas
+---
+
+import { TypeTable } from "fumadocs-ui/components/type-table";
+
+## Overview
+
+The [WeaveUsersPointersPlugin](https://github.com/InditexTech/weavejs/blob/main/code/packages/sdk/src/plugins/users-pointers/users-pointers.ts)
+class that enables real-time cursor sharing across all connected users on the collaborative canvas. It displays live
+pointer positions, often tagged with user metadata like name or color, allowing participants to see each other’s
+activity and collaborate more intuitively.
+
+This plugin helps create a shared sense of presence, making collaborative tools feel dynamic, interactive, and
+truly multi-user.
+
+The class extends the [WeavePlugin](/docs/sdk/api-reference/plugins/plugin) class
+
+## Name
+
+This plugin `name` property value is `usersPointers`.
+
+## Import
+
+```shell
+import { WeaveUsersPointersPlugin } from "@inditextech/weave-sdk";
+```
+
+## Instantiation
+
+```ts
+new WeaveUsersPointersPlugin(params: WeaveUsersPointersPluginParams);
+```
+
+## TypeScript types
+
+```ts
+type WeaveUser = {
+  name: string;
+  email: string;
+};
+
+type WeaveUsersPointersPluginParams = {
+  getUser?: () => WeaveUser;
+};
+```
+
+## Parameters
+
+For `WeaveUsersPointersPluginParams`:
+
+<TypeTable
+  type={{
+    ["getUser"]: {
+      description: "A function that returns the actual instance user metadata.",
+      type: "() => WeaveUser",
+    },
+  }}
+/>
