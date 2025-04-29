@@ -11,7 +11,7 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "next start",
     "postinstall": "fumadocs-mdx",
-    "verify": "npm ci && npm run build",
+    "verify": "npm ci --force && npm run build",
     "version:development": "export BUMP_DEVELOP_VERSION=$(npm version $(npm version minor)-prerelease)",
     "version:release": "npm ci && npm version $RELEASE_VERSION"
   },
