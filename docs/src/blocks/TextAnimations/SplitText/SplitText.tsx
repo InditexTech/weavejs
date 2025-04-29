@@ -25,7 +25,7 @@ const SpanWrapper = ({
   className,
   children,
 }: {
-  style?: any;
+  style?: React.CSSProperties;
   className?: string;
   children: React.ReactNode;
 }) => {

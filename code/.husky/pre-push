@@ -4,8 +4,7 @@ if [ "${SKIP_HOOKS}" != "true" ]
 then
   npm run git:pre-push
 fi
-cd ..
-cd docs
+cd ../docs
 if [ "${SKIP_HOOKS}" != "true" ]
 then
   npm run git:pre-push
