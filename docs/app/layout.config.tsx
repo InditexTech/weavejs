@@ -9,7 +9,7 @@ import {
 } from "lucide-react";
 import Logo from "@/public/images/logo.png";
 import Image from "next/image";
-import Preview from "@/public/banner.png";
+import Preview from "@/public/placeholder.png";
 
 export const logo = (
   <>
@@ -55,7 +55,7 @@ export const baseOptions: BaseLayoutProps = {
                 <Image
                   src={Preview}
                   alt="Preview"
-                  className="rounded-t-lg object-cover"
+                  className="rounded-t-lg object-cover w-full h-[200px]"
                   style={{
                     maskImage:
                       "linear-gradient(to bottom,white 60%,transparent)",

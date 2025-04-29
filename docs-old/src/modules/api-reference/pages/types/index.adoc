@@ -1,5 +1,0 @@
-= TypeScript types
-
-== Guides summary
-
-TODO

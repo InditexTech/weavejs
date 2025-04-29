@@ -1,5 +1,0 @@
-= Server API
-
-== Guides summary
-
-TODO

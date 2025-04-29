@@ -1,0 +1,62 @@
+---
+title: WeaveZoomInToolAction
+description: Increases one step the stage zoom level
+---
+
+import { TypeTable } from "fumadocs-ui/components/type-table";
+
+## Overview
+
+The [WeaveZoomInToolAction](https://github.com/InditexTech/weavejs/blob/main/code/packages/sdk/src/actions/zoom-in-tool/zoom-in-tool.ts)
+class that allows users to incrementally zoom in on the canvas Stage. It provides
+a simple, user-friendly way to enlarge the view, helping users focus on fine
+details within a complex visual environment.
+
+This action works in coordination with the [WeaveStageZoomPlugin](/docs/sdk/api-reference/plugins/stage-zoom)
+plugin and ensures a smooth zooming experience without disrupting the
+layout or collaboration session.
+
+The class extends the [WeaveAction](/docs/sdk/api-reference/actions/action) class.
+
+## Name
+
+This action `name` property value is `zoomInTool`.
+
+## Import
+
+```shell
+import { WeaveZoomInToolAction } from "@inditextech/weave-sdk";
+```
+
+## Instantiation
+
+```ts
+new WeaveZoomInToolAction(params: WeaveActionCallbacks);
+```
+
+## TypeScript types
+
+```ts
+type WeaveZoomInToolActionParams = {
+  previousAction: string;
+};
+```
+
+## Trigger function params
+
+```ts
+trigger(cancelAction: () => void, params?: WeaveZoomInToolActionParams): void;
+```
+
+For `WeaveZoomInToolActionParams`:
+
+<TypeTable
+  type={{
+    ["previousAction"]: {
+      required: true,
+      description:
+        "The action to trigger after the zoom-in action is completed.",
+      type: "string",
+    },
+  }}
+/>

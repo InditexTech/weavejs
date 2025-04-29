@@ -1,5 +1,0 @@
-= Tutorials
-
-== Guides summary
-
-TODO

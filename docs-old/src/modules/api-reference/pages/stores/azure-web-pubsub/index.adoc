@@ -1,5 +1,0 @@
-= Azure Web Pubsub store
-
-== Guides summary
-
-TODO

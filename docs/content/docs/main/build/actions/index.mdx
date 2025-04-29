@@ -17,7 +17,29 @@ functionality to your specific application needs.
 
 ## Action lifecycle
 
-Weave.js plugin lifecycle is pretty simple:
+Weave.js action lifecycle is pretty simple:
+
+<Mermaid
+  chart={`
+stateDiagram-v2
+  A: Weave instance is started
+  B: Actions are registered
+  C: getName() is called on each action
+  D: Rendering cycle begins
+  E: First render
+  F: init() is called on each action
+  [*] --> A
+  A --> B
+  state B {
+    C --> [*]
+  }
+  B --> D
+  state D {
+    E --> F
+    F --> [*]
+  }
+  D --> [*]`}
+/>
 
 <div className="fd-steps">
 
@@ -31,7 +53,7 @@ Weave.js plugin lifecycle is pretty simple:
 
 ### Actions are registered
 
-The `getName` method is used to identify the plugin.
+The `getName` method is used to identify the action.
 
 </div>
 

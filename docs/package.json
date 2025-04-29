@@ -16,6 +16,8 @@
   },
   "dependencies": {
     "@radix-ui/react-slot": "^1.2.0",
+    "@react-spring/web": "^9.7.5",
+    "framer-motion": "^12.9.2",
     "fumadocs-core": "15.2.9",
     "fumadocs-mdx": "11.6.1",
     "fumadocs-ui": "15.2.9",

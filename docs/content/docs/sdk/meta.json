@@ -1,6 +1,6 @@
 {
   "title": "SDK",
-  "description": "The headless library",
+  "description": "The visual collaborative tool headless library",
   "icon": "Package",
   "root": true,
   "pages": [

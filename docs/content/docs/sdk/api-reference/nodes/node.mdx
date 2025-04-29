@@ -1,0 +1,152 @@
+---
+title: WeaveNode
+description: Blueprint for the Node API
+---
+
+## Overview
+
+The abstract [WeaveNode](https://github.com/InditexTech/weavejs/blob/main/code/packages/sdk/src/nodes/node.ts)
+class is the foundational building block for all nodes in the Weave.js ecosystem. It provides
+a common structure and behavior that all other specific nodes (like rectangles, text, images,
+frames, groups, etc.) extend.
+
+By centralizing shared functionality—such as positioning, transformations, event handling,
+and real-time updates—WeaveNodeBase ensures consistency, efficiency, and extensibility
+across the entire node system. Also providing a same syntax for all nodes, make them easier
+to understand.
+
+All nodes must extend this class.
+
+<Callout title="Don't directly use" type="warn">
+  Don't instantiate this WeaveNode class directly.
+</Callout>
+
+## Import
+
+```shell
+import { WeaveNode } from "@inditextech/weave-sdk";
+```
+
+## Type
+
+All nodes must define a property:
+
+```ts
+nodeType: string;
+```
+
+Which defines the node identity, for example the node that handles an image it's `nodeType` is
+`image`. The `nodeType` must be unique among other nodes.
+
+## JSON Model
+
+A node state must be represented using a JSON model, for this we based on React component
+JSON representation, lets call this the `WeaveStateElement`, and take a look at it TypeScript
+definition:
+
+```json
+type WeaveStateElement = {
+  key: string, // (1)
+  type: string, // (2)
+  props: {
+    [key: string]: unknown; // (3)
+    id?: string;
+    nodeType?: string;
+    children?: WeaveStateElement[]; // (4)
+  }
+}
+```
+
+- **(1)**: `key` property, nothing more that an unique identifier of the node.
+- **(2)**: `type` property, defines the kind of node this element represents, for example: rectangle,
+  text, image, etc.
+- **(3)**: `props.key`: defines a property (or properties) of the node, like its color, position, etc.
+  A node can define all the properties it need. It's necessary that the type of the value is a primitive:
+  string, number, boolean, object, array or null, mainly because the element must be serializable via JSON.
+- **(4)**: `props.children`: define the child nodes of this node. This is the property that makes the
+  model hierarchical. Order matters.
+
+## Methods
+
+### getNodeType
+
+```ts
+getNodeType(): string
+```
+
+This method returns the `nodeType` property of the node.
+
+### getSelectionPlugin
+
+```ts
+getSelectionPlugin(): WeaveNodesSelectionPlugin | null
+```
+
+This method returns the `WeaveNodesSelectionPlugin` if is registered on the Weave class instance.
+If not registered returns `null`.
+
+### isSelecting
+
+```ts
+isSelecting(): boolean
+```
+
+This method returns `true` if the Selection Tool is active, `false` otherwise.
+
+### isNodeSelected
+
+```ts
+isNodeSelected(ele: Konva.Node): boolean
+```
+
+This method returns `true` if the specified node is selected, `false` otherwise.
+
+## Abstract Methods
+
+### createNode
+
+```ts
+createNode(key: string, props: WeaveElementAttributes): WeaveStateElement
+```
+
+This method creates a JSON model of the node, based on the previous explained model.
+
+### createInstance
+
+```ts
+createInstance(props: WeaveElementAttributes): WeaveElementInstance
+```
+
+This method converts the node JSON model representation into a Konva instance. This is
+the ideal place to initialize events related to the node for example.
+
+This method is used by the internal React Reconciler to handler the rendering of the
+stage.
+
+### updateInstance
+
+```ts
+updateInstance(
+  instance: WeaveElementInstance,
+  nextProps: WeaveElementAttributes
+): void
+```
+
+This method updates a rendered instance of Konva, that represents a node.
+
+### removeInstance
+
+```ts
+removeInstance(instance: WeaveElementInstance): void
+```
+
+This method destroys the Konva instance rendered, that represents a node.
+
+### toNode
+
+```ts
+toNode(instance: WeaveElementInstance): WeaveStateElement
+```
+
+This method returns the JSON model representation of the provided Konva instance
+that is handled by this Node definition.

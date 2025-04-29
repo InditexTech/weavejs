@@ -3,50 +3,47 @@ title: WeaveLayerNode
 description: Layer node API Reference
 ---
 
-import { CpuIcon, Database } from "lucide-react";
+## Overview
 
-Weave.js is a modular library that streamlines the **development of visual
-collaborative web applications** built on-top of an HTML5 canvas, designed with a
-robust architecture, **Weave.js** enables developers to extend functionality
-seamlessly.
+The [WeaveLayerNode](https://github.com/InditexTech/weavejs/blob/main/code/packages/sdk/src/nodes/layer/layer.ts)
+class represents a logical and visual container within the Weave.js canvas, built directly on top of Konva’s
+[Layer](https://konvajs.org/api/Konva.Layer.html) class. It serves as an organizational unit for grouping nodes
+together, improving rendering performance, and structuring complex scenes in a manageable way.
 
-Weave.js offers a clean and efficient API for:
+Layers are useful for:
 
-<Cards>
+- Improving performance by isolating redraws, only the layers with changes are re-rendered, minimizing canvas work.
+- Helps managing the visual stacking order also known as z-index (in terms of layers).
+- Specific layers can be used by plugins, for example, a grid plugin uses a grid layer to render the grid isolated
+  from the main layer where the user add the nodes of their application.
 
-<Card icon={<CpuIcon className="text-purple-300" />} title='Weave.js SDK'>
-
-Handles most of the logic, includes the base nodes, plugins and actions.
-
-</Card>
-
-<Card icon={<Database className="text-blue-300" />} title='Weave.js Store'>
-
-Handles the backend & frontend (client) logic to support real-time collaboration
-on top different transports.
-
-</Card>
-
-</Cards>
-
-Ideal for building applications such as whiteboards, diagram editors and design
-platforms, Weave.js provides the flexibility and scalability needed for modern,
-canvas-based collaborative tools.
-
-<Callout title="Want to learn more?">
-  Read our in-depth [What is Weave.js](/docs/main/what-is-weavejs) introduction.
+<Callout title="Amount of layers" type="warn">
+  As specified on [Konva.js
+  documentation](https://konvajs.org/docs/performance/Layer_Management.html), in
+  terms of performance, we should take into account the amount of layers we
+  create (this mainly because each layer is a separate instance of a canvas),
+  the maximum amount of layers shouldn't exceed 5.
 </Callout>
 
-## Live demo
+The class extends the [WeaveNode](/docs/sdk/api-reference/nodes/node) class
 
-<div className="flex justify-center items-center *:max-w-[700px] bg-gradient-to-br from-fd-primary/10 rounded-xl border">
-  ![Enter room page of the Weave.js showcase](/images/showcase.png)
-</div>
+## Type
 
-Check our [live whiteboard application](https://weavejs.cloud.inditex.com) built using:
+This node `nodeType` property value is `layer`.
 
-- [React](https://es.react.dev/) & [Next.js](https://nextjs.org/) for the frontend side
-- [Express](https://expressjs.com/) & [Node.js](https://nodejs.org/es) on the backend side
+## Import
 
-Demonstrating the creation from scratch of a real-time, collaborative visual workspace
-application.
+```shell
+import { WeaveLayerNode } from "@inditextech/weave-sdk";
+```
+
+## Instantiation
+
+<Callout title="Don't directly use">
+  We don't recommend to use this node directly. To define the application Stage,
+  use the stores `initialState` configuration property on server-side.
+</Callout>
+
+```ts
+new WeaveLayerNode();
+```

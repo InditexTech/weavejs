@@ -351,6 +351,14 @@ type LinkButtonProps = {
   className?: string;
   href: string;
   external?: boolean;
+  variant?:
+    | "default"
+    | "destructive"
+    | "outline"
+    | "secondary"
+    | "ghost"
+    | "link";
+  style?: "default" | "main";
   children: ReactNode;
 };
 
@@ -358,6 +366,8 @@ export const LinkButton = ({
   className = "",
   href,
   external = false,
+  variant = "default",
+  style = "default",
   children,
 }: Readonly<LinkButtonProps>) => {
   const router = useRouter();
@@ -378,8 +388,14 @@ export const LinkButton = ({
 
   return (
     <Button
-      variant="outline"
-      className={cn("font-mono cursor-pointer", className)}
+      variant={variant}
+      className={cn(
+        "font-mono cursor-pointer",
+        className,
+        style === "default" && "bg-white",
+        style === "main" &&
+          "bg-zinc-950 hover:bg-zinc-500 border-zinc-950 hover:border-zinc-500 dark:bg-zinc-700 dark:hover:bg-zinc-500 dark:hover:border-zinc-500"
+      )}
       onClick={handleStartApplicationClick}
     >
       {children}

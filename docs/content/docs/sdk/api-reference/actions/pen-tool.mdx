@@ -1,0 +1,36 @@
+---
+title: WeavePenToolAction
+description: Add line segments to the canvas
+---
+
+import { TypeTable } from "fumadocs-ui/components/type-table";
+
+## Overview
+
+The [WeavePenToolAction](https://github.com/InditexTech/weavejs/blob/main/code/packages/sdk/src/actions/pen-tool/pen-tool.ts)
+class that allows users to draw precise, vector-based paths by clicking to place
+points and optionally closing or smoothing the resulting shape. Unlike the brush
+tool (which captures freehand strokes), the pen tool emphasizes structured line
+creation, making it ideal for diagrams, connectors, wireframes, and flow-based
+interactions.
+
+Each completed path becomes a [WeaveLineNode](/docs/sdk/api-reference/nodes/line),
+synced in real time across all collaborators.
+
+The class extends the [WeaveAction](/docs/sdk/api-reference/actions/action) class.
+
+## Name
+
+This action `name` property value is `penTool`.
+
+## Import
+
+```shell
+import { WeavePenToolAction } from "@inditextech/weave-sdk";
+```
+
+## Instantiation
+
+```ts
+new WeavePenToolAction(params: WeaveActionCallbacks);
+```

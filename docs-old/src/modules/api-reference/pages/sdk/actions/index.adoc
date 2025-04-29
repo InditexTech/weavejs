@@ -1,5 +1,0 @@
-= Actions
-
-== Guides summary
-
-TODO

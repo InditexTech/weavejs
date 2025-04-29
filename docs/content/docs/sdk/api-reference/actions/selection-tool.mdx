@@ -1,52 +1,35 @@
 ---
 title: WeaveSelectionToolAction
-description: Tool to handle node selection
+description: Activate the selection of canvas nodes
 ---
 
-import { CpuIcon, Database } from "lucide-react";
+import { TypeTable } from "fumadocs-ui/components/type-table";
 
-Weave.js is a modular library that streamlines the **development of visual
-collaborative web applications** built on-top of an HTML5 canvas, designed with a
-robust architecture, **Weave.js** enables developers to extend functionality
-seamlessly.
+## Overview
 
-Weave.js offers a clean and efficient API for:
+The [WeaveSelectionToolAction](https://github.com/InditexTech/weavejs/blob/main/code/packages/sdk/src/actions/selection-tool/selection-tool.ts)
+class that allows users to enter or exit selection mode. While it does not handle
+the selection logic itself, it activates the selection behavior managed by the
+[WeaveNodesSelectionPlugin](/docs/sdk/api-reference/plugins/nodes-selection),
+enabling users to click or drag to select nodes on the canvas.
 
-<Cards>
+This tool acts as a toggle for interaction context, letting users switch between
+selection and other editing tools (e.g., draw, pan, or create).
 
-<Card icon={<CpuIcon className="text-purple-300" />} title='Weave.js SDK'>
+The class extends the [WeaveAction](/docs/sdk/api-reference/actions/action) class.
 
-Handles most of the logic, includes the base nodes, plugins and actions.
+## Name
 
-</Card>
+This action `name` property value is `selectionTool`.
 
-<Card icon={<Database className="text-blue-300" />} title='Weave.js Store'>
+## Import
 
-Handles the backend & frontend (client) logic to support real-time collaboration
-on top different transports.
+```shell
+import { WeaveSelectionToolAction } from "@inditextech/weave-sdk";
+```
 
-</Card>
+## Instantiation
 
-</Cards>
-
-Ideal for building applications such as whiteboards, diagram editors and design
-platforms, Weave.js provides the flexibility and scalability needed for modern,
-canvas-based collaborative tools.
-
-<Callout title="Want to learn more?">
-  Read our in-depth [What is Weave.js](/docs/main/what-is-weavejs) introduction.
-</Callout>
-
-## Live demo
-
-<div className="flex justify-center items-center *:max-w-[700px] bg-gradient-to-br from-fd-primary/10 rounded-xl border">
-  ![Enter room page of the Weave.js showcase](/images/showcase.png)
-</div>
-
-Check our [live whiteboard application](https://weavejs.cloud.inditex.com) built using:
-
-- [React](https://es.react.dev/) & [Next.js](https://nextjs.org/) for the frontend side
-- [Express](https://expressjs.com/) & [Node.js](https://nodejs.org/es) on the backend side
-
-Demonstrating the creation from scratch of a real-time, collaborative visual workspace
-application.
+```ts
+new WeaveSelectionToolAction(params: WeaveActionCallbacks);
+```

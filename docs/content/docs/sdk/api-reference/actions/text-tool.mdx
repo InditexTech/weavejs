@@ -1,0 +1,34 @@
+---
+title: WeaveTextToolAction
+description: Add text to the canvas
+---
+
+import { TypeTable } from "fumadocs-ui/components/type-table";
+
+## Overview
+
+The [WeaveTextToolAction](https://github.com/InditexTech/weavejs/blob/main/code/packages/sdk/src/actions/text-tool/text-tool.ts)
+class that allows users to insert text nodes onto the canvas by clicking. It
+provides a fast and intuitive way to add labels, notes, annotations, or any textual
+content within a collaborative visual environment.
+
+Each interaction results in the creation of a [WeaveTextNode](/docs/sdk/api-reference/nodes/text),
+ready for direct editing and synchronized in real time with all connected users.
+
+The class extends the [WeaveAction](/docs/sdk/api-reference/actions/action) class.
+
+## Name
+
+This action `name` property value is `textTool`.
+
+## Import
+
+```shell
+import { WeaveTextToolAction } from "@inditextech/weave-sdk";
+```
+
+## Instantiation
+
+```ts
+new WeaveTextToolAction(params: WeaveActionCallbacks);
+```

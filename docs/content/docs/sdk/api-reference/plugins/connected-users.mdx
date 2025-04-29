@@ -3,50 +3,74 @@ title: WeaveConnectedUsersPlugin
 description: Get an structure with information about the connected users
 ---
 
-import { CpuIcon, Database } from "lucide-react";
+import { TypeTable } from "fumadocs-ui/components/type-table";
 
-Weave.js is a modular library that streamlines the **development of visual
-collaborative web applications** built on-top of an HTML5 canvas, designed with a
-robust architecture, **Weave.js** enables developers to extend functionality
-seamlessly.
+## Overview
 
-Weave.js offers a clean and efficient API for:
+The [WeaveConnectedUsersPlugin](https://github.com/InditexTech/weavejs/blob/main/code/packages/sdk/src/plugins/connected-users/connected-users.ts)
+class represents a plugin that manages and returns information about users connected to a collaborative
+session. It tracks user presence through the shared store and provides metadata such as active users,
+their IDs, names, and statuses, enabling applications to build user lists, indicators, and collaborative
+awareness features.
 
-<Cards>
+It enhances the multi-user experience by letting participants know who is connected, online, or active on
+the canvas in real time.
 
-<Card icon={<CpuIcon className="text-purple-300" />} title='Weave.js SDK'>
+The class extends the [WeavePlugin](/docs/sdk/api-reference/plugins/plugin) class
 
-Handles most of the logic, includes the base nodes, plugins and actions.
+## Name
 
-</Card>
+This plugin `name` property value is `connectedUsers`.
 
-<Card icon={<Database className="text-blue-300" />} title='Weave.js Store'>
+## Import
 
-Handles the backend & frontend (client) logic to support real-time collaboration
-on top different transports.
+```shell
+import { WeaveConnectedUsersPlugin } from "@inditextech/weave-sdk";
+```
 
-</Card>
+## Instantiation
 
-</Cards>
+```ts
+new WeaveConnectedUsersPlugin(params: WeaveConnectedUsersPluginParams);
+```
 
-Ideal for building applications such as whiteboards, diagram editors and design
-platforms, Weave.js provides the flexibility and scalability needed for modern,
-canvas-based collaborative tools.
+## TypeScript types
 
-<Callout title="Want to learn more?">
-  Read our in-depth [What is Weave.js](/docs/main/what-is-weavejs) introduction.
-</Callout>
+```ts
+type WeaveUser = {
+  name: string;
+  email: string;
+};
 
-## Live demo
+type WeaveConnectedUsersChanged = {
+  [userName: string]: WeaveUser;
+};
 
-<div className="flex justify-center items-center *:max-w-[700px] bg-gradient-to-br from-fd-primary/10 rounded-xl border">
-  ![Enter room page of the Weave.js showcase](/images/showcase.png)
-</div>
+type WeaveConnectedUsersChangeCallback = (
+  users: WeaveConnectedUsersChanged
+) => void;
 
-Check our [live whiteboard application](https://weavejs.cloud.inditex.com) built using:
+type WeaveConnectedUsersPluginParams = {
+  onConnectedUsersChanged?: WeaveConnectedUsersChangeCallback;
+  getUser?: () => WeaveUser;
+};
+```
 
-- [React](https://es.react.dev/) & [Next.js](https://nextjs.org/) for the frontend side
-- [Express](https://expressjs.com/) & [Node.js](https://nodejs.org/es) on the backend side
+## Parameters
 
-Demonstrating the creation from scratch of a real-time, collaborative visual workspace
-application.
+For `WeaveConnectedUsersPluginParams`:
+
+<TypeTable
+  type={{
+    ["onConnectedUsersChanged"]: {
+      description:
+        "A callback that returns a representation of the connected users.",
+      type: "WeaveConnectedUsersChangeCallback",
+    },
+    ["getUser"]: {
+      description:
+        "A function that returns the instance user metadata, used to inform the actual connected user to other peers.",
+      type: "() => WeaveUser",
+    },
+  }}
+/>

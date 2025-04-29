@@ -1,0 +1,139 @@
+---
+title: WeavePlugin
+description: Blueprint for the Plugin API
+---
+
+## Overview
+
+The abstract [WeavePlugin](https://github.com/InditexTech/weavejs/blob/main/code/packages/sdk/src/plugins/plugin.ts)
+class represents the base structure for all plugins in the Weave.js ecosystem. Plugins are modular components that
+extend the functionality of the canvas environment without modifying the core Weave.js system itself.
+
+The WeavePlugin class provides the foundational API that all specific plugins—such as selection tools, grid rendering,
+snapping systems, or user pointers—inherit and build upon. It defines the lifecycle hooks and integration points necessary
+to inject custom behavior into a Weave.js app.
+
+Plugins are ideal for:
+
+- Building reusable visual or behavioral extensions for the canvas.
+- Enabling domain-specific tools (e.g., diagramming tools, design tool overlays).
+- Keeping the core system clean and lightweight, while scaling with feature complexity.
+- Supporting collaborative behaviors (e.g., multi-user cursors, collaborative selection).
+
+All plugins must extend this class.
+
+<Callout title="Don't directly use" type="warn">
+  Don't instantiate this WeavePlugin class directly.
+</Callout>
+
+## Lifecycle
+
+A Weave.js plugin lifecycle is pretty simple:
+
+<Mermaid
+  chart={`
+stateDiagram-v2
+  A: Weave instance is started
+  B: Plugins are registered
+  C: getName() is called on each plugin
+  D: Rendering cycle begins
+  E: First render completed
+  F: init() is called on each plugin
+  G: Subsequent renders
+  H: render() is called on each plugin
+  [*] --> A
+  A --> B
+  state B {
+    C --> [*]
+  }
+  B --> D
+  state D {
+    E --> F
+    F --> G
+  }
+  state G {
+    H --> [*]
+  }
+  G --> G
+  D --> [*]`}
+/>
+
+<Callout title="Decoupled from the lifecycle">
+
+The following methods are called outside the lifecycle:
+
+- When an user wants to disable the plugin, the `disable` method is called.
+- When an user wants to enable the plugin, the `enable` method is called.
+
+</Callout>
+
+## Import
+
+```shell
+import { WeavePlugin } from "@inditextech/weave-sdk";
+```
+
+## Name
+
+All plugins must define a property:
+
+```ts
+name: string;
+```
+
+Which defines the plugin identity, for example the plugin that handles the stage grid it's `name` is
+`stageGrid`. The `name` must be unique among other plugins.
+
+## Methods
+
+### getName
+
+```ts
+getName(): string
+```
+
+This method returns the `name` property of the node.
+
+### isEnabled
+
+```ts
+isEnabled(): boolean
+```
+
+This method returns `true` if the plugin is enabled, `false` otherwise.
+
+## Abstract Methods
+
+### init
+
+```ts
+init?(): void
+```
+
+This method initializes the plugin, ideal to initialize all necessary Konva elements needed
+and their events.
+
+### render
+
+```ts
+render?(): void;
+```
+
+This method is called then the canvas re-renders, useful to update the plugin nodes updated
+according to the changes made by the user.
+
+### enable
+
+```ts
+enable(): void
+```
+
+This method makes enabled the plugin.
+
+### disable
+
+```ts
+disable(): void;
+```
+
+This method disables the plugin.

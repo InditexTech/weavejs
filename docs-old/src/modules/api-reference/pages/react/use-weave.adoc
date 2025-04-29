@@ -1,5 +1,0 @@
-= `useWeave`
-
-== Guides summary
-
-TODO

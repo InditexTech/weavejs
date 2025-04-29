@@ -1,5 +1,0 @@
-= Client API
-
-== Guides summary
-
-TODO

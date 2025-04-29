@@ -7,5 +7,5 @@ export type WeaveStageDropUploadFileCallback = (event: File) => Promise<void>;
 
 export type WeaveStageDropAreaPluginCallbacks = {
   onStageDrop?: WeaveStageDropCallback;
-  doUploadFile?: WeaveStageDropUploadFileCallback;
+  doUploadFile?: WeaveStageDropUploadFileCallback; // TODO: MAYBE REMOVE?
 };

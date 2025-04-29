@@ -3,50 +3,83 @@ title: WeaveNodesSelectionPlugin
 description: Activate support to select nodes on the canvas
 ---
 
-import { CpuIcon, Database } from "lucide-react";
+import { TypeTable } from "fumadocs-ui/components/type-table";
 
-Weave.js is a modular library that streamlines the **development of visual
-collaborative web applications** built on-top of an HTML5 canvas, designed with a
-robust architecture, **Weave.js** enables developers to extend functionality
-seamlessly.
+## Overview
 
-Weave.js offers a clean and efficient API for:
+The [WeaveNodesSelectionPlugin](https://github.com/InditexTech/weavejs/blob/main/code/packages/sdk/src/plugins/nodes-selection/nodes-selection.ts)
+class that provides node selection capabilities on the canvas. It allows users to click to
+select individual nodes, multi-select with modifier keys, or drag-select multiple elements at once
+using a selection rectangle (marquee).
 
-<Cards>
+Selection is a critical foundation for enabling further interactions like moving, grouping, deleting,
+copying, or applying bulk actions on nodes.
 
-<Card icon={<CpuIcon className="text-purple-300" />} title='Weave.js SDK'>
+The class extends the [WeavePlugin](/docs/sdk/api-reference/plugins/plugin) class
 
-Handles most of the logic, includes the base nodes, plugins and actions.
+## Name
 
-</Card>
+This plugin `name` property value is `nodesSelection`.
 
-<Card icon={<Database className="text-blue-300" />} title='Weave.js Store'>
+## Import
 
-Handles the backend & frontend (client) logic to support real-time collaboration
-on top different transports.
+```shell
+import { WeaveNodesSelectionPlugin } from "@inditextech/weave-sdk";
+```
 
-</Card>
+## Instantiation
 
-</Cards>
+```ts
+new WeaveNodesSelectionPlugin(callbacks: WeaveNodesSelectionPluginCallbacks);
+```
 
-Ideal for building applications such as whiteboards, diagram editors and design
-platforms, Weave.js provides the flexibility and scalability needed for modern,
-canvas-based collaborative tools.
+## TypeScript types
 
-<Callout title="Want to learn more?">
-  Read our in-depth [What is Weave.js](/docs/main/what-is-weavejs) introduction.
-</Callout>
+```ts
+type WeaveElementAttributes = {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  [key: string]: any;
+  id?: string;
+  nodeType?: string;
+  children?: WeaveStateElement[];
+};
 
-## Live demo
+type WeaveStateElement = {
+  key: string;
+  type: string;
+  props: WeaveElementAttributes;
+};
 
-<div className="flex justify-center items-center *:max-w-[700px] bg-gradient-to-br from-fd-primary/10 rounded-xl border">
-  ![Enter room page of the Weave.js showcase](/images/showcase.png)
-</div>
+type WeaveSelection = {
+  instance: Konva.Shape | Konva.Group;
+  node: WeaveStateElement;
+};
 
-Check our [live whiteboard application](https://weavejs.cloud.inditex.com) built using:
+type WeaveNodesSelectionChangeCallback = (nodes: WeaveSelection[]) => void;
+type WeaveNodesSelectionStageSelectionCallback = () => void;
 
-- [React](https://es.react.dev/) & [Next.js](https://nextjs.org/) for the frontend side
-- [Express](https://expressjs.com/) & [Node.js](https://nodejs.org/es) on the backend side
+type WeaveNodesSelectionPluginCallbacks = {
+  onNodesChange: WeaveNodesSelectionChangeCallback;
+  onStageSelection?: WeaveNodesSelectionStageSelectionCallback;
+};
+```
 
-Demonstrating the creation from scratch of a real-time, collaborative visual workspace
-application.
+## Parameters
+
+For `WeaveNodesSelectionPluginCallbacks`:
+
+<TypeTable
+  type={{
+    ["onNodesChange"]: {
+      required: true,
+      description:
+        "A callback that is called when the nodes selection changed.",
+      type: "WeaveNodesSelectionChangeCallback",
+    },
+    ["onStageSelection"]: {
+      description:
+        "A callback that is called when the user selects the stage, meaning that it selected nothing.",
+      type: "WeaveNodesSelectionStageSelectionCallback",
+    },
+  }}
+/>

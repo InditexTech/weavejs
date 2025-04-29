@@ -1,52 +1,60 @@
 ---
-title: Users Pointers
+title: WeaveUsersPointersPlugin
 description: Showcase the position of the users mouse pointer on the canvas
 ---
 
-import { CpuIcon, Database } from "lucide-react";
+import { TypeTable } from "fumadocs-ui/components/type-table";
 
-Weave.js is a modular library that streamlines the **development of visual
-collaborative web applications** built on-top of an HTML5 canvas, designed with a
-robust architecture, **Weave.js** enables developers to extend functionality
-seamlessly.
+## Overview
 
-Weave.js offers a clean and efficient API for:
+The [WeaveUsersPointersPlugin](https://github.com/InditexTech/weavejs/blob/main/code/packages/sdk/src/plugins/users-pointers/users-pointers.ts)
+class that enables real-time cursor sharing across all connected users on the collaborative canvas. It displays live
+pointer positions, often tagged with user metadata like name or color, allowing participants to see each other’s
+activity and collaborate more intuitively.
 
-<Cards>
+This plugin helps create a shared sense of presence, making collaborative tools feel dynamic, interactive, and
+truly multi-user.
 
-<Card icon={<CpuIcon className="text-purple-300" />} title='Weave.js SDK'>
+The class extends the [WeavePlugin](/docs/sdk/api-reference/plugins/plugin) class
 
-Handles most of the logic, includes the base nodes, plugins and actions.
+## Name
 
-</Card>
+This plugin `name` property value is `usersPointers`.
 
-<Card icon={<Database className="text-blue-300" />} title='Weave.js Store'>
+## Import
 
-Handles the backend & frontend (client) logic to support real-time collaboration
-on top different transports.
+```shell
+import { WeaveUsersPointersPlugin } from "@inditextech/weave-sdk";
+```
 
-</Card>
+## Instantiation
 
-</Cards>
+```ts
+new WeaveUsersPointersPlugin(params: WeaveUsersPointersPluginParams);
+```
 
-Ideal for building applications such as whiteboards, diagram editors and design
-platforms, Weave.js provides the flexibility and scalability needed for modern,
-canvas-based collaborative tools.
+## TypeScript types
 
-<Callout title="Want to learn more?">
-  Read our in-depth [What is Weave.js](/docs/main/what-is-weavejs) introduction.
-</Callout>
+```ts
+type WeaveUser = {
+  name: string;
+  email: string;
+};
 
-## Live demo
+type WeaveUsersPointersPluginParams = {
+  getUser?: () => WeaveUser;
+};
+```
 
-<div className="flex justify-center items-center *:max-w-[700px] bg-gradient-to-br from-fd-primary/10 rounded-xl border">
-  ![Enter room page of the Weave.js showcase](/images/showcase.png)
-</div>
+## Parameters
 
-Check our [live whiteboard application](https://weavejs.cloud.inditex.com) built using:
+For `WeaveUsersPointersPluginParams`:
 
-- [React](https://es.react.dev/) & [Next.js](https://nextjs.org/) for the frontend side
-- [Express](https://expressjs.com/) & [Node.js](https://nodejs.org/es) on the backend side
-
-Demonstrating the creation from scratch of a real-time, collaborative visual workspace
-application.
+<TypeTable
+  type={{
+    ["getUser"]: {
+      description: "A function that returns the actual instance user metadata.",
+      type: "() => WeaveUser",
+    },
+  }}
+/>

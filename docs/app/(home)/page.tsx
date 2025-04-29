@@ -3,7 +3,7 @@ import React from "react";
 import { cva } from "class-variance-authority";
 import { cn } from "@/lib/utils";
 import Image from "next/image";
-import ArchImg from "./arch.png";
+// import ArchImg from "./arch.png";
 import PlaceholderImg from "./placeholder.png";
 import { type LucideIcon, PencilRulerIcon, ToyBrickIcon } from "lucide-react";
 import {
@@ -21,8 +21,11 @@ import {
 import { CodeBlock } from "@/components/ui/code-block";
 import Threads from "@/src/Backgrounds/Threads/Threads";
 import { LinkButton, PreviewImages } from "./page.client";
-import Feature1Img from "./feature.1.png";
-import Feature2Img from "./feature.2.png";
+import SplitText from "@/src/blocks/TextAnimations/SplitText/SplitText";
+import ShinyText from "@/src/blocks/TextAnimations/ShinyText/ShinyText";
+import RotatingText from "@/src/blocks/TextAnimations/RotatingText/RotatingText";
+// import Feature1Img from "./feature.1.png";
+// import Feature2Img from "./feature.2.png";
 
 export default function HomePage() {
   return (
@@ -59,16 +62,34 @@ export default function HomePage() {
 
 function Hero() {
   return (
-    <div className="rounded-t-md relative z-[2] flex flex-col justify-center items-center border-x border-t bg-zinc-100/80 dark:bg-zinc-900/80 px-6 pt-12 text-center md:px-12 md:pt-16 [.uwu_&]:hidden max-lg:overflow-hidden">
+    <div className="relative z-[2] flex flex-col justify-center items-center px-6 pt-12 text-center md:px-12 md:pt-16 [.uwu_&]:hidden max-lg:overflow-hidden">
       <h1 className="mb-8 text-4xl font-medium md:hidden">
         Build your
         <br />
-        Visual Collaborative Tool
+        <SplitText
+          text="Visual Collaborative Tool"
+          className="text-4xl font-medium text-center"
+          delay={25}
+          animationFrom={{ opacity: 0, transform: "translate3d(0,-50px,0)" }}
+          animationTo={{ opacity: 1, transform: "translate3d(0,0,0)" }}
+          threshold={0.1}
+          rootMargin="50px"
+        />
       </h1>
       <h1 className="mb-8 text-3xl font-medium max-md:hidden">
         <span className="font-mono text-fd-muted-foreground">build</span>
         <br />
-        <span className="text-5xl">Visual Collaborative Tools</span>
+        <span className="text-5xl">
+          <SplitText
+            text="Visual Collaborative Tools"
+            className="text-5xl font-medium text-center"
+            delay={25}
+            animationFrom={{ opacity: 0, transform: "translate3d(0,-50px,0)" }}
+            animationTo={{ opacity: 1, transform: "translate3d(0,0,0)" }}
+            threshold={0.1}
+            rootMargin="50px"
+          />
+        </span>
         <br />
         <span className="font-mono text-fd-muted-foreground">
           with less effort
@@ -80,8 +101,19 @@ function Hero() {
         collaborative tool will be ready in minutes.
       </p>
       <div className="w-full flex justify-center items-center gap-3 max-md:mx-auto">
-        <LinkButton href="/docs/main/quickstart">Getting Started</LinkButton>
-        <LinkButton href="https://weavejs.cloud.inditex.com" external>
+        <LinkButton href="/docs/main/quickstart" variant="default" style="main">
+          <ShinyText
+            text="Getting started"
+            disabled={false}
+            speed={3}
+            className="dark:text-black"
+          />
+        </LinkButton>
+        <LinkButton
+          href="https://weavejs.cloud.inditex.com"
+          external
+          variant="outline"
+        >
           Check the Demo
         </LinkButton>
       </div>
@@ -94,9 +126,9 @@ function Architecture() {
   return (
     <div className="rounded-b-md flex flex-col items-center gap-4 border-x border-t border-b px-8 py-8 md:py-12 md:pt-24 lg:flex-row md:px-12">
       <Image
-        src={ArchImg}
+        src={PlaceholderImg}
         alt="Architecture"
-        className="ms-auto w-full max-w-[450px] invert dark:invert-0"
+        className="ms-auto w-full max-w-[450px] invert-0 dark:invert"
       />
       <div className="shrink-0 flex-1 text-start">
         <p className="p-3 py-2 rounded-md text-sm font-mono bg-fd-primary text-fd-primary-foreground font-bold w-fit mb-4">
@@ -170,7 +202,7 @@ function Introduction(): React.ReactElement {
             Build the UI / UX for your visual collaborative tool.
           </p>
         </div>
-        <LinkButton href="/docs/main/quickstart">
+        <LinkButton href="/docs/main/quickstart" variant="outline">
           Start your Application
         </LinkButton>
       </div>
@@ -200,10 +232,10 @@ function Features() {
         className="overflow-hidden"
         href="/docs/main/what-is-weavejs"
       >
-        <div className="w-full mb-12 flex flex-col justify-center items-center bg-[#f2efed]">
+        <div className="w-full mb-12 flex flex-col justify-center items-center bg-[#d9d9d9] invert-0 dark:invert">
           <Image
             alt="UI Framework Agnostic"
-            src={Feature1Img}
+            src={PlaceholderImg}
             sizes="800px"
             className="w-full min-w-[400px] max-h-[400px] object-contain"
           />
@@ -229,10 +261,10 @@ function Features() {
         }
         href="/docs/main/build"
       >
-        <div className="w-full mb-12 flex flex-col justify-center items-center bg-[#f2efed]">
+        <div className="w-full mb-12 flex flex-col justify-center items-center bg-[#d9d9d9] invert-0 dark:invert">
           <Image
             alt="Powerful Abstractions"
-            src={Feature2Img}
+            src={PlaceholderImg}
             sizes="800px"
             className="w-full min-w-[400px] max-h-[400px] object-contain"
           />
@@ -257,12 +289,12 @@ function Features() {
         }
         href="/docs/main/build/stores"
       >
-        <div className="w-full mb-12 flex flex-col justify-center items-center">
+        <div className="w-full mb-12 flex flex-col justify-center items-center bg-[#d9d9d9] invert-0 dark:invert">
           <Image
             alt="Source"
             src={PlaceholderImg}
             sizes="600px"
-            className="w-full min-w-[400px] max-h-[400px] object-cover"
+            className="w-full min-w-[400px] max-h-[400px] object-contain"
           />
         </div>
       </Feature>
@@ -285,12 +317,12 @@ function Features() {
         }
         href="/docs/react"
       >
-        <div className="w-full mb-12 flex flex-col justify-center items-center">
+        <div className="w-full mb-12 flex flex-col justify-center items-center bg-[#d9d9d9] invert-0 dark:invert">
           <Image
             alt="Source"
             src={PlaceholderImg}
             sizes="600px"
-            className="w-full min-w-[400px] max-h-[400px] object-cover"
+            className="w-full min-w-[400px] max-h-[400px] object-contain"
           />
         </div>
       </Feature>
@@ -328,7 +360,12 @@ function Feature({
         </div>
         <h2 className="mb-2 text-lg font-semibold">{heading}</h2>
         <p className="font-light text-fd-muted-foreground">{description}</p>
-        <LinkButton className="w-full mt-4" href={href} external={external}>
+        <LinkButton
+          className="w-full mt-4"
+          href={href}
+          external={external}
+          variant="outline"
+        >
           Learn More
         </LinkButton>
       </div>
@@ -389,8 +426,8 @@ function Highlight({
 function End() {
   return (
     <div className="grid grid-cols-1 bg-[var(--border)] gap-[1px] rounded-md border overflow-hidden md:grid-cols-2 lg:grid-cols-12">
-      <Integration className="lg:col-span-8" />
-      <div className="bg-white dark:bg-black relative flex flex-col gap-8 overflow-hidden px-8 py-14 lg:col-span-4">
+      <Integration className="lg:col-span-6" />
+      <div className="bg-white dark:bg-black relative flex flex-col gap-8 overflow-hidden p-8 lg:col-span-6">
         <h2 className="text-3xl font-thin font-mono uppercase text-fd-muted-foreground/50">
           Build Your
           <br />
@@ -400,7 +437,7 @@ function End() {
           <li>
             <span className="flex flex-row items-center gap-2 font-mono">
               <BatteryChargingIcon className="size-5" />
-              Battery guaranteed.
+              Support guaranteed.
             </span>
             <span className="mt-2 text-sm font-light text-fd-muted-foreground">
               Actively maintained, open for contributions.
@@ -418,16 +455,22 @@ function End() {
           <li>
             <span className="flex flex-row items-center gap-2 font-mono">
               <TimerIcon className="size-5" />
-              Within seconds.
+              Within minutes.
             </span>
             <span className="mt-2 text-sm font-light text-fd-muted-foreground">
-              Initialize a new project almost instantly.
+              Initialize a new project in a few minutes.
             </span>
           </li>
         </ul>
         <div className="grid grid-cols-1 flex-wrap gap-2 border-t pt-8">
-          <LinkButton href="/docs/main">Read the docs</LinkButton>
-          <LinkButton href="https://weavejs.cloud.inditex.com" external>
+          <LinkButton href="/docs/main" variant="outline">
+            Read the docs
+          </LinkButton>
+          <LinkButton
+            href="https://weavejs.cloud.inditex.com"
+            external
+            variant="outline"
+          >
             Check the Demo
           </LinkButton>
         </div>
@@ -449,24 +492,43 @@ function Integration({
       {...props}
     >
       <div className="col-span-full p-8">
-        <p className="text-sm font-mono">Available now</p>
+        <p className="text-md text-3xl font-thin font-mono uppercase text-fd-muted-foreground/50">
+          Available now
+        </p>
+        <p className="text-sm font-mono mt-5">Scaffold a backend service</p>
         <CodeBlock
           wrapper={{ className: "mt-2" }}
           lang="bash"
-          code="pnpm create weavejs-backend-app"
+          code="pnpm create weave-backend-app"
         />
+        <p className="text-sm font-mono">Scaffold a frontend application</p>
         <CodeBlock
           wrapper={{ className: "mt-2" }}
           lang="bash"
-          code="pnpm create weavejs-frontend-app"
+          code="pnpm create weave-frontend-app"
         />
       </div>
-      <Image
+      <div className="flex flex-col gap-3 p-8 bg-[#d9d9d9] justify-center items-center invert-0 dark:invert">
+        <div className="font-mono text-2xl text-zinc-800">Weave.js is</div>
+        <RotatingText
+          texts={["creativity", "collaborative", "simple", "synced"]}
+          mainClassName="font-mono bg-red-300 text-3xl px-2 sm:px-2 md:px-3 bg-cyan-300 text-black overflow-hidden py-0.5 sm:py-1 md:py-2 justify-center rounded-lg"
+          staggerFrom={"last"}
+          initial={{ y: "100%" }}
+          animate={{ y: 0 }}
+          exit={{ y: "-120%" }}
+          staggerDuration={0.025}
+          splitLevelClassName="overflow-hidden pb-0.5 sm:pb-1 md:pb-1"
+          transition={{ type: "spring", damping: 30, stiffness: 400 }}
+          rotationInterval={2000}
+        />
+      </div>
+      {/* <Image
         alt="Source"
         src={PlaceholderImg}
         sizes="600px"
-        className="w-full min-w-[400px]"
-      />
+        className="w-full min-w-[400px] max-h-[200px] object-contain bg-[#d9d9d9] invert-0 dark:invert"
+      /> */}
     </div>
   );
 }

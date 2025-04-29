@@ -1,5 +1,0 @@
-= React helper
-
-== Guides summary
-
-TODO

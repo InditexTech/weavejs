@@ -21,31 +21,33 @@ functionality to your specific application needs.
 
 Weave.js plugin lifecycle is pretty simple:
 
-<div className="fd-steps">
-
-<div className="[&_h3]:fd-step">
-
-### Weave instance is started
-
-</div>
-
-<div className="[&_h3]:fd-step">
-
-### Plugins are registered
-
-The `getName` method is used to identify the plugin.
-
-</div>
-
-<div className="[&_h3]:fd-step">
-
-### Rendering cycle
-
-- After the first render, the `init` method of every plugins is called.
-- On subsequent renders, the `render` method is called.
-
-</div>
-</div>
+<Mermaid
+  chart={`
+stateDiagram-v2
+  A: Weave instance is started
+  B: Plugins are registered
+  C: getName() is called on each plugin
+  D: Rendering cycle begins
+  E: First render completed
+  F: init() is called on each plugin
+  G: Subsequent renders
+  H: render() is called on each plugin
+  [*] --> A
+  A --> B
+  state B {
+    C --> [*]
+  }
+  B --> D
+  state D {
+    E --> F
+    F --> G
+  }
+  state G {
+    H --> [*]
+  }
+  G --> G
+  D --> [*]`}
+/>
 
 <Callout title="Decoupled from the lifecycle">
 

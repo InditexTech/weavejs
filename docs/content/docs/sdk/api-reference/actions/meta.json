@@ -1,6 +1,7 @@
 {
   "title": "Actions",
   "pages": [
+    "action",
     "move-tool",
     "selection-tool",
     "rectangle-tool",

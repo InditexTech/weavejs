@@ -3,50 +3,87 @@ title: WeaveContextMenuPlugin
 description: Trigger a contextual menu on the canvas
 ---
 
-import { CpuIcon, Database } from "lucide-react";
+import { TypeTable } from "fumadocs-ui/components/type-table";
 
-Weave.js is a modular library that streamlines the **development of visual
-collaborative web applications** built on-top of an HTML5 canvas, designed with a
-robust architecture, **Weave.js** enables developers to extend functionality
-seamlessly.
+## Overview
 
-Weave.js offers a clean and efficient API for:
+The [WeaveContextMenuPlugin](https://github.com/InditexTech/weavejs/blob/main/code/packages/sdk/src/plugins/context-menu/context-menu.ts)
+class that enables custom right-click (context) menus on the canvas. It provides a flexible and modular way
+to trigger context-aware actions based on where and what the user right-clicks—whether it's a node, empty
+space, or selection.
 
-<Cards>
+This plugin enhances usability by letting developers define dynamic, context-sensitive options, making the
+user experience faster, more intuitive, and better organized.
 
-<Card icon={<CpuIcon className="text-purple-300" />} title='Weave.js SDK'>
+The class extends the [WeavePlugin](/docs/sdk/api-reference/plugins/plugin) class
 
-Handles most of the logic, includes the base nodes, plugins and actions.
+## Name
 
-</Card>
+This plugin `name` property value is `contextMenu`.
 
-<Card icon={<Database className="text-blue-300" />} title='Weave.js Store'>
+## Import
 
-Handles the backend & frontend (client) logic to support real-time collaboration
-on top different transports.
+```shell
+import { WeaveContextMenuPlugin } from "@inditextech/weave-sdk";
+```
 
-</Card>
+## Instantiation
 
-</Cards>
+```ts
+new WeaveContextMenuPlugin(
+  options: WeaveStageContextMenuPluginOptions,
+  callbacks: WeaveStageContextMenuPluginCallbacks
+);
+```
 
-Ideal for building applications such as whiteboards, diagram editors and design
-platforms, Weave.js provides the flexibility and scalability needed for modern,
-canvas-based collaborative tools.
+## TypeScript types
 
-<Callout title="Want to learn more?">
-  Read our in-depth [What is Weave.js](/docs/main/what-is-weavejs) introduction.
-</Callout>
+```ts
+type WeaveStageContextMenuPluginOptions = {
+  xOffset?: number;
+  yOffset?: number;
+};
 
-## Live demo
+type WeaveOnNodeMenuCallback = (
+  instance: Weave,
+  selection: WeaveSelection[],
+  point: Vector2d,
+  visible: boolean
+) => void;
 
-<div className="flex justify-center items-center *:max-w-[700px] bg-gradient-to-br from-fd-primary/10 rounded-xl border">
-  ![Enter room page of the Weave.js showcase](/images/showcase.png)
-</div>
+type WeaveStageContextMenuPluginCallbacks = {
+  onNodeMenu: WeaveOnNodeMenuCallback;
+};
+```
 
-Check our [live whiteboard application](https://weavejs.cloud.inditex.com) built using:
+## Parameters
 
-- [React](https://es.react.dev/) & [Next.js](https://nextjs.org/) for the frontend side
-- [Express](https://expressjs.com/) & [Node.js](https://nodejs.org/es) on the backend side
+For `WeaveStageContextMenuPluginOptions`:
 
-Demonstrating the creation from scratch of a real-time, collaborative visual workspace
-application.
+<TypeTable
+  type={{
+    ["xOffset"]: {
+      description: "X-axis offset of the click point in pixels.",
+      type: "number",
+      default: "0",
+    },
+    ["yOffset"]: {
+      description: "Y-axis offset of the click point in pixes",
+      type: "number",
+      default: "0",
+    },
+  }}
+/>
+
+For `WeaveStageContextMenuPluginCallbacks`:
+
+<TypeTable
+  type={{
+    ["onNodeMenu"]: {
+      required: true,
+      description:
+        "Callback called when an user triggers the context menu. It passes as parameters: the instance, the selected nodes, the point of click and if visible or not.",
+      type: "WeaveOnNodeMenuCallback",
+    },
+  }}
+/>

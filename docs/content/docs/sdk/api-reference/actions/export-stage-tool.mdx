@@ -1,0 +1,111 @@
+---
+title: WeaveExportStageToolAction
+description: Tool to export the stage as an image
+---
+
+import { TypeTable } from "fumadocs-ui/components/type-table";
+
+## Overview
+
+The [WeaveExportStageToolAction](https://github.com/InditexTech/weavejs/blob/main/code/packages/sdk/src/actions/export-stage-tool/export-stage-tool.ts)
+class that enables users to export the entire canvas (Stage) as an image file—typically in PNG format. This action captures everything visible on the canvas,
+including all nodes, layers, and plugin-rendered visuals, and converts it into a high-fidelity static image.
+
+It’s particularly useful for sharing snapshots, archiving work, or generating thumbnails from collaborative visual tools.
+
+The class extends the [WeaveAction](/docs/sdk/api-reference/actions/action) class.
+
+## Name
+
+This action `name` property value is `exportStageTool`.
+
+## Import
+
+```shell
+import { WeaveExportStageToolAction } from "@inditextech/weave-sdk";
+```
+
+## Instantiation
+
+```ts
+new WeaveExportStageToolAction(params: WeaveActionCallbacks);
+```
+
+## TypeScript types
+
+```ts
+const WEAVE_EXPORT_FORMATS: {
+  readonly PNG: "image/png";
+  readonly JPEG: "image/jpeg";
+};
+
+type WeaveExportNodeOptions = {
+  format?: typeof WEAVE_EXPORT_FORMATS.PNG;
+  padding?: number;
+  pixelRatio?: number;
+  backgroundColor?: string;
+  quality?: number;
+};
+
+type WeaveExportNodeActionParams = {
+  node: WeaveElementInstance;
+  options?: WeaveExportNodeOptions;
+};
+```
+
+## Trigger function params
+
+```ts
+trigger(cancelAction: () => void, params?: WeaveExportNodeActionParams): Promise<void>;
+```
+
+For `WeaveExportNodeActionParams`:
+
+<TypeTable
+  type={{
+    ["node"]: {
+      required: true,
+      description: "The node instance to export as image.",
+      type: "WeaveElementInstance",
+    },
+    ["options"]: {
+      description: "The exported image options.",
+      type: "WeaveExportNodeOptions",
+    },
+  }}
+/>
+
+For `WeaveExportNodeOptions`:
+
+<TypeTable
+  type={{
+    ["format"]: {
+      required: true,
+      description: "The format of the image to export.",
+      type: "WeaveExportFormat",
+      default: "WEAVE_EXPORT_FORMATS.PNG",
+    },
+    ["padding"]: {
+      description: "The padding to add to the image to export. In pixels.",
+      type: "number",
+      default: "0",
+    },
+    ["pixelRatio"]: {
+      description:
+        "The pixel ratio to use on the image to export. For example 2 on a image of 400x400 generates a image of 800x800 pixels.",
+      type: "number",
+      default: "1",
+    },
+    ["backgroundColor"]: {
+      description:
+        "The background color to use on the image to export. Is a CCS color value.",
+      type: "string",
+      default: "#FFFFFF",
+    },
+    ["quality"]: {
+      description: "The quality of the image to export. From 0 to 1.",
+      type: "number",
+      default: "1",
+    },
+  }}
+/>

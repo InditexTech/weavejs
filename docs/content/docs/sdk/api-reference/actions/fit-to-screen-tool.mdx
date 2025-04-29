@@ -1,0 +1,60 @@
+---
+title: WeaveFitToScreenToolAction
+description: Set the zoom level so all the nodes on the stage are entirely visible on the screen
+---
+
+import { TypeTable } from "fumadocs-ui/components/type-table";
+
+## Overview
+
+The [WeaveFitToScreenToolAction](https://github.com/InditexTech/weavejs/blob/main/code/packages/sdk/src/actions/fit-to-screen-tool/fit-to-screen-tool.ts)
+class that automatically adjusts the canvas viewport so that all visible content (nodes) is centered
+and scaled to fit within the current view. It provides users with a convenient way to reorient the canvas,
+especially after zooming or panning extensively.
+
+This action is commonly used as a “reset view” or “zoom to fit” feature in collaborative or design tools.
+
+The class extends the [WeaveAction](/docs/sdk/api-reference/actions/action) class.
+
+## Name
+
+This action `name` property value is `fitToScreenTool`.
+
+## Import
+
+```shell
+import { WeaveFitToScreenToolAction } from "@inditextech/weave-sdk";
+```
+
+## Instantiation
+
+```ts
+new WeaveFitToScreenToolAction(params: WeaveActionCallbacks);
+```
+
+## TypeScript types
+
+```ts
+type WeaveFitToScreenToolActionParams = {
+  previousAction: string;
+};
+```
+
+## Trigger function params
+
+```ts
+trigger(cancelAction: () => void, params?: WeaveFitToScreenToolActionParams): void;
+```
+
+For `WeaveFitToScreenToolActionParams`:
+
+<TypeTable
+  type={{
+    ["previousAction"]: {
+      required: true,
+      description:
+        "The action to trigger after the fit-to-screen action is completed.",
+      type: "string",
+    },
+  }}
+/>

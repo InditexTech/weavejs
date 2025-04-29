@@ -7,13 +7,24 @@ import { TypeTable } from "fumadocs-ui/components/type-table";
 
 ## Overview
 
-The WeaveStoreWebsockets class is a client-side store implementation in the Weave.js ecosystem
-that enables real-time collaboration using WebSockets. It connects to a compatible WebSocket
-server—such as [WeaveWebsocketsServer](/docs/store-websockets/api-reference/server/weave-websockets-server)
-to sync shared canvas state across all connected users.
+The [Weave](https://github.com/InditexTech/weavejs/blob/main/code/packages/sdk/src/weave.ts)
+class is the central engine of the Weave.js ecosystem. It manages the entire collaborative canvas
+environment, coordinating the rendering of nodes, handling user interactions, dispatching actions,
+and orchestrating plugins—all while maintaining real-time synchronization through a connected store.
 
-Built on top of Yjs and y-websocket, it acts as a bridge between the client-side Weave.js app and the
-remote backend, handling updates, awareness (presence), and document syncing with minimal setup.
+Designed to be modular, scalable, and collaborative, the Weave class provides the foundation
+for building dynamic visual tools like whiteboards, diagram editors, and design platforms.
+
+### Core responsibilities
+
+- **State Management**: connects to a store (e.g., WebSocket, Azure Web PubSub) to load, sync, and
+  manage the shared canvas state and awareness events across connected users.
+- **Canvas Rendering**: creates and manages the Stage, Layers, and Nodes hierarchy using the React Reconciler
+  and Konva.js, maintaining a highly performant rendering loop.
+- **DX System**: registers the nodes (elements to render), plugins (power-up functionality) and actions
+  (user workflows to handle interaction).
+
+Built on top of Yjs and SyncedStore, it acts as a bridge between the client-side Weave.js app and the remote backend, handling updates, awareness (presence), and document syncing with minimal setup.
 
 The Weave instance extends the [Emittery](https://www.npmjs.com/package/emittery) class.
 

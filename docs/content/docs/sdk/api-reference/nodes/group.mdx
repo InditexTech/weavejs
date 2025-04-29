@@ -3,50 +3,36 @@ title: WeaveGroupNode
 description: Group node API Reference
 ---
 
-import { CpuIcon, Database } from "lucide-react";
+## Overview
 
-Weave.js is a modular library that streamlines the **development of visual
-collaborative web applications** built on-top of an HTML5 canvas, designed with a
-robust architecture, **Weave.js** enables developers to extend functionality
-seamlessly.
+The [WeaveGroupNode](https://github.com/InditexTech/weavejs/blob/main/code/packages/sdk/src/nodes/group/group.ts)
+class represents a container node in Weave.js that groups multiple child nodes together into a single, manageable entity.
+Built on top of Konva’s [Group](https://konvajs.org/api/Konva.Group.html) class, it allows developers and users to
+treat a collection of nodes as a single object—moving, scaling, rotating, or interacting with them as one.
 
-Weave.js offers a clean and efficient API for:
+Groups are useful for:
 
-<Cards>
+- Organizing multiple child nodes under one parent, allowing bulk transformations like dragging, resizing, scaling,
+  and rotating.
+- Ensures that transformations applied to the group (like moving or rotating) cascade properly to the children,
+  maintaining relative positions and sizes.
+- Allows nesting other groups or individual nodes, making it flexible for complex scene structures (e.g., a diagram
+  block containing text, shapes, and connectors).
 
-<Card icon={<CpuIcon className="text-purple-300" />} title='Weave.js SDK'>
+The class extends the [WeaveNode](/docs/sdk/api-reference/nodes/node) class
 
-Handles most of the logic, includes the base nodes, plugins and actions.
+## Type
 
-</Card>
+This node `nodeType` property value is `group`.
 
-<Card icon={<Database className="text-blue-300" />} title='Weave.js Store'>
+## Import
 
-Handles the backend & frontend (client) logic to support real-time collaboration
-on top different transports.
+```shell
+import { WeaveGroupNode } from "@inditextech/weave-sdk";
+```
 
-</Card>
+## Instantiation
 
-</Cards>
-
-Ideal for building applications such as whiteboards, diagram editors and design
-platforms, Weave.js provides the flexibility and scalability needed for modern,
-canvas-based collaborative tools.
-
-<Callout title="Want to learn more?">
-  Read our in-depth [What is Weave.js](/docs/main/what-is-weavejs) introduction.
-</Callout>
-
-## Live demo
-
-<div className="flex justify-center items-center *:max-w-[700px] bg-gradient-to-br from-fd-primary/10 rounded-xl border">
-  ![Enter room page of the Weave.js showcase](/images/showcase.png)
-</div>
-
-Check our [live whiteboard application](https://weavejs.cloud.inditex.com) built using:
-
-- [React](https://es.react.dev/) & [Next.js](https://nextjs.org/) for the frontend side
-- [Express](https://expressjs.com/) & [Node.js](https://nodejs.org/es) on the backend side
-
-Demonstrating the creation from scratch of a real-time, collaborative visual workspace
-application.
+```ts
+new WeaveGroupNode();
+```

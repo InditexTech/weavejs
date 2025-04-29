@@ -1,6 +1,7 @@
 {
   "title": "Nodes",
   "pages": [
+    "node",
     "stage",
     "layer",
     "group",

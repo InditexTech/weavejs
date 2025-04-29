@@ -3,50 +3,54 @@ title: WeaveStageGridPlugin
 description: Renders a reference grid behind the nodes layer
 ---
 
-import { CpuIcon, Database } from "lucide-react";
+import { TypeTable } from "fumadocs-ui/components/type-table";
 
-Weave.js is a modular library that streamlines the **development of visual
-collaborative web applications** built on-top of an HTML5 canvas, designed with a
-robust architecture, **Weave.js** enables developers to extend functionality
-seamlessly.
+## Overview
 
-Weave.js offers a clean and efficient API for:
+The [WeaveStageGridPlugin](https://github.com/InditexTech/weavejs/blob/main/code/packages/sdk/src/plugins/stage-grid/stage-grid.ts)
+class that renders a background grid on the canvas Stage. It provides visual guides that help users align, arrange,
+and position nodes more precisely, improving layout consistency and the overall user experience.
 
-<Cards>
+The plugin can render grids as lines or dots, and it is highly configurable to match the needs of different visual
+collaborative tools, from whiteboards to complex design editors.
 
-<Card icon={<CpuIcon className="text-purple-300" />} title='Weave.js SDK'>
+The class extends the [WeavePlugin](/docs/sdk/api-reference/plugins/plugin) class
 
-Handles most of the logic, includes the base nodes, plugins and actions.
+## Name
 
-</Card>
+This plugin `name` property value is `stageGrid`.
 
-<Card icon={<Database className="text-blue-300" />} title='Weave.js Store'>
+## Import
 
-Handles the backend & frontend (client) logic to support real-time collaboration
-on top different transports.
+```shell
+import { WeaveStageGridPlugin } from "@inditextech/weave-sdk";
+```
 
-</Card>
+## Instantiation
 
-</Cards>
+```ts
+new WeaveStageGridPlugin(params: WeaveStageGridPluginParams);
+```
 
-Ideal for building applications such as whiteboards, diagram editors and design
-platforms, Weave.js provides the flexibility and scalability needed for modern,
-canvas-based collaborative tools.
+## TypeScript types
 
-<Callout title="Want to learn more?">
-  Read our in-depth [What is Weave.js](/docs/main/what-is-weavejs) introduction.
-</Callout>
+```ts
+type WeaveStageGridPluginParams = {
+  gridSize?: number;
+};
+```
 
-## Live demo
+## Parameters
 
-<div className="flex justify-center items-center *:max-w-[700px] bg-gradient-to-br from-fd-primary/10 rounded-xl border">
-  ![Enter room page of the Weave.js showcase](/images/showcase.png)
-</div>
+For `WeaveStageGridPluginParams`:
 
-Check our [live whiteboard application](https://weavejs.cloud.inditex.com) built using:
-
-- [React](https://es.react.dev/) & [Next.js](https://nextjs.org/) for the frontend side
-- [Express](https://expressjs.com/) & [Node.js](https://nodejs.org/es) on the backend side
-
-Demonstrating the creation from scratch of a real-time, collaborative visual workspace
-application.
+<TypeTable
+  type={{
+    ["gridSize"]: {
+      description:
+        "A number in pixels that define the size of the grid separation.",
+      type: "number",
+      default: "50",
+    },
+  }}
+/>

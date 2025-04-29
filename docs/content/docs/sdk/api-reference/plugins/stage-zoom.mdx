@@ -3,50 +3,77 @@ title: WeaveStageZoomPlugin
 description: Activates support for zoom on the stage
 ---
 
-import { CpuIcon, Database } from "lucide-react";
+import { TypeTable } from "fumadocs-ui/components/type-table";
 
-Weave.js is a modular library that streamlines the **development of visual
-collaborative web applications** built on-top of an HTML5 canvas, designed with a
-robust architecture, **Weave.js** enables developers to extend functionality
-seamlessly.
+## Overview
 
-Weave.js offers a clean and efficient API for:
+The [WeaveStageZoomPlugin](https://github.com/InditexTech/weavejs/blob/main/code/packages/sdk/src/plugins/stage-zoom/stage-zoom.ts)
+class that adds zooming capabilities to the canvas Stage. It allows users to zoom in and out using gestures like
+the mouse wheel, trackpad, or programmatic controls, enabling smooth navigation across large or detailed workspaces.
 
-<Cards>
+Zooming makes it easier for users to focus on fine details or get a high-level overview of complex visual layouts
+during collaboration.
 
-<Card icon={<CpuIcon className="text-purple-300" />} title='Weave.js SDK'>
+The class extends the [WeavePlugin](/docs/sdk/api-reference/plugins/plugin) class
 
-Handles most of the logic, includes the base nodes, plugins and actions.
+## Name
 
-</Card>
+This plugin `name` property value is `stageZoom`.
 
-<Card icon={<Database className="text-blue-300" />} title='Weave.js Store'>
+## Import
 
-Handles the backend & frontend (client) logic to support real-time collaboration
-on top different transports.
+```shell
+import { WeaveStageZoomPlugin } from "@inditextech/weave-sdk";
+```
 
-</Card>
+## Instantiation
 
-</Cards>
+```ts
+new WeaveStageZoomPlugin(params: WeaveStageZoomPluginParams);
+```
 
-Ideal for building applications such as whiteboards, diagram editors and design
-platforms, Weave.js provides the flexibility and scalability needed for modern,
-canvas-based collaborative tools.
+## TypeScript types
 
-<Callout title="Want to learn more?">
-  Read our in-depth [What is Weave.js](/docs/main/what-is-weavejs) introduction.
-</Callout>
+```ts
+type WeaveStageZoomChanged = {
+  scale: number;
+  zoomSteps: number[];
+  actualStep: number;
+  onDefaultStep: boolean;
+  canZoomIn: boolean;
+  canZoomOut: boolean;
+};
 
-## Live demo
+type WeaveStageZoomOnZoomChangeCallback = (
+  zoomInfo: WeaveStageZoomChanged
+) => void;
 
-<div className="flex justify-center items-center *:max-w-[700px] bg-gradient-to-br from-fd-primary/10 rounded-xl border">
-  ![Enter room page of the Weave.js showcase](/images/showcase.png)
-</div>
+type WeaveStageZoomPluginParams = {
+  zoomSteps?: number[];
+  defaultZoom?: number;
+  onZoomChange?: WeaveStageZoomOnZoomChangeCallback;
+};
+```
 
-Check our [live whiteboard application](https://weavejs.cloud.inditex.com) built using:
+## Parameters
 
-- [React](https://es.react.dev/) & [Next.js](https://nextjs.org/) for the frontend side
-- [Express](https://expressjs.com/) & [Node.js](https://nodejs.org/es) on the backend side
+For `WeaveStageZoomPluginParams`:
 
-Demonstrating the creation from scratch of a real-time, collaborative visual workspace
-application.
+<TypeTable
+  type={{
+    ["zoomSteps"]: {
+      description: "An array that defines the zooming steps of the plugin.",
+      type: "number[]",
+      default: "[0.1, 0.25, 0.5, 1, 2, 4, 8]",
+    },
+    ["defaultZoom"]: {
+      description: "The default zoom when loading the stage (canvas).",
+      type: "number",
+      default: "1",
+    },
+    ["onZoomChange"]: {
+      description: "A callback that is called when the zoom changes.",
+      type: "number",
+    },
+  }}
+/>
