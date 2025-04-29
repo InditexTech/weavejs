@@ -6,6 +6,7 @@
     "build": "next build",
     "cleanup": "rm package-lock.json && npkill -D -y",
     "dev": "next dev --turbo",
+    "git:pre-push": "npm run build",
     "release:prepare": "npm run build",
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "next start",
