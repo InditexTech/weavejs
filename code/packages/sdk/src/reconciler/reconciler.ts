@@ -6,11 +6,11 @@ import { isEqual } from 'lodash';
 import Konva from 'konva';
 import { DefaultEventPriority } from './constants';
 import {
-  WeaveElementInstance,
-  WeaveElementAttributes,
+  type WeaveElementInstance,
+  type WeaveElementAttributes,
 } from '@inditextech/weave-types';
 import { Weave } from '@/weave';
-import { Logger } from 'pino';
+import { type Logger } from 'pino';
 
 export class WeaveReconciler {
   private instance: Weave;
@@ -21,7 +21,10 @@ export class WeaveReconciler {
     this.logger = this.instance.getChildLogger('reconciler');
   }
 
-  addNode(parentInstance: WeaveElementInstance, child: WeaveElementInstance) {
+  addNode(
+    parentInstance: WeaveElementInstance,
+    child: WeaveElementInstance
+  ): void {
     const parentAttrs = parentInstance.getAttrs();
 
     const childInitialZIndex = child.getAttrs().initialZIndex;
@@ -65,7 +68,7 @@ export class WeaveReconciler {
       supportsHydration: false,
       supportsMutation: true,
       supportsMicrotasks: false,
-      getCurrentEventPriority() {
+      getCurrentEventPriority(): number {
         return DefaultEventPriority;
       },
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -73,14 +76,14 @@ export class WeaveReconciler {
         logger.debug({ node }, 'getInstanceFromNode');
         return null;
       },
-      beforeActiveInstanceBlur() {
+      beforeActiveInstanceBlur(): void {
         logger.debug('beforeActiveInstanceBlur');
       },
-      afterActiveInstanceBlur() {
+      afterActiveInstanceBlur(): void {
         logger.debug('afterActiveInstanceBlur');
       },
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      prepareScopeUpdate(scopeInstance: any, instance: any) {
+      prepareScopeUpdate(scopeInstance: any, instance: any): void {
         logger.debug({ scopeInstance, instance }, 'prepareScopeUpdate');
       },
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -88,7 +91,7 @@ export class WeaveReconciler {
         logger.debug({ scopeInstance }, 'getInstanceFromScope');
         return null;
       },
-      getRootHostContext(rootContainer: Weave) {
+      getRootHostContext(rootContainer: Weave): Weave {
         logger.debug({ rootContainer }, 'getRootHostContext');
         return rootContainer;
       },
@@ -96,20 +99,23 @@ export class WeaveReconciler {
         logger.debug({ containerInfo }, 'prepareForCommit');
         return null;
       },
-      scheduleTimeout(fn: (...args: unknown[]) => unknown, delay?: number) {
+      scheduleTimeout(
+        fn: (...args: unknown[]) => unknown,
+        delay?: number
+      ): NodeJS.Timeout {
         logger.debug({ fn, delay }, 'scheduleTimeout');
         return setTimeout(fn, delay);
       },
-      cancelTimeout(id: NodeJS.Timeout | undefined) {
+      cancelTimeout(id: NodeJS.Timeout | undefined): void {
         logger.debug({ id }, 'cancelTimeout');
         if (id) {
           clearTimeout(id);
         }
       },
-      preparePortalMount(containerInfo: Weave) {
+      preparePortalMount(containerInfo: Weave): void {
         logger.debug({ containerInfo }, 'preparePortalMount');
       },
-      resetAfterCommit(containerInfo: Weave) {
+      resetAfterCommit(containerInfo: Weave): void {
         logger.debug({ containerInfo }, 'resetAfterCommit');
       },
       createTextInstance(
@@ -127,7 +133,7 @@ export class WeaveReconciler {
         parentHostContext: Weave,
         type: string,
         rootContainer: Weave
-      ) {
+      ): Weave {
         logger.debug(
           { parentHostContext, type, rootContainer },
           'getChildHostContext'
@@ -143,7 +149,7 @@ export class WeaveReconciler {
         props: WeaveElementAttributes,
         rootContainer: Weave,
         hostContext: Weave
-      ) {
+      ): WeaveElementInstance | undefined {
         logger.debug(
           { type, props, rootContainer, hostContext },
           'createInstance'
@@ -166,34 +172,40 @@ export class WeaveReconciler {
 
         return handler.createInstance(newProps);
       },
-      detachDeletedInstance(node: WeaveElementInstance) {
+      detachDeletedInstance(node: WeaveElementInstance): void {
         logger.debug({ node }, 'detachDeletedInstance');
       },
-      getPublicInstance(instance: WeaveElementInstance) {
+      getPublicInstance(instance: WeaveElementInstance): WeaveElementInstance {
         logger.debug({ instance }, 'getPublicInstance');
         return instance;
       },
       appendInitialChild(
         parentInstance: WeaveElementInstance,
         child: WeaveElementInstance
-      ) {
+      ): void {
         logger.debug({ parentInstance, child }, 'appendInitialChild');
         addNode(parentInstance, child);
       },
-      appendChildToContainer(container: Weave, child: WeaveElementInstance) {
+      appendChildToContainer(
+        container: Weave,
+        child: WeaveElementInstance
+      ): void {
         logger.debug({ container, child }, 'appendChildToContainer');
         if (child instanceof Konva.Stage) {
           container.getStageManager().setStage(child);
         }
       },
-      insertInContainerBefore(container: Weave, child: WeaveElementInstance) {
+      insertInContainerBefore(
+        container: Weave,
+        child: WeaveElementInstance
+      ): void {
         logger.debug({ container, child }, 'insertInContainerBefore');
       },
       insertBefore(
         parentInstance: WeaveElementInstance,
         child: WeaveElementInstance,
         beforeChild: WeaveElementInstance
-      ) {
+      ): void {
         logger.debug({ parentInstance, child, beforeChild }, 'insertBefore ');
         if (parentInstance instanceof Konva.Layer) {
           parentInstance.add(child);
@@ -209,7 +221,7 @@ export class WeaveReconciler {
       appendChild(
         parentInstance: WeaveElementInstance,
         child: WeaveElementInstance
-      ) {
+      ): void {
         logger.debug({ parentInstance, child }, 'appendChild');
         addNode(parentInstance, child);
       },
@@ -231,21 +243,21 @@ export class WeaveReconciler {
         );
         return {};
       },
-      clearContainer(container: Weave) {
+      clearContainer(container: Weave): void {
         logger.debug({ container }, 'clearContainer');
       },
-      setCurrentUpdatePriority() {
+      setCurrentUpdatePriority(): void {
         logger.debug('setCurrentUpdatePriority');
       },
-      getCurrentUpdatePriority() {
+      getCurrentUpdatePriority(): number {
         logger.debug('getCurrentUpdatePriority');
         return 1;
       },
-      resolveUpdatePriority() {
+      resolveUpdatePriority(): number {
         logger.debug('resolveUpdatePriority');
         return 1;
       },
-      maySuspendCommit() {
+      maySuspendCommit(): void {
         logger.debug('maySuspendCommit');
       },
       commitUpdate(
@@ -255,7 +267,7 @@ export class WeaveReconciler {
         type: string,
         prevProps: WeaveElementAttributes,
         nextProps: WeaveElementAttributes
-      ) {
+      ): void {
         logger.debug({ instance, type, prevProps, nextProps }, 'commitUpdate');
 
         if (instance instanceof Weave) {
@@ -277,10 +289,10 @@ export class WeaveReconciler {
           }
         }
       },
-      removeChildFromContainer() {
+      removeChildFromContainer(): void {
         logger.debug('removeChildFromContainer');
       },
-      removeChild(_: WeaveElementInstance, child: WeaveElementInstance) {
+      removeChild(_: WeaveElementInstance, child: WeaveElementInstance): void {
         logger.debug({ child }, 'removeChild');
         child.destroy();
       },

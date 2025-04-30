@@ -10,9 +10,9 @@ import {
   WeaveStagePanningPlugin,
   WeaveStageResizePlugin,
   WeaveStageZoomPlugin,
-  WeaveStageZoomChanged,
+  type WeaveStageZoomChanged,
   WeaveConnectedUsersPlugin,
-  WeaveConnectedUsersChanged,
+  type WeaveConnectedUsersChanged,
   WeaveUsersPointersPlugin,
   WeaveStageDropAreaPlugin,
   WeaveCopyPasteNodesPlugin,
@@ -22,13 +22,13 @@ import {
   WeaveStore,
 } from '@inditextech/weave-sdk';
 import {
-  WeaveState,
-  WeaveSelection,
-  WeaveUser,
-  WeaveFont,
-  WeaveCallbacks,
-  WeaveUndoRedoChange,
-  WeaveStatus,
+  type WeaveState,
+  type WeaveSelection,
+  type WeaveUser,
+  type WeaveFont,
+  type WeaveCallbacks,
+  type WeaveUndoRedoChange,
+  type WeaveStatus,
 } from '@inditextech/weave-types';
 import { useWeave } from './store';
 
@@ -58,7 +58,7 @@ export const WeaveProvider = ({
   fonts = [],
   callbacks = {},
   children,
-}: Readonly<WeaveProviderType>) => {
+}: Readonly<WeaveProviderType>): React.JSX.Element => {
   const weaveInstanceRef = React.useRef<Weave | null>(null);
   const selectedNodes = useWeave((state) => state.selection.nodes);
 

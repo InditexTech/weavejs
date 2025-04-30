@@ -5,7 +5,7 @@
 import { WeaveAction } from '@/actions/action';
 import { WeaveNodesSelectionPlugin } from '@/plugins/nodes-selection/nodes-selection';
 import { WeaveStageZoomPlugin } from '@/plugins/stage-zoom/stage-zoom';
-import { WeaveFitToSelectionToolActionParams } from './types';
+import { type WeaveFitToSelectionToolActionParams } from './types';
 
 export class WeaveFitToSelectionToolAction extends WeaveAction {
   protected previousAction!: string;
@@ -24,7 +24,7 @@ export class WeaveFitToSelectionToolAction extends WeaveAction {
     return this.instance.getPlugin<WeaveStageZoomPlugin>('stageZoom');
   }
 
-  init() {
+  init(): void {
     const stageZoomPlugin = this.getStageZoomPlugin();
     if (!stageZoomPlugin) {
       throw new Error(
@@ -42,7 +42,7 @@ export class WeaveFitToSelectionToolAction extends WeaveAction {
   trigger(
     cancelAction: () => void,
     params: WeaveFitToSelectionToolActionParams
-  ) {
+  ): void {
     const stageZoomPlugin = this.getStageZoomPlugin();
 
     stageZoomPlugin.fitToSelection();
@@ -53,7 +53,7 @@ export class WeaveFitToSelectionToolAction extends WeaveAction {
     this.cancelAction();
   }
 
-  cleanup() {
+  cleanup(): void {
     const stage = this.instance.getStage();
 
     this.instance.triggerAction(this.previousAction);

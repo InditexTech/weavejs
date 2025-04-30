@@ -3,8 +3,8 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import FontFaceObserver from 'fontfaceobserver';
-import { Logger } from 'pino';
-import { WeaveFont } from '@inditextech/weave-types';
+import { type Logger } from 'pino';
+import { type WeaveFont } from '@inditextech/weave-types';
 import { Weave } from '@/weave';
 
 export class WeaveFontsManager {
@@ -35,7 +35,7 @@ export class WeaveFontsManager {
     });
   }
 
-  async loadFonts() {
+  async loadFonts(): Promise<void> {
     this.logger.info('Loading fonts');
 
     if (this.instance.getConfiguration().fonts) {
@@ -53,7 +53,7 @@ export class WeaveFontsManager {
     this.instance.emitEvent('weaveFontsLoaded', {});
   }
 
-  getFonts() {
+  getFonts(): WeaveFont[] {
     return this.loadedFonts;
   }
 }

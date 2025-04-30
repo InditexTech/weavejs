@@ -10,7 +10,10 @@ import {
   WEAVE_GRID_LAYER_ID,
   WEAVE_GRID_TYPES,
 } from './constants';
-import { WeaveStageGridPluginParams, WeaveStageGridType } from './types';
+import {
+  type WeaveStageGridPluginParams,
+  type WeaveStageGridType,
+} from './types';
 import { Circle } from 'konva/lib/shapes/Circle';
 
 export class WeaveStageGridPlugin extends WeavePlugin {
@@ -37,11 +40,11 @@ export class WeaveStageGridPlugin extends WeavePlugin {
     return 'stageGrid';
   }
 
-  getLayerName() {
+  getLayerName(): string {
     return WEAVE_GRID_LAYER_ID;
   }
 
-  initLayer() {
+  initLayer(): void {
     const stage = this.instance.getStage();
 
     const layer = new Konva.Layer({
@@ -51,7 +54,7 @@ export class WeaveStageGridPlugin extends WeavePlugin {
     stage.add(layer);
   }
 
-  init() {
+  init(): void {
     this.initEvents();
     this.renderGrid();
   }
@@ -141,7 +144,7 @@ export class WeaveStageGridPlugin extends WeavePlugin {
     });
   }
 
-  getLayer() {
+  getLayer(): Konva.Layer | undefined {
     const stage = this.instance.getStage();
     const layer = stage.findOne(`#${WEAVE_GRID_LAYER_ID}`) as
       | Konva.Layer
@@ -149,7 +152,7 @@ export class WeaveStageGridPlugin extends WeavePlugin {
     return layer;
   }
 
-  private renderGrid() {
+  private renderGrid(): void {
     const layer = this.getLayer();
 
     if (!layer) {
@@ -320,27 +323,27 @@ export class WeaveStageGridPlugin extends WeavePlugin {
     }
   }
 
-  render() {
+  render(): void {
     this.renderGrid();
   }
 
-  enable() {
+  enable(): void {
     this.enabled = true;
     this.getLayer()?.show();
     this.render();
   }
 
-  disable() {
+  disable(): void {
     this.enabled = false;
     this.getLayer()?.hide();
     this.render();
   }
 
-  getType() {
+  getType(): WeaveStageGridType {
     return this.type;
   }
 
-  setType(type: WeaveStageGridType) {
+  setType(type: WeaveStageGridType): void {
     this.type = type;
     this.render();
   }

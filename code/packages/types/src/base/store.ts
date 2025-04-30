@@ -3,9 +3,9 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import {
-  WeaveAwarenessChange,
-  WeaveUndoManagerOptions,
-  WeaveUser,
+  type WeaveAwarenessChange,
+  type WeaveUndoManagerOptions,
+  type WeaveUser,
 } from '@/types';
 
 export type WeaveStoreOptions = {

@@ -4,8 +4,8 @@
 
 import { WeavePlugin } from '@/plugins/plugin';
 import {
-  WeaveStageZoomOnZoomChangeCallback,
-  WeaveStageZoomPluginParams,
+  type WeaveStageZoomOnZoomChangeCallback,
+  type WeaveStageZoomPluginParams,
 } from './types';
 import Konva from 'konva';
 import { WeaveNodesSelectionPlugin } from '../nodes-selection/nodes-selection';
@@ -46,7 +46,7 @@ export class WeaveStageZoomPlugin extends WeavePlugin {
     return 'stageZoom';
   }
 
-  init() {
+  init(): void {
     this.setZoom(this.zoomSteps[this.actualStep]);
   }
 
@@ -104,7 +104,7 @@ export class WeaveStageZoomPlugin extends WeavePlugin {
     }
   }
 
-  canZoomOut() {
+  canZoomOut(): boolean {
     if (!this.enabled) {
       return false;
     }
@@ -119,7 +119,7 @@ export class WeaveStageZoomPlugin extends WeavePlugin {
     return this.actualStep - 1 > 0;
   }
 
-  canZoomIn() {
+  canZoomIn(): boolean {
     if (!this.enabled) {
       return false;
     }
@@ -134,7 +134,7 @@ export class WeaveStageZoomPlugin extends WeavePlugin {
     return this.actualStep + 1 < this.zoomSteps.length;
   }
 
-  zoomToStep(step: number) {
+  zoomToStep(step: number): void {
     if (!this.enabled) {
       return;
     }
@@ -159,7 +159,7 @@ export class WeaveStageZoomPlugin extends WeavePlugin {
     return closestStepIndex;
   }
 
-  zoomIn() {
+  zoomIn(): void {
     if (!this.enabled) {
       return;
     }
@@ -180,7 +180,7 @@ export class WeaveStageZoomPlugin extends WeavePlugin {
     this.setZoom(this.zoomSteps[this.actualStep]);
   }
 
-  zoomOut() {
+  zoomOut(): void {
     if (!this.enabled) {
       return;
     }
@@ -201,7 +201,7 @@ export class WeaveStageZoomPlugin extends WeavePlugin {
     this.setZoom(this.zoomSteps[this.actualStep]);
   }
 
-  fitToScreen() {
+  fitToScreen(): void {
     if (!this.enabled) {
       return;
     }
@@ -231,7 +231,7 @@ export class WeaveStageZoomPlugin extends WeavePlugin {
     }
   }
 
-  fitToSelection() {
+  fitToSelection(): void {
     if (!this.enabled) {
       return;
     }
@@ -290,11 +290,11 @@ export class WeaveStageZoomPlugin extends WeavePlugin {
     zoomTransformer.destroy();
   }
 
-  enable() {
+  enable(): void {
     this.enabled = true;
   }
 
-  disable() {
+  disable(): void {
     this.enabled = false;
   }
 }

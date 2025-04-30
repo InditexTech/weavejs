@@ -3,8 +3,8 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { Weave } from '@/weave';
-import { WeavePluginBase } from '@inditextech/weave-types';
-import { Logger } from 'pino';
+import { type WeavePluginBase } from '@inditextech/weave-types';
+import { type Logger } from 'pino';
 
 export abstract class WeavePlugin implements WeavePluginBase {
   protected instance!: Weave;
@@ -12,7 +12,7 @@ export abstract class WeavePlugin implements WeavePluginBase {
   protected enabled: boolean = true;
   private logger!: Logger;
 
-  register(instance: Weave) {
+  register(instance: Weave): WeavePlugin {
     this.instance = instance;
     this.logger = this.instance.getChildLogger(this.getName());
     this.instance
@@ -26,11 +26,11 @@ export abstract class WeavePlugin implements WeavePluginBase {
     return this.name;
   }
 
-  getLogger() {
+  getLogger(): Logger {
     return this.logger;
   }
 
-  isEnabled() {
+  isEnabled(): boolean {
     return this.enabled;
   }
 

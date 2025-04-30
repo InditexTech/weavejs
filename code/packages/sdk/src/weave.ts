@@ -5,18 +5,23 @@
 import Emittery from 'emittery';
 import Konva from 'konva';
 import { v4 as uuidv4 } from 'uuid';
-import { Vector2d } from 'konva/lib/types';
-import { Logger } from 'pino';
+import { type Vector2d } from 'konva/lib/types';
+import pino, { type Logger } from 'pino';
 import {
-  WeaveConfig,
-  WeaveStateElement,
-  WeaveState,
-  WeaveElementInstance,
-  WeavePosition,
-  WeaveExportNodeOptions,
-  WeaveStatus,
-  WeaveElementAttributes,
+  type WeaveConfig,
+  type WeaveStateElement,
+  type WeaveState,
+  type WeaveElementInstance,
+  type WeavePosition,
+  type WeaveExportNodeOptions,
+  type WeaveStatus,
+  type WeaveElementAttributes,
   WEAVE_INSTANCE_STATUS,
+  type WeaveMousePointInfo,
+  type WeaveMousePointInfoSimple,
+  type WeaveSerializedGroup,
+  type WeaveFont,
+  type WeaveNodeFound,
 } from '@inditextech/weave-types';
 import { WeaveStore } from './stores/store';
 import { WeaveNode } from './nodes/node';
@@ -40,6 +45,7 @@ import { WeaveStoreManager } from './managers/store';
 import { WeaveExportManager } from './managers/export';
 import { WeavePluginsManager } from './managers/plugins';
 import { WeaveNodesSelectionPlugin } from './plugins/nodes-selection/nodes-selection';
+import type { StageConfig } from 'konva/lib/Stage';
 
 export class Weave extends Emittery {
   private id: string;
@@ -121,7 +127,7 @@ export class Weave extends Emittery {
   }
 
   // INSTANCE MANAGEMENT METHODS
-  setupRenderer() {
+  setupRenderer(): void {
     // Initialize the renderer
     this.renderer.init();
 
@@ -139,19 +145,19 @@ export class Weave extends Emittery {
     });
   }
 
-  setStatus(status: WeaveStatus) {
+  setStatus(status: WeaveStatus): void {
     this.status = status;
   }
 
-  getStatus() {
+  getStatus(): WeaveStatus {
     return this.status;
   }
 
-  setStore(store: WeaveStore) {
+  setStore(store: WeaveStore): void {
     this.storeManager.registerStore(store);
   }
 
-  async start() {
+  async start(): Promise<void> {
     this.moduleLogger.info('Start instance');
 
     this.status = WEAVE_INSTANCE_STATUS.STARTING;
@@ -206,66 +212,66 @@ export class Weave extends Emittery {
   //   this.moduleLogger.info(`Instance destroyed`);
   // }
 
-  getId() {
+  getId(): string {
     return this.id;
   }
 
   // CONFIGURATION
 
-  getConfiguration() {
+  getConfiguration(): WeaveConfig {
     return this.config;
   }
 
   // EVENTS METHODS
 
-  emitEvent<T>(event: string, payload: T) {
+  emitEvent<T>(event: string, payload: T): void {
     this.moduleLogger.debug({ payload }, `Emitted event [${event}]`);
     this.emit(event, payload);
   }
 
-  addEventListener<T>(event: string, callback: (payload: T) => void) {
+  addEventListener<T>(event: string, callback: (payload: T) => void): void {
     this.moduleLogger.debug(`Listening event [${event}]`);
     this.on(event, callback);
   }
 
-  removeEventListener<T>(event: string, callback: (payload: T) => void) {
+  removeEventListener<T>(event: string, callback: (payload: T) => void): void {
     this.moduleLogger.debug(`Removing listening to event [${event}]`);
     this.off(event, callback);
   }
 
   // LOGGING MANAGEMENT METHODS PROXIES
 
-  getLogger() {
+  getLogger(): WeaveLogger {
     return this.logger;
   }
 
-  getMainLogger() {
+  getMainLogger(): Logger {
     return this.moduleLogger;
   }
 
-  getChildLogger(name: string) {
+  getChildLogger(name: string): pino.Logger<never, boolean> {
     return this.logger.getChildLogger(name);
   }
 
   // STAGE MANAGEMENT METHODS PROXIES
 
-  getStageManager() {
+  getStageManager(): WeaveStageManager {
     return this.stageManager;
   }
 
-  getStage() {
+  getStage(): Konva.Stage {
     return this.stageManager.getStage();
   }
 
-  getMainLayer() {
+  getMainLayer(): Konva.Layer | undefined {
     return this.stageManager.getMainLayer();
   }
 
-  setStage(stage: Konva.Stage) {
+  setStage(stage: Konva.Stage): void {
     this.stageManager.setStage(stage);
   }
 
-  getStageConfiguration() {
+  getStageConfiguration(): StageConfig {
     return this.stageManager.getConfiguration();
   }
 
@@ -278,11 +284,11 @@ export class Weave extends Emittery {
 
   // REGISTERS MANAGEMENT METHODS PROXIES
 
-  getRegisterManager() {
+  getRegisterManager(): WeaveRegisterManager {
     return this.registerManager;
   }
 
-  getPlugins() {
+  getPlugins(): Record<string, WeavePlugin> {
     return this.registerManager.getPlugins();
   }
 
@@ -290,7 +296,7 @@ export class Weave extends Emittery {
     return this.registerManager.getPlugin(pluginName) as T;
   }
 
-  getNodesHandlers() {
+  getNodesHandlers(): Record<string, WeaveNode> {
     return this.registerManager.getNodesHandlers();
   }
 
@@ -298,7 +304,7 @@ export class Weave extends Emittery {
     return this.registerManager.getNodeHandler(nodeType) as T;
   }
 
-  getActionsHandlers() {
+  getActionsHandlers(): Record<string, WeaveAction> {
     return this.registerManager.getActionsHandlers();
   }
 
@@ -310,38 +316,38 @@ export class Weave extends Emittery {
     return this.storeManager.getStore() as T;
   }
 
-  registerPlugin(plugin: WeavePlugin) {
+  registerPlugin(plugin: WeavePlugin): void {
     this.registerManager.registerPlugin(plugin);
   }
 
-  registerNodeHandler(node: WeaveNode) {
+  registerNodeHandler(node: WeaveNode): void {
     this.registerManager.registerNodeHandler(node);
   }
 
-  registerActionHandler(action: WeaveAction) {
+  registerActionHandler(action: WeaveAction): void {
     this.registerManager.registerActionHandler(action);
   }
 
-  registerStore(store: WeaveStore) {
+  registerStore(store: WeaveStore): void {
     this.storeManager.registerStore(store);
   }
 
   // PLUGINS MANAGEMENT METHODS PROXIES
-  public isPluginEnabled(pluginName: string) {
+  public isPluginEnabled(pluginName: string): boolean {
     return this.pluginsManager.isEnabled(pluginName);
   }
 
-  public enablePlugin(pluginName: string) {
+  public enablePlugin(pluginName: string): void {
     this.pluginsManager.enable(pluginName);
   }
 
-  public disablePlugin(pluginName: string) {
+  public disablePlugin(pluginName: string): void {
     this.pluginsManager.disable(pluginName);
   }
 
   // ACTIONS MANAGEMENT METHODS PROXIES
 
-  getActiveAction() {
+  getActiveAction(): string | undefined {
     return this.actionsManager.getActiveAction();
   }
 
@@ -349,21 +355,21 @@ export class Weave extends Emittery {
     return this.actionsManager.triggerAction<T>(actionName, params);
   }
 
-  getPropsAction(actionName: string) {
+  getPropsAction(actionName: string): WeaveElementAttributes {
     return this.actionsManager.getPropsAction(actionName);
   }
 
-  updatePropsAction(actionName: string, params: WeaveElementAttributes) {
+  updatePropsAction(actionName: string, params: WeaveElementAttributes): void {
     this.actionsManager.updatePropsAction(actionName, params);
   }
 
-  cancelAction(actionName: string) {
+  cancelAction(actionName: string): void {
     this.actionsManager.cancelAction(actionName);
   }
 
   // STATE MANAGEMENT METHODS PROXIES
 
-  update(newState: WeaveState) {
+  update(newState: WeaveState): void {
     this.getStore().setState(newState);
     this.renderer.render(() => {
       this.config.callbacks?.onRender?.();
@@ -371,7 +377,7 @@ export class Weave extends Emittery {
     });
   }
 
-  render() {
+  render(): void {
     this.renderer.render(() => {
       this.config.callbacks?.onRender?.();
       this.emitEvent('onRender', {});
@@ -383,7 +389,7 @@ export class Weave extends Emittery {
     key: string,
     parent: WeaveStateElement | null = null,
     index = -1
-  ) {
+  ): WeaveNodeFound {
     return this.stateManager.findNodeById(tree, key, parent, index);
   }
 
@@ -394,7 +400,11 @@ export class Weave extends Emittery {
     return this.stateManager.findNodesByType(tree, nodeType);
   }
 
-  getNode(nodeKey: string) {
+  getNode(nodeKey: string): {
+    node: WeaveStateElement | null;
+    parent: WeaveStateElement | null;
+    index: number;
+  } {
     return this.stateManager.getNode(nodeKey);
   }
 
@@ -403,15 +413,15 @@ export class Weave extends Emittery {
     parentId = 'mainLayer',
     index: number | undefined = undefined,
     doRender = true
-  ) {
+  ): void {
     this.stateManager.addNode(node, parentId, index, doRender);
   }
 
-  updateNode(node: WeaveStateElement, doRender = true) {
+  updateNode(node: WeaveStateElement, doRender = true): void {
     this.stateManager.updateNode(node, doRender);
   }
 
-  removeNode(node: WeaveStateElement, doRender = true) {
+  removeNode(node: WeaveStateElement, doRender = true): void {
     this.stateManager.removeNode(node, doRender);
 
     const selectionPlugin =
@@ -421,7 +431,7 @@ export class Weave extends Emittery {
     }
   }
 
-  removeNodes(nodes: WeaveStateElement[], doRender = true) {
+  removeNodes(nodes: WeaveStateElement[], doRender = true): void {
     for (const node of nodes) {
       this.removeNode(node, false);
     }
@@ -437,51 +447,57 @@ export class Weave extends Emittery {
     }
   }
 
-  moveNode(node: WeaveStateElement, position: WeavePosition, doRender = true) {
+  moveNode(
+    node: WeaveStateElement,
+    position: WeavePosition,
+    doRender = true
+  ): void {
     this.stateManager.moveNode(node, position, doRender);
   }
 
   // ZINDEX MANAGEMENT METHODS PROXIES
 
-  moveUp(node: WeaveElementInstance) {
+  moveUp(node: WeaveElementInstance): void {
     this.zIndexManager.moveUp(node);
   }
 
-  moveDown(node: WeaveElementInstance) {
+  moveDown(node: WeaveElementInstance): void {
     this.zIndexManager.moveDown(node);
   }
 
-  sendToBack(node: WeaveElementInstance) {
+  sendToBack(node: WeaveElementInstance): void {
     this.zIndexManager.sendToBack(node);
   }
 
-  bringToFront(node: WeaveElementInstance) {
+  bringToFront(node: WeaveElementInstance): void {
     this.zIndexManager.bringToFront(node);
   }
 
   // GROUP MANAGEMENT METHODS PROXIES
 
-  group(nodes: WeaveStateElement[]) {
+  group(nodes: WeaveStateElement[]): void {
     this.groupsManager.group(nodes);
   }
 
-  unGroup(group: WeaveStateElement) {
+  unGroup(group: WeaveStateElement): void {
     this.groupsManager.unGroup(group);
   }
 
   // TARGETING MANAGEMENT METHODS PROXIES
 
-  getMousePointer(point?: Vector2d) {
+  getMousePointer(point?: Vector2d): WeaveMousePointInfo {
     return this.targetingManager.getMousePointer(point);
   }
 
-  getMousePointerRelativeToContainer(container: Konva.Group | Konva.Layer) {
+  getMousePointerRelativeToContainer(
+    container: Konva.Group | Konva.Layer
+  ): WeaveMousePointInfoSimple {
     return this.targetingManager.getMousePointerRelativeToContainer(container);
   }
 
   // CLONING MANAGEMENT METHODS PROXIES
 
-  nodesToGroupSerialized(instancesToClone: Konva.Node[]) {
+  nodesToGroupSerialized(instancesToClone: Konva.Node[]): WeaveSerializedGroup {
     return this.cloningManager.nodesToGroupSerialized(instancesToClone);
   }
 
@@ -489,13 +505,13 @@ export class Weave extends Emittery {
     instancesToClone: Konva.Node[],
     targetContainer: Konva.Layer | Konva.Group | undefined,
     onPoint: Vector2d
-  ) {
+  ): void {
     this.cloningManager.cloneNodes(instancesToClone, targetContainer, onPoint);
   }
 
   // FONTS MANAGEMENT METHODS PROXIES
 
-  getFonts() {
+  getFonts(): WeaveFont[] {
     return this.fontsManager.getFonts();
   }
 

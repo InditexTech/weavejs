@@ -12,7 +12,7 @@ import * as encoding from 'lib0/encoding';
 import * as decoding from 'lib0/decoding';
 import * as syncProtocol from 'y-protocols/sync';
 import * as awarenessProtocol from 'y-protocols/awareness';
-import { FetchClient } from './types';
+import { type FetchClient } from './types';
 
 const messageSyncStep1 = 0;
 const messageAwareness = 1;
@@ -258,7 +258,7 @@ export class WeaveStoreAzureWebPubSubSyncClient extends Emittery {
     return this._uuid;
   }
 
-  destroy() {
+  destroy(): void {
     if (this._resyncInterval !== null) {
       clearInterval(this._resyncInterval);
     }
@@ -266,7 +266,7 @@ export class WeaveStoreAzureWebPubSubSyncClient extends Emittery {
     this.doc.off('update', this._updateHandler);
   }
 
-  stop() {
+  stop(): void {
     if (this._ws !== null) {
       const encoder = encoding.createEncoder();
       encoding.writeVarUint(encoder, messageAwareness);
@@ -284,7 +284,7 @@ export class WeaveStoreAzureWebPubSubSyncClient extends Emittery {
     }
   }
 
-  async fetchConnectionUrl(fetchClient: FetchClient = fetch) {
+  async fetchConnectionUrl(fetchClient: FetchClient = fetch): Promise<void> {
     try {
       const res = await fetchClient(this._url);
       if (res.ok) {
@@ -299,7 +299,7 @@ export class WeaveStoreAzureWebPubSubSyncClient extends Emittery {
     }
   }
 
-  async start() {
+  async start(): Promise<void> {
     if (this._wsConnected || this._ws) {
       return;
     }

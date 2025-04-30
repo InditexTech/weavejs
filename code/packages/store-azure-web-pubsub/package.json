@@ -27,8 +27,8 @@
     "dist"
   ],
   "scripts": {
-    "build:snapshot": "vite build --mode=development --sourcemap --emptyOutDir",
-    "build": "vite build --mode=production --minify --emptyOutDir",
+    "build:snapshot": "tsdown --sourcemap",
+    "build": "tsdown",
     "bump:snapshot": "npm version $npm_package_version.$(date \"+%s\")",
     "bundle:analyze": "vite-bundle-visualizer",
     "check": "echo \"Monorepo test script\" && exit 0",
@@ -43,17 +43,27 @@
     "release:perform": "npm publish --access public",
     "release:prepare": "npm run verify",
     "start": "tsx ./bin/server.ts",
-    "test": "vitest --passWithNoTests",
+    "test": "vitest --passWithNoTests --coverage --watch=false",
     "types:check": "tsc --noEmit",
     "verify": "npm run lint && npm run test && npm run build",
     "version:development": "npm version $(npm version minor)-SNAPSHOT",
     "version:release": "npm version $RELEASE_VERSION -m \"[npm-scripts] prepare release $RELEASE_VERSION\" --tag-version-prefix \"\""
   },
-  "devDependencies": {
+  "dependencies": {
     "@azure/web-pubsub": "1.1.4",
-    "@azure/web-pubsub-express": "^1.0.6",
+    "@azure/web-pubsub-express": "1.0.6",
     "@inditextech/weave-sdk": "0.2.0-SNAPSHOT",
     "@inditextech/weave-types": "0.2.0-SNAPSHOT",
+    "@syncedstore/core": "0.6.0",
+    "buffer": "6.0.3",
+    "emittery": "1.1.0",
+    "konva": "9.3.20",
+    "reconnecting-websocket": "4.4.0",
+    "uuid": "11.1.0",
+    "ws": "8.18.1",
+    "yjs": "13.6.26"
+  },
+  "devDependencies": {
     "@types/express": "^5.0.1",
     "@types/uuid": "^10.0.0",
     "@types/ws": "^8.18.0",
@@ -61,28 +71,19 @@
     "@typescript-eslint/parser": "8.26.0",
     "@vitest/coverage-v8": "1.6.0",
     "@vitest/ui": "1.6.0",
-    "buffer": "^6.0.3",
     "cors": "^2.8.5",
-    "emittery": "1.1.0",
     "eslint": "8.57.1",
     "express": "^5.1.0",
     "globals": "15.14.0",
-    "js-base64": "^3.7.7",
-    "lib0": "^0.2.49",
-    "reconnecting-websocket": "^4.4.0",
+    "tsdown": "^0.10.2",
     "tsx": "^4.19.3",
     "typescript-eslint": "8.22.0",
-    "uuid": "^11.1.0",
     "vite": "5.2.9",
     "vite-bundle-visualizer": "1.1.0",
     "vite-plugin-compression2": "1.0.0",
     "vite-plugin-dts": "4.0.3",
     "vitest": "1.6.0",
-    "vitest-sonar-reporter": "2.0.0",
-    "ws": "^8.18.1"
-  },
-  "peerDependencies": {
-    "yjs": ">= 13.6.23"
+    "vitest-sonar-reporter": "2.0.0"
   },
   "engines": {
     "node": "^18.12 || ^20.11 || ^22.11",

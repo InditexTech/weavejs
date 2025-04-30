@@ -8,11 +8,11 @@ import { WebSocketServer } from 'ws';
 import { setServer, setupWSConnection } from './websockets-utils';
 import { defaultInitialState } from './default-initial-state';
 import {
-  FetchInitialState,
-  PerformUpgrade,
-  ExtractRoomId,
-  PersistRoom,
-  FetchRoom,
+  type FetchInitialState,
+  type PerformUpgrade,
+  type ExtractRoomId,
+  type PersistRoom,
+  type FetchRoom,
 } from '../types';
 
 type WeaveWebsocketsServerParams = {
@@ -54,7 +54,7 @@ export class WeaveWebsocketsServer {
     );
   }
 
-  handleUpgrade(server: http.Server | https.Server) {
+  handleUpgrade(server: http.Server | https.Server): void {
     server.on('upgrade', async (request, socket, head) => {
       const continueToUpgrade = await this.performUpgrade(request);
 

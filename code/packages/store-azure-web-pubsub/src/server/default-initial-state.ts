@@ -17,7 +17,7 @@ const yjsLayer = function (id: string) {
   return newLayerMap;
 };
 
-export function defaultInitialState(doc: Y.Doc) {
+export function defaultInitialState(doc: Y.Doc): void {
   const children = new Y.Array();
   children.insert(0, [
     yjsLayer('gridLayer'),

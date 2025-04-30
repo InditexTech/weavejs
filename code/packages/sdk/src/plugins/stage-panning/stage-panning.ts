@@ -27,7 +27,7 @@ export class WeaveStagePanningPlugin extends WeavePlugin {
     return 'stagePanning';
   }
 
-  init() {
+  init(): void {
     this.initEvents();
   }
 
@@ -196,11 +196,11 @@ export class WeaveStagePanningPlugin extends WeavePlugin {
     });
   }
 
-  enable() {
+  enable(): void {
     this.enabled = true;
   }
 
-  disable() {
+  disable(): void {
     this.enabled = false;
   }
 }

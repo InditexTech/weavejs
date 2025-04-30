@@ -3,7 +3,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import Konva from 'konva';
-import { WeaveElementInstance } from '@inditextech/weave-types';
+import { type WeaveElementInstance } from '@inditextech/weave-types';
 import { WeaveNodesSelectionPlugin } from '@/plugins/nodes-selection/nodes-selection';
 import { Weave } from '@/weave';
 import { WeaveImageNode } from './image';
@@ -40,7 +40,7 @@ export class WeaveImageClip {
     this.handleDrag = this.handleClipDrag.bind(this);
   }
 
-  show() {
+  show(): void {
     const originalImage = this.internalImage.getAttr('image');
 
     const nodeSnappingPlugin =

@@ -5,13 +5,14 @@
 import { isEmpty } from 'lodash';
 import { Weave } from '@/weave';
 import {
-  WeaveAwarenessChange,
-  WeaveState,
-  WeaveStoreBase,
-  WeaveUndoRedoChange,
-  WeaveStoreOptions,
+  type WeaveAwarenessChange,
+  type WeaveState,
+  type WeaveStoreBase,
+  type WeaveUndoRedoChange,
+  type WeaveStoreOptions,
+  type WeaveUser,
 } from '@inditextech/weave-types';
-import { MappedTypeDescription } from '@syncedstore/core/types/doc';
+import { type MappedTypeDescription } from '@syncedstore/core/types/doc';
 import {
   observeDeep,
   syncedStore,
@@ -19,7 +20,7 @@ import {
   getYjsValue,
 } from '@syncedstore/core';
 import { Doc, AbstractType, UndoManager } from 'yjs';
-import { Logger } from 'pino';
+import { type Logger } from 'pino';
 
 export abstract class WeaveStore implements WeaveStoreBase {
   protected instance!: Weave;
@@ -49,11 +50,11 @@ export abstract class WeaveStore implements WeaveStoreBase {
     return this.name;
   }
 
-  getLogger() {
+  getLogger(): Logger {
     return this.logger;
   }
 
-  register(instance: Weave) {
+  register(instance: Weave): WeaveStore {
     this.instance = instance;
     this.logger = this.instance.getChildLogger(this.getName());
 
@@ -64,15 +65,15 @@ export abstract class WeaveStore implements WeaveStoreBase {
     return this;
   }
 
-  getUser() {
+  getUser(): WeaveUser {
     return this.config.getUser();
   }
 
-  setState(state: WeaveState) {
+  setState(state: WeaveState): void {
     this.state = state;
   }
 
-  setLatestState(newState: WeaveState) {
+  setLatestState(newState: WeaveState): void {
     this.latestState = newState;
   }
 
@@ -92,7 +93,7 @@ export abstract class WeaveStore implements WeaveStoreBase {
     return JSON.parse(JSON.stringify(this.state, undefined, 2)) as WeaveState;
   }
 
-  setup() {
+  setup(): void {
     const config = this.instance.getConfiguration();
 
     config.callbacks?.onRoomLoaded?.(this.isRoomLoaded);
@@ -158,7 +159,7 @@ export abstract class WeaveStore implements WeaveStoreBase {
     });
   }
 
-  canUndoStateStep() {
+  canUndoStateStep(): boolean {
     if (!this.supportsUndoManager) {
       throw new Error('Undo manager not supported');
     }
@@ -166,7 +167,7 @@ export abstract class WeaveStore implements WeaveStoreBase {
     return this.undoManager.canUndo();
   }
 
-  canRedoStateStep() {
+  canRedoStateStep(): boolean {
     if (!this.supportsUndoManager) {
       throw new Error('Undo manager not supported');
     }
@@ -174,7 +175,7 @@ export abstract class WeaveStore implements WeaveStoreBase {
     return this.undoManager.canRedo();
   }
 
-  undoStateStep() {
+  undoStateStep(): void {
     if (!this.supportsUndoManager) {
       throw new Error('Undo manager not supported');
     }
@@ -182,7 +183,7 @@ export abstract class WeaveStore implements WeaveStoreBase {
     this.undoManager.undo();
   }
 
-  redoStateStep() {
+  redoStateStep(): void {
     if (!this.supportsUndoManager) {
       throw new Error('Undo manager not supported');
     }

@@ -3,9 +3,9 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { Weave } from '@/weave';
-import { Logger } from 'pino';
+import { type Logger } from 'pino';
 import {
-  WeaveElementInstance,
+  type WeaveElementInstance,
   WEAVE_NODE_POSITION,
 } from '@inditextech/weave-types';
 
@@ -19,7 +19,7 @@ export class WeaveZIndexManager {
     this.logger.debug('zIndex manager created');
   }
 
-  moveUp(instance: WeaveElementInstance) {
+  moveUp(instance: WeaveElementInstance): void {
     this.logger.debug(
       `Moving instance with id [${
         instance.getAttrs().id
@@ -33,7 +33,7 @@ export class WeaveZIndexManager {
     this.instance.moveNode(node, WEAVE_NODE_POSITION.UP);
   }
 
-  moveDown(instance: WeaveElementInstance) {
+  moveDown(instance: WeaveElementInstance): void {
     this.logger.debug(
       `Moving instance with id [${
         instance.getAttrs().id
@@ -47,7 +47,7 @@ export class WeaveZIndexManager {
     this.instance.moveNode(node, WEAVE_NODE_POSITION.DOWN);
   }
 
-  sendToBack(instance: WeaveElementInstance) {
+  sendToBack(instance: WeaveElementInstance): void {
     this.logger.debug(
       `Moving instance with id [${
         instance.getAttrs().id
@@ -61,7 +61,7 @@ export class WeaveZIndexManager {
     this.instance.moveNode(node, WEAVE_NODE_POSITION.BACK);
   }
 
-  bringToFront(instance: WeaveElementInstance) {
+  bringToFront(instance: WeaveElementInstance): void {
     this.logger.debug(
       `Moving instance with id [${instance.getAttrs().id}], to top of z-index`
     );

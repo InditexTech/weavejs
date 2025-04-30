@@ -16,14 +16,14 @@ const CALLBACK_OBJECTS = process.env.CALLBACK_OBJECTS
   ? JSON.parse(process.env.CALLBACK_OBJECTS)
   : {};
 
-export const isCallbackSet = !!CALLBACK_URL;
+export const isCallbackSet: boolean = !!CALLBACK_URL;
 
 export const callbackHandler = (
   _update: Uint8Array,
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   _origin: any,
   doc: WSSharedDoc
-) => {
+): void => {
   const room = doc.name;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const dataToSend: { room: string; data: any } = {
@@ -44,7 +44,7 @@ export const callbackHandler = (
 };
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export const callbackRequest = (url: URL, timeout: number, data: any) => {
+export const callbackRequest = (url: URL, timeout: number, data: any): void => {
   data = JSON.stringify(data);
   const options = {
     hostname: url.hostname,

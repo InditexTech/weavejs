@@ -9,7 +9,6 @@ export { WeaveAction } from './actions/action';
 export * from './actions/types';
 export { WeavePlugin } from './plugins/plugin';
 export * from './utils';
-export { sendEvent } from './events';
 
 // Provided Nodes
 export { WeaveStageNode } from './nodes/stage/stage';

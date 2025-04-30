@@ -13,7 +13,7 @@ export class WeaveStageResizePlugin extends WeavePlugin {
     return 'stageResize';
   }
 
-  init() {
+  init(): void {
     const stage = this.instance.getStage();
 
     window.addEventListener('resize', () => {
@@ -40,11 +40,11 @@ export class WeaveStageResizePlugin extends WeavePlugin {
     });
   }
 
-  enable() {
+  enable(): void {
     this.enabled = true;
   }
 
-  disable() {
+  disable(): void {
     this.enabled = false;
   }
 }

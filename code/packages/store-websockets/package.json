@@ -27,8 +27,8 @@
     "dist"
   ],
   "scripts": {
-    "build:snapshot": "vite build --mode=development --sourcemap --emptyOutDir",
-    "build": "vite build --mode=production --minify --emptyOutDir",
+    "build:snapshot": "tsdown --sourcemap",
+    "build": "tsdown",
     "bump:snapshot": "npm version $npm_package_version.$(date \"+%s\")",
     "bundle:analyze": "vite-bundle-visualizer",
     "check": "echo \"Monorepo test script\" && exit 0",
@@ -42,15 +42,22 @@
     "publish:snapshot": "npm publish",
     "release:perform": "npm publish --access public",
     "release:prepare": "npm run verify",
-    "test": "vitest --passWithNoTests",
+    "test": "vitest --passWithNoTests --coverage --watch=false",
     "types:check": "tsc --noEmit",
     "verify": "npm run lint && npm run test && npm run build",
     "version:development": "npm version $(npm version minor)-SNAPSHOT",
     "version:release": "npm version $RELEASE_VERSION -m \"[npm-scripts] prepare release $RELEASE_VERSION\" --tag-version-prefix \"\""
   },
-  "devDependencies": {
+  "dependencies": {
+    "@syncedstore/core": "0.6.0",
     "@inditextech/weave-sdk": "0.2.0-SNAPSHOT",
     "@inditextech/weave-types": "0.2.0-SNAPSHOT",
+    "konva": "9.3.20",
+    "ws": "8.18.1",
+    "y-websocket": "3.0.0",
+    "yjs": "13.6.26"
+  },
+  "devDependencies": {
     "@types/express": "^5.0.1",
     "@types/lodash.debounce": "^4.0.9",
     "@types/ws": "^8.18.1",
@@ -67,12 +74,7 @@
     "vite-plugin-compression2": "1.0.0",
     "vite-plugin-dts": "4.0.3",
     "vitest": "1.6.0",
-    "vitest-sonar-reporter": "2.0.0",
-    "ws": "^8.18.1"
-  },
-  "peerDependencies": {
-    "y-websocket": ">= 2.1.0",
-    "yjs": ">= 13.6.23"
+    "vitest-sonar-reporter": "2.0.0"
   },
   "engines": {
     "node": "^18.12 || ^20.11 || ^22.11",

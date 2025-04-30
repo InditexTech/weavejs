@@ -110,11 +110,11 @@ export class WeaveStoreAzureWebPubSubSyncHost {
     doc.on('update', updateHandler);
   }
 
-  get awareness() {
+  get awareness(): awarenessProtocol.Awareness {
     return this._awareness;
   }
 
-  async start() {
+  async start(): Promise<void> {
     const url = await this.negotiate(this.topic);
     const conn = new this._polyfill(url, 'json.webpubsub.azure.v1');
 

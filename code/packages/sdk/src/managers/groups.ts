@@ -6,11 +6,11 @@ import { isEmpty, orderBy } from 'lodash';
 import { v4 as uuidv4 } from 'uuid';
 import Konva from 'konva';
 import {
-  WeaveStateElement,
+  type WeaveStateElement,
   WEAVE_NODE_LAYER_ID,
 } from '@inditextech/weave-types';
 import { Weave } from '@/weave';
-import { Logger } from 'pino';
+import { type Logger } from 'pino';
 import { WeaveNodesSelectionPlugin } from '@/plugins/nodes-selection/nodes-selection';
 
 export class WeaveGroupsManager {
@@ -46,7 +46,7 @@ export class WeaveGroupsManager {
     return { allInSame, nodeId, parentId };
   }
 
-  group(nodes: WeaveStateElement[]) {
+  group(nodes: WeaveStateElement[]): void {
     this.logger.debug({ nodes }, 'Grouping nodes');
 
     const stage = this.instance.getStage();
@@ -185,7 +185,7 @@ export class WeaveGroupsManager {
     }, 0);
   }
 
-  unGroup(group: WeaveStateElement) {
+  unGroup(group: WeaveStateElement): void {
     this.logger.warn({ group }, 'Un-grouping group');
 
     const stage = this.instance.getStage();

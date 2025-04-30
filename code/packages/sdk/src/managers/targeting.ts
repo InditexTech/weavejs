@@ -4,8 +4,12 @@
 
 import Konva from 'konva';
 import { Weave } from '@/weave';
-import { Vector2d } from 'konva/lib/types';
-import { Logger } from 'pino';
+import { type Vector2d } from 'konva/lib/types';
+import { type Logger } from 'pino';
+import type {
+  WeaveMousePointInfo,
+  WeaveMousePointInfoSimple,
+} from '@inditextech/weave-types';
 
 export class WeaveTargetingManager {
   private instance: Weave;
@@ -17,7 +21,7 @@ export class WeaveTargetingManager {
     this.logger.debug('Targeting manager created');
   }
 
-  getMousePointer(point?: Vector2d) {
+  getMousePointer(point?: Vector2d): WeaveMousePointInfo {
     this.logger.debug({ point }, 'getMousePointer');
     const stage = this.instance.getStage();
     const mainLayer = this.instance.getMainLayer();
@@ -76,7 +80,9 @@ export class WeaveTargetingManager {
     return { mousePoint: relativeMousePointer, container, measureContainer };
   }
 
-  getMousePointerRelativeToContainer(container: Konva.Group | Konva.Layer) {
+  getMousePointerRelativeToContainer(
+    container: Konva.Group | Konva.Layer
+  ): WeaveMousePointInfoSimple {
     const relativeMousePointer = container.getRelativePointerPosition() ?? {
       x: 0,
       y: 0,

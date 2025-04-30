@@ -4,17 +4,18 @@
 
 import Konva from 'konva';
 import {
-  WeaveElementAttributes,
-  WeaveElementInstance,
+  type WeaveElementAttributes,
+  type WeaveElementInstance,
+  type WeaveStateElement,
 } from '@inditextech/weave-types';
 import { WeaveNode } from '../node';
 
 export const WEAVE_LINE_NODE_TYPE = 'line';
 
 export class WeaveLineNode extends WeaveNode {
-  protected nodeType = WEAVE_LINE_NODE_TYPE;
+  protected nodeType: string = WEAVE_LINE_NODE_TYPE;
 
-  createNode(key: string, props: WeaveElementAttributes) {
+  createNode(key: string, props: WeaveElementAttributes): WeaveStateElement {
     return {
       key,
       type: this.nodeType,
@@ -27,7 +28,7 @@ export class WeaveLineNode extends WeaveNode {
     };
   }
 
-  createInstance(props: WeaveElementAttributes) {
+  createInstance(props: WeaveElementAttributes): WeaveElementInstance {
     const line = new Konva.Line({
       ...props,
       name: 'node',
@@ -41,17 +42,17 @@ export class WeaveLineNode extends WeaveNode {
   updateInstance(
     nodeInstance: WeaveElementInstance,
     nextProps: WeaveElementAttributes
-  ) {
+  ): void {
     nodeInstance.setAttrs({
       ...nextProps,
     });
   }
 
-  removeInstance(nodeInstance: WeaveElementInstance) {
+  removeInstance(nodeInstance: WeaveElementInstance): void {
     nodeInstance.destroy();
   }
 
-  toNode(instance: WeaveElementInstance) {
+  toNode(instance: WeaveElementInstance): WeaveStateElement {
     const attrs = instance.getAttrs();
 
     const cleanedAttrs = { ...attrs };

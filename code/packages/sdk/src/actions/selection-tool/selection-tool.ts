@@ -3,7 +3,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { WeaveAction } from '@/actions/action';
-import { WeaveSelectionToolActionState } from './types';
+import { type WeaveSelectionToolActionState } from './types';
 import { SELECTION_TOOL_ACTION_NAME, SELECTION_TOOL_STATE } from './constants';
 import { WeaveNodesSelectionPlugin } from '@/plugins/nodes-selection/nodes-selection';
 
@@ -50,7 +50,7 @@ export class WeaveSelectionToolAction extends WeaveAction {
     this.setState(SELECTION_TOOL_STATE.SELECTING);
   }
 
-  trigger(cancelAction: () => void) {
+  trigger(cancelAction: () => void): void {
     if (!this.instance) {
       throw new Error('Instance not defined');
     }
@@ -68,7 +68,7 @@ export class WeaveSelectionToolAction extends WeaveAction {
     this.setSelection();
   }
 
-  cleanup() {
+  cleanup(): void {
     const stage = this.instance.getStage();
 
     stage.container().style.cursor = 'default';

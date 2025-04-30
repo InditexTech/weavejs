@@ -3,16 +3,17 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { v4 as uuidv4 } from 'uuid';
-import { Vector2d } from 'konva/lib/types';
+import { type Vector2d } from 'konva/lib/types';
 import { FRAME_TOOL_ACTION_NAME, FRAME_TOOL_STATE } from './constants';
 import Konva from 'konva';
 import { WeaveAction } from '../action';
 import { WEAVE_NODE_LAYER_ID } from '@inditextech/weave-types';
 import { WeaveNodesSelectionPlugin } from '@/plugins/nodes-selection/nodes-selection';
 import {
-  WeaveFrameToolActionState,
-  WeaveFrameToolActionTriggerParams,
-  WeaveFrameToolCallbacks,
+  type WeaveFrameToolActionState,
+  type WeaveFrameToolActionTriggerParams,
+  type WeaveFrameToolCallbacks,
+  type WeaveFrameToolProps,
 } from './types';
 
 export class WeaveFrameToolAction extends WeaveAction {
@@ -39,7 +40,7 @@ export class WeaveFrameToolAction extends WeaveAction {
     return FRAME_TOOL_ACTION_NAME;
   }
 
-  initProps(params?: WeaveFrameToolActionTriggerParams) {
+  initProps(params?: WeaveFrameToolActionTriggerParams): WeaveFrameToolProps {
     return {
       title: 'Frame XXX',
       fontFamily: params?.fontFamily ?? 'Arial',
@@ -118,7 +119,7 @@ export class WeaveFrameToolAction extends WeaveAction {
   trigger(
     cancelAction: () => void,
     params?: WeaveFrameToolActionTriggerParams
-  ) {
+  ): void {
     if (!this.instance) {
       throw new Error('Instance not defined');
     }
@@ -137,7 +138,7 @@ export class WeaveFrameToolAction extends WeaveAction {
     this.addFrame();
   }
 
-  cleanup() {
+  cleanup(): void {
     const stage = this.instance.getStage();
 
     stage.container().style.cursor = 'default';

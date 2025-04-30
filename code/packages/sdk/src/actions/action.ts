@@ -2,10 +2,10 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-import { WeaveElementAttributes } from '@inditextech/weave-types';
+import { type WeaveElementAttributes } from '@inditextech/weave-types';
 import { Weave } from '@/weave';
-import { Logger } from 'pino';
-import { WeaveActionCallbacks } from './types';
+import { type Logger } from 'pino';
+import { type WeaveActionCallbacks } from './types';
 
 export abstract class WeaveAction {
   protected instance!: Weave;
@@ -34,11 +34,11 @@ export abstract class WeaveAction {
     return this.name;
   }
 
-  getLogger() {
+  getLogger(): Logger {
     return this.logger;
   }
 
-  register(instance: Weave) {
+  register(instance: Weave): WeaveAction {
     this.instance = instance;
     this.logger = this.instance.getChildLogger(this.getName());
     this.instance
@@ -48,14 +48,14 @@ export abstract class WeaveAction {
     return this;
   }
 
-  updateProps(props: WeaveElementAttributes) {
+  updateProps(props: WeaveElementAttributes): void {
     this.props = {
       ...this.props,
       ...props,
     };
   }
 
-  getProps() {
+  getProps(): WeaveElementAttributes {
     return this.props;
   }
 

@@ -4,11 +4,14 @@
 
 import { WeavePlugin } from '@/plugins/plugin';
 import {
-  WeaveStageContextMenuPluginCallbacks,
-  WeaveStageContextMenuPluginOptions,
+  type WeaveStageContextMenuPluginCallbacks,
+  type WeaveStageContextMenuPluginOptions,
 } from './types';
-import { WeaveElementInstance, WeaveSelection } from '@inditextech/weave-types';
-import { Vector2d } from 'konva/lib/types';
+import {
+  type WeaveElementInstance,
+  type WeaveSelection,
+} from '@inditextech/weave-types';
+import { type Vector2d } from 'konva/lib/types';
 import { WeaveNodesSelectionPlugin } from '../nodes-selection/nodes-selection';
 
 export class WeaveContextMenuPlugin extends WeavePlugin {
@@ -36,12 +39,12 @@ export class WeaveContextMenuPlugin extends WeavePlugin {
     return 'contextMenu';
   }
 
-  init() {
+  init(): void {
     this.initEvents();
   }
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  triggerContextMenu(target: any) {
+  triggerContextMenu(target: any): void {
     const stage = this.instance.getStage();
 
     const selectionPlugin =
@@ -160,15 +163,15 @@ export class WeaveContextMenuPlugin extends WeavePlugin {
     });
   }
 
-  isTapHold() {
+  isTapHold(): boolean {
     return this.tapHold;
   }
 
-  enable() {
+  enable(): void {
     this.enabled = true;
   }
 
-  disable() {
+  disable(): void {
     this.enabled = false;
   }
 }

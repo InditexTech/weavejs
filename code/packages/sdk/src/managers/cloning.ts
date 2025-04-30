@@ -6,9 +6,9 @@ import { orderBy } from 'lodash';
 import Konva from 'konva';
 import { v4 as uuidv4 } from 'uuid';
 import { Weave } from '@/weave';
-import { Vector2d } from 'konva/lib/types';
-import { Logger } from 'pino';
-import { WeaveStateElement } from '@inditextech/weave-types';
+import { type Vector2d } from 'konva/lib/types';
+import { type Logger } from 'pino';
+import { type WeaveStateElement } from '@inditextech/weave-types';
 
 export class WeaveCloningManager {
   private instance: Weave;
@@ -126,7 +126,7 @@ export class WeaveCloningManager {
     instancesToClone: Konva.Node[],
     targetContainer: Konva.Group | Konva.Layer | undefined,
     onPoint: Vector2d
-  ) {
+  ): void {
     if (instancesToClone.length === 0) {
       return;
     }

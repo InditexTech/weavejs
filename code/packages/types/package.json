@@ -21,8 +21,8 @@
     "dist"
   ],
   "scripts": {
-    "build:snapshot": "vite build --mode=development --sourcemap --emptyOutDir",
-    "build": "vite build --mode=production --minify --emptyOutDir",
+    "build:snapshot": "tsdown --sourcemap",
+    "build": "tsdown",
     "bump:snapshot": "npm version $npm_package_version.$(date \"+%s\")",
     "bundle:analyze": "vite-bundle-visualizer",
     "check": "echo \"Monorepo test script\" && exit 0",
@@ -41,6 +41,9 @@
     "version:development": "npm version $(npm version minor)-SNAPSHOT",
     "version:release": "npm version $RELEASE_VERSION -m \"[npm-scripts] prepare release $RELEASE_VERSION\" --tag-version-prefix \"\""
   },
+  "dependencies": {
+    "konva": "9.3.20"
+  },
   "devDependencies": {
     "@typescript-eslint/eslint-plugin": "8.26.0",
     "@typescript-eslint/parser": "8.26.0",
@@ -49,11 +52,8 @@
     "eslint": "8.57.1",
     "eslint-plugin-react": "7.34.1",
     "eslint-plugin-react-hooks": "^4.6.2",
+    "tsdown": "^0.10.2",
     "typescript-eslint": "8.22.0",
-    "vite": "5.2.9",
-    "vite-bundle-visualizer": "1.1.0",
-    "vite-plugin-compression2": "1.0.0",
-    "vite-plugin-dts": "4.0.3",
     "vitest": "1.6.0",
     "vitest-sonar-reporter": "2.0.0"
   },

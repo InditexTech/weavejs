@@ -4,12 +4,12 @@
 
 import { v4 as uuidv4 } from 'uuid';
 import Konva from 'konva';
-import { Vector2d } from 'konva/lib/types';
-import { WeaveElementInstance } from '@inditextech/weave-types';
+import { type Vector2d } from 'konva/lib/types';
+import { type WeaveElementInstance } from '@inditextech/weave-types';
 import { WeaveAction } from '@/actions/action';
 import {
-  WeaveRectangleToolActionState,
-  WeaveRectangleToolCallbacks,
+  type WeaveRectangleToolActionState,
+  type WeaveRectangleToolCallbacks,
 } from './types';
 import { RECTANGLE_TOOL_ACTION_NAME, RECTANGLE_TOOL_STATE } from './constants';
 import { WeaveNodesSelectionPlugin } from '@/plugins/nodes-selection/nodes-selection';
@@ -196,7 +196,7 @@ export class WeaveRectangleToolAction extends WeaveAction {
     }
   }
 
-  trigger(cancelAction: () => void) {
+  trigger(cancelAction: () => void): void {
     if (!this.instance) {
       throw new Error('Instance not defined');
     }
@@ -215,7 +215,7 @@ export class WeaveRectangleToolAction extends WeaveAction {
     this.addRectangle();
   }
 
-  cleanup() {
+  cleanup(): void {
     const stage = this.instance.getStage();
 
     stage.container().style.cursor = 'default';

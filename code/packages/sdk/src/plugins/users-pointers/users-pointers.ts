@@ -3,11 +3,14 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import _ from 'lodash';
-import { WeaveAwarenessChange, WeaveUser } from '@inditextech/weave-types';
 import {
-  WeaveUserPointer,
-  WeaveUserPointerKey,
-  WeaveUsersPointersPluginParams,
+  type WeaveAwarenessChange,
+  type WeaveUser,
+} from '@inditextech/weave-types';
+import {
+  type WeaveUserPointer,
+  type WeaveUserPointerKey,
+  type WeaveUsersPointersPluginParams,
 } from './types';
 import {
   WEAVE_USER_POINTER_KEY,
@@ -15,7 +18,7 @@ import {
 } from './constants';
 import { WeavePlugin } from '@/plugins/plugin';
 import Konva from 'konva';
-import { Vector2d } from 'konva/lib/types';
+import { type Vector2d } from 'konva/lib/types';
 
 export class WeaveUsersPointersPlugin extends WeavePlugin {
   private usersPointers: Record<
@@ -54,7 +57,7 @@ export class WeaveUsersPointersPlugin extends WeavePlugin {
     return WEAVE_USERS_POINTERS_LAYER_ID;
   }
 
-  initLayer() {
+  initLayer(): void {
     const stage = this.instance.getStage();
 
     const layer = new Konva.Layer({ id: this.getLayerName() });
@@ -68,7 +71,7 @@ export class WeaveUsersPointersPlugin extends WeavePlugin {
       | undefined;
   }
 
-  init() {
+  init(): void {
     const store = this.instance.getStore();
     const stage = this.instance.getStage();
 
@@ -333,20 +336,20 @@ export class WeaveUsersPointersPlugin extends WeavePlugin {
     }
   }
 
-  toggleRenderCursors() {
+  toggleRenderCursors(): void {
     this.renderCursors = !this.renderCursors;
   }
 
-  setRenderCursors(render: boolean) {
+  setRenderCursors(render: boolean): void {
     this.renderCursors = render;
   }
 
-  enable() {
+  enable(): void {
     this.getLayer()?.show();
     this.enabled = true;
   }
 
-  disable() {
+  disable(): void {
     this.getLayer()?.hide();
     this.enabled = false;
   }

@@ -4,18 +4,19 @@
 
 import Konva from 'konva';
 import {
-  WeaveElementAttributes,
-  WeaveElementInstance,
+  type WeaveElementAttributes,
+  type WeaveElementInstance,
+  type WeaveStateElement,
 } from '@inditextech/weave-types';
 import { WeaveNode } from '@/nodes/node';
-import { Vector2d } from 'konva/lib/types';
+import { type Vector2d } from 'konva/lib/types';
 import { WeaveNodesSelectionPlugin } from '@/plugins/nodes-selection/nodes-selection';
 import { resetScale } from '@/utils';
 
 export const WEAVE_TEXT_NODE_TYPE = 'text';
 
 export class WeaveTextNode extends WeaveNode {
-  protected nodeType = WEAVE_TEXT_NODE_TYPE;
+  protected nodeType: string = WEAVE_TEXT_NODE_TYPE;
   private editing: boolean = false;
 
   constructor() {
@@ -28,7 +29,7 @@ export class WeaveTextNode extends WeaveNode {
     return 'text';
   }
 
-  createNode(key: string, props: WeaveElementAttributes) {
+  createNode(key: string, props: WeaveElementAttributes): WeaveStateElement {
     return {
       key,
       type: this.nodeType,
@@ -48,7 +49,7 @@ export class WeaveTextNode extends WeaveNode {
     clonedText.destroy();
   }
 
-  createInstance(props: WeaveElementAttributes) {
+  createInstance(props: WeaveElementAttributes): WeaveElementInstance {
     const text = new Konva.Text({
       ...props,
       name: 'node',
@@ -103,17 +104,17 @@ export class WeaveTextNode extends WeaveNode {
   updateInstance(
     nodeInstance: WeaveElementInstance,
     nextProps: WeaveElementAttributes
-  ) {
+  ): void {
     nodeInstance.setAttrs({
       ...nextProps,
     });
   }
 
-  removeInstance(nodeInstance: WeaveElementInstance) {
+  removeInstance(nodeInstance: WeaveElementInstance): void {
     nodeInstance.destroy();
   }
 
-  toNode(instance: WeaveElementInstance) {
+  toNode(instance: WeaveElementInstance): WeaveStateElement {
     const attrs = instance.getAttrs();
 
     const cleanedAttrs = { ...attrs };

@@ -4,18 +4,19 @@
 
 import Konva from 'konva';
 import {
-  WeaveElementAttributes,
-  WeaveElementInstance,
+  type WeaveElementAttributes,
+  type WeaveElementInstance,
+  type WeaveStateElement,
 } from '@inditextech/weave-types';
 import { WeaveNode } from '../node';
-import { ImageProps } from './types';
+import { type ImageProps } from './types';
 import { WeaveImageToolAction } from '@/actions/image-tool/image-tool';
 import { WeaveImageClip } from './clip';
 
 export const WEAVE_IMAGE_NODE_TYPE = 'image';
 
 export class WeaveImageNode extends WeaveNode {
-  protected nodeType = WEAVE_IMAGE_NODE_TYPE;
+  protected nodeType: string = WEAVE_IMAGE_NODE_TYPE;
   private imageLoaded: boolean;
   cropping: boolean;
 
@@ -26,7 +27,7 @@ export class WeaveImageNode extends WeaveNode {
     this.cropping = false;
   }
 
-  createNode(key: string, props: WeaveElementAttributes) {
+  createNode(key: string, props: WeaveElementAttributes): WeaveStateElement {
     return {
       key,
       type: this.nodeType,
@@ -39,7 +40,7 @@ export class WeaveImageNode extends WeaveNode {
     };
   }
 
-  createInstance(props: WeaveElementAttributes) {
+  createInstance(props: WeaveElementAttributes): WeaveElementInstance {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const imageProperties: any = props.imageProperties;
     const imageProps = props as ImageProps;
@@ -177,7 +178,7 @@ export class WeaveImageNode extends WeaveNode {
   updateInstance(
     nodeInstance: WeaveElementInstance,
     nextProps: WeaveElementAttributes
-  ) {
+  ): void {
     const id = nodeInstance.getAttrs().id;
     const node = nodeInstance as Konva.Group;
 
@@ -252,11 +253,11 @@ export class WeaveImageNode extends WeaveNode {
     }
   }
 
-  removeInstance(nodeInstance: WeaveElementInstance) {
+  removeInstance(nodeInstance: WeaveElementInstance): void {
     nodeInstance.destroy();
   }
 
-  toNode(instance: WeaveElementInstance) {
+  toNode(instance: WeaveElementInstance): WeaveStateElement {
     const attrs = instance.getAttrs();
 
     const cleanedAttrs = { ...attrs };
