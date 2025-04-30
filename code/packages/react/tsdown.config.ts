@@ -8,6 +8,7 @@ export default defineConfig({
   entry: {
     react: './src/index.ts',
   },
+  external: ['@inditextech/weave-sdk'],
   format: ['es', 'cjs'],
   target: 'es2023',
   inputOptions: {
