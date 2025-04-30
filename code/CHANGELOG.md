@@ -13,6 +13,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- [#117](https://github.com/InditexTech/weavejs/issues/117) Switch to tsdown
+
 ## [0.1.1] - 2025-04-25
 
 ### Fixed
@@ -70,7 +74,5 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - [#18](https://github.com/InditexTech/weavejs/issues/18) Fix awareness not working on store-azure-web-pubsub
 
 [Unreleased]: https://github.com/InditexTech/weavejs/compare/0.1.1...HEAD
-
 [0.1.1]: https://github.com/InditexTech/weavejs/compare/0.1.0...0.1.1
-
 [0.1.0]: https://github.com/InditexTech/weavejs/releases/tag/0.1.0
