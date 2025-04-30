@@ -19,7 +19,7 @@ export class WeaveTextToolAction extends WeaveAction {
   protected clickPoint: Vector2d | null;
   protected cancelAction!: () => void;
   internalUpdate = undefined;
-  init = undefined;
+  onInit = undefined;
 
   constructor() {
     super();

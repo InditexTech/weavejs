@@ -12,7 +12,7 @@ export class WeaveMoveToolAction extends WeaveAction {
   protected state: WeaveMoveToolActionState;
   protected cancelAction!: () => void;
   internalUpdate = undefined;
-  init = undefined;
+  onInit = undefined;
 
   constructor() {
     super();

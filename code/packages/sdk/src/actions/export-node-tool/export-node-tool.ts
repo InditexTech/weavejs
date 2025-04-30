@@ -23,7 +23,7 @@ export class WeaveExportNodeToolAction extends WeaveAction {
   };
   private options!: WeaveExportNodeOptions;
   internalUpdate = undefined;
-  init = undefined;
+  onInit = undefined;
 
   getName(): string {
     return 'exportNodeTool';

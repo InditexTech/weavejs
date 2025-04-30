@@ -66,7 +66,7 @@ export class WeaveSetupManager {
       .getActionsHandlers();
     for (const actionId of Object.keys(actionsHandlers)) {
       const actionInstance = actionsHandlers[actionId];
-      actionInstance.init?.();
+      actionInstance.onInit?.();
     }
   }
 }

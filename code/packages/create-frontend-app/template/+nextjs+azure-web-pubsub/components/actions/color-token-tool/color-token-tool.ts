@@ -41,7 +41,7 @@ export class ColorTokenToolAction extends WeaveAction {
     };
   }
 
-  init() {
+  onInit() {
     this.instance.addEventListener('onStageDrop', () => {
       if (window.colorTokenDragColor) {
         this.instance.triggerAction('colorTokenTool', {

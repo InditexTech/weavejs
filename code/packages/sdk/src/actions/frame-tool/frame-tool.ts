@@ -24,7 +24,7 @@ export class WeaveFrameToolAction extends WeaveAction {
   protected clickPoint: Vector2d | null;
   protected cancelAction!: () => void;
   internalUpdate = undefined;
-  init = undefined;
+  onInit = undefined;
 
   constructor(callbacks: WeaveFrameToolCallbacks) {
     super(callbacks);

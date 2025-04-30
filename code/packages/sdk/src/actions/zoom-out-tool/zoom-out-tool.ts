@@ -19,7 +19,7 @@ export class WeaveZoomOutToolAction extends WeaveAction {
     return this.instance.getPlugin<WeaveStageZoomPlugin>('stageZoom');
   }
 
-  init(): void {
+  onInit(): void {
     const stageZoomPlugin = this.getStageZoomPlugin();
     if (!stageZoomPlugin) {
       throw new Error(

@@ -59,7 +59,7 @@ export abstract class WeaveAction {
     return this.props;
   }
 
-  abstract init?(): void;
+  abstract onInit?(): void;
 
   abstract trigger(cancelAction: () => void, params?: unknown): unknown;
 

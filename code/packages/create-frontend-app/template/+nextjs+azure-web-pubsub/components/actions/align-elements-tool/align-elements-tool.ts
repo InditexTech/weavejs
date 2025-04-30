@@ -5,7 +5,7 @@ import Konva from 'konva';
 export class AlignElementsToolAction extends WeaveAction {
   protected cancelAction!: () => void;
   internalUpdate = undefined;
-  init = undefined;
+  onInit = undefined;
 
   getName(): string {
     return 'alignElementsTool';
