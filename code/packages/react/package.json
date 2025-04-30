@@ -1,6 +1,6 @@
 {
   "name": "@inditextech/weave-react",
-  "version": "0.3.1",
+  "version": "0.4.0-SNAPSHOT",
   "type": "module",
   "license": "Apache-2.0",
   "author": "Jesus Manuel Piñeiro Cid <jesusmpc@inditex.com>",
@@ -43,7 +43,7 @@
     "version:release": "npm version $RELEASE_VERSION -m \"[npm-scripts] prepare release $RELEASE_VERSION\" --tag-version-prefix \"\""
   },
   "dependencies": {
-    "@inditextech/weave-sdk": "0.3.1",
+    "@inditextech/weave-sdk": "0.4.0-SNAPSHOT",
     "@syncedstore/core": "0.6.0",
     "konva": "9.3.20",
     "yjs": "13.6.26"
