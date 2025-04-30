@@ -13,6 +13,7 @@ import {
 } from '@inditextech/weave-types';
 import { type Vector2d } from 'konva/lib/types';
 import { WeaveNodesSelectionPlugin } from '../nodes-selection/nodes-selection';
+import { WEAVE_CONTEXT_MENU_KEY } from './constants';
 
 export class WeaveContextMenuPlugin extends WeavePlugin {
   private config: WeaveStageContextMenuPluginOptions;
@@ -21,7 +22,7 @@ export class WeaveContextMenuPlugin extends WeavePlugin {
   private tapHold: boolean;
   getLayerName = undefined;
   initLayer = undefined;
-  render: undefined;
+  onRender: undefined;
 
   constructor(
     options: WeaveStageContextMenuPluginOptions,
@@ -35,11 +36,11 @@ export class WeaveContextMenuPlugin extends WeavePlugin {
     this.callbacks = callbacks;
   }
 
-  getName() {
-    return 'contextMenu';
+  getName(): string {
+    return WEAVE_CONTEXT_MENU_KEY;
   }
 
-  init(): void {
+  onInit(): void {
     this.initEvents();
   }
 
@@ -84,7 +85,7 @@ export class WeaveContextMenuPlugin extends WeavePlugin {
 
           return {
             instance: node as WeaveElementInstance,
-            node: nodeHandler.toNode(node as WeaveElementInstance),
+            node: nodeHandler.serialize(node as WeaveElementInstance),
           };
         })
         .filter((node) => node !== undefined);

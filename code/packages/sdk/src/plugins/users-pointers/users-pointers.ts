@@ -14,6 +14,7 @@ import {
 } from './types';
 import {
   WEAVE_USER_POINTER_KEY,
+  WEAVE_USERS_POINTERS_KEY,
   WEAVE_USERS_POINTERS_LAYER_ID,
 } from './constants';
 import { WeavePlugin } from '@/plugins/plugin';
@@ -35,7 +36,7 @@ export class WeaveUsersPointersPlugin extends WeavePlugin {
   private userPointerBackgroundCornerRadius: number = 4;
   private userPointerBackgroundPaddingX: number = 4;
   private userPointerBackgroundPaddingY: number = 8;
-  render: undefined;
+  onRender: undefined;
 
   constructor(params: WeaveUsersPointersPluginParams) {
     super();
@@ -49,8 +50,8 @@ export class WeaveUsersPointersPlugin extends WeavePlugin {
       getUser ?? (() => ({ name: 'Unknown', email: 'unknown@domain.com' }));
   }
 
-  getName() {
-    return 'usersPointers';
+  getName(): string {
+    return WEAVE_USERS_POINTERS_KEY;
   }
 
   getLayerName(): string {
@@ -71,7 +72,7 @@ export class WeaveUsersPointersPlugin extends WeavePlugin {
       | undefined;
   }
 
-  init(): void {
+  onInit(): void {
     const store = this.instance.getStore();
     const stage = this.instance.getStage();
 

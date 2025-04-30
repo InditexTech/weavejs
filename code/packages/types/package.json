@@ -21,8 +21,8 @@
     "dist"
   ],
   "scripts": {
-    "build:snapshot": "tsdown --sourcemap",
-    "build": "tsdown",
+    "build:snapshot": "tsc --noEmit && tsdown --sourcemap",
+    "build": "tsc --noEmit && tsdown",
     "bump:snapshot": "npm version $npm_package_version.$(date \"+%s\")",
     "bundle:analyze": "vite-bundle-visualizer",
     "check": "echo \"Monorepo test script\" && exit 0",

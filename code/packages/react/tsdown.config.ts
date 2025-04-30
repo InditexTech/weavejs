@@ -6,15 +6,15 @@ import { defineConfig } from 'tsdown';
 
 export default defineConfig({
   entry: {
-    react: './src/index.ts'
+    react: './src/index.ts',
   },
   format: ['es', 'cjs'],
-  target: 'esnext',
+  target: 'es2023',
   inputOptions: {
     jsx: 'react-jsx',
   },
   clean: true,
   dts: true,
-  platform: 'neutral',
+  platform: 'browser',
   report: true,
 });

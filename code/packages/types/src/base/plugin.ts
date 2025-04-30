@@ -3,9 +3,9 @@
 // SPDX-License-Identifier: Apache-2.0
 
 export interface WeavePluginBase {
-  init?(): void;
+  onInit?(): void;
 
-  render?(): void;
+  onRender?(): void;
 
   enable(): void;
 

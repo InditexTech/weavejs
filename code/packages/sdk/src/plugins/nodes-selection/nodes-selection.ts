@@ -8,7 +8,10 @@ import {
 } from '@inditextech/weave-types';
 import Konva from 'konva';
 import { WeavePlugin } from '@/plugins/plugin';
-import { WEAVE_NODES_SELECTION_LAYER_ID } from './constants';
+import {
+  WEAVE_NODES_SELECTION_KEY,
+  WEAVE_NODES_SELECTION_LAYER_ID,
+} from './constants';
 import { type WeaveNodesSelectionPluginCallbacks } from './types';
 import { WeaveContextMenuPlugin } from '../context-menu/context-menu';
 
@@ -20,7 +23,7 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
   private selecting: boolean;
   private initialized: boolean;
   private callbacks: WeaveNodesSelectionPluginCallbacks;
-  render: undefined;
+  onRender: undefined;
 
   constructor(callbacks: WeaveNodesSelectionPluginCallbacks) {
     super();
@@ -33,8 +36,8 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
     this.enabled = false;
   }
 
-  getName() {
-    return 'nodesSelection';
+  getName(): string {
+    return WEAVE_NODES_SELECTION_KEY;
   }
 
   getLayerName(): string {
@@ -48,7 +51,7 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
     stage.add(layer);
   }
 
-  init(): void {
+  onInit(): void {
     const stage = this.instance.getStage();
     const selectionLayer = this.getLayer();
 
@@ -167,7 +170,7 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
       const nodeHandler = this.instance.getNodeHandler(nodeType);
       return {
         instance: node as Konva.Shape | Konva.Group,
-        node: nodeHandler.toNode(node as Konva.Shape | Konva.Group),
+        node: nodeHandler.serialize(node as Konva.Shape | Konva.Group),
       };
     });
 
@@ -188,7 +191,7 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
           const handler = this.instance.getNodeHandler(
             node.getAttrs().nodeType
           );
-          return handler.toNode(node);
+          return handler.serialize(node);
         });
         this.instance.removeNodes(mappedSelectedNodes);
         this.tr.nodes([]);

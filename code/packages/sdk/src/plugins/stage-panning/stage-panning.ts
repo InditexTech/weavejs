@@ -3,6 +3,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { WeavePlugin } from '@/plugins/plugin';
+import { WEAVE_STAGE_PANNING_KEY } from './constants';
 
 export class WeaveStagePanningPlugin extends WeavePlugin {
   private moveToolActive: boolean;
@@ -11,7 +12,7 @@ export class WeaveStagePanningPlugin extends WeavePlugin {
   protected previousPointer!: string | null;
   getLayerName = undefined;
   initLayer = undefined;
-  render: undefined;
+  onRender: undefined;
 
   constructor() {
     super();
@@ -23,11 +24,11 @@ export class WeaveStagePanningPlugin extends WeavePlugin {
     this.previousPointer = null;
   }
 
-  getName() {
-    return 'stagePanning';
+  getName(): string {
+    return WEAVE_STAGE_PANNING_KEY;
   }
 
-  init(): void {
+  onInit(): void {
     this.initEvents();
   }
 

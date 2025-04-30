@@ -2,4 +2,4 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-export const WEAVE_STAGE_ZOOM_KEY = 'stageZoom';
+export const WEAVE_STAGE_RESIZE_KEY = 'stageResize';

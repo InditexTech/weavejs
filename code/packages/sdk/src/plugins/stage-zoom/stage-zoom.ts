@@ -9,11 +9,12 @@ import {
 } from './types';
 import Konva from 'konva';
 import { WeaveNodesSelectionPlugin } from '../nodes-selection/nodes-selection';
+import { WEAVE_STAGE_ZOOM_KEY } from './constants';
 
 export class WeaveStageZoomPlugin extends WeavePlugin {
   getLayerName = undefined;
   initLayer = undefined;
-  render: undefined;
+  onRender: undefined;
   private zoomSteps: number[];
   private actualScale: number;
   private actualStep: number;
@@ -42,11 +43,11 @@ export class WeaveStageZoomPlugin extends WeavePlugin {
     this.onZoomChangeCb = onZoomChange;
   }
 
-  getName() {
-    return 'stageZoom';
+  getName(): string {
+    return WEAVE_STAGE_ZOOM_KEY;
   }
 
-  init(): void {
+  onInit(): void {
     this.setZoom(this.zoomSteps[this.actualStep]);
   }
 
@@ -87,7 +88,7 @@ export class WeaveStageZoomPlugin extends WeavePlugin {
       const plugins = this.instance.getPlugins();
       for (const pluginId of Object.keys(plugins)) {
         const pluginInstance = plugins[pluginId];
-        pluginInstance.render?.();
+        pluginInstance.onRender?.();
       }
 
       const callbackParams = {

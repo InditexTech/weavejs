@@ -10,11 +10,16 @@ import {
   type LineGuideStop,
   type NodeSnappingEdges,
 } from './types';
-import { GUIDE_LINE_NAME, GUIDE_ORIENTATION, NODE_SNAP } from './constants';
+import {
+  GUIDE_LINE_NAME,
+  GUIDE_ORIENTATION,
+  NODE_SNAP,
+  WEAVE_NODES_SNAPPING_KEY,
+} from './constants';
 
 export class WeaveNodesSnappingPlugin extends WeavePlugin {
   private guideLineOffset: number;
-  render: undefined;
+  onRender: undefined;
 
   constructor() {
     super();
@@ -23,11 +28,11 @@ export class WeaveNodesSnappingPlugin extends WeavePlugin {
     this.enabled = true;
   }
 
-  getName() {
-    return 'nodesSnapping';
+  getName(): string {
+    return WEAVE_NODES_SNAPPING_KEY;
   }
 
-  init(): void {
+  onInit(): void {
     this.initEvents();
   }
 

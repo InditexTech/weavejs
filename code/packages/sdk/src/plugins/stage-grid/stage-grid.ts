@@ -9,6 +9,7 @@ import {
   WEAVE_GRID_DEFAULT_SIZE,
   WEAVE_GRID_LAYER_ID,
   WEAVE_GRID_TYPES,
+  WEAVE_STAGE_GRID_KEY,
 } from './constants';
 import {
   type WeaveStageGridPluginParams,
@@ -36,8 +37,8 @@ export class WeaveStageGridPlugin extends WeavePlugin {
     this.gridSize = gridSize;
   }
 
-  getName() {
-    return 'stageGrid';
+  getName(): string {
+    return WEAVE_STAGE_GRID_KEY;
   }
 
   getLayerName(): string {
@@ -54,7 +55,7 @@ export class WeaveStageGridPlugin extends WeavePlugin {
     stage.add(layer);
   }
 
-  init(): void {
+  onInit(): void {
     this.initEvents();
     this.renderGrid();
   }
@@ -116,7 +117,7 @@ export class WeaveStageGridPlugin extends WeavePlugin {
         return;
       }
 
-      this.render();
+      this.onRender();
     });
 
     stage.on('touchmove', (e) => {
@@ -126,7 +127,7 @@ export class WeaveStageGridPlugin extends WeavePlugin {
         return;
       }
 
-      this.render();
+      this.onRender();
     });
 
     stage.on('wheel', (e) => {
@@ -140,7 +141,7 @@ export class WeaveStageGridPlugin extends WeavePlugin {
         return;
       }
 
-      this.render();
+      this.onRender();
     });
   }
 
@@ -323,20 +324,20 @@ export class WeaveStageGridPlugin extends WeavePlugin {
     }
   }
 
-  render(): void {
+  onRender(): void {
     this.renderGrid();
   }
 
   enable(): void {
     this.enabled = true;
     this.getLayer()?.show();
-    this.render();
+    this.onRender();
   }
 
   disable(): void {
     this.enabled = false;
     this.getLayer()?.hide();
-    this.render();
+    this.onRender();
   }
 
   getType(): WeaveStageGridType {
@@ -345,6 +346,6 @@ export class WeaveStageGridPlugin extends WeavePlugin {
 
   setType(type: WeaveStageGridType): void {
     this.type = type;
-    this.render();
+    this.onRender();
   }
 }

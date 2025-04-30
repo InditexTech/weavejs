@@ -4,12 +4,13 @@
 
 import { WeavePlugin } from '@/plugins/plugin';
 import { type WeaveStageDropAreaPluginCallbacks } from './types';
+import { WEAVE_STAGE_DROP_AREA_KEY } from './constants';
 
 export class WeaveStageDropAreaPlugin extends WeavePlugin {
   private callbacks?: WeaveStageDropAreaPluginCallbacks;
   getLayerName = undefined;
   initLayer = undefined;
-  render: undefined;
+  onRender: undefined;
 
   constructor(callbacks?: WeaveStageDropAreaPluginCallbacks) {
     super();
@@ -18,11 +19,11 @@ export class WeaveStageDropAreaPlugin extends WeavePlugin {
     this.enabled = true;
   }
 
-  getName() {
-    return 'stageDropArea';
+  getName(): string {
+    return WEAVE_STAGE_DROP_AREA_KEY;
   }
 
-  init(): void {
+  onInit(): void {
     this.initEvents();
   }
 

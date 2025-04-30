@@ -60,7 +60,7 @@ export class WeaveExportManager {
         const plugins = this.instance.getPlugins();
         for (const pluginId of Object.keys(plugins)) {
           const pluginInstance = plugins[pluginId];
-          pluginInstance.render?.();
+          pluginInstance.onRender?.();
         }
 
         const stageClientRect = stage.getClientRect({ relativeTo: stage });
@@ -95,7 +95,7 @@ export class WeaveExportManager {
             const plugins = this.instance.getPlugins();
             for (const pluginId of Object.keys(plugins)) {
               const pluginInstance = plugins[pluginId];
-              pluginInstance.render?.();
+              pluginInstance.onRender?.();
             }
 
             background?.destroy();

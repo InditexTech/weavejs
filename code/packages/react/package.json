@@ -21,8 +21,8 @@
     "dist"
   ],
   "scripts": {
-    "build:snapshot": "tsdown --sourcemap",
-    "build": "tsdown",
+    "build:snapshot": "tsc --noEmit && tsdown --sourcemap",
+    "build": "tsc --noEmit && tsdown",
     "bump:snapshot": "npm version $npm_package_version.$(date \"+%s\")",
     "bundle:analyze": "vite-bundle-visualizer",
     "check": "echo \"Monorepo test script\" && exit 0",
@@ -49,6 +49,7 @@
     "yjs": "13.6.26"
   },
   "devDependencies": {
+    "@types/node": "^22.15.3",
     "@typescript-eslint/eslint-plugin": "8.26.0",
     "@typescript-eslint/parser": "8.26.0",
     "@vitejs/plugin-react": "4.3.4",

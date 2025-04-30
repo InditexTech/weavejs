@@ -2,4 +2,5 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-export const WEAVE_NODES_SELECTION_LAYER_ID = "selectionLayer";
+export const WEAVE_NODES_SELECTION_KEY = 'nodesSelection';
+export const WEAVE_NODES_SELECTION_LAYER_ID = 'selectionLayer';
