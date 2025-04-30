@@ -2,9 +2,9 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-import { Logger } from 'pino';
+import { type Logger } from 'pino';
 import { Weave } from '@/weave';
-import { WeaveElementAttributes } from '@inditextech/weave-types';
+import { type WeaveElementAttributes } from '@inditextech/weave-types';
 
 export class WeaveActionsManager {
   private instance: Weave;
@@ -17,11 +17,11 @@ export class WeaveActionsManager {
     this.logger.debug('Actions manager created');
   }
 
-  getActiveAction() {
+  getActiveAction(): string | undefined {
     return this.activeAction;
   }
 
-  triggerAction<T>(actionName: string, params?: T) {
+  triggerAction<T>(actionName: string, params?: T): unknown {
     const config = this.instance.getConfiguration();
     const actionsHandlers = this.instance.getActionsHandlers();
 
@@ -47,7 +47,7 @@ export class WeaveActionsManager {
     return payload;
   }
 
-  updatePropsAction(actionName: string, props: WeaveElementAttributes) {
+  updatePropsAction(actionName: string, props: WeaveElementAttributes): void {
     const actionsHandlers = this.instance.getActionsHandlers();
 
     if (!actionsHandlers[actionName]) {
@@ -66,7 +66,7 @@ export class WeaveActionsManager {
     actionsHandlers[actionName].updateProps?.(props);
   }
 
-  getPropsAction(actionName: string) {
+  getPropsAction(actionName: string): WeaveElementAttributes {
     const actionsHandlers = this.instance.getActionsHandlers();
 
     if (!actionsHandlers[actionName]) {
@@ -85,7 +85,7 @@ export class WeaveActionsManager {
     return actionsHandlers[actionName].getProps?.();
   }
 
-  cancelAction(actionName: string) {
+  cancelAction(actionName: string): void {
     const config = this.instance.getConfiguration();
     const actionsHandlers = this.instance.getActionsHandlers();
 
@@ -103,7 +103,7 @@ export class WeaveActionsManager {
   }
 
   protected cancelActionCallback(actionName: string) {
-    return () => {
+    return (): void => {
       this.cancelAction(actionName);
     };
   }

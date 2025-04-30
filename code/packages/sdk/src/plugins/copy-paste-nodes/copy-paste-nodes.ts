@@ -4,15 +4,19 @@
 
 import { WeavePlugin } from '@/plugins/plugin';
 import { v4 as uuidv4 } from 'uuid';
-import { NodeSerializable, WeaveStateElement } from '@inditextech/weave-types';
+import {
+  type NodeSerializable,
+  type WeaveStateElement,
+} from '@inditextech/weave-types';
 import { COPY_PASTE_NODES_PLUGIN_STATE } from './constants';
 import { WeaveNodesSelectionPlugin } from '../nodes-selection/nodes-selection';
 import {
-  WeaveCopyPasteNodesPluginCallbacks,
-  WeaveCopyPasteNodesPluginState,
-  WeavePasteModel,
+  type WeaveCopyPasteNodesPluginCallbacks,
+  type WeaveCopyPasteNodesPluginState,
+  type WeavePasteModel,
+  type WeaveToPasteNode,
 } from './types';
-import { Vector2d } from 'konva/lib/types';
+import { type Vector2d } from 'konva/lib/types';
 
 export class WeaveCopyPasteNodesPlugin extends WeavePlugin {
   protected state: WeaveCopyPasteNodesPluginState;
@@ -33,7 +37,7 @@ export class WeaveCopyPasteNodesPlugin extends WeavePlugin {
     return 'copyPasteNodes';
   }
 
-  init() {
+  init(): void {
     this.initEvents();
   }
 
@@ -248,20 +252,20 @@ export class WeaveCopyPasteNodesPlugin extends WeavePlugin {
     this.state = COPY_PASTE_NODES_PLUGIN_STATE.PASTING;
   }
 
-  async copy() {
+  async copy(): Promise<void> {
     await this.performCopy();
   }
 
-  async paste() {
+  async paste(): Promise<void> {
     await this.readClipboardData();
     this.performPaste();
   }
 
-  getSelectedNodes() {
+  getSelectedNodes(): WeaveToPasteNode[] {
     return this.mapToPasteNodes();
   }
 
-  isPasting() {
+  isPasting(): boolean {
     return this.state === COPY_PASTE_NODES_PLUGIN_STATE.PASTING;
   }
 
@@ -284,11 +288,11 @@ export class WeaveCopyPasteNodesPlugin extends WeavePlugin {
     return nodesSelectionPlugin;
   }
 
-  enable() {
+  enable(): void {
     this.enabled = true;
   }
 
-  disable() {
+  disable(): void {
     this.enabled = false;
   }
 }

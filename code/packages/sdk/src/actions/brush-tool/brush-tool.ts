@@ -3,11 +3,14 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { v4 as uuidv4 } from 'uuid';
-import { WeaveElementInstance } from '@inditextech/weave-types';
+import { type WeaveElementInstance } from '@inditextech/weave-types';
 import Konva from 'konva';
-import { Vector2d } from 'konva/lib/types';
+import { type Vector2d } from 'konva/lib/types';
 import { WeaveAction } from '@/actions/action';
-import { WeaveBrushToolActionState, WeaveBrushToolCallbacks } from './types';
+import {
+  type WeaveBrushToolActionState,
+  type WeaveBrushToolCallbacks,
+} from './types';
 import { BRUSH_TOOL_STATE } from './constants';
 import { WeaveNodesSelectionPlugin } from '@/plugins/nodes-selection/nodes-selection';
 
@@ -183,7 +186,7 @@ export class WeaveBrushToolAction extends WeaveAction {
     }
   }
 
-  trigger(cancel: () => void) {
+  trigger(cancel: () => void): void {
     if (!this.instance) {
       throw new Error('Instance not defined');
     }
@@ -212,7 +215,7 @@ export class WeaveBrushToolAction extends WeaveAction {
     stage.container().style.cursor = 'crosshair';
   }
 
-  cleanup() {
+  cleanup(): void {
     const stage = this.instance.getStage();
 
     stage.container().style.cursor = 'default';

@@ -4,15 +4,15 @@
 
 import { Weave } from '@/weave';
 import {
-  WeaveElementAttributes,
-  WeaveElementInstance,
-  WeaveStateElement,
-  WeaveNodeBase,
+  type WeaveElementAttributes,
+  type WeaveElementInstance,
+  type WeaveStateElement,
+  type WeaveNodeBase,
 } from '@inditextech/weave-types';
-import { Logger } from 'pino';
+import { type Logger } from 'pino';
 import { WeaveNodesSelectionPlugin } from '@/plugins/nodes-selection/nodes-selection';
 import Konva from 'konva';
-import { WeaveNodesSelectionChangeCallback } from '@/plugins/nodes-selection/types';
+import { type WeaveNodesSelectionChangeCallback } from '@/plugins/nodes-selection/types';
 import { WeaveCopyPasteNodesPlugin } from '@/plugins/copy-paste-nodes/copy-paste-nodes';
 
 export abstract class WeaveNode implements WeaveNodeBase {
@@ -21,7 +21,7 @@ export abstract class WeaveNode implements WeaveNodeBase {
   private logger!: Logger;
   protected previousPointer!: string | null;
 
-  register(instance: Weave) {
+  register(instance: Weave): WeaveNode {
     this.instance = instance;
     this.logger = this.instance.getChildLogger(this.getNodeType());
     this.instance
@@ -31,31 +31,31 @@ export abstract class WeaveNode implements WeaveNodeBase {
     return this;
   }
 
-  getNodeType() {
+  getNodeType(): string {
     return this.nodeType;
   }
 
-  getLogger() {
+  getLogger(): Logger {
     return this.logger;
   }
 
-  getSelectionPlugin() {
+  getSelectionPlugin(): WeaveNodesSelectionPlugin {
     const selectionPlugin =
       this.instance.getPlugin<WeaveNodesSelectionPlugin>('nodesSelection');
     return selectionPlugin;
   }
 
-  isSelecting() {
+  isSelecting(): boolean {
     return this.instance.getActiveAction() === 'selectionTool';
   }
 
-  isPasting() {
+  isPasting(): boolean {
     const copyPastePlugin =
       this.instance.getPlugin<WeaveCopyPasteNodesPlugin>('copyPasteNodes');
     return copyPastePlugin.isPasting();
   }
 
-  isNodeSelected(ele: Konva.Node) {
+  isNodeSelected(ele: Konva.Node): boolean {
     const selectionPlugin =
       this.instance.getPlugin<WeaveNodesSelectionPlugin>('nodesSelection');
 
@@ -70,7 +70,7 @@ export abstract class WeaveNode implements WeaveNodeBase {
     return selected;
   }
 
-  setupDefaultNodeEvents(node: Konva.Node) {
+  setupDefaultNodeEvents(node: Konva.Node): void {
     this.previousPointer = null;
 
     this.instance.addEventListener<WeaveNodesSelectionChangeCallback>(

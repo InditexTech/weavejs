@@ -3,4 +3,8 @@
 // SPDX-License-Identifier: Apache-2.0
 
 export * from './constants';
+export * from './base/action';
+export * from './base/node';
+export * from './base/plugin';
+export * from './base/store';
 export * from './types';

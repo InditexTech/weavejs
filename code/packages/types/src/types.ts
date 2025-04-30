@@ -10,10 +10,11 @@ import {
   WEAVE_INSTANCE_STATUS,
   WEAVE_NODE_POSITION,
 } from './constants';
-import { WeaveNodeBase } from './node';
-import { WeaveActionBase } from './action';
-import { WeavePluginBase } from './plugin';
-import { WeaveStoreBase } from './store';
+import { type WeaveNodeBase } from '@/base/node';
+import { type WeaveActionBase } from '@/base/action';
+import { type WeavePluginBase } from '@/base/plugin';
+import { type WeaveStoreBase } from '@/base/store';
+import type { Vector2d } from 'konva/lib/types';
 
 // Configuration handling
 
@@ -87,6 +88,28 @@ export type WeaveState = {
 export type WeaveSelection = {
   instance: Konva.Shape | Konva.Group;
   node: WeaveStateElement;
+};
+
+export type WeaveMousePointInfoSimple = {
+  mousePoint: Vector2d;
+  container: Konva.Layer | Konva.Group | undefined;
+};
+
+export type WeaveMousePointInfo = WeaveMousePointInfoSimple & {
+  measureContainer: Konva.Layer | Konva.Group | undefined;
+};
+
+export type WeaveSerializedGroup =
+  | {
+      serializedNodes: WeaveStateElement[];
+      minPoint: Vector2d;
+    }
+  | undefined;
+
+export type WeaveNodeFound = {
+  node: WeaveStateElement | null;
+  parent: WeaveStateElement | null;
+  index: number;
 };
 
 // Awareness handler
@@ -169,8 +192,3 @@ export type WeaveCallbacks = {
   onStateChange?: (state: WeaveState) => void;
   onUndoManagerStatusChange?: (undoManagerStatus: WeaveUndoRedoChange) => void;
 };
-
-export * from './action';
-export * from './node';
-export * from './plugin';
-export * from './store';

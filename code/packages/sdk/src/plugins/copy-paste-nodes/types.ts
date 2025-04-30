@@ -4,8 +4,11 @@
 
 import Konva from 'konva';
 import { COPY_PASTE_NODES_PLUGIN_STATE } from './constants';
-import { NodeSerializable, WeaveStateElement } from '@inditextech/weave-types';
-import { Vector2d } from 'konva/lib/types';
+import {
+  type NodeSerializable,
+  type WeaveStateElement,
+} from '@inditextech/weave-types';
+import { type Vector2d } from 'konva/lib/types';
 
 export type WeaveCopyPasteNodesPluginStateKeys =
   keyof typeof COPY_PASTE_NODES_PLUGIN_STATE;

@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-import { Logger } from 'pino';
+import { type Logger } from 'pino';
 import { Weave } from '@/weave';
 import { WeaveStore } from '@/stores/store';
 
@@ -21,7 +21,7 @@ export class WeaveStoreManager {
     return this.store as T;
   }
 
-  registerStore(store: WeaveStore) {
+  registerStore(store: WeaveStore): void {
     if (typeof this.store !== 'undefined') {
       const msg = `Store already registered`;
       this.logger.error(msg);

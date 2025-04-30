@@ -4,8 +4,8 @@
 
 import { v4 as uuidv4 } from 'uuid';
 import { WeaveAction } from '@/actions/action';
-import { Vector2d } from 'konva/lib/types';
-import { WeaveTextToolActionState } from './types';
+import { type Vector2d } from 'konva/lib/types';
+import { type WeaveTextToolActionState } from './types';
 import { TEXT_TOOL_STATE } from './constants';
 import Konva from 'konva';
 import { WeaveNodesSelectionPlugin } from '@/plugins/nodes-selection/nodes-selection';
@@ -118,7 +118,7 @@ export class WeaveTextToolAction extends WeaveAction {
     this.cancelAction();
   }
 
-  trigger(cancelAction: () => void) {
+  trigger(cancelAction: () => void): void {
     if (!this.instance) {
       throw new Error('Instance not defined');
     }
@@ -132,7 +132,7 @@ export class WeaveTextToolAction extends WeaveAction {
     this.addText();
   }
 
-  cleanup() {
+  cleanup(): void {
     const stage = this.instance.getStage();
 
     stage.container().style.cursor = 'default';

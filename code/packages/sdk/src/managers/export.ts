@@ -2,12 +2,12 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-import { Logger } from 'pino';
+import { type Logger } from 'pino';
 import { Weave } from '@/weave';
 import { v4 as uuidv4 } from 'uuid';
 import {
-  WeaveElementInstance,
-  WeaveExportNodeOptions,
+  type WeaveElementInstance,
+  type WeaveExportNodeOptions,
   WEAVE_EXPORT_BACKGROUND_COLOR,
   WEAVE_EXPORT_FORMATS,
 } from '@inditextech/weave-types';

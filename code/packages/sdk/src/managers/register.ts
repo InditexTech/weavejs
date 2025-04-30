@@ -3,7 +3,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { Weave } from '@/weave';
-import { Logger } from 'pino';
+import { type Logger } from 'pino';
 import { WeavePlugin } from '@/plugins/plugin';
 import { WeaveNode } from '@/nodes/node';
 import { WeaveAction } from '@/actions/action';
@@ -21,15 +21,15 @@ export class WeaveRegisterManager {
     this.logger.debug('Register manager created');
   }
 
-  getPlugins() {
+  getPlugins(): Record<string, WeavePlugin> {
     return this.plugins;
   }
 
-  getNodesHandlers() {
+  getNodesHandlers(): Record<string, WeaveNode> {
     return this.nodesHandlers;
   }
 
-  getActionsHandlers() {
+  getActionsHandlers(): Record<string, WeaveAction> {
     return this.actionsHandlers;
   }
 
@@ -51,7 +51,7 @@ export class WeaveRegisterManager {
     return this.actionsHandlers[actionName] as T;
   }
 
-  getNodeHandler(nodeType: string) {
+  getNodeHandler(nodeType: string): WeaveNode {
     if (!this.nodesHandlers[nodeType]) {
       const msg = `Node handler with type [${nodeType}] is not registered`;
       this.logger.error(msg);
@@ -61,7 +61,7 @@ export class WeaveRegisterManager {
     return this.nodesHandlers[nodeType];
   }
 
-  registerPlugins() {
+  registerPlugins(): void {
     const config = this.instance.getConfiguration();
     if (config.plugins) {
       for (const plugin of config.plugins) {
@@ -72,13 +72,13 @@ export class WeaveRegisterManager {
     this.logger.info(`Plugins registered`);
   }
 
-  registerPlugin(plugin: WeavePlugin) {
+  registerPlugin(plugin: WeavePlugin): void {
     const pluginName = plugin.getName();
     plugin.register(this.instance);
     this.plugins[pluginName] = plugin;
   }
 
-  registerNodesHandlers() {
+  registerNodesHandlers(): void {
     const config = this.instance.getConfiguration();
     if (config.nodes) {
       for (const node of config.nodes) {
@@ -89,7 +89,7 @@ export class WeaveRegisterManager {
     this.logger.info(`Nodes handlers registered`);
   }
 
-  registerNodeHandler(node: WeaveNode) {
+  registerNodeHandler(node: WeaveNode): void {
     const nodeType = node.getNodeType();
     if (this.nodesHandlers[nodeType]) {
       const msg = `Node handler with type [${nodeType}] already exists`;
@@ -101,7 +101,7 @@ export class WeaveRegisterManager {
     this.nodesHandlers[nodeType] = node;
   }
 
-  registerActionsHandlers() {
+  registerActionsHandlers(): void {
     const config = this.instance.getConfiguration();
     if (config.actions) {
       for (const action of config.actions) {
@@ -112,7 +112,7 @@ export class WeaveRegisterManager {
     this.logger.info(`Actions handlers registered`);
   }
 
-  registerActionHandler(action: WeaveAction) {
+  registerActionHandler(action: WeaveAction): void {
     const actionName = action.getName();
     if (this.actionsHandlers[actionName]) {
       const msg = `Action handler with name [${actionName}] already exists`;

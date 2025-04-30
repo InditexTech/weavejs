@@ -4,7 +4,12 @@
 
 import Konva from 'konva';
 import { WeavePlugin } from '@/plugins/plugin';
-import { Guide, LineGuide, LineGuideStop, NodeSnappingEdges } from './types';
+import {
+  type Guide,
+  type LineGuide,
+  type LineGuideStop,
+  type NodeSnappingEdges,
+} from './types';
 import { GUIDE_LINE_NAME, GUIDE_ORIENTATION, NODE_SNAP } from './constants';
 
 export class WeaveNodesSnappingPlugin extends WeavePlugin {
@@ -22,11 +27,11 @@ export class WeaveNodesSnappingPlugin extends WeavePlugin {
     return 'nodesSnapping';
   }
 
-  init() {
+  init(): void {
     this.initEvents();
   }
 
-  setEnabled(enabled: boolean) {
+  setEnabled(enabled: boolean): void {
     this.enabled = enabled;
   }
 
@@ -231,7 +236,7 @@ export class WeaveNodesSnappingPlugin extends WeavePlugin {
     return guides;
   }
 
-  drawGuides(guides: Guide[]) {
+  drawGuides(guides: Guide[]): void {
     const stage = this.instance.getStage();
     const mainLayer = this.instance.getMainLayer();
 
@@ -269,11 +274,11 @@ export class WeaveNodesSnappingPlugin extends WeavePlugin {
     }
   }
 
-  enable() {
+  enable(): void {
     this.enabled = true;
   }
 
-  disable() {
+  disable(): void {
     this.enabled = false;
   }
 }

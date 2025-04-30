@@ -4,16 +4,17 @@
 
 import { v4 as uuidv4 } from 'uuid';
 import { WeaveAction } from '@/actions/action';
-import { Vector2d } from 'konva/lib/types';
+import { type Vector2d } from 'konva/lib/types';
 import {
-  WeaveImageToolActionTriggerParams,
-  WeaveImageToolActionCallbacks,
-  WeaveImageToolActionState,
+  type WeaveImageToolActionTriggerParams,
+  type WeaveImageToolActionCallbacks,
+  type WeaveImageToolActionState,
+  type WeaveImageToolActionTriggerReturn,
 } from './types';
 import { IMAGE_TOOL_STATE } from './constants';
 import { WeaveNodesSelectionPlugin } from '@/plugins/nodes-selection/nodes-selection';
 import Konva from 'konva';
-import { WeaveElementInstance } from '@inditextech/weave-types';
+import { type WeaveElementInstance } from '@inditextech/weave-types';
 
 export class WeaveImageToolAction extends WeaveAction {
   private imageCallbacks: WeaveImageToolActionCallbacks;
@@ -61,7 +62,7 @@ export class WeaveImageToolAction extends WeaveAction {
     };
   }
 
-  init() {
+  init(): void {
     this.instance.addEventListener('onStageDrop', () => {
       if (window.weaveDragImageURL) {
         this.instance.triggerAction('imageTool', {
@@ -249,7 +250,7 @@ export class WeaveImageToolAction extends WeaveAction {
   trigger(
     cancelAction: () => void,
     params?: WeaveImageToolActionTriggerParams
-  ) {
+  ): WeaveImageToolActionTriggerReturn {
     if (!this.instance) {
       throw new Error('Instance not defined');
     }
@@ -271,7 +272,7 @@ export class WeaveImageToolAction extends WeaveAction {
     return { finishUploadCallback: this.loadImage.bind(this) };
   }
 
-  internalUpdate() {
+  internalUpdate(): void {
     const stage = this.instance?.getStage();
     if (stage) {
       const tempImage = this.instance
@@ -296,7 +297,7 @@ export class WeaveImageToolAction extends WeaveAction {
     }
   }
 
-  cleanup() {
+  cleanup(): void {
     const stage = this.instance.getStage();
 
     if (this.imageId) {

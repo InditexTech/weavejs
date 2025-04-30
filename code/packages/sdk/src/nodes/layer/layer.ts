@@ -4,18 +4,18 @@
 
 import Konva from 'konva';
 import {
-  WeaveElementAttributes,
-  WeaveElementInstance,
-  WeaveStateElement,
+  type WeaveElementAttributes,
+  type WeaveElementInstance,
+  type WeaveStateElement,
 } from '@inditextech/weave-types';
 import { WeaveNode } from '../node';
 
 export const WEAVE_LAYER_NODE_TYPE = 'layer';
 
 export class WeaveLayerNode extends WeaveNode {
-  protected nodeType = WEAVE_LAYER_NODE_TYPE;
+  protected nodeType: string = WEAVE_LAYER_NODE_TYPE;
 
-  createNode(key: string, props: WeaveElementAttributes) {
+  createNode(key: string, props: WeaveElementAttributes): WeaveStateElement {
     return {
       key,
       type: this.nodeType,
@@ -28,7 +28,7 @@ export class WeaveLayerNode extends WeaveNode {
     };
   }
 
-  createInstance(props: WeaveElementAttributes) {
+  createInstance(props: WeaveElementAttributes): WeaveElementInstance {
     const layer = new Konva.Layer({
       ...props,
     });
@@ -39,17 +39,17 @@ export class WeaveLayerNode extends WeaveNode {
   updateInstance(
     nodeInstance: WeaveElementInstance,
     nextProps: WeaveElementAttributes
-  ) {
+  ): void {
     nodeInstance.setAttrs({
       ...nextProps,
     });
   }
 
-  removeInstance(nodeInstance: WeaveElementInstance) {
+  removeInstance(nodeInstance: WeaveElementInstance): void {
     nodeInstance.destroy();
   }
 
-  toNode(instance: WeaveElementInstance) {
+  toNode(instance: WeaveElementInstance): WeaveStateElement {
     const attrs = instance.getAttrs();
 
     const childrenMapped: WeaveStateElement[] = [];

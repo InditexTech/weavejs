@@ -3,11 +3,11 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import React from 'react';
-import { WeaveStateElement } from '@inditextech/weave-types';
+import { type WeaveStateElement } from '@inditextech/weave-types';
 import { isEmpty } from 'lodash';
 
 export class WeaveStateSerializer {
-  serialize(element: React.ReactNode) {
+  serialize(element: React.ReactNode): string {
     const replacer = (
       key: string,
       value: string | number | boolean | WeaveStateElement[]
@@ -25,7 +25,8 @@ export class WeaveStateSerializer {
     return JSON.stringify(element, replacer);
   }
 
-  deserialize(data: unknown) {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  deserialize(data: unknown): any {
     if (typeof data === 'string') {
       data = JSON.parse(data);
     }

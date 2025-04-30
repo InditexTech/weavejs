@@ -11,11 +11,11 @@ import {
   WEAVE_EXPORT_FORMATS,
   WEAVE_EXPORT_FILE_FORMAT,
   STATE_ACTIONS,
-  WeaveStatus,
-  WeavePosition,
-  WeaveExportFormat,
-  WeaveExportFileFormat,
-  StateAction,
+  type WeaveStatus,
+  type WeavePosition,
+  type WeaveExportFormat,
+  type WeaveExportFileFormat,
+  type StateAction,
 } from './index';
 
 test('WEAVE_INSTANCE_STATUS', () => {

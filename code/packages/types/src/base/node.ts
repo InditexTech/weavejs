@@ -3,10 +3,10 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import {
-  WeaveElementAttributes,
-  WeaveElementInstance,
-  WeaveStateElement,
-} from './types';
+  type WeaveElementAttributes,
+  type WeaveElementInstance,
+  type WeaveStateElement,
+} from '@/types';
 
 export interface WeaveNodeBase {
   createNode(id: string, props: WeaveElementAttributes): WeaveStateElement;

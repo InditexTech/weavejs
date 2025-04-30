@@ -2,15 +2,23 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-import Konva from "konva";
+import Konva from 'konva';
 // import { Weave } from "./weave";
 // import { Group } from "konva/lib/Group";
 // import { WEAVE_NODE_LAYER_ID } from "./constants";
 // import { NodeSerializable } from "./types";
 
-export function resetScale(node: Konva.Node) {
-  node.width(Math.round((Math.max(1, node.width() * node.scaleX()) + Number.EPSILON) * 100) / 100);
-  node.height(Math.round((Math.max(1, node.height() * node.scaleY()) + Number.EPSILON) * 100) / 100);
+export function resetScale(node: Konva.Node): void {
+  node.width(
+    Math.round(
+      (Math.max(1, node.width() * node.scaleX()) + Number.EPSILON) * 100
+    ) / 100
+  );
+  node.height(
+    Math.round(
+      (Math.max(1, node.height() * node.scaleY()) + Number.EPSILON) * 100
+    ) / 100
+  );
   node.scaleX(1);
   node.scaleY(1);
   node.x(Math.round((node.x() + Number.EPSILON) * 100) / 100);

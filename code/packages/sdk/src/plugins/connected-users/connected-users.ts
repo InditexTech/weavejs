@@ -4,11 +4,14 @@
 
 import { isEqual } from 'lodash';
 import { WeavePlugin } from '@/plugins/plugin';
-import { WeaveAwarenessChange, WeaveUser } from '@inditextech/weave-types';
 import {
-  WeaveConnectedUsersChangeCallback,
-  WeaveConnectedUsersPluginParams,
-  WeaveConnectedUserInfoKey,
+  type WeaveAwarenessChange,
+  type WeaveUser,
+} from '@inditextech/weave-types';
+import {
+  type WeaveConnectedUsersChangeCallback,
+  type WeaveConnectedUsersPluginParams,
+  type WeaveConnectedUserInfoKey,
 } from './types';
 import { WEAVE_CONNECTED_USER_INFO_KEY } from './constants';
 
@@ -38,7 +41,7 @@ export class WeaveConnectedUsersPlugin extends WeavePlugin {
     return 'connectedUsers';
   }
 
-  init() {
+  init(): void {
     const store = this.instance.getStore();
 
     const userInfo = this.getUser();
@@ -76,11 +79,11 @@ export class WeaveConnectedUsersPlugin extends WeavePlugin {
     );
   }
 
-  enable() {
+  enable(): void {
     this.enabled = true;
   }
 
-  disable() {
+  disable(): void {
     this.enabled = false;
   }
 }

@@ -4,18 +4,18 @@
 
 import { WeaveStore } from '@inditextech/weave-sdk';
 import {
-  WeaveAwarenessChange,
-  WeaveStoreOptions,
+  type WeaveAwarenessChange,
+  type WeaveStoreOptions,
 } from '@inditextech/weave-types';
 import { WeaveStoreAzureWebPubSubSyncClient } from './client';
 import { WEAVE_STORE_AZURE_WEB_PUBSUB } from './constants';
-import { WeaveStoreAzureWebPubsubOptions } from './types';
+import { type WeaveStoreAzureWebPubsubOptions } from './types';
 
 export class WeaveStoreAzureWebPubsub extends WeaveStore {
   private azureWebPubsubOptions: WeaveStoreAzureWebPubsubOptions;
   private roomId: string;
   protected provider!: WeaveStoreAzureWebPubSubSyncClient;
-  protected name = WEAVE_STORE_AZURE_WEB_PUBSUB;
+  protected name: string = WEAVE_STORE_AZURE_WEB_PUBSUB;
   protected supportsUndoManager = true;
 
   constructor(
@@ -51,7 +51,7 @@ export class WeaveStoreAzureWebPubsub extends WeaveStore {
     });
   }
 
-  async connect() {
+  async connect(): Promise<void> {
     const { fetchClient } = this.azureWebPubsubOptions;
 
     let error: Error | null = null;
@@ -82,11 +82,11 @@ export class WeaveStoreAzureWebPubsub extends WeaveStore {
     await this.provider.start();
   }
 
-  async disconnect() {
+  disconnect(): void {
     this.provider.destroy();
   }
 
-  setAwarenessInfo(field: string, value: unknown) {
+  setAwarenessInfo(field: string, value: unknown): void {
     const awareness = this.provider.awareness;
     awareness.setLocalStateField(field, value);
   }

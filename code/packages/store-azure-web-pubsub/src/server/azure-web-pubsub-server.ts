@@ -4,13 +4,14 @@
 
 import { WebPubSubServiceClient, AzureKeyCredential } from '@azure/web-pubsub';
 import {
-  FetchInitialState,
-  PersistRoom,
-  FetchRoom,
-  WeaveAzureWebPubsubConfig,
+  type FetchInitialState,
+  type PersistRoom,
+  type FetchRoom,
+  type WeaveAzureWebPubsubConfig,
 } from '../types';
 import WeaveAzureWebPubsubSyncHandler from './azure-web-pubsub-sync-handler';
 import { defaultInitialState } from './default-initial-state';
+import type { RequestHandler } from 'express-serve-static-core';
 
 type WeaveAzureWebPubsubServerParams = {
   initialState?: FetchInitialState;
@@ -50,11 +51,11 @@ export class WeaveAzureWebPubsubServer {
     );
   }
 
-  getMiddleware() {
+  getMiddleware(): RequestHandler {
     return this.syncHandler.getMiddleware();
   }
 
-  async clientConnect(roomId: string) {
+  async clientConnect(roomId: string): Promise<string> {
     return await this.syncHandler.clientConnect(roomId);
   }
 }

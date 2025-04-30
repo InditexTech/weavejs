@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-import { Logger } from 'pino';
+import { type Logger } from 'pino';
 import { Weave } from '@/weave';
 
 export class WeavePluginsManager {
@@ -15,7 +15,7 @@ export class WeavePluginsManager {
     this.logger.debug('Plugins manager created');
   }
 
-  enable(pluginName: string) {
+  enable(pluginName: string): void {
     const plugins = this.instance.getPlugins();
 
     if (!plugins[pluginName]) {
@@ -27,7 +27,7 @@ export class WeavePluginsManager {
     plugins[pluginName].enable?.();
   }
 
-  disable(pluginName: string) {
+  disable(pluginName: string): void {
     const plugins = this.instance.getPlugins();
 
     if (!plugins[pluginName]) {
@@ -39,7 +39,7 @@ export class WeavePluginsManager {
     plugins[pluginName].disable?.();
   }
 
-  isEnabled(pluginName: string) {
+  isEnabled(pluginName: string): boolean {
     const plugins = this.instance.getPlugins();
 
     if (!plugins[pluginName]) {

@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-import { WeaveActionCallbacks } from '../types';
+import { type WeaveActionCallbacks } from '../types';
 import { IMAGE_TOOL_STATE } from './constants';
 
 export type WeaveImageToolActionStateKeys = keyof typeof IMAGE_TOOL_STATE;
@@ -26,3 +26,9 @@ export type WeaveImageToolActionCallbacks = WeaveActionCallbacks & {
 export type WeaveImageToolActionTriggerParams = {
   imageURL?: string;
 };
+
+export type WeaveImageToolActionTriggerReturn =
+  | {
+      finishUploadCallback: (imageURL: string) => void;
+    }
+  | undefined;

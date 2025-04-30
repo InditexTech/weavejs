@@ -3,13 +3,13 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import {
-  WeaveExportNodeOptions,
+  type WeaveExportNodeOptions,
   WEAVE_EXPORT_BACKGROUND_COLOR,
   WEAVE_EXPORT_FILE_FORMAT,
   WEAVE_EXPORT_FORMATS,
 } from '@inditextech/weave-types';
 import { WeaveAction } from '../action';
-import { WeaveExportStageActionParams } from './types';
+import { type WeaveExportStageActionParams } from './types';
 
 export class WeaveExportStageToolAction extends WeaveAction {
   protected cancelAction!: () => void;
@@ -44,7 +44,7 @@ export class WeaveExportStageToolAction extends WeaveAction {
   async trigger(
     cancelAction: () => void,
     { options }: WeaveExportStageActionParams
-  ) {
+  ): Promise<void> {
     if (!this.instance) {
       throw new Error('Instance not defined');
     }
@@ -63,7 +63,7 @@ export class WeaveExportStageToolAction extends WeaveAction {
     await this.exportStage();
   }
 
-  cleanup() {
+  cleanup(): void {
     const stage = this.instance.getStage();
 
     stage.container().tabIndex = 0;

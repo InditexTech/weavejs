@@ -2,11 +2,14 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-import { WeaveSelection, NodeSerializable } from '@inditextech/weave-types';
+import {
+  type WeaveSelection,
+  type NodeSerializable,
+} from '@inditextech/weave-types';
 import Konva from 'konva';
 import { WeavePlugin } from '@/plugins/plugin';
 import { WEAVE_NODES_SELECTION_LAYER_ID } from './constants';
-import { WeaveNodesSelectionPluginCallbacks } from './types';
+import { type WeaveNodesSelectionPluginCallbacks } from './types';
 import { WeaveContextMenuPlugin } from '../context-menu/context-menu';
 
 export class WeaveNodesSelectionPlugin extends WeavePlugin {
@@ -38,14 +41,14 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
     return WEAVE_NODES_SELECTION_LAYER_ID;
   }
 
-  initLayer() {
+  initLayer(): void {
     const stage = this.instance.getStage();
 
     const layer = new Konva.Layer({ id: this.getLayerName() });
     stage.add(layer);
   }
 
-  init() {
+  init(): void {
     const stage = this.instance.getStage();
     const selectionLayer = this.getLayer();
 
@@ -483,11 +486,11 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
     });
   }
 
-  getTransformer() {
+  getTransformer(): Konva.Transformer {
     return this.tr;
   }
 
-  setSelectedNodes(nodes: Konva.Node[]) {
+  setSelectedNodes(nodes: Konva.Node[]): void {
     this.tr.setNodes(nodes);
     this.triggerSelectedNodesEvent();
   }
@@ -496,14 +499,14 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
     return this.tr.nodes() as (Konva.Group | Konva.Shape)[];
   }
 
-  removeSelectedNodes() {
+  removeSelectedNodes(): void {
     const selectedNodes = this.tr.getNodes();
     for (const node of selectedNodes) {
       node.destroy();
     }
   }
 
-  selectAll() {
+  selectAll(): void {
     const mainLayer = this.instance.getMainLayer();
     if (mainLayer) {
       const nodes = mainLayer.getChildren();
@@ -511,16 +514,16 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
     }
   }
 
-  selectNone() {
+  selectNone(): void {
     this.tr.nodes([]);
   }
 
-  enable() {
+  enable(): void {
     this.getLayer()?.show();
     this.enabled = true;
   }
 
-  disable() {
+  disable(): void {
     this.getLayer()?.hide();
     this.enabled = false;
   }

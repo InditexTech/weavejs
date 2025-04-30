@@ -3,9 +3,10 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import Konva from 'konva';
-import { Logger } from 'pino';
+import { type Logger } from 'pino';
 import { Weave } from '@/weave';
 import { WEAVE_NODE_LAYER_ID } from '@inditextech/weave-types';
+import type { StageConfig } from 'konva/lib/Stage';
 
 export class WeaveStageManager {
   private instance: Weave;
@@ -20,15 +21,15 @@ export class WeaveStageManager {
     this.logger.debug({ config }, 'Stage manager created');
   }
 
-  getConfiguration() {
+  getConfiguration(): StageConfig {
     return this.config;
   }
 
-  setStage(stage: Konva.Stage) {
+  setStage(stage: Konva.Stage): void {
     this.stage = stage;
   }
 
-  getStage() {
+  getStage(): Konva.Stage {
     return this.stage;
   }
 
@@ -64,7 +65,7 @@ export class WeaveStageManager {
     return instance;
   }
 
-  initStage() {
+  initStage(): void {
     const props = {
       container: this.instance.getStageConfiguration().container,
       width: this.instance.getStageConfiguration().width,

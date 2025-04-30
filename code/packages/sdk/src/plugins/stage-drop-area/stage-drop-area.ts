@@ -3,7 +3,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { WeavePlugin } from '@/plugins/plugin';
-import { WeaveStageDropAreaPluginCallbacks } from './types';
+import { type WeaveStageDropAreaPluginCallbacks } from './types';
 
 export class WeaveStageDropAreaPlugin extends WeavePlugin {
   private callbacks?: WeaveStageDropAreaPluginCallbacks;
@@ -22,7 +22,7 @@ export class WeaveStageDropAreaPlugin extends WeavePlugin {
     return 'stageDropArea';
   }
 
-  init() {
+  init(): void {
     this.initEvents();
   }
 
@@ -43,11 +43,11 @@ export class WeaveStageDropAreaPlugin extends WeavePlugin {
     });
   }
 
-  enable() {
+  enable(): void {
     this.enabled = true;
   }
 
-  disable() {
+  disable(): void {
     this.enabled = false;
   }
 }

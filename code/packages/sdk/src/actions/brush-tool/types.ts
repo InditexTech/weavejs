@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-import { WeaveActionCallbacks } from '../types';
+import { type WeaveActionCallbacks } from '../types';
 import { BRUSH_TOOL_STATE } from './constants';
 
 export type WeaveBrushToolActionStateKeys = keyof typeof BRUSH_TOOL_STATE;

@@ -4,7 +4,7 @@
 
 import { WeaveAction } from '@/actions/action';
 import { WeaveStageZoomPlugin } from '@/plugins/stage-zoom/stage-zoom';
-import { WeaveFitToScreenToolActionParams } from './types';
+import { type WeaveFitToScreenToolActionParams } from './types';
 
 export class WeaveFitToScreenToolAction extends WeaveAction {
   protected previousAction!: string;
@@ -19,7 +19,7 @@ export class WeaveFitToScreenToolAction extends WeaveAction {
     return this.instance.getPlugin<WeaveStageZoomPlugin>('stageZoom');
   }
 
-  init() {
+  init(): void {
     const stageZoomPlugin = this.getStageZoomPlugin();
     if (!stageZoomPlugin) {
       throw new Error(
@@ -28,7 +28,10 @@ export class WeaveFitToScreenToolAction extends WeaveAction {
     }
   }
 
-  trigger(cancelAction: () => void, params: WeaveFitToScreenToolActionParams) {
+  trigger(
+    cancelAction: () => void,
+    params: WeaveFitToScreenToolActionParams
+  ): void {
     const stageZoomPlugin = this.getStageZoomPlugin();
 
     stageZoomPlugin.fitToScreen();
@@ -39,7 +42,7 @@ export class WeaveFitToScreenToolAction extends WeaveAction {
     this.cancelAction();
   }
 
-  cleanup() {
+  cleanup(): void {
     const stage = this.instance.getStage();
 
     this.instance.triggerAction(this.previousAction);

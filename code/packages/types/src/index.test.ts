@@ -3,7 +3,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { test, expect } from 'vitest';
-import { WEAVE_INSTANCE_STATUS, WeaveStatus } from './index';
+import { WEAVE_INSTANCE_STATUS, type WeaveStatus } from './index';
 
 test('import constant', () => {
   expect(WEAVE_INSTANCE_STATUS.IDLE).toBe('idle');

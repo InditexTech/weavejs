@@ -3,8 +3,8 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { Weave } from '@/weave';
-import { WeaveSelection } from '@inditextech/weave-types';
-import { Vector2d } from 'konva/lib/types';
+import { type WeaveSelection } from '@inditextech/weave-types';
+import { type Vector2d } from 'konva/lib/types';
 
 export type WeaveStageContextMenuPluginOptions = {
   xOffset?: number;

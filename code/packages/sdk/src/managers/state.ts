@@ -4,10 +4,11 @@
 
 import { isEmpty } from 'lodash';
 import { Weave } from '@/weave';
-import { Logger } from 'pino';
+import { type Logger } from 'pino';
 import {
-  WeavePosition,
-  WeaveStateElement,
+  type WeaveNodeFound,
+  type WeavePosition,
+  type WeaveStateElement,
   WEAVE_NODE_POSITION,
 } from '@inditextech/weave-types';
 import Konva from 'konva';
@@ -54,7 +55,7 @@ export class WeaveStateManager {
     key: string,
     parent: WeaveStateElement | null = null,
     index = -1
-  ) {
+  ): WeaveNodeFound {
     let found: {
       node: WeaveStateElement | null;
       parent: WeaveStateElement | null;
@@ -99,7 +100,7 @@ export class WeaveStateManager {
     return found;
   }
 
-  getNode(nodeKey: string) {
+  getNode(nodeKey: string): WeaveNodeFound {
     const state = this.instance.getStore().getState().weave;
 
     if (isEmpty(state)) {
@@ -114,7 +115,7 @@ export class WeaveStateManager {
     parentId = 'mainLayer',
     index: number | undefined = undefined,
     doRender = true
-  ) {
+  ): void {
     const userName = this.instance.getStore().getUser().name;
 
     this.instance
@@ -191,7 +192,7 @@ export class WeaveStateManager {
       }, userName);
   }
 
-  updateNode(node: WeaveStateElement, doRender = true) {
+  updateNode(node: WeaveStateElement, doRender = true): void {
     const userName = this.instance.getStore().getUser().name;
 
     this.instance
@@ -230,7 +231,7 @@ export class WeaveStateManager {
       }, userName);
   }
 
-  removeNode(node: WeaveStateElement, doRender = true) {
+  removeNode(node: WeaveStateElement, doRender = true): void {
     const userName = this.instance.getStore().getUser().name;
 
     this.instance
@@ -272,7 +273,7 @@ export class WeaveStateManager {
       }, userName);
   }
 
-  removeNodes(nodes: WeaveStateElement[], doRender = true) {
+  removeNodes(nodes: WeaveStateElement[], doRender = true): void {
     for (const node of nodes) {
       this.removeNode(node, false);
     }
@@ -282,7 +283,11 @@ export class WeaveStateManager {
     }
   }
 
-  moveNode(node: WeaveStateElement, position: WeavePosition, doRender = true) {
+  moveNode(
+    node: WeaveStateElement,
+    position: WeavePosition,
+    doRender = true
+  ): void {
     const userName = this.instance.getStore().getUser().name;
 
     this.instance

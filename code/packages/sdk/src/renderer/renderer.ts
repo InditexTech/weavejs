@@ -2,11 +2,11 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-import ReactReconciler, { Reconciler } from 'react-reconciler';
+import ReactReconciler, { type Reconciler } from 'react-reconciler';
 import { Weave } from '@/weave';
 import { WeaveStateSerializer } from '@/state-serializer/state-serializer';
 import { WeaveReconciler } from '@/reconciler/reconciler';
-import { WeaveElementInstance } from '@inditextech/weave-types';
+import { type WeaveElementInstance } from '@inditextech/weave-types';
 
 export class WeaveRenderer {
   private instance: Weave;
@@ -35,7 +35,7 @@ export class WeaveRenderer {
     this.renderer = null;
   }
 
-  init() {
+  init(): void {
     this.renderer = ReactReconciler(this.reconciler.getConfig());
 
     this.root = this.renderer.createContainer(
@@ -56,7 +56,7 @@ export class WeaveRenderer {
     };
   }
 
-  render(callback?: () => void) {
+  render(callback?: () => void): void {
     const actualState = JSON.parse(
       JSON.stringify(this.instance.getStore().getState())
     );

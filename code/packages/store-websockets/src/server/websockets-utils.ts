@@ -12,7 +12,7 @@ import * as map from 'lib0/map';
 import debounce from 'lodash.debounce';
 
 import { isCallbackSet, callbackHandler } from './websockets-callbacks';
-import { ExtractRoomId, FetchInitialState } from '../types';
+import { type ExtractRoomId, type FetchInitialState } from '../types';
 import { IncomingMessage } from 'node:http';
 import { WeaveWebsocketsServer } from './websockets-server';
 
@@ -31,7 +31,8 @@ const wsReadyStateOpen = 1;
 // disable gc when using snapshots!
 const gcEnabled = process.env.GC !== 'false' && process.env.GC !== '0';
 
-export const docs = new Map();
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export const docs: Map<any, any> = new Map();
 
 const persistenceMap: Map<string, NodeJS.Timeout> = new Map();
 const messageSync = 0;
@@ -50,7 +51,7 @@ const updateHandler = (update: any, _origin: any, doc: any) => {
 let contentInitializor = () => Promise.resolve();
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export const setContentInitializor = (f: any) => {
+export const setContentInitializor = (f: any): void => {
   contentInitializor = f;
 };
 
@@ -122,7 +123,7 @@ export const getYDoc = (
   docName: string,
   initialState: FetchInitialState,
   gc = true
-) =>
+): Promise<WSSharedDoc> =>
   map.setIfUndefined(docs, docName, async () => {
     let documentData = undefined;
     if (actualServer && actualServer.fetchRoom) {
@@ -222,14 +223,23 @@ const send = (doc: WSSharedDoc, conn: any, m: Uint8Array) => {
 
 const pingTimeout = 30000;
 
-export const setServer = (server: WeaveWebsocketsServer) => {
+export const setServer = (server: WeaveWebsocketsServer): void => {
   actualServer = server;
 };
 
 export const setupWSConnection = (
   getDocName: ExtractRoomId,
   initialState: FetchInitialState
-) => {
+): ((
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  conn: any,
+  req: IncomingMessage,
+  {
+    gc,
+  }?: {
+    gc?: boolean | undefined;
+  }
+) => Promise<void>) => {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   return async (conn: any, req: IncomingMessage, { gc = true } = {}) => {
     const docName = getDocName(req);

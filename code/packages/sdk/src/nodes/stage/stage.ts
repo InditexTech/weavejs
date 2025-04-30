@@ -4,17 +4,18 @@
 
 import Konva from 'konva';
 import {
-  WeaveElementAttributes,
-  WeaveElementInstance,
+  type WeaveElementAttributes,
+  type WeaveElementInstance,
+  type WeaveStateElement,
 } from '@inditextech/weave-types';
 import { WeaveNode } from '../node';
 
 export const WEAVE_STAGE_NODE_TYPE = 'stage';
 
 export class WeaveStageNode extends WeaveNode {
-  protected nodeType = WEAVE_STAGE_NODE_TYPE;
+  protected nodeType: string = WEAVE_STAGE_NODE_TYPE;
 
-  createNode(key: string, props: WeaveElementAttributes) {
+  createNode(key: string, props: WeaveElementAttributes): WeaveStateElement {
     return {
       key,
       type: this.nodeType,
@@ -27,7 +28,7 @@ export class WeaveStageNode extends WeaveNode {
     };
   }
 
-  createInstance(props: WeaveElementAttributes) {
+  createInstance(props: WeaveElementAttributes): WeaveElementInstance {
     const stage = new Konva.Stage({
       ...props,
     });
@@ -37,13 +38,13 @@ export class WeaveStageNode extends WeaveNode {
     return stage;
   }
 
-  updateInstance() {}
+  updateInstance(): void {}
 
-  removeInstance(nodeInstance: WeaveElementInstance) {
+  removeInstance(nodeInstance: WeaveElementInstance): void {
     nodeInstance.destroy();
   }
 
-  toNode(instance: WeaveElementInstance) {
+  toNode(instance: WeaveElementInstance): WeaveStateElement {
     const attrs = instance.getAttrs();
 
     return {

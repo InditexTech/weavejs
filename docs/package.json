@@ -1,5 +1,5 @@
 {
-  "name": "docs-final",
+  "name": "docs",
   "version": "0.0.0",
   "private": true,
   "scripts": {
@@ -13,7 +13,7 @@
     "postinstall": "fumadocs-mdx",
     "verify": "npm ci --force && npm run build",
     "version:development": "export BUMP_DEVELOP_VERSION=$(npm version $(npm version minor)-prerelease)",
-    "version:release": "npm ci && npm version $RELEASE_VERSION"
+    "version:release": "npm ci --force && npm version $RELEASE_VERSION"
   },
   "dependencies": {
     "@radix-ui/react-slot": "^1.2.0",

@@ -3,8 +3,8 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { isEqual } from 'lodash';
-import pino, { Logger } from 'pino';
-import { WeaveLoggerConfig } from '@inditextech/weave-types';
+import pino, { type Logger } from 'pino';
+import { type WeaveLoggerConfig } from '@inditextech/weave-types';
 
 export class WeaveLogger {
   private config: WeaveLoggerConfig;
@@ -98,19 +98,19 @@ export class WeaveLogger {
     method(...params);
   }
 
-  getDisabled() {
+  getDisabled(): boolean {
     return this.disabled;
   }
 
-  getLevel() {
+  getLevel(): pino.LevelWithSilentOrString {
     return this.logger.level;
   }
 
-  getLogger() {
+  getLogger(): Logger {
     return this.logger;
   }
 
-  getChildLogger(name: string) {
+  getChildLogger(name: string): pino.Logger<never, boolean> {
     return this.logger.child({
       name,
     });

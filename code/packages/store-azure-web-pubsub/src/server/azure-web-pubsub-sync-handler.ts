@@ -6,7 +6,7 @@ import * as Y from 'yjs';
 import WebSocket from 'ws';
 import { WebPubSubServiceClient } from '@azure/web-pubsub';
 import { WebPubSubEventHandler } from '@azure/web-pubsub-express';
-import { FetchInitialState } from '@/types';
+import { type FetchInitialState } from '@/types';
 import { WeaveStoreAzureWebPubSubSyncHost } from './azure-web-pubsub-host';
 import { WeaveAzureWebPubsubServer } from './azure-web-pubsub-server';
 
@@ -95,8 +95,7 @@ export default class WeaveAzureWebPubsubSyncHandler extends WebPubSubEventHandle
     return this._connections.get(roomId);
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  async clientConnect(roomId: string) {
+  async clientConnect(roomId: string): Promise<string> {
     this.getHostConnection(roomId);
 
     const token = await this._client.getClientAccessToken({

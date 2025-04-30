@@ -3,8 +3,8 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import {
-  WeaveElementInstance,
-  WeaveExportNodeOptions,
+  type WeaveElementInstance,
+  type WeaveExportNodeOptions,
 } from '@inditextech/weave-types';
 
 export type WeaveExportNodeActionParams = {

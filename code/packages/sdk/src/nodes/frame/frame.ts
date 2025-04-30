@@ -5,16 +5,16 @@
 import Konva from 'konva';
 import { WeaveNode } from '../node';
 import {
-  WeaveElementAttributes,
-  WeaveElementInstance,
-  WeaveStateElement,
+  type WeaveElementAttributes,
+  type WeaveElementInstance,
+  type WeaveStateElement,
 } from '@inditextech/weave-types';
 import { WEAVE_FRAME_NODE_TYPE } from './constants';
 
 export class WeaveFrameNode extends WeaveNode {
-  protected nodeType = WEAVE_FRAME_NODE_TYPE;
+  protected nodeType: string = WEAVE_FRAME_NODE_TYPE;
 
-  createNode(key: string, props: WeaveElementAttributes) {
+  createNode(key: string, props: WeaveElementAttributes): WeaveStateElement {
     return {
       key,
       type: this.nodeType,
@@ -27,7 +27,7 @@ export class WeaveFrameNode extends WeaveNode {
     };
   }
 
-  createInstance(props: WeaveElementAttributes) {
+  createInstance(props: WeaveElementAttributes): WeaveElementInstance {
     const { id } = props;
 
     const frameParams = {
@@ -113,7 +113,7 @@ export class WeaveFrameNode extends WeaveNode {
   updateInstance(
     nodeInstance: WeaveElementInstance,
     nextProps: WeaveElementAttributes
-  ) {
+  ): void {
     const { id } = nextProps;
 
     const frameNode = nodeInstance as Konva.Group;
@@ -133,11 +133,11 @@ export class WeaveFrameNode extends WeaveNode {
     }
   }
 
-  removeInstance(nodeInstance: WeaveElementInstance) {
+  removeInstance(nodeInstance: WeaveElementInstance): void {
     nodeInstance.destroy();
   }
 
-  toNode(instance: WeaveElementInstance) {
+  toNode(instance: WeaveElementInstance): WeaveStateElement {
     const attrs = instance.getAttrs();
 
     const frameInternal = (instance as Konva.Group).findOne(
