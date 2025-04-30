@@ -170,7 +170,7 @@ export class WeaveReconciler {
           newProps.height = rootContainer.getStageConfiguration().height;
         }
 
-        return handler.createInstance(newProps);
+        return handler.onRender(newProps);
       },
       detachDeletedInstance(node: WeaveElementInstance): void {
         logger.debug({ node }, 'detachDeletedInstance');
@@ -281,11 +281,11 @@ export class WeaveReconciler {
             return;
           }
 
-          handler.updateInstance(instance, nextProps);
+          handler.onUpdate(instance, nextProps);
 
           const childZIndex = nextProps.zIndex;
           if (childZIndex) {
-            instance.zIndex(childZIndex);
+            instance.zIndex(childZIndex as number);
           }
         }
       },
@@ -294,7 +294,16 @@ export class WeaveReconciler {
       },
       removeChild(_: WeaveElementInstance, child: WeaveElementInstance): void {
         logger.debug({ child }, 'removeChild');
-        child.destroy();
+
+        const type = child.getAttrs().nodeType;
+
+        const handler = weaveInstance.getNodeHandler(type);
+
+        if (!handler) {
+          return;
+        }
+
+        handler.onDestroy(child);
       },
     };
   }

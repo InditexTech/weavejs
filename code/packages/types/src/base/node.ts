@@ -9,16 +9,16 @@ import {
 } from '@/types';
 
 export interface WeaveNodeBase {
-  createNode(id: string, props: WeaveElementAttributes): WeaveStateElement;
+  create(id: string, props: WeaveElementAttributes): WeaveStateElement;
 
-  createInstance(props: WeaveElementAttributes): WeaveElementInstance;
+  onRender(props: WeaveElementAttributes): WeaveElementInstance;
 
-  updateInstance(
+  onUpdate(
     instance: WeaveElementInstance,
     nextProps: WeaveElementAttributes
   ): void;
 
-  removeInstance(instance: WeaveElementInstance): void;
+  onDestroy(instance: WeaveElementInstance): void;
 
-  toNode(instance: WeaveElementInstance): WeaveStateElement;
+  serialize(instance: WeaveElementInstance): WeaveStateElement;
 }

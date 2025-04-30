@@ -105,7 +105,7 @@ export class WeaveFrameToolAction extends WeaveAction {
 
     const nodeHandler = this.instance.getNodeHandler('frame');
 
-    const node = nodeHandler.createNode(this.frameId, {
+    const node = nodeHandler.create(this.frameId, {
       ...this.props,
       x: this.clickPoint.x,
       y: this.clickPoint.y,

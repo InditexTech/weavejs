@@ -14,20 +14,7 @@ import { WEAVE_FRAME_NODE_TYPE } from './constants';
 export class WeaveFrameNode extends WeaveNode {
   protected nodeType: string = WEAVE_FRAME_NODE_TYPE;
 
-  createNode(key: string, props: WeaveElementAttributes): WeaveStateElement {
-    return {
-      key,
-      type: this.nodeType,
-      props: {
-        ...props,
-        id: key,
-        nodeType: this.nodeType,
-        children: [],
-      },
-    };
-  }
-
-  createInstance(props: WeaveElementAttributes): WeaveElementInstance {
+  onRender(props: WeaveElementAttributes): WeaveElementInstance {
     const { id } = props;
 
     const frameParams = {
@@ -110,7 +97,7 @@ export class WeaveFrameNode extends WeaveNode {
     return frame;
   }
 
-  updateInstance(
+  onUpdate(
     nodeInstance: WeaveElementInstance,
     nextProps: WeaveElementAttributes
   ): void {
@@ -133,11 +120,7 @@ export class WeaveFrameNode extends WeaveNode {
     }
   }
 
-  removeInstance(nodeInstance: WeaveElementInstance): void {
-    nodeInstance.destroy();
-  }
-
-  toNode(instance: WeaveElementInstance): WeaveStateElement {
+  serialize(instance: WeaveElementInstance): WeaveStateElement {
     const attrs = instance.getAttrs();
 
     const frameInternal = (instance as Konva.Group).findOne(
@@ -151,7 +134,7 @@ export class WeaveFrameNode extends WeaveNode {
       ];
       for (const node of children) {
         const handler = this.instance.getNodeHandler(node.getAttr('nodeType'));
-        childrenMapped.push(handler.toNode(node));
+        childrenMapped.push(handler.serialize(node));
       }
     }
 

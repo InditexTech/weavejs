@@ -9,26 +9,12 @@ import {
   type WeaveStateElement,
 } from '@inditextech/weave-types';
 import { WeaveNode } from '../node';
-
-export const WEAVE_GROUP_NODE_TYPE = 'group';
+import { WEAVE_GROUP_NODE_TYPE } from './constants';
 
 export class WeaveGroupNode extends WeaveNode {
   protected nodeType: string = WEAVE_GROUP_NODE_TYPE;
 
-  createNode(key: string, props: WeaveElementAttributes): WeaveStateElement {
-    return {
-      key,
-      type: this.nodeType,
-      props: {
-        ...props,
-        id: key,
-        nodeType: this.nodeType,
-        children: [],
-      },
-    };
-  }
-
-  createInstance(props: WeaveElementAttributes): WeaveElementInstance {
+  onRender(props: WeaveElementAttributes): WeaveElementInstance {
     const group = new Konva.Group({
       ...props,
       name: 'node',
@@ -39,7 +25,7 @@ export class WeaveGroupNode extends WeaveNode {
     return group;
   }
 
-  updateInstance(
+  onUpdate(
     nodeInstance: WeaveElementInstance,
     nextProps: WeaveElementAttributes
   ): void {
@@ -48,11 +34,7 @@ export class WeaveGroupNode extends WeaveNode {
     });
   }
 
-  removeInstance(nodeInstance: WeaveElementInstance): void {
-    nodeInstance.destroy();
-  }
-
-  toNode(instance: WeaveElementInstance): WeaveStateElement {
+  serialize(instance: WeaveElementInstance): WeaveStateElement {
     const attrs = instance.getAttrs();
 
     const childrenMapped: WeaveStateElement[] = [];
@@ -61,7 +43,7 @@ export class WeaveGroupNode extends WeaveNode {
     ];
     for (const node of children) {
       const handler = this.instance.getNodeHandler(node.getAttr('nodeType'));
-      childrenMapped.push(handler.toNode(node));
+      childrenMapped.push(handler.serialize(node));
     }
 
     return {

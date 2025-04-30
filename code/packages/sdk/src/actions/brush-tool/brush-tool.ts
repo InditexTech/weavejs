@@ -118,7 +118,7 @@ export class WeaveBrushToolAction extends WeaveAction {
 
     const nodeHandler = this.instance.getNodeHandler('line');
 
-    const node = nodeHandler.createNode(this.strokeId, {
+    const node = nodeHandler.create(this.strokeId, {
       ...this.props,
       x: this.clickPoint?.x ?? 0,
       y: this.clickPoint?.y ?? 0,
@@ -146,7 +146,7 @@ export class WeaveBrushToolAction extends WeaveAction {
       });
 
       this.instance.updateNode(
-        nodeHandler.toNode(tempStroke as WeaveElementInstance)
+        nodeHandler.serialize(tempStroke as WeaveElementInstance)
       );
 
       this.clickPoint = null;
@@ -181,7 +181,7 @@ export class WeaveBrushToolAction extends WeaveAction {
       const nodeHandler = this.instance.getNodeHandler('line');
 
       this.instance.updateNode(
-        nodeHandler.toNode(tempStroke as WeaveElementInstance)
+        nodeHandler.serialize(tempStroke as WeaveElementInstance)
       );
     }
   }

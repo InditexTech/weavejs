@@ -9,26 +9,12 @@ import {
   type WeaveStateElement,
 } from '@inditextech/weave-types';
 import { WeaveNode } from '../node';
-
-export const WEAVE_LAYER_NODE_TYPE = 'layer';
+import { WEAVE_LAYER_NODE_TYPE } from './constants';
 
 export class WeaveLayerNode extends WeaveNode {
   protected nodeType: string = WEAVE_LAYER_NODE_TYPE;
 
-  createNode(key: string, props: WeaveElementAttributes): WeaveStateElement {
-    return {
-      key,
-      type: this.nodeType,
-      props: {
-        ...props,
-        id: key,
-        nodeType: this.nodeType,
-        children: [],
-      },
-    };
-  }
-
-  createInstance(props: WeaveElementAttributes): WeaveElementInstance {
+  onRender(props: WeaveElementAttributes): WeaveElementInstance {
     const layer = new Konva.Layer({
       ...props,
     });
@@ -36,7 +22,7 @@ export class WeaveLayerNode extends WeaveNode {
     return layer;
   }
 
-  updateInstance(
+  onUpdate(
     nodeInstance: WeaveElementInstance,
     nextProps: WeaveElementAttributes
   ): void {
@@ -45,11 +31,7 @@ export class WeaveLayerNode extends WeaveNode {
     });
   }
 
-  removeInstance(nodeInstance: WeaveElementInstance): void {
-    nodeInstance.destroy();
-  }
-
-  toNode(instance: WeaveElementInstance): WeaveStateElement {
+  serialize(instance: WeaveElementInstance): WeaveStateElement {
     const attrs = instance.getAttrs();
 
     const childrenMapped: WeaveStateElement[] = [];
@@ -58,7 +40,7 @@ export class WeaveLayerNode extends WeaveNode {
     ];
     for (const node of children) {
       const handler = this.instance.getNodeHandler(node.getAttr('nodeType'));
-      childrenMapped.push(handler.toNode(node));
+      childrenMapped.push(handler.serialize(node));
     }
 
     return {

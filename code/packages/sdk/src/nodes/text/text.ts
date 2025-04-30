@@ -12,8 +12,7 @@ import { WeaveNode } from '@/nodes/node';
 import { type Vector2d } from 'konva/lib/types';
 import { WeaveNodesSelectionPlugin } from '@/plugins/nodes-selection/nodes-selection';
 import { resetScale } from '@/utils';
-
-export const WEAVE_TEXT_NODE_TYPE = 'text';
+import { WEAVE_TEXT_NODE_TYPE } from './constants';
 
 export class WeaveTextNode extends WeaveNode {
   protected nodeType: string = WEAVE_TEXT_NODE_TYPE;
@@ -25,31 +24,14 @@ export class WeaveTextNode extends WeaveNode {
     this.editing = false;
   }
 
-  getType(): string {
-    return 'text';
-  }
-
-  createNode(key: string, props: WeaveElementAttributes): WeaveStateElement {
-    return {
-      key,
-      type: this.nodeType,
-      props: {
-        ...props,
-        id: key,
-        nodeType: this.nodeType,
-        children: [],
-      },
-    };
-  }
-
   private updateNode(nodeInstance: WeaveElementInstance) {
     const clonedText = nodeInstance.clone();
     clonedText.setAttr('triggerEditMode', undefined);
-    this.instance.updateNode(this.toNode(clonedText));
+    this.instance.updateNode(this.serialize(clonedText));
     clonedText.destroy();
   }
 
-  createInstance(props: WeaveElementAttributes): WeaveElementInstance {
+  onRender(props: WeaveElementAttributes): WeaveElementInstance {
     const text = new Konva.Text({
       ...props,
       name: 'node',
@@ -91,7 +73,7 @@ export class WeaveTextNode extends WeaveNode {
         });
         resetScale(text);
         text.fontSize(text.fontSize() * text.scaleY());
-        this.instance.updateNode(this.toNode(text));
+        this.instance.updateNode(this.serialize(text));
         e.cancelBubble = true;
       }
     });
@@ -101,7 +83,7 @@ export class WeaveTextNode extends WeaveNode {
     return text;
   }
 
-  updateInstance(
+  onUpdate(
     nodeInstance: WeaveElementInstance,
     nextProps: WeaveElementAttributes
   ): void {
@@ -110,11 +92,7 @@ export class WeaveTextNode extends WeaveNode {
     });
   }
 
-  removeInstance(nodeInstance: WeaveElementInstance): void {
-    nodeInstance.destroy();
-  }
-
-  toNode(instance: WeaveElementInstance): WeaveStateElement {
+  serialize(instance: WeaveElementInstance): WeaveStateElement {
     const attrs = instance.getAttrs();
 
     const cleanedAttrs = { ...attrs };

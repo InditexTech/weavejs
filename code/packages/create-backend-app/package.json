@@ -21,10 +21,10 @@
     "dist/*"
   ],
   "scripts": {
-    "build": "tsup",
-    "bump:snapshot": "npm version $npm_package_version.$(date \"+%s\")",
+    "bump:snapshot": "tsdown --sourcemap",
+    "build": "tsdown",
     "clean": "rimraf dist",
-    "dev": "tsup --watch",
+    "dev": "tsdown --watch",
     "link": "npm link",
     "lint:fix": "npm run lint -- --fix",
     "lint": "eslint ./src",
@@ -46,7 +46,7 @@
     "@types/cross-spawn": "^6.0.6",
     "@types/node": "22.14.1",
     "fast-glob": "^3.3.3",
-    "tsup": "8.4.0"
+    "tsdown": "^0.10.2"
   },
   "engines": {
     "node": "^18.12 || ^20.11 || ^22.11"

@@ -8,8 +8,6 @@ import { WeaveNodesSelectionPlugin } from '@/plugins/nodes-selection/nodes-selec
 import { Weave } from '@/weave';
 import { WeaveImageNode } from './image';
 
-export const WEAVE_IMAGE_NODE_TYPE = 'image';
-
 export class WeaveImageClip {
   private instance!: Weave;
   private image!: Konva.Group;
@@ -293,7 +291,7 @@ export class WeaveImageClip {
         y: clipRectPos.y,
       });
       this.instance.updateNode(
-        this.node.toNode(this.image as WeaveElementInstance)
+        this.node.serialize(this.image as WeaveElementInstance)
       );
     }
   }

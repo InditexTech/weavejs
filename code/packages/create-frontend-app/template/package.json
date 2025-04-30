@@ -35,7 +35,7 @@
     "framer-motion": "^11.18.2",
     "konva": "^9.3.18",
     "motion": "^12.4.7",
-    "next": "14.2.24",
+    "next": "14.2.28",
     "next-themes": "^0.4.6",
     "ogl": "^1.0.11",
     "onnxruntime-web": "^1.21.0-dev.20250206-d981b153d3",

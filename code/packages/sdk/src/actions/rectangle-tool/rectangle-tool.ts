@@ -126,7 +126,7 @@ export class WeaveRectangleToolAction extends WeaveAction {
 
     const nodeHandler = this.instance.getNodeHandler('rectangle');
 
-    const node = nodeHandler.createNode(this.rectId, {
+    const node = nodeHandler.create(this.rectId, {
       ...this.props,
       x: this.clickPoint?.x ?? 0,
       y: this.clickPoint?.y ?? 0,
@@ -161,7 +161,7 @@ export class WeaveRectangleToolAction extends WeaveAction {
       });
 
       this.instance.updateNode(
-        nodeHandler.toNode(rectangle as WeaveElementInstance)
+        nodeHandler.serialize(rectangle as WeaveElementInstance)
       );
     }
 
@@ -191,7 +191,7 @@ export class WeaveRectangleToolAction extends WeaveAction {
       });
 
       this.instance.updateNode(
-        nodeHandler.toNode(rectangle as WeaveElementInstance)
+        nodeHandler.serialize(rectangle as WeaveElementInstance)
       );
     }
   }

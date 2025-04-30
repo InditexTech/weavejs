@@ -6,29 +6,14 @@ import Konva from 'konva';
 import {
   type WeaveElementAttributes,
   type WeaveElementInstance,
-  type WeaveStateElement,
 } from '@inditextech/weave-types';
 import { WeaveNode } from '../node';
-
-export const WEAVE_RECTANGLE_NODE_TYPE = 'rectangle';
+import { WEAVE_RECTANGLE_NODE_TYPE } from './constants';
 
 export class WeaveRectangleNode extends WeaveNode {
   protected nodeType: string = WEAVE_RECTANGLE_NODE_TYPE;
 
-  createNode(key: string, props: WeaveElementAttributes): WeaveStateElement {
-    return {
-      key,
-      type: this.nodeType,
-      props: {
-        ...props,
-        id: key,
-        nodeType: this.nodeType,
-        children: [],
-      },
-    };
-  }
-
-  createInstance(props: WeaveElementAttributes): WeaveElementInstance {
+  onRender(props: WeaveElementAttributes): WeaveElementInstance {
     const rectangle = new Konva.Rect({
       ...props,
       name: 'node',
@@ -39,34 +24,12 @@ export class WeaveRectangleNode extends WeaveNode {
     return rectangle;
   }
 
-  updateInstance(
+  onUpdate(
     nodeInstance: WeaveElementInstance,
     nextProps: WeaveElementAttributes
   ): void {
     nodeInstance.setAttrs({
       ...nextProps,
     });
-  }
-
-  removeInstance(nodeInstance: WeaveElementInstance): void {
-    nodeInstance.destroy();
-  }
-
-  toNode(instance: WeaveElementInstance): WeaveStateElement {
-    const attrs = instance.getAttrs();
-
-    const cleanedAttrs = { ...attrs };
-    delete cleanedAttrs.draggable;
-
-    return {
-      key: attrs.id ?? '',
-      type: attrs.nodeType,
-      props: {
-        ...cleanedAttrs,
-        id: attrs.id ?? '',
-        nodeType: attrs.nodeType,
-        children: [],
-      },
-    };
   }
 }

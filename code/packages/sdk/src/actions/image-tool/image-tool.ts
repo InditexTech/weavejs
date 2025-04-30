@@ -121,7 +121,7 @@ export class WeaveImageToolAction extends WeaveAction {
 
         const nodeHandler = this.instance.getNodeHandler('rectangle');
         this.instance.updateNode(
-          nodeHandler.toNode(tempImage as WeaveElementInstance)
+          nodeHandler.serialize(tempImage as WeaveElementInstance)
         );
       }
     });
@@ -180,7 +180,7 @@ export class WeaveImageToolAction extends WeaveAction {
 
       this.tempImageId = uuidv4();
 
-      const node = nodeHandler.createNode(this.tempImageId, {
+      const node = nodeHandler.create(this.tempImageId, {
         ...this.props,
         x: (mousePos?.x ?? 0) + 5,
         y: (mousePos?.y ?? 0) + 5,
@@ -220,7 +220,7 @@ export class WeaveImageToolAction extends WeaveAction {
 
       const nodeHandler = this.instance.getNodeHandler('image');
 
-      const node = nodeHandler.createNode(this.imageId, {
+      const node = nodeHandler.create(this.imageId, {
         ...this.props,
         x: this.clickPoint?.x ?? 0,
         y: this.clickPoint?.y ?? 0,
@@ -238,7 +238,7 @@ export class WeaveImageToolAction extends WeaveAction {
 
       const rectangleNodeHandler = this.instance.getNodeHandler('rectangle');
       this.instance.removeNode(
-        rectangleNodeHandler.toNode(tempImage as WeaveElementInstance)
+        rectangleNodeHandler.serialize(tempImage as WeaveElementInstance)
       );
 
       this.setState(IMAGE_TOOL_STATE.FINISHED);
@@ -291,7 +291,7 @@ export class WeaveImageToolAction extends WeaveAction {
         const nodeHandler = this.instance.getNodeHandler('rectangle');
 
         this.instance.updateNode(
-          nodeHandler.toNode(tempImage as WeaveElementInstance)
+          nodeHandler.serialize(tempImage as WeaveElementInstance)
         );
       }
     }
@@ -308,7 +308,7 @@ export class WeaveImageToolAction extends WeaveAction {
     if (tempImage) {
       const nodeHandler = this.instance.getNodeHandler('rectangle');
       this.instance.removeNode(
-        nodeHandler.toNode(tempImage as WeaveElementInstance)
+        nodeHandler.serialize(tempImage as WeaveElementInstance)
       );
     }
 
