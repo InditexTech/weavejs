@@ -3,6 +3,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import Konva from 'konva';
+import * as Y from 'yjs';
 import {
   STATE_ACTIONS,
   WEAVE_EXPORT_FORMATS,
@@ -192,3 +193,29 @@ export type WeaveCallbacks = {
   onStateChange?: (state: WeaveState) => void;
   onUndoManagerStatusChange?: (undoManagerStatus: WeaveUndoRedoChange) => void;
 };
+
+// Store
+
+export declare type docElementTypeDescription =
+  | 'xml'
+  | 'text'
+  | Array<any>
+  | object;
+export declare type DocTypeDescription = {
+  [key: string]: docElementTypeDescription;
+};
+export declare type MappedTypeDescription<T extends DocTypeDescription> = {
+  readonly [P in keyof T]: T[P] extends 'xml'
+    ? Y.XmlFragment
+    : T[P] extends 'text'
+    ? Y.Text
+    : T[P] extends Array<any>
+    ? T[P]
+    : T[P] extends object
+    ? Partial<T[P]>
+    : never;
+};
+export declare function crdtDoc<T extends DocTypeDescription>(
+  doc: Y.Doc,
+  typeDescription: T
+): MappedTypeDescription<T>;

@@ -11,8 +11,8 @@ import {
   type WeaveUndoRedoChange,
   type WeaveStoreOptions,
   type WeaveUser,
+  type MappedTypeDescription,
 } from '@inditextech/weave-types';
-import { type MappedTypeDescription } from '@syncedstore/core/types/doc';
 import {
   observeDeep,
   syncedStore,
