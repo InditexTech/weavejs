@@ -13,6 +13,7 @@ import {
 } from './types';
 import { BRUSH_TOOL_STATE } from './constants';
 import { WeaveNodesSelectionPlugin } from '@/plugins/nodes-selection/nodes-selection';
+import type { WeaveLineNode } from '@/nodes/line/line';
 
 export class WeaveBrushToolAction extends WeaveAction {
   protected initialized: boolean = false;
@@ -116,7 +117,7 @@ export class WeaveBrushToolAction extends WeaveAction {
 
     this.strokeId = uuidv4();
 
-    const nodeHandler = this.instance.getNodeHandler('line');
+    const nodeHandler = this.instance.getNodeHandler<WeaveLineNode>('line');
 
     const node = nodeHandler.create(this.strokeId, {
       ...this.props,
@@ -138,7 +139,7 @@ export class WeaveBrushToolAction extends WeaveAction {
       | undefined;
 
     if (tempStroke) {
-      const nodeHandler = this.instance.getNodeHandler('line');
+      const nodeHandler = this.instance.getNodeHandler<WeaveLineNode>('line');
 
       tempStroke.setAttrs({
         ...this.props,
@@ -178,7 +179,7 @@ export class WeaveBrushToolAction extends WeaveAction {
         mousePoint.y - tempStroke.y(),
       ]);
 
-      const nodeHandler = this.instance.getNodeHandler('line');
+      const nodeHandler = this.instance.getNodeHandler<WeaveLineNode>('line');
 
       this.instance.updateNode(
         nodeHandler.serialize(tempStroke as WeaveElementInstance)

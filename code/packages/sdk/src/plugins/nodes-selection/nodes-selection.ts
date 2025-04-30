@@ -14,6 +14,7 @@ import {
 } from './constants';
 import { type WeaveNodesSelectionPluginCallbacks } from './types';
 import { WeaveContextMenuPlugin } from '../context-menu/context-menu';
+import type { WeaveNode } from '@/nodes/node';
 
 export class WeaveNodesSelectionPlugin extends WeavePlugin {
   private tr!: Konva.Transformer;
@@ -167,7 +168,7 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
   private triggerSelectedNodesEvent() {
     const selectedNodes: WeaveSelection[] = this.tr.getNodes().map((node) => {
       const nodeType = node.getAttr('nodeType');
-      const nodeHandler = this.instance.getNodeHandler(nodeType);
+      const nodeHandler = this.instance.getNodeHandler<WeaveNode>(nodeType);
       return {
         instance: node as Konva.Shape | Konva.Group,
         node: nodeHandler.serialize(node as Konva.Shape | Konva.Group),
@@ -188,7 +189,7 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
       if (e.key === 'Backspace' || e.key === 'Delete') {
         const selectedNodes = this.getSelectedNodes();
         const mappedSelectedNodes = selectedNodes.map((node) => {
-          const handler = this.instance.getNodeHandler(
+          const handler = this.instance.getNodeHandler<WeaveNode>(
             node.getAttrs().nodeType
           );
           return handler.serialize(node);

@@ -42,7 +42,9 @@ export class WeaveGroupNode extends WeaveNode {
       ...(instance as Konva.Group).getChildren(),
     ];
     for (const node of children) {
-      const handler = this.instance.getNodeHandler(node.getAttr('nodeType'));
+      const handler = this.instance.getNodeHandler<WeaveNode>(
+        node.getAttr('nodeType')
+      );
       childrenMapped.push(handler.serialize(node));
     }
 

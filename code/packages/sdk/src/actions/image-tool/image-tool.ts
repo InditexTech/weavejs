@@ -15,6 +15,8 @@ import { IMAGE_TOOL_STATE } from './constants';
 import { WeaveNodesSelectionPlugin } from '@/plugins/nodes-selection/nodes-selection';
 import Konva from 'konva';
 import { type WeaveElementInstance } from '@inditextech/weave-types';
+import type { WeaveRectangleNode } from '@/nodes/rectangle/rectangle';
+import type { WeaveImageNode } from '@/nodes/image/image';
 
 export class WeaveImageToolAction extends WeaveAction {
   private imageCallbacks: WeaveImageToolActionCallbacks;
@@ -119,7 +121,8 @@ export class WeaveImageToolAction extends WeaveAction {
           strokeWidth: 1,
         });
 
-        const nodeHandler = this.instance.getNodeHandler('rectangle');
+        const nodeHandler =
+          this.instance.getNodeHandler<WeaveRectangleNode>('rectangle');
         this.instance.updateNode(
           nodeHandler.serialize(tempImage as WeaveElementInstance)
         );
@@ -176,7 +179,8 @@ export class WeaveImageToolAction extends WeaveAction {
     if (this.imageId) {
       const mousePos = stage.getRelativePointerPosition();
 
-      const nodeHandler = this.instance.getNodeHandler('rectangle');
+      const nodeHandler =
+        this.instance.getNodeHandler<WeaveRectangleNode>('rectangle');
 
       this.tempImageId = uuidv4();
 
@@ -218,7 +222,7 @@ export class WeaveImageToolAction extends WeaveAction {
       this.clickPoint = mousePoint;
       this.container = container;
 
-      const nodeHandler = this.instance.getNodeHandler('image');
+      const nodeHandler = this.instance.getNodeHandler<WeaveImageNode>('image');
 
       const node = nodeHandler.create(this.imageId, {
         ...this.props,
@@ -236,7 +240,8 @@ export class WeaveImageToolAction extends WeaveAction {
 
       this.instance.addNode(node, this.container?.getAttrs().id);
 
-      const rectangleNodeHandler = this.instance.getNodeHandler('rectangle');
+      const rectangleNodeHandler =
+        this.instance.getNodeHandler<WeaveRectangleNode>('rectangle');
       this.instance.removeNode(
         rectangleNodeHandler.serialize(tempImage as WeaveElementInstance)
       );
@@ -288,7 +293,8 @@ export class WeaveImageToolAction extends WeaveAction {
           strokeWidth: 1,
         });
 
-        const nodeHandler = this.instance.getNodeHandler('rectangle');
+        const nodeHandler =
+          this.instance.getNodeHandler<WeaveRectangleNode>('rectangle');
 
         this.instance.updateNode(
           nodeHandler.serialize(tempImage as WeaveElementInstance)
@@ -306,7 +312,8 @@ export class WeaveImageToolAction extends WeaveAction {
 
     const tempImage = this.instance.getStage().findOne(`#${this.tempImageId}`);
     if (tempImage) {
-      const nodeHandler = this.instance.getNodeHandler('rectangle');
+      const nodeHandler =
+        this.instance.getNodeHandler<WeaveRectangleNode>('rectangle');
       this.instance.removeNode(
         nodeHandler.serialize(tempImage as WeaveElementInstance)
       );

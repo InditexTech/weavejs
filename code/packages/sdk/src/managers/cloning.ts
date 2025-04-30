@@ -9,6 +9,7 @@ import { Weave } from '@/weave';
 import { type Vector2d } from 'konva/lib/types';
 import { type Logger } from 'pino';
 import { type WeaveStateElement } from '@inditextech/weave-types';
+import type { WeaveNode } from '@/nodes/node';
 
 export class WeaveCloningManager {
   private instance: Weave;
@@ -106,7 +107,7 @@ export class WeaveCloningManager {
     const minPoint: Vector2d = { x: Infinity, y: Infinity };
     const serializedNodes: WeaveStateElement[] = [];
     newGroup.getChildren().forEach((node) => {
-      const nodeHandler = this.instance.getNodeHandler(
+      const nodeHandler = this.instance.getNodeHandler<WeaveNode>(
         node.getAttrs().nodeType
       );
       if (node.x() < minPoint.x || node.y() < minPoint.y) {
@@ -206,7 +207,9 @@ export class WeaveCloningManager {
       node.setAbsolutePosition(nodePos);
       node.rotation(nodeRotation);
 
-      const handler = this.instance.getNodeHandler(node.getAttrs().nodeType);
+      const handler = this.instance.getNodeHandler<WeaveNode>(
+        node.getAttrs().nodeType
+      );
       const stateNode = handler.serialize(node);
 
       this.instance.addNode(stateNode, targetContainer.getAttrs().id);

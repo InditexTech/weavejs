@@ -9,6 +9,7 @@ import { type WeaveTextToolActionState } from './types';
 import { TEXT_TOOL_STATE } from './constants';
 import Konva from 'konva';
 import { WeaveNodesSelectionPlugin } from '@/plugins/nodes-selection/nodes-selection';
+import type { WeaveTextNode } from '@/nodes/text/text';
 
 export class WeaveTextToolAction extends WeaveAction {
   protected initialized: boolean = false;
@@ -93,7 +94,7 @@ export class WeaveTextToolAction extends WeaveAction {
 
     this.textId = uuidv4();
 
-    const nodeHandler = this.instance.getNodeHandler('text');
+    const nodeHandler = this.instance.getNodeHandler<WeaveTextNode>('text');
 
     const node = nodeHandler.create(this.textId, {
       x: this.clickPoint?.x ?? 0,
