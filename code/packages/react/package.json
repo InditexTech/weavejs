@@ -43,12 +43,12 @@
     "version:release": "npm version $RELEASE_VERSION -m \"[npm-scripts] prepare release $RELEASE_VERSION\" --tag-version-prefix \"\""
   },
   "dependencies": {
-    "@inditextech/weave-sdk": "0.4.0-SNAPSHOT",
     "@syncedstore/core": "0.6.0",
     "konva": "9.3.20",
     "yjs": "13.6.26"
   },
   "devDependencies": {
+    "@inditextech/weave-sdk": "0.4.0-SNAPSHOT",
     "@types/node": "^22.15.3",
     "@typescript-eslint/eslint-plugin": "8.26.0",
     "@typescript-eslint/parser": "8.26.0",
@@ -72,6 +72,7 @@
     "zustand": "5.0.3"
   },
   "peerDependencies": {
+    "@inditextech/weave-sdk": "0.4.0-SNAPSHOT",
     "@types/react": ">= 18.3.1 && < 19",
     "@types/react-dom": ">= 18.3.0 && < 19",
     "react": ">= 18.2.0 && < 19",

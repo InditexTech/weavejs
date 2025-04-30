@@ -10,6 +10,7 @@ export default [
       server: './src/index.server.ts',
     },
     external: [
+      '@inditextech/weave-sdk',
       'node:crypto',
       'node:events',
       'node:http',
@@ -40,6 +41,7 @@ export default [
       client: './src/index.client.ts',
     },
     external: [
+      '@inditextech/weave-sdk',
       'node:crypto',
       'node:events',
       'node:http',

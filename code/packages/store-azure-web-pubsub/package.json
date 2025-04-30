@@ -52,8 +52,6 @@
   "dependencies": {
     "@azure/web-pubsub": "1.1.4",
     "@azure/web-pubsub-express": "1.0.6",
-    "@inditextech/weave-sdk": "0.4.0-SNAPSHOT",
-    "@inditextech/weave-types": "0.4.0-SNAPSHOT",
     "@syncedstore/core": "0.6.0",
     "buffer": "6.0.3",
     "emittery": "1.1.0",
@@ -64,6 +62,7 @@
     "yjs": "13.6.26"
   },
   "devDependencies": {
+    "@inditextech/weave-sdk": "0.4.0-SNAPSHOT",
     "@types/express": "^5.0.1",
     "@types/node": "^22.15.3",
     "@types/uuid": "^10.0.0",
@@ -85,6 +84,9 @@
     "vite-plugin-dts": "4.0.3",
     "vitest": "1.6.0",
     "vitest-sonar-reporter": "2.0.0"
+  },
+  "peerDependencies": {
+    "@inditextech/weave-sdk": "0.4.0-SNAPSHOT"
   },
   "engines": {
     "node": "^18.12 || ^20.11 || ^22.11",

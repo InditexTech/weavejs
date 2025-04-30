@@ -49,8 +49,6 @@
     "version:release": "npm version $RELEASE_VERSION -m \"[npm-scripts] prepare release $RELEASE_VERSION\" --tag-version-prefix \"\""
   },
   "dependencies": {
-    "@inditextech/weave-sdk": "0.4.0-SNAPSHOT",
-    "@inditextech/weave-types": "0.4.0-SNAPSHOT",
     "@syncedstore/core": "0.6.0",
     "konva": "9.3.20",
     "ws": "8.18.1",
@@ -58,6 +56,7 @@
     "yjs": "13.6.26"
   },
   "devDependencies": {
+    "@inditextech/weave-sdk": "0.4.0-SNAPSHOT",
     "@types/express": "^5.0.1",
     "@types/lodash.debounce": "^4.0.9",
     "@types/node": "^22.15.3",
@@ -76,6 +75,9 @@
     "vite-plugin-dts": "4.0.3",
     "vitest": "1.6.0",
     "vitest-sonar-reporter": "2.0.0"
+  },
+  "peerDependencies": {
+    "@inditextech/weave-sdk": "0.4.0-SNAPSHOT"
   },
   "engines": {
     "node": "^18.12 || ^20.11 || ^22.11",
