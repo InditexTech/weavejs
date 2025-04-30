@@ -103,7 +103,7 @@ export class ColorTokenToolAction extends WeaveAction {
 
     const nodeHandler = this.instance.getNodeHandler('color-token');
 
-    const node = nodeHandler.createNode(this.colorTokenId, {
+    const node = nodeHandler.create(this.colorTokenId, {
       ...this.props,
       x: this.clickPoint.x,
       y: this.clickPoint.y,
