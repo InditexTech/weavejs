@@ -150,14 +150,14 @@ export abstract class WeaveNode implements WeaveNodeBase {
     };
   }
 
-  abstract render(props: WeaveElementAttributes): WeaveElementInstance;
+  abstract onRender(props: WeaveElementAttributes): WeaveElementInstance;
 
-  abstract update(
+  abstract onUpdate(
     instance: WeaveElementInstance,
     nextProps: WeaveElementAttributes
   ): void;
 
-  destroy(nodeInstance: WeaveElementInstance): void {
+  onDestroy(nodeInstance: WeaveElementInstance): void {
     nodeInstance.destroy();
   }
 

@@ -25,7 +25,7 @@ export class WeaveImageNode extends WeaveNode {
     this.cropping = false;
   }
 
-  render(props: WeaveElementAttributes): WeaveElementInstance {
+  onRender(props: WeaveElementAttributes): WeaveElementInstance {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const imageProperties: any = props.imageProperties;
     const imageProps = props as ImageProps;
@@ -160,7 +160,7 @@ export class WeaveImageNode extends WeaveNode {
     return image;
   }
 
-  update(
+  onUpdate(
     nodeInstance: WeaveElementInstance,
     nextProps: WeaveElementAttributes
   ): void {

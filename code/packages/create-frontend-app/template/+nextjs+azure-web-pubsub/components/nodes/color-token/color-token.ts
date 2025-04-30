@@ -17,7 +17,7 @@ const notoSansMono = Noto_Sans_Mono({
 export class ColorTokenNode extends WeaveNode {
   protected nodeType = COLOR_TOKEN_NODE_TYPE;
 
-  render(props: WeaveElementAttributes) {
+  onRender(props: WeaveElementAttributes) {
     const { id } = props;
 
     const colorTokenColor = props.colorToken ?? '#DEFFA0';
@@ -100,7 +100,7 @@ export class ColorTokenNode extends WeaveNode {
     return colorToken;
   }
 
-  update(
+  onUpdate(
     nodeInstance: WeaveElementInstance,
     nextProps: WeaveElementAttributes
   ) {

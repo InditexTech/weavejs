@@ -11,14 +11,14 @@ import {
 export interface WeaveNodeBase {
   create(id: string, props: WeaveElementAttributes): WeaveStateElement;
 
-  render(props: WeaveElementAttributes): WeaveElementInstance;
+  onRender(props: WeaveElementAttributes): WeaveElementInstance;
 
-  update(
+  onUpdate(
     instance: WeaveElementInstance,
     nextProps: WeaveElementAttributes
   ): void;
 
-  destroy(instance: WeaveElementInstance): void;
+  onDestroy(instance: WeaveElementInstance): void;
 
   serialize(instance: WeaveElementInstance): WeaveStateElement;
 }

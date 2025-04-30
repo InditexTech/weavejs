@@ -13,7 +13,7 @@ import { WEAVE_RECTANGLE_NODE_TYPE } from './constants';
 export class WeaveRectangleNode extends WeaveNode {
   protected nodeType: string = WEAVE_RECTANGLE_NODE_TYPE;
 
-  render(props: WeaveElementAttributes): WeaveElementInstance {
+  onRender(props: WeaveElementAttributes): WeaveElementInstance {
     const rectangle = new Konva.Rect({
       ...props,
       name: 'node',
@@ -24,7 +24,7 @@ export class WeaveRectangleNode extends WeaveNode {
     return rectangle;
   }
 
-  update(
+  onUpdate(
     nodeInstance: WeaveElementInstance,
     nextProps: WeaveElementAttributes
   ): void {

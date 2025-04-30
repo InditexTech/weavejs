@@ -13,7 +13,7 @@ import { WEAVE_STAGE_NODE_TYPE } from './constants';
 export class WeaveStageNode extends WeaveNode {
   protected nodeType: string = WEAVE_STAGE_NODE_TYPE;
 
-  render(props: WeaveElementAttributes): WeaveElementInstance {
+  onRender(props: WeaveElementAttributes): WeaveElementInstance {
     const stage = new Konva.Stage({
       ...props,
     });
@@ -23,5 +23,5 @@ export class WeaveStageNode extends WeaveNode {
     return stage;
   }
 
-  update(): void {}
+  onUpdate(): void {}
 }

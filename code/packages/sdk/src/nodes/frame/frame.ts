@@ -14,7 +14,7 @@ import { WEAVE_FRAME_NODE_TYPE } from './constants';
 export class WeaveFrameNode extends WeaveNode {
   protected nodeType: string = WEAVE_FRAME_NODE_TYPE;
 
-  render(props: WeaveElementAttributes): WeaveElementInstance {
+  onRender(props: WeaveElementAttributes): WeaveElementInstance {
     const { id } = props;
 
     const frameParams = {
@@ -97,7 +97,7 @@ export class WeaveFrameNode extends WeaveNode {
     return frame;
   }
 
-  update(
+  onUpdate(
     nodeInstance: WeaveElementInstance,
     nextProps: WeaveElementAttributes
   ): void {

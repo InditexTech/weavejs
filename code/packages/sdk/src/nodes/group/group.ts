@@ -14,7 +14,7 @@ import { WEAVE_GROUP_NODE_TYPE } from './constants';
 export class WeaveGroupNode extends WeaveNode {
   protected nodeType: string = WEAVE_GROUP_NODE_TYPE;
 
-  render(props: WeaveElementAttributes): WeaveElementInstance {
+  onRender(props: WeaveElementAttributes): WeaveElementInstance {
     const group = new Konva.Group({
       ...props,
       name: 'node',
@@ -25,7 +25,7 @@ export class WeaveGroupNode extends WeaveNode {
     return group;
   }
 
-  update(
+  onUpdate(
     nodeInstance: WeaveElementInstance,
     nextProps: WeaveElementAttributes
   ): void {

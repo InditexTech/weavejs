@@ -13,7 +13,7 @@ import { WEAVE_LINE_NODE_TYPE } from './constants';
 export class WeaveLineNode extends WeaveNode {
   protected nodeType: string = WEAVE_LINE_NODE_TYPE;
 
-  render(props: WeaveElementAttributes): WeaveElementInstance {
+  onRender(props: WeaveElementAttributes): WeaveElementInstance {
     const line = new Konva.Line({
       ...props,
       name: 'node',
@@ -24,7 +24,7 @@ export class WeaveLineNode extends WeaveNode {
     return line;
   }
 
-  update(
+  onUpdate(
     nodeInstance: WeaveElementInstance,
     nextProps: WeaveElementAttributes
   ): void {

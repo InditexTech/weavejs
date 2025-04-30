@@ -31,7 +31,7 @@ export class WeaveTextNode extends WeaveNode {
     clonedText.destroy();
   }
 
-  render(props: WeaveElementAttributes): WeaveElementInstance {
+  onRender(props: WeaveElementAttributes): WeaveElementInstance {
     const text = new Konva.Text({
       ...props,
       name: 'node',
@@ -83,7 +83,7 @@ export class WeaveTextNode extends WeaveNode {
     return text;
   }
 
-  update(
+  onUpdate(
     nodeInstance: WeaveElementInstance,
     nextProps: WeaveElementAttributes
   ): void {
