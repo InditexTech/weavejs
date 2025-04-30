@@ -41,6 +41,7 @@
     "framework",
     "sdk",
     "react",
+    "real-time",
     "yjs",
     "sync"
   ],
