@@ -1,5 +1,5 @@
 import { writeFileSync } from 'node:fs';
-import { defineConfig } from 'tsup';
+import { defineConfig } from 'tsdown';
 import typesPkg from '../types/package.json';
 import sdkPkg from '../sdk/package.json';
 import storeWebsocketsPkg from '../store-websockets/package.json';

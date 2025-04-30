@@ -21,10 +21,10 @@
     "dist/*"
   ],
   "scripts": {
-    "build": "tsup",
+    "build": "tsdown",
     "bump:snapshot": "npm version $npm_package_version.$(date \"+%s\")",
     "clean": "rimraf dist",
-    "dev": "tsup --watch",
+    "dev": "tsdown --watch",
     "link": "npm link",
     "lint:fix": "npm run lint -- --fix",
     "lint": "eslint ./src",

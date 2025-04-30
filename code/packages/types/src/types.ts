@@ -59,17 +59,8 @@ export type GroupSerializable = Konva.NodeConfig & {
 };
 
 export type WeaveElementAttributes = {
-  [key: string]:
-    | string
-    | string[]
-    | number
-    | number[]
-    | boolean
-    | boolean[]
-    | object
-    | object[]
-    | null
-    | undefined;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  [key: string]: any;
   id?: string;
   nodeType?: string;
   children?: WeaveStateElement[];
