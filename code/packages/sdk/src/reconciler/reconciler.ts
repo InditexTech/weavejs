@@ -11,6 +11,7 @@ import {
 } from '@inditextech/weave-types';
 import { Weave } from '@/weave';
 import { type Logger } from 'pino';
+import type { WeaveNode } from '@/nodes/node';
 
 export class WeaveReconciler {
   private instance: Weave;
@@ -154,7 +155,7 @@ export class WeaveReconciler {
           { type, props, rootContainer, hostContext },
           'createInstance'
         );
-        const handler = rootContainer.getNodeHandler(type);
+        const handler = rootContainer.getNodeHandler<WeaveNode>(type);
 
         if (!handler) {
           return undefined;
@@ -275,7 +276,7 @@ export class WeaveReconciler {
         }
 
         if (!isEqual(prevProps, nextProps)) {
-          const handler = weaveInstance.getNodeHandler(type);
+          const handler = weaveInstance.getNodeHandler<WeaveNode>(type);
 
           if (!handler) {
             return;
@@ -297,7 +298,7 @@ export class WeaveReconciler {
 
         const type = child.getAttrs().nodeType;
 
-        const handler = weaveInstance.getNodeHandler(type);
+        const handler = weaveInstance.getNodeHandler<WeaveNode>(type);
 
         if (!handler) {
           return;

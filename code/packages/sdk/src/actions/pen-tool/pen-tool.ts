@@ -13,6 +13,7 @@ import {
 } from './types';
 import { PEN_TOOL_STATE } from './constants';
 import { WeaveNodesSelectionPlugin } from '@/plugins/nodes-selection/nodes-selection';
+import type { WeaveLineNode } from '@/nodes/line/line';
 
 export class WeavePenToolAction extends WeaveAction {
   protected initialized: boolean = false;
@@ -129,7 +130,7 @@ export class WeavePenToolAction extends WeaveAction {
     this.lineId = uuidv4();
     this.tempLineId = uuidv4();
 
-    const nodeHandler = this.instance.getNodeHandler('line');
+    const nodeHandler = this.instance.getNodeHandler<WeaveLineNode>('line');
 
     const node = nodeHandler.create(this.lineId, {
       ...this.props,
@@ -201,7 +202,7 @@ export class WeavePenToolAction extends WeaveAction {
         points: newPoints,
       });
 
-      const nodeHandler = this.instance.getNodeHandler('line');
+      const nodeHandler = this.instance.getNodeHandler<WeaveLineNode>('line');
 
       this.instance.updateNode(
         nodeHandler.serialize(tempMainLine as WeaveElementInstance)
@@ -261,7 +262,7 @@ export class WeavePenToolAction extends WeaveAction {
         ],
       });
 
-      const nodeHandler = this.instance.getNodeHandler('line');
+      const nodeHandler = this.instance.getNodeHandler<WeaveLineNode>('line');
 
       this.instance.updateNode(
         nodeHandler.serialize(tempLine as WeaveElementInstance)
@@ -309,21 +310,21 @@ export class WeavePenToolAction extends WeaveAction {
       | undefined;
 
     if (tempLine) {
-      const nodeHandler = this.instance.getNodeHandler('line');
+      const nodeHandler = this.instance.getNodeHandler<WeaveLineNode>('line');
       this.instance.removeNode(
         nodeHandler.serialize(tempLine as WeaveElementInstance)
       );
     }
 
     if (this.lineId && tempMainLine && tempMainLine.points().length < 4) {
-      const nodeHandler = this.instance.getNodeHandler('line');
+      const nodeHandler = this.instance.getNodeHandler<WeaveLineNode>('line');
       this.instance.removeNode(
         nodeHandler.serialize(tempMainLine as WeaveElementInstance)
       );
     }
 
     if (this.lineId && tempMainLine && tempMainLine.points().length >= 4) {
-      const nodeHandler = this.instance.getNodeHandler('line');
+      const nodeHandler = this.instance.getNodeHandler<WeaveLineNode>('line');
 
       tempMainLine.setAttrs({
         ...this.props,

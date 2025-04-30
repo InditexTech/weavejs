@@ -292,7 +292,7 @@ export class Weave extends Emittery {
     return this.registerManager.getPlugins();
   }
 
-  getPlugin<T extends WeavePlugin>(pluginName: string) {
+  getPlugin<T>(pluginName: string) {
     return this.registerManager.getPlugin(pluginName) as T;
   }
 
@@ -300,7 +300,7 @@ export class Weave extends Emittery {
     return this.registerManager.getNodesHandlers();
   }
 
-  getNodeHandler<T extends WeaveNode>(nodeType: string) {
+  getNodeHandler<T>(nodeType: string) {
     return this.registerManager.getNodeHandler(nodeType) as T;
   }
 
@@ -308,7 +308,7 @@ export class Weave extends Emittery {
     return this.registerManager.getActionsHandlers();
   }
 
-  getActionHandler<T extends WeaveAction>(actionName: string) {
+  getActionHandler<T>(actionName: string) {
     return this.registerManager.getActionHandler(actionName) as T;
   }
 

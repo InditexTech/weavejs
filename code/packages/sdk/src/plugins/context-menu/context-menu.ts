@@ -14,6 +14,7 @@ import {
 import { type Vector2d } from 'konva/lib/types';
 import { WeaveNodesSelectionPlugin } from '../nodes-selection/nodes-selection';
 import { WEAVE_CONTEXT_MENU_KEY } from './constants';
+import type { WeaveNode } from '@/nodes/node';
 
 export class WeaveContextMenuPlugin extends WeavePlugin {
   private config: WeaveStageContextMenuPluginOptions;
@@ -79,7 +80,7 @@ export class WeaveContextMenuPlugin extends WeavePlugin {
       nodes = transformer
         .getNodes()
         .map((node) => {
-          const nodeHandler = this.instance.getNodeHandler(
+          const nodeHandler = this.instance.getNodeHandler<WeaveNode>(
             node.getAttrs().nodeType
           );
 

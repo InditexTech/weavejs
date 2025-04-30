@@ -15,6 +15,7 @@ import {
   type WeaveFrameToolCallbacks,
   type WeaveFrameToolProps,
 } from './types';
+import type { WeaveFrameNode } from '@/nodes/frame/frame';
 
 export class WeaveFrameToolAction extends WeaveAction {
   protected initialized: boolean = false;
@@ -103,7 +104,7 @@ export class WeaveFrameToolAction extends WeaveAction {
 
     this.frameId = uuidv4();
 
-    const nodeHandler = this.instance.getNodeHandler('frame');
+    const nodeHandler = this.instance.getNodeHandler<WeaveFrameNode>('frame');
 
     const node = nodeHandler.create(this.frameId, {
       ...this.props,

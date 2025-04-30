@@ -8,6 +8,7 @@ import {
   type WeaveElementInstance,
   WEAVE_NODE_POSITION,
 } from '@inditextech/weave-types';
+import type { WeaveNode } from '@/nodes/node';
 
 export class WeaveZIndexManager {
   private instance: Weave;
@@ -28,7 +29,9 @@ export class WeaveZIndexManager {
 
     instance.moveUp();
 
-    const handler = this.instance.getNodeHandler(instance.getAttrs().nodeType);
+    const handler = this.instance.getNodeHandler<WeaveNode>(
+      instance.getAttrs().nodeType
+    );
     const node = handler.serialize(instance);
     this.instance.moveNode(node, WEAVE_NODE_POSITION.UP);
   }
@@ -42,7 +45,9 @@ export class WeaveZIndexManager {
 
     instance.moveDown();
 
-    const handler = this.instance.getNodeHandler(instance.getAttrs().nodeType);
+    const handler = this.instance.getNodeHandler<WeaveNode>(
+      instance.getAttrs().nodeType
+    );
     const node = handler.serialize(instance);
     this.instance.moveNode(node, WEAVE_NODE_POSITION.DOWN);
   }
@@ -56,7 +61,9 @@ export class WeaveZIndexManager {
 
     instance.moveToBottom();
 
-    const handler = this.instance.getNodeHandler(instance.getAttrs().nodeType);
+    const handler = this.instance.getNodeHandler<WeaveNode>(
+      instance.getAttrs().nodeType
+    );
     const node = handler.serialize(instance);
     this.instance.moveNode(node, WEAVE_NODE_POSITION.BACK);
   }
@@ -68,7 +75,9 @@ export class WeaveZIndexManager {
 
     instance.moveToTop();
 
-    const handler = this.instance.getNodeHandler(instance.getAttrs().nodeType);
+    const handler = this.instance.getNodeHandler<WeaveNode>(
+      instance.getAttrs().nodeType
+    );
     const node = handler.serialize(instance);
     this.instance.updateNode(node);
     this.instance.moveNode(node, WEAVE_NODE_POSITION.FRONT);

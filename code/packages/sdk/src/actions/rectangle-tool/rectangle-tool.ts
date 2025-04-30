@@ -14,6 +14,7 @@ import {
 import { RECTANGLE_TOOL_ACTION_NAME, RECTANGLE_TOOL_STATE } from './constants';
 import { WeaveNodesSelectionPlugin } from '@/plugins/nodes-selection/nodes-selection';
 import { SELECTION_TOOL_ACTION_NAME } from '../selection-tool/constants';
+import type { WeaveRectangleNode } from '@/nodes/rectangle/rectangle';
 
 export class WeaveRectangleToolAction extends WeaveAction {
   protected initialized: boolean = false;
@@ -124,7 +125,8 @@ export class WeaveRectangleToolAction extends WeaveAction {
 
     this.rectId = uuidv4();
 
-    const nodeHandler = this.instance.getNodeHandler('rectangle');
+    const nodeHandler =
+      this.instance.getNodeHandler<WeaveRectangleNode>('rectangle');
 
     const node = nodeHandler.create(this.rectId, {
       ...this.props,
@@ -150,7 +152,8 @@ export class WeaveRectangleToolAction extends WeaveAction {
       const deltaX = mousePoint.x - this.clickPoint?.x;
       const deltaY = mousePoint.y - this.clickPoint?.y;
 
-      const nodeHandler = this.instance.getNodeHandler('rectangle');
+      const nodeHandler =
+        this.instance.getNodeHandler<WeaveRectangleNode>('rectangle');
 
       rectangle.setAttrs({
         ...this.props,
@@ -183,7 +186,8 @@ export class WeaveRectangleToolAction extends WeaveAction {
       const deltaX = mousePoint.x - this.clickPoint?.x;
       const deltaY = mousePoint.y - this.clickPoint?.y;
 
-      const nodeHandler = this.instance.getNodeHandler('rectangle');
+      const nodeHandler =
+        this.instance.getNodeHandler<WeaveRectangleNode>('rectangle');
 
       rectangle.setAttrs({
         width: deltaX,

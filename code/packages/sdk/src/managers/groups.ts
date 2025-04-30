@@ -12,6 +12,8 @@ import {
 import { Weave } from '@/weave';
 import { type Logger } from 'pino';
 import { WeaveNodesSelectionPlugin } from '@/plugins/nodes-selection/nodes-selection';
+import type { WeaveNode } from '@/nodes/node';
+import type { WeaveGroupNode } from '@/nodes/group/group';
 
 export class WeaveGroupsManager {
   private instance: Weave;
@@ -95,7 +97,7 @@ export class WeaveGroupsManager {
 
     parentLayer?.add(groupInstance);
 
-    const groupHandler = this.instance.getNodeHandler('group');
+    const groupHandler = this.instance.getNodeHandler<WeaveGroupNode>('group');
     const groupNode = groupHandler.create(groupId, {
       draggable: true,
     });
@@ -134,7 +136,7 @@ export class WeaveGroupsManager {
           konvaGroup.setAttr('id', uuidv4());
           konvaGroup.setAttr('draggable', false);
 
-          const handler = this.instance.getNodeHandler('group');
+          const handler = this.instance.getNodeHandler<WeaveGroupNode>('group');
           const stateNode = handler.serialize(konvaGroup);
 
           this.instance.addNode(stateNode, groupId);
@@ -156,7 +158,7 @@ export class WeaveGroupsManager {
         konvaNode.setAttr('id', uuidv4());
         konvaNode.setAttr('draggable', false);
 
-        const handler = this.instance.getNodeHandler(
+        const handler = this.instance.getNodeHandler<WeaveNode>(
           konvaNode.getAttrs().nodeType
         );
         const stateNode = handler.serialize(konvaNode);
@@ -250,14 +252,16 @@ export class WeaveGroupsManager {
       child.setAttr('draggable', true);
       newChildId = child.getAttrs().id;
 
-      const handler = this.instance.getNodeHandler(child.getAttrs().nodeType);
+      const handler = this.instance.getNodeHandler<WeaveNode>(
+        child.getAttrs().nodeType
+      );
       const node = handler.serialize(child);
 
       this.instance.addNode(node, nodeId ?? newLayer.getAttrs().id);
       child.destroy();
     }
 
-    const groupHandler = this.instance.getNodeHandler('group');
+    const groupHandler = this.instance.getNodeHandler<WeaveNode>('group');
     const groupNode = groupHandler.serialize(konvaGroup);
     this.instance.removeNode(groupNode);
 

@@ -33,7 +33,7 @@ export class WeaveRegisterManager {
     return this.actionsHandlers;
   }
 
-  getPlugin<T extends WeavePlugin>(pluginName: string) {
+  getPlugin<T>(pluginName: string) {
     if (!this.plugins[pluginName]) {
       const msg = `Plugin with name [${pluginName}] is not registered`;
       this.logger.error(msg);
@@ -42,7 +42,7 @@ export class WeaveRegisterManager {
     return this.plugins[pluginName] as T;
   }
 
-  getActionHandler<T extends WeaveAction>(actionName: string) {
+  getActionHandler<T>(actionName: string) {
     if (!this.actionsHandlers[actionName]) {
       const msg = `Action handler with name [${actionName}] is not registered`;
       this.logger.error(msg);
