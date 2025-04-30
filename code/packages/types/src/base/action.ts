@@ -3,7 +3,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 export interface WeaveActionBase {
-  init?(): void;
+  onInit?(): void;
 
   trigger(cancelAction: () => void, params?: unknown): unknown;
 

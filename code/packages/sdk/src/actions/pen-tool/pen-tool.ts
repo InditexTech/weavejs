@@ -27,7 +27,7 @@ export class WeavePenToolAction extends WeaveAction {
   protected tempNextPoint: Konva.Circle | undefined;
   protected cancelAction!: () => void;
   internalUpdate = undefined;
-  init = undefined;
+  onInit = undefined;
 
   constructor(callbacks: WeavePenToolCallbacks) {
     super(callbacks);

@@ -22,7 +22,7 @@ export class WeaveExportStageToolAction extends WeaveAction {
   };
   private options!: WeaveExportNodeOptions;
   internalUpdate = undefined;
-  init = undefined;
+  onInit = undefined;
 
   getName(): string {
     return 'exportStageTool';

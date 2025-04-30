@@ -62,7 +62,7 @@ export class WeaveImageToolAction extends WeaveAction {
     };
   }
 
-  init(): void {
+  onInit(): void {
     this.instance.addEventListener('onStageDrop', () => {
       if (window.weaveDragImageURL) {
         this.instance.triggerAction('imageTool', {

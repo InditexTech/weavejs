@@ -25,7 +25,7 @@ export class WeaveRectangleToolAction extends WeaveAction {
   protected container!: Konva.Group | Konva.Layer | undefined;
   protected cancelAction!: () => void;
   internalUpdate = undefined;
-  init = undefined;
+  onInit = undefined;
 
   constructor(callbacks: WeaveRectangleToolCallbacks) {
     super(callbacks);

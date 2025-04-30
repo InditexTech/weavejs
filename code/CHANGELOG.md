@@ -15,6 +15,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- [#123](https://github.com/InditexTech/weavejs/issues/123) Refactor action methods names
 - [#116](https://github.com/InditexTech/weavejs/issues/116) Refactor plugin methods names
 - [#115](https://github.com/InditexTech/weavejs/issues/115) Refactor nodes to simplify the API
 

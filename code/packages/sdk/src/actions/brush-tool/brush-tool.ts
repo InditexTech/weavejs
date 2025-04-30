@@ -23,7 +23,7 @@ export class WeaveBrushToolAction extends WeaveAction {
   protected measureContainer: Konva.Layer | Konva.Group | undefined;
   protected cancelAction!: () => void;
   internalUpdate = undefined;
-  init = undefined;
+  onInit = undefined;
 
   constructor(callbacks: WeaveBrushToolCallbacks) {
     super(callbacks);
