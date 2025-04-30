@@ -49,18 +49,27 @@ export type GroupsStateChange = {
 
 export type NodeSerializable = Konva.NodeConfig & {
   id: string;
-  type: string;
+  nodeType: string;
 };
 
 export type GroupSerializable = Konva.NodeConfig & {
   id: string;
-  type: 'group';
+  nodeType: 'group';
   nodes: string[];
 };
 
 export type WeaveElementAttributes = {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  [key: string]: any;
+  [key: string]:
+    | string
+    | string[]
+    | number
+    | number[]
+    | boolean
+    | boolean[]
+    | object
+    | object[]
+    | null
+    | undefined;
   id?: string;
   nodeType?: string;
   children?: WeaveStateElement[];
@@ -199,6 +208,7 @@ export type WeaveCallbacks = {
 export declare type docElementTypeDescription =
   | 'xml'
   | 'text'
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   | Array<any>
   | object;
 export declare type DocTypeDescription = {
@@ -209,7 +219,8 @@ export declare type MappedTypeDescription<T extends DocTypeDescription> = {
     ? Y.XmlFragment
     : T[P] extends 'text'
     ? Y.Text
-    : T[P] extends Array<any>
+    : // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    T[P] extends Array<any>
     ? T[P]
     : T[P] extends object
     ? Partial<T[P]>

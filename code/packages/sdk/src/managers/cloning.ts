@@ -113,7 +113,7 @@ export class WeaveCloningManager {
         minPoint.x = node.x();
         minPoint.y = node.y();
       }
-      const serialized: WeaveStateElement = nodeHandler.toNode(node);
+      const serialized: WeaveStateElement = nodeHandler.serialize(node);
       serializedNodes.push(serialized);
     });
 
@@ -207,7 +207,7 @@ export class WeaveCloningManager {
       node.rotation(nodeRotation);
 
       const handler = this.instance.getNodeHandler(node.getAttrs().nodeType);
-      const stateNode = handler.toNode(node);
+      const stateNode = handler.serialize(node);
 
       this.instance.addNode(stateNode, targetContainer.getAttrs().id);
       node.destroy();

@@ -87,21 +87,21 @@ export abstract class WeaveNode implements WeaveNodeBase {
 
     node.on('transform', (e) => {
       if (this.isSelecting() && this.isNodeSelected(node)) {
-        this.instance.updateNode(this.toNode(node as WeaveElementInstance));
+        this.instance.updateNode(this.serialize(node as WeaveElementInstance));
         e.cancelBubble = true;
       }
     });
 
     node.on('dragmove', (e) => {
       if (this.isSelecting() && this.isNodeSelected(node)) {
-        this.instance.updateNode(this.toNode(node as WeaveElementInstance));
+        this.instance.updateNode(this.serialize(node as WeaveElementInstance));
         e.cancelBubble = true;
       }
     });
 
     node.on('dragend', (e) => {
       if (this.isSelecting() && this.isNodeSelected(node)) {
-        this.instance.updateNode(this.toNode(node as WeaveElementInstance));
+        this.instance.updateNode(this.serialize(node as WeaveElementInstance));
         e.cancelBubble = true;
       }
     });
@@ -137,19 +137,45 @@ export abstract class WeaveNode implements WeaveNodeBase {
     });
   }
 
-  abstract createNode(
-    id: string,
-    props: WeaveElementAttributes
-  ): WeaveStateElement;
+  create(key: string, props: WeaveElementAttributes): WeaveStateElement {
+    return {
+      key,
+      type: this.nodeType,
+      props: {
+        ...props,
+        id: key,
+        nodeType: this.nodeType,
+        children: [],
+      },
+    };
+  }
 
-  abstract createInstance(props: WeaveElementAttributes): WeaveElementInstance;
+  abstract render(props: WeaveElementAttributes): WeaveElementInstance;
 
-  abstract updateInstance(
+  abstract update(
     instance: WeaveElementInstance,
     nextProps: WeaveElementAttributes
   ): void;
 
-  abstract removeInstance(instance: WeaveElementInstance): void;
+  destroy(nodeInstance: WeaveElementInstance): void {
+    nodeInstance.destroy();
+  }
 
-  abstract toNode(instance: WeaveElementInstance): WeaveStateElement;
+  serialize(instance: WeaveElementInstance): WeaveStateElement {
+    const attrs = instance.getAttrs();
+
+    const cleanedAttrs = { ...attrs };
+    delete cleanedAttrs.draggable;
+
+    return {
+      key: attrs.id ?? '',
+      type: attrs.nodeType,
+      props: {
+        ...cleanedAttrs,
+        id: attrs.id ?? '',
+        nodeType: attrs.nodeType,
+        children: [],
+      },
+    };
+  }
 }

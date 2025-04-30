@@ -131,7 +131,7 @@ export class WeavePenToolAction extends WeaveAction {
 
     const nodeHandler = this.instance.getNodeHandler('line');
 
-    const node = nodeHandler.createNode(this.lineId, {
+    const node = nodeHandler.create(this.lineId, {
       ...this.props,
       x: this.clickPoint?.x ?? 0,
       y: this.clickPoint?.y ?? 0,
@@ -150,7 +150,7 @@ export class WeavePenToolAction extends WeaveAction {
     });
     this.measureContainer?.add(this.tempPoint);
 
-    const tempLine = nodeHandler.createNode(this.tempLineId, {
+    const tempLine = nodeHandler.create(this.tempLineId, {
       ...this.props,
       x: this.clickPoint?.x ?? 0,
       y: this.clickPoint?.y ?? 0,
@@ -204,7 +204,7 @@ export class WeavePenToolAction extends WeaveAction {
       const nodeHandler = this.instance.getNodeHandler('line');
 
       this.instance.updateNode(
-        nodeHandler.toNode(tempMainLine as WeaveElementInstance)
+        nodeHandler.serialize(tempMainLine as WeaveElementInstance)
       );
 
       this.tempPoint.setAttrs({
@@ -225,7 +225,7 @@ export class WeavePenToolAction extends WeaveAction {
       });
 
       this.instance.updateNode(
-        nodeHandler.toNode(tempLine as WeaveElementInstance)
+        nodeHandler.serialize(tempLine as WeaveElementInstance)
       );
     }
 
@@ -264,7 +264,7 @@ export class WeavePenToolAction extends WeaveAction {
       const nodeHandler = this.instance.getNodeHandler('line');
 
       this.instance.updateNode(
-        nodeHandler.toNode(tempLine as WeaveElementInstance)
+        nodeHandler.serialize(tempLine as WeaveElementInstance)
       );
 
       this.tempNextPoint.setAttrs({
@@ -311,14 +311,14 @@ export class WeavePenToolAction extends WeaveAction {
     if (tempLine) {
       const nodeHandler = this.instance.getNodeHandler('line');
       this.instance.removeNode(
-        nodeHandler.toNode(tempLine as WeaveElementInstance)
+        nodeHandler.serialize(tempLine as WeaveElementInstance)
       );
     }
 
     if (this.lineId && tempMainLine && tempMainLine.points().length < 4) {
       const nodeHandler = this.instance.getNodeHandler('line');
       this.instance.removeNode(
-        nodeHandler.toNode(tempMainLine as WeaveElementInstance)
+        nodeHandler.serialize(tempMainLine as WeaveElementInstance)
       );
     }
 
@@ -332,7 +332,7 @@ export class WeavePenToolAction extends WeaveAction {
       });
 
       this.instance.updateNode(
-        nodeHandler.toNode(tempMainLine as WeaveElementInstance)
+        nodeHandler.serialize(tempMainLine as WeaveElementInstance)
       );
     }
 

@@ -6,14 +6,12 @@ import Konva from 'konva';
 import {
   type WeaveElementAttributes,
   type WeaveElementInstance,
-  type WeaveStateElement,
 } from '@inditextech/weave-types';
 import { WeaveNode } from '../node';
 import { type ImageProps } from './types';
 import { WeaveImageToolAction } from '@/actions/image-tool/image-tool';
 import { WeaveImageClip } from './clip';
-
-export const WEAVE_IMAGE_NODE_TYPE = 'image';
+import { WEAVE_IMAGE_NODE_TYPE } from './constants';
 
 export class WeaveImageNode extends WeaveNode {
   protected nodeType: string = WEAVE_IMAGE_NODE_TYPE;
@@ -27,20 +25,7 @@ export class WeaveImageNode extends WeaveNode {
     this.cropping = false;
   }
 
-  createNode(key: string, props: WeaveElementAttributes): WeaveStateElement {
-    return {
-      key,
-      type: this.nodeType,
-      props: {
-        ...props,
-        id: key,
-        nodeType: this.nodeType,
-        children: [],
-      },
-    };
-  }
-
-  createInstance(props: WeaveElementAttributes): WeaveElementInstance {
+  render(props: WeaveElementAttributes): WeaveElementInstance {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const imageProperties: any = props.imageProperties;
     const imageProps = props as ImageProps;
@@ -165,7 +150,7 @@ export class WeaveImageNode extends WeaveNode {
         width: preloadImg.width,
         height: preloadImg.height,
       });
-      this.instance.updateNode(this.toNode(image));
+      this.instance.updateNode(this.serialize(image));
     } else {
       this.loadImage(imageProps, image);
     }
@@ -175,7 +160,7 @@ export class WeaveImageNode extends WeaveNode {
     return image;
   }
 
-  updateInstance(
+  update(
     nodeInstance: WeaveElementInstance,
     nextProps: WeaveElementAttributes
   ): void {
@@ -253,28 +238,6 @@ export class WeaveImageNode extends WeaveNode {
     }
   }
 
-  removeInstance(nodeInstance: WeaveElementInstance): void {
-    nodeInstance.destroy();
-  }
-
-  toNode(instance: WeaveElementInstance): WeaveStateElement {
-    const attrs = instance.getAttrs();
-
-    const cleanedAttrs = { ...attrs };
-    delete cleanedAttrs.draggable;
-
-    return {
-      key: attrs.id ?? '',
-      type: attrs.nodeType,
-      props: {
-        ...cleanedAttrs,
-        id: attrs.id ?? '',
-        nodeType: attrs.nodeType,
-        children: [],
-      },
-    };
-  }
-
   private loadImage(params: WeaveElementAttributes, image: Konva.Group) {
     const imageProps = params as ImageProps;
 
@@ -331,7 +294,7 @@ export class WeaveImageNode extends WeaveNode {
         width: imageObj.width,
         height: imageObj.height,
       });
-      this.instance.updateNode(this.toNode(image));
+      this.instance.updateNode(this.serialize(image));
     };
 
     if (imageProps.imageURL) {

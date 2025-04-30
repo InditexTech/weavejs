@@ -96,7 +96,7 @@ export class WeaveGroupsManager {
     parentLayer?.add(groupInstance);
 
     const groupHandler = this.instance.getNodeHandler('group');
-    const groupNode = groupHandler.createNode(groupId, {
+    const groupNode = groupHandler.create(groupId, {
       draggable: true,
     });
     this.instance.addNode(groupNode, nodeId ?? parentNodeId);
@@ -135,7 +135,7 @@ export class WeaveGroupsManager {
           konvaGroup.setAttr('draggable', false);
 
           const handler = this.instance.getNodeHandler('group');
-          const stateNode = handler.toNode(konvaGroup);
+          const stateNode = handler.serialize(konvaGroup);
 
           this.instance.addNode(stateNode, groupId);
         }
@@ -159,7 +159,7 @@ export class WeaveGroupsManager {
         const handler = this.instance.getNodeHandler(
           konvaNode.getAttrs().nodeType
         );
-        const stateNode = handler.toNode(konvaNode);
+        const stateNode = handler.serialize(konvaNode);
 
         this.instance.addNode(stateNode, groupId);
       }
@@ -251,14 +251,14 @@ export class WeaveGroupsManager {
       newChildId = child.getAttrs().id;
 
       const handler = this.instance.getNodeHandler(child.getAttrs().nodeType);
-      const node = handler.toNode(child);
+      const node = handler.serialize(child);
 
       this.instance.addNode(node, nodeId ?? newLayer.getAttrs().id);
       child.destroy();
     }
 
     const groupHandler = this.instance.getNodeHandler('group');
-    const groupNode = groupHandler.toNode(konvaGroup);
+    const groupNode = groupHandler.serialize(konvaGroup);
     this.instance.removeNode(groupNode);
 
     setTimeout(() => {
