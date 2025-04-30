@@ -6,14 +6,10 @@
   "license": "MIT",
   "dependencies": {
     "@azure/storage-blob": "^12.26.0",
-    "@azure/web-pubsub": "^1.1.4",
-    "@azure/web-pubsub-express": "^1.0.6",
     "@imgly/background-removal-node": "^1.4.5",
     "@inditextech/weave-sdk": "0.0.0",
     "@inditextech/weave-store-websockets": "0.0.0",
     "@inditextech/weave-store-azure-web-pubsub": "0.0.0",
-    "@inditextech/weave-types": "0.0.0",
-    "canvas": "^3.1.0",
     "cors": "^2.8.5",
     "dotenv": "^16.4.7",
     "express": "^4.21.2",
@@ -25,9 +21,6 @@
     "pino-pretty": "^13.0.0",
     "ts-node": "^10.9.2",
     "uuid": "^11.1.0",
-    "ws": "^8.18.1",
-    "y-protocols": "^1.0.6",
-    "yjs": "^13.6.24",
     "zod": "^3.24.2"
   },
   "devDependencies": {
@@ -38,7 +31,6 @@
     "@types/morgan": "^1.9.9",
     "@types/multer": "^1.4.12",
     "@types/node": "^22.13.5",
-    "@types/ws": "^8.18.0",
     "@typescript-eslint/eslint-plugin": "^8.25.0",
     "@typescript-eslint/parser": "^8.25.0",
     "commitlint": "^19.7.1",

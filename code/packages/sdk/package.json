@@ -47,6 +47,7 @@
     "@syncedstore/core": "0.6.0",
     "canvas": "3.1.0",
     "konva": "9.3.20",
+    "react-reconciler": "~0.28.0",
     "yjs": "13.6.26"
   },
   "devDependencies": {
@@ -65,7 +66,6 @@
     "lodash": "4.17.21",
     "pino": "^9.6.0",
     "pino-pretty": "^13.0.0",
-    "react-reconciler": "~0.28.0",
     "tsdown": "^0.10.2",
     "typescript-eslint": "8.22.0",
     "uuid": "11.0.5",

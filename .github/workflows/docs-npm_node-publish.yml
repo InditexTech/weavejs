@@ -3,10 +3,12 @@ name: docs-npm-publish
 run-name: "Deploy docs to GH-Pages"
 
 on:
-  pull_request:
-    types: [closed]
-    branches: ["main", "main-*"]
-    paths: ["docs/**", ".github/workflows/docs**"]
+  workflow_call:
+    inputs:
+      BASELINE:
+        type: string
+        description: "Baseline branch"
+        required: true
   workflow_dispatch:
     inputs:
       BASELINE:
@@ -108,7 +110,7 @@ jobs:
         uses: actions/upload-pages-artifact@v3
         with:
           # Upload entire repository
-          path: "./docs/dist"
+          path: "./docs/build/site"
 
       - name: Deploy to GitHub Pages
         id: deployment

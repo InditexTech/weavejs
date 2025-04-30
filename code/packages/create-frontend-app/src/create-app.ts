@@ -121,7 +121,6 @@ function createPackageJson(projectName: string, options: Options): object {
           '@react-three/postprocessing',
           '@tanstack/react-query',
           'boring-avatars',
-          'canvas',
           'class-variance-authority',
           'clsx',
           'cmdk',
@@ -152,7 +151,6 @@ function createPackageJson(projectName: string, options: Options): object {
         ]),
         ...pick(localVersions, [
           '@inditextech/weave-react',
-          '@inditextech/weave-types',
           '@inditextech/weave-sdk',
           '@inditextech/weave-store-azure-web-pubsub',
         ]),
@@ -211,7 +209,6 @@ function createPackageJson(projectName: string, options: Options): object {
         '@react-three/postprocessing',
         '@tanstack/react-query',
         'boring-avatars',
-        'canvas',
         'class-variance-authority',
         'clsx',
         'cmdk',
@@ -242,7 +239,6 @@ function createPackageJson(projectName: string, options: Options): object {
       ]),
       ...pick(localVersions, [
         '@inditextech/weave-react',
-        '@inditextech/weave-types',
         '@inditextech/weave-sdk',
         '@inditextech/weave-store-websockets',
       ]),

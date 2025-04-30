@@ -197,3 +197,9 @@ jobs:
           gh pr comment ${{ github.event.number }} --body "An error occurred creating the Github Docs Release.
           You can manually complete the docs release by creating it in the [releases](https://github.com/${{ github.repository }}/releases)
           page."
+
+      - name: Trigger / Publish Docs
+        uses: inditex/gha-workflowdispatch@v1
+        with:
+          workflow: docs-npm_node-publish.yml
+          inputs: '{ "BASELINE": "${{ env.BASELINE_BRANCH }}" }'

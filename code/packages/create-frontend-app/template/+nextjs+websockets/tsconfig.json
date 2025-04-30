@@ -20,9 +20,7 @@
     ],
     "baseUrl": ".",
     "paths": {
-      "@/*": ["./*"],
-      "konva": ["./node_modules/konva"],
-      "konva/lib/types": ["./node_modules/konva/lib/types"]
+      "@/*": ["./*"]
     }
   },
   "include": [
