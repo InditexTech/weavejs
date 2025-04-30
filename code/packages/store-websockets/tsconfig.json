@@ -8,7 +8,11 @@
     "resolveJsonModule": true,
     "types": ["node"],
     "strict": true,
-    "typeRoots": ["./src/types"],
+    "typeRoots": [
+      "./node_modules/@types",
+      "../../node_modules/@types",
+      "./src/types"
+    ],
     "baseUrl": "./",
     "paths": {
       "@/*": ["./src/*"]

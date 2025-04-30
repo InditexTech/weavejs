@@ -2,6 +2,8 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
+export const WEAVE_NODES_SNAPPING_KEY = 'nodesSnapping';
+
 export const GUIDE_LINE_NAME = 'guide-line';
 
 export const GUIDE_ORIENTATION = {

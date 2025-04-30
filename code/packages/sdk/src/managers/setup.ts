@@ -55,7 +55,7 @@ export class WeaveSetupManager {
     const plugins = this.instance.getRegisterManager().getPlugins();
     for (const plugin of Object.keys(plugins)) {
       const pluginInstance = plugins[plugin];
-      pluginInstance.init?.();
+      pluginInstance.onInit?.();
     }
   }
 

@@ -9,9 +9,8 @@ export default defineConfig({
     sdk: './src/index.ts',
   },
   format: ['es', 'cjs'],
-  target: 'esnext',
+  target: 'es2023',
   clean: true,
   dts: true,
   platform: 'browser',
-  report: true,
 });

@@ -23,7 +23,7 @@ export class WeaveConnectedUsersPlugin extends WeavePlugin {
     | undefined;
   getLayerName = undefined;
   initLayer: undefined;
-  render: undefined;
+  onRender: undefined;
 
   constructor(params: WeaveConnectedUsersPluginParams) {
     super();
@@ -41,7 +41,7 @@ export class WeaveConnectedUsersPlugin extends WeavePlugin {
     return 'connectedUsers';
   }
 
-  init(): void {
+  onInit(): void {
     const store = this.instance.getStore();
 
     const userInfo = this.getUser();

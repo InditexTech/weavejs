@@ -3,17 +3,18 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { WeavePlugin } from '@/plugins/plugin';
+import { WEAVE_STAGE_RESIZE_KEY } from './constants';
 
 export class WeaveStageResizePlugin extends WeavePlugin {
   getLayerName = undefined;
   initLayer = undefined;
-  render: undefined;
+  onRender: undefined;
 
-  getName() {
-    return 'stageResize';
+  getName(): string {
+    return WEAVE_STAGE_RESIZE_KEY;
   }
 
-  init(): void {
+  onInit(): void {
     const stage = this.instance.getStage();
 
     window.addEventListener('resize', () => {
@@ -34,7 +35,7 @@ export class WeaveStageResizePlugin extends WeavePlugin {
         const plugins = this.instance.getPlugins();
         for (const pluginId of Object.keys(plugins)) {
           const pluginInstance = plugins[pluginId];
-          pluginInstance.render?.();
+          pluginInstance.onRender?.();
         }
       }
     });

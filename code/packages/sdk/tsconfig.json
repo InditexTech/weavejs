@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "target": "esnext",
+    "target": "es2023",
     "lib": ["es2023", "DOM", "DOM.Iterable"],
     "moduleDetection": "force",
     "module": "preserve",
@@ -8,13 +8,14 @@
     "resolveJsonModule": true,
     "types": ["node"],
     "strict": true,
-    "typeRoots": ["./src/types"],
+    "typeRoots": [
+      "./node_modules/@types",
+      "../../node_modules/@types",
+      "./src/types"
+    ],
     "baseUrl": "./",
     "paths": {
-      "@/*": ["./src/*"],
-      "@syncedstore/core/types/doc": [
-        "./../../node_modules/@syncedstore/core/types/doc"
-      ]
+      "@/*": ["./src/*"]
     },
     "noUnusedLocals": true,
     "declaration": true,

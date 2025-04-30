@@ -21,8 +21,8 @@
     "dist/*"
   ],
   "scripts": {
-    "bump:snapshot": "tsdown --sourcemap",
-    "build": "tsdown",
+    "bump:snapshot": "tsc --noEmit && tsdown --sourcemap",
+    "build": "tsc --noEmit && tsdown",
     "clean": "rimraf dist",
     "dev": "tsdown --watch",
     "link": "npm link",

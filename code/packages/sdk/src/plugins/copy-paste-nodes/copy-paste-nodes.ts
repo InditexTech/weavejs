@@ -8,7 +8,10 @@ import {
   type NodeSerializable,
   type WeaveStateElement,
 } from '@inditextech/weave-types';
-import { COPY_PASTE_NODES_PLUGIN_STATE } from './constants';
+import {
+  COPY_PASTE_NODES_PLUGIN_STATE,
+  WEAVE_COPY_PASTE_NODES_KEY,
+} from './constants';
 import { WeaveNodesSelectionPlugin } from '../nodes-selection/nodes-selection';
 import {
   type WeaveCopyPasteNodesPluginCallbacks,
@@ -24,7 +27,7 @@ export class WeaveCopyPasteNodesPlugin extends WeavePlugin {
   private toPaste: WeavePasteModel | undefined;
   getLayerName: undefined;
   initLayer: undefined;
-  render: undefined;
+  onRender: undefined;
 
   constructor(callbacks?: WeaveCopyPasteNodesPluginCallbacks) {
     super();
@@ -33,11 +36,11 @@ export class WeaveCopyPasteNodesPlugin extends WeavePlugin {
     this.state = COPY_PASTE_NODES_PLUGIN_STATE.IDLE;
   }
 
-  getName() {
-    return 'copyPasteNodes';
+  getName(): string {
+    return WEAVE_COPY_PASTE_NODES_KEY;
   }
 
-  init(): void {
+  onInit(): void {
     this.initEvents();
   }
 
