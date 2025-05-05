@@ -31,6 +31,8 @@ export class WeaveFrameNode extends WeaveNode {
     const frame = new Konva.Group({
       ...frameParams,
       containerId: `${id}-group-internal`,
+      containerOffsetX: 0,
+      containerOffsetY: titleHeight + strokeWidth,
       width: frameWidth + strokeWidth * 2,
       height: frameHeight + titleHeight + strokeWidth * 2,
       fill: '#ffffffff',

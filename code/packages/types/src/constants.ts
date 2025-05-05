@@ -4,6 +4,8 @@
 
 export const WEAVE_NODE_LAYER_ID = 'mainLayer';
 
+export const WEAVE_UTILITY_LAYER_ID = 'utilityLayer';
+
 export const WEAVE_INSTANCE_STATUS = {
   ['IDLE']: 'idle',
   ['STARTING']: 'starting',

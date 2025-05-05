@@ -382,6 +382,15 @@ can be selected again. The nodes maintain their position, rotation and scale whe
 
 ### Targeting management
 
+#### pointIntersectsContainerElement
+
+```ts
+pointIntersectsContainerElement(point?: Vector2d): Konva.Node | undefined
+```
+
+This method get the container element (i.e. a Frame) that intersect the provided point. If no point
+is provided the relative mouse position towards the Stage is used instead.
+
 #### getMousePointer
 
 ```ts
