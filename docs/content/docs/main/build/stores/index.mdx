@@ -78,7 +78,7 @@ abstract class, and implement the following methods:
 #### connect
 
 ```ts
-connect(): void;
+connect(): void
 ```
 
 The `connect` method is called when an user tries to join a room.
@@ -86,7 +86,7 @@ The `connect` method is called when an user tries to join a room.
 #### disconnect
 
 ```ts
-disconnect(): void;
+disconnect(): void
 ```
 
 The `disconnect` method is called when an user leaves a room.
@@ -96,7 +96,7 @@ The `disconnect` method is called when an user leaves a room.
 ```ts
 onAwarenessChange<K extends string, T>(
   callback: (changes: WeaveAwarenessChange<K, T>[]) => void
-): void;
+): void
 ```
 
 This method listen to awareness event changes, when a change is found a callback must be
@@ -105,7 +105,7 @@ called to propagate those changes to the UI.
 #### setAwarenessInfo
 
 ```ts
-setAwarenessInfo(field: string, value: unknown): void;
+setAwarenessInfo(field: string, value: unknown): void
 ```
 
 This method set awareness information, for example if you want to inform the metadata of

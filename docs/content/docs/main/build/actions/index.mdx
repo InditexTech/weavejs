@@ -27,7 +27,7 @@ stateDiagram-v2
   C: getName() is called on each action
   D: Rendering cycle begins
   E: First render
-  F: init() is called on each action
+  F: onInit() is called on each action
   [*] --> A
   A --> B
   state B {
@@ -227,21 +227,21 @@ getName(): string
 ```
 
 The `getName` method returns the name of the action, used as an identifier
-on the Weave instance.
+on the Weave instance. The name of the action must be unique among other actions.
 
-#### init
+#### onInit
 
 ```ts
-init?(): void;
+onInit?(): void
 ```
 
-The `init` method is optional, and is called after the first render of the
+The `onInit` method is optional, and is called after the first render of the
 Weave instance. It's a good place to initialize the action state, events, etc.
 
 #### trigger
 
 ```ts
-trigger(cancelAction: () => void, params?: unknown): unknown;
+trigger(cancelAction: () => void, params?: unknown): unknown
 ```
 
 When a user wants to call an action, the `trigger` method is called, it receives
@@ -255,7 +255,7 @@ the following parameters:
 #### internalUpdate
 
 ```ts
-internalUpdate?(): void;
+internalUpdate?(): void
 ```
 
 An action instance is wrapped with the
@@ -269,7 +269,7 @@ triggered.
 #### cleanup
 
 ```ts
-cleanup?(): void;
+cleanup?(): void
 ```
 
 The `cleanup` method is called when the action finishes or the user cancel the action. It's a

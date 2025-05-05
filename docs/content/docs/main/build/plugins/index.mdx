@@ -29,9 +29,9 @@ stateDiagram-v2
   C: getName() is called on each plugin
   D: Rendering cycle begins
   E: First render completed
-  F: init() is called on each plugin
+  F: onInit() is called on each plugin
   G: Subsequent renders
-  H: render() is called on each plugin
+  H: onRender() is called on each plugin
   [*] --> A
   A --> B
   state B {
@@ -183,30 +183,30 @@ getName(): string
 ```
 
 The `getName` method returns the name of the plugin, used as an identifier
-on the Weave instance.
+on the Weave instance. The name of the plugin must be unique among other plugins.
 
-#### init
+#### onInit
 
 ```ts
-init?(): void;
+onInit?(): void
 ```
 
-The `init` method is optional, and is called after the first render of the
+The `onInit` method is optional, and is called after the first render of the
 Weave instance. It's a good place to initialize the plugin state, events, etc.
 
-#### render
+#### onRender
 
 ```ts
-render?(): void;
+onRender?(): void
 ```
 
-The `render` method is optional, and is called on every render of the Weave
+The `onRender` method is optional, and is called on every render of the Weave
 instance. It's a good place to update the plugin and render it's changes.
 
 #### enable
 
 ```ts
-enable(): void;
+enable(): void
 ```
 
 The `enable` method is called when the user wants to enable the plugin.
@@ -214,7 +214,7 @@ The `enable` method is called when the user wants to enable the plugin.
 #### disable
 
 ```ts
-disable(): void;
+disable(): void
 ```
 
 The `enable` method is called when the user wants to disable the plugin.
