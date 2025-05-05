@@ -8,6 +8,7 @@ import { Weave } from '@/weave';
 import {
   WEAVE_NODE_LAYER_ID,
   WEAVE_UTILITY_LAYER_ID,
+  type WeaveElementInstance,
 } from '@inditextech/weave-types';
 import type { StageConfig } from 'konva/lib/Stage';
 
@@ -90,5 +91,11 @@ export class WeaveStageManager {
     stage.draw();
 
     this.setStage(stage);
+  }
+
+  getContainerNodes(): WeaveElementInstance[] {
+    return this.instance.getMainLayer()?.find((node: Konva.Node) => {
+      return node.getAttrs().containerId;
+    }) as WeaveElementInstance[];
   }
 }

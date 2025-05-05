@@ -37,3 +37,8 @@ export const STATE_ACTIONS = {
   ['UPDATE']: 'update',
   ['DELETE']: 'delete',
 } as const;
+
+export const WEAVE_NODE_CUSTOM_EVENTS = {
+  onTargetEnter: 'onTargetEnter',
+  onTargetLeave: 'onTargetLeave',
+} as const;

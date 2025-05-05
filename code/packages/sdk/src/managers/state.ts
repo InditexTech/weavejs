@@ -100,6 +100,23 @@ export class WeaveStateManager {
     return found;
   }
 
+  getContainerNodes(tree: WeaveStateElement): WeaveStateElement[] {
+    const found: WeaveStateElement[] = [];
+
+    if (tree.props.containerId) {
+      found.push(tree);
+      return found;
+    }
+
+    if (tree.props?.children && tree.props.children.length > 0) {
+      tree.props.children.some((child) => {
+        found.push(...this.getContainerNodes(child));
+      });
+    }
+
+    return found;
+  }
+
   getNode(nodeKey: string): WeaveNodeFound {
     const state = this.instance.getStore().getState().weave;
 

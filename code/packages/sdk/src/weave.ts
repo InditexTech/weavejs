@@ -286,6 +286,10 @@ export class Weave extends Emittery {
     return this.stageManager.getInstanceRecursive(instance, filterInstanceType);
   }
 
+  getContainerNodes(): WeaveElementInstance[] {
+    return this.stageManager.getContainerNodes();
+  }
+
   // REGISTERS MANAGEMENT METHODS PROXIES
 
   getRegisterManager(): WeaveRegisterManager {

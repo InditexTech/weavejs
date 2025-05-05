@@ -9,6 +9,7 @@ import {
   type WeaveStateElement,
   type WeaveNodeBase,
   WEAVE_NODE_LAYER_ID,
+  WEAVE_NODE_CUSTOM_EVENTS,
 } from '@inditextech/weave-types';
 import { type Logger } from 'pino';
 import { WeaveNodesSelectionPlugin } from '@/plugins/nodes-selection/nodes-selection';
@@ -71,6 +72,87 @@ export abstract class WeaveNode implements WeaveNodeBase {
     return selected;
   }
 
+  clearContainerTargets(): void {
+    const getContainers = this.instance.getContainerNodes();
+    for (const container of getContainers) {
+      container.fire(WEAVE_NODE_CUSTOM_EVENTS.onTargetLeave, { bubbles: true });
+    }
+  }
+
+  checkIfOverContainer(node: Konva.Node): Konva.Node | undefined {
+    const nodesIntersected = this.instance.pointIntersectsContainerElement();
+
+    let nodeActualContainer: Konva.Node | undefined =
+      node.getParent() as Konva.Node;
+    if (nodeActualContainer?.getAttrs().nodeId) {
+      nodeActualContainer = this.instance
+        .getStage()
+        .findOne(`#${nodeActualContainer.getAttrs().nodeId}`);
+    }
+
+    let layerToMove = undefined;
+    // Move to container
+    if (
+      !node.getAttrs().containerId &&
+      nodesIntersected &&
+      nodeActualContainer?.getAttrs().id !== nodesIntersected.getAttrs().id
+    ) {
+      layerToMove = nodesIntersected;
+    }
+
+    return layerToMove;
+  }
+
+  moveNodeToContainer(node: Konva.Node): Konva.Node | undefined {
+    const nodesIntersected = this.instance.pointIntersectsContainerElement();
+
+    let nodeActualContainer: Konva.Node | undefined =
+      node.getParent() as Konva.Node;
+    if (nodeActualContainer?.getAttrs().nodeId) {
+      nodeActualContainer = this.instance
+        .getStage()
+        .findOne(`#${nodeActualContainer.getAttrs().nodeId}`);
+    }
+
+    let layerToMove = undefined;
+    // Move to container
+    if (
+      !node.getAttrs().containerId &&
+      nodesIntersected &&
+      nodeActualContainer?.getAttrs().id !== nodesIntersected.getAttrs().id
+    ) {
+      layerToMove = nodesIntersected;
+    }
+    // Move to main layer
+    if (
+      !nodesIntersected &&
+      nodeActualContainer?.getAttrs().id !== WEAVE_NODE_LAYER_ID
+    ) {
+      layerToMove = this.instance.getMainLayer();
+    }
+
+    if (layerToMove) {
+      const nodePos = node.getAbsolutePosition();
+      const nodeRotation = node.getAbsoluteRotation();
+
+      node.moveTo(layerToMove);
+      node.setAbsolutePosition(nodePos);
+      node.rotation(nodeRotation);
+      node.x(node.x() - (layerToMove.getAttrs().containerOffsetX ?? 0));
+      node.y(node.y() - (layerToMove.getAttrs().containerOffsetY ?? 0));
+
+      const nodeHandler = this.instance.getNodeHandler<WeaveNode>(
+        node.getAttrs().nodeType
+      );
+      const actualNode = nodeHandler.serialize(node as WeaveElementInstance);
+
+      this.instance.removeNode(actualNode);
+      this.instance.addNode(actualNode, layerToMove?.getAttrs().id);
+    }
+
+    return layerToMove;
+  }
+
   setupDefaultNodeEvents(node: Konva.Node): void {
     this.previousPointer = null;
 
@@ -95,71 +177,31 @@ export abstract class WeaveNode implements WeaveNodeBase {
 
     node.on('dragmove', (e) => {
       if (this.isSelecting() && this.isNodeSelected(node)) {
+        this.clearContainerTargets();
+
+        const layerToMove = this.checkIfOverContainer(e.target);
+
+        if (layerToMove) {
+          layerToMove.fire(WEAVE_NODE_CUSTOM_EVENTS.onTargetEnter, {
+            bubbles: true,
+          });
+        }
+
         this.instance.updateNode(this.serialize(node as WeaveElementInstance));
-        e.cancelBubble = true;
       }
     });
 
     node.on('dragend', (e) => {
       if (this.isSelecting() && this.isNodeSelected(node)) {
-        const nodesIntersected =
-          this.instance.pointIntersectsContainerElement();
+        this.clearContainerTargets();
 
-        let nodeActualContainer: Konva.Node | undefined =
-          node.getParent() as Konva.Node;
-        if (nodeActualContainer?.getAttrs().nodeId) {
-          nodeActualContainer = this.instance
-            .getStage()
-            .findOne(`#${nodeActualContainer.getAttrs().nodeId}`);
-        }
-
-        let layerToMove = undefined;
-        // Move to container
-        if (
-          !e.target.getAttrs().containerId &&
-          nodesIntersected &&
-          nodeActualContainer?.getAttrs().id !== nodesIntersected.getAttrs().id
-        ) {
-          layerToMove = nodesIntersected;
-        }
-        // Move to main layer
-        if (
-          !nodesIntersected &&
-          nodeActualContainer?.getAttrs().id !== WEAVE_NODE_LAYER_ID
-        ) {
-          layerToMove = this.instance.getMainLayer();
-        }
+        const layerToMove = this.moveNodeToContainer(e.target);
 
         if (layerToMove) {
-          const nodePos = e.target.getAbsolutePosition();
-          const nodeRotation = e.target.getAbsoluteRotation();
-
-          e.target.moveTo(layerToMove);
-          e.target.setAbsolutePosition(nodePos);
-          e.target.rotation(nodeRotation);
-          e.target.x(
-            e.target.x() - (layerToMove.getAttrs().containerOffsetX ?? 0)
-          );
-          e.target.y(
-            e.target.y() - (layerToMove.getAttrs().containerOffsetY ?? 0)
-          );
-
-          const nodeHandler = this.instance.getNodeHandler<WeaveNode>(
-            e.target.getAttrs().nodeType
-          );
-          const actualNode = nodeHandler.serialize(
-            e.target as WeaveElementInstance
-          );
-
-          this.instance.removeNode(actualNode);
-          this.instance.addNode(actualNode, layerToMove?.getAttrs().id);
-          e.cancelBubble = true;
-
           return;
         }
 
         this.instance.updateNode(this.serialize(node as WeaveElementInstance));
-        e.cancelBubble = true;
       }
     });
 

@@ -8,6 +8,8 @@ description: Constants definitions for Weave.js
 ```ts
 export const WEAVE_NODE_LAYER_ID = "mainLayer";
 
+export const WEAVE_UTILITY_LAYER_ID = "utilityLayer";
+
 export const WEAVE_INSTANCE_STATUS = {
   ["IDLE"]: "idle",
   ["STARTING"]: "starting",
@@ -38,5 +40,10 @@ export const STATE_ACTIONS = {
   ["CREATE"]: "create",
   ["UPDATE"]: "update",
   ["DELETE"]: "delete",
+} as const;
+
+export const WEAVE_NODE_CUSTOM_EVENTS = {
+  onTargetEnter: "onTargetEnter",
+  onTargetLeave: "onTargetLeave",
 } as const;
 ```
