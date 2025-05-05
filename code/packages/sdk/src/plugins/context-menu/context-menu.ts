@@ -5,7 +5,8 @@
 import { WeavePlugin } from '@/plugins/plugin';
 import {
   type WeaveStageContextMenuPluginCallbacks,
-  type WeaveStageContextMenuPluginOptions,
+  type WeaveStageContextMenuPluginConfig,
+  type WeaveStageContextMenuPluginParams,
 } from './types';
 import {
   type WeaveElementInstance,
@@ -13,11 +14,16 @@ import {
 } from '@inditextech/weave-types';
 import { type Vector2d } from 'konva/lib/types';
 import { WeaveNodesSelectionPlugin } from '../nodes-selection/nodes-selection';
-import { WEAVE_CONTEXT_MENU_KEY } from './constants';
+import {
+  WEAVE_CONTEXT_MENU_KEY,
+  WEAVE_CONTEXT_MENU_X_OFFSET_DEFAULT,
+  WEAVE_CONTEXT_MENU_Y_OFFSET_DEFAULT,
+} from './constants';
 import type { WeaveNode } from '@/nodes/node';
+import { WEAVE_NODES_SELECTION_KEY } from '@/plugins/nodes-selection/constants';
 
 export class WeaveContextMenuPlugin extends WeavePlugin {
-  private config: WeaveStageContextMenuPluginOptions;
+  private config: WeaveStageContextMenuPluginConfig;
   private callbacks: WeaveStageContextMenuPluginCallbacks;
   private touchTimer: NodeJS.Timeout | undefined;
   private tapHold: boolean;
@@ -25,16 +31,18 @@ export class WeaveContextMenuPlugin extends WeavePlugin {
   initLayer = undefined;
   onRender: undefined;
 
-  constructor(
-    options: WeaveStageContextMenuPluginOptions,
-    callbacks: WeaveStageContextMenuPluginCallbacks
-  ) {
+  constructor(params: WeaveStageContextMenuPluginParams) {
     super();
 
     this.touchTimer = undefined;
     this.tapHold = false;
-    this.config = options;
-    this.callbacks = callbacks;
+    const { callbacks, config } = params ?? {};
+    this.config = {
+      xOffset: WEAVE_CONTEXT_MENU_X_OFFSET_DEFAULT,
+      yOffset: WEAVE_CONTEXT_MENU_Y_OFFSET_DEFAULT,
+      ...config,
+    };
+    this.callbacks = { ...callbacks };
   }
 
   getName(): string {
@@ -49,8 +57,9 @@ export class WeaveContextMenuPlugin extends WeavePlugin {
   triggerContextMenu(target: any): void {
     const stage = this.instance.getStage();
 
-    const selectionPlugin =
-      this.instance.getPlugin<WeaveNodesSelectionPlugin>('nodesSelection');
+    const selectionPlugin = this.instance.getPlugin<WeaveNodesSelectionPlugin>(
+      WEAVE_NODES_SELECTION_KEY
+    );
 
     let clickOnTransformer = false;
     if (selectionPlugin) {

@@ -5,9 +5,17 @@
 import { type WeaveUser } from '@inditextech/weave-types';
 import { WEAVE_CONNECTED_USER_INFO_KEY } from './constants';
 
-export type WeaveConnectedUsersPluginParams = {
+export type WeaveConnectedUsersPluginConfig = {
+  getUser: () => WeaveUser;
+};
+
+export type WeaveConnectedUsersPluginCallbacks = {
   onConnectedUsersChanged?: WeaveConnectedUsersChangeCallback;
-  getUser?: () => WeaveUser;
+};
+
+export type WeaveConnectedUsersPluginParams = {
+  config: WeaveConnectedUsersPluginConfig;
+  callbacks?: WeaveConnectedUsersPluginCallbacks;
 };
 
 export type WeaveConnectedUsersChanged = {

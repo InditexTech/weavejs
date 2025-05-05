@@ -15,6 +15,7 @@ import {
 import { WeaveNodesSelectionPlugin } from '../nodes-selection/nodes-selection';
 import {
   type WeaveCopyPasteNodesPluginCallbacks,
+  type WeaveCopyPasteNodesPluginParams,
   type WeaveCopyPasteNodesPluginState,
   type WeavePasteModel,
   type WeaveToPasteNode,
@@ -29,8 +30,10 @@ export class WeaveCopyPasteNodesPlugin extends WeavePlugin {
   initLayer: undefined;
   onRender: undefined;
 
-  constructor(callbacks?: WeaveCopyPasteNodesPluginCallbacks) {
+  constructor(params?: WeaveCopyPasteNodesPluginParams) {
     super();
+
+    const { callbacks } = params ?? {};
 
     this.callbacks = callbacks;
     this.state = COPY_PASTE_NODES_PLUGIN_STATE.IDLE;

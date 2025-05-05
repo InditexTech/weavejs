@@ -35,8 +35,15 @@ new WeaveStageGridPlugin(params: WeaveStageGridPluginParams);
 ## TypeScript types
 
 ```ts
+type WeaveStageGridPluginConfig = {
+  type: WeaveStageGridType;
+  gridColor: string;
+  gridOriginColor: string;
+  gridSize: number;
+};
+
 type WeaveStageGridPluginParams = {
-  gridSize?: number;
+  config?: WeaveStageGridPluginConfig;
 };
 ```
 
@@ -46,6 +53,32 @@ For `WeaveStageGridPluginParams`:
 
 <TypeTable
   type={{
+    ["config"]: {
+      description: "Config parameters for the plugin.",
+      type: "Partial<WeaveStageGridPluginConfig>",
+    },
+  }}
+/>
+
+For `WeaveStageGridPluginConfig`:
+
+<TypeTable
+  type={{
+    ["type"]: {
+      description: "Type of the grid to use by default.",
+      type: "WeaveStageGridType",
+      default: "line",
+    },
+    ["gridColor"]: {
+      description: "Color of the grid (lines or dots)",
+      type: "string",
+      default: "rgba(0,0,0,0.2)",
+    },
+    ["gridOriginColor"]: {
+      description: "Color of the grid origin axis.",
+      type: "string",
+      default: "rgba(255,0,0,0.2)",
+    },
     ["gridSize"]: {
       description:
         "A number in pixels that define the size of the grid separation.",

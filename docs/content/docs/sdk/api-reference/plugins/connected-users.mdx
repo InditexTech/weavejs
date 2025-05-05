@@ -38,6 +38,7 @@ new WeaveConnectedUsersPlugin(params: WeaveConnectedUsersPluginParams);
 
 ```ts
 type WeaveUser = {
+  [key: string]: any;
   name: string;
   email: string;
 };
@@ -50,9 +51,17 @@ type WeaveConnectedUsersChangeCallback = (
   users: WeaveConnectedUsersChanged
 ) => void;
 
-type WeaveConnectedUsersPluginParams = {
+type WeaveConnectedUsersPluginConfig = {
+  getUser: () => WeaveUser;
+};
+
+type WeaveConnectedUsersPluginCallbacks = {
   onConnectedUsersChanged?: WeaveConnectedUsersChangeCallback;
-  getUser?: () => WeaveUser;
+};
+
+type WeaveConnectedUsersPluginParams = {
+  config: WeaveConnectedUsersPluginConfig;
+  callbacks?: WeaveConnectedUsersPluginCallbacks;
 };
 ```
 
@@ -62,15 +71,39 @@ For `WeaveConnectedUsersPluginParams`:
 
 <TypeTable
   type={{
+    ["config"]: {
+      required: true,
+      description: "Config parameters for the plugin.",
+      type: "WeaveConnectedUsersPluginConfig",
+    },
+    ["callbacks"]: {
+      description: "Callbacks available for the plugin.",
+      type: "WeaveConnectedUsersPluginCallbacks",
+    },
+  }}
+/>
+
+For `WeaveConnectedUsersPluginConfig`:
+
+<TypeTable
+  type={{
+    ["getUser"]: {
+      required: true,
+      description:
+        "A function that returns the instance user metadata, used to inform the actual connected user to other peers.",
+      type: "() => WeaveUser",
+    },
+  }}
+/>
+
+For `WeaveConnectedUsersPluginCallbacks`:
+
+<TypeTable
+  type={{
     ["onConnectedUsersChanged"]: {
       description:
         "A callback that returns a representation of the connected users.",
       type: "WeaveConnectedUsersChangeCallback",
-    },
-    ["getUser"]: {
-      description:
-        "A function that returns the instance user metadata, used to inform the actual connected user to other peers.",
-      type: "() => WeaveUser",
     },
   }}
 />

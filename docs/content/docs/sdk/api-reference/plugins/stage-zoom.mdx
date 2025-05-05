@@ -29,7 +29,7 @@ import { WeaveStageZoomPlugin } from "@inditextech/weave-sdk";
 ## Instantiation
 
 ```ts
-new WeaveStageZoomPlugin(params: WeaveStageZoomPluginParams);
+new WeaveStageZoomPlugin(params: WeaveStageZoomPluginConfig);
 ```
 
 ## TypeScript types
@@ -42,6 +42,15 @@ type WeaveStageZoomChanged = {
   onDefaultStep: boolean;
   canZoomIn: boolean;
   canZoomOut: boolean;
+};
+
+type WeaveStageZoomPluginConfig = {
+  zoomSteps: number[];
+  defaultZoom: number;
+};
+
+type WeaveStageZoomPluginCallbacks = {
+  onZoomChange?: WeaveStageZoomOnZoomChangeCallback;
 };
 
 type WeaveStageZoomOnZoomChangeCallback = (
@@ -57,7 +66,22 @@ type WeaveStageZoomPluginParams = {
 
 ## Parameters
 
-For `WeaveStageZoomPluginParams`:
+For `WeaveStageZoomPluginConfig`:
+
+<TypeTable
+  type={{
+    ["config"]: {
+      description: "Config parameters for the plugin.",
+      type: "Partial<WeaveStageZoomPluginConfig>",
+    },
+    ["callbacks"]: {
+      description: "Callbacks available for the plugin.",
+      type: "WeaveStageZoomPluginCallbacks",
+    },
+  }}
+/>
+
+For `WeaveStageZoomPluginConfig`:
 
 <TypeTable
   type={{
@@ -71,6 +95,13 @@ For `WeaveStageZoomPluginParams`:
       type: "number",
       default: "1",
     },
+  }}
+/>
+
+For `WeaveStageZoomPluginCallbacks`:
+
+<TypeTable
+  type={{
     ["onZoomChange"]: {
       description: "A callback that is called when the zoom changes.",
       type: "number",

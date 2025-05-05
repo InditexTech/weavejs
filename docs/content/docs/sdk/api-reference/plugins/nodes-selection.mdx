@@ -30,7 +30,7 @@ import { WeaveNodesSelectionPlugin } from "@inditextech/weave-sdk";
 ## Instantiation
 
 ```ts
-new WeaveNodesSelectionPlugin(callbacks: WeaveNodesSelectionPluginCallbacks);
+new WeaveNodesSelectionPlugin(params: WeaveNodesSelectionPluginParams);
 ```
 
 ## TypeScript types
@@ -58,6 +58,15 @@ type WeaveSelection = {
 type WeaveNodesSelectionChangeCallback = (nodes: WeaveSelection[]) => void;
 type WeaveNodesSelectionStageSelectionCallback = () => void;
 
+type WeaveNodesSelectionPluginConfig = {
+  transformer?: TransformerConfig;
+};
+
+type WeaveNodesSelectionPluginParams = {
+  config?: WeaveNodesSelectionPluginConfig;
+  callbacks: WeaveNodesSelectionPluginCallbacks;
+};
+
 type WeaveNodesSelectionPluginCallbacks = {
   onNodesChange: WeaveNodesSelectionChangeCallback;
   onStageSelection?: WeaveNodesSelectionStageSelectionCallback;
@@ -66,12 +75,37 @@ type WeaveNodesSelectionPluginCallbacks = {
 
 ## Parameters
 
+For `WeaveNodesSelectionPluginParams`:
+
+<TypeTable
+  type={{
+    ["config"]: {
+      description: "Config parameters for the plugin.",
+      type: "WeaveNodesSelectionPluginConfig",
+    },
+    ["callbacks"]: {
+      description: "Callbacks available for the plugin.",
+      type: "WeaveNodesSelectionPluginCallbacks",
+    },
+  }}
+/>
+
+For `WeaveNodesSelectionPluginConfig`:
+
+<TypeTable
+  type={{
+    ["transformer"]: {
+      description: "Konva Transformer configuration.",
+      type: "Konva.TransformerConfig",
+    },
+  }}
+/>
+
 For `WeaveNodesSelectionPluginCallbacks`:
 
 <TypeTable
   type={{
     ["onNodesChange"]: {
-      required: true,
       description:
         "A callback that is called when the nodes selection changed.",
       type: "WeaveNodesSelectionChangeCallback",

@@ -3,13 +3,11 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import _ from 'lodash';
-import {
-  type WeaveAwarenessChange,
-  type WeaveUser,
-} from '@inditextech/weave-types';
+import { type WeaveAwarenessChange } from '@inditextech/weave-types';
 import {
   type WeaveUserPointer,
   type WeaveUserPointerKey,
+  type WeaveUsersPointersPluginConfig,
   type WeaveUsersPointersPluginParams,
 } from './types';
 import {
@@ -27,7 +25,7 @@ export class WeaveUsersPointersPlugin extends WeavePlugin {
     { oldPos: WeaveUserPointer; actualPos: WeaveUserPointer }
   >;
   private usersPointersTimers: Record<string, NodeJS.Timeout>;
-  private getUser: () => WeaveUser;
+  private config!: WeaveUsersPointersPluginConfig;
   private renderCursors: boolean;
   private userPointerCircleRadius: number = 4;
   private userPointerSeparation: number = 8;
@@ -41,13 +39,12 @@ export class WeaveUsersPointersPlugin extends WeavePlugin {
   constructor(params: WeaveUsersPointersPluginParams) {
     super();
 
-    const { getUser } = params;
+    const { config } = params;
 
     this.renderCursors = true;
     this.usersPointers = {};
     this.usersPointersTimers = {};
-    this.getUser =
-      getUser ?? (() => ({ name: 'Unknown', email: 'unknown@domain.com' }));
+    this.config = config;
   }
 
   getName(): string {
@@ -80,7 +77,7 @@ export class WeaveUsersPointersPlugin extends WeavePlugin {
       (
         changes: WeaveAwarenessChange<WeaveUserPointerKey, WeaveUserPointer>[]
       ) => {
-        const selfUser = this.getUser();
+        const selfUser = this.config.getUser();
 
         for (const change of changes) {
           if (!change[WEAVE_USER_POINTER_KEY]) {
@@ -110,7 +107,7 @@ export class WeaveUsersPointersPlugin extends WeavePlugin {
     stage.on('dragmove', (e) => {
       e.evt.preventDefault();
 
-      const userInfo = this.getUser();
+      const userInfo = this.config.getUser();
       const mousePos = stage.getRelativePointerPosition();
 
       if (mousePos) {
@@ -124,7 +121,7 @@ export class WeaveUsersPointersPlugin extends WeavePlugin {
 
     stage.on('pointermove', (e) => {
       e.evt.preventDefault();
-      const userInfo = this.getUser();
+      const userInfo = this.config.getUser();
       const mousePos = stage.getRelativePointerPosition();
 
       if (mousePos) {
