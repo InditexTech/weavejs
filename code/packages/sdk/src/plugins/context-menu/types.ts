@@ -6,7 +6,12 @@ import { Weave } from '@/weave';
 import { type WeaveSelection } from '@inditextech/weave-types';
 import { type Vector2d } from 'konva/lib/types';
 
-export type WeaveStageContextMenuPluginOptions = {
+export type WeaveStageContextMenuPluginParams = {
+  config?: WeaveStageContextMenuPluginConfig;
+  callbacks: WeaveStageContextMenuPluginCallbacks;
+};
+
+export type WeaveStageContextMenuPluginConfig = {
   xOffset?: number;
   yOffset?: number;
 };

@@ -12,12 +12,17 @@ import {
   WEAVE_NODES_SELECTION_KEY,
   WEAVE_NODES_SELECTION_LAYER_ID,
 } from './constants';
-import { type WeaveNodesSelectionPluginCallbacks } from './types';
+import {
+  type WeaveNodesSelectionPluginCallbacks,
+  type WeaveNodesSelectionPluginConfig,
+  type WeaveNodesSelectionPluginParams,
+} from './types';
 import { WeaveContextMenuPlugin } from '../context-menu/context-menu';
 import type { WeaveNode } from '@/nodes/node';
 
 export class WeaveNodesSelectionPlugin extends WeavePlugin {
   private tr!: Konva.Transformer;
+  private config!: WeaveNodesSelectionPluginConfig;
   private selectionRectangle!: Konva.Rect;
   private active: boolean;
   private cameFromSelectingMultiple: boolean;
@@ -26,10 +31,40 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
   private callbacks: WeaveNodesSelectionPluginCallbacks;
   onRender: undefined;
 
-  constructor(callbacks: WeaveNodesSelectionPluginCallbacks) {
+  constructor(params: WeaveNodesSelectionPluginParams) {
     super();
 
-    this.callbacks = callbacks;
+    const { config, callbacks } = params ?? {};
+
+    this.config = {
+      transformer: {
+        rotationSnaps: [0, 45, 90, 135, 180, 225, 270, 315, 360],
+        rotationSnapTolerance: 3,
+        ignoreStroke: true,
+        flipEnabled: false,
+        useSingleNodeRotation: true,
+        shouldOverdrawWholeArea: true,
+        anchorStyleFunc: (anchor) => {
+          anchor.stroke('#27272aff');
+          anchor.cornerRadius(12);
+          if (anchor.hasName('top-center') || anchor.hasName('bottom-center')) {
+            anchor.height(8);
+            anchor.offsetY(4);
+            anchor.width(32);
+            anchor.offsetX(16);
+          }
+          if (anchor.hasName('middle-left') || anchor.hasName('middle-right')) {
+            anchor.height(32);
+            anchor.offsetY(16);
+            anchor.width(8);
+            anchor.offsetX(4);
+          }
+        },
+        borderStroke: '#1e40afff',
+        ...config?.transformer,
+      },
+    };
+    this.callbacks = callbacks ?? {};
     this.active = false;
     this.cameFromSelectingMultiple = false;
     this.selecting = false;
@@ -72,29 +107,7 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
 
     const tr = new Konva.Transformer({
       id: 'selectionTransformer',
-      rotationSnaps: [0, 45, 90, 135, 180, 225, 270, 315, 360],
-      rotationSnapTolerance: 3,
-      ignoreStroke: true,
-      flipEnabled: false,
-      useSingleNodeRotation: true,
-      shouldOverdrawWholeArea: true,
-      anchorStyleFunc: (anchor) => {
-        anchor.stroke('#27272aff');
-        anchor.cornerRadius(12);
-        if (anchor.hasName('top-center') || anchor.hasName('bottom-center')) {
-          anchor.height(8);
-          anchor.offsetY(4);
-          anchor.width(32);
-          anchor.offsetX(16);
-        }
-        if (anchor.hasName('middle-left') || anchor.hasName('middle-right')) {
-          anchor.height(32);
-          anchor.offsetY(16);
-          anchor.width(8);
-          anchor.offsetX(4);
-        }
-      },
-      borderStroke: '#1e40afff',
+      ...this.config.transformer,
     });
     selectionLayer?.add(tr);
 

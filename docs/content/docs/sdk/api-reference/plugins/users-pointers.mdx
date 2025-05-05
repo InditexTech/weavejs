@@ -37,18 +37,34 @@ new WeaveUsersPointersPlugin(params: WeaveUsersPointersPluginParams);
 
 ```ts
 type WeaveUser = {
+  [key: string]: any;
   name: string;
   email: string;
 };
 
+type WeaveUsersPointersPluginConfig = {
+  getUser: () => WeaveUser;
+};
+
 type WeaveUsersPointersPluginParams = {
-  getUser?: () => WeaveUser;
+  config: WeaveUsersPointersPluginConfig;
 };
 ```
 
 ## Parameters
 
 For `WeaveUsersPointersPluginParams`:
+
+<TypeTable
+  type={{
+    ["config"]: {
+      description: "Config parameters for the plugin.",
+      type: "WeaveUsersPointersPluginConfig",
+    },
+  }}
+/>
+
+For `WeaveUsersPointersPluginConfig`:
 
 <TypeTable
   type={{

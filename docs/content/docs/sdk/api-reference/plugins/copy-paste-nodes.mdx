@@ -31,7 +31,7 @@ import { WeaveCopyPasteNodesPlugin } from "@inditextech/weave-sdk";
 ## Instantiation
 
 ```ts
-new WeaveCopyPasteNodesPlugin(callbacks?: WeaveCopyPasteNodesPluginCallbacks);
+new WeaveCopyPasteNodesPlugin(params: WeaveCopyPasteNodesPluginParams);
 ```
 
 ## TypeScript types
@@ -41,6 +41,10 @@ type WeaveCopyPasteNodesOnCopyCallback = (error?: Error) => void;
 type WeaveCopyPasteNodesOnPasteCallback = (error?: Error) => void;
 type WeaveCopyPasteNodesOnPasteExternalCallback = (item: ClipboardItem) => void;
 
+type WeaveCopyPasteNodesPluginParams = {
+  callbacks?: WeaveCopyPasteNodesPluginCallbacks;
+};
+
 type WeaveCopyPasteNodesPluginCallbacks = {
   onCopy?: WeaveCopyPasteNodesOnCopyCallback;
   onPaste?: WeaveCopyPasteNodesOnPasteCallback;
@@ -49,6 +53,17 @@ type WeaveCopyPasteNodesPluginCallbacks = {
 ```
 
 ## Parameters
+
+For `WeaveCopyPasteNodesPluginParams`:
+
+<TypeTable
+  type={{
+    ["callbacks"]: {
+      description: "Callbacks available for the plugin.",
+      type: "WeaveCopyPasteNodesPluginCallbacks",
+    },
+  }}
+/>
 
 For `WeaveCopyPasteNodesPluginCallbacks`:
 

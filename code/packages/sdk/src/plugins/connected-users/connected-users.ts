@@ -9,18 +9,20 @@ import {
   type WeaveUser,
 } from '@inditextech/weave-types';
 import {
-  type WeaveConnectedUsersChangeCallback,
   type WeaveConnectedUsersPluginParams,
   type WeaveConnectedUserInfoKey,
+  type WeaveConnectedUsersPluginCallbacks,
+  type WeaveConnectedUsersPluginConfig,
 } from './types';
-import { WEAVE_CONNECTED_USER_INFO_KEY } from './constants';
+import {
+  WEAVE_CONNECTED_USER_INFO_KEY,
+  WEAVE_CONNECTED_USERS_KEY,
+} from './constants';
 
 export class WeaveConnectedUsersPlugin extends WeavePlugin {
+  private config!: WeaveConnectedUsersPluginConfig;
+  private callbacks!: WeaveConnectedUsersPluginCallbacks;
   private connectedUsers: Record<string, WeaveUser> = {};
-  private getUser: () => WeaveUser;
-  private onConnectedUsersChanged:
-    | WeaveConnectedUsersChangeCallback
-    | undefined;
   getLayerName = undefined;
   initLayer: undefined;
   onRender: undefined;
@@ -28,25 +30,24 @@ export class WeaveConnectedUsersPlugin extends WeavePlugin {
   constructor(params: WeaveConnectedUsersPluginParams) {
     super();
 
-    const { getUser, onConnectedUsersChanged } = params;
+    const { config, callbacks } = params ?? {};
+
+    this.config = config;
+    this.callbacks = callbacks ?? {};
 
     this.connectedUsers = {};
-
-    this.onConnectedUsersChanged = onConnectedUsersChanged;
-    this.getUser =
-      getUser ?? (() => ({ name: 'Unknown', email: 'unknown@domain.com' }));
   }
 
-  getName() {
-    return 'connectedUsers';
+  getName(): string {
+    return WEAVE_CONNECTED_USERS_KEY;
   }
 
   onInit(): void {
     const store = this.instance.getStore();
 
-    const userInfo = this.getUser();
+    const userInfo = this.config.getUser();
     store.setAwarenessInfo(WEAVE_CONNECTED_USER_INFO_KEY, userInfo);
-    this.onConnectedUsersChanged?.({ [userInfo.name]: userInfo });
+    this.callbacks?.onConnectedUsersChanged?.({ [userInfo.name]: userInfo });
 
     store.onAwarenessChange(
       (
@@ -54,7 +55,7 @@ export class WeaveConnectedUsersPlugin extends WeavePlugin {
       ) => {
         if (!this.enabled) {
           this.connectedUsers = {};
-          this.onConnectedUsersChanged?.({});
+          this.callbacks?.onConnectedUsersChanged?.({});
           return;
         }
 
@@ -71,7 +72,7 @@ export class WeaveConnectedUsersPlugin extends WeavePlugin {
         }
 
         if (!isEqual(this.connectedUsers, newConnectedUsers)) {
-          this.onConnectedUsersChanged?.(newConnectedUsers);
+          this.callbacks?.onConnectedUsersChanged?.(newConnectedUsers);
         }
 
         this.connectedUsers = newConnectedUsers;

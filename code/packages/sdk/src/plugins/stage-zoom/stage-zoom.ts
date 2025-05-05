@@ -5,6 +5,8 @@
 import { WeavePlugin } from '@/plugins/plugin';
 import {
   type WeaveStageZoomOnZoomChangeCallback,
+  type WeaveStageZoomPluginCallbacks,
+  type WeaveStageZoomPluginConfig,
   type WeaveStageZoomPluginParams,
 } from './types';
 import Konva from 'konva';
@@ -15,32 +17,38 @@ export class WeaveStageZoomPlugin extends WeavePlugin {
   getLayerName = undefined;
   initLayer = undefined;
   onRender: undefined;
-  private zoomSteps: number[];
+  private config!: WeaveStageZoomPluginConfig;
+  private callbacks!: WeaveStageZoomPluginCallbacks;
   private actualScale: number;
   private actualStep: number;
   private padding: number = 100;
-  defaultStep: number;
+  defaultStep: number = 3;
   private onZoomChangeCb: WeaveStageZoomOnZoomChangeCallback | undefined;
 
-  constructor(params: WeaveStageZoomPluginParams) {
+  constructor(params: Partial<WeaveStageZoomPluginParams>) {
     super();
 
-    const {
-      zoomSteps = [0.1, 0.25, 0.5, 1, 2, 4, 8],
-      defaultZoom = 1,
-      onZoomChange,
-    } = params;
+    const { config, callbacks } = params;
 
-    this.zoomSteps = zoomSteps;
+    this.config = {
+      zoomSteps: [0.1, 0.25, 0.5, 1, 2, 4, 8],
+      defaultZoom: 1,
+      ...config,
+    };
+    this.callbacks = callbacks ?? {};
 
-    if (!this.zoomSteps.includes(defaultZoom)) {
-      throw new Error(`Default zoom ${defaultZoom} is not in zoom steps`);
+    if (!this.config.zoomSteps.includes(this.config.defaultZoom)) {
+      throw new Error(
+        `Default zoom ${this.config.defaultZoom} is not in zoom steps`
+      );
     }
 
-    this.actualStep = zoomSteps.findIndex((step) => step === defaultZoom);
-    this.actualScale = this.zoomSteps[this.actualStep];
+    this.actualStep = this.config.zoomSteps.findIndex(
+      (step) => step === this.config.defaultZoom
+    );
+    this.actualScale = this.config.zoomSteps[this.actualStep];
     this.defaultStep = this.actualStep;
-    this.onZoomChangeCb = onZoomChange;
+    this.onZoomChangeCb = this.callbacks?.onZoomChange;
   }
 
   getName(): string {
@@ -48,7 +56,7 @@ export class WeaveStageZoomPlugin extends WeavePlugin {
   }
 
   onInit(): void {
-    this.setZoom(this.zoomSteps[this.actualStep]);
+    this.setZoom(this.config.zoomSteps[this.actualStep]);
   }
 
   private setZoom(scale: number, centered: boolean = true) {
@@ -93,7 +101,7 @@ export class WeaveStageZoomPlugin extends WeavePlugin {
 
       const callbackParams = {
         scale,
-        zoomSteps: this.zoomSteps,
+        zoomSteps: this.config.zoomSteps,
         actualStep: this.actualStep,
         onDefaultStep: this.actualStep === this.defaultStep,
         canZoomIn: this.canZoomIn(),
@@ -110,7 +118,7 @@ export class WeaveStageZoomPlugin extends WeavePlugin {
       return false;
     }
 
-    const actualZoomIsStep = this.zoomSteps.findIndex(
+    const actualZoomIsStep = this.config.zoomSteps.findIndex(
       (scale) => scale === this.actualScale
     );
     if (actualZoomIsStep === -1) {
@@ -125,14 +133,14 @@ export class WeaveStageZoomPlugin extends WeavePlugin {
       return false;
     }
 
-    const actualZoomIsStep = this.zoomSteps.findIndex(
+    const actualZoomIsStep = this.config.zoomSteps.findIndex(
       (scale) => scale === this.actualScale
     );
     if (actualZoomIsStep === -1) {
       this.actualStep = this.findClosestStepIndex();
     }
 
-    return this.actualStep + 1 < this.zoomSteps.length;
+    return this.actualStep + 1 < this.config.zoomSteps.length;
   }
 
   zoomToStep(step: number): void {
@@ -140,21 +148,21 @@ export class WeaveStageZoomPlugin extends WeavePlugin {
       return;
     }
 
-    if (step < 0 || step >= this.zoomSteps.length) {
+    if (step < 0 || step >= this.config.zoomSteps.length) {
       throw new Error(`Defined step ${step} is out of bounds`);
     }
 
     this.actualStep = step;
-    this.setZoom(this.zoomSteps[step]);
+    this.setZoom(this.config.zoomSteps[step]);
   }
 
   private findClosestStepIndex() {
     let closestStepIndex = 0;
     let actualDiff = Infinity;
-    for (let i = 0; i < this.zoomSteps.length; i++) {
-      if (Math.abs(this.zoomSteps[i] - this.actualScale) < actualDiff) {
+    for (let i = 0; i < this.config.zoomSteps.length; i++) {
+      if (Math.abs(this.config.zoomSteps[i] - this.actualScale) < actualDiff) {
         closestStepIndex = i;
-        actualDiff = Math.abs(this.zoomSteps[i] - this.actualScale);
+        actualDiff = Math.abs(this.config.zoomSteps[i] - this.actualScale);
       }
     }
     return closestStepIndex;
@@ -169,7 +177,7 @@ export class WeaveStageZoomPlugin extends WeavePlugin {
       return;
     }
 
-    const actualZoomIsStep = this.zoomSteps.findIndex(
+    const actualZoomIsStep = this.config.zoomSteps.findIndex(
       (scale) => scale === this.actualScale
     );
     if (actualZoomIsStep === -1) {
@@ -178,7 +186,7 @@ export class WeaveStageZoomPlugin extends WeavePlugin {
       this.actualStep += 1;
     }
 
-    this.setZoom(this.zoomSteps[this.actualStep]);
+    this.setZoom(this.config.zoomSteps[this.actualStep]);
   }
 
   zoomOut(): void {
@@ -190,7 +198,7 @@ export class WeaveStageZoomPlugin extends WeavePlugin {
       return;
     }
 
-    const actualZoomIsStep = this.zoomSteps.findIndex(
+    const actualZoomIsStep = this.config.zoomSteps.findIndex(
       (scale) => scale === this.actualScale
     );
     if (actualZoomIsStep === -1) {
@@ -199,7 +207,7 @@ export class WeaveStageZoomPlugin extends WeavePlugin {
       this.actualStep -= 1;
     }
 
-    this.setZoom(this.zoomSteps[this.actualStep]);
+    this.setZoom(this.config.zoomSteps[this.actualStep]);
   }
 
   fitToScreen(): void {
@@ -210,7 +218,7 @@ export class WeaveStageZoomPlugin extends WeavePlugin {
     const mainLayer = this.instance.getMainLayer();
 
     if (mainLayer?.getChildren().length === 0) {
-      this.setZoom(this.zoomSteps[this.defaultStep]);
+      this.setZoom(this.config.zoomSteps[this.defaultStep]);
       return;
     }
 

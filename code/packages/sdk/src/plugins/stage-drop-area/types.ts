@@ -9,3 +9,7 @@ export type WeaveStageDropAreaPluginCallbacks = {
   onStageDrop?: WeaveStageDropCallback;
   doUploadFile?: WeaveStageDropUploadFileCallback; // TODO: MAYBE REMOVE?
 };
+
+export type WeaveStageDropAreaPluginParams = {
+  callbacks?: WeaveStageDropAreaPluginCallbacks;
+};

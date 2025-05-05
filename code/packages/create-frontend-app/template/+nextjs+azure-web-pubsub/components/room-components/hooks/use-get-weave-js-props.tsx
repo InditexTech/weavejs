@@ -89,21 +89,23 @@ function useGetWeaveJSProps() {
       ...CUSTOM_PLUGINS,
       contextMenu,
       new WeaveCopyPasteNodesPlugin({
-        onCopy: (error?: Error) => {
-          if (error) {
-            console.error('onCopy', error);
-            toast.error('Aan error occurred when copying to the clipboard');
-          } else {
-            toast.success('Copy successful');
-          }
-        },
-        onPaste: (error?: Error) => {
-          if (error) {
-            console.error('onPaste', error);
-            toast.error('Aan error occurred when reading from the clipboard');
-          } else {
-            toast.success('Paste successful');
-          }
+        callbacks: {
+          onCopy: (error?: Error) => {
+            if (error) {
+              console.error('onCopy', error);
+              toast.error('Aan error occurred when copying to the clipboard');
+            } else {
+              toast.success('Copy successful');
+            }
+          },
+          onPaste: (error?: Error) => {
+            if (error) {
+              console.error('onPaste', error);
+              toast.error('Aan error occurred when reading from the clipboard');
+            } else {
+              toast.success('Paste successful');
+            }
+          },
         },
       }),
     ];

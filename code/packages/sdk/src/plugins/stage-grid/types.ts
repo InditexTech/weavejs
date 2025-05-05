@@ -4,8 +4,15 @@
 
 import { WEAVE_GRID_TYPES } from './constants';
 
+export type WeaveStageGridPluginConfig = {
+  type: WeaveStageGridType;
+  gridColor: string;
+  gridOriginColor: string;
+  gridSize: number;
+};
+
 export type WeaveStageGridPluginParams = {
-  gridSize?: number;
+  config?: WeaveStageGridPluginConfig;
 };
 
 export type WeaveStageGridTypeKeys = keyof typeof WEAVE_GRID_TYPES;

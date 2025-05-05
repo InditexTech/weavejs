@@ -2,4 +2,6 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-export const WEAVE_CONNECTED_USER_INFO_KEY = "userInfo";
+export const WEAVE_CONNECTED_USERS_KEY = 'connectedUsers';
+
+export const WEAVE_CONNECTED_USER_INFO_KEY = 'userInfo';

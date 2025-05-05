@@ -3,13 +3,23 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { type WeaveSelection } from '@inditextech/weave-types';
+import type Konva from 'konva';
 
 export type WeaveNodesSelectionChangeCallback = (
   nodes: WeaveSelection[]
 ) => void;
 export type WeaveNodesSelectionStageSelectionCallback = () => void;
 
+export type WeaveNodesSelectionPluginConfig = {
+  transformer?: Konva.TransformerConfig;
+};
+
+export type WeaveNodesSelectionPluginParams = {
+  config?: WeaveNodesSelectionPluginConfig;
+  callbacks?: WeaveNodesSelectionPluginCallbacks;
+};
+
 export type WeaveNodesSelectionPluginCallbacks = {
-  onNodesChange: WeaveNodesSelectionChangeCallback;
+  onNodesChange?: WeaveNodesSelectionChangeCallback;
   onStageSelection?: WeaveNodesSelectionStageSelectionCallback;
 };

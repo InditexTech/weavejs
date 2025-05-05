@@ -6,12 +6,16 @@ import Konva from 'konva';
 import { Line } from 'konva/lib/shapes/Line';
 import { WeavePlugin } from '@/plugins/plugin';
 import {
+  WEAVE_GRID_DEFAULT_COLOR,
+  WEAVE_GRID_DEFAULT_ORIGIN_COLOR,
   WEAVE_GRID_DEFAULT_SIZE,
+  WEAVE_GRID_DEFAULT_TYPE,
   WEAVE_GRID_LAYER_ID,
   WEAVE_GRID_TYPES,
   WEAVE_STAGE_GRID_KEY,
 } from './constants';
 import {
+  type WeaveStageGridPluginConfig,
   type WeaveStageGridPluginParams,
   type WeaveStageGridType,
 } from './types';
@@ -21,20 +25,23 @@ export class WeaveStageGridPlugin extends WeavePlugin {
   private moveToolActive: boolean;
   private isMouseMiddleButtonPressed: boolean;
   private isSpaceKeyPressed: boolean;
-  private type: WeaveStageGridType = 'lines';
-  private gridColor: string = 'rgba(0,0,0,0.2)';
-  private originColor: string = 'rgba(255,0,0,0.2)';
-  private gridSize: number;
+  private config!: WeaveStageGridPluginConfig;
 
-  constructor(params: WeaveStageGridPluginParams) {
+  constructor(params?: Partial<WeaveStageGridPluginParams>) {
     super();
 
-    const { gridSize = WEAVE_GRID_DEFAULT_SIZE } = params;
+    const { config } = params ?? {};
 
     this.moveToolActive = false;
     this.isMouseMiddleButtonPressed = false;
     this.isSpaceKeyPressed = false;
-    this.gridSize = gridSize;
+    this.config = {
+      type: WEAVE_GRID_DEFAULT_TYPE as WeaveStageGridType,
+      gridColor: WEAVE_GRID_DEFAULT_COLOR,
+      gridOriginColor: WEAVE_GRID_DEFAULT_ORIGIN_COLOR,
+      gridSize: WEAVE_GRID_DEFAULT_SIZE,
+      ...config,
+    };
   }
 
   getName(): string {
@@ -166,7 +173,7 @@ export class WeaveStageGridPlugin extends WeavePlugin {
       return;
     }
 
-    switch (this.type) {
+    switch (this.config.type) {
       case WEAVE_GRID_TYPES.LINES:
         this.renderGridLines();
         break;
@@ -192,24 +199,24 @@ export class WeaveStageGridPlugin extends WeavePlugin {
 
     const stage = this.instance.getStage();
 
-    const stageXRound = this.round(stage.x(), this.gridSize) * -1;
+    const stageXRound = this.round(stage.x(), this.config.gridSize) * -1;
 
     const pointsX = [];
     for (
       let i = stageXRound;
       i < stageXRound + stage.width();
-      i += this.gridSize
+      i += this.config.gridSize
     ) {
       pointsX.push(i / stage.scaleX());
     }
 
-    const stageYRound = this.round(stage.y(), this.gridSize) * -1;
+    const stageYRound = this.round(stage.y(), this.config.gridSize) * -1;
 
     const pointsY = [];
     for (
       let i = stageYRound;
       i < stageYRound + stage.height();
-      i += this.gridSize
+      i += this.config.gridSize
     ) {
       pointsY.push(i / stage.scaleY());
     }
@@ -217,22 +224,23 @@ export class WeaveStageGridPlugin extends WeavePlugin {
     for (let index = 0; index < pointsX.length; index++) {
       const point = pointsX[index];
 
-      let color = this.gridColor;
+      let color = this.config.gridColor;
       if (point === 0) {
-        color = this.originColor;
+        color = this.config.gridOriginColor;
       }
 
       layer.add(
         new Line({
           points: [
             point,
-            (-stage.y() - 2 * this.gridSize) / stage.scaleY(),
+            (-stage.y() - 2 * this.config.gridSize) / stage.scaleY(),
             point,
-            (stage.height() - stage.y() + 2 * this.gridSize) / stage.scaleY(),
+            (stage.height() - stage.y() + 2 * this.config.gridSize) /
+              stage.scaleY(),
           ],
           stroke: color,
           strokeWidth:
-            (point % (10 * (this.gridSize / stage.scaleX())) === 0
+            (point % (10 * (this.config.gridSize / stage.scaleX())) === 0
               ? 2.5
               : 0.5) / stage.scaleX(),
           listening: false,
@@ -243,22 +251,23 @@ export class WeaveStageGridPlugin extends WeavePlugin {
     for (let index = 0; index < pointsY.length; index++) {
       const point = pointsY[index];
 
-      let color = this.gridColor;
+      let color = this.config.gridColor;
       if (point === 0) {
-        color = this.originColor;
+        color = this.config.gridOriginColor;
       }
 
       layer.add(
         new Line({
           points: [
-            (-stage.x() - 2 * this.gridSize) / stage.scaleX(),
+            (-stage.x() - 2 * this.config.gridSize) / stage.scaleX(),
             point,
-            (stage.width() - stage.x() + 2 * this.gridSize) / stage.scaleX(),
+            (stage.width() - stage.x() + 2 * this.config.gridSize) /
+              stage.scaleX(),
             point,
           ],
           stroke: color,
           strokeWidth:
-            (point % (10 * (this.gridSize / stage.scaleY())) === 0
+            (point % (10 * (this.config.gridSize / stage.scaleY())) === 0
               ? 2.5
               : 0.5) / stage.scaleX(),
           listening: false,
@@ -276,24 +285,24 @@ export class WeaveStageGridPlugin extends WeavePlugin {
 
     const stage = this.instance.getStage();
 
-    const stageXRound = this.round(stage.x(), this.gridSize) * -1;
+    const stageXRound = this.round(stage.x(), this.config.gridSize) * -1;
 
     const pointsX = [];
     for (
       let i = stageXRound;
       i < stageXRound + stage.width();
-      i += this.gridSize
+      i += this.config.gridSize
     ) {
       pointsX.push(i / stage.scaleX());
     }
 
-    const stageYRound = this.round(stage.y(), this.gridSize) * -1;
+    const stageYRound = this.round(stage.y(), this.config.gridSize) * -1;
 
     const pointsY = [];
     for (
       let i = stageYRound;
       i < stageYRound + stage.height();
-      i += this.gridSize
+      i += this.config.gridSize
     ) {
       pointsY.push(i / stage.scaleY());
     }
@@ -304,9 +313,9 @@ export class WeaveStageGridPlugin extends WeavePlugin {
       for (let indexY = 0; indexY < pointsY.length; indexY++) {
         const pointY = pointsY[indexY];
 
-        let color = this.gridColor;
+        let color = this.config.gridColor;
         if (pointX === 0 || pointY === 0) {
-          color = this.originColor;
+          color = this.config.gridOriginColor;
         }
 
         layer.add(
@@ -341,11 +350,11 @@ export class WeaveStageGridPlugin extends WeavePlugin {
   }
 
   getType(): WeaveStageGridType {
-    return this.type;
+    return this.config.type;
   }
 
   setType(type: WeaveStageGridType): void {
-    this.type = type;
+    this.config.type = type;
     this.onRender();
   }
 }

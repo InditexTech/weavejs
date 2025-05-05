@@ -30,7 +30,7 @@ import { WeaveStageDropAreaPlugin } from "@inditextech/weave-sdk";
 ## Instantiation
 
 ```ts
-new WeaveStageDropAreaPlugin(callbacks?: WeaveStageDropAreaPluginCallbacks);
+new WeaveStageDropAreaPlugin(params: WeaveStageDropAreaPluginParams);
 ```
 
 ## TypeScript types
@@ -39,6 +39,10 @@ new WeaveStageDropAreaPlugin(callbacks?: WeaveStageDropAreaPluginCallbacks);
 type WeaveStageDropCallback = (event: DragEvent) => void;
 type WeaveStageDropUploadFileCallback = (event: File) => Promise<void>;
 
+export type WeaveStageDropAreaPluginParams = {
+  callbacks?: WeaveStageDropAreaPluginCallbacks;
+};
+
 type WeaveStageDropAreaPluginCallbacks = {
   onStageDrop?: WeaveStageDropCallback;
   doUploadFile?: WeaveStageDropUploadFileCallback;
@@ -46,6 +50,17 @@ type WeaveStageDropAreaPluginCallbacks = {
 ```
 
 ## Parameters
+
+For `WeaveStageDropAreaPluginParams`:
+
+<TypeTable
+  type={{
+    ["callbacks"]: {
+      description: "Callbacks available for the plugin.",
+      type: "WeaveStageDropAreaPluginCallbacks",
+    },
+  }}
+/>
 
 For `WeaveStageDropAreaPluginCallbacks`:
 

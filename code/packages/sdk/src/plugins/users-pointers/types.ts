@@ -5,8 +5,12 @@
 import { type WeaveUser } from '@inditextech/weave-types';
 import { WEAVE_USER_POINTER_KEY } from './constants';
 
+export type WeaveUsersPointersPluginConfig = {
+  getUser: () => WeaveUser;
+};
+
 export type WeaveUsersPointersPluginParams = {
-  getUser?: () => WeaveUser;
+  config: WeaveUsersPointersPluginConfig;
 };
 
 export type WeaveUserPointer = {

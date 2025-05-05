@@ -173,38 +173,50 @@ export const WeaveProvider = ({
             instancePlugins.push(plugin);
           }
         } else {
-          instancePlugins.push(new WeaveStageGridPlugin({}));
+          instancePlugins.push(new WeaveStageGridPlugin());
           instancePlugins.push(new WeaveStagePanningPlugin());
           instancePlugins.push(new WeaveStageResizePlugin());
           instancePlugins.push(
             new WeaveStageZoomPlugin({
-              onZoomChange: (zoomInfo: WeaveStageZoomChanged) => {
-                setZoom(zoomInfo.scale);
-                setCanZoomIn(zoomInfo.canZoomIn);
-                setCanZoomOut(zoomInfo.canZoomOut);
+              callbacks: {
+                onZoomChange: (zoomInfo: WeaveStageZoomChanged) => {
+                  setZoom(zoomInfo.scale);
+                  setCanZoomIn(zoomInfo.canZoomIn);
+                  setCanZoomOut(zoomInfo.canZoomOut);
+                },
               },
             })
           );
           instancePlugins.push(
             new WeaveNodesSelectionPlugin({
-              onNodesChange,
+              callbacks: {
+                onNodesChange,
+              },
             })
           );
-          instancePlugins.push(new WeaveStageDropAreaPlugin({}));
+          instancePlugins.push(new WeaveStageDropAreaPlugin());
           instancePlugins.push(
             new WeaveConnectedUsersPlugin({
-              onConnectedUsersChanged: (users: WeaveConnectedUsersChanged) => {
-                setUsers(users);
+              config: {
+                getUser,
               },
-              getUser,
+              callbacks: {
+                onConnectedUsersChanged: (
+                  users: WeaveConnectedUsersChanged
+                ) => {
+                  setUsers(users);
+                },
+              },
             })
           );
           instancePlugins.push(
             new WeaveUsersPointersPlugin({
-              getUser,
+              config: {
+                getUser,
+              },
             })
           );
-          instancePlugins.push(new WeaveCopyPasteNodesPlugin({}));
+          instancePlugins.push(new WeaveCopyPasteNodesPlugin());
         }
 
         weaveInstanceRef.current = new Weave(

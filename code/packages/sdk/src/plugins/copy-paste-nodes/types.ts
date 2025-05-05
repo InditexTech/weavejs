@@ -28,6 +28,10 @@ export type WeaveCopyPasteNodesOnPasteExternalCallback = (
   item: ClipboardItem
 ) => void;
 
+export type WeaveCopyPasteNodesPluginParams = {
+  callbacks?: WeaveCopyPasteNodesPluginCallbacks;
+};
+
 export type WeaveCopyPasteNodesPluginCallbacks = {
   onCopy?: WeaveCopyPasteNodesOnCopyCallback;
   onPaste?: WeaveCopyPasteNodesOnPasteCallback;

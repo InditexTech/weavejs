@@ -30,16 +30,18 @@ import { WeaveContextMenuPlugin } from "@inditextech/weave-sdk";
 ## Instantiation
 
 ```ts
-new WeaveContextMenuPlugin(
-  options: WeaveStageContextMenuPluginOptions,
-  callbacks: WeaveStageContextMenuPluginCallbacks
-);
+new WeaveContextMenuPlugin(params: WeaveStageContextMenuPluginParams);
 ```
 
 ## TypeScript types
 
 ```ts
-type WeaveStageContextMenuPluginOptions = {
+type WeaveStageContextMenuPluginParams = {
+  config?: WeaveStageContextMenuPluginConfig;
+  callbacks: WeaveStageContextMenuPluginCallbacks;
+};
+
+type WeaveStageContextMenuPluginConfig = {
   xOffset?: number;
   yOffset?: number;
 };
@@ -58,19 +60,35 @@ type WeaveStageContextMenuPluginCallbacks = {
 
 ## Parameters
 
-For `WeaveStageContextMenuPluginOptions`:
+For `WeaveStageContextMenuPluginParams`:
+
+<TypeTable
+  type={{
+    ["config"]: {
+      required: true,
+      description: "Config parameters for the plugin.",
+      type: "WeaveStageContextMenuPluginConfig",
+    },
+    ["callbacks"]: {
+      description: "Callbacks available for the plugin.",
+      type: "WeaveStageContextMenuPluginCallbacks",
+    },
+  }}
+/>
+
+For `WeaveStageContextMenuPluginConfig`:
 
 <TypeTable
   type={{
     ["xOffset"]: {
       description: "X-axis offset of the click point in pixels.",
       type: "number",
-      default: "0",
+      default: "4",
     },
     ["yOffset"]: {
       description: "Y-axis offset of the click point in pixes",
       type: "number",
-      default: "0",
+      default: "4",
     },
   }}
 />
