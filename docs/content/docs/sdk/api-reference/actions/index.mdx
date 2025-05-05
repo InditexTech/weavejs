@@ -3,50 +3,151 @@ title: Actions
 description: Actions API Reference
 ---
 
-import { CpuIcon, Database } from "lucide-react";
+## Introduction
 
-Weave.js is a modular library that streamlines the **development of visual
-collaborative web applications** built on-top of an HTML5 canvas, designed with a
-robust architecture, **Weave.js** enables developers to extend functionality
-seamlessly.
+Actions are the core mechanism for handling user-driven changes in Weave.js. Whether
+you're adding a node, moving elements, updating properties, or triggering a custom behavior,
+Actions provide a structured, trackable way to apply changes to the shared state.
 
-Weave.js offers a clean and efficient API for:
+Actions help keep your application logic clean and consistent, and collaborative. In Weave.js,
+if something meaningful happens—it’s probably through an Action.
+
+Weave.js includes a set of built-in Actions, but you can also create your own to tailor
+functionality to your specific application needs.
+
+## Available actions
+
+Weave.js team maintain a set of **actions**, think of them as how the users interact with
+the canvas to build visual collaborative applications. This are the actions:
+
+### Base
 
 <Cards>
 
-<Card icon={<CpuIcon className="text-purple-300" />} title='Weave.js SDK'>
+<Card href="/docs/sdk/api-reference/actions/action" title='WeaveAction'>
 
-Handles most of the logic, includes the base nodes, plugins and actions.
-
-</Card>
-
-<Card icon={<Database className="text-blue-300" />} title='Weave.js Store'>
-
-Handles the backend & frontend (client) logic to support real-time collaboration
-on top different transports.
+The WeaveAction node is the abstract class that defines the blueprint of a action in Weave.js.
 
 </Card>
 
 </Cards>
 
-Ideal for building applications such as whiteboards, diagram editors and design
-platforms, Weave.js provides the flexibility and scalability needed for modern,
-canvas-based collaborative tools.
+### UX Tools
 
-<Callout title="Want to learn more?">
-  Read our in-depth [What is Weave.js](/docs/main/what-is-weavejs) introduction.
-</Callout>
+<Cards>
 
-## Live demo
+<Card href="/docs/sdk/api-reference/actions/move-tool" title='WeaveMoveToolAction'>
 
-<div className="flex justify-center items-center *:max-w-[700px] bg-gradient-to-br from-fd-primary/10 rounded-xl border">
-  ![Enter room page of the Weave.js showcase](/images/showcase.png)
-</div>
+Allows users to enable/disable the panning of canvas. When enabled the user can pan the canvas
+at its will.
 
-Check our [live whiteboard application](https://weavejs.cloud.inditex.com) built using:
+</Card>
 
-- [React](https://es.react.dev/) & [Next.js](https://nextjs.org/) for the frontend side
-- [Express](https://expressjs.com/) & [Node.js](https://nodejs.org/es) on the backend side
+<Card href="/docs/sdk/api-reference/actions/selection-tool" title='WeaveSelectionToolAction'>
 
-Demonstrating the creation from scratch of a real-time, collaborative visual workspace
-application.
+Allows users to enable/disable the selection mode of the canvas. When enabled the users can
+select nodes, move then, resize them, etc.
+
+</Card>
+
+</Cards>
+
+### Nodes Tools
+
+<Cards>
+
+<Card href="/docs/sdk/api-reference/actions/rectangle-tool" title='WeaveRectangleToolAction'>
+
+Enables users to create new rectangle nodes on the canvas.
+
+</Card>
+
+<Card href="/docs/sdk/api-reference/actions/pen-tool" title='WeavePenToolAction'>
+
+Enables users to create continuos lines on the canvas with N segments on the canvas.
+
+</Card>
+
+<Card href="/docs/sdk/api-reference/actions/brush-tool" title='WeaveBrushToolAction'>
+
+Enables users to paint freeform strokes on the canvas, similar to a digital brush.
+
+</Card>
+
+<Card href="/docs/sdk/api-reference/actions/image-tool" title='WeaveImageToolAction'>
+
+Enables users to add images to the canvas by selecting a file.
+
+</Card>
+
+<Card href="/docs/sdk/api-reference/actions/text-tool" title='WeaveTextToolAction'>
+
+Enables users to add new text nodes to the canvas by clicking or touching on it.
+
+</Card>
+
+</Cards>
+
+### Grouping Tools
+
+<Cards>
+
+<Card href="/docs/sdk/api-reference/actions/frame-tool" title='WeaveFrameToolAction'>
+
+Enables users to create frame nodes by clicking on the canvas.
+
+</Card>
+
+</Cards>
+
+### Zooming Tools
+
+<Cards>
+
+<Card href="/docs/sdk/api-reference/actions/zoom-in-tool" title='WeaveZoomInToolAction'>
+
+Enables users to incrementally zoom into the canvas, providing a more detailed view of
+content.
+
+</Card>
+
+<Card href="/docs/sdk/api-reference/actions/zoom-out-tool" title='WeaveZoomOutToolAction'>
+
+Enables users to incrementally zoom out the canvas, providing a more general view of
+content.
+
+</Card><Card href="/docs/sdk/api-reference/actions/fit-to-screen-tool" title='WeaveFitToScreenToolAction'>
+
+Automatically adjusts the zoom and position of the canvas to ensure all visible nodes
+fit neatly within the viewport.
+
+</Card>
+
+<Card href="/docs/sdk/api-reference/actions/fit-to-selection-tool" title='WeaveFitToSelectionToolAction'>
+
+Automatically adjusts the zoom and position of the canvas to ensure all selected nodes
+fit neatly within the viewport.
+
+</Card>
+
+</Cards>
+
+### Export Tools
+
+<Cards>
+
+<Card href="/docs/sdk/api-reference/actions/export-stage-tool" title='WeaveExportStageToolAction'>
+
+Automatically adjusts the zoom and position of the canvas to ensure all visible nodes
+fit neatly within the viewport, and then proceeds to export the viewport as an image.
+
+</Card>
+
+<Card href="/docs/sdk/api-reference/actions/export-node-tool" title='WeaveExportNodeToolAction'>
+
+Automatically adjusts the zoom and position of the canvas to ensure all selected nodes
+fit neatly within the viewport, and then proceeds to export the viewport as an image.
+
+</Card>
+
+</Cards>

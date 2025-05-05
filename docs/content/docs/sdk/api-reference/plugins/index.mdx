@@ -3,50 +3,126 @@ title: Plugins
 description: Plugins API Reference
 ---
 
-import { CpuIcon, Database } from "lucide-react";
+## Introduction
 
-Weave.js is a modular library that streamlines the **development of visual
-collaborative web applications** built on-top of an HTML5 canvas, designed with a
-robust architecture, **Weave.js** enables developers to extend functionality
-seamlessly.
+Plugins are the modular pieces that extend and enhance the functionality of Weave.js.
+They allow you to add behavior to the canvas: like selection, zooming, snapping, panning,
+keyboard shortcuts, and more, without modifying the core system.
 
-Weave.js offers a clean and efficient API for:
+Plugins are designed to be lightweight, composable, and easy to integrate, making it simple
+to build rich, interactive experiences. Whether you're enabling multi-selection, managing
+drag-and-drop, or integrating custom logic, Plugins are how you supercharge your canvas with
+reusable, context-aware features.
+
+Weave.js includes a set of built-in plugins, but you can also create your own to tailor
+functionality to your specific application needs.
+
+## Available plugins
+
+Weave.js team maintain a set of **plugins**, think of them as added functionality to
+build visual collaborative applications. This are the plugins:
+
+### Base
 
 <Cards>
 
-<Card icon={<CpuIcon className="text-purple-300" />} title='Weave.js SDK'>
+<Card href="/docs/sdk/api-reference/plugins/plugin" title='WeavePlugin'>
 
-Handles most of the logic, includes the base nodes, plugins and actions.
-
-</Card>
-
-<Card icon={<Database className="text-blue-300" />} title='Weave.js Store'>
-
-Handles the backend & frontend (client) logic to support real-time collaboration
-on top different transports.
+The WeavePlugin node is the abstract class that defines the blueprint of a plugin in Weave.js.
 
 </Card>
 
 </Cards>
 
-Ideal for building applications such as whiteboards, diagram editors and design
-platforms, Weave.js provides the flexibility and scalability needed for modern,
-canvas-based collaborative tools.
+### Awareness
 
-<Callout title="Want to learn more?">
-  Read our in-depth [What is Weave.js](/docs/main/what-is-weavejs) introduction.
-</Callout>
+<Cards>
 
-## Live demo
+<Card href="/docs/sdk/api-reference/plugins/connected-users" title='WeaveConnectedUsersPlugin'>
 
-<div className="flex justify-center items-center *:max-w-[700px] bg-gradient-to-br from-fd-primary/10 rounded-xl border">
-  ![Enter room page of the Weave.js showcase](/images/showcase.png)
-</div>
+Gives the list of users currently active in a collaborative session. Ideal as source
+information to paint the user list on the UI.
 
-Check our [live whiteboard application](https://weavejs.cloud.inditex.com) built using:
+</Card>
 
-- [React](https://es.react.dev/) & [Next.js](https://nextjs.org/) for the frontend side
-- [Express](https://expressjs.com/) & [Node.js](https://nodejs.org/es) on the backend side
+<Card href="/docs/sdk/api-reference/plugins/users-pointers" title='WeaveUsersPointersPlugin'>
 
-Demonstrating the creation from scratch of a real-time, collaborative visual workspace
-application.
+Displays real-time cursors or pointers for all connected users on the canvas.
+
+</Card>
+
+</Cards>
+
+### UX
+
+<Cards>
+
+<Card href="/docs/sdk/api-reference/plugins/context-menu" title='WeaveContextMenuPlugin'>
+
+Adds custom right-click menus to the canvas, enabling users to access context-specific
+actions
+
+</Card>
+
+<Card href="/docs/sdk/api-reference/plugins/copy-paste-nodes" title='WeaveCopyPasteNodesPlugin'>
+
+Enables users to copy & paste selected nodes using familiar keyboard shortcuts like
+Ctrl/Cmd + C and Ctrl/Cmd + V or through actions on the context menu.
+
+</Card>
+
+<Card href="/docs/sdk/api-reference/plugins/nodes-selection" title='WeaveNodesSelectionPlugin'>
+
+Enables users to select one or multiple nodes on the canvas through clicks,
+shift-clicks, or drag-selection (marquee).
+
+</Card>
+
+<Card href="/docs/sdk/api-reference/plugins/nodes-snapping" title='WeaveNodesSnappingPlugin'>
+
+Adds smart alignment assistance by enabling nodes to snap to guides or other nodes as they
+are moved or resized.
+
+</Card>
+
+</Cards>
+
+### Stage
+
+<Cards>
+
+<Card href="/docs/sdk/api-reference/plugins/stage-drop-area" title='WeaveStageDropAreaPlugin'>
+
+Enables drag-and-drop support on the canvas, allowing users to drop elements—such as
+shapes, files, or custom components—directly onto the canvas.
+
+</Card>
+
+<Card href="/docs/sdk/api-reference/plugins/stage-grid" title='WeaveStageGridPlugin'>
+
+Adds a visual background grid to the canvas stage, helping users align and position
+elements more precisely.
+
+</Card>
+
+<Card href="/docs/sdk/api-reference/plugins/stage-panning" title='WeaveStagePanningPlugin'>
+
+Enables users to navigate the canvas by dragging to move around the Stage.
+
+</Card>
+
+<Card href="/docs/sdk/api-reference/plugins/stage-resize" title='WeaveStageResizePlugin'>
+
+Automatically adjusts the canvas size to fit its container or the browser window,
+ensuring a responsive and adaptive user experience.
+
+</Card>
+
+<Card href="/docs/sdk/api-reference/plugins/stage-zoom" title='WeaveStageZoomPlugin'>
+
+Enables smooth zooming in and out of the canvas, allowing users to focus on details
+or get an overview of the entire workspace.
+
+</Card>
+
+</Cards>

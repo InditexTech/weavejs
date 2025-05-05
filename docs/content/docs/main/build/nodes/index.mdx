@@ -108,4 +108,84 @@ properties like position, scale, opacity, and filters.
 Developers can also build their own **custom nodes**, empowering this way their applications
 with new visual nodes with behavior closer to the needs of their applications.
 
-To create a custom node, follow this steps:
+### Base class
+
+In Weave.js a Node is a class that extends the WeaveNode abstract class, and implements a set of
+methods that define the Node behavior.
+
+<Callout title="Access the Weave instance">
+
+You can access Weave.js main instance via `this.instance`.
+
+</Callout>
+
+To create a custom node, create a class that extends the [WeaveNode](https://github.com/InditexTech/weavejs/blob/main/code/packages/sdk/src/nodes/node.ts)
+abstract class, and implement the following attributes and methods:
+
+#### nodeType
+
+All nodes must define a property:
+
+```ts
+nodeType: string;
+```
+
+Which defines the node identity. The `nodeType` attribute must be unique among other nodes.
+
+#### create
+
+```ts
+create(key: string, props: WeaveElementAttributes): WeaveStateElement
+```
+
+The `create` method receives:
+
+- `key`: is the identifier of the node on the rendering tree - and is unique.
+- `props`: the properties of the node.
+
+It should return a JSON representation of the node.
+
+<Callout title="Check the base implementation">
+
+Most times this method is not needed to extend as the implementation on the base class, covers most
+use cases.
+
+</Callout>
+
+#### onRender
+
+```ts
+onRender(props: WeaveElementAttributes): WeaveElementInstance
+```
+
+The `onRender` method is the one responsible for rendering the node on the canvas, It's a good place
+to initialize the nodes, events, etc.
+
+#### onUpdate
+
+```ts
+onUpdate(
+  instance: WeaveElementInstance,
+  nextProps: WeaveElementAttributes
+): void
+```
+
+The `onUpdate` method is called anytime that the nodes needs to update on the canvas, it receives the
+actual canvas instance (Konva element) of the node and the new props.
+
+#### onDestroy
+
+```ts
+onDestroy(nodeInstance: WeaveElementInstance): void
+```
+
+The `onDestroy` method is called when the canvas instance needs to be disposed.
+
+#### serialize
+
+```ts
+serialize(instance: WeaveElementInstance): WeaveStateElement
+```
+
+The `serialize` method transform a canvas instance (Konva element) into its JSON representation so it
+can be sent over the wire for sync with other peers or to persist the model server-side.
