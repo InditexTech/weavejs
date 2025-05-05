@@ -8,6 +8,7 @@ import {
   type WeaveElementAttributes,
   type WeaveElementInstance,
   type WeaveStateElement,
+  WEAVE_NODE_CUSTOM_EVENTS,
 } from '@inditextech/weave-types';
 import { WEAVE_FRAME_NODE_TYPE } from './constants';
 
@@ -33,6 +34,7 @@ export class WeaveFrameNode extends WeaveNode {
       containerId: `${id}-group-internal`,
       containerOffsetX: 0,
       containerOffsetY: titleHeight + strokeWidth,
+      isTarget: false,
       width: frameWidth + strokeWidth * 2,
       height: frameHeight + titleHeight + strokeWidth * 2,
       fill: '#ffffffff',
@@ -95,6 +97,22 @@ export class WeaveFrameNode extends WeaveNode {
     frame.add(frameInternal);
 
     this.setupDefaultNodeEvents(frame);
+
+    frame.on(WEAVE_NODE_CUSTOM_EVENTS.onTargetLeave, () => {
+      background.setAttrs({
+        stroke: '#000000ff',
+        strokeWidth: 2,
+        fill: '#ffffffff',
+      });
+    });
+
+    frame.on(WEAVE_NODE_CUSTOM_EVENTS.onTargetEnter, () => {
+      background.setAttrs({
+        stroke: '#ff6863ff',
+        strokeWidth: 2,
+        fill: '#ecececff',
+      });
+    });
 
     return frame;
   }

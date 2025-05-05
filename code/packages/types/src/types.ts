@@ -113,6 +113,11 @@ export type WeaveNodeFound = {
   index: number;
 };
 
+export const Wea = {
+  onTargetEnter: 'onTargetEnter',
+  onTargetLeave: 'onTargetLeave',
+} as const;
+
 // Awareness handler
 
 export type WeaveAwarenessChange<K extends string, T> = {
