@@ -267,6 +267,10 @@ export class Weave extends Emittery {
     return this.stageManager.getMainLayer();
   }
 
+  getUtilityLayer(): Konva.Layer | undefined {
+    return this.stageManager.getUtilityLayer();
+  }
+
   setStage(stage: Konva.Stage): void {
     this.stageManager.setStage(stage);
   }
@@ -484,6 +488,10 @@ export class Weave extends Emittery {
   }
 
   // TARGETING MANAGEMENT METHODS PROXIES
+
+  pointIntersectsContainerElement(point?: Vector2d): Konva.Node | undefined {
+    return this.targetingManager.pointIntersectsContainerElement(point);
+  }
 
   getMousePointer(point?: Vector2d): WeaveMousePointInfo {
     return this.targetingManager.getMousePointer(point);

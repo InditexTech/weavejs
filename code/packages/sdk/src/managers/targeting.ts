@@ -21,6 +21,34 @@ export class WeaveTargetingManager {
     this.logger.debug('Targeting manager created');
   }
 
+  pointIntersectsContainerElement(point?: Vector2d): Konva.Node | undefined {
+    const stage = this.instance.getStage();
+    const relativeMousePointer = point
+      ? point
+      : stage.getPointerPosition() ?? { x: 0, y: 0 };
+
+    const intersections = this.instance
+      .getMainLayer()
+      ?.getAllIntersections(relativeMousePointer);
+
+    let intersectedNode: Konva.Node | undefined = undefined;
+    if (intersections) {
+      for (const node of intersections) {
+        if (node.getAttrs().nodeId) {
+          const parent = stage.findOne(`#${node.getAttrs().nodeId}`);
+          intersectedNode = parent;
+          break;
+        }
+        if (node.getAttrs().containerId) {
+          intersectedNode = node;
+          break;
+        }
+      }
+    }
+
+    return intersectedNode;
+  }
+
   getMousePointer(point?: Vector2d): WeaveMousePointInfo {
     this.logger.debug({ point }, 'getMousePointer');
     const stage = this.instance.getStage();

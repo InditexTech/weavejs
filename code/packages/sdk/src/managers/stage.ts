@@ -5,7 +5,10 @@
 import Konva from 'konva';
 import { type Logger } from 'pino';
 import { Weave } from '@/weave';
-import { WEAVE_NODE_LAYER_ID } from '@inditextech/weave-types';
+import {
+  WEAVE_NODE_LAYER_ID,
+  WEAVE_UTILITY_LAYER_ID,
+} from '@inditextech/weave-types';
 import type { StageConfig } from 'konva/lib/Stage';
 
 export class WeaveStageManager {
@@ -36,6 +39,13 @@ export class WeaveStageManager {
   getMainLayer() {
     const stage = this.getStage();
     return stage.findOne(`#${WEAVE_NODE_LAYER_ID}`) as Konva.Layer | undefined;
+  }
+
+  getUtilityLayer() {
+    const stage = this.getStage();
+    return stage.findOne(`#${WEAVE_UTILITY_LAYER_ID}`) as
+      | Konva.Layer
+      | undefined;
   }
 
   getInstanceRecursive(

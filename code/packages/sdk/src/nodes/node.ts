@@ -8,6 +8,7 @@ import {
   type WeaveElementInstance,
   type WeaveStateElement,
   type WeaveNodeBase,
+  WEAVE_NODE_LAYER_ID,
 } from '@inditextech/weave-types';
 import { type Logger } from 'pino';
 import { WeaveNodesSelectionPlugin } from '@/plugins/nodes-selection/nodes-selection';
@@ -101,6 +102,62 @@ export abstract class WeaveNode implements WeaveNodeBase {
 
     node.on('dragend', (e) => {
       if (this.isSelecting() && this.isNodeSelected(node)) {
+        const nodesIntersected =
+          this.instance.pointIntersectsContainerElement();
+
+        let nodeActualContainer: Konva.Node | undefined =
+          node.getParent() as Konva.Node;
+        if (nodeActualContainer?.getAttrs().nodeId) {
+          nodeActualContainer = this.instance
+            .getStage()
+            .findOne(`#${nodeActualContainer.getAttrs().nodeId}`);
+        }
+
+        let layerToMove = undefined;
+        // Move to container
+        if (
+          !e.target.getAttrs().containerId &&
+          nodesIntersected &&
+          nodeActualContainer?.getAttrs().id !== nodesIntersected.getAttrs().id
+        ) {
+          layerToMove = nodesIntersected;
+        }
+        // Move to main layer
+        if (
+          !nodesIntersected &&
+          nodeActualContainer?.getAttrs().id !== WEAVE_NODE_LAYER_ID
+        ) {
+          layerToMove = this.instance.getMainLayer();
+        }
+
+        if (layerToMove) {
+          const nodePos = e.target.getAbsolutePosition();
+          const nodeRotation = e.target.getAbsoluteRotation();
+
+          e.target.moveTo(layerToMove);
+          e.target.setAbsolutePosition(nodePos);
+          e.target.rotation(nodeRotation);
+          e.target.x(
+            e.target.x() - (layerToMove.getAttrs().containerOffsetX ?? 0)
+          );
+          e.target.y(
+            e.target.y() - (layerToMove.getAttrs().containerOffsetY ?? 0)
+          );
+
+          const nodeHandler = this.instance.getNodeHandler<WeaveNode>(
+            e.target.getAttrs().nodeType
+          );
+          const actualNode = nodeHandler.serialize(
+            e.target as WeaveElementInstance
+          );
+
+          this.instance.removeNode(actualNode);
+          this.instance.addNode(actualNode, layerToMove?.getAttrs().id);
+          e.cancelBubble = true;
+
+          return;
+        }
+
         this.instance.updateNode(this.serialize(node as WeaveElementInstance));
         e.cancelBubble = true;
       }
