@@ -5,6 +5,7 @@
 import {
   type WeaveSelection,
   type NodeSerializable,
+  type WeaveElementInstance,
 } from '@inditextech/weave-types';
 import Konva from 'konva';
 import { WeavePlugin } from '@/plugins/plugin';
@@ -19,6 +20,7 @@ import {
 } from './types';
 import { WeaveContextMenuPlugin } from '../context-menu/context-menu';
 import type { WeaveNode } from '@/nodes/node';
+import type { WeaveNodesSnappingPlugin } from '../nodes-snapping/nodes-snapping';
 
 export class WeaveNodesSelectionPlugin extends WeavePlugin {
   private tr!: Konva.Transformer;
@@ -87,6 +89,22 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
     stage.add(layer);
   }
 
+  isSelecting(): boolean {
+    return this.instance.getActiveAction() === 'selectionTool';
+  }
+
+  isNodeSelected(ele: Konva.Node): boolean {
+    let selected: boolean = false;
+    if (
+      this.getSelectedNodes().length === 1 &&
+      this.getSelectedNodes()[0].getAttrs().id === ele.getAttrs().id
+    ) {
+      selected = true;
+    }
+
+    return selected;
+  }
+
   onInit(): void {
     const stage = this.instance.getStage();
     const selectionLayer = this.getLayer();
@@ -110,6 +128,46 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
       ...this.config.transformer,
     });
     selectionLayer?.add(tr);
+
+    tr.on('transform', (e) => {
+      const node = e.target;
+
+      const nodesSnappingPlugin =
+        this.instance.getPlugin<WeaveNodesSnappingPlugin>('nodesSnapping');
+
+      if (
+        nodesSnappingPlugin &&
+        this.isSelecting() &&
+        this.isNodeSelected(node)
+      ) {
+        nodesSnappingPlugin.evaluateGuidelines(e);
+      }
+
+      if (this.isSelecting() && this.isNodeSelected(node)) {
+        const nodeHandler = this.instance.getNodeHandler<WeaveNode>(
+          node.getAttrs().nodeType
+        );
+        this.instance.updateNode(
+          nodeHandler.serialize(node as WeaveElementInstance)
+        );
+        e.cancelBubble = true;
+      }
+    });
+
+    tr.on('transformend', (e) => {
+      const node = e.target;
+
+      const nodesSnappingPlugin =
+        this.instance.getPlugin<WeaveNodesSnappingPlugin>('nodesSnapping');
+
+      if (
+        nodesSnappingPlugin &&
+        this.isSelecting() &&
+        this.isNodeSelected(node)
+      ) {
+        nodesSnappingPlugin.cleanupEvaluateGuidelines();
+      }
+    });
 
     tr.on('mouseenter', (e) => {
       const stage = this.instance.getStage();

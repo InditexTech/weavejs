@@ -16,6 +16,7 @@ import { WeaveNodesSelectionPlugin } from '@/plugins/nodes-selection/nodes-selec
 import Konva from 'konva';
 import { type WeaveNodesSelectionChangeCallback } from '@/plugins/nodes-selection/types';
 import { WeaveCopyPasteNodesPlugin } from '@/plugins/copy-paste-nodes/copy-paste-nodes';
+// import type { WeaveNodesSnappingPlugin } from '@/plugins/nodes-snapping/nodes-snapping';
 
 export abstract class WeaveNode implements WeaveNodeBase {
   protected instance!: Weave;
@@ -166,13 +167,6 @@ export abstract class WeaveNode implements WeaveNodeBase {
         node.draggable(false);
       }
     );
-
-    node.on('transform', (e) => {
-      if (this.isSelecting() && this.isNodeSelected(node)) {
-        this.instance.updateNode(this.serialize(node as WeaveElementInstance));
-        e.cancelBubble = true;
-      }
-    });
 
     node.on('dragmove', (e) => {
       if (this.isSelecting() && this.isNodeSelected(node)) {
