@@ -30,5 +30,69 @@ import { WeaveNodesSnappingPlugin } from "@inditextech/weave-sdk";
 ## Instantiation
 
 ```ts
-new WeaveNodesSnappingPlugin();
+new WeaveNodesSnappingPlugin(params: WeaveNodesSnappingPluginParams);
 ```
+
+## TypeScript types
+
+```ts
+const GUIDE_LINE_DEFAULT_CONFIG: Required<
+  Pick<Konva.LineConfig, "stroke" | "strokeWidth" | "dash">
+> = {
+  stroke: "rgb(0, 161, 255)",
+  strokeWidth: 1,
+  dash: [4, 6],
+};
+const GUIDE_LINE_DRAG_SNAPPING_THRESHOLD = 10;
+const GUIDE_LINE_TRANSFORM_SNAPPING_THRESHOLD = 10;
+
+type WeaveNodesSnappingPluginConfig = {
+  guideLine: Konva.LineConfig;
+  dragSnappingThreshold: number;
+  transformSnappingThreshold: number;
+};
+
+type WeaveNodesSnappingPluginParams = {
+  config?: WeaveNodesSnappingPluginConfig;
+};
+```
+
+## Parameters
+
+For `WeaveNodesSnappingPluginParams`:
+
+<TypeTable
+  type={{
+    ["config"]: {
+      description: "Config parameters for the plugin.",
+      type: "WeaveNodesSnappingPluginConfig",
+    },
+  }}
+/>
+
+For `WeaveNodesSnappingPluginConfig`:
+
+<TypeTable
+  type={{
+    ["guideLine"]: {
+      description: "Guide lines configuration, extend from Konva.Line",
+      type: "Konva.LineConfig",
+      default: `{
+        stroke: "rgb(0, 161, 255)",
+        strokeWidth: 1,
+        dash: [4, 6]
+      }`,
+    },
+    ["dragSnappingThreshold"]: {
+      description: "Drag snapping threshold (in px) to the guides.",
+      type: "number",
+      default: "10",
+    },
+    ["transformSnappingThreshold"]: {
+      description:
+        "Transform (resize) snapping threshold (in px) to the guides.",
+      type: "number",
+      default: "10",
+    },
+  }}
+/>
