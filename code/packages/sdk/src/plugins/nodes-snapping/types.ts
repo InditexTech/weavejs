@@ -2,6 +2,7 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
+import type Konva from 'konva';
 import { GUIDE_ORIENTATION, NODE_SNAP } from './constants';
 
 export type NodeSnapKeys = keyof typeof NODE_SNAP;
@@ -38,4 +39,14 @@ export type Guide = {
   offset: number;
   orientation: GuideOrientation;
   snap: NodeSnap;
+};
+
+export type WeaveNodesSnappingPluginConfig = {
+  guideLine: Konva.LineConfig;
+  dragSnappingThreshold: number;
+  transformSnappingThreshold: number;
+};
+
+export type WeaveNodesSnappingPluginParams = {
+  config?: WeaveNodesSnappingPluginConfig;
 };
