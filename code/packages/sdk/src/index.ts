@@ -22,6 +22,7 @@ export { WeaveImageNode } from './nodes/image/image';
 export * from './nodes/image/types';
 export { WeaveFrameNode } from './nodes/frame/frame';
 export * from './nodes/frame/constants';
+export * from './nodes/frame/types';
 
 // Provided Actions
 export { WeaveZoomOutToolAction } from './actions/zoom-out-tool/zoom-out-tool';

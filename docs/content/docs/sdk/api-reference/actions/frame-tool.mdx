@@ -40,7 +40,14 @@ new WeaveFrameToolAction(params: WeaveActionCallbacks);
 
 ```ts
 type WeaveFrameToolActionTriggerParams = {
+  title?: string;
   fontFamily?: string;
+  titleHeight?: number;
+  borderWidth?: number;
+  frameWidth?: number;
+  frameHeight?: number;
+  frameOrientation?: string;
+  frameType?: string;
 };
 ```
 
@@ -54,10 +61,52 @@ For `WeaveFrameToolActionTriggerParams`:
 
 <TypeTable
   type={{
+    ["title"]: {
+      description: "The title of the Frame.",
+      type: "string",
+      default: "Frame XXX",
+    },
     ["fontFamily"]: {
       description: "The font family to use on the Frame title.",
       type: "string",
       default: "Arial",
+    },
+    ["titleHeight"]: {
+      description: "The height of the title for the Frame.",
+      type: "number",
+      default: "30",
+    },
+    ["borderWidth"]: {
+      description: "The border width (px) for the Frame.",
+      type: "number",
+      default: "2",
+    },
+    ["borderColor"]: {
+      description: "The border color (HEX with alpha) for the Frame.",
+      type: "string",
+      default: "#000000ff",
+    },
+    ["frameWidth"]: {
+      description: "The frame format width (px) for the Frame.",
+      type: "number",
+      default: "1485",
+    },
+    ["frameHeight"]: {
+      description: "The frame format height (px) for the Frame.",
+      type: "number",
+      default: "1050",
+    },
+    ["frameOrientation"]: {
+      description:
+        "The frame format orientation (landscape or portrait) for the Frame.",
+      type: "string",
+      default: "landscape",
+    },
+    ["frameType"]: {
+      description:
+        "The frame format type (A1, A2, A3, A4 or custom) for the Frame.",
+      type: "string",
+      default: "A4",
     },
   }}
 />

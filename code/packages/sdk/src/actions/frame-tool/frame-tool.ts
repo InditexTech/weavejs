@@ -16,6 +16,7 @@ import {
   type WeaveFrameToolProps,
 } from './types';
 import type { WeaveFrameNode } from '@/nodes/frame/frame';
+import { WEAVE_FRAME_NODE_DEFAULT_PROPS } from '@/nodes/frame/constants';
 
 export class WeaveFrameToolAction extends WeaveAction {
   protected initialized: boolean = false;
@@ -43,8 +44,9 @@ export class WeaveFrameToolAction extends WeaveAction {
 
   initProps(params?: WeaveFrameToolActionTriggerParams): WeaveFrameToolProps {
     return {
-      title: 'Frame XXX',
-      fontFamily: params?.fontFamily ?? 'Arial',
+      title: params?.title ?? WEAVE_FRAME_NODE_DEFAULT_PROPS.title,
+      fontFamily:
+        params?.fontFamily ?? WEAVE_FRAME_NODE_DEFAULT_PROPS.fontFamily,
       editing: false,
       opacity: 1,
     };

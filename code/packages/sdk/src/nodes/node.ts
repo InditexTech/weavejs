@@ -163,7 +163,6 @@ export abstract class WeaveNode implements WeaveNodeBase {
           node.draggable(true);
           return;
         }
-
         node.draggable(false);
       }
     );

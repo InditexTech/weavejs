@@ -37,7 +37,7 @@ export const NodeProperties = () => {
         return 'Text';
       case 'image':
         return 'Image';
-      case 'colorToken':
+      case 'color-token':
         return 'Color token';
       case 'frame':
         return 'Frame';

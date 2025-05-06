@@ -62,19 +62,6 @@ export class ColorTokenNode extends WeaveNode {
 
     colorToken.add(internalRect2);
 
-    const internalRect3 = new Konva.Rect({
-      id: `${id}-colorToken-2`,
-      groupId: id,
-      x: 1,
-      y: 168,
-      fill: colorTokenColor,
-      width: colorTokenParams.width - 2,
-      height: 12,
-      draggable: false,
-    });
-
-    colorToken.add(internalRect3);
-
     const internalText = new Konva.Text({
       id: `${id}-colorToken-code`,
       groupId: id,
@@ -119,12 +106,6 @@ export class ColorTokenNode extends WeaveNode {
     const colorTokenNode1 = colorTokenNode.findOne(`#${id}-colorToken-1`);
     if (colorTokenNode1) {
       colorTokenNode1.setAttrs({
-        fill: colorTokenColor,
-      });
-    }
-    const colorTokenNode2 = colorTokenNode.findOne(`#${id}-colorToken-2`);
-    if (colorTokenNode2) {
-      colorTokenNode2.setAttrs({
         fill: colorTokenColor,
       });
     }
