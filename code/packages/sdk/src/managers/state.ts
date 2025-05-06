@@ -379,4 +379,19 @@ export class WeaveStateManager {
         }
       }, userName);
   }
+
+  getElementsTree(): WeaveStateElement[] {
+    const state = this.instance.getStore().getState().weave;
+    const jsonState = JSON.parse(JSON.stringify(state, null, 2));
+
+    const mainLayer = jsonState.props.children.find(
+      (node: WeaveStateElement) => node.key === 'mainLayer'
+    );
+
+    if (!mainLayer) {
+      return [];
+    }
+
+    return mainLayer.props.children;
+  }
 }
