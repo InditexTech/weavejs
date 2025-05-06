@@ -76,6 +76,7 @@ export class WeaveFrameNode extends WeaveNode {
       width: props.frameWidth,
       stroke: props.borderColor,
       strokeWidth: props.borderWidth,
+      strokeScaleEnabled: false,
       height: props.frameHeight,
       fill: '#ffffffff',
       draggable: false,
@@ -95,6 +96,7 @@ export class WeaveFrameNode extends WeaveNode {
       text: props.title,
       stroke: '#000000ff',
       strokeWidth: 1,
+      strokeScaleEnabled: false,
       listening: false,
       draggable: false,
     });
@@ -110,6 +112,7 @@ export class WeaveFrameNode extends WeaveNode {
       height: props.frameHeight,
       draggable: false,
       stroke: 'transparent',
+      strokeScaleEnabled: false,
       borderWidth: props.borderWidth,
       clipX: 0,
       clipY: 0,
