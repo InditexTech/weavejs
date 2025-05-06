@@ -181,6 +181,14 @@ getInstanceRecursive(
 This method transverse the internal Konva instance nodes tree from the specified node instance,
 giving the ability to filter by an specific node. The found node is returned.
 
+#### getContainerNodes
+
+```ts
+getContainerNodes(): WeaveElementInstance[]
+```
+
+This method return all the containers nodes (i.e. frame nodes).
+
 ### Actions management
 
 #### getActiveAction
@@ -324,6 +332,15 @@ This method moves the node position relative to its parent on the shared-state.
 
 If you need it to just update the shared-state without refreshing the rendering life-cycle.
 
+#### getElementsTree
+
+```ts
+getElementsTree(): WeaveStateElement[]
+```
+
+This method returns the children of the `mainLayer`. Useful to render a tree view of the elements
+in the canvas.
+
 ### Z-Index management
 
 #### moveUp
@@ -420,6 +437,16 @@ getMousePointerRelativeToContainer(container: Konva.Group | Konva.Layer): {
 This method get the mouse pointer position relative to a container layer.
 Used normally when the user clicks on a container (Layer, Frame) and we want to know the point
 clicked relative relative to that container.
+
+#### selectNodesByKey
+
+```ts
+selectNodesByKey(nodesIds: string[]): void
+```
+
+This method set selected the nodes ids passed as parameter. Must have registered the
+[WeaveNodesSelectionPlugin](/docs/sdk/api-reference/plugins/nodes-selection), if not registered
+no selection is performed.
 
 ### Clone nodes
 

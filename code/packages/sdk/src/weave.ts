@@ -463,6 +463,10 @@ export class Weave extends Emittery {
     this.stateManager.moveNode(node, position, doRender);
   }
 
+  getElementsTree(): WeaveStateElement[] {
+    return this.stateManager.getElementsTree();
+  }
+
   // ZINDEX MANAGEMENT METHODS PROXIES
 
   moveUp(node: WeaveElementInstance): void {
@@ -505,6 +509,22 @@ export class Weave extends Emittery {
     container: Konva.Group | Konva.Layer
   ): WeaveMousePointInfoSimple {
     return this.targetingManager.getMousePointerRelativeToContainer(container);
+  }
+
+  selectNodesByKey(nodesIds: string[]): void {
+    const selectionPlugin =
+      this.getPlugin<WeaveNodesSelectionPlugin>('nodesSelection');
+    if (selectionPlugin) {
+      const stage = this.getStage();
+      const instanceNodes: WeaveElementInstance[] = nodesIds.map((nodeId) => {
+        const nodeInstance = stage.findOne(
+          `#${nodeId}`
+        ) as WeaveElementInstance;
+        return nodeInstance;
+      });
+
+      selectionPlugin.setSelectedNodes(instanceNodes);
+    }
   }
 
   // CLONING MANAGEMENT METHODS PROXIES
