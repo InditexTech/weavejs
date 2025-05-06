@@ -134,6 +134,7 @@ export class WeavePenToolAction extends WeaveAction {
 
     const node = nodeHandler.create(this.lineId, {
       ...this.props,
+      strokeScaleEnabled: false,
       x: this.clickPoint?.x ?? 0,
       y: this.clickPoint?.y ?? 0,
       points: [0, 0],
@@ -145,6 +146,7 @@ export class WeavePenToolAction extends WeaveAction {
       x: this.clickPoint?.x ?? 0,
       y: this.clickPoint?.y ?? 0,
       radius: 5 / stage.scaleX(),
+      strokeScaleEnabled: false,
       stroke: '#cccccc',
       strokeWidth: 0,
       fill: '#cccccc',
@@ -164,6 +166,7 @@ export class WeavePenToolAction extends WeaveAction {
       x: this.clickPoint?.x ?? 0,
       y: this.clickPoint?.y ?? 0,
       radius: 5 / stage.scaleX(),
+      strokeScaleEnabled: false,
       stroke: '#cccccc',
       strokeWidth: 0,
       fill: '#cccccc',
