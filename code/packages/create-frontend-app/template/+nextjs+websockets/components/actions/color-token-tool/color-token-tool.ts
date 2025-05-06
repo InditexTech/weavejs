@@ -7,6 +7,7 @@ import {
 } from './types';
 import { COLOR_TOKEN_TOOL_STATE } from './constants';
 import { WeaveAction, WeaveNodesSelectionPlugin } from '@inditextech/weave-sdk';
+import { ColorTokenNode } from '@/components/nodes/color-token/color-token';
 import Konva from 'konva';
 
 export class ColorTokenToolAction extends WeaveAction {
@@ -101,7 +102,8 @@ export class ColorTokenToolAction extends WeaveAction {
 
     this.colorTokenId = uuidv4();
 
-    const nodeHandler = this.instance.getNodeHandler('color-token');
+    const nodeHandler =
+      this.instance.getNodeHandler<ColorTokenNode>('color-token');
 
     const node = nodeHandler.create(this.colorTokenId, {
       ...this.props,

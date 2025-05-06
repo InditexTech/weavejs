@@ -496,15 +496,15 @@ function useContextMenu() {
 
   const contextMenu = React.useMemo(
     () =>
-      new WeaveContextMenuPlugin(
-        {
+      new WeaveContextMenuPlugin({
+        config: {
           xOffset: 10,
           yOffset: 10,
         },
-        {
+        callbacks: {
           onNodeMenu,
-        }
-      ),
+        },
+      }),
     [onNodeMenu]
   );
 
