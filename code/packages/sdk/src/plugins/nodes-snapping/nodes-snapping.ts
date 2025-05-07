@@ -58,13 +58,13 @@ export class WeaveNodesSnappingPlugin extends WeavePlugin {
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   evaluateGuidelines(e: KonvaEventObject<any>): void {
-    const mainLayer = this.instance.getMainLayer();
+    const utilityLayer = this.instance.getUtilityLayer();
 
     if (!this.enabled) {
       return;
     }
 
-    if (!mainLayer) {
+    if (!utilityLayer) {
       return;
     }
 
@@ -82,9 +82,6 @@ export class WeaveNodesSnappingPlugin extends WeavePlugin {
       return;
     }
 
-    // clear all previous lines on the screen
-    mainLayer.find(`.${GUIDE_LINE_NAME}`).forEach((l) => l.destroy());
-
     // find possible snapping lines
     const lineGuideStops = this.getLineGuideStops(node);
     // find snapping points of current object
@@ -97,6 +94,9 @@ export class WeaveNodesSnappingPlugin extends WeavePlugin {
     if (!guides.length) {
       return;
     }
+
+    // clear all previous lines on the screen
+    utilityLayer.find(`.${GUIDE_LINE_NAME}`).forEach((l) => l.destroy());
 
     this.drawGuides(guides);
 
@@ -123,10 +123,11 @@ export class WeaveNodesSnappingPlugin extends WeavePlugin {
 
       if (nodesSelectionPlugin) {
         const transformer = nodesSelectionPlugin.getTransformer();
+
         transformer.anchorDragBoundFunc((_, newAbsPos) => {
           const finalPos = { ...newAbsPos };
 
-          guides.forEach((lg) => {
+          for (const lg of guides) {
             switch (lg.orientation) {
               case GUIDE_ORIENTATION.VERTICAL: {
                 const distX = Math.sqrt(
@@ -147,7 +148,7 @@ export class WeaveNodesSnappingPlugin extends WeavePlugin {
                 break;
               }
             }
-          });
+          }
 
           return finalPos;
         });
@@ -156,25 +157,25 @@ export class WeaveNodesSnappingPlugin extends WeavePlugin {
   }
 
   cleanupEvaluateGuidelines(): void {
-    const mainLayer = this.instance.getMainLayer();
+    const utilityLayer = this.instance.getUtilityLayer();
 
     if (!this.enabled) {
       return;
     }
 
-    if (!mainLayer) {
+    if (!utilityLayer) {
       return;
     }
 
     // clear all previous lines on the screen
-    mainLayer.find(`.${GUIDE_LINE_NAME}`).forEach((l) => l.destroy());
+    utilityLayer.find(`.${GUIDE_LINE_NAME}`).forEach((l) => l.destroy());
   }
 
   private initEvents() {
     const stage = this.instance.getStage();
-    const mainLayer = this.instance.getMainLayer();
+    const utilityLayer = this.instance.getUtilityLayer();
 
-    if (mainLayer) {
+    if (utilityLayer) {
       stage.on('dragmove', this.evaluateGuidelines.bind(this));
       stage.on('dragend', this.cleanupEvaluateGuidelines.bind(this));
     }
@@ -182,6 +183,13 @@ export class WeaveNodesSnappingPlugin extends WeavePlugin {
 
   getLineGuideStops(skipShape: Konva.Node): LineGuideStop {
     const stage = this.instance.getStage();
+
+    const nodesSelection =
+      this.instance.getPlugin<WeaveNodesSelectionPlugin>('nodesSelection');
+
+    if (nodesSelection) {
+      nodesSelection.getTransformer().hide();
+    }
 
     // we can snap to stage borders and the center of the stage
     const vertical: (number | number[])[] = [
@@ -200,11 +208,16 @@ export class WeaveNodesSnappingPlugin extends WeavePlugin {
       if (guideItem === skipShape) {
         return;
       }
-      const box = guideItem.getClientRect();
+      const box = guideItem.getClientRect({ skipStroke: true });
+
       // and we can snap to all edges of shapes
       vertical.push([box.x, box.x + box.width, box.x + box.width / 2]);
       horizontal.push([box.y, box.y + box.height, box.y + box.height / 2]);
     });
+
+    if (nodesSelection) {
+      nodesSelection.getTransformer().show();
+    }
 
     return {
       vertical: vertical.flat(),
@@ -213,23 +226,23 @@ export class WeaveNodesSnappingPlugin extends WeavePlugin {
   }
 
   getObjectSnappingEdges(node: Konva.Node): NodeSnappingEdges {
-    const box = node.getClientRect();
+    const box = node.getClientRect({ skipStroke: true });
     const absPos = node.absolutePosition();
 
     const snappingEdges: NodeSnappingEdges = {
       vertical: [
         {
-          guide: Math.round(box.x),
+          guide: box.x,
           offset: Math.round(absPos.x - box.x),
           snap: NODE_SNAP.START,
         },
         {
-          guide: Math.round(box.x + box.width / 2),
+          guide: box.x + box.width / 2,
           offset: Math.round(absPos.x - box.x - box.width / 2),
           snap: NODE_SNAP.CENTER,
         },
         {
-          guide: Math.round(box.x + box.width),
+          guide: box.x + box.width,
           offset: Math.round(absPos.x - box.x - box.width),
           snap: NODE_SNAP.END,
         },
@@ -341,9 +354,10 @@ export class WeaveNodesSnappingPlugin extends WeavePlugin {
 
   drawGuides(guides: Guide[]): void {
     const stage = this.instance.getStage();
-    const mainLayer = this.instance.getMainLayer();
+    // const mainLayer = this.instance.getMainLayer();
+    const utilityLayer = this.instance.getUtilityLayer();
 
-    if (mainLayer) {
+    if (utilityLayer) {
       guides.forEach((lg) => {
         if (lg.orientation === GUIDE_ORIENTATION.HORIZONTAL) {
           const line = new Konva.Line({
@@ -355,7 +369,7 @@ export class WeaveNodesSnappingPlugin extends WeavePlugin {
             points: [-6000, 0, 6000, 0],
             name: GUIDE_LINE_NAME,
           });
-          mainLayer.add(line);
+          utilityLayer.add(line);
           line.absolutePosition({
             x: 0,
             y: lg.lineGuide,
@@ -371,7 +385,7 @@ export class WeaveNodesSnappingPlugin extends WeavePlugin {
             points: [0, -6000, 0, 6000],
             name: GUIDE_LINE_NAME,
           });
-          mainLayer.add(line);
+          utilityLayer.add(line);
           line.absolutePosition({
             x: lg.lineGuide,
             y: 0,

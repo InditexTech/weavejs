@@ -44,6 +44,7 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
         rotationSnapTolerance: 3,
         ignoreStroke: true,
         flipEnabled: false,
+        keepRatio: false,
         useSingleNodeRotation: true,
         shouldOverdrawWholeArea: true,
         anchorStyleFunc: (anchor) => {
