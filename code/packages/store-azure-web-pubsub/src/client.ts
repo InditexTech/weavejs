@@ -3,6 +3,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import Emittery from 'emittery';
+import * as time from 'lib0/time';
 import { Buffer } from 'buffer';
 import { v4 as uuidv4 } from 'uuid';
 import { Doc } from 'yjs';
@@ -19,6 +20,7 @@ const messageAwareness = 1;
 const messageQueryAwareness = 3;
 
 const AzureWebPubSubJsonProtocol = 'json.webpubsub.azure.v1';
+const messageReconnectTimeout = 30000;
 
 export enum MessageType {
   System = 'system',
@@ -132,6 +134,8 @@ export class WeaveStoreAzureWebPubSubSyncClient extends Emittery {
   private _wsConnected: boolean;
   // private _wsLastMessageReceived: number;
   private _synced: boolean;
+  private _wsLastMessageReceived!: number;
+  private _checkInterval!: NodeJS.Timeout;
   private _resyncInterval;
   private _uuid: string;
   private _awareness: awarenessProtocol.Awareness;
@@ -259,6 +263,9 @@ export class WeaveStoreAzureWebPubSubSyncClient extends Emittery {
   }
 
   destroy(): void {
+    if (this._checkInterval !== null) {
+      clearInterval(this._checkInterval);
+    }
     if (this._resyncInterval !== null) {
       clearInterval(this._resyncInterval);
     }
@@ -320,7 +327,21 @@ export class WeaveStoreAzureWebPubSubSyncClient extends Emittery {
     this._status = 'connecting';
     this.emit('status', this._status);
 
+    this._checkInterval = setInterval(() => {
+      if (
+        this._ws?.OPEN &&
+        messageReconnectTimeout <
+          time.getUnixTime() - this._wsLastMessageReceived
+      ) {
+        // no message received in a long time - not even your own awareness
+        // updates (which are updated every 15 seconds)
+        this._ws.reconnect();
+      }
+    }, messageReconnectTimeout / 10);
+
     websocket.onmessage = (event) => {
+      this._wsLastMessageReceived = time.getUnixTime();
+
       if (event.data === null) {
         return;
       }
@@ -351,6 +372,7 @@ export class WeaveStoreAzureWebPubSubSyncClient extends Emittery {
     };
 
     websocket.onclose = () => {
+      console.error('Websocket closed');
       this._ws = null;
       if (this._wsConnected) {
         this._status = 'disconnected';
@@ -368,10 +390,11 @@ export class WeaveStoreAzureWebPubSubSyncClient extends Emittery {
     };
 
     websocket.onerror = (err) => {
-      console.error(err);
+      console.error('Websocket error', err);
     };
 
     websocket.onopen = () => {
+      console.error('Websocket open');
       // this._wsLastMessageReceived = Date.now();
       this._wsConnected = true;
       this._status = 'connected';

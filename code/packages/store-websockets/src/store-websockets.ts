@@ -3,10 +3,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { WeaveStore } from '@inditextech/weave-sdk';
-import {
-  type WeaveAwarenessChange,
-  type WeaveStoreOptions,
-} from '@inditextech/weave-types';
+import { type WeaveStoreOptions } from '@inditextech/weave-types';
 import { WEAVE_STORE_WEBSOCKETS } from './constants';
 import {
   type WeaveStoreWebsocketsConnectionStatus,
@@ -53,6 +50,21 @@ export class WeaveStoreWebsockets extends WeaveStore {
     this.provider.on(
       'status',
       ({ status }: { status: WeaveStoreWebsocketsConnectionStatus }) => {
+        if (status === 'connected') {
+          this.handleAwarenessChange();
+
+          const awareness = this.provider.awareness;
+          awareness.on('update', this.handleAwarenessChange.bind(this));
+          awareness.on('change', this.handleAwarenessChange.bind(this));
+        }
+
+        if (status === 'disconnected') {
+          const awareness = this.provider.awareness;
+          awareness.destroy();
+          awareness.off('update', this.handleAwarenessChange.bind(this));
+          awareness.off('change', this.handleAwarenessChange.bind(this));
+        }
+
         this.websocketOptions.callbacks?.onConnectionStatusChange?.(status);
         this.instance.emitEvent('onConnectionStatusChange', status);
       }
@@ -64,22 +76,25 @@ export class WeaveStoreWebsockets extends WeaveStore {
   }
 
   disconnect(): void {
+    const awareness = this.provider.awareness;
+    awareness.destroy();
+    awareness.off('update', this.handleAwarenessChange.bind(this));
+    awareness.off('change', this.handleAwarenessChange.bind(this));
+
     this.provider.connect();
+  }
+
+  handleAwarenessChange(emit: boolean = true): void {
+    const awareness = this.provider.awareness;
+    const values = Array.from(awareness.getStates().values());
+    values.splice(awareness.clientID, 1);
+    if (emit) {
+      this.instance.emitEvent('onAwarenessChange', values);
+    }
   }
 
   setAwarenessInfo(field: string, value: unknown): void {
     const awareness = this.provider.awareness;
     awareness.setLocalStateField(field, value);
-  }
-
-  onAwarenessChange<K extends string, T>(
-    callback: (changes: WeaveAwarenessChange<K, T>[]) => void
-  ): void {
-    const awareness = this.provider.awareness;
-    awareness.on('change', () => {
-      const values = Array.from(awareness.getStates().values());
-      values.splice(awareness.clientID, 1);
-      callback(values as WeaveAwarenessChange<K, T>[]);
-    });
   }
 }

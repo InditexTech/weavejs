@@ -3,7 +3,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import {
-  type WeaveAwarenessChange,
+  // type WeaveAwarenessChange,
   type WeaveUndoManagerOptions,
   type WeaveUser,
 } from '@/types';
@@ -18,9 +18,9 @@ export interface WeaveStoreBase {
 
   disconnect(): void;
 
-  onAwarenessChange<K extends string, T>(
-    callback: (changes: WeaveAwarenessChange<K, T>[]) => void
-  ): void;
+  // onAwarenessChange<K extends string, T>(
+  //   callback: (changes: WeaveAwarenessChange<K, T>[]) => void
+  // ): void;
 
   setAwarenessInfo(field: string, value: unknown): void;
 }

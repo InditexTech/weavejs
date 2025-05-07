@@ -96,3 +96,31 @@ type WeaveStoreWebsocketsOptions = {
   callbacks?: WeaveStoreWebsocketsCallbacks;
 };
 ```
+
+## Methods
+
+#### connect
+
+```ts
+connect(): void
+```
+
+The `connect` method is called when an user tries to join a room.
+
+#### disconnect
+
+```ts
+disconnect(): void
+```
+
+The `disconnect` method is called when an user leaves a room.
+
+#### setAwarenessInfo
+
+```ts
+setAwarenessInfo(field: string, value: unknown): void
+```
+
+This method set awareness information, for example if you want to inform the metadata of
+an user that connected to the room, or to send the pointer information of that user to the
+other peers.

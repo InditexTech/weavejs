@@ -49,7 +49,8 @@ export class WeaveConnectedUsersPlugin extends WeavePlugin {
     store.setAwarenessInfo(WEAVE_CONNECTED_USER_INFO_KEY, userInfo);
     this.callbacks?.onConnectedUsersChanged?.({ [userInfo.name]: userInfo });
 
-    store.onAwarenessChange(
+    this.instance.addEventListener(
+      'onAwarenessChange',
       (
         changes: WeaveAwarenessChange<WeaveConnectedUserInfoKey, WeaveUser>[]
       ) => {

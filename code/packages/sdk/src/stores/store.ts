@@ -5,7 +5,7 @@
 import { isEmpty } from 'lodash';
 import { Weave } from '@/weave';
 import {
-  type WeaveAwarenessChange,
+  // type WeaveAwarenessChange,
   type WeaveState,
   type WeaveStoreBase,
   type WeaveUndoRedoChange,
@@ -194,10 +194,6 @@ export abstract class WeaveStore implements WeaveStoreBase {
   abstract connect(): void;
 
   abstract disconnect(): void;
-
-  abstract onAwarenessChange<K extends string, T>(
-    callback: (changes: WeaveAwarenessChange<K, T>[]) => void
-  ): void;
 
   abstract setAwarenessInfo(field: string, value: unknown): void;
 }
