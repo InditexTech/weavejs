@@ -91,17 +91,6 @@ disconnect(): void
 
 The `disconnect` method is called when an user leaves a room.
 
-#### onAwarenessChange
-
-```ts
-onAwarenessChange<K extends string, T>(
-  callback: (changes: WeaveAwarenessChange<K, T>[]) => void
-): void
-```
-
-This method listen to awareness event changes, when a change is found a callback must be
-called to propagate those changes to the UI.
-
 #### setAwarenessInfo
 
 ```ts

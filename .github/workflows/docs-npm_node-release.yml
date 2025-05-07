@@ -168,6 +168,7 @@ jobs:
       - name: Github Release / Create
         uses: ncipollo/release-action@2c591bcc8ecdcd2db72b97d6147f871fcd833ba5
         id: github-release
+        if: false
         continue-on-error: true
         with:
           name: docs/${{ steps.update-changelog.outputs.version }}

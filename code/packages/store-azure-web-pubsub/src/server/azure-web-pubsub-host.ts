@@ -87,7 +87,7 @@ export class WeaveStoreAzureWebPubSubSyncHost {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       removed: any;
     }) => {
-      const changedClients = added.concat(updated, removed);
+      const changedClients = added.concat(added, updated, removed);
       const encoder = encoding.createEncoder();
       encoding.writeVarUint(encoder, messageAwareness);
       encoding.writeVarUint8Array(
@@ -114,6 +114,20 @@ export class WeaveStoreAzureWebPubSubSyncHost {
     return this._awareness;
   }
 
+  sendInitAwarenessInfo(): void {
+    const encoderAwarenessState = encoding.createEncoder();
+    encoding.writeVarUint(encoderAwarenessState, messageAwareness);
+    encoding.writeVarUint8Array(
+      encoderAwarenessState,
+      awarenessProtocol.encodeAwarenessUpdate(
+        this._awareness,
+        Array.from(this._awareness.getStates().keys())
+      )
+    );
+    const u8 = encoding.toUint8Array(encoderAwarenessState);
+    this.broadcast(this.topic, u8);
+  }
+
   async start(): Promise<void> {
     const url = await this.negotiate(this.topic);
     const conn = new this._polyfill(url, 'json.webpubsub.azure.v1');
@@ -129,6 +143,7 @@ export class WeaveStoreAzureWebPubSubSyncHost {
           case MessageDataType.Init:
             this.onClientInit(group, event.data);
             this.onClientSync(group, event.data);
+            this.sendInitAwarenessInfo();
             return;
           case MessageDataType.Sync:
             this.onClientSync(group, event.data);

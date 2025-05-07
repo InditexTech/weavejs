@@ -73,7 +73,8 @@ export class WeaveUsersPointersPlugin extends WeavePlugin {
     const store = this.instance.getStore();
     const stage = this.instance.getStage();
 
-    store.onAwarenessChange(
+    this.instance.addEventListener(
+      'onAwarenessChange',
       (
         changes: WeaveAwarenessChange<WeaveUserPointerKey, WeaveUserPointer>[]
       ) => {
