@@ -68,12 +68,23 @@ export const WEAVE_FRAME_NODE_SIZES: WeaveFrameNodeSizesInfo = {
   },
 };
 
-export const WEAVE_FRAME_NODE_DEFAULT_PROPS = {
-  title: 'Frame XXX',
+export const WEAVE_FRAME_NODE_DEFAULT_PROPERTIES = {
   fontFamily: 'Arial',
+  fontStyle: 'normal',
   titleHeight: 30,
   borderColor: '#000000ff',
   borderWidth: 2,
+  onTargetLeave: {
+    borderColor: '#000000ff',
+    fill: '#ffffffff',
+  },
+  onTargetEnter: {
+    borderColor: '#ff6863ff',
+    fill: '#ecececff',
+  },
+};
+export const WEAVE_FRAME_NODE_DEFAULT_PROPS = {
+  title: 'Frame XXX',
   frameWidth: (WEAVE_FRAME_NODE_SIZES.landscape.A4.width *
     WEAVE_FRAME_NODE_SIZES_MULTIPLIER) as number,
   frameHeight: (WEAVE_FRAME_NODE_SIZES.landscape.A4.height *

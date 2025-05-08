@@ -26,14 +26,30 @@ export type WeaveFrameNodeSizesInfo = {
   };
 };
 
-export type WeaveFrameAttributes = WeaveElementAttributes & {
-  title: string;
+export type WeaveFrameProperties = {
   fontFamily: string;
+  fontStyle: string;
   titleHeight: number;
   borderWidth: number;
   borderColor: string;
+  onTargetLeave: {
+    borderColor: string;
+    fill: string;
+  };
+  onTargetEnter: {
+    borderColor: string;
+    fill: string;
+  };
+};
+
+export type WeaveFrameAttributes = WeaveElementAttributes & {
+  title: string;
   frameWidth: number;
   frameHeight: number;
   frameOrientation: WeaveFrameNodeSizesOrientation;
   frameType: WeaveFrameNodeSizes;
+};
+
+export type WeaveFrameNodeParams = {
+  config: Partial<WeaveFrameProperties>;
 };

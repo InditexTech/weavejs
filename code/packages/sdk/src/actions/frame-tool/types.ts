@@ -13,10 +13,6 @@ export type WeaveFrameToolCallbacks = WeaveActionCallbacks;
 
 export type WeaveFrameToolActionTriggerParams = {
   title?: string;
-  fontFamily?: string;
-  titleHeight?: number;
-  borderWidth?: number;
-  borderColor?: string;
   frameWidth?: number;
   frameHeight?: number;
   frameOrientation?: string;
@@ -25,7 +21,6 @@ export type WeaveFrameToolActionTriggerParams = {
 
 export type WeaveFrameToolProps = {
   title: string;
-  fontFamily: string;
   editing: boolean;
   opacity: number;
 };

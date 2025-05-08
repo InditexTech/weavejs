@@ -17,6 +17,54 @@ export class WeaveStageResizePlugin extends WeavePlugin {
   onInit(): void {
     const stage = this.instance.getStage();
 
+    const resizeObserver = new ResizeObserver(() => {
+      const containerParent = stage.container().parentNode;
+
+      if (!this.enabled) {
+        return;
+      }
+
+      if (containerParent) {
+        const containerBoundBox = stage.container().getBoundingClientRect();
+
+        const containerWidth = containerBoundBox.width;
+        const containerHeight = containerBoundBox.height;
+        stage.width(containerWidth);
+        stage.height(containerHeight);
+
+        const plugins = this.instance.getPlugins();
+        for (const pluginId of Object.keys(plugins)) {
+          const pluginInstance = plugins[pluginId];
+          pluginInstance.onRender?.();
+        }
+      }
+    });
+
+    resizeObserver.observe(stage.container());
+
+    window.addEventListener('resize', () => {
+      const containerParent = stage.container().parentNode;
+
+      if (!this.enabled) {
+        return;
+      }
+
+      if (containerParent) {
+        const containerBoundBox = stage.container().getBoundingClientRect();
+
+        const containerWidth = containerBoundBox.width;
+        const containerHeight = containerBoundBox.height;
+        stage.width(containerWidth);
+        stage.height(containerHeight);
+
+        const plugins = this.instance.getPlugins();
+        for (const pluginId of Object.keys(plugins)) {
+          const pluginInstance = plugins[pluginId];
+          pluginInstance.onRender?.();
+        }
+      }
+    });
+
     window.addEventListener('resize', () => {
       const containerParent = stage.container().parentNode;
 

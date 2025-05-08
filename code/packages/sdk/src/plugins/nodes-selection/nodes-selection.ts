@@ -575,6 +575,19 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
     return this.tr.nodes() as (Konva.Group | Konva.Shape)[];
   }
 
+  getSelectedNodesExtended(): WeaveSelection[] {
+    const selectedNodes: WeaveSelection[] = this.tr.getNodes().map((node) => {
+      const nodeType = node.getAttr('nodeType');
+      const nodeHandler = this.instance.getNodeHandler<WeaveNode>(nodeType);
+      return {
+        instance: node as Konva.Shape | Konva.Group,
+        node: nodeHandler.serialize(node as Konva.Shape | Konva.Group),
+      };
+    });
+
+    return selectedNodes;
+  }
+
   removeSelectedNodes(): void {
     const selectedNodes = this.tr.getNodes();
     for (const node of selectedNodes) {
