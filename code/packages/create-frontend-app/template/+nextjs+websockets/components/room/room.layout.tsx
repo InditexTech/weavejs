@@ -2,27 +2,27 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-"use client";
+'use client';
 
-import React from "react";
-import { ContextMenuRender } from "@/components/room-components/context-menu";
-import { useCollaborationRoom } from "@/store/store";
-import { RoomHeader } from "@/components/room-components/overlay/room-header";
-import { ToolsOverlay } from "@/components/room-components/overlay/tools-overlay";
-import { useWeave, useWeaveEvents } from "@inditextech/weave-react";
-import { WEAVE_INSTANCE_STATUS } from "@inditextech/weave-types";
-import { Logo } from "../utils/logo";
-import { AnimatePresence, motion } from "framer-motion";
-import { cn } from "@/lib/utils";
-import { ImagesLibrary } from "../room-components/images-library/images-library";
-import { FramesLibrary } from "../room-components/frames-library/frames-library";
-import { ColorTokensLibrary } from "../room-components/color-tokens-library/color-tokens-library";
-import { ElementsTree } from "../room-components/elements-tree/elements-tree";
-import { NodeProperties } from "../room-components/overlay/node-properties";
-import { SIDEBAR_ELEMENTS } from "@/lib/constants";
-import { WeaveActionPropsChangeEvent } from "@inditextech/weave-sdk";
-import useContextMenu from "../room-components/hooks/use-context-menu";
-import useCopyPaste from "../room-components/hooks/use-copy-paste";
+import React from 'react';
+import { ContextMenuRender } from '@/components/room-components/context-menu';
+import { useCollaborationRoom } from '@/store/store';
+import { RoomHeader } from '@/components/room-components/overlay/room-header';
+import { ToolsOverlay } from '@/components/room-components/overlay/tools-overlay';
+import { useWeave, useWeaveEvents } from '@inditextech/weave-react';
+import { WEAVE_INSTANCE_STATUS } from '@inditextech/weave-types';
+import { Logo } from '../utils/logo';
+import { AnimatePresence, motion } from 'framer-motion';
+import { cn } from '@/lib/utils';
+import { ImagesLibrary } from '../room-components/images-library/images-library';
+import { FramesLibrary } from '../room-components/frames-library/frames-library';
+import { ColorTokensLibrary } from '../room-components/color-tokens-library/color-tokens-library';
+import { ElementsTree } from '../room-components/elements-tree/elements-tree';
+import { NodeProperties } from '../room-components/overlay/node-properties';
+import { SIDEBAR_ELEMENTS } from '@/lib/constants';
+import { WeaveActionPropsChangeEvent } from '@inditextech/weave-sdk';
+import useContextMenu from '../room-components/hooks/use-context-menu';
+import useCopyPaste from '../room-components/hooks/use-copy-paste';
 
 export const RoomLayout = () => {
   useWeaveEvents();
@@ -80,18 +80,18 @@ export const RoomLayout = () => {
       setLoadingImage(false);
     };
 
-    instance.addEventListener("onPropsChange", handlePropsChange);
-    instance.addEventListener("onImageLoadStart", handleImageLoadStart);
-    instance.addEventListener("onImageLoadEnd", handleImageLoadEnd);
+    instance.addEventListener('onPropsChange', handlePropsChange);
+    instance.addEventListener('onImageLoadStart', handleImageLoadStart);
+    instance.addEventListener('onImageLoadEnd', handleImageLoadEnd);
 
     return () => {
       if (instance) {
-        instance.removeEventListener("onPropsChange", handlePropsChange);
-        instance.removeEventListener("onImageLoadStart", handlePropsChange);
-        instance.removeEventListener("onImageLoadEnd", handlePropsChange);
+        instance.removeEventListener('onPropsChange', handlePropsChange);
+        instance.removeEventListener('onImageLoadStart', handlePropsChange);
+        instance.removeEventListener('onImageLoadEnd', handlePropsChange);
       }
     };
-  }, [setLoadingImage, setNodePropertiesCreateProps]);
+  }, [instance, setLoadingImage, setNodePropertiesCreateProps]);
 
   return (
     <div className="w-full h-full relative flex">
@@ -99,8 +99,8 @@ export const RoomLayout = () => {
         <motion.div
           animate={{
             filter: !(status === WEAVE_INSTANCE_STATUS.RUNNING && roomLoaded)
-              ? "blur(10px)"
-              : "blur(0px)",
+              ? 'blur(10px)'
+              : 'blur(0px)',
           }}
           transition={{
             duration: 0.5,
@@ -118,14 +118,14 @@ export const RoomLayout = () => {
               }}
               transition={{
                 duration: sidebarLeftActive === null ? 0.1 : 0.25,
-                ease: "easeInOut",
+                ease: 'easeInOut',
               }}
               id="sidebar-left"
               className={cn(
-                "bg-white h-full border-l border-zinc-200 shadow-md",
+                'bg-white h-full border-l border-zinc-200 shadow-md',
                 {
-                  ["w-0"]: sidebarLeftActive === null,
-                  ["w-[320px]"]: sidebarLeftActive !== null,
+                  ['w-0']: sidebarLeftActive === null,
+                  ['w-[320px]']: sidebarLeftActive !== null,
                 }
               )}
             >
@@ -137,10 +137,10 @@ export const RoomLayout = () => {
               </AnimatePresence>
             </motion.section>
             <section
-              className={cn("w-full h-full flex flex-col", {
-                ["w-[calc(100%-320px)]"]:
+              className={cn('w-full h-full flex flex-col', {
+                ['w-[calc(100%-320px)]']:
                   sidebarLeftActive !== null || sidebarRightActive !== null,
-                ["w-[calc(100%-640px)]"]:
+                ['w-[calc(100%-640px)]']:
                   sidebarLeftActive !== null && sidebarRightActive !== null,
               })}
             >
@@ -205,14 +205,14 @@ export const RoomLayout = () => {
               }}
               transition={{
                 duration: sidebarRightActive === null ? 0.1 : 0.25,
-                ease: "easeInOut",
+                ease: 'easeInOut',
               }}
               id="sidebar-right"
               className={cn(
-                "bg-white h-full border-l border-zinc-200 shadow-md",
+                'bg-white h-full border-l border-zinc-200 shadow-md',
                 {
-                  ["w-0"]: sidebarRightActive === null,
-                  ["w-[320px]"]: sidebarRightActive !== null,
+                  ['w-0']: sidebarRightActive === null,
+                  ['w-[320px]']: sidebarRightActive !== null,
                 }
               )}
             >
