@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2025 2025 INDUSTRIA DE DISEÑO TEXTIL S.A. (INDITEX S.A.)
+//
+// SPDX-License-Identifier: Apache-2.0
+
 import React from "react";
 import Image from "next/image";
 import Konva from "konva";
@@ -50,9 +54,7 @@ export const FramePresentationImage = ({ node }: Readonly<FrameImageProps>) => {
   if (loading) {
     return (
       <div className="w-full h-full flex justify-center items-center">
-        <div className="font-noto-sans-mono text-2xl text-white">
-          Loading...
-        </div>
+        <div className="font-questrial text-2xl text-white">Loading...</div>
       </div>
     );
   }

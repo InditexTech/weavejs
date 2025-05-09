@@ -1,6 +1,10 @@
-'use client';
+// SPDX-FileCopyrightText: 2025 2025 INDUSTRIA DE DISEÑO TEXTIL S.A. (INDITEX S.A.)
+//
+// SPDX-License-Identifier: Apache-2.0
 
-import React from 'react';
+"use client";
+
+import React from "react";
 import {
   AlignCenter,
   AlignCenterHorizontal,
@@ -15,14 +19,14 @@ import {
   RemoveFormatting,
   Strikethrough,
   Underline,
-} from 'lucide-react';
-import { WeaveStateElement } from '@inditextech/weave-types';
-import { InputNumber } from '../inputs/input-number';
-import { useWeave } from '@inditextech/weave-react';
-import { useCollaborationRoom } from '@/store/store';
-import { InputColor } from '../inputs/input-color';
-import { ToggleIconButton } from '../toggle-icon-button';
-import InputFontFamily from '../inputs/input-font-family';
+} from "lucide-react";
+import { WeaveStateElement } from "@inditextech/weave-types";
+import { useWeave } from "@inditextech/weave-react";
+import { useCollaborationRoom } from "@/store/store";
+import { InputColor } from "../inputs/input-color";
+import { ToggleIconButton } from "../toggle-icon-button";
+import InputFontFamily from "../inputs/input-font-family";
+import { InputNumber } from "../inputs/input-number";
 
 export function TextProperties() {
   const instance = useWeave((state) => state.instance);
@@ -43,16 +47,16 @@ export function TextProperties() {
 
   React.useEffect(() => {
     if (!instance) return;
-    if (actualAction && nodePropertiesAction === 'create') {
+    if (actualAction && nodePropertiesAction === "create") {
       setActualNode({
-        key: 'creating',
-        type: 'undefined',
+        key: "creating",
+        type: "undefined",
         props: {
           ...nodeCreateProps,
         },
       });
     }
-    if (node && nodePropertiesAction === 'update') {
+    if (node && nodePropertiesAction === "update") {
       setActualNode(node);
     }
     if (!actualAction && !node) {
@@ -63,10 +67,10 @@ export function TextProperties() {
   const updateElement = React.useCallback(
     (updatedNode: WeaveStateElement) => {
       if (!instance) return;
-      if (actualAction && nodePropertiesAction === 'create') {
+      if (actualAction && nodePropertiesAction === "create") {
         instance.updatePropsAction(actualAction, updatedNode.props);
       }
-      if (nodePropertiesAction === 'update') {
+      if (nodePropertiesAction === "update") {
         instance.updateNode(updatedNode);
       }
     },
@@ -79,7 +83,7 @@ export function TextProperties() {
 
   if (!actualAction && !actualNode) return null;
 
-  if (!['text'].includes(actualNode.type)) {
+  if (!["text"].includes(actualNode.type)) {
     return null;
   }
 
@@ -87,9 +91,7 @@ export function TextProperties() {
     <div className="border-b border-zinc-200">
       <div className="w-full flex justify-between items-center gap-3 p-4 py-3">
         <div className="cursor-pointer hover:no-underline items-center py-0">
-          <span className="text-xs font-noto-sans-mono font-light">
-            Typography
-          </span>
+          <span className="text-xs font-questrial font-light">Typography</span>
         </div>
       </div>
       <div className="px-4 pb-4">
@@ -112,7 +114,7 @@ export function TextProperties() {
           <div className="col-span-2">
             <InputColor
               label="Color"
-              value={`${actualNode.props.fill.replace('#', '')}`}
+              value={`${actualNode.props.fill.replace("#", "")}`}
               onChange={(value) => {
                 const updatedNode: WeaveStateElement = {
                   ...actualNode,
@@ -155,7 +157,7 @@ export function TextProperties() {
           />
 
           <div className="w-full flex justify-between items-center gap-4 col-span-2">
-            <div className="text-[11px] text-zinc-600 font-noto-sans-mono font-light text-nowrap">
+            <div className="text-[11px] text-zinc-600 font-questrial font-light text-nowrap">
               Style
             </div>
             <div className="w-full flex justify-end items-center gap-1">
@@ -163,7 +165,7 @@ export function TextProperties() {
                 kind="switch"
                 icon={<RemoveFormatting size={16} />}
                 pressed={
-                  (actualNode.props.fontStyle ?? 'normal').indexOf('normal') !==
+                  (actualNode.props.fontStyle ?? "normal").indexOf("normal") !==
                   -1
                 }
                 onClick={() => {
@@ -171,7 +173,7 @@ export function TextProperties() {
                     ...actualNode,
                     props: {
                       ...actualNode.props,
-                      fontStyle: 'normal',
+                      fontStyle: "normal",
                     },
                   };
                   updateElement(updatedNode);
@@ -181,40 +183,40 @@ export function TextProperties() {
                 kind="switch"
                 icon={<Italic size={16} />}
                 pressed={
-                  (actualNode.props.fontStyle ?? 'normal').indexOf('italic') !==
+                  (actualNode.props.fontStyle ?? "normal").indexOf("italic") !==
                   -1
                 }
                 onClick={() => {
                   let items = [
-                    ...(actualNode.props.fontStyle ?? 'normal')
-                      .split(' ')
-                      .filter((e: string) => e !== 'normal'),
+                    ...(actualNode.props.fontStyle ?? "normal")
+                      .split(" ")
+                      .filter((e: string) => e !== "normal"),
                   ];
                   if (
-                    (actualNode.props.fontStyle ?? 'normal').indexOf(
-                      'italic'
+                    (actualNode.props.fontStyle ?? "normal").indexOf(
+                      "italic"
                     ) !== -1
                   ) {
-                    items = items.filter((e: string) => e !== 'italic');
+                    items = items.filter((e: string) => e !== "italic");
                   }
                   if (
-                    (actualNode.props.fontStyle ?? 'normal').indexOf(
-                      'italic'
+                    (actualNode.props.fontStyle ?? "normal").indexOf(
+                      "italic"
                     ) === -1
                   ) {
                     items = [...items];
-                    items.push('italic');
+                    items.push("italic");
                   }
 
                   if (items.length === 0) {
-                    items = ['normal'];
+                    items = ["normal"];
                   }
 
                   const updatedNode: WeaveStateElement = {
                     ...actualNode,
                     props: {
                       ...actualNode.props,
-                      fontStyle: items.join(' '),
+                      fontStyle: items.join(" "),
                     },
                   };
                   updateElement(updatedNode);
@@ -224,38 +226,38 @@ export function TextProperties() {
                 kind="switch"
                 icon={<Bold size={16} />}
                 pressed={
-                  (actualNode.props.fontStyle ?? 'normal').indexOf('bold') !==
+                  (actualNode.props.fontStyle ?? "normal").indexOf("bold") !==
                   -1
                 }
                 onClick={() => {
                   let items = [
-                    ...(actualNode.props.fontStyle ?? 'normal')
-                      .split(' ')
-                      .filter((e: string) => e !== 'normal'),
+                    ...(actualNode.props.fontStyle ?? "normal")
+                      .split(" ")
+                      .filter((e: string) => e !== "normal"),
                   ];
                   if (
-                    (actualNode.props.fontStyle ?? 'normal').indexOf('bold') !==
+                    (actualNode.props.fontStyle ?? "normal").indexOf("bold") !==
                     -1
                   ) {
-                    items = items.filter((e: string) => e !== 'bold');
+                    items = items.filter((e: string) => e !== "bold");
                   }
                   if (
-                    (actualNode.props.fontStyle ?? 'normal').indexOf('bold') ===
+                    (actualNode.props.fontStyle ?? "normal").indexOf("bold") ===
                     -1
                   ) {
                     items = [...items];
-                    items.push('bold');
+                    items.push("bold");
                   }
 
                   if (items.length === 0) {
-                    items = ['normal'];
+                    items = ["normal"];
                   }
 
                   const updatedNode: WeaveStateElement = {
                     ...actualNode,
                     props: {
                       ...actualNode.props,
-                      fontStyle: items.join(' '),
+                      fontStyle: items.join(" "),
                     },
                   };
                   updateElement(updatedNode);
@@ -264,20 +266,20 @@ export function TextProperties() {
             </div>
           </div>
           <div className="w-full flex justify-between items-center gap-4 col-span-2">
-            <div className="text-[11px] text-zinc-600 font-noto-sans-mono font-light text-nowrap">
+            <div className="text-[11px] text-zinc-600 font-questrial font-light text-nowrap">
               Variant
             </div>
             <div className="w-full flex justify-end items-center gap-1">
               <ToggleIconButton
                 kind="switch"
                 icon={<CaseSensitive size={16} />}
-                pressed={actualNode.props.fontVariant === 'normal'}
+                pressed={actualNode.props.fontVariant === "normal"}
                 onClick={() => {
                   const updatedNode: WeaveStateElement = {
                     ...actualNode,
                     props: {
                       ...actualNode.props,
-                      fontVariant: 'normal',
+                      fontVariant: "normal",
                     },
                   };
                   updateElement(updatedNode);
@@ -286,13 +288,13 @@ export function TextProperties() {
               <ToggleIconButton
                 kind="switch"
                 icon={<CaseUpper size={16} />}
-                pressed={actualNode.props.fontVariant === 'small-caps'}
+                pressed={actualNode.props.fontVariant === "small-caps"}
                 onClick={() => {
                   const updatedNode: WeaveStateElement = {
                     ...actualNode,
                     props: {
                       ...actualNode.props,
-                      fontVariant: 'small-caps',
+                      fontVariant: "small-caps",
                     },
                   };
                   updateElement(updatedNode);
@@ -301,20 +303,20 @@ export function TextProperties() {
             </div>
           </div>
           <div className="w-full flex justify-between items-center gap-4 col-span-2">
-            <div className="text-[11px] text-zinc-600 font-noto-sans-mono font-light text-nowrap">
+            <div className="text-[11px] text-zinc-600 font-questrial font-light text-nowrap">
               Decoration
             </div>
             <div className="w-full flex justify-end items-center gap-1">
               <ToggleIconButton
                 kind="switch"
                 icon={<RemoveFormatting size={16} />}
-                pressed={(actualNode.props.textDecoration ?? '') === ''}
+                pressed={(actualNode.props.textDecoration ?? "") === ""}
                 onClick={() => {
                   const updatedNode: WeaveStateElement = {
                     ...actualNode,
                     props: {
                       ...actualNode.props,
-                      textDecoration: '',
+                      textDecoration: "",
                     },
                   };
                   updateElement(updatedNode);
@@ -324,14 +326,14 @@ export function TextProperties() {
                 kind="switch"
                 icon={<Strikethrough size={16} />}
                 pressed={
-                  (actualNode.props.textDecoration ?? '') === 'line-through'
+                  (actualNode.props.textDecoration ?? "") === "line-through"
                 }
                 onClick={() => {
                   const updatedNode: WeaveStateElement = {
                     ...actualNode,
                     props: {
                       ...actualNode.props,
-                      textDecoration: 'line-through',
+                      textDecoration: "line-through",
                     },
                   };
                   updateElement(updatedNode);
@@ -341,14 +343,14 @@ export function TextProperties() {
                 kind="switch"
                 icon={<Underline size={16} />}
                 pressed={
-                  (actualNode.props.textDecoration ?? '') === 'underline'
+                  (actualNode.props.textDecoration ?? "") === "underline"
                 }
                 onClick={() => {
                   const updatedNode: WeaveStateElement = {
                     ...actualNode,
                     props: {
                       ...actualNode.props,
-                      textDecoration: 'underline',
+                      textDecoration: "underline",
                     },
                   };
                   updateElement(updatedNode);
@@ -357,20 +359,20 @@ export function TextProperties() {
             </div>
           </div>
           <div className="w-full flex justify-between items-center gap-4 col-span-2">
-            <div className="text-[11px] text-zinc-600 font-noto-sans-mono font-light text-nowrap">
+            <div className="text-[11px] text-zinc-600 font-questrial font-light text-nowrap">
               Horizontal alignment
             </div>
             <div className="w-full flex justify-end items-center gap-1">
               <ToggleIconButton
                 kind="switch"
                 icon={<AlignLeft size={16} />}
-                pressed={(actualNode.props.align ?? '') === 'left'}
+                pressed={(actualNode.props.align ?? "") === "left"}
                 onClick={() => {
                   const updatedNode: WeaveStateElement = {
                     ...actualNode,
                     props: {
                       ...actualNode.props,
-                      align: 'left',
+                      align: "left",
                     },
                   };
                   updateElement(updatedNode);
@@ -379,13 +381,13 @@ export function TextProperties() {
               <ToggleIconButton
                 kind="switch"
                 icon={<AlignCenter size={16} />}
-                pressed={(actualNode.props.align ?? '') === 'center'}
+                pressed={(actualNode.props.align ?? "") === "center"}
                 onClick={() => {
                   const updatedNode: WeaveStateElement = {
                     ...actualNode,
                     props: {
                       ...actualNode.props,
-                      align: 'center',
+                      align: "center",
                     },
                   };
                   updateElement(updatedNode);
@@ -394,13 +396,13 @@ export function TextProperties() {
               <ToggleIconButton
                 kind="switch"
                 icon={<AlignRight size={16} />}
-                pressed={(actualNode.props.align ?? '') === 'right'}
+                pressed={(actualNode.props.align ?? "") === "right"}
                 onClick={() => {
                   const updatedNode: WeaveStateElement = {
                     ...actualNode,
                     props: {
                       ...actualNode.props,
-                      align: 'right',
+                      align: "right",
                     },
                   };
                   updateElement(updatedNode);
@@ -409,20 +411,20 @@ export function TextProperties() {
             </div>
           </div>
           <div className="w-full flex justify-between items-center gap-4 col-span-2">
-            <div className="text-[11px] text-zinc-600 font-noto-sans-mono font-light text-nowrap">
+            <div className="text-[11px] text-zinc-600 font-questrial font-light text-nowrap">
               Vertical alignment
             </div>
             <div className="w-full flex justify-end items-center gap-1">
               <ToggleIconButton
                 kind="switch"
                 icon={<AlignStartHorizontal size={16} />}
-                pressed={(actualNode.props.verticalAlign ?? 'top') === 'top'}
+                pressed={(actualNode.props.verticalAlign ?? "top") === "top"}
                 onClick={() => {
                   const updatedNode: WeaveStateElement = {
                     ...actualNode,
                     props: {
                       ...actualNode.props,
-                      verticalAlign: 'top',
+                      verticalAlign: "top",
                     },
                   };
                   updateElement(updatedNode);
@@ -431,13 +433,13 @@ export function TextProperties() {
               <ToggleIconButton
                 kind="switch"
                 icon={<AlignCenterHorizontal size={16} />}
-                pressed={(actualNode.props.verticalAlign ?? 'top') === 'middle'}
+                pressed={(actualNode.props.verticalAlign ?? "top") === "middle"}
                 onClick={() => {
                   const updatedNode: WeaveStateElement = {
                     ...actualNode,
                     props: {
                       ...actualNode.props,
-                      verticalAlign: 'middle',
+                      verticalAlign: "middle",
                     },
                   };
                   updateElement(updatedNode);
@@ -446,13 +448,13 @@ export function TextProperties() {
               <ToggleIconButton
                 kind="switch"
                 icon={<AlignEndHorizontal size={16} />}
-                pressed={(actualNode.props.verticalAlign ?? '') === 'bottom'}
+                pressed={(actualNode.props.verticalAlign ?? "") === "bottom"}
                 onClick={() => {
                   const updatedNode: WeaveStateElement = {
                     ...actualNode,
                     props: {
                       ...actualNode.props,
-                      verticalAlign: 'bottom',
+                      verticalAlign: "bottom",
                     },
                   };
                   updateElement(updatedNode);

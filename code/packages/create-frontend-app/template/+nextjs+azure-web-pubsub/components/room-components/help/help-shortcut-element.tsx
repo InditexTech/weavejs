@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2025 2025 INDUSTRIA DE DISEÑO TEXTIL S.A. (INDITEX S.A.)
+//
+// SPDX-License-Identifier: Apache-2.0
+
 import React from "react";
 import { ShortcutElement } from "./shortcut-element";
 
@@ -16,7 +20,7 @@ export const HelpShortcutElement = ({
     <div className="flex justify-between items-center text-white">
       <div className="flex gap-2 justify-start items-center">
         {React.cloneElement(icon, { size: 20 })}
-        <div className="text-white font-noto-sans-mono text-sm">{label}</div>
+        <div className="text-white font-questrial text-sm">{label}</div>
       </div>
       <ShortcutElement shortcuts={shortcuts} />
     </div>

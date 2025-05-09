@@ -1,18 +1,23 @@
-'use client';
+// SPDX-FileCopyrightText: 2025 2025 INDUSTRIA DE DISEÑO TEXTIL S.A. (INDITEX S.A.)
+//
+// SPDX-License-Identifier: Apache-2.0
 
-import React from 'react';
-import { useWeave } from '@inditextech/weave-react';
-import { useCollaborationRoom } from '@/store/store';
-import { useKeyDown } from '../hooks/use-key-down';
-import { SYSTEM_OS } from '@/lib/utils';
-import { useGetOs } from '../hooks/use-get-os';
+"use client";
+
+import React from "react";
+import { useWeave } from "@inditextech/weave-react";
+import { SidebarActive, useCollaborationRoom } from "@/store/store";
+import { useKeyDown } from "../hooks/use-key-down";
+import { SYSTEM_OS } from "@/lib/utils";
+import { useGetOs } from "../hooks/use-get-os";
 import {
   WeaveCopyPasteNodesPlugin,
   WeaveExportNodeActionParams,
   WeaveExportStageActionParams,
   WeaveNodesSelectionPlugin,
   WeaveUsersPointersPlugin,
-} from '@inditextech/weave-sdk';
+} from "@inditextech/weave-sdk";
+import { SIDEBAR_ELEMENTS } from "@/lib/constants";
 
 export function useKeyboardHandler() {
   const os = useGetOs();
@@ -23,23 +28,8 @@ export function useKeyboardHandler() {
 
   const showUI = useCollaborationRoom((state) => state.ui.show);
   const setShowUi = useCollaborationRoom((state) => state.setShowUi);
-  const framesLibraryVisible = useCollaborationRoom(
-    (state) => state.frames.library.visible
-  );
-  const setFramesLibraryVisible = useCollaborationRoom(
-    (state) => state.setFramesLibraryVisible
-  );
-  const imagesLibraryVisible = useCollaborationRoom(
-    (state) => state.images.library.visible
-  );
-  const setImagesLibraryVisible = useCollaborationRoom(
-    (state) => state.setImagesLibraryVisible
-  );
-  const colorTokensLibraryVisible = useCollaborationRoom(
-    (state) => state.colorToken.library.visible
-  );
-  const setColorTokensLibraryVisible = useCollaborationRoom(
-    (state) => state.setColorTokensLibraryVisible
+  const setSidebarActive = useCollaborationRoom(
+    (state) => state.setSidebarActive
   );
   const setShowSelectFileImage = useCollaborationRoom(
     (state) => state.setShowSelectFileImage
@@ -57,45 +47,20 @@ export function useKeyboardHandler() {
     [instance, actualAction]
   );
 
-  const libraryToggle = React.useCallback(
-    (library: string) => {
-      switch (library) {
-        case 'images':
-          setColorTokensLibraryVisible(false);
-          setFramesLibraryVisible(false);
-          setImagesLibraryVisible(!imagesLibraryVisible);
-          break;
-        case 'colorTokens':
-          setImagesLibraryVisible(false);
-          setFramesLibraryVisible(false);
-          setColorTokensLibraryVisible(!colorTokensLibraryVisible);
-          break;
-        case 'frames':
-          setImagesLibraryVisible(false);
-          setColorTokensLibraryVisible(false);
-          setFramesLibraryVisible(!framesLibraryVisible);
-          break;
-        default:
-          break;
-      }
+  const sidebarToggle = React.useCallback(
+    (element: SidebarActive) => {
+      setSidebarActive(element);
     },
-    [
-      colorTokensLibraryVisible,
-      framesLibraryVisible,
-      imagesLibraryVisible,
-      setImagesLibraryVisible,
-      setColorTokensLibraryVisible,
-      setFramesLibraryVisible,
-    ]
+    [setSidebarActive]
   );
 
   const handleTriggerAction = React.useCallback(
-    (actionName: string) => {
+    (actionName: string, actionParams: unknown) => {
       if (instance) {
-        const triggerSelection = actualAction === 'selectionTool';
-        instance.triggerAction(actionName);
+        const triggerSelection = actualAction === "selectionTool";
+        instance.triggerAction(actionName, actionParams);
         if (triggerSelection) {
-          instance.triggerAction('selectionTool');
+          instance.triggerAction("selectionTool", actionParams);
         }
       }
     },
@@ -115,78 +80,78 @@ export function useKeyboardHandler() {
 
   useKeyDown(
     () => {
-      triggerTool('selectionTool');
+      triggerTool("selectionTool");
     },
-    ['KeyS'],
+    ["KeyS"],
     () => {
       return (
         !window.weaveTextEditing &&
         !window.weaveTextEditing &&
-        !['textTool'].includes(actualAction ?? '')
+        !["textTool"].includes(actualAction ?? "")
       );
     }
   );
 
   useKeyDown(
     () => {
-      triggerTool('frameTool');
+      triggerTool("frameTool");
     },
-    ['KeyF'],
+    ["KeyF"],
     () =>
-      !window.weaveTextEditing && !['textTool'].includes(actualAction ?? ''),
+      !window.weaveTextEditing && !["textTool"].includes(actualAction ?? ""),
     (e) => !(e.ctrlKey || e.metaKey)
   );
 
   useKeyDown(
     () => {
-      triggerTool('rectangleTool');
+      triggerTool("rectangleTool");
     },
-    ['KeyR'],
-    () => !window.weaveTextEditing && !['textTool'].includes(actualAction ?? '')
+    ["KeyR"],
+    () => !window.weaveTextEditing && !["textTool"].includes(actualAction ?? "")
   );
 
   useKeyDown(
     () => {
-      triggerTool('penTool');
+      triggerTool("penTool");
     },
-    ['KeyL'],
-    () => !window.weaveTextEditing && !['textTool'].includes(actualAction ?? '')
+    ["KeyL"],
+    () => !window.weaveTextEditing && !["textTool"].includes(actualAction ?? "")
   );
 
   useKeyDown(
     () => {
-      triggerTool('brushTool');
+      triggerTool("brushTool");
     },
-    ['KeyB'],
-    () => !window.weaveTextEditing && !['textTool'].includes(actualAction ?? '')
+    ["KeyB"],
+    () => !window.weaveTextEditing && !["textTool"].includes(actualAction ?? "")
   );
 
   useKeyDown(
     () => {
-      triggerTool('textTool');
+      triggerTool("textTool");
     },
-    ['KeyT'],
-    () => !window.weaveTextEditing && !['textTool'].includes(actualAction ?? '')
+    ["KeyT"],
+    () => !window.weaveTextEditing && !["textTool"].includes(actualAction ?? "")
   );
 
   useKeyDown(
     () => {
-      triggerTool('imageTool');
+      triggerTool("imageTool");
       setShowSelectFileImage(true);
     },
-    ['KeyI'],
+    ["KeyI"],
     () =>
-      !window.weaveTextEditing && !['textTool'].includes(actualAction ?? ''),
+      !window.weaveTextEditing && !["textTool"].includes(actualAction ?? ""),
     (e) => !(e.ctrlKey || e.metaKey)
   );
 
   useKeyDown(
     () => {
-      triggerTool('colorTokenTool');
+      triggerTool("colorTokenTool");
     },
-    ['KeyP'],
+    ["KeyP"],
     () =>
-      !window.weaveTextEditing && !['textTool'].includes(actualAction ?? ''),
+      !window.weaveTextEditing && !["textTool"].includes(actualAction ?? ""),
     (e) => !(e.ctrlKey || e.metaKey)
   );
 
@@ -197,9 +162,9 @@ export function useKeyboardHandler() {
         actualStore.undoStateStep();
       }
     },
-    ['Comma'],
+    ["Comma"],
     () =>
-      !window.weaveTextEditing && !['textTool'].includes(actualAction ?? ''),
+      !window.weaveTextEditing && !["textTool"].includes(actualAction ?? ""),
     (e) =>
       e.shiftKey &&
       ([SYSTEM_OS.MAC as string].includes(os) ? e.metaKey : e.ctrlKey)
@@ -212,9 +177,9 @@ export function useKeyboardHandler() {
         actualStore.redoStateStep();
       }
     },
-    ['Period'],
+    ["Period"],
     () =>
-      !window.weaveTextEditing && !['textTool'].includes(actualAction ?? ''),
+      !window.weaveTextEditing && !["textTool"].includes(actualAction ?? ""),
     (e) =>
       e.shiftKey &&
       ([SYSTEM_OS.MAC as string].includes(os) ? e.metaKey : e.ctrlKey)
@@ -226,9 +191,9 @@ export function useKeyboardHandler() {
     () => {
       setShowUi(!showUI);
     },
-    ['IntlBackslash'],
+    ["IntlBackslash"],
     () =>
-      !window.weaveTextEditing && !['textTool'].includes(actualAction ?? ''),
+      !window.weaveTextEditing && !["textTool"].includes(actualAction ?? ""),
     (e) => ([SYSTEM_OS.MAC as string].includes(os) ? e.metaKey : e.ctrlKey)
   );
 
@@ -236,15 +201,15 @@ export function useKeyboardHandler() {
     () => {
       if (instance) {
         const usersPointersPlugin =
-          instance.getPlugin<WeaveUsersPointersPlugin>('usersPointers');
+          instance.getPlugin<WeaveUsersPointersPlugin>("usersPointers");
         if (usersPointersPlugin) {
           usersPointersPlugin.toggleRenderCursors();
         }
       }
     },
-    ['KeyU'],
+    ["KeyU"],
     () =>
-      !window.weaveTextEditing && !['textTool'].includes(actualAction ?? ''),
+      !window.weaveTextEditing && !["textTool"].includes(actualAction ?? ""),
     (e) =>
       e.altKey &&
       ([SYSTEM_OS.MAC as string].includes(os) ? e.metaKey : e.ctrlKey)
@@ -256,15 +221,15 @@ export function useKeyboardHandler() {
     () => {
       if (instance) {
         const selectionPlugin =
-          instance.getPlugin<WeaveNodesSelectionPlugin>('nodesSelection');
+          instance.getPlugin<WeaveNodesSelectionPlugin>("nodesSelection");
         if (selectionPlugin) {
           selectionPlugin.selectAll();
         }
       }
     },
-    ['KeyA'],
+    ["KeyA"],
     () =>
-      !window.weaveTextEditing && !['textTool'].includes(actualAction ?? ''),
+      !window.weaveTextEditing && !["textTool"].includes(actualAction ?? ""),
     (e) =>
       e.shiftKey &&
       ([SYSTEM_OS.MAC as string].includes(os) ? e.metaKey : e.ctrlKey)
@@ -274,15 +239,15 @@ export function useKeyboardHandler() {
     () => {
       if (instance) {
         const selectionPlugin =
-          instance.getPlugin<WeaveNodesSelectionPlugin>('nodesSelection');
+          instance.getPlugin<WeaveNodesSelectionPlugin>("nodesSelection");
         if (selectionPlugin) {
           selectionPlugin.selectNone();
         }
       }
     },
-    ['Escape'],
+    ["Escape"],
     () =>
-      !window.weaveTextEditing && !['textTool'].includes(actualAction ?? ''),
+      !window.weaveTextEditing && !["textTool"].includes(actualAction ?? ""),
     (e) => e.shiftKey
   );
 
@@ -292,15 +257,15 @@ export function useKeyboardHandler() {
     async () => {
       if (instance && selectedNodes.length > 0) {
         const weaveCopyPasteNodesPlugin =
-          instance.getPlugin<WeaveCopyPasteNodesPlugin>('copyPasteNodes');
+          instance.getPlugin<WeaveCopyPasteNodesPlugin>("copyPasteNodes");
         if (weaveCopyPasteNodesPlugin) {
           await weaveCopyPasteNodesPlugin.copy();
         }
       }
     },
-    ['KeyC'],
+    ["KeyC"],
     () =>
-      !window.weaveTextEditing && !['textTool'].includes(actualAction ?? ''),
+      !window.weaveTextEditing && !["textTool"].includes(actualAction ?? ""),
     (e) => ([SYSTEM_OS.MAC as string].includes(os) ? e.metaKey : e.ctrlKey)
   );
 
@@ -308,15 +273,15 @@ export function useKeyboardHandler() {
     () => {
       if (instance) {
         const weaveCopyPasteNodesPlugin =
-          instance.getPlugin<WeaveCopyPasteNodesPlugin>('copyPasteNodes');
+          instance.getPlugin<WeaveCopyPasteNodesPlugin>("copyPasteNodes");
         if (weaveCopyPasteNodesPlugin) {
           weaveCopyPasteNodesPlugin.paste();
         }
       }
     },
-    ['KeyP'],
+    ["KeyP"],
     () =>
-      !window.weaveTextEditing && !['textTool'].includes(actualAction ?? ''),
+      !window.weaveTextEditing && !["textTool"].includes(actualAction ?? ""),
     (e) => ([SYSTEM_OS.MAC as string].includes(os) ? e.metaKey : e.ctrlKey)
   );
 
@@ -324,23 +289,23 @@ export function useKeyboardHandler() {
     async () => {
       if (instance && selectedNodes.length === 1) {
         const weaveCopyPasteNodesPlugin =
-          instance.getPlugin<WeaveCopyPasteNodesPlugin>('copyPasteNodes');
+          instance.getPlugin<WeaveCopyPasteNodesPlugin>("copyPasteNodes");
         if (weaveCopyPasteNodesPlugin) {
           await weaveCopyPasteNodesPlugin.copy();
           weaveCopyPasteNodesPlugin.paste();
         }
       }
     },
-    ['KeyD'],
+    ["KeyD"],
     () =>
-      !window.weaveTextEditing && !['textTool'].includes(actualAction ?? ''),
+      !window.weaveTextEditing && !["textTool"].includes(actualAction ?? ""),
     (e) => ([SYSTEM_OS.MAC as string].includes(os) ? e.metaKey : e.ctrlKey)
   );
 
   useKeyDown(
     () => {
       if (instance && selectedNodes.length === 1) {
-        instance.triggerAction<WeaveExportNodeActionParams>('exportNodeTool', {
+        instance.triggerAction<WeaveExportNodeActionParams>("exportNodeTool", {
           node: selectedNodes[0].instance,
           options: {
             padding: 20,
@@ -349,9 +314,9 @@ export function useKeyboardHandler() {
         });
       }
     },
-    ['KeyE'],
+    ["KeyE"],
     () =>
-      !window.weaveTextEditing && !['textTool'].includes(actualAction ?? ''),
+      !window.weaveTextEditing && !["textTool"].includes(actualAction ?? ""),
     (e) =>
       e.shiftKey &&
       ([SYSTEM_OS.MAC as string].includes(os) ? e.metaKey : e.ctrlKey)
@@ -361,7 +326,7 @@ export function useKeyboardHandler() {
     () => {
       if (instance) {
         instance.triggerAction<WeaveExportStageActionParams>(
-          'exportStageTool',
+          "exportStageTool",
           {
             options: {
               padding: 20,
@@ -371,9 +336,9 @@ export function useKeyboardHandler() {
         );
       }
     },
-    ['KeyV'],
+    ["KeyV"],
     () =>
-      !window.weaveTextEditing && !['textTool'].includes(actualAction ?? ''),
+      !window.weaveTextEditing && !["textTool"].includes(actualAction ?? ""),
     (e) =>
       e.shiftKey &&
       ([SYSTEM_OS.MAC as string].includes(os) ? e.metaKey : e.ctrlKey)
@@ -387,9 +352,9 @@ export function useKeyboardHandler() {
         instance.bringToFront(selectedNodes[0].instance);
       }
     },
-    ['BracketRight'],
+    ["BracketRight"],
     () =>
-      !window.weaveTextEditing && !['textTool'].includes(actualAction ?? ''),
+      !window.weaveTextEditing && !["textTool"].includes(actualAction ?? ""),
     (e) => !([SYSTEM_OS.MAC as string].includes(os) ? e.metaKey : e.ctrlKey)
   );
 
@@ -399,9 +364,9 @@ export function useKeyboardHandler() {
         instance.moveUp(selectedNodes[0].instance);
       }
     },
-    ['BracketRight'],
+    ["BracketRight"],
     () =>
-      !window.weaveTextEditing && !['textTool'].includes(actualAction ?? ''),
+      !window.weaveTextEditing && !["textTool"].includes(actualAction ?? ""),
     (e) => ([SYSTEM_OS.MAC as string].includes(os) ? e.metaKey : e.ctrlKey)
   );
 
@@ -411,9 +376,9 @@ export function useKeyboardHandler() {
         instance.moveDown(selectedNodes[0].instance);
       }
     },
-    ['BracketLeft'],
+    ["BracketLeft"],
     () =>
-      !window.weaveTextEditing && !['textTool'].includes(actualAction ?? ''),
+      !window.weaveTextEditing && !["textTool"].includes(actualAction ?? ""),
     (e) => ([SYSTEM_OS.MAC as string].includes(os) ? e.metaKey : e.ctrlKey)
   );
 
@@ -423,9 +388,9 @@ export function useKeyboardHandler() {
         instance.sendToBack(selectedNodes[0].instance);
       }
     },
-    ['BracketLeft'],
+    ["BracketLeft"],
     () =>
-      !window.weaveTextEditing && !['textTool'].includes(actualAction ?? ''),
+      !window.weaveTextEditing && !["textTool"].includes(actualAction ?? ""),
     (e) => !([SYSTEM_OS.MAC as string].includes(os) ? e.metaKey : e.ctrlKey)
   );
 
@@ -435,9 +400,9 @@ export function useKeyboardHandler() {
         instance.group(selectedNodes.map((n) => n.node));
       }
     },
-    ['KeyG'],
+    ["KeyG"],
     () =>
-      !window.weaveTextEditing && !['textTool'].includes(actualAction ?? ''),
+      !window.weaveTextEditing && !["textTool"].includes(actualAction ?? ""),
     (e) =>
       e.shiftKey &&
       ([SYSTEM_OS.MAC as string].includes(os) ? e.metaKey : e.ctrlKey)
@@ -448,14 +413,14 @@ export function useKeyboardHandler() {
       if (
         instance &&
         selectedNodes.length === 1 &&
-        selectedNodes[0].node.type === 'group'
+        selectedNodes[0].node.type === "group"
       ) {
         instance.unGroup(selectedNodes[0].node);
       }
     },
-    ['KeyU'],
+    ["KeyU"],
     () =>
-      !window.weaveTextEditing && !['textTool'].includes(actualAction ?? ''),
+      !window.weaveTextEditing && !["textTool"].includes(actualAction ?? ""),
     (e) =>
       e.shiftKey &&
       ([SYSTEM_OS.MAC as string].includes(os) ? e.metaKey : e.ctrlKey)
@@ -465,11 +430,11 @@ export function useKeyboardHandler() {
 
   useKeyDown(
     () => {
-      libraryToggle('images');
+      sidebarToggle(SIDEBAR_ELEMENTS.images);
     },
-    ['KeyI'],
+    ["KeyI"],
     () =>
-      !window.weaveTextEditing && !['textTool'].includes(actualAction ?? ''),
+      !window.weaveTextEditing && !["textTool"].includes(actualAction ?? ""),
     (e) =>
       e.altKey &&
       ([SYSTEM_OS.MAC as string].includes(os) ? e.metaKey : e.ctrlKey)
@@ -477,11 +442,11 @@ export function useKeyboardHandler() {
 
   useKeyDown(
     () => {
-      libraryToggle('colorTokens');
+      sidebarToggle(SIDEBAR_ELEMENTS.colorTokens);
     },
-    ['KeyP'],
+    ["KeyO"],
     () =>
-      !window.weaveTextEditing && !['textTool'].includes(actualAction ?? ''),
+      !window.weaveTextEditing && !["textTool"].includes(actualAction ?? ""),
     (e) =>
       e.altKey &&
       ([SYSTEM_OS.MAC as string].includes(os) ? e.metaKey : e.ctrlKey)
@@ -489,11 +454,23 @@ export function useKeyboardHandler() {
 
   useKeyDown(
     () => {
-      libraryToggle('frames');
+      sidebarToggle(SIDEBAR_ELEMENTS.frames);
     },
-    ['KeyF'],
+    ["KeyF"],
     () =>
-      !window.weaveTextEditing && !['textTool'].includes(actualAction ?? ''),
+      !window.weaveTextEditing && !["textTool"].includes(actualAction ?? ""),
+    (e) =>
+      e.altKey &&
+      ([SYSTEM_OS.MAC as string].includes(os) ? e.metaKey : e.ctrlKey)
+  );
+
+  useKeyDown(
+    () => {
+      sidebarToggle(SIDEBAR_ELEMENTS.nodesTree);
+    },
+    ["KeyE"],
+    () =>
+      !window.weaveTextEditing && !["textTool"].includes(actualAction ?? ""),
     (e) =>
       e.altKey &&
       ([SYSTEM_OS.MAC as string].includes(os) ? e.metaKey : e.ctrlKey)
@@ -503,41 +480,43 @@ export function useKeyboardHandler() {
 
   useKeyDown(
     () => {
-      handleTriggerAction('zoomInTool');
+      handleTriggerAction("zoomInTool", { previousAction: actualAction });
     },
-    ['BracketRight'],
+    ["BracketRight"],
     () =>
-      !window.weaveTextEditing && !['textTool'].includes(actualAction ?? ''),
+      !window.weaveTextEditing && !["textTool"].includes(actualAction ?? ""),
     (e) => ([SYSTEM_OS.MAC as string].includes(os) ? e.metaKey : e.ctrlKey)
   );
 
   useKeyDown(
     () => {
-      handleTriggerAction('zoomOutTool');
+      handleTriggerAction("zoomOutTool", { previousAction: actualAction });
     },
-    ['Slash'],
+    ["Slash"],
     () =>
-      !window.weaveTextEditing && !['textTool'].includes(actualAction ?? ''),
+      !window.weaveTextEditing && !["textTool"].includes(actualAction ?? ""),
     (e) => ([SYSTEM_OS.MAC as string].includes(os) ? e.metaKey : e.ctrlKey)
   );
 
   useKeyDown(
     () => {
-      handleTriggerAction('fitToScreenTool');
+      handleTriggerAction("fitToScreenTool", { previousAction: actualAction });
     },
-    ['Digit1'],
+    ["Digit1"],
     () =>
-      !window.weaveTextEditing && !['textTool'].includes(actualAction ?? ''),
+      !window.weaveTextEditing && !["textTool"].includes(actualAction ?? ""),
     (e) => e.shiftKey
   );
 
   useKeyDown(
     () => {
-      handleTriggerAction('fitToSelectionTool');
+      handleTriggerAction("fitToSelectionTool", {
+        previousAction: actualAction,
+      });
     },
-    ['Digit2'],
+    ["Digit2"],
     () =>
-      !window.weaveTextEditing && !['textTool'].includes(actualAction ?? ''),
+      !window.weaveTextEditing && !["textTool"].includes(actualAction ?? ""),
     (e) => e.shiftKey
   );
 
@@ -547,9 +526,9 @@ export function useKeyboardHandler() {
     () => {
       handlePrintToConsoleState();
     },
-    ['KeyC'],
+    ["KeyC"],
     () =>
-      !window.weaveTextEditing && !['textTool'].includes(actualAction ?? ''),
+      !window.weaveTextEditing && !["textTool"].includes(actualAction ?? ""),
     (e) =>
       e.altKey &&
       ([SYSTEM_OS.MAC as string].includes(os) ? e.metaKey : e.ctrlKey)

@@ -1,10 +1,14 @@
-'use client';
+// SPDX-FileCopyrightText: 2025 2025 INDUSTRIA DE DISEÑO TEXTIL S.A. (INDITEX S.A.)
+//
+// SPDX-License-Identifier: Apache-2.0
 
-import React from 'react';
-import { WeaveStateElement } from '@inditextech/weave-types';
-import { InputNumber } from '../inputs/input-number';
-import { useWeave } from '@inditextech/weave-react';
-import { useCollaborationRoom } from '@/store/store';
+"use client";
+
+import React from "react";
+import { WeaveStateElement } from "@inditextech/weave-types";
+import { useWeave } from "@inditextech/weave-react";
+import { useCollaborationRoom } from "@/store/store";
+import { InputNumber } from "../inputs/input-number";
 
 export function SizeProperties() {
   const instance = useWeave((state) => state.instance);
@@ -25,16 +29,16 @@ export function SizeProperties() {
 
   React.useEffect(() => {
     if (!instance) return;
-    if (actualAction && nodePropertiesAction === 'create') {
+    if (actualAction && nodePropertiesAction === "create") {
       setActualNode({
-        key: 'creating',
-        type: 'undefined',
+        key: "creating",
+        type: "undefined",
         props: {
           ...nodeCreateProps,
         },
       });
     }
-    if (node && nodePropertiesAction === 'update') {
+    if (node && nodePropertiesAction === "update") {
       setActualNode(node);
     }
     if (!actualAction && !node) {
@@ -45,10 +49,10 @@ export function SizeProperties() {
   const updateElement = React.useCallback(
     (updatedNode: WeaveStateElement) => {
       if (!instance) return;
-      if (actualAction && nodePropertiesAction === 'create') {
+      if (actualAction && nodePropertiesAction === "create") {
         instance.updatePropsAction(actualAction, updatedNode.props);
       }
-      if (nodePropertiesAction === 'update') {
+      if (nodePropertiesAction === "update") {
         instance.updateNode(updatedNode);
       }
     },
@@ -63,7 +67,7 @@ export function SizeProperties() {
 
   if (
     actualAction &&
-    !['selectionTool', 'rectangleTool', 'imageTool'].includes(actualAction)
+    !["selectionTool", "rectangleTool", "imageTool"].includes(actualAction)
   ) {
     return null;
   }
@@ -72,7 +76,7 @@ export function SizeProperties() {
     <div className="border-b border-zinc-200">
       <div className="w-full flex justify-between items-center gap-3 p-4 py-3">
         <div className="cursor-pointer hover:no-underline items-center py-0">
-          <span className="text-xs font-noto-sans-mono font-light">Size</span>
+          <span className="text-xs font-questrial font-light">Size</span>
         </div>
       </div>
       <div className="px-4 pb-4">
@@ -107,7 +111,7 @@ export function SizeProperties() {
               }}
             />
           </div>
-          {['update'].includes(nodePropertiesAction) && (
+          {["update"].includes(nodePropertiesAction) && (
             <InputNumber
               label="Scale (%)"
               value={(actualNode.props.scaleX ?? 1) * 100}

@@ -1,12 +1,16 @@
-'use client';
+// SPDX-FileCopyrightText: 2025 2025 INDUSTRIA DE DISEÑO TEXTIL S.A. (INDITEX S.A.)
+//
+// SPDX-License-Identifier: Apache-2.0
 
-import React from 'react';
-import { WeaveStateElement } from '@inditextech/weave-types';
-import { Eye, EyeOff } from 'lucide-react';
-import { InputColor } from './../inputs/input-color';
-import { ToggleIconButton } from './../toggle-icon-button';
-import { useWeave } from '@inditextech/weave-react';
-import { useCollaborationRoom } from '@/store/store';
+"use client";
+
+import React from "react";
+import { WeaveStateElement } from "@inditextech/weave-types";
+import { Eye, EyeOff } from "lucide-react";
+import { InputColor } from "./../inputs/input-color";
+import { ToggleIconButton } from "./../toggle-icon-button";
+import { useWeave } from "@inditextech/weave-react";
+import { useCollaborationRoom } from "@/store/store";
 
 export function FillProperties() {
   const instance = useWeave((state) => state.instance);
@@ -27,16 +31,16 @@ export function FillProperties() {
 
   React.useEffect(() => {
     if (!instance) return;
-    if (actualAction && nodePropertiesAction === 'create') {
+    if (actualAction && nodePropertiesAction === "create") {
       setActualNode({
-        key: 'creating',
-        type: 'undefined',
+        key: "creating",
+        type: "undefined",
         props: {
           ...nodeCreateProps,
         },
       });
     }
-    if (node && nodePropertiesAction === 'update') {
+    if (node && nodePropertiesAction === "update") {
       setActualNode(node);
     }
     if (!actualAction && !node) {
@@ -47,10 +51,10 @@ export function FillProperties() {
   const updateElement = React.useCallback(
     (updatedNode: WeaveStateElement) => {
       if (!instance) return;
-      if (actualAction && nodePropertiesAction === 'create') {
+      if (actualAction && nodePropertiesAction === "create") {
         instance.updatePropsAction(actualAction, updatedNode.props);
       }
-      if (nodePropertiesAction === 'update') {
+      if (nodePropertiesAction === "update") {
         instance.updateNode(updatedNode);
       }
     },
@@ -65,14 +69,14 @@ export function FillProperties() {
     return null;
   }
 
-  if (actualNode.type !== 'rectangle') {
+  if (actualNode.type !== "rectangle") {
     return null;
   }
   return (
     <div className="border-b border-zinc-200">
       <div className="w-full flex justify-between items-center gap-3 p-4 py-3">
         <div className="cursor-pointer hover:no-underline items-center py-0">
-          <span className="text-xs font-noto-sans-mono font-light">Fill</span>
+          <span className="text-xs font-questrial font-light">Fill</span>
         </div>
         <ToggleIconButton
           kind="toggle"
@@ -96,7 +100,7 @@ export function FillProperties() {
         <div className="grid grid-cols-1 gap-3 w-full">
           <InputColor
             label="Color (#RGBA)"
-            value={`${(actualNode.props.fill ?? '#000000FF').replace('#', '')}`}
+            value={`${(actualNode.props.fill ?? "#000000FF").replace("#", "")}`}
             onChange={(value) => {
               const updatedNode: WeaveStateElement = {
                 ...actualNode,

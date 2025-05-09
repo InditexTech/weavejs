@@ -1,24 +1,28 @@
-'use client';
+// SPDX-FileCopyrightText: 2025 2025 INDUSTRIA DE DISEÑO TEXTIL S.A. (INDITEX S.A.)
+//
+// SPDX-License-Identifier: Apache-2.0
 
-import React from 'react';
-import Avatar from 'boring-avatars';
-import { Avatar as AvatarUI, AvatarFallback } from '@/components/ui/avatar';
+"use client";
+
+import React from "react";
+import Avatar from "boring-avatars";
+import { Avatar as AvatarUI, AvatarFallback } from "@/components/ui/avatar";
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
-} from '@/components/ui/tooltip';
-import { useCollaborationRoom } from '@/store/store';
-import { ChevronDown } from 'lucide-react';
+} from "@/components/ui/tooltip";
+import { useCollaborationRoom } from "@/store/store";
+import { ChevronDown } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
-import { useWeave } from '@inditextech/weave-react';
-import { cn } from '@/lib/utils';
+} from "@/components/ui/dropdown-menu";
+import { useWeave } from "@inditextech/weave-react";
+import { cn } from "@/lib/utils";
 
 export const ConnectedUsers = () => {
   const connectedUsers = useWeave((state) => state.users);
@@ -51,6 +55,14 @@ export const ConnectedUsers = () => {
   return (
     <div className="w-full min-h-[40px] flex gap-1 justify-between items-center">
       <TooltipProvider delayDuration={300}>
+        <div className="flex justify-start items-center gap-1">
+          <div className="w-full flex justify-start gap-2 items-center text-center font-questrial text-xs px-2 pl-0">
+            <div className="px-2 py-1 bg-accent">
+              {Object.keys(connectedUsers).length}
+            </div>
+            <div className="text-left">users</div>
+          </div>
+        </div>
         <div className="w-full flex gap-1 justify-start items-center">
           {connectedUserKey && (
             <Tooltip>
@@ -64,7 +76,7 @@ export const ConnectedUsers = () => {
                 </button>
               </TooltipTrigger>
               <TooltipContent side="bottom" className="rounded-none">
-                <p className="font-noto-sans-mono text-xs">{user?.name}</p>
+                <p className="font-questrial text-xs">{user?.name}</p>
               </TooltipContent>
             </Tooltip>
           )}
@@ -82,7 +94,7 @@ export const ConnectedUsers = () => {
                   </button>
                 </TooltipTrigger>
                 <TooltipContent side="bottom">
-                  <p className="font-noto-sans-mono text-sm">{userInfo.name}</p>
+                  <p className="font-questrial text-sm">{userInfo.name}</p>
                 </TooltipContent>
               </Tooltip>
             );
@@ -96,10 +108,10 @@ export const ConnectedUsers = () => {
                   >
                     <DropdownMenuTrigger
                       className={cn(
-                        ' pointer-events-auto rounded-none cursor-pointer p-2 hover:bg-accent focus:outline-none',
+                        " pointer-events-auto rounded-none cursor-pointer p-2 hover:bg-accent focus:outline-none",
                         {
-                          ['bg-accent']: menuOpen,
-                          ['bg-white']: !menuOpen,
+                          ["bg-accent"]: menuOpen,
+                          ["bg-white"]: !menuOpen,
                         }
                       )}
                     >
@@ -110,7 +122,7 @@ export const ConnectedUsers = () => {
                       side="bottom"
                       alignOffset={0}
                       sideOffset={4}
-                      className="font-noto-sans-mono rounded-none"
+                      className="font-questrial rounded-none"
                     >
                       {restUsers.map((user) => {
                         const userInfo = connectedUsers[user];
@@ -132,19 +144,11 @@ export const ConnectedUsers = () => {
                   </DropdownMenu>
                 </TooltipTrigger>
                 <TooltipContent side="bottom">
-                  <p className="font-noto-sans-mono text-sm">More users</p>
+                  <p className="font-questrial text-sm">More users</p>
                 </TooltipContent>
               </Tooltip>
             </>
           )}
-        </div>
-        <div className="flex justify-start items-center gap-1">
-          <div className="w-full flex justify-start gap-2 items-center text-center font-noto-sans-mono text-xs px-2">
-            <div className="px-2 py-1 bg-accent">
-              {Object.keys(connectedUsers).length}
-            </div>
-            <div className="text-left">users</div>
-          </div>
         </div>
       </TooltipProvider>
     </div>

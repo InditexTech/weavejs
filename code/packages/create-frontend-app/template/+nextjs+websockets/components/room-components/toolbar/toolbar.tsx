@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2025 2025 INDUSTRIA DE DISEÑO TEXTIL S.A. (INDITEX S.A.)
+//
+// SPDX-License-Identifier: Apache-2.0
+
 "use client";
 
 import { cn } from "@/lib/utils";
@@ -15,7 +19,7 @@ export const Toolbar = ({
   return (
     <div
       className={cn(
-        "pointer-events-none gap-[1px] shadow-lg px-1 py-1 bg-white border border-light-border-3 pointer-events-auto",
+        "pointer-events-none gap-[1px] shadow-md px-1 py-1 bg-white border rounded-xl border-zinc-200 pointer-events-auto",
         {
           ["flex"]: orientation === "horizontal",
           ["flex flex-col"]: orientation === "vertical",

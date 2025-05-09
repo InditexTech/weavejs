@@ -1,12 +1,16 @@
-'use client';
+// SPDX-FileCopyrightText: 2025 2025 INDUSTRIA DE DISEÑO TEXTIL S.A. (INDITEX S.A.)
+//
+// SPDX-License-Identifier: Apache-2.0
 
-import React from 'react';
+"use client";
+
+import React from "react";
 // import { Pin, PinOff } from "lucide-react";
-import { WeaveStateElement } from '@inditextech/weave-types';
-import { InputNumber } from '../inputs/input-number';
+import { WeaveStateElement } from "@inditextech/weave-types";
 // import { ToggleIconButton } from "../toggle-icon-button";
-import { useWeave } from '@inditextech/weave-react';
-import { useCollaborationRoom } from '@/store/store';
+import { useWeave } from "@inditextech/weave-react";
+import { useCollaborationRoom } from "@/store/store";
+import { InputNumber } from "../inputs/input-number";
 
 export function PositionProperties() {
   const instance = useWeave((state) => state.instance);
@@ -19,7 +23,7 @@ export function PositionProperties() {
   const updateElement = React.useCallback(
     (updatedNode: WeaveStateElement) => {
       if (!instance) return;
-      if (nodePropertiesAction === 'update') {
+      if (nodePropertiesAction === "update") {
         instance.updateNode(updatedNode);
         return;
       }
@@ -95,7 +99,7 @@ export function PositionProperties() {
     [instance, node, updateElement]
   );
 
-  if (nodePropertiesAction === 'create') {
+  if (nodePropertiesAction === "create") {
     return null;
   }
 
@@ -107,9 +111,7 @@ export function PositionProperties() {
     <div className="border-b border-zinc-200">
       <div className="w-full flex justify-between items-center gap-3 p-4 py-3">
         <div className="cursor-pointer hover:no-underline items-center py-0">
-          <span className="text-xs font-noto-sans-mono font-light">
-            Position
-          </span>
+          <span className="text-xs font-questrial font-light">Position</span>
         </div>
       </div>
       <div className="px-4 pb-4">

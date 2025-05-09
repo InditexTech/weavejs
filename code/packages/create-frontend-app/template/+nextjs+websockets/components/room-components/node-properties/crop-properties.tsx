@@ -1,12 +1,16 @@
-'use client';
+// SPDX-FileCopyrightText: 2025 2025 INDUSTRIA DE DISEÑO TEXTIL S.A. (INDITEX S.A.)
+//
+// SPDX-License-Identifier: Apache-2.0
 
-import React from 'react';
-import { WeaveStateElement } from '@inditextech/weave-types';
-import { Crop } from 'lucide-react';
-import { InputNumber } from '../inputs/input-number';
-import { useWeave } from '@inditextech/weave-react';
-import { useCollaborationRoom } from '@/store/store';
-import { ToggleIconButton } from '../toggle-icon-button';
+"use client";
+
+import React from "react";
+import { WeaveStateElement } from "@inditextech/weave-types";
+import { Crop } from "lucide-react";
+import { useWeave } from "@inditextech/weave-react";
+import { useCollaborationRoom } from "@/store/store";
+import { ToggleIconButton } from "../toggle-icon-button";
+import { InputNumber } from "../inputs/input-number";
 
 export function CropProperties() {
   const instance = useWeave((state) => state.instance);
@@ -27,7 +31,7 @@ export function CropProperties() {
 
   React.useEffect(() => {
     if (!instance) return;
-    if (node && nodePropertiesAction === 'update') {
+    if (node && nodePropertiesAction === "update") {
       setActualNode(node);
     }
   }, [instance, actualAction, node, nodePropertiesAction, nodeCreateProps]);
@@ -35,7 +39,7 @@ export function CropProperties() {
   const updateElement = React.useCallback(
     (updatedNode: WeaveStateElement) => {
       if (!instance) return;
-      if (nodePropertiesAction === 'update') {
+      if (nodePropertiesAction === "update") {
         instance.updateNode(updatedNode);
         return;
       }
@@ -45,7 +49,7 @@ export function CropProperties() {
 
   if (!instance || !actualNode) return null;
 
-  if (!['image'].includes(actualNode.type)) {
+  if (!["image"].includes(actualNode.type)) {
     return null;
   }
 
@@ -53,19 +57,19 @@ export function CropProperties() {
     <div className="border-b border-zinc-200">
       <div className="w-full flex justify-between items-center gap-3 p-4 py-3">
         <div className="cursor-pointer hover:no-underline items-center py-0">
-          <span className="text-xs font-noto-sans-mono font-light">Crop</span>
+          <span className="text-xs font-questrial font-light">Crop</span>
         </div>
         <div className="flex justify-end items-center">
           <ToggleIconButton
             kind="switch"
             icon={<Crop size={16} />}
-            pressed={typeof actualNode.props.cropX !== 'undefined'}
+            pressed={typeof actualNode.props.cropX !== "undefined"}
             onClick={() => {
               const updatedNode: WeaveStateElement = {
                 ...actualNode,
                 props: {
                   ...actualNode.props,
-                  ...(typeof actualNode.props.cropX !== 'undefined'
+                  ...(typeof actualNode.props.cropX !== "undefined"
                     ? {
                         width: actualNode.props.imageInfo.width,
                         height: actualNode.props.imageInfo.height,

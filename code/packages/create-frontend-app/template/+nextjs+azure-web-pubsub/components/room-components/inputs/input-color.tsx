@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2025 2025 INDUSTRIA DE DISEÑO TEXTIL S.A. (INDITEX S.A.)
+//
+// SPDX-License-Identifier: Apache-2.0
+
 "use client";
 
 import React, { useState, useEffect } from "react";
@@ -45,13 +49,13 @@ export const InputColor = ({
   return (
     <div className="flex flex-col items-start justify-start relative">
       {label && (
-        <div className="text-zinc-600 mb-1 text-[11px] font-noto-sans-mono font-light">
+        <div className="text-zinc-600 mb-1 text-[11px] font-questrial font-light">
           {label}
         </div>
       )}
       <div className="w-full flex items-center relative">
         <Popover>
-          <PopoverTrigger>
+          <PopoverTrigger asChild>
             <div
               className="cursor-pointer shrink-0 w-[32px] h-[32px] mr-1 border border-zinc-200 rounded-none"
               style={{ background: `#${actualValue}` }}

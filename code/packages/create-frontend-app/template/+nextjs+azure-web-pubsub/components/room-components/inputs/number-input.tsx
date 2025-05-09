@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2025 2025 INDUSTRIA DE DISEÑO TEXTIL S.A. (INDITEX S.A.)
+//
+// SPDX-License-Identifier: Apache-2.0
+
 import React from "react";
 import { NumericFormat, NumericFormatProps } from "react-number-format";
 import { Input } from "@/components/ui/input";
@@ -89,7 +93,13 @@ export const NumberInput = React.forwardRef<HTMLInputElement, NumberInputProps>(
             fixedDecimalScale={fixedDecimalScale}
             allowNegative={min < 0}
             valueIsNumericString
-            onBlur={handleBlur}
+            onFocus={() => {
+              window.weaveOnFieldFocus = true;
+            }}
+            onBlurCapture={() => {
+              window.weaveOnFieldFocus = false;
+              handleBlur();
+            }}
             max={max}
             min={min}
             customInput={Input}

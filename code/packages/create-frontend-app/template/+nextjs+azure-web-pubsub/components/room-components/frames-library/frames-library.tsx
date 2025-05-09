@@ -1,10 +1,14 @@
-import { PDFDocument } from 'pdf-lib';
-import { WeaveSelection, WeaveStateElement } from '@inditextech/weave-types';
-import React from 'react';
-import Konva from 'konva';
-import { Checkbox } from '@/components/ui/checkbox';
-import { useCollaborationRoom } from '@/store/store';
-import { useWeave } from '@inditextech/weave-react';
+// SPDX-FileCopyrightText: 2025 2025 INDUSTRIA DE DISEÑO TEXTIL S.A. (INDITEX S.A.)
+//
+// SPDX-License-Identifier: Apache-2.0
+
+import { PDFDocument } from "pdf-lib";
+import { WeaveSelection, WeaveStateElement } from "@inditextech/weave-types";
+import React from "react";
+import Konva from "konva";
+import { Checkbox } from "@/components/ui/checkbox";
+import { useCollaborationRoom } from "@/store/store";
+import { useWeave } from "@inditextech/weave-react";
 import {
   AlignStartHorizontal,
   Download,
@@ -14,25 +18,30 @@ import {
   SquareCheck,
   StepBack,
   StepForward,
+  X,
   XIcon,
-} from 'lucide-react';
-import { toImageAsync } from './utils';
-import { FrameImage } from './frames-library.image';
-import { FramePresentationImage } from './frames-library.presentation-image';
+} from "lucide-react";
+import { toImageAsync } from "./utils";
+import { FrameImage } from "./frames-library.image";
+import { FramePresentationImage } from "./frames-library.presentation-image";
+import { SIDEBAR_ELEMENTS } from "@/lib/constants";
 
 export const FramesLibrary = () => {
   const instance = useWeave((state) => state.instance);
   const appState = useWeave((state) => state.appState);
   const selectedNodes = useWeave((state) => state.selection.nodes);
 
+  const sidebarLeftActive = useCollaborationRoom(
+    (state) => state.sidebar.left.active
+  );
+  const setSidebarActive = useCollaborationRoom(
+    (state) => state.setSidebarActive
+  );
+
   const [presentationMode, setPresentationMode] =
     React.useState<boolean>(false);
   const [actualFrame, setActualFrame] = React.useState<number>(0);
   const [selectedFrames, setSelectedFrames] = React.useState<string[]>([]);
-
-  const framesLibraryVisible = useCollaborationRoom(
-    (state) => state.frames.library.visible
-  );
 
   const framesAvailable = React.useMemo(() => {
     if (!instance) {
@@ -40,9 +49,14 @@ export const FramesLibrary = () => {
     }
 
     const stage = instance.getStage();
+
+    if (!stage) {
+      return [];
+    }
+
     const nodes = instance.findNodesByType(
       appState.weave as WeaveStateElement,
-      'frame'
+      "frame"
     );
 
     const frames: Konva.Node[] = [];
@@ -58,7 +72,7 @@ export const FramesLibrary = () => {
   const selectedNodesAllFrame = React.useMemo(() => {
     let allFrame = true;
     for (const node of selectedNodes) {
-      if (node.node.type !== 'frame') {
+      if (node.node.type !== "frame") {
         allFrame = false;
         break;
       }
@@ -72,7 +86,7 @@ export const FramesLibrary = () => {
     }
 
     instance.triggerAction<{ gap: number; nodes: WeaveSelection[] }>(
-      'alignElementsTool',
+      "alignElementsTool",
       {
         gap: 20,
         nodes: selectedNodes,
@@ -89,7 +103,7 @@ export const FramesLibrary = () => {
 
     let framesToRender = selectedFrames;
     if (framesToRender.length === 0) {
-      framesToRender = framesAvailable.map((e) => e.getAttrs().id ?? '');
+      framesToRender = framesAvailable.map((e) => e.getAttrs().id ?? "");
     }
 
     const pages: { title: string; image: string }[] = [];
@@ -123,9 +137,9 @@ export const FramesLibrary = () => {
 
     const pdfDataUri = await pdfDoc.saveAsBase64({ dataUri: true });
 
-    const link = document.createElement('a');
+    const link = document.createElement("a");
     link.href = pdfDataUri;
-    link.download = 'test.pdf';
+    link.download = "test.pdf";
     link.click();
   }, [instance, selectedFrames, framesAvailable]);
 
@@ -142,15 +156,15 @@ export const FramesLibrary = () => {
     return null;
   }
 
-  if (!framesLibraryVisible) {
+  if (sidebarLeftActive !== SIDEBAR_ELEMENTS.frames) {
     return null;
   }
 
   return (
     <>
       <div className="pointer-events-auto w-full h-full">
-        <div className="w-[calc(100%-38px)] font-title-xs p-1 pr-0 bg-white flex justify-between items-center">
-          <div className="flex justify-between font-noto-sans-mono font-light items-center text-md pl-2">
+        <div className="w-full font-title-xs p-1 bg-white flex justify-between items-center">
+          <div className="flex justify-between font-questrial font-light items-center text-md pl-2">
             Frames
           </div>
           <div className="flex justify-end items-center gap-1">
@@ -177,7 +191,7 @@ export const FramesLibrary = () => {
                 if (selectedFrames.length === 0) {
                   const frames = framesAvailable.map((frame) => {
                     const attrs = frame.getAttrs();
-                    return attrs.id ?? '';
+                    return attrs.id ?? "";
                   });
                   setSelectedFrames(frames);
                 } else {
@@ -193,6 +207,15 @@ export const FramesLibrary = () => {
               onClick={exportFramesHandler}
             >
               <Download className="group-disabled:text-accent" size={16} />
+            </button>
+            <div className="w-[1px] h-[16px] bg-zinc-200" />
+            <button
+              className="cursor-pointer bg-transparent hover:bg-accent p-2"
+              onClick={() => {
+                setSidebarActive(null);
+              }}
+            >
+              <X size={16} />
             </button>
           </div>
         </div>
@@ -212,7 +235,7 @@ export const FramesLibrary = () => {
                 className="w-full bg-light-background-1 flex flex-col gap-2"
               >
                 <div className="w-full flex justify-between items-center">
-                  <div className="w-full text-xs font-noto-sans-mono font-light">
+                  <div className="w-full text-xs font-questrial font-light">
                     {attrs.title}
                   </div>
                   <div className="font-label-l-regular">
@@ -224,10 +247,10 @@ export const FramesLibrary = () => {
                       onCheckedChange={() => {
                         setSelectedFrames((prev) => {
                           const newElements = new Set(prev);
-                          if (newElements.has(attrs.id ?? '')) {
-                            newElements.delete(attrs.id ?? '');
+                          if (newElements.has(attrs.id ?? "")) {
+                            newElements.delete(attrs.id ?? "");
                           } else {
-                            newElements.add(attrs.id ?? '');
+                            newElements.add(attrs.id ?? "");
                           }
                           return Array.from(newElements);
                         });
@@ -242,7 +265,7 @@ export const FramesLibrary = () => {
         </div>
       </div>
       {presentationMode && (
-        <div className="fixed top-0 left-0 right-0 bottom-0 bg-black flex flex-col gap-3 justify-center items-start">
+        <div className="fixed z-10 top-0 left-0 right-0 bottom-0 bg-black flex flex-col gap-3 justify-center items-start">
           <div className="absolute top-8 right-8 flex justify-end items-center p-1">
             <div className="flex justify-end items-center shadow-lg bg-white">
               <button
