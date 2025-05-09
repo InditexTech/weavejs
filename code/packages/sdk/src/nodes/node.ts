@@ -14,8 +14,8 @@ import {
 import { type Logger } from 'pino';
 import { WeaveNodesSelectionPlugin } from '@/plugins/nodes-selection/nodes-selection';
 import Konva from 'konva';
-import { type WeaveNodesSelectionChangeCallback } from '@/plugins/nodes-selection/types';
 import { WeaveCopyPasteNodesPlugin } from '@/plugins/copy-paste-nodes/copy-paste-nodes';
+import type { WeaveNodesSelectionPluginOnNodesChangeEvent } from '@/plugins/nodes-selection/types';
 // import type { WeaveNodesSnappingPlugin } from '@/plugins/nodes-snapping/nodes-snapping';
 
 export abstract class WeaveNode implements WeaveNodeBase {
@@ -157,7 +157,7 @@ export abstract class WeaveNode implements WeaveNodeBase {
   setupDefaultNodeEvents(node: Konva.Node): void {
     this.previousPointer = null;
 
-    this.instance.addEventListener<WeaveNodesSelectionChangeCallback>(
+    this.instance.addEventListener<WeaveNodesSelectionPluginOnNodesChangeEvent>(
       'onNodesChange',
       () => {
         if (this.isSelecting() && this.isNodeSelected(node)) {
@@ -211,6 +211,14 @@ export abstract class WeaveNode implements WeaveNodeBase {
         this.previousPointer = stage.container().style.cursor;
         stage.container().style.cursor = 'pointer';
         e.cancelBubble = true;
+        return;
+      }
+      if (this.isPasting()) {
+        const stage = this.instance.getStage();
+        this.previousPointer = stage.container().style.cursor;
+        stage.container().style.cursor = 'crosshair';
+        e.cancelBubble = true;
+        return;
       }
     });
 
@@ -225,6 +233,14 @@ export abstract class WeaveNode implements WeaveNodeBase {
         stage.container().style.cursor = this.previousPointer ?? 'default';
         this.previousPointer = null;
         e.cancelBubble = true;
+        return;
+      }
+      if (this.isPasting()) {
+        const stage = this.instance.getStage();
+        this.previousPointer = stage.container().style.cursor;
+        stage.container().style.cursor = 'crosshair';
+        e.cancelBubble = true;
+        return;
       }
     });
   }

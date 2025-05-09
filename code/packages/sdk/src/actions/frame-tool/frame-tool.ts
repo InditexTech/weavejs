@@ -12,7 +12,6 @@ import { WeaveNodesSelectionPlugin } from '@/plugins/nodes-selection/nodes-selec
 import {
   type WeaveFrameToolActionState,
   type WeaveFrameToolActionTriggerParams,
-  type WeaveFrameToolCallbacks,
   type WeaveFrameToolProps,
 } from './types';
 import type { WeaveFrameNode } from '@/nodes/frame/frame';
@@ -25,11 +24,11 @@ export class WeaveFrameToolAction extends WeaveAction {
   protected container: Konva.Layer | Konva.Group | undefined;
   protected clickPoint: Vector2d | null;
   protected cancelAction!: () => void;
-  internalUpdate = undefined;
+  onPropsChange = undefined;
   onInit = undefined;
 
-  constructor(callbacks: WeaveFrameToolCallbacks) {
-    super(callbacks);
+  constructor() {
+    super();
 
     this.initialized = false;
     this.state = FRAME_TOOL_STATE.IDLE;

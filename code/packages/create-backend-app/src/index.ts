@@ -129,10 +129,6 @@ async function main(): Promise<void> {
   console.log(pc.bold('\nRun Development Server'));
   console.log(pc.cyan('npm run dev | pnpm run dev | yarn dev'));
 
-  // console.log(
-  //   pc.bold('\nYou can now open the project and start writing documents')
-  // );
-
   process.exit(0);
 }
 

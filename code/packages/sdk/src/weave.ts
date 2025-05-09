@@ -224,7 +224,7 @@ export class Weave extends Emittery {
 
   // EVENTS METHODS
 
-  emitEvent<T>(event: string, payload: T): void {
+  emitEvent<T>(event: string, payload?: T): void {
     this.moduleLogger.debug({ payload }, `Emitted event [${event}]`);
     this.emit(event, payload);
   }

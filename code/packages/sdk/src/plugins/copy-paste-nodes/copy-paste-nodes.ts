@@ -14,8 +14,9 @@ import {
 } from './constants';
 import { WeaveNodesSelectionPlugin } from '../nodes-selection/nodes-selection';
 import {
-  type WeaveCopyPasteNodesPluginCallbacks,
-  type WeaveCopyPasteNodesPluginParams,
+  type WeaveCopyPasteNodesPluginOnCopyEvent,
+  type WeaveCopyPasteNodesPluginOnPasteEvent,
+  type WeaveCopyPasteNodesPluginOnPasteExternalEvent,
   type WeaveCopyPasteNodesPluginState,
   type WeavePasteModel,
   type WeaveToPasteNode,
@@ -24,18 +25,14 @@ import { type Vector2d } from 'konva/lib/types';
 
 export class WeaveCopyPasteNodesPlugin extends WeavePlugin {
   protected state: WeaveCopyPasteNodesPluginState;
-  private callbacks: WeaveCopyPasteNodesPluginCallbacks | undefined;
   private toPaste: WeavePasteModel | undefined;
   getLayerName: undefined;
   initLayer: undefined;
   onRender: undefined;
 
-  constructor(params?: WeaveCopyPasteNodesPluginParams) {
+  constructor() {
     super();
 
-    const { callbacks } = params ?? {};
-
-    this.callbacks = callbacks;
     this.state = COPY_PASTE_NODES_PLUGIN_STATE.IDLE;
   }
 
@@ -120,8 +117,10 @@ export class WeaveCopyPasteNodesPlugin extends WeavePlugin {
         this.performPaste();
         // eslint-disable-next-line @typescript-eslint/no-unused-vars, no-empty
       } catch (ex) {
-        this.callbacks?.onPaste?.(ex as Error);
-        this.instance.emitEvent('onPaste', ex as Error);
+        this.instance.emitEvent<WeaveCopyPasteNodesPluginOnPasteEvent>(
+          'onPaste',
+          ex as Error
+        );
       }
 
       try {
@@ -129,13 +128,17 @@ export class WeaveCopyPasteNodesPlugin extends WeavePlugin {
         if (items && items.length === 1) {
           const item = items[0];
 
-          this.callbacks?.onPasteExternal?.(item);
-          this.instance.emitEvent('onPasteExternal', item);
+          this.instance.emitEvent<WeaveCopyPasteNodesPluginOnPasteExternalEvent>(
+            'onPasteExternal',
+            item
+          );
         }
         // eslint-disable-next-line @typescript-eslint/no-unused-vars, no-empty
       } catch (ex) {
-        this.callbacks?.onPaste?.(ex as Error);
-        this.instance.emitEvent('onPaste', ex as Error);
+        this.instance.emitEvent<WeaveCopyPasteNodesPluginOnPasteEvent>(
+          'onPaste',
+          ex as Error
+        );
       }
     };
 
@@ -189,7 +192,9 @@ export class WeaveCopyPasteNodesPlugin extends WeavePlugin {
           mousePoint.y + (node.props.y - this.toPaste.weaveMinPoint.y);
         this.instance.addNode(node, container?.getAttr('id'));
 
-        this.callbacks?.onPaste?.();
+        this.instance.emitEvent<WeaveCopyPasteNodesPluginOnPasteEvent>(
+          'onPaste'
+        );
         this.instance.emitEvent('onPaste', undefined);
       }
 
@@ -236,11 +241,13 @@ export class WeaveCopyPasteNodesPlugin extends WeavePlugin {
 
       try {
         await this.writeClipboardData(JSON.stringify(copyClipboard));
-        this.callbacks?.onCopy?.();
-        this.instance.emitEvent('onCopy', undefined);
+
+        this.instance.emitEvent<WeaveCopyPasteNodesPluginOnCopyEvent>('onCopy');
       } catch (ex) {
-        this.callbacks?.onCopy?.(ex as Error);
-        this.instance.emitEvent('onCopy', ex as Error);
+        this.instance.emitEvent<WeaveCopyPasteNodesPluginOnCopyEvent>(
+          'onCopy',
+          ex as Error
+        );
       }
     }
   }

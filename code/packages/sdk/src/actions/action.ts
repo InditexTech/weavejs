@@ -2,20 +2,21 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-import { type WeaveElementAttributes } from '@inditextech/weave-types';
+import {
+  type WeaveActionBase,
+  type WeaveElementAttributes,
+} from '@inditextech/weave-types';
 import { Weave } from '@/weave';
 import { type Logger } from 'pino';
-import { type WeaveActionCallbacks } from './types';
+import type { WeaveActionPropsChangeEvent } from './types';
 
-export abstract class WeaveAction {
+export abstract class WeaveAction implements WeaveActionBase {
   protected instance!: Weave;
   protected name!: string;
   props!: WeaveElementAttributes;
-  protected callbacks: WeaveActionCallbacks | undefined;
   private logger!: Logger;
 
-  constructor(callbacks?: WeaveActionCallbacks) {
-    this.callbacks = callbacks;
+  constructor() {
     return new Proxy<this>(this, {
       set: (
         target: WeaveAction,
@@ -23,8 +24,11 @@ export abstract class WeaveAction {
         value: keyof typeof WeaveAction
       ) => {
         Reflect.set(target, key, value);
-        this.internalUpdate?.();
-        this.callbacks?.onPropsChange?.(this.props);
+        this.onPropsChange?.();
+        this.instance?.emitEvent<WeaveActionPropsChangeEvent>('onPropsChange', {
+          instance: this,
+          props: this.props,
+        });
         return true;
       },
     });
@@ -63,7 +67,7 @@ export abstract class WeaveAction {
 
   abstract trigger(cancelAction: () => void, params?: unknown): unknown;
 
-  abstract internalUpdate?(): void;
+  abstract onPropsChange?(): void;
 
   abstract cleanup?(): void;
 }

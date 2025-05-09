@@ -7,9 +7,10 @@ import { WeaveAction } from '@/actions/action';
 import { type Vector2d } from 'konva/lib/types';
 import {
   type WeaveImageToolActionTriggerParams,
-  type WeaveImageToolActionCallbacks,
   type WeaveImageToolActionState,
   type WeaveImageToolActionTriggerReturn,
+  type WeaveImageToolActionOnEndLoadImageEvent,
+  type WeaveImageToolActionOnStartLoadImageEvent,
 } from './types';
 import { IMAGE_TOOL_STATE } from './constants';
 import { WeaveNodesSelectionPlugin } from '@/plugins/nodes-selection/nodes-selection';
@@ -19,7 +20,6 @@ import type { WeaveRectangleNode } from '@/nodes/rectangle/rectangle';
 import type { WeaveImageNode } from '@/nodes/image/image';
 
 export class WeaveImageToolAction extends WeaveAction {
-  private imageCallbacks: WeaveImageToolActionCallbacks;
   protected initialized: boolean = false;
   protected initialCursor: string | null = null;
   protected state: WeaveImageToolActionState;
@@ -32,11 +32,9 @@ export class WeaveImageToolAction extends WeaveAction {
   protected cancelAction!: () => void;
   update = undefined;
 
-  constructor(imageCallbacks: WeaveImageToolActionCallbacks) {
-    const { onPropsChange, ...restCallbacks } = imageCallbacks;
-    super({ onPropsChange });
+  constructor() {
+    super();
 
-    this.imageCallbacks = restCallbacks;
     this.initialized = false;
     this.state = IMAGE_TOOL_STATE.IDLE;
     this.imageId = null;
@@ -150,7 +148,10 @@ export class WeaveImageToolAction extends WeaveAction {
       console.error(error);
     };
     this.preloadImgs[this.imageId].onload = () => {
-      this.imageCallbacks?.onImageLoadEnd?.();
+      this.instance.emitEvent<WeaveImageToolActionOnEndLoadImageEvent>(
+        'onImageLoadEnd',
+        undefined
+      );
 
       if (this.imageId) {
         this.props = {
@@ -162,12 +163,17 @@ export class WeaveImageToolAction extends WeaveAction {
       this.addImageNode();
     };
     this.preloadImgs[this.imageId].onerror = () => {
-      this.imageCallbacks?.onImageLoadEnd?.(new Error('Error loading image'));
+      this.instance.emitEvent<WeaveImageToolActionOnEndLoadImageEvent>(
+        'onImageLoadEnd',
+        new Error('Error loading image')
+      );
       this.cancelAction();
     };
 
     this.preloadImgs[this.imageId].src = imageURL;
-    this.imageCallbacks?.onImageLoadStart?.();
+    this.instance.emitEvent<WeaveImageToolActionOnStartLoadImageEvent>(
+      'onImageLoadStart'
+    );
   }
 
   private addImageNode() {
@@ -203,8 +209,6 @@ export class WeaveImageToolAction extends WeaveAction {
   }
 
   private addImage() {
-    this.imageCallbacks?.onUploadImage(this.loadImage.bind(this));
-
     this.setState(IMAGE_TOOL_STATE.UPLOADING);
   }
 
@@ -278,7 +282,7 @@ export class WeaveImageToolAction extends WeaveAction {
     return { finishUploadCallback: this.loadImage.bind(this) };
   }
 
-  internalUpdate(): void {
+  onPropsChange(): void {
     const stage = this.instance?.getStage();
     if (stage) {
       const tempImage = this.instance

@@ -3,11 +3,9 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { type WeaveElementAttributes } from '@inditextech/weave-types';
+import type { WeaveAction } from './action';
 
-export type WeaveActionPropsChangeCallback = (
-  props: WeaveElementAttributes
-) => void;
-
-export type WeaveActionCallbacks = {
-  onPropsChange?: WeaveActionPropsChangeCallback;
+export type WeaveActionPropsChangeEvent = {
+  instance: WeaveAction;
+  props: WeaveElementAttributes;
 };

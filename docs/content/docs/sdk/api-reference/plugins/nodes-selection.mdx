@@ -55,21 +55,15 @@ type WeaveSelection = {
   node: WeaveStateElement;
 };
 
-type WeaveNodesSelectionChangeCallback = (nodes: WeaveSelection[]) => void;
-type WeaveNodesSelectionStageSelectionCallback = () => void;
+type WeaveNodesSelectionPluginOnNodesChangeEvent = WeaveSelection[];
+type WeaveNodesSelectionPluginOnStageSelectionEvent = undefined;
 
 type WeaveNodesSelectionPluginConfig = {
-  transformer?: TransformerConfig;
+  transformer?: Konva.TransformerConfig;
 };
 
 type WeaveNodesSelectionPluginParams = {
   config?: WeaveNodesSelectionPluginConfig;
-  callbacks: WeaveNodesSelectionPluginCallbacks;
-};
-
-type WeaveNodesSelectionPluginCallbacks = {
-  onNodesChange: WeaveNodesSelectionChangeCallback;
-  onStageSelection?: WeaveNodesSelectionStageSelectionCallback;
 };
 ```
 
@@ -82,10 +76,6 @@ For `WeaveNodesSelectionPluginParams`:
     ["config"]: {
       description: "Config parameters for the plugin.",
       type: "WeaveNodesSelectionPluginConfig",
-    },
-    ["callbacks"]: {
-      description: "Callbacks available for the plugin.",
-      type: "WeaveNodesSelectionPluginCallbacks",
     },
   }}
 />
@@ -101,19 +91,21 @@ For `WeaveNodesSelectionPluginConfig`:
   }}
 />
 
-For `WeaveNodesSelectionPluginCallbacks`:
+## Events
 
-<TypeTable
-  type={{
-    ["onNodesChange"]: {
-      description:
-        "A callback that is called when the nodes selection changed.",
-      type: "WeaveNodesSelectionChangeCallback",
-    },
-    ["onStageSelection"]: {
-      description:
-        "A callback that is called when the user selects the stage, meaning that it selected nothing.",
-      type: "WeaveNodesSelectionStageSelectionCallback",
-    },
-  }}
-/>
+### onNodesChange
+
+```ts
+onNodesChange: WeaveNodesSelectionPluginOnNodesChangeEvent;
+```
+
+The `onNodesChange` event is called when the selected nodes changed.
+
+### onStageSelection
+
+```ts
+onStageSelection: WeaveNodesSelectionPluginOnStageSelectionEvent;
+```
+
+The `onStageSelection` event is called when an user selected the stage,
+meaning there is no nodes selected.

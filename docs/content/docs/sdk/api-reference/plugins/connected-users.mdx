@@ -43,26 +43,19 @@ type WeaveUser = {
   email: string;
 };
 
-type WeaveConnectedUsersChanged = {
+type WeaveConnectedUsers = {
   [userName: string]: WeaveUser;
 };
-
-type WeaveConnectedUsersChangeCallback = (
-  users: WeaveConnectedUsersChanged
-) => void;
 
 type WeaveConnectedUsersPluginConfig = {
   getUser: () => WeaveUser;
 };
 
-type WeaveConnectedUsersPluginCallbacks = {
-  onConnectedUsersChanged?: WeaveConnectedUsersChangeCallback;
-};
-
 type WeaveConnectedUsersPluginParams = {
   config: WeaveConnectedUsersPluginConfig;
-  callbacks?: WeaveConnectedUsersPluginCallbacks;
 };
+
+type WeaveConnectedUsersChangeEvent = WeaveConnectedUsers;
 ```
 
 ## Parameters
@@ -75,10 +68,6 @@ For `WeaveConnectedUsersPluginParams`:
       required: true,
       description: "Config parameters for the plugin.",
       type: "WeaveConnectedUsersPluginConfig",
-    },
-    ["callbacks"]: {
-      description: "Callbacks available for the plugin.",
-      type: "WeaveConnectedUsersPluginCallbacks",
     },
   }}
 />
@@ -96,14 +85,12 @@ For `WeaveConnectedUsersPluginConfig`:
   }}
 />
 
-For `WeaveConnectedUsersPluginCallbacks`:
+## Events
 
-<TypeTable
-  type={{
-    ["onConnectedUsersChanged"]: {
-      description:
-        "A callback that returns a representation of the connected users.",
-      type: "WeaveConnectedUsersChangeCallback",
-    },
-  }}
-/>
+### onConnectedUsersChange
+
+```ts
+onConnectedUsersChange: WeaveConnectedUsersChangeEvent;
+```
+
+The `onConnectedUsersChange` event is called every time a user connect / disconnect from a room.

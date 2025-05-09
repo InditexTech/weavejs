@@ -4,8 +4,8 @@
 
 import { WeavePlugin } from '@/plugins/plugin';
 import {
-  type WeaveStageContextMenuPluginCallbacks,
   type WeaveStageContextMenuPluginConfig,
+  type WeaveStageContextMenuPluginOnNodeContextMenuEvent,
   type WeaveStageContextMenuPluginParams,
 } from './types';
 import {
@@ -24,7 +24,6 @@ import { WEAVE_NODES_SELECTION_KEY } from '@/plugins/nodes-selection/constants';
 
 export class WeaveContextMenuPlugin extends WeavePlugin {
   private config: WeaveStageContextMenuPluginConfig;
-  private callbacks: WeaveStageContextMenuPluginCallbacks;
   private touchTimer: NodeJS.Timeout | undefined;
   private tapHold: boolean;
   getLayerName = undefined;
@@ -36,13 +35,12 @@ export class WeaveContextMenuPlugin extends WeavePlugin {
 
     this.touchTimer = undefined;
     this.tapHold = false;
-    const { callbacks, config } = params ?? {};
+    const { config } = params ?? {};
     this.config = {
       xOffset: WEAVE_CONTEXT_MENU_X_OFFSET_DEFAULT,
       yOffset: WEAVE_CONTEXT_MENU_Y_OFFSET_DEFAULT,
       ...config,
     };
-    this.callbacks = { ...callbacks };
   }
 
   getName(): string {
@@ -110,7 +108,14 @@ export class WeaveContextMenuPlugin extends WeavePlugin {
         y: containerRect.top + pointerPos.y + (this.config.yOffset ?? 4),
       };
 
-      this.callbacks.onNodeMenu?.(this.instance, nodes, point, true);
+      this.instance.emitEvent<WeaveStageContextMenuPluginOnNodeContextMenuEvent>(
+        'onNodeContextMenu',
+        {
+          selection: nodes,
+          point,
+          visible: true,
+        }
+      );
     }
   }
 
@@ -169,7 +174,14 @@ export class WeaveContextMenuPlugin extends WeavePlugin {
           y: containerRect.top + pointerPos.y + (this.config.yOffset ?? 4),
         };
 
-        this.callbacks.onNodeMenu?.(this.instance, [], point, false);
+        this.instance.emitEvent<WeaveStageContextMenuPluginOnNodeContextMenuEvent>(
+          'onNodeContextMenu',
+          {
+            selection: [],
+            point,
+            visible: false,
+          }
+        );
       }
     });
   }

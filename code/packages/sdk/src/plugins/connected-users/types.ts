@@ -9,21 +9,14 @@ export type WeaveConnectedUsersPluginConfig = {
   getUser: () => WeaveUser;
 };
 
-export type WeaveConnectedUsersPluginCallbacks = {
-  onConnectedUsersChanged?: WeaveConnectedUsersChangeCallback;
-};
-
 export type WeaveConnectedUsersPluginParams = {
   config: WeaveConnectedUsersPluginConfig;
-  callbacks?: WeaveConnectedUsersPluginCallbacks;
 };
 
-export type WeaveConnectedUsersChanged = {
+export type WeaveConnectedUsers = {
   [userName: string]: WeaveUser;
 };
 
-export type WeaveConnectedUsersChangeCallback = (
-  users: WeaveConnectedUsersChanged
-) => void;
+export type WeaveConnectedUsersChangeEvent = WeaveConnectedUsers;
 
 export type WeaveConnectedUserInfoKey = typeof WEAVE_CONNECTED_USER_INFO_KEY;

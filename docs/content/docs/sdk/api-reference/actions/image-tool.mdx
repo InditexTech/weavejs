@@ -31,52 +31,25 @@ import { WeaveImageToolAction } from "@inditextech/weave-sdk";
 ## Instantiation
 
 ```ts
-new WeaveImageToolAction(params: WeaveImageToolActionCallbacks);
+new WeaveImageToolAction();
 ```
 
 ## TypeScript types
 
 ```ts
-type WeaveImageToolActionOnAddImageCallback = (
-  finished: (imageURL: string) => void
-) => Promise<void>;
-type WeaveImageToolActionOnStartLoadImageCallback = () => void;
-type WeaveImageToolActionOnEndLoadImageCallback = (error?: Error) => void;
-
-type WeaveImageToolActionCallbacks = WeaveActionCallbacks & {
-  onUploadImage: WeaveImageToolActionOnAddImageCallback;
-  onImageLoadStart?: WeaveImageToolActionOnStartLoadImageCallback;
-  onImageLoadEnd?: WeaveImageToolActionOnEndLoadImageCallback;
-};
+type WeaveImageToolActionOnStartLoadImageEvent = undefined;
+type WeaveImageToolActionOnEndLoadImageEvent = Error | undefined;
 
 type WeaveImageToolActionTriggerParams = {
   imageURL?: string;
 };
+
+type WeaveImageToolActionTriggerReturn =
+  | {
+      finishUploadCallback: (imageURL: string) => void;
+    }
+  | undefined;
 ```
-
-## Parameters
-
-For `WeaveImageToolActionCallbacks`, all the properties of WeaveActionCallbacks and:
-
-<TypeTable
-  type={{
-    ["onUploadImage"]: {
-      required: true,
-      description:
-        "Callback that is called when a user tries to add an image to the canvas, this allows to upload the image to an external service (e.g. Azure Storage).",
-      type: "WeaveImageToolActionOnAddImageCallback",
-    },
-    ["onImageLoadStart"]: {
-      description:
-        "Callback called when an image load starts, an image is loaded after is uploaded.",
-      type: "WeaveImageToolActionOnStartLoadImageCallback",
-    },
-    ["onUploadImage"]: {
-      description: "Callback called when an image load ends.",
-      type: "WeaveImageToolActionOnEndLoadImageCallback",
-    },
-  }}
-/>
 
 ## Trigger function params
 
@@ -95,3 +68,21 @@ For `WeaveImageToolActionTriggerParams`:
     },
   }}
 />
+
+## Events
+
+### onImageLoadStart
+
+```ts
+onImageLoadStart: WeaveNodesSelectionPluginOnNodesChangeEvent;
+```
+
+The `onImageLoadStart` event is called when the image is stated to load onto the canvas.
+
+### onImageLoadEnd
+
+```ts
+onImageLoadEnd: WeaveNodesSelectionPluginOnNodesChangeEvent;
+```
+
+The `onImageLoadEnd` event is called when the image ended loading into the canvas.

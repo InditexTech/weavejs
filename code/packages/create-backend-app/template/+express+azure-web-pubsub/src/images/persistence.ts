@@ -29,7 +29,7 @@ export class ImagesPersistenceHandler {
 
     const folderMimeTypePath = path.join(
       process.cwd(),
-      IMAGES_MIME_TYPE_FOLDER,
+      IMAGES_MIME_TYPE_FOLDER
     );
 
     if (!(await existsFolder(folderMimeTypePath))) {
@@ -81,14 +81,14 @@ export class ImagesPersistenceHandler {
       } catch (err) {
         this._logger.error(
           { imageName, error: err },
-          'File does not exist or is not accessible',
+          'File does not exist or is not accessible'
         );
         return false;
       }
     } catch (ex) {
       this._logger.error(
         { imageName, error: ex },
-        'Error checking if image exists',
+        'Error checking if image exists'
       );
       return false;
     }
@@ -110,7 +110,7 @@ export class ImagesPersistenceHandler {
     const roomMimeTypeFolderPath = path.join(
       process.cwd(),
       IMAGES_MIME_TYPE_FOLDER,
-      roomFolder,
+      roomFolder
     );
 
     if (!(await existsFolder(roomMimeTypeFolderPath))) {
@@ -129,7 +129,7 @@ export class ImagesPersistenceHandler {
       const filePath = path.join(
         process.cwd(),
         IMAGES_MIME_TYPE_FOLDER,
-        imageName,
+        imageName
       );
       const filePathMimeType = `${filePath}.mimeType`;
 
@@ -137,7 +137,7 @@ export class ImagesPersistenceHandler {
     } catch (ex) {
       this._logger.error(
         { imageName, error: ex },
-        'Error getting image MIME type',
+        'Error getting image MIME type'
       );
       return 'application/octet-stream';
     }
@@ -146,7 +146,7 @@ export class ImagesPersistenceHandler {
   async persist(
     imageName: string,
     mimeType: string,
-    content: Uint8Array,
+    content: Uint8Array
   ): Promise<boolean> {
     try {
       if (!this._initialized) {
@@ -162,7 +162,7 @@ export class ImagesPersistenceHandler {
       const fileMimeTypePath = path.join(
         process.cwd(),
         IMAGES_MIME_TYPE_FOLDER,
-        imageName,
+        imageName
       );
       const filePathMimeType = `${fileMimeTypePath}.mimeType`;
 
@@ -174,7 +174,6 @@ export class ImagesPersistenceHandler {
 
         return true;
       } catch (err) {
-        console.log(err);
         this._logger.error({ imageName, error: err }, 'Error saving the image');
         return false;
       }
@@ -200,7 +199,7 @@ export class ImagesPersistenceHandler {
         const fileMimeTypePath = path.join(
           process.cwd(),
           IMAGES_MIME_TYPE_FOLDER,
-          imageName,
+          imageName
         );
         const filePathMimeType = `${fileMimeTypePath}.mimeType`;
 
@@ -218,7 +217,7 @@ export class ImagesPersistenceHandler {
       } catch (err) {
         this._logger.error(
           { imageName, error: err },
-          'Error deleting the file',
+          'Error deleting the file'
         );
         return false;
       }

@@ -33,7 +33,7 @@ import { WeaveFrameToolAction } from "@inditextech/weave-sdk";
 ## Instantiation
 
 ```ts
-new WeaveFrameToolAction(params: WeaveActionCallbacks);
+new WeaveFrameToolAction();
 ```
 
 ## TypeScript types
@@ -41,9 +41,6 @@ new WeaveFrameToolAction(params: WeaveActionCallbacks);
 ```ts
 type WeaveFrameToolActionTriggerParams = {
   title?: string;
-  fontFamily?: string;
-  titleHeight?: number;
-  borderWidth?: number;
   frameWidth?: number;
   frameHeight?: number;
   frameOrientation?: string;
@@ -65,26 +62,6 @@ For `WeaveFrameToolActionTriggerParams`:
       description: "The title of the Frame.",
       type: "string",
       default: "Frame XXX",
-    },
-    ["fontFamily"]: {
-      description: "The font family to use on the Frame title.",
-      type: "string",
-      default: "Arial",
-    },
-    ["titleHeight"]: {
-      description: "The height of the title for the Frame.",
-      type: "number",
-      default: "30",
-    },
-    ["borderWidth"]: {
-      description: "The border width (px) for the Frame.",
-      type: "number",
-      default: "2",
-    },
-    ["borderColor"]: {
-      description: "The border color (HEX with alpha) for the Frame.",
-      type: "string",
-      default: "#000000ff",
     },
     ["frameWidth"]: {
       description: "The frame format width (px) for the Frame.",

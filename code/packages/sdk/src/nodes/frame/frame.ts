@@ -11,7 +11,7 @@ import {
   WEAVE_NODE_CUSTOM_EVENTS,
 } from '@inditextech/weave-types';
 import {
-  WEAVE_FRAME_NODE_DEFAULT_PROPERTIES,
+  WEAVE_FRAME_NODE_DEFAULT_CONFIG,
   WEAVE_FRAME_NODE_DEFAULT_PROPS,
   WEAVE_FRAME_NODE_TYPE,
 } from './constants';
@@ -31,7 +31,7 @@ export class WeaveFrameNode extends WeaveNode {
     const { config } = params ?? {};
 
     this.config = {
-      ...WEAVE_FRAME_NODE_DEFAULT_PROPERTIES,
+      ...WEAVE_FRAME_NODE_DEFAULT_CONFIG,
       ...config,
     };
   }

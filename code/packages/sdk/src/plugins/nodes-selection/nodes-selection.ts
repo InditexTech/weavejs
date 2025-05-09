@@ -14,13 +14,15 @@ import {
   WEAVE_NODES_SELECTION_LAYER_ID,
 } from './constants';
 import {
-  type WeaveNodesSelectionPluginCallbacks,
   type WeaveNodesSelectionPluginConfig,
+  type WeaveNodesSelectionPluginOnNodesChangeEvent,
+  type WeaveNodesSelectionPluginOnStageSelectionEvent,
   type WeaveNodesSelectionPluginParams,
 } from './types';
 import { WeaveContextMenuPlugin } from '../context-menu/context-menu';
 import type { WeaveNode } from '@/nodes/node';
 import type { WeaveNodesSnappingPlugin } from '../nodes-snapping/nodes-snapping';
+import type { WeaveCopyPasteNodesPlugin } from '../copy-paste-nodes/copy-paste-nodes';
 
 export class WeaveNodesSelectionPlugin extends WeavePlugin {
   private tr!: Konva.Transformer;
@@ -30,13 +32,12 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
   private cameFromSelectingMultiple: boolean;
   private selecting: boolean;
   private initialized: boolean;
-  private callbacks: WeaveNodesSelectionPluginCallbacks;
   onRender: undefined;
 
-  constructor(params: WeaveNodesSelectionPluginParams) {
+  constructor(params?: WeaveNodesSelectionPluginParams) {
     super();
 
-    const { config, callbacks } = params ?? {};
+    const { config } = params ?? {};
 
     this.config = {
       transformer: {
@@ -67,7 +68,6 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
         ...config?.transformer,
       },
     };
-    this.callbacks = callbacks ?? {};
     this.active = false;
     this.cameFromSelectingMultiple = false;
     this.selecting = false;
@@ -88,6 +88,12 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
 
     const layer = new Konva.Layer({ id: this.getLayerName() });
     stage.add(layer);
+  }
+
+  isPasting(): boolean {
+    const copyPastePlugin =
+      this.instance.getPlugin<WeaveCopyPasteNodesPlugin>('copyPasteNodes');
+    return copyPastePlugin.isPasting();
   }
 
   isSelecting(): boolean {
@@ -171,15 +177,19 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
     });
 
     tr.on('mouseenter', (e) => {
-      const stage = this.instance.getStage();
-      stage.container().style.cursor = 'grab';
-      e.cancelBubble = true;
+      if (!this.isPasting()) {
+        const stage = this.instance.getStage();
+        stage.container().style.cursor = 'grab';
+        e.cancelBubble = true;
+      }
     });
 
     tr.on('mouseleave', (e) => {
-      const stage = this.instance.getStage();
-      stage.container().style.cursor = 'default';
-      e.cancelBubble = true;
+      if (!this.isPasting()) {
+        const stage = this.instance.getStage();
+        stage.container().style.cursor = 'default';
+        e.cancelBubble = true;
+      }
     });
 
     this.tr = tr;
@@ -247,8 +257,10 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
       };
     });
 
-    this.callbacks?.onNodesChange?.(selectedNodes);
-    this.instance.emitEvent('onNodesChange', selectedNodes);
+    this.instance.emitEvent<WeaveNodesSelectionPluginOnNodesChangeEvent>(
+      'onNodesChange',
+      selectedNodes
+    );
   }
 
   private initEvents() {
@@ -487,8 +499,9 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
 
         // Check if context menu is triggered on this same event
         if (contextMenuPlugin && !contextMenuPlugin.isTapHold()) {
-          this.callbacks?.onStageSelection?.();
-          this.instance.emitEvent('onStageSelection', undefined);
+          this.instance.emitEvent<WeaveNodesSelectionPluginOnStageSelectionEvent>(
+            'onStageSelection'
+          );
         }
 
         return;

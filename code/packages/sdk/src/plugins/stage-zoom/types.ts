@@ -11,20 +11,13 @@ export type WeaveStageZoomChanged = {
   canZoomOut: boolean;
 };
 
-export type WeaveStageZoomOnZoomChangeCallback = (
-  zoomInfo: WeaveStageZoomChanged
-) => void;
+export type WeaveStageZoomPluginOnZoomChangeEvent = WeaveStageZoomChanged;
 
 export type WeaveStageZoomPluginConfig = {
   zoomSteps: number[];
   defaultZoom: number;
 };
 
-export type WeaveStageZoomPluginCallbacks = {
-  onZoomChange?: WeaveStageZoomOnZoomChangeCallback;
-};
-
 export type WeaveStageZoomPluginParams = {
   config?: WeaveStageZoomPluginConfig;
-  callbacks?: WeaveStageZoomPluginCallbacks;
 };
