@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2025 2025 INDUSTRIA DE DISEÑO TEXTIL S.A. (INDITEX S.A.)
+//
+// SPDX-License-Identifier: Apache-2.0
+
 'use client';
 
 import React from 'react';
@@ -13,6 +17,7 @@ import useGetWeaveJSProps from '../room-components/hooks/use-get-weave-js-props'
 import useGetAzureWebPubsubProvider from '../room-components/hooks/use-get-azure-web-pubsub-provider';
 import useHandleRouteParams from '../room-components/hooks/use-handle-route-params';
 import { UploadFile } from '../room-components/upload-file';
+import ScrollVelocity from '../ui/reactbits/TextAnimations/ScrollVelocity/ScrollVelocity';
 
 const statusMap = {
   ['idle']: 'Idle',
@@ -63,9 +68,9 @@ export const Room = () => {
     return '';
   }, [loadedParams, loadingFetchConnectionUrl, status, roomLoaded]);
 
-  const { fonts, nodes, customPlugins, actions } = useGetWeaveJSProps();
+  const { fonts, nodes, actions } = useGetWeaveJSProps();
 
-  const store = useGetAzureWebPubsubProvider({
+  const wsStoreProvider = useGetAzureWebPubsubProvider({
     loadedParams,
     getUser,
   });
@@ -98,28 +103,41 @@ export const Room = () => {
           loadingFetchConnectionUrl ||
           status !== WEAVE_INSTANCE_STATUS.RUNNING ||
           (status === WEAVE_INSTANCE_STATUS.RUNNING && !roomLoaded)) && (
-          <RoomLoader
-            roomId={room ? room : '-'}
-            content="LOADING ROOM"
-            description={loadingDescription}
-          />
+          <>
+            <div className="absolute top-0 left-[-100px] right-[-100px] bottom-0 flex justify-center items-center">
+              <ScrollVelocity
+                texts={[
+                  'collaborative - easy to use - extensible - visual - open source -',
+                  'this is weave.js - this is weave.js - this is weave.js - this is weave.js -',
+                  'intuitive - free - html5 canvas - real time - powerful -',
+                ]}
+                velocity={150}
+                numCopies={20}
+                className="text-5xl font-questrial font-extralight text-zinc-500/25"
+              />
+            </div>
+            <RoomLoader
+              roomId={room ? room : '-'}
+              content="LOADING ROOM"
+              description={loadingDescription}
+            />
+          </>
         )}
       </AnimatePresence>
-      {loadedParams && room && store && (
+      {loadedParams && room && wsStoreProvider && (
         <WeaveProvider
           containerId="weave"
           getUser={getUser}
-          store={store}
+          store={wsStoreProvider}
           fonts={fonts}
           nodes={nodes}
           actions={actions}
-          customPlugins={customPlugins}
         >
           <UploadFile />
           <RoomLayout />
         </WeaveProvider>
       )}
-      <Toaster position="bottom-center" />
+      <Toaster />
     </>
   );
 };

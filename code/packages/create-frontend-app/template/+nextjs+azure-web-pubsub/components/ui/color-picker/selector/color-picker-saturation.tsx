@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2025 2025 INDUSTRIA DE DISEÑO TEXTIL S.A. (INDITEX S.A.)
+//
+// SPDX-License-Identifier: Apache-2.0
+
 import {
   HTMLAttributes,
   useCallback,
@@ -27,7 +31,9 @@ export const ColorPickerSaturation = ({
   const renderGradient = useCallback(() => {
     if (canvasRef.current) {
       const canvas = canvasRef.current;
-      const ctx = canvas.getContext("2d");
+      const ctx = canvas.getContext("2d", {
+        willReadFrequently: true,
+      });
       if (ctx && containerRef.current) {
         const { width, height } = containerRef.current.getBoundingClientRect();
         canvas.width = width;
@@ -69,7 +75,9 @@ export const ColorPickerSaturation = ({
       );
       setPosition({ x: x / rect.width, y: y / rect.height });
 
-      const ctx = canvasRef.current.getContext("2d");
+      const ctx = canvasRef.current.getContext("2d", {
+        willReadFrequently: true,
+      });
       if (ctx) {
         const pixel = ctx.getImageData(x, y, 1, 1).data;
 

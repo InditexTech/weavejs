@@ -1,13 +1,18 @@
-'use client';
+// SPDX-FileCopyrightText: 2025 2025 INDUSTRIA DE DISEÑO TEXTIL S.A. (INDITEX S.A.)
+//
+// SPDX-License-Identifier: Apache-2.0
 
-import React from 'react';
-import { useInfiniteQuery, useMutation } from '@tanstack/react-query';
-import { ImagePlus, Trash } from 'lucide-react';
-import { useWeave } from '@inditextech/weave-react';
-import { useCollaborationRoom } from '@/store/store';
-import { getImages } from '@/api/get-images';
-import { postImage } from '@/api/post-image';
-import { delImage } from '@/api/del-image';
+"use client";
+
+import React from "react";
+import { useInfiniteQuery, useMutation } from "@tanstack/react-query";
+import { ImagePlus, Trash, X } from "lucide-react";
+import { useWeave } from "@inditextech/weave-react";
+import { useCollaborationRoom } from "@/store/store";
+import { getImages } from "@/api/get-images";
+import { postImage } from "@/api/post-image";
+import { delImage } from "@/api/del-image";
+import { SIDEBAR_ELEMENTS } from "@/lib/constants";
 
 export const ImagesLibrary = () => {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -16,31 +21,34 @@ export const ImagesLibrary = () => {
   const instance = useWeave((state) => state.instance);
 
   const room = useCollaborationRoom((state) => state.room);
-  const imagesLibraryVisible = useCollaborationRoom(
-    (state) => state.images.library.visible
+  const sidebarLeftActive = useCollaborationRoom(
+    (state) => state.sidebar.left.active
+  );
+  const setSidebarActive = useCollaborationRoom(
+    (state) => state.setSidebarActive
   );
 
   const mutationUpload = useMutation({
     mutationFn: async (file: File) => {
-      return await postImage(room ?? '', file);
+      return await postImage(room ?? "", file);
     },
   });
 
   const mutationDelete = useMutation({
     mutationFn: async (imageId: string) => {
-      return await delImage(room ?? '', imageId);
+      return await delImage(room ?? "", imageId);
     },
   });
 
   const query = useInfiniteQuery({
-    queryKey: ['getImages', room],
+    queryKey: ["getImages", room],
     queryFn: async ({ pageParam }) => {
       if (!room) {
         return [];
       }
-      return await getImages(room ?? '', 20, pageParam);
+      return await getImages(room ?? "", 20, pageParam);
     },
-    initialPageParam: '',
+    initialPageParam: "",
     getNextPageParam: (lastPage) => lastPage.continuationToken,
   });
 
@@ -52,14 +60,14 @@ export const ImagesLibrary = () => {
     return null;
   }
 
-  if (!imagesLibraryVisible) {
+  if (sidebarLeftActive !== SIDEBAR_ELEMENTS.images) {
     return null;
   }
 
   return (
     <div className="pointer-events-auto w-full h-full">
-      <div className="w-[calc(100%-38px)] font-title-xs p-1 pr-0 flex justify-between items-center">
-        <div className="flex justify-between font-noto-sans-mono font-light items-center text-md pl-2">
+      <div className="w-full font-title-xs p-1 flex justify-between items-center">
+        <div className="flex justify-between font-questrial font-light items-center text-md pl-2">
           Images
         </div>
         <div className="flex justify-end items-center gap-1">
@@ -91,6 +99,15 @@ export const ImagesLibrary = () => {
           >
             <ImagePlus size={16} />
           </button>
+          <div className="w-[1px] h-[16px] bg-zinc-200" />
+          <button
+            className="cursor-pointer bg-transparent hover:bg-accent p-2"
+            onClick={() => {
+              setSidebarActive(null);
+            }}
+          >
+            <X size={16} />
+          </button>
         </div>
       </div>
       <div className="flex flex-col gap-2 w-full h-[calc(100%-50px)] border-t border-zinc-200">
@@ -110,7 +127,7 @@ export const ImagesLibrary = () => {
           )}
           {linearData.length > 0 &&
             linearData.map((image) => {
-              const imageUrl = `${process.env.NEXT_PUBLIC_API_ENDPOINT}/rooms/${room}/images/${image}`;
+              const imageUrl = `${process.env.NEXT_PUBLIC_API_ENDPOINT}/${process.env.NEXT_PUBLIC_API_ENDPOINT_HUB_NAME}/rooms/${room}/images/${image}`;
 
               return (
                 <div

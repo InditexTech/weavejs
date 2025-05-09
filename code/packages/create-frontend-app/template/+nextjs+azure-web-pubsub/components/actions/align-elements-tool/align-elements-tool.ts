@@ -1,14 +1,18 @@
-import { WeaveAction, WeaveNode } from '@inditextech/weave-sdk';
-import { WeaveElementInstance, WeaveSelection } from '@inditextech/weave-types';
-import Konva from 'konva';
+// SPDX-FileCopyrightText: 2025 2025 INDUSTRIA DE DISEÑO TEXTIL S.A. (INDITEX S.A.)
+//
+// SPDX-License-Identifier: Apache-2.0
+
+import { WeaveAction, WeaveNode } from "@inditextech/weave-sdk";
+import { WeaveElementInstance, WeaveSelection } from "@inditextech/weave-types";
+import Konva from "konva";
 
 export class AlignElementsToolAction extends WeaveAction {
   protected cancelAction!: () => void;
-  internalUpdate = undefined;
+  onPropsChange = undefined;
   onInit = undefined;
 
   getName(): string {
-    return 'alignElementsTool';
+    return "alignElementsTool";
   }
 
   private alignElements(nodes: WeaveSelection[], gap: number) {
@@ -77,7 +81,7 @@ export class AlignElementsToolAction extends WeaveAction {
     { gap = 20, nodes }: { gap: number; nodes: WeaveSelection[] }
   ) {
     if (!this.instance) {
-      throw new Error('Instance not defined');
+      throw new Error("Instance not defined");
     }
 
     const stage = this.instance.getStage();

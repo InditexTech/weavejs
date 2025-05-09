@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2025 2025 INDUSTRIA DE DISEÑO TEXTIL S.A. (INDITEX S.A.)
+//
+// SPDX-License-Identifier: Apache-2.0
+
 "use client";
 
 import React from "react";
@@ -10,6 +14,7 @@ import {
 } from "@/components/ui/tooltip";
 
 type ToolbarButtonProps = {
+  className?: string;
   icon: React.ReactNode;
   onClick: () => void;
   active?: boolean;
@@ -20,6 +25,7 @@ type ToolbarButtonProps = {
 };
 
 export function ToolbarButton({
+  className,
   icon,
   label = "tool",
   onClick,
@@ -39,7 +45,8 @@ export function ToolbarButton({
                 ["bg-zinc-700 text-white"]: active,
                 ["pointer-events-none cursor-default text-black opacity-50"]:
                   disabled,
-              }
+              },
+              className
             )}
             disabled={disabled}
             onClick={onClick}

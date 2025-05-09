@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2025 2025 INDUSTRIA DE DISEÑO TEXTIL S.A. (INDITEX S.A.)
+//
+// SPDX-License-Identifier: Apache-2.0
+
 import {
   Command,
   CommandEmpty,
@@ -37,11 +41,11 @@ function InputFontFamily({
 
   return (
     <div className="flex flex-col items-start justify-start relative">
-      <div className="text-zinc-600 mb-1 text-[11px] font-noto-sans-mono font-light">
+      <div className="text-zinc-600 mb-1 text-[11px] font-questrial font-light">
         Font Family
       </div>
       <Popover open={open} onOpenChange={setOpen}>
-        <PopoverTrigger className="w-full">
+        <PopoverTrigger className="w-full" asChild>
           <Button
             variant="outline"
             role="combobox"
@@ -58,6 +62,12 @@ function InputFontFamily({
             <CommandInput
               className="!text-xs text-gray-700 justify-between font-normal bg-transparent shadow-none"
               placeholder="Search font..."
+              onFocus={() => {
+                window.weaveOnFieldFocus = true;
+              }}
+              onBlur={() => {
+                window.weaveOnFieldFocus = false;
+              }}
             />
             <CommandList>
               <CommandEmpty>

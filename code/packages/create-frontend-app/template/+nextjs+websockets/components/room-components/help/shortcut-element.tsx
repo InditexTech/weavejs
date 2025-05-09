@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2025 2025 INDUSTRIA DE DISEÑO TEXTIL S.A. (INDITEX S.A.)
+//
+// SPDX-License-Identifier: Apache-2.0
+
 import React from "react";
 import { cn, SYSTEM_OS } from "@/lib/utils";
 import { useGetOs } from "../hooks/use-get-os";
@@ -26,7 +30,7 @@ export const ShortcutElement = ({
           <span
             key={key}
             className={cn(
-              "inline-flex justify-start items-center p-0.5 px-1.5 rounded-xs font-noto-sans-mono text-xs",
+              "inline-flex justify-start items-center p-0.5 px-1.5 rounded-xs font-questrial text-xs",
               {
                 ["bg-accent text-black"]: variant === "light",
                 ["bg-zinc-800 text-white"]: variant === "default",

@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2025 2025 INDUSTRIA DE DISEÑO TEXTIL S.A. (INDITEX S.A.)
+//
+// SPDX-License-Identifier: Apache-2.0
+
 import { HTMLAttributes, useMemo } from "react";
 import { ColorPickerHexaInput } from "../text-inputs/color-picker-hexa";
 import { useColorPicker } from "../context/color-picker-context";

@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2025 2025 INDUSTRIA DE DISEÑO TEXTIL S.A. (INDITEX S.A.)
+//
+// SPDX-License-Identifier: Apache-2.0
+
 import React from "react";
 import Image from "next/image";
 import logoSrc from "@/assets/images/logo.png";
@@ -25,7 +29,7 @@ export function Logo({
         alt="Weave.js logo"
       />
       {variant === "text" && (
-        <div className="font-noto-sans-mono text-muted-foreground !normal-case">
+        <div className="font-questrial text-muted-foreground !normal-case">
           Weave.js
         </div>
       )}

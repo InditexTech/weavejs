@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2025 2025 INDUSTRIA DE DISEÑO TEXTIL S.A. (INDITEX S.A.)
+//
+// SPDX-License-Identifier: Apache-2.0
+
 "use client";
 
 import React from "react";
@@ -73,11 +77,13 @@ function LoginForm() {
             name="roomId"
             render={({ field }) => (
               <FormItem>
-                <FormLabel className="font-noto-sans-mono">ROOM</FormLabel>
+                <FormLabel className="font-questrial font-light">
+                  Room name
+                </FormLabel>
                 <FormControl>
                   <Input
-                    placeholder="the room name to join"
-                    className="font-noto-sans-mono rounded-none shadow-none"
+                    placeholder="room name to join"
+                    className="font-questrial rounded-md"
                     {...field}
                   />
                 </FormControl>
@@ -90,11 +96,13 @@ function LoginForm() {
             name="username"
             render={({ field }) => (
               <FormItem>
-                <FormLabel className="font-noto-sans-mono">USERNAME</FormLabel>
+                <FormLabel className="font-questrial font-light">
+                  Username
+                </FormLabel>
                 <FormControl>
                   <Input
                     placeholder="your username"
-                    className="font-noto-sans-mono rounded-none shadow-none"
+                    className="font-questrial rounded-md"
                     {...field}
                   />
                 </FormControl>
@@ -102,12 +110,14 @@ function LoginForm() {
               </FormItem>
             )}
           />
-          <Button
-            type="submit"
-            className="w-full cursor-pointer font-mono rounded-none"
-          >
-            ENTER THE ROOM
-          </Button>
+          <div className="w-full flex justify-center items-center">
+            <Button
+              type="submit"
+              className="cursor-pointer font-questrial rounded-md mt-8"
+            >
+              ENTER THE ROOM
+            </Button>
+          </div>
         </form>
       </Form>
     </motion.div>

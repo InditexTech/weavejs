@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2025 2025 INDUSTRIA DE DISEÑO TEXTIL S.A. (INDITEX S.A.)
+//
+// SPDX-License-Identifier: Apache-2.0
+
 "use client";
 
 import React from "react";
@@ -23,7 +27,7 @@ export const InputText = ({
   return (
     <div className="flex flex-col items-start justify-start relative">
       {label && (
-        <div className="text-zinc-600 mb-1 text-[11px] font-noto-sans-mono font-light">
+        <div className="text-zinc-600 mb-1 text-[11px] font-questrial font-light">
           {label}
         </div>
       )}
@@ -42,7 +46,11 @@ export const InputText = ({
             input.blur();
           }
         }}
-        onBlur={() => {
+        onFocus={() => {
+          window.weaveOnFieldFocus = true;
+        }}
+        onBlurCapture={() => {
+          window.weaveOnFieldFocus = false;
           onChange(actualValue);
         }}
       />

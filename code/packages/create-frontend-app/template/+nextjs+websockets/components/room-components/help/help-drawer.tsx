@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2025 2025 INDUSTRIA DE DISEÑO TEXTIL S.A. (INDITEX S.A.)
+//
+// SPDX-License-Identifier: Apache-2.0
+
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   Tooltip,
@@ -50,7 +54,7 @@ export const HelpDrawer = () => {
             >
               <Keyboard />
             </TooltipTrigger>
-            <TooltipContent side="top" align="start" className="rounded-none">
+            <TooltipContent side="top" align="end" className="rounded-none">
               <div className="flex flex-col gap-2 justify-start items-end">
                 <p>Keyboard shortcuts</p>
                 <ShortcutElement
@@ -67,11 +71,11 @@ export const HelpDrawer = () => {
       </DrawerTrigger>
       <DrawerContent className="p-0 !rounded-none bg-black flex flex-col justify-start items-center min-h-[330px]">
         <DrawerHeader className="w-[1024px] flex flex-row justify-between items-centers p-0 py-3">
-          <DrawerTitle className="flex flex-row justify-start items-center text-center text-white font-noto-sans-mono">
+          <DrawerTitle className="flex flex-row justify-start items-center text-center text-white font-questrial">
             Keyboard shortcuts
           </DrawerTitle>
           <DrawerClose>
-            <div className="outline-none rounded-none font-noto-sans-mono cursor-pointer text-white">
+            <div className="outline-none rounded-none font-questrial cursor-pointer text-white">
               <XIcon size={24} />
             </div>
           </DrawerClose>
