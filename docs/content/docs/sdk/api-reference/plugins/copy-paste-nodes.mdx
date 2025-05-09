@@ -31,58 +31,51 @@ import { WeaveCopyPasteNodesPlugin } from "@inditextech/weave-sdk";
 ## Instantiation
 
 ```ts
-new WeaveCopyPasteNodesPlugin(params: WeaveCopyPasteNodesPluginParams);
+new WeaveCopyPasteNodesPlugin();
 ```
 
 ## TypeScript types
 
 ```ts
-type WeaveCopyPasteNodesOnCopyCallback = (error?: Error) => void;
-type WeaveCopyPasteNodesOnPasteCallback = (error?: Error) => void;
-type WeaveCopyPasteNodesOnPasteExternalCallback = (item: ClipboardItem) => void;
+type WeaveCopyPasteNodesPluginOnCopyEvent = Error | undefined;
+type WeaveCopyPasteNodesPluginOnPasteEvent = Error | undefined;
+type WeaveCopyPasteNodesPluginOnPasteExternalEvent = ClipboardItem;
 
-type WeaveCopyPasteNodesPluginParams = {
-  callbacks?: WeaveCopyPasteNodesPluginCallbacks;
+type WeavePasteModel = {
+  weaveInstanceId: string;
+  weave: Record<string, WeaveStateElement>;
+  weaveMinPoint: Vector2d;
 };
 
-type WeaveCopyPasteNodesPluginCallbacks = {
-  onCopy?: WeaveCopyPasteNodesOnCopyCallback;
-  onPaste?: WeaveCopyPasteNodesOnPasteCallback;
-  onPasteExternal?: WeaveCopyPasteNodesOnPasteExternalCallback;
+type WeaveToPasteNode = {
+  konvaNode: Konva.Node;
+  node: NodeSerializable;
 };
 ```
 
-## Parameters
+## Events
 
-For `WeaveCopyPasteNodesPluginParams`:
+### onCopy
 
-<TypeTable
-  type={{
-    ["callbacks"]: {
-      description: "Callbacks available for the plugin.",
-      type: "WeaveCopyPasteNodesPluginCallbacks",
-    },
-  }}
-/>
+```ts
+onCopy: WeaveCopyPasteNodesPluginOnCopyEvent;
+```
 
-For `WeaveCopyPasteNodesPluginCallbacks`:
+The `onCopy` event is called when an user triggered a copy action and the copy finished.
 
-<TypeTable
-  type={{
-    ["onCopy"]: {
-      description:
-        "A callback that is called when a copy operation is performed.",
-      type: "WeaveCopyPasteNodesOnCopyCallback",
-    },
-    ["onPaste"]: {
-      description:
-        "A callback that is called when a paste operation is performed.",
-      type: "WeaveCopyPasteNodesOnPasteCallback",
-    },
-    ["onPasteExternal"]: {
-      description:
-        "A callback that is called when someone is trying to paste something that is external to the tab.",
-      type: "WeaveCopyPasteNodesOnPasteExternalCallback",
-    },
-  }}
-/>
+### onPaste
+
+```ts
+onPaste: WeaveCopyPasteNodesPluginOnPasteEvent;
+```
+
+The `onPaste` event is called when an user triggered a paste action and the paste finished.
+
+### onPasteExternal
+
+```ts
+onPasteExternal: WeaveCopyPasteNodesPluginOnPasteExternalEvent;
+```
+
+The `onPasteExternal` event is called when an user triggers a paste action from elements
+external to the actual tab of the browser.

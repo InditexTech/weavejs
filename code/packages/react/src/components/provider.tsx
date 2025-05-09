@@ -10,9 +10,7 @@ import {
   WeaveStagePanningPlugin,
   WeaveStageResizePlugin,
   WeaveStageZoomPlugin,
-  type WeaveStageZoomChanged,
   WeaveConnectedUsersPlugin,
-  type WeaveConnectedUsersChanged,
   WeaveUsersPointersPlugin,
   WeaveStageDropAreaPlugin,
   WeaveCopyPasteNodesPlugin,
@@ -20,10 +18,11 @@ import {
   WeaveAction,
   WeavePlugin,
   WeaveStore,
+  WeaveContextMenuPlugin,
+  WeaveNodesSnappingPlugin,
 } from '@inditextech/weave-sdk';
 import {
   type WeaveState,
-  type WeaveSelection,
   type WeaveUser,
   type WeaveFont,
   type WeaveCallbacks,
@@ -66,14 +65,8 @@ export const WeaveProvider = ({
   const setAppState = useWeave((state) => state.setAppState);
   const setStatus = useWeave((state) => state.setStatus);
   const setRoomLoaded = useWeave((state) => state.setRoomLoaded);
-  const setUsers = useWeave((state) => state.setUsers);
   const setCanUndo = useWeave((state) => state.setCanUndo);
   const setCanRedo = useWeave((state) => state.setCanRedo);
-  const setZoom = useWeave((state) => state.setZoom);
-  const setCanZoomIn = useWeave((state) => state.setCanZoomIn);
-  const setCanZoomOut = useWeave((state) => state.setCanZoomOut);
-  const setSelectedNodes = useWeave((state) => state.setSelectedNodes);
-  const setNode = useWeave((state) => state.setNode);
   const setActualAction = useWeave((state) => state.setActualAction);
 
   const {
@@ -132,18 +125,6 @@ export const WeaveProvider = ({
     [selectedNodes]
   );
 
-  const onNodesChange = React.useCallback((nodes: WeaveSelection[]) => {
-    if (nodes.length === 1) {
-      setNode(nodes[0].node);
-    }
-    if (nodes.length !== 1) {
-      setNode(undefined);
-    }
-
-    setSelectedNodes(nodes);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
   React.useEffect(() => {
     async function initWeave() {
       const weaveEle = document.getElementById(containerId);
@@ -176,36 +157,15 @@ export const WeaveProvider = ({
           instancePlugins.push(new WeaveStageGridPlugin());
           instancePlugins.push(new WeaveStagePanningPlugin());
           instancePlugins.push(new WeaveStageResizePlugin());
-          instancePlugins.push(
-            new WeaveStageZoomPlugin({
-              callbacks: {
-                onZoomChange: (zoomInfo: WeaveStageZoomChanged) => {
-                  setZoom(zoomInfo.scale);
-                  setCanZoomIn(zoomInfo.canZoomIn);
-                  setCanZoomOut(zoomInfo.canZoomOut);
-                },
-              },
-            })
-          );
-          instancePlugins.push(
-            new WeaveNodesSelectionPlugin({
-              callbacks: {
-                onNodesChange,
-              },
-            })
-          );
+          instancePlugins.push(new WeaveStageZoomPlugin());
+          instancePlugins.push(new WeaveNodesSelectionPlugin());
+          instancePlugins.push(new WeaveNodesSnappingPlugin());
           instancePlugins.push(new WeaveStageDropAreaPlugin());
+          instancePlugins.push(new WeaveCopyPasteNodesPlugin());
           instancePlugins.push(
             new WeaveConnectedUsersPlugin({
               config: {
                 getUser,
-              },
-              callbacks: {
-                onConnectedUsersChanged: (
-                  users: WeaveConnectedUsersChanged
-                ) => {
-                  setUsers(users);
-                },
               },
             })
           );
@@ -216,7 +176,14 @@ export const WeaveProvider = ({
               },
             })
           );
-          instancePlugins.push(new WeaveCopyPasteNodesPlugin());
+          instancePlugins.push(
+            new WeaveContextMenuPlugin({
+              config: {
+                xOffset: 10,
+                yOffset: 10,
+              },
+            })
+          );
         }
 
         weaveInstanceRef.current = new Weave(

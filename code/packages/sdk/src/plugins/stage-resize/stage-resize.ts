@@ -14,31 +14,44 @@ export class WeaveStageResizePlugin extends WeavePlugin {
     return WEAVE_STAGE_RESIZE_KEY;
   }
 
-  onInit(): void {
+  private resizeStage() {
     const stage = this.instance.getStage();
 
+    const containerParent = stage.container().parentNode;
+
+    if (!this.enabled) {
+      return;
+    }
+
+    if (containerParent) {
+      const containerBoundBox = stage.container().getBoundingClientRect();
+
+      const containerWidth = containerBoundBox.width;
+      const containerHeight = containerBoundBox.height;
+      stage.width(containerWidth);
+      stage.height(containerHeight);
+
+      const plugins = this.instance.getPlugins();
+      for (const pluginId of Object.keys(plugins)) {
+        const pluginInstance = plugins[pluginId];
+        pluginInstance.onRender?.();
+      }
+    }
+  }
+
+  onInit(): void {
+    // Resize when window is resized
     window.addEventListener('resize', () => {
-      const containerParent = stage.container().parentNode;
-
-      if (!this.enabled) {
-        return;
-      }
-
-      if (containerParent) {
-        const containerBoundBox = stage.container().getBoundingClientRect();
-
-        const containerWidth = containerBoundBox.width;
-        const containerHeight = containerBoundBox.height;
-        stage.width(containerWidth);
-        stage.height(containerHeight);
-
-        const plugins = this.instance.getPlugins();
-        for (const pluginId of Object.keys(plugins)) {
-          const pluginInstance = plugins[pluginId];
-          pluginInstance.onRender?.();
-        }
-      }
+      this.resizeStage();
     });
+
+    // Resize when stage container is resized
+    const resizeObserver = new ResizeObserver(() => {
+      this.resizeStage();
+    });
+
+    const stage = this.instance.getStage();
+    resizeObserver.observe(stage.container());
   }
 
   enable(): void {

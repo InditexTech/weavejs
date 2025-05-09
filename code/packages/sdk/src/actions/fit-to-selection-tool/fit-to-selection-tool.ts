@@ -10,7 +10,7 @@ import { type WeaveFitToSelectionToolActionParams } from './types';
 export class WeaveFitToSelectionToolAction extends WeaveAction {
   protected previousAction!: string;
   protected cancelAction!: () => void;
-  internalUpdate = undefined;
+  onPropsChange = undefined;
 
   getName(): string {
     return 'fitToSelectionTool';

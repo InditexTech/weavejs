@@ -7,10 +7,7 @@ import Konva from 'konva';
 import { type Vector2d } from 'konva/lib/types';
 import { type WeaveElementInstance } from '@inditextech/weave-types';
 import { WeaveAction } from '@/actions/action';
-import {
-  type WeaveRectangleToolActionState,
-  type WeaveRectangleToolCallbacks,
-} from './types';
+import { type WeaveRectangleToolActionState } from './types';
 import { RECTANGLE_TOOL_ACTION_NAME, RECTANGLE_TOOL_STATE } from './constants';
 import { WeaveNodesSelectionPlugin } from '@/plugins/nodes-selection/nodes-selection';
 import { SELECTION_TOOL_ACTION_NAME } from '../selection-tool/constants';
@@ -25,11 +22,11 @@ export class WeaveRectangleToolAction extends WeaveAction {
   protected clickPoint: Vector2d | null;
   protected container!: Konva.Group | Konva.Layer | undefined;
   protected cancelAction!: () => void;
-  internalUpdate = undefined;
+  onPropsChange = undefined;
   onInit = undefined;
 
-  constructor(callbacks: WeaveRectangleToolCallbacks) {
-    super(callbacks);
+  constructor() {
+    super();
 
     this.initialized = false;
     this.state = RECTANGLE_TOOL_STATE.IDLE;

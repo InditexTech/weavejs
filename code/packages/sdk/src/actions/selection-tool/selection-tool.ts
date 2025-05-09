@@ -11,7 +11,7 @@ export class WeaveSelectionToolAction extends WeaveAction {
   protected initialized: boolean = false;
   protected state: WeaveSelectionToolActionState;
   protected cancelAction!: () => void;
-  internalUpdate = undefined;
+  onPropsChange = undefined;
   onInit = undefined;
 
   constructor() {

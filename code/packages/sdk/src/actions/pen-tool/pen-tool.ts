@@ -7,10 +7,7 @@ import Konva from 'konva';
 import { type Vector2d } from 'konva/lib/types';
 import { type WeaveElementInstance } from '@inditextech/weave-types';
 import { WeaveAction } from '@/actions/action';
-import {
-  type WeavePenToolActionState,
-  type WeavePenToolCallbacks,
-} from './types';
+import { type WeavePenToolActionState } from './types';
 import { PEN_TOOL_STATE } from './constants';
 import { WeaveNodesSelectionPlugin } from '@/plugins/nodes-selection/nodes-selection';
 import type { WeaveLineNode } from '@/nodes/line/line';
@@ -27,11 +24,11 @@ export class WeavePenToolAction extends WeaveAction {
   protected tempPoint: Konva.Circle | undefined;
   protected tempNextPoint: Konva.Circle | undefined;
   protected cancelAction!: () => void;
-  internalUpdate = undefined;
+  onPropsChange = undefined;
   onInit = undefined;
 
-  constructor(callbacks: WeavePenToolCallbacks) {
-    super(callbacks);
+  constructor() {
+    super();
 
     this.initialized = false;
     this.state = PEN_TOOL_STATE.IDLE;

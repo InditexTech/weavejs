@@ -30,51 +30,21 @@ import { WeaveStageDropAreaPlugin } from "@inditextech/weave-sdk";
 ## Instantiation
 
 ```ts
-new WeaveStageDropAreaPlugin(params: WeaveStageDropAreaPluginParams);
+new WeaveStageDropAreaPlugin();
 ```
 
 ## TypeScript types
 
 ```ts
-type WeaveStageDropCallback = (event: DragEvent) => void;
-type WeaveStageDropUploadFileCallback = (event: File) => Promise<void>;
-
-export type WeaveStageDropAreaPluginParams = {
-  callbacks?: WeaveStageDropAreaPluginCallbacks;
-};
-
-type WeaveStageDropAreaPluginCallbacks = {
-  onStageDrop?: WeaveStageDropCallback;
-  doUploadFile?: WeaveStageDropUploadFileCallback;
-};
+type WeaveStageDropPluginOnStageDropEvent = DragEvent;
 ```
 
-## Parameters
+## Events
 
-For `WeaveStageDropAreaPluginParams`:
+### onStageDrop
 
-<TypeTable
-  type={{
-    ["callbacks"]: {
-      description: "Callbacks available for the plugin.",
-      type: "WeaveStageDropAreaPluginCallbacks",
-    },
-  }}
-/>
+```ts
+onStageDrop: WeaveStageDropPluginOnStageDropEvent;
+```
 
-For `WeaveStageDropAreaPluginCallbacks`:
-
-<TypeTable
-  type={{
-    ["onStageDrop"]: {
-      description:
-        "A callback that is called when an element is dropped on the stage (canvas).",
-      type: "WeaveStageDropCallback",
-    },
-    ["doUploadFile"]: {
-      description:
-        "A callback that is called when a file is needed to upload to an external environment.",
-      type: "WeaveStageDropUploadFileCallback",
-    },
-  }}
-/>
+The `onStageDrop` event is called when the user drops an element on the stage.

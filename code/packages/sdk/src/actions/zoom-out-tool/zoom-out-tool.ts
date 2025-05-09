@@ -9,7 +9,7 @@ import { type WeaveZoomOutToolActionParams } from './types';
 export class WeaveZoomOutToolAction extends WeaveAction {
   protected previousAction!: string;
   protected cancelAction!: () => void;
-  internalUpdate = undefined;
+  onPropsChange = undefined;
 
   getName(): string {
     return 'zoomOutTool';

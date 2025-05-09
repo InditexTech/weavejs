@@ -1,0 +1,37 @@
+---
+title: useWeaveEvents
+description: API reference for the useWeaveEvents hook
+---
+
+## Overview
+
+The useWeaveEvents hook is a core utility from the Weave.js React Helper library that setups
+the some events in order to manage them in the internal state using the [useWeave](/docs/react/api-reference/hooks/use-weave)
+hook, the events setup are:
+
+- `onZoomChange`
+- `onNodesChange`
+- `onConnectedUsersChange`
+
+Remember that in order to use the useWeaveEvents hook you need to wrap your app (or part of it) with
+the [WeaveProvider](/docs/react/api-reference/providers/weave-provider).
+
+## Import
+
+```shell
+import { useWeaveEvents } from "@inditextech/weave-react";
+```
+
+## Usage
+
+Usage is pretty straight-forward, we just instantiate the hook like this:
+
+```tsx
+import { useWeaveEvents } from "@inditextech/weave-react";
+
+const MyComponent = () => {
+  useWeaveEvents();
+
+  return <div>{`Events initialized`}</div>;
+};
+```

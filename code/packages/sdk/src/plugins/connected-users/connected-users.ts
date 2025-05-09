@@ -11,8 +11,8 @@ import {
 import {
   type WeaveConnectedUsersPluginParams,
   type WeaveConnectedUserInfoKey,
-  type WeaveConnectedUsersPluginCallbacks,
   type WeaveConnectedUsersPluginConfig,
+  type WeaveConnectedUsersChangeEvent,
 } from './types';
 import {
   WEAVE_CONNECTED_USER_INFO_KEY,
@@ -21,7 +21,6 @@ import {
 
 export class WeaveConnectedUsersPlugin extends WeavePlugin {
   private config!: WeaveConnectedUsersPluginConfig;
-  private callbacks!: WeaveConnectedUsersPluginCallbacks;
   private connectedUsers: Record<string, WeaveUser> = {};
   getLayerName = undefined;
   initLayer: undefined;
@@ -30,10 +29,9 @@ export class WeaveConnectedUsersPlugin extends WeavePlugin {
   constructor(params: WeaveConnectedUsersPluginParams) {
     super();
 
-    const { config, callbacks } = params ?? {};
+    const { config } = params ?? {};
 
     this.config = config;
-    this.callbacks = callbacks ?? {};
 
     this.connectedUsers = {};
   }
@@ -47,7 +45,10 @@ export class WeaveConnectedUsersPlugin extends WeavePlugin {
 
     const userInfo = this.config.getUser();
     store.setAwarenessInfo(WEAVE_CONNECTED_USER_INFO_KEY, userInfo);
-    this.callbacks?.onConnectedUsersChanged?.({ [userInfo.name]: userInfo });
+    this.instance.emitEvent<WeaveConnectedUsersChangeEvent>(
+      'onConnectedUsersChange',
+      { [userInfo.name]: userInfo }
+    );
 
     this.instance.addEventListener(
       'onAwarenessChange',
@@ -56,7 +57,10 @@ export class WeaveConnectedUsersPlugin extends WeavePlugin {
       ) => {
         if (!this.enabled) {
           this.connectedUsers = {};
-          this.callbacks?.onConnectedUsersChanged?.({});
+          this.instance.emitEvent<WeaveConnectedUsersChangeEvent>(
+            'onConnectedUsersChange',
+            {}
+          );
           return;
         }
 
@@ -73,7 +77,10 @@ export class WeaveConnectedUsersPlugin extends WeavePlugin {
         }
 
         if (!isEqual(this.connectedUsers, newConnectedUsers)) {
-          this.callbacks?.onConnectedUsersChanged?.(newConnectedUsers);
+          this.instance.emitEvent<WeaveConnectedUsersChangeEvent>(
+            'onConnectedUsersChange',
+            newConnectedUsers
+          );
         }
 
         this.connectedUsers = newConnectedUsers;

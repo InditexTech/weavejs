@@ -5,10 +5,8 @@
 import { type WeaveSelection } from '@inditextech/weave-types';
 import type Konva from 'konva';
 
-export type WeaveNodesSelectionChangeCallback = (
-  nodes: WeaveSelection[]
-) => void;
-export type WeaveNodesSelectionStageSelectionCallback = () => void;
+export type WeaveNodesSelectionPluginOnNodesChangeEvent = WeaveSelection[];
+export type WeaveNodesSelectionPluginOnStageSelectionEvent = undefined;
 
 export type WeaveNodesSelectionPluginConfig = {
   transformer?: Konva.TransformerConfig;
@@ -16,10 +14,4 @@ export type WeaveNodesSelectionPluginConfig = {
 
 export type WeaveNodesSelectionPluginParams = {
   config?: WeaveNodesSelectionPluginConfig;
-  callbacks?: WeaveNodesSelectionPluginCallbacks;
-};
-
-export type WeaveNodesSelectionPluginCallbacks = {
-  onNodesChange?: WeaveNodesSelectionChangeCallback;
-  onStageSelection?: WeaveNodesSelectionStageSelectionCallback;
 };

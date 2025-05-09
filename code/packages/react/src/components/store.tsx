@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-import { Weave, type WeaveConnectedUsersChanged } from '@inditextech/weave-sdk';
+import { Weave, type WeaveConnectedUsers } from '@inditextech/weave-sdk';
 import {
   WEAVE_INSTANCE_STATUS,
   type WeaveSelection,
@@ -22,7 +22,7 @@ interface WeaveRuntimeState {
   room: {
     loaded: boolean;
   };
-  users: WeaveConnectedUsersChanged;
+  users: WeaveConnectedUsers;
   undoRedo: {
     canUndo: boolean;
     canRedo: boolean;
@@ -45,7 +45,7 @@ interface WeaveRuntimeState {
   setAppState: (newAppState: WeaveState) => void;
   setConnectionStatus: (newConnectionStatus: string) => void;
   setRoomLoaded: (newStatus: boolean) => void;
-  setUsers: (newUsers: WeaveConnectedUsersChanged) => void;
+  setUsers: (newUsers: WeaveConnectedUsers) => void;
   setCanUndo: (newCanUndo: boolean) => void;
   setCanRedo: (newCanRedo: boolean) => void;
   setZoom: (newZoom: number) => void;

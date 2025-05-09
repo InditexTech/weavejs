@@ -7,10 +7,7 @@ import { type WeaveElementInstance } from '@inditextech/weave-types';
 import Konva from 'konva';
 import { type Vector2d } from 'konva/lib/types';
 import { WeaveAction } from '@/actions/action';
-import {
-  type WeaveBrushToolActionState,
-  type WeaveBrushToolCallbacks,
-} from './types';
+import { type WeaveBrushToolActionState } from './types';
 import { BRUSH_TOOL_STATE } from './constants';
 import { WeaveNodesSelectionPlugin } from '@/plugins/nodes-selection/nodes-selection';
 import type { WeaveLineNode } from '@/nodes/line/line';
@@ -23,11 +20,11 @@ export class WeaveBrushToolAction extends WeaveAction {
   protected container: Konva.Layer | Konva.Group | undefined;
   protected measureContainer: Konva.Layer | Konva.Group | undefined;
   protected cancelAction!: () => void;
-  internalUpdate = undefined;
+  onPropsChange = undefined;
   onInit = undefined;
 
-  constructor(callbacks: WeaveBrushToolCallbacks) {
-    super(callbacks);
+  constructor() {
+    super();
 
     this.initialized = false;
     this.state = BRUSH_TOOL_STATE.INACTIVE;

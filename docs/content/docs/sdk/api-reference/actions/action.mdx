@@ -176,13 +176,14 @@ This method triggers the action, as parameters receives:
 - **cancelAction**: a callback that allows to cancel the action.
 - **params**: are the params provided by the user when the action is triggered.
 
-### internalUpdate
+### onPropsChange
 
 ```ts
-internalUpdate?(): void
+onPropsChange?(): void
 ```
 
 This method, if defined is called when a property of the class is changed (via set).
+Useful to change the actions parameters when the action is active.
 
 ### cleanup
 

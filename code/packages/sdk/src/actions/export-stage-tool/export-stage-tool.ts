@@ -21,7 +21,7 @@ export class WeaveExportStageToolAction extends WeaveAction {
     quality: 1,
   };
   private options!: WeaveExportNodeOptions;
-  internalUpdate = undefined;
+  onPropsChange = undefined;
   onInit = undefined;
 
   getName(): string {

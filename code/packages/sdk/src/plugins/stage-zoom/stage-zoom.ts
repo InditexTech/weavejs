@@ -4,9 +4,8 @@
 
 import { WeavePlugin } from '@/plugins/plugin';
 import {
-  type WeaveStageZoomOnZoomChangeCallback,
-  type WeaveStageZoomPluginCallbacks,
   type WeaveStageZoomPluginConfig,
+  type WeaveStageZoomPluginOnZoomChangeEvent,
   type WeaveStageZoomPluginParams,
 } from './types';
 import Konva from 'konva';
@@ -18,24 +17,21 @@ export class WeaveStageZoomPlugin extends WeavePlugin {
   initLayer = undefined;
   onRender: undefined;
   private config!: WeaveStageZoomPluginConfig;
-  private callbacks!: WeaveStageZoomPluginCallbacks;
   private actualScale: number;
   private actualStep: number;
   private padding: number = 100;
   defaultStep: number = 3;
-  private onZoomChangeCb: WeaveStageZoomOnZoomChangeCallback | undefined;
 
-  constructor(params: Partial<WeaveStageZoomPluginParams>) {
+  constructor(params?: WeaveStageZoomPluginParams) {
     super();
 
-    const { config, callbacks } = params;
+    const { config } = params ?? {};
 
     this.config = {
       zoomSteps: [0.1, 0.25, 0.5, 1, 2, 4, 8],
       defaultZoom: 1,
       ...config,
     };
-    this.callbacks = callbacks ?? {};
 
     if (!this.config.zoomSteps.includes(this.config.defaultZoom)) {
       throw new Error(
@@ -48,7 +44,6 @@ export class WeaveStageZoomPlugin extends WeavePlugin {
     );
     this.actualScale = this.config.zoomSteps[this.actualStep];
     this.defaultStep = this.actualStep;
-    this.onZoomChangeCb = this.callbacks?.onZoomChange;
   }
 
   getName(): string {
@@ -108,8 +103,10 @@ export class WeaveStageZoomPlugin extends WeavePlugin {
         canZoomOut: this.canZoomOut(),
       };
 
-      this.onZoomChangeCb?.(callbackParams);
-      this.instance.emitEvent('onZoomChange', callbackParams);
+      this.instance.emitEvent<WeaveStageZoomPluginOnZoomChangeEvent>(
+        'onZoomChange',
+        callbackParams
+      );
     }
   }
 

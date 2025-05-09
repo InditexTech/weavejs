@@ -15,28 +15,9 @@ export type WeaveCopyPasteNodesPluginStateKeys =
 export type WeaveCopyPasteNodesPluginState =
   (typeof COPY_PASTE_NODES_PLUGIN_STATE)[WeaveCopyPasteNodesPluginStateKeys];
 
-export type WeaveCopyPasteNodesCanCopyChangeCallback = (
-  canCopy: boolean
-) => void;
-export type WeaveCopyPasteNodesCanPasteChangeCallback = (
-  canPaste: boolean,
-  nodes: WeaveToPasteNode[]
-) => void;
-export type WeaveCopyPasteNodesOnCopyCallback = (error?: Error) => void;
-export type WeaveCopyPasteNodesOnPasteCallback = (error?: Error) => void;
-export type WeaveCopyPasteNodesOnPasteExternalCallback = (
-  item: ClipboardItem
-) => void;
-
-export type WeaveCopyPasteNodesPluginParams = {
-  callbacks?: WeaveCopyPasteNodesPluginCallbacks;
-};
-
-export type WeaveCopyPasteNodesPluginCallbacks = {
-  onCopy?: WeaveCopyPasteNodesOnCopyCallback;
-  onPaste?: WeaveCopyPasteNodesOnPasteCallback;
-  onPasteExternal?: WeaveCopyPasteNodesOnPasteExternalCallback;
-};
+export type WeaveCopyPasteNodesPluginOnCopyEvent = Error | undefined;
+export type WeaveCopyPasteNodesPluginOnPasteEvent = Error | undefined;
+export type WeaveCopyPasteNodesPluginOnPasteExternalEvent = ClipboardItem;
 
 export type WeavePasteModel = {
   weaveInstanceId: string;

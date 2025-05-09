@@ -3,24 +3,17 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { WeavePlugin } from '@/plugins/plugin';
-import {
-  type WeaveStageDropAreaPluginCallbacks,
-  type WeaveStageDropAreaPluginParams,
-} from './types';
 import { WEAVE_STAGE_DROP_AREA_KEY } from './constants';
+import type { WeaveStageDropPluginOnStageDropEvent } from './types';
 
 export class WeaveStageDropAreaPlugin extends WeavePlugin {
-  private callbacks?: WeaveStageDropAreaPluginCallbacks;
   getLayerName = undefined;
   initLayer = undefined;
   onRender: undefined;
 
-  constructor(params?: WeaveStageDropAreaPluginParams) {
+  constructor() {
     super();
 
-    const { callbacks } = params ?? {};
-
-    this.callbacks = callbacks;
     this.enabled = true;
   }
 
@@ -44,8 +37,10 @@ export class WeaveStageDropAreaPlugin extends WeavePlugin {
       e.preventDefault();
       e.stopPropagation();
 
-      this.callbacks?.onStageDrop?.(e);
-      this.instance.emitEvent('onStageDrop', e);
+      this.instance.emitEvent<WeaveStageDropPluginOnStageDropEvent>(
+        'onStageDrop',
+        e
+      );
     });
   }
 

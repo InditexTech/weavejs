@@ -2,21 +2,14 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-import { type WeaveActionCallbacks } from '@/index';
 import { FRAME_TOOL_STATE } from './constants';
 
 export type WeaveFrameToolActionStateKeys = keyof typeof FRAME_TOOL_STATE;
 export type WeaveFrameToolActionState =
   (typeof FRAME_TOOL_STATE)[WeaveFrameToolActionStateKeys];
 
-export type WeaveFrameToolCallbacks = WeaveActionCallbacks;
-
 export type WeaveFrameToolActionTriggerParams = {
   title?: string;
-  fontFamily?: string;
-  titleHeight?: number;
-  borderWidth?: number;
-  borderColor?: string;
   frameWidth?: number;
   frameHeight?: number;
   frameOrientation?: string;
@@ -25,7 +18,6 @@ export type WeaveFrameToolActionTriggerParams = {
 
 export type WeaveFrameToolProps = {
   title: string;
-  fontFamily: string;
   editing: boolean;
   opacity: number;
 };

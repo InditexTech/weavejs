@@ -9,7 +9,7 @@ import { type WeaveFitToScreenToolActionParams } from './types';
 export class WeaveFitToScreenToolAction extends WeaveAction {
   protected previousAction!: string;
   protected cancelAction!: () => void;
-  internalUpdate = undefined;
+  onPropsChange = undefined;
 
   getName(): string {
     return 'fitToScreenTool';
