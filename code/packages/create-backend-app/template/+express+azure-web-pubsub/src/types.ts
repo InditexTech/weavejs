@@ -1,6 +1,6 @@
 export type ServiceConfig = {
   service: {
-    hostname: string;
-    port: number;
-  };
-};
+    hostname: string
+    port: number
+  }
+}

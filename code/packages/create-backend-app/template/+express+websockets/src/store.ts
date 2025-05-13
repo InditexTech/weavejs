@@ -1,36 +1,36 @@
-import path from 'path';
-import fs from 'fs/promises';
-import http from 'http';
-import { WeaveWebsocketsServer } from '@inditextech/weave-store-websockets/server';
-import { createFolder, existsFolder } from '@/utils';
+import path from 'path'
+import fs from 'fs/promises'
+import http from 'http'
+import { WeaveWebsocketsServer } from '@inditextech/weave-store-websockets/server'
+import { createFolder, existsFolder } from '@/utils'
 
-const VALID_ROOM_WEBSOCKET_URL = /\/sync\/rooms\/(.*)/;
+const VALID_ROOM_WEBSOCKET_URL = /\/sync\/rooms\/(.*)/
 
 export const setupStore = (server: http.Server) => {
   const wss = new WeaveWebsocketsServer({
-    performUpgrade: async (request: Request) => {
-      return VALID_ROOM_WEBSOCKET_URL.test(request.url ?? '');
+    performUpgrade: async (request: http.IncomingMessage) => {
+      return VALID_ROOM_WEBSOCKET_URL.test(request.url ?? '')
     },
-    extractRoomId: (request: Request) => {
-      const match = request.url?.match(VALID_ROOM_WEBSOCKET_URL);
+    extractRoomId: (request: http.IncomingMessage) => {
+      const match = request.url?.match(VALID_ROOM_WEBSOCKET_URL)
       if (match) {
-        return match[1];
+        return match[1]
       }
-      return undefined;
+      return undefined
     },
     fetchRoom: async (docName: string) => {
       try {
-        const roomsFolder = path.join(process.cwd(), 'rooms');
+        const roomsFolder = path.join(process.cwd(), 'rooms')
 
         if (!(await existsFolder(roomsFolder))) {
-          await createFolder(roomsFolder);
+          await createFolder(roomsFolder)
         }
 
-        const roomsFile = path.join(roomsFolder, docName);
-        return await fs.readFile(roomsFile);
+        const roomsFile = path.join(roomsFolder, docName)
+        return await fs.readFile(roomsFile)
       } catch (ex) {
-        console.error(ex);
-        return null;
+        console.error(ex)
+        return null
       }
     },
     persistRoom: async (
@@ -38,32 +38,32 @@ export const setupStore = (server: http.Server) => {
       actualState: Uint8Array<ArrayBufferLike>
     ) => {
       try {
-        const roomsFolder = path.join(process.cwd(), 'rooms');
+        const roomsFolder = path.join(process.cwd(), 'rooms')
 
         if (!(await existsFolder(roomsFolder))) {
-          await createFolder(roomsFolder);
+          await createFolder(roomsFolder)
         }
 
-        let folderExists = false;
+        let folderExists = false
         try {
-          await fs.access(roomsFolder);
-          folderExists = true;
+          await fs.access(roomsFolder)
+          folderExists = true
           // eslint-disable-next-line @typescript-eslint/no-unused-vars
         } catch (e) {
-          folderExists = false;
+          folderExists = false
         }
 
         if (!folderExists) {
-          await fs.mkdir(roomsFolder, { recursive: true });
+          await fs.mkdir(roomsFolder, { recursive: true })
         }
 
-        const roomsFile = path.join(roomsFolder, docName);
-        await fs.writeFile(roomsFile, actualState);
+        const roomsFile = path.join(roomsFolder, docName)
+        await fs.writeFile(roomsFile, actualState)
       } catch (ex) {
-        console.error(ex);
+        console.error(ex)
       }
-    },
-  });
+    }
+  })
 
-  wss.handleUpgrade(server);
-};
+  wss.handleUpgrade(server)
+}

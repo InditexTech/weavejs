@@ -1,46 +1,46 @@
-import path from 'path';
-import fs from 'fs/promises';
-import { WeaveAzureWebPubsubServer } from '@inditextech/weave-store-azure-web-pubsub/server';
-import { createFolder, existsFolder } from '@/utils';
+import path from 'path'
+import fs from 'fs/promises'
+import { WeaveAzureWebPubsubServer } from '@inditextech/weave-store-azure-web-pubsub/server'
+import { createFolder, existsFolder } from '@/utils'
 
-const endpoint = process.env.WEAVE_AZURE_WEB_PUBSUB_ENDPOINT;
-const key = process.env.WEAVE_AZURE_WEB_PUBSUB_KEY;
-const hubName = process.env.WEAVE_AZURE_WEB_PUBSUB_HUB_NAME;
+const endpoint = process.env.WEAVE_AZURE_WEB_PUBSUB_ENDPOINT
+const key = process.env.WEAVE_AZURE_WEB_PUBSUB_KEY
+const hubName = process.env.WEAVE_AZURE_WEB_PUBSUB_HUB_NAME
 
 if (!endpoint || !key || !hubName) {
-  throw new Error('Missing required environment variables');
+  throw new Error('Missing required environment variables')
 }
 
-let azureWebPubsubServer: WeaveAzureWebPubsubServer | null = null;
+let azureWebPubsubServer: WeaveAzureWebPubsubServer | null = null
 
 export const getAzureWebPubsubServer = () => {
   if (!azureWebPubsubServer) {
-    throw new Error('Azure Web Pubsub server not initialized');
+    throw new Error('Azure Web Pubsub server not initialized')
   }
 
-  return azureWebPubsubServer;
-};
+  return azureWebPubsubServer
+}
 
 export const setupStore = () => {
   azureWebPubsubServer = new WeaveAzureWebPubsubServer({
     pubsubConfig: {
       endpoint,
       key,
-      hubName,
+      hubName
     },
     fetchRoom: async (docName: string) => {
       try {
-        const roomsFolder = path.join(__dirname, 'rooms');
+        const roomsFolder = path.join(__dirname, 'rooms')
 
         if (!(await existsFolder(roomsFolder))) {
-          await createFolder(roomsFolder);
+          await createFolder(roomsFolder)
         }
 
-        const roomsFile = path.join(roomsFolder, docName);
-        return await fs.readFile(roomsFile);
+        const roomsFile = path.join(roomsFolder, docName)
+        return await fs.readFile(roomsFile)
       } catch (ex) {
-        console.error(ex);
-        return null;
+        console.error(ex)
+        return null
       }
     },
     persistRoom: async (
@@ -48,30 +48,30 @@ export const setupStore = () => {
       actualState: Uint8Array<ArrayBufferLike>
     ) => {
       try {
-        const roomsFolder = path.join(__dirname, 'rooms');
+        const roomsFolder = path.join(__dirname, 'rooms')
 
         if (!(await existsFolder(roomsFolder))) {
-          await createFolder(roomsFolder);
+          await createFolder(roomsFolder)
         }
 
-        let folderExists = false;
+        let folderExists = false
         try {
-          await fs.access(roomsFolder);
-          folderExists = true;
+          await fs.access(roomsFolder)
+          folderExists = true
           // eslint-disable-next-line @typescript-eslint/no-unused-vars
         } catch (e) {
-          folderExists = false;
+          folderExists = false
         }
 
         if (!folderExists) {
-          await fs.mkdir(roomsFolder, { recursive: true });
+          await fs.mkdir(roomsFolder, { recursive: true })
         }
 
-        const roomsFile = path.join(roomsFolder, docName);
-        await fs.writeFile(roomsFile, actualState);
+        const roomsFile = path.join(roomsFolder, docName)
+        await fs.writeFile(roomsFile, actualState)
       } catch (ex) {
-        console.error(ex);
+        console.error(ex)
       }
-    },
-  });
-};
+    }
+  })
+}
