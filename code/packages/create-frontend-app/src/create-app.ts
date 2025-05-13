@@ -90,105 +90,7 @@ async function copy(
 
 function createPackageJson(projectName: string, options: Options): object {
   if (options.template === '+nextjs+azure-web-pubsub') {
-    return {
-      name: projectName,
-      version: '0.0.0',
-      private: true,
-      scripts: {
-        build: 'next build',
-        dev: 'next dev --experimental-https',
-        lint: 'next lint',
-        start: 'next start',
-      },
-      dependencies: {
-        ...pick(versionPkg.dependencies, [
-          '@hookform/resolvers',
-          '@next/env',
-          '@radix-ui/react-accordion',
-          '@radix-ui/react-avatar',
-          '@radix-ui/react-checkbox',
-          '@radix-ui/react-dialog',
-          '@radix-ui/react-dropdown-menu',
-          '@radix-ui/react-label',
-          '@radix-ui/react-popover',
-          '@radix-ui/react-scroll-area',
-          '@radix-ui/react-select',
-          '@radix-ui/react-slider',
-          '@radix-ui/react-slot',
-          '@radix-ui/react-tabs',
-          '@radix-ui/react-tooltip',
-          '@react-three/fiber',
-          '@react-three/postprocessing',
-          '@tanstack/react-query',
-          'boring-avatars',
-          'class-variance-authority',
-          'clsx',
-          'cmdk',
-          'color',
-          'framer-motion',
-          'konva',
-          'motion',
-          'next',
-          'next-themes',
-          'ogl',
-          'onnxruntime-web',
-          'pdf-lib',
-          'platform-detect',
-          'postprocessing',
-          'react',
-          'react-dom',
-          'react-hook-form',
-          'react-number-format',
-          'sharp',
-          'sonner',
-          'tailwind-merge',
-          'tailwindcss-animate',
-          'three',
-          'uuid',
-          'vaul',
-          'zod',
-          'zustand',
-        ]),
-        ...pick(localVersions, [
-          '@inditextech/weave-react',
-          '@inditextech/weave-sdk',
-          '@inditextech/weave-store-azure-web-pubsub',
-        ]),
-      },
-      devDependencies: {
-        ...pick(versionPkg.devDependencies, [
-          '@eslint/eslintrc',
-          '@tailwindcss/postcss',
-          '@testing-library/dom',
-          '@testing-library/react',
-          '@types/node',
-          '@types/react',
-          '@types/react-dom',
-          '@vitejs/plugin-react',
-          'eslint',
-          'eslint-config-next',
-          'eslint-config-prettier',
-          'jsdom',
-          'lucide-react',
-          'tailwindcss',
-          'typescript',
-          'vite-tsconfig-paths',
-        ]),
-      },
-    };
-  }
-
-  return {
-    name: projectName,
-    version: '0.0.0',
-    private: true,
-    scripts: {
-      build: 'next build',
-      dev: 'next dev --experimental-https',
-      lint: 'next lint',
-      start: 'next start',
-    },
-    dependencies: {
+    const dependencies = {
       ...pick(versionPkg.dependencies, [
         '@hookform/resolvers',
         '@next/env',
@@ -240,10 +142,11 @@ function createPackageJson(projectName: string, options: Options): object {
       ...pick(localVersions, [
         '@inditextech/weave-react',
         '@inditextech/weave-sdk',
-        '@inditextech/weave-store-websockets',
+        '@inditextech/weave-store-azure-web-pubsub',
       ]),
-    },
-    devDependencies: {
+    };
+
+    const devDependencies = {
       ...pick(versionPkg.devDependencies, [
         '@eslint/eslintrc',
         '@tailwindcss/postcss',
@@ -262,8 +165,122 @@ function createPackageJson(projectName: string, options: Options): object {
         'typescript',
         'vite-tsconfig-paths',
       ]),
-    },
+    };
+
+    return {
+      name: projectName,
+      version: '0.0.0',
+      private: true,
+      scripts: {
+        build: 'next build',
+        dev: 'next dev --experimental-https',
+        lint: 'next lint',
+        start: 'next start',
+      },
+      dependencies: sortObjectKeys(dependencies),
+      devDependencies: sortObjectKeys(devDependencies),
+    };
+  }
+
+  const dependencies = {
+    ...pick(versionPkg.dependencies, [
+      '@hookform/resolvers',
+      '@next/env',
+      '@radix-ui/react-accordion',
+      '@radix-ui/react-avatar',
+      '@radix-ui/react-checkbox',
+      '@radix-ui/react-dialog',
+      '@radix-ui/react-dropdown-menu',
+      '@radix-ui/react-label',
+      '@radix-ui/react-popover',
+      '@radix-ui/react-scroll-area',
+      '@radix-ui/react-select',
+      '@radix-ui/react-slider',
+      '@radix-ui/react-slot',
+      '@radix-ui/react-tabs',
+      '@radix-ui/react-tooltip',
+      '@react-three/fiber',
+      '@react-three/postprocessing',
+      '@tanstack/react-query',
+      'boring-avatars',
+      'class-variance-authority',
+      'clsx',
+      'cmdk',
+      'color',
+      'framer-motion',
+      'konva',
+      'motion',
+      'next',
+      'next-themes',
+      'ogl',
+      'onnxruntime-web',
+      'pdf-lib',
+      'platform-detect',
+      'postprocessing',
+      'react',
+      'react-dom',
+      'react-hook-form',
+      'react-number-format',
+      'sharp',
+      'sonner',
+      'tailwind-merge',
+      'tailwindcss-animate',
+      'three',
+      'uuid',
+      'vaul',
+      'zod',
+      'zustand',
+    ]),
+    ...pick(localVersions, [
+      '@inditextech/weave-react',
+      '@inditextech/weave-sdk',
+      '@inditextech/weave-store-websockets',
+    ]),
   };
+
+  const devDependencies = {
+    ...pick(versionPkg.devDependencies, [
+      '@eslint/eslintrc',
+      '@tailwindcss/postcss',
+      '@testing-library/dom',
+      '@testing-library/react',
+      '@types/node',
+      '@types/react',
+      '@types/react-dom',
+      '@vitejs/plugin-react',
+      'eslint',
+      'eslint-config-next',
+      'eslint-config-prettier',
+      'jsdom',
+      'lucide-react',
+      'tailwindcss',
+      'typescript',
+      'vite-tsconfig-paths',
+    ]),
+  };
+
+  return {
+    name: projectName,
+    version: '0.0.0',
+    private: true,
+    scripts: {
+      build: 'next build',
+      dev: 'next dev --experimental-https',
+      lint: 'next lint',
+      start: 'next start',
+    },
+    dependencies: sortObjectKeys(dependencies),
+    devDependencies: sortObjectKeys(devDependencies),
+  };
+}
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function sortObjectKeys<T extends Record<string, any>>(obj: T): T {
+  const sortedEntries = Object.keys(obj)
+    .sort()
+    .map((key) => [key, obj[key]] as [keyof T, T[keyof T]]);
+
+  return Object.fromEntries(sortedEntries) as T;
 }
 
 function pick<T extends object, K extends keyof T>(
