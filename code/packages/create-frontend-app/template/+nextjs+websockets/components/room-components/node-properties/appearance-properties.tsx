@@ -1,15 +1,11 @@
-// SPDX-FileCopyrightText: 2025 2025 INDUSTRIA DE DISEÑO TEXTIL S.A. (INDITEX S.A.)
-//
-// SPDX-License-Identifier: Apache-2.0
+'use client';
 
-"use client";
-
-import React from "react";
-import { cn } from "@/lib/utils";
-import { WeaveStateElement } from "@inditextech/weave-types";
-import { useWeave } from "@inditextech/weave-react";
-import { useCollaborationRoom } from "@/store/store";
-import { InputNumber } from "../inputs/input-number";
+import React from 'react';
+import { cn } from '@/lib/utils';
+import { WeaveStateElement } from '@inditextech/weave-types';
+import { useWeave } from '@inditextech/weave-react';
+import { useCollaborationRoom } from '@/store/store';
+import { InputNumber } from '../inputs/input-number';
 
 export function AppearanceProperties() {
   const instance = useWeave((state) => state.instance);
@@ -30,16 +26,16 @@ export function AppearanceProperties() {
 
   React.useEffect(() => {
     if (!instance) return;
-    if (actualAction && nodePropertiesAction === "create") {
+    if (actualAction && nodePropertiesAction === 'create') {
       setActualNode({
-        key: "creating",
-        type: "undefined",
+        key: 'creating',
+        type: 'undefined',
         props: {
           ...nodeCreateProps,
         },
       });
     }
-    if (node && nodePropertiesAction === "update") {
+    if (node && nodePropertiesAction === 'update') {
       setActualNode(node);
     }
     if (!actualAction && !node) {
@@ -50,10 +46,10 @@ export function AppearanceProperties() {
   const updateElement = React.useCallback(
     (updatedNode: WeaveStateElement) => {
       if (!instance) return;
-      if (actualAction && nodePropertiesAction === "create") {
+      if (actualAction && nodePropertiesAction === 'create') {
         instance.updatePropsAction(actualAction, updatedNode.props);
       }
-      if (nodePropertiesAction === "update") {
+      if (nodePropertiesAction === 'update') {
         instance.updateNode(updatedNode);
       }
     },
@@ -64,7 +60,7 @@ export function AppearanceProperties() {
 
   if (!actualAction && !actualNode) return null;
 
-  if (["colorTokenTool", "frameTool"].includes(actualAction)) return null;
+  if (['colorTokenTool', 'frameTool'].includes(actualAction)) return null;
 
   return (
     <div className="border-b border-zinc-200">
@@ -77,8 +73,8 @@ export function AppearanceProperties() {
         <div className="grid grid-cols-2 gap-3 w-full">
           <div
             className={cn({
-              ["col-span-1"]: ["rectangle"].includes(actualNode.type),
-              ["col-span-2"]: !["rectangle"].includes(actualNode.type),
+              ['col-span-1']: ['rectangle'].includes(actualNode.type),
+              ['col-span-2']: !['rectangle'].includes(actualNode.type),
             })}
           >
             <InputNumber
@@ -98,7 +94,7 @@ export function AppearanceProperties() {
               }}
             />
           </div>
-          {["rectangle"].includes(actualNode.type) && (
+          {['rectangle'].includes(actualNode.type) && (
             <InputNumber
               label="Corner Radius (px)"
               value={actualNode.props.cornerRadius ?? 0}

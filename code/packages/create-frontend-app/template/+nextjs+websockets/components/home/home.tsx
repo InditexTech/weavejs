@@ -1,16 +1,12 @@
-// SPDX-FileCopyrightText: 2025 2025 INDUSTRIA DE DISEÑO TEXTIL S.A. (INDITEX S.A.)
-//
-// SPDX-License-Identifier: Apache-2.0
+'use client';
 
-"use client";
-
-import React from "react";
-import { Toaster } from "@/components/ui/sonner";
-import { motion } from "motion/react";
-import { Logo } from "@/components/utils/logo";
-import LoginForm from "../home-components/login-form";
-import Dither from "../ui/reactbits/Backgrounds/Dither/Dither";
-import RotatingText from "../ui/reactbits/TextAnimations/RotatingText/RotatingText";
+import React from 'react';
+import { Toaster } from '@/components/ui/sonner';
+import { motion } from 'motion/react';
+import { Logo } from '@/components/utils/logo';
+import LoginForm from '../home-components/login-form';
+import Dither from '../ui/reactbits/Backgrounds/Dither/Dither';
+import RotatingText from '../ui/reactbits/TextAnimations/RotatingText/RotatingText';
 
 export const Home = () => {
   return (
@@ -55,21 +51,21 @@ export const Home = () => {
             <div className="w-full flex gap-1 items-center justify-center bg-transparent">
               <RotatingText
                 texts={[
-                  "collaborative",
-                  "easy to use",
-                  "extensible",
-                  "visual",
-                  "open source",
+                  'collaborative',
+                  'easy to use',
+                  'extensible',
+                  'visual',
+                  'open source',
                 ]}
                 mainClassName="font-questrial leading-[100px] w-full h-full text-black overflow-hidden justify-center items-center text-3xl"
-                staggerFrom={"last"}
-                initial={{ y: "100%" }}
+                staggerFrom={'last'}
+                initial={{ y: '100%' }}
                 animate={{ y: 0 }}
-                exit={{ y: "-120%" }}
+                exit={{ y: '-120%' }}
                 staggerDuration={0.025}
                 splitBy="characters"
                 splitLevelClassName="overflow-hidden pb-0.5 sm:pb-1 md:pb-1"
-                transition={{ type: "spring", damping: 30, stiffness: 400 }}
+                transition={{ type: 'spring', damping: 30, stiffness: 400 }}
                 rotationInterval={2000}
               />
             </div>

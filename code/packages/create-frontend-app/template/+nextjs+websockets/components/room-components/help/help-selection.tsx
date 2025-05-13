@@ -1,10 +1,6 @@
-// SPDX-FileCopyrightText: 2025 2025 INDUSTRIA DE DISEÑO TEXTIL S.A. (INDITEX S.A.)
-//
-// SPDX-License-Identifier: Apache-2.0
-
-import { SquareDashed, TextSelect } from "lucide-react";
-import { SYSTEM_OS } from "@/lib/utils";
-import { HelpShortcutElement } from "./help-shortcut-element";
+import { SquareDashed, TextSelect } from 'lucide-react';
+import { SYSTEM_OS } from '@/lib/utils';
+import { HelpShortcutElement } from './help-shortcut-element';
 
 export const HelpSelection = () => {
   return (
@@ -14,8 +10,8 @@ export const HelpSelection = () => {
           icon={<TextSelect />}
           label="Select all"
           shortcuts={{
-            [SYSTEM_OS.MAC]: "⇧ ⌘ A",
-            [SYSTEM_OS.OTHER]: "⇧ Ctrl A",
+            [SYSTEM_OS.MAC]: '⇧ ⌘ A',
+            [SYSTEM_OS.OTHER]: '⇧ Ctrl A',
           }}
         />
       </div>
@@ -24,8 +20,8 @@ export const HelpSelection = () => {
           icon={<SquareDashed />}
           label="Select none"
           shortcuts={{
-            [SYSTEM_OS.MAC]: "⇧ Esc",
-            [SYSTEM_OS.OTHER]: "⇧ Esc",
+            [SYSTEM_OS.MAC]: '⇧ Esc',
+            [SYSTEM_OS.OTHER]: '⇧ Esc',
           }}
         />
       </div>

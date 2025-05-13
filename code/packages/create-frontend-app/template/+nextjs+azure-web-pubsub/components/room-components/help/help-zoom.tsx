@@ -1,10 +1,6 @@
-// SPDX-FileCopyrightText: 2025 2025 INDUSTRIA DE DISEÑO TEXTIL S.A. (INDITEX S.A.)
-//
-// SPDX-License-Identifier: Apache-2.0
-
-import { Fullscreen, Maximize, ZoomIn, ZoomOut } from "lucide-react";
-import { SYSTEM_OS } from "@/lib/utils";
-import { HelpShortcutElement } from "./help-shortcut-element";
+import { Fullscreen, Maximize, ZoomIn, ZoomOut } from 'lucide-react';
+import { SYSTEM_OS } from '@/lib/utils';
+import { HelpShortcutElement } from './help-shortcut-element';
 
 export const HelpZoom = () => {
   return (
@@ -14,16 +10,16 @@ export const HelpZoom = () => {
           icon={<ZoomIn />}
           label="Zoom in"
           shortcuts={{
-            [SYSTEM_OS.MAC]: "⌘ +",
-            [SYSTEM_OS.OTHER]: "Ctrl +",
+            [SYSTEM_OS.MAC]: '⌘ +',
+            [SYSTEM_OS.OTHER]: 'Ctrl +',
           }}
         />
         <HelpShortcutElement
           icon={<ZoomOut />}
           label="Zoom out"
           shortcuts={{
-            [SYSTEM_OS.MAC]: "⌘ -",
-            [SYSTEM_OS.OTHER]: "Ctrl -",
+            [SYSTEM_OS.MAC]: '⌘ -',
+            [SYSTEM_OS.OTHER]: 'Ctrl -',
           }}
         />
       </div>
@@ -32,16 +28,16 @@ export const HelpZoom = () => {
           icon={<Maximize />}
           label="Fit to screen"
           shortcuts={{
-            [SYSTEM_OS.MAC]: "⇧ 1",
-            [SYSTEM_OS.OTHER]: "⇧ 1",
+            [SYSTEM_OS.MAC]: '⇧ 1',
+            [SYSTEM_OS.OTHER]: '⇧ 1',
           }}
         />
         <HelpShortcutElement
           icon={<Fullscreen />}
           label="Fit to selection"
           shortcuts={{
-            [SYSTEM_OS.MAC]: "⇧ 2",
-            [SYSTEM_OS.OTHER]: "⇧ 2",
+            [SYSTEM_OS.MAC]: '⇧ 2',
+            [SYSTEM_OS.OTHER]: '⇧ 2',
           }}
         />
       </div>

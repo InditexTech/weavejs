@@ -1,14 +1,10 @@
-// SPDX-FileCopyrightText: 2025 2025 INDUSTRIA DE DISEÑO TEXTIL S.A. (INDITEX S.A.)
-//
-// SPDX-License-Identifier: Apache-2.0
-
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
-} from "@/components/ui/tooltip";
+} from '@/components/ui/tooltip';
 import {
   Drawer,
   DrawerClose,
@@ -16,19 +12,19 @@ import {
   DrawerHeader,
   DrawerTitle,
   DrawerTrigger,
-} from "@/components/ui/drawer";
-import { Keyboard, XIcon } from "lucide-react";
-import { SYSTEM_OS } from "@/lib/utils";
-import { HelpTools } from "./help-tools";
-import { ShortcutElement } from "./shortcut-element";
-import React from "react";
-import { useKeyDown } from "../hooks/use-key-down";
-import { useGetOs } from "../hooks/use-get-os";
-import { HelpZoom } from "./help-zoom";
-import { HelpView } from "./help-view";
-import { HelpSelection } from "./help-selection";
-import { HelpEdit } from "./help-edit";
-import { HelpArrange } from "./help-arrange";
+} from '@/components/ui/drawer';
+import { Keyboard, XIcon } from 'lucide-react';
+import { SYSTEM_OS } from '@/lib/utils';
+import { HelpTools } from './help-tools';
+import { ShortcutElement } from './shortcut-element';
+import React from 'react';
+import { useKeyDown } from '../hooks/use-key-down';
+import { useGetOs } from '../hooks/use-get-os';
+import { HelpZoom } from './help-zoom';
+import { HelpView } from './help-view';
+import { HelpSelection } from './help-selection';
+import { HelpEdit } from './help-edit';
+import { HelpArrange } from './help-arrange';
 
 export const HelpDrawer = () => {
   const os = useGetOs();
@@ -39,7 +35,7 @@ export const HelpDrawer = () => {
     () => {
       setOpen((prev) => !prev);
     },
-    ["KeyK"],
+    ['KeyK'],
     (e) => ([SYSTEM_OS.MAC as string].includes(os) ? e.metaKey : e.ctrlKey)
   );
 
@@ -60,8 +56,8 @@ export const HelpDrawer = () => {
                 <ShortcutElement
                   variant="light"
                   shortcuts={{
-                    [SYSTEM_OS.MAC]: "⌘ K",
-                    [SYSTEM_OS.OTHER]: "Ctrl K",
+                    [SYSTEM_OS.MAC]: '⌘ K',
+                    [SYSTEM_OS.OTHER]: 'Ctrl K',
                   }}
                 />
               </div>

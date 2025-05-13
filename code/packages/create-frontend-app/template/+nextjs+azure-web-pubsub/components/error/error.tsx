@@ -1,31 +1,27 @@
-// SPDX-FileCopyrightText: 2025 2025 INDUSTRIA DE DISEÑO TEXTIL S.A. (INDITEX S.A.)
-//
-// SPDX-License-Identifier: Apache-2.0
+'use client';
 
-"use client";
-
-import Link from "next/link";
-import React from "react";
-import { Button } from "@/components/ui/button";
-import { AlertCircle } from "lucide-react";
+import Link from 'next/link';
+import React from 'react';
+import { Button } from '@/components/ui/button';
+import { AlertCircle } from 'lucide-react';
 import {
   Card,
   CardContent,
   CardFooter,
   CardHeader,
-} from "@/components/ui/card";
-import { Logo } from "@/components/utils/logo";
-import { useSearchParams } from "next/navigation";
-import { getError } from "./errors";
-import Dither from "../ui/reactbits/Backgrounds/Dither/Dither";
-import { motion } from "framer-motion";
+} from '@/components/ui/card';
+import { Logo } from '@/components/utils/logo';
+import { useSearchParams } from 'next/navigation';
+import { getError } from './errors';
+import Dither from '../ui/reactbits/Backgrounds/Dither/Dither';
+import { motion } from 'framer-motion';
 
 export const Error = () => {
   const searchParams = useSearchParams();
 
-  const errorCode = searchParams.get("errorCode");
+  const errorCode = searchParams.get('errorCode');
 
-  const { description, action, href } = getError(errorCode || "");
+  const { description, action, href } = getError(errorCode || '');
 
   return (
     <div className="flex min-h-screen flex-col items-center justify-center bg-background relative gap-5">

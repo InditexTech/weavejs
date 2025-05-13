@@ -1,14 +1,10 @@
-// SPDX-FileCopyrightText: 2025 2025 INDUSTRIA DE DISEÑO TEXTIL S.A. (INDITEX S.A.)
-//
-// SPDX-License-Identifier: Apache-2.0
+'use client';
 
-"use client";
-
-import React from "react";
-import { WeaveStateElement } from "@inditextech/weave-types";
-import { useWeave } from "@inditextech/weave-react";
-import { useCollaborationRoom } from "@/store/store";
-import { InputNumber } from "../inputs/input-number";
+import React from 'react';
+import { WeaveStateElement } from '@inditextech/weave-types';
+import { useWeave } from '@inditextech/weave-react';
+import { useCollaborationRoom } from '@/store/store';
+import { InputNumber } from '../inputs/input-number';
 
 export function ImageProperties() {
   const instance = useWeave((state) => state.instance);
@@ -29,14 +25,14 @@ export function ImageProperties() {
 
   React.useEffect(() => {
     if (!instance) return;
-    if (node && nodePropertiesAction === "update") {
+    if (node && nodePropertiesAction === 'update') {
       setActualNode(node);
     }
   }, [instance, actualAction, node, nodePropertiesAction, nodeCreateProps]);
 
   if (!instance || !actualNode) return null;
 
-  if (!["image"].includes(actualNode.type)) {
+  if (!['image'].includes(actualNode.type)) {
     return null;
   }
 

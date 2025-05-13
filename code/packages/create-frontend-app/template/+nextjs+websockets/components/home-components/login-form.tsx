@@ -1,15 +1,11 @@
-// SPDX-FileCopyrightText: 2025 2025 INDUSTRIA DE DISEÑO TEXTIL S.A. (INDITEX S.A.)
-//
-// SPDX-License-Identifier: Apache-2.0
+'use client';
 
-"use client";
-
-import React from "react";
-import { motion } from "motion/react";
-import { useRouter } from "next/navigation";
-import { z } from "zod";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
+import React from 'react';
+import { motion } from 'motion/react';
+import { useRouter } from 'next/navigation';
+import { z } from 'zod';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { useForm } from 'react-hook-form';
 import {
   Form,
   FormControl,
@@ -17,23 +13,23 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { useCollaborationRoom } from "@/store/store";
+} from '@/components/ui/form';
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
+import { useCollaborationRoom } from '@/store/store';
 
 const formSchema = z
   .object({
     username: z
       .string()
       .trim()
-      .min(1, { message: "The username is required" })
-      .max(50, { message: "The username must be maximum 50 characters long" }),
+      .min(1, { message: 'The username is required' })
+      .max(50, { message: 'The username must be maximum 50 characters long' }),
     roomId: z
       .string()
       .trim()
-      .min(1, { message: "The room name is required" })
-      .max(50, { message: "The room name must be maximum 50 characters long" }),
+      .min(1, { message: 'The room name is required' })
+      .max(50, { message: 'The room name must be maximum 50 characters long' }),
   })
   .required();
 
@@ -46,8 +42,8 @@ function LoginForm() {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      username: "",
-      roomId: "",
+      username: '',
+      roomId: '',
     },
   });
 
@@ -57,7 +53,7 @@ function LoginForm() {
       name: values.username,
       email: `${values.username}@weavejs.com`,
     });
-    router.push(`/room/${values.roomId}?userName=${values.username}`);
+    router.push(`/rooms/${values.roomId}?userName=${values.username}`);
   }
 
   return (
@@ -115,7 +111,7 @@ function LoginForm() {
               type="submit"
               className="cursor-pointer font-questrial rounded-md mt-8"
             >
-              ENTER THE ROOM
+              ENTER
             </Button>
           </div>
         </form>

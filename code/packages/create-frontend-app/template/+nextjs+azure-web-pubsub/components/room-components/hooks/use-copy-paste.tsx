@@ -1,14 +1,10 @@
-// SPDX-FileCopyrightText: 2025 2025 INDUSTRIA DE DISEÑO TEXTIL S.A. (INDITEX S.A.)
-//
-// SPDX-License-Identifier: Apache-2.0
-
 import {
   WeaveCopyPasteNodesPluginOnCopyEvent,
   WeaveCopyPasteNodesPluginOnPasteEvent,
-} from "@inditextech/weave-sdk";
-import React from "react";
-import { useWeave } from "@inditextech/weave-react";
-import { toast } from "sonner";
+} from '@inditextech/weave-sdk';
+import React from 'react';
+import { useWeave } from '@inditextech/weave-react';
+import { toast } from 'sonner';
 
 function useCopyPaste() {
   const instance = useWeave((state) => state.instance);
@@ -16,10 +12,10 @@ function useCopyPaste() {
   const onCopyHandler = React.useCallback(
     (error: WeaveCopyPasteNodesPluginOnCopyEvent): void => {
       if (error) {
-        console.error("onCopy", error);
-        toast.error("Aan error occurred when copying to the clipboard");
+        console.error('onCopy', error);
+        toast.error('Aan error occurred when copying to the clipboard');
       } else {
-        toast.success("Copy successful");
+        toast.success('Copy successful');
       }
     },
     []
@@ -28,10 +24,10 @@ function useCopyPaste() {
   const onPasteHandler = React.useCallback(
     (error: WeaveCopyPasteNodesPluginOnPasteEvent): void => {
       if (error) {
-        console.error("onPaste", error);
-        toast.error("Aan error occurred when reading from the clipboard");
+        console.error('onPaste', error);
+        toast.error('Aan error occurred when reading from the clipboard');
       } else {
-        toast.success("Paste successful");
+        toast.success('Paste successful');
       }
     },
     []
@@ -40,12 +36,12 @@ function useCopyPaste() {
   React.useEffect(() => {
     if (!instance) return;
 
-    instance.addEventListener("onCopy", onCopyHandler);
-    instance.addEventListener("onPaste", onPasteHandler);
+    instance.addEventListener('onCopy', onCopyHandler);
+    instance.addEventListener('onPaste', onPasteHandler);
 
     return () => {
-      instance.removeEventListener("onCopy", onCopyHandler);
-      instance.removeEventListener("onPaste", onPasteHandler);
+      instance.removeEventListener('onCopy', onCopyHandler);
+      instance.removeEventListener('onPaste', onPasteHandler);
     };
   }, [instance, onCopyHandler, onPasteHandler]);
 }

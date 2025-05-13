@@ -1,11 +1,7 @@
-// SPDX-FileCopyrightText: 2025 2025 INDUSTRIA DE DISEÑO TEXTIL S.A. (INDITEX S.A.)
-//
-// SPDX-License-Identifier: Apache-2.0
+'use client';
 
-"use client";
-
-import React from "react";
-import { NumberInput } from "./number-input";
+import React from 'react';
+import { NumberInput } from './number-input';
 
 type InputNumberProps = {
   label?: string;
@@ -31,10 +27,10 @@ export const InputNumber = ({
   }, [value]);
 
   const handleBlur = () => {
-    let numberToSave = actualValue === "" ? "0" : actualValue;
-    numberToSave = numberToSave.replace(/^0+/, "");
+    let numberToSave = actualValue === '' ? '0' : actualValue;
+    numberToSave = numberToSave.replace(/^0+/, '');
     if (isNaN(parseFloat(numberToSave))) {
-      numberToSave = "0";
+      numberToSave = '0';
     }
     onChange?.(parseFloat(actualValue));
   };
@@ -52,7 +48,7 @@ export const InputNumber = ({
         setActualValue(e.target.value);
       }}
       onKeyDown={(e) => {
-        if (e.key === "Enter") {
+        if (e.key === 'Enter') {
           e.preventDefault();
           e.stopPropagation();
           const input = e.target as HTMLInputElement;

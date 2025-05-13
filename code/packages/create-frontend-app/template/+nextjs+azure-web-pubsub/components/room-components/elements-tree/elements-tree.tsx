@@ -1,12 +1,8 @@
-// SPDX-FileCopyrightText: 2025 2025 INDUSTRIA DE DISEÑO TEXTIL S.A. (INDITEX S.A.)
-//
-// SPDX-License-Identifier: Apache-2.0
-
-import { TreeView, TreeDataItem } from "@/components/ui/tree-view";
-import { WeaveSelection, WeaveStateElement } from "@inditextech/weave-types";
-import React from "react";
-import { useCollaborationRoom } from "@/store/store";
-import { useWeave } from "@inditextech/weave-react";
+import { TreeView, TreeDataItem } from '@/components/ui/tree-view';
+import { WeaveSelection, WeaveStateElement } from '@inditextech/weave-types';
+import React from 'react';
+import { useCollaborationRoom } from '@/store/store';
+import { useWeave } from '@inditextech/weave-react';
 import {
   Frame,
   Spline,
@@ -16,9 +12,9 @@ import {
   Type,
   X,
   Trash,
-} from "lucide-react";
-import { Weave, WeaveNodesSelectionPlugin } from "@inditextech/weave-sdk";
-import { SIDEBAR_ELEMENTS } from "@/lib/constants";
+} from 'lucide-react';
+import { Weave, WeaveNodesSelectionPlugin } from '@inditextech/weave-sdk';
+import { SIDEBAR_ELEMENTS } from '@/lib/constants';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const iconsMap: Record<string, any> = {
@@ -26,7 +22,7 @@ const iconsMap: Record<string, any> = {
   text: Type,
   image: Image,
   frame: Frame,
-  "color-token": Tag,
+  'color-token': Tag,
   line: Spline,
 };
 
@@ -38,7 +34,7 @@ function mapElementsToTree(
   const elementsMapped = elements.map((element) => {
     return {
       id: element.key,
-      icon: iconsMap[element.props.nodeType ?? "rectangle"],
+      icon: iconsMap[element.props.nodeType ?? 'rectangle'],
       name: element.key,
       actions: [
         <button
@@ -46,7 +42,7 @@ function mapElementsToTree(
           onClick={(e) => {
             e.stopPropagation();
             const nodesSelectionPlugin =
-              instance?.getPlugin<WeaveNodesSelectionPlugin>("nodesSelection");
+              instance?.getPlugin<WeaveNodesSelectionPlugin>('nodesSelection');
             if (instance && nodesSelectionPlugin) {
               instance.selectNodesByKey([element.key]);
               nodesSelectionPlugin.removeSelectedNodes();
@@ -97,13 +93,13 @@ export const ElementsTree = () => {
     }
 
     if (instance) {
-      instance.addEventListener("onStateChange", handleOnStateChange);
+      instance.addEventListener('onStateChange', handleOnStateChange);
       setElementsTree(instance.getElementsTree());
     }
 
     return () => {
       if (instance) {
-        instance.removeEventListener("onStateChange", handleOnStateChange);
+        instance.removeEventListener('onStateChange', handleOnStateChange);
       }
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -115,13 +111,13 @@ export const ElementsTree = () => {
     }
 
     if (instance) {
-      instance.addEventListener("onNodesChange", handleOnNodesSelectedChange);
+      instance.addEventListener('onNodesChange', handleOnNodesSelectedChange);
     }
 
     return () => {
       if (instance) {
         instance.removeEventListener(
-          "onNodesChange",
+          'onNodesChange',
           handleOnNodesSelectedChange
         );
       }
@@ -174,7 +170,7 @@ export const ElementsTree = () => {
               initialSelectedItems={selectedNodes}
               onSelectedItemsChange={(items: string[]) => {
                 instance.selectNodesByKey(items);
-                instance.triggerAction("fitToSelectionTool", {
+                instance.triggerAction('fitToSelectionTool', {
                   previousAction: actualAction,
                 });
               }}

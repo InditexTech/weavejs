@@ -1,11 +1,7 @@
-// SPDX-FileCopyrightText: 2025 2025 INDUSTRIA DE DISEÑO TEXTIL S.A. (INDITEX S.A.)
-//
-// SPDX-License-Identifier: Apache-2.0
-
-import React from "react";
-import Image from "next/image";
-import Konva from "konva";
-import { toImageAsync } from "./utils";
+import React from 'react';
+import Image from 'next/image';
+import Konva from 'konva';
+import { toImageAsync } from './utils';
 
 type FrameImageProps = {
   node: Konva.Group;

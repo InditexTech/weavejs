@@ -1,18 +1,14 @@
-// SPDX-FileCopyrightText: 2025 2025 INDUSTRIA DE DISEÑO TEXTIL S.A. (INDITEX S.A.)
-//
-// SPDX-License-Identifier: Apache-2.0
+'use client';
 
-"use client";
-
-import React from "react";
-import { useInfiniteQuery, useMutation } from "@tanstack/react-query";
-import { ImagePlus, Trash, X } from "lucide-react";
-import { useWeave } from "@inditextech/weave-react";
-import { useCollaborationRoom } from "@/store/store";
-import { getImages } from "@/api/get-images";
-import { postImage } from "@/api/post-image";
-import { delImage } from "@/api/del-image";
-import { SIDEBAR_ELEMENTS } from "@/lib/constants";
+import React from 'react';
+import { useInfiniteQuery, useMutation } from '@tanstack/react-query';
+import { ImagePlus, Trash, X } from 'lucide-react';
+import { useWeave } from '@inditextech/weave-react';
+import { useCollaborationRoom } from '@/store/store';
+import { getImages } from '@/api/get-images';
+import { postImage } from '@/api/post-image';
+import { delImage } from '@/api/del-image';
+import { SIDEBAR_ELEMENTS } from '@/lib/constants';
 
 export const ImagesLibrary = () => {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -30,25 +26,25 @@ export const ImagesLibrary = () => {
 
   const mutationUpload = useMutation({
     mutationFn: async (file: File) => {
-      return await postImage(room ?? "", file);
+      return await postImage(room ?? '', file);
     },
   });
 
   const mutationDelete = useMutation({
     mutationFn: async (imageId: string) => {
-      return await delImage(room ?? "", imageId);
+      return await delImage(room ?? '', imageId);
     },
   });
 
   const query = useInfiniteQuery({
-    queryKey: ["getImages", room],
+    queryKey: ['getImages', room],
     queryFn: async ({ pageParam }) => {
       if (!room) {
         return [];
       }
-      return await getImages(room ?? "", 20, pageParam);
+      return await getImages(room ?? '', 20, pageParam);
     },
-    initialPageParam: "",
+    initialPageParam: '',
     getNextPageParam: (lastPage) => lastPage.continuationToken,
   });
 

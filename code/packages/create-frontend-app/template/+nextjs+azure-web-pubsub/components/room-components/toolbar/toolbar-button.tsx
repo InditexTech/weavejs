@@ -1,17 +1,13 @@
-// SPDX-FileCopyrightText: 2025 2025 INDUSTRIA DE DISEÑO TEXTIL S.A. (INDITEX S.A.)
-//
-// SPDX-License-Identifier: Apache-2.0
+'use client';
 
-"use client";
-
-import React from "react";
-import { cn } from "@/lib/utils";
+import React from 'react';
+import { cn } from '@/lib/utils';
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
-} from "@/components/ui/tooltip";
+} from '@/components/ui/tooltip';
 
 type ToolbarButtonProps = {
   className?: string;
@@ -20,19 +16,19 @@ type ToolbarButtonProps = {
   active?: boolean;
   disabled?: boolean;
   label?: React.ReactNode;
-  tooltipSide?: "top" | "bottom" | "left" | "right";
-  tooltipAlign?: "start" | "center" | "end";
+  tooltipSide?: 'top' | 'bottom' | 'left' | 'right';
+  tooltipAlign?: 'start' | 'center' | 'end';
 };
 
 export function ToolbarButton({
   className,
   icon,
-  label = "tool",
+  label = 'tool',
   onClick,
   disabled = false,
   active = false,
-  tooltipSide = "right",
-  tooltipAlign = "center",
+  tooltipSide = 'right',
+  tooltipAlign = 'center',
 }: Readonly<ToolbarButtonProps>) {
   return (
     <TooltipProvider delayDuration={300}>
@@ -40,10 +36,10 @@ export function ToolbarButton({
         <TooltipTrigger asChild>
           <button
             className={cn(
-              "pointer-events-auto relative cursor-pointer hover:text-black hover:bg-accent px-2 py-2 flex justify-center items-center",
+              'pointer-events-auto relative cursor-pointer hover:text-black hover:bg-accent px-2 py-2 flex justify-center items-center',
               {
-                ["bg-zinc-700 text-white"]: active,
-                ["pointer-events-none cursor-default text-black opacity-50"]:
+                ['bg-zinc-700 text-white']: active,
+                ['pointer-events-none cursor-default text-black opacity-50']:
                   disabled,
               },
               className

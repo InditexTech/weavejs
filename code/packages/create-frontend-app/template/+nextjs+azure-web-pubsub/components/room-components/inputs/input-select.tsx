@@ -1,7 +1,3 @@
-// SPDX-FileCopyrightText: 2025 2025 INDUSTRIA DE DISEÑO TEXTIL S.A. (INDITEX S.A.)
-//
-// SPDX-License-Identifier: Apache-2.0
-
 import {
   Command,
   CommandEmpty,
@@ -9,16 +5,16 @@ import {
   CommandInput,
   CommandItem,
   CommandList,
-} from "@/components/ui/command";
+} from '@/components/ui/command';
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
-} from "@/components/ui/popover";
-import { Check, ChevronDown } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { useEffect, useRef, useState } from "react";
-import React from "react";
+} from '@/components/ui/popover';
+import { Check, ChevronDown } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { useEffect, useRef, useState } from 'react';
+import React from 'react';
 
 function InputSelect({
   label,
@@ -66,7 +62,7 @@ function InputSelect({
             className="w-full pl-3 h-[32px] rounded-none !text-xs text-gray-700 justify-between font-normal bg-transparent shadow-none"
           >
             {options.find((option) => option.value === selectedOption)?.label ??
-              "-"}
+              '-'}
             {!disabled && (
               <ChevronDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
             )}

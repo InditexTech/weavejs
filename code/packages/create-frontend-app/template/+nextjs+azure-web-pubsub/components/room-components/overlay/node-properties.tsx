@@ -1,24 +1,20 @@
-// SPDX-FileCopyrightText: 2025 2025 INDUSTRIA DE DISEÑO TEXTIL S.A. (INDITEX S.A.)
-//
-// SPDX-License-Identifier: Apache-2.0
+'use client';
 
-"use client";
-
-import React from "react";
-import { useWeave } from "@inditextech/weave-react";
-import { useCollaborationRoom } from "@/store/store";
-import { PositionProperties } from "./../node-properties/position-properties";
-import { SizeProperties } from "./../node-properties/size-properties";
-import { AppearanceProperties } from "./../node-properties/appearance-properties";
-import { FillProperties } from "./../node-properties/fill-properties";
-import { StrokeProperties } from "./../node-properties/stroke-properties";
-import { TextProperties } from "./../node-properties/text-properties";
-import { ImageProperties } from "../node-properties/image-properties";
-import { ColorTokenProperties } from "../node-properties/color-token-properties";
-import { FrameProperties } from "../node-properties/frame-properties";
-import { CropProperties } from "../node-properties/crop-properties";
-import { SIDEBAR_ELEMENTS } from "@/lib/constants";
-import { X } from "lucide-react";
+import React from 'react';
+import { useWeave } from '@inditextech/weave-react';
+import { useCollaborationRoom } from '@/store/store';
+import { PositionProperties } from './../node-properties/position-properties';
+import { SizeProperties } from './../node-properties/size-properties';
+import { AppearanceProperties } from './../node-properties/appearance-properties';
+import { FillProperties } from './../node-properties/fill-properties';
+import { StrokeProperties } from './../node-properties/stroke-properties';
+import { TextProperties } from './../node-properties/text-properties';
+import { ImageProperties } from '../node-properties/image-properties';
+import { ColorTokenProperties } from '../node-properties/color-token-properties';
+import { FrameProperties } from '../node-properties/frame-properties';
+import { CropProperties } from '../node-properties/crop-properties';
+import { SIDEBAR_ELEMENTS } from '@/lib/constants';
+import { X } from 'lucide-react';
 
 export const NodeProperties = () => {
   const instance = useWeave((state) => state.instance);
@@ -38,61 +34,61 @@ export const NodeProperties = () => {
 
   React.useEffect(() => {
     if (node && sidebarRightActive !== SIDEBAR_ELEMENTS.nodeProperties) {
-      setSidebarActive(SIDEBAR_ELEMENTS.nodeProperties, "right");
+      setSidebarActive(SIDEBAR_ELEMENTS.nodeProperties, 'right');
     }
     if (!node && sidebarRightActive === SIDEBAR_ELEMENTS.nodeProperties) {
-      setSidebarActive(null, "right");
+      setSidebarActive(null, 'right');
     }
   }, [node, sidebarRightActive, setSidebarActive]);
 
   const nodeType = React.useMemo(() => {
     switch (node?.type) {
-      case "group":
-        return "Group";
-      case "rectangle":
-        return "Rectangle";
-      case "line":
-        return "Vector path";
-      case "text":
-        return "Text";
-      case "image":
-        return "Image";
-      case "color-token":
-        return "Color Token";
-      case "frame":
-        return "Frame";
+      case 'group':
+        return 'Group';
+      case 'rectangle':
+        return 'Rectangle';
+      case 'line':
+        return 'Vector path';
+      case 'text':
+        return 'Text';
+      case 'image':
+        return 'Image';
+      case 'color-token':
+        return 'Color Token';
+      case 'frame':
+        return 'Frame';
       default:
-        return "Unknown";
+        return 'Unknown';
     }
   }, [node]);
 
   const actionType = React.useMemo(() => {
     switch (actualAction) {
-      case "rectangleTool":
-        return "Rectangle";
-      case "brushTool":
-        return "Vector path";
-      case "penTool":
-        return "Vector path";
-      case "imageTool":
-        return "Image";
-      case "colorTokenTool":
-        return "Color Token";
-      case "frameTool":
-        return "Frame";
+      case 'rectangleTool':
+        return 'Rectangle';
+      case 'brushTool':
+        return 'Vector path';
+      case 'penTool':
+        return 'Vector path';
+      case 'imageTool':
+        return 'Image';
+      case 'colorTokenTool':
+        return 'Color Token';
+      case 'frameTool':
+        return 'Frame';
       default:
-        return "Unknown";
+        return 'Unknown';
     }
   }, [actualAction]);
 
   const title = React.useMemo(() => {
-    if (nodePropertiesAction === "create") {
+    if (nodePropertiesAction === 'create') {
       return actionType;
     }
     return nodeType;
   }, [nodeType, actionType, nodePropertiesAction]);
 
-  if (sidebarRightActive !== "nodeProperties") {
+  if (sidebarRightActive !== 'nodeProperties') {
     return null;
   }
 
@@ -109,7 +105,7 @@ export const NodeProperties = () => {
               if (instance) {
                 instance.selectNodesByKey([]);
               }
-              setSidebarActive(null, "right");
+              setSidebarActive(null, 'right');
             }}
           >
             <X size={16} />

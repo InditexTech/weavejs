@@ -1,15 +1,11 @@
-// SPDX-FileCopyrightText: 2025 2025 INDUSTRIA DE DISEÑO TEXTIL S.A. (INDITEX S.A.)
-//
-// SPDX-License-Identifier: Apache-2.0
+'use client';
 
-"use client";
-
-import React from "react";
-import { SYSTEM_OS } from "@/lib/utils";
-import { useWeave } from "@inditextech/weave-react";
-import { Fullscreen, Maximize, ZoomIn, ZoomOut } from "lucide-react";
-import { ToolbarButton } from "../toolbar/toolbar-button";
-import { ShortcutElement } from "../help/shortcut-element";
+import React from 'react';
+import { SYSTEM_OS } from '@/lib/utils';
+import { useWeave } from '@inditextech/weave-react';
+import { Fullscreen, Maximize, ZoomIn, ZoomOut } from 'lucide-react';
+import { ToolbarButton } from '../toolbar/toolbar-button';
+import { ShortcutElement } from '../help/shortcut-element';
 
 export function ZoomToolbar() {
   const instance = useWeave((state) => state.instance);
@@ -23,10 +19,10 @@ export function ZoomToolbar() {
   const handleTriggerActionWithParams = React.useCallback(
     (actionName: string, params: unknown) => {
       if (instance) {
-        const triggerSelection = actualAction === "selectionTool";
+        const triggerSelection = actualAction === 'selectionTool';
         instance.triggerAction(actionName, params);
         if (triggerSelection) {
-          instance.triggerAction("selectionTool");
+          instance.triggerAction('selectionTool');
         }
       }
     },
@@ -42,19 +38,19 @@ export function ZoomToolbar() {
               icon={<ZoomIn />}
               disabled={!canZoomIn}
               onClick={() => {
-                handleTriggerActionWithParams("zoomInTool", {
+                handleTriggerActionWithParams('zoomInTool', {
                   previousAction: actualAction,
                 });
               }}
               label={
                 <div className="flex flex-col gap-2 justify-start items-end">
-                  {" "}
+                  {' '}
                   <p>Zoom in</p>
                   <ShortcutElement
                     variant="light"
                     shortcuts={{
-                      [SYSTEM_OS.MAC]: "⌘ +",
-                      [SYSTEM_OS.OTHER]: "Ctrl +",
+                      [SYSTEM_OS.MAC]: '⌘ +',
+                      [SYSTEM_OS.OTHER]: 'Ctrl +',
                     }}
                   />
                 </div>
@@ -66,7 +62,7 @@ export function ZoomToolbar() {
               icon={<ZoomOut />}
               disabled={!canZoomOut}
               onClick={() => {
-                handleTriggerActionWithParams("zoomOutTool", {
+                handleTriggerActionWithParams('zoomOutTool', {
                   previousAction: actualAction,
                 });
               }}
@@ -76,8 +72,8 @@ export function ZoomToolbar() {
                   <ShortcutElement
                     variant="light"
                     shortcuts={{
-                      [SYSTEM_OS.MAC]: "⌘ -",
-                      [SYSTEM_OS.OTHER]: "Ctrl -",
+                      [SYSTEM_OS.MAC]: '⌘ -',
+                      [SYSTEM_OS.OTHER]: 'Ctrl -',
                     }}
                   />
                 </div>
@@ -88,7 +84,7 @@ export function ZoomToolbar() {
             <ToolbarButton
               icon={<Maximize />}
               onClick={() => {
-                handleTriggerActionWithParams("fitToScreenTool", {
+                handleTriggerActionWithParams('fitToScreenTool', {
                   previousAction: actualAction,
                 });
               }}
@@ -98,8 +94,8 @@ export function ZoomToolbar() {
                   <ShortcutElement
                     variant="light"
                     shortcuts={{
-                      [SYSTEM_OS.MAC]: "⇧ 1",
-                      [SYSTEM_OS.OTHER]: "⇧ 1",
+                      [SYSTEM_OS.MAC]: '⇧ 1',
+                      [SYSTEM_OS.OTHER]: '⇧ 1',
                     }}
                   />
                 </div>
@@ -111,7 +107,7 @@ export function ZoomToolbar() {
               icon={<Fullscreen />}
               disabled={selectedNodes.length === 0}
               onClick={() => {
-                handleTriggerActionWithParams("fitToSelectionTool", {
+                handleTriggerActionWithParams('fitToSelectionTool', {
                   previousAction: actualAction,
                 });
               }}
@@ -121,8 +117,8 @@ export function ZoomToolbar() {
                   <ShortcutElement
                     variant="light"
                     shortcuts={{
-                      [SYSTEM_OS.MAC]: "⇧ 2",
-                      [SYSTEM_OS.OTHER]: "⇧ 2",
+                      [SYSTEM_OS.MAC]: '⇧ 2',
+                      [SYSTEM_OS.OTHER]: '⇧ 2',
                     }}
                   />
                 </div>

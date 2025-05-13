@@ -1,18 +1,14 @@
-// SPDX-FileCopyrightText: 2025 2025 INDUSTRIA DE DISEÑO TEXTIL S.A. (INDITEX S.A.)
-//
-// SPDX-License-Identifier: Apache-2.0
-
-import React from "react";
-import { cn, SYSTEM_OS } from "@/lib/utils";
-import { useGetOs } from "../hooks/use-get-os";
+import React from 'react';
+import { cn, SYSTEM_OS } from '@/lib/utils';
+import { useGetOs } from '../hooks/use-get-os';
 
 type ShortcutElement = {
-  variant?: "default" | "light";
+  variant?: 'default' | 'light';
   shortcuts: Record<string, string>;
 };
 
 export const ShortcutElement = ({
-  variant = "default",
+  variant = 'default',
   shortcuts,
 }: Readonly<ShortcutElement>) => {
   const os = useGetOs();
@@ -25,15 +21,15 @@ export const ShortcutElement = ({
 
   return (
     <div className="flex gap-1 justify-start items-center">
-      {keys.split(" ").map((key) => {
+      {keys.split(' ').map((key) => {
         return (
           <span
             key={key}
             className={cn(
-              "inline-flex justify-start items-center p-0.5 px-1.5 rounded-xs font-questrial text-xs",
+              'inline-flex justify-start items-center p-0.5 px-1.5 rounded-xs font-questrial text-xs',
               {
-                ["bg-accent text-black"]: variant === "light",
-                ["bg-zinc-800 text-white"]: variant === "default",
+                ['bg-accent text-black']: variant === 'light',
+                ['bg-zinc-800 text-white']: variant === 'default',
               }
             )}
           >
