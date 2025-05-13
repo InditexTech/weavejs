@@ -15,6 +15,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- [#165](https://github.com/InditexTech/weavejs/issues/165) Sort dependencies and devDependencies alphabetically on create-app generated code
 - [#161](https://github.com/InditexTech/weavejs/issues/161) API to remove selected nodes programmatically
 
 ## [0.9.3] - 2025-05-13
