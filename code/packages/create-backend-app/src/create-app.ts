@@ -106,83 +106,11 @@ async function copy(
 
 function createPackageJson(projectName: string, options: Options): object {
   if (options.template === '+express+azure-web-pubsub') {
-    return {
-      name: projectName,
-      type: 'module',
-      scripts: {
-        build:
-          'tsc && tsc-alias -p tsconfig.json && mkdir -p ./dist/public && mkdir -p ./dist/temp && cp-cli ./public ./dist/public && cp-cli ./package.json ./dist/package.json',
-        copyAssets:
-          'mkdir -p ./public && cp-cli node_modules/@imgly/background-removal-node/dist/. public',
-        dev: 'nodemon --exec "dotenvx run -- tsx src/server.ts"',
-        format: 'prettier --write "src/**/*.{ts,tsx}"',
-        lint: 'eslint ./src',
-        postinstall: 'npm run copyAssets',
-        start: 'dotenvx run -- tsx server.js',
-      },
-      private: true,
-      dependencies: {
-        ...pick(localVersions, [
-          '@inditextech/weave-sdk',
-          '@inditextech/weave-store-azure-web-pubsub',
-        ]),
-        ...pick(versionPkg.dependencies, [
-          '@dotenvx/dotenvx',
-          '@imgly/background-removal-node',
-          'cors',
-          'dotenv',
-          'express',
-          'helmet',
-          'morgan',
-          'multer',
-          'pino',
-          'pino-http',
-          'pino-pretty',
-          'ts-node',
-          'tsx',
-          'uuid',
-          'zod',
-        ]),
-      },
-      devDependencies: pick(versionPkg.devDependencies, [
-        '@eslint/js',
-        '@types/cors',
-        '@types/express',
-        '@types/morgan',
-        '@types/multer',
-        '@types/node',
-        '@typescript-eslint/eslint-plugin',
-        '@typescript-eslint/parser',
-        'cp-cli',
-        'eslint',
-        'eslint-config-prettier',
-        'globals',
-        'nodemon',
-        'prettier',
-        'tsc-alias',
-        'tsconfig-paths',
-        'typescript',
-        'typescript-eslint',
+    const dependencies = {
+      ...pick(localVersions, [
+        '@inditextech/weave-sdk',
+        '@inditextech/weave-store-azure-web-pubsub',
       ]),
-    };
-  }
-
-  return {
-    name: projectName,
-    version: '0.0.0',
-    private: true,
-    scripts: {
-      build:
-        'tsc && tsc-alias -p tsconfig.json && mkdir -p ./dist/public && mkdir -p ./dist/temp && cp-cli ./public ./dist/public && cp-cli ./package.json ./dist/package.json',
-      copyAssets:
-        'mkdir -p ./public && cp-cli node_modules/@imgly/background-removal-node/dist/. public',
-      dev: 'nodemon --exec "dotenvx run -- tsx src/server.ts"',
-      format: 'prettier --write "src/**/*.{ts,tsx}"',
-      lint: 'eslint ./src',
-      postinstall: 'npm run copyAssets',
-      start: 'dotenvx run -- tsx server.js',
-    },
-    dependencies: {
       ...pick(versionPkg.dependencies, [
         '@dotenvx/dotenvx',
         '@imgly/background-removal-node',
@@ -200,12 +128,9 @@ function createPackageJson(projectName: string, options: Options): object {
         'uuid',
         'zod',
       ]),
-      ...pick(localVersions, [
-        '@inditextech/weave-sdk',
-        '@inditextech/weave-store-websockets',
-      ]),
-    },
-    devDependencies: {
+    };
+
+    const devDependencies = {
       ...pick(versionPkg.devDependencies, [
         '@eslint/js',
         '@types/cors',
@@ -226,8 +151,102 @@ function createPackageJson(projectName: string, options: Options): object {
         'typescript',
         'typescript-eslint',
       ]),
-    },
+    };
+
+    return {
+      name: projectName,
+      type: 'module',
+      scripts: {
+        build:
+          'tsc && tsc-alias -p tsconfig.json && mkdir -p ./dist/public && mkdir -p ./dist/temp && cp-cli ./public ./dist/public && cp-cli ./package.json ./dist/package.json',
+        copyAssets:
+          'mkdir -p ./public && cp-cli node_modules/@imgly/background-removal-node/dist/. public',
+        dev: 'nodemon --exec "dotenvx run -- tsx src/server.ts"',
+        format: 'prettier --write "src/**/*.{ts,tsx}"',
+        lint: 'eslint ./src',
+        postinstall: 'npm run copyAssets',
+        start: 'dotenvx run -- tsx server.js',
+      },
+      private: true,
+      dependencies: sortObjectKeys(dependencies),
+      devDependencies: sortObjectKeys(devDependencies),
+    };
+  }
+
+  const dependencies = {
+    ...pick(versionPkg.dependencies, [
+      '@dotenvx/dotenvx',
+      '@imgly/background-removal-node',
+      'cors',
+      'dotenv',
+      'express',
+      'helmet',
+      'morgan',
+      'multer',
+      'pino',
+      'pino-http',
+      'pino-pretty',
+      'ts-node',
+      'tsx',
+      'uuid',
+      'zod',
+    ]),
+    ...pick(localVersions, [
+      '@inditextech/weave-sdk',
+      '@inditextech/weave-store-websockets',
+    ]),
   };
+
+  const devDependencies = {
+    ...pick(versionPkg.devDependencies, [
+      '@eslint/js',
+      '@types/cors',
+      '@types/express',
+      '@types/morgan',
+      '@types/multer',
+      '@types/node',
+      '@typescript-eslint/eslint-plugin',
+      '@typescript-eslint/parser',
+      'cp-cli',
+      'eslint',
+      'eslint-config-prettier',
+      'globals',
+      'nodemon',
+      'prettier',
+      'tsc-alias',
+      'tsconfig-paths',
+      'typescript',
+      'typescript-eslint',
+    ]),
+  };
+
+  return {
+    name: projectName,
+    version: '0.0.0',
+    private: true,
+    scripts: {
+      build:
+        'tsc && tsc-alias -p tsconfig.json && mkdir -p ./dist/public && mkdir -p ./dist/temp && cp-cli ./public ./dist/public && cp-cli ./package.json ./dist/package.json',
+      copyAssets:
+        'mkdir -p ./public && cp-cli node_modules/@imgly/background-removal-node/dist/. public',
+      dev: 'nodemon --exec "dotenvx run -- tsx src/server.ts"',
+      format: 'prettier --write "src/**/*.{ts,tsx}"',
+      lint: 'eslint ./src',
+      postinstall: 'npm run copyAssets',
+      start: 'dotenvx run -- tsx server.js',
+    },
+    dependencies: sortObjectKeys(dependencies),
+    devDependencies: sortObjectKeys(devDependencies),
+  };
+}
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function sortObjectKeys<T extends Record<string, any>>(obj: T): T {
+  const sortedEntries = Object.keys(obj)
+    .sort()
+    .map((key) => [key, obj[key]] as [keyof T, T[keyof T]]);
+
+  return Object.fromEntries(sortedEntries) as T;
 }
 
 function pick<T extends object, K extends keyof T>(
