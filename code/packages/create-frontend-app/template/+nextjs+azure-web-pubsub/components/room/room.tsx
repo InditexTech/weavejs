@@ -14,6 +14,7 @@ import useGetAzureWebPubsubProvider from '../room-components/hooks/use-get-azure
 import useHandleRouteParams from '../room-components/hooks/use-handle-route-params';
 import { UploadFile } from '../room-components/upload-file';
 import UserForm from '../room-components/user-form';
+import { HelpDrawer } from '../room-components/help/help-drawer';
 
 const statusMap = {
   ['idle']: 'Idle',
@@ -132,6 +133,7 @@ export const Room = () => {
         >
           <UploadFile />
           <RoomLayout />
+          <HelpDrawer />
         </WeaveProvider>
       )}
       <Toaster />

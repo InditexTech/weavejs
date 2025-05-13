@@ -1,70 +1,70 @@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from '@/components/ui/tooltip';
+  DropdownMenuItem,
+  DropdownMenuShortcut,
+} from '@/components/ui/dropdown-menu';
 import {
   Drawer,
   DrawerClose,
   DrawerContent,
   DrawerHeader,
   DrawerTitle,
-  DrawerTrigger,
 } from '@/components/ui/drawer';
 import { Keyboard, XIcon } from 'lucide-react';
 import { SYSTEM_OS } from '@/lib/utils';
 import { HelpTools } from './help-tools';
-import { ShortcutElement } from './shortcut-element';
 import React from 'react';
-import { useKeyDown } from '../hooks/use-key-down';
 import { useGetOs } from '../hooks/use-get-os';
 import { HelpZoom } from './help-zoom';
 import { HelpView } from './help-view';
 import { HelpSelection } from './help-selection';
 import { HelpEdit } from './help-edit';
 import { HelpArrange } from './help-arrange';
+import { useCollaborationRoom } from '@/store/store';
+import { DRAWER_ELEMENTS } from '@/lib/constants';
 
-export const HelpDrawer = () => {
+export const HelpDrawerTrigger = () => {
   const os = useGetOs();
 
-  const [open, setOpen] = React.useState<boolean>(false);
-
-  useKeyDown(
-    () => {
-      setOpen((prev) => !prev);
-    },
-    ['KeyK'],
-    (e) => ([SYSTEM_OS.MAC as string].includes(os) ? e.metaKey : e.ctrlKey)
+  const keyboardShortcutsVisible = useCollaborationRoom(
+    (state) => state.drawer.keyboardShortcuts.visible
   );
+  const setShowDrawer = useCollaborationRoom((state) => state.setShowDrawer);
 
   return (
-    <Drawer modal={false} open={open} onOpenChange={setOpen}>
-      <DrawerTrigger>
-        <TooltipProvider delayDuration={300}>
-          <Tooltip>
-            <TooltipTrigger
-              asChild
-              className="pointer-events-auto cursor-pointer hover:text-black hover:bg-accent w-8 h-8 px-2 py-2"
-            >
-              <Keyboard />
-            </TooltipTrigger>
-            <TooltipContent side="top" align="end" className="rounded-none">
-              <div className="flex flex-col gap-2 justify-start items-end">
-                <p>Keyboard shortcuts</p>
-                <ShortcutElement
-                  variant="light"
-                  shortcuts={{
-                    [SYSTEM_OS.MAC]: '⌘ K',
-                    [SYSTEM_OS.OTHER]: 'Ctrl K',
-                  }}
-                />
-              </div>
-            </TooltipContent>
-          </Tooltip>
-        </TooltipProvider>
-      </DrawerTrigger>
+    <DropdownMenuItem
+      onClick={() => {
+        setShowDrawer(
+          DRAWER_ELEMENTS.keyboardShortcuts,
+          !keyboardShortcutsVisible
+        );
+      }}
+      className="w-full text-foreground cursor-pointer hover:rounded-none"
+    >
+      <Keyboard /> Keyboard shortcuts
+      <DropdownMenuShortcut>
+        {[SYSTEM_OS.MAC as string].includes(os) ? '⌘ K' : 'Ctrl K'}
+      </DropdownMenuShortcut>
+    </DropdownMenuItem>
+  );
+};
+
+export const HelpDrawer = () => {
+  const keyboardShortcutsVisible = useCollaborationRoom(
+    (state) => state.drawer.keyboardShortcuts.visible
+  );
+  const setShowDrawer = useCollaborationRoom((state) => state.setShowDrawer);
+
+  const handleDrawer = React.useCallback(() => {
+    setShowDrawer(DRAWER_ELEMENTS.keyboardShortcuts, !keyboardShortcutsVisible);
+  }, [keyboardShortcutsVisible, setShowDrawer]);
+
+  return (
+    <Drawer
+      modal={false}
+      open={keyboardShortcutsVisible}
+      onOpenChange={handleDrawer}
+    >
       <DrawerContent className="p-0 !rounded-none bg-black flex flex-col justify-start items-center min-h-[330px]">
         <DrawerHeader className="w-[1024px] flex flex-row justify-between items-centers p-0 py-3">
           <DrawerTitle className="flex flex-row justify-start items-center text-center text-white font-questrial">
