@@ -3,6 +3,8 @@ title: Set up the backend
 description: Learn how to set up the backend of a Weave.js app on Next.js
 ---
 
+In this guide, you will learn how to set up the backend infrastructure for a collaborative application using Weave.js. 
+
 To make the backend functional, we need to set up a Next.js
 [custom server](https://nextjs.org/docs/14/pages/building-your-application/configuring/custom-server)
 to later integrate Weave.js Websockets store. 
@@ -11,11 +13,11 @@ The store will handle the shared-state management, client networking, persistenc
 
 ## Prerequisites
 
-Before you begin, ensure that you have completed the [manual installation guide](/docs/main/requirements) up to the *"Set up the backend project"* step.
+Before you begin, ensure that you have completed the [manual installation](/docs/main/manual-installation) guide up to the *"Set up the backend project"* step.
 
 ## Step by step
 
-To setup Weave.js backend over our Next.js project (on a single artifact), follow these steps:
+To set up Weave.js backend over our Next.js project (on a single artifact), follow these steps:
 
 <div className="fd-steps">
 
@@ -35,7 +37,7 @@ npm install ws @inditextech/weave-store-websockets
 
 <div className="[&_h3]:fd-step">
  
-### Setup the Next.js custom server
+### Set up the Next.js custom server
 
 To have a frontend and backend on the same artifact on top of Next.js we need to implement 
 a [custom server](https://nextjs.org/docs/14/pages/building-your-application/configuring/custom-server)
@@ -143,7 +145,7 @@ We need to:
 - Define how to handle the persistence of the shared-state.
 - Instantiate the [WeaveWebsocketsServer](/docs/store-websockets/api-reference/server/weave-websockets-server) class from the library `@inditextech/weave-store-websockets` and configure it.
 
-#### Setup the shared-state persistence handlers
+#### Set up the shared-state persistence handlers
 
 In this step, we will define the persistence logic for the shared-state.
 In this case, we will use the file system as our persistence layer.
@@ -160,9 +162,9 @@ File explanation:
 - **`(2)`**: `fetchRoom` function fetches a previously saved shared-state of a room by its ID from the file system.
 - **`(3)`**: `persistRoom` function persist the shared-state of a room by its ID onto the file system.
 
-#### Setup the Weave.js Websockets store
+#### Set up the Weave.js Websockets store
 
-Finally, setup the Weave.js store handler.
+Finally, set up the Weave.js store handler.
 In this case, we will set up the Websockets transport.
 
 On the custom server file `server.ts`, add the necessary logic to use the `@inditextech/weave-store-websockets` store handler. 
@@ -187,6 +189,12 @@ Changes explanation:
 - **`(9)`**: Use the previous `persistRoom` function for persistence management.
 - **`(10)`**: Instantiate the [WeaveWebsocketsServer](/docs/store-websockets/api-reference/server/weave-websockets-server) class.
 - **`(11)`**: Attach the **Weave.js** Websockets server to the HTTP server.
+
+</div>
+
+<div className="[&_h3]:fd-step">
+
+### Run the project
 
 Finally, test that the project keeps starting with the changes made to the custom server.
 

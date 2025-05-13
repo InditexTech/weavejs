@@ -3,7 +3,11 @@ title: Set up the frontend
 description: Learn how to set up the frontend of a Weave.js app on Next.js
 ---
 
-The minimal setup for a collaborative application requires defining two pages:
+![Sample Weave.js app](/images/sample-app-manual.gif)
+
+In this guide, you will learn how to set up the frontend of a collaborative application using Weave.js and Next.js.
+
+The minimal setup involves two pages:
 
 - One that allows users to indicate the room name or ID and a username to join a collaboration room.
   Lets call this page the **Enter Room page** from now on.
@@ -12,11 +16,11 @@ The minimal setup for a collaborative application requires defining two pages:
 
 ## Prerequisites
 
-Before you begin, ensure that you have completed the [backend installation guide](/docs/main/manual-installation/backend).
+Before you begin, ensure that you have completed the [backend installation](/docs/main/manual-installation/backend) guide.
 
 ## Step by step
 
-To setup Weave.js frontend over our Next.js project (on a single artifact), follow these steps:
+To set up Weave.js frontend over our Next.js project (on a single artifact), follow these steps:
 
 <div className="fd-steps">
 
@@ -34,7 +38,7 @@ npm install boring-avatars lucide-react @inditextech/weave-react
 
 <div className="[&_h3]:fd-step">
  
-### Setup a global state store for the UI
+### Set up a global state store for the UI
 
 Let's start by creating a global state store to handle the UI state. We will use
 [Zustand](https://zustand.docs.pmnd.rs/getting-started/introduction) for this.
