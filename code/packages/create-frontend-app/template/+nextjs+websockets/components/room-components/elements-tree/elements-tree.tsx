@@ -7,8 +7,17 @@ import { WeaveSelection, WeaveStateElement } from "@inditextech/weave-types";
 import React from "react";
 import { useCollaborationRoom } from "@/store/store";
 import { useWeave } from "@inditextech/weave-react";
-import { Frame, Spline, Image, Square, Tag, Type, X } from "lucide-react";
-import { Weave } from "@inditextech/weave-sdk";
+import {
+  Frame,
+  Spline,
+  Image,
+  Square,
+  Tag,
+  Type,
+  X,
+  Trash,
+} from "lucide-react";
+import { Weave, WeaveNodesSelectionPlugin } from "@inditextech/weave-sdk";
 import { SIDEBAR_ELEMENTS } from "@/lib/constants";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -31,6 +40,22 @@ function mapElementsToTree(
       id: element.key,
       icon: iconsMap[element.props.nodeType ?? "rectangle"],
       name: element.key,
+      actions: [
+        <button
+          className="bg-white p-1 cursor-pointer hover:bg-zinc-950 hover:text-white rounded"
+          onClick={(e) => {
+            e.stopPropagation();
+            const nodesSelectionPlugin =
+              instance?.getPlugin<WeaveNodesSelectionPlugin>("nodesSelection");
+            if (instance && nodesSelectionPlugin) {
+              instance.selectNodesByKey([element.key]);
+              nodesSelectionPlugin.removeSelectedNodes();
+            }
+          }}
+        >
+          <Trash size={16} />
+        </button>,
+      ],
       ...((element.props.children ?? []).length > 0 && {
         children: mapElementsToTree(
           instance,
@@ -47,6 +72,7 @@ function mapElementsToTree(
 export const ElementsTree = () => {
   const instance = useWeave((state) => state.instance);
   const initialSelectedNodes = useWeave((state) => state.selection.nodes);
+  const actualAction = useWeave((state) => state.actions.actual);
 
   const sidebarLeftActive = useCollaborationRoom(
     (state) => state.sidebar.left.active
@@ -148,6 +174,9 @@ export const ElementsTree = () => {
               initialSelectedItems={selectedNodes}
               onSelectedItemsChange={(items: string[]) => {
                 instance.selectNodesByKey(items);
+                instance.triggerAction("fitToSelectionTool", {
+                  previousAction: actualAction,
+                });
               }}
             />
           )}

@@ -312,7 +312,8 @@ const TreeNode = ({
           className={cn(
             treeVariants(),
             selectedItems?.includes(item.id) ? selectedTreeVariants() : "",
-            isDragOver && dragOverVariants()
+            isDragOver && dragOverVariants(),
+            "relative"
           )}
           draggable={!!item.draggable}
           onDragStart={onDragStart}
@@ -423,7 +424,7 @@ const TreeLeaf = React.forwardRef<
       <div
         ref={ref}
         className={cn(
-          "ml-5 flex text-left items-center py-2 cursor-pointer before:right-1",
+          "relative ml-5 flex text-left items-center py-2 cursor-pointer before:right-1",
           treeVariants(),
           className,
           selectedItems?.includes(item.id) && selectedTreeVariants(),
@@ -526,7 +527,7 @@ const TreeActions = ({
     <div
       className={cn(
         isSelected ? "block" : "hidden",
-        "absolute right-3 group-hover:block"
+        "absolute top-1 right-1 group-hover:block"
       )}
     >
       {children}
