@@ -28,6 +28,25 @@ pnpm dev
 yarn dev
 ```
 
+## Build & Deploy
+
+To build the project in order to deploy it follow this steps:
+
+```bash
+npm run build
+# or
+pnpm build
+# or
+yarn build
+```
+
+Then a `dist` folder with the production files will be created, now you just need to:
+
+- Install de dependencies on the `dist` folder.
+- Copy the correct `.env` file with the values for production.
+
+After this steps the result files on the directory should be the runtime of the application.
+
 ## Learn more
 
 To learn more about Express.js and Weave.js, take a look at the following
