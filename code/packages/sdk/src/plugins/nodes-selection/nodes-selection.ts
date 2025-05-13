@@ -263,6 +263,19 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
     );
   }
 
+  removeSelectedNodes(): void {
+    const selectedNodes = this.getSelectedNodes();
+    const mappedSelectedNodes = selectedNodes.map((node) => {
+      const handler = this.instance.getNodeHandler<WeaveNode>(
+        node.getAttrs().nodeType
+      );
+      return handler.serialize(node);
+    });
+    this.instance.removeNodes(mappedSelectedNodes);
+    this.tr.nodes([]);
+    this.triggerSelectedNodesEvent();
+  }
+
   private initEvents() {
     let x1: number, y1: number, x2: number, y2: number;
     this.selecting = false;
@@ -271,16 +284,7 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
 
     stage.container().addEventListener('keydown', (e) => {
       if (e.key === 'Backspace' || e.key === 'Delete') {
-        const selectedNodes = this.getSelectedNodes();
-        const mappedSelectedNodes = selectedNodes.map((node) => {
-          const handler = this.instance.getNodeHandler<WeaveNode>(
-            node.getAttrs().nodeType
-          );
-          return handler.serialize(node);
-        });
-        this.instance.removeNodes(mappedSelectedNodes);
-        this.tr.nodes([]);
-        this.triggerSelectedNodesEvent();
+        this.removeSelectedNodes();
         return;
       }
     });
@@ -599,13 +603,6 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
     });
 
     return selectedNodes;
-  }
-
-  removeSelectedNodes(): void {
-    const selectedNodes = this.tr.getNodes();
-    for (const node of selectedNodes) {
-      node.destroy();
-    }
   }
 
   selectAll(): void {
