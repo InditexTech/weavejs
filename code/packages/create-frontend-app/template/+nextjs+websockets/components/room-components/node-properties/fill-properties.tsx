@@ -65,9 +65,16 @@ export function FillProperties() {
     return null;
   }
 
-  if (actualNode.type !== 'rectangle') {
+  if (
+    actualAction &&
+    !['selectionTool', 'rectangleTool'].includes(actualAction)
+  )
+    return null;
+
+  if (!actualAction && !['rectangle'].includes(actualNode.type)) {
     return null;
   }
+
   return (
     <div className="border-b border-zinc-200">
       <div className="w-full flex justify-between items-center gap-3 p-4 py-3">

@@ -27,19 +27,41 @@ export const NodeProperties = () => {
   const setSidebarActive = useCollaborationRoom(
     (state) => state.setSidebarActive
   );
+  const setNodePropertiesAction = useCollaborationRoom(
+    (state) => state.setNodePropertiesAction
+  );
 
   const nodePropertiesAction = useCollaborationRoom(
     (state) => state.nodeProperties.action
   );
 
   React.useEffect(() => {
-    if (node && sidebarRightActive !== SIDEBAR_ELEMENTS.nodeProperties) {
+    if (!instance) return;
+
+    if (
+      actualAction &&
+      [
+        'rectangleTool',
+        'brushTool',
+        'penTool',
+        'imageTool',
+        'colorTokenTool',
+        'frameTool',
+      ].includes(actualAction)
+    ) {
+      setNodePropertiesAction('create');
       setSidebarActive(SIDEBAR_ELEMENTS.nodeProperties, 'right');
     }
-    if (!node && sidebarRightActive === SIDEBAR_ELEMENTS.nodeProperties) {
+
+    if (!actualAction) {
+      setNodePropertiesAction(undefined);
       setSidebarActive(null, 'right');
     }
-  }, [node, sidebarRightActive, setSidebarActive]);
+
+    if (node) {
+      setNodePropertiesAction('update');
+    }
+  }, [actualAction, node]);
 
   const nodeType = React.useMemo(() => {
     switch (node?.type) {
@@ -80,6 +102,18 @@ export const NodeProperties = () => {
         return 'Unknown';
     }
   }, [actualAction]);
+
+  React.useEffect(() => {
+    if (nodePropertiesAction === 'create' && actionType) {
+      setSidebarActive(SIDEBAR_ELEMENTS.nodeProperties, 'right');
+      return;
+    }
+    if (node && nodePropertiesAction === 'update' && nodeType) {
+      setSidebarActive(SIDEBAR_ELEMENTS.nodeProperties, 'right');
+      return;
+    }
+    setSidebarActive(null, 'right');
+  }, [node, sidebarRightActive, setSidebarActive]);
 
   const title = React.useMemo(() => {
     if (nodePropertiesAction === 'create') {

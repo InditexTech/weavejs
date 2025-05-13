@@ -12,13 +12,9 @@ import {
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
+  DropdownMenuShortcut,
+  DropdownMenuGroup,
 } from '@/components/ui/dropdown-menu';
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from '@/components/ui/tooltip';
 import { Logo } from '@/components/utils/logo';
 import {
   Image as ImageIcon,
@@ -31,7 +27,6 @@ import {
   GripIcon,
   CheckIcon,
   Braces,
-  Cog,
 } from 'lucide-react';
 import {
   WEAVE_GRID_TYPES,
@@ -44,10 +39,8 @@ import { topElementVariants } from './variants';
 import { DropdownMenuLabel } from '@radix-ui/react-dropdown-menu';
 import { ConnectedUsers } from '../connected-users';
 import { Divider } from './divider';
-import { ToolbarButton } from '../toolbar/toolbar-button';
-import { ShortcutElement } from '../help/shortcut-element';
 import { ZoomToolbar } from './zoom-toolbar';
-import { HelpDrawer } from '../help/help-drawer';
+import { HelpDrawerTrigger } from '../help/help-drawer';
 
 export function RoomHeader() {
   const router = useRouter();
@@ -143,67 +136,6 @@ export function RoomHeader() {
     >
       <div className="w-full bg-white shadow-md flex justify-between items-center gap-0 px-3 rounded-xl border border-zinc-200">
         <div className="flex justify-start items-center gap-3">
-          <div className="h-[60px] flex justify-start items-center">
-            <Logo kind="small" />
-          </div>
-          <Divider />
-          <div className="flex justify-start items-center gap-1">
-            <div className="flex justify-start items-center gap-2 font-questrial text-foreground !normal-case min-h-[32px]">
-              <div className="font-questrial text-lg">{room}</div>
-            </div>
-          </div>
-          <Divider />
-          <TooltipProvider delayDuration={300}>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <button
-                  className="pointer-events-auto cursor-pointer font-questrial text-sm hover:text-zinc-200 !normal-case min-h-[32px]"
-                  onClick={handleExitRoom}
-                >
-                  <LogOut />
-                </button>
-              </TooltipTrigger>
-              <TooltipContent
-                side="top"
-                align="center"
-                className="rounded-none"
-              >
-                Exit room
-              </TooltipContent>
-            </Tooltip>
-          </TooltipProvider>
-        </div>
-        <div className="flex justify-end items-center gap-3">
-          <ConnectionStatus weaveConnectionStatus={weaveConnectionStatus} />
-          <Divider />
-          <div className="max-w-[320px]">
-            <ConnectedUsers />
-          </div>
-          <Divider />
-          <ZoomToolbar />
-          <Divider />
-          <div className="flex justify-start items-center gap-0">
-            <HelpDrawer />
-            <ToolbarButton
-              icon={<Braces />}
-              onClick={handlePrintToConsoleState}
-              label={
-                <div className="flex flex-col gap-2 justify-start items-end">
-                  <p>Print model state to browser console</p>
-                  <ShortcutElement
-                    variant="light"
-                    shortcuts={{
-                      [SYSTEM_OS.MAC]: '⌥ ⌘ C',
-                      [SYSTEM_OS.OTHER]: 'Alt Ctrl C',
-                    }}
-                  />
-                </div>
-              }
-              tooltipSide="top"
-              tooltipAlign="end"
-            />
-          </div>
-          <Divider />
           <DropdownMenu onOpenChange={(open: boolean) => setMenuOpen(open)}>
             <DropdownMenuTrigger
               className={cn(
@@ -214,20 +146,44 @@ export function RoomHeader() {
                 }
               )}
             >
-              <div className="flex justify-start items-center gap-2 font-questrial text-foreground !normal-case min-h-[32px]">
-                <Cog />
+              <div className="flex gap-1 justify-start items-center">
+                <div className="h-[60px] flex justify-start items-center">
+                  <Logo kind="small" variant="no-text" />
+                </div>
                 {menuOpen ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
               </div>
             </DropdownMenuTrigger>
             <DropdownMenuContent
-              align="end"
+              align="start"
               side="bottom"
               alignOffset={0}
               sideOffset={4}
               className="font-questrial rounded-none"
             >
               <DropdownMenuLabel className="px-2 py-1 pt-2 text-zinc-600 text-xs">
-                Grid Visibility
+                Debug
+              </DropdownMenuLabel>
+              <DropdownMenuGroup>
+                <DropdownMenuItem
+                  className="text-foreground cursor-pointer hover:rounded-none w-full"
+                  onClick={handlePrintToConsoleState}
+                >
+                  <Braces /> Print state to console
+                  <DropdownMenuShortcut>
+                    {SYSTEM_OS.MAC ? '⌥ ⌘ C' : 'Alt Ctrl C'}
+                  </DropdownMenuShortcut>
+                </DropdownMenuItem>
+              </DropdownMenuGroup>
+              <DropdownMenuSeparator />
+              <DropdownMenuLabel className="px-2 py-1 pt-2 text-zinc-600 text-xs">
+                Interface
+              </DropdownMenuLabel>
+              <DropdownMenuGroup>
+                <HelpDrawerTrigger />
+              </DropdownMenuGroup>
+              <DropdownMenuSeparator />
+              <DropdownMenuLabel className="px-2 py-1 pt-2 text-zinc-600 text-xs">
+                Grid
               </DropdownMenuLabel>
               <DropdownMenuItem
                 className="text-foreground cursor-pointer hover:rounded-none"
@@ -244,9 +200,6 @@ export function RoomHeader() {
                   </>
                 )}
               </DropdownMenuItem>
-              <DropdownMenuLabel className="px-2 py-1 pt-2 text-zinc-600 text-xs">
-                Grid Kind
-              </DropdownMenuLabel>
               <DropdownMenuItem
                 disabled={
                   !gridEnabled ||
@@ -291,8 +244,31 @@ export function RoomHeader() {
               >
                 <ImageIcon /> Stage to image
               </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem
+                className="text-foreground cursor-pointer hover:rounded-none"
+                onClick={handleExitRoom}
+              >
+                <LogOut /> Exit room
+              </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
+          <div className="flex justify-start items-center gap-1">
+            <div className="flex justify-start items-center gap-2 font-questrial text-foreground !normal-case min-h-[32px]">
+              <div className="font-questrial text-2xl font-extralight">
+                {room}
+              </div>
+            </div>
+          </div>
+        </div>
+        <div className="flex justify-end items-center gap-3">
+          <ConnectionStatus weaveConnectionStatus={weaveConnectionStatus} />
+          <Divider />
+          <div className="max-w-[320px]">
+            <ConnectedUsers />
+          </div>
+          <Divider />
+          <ZoomToolbar />
         </div>
       </div>
     </motion.div>

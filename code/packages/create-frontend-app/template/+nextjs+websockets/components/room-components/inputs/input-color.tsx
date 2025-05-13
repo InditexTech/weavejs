@@ -38,10 +38,6 @@ export const InputColor = ({
     setActualValue(e.target.value);
   };
 
-  const handleBlur = () => {
-    onChange(actualValue);
-  };
-
   return (
     <div className="flex flex-col items-start justify-start relative">
       {label && (
@@ -62,6 +58,13 @@ export const InputColor = ({
               value={`#${actualValue}`}
               onChange={(color) => {
                 onChange((color as string).slice(1));
+              }}
+              onFocus={() => {
+                window.weaveOnFieldFocus = true;
+              }}
+              onBlurCapture={() => {
+                window.weaveOnFieldFocus = false;
+                onChange(actualValue);
               }}
             >
               <ColorPickerSaturation />
@@ -85,7 +88,13 @@ export const InputColor = ({
           className="w-full py-0 h-[32px] rounded-none !text-xs font-normal text-gray-700 text-right focus:outline-none bg-transparent shadow-none"
           value={actualValue}
           onChange={handleInputChange}
-          onBlur={handleBlur}
+          onFocus={() => {
+            window.weaveOnFieldFocus = true;
+          }}
+          onBlurCapture={() => {
+            window.weaveOnFieldFocus = false;
+            onChange(actualValue);
+          }}
           onKeyDown={(e) => {
             if (e.key === 'Enter') {
               e.preventDefault();
