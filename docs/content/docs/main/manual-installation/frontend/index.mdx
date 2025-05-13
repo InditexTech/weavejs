@@ -1,21 +1,22 @@
 ---
-title: Setup the Frontend side
-description: Learn how to setup the Backend side of a Weave.js app on Next.js
+title: Set up the frontend
+description: Learn how to set up the frontend of a Weave.js app on Next.js
 ---
 
-## Introduction
+The minimal setup for a collaborative application requires defining two pages:
 
-The minimal setup for a collaborative applications needs to define two pages:
+- One that allows users to indicate the room name or ID and a username to join a collaboration room.
+  Lets call this page the **Enter Room page** from now on.
+- A second page that handles the UI for the collaboration room once the user has joined.
+  Lets call this page the **Room page** from now on.
 
-- One that allow to indicate the room name or ID and username to use to join a collaboration room.
-  Lets call this page from now on the **Enter Room page**.
-- A second one that will handle the UI for the collaboration room once joined.
-  Lets call this page from now on the **Room page**.
+## Prerequisites
 
-## Frontend setup
+Before you begin, ensure that you have completed the [backend installation guide](/docs/main/manual-installation/backend).
 
-To setup Weave.js frontend over our Next.js project (on a single artifact), we need
-to fully complete this steps:
+## Step by step
+
+To setup Weave.js frontend over our Next.js project (on a single artifact), follow these steps:
 
 <div className="fd-steps">
 
@@ -23,7 +24,7 @@ to fully complete this steps:
  
 ### Install the Weave.js frontend dependencies
 
-Located on your project folder, let's now install the **Weave.js** frontend dependencies:
+Located on your project folder, install the **Weave.js** frontend dependencies:
 
 ```shell
 npm install boring-avatars lucide-react @inditextech/weave-react
@@ -35,21 +36,17 @@ npm install boring-avatars lucide-react @inditextech/weave-react
  
 ### Setup a global state store for the UI
 
-Let's start by creating a global state store to handle the UI state, we will use
+Let's start by creating a global state store to handle the UI state. We will use
 [Zustand](https://zustand.docs.pmnd.rs/getting-started/introduction) for this.
 
-```shell
-npm install boring-avatars lucide-react @inditextech/weave-react
-```
 
-- First install the [Zustand](https://zustand.docs.pmnd.rs/getting-started/introduction) dependency:
+- First, install the [Zustand](https://zustand.docs.pmnd.rs/getting-started/introduction) dependency:
 
   ```shell
   npm install zustand
   ```
 
-- Create a `store/store.ts` file on the `src` folder of your project and set it's
-  content to this:
+- Create a `store/store.ts` file on the `src` folder of your project and set its content to:
 
   <include lang="ts" meta='title="store/store.ts"'>
     ../../../examples/manual-installation/store/store.ts
@@ -59,24 +56,22 @@ npm install boring-avatars lucide-react @inditextech/weave-react
 
 <div className="[&_h3]:fd-step">
  
-### Setup the Enter Room page
+### Set up the Enter Room page
 
-Now we have a working global state store for the UI, let's setup the
-[Enter Room page](/docs/main/manual-installation/frontend/enter-room-page).
+With the global state store in place, create the [Enter Room page](/docs/main/manual-installation/frontend/enter-room-page).
 
 </div>
 
 <div className="[&_h3]:fd-step">
  
-### Setup the Room page
+### Set up the Room page
 
-Now that we have setup the Enter Room page, let's setup the
-[Room page](/docs/main/manual-installation/frontend/room-page).
-
-</div>
+Now that the Enter Room page is set up, create the [Room page](/docs/main/manual-installation/frontend/room-page).
 
 </div>
 
-### Next steps
+</div>
+
+## Next steps
 
 Let's now [run the project](/docs/main/manual-installation#run-the-project).

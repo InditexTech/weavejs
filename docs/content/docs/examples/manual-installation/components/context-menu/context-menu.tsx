@@ -56,7 +56,7 @@ function ContextMenuButton({
   );
 }
 
-export const ContextMenu = ({
+export const ContextMenuRender = ({
   show,
   onChanged,
   position,

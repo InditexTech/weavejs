@@ -13,7 +13,7 @@ interface CollaborationRoomState {
   };
   user: ShowcaseUser | undefined;
   room: string | undefined;
-  contextMenu: {
+  contextMenu: { // [!code ++]
     // [!code ++]
     show: boolean; // [!code ++]
     position: Vector2d; // [!code ++]
@@ -33,7 +33,7 @@ export const useCollaborationRoom = create<CollaborationRoomState>()((set) => ({
   },
   user: undefined,
   room: undefined,
-  contextMenu: {
+  contextMenu: { // [!code ++]
     // [!code ++]
     show: false, // [!code ++]
     position: { x: 0, y: 0 }, // [!code ++]
@@ -46,7 +46,7 @@ export const useCollaborationRoom = create<CollaborationRoomState>()((set) => ({
     })),
   setUser: (newUser) => set((state) => ({ ...state, user: newUser })),
   setRoom: (newRoom) => set((state) => ({ ...state, room: newRoom })),
-  // prettier-ignore
+  // prettier-ignore // [!code ++]
   setContextMenuShow: ( // [!code ++]
     newContextMenuShow // [!code ++]
   ) => // [!code ++]
@@ -54,7 +54,7 @@ export const useCollaborationRoom = create<CollaborationRoomState>()((set) => ({
       ...state, // [!code ++]
       contextMenu: { ...state.contextMenu, show: newContextMenuShow }, // [!code ++]
     })), // [!code ++]
-  // prettier-ignore
+  // prettier-ignore // [!code ++]
   setContextMenuPosition: ( // [!code ++]
     newContextMenuPosition // [!code ++]
   ) => // [!code ++]
@@ -62,7 +62,7 @@ export const useCollaborationRoom = create<CollaborationRoomState>()((set) => ({
       ...state, // [!code ++]
       contextMenu: { ...state.contextMenu, position: newContextMenuPosition }, // [!code ++]
     })), // [!code ++]
-  // prettier-ignore
+  // prettier-ignore // [!code ++]
   setContextMenuOptions: ( // [!code ++]
     newContextMenuOptions // [!code ++]
   ) => // [!code ++]

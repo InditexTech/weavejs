@@ -1,20 +1,24 @@
 ---
 title: Enter Room page
-description: Learn how to setup the Enter Room page on Next.js
+description: Learn how to set up the Enter Room page on Next.js
 ---
 
 import { Separator } from "@/components/separator";
 
-## Introduction
+In this guide, we will walk through the process of building the **Enter Room page**:
 
-On this guide we build the **Enter Room page**. This page will allow an user to define
-which room we wants to join and with what username it wants to join it. Lets build it
-step by step.
+![Enter room page](/images/enter-room-page.png)
 
-## Setup the page
+This page allows users to define the room they wish to join and set their username. 
+Let's build it step by step.
 
-To setup the Enter Room page on the Next.js project, we need to fully complete
-this steps:
+## Prerequisites
+
+Before you begin, ensure that you have completed the [frontend installation guide](/docs/main/manual-installation/frontend), up to the *"Enter Room page"* step.
+
+## Step by step
+
+To set up the **Enter Room** page in your Next.js project, follow these steps:
 
 <div className="fd-steps">
 
@@ -24,7 +28,7 @@ this steps:
 
 Replace the contents of the file `app/page.tsx` with the following content:
 
-<include lang="tsx" meta='title="store/store.ts"'>
+<include lang="tsx" meta='title="app/page.tsx"'>
   ../../../examples/manual-installation/app/page.tsx
 </include>
 
@@ -34,18 +38,20 @@ Replace the contents of the file `app/page.tsx` with the following content:
  
 ### Install the UI building block components
 
-Lets now setup the necessary [Shadcn/UI](https://ui.shadcn.com/docs) components for the Enter Room page.
+Set up the necessary [Shadcn/UI](https://ui.shadcn.com/docs) components for the **Enter Room** page.
 
-We'll be using the [Shadcn/UI CLI](https://ui.shadcn.com/docs/cli) to install the UI components. Accept
+We will be using the [Shadcn/UI CLI](https://ui.shadcn.com/docs/cli) to install the UI components. Accept
 all the defaults from the CLI options.
 
-- First lets install the [Form](https://ui.shadcn.com/docs/components/form) component
+In the root directory of your project, follow these steps:
+
+- Install the [Form](https://ui.shadcn.com/docs/components/form) component:
 
   ```shell
   npx shadcn@latest add form
   ```
 
-- Then install the [Input](https://ui.shadcn.com/docs/components/input) component
+- Install the [Input](https://ui.shadcn.com/docs/components/input) component:
 
   ```shell
   npx shadcn@latest add input
@@ -57,11 +63,11 @@ all the defaults from the CLI options.
  
 ### Define the base styles
 
-Now let's tune up a little bit the styling of the `Enter Room` page.
+Now, let's tune up a little bit the styling of the **Enter Room** page.
 
-Replace the `@layer base` directive configuration on the `app/globals.css` file with this:
+On the `app/globals.css` file, replace the `@layer base` directive configuration with:
 
-<include lang="css" meta='title="store/store.ts"'>
+<include lang="css" meta='title="app/globals.css"'>
   ../../../examples/manual-installation/app/globals.css
 </include>
 
@@ -71,15 +77,11 @@ Replace the `@layer base` directive configuration on the `app/globals.css` file 
  
 ### Setup the page React component
 
-Lets first setup a folder to put all our components:
-
-- First create a `components` folder on the root of the project.
-- Then create a `home` folder on the `components` folder.
+Create a `home` folder on the `components` folder.
 
 #### Home component
 
-To setup the `Home` React component, create a file named: `home.tsx` inside the `components/home`
-folder with the following content:
+On the `components/home` folder, create a file named `home.tsx` with the following content:
 
 <include lang="tsx" meta='title="components/home/home.tsx"'>
   ../../../examples/manual-installation/components/home/home.tsx
@@ -87,23 +89,21 @@ folder with the following content:
 
 #### LoginForm component
 
-To setup the `LoginForm` React component, create a file named: `login-form.tsx` inside the `components/home`
-folder with the following content:
+On the `components/home` folder, create a file named `login-form.tsx` with the following content:
 
-<include lang="tsx" meta='title="compocomponents/home/login-form.tsx"'>
+<include lang="tsx" meta='title="components/home/login-form.tsx"'>
   ../../../examples/manual-installation/components/home/login-form.tsx
 </include>
 
 <Separator />
 
-Now that we have finished the setup of the Enter Room page, lets try and run the project, run the
-following command:
+Now that we have finished the setup of the **Enter Room** page, let's run the project:
 
 ```shell
 npm run dev
 ```
 
-Navigate to http://localhost:3000 on a browser, you should see the following:
+Navigate to `http://localhost:3000` on a browser. You should see the following:
 
 <div className="flex justify-center items-center *:max-w-[500px] bg-gradient-to-br from-fd-primary/10 rounded-xl border">
   ![Enter room page](/images/enter-room-page.png)
@@ -113,6 +113,6 @@ Navigate to http://localhost:3000 on a browser, you should see the following:
 
 </div>
 
-## Next Steps
+## Next steps
 
-Let's now setup the [Room page](/docs/main/manual-installation/frontend/room-page) of the Next.js application.
+Let's now set up the [Room page](/docs/main/manual-installation/frontend/room-page) of the Next.js application.

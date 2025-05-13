@@ -1,26 +1,24 @@
 ---
-title: Quick Start
-description: Start your first project
+title: Quickstart
+description: Build a real-time collaborative canvas application in minutes
 ---
 
 import { Tab, Tabs } from "fumadocs-ui/components/tabs";
 
-This Quickstart will guide you through getting your first real-time collaborative
-canvas project up and running — including both the backend and frontend — in just a
-few minutes.
+**Weave.js** is a framework for building collaborative visual tools. It's composable, extendable, and includes a CLI for quickly scaffolding projects.
 
-**Weave.js** is designed to make building collaborative visual tools simple,
-composable, and extendable, and our CLI tool helps you bootstrap everything quickly
-and easily.
+In this quickstart, you will learn how to set up your first real-time collaborative canvas project with Weave.js.
 
-## What You’ll Set Up
+## Prerequisites
 
-- A backend server that handles real-time synchronization using a Weave.js Store
-  provider, in the case of this quickstart we will use the [Weave.js Store WebSockets](/docs/main/build/stores/websockets-store).
-- A minimal frontend application powered by Weave.js, ready to render a collaborative
-  canvas with live updates.
+Before you begin, ensure that you meet the [requirements](/docs/main/requirements).
 
-## Quickstart
+## What you will set up
+
+- A backend server that handles real-time synchronization using a Weave.js Store provider.
+- A Next.js frontend application powered by Weave.js to render a collaborative canvas with live updates.
+
+## Step by step
 
 <div className="fd-steps">
 
@@ -28,8 +26,8 @@ and easily.
 
 ### Scaffold the backend project
 
-First lets create the backend server that will handle all the real-time synchronization
-using a Weave.js Store provider, in this case we will use the [Weave.js Store WebSockets](/docs/main/build/stores/websockets-store).
+First, create the backend server that will handle all the real-time synchronization using a Weave.js Store provider.
+In this case, we will use the [Weave.js Store WebSockets](/docs/main/build/stores/websockets-store).
 
 Open a terminal on your preferred folder and execute the following command:
 
@@ -47,13 +45,12 @@ yarn create weave-backend-app
 
 This command will launch Weave.js create backend CLI with the following steps:
 
-1. **Project name**: type the name of the folder where the backend project will be created.
-2. **Select the store**: for this quickstart select the store named,
+1. **Project name:**  The folder name where the backend project will be created (e.g. `my-service`).
+2. **Select the store:**  For this quickstart, select the store named:
 
-   `Express.js: Weave.js Websockets Store`
+    **Express.js: Weave.js Websockets Store**
 
-3. **Install dependencies automatically**: select `Yes`, this will install the
-   necessary dependencies of the project.
+3. **Install dependencies automatically:** Select **YES**.  This will install the necessary dependencies of the project.
 
 After the CLI finishes execute the following:
 
@@ -72,14 +69,15 @@ cd [backend-project-name]
 yarn run dev
 ```
 
-This will startup the backend server on `http://localhost:8080`. To check if everything is
-OK, open a browser and type the URL `http://localhost:8080/api/v1/health`, you should see a:
+This will start the backend server at `http://localhost:8080`. 
+
+To verify everything is running correctly, open a browser and enter the URL `http://localhost:8080/api/v1/health`.
+
+You should see the following response:
 
 ```json
 { "status": "OK" }
 ```
-
-on the screen when navigating to the URL if everything is up and running.
 
 </div>
 
@@ -87,11 +85,10 @@ on the screen when navigating to the URL if everything is up and running.
 
 ### Scaffold the frontend project
 
-Now let's create the frontend application on top of Next.js and powered by Weave.js,
-this will render the UI and canvas with live updates.
+Now let's create the frontend application on top of Next.js and powered by Weave.js.
+This will render the UI and canvas with live updates.
 
-Open a terminal on the same parent folder as the backend side project and execute the
-following command:
+Open a terminal on the same parent folder as the backend side project and execute the following command:
 
 ```bash tab="pnpm"
 pnpm create weave-frontend-app
@@ -107,14 +104,13 @@ yarn create weave-frontend-app
 
 This command will launch Weave.js create frontend CLI with the following steps:
 
-1. **Project name**: type the name of the folder where the frontend project will be
-   created.
-2. **Select the store**: for this quickstart select the store named,
+1. **Project name:**  The folder name where the frontend project will be created (e.g. `my-app`).
 
-   `Next.js: Weave.js Websockets Store`
+2. **Select the store:**  For this quickstart, select the store named:
 
-3. **Install dependencies automatically**: select `Yes`, this will install the
-   necessary dependencies of the project.
+    **Express.js: Weave.js Websockets Store**
+
+3. **Install dependencies automatically:** Select **YES**.  This will install the necessary dependencies of the project.
 
 After the CLI finishes execute the following:
 
@@ -133,9 +129,9 @@ cd [frontend-project-name]
 yarn run dev
 ```
 
-This will startup the Next.js frontend application on `http://localhost:3030`. Open
-a browser and navigate to: `http://localhost:3030`, you should see the following
-screen (be patient Next.js takes some time compiling the pages):
+This will start the Next.js frontend application at `http://localhost:3030`.
+
+Open a browser and navigate to `http://localhost:3030`. You should see the following screen (please be patient, as Next.js may take a moment to compile the pages):
 
 <div className="flex justify-center items-center *:max-w-[600px] bg-gradient-to-br from-fd-primary/10 rounded-xl border">
   ![Enter room page of the Weave.js project](/images/scaffolding/enter-room.png)
@@ -147,14 +143,13 @@ screen (be patient Next.js takes some time compiling the pages):
 
 ### Run the application
 
-To run the collaborative tool, just:
+To run the collaborative tool, follow these steps:
 
-1. Type the room name you want to join.
+1. Enter the room name you want to join.
 2. Type your username.
-3. Press the `ENTER THE ROOM` button.
+3. Press the **ENTER THE ROOM** button.
 
-Once the room is loaded (remember pages take time to compile) you should see this
-screen:
+Once the room is loaded (note that pages may take some time to compile), you should see the following screen:
 
 <div className="flex justify-center items-center *:max-w-[600px] bg-gradient-to-br from-fd-primary/10 rounded-xl border">
   ![Room page of the Weave.js project](/images/scaffolding/room.png)
@@ -168,20 +163,18 @@ Try adding a rectangle and enjoy!
 
 ## Next steps
 
-Now that you've completed the quickstart, you're ready to dive deeper into Weave.js and unlock its
-full potential. Here are some of our recommended next steps:
+Now that you have completed the quickstart, you are ready to dive deeper into Weave.js and unlock its full potential. 
+Here are some of our recommended next steps:
 
-### Explore the Architecture
+### Explore the building blocks
 
-To better understand Weave.js [architecture](/docs/main/build) and to learn
-how to build modular and interactive tools, learn how Weave.js is structured under
-the hood and get familiar with core concepts like:
+To learn how to build modular and interactive tools, explore how Weave.js is structured under the hood and get familiar with core concepts like:
 
-- [Nodes](/docs/main/build/nodes),
-- [Plugins](/docs/main/build/plugins),
-- and [Actions](/docs/main/build/actions).
+- [Nodes](/docs/main/build/nodes)
+- [Plugins](/docs/main/build/plugins)
+- [Actions](/docs/main/build/actions)
 
 ### Review the API Reference
 
-Dive into [API reference](/docs/sdk) to explore all available methods, utilities,
-and configuration options. This is your go-to resource as you start building more advanced features.
+Dive into [API reference](/docs/sdk) to explore all available methods, utilities, and configuration options.
+This is your go-to resource as you start building more advanced features.

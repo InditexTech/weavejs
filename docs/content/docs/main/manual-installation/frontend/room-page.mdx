@@ -1,17 +1,17 @@
 ---
 title: Room page
-description: Learn how to setup the Room page on Next.js
+description: Learn how to set up the Room page on Next.js
 ---
 
-## Introduction
+In this guide, we will build the **Room page**:
 
-On this guide we build the **Room page**. This page will render the collaborative
-canvas once an user joins the room.
+![Room page](/images/scaffolding/room.png)
 
-## Overview
+This page renders the collaborative canvas once a user joins the room.
 
-To setup the Room page on the Next.js project, we need to fully complete
-this steps:
+## Step by step
+
+To set up the Room page in your Next.js project, follow these steps:
 
 <div className="fd-steps">
 
@@ -19,13 +19,13 @@ this steps:
  
 ### Define the page component
 
-To setup the `Room` page component, follow this steps:
+To set up the **Room** page component, follow these steps:
 
-- Create a folder named `room` on the `app` folder.
-- Create a folder named `[roomId]` on the `app/room` folder.
-- Create a file named `page.tsx` on the `app/room/[roomId]` folder with the following content:
+- On the `app` folder, create a folder named `room`.
+- On the `app/room` folder, create a folder named `[roomId]`.
+- On the `app/room/[roomId]` folder, create a file named `page.tsx` with the following content:
 
-  <include lang="tsx" meta='title="app/room/roomId/page.tsx"'>
+  <include lang="tsx" meta='title="app/room/[roomId]/page.tsx"'>
     ../../../examples/manual-installation/app/room/roomId/page.tsx
   </include>
 
@@ -35,24 +35,26 @@ To setup the `Room` page component, follow this steps:
  
 ### Install the UI building block components
 
-Lets now setup the necessary [Shadcn/UI](https://ui.shadcn.com/docs) components for the `Room` page.
+Set up the necessary [Shadcn/UI](https://ui.shadcn.com/docs) components for the `Room` page.
 
-We'll be using the [Shadcn/UI CLI](https://ui.shadcn.com/docs/cli) to install the UI components. Accept
+We will be using the [Shadcn/UI CLI](https://ui.shadcn.com/docs/cli) to install the UI components. Accept
 all the defaults from the CLI options.
 
-- First lets install the [Tooltip](https://ui.shadcn.com/docs/components/tooltip) component
+In the root directory of your project, follow these steps:
+
+- Install the [Tooltip](https://ui.shadcn.com/docs/components/tooltip) component:
 
   ```shell
   npx shadcn@latest add tooltip
   ```
 
-- Install the [Dropdown Menu](https://ui.shadcn.com/docs/components/dropdown-menu) component
+- Install the [Dropdown Menu](https://ui.shadcn.com/docs/components/dropdown-menu) component:
 
   ```shell
   npx shadcn@latest add dropdown-menu
   ```
 
-- Finally install the [Avatar](https://ui.shadcn.com/docs/components/avatar) component
+- Install the [Avatar](https://ui.shadcn.com/docs/components/avatar) component:
 
   ```shell
   npx shadcn@latest add avatar
@@ -64,11 +66,12 @@ all the defaults from the CLI options.
  
 ### Define a constants file
 
-Lets define a set of constants that will define the **Weave.js** Nodes, Plugins and Actions
-that we will use, follow this steps:
+Let's define a set of constants that will define the **Weave.js** Nodes, Plugins, and Actions that we will use.
 
-- Lets create a folder named `utils` on the `components` folder.
-- Create a file named `constants.ts` on the `components/utils` folder with the following content:
+Follow these steps:
+
+- On the `components` folder, create a folder named `utils`.
+- On the `components/utils` folder, create a file named `constants.ts` with the following content:
 
   <include lang="ts" meta='title="components/utils/constants.ts"'>
     ../../../examples/manual-installation/components/utils/constants.ts
@@ -76,12 +79,12 @@ that we will use, follow this steps:
 
   File explanation:
 
-  - **`(1)`**: Import the **Weave.js** SDK dependency.
-  - **`(2)`**: Setup the Fonts available on **Weave.js**.
-  - **`(3)`**: Define the nodes we'll use on this example.
-  - **`(4)`**: Define the actions we'll use on this example.
-  - **`(5)`**: Define the custom plugins we'll use on this example. By default the xref:api-reference:react/weave-provider.adoc[WeaveProvider]
-    provider pre-defines a set of plugins. On this case we can override them or add extra plugins.
+  - **`(1)`**: Import the **Weave.js SDK** dependency.
+  - **`(2)`**: Set up the fonts available on **Weave.js**.
+  - **`(3)`**: Define the nodes we will use in this example.
+  - **`(4)`**: Define the actions we will use in this example.
+  - **`(5)`**: Define the custom plugins we will use in this example. By default the [WeaveProvider](/docs/react/api-reference/providers/weave-provider)
+    pre-defines a set of plugins. In this case, we can override them or add extra plugins.
 
 </div>
 
@@ -89,12 +92,14 @@ that we will use, follow this steps:
  
 ### Define the page React hooks
 
-Lets define the hooks with the logic for the Room page, this way we separate the component logic
-from the UI logic. To start create a `hooks` folder on the `components` folder.
+Let's define the hooks with the logic for the **Room** page.
+This way, we separate the component logic from the UI logic. 
+
+To start, create a `hooks` folder on the root directory.
 
 ##### useHandleRouteParams hook
 
-On the `components/hooks` folder, create a file named `use-handle-route-params.ts` with
+On the `hooks` folder, create a file named `use-handle-route-params.ts` with
 the following content:
 
 <include lang="tsx" meta='title="hooks/use-handle-route-params.ts"'>
@@ -103,7 +108,7 @@ the following content:
 
 #### useGetWebsocketsStore hook
 
-On the `components/hooks` folder, create a file named `use-get-websockets-store.ts` with the following
+On the `hooks` folder, create a file named `use-get-websockets-store.ts` with the following
 content:
 
 <include lang="tsx" meta='title="hooks/use-get-websockets-store.ts"'>
@@ -112,7 +117,7 @@ content:
 
 #### useGetWeaveJsProps
 
-On the `components/hooks` folder, create a file named `use-get-weave-js-props.ts` with the following
+On the `hooks` folder, create a file named `use-get-weave-js-props.ts` with the following
 content:
 
 <include lang="tsx" meta='title="hooks/use-get-weave-js-props.ts"'>
@@ -121,11 +126,11 @@ content:
 
 #### useContextMenu
 
-On the `components/hooks` folder, create a file named `use-context-menu.ts` with the following
+On the `hooks` folder, create a file named `use-context-menu.tsx` with the following
 content:
 
-<include lang="tsx" meta='title="hooks/use-context-menu.ts"'>
-  ../../../examples/manual-installation/hooks/use-context-menu.ts
+<include lang="tsx" meta='title="hooks/use-context-menu.tsx"'>
+  ../../../examples/manual-installation/hooks/use-context-menu.tsx
 </include>
 
 </div>
@@ -134,16 +139,15 @@ content:
  
 ### Define the page React components
 
-Lets first setup a folder to put all our components:
+Set up the following directories to organize our components:
 
-- Create a `room` folder on the `components` folder.
-- Create a `overlays` folder on the `components` folder.
-- Create a `context-menu` folder on the `components` folder.
+- On the `components` folder, create a `room` folder.
+- On the `components` folder, create an `overlays` folder.
+- On the `components` folder, create a `context-menu` folder.
 
 #### Room component
 
-To setup the `Room` React component, create a file named `room.tsx` on the `components/room`
-folder with the following content:
+On the `components/room` folder, create a file named `room.tsx` with the following content:
 
 <include lang="tsx" meta='title="components/room/room.tsx"'>
   ../../../examples/manual-installation/components/room/room.tsx
@@ -151,8 +155,7 @@ folder with the following content:
 
 #### RoomLayout component
 
-To setup the `RoomLayout` React component, create a file named `room.layout.tsx` on the `components/room`
-folder with the following content:
+On the `components/room` folder, create a file named `room.layout.tsx` with the following content:
 
 <include lang="tsx" meta='title="components/room/room.layout.tsx"'>
   ../../../examples/manual-installation/components/room/room.layout.tsx
@@ -160,8 +163,7 @@ folder with the following content:
 
 #### RoomLoader
 
-To setup the `Room` React component, create a file named `room-loader.tsx` on the `components/room`
-folder with the following content:
+On the `components/room` folder, create a file named `room-loader.tsx` with the following content:
 
 <include lang="tsx" meta='title="components/room/room-loader.tsx"'>
   ../../../examples/manual-installation/components/room/room-loader.tsx
@@ -169,8 +171,7 @@ folder with the following content:
 
 #### ConnectedUsers
 
-To setup the `ConnectedUsers` React component, create a file named `connected-users.tsx` on the `components/overlays`
-folder with the following content:
+On the `components/overlays` folder, create a file named `connected-users.tsx` with the following content:
 
 <include lang="tsx" meta='title="components/overlays/connected-users.tsx"'>
   ../../../examples/manual-installation/components/overlays/connected-users.tsx
@@ -178,8 +179,7 @@ folder with the following content:
 
 #### ConnectionStatus
 
-To setup the `ConnectionStatus` React component, create a file named `connection-status.tsx` on the `components/overlays`
-folder with the following content:
+On the `components/overlays` folder, create a file named `connection-status.tsx` with the following content:
 
 <include lang="tsx" meta='title="components/overlays/connection-status.tsx"'>
   ../../../examples/manual-installation/components/overlays/connection-status.tsx
@@ -187,8 +187,7 @@ folder with the following content:
 
 #### RoomInformationOverlay
 
-To setup the `RoomInformationOverlay` React component, create a file named `room-information-overlay.tsx` on the `components/overlays`
-folder with the following content:
+On the `components/overlays` folder, create a file named `room-information-overlay.tsx` with the following content:
 
 <include
   lang="tsx"
@@ -199,8 +198,7 @@ folder with the following content:
 
 #### RoomUsersOverlay
 
-To setup the `RoomUsersOverlay` React component, create a file named `room-users-overlay.tsx` on the `components/overlays`
-folder with the following content:
+On the `components/overlays` folder, create a file named `room-users-overlay.tsx` with the following content:
 
 <include lang="tsx" meta='title="components/overlays/room-users-overlay.tsx"'>
   ../../../examples/manual-installation/components/overlays/room-users-overlay.tsx
@@ -208,8 +206,7 @@ folder with the following content:
 
 #### ToolbarButton
 
-To setup the `ToolbarButton` React component, create a file named `toolbar-button.tsx` on the `components/overlays`
-folder with the following content:
+On the `components/overlays` folder, create a file named `toolbar-button.tsx` with the following content:
 
 <include lang="tsx" meta='title="components/overlays/toolbar-button.tsx"'>
   ../../../examples/manual-installation/components/overlays/toolbar-button.tsx
@@ -217,8 +214,7 @@ folder with the following content:
 
 #### Toolbar
 
-To setup the `Toolbar` React component, create a file named `toolbar.tsx` on the `components/overlays`
-folder with the following content:
+On the `components/overlays` folder, create a file named `toolbar.tsx` with the following content:
 
 <include lang="tsx" meta='title="components/overlays/toolbar.tsx"'>
   ../../../examples/manual-installation/components/overlays/toolbar.tsx
@@ -226,8 +222,7 @@ folder with the following content:
 
 #### ToolsOverlay
 
-To setup the `ToolsOverlay` React component, create a file named `tools-overlay.tsx` on the `components/overlays`
-folder with the following content:
+On the `components/overlays` folder, create a file named `tools-overlay.tsx` with the following content:
 
 <include lang="tsx" meta='title="components/overlays/tools-overlay.tsx"'>
   ../../../examples/manual-installation/components/overlays/tools-overlay.tsx
@@ -235,8 +230,7 @@ folder with the following content:
 
 #### ZoomHandlerOverlay
 
-To setup the `ZoomHandlerOverlay` React component, create a file named `zoom-handler-overlay.tsx` on the `components/overlays`
-folder with the following content:
+On the `components/overlays` folder, create a file named `zoom-handler-overlay.tsx` with the following content:
 
 <include lang="tsx" meta='title="components/overlays/zoom-handler-overlay.tsx"'>
   ../../../examples/manual-installation/components/overlays/zoom-handler-overlay.tsx
@@ -244,8 +238,7 @@ folder with the following content:
 
 #### ContextMenu
 
-To setup the `ContextMenu` React component, create a file named `context-menu` on the `components/context-menu`
-folder with the following content:
+On the `components/context-menu` folder, create a file named `context-menu` with the following content:
 
 <include lang="tsx" meta='title="components/context-menu/context-menu.tsx"'>
   ../../../examples/manual-installation/components/context-menu/context-menu.tsx
@@ -267,6 +260,6 @@ Add the following changes to the `store/store.ts` file, to maintain the state of
 
 </div>
 
-## Next Steps
+## Next steps
 
 Let's now [run the project](/docs/main/manual-installation#run-the-project).
