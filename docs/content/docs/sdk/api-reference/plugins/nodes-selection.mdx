@@ -91,6 +91,64 @@ For `WeaveNodesSelectionPluginConfig`:
   }}
 />
 
+## Methods
+
+### getTransformer
+
+```ts
+getTransformer(): Konva.Transformer
+```
+
+This method returns the underlying Transformer of the plugin.
+
+### setSelectedNodes
+
+```ts
+setSelectedNodes(nodes: Konva.Node[]): void
+```
+
+This method set the specified nodes as selected on the underlying Transformer of the plugin.
+
+### getSelectedNodes
+
+```ts
+getSelectedNodes(): (Konva.Group | Konva.Shape)[]
+```
+
+This method returns the selected nodes from the underlying Transformer of the plugin.
+
+### getSelectedNodesExtended
+
+```ts
+getSelectedNodesExtended(): WeaveSelection[]
+```
+
+This method returns the selected nodes but using the WeaveSelection format from the underlying Transformer of the plugin.
+
+### selectAll
+
+```ts
+selectAll(): void
+```
+
+This method selects all nodes using the underlying Transformer of the plugin.
+
+### selectNone
+
+```ts
+selectNone(): void
+```
+
+This method selects no nodes (0) using the underlying Transformer of the plugin.
+
+### removeSelectedNodes
+
+```ts
+removeSelectedNodes(): void
+```
+
+This method removes the selected nodes of the underlying Transformer of the plugin.
+
 ## Events
 
 ### onNodesChange
