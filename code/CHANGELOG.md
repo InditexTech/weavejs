@@ -13,6 +13,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.9.3] - 2025-05-13
+
 ### Fixed
 
 - [#161](https://github.com/InditexTech/weavejs/issues/161) Fix create-app issues with Node 18 and missing dependencies
@@ -168,21 +170,40 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - [#24](https://github.com/InditexTech/weavejs/issues/24) Bug when loading rooms with text or images
 - [#18](https://github.com/InditexTech/weavejs/issues/18) Fix awareness not working on store-azure-web-pubsub
 
-[Unreleased]: https://github.com/InditexTech/weavejs/compare/0.9.2...HEAD
+[Unreleased]: https://github.com/InditexTech/weavejs/compare/0.9.3...HEAD
+
+[0.9.3]: https://github.com/InditexTech/weavejs/compare/0.9.2...0.9.3
+
 [0.9.2]: https://github.com/InditexTech/weavejs/compare/0.9.1...0.9.2
+
 [0.9.1]: https://github.com/InditexTech/weavejs/compare/0.9.0...0.9.1
+
 [0.9.0]: https://github.com/InditexTech/weavejs/compare/0.8.0...0.9.0
+
 [0.8.0]: https://github.com/InditexTech/weavejs/compare/0.7.1...0.8.0
+
 [0.7.1]: https://github.com/InditexTech/weavejs/compare/0.7.0...0.7.1
+
 [0.7.0]: https://github.com/InditexTech/weavejs/compare/0.6.0...0.7.0
+
 [0.6.0]: https://github.com/InditexTech/weavejs/compare/0.5.0...0.6.0
+
 [0.5.0]: https://github.com/InditexTech/weavejs/compare/0.4.0...0.5.0
+
 [0.4.0]: https://github.com/InditexTech/weavejs/compare/0.3.3...0.4.0
+
 [0.3.3]: https://github.com/InditexTech/weavejs/compare/0.3.2...0.3.3
+
 [0.3.2]: https://github.com/InditexTech/weavejs/compare/0.3.1...0.3.2
+
 [0.3.1]: https://github.com/InditexTech/weavejs/compare/0.3.0...0.3.1
+
 [0.3.0]: https://github.com/InditexTech/weavejs/compare/0.2.1...0.3.0
+
 [0.2.1]: https://github.com/InditexTech/weavejs/compare/0.2.0...0.2.1
+
 [0.2.0]: https://github.com/InditexTech/weavejs/compare/0.1.1...0.2.0
+
 [0.1.1]: https://github.com/InditexTech/weavejs/compare/0.1.0...0.1.1
+
 [0.1.0]: https://github.com/InditexTech/weavejs/releases/tag/0.1.0
