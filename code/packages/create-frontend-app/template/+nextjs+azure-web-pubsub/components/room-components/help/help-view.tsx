@@ -1,10 +1,6 @@
-// SPDX-FileCopyrightText: 2025 2025 INDUSTRIA DE DISEÑO TEXTIL S.A. (INDITEX S.A.)
-//
-// SPDX-License-Identifier: Apache-2.0
-
-import { Eye, MousePointer } from "lucide-react";
-import { SYSTEM_OS } from "@/lib/utils";
-import { HelpShortcutElement } from "./help-shortcut-element";
+import { Eye, MousePointer } from 'lucide-react';
+import { SYSTEM_OS } from '@/lib/utils';
+import { HelpShortcutElement } from './help-shortcut-element';
 
 export const HelpView = () => {
   return (
@@ -14,8 +10,8 @@ export const HelpView = () => {
           icon={<Eye />}
           label="Show/Hide UI / Zen mode"
           shortcuts={{
-            [SYSTEM_OS.MAC]: "⌘ \\",
-            [SYSTEM_OS.OTHER]: "Ctrl \\",
+            [SYSTEM_OS.MAC]: '⌘ \\',
+            [SYSTEM_OS.OTHER]: 'Ctrl \\',
           }}
         />
       </div>
@@ -24,8 +20,8 @@ export const HelpView = () => {
           icon={<MousePointer />}
           label="Users cursors"
           shortcuts={{
-            [SYSTEM_OS.MAC]: "⌥ ⌘ U",
-            [SYSTEM_OS.OTHER]: "Alt Ctrl U",
+            [SYSTEM_OS.MAC]: '⌥ ⌘ U',
+            [SYSTEM_OS.OTHER]: 'Alt Ctrl U',
           }}
         />
       </div>

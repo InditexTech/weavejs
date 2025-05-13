@@ -1,19 +1,15 @@
-// SPDX-FileCopyrightText: 2025 2025 INDUSTRIA DE DISEÑO TEXTIL S.A. (INDITEX S.A.)
-//
-// SPDX-License-Identifier: Apache-2.0
-
-import { Vector2d } from "konva/lib/types";
-import { create } from "zustand";
-import { ContextMenuOption } from "@/components/room-components/context-menu";
-import { WeaveElementAttributes } from "@inditextech/weave-types";
-import { SIDEBAR_ELEMENTS } from "@/lib/constants";
+import { Vector2d } from 'konva/lib/types';
+import { create } from 'zustand';
+import { ContextMenuOption } from '@/components/room-components/context-menu';
+import { WeaveElementAttributes } from '@inditextech/weave-types';
+import { SIDEBAR_ELEMENTS } from '@/lib/constants';
 
 type ShowcaseUser = {
   name: string;
   email: string;
 };
 
-type NodePropertiesAction = "create" | "update" | undefined;
+type NodePropertiesAction = 'create' | 'update' | undefined;
 
 type FinishUploadCallback = (imageURL: string) => void;
 
@@ -79,7 +75,7 @@ interface CollaborationRoomState {
   ) => void;
   setSidebarActive: (
     newSidebarActive: SidebarActive,
-    position?: "left" | "right"
+    position?: 'left' | 'right'
   ) => void;
 }
 
@@ -213,7 +209,7 @@ export const useCollaborationRoom = create<CollaborationRoomState>()((set) => ({
         createProps: newNodePropertiesCreateProps,
       },
     })),
-  setSidebarActive: (newSidebarActive, position = "left") =>
+  setSidebarActive: (newSidebarActive, position = 'left') =>
     set((state) => ({
       ...state,
       sidebar: {

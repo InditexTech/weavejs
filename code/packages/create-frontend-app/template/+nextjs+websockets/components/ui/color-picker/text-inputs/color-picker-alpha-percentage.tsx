@@ -1,16 +1,8 @@
-// SPDX-FileCopyrightText: 2025 2025 INDUSTRIA DE DISEÑO TEXTIL S.A. (INDITEX S.A.)
-//
-// SPDX-License-Identifier: Apache-2.0
-
-import { Input } from "@/components/ui/input";
-import { cn } from "@/lib/utils";
-import {
-  type ComponentProps,
-  useEffect,
-  useState,
-} from "react";
-import { useColorPicker } from "../context/color-picker-context";
-import Color, { ColorInstance } from "color";
+import { Input } from '@/components/ui/input';
+import { cn } from '@/lib/utils';
+import { type ComponentProps, useEffect, useState } from 'react';
+import { useColorPicker } from '../context/color-picker-context';
+import Color, { ColorInstance } from 'color';
 
 /**
  * PercentageInput component
@@ -32,7 +24,7 @@ const PercentageInput = ({
       const newColor = Color(color.alpha(Number(e.target.value) / 100));
       setColor(newColor);
     } catch (error) {
-      console.error("Invalid color value", error);
+      console.error('Invalid color value', error);
     }
   };
 
@@ -50,7 +42,7 @@ const PercentageInput = ({
         aria-label="Opacity percentage"
         {...props}
         className={cn(
-          "h-8 w-[4.7rem] rounded-none !text-xs font-normal text-gray-700 text-left focus:outline-none bg-transparent uppercase",
+          'h-8 w-[4.7rem] rounded-none !text-xs font-normal text-gray-700 text-left focus:outline-none bg-transparent uppercase',
           className
         )}
       />

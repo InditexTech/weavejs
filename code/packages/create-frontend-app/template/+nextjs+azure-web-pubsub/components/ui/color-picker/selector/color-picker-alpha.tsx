@@ -1,10 +1,6 @@
-// SPDX-FileCopyrightText: 2025 2025 INDUSTRIA DE DISEÑO TEXTIL S.A. (INDITEX S.A.)
-//
-// SPDX-License-Identifier: Apache-2.0
-
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { cn } from "@/lib/utils";
-import { Range, Root, Thumb, Track } from "@radix-ui/react-slider";
+import { cn } from '@/lib/utils';
+import { Range, Root, Thumb, Track } from '@radix-ui/react-slider';
 import {
   type HTMLAttributes,
   useCallback,
@@ -12,8 +8,8 @@ import {
   useMemo,
   useRef,
   useState,
-} from "react";
-import { useColorPicker } from "../context/color-picker-context";
+} from 'react';
+import { useColorPicker } from '../context/color-picker-context';
 
 export type ColorPickerAlphaProps = HTMLAttributes<HTMLDivElement>;
 
@@ -55,7 +51,7 @@ export const ColorPickerAlpha = ({
       max={100}
       step={1}
       className={cn(
-        "relative flex h-5 w-full touch-none items-center transition-opacity duration-200",
+        'relative flex h-5 w-full touch-none items-center transition-opacity duration-200',
         className
       )}
       onValueChange={onValueChange}

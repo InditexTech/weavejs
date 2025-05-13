@@ -1,7 +1,3 @@
-// SPDX-FileCopyrightText: 2025 2025 INDUSTRIA DE DISEÑO TEXTIL S.A. (INDITEX S.A.)
-//
-// SPDX-License-Identifier: Apache-2.0
-
 import {
   Command,
   CommandEmpty,
@@ -9,17 +5,17 @@ import {
   CommandInput,
   CommandItem,
   CommandList,
-} from "@/components/ui/command";
+} from '@/components/ui/command';
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
-} from "@/components/ui/popover";
-import { Check, ChevronDown } from "lucide-react";
+} from '@/components/ui/popover';
+import { Check, ChevronDown } from 'lucide-react';
 
-import { Button } from "@/components/ui/button";
-import { useEffect, useRef, useState } from "react";
-import { FONTS } from "@/components/utils/constants";
+import { Button } from '@/components/ui/button';
+import { useEffect, useRef, useState } from 'react';
+import { FONTS } from '@/components/utils/constants';
 
 function InputFontFamily({
   value,

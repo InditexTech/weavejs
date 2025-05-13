@@ -1,13 +1,9 @@
-// SPDX-FileCopyrightText: 2025 2025 INDUSTRIA DE DISEÑO TEXTIL S.A. (INDITEX S.A.)
-//
-// SPDX-License-Identifier: Apache-2.0
-
-import React from "react";
-import { NumericFormat, NumericFormatProps } from "react-number-format";
-import { Input } from "@/components/ui/input";
+import React from 'react';
+import { NumericFormat, NumericFormatProps } from 'react-number-format';
+import { Input } from '@/components/ui/input';
 
 export interface NumberInputProps
-  extends Omit<NumericFormatProps, "value" | "onValueChange"> {
+  extends Omit<NumericFormatProps, 'value' | 'onValueChange'> {
   label?: string;
   stepper?: number;
   thousandSeparator?: string;
@@ -114,4 +110,4 @@ export const NumberInput = React.forwardRef<HTMLInputElement, NumberInputProps>(
   }
 );
 
-NumberInput.displayName = "NumberInput";
+NumberInput.displayName = 'NumberInput';

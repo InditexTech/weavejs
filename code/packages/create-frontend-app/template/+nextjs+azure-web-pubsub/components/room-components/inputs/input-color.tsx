@@ -1,11 +1,7 @@
-// SPDX-FileCopyrightText: 2025 2025 INDUSTRIA DE DISEÑO TEXTIL S.A. (INDITEX S.A.)
-//
-// SPDX-License-Identifier: Apache-2.0
+'use client';
 
-"use client";
-
-import React, { useState, useEffect } from "react";
-import { Input } from "@/components/ui/input";
+import React, { useState, useEffect } from 'react';
+import { Input } from '@/components/ui/input';
 import {
   ColorPicker,
   ColorPickerAlpha,
@@ -14,12 +10,12 @@ import {
   ColorPickerHue,
   ColorPickerFormatSelector,
   ColorPickerSaturation,
-} from "@/components/ui/color-picker";
+} from '@/components/ui/color-picker';
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
-} from "@/components/ui/popover";
+} from '@/components/ui/popover';
 
 type InputColorProps = {
   label?: string;
@@ -91,7 +87,7 @@ export const InputColor = ({
           onChange={handleInputChange}
           onBlur={handleBlur}
           onKeyDown={(e) => {
-            if (e.key === "Enter") {
+            if (e.key === 'Enter') {
               e.preventDefault();
               e.stopPropagation();
               const input = e.target as HTMLInputElement;

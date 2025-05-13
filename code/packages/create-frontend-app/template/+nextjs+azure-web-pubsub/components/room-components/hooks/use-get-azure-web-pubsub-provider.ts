@@ -15,6 +15,7 @@ function useGetAzureWebPubsubProvider({
   getUser: () => WeaveUser;
 }) {
   const room = useCollaborationRoom((state) => state.room);
+  const user = useCollaborationRoom((state) => state.user);
 
   const setFetchConnectionUrlLoading = useCollaborationRoom(
     (state) => state.setFetchConnectionUrlLoading
@@ -44,7 +45,7 @@ function useGetAzureWebPubsubProvider({
   );
 
   const wsProvider = React.useMemo(() => {
-    if (loadedParams && room) {
+    if (loadedParams && room && user) {
       return new WeaveStoreAzureWebPubsub(
         {
           getUser,
@@ -70,6 +71,7 @@ function useGetAzureWebPubsubProvider({
     onConnectionStatusChangeHandler,
     onFetchConnectionUrlHandler,
     room,
+    user,
   ]);
 
   return wsProvider;

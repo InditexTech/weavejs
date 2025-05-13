@@ -1,7 +1,3 @@
-// SPDX-FileCopyrightText: 2025 2025 INDUSTRIA DE DISEÑO TEXTIL S.A. (INDITEX S.A.)
-//
-// SPDX-License-Identifier: Apache-2.0
-
 import {
   HTMLAttributes,
   useCallback,
@@ -9,10 +5,10 @@ import {
   useMemo,
   useRef,
   useState,
-} from "react";
-import { useColorPicker } from "../context/color-picker-context";
-import { cn } from "@/lib/utils";
-import Color from "color";
+} from 'react';
+import { useColorPicker } from '../context/color-picker-context';
+import { cn } from '@/lib/utils';
+import Color from 'color';
 
 export type ColorPickerSaturationProps = HTMLAttributes<HTMLDivElement>;
 
@@ -31,7 +27,7 @@ export const ColorPickerSaturation = ({
   const renderGradient = useCallback(() => {
     if (canvasRef.current) {
       const canvas = canvasRef.current;
-      const ctx = canvas.getContext("2d", {
+      const ctx = canvas.getContext('2d', {
         willReadFrequently: true,
       });
       if (ctx && containerRef.current) {
@@ -40,14 +36,14 @@ export const ColorPickerSaturation = ({
         canvas.height = height;
 
         const gradX = ctx.createLinearGradient(0, 0, width, 0);
-        gradX.addColorStop(0.1, "rgb(255,255,255)");
+        gradX.addColorStop(0.1, 'rgb(255,255,255)');
         gradX.addColorStop(0.9, `hsl(${hue}, 100%, 50%)`);
         ctx.fillStyle = gradX;
         ctx.fillRect(0, 0, width, height);
 
         const gradY = ctx.createLinearGradient(0, 0, 0, height);
-        gradY.addColorStop(0.1, "rgba(0,0,0,0)");
-        gradY.addColorStop(0.9, "rgba(0,0,0,1)");
+        gradY.addColorStop(0.1, 'rgba(0,0,0,0)');
+        gradY.addColorStop(0.9, 'rgba(0,0,0,1)');
         ctx.fillStyle = gradY;
         ctx.fillRect(0, 0, width, height);
       }
@@ -75,7 +71,7 @@ export const ColorPickerSaturation = ({
       );
       setPosition({ x: x / rect.width, y: y / rect.height });
 
-      const ctx = canvasRef.current.getContext("2d", {
+      const ctx = canvasRef.current.getContext('2d', {
         willReadFrequently: true,
       });
       if (ctx) {
@@ -102,11 +98,11 @@ export const ColorPickerSaturation = ({
   useEffect(() => {
     if (isDragging) {
       const onPointerUp = () => setIsDragging(false);
-      window.addEventListener("pointermove", handlePointerMove);
-      window.addEventListener("pointerup", onPointerUp);
+      window.addEventListener('pointermove', handlePointerMove);
+      window.addEventListener('pointerup', onPointerUp);
       return () => {
-        window.removeEventListener("pointermove", handlePointerMove);
-        window.removeEventListener("pointerup", onPointerUp);
+        window.removeEventListener('pointermove', handlePointerMove);
+        window.removeEventListener('pointerup', onPointerUp);
       };
     }
   }, [isDragging, handlePointerMove]);
@@ -125,7 +121,7 @@ export const ColorPickerSaturation = ({
       <div
         ref={containerRef}
         className={cn(
-          "relative aspect-[4/3] w-full cursor-crosshair rounded-none",
+          'relative aspect-[4/3] w-full cursor-crosshair rounded-none',
           className
         )}
         style={{
@@ -143,11 +139,11 @@ export const ColorPickerSaturation = ({
           style={{
             left: `${position.x * 100}%`,
             top: `${position.y * 100}%`,
-            boxShadow: "0 0 0 1px rgba(0,0,0,0.5)",
+            boxShadow: '0 0 0 1px rgba(0,0,0,0.5)',
           }}
         />
       </div>
-      <canvas ref={canvasRef} style={{ display: "none" }} />
+      <canvas ref={canvasRef} style={{ display: 'none' }} />
     </>
   );
 };

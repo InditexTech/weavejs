@@ -1,11 +1,7 @@
-// SPDX-FileCopyrightText: 2025 2025 INDUSTRIA DE DISEÑO TEXTIL S.A. (INDITEX S.A.)
-//
-// SPDX-License-Identifier: Apache-2.0
+'use client';
 
-"use client";
-
-import React from "react";
-import { WeaveStateElement } from "@inditextech/weave-types";
+import React from 'react';
+import { WeaveStateElement } from '@inditextech/weave-types';
 import {
   Eye,
   EyeOff,
@@ -15,12 +11,12 @@ import {
   Tally1,
   Tally2,
   Tally3,
-} from "lucide-react";
-import { InputColor } from "../inputs/input-color";
-import { ToggleIconButton } from "../toggle-icon-button";
-import { useWeave } from "@inditextech/weave-react";
-import { useCollaborationRoom } from "@/store/store";
-import { InputNumber } from "../inputs/input-number";
+} from 'lucide-react';
+import { InputColor } from '../inputs/input-color';
+import { ToggleIconButton } from '../toggle-icon-button';
+import { useWeave } from '@inditextech/weave-react';
+import { useCollaborationRoom } from '@/store/store';
+import { InputNumber } from '../inputs/input-number';
 
 export function StrokeProperties() {
   const instance = useWeave((state) => state.instance);
@@ -41,16 +37,16 @@ export function StrokeProperties() {
 
   React.useEffect(() => {
     if (!instance) return;
-    if (actualAction && nodePropertiesAction === "create") {
+    if (actualAction && nodePropertiesAction === 'create') {
       setActualNode({
-        key: "creating",
-        type: "undefined",
+        key: 'creating',
+        type: 'undefined',
         props: {
           ...nodeCreateProps,
         },
       });
     }
-    if (node && nodePropertiesAction === "update") {
+    if (node && nodePropertiesAction === 'update') {
       setActualNode(node);
     }
     if (!actualAction && !node) {
@@ -61,10 +57,10 @@ export function StrokeProperties() {
   const updateElement = React.useCallback(
     (updatedNode: WeaveStateElement) => {
       if (!instance) return;
-      if (actualAction && nodePropertiesAction === "create") {
+      if (actualAction && nodePropertiesAction === 'create') {
         instance.updatePropsAction(actualAction, updatedNode.props);
       }
-      if (nodePropertiesAction === "update") {
+      if (nodePropertiesAction === 'update') {
         instance.updateNode(updatedNode);
       }
     },
@@ -77,9 +73,9 @@ export function StrokeProperties() {
 
   if (!actualAction && !actualNode) return null;
 
-  if (["colorTokenTool", "frameTool"].includes(actualAction)) return null;
+  if (['colorTokenTool', 'frameTool'].includes(actualAction)) return null;
 
-  if (["text", "color-token", "frame"].includes(actualNode.type)) {
+  if (['text', 'color-token', 'frame'].includes(actualNode.type)) {
     return null;
   }
 
@@ -111,9 +107,9 @@ export function StrokeProperties() {
         <div className="grid grid-cols-2 gap-3 w-full">
           <InputColor
             label="Color (#RGBA)"
-            value={`${(actualNode.props.stroke ?? "#000000FF").replace(
-              "#",
-              ""
+            value={`${(actualNode.props.stroke ?? '#000000FF').replace(
+              '#',
+              ''
             )}`}
             onChange={(value) => {
               const updatedNode: WeaveStateElement = {
@@ -140,8 +136,8 @@ export function StrokeProperties() {
               updateElement(updatedNode);
             }}
           />
-          {(["line"].includes(actualNode.type) ||
-            ["brushTool", "penTool"].includes(actualAction)) && (
+          {(['line'].includes(actualNode.type) ||
+            ['brushTool', 'penTool'].includes(actualAction)) && (
             <>
               <div className="col-span-2">
                 <InputNumber
@@ -167,13 +163,13 @@ export function StrokeProperties() {
                   <ToggleIconButton
                     kind="switch"
                     icon={<Tally1 size={16} />}
-                    pressed={(actualNode.props.lineJoin ?? "miter") === "miter"}
+                    pressed={(actualNode.props.lineJoin ?? 'miter') === 'miter'}
                     onClick={() => {
                       const updatedNode: WeaveStateElement = {
                         ...actualNode,
                         props: {
                           ...actualNode.props,
-                          lineJoin: "miter",
+                          lineJoin: 'miter',
                         },
                       };
                       updateElement(updatedNode);
@@ -182,13 +178,13 @@ export function StrokeProperties() {
                   <ToggleIconButton
                     kind="switch"
                     icon={<Tally2 size={16} />}
-                    pressed={(actualNode.props.lineJoin ?? "miter") === "round"}
+                    pressed={(actualNode.props.lineJoin ?? 'miter') === 'round'}
                     onClick={() => {
                       const updatedNode: WeaveStateElement = {
                         ...actualNode,
                         props: {
                           ...actualNode.props,
-                          lineJoin: "round",
+                          lineJoin: 'round',
                         },
                       };
                       updateElement(updatedNode);
@@ -197,13 +193,13 @@ export function StrokeProperties() {
                   <ToggleIconButton
                     kind="switch"
                     icon={<Tally3 size={16} />}
-                    pressed={(actualNode.props.lineJoin ?? "miter") === "bevel"}
+                    pressed={(actualNode.props.lineJoin ?? 'miter') === 'bevel'}
                     onClick={() => {
                       const updatedNode: WeaveStateElement = {
                         ...actualNode,
                         props: {
                           ...actualNode.props,
-                          lineJoin: "bevel",
+                          lineJoin: 'bevel',
                         },
                       };
                       updateElement(updatedNode);
@@ -219,13 +215,13 @@ export function StrokeProperties() {
                   <ToggleIconButton
                     kind="switch"
                     icon={<Tally1 size={16} />}
-                    pressed={(actualNode.props.lineCap ?? "butt") === "butt"}
+                    pressed={(actualNode.props.lineCap ?? 'butt') === 'butt'}
                     onClick={() => {
                       const updatedNode: WeaveStateElement = {
                         ...actualNode,
                         props: {
                           ...actualNode.props,
-                          lineCap: "butt",
+                          lineCap: 'butt',
                         },
                       };
                       updateElement(updatedNode);
@@ -234,13 +230,13 @@ export function StrokeProperties() {
                   <ToggleIconButton
                     kind="switch"
                     icon={<Tally2 size={16} />}
-                    pressed={(actualNode.props.lineCap ?? "butt") === "round"}
+                    pressed={(actualNode.props.lineCap ?? 'butt') === 'round'}
                     onClick={() => {
                       const updatedNode: WeaveStateElement = {
                         ...actualNode,
                         props: {
                           ...actualNode.props,
-                          lineCap: "round",
+                          lineCap: 'round',
                         },
                       };
                       updateElement(updatedNode);
@@ -249,13 +245,13 @@ export function StrokeProperties() {
                   <ToggleIconButton
                     kind="switch"
                     icon={<Tally3 size={16} />}
-                    pressed={(actualNode.props.lineCap ?? "butt") === "square"}
+                    pressed={(actualNode.props.lineCap ?? 'butt') === 'square'}
                     onClick={() => {
                       const updatedNode: WeaveStateElement = {
                         ...actualNode,
                         props: {
                           ...actualNode.props,
-                          lineCap: "square",
+                          lineCap: 'square',
                         },
                       };
                       updateElement(updatedNode);

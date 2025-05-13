@@ -1,8 +1,4 @@
-// SPDX-FileCopyrightText: 2025 2025 INDUSTRIA DE DISEÑO TEXTIL S.A. (INDITEX S.A.)
-//
-// SPDX-License-Identifier: Apache-2.0
-
-import Konva from "konva";
+import Konva from 'konva';
 
 export const toImageAsync = (
   node: Konva.Node,
@@ -16,7 +12,7 @@ export const toImageAsync = (
 ): Promise<HTMLImageElement> => {
   return new Promise((resolve) => {
     node.toImage({
-      mimeType: "image/jpeg",
+      mimeType: 'image/jpeg',
       quality: 1,
       pixelRatio: properties.pixelRatio ?? 1,
       x: properties.x,

@@ -1,26 +1,22 @@
-// SPDX-FileCopyrightText: 2025 2025 INDUSTRIA DE DISEÑO TEXTIL S.A. (INDITEX S.A.)
-//
-// SPDX-License-Identifier: Apache-2.0
+'use client';
 
-"use client"
-
-import type React from "react"
-import { motion } from "framer-motion"
+import type React from 'react';
+import { motion } from 'framer-motion';
 
 const draw = {
   hidden: { pathLength: 0, opacity: 0 },
   visible: (i: number) => {
-    const delay = 1 + i * 0.5
+    const delay = 1 + i * 0.5;
     return {
       pathLength: 1,
       opacity: 1,
       transition: {
-        pathLength: { delay, type: "spring", duration: 1.5, bounce: 0 },
+        pathLength: { delay, type: 'spring', duration: 1.5, bounce: 0 },
         opacity: { delay, duration: 0.01 },
       },
-    }
+    };
   },
-}
+};
 
 export const HomeShowCaseAnimation: React.FC = () => {
   return (
@@ -32,7 +28,16 @@ export const HomeShowCaseAnimation: React.FC = () => {
       animate="visible"
       className="max-w-full h-auto"
     >
-      <motion.rect x="50" y="50" width="500" height="500" rx="30" fill="#f0f0f0" stroke="#e0e0e0" strokeWidth="5" />
+      <motion.rect
+        x="50"
+        y="50"
+        width="500"
+        height="500"
+        rx="30"
+        fill="#f0f0f0"
+        stroke="#e0e0e0"
+        strokeWidth="5"
+      />
 
       <motion.path
         d="M150 400 Q150 300 300 200 Q450 300 450 400 L450 400 Q450 420 430 420 L170 420 Q150 420 150 400 Z"
@@ -99,7 +104,7 @@ export const HomeShowCaseAnimation: React.FC = () => {
         transition={{
           duration: 5,
           repeat: Number.POSITIVE_INFINITY,
-          repeatType: "reverse",
+          repeatType: 'reverse',
         }}
       />
       <motion.circle
@@ -114,10 +119,9 @@ export const HomeShowCaseAnimation: React.FC = () => {
         transition={{
           duration: 4,
           repeat: Number.POSITIVE_INFINITY,
-          repeatType: "reverse",
+          repeatType: 'reverse',
         }}
       />
     </motion.svg>
-  )
-}
-
+  );
+};

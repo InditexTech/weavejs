@@ -1,19 +1,15 @@
-// SPDX-FileCopyrightText: 2025 2025 INDUSTRIA DE DISEÑO TEXTIL S.A. (INDITEX S.A.)
-//
-// SPDX-License-Identifier: Apache-2.0
-
-"use client";
+'use client';
 
 /*
 	Installed from https://reactbits.dev/ts/tailwind/
 */
 
 /* eslint-disable react/no-unknown-property */
-import React, { useRef, useState, useEffect } from "react";
-import { Canvas, useFrame, useThree, ThreeEvent } from "@react-three/fiber";
-import { EffectComposer, wrapEffect } from "@react-three/postprocessing";
-import { Effect } from "postprocessing";
-import * as THREE from "three";
+import React, { useRef, useState, useEffect } from 'react';
+import { Canvas, useFrame, useThree, ThreeEvent } from '@react-three/fiber';
+import { EffectComposer, wrapEffect } from '@react-three/postprocessing';
+import { Effect } from 'postprocessing';
+import * as THREE from 'three';
 
 const waveVertexShader = `
 precision highp float;
@@ -144,23 +140,23 @@ class RetroEffectImpl extends Effect {
   constructor() {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const uniforms = new Map<string, THREE.Uniform<any>>([
-      ["colorNum", new THREE.Uniform(4.0)],
-      ["pixelSize", new THREE.Uniform(2.0)],
+      ['colorNum', new THREE.Uniform(4.0)],
+      ['pixelSize', new THREE.Uniform(2.0)],
     ]);
-    super("RetroEffect", ditherFragmentShader, { uniforms });
+    super('RetroEffect', ditherFragmentShader, { uniforms });
     this.uniforms = uniforms;
   }
   set colorNum(value: number) {
-    this.uniforms.get("colorNum")!.value = value;
+    this.uniforms.get('colorNum')!.value = value;
   }
   get colorNum(): number {
-    return this.uniforms.get("colorNum")!.value;
+    return this.uniforms.get('colorNum')!.value;
   }
   set pixelSize(value: number) {
-    this.uniforms.get("pixelSize")!.value = value;
+    this.uniforms.get('pixelSize')!.value = value;
   }
   get pixelSize(): number {
-    return this.uniforms.get("pixelSize")!.value;
+    return this.uniforms.get('pixelSize')!.value;
   }
 }
 
@@ -234,11 +230,11 @@ function DitheredWaves({
       currentRes.set(newWidth, newHeight);
       if (
         effect.current &&
-        effect.current.uniforms.get("resolution") &&
-        effect.current.uniforms.get("resolution")!.value
+        effect.current.uniforms.get('resolution') &&
+        effect.current.uniforms.get('resolution')!.value
       ) {
         effect.current.uniforms
-          .get("resolution")!
+          .get('resolution')!
           .value.set(newWidth, newHeight);
       }
     }

@@ -1,6 +1,6 @@
-import { useCollaborationRoom } from "@/store/store";
-import { useParams, useSearchParams } from "next/navigation";
-import React from "react";
+import { useCollaborationRoom } from '@/store/store';
+import { useParams, useSearchParams } from 'next/navigation';
+import React from 'react';
 
 function useHandleRouteParams() {
   const [loadedParams, setLoadedParams] = React.useState(false);
@@ -11,9 +11,11 @@ function useHandleRouteParams() {
 
   React.useEffect(() => {
     const roomId = params.roomId;
-    const userName = searchParams.get("userName");
-    if (roomId && userName) {
+    const userName = searchParams.get('userName');
+    if (roomId) {
       setRoom(roomId);
+    }
+    if (userName) {
       setUser({
         name: userName,
         email: `${userName}@weave.js`,
@@ -24,7 +26,7 @@ function useHandleRouteParams() {
 
   return {
     loadedParams,
-  }
+  };
 }
 
 export default useHandleRouteParams;

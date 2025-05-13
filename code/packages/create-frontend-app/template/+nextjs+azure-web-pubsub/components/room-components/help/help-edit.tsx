@@ -1,7 +1,3 @@
-// SPDX-FileCopyrightText: 2025 2025 INDUSTRIA DE DISEÑO TEXTIL S.A. (INDITEX S.A.)
-//
-// SPDX-License-Identifier: Apache-2.0
-
 import {
   ClipboardPaste,
   Copy,
@@ -10,9 +6,9 @@ import {
   MonitorDown,
   Undo,
   Redo,
-} from "lucide-react";
-import { SYSTEM_OS } from "@/lib/utils";
-import { HelpShortcutElement } from "./help-shortcut-element";
+} from 'lucide-react';
+import { SYSTEM_OS } from '@/lib/utils';
+import { HelpShortcutElement } from './help-shortcut-element';
 
 export const HelpEdit = () => {
   return (
@@ -22,16 +18,16 @@ export const HelpEdit = () => {
           icon={<ClipboardCopy />}
           label="Copy"
           shortcuts={{
-            [SYSTEM_OS.MAC]: "⌘ C",
-            [SYSTEM_OS.OTHER]: "Ctrl C",
+            [SYSTEM_OS.MAC]: '⌘ C',
+            [SYSTEM_OS.OTHER]: 'Ctrl C',
           }}
         />
         <HelpShortcutElement
           icon={<ClipboardPaste />}
           label="Paste"
           shortcuts={{
-            [SYSTEM_OS.MAC]: "⌘ P",
-            [SYSTEM_OS.OTHER]: "Ctrl P",
+            [SYSTEM_OS.MAC]: '⌘ P',
+            [SYSTEM_OS.OTHER]: 'Ctrl P',
           }}
         />
       </div>
@@ -40,24 +36,24 @@ export const HelpEdit = () => {
           icon={<Copy />}
           label="Duplicate"
           shortcuts={{
-            [SYSTEM_OS.MAC]: "⌘ D",
-            [SYSTEM_OS.OTHER]: "Ctrl D",
+            [SYSTEM_OS.MAC]: '⌘ D',
+            [SYSTEM_OS.OTHER]: 'Ctrl D',
           }}
         />
         <HelpShortcutElement
           icon={<Undo />}
           label="Undo"
           shortcuts={{
-            [SYSTEM_OS.MAC]: "⇧ ⌘ ,",
-            [SYSTEM_OS.OTHER]: "⇧ Ctrl ,",
+            [SYSTEM_OS.MAC]: '⇧ ⌘ ,',
+            [SYSTEM_OS.OTHER]: '⇧ Ctrl ,',
           }}
         />
         <HelpShortcutElement
           icon={<Redo />}
           label="Redo"
           shortcuts={{
-            [SYSTEM_OS.MAC]: "⇧ ⌘ .",
-            [SYSTEM_OS.OTHER]: "⇧ Ctrl .",
+            [SYSTEM_OS.MAC]: '⇧ ⌘ .',
+            [SYSTEM_OS.OTHER]: '⇧ Ctrl .',
           }}
         />
       </div>
@@ -66,16 +62,16 @@ export const HelpEdit = () => {
           icon={<ImageDown />}
           label="Export selected as image"
           shortcuts={{
-            [SYSTEM_OS.MAC]: "⇧ ⌘ E",
-            [SYSTEM_OS.OTHER]: "⇧ Ctrl E",
+            [SYSTEM_OS.MAC]: '⇧ ⌘ E',
+            [SYSTEM_OS.OTHER]: '⇧ Ctrl E',
           }}
         />
         <HelpShortcutElement
           icon={<MonitorDown />}
           label="Export viewport as image"
           shortcuts={{
-            [SYSTEM_OS.MAC]: "⇧ ⌘ V",
-            [SYSTEM_OS.OTHER]: "⇧ Ctrl V",
+            [SYSTEM_OS.MAC]: '⇧ ⌘ V',
+            [SYSTEM_OS.OTHER]: '⇧ Ctrl V',
           }}
         />
       </div>

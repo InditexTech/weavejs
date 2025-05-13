@@ -1,14 +1,10 @@
-// SPDX-FileCopyrightText: 2025 2025 INDUSTRIA DE DISEÑO TEXTIL S.A. (INDITEX S.A.)
-//
-// SPDX-License-Identifier: Apache-2.0
+'use client';
 
-"use client";
-
-import React from "react";
-import { motion } from "framer-motion";
-import { ConnectedUsers } from "../connected-users";
-import { topElementVariants } from "./variants";
-import { useCollaborationRoom } from "@/store/store";
+import React from 'react';
+import { motion } from 'framer-motion';
+import { ConnectedUsers } from '../connected-users';
+import { topElementVariants } from './variants';
+import { useCollaborationRoom } from '@/store/store';
 
 export function RoomUsersOverlay() {
   const showUI = useCollaborationRoom((state) => state.ui.show);

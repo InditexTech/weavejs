@@ -15,6 +15,7 @@ function useGetWebsocketsProvider({
   getUser: () => WeaveUser;
 }) {
   const room = useCollaborationRoom((state) => state.room);
+  const user = useCollaborationRoom((state) => state.user);
 
   const setFetchConnectionUrlLoading = useCollaborationRoom(
     (state) => state.setFetchConnectionUrlLoading
@@ -44,7 +45,7 @@ function useGetWebsocketsProvider({
   );
 
   const store = React.useMemo(() => {
-    if (loadedParams && room) {
+    if (loadedParams && room && user) {
       return new WeaveStoreWebsockets(
         {
           getUser,
@@ -71,6 +72,7 @@ function useGetWebsocketsProvider({
     onConnectionStatusChangeHandler,
     onFetchConnectionUrlHandler,
     room,
+    user,
   ]);
 
   return store;

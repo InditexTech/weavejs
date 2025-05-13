@@ -1,16 +1,12 @@
-// SPDX-FileCopyrightText: 2025 2025 INDUSTRIA DE DISEÑO TEXTIL S.A. (INDITEX S.A.)
-//
-// SPDX-License-Identifier: Apache-2.0
+'use client';
 
-"use client";
-
-import React from "react";
+import React from 'react';
 // import { Pin, PinOff } from "lucide-react";
-import { WeaveStateElement } from "@inditextech/weave-types";
+import { WeaveStateElement } from '@inditextech/weave-types';
 // import { ToggleIconButton } from "../toggle-icon-button";
-import { useWeave } from "@inditextech/weave-react";
-import { useCollaborationRoom } from "@/store/store";
-import { InputNumber } from "../inputs/input-number";
+import { useWeave } from '@inditextech/weave-react';
+import { useCollaborationRoom } from '@/store/store';
+import { InputNumber } from '../inputs/input-number';
 
 export function PositionProperties() {
   const instance = useWeave((state) => state.instance);
@@ -23,7 +19,7 @@ export function PositionProperties() {
   const updateElement = React.useCallback(
     (updatedNode: WeaveStateElement) => {
       if (!instance) return;
-      if (nodePropertiesAction === "update") {
+      if (nodePropertiesAction === 'update') {
         instance.updateNode(updatedNode);
         return;
       }
@@ -99,7 +95,7 @@ export function PositionProperties() {
     [instance, node, updateElement]
   );
 
-  if (nodePropertiesAction === "create") {
+  if (nodePropertiesAction === 'create') {
     return null;
   }
 

@@ -1,7 +1,3 @@
-// SPDX-FileCopyrightText: 2025 2025 INDUSTRIA DE DISEÑO TEXTIL S.A. (INDITEX S.A.)
-//
-// SPDX-License-Identifier: Apache-2.0
-
 'use client';
 
 import React from 'react';
@@ -17,7 +13,7 @@ import useGetWeaveJSProps from '../room-components/hooks/use-get-weave-js-props'
 import useGetWsProvider from '../room-components/hooks/use-get-websockets-provider';
 import useHandleRouteParams from '../room-components/hooks/use-handle-route-params';
 import { UploadFile } from '../room-components/upload-file';
-import ScrollVelocity from '../ui/reactbits/TextAnimations/ScrollVelocity/ScrollVelocity';
+import UserForm from '../room-components/user-form';
 
 const statusMap = {
   ['idle']: 'Idle',
@@ -35,15 +31,6 @@ export const Room = () => {
 
   const room = useCollaborationRoom((state) => state.room);
   const user = useCollaborationRoom((state) => state.user);
-  const loadingFetchConnectionUrl = useCollaborationRoom(
-    (state) => state.fetchConnectionUrl.loading
-  );
-  const errorFetchConnectionUrl = useCollaborationRoom(
-    (state) => state.fetchConnectionUrl.error
-  );
-  const setFetchConnectionUrlError = useCollaborationRoom(
-    (state) => state.setFetchConnectionUrlError
-  );
 
   const { loadedParams } = useHandleRouteParams();
 
@@ -55,9 +42,6 @@ export const Room = () => {
     if (!loadedParams) {
       return 'Fetching room parameters...';
     }
-    if (loadingFetchConnectionUrl) {
-      return 'Connecting to the room...';
-    }
     if (status !== WEAVE_INSTANCE_STATUS.RUNNING) {
       return statusMap[status];
     }
@@ -66,7 +50,7 @@ export const Room = () => {
     }
 
     return '';
-  }, [loadedParams, loadingFetchConnectionUrl, status, roomLoaded]);
+  }, [loadedParams, status, roomLoaded]);
 
   const { fonts, nodes, actions } = useGetWeaveJSProps();
 
@@ -76,23 +60,13 @@ export const Room = () => {
   });
 
   React.useEffect(() => {
-    setFetchConnectionUrlError(null);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  React.useEffect(() => {
     if (instance && status === WEAVE_INSTANCE_STATUS.RUNNING && roomLoaded) {
       instance.triggerAction('selectionTool');
     }
   }, [instance, status, roomLoaded]);
 
-  if ((!room || !user) && loadedParams) {
+  if (!room && !user && loadedParams) {
     router.push('/error?errorCode=room-required-parameters');
-    return null;
-  }
-
-  if (errorFetchConnectionUrl) {
-    router.push('/error?errorCode=room-failed-connection');
     return null;
   }
 
@@ -100,31 +74,31 @@ export const Room = () => {
     <>
       <AnimatePresence>
         {(!loadedParams ||
-          loadingFetchConnectionUrl ||
           status !== WEAVE_INSTANCE_STATUS.RUNNING ||
           (status === WEAVE_INSTANCE_STATUS.RUNNING && !roomLoaded)) && (
           <>
-            <div className="absolute top-0 left-[-100px] right-[-100px] bottom-0 flex justify-center items-center">
-              <ScrollVelocity
-                texts={[
-                  'collaborative - easy to use - extensible - visual - open source -',
-                  'this is weave.js - this is weave.js - this is weave.js - this is weave.js -',
-                  'intuitive - free - html5 canvas - real time - powerful -',
-                ]}
-                velocity={150}
-                numCopies={20}
-                className="text-5xl font-questrial font-extralight text-zinc-500/25"
-              />
-            </div>
             <RoomLoader
+              key="loader"
               roomId={room ? room : '-'}
-              content="LOADING ROOM"
-              description={loadingDescription}
+              content={
+                loadedParams && room && !user ? 'ENTER ROOM' : 'LOADING ROOM'
+              }
+              description={
+                <>
+                  {loadedParams && room && !user ? (
+                    <div className="w-full mt-8">
+                      <UserForm />
+                    </div>
+                  ) : (
+                    loadingDescription
+                  )}
+                </>
+              }
             />
           </>
         )}
       </AnimatePresence>
-      {loadedParams && room && wsStoreProvider && (
+      {loadedParams && room && user && wsStoreProvider && (
         <WeaveProvider
           containerId="weave"
           getUser={getUser}
