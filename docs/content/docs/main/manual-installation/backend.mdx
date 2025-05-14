@@ -46,7 +46,7 @@ on Next.js, and later on, include the necessary Weave.js backend logic.
 <Callout title="Not recommended for production" type="warn">
   For production environments, you should consider using a separate backend server to handle the Weave.js backend logic.
 
-For more details, refer to our [backend showcase implementation](https://github.com/InditexTech/weavejs-backend).
+For more details, refer to the [backend showcase implementation](https://github.com/InditexTech/weavejs-backend).
 </Callout>
 
 #### Dependencies installation
@@ -88,7 +88,7 @@ Then, set up the TypeScript configuration for the server part:
 #### Custom server logic
 
 <Callout title="Express" type="note">
-  This sections uses [Express](https://expressjs.com), a web framework for Node.js, as the underlying server for the custom server.
+  This section uses [Express](https://expressjs.com), a web framework for Node.js, as the underlying server for the custom server.
 </Callout>
 
 Define the custom server logic by creating a file named `server.ts` on the root of your project with the following content:
@@ -137,7 +137,7 @@ You should still see the Next.js default application running and the console sho
  
 ### Integrate Weave.js into the backend
 
-Now the Next.js custom server is completely set up, let's add the necessary Weave.js backend logic for that we will use the xref:api-reference:stores/websockets/index.adoc[Websockets store] library
+Now that the Next.js custom server is completely set up, let's add the necessary Weave.js backend logic. For that, we will use the xref:api-reference:stores/websockets/index.adoc[Websockets store] library: 
 (`@inditextech/weave-store-websockets`). 
 
 We need to:
