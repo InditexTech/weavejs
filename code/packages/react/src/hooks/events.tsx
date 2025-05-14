@@ -15,6 +15,7 @@ import React from 'react';
 
 export const useWeaveEvents = (): void => {
   const instance = useWeave((state) => state.instance);
+  const node = useWeave((state) => state.selection.node);
   const setZoom = useWeave((state) => state.setZoom);
   const setCanZoomIn = useWeave((state) => state.setCanZoomIn);
   const setCanZoomOut = useWeave((state) => state.setCanZoomOut);
@@ -32,17 +33,19 @@ export const useWeaveEvents = (): void => {
     []
   );
 
-  const onNodesChangeHandler = React.useCallback((nodes: WeaveSelection[]) => {
-    if (nodes.length === 1) {
-      setNode(nodes[0].node);
-    }
-    if (nodes.length !== 1) {
-      setNode(undefined);
-    }
-
-    setSelectedNodes(nodes);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  const onNodesChangeHandler = React.useCallback(
+    (nodes: WeaveSelection[]) => {
+      if (nodes.length === 1 && node?.key !== nodes[0].node.key) {
+        setNode(nodes[0].node);
+      }
+      if (nodes.length !== 1 && typeof node !== 'undefined') {
+        setNode(undefined);
+      }
+      setSelectedNodes(nodes);
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    },
+    [node]
+  );
 
   const onConnectedUsersChangedHandler = React.useCallback(
     (users: WeaveConnectedUsers) => {
