@@ -17,6 +17,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - [#185](https://github.com/InditexTech/weavejs/issues/185) Support to zoom in and zoom out with ctrl / cmd + wheel mouse
 
+### Fixed
+
+- [#200](https://github.com/InditexTech/weavejs/issues/200) Movement with mouse wheel breaks the grid movement
+
 ## [0.10.3] - 2025-05-13
 
 ### Fixed

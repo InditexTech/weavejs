@@ -201,10 +201,13 @@ export class WeaveStageGridPlugin extends WeavePlugin {
 
     const stageXRound = this.round(stage.x(), this.config.gridSize) * -1;
 
+    const overflowX = Math.max(stage.width() * 0.2, 10 * this.config.gridSize);
+    const overflowY = Math.max(stage.height() * 0.2, 10 * this.config.gridSize);
+
     const pointsX = [];
     for (
-      let i = stageXRound;
-      i < stageXRound + stage.width();
+      let i = stageXRound - overflowX;
+      i < stageXRound + stage.width() + overflowX;
       i += this.config.gridSize
     ) {
       pointsX.push(i / stage.scaleX());
@@ -214,8 +217,8 @@ export class WeaveStageGridPlugin extends WeavePlugin {
 
     const pointsY = [];
     for (
-      let i = stageYRound;
-      i < stageYRound + stage.height();
+      let i = stageYRound - overflowY;
+      i < stageYRound + stage.height() + overflowY;
       i += this.config.gridSize
     ) {
       pointsY.push(i / stage.scaleY());
@@ -233,10 +236,11 @@ export class WeaveStageGridPlugin extends WeavePlugin {
         new Line({
           points: [
             point,
-            (-stage.y() - 2 * this.config.gridSize) / stage.scaleY(),
+            // 0,
+            (-stage.y() - overflowY) / stage.scaleY(),
             point,
-            (stage.height() - stage.y() + 2 * this.config.gridSize) /
-              stage.scaleY(),
+            // 100,
+            (-stage.y() + stage.height() + overflowY) / stage.scaleY(),
           ],
           stroke: color,
           strokeWidth:
@@ -259,10 +263,9 @@ export class WeaveStageGridPlugin extends WeavePlugin {
       layer.add(
         new Line({
           points: [
-            (-stage.x() - 2 * this.config.gridSize) / stage.scaleX(),
+            (-stage.x() - overflowX) / stage.scaleX(),
             point,
-            (stage.width() - stage.x() + 2 * this.config.gridSize) /
-              stage.scaleX(),
+            (-stage.x() + stage.width() + overflowX) / stage.scaleX(),
             point,
           ],
           stroke: color,
@@ -285,12 +288,15 @@ export class WeaveStageGridPlugin extends WeavePlugin {
 
     const stage = this.instance.getStage();
 
+    const overflowX = Math.max(stage.width() * 0.2, 10 * this.config.gridSize);
+    const overflowY = Math.max(stage.height() * 0.2, 10 * this.config.gridSize);
+
     const stageXRound = this.round(stage.x(), this.config.gridSize) * -1;
 
     const pointsX = [];
     for (
-      let i = stageXRound;
-      i < stageXRound + stage.width();
+      let i = stageXRound - overflowX;
+      i < stageXRound + stage.width() + overflowX;
       i += this.config.gridSize
     ) {
       pointsX.push(i / stage.scaleX());
@@ -300,8 +306,8 @@ export class WeaveStageGridPlugin extends WeavePlugin {
 
     const pointsY = [];
     for (
-      let i = stageYRound;
-      i < stageYRound + stage.height();
+      let i = stageYRound - overflowY;
+      i < stageYRound + stage.height() + overflowY;
       i += this.config.gridSize
     ) {
       pointsY.push(i / stage.scaleY());
