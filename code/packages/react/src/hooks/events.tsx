@@ -38,7 +38,7 @@ export const useWeaveEvents = (): void => {
       if (nodes.length === 1 && node?.key !== nodes[0].node.key) {
         setNode(nodes[0].node);
       }
-      if (nodes.length !== 1 && typeof node !== 'undefined') {
+      if (nodes.length === 0) {
         setNode(undefined);
       }
       setSelectedNodes(nodes);
