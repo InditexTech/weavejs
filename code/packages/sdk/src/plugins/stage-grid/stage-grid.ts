@@ -201,8 +201,8 @@ export class WeaveStageGridPlugin extends WeavePlugin {
 
     const stageXRound = this.round(stage.x(), this.config.gridSize) * -1;
 
-    const overflowX = Math.max(200, 10 * this.config.gridSize);
-    const overflowY = Math.max(200, 10 * this.config.gridSize);
+    const overflowX = Math.max(stage.width() * 0.2, 10 * this.config.gridSize);
+    const overflowY = Math.max(stage.height() * 0.2, 10 * this.config.gridSize);
 
     const pointsX = [];
     for (
@@ -288,8 +288,8 @@ export class WeaveStageGridPlugin extends WeavePlugin {
 
     const stage = this.instance.getStage();
 
-    const overflowX = Math.max(200, 10 * this.config.gridSize);
-    const overflowY = Math.max(200, 10 * this.config.gridSize);
+    const overflowX = Math.max(stage.width() * 0.2, 10 * this.config.gridSize);
+    const overflowY = Math.max(stage.height() * 0.2, 10 * this.config.gridSize);
 
     const stageXRound = this.round(stage.x(), this.config.gridSize) * -1;
 
