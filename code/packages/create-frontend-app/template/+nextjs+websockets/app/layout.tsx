@@ -44,6 +44,8 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
+        contentEditable="true"
+        suppressContentEditableWarning={true}
         className={`${questrial.variable} ${notoSans.variable} ${notoSansMono.variable} antialiased`}
       >
         <AppProviders>{children}</AppProviders>

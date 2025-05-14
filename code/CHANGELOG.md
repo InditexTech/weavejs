@@ -21,6 +21,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 - [#200](https://github.com/InditexTech/weavejs/issues/200) Movement with mouse wheel breaks the grid movement
+- [#186](https://github.com/InditexTech/weavejs/issues/186) Fix copy / paste events not triggering after click outside canvas
 
 ## [0.10.3] - 2025-05-13
 

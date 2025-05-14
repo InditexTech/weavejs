@@ -107,15 +107,7 @@ export const RoomLayout = () => {
           className="w-full h-full flex flex-col"
         >
           <section className="w-full h-full flex">
-            <motion.section
-              animate={{
-                width: sidebarLeftActive === null ? 0 : 320,
-                opacity: sidebarLeftActive === null ? 0 : 1,
-              }}
-              transition={{
-                duration: sidebarLeftActive === null ? 0.1 : 0.25,
-                ease: 'easeInOut',
-              }}
+            <section
               id="sidebar-left"
               className={cn(
                 'bg-white h-full border-l border-zinc-200 shadow-md',
@@ -131,7 +123,7 @@ export const RoomLayout = () => {
                 <ColorTokensLibrary key={SIDEBAR_ELEMENTS.colorTokens} />
                 <ElementsTree key={SIDEBAR_ELEMENTS.nodesTree} />
               </AnimatePresence>
-            </motion.section>
+            </section>
             <section
               className={cn('w-full h-full flex flex-col', {
                 ['w-[calc(100%-320px)]']:
@@ -194,15 +186,7 @@ export const RoomLayout = () => {
                 )}
               </section>
             </section>
-            <motion.section
-              animate={{
-                width: sidebarRightActive === null ? 0 : 320,
-                opacity: sidebarRightActive === null ? 0 : 1,
-              }}
-              transition={{
-                duration: sidebarRightActive === null ? 0.1 : 0.25,
-                ease: 'easeInOut',
-              }}
+            <section
               id="sidebar-right"
               className={cn(
                 'bg-white h-full border-l border-zinc-200 shadow-md',
@@ -213,7 +197,7 @@ export const RoomLayout = () => {
               )}
             >
               <NodeProperties />
-            </motion.section>
+            </section>
           </section>
         </motion.div>
       </AnimatePresence>
