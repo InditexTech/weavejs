@@ -59,6 +59,7 @@ export class WeaveStageGridPlugin extends WeavePlugin {
       id: this.getLayerName(),
       listening: false,
     });
+
     stage.add(layer);
   }
 

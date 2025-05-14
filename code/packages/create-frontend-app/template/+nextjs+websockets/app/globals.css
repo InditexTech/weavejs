@@ -1,10 +1,4 @@
-/*
- * SPDX-FileCopyrightText: 2025 2025 INDUSTRIA DE DISEÑO TEXTIL S.A. (INDITEX S.A.)
- *
- * SPDX-License-Identifier: Apache-2.0
- */
-
-@import "tailwindcss";
+@import 'tailwindcss';
 
 @plugin "tailwindcss-animate";
 
@@ -186,7 +180,7 @@
     @apply w-full h-full;
   }
   body {
-    @apply bg-background ring-0 text-foreground w-full h-full;
+    @apply bg-background ring-0 text-foreground w-full h-full overflow-hidden;
   }
 }
 
@@ -195,6 +189,6 @@
     @apply border-border outline-ring/50;
   }
   body {
-    @apply bg-background ring-0 text-foreground;
+    @apply bg-background ring-0 text-foreground overflow-hidden;
   }
 }
