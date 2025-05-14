@@ -208,9 +208,9 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
 
     this.initialized = true;
 
-    this.instance.on('onRender', () => {
-      this.triggerSelectedNodesEvent();
-    });
+    // this.instance.on('onRender', () => {
+    //   this.triggerSelectedNodesEvent();
+    // });
 
     this.instance.on(
       'onActiveActionChange',

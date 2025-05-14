@@ -24,9 +24,9 @@ export class WeaveUsersPointersPlugin extends WeavePlugin {
     string,
     { oldPos: WeaveUserPointer; actualPos: WeaveUserPointer }
   >;
-  private usersPointersTimers: Record<string, NodeJS.Timeout>;
+  // private usersPointersTimers: Record<string, NodeJS.Timeout>;
   private config!: WeaveUsersPointersPluginConfig;
-  private renderCursors: boolean;
+  private doRenderPointers: boolean;
   private userPointerCircleRadius: number = 4;
   private userPointerSeparation: number = 8;
   private userPointerCircleStrokeWidth: number = 1;
@@ -34,16 +34,15 @@ export class WeaveUsersPointersPlugin extends WeavePlugin {
   private userPointerBackgroundCornerRadius: number = 4;
   private userPointerBackgroundPaddingX: number = 4;
   private userPointerBackgroundPaddingY: number = 8;
-  onRender: undefined;
 
   constructor(params: WeaveUsersPointersPluginParams) {
     super();
 
     const { config } = params;
 
-    this.renderCursors = true;
+    this.doRenderPointers = true;
     this.usersPointers = {};
-    this.usersPointersTimers = {};
+    // this.usersPointersTimers = {};
     this.config = config;
   }
 
@@ -58,8 +57,16 @@ export class WeaveUsersPointersPlugin extends WeavePlugin {
   initLayer(): void {
     const stage = this.instance.getStage();
 
-    const layer = new Konva.Layer({ id: this.getLayerName() });
+    const layer = new Konva.Layer({
+      id: this.getLayerName(),
+      listening: false,
+    });
+
     stage.add(layer);
+  }
+
+  onRender(): void {
+    this.renderPointers();
   }
 
   getLayer() {
@@ -80,6 +87,8 @@ export class WeaveUsersPointersPlugin extends WeavePlugin {
       ) => {
         const selfUser = this.config.getUser();
 
+        const allActiveUsers = [];
+
         for (const change of changes) {
           if (!change[WEAVE_USER_POINTER_KEY]) {
             continue;
@@ -90,6 +99,7 @@ export class WeaveUsersPointersPlugin extends WeavePlugin {
             selfUser.name !== change[WEAVE_USER_POINTER_KEY].user
           ) {
             const userPointer = change[WEAVE_USER_POINTER_KEY];
+            allActiveUsers.push(userPointer.user);
             this.usersPointers[userPointer.user] = {
               oldPos: this.usersPointers[userPointer.user]?.actualPos ?? {
                 user: userPointer.user,
@@ -99,6 +109,33 @@ export class WeaveUsersPointersPlugin extends WeavePlugin {
               actualPos: userPointer,
             };
           }
+        }
+
+        const allActiveUsersPointers = Object.keys(this.usersPointers).map(
+          (userPointerKey) => {
+            const pointerInfo = this.usersPointers[userPointerKey];
+            return pointerInfo.actualPos.user;
+          }
+        );
+
+        const inactivePointers = _.differenceWith(
+          allActiveUsersPointers,
+          allActiveUsers,
+          _.isEqual
+        );
+
+        const pointersLayer = this.getLayer();
+
+        for (const inactivePointer of inactivePointers) {
+          const userPointerNode = pointersLayer?.findOne(
+            `#${inactivePointer}`
+          ) as Konva.Group | undefined;
+
+          if (userPointerNode) {
+            userPointerNode.destroy();
+          }
+
+          delete this.usersPointers[inactivePointer];
         }
 
         this.renderPointers();
@@ -134,9 +171,7 @@ export class WeaveUsersPointersPlugin extends WeavePlugin {
       }
     });
 
-    this.instance.addEventListener('onZoomChange', () => {
-      this.renderPointers();
-    });
+    this.renderPointers();
   }
 
   private stringToColour(str: string) {
@@ -152,50 +187,16 @@ export class WeaveUsersPointersPlugin extends WeavePlugin {
     return colour;
   }
 
-  private setUserMovementTimer(userPointer: WeaveUserPointer) {
-    const pointersLayer = this.getLayer();
-
-    if (this.usersPointersTimers[`${userPointer.user}-opacity`]) {
-      clearTimeout(this.usersPointersTimers[`${userPointer.user}-opacity`]);
-    }
-
-    this.usersPointersTimers[`${userPointer.user}-opacity`] = setTimeout(() => {
-      const userPointerNode = pointersLayer?.findOne(`#${userPointer.user}`) as
-        | Konva.Group
-        | undefined;
-
-      if (userPointerNode) {
-        userPointerNode.opacity(0.5);
-      }
-    }, 5000);
-
-    if (this.usersPointersTimers[`${userPointer.user}-destroy`]) {
-      clearTimeout(this.usersPointersTimers[`${userPointer.user}-destroy`]);
-    }
-
-    this.usersPointersTimers[`${userPointer.user}-destroy`] = setTimeout(() => {
-      const userPointerNode = pointersLayer?.findOne(`#${userPointer.user}`) as
-        | Konva.Group
-        | undefined;
-
-      if (userPointerNode) {
-        userPointerNode.destroy();
-      }
-    }, 30000);
-  }
-
   private renderPointers() {
     const stage = this.instance.getStage();
 
     const pointersLayer = this.getLayer();
 
-    pointersLayer?.clear();
-
     if (!this.enabled) {
       return;
     }
 
-    if (this.renderCursors) {
+    if (this.doRenderPointers) {
       for (const userPointerKey of Object.keys(this.usersPointers)) {
         const userPointer = this.usersPointers[userPointerKey];
 
@@ -205,6 +206,7 @@ export class WeaveUsersPointersPlugin extends WeavePlugin {
 
         if (!userPointerNode) {
           const userPointerNode = new Konva.Group({
+            name: 'pointer',
             id: userPointer.actualPos.user,
             x: userPointer.actualPos.x,
             y: userPointer.actualPos.y,
@@ -267,7 +269,6 @@ export class WeaveUsersPointersPlugin extends WeavePlugin {
 
           pointersLayer?.add(userPointerNode);
 
-          this.setUserMovementTimer(userPointer.actualPos);
           continue;
         }
 
@@ -326,21 +327,21 @@ export class WeaveUsersPointersPlugin extends WeavePlugin {
             y: userPointer.actualPos.y,
             opacity: 1,
           });
-
-          if (hasChanged) {
-            this.setUserMovementTimer(userPointer.actualPos);
-          }
         }
       }
     }
   }
 
-  toggleRenderCursors(): void {
-    this.renderCursors = !this.renderCursors;
+  pointersRendered(): boolean {
+    return this.doRenderPointers;
   }
 
-  setRenderCursors(render: boolean): void {
-    this.renderCursors = render;
+  toggleRenderPointers(): void {
+    this.doRenderPointers = !this.doRenderPointers;
+  }
+
+  setRenderPointers(render: boolean): void {
+    this.doRenderPointers = render;
   }
 
   enable(): void {
