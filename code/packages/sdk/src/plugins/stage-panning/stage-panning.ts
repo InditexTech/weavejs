@@ -8,6 +8,7 @@ import { WEAVE_STAGE_PANNING_KEY } from './constants';
 export class WeaveStagePanningPlugin extends WeavePlugin {
   private moveToolActive: boolean;
   private isMouseMiddleButtonPressed: boolean;
+  private isCtrlOrMetaPressed: boolean;
   private isSpaceKeyPressed: boolean;
   protected previousPointer!: string | null;
   getLayerName = undefined;
@@ -20,6 +21,7 @@ export class WeaveStagePanningPlugin extends WeavePlugin {
     this.enabled = true;
     this.moveToolActive = false;
     this.isMouseMiddleButtonPressed = false;
+    this.isCtrlOrMetaPressed = false;
     this.isSpaceKeyPressed = false;
     this.previousPointer = null;
   }
@@ -55,6 +57,10 @@ export class WeaveStagePanningPlugin extends WeavePlugin {
     const stage = this.instance.getStage();
 
     stage.container().addEventListener('keydown', (e) => {
+      if (e.ctrlKey || e.metaKey) {
+        this.isCtrlOrMetaPressed = true;
+        e.cancelBubble = true;
+      }
       if (e.code === 'Space') {
         this.isSpaceKeyPressed = true;
         this.enableMove();
@@ -62,6 +68,9 @@ export class WeaveStagePanningPlugin extends WeavePlugin {
     });
 
     stage.container().addEventListener('keyup', (e) => {
+      if (e.ctrlKey || e.metaKey) {
+        this.isCtrlOrMetaPressed = false;
+      }
       if (e.code === 'Space') {
         this.isSpaceKeyPressed = false;
         this.disableMove();
@@ -186,6 +195,7 @@ export class WeaveStagePanningPlugin extends WeavePlugin {
 
       if (
         !this.enabled ||
+        this.isCtrlOrMetaPressed ||
         this.isSpaceKeyPressed ||
         this.isMouseMiddleButtonPressed
       ) {

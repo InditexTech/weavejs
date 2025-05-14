@@ -13,6 +13,8 @@ import { WeaveNodesSelectionPlugin } from '../nodes-selection/nodes-selection';
 import { WEAVE_STAGE_ZOOM_KEY } from './constants';
 
 export class WeaveStageZoomPlugin extends WeavePlugin {
+  private isCtrlOrMetaPressed: boolean;
+  protected previousPointer!: string | null;
   getLayerName = undefined;
   initLayer = undefined;
   onRender: undefined;
@@ -39,6 +41,7 @@ export class WeaveStageZoomPlugin extends WeavePlugin {
       );
     }
 
+    this.isCtrlOrMetaPressed = false;
     this.actualStep = this.config.zoomSteps.findIndex(
       (step) => step === this.config.defaultZoom
     );
@@ -51,6 +54,7 @@ export class WeaveStageZoomPlugin extends WeavePlugin {
   }
 
   onInit(): void {
+    this.initEvents();
     this.setZoom(this.config.zoomSteps[this.actualStep]);
   }
 
@@ -302,5 +306,72 @@ export class WeaveStageZoomPlugin extends WeavePlugin {
 
   disable(): void {
     this.enabled = false;
+  }
+
+  private enableZoom() {
+    const stage = this.instance.getStage();
+    if (!['zoom-in', 'zoom-out'].includes(stage.container().style.cursor)) {
+      this.previousPointer = stage.container().style.cursor;
+      stage.container().style.cursor = 'zoom-in';
+    }
+  }
+
+  private disableZoom() {
+    const stage = this.instance.getStage();
+    if (['zoom-in', 'zoom-out'].includes(stage.container().style.cursor)) {
+      stage.container().style.cursor = this.previousPointer ?? 'default';
+      this.previousPointer = null;
+    }
+  }
+
+  private initEvents() {
+    const stage = this.instance.getStage();
+
+    stage.container().addEventListener('keydown', (e) => {
+      if (e.ctrlKey || e.metaKey) {
+        this.isCtrlOrMetaPressed = true;
+        this.enableZoom();
+      }
+    });
+
+    stage.container().addEventListener('keyup', (e) => {
+      if (!(e.ctrlKey || e.metaKey)) {
+        this.isCtrlOrMetaPressed = false;
+        this.disableZoom();
+      }
+    });
+
+    stage.on('mousemove', (e) => {
+      e.evt.preventDefault();
+
+      if (!this.enabled) {
+        return;
+      }
+
+      if (this.isCtrlOrMetaPressed) {
+        this.enableZoom();
+      }
+      if (!this.isCtrlOrMetaPressed) {
+        this.disableZoom();
+      }
+    });
+
+    stage.on('wheel', (e) => {
+      e.evt.preventDefault();
+
+      if (!this.enabled || !this.isCtrlOrMetaPressed) {
+        return;
+      }
+
+      if (e.evt.deltaY < 0) {
+        this.zoomOut();
+        stage.container().style.cursor = 'zoom-out';
+      }
+
+      if (e.evt.deltaY > 0) {
+        this.zoomIn();
+        stage.container().style.cursor = 'zoom-in';
+      }
+    });
   }
 }
