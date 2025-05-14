@@ -21,18 +21,20 @@ import {
   LogOut,
   ChevronDown,
   ChevronUp,
-  Grid2X2PlusIcon,
-  Grid2x2XIcon,
   Grid3X3Icon,
   GripIcon,
-  CheckIcon,
   Braces,
+  MousePointer2,
+  Check,
+  Grid2X2Check,
+  Grid2X2X,
 } from 'lucide-react';
 import {
   WEAVE_GRID_TYPES,
   WeaveExportStageActionParams,
   WeaveStageGridPlugin,
   WeaveStageGridType,
+  WeaveUsersPointersPlugin,
 } from '@inditextech/weave-sdk';
 import { ConnectionStatus } from '../connection-status';
 import { topElementVariants } from './variants';
@@ -52,10 +54,29 @@ export function RoomHeader() {
   const room = useCollaborationRoom((state) => state.room);
 
   const [menuOpen, setMenuOpen] = React.useState(false);
+  const [pointersEnabled, setPointersEnabled] = React.useState(true);
   const [gridEnabled, setGridEnabled] = React.useState(true);
   const [gridType, setGridType] = React.useState<WeaveStageGridType>(
     WEAVE_GRID_TYPES.LINES
   );
+
+  const handleToggleUsersPointers = React.useCallback(() => {
+    if (!instance) return;
+
+    const userPointersPlugin =
+      instance.getPlugin<WeaveUsersPointersPlugin>('usersPointers');
+
+    if (userPointersPlugin && userPointersPlugin.isEnabled()) {
+      userPointersPlugin.disable();
+      setPointersEnabled(false);
+      return;
+    }
+    if (userPointersPlugin && !userPointersPlugin.isEnabled()) {
+      userPointersPlugin.enable();
+      setPointersEnabled(true);
+      return;
+    }
+  }, [instance]);
 
   const handleToggleGrid = React.useCallback(() => {
     if (instance && instance.isPluginEnabled('stageGrid')) {
@@ -180,60 +201,75 @@ export function RoomHeader() {
               </DropdownMenuLabel>
               <DropdownMenuGroup>
                 <HelpDrawerTrigger />
+                <DropdownMenuItem
+                  className="text-foreground cursor-pointer hover:rounded-none"
+                  onClick={handleToggleUsersPointers}
+                >
+                  <div className="w-full flex justify-between items-center gap-2">
+                    <div className="w-full flex justify-start items-center gap-2">
+                      <MousePointer2 size={16} />
+                      Show users pointers
+                    </div>
+                    {pointersEnabled && (
+                      <Check size={16} className="text-foreground" />
+                    )}
+                  </div>
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  className="text-foreground cursor-pointer hover:rounded-none"
+                  onClick={handleToggleGrid}
+                >
+                  <div className="w-full flex justify-between items-center gap-2">
+                    <div className="w-full flex justify-start items-center gap-2">
+                      {gridEnabled ? (
+                        <>
+                          <Grid2X2X size={16} />
+                          Hide grid
+                        </>
+                      ) : (
+                        <>
+                          <Grid2X2Check size={16} />
+                          Show grid
+                        </>
+                      )}
+                    </div>
+                  </div>
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  disabled={
+                    !gridEnabled ||
+                    (gridEnabled && gridType === WEAVE_GRID_TYPES.DOTS)
+                  }
+                  className="text-foreground cursor-pointer hover:rounded-none"
+                  onClick={() => {
+                    handleSetGridType(WEAVE_GRID_TYPES.DOTS);
+                  }}
+                >
+                  <div className="w-full flex justify-between items-center">
+                    <div className="w-full flex justify-start items-center gap-2">
+                      <GripIcon size={16} /> Grid as dots
+                    </div>
+                    {gridType === WEAVE_GRID_TYPES.DOTS && <Check size={16} />}
+                  </div>
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  disabled={
+                    !gridEnabled ||
+                    (gridEnabled && gridType === WEAVE_GRID_TYPES.LINES)
+                  }
+                  className="text-foreground cursor-pointer hover:rounded-none"
+                  onClick={() => {
+                    handleSetGridType(WEAVE_GRID_TYPES.LINES);
+                  }}
+                >
+                  <div className="w-full flex justify-between items-center">
+                    <div className="w-full flex justify-start items-center gap-2">
+                      <Grid3X3Icon size={16} /> Grid as lines
+                    </div>
+                    {gridType === WEAVE_GRID_TYPES.LINES && <Check size={16} />}
+                  </div>
+                </DropdownMenuItem>
               </DropdownMenuGroup>
-              <DropdownMenuSeparator />
-              <DropdownMenuLabel className="px-2 py-1 pt-2 text-zinc-600 text-xs">
-                Grid
-              </DropdownMenuLabel>
-              <DropdownMenuItem
-                className="text-foreground cursor-pointer hover:rounded-none"
-                onClick={handleToggleGrid}
-              >
-                {!gridEnabled && (
-                  <>
-                    <Grid2X2PlusIcon /> Enable
-                  </>
-                )}
-                {gridEnabled && (
-                  <>
-                    <Grid2x2XIcon /> Disable
-                  </>
-                )}
-              </DropdownMenuItem>
-              <DropdownMenuItem
-                disabled={
-                  !gridEnabled ||
-                  (gridEnabled && gridType === WEAVE_GRID_TYPES.DOTS)
-                }
-                className="text-foreground cursor-pointer hover:rounded-none"
-                onClick={() => {
-                  handleSetGridType(WEAVE_GRID_TYPES.DOTS);
-                }}
-              >
-                <div className="w-full flex justify-between items-center">
-                  <div className="w-full flex justify-start items-center gap-2">
-                    <GripIcon size={16} /> Dots
-                  </div>
-                  {gridType === WEAVE_GRID_TYPES.DOTS && <CheckIcon />}
-                </div>
-              </DropdownMenuItem>
-              <DropdownMenuItem
-                disabled={
-                  !gridEnabled ||
-                  (gridEnabled && gridType === WEAVE_GRID_TYPES.LINES)
-                }
-                className="text-foreground cursor-pointer hover:rounded-none"
-                onClick={() => {
-                  handleSetGridType(WEAVE_GRID_TYPES.LINES);
-                }}
-              >
-                <div className="w-full flex justify-between items-center">
-                  <div className="w-full flex justify-start items-center gap-2">
-                    <Grid3X3Icon size={16} /> Lines
-                  </div>
-                  {gridType === WEAVE_GRID_TYPES.LINES && <CheckIcon />}
-                </div>
-              </DropdownMenuItem>
               <DropdownMenuSeparator />
               <DropdownMenuLabel className="px-2 py-1 pt-2 text-zinc-600 text-xs">
                 Exporting
