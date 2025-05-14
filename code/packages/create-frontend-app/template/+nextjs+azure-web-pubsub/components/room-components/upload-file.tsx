@@ -48,7 +48,7 @@ export function UploadFile() {
               ) as any;
 
               finishUploadCallback?.(
-                `${process.env.NEXT_PUBLIC_API_ENDPOINT}/rooms/${room}/images/${imageId}`
+                `${process.env.NEXT_PUBLIC_API_ENDPOINT}/weavejs/rooms/${room}/images/${imageId}`
               );
             }
           },
@@ -94,6 +94,9 @@ export function UploadFile() {
     }
 
     if (showSelectFile && inputFileRef.current) {
+      inputFileRef.current.addEventListener('cancel', () => {
+        instance?.cancelAction('imageTool');
+      });
       inputFileRef.current.click();
       setShowSelectFileImage(false);
     }
@@ -118,7 +121,10 @@ export function UploadFile() {
       accept="image/png,image/gif,image/jpeg"
       name="image"
       ref={inputFileRef}
-      className="hidden"
+      className="invisible"
+      onClick={() => {
+        inputFileRef.current.value = null;
+      }}
       onChange={(e) => {
         const file = e.target.files?.[0];
         if (file) {

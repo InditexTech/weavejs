@@ -59,7 +59,6 @@ export class WeaveStagePanningPlugin extends WeavePlugin {
     stage.container().addEventListener('keydown', (e) => {
       if (e.ctrlKey || e.metaKey) {
         this.isCtrlOrMetaPressed = true;
-        e.cancelBubble = true;
       }
       if (e.code === 'Space') {
         this.isSpaceKeyPressed = true;

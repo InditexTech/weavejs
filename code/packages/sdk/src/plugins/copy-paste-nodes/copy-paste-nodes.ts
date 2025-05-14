@@ -94,55 +94,53 @@ export class WeaveCopyPasteNodesPlugin extends WeavePlugin {
     });
   }
 
-  private initEvents() {
+  initEvents(): void {
     const stage = this.instance.getStage();
 
-    document.oncopy = async () => {
-      this.performCopy();
-      return;
-    };
+    window.addEventListener('keydown', async (e) => {
+      if (e.key === 'c' && (e.ctrlKey || e.metaKey)) {
+        e.preventDefault();
 
-    document.onpaste = async (event) => {
-      if (!this.enabled) {
+        await this.performCopy();
         return;
       }
+      if (e.key === 'v' && (e.ctrlKey || e.metaKey)) {
+        e.preventDefault();
 
-      const items = event.clipboardData?.items;
-      if (!items) {
-        return;
-      }
+        if (!this.enabled) {
+          return;
+        }
 
-      try {
-        await this.readClipboardData();
-        this.performPaste();
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars, no-empty
-      } catch (ex) {
-        this.instance.emitEvent<WeaveCopyPasteNodesPluginOnPasteEvent>(
-          'onPaste',
-          ex as Error
-        );
-      }
-
-      try {
-        const items = await navigator.clipboard.read();
-        if (items && items.length === 1) {
-          const item = items[0];
-
-          this.instance.emitEvent<WeaveCopyPasteNodesPluginOnPasteExternalEvent>(
-            'onPasteExternal',
-            item
+        try {
+          await this.readClipboardData();
+          this.performPaste();
+          // eslint-disable-next-line @typescript-eslint/no-unused-vars, no-empty
+        } catch (ex) {
+          this.instance.emitEvent<WeaveCopyPasteNodesPluginOnPasteEvent>(
+            'onPaste',
+            ex as Error
           );
         }
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars, no-empty
-      } catch (ex) {
-        this.instance.emitEvent<WeaveCopyPasteNodesPluginOnPasteEvent>(
-          'onPaste',
-          ex as Error
-        );
-      }
-    };
 
-    stage.container().addEventListener('keydown', (e) => {
+        try {
+          const items = await navigator.clipboard.read();
+          if (items && items.length === 1) {
+            const item = items[0];
+
+            this.instance.emitEvent<WeaveCopyPasteNodesPluginOnPasteExternalEvent>(
+              'onPasteExternal',
+              item
+            );
+          }
+          // eslint-disable-next-line @typescript-eslint/no-unused-vars, no-empty
+        } catch (ex) {
+          this.instance.emitEvent<WeaveCopyPasteNodesPluginOnPasteEvent>(
+            'onPaste',
+            ex as Error
+          );
+        }
+        return;
+      }
       if (e.key === 'Escape') {
         this.cancel();
         return;
