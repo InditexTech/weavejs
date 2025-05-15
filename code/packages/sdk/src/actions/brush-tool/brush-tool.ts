@@ -208,6 +208,10 @@ export class WeaveBrushToolAction extends WeaveAction {
 
     this.cancelAction = cancel;
 
+    if (selectionPlugin) {
+      selectionPlugin.setSelectedNodes([]);
+    }
+
     this.props = this.initProps();
     this.setState(BRUSH_TOOL_STATE.IDLE);
 
