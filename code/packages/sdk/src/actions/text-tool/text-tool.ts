@@ -10,6 +10,7 @@ import { TEXT_TOOL_STATE } from './constants';
 import Konva from 'konva';
 import { WeaveNodesSelectionPlugin } from '@/plugins/nodes-selection/nodes-selection';
 import type { WeaveTextNode } from '@/nodes/text/text';
+import { SELECTION_TOOL_ACTION_NAME } from '../selection-tool/constants';
 
 export class WeaveTextToolAction extends WeaveAction {
   protected initialized: boolean = false;
@@ -138,6 +139,16 @@ export class WeaveTextToolAction extends WeaveAction {
     const stage = this.instance.getStage();
 
     stage.container().style.cursor = 'default';
+
+    const selectionPlugin =
+      this.instance.getPlugin<WeaveNodesSelectionPlugin>('nodesSelection');
+    if (selectionPlugin) {
+      const node = stage.findOne(`#${this.textId}`);
+      if (node) {
+        selectionPlugin.setSelectedNodes([node]);
+      }
+      this.instance.triggerAction(SELECTION_TOOL_ACTION_NAME);
+    }
 
     const node = stage.findOne(`#${this.textId}`) as Konva.Text | undefined;
     if (node) {

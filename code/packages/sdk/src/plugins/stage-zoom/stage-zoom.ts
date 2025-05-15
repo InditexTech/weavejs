@@ -21,7 +21,7 @@ export class WeaveStageZoomPlugin extends WeavePlugin {
   private config!: WeaveStageZoomPluginConfig;
   private actualScale: number;
   private actualStep: number;
-  private padding: number = 100;
+  private padding: number = 175;
   defaultStep: number = 3;
 
   constructor(params?: WeaveStageZoomPluginParams) {
@@ -309,32 +309,28 @@ export class WeaveStageZoomPlugin extends WeavePlugin {
   }
 
   private initEvents() {
-    const stage = this.instance.getStage();
-
-    stage.container().addEventListener('keydown', (e) => {
+    window.addEventListener('keydown', (e) => {
       if (e.ctrlKey || e.metaKey) {
         this.isCtrlOrMetaPressed = true;
       }
     });
 
-    stage.container().addEventListener('keyup', (e) => {
+    window.addEventListener('keyup', (e) => {
       if (!(e.ctrlKey || e.metaKey)) {
         this.isCtrlOrMetaPressed = false;
       }
     });
 
-    stage.on('wheel', (e) => {
-      e.evt.preventDefault();
-
+    window.addEventListener('wheel', (e) => {
       if (!this.enabled || !this.isCtrlOrMetaPressed) {
         return;
       }
 
-      if (e.evt.deltaY > 0) {
+      if (e.deltaY > 0) {
         this.zoomOut();
       }
 
-      if (e.evt.deltaY < 0) {
+      if (e.deltaY < 0) {
         this.zoomIn();
       }
     });

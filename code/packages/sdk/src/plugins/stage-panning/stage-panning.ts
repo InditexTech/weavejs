@@ -147,6 +147,8 @@ export class WeaveStagePanningPlugin extends WeavePlugin {
 
       stage.x(stage.x() - deltaX);
       stage.y(stage.y() - deltaY);
+
+      this.instance.emit('onStageMove', undefined);
     });
 
     stage.on('touchstart', (e) => {
@@ -187,11 +189,11 @@ export class WeaveStagePanningPlugin extends WeavePlugin {
 
       stage.x(stage.x() - deltaX);
       stage.y(stage.y() - deltaY);
+
+      this.instance.emit('onStageMove', undefined);
     });
 
-    stage.on('wheel', (e) => {
-      e.evt.preventDefault();
-
+    window.addEventListener('wheel', (e) => {
       if (
         !this.enabled ||
         this.isCtrlOrMetaPressed ||
@@ -201,8 +203,10 @@ export class WeaveStagePanningPlugin extends WeavePlugin {
         return;
       }
 
-      stage.x(stage.x() - e.evt.deltaX);
-      stage.y(stage.y() - e.evt.deltaY);
+      stage.x(stage.x() - e.deltaX);
+      stage.y(stage.y() - e.deltaY);
+
+      this.instance.emit('stageMove', undefined);
     });
   }
 
