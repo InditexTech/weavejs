@@ -26,7 +26,7 @@ SPDX-License-Identifier: Apache-2.0
 <h3 align="center">Weave.js</h3>
 
   <p align="center">
-    Build visual collaborative tools like Canva, Excalidraw, Miro or Figma!
+    Build online whiteboard applications like Excalidraw, Miro, Canva, or Figma!
     <br />
     <a href="https://github.com/InditexTech/weavejs"><strong>Explore the docs »</strong></a>
     <br />
@@ -47,6 +47,7 @@ SPDX-License-Identifier: Apache-2.0
       <a href="#about-the-project">About The Project</a>
       <ul>
         <li><a href="#built-with">Built With</a></li>
+        <li><a href="#related-repositories">Related repositories</a></li>
       </ul>
     </li>
     <li><a href="#quickstart">Quickstart</a></li>
@@ -73,16 +74,22 @@ SPDX-License-Identifier: Apache-2.0
 
 Weave.js is a powerful headless framework for building end-to-end collaborative whiteboard applications. Aimed at developers, it provides all the building blocks and plugins to develop visual collaborative canvas, as well as it handles user interactions in real time, so that changes in the visual canvas can be shared among multi users in real time.
 
-It provides robust synchronization based on [Yjs][Yjs-url] and [SyncedStore][SyncedStore-url] as well as an extensible API to streamline the development of interactive, collaborative applications.
+It provides robust synchronization based on [Yjs][https://yjs.dev/] and [SyncedStore][https://syncedstore.org/docs/] as well as an extensible API to streamline the development of interactive, collaborative applications.
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 ### Built With
 
-- [React Reconciler][ReactReconciler-url]
-- [Konva][Konva-url]
-- [Yjs][Yjs-url]
-- [SyncedStore][SyncedStore-url]
+- [Konva][https://konvajs.org/]
+- [Yjs][https://yjs.dev/]
+- [SyncedStore][https://syncedstore.org/docs/]
+
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
+
+### Related repositories
+
+- [Weave.js][https://github.com/InditexTech/weavejs]
+- [Weave.js backend][https://github.com/InditexTech/weavejs-backend]
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
