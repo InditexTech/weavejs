@@ -56,7 +56,7 @@ export class WeaveStagePanningPlugin extends WeavePlugin {
 
     const stage = this.instance.getStage();
 
-    stage.container().addEventListener('keydown', (e) => {
+    window.addEventListener('keydown', (e) => {
       if (e.ctrlKey || e.metaKey) {
         this.isCtrlOrMetaPressed = true;
       }
@@ -66,7 +66,7 @@ export class WeaveStagePanningPlugin extends WeavePlugin {
       }
     });
 
-    stage.container().addEventListener('keyup', (e) => {
+    window.addEventListener('keyup', (e) => {
       if (e.ctrlKey || e.metaKey) {
         this.isCtrlOrMetaPressed = false;
       }

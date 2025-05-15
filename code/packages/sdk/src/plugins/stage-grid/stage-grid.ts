@@ -21,6 +21,10 @@ import {
 } from './types';
 import { Circle } from 'konva/lib/shapes/Circle';
 
+function isZeroOrClose(value: number, tolerance: number = 1e-6): boolean {
+  return Math.abs(value) <= tolerance;
+}
+
 export class WeaveStageGridPlugin extends WeavePlugin {
   private moveToolActive: boolean;
   private isMouseMiddleButtonPressed: boolean;
@@ -71,13 +75,13 @@ export class WeaveStageGridPlugin extends WeavePlugin {
   private initEvents() {
     const stage = this.instance.getStage();
 
-    stage.container().addEventListener('keydown', (e) => {
+    window.addEventListener('keydown', (e) => {
       if (e.code === 'Space') {
         this.isSpaceKeyPressed = true;
       }
     });
 
-    stage.container().addEventListener('keyup', (e) => {
+    window.addEventListener('keyup', (e) => {
       if (e.code === 'Space') {
         this.isSpaceKeyPressed = false;
       }
@@ -202,8 +206,8 @@ export class WeaveStageGridPlugin extends WeavePlugin {
 
     const stageXRound = this.round(stage.x(), this.config.gridSize) * -1;
 
-    const overflowX = Math.max(stage.width() * 0.2, 10 * this.config.gridSize);
-    const overflowY = Math.max(stage.height() * 0.2, 10 * this.config.gridSize);
+    const overflowX = 10 * this.config.gridSize;
+    const overflowY = 10 * this.config.gridSize;
 
     const pointsX = [];
     for (
@@ -237,15 +241,15 @@ export class WeaveStageGridPlugin extends WeavePlugin {
         new Line({
           points: [
             point,
-            // 0,
             (-stage.y() - overflowY) / stage.scaleY(),
             point,
-            // 100,
             (-stage.y() + stage.height() + overflowY) / stage.scaleY(),
           ],
           stroke: color,
           strokeWidth:
-            (point % (10 * (this.config.gridSize / stage.scaleX())) === 0
+            (isZeroOrClose(
+              point % (10 * (this.config.gridSize / stage.scaleX()))
+            )
               ? 2.5
               : 0.5) / stage.scaleX(),
           listening: false,
@@ -271,7 +275,9 @@ export class WeaveStageGridPlugin extends WeavePlugin {
           ],
           stroke: color,
           strokeWidth:
-            (point % (10 * (this.config.gridSize / stage.scaleY())) === 0
+            (isZeroOrClose(
+              point % (10 * (this.config.gridSize / stage.scaleY()))
+            )
               ? 2.5
               : 0.5) / stage.scaleX(),
           listening: false,
