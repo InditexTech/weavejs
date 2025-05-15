@@ -300,7 +300,7 @@ export class WeaveTextNode extends WeaveNode {
               (1 / textNode.getAbsoluteScale().x)
           );
           textNode.height(
-            textArea.scrollHeight * (1 / textNode.getAbsoluteScale().x)
+            (textArea.scrollHeight + 1.6) * (1 / textNode.getAbsoluteScale().x)
           );
           textNode.text(textArea.value);
           this.updateNode(textNode);
