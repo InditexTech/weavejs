@@ -45,7 +45,7 @@ export class WeaveCopyPasteNodesPlugin extends WeavePlugin {
   }
 
   private readClipboardData() {
-    return new Promise<void>((resolve, reject) => {
+    return new Promise<boolean>((resolve, reject) => {
       setTimeout(async () => {
         if (typeof navigator.clipboard === 'undefined') {
           return reject(new Error('Clipboard API not supported'));
@@ -63,9 +63,10 @@ export class WeaveCopyPasteNodesPlugin extends WeavePlugin {
                   weaveMinPoint: object.weaveMinPoint,
                 };
               }
-              resolve();
-            } catch (ex) {
-              reject(ex);
+              resolve(true);
+              // eslint-disable-next-line @typescript-eslint/no-unused-vars
+            } catch (_) {
+              resolve(false);
             }
           })
           .catch((error) => {
@@ -112,7 +113,14 @@ export class WeaveCopyPasteNodesPlugin extends WeavePlugin {
         }
 
         try {
-          await this.readClipboardData();
+          const continueToPaste = await this.readClipboardData();
+          if (!continueToPaste) {
+            this.instance.emitEvent<WeaveCopyPasteNodesPluginOnPasteEvent>(
+              'onPaste',
+              new Error('Invalid elements to paste') as Error
+            );
+            return;
+          }
           this.performPaste();
           // eslint-disable-next-line @typescript-eslint/no-unused-vars, no-empty
         } catch (ex) {
@@ -268,7 +276,14 @@ export class WeaveCopyPasteNodesPlugin extends WeavePlugin {
   }
 
   async paste(): Promise<void> {
-    await this.readClipboardData();
+    const continueToPaste = await this.readClipboardData();
+    if (!continueToPaste) {
+      this.instance.emitEvent<WeaveCopyPasteNodesPluginOnPasteEvent>(
+        'onPaste',
+        new Error('Invalid elements to paste') as Error
+      );
+      return;
+    }
     this.performPaste();
   }
 
