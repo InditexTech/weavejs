@@ -49,7 +49,7 @@ SPDX-License-Identifier: Apache-2.0
         <li><a href="#built-with">Built With</a></li>
       </ul>
     </li>
-    <li><a href="#quick-start">Quick Start</a></li>
+    <li><a href="#quickstart">Quickstart</a></li>
     <li>
       <a href="#development">Development</a>
       <ul>
@@ -71,7 +71,9 @@ SPDX-License-Identifier: Apache-2.0
 
 [![Weave.js Screen Shot][product-screenshot]](images/screenshot.png)
 
-Weave.js is a powerful headless framework for building end-to-end visual collaborative applications, enabling real-time multi-user interactions on-the-fly. It provides robust synchronization based on [Yjs][Yjs-url] and [SyncedStore][SyncedStore-url] and provides an extensible API to streamline the development of interactive, collaborative applications.
+Weave.js is a powerful headless framework for building end-to-end collaborative whiteboard applications. Aimed at developers, it provides all the building blocks and plugins to develop visual collaborative canvas, as well as it handles user interactions in real time, so that changes in the visual canvas can be shared among multi users in real time.
+
+It provides robust synchronization based on [Yjs][Yjs-url] and [SyncedStore][SyncedStore-url] as well as an extensible API to streamline the development of interactive, collaborative applications.
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
@@ -86,10 +88,9 @@ Weave.js is a powerful headless framework for building end-to-end visual collabo
 
 <!-- GETTING STARTED -->
 
-## Quick Start
+## Quickstart
 
-Check out the documentation [Quick Start][docs-quick-start-url] page to setup on your LDE an
-example of a project that uses Weave.js (backend and frontend).
+Follow the [Quickstart documentation][docs-quick-start-url] to set up the a sample Weave.js project (backend and frontend), running on your local development environment.
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
@@ -97,9 +98,9 @@ example of a project that uses Weave.js (backend and frontend).
 
 ## Documentation
 
-You can find the Weave.js documentation [here][docs-url].
+Follow the [Weave.js documentation][docs-url] for details on setup instructions, usage guidelines, architecture details, and more.
 
-Check out the [What is Weave.js][docs-what-is-weave-url] section for a quick overview.
+Check the [What is Weave.js][docs-what-is-weave-url] section for full context of Weave.js library, its scope, architecture, and how it works.
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
@@ -107,7 +108,7 @@ Check out the [What is Weave.js][docs-what-is-weave-url] section for a quick ove
 
 ## Roadmap
 
-Check out the [roadmap][docs-roadmap-url] page on the documentation for more information.
+Check out [Weave.js roadmap][docs-roadmap-url] for details on planned work and the features that will come next.
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
