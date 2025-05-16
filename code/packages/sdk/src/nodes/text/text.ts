@@ -223,6 +223,7 @@ export class WeaveTextNode extends WeaveNode {
     textArea.style.border = 'solid 1px #1e40af';
     // textArea.style.padding = '0px';
     // textArea.style.paddingTop = '0.1em';
+    textArea.style.minHeight = 'auto';
     textArea.style.margin = '0px';
     textArea.style.overflow = 'hidden';
     textArea.style.background = 'transparent';
@@ -264,7 +265,7 @@ export class WeaveTextNode extends WeaveNode {
     }
 
     const px = 0;
-    const py = -1 * textNode.lineHeight() * textNode.getAbsoluteScale().x;
+    const py = -3 * textNode.getAbsoluteScale().x;
     transform += 'translateX(' + px + 'px)';
     transform += 'translateY(' + py + 'px)';
 
@@ -282,8 +283,7 @@ export class WeaveTextNode extends WeaveNode {
               textArea.style.height = 'auto';
               textArea.style.height =
                 textArea.scrollHeight +
-                1.6 +
-                textNode.fontSize() * textNode.getAbsoluteScale().x +
+                1.6 * textNode.getAbsoluteScale().x +
                 'px';
               textArea.tabIndex = 1;
               textArea.focus();
