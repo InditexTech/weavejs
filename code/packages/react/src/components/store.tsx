@@ -33,6 +33,7 @@ interface WeaveRuntimeState {
     canZoomOut: boolean;
   };
   selection: {
+    active: boolean;
     nodes: WeaveSelection[];
     node: WeaveStateElement | undefined;
   };
@@ -51,6 +52,7 @@ interface WeaveRuntimeState {
   setZoom: (newZoom: number) => void;
   setCanZoomIn: (newCanZoomIn: boolean) => void;
   setCanZoomOut: (newCanZoomOut: boolean) => void;
+  setSelectionActive: (newSelectionActive: boolean) => void;
   setSelectedNodes: (newSelectedNodes: WeaveSelection[]) => void;
   setNode: (newNode: WeaveStateElement | undefined) => void;
   setActualAction: (newActualAction: string | undefined) => void;
@@ -83,6 +85,7 @@ export const useWeave: UseBoundStore<StoreApi<WeaveRuntimeState>> =
       options: [],
     },
     selection: {
+      active: false,
       nodes: [],
       node: undefined,
     },
@@ -127,6 +130,11 @@ export const useWeave: UseBoundStore<StoreApi<WeaveRuntimeState>> =
       set((state) => ({
         ...state,
         zoom: { ...state.zoom, canZoomOut: newCanZoomOut },
+      })),
+    setSelectionActive: (newSelectionActive) =>
+      set((state) => ({
+        ...state,
+        selection: { ...state.selection, active: newSelectionActive },
       })),
     setSelectedNodes: (newSelectedNodes) =>
       set((state) => ({

@@ -98,6 +98,40 @@ type WeaveStoreWebsocketsOptions = {
 };
 ```
 
+## Events
+
+### onStateChange
+
+```ts
+onStateChange: WeaveStoreOnStateChangeEvent;
+```
+
+The `onStateChange` event is called when the shared-state changes.
+
+### onRoomLoaded
+
+```ts
+onRoomLoaded: WeaveStoreOnRoomLoadedEvent;
+```
+
+The `onRoomLoaded` event is called when the room shared-state is loaded.
+
+### onUndoManagerStatusChange
+
+```ts
+onUndoManagerStatusChange: WeaveStoreOnUndoRedoChangeEvent;
+```
+
+The `onUndoManagerStatusChange` event is called when the undo/redo manager changes.
+
+### onNodeChange
+
+```ts
+onNodeChange: WeaveStoreOnNodeChangeEvent;
+```
+
+The `onNodeChange` event is called when there is a single node selected and the node changes.
+
 ## Methods
 
 #### connect

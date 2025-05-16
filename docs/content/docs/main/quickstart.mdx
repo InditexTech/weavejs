@@ -3,6 +3,8 @@ title: Quick Start
 description: Start your first project
 ---
 
+import { Tab, Tabs } from "fumadocs-ui/components/tabs";
+
 This Quickstart will guide you through getting your first real-time collaborative
 canvas project up and running — including both the backend and frontend — in just a
 few minutes.
@@ -31,8 +33,16 @@ using a Weave.js Store provider, in this case we will use the [Weave.js Store We
 
 Open a terminal on your preferred folder and execute the following command:
 
-```bash
+```bash tab="pnpm"
+pnpm create weave-backend-app
+```
+
+```bash tab="npm"
 npm create weave-backend-app
+```
+
+```bash tab="yarn"
+yarn create weave-backend-app
 ```
 
 This command will launch Weave.js create backend CLI with the following steps:
@@ -47,9 +57,19 @@ This command will launch Weave.js create backend CLI with the following steps:
 
 After the CLI finishes execute the following:
 
-```bash
+```bash tab="pnpm"
+cd [backend-project-name]
+pnpm run dev
+```
+
+```bash tab="npm"
 cd [backend-project-name]
 npm run dev
+```
+
+```bash tab="yarn"
+cd [backend-project-name]
+yarn run dev
 ```
 
 This will startup the backend server on `http://localhost:8080`. To check if everything is
@@ -73,8 +93,16 @@ this will render the UI and canvas with live updates.
 Open a terminal on the same parent folder as the backend side project and execute the
 following command:
 
-```bash
+```bash tab="pnpm"
+pnpm create weave-frontend-app
+```
+
+```bash tab="npm"
 npm create weave-frontend-app
+```
+
+```bash tab="yarn"
+yarn create weave-frontend-app
 ```
 
 This command will launch Weave.js create frontend CLI with the following steps:
@@ -90,9 +118,19 @@ This command will launch Weave.js create frontend CLI with the following steps:
 
 After the CLI finishes execute the following:
 
-```bash
+```bash tab="pnpm"
+cd [frontend-project-name]
+pnpm run dev
+```
+
+```bash tab="npm"
 cd [frontend-project-name]
 npm run dev
+```
+
+```bash tab="yarn"
+cd [frontend-project-name]
+yarn run dev
 ```
 
 This will startup the Next.js frontend application on `http://localhost:3030`. Open

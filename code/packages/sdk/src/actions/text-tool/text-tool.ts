@@ -103,7 +103,7 @@ export class WeaveTextToolAction extends WeaveAction {
       text: 'Your text here...',
       width: 300,
       fontSize: 20,
-      fontFamily: 'NotoSansMono, monospace',
+      fontFamily: 'Arial, sans-serif',
       fill: '#000000ff',
       strokeEnabled: false,
       stroke: '#000000ff',
