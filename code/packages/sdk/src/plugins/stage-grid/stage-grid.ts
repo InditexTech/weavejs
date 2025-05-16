@@ -206,8 +206,14 @@ export class WeaveStageGridPlugin extends WeavePlugin {
 
     const stageXRound = this.round(stage.x(), this.config.gridSize) * -1;
 
-    const overflowX = 10 * this.config.gridSize;
-    const overflowY = 10 * this.config.gridSize;
+    const overflowX = this.round(
+      10 * this.config.gridSize,
+      this.config.gridSize
+    );
+    const overflowY = this.round(
+      10 * this.config.gridSize,
+      this.config.gridSize
+    );
 
     const pointsX = [];
     for (
@@ -215,7 +221,7 @@ export class WeaveStageGridPlugin extends WeavePlugin {
       i < stageXRound + stage.width() + overflowX;
       i += this.config.gridSize
     ) {
-      pointsX.push(i / stage.scaleX());
+      pointsX.push({ real: i / stage.scaleX(), ref: i });
     }
 
     const stageYRound = this.round(stage.y(), this.config.gridSize) * -1;
@@ -226,11 +232,11 @@ export class WeaveStageGridPlugin extends WeavePlugin {
       i < stageYRound + stage.height() + overflowY;
       i += this.config.gridSize
     ) {
-      pointsY.push(i / stage.scaleY());
+      pointsY.push({ real: i / stage.scaleY(), ref: i });
     }
 
     for (let index = 0; index < pointsX.length; index++) {
-      const point = pointsX[index];
+      const { real: point, ref } = pointsX[index];
 
       let color = this.config.gridColor;
       if (point === 0) {
@@ -247,18 +253,15 @@ export class WeaveStageGridPlugin extends WeavePlugin {
           ],
           stroke: color,
           strokeWidth:
-            (isZeroOrClose(
-              point % (10 * (this.config.gridSize / stage.scaleX()))
-            )
-              ? 2.5
-              : 0.5) / stage.scaleX(),
+            (isZeroOrClose(ref % (10 * this.config.gridSize)) ? 2.5 : 0.5) /
+            stage.scaleX(),
           listening: false,
         })
       );
     }
 
     for (let index = 0; index < pointsY.length; index++) {
-      const point = pointsY[index];
+      const { real: point, ref } = pointsY[index];
 
       let color = this.config.gridColor;
       if (point === 0) {
@@ -275,11 +278,8 @@ export class WeaveStageGridPlugin extends WeavePlugin {
           ],
           stroke: color,
           strokeWidth:
-            (isZeroOrClose(
-              point % (10 * (this.config.gridSize / stage.scaleY()))
-            )
-              ? 2.5
-              : 0.5) / stage.scaleX(),
+            (isZeroOrClose(ref % (10 * this.config.gridSize)) ? 2.5 : 0.5) /
+            stage.scaleX(),
           listening: false,
         })
       );
@@ -295,8 +295,8 @@ export class WeaveStageGridPlugin extends WeavePlugin {
 
     const stage = this.instance.getStage();
 
-    const overflowX = Math.max(stage.width() * 0.2, 10 * this.config.gridSize);
-    const overflowY = Math.max(stage.height() * 0.2, 10 * this.config.gridSize);
+    const overflowX = 10 * this.config.gridSize;
+    const overflowY = 10 * this.config.gridSize;
 
     const stageXRound = this.round(stage.x(), this.config.gridSize) * -1;
 
@@ -306,7 +306,7 @@ export class WeaveStageGridPlugin extends WeavePlugin {
       i < stageXRound + stage.width() + overflowX;
       i += this.config.gridSize
     ) {
-      pointsX.push(i / stage.scaleX());
+      pointsX.push({ real: i / stage.scaleX(), ref: i });
     }
 
     const stageYRound = this.round(stage.y(), this.config.gridSize) * -1;
@@ -317,17 +317,17 @@ export class WeaveStageGridPlugin extends WeavePlugin {
       i < stageYRound + stage.height() + overflowY;
       i += this.config.gridSize
     ) {
-      pointsY.push(i / stage.scaleY());
+      pointsY.push({ real: i / stage.scaleY(), ref: i });
     }
 
     for (let indexX = 0; indexX < pointsX.length; indexX++) {
-      const pointX = pointsX[indexX];
+      const { real: pointX, ref: refX } = pointsX[indexX];
 
       for (let indexY = 0; indexY < pointsY.length; indexY++) {
-        const pointY = pointsY[indexY];
+        const { real: pointY, ref: refY } = pointsY[indexY];
 
         let color = this.config.gridColor;
-        if (pointX === 0 || pointY === 0) {
+        if (refX === 0 || refY === 0) {
           color = this.config.gridOriginColor;
         }
 

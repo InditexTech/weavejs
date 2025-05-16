@@ -384,7 +384,7 @@ export class WeaveStateManager {
     const state = this.instance.getStore().getState().weave;
     const jsonState = JSON.parse(JSON.stringify(state, null, 2));
 
-    const mainLayer = jsonState.props.children.find(
+    const mainLayer = jsonState.props?.children.find(
       (node: WeaveStateElement) => node.key === 'mainLayer'
     );
 

@@ -55,6 +55,7 @@ type WeaveSelection = {
   node: WeaveStateElement;
 };
 
+type WeaveNodesSelectionPluginOnSelectionStateEvent = boolean;
 type WeaveNodesSelectionPluginOnNodesChangeEvent = WeaveSelection[];
 type WeaveNodesSelectionPluginOnStageSelectionEvent = undefined;
 
@@ -150,6 +151,15 @@ removeSelectedNodes(): void
 This method removes the selected nodes of the underlying Transformer of the plugin.
 
 ## Events
+
+### onSelectionState
+
+```ts
+onSelectionState: WeaveNodesSelectionPluginOnSelectionStateEvent;
+```
+
+The `onSelectionState` event is called when the user is selecting (true) or not selecting
+(false).
 
 ### onNodesChange
 

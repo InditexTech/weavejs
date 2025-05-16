@@ -5,6 +5,7 @@
 import { type WeaveSelection } from '@inditextech/weave-types';
 import type Konva from 'konva';
 
+export type WeaveNodesSelectionPluginOnSelectionStateEvent = boolean;
 export type WeaveNodesSelectionPluginOnNodesChangeEvent = WeaveSelection[];
 export type WeaveNodesSelectionPluginOnStageSelectionEvent = undefined;
 

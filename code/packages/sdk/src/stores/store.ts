@@ -21,6 +21,13 @@ import {
 } from '@syncedstore/core';
 import { Doc, AbstractType, UndoManager } from 'yjs';
 import { type Logger } from 'pino';
+import type { WeaveNodesSelectionPlugin } from '@/plugins/nodes-selection/nodes-selection';
+import type {
+  WeaveStoreOnNodeChangeEvent,
+  WeaveStoreOnRoomLoadedEvent,
+  WeaveStoreOnStateChangeEvent,
+  WeaveStoreOnUndoRedoChangeEvent,
+} from './types';
 
 export abstract class WeaveStore implements WeaveStoreBase {
   protected instance!: Weave;
@@ -97,7 +104,10 @@ export abstract class WeaveStore implements WeaveStoreBase {
     const config = this.instance.getConfiguration();
 
     config.callbacks?.onRoomLoaded?.(this.isRoomLoaded);
-    this.instance.emitEvent('onRoomLoaded', this.isRoomLoaded);
+    this.instance.emitEvent<WeaveStoreOnRoomLoadedEvent>(
+      'onRoomLoaded',
+      this.isRoomLoaded
+    );
 
     if (this.supportsUndoManager) {
       const weaveStateValues = getYjsValue(
@@ -123,7 +133,10 @@ export abstract class WeaveStore implements WeaveStoreBase {
           };
 
           config.callbacks?.onUndoManagerStatusChange?.(change);
-          this.instance.emitEvent('onUndoManagerStatusChange', change);
+          this.instance.emitEvent<WeaveStoreOnUndoRedoChangeEvent>(
+            'onUndoManagerStatusChange',
+            change
+          );
         });
 
         this.undoManager.on('stack-item-popped', () => {
@@ -135,23 +148,53 @@ export abstract class WeaveStore implements WeaveStoreBase {
           };
 
           config.callbacks?.onUndoManagerStatusChange?.(change);
-          this.instance.emitEvent('onUndoManagerStatusChange', change);
+          this.instance.emitEvent<WeaveStoreOnUndoRedoChangeEvent>(
+            'onUndoManagerStatusChange',
+            change
+          );
         });
       }
     }
 
     observeDeep(this.getState(), () => {
-      const newState = JSON.parse(JSON.stringify(this.getState()));
+      const newState: WeaveState = JSON.parse(JSON.stringify(this.getState()));
 
       config.callbacks?.onStateChange?.(newState);
-      this.instance.emitEvent('onStateChange', newState);
+      this.instance.emitEvent<WeaveStoreOnStateChangeEvent>(
+        'onStateChange',
+        newState
+      );
+
+      const nodesSelectionPlugin =
+        this.instance.getPlugin<WeaveNodesSelectionPlugin>('nodesSelection');
+
+      if (
+        this.isRoomLoaded &&
+        nodesSelectionPlugin &&
+        nodesSelectionPlugin.getSelectedNodes().length === 1
+      ) {
+        const selectedNode = nodesSelectionPlugin.getSelectedNodes()[0];
+        const nodeInfo = this.instance.getNode(
+          selectedNode.getAttrs().id ?? ''
+        );
+
+        if (nodeInfo && nodeInfo.node) {
+          this.instance.emitEvent<WeaveStoreOnNodeChangeEvent>('onNodeChange', {
+            instance: selectedNode,
+            node: JSON.parse(JSON.stringify(nodeInfo.node)),
+          });
+        }
+      }
 
       if (!this.isRoomLoaded && !isEmpty(this.state.weave)) {
         this.instance.setupRenderer();
         this.isRoomLoaded = true;
 
         config.callbacks?.onRoomLoaded?.(this.isRoomLoaded);
-        this.instance.emitEvent('onRoomLoaded', this.isRoomLoaded);
+        this.instance.emitEvent<WeaveStoreOnRoomLoadedEvent>(
+          'onRoomLoaded',
+          this.isRoomLoaded
+        );
       }
       if (this.isRoomLoaded && !isEmpty(this.state.weave)) {
         this.instance.render();

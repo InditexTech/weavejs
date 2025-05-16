@@ -7,6 +7,7 @@ import type {
   WeaveConnectedUsers,
   WeaveConnectedUsersChangeEvent,
   WeaveNodesSelectionPluginOnNodesChangeEvent,
+  WeaveNodesSelectionPluginOnSelectionStateEvent,
   WeaveStageZoomChanged,
   WeaveStageZoomPluginOnZoomChangeEvent,
 } from '@inditextech/weave-sdk';
@@ -19,9 +20,15 @@ export const useWeaveEvents = (): void => {
   const setZoom = useWeave((state) => state.setZoom);
   const setCanZoomIn = useWeave((state) => state.setCanZoomIn);
   const setCanZoomOut = useWeave((state) => state.setCanZoomOut);
+  const setSelectionActive = useWeave((state) => state.setSelectionActive);
   const setSelectedNodes = useWeave((state) => state.setSelectedNodes);
   const setNode = useWeave((state) => state.setNode);
   const setUsers = useWeave((state) => state.setUsers);
+
+  const onSelectionStateHandler = React.useCallback((active: boolean) => {
+    setSelectionActive(active);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const onZoomChangeHandler = React.useCallback(
     (zoomInfo: WeaveStageZoomChanged) => {
@@ -58,6 +65,10 @@ export const useWeaveEvents = (): void => {
   React.useEffect(() => {
     if (!instance) return;
 
+    instance.addEventListener<WeaveNodesSelectionPluginOnSelectionStateEvent>(
+      'onSelectionState',
+      onSelectionStateHandler
+    );
     instance.addEventListener<WeaveStageZoomPluginOnZoomChangeEvent>(
       'onZoomChange',
       onZoomChangeHandler
@@ -72,6 +83,10 @@ export const useWeaveEvents = (): void => {
     );
 
     return () => {
+      instance.removeEventListener<WeaveNodesSelectionPluginOnSelectionStateEvent>(
+        'onSelectionState',
+        onSelectionStateHandler
+      );
       instance.removeEventListener<WeaveStageZoomPluginOnZoomChangeEvent>(
         'onZoomChange',
         onZoomChangeHandler

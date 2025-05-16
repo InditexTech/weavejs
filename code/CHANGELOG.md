@@ -19,6 +19,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- [#215](https://github.com/InditexTech/weavejs/issues/215) Fix returned value when no state is initialized
 - [#188](https://github.com/InditexTech/weavejs/issues/188) Text node edition state issues
 
 ## [0.11.0] - 2025-05-15

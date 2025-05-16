@@ -47,6 +47,7 @@ interface WeaveRuntimeState {
     canZoomOut: boolean;
   };
   selection: {
+    active: boolean;
     nodes: WeaveSelection[];
     node: WeaveStateElement | undefined;
   };
@@ -65,6 +66,7 @@ interface WeaveRuntimeState {
   setZoom: (newZoom: number) => void;
   setCanZoomIn: (newCanZoomIn: boolean) => void;
   setCanZoomOut: (newCanZoomOut: boolean) => void;
+  setSelectionActive: (newSelectionActive: boolean) => void;
   setSelectedNodes: (newSelectedNodes: WeaveSelection[]) => void;
   setNode: (newNode: WeaveStateElement | undefined) => void;
   setActualAction: (newActualAction: string | undefined) => void;

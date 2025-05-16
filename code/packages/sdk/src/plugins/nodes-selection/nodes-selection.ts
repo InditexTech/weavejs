@@ -16,6 +16,7 @@ import {
 import {
   type WeaveNodesSelectionPluginConfig,
   type WeaveNodesSelectionPluginOnNodesChangeEvent,
+  type WeaveNodesSelectionPluginOnSelectionStateEvent,
   type WeaveNodesSelectionPluginOnStageSelectionEvent,
   type WeaveNodesSelectionPluginParams,
 } from './types';
@@ -329,6 +330,11 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
       this.selectionRectangle.height(0);
       this.selecting = true;
 
+      this.instance.emitEvent<WeaveNodesSelectionPluginOnSelectionStateEvent>(
+        'onSelectionState',
+        true
+      );
+
       if (!(e.target instanceof Konva.Stage)) {
         this.cameFromSelectingMultiple = true;
       }
@@ -375,6 +381,11 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
       }
 
       this.selecting = false;
+
+      this.instance.emitEvent<WeaveNodesSelectionPluginOnSelectionStateEvent>(
+        'onSelectionState',
+        false
+      );
 
       if (!this.selectionRectangle.visible()) {
         this.cameFromSelectingMultiple = false;

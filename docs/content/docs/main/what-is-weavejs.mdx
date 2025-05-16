@@ -95,9 +95,10 @@ canvas building blocks.
 </Tags>
 
 We use a custom [React Reconciler](https://github.com/facebook/react/tree/main/packages/react-reconciler)
-to bridge React’s component model state with the Konva rendering process. This integration allows
-developers to declaratively manage the canvas node tree, while benefiting from efficient, incremental
-updates and the internal React's renderer life-cycle optimizations.
+to bridge React’s component model state for the Konva rendering process. This integration allows
+developers to define nodes as Classes with specific life-cycle and we internally handle the rest.
+This way we benefit from efficient, incremental updates and the internal React's renderer life-cycle
+optimizations without the need to know React declaratively way (JSX).
 
 ### Yjs
 
