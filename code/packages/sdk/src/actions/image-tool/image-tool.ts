@@ -30,6 +30,7 @@ export class WeaveImageToolAction extends WeaveAction {
   protected preloadImgs: Record<string, HTMLImageElement>;
   protected clickPoint: Vector2d | null;
   protected cancelAction!: () => void;
+  onPropsChange = undefined;
   update = undefined;
 
   constructor() {
@@ -289,43 +290,6 @@ export class WeaveImageToolAction extends WeaveAction {
 
     return { finishUploadCallback: this.loadImage.bind(this) };
   }
-
-  onPropsChange = undefined;
-  // onPropsChange(): void {
-  //   const stage = this.instance?.getStage();
-  //   if (stage) {
-  //     const tempImage = this.instance
-  //       .getStage()
-  //       .findOne(`#${this.tempImageId}`) as Konva.Image;
-
-  //     console.log('UPDATE', {
-  //       imageId: this.imageId,
-  //       tempImage,
-  //       imageURL: this.imageURL,
-  //     });
-
-  //     if (this.imageId && this.imageURL && tempImage) {
-  //       console.log('SET IMAGE URL', this.imageURL);
-  //       const aspectRatio =
-  //         this.preloadImgs[this.imageId].width /
-  //         this.preloadImgs[this.imageId].height;
-
-  //       tempImage.setAttrs({
-  //         width: 100 * aspectRatio,
-  //         height: 100,
-  //         imageURL: this.imageURL,
-  //       });
-  //       tempImage.image(this.preloadImgs[this.imageId]);
-
-  //       const nodeHandler =
-  //         this.instance.getNodeHandler<WeaveRectangleNode>('rectangle');
-
-  //       this.instance.updateNode(
-  //         nodeHandler.serialize(tempImage as WeaveElementInstance)
-  //       );
-  //     }
-  //   }
-  // }
 
   cleanup(): void {
     const stage = this.instance.getStage();
