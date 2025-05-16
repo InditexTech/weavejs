@@ -30,6 +30,7 @@ export class WeaveImageToolAction extends WeaveAction {
   protected preloadImgs: Record<string, HTMLImageElement>;
   protected clickPoint: Vector2d | null;
   protected cancelAction!: () => void;
+  onPropsChange = undefined;
   update = undefined;
 
   constructor() {
@@ -110,13 +111,8 @@ export class WeaveImageToolAction extends WeaveAction {
       if (this.state === IMAGE_TOOL_STATE.ADDING && tempImage) {
         const mousePos = stage.getRelativePointerPosition();
         tempImage.setAttrs({
-          ...this.props,
-          name: undefined,
           x: (mousePos?.x ?? 0) + 2,
           y: (mousePos?.y ?? 0) + 2,
-          fill: '#ccccccff',
-          stroke: '#000000ff',
-          strokeWidth: 1,
         });
 
         const nodeHandler =
@@ -156,10 +152,12 @@ export class WeaveImageToolAction extends WeaveAction {
       if (this.imageId) {
         this.props = {
           ...this.props,
+          imageURL: this.imageURL,
           width: this.preloadImgs[this.imageId].width,
           height: this.preloadImgs[this.imageId].height,
         };
       }
+
       this.addImageNode();
     };
     this.preloadImgs[this.imageId].onerror = () => {
@@ -185,20 +183,25 @@ export class WeaveImageToolAction extends WeaveAction {
     if (this.imageId) {
       const mousePos = stage.getRelativePointerPosition();
 
-      const nodeHandler =
-        this.instance.getNodeHandler<WeaveRectangleNode>('rectangle');
+      const nodeHandler = this.instance.getNodeHandler<WeaveImageNode>('image');
 
       this.tempImageId = uuidv4();
 
+      const aspectRatio =
+        this.preloadImgs[this.imageId].width /
+        this.preloadImgs[this.imageId].height;
+
       const node = nodeHandler.create(this.tempImageId, {
-        ...this.props,
         x: (mousePos?.x ?? 0) + 5,
         y: (mousePos?.y ?? 0) + 5,
-        width: this.preloadImgs[this.imageId].width,
-        height: this.preloadImgs[this.imageId].height,
-        fill: '#ccccccff',
+        width: 100 * aspectRatio,
+        height: 100,
+        opacity: 1,
+        imageURL: this.imageURL,
         stroke: '#000000ff',
-        strokeWidth: 1,
+        strokeWidth: 0,
+        strokeScaleEnabled: false,
+        listening: false,
       });
 
       this.instance.addNode(node, this.container?.getAttrs().id);
@@ -286,32 +289,6 @@ export class WeaveImageToolAction extends WeaveAction {
     this.addImage();
 
     return { finishUploadCallback: this.loadImage.bind(this) };
-  }
-
-  onPropsChange(): void {
-    const stage = this.instance?.getStage();
-    if (stage) {
-      const tempImage = this.instance
-        .getStage()
-        .findOne(`#${this.tempImageId}`);
-
-      if (tempImage) {
-        tempImage.setAttrs({
-          ...this.props,
-          name: undefined,
-          fill: '#ccccccff',
-          stroke: '#000000ff',
-          strokeWidth: 1,
-        });
-
-        const nodeHandler =
-          this.instance.getNodeHandler<WeaveRectangleNode>('rectangle');
-
-        this.instance.updateNode(
-          nodeHandler.serialize(tempImage as WeaveElementInstance)
-        );
-      }
-    }
   }
 
   cleanup(): void {
