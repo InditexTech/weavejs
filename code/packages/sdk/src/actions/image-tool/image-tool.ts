@@ -271,6 +271,12 @@ export class WeaveImageToolAction extends WeaveAction {
 
     this.cancelAction = cancelAction;
 
+    const selectionPlugin =
+      this.instance.getPlugin<WeaveNodesSelectionPlugin>('nodesSelection');
+    if (selectionPlugin) {
+      selectionPlugin.setSelectedNodes([]);
+    }
+
     if (params?.imageURL) {
       this.loadImage(params.imageURL);
       return;

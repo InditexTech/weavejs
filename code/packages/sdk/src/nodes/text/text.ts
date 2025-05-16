@@ -39,8 +39,37 @@ export class WeaveTextNode extends WeaveNode {
 
     this.setupDefaultNodeEvents(text);
 
-    text.on('dblclick dbltap', (evt) => {
-      evt.cancelBubble = true;
+    window.addEventListener('keypress', (e) => {
+      if (this.editing) {
+        return;
+      }
+
+      if (e.key !== 'Enter' && !e.shiftKey) {
+        return;
+      }
+
+      if (this.isSelecting() && this.isNodeSelected(text)) {
+        const nodesSelectionPlugin =
+          this.instance.getPlugin<WeaveNodesSelectionPlugin>('nodesSelection');
+        if (
+          nodesSelectionPlugin &&
+          nodesSelectionPlugin.getSelectedNodes().length === 1 &&
+          nodesSelectionPlugin.getSelectedNodes()[0].getAttrs().nodeType ===
+            WEAVE_TEXT_NODE_TYPE &&
+          !window.weaveTextEditing[
+            nodesSelectionPlugin.getSelectedNodes()[0].id()
+          ]
+        ) {
+          e.preventDefault();
+          this.triggerEditMode(
+            nodesSelectionPlugin.getSelectedNodes()[0] as Konva.Text
+          );
+        }
+      }
+    });
+
+    text.on('dblclick dbltap', (e) => {
+      e.cancelBubble = true;
 
       if (this.editing) {
         return;
@@ -111,14 +140,66 @@ export class WeaveTextNode extends WeaveNode {
     };
   }
 
+  private resizeTextAreaDOM(textNode: Konva.Text) {
+    const textArea = document.getElementById(
+      textNode.id()
+    ) as HTMLTextAreaElement | null;
+
+    if (!textArea) {
+      return;
+    }
+
+    const stage = this.instance.getStage();
+    const textPosition = textNode.absolutePosition();
+    const position: Vector2d = {
+      x: stage.container().offsetLeft + textPosition.x,
+      y: stage.container().offsetTop + textPosition.y,
+    };
+
+    textArea.style.top = position.y + 'px';
+    textArea.style.left = position.x + 'px';
+    textArea.style.width =
+      textNode.getWidth() * textNode.getAbsoluteScale().x + 'px';
+    textArea.style.height =
+      textNode.getHeight() * textNode.getAbsoluteScale().x + 'px';
+    textArea.style.fontSize =
+      textNode.fontSize() * textNode.getAbsoluteScale().x + 'px';
+  }
+
+  private onZoomChangeHandler = (textNode: Konva.Text) => () => {
+    if (!this.editing) {
+      return;
+    }
+
+    this.resizeTextAreaDOM(textNode);
+  };
+
+  private onStageMoveHandler = (textNode: Konva.Text) => () => {
+    if (!this.editing) {
+      return;
+    }
+
+    this.resizeTextAreaDOM(textNode);
+  };
+
   private createTextAreaDOM(textNode: Konva.Text, position: Vector2d) {
     const stage = this.instance.getStage();
 
     // create textarea and style it
     const textArea = document.createElement('textarea');
+    textArea.id = textNode.id();
     stage.container().appendChild(textArea);
 
-    window.weaveTextEditing = true;
+    this.instance.addEventListener(
+      'onZoomChange',
+      this.onZoomChangeHandler(textNode).bind(this)
+    );
+    this.instance.addEventListener(
+      'onStageMove',
+      this.onStageMoveHandler(textNode).bind(this)
+    );
+
+    window.weaveTextEditing[textNode.id()] = 'editing';
 
     // apply many styles to match text on canvas as close as possible
     // remember that text rendering on canvas and on the textarea can be different
@@ -135,14 +216,17 @@ export class WeaveTextNode extends WeaveNode {
     textArea.style.height =
       (textNode.height() - textNode.padding() * 2) *
         textNode.getAbsoluteScale().x +
+      2 +
       'px';
     textArea.style.fontSize =
       textNode.fontSize() * textNode.getAbsoluteScale().x + 'px';
-    textArea.style.border = 'solid 1px rgba(0,0,255,0.5)';
-    textArea.style.padding = '0px';
+    textArea.style.border = 'solid 1px #1e40af';
+    // textArea.style.padding = '0px';
+    // textArea.style.paddingTop = '0.1em';
+    textArea.style.minHeight = 'auto';
     textArea.style.margin = '0px';
     textArea.style.overflow = 'hidden';
-    textArea.style.background = 'rgba(255,255,255,0.5)';
+    textArea.style.background = 'transparent';
     textArea.style.outline = 'none';
     textArea.style.resize = 'none';
     textArea.style.lineHeight = `${textNode.lineHeight()}`;
@@ -150,32 +234,47 @@ export class WeaveTextNode extends WeaveNode {
     textArea.style.transformOrigin = 'left top';
     textArea.style.textAlign = textNode.align();
     textArea.style.color = `${textNode.fill()}`;
+    textArea.onfocus = () => {
+      textArea.style.height = 'auto';
+      textArea.style.height =
+        textArea.scrollHeight + 1.6 * textNode.getAbsoluteScale().x + 'px';
+      textArea.setSelectionRange(textArea.value.length, textArea.value.length);
+    };
+    textArea.onkeydown = () => {
+      textArea.style.height = 'auto';
+      textArea.style.height =
+        textArea.scrollHeight + 1.6 * textNode.getAbsoluteScale().x + 'px';
+    };
+    textArea.onkeyup = () => {
+      textArea.style.height = 'auto';
+      textArea.style.height =
+        textArea.scrollHeight + 1.6 * textNode.getAbsoluteScale().x + 'px';
+    };
+    textArea.onwheel = (e) => {
+      e.preventDefault();
+    };
+    textArea.oninput = () => {
+      textArea.style.height = 'auto';
+      textArea.style.height =
+        textArea.scrollHeight + 1.6 * textNode.getAbsoluteScale().x + 'px';
+    };
     const rotation = textNode.rotation();
     let transform = '';
     if (rotation) {
       transform += 'rotateZ(' + rotation + 'deg)';
     }
 
-    const px = 1;
-    const py = 2;
-    transform += 'translateX(-' + px + 'px)';
-    transform += 'translateY(-' + py + 'px)';
+    const px = 0;
+    const py = -3 * textNode.getAbsoluteScale().x;
+    transform += 'translateX(' + px + 'px)';
+    transform += 'translateY(' + py + 'px)';
 
     textArea.style.transform = transform;
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const handleKeyDown = (e: any) => {
       if (textArea && textNode) {
-        // hide on enter
-        // but don't hide on shift + enter
-        if (e.key === 'Enter' && !e.shiftKey) {
-          textNode.text(textArea.value);
-          this.updateNode(textNode);
-          this.removeTextAreaDOM(textNode);
-          window.removeEventListener('click', handleOutsideClick);
-          return;
-        }
-        if (e.key === 'Enter' && e.shiftKey) {
+        if (e.key === 'Enter') {
           if (textArea && textNode) {
             try {
               textNode.text(textArea.value);
@@ -184,7 +283,7 @@ export class WeaveTextNode extends WeaveNode {
               textArea.style.height = 'auto';
               textArea.style.height =
                 textArea.scrollHeight +
-                textNode.fontSize() * textNode.getAbsoluteScale().x +
+                1.6 * textNode.getAbsoluteScale().x +
                 'px';
               textArea.tabIndex = 1;
               textArea.focus();
@@ -194,9 +293,26 @@ export class WeaveTextNode extends WeaveNode {
           }
           return;
         }
-        // on esc do not set value back to node
+        // save changes
         if (e.key === 'Escape') {
+          textNode.width(
+            parseFloat(textArea.style.width) *
+              (1 / textNode.getAbsoluteScale().x)
+          );
+          textNode.height(
+            (textArea.scrollHeight + 1.6) * (1 / textNode.getAbsoluteScale().x)
+          );
+          textNode.text(textArea.value);
+          this.updateNode(textNode);
           this.removeTextAreaDOM(textNode);
+          this.instance.removeEventListener(
+            'onZoomChange',
+            this.onZoomChangeHandler(textNode).bind(this)
+          );
+          this.instance.removeEventListener(
+            'onStageMove',
+            this.onStageMoveHandler(textNode).bind(this)
+          );
           window.removeEventListener('click', handleOutsideClick);
           return;
         }
@@ -204,16 +320,15 @@ export class WeaveTextNode extends WeaveNode {
     };
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const handleKeyUp = (e: any) => {
+    const handleKeyUp = () => {
       textNode.text(textArea.value);
       if (textArea && textNode) {
         // textNode.text(textArea.value);
         textArea.style.width =
           textNode.width() * textNode.getAbsoluteScale().x + 'px';
-        if (!(e.key === 'Enter' && e.shiftKey)) {
-          textArea.style.height = 'auto';
-          textArea.style.height = textArea.scrollHeight + 'px';
-        }
+        textArea.style.height = 'auto';
+        textArea.style.height =
+          textArea.scrollHeight + 1.6 * textNode.getAbsoluteScale().x + 'px';
       }
     };
 
@@ -254,7 +369,7 @@ export class WeaveTextNode extends WeaveNode {
   private removeTextAreaDOM(textNode: Konva.Text) {
     const stage = this.instance.getStage();
 
-    window.weaveTextEditing = false;
+    delete window.weaveTextEditing[textNode.id()];
 
     const textArea = document.getElementById(
       textNode.id()

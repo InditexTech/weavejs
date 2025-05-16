@@ -122,6 +122,10 @@ export class Weave extends Emittery {
       window.weave = this;
     }
 
+    // Initialize global window variables
+    window.weaveTextEditing = {};
+    window.weaveDragImageURL = undefined;
+
     // Render welcome log to console
     this.setupManager.welcomeLog();
   }

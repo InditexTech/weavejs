@@ -213,6 +213,12 @@ export class WeaveRectangleToolAction extends WeaveAction {
 
     this.cancelAction = cancelAction;
 
+    const selectionPlugin =
+      this.instance.getPlugin<WeaveNodesSelectionPlugin>('nodesSelection');
+    if (selectionPlugin) {
+      selectionPlugin.setSelectedNodes([]);
+    }
+
     this.props = this.initProps();
     this.addRectangle();
   }

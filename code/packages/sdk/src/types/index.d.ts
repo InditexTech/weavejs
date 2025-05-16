@@ -5,7 +5,7 @@
 declare global {
   interface Window {
     weave: Weave;
-    weaveTextEditing: boolean;
+    weaveTextEditing: Record<string, string>;
     weaveDragImageURL: string | undefined;
   }
 }

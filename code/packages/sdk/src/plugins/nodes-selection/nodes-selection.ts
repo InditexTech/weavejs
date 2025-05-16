@@ -283,7 +283,10 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
     const stage = this.instance.getStage();
 
     stage.container().addEventListener('keydown', (e) => {
-      if (e.key === 'Backspace' || e.key === 'Delete') {
+      if (
+        (e.key === 'Backspace' || e.key === 'Delete') &&
+        Object.keys(window.weaveTextEditing).length === 0
+      ) {
         this.removeSelectedNodes();
         return;
       }
