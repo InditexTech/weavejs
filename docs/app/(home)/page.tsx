@@ -271,7 +271,7 @@ function Features() {
             <>
               <span>
                 Weave.js uses Konva.js and React Reconciler under the hood to
-                make canvas' real-time sync and rendering a breeze.
+                make canvas&apos; real-time sync and rendering a breeze.
               </span>
             </>
           }
@@ -387,9 +387,9 @@ function Faq() {
             make the integration with React more seamlessly.
             <br />
             <br />
-            If you're using another framework (like Vue or Svelte), integration
-            is possible, but may require additional setup or custom wrappers not
-            provided by Weave.js documentation.
+            If you&apos;re using another framework (like Vue or Svelte),
+            integration is possible, but may require additional setup or custom
+            wrappers not provided by Weave.js documentation.
           </AccordionContent>
         </AccordionItem>
         <AccordionItem value="item-3" className="!border-b-0">
@@ -418,7 +418,7 @@ function Faq() {
             discussions that will help us improve our product further.
             <br />
             <br />
-            If you liked it, don't forget to give us a :star: ;-)
+            If you liked it, don&apos;t forget to give us a :star: ;-)
           </AccordionContent>
         </AccordionItem>
       </Accordion>
