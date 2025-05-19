@@ -4,7 +4,7 @@ import React from 'react';
 import {
   Cloud,
   //CloudCog,
-  CloudAlert,
+  CloudOff,
 } from 'lucide-react';
 import { WEAVE_STORE_AZURE_WEB_PUBSUB_CONNECTION_STATUS } from '@inditextech/weave-store-azure-web-pubsub/client';
 import { cn } from '@/lib/utils';
@@ -20,15 +20,15 @@ export const ConnectionStatus = ({
     <div className="flex">
       <div
         className={cn(
-          'bg-light-background-1 p-2 flex justify-center items-center rounded-full',
+          'bg-light-background-1 h-[20px] px-1 flex justify-center items-center',
           {
-            ['bg-emerald-200 text-black']:
+            ['bg-[#C2F0E8] text-black']:
               weaveConnectionStatus ===
               WEAVE_STORE_AZURE_WEB_PUBSUB_CONNECTION_STATUS.CONNECTED,
             // ["bg-sky-300 text-white"]:
             //   weaveConnectionStatus ===
             //   WEAVE_STORE_AZURE_WEB_PUBSUB_CONNECTION_STATUS.CONNECTING,
-            ['bg-rose-300 text-white']:
+            ['bg-[#FDB4BB] text-white']:
               weaveConnectionStatus ===
               WEAVE_STORE_AZURE_WEB_PUBSUB_CONNECTION_STATUS.DISCONNECTED,
           }
@@ -37,8 +37,8 @@ export const ConnectionStatus = ({
         {weaveConnectionStatus ===
           WEAVE_STORE_AZURE_WEB_PUBSUB_CONNECTION_STATUS.CONNECTED && (
           <>
-            <span className="mr-2 text-xs">connected</span>
-            <Cloud size={20} />
+            <Cloud size={18} strokeWidth={1} />
+            <span className="ml-1 font-inter text-xs uppercase">connected</span>
           </>
         )}
         {/* {weaveConnectionStatus ===
@@ -48,8 +48,10 @@ export const ConnectionStatus = ({
         {weaveConnectionStatus ===
           WEAVE_STORE_AZURE_WEB_PUBSUB_CONNECTION_STATUS.DISCONNECTED && (
           <>
-            <span className="mr-2 text-xs">disconnected</span>
-            <CloudAlert size={20} />
+            <CloudOff size={18} strokeWidth={1} />
+            <span className="ml-1 font-inter text-xs uppercase">
+              disconnected
+            </span>
           </>
         )}
       </div>

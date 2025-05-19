@@ -25,7 +25,7 @@ export function Logo({
         alt="Weave.js logo"
       />
       {variant === 'text' && (
-        <div className="font-questrial text-muted-foreground !normal-case">
+        <div className="font-inter font-light text-muted-foreground !normal-case">
           Weave.js
         </div>
       )}

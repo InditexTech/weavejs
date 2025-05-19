@@ -52,7 +52,7 @@ export const ColorPickerRGBAInput = ({
         maxLength={25}
         aria-label="RGBA color value"
         className={cn(
-          'h-8 rounded-none !text-xs font-normal text-gray-700 text-right focus:outline-none bg-transparent',
+          'h-8 rounded-none !text-[14px] font-normal text-black !border-black text-right focus:outline-none bg-transparent',
           error && 'border-red-500',
           !error && 'border-zinc-200'
         )}

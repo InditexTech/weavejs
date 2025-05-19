@@ -12,7 +12,7 @@ export const toImageAsync = (
 ): Promise<HTMLImageElement> => {
   return new Promise((resolve) => {
     node.toImage({
-      mimeType: 'image/jpeg',
+      mimeType: 'image/png',
       quality: 1,
       pixelRatio: properties.pixelRatio ?? 1,
       x: properties.x,

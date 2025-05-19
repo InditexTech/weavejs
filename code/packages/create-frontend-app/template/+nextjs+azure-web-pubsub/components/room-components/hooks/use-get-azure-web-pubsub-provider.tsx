@@ -55,7 +55,7 @@ function useGetAzureWebPubsubProvider({
         },
         {
           roomId: room,
-          url: `${process.env.NEXT_PUBLIC_API_ENDPOINT}/${process.env.NEXT_PUBLIC_API_ENDPOINT_HUB_NAME}/rooms/${room}/connect`,
+          url: `${process.env.NEXT_PUBLIC_API_ENDPOINT}/rooms/${room}/connect`,
           callbacks: {
             onFetchConnectionUrl: onFetchConnectionUrlHandler,
             onConnectionStatusChange: onConnectionStatusChangeHandler,

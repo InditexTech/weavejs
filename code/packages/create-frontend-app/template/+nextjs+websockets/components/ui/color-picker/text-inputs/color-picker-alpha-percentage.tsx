@@ -42,7 +42,7 @@ const PercentageInput = ({
         aria-label="Opacity percentage"
         {...props}
         className={cn(
-          'h-8 w-[4.7rem] rounded-none !text-xs font-normal text-gray-700 text-left focus:outline-none bg-transparent uppercase',
+          'h-[40px] w-[4.7rem] rounded-none !text-[14px] font-normal text-black !border-black text-left focus:outline-none bg-transparent uppercase',
           className
         )}
       />

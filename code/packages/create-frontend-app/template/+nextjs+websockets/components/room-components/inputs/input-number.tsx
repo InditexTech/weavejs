@@ -42,7 +42,7 @@ export const InputNumber = ({
       min={min}
       max={max}
       decimalScale={2}
-      className="w-full text-xs font-normal text-gray-700 text-right focus:outline-none bg-transparent"
+      className="w-full text-[3px] font-normal text-gray-700 text-right focus:outline-none bg-transparent"
       value={Number(actualValue)}
       onChange={(e) => {
         setActualValue(e.target.value);

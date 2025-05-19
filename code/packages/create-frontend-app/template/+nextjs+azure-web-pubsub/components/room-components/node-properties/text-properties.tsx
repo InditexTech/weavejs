@@ -84,379 +84,374 @@ export function TextProperties() {
   }
 
   return (
-    <div className="border-b border-zinc-200">
-      <div className="w-full flex justify-between items-center gap-3 p-4 py-3">
+    <div className="border-b border-[#c9c9c9] p-[24px] flex flex-col gap-[16px]">
+      <div className="w-full flex justify-between items-center gap-3">
         <div className="cursor-pointer hover:no-underline items-center py-0">
-          <span className="text-xs font-questrial font-light">Typography</span>
+          <span className="text-[13px] font-inter font-light uppercase">
+            Typography
+          </span>
         </div>
       </div>
-      <div className="px-4 pb-4">
-        <div className="grid grid-cols-2 gap-3 w-full">
-          <div className="col-span-2">
-            <InputFontFamily
-              value={`${actualNode.props.fontFamily ?? null}`}
-              onChange={(value) => {
-                const updatedNode: WeaveStateElement = {
-                  ...actualNode,
-                  props: {
-                    ...actualNode.props,
-                    fontFamily: value,
-                  },
-                };
-                updateElement(updatedNode);
-              }}
-            />
-          </div>
-          <div className="col-span-2">
-            <InputColor
-              label="Color"
-              value={`${actualNode.props.fill.replace('#', '')}`}
-              onChange={(value) => {
-                const updatedNode: WeaveStateElement = {
-                  ...actualNode,
-                  props: {
-                    ...actualNode.props,
-                    fill: `#${value}`,
-                  },
-                };
-                updateElement(updatedNode);
-              }}
-            />
-          </div>
-          <InputNumber
-            label="Size (px)"
-            value={actualNode.props.fontSize ?? 16}
+      <div className="grid grid-cols-2 gap-3 w-full">
+        <div className="col-span-2">
+          <InputFontFamily
+            value={`${actualNode.props.fontFamily ?? null}`}
             onChange={(value) => {
               const updatedNode: WeaveStateElement = {
                 ...actualNode,
                 props: {
                   ...actualNode.props,
-                  fontSize: value,
+                  fontFamily: value,
                 },
               };
               updateElement(updatedNode);
             }}
           />
-          <InputNumber
-            label="Line Height"
-            value={actualNode.props.lineHeight ?? 1}
+        </div>
+        <div className="col-span-2">
+          <InputColor
+            label="Color"
+            value={actualNode.props.fill}
             onChange={(value) => {
               const updatedNode: WeaveStateElement = {
                 ...actualNode,
                 props: {
                   ...actualNode.props,
-                  lineHeight: value,
+                  fill: value,
                 },
               };
               updateElement(updatedNode);
             }}
           />
+        </div>
+        <InputNumber
+          label="Size (px)"
+          value={actualNode.props.fontSize ?? 16}
+          onChange={(value) => {
+            const updatedNode: WeaveStateElement = {
+              ...actualNode,
+              props: {
+                ...actualNode.props,
+                fontSize: value,
+              },
+            };
+            updateElement(updatedNode);
+          }}
+        />
+        <InputNumber
+          label="Line Height"
+          value={actualNode.props.lineHeight ?? 1}
+          onChange={(value) => {
+            const updatedNode: WeaveStateElement = {
+              ...actualNode,
+              props: {
+                ...actualNode.props,
+                lineHeight: value,
+              },
+            };
+            updateElement(updatedNode);
+          }}
+        />
 
-          <div className="w-full flex justify-between items-center gap-4 col-span-2">
-            <div className="text-[11px] text-zinc-600 font-questrial font-light text-nowrap">
-              Style
-            </div>
-            <div className="w-full flex justify-end items-center gap-1">
-              <ToggleIconButton
-                kind="switch"
-                icon={<RemoveFormatting size={16} />}
-                pressed={
-                  (actualNode.props.fontStyle ?? 'normal').indexOf('normal') !==
-                  -1
-                }
-                onClick={() => {
-                  const updatedNode: WeaveStateElement = {
-                    ...actualNode,
-                    props: {
-                      ...actualNode.props,
-                      fontStyle: 'normal',
-                    },
-                  };
-                  updateElement(updatedNode);
-                }}
-              />
-              <ToggleIconButton
-                kind="switch"
-                icon={<Italic size={16} />}
-                pressed={
+        <div className="w-full flex justify-between items-center gap-4 col-span-2">
+          <div className="text-[12px] text-[#757575] font-inter font-light text-nowrap">
+            Style
+          </div>
+          <div className="w-full flex justify-end items-center gap-1">
+            <ToggleIconButton
+              kind="switch"
+              icon={<RemoveFormatting size={20} strokeWidth={1} />}
+              pressed={
+                (actualNode.props.fontStyle ?? 'normal').indexOf('normal') !==
+                -1
+              }
+              onClick={() => {
+                const updatedNode: WeaveStateElement = {
+                  ...actualNode,
+                  props: {
+                    ...actualNode.props,
+                    fontStyle: 'normal',
+                  },
+                };
+                updateElement(updatedNode);
+              }}
+            />
+            <ToggleIconButton
+              kind="switch"
+              icon={<Italic size={20} strokeWidth={1} />}
+              pressed={
+                (actualNode.props.fontStyle ?? 'normal').indexOf('italic') !==
+                -1
+              }
+              onClick={() => {
+                let items = [
+                  ...(actualNode.props.fontStyle ?? 'normal')
+                    .split(' ')
+                    .filter((e: string) => e !== 'normal'),
+                ];
+                if (
                   (actualNode.props.fontStyle ?? 'normal').indexOf('italic') !==
                   -1
+                ) {
+                  items = items.filter((e: string) => e !== 'italic');
                 }
-                onClick={() => {
-                  let items = [
-                    ...(actualNode.props.fontStyle ?? 'normal')
-                      .split(' ')
-                      .filter((e: string) => e !== 'normal'),
-                  ];
-                  if (
-                    (actualNode.props.fontStyle ?? 'normal').indexOf(
-                      'italic'
-                    ) !== -1
-                  ) {
-                    items = items.filter((e: string) => e !== 'italic');
-                  }
-                  if (
-                    (actualNode.props.fontStyle ?? 'normal').indexOf(
-                      'italic'
-                    ) === -1
-                  ) {
-                    items = [...items];
-                    items.push('italic');
-                  }
+                if (
+                  (actualNode.props.fontStyle ?? 'normal').indexOf('italic') ===
+                  -1
+                ) {
+                  items = [...items];
+                  items.push('italic');
+                }
 
-                  if (items.length === 0) {
-                    items = ['normal'];
-                  }
+                if (items.length === 0) {
+                  items = ['normal'];
+                }
 
-                  const updatedNode: WeaveStateElement = {
-                    ...actualNode,
-                    props: {
-                      ...actualNode.props,
-                      fontStyle: items.join(' '),
-                    },
-                  };
-                  updateElement(updatedNode);
-                }}
-              />
-              <ToggleIconButton
-                kind="switch"
-                icon={<Bold size={16} />}
-                pressed={
+                const updatedNode: WeaveStateElement = {
+                  ...actualNode,
+                  props: {
+                    ...actualNode.props,
+                    fontStyle: items.join(' '),
+                  },
+                };
+                updateElement(updatedNode);
+              }}
+            />
+            <ToggleIconButton
+              kind="switch"
+              icon={<Bold size={20} strokeWidth={1} />}
+              pressed={
+                (actualNode.props.fontStyle ?? 'normal').indexOf('bold') !== -1
+              }
+              onClick={() => {
+                let items = [
+                  ...(actualNode.props.fontStyle ?? 'normal')
+                    .split(' ')
+                    .filter((e: string) => e !== 'normal'),
+                ];
+                if (
                   (actualNode.props.fontStyle ?? 'normal').indexOf('bold') !==
                   -1
+                ) {
+                  items = items.filter((e: string) => e !== 'bold');
                 }
-                onClick={() => {
-                  let items = [
-                    ...(actualNode.props.fontStyle ?? 'normal')
-                      .split(' ')
-                      .filter((e: string) => e !== 'normal'),
-                  ];
-                  if (
-                    (actualNode.props.fontStyle ?? 'normal').indexOf('bold') !==
-                    -1
-                  ) {
-                    items = items.filter((e: string) => e !== 'bold');
-                  }
-                  if (
-                    (actualNode.props.fontStyle ?? 'normal').indexOf('bold') ===
-                    -1
-                  ) {
-                    items = [...items];
-                    items.push('bold');
-                  }
+                if (
+                  (actualNode.props.fontStyle ?? 'normal').indexOf('bold') ===
+                  -1
+                ) {
+                  items = [...items];
+                  items.push('bold');
+                }
 
-                  if (items.length === 0) {
-                    items = ['normal'];
-                  }
+                if (items.length === 0) {
+                  items = ['normal'];
+                }
 
-                  const updatedNode: WeaveStateElement = {
-                    ...actualNode,
-                    props: {
-                      ...actualNode.props,
-                      fontStyle: items.join(' '),
-                    },
-                  };
-                  updateElement(updatedNode);
-                }}
-              />
-            </div>
+                const updatedNode: WeaveStateElement = {
+                  ...actualNode,
+                  props: {
+                    ...actualNode.props,
+                    fontStyle: items.join(' '),
+                  },
+                };
+                updateElement(updatedNode);
+              }}
+            />
           </div>
-          <div className="w-full flex justify-between items-center gap-4 col-span-2">
-            <div className="text-[11px] text-zinc-600 font-questrial font-light text-nowrap">
-              Variant
-            </div>
-            <div className="w-full flex justify-end items-center gap-1">
-              <ToggleIconButton
-                kind="switch"
-                icon={<CaseSensitive size={16} />}
-                pressed={actualNode.props.fontVariant === 'normal'}
-                onClick={() => {
-                  const updatedNode: WeaveStateElement = {
-                    ...actualNode,
-                    props: {
-                      ...actualNode.props,
-                      fontVariant: 'normal',
-                    },
-                  };
-                  updateElement(updatedNode);
-                }}
-              />
-              <ToggleIconButton
-                kind="switch"
-                icon={<CaseUpper size={16} />}
-                pressed={actualNode.props.fontVariant === 'small-caps'}
-                onClick={() => {
-                  const updatedNode: WeaveStateElement = {
-                    ...actualNode,
-                    props: {
-                      ...actualNode.props,
-                      fontVariant: 'small-caps',
-                    },
-                  };
-                  updateElement(updatedNode);
-                }}
-              />
-            </div>
+        </div>
+        <div className="w-full flex justify-between items-center gap-4 col-span-2">
+          <div className="text-[12px] text-[#757575] font-inter font-light text-nowrap">
+            Variant
           </div>
-          <div className="w-full flex justify-between items-center gap-4 col-span-2">
-            <div className="text-[11px] text-zinc-600 font-questrial font-light text-nowrap">
-              Decoration
-            </div>
-            <div className="w-full flex justify-end items-center gap-1">
-              <ToggleIconButton
-                kind="switch"
-                icon={<RemoveFormatting size={16} />}
-                pressed={(actualNode.props.textDecoration ?? '') === ''}
-                onClick={() => {
-                  const updatedNode: WeaveStateElement = {
-                    ...actualNode,
-                    props: {
-                      ...actualNode.props,
-                      textDecoration: '',
-                    },
-                  };
-                  updateElement(updatedNode);
-                }}
-              />
-              <ToggleIconButton
-                kind="switch"
-                icon={<Strikethrough size={16} />}
-                pressed={
-                  (actualNode.props.textDecoration ?? '') === 'line-through'
-                }
-                onClick={() => {
-                  const updatedNode: WeaveStateElement = {
-                    ...actualNode,
-                    props: {
-                      ...actualNode.props,
-                      textDecoration: 'line-through',
-                    },
-                  };
-                  updateElement(updatedNode);
-                }}
-              />
-              <ToggleIconButton
-                kind="switch"
-                icon={<Underline size={16} />}
-                pressed={
-                  (actualNode.props.textDecoration ?? '') === 'underline'
-                }
-                onClick={() => {
-                  const updatedNode: WeaveStateElement = {
-                    ...actualNode,
-                    props: {
-                      ...actualNode.props,
-                      textDecoration: 'underline',
-                    },
-                  };
-                  updateElement(updatedNode);
-                }}
-              />
-            </div>
+          <div className="w-full flex justify-end items-center gap-1">
+            <ToggleIconButton
+              kind="switch"
+              icon={<CaseSensitive size={20} strokeWidth={1} />}
+              pressed={actualNode.props.fontVariant === 'normal'}
+              onClick={() => {
+                const updatedNode: WeaveStateElement = {
+                  ...actualNode,
+                  props: {
+                    ...actualNode.props,
+                    fontVariant: 'normal',
+                  },
+                };
+                updateElement(updatedNode);
+              }}
+            />
+            <ToggleIconButton
+              kind="switch"
+              icon={<CaseUpper size={20} strokeWidth={1} />}
+              pressed={actualNode.props.fontVariant === 'small-caps'}
+              onClick={() => {
+                const updatedNode: WeaveStateElement = {
+                  ...actualNode,
+                  props: {
+                    ...actualNode.props,
+                    fontVariant: 'small-caps',
+                  },
+                };
+                updateElement(updatedNode);
+              }}
+            />
           </div>
-          <div className="w-full flex justify-between items-center gap-4 col-span-2">
-            <div className="text-[11px] text-zinc-600 font-questrial font-light text-nowrap">
-              Horizontal alignment
-            </div>
-            <div className="w-full flex justify-end items-center gap-1">
-              <ToggleIconButton
-                kind="switch"
-                icon={<AlignLeft size={16} />}
-                pressed={(actualNode.props.align ?? '') === 'left'}
-                onClick={() => {
-                  const updatedNode: WeaveStateElement = {
-                    ...actualNode,
-                    props: {
-                      ...actualNode.props,
-                      align: 'left',
-                    },
-                  };
-                  updateElement(updatedNode);
-                }}
-              />
-              <ToggleIconButton
-                kind="switch"
-                icon={<AlignCenter size={16} />}
-                pressed={(actualNode.props.align ?? '') === 'center'}
-                onClick={() => {
-                  const updatedNode: WeaveStateElement = {
-                    ...actualNode,
-                    props: {
-                      ...actualNode.props,
-                      align: 'center',
-                    },
-                  };
-                  updateElement(updatedNode);
-                }}
-              />
-              <ToggleIconButton
-                kind="switch"
-                icon={<AlignRight size={16} />}
-                pressed={(actualNode.props.align ?? '') === 'right'}
-                onClick={() => {
-                  const updatedNode: WeaveStateElement = {
-                    ...actualNode,
-                    props: {
-                      ...actualNode.props,
-                      align: 'right',
-                    },
-                  };
-                  updateElement(updatedNode);
-                }}
-              />
-            </div>
+        </div>
+        <div className="w-full flex justify-between items-center gap-4 col-span-2">
+          <div className="text-[12px] text-[#757575] font-inter font-light text-nowrap">
+            Decoration
           </div>
-          <div className="w-full flex justify-between items-center gap-4 col-span-2">
-            <div className="text-[11px] text-zinc-600 font-questrial font-light text-nowrap">
-              Vertical alignment
-            </div>
-            <div className="w-full flex justify-end items-center gap-1">
-              <ToggleIconButton
-                kind="switch"
-                icon={<AlignStartHorizontal size={16} />}
-                pressed={(actualNode.props.verticalAlign ?? 'top') === 'top'}
-                onClick={() => {
-                  const updatedNode: WeaveStateElement = {
-                    ...actualNode,
-                    props: {
-                      ...actualNode.props,
-                      verticalAlign: 'top',
-                    },
-                  };
-                  updateElement(updatedNode);
-                }}
-              />
-              <ToggleIconButton
-                kind="switch"
-                icon={<AlignCenterHorizontal size={16} />}
-                pressed={(actualNode.props.verticalAlign ?? 'top') === 'middle'}
-                onClick={() => {
-                  const updatedNode: WeaveStateElement = {
-                    ...actualNode,
-                    props: {
-                      ...actualNode.props,
-                      verticalAlign: 'middle',
-                    },
-                  };
-                  updateElement(updatedNode);
-                }}
-              />
-              <ToggleIconButton
-                kind="switch"
-                icon={<AlignEndHorizontal size={16} />}
-                pressed={(actualNode.props.verticalAlign ?? '') === 'bottom'}
-                onClick={() => {
-                  const updatedNode: WeaveStateElement = {
-                    ...actualNode,
-                    props: {
-                      ...actualNode.props,
-                      verticalAlign: 'bottom',
-                    },
-                  };
-                  updateElement(updatedNode);
-                }}
-              />
-            </div>
+          <div className="w-full flex justify-end items-center gap-1">
+            <ToggleIconButton
+              kind="switch"
+              icon={<RemoveFormatting size={20} strokeWidth={1} />}
+              pressed={(actualNode.props.textDecoration ?? '') === ''}
+              onClick={() => {
+                const updatedNode: WeaveStateElement = {
+                  ...actualNode,
+                  props: {
+                    ...actualNode.props,
+                    textDecoration: '',
+                  },
+                };
+                updateElement(updatedNode);
+              }}
+            />
+            <ToggleIconButton
+              kind="switch"
+              icon={<Strikethrough size={20} strokeWidth={1} />}
+              pressed={
+                (actualNode.props.textDecoration ?? '') === 'line-through'
+              }
+              onClick={() => {
+                const updatedNode: WeaveStateElement = {
+                  ...actualNode,
+                  props: {
+                    ...actualNode.props,
+                    textDecoration: 'line-through',
+                  },
+                };
+                updateElement(updatedNode);
+              }}
+            />
+            <ToggleIconButton
+              kind="switch"
+              icon={<Underline size={20} strokeWidth={1} />}
+              pressed={(actualNode.props.textDecoration ?? '') === 'underline'}
+              onClick={() => {
+                const updatedNode: WeaveStateElement = {
+                  ...actualNode,
+                  props: {
+                    ...actualNode.props,
+                    textDecoration: 'underline',
+                  },
+                };
+                updateElement(updatedNode);
+              }}
+            />
+          </div>
+        </div>
+        <div className="w-full flex justify-between items-center gap-4 col-span-2">
+          <div className="text-[12px] text-[#757575] font-inter font-light text-nowrap">
+            Horizontal alignment
+          </div>
+          <div className="w-full flex justify-end items-center gap-1">
+            <ToggleIconButton
+              kind="switch"
+              icon={<AlignLeft size={20} strokeWidth={1} />}
+              pressed={(actualNode.props.align ?? '') === 'left'}
+              onClick={() => {
+                const updatedNode: WeaveStateElement = {
+                  ...actualNode,
+                  props: {
+                    ...actualNode.props,
+                    align: 'left',
+                  },
+                };
+                updateElement(updatedNode);
+              }}
+            />
+            <ToggleIconButton
+              kind="switch"
+              icon={<AlignCenter size={20} strokeWidth={1} />}
+              pressed={(actualNode.props.align ?? '') === 'center'}
+              onClick={() => {
+                const updatedNode: WeaveStateElement = {
+                  ...actualNode,
+                  props: {
+                    ...actualNode.props,
+                    align: 'center',
+                  },
+                };
+                updateElement(updatedNode);
+              }}
+            />
+            <ToggleIconButton
+              kind="switch"
+              icon={<AlignRight size={20} strokeWidth={1} />}
+              pressed={(actualNode.props.align ?? '') === 'right'}
+              onClick={() => {
+                const updatedNode: WeaveStateElement = {
+                  ...actualNode,
+                  props: {
+                    ...actualNode.props,
+                    align: 'right',
+                  },
+                };
+                updateElement(updatedNode);
+              }}
+            />
+          </div>
+        </div>
+        <div className="w-full flex justify-between items-center gap-4 col-span-2">
+          <div className="text-[12px] text-[#757575] font-inter font-light text-nowrap">
+            Vertical alignment
+          </div>
+          <div className="w-full flex justify-end items-center gap-1">
+            <ToggleIconButton
+              kind="switch"
+              icon={<AlignStartHorizontal size={20} strokeWidth={1} />}
+              pressed={(actualNode.props.verticalAlign ?? 'top') === 'top'}
+              onClick={() => {
+                const updatedNode: WeaveStateElement = {
+                  ...actualNode,
+                  props: {
+                    ...actualNode.props,
+                    verticalAlign: 'top',
+                  },
+                };
+                updateElement(updatedNode);
+              }}
+            />
+            <ToggleIconButton
+              kind="switch"
+              icon={<AlignCenterHorizontal size={20} strokeWidth={1} />}
+              pressed={(actualNode.props.verticalAlign ?? 'top') === 'middle'}
+              onClick={() => {
+                const updatedNode: WeaveStateElement = {
+                  ...actualNode,
+                  props: {
+                    ...actualNode.props,
+                    verticalAlign: 'middle',
+                  },
+                };
+                updateElement(updatedNode);
+              }}
+            />
+            <ToggleIconButton
+              kind="switch"
+              icon={<AlignEndHorizontal size={20} strokeWidth={1} />}
+              pressed={(actualNode.props.verticalAlign ?? '') === 'bottom'}
+              onClick={() => {
+                const updatedNode: WeaveStateElement = {
+                  ...actualNode,
+                  props: {
+                    ...actualNode.props,
+                    verticalAlign: 'bottom',
+                  },
+                };
+                updateElement(updatedNode);
+              }}
+            />
           </div>
         </div>
       </div>

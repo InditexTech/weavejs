@@ -74,61 +74,33 @@ export function useKeyboardHandler() {
 
   /* Keyboard shortcuts toolbar */
 
-  useKeyDown(
-    () => {
-      triggerTool('selectionTool');
-    },
-    ['KeyS'],
-    () => {
-      return (
-        !window.weaveTextEditing &&
-        !window.weaveTextEditing &&
-        !['textTool'].includes(actualAction ?? '')
-      );
-    }
-  );
+  useKeyDown(() => {
+    triggerTool('selectionTool');
+  }, ['KeyS']);
 
   useKeyDown(
     () => {
       triggerTool('frameTool');
     },
     ['KeyF'],
-    () =>
-      !window.weaveTextEditing && !['textTool'].includes(actualAction ?? ''),
     (e) => !(e.ctrlKey || e.metaKey)
   );
 
-  useKeyDown(
-    () => {
-      triggerTool('rectangleTool');
-    },
-    ['KeyR'],
-    () => !window.weaveTextEditing && !['textTool'].includes(actualAction ?? '')
-  );
+  useKeyDown(() => {
+    triggerTool('rectangleTool');
+  }, ['KeyR']);
 
-  useKeyDown(
-    () => {
-      triggerTool('penTool');
-    },
-    ['KeyL'],
-    () => !window.weaveTextEditing && !['textTool'].includes(actualAction ?? '')
-  );
+  useKeyDown(() => {
+    triggerTool('penTool');
+  }, ['KeyL']);
 
-  useKeyDown(
-    () => {
-      triggerTool('brushTool');
-    },
-    ['KeyB'],
-    () => !window.weaveTextEditing && !['textTool'].includes(actualAction ?? '')
-  );
+  useKeyDown(() => {
+    triggerTool('brushTool');
+  }, ['KeyB']);
 
-  useKeyDown(
-    () => {
-      triggerTool('textTool');
-    },
-    ['KeyT'],
-    () => !window.weaveTextEditing && !['textTool'].includes(actualAction ?? '')
-  );
+  useKeyDown(() => {
+    triggerTool('textTool');
+  }, ['KeyT']);
 
   useKeyDown(
     () => {
@@ -136,8 +108,6 @@ export function useKeyboardHandler() {
       setShowSelectFileImage(true);
     },
     ['KeyI'],
-    () =>
-      !window.weaveTextEditing && !['textTool'].includes(actualAction ?? ''),
     (e) => !(e.ctrlKey || e.metaKey)
   );
 
@@ -146,8 +116,6 @@ export function useKeyboardHandler() {
       triggerTool('colorTokenTool');
     },
     ['KeyP'],
-    () =>
-      !window.weaveTextEditing && !['textTool'].includes(actualAction ?? ''),
     (e) => !(e.ctrlKey || e.metaKey)
   );
 
@@ -159,8 +127,6 @@ export function useKeyboardHandler() {
       }
     },
     ['Comma'],
-    () =>
-      !window.weaveTextEditing && !['textTool'].includes(actualAction ?? ''),
     (e) =>
       e.shiftKey &&
       ([SYSTEM_OS.MAC as string].includes(os) ? e.metaKey : e.ctrlKey)
@@ -174,8 +140,6 @@ export function useKeyboardHandler() {
       }
     },
     ['Period'],
-    () =>
-      !window.weaveTextEditing && !['textTool'].includes(actualAction ?? ''),
     (e) =>
       e.shiftKey &&
       ([SYSTEM_OS.MAC as string].includes(os) ? e.metaKey : e.ctrlKey)
@@ -188,8 +152,6 @@ export function useKeyboardHandler() {
       setShowUi(!showUI);
     },
     ['IntlBackslash'],
-    () =>
-      !window.weaveTextEditing && !['textTool'].includes(actualAction ?? ''),
     (e) => ([SYSTEM_OS.MAC as string].includes(os) ? e.metaKey : e.ctrlKey)
   );
 
@@ -198,14 +160,14 @@ export function useKeyboardHandler() {
       if (instance) {
         const usersPointersPlugin =
           instance.getPlugin<WeaveUsersPointersPlugin>('usersPointers');
-        if (usersPointersPlugin) {
-          usersPointersPlugin.toggleRenderCursors();
+        if (usersPointersPlugin && usersPointersPlugin.isEnabled()) {
+          usersPointersPlugin.disable();
+        } else {
+          usersPointersPlugin.enable();
         }
       }
     },
     ['KeyU'],
-    () =>
-      !window.weaveTextEditing && !['textTool'].includes(actualAction ?? ''),
     (e) =>
       e.altKey &&
       ([SYSTEM_OS.MAC as string].includes(os) ? e.metaKey : e.ctrlKey)
@@ -224,8 +186,6 @@ export function useKeyboardHandler() {
       }
     },
     ['KeyA'],
-    () =>
-      !window.weaveTextEditing && !['textTool'].includes(actualAction ?? ''),
     (e) =>
       e.shiftKey &&
       ([SYSTEM_OS.MAC as string].includes(os) ? e.metaKey : e.ctrlKey)
@@ -242,8 +202,6 @@ export function useKeyboardHandler() {
       }
     },
     ['Escape'],
-    () =>
-      !window.weaveTextEditing && !['textTool'].includes(actualAction ?? ''),
     (e) => e.shiftKey
   );
 
@@ -260,8 +218,6 @@ export function useKeyboardHandler() {
       }
     },
     ['KeyC'],
-    () =>
-      !window.weaveTextEditing && !['textTool'].includes(actualAction ?? ''),
     (e) => ([SYSTEM_OS.MAC as string].includes(os) ? e.metaKey : e.ctrlKey)
   );
 
@@ -276,8 +232,6 @@ export function useKeyboardHandler() {
       }
     },
     ['KeyP'],
-    () =>
-      !window.weaveTextEditing && !['textTool'].includes(actualAction ?? ''),
     (e) => ([SYSTEM_OS.MAC as string].includes(os) ? e.metaKey : e.ctrlKey)
   );
 
@@ -293,8 +247,6 @@ export function useKeyboardHandler() {
       }
     },
     ['KeyD'],
-    () =>
-      !window.weaveTextEditing && !['textTool'].includes(actualAction ?? ''),
     (e) => ([SYSTEM_OS.MAC as string].includes(os) ? e.metaKey : e.ctrlKey)
   );
 
@@ -311,8 +263,6 @@ export function useKeyboardHandler() {
       }
     },
     ['KeyE'],
-    () =>
-      !window.weaveTextEditing && !['textTool'].includes(actualAction ?? ''),
     (e) =>
       e.shiftKey &&
       ([SYSTEM_OS.MAC as string].includes(os) ? e.metaKey : e.ctrlKey)
@@ -333,8 +283,6 @@ export function useKeyboardHandler() {
       }
     },
     ['KeyV'],
-    () =>
-      !window.weaveTextEditing && !['textTool'].includes(actualAction ?? ''),
     (e) =>
       e.shiftKey &&
       ([SYSTEM_OS.MAC as string].includes(os) ? e.metaKey : e.ctrlKey)
@@ -349,8 +297,6 @@ export function useKeyboardHandler() {
       }
     },
     ['BracketRight'],
-    () =>
-      !window.weaveTextEditing && !['textTool'].includes(actualAction ?? ''),
     (e) => !([SYSTEM_OS.MAC as string].includes(os) ? e.metaKey : e.ctrlKey)
   );
 
@@ -361,8 +307,6 @@ export function useKeyboardHandler() {
       }
     },
     ['BracketRight'],
-    () =>
-      !window.weaveTextEditing && !['textTool'].includes(actualAction ?? ''),
     (e) => ([SYSTEM_OS.MAC as string].includes(os) ? e.metaKey : e.ctrlKey)
   );
 
@@ -373,8 +317,6 @@ export function useKeyboardHandler() {
       }
     },
     ['BracketLeft'],
-    () =>
-      !window.weaveTextEditing && !['textTool'].includes(actualAction ?? ''),
     (e) => ([SYSTEM_OS.MAC as string].includes(os) ? e.metaKey : e.ctrlKey)
   );
 
@@ -385,8 +327,6 @@ export function useKeyboardHandler() {
       }
     },
     ['BracketLeft'],
-    () =>
-      !window.weaveTextEditing && !['textTool'].includes(actualAction ?? ''),
     (e) => !([SYSTEM_OS.MAC as string].includes(os) ? e.metaKey : e.ctrlKey)
   );
 
@@ -397,8 +337,6 @@ export function useKeyboardHandler() {
       }
     },
     ['KeyG'],
-    () =>
-      !window.weaveTextEditing && !['textTool'].includes(actualAction ?? ''),
     (e) =>
       e.shiftKey &&
       ([SYSTEM_OS.MAC as string].includes(os) ? e.metaKey : e.ctrlKey)
@@ -415,8 +353,6 @@ export function useKeyboardHandler() {
       }
     },
     ['KeyU'],
-    () =>
-      !window.weaveTextEditing && !['textTool'].includes(actualAction ?? ''),
     (e) =>
       e.shiftKey &&
       ([SYSTEM_OS.MAC as string].includes(os) ? e.metaKey : e.ctrlKey)
@@ -429,8 +365,6 @@ export function useKeyboardHandler() {
       sidebarToggle(SIDEBAR_ELEMENTS.images);
     },
     ['KeyI'],
-    () =>
-      !window.weaveTextEditing && !['textTool'].includes(actualAction ?? ''),
     (e) =>
       e.altKey &&
       ([SYSTEM_OS.MAC as string].includes(os) ? e.metaKey : e.ctrlKey)
@@ -441,8 +375,6 @@ export function useKeyboardHandler() {
       sidebarToggle(SIDEBAR_ELEMENTS.colorTokens);
     },
     ['KeyO'],
-    () =>
-      !window.weaveTextEditing && !['textTool'].includes(actualAction ?? ''),
     (e) =>
       e.altKey &&
       ([SYSTEM_OS.MAC as string].includes(os) ? e.metaKey : e.ctrlKey)
@@ -453,8 +385,6 @@ export function useKeyboardHandler() {
       sidebarToggle(SIDEBAR_ELEMENTS.frames);
     },
     ['KeyF'],
-    () =>
-      !window.weaveTextEditing && !['textTool'].includes(actualAction ?? ''),
     (e) =>
       e.altKey &&
       ([SYSTEM_OS.MAC as string].includes(os) ? e.metaKey : e.ctrlKey)
@@ -465,8 +395,6 @@ export function useKeyboardHandler() {
       sidebarToggle(SIDEBAR_ELEMENTS.nodesTree);
     },
     ['KeyE'],
-    () =>
-      !window.weaveTextEditing && !['textTool'].includes(actualAction ?? ''),
     (e) =>
       e.altKey &&
       ([SYSTEM_OS.MAC as string].includes(os) ? e.metaKey : e.ctrlKey)
@@ -479,8 +407,6 @@ export function useKeyboardHandler() {
       handleTriggerAction('zoomInTool', { previousAction: actualAction });
     },
     ['BracketRight'],
-    () =>
-      !window.weaveTextEditing && !['textTool'].includes(actualAction ?? ''),
     (e) => ([SYSTEM_OS.MAC as string].includes(os) ? e.metaKey : e.ctrlKey)
   );
 
@@ -489,8 +415,6 @@ export function useKeyboardHandler() {
       handleTriggerAction('zoomOutTool', { previousAction: actualAction });
     },
     ['Slash'],
-    () =>
-      !window.weaveTextEditing && !['textTool'].includes(actualAction ?? ''),
     (e) => ([SYSTEM_OS.MAC as string].includes(os) ? e.metaKey : e.ctrlKey)
   );
 
@@ -499,8 +423,6 @@ export function useKeyboardHandler() {
       handleTriggerAction('fitToScreenTool', { previousAction: actualAction });
     },
     ['Digit1'],
-    () =>
-      !window.weaveTextEditing && !['textTool'].includes(actualAction ?? ''),
     (e) => e.shiftKey
   );
 
@@ -511,8 +433,6 @@ export function useKeyboardHandler() {
       });
     },
     ['Digit2'],
-    () =>
-      !window.weaveTextEditing && !['textTool'].includes(actualAction ?? ''),
     (e) => e.shiftKey
   );
 
@@ -523,8 +443,6 @@ export function useKeyboardHandler() {
       handlePrintToConsoleState();
     },
     ['KeyC'],
-    () =>
-      !window.weaveTextEditing && !['textTool'].includes(actualAction ?? ''),
     (e) =>
       e.altKey &&
       ([SYSTEM_OS.MAC as string].includes(os) ? e.metaKey : e.ctrlKey)

@@ -75,11 +75,10 @@ export const NumberInput = React.forwardRef<HTMLInputElement, NumberInputProps>(
     return (
       <div className="flex flex-col items-start justify-start relative">
         {label && (
-          <div className="text-zinc-600 mb-1 text-[11px] font-noto-sans-mono font-light">
+          <div className="text-[#757575] mb-1 text-[12px] font-inter font-light">
             {label}
           </div>
         )}
-
         <div className="w-full flex items-center relative">
           <NumericFormat
             value={value}
@@ -102,7 +101,7 @@ export const NumberInput = React.forwardRef<HTMLInputElement, NumberInputProps>(
             placeholder={placeholder}
             getInputRef={ref}
             {...props}
-            className="w-full py-0 h-[32px] rounded-none !text-xs font-normal text-gray-700 text-right focus:outline-none bg-transparent shadow-none"
+            className="w-full py-0 h-[40px] rounded-none !text-[14px] !border-black font-normal text-black text-right focus:outline-none bg-transparent shadow-none"
           />
         </div>
       </div>

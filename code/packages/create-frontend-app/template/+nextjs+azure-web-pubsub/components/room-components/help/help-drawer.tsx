@@ -67,11 +67,11 @@ export const HelpDrawer = () => {
     >
       <DrawerContent className="p-0 !rounded-none bg-black flex flex-col justify-start items-center min-h-[330px]">
         <DrawerHeader className="w-[1024px] flex flex-row justify-between items-centers p-0 py-3">
-          <DrawerTitle className="flex flex-row justify-start items-center text-center text-white font-questrial">
+          <DrawerTitle className="flex flex-row justify-start items-center text-center text-white font-inter">
             Keyboard shortcuts
           </DrawerTitle>
           <DrawerClose>
-            <div className="outline-none rounded-none font-questrial cursor-pointer text-white">
+            <div className="outline-none rounded-none font-inter cursor-pointer text-white">
               <XIcon size={24} />
             </div>
           </DrawerClose>

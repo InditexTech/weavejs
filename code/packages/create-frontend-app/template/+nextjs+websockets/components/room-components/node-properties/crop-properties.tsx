@@ -50,15 +50,17 @@ export function CropProperties() {
   }
 
   return (
-    <div className="border-b border-zinc-200">
-      <div className="w-full flex justify-between items-center gap-3 p-4 py-3">
+    <div className="border-b border-[#c9c9c9] p-[24px] flex flex-col gap-[16px]">
+      <div className="w-full flex justify-between items-center gap-3">
         <div className="cursor-pointer hover:no-underline items-center py-0">
-          <span className="text-xs font-questrial font-light">Crop</span>
+          <span className="text-[13px] font-inter font-light uppercase">
+            Crop
+          </span>
         </div>
         <div className="flex justify-end items-center">
           <ToggleIconButton
             kind="switch"
-            icon={<Crop size={16} />}
+            icon={<Crop size={16} strokeWidth={1} />}
             pressed={typeof actualNode.props.cropX !== 'undefined'}
             onClick={() => {
               const updatedNode: WeaveStateElement = {
@@ -89,67 +91,65 @@ export function CropProperties() {
           />
         </div>
       </div>
-      <div className="px-4 pb-4">
-        <div className="grid grid-cols-2 gap-3 w-full">
-          <InputNumber
-            label="X"
-            value={actualNode.props.cropX ?? 0}
-            onChange={(value) => {
-              const updatedNode: WeaveStateElement = {
-                ...actualNode,
-                props: {
-                  ...actualNode.props,
-                  cropX: value,
-                },
-              };
-              updateElement(updatedNode);
-            }}
-          />
-          <InputNumber
-            label="Y"
-            value={actualNode.props.cropY ?? 0}
-            onChange={(value) => {
-              const updatedNode: WeaveStateElement = {
-                ...actualNode,
-                props: {
-                  ...actualNode.props,
-                  cropY: value,
-                },
-              };
-              updateElement(updatedNode);
-            }}
-          />
-          <InputNumber
-            label="W"
-            value={actualNode.props.cropWidth ?? actualNode.props.width}
-            onChange={(value) => {
-              const updatedNode: WeaveStateElement = {
-                ...actualNode,
-                props: {
-                  ...actualNode.props,
-                  cropWidth: value,
-                  width: value,
-                },
-              };
-              updateElement(updatedNode);
-            }}
-          />
-          <InputNumber
-            label="H"
-            value={actualNode.props.cropHeight ?? actualNode.props.height}
-            onChange={(value) => {
-              const updatedNode: WeaveStateElement = {
-                ...actualNode,
-                props: {
-                  ...actualNode.props,
-                  cropHeight: value,
-                  height: value,
-                },
-              };
-              updateElement(updatedNode);
-            }}
-          />
-        </div>
+      <div className="grid grid-cols-2 gap-3 w-full">
+        <InputNumber
+          label="X"
+          value={actualNode.props.cropX ?? 0}
+          onChange={(value) => {
+            const updatedNode: WeaveStateElement = {
+              ...actualNode,
+              props: {
+                ...actualNode.props,
+                cropX: value,
+              },
+            };
+            updateElement(updatedNode);
+          }}
+        />
+        <InputNumber
+          label="Y"
+          value={actualNode.props.cropY ?? 0}
+          onChange={(value) => {
+            const updatedNode: WeaveStateElement = {
+              ...actualNode,
+              props: {
+                ...actualNode.props,
+                cropY: value,
+              },
+            };
+            updateElement(updatedNode);
+          }}
+        />
+        <InputNumber
+          label="Width"
+          value={actualNode.props.cropWidth ?? actualNode.props.width}
+          onChange={(value) => {
+            const updatedNode: WeaveStateElement = {
+              ...actualNode,
+              props: {
+                ...actualNode.props,
+                cropWidth: value,
+                width: value,
+              },
+            };
+            updateElement(updatedNode);
+          }}
+        />
+        <InputNumber
+          label="Height"
+          value={actualNode.props.cropHeight ?? actualNode.props.height}
+          onChange={(value) => {
+            const updatedNode: WeaveStateElement = {
+              ...actualNode,
+              props: {
+                ...actualNode.props,
+                cropHeight: value,
+                height: value,
+              },
+            };
+            updateElement(updatedNode);
+          }}
+        />
       </div>
     </div>
   );

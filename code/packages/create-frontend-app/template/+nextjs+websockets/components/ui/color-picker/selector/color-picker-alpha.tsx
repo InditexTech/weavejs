@@ -59,21 +59,21 @@ export const ColorPickerAlpha = ({
       {...props}
     >
       <Track
-        className="relative my-0.5 h-3 w-full grow overflow-hidden rounded-full"
+        className="relative my-0.5 h-3 w-full grow overflow-hidden rounded-none"
         style={{
           background:
             'url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAMUlEQVQ4T2NkYGAQYcAP3uCTZhw1gGGYhAGBZIA/nYDCgBDAm9BGDWAAJyRCgLaBCAAgXwixzAS0pgAAAABJRU5ErkJggg==") left center',
         }}
       >
         <div
-          className="absolute inset-0 rounded-full transition-all duration-200"
+          className="absolute inset-0 rounded-none transition-all duration-200"
           style={{
             background: `linear-gradient(90deg, transparent, ${solidColor})`,
           }}
         />
         <Range className="absolute h-full rounded-full bg-transparent" />
       </Track>
-      <Thumb className="block h-4 w-4 rounded-full border border-primary/50 bg-background shadow transition-all duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 hover:h-5 hover:w-5" />
+      <Thumb className="block h-4 w-4 cursor-pointer rounded-full border border-primary/50 bg-background shadow transition-all duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 hover:h-5 hover:w-5" />
     </Root>
   );
 };

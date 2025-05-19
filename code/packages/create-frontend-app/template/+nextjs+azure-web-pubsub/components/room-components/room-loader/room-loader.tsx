@@ -7,7 +7,7 @@ import ScrollVelocity from '@/components/ui/reactbits/TextAnimations/ScrollVeloc
 
 type RoomLoaderProps = {
   roomId?: string;
-  content: string;
+  content: React.ReactNode;
   description?: React.ReactNode;
 };
 
@@ -63,28 +63,28 @@ export function RoomLoader({
           ]}
           velocity={150}
           numCopies={20}
-          className="text-5xl font-questrial font-extralight text-zinc-500/25"
+          className="text-5xl font-inter font-light text-zinc-500/25"
         />
       </div>
       <div className="absolute bottom-0 left-0 right-0 h-full flex justify-center items-center">
-        <div className="flex flex-col items-center justify-center min-w-[320px] px-6 py-6 bg-white border-2 shadow-md border-zinc-500 rounded-xl">
+        <div className="flex flex-col items-center justify-center min-w-[320px] p-[32px] bg-white border-1 shadow-none border-[#c9c9c9]">
           <motion.div variants={childVariants}>
             <Logo kind="large" variant="no-text" />
           </motion.div>
 
-          <div className="w-full flex flex-col justify-center items-center text-black gap-0 mt-2">
-            <div className="font-questrial font-extralight text-3xl uppercase">
+          <div className="w-full flex flex-col justify-center items-center text-black gap-0 mt-[24px]">
+            <div className="font-inter font-light text-[20px] line-height-[28px] uppercase">
               <motion.span variants={childVariants}>{content}</motion.span>
             </div>
 
             {roomId && (
-              <div className="font-questrial text-2xl mt-5">
+              <div className="font-inter font-light text-[20px] line-height-[28px] mt-3">
                 <motion.span variants={childVariants}>{roomId}</motion.span>
               </div>
             )}
             <AnimatePresence>
               {description && (
-                <div className="w-full flex text-center justify-center items-center font-questrial font-extralight text-xl">
+                <div className="w-full flex text-center justify-center items-center font-inter font-light text-[#757575] text-[18px] mt-[32px]">
                   <motion.span
                     className="w-full"
                     variants={childVariants}

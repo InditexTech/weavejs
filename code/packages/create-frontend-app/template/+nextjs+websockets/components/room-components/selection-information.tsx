@@ -16,7 +16,7 @@ export const SelectionInformation = () => {
   }
 
   return (
-    <div className="w-full justify-center items-center rounded-lg">
+    <div className="w-full justify-center items-center rounded-none">
       <div className="w-full h-full flex flex-col gap-[1px] bg-light-background-1">
         <div className="w-full font-title-xs p-4 border-b border-light-border-3 bg-light-background-2">
           Selected elements
