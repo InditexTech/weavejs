@@ -3,10 +3,13 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import Konva from 'konva';
-// import { Weave } from "./weave";
-// import { Group } from "konva/lib/Group";
-// import { WEAVE_NODE_LAYER_ID } from "./constants";
-// import { NodeSerializable } from "./types";
+import type { Weave } from './weave';
+import {
+  WEAVE_NODE_CUSTOM_EVENTS,
+  WEAVE_NODE_LAYER_ID,
+  type WeaveElementInstance,
+} from '@inditextech/weave-types';
+import type { WeaveNode } from './nodes/node';
 
 export function resetScale(node: Konva.Node): void {
   node.width(
@@ -26,25 +29,91 @@ export function resetScale(node: Konva.Node): void {
   node.rotation(Math.round((node.rotation() + Number.EPSILON) * 100) / 100);
 }
 
-// export function updateLayerNodesZIndex(instance: Weave) {
-//   const stage = instance.getStage();
+// Container management functions
 
-//   const nodesLayer = stage.findOne(`#${WEAVE_NODE_LAYER_ID}`) as Konva.Layer | undefined;
-//   if (nodesLayer) {
-//     updateNodesZIndex(instance, nodesLayer.getChildren());
-//   }
-// }
+export function clearContainerTargets(instance: Weave): void {
+  const getContainers = instance.getContainerNodes();
+  for (const container of getContainers) {
+    container.fire(WEAVE_NODE_CUSTOM_EVENTS.onTargetLeave, { bubbles: true });
+  }
+}
 
-// export function updateNodesZIndex(instance: Weave, nodes: (Konva.Node | Group)[]) {
-// const state = instance.getStore().getState();
-// for (const node of nodes) {
-//   const attrs = node.getAttrs() as NodeSerializable;
-//   if (state.weave.nodes?.[attrs.id]) {
-//     state.weave.nodes[attrs.id].zIndex = node.getZIndex();
-//   }
-//   if (attrs.type === "group") {
-//     const groupNode = node as Group;
-//     updateNodesZIndex(instance, groupNode.getChildren());
-//   }
-// }
-// }
+export function checkIfOverContainer(
+  instance: Weave,
+  node: Konva.Node
+): Konva.Node | undefined {
+  const nodesIntersected = instance.pointIntersectsContainerElement();
+
+  let nodeActualContainer: Konva.Node | undefined =
+    node.getParent() as Konva.Node;
+  if (nodeActualContainer?.getAttrs().nodeId) {
+    nodeActualContainer = instance
+      .getStage()
+      .findOne(`#${nodeActualContainer.getAttrs().nodeId}`);
+  }
+
+  let layerToMove = undefined;
+  // Move to container
+  if (
+    !node.getAttrs().containerId &&
+    nodesIntersected &&
+    nodeActualContainer?.getAttrs().id !== nodesIntersected.getAttrs().id
+  ) {
+    layerToMove = nodesIntersected;
+  }
+
+  return layerToMove;
+}
+
+export function moveNodeToContainer(
+  instance: Weave,
+  node: Konva.Node
+): Konva.Node | undefined {
+  const nodesIntersected = instance.pointIntersectsContainerElement();
+
+  let nodeActualContainer: Konva.Node | undefined =
+    node.getParent() as Konva.Node;
+  if (nodeActualContainer?.getAttrs().nodeId) {
+    nodeActualContainer = instance
+      .getStage()
+      .findOne(`#${nodeActualContainer.getAttrs().nodeId}`);
+  }
+
+  let layerToMove = undefined;
+  // Move to container
+  if (
+    !node.getAttrs().containerId &&
+    nodesIntersected &&
+    nodeActualContainer?.getAttrs().id !== nodesIntersected.getAttrs().id
+  ) {
+    layerToMove = nodesIntersected;
+  }
+  // Move to main layer
+  if (
+    !nodesIntersected &&
+    nodeActualContainer?.getAttrs().id !== WEAVE_NODE_LAYER_ID
+  ) {
+    layerToMove = instance.getMainLayer();
+  }
+
+  if (layerToMove) {
+    const nodePos = node.getAbsolutePosition();
+    const nodeRotation = node.getAbsoluteRotation();
+
+    node.moveTo(layerToMove);
+    node.setAbsolutePosition(nodePos);
+    node.rotation(nodeRotation);
+    node.x(node.x() - (layerToMove.getAttrs().containerOffsetX ?? 0));
+    node.y(node.y() - (layerToMove.getAttrs().containerOffsetY ?? 0));
+
+    const nodeHandler = instance.getNodeHandler<WeaveNode>(
+      node.getAttrs().nodeType
+    );
+    const actualNode = nodeHandler.serialize(node as WeaveElementInstance);
+
+    instance.removeNode(actualNode);
+    instance.addNode(actualNode, layerToMove?.getAttrs().id);
+  }
+
+  return layerToMove;
+}

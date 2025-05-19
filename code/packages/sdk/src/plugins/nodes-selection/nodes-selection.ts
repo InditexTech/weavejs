@@ -6,6 +6,7 @@ import {
   type WeaveSelection,
   type NodeSerializable,
   type WeaveElementInstance,
+  WEAVE_NODE_CUSTOM_EVENTS,
 } from '@inditextech/weave-types';
 import Konva from 'konva';
 import { WeavePlugin } from '@/plugins/plugin';
@@ -24,6 +25,11 @@ import { WeaveContextMenuPlugin } from '../context-menu/context-menu';
 import type { WeaveNode } from '@/nodes/node';
 import type { WeaveNodesSnappingPlugin } from '../nodes-snapping/nodes-snapping';
 import type { WeaveCopyPasteNodesPlugin } from '../copy-paste-nodes/copy-paste-nodes';
+import {
+  checkIfOverContainer,
+  clearContainerTargets,
+  moveNodeToContainer,
+} from '@/utils';
 
 export class WeaveNodesSelectionPlugin extends WeavePlugin {
   private tr!: Konva.Transformer;
@@ -190,6 +196,34 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
         const stage = this.instance.getStage();
         stage.container().style.cursor = 'default';
         e.cancelBubble = true;
+      }
+    });
+
+    tr.on('dragmove', (e) => {
+      if (this.isSelecting() && tr.nodes().length > 1) {
+        clearContainerTargets(this.instance);
+
+        const layerToMove = checkIfOverContainer(this.instance, e.target);
+
+        if (layerToMove) {
+          layerToMove.fire(WEAVE_NODE_CUSTOM_EVENTS.onTargetEnter, {
+            bubbles: true,
+          });
+        }
+      }
+    });
+
+    tr.on('dragend', () => {
+      if (this.isSelecting() && tr.nodes().length > 1) {
+        clearContainerTargets(this.instance);
+
+        for (const node of tr.nodes()) {
+          const layerToMove = moveNodeToContainer(this.instance, node);
+
+          if (layerToMove) {
+            continue;
+          }
+        }
       }
     });
 
