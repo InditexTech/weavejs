@@ -334,7 +334,7 @@ function WhyPanel(props: HTMLProps<HTMLDivElement>) {
 
 export function PreviewImages() {
   return (
-    <div className="mt-12 mb-12 min-w-full lg:-mb-18 xl:min-w-[1100px] xl:-mx-24">
+    <div className="mt-[48px] mb-12 min-w-full lg:-mb-18 xl:min-w-[1100px] xl:-mx-24">
       <Image
         src={MainImg}
         alt="preview"
@@ -390,7 +390,7 @@ export const LinkButton = ({
     <Button
       variant={variant}
       className={cn(
-        "font-mono cursor-pointer",
+        "font-light text-[13px] uppercase cursor-pointer px-[32px] h-[40px]",
         className,
         style === "default" && "bg-white",
         style === "main" &&
