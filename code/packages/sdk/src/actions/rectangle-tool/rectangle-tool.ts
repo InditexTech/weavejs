@@ -147,18 +147,28 @@ export class WeaveRectangleToolAction extends WeaveAction {
         this.container
       );
 
-      const deltaX = mousePoint.x - this.clickPoint?.x;
-      const deltaY = mousePoint.y - this.clickPoint?.y;
-
       const nodeHandler =
         this.instance.getNodeHandler<WeaveRectangleNode>('rectangle');
 
+      const rectPos: Vector2d = {
+        x: this.clickPoint.x,
+        y: this.clickPoint.y,
+      };
+      let rectWidth = this.props.width;
+      let rectHeight = this.props.height;
+      if (this.moved) {
+        rectPos.x = Math.min(this.clickPoint.x, mousePoint.x);
+        rectPos.y = Math.min(this.clickPoint.y, mousePoint.y);
+        rectWidth = Math.abs(this.clickPoint.x - mousePoint.x);
+        rectHeight = Math.abs(this.clickPoint.y - mousePoint.y);
+      }
+
       rectangle.setAttrs({
         ...this.props,
-        x: this.moved ? rectangle.getAttrs().x : this.clickPoint.x,
-        y: this.moved ? rectangle.getAttrs().y : this.clickPoint.y,
-        width: this.moved ? Math.abs(deltaX) : this.props.width,
-        height: this.moved ? Math.abs(deltaY) : this.props.height,
+        x: rectPos.x,
+        y: rectPos.y,
+        width: rectWidth,
+        height: rectHeight,
       });
 
       this.instance.updateNode(
