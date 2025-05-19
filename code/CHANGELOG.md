@@ -17,6 +17,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - [#217](https://github.com/InditexTech/weavejs/issues/217) Fix rectangle creation when click and drag-and-drop
 - [#218](https://github.com/InditexTech/weavejs/issues/218) Fix drag selection to frame
+- [#224](https://github.com/InditexTech/weavejs/issues/224) Frame visual issues
 
 ## [0.12.0] - 2025-05-16
 

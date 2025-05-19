@@ -141,8 +141,8 @@ export class WeaveFrameNode extends WeaveNode {
     const frameInternal = new Konva.Group({
       id: `${id}-group-internal`,
       nodeId: id,
-      x: borderWidth,
-      y: titleHeight + borderWidth,
+      x: borderWidth * 2,
+      y: titleHeight + borderWidth * 2,
       width: props.frameWidth,
       height: props.frameHeight,
       draggable: false,
@@ -151,8 +151,8 @@ export class WeaveFrameNode extends WeaveNode {
       borderWidth: borderWidth,
       clipX: 0,
       clipY: 0,
-      clipWidth: props.frameWidth,
-      clipHeight: props.frameHeight,
+      clipWidth: props.frameWidth - borderWidth * 2,
+      clipHeight: props.frameHeight - borderWidth * 2,
     });
 
     frame.add(frameInternal);
