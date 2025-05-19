@@ -16,6 +16,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 - [#226](https://github.com/InditexTech/weavejs/issues/226) Update frontend boilerplate with latest UI changes
+- [#227](https://github.com/InditexTech/weavejs/issues/227) Update documentation landing to new UI
 
 ## [0.12.1] - 2025-05-19
 
