@@ -4,9 +4,11 @@
   "icon": "Blocks",
   "root": true,
   "pages": [
-    "---Introduction---",
+    "---Overview---",
     "index",
-    "what-is-weavejs",
+    "architecture",
+    "application-structure",
+    "glossary",
     "requirements",
     "---Setup---",
     "quickstart",

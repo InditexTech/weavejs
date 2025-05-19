@@ -230,7 +230,7 @@ function Features() {
           </>
         }
         className="overflow-hidden"
-        href="/docs/main/what-is-weavejs"
+        href="/docs/main/architecture"
       >
         <div className="w-full mb-12 flex flex-col justify-center items-center bg-[#d9d9d9] invert-0 dark:invert">
           <Image

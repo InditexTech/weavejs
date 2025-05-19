@@ -1,0 +1,31 @@
+---
+title: Glossary
+description: Key terms and concepts used throughout the Weave.js documentation
+---
+
+import { Separator } from "@/components/separator";
+
+
+## Canvas
+
+The [HTML5 Canvas](https://developer.mozilla.org/es/docs/Web/HTML/Reference/Elements/canvas)
+is a powerful web API that provides a drawing surface within the browser. It allows
+developers to render 2D graphics, such as shapes, images, animations, and visual interfaces, using JavaScript.
+
+Unlike HTML elements, canvas content is pixel-based and doesn't retain a DOM structure,
+making it ideal for high-performance, dynamic visuals like games, design tools,
+and collaborative drawing apps—like those built with Weave.js.
+
+<Separator />
+
+## CRDT
+
+A CRDT (Conflict-free Replicated Data Type) is a data structure designed to
+automatically resolve conflicts in distributed systems, especially in real-time
+collaborative applications. It allows multiple users to update shared data
+simultaneously, and guarantees that all changes will merge consistently across
+devices—without requiring a central server or manual conflict resolution.
+
+CRDTs are the foundation of real-time sync in Weave.js (via [Yjs](https://yjs.dev)),
+making collaboration smooth, reliable, and resilient—even under network latency or
+disconnection.
