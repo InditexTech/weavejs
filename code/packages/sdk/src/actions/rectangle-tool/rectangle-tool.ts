@@ -147,9 +147,6 @@ export class WeaveRectangleToolAction extends WeaveAction {
         this.container
       );
 
-      // const deltaX = mousePoint.x - this.clickPoint?.x;
-      // const deltaY = mousePoint.y - this.clickPoint?.y;
-
       const nodeHandler =
         this.instance.getNodeHandler<WeaveRectangleNode>('rectangle');
 
