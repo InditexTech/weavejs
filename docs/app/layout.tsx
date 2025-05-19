@@ -1,9 +1,12 @@
 import "./global.css";
 import { RootProvider } from "fumadocs-ui/provider";
-import { Noto_Sans } from "next/font/google";
+import { Inter } from "next/font/google";
 import type { ReactNode } from "react";
 
-const inter = Noto_Sans({
+const inter = Inter({
+  weight: ["300", "400", "500"],
+  preload: true,
+  variable: "--inter",
   subsets: ["latin"],
 });
 
