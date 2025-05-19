@@ -13,12 +13,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- [#227](https://github.com/InditexTech/weavejs/issues/227) Update documentation landing to new UI
+
 ## [0.13.0] - 2025-05-19
 
 ### Changed
 
 - [#226](https://github.com/InditexTech/weavejs/issues/226) Update frontend boilerplate with latest UI changes
-- [#227](https://github.com/InditexTech/weavejs/issues/227) Update documentation landing to new UI
 
 ## [0.12.1] - 2025-05-19
 
@@ -235,55 +238,29 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - [#18](https://github.com/InditexTech/weavejs/issues/18) Fix awareness not working on store-azure-web-pubsub
 
 [Unreleased]: https://github.com/InditexTech/weavejs/compare/0.13.0...HEAD
-
 [0.13.0]: https://github.com/InditexTech/weavejs/compare/0.12.1...0.13.0
-
 [0.12.1]: https://github.com/InditexTech/weavejs/compare/0.12.0...0.12.1
-
 [0.12.0]: https://github.com/InditexTech/weavejs/compare/0.11.0...0.12.0
-
 [0.11.0]: https://github.com/InditexTech/weavejs/compare/0.10.3...0.11.0
-
 [0.10.3]: https://github.com/InditexTech/weavejs/compare/0.10.2...0.10.3
-
 [0.10.2]: https://github.com/InditexTech/weavejs/compare/0.10.1...0.10.2
-
 [0.10.1]: https://github.com/InditexTech/weavejs/compare/0.10.0...0.10.1
-
 [0.10.0]: https://github.com/InditexTech/weavejs/compare/0.9.3...0.10.0
-
 [0.9.3]: https://github.com/InditexTech/weavejs/compare/0.9.2...0.9.3
-
 [0.9.2]: https://github.com/InditexTech/weavejs/compare/0.9.1...0.9.2
-
 [0.9.1]: https://github.com/InditexTech/weavejs/compare/0.9.0...0.9.1
-
 [0.9.0]: https://github.com/InditexTech/weavejs/compare/0.8.0...0.9.0
-
 [0.8.0]: https://github.com/InditexTech/weavejs/compare/0.7.1...0.8.0
-
 [0.7.1]: https://github.com/InditexTech/weavejs/compare/0.7.0...0.7.1
-
 [0.7.0]: https://github.com/InditexTech/weavejs/compare/0.6.0...0.7.0
-
 [0.6.0]: https://github.com/InditexTech/weavejs/compare/0.5.0...0.6.0
-
 [0.5.0]: https://github.com/InditexTech/weavejs/compare/0.4.0...0.5.0
-
 [0.4.0]: https://github.com/InditexTech/weavejs/compare/0.3.3...0.4.0
-
 [0.3.3]: https://github.com/InditexTech/weavejs/compare/0.3.2...0.3.3
-
 [0.3.2]: https://github.com/InditexTech/weavejs/compare/0.3.1...0.3.2
-
 [0.3.1]: https://github.com/InditexTech/weavejs/compare/0.3.0...0.3.1
-
 [0.3.0]: https://github.com/InditexTech/weavejs/compare/0.2.1...0.3.0
-
 [0.2.1]: https://github.com/InditexTech/weavejs/compare/0.2.0...0.2.1
-
 [0.2.0]: https://github.com/InditexTech/weavejs/compare/0.1.1...0.2.0
-
 [0.1.1]: https://github.com/InditexTech/weavejs/compare/0.1.0...0.1.1
-
 [0.1.0]: https://github.com/InditexTech/weavejs/releases/tag/0.1.0
