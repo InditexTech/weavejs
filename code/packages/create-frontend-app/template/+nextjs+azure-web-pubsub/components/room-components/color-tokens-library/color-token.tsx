@@ -20,10 +20,7 @@ export const ColorToken = ({ color }: Readonly<ColorTokenProps>) => {
       data-colortoken={color}
       style={{ background: color }}
     >
-      <div
-        style={{ color: forefrontColor }}
-        className="font-noto-sans-mono text-base"
-      >
+      <div style={{ color: forefrontColor }} className="font-inter text-base">
         {color}
       </div>
     </div>

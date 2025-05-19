@@ -40,7 +40,7 @@ export const ColorPickerHexaInput = ({
 
   return (
     <div
-      className={cn('relative flex items-center gap-0.5', className)}
+      className={cn('relative flex items-center gap-1', className)}
       {...props}
     >
       <Input
@@ -51,7 +51,7 @@ export const ColorPickerHexaInput = ({
         maxLength={9}
         aria-label="Hex color value"
         className={cn(
-          'h-8 rounded-none !text-xs font-normal text-gray-700 text-right focus:outline-none bg-transparent uppercase',
+          'h-8 rounded-none !text-[14px] font-normal text-black !border-black text-right focus:outline-none bg-transparent uppercase',
           error && 'border-red-500',
           !error && 'border-zinc-200'
         )}

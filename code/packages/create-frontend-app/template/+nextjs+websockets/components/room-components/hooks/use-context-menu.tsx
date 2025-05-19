@@ -150,33 +150,34 @@ function useContextMenu() {
           id: 'div-0',
           type: 'divider',
         });
+
+        // COPY
+        options.push({
+          id: 'copy',
+          type: 'button',
+          label: (
+            <div className="w-full flex justify-between items-center">
+              <div>Copy</div>
+              <ShortcutElement
+                shortcuts={{
+                  [SYSTEM_OS.MAC]: '⌘ C',
+                  [SYSTEM_OS.OTHER]: 'Ctrl C',
+                }}
+              />
+            </div>
+          ),
+          icon: <ClipboardCopy size={16} />,
+          disabled: !['selectionTool'].includes(actActionActive ?? ''),
+          onClick: async () => {
+            const weaveCopyPasteNodesPlugin =
+              instance.getPlugin<WeaveCopyPasteNodesPlugin>('copyPasteNodes');
+            if (weaveCopyPasteNodesPlugin) {
+              await weaveCopyPasteNodesPlugin.copy();
+            }
+            setContextMenuShow(false);
+          },
+        });
       }
-      // COPY
-      options.push({
-        id: 'copy',
-        type: 'button',
-        label: (
-          <div className="w-full flex justify-between items-center">
-            <div>Copy</div>
-            <ShortcutElement
-              shortcuts={{
-                [SYSTEM_OS.MAC]: '⌘ C',
-                [SYSTEM_OS.OTHER]: 'Ctrl C',
-              }}
-            />
-          </div>
-        ),
-        icon: <ClipboardCopy size={16} />,
-        disabled: !['selectionTool'].includes(actActionActive ?? ''),
-        onClick: async () => {
-          const weaveCopyPasteNodesPlugin =
-            instance.getPlugin<WeaveCopyPasteNodesPlugin>('copyPasteNodes');
-          if (weaveCopyPasteNodesPlugin) {
-            await weaveCopyPasteNodesPlugin.copy();
-          }
-          setContextMenuShow(false);
-        },
-      });
       // PASTE
       options.push({
         id: 'paste',

@@ -15,11 +15,14 @@ import { FrameProperties } from '../node-properties/frame-properties';
 import { CropProperties } from '../node-properties/crop-properties';
 import { SIDEBAR_ELEMENTS } from '@/lib/constants';
 import { X } from 'lucide-react';
+import { ScrollArea } from '@/components/ui/scroll-area';
+import { WeaveSelection } from '@inditextech/weave-types';
 
 export const NodeProperties = () => {
   const instance = useWeave((state) => state.instance);
   const actualAction = useWeave((state) => state.actions.actual);
   const node = useWeave((state) => state.selection.node);
+  const setNode = useWeave((state) => state.setNode);
 
   const sidebarRightActive = useCollaborationRoom(
     (state) => state.sidebar.right.active
@@ -121,6 +124,7 @@ export const NodeProperties = () => {
     }
     setSidebarActive(null, 'right');
   }, [
+    actualAction,
     actionType,
     nodeType,
     nodePropertiesAction,
@@ -128,6 +132,21 @@ export const NodeProperties = () => {
     sidebarRightActive,
     setSidebarActive,
   ]);
+
+  React.useEffect(() => {
+    if (!instance) return;
+
+    function handleOnNodeChange({ node }: WeaveSelection) {
+      setNode(node);
+    }
+
+    instance.addEventListener('onNodeChange', handleOnNodeChange);
+
+    return () => {
+      instance.removeEventListener('onNodeChange', handleOnNodeChange);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [node, instance]);
 
   const title = React.useMemo(() => {
     if (nodePropertiesAction === 'create') {
@@ -141,14 +160,14 @@ export const NodeProperties = () => {
   }
 
   return (
-    <div className="w-full justify-center items-center">
-      <div className="w-full font-title-xs p-1 bg-white flex justify-between items-center">
-        <div className="flex justify-between  h-7 font-questrial font-light items-center text-md pl-2">
+    <div className="w-full h-full">
+      <div className="w-full px-[24px] py-[29px] bg-white flex justify-between items-center border-b border-[#c9c9c9]">
+        <div className="flex justify-between font-inter font-light text-[24px] items-center text-md pl-2 uppercase">
           {title}
         </div>
         <div className="flex justify-end items-center gap-1">
           <button
-            className="cursor-pointer bg-transparent hover:bg-accent p-2"
+            className="cursor-pointer bg-transparent hover:bg-accent p-[2px]"
             onClick={() => {
               if (!instance) return;
               if (
@@ -169,22 +188,24 @@ export const NodeProperties = () => {
               setSidebarActive(null, 'right');
             }}
           >
-            <X size={16} />
+            <X size={16} strokeWidth={1} />
           </button>
         </div>
       </div>
-      <div className="flex-1 border-t border-zinc-200">
-        <ImageProperties />
-        <ColorTokenProperties />
-        <FrameProperties />
-        <PositionProperties />
-        <SizeProperties />
-        <AppearanceProperties />
-        <FillProperties />
-        <StrokeProperties />
-        <TextProperties />
-        <CropProperties />
-      </div>
+      <ScrollArea className="w-full h-[calc(100%-95px)]">
+        <div className="w-full flex flex-col">
+          <ImageProperties />
+          <ColorTokenProperties />
+          <FrameProperties />
+          <PositionProperties />
+          <SizeProperties />
+          <AppearanceProperties />
+          <FillProperties />
+          <StrokeProperties />
+          <TextProperties />
+          <CropProperties />
+        </div>
+      </ScrollArea>
     </div>
   );
 };

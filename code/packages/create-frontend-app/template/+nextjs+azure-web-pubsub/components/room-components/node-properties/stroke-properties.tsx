@@ -80,15 +80,17 @@ export function StrokeProperties() {
   }
 
   return (
-    <div className="border-b border-zinc-200">
-      <div className="w-full flex justify-between items-center gap-3 p-4 py-3">
+    <div className="border-b border-[#c9c9c9] p-[24px] flex flex-col gap-[16px]">
+      <div className="w-full flex justify-between items-center gap-3">
         <div className="cursor-pointer hover:no-underline items-center py-0">
-          <span className="text-xs font-questrial font-light">Stroke</span>
+          <span className="text-[13px] font-inter font-light uppercase">
+            Stroke
+          </span>
         </div>
         <ToggleIconButton
           kind="toggle"
-          icon={<Eye size={12} />}
-          pressedIcon={<EyeOff size={12} />}
+          icon={<Eye size={16} strokeWidth={1} />}
+          pressedIcon={<EyeOff size={16} strokeWidth={1} />}
           pressed={actualNode.props.strokeEnabled ?? true}
           onClick={(e) => {
             e.stopPropagation();
@@ -103,224 +105,219 @@ export function StrokeProperties() {
           }}
         />
       </div>
-      <div className="px-4 pb-4">
-        <div className="grid grid-cols-2 gap-3 w-full">
-          <InputColor
-            label="Color (#RGBA)"
-            value={`${(actualNode.props.stroke ?? '#000000FF').replace(
-              '#',
-              ''
-            )}`}
-            onChange={(value) => {
-              const updatedNode: WeaveStateElement = {
-                ...actualNode,
-                props: {
-                  ...actualNode.props,
-                  stroke: `#${value}`,
-                },
-              };
-              updateElement(updatedNode);
-            }}
-          />
-          <InputNumber
-            label="Width (px)"
-            value={actualNode.props.strokeWidth ?? 1}
-            onChange={(value) => {
-              const updatedNode: WeaveStateElement = {
-                ...actualNode,
-                props: {
-                  ...actualNode.props,
-                  strokeWidth: value,
-                },
-              };
-              updateElement(updatedNode);
-            }}
-          />
-          {(['line'].includes(actualNode.type) ||
-            ['brushTool', 'penTool'].includes(actualAction)) && (
-            <>
-              <div className="col-span-2">
-                <InputNumber
-                  label="Tension"
-                  value={actualNode.props.tension ?? 0}
-                  onChange={(value) => {
+      <div className="grid grid-cols-2 gap-3 w-full">
+        <InputColor
+          label="Color (#RGBA)"
+          value={actualNode.props.stroke}
+          onChange={(value) => {
+            const updatedNode: WeaveStateElement = {
+              ...actualNode,
+              props: {
+                ...actualNode.props,
+                stroke: value,
+              },
+            };
+            updateElement(updatedNode);
+          }}
+        />
+        <InputNumber
+          label="Width (px)"
+          value={actualNode.props.strokeWidth ?? 1}
+          onChange={(value) => {
+            const updatedNode: WeaveStateElement = {
+              ...actualNode,
+              props: {
+                ...actualNode.props,
+                strokeWidth: value,
+              },
+            };
+            updateElement(updatedNode);
+          }}
+        />
+        {(['line'].includes(actualNode.type) ||
+          ['brushTool', 'penTool'].includes(actualAction)) && (
+          <>
+            <div className="col-span-2">
+              <InputNumber
+                label="Tension"
+                value={actualNode.props.tension ?? 0}
+                onChange={(value) => {
+                  const updatedNode: WeaveStateElement = {
+                    ...actualNode,
+                    props: {
+                      ...actualNode.props,
+                      tension: value,
+                    },
+                  };
+                  updateElement(updatedNode);
+                }}
+              />
+            </div>
+            <div className="w-full flex justify-between items-center gap-4 col-span-2">
+              <div className="text-[12px] text-[#757575] font-inter font-light text-nowrap">
+                Line join
+              </div>
+              <div className="w-full flex justify-end items-center gap-1">
+                <ToggleIconButton
+                  kind="switch"
+                  icon={<Tally1 size={20} strokeWidth={1} />}
+                  pressed={(actualNode.props.lineJoin ?? 'miter') === 'miter'}
+                  onClick={() => {
                     const updatedNode: WeaveStateElement = {
                       ...actualNode,
                       props: {
                         ...actualNode.props,
-                        tension: value,
+                        lineJoin: 'miter',
+                      },
+                    };
+                    updateElement(updatedNode);
+                  }}
+                />
+                <ToggleIconButton
+                  kind="switch"
+                  icon={<Tally2 size={20} strokeWidth={1} />}
+                  pressed={(actualNode.props.lineJoin ?? 'miter') === 'round'}
+                  onClick={() => {
+                    const updatedNode: WeaveStateElement = {
+                      ...actualNode,
+                      props: {
+                        ...actualNode.props,
+                        lineJoin: 'round',
+                      },
+                    };
+                    updateElement(updatedNode);
+                  }}
+                />
+                <ToggleIconButton
+                  kind="switch"
+                  icon={<Tally3 size={20} strokeWidth={1} />}
+                  pressed={(actualNode.props.lineJoin ?? 'miter') === 'bevel'}
+                  onClick={() => {
+                    const updatedNode: WeaveStateElement = {
+                      ...actualNode,
+                      props: {
+                        ...actualNode.props,
+                        lineJoin: 'bevel',
                       },
                     };
                     updateElement(updatedNode);
                   }}
                 />
               </div>
-              <div className="w-full flex justify-between items-center gap-4 col-span-2">
-                <div className="text-[11px] text-zinc-600 font-questrial font-light text-nowrap">
-                  Line join
-                </div>
-                <div className="w-full flex justify-end items-center gap-1">
-                  <ToggleIconButton
-                    kind="switch"
-                    icon={<Tally1 size={16} />}
-                    pressed={(actualNode.props.lineJoin ?? 'miter') === 'miter'}
-                    onClick={() => {
-                      const updatedNode: WeaveStateElement = {
-                        ...actualNode,
-                        props: {
-                          ...actualNode.props,
-                          lineJoin: 'miter',
-                        },
-                      };
-                      updateElement(updatedNode);
-                    }}
-                  />
-                  <ToggleIconButton
-                    kind="switch"
-                    icon={<Tally2 size={16} />}
-                    pressed={(actualNode.props.lineJoin ?? 'miter') === 'round'}
-                    onClick={() => {
-                      const updatedNode: WeaveStateElement = {
-                        ...actualNode,
-                        props: {
-                          ...actualNode.props,
-                          lineJoin: 'round',
-                        },
-                      };
-                      updateElement(updatedNode);
-                    }}
-                  />
-                  <ToggleIconButton
-                    kind="switch"
-                    icon={<Tally3 size={16} />}
-                    pressed={(actualNode.props.lineJoin ?? 'miter') === 'bevel'}
-                    onClick={() => {
-                      const updatedNode: WeaveStateElement = {
-                        ...actualNode,
-                        props: {
-                          ...actualNode.props,
-                          lineJoin: 'bevel',
-                        },
-                      };
-                      updateElement(updatedNode);
-                    }}
-                  />
-                </div>
+            </div>
+            <div className="w-full flex justify-between items-center gap-4 col-span-2">
+              <div className="text-[12px] text-[#757575] font-inter font-light text-nowrap">
+                Line cap
               </div>
-              <div className="w-full flex justify-between items-center gap-4 col-span-2">
-                <div className="text-[11px] text-zinc-600 font-questrial font-light text-nowrap">
-                  Line cap
-                </div>
-                <div className="w-full flex justify-end items-center gap-1">
-                  <ToggleIconButton
-                    kind="switch"
-                    icon={<Tally1 size={16} />}
-                    pressed={(actualNode.props.lineCap ?? 'butt') === 'butt'}
-                    onClick={() => {
-                      const updatedNode: WeaveStateElement = {
-                        ...actualNode,
-                        props: {
-                          ...actualNode.props,
-                          lineCap: 'butt',
-                        },
-                      };
-                      updateElement(updatedNode);
-                    }}
-                  />
-                  <ToggleIconButton
-                    kind="switch"
-                    icon={<Tally2 size={16} />}
-                    pressed={(actualNode.props.lineCap ?? 'butt') === 'round'}
-                    onClick={() => {
-                      const updatedNode: WeaveStateElement = {
-                        ...actualNode,
-                        props: {
-                          ...actualNode.props,
-                          lineCap: 'round',
-                        },
-                      };
-                      updateElement(updatedNode);
-                    }}
-                  />
-                  <ToggleIconButton
-                    kind="switch"
-                    icon={<Tally3 size={16} />}
-                    pressed={(actualNode.props.lineCap ?? 'butt') === 'square'}
-                    onClick={() => {
-                      const updatedNode: WeaveStateElement = {
-                        ...actualNode,
-                        props: {
-                          ...actualNode.props,
-                          lineCap: 'square',
-                        },
-                      };
-                      updateElement(updatedNode);
-                    }}
-                  />
-                </div>
+              <div className="w-full flex justify-end items-center gap-1">
+                <ToggleIconButton
+                  kind="switch"
+                  icon={<Tally1 size={20} strokeWidth={1} />}
+                  pressed={(actualNode.props.lineCap ?? 'butt') === 'butt'}
+                  onClick={() => {
+                    const updatedNode: WeaveStateElement = {
+                      ...actualNode,
+                      props: {
+                        ...actualNode.props,
+                        lineCap: 'butt',
+                      },
+                    };
+                    updateElement(updatedNode);
+                  }}
+                />
+                <ToggleIconButton
+                  kind="switch"
+                  icon={<Tally2 size={20} strokeWidth={1} />}
+                  pressed={(actualNode.props.lineCap ?? 'butt') === 'round'}
+                  onClick={() => {
+                    const updatedNode: WeaveStateElement = {
+                      ...actualNode,
+                      props: {
+                        ...actualNode.props,
+                        lineCap: 'round',
+                      },
+                    };
+                    updateElement(updatedNode);
+                  }}
+                />
+                <ToggleIconButton
+                  kind="switch"
+                  icon={<Tally3 size={20} strokeWidth={1} />}
+                  pressed={(actualNode.props.lineCap ?? 'butt') === 'square'}
+                  onClick={() => {
+                    const updatedNode: WeaveStateElement = {
+                      ...actualNode,
+                      props: {
+                        ...actualNode.props,
+                        lineCap: 'square',
+                      },
+                    };
+                    updateElement(updatedNode);
+                  }}
+                />
               </div>
-              <div className="w-full flex justify-between items-center gap-4 col-span-2">
-                <div className="text-[11px] text-zinc-600 font-questrial font-light text-nowrap">
-                  Open / Closed
-                </div>
-                <div className="w-full flex justify-end items-center gap-1">
-                  <ToggleIconButton
-                    kind="switch"
-                    icon={<Slash size={16} />}
-                    pressed={(actualNode.props.closed ?? false) === false}
-                    onClick={() => {
-                      const updatedNode: WeaveStateElement = {
-                        ...actualNode,
-                        props: {
-                          ...actualNode.props,
-                          closed: false,
-                        },
-                      };
-                      updateElement(updatedNode);
-                    }}
-                  />
-                  <ToggleIconButton
-                    kind="switch"
-                    icon={<Hexagon size={16} />}
-                    pressed={(actualNode.props.closed ?? false) === true}
-                    onClick={() => {
-                      const updatedNode: WeaveStateElement = {
-                        ...actualNode,
-                        props: {
-                          ...actualNode.props,
-                          closed: true,
-                        },
-                      };
-                      updateElement(updatedNode);
-                    }}
-                  />
-                </div>
+            </div>
+            <div className="w-full flex justify-between items-center gap-4 col-span-2">
+              <div className="text-[12px] text-[#757575] font-inter font-light text-nowrap">
+                Open / Closed
               </div>
-              <div className="w-full flex justify-between items-center gap-4 col-span-2">
-                <div className="text-[11px] text-zinc-600 font-questrial font-light text-nowrap">
-                  Bezier
-                </div>
-                <div className="w-full flex justify-end items-center gap-1">
-                  <ToggleIconButton
-                    kind="switch"
-                    icon={<Spline size={16} />}
-                    pressed={(actualNode.props.bezier ?? false) === true}
-                    onClick={() => {
-                      const updatedNode: WeaveStateElement = {
-                        ...actualNode,
-                        props: {
-                          ...actualNode.props,
-                          bezier: !(actualNode.props.bezier ?? false),
-                        },
-                      };
-                      updateElement(updatedNode);
-                    }}
-                  />
-                </div>
+              <div className="w-full flex justify-end items-center gap-1">
+                <ToggleIconButton
+                  kind="switch"
+                  icon={<Slash size={20} strokeWidth={1} />}
+                  pressed={(actualNode.props.closed ?? false) === false}
+                  onClick={() => {
+                    const updatedNode: WeaveStateElement = {
+                      ...actualNode,
+                      props: {
+                        ...actualNode.props,
+                        closed: false,
+                      },
+                    };
+                    updateElement(updatedNode);
+                  }}
+                />
+                <ToggleIconButton
+                  kind="switch"
+                  icon={<Hexagon size={20} strokeWidth={1} />}
+                  pressed={(actualNode.props.closed ?? false) === true}
+                  onClick={() => {
+                    const updatedNode: WeaveStateElement = {
+                      ...actualNode,
+                      props: {
+                        ...actualNode.props,
+                        closed: true,
+                      },
+                    };
+                    updateElement(updatedNode);
+                  }}
+                />
               </div>
-            </>
-          )}
-        </div>
+            </div>
+            <div className="w-full flex justify-between items-center gap-4 col-span-2">
+              <div className="text-[12px] text-[#757575] font-inter font-light text-nowrap">
+                Bezier
+              </div>
+              <div className="w-full flex justify-end items-center gap-1">
+                <ToggleIconButton
+                  kind="switch"
+                  icon={<Spline size={20} strokeWidth={1} />}
+                  pressed={(actualNode.props.bezier ?? false) === true}
+                  onClick={() => {
+                    const updatedNode: WeaveStateElement = {
+                      ...actualNode,
+                      props: {
+                        ...actualNode.props,
+                        bezier: !(actualNode.props.bezier ?? false),
+                      },
+                    };
+                    updateElement(updatedNode);
+                  }}
+                />
+              </div>
+            </div>
+          </>
+        )}
       </div>
     </div>
   );

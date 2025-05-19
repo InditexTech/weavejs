@@ -38,8 +38,8 @@ export const setupStore = () => {
 
         const roomsFile = path.join(roomsFolder, docName)
         return await fs.readFile(roomsFile)
-      } catch (ex) {
-        console.error(ex)
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      } catch (_) {
         return null
       }
     },
@@ -69,8 +69,9 @@ export const setupStore = () => {
 
         const roomsFile = path.join(roomsFolder, docName)
         await fs.writeFile(roomsFile, actualState)
-      } catch (ex) {
-        console.error(ex)
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      } catch (_) {
+        /* empty */
       }
     }
   })

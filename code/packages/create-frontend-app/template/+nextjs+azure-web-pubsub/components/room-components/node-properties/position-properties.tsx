@@ -104,44 +104,44 @@ export function PositionProperties() {
   }
 
   return (
-    <div className="border-b border-zinc-200">
-      <div className="w-full flex justify-between items-center gap-3 p-4 py-3">
+    <div className="border-b border-[#c9c9c9] p-[24px] flex flex-col gap-[16px]">
+      <div className="w-full flex justify-between items-center gap-3">
         <div className="cursor-pointer hover:no-underline items-center py-0">
-          <span className="text-xs font-questrial font-light">Position</span>
+          <span className="text-[13px] font-inter font-light uppercase">
+            Position
+          </span>
         </div>
       </div>
-      <div className="px-4 pb-4">
-        <div className="grid grid-cols-1 gap-3 w-full">
-          <div className="grid grid-cols-2 gap-3 w-full">
-            <InputNumber
-              label="X (px)"
-              value={node.props.x ?? 0}
-              onChange={(value) => {
-                const updatedNode = {
-                  ...node,
-                  props: {
-                    ...node.props,
-                    x: value,
-                  },
-                };
-                updateElement(updatedNode);
-              }}
-            />
-            <InputNumber
-              label="Y (px)"
-              value={node.props.y ?? 0}
-              onChange={(value) => {
-                const updatedNode = {
-                  ...node,
-                  props: {
-                    ...node.props,
-                    y: value,
-                  },
-                };
-                updateElement(updatedNode);
-              }}
-            />
-          </div>
+      <div className="grid grid-cols-1 gap-3 w-full">
+        <div className="grid grid-cols-3 gap-3 w-full">
+          <InputNumber
+            label="X"
+            value={node.props.x ?? 0}
+            onChange={(value) => {
+              const updatedNode = {
+                ...node,
+                props: {
+                  ...node.props,
+                  x: value,
+                },
+              };
+              updateElement(updatedNode);
+            }}
+          />
+          <InputNumber
+            label="Y"
+            value={node.props.y ?? 0}
+            onChange={(value) => {
+              const updatedNode = {
+                ...node,
+                props: {
+                  ...node.props,
+                  y: value,
+                },
+              };
+              updateElement(updatedNode);
+            }}
+          />
           <InputNumber
             label="Rotation (deg)"
             value={node.props.rotation ?? 0}

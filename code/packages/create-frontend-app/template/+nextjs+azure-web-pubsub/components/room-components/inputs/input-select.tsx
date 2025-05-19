@@ -42,7 +42,7 @@ function InputSelect({
 
   return (
     <div className="flex flex-col items-start justify-start relative">
-      <div className="text-zinc-600 mb-1 text-[11px] font-questrial font-light">
+      <div className="text-[#757575] mb-1 text-[12px] font-inter font-light">
         {label}
       </div>
       <Popover
@@ -59,7 +59,7 @@ function InputSelect({
             role="combobox"
             aria-expanded={open}
             disabled={disabled}
-            className="w-full pl-3 h-[32px] rounded-none !text-xs text-gray-700 justify-between font-normal bg-transparent shadow-none"
+            className="w-full pl-3 h-[40px] rounded-none !text-[14px] !border-black text-black justify-between font-normal bg-transparent shadow-none"
           >
             {options.find((option) => option.value === selectedOption)?.label ??
               '-'}
@@ -68,10 +68,10 @@ function InputSelect({
             )}
           </Button>
         </PopoverTrigger>
-        <PopoverContent className="rounded-none p-0 w-[var(--radix-popover-trigger-width)]">
+        <PopoverContent className="rounded-none p-0 w-[var(--radix-popover-trigger-width)] border-black rounded-none">
           <Command>
             <CommandInput
-              className="!text-xs text-gray-700 justify-between font-normal bg-transparent shadow-none"
+              className="!text-[14px] text-black justify-between font-normal bg-transparent shadow-none"
               onFocus={() => {
                 window.weaveOnFieldFocus = true;
               }}
@@ -82,7 +82,7 @@ function InputSelect({
             />
             <CommandList>
               <CommandEmpty>
-                <span className="!text-xs text-gray-700 justify-between font-normal bg-transparent shadow-none">
+                <span className="!text-[14px] rounded-none text-black justify-between font-normal bg-transparent shadow-none">
                   No font found.
                 </span>
               </CommandEmpty>
@@ -95,9 +95,9 @@ function InputSelect({
                       setSelectedOption(option.value);
                       setOpen(false);
                     }}
-                    className="flex items-center"
+                    className="flex items-center rounded-none"
                   >
-                    <span className="!text-xs text-gray-700 justify-between font-normal bg-transparent shadow-none">
+                    <span className="!text-[14px] text-black justify-between font-normal bg-transparent shadow-none">
                       {option.label}
                     </span>
                     {selectedOption === option.value && (

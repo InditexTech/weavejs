@@ -41,12 +41,27 @@ export const Room = () => {
   const setFetchConnectionUrlError = useCollaborationRoom(
     (state) => state.setFetchConnectionUrlError
   );
+  const setUser = useCollaborationRoom((state) => state.setUser);
 
   const { loadedParams } = useHandleRouteParams();
 
   const getUser = React.useCallback(() => {
     return user as WeaveUser;
   }, [user]);
+
+  React.useEffect(() => {
+    if (room && !user) {
+      const userStorage = sessionStorage.getItem(`weave.js_${room}`);
+      try {
+        const userMapped = JSON.parse(userStorage ?? '');
+        if (userMapped) {
+          setUser(userMapped);
+        }
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      } catch (_) {}
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [room, user]);
 
   const loadingDescription = React.useMemo(() => {
     if (!loadedParams) {
@@ -105,12 +120,19 @@ export const Room = () => {
               key="loader"
               roomId={room ? room : '-'}
               content={
-                loadedParams && room && !user ? 'ENTER ROOM' : 'LOADING ROOM'
+                loadedParams && room && !user ? (
+                  <div className="text-center">
+                    <p>ENTER YOUR USERNAME</p>
+                    <p>TO ACCESS THE ROOM</p>
+                  </div>
+                ) : (
+                  'LOADING ROOM'
+                )
               }
               description={
                 <>
                   {loadedParams && room && !user ? (
-                    <div className="w-full mt-8">
+                    <div className="w-full">
                       <UserForm />
                     </div>
                   ) : (

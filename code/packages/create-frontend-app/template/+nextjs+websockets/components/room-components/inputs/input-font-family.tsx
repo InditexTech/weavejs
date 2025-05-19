@@ -37,7 +37,7 @@ function InputFontFamily({
 
   return (
     <div className="flex flex-col items-start justify-start relative">
-      <div className="text-zinc-600 mb-1 text-[11px] font-questrial font-light">
+      <div className="text-[#757575] mb-1 text-[12px] font-inter font-light">
         Font Family
       </div>
       <Popover open={open} onOpenChange={setOpen}>
@@ -46,17 +46,23 @@ function InputFontFamily({
             variant="outline"
             role="combobox"
             aria-expanded={open}
-            className="w-full h-[32px] rounded-none !text-xs text-gray-700 justify-between font-normal bg-transparent shadow-none"
+            className="w-full h-[40px] rounded-none !text-[14] text-black border-black justify-between font-normal bg-transparent shadow-none"
             style={{ fontFamily: selectedFont }}
           >
             {selectedFont}
             <ChevronDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
           </Button>
         </PopoverTrigger>
-        <PopoverContent className="rounded-none p-0 w-[var(--radix-popover-trigger-width)]">
+        <PopoverContent
+          className="rounded-none p-0 w-[var(--radix-popover-trigger-width)] border-black"
+          align="end"
+          side="top"
+          alignOffset={0}
+          sideOffset={9}
+        >
           <Command>
             <CommandInput
-              className="!text-xs text-gray-700 justify-between font-normal bg-transparent shadow-none"
+              className="!text-[14px] !border-b-black text-black justify-between font-normal bg-transparent shadow-none"
               placeholder="Search font..."
               onFocus={() => {
                 window.weaveOnFieldFocus = true;
@@ -67,7 +73,7 @@ function InputFontFamily({
             />
             <CommandList>
               <CommandEmpty>
-                <span className="!text-xs text-gray-700 justify-between font-normal bg-transparent shadow-none">
+                <span className="!text-[14px] text-black justify-between font-normal bg-transparent shadow-none">
                   No font found.
                 </span>
               </CommandEmpty>
@@ -83,7 +89,7 @@ function InputFontFamily({
                     className="flex items-center"
                   >
                     <span
-                      className="!text-xs text-gray-700 justify-between font-normal bg-transparent shadow-none"
+                      className="!text-[14px] text-black justify-between font-normal bg-transparent shadow-none"
                       style={{ fontFamily: font.name }}
                     >
                       {font.name}

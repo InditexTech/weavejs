@@ -23,13 +23,13 @@ export const InputText = ({
   return (
     <div className="flex flex-col items-start justify-start relative">
       {label && (
-        <div className="text-zinc-600 mb-1 text-[11px] font-questrial font-light">
+        <div className="text-[#757575] mb-1 text-[12px] font-inter font-light">
           {label}
         </div>
       )}
       <Input
         type="text"
-        className="w-full py-0 h-[32px] rounded-none !text-xs font-normal text-gray-700 text-left focus:outline-none bg-transparent shadow-none"
+        className="w-full py-0 h-[40px] rounded-none !text-[14px] !border-black font-normal text-black text-left focus:outline-none bg-transparent shadow-none"
         value={actualValue}
         onChange={(e) => {
           setActualValue(e.target.value);

@@ -10,7 +10,7 @@ import { RoomLayout } from './room.layout';
 import { RoomLoader } from '../room-components/room-loader/room-loader';
 import { AnimatePresence } from 'framer-motion';
 import useGetWeaveJSProps from '../room-components/hooks/use-get-weave-js-props';
-import useGetWsProvider from '../room-components/hooks/use-get-websockets-provider';
+import useGetWebsocketsProvider from '../room-components/hooks/use-get-websockets-provider';
 import useHandleRouteParams from '../room-components/hooks/use-handle-route-params';
 import { UploadFile } from '../room-components/upload-file';
 import UserForm from '../room-components/user-form';
@@ -32,12 +32,27 @@ export const Room = () => {
 
   const room = useCollaborationRoom((state) => state.room);
   const user = useCollaborationRoom((state) => state.user);
+  const setUser = useCollaborationRoom((state) => state.setUser);
 
   const { loadedParams } = useHandleRouteParams();
 
   const getUser = React.useCallback(() => {
     return user as WeaveUser;
   }, [user]);
+
+  React.useEffect(() => {
+    if (room && !user) {
+      const userStorage = sessionStorage.getItem(`weave.js_${room}`);
+      try {
+        const userMapped = JSON.parse(userStorage ?? '');
+        if (userMapped) {
+          setUser(userMapped);
+        }
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      } catch (_) {}
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [room, user]);
 
   const loadingDescription = React.useMemo(() => {
     if (!loadedParams) {
@@ -55,7 +70,7 @@ export const Room = () => {
 
   const { fonts, nodes, actions } = useGetWeaveJSProps();
 
-  const wsStoreProvider = useGetWsProvider({
+  const wsStoreProvider = useGetWebsocketsProvider({
     loadedParams,
     getUser,
   });
@@ -82,12 +97,19 @@ export const Room = () => {
               key="loader"
               roomId={room ? room : '-'}
               content={
-                loadedParams && room && !user ? 'ENTER ROOM' : 'LOADING ROOM'
+                loadedParams && room && !user ? (
+                  <div className="text-center">
+                    <p>ENTER YOUR USERNAME</p>
+                    <p>TO ACCESS THE ROOM</p>
+                  </div>
+                ) : (
+                  'LOADING ROOM'
+                )
               }
               description={
                 <>
                   {loadedParams && room && !user ? (
-                    <div className="w-full mt-8">
+                    <div className="w-full">
                       <UserForm />
                     </div>
                   ) : (

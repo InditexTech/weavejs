@@ -71,20 +71,22 @@ export function FillProperties() {
   )
     return null;
 
-  if (!actualAction && !['rectangle'].includes(actualNode.type)) {
+  if (!['rectangle'].includes(actualNode.type)) {
     return null;
   }
 
   return (
-    <div className="border-b border-zinc-200">
-      <div className="w-full flex justify-between items-center gap-3 p-4 py-3">
+    <div className="border-b border-[#c9c9c9] p-[24px] flex flex-col gap-[16px]">
+      <div className="w-full flex justify-between items-center gap-3">
         <div className="cursor-pointer hover:no-underline items-center py-0">
-          <span className="text-xs font-questrial font-light">Fill</span>
+          <span className="text-[13px] font-inter font-light uppercase">
+            Fill
+          </span>
         </div>
         <ToggleIconButton
           kind="toggle"
-          icon={<Eye size={12} />}
-          pressedIcon={<EyeOff size={12} />}
+          icon={<Eye size={16} strokeWidth={1} />}
+          pressedIcon={<EyeOff size={16} strokeWidth={1} />}
           pressed={actualNode.props.fillEnabled ?? true}
           onClick={(e) => {
             e.stopPropagation();
@@ -99,23 +101,21 @@ export function FillProperties() {
           }}
         />
       </div>
-      <div className="px-4 pb-4">
-        <div className="grid grid-cols-1 gap-3 w-full">
-          <InputColor
-            label="Color (#RGBA)"
-            value={`${(actualNode.props.fill ?? '#000000FF').replace('#', '')}`}
-            onChange={(value) => {
-              const updatedNode: WeaveStateElement = {
-                ...actualNode,
-                props: {
-                  ...actualNode.props,
-                  fill: `#${value}`,
-                },
-              };
-              updateElement(updatedNode);
-            }}
-          />
-        </div>
+      <div className="grid grid-cols-1 gap-3 w-full">
+        <InputColor
+          label="Color (#RGBA)"
+          value={actualNode.props.fill}
+          onChange={(value) => {
+            const updatedNode: WeaveStateElement = {
+              ...actualNode,
+              props: {
+                ...actualNode.props,
+                fill: value,
+              },
+            };
+            updateElement(updatedNode);
+          }}
+        />
       </div>
     </div>
   );

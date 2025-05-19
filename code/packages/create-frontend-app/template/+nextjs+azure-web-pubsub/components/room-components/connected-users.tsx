@@ -52,27 +52,29 @@ export const ConnectedUsers = () => {
     <div className="w-full min-h-[40px] flex gap-1 justify-between items-center">
       <TooltipProvider delayDuration={300}>
         <div className="flex justify-start items-center gap-1">
-          <div className="w-full flex justify-start gap-2 items-center text-center font-questrial text-xs px-2 pl-0">
-            <div className="px-2 py-1 bg-accent">
-              {Object.keys(connectedUsers).length}
-            </div>
-            <div className="text-left">users</div>
+          <div className="w-full flex justify-start gap-2 items-center text-center font-inter font-light text-xs px-2 pl-0">
+            <div>{Object.keys(connectedUsers).length}</div>
+            <div className="text-left">USERS</div>
           </div>
         </div>
         <div className="w-full flex gap-1 justify-start items-center">
           {connectedUserKey && (
             <Tooltip>
               <TooltipTrigger asChild>
-                <button className="cursor-pointer pointer-events-auto">
+                <button className="cursor-pointer">
                   <AvatarUI className="w-[32px] h-[32px]">
                     <AvatarFallback>
-                      <Avatar name={user?.name} variant="beam" />
+                      <Avatar name={user?.name} size={32} variant="beam" />
                     </AvatarFallback>
                   </AvatarUI>
                 </button>
               </TooltipTrigger>
-              <TooltipContent side="bottom" className="rounded-none">
-                <p className="font-questrial text-xs">{user?.name}</p>
+              <TooltipContent
+                sideOffset={8}
+                side="bottom"
+                className="rounded-none"
+              >
+                <p className="font-inter text-xs">{user?.name}</p>
               </TooltipContent>
             </Tooltip>
           )}
@@ -81,16 +83,20 @@ export const ConnectedUsers = () => {
             return (
               <Tooltip key={user}>
                 <TooltipTrigger asChild>
-                  <button className="cursor-pointer pointer-events-auto">
+                  <button className="cursor-pointer">
                     <AvatarUI className="w-[32px] h-[32px]">
                       <AvatarFallback>
-                        <Avatar name={userInfo?.name} variant="beam" />
+                        <Avatar
+                          name={userInfo?.name}
+                          size={32}
+                          variant="beam"
+                        />
                       </AvatarFallback>
                     </AvatarUI>
                   </button>
                 </TooltipTrigger>
                 <TooltipContent side="bottom">
-                  <p className="font-questrial text-sm">{userInfo.name}</p>
+                  <p className="font-inter text-sm">{userInfo.name}</p>
                 </TooltipContent>
               </Tooltip>
             );
@@ -104,7 +110,7 @@ export const ConnectedUsers = () => {
                   >
                     <DropdownMenuTrigger
                       className={cn(
-                        ' pointer-events-auto rounded-none cursor-pointer p-2 hover:bg-accent focus:outline-none',
+                        'rounded-none cursor-pointer p-2 hover:bg-accent focus:outline-none',
                         {
                           ['bg-accent']: menuOpen,
                           ['bg-white']: !menuOpen,
@@ -118,7 +124,7 @@ export const ConnectedUsers = () => {
                       side="bottom"
                       alignOffset={0}
                       sideOffset={4}
-                      className="font-questrial rounded-none"
+                      className="font-inter rounded-none"
                     >
                       {restUsers.map((user) => {
                         const userInfo = connectedUsers[user];
@@ -140,7 +146,7 @@ export const ConnectedUsers = () => {
                   </DropdownMenu>
                 </TooltipTrigger>
                 <TooltipContent side="bottom">
-                  <p className="font-questrial text-sm">More users</p>
+                  <p className="font-inter text-sm">More users</p>
                 </TooltipContent>
               </Tooltip>
             </>

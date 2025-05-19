@@ -1,17 +1,17 @@
-import { WeaveNode } from '@inditextech/weave-sdk';
+import { WeaveNode } from "@inditextech/weave-sdk";
 import {
   WeaveElementAttributes,
   WeaveElementInstance,
-} from '@inditextech/weave-types';
-import Konva from 'konva';
-import { Noto_Sans_Mono } from 'next/font/google';
+} from "@inditextech/weave-types";
+import Konva from "konva";
+import { Inter } from "next/font/google";
 
-export const COLOR_TOKEN_NODE_TYPE = 'color-token';
+export const COLOR_TOKEN_NODE_TYPE = "color-token";
 
-const notoSansMono = Noto_Sans_Mono({
+const inter = Inter({
   preload: true,
-  variable: '--font-noto-sans-mono',
-  subsets: ['latin'],
+  variable: "--inter",
+  subsets: ["latin"],
 });
 
 export class ColorTokenNode extends WeaveNode {
@@ -20,34 +20,35 @@ export class ColorTokenNode extends WeaveNode {
   onRender(props: WeaveElementAttributes) {
     const { id } = props;
 
-    const colorTokenColor = props.colorToken ?? '#DEFFA0';
+    const colorTokenColor = props.colorToken ?? "#DEFFA0";
 
     const colorTokenParams = {
       ...props,
     };
     delete colorTokenParams.zIndex;
 
-    const colorToken = new Konva.Group({
+    const colorTokenNode = new Konva.Group({
       ...colorTokenParams,
       width: colorTokenParams.width,
       height: colorTokenParams.height,
-      name: 'node',
+      name: "node",
     });
 
     const internalRect = new Konva.Rect({
       groupId: id,
+      id: `${id}-colorToken`,
       x: 0,
       y: 0,
-      fill: '#FFFFFFFF',
+      fill: "#FFFFFFFF",
       width: colorTokenParams.width,
       height: colorTokenParams.height,
       draggable: false,
-      listening: true,
-      stroke: 'black',
+      stroke: "black",
       strokeWidth: 2,
+      name: "node",
     });
 
-    colorToken.add(internalRect);
+    colorTokenNode.add(internalRect);
 
     const internalRect2 = new Konva.Rect({
       id: `${id}-colorToken-1`,
@@ -57,10 +58,11 @@ export class ColorTokenNode extends WeaveNode {
       fill: colorTokenColor,
       width: colorTokenParams.width - 2,
       height: (colorTokenParams.height ?? 0) - 60,
+      listening: false,
       draggable: false,
     });
 
-    colorToken.add(internalRect2);
+    colorTokenNode.add(internalRect2);
 
     const internalText = new Konva.Text({
       id: `${id}-colorToken-code`,
@@ -68,23 +70,24 @@ export class ColorTokenNode extends WeaveNode {
       x: 20,
       y: 260,
       fontSize: 20,
-      fontFamily: notoSansMono.style.fontFamily,
-      fill: '#CCCCCCFF',
+      fontFamily: inter.style.fontFamily,
+      fill: "#CCCCCCFF",
       strokeEnabled: false,
-      stroke: '#000000FF',
+      stroke: "#000000FF",
       strokeWidth: 1,
       text: `${colorTokenColor}`,
       width: (colorTokenParams.width ?? 0) - 40,
       height: 20,
-      align: 'left',
+      align: "left",
+      listening: false,
       draggable: false,
     });
 
-    colorToken.add(internalText);
+    colorTokenNode.add(internalText);
 
-    this.setupDefaultNodeEvents(colorToken);
+    this.setupDefaultNodeEvents(colorTokenNode);
 
-    return colorToken;
+    return colorTokenNode;
   }
 
   onUpdate(
@@ -101,7 +104,7 @@ export class ColorTokenNode extends WeaveNode {
       zIndex: nodeInstanceZIndex,
     });
 
-    const colorTokenColor = colorToken ?? '#DEFFA0';
+    const colorTokenColor = colorToken ?? "#DEFFA0";
 
     const colorTokenNode1 = colorTokenNode.findOne(`#${id}-colorToken-1`);
     if (colorTokenNode1) {
@@ -111,7 +114,7 @@ export class ColorTokenNode extends WeaveNode {
     }
     const colorTokenCode = colorTokenNode.findOne(`#${id}-colorToken-code`);
     if (colorTokenCode) {
-      colorTokenCode.setAttr('text', `${colorTokenColor}`);
+      colorTokenCode.setAttr("text", `${colorTokenColor}`);
     }
   }
 }

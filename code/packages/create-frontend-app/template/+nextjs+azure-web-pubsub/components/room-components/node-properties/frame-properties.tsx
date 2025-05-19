@@ -79,117 +79,117 @@ export function FrameProperties() {
     return null;
 
   return (
-    <div className="border-b border-zinc-200">
-      <div className="w-full flex justify-between items-center gap-3 p-4 py-3">
+    <div className="border-b border-[#c9c9c9] p-[24px] flex flex-col gap-[16px]">
+      <div className="w-full flex justify-between items-center gap-3">
         <div className="cursor-pointer hover:no-underline items-center py-0">
-          <span className="text-xs font-questrial font-light">Frame</span>
+          <span className="text-[13px] font-inter font-light uppercase">
+            Frame
+          </span>
         </div>
       </div>
-      <div className="px-4 pb-4">
-        <div className="grid grid-cols-1 gap-3 w-full">
-          <InputText
-            label="Title"
-            value={`${actualNode.props.title ?? 'Frame XXX'}`}
-            onChange={(value) => {
-              const updatedNode: WeaveStateElement = {
-                ...actualNode,
-                props: {
-                  ...actualNode.props,
-                  title: value,
-                },
-              };
-              updateElement(updatedNode);
-            }}
-          />
-          <InputSelect
-            label="Orientation"
-            options={[
-              { label: 'Landscape', value: 'landscape' },
-              { label: 'Portrait', value: 'portrait' },
-            ]}
-            disabled={nodePropertiesAction === 'update'}
-            value={`${actualNode.props.frameOrientation ?? 'landscape'}`}
-            onChange={(value) => {
-              const updatedNode: WeaveStateElement = {
-                ...actualNode,
-                props: {
-                  ...actualNode.props,
-                  frameOrientation: value,
-                },
-              };
-              updateElement(updatedNode);
-            }}
-          />
-          <InputSelect
-            label="Type"
-            options={[
-              { label: 'A1', value: 'A1' },
-              { label: 'A2', value: 'A2' },
-              { label: 'A3', value: 'A3' },
-              { label: 'A4', value: 'A4' },
-              { label: 'Custom', value: 'custom' },
-            ]}
-            disabled={nodePropertiesAction === 'update'}
-            value={`${actualNode.props.frameType ?? null}`}
-            onChange={(value) => {
-              const orientation: WeaveFrameNodeSizesOrientation = (actualNode
-                .props.frameOrientation ??
-                'landscape') as WeaveFrameNodeSizesOrientation;
-              const type: WeaveFrameNodeSizes = (actualNode.props.frameType ??
-                'A4') as WeaveFrameNodeSizes;
+      <div className="grid grid-cols-1 gap-3 w-full">
+        <InputText
+          label="Title"
+          value={`${actualNode.props.title ?? 'Frame XXX'}`}
+          onChange={(value) => {
+            const updatedNode: WeaveStateElement = {
+              ...actualNode,
+              props: {
+                ...actualNode.props,
+                title: value,
+              },
+            };
+            updateElement(updatedNode);
+          }}
+        />
+        <InputSelect
+          label="Orientation"
+          options={[
+            { label: 'Landscape', value: 'landscape' },
+            { label: 'Portrait', value: 'portrait' },
+          ]}
+          disabled={nodePropertiesAction === 'update'}
+          value={`${actualNode.props.frameOrientation ?? 'landscape'}`}
+          onChange={(value) => {
+            const updatedNode: WeaveStateElement = {
+              ...actualNode,
+              props: {
+                ...actualNode.props,
+                frameOrientation: value,
+              },
+            };
+            updateElement(updatedNode);
+          }}
+        />
+        <InputSelect
+          label="Type"
+          options={[
+            { label: 'A1', value: 'A1' },
+            { label: 'A2', value: 'A2' },
+            { label: 'A3', value: 'A3' },
+            { label: 'A4', value: 'A4' },
+            { label: 'Custom', value: 'custom' },
+          ]}
+          disabled={nodePropertiesAction === 'update'}
+          value={`${actualNode.props.frameType ?? null}`}
+          onChange={(value) => {
+            const orientation: WeaveFrameNodeSizesOrientation = (actualNode
+              .props.frameOrientation ??
+              'landscape') as WeaveFrameNodeSizesOrientation;
+            const type: WeaveFrameNodeSizes = (actualNode.props.frameType ??
+              'A4') as WeaveFrameNodeSizes;
 
-              const updatedNode: WeaveStateElement = {
-                ...actualNode,
-                props: {
-                  ...actualNode.props,
-                  frameType: value,
-                  frameWidth:
-                    WEAVE_FRAME_NODE_SIZES[orientation][type].width *
-                    WEAVE_FRAME_NODE_SIZES_MULTIPLIER,
-                  frameHeight:
-                    WEAVE_FRAME_NODE_SIZES[orientation][type].height *
-                    WEAVE_FRAME_NODE_SIZES_MULTIPLIER,
-                },
-              };
-              updateElement(updatedNode);
-            }}
-          />
-          {actualNode.props.frameType === 'custom' && (
-            <>
-              <InputNumber
-                label="Width (px)"
-                value={actualNode.props.frameWidth ?? 16}
-                disabled={nodePropertiesAction === 'update'}
-                onChange={(value) => {
-                  const updatedNode: WeaveStateElement = {
-                    ...actualNode,
-                    props: {
-                      ...actualNode.props,
-                      frameWidth: value,
-                    },
-                  };
-                  updateElement(updatedNode);
-                }}
-              />
+            const updatedNode: WeaveStateElement = {
+              ...actualNode,
+              props: {
+                ...actualNode.props,
+                frameType: value,
+                frameWidth:
+                  WEAVE_FRAME_NODE_SIZES[orientation][type].width *
+                  WEAVE_FRAME_NODE_SIZES_MULTIPLIER,
+                frameHeight:
+                  WEAVE_FRAME_NODE_SIZES[orientation][type].height *
+                  WEAVE_FRAME_NODE_SIZES_MULTIPLIER,
+              },
+            };
+            updateElement(updatedNode);
+          }}
+        />
+        {actualNode.props.frameType === 'custom' && (
+          <>
+            <InputNumber
+              label="Width"
+              value={actualNode.props.frameWidth ?? 16}
+              disabled={nodePropertiesAction === 'update'}
+              onChange={(value) => {
+                const updatedNode: WeaveStateElement = {
+                  ...actualNode,
+                  props: {
+                    ...actualNode.props,
+                    frameWidth: value,
+                  },
+                };
+                updateElement(updatedNode);
+              }}
+            />
 
-              <InputNumber
-                label="Height (px)"
-                value={actualNode.props.frameHeight ?? 16}
-                disabled={nodePropertiesAction === 'update'}
-                onChange={(value) => {
-                  const updatedNode: WeaveStateElement = {
-                    ...actualNode,
-                    props: {
-                      ...actualNode.props,
-                      frameHeight: value,
-                    },
-                  };
-                  updateElement(updatedNode);
-                }}
-              />
-            </>
-          )}
-        </div>
+            <InputNumber
+              label="Height"
+              value={actualNode.props.frameHeight ?? 16}
+              disabled={nodePropertiesAction === 'update'}
+              onChange={(value) => {
+                const updatedNode: WeaveStateElement = {
+                  ...actualNode,
+                  props: {
+                    ...actualNode.props,
+                    frameHeight: value,
+                  },
+                };
+                updateElement(updatedNode);
+              }}
+            />
+          </>
+        )}
       </div>
     </div>
   );

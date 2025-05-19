@@ -23,7 +23,7 @@ export const FramePresentationImage = ({ node }: Readonly<FrameImageProps>) => {
         const boxBg = frameBg.getClientRect();
         setLoading(true);
         const img = await toImageAsync(node, {
-          pixelRatio: 6,
+          pixelRatio: 2,
           x: boxBg.x + 2,
           y: boxBg.y + 2,
           width: boxBg.width - 4,
@@ -33,8 +33,8 @@ export const FramePresentationImage = ({ node }: Readonly<FrameImageProps>) => {
         setImage(
           <Image
             src={img.src}
-            width={500}
-            height={600}
+            width={1920}
+            height={1080}
             alt="A frame image"
             className="object-contain w-full h-full"
           />
@@ -50,7 +50,7 @@ export const FramePresentationImage = ({ node }: Readonly<FrameImageProps>) => {
   if (loading) {
     return (
       <div className="w-full h-full flex justify-center items-center">
-        <div className="font-questrial text-2xl text-white">Loading...</div>
+        <div className="font-inter text-2xl text-white">Loading...</div>
       </div>
     );
   }

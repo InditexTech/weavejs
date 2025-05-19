@@ -6,6 +6,8 @@ import { useCollaborationRoom } from "@/store/store";
 import { ColorToken } from "./color-token";
 import { SIDEBAR_ELEMENTS } from "@/lib/constants";
 import { X } from "lucide-react";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { SidebarSelector } from "../sidebar-selector";
 
 type ColorTokenElement = {
   id: string;
@@ -44,10 +46,10 @@ export const ColorTokensLibrary = () => {
   }
 
   return (
-    <div className="pointer-events-auto w-full h-full">
-      <div className="w-full font-title-xs p-1 bg-white flex justify-between items-center">
-        <div className="flex justify-between  h-7 font-questrial font-light items-center text-md pl-2">
-          Some Color Tokens
+    <div className="w-full h-full">
+      <div className="w-full px-[24px] py-[27px] bg-white flex justify-between items-center border-b border-[#c9c9c9]">
+        <div className="flex justify-between font-inter font-light items-center text-[24px] uppercase">
+          <SidebarSelector title="Color Tokens" />
         </div>
         <div className="flex justify-end items-center gap-1">
           <button
@@ -60,20 +62,22 @@ export const ColorTokensLibrary = () => {
           </button>
         </div>
       </div>
-      <div className="flex flex-col gap-2 w-full h-[calc(100%-50px)] border-t border-zinc-200">
-        <div
-          className="grid grid-cols-1 gap-2 w-full weaveDraggable p-4"
-          onDragStart={(e) => {
-            if (e.target instanceof HTMLDivElement) {
-              window.colorTokenDragColor = e.target.dataset.colortoken;
-            }
-          }}
-        >
-          {commonColorTokens.map((ele) => {
-            return <ColorToken key={ele.id} color={ele.color} />;
-          })}
+      <ScrollArea className="w-full h-[calc(100%-95px)]">
+        <div className="flex flex-col gap-2 w-full h-full p-[24px]">
+          <div
+            className="grid grid-cols-2 gap-2 w-full weaveDraggable"
+            onDragStart={(e) => {
+              if (e.target instanceof HTMLDivElement) {
+                window.colorTokenDragColor = e.target.dataset.colortoken;
+              }
+            }}
+          >
+            {commonColorTokens.map((ele) => {
+              return <ColorToken key={ele.id} color={ele.color} />;
+            })}
+          </div>
         </div>
-      </div>
+      </ScrollArea>
     </div>
   );
 };

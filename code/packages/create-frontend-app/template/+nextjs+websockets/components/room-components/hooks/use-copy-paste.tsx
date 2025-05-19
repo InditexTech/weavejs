@@ -24,8 +24,12 @@ function useCopyPaste() {
   const onPasteHandler = React.useCallback(
     (error: WeaveCopyPasteNodesPluginOnPasteEvent): void => {
       if (error) {
-        console.error('onPaste', error);
-        toast.error('An error occurred when reading from the clipboard');
+        if (error.message === 'Invalid elements to paste') {
+          toast.warning('Elements in clipboard cannot be pasted here');
+        } else {
+          console.error('onPaste', error);
+          toast.error('An error occurred when reading from the clipboard');
+        }
       } else {
         toast.success('Paste successful');
       }
