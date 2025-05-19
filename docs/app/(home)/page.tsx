@@ -50,7 +50,7 @@ function Hero() {
           Build collaborative canvas applications
         </span>
       </h1>
-      <p className="mb-8 !font-light leading-[28px] text-black md:text-[20px]">
+      <p className="mb-8 !font-light leading-[28px] text-black dark:text-white md:text-[20px]">
         Created for developers, Weave.js is an open-source library that provides
         all the building blocks, plugins, and APIs to develop visual
         collaborative tools at the speed of light.
@@ -135,7 +135,7 @@ function Architecture() {
               Unlock Weave.js full potential with nodes, plugins, actions, and
               stores. All while customizing the look & feel.
             </p>
-            <div className="h-[50px] flex justify-end items-end">
+            <div className="h-[50px] flex justify-start items-end">
               <LinkButton
                 href="/docs/main/quickstart"
                 variant="default"
@@ -153,7 +153,7 @@ function Architecture() {
 
 function OpenSource() {
   return (
-    <div className="w-full mt-[128px] py-[48px] border-black border-t-[1px] border-b-[1px] flex justify-center items-center">
+    <div className="w-full mt-[128px] py-[48px] border-black dark:border-white border-t-[1px] border-b-[1px] flex justify-center items-center">
       <div className="max-w-[800px] flex flex-col gap-[24px]">
         <div className="text-center text-[48px] leading-[56px] font-light uppercase">
           Free & Open Source

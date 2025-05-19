@@ -6,11 +6,11 @@ import { type HTMLAttributes, useLayoutEffect, useState } from "react";
 import { cn } from "fumadocs-ui/utils/cn";
 
 const itemVariants = cva(
-  "cursor-pointer size-[20px] rounded-none p-[2px] text-[#5C5C5C] hover:text-black",
+  "cursor-pointer size-[20px] rounded-none p-[2px] text-[#5C5C5C] hover:text-black dark:hover:text-white",
   {
     variants: {
       active: {
-        true: "bg-black text-white",
+        true: "bg-black dark:bg-[#454545] text-white",
         false: "text-[#5C5C5C]",
       },
     },

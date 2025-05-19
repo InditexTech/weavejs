@@ -115,7 +115,7 @@ export function Header({
             <NavbarLinkItem
               key={i}
               item={item}
-              className="font-light !text-[#757575] text-[13px] hover:!text-[#757575] hover:!font-medium data-[state=open]:font-medium data-[state=open]:bg-transparent data-[state=open]:!underline data-[state=open]:!underline-offset-4 data-[active=true]:!bg-transparent"
+              className="font-light !text-black dark:!text-white text-[13px] hover:!text-[#757575] hover:!font-medium data-[state=open]:font-medium data-[state=open]:bg-transparent data-[state=open]:!underline data-[state=open]:!underline-offset-4 data-[active=true]:!bg-transparent"
             />
           ))}
       </ul>
@@ -148,7 +148,7 @@ export function Header({
           <NavbarLinkItem
             key={i}
             item={item}
-            className="font-light text-black bg-transparent shadow-none text-[13px] hover:!text-[#757575] hover:!font-medium hover:!text-black hover:!bg-transparent !w-auto max-lg:hidden"
+            className="font-light text-black dark:text-white bg-transparent shadow-none text-[13px] dark:hover:!text-[#454545] hover:!text-[#757575] hover:!font-medium hover:!text-black hover:!bg-transparent !w-auto max-lg:hidden"
           />
         ))}
         <Menu className="lg:hidden">
@@ -159,7 +159,7 @@ export function Header({
           >
             <ChevronDown className="size-3 transition-transform duration-300 group-data-[state=open]:rotate-180" />
           </MenuTrigger>
-          <MenuContent className="sm:flex-row sm:items-center sm:justify-end bg-white">
+          <MenuContent className="sm:flex-row sm:items-center sm:justify-end bg-white dark:bg-black">
             {menuItems
               .filter((item) => !isSecondary(item))
               .map((item, i) => (
@@ -220,7 +220,7 @@ function NavbarLinkItem({
             <>
               {banner}
               <p className="text-[16px] font-light">{child.text}</p>
-              <p className="text-[14px] font-light text-black empty:hidden">
+              <p className="text-[14px] font-light text-black dark:text-white empty:hidden">
                 {child.description}
               </p>
             </>

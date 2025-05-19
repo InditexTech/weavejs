@@ -18,7 +18,7 @@ import type {
   NavigationMenuContentProps,
   NavigationMenuTriggerProps,
 } from "@radix-ui/react-navigation-menu";
-import { buttonVariants } from "@/components/ui/button";
+import { buttonVariants } from "fumadocs-ui/components/ui/button";
 
 const navItemVariants = cva(
   "inline-flex items-center gap-1 p-2 text-fd-muted-foreground transition-colors hover:text-fd-accent-foreground data-[active=true]:text-fd-primary [&_svg]:size-4"
@@ -36,7 +36,8 @@ export function Navbar(props: ComponentProps<"div">) {
         className={cn(
           "fixed top-(--fd-banner-height) z-40 box-content backdrop-blur-lg max-w-fd-container -translate-x-1/2 border-b transition-colors lg:mt-[16px] lg:[--fd-padding:1rem] lg:rounded-none lg:border",
           value.length > 0 ? "shadow-none" : "shadow-none",
-          (!isTransparent || value.length > 0) && "bg-white",
+          (!isTransparent || value.length > 0) &&
+            "bg-white/50 dark:bg-black/50",
           props.className
         )}
         style={
@@ -93,7 +94,7 @@ export function NavbarMenuLink(props: LinkProps) {
       <Link
         {...props}
         className={cn(
-          "flex flex-col gap-2 rounded-none border bg-white p-3 transition-colors hover:bg-[#ededed] hover:text-fd-accent-foreground",
+          "flex flex-col gap-2 rounded-none border bg-white dark:bg-black p-3 transition-colors hover:bg-[#ededed] dark:hover:bg-[#454545] hover:text-fd-accent-foreground",
           props.className
         )}
       >
