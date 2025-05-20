@@ -26,7 +26,7 @@ SPDX-License-Identifier: Apache-2.0
 <h3 align="center">Weave.js</h3>
 
   <p align="center">
-    Build online whiteboard applications like Excalidraw, Miro, Canva, or Figma!
+    Build visual collaborative tools like Excalidraw, Miro, Canva, Figma or others!
     <br />
     <a href="https://github.com/InditexTech/weavejs"><strong>Explore the docs »</strong></a>
     <br />
