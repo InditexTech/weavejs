@@ -4,7 +4,7 @@ import {
   ComponentIcon,
   Database,
   Pencil,
-  Server,
+  Blocks,
   AppWindow,
 } from "lucide-react";
 import Logo from "@/public/images/logo.png";
@@ -35,7 +35,7 @@ export const baseOptions: BaseLayoutProps = {
     title: (
       <>
         {logo}
-        <span className="font-medium [.uwu_&]:hidden [header_&]:text-[15px]">
+        <span className="font-light [.uwu_&]:hidden [header_&]:text-[20px]">
           Weave.js
         </span>
       </>
@@ -45,7 +45,7 @@ export const baseOptions: BaseLayoutProps = {
   links: [
     {
       type: "menu",
-      text: "Documentation",
+      text: "DOCUMENTATION",
       url: "/docs/main",
       items: [
         {
@@ -65,46 +65,46 @@ export const baseOptions: BaseLayoutProps = {
             ),
             className: "md:row-span-2",
           },
-          icon: <Book />,
+          icon: <Book strokeWidth={1} />,
           text: "Getting Started",
-          description: "Learn to use Weave.js, and start your project asap.",
+          description: "Learn how to start your project with Weave.js",
           url: "/docs/main/quickstart",
         },
         {
-          icon: <ComponentIcon />,
+          icon: <ComponentIcon strokeWidth={1} />,
           text: "Nodes",
           description:
-            "Visual elements that can be added to the canvas. Use the provided ones or build your own.",
+            "Core building blocks of the collaborative interface: lines, rectangles, text, images, frames, etc. Use the provided ones or build your own.",
           url: "/docs/main/build/nodes",
           menu: {
             className: "lg:col-start-2",
           },
         },
         {
-          icon: <Server />,
+          icon: <Blocks strokeWidth={1} />,
           text: "Plugins",
           description:
-            "Add extra functionality to the canvas. Empower your visual collaborative tool.",
+            "Extend and enhance the functionality of Weave.js. Add behavior to the canvas in a lightweight, composable, and easy way.",
           url: "/docs/main/build/plugins",
           menu: {
             className: "lg:col-start-2",
           },
         },
         {
-          icon: <Pencil />,
+          icon: <Pencil strokeWidth={1} />,
           text: "Actions",
           description:
-            "Learn how to handle user interactions. Make the dream UX for your visual collaborative tool.",
+            "Handle user interactions and user-driven changes. Actions provide a structured, trackable way to make your visual tool truly collaborative.",
           url: "/docs/main/build/actions",
           menu: {
             className: "lg:col-start-3 lg:row-start-1",
           },
         },
         {
-          icon: <Database />,
+          icon: <Database strokeWidth={1} />,
           text: "Stores",
           description:
-            "Real-time sharing of the shared-state among peers a reality. Persistence, awareness & undo-redo support. Simple and easy.",
+            "Stores allow keeping users in sync. They manage changes and the state of the canvas in real time. Simple and easy.",
           url: "/docs/main/build/stores",
           menu: {
             className: "lg:col-start-3",
@@ -114,21 +114,10 @@ export const baseOptions: BaseLayoutProps = {
     },
     {
       icon: <AppWindow />,
-      text: "Demo",
+      text: "DEMO",
       url: "https://weavejs.cloud.inditex.com",
       external: true,
     },
-    // {
-    //   type: "icon",
-    //   url: "https://github.com/InditexTech/weavejs",
-    //   text: "Github",
-    //   icon: (
-    //     <svg role="img" viewBox="0 0 24 24" fill="currentColor">
-    //       <path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12" />
-    //     </svg>
-    //   ),
-    //   external: true,
-    // },
   ],
   githubUrl: "https://github.com/InditexTech/weavejs",
 };
