@@ -20,6 +20,7 @@ import {
   clearContainerTargets,
   moveNodeToContainer,
 } from '@/utils';
+import type { WeaveNodesSnappingPlugin } from '@/plugins/nodes-snapping/nodes-snapping';
 
 export abstract class WeaveNode implements WeaveNodeBase {
   protected instance!: Weave;
@@ -76,6 +77,29 @@ export abstract class WeaveNode implements WeaveNodeBase {
     return selected;
   }
 
+  private scaleReset(node: Konva.Node) {
+    // for lines, adjust points to scale
+    if (node.getAttrs().nodeType === 'line') {
+      const lineNode = node as Konva.Line;
+      const oldPoints = lineNode.points();
+      const newPoints = [];
+      for (let i = 0; i < oldPoints.length / 2; i++) {
+        const point = {
+          x: oldPoints[i * 2] * lineNode.scaleX(),
+          y: oldPoints[i * 2 + 1] * lineNode.scaleY(),
+        };
+        newPoints.push(point.x, point.y);
+      }
+      lineNode.points(newPoints);
+    }
+    // adjust size to scale and set minimal size
+    node.width(Math.max(5, node.width() * node.scaleX()));
+    node.height(Math.max(5, node.height() * node.scaleY()));
+    // reset scale to 1
+    node.scaleX(1);
+    node.scaleY(1);
+  }
+
   setupDefaultNodeEvents(node: Konva.Node): void {
     this.previousPointer = null;
 
@@ -89,6 +113,48 @@ export abstract class WeaveNode implements WeaveNodeBase {
         node.draggable(false);
       }
     );
+
+    node.on('transform', (e) => {
+      const node = e.target;
+
+      const nodesSnappingPlugin =
+        this.instance.getPlugin<WeaveNodesSnappingPlugin>('nodesSnapping');
+
+      if (
+        nodesSnappingPlugin &&
+        this.isSelecting() &&
+        this.isNodeSelected(node)
+      ) {
+        nodesSnappingPlugin.evaluateGuidelines(e);
+      }
+
+      if (this.isSelecting() && this.isNodeSelected(node)) {
+        this.scaleReset(node);
+
+        const nodeHandler = this.instance.getNodeHandler<WeaveNode>(
+          node.getAttrs().nodeType
+        );
+        this.instance.updateNode(
+          nodeHandler.serialize(node as WeaveElementInstance)
+        );
+        e.cancelBubble = true;
+      }
+    });
+
+    node.on('transformend', (e) => {
+      const node = e.target;
+
+      const nodesSnappingPlugin =
+        this.instance.getPlugin<WeaveNodesSnappingPlugin>('nodesSnapping');
+
+      if (
+        nodesSnappingPlugin &&
+        this.isSelecting() &&
+        this.isNodeSelected(node)
+      ) {
+        nodesSnappingPlugin.cleanupEvaluateGuidelines();
+      }
+    });
 
     node.on('dragmove', (e) => {
       if (this.isSelecting() && this.isNodeSelected(node)) {
