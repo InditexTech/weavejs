@@ -183,13 +183,30 @@ export class WeaveCopyPasteNodesPlugin extends WeavePlugin {
     this.state = state;
   }
 
+  private recursivelyUpdateKeys(nodes: WeaveStateElement[]) {
+    for (const child of nodes) {
+      const newNodeId = uuidv4();
+      child.key = newNodeId;
+      child.props.id = newNodeId;
+      if (child.props.children) {
+        this.recursivelyUpdateKeys(child.props.children);
+      }
+    }
+  }
+
   private handlePaste() {
     if (this.toPaste) {
       const { mousePoint, container } = this.instance.getMousePointer();
 
       for (const element of Object.keys(this.toPaste.weave)) {
         const node = this.toPaste.weave[element];
+
+        if (node.props.children) {
+          this.recursivelyUpdateKeys(node.props.children);
+        }
+
         const newNodeId = uuidv4();
+        delete node.props.containerId;
         node.key = newNodeId;
         node.props.id = newNodeId;
         node.props.x =
