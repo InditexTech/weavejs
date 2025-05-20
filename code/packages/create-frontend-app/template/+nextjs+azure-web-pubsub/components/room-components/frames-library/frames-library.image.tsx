@@ -16,10 +16,13 @@ export const FrameImage = ({ node }: Readonly<FrameImageProps>) => {
 
   React.useEffect(() => {
     const loadImage = async () => {
+      if (!instance) return;
+
+      const stage = instance.getStage();
       const nodeAttrs = node.getAttrs();
       try {
         // const box = frameInternal.getClientRect({ relativeTo: stage });
-        const frameBg = node.findOne(`#${nodeAttrs.id}-bg`) as Konva.Group;
+        const frameBg = stage.findOne(`#${nodeAttrs.id}-bg`) as Konva.Group;
         if (!frameBg) {
           return;
         }
@@ -34,10 +37,10 @@ export const FrameImage = ({ node }: Readonly<FrameImageProps>) => {
         setImage(
           <Image
             src={img.src}
-            width={320}
-            height={225}
+            width={1920}
+            height={1080}
             alt="A frame image"
-            className="object-fit w-full h-full"
+            className="w-auto h-full"
           />
         );
       } catch (ex) {

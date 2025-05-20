@@ -8,33 +8,6 @@ export type PresentationImage = {
   alt: string;
 };
 
-export const loadImage = async (node: Konva.Node) => {
-  const nodeAttrs = node.getAttrs();
-  try {
-    const frameBg = node.findOne(`#${nodeAttrs.id}-bg`) as Konva.Group;
-    if (!frameBg) {
-      return;
-    }
-    const boxBg = frameBg.getClientRect();
-    const img = await toImageAsync(node, {
-      x: boxBg.x + 4,
-      y: boxBg.y + 4,
-      pixelRatio: 2,
-      width: boxBg.width - 8,
-      height: boxBg.height - 8,
-    });
-    return {
-      src: img.src,
-      width: img.width,
-      height: img.height,
-      alt: 'A frame image',
-      className: 'object-fit w-full h-full',
-    };
-  } catch (ex) {
-    console.error(ex);
-  }
-};
-
 export const toImageAsync = (
   node: Konva.Node,
   properties: {
@@ -54,6 +27,7 @@ export const toImageAsync = (
       y: properties.y,
       width: properties.width,
       height: properties.height,
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       callback(img: any) {
         resolve(img);
       },
@@ -61,11 +35,16 @@ export const toImageAsync = (
   });
 };
 
-export async function generatePresentation(framesAvailable: Konva.Node[]) {
+export async function generatePresentation(
+  instance: Weave,
+  framesAvailable: Konva.Node[]
+) {
+  const stage = instance.getStage();
+
   const images: PresentationImage[] = [];
   for (const frame of framesAvailable) {
     const attrs = frame.getAttrs();
-    const frameBg = frame.findOne(`#${attrs.id}-bg`) as Konva.Group;
+    const frameBg = stage.findOne(`#${attrs.id}-bg`) as Konva.Group;
     const boxBg = frameBg.getClientRect();
     const img = await toImageAsync(frame, {
       pixelRatio: 4,
