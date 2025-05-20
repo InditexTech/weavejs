@@ -9,7 +9,8 @@ import {
 } from "lucide-react";
 import Logo from "@/public/images/logo.png";
 import Image from "next/image";
-import Preview from "@/public/placeholder.png";
+import MenuImage from "@/public/images/menu_image.png";
+import MenuDarkImage from "@/public/images/menu_image_dark.png";
 
 export const logo = (
   <>
@@ -53,12 +54,21 @@ export const baseOptions: BaseLayoutProps = {
             banner: (
               <div className="-mx-3 -mt-3">
                 <Image
-                  src={Preview}
-                  alt="Preview"
-                  className="rounded-t-lg object-cover w-full h-[200px]"
+                  src={MenuImage}
+                  alt="Getting started"
+                  className="block dark:hidden rounded-t-lg object-cover w-full h-[200px]"
                   style={{
                     maskImage:
-                      "linear-gradient(to bottom,white 60%,transparent)",
+                      "linear-gradient(to bottom, white 70%, transparent)",
+                  }}
+                />
+                <Image
+                  src={MenuDarkImage}
+                  alt="Getting started"
+                  className="hidden dark:block rounded-t-lg object-cover w-full h-[200px]"
+                  style={{
+                    maskImage:
+                      "linear-gradient(to bottom, white 70%, transparent)",
                   }}
                 />
               </div>
