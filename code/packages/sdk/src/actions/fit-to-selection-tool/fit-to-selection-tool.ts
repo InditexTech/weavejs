@@ -6,6 +6,7 @@ import { WeaveAction } from '@/actions/action';
 import { WeaveNodesSelectionPlugin } from '@/plugins/nodes-selection/nodes-selection';
 import { WeaveStageZoomPlugin } from '@/plugins/stage-zoom/stage-zoom';
 import { type WeaveFitToSelectionToolActionParams } from './types';
+import { FIT_TO_SELECTION_TOOL_ACTION_NAME } from './constants';
 
 export class WeaveFitToSelectionToolAction extends WeaveAction {
   protected previousAction!: string;
@@ -13,7 +14,7 @@ export class WeaveFitToSelectionToolAction extends WeaveAction {
   onPropsChange = undefined;
 
   getName(): string {
-    return 'fitToSelectionTool';
+    return FIT_TO_SELECTION_TOOL_ACTION_NAME;
   }
 
   private getNodesSelectionPlugin() {

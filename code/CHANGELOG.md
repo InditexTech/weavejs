@@ -16,6 +16,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 - [#235](https://github.com/InditexTech/weavejs/issues/235) Frame copy / paste not cloning internal nodes
+- [#240](https://github.com/InditexTech/weavejs/issues/240) Fix text node quirks
 
 ## [0.14.0] - 2025-05-20
 

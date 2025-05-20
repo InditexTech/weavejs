@@ -8,7 +8,7 @@ import { type Vector2d } from 'konva/lib/types';
 import { type WeaveElementInstance } from '@inditextech/weave-types';
 import { WeaveAction } from '@/actions/action';
 import { type WeavePenToolActionState } from './types';
-import { PEN_TOOL_STATE } from './constants';
+import { PEN_TOOL_ACTION_NAME, PEN_TOOL_STATE } from './constants';
 import { WeaveNodesSelectionPlugin } from '@/plugins/nodes-selection/nodes-selection';
 import type { WeaveLineNode } from '@/nodes/line/line';
 
@@ -43,7 +43,7 @@ export class WeavePenToolAction extends WeaveAction {
   }
 
   getName(): string {
-    return 'penTool';
+    return PEN_TOOL_ACTION_NAME;
   }
 
   initProps() {
@@ -58,11 +58,17 @@ export class WeavePenToolAction extends WeaveAction {
     const stage = this.instance.getStage();
 
     stage.container().addEventListener('keydown', (e) => {
-      if (e.key === 'Enter') {
+      if (
+        e.key === 'Enter' &&
+        this.instance.getActiveAction() === PEN_TOOL_ACTION_NAME
+      ) {
         this.cancelAction();
         return;
       }
-      if (e.key === 'Escape') {
+      if (
+        e.key === 'Escape' &&
+        this.instance.getActiveAction() === PEN_TOOL_ACTION_NAME
+      ) {
         this.cancelAction();
         return;
       }

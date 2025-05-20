@@ -5,6 +5,7 @@
 import { WeaveAction } from '@/actions/action';
 import { WeaveStageZoomPlugin } from '@/plugins/stage-zoom/stage-zoom';
 import { type WeaveFitToScreenToolActionParams } from './types';
+import { FIT_TO_SCREEN_TOOL_ACTION_NAME } from './constants';
 
 export class WeaveFitToScreenToolAction extends WeaveAction {
   protected previousAction!: string;
@@ -12,7 +13,7 @@ export class WeaveFitToScreenToolAction extends WeaveAction {
   onPropsChange = undefined;
 
   getName(): string {
-    return 'fitToScreenTool';
+    return FIT_TO_SCREEN_TOOL_ACTION_NAME;
   }
 
   private getStageZoomPlugin() {

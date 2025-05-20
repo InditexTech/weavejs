@@ -53,7 +53,10 @@ export class WeaveFrameToolAction extends WeaveAction {
     const stage = this.instance.getStage();
 
     stage.container().addEventListener('keydown', (e) => {
-      if (e.key === 'Escape') {
+      if (
+        e.key === 'Escape' &&
+        this.instance.getActiveAction() === FRAME_TOOL_ACTION_NAME
+      ) {
         this.cancelAction();
         return;
       }

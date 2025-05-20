@@ -6,7 +6,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { WeaveAction } from '@/actions/action';
 import { type Vector2d } from 'konva/lib/types';
 import { type WeaveTextToolActionState } from './types';
-import { TEXT_TOOL_STATE } from './constants';
+import { TEXT_TOOL_ACTION_NAME, TEXT_TOOL_STATE } from './constants';
 import Konva from 'konva';
 import { WeaveNodesSelectionPlugin } from '@/plugins/nodes-selection/nodes-selection';
 import type { WeaveTextNode } from '@/nodes/text/text';
@@ -34,14 +34,17 @@ export class WeaveTextToolAction extends WeaveAction {
   }
 
   getName(): string {
-    return 'textTool';
+    return TEXT_TOOL_ACTION_NAME;
   }
 
   private setupEvents() {
     const stage = this.instance.getStage();
 
     stage.container().addEventListener('keydown', (e) => {
-      if (e.key === 'Escape') {
+      if (
+        e.key === 'Escape' &&
+        this.instance.getActiveAction() === TEXT_TOOL_ACTION_NAME
+      ) {
         this.cancelAction();
         return;
       }

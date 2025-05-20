@@ -11,6 +11,7 @@ import {
 } from '@inditextech/weave-types';
 import { type WeaveExportNodeActionParams } from './types';
 import { WeaveAction } from '../action';
+import { EXPORT_NODE_TOOL_ACTION_NAME } from './constants';
 
 export class WeaveExportNodeToolAction extends WeaveAction {
   protected cancelAction!: () => void;
@@ -26,7 +27,7 @@ export class WeaveExportNodeToolAction extends WeaveAction {
   onInit = undefined;
 
   getName(): string {
-    return 'exportNodeTool';
+    return EXPORT_NODE_TOOL_ACTION_NAME;
   }
 
   private async exportNode(node: WeaveElementInstance) {

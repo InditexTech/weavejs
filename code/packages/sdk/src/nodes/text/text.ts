@@ -13,6 +13,7 @@ import { type Vector2d } from 'konva/lib/types';
 import { WeaveNodesSelectionPlugin } from '@/plugins/nodes-selection/nodes-selection';
 import { resetScale } from '@/utils';
 import { WEAVE_TEXT_NODE_TYPE } from './constants';
+import { SELECTION_TOOL_ACTION_NAME } from '@/actions/selection-tool/constants';
 
 export class WeaveTextNode extends WeaveNode {
   protected nodeType: string = WEAVE_TEXT_NODE_TYPE;
@@ -40,30 +41,32 @@ export class WeaveTextNode extends WeaveNode {
     this.setupDefaultNodeEvents(text);
 
     window.addEventListener('keypress', (e) => {
-      if (this.editing) {
-        return;
-      }
+      if (
+        e.key === 'Enter' &&
+        this.instance.getActiveAction() === SELECTION_TOOL_ACTION_NAME &&
+        !this.editing
+      ) {
+        e.preventDefault();
 
-      if (e.key !== 'Enter' && !e.shiftKey) {
-        return;
-      }
-
-      if (this.isSelecting() && this.isNodeSelected(text)) {
-        const nodesSelectionPlugin =
-          this.instance.getPlugin<WeaveNodesSelectionPlugin>('nodesSelection');
-        if (
-          nodesSelectionPlugin &&
-          nodesSelectionPlugin.getSelectedNodes().length === 1 &&
-          nodesSelectionPlugin.getSelectedNodes()[0].getAttrs().nodeType ===
-            WEAVE_TEXT_NODE_TYPE &&
-          !window.weaveTextEditing[
-            nodesSelectionPlugin.getSelectedNodes()[0].id()
-          ]
-        ) {
-          e.preventDefault();
-          this.triggerEditMode(
-            nodesSelectionPlugin.getSelectedNodes()[0] as Konva.Text
-          );
+        if (this.isSelecting() && this.isNodeSelected(text)) {
+          const nodesSelectionPlugin =
+            this.instance.getPlugin<WeaveNodesSelectionPlugin>(
+              'nodesSelection'
+            );
+          if (
+            nodesSelectionPlugin &&
+            nodesSelectionPlugin.getSelectedNodes().length === 1 &&
+            nodesSelectionPlugin.getSelectedNodes()[0].getAttrs().nodeType ===
+              WEAVE_TEXT_NODE_TYPE &&
+            !window.weaveTextEditing[
+              nodesSelectionPlugin.getSelectedNodes()[0].id()
+            ]
+          ) {
+            e.preventDefault();
+            this.triggerEditMode(
+              nodesSelectionPlugin.getSelectedNodes()[0] as Konva.Text
+            );
+          }
         }
       }
     });
@@ -221,8 +224,6 @@ export class WeaveTextNode extends WeaveNode {
     textArea.style.fontSize =
       textNode.fontSize() * textNode.getAbsoluteScale().x + 'px';
     textArea.style.border = 'solid 1px #1e40af';
-    // textArea.style.padding = '0px';
-    // textArea.style.paddingTop = '0.1em';
     textArea.style.minHeight = 'auto';
     textArea.style.margin = '0px';
     textArea.style.overflow = 'hidden';
@@ -250,9 +251,6 @@ export class WeaveTextNode extends WeaveNode {
       textArea.style.height =
         textArea.scrollHeight + 1.6 * textNode.getAbsoluteScale().x + 'px';
     };
-    textArea.onwheel = (e) => {
-      e.preventDefault();
-    };
     textArea.oninput = () => {
       textArea.style.height = 'auto';
       textArea.style.height =
@@ -265,7 +263,7 @@ export class WeaveTextNode extends WeaveNode {
     }
 
     const px = 0;
-    const py = -3 * textNode.getAbsoluteScale().x;
+    const py = -3 * stage.scaleY();
     transform += 'translateX(' + px + 'px)';
     transform += 'translateY(' + py + 'px)';
 
@@ -273,49 +271,27 @@ export class WeaveTextNode extends WeaveNode {
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const handleKeyDown = (e: any) => {
-      if (textArea && textNode) {
-        if (e.key === 'Enter') {
-          if (textArea && textNode) {
-            try {
-              textNode.text(textArea.value);
-              textArea.style.width =
-                textNode.width() * textNode.getAbsoluteScale().x + 'px';
-              textArea.style.height = 'auto';
-              textArea.style.height =
-                textArea.scrollHeight +
-                1.6 * textNode.getAbsoluteScale().x +
-                'px';
-              textArea.tabIndex = 1;
-              textArea.focus();
-            } catch (ex) {
-              console.error(ex);
-            }
-          }
-          return;
-        }
-        // save changes
-        if (e.key === 'Escape') {
-          textNode.width(
-            parseFloat(textArea.style.width) *
-              (1 / textNode.getAbsoluteScale().x)
-          );
-          textNode.height(
-            (textArea.scrollHeight + 1.6) * (1 / textNode.getAbsoluteScale().x)
-          );
-          textNode.text(textArea.value);
-          this.updateNode(textNode);
-          this.removeTextAreaDOM(textNode);
-          this.instance.removeEventListener(
-            'onZoomChange',
-            this.onZoomChangeHandler(textNode).bind(this)
-          );
-          this.instance.removeEventListener(
-            'onStageMove',
-            this.onStageMoveHandler(textNode).bind(this)
-          );
-          window.removeEventListener('click', handleOutsideClick);
-          return;
-        }
+      e.stopPropagation();
+      if (textArea && textNode && e.key === 'Escape') {
+        textNode.width(
+          parseFloat(textArea.style.width) * (1 / textNode.getAbsoluteScale().x)
+        );
+        textNode.height(
+          (textArea.scrollHeight + 1.6) * (1 / textNode.getAbsoluteScale().x)
+        );
+        textNode.text(textArea.value);
+        this.updateNode(textNode);
+        this.removeTextAreaDOM(textNode);
+        this.instance.removeEventListener(
+          'onZoomChange',
+          this.onZoomChangeHandler(textNode).bind(this)
+        );
+        this.instance.removeEventListener(
+          'onStageMove',
+          this.onStageMoveHandler(textNode).bind(this)
+        );
+        window.removeEventListener('click', handleOutsideClick);
+        return;
       }
     };
 

@@ -2,8 +2,10 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
+export const BRUSH_TOOL_ACTION_NAME = 'brushTool';
+
 export const BRUSH_TOOL_STATE = {
-  ["INACTIVE"]: "inactive",
-  ["IDLE"]: "idle",
-  ["DEFINE_STROKE"]: "defineStroke",
+  ['INACTIVE']: 'inactive',
+  ['IDLE']: 'idle',
+  ['DEFINE_STROKE']: 'defineStroke',
 } as const;
