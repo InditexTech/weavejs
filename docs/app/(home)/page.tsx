@@ -1,10 +1,8 @@
-import type { HTMLAttributes, ReactNode } from "react";
 import React from "react";
 import { cva } from "class-variance-authority";
 import { cn } from "@/lib/utils";
 import Image from "next/image";
-// import ArchImg from "./arch.png";
-import PlaceholderImg from "./placeholder.png";
+import GithubImg from "@/public/images/github.png";
 import {
   Accordion,
   AccordionContent,
@@ -12,29 +10,25 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import { CodeBlock } from "@/components/ui/code-block";
-// import Threads from "@/src/Backgrounds/Threads/Threads";
 import { LinkButton, PreviewImages } from "./page.client";
-// import Feature1Img from "./feature.1.png";
-// import Feature2Img from "./feature.2.png";
+import { Architecture, Features } from "./page-components";
 
 export default function HomePage() {
   return (
     <>
-      {/* <div className="absolute left-0 top-0 right-0 h-screen z-1">
-        <Threads amplitude={2} distance={0} enableMouseInteraction={false} />
-      </div> */}
       <main className="container relative max-w-[1400px] py-4 z-[2] lg:py-0">
         <div className="flex flex-col justify-start items-center">
           <div className="max-w-[1200px] relative w-full flex justify-center items-center">
             <Hero />
           </div>
           <Architecture />
+          <GetStarted />
           <OpenSource />
           <Features />
           <Faq />
-          <End />
         </div>
       </main>
+      <End />
     </>
   );
 }
@@ -50,7 +44,7 @@ function Hero() {
           Build collaborative canvas applications
         </span>
       </h1>
-      <p className="mb-8 !font-light leading-[28px] text-black dark:text-white md:text-[20px]">
+      <p className="mb-8 font-light leading-[28px] text-black dark:text-white md:text-[20px]">
         Created for developers, Weave.js is an open-source library that provides
         all the building blocks, plugins, and APIs to develop visual
         collaborative tools at the speed of light.
@@ -61,7 +55,7 @@ function Hero() {
           external
           variant="outline"
         >
-          Check the Demo
+          Open the Demo
         </LinkButton>
         <LinkButton href="/docs/main/quickstart" variant="default" style="main">
           Getting started
@@ -72,12 +66,12 @@ function Hero() {
   );
 }
 
-function Architecture() {
+function GetStarted() {
   return (
-    <div className="max-w-[1200px] rounded-b-md flex flex-col justify-center items-center gap-4 border-0 px-0 py-0 md:py-0 md:pt-[188px] lg:flex-col md:px-0">
+    <div className="max-w-[1200px] rounded-b-md flex flex-col justify-center items-center gap-4 border-0 px-0 pt-[128px] lg:flex-col md:px-0">
       <div>
         <h2 className="font-light text-[32px] leading-[40px] uppercase text-center">
-          Get started in three steps
+          Get started in three easy steps...
         </h2>
         <div className="mt-[16px] font-light text-[20px] leading-[28px] text-center">
           Weave.js toolset provides a complete canvas experience.
@@ -85,19 +79,12 @@ function Architecture() {
           Extend, customize and develop on top.
         </div>
       </div>
-      {/* <div className="mt-[24px]">
-        <Image
-          src={PlaceholderImg}
-          alt="Architecture"
-          className="ms-auto max-w-[450px] invert-0 dark:invert"
-        />
-      </div> */}
-      <div className="w-full grid grid-cols-1 gap-[80px] md:grid-cols-3 my-12 rounded-md overflow-hidden">
+      <div className="w-full px-3 md:px-0 grid grid-cols-1 gap-[80px] md:grid-cols-3 mt-12 rounded-md overflow-hidden">
         <div className="bg-white dark:bg-black flex flex-col gap-3 justify-between items-start">
           <div className="flex flex-col gap-3">
             <div className={cn(badgeVariants())}>1</div>
             <h3 className="text-[20px] leading-[28px] font-light">
-              Create the backend.
+              Create the backend
             </h3>
             <p className="text-[16px] leading-[22px] font-light md:min-h-[72px] ">
               Initialize the backend boilerplate server, using Express to handle
@@ -114,7 +101,7 @@ function Architecture() {
           <div className="flex flex-col gap-3">
             <div className={cn(badgeVariants())}>2</div>
             <h3 className="text-[20px] leading-[28px] font-light">
-              Create the frontend.
+              Create the frontend
             </h3>
             <p className="text-[16px] leading-[22px] font-light md:min-h-[72px]">
               Initialize the frontend application boilerplate, using Next.js as
@@ -130,7 +117,7 @@ function Architecture() {
         <div className="bg-white dark:bg-black flex flex-col gap-3 justify-between items-end">
           <div className="w-full flex flex-col gap-3">
             <div className={cn(badgeVariants())}>3</div>
-            <h3 className="text-[20px] leading-[28px] font-light">Build it.</h3>
+            <h3 className="text-[20px] leading-[28px] font-light">Build it</h3>
             <p className="text-[16px] leading-[22px] font-light md:min-h-[72px]">
               Unlock Weave.js full potential with nodes, plugins, actions, and
               stores. All while customizing the look & feel.
@@ -154,14 +141,23 @@ function Architecture() {
 function OpenSource() {
   return (
     <div className="w-full mt-[128px] py-[48px] border-black dark:border-white border-t-[1px] border-b-[1px] flex justify-center items-center">
-      <div className="max-w-[800px] flex flex-col gap-[24px]">
+      <div className="max-w-[800px] flex flex-col gap-[24px] justify-center items-center">
         <div className="text-center text-[48px] leading-[56px] font-light uppercase">
           Free & Open Source
         </div>
         <div className="text-center text-[20px] leading-[28px] font-light">
-          Loved by users
-          <br />
-          Built for developers
+          Weave.js is actively maintained and open for contributions.
+          <br /> It comes with best-in-class documentation and developer
+          experience.
+        </div>
+        <div>
+          <Image
+            src={GithubImg}
+            width={40}
+            height={40}
+            alt="Github logo"
+            className="ms-auto max-w-[450px] invert-0 dark:invert"
+          />
         </div>
         <div className="text-center">
           <LinkButton
@@ -178,164 +174,8 @@ function OpenSource() {
 }
 
 const badgeVariants = cva(
-  "inline-flex size-7 text-[16px] leading-[20px] font-light items-center justify-center rounded-full bg-black text-white"
+  "inline-flex size-7 text-[16px] leading-[20px] font-light items-center justify-center rounded-full bg-black text-white dark:bg-white dark:text-black"
 );
-
-function Features() {
-  return (
-    <div className="max-w-[1200px] mt-[128px] flex flex-col">
-      <div className="col-span-2">
-        <div className="text-center text-[32px] leading-[40px] font-light uppercase">
-          An e2e solution to build collaborative
-          <br />
-          whiteboard applications
-        </div>
-      </div>
-      <div className="w-full mt-[40px] grid grid-cols-1 gap-[80px] md:grid-cols-2">
-        <Feature
-          subheading="UI-agnostic"
-          heading="Integrates with the UI framework of your choice"
-          description={
-            <>
-              <span>
-                Change the UI using our included primitives or build a new one.
-                With Weave.js, you get a unified system that includes a
-                high-performance, fully customizable whiteboard so you can focus
-                on building the product.
-              </span>
-            </>
-          }
-          className="overflow-hidden"
-          href="/docs/main/what-is-weavejs"
-        >
-          <div className="w-full mb-0 flex flex-col justify-center items-center bg-[#d9d9d9] invert-0 dark:invert">
-            <Image
-              alt="UI Framework Agnostic"
-              src={PlaceholderImg}
-              sizes="800px"
-              className="w-full min-w-[400px] max-h-[400px] object-contain"
-            />
-          </div>
-        </Feature>
-        <Feature
-          subheading="Powerful abstractions"
-          heading="Made for developers"
-          description={
-            <>
-              <span>
-                Keep what you need, discard the rest, and build your own. Stores
-                handle the real-time sync complexity while nodes, plugins, and
-                actions allow for selection, drawing, erasing, creating
-                geometric shapes, and perfect freehand drawing to smooth
-                development.
-              </span>
-            </>
-          }
-          href="/docs/main/build"
-        >
-          <div className="w-full mb-0 flex flex-col justify-center items-center bg-[#d9d9d9] invert-0 dark:invert">
-            <Image
-              alt="Powerful Abstractions"
-              src={PlaceholderImg}
-              sizes="800px"
-              className="w-full min-w-[400px] max-h-[400px] object-contain"
-            />
-          </div>
-        </Feature>
-        <Feature
-          subheading="React Helper library"
-          heading="Easy integration into React projects"
-          description={
-            <>
-              <span>
-                Our React Helper library provides all the necessary components
-                to easily integrate Weave.js on top of React projects.
-              </span>
-            </>
-          }
-          href="/docs/react"
-        >
-          <div className="w-full mb-0 flex flex-col justify-center items-center bg-[#d9d9d9] invert-0 dark:invert">
-            <Image
-              alt="Source"
-              src={PlaceholderImg}
-              sizes="600px"
-              className="w-full min-w-[400px] max-h-[400px] object-contain"
-            />
-          </div>
-        </Feature>
-        <Feature
-          subheading="Light & well-built"
-          heading="Fast rendering"
-          description={
-            <>
-              <span>
-                Weave.js uses Konva.js and React Reconciler under the hood to
-                make canvas&apos; real-time sync and rendering a breeze.
-              </span>
-            </>
-          }
-          href="/docs/react"
-        >
-          <div className="w-full mb-0 flex flex-col justify-center items-center bg-[#d9d9d9] invert-0 dark:invert">
-            <Image
-              alt="Source"
-              src={PlaceholderImg}
-              sizes="600px"
-              className="w-full min-w-[400px] max-h-[400px] object-contain"
-            />
-          </div>
-        </Feature>
-      </div>
-    </div>
-  );
-}
-
-function Feature({
-  className,
-  heading,
-  subheading,
-  description,
-  href,
-  external = false,
-  ...props
-}: HTMLAttributes<HTMLDivElement> & {
-  subheading: ReactNode;
-  heading: ReactNode;
-  description: ReactNode;
-  href: string;
-  external?: boolean;
-}): React.ReactElement {
-  return (
-    <div
-      className={cn("rounded-md border-0 dark:bg-black", className)}
-      {...props}
-    >
-      {props.children}
-      <div className="p-0">
-        <div className="mt-[16px] inline-flex items-center gap-2 text-[11px] font-light leading-[16px] uppercase">
-          <p>{subheading}</p>
-        </div>
-        <h2 className="mt-[8px] text-[20px] font-light leading-[28px]">
-          {heading}
-        </h2>
-        <p className="mt-[16px] text-[16px] font-light leading-[22px]">
-          {description}
-        </p>
-        <div className="w-full text-left mt-[16px]">
-          <LinkButton
-            href={href}
-            external={external}
-            variant="link"
-            className="!px-[0px]"
-          >
-            Learn More
-          </LinkButton>
-        </div>
-      </div>
-    </div>
-  );
-}
 
 function Faq() {
   return (
@@ -397,7 +237,12 @@ function Faq() {
             Is Weave.js free to use and open source?
           </AccordionTrigger>
           <AccordionContent className="text-[16px] font-light leading-[22px] mt-[12px]">
-            TODO
+            Yes, Weave.js is free to use and open source. It is distributed
+            under the Apache 2.0 License, which means you can use, modify, and
+            distribute the software. When using Weave.js, remember to comply
+            with the license: simply provide a copy of the License, include the
+            required notices, and indicate any modifications you make to the
+            Weave.js code.
           </AccordionContent>
         </AccordionItem>
         <AccordionItem value="item-4" className="!border-b-0">
@@ -405,7 +250,9 @@ function Faq() {
             Can I use Weave.js in a commercial application?
           </AccordionTrigger>
           <AccordionContent className="text-[16px] font-light leading-[22px] mt-[12px]">
-            TODO
+            Yes, you can use Weave.js in a commercial application. The Apache
+            2.0 License is a permissive license that allows its use in all types
+            of applications.
           </AccordionContent>
         </AccordionItem>
         <AccordionItem value="item-5" className="!border-b-0">
@@ -428,7 +275,7 @@ function Faq() {
 
 function End() {
   return (
-    <div className="w-full my-[128px] py-[48px] flex justify-center items-center">
+    <div className="w-full my-[128px] mb-0 py-[128px] text-white bg-black dark:bg-white dark:text-black flex justify-center items-center">
       <div className="max-w-[800px] flex flex-col gap-[24px]">
         <div className="text-center text-[48px] leading-[56px] font-light uppercase">
           Get started in minutes
@@ -438,19 +285,8 @@ function End() {
           your own collaborative canvas in minutes.
         </div>
         <div className="text-center flex gap-[12px] justify-center items-center">
-          <LinkButton
-            href="https://weavejs.cloud.inditex.com"
-            external
-            variant="outline"
-          >
-            Check the Demo
-          </LinkButton>
-          <LinkButton
-            href="/docs/main/quickstart"
-            variant="default"
-            style="main"
-          >
-            Getting started
+          <LinkButton href="/docs/main/quickstart" variant="outline">
+            Go to Quickstart
           </LinkButton>
         </div>
       </div>

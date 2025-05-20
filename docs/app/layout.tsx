@@ -4,7 +4,7 @@ import { Inter } from "next/font/google";
 import type { ReactNode } from "react";
 
 const inter = Inter({
-  weight: ["300", "400", "500"],
+  weight: ["200", "300", "400", "500"],
   preload: true,
   variable: "--inter",
   subsets: ["latin"],

@@ -82,7 +82,13 @@ export function getLinks(
         url: githubUrl,
         text: "Github",
         label: "GitHub",
-        icon: <Github />,
+        icon: (
+          <Github
+            className="text-black dark:text-white hover:text-[#757575] dark:hover:text-[#bfbfbf]"
+            absoluteStrokeWidth
+            strokeWidth={1}
+          />
+        ),
         external: true,
       },
     ];
