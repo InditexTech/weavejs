@@ -37,7 +37,7 @@ function mapElementsToTree(
     return {
       id: element.key,
       icon: iconsMap[element.props.nodeType ?? 'rectangle'],
-      name: element.key,
+      name: element.props.nodeName ? element.props.nodeName : element.key,
       actions: [
         <div
           key="remove"

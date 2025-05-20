@@ -1,13 +1,9 @@
-// SPDX-FileCopyrightText: 2025 2025 INDUSTRIA DE DISEÑO TEXTIL S.A. (INDITEX S.A.)
-//
-// SPDX-License-Identifier: Apache-2.0
+'use client';
 
-"use client";
-
-import React from "react";
-import { ToolbarButton } from "../toolbar/toolbar-button";
-import { useMutation } from "@tanstack/react-query";
-import { postImage } from "@/api/post-image";
+import React from 'react';
+import { ToolbarButton } from '../toolbar/toolbar-button';
+import { useMutation } from '@tanstack/react-query';
+import { postImage } from '@/api/post-image';
 import {
   Brush,
   ImagePlus,
@@ -20,15 +16,15 @@ import {
   Tags,
   Undo,
   Redo,
-} from "lucide-react";
-import { useWeave } from "@inditextech/weave-react";
-import { Toolbar } from "../toolbar/toolbar";
-import { motion } from "framer-motion";
-import { topElementVariants } from "./variants";
-import { useCollaborationRoom } from "@/store/store";
-import { ShortcutElement } from "../help/shortcut-element";
-import { SYSTEM_OS } from "@/lib/utils";
-import { useKeyboardHandler } from "../hooks/use-keyboard-handler";
+} from 'lucide-react';
+import { useWeave } from '@inditextech/weave-react';
+import { Toolbar } from '../toolbar/toolbar';
+import { motion } from 'framer-motion';
+import { topElementVariants } from './variants';
+import { useCollaborationRoom } from '@/store/store';
+import { ShortcutElement } from '../help/shortcut-element';
+import { SYSTEM_OS } from '@/lib/utils';
+import { useKeyboardHandler } from '../hooks/use-keyboard-handler';
 
 function ToolbarDivider() {
   return (
@@ -57,7 +53,7 @@ export function ToolsOverlay() {
 
   const mutationUpload = useMutation({
     mutationFn: async (file: File) => {
-      return await postImage(room ?? "", file);
+      return await postImage(room ?? '', file);
     },
   });
 
@@ -80,14 +76,14 @@ export function ToolsOverlay() {
   React.useEffect(() => {
     const onPasteExternalImage = async (item: ClipboardItem) => {
       let blob: Blob | null = null;
-      if (item.types.includes("image/png")) {
-        blob = await item.getType("image/png");
+      if (item.types.includes('image/png')) {
+        blob = await item.getType('image/png');
       }
-      if (item.types.includes("image/jpeg")) {
-        blob = await item.getType("image/jpeg");
+      if (item.types.includes('image/jpeg')) {
+        blob = await item.getType('image/jpeg');
       }
-      if (item.types.includes("image/gif")) {
-        blob = await item.getType("image/gif");
+      if (item.types.includes('image/gif')) {
+        blob = await item.getType('image/gif');
       }
 
       if (!blob) {
@@ -95,14 +91,14 @@ export function ToolsOverlay() {
       }
 
       setUploadingImage(true);
-      const file = new File([blob], "external.image");
+      const file = new File([blob], 'external.image');
       mutationUpload.mutate(file, {
         onSuccess: (data) => {
-          const room = data.fileName.split("/")[0];
-          const imageId = data.fileName.split("/")[1];
+          const room = data.fileName.split('/')[0];
+          const imageId = data.fileName.split('/')[1];
 
           const { finishUploadCallback } = instance?.triggerAction(
-            "imageTool"
+            'imageTool'
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
           ) as any;
 
@@ -111,7 +107,7 @@ export function ToolsOverlay() {
           );
         },
         onError: () => {
-          console.error("Error uploading image");
+          console.error('Error uploading image');
         },
         onSettled: () => {
           setUploadingImage(false);
@@ -120,12 +116,12 @@ export function ToolsOverlay() {
     };
 
     if (instance) {
-      instance.addEventListener("onPasteExternal", onPasteExternalImage);
+      instance.addEventListener('onPasteExternal', onPasteExternalImage);
     }
 
     return () => {
       if (instance) {
-        instance.removeEventListener("onPasteExternal", onPasteExternalImage);
+        instance.removeEventListener('onPasteExternal', onPasteExternalImage);
       }
     };
   }, [instance, mutationUpload, setShowSelectFileImage, setUploadingImage]);
@@ -146,15 +142,15 @@ export function ToolsOverlay() {
         <ToolbarButton
           className="rounded-full !w-[40px]"
           icon={<Hand className="px-2" size={40} strokeWidth={1} />}
-          active={actualAction === "moveTool"}
-          onClick={() => triggerTool("moveTool")}
+          active={actualAction === 'moveTool'}
+          onClick={() => triggerTool('moveTool')}
           label={
             <div className="flex gap-3 justify-start items-center">
               <p>Move</p>
               <ShortcutElement
                 shortcuts={{
-                  [SYSTEM_OS.MAC]: "M",
-                  [SYSTEM_OS.OTHER]: "M",
+                  [SYSTEM_OS.MAC]: 'M',
+                  [SYSTEM_OS.OTHER]: 'M',
                 }}
               />
             </div>
@@ -165,15 +161,15 @@ export function ToolsOverlay() {
         <ToolbarButton
           className="rounded-full !w-[40px]"
           icon={<MousePointer className="px-2" size={40} strokeWidth={1} />}
-          active={actualAction === "selectionTool"}
-          onClick={() => triggerTool("selectionTool")}
+          active={actualAction === 'selectionTool'}
+          onClick={() => triggerTool('selectionTool')}
           label={
             <div className="flex gap-3 justify-start items-center">
               <p>Selection</p>
               <ShortcutElement
                 shortcuts={{
-                  [SYSTEM_OS.MAC]: "S",
-                  [SYSTEM_OS.OTHER]: "S",
+                  [SYSTEM_OS.MAC]: 'S',
+                  [SYSTEM_OS.OTHER]: 'S',
                 }}
               />
             </div>
@@ -184,15 +180,15 @@ export function ToolsOverlay() {
         <ToolbarButton
           className="rounded-full !w-[40px]"
           icon={<Square className="px-2" size={40} strokeWidth={1} />}
-          active={actualAction === "rectangleTool"}
-          onClick={() => triggerTool("rectangleTool")}
+          active={actualAction === 'rectangleTool'}
+          onClick={() => triggerTool('rectangleTool')}
           label={
             <div className="flex gap-3 justify-start items-center">
               <p>Add a rectangle</p>
               <ShortcutElement
                 shortcuts={{
-                  [SYSTEM_OS.MAC]: "R",
-                  [SYSTEM_OS.OTHER]: "R",
+                  [SYSTEM_OS.MAC]: 'R',
+                  [SYSTEM_OS.OTHER]: 'R',
                 }}
               />
             </div>
@@ -203,15 +199,15 @@ export function ToolsOverlay() {
         <ToolbarButton
           className="rounded-full !w-[40px]"
           icon={<PenTool className="px-2" size={40} strokeWidth={1} />}
-          active={actualAction === "penTool"}
-          onClick={() => triggerTool("penTool")}
+          active={actualAction === 'penTool'}
+          onClick={() => triggerTool('penTool')}
           label={
             <div className="flex gap-3 justify-start items-center">
               <p>Add a line</p>
               <ShortcutElement
                 shortcuts={{
-                  [SYSTEM_OS.MAC]: "L",
-                  [SYSTEM_OS.OTHER]: "L",
+                  [SYSTEM_OS.MAC]: 'L',
+                  [SYSTEM_OS.OTHER]: 'L',
                 }}
               />
             </div>
@@ -222,15 +218,15 @@ export function ToolsOverlay() {
         <ToolbarButton
           className="rounded-full !w-[40px]"
           icon={<Brush className="px-2" size={40} strokeWidth={1} />}
-          active={actualAction === "brushTool"}
-          onClick={() => triggerTool("brushTool")}
+          active={actualAction === 'brushTool'}
+          onClick={() => triggerTool('brushTool')}
           label={
             <div className="flex gap-3 justify-start items-center">
               <p>Free draw</p>
               <ShortcutElement
                 shortcuts={{
-                  [SYSTEM_OS.MAC]: "B",
-                  [SYSTEM_OS.OTHER]: "B",
+                  [SYSTEM_OS.MAC]: 'B',
+                  [SYSTEM_OS.OTHER]: 'B',
                 }}
               />
             </div>
@@ -241,15 +237,15 @@ export function ToolsOverlay() {
         <ToolbarButton
           className="rounded-full !w-[40px]"
           icon={<Type className="px-2" size={40} strokeWidth={1} />}
-          active={actualAction === "textTool"}
-          onClick={() => triggerTool("textTool")}
+          active={actualAction === 'textTool'}
+          onClick={() => triggerTool('textTool')}
           label={
             <div className="flex gap-3 justify-start items-center">
               <p>Add text</p>
               <ShortcutElement
                 shortcuts={{
-                  [SYSTEM_OS.MAC]: "T",
-                  [SYSTEM_OS.OTHER]: "t",
+                  [SYSTEM_OS.MAC]: 'T',
+                  [SYSTEM_OS.OTHER]: 't',
                 }}
               />
             </div>
@@ -260,9 +256,9 @@ export function ToolsOverlay() {
         <ToolbarButton
           className="rounded-full !w-[40px]"
           icon={<ImagePlus className="px-2" size={40} strokeWidth={1} />}
-          active={actualAction === "imageTool"}
+          active={actualAction === 'imageTool'}
           onClick={() => {
-            triggerTool("imageTool");
+            triggerTool('imageTool');
             setShowSelectFileImage(true);
           }}
           label={
@@ -270,8 +266,8 @@ export function ToolsOverlay() {
               <p>Add an image</p>
               <ShortcutElement
                 shortcuts={{
-                  [SYSTEM_OS.MAC]: "I",
-                  [SYSTEM_OS.OTHER]: "I",
+                  [SYSTEM_OS.MAC]: 'I',
+                  [SYSTEM_OS.OTHER]: 'I',
                 }}
               />
             </div>
@@ -282,15 +278,15 @@ export function ToolsOverlay() {
         <ToolbarButton
           className="rounded-full !w-[40px]"
           icon={<Frame className="px-2" size={40} strokeWidth={1} />}
-          active={actualAction === "frameTool"}
-          onClick={() => triggerTool("frameTool", nodeCreateProps)}
+          active={actualAction === 'frameTool'}
+          onClick={() => triggerTool('frameTool', nodeCreateProps)}
           label={
             <div className="flex gap-3 justify-start items-center">
               <p>Add a frame</p>
               <ShortcutElement
                 shortcuts={{
-                  [SYSTEM_OS.MAC]: "F",
-                  [SYSTEM_OS.OTHER]: "F",
+                  [SYSTEM_OS.MAC]: 'F',
+                  [SYSTEM_OS.OTHER]: 'F',
                 }}
               />
             </div>
@@ -302,15 +298,15 @@ export function ToolsOverlay() {
         <ToolbarButton
           className="rounded-full !w-[40px]"
           icon={<Tags className="px-2" size={40} strokeWidth={1} />}
-          active={actualAction === "colorTokenTool"}
-          onClick={() => triggerTool("colorTokenTool")}
+          active={actualAction === 'colorTokenTool'}
+          onClick={() => triggerTool('colorTokenTool')}
           label={
             <div className="flex gap-3 justify-start items-center">
               <p>Add color token reference</p>
               <ShortcutElement
                 shortcuts={{
-                  [SYSTEM_OS.MAC]: "P",
-                  [SYSTEM_OS.OTHER]: "P",
+                  [SYSTEM_OS.MAC]: 'P',
+                  [SYSTEM_OS.OTHER]: 'P',
                 }}
               />
             </div>
@@ -334,8 +330,8 @@ export function ToolsOverlay() {
               <p>Undo latest changes</p>
               <ShortcutElement
                 shortcuts={{
-                  [SYSTEM_OS.MAC]: "⇧ ⌘ ,",
-                  [SYSTEM_OS.OTHER]: "⇧ Ctrl ,",
+                  [SYSTEM_OS.MAC]: '⇧ ⌘ ,',
+                  [SYSTEM_OS.OTHER]: '⇧ Ctrl ,',
                 }}
               />
             </div>
@@ -358,8 +354,8 @@ export function ToolsOverlay() {
               <p>Redo latest changes</p>
               <ShortcutElement
                 shortcuts={{
-                  [SYSTEM_OS.MAC]: "⇧ ⌘ .",
-                  [SYSTEM_OS.OTHER]: "⇧ Ctrl .",
+                  [SYSTEM_OS.MAC]: '⇧ ⌘ .',
+                  [SYSTEM_OS.OTHER]: '⇧ Ctrl .',
                 }}
               />
             </div>

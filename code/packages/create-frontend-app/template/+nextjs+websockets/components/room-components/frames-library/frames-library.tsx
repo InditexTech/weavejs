@@ -6,6 +6,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { useCollaborationRoom } from '@/store/store';
 import { useWeave } from '@inditextech/weave-react';
 import {
+  Loader2Icon,
   AlignStartHorizontal,
   Download,
   Presentation,
@@ -17,7 +18,7 @@ import {
   X,
   XIcon,
 } from 'lucide-react';
-import { toImageAsync } from './utils';
+import { generatePresentation, PresentationImage, toImageAsync } from './utils';
 import { FrameImage } from './frames-library.image';
 import { FramePresentationImage } from './frames-library.presentation-image';
 import { SIDEBAR_ELEMENTS } from '@/lib/constants';
@@ -44,6 +45,11 @@ export const FramesLibrary = () => {
 
   const [presentationMode, setPresentationMode] =
     React.useState<boolean>(false);
+  const [presentationImagesLoaded, setPresentationImagesLoaded] =
+    React.useState<boolean>(false);
+  const [presentationImages, setPresentationImages] = React.useState<
+    PresentationImage[]
+  >([]);
   const [actualFrame, setActualFrame] = React.useState<number>(0);
   const [selectedFrames, setSelectedFrames] = React.useState<string[]>([]);
 
@@ -150,14 +156,24 @@ export const FramesLibrary = () => {
     link.click();
   }, [instance, selectedFrames, framesAvailable]);
 
-  const actualNodePresentation = React.useMemo(() => {
-    const frameId = selectedFrames[actualFrame];
-    const node = framesAvailable.find((e) => e.getAttrs().id === frameId);
-    if (node) {
-      return node;
+  const actualImagePresentation = React.useMemo(() => {
+    return presentationImages[actualFrame];
+  }, [actualFrame, presentationImages]);
+
+  React.useEffect(() => {
+    async function setupPresentation() {
+      const images = await generatePresentation(framesAvailable);
+      setPresentationImages(images);
+      setPresentationImagesLoaded(true);
     }
-    return undefined;
-  }, [actualFrame, selectedFrames, framesAvailable]);
+
+    if (presentationMode && !presentationImagesLoaded) {
+      setupPresentation();
+    }
+    if (!presentationMode) {
+      setPresentationImagesLoaded(false);
+    }
+  }, [framesAvailable, presentationMode, presentationImagesLoaded]);
 
   if (!instance) {
     return null;
@@ -166,8 +182,6 @@ export const FramesLibrary = () => {
   if (sidebarLeftActive !== SIDEBAR_ELEMENTS.frames) {
     return null;
   }
-
-  console.log('AQUI?');
 
   return (
     <>
@@ -340,7 +354,7 @@ export const FramesLibrary = () => {
       </div>
       {presentationMode && (
         <div className="fixed z-10 top-0 left-0 right-0 bottom-0 bg-black flex flex-col gap-3 justify-center items-start">
-          <div className="absolute top-8 right-8 flex justify-end items-center p-1">
+          <div className="absolute top-[16px] right-[16px] flex justify-end items-center p-1">
             <div className="flex justify-end items-center bg-white">
               <button
                 className="cursor-pointer bg-transparent hover:bg-accent p-2"
@@ -352,59 +366,90 @@ export const FramesLibrary = () => {
               </button>
             </div>
           </div>
-          <div className="absolute bottom-8 left-8 right-8 flex justify-center items-center">
-            <div className="flex justify-center items-center  p-1">
-              <div className="flex justify-end items-center bg-white border border-zinc-200 p-1">
-                <button
-                  className="group cursor-pointer bg-transparent disabled:cursor-default hover:disabled:bg-transparent hover:bg-accent p-2"
-                  disabled={actualFrame === 0}
-                  onClick={() => {
-                    setActualFrame(0);
-                  }}
-                >
-                  <SkipBack className="group-disabled:text-accent" size={24} />
-                </button>
-                <button
-                  className="group cursor-pointer bg-transparent disabled:cursor-default hover:disabled:bg-transparent hover:bg-accent p-2"
-                  disabled={actualFrame === 0}
-                  onClick={() => {
-                    setActualFrame((prev) => prev - 1);
-                  }}
-                >
-                  <StepBack className="group-disabled:text-accent" size={24} />
-                </button>
-                <button
-                  className="group cursor-pointer bg-transparent disabled:cursor-default hover:disabled:bg-transparent hover:bg-accent p-2"
-                  disabled={actualFrame === selectedFrames.length - 1}
-                  onClick={() => {
-                    setActualFrame((prev) => prev + 1);
-                  }}
-                >
-                  <StepForward
-                    className="group-disabled:text-accent"
-                    size={24}
-                  />
-                </button>
-                <button
-                  className="group cursor-pointer bg-transparent disabled:cursor-default hover:disabled:bg-transparent hover:bg-accent p-2"
-                  disabled={actualFrame === selectedFrames.length - 1}
-                  onClick={() => {
-                    setActualFrame(selectedFrames.length - 1);
-                  }}
-                >
-                  <SkipForward
-                    className="group-disabled:text-accent"
-                    size={24}
-                  />
-                </button>
+          {presentationImagesLoaded && (
+            <div className="absolute bottom-[16px] left-[16px] right-[16px] flex justify-center items-center">
+              <div className="flex justify-center items-center  p-1">
+                <div className="flex justify-end items-center bg-white border border-zinc-200 p-1 rounded-full">
+                  <button
+                    className="group cursor-pointer bg-transparent disabled:cursor-default hover:disabled:bg-transparent hover:bg-accent p-2 rounded-full hover:text-[#666666]"
+                    disabled={presentationImagesLoaded && actualFrame === 0}
+                    onClick={() => {
+                      setActualFrame(0);
+                    }}
+                  >
+                    <SkipBack
+                      className="group-disabled:text-accent"
+                      strokeWidth={1}
+                      size={24}
+                    />
+                  </button>
+                  <button
+                    className="group cursor-pointer bg-transparent disabled:cursor-default hover:disabled:bg-transparent hover:bg-accent p-2 rounded-full"
+                    disabled={presentationImagesLoaded && actualFrame === 0}
+                    onClick={() => {
+                      setActualFrame((prev) => prev - 1);
+                    }}
+                  >
+                    <StepBack
+                      className="group-disabled:text-accent"
+                      strokeWidth={1}
+                      size={24}
+                    />
+                  </button>
+                  <button
+                    className="group cursor-pointer bg-transparent disabled:cursor-default hover:disabled:bg-transparent hover:bg-accent p-2 rounded-full"
+                    disabled={
+                      presentationImagesLoaded &&
+                      actualFrame === selectedFrames.length - 1
+                    }
+                    onClick={() => {
+                      setActualFrame((prev) => prev + 1);
+                    }}
+                  >
+                    <StepForward
+                      className="group-disabled:text-accent"
+                      strokeWidth={1}
+                      size={24}
+                    />
+                  </button>
+                  <button
+                    className="group cursor-pointer bg-transparent disabled:cursor-default hover:disabled:bg-transparent hover:bg-accent p-2 rounded-full"
+                    disabled={
+                      presentationImagesLoaded &&
+                      actualFrame === selectedFrames.length - 1
+                    }
+                    onClick={() => {
+                      setActualFrame(selectedFrames.length - 1);
+                    }}
+                  >
+                    <SkipForward
+                      className="group-disabled:text-accent"
+                      strokeWidth={1}
+                      size={24}
+                    />
+                  </button>
+                </div>
               </div>
             </div>
-          </div>
-          <div className="w-full h-full bg-black">
-            <FramePresentationImage
-              key={selectedFrames[actualFrame]}
-              node={actualNodePresentation as Konva.Group}
-            />
+          )}
+          <div className="w-full h-full bg-black flex justify-center items-center">
+            {!presentationImagesLoaded && (
+              <div className="w-full h-full flex flex-col gap-3 justify-center items-center">
+                <Loader2Icon
+                  className="animate-spin h-[64px] w-[64px]"
+                  color="#FFFFFF"
+                />
+                <div className="font-inter text-2xl text-white uppercase">
+                  generating presentation
+                </div>
+              </div>
+            )}
+            {presentationImagesLoaded && (
+              <FramePresentationImage
+                key={selectedFrames[actualFrame]}
+                presentationImage={actualImagePresentation}
+              />
+            )}
           </div>
         </div>
       )}
