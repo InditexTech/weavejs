@@ -154,6 +154,7 @@ export class WeavePenToolAction extends WeaveAction {
       ...this.props,
       x: this.clickPoint?.x ?? 0,
       y: this.clickPoint?.y ?? 0,
+      strokeScaleEnabled: false,
       points: [0, 0],
     });
 

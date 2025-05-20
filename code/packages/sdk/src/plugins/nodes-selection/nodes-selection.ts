@@ -5,7 +5,6 @@
 import {
   type WeaveSelection,
   type NodeSerializable,
-  type WeaveElementInstance,
   WEAVE_NODE_CUSTOM_EVENTS,
 } from '@inditextech/weave-types';
 import Konva from 'konva';
@@ -23,7 +22,6 @@ import {
 } from './types';
 import { WeaveContextMenuPlugin } from '../context-menu/context-menu';
 import type { WeaveNode } from '@/nodes/node';
-import type { WeaveNodesSnappingPlugin } from '../nodes-snapping/nodes-snapping';
 import type { WeaveCopyPasteNodesPlugin } from '../copy-paste-nodes/copy-paste-nodes';
 import {
   checkIfOverContainer,
@@ -142,46 +140,6 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
       ...this.config.transformer,
     });
     selectionLayer?.add(tr);
-
-    tr.on('transform', (e) => {
-      const node = e.target;
-
-      const nodesSnappingPlugin =
-        this.instance.getPlugin<WeaveNodesSnappingPlugin>('nodesSnapping');
-
-      if (
-        nodesSnappingPlugin &&
-        this.isSelecting() &&
-        this.isNodeSelected(node)
-      ) {
-        nodesSnappingPlugin.evaluateGuidelines(e);
-      }
-
-      if (this.isSelecting() && this.isNodeSelected(node)) {
-        const nodeHandler = this.instance.getNodeHandler<WeaveNode>(
-          node.getAttrs().nodeType
-        );
-        this.instance.updateNode(
-          nodeHandler.serialize(node as WeaveElementInstance)
-        );
-        e.cancelBubble = true;
-      }
-    });
-
-    tr.on('transformend', (e) => {
-      const node = e.target;
-
-      const nodesSnappingPlugin =
-        this.instance.getPlugin<WeaveNodesSnappingPlugin>('nodesSnapping');
-
-      if (
-        nodesSnappingPlugin &&
-        this.isSelecting() &&
-        this.isNodeSelected(node)
-      ) {
-        nodesSnappingPlugin.cleanupEvaluateGuidelines();
-      }
-    });
 
     tr.on('mouseenter', (e) => {
       if (!this.isPasting()) {
