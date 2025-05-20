@@ -334,7 +334,7 @@ function WhyPanel(props: HTMLProps<HTMLDivElement>) {
 
 export function PreviewImages() {
   return (
-    <div className="mt-12 mb-12 min-w-full lg:-mb-18 xl:min-w-[1100px] xl:-mx-24">
+    <div className="mt-[48px] mb-12 min-w-full lg:-mb-18 xl:min-w-[1100px] xl:-mx-24">
       <Image
         src={MainImg}
         alt="preview"
@@ -390,11 +390,12 @@ export const LinkButton = ({
     <Button
       variant={variant}
       className={cn(
-        "font-mono cursor-pointer",
+        "font-light text-[13px] uppercase cursor-pointer px-[32px] h-[40px]",
         className,
-        style === "default" && "bg-white",
+        style === "default" &&
+          "bg-white dark:bg-white text-white dark:text-black hover:bg-[#ededed] dark:hover:bg-[#454545]",
         style === "main" &&
-          "bg-zinc-950 hover:bg-zinc-500 border-zinc-950 hover:border-zinc-500 dark:bg-zinc-700 dark:hover:bg-zinc-500 dark:hover:border-zinc-500"
+          "bg-black hover:bg-[#757575] border-zinc-950 hover:border-zinc-500 dark:bg-white dark:hover:bg-[#454545] dark:hover:text-white dark:hover:border-[#454545]"
       )}
       onClick={handleStartApplicationClick}
     >
