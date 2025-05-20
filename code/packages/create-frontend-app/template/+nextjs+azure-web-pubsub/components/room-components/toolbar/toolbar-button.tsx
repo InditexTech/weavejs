@@ -52,10 +52,10 @@ export const ToolbarButton = React.forwardRef<
                 '!pointer-events-none relative cursor-pointer h-[40px] flex justify-center items-center',
                 {
                   ['hover:bg-[#f0f0f0]']: variant === 'rounded',
-                  ['hover:text-[#666666] ']: variant === 'squared',
+                  ['hover:text-[#666666]']: variant === 'squared',
                   ['!pointer-events-auto']: !selectionActive,
                   ['!pointer-events-none']: selectionActive,
-                  ['bg-[#2e2e2e] text-white']: active,
+                  ['bg-[#2e2e2e] text-white hover:text-[#666666]']: active,
                   ['pointer-events-none cursor-default text-black opacity-50']:
                     disabled,
                 },
