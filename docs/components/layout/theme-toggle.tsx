@@ -10,7 +10,7 @@ const itemVariants = cva(
   {
     variants: {
       active: {
-        true: "bg-black dark:bg-[#454545] text-white",
+        true: "bg-black dark:bg-[#454545] hover:bg-[#454545] hover:text-white text-white",
         false: "text-[#5C5C5C]",
       },
     },
@@ -80,7 +80,7 @@ export function ThemeToggle({
           className={cn(itemVariants({ active: value === key }))}
           onClick={() => setTheme(key)}
         >
-          <Icon className="size-full" fill="currentColor" />
+          <Icon className="size-full" fill="currentColor" strokeWidth={1} />
         </button>
       ))}
     </div>

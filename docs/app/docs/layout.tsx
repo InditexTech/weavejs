@@ -1,7 +1,8 @@
-import { DocsLayout } from "fumadocs-ui/layouts/docs";
+import { DocsLayout } from "@/layouts/docs";
 import type { ReactNode } from "react";
 import { baseOptions } from "@/app/layout.config";
 import { source } from "@/lib/source";
+import React from "react";
 
 export default function Layout({ children }: { children: ReactNode }) {
   return (
@@ -21,16 +22,21 @@ export default function Layout({ children }: { children: ReactNode }) {
               ...option,
               icon: (
                 <div
-                  className="rounded-md p-1 shadow-lg ring-2 [&_svg]:size-5"
+                  className="rounded-md p-1 shadow-none ring-0 [&_svg]:size-5"
                   style={
                     {
                       color,
-                      border: `1px solid color-mix(in oklab, ${color} 50%, transparent)`,
+                      border: `0px solid color-mix(in oklab, ${color} 50%, transparent)`,
                       "--tw-ring-color": `color-mix(in oklab, ${color} 20%, transparent)`,
                     } as object
                   }
                 >
-                  {node.icon}
+                  {React.cloneElement(
+                    node.icon as React.ReactElement<
+                      React.SVGProps<SVGSVGElement>
+                    >,
+                    { strokeWidth: 1 }
+                  )}
                 </div>
               ),
             };
