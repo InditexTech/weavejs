@@ -17,6 +17,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - [#205](https://github.com/InditexTech/weavejs/issues/205) Transformer resize change size and not scale
 
+### Fixed
+
+- [#236](https://github.com/InditexTech/weavejs/issues/236) Missing class `WeaveStoreAzureWebPubSubSyncHost` on package `@inditextech/weave-store-azure-web-pubsub`
+
 ## [0.13.1] - 2025-05-19
 
 ### Changed

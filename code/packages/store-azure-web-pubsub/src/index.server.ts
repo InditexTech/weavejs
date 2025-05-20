@@ -3,5 +3,6 @@
 // SPDX-License-Identifier: Apache-2.0
 
 export { WeaveAzureWebPubsubServer } from './server/azure-web-pubsub-server';
+export { WeaveStoreAzureWebPubSubSyncHost } from './server/azure-web-pubsub-host';
 export * from './constants';
 export * from './types';
