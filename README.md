@@ -80,6 +80,7 @@ It provides robust synchronization based on [Yjs][https://yjs.dev/] and [SyncedS
 
 ### Built With
 
+- [React Reconciler][ReactReconciler-url]
 - [Konva][https://konvajs.org/]
 - [Yjs][https://yjs.dev/]
 - [SyncedStore][https://syncedstore.org/docs/]
@@ -88,8 +89,8 @@ It provides robust synchronization based on [Yjs][https://yjs.dev/] and [SyncedS
 
 ### Related repositories
 
-- [Weave.js][https://github.com/InditexTech/weavejs]
 - [Weave.js backend][https://github.com/InditexTech/weavejs-backend]
+- [Weave.js frontend][https://github.com/InditexTech/weavejs-frontend]
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
