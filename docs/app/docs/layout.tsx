@@ -31,7 +31,12 @@ export default function Layout({ children }: { children: ReactNode }) {
                     } as object
                   }
                 >
-                  {React.cloneElement(node.icon as any, { strokeWidth: 1 })}
+                  {React.cloneElement(
+                    node.icon as React.ReactElement<
+                      React.SVGProps<SVGSVGElement>
+                    >,
+                    { strokeWidth: 1 }
+                  )}
                 </div>
               ),
             };
