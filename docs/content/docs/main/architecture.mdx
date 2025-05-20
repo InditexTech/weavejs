@@ -1,0 +1,95 @@
+---
+title: Architecture overview
+description: Deep dive into Weave.js architecture and design principles
+---
+
+import { Tags, Tag } from "@/components/tags";
+
+This page provides a detailed overview of the Weave.js architecture, including its design principles, key features, and underlying technologies.
+
+## Design principles
+
+Weave.js is designed to help developers build visual collaborative UI applications,
+tools that are often complex by nature, involving canvas rendering, rich interactions, and
+dynamic real-time state management. To manage all this complexity, Weave.js it is built on four key principles:
+
+- **Simple and opinionated:** A declarative API and strong defaults reduce boilerplate code and guide you toward scalable patterns—so you can focus on building features, not fighting complexity.
+
+- **Composable:** High-level [building blocks](/docs/main/build) that are modular and designed for composition, enabling clear separation of rendering, state, and interactions.
+
+- **Extendable:** A plugin-based architecture makes nearly every part of Weave.js customizable, from canvas behavior to rendering, without touching the core.
+
+- **UI framework agnostic:** Works with any framework. Use React, Vue, or others; Weave.js handles the collaborative layer, while you own the UI.
+
+## Key features
+
+These are the functional domains that Weave.js is built to support out of the box:
+
+### Canvas rendering
+
+Weave.js simplifies [canvas](/docs/main/glossary#canvas) rendering logic and interactions and provides a custom rendering lifecycle.
+It introduces the [Node](/docs/main/build/nodes) and [Plugin](/docs/main/build/plugins) abstractions to give you a unified, extensible way to manage canvas logic.
+
+To help you get started quickly, Weave.js includes a set of base nodes and plugins that cover common use cases.
+
+### Real-time state synchronization
+
+Weave.js provides everything you need to enable real-time collaboration across different transport layers.
+It introduces the [Store](/docs/main/build/stores) abstraction for managing shared state.
+
+To help you get started without delay, Weave.js includes a set of base stores.
+
+### Users interactions
+
+Weave.js offers an API for building custom user interactions.
+By separating rendering from interaction logic, it gives you greater control over application behavior, making features like undo/redo easier to implement without affecting the rendering process.
+
+The [Action](/docs/main/build/actions) abstraction provides a unified API for managing user interactions. To accelerate development, Weave.js also includes a set of base actions.
+
+## Technologies behind Weave.js
+
+Internally, Weave.js profusely uses the following open-source libraries:
+
+### Konva.js
+
+<Tags>
+  <Tag color="lime">FRONTEND</Tag>
+</Tags>
+
+We use [Konva.js](https://konvajs.org/docs/overview.html) to manage and simplify the HTML5 canvas rendering. 
+Its high-level abstraction over the HTML5 canvas API simplifies the process of creating and manipulating canvas primitives
+—the basic building blocks for any canvas-based application.
+
+### React Reconciler
+
+<Tags>
+  <Tag color="lime">FRONTEND</Tag>
+</Tags>
+
+We use a custom [React Reconciler](https://github.com/facebook/react/tree/main/packages/react-reconciler) to bridge React’s component model state for the Konva rendering process. 
+This integration allows developers to define nodes as Classes with specific life-cycle while Weave.js internally handles the rest.
+This way we benefit from efficient, incremental updates and the internal React's renderer life-cycle optimizations without the need to know React declaratively way (JSX).
+
+### Yjs
+
+<Tags>
+  <Tag color="lime">FRONTEND</Tag>
+  <Tag color="red">BACKEND</Tag>
+</Tags>
+
+Real-time collaboration is part of our core.
+To handle all the heavy lifting about the shared-state, network, and client management, Weave.js uses [Yjs](https://yjs.dev), a [CRDT](/docs/main/glossary#crdt)-based framework that ensures consistency across distributed clients.
+
+It handles network conflicts automatically, guarantees that all users stay in sync, even during offline
+or concurrent edits and support awareness events sharing. Also allows to persist the shared-state in an
+agnostic and custom way.
+
+### SyncedStore
+
+<Tags>
+  <Tag color="lime">FRONTEND</Tag>
+</Tags>
+
+We use [SyncedStore](https://syncedstore.org/docs), an API for Yjs, to provide a developer-friendly
+abstraction layer. SyncedStore offers a simple, reactive API that makes working with shared-state feel
+like building a regular single-user app—while seamlessly handling all the multiplayer complexity under the hood.
