@@ -5,6 +5,7 @@
 import { WeaveAction } from '@/actions/action';
 import { WeaveStageZoomPlugin } from '@/plugins/stage-zoom/stage-zoom';
 import { type WeaveZoomInToolActionParams } from './types';
+import { ZOOM_IN_TOOL_ACTION_NAME } from './constants';
 
 export class WeaveZoomInToolAction extends WeaveAction {
   protected previousAction!: string;
@@ -12,7 +13,7 @@ export class WeaveZoomInToolAction extends WeaveAction {
   onPropsChange = undefined;
 
   getName(): string {
-    return 'zoomInTool';
+    return ZOOM_IN_TOOL_ACTION_NAME;
   }
 
   private getStageZoomPlugin() {

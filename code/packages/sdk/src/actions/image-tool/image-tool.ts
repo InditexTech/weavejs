@@ -12,7 +12,7 @@ import {
   type WeaveImageToolActionOnEndLoadImageEvent,
   type WeaveImageToolActionOnStartLoadImageEvent,
 } from './types';
-import { IMAGE_TOOL_STATE } from './constants';
+import { IMAGE_TOOL_ACTION_NAME, IMAGE_TOOL_STATE } from './constants';
 import { WeaveNodesSelectionPlugin } from '@/plugins/nodes-selection/nodes-selection';
 import Konva from 'konva';
 import { type WeaveElementInstance } from '@inditextech/weave-types';
@@ -47,7 +47,7 @@ export class WeaveImageToolAction extends WeaveAction {
   }
 
   getName(): string {
-    return 'imageTool';
+    return IMAGE_TOOL_ACTION_NAME;
   }
 
   getPreloadedImage(imageId: string): HTMLImageElement | undefined {
@@ -78,10 +78,13 @@ export class WeaveImageToolAction extends WeaveAction {
     const stage = this.instance.getStage();
 
     stage.container().addEventListener('keydown', (e) => {
-      if (e.key === 'Escape') {
+      if (
+        e.key === 'Escape' &&
+        this.instance.getActiveAction() === IMAGE_TOOL_ACTION_NAME
+      ) {
         this.cancelAction();
+        return;
       }
-      e.preventDefault();
     });
 
     stage.on('click tap', (e) => {

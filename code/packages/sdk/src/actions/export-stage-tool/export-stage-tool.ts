@@ -10,6 +10,7 @@ import {
 } from '@inditextech/weave-types';
 import { WeaveAction } from '../action';
 import { type WeaveExportStageActionParams } from './types';
+import { EXPORT_STAGE_TOOL_ACTION_NAME } from './constants';
 
 export class WeaveExportStageToolAction extends WeaveAction {
   protected cancelAction!: () => void;
@@ -25,7 +26,7 @@ export class WeaveExportStageToolAction extends WeaveAction {
   onInit = undefined;
 
   getName(): string {
-    return 'exportStageTool';
+    return EXPORT_STAGE_TOOL_ACTION_NAME;
   }
 
   private async exportStage() {

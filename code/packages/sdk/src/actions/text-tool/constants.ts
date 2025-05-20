@@ -2,8 +2,10 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
+export const TEXT_TOOL_ACTION_NAME = 'textTool';
+
 export const TEXT_TOOL_STATE = {
-  ["IDLE"]: "idle",
-  ["ADDING"]: "adding",
-  ["FINISHED"]: "finished",
+  ['IDLE']: 'idle',
+  ['ADDING']: 'adding',
+  ['FINISHED']: 'finished',
 } as const;

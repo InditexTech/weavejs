@@ -8,7 +8,7 @@ import Konva from 'konva';
 import { type Vector2d } from 'konva/lib/types';
 import { WeaveAction } from '@/actions/action';
 import { type WeaveBrushToolActionState } from './types';
-import { BRUSH_TOOL_STATE } from './constants';
+import { BRUSH_TOOL_ACTION_NAME, BRUSH_TOOL_STATE } from './constants';
 import { WeaveNodesSelectionPlugin } from '@/plugins/nodes-selection/nodes-selection';
 import type { WeaveLineNode } from '@/nodes/line/line';
 
@@ -36,7 +36,7 @@ export class WeaveBrushToolAction extends WeaveAction {
   }
 
   getName(): string {
-    return 'brushTool';
+    return BRUSH_TOOL_ACTION_NAME;
   }
 
   initProps() {
@@ -54,11 +54,17 @@ export class WeaveBrushToolAction extends WeaveAction {
     stage.container().focus();
 
     stage.container().addEventListener('keydown', (e) => {
-      if (e.key === 'Enter') {
+      if (
+        e.key === 'Enter' &&
+        this.instance.getActiveAction() === BRUSH_TOOL_ACTION_NAME
+      ) {
         this.cancelAction();
         return;
       }
-      if (e.key === 'Escape') {
+      if (
+        e.key === 'Escape' &&
+        this.instance.getActiveAction() === BRUSH_TOOL_ACTION_NAME
+      ) {
         this.cancelAction();
         return;
       }
