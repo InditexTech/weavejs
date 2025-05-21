@@ -74,23 +74,23 @@ SPDX-License-Identifier: Apache-2.0
 
 Weave.js is a powerful headless framework for building end-to-end collaborative whiteboard applications. Aimed at developers, it provides all the building blocks and plugins to develop visual collaborative canvas, while handling user interactions to enable real-time collaboration among multiple users.
 
-It provides robust synchronization based on [Yjs][https://yjs.dev/] and [SyncedStore][https://syncedstore.org/docs/] as well as an extensible API to streamline the development of interactive, collaborative applications.
+It provides robust synchronization based on [Yjs](https://yjs.dev/) and [SyncedStore](https://syncedstore.org/docs/) as well as an extensible API to streamline the development of interactive, collaborative applications.
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 ### Built With
 
 - [React Reconciler][ReactReconciler-url]
-- [Konva][https://konvajs.org/]
-- [Yjs][https://yjs.dev/]
-- [SyncedStore][https://syncedstore.org/docs/]
+- [Konva](https://konvajs.org/)
+- [Yjs](https://yjs.dev/)
+- [SyncedStore](https://syncedstore.org/docs/)
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 ### Related repositories
 
-- [Weave.js backend][https://github.com/InditexTech/weavejs-backend]
-- [Weave.js frontend][https://github.com/InditexTech/weavejs-frontend]
+- [Weave.js backend](https://github.com/InditexTech/weavejs-backend)
+- [Weave.js frontend](https://github.com/InditexTech/weavejs-frontend)
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
@@ -165,7 +165,7 @@ Project Link: [https://github.com/InditexTech/weavejs](https://github.com/Indite
 [stars-url]: https://github.com/InditexTech/weavejs/stargazers
 [issues-shield]: https://img.shields.io/github/issues/InditexTech/weavejs.svg?style=for-the-badge
 [docs-url]: https://stunning-enigma-169l5kv.pages.github.io
-[docs-what-is-weave-url]: https://stunning-enigma-169l5kv.pages.github.io/docs/main/what-is-weavejs
+[docs-what-is-weave-url]: https://stunning-enigma-169l5kv.pages.github.io/docs/main/architecture
 [docs-quick-start-url]: https://stunning-enigma-169l5kv.pages.github.io/docs/main/quickstart
 [docs-roadmap-url]: https://stunning-enigma-169l5kv.pages.github.io/docs/main/roadmap
 [issues-url]: https://github.com/InditexTech/weavejs/issues
