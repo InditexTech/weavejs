@@ -13,20 +13,22 @@ import Feature3Img from "@/public/images/feature_3.png";
 import Feature3DarkImg from "@/public/images/feature_3_dark.png";
 import Feature4Img from "@/public/images/feature_4.png";
 import Feature4DarkImg from "@/public/images/feature_4_dark.png";
-import { useTheme } from "next-themes";
 import { cn } from "@/lib/utils";
 import { LinkButton } from "./page.client";
 
 export function Architecture() {
-  const { theme } = useTheme();
-
   return (
     <div className="max-w-[1200px] rounded-b-md grid grid-cols-1 px-3 md:px-0 md:grid-cols-2 gap-[80px] border-0 px-0 py-0 md:py-0 pt-[64px] md:pt-[188px] lg:flex-col md:px-0">
       <div className="md:hidden mx-3 flex justify-center items-center">
         <Image
-          src={theme === "dark" ? LayersDarkImg : LayersImg}
+          src={LayersDarkImg}
           alt="Architecture"
-          className="w-full h-auto max-w-[450px]"
+          className="w-full h-auto max-w-[450px] hidden dark:block"
+        />
+        <Image
+          src={LayersImg}
+          alt="Architecture"
+          className="w-full h-auto max-w-[450px] block dark:hidden"
         />
       </div>
       <div>
@@ -60,9 +62,14 @@ export function Architecture() {
       </div>
       <div className="hidden md:flex justify-center items-center">
         <Image
-          src={theme === "dark" ? LayersDarkImg : LayersImg}
+          src={LayersDarkImg}
           alt="Architecture"
-          className="w-full h-auto max-w-[450px]"
+          className="w-full h-auto max-w-[450px] hidden dark:block"
+        />
+        <Image
+          src={LayersImg}
+          alt="Architecture"
+          className="w-full h-auto max-w-[450px] block dark:hidden"
         />
       </div>
     </div>
@@ -70,8 +77,6 @@ export function Architecture() {
 }
 
 export function Features() {
-  const { theme } = useTheme();
-
   return (
     <div className="max-w-[1200px] mt-[128px] flex flex-col">
       <div className="col-span-2">
@@ -101,9 +106,15 @@ export function Features() {
           <div className="w-full mb-0 flex flex-col justify-center items-center">
             <Image
               alt="UI Framework Agnostic"
-              src={theme === "dark" ? Feature1DarkImg : Feature1Img}
+              src={Feature1DarkImg}
               sizes="800px"
-              className="w-full min-w-[400px] max-h-[400px] object-contain"
+              className="w-full min-w-[400px] max-h-[400px] object-contain hidden dark:block"
+            />
+            <Image
+              alt="UI Framework Agnostic"
+              src={Feature1Img}
+              sizes="800px"
+              className="w-full min-w-[400px] max-h-[400px] object-contain block dark:hidden"
             />
           </div>
         </Feature>
@@ -126,9 +137,15 @@ export function Features() {
           <div className="w-full mb-0 flex flex-col justify-center items-center">
             <Image
               alt="Powerful Abstractions"
-              src={theme === "dark" ? Feature2DarkImg : Feature2Img}
+              src={Feature2DarkImg}
               sizes="800px"
-              className="w-full min-w-[400px] max-h-[400px] object-contain"
+              className="w-full min-w-[400px] max-h-[400px] object-contain hidden dark:block"
+            />
+            <Image
+              alt="Powerful Abstractions"
+              src={Feature2Img}
+              sizes="800px"
+              className="w-full min-w-[400px] max-h-[400px] object-contain block dark:hidden"
             />
           </div>
         </Feature>
@@ -148,9 +165,15 @@ export function Features() {
           <div className="w-full mb-0 flex flex-col justify-center items-center">
             <Image
               alt="Source"
-              src={theme === "dark" ? Feature3DarkImg : Feature3Img}
+              src={Feature3DarkImg}
               sizes="600px"
-              className="w-full min-w-[400px] max-h-[400px] object-contain"
+              className="w-full min-w-[400px] max-h-[400px] object-contain hidden dark:block"
+            />
+            <Image
+              alt="Source"
+              src={Feature3Img}
+              sizes="600px"
+              className="w-full min-w-[400px] max-h-[400px] object-contain block dark:hidden"
             />
           </div>
         </Feature>
@@ -172,9 +195,15 @@ export function Features() {
           <div className="w-full mb-0 flex flex-col justify-center items-center">
             <Image
               alt="Source"
-              src={theme === "dark" ? Feature4DarkImg : Feature4Img}
+              src={Feature4DarkImg}
               sizes="600px"
-              className="w-full min-w-[400px] max-h-[400px] object-contain"
+              className="w-full min-w-[400px] max-h-[400px] object-contain block dark:hidden"
+            />
+            <Image
+              alt="Source"
+              src={Feature4Img}
+              sizes="600px"
+              className="w-full min-w-[400px] max-h-[400px] object-contain hidden dark:block"
             />
           </div>
         </Feature>

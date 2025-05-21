@@ -13,6 +13,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- [#255](https://github.com/InditexTech/weavejs/issues/255) Update documentation images and favicon
+
 ### Fixed
 
 - [#248](https://github.com/InditexTech/weavejs/issues/248) Mouse wheel panning only when over stage
