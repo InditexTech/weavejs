@@ -80,7 +80,7 @@ export const WEAVE_FRAME_NODE_DEFAULT_CONFIG = {
   },
   onTargetEnter: {
     borderColor: '#ff6863ff',
-    fill: '#ecececff',
+    fill: '#ffffffff',
   },
 };
 

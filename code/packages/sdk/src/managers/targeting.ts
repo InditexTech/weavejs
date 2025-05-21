@@ -10,6 +10,7 @@ import type {
   WeaveMousePointInfo,
   WeaveMousePointInfoSimple,
 } from '@inditextech/weave-types';
+import type { WeaveNodesSelectionPlugin } from '@/plugins/nodes-selection/nodes-selection';
 
 export class WeaveTargetingManager {
   private instance: Weave;
@@ -60,6 +61,13 @@ export class WeaveTargetingManager {
     let measureContainer: Konva.Layer | Konva.Group | undefined = mainLayer;
     let container: Konva.Layer | Konva.Group | undefined = mainLayer;
 
+    const nodesSelection =
+      this.instance.getPlugin<WeaveNodesSelectionPlugin>('nodesSelection');
+
+    if (nodesSelection) {
+      nodesSelection.disable();
+    }
+
     const intersectedNode = stage.getIntersection(relativeMousePointer);
     if (intersectedNode) {
       const node = this.instance.getInstanceRecursive(intersectedNode, [
@@ -103,6 +111,10 @@ export class WeaveTargetingManager {
         x: 0,
         y: 0,
       };
+    }
+
+    if (nodesSelection) {
+      nodesSelection.enable();
     }
 
     return { mousePoint: relativeMousePointer, container, measureContainer };
