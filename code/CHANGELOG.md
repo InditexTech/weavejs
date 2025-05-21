@@ -17,6 +17,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - [#248](https://github.com/InditexTech/weavejs/issues/248) Mouse wheel panning only when over stage
 - [#250](https://github.com/InditexTech/weavejs/issues/250) Copy / paste on frame doesn't set copied element on it
+- [#253](https://github.com/InditexTech/weavejs/issues/253) Selected nodes not triggering snapping lines
 
 ## [0.14.2] - 2025-05-20
 
