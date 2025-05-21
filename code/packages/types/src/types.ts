@@ -25,7 +25,6 @@ export type WeaveConfig = {
   actions?: WeaveActionBase[];
   plugins?: WeavePluginBase[];
   fonts?: WeaveFont[];
-  callbacks?: WeaveCallbacks;
   logger?: WeaveLoggerConfig;
 };
 
@@ -188,17 +187,6 @@ export type WeaveUndoRedoChange = {
   canUndo: boolean;
   redoStackLength: number;
   undoStackLength: number;
-};
-
-// Callbacks
-
-export type WeaveCallbacks = {
-  onRender?: () => void;
-  onRoomLoaded?: (loaded: boolean) => void;
-  onInstanceStatus?: (status: WeaveStatus) => void;
-  onActiveActionChange?: (actionName: string | undefined) => void;
-  onStateChange?: (state: WeaveState) => void;
-  onUndoManagerStatusChange?: (undoManagerStatus: WeaveUndoRedoChange) => void;
 };
 
 // Store

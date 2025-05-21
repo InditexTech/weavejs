@@ -46,6 +46,7 @@ import { WeaveExportManager } from './managers/export';
 import { WeavePluginsManager } from './managers/plugins';
 import { WeaveNodesSelectionPlugin } from './plugins/nodes-selection/nodes-selection';
 import type { StageConfig } from 'konva/lib/Stage';
+import type { WeaveStoreOnRoomLoadedEvent } from './stores/types';
 
 export class Weave extends Emittery {
   private id: string;
@@ -144,7 +145,6 @@ export class Weave extends Emittery {
       this.moduleLogger.info('Instance started');
 
       this.status = WEAVE_INSTANCE_STATUS.RUNNING;
-      this.getConfiguration().callbacks?.onInstanceStatus?.(this.status);
       this.emitEvent('onInstanceStatus', this.status);
     });
   }
@@ -164,8 +164,9 @@ export class Weave extends Emittery {
   async start(): Promise<void> {
     this.moduleLogger.info('Start instance');
 
+    this.emitEvent<WeaveStoreOnRoomLoadedEvent>('onRoomLoaded', false);
+
     this.status = WEAVE_INSTANCE_STATUS.STARTING;
-    this.getConfiguration().callbacks?.onInstanceStatus?.(this.status);
     this.emitEvent('onInstanceStatus', this.status);
 
     // Register all the nodes, plugins and actions that come from the configuration
@@ -177,7 +178,6 @@ export class Weave extends Emittery {
     this.storeManager.registerStore(this.config.store as WeaveStore);
 
     this.status = WEAVE_INSTANCE_STATUS.LOADING_FONTS;
-    this.getConfiguration().callbacks?.onInstanceStatus?.(this.status);
     this.emitEvent('onInstanceStatus', this.status);
 
     // Start loading the fonts, this operation is asynchronous
@@ -193,28 +193,27 @@ export class Weave extends Emittery {
     store.connect();
   }
 
-  // destroy() {
-  //   this.moduleLogger.info(`Destroying the instance`);
+  destroy(): void {
+    this.moduleLogger.info(`Destroying the instance`);
 
-  //   // clear listeners
-  //   this.clearListeners();
+    // clear listeners
+    this.clearListeners();
 
-  //   this.status = WEAVE_INSTANCE_STATUS.IDLE;
-  //   this.getConfiguration().callbacks?.onInstanceStatus?.(this.status);
-  //   this.emitEvent('onInstanceStatus', this.status);
+    this.status = WEAVE_INSTANCE_STATUS.IDLE;
+    this.emitEvent('onInstanceStatus', this.status);
 
-  //   // disconnect from the store
-  //   const store = this.storeManager.getStore();
-  //   store.disconnect();
+    // disconnect from the store
+    const store = this.storeManager.getStore();
+    store.disconnect();
 
-  //   // destroy the stage from memory
-  //   const stage = this.getStage();
-  //   if (stage) {
-  //     stage.destroy();
-  //   }
+    // destroy the stage from memory
+    const stage = this.getStage();
+    if (stage) {
+      stage.destroy();
+    }
 
-  //   this.moduleLogger.info(`Instance destroyed`);
-  // }
+    this.moduleLogger.info(`Instance destroyed`);
+  }
 
   getId(): string {
     return this.id;
@@ -384,14 +383,12 @@ export class Weave extends Emittery {
   update(newState: WeaveState): void {
     this.getStore().setState(newState);
     this.renderer.render(() => {
-      this.config.callbacks?.onRender?.();
       this.emitEvent('onRender', {});
     });
   }
 
   render(): void {
     this.renderer.render(() => {
-      this.config.callbacks?.onRender?.();
       this.emitEvent('onRender', {});
     });
   }
