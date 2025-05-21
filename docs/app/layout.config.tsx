@@ -18,7 +18,7 @@ export const logo = (
       alt="Weave.js"
       src={Logo}
       sizes="100px"
-      className="w-8 md:w-8 [.uwu_&]:block"
+      className="w-[40px] md:w-[40px] [.uwu_&]:block invert-0 dark:invert-100"
       aria-label="Weave.js"
     />
   </>
@@ -36,7 +36,7 @@ export const baseOptions: BaseLayoutProps = {
     title: (
       <>
         {logo}
-        <span className="font-light [.uwu_&]:hidden [header_&]:text-[20px]">
+        <span className="font-extralight [.uwu_&]:hidden [header_&]:text-[18px]">
           Weave.js
         </span>
       </>

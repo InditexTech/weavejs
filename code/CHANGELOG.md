@@ -13,6 +13,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- [#255](https://github.com/InditexTech/weavejs/issues/255) Update documentation images and favicon
+
 ## [0.14.3] - 2025-05-21
 
 ### Fixed
