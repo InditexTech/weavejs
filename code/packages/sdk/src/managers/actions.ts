@@ -22,7 +22,6 @@ export class WeaveActionsManager {
   }
 
   triggerAction<T>(actionName: string, params?: T): unknown {
-    const config = this.instance.getConfiguration();
     const actionsHandlers = this.instance.getActionsHandlers();
 
     if (!actionsHandlers[actionName]) {
@@ -41,7 +40,6 @@ export class WeaveActionsManager {
       params
     );
 
-    config.callbacks?.onActiveActionChange?.(this.activeAction);
     this.instance.emitEvent('onActiveActionChange', this.activeAction);
 
     return payload;
@@ -86,7 +84,6 @@ export class WeaveActionsManager {
   }
 
   cancelAction(actionName: string): void {
-    const config = this.instance.getConfiguration();
     const actionsHandlers = this.instance.getActionsHandlers();
 
     if (!actionsHandlers[actionName]) {
@@ -98,7 +95,6 @@ export class WeaveActionsManager {
     this.activeAction = undefined;
     actionsHandlers[actionName].cleanup?.();
 
-    config.callbacks?.onActiveActionChange?.(this.activeAction);
     this.instance.emitEvent('onActiveActionChange', this.activeAction);
   }
 

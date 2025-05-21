@@ -69,6 +69,11 @@ export abstract class WeaveStore implements WeaveStoreBase {
       .getMainLogger()
       .info(`Store with name [${this.getName()}] registered`);
 
+    this.instance.emitEvent<WeaveStoreOnRoomLoadedEvent>(
+      'onRoomLoaded',
+      this.isRoomLoaded
+    );
+
     return this;
   }
 
@@ -101,9 +106,8 @@ export abstract class WeaveStore implements WeaveStoreBase {
   }
 
   setup(): void {
-    const config = this.instance.getConfiguration();
+    this.isRoomLoaded = false;
 
-    config.callbacks?.onRoomLoaded?.(this.isRoomLoaded);
     this.instance.emitEvent<WeaveStoreOnRoomLoadedEvent>(
       'onRoomLoaded',
       this.isRoomLoaded
@@ -132,7 +136,6 @@ export abstract class WeaveStore implements WeaveStoreBase {
             undoStackLength: this.undoManager.undoStack.length,
           };
 
-          config.callbacks?.onUndoManagerStatusChange?.(change);
           this.instance.emitEvent<WeaveStoreOnUndoRedoChangeEvent>(
             'onUndoManagerStatusChange',
             change
@@ -147,7 +150,6 @@ export abstract class WeaveStore implements WeaveStoreBase {
             undoStackLength: this.undoManager.undoStack.length,
           };
 
-          config.callbacks?.onUndoManagerStatusChange?.(change);
           this.instance.emitEvent<WeaveStoreOnUndoRedoChangeEvent>(
             'onUndoManagerStatusChange',
             change
@@ -159,7 +161,6 @@ export abstract class WeaveStore implements WeaveStoreBase {
     observeDeep(this.getState(), () => {
       const newState: WeaveState = JSON.parse(JSON.stringify(this.getState()));
 
-      config.callbacks?.onStateChange?.(newState);
       this.instance.emitEvent<WeaveStoreOnStateChangeEvent>(
         'onStateChange',
         newState
@@ -190,7 +191,6 @@ export abstract class WeaveStore implements WeaveStoreBase {
         this.instance.setupRenderer();
         this.isRoomLoaded = true;
 
-        config.callbacks?.onRoomLoaded?.(this.isRoomLoaded);
         this.instance.emitEvent<WeaveStoreOnRoomLoadedEvent>(
           'onRoomLoaded',
           this.isRoomLoaded

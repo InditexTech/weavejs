@@ -25,9 +25,9 @@ import {
   type WeaveState,
   type WeaveUser,
   type WeaveFont,
-  type WeaveCallbacks,
   type WeaveUndoRedoChange,
   type WeaveStatus,
+  WEAVE_INSTANCE_STATUS,
 } from '@inditextech/weave-types';
 import { useWeave } from './store';
 
@@ -42,7 +42,6 @@ type WeaveProviderType = {
   customNodes?: WeaveNode[];
   customActions?: WeaveAction[];
   customPlugins?: WeavePlugin[];
-  callbacks?: WeaveCallbacks;
   children: React.ReactNode;
 };
 
@@ -55,7 +54,6 @@ export const WeaveProvider = ({
   plugins = [],
   customPlugins = [],
   fonts = [],
-  callbacks = {},
   children,
 }: Readonly<WeaveProviderType>): React.JSX.Element => {
   const weaveInstanceRef = React.useRef<Weave | null>(null);
@@ -69,19 +67,9 @@ export const WeaveProvider = ({
   const setCanRedo = useWeave((state) => state.setCanRedo);
   const setActualAction = useWeave((state) => state.setActualAction);
 
-  const {
-    onInstanceStatus,
-    onRoomLoaded,
-    onStateChange,
-    onUndoManagerStatusChange,
-    onActiveActionChange,
-    ...restCallbacks
-  } = callbacks;
-
   const onInstanceStatusHandler = React.useCallback(
     (status: WeaveStatus) => {
       setStatus(status);
-      onInstanceStatus?.(status);
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
     []
@@ -90,7 +78,6 @@ export const WeaveProvider = ({
   const onRoomLoadedHandler = React.useCallback(
     (status: boolean) => {
       setRoomLoaded(status);
-      onRoomLoaded?.(status);
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
     []
@@ -99,7 +86,6 @@ export const WeaveProvider = ({
   const onStateChangeHandler = React.useCallback(
     (state: WeaveState) => {
       setAppState(state);
-      onStateChange?.(state);
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [selectedNodes]
@@ -110,7 +96,6 @@ export const WeaveProvider = ({
       const { canUndo, canRedo } = undoManagerStatus;
       setCanUndo(canUndo);
       setCanRedo(canRedo);
-      onUndoManagerStatusChange?.(undoManagerStatus);
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
     []
@@ -119,7 +104,6 @@ export const WeaveProvider = ({
   const onActiveActionChangeHandler = React.useCallback(
     (actionName: string | undefined) => {
       setActualAction(actionName);
-      onActiveActionChange?.(status);
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [selectedNodes]
@@ -193,14 +177,6 @@ export const WeaveProvider = ({
             actions,
             plugins: [...instancePlugins, ...customPlugins],
             fonts,
-            callbacks: {
-              ...restCallbacks,
-              onInstanceStatus: onInstanceStatusHandler,
-              onRoomLoaded: onRoomLoadedHandler,
-              onStateChange: onStateChangeHandler,
-              onUndoManagerStatusChange: onUndoManagerStatusChangeHandler,
-              onActiveActionChange: onActiveActionChangeHandler,
-            },
             logger: {
               level: 'info',
             },
@@ -212,13 +188,45 @@ export const WeaveProvider = ({
           }
         );
 
+        weaveInstanceRef.current.addEventListener(
+          'onInstanceStatus',
+          onInstanceStatusHandler
+        );
+
+        weaveInstanceRef.current.addEventListener(
+          'onRoomLoaded',
+          onRoomLoadedHandler
+        );
+
+        weaveInstanceRef.current.addEventListener(
+          'onStateChange',
+          onStateChangeHandler
+        );
+
+        weaveInstanceRef.current.addEventListener(
+          'onUndoManagerStatusChange',
+          onUndoManagerStatusChangeHandler
+        );
+
+        weaveInstanceRef.current.addEventListener(
+          'onActiveActionChange',
+          onActiveActionChangeHandler
+        );
+
         setInstance(weaveInstanceRef.current);
         weaveInstanceRef.current.start();
       }
     }
 
+    setStatus(WEAVE_INSTANCE_STATUS.IDLE);
+    setRoomLoaded(false);
     initWeave();
     // eslint-disable-next-line react-hooks/exhaustive-deps
+
+    return () => {
+      weaveInstanceRef.current?.destroy();
+      weaveInstanceRef.current = null;
+    };
   }, []);
 
   return <>{children}</>;
