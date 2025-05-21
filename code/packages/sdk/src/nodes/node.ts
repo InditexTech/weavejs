@@ -168,7 +168,9 @@ export abstract class WeaveNode implements WeaveNodeBase {
           });
         }
 
-        this.instance.updateNode(this.serialize(node as WeaveElementInstance));
+        this.instance.updateNode(
+          this.serialize(e.target as WeaveElementInstance)
+        );
       }
     });
 
@@ -176,9 +178,9 @@ export abstract class WeaveNode implements WeaveNodeBase {
       if (this.isSelecting() && this.isNodeSelected(node)) {
         clearContainerTargets(this.instance);
 
-        const layerToMove = moveNodeToContainer(this.instance, e.target);
+        const containerToMove = moveNodeToContainer(this.instance, e.target);
 
-        if (layerToMove) {
+        if (containerToMove) {
           return;
         }
 

@@ -112,7 +112,7 @@ export function moveNodeToContainer(
     const actualNode = nodeHandler.serialize(node as WeaveElementInstance);
 
     instance.removeNode(actualNode);
-    instance.addNode(actualNode, layerToMove?.getAttrs().id);
+    instance.addNode(actualNode, layerToMove.getAttrs().id);
   }
 
   return layerToMove;

@@ -22,6 +22,7 @@ import {
 } from './constants';
 import type { KonvaEventObject } from 'konva/lib/Node';
 import type { WeaveNodesSelectionPlugin } from '../nodes-selection/nodes-selection';
+import type { Vector2d } from 'konva/lib/types';
 
 export class WeaveNodesSnappingPlugin extends WeavePlugin {
   private guideLineConfig: Konva.LineConfig;
@@ -56,6 +57,48 @@ export class WeaveNodesSnappingPlugin extends WeavePlugin {
     this.enabled = enabled;
   }
 
+  getSelectedNodesMetadata(transformer: Konva.Transformer): {
+    width: number;
+    height: number;
+    nodes: string[];
+  } {
+    const firstNode = transformer.getNodes()[0];
+    const firstNodeClientRect = firstNode.getClientRect();
+
+    const rectCoordsMin: Vector2d = {
+      x: firstNodeClientRect.x,
+      y: firstNodeClientRect.y,
+    };
+    const rectCoordsMax: Vector2d = {
+      x: firstNodeClientRect.x + firstNodeClientRect.width,
+      y: firstNodeClientRect.y + firstNodeClientRect.height,
+    };
+
+    const nodes = [];
+    for (const node of transformer.getNodes()) {
+      const clientRect = node.getClientRect();
+      if (clientRect.x < rectCoordsMin.x) {
+        rectCoordsMin.x = clientRect.x;
+      }
+      if (clientRect.y < rectCoordsMin.y) {
+        rectCoordsMin.y = clientRect.y;
+      }
+      if (clientRect.x + clientRect.width > rectCoordsMax.x) {
+        rectCoordsMax.x = clientRect.x + clientRect.width;
+      }
+      if (clientRect.y + clientRect.height > rectCoordsMax.y) {
+        rectCoordsMax.y = clientRect.y + clientRect.height;
+      }
+      nodes.push(node.getAttrs().id as string);
+    }
+
+    return {
+      width: rectCoordsMax.x - rectCoordsMin.x,
+      height: rectCoordsMax.y - rectCoordsMin.y,
+      nodes,
+    };
+  }
+
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   evaluateGuidelines(e: KonvaEventObject<any>): void {
     const utilityLayer = this.instance.getUtilityLayer();
@@ -68,11 +111,31 @@ export class WeaveNodesSnappingPlugin extends WeavePlugin {
       return;
     }
 
+    const nodesSelectionPlugin =
+      this.instance.getPlugin<WeaveNodesSelectionPlugin>('nodesSelection');
+
+    let skipNodes = [];
     let node: Konva.Node | undefined = undefined;
-    if (e.type === 'dragmove' && e.target instanceof Konva.Transformer) {
+    if (
+      e.type === 'dragmove' &&
+      nodesSelectionPlugin &&
+      e.target instanceof Konva.Transformer &&
+      e.target.getNodes().length === 1
+    ) {
       const actualTarget: Konva.Transformer =
         e.target as unknown as Konva.Transformer;
       node = actualTarget.getNodes()[0];
+      skipNodes.push(node.getAttrs().id ?? '');
+    }
+    if (
+      e.type === 'dragmove' &&
+      nodesSelectionPlugin &&
+      e.target instanceof Konva.Transformer &&
+      e.target.getNodes().length > 1
+    ) {
+      const { nodes } = this.getSelectedNodesMetadata(e.target);
+      node = e.target;
+      skipNodes = [...nodes];
     }
     if (e.type === 'transform') {
       node = e.target;
@@ -83,12 +146,14 @@ export class WeaveNodesSnappingPlugin extends WeavePlugin {
     }
 
     // find possible snapping lines
-    const lineGuideStops = this.getLineGuideStops(node);
+    const lineGuideStops = this.getLineGuideStops(skipNodes);
     // find snapping points of current object
     const itemBounds = this.getObjectSnappingEdges(node);
 
     // now find where can we snap current object
     const guides = this.getGuides(lineGuideStops, itemBounds, e.type);
+
+    utilityLayer.destroyChildren();
 
     // do nothing of no snapping
     if (!guides.length) {
@@ -101,6 +166,7 @@ export class WeaveNodesSnappingPlugin extends WeavePlugin {
     this.drawGuides(guides);
 
     if (e.type === 'dragmove') {
+      const orgAbsPos = node.absolutePosition();
       const absPos = node.absolutePosition();
       // now force object position
       guides.forEach((lg) => {
@@ -115,7 +181,26 @@ export class WeaveNodesSnappingPlugin extends WeavePlugin {
           }
         }
       });
-      node.absolutePosition(absPos);
+
+      const vecDiff = {
+        x: orgAbsPos.x - absPos.x,
+        y: orgAbsPos.y - absPos.y,
+      };
+
+      if (node instanceof Konva.Transformer) {
+        node.getNodes().forEach((n) => {
+          const nodeAbsPos = n.getAbsolutePosition();
+
+          const newPos = {
+            x: nodeAbsPos.x - vecDiff.x,
+            y: nodeAbsPos.y - vecDiff.y,
+          };
+
+          n.setAbsolutePosition(newPos);
+        });
+      } else {
+        node.absolutePosition(absPos);
+      }
     }
     if (e.type === 'transform') {
       const nodesSelectionPlugin =
@@ -167,8 +252,7 @@ export class WeaveNodesSnappingPlugin extends WeavePlugin {
       return;
     }
 
-    // clear all previous lines on the screen
-    utilityLayer.find(`.${GUIDE_LINE_NAME}`).forEach((l) => l.destroy());
+    utilityLayer.destroyChildren();
   }
 
   private initEvents() {
@@ -181,7 +265,7 @@ export class WeaveNodesSnappingPlugin extends WeavePlugin {
     }
   }
 
-  getLineGuideStops(skipShape: Konva.Node): LineGuideStop {
+  getLineGuideStops(skipNodes: string[]): LineGuideStop {
     const stage = this.instance.getStage();
 
     const nodesSelection =
@@ -205,9 +289,10 @@ export class WeaveNodesSnappingPlugin extends WeavePlugin {
 
     // and we snap over edges and center of each object on the canvas
     stage.find('.node').forEach((guideItem) => {
-      if (guideItem === skipShape) {
+      if (skipNodes.includes(guideItem.getAttrs().id ?? '')) {
         return;
       }
+
       const box = guideItem.getClientRect({ skipStroke: true });
 
       // and we can snap to all edges of shapes
@@ -226,7 +311,17 @@ export class WeaveNodesSnappingPlugin extends WeavePlugin {
   }
 
   getObjectSnappingEdges(node: Konva.Node): NodeSnappingEdges {
-    const box = node.getClientRect({ skipStroke: true });
+    let box = node.getClientRect({ skipStroke: true });
+
+    if (node instanceof Konva.Transformer) {
+      const transformerRect = node.getChildren((node) => {
+        return node.getAttrs().name === 'back';
+      })[0];
+      box = transformerRect.getClientRect({
+        skipStroke: true,
+      });
+    }
+
     const absPos = node.absolutePosition();
 
     const snappingEdges: NodeSnappingEdges = {
