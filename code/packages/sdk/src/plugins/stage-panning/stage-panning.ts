@@ -10,6 +10,7 @@ export class WeaveStagePanningPlugin extends WeavePlugin {
   private isMouseMiddleButtonPressed: boolean;
   private isCtrlOrMetaPressed: boolean;
   private isSpaceKeyPressed: boolean;
+  private overStage: boolean;
   protected previousPointer!: string | null;
   getLayerName = undefined;
   initLayer = undefined;
@@ -23,6 +24,7 @@ export class WeaveStagePanningPlugin extends WeavePlugin {
     this.isMouseMiddleButtonPressed = false;
     this.isCtrlOrMetaPressed = false;
     this.isSpaceKeyPressed = false;
+    this.overStage = false;
     this.previousPointer = null;
   }
 
@@ -74,6 +76,14 @@ export class WeaveStagePanningPlugin extends WeavePlugin {
         this.isSpaceKeyPressed = false;
         this.disableMove();
       }
+    });
+
+    stage.on('mouseenter', () => {
+      this.overStage = true;
+    });
+
+    stage.on('mouseleave', () => {
+      this.overStage = false;
     });
 
     stage.on('mousedown', (e) => {
@@ -196,6 +206,7 @@ export class WeaveStagePanningPlugin extends WeavePlugin {
     window.addEventListener('wheel', (e) => {
       if (
         !this.enabled ||
+        !this.overStage ||
         this.isCtrlOrMetaPressed ||
         this.isSpaceKeyPressed ||
         this.isMouseMiddleButtonPressed
