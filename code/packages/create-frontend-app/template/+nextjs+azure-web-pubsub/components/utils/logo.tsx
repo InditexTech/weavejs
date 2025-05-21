@@ -16,16 +16,21 @@ export function Logo({
     <div className="p-0 bg-transparent flex justify-start items-center gap-2">
       <Image
         src={logoSrc}
-        width={kind === 'large' ? 64 : 32}
-        height={kind === 'large' ? 64 : 32}
+        width={kind === 'large' ? 64 : 40}
+        height={kind === 'large' ? 64 : 40}
         className={cn(`object-cover`, {
           ['w-11 h-11']: kind === 'large',
-          ['w-8 h-8']: kind === 'small',
+          ['w-[40px] h-[40px]']: kind === 'small',
         })}
         alt="Weave.js logo"
       />
       {variant === 'text' && (
-        <div className="font-inter font-light text-muted-foreground !normal-case">
+        <div
+          className={cn('font-inter font-extralight text-black !normal-case', {
+            ['text-[32px]']: kind === 'large',
+            ['text-[22px]']: kind === 'small',
+          })}
+        >
           Weave.js
         </div>
       )}

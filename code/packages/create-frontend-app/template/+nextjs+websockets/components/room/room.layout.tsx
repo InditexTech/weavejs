@@ -64,6 +64,8 @@ export const RoomLayout = () => {
   React.useEffect(() => {
     if (!instance) return;
 
+    if (status !== WEAVE_INSTANCE_STATUS.RUNNING) return;
+
     if (!roomLoaded) return;
 
     const elementsTree = instance.getElementsTree();
@@ -76,7 +78,7 @@ export const RoomLayout = () => {
         previousAction: 'selectionTool',
       });
     }
-  }, [instance, roomLoaded]);
+  }, [instance, status, roomLoaded]);
 
   React.useEffect(() => {
     if (!instance) return;

@@ -16,6 +16,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 - [#255](https://github.com/InditexTech/weavejs/issues/255) Update documentation images and favicon
+- [#260](https://github.com/InditexTech/weavejs/issues/260) Update create-app frontend
 
 ### Fixed
 
