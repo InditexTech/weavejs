@@ -21,6 +21,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - [#263](https://github.com/InditexTech/weavejs/issues/263) Awareness cursor UI improvements
 
+## Fixed
+
+- [#245](https://github.com/InditexTech/weavejs/issues/245) Frames drag-and-drop quirks when frames overlap
+
 ## [0.15.0] - 2025-05-21
 
 ### Changed

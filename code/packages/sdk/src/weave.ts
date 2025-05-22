@@ -498,8 +498,14 @@ export class Weave extends Emittery {
 
   // TARGETING MANAGEMENT METHODS PROXIES
 
-  pointIntersectsContainerElement(point?: Vector2d): Konva.Node | undefined {
-    return this.targetingManager.pointIntersectsContainerElement(point);
+  pointIntersectsContainerElement(
+    actualLayer?: Konva.Layer | Konva.Group,
+    point?: Vector2d
+  ): Konva.Node | undefined {
+    return this.targetingManager.pointIntersectsContainerElement(
+      actualLayer,
+      point
+    );
   }
 
   getMousePointer(point?: Vector2d): WeaveMousePointInfo {

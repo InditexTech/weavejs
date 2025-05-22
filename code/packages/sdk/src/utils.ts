@@ -42,7 +42,9 @@ export function checkIfOverContainer(
   instance: Weave,
   node: Konva.Node
 ): Konva.Node | undefined {
-  const nodesIntersected = instance.pointIntersectsContainerElement();
+  const nodesIntersected = instance.pointIntersectsContainerElement(
+    node.getParent() as Konva.Layer | Konva.Group
+  );
 
   let nodeActualContainer: Konva.Node | undefined =
     node.getParent() as Konva.Node;

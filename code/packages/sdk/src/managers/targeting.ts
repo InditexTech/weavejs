@@ -22,7 +22,10 @@ export class WeaveTargetingManager {
     this.logger.debug('Targeting manager created');
   }
 
-  pointIntersectsContainerElement(point?: Vector2d): Konva.Node | undefined {
+  pointIntersectsContainerElement(
+    actualLayer?: Konva.Layer | Konva.Group,
+    point?: Vector2d
+  ): Konva.Node | undefined {
     const stage = this.instance.getStage();
     const relativeMousePointer = point
       ? point
@@ -38,11 +41,14 @@ export class WeaveTargetingManager {
         if (node.getAttrs().nodeId) {
           const parent = stage.findOne(`#${node.getAttrs().nodeId}`);
           intersectedNode = parent;
-          break;
+          continue;
         }
-        if (node.getAttrs().containerId) {
+        if (
+          node.getAttrs().containerId &&
+          node.getAttrs().id !== actualLayer?.getAttrs().id
+        ) {
           intersectedNode = node;
-          break;
+          continue;
         }
       }
     }
