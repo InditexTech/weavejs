@@ -7,11 +7,13 @@ import { type WeaveAwarenessChange } from '@inditextech/weave-types';
 import {
   type WeaveUserPointer,
   type WeaveUserPointerKey,
+  type WeaveUserPointersUIProperties,
   type WeaveUsersPointersPluginConfig,
   type WeaveUsersPointersPluginParams,
 } from './types';
 import {
   WEAVE_USER_POINTER_KEY,
+  WEAVE_USER_POINTERS_DEFAULT_PROPS,
   WEAVE_USERS_POINTERS_KEY,
   WEAVE_USERS_POINTERS_LAYER_ID,
 } from './constants';
@@ -25,21 +27,20 @@ export class WeaveUsersPointersPlugin extends WeavePlugin {
     { oldPos: WeaveUserPointer; actualPos: WeaveUserPointer }
   >;
   private config!: WeaveUsersPointersPluginConfig;
-  private userPointerCircleRadius: number = 4;
-  private userPointerSeparation: number = 8;
-  private userPointerCircleStrokeWidth: number = 1;
-  private userPointerNameFontSize: number = 10;
-  private userPointerBackgroundCornerRadius: number = 4;
-  private userPointerBackgroundPaddingX: number = 4;
-  private userPointerBackgroundPaddingY: number = 8;
+  private uiConfig!: WeaveUserPointersUIProperties;
 
   constructor(params: WeaveUsersPointersPluginParams) {
     super();
 
     const { config } = params;
 
-    this.usersPointers = {};
     this.config = config;
+    this.uiConfig = {
+      ...WEAVE_USER_POINTERS_DEFAULT_PROPS,
+      ...this.config.ui,
+    };
+
+    this.usersPointers = {};
   }
 
   getName(): string {
@@ -170,7 +171,23 @@ export class WeaveUsersPointersPlugin extends WeavePlugin {
     this.renderPointers();
   }
 
-  private stringToColour(str: string) {
+  private getContrastTextColor(hex: string): 'white' | 'black' {
+    // Remove "#" if present
+    const cleaned = hex.replace(/^#/, '');
+
+    // Parse R, G, B from hex
+    const r = parseInt(cleaned.slice(0, 2), 16);
+    const g = parseInt(cleaned.slice(2, 4), 16);
+    const b = parseInt(cleaned.slice(4, 6), 16);
+
+    // Calculate luminance (per W3C)
+    const luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+
+    // Return black for light colors, white for dark
+    return luminance > 0.5 ? 'black' : 'white';
+  }
+
+  private stringToColor(str: string) {
     let hash = 0;
     str.split('').forEach((char) => {
       hash = char.charCodeAt(0) + ((hash << 5) - hash);
@@ -209,46 +226,62 @@ export class WeaveUsersPointersPlugin extends WeavePlugin {
           listening: false,
         });
 
+        const {
+          separation,
+          pointer: { circleRadius, circleStrokeWidth },
+          name: {
+            fontFamily,
+            fontSize,
+            backgroundCornerRadius,
+            backgroundPaddingX,
+            backgroundPaddingY,
+          },
+        } = this.uiConfig;
+
+        const userColor = this.stringToColor(userPointer.actualPos.user);
+        const userContrastColor = this.getContrastTextColor(userColor);
+
         const userPointNode = new Konva.Circle({
           id: 'userPoint',
           x: 0,
           y: 0,
-          radius: this.userPointerCircleRadius / stage.scaleX(),
-          fill: this.stringToColour(userPointer.actualPos.user),
+          radius: circleRadius,
+          fill: userColor,
           stroke: 'black',
-          strokeWidth: this.userPointerCircleStrokeWidth / stage.scaleX(),
+          strokeWidth: circleStrokeWidth,
+          strokeScaleEnabled: false,
           listening: false,
         });
 
         const userNameNode = new Konva.Text({
           id: 'userPointName',
-          x:
-            (this.userPointerSeparation + this.userPointerBackgroundPaddingX) /
-            stage.scaleX(),
-          y: 0 / stage.scaleX(),
-          height: (userPointNode.height() * 2) / stage.scaleX(),
-          text: userPointer.actualPos.user,
-          fontSize: this.userPointerNameFontSize / stage.scaleX(),
-          fontFamily: 'NotoSansMono, monospace',
-          fill: 'black',
-          align: 'left',
+          x: separation,
+          y: -circleRadius * 2 + backgroundPaddingY,
+          text: userPointer.actualPos.user.trim(),
+          fontSize: fontSize,
+          fontFamily: fontFamily,
+          lineHeight: 0.9,
+          fill: userContrastColor,
+          align: 'center',
           verticalAlign: 'middle',
           listening: false,
+          strokeScaleEnabled: false,
+          ellipsis: true,
         });
+
+        const textWidth = userNameNode.getTextWidth();
+        const textHeight = userNameNode.getTextHeight();
+        userNameNode.width(textWidth + backgroundPaddingX * 2);
+        userNameNode.height(textHeight + backgroundPaddingY * 2);
 
         const userNameBackground = new Konva.Rect({
           id: 'userPointRect',
-          x: this.userPointerSeparation / stage.scaleX(),
-          y: -this.userPointerBackgroundPaddingY / stage.scaleX(),
-          width:
-            (userNameNode.width() + this.userPointerBackgroundPaddingX * 2) /
-            stage.scaleX(),
-          height:
-            (userNameNode.height() + this.userPointerBackgroundPaddingY * 2) /
-            stage.scaleX(),
-          cornerRadius: this.userPointerBackgroundCornerRadius / stage.scaleX(),
-          fill: 'rgba(0,0,0,0.2)',
-          strokeWidth: 0,
+          x: separation,
+          y: -backgroundPaddingY,
+          width: textWidth + backgroundPaddingX * 2,
+          height: textHeight + backgroundPaddingY * 2,
+          cornerRadius: backgroundCornerRadius,
+          fill: userColor,
           listening: false,
         });
 
@@ -276,43 +309,8 @@ export class WeaveUsersPointersPlugin extends WeavePlugin {
       const hasChanged = !_.isEqual(actualPos, oldPos);
 
       // UPDATE TO SCALE
-      const userPointNode = userPointerNode.getChildren(
-        (node) => node.getAttrs().id === 'userPoint'
-      );
-      userPointNode[0]?.setAttrs({
-        radius: this.userPointerCircleRadius / stage.scaleX(),
-        strokeWidth: this.userPointerCircleStrokeWidth / stage.scaleX(),
-      });
-      const userPointNodeText = userPointerNode.getChildren(
-        (node) => node.getAttrs().id === 'userPointName'
-      );
-      userPointNodeText[0]?.setAttrs({
-        x:
-          (this.userPointerSeparation + this.userPointerBackgroundPaddingX) /
-          stage.scaleX(),
-        y: 0 / stage.scaleX(),
-        height: userPointNode[0]?.height(),
-        fontSize: this.userPointerNameFontSize / stage.scaleX(),
-      });
-      const userPointNodeBackground = userPointerNode.getChildren(
-        (node) => node.getAttrs().id === 'userPointRect'
-      );
-      userPointNodeBackground[0]?.setAttrs({
-        x: this.userPointerSeparation / stage.scaleX(),
-        y: -this.userPointerBackgroundPaddingY / stage.scaleX(),
-        cornerRadius: this.userPointerBackgroundCornerRadius / stage.scaleX(),
-        width:
-          userPointNodeText[0]?.width() +
-          this.userPointerBackgroundPaddingX * 2,
-        height:
-          userPointNodeText[0]?.height() +
-          this.userPointerBackgroundPaddingY * 2,
-      });
-      userPointNode[0]?.setAttrs({
-        y:
-          userPointNodeBackground[0]?.y() +
-          userPointNodeBackground[0]?.height() / 2,
-      });
+      userPointerNode.scaleX(1 / stage.scaleX());
+      userPointerNode.scaleY(1 / stage.scaleY());
 
       if (hasChanged) {
         userPointerNode.setAttrs({

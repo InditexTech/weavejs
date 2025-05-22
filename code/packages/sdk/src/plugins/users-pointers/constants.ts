@@ -10,3 +10,18 @@ export const WEAVE_DEFAULT_USER_INFO_FUNCTION = () => ({
   name: 'Unknown',
   email: 'unknown@domain.com',
 });
+
+export const WEAVE_USER_POINTERS_DEFAULT_PROPS = {
+  separation: 8,
+  pointer: {
+    circleRadius: 4,
+    circleStrokeWidth: 0,
+  },
+  name: {
+    fontFamily: 'Arial',
+    fontSize: 10,
+    backgroundCornerRadius: 0,
+    backgroundPaddingX: 8,
+    backgroundPaddingY: 4,
+  },
+};
