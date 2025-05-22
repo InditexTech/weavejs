@@ -1,0 +1,75 @@
+---
+title: WeaveUsersSelectionPlugin
+description: Showcase what the users are selecting on the canvas
+---
+
+import { TypeTable } from "fumadocs-ui/components/type-table";
+
+## Overview
+
+The [WeaveUsersSelectionPlugin](https://github.com/InditexTech/weavejs/blob/main/code/packages/sdk/src/plugins/users-selector/users-selector.ts)
+class that enables real-time user selection sharing across all connected users on the collaborative canvas. It displays live
+what each user is selecting, allowing participants to see each other’s activity and collaborate more intuitively.
+
+This plugin helps create a shared sense of presence, making collaborative tools feel dynamic, interactive, and
+truly multi-user.
+
+The class extends the [WeavePlugin](/docs/sdk/api-reference/plugins/plugin) class
+
+## Name
+
+This plugin `name` property value is `usersSelection`.
+
+## Import
+
+```shell
+import { WeaveUsersSelectionPlugin } from "@inditextech/weave-sdk";
+```
+
+## Instantiation
+
+```ts
+new WeaveUsersSelectionPlugin(params: WeaveUsersSelectionPluginParams);
+```
+
+## TypeScript types
+
+```ts
+type WeaveUser = {
+  [key: string]: any;
+  name: string;
+  email: string;
+};
+
+type WeaveUsersSelectionPluginConfig = {
+  getUser: () => WeaveUser;
+};
+
+type WeaveUsersSelectionPluginParams = {
+  config: WeaveUsersSelectionPluginConfig;
+};
+```
+
+## Parameters
+
+For `WeaveUsersSelectionPluginParams`:
+
+<TypeTable
+  type={{
+    ["config"]: {
+      description: "Config parameters for the plugin.",
+      type: "WeaveUsersSelectionPluginConfig",
+    },
+  }}
+/>
+
+For `WeaveUsersSelectionPluginConfig`:
+
+<TypeTable
+  type={{
+    ["getUser"]: {
+      description: "A function that returns the actual instance user metadata.",
+      type: "() => WeaveUser",
+    },
+  }}
+/>
