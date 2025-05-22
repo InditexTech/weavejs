@@ -1,0 +1,56 @@
+---
+title: Users Selector
+description: Showcase the selection of the users on the canvas
+---
+
+import { Accordion, Accordions } from "fumadocs-ui/components/accordion";
+
+## Introduction
+
+This plugin displays real-time the user selection for all connected users on the
+canvas. Each selector is typically painted with the user related color, allowing
+collaborators to see where others are selecting in real time.
+
+This plugin enhances awareness and coordination in multi-user sessions, making
+collaboration feel more intuitive and dynamic. It integrates with Weave.js's
+presence system and updates instantly as users move their mouse or interact with
+the canvas.
+
+## Dependencies
+
+This plugin needs also registered on the Weave instance the following:
+
+- An Store with awareness support.
+
+## Usage
+
+<Accordions>
+  <Accordion title="1. Import the plugin" id="import-plugin">
+    Start by importing the action with the following import:
+
+    ```ts
+    import { WeaveUsersSelectionPlugin } from "@inditextech/weave-sdk";
+    ```
+
+  </Accordion>
+  <Accordion title="2. Register the plugin" id="register-plugin">
+    Then register the action on the Weave class instance.
+
+    ```ts
+    const instance = new Weave({
+      ...
+      plugins: [
+        ...,
+        new WeaveUsersSelectionPlugin({ // [!code ++]
+          getUser, // function that defines how to get an user metadata [!code ++]
+        }), // [!code ++]
+      ]
+    })
+    ```
+
+  </Accordion>
+  <Accordion title="3. Use the plugin" id="use-the-plugin">
+    Now when a user connects to a room and selects something, you should be able to see it.
+
+  </Accordion>
+</Accordions>

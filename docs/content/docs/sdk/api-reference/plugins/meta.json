@@ -12,6 +12,7 @@
     "stage-panning",
     "stage-resize",
     "stage-zoom",
-    "users-pointers"
+    "users-pointers",
+    "users-selector"
   ]
 }

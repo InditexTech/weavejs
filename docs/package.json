@@ -9,6 +9,7 @@
     "git:pre-push": "npm run build",
     "release:prepare": "npm run build",
     "test": "echo \"Error: no test specified\" && exit 1",
+    "reset": "nx reset",
     "start": "next start",
     "postinstall": "fumadocs-mdx",
     "verify": "npm ci --force && npm run build",

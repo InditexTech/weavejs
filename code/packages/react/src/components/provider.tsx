@@ -12,6 +12,7 @@ import {
   WeaveStageZoomPlugin,
   WeaveConnectedUsersPlugin,
   WeaveUsersPointersPlugin,
+  WeaveUsersSelectionPlugin,
   WeaveStageDropAreaPlugin,
   WeaveCopyPasteNodesPlugin,
   WeaveNode,
@@ -155,6 +156,13 @@ export const WeaveProvider = ({
           );
           instancePlugins.push(
             new WeaveUsersPointersPlugin({
+              config: {
+                getUser,
+              },
+            })
+          );
+          instancePlugins.push(
+            new WeaveUsersSelectionPlugin({
               config: {
                 getUser,
               },

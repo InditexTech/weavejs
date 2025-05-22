@@ -2,7 +2,7 @@
 name: docs-npm-release
 run-name: "Release Docs${{ github.event_name == 'workflow_dispatch' && ' manually dispatched' || ' from PR' }}"
 
-concurrency: docs-release-${{ github.ref }}
+concurrency: code-release-${{ github.ref }}
 
 on:
   pull_request:

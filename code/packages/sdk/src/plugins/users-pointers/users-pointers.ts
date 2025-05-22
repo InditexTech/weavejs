@@ -125,7 +125,7 @@ export class WeaveUsersPointersPlugin extends WeavePlugin {
 
         for (const inactivePointer of inactivePointers) {
           const userPointerNode = pointersLayer?.findOne(
-            `#${inactivePointer}`
+            `#pointer_${inactivePointer}`
           ) as Konva.Group | undefined;
 
           if (userPointerNode) {
@@ -192,12 +192,12 @@ export class WeaveUsersPointersPlugin extends WeavePlugin {
     str.split('').forEach((char) => {
       hash = char.charCodeAt(0) + ((hash << 5) - hash);
     });
-    let colour = '#';
+    let color = '#';
     for (let i = 0; i < 3; i++) {
       const value = (hash >> (i * 8)) & 0xff;
-      colour += value.toString(16).padStart(2, '0');
+      color += value.toString(16).padStart(2, '0');
     }
-    return colour;
+    return color;
   }
 
   private renderPointers() {
@@ -213,13 +213,13 @@ export class WeaveUsersPointersPlugin extends WeavePlugin {
       const userPointer = this.usersPointers[userPointerKey];
 
       const userPointerNode = pointersLayer?.findOne(
-        `#${userPointer.actualPos.user}`
+        `#pointer_${userPointer.actualPos.user}`
       ) as Konva.Group | undefined;
 
       if (!userPointerNode) {
         const userPointerNode = new Konva.Group({
           name: 'pointer',
-          id: userPointer.actualPos.user,
+          id: `pointer_${userPointer.actualPos.user}`,
           x: userPointer.actualPos.x,
           y: userPointer.actualPos.y,
           opacity: 1,
@@ -242,7 +242,7 @@ export class WeaveUsersPointersPlugin extends WeavePlugin {
         const userContrastColor = this.getContrastTextColor(userColor);
 
         const userPointNode = new Konva.Circle({
-          id: 'userPoint',
+          id: `pointer_${userPointer.actualPos.user}_userPoint`,
           x: 0,
           y: 0,
           radius: circleRadius,
@@ -254,7 +254,7 @@ export class WeaveUsersPointersPlugin extends WeavePlugin {
         });
 
         const userNameNode = new Konva.Text({
-          id: 'userPointName',
+          id: `pointer_${userPointer.actualPos.user}_userPointName`,
           x: separation,
           y: -circleRadius * 2 + backgroundPaddingY,
           text: userPointer.actualPos.user.trim(),
@@ -275,7 +275,7 @@ export class WeaveUsersPointersPlugin extends WeavePlugin {
         userNameNode.height(textHeight + backgroundPaddingY * 2);
 
         const userNameBackground = new Konva.Rect({
-          id: 'userPointRect',
+          id: `pointer_${userPointer.actualPos.user}_userPointRect`,
           x: separation,
           y: -backgroundPaddingY,
           width: textWidth + backgroundPaddingX * 2,
