@@ -46,8 +46,24 @@ type WeaveUsersPointersPluginConfig = {
   getUser: () => WeaveUser;
 };
 
+type WeaveUserPointersUIProperties = {
+  separation: number;
+  pointer: {
+    circleRadius: number;
+    circleStrokeWidth: number;
+  };
+  name: {
+    fontFamily: string;
+    fontSize: number;
+    backgroundCornerRadius: number;
+    backgroundPaddingX: number;
+    backgroundPaddingY: number;
+  };
+};
+
 type WeaveUsersPointersPluginParams = {
   config: WeaveUsersPointersPluginConfig;
+  ui?: WeaveUserPointersUIProperties;
 };
 ```
 
@@ -71,6 +87,10 @@ For `WeaveUsersPointersPluginConfig`:
     ["getUser"]: {
       description: "A function that returns the actual instance user metadata.",
       type: "() => WeaveUser",
+    },
+    ["ui"]: {
+      description: "An object that defined the cursor properties (UI)",
+      type: "WeaveUserPointersUIProperties",
     },
   }}
 />

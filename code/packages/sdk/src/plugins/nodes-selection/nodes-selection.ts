@@ -28,6 +28,8 @@ import {
   clearContainerTargets,
   moveNodeToContainer,
 } from '@/utils';
+import { WEAVE_USERS_SELECTION_KEY } from '../users-selection/constants';
+import type { WeaveUsersSelectionPlugin } from '../users-selection/users-selection';
 
 export class WeaveNodesSelectionPlugin extends WeavePlugin {
   private tr!: Konva.Transformer;
@@ -245,6 +247,15 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
         node: nodeHandler.serialize(node as Konva.Shape | Konva.Group),
       };
     });
+
+    const usersSelectionPlugin =
+      this.instance.getPlugin<WeaveUsersSelectionPlugin>(
+        WEAVE_USERS_SELECTION_KEY
+      );
+
+    if (usersSelectionPlugin) {
+      usersSelectionPlugin.sendSelectionAwarenessInfo(this.tr);
+    }
 
     this.instance.emitEvent<WeaveNodesSelectionPluginOnNodesChangeEvent>(
       'onNodesChange',
