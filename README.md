@@ -28,7 +28,7 @@ SPDX-License-Identifier: Apache-2.0
   <p align="center">
     Build visual collaborative tools like Excalidraw, Miro, Canva, Figma or others!
     <br />
-    <a href="https://github.com/InditexTech/weavejs"><strong>Explore the docs »</strong></a>
+    <a href="https://stunning-enigma-169l5kv.pages.github.io/docs/main/"><strong>Explore the docs »</strong></a>
     <br />
     <br />
     <a href="https://weavejs.cloud.inditex.com/">View Demo</a>
