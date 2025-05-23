@@ -13,16 +13,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-## Added
+### Added
 
 - [#264](https://github.com/InditexTech/weavejs/issues/264) User selection awareness events plugin
 
-## Changed
+### Changed
 
 - [#263](https://github.com/InditexTech/weavejs/issues/263) Awareness cursor UI improvements
 - [#274](https://github.com/InditexTech/weavejs/issues/274) Update create-app frontend
 
-## Fixed
+### Fixed
 
 - [#245](https://github.com/InditexTech/weavejs/issues/245) Frames drag-and-drop quirks when frames overlap
 
