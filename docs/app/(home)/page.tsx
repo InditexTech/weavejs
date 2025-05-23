@@ -23,7 +23,7 @@ export default function HomePage() {
           </div>
           <Architecture />
           <GetStarted />
-          <OpenSource />
+          {/* <OpenSource /> */}
           <Features />
           <Faq />
         </div>
@@ -232,7 +232,7 @@ function Faq() {
             wrappers not provided by Weave.js documentation.
           </AccordionContent>
         </AccordionItem>
-        <AccordionItem value="item-3" className="!border-b-0">
+        {/* <AccordionItem value="item-3" className="!border-b-0">
           <AccordionTrigger className="text-[20px] font-medium leading-[28px] !py-0">
             Is Weave.js free to use and open source?
           </AccordionTrigger>
@@ -254,7 +254,7 @@ function Faq() {
             2.0 License is a permissive license that allows its use in all types
             of applications.
           </AccordionContent>
-        </AccordionItem>
+        </AccordionItem> */}
         <AccordionItem value="item-5" className="!border-b-0">
           <AccordionTrigger className="text-[20px] font-medium leading-[28px] !py-0">
             How do I request a feature for Weave.js?
