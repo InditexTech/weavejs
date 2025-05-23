@@ -1,8 +1,8 @@
 import React from "react";
 import { cva } from "class-variance-authority";
 import { cn } from "@/lib/utils";
-import Image from "next/image";
-import GithubImg from "@/public/images/github.png";
+// import Image from "next/image";
+// import GithubImg from "@/public/images/github.png";
 import {
   Accordion,
   AccordionContent,
@@ -23,7 +23,7 @@ export default function HomePage() {
           </div>
           <Architecture />
           <GetStarted />
-          <OpenSource />
+          {/* <OpenSource /> */}
           <Features />
           <Faq />
         </div>
@@ -138,40 +138,40 @@ function GetStarted() {
   );
 }
 
-function OpenSource() {
-  return (
-    <div className="w-full mt-[128px] py-[48px] border-black dark:border-white border-t-[1px] border-b-[1px] flex justify-center items-center">
-      <div className="max-w-[800px] flex flex-col gap-[24px] justify-center items-center">
-        <div className="text-center text-[48px] leading-[56px] font-light uppercase">
-          Free & Open Source
-        </div>
-        <div className="text-center text-[20px] leading-[28px] font-light">
-          Weave.js is actively maintained and open for contributions.
-          <br /> It comes with best-in-class documentation and developer
-          experience.
-        </div>
-        <div>
-          <Image
-            src={GithubImg}
-            width={40}
-            height={40}
-            alt="Github logo"
-            className="ms-auto max-w-[450px] invert-0 dark:invert"
-          />
-        </div>
-        <div className="text-center">
-          <LinkButton
-            href="https://github.com/InditexTech/weavejs-frontend/fork"
-            variant="default"
-            style="main"
-          >
-            Create a fork
-          </LinkButton>
-        </div>
-      </div>
-    </div>
-  );
-}
+// function OpenSource() {
+//   return (
+//     <div className="w-full mt-[128px] py-[48px] border-black dark:border-white border-t-[1px] border-b-[1px] flex justify-center items-center">
+//       <div className="max-w-[800px] flex flex-col gap-[24px] justify-center items-center">
+//         <div className="text-center text-[48px] leading-[56px] font-light uppercase">
+//           Free & Open Source
+//         </div>
+//         <div className="text-center text-[20px] leading-[28px] font-light">
+//           Weave.js is actively maintained and open for contributions.
+//           <br /> It comes with best-in-class documentation and developer
+//           experience.
+//         </div>
+//         <div>
+//           <Image
+//             src={GithubImg}
+//             width={40}
+//             height={40}
+//             alt="Github logo"
+//             className="ms-auto max-w-[450px] invert-0 dark:invert"
+//           />
+//         </div>
+//         <div className="text-center">
+//           <LinkButton
+//             href="https://github.com/InditexTech/weavejs-frontend/fork"
+//             variant="default"
+//             style="main"
+//           >
+//             Create a fork
+//           </LinkButton>
+//         </div>
+//       </div>
+//     </div>
+//   );
+// }
 
 const badgeVariants = cva(
   "inline-flex size-7 text-[16px] leading-[20px] font-light items-center justify-center rounded-full bg-black text-white dark:bg-white dark:text-black"
@@ -232,7 +232,7 @@ function Faq() {
             wrappers not provided by Weave.js documentation.
           </AccordionContent>
         </AccordionItem>
-        <AccordionItem value="item-3" className="!border-b-0">
+        {/* <AccordionItem value="item-3" className="!border-b-0">
           <AccordionTrigger className="text-[20px] font-medium leading-[28px] !py-0">
             Is Weave.js free to use and open source?
           </AccordionTrigger>
@@ -254,7 +254,7 @@ function Faq() {
             2.0 License is a permissive license that allows its use in all types
             of applications.
           </AccordionContent>
-        </AccordionItem>
+        </AccordionItem> */}
         <AccordionItem value="item-5" className="!border-b-0">
           <AccordionTrigger className="text-[20px] font-medium leading-[28px] !py-0">
             How do I request a feature for Weave.js?
