@@ -20,6 +20,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## Changed
 
 - [#263](https://github.com/InditexTech/weavejs/issues/263) Awareness cursor UI improvements
+- [#274](https://github.com/InditexTech/weavejs/issues/274) Update create-app frontend
 
 ## Fixed
 
