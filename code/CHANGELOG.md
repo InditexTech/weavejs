@@ -25,6 +25,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 - [#245](https://github.com/InditexTech/weavejs/issues/245) Frames drag-and-drop quirks when frames overlap
+- [#270](https://github.com/InditexTech/weavejs/issues/270) "m" shortcut doesn't work
 
 ## [0.15.0] - 2025-05-21
 
