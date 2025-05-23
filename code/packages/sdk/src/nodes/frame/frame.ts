@@ -20,6 +20,7 @@ import type {
   WeaveFrameNodeParams,
   WeaveFrameProperties,
 } from './types';
+import type { WeaveNodesSelectionPlugin } from '@/plugins/nodes-selection/nodes-selection';
 
 export class WeaveFrameNode extends WeaveNode {
   private config: WeaveFrameProperties;
@@ -197,6 +198,13 @@ export class WeaveFrameNode extends WeaveNode {
       frameTitle.setAttrs({
         text: nextProps.title,
       });
+    }
+
+    const nodesSelectionPlugin =
+      this.instance.getPlugin<WeaveNodesSelectionPlugin>('nodesSelection');
+
+    if (nodesSelectionPlugin) {
+      nodesSelectionPlugin.getTransformer().forceUpdate();
     }
   }
 

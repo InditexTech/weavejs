@@ -238,7 +238,7 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
     return stage.findOne(`#${this.getLayerName()}`) as Konva.Layer | undefined;
   }
 
-  private triggerSelectedNodesEvent() {
+  triggerSelectedNodesEvent(): void {
     const selectedNodes: WeaveSelection[] = this.tr.getNodes().map((node) => {
       const nodeType = node.getAttr('nodeType');
       const nodeHandler = this.instance.getNodeHandler<WeaveNode>(nodeType);

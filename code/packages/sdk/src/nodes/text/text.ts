@@ -122,6 +122,13 @@ export class WeaveTextNode extends WeaveNode {
     nodeInstance.setAttrs({
       ...nextProps,
     });
+
+    const nodesSelectionPlugin =
+      this.instance.getPlugin<WeaveNodesSelectionPlugin>('nodesSelection');
+
+    if (nodesSelectionPlugin) {
+      nodesSelectionPlugin.getTransformer().forceUpdate();
+    }
   }
 
   serialize(instance: WeaveElementInstance): WeaveStateElement {

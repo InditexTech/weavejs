@@ -12,6 +12,7 @@ import { type ImageProps } from './types';
 import { WeaveImageToolAction } from '@/actions/image-tool/image-tool';
 import { WeaveImageClip } from './clip';
 import { WEAVE_IMAGE_NODE_TYPE } from './constants';
+import type { WeaveNodesSelectionPlugin } from '@/plugins/nodes-selection/nodes-selection';
 
 export class WeaveImageNode extends WeaveNode {
   protected nodeType: string = WEAVE_IMAGE_NODE_TYPE;
@@ -47,6 +48,7 @@ export class WeaveImageNode extends WeaveNode {
 
     const image = new Konva.Group({
       ...groupImageProps,
+      ...internalImageProps,
       id,
       name: 'node',
     });
@@ -89,6 +91,8 @@ export class WeaveImageNode extends WeaveNode {
     const clipGroup = new Konva.Group({
       x: 0,
       y: 0,
+      scaleX: 1,
+      scaleY: 1,
       visible: false,
     });
 
@@ -221,6 +225,7 @@ export class WeaveImageNode extends WeaveNode {
       });
     }
     if (this.imageLoaded) {
+      console.log({ attrs: internalImageProps });
       internalImage?.setAttrs({
         ...internalImageProps,
         ...(nodeAttrs.imageProperties ?? {}),
@@ -235,6 +240,13 @@ export class WeaveImageNode extends WeaveNode {
         draggable: false,
         zIndex: 0,
       });
+    }
+
+    const nodesSelectionPlugin =
+      this.instance.getPlugin<WeaveNodesSelectionPlugin>('nodesSelection');
+
+    if (nodesSelectionPlugin) {
+      nodesSelectionPlugin.getTransformer().forceUpdate();
     }
   }
 
@@ -267,29 +279,25 @@ export class WeaveImageNode extends WeaveNode {
         height: imageProps.height ? imageProps.height : imageObj.height,
       });
       imagePlaceholder?.destroy();
-      // imagePlaceholder?.setAttrs({
-      //   width: imageProps.width ? imageProps.width : imageObj.width,
-      //   height: imageProps.height ? imageProps.height : imageObj.height,
-      //   visible: false,
-      // });
+
       internalImage?.setAttrs({
         width: imageProps.width ? imageProps.width : imageObj.width,
         height: imageProps.height ? imageProps.height : imageObj.height,
         image: imageObj,
         visible: true,
       });
+      internalImage?.setAttr('imageInfo', {
+        width: imageObj.width,
+        height: imageObj.height,
+      });
       internalImage?.zIndex(0);
 
       this.imageLoaded = true;
 
-      image.setAttr(
-        'width',
-        imageProps.width ? imageProps.width : imageObj.width
-      );
-      image.setAttr(
-        'height',
-        imageProps.height ? imageProps.height : imageObj.height
-      );
+      image.setAttrs({
+        width: imageProps.width ? imageProps.width : imageObj.width,
+        height: imageProps.height ? imageProps.height : imageObj.height,
+      });
       image.setAttr('imageInfo', {
         width: imageObj.width,
         height: imageObj.height,

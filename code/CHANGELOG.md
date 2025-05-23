@@ -23,6 +23,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Fixed
 
+- [#238](https://github.com/InditexTech/weavejs/issues/238) Crop image resizing and after-cropping position issues
 - [#245](https://github.com/InditexTech/weavejs/issues/245) Frames drag-and-drop quirks when frames overlap
 
 ## [0.15.0] - 2025-05-21

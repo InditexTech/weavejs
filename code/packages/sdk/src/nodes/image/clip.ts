@@ -12,14 +12,14 @@ export class WeaveImageClip {
   private instance!: Weave;
   private image!: Konva.Group;
   private internalImage!: Konva.Image;
+  private clipImage!: Konva.Image;
   private clipGroup!: Konva.Group;
   private clipRect!: Konva.Rect;
   private grid!: Konva.Group;
+  private imageTransformer!: Konva.Transformer;
   private transformer!: Konva.Transformer;
   private node: WeaveImageNode;
-  private handleHide: () => void;
-  private handleCrop: () => void;
-  private handleDrag: () => void;
+  private handleHide: (e: KeyboardEvent) => void;
 
   constructor(
     instance: Weave,
@@ -34,13 +34,9 @@ export class WeaveImageClip {
     this.internalImage = internalImage;
     this.clipGroup = clipGroup;
     this.handleHide = this.hide.bind(this);
-    this.handleCrop = this.handleClipTransform.bind(this);
-    this.handleDrag = this.handleClipDrag.bind(this);
   }
 
   show(): void {
-    const originalImage = this.internalImage.getAttr('image');
-
     const nodeSnappingPlugin =
       this.instance.getPlugin<WeaveNodesSelectionPlugin>('nodesSnapping');
     if (nodeSnappingPlugin) {
@@ -55,37 +51,64 @@ export class WeaveImageClip {
       selectionPlugin.getTransformer().hide();
     }
 
-    const ratio =
-      this.internalImage.cropWidth() === 0
-        ? this.image.width() / this.image.width()
-        : this.image.width() / this.internalImage.cropWidth();
+    console.log({ attrs: this.internalImage.getAttrs() });
 
-    const originWidth = ratio * originalImage.width;
-    const originHeight = ratio * originalImage.height;
-    const cropX = this.internalImage.cropX() * ratio;
-    const cropY = this.internalImage.cropY() * ratio;
+    const imageAttrs = this.internalImage.getAttrs();
+    const clipWidth = imageAttrs.cropRect
+      ? imageAttrs.cropRect.width
+      : imageAttrs.width;
+    const clipHeight = imageAttrs.cropRect
+      ? imageAttrs.cropRect.height
+      : imageAttrs.height;
 
     this.internalImage.hide();
 
-    const clipImage = this.internalImage.clone({
-      width: originWidth,
-      height: originHeight,
-      cropX: 0,
-      cropY: 0,
-      cropWidth: 0,
-      cropHeight: 0,
+    this.clipImage = this.internalImage.clone({
+      x: imageAttrs.cropRect ? (imageAttrs.x ?? 0) - imageAttrs.cropRect.x : 0,
+      y: imageAttrs.cropRect ? (imageAttrs.y ?? 0) - imageAttrs.cropRect.y : 0,
+      width: imageAttrs.uncroppedImage
+        ? imageAttrs.uncroppedImage.width
+        : this.internalImage.width(),
+      height: imageAttrs.uncroppedImage
+        ? imageAttrs.uncroppedImage.height
+        : this.internalImage.height(),
+      scaleX: 1,
+      scaleY: 1,
+      crop: undefined,
       visible: true,
-      draggable: false,
-      rotation: 0,
+      draggable: true,
     });
 
+    this.imageTransformer = new Konva.Transformer({
+      flipEnabled: false,
+      keepRatio: false,
+      rotateEnabled: false,
+      enabledAnchors: [
+        'top-left',
+        'top-center',
+        'top-right',
+        'middle-right',
+        'bottom-left',
+        'middle-left',
+        'bottom-right',
+        'bottom-center',
+      ],
+    });
+
+    this.imageTransformer.nodes([this.clipImage]);
+
+    this.clipImage.stroke('red');
+    this.clipImage.strokeWidth(1);
+    this.clipImage.strokeScaleEnabled(false);
+
     this.clipRect = new Konva.Rect({
-      width: this.internalImage.width(),
-      height: this.internalImage.height(),
-      fill: 'rgba(0,0,0,0.5)',
       x: 0,
       y: 0,
-      draggable: true,
+      width: clipWidth,
+      height: clipHeight,
+      fill: 'rgba(0,0,0,0.2)',
+      listening: false,
+      draggable: false,
       rotation: 0,
     });
 
@@ -93,29 +116,40 @@ export class WeaveImageClip {
       flipEnabled: false,
       keepRatio: false,
       rotateEnabled: false,
-      enabledAnchors: ['top-left', 'top-right', 'bottom-left', 'bottom-right'],
+      enabledAnchors: [
+        'top-left',
+        'top-center',
+        'top-right',
+        'middle-right',
+        'bottom-left',
+        'middle-left',
+        'bottom-right',
+        'bottom-center',
+      ],
       rotation: 0,
     });
 
     this.grid = new Konva.Group();
+    this.drawGridLines(this.clipRect.width(), this.clipRect.height());
 
-    this.transformer.on('dragmove', this.handleDrag);
-    this.transformer.on('transform', this.handleCrop);
+    // this.transformer.on('dragmove', this.handleDrag);
+    // this.transformer.on('transform', this.handleCrop);
 
     this.transformer.nodes([this.clipRect]);
 
-    this.clipGroup.add(clipImage);
+    this.clipGroup.add(this.clipImage);
+    this.clipGroup.add(this.imageTransformer);
     this.clipGroup.add(this.clipRect);
     this.clipGroup.add(this.grid);
     this.clipGroup.add(this.transformer);
 
-    this.clipGroup.setPosition({ x: -cropX, y: -cropY });
-    this.clipRect.position({
-      x: cropX,
-      y: cropY,
-    });
+    // this.clipGroup.setPosition({ x: -clipX, y: -clipY });
+    // this.clipRect.position({
+    //   x: clipX,
+    //   y: cropY,
+    // });
 
-    this.handleClipTransform();
+    // this.handleClipTransform();
 
     this.clipGroup.show();
 
@@ -125,8 +159,14 @@ export class WeaveImageClip {
       .addEventListener('keydown', this.handleHide);
   }
 
-  private hide() {
-    this.handleClipEnd();
+  private hide(e: KeyboardEvent) {
+    if (!['Enter', 'Escape'].includes(e.key)) {
+      return;
+    }
+
+    if (e.key === 'Enter') {
+      this.handleClipEnd();
+    }
 
     this.node.cropping = false;
 
@@ -134,9 +174,6 @@ export class WeaveImageClip {
       .getStage()
       .container()
       .removeEventListener('keydown', this.handleHide);
-
-    this.transformer.off('dragmove', this.handleDrag);
-    this.transformer.off('transform', this.handleCrop);
 
     this.clipGroup.destroyChildren();
     this.clipGroup.hide();
@@ -155,92 +192,12 @@ export class WeaveImageClip {
       selectionTransformer.nodes([this.image]);
       selectionTransformer.show();
       setTimeout(() => {
+        selectionPlugin.triggerSelectedNodesEvent();
         selectionTransformer.forceUpdate();
       }, 0);
     }
 
     this.internalImage.show();
-  }
-
-  private handleClipTransform() {
-    if (!this.node.cropping) {
-      return;
-    }
-
-    const originalImage = this.internalImage.getAttr('image');
-
-    let x = this.clipRect.x();
-    let y = this.clipRect.y();
-    let width = this.clipRect.width() * this.clipRect.scaleX();
-    let height = this.clipRect.height() * this.clipRect.scaleY();
-
-    if (x < 0) {
-      width += x;
-      x = 0;
-    }
-    if (x + width > originalImage.width) {
-      width = originalImage.width - x;
-    }
-    if (y < 0) {
-      height += y;
-      y = 0;
-    }
-    if (y + height > originalImage.height) {
-      height = originalImage.height - y;
-    }
-
-    this.clipRect.setAttrs({
-      x,
-      y,
-      width,
-      height,
-      scaleX: 1,
-      scaleY: 1,
-    });
-    this.transformer.absolutePosition(this.clipRect.absolutePosition());
-    this.grid.position({ x, y });
-    this.drawGridLines(width, height);
-  }
-
-  private handleClipDrag() {
-    if (!this.node.cropping) {
-      return;
-    }
-
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const originalImage: any = this.internalImage.getAttr('image');
-
-    let x = this.clipRect.x();
-    let y = this.clipRect.y();
-    let width = this.clipRect.width();
-    let height = this.clipRect.height();
-    const originWidth = originalImage.width;
-    const originHeight = originalImage.height;
-
-    if (x < 0) {
-      x = 0;
-    }
-    if (x + width > originWidth) {
-      x = originWidth - width;
-      width = originWidth - x;
-    }
-    if (y < 0) {
-      y = 0;
-    }
-    if (y + height > originHeight) {
-      y = originHeight - height;
-      height = originHeight - y;
-    }
-
-    this.clipRect.setAttrs({
-      x,
-      y,
-      width,
-      height,
-    });
-
-    this.grid.position({ x, y });
-    this.drawGridLines(width, height);
   }
 
   private drawGridLines(width: number, height: number) {
@@ -271,28 +228,77 @@ export class WeaveImageClip {
       return;
     }
 
-    const cropX = this.clipRect.x();
-    const cropY = this.clipRect.y();
-    const width = this.clipRect.width();
-    const height = this.clipRect.height();
+    const clipImageRectCoords = this.clipImage.getClientRect();
+    const clipRectCoords = this.clipRect.getClientRect();
 
-    if (this.image) {
+    const clipRect = this.getIntersectionRect(this.clipRect, this.clipImage);
+
+    // const clipX = clipRectCoords.x;
+    // const clipY = clipRectCoords.y;
+    // const clipWidth = clipRectCoords.width;
+    // const clipHeight = clipRectCoords.height;
+
+    if (this.image && clipRect) {
+      const clonedClipRect = { ...clipRect };
+      console.log('BEFORE', {
+        clonedClipRect,
+        clipImageRectCoords,
+        clipRectCoords,
+      });
+
+      clipRect.x = clipRect.x - clipImageRectCoords.x;
+      clipRect.y = clipRect.y - clipImageRectCoords.y;
+
       this.image.setAttrs({
-        width,
-        height,
-        cropX,
-        cropY,
-        cropWidth: width,
-        cropHeight: height,
+        width: clipRect.width,
+        height: clipRect.height,
+        uncroppedImage: {
+          x: this.clipImage.getAbsolutePosition().x,
+          y: this.clipImage.getAbsolutePosition().y,
+          width: this.clipImage.width(),
+          height: this.clipImage.height(),
+        },
+        cropRect: clipRect,
+        crop: clipRect,
       });
-      const clipRectPos = this.clipRect.getAbsolutePosition();
-      this.image.setPosition({
-        x: clipRectPos.x,
-        y: clipRectPos.y,
-      });
+
+      // Update position
+      const clipImage = this.clipImage.getAbsolutePosition();
+      const clipPos = this.clipRect.getAbsolutePosition();
+      const clipRotation = this.clipRect.getAbsoluteRotation();
+      const newCoords = {
+        x: clipImageRectCoords.x > clipRectCoords.x ? clipImage.x : clipPos.x,
+        y: clipImageRectCoords.y > clipRectCoords.y ? clipImage.y : clipPos.y,
+      };
+      this.image.setAbsolutePosition(newCoords);
+      this.image.rotation(clipRotation);
+
+      // Update node
       this.instance.updateNode(
         this.node.serialize(this.image as WeaveElementInstance)
       );
     }
+  }
+
+  private getIntersectionRect(
+    a: Konva.Node,
+    b: Konva.Node
+  ): { x: number; y: number; width: number; height: number } | null {
+    const rectA = a.getClientRect();
+    const rectB = b.getClientRect();
+
+    const x1 = Math.max(rectA.x, rectB.x);
+    const y1 = Math.max(rectA.y, rectB.y);
+    const x2 = Math.min(rectA.x + rectA.width, rectB.x + rectB.width);
+    const y2 = Math.min(rectA.y + rectA.height, rectB.y + rectB.height);
+
+    const width = x2 - x1;
+    const height = y2 - y1;
+
+    if (width <= 0 || height <= 0) {
+      return null; // No intersection
+    }
+
+    return { x: x1, y: y1, width, height };
   }
 }

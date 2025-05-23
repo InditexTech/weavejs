@@ -117,8 +117,19 @@ export abstract class WeaveNode implements WeaveNodeBase {
     node.on('transform', (e) => {
       const node = e.target;
 
+      const nodesSelectionPlugin =
+        this.instance.getPlugin<WeaveNodesSelectionPlugin>('nodesSelection');
+
       const nodesSnappingPlugin =
         this.instance.getPlugin<WeaveNodesSnappingPlugin>('nodesSnapping');
+
+      if (
+        nodesSelectionPlugin &&
+        this.isSelecting() &&
+        this.isNodeSelected(node)
+      ) {
+        nodesSelectionPlugin.getTransformer().forceUpdate();
+      }
 
       if (
         nodesSnappingPlugin &&
@@ -144,6 +155,9 @@ export abstract class WeaveNode implements WeaveNodeBase {
     node.on('transformend', (e) => {
       const node = e.target;
 
+      const nodesSelectionPlugin =
+        this.instance.getPlugin<WeaveNodesSelectionPlugin>('nodesSelection');
+
       const nodesSnappingPlugin =
         this.instance.getPlugin<WeaveNodesSnappingPlugin>('nodesSnapping');
 
@@ -153,6 +167,14 @@ export abstract class WeaveNode implements WeaveNodeBase {
         this.isNodeSelected(node)
       ) {
         nodesSnappingPlugin.cleanupEvaluateGuidelines();
+      }
+
+      if (
+        nodesSelectionPlugin &&
+        this.isSelecting() &&
+        this.isNodeSelected(node)
+      ) {
+        nodesSelectionPlugin.getTransformer().forceUpdate();
       }
     });
 

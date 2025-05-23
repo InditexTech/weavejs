@@ -9,6 +9,7 @@ import {
 } from '@inditextech/weave-types';
 import { WeaveNode } from '../node';
 import { WEAVE_LINE_NODE_TYPE } from './constants';
+import type { WeaveNodesSelectionPlugin } from '@/plugins/nodes-selection/nodes-selection';
 
 export class WeaveLineNode extends WeaveNode {
   protected nodeType: string = WEAVE_LINE_NODE_TYPE;
@@ -31,5 +32,12 @@ export class WeaveLineNode extends WeaveNode {
     nodeInstance.setAttrs({
       ...nextProps,
     });
+
+    const nodesSelectionPlugin =
+      this.instance.getPlugin<WeaveNodesSelectionPlugin>('nodesSelection');
+
+    if (nodesSelectionPlugin) {
+      nodesSelectionPlugin.getTransformer().forceUpdate();
+    }
   }
 }

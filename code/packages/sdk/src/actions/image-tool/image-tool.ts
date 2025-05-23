@@ -243,6 +243,8 @@ export class WeaveImageToolAction extends WeaveAction {
         stroke: '#000000ff',
         strokeWidth: 0,
         strokeScaleEnabled: false,
+        imageWidth: this.preloadImgs[this.imageId].width,
+        imageHeight: this.preloadImgs[this.imageId].height,
         imageInfo: {
           width: this.preloadImgs[this.imageId].width,
           height: this.preloadImgs[this.imageId].height,
