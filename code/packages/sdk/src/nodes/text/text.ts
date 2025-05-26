@@ -393,9 +393,12 @@ export class WeaveTextNode extends WeaveNode {
 
     const textPosition = textNode.absolutePosition();
 
+    const stageContainer = stage.container();
+    const stageRect = stageContainer.getBoundingClientRect();
+
     const areaPosition: Vector2d = {
-      x: stage.container().offsetLeft + textPosition.x,
-      y: stage.container().offsetTop + textPosition.y,
+      x: stageRect.x + stageContainer.offsetLeft + textPosition.x,
+      y: stageRect.y + stageContainer.offsetTop + textPosition.y,
     };
 
     this.createTextAreaDOM(textNode, areaPosition);
