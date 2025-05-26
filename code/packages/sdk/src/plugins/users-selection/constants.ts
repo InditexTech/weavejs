@@ -3,5 +3,4 @@
 // SPDX-License-Identifier: Apache-2.0
 
 export const WEAVE_USERS_SELECTION_KEY = 'usersSelection';
-export const WEAVE_USERS_SELECTION_LAYER_ID = 'usersPointersLayer';
 export const WEAVE_USER_SELECTION_KEY = 'userSelection';
