@@ -1,7 +1,6 @@
 'use client';
 
 import React from 'react';
-import { WeaveStateElement } from '@inditextech/weave-types';
 import { useWeave } from '@inditextech/weave-react';
 import { useCollaborationRoom } from '@/store/store';
 import { InputNumber } from '../inputs/input-number';
@@ -9,26 +8,17 @@ import { InputNumber } from '../inputs/input-number';
 export function ImageProperties() {
   const instance = useWeave((state) => state.instance);
   const node = useWeave((state) => state.selection.node);
-  const actualAction = useWeave((state) => state.actions.actual);
 
   const nodePropertiesAction = useCollaborationRoom(
     (state) => state.nodeProperties.action
   );
 
-  const nodeCreateProps = useCollaborationRoom(
-    (state) => state.nodeProperties.createProps
-  );
-
-  const [actualNode, setActualNode] = React.useState<
-    WeaveStateElement | undefined
-  >(node);
-
-  React.useEffect(() => {
-    if (!instance) return;
+  const actualNode = React.useMemo(() => {
     if (node && nodePropertiesAction === 'update') {
-      setActualNode(node);
+      return node;
     }
-  }, [instance, actualAction, node, nodePropertiesAction, nodeCreateProps]);
+    return undefined;
+  }, [node, nodePropertiesAction]);
 
   if (!instance || !actualNode) return null;
 
