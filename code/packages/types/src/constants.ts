@@ -3,7 +3,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 export const WEAVE_NODE_LAYER_ID = 'mainLayer';
-
+export const WEAVE_AWARENESS_LAYER_ID = 'usersPointersLayer';
 export const WEAVE_UTILITY_LAYER_ID = 'utilityLayer';
 
 export const WEAVE_INSTANCE_STATUS = {

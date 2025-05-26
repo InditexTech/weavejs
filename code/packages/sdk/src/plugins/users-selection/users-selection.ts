@@ -2,8 +2,10 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-import _ from 'lodash';
-import { type WeaveAwarenessChange } from '@inditextech/weave-types';
+import {
+  type WeaveAwarenessChange,
+  WEAVE_AWARENESS_LAYER_ID,
+} from '@inditextech/weave-types';
 import {
   type WeaveUserSelectionInfo,
   type WeaveUserSelectionKey,
@@ -13,7 +15,6 @@ import {
 import {
   WEAVE_USER_SELECTION_KEY,
   WEAVE_USERS_SELECTION_KEY,
-  WEAVE_USERS_SELECTION_LAYER_ID,
 } from './constants';
 import { WeavePlugin } from '@/plugins/plugin';
 import Konva from 'konva';
@@ -41,7 +42,7 @@ export class WeaveUsersSelectionPlugin extends WeavePlugin {
   }
 
   getLayerName(): string {
-    return WEAVE_USERS_SELECTION_LAYER_ID;
+    return WEAVE_AWARENESS_LAYER_ID;
   }
 
   initLayer(): void {
@@ -61,9 +62,7 @@ export class WeaveUsersSelectionPlugin extends WeavePlugin {
 
   getLayer() {
     const stage = this.instance.getStage();
-    return stage.findOne(`#${WEAVE_USERS_SELECTION_LAYER_ID}`) as
-      | Konva.Layer
-      | undefined;
+    return stage.findOne(`#${this.getLayerName()}`) as Konva.Layer | undefined;
   }
 
   onInit(): void {
@@ -99,33 +98,6 @@ export class WeaveUsersSelectionPlugin extends WeavePlugin {
               actualNodes: userSelection,
             };
           }
-        }
-
-        const allActiveUsersSelections = Object.keys(this.usersSelection).map(
-          (userSelectionKey) => {
-            const selectionInfo = this.usersSelection[userSelectionKey];
-            return selectionInfo.actualNodes.user;
-          }
-        );
-
-        const inactiveSelections = _.differenceWith(
-          allActiveUsersSelections,
-          allActiveUsers,
-          _.isEqual
-        );
-
-        const selectionsLayer = this.getLayer();
-
-        for (const inactiveSelection of inactiveSelections) {
-          const userPointerNode = selectionsLayer?.findOne(
-            `#${inactiveSelection}`
-          ) as Konva.Group | undefined;
-
-          if (userPointerNode) {
-            userPointerNode.destroy();
-          }
-
-          delete this.usersSelection[inactiveSelection];
         }
 
         this.renderSelectors();
@@ -218,70 +190,40 @@ export class WeaveUsersSelectionPlugin extends WeavePlugin {
     for (const userPointerKey of Object.keys(this.usersSelection)) {
       const userSelector = this.usersSelection[userPointerKey];
 
-      const userSelectorNode = selectorsLayer?.findOne(
-        `#selector_${userSelector.actualNodes.user}`
-      ) as Konva.Group | undefined;
+      const selectionRect = this.getSelectedNodesRect(
+        userSelector.actualNodes.nodes
+      );
 
-      if (!userSelectorNode) {
-        const selectionRect = this.getSelectedNodesRect(
-          userSelector.actualNodes.nodes
-        );
+      const userSelectorNode = new Konva.Group({
+        name: 'selector',
+        id: `selector_${userSelector.actualNodes.user}`,
+        x: selectionRect.x,
+        y: selectionRect.y,
+        width: selectionRect.width / stage.scaleX(),
+        height: selectionRect.height / stage.scaleY(),
+        listening: false,
+      });
+      userSelectorNode.moveToBottom();
 
-        const userSelectorNode = new Konva.Group({
-          name: 'selector',
-          id: `selector_${userSelector.actualNodes.user}`,
-          x: selectionRect.x,
-          y: selectionRect.y,
-          width: selectionRect.width / stage.scaleX(),
-          height: selectionRect.height / stage.scaleY(),
-          listening: false,
-        });
+      const userSelectorRect = new Konva.Rect({
+        x: 0,
+        y: 0,
+        id: `selector_${userSelector.actualNodes.user}_rect`,
+        width: selectionRect.width / stage.scaleX(),
+        height: selectionRect.height / stage.scaleY(),
+        fill: 'transparent',
+        stroke: this.stringToColor(userSelector.actualNodes.user),
+        strokeWidth: 3,
+        strokeScaleEnabled: false,
+      });
 
-        const userSelectorRect = new Konva.Rect({
-          x: 0,
-          y: 0,
-          id: `selector_${userSelector.actualNodes.user}_rect`,
-          width: selectionRect.width / stage.scaleX(),
-          height: selectionRect.height / stage.scaleY(),
-          fill: 'transparent',
-          stroke: this.stringToColor(userSelector.actualNodes.user),
-          strokeWidth: 3,
-          strokeScaleEnabled: false,
-        });
+      userSelectorNode.add(userSelectorRect);
+      selectorsLayer?.add(userSelectorNode);
+    }
 
-        userSelectorNode.add(userSelectorRect);
-        selectorsLayer?.add(userSelectorNode);
-
-        continue;
-      }
-
-      const userSelectorRect = selectorsLayer?.findOne(
-        `#selector_${userSelector.actualNodes.user}_rect`
-      ) as Konva.Group | undefined;
-
-      if (userSelectorRect) {
-        const selectionRect = this.getSelectedNodesRect(
-          userSelector.actualNodes.nodes
-        );
-
-        userSelectorNode.setAttrs({
-          x: selectionRect.x,
-          y: selectionRect.y,
-          width: selectionRect.width,
-          height: selectionRect.height,
-          scale: 1,
-        });
-
-        userSelectorRect.setAttrs({
-          x: 0,
-          y: 0,
-          width: selectionRect.width,
-          height: selectionRect.height,
-        });
-
-        // userSelectorNode.scaleX(userSelectorNode.scaleX() * stage.scaleX());
-        // userSelectorNode.scaleY(userSelectorNode.scaleY() * stage.scaleY());
-      }
+    const pointers = selectorsLayer?.find('.pointer') ?? [];
+    for (const pointer of pointers) {
+      pointer.moveToTop();
     }
   }
 
