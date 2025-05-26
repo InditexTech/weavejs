@@ -14,7 +14,7 @@ import {
 import { Check, ChevronDown } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
-import { useEffect, useRef, useState } from 'react';
+import React from 'react';
 import { FONTS } from '@/components/utils/constants';
 
 function InputFontFamily({
@@ -24,11 +24,11 @@ function InputFontFamily({
   value: string;
   onChange: (value: string) => void;
 }) {
-  const [selectedFont, setSelectedFont] = useState<string>(value);
-  const [open, setOpen] = useState(false);
-  const lastSelectedFontFamily = useRef<string>(value);
+  const [selectedFont, setSelectedFont] = React.useState<string>(value);
+  const [open, setOpen] = React.useState(false);
+  const lastSelectedFontFamily = React.useRef<string>(value);
 
-  useEffect(() => {
+  React.useEffect(() => {
     if (onChange && selectedFont !== lastSelectedFontFamily.current) {
       lastSelectedFontFamily.current = selectedFont;
       onChange(selectedFont);

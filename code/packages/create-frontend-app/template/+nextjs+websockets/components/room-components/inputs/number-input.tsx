@@ -31,46 +31,52 @@ export const NumberInput = React.forwardRef<HTMLInputElement, NumberInputProps>(
       onValueChange,
       fixedDecimalScale = false,
       decimalScale = 0,
-      value: controlledValue,
+      value,
       ...props
     },
     ref
   ) => {
-    const [value, setValue] = React.useState<number | undefined>(
-      controlledValue ?? defaultValue
+    const editingRef = React.useRef<HTMLInputElement>(null);
+    const [editing, setEditing] = React.useState<boolean>(false);
+    const [editedValue, setEditedValue] = React.useState<number | undefined>(
+      defaultValue
     );
 
-    React.useEffect(() => {
-      if (controlledValue !== undefined) {
-        setValue(controlledValue);
-      }
-    }, [controlledValue]);
+    const handleChange = React.useCallback(
+      (values: { value: string; floatValue: number | undefined }) => {
+        const newValue =
+          values.floatValue === undefined ? undefined : values.floatValue;
 
-    const handleChange = (values: {
-      value: string;
-      floatValue: number | undefined;
-    }) => {
-      const newValue =
-        values.floatValue === undefined ? undefined : values.floatValue;
-      setValue(newValue);
-      if (onValueChange) {
-        onValueChange(newValue);
-      }
-    };
+        setEditedValue(newValue);
+      },
+      []
+    );
 
-    const handleBlur = () => {
-      if (value !== undefined) {
-        if (value < min) {
-          setValue(min);
+    const handleBlur = React.useCallback(() => {
+      onValueChange?.(editedValue);
+
+      if (editedValue !== undefined) {
+        if (editedValue < min) {
+          if (onValueChange) {
+            onValueChange(min);
+          }
           (ref as React.RefObject<HTMLInputElement>).current!.value =
             String(min);
-        } else if (value > max) {
-          setValue(max);
+        } else if (editedValue > max) {
+          if (onValueChange) {
+            onValueChange(max);
+          }
           (ref as React.RefObject<HTMLInputElement>).current!.value =
             String(max);
         }
       }
-    };
+    }, [editedValue, onValueChange, min, max, ref]);
+
+    React.useEffect(() => {
+      if (editingRef.current) {
+        editingRef.current.focus();
+      }
+    }, [editing]);
 
     return (
       <div className="flex flex-col items-start justify-start relative">
@@ -80,29 +86,52 @@ export const NumberInput = React.forwardRef<HTMLInputElement, NumberInputProps>(
           </div>
         )}
         <div className="w-full flex items-center relative">
-          <NumericFormat
-            value={value}
-            onValueChange={handleChange}
-            thousandSeparator={thousandSeparator}
-            decimalScale={decimalScale}
-            fixedDecimalScale={fixedDecimalScale}
-            allowNegative={min < 0}
-            valueIsNumericString
-            onFocus={() => {
-              window.weaveOnFieldFocus = true;
-            }}
-            onBlurCapture={() => {
-              window.weaveOnFieldFocus = false;
-              handleBlur();
-            }}
-            max={max}
-            min={min}
-            customInput={Input}
-            placeholder={placeholder}
-            getInputRef={ref}
-            {...props}
-            className="w-full py-0 h-[40px] rounded-none !text-[14px] !border-black font-normal text-black text-right focus:outline-none bg-transparent shadow-none"
-          />
+          {!editing && (
+            <NumericFormat
+              value={value}
+              onValueChange={handleChange}
+              thousandSeparator={thousandSeparator}
+              decimalScale={decimalScale}
+              fixedDecimalScale={fixedDecimalScale}
+              allowNegative={min < 0}
+              valueIsNumericString
+              onFocus={() => {
+                setEditing(true);
+                setEditedValue(value);
+                window.weaveOnFieldFocus = true;
+              }}
+              max={max}
+              min={min}
+              customInput={Input}
+              placeholder={placeholder}
+              getInputRef={ref}
+              {...props}
+              className="w-full py-0 h-[40px] rounded-none !text-[14px] !border-black font-normal text-black text-right focus:outline-none bg-transparent shadow-none"
+            />
+          )}
+          {editing && (
+            <NumericFormat
+              value={editedValue}
+              onValueChange={handleChange}
+              thousandSeparator={thousandSeparator}
+              decimalScale={decimalScale}
+              fixedDecimalScale={fixedDecimalScale}
+              allowNegative={min < 0}
+              valueIsNumericString
+              onBlurCapture={() => {
+                window.weaveOnFieldFocus = false;
+                setEditing(false);
+                handleBlur();
+              }}
+              max={max}
+              min={min}
+              customInput={Input}
+              placeholder={placeholder}
+              getInputRef={editingRef}
+              {...props}
+              className="w-full py-0 h-[40px] rounded-none !text-[14px] !border-black font-normal text-black text-right focus:outline-none bg-transparent shadow-none"
+            />
+          )}
         </div>
       </div>
     );
