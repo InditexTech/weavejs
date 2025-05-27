@@ -46,6 +46,11 @@ const azureWebPubSubServer = new WeaveAzureWebPubsubServer(params: WeaveAzureWeb
         "An object defining the Azure Web PubSub params: endpoint, access key and hub name",
       type: "WeaveAzureWebPubsubConfig",
     },
+    eventsHandlerConfig: {
+      required: true,
+      description: "An object Azure Web PubSub Event Handler configuration",
+      type: "WebPubSubEventHandlerOptions",
+    },
     persistRoom: {
       description:
         "Weave.js Store to use to handle the real-time communication",
