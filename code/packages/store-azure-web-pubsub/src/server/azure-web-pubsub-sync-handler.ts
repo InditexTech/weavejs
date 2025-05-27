@@ -5,7 +5,10 @@
 import * as Y from 'yjs';
 import WebSocket from 'ws';
 import { WebPubSubServiceClient } from '@azure/web-pubsub';
-import { WebPubSubEventHandler } from '@azure/web-pubsub-express';
+import {
+  WebPubSubEventHandler,
+  type WebPubSubEventHandlerOptions,
+} from '@azure/web-pubsub-express';
 import { type FetchInitialState } from '@/types';
 import { WeaveStoreAzureWebPubSubSyncHost } from './azure-web-pubsub-host';
 import { WeaveAzureWebPubsubServer } from './azure-web-pubsub-server';
@@ -22,14 +25,15 @@ export default class WeaveAzureWebPubsubSyncHandler extends WebPubSubEventHandle
   private actualServer: WeaveAzureWebPubsubServer;
 
   constructor(
-    hub: string,
-    path: string,
+    server: WeaveAzureWebPubsubServer,
     client: WebPubSubServiceClient,
     initialState: FetchInitialState,
-    server: WeaveAzureWebPubsubServer
+    hub: string,
+    // path: string,
+    options?: WebPubSubEventHandlerOptions
   ) {
     super(hub, {
-      path: path,
+      ...options,
     });
 
     this.actualServer = server;
