@@ -217,7 +217,7 @@ export class WeaveStagePanningPlugin extends WeavePlugin {
       stage.x(stage.x() - e.deltaX);
       stage.y(stage.y() - e.deltaY);
 
-      this.instance.emit('stageMove', undefined);
+      this.instance.emit('onStageMove', undefined);
     });
   }
 
