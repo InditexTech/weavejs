@@ -17,6 +17,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - [#288](https://github.com/InditexTech/weavejs/issues/288) Provide a tool for erasing elements
 
+### Fixed
+
+- [#290](https://github.com/InditexTech/weavejs/issues/290) Maintain text node size when changed
+
 ## [0.18.0] - 2025-05-27
 
 ### Changed

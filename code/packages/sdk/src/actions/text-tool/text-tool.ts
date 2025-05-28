@@ -6,7 +6,11 @@ import { v4 as uuidv4 } from 'uuid';
 import { WeaveAction } from '@/actions/action';
 import { type Vector2d } from 'konva/lib/types';
 import { type WeaveTextToolActionState } from './types';
-import { TEXT_TOOL_ACTION_NAME, TEXT_TOOL_STATE } from './constants';
+import {
+  TEXT_LAYOUT,
+  TEXT_TOOL_ACTION_NAME,
+  TEXT_TOOL_STATE,
+} from './constants';
 import Konva from 'konva';
 import { WeaveNodesSelectionPlugin } from '@/plugins/nodes-selection/nodes-selection';
 import type { WeaveTextNode } from '@/nodes/text/text';
@@ -103,8 +107,9 @@ export class WeaveTextToolAction extends WeaveAction {
     const node = nodeHandler.create(this.textId, {
       x: this.clickPoint?.x ?? 0,
       y: this.clickPoint?.y ?? 0,
-      text: 'Your text here...',
-      width: 300,
+      text: '',
+      layout: TEXT_LAYOUT.AUTO_ALL,
+      width: 10,
       fontSize: 20,
       fontFamily: 'Arial, sans-serif',
       fill: '#000000ff',

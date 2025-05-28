@@ -9,3 +9,9 @@ export const TEXT_TOOL_STATE = {
   ['ADDING']: 'adding',
   ['FINISHED']: 'finished',
 } as const;
+
+export const TEXT_LAYOUT = {
+  ['AUTO_ALL']: 'auto-all',
+  ['AUTO_HEIGHT']: 'auto-height',
+  ['FIXED']: 'fixed',
+} as const;
