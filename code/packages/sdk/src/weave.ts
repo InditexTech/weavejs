@@ -498,6 +498,18 @@ export class Weave extends Emittery {
 
   // TARGETING MANAGEMENT METHODS PROXIES
 
+  resolveNode(node: Konva.Node): WeaveElementInstance | undefined {
+    const resolvedNode = this.targetingManager.resolveNode(node);
+    if (resolvedNode) {
+      return resolvedNode as WeaveElementInstance;
+    }
+    return undefined;
+  }
+
+  pointIntersectsElement(point?: Vector2d): Konva.Node | null {
+    return this.targetingManager.pointIntersectsElement(point);
+  }
+
   pointIntersectsContainerElement(
     actualLayer?: Konva.Layer | Konva.Group,
     point?: Vector2d

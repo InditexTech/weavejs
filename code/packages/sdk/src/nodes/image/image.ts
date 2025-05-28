@@ -34,6 +34,7 @@ export class WeaveImageNode extends WeaveNode {
     const groupImageProps = {
       ...imageProps,
     };
+    delete groupImageProps.children;
     delete groupImageProps.imageProperties;
     delete groupImageProps.zIndex;
 
@@ -54,6 +55,7 @@ export class WeaveImageNode extends WeaveNode {
     const imagePlaceholder = new Konva.Rect({
       ...groupImageProps,
       id: `${id}-placeholder`,
+      nodeId: id,
       x: 0,
       y: 0,
       scaleX: 1,
@@ -73,6 +75,7 @@ export class WeaveImageNode extends WeaveNode {
       ...internalImageProps,
       ...imageProperties,
       id: `${id}-image`,
+      nodeId: id,
       x: 0,
       y: 0,
       scaleX: 1,
@@ -194,6 +197,7 @@ export class WeaveImageNode extends WeaveNode {
         ...(nodeAttrs.imageProperties ?? {}),
         name: undefined,
         id: `${id}-placeholder`,
+        nodeId: id,
         x: 0,
         y: 0,
         scaleX: 1,
@@ -210,6 +214,7 @@ export class WeaveImageNode extends WeaveNode {
         ...(nodeAttrs.imageProperties ?? {}),
         name: undefined,
         id: `${id}-image`,
+        nodeId: id,
         x: 0,
         y: 0,
         scaleX: 1,
@@ -226,6 +231,7 @@ export class WeaveImageNode extends WeaveNode {
         ...(nodeAttrs.imageProperties ?? {}),
         name: undefined,
         id: `${id}-image`,
+        nodeId: id,
         x: 0,
         y: 0,
         scaleX: 1,
