@@ -20,6 +20,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 - [#290](https://github.com/InditexTech/weavejs/issues/290) Maintain text node size when changed
+- [#297](https://github.com/InditexTech/weavejs/issues/297) Changing font size causes text duplication and incorrect bounding box update
 
 ## [0.18.0] - 2025-05-27
 
