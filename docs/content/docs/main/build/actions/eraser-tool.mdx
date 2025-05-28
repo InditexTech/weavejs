@@ -1,21 +1,13 @@
 ---
-title: Zoom In Tool
-description: Decreases one step the stage zoom level
+title: Eraser Tool
+description: Activate the deletion of nodes from the canvas
 ---
 
 import { Accordion, Accordions } from "fumadocs-ui/components/accordion";
 
 ## Introduction
 
-This action allows users to incrementally zoom out the canvas, providing a more
-general view of the content. It adjusts the Stage’s scale smoothly and centers the
-zoom on the current viewport or a specific focal point.
-
-## Dependencies
-
-This action needs also registered on the Weave instance the following:
-
-- [Stage zoom](/docs/main/build/plugins/stage-zoom) plugin
+This action allows users to erase (delete) elements from the Stage canvas.
 
 ## Usage
 
@@ -24,7 +16,7 @@ This action needs also registered on the Weave instance the following:
     Start by importing the action with the following import:
 
     ```ts
-    import { WeaveZoomOutToolAction } from "@inditextech/weave-sdk";
+    import { WeaveEraserToolAction } from "@inditextech/weave-sdk";
     ```
 
   </Accordion>
@@ -36,7 +28,7 @@ This action needs also registered on the Weave instance the following:
       ...
       actions: [
         ...,
-        new WeaveZoomOutToolAction(), // [!code ++]
+        new WeaveEraserToolAction(), // [!code ++]
       ]
     })
     ```
@@ -49,15 +41,15 @@ This action needs also registered on the Weave instance the following:
     ```tsx
     import { useWeave } from "@inditextech/weave-react";
 
-    const MyZoomOutToolTriggerComponent = () => {
+    const MyEraserToolTriggerComponent = () => {
       const instance = useWeave((state) => state.instance);
 
       const triggerTool = React.useCallback(() => {
-        instance.triggerAction("zoomOutTool");
+        instance.triggerAction("eraserTool");
       }, [instance])
 
       return (
-        <button onClick={triggerTool}>Zoom Out Tool</button>
+        <button onClick={triggerTool}>Eraser Tool</button>
       )
     }
     ```
@@ -66,7 +58,7 @@ This action needs also registered on the Weave instance the following:
   <Accordion title="4. Trigger the action" id="trigger-the-action">
     Finally as an user trigger the UI element that launches the action.
 
-    When triggered decreases the zoom level of the canvas by one step.
+    When enabled the user can click / touch on an element and it will deleted.
 
   </Accordion>
 </Accordions>

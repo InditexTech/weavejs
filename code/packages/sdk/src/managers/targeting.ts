@@ -22,6 +22,45 @@ export class WeaveTargetingManager {
     this.logger.debug('Targeting manager created');
   }
 
+  resolveNode(node: Konva.Node): Konva.Node | undefined {
+    const stage = this.instance.getStage();
+
+    const nodeAttrs = node.getAttrs();
+
+    // Is an internal node container, continue to its parent
+    if (nodeAttrs.nodeId) {
+      const parentNode = stage.findOne(`#${nodeAttrs.nodeId}`);
+
+      if (!parentNode) {
+        return undefined;
+      }
+
+      return this.resolveNode(parentNode);
+    }
+    // Is a node and not a layer
+    if (nodeAttrs.nodeType && nodeAttrs.nodeType !== 'layer') {
+      return node;
+    }
+    return undefined;
+  }
+
+  pointIntersectsElement(point?: Vector2d): Konva.Node | null {
+    const stage = this.instance.getStage();
+    const relativeMousePointer = point
+      ? point
+      : stage.getPointerPosition() ?? { x: 0, y: 0 };
+
+    const mainLayer = this.instance.getMainLayer();
+
+    if (!mainLayer) {
+      return null;
+    }
+
+    const intersectedNode = mainLayer.getIntersection(relativeMousePointer);
+
+    return intersectedNode;
+  }
+
   pointIntersectsContainerElement(
     actualLayer?: Konva.Layer | Konva.Group,
     point?: Vector2d
@@ -40,7 +79,17 @@ export class WeaveTargetingManager {
       for (const node of intersections) {
         if (node.getAttrs().nodeId) {
           const parent = stage.findOne(`#${node.getAttrs().nodeId}`);
-          intersectedNode = parent;
+          if (!parent) {
+            continue;
+          }
+          const resolvedNode = this.resolveNode(parent);
+          if (
+            resolvedNode &&
+            resolvedNode.getAttrs().containerId &&
+            resolvedNode.getAttrs().id !== actualLayer?.getAttrs().id
+          ) {
+            intersectedNode = parent;
+          }
           continue;
         }
         if (

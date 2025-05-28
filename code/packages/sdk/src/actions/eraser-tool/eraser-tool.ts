@@ -3,14 +3,17 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { WeaveAction } from '@/actions/action';
-import { type WeaveMoveToolActionState } from './types';
-import { MOVE_TOOL_ACTION_NAME, MOVE_TOOL_STATE } from './constants';
+import { type WeaveEraserToolActionState } from './types';
+import { ERASER_TOOL_ACTION_NAME, ERASER_TOOL_STATE } from './constants';
 import type { WeaveNodesSelectionPlugin } from '@/plugins/nodes-selection/nodes-selection';
 import { SELECTION_TOOL_ACTION_NAME } from '../selection-tool/constants';
+import type { WeaveNode } from '@/nodes/node';
+import type { WeaveElementInstance } from '@inditextech/weave-types';
 
-export class WeaveMoveToolAction extends WeaveAction {
+export class WeaveEraserToolAction extends WeaveAction {
   protected initialized: boolean = false;
-  protected state: WeaveMoveToolActionState;
+  protected state: WeaveEraserToolActionState;
+  protected erasing: boolean = false;
   protected cancelAction!: () => void;
   onPropsChange = undefined;
   onInit = undefined;
@@ -19,20 +22,46 @@ export class WeaveMoveToolAction extends WeaveAction {
     super();
 
     this.initialized = false;
-    this.state = MOVE_TOOL_STATE.IDLE;
+    this.erasing = false;
+    this.state = ERASER_TOOL_STATE.IDLE;
   }
 
   getName(): string {
-    return MOVE_TOOL_ACTION_NAME;
+    return ERASER_TOOL_ACTION_NAME;
   }
 
   private setupEvents() {
     const stage = this.instance.getStage();
 
+    stage.on('click touch', (e) => {
+      e.evt.preventDefault();
+
+      if (!this.erasing) {
+        return;
+      }
+
+      const nodeIntersected = this.instance.pointIntersectsElement();
+
+      if (nodeIntersected) {
+        const realNode = this.instance.resolveNode(nodeIntersected);
+
+        if (!realNode) {
+          return;
+        }
+
+        const nodeType = realNode.getAttrs().nodeType;
+        const nodeHandler = this.instance.getNodeHandler<WeaveNode>(nodeType);
+        const nodeSerialized = nodeHandler.serialize(
+          realNode as WeaveElementInstance
+        );
+        this.instance.removeNode(nodeSerialized);
+      }
+    });
+
     stage.container().addEventListener('keydown', (e) => {
       if (
         e.key === 'Escape' &&
-        this.instance.getActiveAction() === MOVE_TOOL_ACTION_NAME
+        this.instance.getActiveAction() === ERASER_TOOL_ACTION_NAME
       ) {
         this.cancelAction();
         return;
@@ -42,17 +71,19 @@ export class WeaveMoveToolAction extends WeaveAction {
     this.initialized = true;
   }
 
-  private setState(state: WeaveMoveToolActionState) {
+  private setState(state: WeaveEraserToolActionState) {
     this.state = state;
   }
 
-  private setMoving() {
+  private setEraser() {
     const stage = this.instance.getStage();
 
-    stage.container().style.cursor = 'grab';
+    stage.container().style.cursor = 'crosshair';
     stage.container().focus();
 
-    this.setState(MOVE_TOOL_STATE.MOVING);
+    this.erasing = true;
+
+    this.setState(ERASER_TOOL_STATE.ERASING);
   }
 
   trigger(cancelAction: () => void): void {
@@ -70,13 +101,14 @@ export class WeaveMoveToolAction extends WeaveAction {
 
     this.cancelAction = cancelAction;
 
-    this.setMoving();
+    this.setEraser();
   }
 
   cleanup(): void {
     const stage = this.instance.getStage();
 
     stage.container().style.cursor = 'default';
+    this.erasing = false;
 
     const selectionPlugin =
       this.instance.getPlugin<WeaveNodesSelectionPlugin>('nodesSelection');
@@ -84,6 +116,6 @@ export class WeaveMoveToolAction extends WeaveAction {
       this.instance.triggerAction(SELECTION_TOOL_ACTION_NAME);
     }
 
-    this.setState(MOVE_TOOL_STATE.IDLE);
+    this.setState(ERASER_TOOL_STATE.IDLE);
   }
 }
