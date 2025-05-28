@@ -291,14 +291,11 @@ export class WeaveTextNode extends WeaveNode {
     textAreaSuperContainer.style.bottom = '0px';
     textAreaSuperContainer.style.right = '0px';
     textAreaSuperContainer.style.overflow = 'hidden';
-    // textAreaSuperContainer.style.pointerEvents = 'none';
 
     const textAreaContainer = document.createElement('div');
     textAreaContainer.id = `${textNode.id()}_container`;
-    // textAreaContainer.style.pointerEvents = 'none';
     const textArea = document.createElement('textarea');
     textArea.id = textNode.id();
-    // textArea.style.pointerEvents = 'none';
     textAreaContainer.appendChild(textArea);
     textAreaSuperContainer.appendChild(textAreaContainer);
     stage.container().appendChild(textAreaSuperContainer);
@@ -610,7 +607,6 @@ export class WeaveTextNode extends WeaveNode {
       if (tr) {
         tr.nodes([textNode]);
         tr.show();
-        // tr.forceUpdate();
       }
       this.instance.triggerAction('selectionTool');
     }
