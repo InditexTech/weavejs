@@ -7,6 +7,7 @@ import type {
   WEAVE_FRAME_NODE_SIZES_ORIENTATION,
   WEAVE_FRAME_NODE_SIZES_TYPES,
 } from './constants';
+import type { WeaveNodeTransformerProperties } from '../types';
 
 export type WeaveFrameNodeSizesOrientationKeys =
   keyof typeof WEAVE_FRAME_NODE_SIZES_ORIENTATION;
@@ -40,6 +41,7 @@ export type WeaveFrameProperties = {
     borderColor: string;
     fill: string;
   };
+  transform: WeaveNodeTransformerProperties;
 };
 
 export type WeaveFrameAttributes = WeaveElementAttributes & {

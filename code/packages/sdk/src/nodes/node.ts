@@ -21,6 +21,16 @@ import {
   moveNodeToContainer,
 } from '@/utils';
 import type { WeaveNodesSnappingPlugin } from '@/plugins/nodes-snapping/nodes-snapping';
+import './node-extensions.d';
+import { DEFAULT_ANCHORS_ENABLED } from './constants';
+
+Konva.Node.prototype.getTransformerProperties = function () {
+  return {
+    rotateEnabled: true,
+    resizeEnabled: true,
+    enabledAnchors: DEFAULT_ANCHORS_ENABLED,
+  };
+};
 
 export abstract class WeaveNode implements WeaveNodeBase {
   protected instance!: Weave;

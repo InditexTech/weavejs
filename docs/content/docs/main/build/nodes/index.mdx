@@ -4,6 +4,7 @@ description: Nodes maintained by Weave.js team
 ---
 
 import { CpuIcon, Database } from "lucide-react";
+import { Separator } from "@/components/separator";
 
 ## Introduction
 
@@ -160,6 +161,31 @@ onRender(props: WeaveElementAttributes): WeaveElementInstance
 
 The `onRender` method is the one responsible for rendering the node on the canvas, It's a good place
 to initialize the nodes, events, etc.
+
+<Separator />
+
+We extend the `Konva.Node` class to define a function:
+
+```ts
+getTransformerProperties(): WeaveNodeTransformerProperties
+```
+
+That you can override, allowing to define when the node is selected if can: rotate, resize and if is resizable which anchors for resizing will be available.
+
+By default, all nodes can rotate, resize and the default anchors are:
+
+```ts
+const DEFAULT_ANCHORS_ENABLED: string[] = [
+  "top-left",
+  "top-center",
+  "top-right",
+  "middle-right",
+  "middle-left",
+  "bottom-left",
+  "bottom-center",
+  "bottom-right",
+];
+```
 
 #### onUpdate
 

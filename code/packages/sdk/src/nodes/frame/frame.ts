@@ -102,6 +102,10 @@ export class WeaveFrameNode extends WeaveNode {
       name: 'node',
     });
 
+    frame.getTransformerProperties = () => {
+      return this.config.transform;
+    };
+
     const background = new Konva.Rect({
       id: `${id}-bg`,
       nodeId: id,
