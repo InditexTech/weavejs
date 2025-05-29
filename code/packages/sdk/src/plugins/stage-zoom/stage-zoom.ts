@@ -24,7 +24,6 @@ export class WeaveStageZoomPlugin extends WeavePlugin {
   private config!: WeaveStageZoomPluginConfig;
   private actualScale: number;
   private actualStep: number;
-  private padding: number = 175;
   defaultStep: number = 3;
 
   constructor(params?: WeaveStageZoomPluginParams) {
@@ -229,16 +228,36 @@ export class WeaveStageZoomPlugin extends WeavePlugin {
     const stage = this.instance.getStage();
 
     if (mainLayer) {
-      const box = mainLayer.getClientRect({ relativeTo: stage });
-      const scale = Math.min(
-        stage.width() / (box.width + this.padding * 2),
-        stage.height() / (box.height + this.padding * 2)
-      );
-
-      stage.setAttrs({
-        x: -box.x * scale + (stage.width() - box.width * scale) / 2,
-        y: -box.y * scale + (stage.height() - box.height * scale) / 2,
+      const box = mainLayer.getClientRect({
+        relativeTo: stage,
+        skipStroke: true,
       });
+      const stageBox = {
+        width: stage.width(),
+        height: stage.height(),
+      };
+
+      const availableScreenWidth =
+        stageBox.width - 2 * this.config.fitToScreen.padding;
+      const availableScreenHeight =
+        stageBox.height - 2 * this.config.fitToScreen.padding;
+
+      const scaleX = availableScreenWidth / box.width;
+      const scaleY = availableScreenHeight / box.height;
+      const scale = Math.min(scaleX, scaleY);
+
+      stage.scale({ x: scale, y: scale });
+
+      const selectionCenterX = box.x + box.width / 2;
+      const selectionCenterY = box.y + box.height / 2;
+
+      const canvasCenterX = stage.width() / (2 * scale);
+      const canvasCenterY = stage.height() / (2 * scale);
+
+      const stageX = (canvasCenterX - selectionCenterX) * scale;
+      const stageY = (canvasCenterY - selectionCenterY) * scale;
+
+      stage.position({ x: stageX, y: stageY });
 
       this.setZoom(scale, false);
     }
@@ -286,17 +305,32 @@ export class WeaveStageZoomPlugin extends WeavePlugin {
     zoomTransformer.forceUpdate();
 
     const box = zoomTransformer.__getNodeRect();
-    const scale = Math.min(
-      stage.width() / (zoomTransformer.width() + this.padding * 2),
-      stage.height() / (zoomTransformer.height() + this.padding * 2)
-    );
+    const stageBox = {
+      width: stage.width(),
+      height: stage.height(),
+    };
 
-    stage.setAttrs({
-      x: -box.x * scale + (stage.width() - zoomTransformer.width() * scale) / 2,
-      y:
-        -box.y * scale +
-        (stage.height() - zoomTransformer.height() * scale) / 2,
-    });
+    const availableScreenWidth =
+      stageBox.width - 2 * this.config.fitToSelection.padding;
+    const availableScreenHeight =
+      stageBox.height - 2 * this.config.fitToSelection.padding;
+
+    const scaleX = availableScreenWidth / box.width;
+    const scaleY = availableScreenHeight / box.height;
+    const scale = Math.min(scaleX, scaleY);
+
+    stage.scale({ x: scale, y: scale });
+
+    const selectionCenterX = box.x + box.width / 2;
+    const selectionCenterY = box.y + box.height / 2;
+
+    const canvasCenterX = stage.width() / (2 * scale);
+    const canvasCenterY = stage.height() / (2 * scale);
+
+    const stageX = (canvasCenterX - selectionCenterX) * scale;
+    const stageY = (canvasCenterY - selectionCenterY) * scale;
+
+    stage.position({ x: stageX, y: stageY });
 
     this.setZoom(scale, false);
 

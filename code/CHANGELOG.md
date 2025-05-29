@@ -23,6 +23,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - [#291](https://github.com/InditexTech/weavejs/issues/291) Group of elements moving not maintaining position (all layers)
 - [#300](https://github.com/InditexTech/weavejs/issues/300) Un-grouping elements are unordered
 - [#310](https://github.com/InditexTech/weavejs/issues/310) Fix zoom in / out stepping before fitting
+- [#311](https://github.com/InditexTech/weavejs/issues/311) Fix fit stage / selection plugin to fit correctly with the specified padding
 
 ## [0.19.0] - 2025-05-28
 
