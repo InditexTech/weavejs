@@ -6,6 +6,7 @@ import {
   type WeaveSelection,
   type NodeSerializable,
   WEAVE_NODE_CUSTOM_EVENTS,
+  type WeaveElementInstance,
 } from '@inditextech/weave-types';
 import Konva from 'konva';
 import { WeavePlugin } from '@/plugins/plugin';
@@ -170,6 +171,15 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
             bubbles: true,
           });
         }
+
+        for (const node of tr.nodes()) {
+          const nodeHandler = this.instance.getNodeHandler<WeaveNode>(
+            node.getAttrs().nodeType
+          );
+          this.instance.updateNode(
+            nodeHandler.serialize(node as WeaveElementInstance)
+          );
+        }
       }
     });
 
@@ -177,12 +187,21 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
       if (this.isSelecting() && tr.nodes().length > 1) {
         clearContainerTargets(this.instance);
 
+        console.log('tr.nodes()', tr.nodes());
+
         for (const node of tr.nodes()) {
           const layerToMove = moveNodeToContainer(this.instance, node);
 
           if (layerToMove) {
             continue;
           }
+
+          const nodeHandler = this.instance.getNodeHandler<WeaveNode>(
+            node.getAttrs().nodeType
+          );
+          this.instance.updateNode(
+            nodeHandler.serialize(node as WeaveElementInstance)
+          );
         }
       }
     });
