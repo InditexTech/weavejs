@@ -4,7 +4,9 @@
 
 export { Weave } from './weave';
 export { WeaveStore } from './stores/store';
+export * from './stores/types';
 export { WeaveNode } from './nodes/node';
+export * from './nodes/constants';
 export { WeaveAction } from './actions/action';
 export * from './actions/types';
 export { WeavePlugin } from './plugins/plugin';

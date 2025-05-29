@@ -16,6 +16,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - [#305](https://github.com/InditexTech/weavejs/issues/305) Don't allow to transform when more than one element is selected
+- [#308](https://github.com/InditexTech/weavejs/issues/308) Allow to configure transformer configuration per node
 
 ### Fixed
 

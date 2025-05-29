@@ -82,6 +82,11 @@ export const WEAVE_FRAME_NODE_DEFAULT_CONFIG = {
     borderColor: '#ff6863ff',
     fill: '#ffffffff',
   },
+  transform: {
+    rotateEnabled: false,
+    resizeEnabled: false,
+    enabledAnchors: [] as string[],
+  },
 };
 
 export const WEAVE_FRAME_NODE_DEFAULT_PROPS = {

@@ -652,6 +652,12 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
       ) {
         this.tr.enabledAnchors(this.defaultEnabledAnchors);
       }
+      if (nodesSelected === 1 && nodeTargeted.getTransformerProperties) {
+        this.tr.setAttrs({
+          ...nodeTargeted.getTransformerProperties(),
+        });
+        this.tr.forceUpdate();
+      }
 
       if (areNodesSelected) {
         stage.container().tabIndex = 1;
