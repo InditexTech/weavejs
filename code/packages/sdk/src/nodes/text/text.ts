@@ -187,6 +187,7 @@ export class WeaveTextNode extends WeaveNode {
     const cleanedAttrs = { ...attrs };
     delete cleanedAttrs.draggable;
     delete cleanedAttrs.triggerEditMode;
+    delete cleanedAttrs.measureMultilineText;
 
     return {
       key: attrs.id ?? '',

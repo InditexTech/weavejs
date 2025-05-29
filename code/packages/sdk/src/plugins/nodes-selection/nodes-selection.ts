@@ -652,7 +652,7 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
       ) {
         this.tr.enabledAnchors(this.defaultEnabledAnchors);
       }
-      if (nodesSelected === 1 && nodeTargeted.getTransformerProperties) {
+      if (nodesSelected === 1) {
         this.tr.setAttrs({
           ...nodeTargeted.getTransformerProperties(),
         });
@@ -675,6 +675,32 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
 
   setSelectedNodes(nodes: Konva.Node[]): void {
     this.tr.setNodes(nodes);
+
+    const nodesSelected = nodes.length;
+
+    if (
+      (nodesSelected > 1 &&
+        !this.config.transformations.multipleSelection.enabled) ||
+      (nodesSelected === 1 &&
+        !this.config.transformations.singleSelection.enabled)
+    ) {
+      this.tr.enabledAnchors([]);
+    }
+    if (
+      (nodesSelected > 1 &&
+        this.config.transformations.multipleSelection.enabled) ||
+      (nodesSelected === 1 &&
+        this.config.transformations.singleSelection.enabled)
+    ) {
+      this.tr.enabledAnchors(this.defaultEnabledAnchors);
+    }
+    if (nodesSelected === 1) {
+      this.tr.setAttrs({
+        ...nodes[0].getTransformerProperties(),
+      });
+      this.tr.forceUpdate();
+    }
+
     this.triggerSelectedNodesEvent();
   }
 

@@ -110,9 +110,12 @@ export class WeaveCloningManager {
       const nodeHandler = this.instance.getNodeHandler<WeaveNode>(
         node.getAttrs().nodeType
       );
-      if (node.x() < minPoint.x || node.y() < minPoint.y) {
-        minPoint.x = node.x();
-        minPoint.y = node.y();
+
+      const nodePos = node.getClientRect();
+
+      if (nodePos.x < minPoint.x || nodePos.y < minPoint.y) {
+        minPoint.x = nodePos.x;
+        minPoint.y = nodePos.y;
       }
       const serialized: WeaveStateElement = nodeHandler.serialize(node);
       serializedNodes.push(serialized);

@@ -21,6 +21,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 - [#291](https://github.com/InditexTech/weavejs/issues/291) Group of elements moving not maintaining position (all layers)
+- [#300](https://github.com/InditexTech/weavejs/issues/300) Un-grouping elements are unordered
 
 ## [0.19.0] - 2025-05-28
 
