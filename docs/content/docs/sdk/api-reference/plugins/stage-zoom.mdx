@@ -49,6 +49,12 @@ type WeaveStageZoomPluginOnZoomChangeEvent = WeaveStageZoomChanged;
 type WeaveStageZoomPluginConfig = {
   zoomSteps: number[];
   defaultZoom: number;
+  fitToScreen: {
+    padding: number;
+  };
+  fitToSelection: {
+    padding: number;
+  };
 };
 
 type WeaveStageZoomPluginParams = {
@@ -83,6 +89,18 @@ For `WeaveStageZoomPluginConfig`:
       description: "The default zoom when loading the stage (canvas).",
       type: "number",
       default: "1",
+    },
+    ["fitToScreen.padding"]: {
+      description:
+        "The default padding zoom when fitting elements to screen (in px).",
+      type: "number",
+      default: "40",
+    },
+    ["fitToSelection.padding"]: {
+      description:
+        "The default padding zoom when fitting elements to selection (in px).",
+      type: "number",
+      default: "40",
     },
   }}
 />

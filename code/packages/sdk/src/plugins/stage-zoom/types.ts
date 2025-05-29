@@ -16,6 +16,12 @@ export type WeaveStageZoomPluginOnZoomChangeEvent = WeaveStageZoomChanged;
 export type WeaveStageZoomPluginConfig = {
   zoomSteps: number[];
   defaultZoom: number;
+  fitToScreen: {
+    padding: number;
+  };
+  fitToSelection: {
+    padding: number;
+  };
 };
 
 export type WeaveStageZoomPluginParams = {

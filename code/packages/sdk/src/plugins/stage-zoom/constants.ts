@@ -12,4 +12,10 @@ export const WEAVE_STAGE_ZOOM_DEFAULT_CONFIG: WeaveStageZoomPluginConfig = {
     8, 10,
   ],
   defaultZoom: 1,
+  fitToScreen: {
+    padding: 40,
+  },
+  fitToSelection: {
+    padding: 40,
+  },
 };
