@@ -10,7 +10,10 @@ import {
 } from './types';
 import Konva from 'konva';
 import { WeaveNodesSelectionPlugin } from '../nodes-selection/nodes-selection';
-import { WEAVE_STAGE_ZOOM_KEY } from './constants';
+import {
+  WEAVE_STAGE_ZOOM_DEFAULT_CONFIG,
+  WEAVE_STAGE_ZOOM_KEY,
+} from './constants';
 
 export class WeaveStageZoomPlugin extends WeavePlugin {
   private isCtrlOrMetaPressed: boolean;
@@ -30,8 +33,7 @@ export class WeaveStageZoomPlugin extends WeavePlugin {
     const { config } = params ?? {};
 
     this.config = {
-      zoomSteps: [0.1, 0.25, 0.5, 1, 2, 4, 8],
-      defaultZoom: 1,
+      ...WEAVE_STAGE_ZOOM_DEFAULT_CONFIG,
       ...config,
     };
 
@@ -122,8 +124,9 @@ export class WeaveStageZoomPlugin extends WeavePlugin {
     const actualZoomIsStep = this.config.zoomSteps.findIndex(
       (scale) => scale === this.actualScale
     );
+
     if (actualZoomIsStep === -1) {
-      this.actualStep = this.findClosestStepIndex();
+      this.actualStep = this.findClosestStepIndex('zoomOut');
     }
 
     return this.actualStep - 1 > 0;
@@ -138,7 +141,7 @@ export class WeaveStageZoomPlugin extends WeavePlugin {
       (scale) => scale === this.actualScale
     );
     if (actualZoomIsStep === -1) {
-      this.actualStep = this.findClosestStepIndex();
+      this.actualStep = this.findClosestStepIndex('zoomIn');
     }
 
     return this.actualStep + 1 < this.config.zoomSteps.length;
@@ -157,16 +160,16 @@ export class WeaveStageZoomPlugin extends WeavePlugin {
     this.setZoom(this.config.zoomSteps[step]);
   }
 
-  private findClosestStepIndex() {
-    let closestStepIndex = 0;
-    let actualDiff = Infinity;
-    for (let i = 0; i < this.config.zoomSteps.length; i++) {
-      if (Math.abs(this.config.zoomSteps[i] - this.actualScale) < actualDiff) {
-        closestStepIndex = i;
-        actualDiff = Math.abs(this.config.zoomSteps[i] - this.actualScale);
-      }
-    }
-    return closestStepIndex;
+  private findClosestStepIndex(direction: 'zoomIn' | 'zoomOut'): number {
+    const nextValue = this.config.zoomSteps
+      .filter((scale) =>
+        direction === 'zoomIn'
+          ? scale >= this.actualScale
+          : scale <= this.actualScale
+      )
+      .sort((a, b) => (direction === 'zoomIn' ? a - b : b - a))[0];
+
+    return this.config.zoomSteps.findIndex((scale) => scale === nextValue);
   }
 
   zoomIn(): void {
@@ -182,7 +185,7 @@ export class WeaveStageZoomPlugin extends WeavePlugin {
       (scale) => scale === this.actualScale
     );
     if (actualZoomIsStep === -1) {
-      this.actualStep = this.findClosestStepIndex();
+      this.actualStep = this.findClosestStepIndex('zoomIn');
     } else {
       this.actualStep += 1;
     }
@@ -203,7 +206,7 @@ export class WeaveStageZoomPlugin extends WeavePlugin {
       (scale) => scale === this.actualScale
     );
     if (actualZoomIsStep === -1) {
-      this.actualStep = this.findClosestStepIndex();
+      this.actualStep = this.findClosestStepIndex('zoomOut');
     } else {
       this.actualStep -= 1;
     }
