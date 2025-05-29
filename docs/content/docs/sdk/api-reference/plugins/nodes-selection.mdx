@@ -59,9 +59,21 @@ type WeaveNodesSelectionPluginOnSelectionStateEvent = boolean;
 type WeaveNodesSelectionPluginOnNodesChangeEvent = WeaveSelection[];
 type WeaveNodesSelectionPluginOnStageSelectionEvent = undefined;
 
-type WeaveNodesSelectionPluginConfig = {
-  transformer?: Konva.TransformerConfig;
+type WeaveNodesSelectionTransformationsConfig = {
+  singleSelection: {
+    enabled: boolean;
+  };
+  multipleSelection: {
+    enabled: boolean;
+  };
 };
+
+type WeaveNodesSelectionConfig = {
+  transformer: Konva.TransformerConfig;
+  transformations: WeaveNodesSelectionTransformationsConfig;
+};
+
+type WeaveNodesSelectionPluginConfig = Partial<WeaveNodesSelectionConfig>;
 
 type WeaveNodesSelectionPluginParams = {
   config?: WeaveNodesSelectionPluginConfig;
@@ -88,6 +100,10 @@ For `WeaveNodesSelectionPluginConfig`:
     ["transformer"]: {
       description: "Konva Transformer configuration.",
       type: "Konva.TransformerConfig",
+    },
+    ["transformations"]: {
+      description: "Transformations configuration.",
+      type: "WeaveNodesSelectionTransformationsConfig",
     },
   }}
 />
