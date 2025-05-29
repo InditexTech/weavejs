@@ -652,12 +652,6 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
       ) {
         this.tr.enabledAnchors(this.defaultEnabledAnchors);
       }
-      if (nodesSelected === 1 && nodeTargeted.getAttrs().getRotateEnabled) {
-        this.tr.rotateEnabled(nodeTargeted.getAttrs().getRotateEnabled());
-      }
-      if (nodesSelected === 1 && nodeTargeted.getAttrs().getAnchorsEnabled) {
-        this.tr.enabledAnchors(nodeTargeted.getAttrs().getAnchorsEnabled());
-      }
 
       if (areNodesSelected) {
         stage.container().tabIndex = 1;
