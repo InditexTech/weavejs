@@ -121,7 +121,7 @@ export function UploadFile() {
       accept="image/png,image/gif,image/jpeg"
       name="image"
       ref={inputFileRef}
-      className="invisible"
+      className="hidden"
       onClick={() => {
         inputFileRef.current.value = null;
       }}

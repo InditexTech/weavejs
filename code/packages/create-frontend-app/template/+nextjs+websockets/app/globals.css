@@ -181,7 +181,7 @@
     @apply border-border outline-ring/50;
   }
   html {
-    @apply w-full h-full;
+    @apply w-full h-full overflow-hidden;
   }
   body {
     @apply bg-background ring-0 text-foreground w-full h-full overflow-hidden;

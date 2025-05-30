@@ -16,6 +16,7 @@ import {
   Tags,
   Undo,
   Redo,
+  Eraser,
 } from 'lucide-react';
 import { useWeave } from '@inditextech/weave-react';
 import { Toolbar } from '../toolbar/toolbar';
@@ -177,6 +178,26 @@ export function ToolsOverlay() {
           tooltipSide="top"
           tooltipAlign="center"
         />
+        <ToolbarButton
+          className="rounded-full !w-[40px]"
+          icon={<Eraser className="px-2" size={40} strokeWidth={1} />}
+          active={actualAction === 'eraserTool'}
+          onClick={() => triggerTool('eraserTool')}
+          label={
+            <div className="flex gap-3 justify-start items-center">
+              <p>Erase</p>
+              <ShortcutElement
+                shortcuts={{
+                  [SYSTEM_OS.MAC]: 'D',
+                  [SYSTEM_OS.OTHER]: 'D',
+                }}
+              />
+            </div>
+          }
+          tooltipSide="top"
+          tooltipAlign="center"
+        />
+        <ToolbarDivider />
         <ToolbarButton
           className="rounded-full !w-[40px]"
           icon={<Square className="px-2" size={40} strokeWidth={1} />}

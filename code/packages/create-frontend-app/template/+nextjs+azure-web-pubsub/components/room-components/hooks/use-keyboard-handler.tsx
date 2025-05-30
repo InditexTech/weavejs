@@ -3,9 +3,9 @@
 import React from 'react';
 import { useWeave } from '@inditextech/weave-react';
 import { SidebarActive, useCollaborationRoom } from '@/store/store';
-import { useKeyDown } from '../hooks/use-key-down';
+import { useKeyDown } from './use-key-down';
 import { SYSTEM_OS } from '@/lib/utils';
-import { useGetOs } from '../hooks/use-get-os';
+import { useGetOs } from './use-get-os';
 import {
   WeaveCopyPasteNodesPlugin,
   WeaveExportNodeActionParams,
@@ -73,10 +73,17 @@ export function useKeyboardHandler() {
   }, [instance]);
 
   /* Keyboard shortcuts toolbar */
+  useKeyDown(() => {
+    triggerTool('moveTool');
+  }, ['KeyM']);
 
   useKeyDown(() => {
     triggerTool('selectionTool');
   }, ['KeyS']);
+
+  useKeyDown(() => {
+    triggerTool('eraserTool');
+  }, ['KeyD']);
 
   useKeyDown(
     () => {
