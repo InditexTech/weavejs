@@ -3,9 +3,11 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import 'konva';
+import type { Vector2d } from 'konva/lib/types';
 
 declare module 'konva/lib/Node' {
   interface Node {
     getTransformerProperties(): WeaveNodeTransformerProperties;
+    updatePosition(position: Vector2d): void;
   }
 }

@@ -3,6 +3,8 @@ title: WeaveImageNode
 description: Text node API Reference
 ---
 
+import { TypeTable } from "fumadocs-ui/components/type-table";
+
 ## Overview
 
 The [WeaveImageNode](https://github.com/InditexTech/weavejs/blob/main/code/packages/sdk/src/nodes/image/image.ts)
@@ -35,5 +37,73 @@ import { WeaveImageNode } from "@inditextech/weave-sdk";
 ## Instantiation
 
 ```ts
-new WeaveImageNode();
+new WeaveImageNode(params?: WeaveImageNodeParams);
+```
+
+## TypeScript types
+
+```ts
+type WeaveNodeTransformerProperties = Konva.TransformerConfig;
+
+type WeaveImageProperties = {
+  transform: WeaveNodeTransformerProperties;
+};
+
+type WeaveImageNodeParams = {
+  config: Partial<WeaveImageProperties>;
+};
+```
+
+## Parameters
+
+For `WeaveImageNodeParams`:
+
+<TypeTable
+  type={{
+    ["config"]: {
+      required: true,
+      description: "Config parameters for the node.",
+      type: "Partial<WeaveImageProperties>",
+    },
+  }}
+/>
+
+For `WeaveImageProperties`:
+
+<TypeTable
+  type={{
+    ["transform"]: {
+      description:
+        "Setup the transform properties for the image (if can be resized, rotated, anchors, etc.).",
+      type: "object",
+      default: "check default values",
+    },
+  }}
+/>
+
+## Default values
+
+```ts
+const WEAVE_TRANSFORMER_ANCHORS = {
+  ["TOP_LEFT"]: "top-left",
+  ["TOP_CENTER"]: "top-center",
+  ["TOP_RIGHT"]: "top-right",
+  ["MIDDLE_RIGHT"]: "middle-right",
+  ["MIDDLE_LEFT"]: "middle-left",
+  ["BOTTOM_LEFT"]: "bottom-left",
+  ["BOTTOM_CENTER"]: "bottom-center",
+  ["BOTTOM_RIGHT"]: "bottom-right",
+};
+
+const WEAVE_DEFAULT_ENABLED_ANCHORS: string[] = Object.values(
+  WEAVE_TRANSFORMER_ANCHORS
+);
+
+const WEAVE_DEFAULT_TRANSFORM_PROPERTIES: WeaveNodeTransformerProperties = {
+  rotateEnabled: true,
+  resizeEnabled: true,
+  enabledAnchors: WEAVE_DEFAULT_ENABLED_ANCHORS,
+  borderStrokeWidth: 3,
+  padding: 0,
+};
 ```

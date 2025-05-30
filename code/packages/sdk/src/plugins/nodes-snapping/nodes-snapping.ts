@@ -99,6 +99,14 @@ export class WeaveNodesSnappingPlugin extends WeavePlugin {
     };
   }
 
+  deleteGuides(): void {
+    const utilityLayer = this.instance.getUtilityLayer();
+
+    if (utilityLayer) {
+      utilityLayer.find(`.${GUIDE_LINE_NAME}`).forEach((l) => l.destroy());
+    }
+  }
+
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   evaluateGuidelines(e: KonvaEventObject<any>): void {
     const utilityLayer = this.instance.getUtilityLayer();
@@ -119,22 +127,20 @@ export class WeaveNodesSnappingPlugin extends WeavePlugin {
     if (
       e.type === 'dragmove' &&
       nodesSelectionPlugin &&
-      e.target instanceof Konva.Transformer &&
-      e.target.getNodes().length === 1
+      nodesSelectionPlugin.getTransformer().nodes().length === 1
     ) {
-      const actualTarget: Konva.Transformer =
-        e.target as unknown as Konva.Transformer;
-      node = actualTarget.getNodes()[0];
+      node = nodesSelectionPlugin.getTransformer().nodes()[0];
       skipNodes.push(node.getAttrs().id ?? '');
     }
     if (
       e.type === 'dragmove' &&
       nodesSelectionPlugin &&
-      e.target instanceof Konva.Transformer &&
-      e.target.getNodes().length > 1
+      nodesSelectionPlugin.getTransformer().nodes().length > 1
     ) {
-      const { nodes } = this.getSelectedNodesMetadata(e.target);
-      node = e.target;
+      const { nodes } = this.getSelectedNodesMetadata(
+        nodesSelectionPlugin.getTransformer()
+      );
+      node = nodesSelectionPlugin.getTransformer();
       skipNodes = [...nodes];
     }
     if (e.type === 'transform') {
@@ -197,9 +203,11 @@ export class WeaveNodesSnappingPlugin extends WeavePlugin {
           };
 
           n.setAbsolutePosition(newPos);
+          // n.fire('dragmove', { target: n, absPos }, true);
         });
       } else {
         node.absolutePosition(absPos);
+        // node.fire('dragmove', { target: node, absPos }, true);
       }
     }
     if (e.type === 'transform') {
@@ -449,7 +457,6 @@ export class WeaveNodesSnappingPlugin extends WeavePlugin {
 
   drawGuides(guides: Guide[]): void {
     const stage = this.instance.getStage();
-    // const mainLayer = this.instance.getMainLayer();
     const utilityLayer = this.instance.getUtilityLayer();
 
     if (utilityLayer) {

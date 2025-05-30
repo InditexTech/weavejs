@@ -83,7 +83,7 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
             anchor.offsetX(4);
           }
         },
-        borderStroke: '#1e40afff',
+        borderStroke: '#0074ffcc',
         ...config?.transformer,
       },
       transformations: {
@@ -186,7 +186,35 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
       }
     });
 
+    tr.on('transformstart', () => {
+      this.triggerSelectedNodesEvent();
+    });
+
+    tr.on('transform', () => {
+      this.triggerSelectedNodesEvent();
+    });
+
+    tr.on('transformend', () => {
+      this.triggerSelectedNodesEvent();
+    });
+
+    tr.on('dragstart', (e) => {
+      for (const node of tr.nodes()) {
+        node.updatePosition(e.target.getAbsolutePosition());
+      }
+
+      tr.forceUpdate();
+
+      e.cancelBubble = true;
+    });
+
     tr.on('dragmove', (e) => {
+      for (const node of tr.nodes()) {
+        node.updatePosition(e.target.getAbsolutePosition());
+      }
+
+      e.cancelBubble = true;
+
       if (this.isSelecting() && tr.nodes().length > 1) {
         clearContainerTargets(this.instance);
 
@@ -207,9 +235,17 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
           );
         }
       }
+
+      tr.forceUpdate();
     });
 
-    tr.on('dragend', () => {
+    tr.on('dragend', (e) => {
+      for (const node of tr.nodes()) {
+        node.updatePosition(e.target.getAbsolutePosition());
+      }
+
+      e.cancelBubble = true;
+
       if (this.isSelecting() && tr.nodes().length > 1) {
         clearContainerTargets(this.instance);
 
@@ -228,6 +264,8 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
           );
         }
       }
+
+      tr.forceUpdate();
     });
 
     this.tr = tr;
@@ -447,9 +485,16 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
       });
       const box = this.selectionRectangle.getClientRect();
       const selected = shapes.filter((shape) => {
-        const parent = this.instance.getInstanceRecursive(
+        let parent = this.instance.getInstanceRecursive(
           shape.getParent() as Konva.Node
         );
+
+        if (parent.getAttrs().nodeId) {
+          parent = this.instance
+            .getStage()
+            .findOne(`#${parent.getAttrs().nodeId}`) as Konva.Node;
+        }
+
         if (
           shape.getAttrs().nodeType &&
           shape.getAttrs().nodeType === 'frame'

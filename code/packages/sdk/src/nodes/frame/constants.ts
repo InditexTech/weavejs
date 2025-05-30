@@ -70,10 +70,10 @@ export const WEAVE_FRAME_NODE_SIZES: WeaveFrameNodeSizesInfo = {
 
 export const WEAVE_FRAME_NODE_DEFAULT_CONFIG = {
   fontFamily: 'Arial',
-  fontStyle: 'normal',
+  fontStyle: 'bold',
   titleHeight: 30,
   borderColor: '#000000ff',
-  borderWidth: 2,
+  borderWidth: 1,
   onTargetLeave: {
     borderColor: '#000000ff',
     fill: '#ffffffff',
@@ -86,6 +86,8 @@ export const WEAVE_FRAME_NODE_DEFAULT_CONFIG = {
     rotateEnabled: false,
     resizeEnabled: false,
     enabledAnchors: [] as string[],
+    borderStrokeWidth: 3,
+    padding: 0,
   },
 };
 

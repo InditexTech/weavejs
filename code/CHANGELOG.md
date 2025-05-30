@@ -18,6 +18,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - [#305](https://github.com/InditexTech/weavejs/issues/305) Don't allow to transform when more than one element is selected
 - [#308](https://github.com/InditexTech/weavejs/issues/308) Allow to configure transformer configuration per node
 
+### Changed
+
+- [#219](https://github.com/InditexTech/weavejs/issues/219) Improve frame
+
 ### Fixed
 
 - [#291](https://github.com/InditexTech/weavejs/issues/291) Group of elements moving not maintaining position (all layers)

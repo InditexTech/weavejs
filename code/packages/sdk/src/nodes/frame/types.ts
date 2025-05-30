@@ -2,12 +2,14 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-import type { WeaveElementAttributes } from '@inditextech/weave-types';
+import type {
+  WeaveElementAttributes,
+  WeaveNodeTransformerProperties,
+} from '@inditextech/weave-types';
 import type {
   WEAVE_FRAME_NODE_SIZES_ORIENTATION,
   WEAVE_FRAME_NODE_SIZES_TYPES,
 } from './constants';
-import type { WeaveNodeTransformerProperties } from '../types';
 
 export type WeaveFrameNodeSizesOrientationKeys =
   keyof typeof WEAVE_FRAME_NODE_SIZES_ORIENTATION;

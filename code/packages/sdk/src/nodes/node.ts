@@ -9,6 +9,8 @@ import {
   type WeaveStateElement,
   type WeaveNodeBase,
   WEAVE_NODE_CUSTOM_EVENTS,
+  type WeaveNodeConfiguration,
+  WEAVE_DEFAULT_TRANSFORM_PROPERTIES,
 } from '@inditextech/weave-types';
 import { type Logger } from 'pino';
 import { WeaveNodesSelectionPlugin } from '@/plugins/nodes-selection/nodes-selection';
@@ -22,14 +24,19 @@ import {
 } from '@/utils';
 import type { WeaveNodesSnappingPlugin } from '@/plugins/nodes-snapping/nodes-snapping';
 import './node-extensions.d';
-import { DEFAULT_ANCHORS_ENABLED } from './constants';
 
-Konva.Node.prototype.getTransformerProperties = function () {
-  return {
-    rotateEnabled: true,
-    resizeEnabled: true,
-    enabledAnchors: DEFAULT_ANCHORS_ENABLED,
+export const setNodesDefaultConfiguration = (
+  config?: WeaveNodeConfiguration
+): void => {
+  const { transform } = config ?? {};
+
+  Konva.Node.prototype.getTransformerProperties = function () {
+    return {
+      WEAVE_DEFAULT_TRANSFORM_PROPERTIES,
+      ...transform,
+    };
   };
+  Konva.Node.prototype.updatePosition = function () {};
 };
 
 export abstract class WeaveNode implements WeaveNodeBase {

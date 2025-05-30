@@ -10,6 +10,7 @@ import {
   WEAVE_EXPORT_FILE_FORMAT,
   WEAVE_INSTANCE_STATUS,
   WEAVE_NODE_POSITION,
+  WEAVE_TRANSFORMER_ANCHORS,
 } from './constants';
 import { type WeaveNodeBase } from '@/base/node';
 import { type WeaveActionBase } from '@/base/action';
@@ -216,3 +217,16 @@ export declare function crdtDoc<T extends DocTypeDescription>(
   doc: Y.Doc,
   typeDescription: T
 ): MappedTypeDescription<T>;
+
+// Configuration
+
+export type WeaveTransformerAnchorsKeys =
+  keyof typeof WEAVE_TRANSFORMER_ANCHORS;
+export type WeaveTransformerAnchors =
+  (typeof WEAVE_TRANSFORMER_ANCHORS)[WeaveTransformerAnchorsKeys];
+
+export type WeaveNodeTransformerProperties = Konva.TransformerConfig;
+
+export type WeaveNodeConfiguration = {
+  transform: Partial<WeaveNodeTransformerProperties>;
+};

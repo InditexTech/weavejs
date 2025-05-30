@@ -123,6 +123,8 @@ type WeaveFrameNodeSizesInfo = {
   };
 };
 
+type WeaveNodeTransformerProperties = Konva.TransformerConfig;
+
 type WeaveFrameProperties = {
   fontFamily: string;
   fontStyle: string;
@@ -137,6 +139,7 @@ type WeaveFrameProperties = {
     borderColor: string;
     fill: string;
   };
+  transform: WeaveNodeTransformerProperties;
 };
 
 type WeaveFrameAttributes = WeaveElementAttributes & {
@@ -173,51 +176,57 @@ For `WeaveFrameProperties`:
     ["fontFamily"]: {
       description: "The font family to use on the frame title.",
       type: "string",
-      default: "Arial",
+      default: "check default values",
     },
     ["fontStyle"]: {
       description: "The font style to use on the frame title.",
       type: "string",
-      default: "normal",
+      default: "check default values",
     },
     ["titleHeight"]: {
       description: "The height of the title (px) to use on the frame.",
       type: "number",
-      default: "30",
+      default: "check default values",
     },
     ["borderWidth"]: {
       description: "The border width (px) of the frame.",
       type: "number",
-      default: "2",
+      default: "check default values",
     },
     ["borderColor"]: {
       description: "The border color (HEX with alpha) of the frame.",
       type: "string",
-      default: "#000000ff",
+      default: "#000check default values0ff",
     },
     ["onTargetLeave.borderColor"]: {
       description:
         "The border color (HEX with alpha) of the frame when no target is added.",
       type: "string",
-      default: "#000000ff",
+      default: "check default values",
     },
     ["onTargetLeave.fill"]: {
       description:
         "The frame background color (HEX with alpha) of the frame when no target is added.",
       type: "string",
-      default: "#ffffffff",
+      default: "check default values",
     },
     ["onTargetEnter.borderColor"]: {
       description:
         "The border color (HEX with alpha) of the frame when a target is going to be added.",
       type: "string",
-      default: "#ff6863ff",
+      default: "check default values",
     },
     ["onTargetEnter.fill"]: {
       description:
         "The frame background color (HEX with alpha) of the frame when a target going to be added.",
       type: "string",
-      default: "#ecececff",
+      default: "check default values",
+    },
+    ["transform"]: {
+      description:
+        "Setup the transform properties for the frame (if can be resized, rotated, anchors, etc.).",
+      type: "object",
+      default: "check default values",
     },
   }}
 />
@@ -230,14 +239,21 @@ const WEAVE_FRAME_NODE_DEFAULT_CONFIG = {
   fontStyle: "normal",
   titleHeight: 30,
   borderColor: "#000000ff",
-  borderWidth: 2,
+  borderWidth: 1,
   onTargetLeave: {
     borderColor: "#000000ff",
     fill: "#ffffffff",
   },
   onTargetEnter: {
     borderColor: "#ff6863ff",
-    fill: "#ecececff",
+    fill: "#ffffffff",
+  },
+  transform: {
+    rotateEnabled: false,
+    resizeEnabled: false,
+    enabledAnchors: [] as string[],
+    borderStrokeWidth: 3,
+    padding: 0,
   },
 };
 
