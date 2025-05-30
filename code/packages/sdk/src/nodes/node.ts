@@ -23,7 +23,6 @@ import {
   moveNodeToContainer,
 } from '@/utils';
 import type { WeaveNodesSnappingPlugin } from '@/plugins/nodes-snapping/nodes-snapping';
-import './node-extensions.d';
 
 export const setNodesDefaultConfiguration = (
   config?: WeaveNodeConfiguration
