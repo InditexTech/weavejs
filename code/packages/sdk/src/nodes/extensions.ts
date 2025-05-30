@@ -4,6 +4,7 @@
 
 import 'konva';
 import type { Vector2d } from 'konva/lib/types';
+import type { WeaveNodeTransformerProperties } from '@inditextech/weave-types';
 
 declare module 'konva/lib/Node' {
   interface Node {
