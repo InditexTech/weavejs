@@ -21,6 +21,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 - [#219](https://github.com/InditexTech/weavejs/issues/219) Improve frame
+- [#302](https://github.com/InditexTech/weavejs/issues/302) Update create-app frontend
 
 ### Fixed
 
