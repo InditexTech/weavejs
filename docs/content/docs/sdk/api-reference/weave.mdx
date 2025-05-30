@@ -107,6 +107,45 @@ getId(): string
 
 This method gets the id of the Weave instance.
 
+### Instance configuration
+
+#### setNodesDefaultConfiguration
+
+```ts
+setNodesDefaultConfiguration(config?: WeaveNodeConfiguration): void
+```
+
+This method set the Node default configuration properties.
+
+By default:
+
+```ts
+const WEAVE_TRANSFORMER_ANCHORS = {
+  ["TOP_LEFT"]: "top-left",
+  ["TOP_CENTER"]: "top-center",
+  ["TOP_RIGHT"]: "top-right",
+  ["MIDDLE_RIGHT"]: "middle-right",
+  ["MIDDLE_LEFT"]: "middle-left",
+  ["BOTTOM_LEFT"]: "bottom-left",
+  ["BOTTOM_CENTER"]: "bottom-center",
+  ["BOTTOM_RIGHT"]: "bottom-right",
+};
+
+const WEAVE_DEFAULT_ENABLED_ANCHORS: string[] = Object.values(
+  WEAVE_TRANSFORMER_ANCHORS
+);
+
+const defaultNodeConfig: WeaveNodeConfiguration = {
+  transform: {
+    rotateEnabled: true,
+    resizeEnabled: true,
+    enabledAnchors: WEAVE_DEFAULT_ENABLED_ANCHORS,
+    borderStrokeWidth: 3,
+    padding: 0,
+  },
+};
+```
+
 ### Events
 
 #### emitEvent

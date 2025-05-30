@@ -4,22 +4,37 @@
 
 import Konva from 'konva';
 import {
+  WEAVE_DEFAULT_TRANSFORM_PROPERTIES,
   type WeaveElementAttributes,
   type WeaveElementInstance,
 } from '@inditextech/weave-types';
 import { WeaveNode } from '../node';
-import { type ImageProps } from './types';
+import {
+  type ImageProps,
+  type WeaveImageNodeParams,
+  type WeaveImageProperties,
+} from './types';
 import { WeaveImageToolAction } from '@/actions/image-tool/image-tool';
 import { WeaveImageClip } from './clip';
 import { WEAVE_IMAGE_NODE_TYPE } from './constants';
 
 export class WeaveImageNode extends WeaveNode {
+  private config: WeaveImageProperties;
   protected nodeType: string = WEAVE_IMAGE_NODE_TYPE;
   private imageLoaded: boolean;
   cropping: boolean;
 
-  constructor() {
+  constructor(params?: WeaveImageNodeParams) {
     super();
+
+    const { config } = params ?? {};
+
+    this.config = {
+      transform: {
+        ...WEAVE_DEFAULT_TRANSFORM_PROPERTIES,
+        ...config?.transform,
+      },
+    };
 
     this.imageLoaded = false;
     this.cropping = false;
@@ -51,6 +66,10 @@ export class WeaveImageNode extends WeaveNode {
       id,
       name: 'node',
     });
+
+    image.getTransformerProperties = () => {
+      return this.config.transform;
+    };
 
     const imagePlaceholder = new Konva.Rect({
       ...groupImageProps,

@@ -4,6 +4,7 @@
 
 import Konva from 'konva';
 import {
+  WEAVE_DEFAULT_TRANSFORM_PROPERTIES,
   type WeaveElementAttributes,
   type WeaveElementInstance,
   type WeaveStateElement,
@@ -15,13 +16,24 @@ import { resetScale } from '@/utils';
 import { WEAVE_TEXT_NODE_TYPE } from './constants';
 import { SELECTION_TOOL_ACTION_NAME } from '@/actions/selection-tool/constants';
 import { TEXT_LAYOUT } from '@/actions/text-tool/constants';
+import type { WeaveTextNodeParams, WeaveTextProperties } from './types';
 
 export class WeaveTextNode extends WeaveNode {
+  private config: WeaveTextProperties;
   protected nodeType: string = WEAVE_TEXT_NODE_TYPE;
   private editing: boolean = false;
 
-  constructor() {
+  constructor(params?: WeaveTextNodeParams) {
     super();
+
+    const { config } = params ?? {};
+
+    this.config = {
+      transform: {
+        ...WEAVE_DEFAULT_TRANSFORM_PROPERTIES,
+        ...config?.transform,
+      },
+    };
 
     this.editing = false;
   }
@@ -38,6 +50,10 @@ export class WeaveTextNode extends WeaveNode {
       ...props,
       name: 'node',
     });
+
+    text.getTransformerProperties = () => {
+      return this.config.transform;
+    };
 
     text.setAttrs({
       measureMultilineText: this.measureMultilineText(text),

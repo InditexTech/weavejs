@@ -4,21 +4,41 @@
 
 import Konva from 'konva';
 import {
+  WEAVE_DEFAULT_TRANSFORM_PROPERTIES,
   type WeaveElementAttributes,
   type WeaveElementInstance,
   type WeaveStateElement,
 } from '@inditextech/weave-types';
 import { WeaveNode } from '../node';
 import { WEAVE_GROUP_NODE_TYPE } from './constants';
+import type { WeaveGroupNodeParams, WeaveGroupProperties } from './types';
 
 export class WeaveGroupNode extends WeaveNode {
+  private config: WeaveGroupProperties;
   protected nodeType: string = WEAVE_GROUP_NODE_TYPE;
+
+  constructor(params?: WeaveGroupNodeParams) {
+    super();
+
+    const { config } = params ?? {};
+
+    this.config = {
+      transform: {
+        ...WEAVE_DEFAULT_TRANSFORM_PROPERTIES,
+        ...config?.transform,
+      },
+    };
+  }
 
   onRender(props: WeaveElementAttributes): WeaveElementInstance {
     const group = new Konva.Group({
       ...props,
       name: 'node',
     });
+
+    group.getTransformerProperties = () => {
+      return this.config.transform;
+    };
 
     this.setupDefaultNodeEvents(group);
 

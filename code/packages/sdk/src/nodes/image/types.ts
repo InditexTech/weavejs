@@ -2,7 +2,10 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-import { type WeaveElementAttributes } from '@inditextech/weave-types';
+import {
+  type WeaveElementAttributes,
+  type WeaveNodeTransformerProperties,
+} from '@inditextech/weave-types';
 
 export type ImageProps = WeaveElementAttributes & {
   id: string;
@@ -13,4 +16,12 @@ export type ImageProps = WeaveElementAttributes & {
     width: number;
     height: number;
   };
+};
+
+export type WeaveImageProperties = {
+  transform: WeaveNodeTransformerProperties;
+};
+
+export type WeaveImageNodeParams = {
+  config: Partial<WeaveImageProperties>;
 };

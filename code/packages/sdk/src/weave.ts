@@ -22,9 +22,10 @@ import {
   type WeaveSerializedGroup,
   type WeaveFont,
   type WeaveNodeFound,
+  type WeaveNodeConfiguration,
 } from '@inditextech/weave-types';
 import { WeaveStore } from './stores/store';
-import { WeaveNode } from './nodes/node';
+import { setNodesDefaultConfiguration, WeaveNode } from './nodes/node';
 import { WeaveAction } from './actions/action';
 import { WeavePlugin } from './plugins/plugin';
 import { WeaveReconciler } from './reconciler/reconciler';
@@ -171,6 +172,7 @@ export class Weave extends Emittery {
 
     // Register all the nodes, plugins and actions that come from the configuration
     this.registerManager.registerNodesHandlers();
+    this.setNodesDefaultConfiguration();
     this.registerManager.registerPlugins();
     this.registerManager.registerActionsHandlers();
 
@@ -223,6 +225,10 @@ export class Weave extends Emittery {
 
   getConfiguration(): WeaveConfig {
     return this.config;
+  }
+
+  setNodesDefaultConfiguration(config?: WeaveNodeConfiguration): void {
+    setNodesDefaultConfiguration(config);
   }
 
   // EVENTS METHODS

@@ -2,6 +2,8 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
+import type { WeaveNodeTransformerProperties } from './types';
+
 export const WEAVE_NODE_LAYER_ID = 'mainLayer';
 export const WEAVE_AWARENESS_LAYER_ID = 'usersPointersLayer';
 export const WEAVE_UTILITY_LAYER_ID = 'utilityLayer';
@@ -42,3 +44,27 @@ export const WEAVE_NODE_CUSTOM_EVENTS = {
   onTargetEnter: 'onTargetEnter',
   onTargetLeave: 'onTargetLeave',
 } as const;
+
+export const WEAVE_TRANSFORMER_ANCHORS = {
+  ['TOP_LEFT']: 'top-left',
+  ['TOP_CENTER']: 'top-center',
+  ['TOP_RIGHT']: 'top-right',
+  ['MIDDLE_RIGHT']: 'middle-right',
+  ['MIDDLE_LEFT']: 'middle-left',
+  ['BOTTOM_LEFT']: 'bottom-left',
+  ['BOTTOM_CENTER']: 'bottom-center',
+  ['BOTTOM_RIGHT']: 'bottom-right',
+};
+
+export const WEAVE_DEFAULT_ENABLED_ANCHORS: string[] = Object.values(
+  WEAVE_TRANSFORMER_ANCHORS
+);
+
+export const WEAVE_DEFAULT_TRANSFORM_PROPERTIES: WeaveNodeTransformerProperties =
+  {
+    rotateEnabled: true,
+    resizeEnabled: true,
+    enabledAnchors: WEAVE_DEFAULT_ENABLED_ANCHORS,
+    borderStrokeWidth: 3,
+    padding: 0,
+  };
