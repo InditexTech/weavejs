@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { Input } from '@/components/ui/input';
 import {
   ColorPicker,
@@ -28,15 +28,36 @@ export const InputColor = ({
   value,
   onChange,
 }: Readonly<InputColorProps>) => {
-  const [actualValue, setActualValue] = useState<string>(value);
+  const editingRef = React.useRef<HTMLInputElement>(null);
+  const [enterPressed, setEnterPressed] = React.useState<boolean>(false);
+  const [editing, setEditing] = React.useState<boolean>(false);
+  const [editedValue, setEditedValue] = React.useState<string>(value);
 
-  useEffect(() => {
-    setActualValue(value);
-  }, [value]);
+  const handleKeyDown = React.useCallback(
+    (e: React.KeyboardEvent<HTMLInputElement>) => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        e.stopPropagation();
+        const input = e.target as HTMLInputElement;
+        input.blur();
+        setEnterPressed(true);
+      }
+    },
+    []
+  );
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setActualValue(e.target.value);
-  };
+  const handleOnChange = React.useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      setEditedValue(e.target.value);
+    },
+    []
+  );
+
+  React.useEffect(() => {
+    if (editingRef.current) {
+      editingRef.current.focus();
+    }
+  }, [editing]);
 
   return (
     <div className="flex flex-col items-start justify-start relative">
@@ -49,8 +70,8 @@ export const InputColor = ({
         <Popover>
           <PopoverTrigger asChild>
             <div
-              className="cursor-pointer shrink-0 w-[40px] h-[40px] mr-1 border border-zinc-200 rounded-none"
-              style={{ background: actualValue }}
+              className="cursor-pointer shrink-0 w-[40px] h-[40px] mr-1 border border-black rounded-none"
+              style={{ background: value }}
             />
           </PopoverTrigger>
           <PopoverContent
@@ -61,9 +82,8 @@ export const InputColor = ({
             className="rounded-none border-black"
           >
             <ColorPicker
-              value={actualValue}
+              value={value}
               onChange={(color) => {
-                setActualValue(color as string);
                 onChange(color as string);
               }}
               onFocus={() => {
@@ -71,7 +91,6 @@ export const InputColor = ({
               }}
               onBlurCapture={() => {
                 window.weaveOnFieldFocus = false;
-                onChange(actualValue);
               }}
             >
               <ColorPickerSaturation />
@@ -89,28 +108,39 @@ export const InputColor = ({
             </ColorPicker>
           </PopoverContent>
         </Popover>
-
-        <Input
-          type="text"
-          className="w-full py-0 h-[40px] rounded-none !text-[14px] !border-black font-normal text-black text-right focus:outline-none bg-transparent shadow-none"
-          value={actualValue ?? '#000000ff'}
-          onChange={handleInputChange}
-          onFocus={() => {
-            window.weaveOnFieldFocus = true;
-          }}
-          onBlurCapture={() => {
-            window.weaveOnFieldFocus = false;
-            onChange(actualValue);
-          }}
-          onKeyDown={(e) => {
-            if (e.key === 'Enter') {
-              e.preventDefault();
-              e.stopPropagation();
-              const input = e.target as HTMLInputElement;
-              input.blur();
-            }
-          }}
-        />
+        {!editing && (
+          <Input
+            type="text"
+            className="w-full py-0 h-[40px] rounded-none !text-[14px] !border-black font-normal text-black text-right focus:outline-none bg-transparent shadow-none"
+            value={value ?? '#000000ff'}
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+              if (enterPressed) {
+                onChange?.(e.target.value);
+                setEnterPressed(false);
+              }
+            }}
+            onFocus={() => {
+              setEditing(true);
+              setEditedValue(value ?? '#000000ff');
+              window.weaveOnFieldFocus = true;
+            }}
+          />
+        )}
+        {editing && (
+          <Input
+            ref={editingRef}
+            type="text"
+            className="w-full py-0 h-[40px] rounded-none !text-[14px] !border-black font-normal text-black text-right focus:outline-none bg-transparent shadow-none"
+            value={editedValue}
+            onChange={handleOnChange}
+            onBlurCapture={() => {
+              window.weaveOnFieldFocus = false;
+              setEditing(false);
+              onChange(editedValue);
+            }}
+            onKeyDown={handleKeyDown}
+          />
+        )}
       </div>
     </div>
   );

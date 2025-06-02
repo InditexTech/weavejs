@@ -155,7 +155,7 @@ export class WeaveFrameToolAction extends WeaveAction {
     const selectionPlugin =
       this.instance.getPlugin<WeaveNodesSelectionPlugin>('nodesSelection');
     if (selectionPlugin) {
-      const node = stage.findOne(`#${this.frameId}`);
+      const node = stage.findOne(`#${this.frameId}-selector-area`);
       if (node) {
         selectionPlugin.setSelectedNodes([node]);
       }

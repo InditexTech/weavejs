@@ -5,6 +5,7 @@ import { WeaveStateElement } from '@inditextech/weave-types';
 import { useWeave } from '@inditextech/weave-react';
 import { useCollaborationRoom } from '@/store/store';
 import { InputNumber } from '../inputs/input-number';
+import { ToggleIconButton } from '../toggle-icon-button';
 
 export function SizeProperties() {
   const instance = useWeave((state) => state.instance);
@@ -19,28 +20,21 @@ export function SizeProperties() {
     (state) => state.nodeProperties.createProps
   );
 
-  const [actualNode, setActualNode] = React.useState<
-    WeaveStateElement | undefined
-  >(node);
-
-  React.useEffect(() => {
-    if (!instance) return;
+  const actualNode = React.useMemo(() => {
     if (actualAction && nodePropertiesAction === 'create') {
-      setActualNode({
+      return {
         key: 'creating',
         type: 'undefined',
         props: {
           ...nodeCreateProps,
         },
-      });
+      };
     }
     if (node && nodePropertiesAction === 'update') {
-      setActualNode(node);
+      return node;
     }
-    if (!actualAction && !node) {
-      setActualNode(undefined);
-    }
-  }, [instance, actualAction, node, nodePropertiesAction, nodeCreateProps]);
+    return undefined;
+  }, [actualAction, node, nodePropertiesAction, nodeCreateProps]);
 
   const updateElement = React.useCallback(
     (updatedNode: WeaveStateElement) => {
@@ -78,15 +72,73 @@ export function SizeProperties() {
         </div>
       </div>
       <div className="grid grid-cols-1 gap-3 w-full">
+        {actualNode.type === 'text' && (
+          <div className="w-full flex justify-between items-center gap-4 col-span-2">
+            <div className="w-full flex justify-evenly items-center gap-1">
+              <ToggleIconButton
+                kind="switch"
+                className="w-full"
+                icon={<div className="text-[12px] uppercase">Auto width</div>}
+                pressed={(actualNode.props.layout ?? 'auto-all') === 'auto-all'}
+                onClick={() => {
+                  const updatedNode: WeaveStateElement = {
+                    ...actualNode,
+                    props: {
+                      ...actualNode.props,
+                      layout: 'auto-all',
+                    },
+                  };
+                  updateElement(updatedNode);
+                }}
+              />
+              <ToggleIconButton
+                kind="switch"
+                className="w-full"
+                icon={<div className="text-[12px] uppercase">Auto height</div>}
+                pressed={
+                  (actualNode.props.layout ?? 'auto-all') === 'auto-height'
+                }
+                onClick={() => {
+                  const updatedNode: WeaveStateElement = {
+                    ...actualNode,
+                    props: {
+                      ...actualNode.props,
+                      layout: 'auto-height',
+                    },
+                  };
+                  updateElement(updatedNode);
+                }}
+              />
+              <ToggleIconButton
+                kind="switch"
+                className="w-full"
+                icon={<div className="text-[12px] uppercase">Fixed size</div>}
+                pressed={(actualNode.props.layout ?? 'auto-all') === 'fixed'}
+                onClick={() => {
+                  const updatedNode: WeaveStateElement = {
+                    ...actualNode,
+                    props: {
+                      ...actualNode.props,
+                      layout: 'fixed',
+                    },
+                  };
+                  updateElement(updatedNode);
+                }}
+              />
+            </div>
+          </div>
+        )}
         <div className="grid grid-cols-3 gap-3 w-full">
           <InputNumber
             label="Width"
             value={actualNode.props.width ?? 0}
             onChange={(value) => {
+              const isText = actualNode.type === 'text';
               const updatedNode: WeaveStateElement = {
                 ...actualNode,
                 props: {
                   ...actualNode.props,
+                  ...(isText && { layout: 'fixed' }),
                   width: value,
                 },
               };
@@ -97,10 +149,12 @@ export function SizeProperties() {
             label="Height"
             value={actualNode.props.height ?? 0}
             onChange={(value) => {
+              const isText = actualNode.type === 'text';
               const updatedNode: WeaveStateElement = {
                 ...actualNode,
                 props: {
                   ...actualNode.props,
+                  ...(isText && { layout: 'fixed' }),
                   height: value,
                 },
               };

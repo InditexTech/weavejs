@@ -2,7 +2,10 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-import type { WeaveElementAttributes } from '@inditextech/weave-types';
+import type {
+  WeaveElementAttributes,
+  WeaveNodeTransformerProperties,
+} from '@inditextech/weave-types';
 import type {
   WEAVE_FRAME_NODE_SIZES_ORIENTATION,
   WEAVE_FRAME_NODE_SIZES_TYPES,
@@ -40,6 +43,7 @@ export type WeaveFrameProperties = {
     borderColor: string;
     fill: string;
   };
+  transform: WeaveNodeTransformerProperties;
 };
 
 export type WeaveFrameAttributes = WeaveElementAttributes & {

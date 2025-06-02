@@ -1,10 +1,10 @@
-"use client";
+'use client';
 
-import React from "react";
-import { WeaveStateElement } from "@inditextech/weave-types";
-import { useWeave } from "@inditextech/weave-react";
-import { useCollaborationRoom } from "@/store/store";
-import { InputColor } from "../inputs/input-color";
+import React from 'react';
+import { WeaveStateElement } from '@inditextech/weave-types';
+import { useWeave } from '@inditextech/weave-react';
+import { useCollaborationRoom } from '@/store/store';
+import { InputColor } from '../inputs/input-color';
 
 export function ColorTokenProperties() {
   const instance = useWeave((state) => state.instance);
@@ -19,36 +19,29 @@ export function ColorTokenProperties() {
     (state) => state.nodeProperties.createProps
   );
 
-  const [actualNode, setActualNode] = React.useState<
-    WeaveStateElement | undefined
-  >(node);
-
-  React.useEffect(() => {
-    if (!instance) return;
-    if (actualAction && nodePropertiesAction === "create") {
-      setActualNode({
-        key: "creating",
-        type: "undefined",
+  const actualNode = React.useMemo(() => {
+    if (actualAction && nodePropertiesAction === 'create') {
+      return {
+        key: 'creating',
+        type: 'undefined',
         props: {
           ...nodeCreateProps,
         },
-      });
+      };
     }
-    if (node && nodePropertiesAction === "update") {
-      setActualNode(node);
+    if (node && nodePropertiesAction === 'update') {
+      return node;
     }
-    if (!actualAction && !node) {
-      setActualNode(undefined);
-    }
-  }, [instance, actualAction, node, nodePropertiesAction, nodeCreateProps]);
+    return undefined;
+  }, [actualAction, node, nodePropertiesAction, nodeCreateProps]);
 
   const updateElement = React.useCallback(
     (updatedNode: WeaveStateElement) => {
       if (!instance) return;
-      if (actualAction && nodePropertiesAction === "create") {
+      if (actualAction && nodePropertiesAction === 'create') {
         instance.updatePropsAction(actualAction, updatedNode.props);
       }
-      if (nodePropertiesAction === "update") {
+      if (nodePropertiesAction === 'update') {
         instance.updateNode(updatedNode);
       }
     },
@@ -61,15 +54,15 @@ export function ColorTokenProperties() {
 
   if (
     actualAction &&
-    ["selectionTool"].includes(actualAction) &&
-    !["color-token"].includes(actualNode.type)
+    ['selectionTool'].includes(actualAction) &&
+    !['color-token'].includes(actualNode.type)
   ) {
     return null;
   }
 
   if (
     actualAction &&
-    !["selectionTool", "colorTokenTool"].includes(actualAction)
+    !['selectionTool', 'colorTokenTool'].includes(actualAction)
   )
     return null;
 

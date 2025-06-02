@@ -4,6 +4,7 @@
 
 export { Weave } from './weave';
 export { WeaveStore } from './stores/store';
+export * from './stores/types';
 export { WeaveNode } from './nodes/node';
 export { WeaveAction } from './actions/action';
 export * from './actions/types';
@@ -39,6 +40,9 @@ export * from './actions/move-tool/types';
 export { WeaveSelectionToolAction } from './actions/selection-tool/selection-tool';
 export * from './actions/selection-tool/constants';
 export * from './actions/selection-tool/types';
+export { WeaveEraserToolAction } from './actions/eraser-tool/eraser-tool';
+export * from './actions/eraser-tool/constants';
+export * from './actions/eraser-tool/types';
 export { WeaveRectangleToolAction } from './actions/rectangle-tool/rectangle-tool';
 export * from './actions/rectangle-tool/constants';
 export * from './actions/rectangle-tool/types';

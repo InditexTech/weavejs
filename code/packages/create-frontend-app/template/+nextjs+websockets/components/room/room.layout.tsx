@@ -109,121 +109,118 @@ export const RoomLayout = () => {
   }, [instance, setLoadingImage, setNodePropertiesCreateProps]);
 
   return (
-    <div className="w-full h-full relative flex">
-      <AnimatePresence>
-        <motion.div
-          animate={{
-            filter: !(status === WEAVE_INSTANCE_STATUS.RUNNING && roomLoaded)
-              ? 'blur(10px)'
-              : 'blur(0px)',
-          }}
-          transition={{
-            duration: 0.5,
-            delay: !(status === WEAVE_INSTANCE_STATUS.RUNNING && roomLoaded)
-              ? 0
-              : 0.5,
-          }}
-          className="w-full h-full flex flex-col"
+    <AnimatePresence>
+      <motion.div
+        animate={{
+          filter: !(status === WEAVE_INSTANCE_STATUS.RUNNING && roomLoaded)
+            ? 'blur(10px)'
+            : 'blur(0px)',
+        }}
+        transition={{
+          duration: 0.5,
+          delay: !(status === WEAVE_INSTANCE_STATUS.RUNNING && roomLoaded)
+            ? 0
+            : 0.5,
+        }}
+        className="w-full h-full flex flex-col relative overflow-hidden"
+      >
+        <section
+          id="sidebar-left"
+          className={cn(
+            'bg-white absolute top-0 left-0 bottom-0 border-r border-[#c9c9c9] z-1 overflow-hidden',
+            {
+              ['w-0']: sidebarLeftActive === null,
+              ['w-[370px]']: sidebarLeftActive !== null,
+            }
+          )}
         >
-          <section className="w-full h-full flex">
-            <section
-              id="sidebar-left"
-              className={cn(
-                'bg-white h-full border-r border-[#c9c9c9] z-1 overflow-hidden',
-                {
-                  ['w-0']: sidebarLeftActive === null,
-                  ['w-[370px]']: sidebarLeftActive !== null,
-                }
-              )}
-            >
-              <AnimatePresence>
-                <ImagesLibrary key={SIDEBAR_ELEMENTS.images} />
-                <FramesLibrary key={SIDEBAR_ELEMENTS.frames} />
-                <ColorTokensLibrary key={SIDEBAR_ELEMENTS.colorTokens} />
-                <ElementsTree key={SIDEBAR_ELEMENTS.nodesTree} />
-              </AnimatePresence>
-            </section>
-            <section
-              className={cn('w-full h-full flex flex-col z-0', {
-                ['w-[calc(100%-370px)]']:
-                  sidebarLeftActive !== null || sidebarRightActive !== null,
-                ['w-[calc(100%-740px)]']:
-                  sidebarLeftActive !== null && sidebarRightActive !== null,
-              })}
-            >
-              <section className="w-full h-full flex relative">
-                <RoomHeader />
-                <div
-                  id="weave"
-                  tabIndex={0}
-                  className="w-full h-full overflow-hidden"
-                ></div>
-                {status === WEAVE_INSTANCE_STATUS.RUNNING && roomLoaded && (
-                  <>
-                    <ContextMenuRender
-                      show={contextMenuShow}
-                      onChanged={(show: boolean) => {
-                        setContextMenuShow(show);
-                      }}
-                      position={contextMenuPosition}
-                      options={contextMenuOptions}
-                    />
-                    {/* <div className="absolute top-[104px] left-[12px] right-[12px] flex justify-center items-center pointer-events-none">
+          <AnimatePresence>
+            <ImagesLibrary key={SIDEBAR_ELEMENTS.images} />
+            <FramesLibrary key={SIDEBAR_ELEMENTS.frames} />
+            <ColorTokensLibrary key={SIDEBAR_ELEMENTS.colorTokens} />
+            <ElementsTree key={SIDEBAR_ELEMENTS.nodesTree} />
+          </AnimatePresence>
+        </section>
+        <section
+          className={cn(
+            'absolute top-0 left-0 right-0 bottom-0 flex z-0 overflow-hidden',
+            {
+              ['left-[370px]']: sidebarLeftActive !== null,
+              ['right-[370px]']: sidebarRightActive !== null,
+              ['w-[calc(100%-370px)]']:
+                sidebarLeftActive !== null || sidebarRightActive !== null,
+              ['w-[calc(100%-740px)]']:
+                sidebarLeftActive !== null && sidebarRightActive !== null,
+            }
+          )}
+        >
+          <RoomHeader />
+          <div
+            id="weave"
+            tabIndex={0}
+            className="w-full h-full relative overflow-hidden"
+          ></div>
+          {status === WEAVE_INSTANCE_STATUS.RUNNING && roomLoaded && (
+            <>
+              <ContextMenuRender
+                show={contextMenuShow}
+                onChanged={(show: boolean) => {
+                  setContextMenuShow(show);
+                }}
+                position={contextMenuPosition}
+                options={contextMenuOptions}
+              />
+              {/* <div className="absolute top-[104px] left-[12px] right-[12px] flex justify-center items-center pointer-events-none">
                       <div className="max-w-[320px] text-center bg-transparent bg-white/50 p-1 font-inter font-light text-[10px] text-zinc-600">
                         To pan the canvas, keep the mouse wheel or the space bar
                         pressed while dragging or use the hand tool.
                       </div>
                     </div> */}
-                    <ToolsOverlay />
-                    {transformingImage && (
-                      <div className="bg-black/25 flex justify-center items-center absolute top-0 left-0 right-0 bottom-0">
-                        <div className="flex flex-col gap-5 bg-white p-11 py-8 justify-center items-center">
-                          <Logo kind="large" variant="no-text" />
-                          <div className="font-inter text-base">
-                            Removing background...
-                          </div>
-                        </div>
-                      </div>
-                    )}
-                    {uploadingImage && (
-                      <div className="bg-black/25 flex justify-center items-center absolute top-0 left-0 right-0 bottom-0">
-                        <div className="flex flex-col gap-5 bg-white p-11 py-8 justify-center items-center">
-                          <Logo kind="large" variant="no-text" />
-                          <div className="font-inter text-base">
-                            Uploading image...
-                          </div>
-                        </div>
-                      </div>
-                    )}
-                    {loadingImage && (
-                      <div className="bg-black/25 flex justify-center items-center absolute top-0 left-0 right-0 bottom-0">
-                        <div className="flex flex-col gap-5 bg-white p-11 py-8 justify-center items-center">
-                          <Logo kind="large" variant="no-text" />
-                          <div className="font-inter text-base">
-                            Loading image...
-                          </div>
-                        </div>
-                      </div>
-                    )}
-                  </>
-                )}
-              </section>
-            </section>
-            <section
-              id="sidebar-right"
-              className={cn(
-                'bg-white h-full border-l border-[#c9c9c9] z-0 overflow-hidden',
-                {
-                  ['w-0']: sidebarRightActive === null,
-                  ['w-[370px]']: sidebarRightActive !== null,
-                }
+              <ToolsOverlay />
+              {transformingImage && (
+                <div className="bg-black/25 flex justify-center items-center absolute top-0 left-0 right-0 bottom-0">
+                  <div className="flex flex-col gap-5 bg-white p-11 py-8 justify-center items-center">
+                    <Logo kind="large" variant="no-text" />
+                    <div className="font-inter text-base">
+                      Removing background...
+                    </div>
+                  </div>
+                </div>
               )}
-            >
-              <NodeProperties />
-            </section>
-          </section>
-        </motion.div>
-      </AnimatePresence>
-    </div>
+              {uploadingImage && (
+                <div className="bg-black/25 flex justify-center items-center absolute top-0 left-0 right-0 bottom-0">
+                  <div className="flex flex-col gap-5 bg-white p-11 py-8 justify-center items-center">
+                    <Logo kind="large" variant="no-text" />
+                    <div className="font-inter text-base">
+                      Uploading image...
+                    </div>
+                  </div>
+                </div>
+              )}
+              {loadingImage && (
+                <div className="bg-black/25 flex justify-center items-center absolute top-0 left-0 right-0 bottom-0">
+                  <div className="flex flex-col gap-5 bg-white p-11 py-8 justify-center items-center">
+                    <Logo kind="large" variant="no-text" />
+                    <div className="font-inter text-base">Loading image...</div>
+                  </div>
+                </div>
+              )}
+            </>
+          )}
+        </section>
+        <section
+          id="sidebar-right"
+          className={cn(
+            'bg-white absolute top-0 right-0 bottom-0 border-l border-[#c9c9c9] z-0 overflow-hidden',
+            {
+              ['w-0']: sidebarRightActive === null,
+              ['w-[370px]']: sidebarRightActive !== null,
+            }
+          )}
+        >
+          <NodeProperties />
+        </section>
+      </motion.div>
+    </AnimatePresence>
   );
 };

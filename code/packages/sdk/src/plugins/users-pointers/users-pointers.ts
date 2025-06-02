@@ -2,8 +2,10 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-import _ from 'lodash';
-import { type WeaveAwarenessChange } from '@inditextech/weave-types';
+import {
+  type WeaveAwarenessChange,
+  WEAVE_AWARENESS_LAYER_ID,
+} from '@inditextech/weave-types';
 import {
   type WeaveUserPointer,
   type WeaveUserPointerKey,
@@ -15,11 +17,9 @@ import {
   WEAVE_USER_POINTER_KEY,
   WEAVE_USER_POINTERS_DEFAULT_PROPS,
   WEAVE_USERS_POINTERS_KEY,
-  WEAVE_USERS_POINTERS_LAYER_ID,
 } from './constants';
 import { WeavePlugin } from '@/plugins/plugin';
 import Konva from 'konva';
-import { type Vector2d } from 'konva/lib/types';
 
 export class WeaveUsersPointersPlugin extends WeavePlugin {
   private usersPointers: Record<
@@ -48,7 +48,7 @@ export class WeaveUsersPointersPlugin extends WeavePlugin {
   }
 
   getLayerName(): string {
-    return WEAVE_USERS_POINTERS_LAYER_ID;
+    return WEAVE_AWARENESS_LAYER_ID;
   }
 
   initLayer(): void {
@@ -68,9 +68,7 @@ export class WeaveUsersPointersPlugin extends WeavePlugin {
 
   getLayer() {
     const stage = this.instance.getStage();
-    return stage.findOne(`#${WEAVE_USERS_POINTERS_LAYER_ID}`) as
-      | Konva.Layer
-      | undefined;
+    return stage.findOne(`#${this.getLayerName()}`) as Konva.Layer | undefined;
   }
 
   onInit(): void {
@@ -106,33 +104,6 @@ export class WeaveUsersPointersPlugin extends WeavePlugin {
               actualPos: userPointer,
             };
           }
-        }
-
-        const allActiveUsersPointers = Object.keys(this.usersPointers).map(
-          (userPointerKey) => {
-            const pointerInfo = this.usersPointers[userPointerKey];
-            return pointerInfo.actualPos.user;
-          }
-        );
-
-        const inactivePointers = _.differenceWith(
-          allActiveUsersPointers,
-          allActiveUsers,
-          _.isEqual
-        );
-
-        const pointersLayer = this.getLayer();
-
-        for (const inactivePointer of inactivePointers) {
-          const userPointerNode = pointersLayer?.findOne(
-            `#pointer_${inactivePointer}`
-          ) as Konva.Group | undefined;
-
-          if (userPointerNode) {
-            userPointerNode.destroy();
-          }
-
-          delete this.usersPointers[inactivePointer];
         }
 
         this.renderPointers();
@@ -209,116 +180,99 @@ export class WeaveUsersPointersPlugin extends WeavePlugin {
       return;
     }
 
+    const pointers = pointersLayer?.find('.pointer') ?? [];
+    for (const pointer of pointers) {
+      pointer.destroy();
+    }
+
     for (const userPointerKey of Object.keys(this.usersPointers)) {
       const userPointer = this.usersPointers[userPointerKey];
 
-      const userPointerNode = pointersLayer?.findOne(
-        `#pointer_${userPointer.actualPos.user}`
-      ) as Konva.Group | undefined;
-
-      if (!userPointerNode) {
-        const userPointerNode = new Konva.Group({
-          name: 'pointer',
-          id: `pointer_${userPointer.actualPos.user}`,
-          x: userPointer.actualPos.x,
-          y: userPointer.actualPos.y,
-          opacity: 1,
-          listening: false,
-        });
-
-        const {
-          separation,
-          pointer: { circleRadius, circleStrokeWidth },
-          name: {
-            fontFamily,
-            fontSize,
-            backgroundCornerRadius,
-            backgroundPaddingX,
-            backgroundPaddingY,
-          },
-        } = this.uiConfig;
-
-        const userColor = this.stringToColor(userPointer.actualPos.user);
-        const userContrastColor = this.getContrastTextColor(userColor);
-
-        const userPointNode = new Konva.Circle({
-          id: `pointer_${userPointer.actualPos.user}_userPoint`,
-          x: 0,
-          y: 0,
-          radius: circleRadius,
-          fill: userColor,
-          stroke: 'black',
-          strokeWidth: circleStrokeWidth,
-          strokeScaleEnabled: false,
-          listening: false,
-        });
-
-        const userNameNode = new Konva.Text({
-          id: `pointer_${userPointer.actualPos.user}_userPointName`,
-          x: separation,
-          y: -circleRadius * 2 + backgroundPaddingY,
-          text: userPointer.actualPos.user.trim(),
-          fontSize: fontSize,
-          fontFamily: fontFamily,
-          lineHeight: 0.9,
-          fill: userContrastColor,
-          align: 'center',
-          verticalAlign: 'middle',
-          listening: false,
-          strokeScaleEnabled: false,
-          ellipsis: true,
-        });
-
-        const textWidth = userNameNode.getTextWidth();
-        const textHeight = userNameNode.getTextHeight();
-        userNameNode.width(textWidth + backgroundPaddingX * 2);
-        userNameNode.height(textHeight + backgroundPaddingY * 2);
-
-        const userNameBackground = new Konva.Rect({
-          id: `pointer_${userPointer.actualPos.user}_userPointRect`,
-          x: separation,
-          y: -backgroundPaddingY,
-          width: textWidth + backgroundPaddingX * 2,
-          height: textHeight + backgroundPaddingY * 2,
-          cornerRadius: backgroundCornerRadius,
-          fill: userColor,
-          listening: false,
-        });
-
-        userPointNode.setAttrs({
-          y: userNameBackground.y() + userNameBackground.height() / 2,
-        });
-
-        userPointerNode.add(userPointNode);
-        userPointerNode.add(userNameBackground);
-        userPointerNode.add(userNameNode);
-
-        pointersLayer?.add(userPointerNode);
-
-        continue;
-      }
-
-      const oldPos: Vector2d = {
-        x: userPointer.oldPos.x,
-        y: userPointer.oldPos.y,
-      };
-      const actualPos: Vector2d = {
+      const userPointerNode = new Konva.Group({
+        name: 'pointer',
+        id: `pointer_${userPointer.actualPos.user}`,
         x: userPointer.actualPos.x,
         y: userPointer.actualPos.y,
-      };
-      const hasChanged = !_.isEqual(actualPos, oldPos);
+        opacity: 1,
+        listening: false,
+        scaleX: 1 / stage.scaleX(),
+        scaleY: 1 / stage.scaleY(),
+      });
+      userPointerNode.moveToTop();
 
-      // UPDATE TO SCALE
-      userPointerNode.scaleX(1 / stage.scaleX());
-      userPointerNode.scaleY(1 / stage.scaleY());
+      const {
+        separation,
+        pointer: { circleRadius, circleStrokeWidth },
+        name: {
+          fontFamily,
+          fontSize,
+          backgroundCornerRadius,
+          backgroundPaddingX,
+          backgroundPaddingY,
+        },
+      } = this.uiConfig;
 
-      if (hasChanged) {
-        userPointerNode.setAttrs({
-          x: userPointer.actualPos.x,
-          y: userPointer.actualPos.y,
-          opacity: 1,
-        });
-      }
+      const userColor = this.stringToColor(userPointer.actualPos.user);
+      const userContrastColor = this.getContrastTextColor(userColor);
+
+      const userPointNode = new Konva.Circle({
+        id: `pointer_${userPointer.actualPos.user}_userPoint`,
+        x: 0,
+        y: 0,
+        radius: circleRadius,
+        fill: userColor,
+        stroke: 'black',
+        strokeWidth: circleStrokeWidth,
+        strokeScaleEnabled: false,
+        listening: false,
+      });
+
+      const userNameNode = new Konva.Text({
+        id: `pointer_${userPointer.actualPos.user}_userPointName`,
+        x: separation,
+        y: -circleRadius * 2 + backgroundPaddingY,
+        text: userPointer.actualPos.user.trim(),
+        fontSize: fontSize,
+        fontFamily: fontFamily,
+        lineHeight: 0.9,
+        fill: userContrastColor,
+        align: 'center',
+        verticalAlign: 'middle',
+        listening: false,
+        strokeScaleEnabled: false,
+        ellipsis: true,
+      });
+
+      const textWidth = userNameNode.getTextWidth();
+      const textHeight = userNameNode.getTextHeight();
+      userNameNode.width(textWidth + backgroundPaddingX * 2);
+      userNameNode.height(textHeight + backgroundPaddingY * 2);
+
+      const userNameBackground = new Konva.Rect({
+        id: `pointer_${userPointer.actualPos.user}_userPointRect`,
+        x: separation,
+        y: -backgroundPaddingY,
+        width: textWidth + backgroundPaddingX * 2,
+        height: textHeight + backgroundPaddingY * 2,
+        cornerRadius: backgroundCornerRadius,
+        fill: userColor,
+        listening: false,
+      });
+
+      userPointNode.setAttrs({
+        y: userNameBackground.y() + userNameBackground.height() / 2,
+      });
+
+      userPointerNode.add(userPointNode);
+      userPointerNode.add(userNameBackground);
+      userPointerNode.add(userNameNode);
+
+      pointersLayer?.add(userPointerNode);
+    }
+
+    const selectors = pointersLayer?.find('.selector') ?? [];
+    for (const selector of selectors) {
+      selector.moveToBottom();
     }
   }
 

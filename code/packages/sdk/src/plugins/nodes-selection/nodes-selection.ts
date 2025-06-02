@@ -6,6 +6,7 @@ import {
   type WeaveSelection,
   type NodeSerializable,
   WEAVE_NODE_CUSTOM_EVENTS,
+  type WeaveElementInstance,
 } from '@inditextech/weave-types';
 import Konva from 'konva';
 import { WeavePlugin } from '@/plugins/plugin';
@@ -14,7 +15,7 @@ import {
   WEAVE_NODES_SELECTION_LAYER_ID,
 } from './constants';
 import {
-  type WeaveNodesSelectionPluginConfig,
+  type WeaveNodesSelectionConfig,
   type WeaveNodesSelectionPluginOnNodesChangeEvent,
   type WeaveNodesSelectionPluginOnSelectionStateEvent,
   type WeaveNodesSelectionPluginOnStageSelectionEvent,
@@ -33,10 +34,11 @@ import type { WeaveUsersSelectionPlugin } from '../users-selection/users-selecti
 
 export class WeaveNodesSelectionPlugin extends WeavePlugin {
   private tr!: Konva.Transformer;
-  private config!: WeaveNodesSelectionPluginConfig;
+  private config!: WeaveNodesSelectionConfig;
   private selectionRectangle!: Konva.Rect;
   private active: boolean;
   private cameFromSelectingMultiple: boolean;
+  private defaultEnabledAnchors: string[];
   private selecting: boolean;
   private initialized: boolean;
   onRender: undefined;
@@ -55,6 +57,16 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
         keepRatio: false,
         useSingleNodeRotation: true,
         shouldOverdrawWholeArea: true,
+        enabledAnchors: [
+          'top-left',
+          'top-center',
+          'top-right',
+          'middle-right',
+          'middle-left',
+          'bottom-left',
+          'bottom-center',
+          'bottom-right',
+        ],
         anchorStyleFunc: (anchor) => {
           anchor.stroke('#27272aff');
           anchor.cornerRadius(12);
@@ -71,10 +83,25 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
             anchor.offsetX(4);
           }
         },
-        borderStroke: '#1e40afff',
+        borderStroke: '#0074ffcc',
         ...config?.transformer,
       },
+      transformations: {
+        singleSelection: { enabled: true },
+        multipleSelection: { enabled: false },
+        ...config?.transformations,
+      },
     };
+    this.defaultEnabledAnchors = this.config.transformer?.enabledAnchors ?? [
+      'top-left',
+      'top-center',
+      'top-right',
+      'middle-right',
+      'middle-left',
+      'bottom-left',
+      'bottom-center',
+      'bottom-right',
+    ];
     this.active = false;
     this.cameFromSelectingMultiple = false;
     this.selecting = false;
@@ -159,7 +186,35 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
       }
     });
 
+    tr.on('transformstart', () => {
+      this.triggerSelectedNodesEvent();
+    });
+
+    tr.on('transform', () => {
+      this.triggerSelectedNodesEvent();
+    });
+
+    tr.on('transformend', () => {
+      this.triggerSelectedNodesEvent();
+    });
+
+    tr.on('dragstart', (e) => {
+      for (const node of tr.nodes()) {
+        node.updatePosition(e.target.getAbsolutePosition());
+      }
+
+      tr.forceUpdate();
+
+      e.cancelBubble = true;
+    });
+
     tr.on('dragmove', (e) => {
+      for (const node of tr.nodes()) {
+        node.updatePosition(e.target.getAbsolutePosition());
+      }
+
+      e.cancelBubble = true;
+
       if (this.isSelecting() && tr.nodes().length > 1) {
         clearContainerTargets(this.instance);
 
@@ -170,10 +225,27 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
             bubbles: true,
           });
         }
+
+        for (const node of tr.nodes()) {
+          const nodeHandler = this.instance.getNodeHandler<WeaveNode>(
+            node.getAttrs().nodeType
+          );
+          this.instance.updateNode(
+            nodeHandler.serialize(node as WeaveElementInstance)
+          );
+        }
       }
+
+      tr.forceUpdate();
     });
 
-    tr.on('dragend', () => {
+    tr.on('dragend', (e) => {
+      for (const node of tr.nodes()) {
+        node.updatePosition(e.target.getAbsolutePosition());
+      }
+
+      e.cancelBubble = true;
+
       if (this.isSelecting() && tr.nodes().length > 1) {
         clearContainerTargets(this.instance);
 
@@ -183,8 +255,17 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
           if (layerToMove) {
             continue;
           }
+
+          const nodeHandler = this.instance.getNodeHandler<WeaveNode>(
+            node.getAttrs().nodeType
+          );
+          this.instance.updateNode(
+            nodeHandler.serialize(node as WeaveElementInstance)
+          );
         }
       }
+
+      tr.forceUpdate();
     });
 
     this.tr = tr;
@@ -404,9 +485,16 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
       });
       const box = this.selectionRectangle.getClientRect();
       const selected = shapes.filter((shape) => {
-        const parent = this.instance.getInstanceRecursive(
+        let parent = this.instance.getInstanceRecursive(
           shape.getParent() as Konva.Node
         );
+
+        if (parent.getAttrs().nodeId) {
+          parent = this.instance
+            .getStage()
+            .findOne(`#${parent.getAttrs().nodeId}`) as Konva.Node;
+        }
+
         if (
           shape.getAttrs().nodeType &&
           shape.getAttrs().nodeType === 'frame'
@@ -524,18 +612,15 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
         return;
       }
 
-      // do we pressed shift or ctrl?
-      const metaPressed = e.evt.shiftKey || e.evt.ctrlKey || e.evt.metaKey;
-      const isSelected = this.tr.nodes().indexOf(e.target) >= 0;
       let areNodesSelected = false;
 
-      let nodeToAdd =
+      let nodeTargeted =
         selectedGroup && !(selectedGroup.getAttrs().active ?? false)
           ? selectedGroup
           : e.target;
 
       // Check if clicked on transformer
-      if (nodeToAdd.getParent() instanceof Konva.Transformer) {
+      if (nodeTargeted.getParent() instanceof Konva.Transformer) {
         const intersections = stage.getAllIntersections(mousePos);
         const nodesIntersected = intersections.filter(
           (ele) => ele.getAttrs().nodeType
@@ -548,23 +633,31 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
           );
         }
 
-        // Check if transformer has a frame selected
         if (targetNode && targetNode.getAttrs().nodeType) {
-          this.tr.nodes([]);
-          this.triggerSelectedNodesEvent();
-
-          nodeToAdd = targetNode;
+          nodeTargeted = targetNode;
         }
       }
 
-      if (!nodeToAdd.getAttrs().nodeType) {
+      if (!nodeTargeted.getAttrs().nodeType) {
         return;
       }
 
-      if (!metaPressed && !isSelected) {
+      let nodesSelected = 0;
+
+      // do we pressed shift or ctrl?
+      const metaPressed = e.evt.shiftKey || e.evt.ctrlKey || e.evt.metaKey;
+      const nodeSelectedIndex = this.tr.nodes().findIndex((node) => {
+        return node.getAttrs().id === nodeTargeted.getAttrs().id;
+      });
+      const isSelected = nodeSelectedIndex !== -1;
+
+      if (!metaPressed) {
         // if no key pressed and the node is not selected
         // select just one
-        this.tr.nodes([nodeToAdd]);
+        this.tr.nodes([nodeTargeted]);
+
+        nodesSelected = this.tr.nodes().length;
+
         this.tr.show();
         areNodesSelected = true;
       } else if (metaPressed && isSelected) {
@@ -572,14 +665,43 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
         // we need to remove it from selection:
         const nodes = this.tr.nodes().slice(); // use slice to have new copy of array
         // remove node from array
-        nodes.splice(nodes.indexOf(nodeToAdd), 1);
+        nodes.splice(nodes.indexOf(nodeTargeted), 1);
         this.tr.nodes(nodes);
+
+        nodesSelected = this.tr.nodes().length;
+
         areNodesSelected = true;
       } else if (metaPressed && !isSelected) {
         // add the node into selection
-        const nodes = this.tr.nodes().concat([nodeToAdd]);
+        const nodes = this.tr.nodes().concat([nodeTargeted]);
         this.tr.nodes(nodes);
+
+        nodesSelected = this.tr.nodes().length;
+
         areNodesSelected = true;
+      }
+
+      if (
+        (nodesSelected > 1 &&
+          !this.config.transformations.multipleSelection.enabled) ||
+        (nodesSelected === 1 &&
+          !this.config.transformations.singleSelection.enabled)
+      ) {
+        this.tr.enabledAnchors([]);
+      }
+      if (
+        (nodesSelected > 1 &&
+          this.config.transformations.multipleSelection.enabled) ||
+        (nodesSelected === 1 &&
+          this.config.transformations.singleSelection.enabled)
+      ) {
+        this.tr.enabledAnchors(this.defaultEnabledAnchors);
+      }
+      if (nodesSelected === 1) {
+        this.tr.setAttrs({
+          ...nodeTargeted.getTransformerProperties(),
+        });
+        this.tr.forceUpdate();
       }
 
       if (areNodesSelected) {
@@ -598,6 +720,32 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
 
   setSelectedNodes(nodes: Konva.Node[]): void {
     this.tr.setNodes(nodes);
+
+    const nodesSelected = nodes.length;
+
+    if (
+      (nodesSelected > 1 &&
+        !this.config.transformations.multipleSelection.enabled) ||
+      (nodesSelected === 1 &&
+        !this.config.transformations.singleSelection.enabled)
+    ) {
+      this.tr.enabledAnchors([]);
+    }
+    if (
+      (nodesSelected > 1 &&
+        this.config.transformations.multipleSelection.enabled) ||
+      (nodesSelected === 1 &&
+        this.config.transformations.singleSelection.enabled)
+    ) {
+      this.tr.enabledAnchors(this.defaultEnabledAnchors);
+    }
+    if (nodesSelected === 1) {
+      this.tr.setAttrs({
+        ...nodes[0].getTransformerProperties(),
+      });
+      this.tr.forceUpdate();
+    }
+
     this.triggerSelectedNodesEvent();
   }
 

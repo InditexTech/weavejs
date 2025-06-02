@@ -20,20 +20,24 @@ export const InputNumber = ({
   min = -Infinity,
   max = Infinity,
 }: Readonly<InputNumberProps>) => {
-  const [actualValue, setActualValue] = React.useState<string>(`${value}`);
+  const handleKeyDown = React.useCallback(
+    (e: React.KeyboardEvent<HTMLInputElement>) => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        e.stopPropagation();
+        const input = e.target as HTMLInputElement;
+        input.blur();
+      }
+    },
+    []
+  );
 
-  React.useEffect(() => {
-    setActualValue(`${value}`);
-  }, [value]);
-
-  const handleBlur = () => {
-    let numberToSave = actualValue === '' ? '0' : actualValue;
-    numberToSave = numberToSave.replace(/^0+/, '');
-    if (isNaN(parseFloat(numberToSave))) {
-      numberToSave = '0';
-    }
-    onChange?.(parseFloat(actualValue));
-  };
+  const handleOnValueChange = React.useCallback(
+    (numberValue: number | undefined) => {
+      onChange?.(numberValue ?? 0);
+    },
+    [onChange]
+  );
 
   return (
     <NumberInput
@@ -43,19 +47,9 @@ export const InputNumber = ({
       max={max}
       decimalScale={2}
       className="w-full text-[3px] font-normal text-gray-700 text-right focus:outline-none bg-transparent"
-      value={Number(actualValue)}
-      onChange={(e) => {
-        setActualValue(e.target.value);
-      }}
-      onKeyDown={(e) => {
-        if (e.key === 'Enter') {
-          e.preventDefault();
-          e.stopPropagation();
-          const input = e.target as HTMLInputElement;
-          input.blur();
-        }
-      }}
-      onBlur={handleBlur}
+      value={Number(value)}
+      onValueChange={handleOnValueChange}
+      onKeyDown={handleKeyDown}
     />
   );
 };

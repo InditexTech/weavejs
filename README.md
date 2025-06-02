@@ -20,7 +20,10 @@ SPDX-License-Identifier: Apache-2.0
 <br />
 <div align="center">
   <a href="https://github.com/InditexTech/weavejs">
-    <img src="images/logo.png" alt="Logo" width="80" height="80">
+    <picture>
+      <source media="(prefers-color-scheme: dark)" srcset="images/logo_inv.png">
+      <img src="images/logo.png" alt="Weave.js logo" width="80" height="80">
+    </picture>
   </a>
 
 <h3 align="center">Weave.js</h3>
@@ -28,7 +31,7 @@ SPDX-License-Identifier: Apache-2.0
   <p align="center">
     Build visual collaborative tools like Excalidraw, Miro, Canva, Figma or others!
     <br />
-    <a href="https://github.com/InditexTech/weavejs"><strong>Explore the docs »</strong></a>
+    <a href="https://stunning-enigma-169l5kv.pages.github.io/docs/main"><strong>Explore the docs »</strong></a>
     <br />
     <br />
     <a href="https://weavejs.cloud.inditex.com/">View Demo</a>
@@ -108,7 +111,7 @@ Follow the [Quickstart documentation][docs-quick-start-url] to set up the a samp
 
 Follow the [Weave.js documentation][docs-url] for details on setup instructions, usage guidelines, architecture details, and more.
 
-Check the [What is Weave.js][docs-what-is-weave-url] section for full context of Weave.js library, its scope, architecture, and how it works.
+Check the [Architecture overivew][docs-architecture] section for full context of Weave.js library, its scope, architecture, and how it works.
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
@@ -165,7 +168,7 @@ Project Link: [https://github.com/InditexTech/weavejs](https://github.com/Indite
 [stars-url]: https://github.com/InditexTech/weavejs/stargazers
 [issues-shield]: https://img.shields.io/github/issues/InditexTech/weavejs.svg?style=for-the-badge
 [docs-url]: https://stunning-enigma-169l5kv.pages.github.io
-[docs-what-is-weave-url]: https://stunning-enigma-169l5kv.pages.github.io/docs/main/architecture
+[docs-architecture]: https://stunning-enigma-169l5kv.pages.github.io/docs/main/architecture
 [docs-quick-start-url]: https://stunning-enigma-169l5kv.pages.github.io/docs/main/quickstart
 [docs-roadmap-url]: https://stunning-enigma-169l5kv.pages.github.io/docs/main/roadmap
 [issues-url]: https://github.com/InditexTech/weavejs/issues

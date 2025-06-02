@@ -78,11 +78,11 @@ export class WeaveStagePanningPlugin extends WeavePlugin {
       }
     });
 
-    stage.on('mouseenter', () => {
+    stage.container().addEventListener('mouseenter', () => {
       this.overStage = true;
     });
 
-    stage.on('mouseleave', () => {
+    stage.container().addEventListener('mouseleave', () => {
       this.overStage = false;
     });
 
@@ -217,7 +217,7 @@ export class WeaveStagePanningPlugin extends WeavePlugin {
       stage.x(stage.x() - e.deltaX);
       stage.y(stage.y() - e.deltaY);
 
-      this.instance.emit('stageMove', undefined);
+      this.instance.emit('onStageMove', undefined);
     });
   }
 

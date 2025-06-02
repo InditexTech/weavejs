@@ -37,28 +37,21 @@ export function TextProperties() {
     (state) => state.nodeProperties.createProps
   );
 
-  const [actualNode, setActualNode] = React.useState<
-    WeaveStateElement | undefined
-  >(node);
-
-  React.useEffect(() => {
-    if (!instance) return;
+  const actualNode = React.useMemo(() => {
     if (actualAction && nodePropertiesAction === 'create') {
-      setActualNode({
+      return {
         key: 'creating',
         type: 'undefined',
         props: {
           ...nodeCreateProps,
         },
-      });
+      };
     }
     if (node && nodePropertiesAction === 'update') {
-      setActualNode(node);
+      return node;
     }
-    if (!actualAction && !node) {
-      setActualNode(undefined);
-    }
-  }, [instance, actualAction, node, nodeCreateProps, nodePropertiesAction]);
+    return undefined;
+  }, [actualAction, node, nodePropertiesAction, nodeCreateProps]);
 
   const updateElement = React.useCallback(
     (updatedNode: WeaveStateElement) => {
@@ -104,6 +97,7 @@ export function TextProperties() {
                   fontFamily: value,
                 },
               };
+
               updateElement(updatedNode);
             }}
           />
@@ -267,7 +261,10 @@ export function TextProperties() {
             <ToggleIconButton
               kind="switch"
               icon={<CaseSensitive size={20} strokeWidth={1} />}
-              pressed={actualNode.props.fontVariant === 'normal'}
+              pressed={
+                !actualNode.props.fontVariant ||
+                actualNode.props.fontVariant === 'normal'
+              }
               onClick={() => {
                 const updatedNode: WeaveStateElement = {
                   ...actualNode,

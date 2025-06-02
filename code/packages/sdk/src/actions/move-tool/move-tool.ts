@@ -5,7 +5,8 @@
 import { WeaveAction } from '@/actions/action';
 import { type WeaveMoveToolActionState } from './types';
 import { MOVE_TOOL_ACTION_NAME, MOVE_TOOL_STATE } from './constants';
-import { WeaveNodesSelectionPlugin } from '@/plugins/nodes-selection/nodes-selection';
+import type { WeaveNodesSelectionPlugin } from '@/plugins/nodes-selection/nodes-selection';
+import { SELECTION_TOOL_ACTION_NAME } from '../selection-tool/constants';
 
 export class WeaveMoveToolAction extends WeaveAction {
   protected initialized: boolean = false;
@@ -26,6 +27,18 @@ export class WeaveMoveToolAction extends WeaveAction {
   }
 
   private setupEvents() {
+    const stage = this.instance.getStage();
+
+    stage.container().addEventListener('keydown', (e) => {
+      if (
+        e.key === 'Escape' &&
+        this.instance.getActiveAction() === MOVE_TOOL_ACTION_NAME
+      ) {
+        this.cancelAction();
+        return;
+      }
+    });
+
     this.initialized = true;
   }
 
@@ -68,9 +81,7 @@ export class WeaveMoveToolAction extends WeaveAction {
     const selectionPlugin =
       this.instance.getPlugin<WeaveNodesSelectionPlugin>('nodesSelection');
     if (selectionPlugin) {
-      const tr = selectionPlugin.getTransformer();
-      this.instance.disablePlugin('nodesSelection');
-      tr.hide();
+      this.instance.triggerAction(SELECTION_TOOL_ACTION_NAME);
     }
 
     this.setState(MOVE_TOOL_STATE.IDLE);

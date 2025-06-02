@@ -188,7 +188,7 @@ export class WeaveGroupsManager {
   }
 
   unGroup(group: WeaveStateElement): void {
-    this.logger.warn({ group }, 'Un-grouping group');
+    this.logger.debug({ group }, 'Un-grouping group');
 
     const stage = this.instance.getStage();
     const konvaGroup = stage.findOne(`#${group.props.id}`) as
@@ -196,7 +196,7 @@ export class WeaveGroupsManager {
       | undefined;
 
     if (!konvaGroup) {
-      this.logger.warn(
+      this.logger.debug(
         { group },
         "Group instance doesn't exists, cannot un-group"
       );
@@ -229,7 +229,7 @@ export class WeaveGroupsManager {
     }
 
     if (!newLayer) {
-      this.logger.warn(
+      this.logger.debug(
         { group },
         "Group target container doesn't exists, cannot un-group"
       );

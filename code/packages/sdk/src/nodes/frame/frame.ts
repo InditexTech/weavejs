@@ -21,6 +21,9 @@ import type {
   WeaveFrameProperties,
 } from './types';
 import type { WeaveNodesSelectionPlugin } from '@/plugins/nodes-selection/nodes-selection';
+import type { KonvaEventObject } from 'konva/lib/Node';
+import type { Rect } from 'konva/lib/shapes/Rect';
+import type { WeaveNodesSnappingPlugin } from '@/plugins/nodes-snapping/nodes-snapping';
 
 export class WeaveFrameNode extends WeaveNode {
   private config: WeaveFrameProperties;
@@ -94,37 +97,47 @@ export class WeaveFrameNode extends WeaveNode {
       containerOffsetX: 0,
       containerOffsetY: titleHeight,
       width: props.frameWidth,
-      height: props.frameHeight + titleHeight,
-      fill: '#ffffffff',
-      clipX: 0,
-      clipY: 0,
-      clipWidth: props.frameWidth,
-      clipHeight: props.frameHeight + titleHeight,
-      name: 'node',
+      height: props.frameHeight,
+      fill: 'transparent',
+      draggable: false,
     });
+
+    const frameInternalGroup = new Konva.Group({
+      id: `${id}-selector`,
+      x: 0,
+      y: 0,
+      width: props.frameWidth,
+      height: props.frameHeight,
+      strokeScaleEnabled: false,
+      draggable: false,
+    });
+
+    frame.add(frameInternalGroup);
 
     const background = new Konva.Rect({
       id: `${id}-bg`,
       nodeId: id,
       x: 0,
-      y: titleHeight,
+      y: 0,
       width: props.frameWidth,
       stroke: borderColor,
       strokeWidth: borderWidth,
       strokeScaleEnabled: false,
+      shadowForStrokeEnabled: false,
       height: props.frameHeight,
       fill: '#ffffffff',
+      listening: false,
       draggable: false,
     });
 
-    frame.add(background);
+    frameInternalGroup.add(background);
 
     const text = new Konva.Text({
       id: `${id}-title`,
       x: 0,
-      y: 0,
+      y: -titleHeight,
       width: props.frameWidth,
-      height: titleHeight - 10,
+      height: titleHeight,
       fontSize: 20,
       fontFamily,
       fontStyle,
@@ -137,7 +150,137 @@ export class WeaveFrameNode extends WeaveNode {
       draggable: false,
     });
 
-    frame.add(text);
+    frameInternalGroup.add(text);
+
+    const selectorArea = new Konva.Rect({
+      ...frameParams,
+      id: `${id}-selector-area`,
+      name: 'node',
+      nodeId: id,
+      containerId: `${id}-group-internal`,
+      x: 0,
+      y: 0,
+      strokeWidth: 0,
+      strokeScaleEnabled: false,
+      width: props.frameWidth,
+      height: props.frameHeight,
+      fill: 'transparent',
+      draggable: false,
+    });
+
+    selectorArea.getTransformerProperties = () => {
+      return this.config.transform;
+    };
+
+    selectorArea.updatePosition = (position) => {
+      frame.setAbsolutePosition(position);
+      selectorArea.setAttrs({
+        x: 0,
+        y: 0,
+      });
+      this.instance.updateNode(
+        this.serialize(selectorArea as WeaveElementInstance)
+      );
+    };
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const updateFrame = (e: KonvaEventObject<any, Rect>) => {
+      const selectorArea = e.target;
+      const stage = selectorArea.getStage();
+      if (!stage) return;
+
+      const absPos = selectorArea.getAbsolutePosition();
+      const absRot = selectorArea.getAbsoluteRotation();
+
+      const scaleX = selectorArea.scaleX();
+      const scaleY = selectorArea.scaleY();
+      selectorArea.x(0);
+      selectorArea.y(0);
+
+      frame.setAbsolutePosition(absPos);
+      frame.rotation(absRot);
+      frame.width(selectorArea.width());
+      frame.height(selectorArea.height());
+
+      frameInternalGroup.width(Math.max(5, selectorArea.width() * scaleX));
+      frameInternalGroup.height(Math.max(5, selectorArea.height() * scaleY));
+
+      background.width(Math.max(5, selectorArea.width() * scaleX));
+      background.height(Math.max(5, selectorArea.height() * scaleY));
+
+      text.width(Math.max(5, selectorArea.width() * scaleX));
+      text.height(titleHeight * scaleY);
+
+      frameInternal.width(Math.max(5, selectorArea.width() * scaleX));
+      frameInternal.height(Math.max(5, selectorArea.height() * scaleY));
+    };
+
+    selectorArea.on('transform', (e) => {
+      updateFrame(e);
+
+      const node = e.target;
+
+      const nodesSnappingPlugin =
+        this.instance.getPlugin<WeaveNodesSnappingPlugin>('nodesSnapping');
+
+      if (
+        nodesSnappingPlugin &&
+        this.isSelecting() &&
+        this.isNodeSelected(node)
+      ) {
+        nodesSnappingPlugin.evaluateGuidelines(e);
+      }
+
+      const clonedSA = selectorArea.clone();
+      const scaleX = clonedSA.scaleX();
+      const scaleY = clonedSA.scaleY();
+
+      clonedSA.x(0);
+      clonedSA.y(0);
+      clonedSA.width(Math.max(5, clonedSA.width() * scaleX));
+      clonedSA.height(Math.max(5, clonedSA.height() * scaleY));
+      clonedSA.scaleX(1);
+      clonedSA.scaleY(1);
+
+      this.instance.updateNode(
+        this.serialize(clonedSA as WeaveElementInstance)
+      );
+
+      e.cancelBubble = true;
+    });
+
+    selectorArea.on('transformend', (e) => {
+      const node = e.target;
+
+      const nodesSnappingPlugin =
+        this.instance.getPlugin<WeaveNodesSnappingPlugin>('nodesSnapping');
+
+      if (
+        nodesSnappingPlugin &&
+        this.isSelecting() &&
+        this.isNodeSelected(node)
+      ) {
+        nodesSnappingPlugin.cleanupEvaluateGuidelines();
+      }
+
+      const scaleX = selectorArea.scaleX();
+      const scaleY = selectorArea.scaleY();
+
+      selectorArea.x(0);
+      selectorArea.y(0);
+      selectorArea.width(Math.max(5, selectorArea.width() * scaleX));
+      selectorArea.height(Math.max(5, selectorArea.height() * scaleY));
+      selectorArea.scaleX(1);
+      selectorArea.scaleY(1);
+
+      updateFrame(e);
+
+      this.instance.updateNode(
+        this.serialize(selectorArea as WeaveElementInstance)
+      );
+    });
+
+    frameInternalGroup.add(selectorArea);
 
     const frameInternal = new Konva.Group({
       id: `${id}-group-internal`,
@@ -146,19 +289,22 @@ export class WeaveFrameNode extends WeaveNode {
       y: titleHeight,
       width: props.frameWidth,
       height: props.frameHeight,
-      draggable: false,
-      stroke: 'transparent',
       strokeScaleEnabled: false,
-      borderWidth: 0,
-      clipX: 0,
-      clipY: 0,
-      clipWidth: props.frameWidth,
-      clipHeight: props.frameHeight,
+      draggable: false,
     });
 
-    frame.add(frameInternal);
+    frameInternal.clipFunc((ctx) => {
+      const width = frameInternal.width() * frameInternal.scaleX();
+      const height = frameInternal.height() * frameInternal.scaleY();
+      ctx.rect(0, -titleHeight, width, height);
+    });
+
+    frameInternalGroup.add(frameInternal);
 
     this.setupDefaultNodeEvents(frame);
+
+    frame.on('dragmove', () => {});
+    frame.on('dragend', () => {});
 
     frame.on(WEAVE_NODE_CUSTOM_EVENTS.onTargetLeave, () => {
       background.setAttrs({
@@ -189,15 +335,60 @@ export class WeaveFrameNode extends WeaveNode {
 
     const newProps = { ...nextProps };
 
+    const { titleHeight } = this.config;
+
     nodeInstance.setAttrs({
       ...newProps,
     });
 
-    const frameTitle = frameNode.findOne(`#${id}-title`);
-    if (frameTitle) {
-      frameTitle.setAttrs({
-        text: nextProps.title,
+    const selectorArea = frameNode.findOne(`#${id}-selector-area`);
+    if (selectorArea) {
+      selectorArea.setAttrs({
+        x: 0,
+        y: 0,
+        width: nextProps.width,
+        height: nextProps.height,
       });
+
+      const frameInternalGroup = frameNode.findOne(`#${id}-selector`);
+      if (frameInternalGroup) {
+        frameInternalGroup.setAttrs({
+          x: 0,
+          y: 0,
+          width: nextProps.width * selectorArea.scaleX(),
+          height: nextProps.height * selectorArea.scaleY(),
+        });
+      }
+
+      const background = frameNode.findOne(`#${id}-bg`);
+      if (background) {
+        background.setAttrs({
+          x: 0,
+          y: 0,
+          width: nextProps.width * selectorArea.scaleX(),
+          height: nextProps.height * selectorArea.scaleY(),
+        });
+      }
+
+      const text = frameNode.findOne(`#${id}-title`);
+      if (text) {
+        text.setAttrs({
+          x: 0,
+          y: -titleHeight,
+          text: nextProps.title,
+          width: nextProps.width * selectorArea.scaleX(),
+        });
+      }
+
+      const frameInternal = frameNode.findOne(`#${id}-group-internal`);
+      if (frameInternal) {
+        frameInternal.setAttrs({
+          x: 0,
+          y: titleHeight,
+          width: nextProps.width * selectorArea.scaleX(),
+          height: nextProps.height * selectorArea.scaleY(),
+        });
+      }
     }
 
     const nodesSelectionPlugin =
@@ -209,11 +400,16 @@ export class WeaveFrameNode extends WeaveNode {
   }
 
   serialize(instance: WeaveElementInstance): WeaveStateElement {
+    const stage = this.instance.getStage();
     const attrs = instance.getAttrs();
 
-    const frameInternal = (instance as Konva.Group).findOne(
-      `#${attrs.containerId}`
-    ) as Konva.Group | undefined;
+    const mainNode = stage?.findOne(`#${attrs.nodeId}`) as
+      | Konva.Group
+      | undefined;
+
+    const frameInternal = mainNode?.findOne(`#${attrs.containerId}`) as
+      | Konva.Group
+      | undefined;
 
     const childrenMapped: WeaveStateElement[] = [];
     if (frameInternal) {
@@ -228,16 +424,22 @@ export class WeaveFrameNode extends WeaveNode {
       }
     }
 
-    const cleanedAttrs = { ...attrs };
+    const realAttrs = mainNode?.getAttrs();
+
+    const cleanedAttrs = { ...realAttrs };
     delete cleanedAttrs.draggable;
 
     return {
-      key: attrs.id ?? '',
-      type: attrs.nodeType,
+      key: realAttrs?.id ?? '',
+      type: realAttrs?.nodeType,
       props: {
         ...cleanedAttrs,
-        id: attrs.id ?? '',
-        nodeType: attrs.nodeType,
+        id: realAttrs?.id ?? '',
+        // x: instance.x(),
+        // y: instance.y(),
+        // width: instance.width(),
+        // height: instance.height(),
+        nodeType: realAttrs?.nodeType,
         children: childrenMapped,
       },
     };

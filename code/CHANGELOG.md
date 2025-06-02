@@ -13,18 +13,82 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-## Added
+## [0.20.1] - 2025-05-30
+
+### Fixed
+
+- [#318](https://github.com/InditexTech/weavejs/issues/318) Building issues when finding definitions for augmenting Konva module
+
+## [0.20.0] - 2025-05-30
+
+### Added
+
+- [#305](https://github.com/InditexTech/weavejs/issues/305) Don't allow to transform when more than one element is selected
+- [#308](https://github.com/InditexTech/weavejs/issues/308) Allow to configure transformer configuration per node
+
+### Changed
+
+- [#219](https://github.com/InditexTech/weavejs/issues/219) Improve frame
+- [#302](https://github.com/InditexTech/weavejs/issues/302) Update create-app frontend
+
+### Fixed
+
+- [#291](https://github.com/InditexTech/weavejs/issues/291) Group of elements moving not maintaining position (all layers)
+- [#300](https://github.com/InditexTech/weavejs/issues/300) Un-grouping elements are unordered
+- [#310](https://github.com/InditexTech/weavejs/issues/310) Fix zoom in / out stepping before fitting
+- [#311](https://github.com/InditexTech/weavejs/issues/311) Fix fit stage / selection plugin to fit correctly with the specified padding
+
+## [0.19.0] - 2025-05-28
+
+### Added
+
+- [#288](https://github.com/InditexTech/weavejs/issues/288) Provide a tool for erasing elements
+
+### Fixed
+
+- [#290](https://github.com/InditexTech/weavejs/issues/290) Maintain text node size when changed
+- [#297](https://github.com/InditexTech/weavejs/issues/297) Changing font size causes text duplication and incorrect bounding box update
+
+## [0.18.0] - 2025-05-27
+
+### Changed
+
+- [#292](https://github.com/InditexTech/weavejs/issues/292) Improve Azure Web PubSub to allow EventHandler options
+
+## [0.17.0] - 2025-05-26
+
+### Changed
+
+- [#287](https://github.com/InditexTech/weavejs/issues/287) Update create-app frontend
+
+## [0.16.2] - 2025-05-26
+
+### Fixed
+
+- [#285](https://github.com/InditexTech/weavejs/issues/285) Text editing jumps when sidebars are opened
+
+## [0.16.1] - 2025-05-26
+
+### Fixed
+
+- [#283](https://github.com/InditexTech/weavejs/issues/283) Improve pointers and selectors rendering
+
+## [0.16.0] - 2025-05-23
+
+### Added
 
 - [#264](https://github.com/InditexTech/weavejs/issues/264) User selection awareness events plugin
 
-## Changed
+### Changed
 
 - [#263](https://github.com/InditexTech/weavejs/issues/263) Awareness cursor UI improvements
+- [#274](https://github.com/InditexTech/weavejs/issues/274) Update create-app frontend
 
-## Fixed
+### Fixed
 
 - [#238](https://github.com/InditexTech/weavejs/issues/238) Crop image resizing and after-cropping position issues
 - [#245](https://github.com/InditexTech/weavejs/issues/245) Frames drag-and-drop quirks when frames overlap
+- [#270](https://github.com/InditexTech/weavejs/issues/270) "m" shortcut doesn't work
 
 ## [0.15.0] - 2025-05-21
 
@@ -298,36 +362,84 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - [#24](https://github.com/InditexTech/weavejs/issues/24) Bug when loading rooms with text or images
 - [#18](https://github.com/InditexTech/weavejs/issues/18) Fix awareness not working on store-azure-web-pubsub
 
-[Unreleased]: https://github.com/InditexTech/weavejs/compare/0.15.0...HEAD
+[Unreleased]: https://github.com/InditexTech/weavejs/compare/0.20.1...HEAD
+
+[0.20.1]: https://github.com/InditexTech/weavejs/compare/0.20.0...0.20.1
+
+[0.20.0]: https://github.com/InditexTech/weavejs/compare/0.19.0...0.20.0
+
+[0.19.0]: https://github.com/InditexTech/weavejs/compare/0.18.0...0.19.0
+
+[0.18.0]: https://github.com/InditexTech/weavejs/compare/0.17.0...0.18.0
+
+[0.17.0]: https://github.com/InditexTech/weavejs/compare/0.16.2...0.17.0
+
+[0.16.2]: https://github.com/InditexTech/weavejs/compare/0.16.1...0.16.2
+
+[0.16.1]: https://github.com/InditexTech/weavejs/compare/0.16.0...0.16.1
+
+[0.16.0]: https://github.com/InditexTech/weavejs/compare/0.15.0...0.16.0
+
 [0.15.0]: https://github.com/InditexTech/weavejs/compare/0.14.3...0.15.0
+
 [0.14.3]: https://github.com/InditexTech/weavejs/compare/0.14.2...0.14.3
+
 [0.14.2]: https://github.com/InditexTech/weavejs/compare/0.14.1...0.14.2
+
 [0.14.1]: https://github.com/InditexTech/weavejs/compare/0.14.0...0.14.1
+
 [0.14.0]: https://github.com/InditexTech/weavejs/compare/0.13.1...0.14.0
+
 [0.13.1]: https://github.com/InditexTech/weavejs/compare/0.13.0...0.13.1
+
 [0.13.0]: https://github.com/InditexTech/weavejs/compare/0.12.1...0.13.0
+
 [0.12.1]: https://github.com/InditexTech/weavejs/compare/0.12.0...0.12.1
+
 [0.12.0]: https://github.com/InditexTech/weavejs/compare/0.11.0...0.12.0
+
 [0.11.0]: https://github.com/InditexTech/weavejs/compare/0.10.3...0.11.0
+
 [0.10.3]: https://github.com/InditexTech/weavejs/compare/0.10.2...0.10.3
+
 [0.10.2]: https://github.com/InditexTech/weavejs/compare/0.10.1...0.10.2
+
 [0.10.1]: https://github.com/InditexTech/weavejs/compare/0.10.0...0.10.1
+
 [0.10.0]: https://github.com/InditexTech/weavejs/compare/0.9.3...0.10.0
+
 [0.9.3]: https://github.com/InditexTech/weavejs/compare/0.9.2...0.9.3
+
 [0.9.2]: https://github.com/InditexTech/weavejs/compare/0.9.1...0.9.2
+
 [0.9.1]: https://github.com/InditexTech/weavejs/compare/0.9.0...0.9.1
+
 [0.9.0]: https://github.com/InditexTech/weavejs/compare/0.8.0...0.9.0
+
 [0.8.0]: https://github.com/InditexTech/weavejs/compare/0.7.1...0.8.0
+
 [0.7.1]: https://github.com/InditexTech/weavejs/compare/0.7.0...0.7.1
+
 [0.7.0]: https://github.com/InditexTech/weavejs/compare/0.6.0...0.7.0
+
 [0.6.0]: https://github.com/InditexTech/weavejs/compare/0.5.0...0.6.0
+
 [0.5.0]: https://github.com/InditexTech/weavejs/compare/0.4.0...0.5.0
+
 [0.4.0]: https://github.com/InditexTech/weavejs/compare/0.3.3...0.4.0
+
 [0.3.3]: https://github.com/InditexTech/weavejs/compare/0.3.2...0.3.3
+
 [0.3.2]: https://github.com/InditexTech/weavejs/compare/0.3.1...0.3.2
+
 [0.3.1]: https://github.com/InditexTech/weavejs/compare/0.3.0...0.3.1
+
 [0.3.0]: https://github.com/InditexTech/weavejs/compare/0.2.1...0.3.0
+
 [0.2.1]: https://github.com/InditexTech/weavejs/compare/0.2.0...0.2.1
+
 [0.2.0]: https://github.com/InditexTech/weavejs/compare/0.1.1...0.2.0
+
 [0.1.1]: https://github.com/InditexTech/weavejs/compare/0.1.0...0.1.1
+
 [0.1.0]: https://github.com/InditexTech/weavejs/releases/tag/0.1.0

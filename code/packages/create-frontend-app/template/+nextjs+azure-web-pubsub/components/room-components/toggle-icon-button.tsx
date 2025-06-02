@@ -6,6 +6,7 @@ import { cn } from '@/lib/utils';
 type ToggleIconButtonKind = 'toggle' | 'switch';
 
 interface ToggleIconButtonCommonProps {
+  className?: string;
   kind: ToggleIconButtonKind;
   onClick: (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void;
   pressed: boolean;
@@ -29,7 +30,8 @@ type ToggleIconButtonProps =
   | ToggleIconButtonSwitchProps;
 
 export const ToggleIconButton = (props: Readonly<ToggleIconButtonProps>) => {
-  const { kind, onClick, pressed, disabled, icon, pressedIcon } = props;
+  const { kind, className, onClick, pressed, disabled, icon, pressedIcon } =
+    props;
 
   const [isPressed, setIsPressed] = React.useState<boolean>(pressed);
 
@@ -48,7 +50,8 @@ export const ToggleIconButton = (props: Readonly<ToggleIconButtonProps>) => {
           ['text-black bg-white hover:bg-[#f0f0f0]']:
             (kind === 'switch' && !isPressed) || kind === 'toggle',
           ['bg-black text-white']: kind === 'switch' && isPressed,
-        }
+        },
+        className
       )}
       disabled={disabled}
       onClick={(e) => onClick?.(e)}

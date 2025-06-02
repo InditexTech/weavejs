@@ -12,10 +12,12 @@ import {
 import WeaveAzureWebPubsubSyncHandler from './azure-web-pubsub-sync-handler';
 import { defaultInitialState } from './default-initial-state';
 import type { RequestHandler } from 'express-serve-static-core';
+import type { WebPubSubEventHandlerOptions } from '@azure/web-pubsub-express';
 
 type WeaveAzureWebPubsubServerParams = {
   initialState?: FetchInitialState;
   pubsubConfig: WeaveAzureWebPubsubConfig;
+  eventsHandlerConfig?: WebPubSubEventHandlerOptions;
   persistRoom?: PersistRoom;
   fetchRoom?: FetchRoom;
 };
@@ -27,6 +29,7 @@ export class WeaveAzureWebPubsubServer {
 
   constructor({
     pubsubConfig,
+    eventsHandlerConfig,
     initialState = defaultInitialState,
     persistRoom,
     fetchRoom,
@@ -43,11 +46,12 @@ export class WeaveAzureWebPubsubServer {
     );
 
     this.syncHandler = new WeaveAzureWebPubsubSyncHandler(
-      pubsubConfig.hubName,
-      `/api/webpubsub/hubs/${pubsubConfig.hubName}`,
+      this,
       syncClient,
       initialState,
-      this
+      pubsubConfig.hubName,
+      // `/api/webpubsub/hubs/${pubsubConfig.hubName}`,
+      eventsHandlerConfig
     );
   }
 

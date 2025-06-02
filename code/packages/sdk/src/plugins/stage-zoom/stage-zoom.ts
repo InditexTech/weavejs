@@ -10,7 +10,10 @@ import {
 } from './types';
 import Konva from 'konva';
 import { WeaveNodesSelectionPlugin } from '../nodes-selection/nodes-selection';
-import { WEAVE_STAGE_ZOOM_KEY } from './constants';
+import {
+  WEAVE_STAGE_ZOOM_DEFAULT_CONFIG,
+  WEAVE_STAGE_ZOOM_KEY,
+} from './constants';
 
 export class WeaveStageZoomPlugin extends WeavePlugin {
   private isCtrlOrMetaPressed: boolean;
@@ -21,7 +24,6 @@ export class WeaveStageZoomPlugin extends WeavePlugin {
   private config!: WeaveStageZoomPluginConfig;
   private actualScale: number;
   private actualStep: number;
-  private padding: number = 175;
   defaultStep: number = 3;
 
   constructor(params?: WeaveStageZoomPluginParams) {
@@ -30,8 +32,7 @@ export class WeaveStageZoomPlugin extends WeavePlugin {
     const { config } = params ?? {};
 
     this.config = {
-      zoomSteps: [0.1, 0.25, 0.5, 1, 2, 4, 8],
-      defaultZoom: 1,
+      ...WEAVE_STAGE_ZOOM_DEFAULT_CONFIG,
       ...config,
     };
 
@@ -122,8 +123,9 @@ export class WeaveStageZoomPlugin extends WeavePlugin {
     const actualZoomIsStep = this.config.zoomSteps.findIndex(
       (scale) => scale === this.actualScale
     );
+
     if (actualZoomIsStep === -1) {
-      this.actualStep = this.findClosestStepIndex();
+      this.actualStep = this.findClosestStepIndex('zoomOut');
     }
 
     return this.actualStep - 1 > 0;
@@ -138,7 +140,7 @@ export class WeaveStageZoomPlugin extends WeavePlugin {
       (scale) => scale === this.actualScale
     );
     if (actualZoomIsStep === -1) {
-      this.actualStep = this.findClosestStepIndex();
+      this.actualStep = this.findClosestStepIndex('zoomIn');
     }
 
     return this.actualStep + 1 < this.config.zoomSteps.length;
@@ -157,16 +159,16 @@ export class WeaveStageZoomPlugin extends WeavePlugin {
     this.setZoom(this.config.zoomSteps[step]);
   }
 
-  private findClosestStepIndex() {
-    let closestStepIndex = 0;
-    let actualDiff = Infinity;
-    for (let i = 0; i < this.config.zoomSteps.length; i++) {
-      if (Math.abs(this.config.zoomSteps[i] - this.actualScale) < actualDiff) {
-        closestStepIndex = i;
-        actualDiff = Math.abs(this.config.zoomSteps[i] - this.actualScale);
-      }
-    }
-    return closestStepIndex;
+  private findClosestStepIndex(direction: 'zoomIn' | 'zoomOut'): number {
+    const nextValue = this.config.zoomSteps
+      .filter((scale) =>
+        direction === 'zoomIn'
+          ? scale >= this.actualScale
+          : scale <= this.actualScale
+      )
+      .sort((a, b) => (direction === 'zoomIn' ? a - b : b - a))[0];
+
+    return this.config.zoomSteps.findIndex((scale) => scale === nextValue);
   }
 
   zoomIn(): void {
@@ -182,7 +184,7 @@ export class WeaveStageZoomPlugin extends WeavePlugin {
       (scale) => scale === this.actualScale
     );
     if (actualZoomIsStep === -1) {
-      this.actualStep = this.findClosestStepIndex();
+      this.actualStep = this.findClosestStepIndex('zoomIn');
     } else {
       this.actualStep += 1;
     }
@@ -203,7 +205,7 @@ export class WeaveStageZoomPlugin extends WeavePlugin {
       (scale) => scale === this.actualScale
     );
     if (actualZoomIsStep === -1) {
-      this.actualStep = this.findClosestStepIndex();
+      this.actualStep = this.findClosestStepIndex('zoomOut');
     } else {
       this.actualStep -= 1;
     }
@@ -226,16 +228,36 @@ export class WeaveStageZoomPlugin extends WeavePlugin {
     const stage = this.instance.getStage();
 
     if (mainLayer) {
-      const box = mainLayer.getClientRect({ relativeTo: stage });
-      const scale = Math.min(
-        stage.width() / (box.width + this.padding * 2),
-        stage.height() / (box.height + this.padding * 2)
-      );
-
-      stage.setAttrs({
-        x: -box.x * scale + (stage.width() - box.width * scale) / 2,
-        y: -box.y * scale + (stage.height() - box.height * scale) / 2,
+      const box = mainLayer.getClientRect({
+        relativeTo: stage,
+        skipStroke: true,
       });
+      const stageBox = {
+        width: stage.width(),
+        height: stage.height(),
+      };
+
+      const availableScreenWidth =
+        stageBox.width - 2 * this.config.fitToScreen.padding;
+      const availableScreenHeight =
+        stageBox.height - 2 * this.config.fitToScreen.padding;
+
+      const scaleX = availableScreenWidth / box.width;
+      const scaleY = availableScreenHeight / box.height;
+      const scale = Math.min(scaleX, scaleY);
+
+      stage.scale({ x: scale, y: scale });
+
+      const selectionCenterX = box.x + box.width / 2;
+      const selectionCenterY = box.y + box.height / 2;
+
+      const canvasCenterX = stage.width() / (2 * scale);
+      const canvasCenterY = stage.height() / (2 * scale);
+
+      const stageX = (canvasCenterX - selectionCenterX) * scale;
+      const stageY = (canvasCenterY - selectionCenterY) * scale;
+
+      stage.position({ x: stageX, y: stageY });
 
       this.setZoom(scale, false);
     }
@@ -283,17 +305,32 @@ export class WeaveStageZoomPlugin extends WeavePlugin {
     zoomTransformer.forceUpdate();
 
     const box = zoomTransformer.__getNodeRect();
-    const scale = Math.min(
-      stage.width() / (zoomTransformer.width() + this.padding * 2),
-      stage.height() / (zoomTransformer.height() + this.padding * 2)
-    );
+    const stageBox = {
+      width: stage.width(),
+      height: stage.height(),
+    };
 
-    stage.setAttrs({
-      x: -box.x * scale + (stage.width() - zoomTransformer.width() * scale) / 2,
-      y:
-        -box.y * scale +
-        (stage.height() - zoomTransformer.height() * scale) / 2,
-    });
+    const availableScreenWidth =
+      stageBox.width - 2 * this.config.fitToSelection.padding;
+    const availableScreenHeight =
+      stageBox.height - 2 * this.config.fitToSelection.padding;
+
+    const scaleX = availableScreenWidth / box.width;
+    const scaleY = availableScreenHeight / box.height;
+    const scale = Math.min(scaleX, scaleY);
+
+    stage.scale({ x: scale, y: scale });
+
+    const selectionCenterX = box.x + box.width / 2;
+    const selectionCenterY = box.y + box.height / 2;
+
+    const canvasCenterX = stage.width() / (2 * scale);
+    const canvasCenterY = stage.height() / (2 * scale);
+
+    const stageX = (canvasCenterX - selectionCenterX) * scale;
+    const stageY = (canvasCenterY - selectionCenterY) * scale;
+
+    stage.position({ x: stageX, y: stageY });
 
     this.setZoom(scale, false);
 

@@ -17,6 +17,7 @@ import { ToggleIconButton } from '../toggle-icon-button';
 import { useWeave } from '@inditextech/weave-react';
 import { useCollaborationRoom } from '@/store/store';
 import { InputNumber } from '../inputs/input-number';
+import InputSelect from '../inputs/input-select';
 
 export function StrokeProperties() {
   const instance = useWeave((state) => state.instance);
@@ -31,28 +32,21 @@ export function StrokeProperties() {
     (state) => state.nodeProperties.createProps
   );
 
-  const [actualNode, setActualNode] = React.useState<
-    WeaveStateElement | undefined
-  >(node);
-
-  React.useEffect(() => {
-    if (!instance) return;
+  const actualNode = React.useMemo(() => {
     if (actualAction && nodePropertiesAction === 'create') {
-      setActualNode({
+      return {
         key: 'creating',
         type: 'undefined',
         props: {
           ...nodeCreateProps,
         },
-      });
+      };
     }
     if (node && nodePropertiesAction === 'update') {
-      setActualNode(node);
+      return node;
     }
-    if (!actualAction && !node) {
-      setActualNode(undefined);
-    }
-  }, [instance, actualAction, node, nodePropertiesAction, nodeCreateProps]);
+    return undefined;
+  }, [actualAction, node, nodePropertiesAction, nodeCreateProps]);
 
   const updateElement = React.useCallback(
     (updatedNode: WeaveStateElement) => {
@@ -134,6 +128,38 @@ export function StrokeProperties() {
             updateElement(updatedNode);
           }}
         />
+        <div className="col-span-2">
+          <InputSelect
+            hideSearch
+            label="Style"
+            options={[
+              { label: 'Normal', value: '' },
+              { label: 'Short dashed', value: '5,5' },
+              { label: 'Long dashed', value: '10,10' },
+            ]}
+            value={
+              actualNode.props.dash && actualNode.props.dash.length > 0
+                ? actualNode.props.dash.map((e: number) => `${e}`).join(',')
+                : ''
+            }
+            onChange={(value) => {
+              const dashArray: number[] = [];
+              const tokens = value.split(',');
+              for (const token of tokens) {
+                dashArray.push(parseInt(token));
+              }
+
+              const updatedNode: WeaveStateElement = {
+                ...actualNode,
+                props: {
+                  ...actualNode.props,
+                  dash: value ? dashArray : [],
+                },
+              };
+              updateElement(updatedNode);
+            }}
+          />
+        </div>
         {(['line'].includes(actualNode.type) ||
           ['brushTool', 'penTool'].includes(actualAction)) && (
           <>

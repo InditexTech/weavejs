@@ -5,10 +5,6 @@ run-name: "Release Docs${{ github.event_name == 'workflow_dispatch' && ' manuall
 concurrency: code-release-${{ github.ref }}
 
 on:
-  pull_request:
-    types: [closed]
-    branches: ["main", "main-*"]
-    paths: ["docs/**", ".github/workflows/docs**"]
   workflow_dispatch:
     inputs:
       BASELINE:

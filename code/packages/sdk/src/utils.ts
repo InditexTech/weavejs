@@ -71,7 +71,7 @@ export function moveNodeToContainer(
   instance: Weave,
   node: Konva.Node
 ): Konva.Node | undefined {
-  const nodesIntersected = instance.pointIntersectsContainerElement();
+  const nodeIntersected = instance.pointIntersectsContainerElement();
 
   let nodeActualContainer: Konva.Node | undefined =
     node.getParent() as Konva.Node;
@@ -85,14 +85,14 @@ export function moveNodeToContainer(
   // Move to container
   if (
     !node.getAttrs().containerId &&
-    nodesIntersected &&
-    nodeActualContainer?.getAttrs().id !== nodesIntersected.getAttrs().id
+    nodeIntersected &&
+    nodeActualContainer?.getAttrs().id !== nodeIntersected.getAttrs().id
   ) {
-    layerToMove = nodesIntersected;
+    layerToMove = nodeIntersected;
   }
   // Move to main layer
   if (
-    !nodesIntersected &&
+    !nodeIntersected &&
     nodeActualContainer?.getAttrs().id !== WEAVE_NODE_LAYER_ID
   ) {
     layerToMove = instance.getMainLayer();

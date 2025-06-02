@@ -4,6 +4,7 @@
     "action",
     "move-tool",
     "selection-tool",
+    "eraser-tool",
     "rectangle-tool",
     "pen-tool",
     "brush-tool",

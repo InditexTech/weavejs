@@ -3,7 +3,6 @@
 // SPDX-License-Identifier: Apache-2.0
 
 export const WEAVE_USERS_POINTERS_KEY = 'usersPointers';
-export const WEAVE_USERS_POINTERS_LAYER_ID = 'usersPointersLayer';
 export const WEAVE_USER_POINTER_KEY = 'userPointer';
 
 export const WEAVE_DEFAULT_USER_INFO_FUNCTION = () => ({

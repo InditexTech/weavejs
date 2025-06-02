@@ -20,28 +20,21 @@ export function AppearanceProperties() {
     (state) => state.nodeProperties.createProps
   );
 
-  const [actualNode, setActualNode] = React.useState<
-    WeaveStateElement | undefined
-  >(node);
-
-  React.useEffect(() => {
-    if (!instance) return;
+  const actualNode = React.useMemo(() => {
     if (actualAction && nodePropertiesAction === 'create') {
-      setActualNode({
+      return {
         key: 'creating',
         type: 'undefined',
         props: {
           ...nodeCreateProps,
         },
-      });
+      };
     }
     if (node && nodePropertiesAction === 'update') {
-      setActualNode(node);
+      return node;
     }
-    if (!actualAction && !node) {
-      setActualNode(undefined);
-    }
-  }, [instance, actualAction, node, nodePropertiesAction, nodeCreateProps]);
+    return undefined;
+  }, [actualAction, node, nodePropertiesAction, nodeCreateProps]);
 
   const updateElement = React.useCallback(
     (updatedNode: WeaveStateElement) => {
