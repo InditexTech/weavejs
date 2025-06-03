@@ -204,11 +204,10 @@ export class WeaveImageNode extends WeaveNode {
         'height',
         image.height() ? image.height() : preloadImg.height
       );
-      const imageRect = image.getClientRect();
       image.setAttr('cropInfo', undefined);
       image.setAttr('uncroppedImage', {
-        width: imageRect.width,
-        height: imageRect.height,
+        width: image.width() ? image.width() : preloadImg.width,
+        height: image.height() ? image.height() : preloadImg.height,
       });
       image.setAttr('imageInfo', {
         width: preloadImg.width,
@@ -328,7 +327,7 @@ export class WeaveImageNode extends WeaveNode {
 
     const imageObj = new Image();
     imageObj.onerror = (error) => {
-      console.error('Error loading image', error);
+      console.error('Error loading image', imageProps.imageURL, error);
       imagePlaceholder?.setAttrs({
         visible: true,
       });
@@ -364,6 +363,14 @@ export class WeaveImageNode extends WeaveNode {
         image.setAttr('imageInfo', {
           width: imageObj.width,
           height: imageObj.height,
+        });
+        image.setAttr('uncroppedImage', {
+          width: imageProps.uncroppedImage
+            ? imageProps.uncroppedImage.width
+            : imageObj.width,
+          height: imageProps.uncroppedImage
+            ? imageProps.uncroppedImage.height
+            : imageObj.height,
         });
 
         this.updateCrop(imageProps);
