@@ -1,8 +1,9 @@
 const nextConfig = {
-  output: "standalone",
+  output: 'standalone',
   reactStrictMode: false,
+  transpilePackages: ['@inditextech/weave-sdk'],
   webpack: (config) => {
-    config.externals = [...config.externals, { canvas: "canvas" }]; // required to make Konva work
+    config.externals = [...config.externals, { canvas: 'canvas' }]; // required to make Konva work
     return config;
   },
   experimental: {
@@ -12,7 +13,7 @@ const nextConfig = {
     return {
       beforeFiles: [
         {
-          source: "/weavebff/:path*",
+          source: '/weavebff/:path*',
           destination: `${process.env.BACKEND_ENDPOINT}/:path*`, // Proxy to Backend
         },
       ],
@@ -21,15 +22,15 @@ const nextConfig = {
   headers() {
     return [
       {
-        source: "/:path*",
+        source: '/:path*',
         headers: [
           {
-            key: "Cross-Origin-Opener-Policy",
-            value: "same-origin",
+            key: 'Cross-Origin-Opener-Policy',
+            value: 'same-origin',
           },
           {
-            key: "Cross-Origin-Embedder-Policy",
-            value: "require-corp",
+            key: 'Cross-Origin-Embedder-Policy',
+            value: 'require-corp',
           },
         ],
       },
@@ -38,12 +39,12 @@ const nextConfig = {
   images: {
     localPatterns: [
       {
-        pathname: "/assets/images/**",
-        search: "",
+        pathname: '/assets/images/**',
+        search: '',
       },
       {
-        pathname: "/weavebff/api/v1/weavejs/rooms/**/images/**",
-        search: "",
+        pathname: '/weavebff/api/v1/weavejs/rooms/**/images/**',
+        search: '',
       },
     ],
   },
