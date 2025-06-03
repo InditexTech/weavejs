@@ -15,14 +15,27 @@ import {
   type WeaveImageProperties,
 } from './types';
 import { WeaveImageToolAction } from '@/actions/image-tool/image-tool';
-import { WeaveImageClip } from './clip';
+import { WeaveImageCrop } from './crop';
 import { WEAVE_IMAGE_NODE_TYPE } from './constants';
+import type { WeaveNodesSelectionPlugin } from '@/plugins/nodes-selection/nodes-selection';
+import { isEqual } from 'lodash';
 
 export class WeaveImageNode extends WeaveNode {
   private config: WeaveImageProperties;
   protected nodeType: string = WEAVE_IMAGE_NODE_TYPE;
+  private cachedCropInfo!: Record<
+    string,
+    | {
+        scaleX: number;
+        scaleY: number;
+        x: number;
+        y: number;
+        width: number;
+        height: number;
+      }
+    | undefined
+  >;
   private imageLoaded: boolean;
-  cropping: boolean;
 
   constructor(params?: WeaveImageNodeParams) {
     super();
@@ -35,9 +48,8 @@ export class WeaveImageNode extends WeaveNode {
         ...config?.transform,
       },
     };
-
+    this.cachedCropInfo = {};
     this.imageLoaded = false;
-    this.cropping = false;
   }
 
   onRender(props: WeaveElementAttributes): WeaveElementInstance {
@@ -56,16 +68,36 @@ export class WeaveImageNode extends WeaveNode {
     const internalImageProps = {
       ...props,
     };
-    // delete internalImageProps.nodeType;
     delete internalImageProps.imageProperties;
     delete internalImageProps.imageURL;
     delete internalImageProps.zIndex;
 
     const image = new Konva.Group({
       ...groupImageProps,
+      ...internalImageProps,
       id,
       name: 'node',
     });
+
+    image.resetCrop = () => {
+      const stage = this.instance.getStage();
+      const image = stage.findOne(`#${id}`) as Konva.Group | undefined;
+
+      if (!image) {
+        return;
+      }
+
+      const imageCrop = new WeaveImageCrop(
+        this.instance,
+        this,
+        image,
+        internalImage,
+        cropGroup
+      );
+
+      imageCrop.unCrop();
+      this.cachedCropInfo[image.getAttrs().id ?? ''] = undefined;
+    };
 
     image.getTransformerProperties = () => {
       return this.config.transform;
@@ -102,26 +134,32 @@ export class WeaveImageNode extends WeaveNode {
       rotation: 0,
       width: 0,
       height: 0,
+      stroke: '#ff0000ff',
+      strokeWidth: 0,
+      strokeScaleEnabled: false,
       draggable: false,
       visible: false,
     });
 
     image.add(internalImage);
 
-    const clipGroup = new Konva.Group({
+    const cropGroup = new Konva.Group({
+      id: `${id}-cropGroup`,
       x: 0,
       y: 0,
+      scaleX: 1,
+      scaleY: 1,
       visible: false,
     });
 
-    image.add(clipGroup);
+    image.add(cropGroup);
 
     this.setupDefaultNodeEvents(image);
 
     image.on('dblclick dbltap', (evt) => {
       evt.cancelBubble = true;
 
-      if (this.cropping) {
+      if (image.getAttrs().cropping ?? false) {
         return;
       }
 
@@ -133,17 +171,15 @@ export class WeaveImageNode extends WeaveNode {
         return;
       }
 
-      this.cropping = true;
-
-      const imageClip = new WeaveImageClip(
+      const imageCrop = new WeaveImageCrop(
         this.instance,
         this,
         image,
         internalImage,
-        clipGroup
+        cropGroup
       );
 
-      imageClip.show();
+      imageCrop.show();
     });
 
     const imageActionTool = this.getImageToolAction();
@@ -168,6 +204,12 @@ export class WeaveImageNode extends WeaveNode {
         'height',
         image.height() ? image.height() : preloadImg.height
       );
+      const imageRect = image.getClientRect();
+      image.setAttr('cropInfo', undefined);
+      image.setAttr('uncroppedImage', {
+        width: imageRect.width,
+        height: imageRect.height,
+      });
       image.setAttr('imageInfo', {
         width: preloadImg.width,
         height: preloadImg.height,
@@ -260,15 +302,23 @@ export class WeaveImageNode extends WeaveNode {
         draggable: false,
         zIndex: 0,
       });
+      this.updateCrop(nextProps);
+    }
+
+    try {
+      const selectionPlugin =
+        this.instance.getPlugin<WeaveNodesSelectionPlugin>('nodesSelection');
+      if (selectionPlugin) {
+        selectionPlugin.getTransformer().forceUpdate();
+      }
+    } catch (error) {
+      console.error('Error updating transformer', error);
     }
   }
 
   private loadImage(params: WeaveElementAttributes, image: Konva.Group) {
     const imageProps = params as ImageProps;
 
-    const imageGroup = image.findOne(`#${imageProps.id}`) as
-      | Konva.Group
-      | undefined;
     const imagePlaceholder = image.findOne(`#${imageProps.id}-placeholder`) as
       | Konva.Rect
       | undefined;
@@ -287,43 +337,93 @@ export class WeaveImageNode extends WeaveNode {
       });
     };
     imageObj.onload = () => {
-      imageGroup?.setAttrs({
-        width: imageProps.width ? imageProps.width : imageObj.width,
-        height: imageProps.height ? imageProps.height : imageObj.height,
-      });
-      imagePlaceholder?.destroy();
-      // imagePlaceholder?.setAttrs({
-      //   width: imageProps.width ? imageProps.width : imageObj.width,
-      //   height: imageProps.height ? imageProps.height : imageObj.height,
-      //   visible: false,
-      // });
-      internalImage?.setAttrs({
-        width: imageProps.width ? imageProps.width : imageObj.width,
-        height: imageProps.height ? imageProps.height : imageObj.height,
-        image: imageObj,
-        visible: true,
-      });
-      internalImage?.zIndex(0);
+      if (image && imagePlaceholder && internalImage) {
+        image.setAttrs({
+          width: imageProps.width ? imageProps.width : imageObj.width,
+          height: imageProps.height ? imageProps.height : imageObj.height,
+        });
+        imagePlaceholder.destroy();
+        internalImage.setAttrs({
+          width: imageProps.width ? imageProps.width : imageObj.width,
+          height: imageProps.height ? imageProps.height : imageObj.height,
+          image: imageObj,
+          visible: true,
+        });
+        internalImage.setAttr('imageInfo', {
+          width: imageObj.width,
+          height: imageObj.height,
+        });
+        internalImage.zIndex(0);
 
-      this.imageLoaded = true;
+        this.imageLoaded = true;
 
-      image.setAttr(
-        'width',
-        imageProps.width ? imageProps.width : imageObj.width
-      );
-      image.setAttr(
-        'height',
-        imageProps.height ? imageProps.height : imageObj.height
-      );
-      image.setAttr('imageInfo', {
-        width: imageObj.width,
-        height: imageObj.height,
-      });
-      this.instance.updateNode(this.serialize(image));
+        image.setAttrs({
+          width: imageProps.width ? imageProps.width : imageObj.width,
+          height: imageProps.height ? imageProps.height : imageObj.height,
+        });
+        image.setAttr('imageInfo', {
+          width: imageObj.width,
+          height: imageObj.height,
+        });
+
+        this.updateCrop(imageProps);
+      }
     };
 
     if (imageProps.imageURL) {
       imageObj.src = imageProps.imageURL;
+    }
+  }
+
+  updateCrop(nextProps: WeaveElementAttributes): void {
+    const imageAttrs = nextProps;
+
+    const stage = this.instance.getStage();
+    const image = stage.findOne(`#${imageAttrs.id}`) as Konva.Group | undefined;
+    const internalImage = image?.findOne(`#${imageAttrs.id}-image`) as
+      | Konva.Image
+      | undefined;
+
+    if (
+      image &&
+      internalImage &&
+      !imageAttrs.adding &&
+      imageAttrs.cropInfo &&
+      !isEqual(imageAttrs.cropInfo, this.cachedCropInfo[imageAttrs.id ?? ''])
+    ) {
+      const actualScale =
+        imageAttrs.uncroppedImage.width / imageAttrs.imageInfo.width;
+      internalImage.width(imageAttrs.uncroppedImage.width);
+      internalImage.height(imageAttrs.uncroppedImage.height);
+      internalImage.rotation(0);
+      internalImage.scaleX(1);
+      internalImage.scaleY(1);
+      internalImage.crop({
+        x: imageAttrs.cropInfo.x / actualScale,
+        y: imageAttrs.cropInfo.y / actualScale,
+        width: imageAttrs.cropInfo.width / actualScale,
+        height: imageAttrs.cropInfo.height / actualScale,
+      });
+      internalImage.width(imageAttrs.cropSize.width);
+      internalImage.height(imageAttrs.cropSize.height);
+      this.cachedCropInfo[imageAttrs.id ?? ''] = imageAttrs.cropInfo;
+    }
+    if (
+      image &&
+      internalImage &&
+      !imageAttrs.adding &&
+      !imageAttrs.cropInfo &&
+      !isEqual(imageAttrs.cropInfo, this.cachedCropInfo[imageAttrs.id ?? ''])
+    ) {
+      internalImage.width(imageAttrs.uncroppedImage.width);
+      internalImage.height(imageAttrs.uncroppedImage.height);
+      internalImage.rotation(0);
+      internalImage.scaleX(1);
+      internalImage.scaleY(1);
+      internalImage.crop(undefined);
+      internalImage.width(imageAttrs.uncroppedImage.width);
+      internalImage.height(imageAttrs.uncroppedImage.height);
+      this.cachedCropInfo[imageAttrs.id ?? ''] = undefined;
     }
   }
 

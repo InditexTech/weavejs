@@ -9,6 +9,7 @@ import type { WeaveNodeTransformerProperties } from '@inditextech/weave-types';
 declare module 'konva/lib/Node' {
   interface Node {
     getTransformerProperties(): WeaveNodeTransformerProperties;
+    resetCrop(): void;
     updatePosition(position: Vector2d): void;
   }
 }
