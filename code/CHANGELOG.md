@@ -17,6 +17,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - [#322](https://github.com/InditexTech/weavejs/issues/322) Update create-app frontend
 
+### Fixed
+
+- [#327](https://github.com/InditexTech/weavejs/issues/327) Fix missing uncroppedImage property on image
+
 ## [0.20.3] - 2025-06-03
 
 ### Fixed
