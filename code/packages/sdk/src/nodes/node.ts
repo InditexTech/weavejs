@@ -226,6 +226,17 @@ export abstract class WeaveNode implements WeaveNodeBase {
       if (this.isSelecting() && this.isNodeSelected(node)) {
         clearContainerTargets(this.instance);
 
+        const nodesSnappingPlugin =
+          this.instance.getPlugin<WeaveNodesSnappingPlugin>('nodesSnapping');
+
+        if (
+          nodesSnappingPlugin &&
+          this.isSelecting() &&
+          this.isNodeSelected(node)
+        ) {
+          nodesSnappingPlugin.cleanupEvaluateGuidelines();
+        }
+
         const containerToMove = moveNodeToContainer(this.instance, e.target);
 
         if (containerToMove) {

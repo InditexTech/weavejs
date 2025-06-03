@@ -342,12 +342,18 @@ export class WeaveFrameNode extends WeaveNode {
     });
 
     const selectorArea = frameNode.findOne(`#${id}-selector-area`);
+
     if (selectorArea) {
+      const width = nextProps.width ? nextProps.width : nextProps.frameWidth;
+      const height = nextProps.height
+        ? nextProps.height
+        : nextProps.frameHeight;
+
       selectorArea.setAttrs({
         x: 0,
         y: 0,
-        width: nextProps.width,
-        height: nextProps.height,
+        width,
+        height,
       });
 
       const frameInternalGroup = frameNode.findOne(`#${id}-selector`);
@@ -355,8 +361,8 @@ export class WeaveFrameNode extends WeaveNode {
         frameInternalGroup.setAttrs({
           x: 0,
           y: 0,
-          width: nextProps.width * selectorArea.scaleX(),
-          height: nextProps.height * selectorArea.scaleY(),
+          width: width * selectorArea.scaleX(),
+          height: height * selectorArea.scaleY(),
         });
       }
 
@@ -365,8 +371,8 @@ export class WeaveFrameNode extends WeaveNode {
         background.setAttrs({
           x: 0,
           y: 0,
-          width: nextProps.width * selectorArea.scaleX(),
-          height: nextProps.height * selectorArea.scaleY(),
+          width: width * selectorArea.scaleX(),
+          height: height * selectorArea.scaleY(),
         });
       }
 
@@ -376,7 +382,7 @@ export class WeaveFrameNode extends WeaveNode {
           x: 0,
           y: -titleHeight,
           text: nextProps.title,
-          width: nextProps.width * selectorArea.scaleX(),
+          width: width * selectorArea.scaleX(),
         });
       }
 
@@ -385,8 +391,8 @@ export class WeaveFrameNode extends WeaveNode {
         frameInternal.setAttrs({
           x: 0,
           y: titleHeight,
-          width: nextProps.width * selectorArea.scaleX(),
-          height: nextProps.height * selectorArea.scaleY(),
+          width: width * selectorArea.scaleX(),
+          height: height * selectorArea.scaleY(),
         });
       }
     }
@@ -435,10 +441,6 @@ export class WeaveFrameNode extends WeaveNode {
       props: {
         ...cleanedAttrs,
         id: realAttrs?.id ?? '',
-        // x: instance.x(),
-        // y: instance.y(),
-        // width: instance.width(),
-        // height: instance.height(),
         nodeType: realAttrs?.nodeType,
         children: childrenMapped,
       },
