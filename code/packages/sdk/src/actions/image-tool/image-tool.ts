@@ -200,6 +200,7 @@ export class WeaveImageToolAction extends WeaveAction {
         width: 100 * aspectRatio,
         height: 100,
         opacity: 1,
+        adding: true,
         imageURL: this.imageURL,
         stroke: '#000000ff',
         strokeWidth: 0,
@@ -239,6 +240,7 @@ export class WeaveImageToolAction extends WeaveAction {
         x: this.clickPoint?.x ?? 0,
         y: this.clickPoint?.y ?? 0,
         opacity: 1,
+        adding: false,
         imageURL: this.imageURL,
         stroke: '#000000ff',
         strokeWidth: 0,
@@ -253,10 +255,10 @@ export class WeaveImageToolAction extends WeaveAction {
 
       this.instance.addNode(node, this.container?.getAttrs().id);
 
-      const rectangleNodeHandler =
-        this.instance.getNodeHandler<WeaveRectangleNode>('rectangle');
+      const imageNodeHandler =
+        this.instance.getNodeHandler<WeaveImageNode>('image');
       this.instance.removeNode(
-        rectangleNodeHandler.serialize(tempImage as WeaveElementInstance)
+        imageNodeHandler.serialize(tempImage as WeaveElementInstance)
       );
 
       this.setState(IMAGE_TOOL_STATE.FINISHED);

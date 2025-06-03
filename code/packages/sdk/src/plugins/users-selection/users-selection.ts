@@ -21,6 +21,7 @@ import Konva from 'konva';
 import { type Vector2d } from 'konva/lib/types';
 
 export class WeaveUsersSelectionPlugin extends WeavePlugin {
+  private padding = 1;
   private usersSelection: Record<
     string,
     { oldNodes: WeaveUserSelectionInfo; actualNodes: WeaveUserSelectionInfo }
@@ -33,7 +34,6 @@ export class WeaveUsersSelectionPlugin extends WeavePlugin {
     const { config } = params;
 
     this.config = config;
-
     this.usersSelection = {};
   }
 
@@ -136,7 +136,12 @@ export class WeaveUsersSelectionPlugin extends WeavePlugin {
     return color;
   }
 
-  private getSelectedNodesRect(nodes: string[]) {
+  private getSelectedNodesRect(nodes: string[]): {
+    x: number;
+    y: number;
+    width: number;
+    height: number;
+  } {
     const stage = this.instance.getStage();
 
     const maxPoint: Vector2d = { x: -Infinity, y: -Infinity };
@@ -199,18 +204,16 @@ export class WeaveUsersSelectionPlugin extends WeavePlugin {
         id: `selector_${userSelector.actualNodes.user}`,
         x: selectionRect.x,
         y: selectionRect.y,
-        width: selectionRect.width / stage.scaleX(),
-        height: selectionRect.height / stage.scaleY(),
         listening: false,
       });
       userSelectorNode.moveToBottom();
 
       const userSelectorRect = new Konva.Rect({
-        x: 0,
-        y: 0,
+        x: -this.padding / stage.scaleX(),
+        y: -this.padding / stage.scaleY(),
         id: `selector_${userSelector.actualNodes.user}_rect`,
-        width: selectionRect.width / stage.scaleX(),
-        height: selectionRect.height / stage.scaleY(),
+        width: (selectionRect.width + 2 * this.padding) / stage.scaleX(),
+        height: (selectionRect.height + 2 * this.padding) / stage.scaleY(),
         fill: 'transparent',
         stroke: this.stringToColor(userSelector.actualNodes.user),
         strokeWidth: 3,

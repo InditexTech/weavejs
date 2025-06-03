@@ -36,6 +36,7 @@ export const setNodesDefaultConfiguration = (
     };
   };
   Konva.Node.prototype.updatePosition = function () {};
+  Konva.Node.prototype.resetCrop = function () {};
 };
 
 export abstract class WeaveNode implements WeaveNodeBase {
@@ -93,7 +94,7 @@ export abstract class WeaveNode implements WeaveNodeBase {
     return selected;
   }
 
-  private scaleReset(node: Konva.Node) {
+  protected scaleReset(node: Konva.Node): void {
     // for lines, adjust points to scale
     if (node.getAttrs().nodeType === 'line') {
       const lineNode = node as Konva.Line;
@@ -108,9 +109,18 @@ export abstract class WeaveNode implements WeaveNodeBase {
       }
       lineNode.points(newPoints);
     }
+
     // adjust size to scale and set minimal size
     node.width(Math.max(5, node.width() * node.scaleX()));
     node.height(Math.max(5, node.height() * node.scaleY()));
+    if (node.getAttrs().nodeType === 'image') {
+      node.setAttrs({
+        uncroppedImage: {
+          width: node.getAttrs().uncroppedImage.width * node.scaleX(),
+          height: node.getAttrs().uncroppedImage.height * node.scaleY(),
+        },
+      });
+    }
     // reset scale to 1
     node.scaleX(1);
     node.scaleY(1);
