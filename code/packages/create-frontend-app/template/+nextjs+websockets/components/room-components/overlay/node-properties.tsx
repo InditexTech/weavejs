@@ -18,6 +18,7 @@ import { X } from 'lucide-react';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { WeaveSelection } from '@inditextech/weave-types';
 import { MetaProperties } from '../node-properties/meta-properties';
+import { RadiusProperties } from '../node-properties/radius-properties';
 
 export const NodeProperties = () => {
   const instance = useWeave((state) => state.instance);
@@ -44,6 +45,7 @@ export const NodeProperties = () => {
       actualAction &&
       [
         'rectangleTool',
+        'ellipseTool',
         'brushTool',
         'penTool',
         'imageTool',
@@ -71,6 +73,8 @@ export const NodeProperties = () => {
         return 'Group';
       case 'rectangle':
         return 'Rectangle';
+      case 'ellipse':
+        return 'Ellipse';
       case 'line':
         return 'Vector path';
       case 'text':
@@ -90,6 +94,8 @@ export const NodeProperties = () => {
     switch (actualAction) {
       case 'rectangleTool':
         return 'Rectangle';
+      case 'ellipseTool':
+        return 'Ellipse';
       case 'brushTool':
         return 'Vector path';
       case 'penTool':
@@ -175,6 +181,7 @@ export const NodeProperties = () => {
                 actualAction &&
                 [
                   'rectangleTool',
+                  'ellipseTool',
                   'brushTool',
                   'penTool',
                   'imageTool',
@@ -201,6 +208,7 @@ export const NodeProperties = () => {
           <FrameProperties />
           <PositionProperties />
           <SizeProperties />
+          <RadiusProperties />
           <AppearanceProperties />
           <FillProperties />
           <StrokeProperties />

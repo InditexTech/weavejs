@@ -6,6 +6,7 @@
     "group",
     "frame",
     "rectangle",
+    "ellipse",
     "line",
     "text",
     "image"
