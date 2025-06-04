@@ -83,8 +83,8 @@ export function StrokeProperties() {
         </div>
         <ToggleIconButton
           kind="toggle"
-          icon={<Eye size={16} strokeWidth={1} />}
-          pressedIcon={<EyeOff size={16} strokeWidth={1} />}
+          icon={<Eye size={20} strokeWidth={1} />}
+          pressedIcon={<EyeOff size={20} strokeWidth={1} />}
           pressed={actualNode.props.strokeEnabled ?? true}
           onClick={(e) => {
             e.stopPropagation();

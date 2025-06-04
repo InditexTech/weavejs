@@ -6,6 +6,7 @@ import { useWeave } from '@inditextech/weave-react';
 import { useCollaborationRoom } from '@/store/store';
 import { InputNumber } from '../inputs/input-number';
 import { ToggleIconButton } from '../toggle-icon-button';
+import { Scaling } from 'lucide-react';
 
 export function SizeProperties() {
   const instance = useWeave((state) => state.instance);
@@ -19,6 +20,8 @@ export function SizeProperties() {
   const nodeCreateProps = useCollaborationRoom(
     (state) => state.nodeProperties.createProps
   );
+
+  const [maintainAspectRatio, setMaintainAspectRatio] = React.useState(true);
 
   const actualNode = React.useMemo(() => {
     if (actualAction && nodePropertiesAction === 'create') {
@@ -48,6 +51,12 @@ export function SizeProperties() {
     },
     [instance, actualAction, nodePropertiesAction]
   );
+
+  React.useEffect(() => {
+    if (actualNode && actualNode.type === 'image') {
+      setMaintainAspectRatio(true);
+    }
+  }, [actualNode]);
 
   if (!instance || !actualNode || !nodePropertiesAction) {
     return null;
@@ -132,14 +141,45 @@ export function SizeProperties() {
           <InputNumber
             label="Width"
             value={actualNode.props.width ?? 0}
+            disabled={actualNode.type === 'frame'}
             onChange={(value) => {
+              const isImage = actualNode.type === 'image';
               const isText = actualNode.type === 'text';
+
+              let newWidth = value;
+              let newHeight = actualNode.props.height;
+              if (
+                isImage &&
+                maintainAspectRatio &&
+                actualNode.props.imageInfo
+              ) {
+                const ratio =
+                  actualNode.props.imageInfo.width /
+                  actualNode.props.imageInfo.height;
+
+                newWidth = value;
+                newHeight = value / ratio;
+              }
+              if (!isImage && maintainAspectRatio) {
+                const ratio = actualNode.props.width / actualNode.props.height;
+
+                newWidth = value;
+                newHeight = value / ratio;
+              }
+
               const updatedNode: WeaveStateElement = {
                 ...actualNode,
                 props: {
                   ...actualNode.props,
+                  ...(isImage && {
+                    uncroppedImage: {
+                      width: newWidth,
+                      height: newHeight,
+                    },
+                  }),
                   ...(isText && { layout: 'fixed' }),
-                  width: value,
+                  width: newWidth,
+                  height: newHeight,
                 },
               };
               updateElement(updatedNode);
@@ -148,14 +188,47 @@ export function SizeProperties() {
           <InputNumber
             label="Height"
             value={actualNode.props.height ?? 0}
+            disabled={actualNode.type === 'frame'}
             onChange={(value) => {
+              const isImage = actualNode.type === 'image';
               const isText = actualNode.type === 'text';
+
+              let newWidth = actualNode.props.width;
+              let newHeight = value;
+              if (
+                isImage &&
+                actualNode.props.imageInfo &&
+                maintainAspectRatio
+              ) {
+                const ratio =
+                  actualNode.props.imageInfo.height /
+                  actualNode.props.imageInfo.width;
+
+                newWidth = value / ratio;
+                newHeight = value;
+              }
+              if (!isImage && maintainAspectRatio) {
+                const ratio =
+                  actualNode.props.imageInfo.height /
+                  actualNode.props.imageInfo.width;
+
+                newWidth = value / ratio;
+                newHeight = value;
+              }
+
               const updatedNode: WeaveStateElement = {
                 ...actualNode,
                 props: {
                   ...actualNode.props,
+                  ...(isImage && {
+                    uncroppedImage: {
+                      width: newWidth,
+                      height: newHeight,
+                    },
+                  }),
                   ...(isText && { layout: 'fixed' }),
-                  height: value,
+                  width: newWidth,
+                  height: newHeight,
                 },
               };
               updateElement(updatedNode);
@@ -165,6 +238,7 @@ export function SizeProperties() {
             <InputNumber
               label="Scale (%)"
               value={(actualNode.props.scaleX ?? 1) * 100}
+              disabled={actualNode.type === 'frame'}
               onChange={(value) => {
                 const updatedNode: WeaveStateElement = {
                   ...actualNode,
@@ -178,6 +252,23 @@ export function SizeProperties() {
               }}
             />
           )}
+
+          <div className="w-full flex justify-between items-center gap-4 col-span-3">
+            <div className="text-[12px] text-[#757575] font-inter font-light text-nowrap">
+              Maintain aspect ratio
+            </div>
+            <div className="w-full flex justify-end items-center gap-1">
+              <ToggleIconButton
+                kind="switch"
+                disabled={actualNode.type === 'image'}
+                icon={<Scaling size={20} strokeWidth={1} />}
+                pressed={maintainAspectRatio}
+                onClick={() => {
+                  setMaintainAspectRatio((prev) => !prev);
+                }}
+              />
+            </div>
+          </div>
         </div>
       </div>
     </div>

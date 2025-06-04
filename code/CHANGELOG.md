@@ -16,6 +16,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 - [#342](https://github.com/InditexTech/weavejs/issues/342) Fix image initialization
+- [#343](https://github.com/InditexTech/weavejs/issues/343) Update create-app frontend
 
 ## [0.21.1] - 2025-06-04
 
@@ -31,7 +32,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - [#330](https://github.com/InditexTech/weavejs/issues/330) Performance improvements
 - [#333](https://github.com/InditexTech/weavejs/issues/333) Update create-app frontend
 
-\### Fixed
+### Fixed
 
 - [#329](https://github.com/InditexTech/weavejs/issues/329) Fix initial state of images when cropping
 - [#334](https://github.com/InditexTech/weavejs/issues/334) Don't include d.ts as ts files on bundle
