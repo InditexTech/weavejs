@@ -246,9 +246,6 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
     tr.on('dragend', (e) => {
       e.cancelBubble = true;
 
-      const actualCursor = stage.container().style.cursor;
-      stage.container().style.cursor = 'wait';
-
       const selectedNodes = tr.nodes();
       for (let i = 0; i < selectedNodes.length; i++) {
         const node = selectedNodes[i];
@@ -256,6 +253,9 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
       }
 
       if (this.isSelecting() && tr.nodes().length > 1) {
+        const actualCursor = stage.container().style.cursor;
+        stage.container().style.cursor = 'wait';
+
         clearContainerTargets(this.instance);
 
         const toUpdate: WeaveStateElement[] = [];

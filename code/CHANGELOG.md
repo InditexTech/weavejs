@@ -16,6 +16,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 - [#339](https://github.com/InditexTech/weavejs/issues/339) Image resizing issue
+- [#340](https://github.com/InditexTech/weavejs/issues/340) Frames resizing when interacting with them
 
 ## [0.21.0] - 2025-06-04
 
