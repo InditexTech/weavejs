@@ -436,6 +436,22 @@ export class Weave extends Emittery {
     this.stateManager.updateNode(node, doRender);
   }
 
+  updateNodes(nodes: WeaveStateElement[], doRender = true): void {
+    for (const node of nodes) {
+      this.updateNode(node, false);
+    }
+
+    const selectionPlugin =
+      this.getPlugin<WeaveNodesSelectionPlugin>('nodesSelection');
+    if (selectionPlugin) {
+      selectionPlugin.setSelectedNodes([]);
+    }
+
+    if (doRender) {
+      this.render();
+    }
+  }
+
   removeNode(node: WeaveStateElement, doRender = true): void {
     this.stateManager.removeNode(node, doRender);
 

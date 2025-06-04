@@ -20,6 +20,8 @@ import {
   type WeaveStageGridType,
 } from './types';
 import { Circle } from 'konva/lib/shapes/Circle';
+import type { KonvaEventObject } from 'konva/lib/Node';
+import { throttle } from 'lodash';
 
 function isZeroOrClose(value: number, tolerance: number = 1e-6): boolean {
   return Math.abs(value) <= tolerance;
@@ -115,7 +117,7 @@ export class WeaveStageGridPlugin extends WeavePlugin {
       }
     });
 
-    stage.on('mousemove', (e) => {
+    const handleMouseMove = (e: KonvaEventObject<MouseEvent, Konva.Stage>) => {
       e.evt.preventDefault();
 
       if (
@@ -130,7 +132,9 @@ export class WeaveStageGridPlugin extends WeavePlugin {
       }
 
       this.onRender();
-    });
+    };
+
+    stage.on('mousemove', throttle(handleMouseMove, 50));
 
     stage.on('touchmove', (e) => {
       e.evt.preventDefault();

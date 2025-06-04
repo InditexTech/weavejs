@@ -75,38 +75,45 @@ export function moveNodeToContainer(
 
   let nodeActualContainer: Konva.Node | undefined =
     node.getParent() as Konva.Node;
-  if (nodeActualContainer?.getAttrs().nodeId) {
+
+  if (!nodeActualContainer) {
+    return undefined;
+  }
+
+  const actualContainerAttrs = nodeActualContainer.getAttrs();
+  const nodeAttrs = node.getAttrs();
+
+  if (actualContainerAttrs.nodeId) {
     nodeActualContainer = instance
       .getStage()
-      .findOne(`#${nodeActualContainer.getAttrs().nodeId}`);
+      .findOne(`#${actualContainerAttrs.nodeId}`);
   }
 
   let layerToMove = undefined;
   // Move to container
   if (
-    !node.getAttrs().containerId &&
+    !nodeAttrs.containerId &&
     nodeIntersected &&
-    nodeActualContainer?.getAttrs().id !== nodeIntersected.getAttrs().id
+    actualContainerAttrs.id !== nodeIntersected.getAttrs().id
   ) {
     layerToMove = nodeIntersected;
   }
   // Move to main layer
-  if (
-    !nodeIntersected &&
-    nodeActualContainer?.getAttrs().id !== WEAVE_NODE_LAYER_ID
-  ) {
+  if (!nodeIntersected && actualContainerAttrs.id !== WEAVE_NODE_LAYER_ID) {
     layerToMove = instance.getMainLayer();
   }
 
   if (layerToMove) {
+    const layerToMoveAttrs = layerToMove.getAttrs();
+
     const nodePos = node.getAbsolutePosition();
     const nodeRotation = node.getAbsoluteRotation();
 
     node.moveTo(layerToMove);
     node.setAbsolutePosition(nodePos);
     node.rotation(nodeRotation);
-    node.x(node.x() - (layerToMove.getAttrs().containerOffsetX ?? 0));
-    node.y(node.y() - (layerToMove.getAttrs().containerOffsetY ?? 0));
+    node.x(node.x() - (layerToMoveAttrs.containerOffsetX ?? 0));
+    node.y(node.y() - (layerToMoveAttrs.containerOffsetY ?? 0));
 
     const nodeHandler = instance.getNodeHandler<WeaveNode>(
       node.getAttrs().nodeType
@@ -114,7 +121,7 @@ export function moveNodeToContainer(
     const actualNode = nodeHandler.serialize(node as WeaveElementInstance);
 
     instance.removeNode(actualNode);
-    instance.addNode(actualNode, layerToMove.getAttrs().id);
+    instance.addNode(actualNode, layerToMoveAttrs.id);
   }
 
   return layerToMove;

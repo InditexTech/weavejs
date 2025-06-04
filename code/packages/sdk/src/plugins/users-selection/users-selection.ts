@@ -215,6 +215,7 @@ export class WeaveUsersSelectionPlugin extends WeavePlugin {
         width: (selectionRect.width + 2 * this.padding) / stage.scaleX(),
         height: (selectionRect.height + 2 * this.padding) / stage.scaleY(),
         fill: 'transparent',
+        listening: false,
         stroke: this.stringToColor(userSelector.actualNodes.user),
         strokeWidth: 3,
         strokeScaleEnabled: false,

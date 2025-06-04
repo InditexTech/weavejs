@@ -18,7 +18,7 @@ export class WeaveStageNode extends WeaveNode {
       ...props,
     });
 
-    stage.draw();
+    stage.batchDraw();
 
     return stage;
   }

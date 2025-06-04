@@ -4,6 +4,9 @@
 
 import { WeavePlugin } from '@/plugins/plugin';
 import { WEAVE_STAGE_PANNING_KEY } from './constants';
+import type { KonvaEventObject } from 'konva/lib/Node';
+import type Konva from 'konva';
+import { throttle } from 'lodash';
 
 export class WeaveStagePanningPlugin extends WeavePlugin {
   private moveToolActive: boolean;
@@ -126,7 +129,7 @@ export class WeaveStagePanningPlugin extends WeavePlugin {
       }
     });
 
-    stage.on('mousemove', (e) => {
+    const handleMouseMove = (e: KonvaEventObject<MouseEvent, Konva.Stage>) => {
       e.evt.preventDefault();
 
       const mousePos = stage.getPointerPosition();
@@ -159,7 +162,9 @@ export class WeaveStagePanningPlugin extends WeavePlugin {
       stage.y(stage.y() - deltaY);
 
       this.instance.emit('onStageMove', undefined);
-    });
+    };
+
+    stage.on('mousemove', throttle(handleMouseMove, 50));
 
     stage.on('touchstart', (e) => {
       e.evt.preventDefault();

@@ -23,6 +23,8 @@ import {
   moveNodeToContainer,
 } from '@/utils';
 import type { WeaveNodesSnappingPlugin } from '@/plugins/nodes-snapping/nodes-snapping';
+import { throttle } from 'lodash';
+import type { KonvaEventObject } from 'konva/lib/Node';
 
 export const setNodesDefaultConfiguration = (
   config?: WeaveNodeConfiguration
@@ -140,7 +142,13 @@ export abstract class WeaveNode implements WeaveNodeBase {
       }
     );
 
-    node.on('transform', (e) => {
+    let transforming = false;
+
+    node.on('transformstart', () => {
+      transforming = true;
+    });
+
+    const handleTransform = (e: KonvaEventObject<Event, Konva.Node>) => {
       const node = e.target;
 
       const nodesSelectionPlugin =
@@ -159,6 +167,7 @@ export abstract class WeaveNode implements WeaveNodeBase {
 
       if (
         nodesSnappingPlugin &&
+        transforming &&
         this.isSelecting() &&
         this.isNodeSelected(node)
       ) {
@@ -168,18 +177,16 @@ export abstract class WeaveNode implements WeaveNodeBase {
       if (this.isSelecting() && this.isNodeSelected(node)) {
         this.scaleReset(node);
 
-        const nodeHandler = this.instance.getNodeHandler<WeaveNode>(
-          node.getAttrs().nodeType
-        );
-        this.instance.updateNode(
-          nodeHandler.serialize(node as WeaveElementInstance)
-        );
         e.cancelBubble = true;
       }
-    });
+    };
+
+    node.on('transform', throttle(handleTransform, 50));
 
     node.on('transformend', (e) => {
       const node = e.target;
+
+      transforming = false;
 
       const nodesSelectionPlugin =
         this.instance.getPlugin<WeaveNodesSelectionPlugin>('nodesSelection');
@@ -187,24 +194,23 @@ export abstract class WeaveNode implements WeaveNodeBase {
       const nodesSnappingPlugin =
         this.instance.getPlugin<WeaveNodesSnappingPlugin>('nodesSnapping');
 
-      if (
-        nodesSnappingPlugin &&
-        this.isSelecting() &&
-        this.isNodeSelected(node)
-      ) {
+      if (nodesSnappingPlugin) {
         nodesSnappingPlugin.cleanupEvaluateGuidelines();
       }
 
-      if (
-        nodesSelectionPlugin &&
-        this.isSelecting() &&
-        this.isNodeSelected(node)
-      ) {
+      if (nodesSelectionPlugin) {
         nodesSelectionPlugin.getTransformer().forceUpdate();
       }
+
+      const nodeHandler = this.instance.getNodeHandler<WeaveNode>(
+        node.getAttrs().nodeType
+      );
+      this.instance.updateNode(
+        nodeHandler.serialize(node as WeaveElementInstance)
+      );
     });
 
-    node.on('dragmove', (e) => {
+    const handleDragMove = (e: KonvaEventObject<DragEvent, Konva.Node>) => {
       if (this.isSelecting() && this.isNodeSelected(node)) {
         clearContainerTargets(this.instance);
 
@@ -215,12 +221,10 @@ export abstract class WeaveNode implements WeaveNodeBase {
             bubbles: true,
           });
         }
-
-        this.instance.updateNode(
-          this.serialize(e.target as WeaveElementInstance)
-        );
       }
-    });
+    };
+
+    node.on('dragmove', throttle(handleDragMove, 50));
 
     node.on('dragend', (e) => {
       if (this.isSelecting() && this.isNodeSelected(node)) {
@@ -229,11 +233,7 @@ export abstract class WeaveNode implements WeaveNodeBase {
         const nodesSnappingPlugin =
           this.instance.getPlugin<WeaveNodesSnappingPlugin>('nodesSnapping');
 
-        if (
-          nodesSnappingPlugin &&
-          this.isSelecting() &&
-          this.isNodeSelected(node)
-        ) {
+        if (nodesSnappingPlugin) {
           nodesSnappingPlugin.cleanupEvaluateGuidelines();
         }
 

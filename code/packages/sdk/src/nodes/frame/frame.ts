@@ -24,6 +24,7 @@ import type { WeaveNodesSelectionPlugin } from '@/plugins/nodes-selection/nodes-
 import type { KonvaEventObject } from 'konva/lib/Node';
 import type { Rect } from 'konva/lib/shapes/Rect';
 import type { WeaveNodesSnappingPlugin } from '@/plugins/nodes-snapping/nodes-snapping';
+import { throttle } from 'lodash';
 
 export class WeaveFrameNode extends WeaveNode {
   private config: WeaveFrameProperties;
@@ -215,7 +216,7 @@ export class WeaveFrameNode extends WeaveNode {
       frameInternal.height(Math.max(5, selectorArea.height() * scaleY));
     };
 
-    selectorArea.on('transform', (e) => {
+    const handleSelectorAreaTransform = (e: KonvaEventObject<Event, Rect>) => {
       updateFrame(e);
 
       const node = e.target;
@@ -242,24 +243,16 @@ export class WeaveFrameNode extends WeaveNode {
       clonedSA.scaleX(1);
       clonedSA.scaleY(1);
 
-      this.instance.updateNode(
-        this.serialize(clonedSA as WeaveElementInstance)
-      );
-
       e.cancelBubble = true;
-    });
+    };
+
+    selectorArea.on('transform', throttle(handleSelectorAreaTransform, 50));
 
     selectorArea.on('transformend', (e) => {
-      const node = e.target;
-
       const nodesSnappingPlugin =
         this.instance.getPlugin<WeaveNodesSnappingPlugin>('nodesSnapping');
 
-      if (
-        nodesSnappingPlugin &&
-        this.isSelecting() &&
-        this.isNodeSelected(node)
-      ) {
+      if (nodesSnappingPlugin) {
         nodesSnappingPlugin.cleanupEvaluateGuidelines();
       }
 
