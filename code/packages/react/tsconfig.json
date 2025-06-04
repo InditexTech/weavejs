@@ -26,5 +26,5 @@
     "skipLibCheck": true,
     "jsx": "react"
   },
-  "include": ["src/**/*", "src/**/*.json", "src/.ts", "tests"]
+  "include": ["src/**/*", "src/**/*.json", "tests"]
 }

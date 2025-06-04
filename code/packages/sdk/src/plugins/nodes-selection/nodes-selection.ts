@@ -7,6 +7,7 @@ import {
   type NodeSerializable,
   WEAVE_NODE_CUSTOM_EVENTS,
   type WeaveElementInstance,
+  type WeaveStateElement,
 } from '@inditextech/weave-types';
 import Konva from 'konva';
 import { WeavePlugin } from '@/plugins/plugin';
@@ -31,6 +32,8 @@ import {
 } from '@/utils';
 import { WEAVE_USERS_SELECTION_KEY } from '../users-selection/constants';
 import type { WeaveUsersSelectionPlugin } from '../users-selection/users-selection';
+import type { KonvaEventObject } from 'konva/lib/Node';
+import { throttle } from 'lodash';
 
 export class WeaveNodesSelectionPlugin extends WeavePlugin {
   private tr!: Konva.Transformer;
@@ -190,16 +193,20 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
       this.triggerSelectedNodesEvent();
     });
 
-    tr.on('transform', () => {
+    const handleTransform = () => {
       this.triggerSelectedNodesEvent();
-    });
+    };
+
+    tr.on('transform', throttle(handleTransform, 50));
 
     tr.on('transformend', () => {
       this.triggerSelectedNodesEvent();
     });
 
     tr.on('dragstart', (e) => {
-      for (const node of tr.nodes()) {
+      const selectedNodes = tr.nodes();
+      for (let i = 0; i < selectedNodes.length; i++) {
+        const node = selectedNodes[i];
         node.updatePosition(e.target.getAbsolutePosition());
       }
 
@@ -208,14 +215,18 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
       e.cancelBubble = true;
     });
 
-    tr.on('dragmove', (e) => {
-      for (const node of tr.nodes()) {
+    const handleDragMove = (
+      e: KonvaEventObject<DragEvent, Konva.Transformer>
+    ) => {
+      const selectedNodes = tr.nodes();
+      for (let i = 0; i < selectedNodes.length; i++) {
+        const node = selectedNodes[i];
         node.updatePosition(e.target.getAbsolutePosition());
       }
 
       e.cancelBubble = true;
 
-      if (this.isSelecting() && tr.nodes().length > 1) {
+      if (this.isSelecting() && selectedNodes.length > 1) {
         clearContainerTargets(this.instance);
 
         const layerToMove = checkIfOverContainer(this.instance, e.target);
@@ -225,44 +236,72 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
             bubbles: true,
           });
         }
-
-        for (const node of tr.nodes()) {
-          const nodeHandler = this.instance.getNodeHandler<WeaveNode>(
-            node.getAttrs().nodeType
-          );
-          this.instance.updateNode(
-            nodeHandler.serialize(node as WeaveElementInstance)
-          );
-        }
       }
 
       tr.forceUpdate();
-    });
+    };
+
+    tr.on('dragmove', throttle(handleDragMove, 50));
 
     tr.on('dragend', (e) => {
-      for (const node of tr.nodes()) {
+      e.cancelBubble = true;
+
+      const actualCursor = stage.container().style.cursor;
+      stage.container().style.cursor = 'wait';
+
+      const selectedNodes = tr.nodes();
+      for (let i = 0; i < selectedNodes.length; i++) {
+        const node = selectedNodes[i];
         node.updatePosition(e.target.getAbsolutePosition());
       }
-
-      e.cancelBubble = true;
 
       if (this.isSelecting() && tr.nodes().length > 1) {
         clearContainerTargets(this.instance);
 
-        for (const node of tr.nodes()) {
-          const layerToMove = moveNodeToContainer(this.instance, node);
+        const toUpdate: WeaveStateElement[] = [];
 
-          if (layerToMove) {
-            continue;
+        const nodeUpdatePromise = (node: Konva.Node) => {
+          return new Promise<void>((resolve) => {
+            setTimeout(() => {
+              const layerToMove = moveNodeToContainer(this.instance, node);
+
+              if (layerToMove) {
+                return resolve();
+              }
+
+              const nodeHandler = this.instance.getNodeHandler<WeaveNode>(
+                node.getAttrs().nodeType
+              );
+              toUpdate.push(
+                nodeHandler.serialize(node as WeaveElementInstance)
+              );
+
+              resolve();
+            }, 0);
+          });
+        };
+
+        const promises = [];
+        for (let i = 0; i < selectedNodes.length; i++) {
+          promises.push(nodeUpdatePromise(selectedNodes[i]));
+        }
+
+        Promise.all(promises).then(() => {
+          if (toUpdate.length > 0) {
+            this.instance.updateNodes(toUpdate);
           }
 
-          const nodeHandler = this.instance.getNodeHandler<WeaveNode>(
-            node.getAttrs().nodeType
-          );
-          this.instance.updateNode(
-            nodeHandler.serialize(node as WeaveElementInstance)
-          );
-        }
+          stage.container().style.cursor = actualCursor;
+        });
+      }
+
+      const usersSelectionPlugin =
+        this.instance.getPlugin<WeaveUsersSelectionPlugin>(
+          WEAVE_USERS_SELECTION_KEY
+        );
+
+      if (usersSelectionPlugin) {
+        usersSelectionPlugin.sendSelectionAwarenessInfo(this.tr);
       }
 
       tr.forceUpdate();
@@ -420,7 +459,7 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
       }
     });
 
-    stage.on('mousemove touchmove', (e) => {
+    const handleMouseMove = (e: KonvaEventObject<MouseEvent, Konva.Stage>) => {
       if (!this.initialized) {
         return;
       }
@@ -449,7 +488,9 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
         width: Math.abs(x2 - x1),
         height: Math.abs(y2 - y1),
       });
-    });
+    };
+
+    stage.on('mousemove touchmove', throttle(handleMouseMove, 50));
 
     stage.on('mouseup touchend', (e) => {
       if (!this.initialized) {

@@ -17,6 +17,8 @@ import { WEAVE_TEXT_NODE_TYPE } from './constants';
 import { SELECTION_TOOL_ACTION_NAME } from '@/actions/selection-tool/constants';
 import { TEXT_LAYOUT } from '@/actions/text-tool/constants';
 import type { WeaveTextNodeParams, WeaveTextProperties } from './types';
+import type { KonvaEventObject } from 'konva/lib/Node';
+import { throttle } from 'lodash';
 
 export class WeaveTextNode extends WeaveNode {
   private config: WeaveTextProperties;
@@ -52,6 +54,26 @@ export class WeaveTextNode extends WeaveNode {
     });
 
     text.getTransformerProperties = () => {
+      const stage = this.instance.getStage();
+      const actualText = stage.findOne(`#${text.id()}`) as Konva.Text;
+
+      if (actualText) {
+        const attrs = actualText.getAttrs();
+
+        if (attrs.layout === TEXT_LAYOUT.AUTO_ALL) {
+          return {
+            resizeEnabled: false,
+            enabledAnchors: [] as string[],
+          };
+        }
+        if (attrs.layout === TEXT_LAYOUT.AUTO_HEIGHT) {
+          return {
+            resizeEnabled: true,
+            enabledAnchors: ['middle-right', 'middle-left'] as string[],
+          };
+        }
+      }
+
       return this.config.transform;
     };
 
@@ -61,25 +83,15 @@ export class WeaveTextNode extends WeaveNode {
 
     this.setupDefaultNodeEvents(text);
 
-    text.on('transform', (e) => {
+    const handleTextTransform = (e: KonvaEventObject<Event, Konva.Text>) => {
       const node = e.target;
 
       if (this.isSelecting() && this.isNodeSelected(node)) {
-        const nodeHandler =
-          this.instance.getNodeHandler<WeaveNode>(WEAVE_TEXT_NODE_TYPE);
-        const serializedNode = nodeHandler.serialize(
-          node as WeaveElementInstance
-        );
-        this.instance.updateNode({
-          ...serializedNode,
-          props: {
-            ...serializedNode.props,
-            layout: TEXT_LAYOUT.FIXED,
-          },
-        });
         e.cancelBubble = true;
       }
-    });
+    };
+
+    text.on('transform', throttle(handleTextTransform, 50));
 
     window.addEventListener('keypress', (e) => {
       if (
@@ -194,6 +206,13 @@ export class WeaveTextNode extends WeaveNode {
 
     if (this.editing) {
       this.updateTextAreaDOM(nodeInstance as Konva.Text);
+    }
+
+    const nodesSelectionPlugin =
+      this.instance.getPlugin<WeaveNodesSelectionPlugin>('nodesSelection');
+    if (nodesSelectionPlugin) {
+      const actualSelectedNodes = nodesSelectionPlugin.getSelectedNodes();
+      nodesSelectionPlugin.setSelectedNodes(actualSelectedNodes);
     }
   }
 

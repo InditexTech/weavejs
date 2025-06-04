@@ -268,8 +268,12 @@ export class WeaveNodesSnappingPlugin extends WeavePlugin {
     const utilityLayer = this.instance.getUtilityLayer();
 
     if (utilityLayer) {
-      stage.on('dragmove', this.evaluateGuidelines.bind(this));
-      stage.on('dragend', this.cleanupEvaluateGuidelines.bind(this));
+      stage.on('dragmove', (e) => {
+        this.evaluateGuidelines(e);
+      });
+      stage.on('dragend', () => {
+        this.cleanupEvaluateGuidelines();
+      });
     }
   }
 
