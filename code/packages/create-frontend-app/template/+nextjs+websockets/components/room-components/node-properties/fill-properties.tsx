@@ -3,8 +3,8 @@
 import React from 'react';
 import { WeaveStateElement } from '@inditextech/weave-types';
 import { Eye, EyeOff } from 'lucide-react';
-import { InputColor } from './../inputs/input-color';
-import { ToggleIconButton } from './../toggle-icon-button';
+import { InputColor } from '../inputs/input-color';
+import { ToggleIconButton } from '../toggle-icon-button';
 import { useWeave } from '@inditextech/weave-react';
 import { useCollaborationRoom } from '@/store/store';
 
@@ -50,21 +50,24 @@ export function FillProperties() {
     [instance, actualAction, nodePropertiesAction]
   );
 
-  if (!instance || !actualAction || !actualNode) {
+  if (!instance || !actualNode || !nodePropertiesAction) {
     return null;
   }
 
-  if (!actualAction && !actualNode) {
+  if (!actualAction && !actualNode) return null;
+
+  if (
+    actualAction &&
+    ['selectionTool'].includes(actualAction) &&
+    ['text'].includes(actualNode.type)
+  ) {
     return null;
   }
 
   if (
     actualAction &&
-    !['selectionTool', 'rectangleTool'].includes(actualAction)
-  )
-    return null;
-
-  if (!['rectangle'].includes(actualNode.type)) {
+    !['selectionTool', 'rectangleTool', 'ellipseTool'].includes(actualAction)
+  ) {
     return null;
   }
 

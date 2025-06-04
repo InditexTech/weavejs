@@ -1,0 +1,35 @@
+---
+title: WeaveEllipseToolAction
+description: Add an ellipse to the canvas
+---
+
+import { TypeTable } from "fumadocs-ui/components/type-table";
+
+## Overview
+
+The [WeaveEllipseToolAction](https://github.com/InditexTech/weavejs/blob/main/code/packages/sdk/src/actions/ellipse-tool/ellipse-tool.ts)
+class that allows users to create ellipse shapes on the canvas by clicking
+and dragging. It provides a smooth, intuitive way to add structured, resizable
+rectangular elements that can serve as building blocks for diagrams, layouts,
+mockups, and more.
+
+Each interaction results in the creation of a [WeaveEllipseNode](/docs/sdk/api-reference/nodes/ellipse),
+added to the shared state and synchronized across all users.
+
+The class extends the [WeaveAction](/docs/sdk/api-reference/actions/action) class.
+
+## Name
+
+This action `name` property value is `ellipseTool`.
+
+## Import
+
+```shell
+import { WeaveEllipseToolAction } from "@inditextech/weave-sdk";
+```
+
+## Instantiation
+
+```ts
+new WeaveEllipseToolAction();
+```

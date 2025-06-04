@@ -6,6 +6,7 @@
     "selection-tool",
     "eraser-tool",
     "rectangle-tool",
+    "ellipse-tool",
     "pen-tool",
     "brush-tool",
     "text-tool",

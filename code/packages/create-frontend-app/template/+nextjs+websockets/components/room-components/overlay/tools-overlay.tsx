@@ -17,6 +17,7 @@ import {
   Undo,
   Redo,
   Eraser,
+  Circle,
 } from 'lucide-react';
 import { useWeave } from '@inditextech/weave-react';
 import { Toolbar } from '../toolbar/toolbar';
@@ -210,6 +211,25 @@ export function ToolsOverlay() {
                 shortcuts={{
                   [SYSTEM_OS.MAC]: 'R',
                   [SYSTEM_OS.OTHER]: 'R',
+                }}
+              />
+            </div>
+          }
+          tooltipSide="top"
+          tooltipAlign="center"
+        />
+        <ToolbarButton
+          className="rounded-full !w-[40px]"
+          icon={<Circle className="px-2" size={40} strokeWidth={1} />}
+          active={actualAction === 'ellipseTool'}
+          onClick={() => triggerTool('ellipseTool')}
+          label={
+            <div className="flex gap-3 justify-start items-center">
+              <p>Add a ellipsis</p>
+              <ShortcutElement
+                shortcuts={{
+                  [SYSTEM_OS.MAC]: 'T',
+                  [SYSTEM_OS.OTHER]: 'T',
                 }}
               />
             </div>

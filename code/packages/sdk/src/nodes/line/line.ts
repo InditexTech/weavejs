@@ -60,4 +60,28 @@ export class WeaveLineNode extends WeaveNode {
       nodesSelectionPlugin.getTransformer().forceUpdate();
     }
   }
+
+  protected scaleReset(node: Konva.Node): void {
+    // for lines, adjust points to scale
+    if (node.getAttrs().nodeType === 'line') {
+      const lineNode = node as Konva.Line;
+      const oldPoints = lineNode.points();
+      const newPoints = [];
+      for (let i = 0; i < oldPoints.length / 2; i++) {
+        const point = {
+          x: oldPoints[i * 2] * lineNode.scaleX(),
+          y: oldPoints[i * 2 + 1] * lineNode.scaleY(),
+        };
+        newPoints.push(point.x, point.y);
+      }
+      lineNode.points(newPoints);
+    }
+
+    node.width(Math.max(5, node.width() * node.scaleX()));
+    node.height(Math.max(5, node.height() * node.scaleY()));
+
+    // reset scale to 1
+    node.scaleX(1);
+    node.scaleY(1);
+  }
 }

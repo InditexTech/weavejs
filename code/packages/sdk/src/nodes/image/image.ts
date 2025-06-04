@@ -457,4 +457,29 @@ export class WeaveImageNode extends WeaveNode {
     }
     return imageToolAction;
   }
+
+  protected scaleReset(node: Konva.Node): void {
+    const widthNotNormalized = node.width();
+    const heightNotNormalized = node.height();
+
+    node.width(Math.max(5, node.width() * node.scaleX()));
+    node.height(Math.max(5, node.height() * node.scaleY()));
+
+    const uncroppedWidth = node.getAttrs().uncroppedImage
+      ? node.getAttrs().uncroppedImage.width
+      : widthNotNormalized;
+    const uncroppedHeight = node.getAttrs().uncroppedImage
+      ? node.getAttrs().uncroppedImage.height
+      : heightNotNormalized;
+    node.setAttrs({
+      uncroppedImage: {
+        width: uncroppedWidth * node.scaleX(),
+        height: uncroppedHeight * node.scaleY(),
+      },
+    });
+
+    // reset scale to 1
+    node.scaleX(1);
+    node.scaleY(1);
+  }
 }
