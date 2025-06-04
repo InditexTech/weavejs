@@ -115,7 +115,10 @@ export abstract class WeaveNode implements WeaveNodeBase {
     // adjust size to scale and set minimal size
     node.width(Math.max(5, node.width() * node.scaleX()));
     node.height(Math.max(5, node.height() * node.scaleY()));
-    if (node.getAttrs().nodeType === 'image') {
+    if (
+      node.getAttrs().nodeType === 'image' &&
+      node.getAttrs().uncroppedImage
+    ) {
       node.setAttrs({
         uncroppedImage: {
           width: node.getAttrs().uncroppedImage.width * node.scaleX(),
@@ -176,6 +179,13 @@ export abstract class WeaveNode implements WeaveNodeBase {
 
       if (this.isSelecting() && this.isNodeSelected(node)) {
         this.scaleReset(node);
+
+        const nodeHandler = this.instance.getNodeHandler<WeaveNode>(
+          node.getAttrs().nodeType
+        );
+        this.instance.updateNode(
+          nodeHandler.serialize(node as WeaveElementInstance)
+        );
 
         e.cancelBubble = true;
       }

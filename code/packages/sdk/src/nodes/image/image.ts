@@ -364,6 +364,7 @@ export class WeaveImageNode extends WeaveNode {
           width: imageObj.width,
           height: imageObj.height,
         });
+        this.scaleReset(image);
         const imageRect = image.getClientRect({
           relativeTo: this.instance.getStage(),
         });
@@ -377,6 +378,13 @@ export class WeaveImageNode extends WeaveNode {
         });
 
         this.updateCrop(imageProps);
+
+        const nodeHandler = this.instance.getNodeHandler<WeaveNode>(
+          image.getAttrs().nodeType
+        );
+        this.instance.updateNode(
+          nodeHandler.serialize(image as WeaveElementInstance)
+        );
       }
     };
 
