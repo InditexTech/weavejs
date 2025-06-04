@@ -101,6 +101,7 @@ export class WeaveFrameNode extends WeaveNode {
       height: props.frameHeight,
       fill: 'transparent',
       draggable: false,
+      clip: undefined,
     });
 
     const frameInternalGroup = new Konva.Group({
@@ -332,15 +333,16 @@ export class WeaveFrameNode extends WeaveNode {
 
     nodeInstance.setAttrs({
       ...newProps,
+      clip: undefined,
     });
 
     const selectorArea = frameNode.findOne(`#${id}-selector-area`);
 
     if (selectorArea) {
-      const width = nextProps.width ? nextProps.width : nextProps.frameWidth;
-      const height = nextProps.height
-        ? nextProps.height
-        : nextProps.frameHeight;
+      const resizable = this.config.transform?.resizeEnabled ?? false;
+
+      const width = !resizable ? nextProps.frameWidth : nextProps.width;
+      const height = !resizable ? nextProps.frameHeight : nextProps.height;
 
       selectorArea.setAttrs({
         x: 0,
