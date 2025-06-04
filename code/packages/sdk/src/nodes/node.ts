@@ -112,17 +112,23 @@ export abstract class WeaveNode implements WeaveNodeBase {
       lineNode.points(newPoints);
     }
 
+    const widthNotNormalized = node.width();
+    const heightNotNormalized = node.height();
+
     // adjust size to scale and set minimal size
     node.width(Math.max(5, node.width() * node.scaleX()));
     node.height(Math.max(5, node.height() * node.scaleY()));
-    if (
-      node.getAttrs().nodeType === 'image' &&
-      node.getAttrs().uncroppedImage
-    ) {
+    if (node.getAttrs().nodeType === 'image') {
+      const uncroppedWidth = node.getAttrs().uncroppedImage
+        ? node.getAttrs().uncroppedImage.width
+        : widthNotNormalized;
+      const uncroppedHeight = node.getAttrs().uncroppedImage
+        ? node.getAttrs().uncroppedImage.height
+        : heightNotNormalized;
       node.setAttrs({
         uncroppedImage: {
-          width: node.getAttrs().uncroppedImage.width * node.scaleX(),
-          height: node.getAttrs().uncroppedImage.height * node.scaleY(),
+          width: uncroppedWidth * node.scaleX(),
+          height: uncroppedHeight * node.scaleY(),
         },
       });
     }
