@@ -16,6 +16,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 - [#330](https://github.com/InditexTech/weavejs/issues/330) Performance improvements
+- [#333](https://github.com/InditexTech/weavejs/issues/333) Update create-app frontend
 
 ### Fixed
 

@@ -1,7 +1,6 @@
 const nextConfig = {
   output: 'standalone',
   reactStrictMode: false,
-  transpilePackages: ['@inditextech/weave-sdk'],
   webpack: (config) => {
     config.externals = [...config.externals, { canvas: 'canvas' }]; // required to make Konva work
     return config;
