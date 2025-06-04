@@ -2,8 +2,6 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-import './nodes/extensions.d';
-
 export { Weave } from './weave';
 export { WeaveStore } from './stores/store';
 export * from './stores/types';

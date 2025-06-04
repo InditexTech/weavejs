@@ -2,8 +2,6 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-import '@/nodes/extensions';
-
 declare global {
   interface Window {
     weave: Weave;
