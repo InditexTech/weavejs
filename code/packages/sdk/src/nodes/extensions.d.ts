@@ -2,9 +2,7 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-import 'konva';
-import type { Vector2d } from 'konva/lib/types';
-import type { WeaveNodeTransformerProperties } from '@inditextech/weave-types';
+import 'konva/lib/Node';
 
 declare module 'konva/lib/Node' {
   interface Node {
