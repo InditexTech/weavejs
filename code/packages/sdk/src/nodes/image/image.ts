@@ -364,13 +364,16 @@ export class WeaveImageNode extends WeaveNode {
           width: imageObj.width,
           height: imageObj.height,
         });
+        const imageRect = image.getClientRect({
+          relativeTo: this.instance.getStage(),
+        });
         image.setAttr('uncroppedImage', {
           width: imageProps.uncroppedImage
             ? imageProps.uncroppedImage.width
-            : imageObj.width,
+            : imageRect.width,
           height: imageProps.uncroppedImage
             ? imageProps.uncroppedImage.height
-            : imageObj.height,
+            : imageRect.height,
         });
 
         this.updateCrop(imageProps);

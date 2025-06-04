@@ -20,6 +20,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- [#329](https://github.com/InditexTech/weavejs/issues/329) Fix initial state of images when cropping
 - [#334](https://github.com/InditexTech/weavejs/issues/334) Don't include d.ts as ts files on bundle
 
 ## [0.20.4] - 2025-06-03
