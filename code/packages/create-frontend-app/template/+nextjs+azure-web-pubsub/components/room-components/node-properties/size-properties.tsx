@@ -71,7 +71,7 @@ export function SizeProperties() {
   if (
     actualAction &&
     ['selectionTool'].includes(actualAction) &&
-    ['ellipse', 'star'].includes(actualNode.type)
+    ['ellipse', 'regular-polygon', 'star'].includes(actualNode.type)
   ) {
     return null;
   }
