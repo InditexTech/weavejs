@@ -19,6 +19,7 @@ import {
   Eraser,
   Circle,
   Star,
+  ArrowUpRight,
 } from 'lucide-react';
 import { useWeave } from '@inditextech/weave-react';
 import { Toolbar } from '../toolbar/toolbar';
@@ -329,6 +330,25 @@ export function ToolsOverlay() {
                 shortcuts={{
                   [SYSTEM_OS.MAC]: 'S',
                   [SYSTEM_OS.OTHER]: 'S',
+                }}
+              />
+            </div>
+          }
+          tooltipSide="top"
+          tooltipAlign="center"
+        />
+        <ToolbarButton
+          className="rounded-full !w-[40px]"
+          icon={<ArrowUpRight className="px-2" size={40} strokeWidth={1} />}
+          active={actualAction === 'arrowTool'}
+          onClick={() => triggerTool('arrowTool')}
+          label={
+            <div className="flex gap-3 justify-start items-center">
+              <p>Add a arrow</p>
+              <ShortcutElement
+                shortcuts={{
+                  [SYSTEM_OS.MAC]: 'A',
+                  [SYSTEM_OS.OTHER]: 'A',
                 }}
               />
             </div>

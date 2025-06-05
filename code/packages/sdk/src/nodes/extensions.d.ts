@@ -9,5 +9,6 @@ declare module 'konva/lib/Node' {
     getTransformerProperties(): WeaveNodeTransformerProperties;
     resetCrop(): void;
     updatePosition(position: Vector2d): void;
+    movedToContainer(container: Konva.Layer | Konva.Group): void;
   }
 }

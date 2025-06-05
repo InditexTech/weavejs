@@ -11,7 +11,7 @@ import { type WeaveStarToolActionState } from './types';
 import { STAR_TOOL_ACTION_NAME, STAR_TOOL_STATE } from './constants';
 import { WeaveNodesSelectionPlugin } from '@/plugins/nodes-selection/nodes-selection';
 import { SELECTION_TOOL_ACTION_NAME } from '../selection-tool/constants';
-import type { WeaveEllipseNode } from '@/nodes/ellipse/ellipse';
+import type { WeaveStarNode } from '@/nodes/star/star';
 
 export class WeaveStarToolAction extends WeaveAction {
   protected initialized: boolean = false;
@@ -130,11 +130,11 @@ export class WeaveStarToolAction extends WeaveAction {
 
     this.starId = uuidv4();
 
-    const nodeHandler = this.instance.getNodeHandler<WeaveEllipseNode>('star');
+    const nodeHandler = this.instance.getNodeHandler<WeaveStarNode>('star');
 
     const node = nodeHandler.create(this.starId, {
       ...this.props,
-      strokeScaleEnabled: false,
+      strokeScaleEnabled: true,
       x: this.clickPoint?.x ?? 0,
       y: this.clickPoint?.y ?? 0,
       numPoints: 5,
@@ -155,8 +155,7 @@ export class WeaveStarToolAction extends WeaveAction {
         this.container
       );
 
-      const nodeHandler =
-        this.instance.getNodeHandler<WeaveEllipseNode>('star');
+      const nodeHandler = this.instance.getNodeHandler<WeaveStarNode>('star');
 
       const starPos: Vector2d = {
         x: this.clickPoint.x,
@@ -202,8 +201,7 @@ export class WeaveStarToolAction extends WeaveAction {
       const deltaX = Math.abs(mousePoint.x - this.clickPoint?.x);
       const deltaY = Math.abs(mousePoint.y - this.clickPoint?.y);
 
-      const nodeHandler =
-        this.instance.getNodeHandler<WeaveEllipseNode>('star');
+      const nodeHandler = this.instance.getNodeHandler<WeaveStarNode>('star');
 
       const starPos: Vector2d = {
         x: this.clickPoint.x,

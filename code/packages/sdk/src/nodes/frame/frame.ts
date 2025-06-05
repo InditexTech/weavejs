@@ -96,7 +96,7 @@ export class WeaveFrameNode extends WeaveNode {
       id,
       containerId: `${id}-group-internal`,
       containerOffsetX: 0,
-      containerOffsetY: titleHeight,
+      containerOffsetY: borderWidth,
       width: props.frameWidth,
       height: props.frameHeight,
       fill: 'transparent',
@@ -110,7 +110,7 @@ export class WeaveFrameNode extends WeaveNode {
       y: 0,
       width: props.frameWidth,
       height: props.frameHeight,
-      strokeScaleEnabled: false,
+      strokeScaleEnabled: true,
       draggable: false,
     });
 
@@ -124,7 +124,7 @@ export class WeaveFrameNode extends WeaveNode {
       width: props.frameWidth,
       stroke: borderColor,
       strokeWidth: borderWidth,
-      strokeScaleEnabled: false,
+      strokeScaleEnabled: true,
       shadowForStrokeEnabled: false,
       height: props.frameHeight,
       fill: '#ffffffff',
@@ -147,7 +147,7 @@ export class WeaveFrameNode extends WeaveNode {
       text: props.title,
       stroke: '#000000ff',
       strokeWidth: 1,
-      strokeScaleEnabled: false,
+      strokeScaleEnabled: true,
       listening: false,
       draggable: false,
     });
@@ -279,18 +279,25 @@ export class WeaveFrameNode extends WeaveNode {
     const frameInternal = new Konva.Group({
       id: `${id}-group-internal`,
       nodeId: id,
-      x: 0,
-      y: titleHeight,
-      width: props.frameWidth,
-      height: props.frameHeight,
-      strokeScaleEnabled: false,
+      x: borderWidth,
+      y: borderWidth,
+      width: props.frameWidth - borderWidth * 2,
+      height: props.frameHeight - borderWidth * 2,
+      strokeScaleEnabled: true,
       draggable: false,
     });
 
     frameInternal.clipFunc((ctx) => {
-      const width = frameInternal.width() * frameInternal.scaleX();
-      const height = frameInternal.height() * frameInternal.scaleY();
-      ctx.rect(0, -titleHeight, width, height);
+      const width =
+        (frameInternal.width() + borderWidth) * frameInternal.scaleX();
+      const height =
+        (frameInternal.height() + borderWidth) * frameInternal.scaleY();
+      ctx.rect(
+        -(borderWidth / 2) * frameInternal.scaleX(),
+        -(borderWidth / 2) * frameInternal.scaleY(),
+        width,
+        height
+      );
     });
 
     frameInternalGroup.add(frameInternal);
@@ -329,10 +336,12 @@ export class WeaveFrameNode extends WeaveNode {
 
     const newProps = { ...nextProps };
 
-    const { titleHeight } = this.config;
+    const { titleHeight, borderWidth } = this.config;
 
     nodeInstance.setAttrs({
       ...newProps,
+      containerOffsetX: 0,
+      containerOffsetY: borderWidth,
       clip: undefined,
     });
 
@@ -378,16 +387,17 @@ export class WeaveFrameNode extends WeaveNode {
           y: -titleHeight,
           text: nextProps.title,
           width: width * selectorArea.scaleX(),
+          height: titleHeight * selectorArea.scaleY(),
         });
       }
 
       const frameInternal = frameNode.findOne(`#${id}-group-internal`);
       if (frameInternal) {
         frameInternal.setAttrs({
-          x: 0,
-          y: titleHeight,
-          width: width * selectorArea.scaleX(),
-          height: height * selectorArea.scaleY(),
+          x: borderWidth,
+          y: borderWidth,
+          width: (width - borderWidth * 2) * selectorArea.scaleX(),
+          height: (height - borderWidth * 2) * selectorArea.scaleY(),
         });
       }
     }

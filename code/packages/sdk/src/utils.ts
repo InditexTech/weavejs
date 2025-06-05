@@ -103,7 +103,11 @@ export function moveNodeToContainer(
     layerToMove = instance.getMainLayer();
   }
 
-  if (layerToMove) {
+  if (
+    layerToMove &&
+    actualContainerAttrs.id !== layerToMove.getAttrs().id &&
+    actualContainerAttrs.id !== layerToMove.getAttrs().containerId
+  ) {
     const layerToMoveAttrs = layerToMove.getAttrs();
 
     const nodePos = node.getAbsolutePosition();
@@ -114,6 +118,7 @@ export function moveNodeToContainer(
     node.rotation(nodeRotation);
     node.x(node.x() - (layerToMoveAttrs.containerOffsetX ?? 0));
     node.y(node.y() - (layerToMoveAttrs.containerOffsetY ?? 0));
+    node.movedToContainer(layerToMove);
 
     const nodeHandler = instance.getNodeHandler<WeaveNode>(
       node.getAttrs().nodeType
@@ -122,7 +127,9 @@ export function moveNodeToContainer(
 
     instance.removeNode(actualNode);
     instance.addNode(actualNode, layerToMoveAttrs.id);
+
+    return layerToMove;
   }
 
-  return layerToMove;
+  return undefined;
 }
