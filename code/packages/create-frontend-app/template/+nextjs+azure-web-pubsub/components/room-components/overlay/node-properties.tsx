@@ -20,6 +20,7 @@ import { WeaveSelection } from '@inditextech/weave-types';
 import { MetaProperties } from '../node-properties/meta-properties';
 import { EllipseProperties } from '../node-properties/ellipse-properties';
 import { StarProperties } from '../node-properties/star-properties';
+import { ArrowProperties } from '../node-properties/arrow-properties';
 
 export const NodeProperties = () => {
   const instance = useWeave((state) => state.instance);
@@ -51,6 +52,7 @@ export const NodeProperties = () => {
         'penTool',
         'imageTool',
         'starTool',
+        'arrowTool',
         'colorTokenTool',
         'frameTool',
       ].includes(actualAction)
@@ -85,6 +87,8 @@ export const NodeProperties = () => {
         return 'Image';
       case 'star':
         return 'Star';
+      case 'arrow':
+        return 'Arrow';
       case 'color-token':
         return 'Color Token';
       case 'frame':
@@ -108,6 +112,8 @@ export const NodeProperties = () => {
         return 'Image';
       case 'starTool':
         return 'Star';
+      case 'arrowTool':
+        return 'Arrow';
       case 'colorTokenTool':
         return 'Color Token';
       case 'frameTool':
@@ -192,6 +198,7 @@ export const NodeProperties = () => {
                   'penTool',
                   'imageTool',
                   'starTool',
+                  'arrowTool',
                   'colorTokenTool',
                   'frameTool',
                 ].includes(actualAction)
@@ -216,6 +223,7 @@ export const NodeProperties = () => {
           <PositionProperties />
           <SizeProperties />
           <EllipseProperties />
+          <ArrowProperties />
           <StarProperties />
           <AppearanceProperties />
           <FillProperties />

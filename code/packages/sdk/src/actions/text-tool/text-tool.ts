@@ -116,7 +116,7 @@ export class WeaveTextToolAction extends WeaveAction {
       strokeEnabled: false,
       stroke: '#000000ff',
       strokeWidth: 1,
-      strokeScaleEnabled: false,
+      strokeScaleEnabled: true,
       align: 'left',
       verticalAlign: 'top',
       opacity: 1,

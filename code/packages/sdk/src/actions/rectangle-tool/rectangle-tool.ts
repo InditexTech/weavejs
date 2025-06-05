@@ -133,7 +133,7 @@ export class WeaveRectangleToolAction extends WeaveAction {
 
     const node = nodeHandler.create(this.rectId, {
       ...this.props,
-      strokeScaleEnabled: false,
+      strokeScaleEnabled: true,
       x: this.clickPoint?.x ?? 0,
       y: this.clickPoint?.y ?? 0,
       width: 0,

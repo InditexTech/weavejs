@@ -134,7 +134,7 @@ export class WeaveEllipseToolAction extends WeaveAction {
 
     const node = nodeHandler.create(this.ellipseId, {
       ...this.props,
-      strokeScaleEnabled: false,
+      strokeScaleEnabled: true,
       x: this.clickPoint?.x ?? 0,
       y: this.clickPoint?.y ?? 0,
       radiusX: 0,

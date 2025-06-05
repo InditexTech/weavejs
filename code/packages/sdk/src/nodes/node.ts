@@ -37,6 +37,7 @@ export const setNodesDefaultConfiguration = (
       ...transform,
     };
   };
+  Konva.Node.prototype.movedToContainer = function () {};
   Konva.Node.prototype.updatePosition = function () {};
   Konva.Node.prototype.resetCrop = function () {};
 };

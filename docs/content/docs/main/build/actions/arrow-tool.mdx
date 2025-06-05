@@ -1,24 +1,19 @@
 ---
-title: Pen Tool
-description: Add line segments to the canvas
+title: Arrow Tool
+description: Add an arrow to the canvas
 ---
 
 import { Accordion, Accordions } from "fumadocs-ui/components/accordion";
-import { Kbd } from "@/components/kbd";
 
 ## Introduction
 
-This action allows users to draw continuos lines on the canvas with N segments, by
-clicking N times to define the N segments. This tool is ideal for sketching, annotating,
-or creating custom shapes.
-
-Each line is captured as a Line Node with configurable styling, and is instantly
-synchronized across all connected users.
+This action enables users to create new arrow nodes on the canvas.
 
 ## Dependencies
 
 This action needs also registered on the Weave instance the following:
 
+- [Arrow](/docs/main/build/nodes/arrow) node
 - [Line](/docs/main/build/nodes/line) node
 
 ## Usage
@@ -28,7 +23,7 @@ This action needs also registered on the Weave instance the following:
     Start by importing the action with the following import:
 
     ```ts
-    import { WeavePenToolAction } from "@inditextech/weave-sdk";
+    import { WeaveArrowToolAction } from "@inditextech/weave-sdk";
     ```
 
   </Accordion>
@@ -40,7 +35,7 @@ This action needs also registered on the Weave instance the following:
       ...
       actions: [
         ...,
-        new WeavePenToolAction(), // [!code ++]
+        new WeaveArrowToolAction(), // [!code ++]
       ]
     })
     ```
@@ -53,15 +48,15 @@ This action needs also registered on the Weave instance the following:
     ```tsx
     import { useWeave } from "@inditextech/weave-react";
 
-    const MyPenToolTriggerComponent = () => {
+    const MyArrowToolTriggerComponent = () => {
       const instance = useWeave((state) => state.instance);
 
       const triggerTool = React.useCallback(() => {
-        instance.triggerAction("penTool");
+        instance.triggerAction("arrowTool");
       }, [instance])
 
       return (
-        <button onClick={triggerTool}>Pen Tool</button>
+        <button onClick={triggerTool}>Arrow Tool</button>
       )
     }
     ```
@@ -70,19 +65,20 @@ This action needs also registered on the Weave instance the following:
   <Accordion title="4. Trigger the action" id="trigger-the-action">
     Finally as an user trigger the UI element that launches the action.
 
-    When active the user will iterate on the following steps:
+    When active the user can:
 
-    - **Click** or **Touch** on the canvas, to define a line segment start point.
-    - **Click** or **Touch** again on the canvas, to define the line final segment point.
+    - **Click** or **Touch** on the canvas, to define an arrow segment start point.
+    - **Click** or **Touch** again on the canvas, to define the arrow final segment point.
 
-    When the user is satisfied with the line segments:
+    When the user is satisfied with the arrow segments:
 
     - On non-touch devices, press the <Kbd keys={["Enter"]} /> or <Kbd keys={["Esc"]} /> keys.
     - On touch devices, trigger the [Selection Tool](/docs/main/build/actions/selection-tool).
 
-    Then the line with the N defined segments is added to the canvas as a fully functional
+    Then the arrow with the N defined segments is added to the canvas as a fully functional
     node—ready. This action integrates seamlessly with Weave.js's real-time state system,
     ensuring the new element appears instantly for all connected users.
 
-  </Accordion>
+    </Accordion>
+
 </Accordions>

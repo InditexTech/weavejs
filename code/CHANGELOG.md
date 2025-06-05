@@ -15,6 +15,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- [#324](https://github.com/InditexTech/weavejs/issues/324) Arrow node & action
 - [#325](https://github.com/InditexTech/weavejs/issues/325) Circle node & action
 - [#326](https://github.com/InditexTech/weavejs/issues/326) Star node & action
 
