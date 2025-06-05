@@ -26,6 +26,12 @@ import type { WeaveNodesSnappingPlugin } from '@/plugins/nodes-snapping/nodes-sn
 import { throttle } from 'lodash';
 import type { KonvaEventObject } from 'konva/lib/Node';
 
+export const setStageDefaultConfiguration = (): void => {
+  Konva.Stage.prototype.isMouseWheelPressed = function () {
+    return false;
+  };
+};
+
 export const setNodesDefaultConfiguration = (
   config?: WeaveNodeConfiguration
 ): void => {
@@ -194,7 +200,23 @@ export abstract class WeaveNode implements WeaveNodeBase {
       );
     });
 
+    node.on('dragstart', (e) => {
+      const stage = this.instance.getStage();
+      if (stage.isMouseWheelPressed()) {
+        e.cancelBubble = true;
+        node.stopDrag();
+        return;
+      }
+    });
+
     const handleDragMove = (e: KonvaEventObject<DragEvent, Konva.Node>) => {
+      const stage = this.instance.getStage();
+      if (stage.isMouseWheelPressed()) {
+        e.cancelBubble = true;
+        node.stopDrag();
+        return;
+      }
+
       if (this.isSelecting() && this.isNodeSelected(node)) {
         clearContainerTargets(this.instance);
 
