@@ -66,7 +66,9 @@ export function FillProperties() {
 
   if (
     actualAction &&
-    !['selectionTool', 'rectangleTool', 'ellipseTool'].includes(actualAction)
+    !['selectionTool', 'rectangleTool', 'ellipseTool', 'starTool'].includes(
+      actualAction
+    )
   ) {
     return null;
   }

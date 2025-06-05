@@ -18,7 +18,8 @@ import { X } from 'lucide-react';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { WeaveSelection } from '@inditextech/weave-types';
 import { MetaProperties } from '../node-properties/meta-properties';
-import { RadiusProperties } from '../node-properties/radius-properties';
+import { EllipseProperties } from '../node-properties/ellipse-properties';
+import { StarProperties } from '../node-properties/star-properties';
 
 export const NodeProperties = () => {
   const instance = useWeave((state) => state.instance);
@@ -49,6 +50,7 @@ export const NodeProperties = () => {
         'brushTool',
         'penTool',
         'imageTool',
+        'starTool',
         'colorTokenTool',
         'frameTool',
       ].includes(actualAction)
@@ -81,6 +83,8 @@ export const NodeProperties = () => {
         return 'Text';
       case 'image':
         return 'Image';
+      case 'star':
+        return 'Star';
       case 'color-token':
         return 'Color Token';
       case 'frame':
@@ -102,6 +106,8 @@ export const NodeProperties = () => {
         return 'Vector path';
       case 'imageTool':
         return 'Image';
+      case 'starTool':
+        return 'Star';
       case 'colorTokenTool':
         return 'Color Token';
       case 'frameTool':
@@ -185,6 +191,7 @@ export const NodeProperties = () => {
                   'brushTool',
                   'penTool',
                   'imageTool',
+                  'starTool',
                   'colorTokenTool',
                   'frameTool',
                 ].includes(actualAction)
@@ -208,7 +215,8 @@ export const NodeProperties = () => {
           <FrameProperties />
           <PositionProperties />
           <SizeProperties />
-          <RadiusProperties />
+          <EllipseProperties />
+          <StarProperties />
           <AppearanceProperties />
           <FillProperties />
           <StrokeProperties />

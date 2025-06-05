@@ -18,6 +18,7 @@ import {
   Redo,
   Eraser,
   Circle,
+  Star,
 } from 'lucide-react';
 import { useWeave } from '@inditextech/weave-react';
 import { Toolbar } from '../toolbar/toolbar';
@@ -309,6 +310,25 @@ export function ToolsOverlay() {
                 shortcuts={{
                   [SYSTEM_OS.MAC]: 'I',
                   [SYSTEM_OS.OTHER]: 'I',
+                }}
+              />
+            </div>
+          }
+          tooltipSide="top"
+          tooltipAlign="center"
+        />
+        <ToolbarButton
+          className="rounded-full !w-[40px]"
+          icon={<Star className="px-2" size={40} strokeWidth={1} />}
+          active={actualAction === 'starTool'}
+          onClick={() => triggerTool('starTool')}
+          label={
+            <div className="flex gap-3 justify-start items-center">
+              <p>Add a star</p>
+              <ShortcutElement
+                shortcuts={{
+                  [SYSTEM_OS.MAC]: 'S',
+                  [SYSTEM_OS.OTHER]: 'S',
                 }}
               />
             </div>

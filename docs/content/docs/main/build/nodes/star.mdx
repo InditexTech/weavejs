@@ -1,16 +1,17 @@
 ---
-title: Ellipse
-description: Draw an ellipse (or circle) on the canvas
+title: Star
+description: Draw a star on the canvas
 ---
 
 import { Accordion, Accordions } from "fumadocs-ui/components/accordion";
 
-The Ellipse node is a simple, versatile primitive shape used to render ellipse
-elements on the canvas. Built on top of Konva’s [Ellipse](https://konvajs.org/api/Konva.Ellipse.html),
-it supports customizable properties such as position, axis radius, fill color, stroke, radius (on both axis),
+The Star node is a simple, versatile primitive shape used to render star
+elements on the canvas. Built on top of Konva’s [Star](https://konvajs.org/api/Konva.Star.html),
+it supports customizable properties such as amount of points, position, inner and outer radius, fill color, stroke, radius (on both axis),
 and more.
 
-They can also respond to interactions like dragging, resizing, or selection.
+They can also respond to interactions like dragging, resizing,
+or selection.
 
 ## Usage
 
@@ -19,7 +20,7 @@ They can also respond to interactions like dragging, resizing, or selection.
     Start by importing the action with the following import:
 
     ```ts
-    import { WeaveEllipseNode } from "@inditextech/weave-sdk";
+    import { WeaveStarNode } from "@inditextech/weave-sdk";
     ```
 
   </Accordion>
@@ -31,7 +32,7 @@ They can also respond to interactions like dragging, resizing, or selection.
       ...
       nodes: [
         ...,
-        new WeaveEllipseNode(), // [!code ++]
+        new WeaveStarNode(), // [!code ++]
       ]
     })
     ```

@@ -7,16 +7,16 @@ import Konva from 'konva';
 import { type Vector2d } from 'konva/lib/types';
 import { type WeaveElementInstance } from '@inditextech/weave-types';
 import { WeaveAction } from '@/actions/action';
-import { type WeaveEllipseToolActionState } from './types';
-import { ELLIPSE_TOOL_ACTION_NAME, ELLIPSE_TOOL_STATE } from './constants';
+import { type WeaveStarToolActionState } from './types';
+import { STAR_TOOL_ACTION_NAME, STAR_TOOL_STATE } from './constants';
 import { WeaveNodesSelectionPlugin } from '@/plugins/nodes-selection/nodes-selection';
 import { SELECTION_TOOL_ACTION_NAME } from '../selection-tool/constants';
 import type { WeaveEllipseNode } from '@/nodes/ellipse/ellipse';
 
-export class WeaveEllipseToolAction extends WeaveAction {
+export class WeaveStarToolAction extends WeaveAction {
   protected initialized: boolean = false;
-  protected state: WeaveEllipseToolActionState;
-  protected ellipseId: string | null;
+  protected state: WeaveStarToolActionState;
+  protected starId: string | null;
   protected creating: boolean;
   protected moved: boolean;
   protected clickPoint: Vector2d | null;
@@ -29,8 +29,8 @@ export class WeaveEllipseToolAction extends WeaveAction {
     super();
 
     this.initialized = false;
-    this.state = ELLIPSE_TOOL_STATE.IDLE;
-    this.ellipseId = null;
+    this.state = STAR_TOOL_STATE.IDLE;
+    this.starId = null;
     this.creating = false;
     this.moved = false;
     this.container = undefined;
@@ -39,7 +39,7 @@ export class WeaveEllipseToolAction extends WeaveAction {
   }
 
   getName(): string {
-    return ELLIPSE_TOOL_ACTION_NAME;
+    return STAR_TOOL_ACTION_NAME;
   }
 
   initProps() {
@@ -48,8 +48,9 @@ export class WeaveEllipseToolAction extends WeaveAction {
       fill: '#71717aff',
       stroke: '#000000ff',
       strokeWidth: 1,
-      radiusX: 50,
-      radiusY: 50,
+      numPoints: 5,
+      innerRadius: 70,
+      outerRadius: 184,
       keepAspectRatio: false,
     };
   }
@@ -60,14 +61,14 @@ export class WeaveEllipseToolAction extends WeaveAction {
     stage.container().addEventListener('keydown', (e) => {
       if (
         e.key === 'Enter' &&
-        this.instance.getActiveAction() === ELLIPSE_TOOL_ACTION_NAME
+        this.instance.getActiveAction() === STAR_TOOL_ACTION_NAME
       ) {
         this.cancelAction();
         return;
       }
       if (
         e.key === 'Escape' &&
-        this.instance.getActiveAction() === ELLIPSE_TOOL_ACTION_NAME
+        this.instance.getActiveAction() === STAR_TOOL_ACTION_NAME
       ) {
         this.cancelAction();
         return;
@@ -77,7 +78,7 @@ export class WeaveEllipseToolAction extends WeaveAction {
     stage.on('mousedown touchstart', (e) => {
       e.evt.preventDefault();
 
-      if (this.state === ELLIPSE_TOOL_STATE.ADDING) {
+      if (this.state === STAR_TOOL_STATE.ADDING) {
         this.creating = true;
 
         this.handleAdding();
@@ -87,7 +88,7 @@ export class WeaveEllipseToolAction extends WeaveAction {
     stage.on('mousemove touchmove', (e) => {
       e.evt.preventDefault();
 
-      if (this.state === ELLIPSE_TOOL_STATE.DEFINING_SIZE) {
+      if (this.state === STAR_TOOL_STATE.DEFINING_SIZE) {
         this.moved = true;
 
         this.handleMovement();
@@ -97,7 +98,7 @@ export class WeaveEllipseToolAction extends WeaveAction {
     stage.on('mouseup touchend', (e) => {
       e.evt.preventDefault();
 
-      if (this.state === ELLIPSE_TOOL_STATE.DEFINING_SIZE) {
+      if (this.state === STAR_TOOL_STATE.DEFINING_SIZE) {
         this.creating = false;
 
         this.handleSettingSize();
@@ -107,18 +108,18 @@ export class WeaveEllipseToolAction extends WeaveAction {
     this.initialized = true;
   }
 
-  private setState(state: WeaveEllipseToolActionState) {
+  private setState(state: WeaveStarToolActionState) {
     this.state = state;
   }
 
-  private addEllipse() {
+  private addStar() {
     const stage = this.instance.getStage();
 
     stage.container().style.cursor = 'crosshair';
     stage.container().focus();
 
     this.clickPoint = null;
-    this.setState(ELLIPSE_TOOL_STATE.ADDING);
+    this.setState(STAR_TOOL_STATE.ADDING);
   }
 
   private handleAdding() {
@@ -127,59 +128,59 @@ export class WeaveEllipseToolAction extends WeaveAction {
     this.clickPoint = mousePoint;
     this.container = container;
 
-    this.ellipseId = uuidv4();
+    this.starId = uuidv4();
 
-    const nodeHandler =
-      this.instance.getNodeHandler<WeaveEllipseNode>('ellipse');
+    const nodeHandler = this.instance.getNodeHandler<WeaveEllipseNode>('star');
 
-    const node = nodeHandler.create(this.ellipseId, {
+    const node = nodeHandler.create(this.starId, {
       ...this.props,
       strokeScaleEnabled: false,
       x: this.clickPoint?.x ?? 0,
       y: this.clickPoint?.y ?? 0,
-      radiusX: 0,
-      radiusY: 0,
+      numPoints: 5,
+      innerRadius: 0,
+      outerRadius: 0,
     });
 
     this.instance.addNode(node, this.container?.getAttrs().id);
 
-    this.setState(ELLIPSE_TOOL_STATE.DEFINING_SIZE);
+    this.setState(STAR_TOOL_STATE.DEFINING_SIZE);
   }
 
   private handleSettingSize() {
-    const ellipse = this.instance.getStage().findOne(`#${this.ellipseId}`);
+    const star = this.instance.getStage().findOne(`#${this.starId}`);
 
-    if (this.ellipseId && this.clickPoint && this.container && ellipse) {
+    if (this.starId && this.clickPoint && this.container && star) {
       const { mousePoint } = this.instance.getMousePointerRelativeToContainer(
         this.container
       );
 
       const nodeHandler =
-        this.instance.getNodeHandler<WeaveEllipseNode>('ellipse');
+        this.instance.getNodeHandler<WeaveEllipseNode>('star');
 
-      const ellipsePos: Vector2d = {
+      const starPos: Vector2d = {
         x: this.clickPoint.x,
         y: this.clickPoint.y,
       };
-      let ellipseRadiusX = this.props.radiusY;
-      let ellipseRadiusY = this.props.radiusY;
+      let starOuterRadius = this.props.outerRadius;
+      let starInnerRadius = this.props.innerRadius;
       if (this.moved) {
-        ellipsePos.x = Math.min(this.clickPoint.x, mousePoint.x);
-        ellipsePos.y = Math.min(this.clickPoint.y, mousePoint.y);
-        ellipseRadiusX = Math.abs(this.clickPoint.x - mousePoint.x);
-        ellipseRadiusY = Math.abs(this.clickPoint.y - mousePoint.y);
+        starPos.x = Math.min(this.clickPoint.x, mousePoint.x);
+        starPos.y = Math.min(this.clickPoint.y, mousePoint.y);
+        starOuterRadius = Math.abs(this.clickPoint.x - mousePoint.x);
+        starInnerRadius = Math.abs(this.clickPoint.y - mousePoint.y);
       }
 
-      ellipse.setAttrs({
+      star.setAttrs({
         ...this.props,
-        x: ellipsePos.x + ellipseRadiusX / 2,
-        y: ellipsePos.y + ellipseRadiusY / 2,
-        radiusX: ellipseRadiusX,
-        radiusY: ellipseRadiusY,
+        x: starPos.x + starOuterRadius / 2,
+        y: starPos.y + starOuterRadius / 2,
+        outerRadius: starOuterRadius,
+        innerRadius: starInnerRadius,
       });
 
       this.instance.updateNode(
-        nodeHandler.serialize(ellipse as WeaveElementInstance)
+        nodeHandler.serialize(star as WeaveElementInstance)
       );
     }
 
@@ -187,13 +188,13 @@ export class WeaveEllipseToolAction extends WeaveAction {
   }
 
   private handleMovement() {
-    if (this.state !== ELLIPSE_TOOL_STATE.DEFINING_SIZE) {
+    if (this.state !== STAR_TOOL_STATE.DEFINING_SIZE) {
       return;
     }
 
-    const ellipse = this.instance.getStage().findOne(`#${this.ellipseId}`);
+    const star = this.instance.getStage().findOne(`#${this.starId}`);
 
-    if (this.ellipseId && this.container && this.clickPoint && ellipse) {
+    if (this.starId && this.container && this.clickPoint && star) {
       const { mousePoint } = this.instance.getMousePointerRelativeToContainer(
         this.container
       );
@@ -202,26 +203,26 @@ export class WeaveEllipseToolAction extends WeaveAction {
       const deltaY = Math.abs(mousePoint.y - this.clickPoint?.y);
 
       const nodeHandler =
-        this.instance.getNodeHandler<WeaveEllipseNode>('ellipse');
+        this.instance.getNodeHandler<WeaveEllipseNode>('star');
 
-      const ellipsePos: Vector2d = {
+      const starPos: Vector2d = {
         x: this.clickPoint.x,
         y: this.clickPoint.y,
       };
       if (this.moved) {
-        ellipsePos.x = Math.min(this.clickPoint.x, mousePoint.x);
-        ellipsePos.y = Math.min(this.clickPoint.y, mousePoint.y);
+        starPos.x = Math.min(this.clickPoint.x, mousePoint.x);
+        starPos.y = Math.min(this.clickPoint.y, mousePoint.y);
       }
 
-      ellipse.setAttrs({
-        x: ellipsePos.x + deltaX / 2,
-        y: ellipsePos.y + deltaY / 2,
-        radiusX: deltaX,
-        radiusY: deltaY,
+      star.setAttrs({
+        x: starPos.x + deltaX / 2,
+        y: starPos.y + deltaX / 2,
+        outerRadius: deltaX,
+        innerRadius: deltaY,
       });
 
       this.instance.updateNode(
-        nodeHandler.serialize(ellipse as WeaveElementInstance)
+        nodeHandler.serialize(star as WeaveElementInstance)
       );
     }
   }
@@ -248,7 +249,7 @@ export class WeaveEllipseToolAction extends WeaveAction {
     }
 
     this.props = this.initProps();
-    this.addEllipse();
+    this.addStar();
   }
 
   cleanup(): void {
@@ -259,18 +260,18 @@ export class WeaveEllipseToolAction extends WeaveAction {
     const selectionPlugin =
       this.instance.getPlugin<WeaveNodesSelectionPlugin>('nodesSelection');
     if (selectionPlugin) {
-      const node = stage.findOne(`#${this.ellipseId}`);
+      const node = stage.findOne(`#${this.starId}`);
       if (node) {
         selectionPlugin.setSelectedNodes([node]);
       }
       this.instance.triggerAction(SELECTION_TOOL_ACTION_NAME);
     }
 
-    this.ellipseId = null;
+    this.starId = null;
     this.creating = false;
     this.moved = false;
     this.container = undefined;
     this.clickPoint = null;
-    this.setState(ELLIPSE_TOOL_STATE.IDLE);
+    this.setState(STAR_TOOL_STATE.IDLE);
   }
 }
