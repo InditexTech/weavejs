@@ -15,6 +15,7 @@ import {
   WEAVE_STAGE_ZOOM_KEY,
 } from './constants';
 import type { Vector2d } from 'konva/lib/types';
+import { throttle } from 'lodash';
 
 export class WeaveStageZoomPlugin extends WeavePlugin {
   private isCtrlOrMetaPressed: boolean;
@@ -60,25 +61,23 @@ export class WeaveStageZoomPlugin extends WeavePlugin {
   onInit(): void {
     this.initEvents();
 
-    const minimumZoom = this.minimumZoom();
-    if (minimumZoom < this.config.zoomSteps[0]) {
-      this.updatedMinimumZoom = true;
-      this.config.zoomSteps = [minimumZoom, ...this.config.zoomSteps];
-    }
-
     const mainLayer = this.instance.getMainLayer();
-    mainLayer?.on('draw', () => {
+
+    const handleDraw = () => {
       const minimumZoom = this.minimumZoom();
       if (this.updatedMinimumZoom && minimumZoom < this.config.zoomSteps[0]) {
         this.updatedMinimumZoom = true;
-        this.config.zoomSteps.shift();
-        this.config.zoomSteps = [minimumZoom, ...this.config.zoomSteps];
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        const [_, ...restSteps] = this.config.zoomSteps;
+        this.config.zoomSteps = [minimumZoom, ...restSteps];
       }
       if (!this.updatedMinimumZoom && minimumZoom < this.config.zoomSteps[0]) {
         this.updatedMinimumZoom = true;
         this.config.zoomSteps = [minimumZoom, ...this.config.zoomSteps];
       }
-    });
+    };
+
+    mainLayer?.on('draw', throttle(handleDraw, 50));
 
     this.setZoom(this.config.zoomSteps[this.actualStep]);
   }
