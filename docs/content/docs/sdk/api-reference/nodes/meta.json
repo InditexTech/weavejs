@@ -8,6 +8,7 @@
     "frame",
     "rectangle",
     "ellipse",
+    "regular-polygon",
     "line",
     "text",
     "image",

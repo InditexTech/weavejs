@@ -135,8 +135,8 @@ export class WeaveStarToolAction extends WeaveAction {
     const node = nodeHandler.create(this.starId, {
       ...this.props,
       strokeScaleEnabled: true,
-      x: this.clickPoint?.x ?? 0,
-      y: this.clickPoint?.y ?? 0,
+      x: this.clickPoint?.x ?? 0 + this.props.outerRadius,
+      y: this.clickPoint?.y ?? 0 + this.props.outerRadius,
       numPoints: 5,
       innerRadius: 0,
       outerRadius: 0,
@@ -172,8 +172,8 @@ export class WeaveStarToolAction extends WeaveAction {
 
       star.setAttrs({
         ...this.props,
-        x: starPos.x + starOuterRadius / 2,
-        y: starPos.y + starOuterRadius / 2,
+        x: starPos.x + starOuterRadius,
+        y: starPos.y + starOuterRadius,
         outerRadius: starOuterRadius,
         innerRadius: starInnerRadius,
       });
@@ -213,8 +213,8 @@ export class WeaveStarToolAction extends WeaveAction {
       }
 
       star.setAttrs({
-        x: starPos.x + deltaX / 2,
-        y: starPos.y + deltaX / 2,
+        x: starPos.x + deltaX,
+        y: starPos.y + deltaX,
         outerRadius: deltaX,
         innerRadius: deltaY,
       });
