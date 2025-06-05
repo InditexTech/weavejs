@@ -8,7 +8,7 @@ import { InputNumber } from '../inputs/input-number';
 import { ToggleIconButton } from '../toggle-icon-button';
 import { Scaling } from 'lucide-react';
 
-export function RadiusProperties() {
+export function EllipseProperties() {
   const instance = useWeave((state) => state.instance);
   const node = useWeave((state) => state.selection.node);
   const actualAction = useWeave((state) => state.actions.actual);
@@ -53,9 +53,6 @@ export function RadiusProperties() {
   );
 
   React.useEffect(() => {
-    if (actualNode && actualNode.type === 'image') {
-      setMaintainAspectRatio(true);
-    }
     if (actualNode && typeof actualNode.props.keepAspectRatio !== 'undefined') {
       setMaintainAspectRatio(actualNode.props.keepAspectRatio);
     }
@@ -87,19 +84,18 @@ export function RadiusProperties() {
       <div className="w-full flex justify-between items-center gap-3">
         <div className="cursor-pointer hover:no-underline items-center py-0">
           <span className="text-[13px] font-inter font-light uppercase">
-            Diameter
+            Size
           </span>
         </div>
       </div>
       <div className="grid grid-cols-1 gap-3 w-full">
         <div className="grid grid-cols-2 gap-3 w-full">
           <InputNumber
-            label="Diameter X"
-            value={(actualNode.props.radiusX ?? 0.0) * 2.0}
-            disabled={actualNode.type === 'frame'}
+            label="Radius X"
+            value={actualNode.props.radiusX ?? 0.0}
             onChange={(value) => {
               let newRadiusX = value;
-              let newRadiusY = actualNode.props.radiusY * 2.0;
+              let newRadiusY = actualNode.props.radiusY;
               if (maintainAspectRatio) {
                 const ratio =
                   actualNode.props.radiusX / actualNode.props.radiusY;
@@ -112,8 +108,8 @@ export function RadiusProperties() {
                 ...actualNode,
                 props: {
                   ...actualNode.props,
-                  radiusX: newRadiusX / 2,
-                  radiusY: newRadiusY / 2,
+                  radiusX: newRadiusX,
+                  radiusY: newRadiusY,
                   keepAspectRatio: maintainAspectRatio,
                 },
               };
@@ -121,11 +117,10 @@ export function RadiusProperties() {
             }}
           />
           <InputNumber
-            label="Diameter Y"
-            value={(actualNode.props.radiusY ?? 0.0) * 2.0}
-            disabled={actualNode.type === 'frame'}
+            label="Radius Y"
+            value={actualNode.props.radiusY ?? 0.0}
             onChange={(value) => {
-              let newRadiusX = actualNode.props.radiusX * 2.0;
+              let newRadiusX = actualNode.props.radiusX;
               let newRadiusY = value;
               if (maintainAspectRatio) {
                 const ratio =
@@ -139,8 +134,8 @@ export function RadiusProperties() {
                 ...actualNode,
                 props: {
                   ...actualNode.props,
-                  radiusX: newRadiusX / 2,
-                  radiusY: newRadiusY / 2,
+                  radiusX: newRadiusX,
+                  radiusY: newRadiusY,
                   keepAspectRatio: maintainAspectRatio,
                 },
               };

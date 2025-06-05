@@ -71,7 +71,7 @@ export function SizeProperties() {
   if (
     actualAction &&
     ['selectionTool'].includes(actualAction) &&
-    ['ellipse'].includes(actualNode.type)
+    ['ellipse', 'star'].includes(actualNode.type)
   ) {
     return null;
   }
