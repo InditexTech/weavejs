@@ -1,0 +1,34 @@
+---
+title: WeaveStarToolAction
+description: Add a star to the canvas
+---
+
+import { TypeTable } from "fumadocs-ui/components/type-table";
+
+## Overview
+
+The [WeaveStarToolAction](https://github.com/InditexTech/weavejs/blob/main/code/packages/sdk/src/actions/star-tool/star-tool.ts)
+class that allows users to create star shapes on the canvas by clicking
+and dragging. It provides a smooth, intuitive way to add structured, resizable
+star elements .
+
+Each interaction results in the creation of a [WeaveStarNode](/docs/sdk/api-reference/nodes/star),
+added to the shared state and synchronized across all users.
+
+The class extends the [WeaveAction](/docs/sdk/api-reference/actions/action) class.
+
+## Name
+
+This action `name` property value is `starTool`.
+
+## Import
+
+```shell
+import { WeaveStarToolAction } from "@inditextech/weave-sdk";
+```
+
+## Instantiation
+
+```ts
+new WeaveStarToolAction();
+```
