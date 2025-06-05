@@ -15,7 +15,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
-- [#351](https://github.com/InditexTech/weavejs/issues/351) Fix zoom steps
+- [#351](https://github.com/InditexTech/weavejs/issues/351) Missing zoom steps
 
 ## [0.22.0] - 2025-06-05
 
