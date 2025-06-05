@@ -12,10 +12,27 @@ import { WEAVE_STAGE_NODE_TYPE } from './constants';
 
 export class WeaveStageNode extends WeaveNode {
   protected nodeType: string = WEAVE_STAGE_NODE_TYPE;
+  protected wheelMousePressed: boolean = false;
 
   onRender(props: WeaveElementAttributes): WeaveElementInstance {
     const stage = new Konva.Stage({
       ...props,
+    });
+
+    this.wheelMousePressed = false;
+
+    stage.isMouseWheelPressed = () => this.wheelMousePressed;
+
+    stage.on('mousedown', (e) => {
+      if (e.evt.button === 1) {
+        this.wheelMousePressed = true;
+      }
+    });
+
+    stage.on('mouseup', (e) => {
+      if (e.evt.button === 1) {
+        this.wheelMousePressed = false;
+      }
     });
 
     stage.batchDraw();

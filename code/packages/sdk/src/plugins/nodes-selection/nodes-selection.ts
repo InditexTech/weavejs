@@ -204,6 +204,13 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
     });
 
     tr.on('dragstart', (e) => {
+      const stage = this.instance.getStage();
+      if (stage.isMouseWheelPressed()) {
+        e.cancelBubble = true;
+        e.target.stopDrag();
+        return;
+      }
+
       const selectedNodes = tr.nodes();
       for (let i = 0; i < selectedNodes.length; i++) {
         const node = selectedNodes[i];
@@ -218,6 +225,13 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
     const handleDragMove = (
       e: KonvaEventObject<DragEvent, Konva.Transformer>
     ) => {
+      const stage = this.instance.getStage();
+      if (stage.isMouseWheelPressed()) {
+        e.cancelBubble = true;
+        e.target.stopDrag();
+        return;
+      }
+
       const selectedNodes = tr.nodes();
       for (let i = 0; i < selectedNodes.length; i++) {
         const node = selectedNodes[i];

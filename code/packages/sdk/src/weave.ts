@@ -25,7 +25,11 @@ import {
   type WeaveNodeConfiguration,
 } from '@inditextech/weave-types';
 import { WeaveStore } from './stores/store';
-import { setNodesDefaultConfiguration, WeaveNode } from './nodes/node';
+import {
+  setNodesDefaultConfiguration,
+  setStageDefaultConfiguration,
+  WeaveNode,
+} from './nodes/node';
 import { WeaveAction } from './actions/action';
 import { WeavePlugin } from './plugins/plugin';
 import { WeaveReconciler } from './reconciler/reconciler';
@@ -225,6 +229,10 @@ export class Weave extends Emittery {
 
   getConfiguration(): WeaveConfig {
     return this.config;
+  }
+
+  setStageDefaultConfiguration(): void {
+    setStageDefaultConfiguration();
   }
 
   setNodesDefaultConfiguration(config?: WeaveNodeConfiguration): void {

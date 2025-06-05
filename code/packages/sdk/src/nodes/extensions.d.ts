@@ -2,6 +2,7 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
+import 'konva';
 import 'konva/lib/Node';
 
 declare module 'konva/lib/Node' {
@@ -10,5 +11,11 @@ declare module 'konva/lib/Node' {
     resetCrop(): void;
     updatePosition(position: Vector2d): void;
     movedToContainer(container: Konva.Layer | Konva.Group): void;
+  }
+}
+
+declare module 'konva/lib/Stage' {
+  interface Stage {
+    isMouseWheelPressed(): boolean;
   }
 }

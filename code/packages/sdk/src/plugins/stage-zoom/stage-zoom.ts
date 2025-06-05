@@ -14,6 +14,7 @@ import {
   WEAVE_STAGE_ZOOM_DEFAULT_CONFIG,
   WEAVE_STAGE_ZOOM_KEY,
 } from './constants';
+import type { Vector2d } from 'konva/lib/types';
 
 export class WeaveStageZoomPlugin extends WeavePlugin {
   private isCtrlOrMetaPressed: boolean;
@@ -24,6 +25,7 @@ export class WeaveStageZoomPlugin extends WeavePlugin {
   private config!: WeaveStageZoomPluginConfig;
   private actualScale: number;
   private actualStep: number;
+  private updatedMinimumZoom: boolean;
   defaultStep: number = 3;
 
   constructor(params?: WeaveStageZoomPluginParams) {
@@ -43,6 +45,7 @@ export class WeaveStageZoomPlugin extends WeavePlugin {
     }
 
     this.isCtrlOrMetaPressed = false;
+    this.updatedMinimumZoom = false;
     this.actualStep = this.config.zoomSteps.findIndex(
       (step) => step === this.config.defaultZoom
     );
@@ -56,10 +59,31 @@ export class WeaveStageZoomPlugin extends WeavePlugin {
 
   onInit(): void {
     this.initEvents();
+
+    const minimumZoom = this.minimumZoom();
+    if (minimumZoom < this.config.zoomSteps[0]) {
+      this.updatedMinimumZoom = true;
+      this.config.zoomSteps = [minimumZoom, ...this.config.zoomSteps];
+    }
+
+    const mainLayer = this.instance.getMainLayer();
+    mainLayer?.on('draw', () => {
+      const minimumZoom = this.minimumZoom();
+      if (this.updatedMinimumZoom && minimumZoom < this.config.zoomSteps[0]) {
+        this.updatedMinimumZoom = true;
+        this.config.zoomSteps.shift();
+        this.config.zoomSteps = [minimumZoom, ...this.config.zoomSteps];
+      }
+      if (!this.updatedMinimumZoom && minimumZoom < this.config.zoomSteps[0]) {
+        this.updatedMinimumZoom = true;
+        this.config.zoomSteps = [minimumZoom, ...this.config.zoomSteps];
+      }
+    });
+
     this.setZoom(this.config.zoomSteps[this.actualStep]);
   }
 
-  private setZoom(scale: number, centered: boolean = true) {
+  private setZoom(scale: number, centered: boolean = true, pointer?: Vector2d) {
     const stage = this.instance.getStage();
 
     const mainLayer = this.instance.getMainLayer();
@@ -88,6 +112,20 @@ export class WeaveStageZoomPlugin extends WeavePlugin {
         const newPos = {
           x: stageCenter.x - relatedTo.x * scale,
           y: stageCenter.y - relatedTo.y * scale,
+        };
+
+        stage.position(newPos);
+      }
+
+      if (!centered && pointer) {
+        const mousePointTo = {
+          x: (pointer.x - stage.x()) / oldScale,
+          y: (pointer.y - stage.y()) / oldScale,
+        };
+
+        const newPos = {
+          x: pointer.x - mousePointTo.x * scale,
+          y: pointer.y - mousePointTo.y * scale,
         };
 
         stage.position(newPos);
@@ -128,7 +166,7 @@ export class WeaveStageZoomPlugin extends WeavePlugin {
       this.actualStep = this.findClosestStepIndex('zoomOut');
     }
 
-    return this.actualStep - 1 > 0;
+    return this.actualStep - 1 >= 0;
   }
 
   canZoomIn(): boolean {
@@ -171,7 +209,7 @@ export class WeaveStageZoomPlugin extends WeavePlugin {
     return this.config.zoomSteps.findIndex((scale) => scale === nextValue);
   }
 
-  zoomIn(): void {
+  zoomIn(pointer?: Vector2d): void {
     if (!this.enabled) {
       return;
     }
@@ -189,10 +227,14 @@ export class WeaveStageZoomPlugin extends WeavePlugin {
       this.actualStep += 1;
     }
 
-    this.setZoom(this.config.zoomSteps[this.actualStep]);
+    this.setZoom(
+      this.config.zoomSteps[this.actualStep],
+      pointer ? false : true,
+      pointer
+    );
   }
 
-  zoomOut(): void {
+  zoomOut(pointer?: Vector2d): void {
     if (!this.enabled) {
       return;
     }
@@ -204,13 +246,56 @@ export class WeaveStageZoomPlugin extends WeavePlugin {
     const actualZoomIsStep = this.config.zoomSteps.findIndex(
       (scale) => scale === this.actualScale
     );
+
     if (actualZoomIsStep === -1) {
       this.actualStep = this.findClosestStepIndex('zoomOut');
     } else {
       this.actualStep -= 1;
     }
 
-    this.setZoom(this.config.zoomSteps[this.actualStep]);
+    this.setZoom(
+      this.config.zoomSteps[this.actualStep],
+      pointer ? false : true,
+      pointer
+    );
+  }
+
+  minimumZoom(): number {
+    if (!this.enabled) {
+      return -1;
+    }
+
+    const mainLayer = this.instance.getMainLayer();
+
+    if (!mainLayer) {
+      return -1;
+    }
+
+    if (mainLayer.getChildren().length === 0) {
+      return this.config.zoomSteps[this.defaultStep];
+    }
+
+    const stage = this.instance.getStage();
+
+    const box = mainLayer.getClientRect({
+      relativeTo: stage,
+      skipStroke: true,
+    });
+    const stageBox = {
+      width: stage.width(),
+      height: stage.height(),
+    };
+
+    const availableScreenWidth =
+      stageBox.width - 2 * this.config.fitToScreen.padding;
+    const availableScreenHeight =
+      stageBox.height - 2 * this.config.fitToScreen.padding;
+
+    const scaleX = availableScreenWidth / box.width;
+    const scaleY = availableScreenHeight / box.height;
+    const scale = Math.min(scaleX, scaleY);
+
+    return scale;
   }
 
   fitToScreen(): void {
@@ -220,6 +305,10 @@ export class WeaveStageZoomPlugin extends WeavePlugin {
 
     const mainLayer = this.instance.getMainLayer();
 
+    if (!mainLayer) {
+      return;
+    }
+
     if (mainLayer?.getChildren().length === 0) {
       this.setZoom(this.config.zoomSteps[this.defaultStep]);
       return;
@@ -227,40 +316,38 @@ export class WeaveStageZoomPlugin extends WeavePlugin {
 
     const stage = this.instance.getStage();
 
-    if (mainLayer) {
-      const box = mainLayer.getClientRect({
-        relativeTo: stage,
-        skipStroke: true,
-      });
-      const stageBox = {
-        width: stage.width(),
-        height: stage.height(),
-      };
+    const box = mainLayer.getClientRect({
+      relativeTo: stage,
+      skipStroke: true,
+    });
+    const stageBox = {
+      width: stage.width(),
+      height: stage.height(),
+    };
 
-      const availableScreenWidth =
-        stageBox.width - 2 * this.config.fitToScreen.padding;
-      const availableScreenHeight =
-        stageBox.height - 2 * this.config.fitToScreen.padding;
+    const availableScreenWidth =
+      stageBox.width - 2 * this.config.fitToScreen.padding;
+    const availableScreenHeight =
+      stageBox.height - 2 * this.config.fitToScreen.padding;
 
-      const scaleX = availableScreenWidth / box.width;
-      const scaleY = availableScreenHeight / box.height;
-      const scale = Math.min(scaleX, scaleY);
+    const scaleX = availableScreenWidth / box.width;
+    const scaleY = availableScreenHeight / box.height;
+    const scale = Math.min(scaleX, scaleY);
 
-      stage.scale({ x: scale, y: scale });
+    stage.scale({ x: scale, y: scale });
 
-      const selectionCenterX = box.x + box.width / 2;
-      const selectionCenterY = box.y + box.height / 2;
+    const selectionCenterX = box.x + box.width / 2;
+    const selectionCenterY = box.y + box.height / 2;
 
-      const canvasCenterX = stage.width() / (2 * scale);
-      const canvasCenterY = stage.height() / (2 * scale);
+    const canvasCenterX = stage.width() / (2 * scale);
+    const canvasCenterY = stage.height() / (2 * scale);
 
-      const stageX = (canvasCenterX - selectionCenterX) * scale;
-      const stageY = (canvasCenterY - selectionCenterY) * scale;
+    const stageX = (canvasCenterX - selectionCenterX) * scale;
+    const stageY = (canvasCenterY - selectionCenterY) * scale;
 
-      stage.position({ x: stageX, y: stageY });
+    stage.position({ x: stageX, y: stageY });
 
-      this.setZoom(scale, false);
-    }
+    this.setZoom(scale, false);
   }
 
   fitToSelection(): void {
@@ -363,12 +450,19 @@ export class WeaveStageZoomPlugin extends WeavePlugin {
         return;
       }
 
+      const stage = this.instance.getStage();
+      const pointer = stage.getPointerPosition();
+
+      if (!pointer) {
+        return;
+      }
+
       if (e.deltaY > 0) {
-        this.zoomOut();
+        this.zoomOut(pointer);
       }
 
       if (e.deltaY < 0) {
-        this.zoomIn();
+        this.zoomIn(pointer);
       }
     });
   }
