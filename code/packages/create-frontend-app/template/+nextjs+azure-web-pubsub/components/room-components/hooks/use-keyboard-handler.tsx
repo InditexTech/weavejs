@@ -98,6 +98,14 @@ export function useKeyboardHandler() {
   }, ['KeyR']);
 
   useKeyDown(() => {
+    triggerTool('ellipseTool');
+  }, ['KeyE']);
+
+  useKeyDown(() => {
+    triggerTool('regularPolygonTool');
+  }, ['KeyP']);
+
+  useKeyDown(() => {
     triggerTool('penTool');
   }, ['KeyL']);
 
@@ -118,6 +126,14 @@ export function useKeyboardHandler() {
     (e) => !(e.ctrlKey || e.metaKey)
   );
 
+  useKeyDown(() => {
+    triggerTool('starTool');
+  }, ['KeyJ']);
+
+  useKeyDown(() => {
+    triggerTool('arrowTool');
+  }, ['KeyA']);
+
   useKeyDown(
     () => {
       triggerTool('colorTokenTool');
@@ -133,10 +149,8 @@ export function useKeyboardHandler() {
         actualStore.undoStateStep();
       }
     },
-    ['Comma'],
-    (e) =>
-      e.shiftKey &&
-      ([SYSTEM_OS.MAC as string].includes(os) ? e.metaKey : e.ctrlKey)
+    ['KeyZ'],
+    (e) => ([SYSTEM_OS.MAC as string].includes(os) ? e.metaKey : e.ctrlKey)
   );
 
   useKeyDown(
@@ -146,10 +160,8 @@ export function useKeyboardHandler() {
         actualStore.redoStateStep();
       }
     },
-    ['Period'],
-    (e) =>
-      e.shiftKey &&
-      ([SYSTEM_OS.MAC as string].includes(os) ? e.metaKey : e.ctrlKey)
+    ['KeyY'],
+    (e) => ([SYSTEM_OS.MAC as string].includes(os) ? e.metaKey : e.ctrlKey)
   );
 
   /* Keyboard shortcuts visibility */

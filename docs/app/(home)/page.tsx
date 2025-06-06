@@ -57,7 +57,12 @@ function Hero() {
         >
           Open the Demo
         </LinkButton>
-        <LinkButton href="/docs/main/quickstart" variant="default" style="main">
+        <LinkButton
+          href="/docs/main/quickstart"
+          external
+          variant="default"
+          style="main"
+        >
           Getting started
         </LinkButton>
       </div>
@@ -125,6 +130,7 @@ function GetStarted() {
             <div className="h-[50px] flex justify-start items-end">
               <LinkButton
                 href="/docs/main/quickstart"
+                external
                 variant="default"
                 style="main"
               >
@@ -285,7 +291,7 @@ function End() {
           your own collaborative canvas in minutes.
         </div>
         <div className="text-center flex gap-[12px] justify-center items-center">
-          <LinkButton href="/docs/main/quickstart" variant="outline">
+          <LinkButton href="/docs/main/quickstart" external variant="outline">
             Go to Quickstart
           </LinkButton>
         </div>

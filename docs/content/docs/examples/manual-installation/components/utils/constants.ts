@@ -40,7 +40,7 @@ const NODES = [
 const ACTIONS = [
   new WeaveMoveToolAction(),
   new WeaveSelectionToolAction(),
-  new WeaveRectangleToolAction({}),
+  new WeaveRectangleToolAction(),
   new WeaveZoomOutToolAction(),
   new WeaveZoomInToolAction(),
   new WeaveFitToScreenToolAction(),

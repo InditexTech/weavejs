@@ -44,6 +44,8 @@ export const ConnectedUsers = () => {
     };
   }, [user, connectedUsers]);
 
+  console.log({ connectedUsers });
+
   if (Object.keys(connectedUsers).length === 0) {
     return null;
   }

@@ -134,3 +134,9 @@
     --fd-padding: 0px;
   }
 }
+
+h4 {
+  color: rgb(115, 115, 115) !important;
+  font-size: 18px !important;
+  margin-bottom: 1rem !important;
+}

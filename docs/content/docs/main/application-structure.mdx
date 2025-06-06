@@ -9,7 +9,8 @@ A standard **Weave.js** project follows a frontend-backend architecture designed
 
 <Callout title="In production..." type="warn">
   For production, we recommend deploying the frontend and backend separately.
-  However, they can also run together in a single project, as shown in the  [Manual installation](/docs/main/manual-installation) guide using Next.js.
+  However, they can also run together in a single project, as shown in the
+  [Manual installation](/docs/main/manual-installation) guide using Next.js.
 </Callout>
 
 ## Frontend artifact
@@ -18,7 +19,8 @@ The frontend is usually built with a modern web framework like React or Vue.
 Weave.js provides an SDK and optional integration libraries, like our React helper library, to facilitate the creation of collaborative visual interfaces.
 
 <Callout title="Example" type="note">
-See the [weavejs-frontend](https://github.com/InditexTech/weavejs-frontend) repository for a reference implementation.
+  See the [weavejs-frontend](https://github.com/InditexTech/weavejs-frontend)
+  repository for a reference implementation.
 </Callout>
 
 On the frontend, Weave.js handles:
@@ -29,26 +31,27 @@ On the frontend, Weave.js handles:
 
 Weave.js exposes a set of core abstractions to simplify and standardize development:
 
-* [Nodes](/docs/main/build/nodes):  Core building blocks of the collaborative interface: lines, rectangles, text, images, frames... Use the provided ones or build your own.
+- [Nodes](/docs/main/build/nodes): Core building blocks of the collaborative interface: lines, rectangles, text, images, frames... Use the provided ones or build your own.
 
-* [Plugins](/docs/main/build/plugins): Extend and enhance the functionality of Weave.js. 
+- [Plugins](/docs/main/build/plugins): Extend and enhance the functionality of Weave.js.
 
-* [Actions](/docs/main/build/actions): Handle user interactions and user-driven changes. 
+- [Actions](/docs/main/build/actions): Handle user interactions and user-driven changes.
 
 ## Backend artifact
 
-The backend is usually built using Node.js on top of a server framework like Express, Koa, etc. 
-Weave.js provides the [Store](/docs/main/build/store) abstraction to manage the shared application state and enable collaborative editing.
+The backend is usually built using Node.js on top of a server framework like Express, Koa, etc.
+Weave.js provides the [Stores](/docs/main/build/stores) abstraction to manage the shared application state and enable collaborative editing.
 
 <Callout title="Example" type="note">
-See the [weavejs-backend](https://github.com/InditexTech/weavejs-backend) repository for a reference implementation.
+  See the [weavejs-backend](https://github.com/InditexTech/weavejs-backend)
+  repository for a reference implementation.
 </Callout>
 
 On the backend, Weave.js handles:
 
-* **State persistence and retrieval:** [Stores](/docs/main/build/stores) exposes an API for loading and saving shared state, enabling custom storage backends such as a file system, blob storage, or a cloud service.
+- **State persistence and retrieval:** [Stores](/docs/main/build/stores) exposes an API for loading and saving shared state, enabling custom storage backends such as a file system, blob storage, or a cloud service.
   In the reference implementation, shared state binary files are persisted and retrieved using [Azure Blob Storage](https://azure.microsoft.com/en-us/products/storage/blobs).
 
-* **Real-time state transport**: Stores also handle real-time synchronization of the shared state across clients. Weave.js includes built-in support for WebSockets and Azure Web PubSub, and also lets you implement custom stores with your own transport layer (e.g. AWS AppSync).
+- **Real-time state transport**: Stores also handle real-time synchronization of the shared state across clients. Weave.js includes built-in support for WebSockets and Azure Web PubSub, and also lets you implement custom stores with your own transport layer (e.g. AWS AppSync).
 
-* **Awareness events (optional)**: Weave.js supports optional awareness events—such as user join/leave events or cursor position—using Yjs's [awareness](https://docs.yjs.dev/getting-started/adding-awareness) mechanism. This ephemeral data is shared only between active clients (not persisted) and is supported out of the box by all built-in stores. Awareness can enhance collaboration but should be used thoughtfully to avoid distractions.
+- **Awareness events (optional)**: Weave.js supports optional awareness events—such as user join/leave events or cursor position—using Yjs's [awareness](https://docs.yjs.dev/getting-started/adding-awareness) mechanism. This ephemeral data is shared only between active clients (not persisted) and is supported out of the box by all built-in stores. Awareness can enhance collaboration but should be used thoughtfully to avoid distractions.

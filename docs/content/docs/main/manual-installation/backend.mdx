@@ -3,17 +3,17 @@ title: Set up the backend
 description: Learn how to set up the backend of a Weave.js app on Next.js
 ---
 
-In this guide, you will learn how to set up the backend infrastructure for a collaborative application using Weave.js. 
+In this guide, you will learn how to set up the backend infrastructure for a collaborative application using Weave.js.
 
 To make the backend functional, we need to set up a Next.js
 [custom server](https://nextjs.org/docs/14/pages/building-your-application/configuring/custom-server)
-to later integrate Weave.js Websockets store. 
+to later integrate Weave.js Websockets store.
 
 The store will handle the shared-state management, client networking, persistence, and awareness events.
 
 ## Prerequisites
 
-Before you begin, ensure that you have completed the [manual installation](/docs/main/manual-installation) guide up to the *"Set up the backend project"* step.
+Before you begin, ensure that you have completed the [manual installation](/docs/main/manual-installation) guide up to the _"Set up the backend project"_ step.
 
 ## Step by step
 
@@ -25,7 +25,7 @@ To set up Weave.js backend over our Next.js project (on a single artifact), foll
  
 ### Install the Weave.js backend dependencies
 
-First, let's install the **Weave.js** websocket store dependencies. 
+First, let's install the **Weave.js** websocket store dependencies.
 
 On your root project folder, execute the following command:
 
@@ -39,7 +39,7 @@ npm install ws @inditextech/weave-store-websockets
  
 ### Set up the Next.js custom server
 
-To have a frontend and backend on the same artifact on top of Next.js we need to implement 
+To have a frontend and backend on the same artifact on top of Next.js we need to implement
 a [custom server](https://nextjs.org/docs/14/pages/building-your-application/configuring/custom-server)
 on Next.js, and later on, include the necessary Weave.js backend logic.
 
@@ -47,7 +47,10 @@ on Next.js, and later on, include the necessary Weave.js backend logic.
   For production environments, you should consider using a separate backend server to handle the Weave.js backend logic.
 
 For more details, refer to the [backend showcase implementation](https://github.com/InditexTech/weavejs-backend).
+
 </Callout>
+
+---
 
 #### Dependencies installation
 
@@ -65,10 +68,14 @@ npm install cross-env express
 npm install -D ts-node nodemon @types/express
 ```
 
+---
+
 #### TypeScript configuration
 
 <Callout title="Nodemon" type="note">
-This section uses [nodemon](https://www.npmjs.com/package/nodemon), a tool that helps to automatically start the underlying Node.js application when a file changes.
+  This section uses [nodemon](https://www.npmjs.com/package/nodemon), a tool
+  that helps to automatically start the underlying Node.js application when a
+  file changes.
 </Callout>
 
 Then, set up the TypeScript configuration for the server part:
@@ -85,10 +92,25 @@ Then, set up the TypeScript configuration for the server part:
     ../../examples/manual-installation/nodemon.json
   </include>
 
+---
+
+#### Next.js configuration
+
+Then, set up the Next.js configuration:
+
+- Create a `next.config.mjs` file on the root of your project with the following content:
+
+  <include lang="json" meta='title="next.config.mjs"'>
+    ../../examples/manual-installation/next.config.mjs
+  </include>
+
+---
+
 #### Custom server logic
 
 <Callout title="Express" type="note">
-  This section uses [Express](https://expressjs.com), a web framework for Node.js, as the underlying server for the custom server.
+  This section uses [Express](https://expressjs.com), a web framework for
+  Node.js, as the underlying server for the custom server.
 </Callout>
 
 Define the custom server logic by creating a file named `server.ts` on the root of your project with the following content:
@@ -96,6 +118,8 @@ Define the custom server logic by creating a file named `server.ts` on the root 
 <include lang="ts" meta='title="server.ts"'>
   ../../examples/manual-installation/server.ts
 </include>
+
+---
 
 #### Custom server tooling
 
@@ -120,7 +144,7 @@ Change the scripts definitions with the following content:
 }
 ```
 
-Finally, test that the Next.js project keeps starting with the new custom server configuration. 
+Finally, test that the Next.js project keeps starting with the new custom server configuration.
 
 On the project root folder, run the following command:
 
@@ -138,12 +162,14 @@ You should still see the Next.js default application running and the console sho
 ### Integrate Weave.js into the backend
 
 Now that the Next.js custom server is completely set up, let's add the necessary Weave.js backend logic.
-For that, we will use the [Websockets store](/docs/main/build/stores/websockets-store) library: (`@inditextech/weave-store-websockets`). 
+For that, we will use the [Websockets store](/docs/main/build/stores/websockets-store) library: (`@inditextech/weave-store-websockets`).
 
 We need to:
 
 - Define how to handle the persistence of the shared-state.
 - Instantiate the [WeaveWebsocketsServer](/docs/store-websockets/api-reference/server/weave-websockets-server) class from the library `@inditextech/weave-store-websockets` and configure it.
+
+---
 
 #### Set up the shared-state persistence handlers
 
@@ -162,12 +188,14 @@ File explanation:
 - **`(2)`**: `fetchRoom` function fetches a previously saved shared-state of a room by its ID from the file system.
 - **`(3)`**: `persistRoom` function persist the shared-state of a room by its ID onto the file system.
 
+---
+
 #### Set up the Weave.js Websockets store
 
 Finally, set up the Weave.js store handler.
 In this case, we use the Websockets transport.
 
-On the custom server file `server.ts`, add the necessary logic to use the `@inditextech/weave-store-websockets` store handler. 
+On the custom server file `server.ts`, add the necessary logic to use the `@inditextech/weave-store-websockets` store handler.
 
 You can replace the contents of `server.ts` with this content:
 
@@ -207,6 +235,7 @@ npm run dev
 Navigate to `http://localhost:3000` on a browser.
 
 You should still see the Next.js default application running and the console should have no errors at all.
+
 </div>
 
 </div>

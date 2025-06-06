@@ -97,11 +97,13 @@ Follow these steps:
 ### Define the page React hooks
 
 Let's define the hooks with the logic for the **Room** page.
-This way, we separate the component logic from the UI logic. 
+This way, we separate the component logic from the UI logic.
 
 To start, create a `hooks` folder on the root directory.
 
-##### useHandleRouteParams hook
+---
+
+#### useHandleRouteParams hook
 
 On the `hooks` folder, create a file named `use-handle-route-params.ts` with
 the following content:
@@ -109,6 +111,11 @@ the following content:
 <include lang="tsx" meta='title="hooks/use-handle-route-params.ts"'>
   ../../../examples/manual-installation/hooks/use-handle-route-params.ts
 </include>
+
+This hook helps us handling the route params with Next.js to extract the roomId where
+we want to connect to.
+
+---
 
 #### useGetWebsocketsStore hook
 
@@ -119,14 +126,9 @@ content:
   ../../../examples/manual-installation/hooks/use-get-websockets-store.ts
 </include>
 
-#### useGetWeaveJsProps
+This hook is a helper to setup the Websocket Store of Weave.js.
 
-On the `hooks` folder, create a file named `use-get-weave-js-props.ts` with the following
-content:
-
-<include lang="tsx" meta='title="hooks/use-get-weave-js-props.ts"'>
-  ../../../examples/manual-installation/hooks/use-get-weave-js-props.ts
-</include>
+---
 
 #### useContextMenu
 
@@ -149,7 +151,9 @@ Set up the following directories to organize our components:
 - On the `components` folder, create an `overlays` folder.
 - On the `components` folder, create a `context-menu` folder.
 
-#### Room component
+---
+
+#### Room
 
 On the `components/room` folder, create a file named `room.tsx` with the following content:
 
@@ -157,7 +161,9 @@ On the `components/room` folder, create a file named `room.tsx` with the followi
   ../../../examples/manual-installation/components/room/room.tsx
 </include>
 
-#### RoomLayout component
+---
+
+#### RoomLayout
 
 On the `components/room` folder, create a file named `room.layout.tsx` with the following content:
 
@@ -165,13 +171,17 @@ On the `components/room` folder, create a file named `room.layout.tsx` with the 
   ../../../examples/manual-installation/components/room/room.layout.tsx
 </include>
 
+---
+
 #### RoomLoader
 
-On the `components/room` folder, create a file named `room-loader.tsx` with the following content:
+On the `components/room` folder, create a file named `room.loader.tsx` with the following content:
 
-<include lang="tsx" meta='title="components/room/room-loader.tsx"'>
-  ../../../examples/manual-installation/components/room/room-loader.tsx
+<include lang="tsx" meta='title="components/room/room.loader.tsx"'>
+  ../../../examples/manual-installation/components/room/room.loader.tsx
 </include>
+
+---
 
 #### ConnectedUsers
 
@@ -181,6 +191,8 @@ On the `components/overlays` folder, create a file named `connected-users.tsx` w
   ../../../examples/manual-installation/components/overlays/connected-users.tsx
 </include>
 
+---
+
 #### ConnectionStatus
 
 On the `components/overlays` folder, create a file named `connection-status.tsx` with the following content:
@@ -188,6 +200,8 @@ On the `components/overlays` folder, create a file named `connection-status.tsx`
 <include lang="tsx" meta='title="components/overlays/connection-status.tsx"'>
   ../../../examples/manual-installation/components/overlays/connection-status.tsx
 </include>
+
+---
 
 #### RoomInformationOverlay
 
@@ -200,6 +214,8 @@ On the `components/overlays` folder, create a file named `room-information-overl
   ../../../examples/manual-installation/components/overlays/room-information-overlay.tsx
 </include>
 
+---
+
 #### RoomUsersOverlay
 
 On the `components/overlays` folder, create a file named `room-users-overlay.tsx` with the following content:
@@ -207,6 +223,8 @@ On the `components/overlays` folder, create a file named `room-users-overlay.tsx
 <include lang="tsx" meta='title="components/overlays/room-users-overlay.tsx"'>
   ../../../examples/manual-installation/components/overlays/room-users-overlay.tsx
 </include>
+
+---
 
 #### ToolbarButton
 
@@ -216,6 +234,8 @@ On the `components/overlays` folder, create a file named `toolbar-button.tsx` wi
   ../../../examples/manual-installation/components/overlays/toolbar-button.tsx
 </include>
 
+---
+
 #### Toolbar
 
 On the `components/overlays` folder, create a file named `toolbar.tsx` with the following content:
@@ -223,6 +243,8 @@ On the `components/overlays` folder, create a file named `toolbar.tsx` with the 
 <include lang="tsx" meta='title="components/overlays/toolbar.tsx"'>
   ../../../examples/manual-installation/components/overlays/toolbar.tsx
 </include>
+
+---
 
 #### ToolsOverlay
 
@@ -232,6 +254,8 @@ On the `components/overlays` folder, create a file named `tools-overlay.tsx` wit
   ../../../examples/manual-installation/components/overlays/tools-overlay.tsx
 </include>
 
+---
+
 #### ZoomHandlerOverlay
 
 On the `components/overlays` folder, create a file named `zoom-handler-overlay.tsx` with the following content:
@@ -239,6 +263,8 @@ On the `components/overlays` folder, create a file named `zoom-handler-overlay.t
 <include lang="tsx" meta='title="components/overlays/zoom-handler-overlay.tsx"'>
   ../../../examples/manual-installation/components/overlays/zoom-handler-overlay.tsx
 </include>
+
+---
 
 #### ContextMenu
 

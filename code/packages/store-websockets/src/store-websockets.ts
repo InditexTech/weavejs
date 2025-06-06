@@ -81,7 +81,7 @@ export class WeaveStoreWebsockets extends WeaveStore {
     awareness.off('update', this.handleAwarenessChange.bind(this));
     awareness.off('change', this.handleAwarenessChange.bind(this));
 
-    this.provider.connect();
+    this.provider.disconnect();
   }
 
   handleAwarenessChange(emit: boolean = true): void {
