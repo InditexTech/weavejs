@@ -1,0 +1,45 @@
+---
+title: Regular Polygon
+description: Draw a regular polygon on the canvas
+---
+
+import { Accordion, Accordions } from "fumadocs-ui/components/accordion";
+
+The Regular Polygon node is a simple, versatile primitive shape used to render star
+elements on the canvas. Built on top of Konva’s [RegularPolygon](https://konvajs.org/api/Konva.RegularPolygon.html),
+it supports customizable properties such as amount of sides, position, radius, fill color, stroke, radius (on both axis),
+and more.
+
+They can also respond to interactions like dragging, resizing,
+or selection.
+
+## Usage
+
+<Accordions className="bg-transparent">
+  <Accordion title="1. Import the node" id="import-node">
+    Start by importing the action with the following import:
+
+    ```ts
+    import { WeaveRegularPolygonNode } from "@inditextech/weave-sdk";
+    ```
+
+  </Accordion>
+  <Accordion title="2. Register the node" id="register-node">
+    Then register the node on the Weave class instance.
+
+    ```ts
+    const instance = new Weave({
+      ...
+      nodes: [
+        ...,
+        new WeaveRegularPolygonNode(), // [!code ++]
+      ]
+    })
+    ```
+
+  </Accordion>
+  <Accordion title="3. Use the node" id="use-the-node">
+    TODO
+
+  </Accordion>
+</Accordions>

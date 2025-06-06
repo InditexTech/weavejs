@@ -7,16 +7,19 @@ import Konva from 'konva';
 import { type Vector2d } from 'konva/lib/types';
 import { type WeaveElementInstance } from '@inditextech/weave-types';
 import { WeaveAction } from '@/actions/action';
-import { type WeaveEllipseToolActionState } from './types';
-import { ELLIPSE_TOOL_ACTION_NAME, ELLIPSE_TOOL_STATE } from './constants';
+import { type WeaveRegularPolygonToolActionState } from './types';
+import {
+  REGULAR_POLYGON_TOOL_ACTION_NAME,
+  REGULAR_POLYGON_TOOL_STATE,
+} from './constants';
 import { WeaveNodesSelectionPlugin } from '@/plugins/nodes-selection/nodes-selection';
 import { SELECTION_TOOL_ACTION_NAME } from '../selection-tool/constants';
-import type { WeaveEllipseNode } from '@/nodes/ellipse/ellipse';
+import type { WeaveRegularPolygonNode } from '@/nodes/regular-polygon/regular-polygon';
 
-export class WeaveEllipseToolAction extends WeaveAction {
+export class WeaveRegularPolygonToolAction extends WeaveAction {
   protected initialized: boolean = false;
-  protected state: WeaveEllipseToolActionState;
-  protected ellipseId: string | null;
+  protected state: WeaveRegularPolygonToolActionState;
+  protected regularPolygonId: string | null;
   protected creating: boolean;
   protected moved: boolean;
   protected clickPoint: Vector2d | null;
@@ -29,8 +32,8 @@ export class WeaveEllipseToolAction extends WeaveAction {
     super();
 
     this.initialized = false;
-    this.state = ELLIPSE_TOOL_STATE.IDLE;
-    this.ellipseId = null;
+    this.state = REGULAR_POLYGON_TOOL_STATE.IDLE;
+    this.regularPolygonId = null;
     this.creating = false;
     this.moved = false;
     this.container = undefined;
@@ -39,7 +42,7 @@ export class WeaveEllipseToolAction extends WeaveAction {
   }
 
   getName(): string {
-    return ELLIPSE_TOOL_ACTION_NAME;
+    return REGULAR_POLYGON_TOOL_ACTION_NAME;
   }
 
   initProps() {
@@ -48,9 +51,8 @@ export class WeaveEllipseToolAction extends WeaveAction {
       fill: '#71717aff',
       stroke: '#000000ff',
       strokeWidth: 1,
-      radiusX: 50,
-      radiusY: 50,
-      keepAspectRatio: false,
+      sides: 5,
+      radius: 50,
     };
   }
 
@@ -60,14 +62,14 @@ export class WeaveEllipseToolAction extends WeaveAction {
     stage.container().addEventListener('keydown', (e) => {
       if (
         e.key === 'Enter' &&
-        this.instance.getActiveAction() === ELLIPSE_TOOL_ACTION_NAME
+        this.instance.getActiveAction() === REGULAR_POLYGON_TOOL_ACTION_NAME
       ) {
         this.cancelAction();
         return;
       }
       if (
         e.key === 'Escape' &&
-        this.instance.getActiveAction() === ELLIPSE_TOOL_ACTION_NAME
+        this.instance.getActiveAction() === REGULAR_POLYGON_TOOL_ACTION_NAME
       ) {
         this.cancelAction();
         return;
@@ -77,7 +79,7 @@ export class WeaveEllipseToolAction extends WeaveAction {
     stage.on('mousedown touchstart', (e) => {
       e.evt.preventDefault();
 
-      if (this.state === ELLIPSE_TOOL_STATE.ADDING) {
+      if (this.state === REGULAR_POLYGON_TOOL_STATE.ADDING) {
         this.creating = true;
 
         this.handleAdding();
@@ -87,7 +89,7 @@ export class WeaveEllipseToolAction extends WeaveAction {
     stage.on('mousemove touchmove', (e) => {
       e.evt.preventDefault();
 
-      if (this.state === ELLIPSE_TOOL_STATE.DEFINING_SIZE) {
+      if (this.state === REGULAR_POLYGON_TOOL_STATE.DEFINING_SIZE) {
         this.moved = true;
 
         this.handleMovement();
@@ -97,7 +99,7 @@ export class WeaveEllipseToolAction extends WeaveAction {
     stage.on('mouseup touchend', (e) => {
       e.evt.preventDefault();
 
-      if (this.state === ELLIPSE_TOOL_STATE.DEFINING_SIZE) {
+      if (this.state === REGULAR_POLYGON_TOOL_STATE.DEFINING_SIZE) {
         this.creating = false;
 
         this.handleSettingSize();
@@ -107,18 +109,18 @@ export class WeaveEllipseToolAction extends WeaveAction {
     this.initialized = true;
   }
 
-  private setState(state: WeaveEllipseToolActionState) {
+  private setState(state: WeaveRegularPolygonToolActionState) {
     this.state = state;
   }
 
-  private addEllipse() {
+  private addRegularPolygon() {
     const stage = this.instance.getStage();
 
     stage.container().style.cursor = 'crosshair';
     stage.container().focus();
 
     this.clickPoint = null;
-    this.setState(ELLIPSE_TOOL_STATE.ADDING);
+    this.setState(REGULAR_POLYGON_TOOL_STATE.ADDING);
   }
 
   private handleAdding() {
@@ -127,59 +129,64 @@ export class WeaveEllipseToolAction extends WeaveAction {
     this.clickPoint = mousePoint;
     this.container = container;
 
-    this.ellipseId = uuidv4();
+    this.regularPolygonId = uuidv4();
 
     const nodeHandler =
-      this.instance.getNodeHandler<WeaveEllipseNode>('ellipse');
+      this.instance.getNodeHandler<WeaveRegularPolygonNode>('regular-polygon');
 
-    const node = nodeHandler.create(this.ellipseId, {
+    const node = nodeHandler.create(this.regularPolygonId, {
       ...this.props,
       strokeScaleEnabled: true,
-      x: this.clickPoint?.x ?? 0 + this.props.radiusX,
-      y: this.clickPoint?.y ?? 0 + this.props.radiusY,
-      radiusX: 0,
-      radiusY: 0,
+      x: (this.clickPoint?.x ?? 0) + this.props.radius,
+      y: (this.clickPoint?.y ?? 0) + this.props.radius,
+      radius: 0,
     });
 
     this.instance.addNode(node, this.container?.getAttrs().id);
 
-    this.setState(ELLIPSE_TOOL_STATE.DEFINING_SIZE);
+    this.setState(REGULAR_POLYGON_TOOL_STATE.DEFINING_SIZE);
   }
 
   private handleSettingSize() {
-    const ellipse = this.instance.getStage().findOne(`#${this.ellipseId}`);
+    const regularPolygon = this.instance
+      .getStage()
+      .findOne(`#${this.regularPolygonId}`);
 
-    if (this.ellipseId && this.clickPoint && this.container && ellipse) {
+    if (
+      this.regularPolygonId &&
+      this.clickPoint &&
+      this.container &&
+      regularPolygon
+    ) {
       const { mousePoint } = this.instance.getMousePointerRelativeToContainer(
         this.container
       );
 
       const nodeHandler =
-        this.instance.getNodeHandler<WeaveEllipseNode>('ellipse');
+        this.instance.getNodeHandler<WeaveRegularPolygonNode>(
+          'regular-polygon'
+        );
 
-      const ellipsePos: Vector2d = {
+      const starPos: Vector2d = {
         x: this.clickPoint.x,
         y: this.clickPoint.y,
       };
-      let ellipseRadiusX = this.props.radiusY;
-      let ellipseRadiusY = this.props.radiusY;
+      let newRadius = this.props.radius;
       if (this.moved) {
-        ellipsePos.x = Math.min(this.clickPoint.x, mousePoint.x);
-        ellipsePos.y = Math.min(this.clickPoint.y, mousePoint.y);
-        ellipseRadiusX = Math.abs(this.clickPoint.x - mousePoint.x);
-        ellipseRadiusY = Math.abs(this.clickPoint.y - mousePoint.y);
+        starPos.x = Math.min(this.clickPoint.x, mousePoint.x);
+        starPos.y = Math.min(this.clickPoint.y, mousePoint.y);
+        newRadius = Math.abs(this.clickPoint.x - mousePoint.x);
       }
 
-      ellipse.setAttrs({
+      regularPolygon.setAttrs({
         ...this.props,
-        x: ellipsePos.x + ellipseRadiusX,
-        y: ellipsePos.y + ellipseRadiusY,
-        radiusX: ellipseRadiusX,
-        radiusY: ellipseRadiusY,
+        x: starPos.x + newRadius,
+        y: starPos.y + newRadius,
+        radius: newRadius,
       });
 
       this.instance.updateNode(
-        nodeHandler.serialize(ellipse as WeaveElementInstance)
+        nodeHandler.serialize(regularPolygon as WeaveElementInstance)
       );
     }
 
@@ -187,41 +194,48 @@ export class WeaveEllipseToolAction extends WeaveAction {
   }
 
   private handleMovement() {
-    if (this.state !== ELLIPSE_TOOL_STATE.DEFINING_SIZE) {
+    if (this.state !== REGULAR_POLYGON_TOOL_STATE.DEFINING_SIZE) {
       return;
     }
 
-    const ellipse = this.instance.getStage().findOne(`#${this.ellipseId}`);
+    const regularPolygon = this.instance
+      .getStage()
+      .findOne(`#${this.regularPolygonId}`);
 
-    if (this.ellipseId && this.container && this.clickPoint && ellipse) {
+    if (
+      this.regularPolygonId &&
+      this.container &&
+      this.clickPoint &&
+      regularPolygon
+    ) {
       const { mousePoint } = this.instance.getMousePointerRelativeToContainer(
         this.container
       );
 
       const deltaX = Math.abs(mousePoint.x - this.clickPoint?.x);
-      const deltaY = Math.abs(mousePoint.y - this.clickPoint?.y);
 
       const nodeHandler =
-        this.instance.getNodeHandler<WeaveEllipseNode>('ellipse');
+        this.instance.getNodeHandler<WeaveRegularPolygonNode>(
+          'regular-polygon'
+        );
 
-      const ellipsePos: Vector2d = {
+      const starPos: Vector2d = {
         x: this.clickPoint.x,
         y: this.clickPoint.y,
       };
       if (this.moved) {
-        ellipsePos.x = Math.min(this.clickPoint.x, mousePoint.x);
-        ellipsePos.y = Math.min(this.clickPoint.y, mousePoint.y);
+        starPos.x = Math.min(this.clickPoint.x, mousePoint.x);
+        starPos.y = Math.min(this.clickPoint.y, mousePoint.y);
       }
 
-      ellipse.setAttrs({
-        x: ellipsePos.x + deltaX,
-        y: ellipsePos.y + deltaY,
-        radiusX: deltaX,
-        radiusY: deltaY,
+      regularPolygon.setAttrs({
+        x: starPos.x + deltaX,
+        y: starPos.y + deltaX,
+        radius: deltaX,
       });
 
       this.instance.updateNode(
-        nodeHandler.serialize(ellipse as WeaveElementInstance)
+        nodeHandler.serialize(regularPolygon as WeaveElementInstance)
       );
     }
   }
@@ -248,7 +262,7 @@ export class WeaveEllipseToolAction extends WeaveAction {
     }
 
     this.props = this.initProps();
-    this.addEllipse();
+    this.addRegularPolygon();
   }
 
   cleanup(): void {
@@ -259,18 +273,18 @@ export class WeaveEllipseToolAction extends WeaveAction {
     const selectionPlugin =
       this.instance.getPlugin<WeaveNodesSelectionPlugin>('nodesSelection');
     if (selectionPlugin) {
-      const node = stage.findOne(`#${this.ellipseId}`);
+      const node = stage.findOne(`#${this.regularPolygonId}`);
       if (node) {
         selectionPlugin.setSelectedNodes([node]);
       }
       this.instance.triggerAction(SELECTION_TOOL_ACTION_NAME);
     }
 
-    this.ellipseId = null;
+    this.regularPolygonId = null;
     this.creating = false;
     this.moved = false;
     this.container = undefined;
     this.clickPoint = null;
-    this.setState(ELLIPSE_TOOL_STATE.IDLE);
+    this.setState(REGULAR_POLYGON_TOOL_STATE.IDLE);
   }
 }

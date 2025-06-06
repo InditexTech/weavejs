@@ -20,6 +20,7 @@ import {
   Circle,
   Star,
   ArrowUpRight,
+  Hexagon,
 } from 'lucide-react';
 import { useWeave } from '@inditextech/weave-react';
 import { Toolbar } from '../toolbar/toolbar';
@@ -232,6 +233,25 @@ export function ToolsOverlay() {
                 shortcuts={{
                   [SYSTEM_OS.MAC]: 'T',
                   [SYSTEM_OS.OTHER]: 'T',
+                }}
+              />
+            </div>
+          }
+          tooltipSide="top"
+          tooltipAlign="center"
+        />
+        <ToolbarButton
+          className="rounded-full !w-[40px]"
+          icon={<Hexagon className="px-2" size={40} strokeWidth={1} />}
+          active={actualAction === 'regularPolygonTool'}
+          onClick={() => triggerTool('regularPolygonTool')}
+          label={
+            <div className="flex gap-3 justify-start items-center">
+              <p>Add a regular polygon</p>
+              <ShortcutElement
+                shortcuts={{
+                  [SYSTEM_OS.MAC]: 'P',
+                  [SYSTEM_OS.OTHER]: 'P',
                 }}
               />
             </div>

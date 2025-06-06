@@ -1,0 +1,34 @@
+---
+title: WeaveRegularPolygonToolAction
+description: Add a regular polygon to the canvas
+---
+
+import { TypeTable } from "fumadocs-ui/components/type-table";
+
+## Overview
+
+The [WeaveRegularPolygonToolAction](https://github.com/InditexTech/weavejs/blob/main/code/packages/sdk/src/actions/regular-polygon-tool/regular-polygon-tool.ts)
+class that allows users to create regular polygons shapes on the canvas by clicking
+and dragging. It provides a smooth, intuitive way to add structured, resizable
+star elements .
+
+Each interaction results in the creation of a [WeaveRegularPolygonNode](/docs/sdk/api-reference/nodes/star),
+added to the shared state and synchronized across all users.
+
+The class extends the [WeaveAction](/docs/sdk/api-reference/actions/action) class.
+
+## Name
+
+This action `name` property value is `regularPolygonTool`.
+
+## Import
+
+```shell
+import { WeaveRegularPolygonToolAction } from "@inditextech/weave-sdk";
+```
+
+## Instantiation
+
+```ts
+new WeaveRegularPolygonToolAction();
+```

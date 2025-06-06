@@ -1,0 +1,78 @@
+---
+title: Regular Polygon Tool
+description: Add a regular polygon to the canvas
+---
+
+import { Accordion, Accordions } from "fumadocs-ui/components/accordion";
+
+## Introduction
+
+This action enables users to create new regular polygons nodes on the canvas.
+
+## Dependencies
+
+This action needs also registered on the Weave instance the following:
+
+- [Regular Polygon](/docs/main/build/nodes/regular-polygon) node
+
+## Usage
+
+<Accordions className="bg-transparent">
+  <Accordion title="1. Import the action" id="import-action">
+    Start by importing the action with the following import:
+
+    ```ts
+    import { WeaveRegularPolygonToolAction } from "@inditextech/weave-sdk";
+    ```
+
+  </Accordion>
+  <Accordion title="2. Register the action" id="register-action">
+    Then register the action on the Weave class instance.
+
+    ```ts
+    const instance = new Weave({
+      ...
+      actions: [
+        ...,
+        new WeaveRegularPolygonToolAction(), // [!code ++]
+      ]
+    })
+    ```
+
+  </Accordion>
+  <Accordion title="3. Setup the action trigger" id="setup-action-trigger">
+    Setup on a button or any element on the UI the user can trigger, an action
+    to trigger the action. For example on a button on React:
+
+    ```tsx
+    import { useWeave } from "@inditextech/weave-react";
+
+    const MyRegularPolygonToolTriggerComponent = () => {
+      const instance = useWeave((state) => state.instance);
+
+      const triggerTool = React.useCallback(() => {
+        instance.triggerAction("regularPolygonTool");
+      }, [instance])
+
+      return (
+        <button onClick={triggerTool}>Regular Polygon Tool</button>
+      )
+    }
+    ```
+
+  </Accordion>
+  <Accordion title="4. Trigger the action" id="trigger-the-action">
+    Finally as an user trigger the UI element that launches the action.
+
+    When active the user can:
+
+    - **Click** on the canvas, it will create a regular polygon with a default size.
+    - **Touch** on the canvas, it will create a regular polygon with a default size.
+    - **Click & drag** to create a regular polygon and define its radius.
+
+    Once clicked or click-drag finishes, the regular polygon is added to the canvas as a fully functional
+    node—ready. This action integrates seamlessly with Weave.js's real-time state system,
+    ensuring the new element appears instantly for all connected users.
+
+  </Accordion>
+</Accordions>

@@ -9,15 +9,18 @@ import {
   type WeaveElementInstance,
 } from '@inditextech/weave-types';
 import { WeaveNode } from '../node';
-import { WEAVE_STAR_NODE_TYPE } from './constants';
+import { WEAVE_REGULAR_POLYGON_NODE_TYPE } from './constants';
 import type { WeaveNodesSelectionPlugin } from '@/plugins/nodes-selection/nodes-selection';
-import type { WeaveStarNodeParams, WeaveStarProperties } from './types';
+import type {
+  WeaveRegularPolygonNodeParams,
+  WeaveRegularPolygonProperties,
+} from './types';
 
-export class WeaveStarNode extends WeaveNode {
-  private config: WeaveStarProperties;
-  protected nodeType: string = WEAVE_STAR_NODE_TYPE;
+export class WeaveRegularPolygonNode extends WeaveNode {
+  private config: WeaveRegularPolygonProperties;
+  protected nodeType: string = WEAVE_REGULAR_POLYGON_NODE_TYPE;
 
-  constructor(params?: WeaveStarNodeParams) {
+  constructor(params?: WeaveRegularPolygonNodeParams) {
     super();
 
     const { config } = params ?? {};
@@ -31,38 +34,29 @@ export class WeaveStarNode extends WeaveNode {
   }
 
   onRender(props: WeaveElementAttributes): WeaveElementInstance {
-    const star = new Konva.Star({
+    const regularPolygon = new Konva.RegularPolygon({
       ...props,
       name: 'node',
-      numPoints: props.numPoints,
-      innerRadius: props.innerRadius,
-      outerRadius: props.outerRadius,
+      sides: props.sides,
+      radius: props.radius,
     });
 
-    star.getTransformerProperties = () => {
-      const stage = this.instance.getStage();
-
-      const node = stage.findOne(`#${props.id}`) as Konva.Star | undefined;
-
-      if (node && node.getAttrs().keepAspectRatio) {
-        return {
-          ...this.config.transform,
-          enabledAnchors: [
-            'top-left',
-            'top-right',
-            'bottom-left',
-            'bottom-right',
-          ],
-          keepRatio: true,
-        };
-      }
-
-      return this.config.transform;
+    regularPolygon.getTransformerProperties = () => {
+      return {
+        ...this.config.transform,
+        enabledAnchors: [
+          'top-left',
+          'top-right',
+          'bottom-left',
+          'bottom-right',
+        ],
+        keepRatio: true,
+      };
     };
 
-    this.setupDefaultNodeEvents(star);
+    this.setupDefaultNodeEvents(regularPolygon);
 
-    return star;
+    return regularPolygon;
   }
 
   onUpdate(
@@ -71,6 +65,7 @@ export class WeaveStarNode extends WeaveNode {
   ): void {
     nodeInstance.setAttrs({
       ...nextProps,
+      radius: nextProps.radius,
     });
 
     const nodesSelectionPlugin =
@@ -84,12 +79,9 @@ export class WeaveStarNode extends WeaveNode {
   }
 
   protected scaleReset(node: Konva.Node): void {
-    const starNode = node as Konva.Star;
-    starNode.innerRadius(
-      Math.max(5, starNode.innerRadius() * starNode.scaleX())
-    );
-    starNode.outerRadius(
-      Math.max(5, starNode.outerRadius() * starNode.scaleY())
+    const regularPolygonNode = node as Konva.RegularPolygon;
+    regularPolygonNode.radius(
+      Math.max(5, regularPolygonNode.radius() * regularPolygonNode.scaleX())
     );
 
     // reset scale to 1

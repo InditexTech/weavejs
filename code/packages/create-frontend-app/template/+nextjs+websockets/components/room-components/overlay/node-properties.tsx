@@ -21,6 +21,7 @@ import { MetaProperties } from '../node-properties/meta-properties';
 import { EllipseProperties } from '../node-properties/ellipse-properties';
 import { StarProperties } from '../node-properties/star-properties';
 import { ArrowProperties } from '../node-properties/arrow-properties';
+import { RegularPolygonProperties } from '../node-properties/regular-polygon-properties';
 
 export const NodeProperties = () => {
   const instance = useWeave((state) => state.instance);
@@ -48,6 +49,7 @@ export const NodeProperties = () => {
       [
         'rectangleTool',
         'ellipseTool',
+        'regularPolygonTool',
         'brushTool',
         'penTool',
         'imageTool',
@@ -79,6 +81,8 @@ export const NodeProperties = () => {
         return 'Rectangle';
       case 'ellipse':
         return 'Ellipse';
+      case 'regular-polygon':
+        return 'Regular Polygon';
       case 'line':
         return 'Vector path';
       case 'text':
@@ -104,6 +108,8 @@ export const NodeProperties = () => {
         return 'Rectangle';
       case 'ellipseTool':
         return 'Ellipse';
+      case 'regularPolygonTool':
+        return 'RegularPolygon';
       case 'brushTool':
         return 'Vector path';
       case 'penTool':
@@ -194,6 +200,7 @@ export const NodeProperties = () => {
                 [
                   'rectangleTool',
                   'ellipseTool',
+                  'regularPolygonTool',
                   'brushTool',
                   'penTool',
                   'imageTool',
@@ -225,6 +232,7 @@ export const NodeProperties = () => {
           <EllipseProperties />
           <ArrowProperties />
           <StarProperties />
+          <RegularPolygonProperties />
           <AppearanceProperties />
           <FillProperties />
           <StrokeProperties />

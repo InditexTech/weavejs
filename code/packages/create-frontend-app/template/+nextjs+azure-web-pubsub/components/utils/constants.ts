@@ -11,6 +11,7 @@ import {
   WeaveTextToolAction,
   WeaveStarToolAction,
   WeaveArrowToolAction,
+  WeaveRegularPolygonToolAction,
   WeaveZoomOutToolAction,
   WeaveZoomInToolAction,
   WeaveExportNodeToolAction,
@@ -27,6 +28,7 @@ import {
   WeaveImageNode,
   WeaveStarNode,
   WeaveArrowNode,
+  WeaveRegularPolygonNode,
   WeaveFrameNode,
 } from '@inditextech/weave-sdk';
 import { Inter } from 'next/font/google';
@@ -131,6 +133,7 @@ const NODES = [
   }),
   new WeaveStarNode(),
   new WeaveArrowNode(),
+  new WeaveRegularPolygonNode(),
   new WeaveFrameNode({
     config: {
       fontFamily: inter.style.fontFamily,
@@ -159,6 +162,7 @@ const ACTIONS = [
   new WeaveFrameToolAction(),
   new WeaveStarToolAction(),
   new WeaveArrowToolAction(),
+  new WeaveRegularPolygonToolAction(),
   new ColorTokenToolAction(),
   new WeaveTextToolAction(),
   new WeaveZoomOutToolAction(),
