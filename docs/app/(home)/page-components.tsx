@@ -101,7 +101,8 @@ export function Features() {
             </>
           }
           className="overflow-hidden"
-          href="/docs/main/what-is-weavejs"
+          href="/docs/main/architecture"
+          external
         >
           <div className="w-full mb-0 flex flex-col justify-center items-center">
             <Image

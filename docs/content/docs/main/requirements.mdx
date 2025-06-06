@@ -3,17 +3,24 @@ title: Requirements
 description: Required system dependencies and versions
 ---
 
-<Callout title="UI agnostic" type="note">
-  Install Weave.js on top of any UI framework, such as Next.js, React, Angular,
-  or Vue. As Weave.js is UI agnostic.
-</Callout>
-
 Before you begin, make sure your system meets the following requirements:
 
 - macOS, Windows (WSL), or Linux.
 - [Node.js](https://nodejs.org/es/download) `18.18.0` or later.
+
+<Callout title="UI agnostic" type="info">
+  Install Weave.js on top of any UI framework, such as Next.js, React, Angular,
+  or Vue. As Weave.js is UI agnostic.
+</Callout>
+
+## Peer dependencies
+
 - [React](https://reactjs.org/docs/create-a-new-react-app.html) `18.2.0` or less than `19.x`.
 
+<Callout title="Why React is a requirement?" type="warning">
+  Weave.js internally uses a custom React Reconciler, so we need React as peer
+  dependency ans we support an specific React version range.
+</Callout>
 
 Although not required, some basic knowledge of [Konva.js](https://konvajs.org/docs/overview.html)
 would be useful for further customizations.

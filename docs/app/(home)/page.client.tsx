@@ -376,13 +376,7 @@ export const LinkButton = ({
     if (!external) {
       router.push(href);
     } else {
-      window
-        .open(
-          "https://weavejs.cloud.inditex.com",
-          "_blank",
-          "noreferrer,noopener"
-        )
-        ?.focus();
+      window.open(href, "_blank", "noreferrer,noopener")?.focus();
     }
   }, [href, external, router]);
 
@@ -393,7 +387,7 @@ export const LinkButton = ({
         "font-light text-[13px] uppercase cursor-pointer px-[32px] h-[40px]",
         className,
         style === "default" &&
-          "bg-white dark:bg-white text-white dark:text-black hover:bg-[#ededed] dark:hover:bg-[#454545]",
+          "bg-white dark:bg-white text-black dark:text-white hover:bg-[#ededed] dark:hover:bg-[#454545]",
         style === "main" &&
           "bg-black hover:bg-[#757575] border-zinc-950 hover:border-zinc-500 dark:bg-white dark:hover:bg-[#454545] dark:hover:text-white dark:hover:border-[#454545]"
       )}

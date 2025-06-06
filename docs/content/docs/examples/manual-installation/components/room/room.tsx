@@ -6,10 +6,15 @@ import { WeaveUser, WEAVE_INSTANCE_STATUS } from "@inditextech/weave-types";
 import { useCollaborationRoom } from "@/store/store";
 import { useWeave, WeaveProvider } from "@inditextech/weave-react";
 import { RoomLayout } from "./room.layout";
-import { RoomLoader } from "./room-loader";
-import useGetWeaveJSProps from "@/hooks/use-get-weave-js-props";
+import { RoomLoader } from "./room.loader";
 import useGetWebsocketsStore from "@/hooks/use-get-websockets-store";
 import useHandleRouteParams from "@/hooks/use-handle-route-params";
+import {
+  FONTS,
+  NODES,
+  ACTIONS,
+  CUSTOM_PLUGINS,
+} from "@/components/utils/constants";
 
 const statusMap = {
   ["idle"]: "Idle",
@@ -46,8 +51,6 @@ export const Room = () => {
     return "";
   }, [loadedParams, status]);
 
-  const { fonts, nodes, customPlugins, actions } = useGetWeaveJSProps();
-
   const websocketsStore = useGetWebsocketsStore({
     loadedParams,
     getUser,
@@ -72,10 +75,10 @@ export const Room = () => {
           containerId="weave"
           getUser={getUser}
           store={websocketsStore}
-          fonts={fonts}
-          nodes={nodes}
-          actions={actions}
-          customPlugins={customPlugins}
+          fonts={FONTS}
+          nodes={NODES}
+          actions={ACTIONS}
+          customPlugins={CUSTOM_PLUGINS}
         >
           <RoomLayout />
         </WeaveProvider>

@@ -231,8 +231,8 @@ export function ToolsOverlay() {
               <p>Add a ellipsis</p>
               <ShortcutElement
                 shortcuts={{
-                  [SYSTEM_OS.MAC]: 'T',
-                  [SYSTEM_OS.OTHER]: 'T',
+                  [SYSTEM_OS.MAC]: 'E',
+                  [SYSTEM_OS.OTHER]: 'E',
                 }}
               />
             </div>
@@ -308,7 +308,7 @@ export function ToolsOverlay() {
               <ShortcutElement
                 shortcuts={{
                   [SYSTEM_OS.MAC]: 'T',
-                  [SYSTEM_OS.OTHER]: 't',
+                  [SYSTEM_OS.OTHER]: 'T',
                 }}
               />
             </div>
@@ -348,8 +348,8 @@ export function ToolsOverlay() {
               <p>Add a star</p>
               <ShortcutElement
                 shortcuts={{
-                  [SYSTEM_OS.MAC]: 'S',
-                  [SYSTEM_OS.OTHER]: 'S',
+                  [SYSTEM_OS.MAC]: 'J',
+                  [SYSTEM_OS.OTHER]: 'J',
                 }}
               />
             </div>
@@ -427,12 +427,12 @@ export function ToolsOverlay() {
             }
           }}
           label={
-            <div className="flex flex-col gap-2 justify-start items-end">
+            <div className="flex gap-3 justify-start items-center">
               <p>Undo latest changes</p>
               <ShortcutElement
                 shortcuts={{
-                  [SYSTEM_OS.MAC]: '⇧ ⌘ ,',
-                  [SYSTEM_OS.OTHER]: '⇧ Ctrl ,',
+                  [SYSTEM_OS.MAC]: '⌘ Z',
+                  [SYSTEM_OS.OTHER]: 'Ctrl Z',
                 }}
               />
             </div>
@@ -455,8 +455,8 @@ export function ToolsOverlay() {
               <p>Redo latest changes</p>
               <ShortcutElement
                 shortcuts={{
-                  [SYSTEM_OS.MAC]: '⇧ ⌘ .',
-                  [SYSTEM_OS.OTHER]: '⇧ Ctrl .',
+                  [SYSTEM_OS.MAC]: '⌘ Y',
+                  [SYSTEM_OS.OTHER]: 'Ctrl Y',
                 }}
               />
             </div>

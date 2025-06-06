@@ -49,8 +49,8 @@ export class WeaveStarToolAction extends WeaveAction {
       stroke: '#000000ff',
       strokeWidth: 1,
       numPoints: 5,
-      innerRadius: 70,
-      outerRadius: 184,
+      innerRadius: 35,
+      outerRadius: 92,
       keepAspectRatio: false,
     };
   }
