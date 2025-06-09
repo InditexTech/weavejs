@@ -16,36 +16,61 @@ share the same coordinate space but can be managed and updated independently.
 
 ## Usage
 
-<Callout title="Don't directly use">
-  We don't recommend to use this node directly. To define the application
-  Layers, use the stores `initialState` configuration property on server-side.
+<div className="fd-steps">
+
+<div className="[&_h3]:fd-step">
+
+### Import the Node
+
+Start by importing the node:
+
+```ts
+import { WeaveLayerNode } from "@inditextech/weave-sdk";
+```
+
+</div>
+
+<div className='[&_h3]:fd-step'>
+
+### Register the Node
+
+Then register the node on the [Weave](/docs/sdk/api-reference/weave) class instance.
+
+```ts
+const instance = new Weave({
+  ...
+  nodes: [
+    ...,
+    new WeaveLayerNode(), // [!code ++]
+  ]
+})
+```
+
+</div>
+
+<div className='[&_h3]:fd-step'>
+
+### Use the node
+
+<Callout type="warn">
+
+Don't use this node directly.
+
 </Callout>
 
-<Accordions className="bg-transparent">
-  <Accordion title="1. Import the node" id="import-node">
-    Start by importing the action with the following import:
+<Callout type="warn">
 
-    ```ts
-    import { WeaveLayerNode } from "@inditextech/weave-sdk";
-    ```
+The Layer node is a layering node, it doesn't render anything visual per-se to the end user.
 
-  </Accordion>
-  <Accordion title="2. Register the node" id="register-node">
-    Then register the node on the Weave class instance.
+</Callout>
 
-    ```ts
-    const instance = new Weave({
-      ...
-      nodes: [
-        ...,
-        new WeaveLayerNode(), // [!code ++]
-      ]
-    })
-    ```
+To define your application structure: Stage and Layers,
+use the stores `initialState` configuration property on server-side. You can find more information
+on this links:
 
-  </Accordion>
-  <Accordion title="3. Use the node" id="use-the-node">
-    TODO
+- [Websockets Store](/docs/store-websockets/api-reference/server/weave-websockets-server#shared-state-initial-value)
+- [Azure Web PubSub Store](/docs/store-azure-web-pubsub/api-reference/server/weave-azure-web-pubsub-server#shared-state-initial-value)
 
-  </Accordion>
-</Accordions>
+</div>
+
+</div>

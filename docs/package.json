@@ -17,6 +17,8 @@
     "version:release": "npm ci --force && npm version $RELEASE_VERSION"
   },
   "dependencies": {
+    "@codesandbox/sandpack-react": "^2.20.0",
+    "@codesandbox/sandpack-themes": "^2.0.21",
     "@radix-ui/react-accordion": "^1.2.10",
     "@radix-ui/react-slot": "^1.2.0",
     "@react-spring/web": "^9.7.5",

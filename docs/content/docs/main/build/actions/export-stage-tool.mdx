@@ -3,7 +3,10 @@ title: Export Stage Tool
 description: Export the entire stage (all nodes) node as an image
 ---
 
-import { Accordion, Accordions } from "fumadocs-ui/components/accordion";
+<div className="flex justify-center items-center *:max-w-[700px] bg-gradient-to-br from-fd-primary/10 rounded-xl border">
+  ![Export Stage Tool action on use on the Weave.js
+  showcase](/images/actions/export-stage-tool.gif)
+</div>
 
 ## Introduction
 
@@ -19,60 +22,86 @@ This action needs also registered on the Weave instance the following:
 
 ## Usage
 
-<Accordions className="bg-transparent">
-  <Accordion title="1. Import the action" id="import-action">
-    Start by importing the action with the following import:
+<div className="fd-steps">
 
-    ```ts
-    import { WeaveExportStageToolAction } from "@inditextech/weave-sdk";
-    ```
+<div className="[&_h3]:fd-step">
 
-  </Accordion>
-  <Accordion title="2. Register the action" id="register-action">
-    Then register the action on the Weave class instance.
+### Import the Action
 
-    ```ts
-    const instance = new Weave({
-      ...
-      actions: [
-        ...,
-        new WeaveExportStageToolAction(), // [!code ++]
-      ]
-    })
-    ```
+Start by importing the action:
 
-  </Accordion>
-  <Accordion title="3. Setup the action trigger" id="setup-action-trigger">
-    Setup on a button or any element on the UI the user can trigger, an action
-    to trigger the action. For example on a button on React:
+```ts
+import { WeaveExportStageToolAction } from "@inditextech/weave-sdk";
+```
 
-    ```tsx
-    import { useWeave } from "@inditextech/weave-react";
+</div>
 
-    const MyExportStageToolTriggerComponent = () => {
-      const instance = useWeave((state) => state.instance);
+<div className='[&_h3]:fd-step'>
 
-      const triggerTool = React.useCallback(() => {
-        instance.triggerAction("exportStageTool", {
-          options: {
-            padding: 20, // the exported stage image should have a 20px padding
-            pixelRatio: 2, // the exported stage image should have 2x resolution
-          }
-        });
-      }, [instance])
+### Register the Action
 
-      return (
-        <button onClick={triggerTool}>Export Stage Tool</button>
-      )
-    }
-    ```
+Then register the action on the [Weave](/docs/sdk/api-reference/weave) class instance.
 
-  </Accordion>
-  <Accordion title="4. Trigger the action" id="trigger-the-action">
-    Finally as an user trigger the UI element that launches the action.
+```ts
+const instance = new Weave({
+  ...
+  actions: [
+    ...,
+    new WeaveExportStageToolAction(), // [!code ++]
+  ]
+})
+```
 
-    When triggered fit all the nodes of the canvas in the viewport, center on its and then
-    proceed to generate an image from it. Allowing to download it.
+</div>
 
-  </Accordion>
-</Accordions>
+<div className='[&_h3]:fd-step'>
+
+### Setup the action trigger
+
+Setup on a button or any element on the UI the user can interact with on the action event:
+
+```ts
+instance.triggerAction("exportStageTool", {
+  options: {
+    padding: 20, // the exported stage image should have a 20px padding
+    pixelRatio: 2, // the exported stage image should have 2x resolution
+  },
+});
+```
+
+---
+
+For example on a button on React:
+
+```tsx
+import React from "react";
+import { useWeave } from "@inditextech/weave-react";
+
+const MyExportStageToolTriggerComponent = () => {
+  const instance = useWeave((state) => state.instance);
+
+  const triggerTool = React.useCallback(() => {
+    instance.triggerAction("exportStageTool", {
+      options: {
+        padding: 20,
+        pixelRatio: 2,
+      },
+    });
+  }, [instance]);
+
+  return <button onClick={triggerTool}>Export Node Tool</button>;
+};
+```
+
+### Trigger the action
+
+Finally a final user trigger the UI element that launches the action.
+
+---
+
+When triggered fit all the nodes of the canvas in the viewport, center on its and then
+proceed to generate an image from it. Allowing to download it.
+
+</div>
+
+</div>

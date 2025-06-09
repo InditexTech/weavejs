@@ -3,7 +3,10 @@ title: Stage Zoom
 description: Activates support for zoom on the stage
 ---
 
-import { Accordion, Accordions } from "fumadocs-ui/components/accordion";
+<div className="flex justify-center items-center *:max-w-[700px] bg-gradient-to-br from-fd-primary/10 rounded-xl border">
+  ![Stage zoom on use on the Weave.js
+  showcase](/images/plugins/stage-panning.gif)
+</div>
 
 ## Introduction
 
@@ -24,45 +27,57 @@ This plugin needs also registered on the Weave instance the following:
 
 ## Usage
 
-<Accordions className="bg-transparent">
-  <Accordion title="1. Import the plugin" id="import-plugin">
-    Start by importing the action with the following import:
+<div className="fd-steps">
 
-    ```ts
-    import { WeaveStageZoomPlugin } from "@inditextech/weave-sdk";
-    ```
+<div className="[&_h3]:fd-step">
 
-  </Accordion>
-  <Accordion title="2. Register the plugin" id="register-plugin">
-    Then register the action on the Weave class instance.
+### Import the Plugin
 
-    ```ts
-    const instance = new Weave({
-      ...
-      plugins: [
-        ...,
-        new WeaveStageZoomPlugin({ // [!code ++]
-          zoomSteps, // an array of zoom levels to snap to [!code ++]
-          defaultZoom, // the initial zoom level [!code ++]
-          onZoomChange, // callback that is called when the zoom level changes [!code ++]
-        }), // [!code ++]
-      ]
-    })
-    ```
+Start by importing the plugin:
 
-  </Accordion>
-  <Accordion title="3. Use the plugin" id="use-the-plugin">
-    Now the user, by triggering the actions:
+```ts
+import { WeaveStageZoomPlugin } from "@inditextech/weave-sdk";
+```
 
-    - [Zoom in tool](/docs/main/build/actions/zoom-in-tool)
-    - [Zoom out tool](/docs/main/build/actions/zoom-out-tool)
-    - [Fit to screen tool](/docs/main/build/actions/fit-to-screen-tool)
-    - [Fit to selection tool](/docs/main/build/actions/fit-to-selection-tool)
+</div>
 
-    Can change the zoom properties of the stage at its will.
+<div className='[&_h3]:fd-step'>
 
-    Also if you need to react to zoom changes you can listen to changes on the `onZoomChange`callback,
-    and then react accordingly.
+### Register the Plugin
 
-  </Accordion>
-</Accordions>
+Then register the plugin on the [Weave](/docs/sdk/api-reference/weave) class instance.
+
+```ts
+const instance = new Weave({
+  ...
+  plugins: [
+    ...,
+    new WeaveStageZoomPlugin(), // [!code ++]
+  ]
+})
+```
+
+You can also define:
+
+- The steps of the zoom.
+- The default step of the zoom.
+
+For more information check the [WeaveStageZoomPlugin](/docs/sdk/api-reference/plugins/stage-zoom)
+plugin API.
+
+</div>
+
+<div className='[&_h3]:fd-step'>
+
+### Use the plugin
+
+Once the plugin is registered the final user can change the zoom through the following actions:
+
+- [Fit-to-screen Tool](): allows to set a zoom that makes visible the entire stage.
+- [Fit-to-selection Tool](): allows to set a zoom that makes visible the actual selection.
+- [Zoom-in Tool](): allows to interact and zoom-in the stage one zoom step.
+- [Zoom-out Tool](): allows to interact and zoom-out the stage one zoom step.
+
+</div>
+
+</div>

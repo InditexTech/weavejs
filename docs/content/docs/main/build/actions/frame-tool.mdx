@@ -3,7 +3,10 @@ title: Frame Tool
 description: Allows to add a canvas in canvas area
 ---
 
-import { Accordion, Accordions } from "fumadocs-ui/components/accordion";
+<div className="flex justify-center items-center *:max-w-[700px] bg-gradient-to-br from-fd-primary/10 rounded-xl border">
+  ![Frame Tool action on use on the Weave.js
+  showcase](/images/actions/frame-tool.gif)
+</div>
 
 ## Introduction
 
@@ -13,66 +16,97 @@ to group related content, define sections, or build modular layouts.
 
 ## Dependencies
 
-This action needs also registered on the Weave instance the following:
+This action needs registered on the Weave instance the following elements:
 
 - [Frame](/docs/main/build/nodes/frame) node
 
 ## Usage
 
-<Accordions className="bg-transparent">
-  <Accordion title="1. Import the action" id="import-action">
-    Start by importing the action with the following import:
+<div className="fd-steps">
 
-    ```ts
-    import { WeaveFrameToolAction } from "@inditextech/weave-sdk";
-    ```
+<div className="[&_h3]:fd-step">
 
-  </Accordion>
-  <Accordion title="2. Register the action" id="register-action">
-    Then register the action on the Weave class instance.
+### Import the Action
 
-    ```ts
-    const instance = new Weave({
-      ...
-      actions: [
-        ...,
-        new WeaveFrameToolAction(), // [!code ++]
-      ]
-    })
-    ```
+Start by importing the action:
 
-  </Accordion>
-  <Accordion title="3. Setup the action trigger" id="setup-action-trigger">
-    Setup on a button or any element on the UI the user can trigger, an action
-    to trigger the action. For example on a button on React:
+```ts
+import { WeaveFrameToolAction } from "@inditextech/weave-sdk";
+```
 
-    ```tsx
-    import { useWeave } from "@inditextech/weave-react";
+</div>
 
-    const MyFrameToolTriggerComponent = () => {
-      const instance = useWeave((state) => state.instance);
+<div className='[&_h3]:fd-step'>
 
-      const triggerTool = React.useCallback(() => {
-        instance.triggerAction("frameTool");
-      }, [instance])
+### Register the Action
 
-      return (
-        <button onClick={triggerTool}>Frame Tool</button>
-      )
-    }
-    ```
+Then register the action on the [Weave](/docs/sdk/api-reference/weave) class instance.
 
-  </Accordion>
-  <Accordion title="4. Trigger the action" id="trigger-the-action">
-    Finally as an user trigger the UI element that launches the action.
+```ts
+const instance = new Weave({
+  ...
+  actions: [
+    ...,
+    new WeaveFrameToolAction(), // [!code ++]
+  ]
+})
+```
 
-    When active the user:
+</div>
 
-    - Clicks on an empty canvas space to add the frame.
+<div className='[&_h3]:fd-step'>
 
-    Then the frame is added to the canvas as a fully functional node—ready.
-    This action integrates seamlessly with Weave.js's real-time state system,
-    ensuring the new element appears instantly for all connected users.
+### Setup the action trigger
 
-  </Accordion>
-</Accordions>
+Setup on a button or any element on the UI the user can interact with on the action event:
+
+```ts
+instance.triggerAction("frameTool");
+```
+
+You can also optionally pass information to the tool as:
+
+- Frame title.
+- Frame width and height (this disable the creation of a frame by click-and-drag).
+- Frame orientation (portrait or landscape).
+
+To lean more check the [WeaveFrameToolAction](/docs/sdk/api-reference/actions/frame-tool)
+plugin API.
+
+---
+
+For example on a button on React:
+
+```tsx
+import React from "react";
+import { useWeave } from "@inditextech/weave-react";
+
+const MyFrameToolTriggerComponent = () => {
+  const instance = useWeave((state) => state.instance);
+
+  const triggerTool = React.useCallback(() => {
+    instance.triggerAction("frameTool");
+  }, [instance]);
+
+  return <button onClick={triggerTool}>Frame Tool</button>;
+};
+```
+
+### Trigger the action
+
+Finally a final user trigger the UI element that launches the action.
+
+---
+
+When active the user:
+
+- Click on an empty stage space to add a frame.
+- Click-and-drag to create a frame with custom size (if enabled).
+
+Then the frame is added to the canvas as a fully functional node—ready.
+This action integrates seamlessly with Weave.js's real-time state system,
+ensuring the new element appears instantly for all connected users.
+
+</div>
+
+</div>

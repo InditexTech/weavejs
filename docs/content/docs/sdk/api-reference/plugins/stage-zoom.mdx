@@ -105,6 +105,32 @@ For `WeaveStageZoomPluginConfig`:
   }}
 />
 
+## Methods
+
+### canZoomOut
+
+```ts
+canZoomOut(): boolean
+```
+
+Returns true if zoom-out is possible with the defined steps and actual step, return false otherwise.
+
+### canZoomIn
+
+```ts
+canZoomIn(): boolean
+```
+
+Returns true if zoom-in is possible with the defined steps and actual step, return false otherwise.
+
+### zoomToStep
+
+```ts
+zoomToStep(index: number): void
+```
+
+This method set the defined step index as zoom.
+
 ## Events
 
 ### onZoomChange

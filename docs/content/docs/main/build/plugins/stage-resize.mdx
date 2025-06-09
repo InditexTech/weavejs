@@ -3,8 +3,6 @@ title: Stage Resize
 description: Activates the stage resizing (responsive support)
 ---
 
-import { Accordion, Accordions } from "fumadocs-ui/components/accordion";
-
 ## Introduction
 
 This plugin automatically adjusts the canvas size to fit its container or the
@@ -17,31 +15,44 @@ flexibility and visibility are key.
 
 ## Usage
 
-<Accordions className="bg-transparent">
-  <Accordion title="1. Import the plugin" id="import-plugin">
-    Start by importing the action with the following import:
+<div className="fd-steps">
 
-    ```ts
-    import { WeaveStageResizePlugin } from "@inditextech/weave-sdk";
-    ```
+<div className="[&_h3]:fd-step">
 
-  </Accordion>
-  <Accordion title="2. Register the plugin" id="register-plugin">
-    Then register the action on the Weave class instance.
+### Import the Plugin
 
-    ```ts
-    const instance = new Weave({
-      ...
-      plugins: [
-        ...,
-        new WeaveStageResizePlugin(), // [!code ++]
-      ]
-    })
-    ```
+Start by importing the plugin:
 
-  </Accordion>
-  <Accordion title="3. Use the plugin" id="use-the-plugin">
-    Now the canvas is automatically resized when the browser windows changes size.
+```ts
+import { WeaveStageResizePlugin } from "@inditextech/weave-sdk";
+```
 
-  </Accordion>
-</Accordions>
+</div>
+
+<div className='[&_h3]:fd-step'>
+
+### Register the Plugin
+
+Then register the plugin on the [Weave](/docs/sdk/api-reference/weave) class instance.
+
+```ts
+const instance = new Weave({
+  ...
+  plugins: [
+    ...,
+    new WeaveStageResizePlugin(), // [!code ++]
+  ]
+})
+```
+
+</div>
+
+<div className='[&_h3]:fd-step'>
+
+### Use the plugin
+
+Once the plugin is registered the canvas is automatically resized when the browser windows changes size.
+
+</div>
+
+</div>

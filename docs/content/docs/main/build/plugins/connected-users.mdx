@@ -3,7 +3,10 @@ title: Connected Users
 description: Get an structure with information about the connected users
 ---
 
-import { Accordion, Accordions } from "fumadocs-ui/components/accordion";
+<div className="flex justify-center items-center *:max-w-[700px] bg-gradient-to-br from-fd-primary/10 rounded-xl border">
+  ![Connected Users plugin on use on the Weave.js
+  showcase](/images/plugins/connected-users.gif)
+</div>
 
 ## Introduction
 
@@ -11,61 +14,70 @@ This plugin returns the list of users currently active in a collaborative sessio
 It can provide the user name and email, helping participants stay aware of who’s
 online and interacting with the canvas.
 
-## Dependencies
-
-This plugin needs also registered on the Weave instance the following:
-
-- An Store with awareness support.
+<Callout title="UI Agnostic" type="info">
+  This plugin only returns an structure of the connected users to a
+  [room](/docs/main/glossary#room), it doesn't provide an UI.
+</Callout>
 
 ## Usage
 
-<Accordions className="bg-transparent">
-  <Accordion title="1. Import the plugin" id="import-plugin">
-    Start by importing the action with the following import:
+<div className="fd-steps">
 
-    ```ts
-    import { WeaveConnectedUsersPlugin } from "@inditextech/weave-sdk";
-    ```
+<div className="[&_h3]:fd-step">
 
-  </Accordion>
-  <Accordion title="2. Register the plugin" id="register-plugin">
-    Then register the action on the Weave class instance.
+### Import the Plugin
 
-    ```ts
-    const instance = new Weave({
-      ...
-      plugins: [
-        ...,
-        new WeaveConnectedUsersPlugin({ // [!code ++]
-          onConnectedUsersChanged, // callback to listen to changes to the connected users [!code ++]
-          getUser, // function that defines how to get an user metadata [!code ++]
-        }), // [!code ++]
-      ]
-    })
-    ```
+Start by importing the plugin:
 
-  </Accordion>
-  <Accordion title="3. Use the plugin" id="use-the-plugin">
-    Listen to changes to connected users on the `onConnectedUsersChanged` configured callback,
-    then react accordingly. Something like this:
-    
-    ```ts
-    const instance = new Weave({
-      ...
-      plugins: [
-        ...,
-        new WeaveConnectedUsersPlugin({
-          onConnectedUsersChanged: (usersConnected) => {
-            for (const [key, value] of Object.entries(usersConnected)) {
-              console.log(`${key}: ${value}`);
-              // key is an identifier of the user on Yjs, and value is the metadata of
-              // the user provided when it joins the room, defined by the WeaveUser type.
-            }
-          },
-          ...
-        }),
-      ]
-    })
-    ```
-  </Accordion>
-</Accordions>
+```ts
+import { WeaveConnectedUsersPlugin } from "@inditextech/weave-sdk";
+```
+
+</div>
+
+<div className='[&_h3]:fd-step'>
+
+### Register the Plugin
+
+Then register the plugin on the [Weave](/docs/sdk/api-reference/weave) class instance.
+
+```ts
+const instance = new Weave({
+  ...
+  plugins: [
+    ...,
+    new WeaveConnectedUsersPlugin(), // [!code ++]
+  ]
+})
+```
+
+</div>
+
+<div className='[&_h3]:fd-step'>
+
+### Use the plugin
+
+Once the plugin is registered you can add a listener with the [Weave](/docs/sdk/api-reference/weave)
+instance [Events API](/docs/sdk/api-reference/weave#events) that listen to the event named `onConnectedUsersChange`.
+
+```ts
+// Import types
+import type {
+  WeaveConnectedUsers,
+  WeaveConnectedUsersChangeEvent,
+} from "@inditextech/weave-sdk";
+
+instance.addEventListener<WeaveConnectedUsersChangeEvent>(
+  "onConnectedUsersChange",
+  (users: WeaveConnectedUsers) => {
+    console.log(users);
+  }
+);
+```
+
+With this callback you can save this information on the UI state and render accordingly, whenever it
+changes your UI will remain updated.
+
+</div>
+
+</div>

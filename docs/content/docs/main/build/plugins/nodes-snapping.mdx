@@ -3,7 +3,10 @@ title: Nodes Snapping
 description: Allow to snap nodes to guides and to themselves
 ---
 
-import { Accordion, Accordions } from "fumadocs-ui/components/accordion";
+<div className="flex justify-center items-center *:max-w-[700px] bg-gradient-to-br from-fd-primary/10 rounded-xl border">
+  ![Nodes Snapping plugin on use on the Weave.js
+  showcase](/images/plugins/nodes-snapping.gif)
+</div>
 
 ## Introduction
 
@@ -22,32 +25,45 @@ This plugin needs also registered on the Weave instance the following:
 
 ## Usage
 
-<Accordions className="bg-transparent">
-  <Accordion title="1. Import the plugin" id="import-plugin">
-    Start by importing the action with the following import:
+<div className="fd-steps">
 
-    ```ts
-    import { WeaveNodesSnappingPlugin } from "@inditextech/weave-sdk";
-    ```
+<div className="[&_h3]:fd-step">
 
-  </Accordion>
-  <Accordion title="2. Register the plugin" id="register-plugin">
-    Then register the action on the Weave class instance.
+### Import the Plugin
 
-    ```ts
-    const instance = new Weave({
-      ...
-      plugins: [
-        ...,
-        new WeaveNodesSnappingPlugin(), // [!code ++]
-      ]
-    })
-    ```
+Start by importing the plugin:
 
-  </Accordion>
-  <Accordion title="3. Use the plugin" id="use-the-plugin">
-    The user now can snap the nodes when moved or resized relative to other nodes or
-    some guides like the center of the relative canvas.
+```ts
+import { WeaveNodesSnappingPlugin } from "@inditextech/weave-sdk";
+```
 
-  </Accordion>
-</Accordions>
+</div>
+
+<div className='[&_h3]:fd-step'>
+
+### Register the Plugin
+
+Then register the plugin on the [Weave](/docs/sdk/api-reference/weave) class instance.
+
+```ts
+const instance = new Weave({
+  ...
+  plugins: [
+    ...,
+    new WeaveNodesSnappingPlugin(), // [!code ++]
+  ]
+})
+```
+
+</div>
+
+<div className='[&_h3]:fd-step'>
+
+### Use the plugin
+
+Once the plugin is registered the final user now can snap the nodes when moved or resized
+relative to other nodes or some guides like the center of the relative canvas.
+
+</div>
+
+</div>

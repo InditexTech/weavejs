@@ -3,8 +3,12 @@ title: Pen Tool
 description: Add line segments to the canvas
 ---
 
-import { Accordion, Accordions } from "fumadocs-ui/components/accordion";
 import { Kbd } from "@/components/kbd";
+
+<div className="flex justify-center items-center *:max-w-[700px] bg-gradient-to-br from-fd-primary/10 rounded-xl border">
+  ![Pen Tool action on use on the Weave.js
+  showcase](/images/actions/pen-tool.gif)
+</div>
 
 ## Introduction
 
@@ -17,72 +21,93 @@ synchronized across all connected users.
 
 ## Dependencies
 
-This action needs also registered on the Weave instance the following:
+This action needs registered on the Weave instance the following elements:
 
 - [Line](/docs/main/build/nodes/line) node
 
 ## Usage
 
-<Accordions className="bg-transparent">
-  <Accordion title="1. Import the action" id="import-action">
-    Start by importing the action with the following import:
+<div className="fd-steps">
 
-    ```ts
-    import { WeavePenToolAction } from "@inditextech/weave-sdk";
-    ```
+<div className="[&_h3]:fd-step">
 
-  </Accordion>
-  <Accordion title="2. Register the action" id="register-action">
-    Then register the action on the Weave class instance.
+### Import the Action
 
-    ```ts
-    const instance = new Weave({
-      ...
-      actions: [
-        ...,
-        new WeavePenToolAction(), // [!code ++]
-      ]
-    })
-    ```
+Start by importing the action:
 
-  </Accordion>
-  <Accordion title="3. Setup the action trigger" id="setup-action-trigger">
-    Setup on a button or any element on the UI the user can trigger, an action
-    to trigger the action. For example on a button on React:
+```ts
+import { WeavePenToolAction } from "@inditextech/weave-sdk";
+```
 
-    ```tsx
-    import { useWeave } from "@inditextech/weave-react";
+</div>
 
-    const MyPenToolTriggerComponent = () => {
-      const instance = useWeave((state) => state.instance);
+<div className='[&_h3]:fd-step'>
 
-      const triggerTool = React.useCallback(() => {
-        instance.triggerAction("penTool");
-      }, [instance])
+### Register the Action
 
-      return (
-        <button onClick={triggerTool}>Pen Tool</button>
-      )
-    }
-    ```
+Then register the action on the [Weave](/docs/sdk/api-reference/weave) class instance.
 
-  </Accordion>
-  <Accordion title="4. Trigger the action" id="trigger-the-action">
-    Finally as an user trigger the UI element that launches the action.
+```ts
+const instance = new Weave({
+  ...
+  actions: [
+    ...,
+    new WeavePenToolAction(), // [!code ++]
+  ]
+})
+```
 
-    When active the user will iterate on the following steps:
+</div>
 
-    - **Click** or **Touch** on the canvas, to define a line segment start point.
-    - **Click** or **Touch** again on the canvas, to define the line final segment point.
+<div className='[&_h3]:fd-step'>
 
-    When the user is satisfied with the line segments:
+### Setup the action trigger
 
-    - On non-touch devices, press the <Kbd keys={["Enter"]} /> or <Kbd keys={["Esc"]} /> keys.
-    - On touch devices, trigger the [Selection Tool](/docs/main/build/actions/selection-tool).
+Setup on a button or any element on the UI the user can interact with on the action event:
 
-    Then the line with the N defined segments is added to the canvas as a fully functional
-    node—ready. This action integrates seamlessly with Weave.js's real-time state system,
-    ensuring the new element appears instantly for all connected users.
+```ts
+instance.triggerAction("penTool");
+```
 
-  </Accordion>
-</Accordions>
+---
+
+For example on a button on React:
+
+```tsx
+import React from "react";
+import { useWeave } from "@inditextech/weave-react";
+
+const MyPenToolTriggerComponent = () => {
+  const instance = useWeave((state) => state.instance);
+
+  const triggerTool = React.useCallback(() => {
+    instance.triggerAction("penTool");
+  }, [instance]);
+
+  return <button onClick={triggerTool}>Pen Tool</button>;
+};
+```
+
+### Trigger the action
+
+Finally a final user trigger the UI element that launches the action.
+
+---
+
+When active the user will iterate on the following steps:
+
+- **Click** or **Touch** on the canvas, to define a line segment start point.
+- **Click** or **Touch** again on the canvas, to define the line final segment point.
+
+When the user is satisfied with the line segments:
+
+- On non-touch devices, press the <Kbd keys={["Enter"]} /> or <Kbd keys={["Esc"]} /> keys.
+- On touch devices, trigger the [Selection Tool](/docs/main/build/actions/selection-tool).
+
+Then the line with the N defined segments is added to the canvas as a fully functional
+node—ready. This action integrates seamlessly with Weave.js's real-time state system,
+ensuring the new element appears instantly for all connected users.
+
+</div>
+
+</div>

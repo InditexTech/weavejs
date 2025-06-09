@@ -3,7 +3,10 @@ title: Image Tool
 description: Add an image to the canvas
 ---
 
-import { Accordion, Accordions } from "fumadocs-ui/components/accordion";
+<div className="flex justify-center items-center *:max-w-[700px] bg-gradient-to-br from-fd-primary/10 rounded-xl border">
+  ![Image Tool action on use on the Weave.js
+  showcase](/images/actions/image-tool.gif)
+</div>
 
 ## Introduction
 
@@ -21,63 +24,128 @@ This action needs also registered on the Weave instance the following:
 
 ## Usage
 
-<Accordions className="bg-transparent">
-  <Accordion title="1. Import the action" id="import-action">
-    Start by importing the action with the following import:
+<div className="fd-steps">
 
-    ```ts
-    import { WeaveImageToolAction } from "@inditextech/weave-sdk";
-    ```
+<div className="[&_h3]:fd-step">
 
-  </Accordion>
-  <Accordion title="2. Register the action" id="register-action">
-    Then register the action on the Weave class instance.
+### Import the Action
 
-    ```ts
-    const instance = new Weave({
-      ...
-      actions: [
-        ...,
-        new WeaveImageToolAction(), // [!code ++]
-      ]
-    })
-    ```
+Start by importing the action:
 
-  </Accordion>
-  <Accordion title="3. Setup the action trigger" id="setup-action-trigger">
-    Setup on a button or any element on the UI the user can trigger, an action
-    to trigger the action. For example on a button on React:
+```ts
+import { WeaveImageToolAction } from "@inditextech/weave-sdk";
+```
 
-    ```tsx
-    import { useWeave } from "@inditextech/weave-react";
+</div>
 
-    const MyImageToolTriggerComponent = () => {
-      const instance = useWeave((state) => state.instance);
+<div className='[&_h3]:fd-step'>
 
-      const triggerTool = React.useCallback(() => {
-        instance.triggerAction("imageTool");
-      }, [instance])
+### Register the Action
 
-      return (
-        <button onClick={triggerTool}>Image Tool</button>
-      )
+Then register the action on the [Weave](/docs/sdk/api-reference/weave) class instance.
+
+```ts
+const instance = new Weave({
+  ...
+  actions: [
+    ...,
+    new WeaveImageToolAction(), // [!code ++]
+  ]
+})
+```
+
+</div>
+
+<div className='[&_h3]:fd-step'>
+
+### Setup the action trigger
+
+Setup on a button or any element on the UI the user can interact with on the action event:
+
+```ts
+const { finishUploadCallback } = instance.triggerAction("imageTool");
+```
+
+Then select the image to upload (by showcasing a file select to the end user), and when the user
+selects an image, call the `finishUploadCallback`, passing as parameter the URL where the image
+can be accessed.
+
+---
+
+For example on a button on React:
+
+```tsx
+import React from "react";
+import { useWeave } from "@inditextech/weave-react";
+
+const MyImageToolTriggerComponent = () => {
+  const inputFileRef = React.useRef<any>(null);
+  const instance = useWeave((state) => state.instance);
+  const [showSelectFile, setShowSelectFile] = React.useState<boolean>(false);
+
+  React.useEffect(() => {
+    if (showSelectFile && inputFileRef.current) {
+      inputFileRef.current.click();
+      setShowSelectFileImage(false);
     }
-    ```
+  }, [instance, showSelectFile, setShowSelectFileImage]);
 
-  </Accordion>
-  <Accordion title="4. Trigger the action" id="trigger-the-action">
-    Finally as an user trigger the UI element that launches the action.
+  const handleUploadFile = React.useCallback(
+    async (file) => {
+      // Upload file to you storage / this is dummy, just an example
+      const imageURL = await uploadImage(file);
+      const { finishUploadCallback } = instance.triggerAction("imageTool");
+      finishUploadCallback(imageURL);
+    },
+    [instance]
+  );
 
-    When active the user:
+  return (
+    <>
+      <input
+        type="file"
+        accept="image/png,image/gif,image/jpeg"
+        name="image"
+        style={{ display: "none" }}
+        ref={inputFileRef}
+        onClick={() => {
+          inputFileRef.current.value = null;
+        }}
+        onChange={(e) => {
+          const file = e.target.files?.[0];
+          if (file) {
+            handleUploadFile(file);
+          }
+        }}
+      />
+      <button
+        onClick={() => {
+          setShowSelectFileImage(true);
+        }}
+      >
+        Image Tool
+      </button>
+    </>
+  );
+};
+```
 
-    - Select the image to upload.
-    - Image is uploaded to the developer storage of their choice.
-    - Image URL must be proxied through the backend, to avoid cross-origin issues.
-    - Once the image is uploaded, the user can click or touch on the canvas to place it.
+### Trigger the action
 
-    Then the image is added to the canvas as a fully functional node—ready.
-    This action integrates seamlessly with Weave.js's real-time state system,
-    ensuring the new element appears instantly for all connected users.
+Finally a final user trigger the UI element that launches the action.
 
-  </Accordion>
-</Accordions>
+---
+
+When active the user:
+
+- Select the image to upload.
+- Image is uploaded with the API the developer choses or has available.
+- Once the image is uploaded, the user can click or touch on the canvas to place it.
+
+Then the image is added to the canvas as a fully functional node—ready.
+This action integrates seamlessly with Weave.js's real-time state system,
+ensuring the new element appears instantly for all connected users.
+
+</div>
+
+</div>

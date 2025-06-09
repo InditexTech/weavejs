@@ -3,7 +3,10 @@ title: Fit to Selection Tool
 description: Set the zoom level so all the selected nodes are entirely visible on the screen
 ---
 
-import { Accordion, Accordions } from "fumadocs-ui/components/accordion";
+<div className="flex justify-center items-center *:max-w-[700px] bg-gradient-to-br from-fd-primary/10 rounded-xl border">
+  ![Fit to Selection Tool action on use on the Weave.js
+  showcase](/images/actions/fit-to-selection-tool.gif)
+</div>
 
 ## Introduction
 
@@ -13,62 +16,82 @@ selection.
 
 ## Dependencies
 
-This action needs also registered on the Weave instance the following:
+This action needs registered on the Weave instance the following elements:
 
 - [Stage zoom](/docs/main/build/plugins/stage-zoom) plugin
 
 ## Usage
 
-<Accordions className="bg-transparent">
-  <Accordion title="1. Import the action" id="import-action">
-    Start by importing the action with the following import:
+<div className="fd-steps">
 
-    ```ts
-    import { WeaveFitToSelectionToolAction } from "@inditextech/weave-sdk";
-    ```
+<div className="[&_h3]:fd-step">
 
-  </Accordion>
-  <Accordion title="2.
-   Register the action" id="register-action">
-    Then register the action on the Weave class instance.
+### Import the Action
 
-    ```ts
-    const instance = new Weave({
-      ...
-      actions: [
-        ...,
-        new WeaveFitToSelectionToolAction(), // [!code ++]
-      ]
-    })
-    ```
+Start by importing the action:
 
-  </Accordion>
-  <Accordion title="3. Setup the action trigger" id="setup-action-trigger">
-    Setup on a button or any element on the UI the user can trigger, an action
-    to trigger the action. For example on a button on React:
+```ts
+import { WeaveFitToSelectionToolAction } from "@inditextech/weave-sdk";
+```
 
-    ```tsx
-    import { useWeave } from "@inditextech/weave-react";
+</div>
 
-    const MyFitToSelectionToolTriggerComponent = () => {
-      const instance = useWeave((state) => state.instance);
+<div className='[&_h3]:fd-step'>
 
-      const triggerTool = React.useCallback(() => {
-        instance.triggerAction("fitToSelectionTool");
-      }, [instance])
+### Register the Action
 
-      return (
-        <button onClick={triggerTool}>Fit to Selection Tool</button>
-      )
-    }
-    ```
+Then register the action on the [Weave](/docs/sdk/api-reference/weave) class instance.
 
-  </Accordion>
-  <Accordion title="4. Trigger the action" id="trigger-the-action">
-    Finally as an user trigger the UI element that launches the action.
+```ts
+const instance = new Weave({
+  ...
+  actions: [
+    ...,
+    new WeaveFitToSelectionToolAction(), // [!code ++]
+  ]
+})
+```
 
-    When triggered finds the zoom level necessary to fit all the selected nodes
-    in the viewport and center on them, so they can be entirely visible.
+</div>
 
-  </Accordion>
-</Accordions>
+<div className='[&_h3]:fd-step'>
+
+### Setup the action trigger
+
+Setup on a button or any element on the UI the user can interact with on the action event:
+
+```ts
+instance.triggerAction("fitToSelectionTool");
+```
+
+---
+
+For example on a button on React:
+
+```tsx
+import React from "react";
+import { useWeave } from "@inditextech/weave-react";
+
+const MyFitToSelectionToolTriggerComponent = () => {
+  const instance = useWeave((state) => state.instance);
+
+  const triggerTool = React.useCallback(() => {
+    instance.triggerAction("fitToSelectionTool");
+  }, [instance]);
+
+  return <button onClick={triggerTool}>Fit to Selection Tool</button>;
+};
+```
+
+### Trigger the action
+
+Finally a final user trigger the UI element that launches the action.
+
+---
+
+When triggered finds the zoom level necessary to fit all the nodes of the canvas in the
+viewport and center on them, so they can be entirely visible.
+
+</div>
+
+</div>

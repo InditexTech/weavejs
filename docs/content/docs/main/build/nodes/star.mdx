@@ -3,7 +3,9 @@ title: Star
 description: Draw a star on the canvas
 ---
 
-import { Accordion, Accordions } from "fumadocs-ui/components/accordion";
+<div className="flex justify-center items-center *:max-w-[700px] bg-gradient-to-br from-fd-primary/10 rounded-xl border">
+  ![Star on Weave.js showcase](/images/nodes/star.png)
+</div>
 
 The Star node is a simple, versatile primitive shape used to render star
 elements on the canvas. Built on top of Konva’s [Star](https://konvajs.org/api/Konva.Star.html),
@@ -15,31 +17,50 @@ or selection.
 
 ## Usage
 
-<Accordions className="bg-transparent">
-  <Accordion title="1. Import the node" id="import-node">
-    Start by importing the action with the following import:
+<div className="fd-steps">
 
-    ```ts
-    import { WeaveStarNode } from "@inditextech/weave-sdk";
-    ```
+<div className="[&_h3]:fd-step">
 
-  </Accordion>
-  <Accordion title="2. Register the node" id="register-node">
-    Then register the node on the Weave class instance.
+### Import the Node
 
-    ```ts
-    const instance = new Weave({
-      ...
-      nodes: [
-        ...,
-        new WeaveStarNode(), // [!code ++]
-      ]
-    })
-    ```
+Start by importing the node:
 
-  </Accordion>
-  <Accordion title="3. Use the node" id="use-the-node">
-    TODO
+```ts
+import { WeaveStarNode } from "@inditextech/weave-sdk";
+```
 
-  </Accordion>
-</Accordions>
+</div>
+
+<div className='[&_h3]:fd-step'>
+
+### Register the Node
+
+Then register the node on the [Weave](/docs/sdk/api-reference/weave) class instance.
+
+```ts
+const instance = new Weave({
+  ...
+  nodes: [
+    ...,
+    new WeaveStarNode(), // [!code ++]
+  ]
+})
+```
+
+</div>
+
+<div className='[&_h3]:fd-step'>
+
+### Use the node
+
+Once the node is registered you can use it on [Actions](/docs/main/build/actions) or
+[Plugins](/docs/main/build/plugins) or even other [Nodes](/docs/main/build/nodes).
+
+We provide two actions:
+
+- [Star Tool](/docs/main/build/actions/text-tool) that allows users to add Star nodes
+  to the application.
+
+</div>
+
+</div>

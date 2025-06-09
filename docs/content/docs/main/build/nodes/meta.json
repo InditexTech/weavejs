@@ -1,17 +1,17 @@
 {
   "title": "Nodes",
   "pages": [
-    "stage",
-    "layer",
-    "group",
-    "frame",
-    "rectangle",
+    "arrow",
     "ellipse",
-    "regular-polygon",
-    "line",
-    "text",
+    "frame",
+    "group",
     "image",
+    "layer",
+    "line",
+    "rectangle",
+    "regular-polygon",
+    "stage",
     "star",
-    "arrow"
+    "text"
   ]
 }

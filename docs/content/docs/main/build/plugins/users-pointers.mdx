@@ -3,7 +3,10 @@ title: Users Pointers
 description: Showcase the position of the users mouse pointer on the canvas
 ---
 
-import { Accordion, Accordions } from "fumadocs-ui/components/accordion";
+<div className="flex justify-center items-center *:max-w-[700px] bg-gradient-to-br from-fd-primary/10 rounded-xl border">
+  ![Users pointers plugin on use on the Weave.js
+  showcase](/images/plugins/users-pointers.gif)
+</div>
 
 ## Introduction
 
@@ -16,42 +19,50 @@ collaboration feel more intuitive and dynamic. It integrates with Weave.js's
 presence system and updates instantly as users move their mouse or interact with
 the canvas.
 
-## Dependencies
-
-This plugin needs also registered on the Weave instance the following:
-
-- An Store with awareness support.
-
 ## Usage
 
-<Accordions className="bg-transparent">
-  <Accordion title="1. Import the plugin" id="import-plugin">
-    Start by importing the action with the following import:
+<div className="fd-steps">
 
-    ```ts
-    import { WeaveUsersPointersPlugin } from "@inditextech/weave-sdk";
-    ```
+<div className="[&_h3]:fd-step">
 
-  </Accordion>
-  <Accordion title="2. Register the plugin" id="register-plugin">
-    Then register the action on the Weave class instance.
+### Import the Plugin
 
-    ```ts
-    const instance = new Weave({
-      ...
-      plugins: [
-        ...,
-        new WeaveUsersPointersPlugin({ // [!code ++]
-          getUser, // function that defines how to get an user metadata [!code ++]
-        }), // [!code ++]
-      ]
-    })
-    ```
+Start by importing the plugin:
 
-  </Accordion>
-  <Accordion title="3. Use the plugin" id="use-the-plugin">
-    Now when a user connects to a room and moves its mouse, you should be able to see,
-    where is pointing.
+```ts
+import { WeaveUsersPointersPlugin } from "@inditextech/weave-sdk";
+```
 
-  </Accordion>
-</Accordions>
+</div>
+
+<div className='[&_h3]:fd-step'>
+
+### Register the Plugin
+
+Then register the plugin on the [Weave](/docs/sdk/api-reference/weave) class instance.
+
+```ts
+const instance = new Weave({
+  ...
+  plugins: [
+    ...,
+    new WeaveUsersPointersPlugin(), // [!code ++]
+  ]
+})
+```
+
+You can also customize the pointer visual style and font style. For more information check the
+[WeaveUsersPointersPlugin](/docs/sdk/api-reference/plugins/users-pointers) plugin API.
+
+</div>
+
+<div className='[&_h3]:fd-step'>
+
+### Use the plugin
+
+Once the plugin is registered if more than one users are connected to the [room](/docs/main/glossary#room),
+the instance user will be able to see the other users pointers, and the others users can see theirs.
+
+</div>
+
+</div>

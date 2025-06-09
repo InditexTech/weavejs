@@ -3,7 +3,9 @@ title: Line
 description: Draw a line on the canvas
 ---
 
-import { Accordion, Accordions } from "fumadocs-ui/components/accordion";
+<div className="flex justify-center items-center *:max-w-[700px] bg-gradient-to-br from-fd-primary/10 rounded-xl border">
+  ![Line on Weave.js showcase](/images/nodes/line.png)
+</div>
 
 The Line node represents a customizable straight or curved line on the canvas.
 Built on top of Konva’s [Line](https://konvajs.org/api/Konva.Line.html), it supports
@@ -16,31 +18,53 @@ flow editors, and visual programming interfaces.
 
 ## Usage
 
-<Accordions className="bg-transparent">
-  <Accordion title="1. Import the node" id="import-node">
-    Start by importing the action with the following import:
+<div className="fd-steps">
 
-    ```ts
-    import { WeaveLineNode } from "@inditextech/weave-sdk";
-    ```
+<div className="[&_h3]:fd-step">
 
-  </Accordion>
-  <Accordion title="2. Register the node" id="register-node">
-    Then register the node on the Weave class instance.
+### Import the Node
 
-    ```ts
-    const instance = new Weave({
-      ...
-      nodes: [
-        ...,
-        new WeaveLineNode(), // [!code ++]
-      ]
-    })
-    ```
+Start by importing the node:
 
-  </Accordion>
-  <Accordion title="3. Use the node" id="use-the-node">
-    TODO
+```ts
+import { WeaveLineNode } from "@inditextech/weave-sdk";
+```
 
-  </Accordion>
-</Accordions>
+</div>
+
+<div className='[&_h3]:fd-step'>
+
+### Register the Node
+
+Then register the node on the [Weave](/docs/sdk/api-reference/weave) class instance.
+
+```ts
+const instance = new Weave({
+  ...
+  nodes: [
+    ...,
+    new WeaveLineNode(), // [!code ++]
+  ]
+})
+```
+
+</div>
+
+<div className='[&_h3]:fd-step'>
+
+### Use the node
+
+Once the node is registered you can use it on [Actions](/docs/main/build/actions) or
+[Plugins](/docs/main/build/plugins) or even other [Nodes](/docs/main/build/nodes).
+
+We provide two actions:
+
+- [Pen Tool](/docs/main/build/actions/pen-tool) that allows users to add Line nodes,
+  to the application by specifying all segments one-by-one (a line is a collection of points,
+  and lines are rendered among them).
+- [Brush Tool](/docs/main/build/actions/brush-tool) that allows users to add Line nodes,
+  to the application by free-hand (mouse or digital pencil).
+
+</div>
+
+</div>
