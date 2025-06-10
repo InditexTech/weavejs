@@ -11,7 +11,6 @@
   "scripts": {
     "build": "nx run-many -t build",
     "bump:snapshot": "npm ci && nx release version $npm_package_version.$(date \"+%s\")",
-    "changed:files": "cd .. && node code/changed-files.js",
     "check": "nx run-many -t check",
     "cleanup": "rm package-lock.json && npkill -D -y",
     "dev": "nx run-many -t dev",
@@ -79,8 +78,5 @@
   "overrides": {
     "rimraf": "6.0.1"
   },
-  "repository": "github:InditexTech/weavejs",
-  "dependencies": {
-    "git-changed-files": "^1.0.0"
-  }
+  "repository": "github:InditexTech/weavejs"
 }
