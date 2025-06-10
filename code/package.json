@@ -1,6 +1,6 @@
 {
   "name": "@inditextech/weave",
-  "version": "0.24.0-SNAPSHOT",
+  "version": "0.24.0",
   "description": "Weave.js framework",
   "packageManager": "npm@10.2.4",
   "workspaces": [
@@ -33,7 +33,7 @@
     "test": "nx run-many -t test",
     "verify": "npm ci && nx run-many -t verify",
     "version:development": "export BUMP_DEVELOP_VERSION=$(npm version $(npm version minor)-SNAPSHOT) && nx release version --git-tag=false --git-commit=false $BUMP_DEVELOP_VERSION && npm version $(npm version minor)-SNAPSHOT && npm install",
-    "version:release": "npm ci && nx release version --git-tag=false --git-commit=false $RELEASE_VERSION && npm version $RELEASE_VERSION"
+    "version:release": "nx release version --git-tag=false --git-commit=false $RELEASE_VERSION && npm version $RELEASE_VERSION"
   },
   "keywords": [
     "weave",
