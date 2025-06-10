@@ -2,10 +2,12 @@
 cd code
 if [ "${SKIP_HOOKS}" != "true" ]
 then
+  npm run changed:files -- "code/**/*"
   npm run git:pre-push
 fi
 cd ../docs
 if [ "${SKIP_HOOKS}" != "true" ]
 then
+  npm run changed:files -- "docs/**/*"
   npm run git:pre-push
 fi
