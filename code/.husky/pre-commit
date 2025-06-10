@@ -1,6 +1,6 @@
 #!/usr/bin/env sh
 cd code
-CODE_CHANGES='npm run changed:files -- "code/**/*"'
+CODE_CHANGES='$(npm run changed:files -- "code/**/*")'
 echo "CODE_CHANGES: ${CODE_CHANGES}"
 if [ "${SKIP_HOOKS}" != "true" && "${CODE_CHANGES}" > 0 ]
 then
