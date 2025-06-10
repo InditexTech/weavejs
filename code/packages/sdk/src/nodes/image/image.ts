@@ -79,6 +79,8 @@ export class WeaveImageNode extends WeaveNode {
       name: 'node',
     });
 
+    this.setupDefaultNodeAugmentation(image);
+
     image.movedToContainer = () => {
       const stage = this.instance.getStage();
       const image = stage.findOne(`#${id}`) as Konva.Group | undefined;

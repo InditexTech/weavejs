@@ -53,6 +53,8 @@ export class WeaveTextNode extends WeaveNode {
       name: 'node',
     });
 
+    this.setupDefaultNodeAugmentation(text);
+
     text.getTransformerProperties = () => {
       const stage = this.instance.getStage();
       const actualText = stage.findOne(`#${text.id()}`) as Konva.Text;

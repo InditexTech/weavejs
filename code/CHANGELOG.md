@@ -13,6 +13,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- [#365](https://github.com/InditexTech/weavejs/issues/365) Improved drag & drop elements
+
 ### Fixed
 
 - [#364](https://github.com/InditexTech/weavejs/issues/364) User pointer not disappearing on disconnection

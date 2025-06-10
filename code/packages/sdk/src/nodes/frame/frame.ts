@@ -104,6 +104,8 @@ export class WeaveFrameNode extends WeaveNode {
       clip: undefined,
     });
 
+    this.setupDefaultNodeAugmentation(frame);
+
     const frameInternalGroup = new Konva.Group({
       id: `${id}-selector`,
       x: 0,

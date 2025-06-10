@@ -26,8 +26,8 @@ import {
 } from '@inditextech/weave-types';
 import { WeaveStore } from './stores/store';
 import {
-  setNodesDefaultConfiguration,
-  setStageDefaultConfiguration,
+  augmentKonvaNodeClass,
+  augmentKonvaStageClass,
   WeaveNode,
 } from './nodes/node';
 import { WeaveAction } from './actions/action';
@@ -176,7 +176,9 @@ export class Weave extends Emittery {
 
     // Register all the nodes, plugins and actions that come from the configuration
     this.registerManager.registerNodesHandlers();
-    this.setNodesDefaultConfiguration();
+    // Augment the Konva classes
+    this.augmentKonvaStageClass();
+    this.augmentKonvaNodeClass();
     this.registerManager.registerPlugins();
     this.registerManager.registerActionsHandlers();
 
@@ -231,12 +233,12 @@ export class Weave extends Emittery {
     return this.config;
   }
 
-  setStageDefaultConfiguration(): void {
-    setStageDefaultConfiguration();
+  augmentKonvaStageClass(): void {
+    augmentKonvaStageClass();
   }
 
-  setNodesDefaultConfiguration(config?: WeaveNodeConfiguration): void {
-    setNodesDefaultConfiguration(config);
+  augmentKonvaNodeClass(config?: WeaveNodeConfiguration): void {
+    augmentKonvaNodeClass(config);
   }
 
   // EVENTS METHODS

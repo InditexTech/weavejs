@@ -39,6 +39,8 @@ export class WeaveRectangleNode extends WeaveNode {
       name: 'node',
     });
 
+    this.setupDefaultNodeAugmentation(rectangle);
+
     rectangle.getTransformerProperties = () => {
       return this.config.transform;
     };

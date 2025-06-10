@@ -39,6 +39,8 @@ export class WeaveStarNode extends WeaveNode {
       outerRadius: props.outerRadius,
     });
 
+    this.setupDefaultNodeAugmentation(star);
+
     star.getTransformerProperties = () => {
       const stage = this.instance.getStage();
 

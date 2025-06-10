@@ -64,10 +64,13 @@ export class WeaveImageToolAction extends WeaveAction {
   }
 
   onInit(): void {
-    this.instance.addEventListener('onStageDrop', () => {
+    this.instance.addEventListener('onStageDrop', (e) => {
       if (window.weaveDragImageURL) {
+        this.instance.getStage().setPointersPositions(e);
+        const position = this.instance.getStage().getPointerPosition();
         this.instance.triggerAction('imageTool', {
           imageURL: window.weaveDragImageURL,
+          position,
         });
         window.weaveDragImageURL = undefined;
       }
@@ -133,7 +136,7 @@ export class WeaveImageToolAction extends WeaveAction {
     this.state = state;
   }
 
-  private loadImage(imageURL: string) {
+  private loadImage(imageURL: string, position?: Vector2d) {
     const stage = this.instance.getStage();
 
     stage.container().style.cursor = 'crosshair';
@@ -161,7 +164,7 @@ export class WeaveImageToolAction extends WeaveAction {
         };
       }
 
-      this.addImageNode();
+      this.addImageNode(position);
     };
     this.preloadImgs[this.imageId].onerror = () => {
       this.instance.emitEvent<WeaveImageToolActionOnEndLoadImageEvent>(
@@ -177,11 +180,18 @@ export class WeaveImageToolAction extends WeaveAction {
     );
   }
 
-  private addImageNode() {
+  private addImageNode(position?: Vector2d) {
     const stage = this.instance.getStage();
 
     stage.container().style.cursor = 'crosshair';
     stage.container().focus();
+
+    if (position) {
+      console.log('auto adding', position);
+      this.handleAdding(position);
+      this.setState(IMAGE_TOOL_STATE.ADDING);
+      return;
+    }
 
     if (this.imageId) {
       const mousePos = stage.getRelativePointerPosition();
@@ -215,20 +225,24 @@ export class WeaveImageToolAction extends WeaveAction {
     this.setState(IMAGE_TOOL_STATE.ADDING);
   }
 
-  private addImage() {
+  private addImage(position?: Vector2d) {
+    if (position) {
+      this.clickPoint = position;
+    }
+
     this.setState(IMAGE_TOOL_STATE.UPLOADING);
   }
 
-  private handleAdding() {
+  private handleAdding(position?: Vector2d) {
     const tempImage = this.instance.getStage().findOne(`#${this.tempImageId}`);
 
     if (
       this.imageId &&
       this.imageURL &&
       this.preloadImgs[this.imageId] &&
-      tempImage
+      ((!position && tempImage) || position)
     ) {
-      const { mousePoint, container } = this.instance.getMousePointer();
+      const { mousePoint, container } = this.instance.getMousePointer(position);
 
       this.clickPoint = mousePoint;
       this.container = container;
@@ -255,11 +269,13 @@ export class WeaveImageToolAction extends WeaveAction {
 
       this.instance.addNode(node, this.container?.getAttrs().id);
 
-      const imageNodeHandler =
-        this.instance.getNodeHandler<WeaveImageNode>('image');
-      this.instance.removeNode(
-        imageNodeHandler.serialize(tempImage as WeaveElementInstance)
-      );
+      if (!position) {
+        const imageNodeHandler =
+          this.instance.getNodeHandler<WeaveImageNode>('image');
+        this.instance.removeNode(
+          imageNodeHandler.serialize(tempImage as WeaveElementInstance)
+        );
+      }
 
       this.setState(IMAGE_TOOL_STATE.FINISHED);
     }
@@ -288,7 +304,7 @@ export class WeaveImageToolAction extends WeaveAction {
     }
 
     if (params?.imageURL) {
-      this.loadImage(params.imageURL);
+      this.loadImage(params.imageURL, params?.position ?? undefined);
       return;
     }
 

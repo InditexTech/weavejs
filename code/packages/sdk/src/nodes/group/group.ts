@@ -37,6 +37,8 @@ export class WeaveGroupNode extends WeaveNode {
       name: 'node',
     });
 
+    this.setupDefaultNodeAugmentation(group);
+
     group.getTransformerProperties = () => {
       return this.config.transform;
     };

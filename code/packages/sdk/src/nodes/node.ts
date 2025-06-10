@@ -26,13 +26,13 @@ import type { WeaveNodesSnappingPlugin } from '@/plugins/nodes-snapping/nodes-sn
 import { throttle } from 'lodash';
 import type { KonvaEventObject } from 'konva/lib/Node';
 
-export const setStageDefaultConfiguration = (): void => {
+export const augmentKonvaStageClass = (): void => {
   Konva.Stage.prototype.isMouseWheelPressed = function () {
     return false;
   };
 };
 
-export const setNodesDefaultConfiguration = (
+export const augmentKonvaNodeClass = (
   config?: WeaveNodeConfiguration
 ): void => {
   const { transform } = config ?? {};
@@ -86,6 +86,15 @@ export abstract class WeaveNode implements WeaveNodeBase {
     const copyPastePlugin =
       this.instance.getPlugin<WeaveCopyPasteNodesPlugin>('copyPasteNodes');
     return copyPastePlugin.isPasting();
+  }
+
+  setupDefaultNodeAugmentation(node: Konva.Node): void {
+    node.getTransformerProperties = () => {
+      return WEAVE_DEFAULT_TRANSFORM_PROPERTIES;
+    };
+    node.movedToContainer = () => {};
+    node.updatePosition = () => {};
+    node.resetCrop = () => {};
   }
 
   isNodeSelected(ele: Konva.Node): boolean {
