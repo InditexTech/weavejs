@@ -1,12 +1,12 @@
 #!/usr/bin/env sh
 cd code
-CODE_CHANGES=$(npm run changed:files -- "code/**/*")
+CODE_CHANGES=$(npm run changed:files -- "code/**/*" 2> /dev/null)
 if [ "${CODE_CHANGES}" != "0" ]
 then
   npm run git:pre-push
 fi
 cd ../docs
-DOCS_CHANGES=$(npm run changed:files -- "docs/**/*")
+DOCS_CHANGES=$(npm run changed:files -- "docs/**/*" 2> /dev/null)
 if [ "${DOCS_CHANGES}" != "0" ]
 then
   npm run changed:files -- "docs/**/*"
