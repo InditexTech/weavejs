@@ -29,7 +29,7 @@
     "dev": "tsdown --watch",
     "dev:test": "vitest --passWithNoTests --coverage",
     "dist:tag": "npm dist-tag add \"$(jq -r .name package.json)@$(jq -r .version package.json)\" \"$PR_TAG\" --registry=\"$NPM_PUBLISHING_REGISTRY\" --verbose",
-    "format": "npm run lint -- --quiet --fix --fix-type layout",
+    "format": "prettier --write ./src",
     "link": "npm link",
     "lint:fix": "npm run lint -- --fix",
     "lint": "eslint ./src",

@@ -13,6 +13,7 @@
     "check": "nx run-many -t check",
     "cleanup": "rm package-lock.json && npkill -D -y",
     "dev": "nx run-many -t dev",
+    "format": "nx run-many -t format",
     "dist:tag": "nx run-many -t dist:tag",
     "git:commit-msg": "commitlint -e",
     "git:pre-commit": "npm run lint",

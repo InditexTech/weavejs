@@ -1,13 +1,13 @@
-"use client";
+'use client';
 
-import React from "react";
-import { useWeave } from "@inditextech/weave-react";
-import { useCollaborationRoom } from "@/store/store";
-import { ColorToken } from "./color-token";
-import { SIDEBAR_ELEMENTS } from "@/lib/constants";
-import { X } from "lucide-react";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { SidebarSelector } from "../sidebar-selector";
+import React from 'react';
+import { useWeave } from '@inditextech/weave-react';
+import { useCollaborationRoom } from '@/store/store';
+import { ColorToken } from './color-token';
+import { SIDEBAR_ELEMENTS } from '@/lib/constants';
+import { X } from 'lucide-react';
+import { ScrollArea } from '@/components/ui/scroll-area';
+import { SidebarSelector } from '../sidebar-selector';
 
 type ColorTokenElement = {
   id: string;
@@ -26,14 +26,14 @@ export const ColorTokensLibrary = () => {
 
   const commonColorTokens: ColorTokenElement[] = React.useMemo(() => {
     return [
-      { id: "1", color: "#28282D" },
-      { id: "2", color: "#00656B" },
-      { id: "3", color: "#D79D00" },
-      { id: "4", color: "#3073B7" },
-      { id: "5", color: "#953640" },
-      { id: "6", color: "#C5AECF" },
-      { id: "7", color: "#46295A" },
-      { id: "8", color: "#79797C" },
+      { id: '1', color: '#28282D' },
+      { id: '2', color: '#00656B' },
+      { id: '3', color: '#D79D00' },
+      { id: '4', color: '#3073B7' },
+      { id: '5', color: '#953640' },
+      { id: '6', color: '#C5AECF' },
+      { id: '7', color: '#46295A' },
+      { id: '8', color: '#79797C' },
     ];
   }, []);
 
