@@ -1,6 +1,6 @@
 {
   "name": "@inditextech/weave-store-azure-web-pubsub",
-  "version": "0.24.1",
+  "version": "0.25.0-SNAPSHOT",
   "type": "module",
   "license": "Apache-2.0",
   "author": "Jesus Manuel Piñeiro Cid <jesusmpc@inditex.com>",
@@ -62,7 +62,7 @@
     "yjs": "13.6.26"
   },
   "devDependencies": {
-    "@inditextech/weave-sdk": "0.24.1",
+    "@inditextech/weave-sdk": "0.25.0-SNAPSHOT",
     "@types/express": "^5.0.1",
     "@types/node": "^22.15.3",
     "@types/uuid": "^10.0.0",
