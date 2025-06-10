@@ -15,13 +15,9 @@ const baseBranch = process.env.CHANGES_BASE_BRANCH || 'main';
     formats: args,
   });
 
-  console.log(committedGitFiles);
-
-  if (committedGitFiles.length > 0) {
-    return process.exit(0);
-  } else {
-    return process.exit(1);
-  }
+  console.log(committedGitFiles.committedFiles.length);
+  process.exit(0);
 })().catch((err) => {
   console.log(err);
+  process.exit(1);
 });

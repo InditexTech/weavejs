@@ -1,6 +1,6 @@
 #!/usr/bin/env sh
 cd code
-if [ "${SKIP_HOOKS}" != "true" ]
+if [ "${SKIP_HOOKS}" != "true" && (npm run changed:files -- "code/**/*") == 0 ]
 then
   npm run git:pre-commit
   git update-index --again
