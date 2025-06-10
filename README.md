@@ -43,7 +43,7 @@ SPDX-License-Identifier: Apache-2.0
 </div>
 
 <!-- TABLE OF CONTENTS -->
-<details>
+<!-- <details>
   <summary>Table of Contents</summary>
   <ol>
     <li>
@@ -67,7 +67,7 @@ SPDX-License-Identifier: Apache-2.0
     <li><a href="#license">License</a></li>
     <li><a href="#contact">Contact</a></li>
   </ol>
-</details>
+</details> -->
 
 <!-- ABOUT THE PROJECT -->
 
@@ -75,61 +75,61 @@ SPDX-License-Identifier: Apache-2.0
 
 [![Weave.js Screen Shot][product-screenshot]](images/screenshot.png)
 
-Weave.js is a powerful headless framework for building end-to-end collaborative whiteboard applications. Aimed at developers, it provides all the building blocks and plugins to develop visual collaborative canvas, while handling user interactions to enable real-time collaboration among multiple users.
+Weave.js is a powerful headless framework for building end-to-end collaborative whiteboard applications. Aimed at developers, it provides all the building blocks to develop visual collaborative canvas applications, while handling user interactions to enable real-time collaboration among multiple users.
 
-It provides robust synchronization based on [Yjs](https://yjs.dev/) and [SyncedStore](https://syncedstore.org/docs/) as well as an extensible API to streamline the development of interactive, collaborative applications.
+It provides robust synchronization of a shared-state based on [Yjs](https://yjs.dev/) and [SyncedStore](https://syncedstore.org/docs/) as well as an extensible API to streamline the development of interactive, collaborative applications. Rendering is handled using [Konva.js](https://konvajs.org/) and a custom [React Reconciler](https://github.com/facebook/react/tree/main/packages/react-reconciler).
 
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
+<!-- <p align="right">(<a href="#readme-top">back to top</a>)</p> -->
 
-### Built With
+<!-- ### Built With
 
 - [React Reconciler][ReactReconciler-url]
 - [Konva](https://konvajs.org/)
 - [Yjs](https://yjs.dev/)
 - [SyncedStore](https://syncedstore.org/docs/)
 
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
+<p align="right">(<a href="#readme-top">back to top</a>)</p> -->
 
-### Related repositories
+### Related repos
 
-- [Weave.js backend](https://github.com/InditexTech/weavejs-backend)
-- [Weave.js frontend](https://github.com/InditexTech/weavejs-frontend)
+- Weave.js [showcase backend](https://github.com/InditexTech/weavejs-backend)
+- Weave.js [showcase frontend](https://github.com/InditexTech/weavejs-frontend)
 
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
+<!-- <p align="right">(<a href="#readme-top">back to top</a>)</p> -->
 
 <!-- GETTING STARTED -->
 
 ## Quickstart
 
-Follow the [Quickstart documentation][docs-quick-start-url] to set up the a sample Weave.js project (backend and frontend), running on your local development environment.
+Follow our [quickstart][docs-quick-start-url] to set up the a sample Weave.js project - based on Next.js and Express.js (backend and frontend), running on your local development environment.
 
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
+<!-- <p align="right">(<a href="#readme-top">back to top</a>)</p> -->
 
 <!-- DOCUMENTATION -->
 
 ## Documentation
 
-Follow the [Weave.js documentation][docs-url] for details on setup instructions, usage guidelines, architecture details, and more.
+If you want to learn more, check our [documentation][docs-url].
 
-Check the [Architecture overivew][docs-architecture] section for full context of Weave.js library, its scope, architecture, and how it works.
+Also, don't forget to take a look at the Weave.js [architecture overview][docs-architecture] section for a complete scope of Weave.js and how it works.
 
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
+<!-- <p align="right">(<a href="#readme-top">back to top</a>)</p> -->
 
 <!-- ROADMAP -->
 
 ## Roadmap
 
-Check out [Weave.js roadmap][docs-roadmap-url] for details on planned work and the features that will come next.
+Check out the Weave.js [roadmap][docs-roadmap-url] for details on planned work and the features that will come next.
 
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
+<!-- <p align="right">(<a href="#readme-top">back to top</a>)</p> -->
 
 <!-- CONTRIBUTING -->
 
 ## Contributing
 
-Contributions are welcome! Please see the [CONTRIBUTING.md](CONTRIBUTING.md) file for guidelines on how to contribute to this project.
+Contributions are welcome! Please read the [Contributing Guide](CONTRIBUTING.md) for guidelines on how to contribute to this project.
 
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
+<!-- <p align="right">(<a href="#readme-top">back to top</a>)</p> -->
 
 <!-- ### Top contributors:
 
