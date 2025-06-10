@@ -177,6 +177,10 @@ To make a change and test it:
 
 As you can see to test you can repeat steps 1-2 as many times as you want.
 
+### Before Submitting
+
+- Set the version to release of the docs on the `.release` file located on the `/docs` folder.
+
 ## Helpful Resources
 
 - [Project documentation](README.md): Refer to our documentation for more information on the project structure and how to contribute.
