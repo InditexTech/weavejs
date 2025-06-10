@@ -75,6 +75,12 @@ export class WeaveUsersPointersPlugin extends WeavePlugin {
     const store = this.instance.getStore();
     const stage = this.instance.getStage();
 
+    this.instance.addEventListener('onConnectionStatusChange', (status) => {
+      if (status === 'disconnected') {
+        store.setAwarenessInfo(WEAVE_USER_POINTER_KEY, undefined);
+      }
+    });
+
     this.instance.addEventListener(
       'onAwarenessChange',
       (
@@ -82,8 +88,7 @@ export class WeaveUsersPointersPlugin extends WeavePlugin {
       ) => {
         const selfUser = this.config.getUser();
 
-        const allActiveUsers = [];
-
+        const allActiveUsers: string[] = [];
         for (const change of changes) {
           if (!change[WEAVE_USER_POINTER_KEY]) {
             continue;
@@ -104,6 +109,15 @@ export class WeaveUsersPointersPlugin extends WeavePlugin {
               actualPos: userPointer,
             };
           }
+        }
+
+        const allPointers = Object.keys(this.usersPointers);
+        const inactiveUsers = allPointers.filter(
+          (user) => !allActiveUsers.includes(user)
+        );
+
+        for (let i = 0; i < inactiveUsers.length; i++) {
+          delete this.usersPointers[inactiveUsers[i]];
         }
 
         this.renderPointers();
