@@ -34,6 +34,8 @@ export class ColorTokenNode extends WeaveNode {
       name: 'node',
     });
 
+    this.setupDefaultNodeAugmentation(colorTokenNode);
+
     const internalRect = new Konva.Rect({
       groupId: id,
       id: `${id}-colorToken`,
@@ -42,10 +44,9 @@ export class ColorTokenNode extends WeaveNode {
       fill: '#FFFFFFFF',
       width: colorTokenParams.width,
       height: colorTokenParams.height,
-      draggable: false,
+      strokeScaleEnabled: true,
       stroke: 'black',
       strokeWidth: 2,
-      name: 'node',
     });
 
     colorTokenNode.add(internalRect);

@@ -37,6 +37,8 @@ export class WeaveArrowNode extends WeaveNode {
       points: props.points,
     });
 
+    this.setupDefaultNodeAugmentation(line);
+
     line.getTransformerProperties = () => {
       return this.config.transform;
     };

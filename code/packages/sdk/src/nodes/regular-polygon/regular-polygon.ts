@@ -41,6 +41,8 @@ export class WeaveRegularPolygonNode extends WeaveNode {
       radius: props.radius,
     });
 
+    this.setupDefaultNodeAugmentation(regularPolygon);
+
     regularPolygon.getTransformerProperties = () => {
       return {
         ...this.config.transform,

@@ -31,14 +31,16 @@ export class WeaveEllipseNode extends WeaveNode {
   }
 
   onRender(props: WeaveElementAttributes): WeaveElementInstance {
-    const rectangle = new Konva.Ellipse({
+    const ellipse = new Konva.Ellipse({
       ...props,
       name: 'node',
       radiusX: props.radiusX,
       radiusY: props.radiusY,
     });
 
-    rectangle.getTransformerProperties = () => {
+    this.setupDefaultNodeAugmentation(ellipse);
+
+    ellipse.getTransformerProperties = () => {
       const stage = this.instance.getStage();
 
       const node = stage.findOne(`#${props.id}`) as Konva.Ellipse | undefined;
@@ -59,9 +61,9 @@ export class WeaveEllipseNode extends WeaveNode {
       return this.config.transform;
     };
 
-    this.setupDefaultNodeEvents(rectangle);
+    this.setupDefaultNodeEvents(ellipse);
 
-    return rectangle;
+    return ellipse;
   }
 
   onUpdate(

@@ -42,10 +42,13 @@ export class ColorTokenToolAction extends WeaveAction {
   }
 
   onInit() {
-    this.instance.addEventListener('onStageDrop', () => {
+    this.instance.addEventListener('onStageDrop', (e) => {
       if (window.colorTokenDragColor) {
+        this.instance.getStage().setPointersPositions(e);
+        const position = this.instance.getStage().getPointerPosition();
         this.instance.triggerAction('colorTokenTool', {
           color: window.colorTokenDragColor,
+          position,
         });
         window.colorTokenDragColor = undefined;
       }
@@ -82,19 +85,26 @@ export class ColorTokenToolAction extends WeaveAction {
     this.state = state;
   }
 
-  private addColorToken() {
+  private addColorToken(position?: Vector2d) {
     const stage = this.instance.getStage();
 
     stage.container().style.cursor = 'crosshair';
+    stage.container().blur();
     stage.container().focus();
+
+    if (position) {
+      this.handleAdding(position);
+      this.state === COLOR_TOKEN_TOOL_STATE.IDLE;
+      return;
+    }
 
     this.colorTokenId = null;
     this.clickPoint = null;
     this.setState(COLOR_TOKEN_TOOL_STATE.ADDING);
   }
 
-  private handleAdding() {
-    const { mousePoint, container } = this.instance.getMousePointer();
+  private handleAdding(position?: Vector2d) {
+    const { mousePoint, container } = this.instance.getMousePointer(position);
 
     this.clickPoint = mousePoint;
     this.container = container;
@@ -139,7 +149,7 @@ export class ColorTokenToolAction extends WeaveAction {
       this.props.colorToken = params.color;
     }
 
-    this.addColorToken();
+    this.addColorToken(params?.position ?? undefined);
   }
 
   cleanup() {

@@ -111,7 +111,11 @@ For start:
 
    To link the built packages and use this instead of installed from NPM.
 
-6. Start your backend and frontend, this will use the built linked packages.
+6. Start your backend, this will use the built linked packages.
+7. Before starting the frontend, setup the following environment variables:
+   1. `WEAVE_KONVA_PATH`, that points to the konva instance of your node_modules folder: `<project_path>/code/node_modules/konva`.
+   2. `WEAVE_YJS_PATH`, that points to the yjs instance of your node_modules folder: `<project_path>/code/node_modules/yjs`.
+8. Start your frontend, this will use the built linked packages and will also use a single instance of `konva` and `yjs` packages.
 
 To make a change and test it:
 

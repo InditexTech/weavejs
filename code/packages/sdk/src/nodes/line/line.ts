@@ -36,6 +36,8 @@ export class WeaveLineNode extends WeaveNode {
       name: 'node',
     });
 
+    this.setupDefaultNodeAugmentation(line);
+
     line.getTransformerProperties = () => {
       return this.config.transform;
     };
