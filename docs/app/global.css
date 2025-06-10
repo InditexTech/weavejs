@@ -140,3 +140,7 @@ h4 {
   font-size: 18px !important;
   margin-bottom: 1rem !important;
 }
+
+.prose :where(img):not(:where([class~="not-prose"], [class~="not-prose"] *)) {
+  margin: 0px !important;
+}
