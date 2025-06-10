@@ -94,7 +94,7 @@ export class ColorTokenToolAction extends WeaveAction {
 
     if (position) {
       this.handleAdding(position);
-      this.state === COLOR_TOKEN_TOOL_STATE.IDLE;
+      this.setState(COLOR_TOKEN_TOOL_STATE.IDLE);
       return;
     }
 

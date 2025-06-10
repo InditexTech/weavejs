@@ -187,7 +187,6 @@ export class WeaveImageToolAction extends WeaveAction {
     stage.container().focus();
 
     if (position) {
-      console.log('auto adding', position);
       this.handleAdding(position);
       this.setState(IMAGE_TOOL_STATE.ADDING);
       return;

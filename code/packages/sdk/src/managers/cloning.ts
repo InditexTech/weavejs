@@ -21,25 +21,6 @@ export class WeaveCloningManager {
     this.logger.debug('Cloning manager created');
   }
 
-  private allInstancesInSameParent(nodes: Konva.Node[]) {
-    if (nodes.length === 0) {
-      return { allInSame: false, nodeId: undefined, parentId: undefined };
-    }
-
-    let allInSame = true;
-    const parentId = nodes[0]?.getParent()?.getAttrs().id;
-    const nodeId = nodes[0]?.getParent()?.getAttrs().nodeId;
-    for (const node of nodes) {
-      const nodeParentId = node?.getParent()?.getAttrs().id;
-      if (nodeParentId !== parentId) {
-        allInSame = false;
-        break;
-      }
-    }
-
-    return { allInSame, nodeId, parentId };
-  }
-
   nodesToGroupSerialized(instancesToClone: Konva.Node[]):
     | {
         serializedNodes: WeaveStateElement[];
@@ -47,12 +28,6 @@ export class WeaveCloningManager {
       }
     | undefined {
     if (instancesToClone.length === 0) {
-      return;
-    }
-
-    const { allInSame } = this.allInstancesInSameParent(instancesToClone);
-
-    if (!allInSame) {
       return;
     }
 
@@ -83,6 +58,28 @@ export class WeaveCloningManager {
         const nodePos = clonedNode.getAbsolutePosition();
         const nodeRotation = clonedNode.getAbsoluteRotation();
 
+        const parent = node.getParent();
+        // Is a Container (frame)
+        if (node.getAttrs().nodeId) {
+          const realParent = this.instance
+            .getStage()
+            .findOne(`#${node.getAttrs().nodeId}`);
+          if (realParent) {
+            nodePos.x += realParent.x();
+            nodePos.y += realParent.y();
+          }
+        }
+        // Its parent is a Container (frame)
+        if (parent && parent.getAttrs().nodeId) {
+          const realParent = this.instance
+            .getStage()
+            .findOne(`#${parent.getAttrs().nodeId}`);
+          if (realParent) {
+            nodePos.x += realParent.x();
+            nodePos.y += realParent.y();
+          }
+        }
+
         clonedNode.moveTo(newGroup);
         clonedNode.zIndex(index);
         clonedNode.setAbsolutePosition(nodePos);
@@ -97,6 +94,28 @@ export class WeaveCloningManager {
 
       const nodePos = clonedNode.getAbsolutePosition();
       const nodeRotation = clonedNode.getAbsoluteRotation();
+
+      const parent = node.getParent();
+      // Is a Container (frame)
+      if (node.getAttrs().nodeId) {
+        const realParent = this.instance
+          .getStage()
+          .findOne(`#${node.getAttrs().nodeId}`);
+        if (realParent) {
+          nodePos.x += realParent.x();
+          nodePos.y += realParent.y();
+        }
+      }
+      // Its parent is a Container (frame)
+      if (parent && parent.getAttrs().nodeId) {
+        const realParent = this.instance
+          .getStage()
+          .findOne(`#${parent.getAttrs().nodeId}`);
+        if (realParent) {
+          nodePos.x += realParent.x();
+          nodePos.y += realParent.y();
+        }
+      }
 
       clonedNode.moveTo(newGroup);
       clonedNode.zIndex(index);
@@ -113,8 +132,10 @@ export class WeaveCloningManager {
 
       const nodePos = node.getClientRect();
 
-      if (nodePos.x < minPoint.x || nodePos.y < minPoint.y) {
+      if (nodePos.x < minPoint.x) {
         minPoint.x = nodePos.x;
+      }
+      if (nodePos.y < minPoint.y) {
         minPoint.y = nodePos.y;
       }
       const serialized: WeaveStateElement = nodeHandler.serialize(node);
@@ -136,12 +157,6 @@ export class WeaveCloningManager {
     }
 
     if (!targetContainer) {
-      return;
-    }
-
-    const { allInSame } = this.allInstancesInSameParent(instancesToClone);
-
-    if (!allInSame) {
       return;
     }
 
@@ -174,6 +189,21 @@ export class WeaveCloningManager {
         const nodePos = clonedNode.getAbsolutePosition();
         const nodeRotation = clonedNode.getAbsoluteRotation();
 
+        const parent = node.getParent();
+        if (
+          parent &&
+          parent.getAttrs().nodeId &&
+          !parent.getAttrs().containerId
+        ) {
+          const realParent = this.instance
+            .getStage()
+            .findOne(`#${parent.getAttrs().nodeId}`);
+          if (realParent) {
+            nodePos.x += realParent.x();
+            nodePos.y += realParent.y();
+          }
+        }
+
         clonedNode.moveTo(newGroup);
         clonedNode.zIndex(index);
         clonedNode.setAbsolutePosition(nodePos);
@@ -188,6 +218,21 @@ export class WeaveCloningManager {
 
       const nodePos = clonedNode.getAbsolutePosition();
       const nodeRotation = clonedNode.getAbsoluteRotation();
+
+      const parent = node.getParent();
+      if (
+        parent &&
+        parent.getAttrs().nodeId &&
+        !parent.getAttrs().containerId
+      ) {
+        const realParent = this.instance
+          .getStage()
+          .findOne(`#${parent.getAttrs().nodeId}`);
+        if (realParent) {
+          nodePos.x += realParent.x();
+          nodePos.y += realParent.y();
+        }
+      }
 
       clonedNode.moveTo(newGroup);
       clonedNode.zIndex(index);

@@ -103,6 +103,7 @@ export class WeaveCopyPasteNodesPlugin extends WeavePlugin {
         e.preventDefault();
 
         await this.performCopy();
+
         return;
       }
       if (e.key === 'v' && (e.ctrlKey || e.metaKey)) {
@@ -121,7 +122,13 @@ export class WeaveCopyPasteNodesPlugin extends WeavePlugin {
             );
             return;
           }
-          this.performPaste();
+
+          const position = this.instance.getStage().getPointerPosition();
+
+          if (position) {
+            this.state = COPY_PASTE_NODES_PLUGIN_STATE.PASTING;
+            this.handlePaste(position);
+          }
           // eslint-disable-next-line @typescript-eslint/no-unused-vars, no-empty
         } catch (ex) {
           this.instance.emitEvent<WeaveCopyPasteNodesPluginOnPasteEvent>(
@@ -147,23 +154,12 @@ export class WeaveCopyPasteNodesPlugin extends WeavePlugin {
             ex as Error
           );
         }
+
+        stage.container().focus();
         return;
       }
       if (e.key === 'Escape') {
         this.cancel();
-        return;
-      }
-    });
-
-    stage.on('click tap', (e) => {
-      e.evt.preventDefault();
-
-      if (this.state === COPY_PASTE_NODES_PLUGIN_STATE.IDLE) {
-        return;
-      }
-
-      if (this.state === COPY_PASTE_NODES_PLUGIN_STATE.PASTING) {
-        this.handlePaste();
         return;
       }
     });
@@ -194,9 +190,9 @@ export class WeaveCopyPasteNodesPlugin extends WeavePlugin {
     }
   }
 
-  private handlePaste() {
+  private handlePaste(position: Vector2d) {
     if (this.toPaste) {
-      const { mousePoint, container } = this.instance.getMousePointer();
+      const { mousePoint, container } = this.instance.getMousePointer(position);
 
       for (const element of Object.keys(this.toPaste.weave)) {
         const node = this.toPaste.weave[element];
@@ -275,24 +271,11 @@ export class WeaveCopyPasteNodesPlugin extends WeavePlugin {
     }
   }
 
-  private performPaste() {
-    if (!this.enabled) {
-      return;
-    }
-
-    const stage = this.instance.getStage();
-
-    stage.container().style.cursor = 'crosshair';
-    stage.container().focus();
-
-    this.state = COPY_PASTE_NODES_PLUGIN_STATE.PASTING;
-  }
-
   async copy(): Promise<void> {
     await this.performCopy();
   }
 
-  async paste(): Promise<void> {
+  async paste(position: Vector2d): Promise<void> {
     const continueToPaste = await this.readClipboardData();
     if (!continueToPaste) {
       this.instance.emitEvent<WeaveCopyPasteNodesPluginOnPasteEvent>(
@@ -301,7 +284,7 @@ export class WeaveCopyPasteNodesPlugin extends WeavePlugin {
       );
       return;
     }
-    this.performPaste();
+    this.handlePaste(position);
   }
 
   getSelectedNodes(): WeaveToPasteNode[] {

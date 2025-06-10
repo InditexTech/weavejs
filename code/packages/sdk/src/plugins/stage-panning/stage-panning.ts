@@ -72,7 +72,7 @@ export class WeaveStagePanningPlugin extends WeavePlugin {
     });
 
     window.addEventListener('keyup', (e) => {
-      if (e.ctrlKey || e.metaKey) {
+      if (e.key === 'Meta' || e.key === 'Control') {
         this.isCtrlOrMetaPressed = false;
       }
       if (e.code === 'Space') {
@@ -208,7 +208,7 @@ export class WeaveStagePanningPlugin extends WeavePlugin {
       this.instance.emit('onStageMove', undefined);
     });
 
-    window.addEventListener('wheel', (e) => {
+    const handleWheel = (e: WheelEvent) => {
       if (
         !this.enabled ||
         !this.overStage ||
@@ -223,7 +223,9 @@ export class WeaveStagePanningPlugin extends WeavePlugin {
       stage.y(stage.y() - e.deltaY);
 
       this.instance.emit('onStageMove', undefined);
-    });
+    };
+
+    window.addEventListener('wheel', throttle(handleWheel, 10));
   }
 
   enable(): void {

@@ -13,7 +13,6 @@ import { ShortcutElement } from '../help/shortcut-element';
 import { SYSTEM_OS } from '@/lib/utils';
 import Konva from 'konva';
 import {
-  Copy,
   ClipboardCopy,
   ClipboardPaste,
   Group,
@@ -33,6 +32,9 @@ function useContextMenu() {
   const instance = useWeave((state) => state.instance);
 
   const room = useCollaborationRoom((state) => state.room);
+  const contextMenuPosition = useCollaborationRoom(
+    (state) => state.contextMenu.position
+  );
   const setContextMenuShow = useCollaborationRoom(
     (state) => state.setContextMenuShow
   );
@@ -71,44 +73,6 @@ function useContextMenu() {
 
       const options: ContextMenuOption[] = [];
 
-      if (nodes.length > 0) {
-        // DUPLICATE
-        options.push({
-          id: 'duplicate',
-          type: 'button',
-          label: (
-            <div className="w-full flex justify-between items-center">
-              <div>Duplicate</div>
-              <ShortcutElement
-                shortcuts={{
-                  [SYSTEM_OS.MAC]: '⌘ D',
-                  [SYSTEM_OS.OTHER]: 'Ctrl D',
-                }}
-              />
-            </div>
-          ),
-          icon: <Copy size={16} />,
-          disabled: nodes.length > 1,
-          onClick: async () => {
-            if (nodes.length === 1) {
-              const weaveCopyPasteNodesPlugin =
-                instance.getPlugin<WeaveCopyPasteNodesPlugin>('copyPasteNodes');
-              if (weaveCopyPasteNodesPlugin) {
-                await weaveCopyPasteNodesPlugin.copy();
-                weaveCopyPasteNodesPlugin.paste();
-              }
-              setContextMenuShow(false);
-            }
-          },
-        });
-      }
-      if (nodes.length > 0) {
-        // SEPARATOR
-        options.push({
-          id: 'div--1',
-          type: 'divider',
-        });
-      }
       if (nodes.length > 0) {
         // EXPORT
         options.push({
@@ -199,7 +163,7 @@ function useContextMenu() {
           const weaveCopyPasteNodesPlugin =
             instance.getPlugin<WeaveCopyPasteNodesPlugin>('copyPasteNodes');
           if (weaveCopyPasteNodesPlugin) {
-            await weaveCopyPasteNodesPlugin.paste();
+            await weaveCopyPasteNodesPlugin.paste(contextMenuPosition);
             setContextMenuShow(false);
           }
         },
@@ -440,7 +404,13 @@ function useContextMenu() {
 
       return options;
     },
-    [instance, mutationUpload, setTransformingImage, setContextMenuShow]
+    [
+      instance,
+      contextMenuPosition,
+      mutationUpload,
+      setTransformingImage,
+      setContextMenuShow,
+    ]
   );
 
   const onNodeContextMenuHandler = React.useCallback(
