@@ -2,7 +2,7 @@
 cd code
 CODE_CHANGES=$(npm run changed:files -- "code/**/*")
 echo "CODE CHANGES: $CODE_CHANGES"
-if [ "${SKIP_HOOKS}" != "true" & "${CODE_CHANGES}" > 0 ]
+if [ "${CODE_CHANGES}" > 0 ]
 then
   npm run git:pre-commit
   git update-index --again
