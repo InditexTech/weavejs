@@ -130,7 +130,12 @@ provided events:
   );
   ```
 
-- `onPasteExternal`: triggers when an user paste something from external sources (not the application).
+- `onPasteExternal`: triggers when an user paste something from external sources (not from the same application).
+
+  You receive an object as parameter with:
+
+  - `position`: a `Vector2d` element, that represents the position on the stage that user pasted.
+  - `item`: a `ClipboardItem` structure with the elements on the clipboard.
 
   ```ts
   // Import types
@@ -141,8 +146,9 @@ provided events:
 
   instance.addEventListener<WeaveCopyPasteNodesPluginOnPasteExternalEvent>(
     "onPasteExternal",
-    () => {
+    ({ position, item }) => {
       console.log("external paste operation performed");
+      console.log("you're responsible to add something external to the app.");
     }
   );
   ```
