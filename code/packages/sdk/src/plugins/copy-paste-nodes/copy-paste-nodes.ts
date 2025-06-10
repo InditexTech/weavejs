@@ -115,19 +115,13 @@ export class WeaveCopyPasteNodesPlugin extends WeavePlugin {
 
         try {
           const continueToPaste = await this.readClipboardData();
-          if (!continueToPaste) {
-            this.instance.emitEvent<WeaveCopyPasteNodesPluginOnPasteEvent>(
-              'onPaste',
-              new Error('Invalid elements to paste') as Error
-            );
-            return;
-          }
+          if (continueToPaste) {
+            const position = this.instance.getStage().getPointerPosition();
 
-          const position = this.instance.getStage().getPointerPosition();
-
-          if (position) {
-            this.state = COPY_PASTE_NODES_PLUGIN_STATE.PASTING;
-            this.handlePaste(position);
+            if (position) {
+              this.state = COPY_PASTE_NODES_PLUGIN_STATE.PASTING;
+              this.handlePaste(position);
+            }
           }
           // eslint-disable-next-line @typescript-eslint/no-unused-vars, no-empty
         } catch (ex) {
@@ -142,10 +136,15 @@ export class WeaveCopyPasteNodesPlugin extends WeavePlugin {
           if (items && items.length === 1) {
             const item = items[0];
 
-            this.instance.emitEvent<WeaveCopyPasteNodesPluginOnPasteExternalEvent>(
-              'onPasteExternal',
-              item
-            );
+            this.instance.getStage().setPointersPositions(e);
+            const position = this.instance.getStage().getPointerPosition();
+
+            if (position) {
+              this.instance.emitEvent<WeaveCopyPasteNodesPluginOnPasteExternalEvent>(
+                'onPasteExternal',
+                { position, item }
+              );
+            }
           }
           // eslint-disable-next-line @typescript-eslint/no-unused-vars, no-empty
         } catch (ex) {
@@ -276,15 +275,37 @@ export class WeaveCopyPasteNodesPlugin extends WeavePlugin {
   }
 
   async paste(position: Vector2d): Promise<void> {
-    const continueToPaste = await this.readClipboardData();
-    if (!continueToPaste) {
+    try {
+      const continueToPaste = await this.readClipboardData();
+      if (continueToPaste) {
+        this.handlePaste(position);
+      }
+    } catch (ex) {
       this.instance.emitEvent<WeaveCopyPasteNodesPluginOnPasteEvent>(
         'onPaste',
-        new Error('Invalid elements to paste') as Error
+        ex as Error
       );
-      return;
     }
-    this.handlePaste(position);
+
+    try {
+      const items = await navigator.clipboard.read();
+      if (items && items.length === 1) {
+        const item = items[0];
+
+        if (position) {
+          this.instance.emitEvent<WeaveCopyPasteNodesPluginOnPasteExternalEvent>(
+            'onPasteExternal',
+            { position, item }
+          );
+        }
+      }
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars, no-empty
+    } catch (ex) {
+      this.instance.emitEvent<WeaveCopyPasteNodesPluginOnPasteEvent>(
+        'onPaste',
+        ex as Error
+      );
+    }
   }
 
   getSelectedNodes(): WeaveToPasteNode[] {

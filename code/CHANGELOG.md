@@ -23,6 +23,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 - [#364](https://github.com/InditexTech/weavejs/issues/364) User pointer not disappearing on disconnection
+- [#371](https://github.com/InditexTech/weavejs/issues/371) Images not appearing on library when copy/pasted from other place (external)
 
 ## [0.23.1] - 2025-06-06
 
