@@ -1,8 +1,9 @@
 'use client';
 
 import React from 'react';
+import { Vector2d } from 'konva/lib/types';
 import { ToolbarButton } from '../toolbar/toolbar-button';
-import { useMutation } from '@tanstack/react-query';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { postImage } from '@/api/post-image';
 import {
   Brush,
@@ -56,6 +57,8 @@ export function ToolsOverlay() {
     (state) => state.setUploadingImage
   );
 
+  const queryClient = useQueryClient();
+
   const mutationUpload = useMutation({
     mutationFn: async (file: File) => {
       return await postImage(room ?? '', file);
@@ -79,7 +82,13 @@ export function ToolsOverlay() {
   );
 
   React.useEffect(() => {
-    const onPasteExternalImage = async (item: ClipboardItem) => {
+    const onPasteExternalImage = async ({
+      position,
+      item,
+    }: {
+      position: Vector2d;
+      item: ClipboardItem;
+    }) => {
       let blob: Blob | null = null;
       if (item.types.includes('image/png')) {
         blob = await item.getType('image/png');
@@ -99,17 +108,20 @@ export function ToolsOverlay() {
       const file = new File([blob], 'external.image');
       mutationUpload.mutate(file, {
         onSuccess: (data) => {
-          const room = data.fileName.split('/')[0];
+          const room: string = data.fileName.split('/')[0];
           const imageId = data.fileName.split('/')[1];
 
-          const { finishUploadCallback } = instance?.triggerAction(
-            'imageTool'
+          const queryKey = ['getImages', room];
+          queryClient.invalidateQueries({ queryKey });
+
+          instance?.triggerAction(
+            'imageTool',
+            {
+              position,
+              imageURL: `${process.env.NEXT_PUBLIC_API_ENDPOINT}/weavejs/rooms/${room}/images/${imageId}`,
+            }
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
           ) as any;
-
-          finishUploadCallback?.(
-            `${process.env.NEXT_PUBLIC_API_ENDPOINT}/weavejs/rooms/${room}/images/${imageId}`
-          );
         },
         onError: () => {
           console.error('Error uploading image');
@@ -129,7 +141,13 @@ export function ToolsOverlay() {
         instance.removeEventListener('onPasteExternal', onPasteExternalImage);
       }
     };
-  }, [instance, mutationUpload, setShowSelectFileImage, setUploadingImage]);
+  }, [
+    instance,
+    queryClient,
+    mutationUpload,
+    setShowSelectFileImage,
+    setUploadingImage,
+  ]);
 
   if (!showUI) {
     return null;

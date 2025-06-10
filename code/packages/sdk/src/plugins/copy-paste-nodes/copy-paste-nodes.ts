@@ -136,7 +136,6 @@ export class WeaveCopyPasteNodesPlugin extends WeavePlugin {
           if (items && items.length === 1) {
             const item = items[0];
 
-            this.instance.getStage().setPointersPositions(e);
             const position = this.instance.getStage().getPointerPosition();
 
             if (position) {
