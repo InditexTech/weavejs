@@ -2,7 +2,7 @@
 	Installed from https://reactbits.dev/ts/tailwind/
 */
 
-import React, { useRef, useLayoutEffect, useState } from "react";
+import React, { useRef, useLayoutEffect, useState } from 'react';
 import {
   motion,
   useScroll,
@@ -11,7 +11,7 @@ import {
   useMotionValue,
   useVelocity,
   useAnimationFrame,
-} from "framer-motion";
+} from 'framer-motion';
 
 interface VelocityMapping {
   input: [number, number];
@@ -58,8 +58,8 @@ function useElementWidth(ref: React.RefObject<HTMLElement>): number {
       }
     }
     updateWidth();
-    window.addEventListener("resize", updateWidth);
-    return () => window.removeEventListener("resize", updateWidth);
+    window.addEventListener('resize', updateWidth);
+    return () => window.removeEventListener('resize', updateWidth);
   }, [ref]);
 
   return width;
@@ -69,7 +69,7 @@ export const ScrollVelocity: React.FC<ScrollVelocityProps> = ({
   scrollContainerRef,
   texts = [],
   velocity = 100,
-  className = "",
+  className = '',
   damping = 50,
   stiffness = 400,
   numCopies = 6,
@@ -83,7 +83,7 @@ export const ScrollVelocity: React.FC<ScrollVelocityProps> = ({
     children,
     baseVelocity = velocity,
     scrollContainerRef,
-    className = "",
+    className = '',
     damping,
     stiffness,
     numCopies,
@@ -107,7 +107,7 @@ export const ScrollVelocity: React.FC<ScrollVelocityProps> = ({
       smoothVelocity,
       velocityMapping?.input || [0, 1000],
       velocityMapping?.output || [0, 5],
-      { clamp: false },
+      { clamp: false }
     );
 
     const copyRef = useRef<HTMLSpanElement>(null);
@@ -120,7 +120,7 @@ export const ScrollVelocity: React.FC<ScrollVelocityProps> = ({
     }
 
     const x = useTransform(baseX, (v) => {
-      if (copyWidth === 0) return "0px";
+      if (copyWidth === 0) return '0px';
       return `${wrap(-copyWidth, 0, v)}px`;
     });
 
@@ -147,7 +147,7 @@ export const ScrollVelocity: React.FC<ScrollVelocityProps> = ({
           ref={i === 0 ? copyRef : null}
         >
           {children}
-        </span>,
+        </span>
       );
     }
 

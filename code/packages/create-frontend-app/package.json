@@ -25,6 +25,7 @@
     "build": "tsc --noEmit && tsdown",
     "clean": "rimraf dist",
     "dev": "tsdown --watch",
+    "format": "prettier --write ./src ./template",
     "link": "npm link",
     "lint:fix": "npm run lint -- --fix",
     "lint": "eslint ./src",

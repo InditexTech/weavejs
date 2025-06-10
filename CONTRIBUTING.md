@@ -82,10 +82,10 @@ All this operations can be performed:
 - Per package, just launch the following command:
 
   ```
-  npm run <operation> --workspace=@inditextech/<package-name>
+  npm run <operation> --workspace=<package-name>
   ```
 
-  Where `<package-name>` is the name of the package you want to build.
+  Where `<package-name>` is the name of the package you want to build. You can find the package name in the `package.json` file, attribute `name` of each `/code/packages/*` folder.
 
 - All packages:
 

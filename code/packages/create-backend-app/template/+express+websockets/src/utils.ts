@@ -9,7 +9,9 @@ export const getFileContents = async (
     return content
   } catch (err) {
     console.error(
-      `Error reading file ${filePath}: ${err instanceof Error ? err.message : err}`
+      `Error reading file ${filePath}: ${
+        err instanceof Error ? err.message : err
+      }`
     )
     throw err
   }

@@ -1,4 +1,4 @@
-import { COLOR_TOKEN_TOOL_STATE } from "./constants";
+import { COLOR_TOKEN_TOOL_STATE } from './constants';
 
 export type ColorTokenToolActionStateKeys = keyof typeof COLOR_TOKEN_TOOL_STATE;
 export type ColorTokenToolActionState =

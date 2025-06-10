@@ -1,11 +1,5 @@
 #!/usr/bin/env sh
 cd code
-if [ "${SKIP_HOOKS}" != "true" ]
-then
-  npm run git:pre-push
-fi
+npm run git:pre-push
 cd ../docs
-if [ "${SKIP_HOOKS}" != "true" ]
-then
-  npm run git:pre-push
-fi
+npm run git:pre-push

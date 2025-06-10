@@ -22,7 +22,7 @@ export function getPackageManager(): PackageManager {
 
 export function autoInstall(
   manager: PackageManager,
-  dest: string,
+  dest: string
 ): Promise<void> {
   return new Promise((res, reject) => {
     const installProcess = spawn(manager, ['install'], {
