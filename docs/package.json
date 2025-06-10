@@ -4,6 +4,7 @@
   "private": true,
   "scripts": {
     "build": "next build",
+    "changed:files": "cd .. && node code/changed-files.js",
     "cleanup": "rm package-lock.json && npkill -D -y",
     "dev": "next dev --turbo",
     "git:pre-push": "npm run build",
