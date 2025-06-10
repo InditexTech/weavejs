@@ -2,5 +2,4 @@
 cd code
 npm run git:pre-push
 cd ../docs
-npm run changed:files -- "docs/**/*"
 npm run git:pre-push
