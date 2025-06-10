@@ -5,10 +5,10 @@ description: Build your visual collaborative tool with Weave.js
 
 import { SquareMousePointer, Blocks, Flame, Archive } from "lucide-react";
 
-## Building blocks
+### Building blocks
 
-A building block is typically a simple, well-defined unit—like a shape, a UI component, or a
-plugin—that does one thing well. You can mix and match these blocks to assemble more advanced
+A building block is typically a simple, well-defined unit—like a shape, a UI component, or
+a plugin—that does one thing well. You can mix and match these blocks to assemble more advanced
 features or entire applications. **Weave.js** provides a set of well-defined building blocks:
 
 <Cards>
@@ -51,7 +51,7 @@ persistence, on the frontend, a client is provided to connect to the backend.
 
 </Cards>
 
-## Example of building blocks
+### Example of building blocks
 
 - A **Node** like a rectangle or text element is a building block of the _visual canvas_.
 - A **Plugin** that handles zooming is a building block for _enhancing logic_.
@@ -59,3 +59,212 @@ persistence, on the frontend, a client is provided to connect to the backend.
 
 Just like LEGO pieces, these building blocks are designed to fit together, letting developers
 construct complex behavior without starting from scratch each time.
+
+## How to start building with Weave.js?
+
+Weave.js is supported by a frontend-backend architecture, so in order to start building
+your collaborative application you need to setup Weave in both the backend and the frontend
+side of your application.
+
+Let's see what we need on both ends to start using Weave.js
+
+### Backend-side
+
+On the backend-side you'll use a [Store](/docs/main/build/stores), that will help setup almost
+everything you need on this side of your application. Weave.js Stores will handle and provide
+the basic tasks performed backend-side for you:
+
+- A real-time transport where clients can connect to.
+- Defines the initial state of a [room](/docs/main/glossary#room).
+- Handling the merging of the changes of the shared-state and sharing them with other peers.
+- Persistence and retrieval of your application data.
+- Handling the awareness messages among all the peers.
+
+Getting running a store is pretty simple, just checkout our documentation about them, select the
+one that best suits your project and follow the setup guide to get started in no time.
+
+### Frontend-side
+
+Being more a frontend-heavy application, on the frontend-side you'll need to setup more stuff,
+but it's still pretty simple, so lets get started.
+
+---
+
+#### 1. Setup the container element
+
+First you need to setup an `<div />` element on the HTML structure of your application:
+
+```html
+<div id="my-weave-id"></div>
+```
+
+<Callout title="Element Id" type="info">
+  Remember to setup and `id` to the HTML `<div />` element
+</Callout>
+
+This element is called the **Weave.js container** and it is used on the [Weave](/docs/sdk/api-reference/weave)
+class instance, the Weave instance will setup everything you need to get the collaborative
+canvas application running in no time.
+
+So lets as you probably guess the next step is to setup the Weave class instance, but no,
+before instantiating the Weave class lets first create the [Store](/docs/main/build/stores) client.
+
+---
+
+#### 2. Setup the Store client
+
+The [Store](/docs/main/build/stores) is the one that communicates all the changes on the
+shared-state to the central server, also receives changes from others peers and always maintain
+a stable and correct shared-state. We need to define to which [room](/docs/main/glossary#room) we want to connect.
+
+This is a simplified example of the instantiation of the [Store](/docs/main/build/stores)
+client using the [WeaveStoreWebsockets](/docs/store-websockets) store:
+
+```ts
+// Import the store dependency, in this case the client one.
+import { WeaveStoreWebsockets } from "@inditextech/weave-store-websockets/client";
+
+// Define a function needed by the store that provides
+// metadata of the user of the instance
+const getUser = () => { email: "user-email@domain.com", name: "User name" };
+
+// Define the id of the room that we will connect to
+const roomId = "my-room";
+
+// Instantiate the store
+const store = new WeaveStoreWebsockets(
+  {
+    // We pass the defined user metadata function to the store
+    getUser,
+  },
+  {
+    // We pass to which room we want to connect
+    roomId,
+    wsOptions: {
+      // We define the URL where the store is running server-side, learn more at the store documentation
+      serverUrl: `http://localhost:8080/sync/rooms`,
+    },
+  }
+);
+```
+
+---
+
+#### 3. Instantiate the Weave class
+
+The [Weave](/docs/sdk/api-reference/weave) class is the central object in a Weave.js collaborative canvas. It
+represents the active canvas environment. Essentially, it's the core controller and API
+that orchestrates everything happening on the canvas — from element creation to user input
+and shared state updates. To instantiate the Weave class you need to:
+
+- Define on which container element the collaborative application will run.
+- Define which [Store](/docs/main/build/stores) you'll use to connect to the backend and handle
+  the shared-state.
+
+Optionally you can also:
+
+- Register which kind of [Nodes](/docs/main/build/nodes) you application will be using.
+- Register which kind of [Plugins](/docs/main/build/plugins) you application will be using.
+- Register which kind of [Actions](/docs/main/build/actions) you application will be using.
+- Define which fonts the canvas has access to.
+
+For this example this is the instantiation of the Weave class:
+
+```ts
+// Import the Weave class dependency and two important nodes Stage and Layer
+import { Weave, WeaveStageNode, WeaveLayerNode } from "@inditextech/weave-sdk";
+
+// store definition (omitted)
+
+// We instantiate the Weave class
+const myWeaveInstance = new Weave(
+  {
+    // We pass the store instantiated previously
+    store,
+    nodes: [new WeaveStageNode(), new WeaveLayerNode()],
+  },
+  {
+    container: containerId,
+    width: 1920,
+    height: 1080,
+  }
+);
+```
+
+As you can see we are instantiating the class but we're not registering any:
+
+- [Actions](/docs/main/build/actions), or
+- [Plugins](/docs/main/build/plugins)
+
+Also we're just registering the [Stage](/docs/main/build/nodes/stage) and [Layer](/docs/main/build/nodes/layer) nodes,
+this mainly because we define them on the Store [initial state](/docs/store-websockets/api-reference/server/weave-websockets-server#shared-state-initial-value).
+
+<Callout title="What this means?" type="info">
+
+This means that we will render the application, but final users will not be able to do nothing with it, yet.
+
+</ Callout>
+
+---
+
+#### 4. Start the instance
+
+Finally to get all up-and-running you need to start the instance, this is done by calling the `start()`
+provided API.
+
+```ts
+myWeaveInstance.start();
+```
+
+---
+
+#### Complete example
+
+Putting all together this will be all the code to setup Weave.js on the frontend-side (vanilla).
+
+```ts
+import { Weave, WeaveStageNode, WeaveLayerNode } from "@inditextech/weave-sdk";
+import { WeaveStoreWebsockets } from "@inditextech/weave-store-websockets/client";
+
+const getUser = () => { email: "user-email@domain.com", name: "User name" };
+
+const roomId = "my-room";
+
+const store = new WeaveStoreWebsockets(
+  {
+    getUser,
+  },
+  {
+    roomId,
+    wsOptions: {
+      serverUrl: `http://localhost:8080/sync/rooms`,
+    },
+  }
+);
+
+const myWeaveInstance = new Weave(
+  {
+    // We pass the store instantiated previously
+    store,
+    nodes: [
+      new WeaveStageNode(),
+      new WeaveLayerNode(),
+    ]
+  },
+  {
+    container: containerId,
+    width: 1920,
+    height: 1080,
+  }
+);
+
+myWeaveInstance.start();
+```
+
+## Next Steps
+
+Check the:
+
+- [Nodes](/docs/main/build/nodes) section to learn how to add more nodes to your application,
+- [Actions](/docs/main/build/actions) section to learn how to add or interact with the nodes of your application,
+- [Plugins](/docs/main/build/plugins) section to learn how to add control behaviors to your application (zoom, panning, selection and more)

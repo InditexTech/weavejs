@@ -3,7 +3,7 @@ title: Stage Panning
 description: Activates the panning (move) of the stage
 ---
 
-import { Accordion, Accordions } from "fumadocs-ui/components/accordion";
+![Stage panning on use on the Weave.js showcase](/images/plugins/stage-panning.gif)
 
 ## Introduction
 
@@ -24,32 +24,47 @@ This plugin needs also registered on the Weave instance the following:
 
 ## Usage
 
-<Accordions className="bg-transparent">
-  <Accordion title="1. Import the plugin" id="import-plugin">
-    Start by importing the action with the following import:
+<div className="fd-steps">
 
-    ```ts
-    import { WeaveStagePanningPlugin } from "@inditextech/weave-sdk";
-    ```
+<div className="[&_h3]:fd-step">
 
-  </Accordion>
-  <Accordion title="2. Register the plugin" id="register-plugin">
-    Then register the action on the Weave class instance.
+### Import the Plugin
 
-    ```ts
-    const instance = new Weave({
-      ...
-      plugins: [
-        ...,
-        new WeaveStagePanningPlugin(), // [!code ++]
-      ]
-    })
-    ```
+Start by importing the plugin:
 
-  </Accordion>
-  <Accordion title="3. Use the plugin" id="use-the-plugin">
-    The user now, when toggle the [Move tool](/docs/main/build/actions/move-tool) action
-    should be able to pan the stage at its will.
+```ts
+import { WeaveStagePanningPlugin } from "@inditextech/weave-sdk";
+```
 
-  </Accordion>
-</Accordions>
+</div>
+
+<div className='[&_h3]:fd-step'>
+
+### Register the Plugin
+
+Then register the plugin on the [Weave](/docs/sdk/api-reference/weave) class instance.
+
+```ts
+const instance = new Weave({
+  ...
+  plugins: [
+    ...,
+    new WeaveStagePanningPlugin(), // [!code ++]
+  ]
+})
+```
+
+</div>
+
+<div className='[&_h3]:fd-step'>
+
+### Use the plugin
+
+Once the plugin is registered you can pan the stage by:
+
+- Pressing the `Space` key and using the mouse to move.
+- Toggling on/off the `Move Tool` action, when enabled you can freely move the canvas.
+
+</div>
+
+</div>

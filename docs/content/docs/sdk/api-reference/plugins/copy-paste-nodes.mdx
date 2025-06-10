@@ -4,13 +4,16 @@ description: Activate support to copy & paste the nodes
 ---
 
 import { TypeTable } from "fumadocs-ui/components/type-table";
+import { Kbd } from "@/components/kbd";
 
 ## Overview
 
 The [WeaveCopyPasteNodesPlugin](https://github.com/InditexTech/weavejs/blob/main/code/packages/sdk/src/plugins/copy-paste-nodes/copy-paste-nodes.ts)
-class that enables copying and pasting nodes within the collaborative canvas environment. It provides
-users with familiar keyboard shortcuts (Ctrl/Cmd + C to copy and Ctrl/Cmd + V to paste), helping them
-duplicate nodes or selections easily while keeping all changes synchronized in real-time across
+class that enables copying and pasting nodes within the collaborative canvas environment.
+
+It provides users with familiar keyboard shortcuts: <Kbd keys={["Ctrl"]} /> / <Kbd keys={["Cmd"]} /> + <Kbd keys={["C"]} />
+to copy and <Kbd keys={["Ctrl"]} /> / <Kbd keys={["Cmd"]} /> + <Kbd keys={["V"]} />
+to paste, helping them duplicate nodes or selections easily while keeping all changes synchronized in real-time across
 connected users.
 
 This plugin improves productivity and usability, especially in complex design, diagramming, or
@@ -52,6 +55,24 @@ type WeaveToPasteNode = {
   node: NodeSerializable;
 };
 ```
+
+## Methods
+
+### copy
+
+```ts
+async copy(): void
+```
+
+This method copy the selected nodes to the clipboard.
+
+### paste
+
+```ts
+paste(): void
+```
+
+This method paste onto the stage the contents of the clipboard ir are supported by Weave.js.
 
 ## Events
 

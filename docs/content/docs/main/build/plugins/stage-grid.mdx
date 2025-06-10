@@ -18,31 +18,58 @@ during interactions.
 
 ## Usage
 
-<Accordions className="bg-transparent">
-  <Accordion title="1. Import the plugin" id="import-plugin">
-    Start by importing the action with the following import:
+<div className="fd-steps">
 
-    ```ts
-    import { WeaveStageGridPlugin } from "@inditextech/weave-sdk";
-    ```
+<div className="[&_h3]:fd-step">
 
-  </Accordion>
-  <Accordion title="2. Register the plugin" id="register-plugin">
-    Then register the action on the Weave class instance.
+### Import the Plugin
 
-    ```ts
-    const instance = new Weave({
-      ...
-      plugins: [
-        ...,
-        new WeaveStageGridPlugin(), // [!code ++]
-      ]
-    })
-    ```
+Start by importing the plugin:
 
-  </Accordion>
-  <Accordion title="3. Use the plugin" id="use-the-plugin">
-    The user now should be able to see the reference grid.
+```ts
+import { WeaveStageGridPlugin } from "@inditextech/weave-sdk";
+```
 
-  </Accordion>
-</Accordions>
+</div>
+
+<div className='[&_h3]:fd-step'>
+
+### Register the Plugin
+
+Then register the plugin on the [Weave](/docs/sdk/api-reference/weave) class instance.
+
+```ts
+const instance = new Weave({
+  ...
+  plugins: [
+    ...,
+    new WeaveStageGridPlugin(), // [!code ++]
+  ]
+})
+```
+
+You can also define:
+
+- The type of the grid (by default is a line grid, but it also can be a dot grid).
+- The style of the grid (visual colors and appearance).
+- The separation of the grid cells.
+
+For more information check the [WeaveStageGridPlugin](/docs/sdk/api-reference/plugins/stage-grid)
+plugin API.
+
+</div>
+
+<div className='[&_h3]:fd-step'>
+
+### Use the plugin
+
+Once the plugin is registered the final user should be able to see the reference grid.
+
+The plugin also provides a public API to:
+
+- Enable / disable the grid.
+- Change the grid type.
+
+</div>
+
+</div>

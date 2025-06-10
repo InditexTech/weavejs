@@ -3,7 +3,7 @@ title: Context Menu
 description: Trigger a contextual menu on the canvas
 ---
 
-import { Accordion, Accordions } from "fumadocs-ui/components/accordion";
+![Context Menu plugin on use on the Weave.js showcase](/images/plugins/context-menu.gif)
 
 ## Introduction
 
@@ -15,60 +15,80 @@ based on the current selection or interaction.
 Fully customizable and extensible, making it easy to tailor the experience to your
 application's needs.
 
-## Dependencies
-
-This plugin needs also registered on the Weave instance the following:
-
-- [Nodes selection](/docs/main/build/plugins/nodes-selection) plugin.
+<Callout title="UI Agnostic" type="info">
+  This plugin only returns metadata that allows developers to render a context
+  menu on the [room](/docs/main/glossary#room), it doesn't provide an UI.
+</Callout>
 
 ## Usage
 
-<Accordions className="bg-transparent">
-  <Accordion title="1. Import the plugin" id="import-plugin">
-    Start by importing the action with the following import:
+<div className="fd-steps">
 
-    ```ts
-    import { WeaveContextMenuPlugin } from "@inditextech/weave-sdk";
-    ```
+<div className="[&_h3]:fd-step">
 
-  </Accordion>
-  <Accordion title="2. Register the plugin" id="register-plugin">
-    Then register the action on the Weave class instance.
+### Import the Plugin
 
-    ```ts
-    const instance = new Weave({
-      ...
-      plugins: [
-        ...,
-        new WeaveContextMenuPlugin({ // [!code ++]
-          xOffset, // define the X offset of the click point  [!code ++]
-          yOffset, // define the Y offset of the click point [!code ++]
-          onNodeMenu, // callback to listen when the user right-click [!code ++]
-        }), // [!code ++]
-      ]
-    })
-    ```
+Start by importing the plugin:
 
-  </Accordion>
-  <Accordion title="3. Use the plugin" id="use-the-plugin">
-    Listen to changes when user right-clicked on the `onNodeMenu` callback, then
-    react accordingly. Something like this:
-    
-    ```ts
-    const instance = new Weave({
-      ...
-      plugins: [
-        ...,
-        new WeaveContextMenuPlugin({
-          onNodeMenu: ({ instance, selection, point, visible }) => {
-            // based on the selection, render the UI of your context menu (options)
-            // and then render it on the coordinates provided by point. Remember to
-            // handle the context menu screen overflow based on the point provided.
-          },
-          ...
-        }),
-      ]
-    })
-    ```
-  </Accordion>
-</Accordions>
+```ts
+import { WeaveContextMenuPlugin } from "@inditextech/weave-sdk";
+```
+
+</div>
+
+<div className='[&_h3]:fd-step'>
+
+### Register the Plugin
+
+Then register the plugin on the [Weave](/docs/sdk/api-reference/weave) class instance.
+
+```ts
+const instance = new Weave({
+  ...
+  plugins: [
+    ...,
+    new WeaveContextMenuPlugin(), // [!code ++]
+  ]
+})
+```
+
+</div>
+
+<div className='[&_h3]:fd-step'>
+
+### Use the plugin
+
+Once the plugin is registered you can add a listener with the [Weave](/docs/sdk/api-reference/weave)
+instance [Events API](/docs/sdk/api-reference/weave#events) that listen to the event named `onNodeContextMenu`.
+
+```ts
+// Import types
+import type {
+  WeaveContextMenuPlugin,
+  WeaveStageContextMenuPluginOnNodeContextMenuEvent,
+} from "@inditextech/weave-sdk";
+
+instance.addEventListener<WeaveConnectedUsersChangeEvent>(
+  "onNodeContextMenu",
+  ({
+    selection,
+    point,
+    visible,
+  }: WeaveStageContextMenuPluginOnNodeContextMenuEvent) => {
+    // Returns what is selected, the point where the user press the mouse button or
+    // touched and if is visible or not, useful when for example the user touches
+    // the stage to close the contextual menu.
+    console.log({
+      selection,
+      point,
+      visible,
+    });
+  }
+);
+```
+
+With this callback you can trigger your own Context Menu UI.
+
+</div>
+
+</div>

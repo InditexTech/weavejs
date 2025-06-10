@@ -3,7 +3,7 @@ title: Selection Tool
 description: Activate the selection of canvas nodes
 ---
 
-import { Accordion, Accordions } from "fumadocs-ui/components/accordion";
+![Selection Tool action on use on the Weave.js showcase](/images/actions/selection-tool.gif)
 
 ## Introduction
 
@@ -11,63 +11,84 @@ This action toggles the selection of nodes within the canvas on or off.
 
 ## Dependencies
 
-This action needs also registered on the Weave instance the following:
+This action needs registered on the Weave instance the following element:
 
 - [Nodes selection](/docs/main/build/plugins/nodes-selection) plugin
 
 ## Usage
 
-<Accordions className="bg-transparent">
-  <Accordion title="1. Import the action" id="import-action">
-    Start by importing the action with the following import:
+<div className="fd-steps">
 
-    ```ts
-    import { WeaveSelectionToolAction } from "@inditextech/weave-sdk";
-    ```
+<div className="[&_h3]:fd-step">
 
-  </Accordion>
-  <Accordion title="2. Register the action" id="register-action">
-    Then register the action on the Weave class instance.
+### Import the Action
 
-    ```ts
-    const instance = new Weave({
-      ...
-      actions: [
-        ...,
-        new WeaveSelectionToolAction(), // [!code ++]
-      ]
-    })
-    ```
+Start by importing the action:
 
-  </Accordion>
-  <Accordion title="3. Setup the action trigger" id="setup-action-trigger">
-    Setup on a button or any element on the UI the user can trigger, an action
-    to trigger the action. For example on a button on React:
+```ts
+import { WeaveSelectionToolAction } from "@inditextech/weave-sdk";
+```
 
-    ```tsx
-    import { useWeave } from "@inditextech/weave-react";
+</div>
 
-    const MySelectionToolTriggerComponent = () => {
-      const instance = useWeave((state) => state.instance);
+<div className='[&_h3]:fd-step'>
 
-      const triggerTool = React.useCallback(() => {
-        instance.triggerAction("selectionTool");
-      }, [instance])
+### Register the Action
 
-      return (
-        <button onClick={triggerTool}>Selection Tool</button>
-      )
-    }
-    ```
+Then register the action on the [Weave](/docs/sdk/api-reference/weave) class instance.
 
-  </Accordion>
-  <Accordion title="4. Trigger the action" id="trigger-the-action">
-    Finally as an user trigger the UI element that launches the action.
+```ts
+const instance = new Weave({
+  ...
+  actions: [
+    ...,
+    new WeaveSelectionToolAction(), // [!code ++]
+  ]
+})
+```
 
-    When enabled, it allows users to interactively select nodes using the
-    [Nodes Selection](/docs/main/build/plugins/node-selection) plugin. This action
-    doesn’t handle selection logic itself—instead, it simply activates or deactivates
-    selection capabilities in the UI.
+</div>
 
-  </Accordion>
-</Accordions>
+<div className='[&_h3]:fd-step'>
+
+### Setup the action trigger
+
+Setup on a button or any element on the UI the user can interact with on the action event:
+
+```ts
+instance.triggerAction("selectionTool");
+```
+
+---
+
+For example on a button on React:
+
+```tsx
+import React from "react";
+import { useWeave } from "@inditextech/weave-react";
+
+const MySelectionToolTriggerComponent = () => {
+  const instance = useWeave((state) => state.instance);
+
+  const triggerTool = React.useCallback(() => {
+    instance.triggerAction("selectionTool");
+  }, [instance]);
+
+  return <button onClick={triggerTool}>Selection Tool</button>;
+};
+```
+
+### Trigger the action
+
+Finally a final user trigger the UI element that launches the action.
+
+---
+
+When enabled, it allows users to interactively select nodes using the
+[Nodes Selection](/docs/main/build/plugins/node-selection) plugin. This action
+doesn’t handle selection logic itself—instead, it simply activates or deactivates
+selection capabilities in the UI.
+
+</div>
+
+</div>

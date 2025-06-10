@@ -3,7 +3,7 @@ title: Group
 description: Group nodes and manipulate them
 ---
 
-import { Accordion, Accordions } from "fumadocs-ui/components/accordion";
+![Group on Weave.js showcase](/images/nodes/group.png)
 
 The Group node is a container for organizing multiple nodes into a single, movable
 and transformable unit. Based on Konva’s [Group](https://konvajs.org/api/Konva.Group.html),
@@ -16,31 +16,53 @@ scene organized and easier to manipulate programmatically.
 
 ## Usage
 
-<Accordions className="bg-transparent">
-  <Accordion title="1. Import the node" id="import-node">
-    Start by importing the action with the following import:
+<div className="fd-steps">
 
-    ```ts
-    import { WeaveGroupNode } from "@inditextech/weave-sdk";
-    ```
+<div className="[&_h3]:fd-step">
 
-  </Accordion>
-  <Accordion title="2. Register the node" id="register-node">
-    Then register the node on the Weave class instance.
+### Import the Node
 
-    ```ts
-    const instance = new Weave({
-      ...
-      nodes: [
-        ...,
-        new WeaveGroupNode(), // [!code ++]
-      ]
-    })
-    ```
+Start by importing the node:
 
-  </Accordion>
-  <Accordion title="3. Use the node" id="use-the-node">
-    TODO
+```ts
+import { WeaveGroupNode } from "@inditextech/weave-sdk";
+```
 
-  </Accordion>
-</Accordions>
+</div>
+
+<div className='[&_h3]:fd-step'>
+
+### Register the Node
+
+Then register the node on the [Weave](/docs/sdk/api-reference/weave) class instance.
+
+```ts
+const instance = new Weave({
+  ...
+  nodes: [
+    ...,
+    new WeaveGroupNode(), // [!code ++]
+  ]
+})
+```
+
+</div>
+
+<div className='[&_h3]:fd-step'>
+
+### Use the node
+
+<Callout type="warn">
+
+The Group node is a layering node, it doesn't render anything visual to the end user, its normally
+used through the contextual menu to group selected nodes or un-group a group. Check the [Weave](/docs/sdk/api-reference/weave)
+class API to learn about the [Group Management](/docs/sdk/api-reference/weave#group-management) API.
+
+</Callout>
+
+Once the node is registered you can use it on [Actions](/docs/main/build/actions) or
+[Plugins](/docs/main/build/plugins) or even other [Nodes](/docs/main/build/nodes).
+
+</div>
+
+</div>

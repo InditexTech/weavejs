@@ -150,3 +150,55 @@ toNode(instance: WeaveElementInstance): WeaveStateElement
 
 This method returns the JSON model representation of the provided Konva instance
 that is handled by this Node definition.
+
+## Konva.Node Augmentation
+
+The WeaveNode extend the `Konva.Node` class to define several functions:
+
+---
+
+### getTransformerProperties
+
+```ts
+getTransformerProperties(): WeaveNodeTransformerProperties
+```
+
+This function allows you to override how when node is selected it can: rotate, resize and if is
+resizable which anchors for resizing will be available.
+
+By default, all nodes can rotate, resize and the default anchors are:
+
+```ts
+const DEFAULT_ANCHORS_ENABLED: string[] = [
+  "top-left",
+  "top-center",
+  "top-right",
+  "middle-right",
+  "middle-left",
+  "bottom-left",
+  "bottom-center",
+  "bottom-right",
+];
+```
+
+---
+
+### movedToContainer
+
+```ts
+movedToContainer(): void
+```
+
+Function that is called when the node changes from one container to another.
+
+---
+
+### updatePosition
+
+```ts
+updatePosition(): void
+```
+
+Function that is called when a node updates its position, its useful when trying to move Nodes
+my its children and not its parents, check how the [Frame](https://github.com/InditexTech/weavejs/blob/main/code/packages/sdk/src/nodes/frame/frame.ts)
+node is coded and look for how it uses the `updatePosition` callback.

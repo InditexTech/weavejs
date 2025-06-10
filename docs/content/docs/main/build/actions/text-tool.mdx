@@ -3,8 +3,9 @@ title: Text Tool
 description: Add text to the canvas
 ---
 
-import { Accordion, Accordions } from "fumadocs-ui/components/accordion";
 import { Kbd } from "@/components/kbd";
+
+![Text Tool action on use on the Weave.js showcase](/images/actions/text-tool.gif)
 
 ## Introduction
 
@@ -18,64 +19,85 @@ across all connected users in real time.
 
 ## Dependencies
 
-This action needs also registered on the Weave instance the following:
+This action needs registered on the Weave instance the following element:
 
 - [Text](/docs/main/build/nodes/text) node
 
 ## Usage
 
-<Accordions className="bg-transparent">
-  <Accordion title="1. Import the action" id="import-action">
-    Start by importing the action with the following import:
+<div className="fd-steps">
 
-    ```ts
-    import { WeaveTextToolAction } from "@inditextech/weave-sdk";
-    ```
+<div className="[&_h3]:fd-step">
 
-  </Accordion>
-  <Accordion title="2. Register the action" id="register-action">
-    Then register the action on the Weave class instance.
+### Import the Action
 
-    ```ts
-    const instance = new Weave({
-      ...
-      actions: [
-        ...,
-        new WeaveTextToolAction(), // [!code ++]
-      ]
-    })
-    ```
+Start by importing the action:
 
-  </Accordion>
-  <Accordion title="3. Setup the action trigger" id="setup-action-trigger">
-    Setup on a button or any element on the UI the user can trigger, an action
-    to trigger the action. For example on a button on React:
+```ts
+import { WeaveTextToolAction } from "@inditextech/weave-sdk";
+```
 
-    ```tsx
-    import { useWeave } from "@inditextech/weave-react";
+</div>
 
-    const MyTextToolTriggerComponent = () => {
-      const instance = useWeave((state) => state.instance);
+<div className='[&_h3]:fd-step'>
 
-      const triggerTool = React.useCallback(() => {
-        instance.triggerAction("textTool");
-      }, [instance])
+### Register the Action
 
-      return (
-        <button onClick={triggerTool}>Text Tool</button>
-      )
-    }
-    ```
+Then register the action on the [Weave](/docs/sdk/api-reference/weave) class instance.
 
-  </Accordion>
-  <Accordion title="4. Trigger the action" id="trigger-the-action">
-    Finally as an user trigger the UI element that launches the action.
+```ts
+const instance = new Weave({
+  ...
+  actions: [
+    ...,
+    new WeaveTextToolAction(), // [!code ++]
+  ]
+})
+```
 
-    When active the user can:
+</div>
 
-    - **Click** on the canvas, it will create a new text node.
+<div className='[&_h3]:fd-step'>
 
-    After the node is added it can be edited by **double-click** or **double-touch** on it.
+### Setup the action trigger
 
-  </Accordion>
-</Accordions>
+Setup on a button or any element on the UI the user can interact with on the action event:
+
+```ts
+instance.triggerAction("textTool");
+```
+
+---
+
+For example on a button on React:
+
+```tsx
+import React from "react";
+import { useWeave } from "@inditextech/weave-react";
+
+const MyTextToolTriggerComponent = () => {
+  const instance = useWeave((state) => state.instance);
+
+  const triggerTool = React.useCallback(() => {
+    instance.triggerAction("textTool");
+  }, [instance]);
+
+  return <button onClick={triggerTool}>Text Tool</button>;
+};
+```
+
+### Trigger the action
+
+Finally a final user trigger the UI element that launches the action.
+
+---
+
+When active the user can:
+
+- **Click** on the canvas, it will create a new text node.
+
+After the node is added it can be edited by **double-click** or **double-touch** on it.
+
+</div>
+
+</div>

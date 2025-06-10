@@ -136,15 +136,18 @@ fill color, stroke and more.
 
 </Cards>
 
-## Extensibility
+## Custom Nodes
 
 Developers can also build their own **custom nodes**, empowering this way their applications
 with new visual nodes with behavior closer to the needs of their applications.
 
-### Base class
+For this we provide an extension mechanism that allows to define your own nodes and use them
+on your application.
 
-In Weave.js a Node is a class that extends the WeaveNode abstract class, and implements a set of
-methods that define the Node behavior.
+### WeaveNode class
+
+In Weave.js a Node is a class that extends the [WeaveNode](https://github.com/InditexTech/weavejs/blob/main/code/packages/sdk/src/nodes/node.ts)
+abstract class, and implements a set of methods that define the Node behavior.
 
 <Callout title="Access the Weave instance">
 
@@ -155,6 +158,8 @@ You can access Weave.js main instance via `this.instance`.
 To create a custom node, create a class that extends the [WeaveNode](https://github.com/InditexTech/weavejs/blob/main/code/packages/sdk/src/nodes/node.ts)
 abstract class, and implement the following attributes and methods:
 
+---
+
 #### nodeType
 
 All nodes must define a property:
@@ -164,6 +169,8 @@ nodeType: string;
 ```
 
 Which defines the node identity. The `nodeType` attribute must be unique among other nodes.
+
+---
 
 #### create
 
@@ -185,6 +192,8 @@ use cases.
 
 </Callout>
 
+---
+
 #### onRender
 
 ```ts
@@ -194,15 +203,55 @@ onRender(props: WeaveElementAttributes): WeaveElementInstance
 The `onRender` method is the one responsible for rendering the node on the canvas, It's a good place
 to initialize the nodes, events, etc.
 
-<Separator />
+---
 
-We extend the `Konva.Node` class to define a function:
+#### onUpdate
+
+```ts
+onUpdate(
+  instance: WeaveElementInstance,
+  nextProps: WeaveElementAttributes
+): void
+```
+
+The `onUpdate` method is called anytime that the nodes needs to update on the canvas, it receives the
+actual canvas instance (Konva element) of the node and the new props.
+
+---
+
+#### onDestroy
+
+```ts
+onDestroy(nodeInstance: WeaveElementInstance): void
+```
+
+The `onDestroy` method is called when the canvas instance needs to be disposed.
+
+---
+
+#### serialize
+
+```ts
+serialize(instance: WeaveElementInstance): WeaveStateElement
+```
+
+The `serialize` method transform a canvas instance (Konva element) into its JSON representation so it
+can be sent over the wire for sync with other peers or to persist the model server-side.
+
+### Konva.Node Augmentation
+
+Our [WeaveNode](/docs/sdk/api-reference/nodes/node) base class extend the `Konva.Node` class to define several functions:
+
+---
+
+#### getTransformerProperties
 
 ```ts
 getTransformerProperties(): WeaveNodeTransformerProperties
 ```
 
-That you can override, allowing to define when the node is selected if can: rotate, resize and if is resizable which anchors for resizing will be available.
+This function allows you to override how when node is selected it can: rotate, resize and if is
+resizable which anchors for resizing will be available.
 
 By default, all nodes can rotate, resize and the default anchors are:
 
@@ -219,31 +268,24 @@ const DEFAULT_ANCHORS_ENABLED: string[] = [
 ];
 ```
 
-#### onUpdate
+---
+
+#### movedToContainer
 
 ```ts
-onUpdate(
-  instance: WeaveElementInstance,
-  nextProps: WeaveElementAttributes
-): void
+movedToContainer(): void
 ```
 
-The `onUpdate` method is called anytime that the nodes needs to update on the canvas, it receives the
-actual canvas instance (Konva element) of the node and the new props.
+Function that is called when the node changes from one container to another.
 
-#### onDestroy
+---
+
+#### updatePosition
 
 ```ts
-onDestroy(nodeInstance: WeaveElementInstance): void
+updatePosition(): void
 ```
 
-The `onDestroy` method is called when the canvas instance needs to be disposed.
-
-#### serialize
-
-```ts
-serialize(instance: WeaveElementInstance): WeaveStateElement
-```
-
-The `serialize` method transform a canvas instance (Konva element) into its JSON representation so it
-can be sent over the wire for sync with other peers or to persist the model server-side.
+Function that is called when a node updates its position, its useful when trying to move Nodes
+my its children and not its parents, check how the [Frame](https://github.com/InditexTech/weavejs/blob/main/code/packages/sdk/src/nodes/frame/frame.ts)
+node is coded and look for how it uses the `updatePosition` callback.

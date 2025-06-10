@@ -3,65 +3,150 @@ title: Copy & Paste Nodes
 description: Activate support to copy & paste the nodes
 ---
 
-import { Accordion, Accordions } from "fumadocs-ui/components/accordion";
+import { Kbd } from "@/components/kbd";
+
+![Copy & Paste plugin on use on the Weave.js showcase](/images/plugins/copy-paste.gif)
 
 ## Introduction
 
-This plugin enables users to duplicate selected nodes using familiar keyboard
-shortcuts like Ctrl/Cmd + C and Ctrl/Cmd + V, or through options in a context-menu.
-It preserves node structure, styles, and metadata, allowing for quick reuse and
-layout iteration.
+This plugin enables users to copy & paste selected nodes.
+
+Using familiar keyboard shortcuts like <Kbd keys={["Ctrl"]} /> / <Kbd keys={["Cmd"]} /> + <Kbd keys={["C"]} />
+and <Kbd keys={["Ctrl"]} /> / <Kbd keys={["Cmd"]} /> + <Kbd keys={["V"]} />, or
+through options in a context-menu. It preserves node structure, styles, and
+metadata, allowing for quick reuse and layout iteration.
 
 Supports multi-node copy & copy & paste between tabs. It integrates
 seamlessly with the selection and action systems, making it a natural part of the
 collaborative editing workflow.
 
-## Dependencies
-
-This plugin needs also registered on the Weave instance the following:
-
-- [Nodes selection](/docs/main/build/plugins/nodes-selection) plugin.
-
 ## Usage
 
-<Accordions className="bg-transparent">
-  <Accordion title="1. Import the plugin" id="import-plugin">
-    Start by importing the action with the following import:
+<div className="fd-steps">
 
-    ```ts
-    import { WeaveCopyPasteNodesPlugin } from "@inditextech/weave-sdk";
-    ```
+<div className="[&_h3]:fd-step">
 
-  </Accordion>
-  <Accordion title="2. Register the plugin" id="register-plugin">
-    Then register the action on the Weave class instance.
+### Import the Plugin
 
-    ```ts
-    const instance = new Weave({
-      ...
-      plugins: [
-        ...,
-        new WeaveCopyPasteNodesPlugin({ // [!code ++]
-          onCopy, // callback to listen when the user copies a node or nodes [!code ++]
-          onPaste, // callback to listen when the user paste a node or nodes [!code ++]
-          onPasteExternal, // TODO [!code ++]
-        }), // [!code ++]
-      ]
-    })
-    ```
+Start by importing the plugin:
 
-  </Accordion>
-  <Accordion title="3. Use the plugin" id="use-the-plugin">
-    Users now can copy & paste selected nodes to the actual canvas, or to other canvases
-    located on other tabs.
-    
-    Also depending on your needs:
+```ts
+import { WeaveCopyPasteNodesPlugin } from "@inditextech/weave-sdk";
+```
 
-    - Listen to the `onCopy` callback to know when the user copies a node or nodes,
-      for example to showcase a toast for feedback.
-    - Listen to the `onPaste` callback to know when the user paste a node or nodes,
-      for example to showcase a toast for feedback.
-    - Listen to the `onPasteExternal` callback, TODO.
+</div>
 
-  </Accordion>
-</Accordions>
+<div className='[&_h3]:fd-step'>
+
+### Register the Plugin
+
+Then register the plugin on the [Weave](/docs/sdk/api-reference/weave) class instance.
+
+```ts
+const instance = new Weave({
+  ...
+  plugins: [
+    ...,
+    new WeaveCopyPasteNodesPlugin(), // [!code ++]
+  ]
+})
+```
+
+</div>
+
+<div className='[&_h3]:fd-step'>
+
+### Use the plugin
+
+Once the plugin is registered final users can now copy & paste nodes freely, but the copy & paste
+mus be triggered using the API provided by the plugin.
+
+---
+
+#### Public API
+
+- To copy just select a node (or nodes), and trigger the `copy()` function:
+
+  ```ts
+  const copyPastePlugin =
+    this.instance.getPlugin<WeaveCopyPasteNodesPlugin>("copyPasteNodes");
+  if (copyPastePlugin) {
+    await copyPastePlugin.copy();
+  }
+  ```
+
+- To paste, after copy something to the clipboard just trigger the `paste()` function:
+
+  ```ts
+  const copyPastePlugin =
+    this.instance.getPlugin<WeaveCopyPasteNodesPlugin>("copyPasteNodes");
+  if (copyPastePlugin) {
+    copyPastePlugin.paste();
+  }
+  ```
+
+To learn more check the [WeaveCopyPasteNodesPlugin](/docs/sdk/api-reference/plugins/copy-paste-nodes)
+plugin.
+
+---
+
+#### Events
+
+You can also add some listeners with the [Weave](/docs/sdk/api-reference/weave)
+instance [Events API](/docs/sdk/api-reference/weave#events) that listen to the following
+provided events:
+
+- `onCopy`: triggers when an user copy something onto the clipboard.
+
+  ```ts
+  // Import types
+  import type {
+    WeaveCopyPasteNodesPlugin,
+    WeaveCopyPasteNodesPluginOnCopyEvent,
+  } from "@inditextech/weave-sdk";
+
+  instance.addEventListener<WeaveCopyPasteNodesPluginOnCopyEvent>(
+    "onCopy",
+    () => {
+      console.log("copy operation performed");
+    }
+  );
+  ```
+
+- `onPaste`: triggers when an user paste something from the clipboard onto the stage.
+
+  ```ts
+  // Import types
+  import type {
+    WeaveCopyPasteNodesPlugin,
+    WeaveCopyPasteNodesPluginOnPasteEvent,
+  } from "@inditextech/weave-sdk";
+
+  instance.addEventListener<WeaveCopyPasteNodesPluginOnPasteEvent>(
+    "onPaste",
+    () => {
+      console.log("paste operation performed");
+    }
+  );
+  ```
+
+- `onPasteExternal`: triggers when an user paste something from external sources (not the application).
+
+  ```ts
+  // Import types
+  import type {
+    WeaveCopyPasteNodesPlugin,
+    WeaveCopyPasteNodesPluginOnPasteExternalEvent,
+  } from "@inditextech/weave-sdk";
+
+  instance.addEventListener<WeaveCopyPasteNodesPluginOnPasteExternalEvent>(
+    "onPasteExternal",
+    () => {
+      console.log("external paste operation performed");
+    }
+  );
+  ```
+
+</div>
+
+</div>
