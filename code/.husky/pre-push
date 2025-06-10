@@ -1,13 +1,13 @@
 #!/usr/bin/env sh
 cd code
 CODE_CHANGES=$(npm run changed:files -- "code/**/*")
-if [ "${CODE_CHANGES}" > 0 ]
+if [ "${CODE_CHANGES}" != "0" ]
 then
   npm run git:pre-push
 fi
 cd ../docs
 DOCS_CHANGES=$(npm run changed:files -- "docs/**/*")
-if [ "${DOCS_CHANGES}" > 0 ]
+if [ "${DOCS_CHANGES}" != "0" ]
 then
   npm run changed:files -- "docs/**/*"
   npm run git:pre-push
