@@ -23,6 +23,8 @@ import {
   type WeaveFont,
   type WeaveNodeFound,
   type WeaveNodeConfiguration,
+  type WeaveStoreConnectionStatus,
+  WEAVE_STORE_CONNECTION_STATUS,
 } from '@inditextech/weave-types';
 import { WeaveStore } from './stores/store';
 import {
@@ -143,6 +145,11 @@ export class Weave extends Emittery {
 
     // Perform the first render of the instance
     this.renderer.render(() => {
+      this.removeEventListener(
+        'onStoreConnectionStatusChange',
+        this.handleStoreConnectionStatusChange.bind(this)
+      );
+
       // Setup the plugins and actions that needed the first render to work
       this.setupManager.setupPlugins();
       this.setupManager.setupActions();
@@ -164,6 +171,19 @@ export class Weave extends Emittery {
 
   setStore(store: WeaveStore): void {
     this.storeManager.registerStore(store);
+  }
+
+  private handleStoreConnectionStatusChange(
+    status: WeaveStoreConnectionStatus
+  ): void {
+    if (status === WEAVE_STORE_CONNECTION_STATUS.ERROR) {
+      this.status = WEAVE_INSTANCE_STATUS.CONNECTING_ERROR;
+      this.emitEvent('onInstanceStatus', this.status);
+    }
+    if (status === WEAVE_STORE_CONNECTION_STATUS.CONNECTED) {
+      this.status = WEAVE_INSTANCE_STATUS.LOADING_ROOM;
+      this.emitEvent('onInstanceStatus', this.status);
+    }
   }
 
   async start(): Promise<void> {
@@ -195,8 +215,16 @@ export class Weave extends Emittery {
     // Setup stage
     this.stageManager.initStage();
 
+    this.status = WEAVE_INSTANCE_STATUS.CONNECTING_TO_ROOM;
+    this.emitEvent('onInstanceStatus', this.status);
     // Setup and connect to the store
     const store = this.storeManager.getStore();
+
+    this.addEventListener(
+      'onStoreConnectionStatusChange',
+      this.handleStoreConnectionStatusChange.bind(this)
+    );
+
     store.setup();
     store.connect();
   }

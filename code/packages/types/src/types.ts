@@ -11,6 +11,7 @@ import {
   WEAVE_INSTANCE_STATUS,
   WEAVE_NODE_POSITION,
   WEAVE_TRANSFORMER_ANCHORS,
+  WEAVE_STORE_CONNECTION_STATUS,
 } from './constants';
 import { type WeaveNodeBase } from '@/base/node';
 import { type WeaveActionBase } from '@/base/action';
@@ -191,6 +192,43 @@ export type WeaveUndoRedoChange = {
 };
 
 // Store
+
+export type WeaveStoreConnectionStatusKeys =
+  keyof typeof WEAVE_STORE_CONNECTION_STATUS;
+export type WeaveStoreConnectionStatus =
+  (typeof WEAVE_STORE_CONNECTION_STATUS)[WeaveStoreConnectionStatusKeys];
+
+export type WeaveStoreOnStoreConnectionStatusChangeEvent =
+  WeaveStoreOnPubSubClientStatusChange;
+
+export type WeaveStoreOnPubSubClientStatusChange =
+  | {
+      status: 'connecting' | 'connect' | 'ready' | 'end';
+      error?: undefined;
+      delay?: undefined;
+    }
+  | {
+      status: 'error';
+      error: Error;
+      delay?: undefined;
+    }
+  | {
+      status: 'reconnecting';
+      error?: undefined;
+      delay: number;
+    };
+
+export type WeaveStoreHorizontalSyncRedisConfig = {
+  host: string;
+  port: number;
+  keyPrefix: string;
+  password?: string;
+};
+
+export type WeaveStoreHorizontalSyncConfig = {
+  type: 'redis';
+  config: WeaveStoreHorizontalSyncRedisConfig;
+};
 
 export declare type docElementTypeDescription =
   | 'xml'

@@ -12,6 +12,9 @@ export const WEAVE_INSTANCE_STATUS = {
   ['IDLE']: 'idle',
   ['STARTING']: 'starting',
   ['LOADING_FONTS']: 'loadingFonts',
+  ['CONNECTING_TO_ROOM']: 'connectingToRoom',
+  ['CONNECTING_ERROR']: 'connectingError',
+  ['LOADING_ROOM']: 'loadingRoom',
   ['RUNNING']: 'running',
 } as const;
 
@@ -68,3 +71,10 @@ export const WEAVE_DEFAULT_TRANSFORM_PROPERTIES: WeaveNodeTransformerProperties 
     borderStrokeWidth: 3,
     padding: 0,
   };
+
+export const WEAVE_STORE_CONNECTION_STATUS = {
+  ['ERROR']: 'error',
+  ['CONNECTING']: 'connecting',
+  ['CONNECTED']: 'connected',
+  ['DISCONNECTED']: 'disconnected',
+} as const;

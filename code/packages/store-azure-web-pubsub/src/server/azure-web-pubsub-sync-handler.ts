@@ -8,17 +8,18 @@ import { WebPubSubServiceClient } from '@azure/web-pubsub';
 import {
   WebPubSubEventHandler,
   type WebPubSubEventHandlerOptions,
-} from '@azure/web-pubsub-express';
+} from './event-handler';
 import { type FetchInitialState } from '@/types';
 import { WeaveStoreAzureWebPubSubSyncHost } from './azure-web-pubsub-host';
 import { WeaveAzureWebPubsubServer } from './azure-web-pubsub-server';
+import type { WeaveHorizontalSyncHandlerRedis } from './horizontal-sync-handler/redis/client';
 
 export default class WeaveAzureWebPubsubSyncHandler extends WebPubSubEventHandler {
+  private horizontalSyncHandler: WeaveHorizontalSyncHandlerRedis;
   // eslint-disable-next-line @typescript-eslint/naming-convention
   private _client: WebPubSubServiceClient;
   // eslint-disable-next-line @typescript-eslint/naming-convention
-  private _connections: Map<string, WeaveStoreAzureWebPubSubSyncHost> =
-    new Map();
+  private _rooms: Map<string, Y.Doc> = new Map();
   // eslint-disable-next-line @typescript-eslint/naming-convention
   private _store_persistence: Map<string, NodeJS.Timeout> = new Map();
   private initialState: FetchInitialState;
@@ -27,6 +28,7 @@ export default class WeaveAzureWebPubsubSyncHandler extends WebPubSubEventHandle
   constructor(
     server: WeaveAzureWebPubsubServer,
     client: WebPubSubServiceClient,
+    horizontalSyncHandler: WeaveHorizontalSyncHandlerRedis,
     initialState: FetchInitialState,
     hub: string,
     // path: string,
@@ -37,6 +39,7 @@ export default class WeaveAzureWebPubsubSyncHandler extends WebPubSubEventHandle
     });
 
     this.actualServer = server;
+    this.horizontalSyncHandler = horizontalSyncHandler;
     this.initialState = initialState;
     this._client = client;
   }
@@ -45,13 +48,10 @@ export default class WeaveAzureWebPubsubSyncHandler extends WebPubSubEventHandle
     return new Y.Doc();
   }
 
-  private async setupRoomPersistence(
-    roomId: string,
-    connection: WeaveStoreAzureWebPubSubSyncHost
-  ) {
+  private async setupRoomPersistence(roomId: string, doc: Y.Doc) {
     if (!this._store_persistence.has(roomId)) {
       const intervalId = setInterval(async () => {
-        const actualState = Y.encodeStateAsUpdate(connection.doc);
+        const actualState = Y.encodeStateAsUpdate(doc);
         if (this.actualServer && this.actualServer.persistRoom) {
           try {
             await this.actualServer.persistRoom(roomId, actualState);
@@ -66,7 +66,7 @@ export default class WeaveAzureWebPubsubSyncHandler extends WebPubSubEventHandle
   }
 
   private async getHostConnection(roomId: string) {
-    if (!this._connections.has(roomId)) {
+    if (!this._rooms.has(roomId)) {
       const doc = this.getNewYDoc();
 
       let documentData = undefined;
@@ -82,6 +82,7 @@ export default class WeaveAzureWebPubsubSyncHandler extends WebPubSubEventHandle
 
       const connection = new WeaveStoreAzureWebPubSubSyncHost(
         this._client,
+        this.horizontalSyncHandler,
         roomId,
         doc,
         {
@@ -91,16 +92,19 @@ export default class WeaveAzureWebPubsubSyncHandler extends WebPubSubEventHandle
       );
       connection.start();
 
-      this._connections.set(roomId, connection);
+      this._rooms.set(roomId, doc);
 
-      await this.setupRoomPersistence(roomId, connection);
+      await this.setupRoomPersistence(roomId, doc);
     }
-
-    return this._connections.get(roomId);
   }
 
-  async clientConnect(roomId: string): Promise<string> {
-    this.getHostConnection(roomId);
+  async clientConnect(roomId: string): Promise<string | null> {
+    try {
+      this.getHostConnection(roomId);
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    } catch (ex) {
+      return null;
+    }
 
     const token = await this._client.getClientAccessToken({
       roles: [

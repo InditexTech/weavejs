@@ -5,13 +5,14 @@
 import { isEmpty } from 'lodash';
 import { Weave } from '@/weave';
 import {
-  // type WeaveAwarenessChange,
   type WeaveState,
   type WeaveStoreBase,
   type WeaveUndoRedoChange,
   type WeaveStoreOptions,
   type WeaveUser,
   type MappedTypeDescription,
+  type WeaveStoreConnectionStatus,
+  type WeaveStoreOnStoreConnectionStatusChangeEvent,
 } from '@inditextech/weave-types';
 import {
   observeDeep,
@@ -232,6 +233,14 @@ export abstract class WeaveStore implements WeaveStoreBase {
     }
 
     this.undoManager.redo();
+  }
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  handleConnectionStatusChange(status: WeaveStoreConnectionStatus): void {
+    this.instance.emitEvent<WeaveStoreOnStoreConnectionStatusChangeEvent>(
+      'onStoreConnectionStatusChange',
+      status
+    );
   }
 
   abstract connect(): void;

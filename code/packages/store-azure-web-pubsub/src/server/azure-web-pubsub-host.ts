@@ -10,6 +10,7 @@ import * as awarenessProtocol from 'y-protocols/awareness';
 import { WebPubSubServiceClient } from '@azure/web-pubsub';
 import { WebSocket } from 'ws';
 import * as Y from 'yjs';
+import { WeaveHorizontalSyncHandlerRedis } from './horizontal-sync-handler/redis/client';
 
 const messageSync = 0;
 const messageAwareness = 1;
@@ -46,8 +47,10 @@ export interface WebPubSubHostOptions {
 }
 
 export class WeaveStoreAzureWebPubSubSyncHost {
+  private horizontalSyncHandler: WeaveHorizontalSyncHandlerRedis;
   public doc: Y.Doc;
   public topic: string;
+  public topicAwarenessChannel: string;
 
   private _client: WebPubSubServiceClient;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -59,13 +62,16 @@ export class WeaveStoreAzureWebPubSubSyncHost {
 
   constructor(
     client: WebPubSubServiceClient,
+    horizontalSyncHandler: WeaveHorizontalSyncHandlerRedis,
     topic: string,
     doc: Y.Doc,
     { WebSocketPolyfill = WebSocket }: WebPubSubHostOptions
   ) {
     this.doc = doc;
     this.topic = topic;
+    this.topicAwarenessChannel = `${topic}-awareness`;
     this._client = client;
+    this.horizontalSyncHandler = horizontalSyncHandler;
 
     this._conn = null;
     this._polyfill = WebSocketPolyfill;
@@ -105,9 +111,48 @@ export class WeaveStoreAzureWebPubSubSyncHost {
       encoding.writeVarUint(encoder, messageSync);
       syncProtocol.writeUpdate(encoder, update);
       const u8 = encoding.toUint8Array(encoder);
+
+      if (this.horizontalSyncHandler.isEnabledPubSub() && update.length > 0) {
+        this.horizontalSyncHandler
+          .getPubClient()
+          .publish(this.topic, Buffer.from(update))
+          .catch((err: Error) => {
+            console.error(err);
+          });
+      }
+
       this.broadcast(this.topic, u8);
     };
     doc.on('update', updateHandler);
+
+    if (this.horizontalSyncHandler.isEnabledPubSub()) {
+      this.horizontalSyncHandler.getSubClient().subscribe(this.topic);
+      this.horizontalSyncHandler
+        .getSubClient()
+        .subscribe(this.topicAwarenessChannel);
+      this.horizontalSyncHandler
+        .getSubClient()
+        .on('messageBuffer', (channel, update) => {
+          const channelId = channel.toString();
+
+          // update is a Buffer, Buffer is a subclass of Uint8Array, update can be applied
+          // as an update directly
+
+          if (channelId === this.topic) {
+            Y.applyUpdate(
+              doc,
+              update,
+              this.horizontalSyncHandler.getPubClient()
+            );
+          } else if (channelId === this.topicAwarenessChannel) {
+            awarenessProtocol.applyAwarenessUpdate(
+              this.awareness,
+              update,
+              this.horizontalSyncHandler.getPubClient()
+            );
+          }
+        });
+    }
   }
 
   get awareness(): awarenessProtocol.Awareness {
@@ -231,9 +276,17 @@ export class WeaveStoreAzureWebPubSubSyncHost {
       const buf = Buffer.from(data.c, 'base64');
       const decoder = decoding.createDecoder(buf);
       decoding.readVarUint(decoder); // skip the message type
+      const update = decoding.readVarUint8Array(decoder);
+
+      if (this.horizontalSyncHandler.isEnabledPubSub() && update.length > 0) {
+        this.horizontalSyncHandler
+          .getPubClient()
+          .publish(this.topicAwarenessChannel, Buffer.from(update));
+      }
+
       awarenessProtocol.applyAwarenessUpdate(
         this._awareness,
-        decoding.readVarUint8Array(decoder),
+        update,
         undefined
       );
     } catch (err) {
