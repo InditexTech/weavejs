@@ -199,6 +199,9 @@ export type WeaveStoreConnectionStatus =
   (typeof WEAVE_STORE_CONNECTION_STATUS)[WeaveStoreConnectionStatusKeys];
 
 export type WeaveStoreOnStoreConnectionStatusChangeEvent =
+  WeaveStoreConnectionStatus;
+
+export type WeaveStoreOnSyncHandleConnectionStatusChangeEvent =
   WeaveStoreOnPubSubClientStatusChange;
 
 export type WeaveStoreOnPubSubClientStatusChange =

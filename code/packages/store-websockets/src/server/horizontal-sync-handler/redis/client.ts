@@ -1,7 +1,7 @@
 import type { WeaveWebsocketsServer } from '@/index.server';
 import type {
   WeaveStoreHorizontalSyncRedisConfig,
-  WeaveStoreOnStoreConnectionStatusChangeEvent,
+  WeaveStoreOnSyncHandleConnectionStatusChangeEvent,
 } from '@inditextech/weave-types';
 import Redis from 'ioredis';
 
@@ -41,27 +41,27 @@ export class WeaveHorizontalSyncHandlerRedis {
   initPubClient(): void {
     this.pubClient = new Redis(this.config);
 
-    this.server.emitEvent<WeaveStoreOnStoreConnectionStatusChangeEvent>(
+    this.server.emitEvent<WeaveStoreOnSyncHandleConnectionStatusChangeEvent>(
       'onPubClientStatusChange',
       { status: 'connecting' }
     );
 
     this.pubClient.on('error', (error) => {
-      this.server.emitEvent<WeaveStoreOnStoreConnectionStatusChangeEvent>(
+      this.server.emitEvent<WeaveStoreOnSyncHandleConnectionStatusChangeEvent>(
         'onPubClientStatusChange',
         { status: 'error', error }
       );
     });
 
     this.pubClient.on('end', () => {
-      this.server.emitEvent<WeaveStoreOnStoreConnectionStatusChangeEvent>(
+      this.server.emitEvent<WeaveStoreOnSyncHandleConnectionStatusChangeEvent>(
         'onPubClientStatusChange',
         { status: 'end' }
       );
     });
 
     this.pubClient.on('reconnecting', (delay: number) => {
-      this.server.emitEvent<WeaveStoreOnStoreConnectionStatusChangeEvent>(
+      this.server.emitEvent<WeaveStoreOnSyncHandleConnectionStatusChangeEvent>(
         'onPubClientStatusChange',
         {
           status: 'reconnecting',
@@ -71,14 +71,14 @@ export class WeaveHorizontalSyncHandlerRedis {
     });
 
     this.pubClient.on('connect', () => {
-      this.server.emitEvent<WeaveStoreOnStoreConnectionStatusChangeEvent>(
+      this.server.emitEvent<WeaveStoreOnSyncHandleConnectionStatusChangeEvent>(
         'onPubClientStatusChange',
         { status: 'connect' }
       );
     });
 
     this.pubClient.on('ready', () => {
-      this.server.emitEvent<WeaveStoreOnStoreConnectionStatusChangeEvent>(
+      this.server.emitEvent<WeaveStoreOnSyncHandleConnectionStatusChangeEvent>(
         'onPubClientStatusChange',
         { status: 'ready' }
       );
@@ -88,27 +88,27 @@ export class WeaveHorizontalSyncHandlerRedis {
   initSubClient(): void {
     this.subClient = new Redis(this.config);
 
-    this.server.emitEvent<WeaveStoreOnStoreConnectionStatusChangeEvent>(
+    this.server.emitEvent<WeaveStoreOnSyncHandleConnectionStatusChangeEvent>(
       'onSubClientStatusChange',
       { status: 'connecting' }
     );
 
     this.subClient.on('error', (error) => {
-      this.server.emitEvent<WeaveStoreOnStoreConnectionStatusChangeEvent>(
+      this.server.emitEvent<WeaveStoreOnSyncHandleConnectionStatusChangeEvent>(
         'onSubClientStatusChange',
         { status: 'error', error }
       );
     });
 
     this.subClient.on('end', () => {
-      this.server.emitEvent<WeaveStoreOnStoreConnectionStatusChangeEvent>(
+      this.server.emitEvent<WeaveStoreOnSyncHandleConnectionStatusChangeEvent>(
         'onSubClientStatusChange',
         { status: 'end' }
       );
     });
 
     this.subClient.on('reconnecting', (delay: number) => {
-      this.server.emitEvent<WeaveStoreOnStoreConnectionStatusChangeEvent>(
+      this.server.emitEvent<WeaveStoreOnSyncHandleConnectionStatusChangeEvent>(
         'onSubClientStatusChange',
         {
           status: 'reconnecting',
@@ -118,14 +118,14 @@ export class WeaveHorizontalSyncHandlerRedis {
     });
 
     this.subClient.on('connect', () => {
-      this.server.emitEvent<WeaveStoreOnStoreConnectionStatusChangeEvent>(
+      this.server.emitEvent<WeaveStoreOnSyncHandleConnectionStatusChangeEvent>(
         'onSubClientStatusChange',
         { status: 'connect' }
       );
     });
 
     this.subClient.on('ready', () => {
-      this.server.emitEvent<WeaveStoreOnStoreConnectionStatusChangeEvent>(
+      this.server.emitEvent<WeaveStoreOnSyncHandleConnectionStatusChangeEvent>(
         'onSubClientStatusChange',
         { status: 'ready' }
       );
