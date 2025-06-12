@@ -23,7 +23,6 @@
     "lint": "nx run-many -t lint",
     "lint:fix": "nx run-many -t lint:fix",
     "package": "nx run-many -t package",
-    "postinstall": "patch-package",
     "prepare": "cd ../ && node code/.husky/install.mjs",
     "publish:snapshot": "nx run-many -t publish:snapshot -- --verbose --tag next --unsafe-perm",
     "release:perform": "nx run-many -t release:perform -- --verbose --unsafe-perm",
@@ -67,7 +66,6 @@
     "husky": "9.1.4",
     "npkill": "0.12.2",
     "nx": "19.5.7",
-    "patch-package": "8.0.0",
     "prettier": "2.8.8",
     "typescript": "5.7.3"
   },

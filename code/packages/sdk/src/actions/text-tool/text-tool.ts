@@ -35,10 +35,24 @@ export class WeaveTextToolAction extends WeaveAction {
     this.textId = null;
     this.container = undefined;
     this.clickPoint = null;
+    this.props = this.initProps();
   }
 
   getName(): string {
     return TEXT_TOOL_ACTION_NAME;
+  }
+
+  initProps() {
+    return {
+      text: '',
+      layout: TEXT_LAYOUT.AUTO_ALL,
+      fontSize: 20,
+      fontFamily: 'Arial, sans-serif',
+      fill: '#000000',
+      align: 'left',
+      verticalAlign: 'top',
+      strokeEnabled: false,
+    };
   }
 
   private setupEvents() {
@@ -105,21 +119,9 @@ export class WeaveTextToolAction extends WeaveAction {
     const nodeHandler = this.instance.getNodeHandler<WeaveTextNode>('text');
 
     const node = nodeHandler.create(this.textId, {
+      ...this.props,
       x: this.clickPoint?.x ?? 0,
       y: this.clickPoint?.y ?? 0,
-      text: '',
-      layout: TEXT_LAYOUT.AUTO_ALL,
-      width: 10,
-      fontSize: 20,
-      fontFamily: 'Arial, sans-serif',
-      fill: '#000000ff',
-      strokeEnabled: false,
-      stroke: '#000000ff',
-      strokeWidth: 1,
-      strokeScaleEnabled: true,
-      align: 'left',
-      verticalAlign: 'top',
-      opacity: 1,
       draggable: true,
     });
 
@@ -146,6 +148,7 @@ export class WeaveTextToolAction extends WeaveAction {
       selectionPlugin.setSelectedNodes([]);
     }
 
+    this.props = this.initProps();
     this.addText();
   }
 
