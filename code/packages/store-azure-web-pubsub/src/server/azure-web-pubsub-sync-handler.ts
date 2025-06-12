@@ -92,6 +92,10 @@ export default class WeaveAzureWebPubsubSyncHandler extends WebPubSubEventHandle
       );
       connection.start();
 
+      connection.on('connected', () => {
+        console.log('reload state');
+      });
+
       this._rooms.set(roomId, doc);
 
       await this.setupRoomPersistence(roomId, doc);
@@ -100,7 +104,7 @@ export default class WeaveAzureWebPubsubSyncHandler extends WebPubSubEventHandle
 
   async clientConnect(roomId: string): Promise<string | null> {
     try {
-      this.getHostConnection(roomId);
+      await this.getHostConnection(roomId);
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (ex) {
       return null;

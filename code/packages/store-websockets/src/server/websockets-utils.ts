@@ -172,13 +172,8 @@ export const getYDoc = (
 ): Promise<WSSharedDoc | null> =>
   map.setIfUndefined(docs, docName, async () => {
     let documentData = undefined;
-    try {
-      if (actualServer && actualServer.fetchRoom) {
-        documentData = await actualServer.fetchRoom(docName);
-      }
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    } catch (ex) {
-      return null;
+    if (actualServer && actualServer.fetchRoom) {
+      documentData = await actualServer.fetchRoom(docName);
     }
     // const documentData = await getRoomStateFromFile(`${docName}.room`);
     const doc = new WSSharedDoc(docName, horizontalSyncHandler);

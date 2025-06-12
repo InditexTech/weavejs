@@ -63,6 +63,7 @@ export class Weave extends Emittery {
   private reconciler: WeaveReconciler;
   private stateSerializer: WeaveStateSerializer;
   private renderer: WeaveRenderer;
+  private initialized: boolean = false;
 
   private status: WeaveStatus = WEAVE_INSTANCE_STATUS.IDLE;
   private setupManager: WeaveSetupManager;
@@ -86,6 +87,7 @@ export class Weave extends Emittery {
 
     // Setup instance id
     this.id = uuidv4();
+    this.initialized = false;
 
     // Save in memory the configuration provided
     this.config = weaveConfig;
@@ -156,6 +158,8 @@ export class Weave extends Emittery {
 
       this.moduleLogger.info('Instance started');
 
+      this.initialized = true;
+
       this.status = WEAVE_INSTANCE_STATUS.RUNNING;
       this.emitEvent('onInstanceStatus', this.status);
     });
@@ -176,11 +180,15 @@ export class Weave extends Emittery {
   private handleStoreConnectionStatusChange(
     status: WeaveStoreConnectionStatus
   ): void {
+    console.log('status', status);
     if (status === WEAVE_STORE_CONNECTION_STATUS.ERROR) {
       this.status = WEAVE_INSTANCE_STATUS.CONNECTING_ERROR;
       this.emitEvent('onInstanceStatus', this.status);
     }
-    if (status === WEAVE_STORE_CONNECTION_STATUS.CONNECTED) {
+    if (
+      status === WEAVE_STORE_CONNECTION_STATUS.CONNECTED &&
+      !this.initialized
+    ) {
       this.status = WEAVE_INSTANCE_STATUS.LOADING_ROOM;
       this.emitEvent('onInstanceStatus', this.status);
     }

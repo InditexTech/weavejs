@@ -324,9 +324,6 @@ export class WeaveStoreAzureWebPubSubSyncClient extends Emittery {
     this._wsConnected = false;
     this.synced = false;
 
-    this._status = 'connecting';
-    this.emit('status', this._status);
-
     this._checkInterval = setInterval(() => {
       if (
         this._ws?.OPEN &&
@@ -338,6 +335,11 @@ export class WeaveStoreAzureWebPubSubSyncClient extends Emittery {
         this._ws.reconnect();
       }
     }, messageReconnectTimeout / 10);
+
+    websocket.addEventListener('error', () => {
+      this._status = 'connecting';
+      this.emit('status', this._status);
+    });
 
     websocket.onmessage = (event) => {
       this._wsLastMessageReceived = time.getUnixTime();
@@ -372,10 +374,10 @@ export class WeaveStoreAzureWebPubSubSyncClient extends Emittery {
     };
 
     websocket.onclose = () => {
+      this._status = 'disconnected';
+      this.emit('status', this._status);
       this._ws = null;
       if (this._wsConnected) {
-        this._status = 'disconnected';
-        this.emit('status', this._status);
         this._wsConnected = false;
         this.synced = false;
         awarenessProtocol.removeAwarenessStates(
@@ -388,11 +390,8 @@ export class WeaveStoreAzureWebPubSubSyncClient extends Emittery {
       }
     };
 
-    websocket.onerror = (err) => {
-      console.error('Websocket error', err);
-    };
-
     websocket.onopen = () => {
+      console.log('connected client');
       // this._wsLastMessageReceived = Date.now();
       this._wsConnected = true;
       this._status = 'connected';

@@ -2,10 +2,12 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
+import Emittery from 'emittery';
 import * as decoding from 'lib0/decoding';
 import * as encoding from 'lib0/encoding';
 import * as syncProtocol from 'y-protocols/sync';
 import * as awarenessProtocol from 'y-protocols/awareness';
+import ReconnectingWebSocket from 'reconnecting-websocket';
 
 import { WebPubSubServiceClient } from '@azure/web-pubsub';
 import { WebSocket } from 'ws';
@@ -14,6 +16,7 @@ import { WeaveHorizontalSyncHandlerRedis } from './horizontal-sync-handler/redis
 
 const messageSync = 0;
 const messageAwareness = 1;
+const AzureWebPubSubJsonProtocol = 'json.webpubsub.azure.v1';
 
 export enum MessageType {
   System = 'system',
@@ -46,7 +49,7 @@ export interface WebPubSubHostOptions {
   WebSocketPolyfill: any;
 }
 
-export class WeaveStoreAzureWebPubSubSyncHost {
+export class WeaveStoreAzureWebPubSubSyncHost extends Emittery {
   private horizontalSyncHandler: WeaveHorizontalSyncHandlerRedis;
   public doc: Y.Doc;
   public topic: string;
@@ -67,6 +70,8 @@ export class WeaveStoreAzureWebPubSubSyncHost {
     doc: Y.Doc,
     { WebSocketPolyfill = WebSocket }: WebPubSubHostOptions
   ) {
+    super();
+
     this.doc = doc;
     this.topic = topic;
     this.topicAwarenessChannel = `${topic}-awareness`;
@@ -175,7 +180,9 @@ export class WeaveStoreAzureWebPubSubSyncHost {
 
   async start(): Promise<void> {
     const url = await this.negotiate(this.topic);
-    const conn = new this._polyfill(url, 'json.webpubsub.azure.v1');
+    const conn = new ReconnectingWebSocket(url, AzureWebPubSubJsonProtocol, {
+      WebSocket: this._polyfill,
+    });
 
     const group = this.topic;
 
@@ -184,6 +191,7 @@ export class WeaveStoreAzureWebPubSubSyncHost {
       const event: Message = JSON.parse(e.data.toString());
 
       if (event.type === 'message' && event.from === 'group') {
+        console.log('Received message', event.data);
         switch (event.data.t) {
           case MessageDataType.Init:
             this.onClientInit(group, event.data);
@@ -200,7 +208,16 @@ export class WeaveStoreAzureWebPubSubSyncHost {
       }
     };
 
+    conn.addEventListener('error', (error) => {
+      this.emit('error', error);
+    });
+
+    conn.onclose = () => {
+      this.emit('close');
+    };
+
     conn.onopen = () => {
+      this.emit('connected');
       conn.send(
         JSON.stringify({
           type: MessageType.JoinGroup,

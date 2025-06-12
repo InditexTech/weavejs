@@ -55,6 +55,12 @@ export class WeaveStoreAzureWebPubsub extends WeaveStore {
       awareness.destroy();
     });
 
+    this.provider.on('error', () => {
+      this.handleConnectionStatusChange(
+        WEAVE_STORE_CONNECTION_STATUS.DISCONNECTED
+      );
+    });
+
     this.provider.on('status', (status) => {
       if (status === WEAVE_STORE_CONNECTION_STATUS.CONNECTED) {
         this.handleAwarenessChange();
@@ -91,7 +97,9 @@ export class WeaveStoreAzureWebPubsub extends WeaveStore {
     } catch (ex) {
       error = ex as Error;
     } finally {
-      this.handleConnectionStatusChange(WEAVE_STORE_CONNECTION_STATUS.ERROR);
+      if (error) {
+        this.handleConnectionStatusChange(WEAVE_STORE_CONNECTION_STATUS.ERROR);
+      }
       this.instance.emitEvent<WeaveStoreAzureWebPubsubOnStoreFetchConnectionUrlEvent>(
         'onStoreFetchConnectionUrl',
         {
