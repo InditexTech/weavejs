@@ -3,26 +3,13 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import * as Y from 'yjs';
-import { WEAVE_STORE_WEBSOCKETS_CONNECTION_STATUS } from './constants';
 import { IncomingMessage } from 'http';
-
-export type WeaveStoreWebsocketsConnectionStatusKeys =
-  keyof typeof WEAVE_STORE_WEBSOCKETS_CONNECTION_STATUS;
-export type WeaveStoreWebsocketsConnectionStatus =
-  (typeof WEAVE_STORE_WEBSOCKETS_CONNECTION_STATUS)[WeaveStoreWebsocketsConnectionStatusKeys];
 
 export type WeaveStoreWebsocketsOptions = {
   roomId: string;
   wsOptions: {
     serverUrl: string;
   };
-  callbacks?: WeaveStoreWebsocketsCallbacks;
-};
-
-export type WeaveStoreWebsocketsCallbacks = {
-  onConnectionStatusChange?: (
-    status: WeaveStoreWebsocketsConnectionStatus
-  ) => void;
 };
 
 export type PerformUpgrade = (req: IncomingMessage) => Promise<boolean>;

@@ -1,0 +1,16 @@
+version: '3.8'
+services:
+  redis:
+    container_name: weave_redis_ws
+    image: redis:6.0.6
+    command: redis-server
+    ports:
+      - '6379:6379'
+
+  nginx:
+    container_name: weave_nginx_ws
+    build:
+      context: ./
+      dockerfile: DockerfileNginx
+    ports:
+      - '666:666'

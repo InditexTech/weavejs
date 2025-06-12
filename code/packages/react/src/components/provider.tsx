@@ -29,6 +29,7 @@ import {
   type WeaveUndoRedoChange,
   type WeaveStatus,
   WEAVE_INSTANCE_STATUS,
+  type WeaveStoreConnectionStatus,
 } from '@inditextech/weave-types';
 import { useWeave } from './store';
 
@@ -67,10 +68,19 @@ export const WeaveProvider = ({
   const setCanUndo = useWeave((state) => state.setCanUndo);
   const setCanRedo = useWeave((state) => state.setCanRedo);
   const setActualAction = useWeave((state) => state.setActualAction);
+  const setConnectionStatus = useWeave((state) => state.setConnectionStatus);
 
   const onInstanceStatusHandler = React.useCallback(
     (status: WeaveStatus) => {
       setStatus(status);
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    []
+  );
+
+  const onStoreConnectionStatusChangeHandler = React.useCallback(
+    (status: WeaveStoreConnectionStatus) => {
+      setConnectionStatus(status);
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
     []
@@ -202,6 +212,11 @@ export const WeaveProvider = ({
         );
 
         weaveInstanceRef.current.addEventListener(
+          'onStoreConnectionStatusChange',
+          onStoreConnectionStatusChangeHandler
+        );
+
+        weaveInstanceRef.current.addEventListener(
           'onRoomLoaded',
           onRoomLoadedHandler
         );
@@ -232,6 +247,36 @@ export const WeaveProvider = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
 
     return () => {
+      weaveInstanceRef.current?.removeEventListener(
+        'onInstanceStatus',
+        onInstanceStatusHandler
+      );
+
+      weaveInstanceRef.current?.removeEventListener(
+        'onStoreConnectionStatusChange',
+        onStoreConnectionStatusChangeHandler
+      );
+
+      weaveInstanceRef.current?.removeEventListener(
+        'onRoomLoaded',
+        onRoomLoadedHandler
+      );
+
+      weaveInstanceRef.current?.removeEventListener(
+        'onStateChange',
+        onStateChangeHandler
+      );
+
+      weaveInstanceRef.current?.removeEventListener(
+        'onUndoManagerStatusChange',
+        onUndoManagerStatusChangeHandler
+      );
+
+      weaveInstanceRef.current?.removeEventListener(
+        'onActiveActionChange',
+        onActiveActionChangeHandler
+      );
+
       weaveInstanceRef.current?.destroy();
       weaveInstanceRef.current = null;
     };

@@ -6,10 +6,12 @@ import { useWeave } from '@inditextech/weave-react';
 import { Fullscreen, Maximize, ZoomIn, ZoomOut } from 'lucide-react';
 import { ToolbarButton } from '../toolbar/toolbar-button';
 import { ShortcutElement } from '../help/shortcut-element';
+import { WEAVE_STORE_CONNECTION_STATUS } from '@inditextech/weave-types';
 
 export function ZoomToolbar() {
   const instance = useWeave((state) => state.instance);
   const actualAction = useWeave((state) => state.actions.actual);
+  const weaveConnectionStatus = useWeave((state) => state.connection.status);
 
   const zoomValue = useWeave((state) => state.zoom.value);
   const canZoomIn = useWeave((state) => state.zoom.canZoomIn);
@@ -35,7 +37,11 @@ export function ZoomToolbar() {
           <div className="flex justify-start items-center gap-[16px]">
             <ToolbarButton
               icon={<ZoomIn size={20} strokeWidth={1} />}
-              disabled={!canZoomIn}
+              disabled={
+                !canZoomIn ||
+                weaveConnectionStatus !==
+                  WEAVE_STORE_CONNECTION_STATUS.CONNECTED
+              }
               onClick={() => {
                 handleTriggerActionWithParams('zoomInTool', {
                   previousAction: actualAction,
@@ -58,7 +64,11 @@ export function ZoomToolbar() {
             />
             <ToolbarButton
               icon={<ZoomOut size={20} strokeWidth={1} />}
-              disabled={!canZoomOut}
+              disabled={
+                !canZoomOut ||
+                weaveConnectionStatus !==
+                  WEAVE_STORE_CONNECTION_STATUS.CONNECTED
+              }
               onClick={() => {
                 handleTriggerActionWithParams('zoomOutTool', {
                   previousAction: actualAction,
@@ -81,6 +91,10 @@ export function ZoomToolbar() {
             />
             <ToolbarButton
               icon={<Maximize size={20} strokeWidth={1} />}
+              disabled={
+                weaveConnectionStatus !==
+                WEAVE_STORE_CONNECTION_STATUS.CONNECTED
+              }
               onClick={() => {
                 handleTriggerActionWithParams('fitToScreenTool', {
                   previousAction: actualAction,
@@ -103,6 +117,10 @@ export function ZoomToolbar() {
             />
             <ToolbarButton
               icon={<Fullscreen size={20} strokeWidth={1} />}
+              disabled={
+                weaveConnectionStatus !==
+                WEAVE_STORE_CONNECTION_STATUS.CONNECTED
+              }
               onClick={() => {
                 handleTriggerActionWithParams('fitToSelectionTool', {
                   previousAction: actualAction,

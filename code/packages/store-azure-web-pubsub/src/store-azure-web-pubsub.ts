@@ -3,10 +3,16 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { WeaveStore } from '@inditextech/weave-sdk';
-import { type WeaveStoreOptions } from '@inditextech/weave-types';
+import {
+  WEAVE_STORE_CONNECTION_STATUS,
+  type WeaveStoreOptions,
+} from '@inditextech/weave-types';
 import { WeaveStoreAzureWebPubSubSyncClient } from './client';
 import { WEAVE_STORE_AZURE_WEB_PUBSUB } from './constants';
-import { type WeaveStoreAzureWebPubsubOptions } from './types';
+import {
+  type WeaveStoreAzureWebPubsubOptions,
+  type WeaveStoreAzureWebPubsubOnStoreFetchConnectionUrlEvent,
+} from './types';
 
 export class WeaveStoreAzureWebPubsub extends WeaveStore {
   private azureWebPubsubOptions: WeaveStoreAzureWebPubsubOptions;
@@ -49,53 +55,48 @@ export class WeaveStoreAzureWebPubsub extends WeaveStore {
       awareness.destroy();
     });
 
+    this.provider.on('error', () => {
+      this.handleConnectionStatusChange(
+        WEAVE_STORE_CONNECTION_STATUS.DISCONNECTED
+      );
+      this.disconnect();
+    });
+
     this.provider.on('status', (status) => {
-      if (status === 'connected') {
-        this.handleAwarenessChange();
-
-        const awareness = this.provider.awareness;
-        awareness.on('update', this.handleAwarenessChange.bind(this));
-        awareness.on('change', this.handleAwarenessChange.bind(this));
-      }
-
-      if (status === 'disconnected') {
-        const awareness = this.provider.awareness;
-        awareness.destroy();
-        awareness.off('update', this.handleAwarenessChange.bind(this));
-        awareness.off('change', this.handleAwarenessChange.bind(this));
-      }
-
-      this.azureWebPubsubOptions.callbacks?.onConnectionStatusChange?.(status);
-      this.instance.emitEvent('onConnectionStatusChange', status);
+      this.handleConnectionStatusChange(status);
     });
   }
 
   async connect(): Promise<void> {
     const { fetchClient } = this.azureWebPubsubOptions;
 
+    const awareness = this.provider.awareness;
+    awareness.on('update', this.handleAwarenessChange.bind(this));
+    awareness.on('change', this.handleAwarenessChange.bind(this));
+
     let error: Error | null = null;
     try {
-      this.azureWebPubsubOptions.callbacks?.onFetchConnectionUrl?.({
-        loading: true,
-        error: null,
-      });
-      this.instance.emitEvent('onFetchConnectionUrl', {
-        loading: true,
-        error: null,
-      });
-
+      this.instance.emitEvent<WeaveStoreAzureWebPubsubOnStoreFetchConnectionUrlEvent>(
+        'onStoreFetchConnectionUrl',
+        {
+          loading: true,
+          error: null,
+        }
+      );
       await this.provider.fetchConnectionUrl(fetchClient ?? fetch);
     } catch (ex) {
       error = ex as Error;
     } finally {
-      this.azureWebPubsubOptions.callbacks?.onFetchConnectionUrl?.({
-        loading: false,
-        error,
-      });
-      this.instance.emitEvent('onFetchConnectionUrl', {
-        loading: false,
-        error,
-      });
+      if (error) {
+        this.handleConnectionStatusChange(WEAVE_STORE_CONNECTION_STATUS.ERROR);
+      }
+      this.instance.emitEvent<WeaveStoreAzureWebPubsubOnStoreFetchConnectionUrlEvent>(
+        'onStoreFetchConnectionUrl',
+        {
+          loading: false,
+          error,
+        }
+      );
     }
 
     await this.provider.start();

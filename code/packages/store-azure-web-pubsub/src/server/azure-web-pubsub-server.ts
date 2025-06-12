@@ -3,63 +3,83 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { WebPubSubServiceClient, AzureKeyCredential } from '@azure/web-pubsub';
+import koa from 'koa';
+import Emittery from 'emittery';
 import {
   type FetchInitialState,
   type PersistRoom,
   type FetchRoom,
-  type WeaveAzureWebPubsubConfig,
+  type WeaveStoreAzureWebPubsubConfig,
 } from '../types';
 import WeaveAzureWebPubsubSyncHandler from './azure-web-pubsub-sync-handler';
 import { defaultInitialState } from './default-initial-state';
+import type { WebPubSubEventHandlerOptions } from './event-handler';
 import type { RequestHandler } from 'express-serve-static-core';
-import type { WebPubSubEventHandlerOptions } from '@azure/web-pubsub-express';
 
 type WeaveAzureWebPubsubServerParams = {
   initialState?: FetchInitialState;
-  pubsubConfig: WeaveAzureWebPubsubConfig;
+  pubSubConfig: WeaveStoreAzureWebPubsubConfig;
   eventsHandlerConfig?: WebPubSubEventHandlerOptions;
   persistRoom?: PersistRoom;
   fetchRoom?: FetchRoom;
 };
 
-export class WeaveAzureWebPubsubServer {
+export class WeaveAzureWebPubsubServer extends Emittery {
+  private syncClient: WebPubSubServiceClient;
   private syncHandler: WeaveAzureWebPubsubSyncHandler;
   persistRoom: PersistRoom | undefined = undefined;
   fetchRoom: FetchRoom | undefined = undefined;
 
   constructor({
-    pubsubConfig,
+    pubSubConfig,
     eventsHandlerConfig,
     initialState = defaultInitialState,
     persistRoom,
     fetchRoom,
   }: WeaveAzureWebPubsubServerParams) {
+    super();
+
     this.persistRoom = persistRoom;
     this.fetchRoom = fetchRoom;
 
-    const credentials = new AzureKeyCredential(pubsubConfig.key ?? '');
+    const credentials = new AzureKeyCredential(pubSubConfig.key ?? '');
 
-    const syncClient: WebPubSubServiceClient = new WebPubSubServiceClient(
-      pubsubConfig.endpoint,
+    this.syncClient = new WebPubSubServiceClient(
+      pubSubConfig.endpoint,
       credentials,
-      pubsubConfig.hubName
+      pubSubConfig.hubName
     );
 
     this.syncHandler = new WeaveAzureWebPubsubSyncHandler(
       this,
-      syncClient,
+      this.syncClient,
       initialState,
-      pubsubConfig.hubName,
-      // `/api/webpubsub/hubs/${pubsubConfig.hubName}`,
+      pubSubConfig.hubName,
       eventsHandlerConfig
     );
   }
 
-  getMiddleware(): RequestHandler {
-    return this.syncHandler.getMiddleware();
+  getKoaMiddleware(): koa.Middleware {
+    return this.syncHandler.getKoaMiddleware();
   }
 
-  async clientConnect(roomId: string): Promise<string> {
+  getExpressJsMiddleware(): RequestHandler {
+    return this.syncHandler.getExpressJsMiddleware();
+  }
+
+  emitEvent<T>(event: string, payload?: T): void {
+    this.emit(event, payload);
+  }
+
+  addEventListener<T>(event: string, callback: (payload: T) => void): void {
+    this.on(event, callback);
+  }
+
+  removeEventListener<T>(event: string, callback: (payload: T) => void): void {
+    this.off(event, callback);
+  }
+
+  async clientConnect(roomId: string): Promise<string | null> {
     return await this.syncHandler.clientConnect(roomId);
   }
 }

@@ -4,7 +4,7 @@
 
 export const WEAVE_STORE_AZURE_WEB_PUBSUB = 'store-azure-web-pubsub';
 
-export const WEAVE_STORE_AZURE_WEB_PUBSUB_CONNECTION_STATUS = {
-  ['CONNECTED']: 'connected',
-  ['DISCONNECTED']: 'disconnected',
-} as const;
+export const WEAVE_STORE_HORIZONTAL_SYNC_HANDLER_CLIENT_TYPE = {
+  ['PUB']: 'pub',
+  ['SUB']: 'sub',
+};

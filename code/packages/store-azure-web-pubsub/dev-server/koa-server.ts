@@ -5,8 +5,9 @@
 import { fileURLToPath } from 'url';
 import path from 'path';
 import fs from 'fs/promises';
-import cors from 'cors';
-import express, { Router } from 'express';
+import Koa from 'koa';
+import cors from '@koa/cors';
+import Router from 'koa-router';
 import { WeaveAzureWebPubsubServer } from '../src/index.server';
 
 // eslint-disable-next-line @typescript-eslint/naming-convention
@@ -14,8 +15,8 @@ const __filename = fileURLToPath(import.meta.url);
 // eslint-disable-next-line @typescript-eslint/naming-convention
 const __dirname = path.dirname(__filename);
 
-const host = process.env.WEAVE_AZURE_WEB_PUBSUB_HOST || 'localhost';
-const port = parseInt(process.env.WEAVE_AZURE_WEB_PUBSUB_PORT || '1234');
+const host = process.env.HOST || 'localhost';
+const port = parseInt(process.env.PORT || '1234');
 
 const endpoint = process.env.WEAVE_AZURE_WEB_PUBSUB_ENDPOINT;
 const key = process.env.WEAVE_AZURE_WEB_PUBSUB_KEY;
@@ -26,7 +27,7 @@ if (!endpoint || !key || !hubName) {
 }
 
 const azureWebPubsubServer = new WeaveAzureWebPubsubServer({
-  pubsubConfig: {
+  pubSubConfig: {
     endpoint,
     key,
     hubName,
@@ -36,8 +37,8 @@ const azureWebPubsubServer = new WeaveAzureWebPubsubServer({
       const roomsFolder = path.join(__dirname, 'rooms');
       const roomsFile = path.join(roomsFolder, docName);
       return await fs.readFile(roomsFile);
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (ex) {
-      console.error(ex);
       return null;
     }
   },
@@ -63,34 +64,46 @@ const azureWebPubsubServer = new WeaveAzureWebPubsubServer({
 
       const roomsFile = path.join(roomsFolder, docName);
       await fs.writeFile(roomsFile, actualState);
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (ex) {
-      console.error(ex);
+      /* empty */
     }
   },
 });
 
-const app = express();
+const app = new Koa();
 
 const corsOptions = {
-  origin: true,
+  origin(ctx) {
+    return ctx.get('Origin') || '*';
+  },
 };
 
-app.use(cors(corsOptions));
+app.use(cors(corsOptions) as unknown as Koa.Middleware);
 
-const router = Router();
-
-router.use(azureWebPubsubServer.getMiddleware());
-router.get(`/rooms/:roomId/connect`, async (req, res) => {
-  const roomId = req.params.roomId;
-  const url = await azureWebPubsubServer.clientConnect(roomId);
-  res.json({ url });
+const router = new Router({
+  prefix: `/api/v1/${hubName}`,
 });
 
-app.use(`/api/v1/${hubName}`, router);
+router.use(azureWebPubsubServer.getKoaMiddleware());
+router.get(`/rooms/:roomId/connect`, async (ctx) => {
+  const roomId = ctx.params.roomId;
+  const url = await azureWebPubsubServer.clientConnect(roomId);
+  console.log(`connect URL: ${url}`);
+  if (!url) {
+    ctx.status = 404;
+    ctx.body = { error: 'Error connecting to the room' };
+    return;
+  }
+  ctx.body = {
+    url,
+  };
+});
 
-app.listen(port, host, (err: Error | undefined) => {
-  if (err) throw err;
+app.use(router.routes());
+app.use(router.allowedMethods());
 
+app.listen(port, host, 0, () => {
   // eslint-disable-next-line no-console
   console.log(`Server started @ http://${host}:${port}\n`);
   // eslint-disable-next-line no-console

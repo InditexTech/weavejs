@@ -15,6 +15,7 @@ import { isCallbackSet, callbackHandler } from './websockets-callbacks';
 import { type ExtractRoomId, type FetchInitialState } from '../types';
 import { IncomingMessage } from 'node:http';
 import { WeaveWebsocketsServer } from './websockets-server';
+import { WeaveHorizontalSyncHandlerRedis } from './horizontal-sync-handler/redis/client';
 
 let actualServer: WeaveWebsocketsServer | undefined = undefined;
 
@@ -38,15 +39,27 @@ const persistenceMap: Map<string, NodeJS.Timeout> = new Map();
 const messageSync = 0;
 const messageAwareness = 1;
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-const updateHandler = (update: any, _origin: any, doc: any) => {
-  const encoder = encoding.createEncoder();
-  encoding.writeVarUint(encoder, messageSync);
-  syncProtocol.writeUpdate(encoder, update);
-  const message = encoding.toUint8Array(encoder);
+const getUpdateHandler =
+  (horizontalSyncHandler: WeaveHorizontalSyncHandlerRedis) =>
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  doc.conns.forEach((_: any, conn: any) => send(doc, conn, message));
-};
+  (update: any, _origin: any, doc: any) => {
+    const encoder = encoding.createEncoder();
+    encoding.writeVarUint(encoder, messageSync);
+    syncProtocol.writeUpdate(encoder, update);
+    const message = encoding.toUint8Array(encoder);
+
+    if (horizontalSyncHandler.isEnabledPubSub() && update.length > 0) {
+      horizontalSyncHandler
+        .getPubClient()
+        .publish(doc.topic, Buffer.from(update))
+        .catch((err: Error) => {
+          console.error(err);
+        });
+    }
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    doc.conns.forEach((_: any, conn: any) => send(doc, conn, message));
+  };
 
 let contentInitializor = () => Promise.resolve();
 
@@ -56,6 +69,8 @@ export const setContentInitializor = (f: any): void => {
 };
 
 export class WSSharedDoc extends Y.Doc {
+  topic: string;
+  topicAwarenessChannel: string;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   name: any;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -63,9 +78,13 @@ export class WSSharedDoc extends Y.Doc {
   awareness: awarenessProtocol.Awareness;
   whenInitialized: Promise<void>;
 
-  constructor(name: string) {
+  constructor(
+    name: string,
+    horizontalSyncHandler: WeaveHorizontalSyncHandlerRedis
+  ) {
     super({ gc: gcEnabled });
-    this.name = name;
+    this.topic = name;
+    this.topicAwarenessChannel = `${name}-awareness`;
     this.conns = new Map();
     this.awareness = new awarenessProtocol.Awareness(this);
     this.awareness.setLocalState(null);
@@ -104,8 +123,9 @@ export class WSSharedDoc extends Y.Doc {
         send(this, c, buff);
       });
     };
+
     this.awareness.on('update', awarenessChangeHandler);
-    this.on('update', updateHandler);
+    this.on('update', getUpdateHandler(horizontalSyncHandler));
     if (isCallbackSet) {
       this.on(
         'update',
@@ -116,21 +136,47 @@ export class WSSharedDoc extends Y.Doc {
       );
     }
     this.whenInitialized = contentInitializor();
+
+    if (horizontalSyncHandler.isEnabledPubSub()) {
+      horizontalSyncHandler.getSubClient().subscribe(this.topic);
+      horizontalSyncHandler
+        .getSubClient()
+        .subscribe(this.topicAwarenessChannel);
+      horizontalSyncHandler
+        .getSubClient()
+        .on('messageBuffer', (channel, update) => {
+          const channelId = channel.toString();
+
+          // update is a Buffer, Buffer is a subclass of Uint8Array, update can be applied
+          // as an update directly
+
+          if (channelId === this.topic) {
+            Y.applyUpdate(this, update, horizontalSyncHandler.getPubClient());
+          } else if (channelId === this.topicAwarenessChannel) {
+            awarenessProtocol.applyAwarenessUpdate(
+              this.awareness,
+              update,
+              horizontalSyncHandler.getPubClient()
+            );
+          }
+        });
+    }
   }
 }
 
 export const getYDoc = (
   docName: string,
   initialState: FetchInitialState,
+  horizontalSyncHandler: WeaveHorizontalSyncHandlerRedis,
   gc = true
-): Promise<WSSharedDoc> =>
+): Promise<WSSharedDoc | null> =>
   map.setIfUndefined(docs, docName, async () => {
     let documentData = undefined;
     if (actualServer && actualServer.fetchRoom) {
       documentData = await actualServer.fetchRoom(docName);
     }
     // const documentData = await getRoomStateFromFile(`${docName}.room`);
-    const doc = new WSSharedDoc(docName);
+    const doc = new WSSharedDoc(docName, horizontalSyncHandler);
     doc.gc = gc;
     docs.set(docName, doc);
 
@@ -149,7 +195,8 @@ export const getYDoc = (
 const messageListener = (
   conn: WebSocket,
   doc: WSSharedDoc,
-  message: Uint8Array
+  message: Uint8Array,
+  horizontalSyncHandler: WeaveHorizontalSyncHandlerRedis
 ) => {
   try {
     const encoder = encoding.createEncoder();
@@ -168,11 +215,15 @@ const messageListener = (
         }
         break;
       case messageAwareness: {
-        awarenessProtocol.applyAwarenessUpdate(
-          doc.awareness,
-          decoding.readVarUint8Array(decoder),
-          conn
-        );
+        const update = decoding.readVarUint8Array(decoder);
+
+        if (horizontalSyncHandler.isEnabledPubSub() && update.length > 0) {
+          horizontalSyncHandler
+            .getPubClient()
+            .publish(doc.topicAwarenessChannel, Buffer.from(update));
+        }
+
+        awarenessProtocol.applyAwarenessUpdate(doc.awareness, update, conn);
         break;
       }
     }
@@ -229,7 +280,8 @@ export const setServer = (server: WeaveWebsocketsServer): void => {
 
 export const setupWSConnection = (
   getDocName: ExtractRoomId,
-  initialState: FetchInitialState
+  initialState: FetchInitialState,
+  horizontalSyncHandler: WeaveHorizontalSyncHandlerRedis
 ): ((
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   conn: any,
@@ -248,11 +300,17 @@ export const setupWSConnection = (
     }
     conn.binaryType = 'arraybuffer';
     // get doc, initialize if it does not exist yet
-    const doc = await getYDoc(docName, initialState, gc);
+    const doc = await getYDoc(docName, initialState, horizontalSyncHandler, gc);
+
+    if (!doc) {
+      conn.close();
+      return;
+    }
+
     doc.conns.set(conn, new Set());
     // listen and reply to events
     conn.on('message', (message: ArrayBuffer) =>
-      messageListener(conn, doc, new Uint8Array(message))
+      messageListener(conn, doc, new Uint8Array(message), horizontalSyncHandler)
     );
 
     // Check if connection is still alive

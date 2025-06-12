@@ -2,10 +2,12 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
+import Emittery from 'emittery';
 import * as decoding from 'lib0/decoding';
 import * as encoding from 'lib0/encoding';
 import * as syncProtocol from 'y-protocols/sync';
 import * as awarenessProtocol from 'y-protocols/awareness';
+import ReconnectingWebSocket from 'reconnecting-websocket';
 
 import { WebPubSubServiceClient } from '@azure/web-pubsub';
 import { WebSocket } from 'ws';
@@ -13,6 +15,7 @@ import * as Y from 'yjs';
 
 const messageSync = 0;
 const messageAwareness = 1;
+const AzureWebPubSubJsonProtocol = 'json.webpubsub.azure.v1';
 
 export enum MessageType {
   System = 'system',
@@ -45,9 +48,10 @@ export interface WebPubSubHostOptions {
   WebSocketPolyfill: any;
 }
 
-export class WeaveStoreAzureWebPubSubSyncHost {
+export class WeaveStoreAzureWebPubSubSyncHost extends Emittery {
   public doc: Y.Doc;
   public topic: string;
+  public topicAwarenessChannel: string;
 
   private _client: WebPubSubServiceClient;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -63,8 +67,11 @@ export class WeaveStoreAzureWebPubSubSyncHost {
     doc: Y.Doc,
     { WebSocketPolyfill = WebSocket }: WebPubSubHostOptions
   ) {
+    super();
+
     this.doc = doc;
     this.topic = topic;
+    this.topicAwarenessChannel = `${topic}-awareness`;
     this._client = client;
 
     this._conn = null;
@@ -105,6 +112,7 @@ export class WeaveStoreAzureWebPubSubSyncHost {
       encoding.writeVarUint(encoder, messageSync);
       syncProtocol.writeUpdate(encoder, update);
       const u8 = encoding.toUint8Array(encoder);
+
       this.broadcast(this.topic, u8);
     };
     doc.on('update', updateHandler);
@@ -130,7 +138,9 @@ export class WeaveStoreAzureWebPubSubSyncHost {
 
   async start(): Promise<void> {
     const url = await this.negotiate(this.topic);
-    const conn = new this._polyfill(url, 'json.webpubsub.azure.v1');
+    const conn = new ReconnectingWebSocket(url, AzureWebPubSubJsonProtocol, {
+      WebSocket: this._polyfill,
+    });
 
     const group = this.topic;
 
@@ -155,7 +165,16 @@ export class WeaveStoreAzureWebPubSubSyncHost {
       }
     };
 
+    conn.addEventListener('error', (error) => {
+      this.emit('error', error);
+    });
+
+    conn.onclose = () => {
+      this.emit('close');
+    };
+
     conn.onopen = () => {
+      this.emit('connected');
       conn.send(
         JSON.stringify({
           type: MessageType.JoinGroup,
@@ -231,9 +250,11 @@ export class WeaveStoreAzureWebPubSubSyncHost {
       const buf = Buffer.from(data.c, 'base64');
       const decoder = decoding.createDecoder(buf);
       decoding.readVarUint(decoder); // skip the message type
+      const update = decoding.readVarUint8Array(decoder);
+
       awarenessProtocol.applyAwarenessUpdate(
         this._awareness,
-        decoding.readVarUint8Array(decoder),
+        update,
         undefined
       );
     } catch (err) {

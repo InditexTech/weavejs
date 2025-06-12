@@ -161,3 +161,65 @@ Explanation:
 </div>
 
 </div>
+
+## Client events
+
+When the store client tries to connect, we provide an event were we return the connection status,
+the event is named `onStoreConnectionStatusChange`, and it returns the actual connection status,
+being this status:
+
+```ts
+const WEAVE_STORE_CONNECTION_STATUS = {
+  ["ERROR"]: "error",
+  ["CONNECTING"]: "connecting",
+  ["CONNECTED"]: "connected",
+  ["DISCONNECTED"]: "disconnected",
+} as const;
+
+type WeaveStoreConnectionStatusKeys =
+  keyof typeof WEAVE_STORE_CONNECTION_STATUS;
+type WeaveStoreConnectionStatus =
+  (typeof WEAVE_STORE_CONNECTION_STATUS)[WeaveStoreConnectionStatusKeys];
+
+type WeaveStoreOnStoreConnectionStatusChangeEvent = WeaveStoreConnectionStatus;
+```
+
+## Client connectivity flow
+
+We've prepared this simple diagram showcasing how the connectivity works on the Weave.js instance
+when using this store. The lines connecting display the value of the connection `status` returned
+on the `onStoreConnectionStatusChange` event.
+
+<Mermaid
+  chart={`
+flowchart TD
+  A["Weave.js instance start\(\)"]
+  B["Trigger connect\(\) to store"]
+  C["Fetch Azure Web PubSub websocket connection URL"]
+  D1["connection URL fetched"]
+  D2["Failed to fetch connection URL"]
+  E2["Handle error on UI"]
+  E1["Connecting to websocket"]
+  F2["Websocket failed to connect"]
+  F1["Websocket connected"]
+  G["Loads room"]
+  H["Instance running"]
+  F2["Websocket failed to connect"]
+  K["Handle error on UI"]
+  I["Error with connection"]
+  J["Reconnection"]
+  A --> B
+  B --> C
+  C --> |fetch: failure| D2
+  C --> |fetch: success| D1
+  D2 --> E2
+  D1 --> |connecting| E1
+  E1 --> |connected| F1
+  E1 --> |error| F2
+  F1 --> G
+  F2 --> K
+  G --> H
+  H --> I
+  I --> |connecting| J
+  J --> |connected| H`}
+/>

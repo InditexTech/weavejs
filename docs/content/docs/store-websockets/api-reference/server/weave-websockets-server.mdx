@@ -58,13 +58,25 @@ const websocketsServer = new WeaveWebsocketsServer(params: WeaveWebsocketsServer
       description: "Child nodes to render",
       type: "FetchRoom",
     },
+    horizontalSyncHandlerConfig: {
+      required: false,
+      description:
+        "The configuration for a Redis instance that syncs horizontally several instances of the server. A must-be when scaling horizontally. If not defined no horizontal sync is performed.",
+      type: "WeaveStoreHorizontalSyncConfig",
+    },
     initialState: {
       description: "Array of nodes to register and use by the instance",
       type: "initialState",
       default: "defaultInitialState",
     },
-  }}
+
+}}
 />
+
+<Callout title="In production..." type="warn">
+  For production, we recommend deploying using the `horizontalSyncHandlerConfig`
+  setup.
+</Callout>
 
 ## Methods
 
@@ -93,8 +105,21 @@ type PersistRoom = (
 
 type FetchRoom = (roomId: string) => Promise<Uint8Array | null>;
 
+type WeaveStoreHorizontalSyncRedisConfig = {
+  host: string;
+  port: number;
+  keyPrefix: string;
+  password?: string;
+};
+
+type WeaveStoreHorizontalSyncConfig = {
+  type: "redis";
+  config: WeaveStoreHorizontalSyncRedisConfig;
+};
+
 type WeaveWebsocketsServerParams = {
   initialState?: FetchInitialState;
+  horizontalSyncHandlerConfig?: WeaveStoreHorizontalSyncConfig;
   performUpgrade: PerformUpgrade;
   extractRoomId: ExtractRoomId;
   persistRoom?: PersistRoom;

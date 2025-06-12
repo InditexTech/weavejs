@@ -3,14 +3,8 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import * as Y from 'yjs';
-import { WEAVE_STORE_AZURE_WEB_PUBSUB_CONNECTION_STATUS } from './constants';
 
-export type WeaveStoreAzureWebPubsubConnectionStatusKeys =
-  keyof typeof WEAVE_STORE_AZURE_WEB_PUBSUB_CONNECTION_STATUS;
-export type WeaveStoreAzureWebPubsubConnectionStatus =
-  (typeof WEAVE_STORE_AZURE_WEB_PUBSUB_CONNECTION_STATUS)[WeaveStoreAzureWebPubsubConnectionStatusKeys];
-
-export type WeaveAzureWebPubsubConfig = {
+export type WeaveStoreAzureWebPubsubConfig = {
   endpoint: string;
   key: string;
   hubName: string;
@@ -20,17 +14,11 @@ export type WeaveStoreAzureWebPubsubOptions = {
   roomId: string;
   url: string;
   fetchClient?: FetchClient;
-  callbacks?: WeaveStoreAzureWebPubsubStoreCallbacks;
 };
 
-export type WeaveStoreAzureWebPubsubStoreCallbacks = {
-  onFetchConnectionUrl?: (payload: {
-    loading: boolean;
-    error: Error | null;
-  }) => void;
-  onConnectionStatusChange?: (
-    status: WeaveStoreAzureWebPubsubConnectionStatus
-  ) => void;
+export type WeaveStoreAzureWebPubsubOnStoreFetchConnectionUrlEvent = {
+  loading: boolean;
+  error: Error | null;
 };
 
 export type FetchClient = (

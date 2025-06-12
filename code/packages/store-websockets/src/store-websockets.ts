@@ -3,17 +3,18 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { WeaveStore } from '@inditextech/weave-sdk';
-import { type WeaveStoreOptions } from '@inditextech/weave-types';
-import { WEAVE_STORE_WEBSOCKETS } from './constants';
 import {
-  type WeaveStoreWebsocketsConnectionStatus,
-  type WeaveStoreWebsocketsOptions,
-} from './types';
+  WEAVE_STORE_CONNECTION_STATUS,
+  type WeaveStoreOptions,
+} from '@inditextech/weave-types';
+import { WEAVE_STORE_WEBSOCKETS } from './constants';
+import { type WeaveStoreWebsocketsOptions } from './types';
 import { WebsocketProvider } from 'y-websocket';
 
 export class WeaveStoreWebsockets extends WeaveStore {
   private websocketOptions: WeaveStoreWebsocketsOptions;
   private roomId: string;
+  private initialized!: boolean;
   protected provider!: WebsocketProvider;
   protected name: string = WEAVE_STORE_WEBSOCKETS;
   protected supportsUndoManager = true;
@@ -37,6 +38,7 @@ export class WeaveStoreWebsockets extends WeaveStore {
       wsOptions: { serverUrl },
     } = this.websocketOptions;
 
+    this.initialized = false;
     this.provider = new WebsocketProvider(
       serverUrl,
       this.roomId,
@@ -47,31 +49,41 @@ export class WeaveStoreWebsockets extends WeaveStore {
       }
     );
 
-    this.provider.on(
-      'status',
-      ({ status }: { status: WeaveStoreWebsocketsConnectionStatus }) => {
-        if (status === 'connected') {
-          this.handleAwarenessChange();
-
-          const awareness = this.provider.awareness;
-          awareness.on('update', this.handleAwarenessChange.bind(this));
-          awareness.on('change', this.handleAwarenessChange.bind(this));
-        }
-
-        if (status === 'disconnected') {
-          const awareness = this.provider.awareness;
-          awareness.destroy();
-          awareness.off('update', this.handleAwarenessChange.bind(this));
-          awareness.off('change', this.handleAwarenessChange.bind(this));
-        }
-
-        this.websocketOptions.callbacks?.onConnectionStatusChange?.(status);
-        this.instance.emitEvent('onConnectionStatusChange', status);
+    this.provider.on('status', ({ status }) => {
+      this.handleConnectionStatusChange(status);
+      if (!this.initialized && status === 'connected') {
+        this.initialized = true;
       }
-    );
+    });
+
+    this.provider.on('connection-close', () => {
+      if (this.initialized) {
+        this.handleConnectionStatusChange(
+          WEAVE_STORE_CONNECTION_STATUS.CONNECTING
+        );
+        return;
+      }
+      this.handleConnectionStatusChange(
+        WEAVE_STORE_CONNECTION_STATUS.DISCONNECTED
+      );
+    });
+
+    this.provider.on('connection-error', () => {
+      if (this.initialized) {
+        this.handleConnectionStatusChange(
+          WEAVE_STORE_CONNECTION_STATUS.DISCONNECTED
+        );
+        return;
+      }
+      this.handleConnectionStatusChange(WEAVE_STORE_CONNECTION_STATUS.ERROR);
+    });
   }
 
   connect(): void {
+    const awareness = this.provider.awareness;
+    awareness.on('update', this.handleAwarenessChange.bind(this));
+    awareness.on('change', this.handleAwarenessChange.bind(this));
+
     this.provider.connect();
   }
 

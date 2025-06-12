@@ -4,6 +4,7 @@
 
 import http from 'http';
 import https from 'https';
+import Emittery from 'emittery';
 import { WebSocketServer } from 'ws';
 import { setServer, setupWSConnection } from './websockets-utils';
 import { defaultInitialState } from './default-initial-state';
@@ -14,17 +15,21 @@ import {
   type PersistRoom,
   type FetchRoom,
 } from '../types';
+import { WeaveHorizontalSyncHandlerRedis } from './horizontal-sync-handler/redis/client';
+import type { WeaveStoreHorizontalSyncConfig } from '@inditextech/weave-types';
 
 type WeaveWebsocketsServerParams = {
   initialState?: FetchInitialState;
+  horizontalSyncHandlerConfig?: WeaveStoreHorizontalSyncConfig;
   performUpgrade: PerformUpgrade;
   extractRoomId: ExtractRoomId;
   persistRoom?: PersistRoom;
   fetchRoom?: FetchRoom;
 };
 
-export class WeaveWebsocketsServer {
+export class WeaveWebsocketsServer extends Emittery {
   private initialState: FetchInitialState;
+  private horizontalSyncHandler: WeaveHorizontalSyncHandlerRedis;
   private performUpgrade: PerformUpgrade;
   private extractRoomId: ExtractRoomId;
   private wss: WebSocketServer;
@@ -33,16 +38,35 @@ export class WeaveWebsocketsServer {
 
   constructor({
     initialState = defaultInitialState,
+    horizontalSyncHandlerConfig,
     performUpgrade,
     extractRoomId,
     persistRoom,
     fetchRoom,
   }: WeaveWebsocketsServerParams) {
+    super();
+
     this.initialState = initialState;
     this.performUpgrade = performUpgrade;
     this.extractRoomId = extractRoomId;
     this.persistRoom = persistRoom;
     this.fetchRoom = fetchRoom;
+
+    switch (horizontalSyncHandlerConfig?.type) {
+      case 'redis':
+        this.horizontalSyncHandler = new WeaveHorizontalSyncHandlerRedis(
+          this,
+          horizontalSyncHandlerConfig?.config
+        );
+        break;
+
+      default:
+        this.horizontalSyncHandler = new WeaveHorizontalSyncHandlerRedis(
+          this,
+          horizontalSyncHandlerConfig?.config
+        );
+        break;
+    }
 
     this.wss = new WebSocketServer({ noServer: true });
 
@@ -50,8 +74,28 @@ export class WeaveWebsocketsServer {
 
     this.wss.on(
       'connection',
-      setupWSConnection(this.extractRoomId, this.initialState)
+      setupWSConnection(
+        this.extractRoomId,
+        this.initialState,
+        this.horizontalSyncHandler
+      )
     );
+  }
+
+  getHorizontalSyncHandler(): WeaveHorizontalSyncHandlerRedis {
+    return this.horizontalSyncHandler;
+  }
+
+  emitEvent<T>(event: string, payload?: T): void {
+    this.emit(event, payload);
+  }
+
+  addEventListener<T>(event: string, callback: (payload: T) => void): void {
+    this.on(event, callback);
+  }
+
+  removeEventListener<T>(event: string, callback: (payload: T) => void): void {
+    this.off(event, callback);
   }
 
   handleUpgrade(server: http.Server | https.Server): void {
