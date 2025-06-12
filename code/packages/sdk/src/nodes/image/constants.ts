@@ -3,3 +3,8 @@
 // SPDX-License-Identifier: Apache-2.0
 
 export const WEAVE_IMAGE_NODE_TYPE = 'image';
+
+export const WEAVE_IMAGE_CROP_END_TYPE = {
+  ['ACCEPT']: 'accept',
+  ['CANCEL']: 'cancel',
+};

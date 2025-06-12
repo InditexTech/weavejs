@@ -21,6 +21,7 @@ export class WeaveImageCrop {
   private grid!: Konva.Group;
   private transformer!: Konva.Transformer;
   private node: WeaveImageNode;
+  private onClose: () => void;
   private handleHide: (e: KeyboardEvent) => void;
 
   constructor(
@@ -35,10 +36,13 @@ export class WeaveImageCrop {
     this.image = image;
     this.internalImage = internalImage;
     this.cropGroup = clipGroup;
+    this.onClose = () => {};
     this.handleHide = this.hide.bind(this);
   }
 
-  show(): void {
+  show(onClose: () => void): void {
+    this.onClose = onClose;
+
     const nodeSnappingPlugin =
       this.instance.getPlugin<WeaveNodesSelectionPlugin>('nodesSnapping');
     if (nodeSnappingPlugin) {
@@ -226,6 +230,14 @@ export class WeaveImageCrop {
       .addEventListener('keydown', this.handleHide);
   }
 
+  accept() {
+    this.hide({ key: 'Enter' } as KeyboardEvent);
+  }
+
+  cancel() {
+    this.hide({ key: 'Escape' } as KeyboardEvent);
+  }
+
   private hide(e: KeyboardEvent) {
     if (!['Enter', 'Escape'].includes(e.key)) {
       return;
@@ -236,6 +248,8 @@ export class WeaveImageCrop {
     if (e.key === 'Enter') {
       this.handleClipEnd();
     }
+
+    this.onClose();
 
     const utilityLayer = this.instance.getUtilityLayer();
     utilityLayer?.destroyChildren();
@@ -336,7 +350,7 @@ export class WeaveImageCrop {
     );
   }
 
-  private handleClipEnd() {
+  handleClipEnd() {
     const clipRect = this.cropRect.getClientRect({
       relativeTo: this.cropGroup,
     });

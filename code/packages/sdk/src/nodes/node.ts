@@ -45,6 +45,8 @@ export const augmentKonvaNodeClass = (
   };
   Konva.Node.prototype.movedToContainer = function () {};
   Konva.Node.prototype.updatePosition = function () {};
+  Konva.Node.prototype.triggerCrop = function () {};
+  Konva.Node.prototype.closeCrop = function () {};
   Konva.Node.prototype.resetCrop = function () {};
 };
 

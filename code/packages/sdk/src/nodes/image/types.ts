@@ -6,6 +6,8 @@ import {
   type WeaveElementAttributes,
   type WeaveNodeTransformerProperties,
 } from '@inditextech/weave-types';
+import type Konva from 'konva';
+import type { WEAVE_IMAGE_CROP_END_TYPE } from './constants';
 
 export type ImageProps = WeaveElementAttributes & {
   id: string;
@@ -24,4 +26,16 @@ export type WeaveImageProperties = {
 
 export type WeaveImageNodeParams = {
   config: Partial<WeaveImageProperties>;
+};
+
+export type WeaveImageCropEndTypeKeys = keyof typeof WEAVE_IMAGE_CROP_END_TYPE;
+export type WeaveImageCropEndType =
+  (typeof WEAVE_IMAGE_CROP_END_TYPE)[WeaveImageCropEndTypeKeys];
+
+export type WeaveImageOnCropStartEvent = {
+  instance: Konva.Group;
+};
+
+export type WeaveImageOnCropEndEvent = {
+  instance: Konva.Group;
 };

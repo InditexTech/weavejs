@@ -13,6 +13,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- [#388](https://github.com/InditexTech/weavejs/issues/388) Allow the image tool to receive a specific event to trigger the crop mode
+
 ### Changed
 
 - [#304](https://github.com/InditexTech/weavejs/issues/304) Improve stores connectivity
