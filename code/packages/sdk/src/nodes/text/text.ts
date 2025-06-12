@@ -419,6 +419,18 @@ export class WeaveTextNode extends WeaveNode {
     textArea.style.resize = 'none';
     textArea.style.lineHeight = `${textNode.lineHeight()}`;
     textArea.style.fontFamily = textNode.fontFamily();
+    let fontWeight = 'normal';
+    let fontStyle = 'normal';
+    if ((textNode.fontStyle() ?? 'normal').indexOf('bold') !== -1) {
+      fontWeight = 'bold';
+    }
+    if ((textNode.fontStyle() ?? 'normal').indexOf('italic') !== -1) {
+      fontStyle = 'italic';
+    }
+    textArea.style.fontWeight = fontWeight;
+    textArea.style.fontStyle = fontStyle;
+    textArea.style.fontVariant = textNode.fontVariant();
+    textArea.style.textDecoration = textNode.textDecoration();
     textAreaContainer.style.transformOrigin = 'left top';
     textArea.style.textAlign = textNode.align();
     textArea.style.color = `${textNode.fill()}`;

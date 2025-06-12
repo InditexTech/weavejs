@@ -13,6 +13,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- [#380](https://github.com/InditexTech/weavejs/issues/380) Allow WeaveTextToolAction to pass node properties
+
 ## [0.24.1] - 2025-06-10
 
 ### Fixed
