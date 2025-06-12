@@ -66,7 +66,6 @@
     "husky": "9.1.4",
     "npkill": "0.12.2",
     "nx": "19.5.7",
-    "patch-package": "8.0.0",
     "prettier": "2.8.8",
     "typescript": "5.7.3"
   },
