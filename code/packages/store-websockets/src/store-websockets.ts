@@ -14,6 +14,7 @@ import { WebsocketProvider } from 'y-websocket';
 export class WeaveStoreWebsockets extends WeaveStore {
   private websocketOptions: WeaveStoreWebsocketsOptions;
   private roomId: string;
+  private initialized!: boolean;
   protected provider!: WebsocketProvider;
   protected name: string = WEAVE_STORE_WEBSOCKETS;
   protected supportsUndoManager = true;
@@ -37,6 +38,7 @@ export class WeaveStoreWebsockets extends WeaveStore {
       wsOptions: { serverUrl },
     } = this.websocketOptions;
 
+    this.initialized = false;
     this.provider = new WebsocketProvider(
       serverUrl,
       this.roomId,
@@ -48,26 +50,40 @@ export class WeaveStoreWebsockets extends WeaveStore {
     );
 
     this.provider.on('status', ({ status }) => {
-      if (status === WEAVE_STORE_CONNECTION_STATUS.CONNECTED) {
-        this.handleAwarenessChange();
-
-        const awareness = this.provider.awareness;
-        awareness.on('update', this.handleAwarenessChange.bind(this));
-        awareness.on('change', this.handleAwarenessChange.bind(this));
-      }
-
-      if (status === WEAVE_STORE_CONNECTION_STATUS.DISCONNECTED) {
-        const awareness = this.provider.awareness;
-        awareness.destroy();
-        awareness.off('update', this.handleAwarenessChange.bind(this));
-        awareness.off('change', this.handleAwarenessChange.bind(this));
-      }
-
       this.handleConnectionStatusChange(status);
+      if (!this.initialized && status === 'connected') {
+        this.initialized = true;
+      }
+    });
+
+    this.provider.on('connection-close', () => {
+      if (this.initialized) {
+        this.handleConnectionStatusChange(
+          WEAVE_STORE_CONNECTION_STATUS.CONNECTING
+        );
+        return;
+      }
+      this.handleConnectionStatusChange(
+        WEAVE_STORE_CONNECTION_STATUS.DISCONNECTED
+      );
+    });
+
+    this.provider.on('connection-error', () => {
+      if (this.initialized) {
+        this.handleConnectionStatusChange(
+          WEAVE_STORE_CONNECTION_STATUS.DISCONNECTED
+        );
+        return;
+      }
+      this.handleConnectionStatusChange(WEAVE_STORE_CONNECTION_STATUS.ERROR);
     });
   }
 
   connect(): void {
+    const awareness = this.provider.awareness;
+    awareness.on('update', this.handleAwarenessChange.bind(this));
+    awareness.on('change', this.handleAwarenessChange.bind(this));
+
     this.provider.connect();
   }
 

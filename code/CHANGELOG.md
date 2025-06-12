@@ -13,6 +13,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- [#304](https://github.com/InditexTech/weavejs/issues/304) Improve stores connectivity
+
 ## [0.25.0] - 2025-06-12
 
 ### Added

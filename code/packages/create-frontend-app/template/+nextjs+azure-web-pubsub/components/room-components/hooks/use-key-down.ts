@@ -1,3 +1,5 @@
+import { useWeave } from '@inditextech/weave-react';
+import { WEAVE_STORE_CONNECTION_STATUS } from '@inditextech/weave-types';
 import React from 'react';
 
 const canDetectKeyboard = () => {
@@ -12,6 +14,8 @@ export const useKeyDown = (
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   modifiers: (event: any) => boolean = () => true
 ) => {
+  const weaveConnectionStatus = useWeave((state) => state.connection.status);
+
   const onKeyDown = React.useCallback(
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (event: any) => {
@@ -20,13 +24,14 @@ export const useKeyDown = (
         wasAnyKeyPressed &&
         !window.weaveOnFieldFocus &&
         canDetectKeyboard() &&
-        modifiers(event)
+        modifiers(event) &&
+        weaveConnectionStatus === WEAVE_STORE_CONNECTION_STATUS.CONNECTED
       ) {
         event.preventDefault();
         callback();
       }
     },
-    [callback, keys, modifiers]
+    [callback, keys, weaveConnectionStatus, modifiers]
   );
 
   React.useEffect(() => {

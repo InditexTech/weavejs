@@ -8,6 +8,9 @@ import LoginForm from '../home-components/login-form';
 import { Button } from '../ui/button';
 import { Github, Book } from 'lucide-react';
 import { DOCUMENTATION_URL, GITHUB_URL } from '@/lib/constants';
+import weavePackage from '../../node_modules/@inditextech/weave-sdk/package.json';
+import weaveReactHelperPackage from '../../node_modules/@inditextech/weave-react/package.json';
+import weaveStorePackage from '../../node_modules/@inditextech/weave-store-azure-web-pubsub/package.json';
 
 export const Home = () => {
   return (
@@ -39,29 +42,59 @@ export const Home = () => {
             <div className="w-full flex flex-col gap-2 items-center justify-center bg-background p-[32px] border border-[#c9c9c9] mt-[32px]">
               <LoginForm />
             </div>
-            <div className="w-full flex gap-2 items-center justify-center bg-background p-8 py-2 mt-4 border border-[#c9c9c9]">
-              <Button
-                variant="link"
-                onClick={() => {
-                  window.open(GITHUB_URL, '_blank', 'noopener,noreferrer');
-                }}
-                className="cursor-pointer font-inter font-light"
-              >
-                <Github strokeWidth={1} /> GITHUB
-              </Button>
-              <Button
-                variant="link"
-                onClick={() => {
-                  window.open(
-                    DOCUMENTATION_URL,
-                    '_blank',
-                    'noopener,noreferrer'
-                  );
-                }}
-                className="cursor-pointer font-inter font-light"
-              >
-                <Book strokeWidth={1} /> DOCUMENTATION
-              </Button>
+            <div className="w-full flex flex-col gap-2 items-center justify-center bg-background p-8 py-2 mt-4 border border-[#c9c9c9]">
+              <div className="flex gap-2 justify-center-items-center">
+                <Button
+                  variant="link"
+                  onClick={() => {
+                    window.open(GITHUB_URL, '_blank', 'noopener,noreferrer');
+                  }}
+                  className="cursor-pointer font-inter font-light"
+                >
+                  <Github strokeWidth={1} /> GITHUB
+                </Button>
+                <Button
+                  variant="link"
+                  onClick={() => {
+                    window.open(
+                      DOCUMENTATION_URL,
+                      '_blank',
+                      'noopener,noreferrer'
+                    );
+                  }}
+                  className="cursor-pointer font-inter font-light"
+                >
+                  <Book strokeWidth={1} /> DOCUMENTATION
+                </Button>
+              </div>
+            </div>
+            <div className="w-full flex flex-col gap-2 items-center justify-center bg-background p-8 py-2 mt-4 border border-[#c9c9c9]">
+              <div className="w-full grid grid-cols-[1fr_auto] gap-1 justify-center-items-center font-light text-[12px] py-3">
+                <div className="flex gap-1 justify-start items-center">
+                  <code>@inditextech/weave-sdk</code>
+                </div>
+                <div className="flex gap-1 justify-center items-center">
+                  <code className="bg-[#e9e9e9] px-2 py-1">
+                    v{weavePackage.version}
+                  </code>
+                </div>
+                <div className="flex gap-1 justify-start items-center">
+                  <code>@inditextech/weave-react</code>
+                </div>
+                <div className="flex gap-1 justify-center items-center">
+                  <code className="bg-[#e9e9e9] px-2 py-1">
+                    v{weaveReactHelperPackage.version}
+                  </code>
+                </div>
+                <div className="flex gap-1 justify-start items-center">
+                  <code>@inditextech/weave-store-azure-web-pubsub</code>
+                </div>
+                <div className="flex gap-1 justify-center items-center">
+                  <code className="bg-[#e9e9e9] px-2 py-1">
+                    v{weaveStorePackage.version}
+                  </code>
+                </div>
+              </div>
             </div>
           </div>
         </motion.section>

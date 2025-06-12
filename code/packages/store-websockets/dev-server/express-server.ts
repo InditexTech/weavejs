@@ -71,8 +71,8 @@ const wss = new WeaveWebsocketsServer({
       const roomsFolder = path.join(__dirname, 'rooms');
       const roomsFile = path.join(roomsFolder, docName);
       return await fs.readFile(roomsFile);
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (ex) {
-      console.error(ex);
       return null;
     }
   },
@@ -98,8 +98,9 @@ const wss = new WeaveWebsocketsServer({
 
       const roomsFile = path.join(roomsFolder, docName);
       await fs.writeFile(roomsFile, actualState);
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (ex) {
-      console.error(ex);
+      /* empty */
     }
   },
 });

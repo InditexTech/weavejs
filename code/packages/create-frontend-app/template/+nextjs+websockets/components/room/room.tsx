@@ -16,11 +16,14 @@ import { UploadFile } from '../room-components/upload-file';
 import UserForm from '../room-components/user-form';
 import { HelpDrawer } from '../room-components/help/help-drawer';
 
-const statusMap = {
-  ['idle']: 'Idle',
-  ['starting']: 'Starting Weave...',
-  ['loadingFonts']: 'Fetching custom fonts...',
-  ['running']: 'Running',
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const statusMap: any = {
+  [WEAVE_INSTANCE_STATUS.IDLE]: 'Idle',
+  [WEAVE_INSTANCE_STATUS.STARTING]: 'Starting Weave...',
+  [WEAVE_INSTANCE_STATUS.LOADING_FONTS]: 'Fetching fonts...',
+  [WEAVE_INSTANCE_STATUS.CONNECTING_TO_ROOM]: 'Connecting to room...',
+  [WEAVE_INSTANCE_STATUS.LOADING_ROOM]: 'Loading room...',
+  [WEAVE_INSTANCE_STATUS.RUNNING]: 'Running',
 };
 
 export const Room = () => {
@@ -32,6 +35,15 @@ export const Room = () => {
 
   const room = useCollaborationRoom((state) => state.room);
   const user = useCollaborationRoom((state) => state.user);
+  const loadingFetchConnectionUrl = useCollaborationRoom(
+    (state) => state.fetchConnectionUrl.loading
+  );
+  const errorFetchConnectionUrl = useCollaborationRoom(
+    (state) => state.fetchConnectionUrl.error
+  );
+  const setFetchConnectionUrlError = useCollaborationRoom(
+    (state) => state.setFetchConnectionUrlError
+  );
   const setUser = useCollaborationRoom((state) => state.setUser);
 
   const { loadedParams } = useHandleRouteParams();
@@ -58,20 +70,25 @@ export const Room = () => {
     if (!loadedParams) {
       return 'Fetching room parameters...';
     }
+    if (loadingFetchConnectionUrl) {
+      return 'Connecting to the room...';
+    }
     if (status !== WEAVE_INSTANCE_STATUS.RUNNING) {
       return statusMap[status];
     }
-    if (status === WEAVE_INSTANCE_STATUS.RUNNING && !roomLoaded) {
-      return 'Fetching room content...';
-    }
 
     return '';
-  }, [loadedParams, status, roomLoaded]);
+  }, [loadedParams, loadingFetchConnectionUrl, status, roomLoaded]);
 
-  const wsStoreProvider = useGetWebsocketsProvider({
+  const storeProvider = useGetWebsocketsProvider({
     loadedParams,
     getUser,
   });
+
+  React.useEffect(() => {
+    setFetchConnectionUrlError(null);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   React.useEffect(() => {
     if (instance && status === WEAVE_INSTANCE_STATUS.RUNNING && roomLoaded) {
@@ -79,8 +96,29 @@ export const Room = () => {
     }
   }, [instance, status, roomLoaded]);
 
+  React.useEffect(() => {
+    if (status === WEAVE_INSTANCE_STATUS.CONNECTING_ERROR) {
+      router.push('/error?errorCode=room-failed-connection');
+    }
+
+    if (!room && !user && loadedParams) {
+      router.push('/error?errorCode=room-required-parameters');
+    }
+
+    if (errorFetchConnectionUrl) {
+      router.push('/error?errorCode=room-failed-connection');
+    }
+  }, [router, room, user, status, loadedParams, errorFetchConnectionUrl]);
+
+  if (status === WEAVE_INSTANCE_STATUS.CONNECTING_ERROR) {
+    return null;
+  }
+
   if (!room && !user && loadedParams) {
-    router.push('/error?errorCode=room-required-parameters');
+    return null;
+  }
+
+  if (errorFetchConnectionUrl) {
     return null;
   }
 
@@ -88,6 +126,7 @@ export const Room = () => {
     <>
       <AnimatePresence>
         {(!loadedParams ||
+          loadingFetchConnectionUrl ||
           status !== WEAVE_INSTANCE_STATUS.RUNNING ||
           (status === WEAVE_INSTANCE_STATUS.RUNNING && !roomLoaded)) && (
           <>
@@ -119,11 +158,11 @@ export const Room = () => {
           </>
         )}
       </AnimatePresence>
-      {loadedParams && room && user && wsStoreProvider && (
+      {loadedParams && room && user && storeProvider && (
         <WeaveProvider
           containerId="weave"
           getUser={getUser}
-          store={wsStoreProvider}
+          store={storeProvider}
           fonts={FONTS}
           nodes={NODES}
           actions={ACTIONS}

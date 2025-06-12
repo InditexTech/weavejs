@@ -92,10 +92,6 @@ export default class WeaveAzureWebPubsubSyncHandler extends WebPubSubEventHandle
       );
       connection.start();
 
-      connection.on('connected', () => {
-        console.log('reload state');
-      });
-
       this._rooms.set(roomId, doc);
 
       await this.setupRoomPersistence(roomId, doc);

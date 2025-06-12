@@ -191,7 +191,6 @@ export class WeaveStoreAzureWebPubSubSyncHost extends Emittery {
       const event: Message = JSON.parse(e.data.toString());
 
       if (event.type === 'message' && event.from === 'group') {
-        console.log('Received message', event.data);
         switch (event.data.t) {
           case MessageDataType.Init:
             this.onClientInit(group, event.data);

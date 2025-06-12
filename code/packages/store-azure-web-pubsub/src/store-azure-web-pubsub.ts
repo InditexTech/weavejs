@@ -59,30 +59,20 @@ export class WeaveStoreAzureWebPubsub extends WeaveStore {
       this.handleConnectionStatusChange(
         WEAVE_STORE_CONNECTION_STATUS.DISCONNECTED
       );
+      this.disconnect();
     });
 
     this.provider.on('status', (status) => {
-      if (status === WEAVE_STORE_CONNECTION_STATUS.CONNECTED) {
-        this.handleAwarenessChange();
-
-        const awareness = this.provider.awareness;
-        awareness.on('update', this.handleAwarenessChange.bind(this));
-        awareness.on('change', this.handleAwarenessChange.bind(this));
-      }
-
-      if (status === WEAVE_STORE_CONNECTION_STATUS.DISCONNECTED) {
-        const awareness = this.provider.awareness;
-        awareness.destroy();
-        awareness.off('update', this.handleAwarenessChange.bind(this));
-        awareness.off('change', this.handleAwarenessChange.bind(this));
-      }
-
       this.handleConnectionStatusChange(status);
     });
   }
 
   async connect(): Promise<void> {
     const { fetchClient } = this.azureWebPubsubOptions;
+
+    const awareness = this.provider.awareness;
+    awareness.on('update', this.handleAwarenessChange.bind(this));
+    awareness.on('change', this.handleAwarenessChange.bind(this));
 
     let error: Error | null = null;
     try {

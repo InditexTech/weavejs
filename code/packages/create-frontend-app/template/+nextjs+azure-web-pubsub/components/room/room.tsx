@@ -10,17 +10,20 @@ import { useWeave, WeaveProvider } from '@inditextech/weave-react';
 import { RoomLayout } from './room.layout';
 import { RoomLoader } from '../room-components/room-loader/room-loader';
 import { AnimatePresence } from 'framer-motion';
-import useGetAzureWebPubsubProvider from '../room-components/hooks/use-get-azure-web-pubsub-provider';
+import useGetAzureWebPubSubProvider from '../room-components/hooks/use-get-azure-web-pubsub-provider';
 import useHandleRouteParams from '../room-components/hooks/use-handle-route-params';
 import { UploadFile } from '../room-components/upload-file';
 import UserForm from '../room-components/user-form';
 import { HelpDrawer } from '../room-components/help/help-drawer';
 
-const statusMap = {
-  ['idle']: 'Idle',
-  ['starting']: 'Starting Weave...',
-  ['loadingFonts']: 'Fetching custom fonts...',
-  ['running']: 'Running',
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const statusMap: any = {
+  [WEAVE_INSTANCE_STATUS.IDLE]: 'Idle',
+  [WEAVE_INSTANCE_STATUS.STARTING]: 'Starting Weave...',
+  [WEAVE_INSTANCE_STATUS.LOADING_FONTS]: 'Fetching fonts...',
+  [WEAVE_INSTANCE_STATUS.CONNECTING_TO_ROOM]: 'Connecting to room...',
+  [WEAVE_INSTANCE_STATUS.LOADING_ROOM]: 'Loading room...',
+  [WEAVE_INSTANCE_STATUS.RUNNING]: 'Running',
 };
 
 export const Room = () => {
@@ -73,14 +76,11 @@ export const Room = () => {
     if (status !== WEAVE_INSTANCE_STATUS.RUNNING) {
       return statusMap[status];
     }
-    if (status === WEAVE_INSTANCE_STATUS.RUNNING && !roomLoaded) {
-      return 'Fetching room content...';
-    }
 
     return '';
   }, [loadedParams, loadingFetchConnectionUrl, status, roomLoaded]);
 
-  const wsStoreProvider = useGetAzureWebPubsubProvider({
+  const storeProvider = useGetAzureWebPubSubProvider({
     loadedParams,
     getUser,
   });
@@ -96,13 +96,29 @@ export const Room = () => {
     }
   }, [instance, status, roomLoaded]);
 
+  React.useEffect(() => {
+    if (status === WEAVE_INSTANCE_STATUS.CONNECTING_ERROR) {
+      router.push('/error?errorCode=room-failed-connection');
+    }
+
+    if (!room && !user && loadedParams) {
+      router.push('/error?errorCode=room-required-parameters');
+    }
+
+    if (errorFetchConnectionUrl) {
+      router.push('/error?errorCode=room-failed-connection');
+    }
+  }, [router, room, user, status, loadedParams, errorFetchConnectionUrl]);
+
+  if (status === WEAVE_INSTANCE_STATUS.CONNECTING_ERROR) {
+    return null;
+  }
+
   if (!room && !user && loadedParams) {
-    router.push('/error?errorCode=room-required-parameters');
     return null;
   }
 
   if (errorFetchConnectionUrl) {
-    router.push('/error?errorCode=room-failed-connection');
     return null;
   }
 
@@ -142,11 +158,11 @@ export const Room = () => {
           </>
         )}
       </AnimatePresence>
-      {loadedParams && room && user && wsStoreProvider && (
+      {loadedParams && room && user && storeProvider && (
         <WeaveProvider
           containerId="weave"
           getUser={getUser}
-          store={wsStoreProvider}
+          store={storeProvider}
           fonts={FONTS}
           nodes={NODES}
           actions={ACTIONS}

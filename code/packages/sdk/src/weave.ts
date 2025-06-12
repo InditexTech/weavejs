@@ -180,8 +180,7 @@ export class Weave extends Emittery {
   private handleStoreConnectionStatusChange(
     status: WeaveStoreConnectionStatus
   ): void {
-    console.log('status', status);
-    if (status === WEAVE_STORE_CONNECTION_STATUS.ERROR) {
+    if (!this.initialized && status === WEAVE_STORE_CONNECTION_STATUS.ERROR) {
       this.status = WEAVE_INSTANCE_STATUS.CONNECTING_ERROR;
       this.emitEvent('onInstanceStatus', this.status);
     }

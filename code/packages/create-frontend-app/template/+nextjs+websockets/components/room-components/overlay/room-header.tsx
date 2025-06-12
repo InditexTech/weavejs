@@ -61,13 +61,17 @@ import {
   GITHUB_URL,
   SIDEBAR_ELEMENTS,
 } from '@/lib/constants';
+import weavePackage from '../../../node_modules/@inditextech/weave-sdk/package.json';
+import weaveReactHelperPackage from '../../../node_modules/@inditextech/weave-react/package.json';
+import weaveStorePackage from '../../../node_modules/@inditextech/weave-store-azure-web-pubsub/package.json';
+import { WEAVE_STORE_CONNECTION_STATUS } from '@inditextech/weave-types';
 
 export function RoomHeader() {
   const router = useRouter();
 
   const instance = useWeave((state) => state.instance);
-  const weaveConnectionStatus = useWeave((state) => state.connection.status);
   const selectionActive = useWeave((state) => state.selection.active);
+  const weaveConnectionStatus = useWeave((state) => state.connection.status);
 
   const showUI = useCollaborationRoom((state) => state.ui.show);
   const room = useCollaborationRoom((state) => state.room);
@@ -252,6 +256,10 @@ export function RoomHeader() {
                   <HelpDrawerTrigger />
                   <DropdownMenuItem
                     className="text-foreground cursor-pointer hover:rounded-none"
+                    disabled={
+                      weaveConnectionStatus !==
+                      WEAVE_STORE_CONNECTION_STATUS.CONNECTED
+                    }
                     onClick={handleToggleUsersPointers}
                   >
                     <div className="w-full flex justify-between items-center gap-2">
@@ -266,6 +274,10 @@ export function RoomHeader() {
                   </DropdownMenuItem>
                   <DropdownMenuItem
                     className="text-foreground cursor-pointer hover:rounded-none"
+                    disabled={
+                      weaveConnectionStatus !==
+                      WEAVE_STORE_CONNECTION_STATUS.CONNECTED
+                    }
                     onClick={handleToggleGrid}
                   >
                     <div className="w-full flex justify-between items-center gap-2">
@@ -287,7 +299,9 @@ export function RoomHeader() {
                   <DropdownMenuItem
                     disabled={
                       !gridEnabled ||
-                      (gridEnabled && gridType === WEAVE_GRID_TYPES.DOTS)
+                      (gridEnabled && gridType === WEAVE_GRID_TYPES.DOTS) ||
+                      weaveConnectionStatus !==
+                        WEAVE_STORE_CONNECTION_STATUS.CONNECTED
                     }
                     className="text-foreground cursor-pointer hover:rounded-none"
                     onClick={() => {
@@ -306,7 +320,9 @@ export function RoomHeader() {
                   <DropdownMenuItem
                     disabled={
                       !gridEnabled ||
-                      (gridEnabled && gridType === WEAVE_GRID_TYPES.LINES)
+                      (gridEnabled && gridType === WEAVE_GRID_TYPES.LINES) ||
+                      weaveConnectionStatus !==
+                        WEAVE_STORE_CONNECTION_STATUS.CONNECTED
                     }
                     className="text-foreground cursor-pointer hover:rounded-none"
                     onClick={() => {
@@ -329,6 +345,10 @@ export function RoomHeader() {
                 </DropdownMenuLabel>
                 <DropdownMenuItem
                   className="text-foreground cursor-pointer hover:rounded-none"
+                  disabled={
+                    weaveConnectionStatus !==
+                    WEAVE_STORE_CONNECTION_STATUS.CONNECTED
+                  }
                   onClick={handleExportToImage}
                 >
                   <ImageIcon /> Stage to image
@@ -353,6 +373,34 @@ export function RoomHeader() {
                   }}
                 >
                   <Book /> Documentation
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuLabel className="px-2 py-1 pt-2 text-zinc-600 text-xs">
+                  Weave.js dependencies versions
+                </DropdownMenuLabel>
+                <DropdownMenuItem className="text-foreground cursor-pointer hover:rounded-none">
+                  <div className="w-full flex gap-1 justify-between items-center">
+                    <code>@inditextech/weave-sdk</code>
+                    <code className="bg-[#e9e9e9] px-2 py-1 ml-8">
+                      v{weavePackage.version}
+                    </code>
+                  </div>
+                </DropdownMenuItem>
+                <DropdownMenuItem className="text-foreground cursor-pointer hover:rounded-none">
+                  <div className="w-full flex gap-1 justify-between items-center">
+                    <code>@inditextech/weave-react</code>
+                    <code className="bg-[#e9e9e9] px-2 py-1 ml-8">
+                      v{weaveReactHelperPackage.version}
+                    </code>
+                  </div>
+                </DropdownMenuItem>
+                <DropdownMenuItem className="text-foreground cursor-pointer hover:rounded-none">
+                  <div className="w-full flex gap-1 justify-between items-center">
+                    <code>@inditextech/weave-store-azure-web-pubsub</code>
+                    <code className="bg-[#e9e9e9] px-2 py-1 ml-8">
+                      v{weaveStorePackage.version}
+                    </code>
+                  </div>
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem
@@ -402,11 +450,18 @@ export function RoomHeader() {
                 }}
               >
                 <DropdownMenuTrigger
+                  disabled={
+                    weaveConnectionStatus !==
+                    WEAVE_STORE_CONNECTION_STATUS.CONNECTED
+                  }
                   className={cn(
                     'rounded-none cursor-pointer h-[40px] hover:text-[#666666] focus:outline-none',
                     {
                       ['font-normal']: sidebarsMenuOpen,
                       ['font-extralight']: !sidebarsMenuOpen,
+                      ['disabled:cursor-default disabled:opacity-50']:
+                        weaveConnectionStatus !==
+                        WEAVE_STORE_CONNECTION_STATUS.CONNECTED,
                     }
                   )}
                 >

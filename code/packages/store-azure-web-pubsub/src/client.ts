@@ -3,7 +3,6 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import Emittery from 'emittery';
-import * as time from 'lib0/time';
 import { Buffer } from 'buffer';
 import { v4 as uuidv4 } from 'uuid';
 import { Doc } from 'yjs';
@@ -20,7 +19,6 @@ const messageAwareness = 1;
 const messageQueryAwareness = 3;
 
 const AzureWebPubSubJsonProtocol = 'json.webpubsub.azure.v1';
-const messageReconnectTimeout = 30000;
 
 export enum MessageType {
   System = 'system',
@@ -130,15 +128,15 @@ export class WeaveStoreAzureWebPubSubSyncClient extends Emittery {
   private _ws: ReconnectingWebSocket | null;
   private _url: string;
   private _connectionUrl: string | null;
-  private _status: 'connected' | 'connecting' | 'disconnected';
+  private _status: 'connected' | 'connecting' | 'disconnected' | 'error';
   private _wsConnected: boolean;
-  // private _wsLastMessageReceived: number;
   private _synced: boolean;
-  private _wsLastMessageReceived!: number;
-  private _checkInterval!: NodeJS.Timeout;
-  private _resyncInterval;
+  private _resyncInterval!: NodeJS.Timeout | null;
+  private _connectionRetries: number;
   private _uuid: string;
   private _awareness: awarenessProtocol.Awareness;
+  private _options: ClientOptions;
+  private _initialized: boolean;
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   private _updateHandler: (update: any, origin: any) => void;
@@ -167,6 +165,8 @@ export class WeaveStoreAzureWebPubSubSyncClient extends Emittery {
   ) {
     super();
 
+    this._options = options;
+
     this.doc = doc;
     this.topic = topic;
 
@@ -176,32 +176,16 @@ export class WeaveStoreAzureWebPubSubSyncClient extends Emittery {
 
     this._status = 'disconnected';
     this._wsConnected = false;
+    this._initialized = false;
 
+    this._connectionRetries = 0;
     this._synced = false;
     this._ws = null;
-    // this._wsLastMessageReceived = 0;
 
     const awareness = new awarenessProtocol.Awareness(doc);
     this._awareness = awareness;
 
     this._resyncInterval = null;
-
-    if (options.resyncInterval > 0) {
-      this._resyncInterval = setInterval(() => {
-        if (this._ws) {
-          // resend sync step 1
-          const encoder = encoding.createEncoder();
-          encoding.writeVarUint(encoder, messageSyncStep1);
-          syncProtocol.writeSyncStep1(encoder, doc);
-          sendToControlGroup(
-            this,
-            topic,
-            MessageDataType.Sync,
-            encoding.toUint8Array(encoder)
-          );
-        }
-      }, options.resyncInterval);
-    }
 
     // register text update handler
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -262,11 +246,27 @@ export class WeaveStoreAzureWebPubSubSyncClient extends Emittery {
     return this._uuid;
   }
 
-  destroy(): void {
-    if (this._checkInterval !== null) {
-      clearInterval(this._checkInterval);
+  setupResyncInterval(): void {
+    if (this._options.resyncInterval > 0) {
+      this._resyncInterval = setInterval(() => {
+        if (this._ws && this._wsConnected) {
+          // resend sync step 1
+          const encoder = encoding.createEncoder();
+          encoding.writeVarUint(encoder, messageSyncStep1);
+          syncProtocol.writeSyncStep1(encoder, this.doc);
+          sendToControlGroup(
+            this,
+            this.topic,
+            MessageDataType.Sync,
+            encoding.toUint8Array(encoder)
+          );
+        }
+      }, this._options.resyncInterval);
     }
-    if (this._resyncInterval !== null) {
+  }
+
+  destroy(): void {
+    if (this._resyncInterval) {
       clearInterval(this._resyncInterval);
     }
     this.stop();
@@ -287,6 +287,7 @@ export class WeaveStoreAzureWebPubSubSyncClient extends Emittery {
       );
       const u8 = encoding.toUint8Array(encoder);
       sendToControlGroup(this, this.topic, MessageDataType.Awareness, u8);
+      this._initialized = false;
       this._ws.close();
     }
   }
@@ -322,28 +323,20 @@ export class WeaveStoreAzureWebPubSubSyncClient extends Emittery {
     websocket.binaryType = 'arraybuffer';
     this._ws = websocket;
     this._wsConnected = false;
+    this._initialized = false;
     this.synced = false;
 
-    this._checkInterval = setInterval(() => {
-      if (
-        this._ws?.OPEN &&
-        messageReconnectTimeout <
-          time.getUnixTime() - this._wsLastMessageReceived
-      ) {
-        // no message received in a long time - not even your own awareness
-        // updates (which are updated every 15 seconds)
-        this._ws.reconnect();
-      }
-    }, messageReconnectTimeout / 10);
-
     websocket.addEventListener('error', () => {
-      this._status = 'connecting';
+      if (this._initialized && websocket.retryCount > 0) {
+        this._status = 'connecting';
+        this.emit('status', this._status);
+        return;
+      }
+      this._status = 'error';
       this.emit('status', this._status);
     });
 
     websocket.onmessage = (event) => {
-      this._wsLastMessageReceived = time.getUnixTime();
-
       if (event.data === null) {
         return;
       }
@@ -376,8 +369,13 @@ export class WeaveStoreAzureWebPubSubSyncClient extends Emittery {
     websocket.onclose = () => {
       this._status = 'disconnected';
       this.emit('status', this._status);
-      this._ws = null;
+
       if (this._wsConnected) {
+        if (this._resyncInterval) {
+          clearInterval(this._resyncInterval);
+        }
+
+        this._resyncInterval = null;
         this._wsConnected = false;
         this.synced = false;
         awarenessProtocol.removeAwarenessStates(
@@ -391,11 +389,15 @@ export class WeaveStoreAzureWebPubSubSyncClient extends Emittery {
     };
 
     websocket.onopen = () => {
-      console.log('connected client');
       // this._wsLastMessageReceived = Date.now();
-      this._wsConnected = true;
       this._status = 'connected';
       this.emit('status', this._status);
+      this._wsConnected = true;
+      this._initialized = true;
+
+      this._connectionRetries = this._connectionRetries++;
+
+      this.setupResyncInterval();
 
       joinGroup(this, this.topic);
 
