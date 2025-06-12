@@ -17,6 +17,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - [#304](https://github.com/InditexTech/weavejs/issues/304) Improve stores connectivity
 
+### Fixed
+
+- [#387](https://github.com/InditexTech/weavejs/issues/387) Image border issues on the first render
+
 ## [0.25.0] - 2025-06-12
 
 ### Added
