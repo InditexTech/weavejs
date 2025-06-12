@@ -147,8 +147,6 @@ export class WeaveImageNode extends WeaveNode {
       rotation: 0,
       width: 0,
       height: 0,
-      stroke: '#ff0000ff',
-      strokeWidth: 0,
       strokeScaleEnabled: true,
       draggable: false,
       visible: false,
