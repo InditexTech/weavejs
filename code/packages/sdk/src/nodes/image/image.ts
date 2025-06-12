@@ -11,18 +11,22 @@ import {
 import { WeaveNode } from '../node';
 import {
   type ImageProps,
+  type WeaveImageCropEndType,
   type WeaveImageNodeParams,
+  type WeaveImageOnCropEndEvent,
+  type WeaveImageOnCropStartEvent,
   type WeaveImageProperties,
 } from './types';
 import { WeaveImageToolAction } from '@/actions/image-tool/image-tool';
 import { WeaveImageCrop } from './crop';
-import { WEAVE_IMAGE_NODE_TYPE } from './constants';
+import { WEAVE_IMAGE_CROP_END_TYPE, WEAVE_IMAGE_NODE_TYPE } from './constants';
 import type { WeaveNodesSelectionPlugin } from '@/plugins/nodes-selection/nodes-selection';
 import { isEqual } from 'lodash';
 
 export class WeaveImageNode extends WeaveNode {
   private config: WeaveImageProperties;
   protected nodeType: string = WEAVE_IMAGE_NODE_TYPE;
+  private imageCrop!: WeaveImageCrop | null;
   private cachedCropInfo!: Record<
     string,
     | {
@@ -48,8 +52,48 @@ export class WeaveImageNode extends WeaveNode {
         ...config?.transform,
       },
     };
+    this.imageCrop = null;
     this.cachedCropInfo = {};
     this.imageLoaded = false;
+  }
+
+  triggerCrop(imageNode: Konva.Group): void {
+    const stage = this.instance.getStage();
+
+    const image = stage.findOne(`#${imageNode.getAttrs().id}`) as
+      | Konva.Group
+      | undefined;
+
+    const internalImage = image?.findOne(`#${image.getAttrs().id}-image`) as
+      | Konva.Image
+      | undefined;
+
+    const cropGroup = image?.findOne(`#${image.getAttrs().id}-cropGroup`) as
+      | Konva.Group
+      | undefined;
+
+    if (!image || !internalImage || !cropGroup) {
+      return;
+    }
+
+    this.imageCrop = new WeaveImageCrop(
+      this.instance,
+      this,
+      image,
+      internalImage,
+      cropGroup
+    );
+
+    this.imageCrop.show(() => {
+      this.instance.emitEvent<WeaveImageOnCropEndEvent>('onImageCropEnd', {
+        instance: image,
+      });
+      this.imageCrop = null;
+    });
+
+    this.instance.emitEvent<WeaveImageOnCropStartEvent>('onImageCropStart', {
+      instance: image,
+    });
   }
 
   onRender(props: WeaveElementAttributes): WeaveElementInstance {
@@ -90,6 +134,39 @@ export class WeaveImageNode extends WeaveNode {
       }
 
       this.cachedCropInfo[image.getAttrs().id ?? ''] = undefined;
+    };
+
+    image.triggerCrop = () => {
+      const stage = this.instance.getStage();
+      const image = stage.findOne(`#${id}`) as Konva.Group | undefined;
+
+      if (!image) {
+        return;
+      }
+
+      this.triggerCrop(image);
+    };
+
+    image.closeCrop = (type: WeaveImageCropEndType) => {
+      const stage = this.instance.getStage();
+      const image = stage.findOne(`#${id}`) as Konva.Group | undefined;
+
+      if (!image || !this.imageCrop) {
+        return;
+      }
+
+      if (type === WEAVE_IMAGE_CROP_END_TYPE.ACCEPT) {
+        this.imageCrop.accept();
+        this.instance.emitEvent<WeaveImageOnCropEndEvent>('onImageCropEnd', {
+          instance: image,
+        });
+      }
+      if (type === WEAVE_IMAGE_CROP_END_TYPE.CANCEL) {
+        this.imageCrop.cancel();
+        this.instance.emitEvent<WeaveImageOnCropEndEvent>('onImageCropEnd', {
+          instance: image,
+        });
+      }
     };
 
     image.resetCrop = () => {
@@ -182,15 +259,7 @@ export class WeaveImageNode extends WeaveNode {
         return;
       }
 
-      const imageCrop = new WeaveImageCrop(
-        this.instance,
-        this,
-        image,
-        internalImage,
-        cropGroup
-      );
-
-      imageCrop.show();
+      this.triggerCrop(image);
     });
 
     const imageActionTool = this.getImageToolAction();
