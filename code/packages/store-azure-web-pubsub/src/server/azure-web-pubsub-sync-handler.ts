@@ -12,10 +12,8 @@ import {
 import { type FetchInitialState } from '@/types';
 import { WeaveStoreAzureWebPubSubSyncHost } from './azure-web-pubsub-host';
 import { WeaveAzureWebPubsubServer } from './azure-web-pubsub-server';
-import type { WeaveHorizontalSyncHandlerRedis } from './horizontal-sync-handler/redis/client';
 
 export default class WeaveAzureWebPubsubSyncHandler extends WebPubSubEventHandler {
-  private horizontalSyncHandler: WeaveHorizontalSyncHandlerRedis;
   // eslint-disable-next-line @typescript-eslint/naming-convention
   private _client: WebPubSubServiceClient;
   // eslint-disable-next-line @typescript-eslint/naming-convention
@@ -28,7 +26,6 @@ export default class WeaveAzureWebPubsubSyncHandler extends WebPubSubEventHandle
   constructor(
     server: WeaveAzureWebPubsubServer,
     client: WebPubSubServiceClient,
-    horizontalSyncHandler: WeaveHorizontalSyncHandlerRedis,
     initialState: FetchInitialState,
     hub: string,
     // path: string,
@@ -39,7 +36,6 @@ export default class WeaveAzureWebPubsubSyncHandler extends WebPubSubEventHandle
     });
 
     this.actualServer = server;
-    this.horizontalSyncHandler = horizontalSyncHandler;
     this.initialState = initialState;
     this._client = client;
   }
@@ -82,7 +78,6 @@ export default class WeaveAzureWebPubsubSyncHandler extends WebPubSubEventHandle
 
       const connection = new WeaveStoreAzureWebPubSubSyncHost(
         this._client,
-        this.horizontalSyncHandler,
         roomId,
         doc,
         {

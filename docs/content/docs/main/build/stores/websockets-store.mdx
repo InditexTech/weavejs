@@ -36,3 +36,56 @@ of how to use it both:
 
 - [Server-side](/docs/store-websockets#backend-side-usage) or
 - [Frontend-side](/docs/store-websockets#frontend-side-usage)
+
+## Client events
+
+When the store client tries to connect, we provide an event were we return the connection status,
+the event is named `onStoreConnectionStatusChange`, and it returns the actual connection status,
+being this status:
+
+```ts
+const WEAVE_STORE_CONNECTION_STATUS = {
+  ["ERROR"]: "error",
+  ["CONNECTING"]: "connecting",
+  ["CONNECTED"]: "connected",
+  ["DISCONNECTED"]: "disconnected",
+} as const;
+
+type WeaveStoreConnectionStatusKeys =
+  keyof typeof WEAVE_STORE_CONNECTION_STATUS;
+type WeaveStoreConnectionStatus =
+  (typeof WEAVE_STORE_CONNECTION_STATUS)[WeaveStoreConnectionStatusKeys];
+
+type WeaveStoreOnStoreConnectionStatusChangeEvent = WeaveStoreConnectionStatus;
+```
+
+## Client connectivity flow
+
+We've prepared this simple diagram showcasing how the connectivity works on the Weave.js instance
+when using this store. The lines connecting display the value of the connection `status` returned
+on the `onStoreConnectionStatusChange` event.
+
+<Mermaid
+  chart={`
+flowchart TD
+  A["Weave.js instance start\(\)"]
+  B["Trigger connect\(\) to store"]
+  C["Connecting to websocket"]
+  D1["Websocket connected"]
+  E["Loads room"]
+  F["Instance running"]
+  D2["Websocket failed to connect"]
+  E1["Handle error on UI"]
+  G["Error with connection"]
+  H["Reconnection"]
+  A --> B
+  B --> |connecting| C
+  C --> |connected| D1
+  C --> |error| D2
+  D2 --> E1
+  D1 --> E
+  E --> F
+  F --> G
+  G --> |connecting|H
+  H --> |connected|F`}
+/>
