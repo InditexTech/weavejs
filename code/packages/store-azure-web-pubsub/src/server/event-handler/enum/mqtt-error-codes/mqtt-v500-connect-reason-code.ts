@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2025 2025 INDUSTRIA DE DISEÑO TEXTIL S.A. (INDITEX S.A.)
+//
+// SPDX-License-Identifier: Apache-2.0
+
 /**
  * MQTT Connect Reason Codes
  * These codes represent the reasons for the outcome of an MQTT CONNECT packet as per MQTT 5.0 specification.
