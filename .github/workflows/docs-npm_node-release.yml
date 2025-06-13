@@ -13,7 +13,7 @@ on:
         default: "main"
 
 env:
-  DOCS_SITE_URL: https://stunning-enigma-169l5kv.pages.github.io
+  DOCS_SITE_URL: https://inditextech.github.io/weavejs
 
 jobs:
   release:

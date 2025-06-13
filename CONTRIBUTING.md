@@ -192,4 +192,4 @@ As you can see to test you can repeat steps 1-2 as many times as you want.
 
 Thank you for your time and contribution! Your work helps to grow and improve this project. If you have any questions, feel free to reach out to us.
 
-[docs-quick-start-url]: https://stunning-enigma-169l5kv.pages.github.io/docs/main/quickstart
+[docs-quick-start-url]: https://inditextech.github.io/weavejs/docs/main/quickstart

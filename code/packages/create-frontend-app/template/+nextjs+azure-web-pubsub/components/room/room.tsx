@@ -78,7 +78,7 @@ export const Room = () => {
     }
 
     return '';
-  }, [loadedParams, loadingFetchConnectionUrl, status, roomLoaded]);
+  }, [loadedParams, loadingFetchConnectionUrl, status]);
 
   const storeProvider = useGetAzureWebPubSubProvider({
     loadedParams,
