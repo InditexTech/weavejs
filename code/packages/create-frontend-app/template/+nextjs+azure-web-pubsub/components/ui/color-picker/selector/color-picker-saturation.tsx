@@ -9,6 +9,7 @@ import {
 import { useColorPicker } from '../context/color-picker-context';
 import { cn } from '@/lib/utils';
 import Color from 'color';
+import { hslToRgb, rgbToHsl } from '../utils';
 
 export type ColorPickerSaturationProps = HTMLAttributes<HTMLDivElement>;
 
@@ -35,17 +36,20 @@ export const ColorPickerSaturation = ({
         canvas.width = width;
         canvas.height = height;
 
-        const gradX = ctx.createLinearGradient(0, 0, width, 0);
-        gradX.addColorStop(0.1, 'rgb(255,255,255)');
-        gradX.addColorStop(0.9, `hsl(${hue}, 100%, 50%)`);
-        ctx.fillStyle = gradX;
-        ctx.fillRect(0, 0, width, height);
-
-        const gradY = ctx.createLinearGradient(0, 0, 0, height);
-        gradY.addColorStop(0.1, 'rgba(0,0,0,0)');
-        gradY.addColorStop(0.9, 'rgba(0,0,0,1)');
-        ctx.fillStyle = gradY;
-        ctx.fillRect(0, 0, width, height);
+        const image = ctx.createImageData(canvas.width, canvas.height);
+        for (let y = 0; y < canvas.height; y++) {
+          const lightness = 1 - y / canvas.height; // top = 100%
+          for (let x = 0; x < canvas.width; x++) {
+            const saturation = x / canvas.width;
+            const [r, g, b] = hslToRgb(hue, saturation, lightness);
+            const i = (y * canvas.width + x) * 4;
+            image.data[i] = r;
+            image.data[i + 1] = g;
+            image.data[i + 2] = b;
+            image.data[i + 3] = 255;
+          }
+        }
+        ctx.putImageData(image, 0, 0);
       }
     }
   }, [hue]);
@@ -55,44 +59,24 @@ export const ColorPickerSaturation = ({
   }, [renderGradient]);
 
   const handlePointerMove = useCallback(
-    (event: PointerEvent) => {
-      if (!isDragging || !containerRef.current || !canvasRef.current) {
+    (e: PointerEvent) => {
+      if (!containerRef.current || !canvasRef.current) {
         return;
       }
 
       const rect = containerRef.current.getBoundingClientRect();
-      const x = Math.max(
-        0,
-        Math.min(rect.width - 1, event.clientX - rect.left)
-      );
-      const y = Math.max(
-        0,
-        Math.min(rect.height - 1, event.clientY - rect.top)
-      );
-      setPosition({ x: x / rect.width, y: y / rect.height });
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
 
-      const ctx = canvasRef.current.getContext('2d', {
-        willReadFrequently: true,
-      });
-      if (ctx) {
-        const pixel = ctx.getImageData(x, y, 1, 1).data;
+      const saturation = Math.min(1, Math.max(0, x / rect.width));
+      const lightness = Math.max(0, Math.min(1, 1 - y / rect.height)); // inverted Y
 
-        const [r, g, b] = pixel;
+      const [r, g, b] = hslToRgb(hue, saturation, lightness);
 
-        let newColor = Color.rgb(r, g, b);
-
-        const newHsv = newColor.hsv().object();
-        const oldHsv = color.hsv().object();
-
-        if (newHsv.s === 0) {
-          newHsv.h = oldHsv.h;
-        }
-
-        newColor = Color.hsv(newHsv.h, newHsv.s, newHsv.v).alpha(color.alpha());
-        setColor(newColor);
-      }
+      setPosition({ x: x, y: y });
+      setColor(Color.rgb(r, g, b));
     },
-    [color, isDragging, setColor]
+    [hue, setColor]
   );
 
   useEffect(() => {
@@ -109,10 +93,15 @@ export const ColorPickerSaturation = ({
 
   useEffect(() => {
     if (!isDragging && containerRef.current) {
-      const { s, v } = color.hsv().object();
-      const newX = s / 100;
-      const newY = (100 - v) / 100;
-      setPosition({ x: newX, y: newY });
+      const { width, height } = containerRef.current.getBoundingClientRect();
+
+      const [r, g, b] = color.rgb().array();
+      const [, s, l] = rgbToHsl(r, g, b);
+
+      const x = s * width;
+      const y = (1 - l) * height;
+
+      setPosition({ x, y });
     }
   }, [color, isDragging]);
 
@@ -135,15 +124,15 @@ export const ColorPickerSaturation = ({
         {...props}
       >
         <div
-          className="-translate-x-1/2 -translate-y-1/2 pointer-events-none absolute h-4 w-4 rounded-full border-2 border-white"
+          className="-translate-x-1/2 -translate-y-1/2 pointer-events-none absolute h-3 w-3 rounded-full border-2 border-white"
           style={{
-            left: `${position.x * 100}%`,
-            top: `${position.y * 100}%`,
-            boxShadow: '0 0 0 1px rgba(0,0,0,0.5)',
+            left: `${position.x}px`,
+            top: `${position.y}px`,
+            boxShadow: '0 0 0 2px black',
           }}
         />
+        <canvas ref={canvasRef} style={{ display: 'none' }} />
       </div>
-      <canvas ref={canvasRef} style={{ display: 'none' }} />
     </>
   );
 };

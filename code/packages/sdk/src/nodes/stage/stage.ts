@@ -12,6 +12,7 @@ import { WEAVE_STAGE_NODE_TYPE } from './constants';
 
 export class WeaveStageNode extends WeaveNode {
   protected nodeType: string = WEAVE_STAGE_NODE_TYPE;
+  protected stageFocused: boolean = false;
   protected wheelMousePressed: boolean = false;
 
   onRender(props: WeaveElementAttributes): WeaveElementInstance {
@@ -21,7 +22,19 @@ export class WeaveStageNode extends WeaveNode {
 
     this.wheelMousePressed = false;
 
+    stage.isFocused = () => this.stageFocused;
     stage.isMouseWheelPressed = () => this.wheelMousePressed;
+
+    const container = stage.container();
+    container.setAttribute('tabindex', '0');
+
+    stage.container().addEventListener('focus', () => {
+      this.stageFocused = true;
+    });
+
+    stage.container().addEventListener('blur', () => {
+      this.stageFocused = false;
+    });
 
     stage.on('mousedown', (e) => {
       if (e.evt.button === 1) {
