@@ -31,7 +31,7 @@ SPDX-License-Identifier: Apache-2.0
   <p align="center">
     Build visual collaborative tools like Excalidraw, Miro, Canva, Figma or others!
     <br />
-    <a href="https://stunning-enigma-169l5kv.pages.github.io/docs/main"><strong>Explore the docs »</strong></a>
+    <a href="https://inditextech.github.io/weavejs/docs/main"><strong>Explore the docs »</strong></a>
     <br />
     <br />
     <a href="https://weavejs.cloud.inditex.com/">View Demo</a>
@@ -167,10 +167,10 @@ Project Link: [https://github.com/InditexTech/weavejs](https://github.com/Indite
 [stars-shield]: https://img.shields.io/github/stars/InditexTech/weavejs.svg?style=for-the-badge
 [stars-url]: https://github.com/InditexTech/weavejs/stargazers
 [issues-shield]: https://img.shields.io/github/issues/InditexTech/weavejs.svg?style=for-the-badge
-[docs-url]: https://stunning-enigma-169l5kv.pages.github.io
-[docs-architecture]: https://stunning-enigma-169l5kv.pages.github.io/docs/main/architecture
-[docs-quick-start-url]: https://stunning-enigma-169l5kv.pages.github.io/docs/main/quickstart
-[docs-roadmap-url]: https://stunning-enigma-169l5kv.pages.github.io/docs/main/roadmap
+[docs-url]: https://inditextech.github.io/weavejs
+[docs-architecture]: https://inditextech.github.io/weavejs/docs/main/architecture
+[docs-quick-start-url]: https://inditextech.github.io/weavejs/docs/main/quickstart
+[docs-roadmap-url]: https://inditextech.github.io/weavejs/docs/main/roadmap
 [issues-url]: https://github.com/InditexTech/weavejs/issues
 [license-shield]: https://img.shields.io/github/license/InditexTech/weavejs.svg?style=for-the-badge
 [license-url]: https://github.com/InditexTech/weavejs/blob/master/LICENSE.txt
