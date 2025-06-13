@@ -12,7 +12,12 @@ import * as encoding from 'lib0/encoding';
 import * as decoding from 'lib0/decoding';
 import * as syncProtocol from 'y-protocols/sync';
 import * as awarenessProtocol from 'y-protocols/awareness';
-import { type FetchClient } from './types';
+import {
+  type FetchClient,
+  type WeaveStoreAzureWebPubsubOnStoreFetchConnectionUrlEvent,
+} from './types';
+import type { WeaveStoreAzureWebPubsub } from './store-azure-web-pubsub';
+import { WEAVE_STORE_CONNECTION_STATUS } from '@inditextech/weave-types';
 
 const messageSyncStep1 = 0;
 const messageAwareness = 1;
@@ -125,9 +130,10 @@ export class WeaveStoreAzureWebPubSubSyncClient extends Emittery {
   public doc: Doc;
   public topic: string;
 
+  private instance: WeaveStoreAzureWebPubsub;
   private _ws: ReconnectingWebSocket | null;
   private _url: string;
-  private _connectionUrl: string | null;
+  private _fetchClient: FetchClient;
   private _status: 'connected' | 'connecting' | 'disconnected' | 'error';
   private _wsConnected: boolean;
   private _synced: boolean;
@@ -155,6 +161,7 @@ export class WeaveStoreAzureWebPubSubSyncClient extends Emittery {
    * @param {number} [options.tokenProvider] token generator for negotiation.
    */
   constructor(
+    instance: WeaveStoreAzureWebPubsub,
     url: string,
     topic: string,
     doc: Doc,
@@ -165,13 +172,14 @@ export class WeaveStoreAzureWebPubSubSyncClient extends Emittery {
   ) {
     super();
 
+    this.instance = instance;
     this._options = options;
 
     this.doc = doc;
     this.topic = topic;
 
+    this._fetchClient = fetch;
     this._url = url;
-    this._connectionUrl = null;
     this._uuid = uuidv4();
 
     this._status = 'disconnected';
@@ -292,12 +300,16 @@ export class WeaveStoreAzureWebPubSubSyncClient extends Emittery {
     }
   }
 
-  async fetchConnectionUrl(fetchClient: FetchClient = fetch): Promise<void> {
+  setFetchClient(fetchClient: FetchClient = window.fetch): void {
+    this._fetchClient = fetchClient.bind(window);
+  }
+
+  async fetchConnectionUrl(): Promise<string> {
     try {
-      const res = await fetchClient(this._url);
+      const res = await this._fetchClient(this._url);
       if (res.ok) {
         const data = (await res.json()) as { url: string };
-        this._connectionUrl = data.url;
+        return data.url;
       } else {
         throw new Error(`Failed to fetch connection url from: ${this._url}`);
       }
@@ -312,14 +324,39 @@ export class WeaveStoreAzureWebPubSubSyncClient extends Emittery {
       return;
     }
 
-    if (!this._connectionUrl) {
-      return;
-    }
+    const websocket = new ReconnectingWebSocket(async () => {
+      let url: string = 'https://error';
+      let error: Error | null = null;
 
-    const websocket = new ReconnectingWebSocket(
-      this._connectionUrl,
-      AzureWebPubSubJsonProtocol
-    );
+      try {
+        this.instance.emitEvent<WeaveStoreAzureWebPubsubOnStoreFetchConnectionUrlEvent>(
+          'onStoreFetchConnectionUrl',
+          {
+            loading: true,
+            error: null,
+          }
+        );
+        url = await this.fetchConnectionUrl();
+      } catch (ex) {
+        error = ex as Error;
+      } finally {
+        if (error) {
+          this.instance.handleConnectionStatusChange(
+            WEAVE_STORE_CONNECTION_STATUS.ERROR
+          );
+        }
+        this.instance.emitEvent<WeaveStoreAzureWebPubsubOnStoreFetchConnectionUrlEvent>(
+          'onStoreFetchConnectionUrl',
+          {
+            loading: false,
+            error,
+          }
+        );
+      }
+
+      return url;
+    }, AzureWebPubSubJsonProtocol);
+
     websocket.binaryType = 'arraybuffer';
     this._ws = websocket;
     this._wsConnected = false;
