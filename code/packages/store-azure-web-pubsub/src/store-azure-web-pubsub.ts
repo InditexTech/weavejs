@@ -9,10 +9,7 @@ import {
 } from '@inditextech/weave-types';
 import { WeaveStoreAzureWebPubSubSyncClient } from './client';
 import { WEAVE_STORE_AZURE_WEB_PUBSUB } from './constants';
-import {
-  type WeaveStoreAzureWebPubsubOptions,
-  type WeaveStoreAzureWebPubsubOnStoreFetchConnectionUrlEvent,
-} from './types';
+import { type WeaveStoreAzureWebPubsubOptions } from './types';
 
 export class WeaveStoreAzureWebPubsub extends WeaveStore {
   private azureWebPubsubOptions: WeaveStoreAzureWebPubsubOptions;
@@ -41,6 +38,7 @@ export class WeaveStoreAzureWebPubsub extends WeaveStore {
     const { url } = this.azureWebPubsubOptions;
 
     this.provider = new WeaveStoreAzureWebPubSubSyncClient(
+      this,
       url,
       this.roomId,
       this.getDocument(),
@@ -67,6 +65,10 @@ export class WeaveStoreAzureWebPubsub extends WeaveStore {
     });
   }
 
+  emitEvent<T>(name: string, payload?: T): void {
+    this.instance.emitEvent(name, payload);
+  }
+
   async connect(): Promise<void> {
     const { fetchClient } = this.azureWebPubsubOptions;
 
@@ -74,30 +76,7 @@ export class WeaveStoreAzureWebPubsub extends WeaveStore {
     awareness.on('update', this.handleAwarenessChange.bind(this));
     awareness.on('change', this.handleAwarenessChange.bind(this));
 
-    let error: Error | null = null;
-    try {
-      this.instance.emitEvent<WeaveStoreAzureWebPubsubOnStoreFetchConnectionUrlEvent>(
-        'onStoreFetchConnectionUrl',
-        {
-          loading: true,
-          error: null,
-        }
-      );
-      await this.provider.fetchConnectionUrl(fetchClient ?? fetch);
-    } catch (ex) {
-      error = ex as Error;
-    } finally {
-      if (error) {
-        this.handleConnectionStatusChange(WEAVE_STORE_CONNECTION_STATUS.ERROR);
-      }
-      this.instance.emitEvent<WeaveStoreAzureWebPubsubOnStoreFetchConnectionUrlEvent>(
-        'onStoreFetchConnectionUrl',
-        {
-          loading: false,
-          error,
-        }
-      );
-    }
+    this.provider.setFetchClient(fetchClient ?? window.fetch);
 
     await this.provider.start();
   }
