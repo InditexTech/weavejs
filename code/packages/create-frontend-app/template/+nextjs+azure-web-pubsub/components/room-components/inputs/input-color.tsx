@@ -48,7 +48,7 @@ export const InputColor = ({
 
   const handleOnChange = React.useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
-      setEditedValue(e.target.value);
+      setEditedValue(e.target.value === '' ? '#ffffff' : e.target.value);
     },
     []
   );

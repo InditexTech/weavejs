@@ -18,6 +18,7 @@ declare module 'konva/lib/Node' {
 
 declare module 'konva/lib/Stage' {
   interface Stage {
+    isFocused(): boolean;
     isMouseWheelPressed(): boolean;
   }
 }

@@ -27,6 +27,9 @@ import { throttle } from 'lodash';
 import type { KonvaEventObject } from 'konva/lib/Node';
 
 export const augmentKonvaStageClass = (): void => {
+  Konva.Stage.prototype.isFocused = function () {
+    return false;
+  };
   Konva.Stage.prototype.isMouseWheelPressed = function () {
     return false;
   };

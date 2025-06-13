@@ -99,14 +99,14 @@ export class WeaveCopyPasteNodesPlugin extends WeavePlugin {
     const stage = this.instance.getStage();
 
     window.addEventListener('keydown', async (e) => {
-      if (e.key === 'c' && (e.ctrlKey || e.metaKey)) {
+      if (stage.isFocused() && e.key === 'c' && (e.ctrlKey || e.metaKey)) {
         e.preventDefault();
 
         await this.performCopy();
 
         return;
       }
-      if (e.key === 'v' && (e.ctrlKey || e.metaKey)) {
+      if (stage.isFocused() && e.key === 'v' && (e.ctrlKey || e.metaKey)) {
         e.preventDefault();
 
         if (!this.enabled) {
@@ -154,10 +154,6 @@ export class WeaveCopyPasteNodesPlugin extends WeavePlugin {
         }
 
         stage.container().focus();
-        return;
-      }
-      if (e.key === 'Escape') {
-        this.cancel();
         return;
       }
     });
