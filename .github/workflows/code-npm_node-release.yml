@@ -57,6 +57,13 @@ jobs:
           fetch-depth: 0
           persist-credentials: false
 
+      # - name: Generate app token
+      #   id: generate-token
+      #   uses: peter-murray/workflow-application-token-action@v4
+      #   with:
+      #     application_id: ${{ vars.IT_BOT_APP_ID }}
+      #     application_private_key: ${{ secrets.IT_BOT_PKEY }}
+
       - name: Check if CHANGELOG.md has changes
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -179,6 +186,7 @@ jobs:
 
       - name: Release / Commit and Tag
         env:
+          # GITHUB_TOKEN: ${{ steps.generate-token.outputs.token }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         working-directory: code
         run: |
@@ -194,7 +202,8 @@ jobs:
 
       - name: Next Development Iteration / Commit Changes
         env:
-          GITHUB_TOKEN: ${{ secrets.GH_TOKEN_PUSH }}
+          # GITHUB_TOKEN: ${{ steps.generate-token.outputs.token }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         working-directory: code
         run: |
           git commit -i package.json package-lock.json -m "[npm-scripts] prepare for next development iteration" --no-verify
