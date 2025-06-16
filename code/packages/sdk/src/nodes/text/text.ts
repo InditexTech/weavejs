@@ -268,7 +268,7 @@ export class WeaveTextNode extends WeaveNode {
         textNode
       );
       textAreaContainer.style.width =
-        (textAreaWidth + 5) * textNode.getAbsoluteScale().x + 'px';
+        textAreaWidth * textNode.getAbsoluteScale().x + 1 + 'px';
     }
     if (
       !textNode.getAttrs().layout ||
@@ -329,6 +329,7 @@ export class WeaveTextNode extends WeaveNode {
     textAreaSuperContainer.style.bottom = '0px';
     textAreaSuperContainer.style.right = '0px';
     textAreaSuperContainer.style.overflow = 'hidden';
+    textAreaSuperContainer.style.pointerEvents = 'none';
 
     const textAreaContainer = document.createElement('div');
     textAreaContainer.id = `${textNode.id()}_container`;
@@ -337,8 +338,9 @@ export class WeaveTextNode extends WeaveNode {
     textAreaContainer.appendChild(textArea);
     textAreaSuperContainer.appendChild(textAreaContainer);
     stage.container().appendChild(textAreaSuperContainer);
-
-    const containerRect = stage.container().getBoundingClientRect();
+    textAreaContainer.style.pointerEvents = 'auto';
+    textAreaContainer.style.backgroundColor = 'transparent';
+    textArea.style.pointerEvents = 'auto';
 
     this.instance.addEventListener(
       'onZoomChange',
@@ -369,8 +371,9 @@ export class WeaveTextNode extends WeaveNode {
       textAreaContainer.style.alignItems = 'end';
     }
     textAreaContainer.style.position = 'absolute';
-    textAreaContainer.style.top = -containerRect.y + position.y + 'px';
-    textAreaContainer.style.left = -containerRect.x + position.x + 'px';
+    textAreaContainer.style.top = position.y + 'px';
+    textAreaContainer.style.left = position.x + 'px';
+
     if (
       !textNode.getAttrs().layout ||
       textNode.getAttrs().layout === TEXT_LAYOUT.AUTO_ALL
@@ -408,10 +411,17 @@ export class WeaveTextNode extends WeaveNode {
       textNode.fontSize() * textNode.getAbsoluteScale().x + 'px';
     textArea.rows = textNode.text().split('\n').length;
     textAreaContainer.style.border = 'solid 1px #1e40af';
+    textArea.style.position = 'absolute';
+    textArea.style.top = '0px';
+    textArea.style.left = '0px';
+    textArea.style.overscrollBehavior = 'contains';
+    textArea.style.scrollBehavior = 'auto';
     textArea.style.caretColor = 'black';
     textArea.style.width = '100%';
+    textArea.style.letterSpacing = `${textNode.letterSpacing()}`;
     textArea.style.minHeight = 'auto';
     textArea.style.margin = '0px';
+    textArea.style.padding = '0px';
     textArea.style.overflow = 'hidden';
     textArea.style.background = 'transparent';
     textArea.style.border = 'none';
@@ -428,6 +438,7 @@ export class WeaveTextNode extends WeaveNode {
       fontStyle = 'italic';
     }
     textArea.style.fontWeight = fontWeight;
+    textArea.style.backgroundColor = 'transparent';
     textArea.style.fontStyle = fontStyle;
     textArea.style.fontVariant = textNode.fontVariant();
     textArea.style.textDecoration = textNode.textDecoration();
@@ -443,9 +454,25 @@ export class WeaveTextNode extends WeaveNode {
     textArea.onkeyup = () => {
       this.textAreaDomResize(textAreaContainer, textArea, textNode);
     };
+    textArea.onpaste = () => {
+      this.textAreaDomResize(textAreaContainer, textArea, textNode);
+    };
     textArea.oninput = () => {
       this.textAreaDomResize(textAreaContainer, textArea, textNode);
     };
+    // lock internal scroll
+    textAreaSuperContainer.addEventListener('scroll', () => {
+      textAreaSuperContainer.scrollTop = 0;
+      textAreaSuperContainer.scrollLeft = 0;
+    });
+    textAreaContainer.addEventListener('scroll', () => {
+      textAreaContainer.scrollTop = 0;
+      textAreaContainer.scrollLeft = 0;
+    });
+    textArea.addEventListener('scroll', () => {
+      textArea.scrollTop = 0;
+      textArea.scrollLeft = 0;
+    });
     const rotation = textNode.rotation();
     let transform = '';
     if (rotation) {
@@ -559,15 +586,15 @@ export class WeaveTextNode extends WeaveNode {
     }
 
     const stage = this.instance.getStage();
-    const containerRect = stage.container().getBoundingClientRect();
     const textPosition = textNode.getClientRect();
     const position: Vector2d = {
       x: textPosition.x,
       y: textPosition.y,
     };
 
-    textAreaContainer.style.top = -containerRect.y + position.y + 'px';
-    textAreaContainer.style.left = -containerRect.x + position.x + 'px';
+    textAreaContainer.style.top = position.y + 'px';
+    textAreaContainer.style.left = position.x + 'px';
+
     if (textNode.getAttrs().verticalAlign === 'top') {
       textAreaContainer.style.alignItems = 'start';
     }

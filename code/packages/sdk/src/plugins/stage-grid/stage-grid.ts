@@ -146,9 +146,7 @@ export class WeaveStageGridPlugin extends WeavePlugin {
       this.onRender();
     });
 
-    stage.on('wheel', (e) => {
-      e.evt.preventDefault();
-
+    window.addEventListener('wheel', () => {
       if (
         !this.enabled ||
         this.isSpaceKeyPressed ||
