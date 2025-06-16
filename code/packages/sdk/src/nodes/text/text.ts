@@ -268,7 +268,7 @@ export class WeaveTextNode extends WeaveNode {
         textNode
       );
       textAreaContainer.style.width =
-        textAreaWidth * textNode.getAbsoluteScale().x + 1 + 'px';
+        textAreaWidth * textNode.getAbsoluteScale().x + 2 + 'px';
     }
     if (
       !textNode.getAttrs().layout ||
@@ -422,6 +422,7 @@ export class WeaveTextNode extends WeaveNode {
     textArea.style.minHeight = 'auto';
     textArea.style.margin = '0px';
     textArea.style.padding = '0px';
+    textArea.style.boxSizing = 'content-box';
     textArea.style.overflow = 'hidden';
     textArea.style.background = 'transparent';
     textArea.style.border = 'none';
@@ -479,8 +480,14 @@ export class WeaveTextNode extends WeaveNode {
       transform += 'rotateZ(' + rotation + 'deg)';
     }
 
-    const px = 0;
-    const py = -3 * stage.scaleY();
+    const measures = textNode.measureSize(textNode.text());
+    const px = 0 * stage.scaleX();
+    const py =
+      2 *
+      (measures.fontBoundingBoxAscent -
+        measures.hangingBaseline -
+        measures.fontBoundingBoxDescent) *
+      stage.scaleY();
     transform += 'translateX(' + px + 'px)';
     transform += 'translateY(' + py + 'px)';
 
