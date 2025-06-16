@@ -1,6 +1,6 @@
 {
   "name": "@inditextech/weave",
-  "version": "0.27.0",
+  "version": "0.28.0-SNAPSHOT",
   "description": "Weave.js framework",
   "packageManager": "npm@10.2.4",
   "workspaces": [
