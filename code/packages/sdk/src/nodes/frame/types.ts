@@ -32,7 +32,9 @@ export type WeaveFrameNodeSizesInfo = {
 export type WeaveFrameProperties = {
   fontFamily: string;
   fontStyle: string;
-  titleHeight: number;
+  fontSize: number;
+  fontColor: string;
+  titleMargin: number;
   borderWidth: number;
   borderColor: string;
   onTargetLeave: {

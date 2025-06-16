@@ -128,7 +128,9 @@ type WeaveNodeTransformerProperties = Konva.TransformerConfig;
 type WeaveFrameProperties = {
   fontFamily: string;
   fontStyle: string;
-  titleHeight: number;
+  fontSize: number;
+  fontColor: string;
+  titleMargin: number;
   borderWidth: number;
   borderColor: string;
   onTargetLeave: {
@@ -183,8 +185,18 @@ For `WeaveFrameProperties`:
       type: "string",
       default: "check default values",
     },
-    ["titleHeight"]: {
-      description: "The height of the title (px) to use on the frame.",
+    ["fontSize"]: {
+      description: "The font size to use on the frame title.",
+      type: "string",
+      default: "check default values",
+    },
+    ["fontColor"]: {
+      description: "The font color to use on the frame title.",
+      type: "string",
+      default: "check default values",
+    },
+    ["titleMargin"]: {
+      description: "The margin of the title (px) with the frame contents.",
       type: "number",
       default: "check default values",
     },
@@ -237,7 +249,9 @@ For `WeaveFrameProperties`:
 const WEAVE_FRAME_NODE_DEFAULT_CONFIG = {
   fontFamily: "Arial",
   fontStyle: "normal",
-  titleHeight: 30,
+  fontSize: 20,
+  fontColor: "#000000ff",
+  titleMargin: 20,
   borderColor: "#000000ff",
   borderWidth: 1,
   onTargetLeave: {

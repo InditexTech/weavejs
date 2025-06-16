@@ -74,7 +74,9 @@ export class WeaveFrameNode extends WeaveNode {
     const {
       fontFamily,
       fontStyle,
-      titleHeight,
+      fontSize,
+      fontColor,
+      titleMargin,
       borderColor,
       borderWidth,
       onTargetEnter: {
@@ -139,20 +141,23 @@ export class WeaveFrameNode extends WeaveNode {
     const text = new Konva.Text({
       id: `${id}-title`,
       x: 0,
-      y: -titleHeight,
       width: props.frameWidth,
-      height: titleHeight,
-      fontSize: 20,
+      fontSize,
       fontFamily,
       fontStyle,
       align: 'left',
       text: props.title,
-      stroke: '#000000ff',
-      strokeWidth: 1,
+      fill: fontColor,
+      strokeWidth: 0,
       strokeScaleEnabled: true,
       listening: false,
       draggable: false,
     });
+
+    const textMeasures = text.measureSize(text.getAttrs().text ?? '');
+    const textHeight = textMeasures.height;
+    text.y(-textHeight - titleMargin);
+    text.height(textHeight);
 
     frameInternalGroup.add(text);
 
@@ -213,7 +218,9 @@ export class WeaveFrameNode extends WeaveNode {
       background.height(Math.max(5, selectorArea.height() * scaleY));
 
       text.width(Math.max(5, selectorArea.width() * scaleX));
-      text.height(titleHeight * scaleY);
+      const textMeasures = text.measureSize(text.getAttrs().text ?? '');
+      const textHeight = textMeasures.height;
+      text.height(textHeight * scaleY);
 
       frameInternal.width(Math.max(5, selectorArea.width() * scaleX));
       frameInternal.height(Math.max(5, selectorArea.height() * scaleY));
@@ -338,7 +345,7 @@ export class WeaveFrameNode extends WeaveNode {
 
     const newProps = { ...nextProps };
 
-    const { titleHeight, borderWidth } = this.config;
+    const { titleMargin, borderWidth } = this.config;
 
     nodeInstance.setAttrs({
       ...newProps,
@@ -382,15 +389,17 @@ export class WeaveFrameNode extends WeaveNode {
         });
       }
 
-      const text = frameNode.findOne(`#${id}-title`);
+      const text = frameNode.findOne(`#${id}-title`) as Konva.Text | undefined;
       if (text) {
         text.setAttrs({
           x: 0,
-          y: -titleHeight,
           text: nextProps.title,
           width: width * selectorArea.scaleX(),
-          height: titleHeight * selectorArea.scaleY(),
         });
+        const textMeasures = text.measureSize(text.getAttrs().text ?? '');
+        const textHeight = textMeasures.height;
+        text.y(-textHeight - titleMargin);
+        text.height(textHeight * selectorArea.scaleY());
       }
 
       const frameInternal = frameNode.findOne(`#${id}-group-internal`);

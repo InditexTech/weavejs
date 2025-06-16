@@ -13,9 +13,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- [#400](https://github.com/InditexTech/weavejs/issues/400) Allow styles customizations on Frame title
+
 ### Fixed
 
-- [#398](https://github.com/InditexTech/weavejs/issues/398) Sometimes when adding text, it wraps without need to
+- [#398](https://github.com/InditexTech/weavejs/issues/398) Sometimes when adding text on the Text node, it wraps without need to
 
 ## [0.26.2] - 2025-06-13
 
