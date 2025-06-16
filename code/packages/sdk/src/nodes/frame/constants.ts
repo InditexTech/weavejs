@@ -71,7 +71,9 @@ export const WEAVE_FRAME_NODE_SIZES: WeaveFrameNodeSizesInfo = {
 export const WEAVE_FRAME_NODE_DEFAULT_CONFIG = {
   fontFamily: 'Arial',
   fontStyle: 'bold',
-  titleHeight: 30,
+  fontSize: 20,
+  fontColor: '#000000ff',
+  titleMargin: 20,
   borderColor: '#000000ff',
   borderWidth: 1,
   onTargetLeave: {
