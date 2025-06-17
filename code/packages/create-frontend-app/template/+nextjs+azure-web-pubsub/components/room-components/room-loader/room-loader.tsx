@@ -68,8 +68,8 @@ export function RoomLoader({
       </div>
       <div className="absolute bottom-0 left-0 right-0 h-full flex justify-center items-center">
         <div className="flex flex-col items-center justify-center min-w-[320px] p-[32px] bg-white border-1 shadow-none border-[#c9c9c9]">
-          <motion.div variants={childVariants}>
-            <Logo kind="large" variant="no-text" />
+          <motion.div variants={childVariants} className="my-[24px]">
+            <Logo kind="landscape" variant="no-text" />
           </motion.div>
 
           <div className="w-full flex flex-col justify-center items-center text-black gap-0 mt-[24px]">

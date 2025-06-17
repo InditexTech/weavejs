@@ -32,17 +32,17 @@ export const Error = () => {
       >
         <div className="max-w-[520px] w-full flex flex-col items-center justify-between gap-0 border border-[#c9c9c9]">
           <div className="w-full flex justify-between items-center gap-2 md:left-8 md:top-8 bg-background p-8 py-6 rounded-xl">
-            <Logo kind="small" />
+            <Logo kind="landscape" variant="no-text" />
             <motion.div
               initial={{ opacity: 0, y: -20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 0.2 }}
               className="flex flex-col items-end justify-center"
             >
-              <h1 className="text-3xl font-inter font-bold text-foreground uppercase">
+              <h1 className="text-2xl font-inter font-bold text-foreground uppercase">
                 WHITEBOARD
               </h1>
-              <h2 className="text-2xl font-inter font-light text-muted-foreground uppercase">
+              <h2 className="text-1xl font-inter font-light text-muted-foreground uppercase">
                 SHOWCASE
               </h2>
             </motion.div>
