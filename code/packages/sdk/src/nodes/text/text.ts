@@ -495,8 +495,8 @@ export class WeaveTextNode extends WeaveNode {
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const handleKeyDown = (e: any) => {
-      e.stopPropagation();
       if (textArea && textNode && e.key === 'Escape') {
+        e.stopPropagation();
         if (
           !textNode.getAttrs().layout ||
           textNode.getAttrs().layout === TEXT_LAYOUT.AUTO_ALL
@@ -555,8 +555,10 @@ export class WeaveTextNode extends WeaveNode {
     textArea.focus();
 
     const handleOutsideClick = (e: Event) => {
+      e.stopPropagation();
+
       let clickedOnCanvas = false;
-      if ((e.target as Element)?.id === `${textNode.id()}_supercontainer`) {
+      if ((e.target as Element)?.id !== `${textNode.id()}`) {
         clickedOnCanvas = true;
       }
 
@@ -576,7 +578,9 @@ export class WeaveTextNode extends WeaveNode {
     setTimeout(() => {
       window.addEventListener('click', handleOutsideClick);
       window.addEventListener('touchstart', handleOutsideClick);
-    });
+    }, 0);
+
+    this.editing = true;
   }
 
   private updateTextAreaDOM(textNode: Konva.Text) {
