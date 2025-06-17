@@ -15,7 +15,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
-- [#405](https://github.com/InditexTech/weavejs/issues/405) Text node click outside not working
+- [#405](https://github.com/InditexTech/weavejs/issues/405) Text node, on edition mode, click outside not working
 
 ## [0.27.1] - 2025-06-16
 
