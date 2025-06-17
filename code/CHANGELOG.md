@@ -47,7 +47,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [0.26.0] - 2025-06-12
 
-\### Added
+### Added
 
 - [#388](https://github.com/InditexTech/weavejs/issues/388) Allow the image tool to receive a specific event to trigger the crop mode
 
@@ -134,7 +134,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - [#330](https://github.com/InditexTech/weavejs/issues/330) Performance improvements
 - [#333](https://github.com/InditexTech/weavejs/issues/333) Update create-app frontend
 
-\### Fixed
+### Fixed
 
 - [#329](https://github.com/InditexTech/weavejs/issues/329) Fix initial state of images when cropping
 - [#334](https://github.com/InditexTech/weavejs/issues/334) Don't include d.ts as ts files on bundle
