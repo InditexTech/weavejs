@@ -352,6 +352,9 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
       }
     );
 
+    this.instance.on('onStateChange', () => {
+      this.triggerSelectedNodesEvent();
+    });
     this.instance.on('onNodeRemoved', (node: NodeSerializable) => {
       const selectedNodes = this.getSelectedNodes();
       const newSelectedNodes = selectedNodes.filter((actNode) => {

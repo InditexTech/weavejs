@@ -425,13 +425,21 @@ export class WeaveFrameNode extends WeaveNode {
     const stage = this.instance.getStage();
     const attrs = instance.getAttrs();
 
-    const mainNode = stage?.findOne(`#${attrs.nodeId}`) as
+    let mainNode = stage?.findOne(`#${attrs.id}`) as Konva.Group | undefined;
+
+    if (attrs.id?.indexOf('-selector-area') !== -1) {
+      mainNode = stage?.findOne(`#${attrs.nodeId}`) as Konva.Group | undefined;
+    }
+
+    let frameInternal = mainNode?.findOne(`#${attrs.containerId}`) as
       | Konva.Group
       | undefined;
 
-    const frameInternal = mainNode?.findOne(`#${attrs.containerId}`) as
-      | Konva.Group
-      | undefined;
+    if (attrs.id?.indexOf('-selector-area') !== -1) {
+      frameInternal = mainNode?.findOne(`#${attrs.containerId}`) as
+        | Konva.Group
+        | undefined;
+    }
 
     const childrenMapped: WeaveStateElement[] = [];
     if (frameInternal) {
