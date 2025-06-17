@@ -59,7 +59,7 @@ export function FillProperties() {
   if (
     actualAction &&
     ['selectionTool'].includes(actualAction) &&
-    ['text'].includes(actualNode.type)
+    ['text', 'frame'].includes(actualNode.type)
   ) {
     return null;
   }
