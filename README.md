@@ -21,7 +21,7 @@ SPDX-License-Identifier: Apache-2.0
 <div align="center">
   <a href="https://github.com/InditexTech/weavejs">
     <picture>
-      <source media="(prefers-color-scheme: dark)" srcset="images/logo_inv.png">
+      <source media="(prefers-color-scheme: dark)" srcset="images/logo.png">
       <img src="images/logo.png" alt="Weave.js logo" width="80" height="80">
     </picture>
   </a>
@@ -29,7 +29,7 @@ SPDX-License-Identifier: Apache-2.0
 <h3 align="center">Weave.js</h3>
 
   <p align="center">
-    Build visual collaborative tools like Excalidraw, Miro, Canva, Figma or others!
+    Free, open source library to build real-time collaboration applications like whiteboards, diagram editors, etc. on HTML5 Canvas with your own UI!
     <br />
     <a href="https://inditextech.github.io/weavejs/docs/main"><strong>Explore the docs »</strong></a>
     <br />
