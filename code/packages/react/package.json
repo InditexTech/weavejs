@@ -1,6 +1,6 @@
 {
   "name": "@inditextech/weave-react",
-  "version": "0.29.0",
+  "version": "0.30.0-SNAPSHOT",
   "type": "module",
   "license": "Apache-2.0",
   "author": "Jesus Manuel Piñeiro Cid <jesusmpc@inditex.com>",
@@ -48,7 +48,7 @@
     "yjs": "13.6.26"
   },
   "devDependencies": {
-    "@inditextech/weave-sdk": "0.29.0",
+    "@inditextech/weave-sdk": "0.30.0-SNAPSHOT",
     "@types/node": "^22.15.3",
     "@typescript-eslint/eslint-plugin": "8.26.0",
     "@typescript-eslint/parser": "8.26.0",
