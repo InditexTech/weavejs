@@ -145,6 +145,7 @@ export class WeaveNodesSnappingPlugin extends WeavePlugin {
     }
     if (e.type === 'transform') {
       node = e.target;
+      skipNodes.push(node.getAttrs().id ?? '');
     }
 
     if (typeof node === 'undefined') {
