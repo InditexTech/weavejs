@@ -443,28 +443,24 @@ export class WeaveStageZoomPlugin extends WeavePlugin {
 
     const stage = this.instance.getStage();
 
-    function getRelativePointerPosition(
-      stage: Konva.Stage,
-      center: { x: number; y: number }
-    ): { x: number; y: number } {
-      const transform = stage.getAbsoluteTransform().copy().invert();
-      return transform.point(center);
-    }
-
     const stageContainer = this.instance.getStage().container();
     const sc = new Hammer.Manager(stageContainer);
-    sc.add(new Hammer.Pinch({ threshold: 10 }));
+    sc.add(new Hammer.Pinch({ threshold: 0, pointers: 2 }));
 
     let initialScale = stage.scaleX();
     let center: { x: number; y: number } = { x: 0, y: 0 };
 
     sc.on('pinchstart', (ev: HammerInput) => {
       initialScale = stage.scaleX(); // assume uniform scale
-      center = getRelativePointerPosition(stage, ev.center);
+      center = {
+        x: ev.center.x,
+        y: ev.center.y,
+      };
     });
 
     sc.on('pinchmove', (ev: HammerInput) => {
       const newScale = initialScale * ev.scale;
+
       this.setZoom(newScale, true, center);
     });
 

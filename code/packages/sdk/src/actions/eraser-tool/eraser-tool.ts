@@ -36,22 +36,14 @@ export class WeaveEraserToolAction extends WeaveAction {
     stage.on('click tap', (e) => {
       e.evt.preventDefault();
 
-      console.log('click or tap');
-
       if (!this.erasing) {
         return;
       }
 
-      console.log('click or tap - erasing');
-
       const nodeIntersected = this.instance.pointIntersectsElement();
-
-      console.log('click or tap - intersection', nodeIntersected);
 
       if (nodeIntersected) {
         const realNode = this.instance.resolveNode(nodeIntersected);
-
-        console.log('click or tap - real node', realNode);
 
         if (!realNode) {
           return;

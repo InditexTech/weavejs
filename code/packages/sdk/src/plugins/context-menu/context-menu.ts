@@ -25,6 +25,7 @@ import { WEAVE_NODES_SELECTION_KEY } from '@/plugins/nodes-selection/constants';
 export class WeaveContextMenuPlugin extends WeavePlugin {
   private config: WeaveStageContextMenuPluginConfig;
   private touchTimer: NodeJS.Timeout | undefined;
+  private contextMenuVisible: boolean;
   private tapHold: boolean;
   private tapHoldTimeout: number;
   getLayerName = undefined;
@@ -36,6 +37,7 @@ export class WeaveContextMenuPlugin extends WeavePlugin {
 
     this.touchTimer = undefined;
     this.tapHold = false;
+    this.contextMenuVisible = false;
     this.tapHoldTimeout = 500;
     const { config } = params ?? {};
     this.config = {
@@ -110,6 +112,8 @@ export class WeaveContextMenuPlugin extends WeavePlugin {
         y: containerRect.top + pointerPos.y + (this.config.yOffset ?? 4),
       };
 
+      this.contextMenuVisible = true;
+
       this.instance.emitEvent<WeaveStageContextMenuPluginOnNodeContextMenuEvent>(
         'onNodeContextMenu',
         {
@@ -121,30 +125,24 @@ export class WeaveContextMenuPlugin extends WeavePlugin {
     }
   }
 
+  closeContextMenu(): void {
+    this.contextMenuVisible = false;
+
+    this.instance.emitEvent<WeaveStageContextMenuPluginOnNodeContextMenuEvent>(
+      'onNodeContextMenu',
+      {
+        selection: [],
+        point: { x: 0, y: 0 },
+        visible: false,
+      }
+    );
+  }
+
   private initEvents() {
     const stage = this.instance.getStage();
 
-    const stageContainer = this.instance.getStage().container();
-    const sc = new Hammer.Manager(stageContainer);
-    sc.add(new Hammer.Pan({ threshold: 1, pointers: 2 }));
-    sc.add(new Hammer.Pinch({ threshold: 10 }));
-
-    sc.on('panstart', () => {
-      if (this.touchTimer) {
-        clearTimeout(this.touchTimer);
-      }
-    });
-
-    sc.on('pinchstart', () => {
-      if (this.touchTimer) {
-        clearTimeout(this.touchTimer);
-      }
-    });
-
     stage.on('touchstart', (e) => {
       e.evt.preventDefault();
-
-      console.log('touchstart', e.evt.touches);
 
       if (
         e.evt instanceof TouchEvent &&
@@ -163,10 +161,14 @@ export class WeaveContextMenuPlugin extends WeavePlugin {
       }, this.tapHoldTimeout);
     });
 
+    stage.on('touchmove', () => {
+      if (this.touchTimer) {
+        clearTimeout(this.touchTimer);
+      }
+    });
+
     stage.on('touchend', (e) => {
       e.evt.preventDefault();
-
-      console.log('touchstart', e.evt.touches);
 
       if (
         e.evt instanceof TouchEvent &&
@@ -221,6 +223,10 @@ export class WeaveContextMenuPlugin extends WeavePlugin {
         );
       }
     });
+  }
+
+  isContextMenuVisible(): boolean {
+    return this.contextMenuVisible;
   }
 
   isTapHold(): boolean {
