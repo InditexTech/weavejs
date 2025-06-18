@@ -54,10 +54,6 @@ export class WeaveFrameNode extends WeaveNode {
         ...(props.title && { title: props.title }),
         ...(props.frameWidth && { frameWidth: props.frameWidth }),
         ...(props.frameHeight && { frameHeight: props.frameHeight }),
-        ...(props.frameType && { frameType: props.frameType }),
-        ...(props.frameOrientation && {
-          frameOrientation: props.frameOrientation,
-        }),
         children: [],
       },
     };
@@ -425,18 +421,18 @@ export class WeaveFrameNode extends WeaveNode {
     const stage = this.instance.getStage();
     const attrs = instance.getAttrs();
 
-    let mainNode = stage?.findOne(`#${attrs.id}`) as Konva.Group | undefined;
+    let mainNode = instance as Konva.Group | undefined;
 
     if (attrs.id?.indexOf('-selector-area') !== -1) {
-      mainNode = stage?.findOne(`#${attrs.nodeId}`) as Konva.Group | undefined;
+      mainNode = stage.findOne(`#${attrs.nodeId}`) as Konva.Group | undefined;
     }
 
-    let frameInternal = mainNode?.findOne(`#${attrs.containerId}`) as
+    let frameInternal = stage.findOne(`#${attrs.containerId}`) as
       | Konva.Group
       | undefined;
 
     if (attrs.id?.indexOf('-selector-area') !== -1) {
-      frameInternal = mainNode?.findOne(`#${attrs.containerId}`) as
+      frameInternal = stage.findOne(`#${attrs.containerId}`) as
         | Konva.Group
         | undefined;
     }
