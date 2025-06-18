@@ -6,20 +6,16 @@ SPDX-License-Identifier: Apache-2.0
 
 <a id="readme-top"></a>
 
-<!-- PROJECT SHIELDS -->
-
 [![Contributors][contributors-shield]][contributors-url]
 [![Forks][forks-shield]][forks-url]
 [![Stargazers][stars-shield]][stars-url]
 [![Issues][issues-shield]][issues-url]
 [![project_license][license-shield]][license-url]
 
-<!-- PROJECT LOGO -->
 <br />
 <div align="center">
   <a href="https://github.com/InditexTech/weavejs">
     <picture>
-      <source media="(prefers-color-scheme: dark)" srcset="images/logo.png">
       <img src="images/logo.png" alt="Weave.js logo" width="80" height="80">
     </picture>
   </a>
@@ -71,7 +67,6 @@ In your terminal:
 
 ```bash
 pnpm create weave-backend-app
-# Enter your backend project name when prompted (e.g., my-service)
 cd [my-service]
 pnpm run dev
 ```
@@ -84,14 +79,11 @@ In a new terminal (ensure you are in the same parent directory as your backend p
 
 ```bash
 pnpm create weave-frontend-app
-# Enter your frontend project name when prompted (e.g., my-app)
 cd [my-app]
 pnpm run dev
 ```
 
-The frontend application will start (at `http://localhost:3030`).
-
-Once both the backend and frontend are running, you can open your browser and navigate to `http://localhost:3030` to try out the sample application.
+The frontend application will start at `http://localhost:3030`. Open your browser to this URL to try out the sample application.
 
 This basic setup uses an Express.js backend with a WebSockets store. For further details, alternative stores, or troubleshooting, please consult the full [quickstart guide][docs-quick-start-url].
 
