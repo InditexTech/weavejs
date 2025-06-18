@@ -13,6 +13,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- [#306](https://github.com/InditexTech/weavejs/issues/306) Improve touch devices support
+
 ### Changed
 
 - [#419](https://github.com/InditexTech/weavejs/issues/419) Nodes, fill white and stroke black by default

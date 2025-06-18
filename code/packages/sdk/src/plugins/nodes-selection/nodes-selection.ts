@@ -133,6 +133,10 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
     return copyPastePlugin.isPasting();
   }
 
+  isAreaSelecting(): boolean {
+    return this.selecting;
+  }
+
   isSelecting(): boolean {
     return this.instance.getActiveAction() === 'selectionTool';
   }
@@ -442,6 +446,10 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
         return;
       }
 
+      if (e.evt.touches && e.evt.touches.length > 1) {
+        return;
+      }
+
       const selectedGroup = this.instance.getInstanceRecursive(e.target);
 
       if (
@@ -476,12 +484,22 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
       }
     });
 
-    const handleMouseMove = (e: KonvaEventObject<MouseEvent, Konva.Stage>) => {
+    const handleMouseMove = (
+      e: KonvaEventObject<MouseEvent | TouchEvent, Konva.Stage>
+    ) => {
       if (!this.initialized) {
         return;
       }
 
       if (!this.active) {
+        return;
+      }
+
+      if (
+        e.evt instanceof TouchEvent &&
+        e.evt.touches &&
+        e.evt.touches.length > 1
+      ) {
         return;
       }
 
@@ -515,6 +533,22 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
       }
 
       if (!this.active) {
+        return;
+      }
+
+      if (
+        e.evt instanceof TouchEvent &&
+        e.evt.touches &&
+        e.evt.touches.length > 1
+      ) {
+        return;
+      }
+
+      const contextMenuPlugin = this.instance.getPlugin('contextMenu') as
+        | WeaveContextMenuPlugin
+        | undefined;
+
+      if (contextMenuPlugin && contextMenuPlugin.isContextMenuVisible()) {
         return;
       }
 
@@ -626,6 +660,10 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
       const contextMenuPlugin = this.instance.getPlugin('contextMenu') as
         | WeaveContextMenuPlugin
         | undefined;
+
+      if (contextMenuPlugin && contextMenuPlugin.isContextMenuVisible()) {
+        return;
+      }
 
       if (this.cameFromSelectingMultiple) {
         this.cameFromSelectingMultiple = false;

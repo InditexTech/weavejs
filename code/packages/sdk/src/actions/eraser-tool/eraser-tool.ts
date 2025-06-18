@@ -33,7 +33,7 @@ export class WeaveEraserToolAction extends WeaveAction {
   private setupEvents() {
     const stage = this.instance.getStage();
 
-    stage.on('click touch', (e) => {
+    stage.on('click tap', (e) => {
       e.evt.preventDefault();
 
       if (!this.erasing) {
@@ -101,6 +101,12 @@ export class WeaveEraserToolAction extends WeaveAction {
 
     this.cancelAction = cancelAction;
 
+    const selectionPlugin =
+      this.instance.getPlugin<WeaveNodesSelectionPlugin>('nodesSelection');
+    if (selectionPlugin) {
+      selectionPlugin.disable();
+    }
+
     this.setEraser();
   }
 
@@ -113,6 +119,7 @@ export class WeaveEraserToolAction extends WeaveAction {
     const selectionPlugin =
       this.instance.getPlugin<WeaveNodesSelectionPlugin>('nodesSelection');
     if (selectionPlugin) {
+      selectionPlugin.enable();
       this.instance.triggerAction(SELECTION_TOOL_ACTION_NAME);
     }
 

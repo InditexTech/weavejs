@@ -16,6 +16,7 @@ import {
 } from './constants';
 import type { Vector2d } from 'konva/lib/types';
 import { throttle } from 'lodash';
+import Hammer from 'hammerjs';
 import { getBoundingBox } from '@/utils';
 
 export class WeaveStageZoomPlugin extends WeavePlugin {
@@ -440,25 +441,59 @@ export class WeaveStageZoomPlugin extends WeavePlugin {
       }
     });
 
-    window.addEventListener('wheel', (e) => {
-      if (!this.enabled || !this.isCtrlOrMetaPressed) {
-        return;
-      }
+    const stage = this.instance.getStage();
 
-      const stage = this.instance.getStage();
-      const pointer = stage.getPointerPosition();
+    const stageContainer = this.instance.getStage().container();
+    const sc = new Hammer.Manager(stageContainer);
+    sc.add(new Hammer.Pinch({ threshold: 0, pointers: 2 }));
 
-      if (!pointer) {
-        return;
-      }
+    let initialScale: number | null = null;
+    let center: { x: number; y: number } = { x: 0, y: 0 };
 
-      if (e.deltaY > 0) {
-        this.zoomOut(pointer);
-      }
-
-      if (e.deltaY < 0) {
-        this.zoomIn(pointer);
-      }
+    sc.on('pinchstart', (ev: HammerInput) => {
+      initialScale = stage.scaleX(); // assume uniform scale
+      center = {
+        x: ev.center.x,
+        y: ev.center.y,
+      };
     });
+
+    sc.on('pinchmove', (ev: HammerInput) => {
+      if (!initialScale) {
+        return;
+      }
+
+      const newScale = initialScale * ev.scale;
+
+      this.setZoom(newScale, false, center);
+    });
+
+    window.addEventListener(
+      'wheel',
+      (e) => {
+        e.preventDefault();
+
+        if (!this.enabled || !this.isCtrlOrMetaPressed) {
+          return;
+        }
+
+        const stage = this.instance.getStage();
+        const oldScale = stage.scaleX();
+
+        const pointer = stage.getPointerPosition();
+
+        if (!pointer) {
+          return;
+        }
+
+        const scaleBy = 1.05;
+        const direction = e.deltaY > 0 ? 1 : -1;
+        const newScale =
+          direction > 0 ? oldScale / scaleBy : oldScale * scaleBy;
+
+        this.setZoom(newScale, false, pointer);
+      },
+      { passive: false }
+    );
   }
 }
