@@ -102,6 +102,21 @@ export class WeaveFrameNode extends WeaveNode {
       clip: undefined,
     });
 
+    frame.getRealClientRect = function (config) {
+      const node = frame.getStage()?.findOne(`#${`${id}-selector-area`}`);
+      const nodeTitle = frame.getStage()?.findOne(`#${`${id}-title`}`);
+      if (!node || !nodeTitle) {
+        return { x: 0, y: 0, width: 0, height: 0 };
+      }
+      const rectContainer = node.getClientRect(config);
+      const rectTitle = nodeTitle.getClientRect(config);
+      rectContainer.y = rectContainer.y - rectTitle.height - titleMargin;
+      rectContainer.height =
+        rectContainer.height + rectTitle.height + titleMargin;
+
+      return rectContainer;
+    };
+
     this.setupDefaultNodeAugmentation(frame);
 
     const frameInternalGroup = new Konva.Group({

@@ -2,4 +2,4 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-export const EXPORT_NODE_TOOL_ACTION_NAME = 'exportNodeTool';
+export const EXPORT_NODES_TOOL_ACTION_NAME = 'exportNodesTool';

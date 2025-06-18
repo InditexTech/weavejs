@@ -13,7 +13,7 @@ import {
   type WeaveState,
   type WeaveElementInstance,
   type WeavePosition,
-  type WeaveExportNodeOptions,
+  type WeaveExportNodesOptions,
   type WeaveStatus,
   type WeaveElementAttributes,
   WEAVE_INSTANCE_STATUS,
@@ -635,16 +635,10 @@ export class Weave extends Emittery {
 
   // EXPORT MANAGEMENT METHODS PROXIES
 
-  public async exportStage(
-    options: WeaveExportNodeOptions
+  public async exportNodes(
+    nodes: WeaveElementInstance[],
+    options: WeaveExportNodesOptions
   ): Promise<HTMLImageElement> {
-    return await this.exportManager.exportStage(options);
-  }
-
-  public async exportNode(
-    node: WeaveElementInstance,
-    options: WeaveExportNodeOptions
-  ): Promise<HTMLImageElement> {
-    return await this.exportManager.exportNode(node, options);
+    return await this.exportManager.exportNodes(nodes, options);
   }
 }

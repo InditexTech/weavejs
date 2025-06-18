@@ -2,40 +2,41 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
+import { v4 as uuidv4 } from 'uuid';
 import {
-  type WeaveExportNodeOptions,
+  type WeaveExportNodesOptions,
   type WeaveElementInstance,
   WEAVE_EXPORT_BACKGROUND_COLOR,
   WEAVE_EXPORT_FILE_FORMAT,
   WEAVE_EXPORT_FORMATS,
 } from '@inditextech/weave-types';
-import { type WeaveExportNodeActionParams } from './types';
+import { type WeaveExportNodesActionParams } from './types';
 import { WeaveAction } from '../action';
-import { EXPORT_NODE_TOOL_ACTION_NAME } from './constants';
+import { EXPORT_NODES_TOOL_ACTION_NAME } from './constants';
 
-export class WeaveExportNodeToolAction extends WeaveAction {
+export class WeaveExportNodesToolAction extends WeaveAction {
   protected cancelAction!: () => void;
-  private defaultFormatOptions: WeaveExportNodeOptions = {
+  private defaultFormatOptions: WeaveExportNodesOptions = {
     format: WEAVE_EXPORT_FORMATS.PNG,
     padding: 0,
     pixelRatio: 1,
     backgroundColor: WEAVE_EXPORT_BACKGROUND_COLOR,
     quality: 1,
   };
-  private options!: WeaveExportNodeOptions;
+  private options!: WeaveExportNodesOptions;
   onPropsChange = undefined;
   onInit = undefined;
 
   getName(): string {
-    return EXPORT_NODE_TOOL_ACTION_NAME;
+    return EXPORT_NODES_TOOL_ACTION_NAME;
   }
 
-  private async exportNode(node: WeaveElementInstance) {
-    const img = await this.instance.exportNode(node, this.options);
+  private async exportNodes(nodes: WeaveElementInstance[]) {
+    const img = await this.instance.exportNodes(nodes, this.options);
 
     const link = document.createElement('a');
     link.href = img.src;
-    link.download = `node-${node.getAttrs().id}${
+    link.download = `${uuidv4()}${
       WEAVE_EXPORT_FILE_FORMAT[this.options.format ?? WEAVE_EXPORT_FORMATS.PNG]
     }`;
     link.click();
@@ -45,7 +46,7 @@ export class WeaveExportNodeToolAction extends WeaveAction {
 
   async trigger(
     cancelAction: () => void,
-    { node, options }: WeaveExportNodeActionParams
+    { nodes, options }: WeaveExportNodesActionParams
   ): Promise<void> {
     if (!this.instance) {
       throw new Error('Instance not defined');
@@ -63,7 +64,7 @@ export class WeaveExportNodeToolAction extends WeaveAction {
       ...options,
     };
 
-    await this.exportNode(node);
+    await this.exportNodes(nodes);
   }
 
   cleanup(): void {

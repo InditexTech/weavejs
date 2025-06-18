@@ -16,6 +16,7 @@ import {
 } from './constants';
 import type { Vector2d } from 'konva/lib/types';
 import { throttle } from 'lodash';
+import { getBoundingBox } from '@/utils';
 
 export class WeaveStageZoomPlugin extends WeavePlugin {
   private isCtrlOrMetaPressed: boolean;
@@ -315,36 +316,31 @@ export class WeaveStageZoomPlugin extends WeavePlugin {
 
     const stage = this.instance.getStage();
 
-    const box = mainLayer.getClientRect({
-      relativeTo: stage,
-      skipStroke: true,
-    });
-    const stageBox = {
-      width: stage.width(),
-      height: stage.height(),
-    };
+    stage.scale({ x: 1, y: 1 });
+    stage.position({ x: 0, y: 0 });
 
-    const availableScreenWidth =
-      stageBox.width - 2 * this.config.fitToScreen.padding;
-    const availableScreenHeight =
-      stageBox.height - 2 * this.config.fitToScreen.padding;
+    const bounds = getBoundingBox(stage, mainLayer.getChildren());
 
-    const scaleX = availableScreenWidth / box.width;
-    const scaleY = availableScreenHeight / box.height;
+    const stageWidth = stage.width();
+    const stageHeight = stage.height();
+
+    // Calculate scale needed to fit content + padding
+    const scaleX =
+      (stageWidth - this.config.fitToScreen.padding * 2) / bounds.width;
+    const scaleY =
+      (stageHeight - this.config.fitToScreen.padding * 2) / bounds.height;
     const scale = Math.min(scaleX, scaleY);
+
+    // Center content in the stage
+    const offsetX = bounds.x + bounds.width / 2;
+    const offsetY = bounds.y + bounds.height / 2;
 
     stage.scale({ x: scale, y: scale });
 
-    const selectionCenterX = box.x + box.width / 2;
-    const selectionCenterY = box.y + box.height / 2;
-
-    const canvasCenterX = stage.width() / (2 * scale);
-    const canvasCenterY = stage.height() / (2 * scale);
-
-    const stageX = (canvasCenterX - selectionCenterX) * scale;
-    const stageY = (canvasCenterY - selectionCenterY) * scale;
-
-    stage.position({ x: stageX, y: stageY });
+    stage.position({
+      x: stageWidth / 2 - offsetX * scale,
+      y: stageHeight / 2 - offsetY * scale,
+    });
 
     this.setZoom(scale, false);
   }

@@ -144,8 +144,12 @@ export type WeavePosition = (typeof WEAVE_NODE_POSITION)[WeavePositionKeys];
 
 // Export nodes handling
 
-export type WeaveExportNodeOptions = {
-  format?: typeof WEAVE_EXPORT_FORMATS.PNG;
+export type WeaveExportFormatsKeys = keyof typeof WEAVE_EXPORT_FORMATS;
+export type WeaveExportFormats =
+  (typeof WEAVE_EXPORT_FORMATS)[WeaveExportFormatsKeys];
+
+export type WeaveExportNodesOptions = {
+  format?: WeaveExportFormats;
   padding?: number;
   pixelRatio?: number;
   backgroundColor?: string;
