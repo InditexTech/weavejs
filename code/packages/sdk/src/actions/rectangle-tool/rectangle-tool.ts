@@ -45,7 +45,7 @@ export class WeaveRectangleToolAction extends WeaveAction {
   initProps() {
     return {
       opacity: 1,
-      fill: '#71717aff',
+      fill: '#ffffffff',
       stroke: '#000000ff',
       strokeWidth: 1,
       width: 100,
