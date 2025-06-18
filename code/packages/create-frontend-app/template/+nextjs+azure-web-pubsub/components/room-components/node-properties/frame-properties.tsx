@@ -5,13 +5,6 @@ import { WeaveStateElement } from '@inditextech/weave-types';
 import { useWeave } from '@inditextech/weave-react';
 import { useCollaborationRoom } from '@/store/store';
 import { InputText } from '../inputs/input-text';
-import InputSelect from '../inputs/input-select';
-import {
-  WEAVE_FRAME_NODE_SIZES,
-  WEAVE_FRAME_NODE_SIZES_MULTIPLIER,
-  WeaveFrameNodeSizes,
-  type WeaveFrameNodeSizesOrientation,
-} from '@inditextech/weave-sdk';
 import { InputNumber } from '../inputs/input-number';
 
 export function FrameProperties() {
@@ -95,94 +88,36 @@ export function FrameProperties() {
             updateElement(updatedNode);
           }}
         />
-        <InputSelect
-          label="Orientation"
-          options={[
-            { label: 'Landscape', value: 'landscape' },
-            { label: 'Portrait', value: 'portrait' },
-          ]}
+        <InputNumber
+          label="Width"
+          value={actualNode.props.frameWidth ?? 1920}
           disabled={nodePropertiesAction === 'update'}
-          value={`${actualNode.props.frameOrientation ?? 'landscape'}`}
           onChange={(value) => {
             const updatedNode: WeaveStateElement = {
               ...actualNode,
               props: {
                 ...actualNode.props,
-                frameOrientation: value,
+                frameWidth: value,
               },
             };
             updateElement(updatedNode);
           }}
         />
-        <InputSelect
-          label="Type"
-          options={[
-            { label: 'A1', value: 'A1' },
-            { label: 'A2', value: 'A2' },
-            { label: 'A3', value: 'A3' },
-            { label: 'A4', value: 'A4' },
-            { label: 'Custom', value: 'custom' },
-          ]}
+        <InputNumber
+          label="Height"
+          value={actualNode.props.frameHeight ?? 1080}
           disabled={nodePropertiesAction === 'update'}
-          value={`${actualNode.props.frameType ?? null}`}
           onChange={(value) => {
-            const orientation: WeaveFrameNodeSizesOrientation = (actualNode
-              .props.frameOrientation ??
-              'landscape') as WeaveFrameNodeSizesOrientation;
-            const type: WeaveFrameNodeSizes = (actualNode.props.frameType ??
-              'A4') as WeaveFrameNodeSizes;
-
             const updatedNode: WeaveStateElement = {
               ...actualNode,
               props: {
                 ...actualNode.props,
-                frameType: value,
-                frameWidth:
-                  WEAVE_FRAME_NODE_SIZES[orientation][type].width *
-                  WEAVE_FRAME_NODE_SIZES_MULTIPLIER,
-                frameHeight:
-                  WEAVE_FRAME_NODE_SIZES[orientation][type].height *
-                  WEAVE_FRAME_NODE_SIZES_MULTIPLIER,
+                frameHeight: value,
               },
             };
             updateElement(updatedNode);
           }}
         />
-        {actualNode.props.frameType === 'custom' && (
-          <>
-            <InputNumber
-              label="Width"
-              value={actualNode.props.frameWidth ?? 16}
-              disabled={nodePropertiesAction === 'update'}
-              onChange={(value) => {
-                const updatedNode: WeaveStateElement = {
-                  ...actualNode,
-                  props: {
-                    ...actualNode.props,
-                    frameWidth: value,
-                  },
-                };
-                updateElement(updatedNode);
-              }}
-            />
-
-            <InputNumber
-              label="Height"
-              value={actualNode.props.frameHeight ?? 16}
-              disabled={nodePropertiesAction === 'update'}
-              onChange={(value) => {
-                const updatedNode: WeaveStateElement = {
-                  ...actualNode,
-                  props: {
-                    ...actualNode.props,
-                    frameHeight: value,
-                  },
-                };
-                updateElement(updatedNode);
-              }}
-            />
-          </>
-        )}
       </div>
     </div>
   );
