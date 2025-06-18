@@ -13,6 +13,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- [#332](https://github.com/InditexTech/weavejs/issues/332) Presence feedback when moving
+
 ### Changed
 
 - [#416](https://github.com/InditexTech/weavejs/issues/416) Update create app frontend

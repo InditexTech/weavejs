@@ -20,12 +20,10 @@ import {
 } from './constants';
 import { WeavePlugin } from '@/plugins/plugin';
 import Konva from 'konva';
+import { getContrastTextColor, stringToColor } from '@/utils';
 
 export class WeaveUsersPointersPlugin extends WeavePlugin {
-  private usersPointers: Record<
-    string,
-    { oldPos: WeaveUserPointer; actualPos: WeaveUserPointer }
-  >;
+  private usersPointers: Record<string, WeaveUserPointer>;
   private config!: WeaveUsersPointersPluginConfig;
   private uiConfig!: WeaveUserPointersUIProperties;
 
@@ -100,14 +98,7 @@ export class WeaveUsersPointersPlugin extends WeavePlugin {
           ) {
             const userPointer = change[WEAVE_USER_POINTER_KEY];
             allActiveUsers.push(userPointer.user);
-            this.usersPointers[userPointer.user] = {
-              oldPos: this.usersPointers[userPointer.user]?.actualPos ?? {
-                user: userPointer.user,
-                x: 0,
-                y: 0,
-              },
-              actualPos: userPointer,
-            };
+            this.usersPointers[userPointer.user] = userPointer;
           }
         }
 
@@ -156,35 +147,6 @@ export class WeaveUsersPointersPlugin extends WeavePlugin {
     this.renderPointers();
   }
 
-  private getContrastTextColor(hex: string): 'white' | 'black' {
-    // Remove "#" if present
-    const cleaned = hex.replace(/^#/, '');
-
-    // Parse R, G, B from hex
-    const r = parseInt(cleaned.slice(0, 2), 16);
-    const g = parseInt(cleaned.slice(2, 4), 16);
-    const b = parseInt(cleaned.slice(4, 6), 16);
-
-    // Calculate luminance (per W3C)
-    const luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
-
-    // Return black for light colors, white for dark
-    return luminance > 0.5 ? 'black' : 'white';
-  }
-
-  private stringToColor(str: string) {
-    let hash = 0;
-    str.split('').forEach((char) => {
-      hash = char.charCodeAt(0) + ((hash << 5) - hash);
-    });
-    let color = '#';
-    for (let i = 0; i < 3; i++) {
-      const value = (hash >> (i * 8)) & 0xff;
-      color += value.toString(16).padStart(2, '0');
-    }
-    return color;
-  }
-
   private renderPointers() {
     const stage = this.instance.getStage();
 
@@ -204,9 +166,9 @@ export class WeaveUsersPointersPlugin extends WeavePlugin {
 
       const userPointerNode = new Konva.Group({
         name: 'pointer',
-        id: `pointer_${userPointer.actualPos.user}`,
-        x: userPointer.actualPos.x,
-        y: userPointer.actualPos.y,
+        id: `pointer_${userPointer.user}`,
+        x: userPointer.x,
+        y: userPointer.y,
         opacity: 1,
         listening: false,
         scaleX: 1 / stage.scaleX(),
@@ -226,11 +188,11 @@ export class WeaveUsersPointersPlugin extends WeavePlugin {
         },
       } = this.uiConfig;
 
-      const userColor = this.stringToColor(userPointer.actualPos.user);
-      const userContrastColor = this.getContrastTextColor(userColor);
+      const userColor = stringToColor(userPointer.user);
+      const userContrastColor = getContrastTextColor(userColor);
 
       const userPointNode = new Konva.Circle({
-        id: `pointer_${userPointer.actualPos.user}_userPoint`,
+        id: `pointer_${userPointer.user}_userPoint`,
         x: 0,
         y: 0,
         radius: circleRadius,
@@ -242,10 +204,10 @@ export class WeaveUsersPointersPlugin extends WeavePlugin {
       });
 
       const userNameNode = new Konva.Text({
-        id: `pointer_${userPointer.actualPos.user}_userPointName`,
+        id: `pointer_${userPointer.user}_userPointName`,
         x: separation,
         y: -circleRadius * 2 + backgroundPaddingY,
-        text: userPointer.actualPos.user.trim(),
+        text: userPointer.user.trim(),
         fontSize: fontSize,
         fontFamily: fontFamily,
         lineHeight: 0.9,
@@ -263,7 +225,7 @@ export class WeaveUsersPointersPlugin extends WeavePlugin {
       userNameNode.height(textHeight + backgroundPaddingY * 2);
 
       const userNameBackground = new Konva.Rect({
-        id: `pointer_${userPointer.actualPos.user}_userPointRect`,
+        id: `pointer_${userPointer.user}_userPointRect`,
         x: separation,
         y: -backgroundPaddingY,
         width: textWidth + backgroundPaddingX * 2,

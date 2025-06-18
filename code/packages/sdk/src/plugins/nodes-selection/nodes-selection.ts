@@ -309,14 +309,14 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
         });
       }
 
-      const usersSelectionPlugin =
-        this.instance.getPlugin<WeaveUsersSelectionPlugin>(
-          WEAVE_USERS_SELECTION_KEY
-        );
+      // const usersSelectionPlugin =
+      //   this.instance.getPlugin<WeaveUsersSelectionPlugin>(
+      //     WEAVE_USERS_SELECTION_KEY
+      //   );
 
-      if (usersSelectionPlugin) {
-        usersSelectionPlugin.sendSelectionAwarenessInfo(this.tr);
-      }
+      // if (usersSelectionPlugin) {
+      //   usersSelectionPlugin.sendSelectionAwarenessInfo(this.tr);
+      // }
 
       tr.forceUpdate();
     });

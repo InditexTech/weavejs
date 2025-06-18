@@ -27,9 +27,6 @@ import { throttle } from 'lodash';
 import type { KonvaEventObject } from 'konva/lib/Node';
 
 export const augmentKonvaStageClass = (): void => {
-  Konva.Stage.prototype.isFocused = function () {
-    return false;
-  };
   Konva.Stage.prototype.isMouseWheelPressed = function () {
     return false;
   };
@@ -180,12 +177,10 @@ export abstract class WeaveNode implements WeaveNodeBase {
         this.instance.updateNode(
           nodeHandler.serialize(node as WeaveElementInstance)
         );
-
-        e.cancelBubble = true;
       }
     };
 
-    node.on('transform', throttle(handleTransform, 50));
+    node.on('transform', throttle(handleTransform, 100));
 
     node.on('transformend', (e) => {
       const node = e.target;
@@ -241,10 +236,17 @@ export abstract class WeaveNode implements WeaveNodeBase {
             bubbles: true,
           });
         }
+
+        const nodeHandler = this.instance.getNodeHandler<WeaveNode>(
+          node.getAttrs().nodeType
+        );
+        this.instance.updateNode(
+          nodeHandler.serialize(node as WeaveElementInstance)
+        );
       }
     };
 
-    node.on('dragmove', throttle(handleDragMove, 50));
+    node.on('dragmove', throttle(handleDragMove, 100));
 
     node.on('dragend', (e) => {
       if (this.isSelecting() && this.isNodeSelected(node)) {
