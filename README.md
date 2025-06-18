@@ -89,17 +89,38 @@ This basic setup uses an Express.js backend with a WebSockets store. For further
 
 ## Documentation
 
-If you want to learn more, check our [documentation][docs-url].
+To unlock the full potential of Weave.js, we recommend exploring our official documentation:
 
-Also, don't forget to take a look at the Weave.js [architecture overview][docs-architecture] section for a complete scope of Weave.js and how it works.
+- **[Full Documentation & Guides][docs-url]:** Your complete reference for all features and APIs.
+- **[Architecture Overview][docs-architecture]:** Get a high-level understanding of the framework's design and core principles.
 
 ## Roadmap
 
-Check out the Weave.js [roadmap][docs-roadmap-url] for details on planned work and the features that will come next.
+The following table provides a high-level overview of our approximate roadmap. For detailed information on planned features and the most current timeline, please consult the official Weave.js [roadmap][docs-roadmap-url].
+
+| Quarter | Focus Area                                               |
+| ------- | -------------------------------------------------------- |
+| Q3 2025 | Mobile gesture support improvements, Smart Guides Plugin |
+| Q4 2025 | Connector Tool, Sticky Notes Tool                        |
+| Q1 2026 | Awareness enhancement, Comment plugin, Minimap Plugin    |
+| Q2 2026 | Other cloud providers stores                             |
+| Q3 2026 | Koa server, Fastify server, NestJS server                |
+| Q4 2026 | Bindings kit for Vue, Bindings for Svelte                |
 
 ## Contributing
 
-Contributions are welcome! Please read the [Contributing Guide](CONTRIBUTING.md) for guidelines on how to contribute to this project.
+We welcome contributions from the community! Whether you're fixing a bug, adding a new feature, or improving documentation, your help is valuable.
+
+Before you start, please take a moment to read our [Contributing Guide](CONTRIBUTING.md). It provides detailed instructions on how to get your contributions accepted. Please note that you'll need to sign our [Contributor License Agreement (CLA)](https://github.com/InditexTech/foss/blob/main/documents/CLA.pdf) before we can accept your pull request.
+
+Here's a quick overview of how you can contribute:
+
+1. **Discuss:** Open an [issue](https://github.com/InditexTech/weavejs/issues/new/choose) to discuss the changes you'd like to make.
+2. **Fork & Branch:** Fork the repository and create a new branch for your work.
+3. **Develop:** Make your changes, following the project's coding style. Our `CONTRIBUTING.md` has detailed instructions on setting up your development environment.
+4. **Pull Request:** Open a pull request and link it to the issue you created.
+
+We look forward to your contributions!
 
 ## License
 
