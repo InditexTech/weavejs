@@ -447,7 +447,7 @@ export class WeaveStageZoomPlugin extends WeavePlugin {
     const sc = new Hammer.Manager(stageContainer);
     sc.add(new Hammer.Pinch({ threshold: 0, pointers: 2 }));
 
-    let initialScale = stage.scaleX();
+    let initialScale: number | null = null;
     let center: { x: number; y: number } = { x: 0, y: 0 };
 
     sc.on('pinchstart', (ev: HammerInput) => {
@@ -459,30 +459,41 @@ export class WeaveStageZoomPlugin extends WeavePlugin {
     });
 
     sc.on('pinchmove', (ev: HammerInput) => {
+      if (!initialScale) {
+        return;
+      }
+
       const newScale = initialScale * ev.scale;
 
-      this.setZoom(newScale, true, center);
+      this.setZoom(newScale, false, center);
     });
 
-    window.addEventListener('wheel', (e) => {
-      if (!this.enabled || !this.isCtrlOrMetaPressed) {
-        return;
-      }
+    window.addEventListener(
+      'wheel',
+      (e) => {
+        e.preventDefault();
 
-      const stage = this.instance.getStage();
-      const pointer = stage.getPointerPosition();
+        if (!this.enabled || !this.isCtrlOrMetaPressed) {
+          return;
+        }
 
-      if (!pointer) {
-        return;
-      }
+        const stage = this.instance.getStage();
+        const oldScale = stage.scaleX();
 
-      if (e.deltaY > 0) {
-        this.zoomOut(pointer);
-      }
+        const pointer = stage.getPointerPosition();
 
-      if (e.deltaY < 0) {
-        this.zoomIn(pointer);
-      }
-    });
+        if (!pointer) {
+          return;
+        }
+
+        const scaleBy = 1.05;
+        const direction = e.deltaY > 0 ? 1 : -1;
+        const newScale =
+          direction > 0 ? oldScale / scaleBy : oldScale * scaleBy;
+
+        this.setZoom(newScale, false, pointer);
+      },
+      { passive: false }
+    );
   }
 }
