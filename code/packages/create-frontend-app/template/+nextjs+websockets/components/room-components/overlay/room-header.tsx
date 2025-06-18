@@ -215,7 +215,7 @@ export function RoomHeader() {
               >
                 <div className="flex gap-1 justify-start items-center">
                   <div className="h-[60px] flex justify-start items-center">
-                    <Logo kind="small" variant="no-text" />
+                    <Logo kind="only-logo" variant="no-text" />
                   </div>
                   {menuOpen ? (
                     <ChevronUp size={16} />
