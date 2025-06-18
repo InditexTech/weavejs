@@ -17,6 +17,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - [#416](https://github.com/InditexTech/weavejs/issues/416) Update create app frontend
 
+### Fixed
+
+- [#411](https://github.com/InditexTech/weavejs/issues/411) Snapping lines when transforming taking into account transformed node
+
 ## [0.27.4] - 2025-06-18
 
 ### Fixed
