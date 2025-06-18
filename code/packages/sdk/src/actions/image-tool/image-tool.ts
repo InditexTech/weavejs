@@ -146,8 +146,12 @@ export class WeaveImageToolAction extends WeaveAction {
     this.imageURL = imageURL;
 
     this.preloadImgs[this.imageId] = new Image();
-    this.preloadImgs[this.imageId].onerror = (error) => {
-      console.error(error);
+    this.preloadImgs[this.imageId].onerror = () => {
+      this.instance.emitEvent<WeaveImageToolActionOnEndLoadImageEvent>(
+        'onImageLoadEnd',
+        new Error('Error loading image')
+      );
+      this.cancelAction();
     };
     this.preloadImgs[this.imageId].onload = () => {
       this.instance.emitEvent<WeaveImageToolActionOnEndLoadImageEvent>(
@@ -165,13 +169,6 @@ export class WeaveImageToolAction extends WeaveAction {
       }
 
       this.addImageNode(position);
-    };
-    this.preloadImgs[this.imageId].onerror = () => {
-      this.instance.emitEvent<WeaveImageToolActionOnEndLoadImageEvent>(
-        'onImageLoadEnd',
-        new Error('Error loading image')
-      );
-      this.cancelAction();
     };
 
     this.preloadImgs[this.imageId].src = imageURL;
