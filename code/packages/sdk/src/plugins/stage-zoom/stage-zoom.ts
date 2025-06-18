@@ -16,6 +16,7 @@ import {
 } from './constants';
 import type { Vector2d } from 'konva/lib/types';
 import { throttle } from 'lodash';
+import Hammer from 'hammerjs';
 import { getBoundingBox } from '@/utils';
 
 export class WeaveStageZoomPlugin extends WeavePlugin {
@@ -438,6 +439,33 @@ export class WeaveStageZoomPlugin extends WeavePlugin {
       if (!(e.ctrlKey || e.metaKey)) {
         this.isCtrlOrMetaPressed = false;
       }
+    });
+
+    const stage = this.instance.getStage();
+
+    function getRelativePointerPosition(
+      stage: Konva.Stage,
+      center: { x: number; y: number }
+    ): { x: number; y: number } {
+      const transform = stage.getAbsoluteTransform().copy().invert();
+      return transform.point(center);
+    }
+
+    const stageContainer = this.instance.getStage().container();
+    const sc = new Hammer.Manager(stageContainer);
+    sc.add(new Hammer.Pinch({ threshold: 10 }));
+
+    let initialScale = stage.scaleX();
+    let center: { x: number; y: number } = { x: 0, y: 0 };
+
+    sc.on('pinchstart', (ev: HammerInput) => {
+      initialScale = stage.scaleX(); // assume uniform scale
+      center = getRelativePointerPosition(stage, ev.center);
+    });
+
+    sc.on('pinchmove', (ev: HammerInput) => {
+      const newScale = initialScale * ev.scale;
+      this.setZoom(newScale, true, center);
     });
 
     window.addEventListener('wheel', (e) => {

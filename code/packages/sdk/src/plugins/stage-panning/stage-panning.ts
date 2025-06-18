@@ -61,6 +61,23 @@ export class WeaveStagePanningPlugin extends WeavePlugin {
 
     const stage = this.instance.getStage();
 
+    const stageContainer = this.instance.getStage().container();
+    const sc = new Hammer.Manager(stageContainer);
+    sc.add(new Hammer.Pan({ threshold: 1, pointers: 2 }));
+
+    let startPos = { x: 0, y: 0 };
+
+    sc.on('panstart', () => {
+      startPos = stage.position();
+    });
+
+    sc.on('panmove', (ev: HammerInput) => {
+      stage.position({
+        x: startPos.x + ev.deltaX,
+        y: startPos.y + ev.deltaY,
+      });
+    });
+
     window.addEventListener('keydown', (e) => {
       if (e.ctrlKey || e.metaKey) {
         this.isCtrlOrMetaPressed = true;

@@ -33,17 +33,25 @@ export class WeaveEraserToolAction extends WeaveAction {
   private setupEvents() {
     const stage = this.instance.getStage();
 
-    stage.on('click touch', (e) => {
+    stage.on('click tap', (e) => {
       e.evt.preventDefault();
+
+      console.log('click or tap');
 
       if (!this.erasing) {
         return;
       }
 
+      console.log('click or tap - erasing');
+
       const nodeIntersected = this.instance.pointIntersectsElement();
+
+      console.log('click or tap - intersection', nodeIntersected);
 
       if (nodeIntersected) {
         const realNode = this.instance.resolveNode(nodeIntersected);
+
+        console.log('click or tap - real node', realNode);
 
         if (!realNode) {
           return;
@@ -101,6 +109,12 @@ export class WeaveEraserToolAction extends WeaveAction {
 
     this.cancelAction = cancelAction;
 
+    const selectionPlugin =
+      this.instance.getPlugin<WeaveNodesSelectionPlugin>('nodesSelection');
+    if (selectionPlugin) {
+      selectionPlugin.disable();
+    }
+
     this.setEraser();
   }
 
@@ -113,6 +127,7 @@ export class WeaveEraserToolAction extends WeaveAction {
     const selectionPlugin =
       this.instance.getPlugin<WeaveNodesSelectionPlugin>('nodesSelection');
     if (selectionPlugin) {
+      selectionPlugin.enable();
       this.instance.triggerAction(SELECTION_TOOL_ACTION_NAME);
     }
 

@@ -442,6 +442,12 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
         return;
       }
 
+      if (e.evt.touches && e.evt.touches.length > 1) {
+        return;
+      }
+
+      console.log('mousedown touchstart', e);
+
       const selectedGroup = this.instance.getInstanceRecursive(e.target);
 
       if (
@@ -476,12 +482,22 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
       }
     });
 
-    const handleMouseMove = (e: KonvaEventObject<MouseEvent, Konva.Stage>) => {
+    const handleMouseMove = (
+      e: KonvaEventObject<MouseEvent | TouchEvent, Konva.Stage>
+    ) => {
       if (!this.initialized) {
         return;
       }
 
       if (!this.active) {
+        return;
+      }
+
+      if (
+        e.evt instanceof TouchEvent &&
+        e.evt.touches &&
+        e.evt.touches.length > 1
+      ) {
         return;
       }
 
@@ -515,6 +531,14 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
       }
 
       if (!this.active) {
+        return;
+      }
+
+      if (
+        e.evt instanceof TouchEvent &&
+        e.evt.touches &&
+        e.evt.touches.length > 1
+      ) {
         return;
       }
 

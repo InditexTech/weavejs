@@ -26,6 +26,7 @@ export class WeaveContextMenuPlugin extends WeavePlugin {
   private config: WeaveStageContextMenuPluginConfig;
   private touchTimer: NodeJS.Timeout | undefined;
   private tapHold: boolean;
+  private tapHoldTimeout: number;
   getLayerName = undefined;
   initLayer = undefined;
   onRender: undefined;
@@ -35,6 +36,7 @@ export class WeaveContextMenuPlugin extends WeavePlugin {
 
     this.touchTimer = undefined;
     this.tapHold = false;
+    this.tapHoldTimeout = 500;
     const { config } = params ?? {};
     this.config = {
       xOffset: WEAVE_CONTEXT_MENU_X_OFFSET_DEFAULT,
@@ -122,25 +124,60 @@ export class WeaveContextMenuPlugin extends WeavePlugin {
   private initEvents() {
     const stage = this.instance.getStage();
 
-    stage.on('touchstart', (e) => {
-      e.evt.preventDefault();
+    const stageContainer = this.instance.getStage().container();
+    const sc = new Hammer.Manager(stageContainer);
+    sc.add(new Hammer.Pan({ threshold: 1, pointers: 2 }));
+    sc.add(new Hammer.Pinch({ threshold: 10 }));
 
-      this.touchTimer = setTimeout(() => {
-        this.tapHold = true;
-        this.triggerContextMenu(e.target);
-      }, 500);
-    });
-
-    stage.on('touchmove', (e) => {
-      e.evt.preventDefault();
-      this.tapHold = false;
+    sc.on('panstart', () => {
       if (this.touchTimer) {
         clearTimeout(this.touchTimer);
       }
     });
 
+    sc.on('pinchstart', () => {
+      if (this.touchTimer) {
+        clearTimeout(this.touchTimer);
+      }
+    });
+
+    stage.on('touchstart', (e) => {
+      e.evt.preventDefault();
+
+      console.log('touchstart', e.evt.touches);
+
+      if (
+        e.evt instanceof TouchEvent &&
+        e.evt.touches &&
+        e.evt.touches.length > 1
+      ) {
+        if (this.touchTimer) {
+          clearTimeout(this.touchTimer);
+        }
+        return;
+      }
+
+      this.touchTimer = setTimeout(() => {
+        this.tapHold = true;
+        this.triggerContextMenu(e.target);
+      }, this.tapHoldTimeout);
+    });
+
     stage.on('touchend', (e) => {
       e.evt.preventDefault();
+
+      console.log('touchstart', e.evt.touches);
+
+      if (
+        e.evt instanceof TouchEvent &&
+        e.evt.touches &&
+        e.evt.touches.length > 1
+      ) {
+        if (this.touchTimer) {
+          clearTimeout(this.touchTimer);
+        }
+        return;
+      }
 
       if (this.touchTimer) {
         clearTimeout(this.touchTimer);
