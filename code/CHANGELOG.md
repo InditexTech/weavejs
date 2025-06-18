@@ -17,6 +17,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - [#419](https://github.com/InditexTech/weavejs/issues/419) Nodes, fill white and stroke black by default
 
+### Fixed
+
+- [#420](https://github.com/InditexTech/weavejs/issues/420) Nodes export to image is wrong
+
 ## [0.28.0] - 2025-06-18
 
 \### Added

@@ -4,10 +4,10 @@
 
 import {
   type WeaveElementInstance,
-  type WeaveExportNodeOptions,
+  type WeaveExportNodesOptions,
 } from '@inditextech/weave-types';
 
-export type WeaveExportNodeActionParams = {
-  node: WeaveElementInstance;
-  options?: WeaveExportNodeOptions;
+export type WeaveExportNodesActionParams = {
+  nodes: WeaveElementInstance[];
+  options?: WeaveExportNodesOptions;
 };

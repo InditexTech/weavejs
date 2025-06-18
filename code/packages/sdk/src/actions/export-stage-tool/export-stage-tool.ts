@@ -2,26 +2,28 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
+import { v4 as uuidv4 } from 'uuid';
 import {
-  type WeaveExportNodeOptions,
+  type WeaveExportFormats,
+  type WeaveExportNodesOptions,
   WEAVE_EXPORT_BACKGROUND_COLOR,
   WEAVE_EXPORT_FILE_FORMAT,
   WEAVE_EXPORT_FORMATS,
 } from '@inditextech/weave-types';
 import { WeaveAction } from '../action';
-import { type WeaveExportStageActionParams } from './types';
 import { EXPORT_STAGE_TOOL_ACTION_NAME } from './constants';
+import type { WeaveExportNodesActionParams } from '../export-nodes-tool/types';
 
 export class WeaveExportStageToolAction extends WeaveAction {
   protected cancelAction!: () => void;
-  private defaultFormatOptions: WeaveExportNodeOptions = {
+  private defaultFormatOptions: WeaveExportNodesOptions = {
     format: WEAVE_EXPORT_FORMATS.PNG,
     padding: 0,
     pixelRatio: 1,
     backgroundColor: WEAVE_EXPORT_BACKGROUND_COLOR,
     quality: 1,
   };
-  private options!: WeaveExportNodeOptions;
+  private options!: WeaveExportNodesOptions;
   onPropsChange = undefined;
   onInit = undefined;
 
@@ -30,12 +32,19 @@ export class WeaveExportStageToolAction extends WeaveAction {
   }
 
   private async exportStage() {
-    const img = await this.instance.exportStage(this.options);
+    const mainLayer = this.instance.getMainLayer();
+
+    const img = await this.instance.exportNodes(
+      mainLayer?.getChildren() ?? [],
+      this.options
+    );
 
     const link = document.createElement('a');
     link.href = img.src;
-    link.download = `stage${
-      WEAVE_EXPORT_FILE_FORMAT[this.options.format ?? WEAVE_EXPORT_FORMATS.PNG]
+    link.download = `${uuidv4()}${
+      WEAVE_EXPORT_FILE_FORMAT[
+        (this.options.format as WeaveExportFormats) ?? WEAVE_EXPORT_FORMATS.PNG
+      ]
     }`;
     link.click();
 
@@ -44,7 +53,7 @@ export class WeaveExportStageToolAction extends WeaveAction {
 
   async trigger(
     cancelAction: () => void,
-    { options }: WeaveExportStageActionParams
+    { options }: WeaveExportNodesActionParams
   ): Promise<void> {
     if (!this.instance) {
       throw new Error('Instance not defined');

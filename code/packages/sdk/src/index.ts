@@ -97,8 +97,8 @@ export * from './actions/frame-tool/constants';
 export * from './actions/frame-tool/types';
 export { WeaveExportStageToolAction } from './actions/export-stage-tool/export-stage-tool';
 export * from './actions/export-stage-tool/types';
-export { WeaveExportNodeToolAction } from './actions/export-node-tool/export-node-tool';
-export * from './actions/export-node-tool/types';
+export { WeaveExportNodesToolAction } from './actions/export-nodes-tool/export-nodes-tool';
+export * from './actions/export-nodes-tool/types';
 
 // Provided Plugins
 export { WeaveStageGridPlugin } from './plugins/stage-grid/stage-grid';

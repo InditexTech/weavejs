@@ -526,27 +526,16 @@ This method return the Fonts available on the Weave instance.
 
 ### Export management
 
-#### exportStage
+#### exportNodes
 
 ```ts
-exportStage(
+exportNodes(
+  nodes: WeaveElementInstance[],
   options: WeaveExportNodeOptions
 ): Promise<HTMLImageElement>
 ```
 
-This method exports the whole stage (all nodes on the canvas) as
-an image. You can define the exportation options.
-
-#### exportNode
-
-```ts
-exportNode(
-  node: WeaveElementInstance,
-  options: WeaveExportNodeOptions
-): Promise<HTMLImageElement>
-```
-
-This method exports the specified node as an image. You can define the
+This method exports the specified nodes as an image. You can define the
 exportation options.
 
 ## TypeScript types
