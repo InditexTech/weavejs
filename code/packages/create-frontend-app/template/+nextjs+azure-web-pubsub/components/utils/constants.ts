@@ -14,7 +14,7 @@ import {
   WeaveRegularPolygonToolAction,
   WeaveZoomOutToolAction,
   WeaveZoomInToolAction,
-  WeaveExportNodeToolAction,
+  WeaveExportNodesToolAction,
   WeaveExportStageToolAction,
   WeaveFitToScreenToolAction,
   WeaveFitToSelectionToolAction,
@@ -137,7 +137,10 @@ const NODES = [
   new WeaveFrameNode({
     config: {
       fontFamily: inter.style.fontFamily,
-      fontStyle: '300',
+      fontStyle: 'normal',
+      fontSize: 32,
+      fontColor: '#000000ff',
+      titleMargin: 10,
       transform: {
         rotateEnabled: false,
         resizeEnabled: false,
@@ -170,7 +173,7 @@ const ACTIONS = [
   new WeaveFitToScreenToolAction(),
   new WeaveFitToSelectionToolAction(),
   new AlignElementsToolAction(),
-  new WeaveExportNodeToolAction(),
+  new WeaveExportNodesToolAction(),
   new WeaveExportStageToolAction(),
 ];
 
