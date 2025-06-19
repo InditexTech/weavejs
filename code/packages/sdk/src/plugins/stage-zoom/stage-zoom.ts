@@ -21,6 +21,7 @@ import { getBoundingBox } from '@/utils';
 
 export class WeaveStageZoomPlugin extends WeavePlugin {
   private isCtrlOrMetaPressed: boolean;
+  private isSpaceKeyPressed: boolean;
   protected previousPointer!: string | null;
   getLayerName = undefined;
   initLayer = undefined;
@@ -47,6 +48,7 @@ export class WeaveStageZoomPlugin extends WeavePlugin {
       );
     }
 
+    this.isSpaceKeyPressed = false;
     this.isCtrlOrMetaPressed = false;
     this.updatedMinimumZoom = false;
     this.actualStep = this.config.zoomSteps.findIndex(
@@ -433,11 +435,17 @@ export class WeaveStageZoomPlugin extends WeavePlugin {
       if (e.ctrlKey || e.metaKey) {
         this.isCtrlOrMetaPressed = true;
       }
+      if (e.code === 'Space') {
+        this.isSpaceKeyPressed = true;
+      }
     });
 
     window.addEventListener('keyup', (e) => {
       if (!(e.ctrlKey || e.metaKey)) {
         this.isCtrlOrMetaPressed = false;
+      }
+      if (e.code === 'Space') {
+        this.isSpaceKeyPressed = false;
       }
     });
 
@@ -468,32 +476,31 @@ export class WeaveStageZoomPlugin extends WeavePlugin {
       this.setZoom(newScale, false, center);
     });
 
-    window.addEventListener(
-      'wheel',
-      (e) => {
-        e.preventDefault();
+    window.addEventListener('wheel', (e) => {
+      const stage = this.instance.getStage();
 
-        if (!this.enabled || !this.isCtrlOrMetaPressed) {
-          return;
-        }
+      if (
+        !this.enabled ||
+        !stage.isFocused() ||
+        !this.isCtrlOrMetaPressed ||
+        this.isSpaceKeyPressed
+      ) {
+        return;
+      }
 
-        const stage = this.instance.getStage();
-        const oldScale = stage.scaleX();
+      const oldScale = stage.scaleX();
 
-        const pointer = stage.getPointerPosition();
+      const pointer = stage.getPointerPosition();
 
-        if (!pointer) {
-          return;
-        }
+      if (!pointer) {
+        return;
+      }
 
-        const scaleBy = 1.05;
-        const direction = e.deltaY > 0 ? 1 : -1;
-        const newScale =
-          direction > 0 ? oldScale / scaleBy : oldScale * scaleBy;
+      const scaleBy = 1.025;
+      const direction = e.deltaY > 0 ? 1 : -1;
+      const newScale = direction > 0 ? oldScale / scaleBy : oldScale * scaleBy;
 
-        this.setZoom(newScale, false, pointer);
-      },
-      { passive: false }
-    );
+      this.setZoom(newScale, false, pointer);
+    });
   }
 }

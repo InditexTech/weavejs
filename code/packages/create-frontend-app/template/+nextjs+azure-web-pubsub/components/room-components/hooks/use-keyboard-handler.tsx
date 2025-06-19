@@ -3,12 +3,11 @@
 import React from 'react';
 import { useWeave } from '@inditextech/weave-react';
 import { SidebarActive, useCollaborationRoom } from '@/store/store';
-import { useKeyDown } from './use-key-down';
+import { useKeyDown } from '../hooks/use-key-down';
 import { SYSTEM_OS } from '@/lib/utils';
-import { useGetOs } from './use-get-os';
+import { useGetOs } from '../hooks/use-get-os';
 import {
-  WeaveCopyPasteNodesPlugin,
-  WeaveExportNodeActionParams,
+  WeaveExportNodesActionParams,
   WeaveExportStageActionParams,
   WeaveNodesSelectionPlugin,
   WeaveUsersPointersPlugin,
@@ -227,53 +226,10 @@ export function useKeyboardHandler() {
   /* Keyboard shortcuts editing */
 
   useKeyDown(
-    async () => {
-      if (instance && selectedNodes.length > 0) {
-        const weaveCopyPasteNodesPlugin =
-          instance.getPlugin<WeaveCopyPasteNodesPlugin>('copyPasteNodes');
-        if (weaveCopyPasteNodesPlugin) {
-          await weaveCopyPasteNodesPlugin.copy();
-        }
-      }
-    },
-    ['KeyC'],
-    (e) => ([SYSTEM_OS.MAC as string].includes(os) ? e.metaKey : e.ctrlKey)
-  );
-
-  useKeyDown(
-    () => {
-      if (instance) {
-        const weaveCopyPasteNodesPlugin =
-          instance.getPlugin<WeaveCopyPasteNodesPlugin>('copyPasteNodes');
-        if (weaveCopyPasteNodesPlugin) {
-          weaveCopyPasteNodesPlugin.paste();
-        }
-      }
-    },
-    ['KeyP'],
-    (e) => ([SYSTEM_OS.MAC as string].includes(os) ? e.metaKey : e.ctrlKey)
-  );
-
-  useKeyDown(
-    async () => {
-      if (instance && selectedNodes.length === 1) {
-        const weaveCopyPasteNodesPlugin =
-          instance.getPlugin<WeaveCopyPasteNodesPlugin>('copyPasteNodes');
-        if (weaveCopyPasteNodesPlugin) {
-          await weaveCopyPasteNodesPlugin.copy();
-          weaveCopyPasteNodesPlugin.paste();
-        }
-      }
-    },
-    ['KeyD'],
-    (e) => ([SYSTEM_OS.MAC as string].includes(os) ? e.metaKey : e.ctrlKey)
-  );
-
-  useKeyDown(
     () => {
       if (instance && selectedNodes.length === 1) {
-        instance.triggerAction<WeaveExportNodeActionParams>('exportNodeTool', {
-          node: selectedNodes[0].instance,
+        instance.triggerAction<WeaveExportNodesActionParams>('exportNodeTool', {
+          nodes: selectedNodes.map((node) => node.instance),
           options: {
             padding: 20,
             pixelRatio: 2,
