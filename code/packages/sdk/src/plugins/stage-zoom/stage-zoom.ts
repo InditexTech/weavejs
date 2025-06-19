@@ -48,6 +48,7 @@ export class WeaveStageZoomPlugin extends WeavePlugin {
       );
     }
 
+    this.isSpaceKeyPressed = false;
     this.isCtrlOrMetaPressed = false;
     this.updatedMinimumZoom = false;
     this.actualStep = this.config.zoomSteps.findIndex(
