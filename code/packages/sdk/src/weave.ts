@@ -635,6 +635,10 @@ export class Weave extends Emittery {
 
   // EXPORT MANAGEMENT METHODS PROXIES
 
+  public imageToBase64(img: HTMLImageElement, mimeType: string): string {
+    return this.exportManager.imageToBase64(img, mimeType);
+  }
+
   public async exportNodes(
     nodes: WeaveElementInstance[],
     options: WeaveExportNodesOptions
