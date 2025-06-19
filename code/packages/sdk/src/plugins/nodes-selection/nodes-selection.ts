@@ -503,6 +503,15 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
         return;
       }
 
+      const contextMenuPlugin = this.instance.getPlugin('contextMenu') as
+        | WeaveContextMenuPlugin
+        | undefined;
+
+      if (contextMenuPlugin && contextMenuPlugin.isContextMenuVisible()) {
+        this.selecting = false;
+        return;
+      }
+
       // do nothing if we didn't start selection
       if (!this.selecting) {
         this.cameFromSelectingMultiple = false;
@@ -549,6 +558,7 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
         | undefined;
 
       if (contextMenuPlugin && contextMenuPlugin.isContextMenuVisible()) {
+        this.selecting = false;
         return;
       }
 
@@ -662,6 +672,7 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
         | undefined;
 
       if (contextMenuPlugin && contextMenuPlugin.isContextMenuVisible()) {
+        this.selecting = false;
         return;
       }
 
