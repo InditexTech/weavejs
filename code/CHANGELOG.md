@@ -16,6 +16,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - [#435](https://github.com/InditexTech/weavejs/issues/435) Generate base64 image on Export Nodes Action
+- [#437](https://github.com/InditexTech/weavejs/issues/437) Add support to ShadowDOM
 
 ### Changed
 

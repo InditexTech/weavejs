@@ -21,7 +21,7 @@ import {
 import { useWeave } from './store';
 
 type WeaveProviderType = {
-  containerId: string;
+  getContainer: () => HTMLDivElement;
   fonts?: WeaveFont[];
   store: WeaveStore;
   nodes?: WeaveNode[];
@@ -34,7 +34,7 @@ type WeaveProviderType = {
 };
 
 export const WeaveProvider = ({
-  containerId,
+  getContainer,
   store,
   nodes = [],
   actions = [],
@@ -107,7 +107,12 @@ export const WeaveProvider = ({
 
   React.useEffect(() => {
     async function initWeave() {
-      const weaveEle = document.getElementById(containerId);
+      const weaveEle: Element = getContainer();
+
+      if (!weaveEle) {
+        throw new Error(`Weave container not defined.`);
+      }
+
       const weaveEleClientRect = weaveEle?.getBoundingClientRect();
 
       if (weaveEle && !weaveInstanceRef.current) {
@@ -147,7 +152,7 @@ export const WeaveProvider = ({
             },
           },
           {
-            container: containerId,
+            container: weaveEle as HTMLDivElement,
             width: weaveEleClientRect?.width ?? 1920,
             height: weaveEleClientRect?.height ?? 1080,
           }
