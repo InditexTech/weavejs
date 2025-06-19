@@ -13,7 +13,7 @@ export class WeaveStagePanningPlugin extends WeavePlugin {
   private isMouseMiddleButtonPressed: boolean;
   private isCtrlOrMetaPressed: boolean;
   private isSpaceKeyPressed: boolean;
-  private overStage: boolean;
+  // private overStage: boolean;
   protected previousPointer!: string | null;
   getLayerName = undefined;
   initLayer = undefined;
@@ -27,7 +27,7 @@ export class WeaveStagePanningPlugin extends WeavePlugin {
     this.isMouseMiddleButtonPressed = false;
     this.isCtrlOrMetaPressed = false;
     this.isSpaceKeyPressed = false;
-    this.overStage = false;
+    // this.overStage = false;
     this.previousPointer = null;
   }
 
@@ -81,13 +81,13 @@ export class WeaveStagePanningPlugin extends WeavePlugin {
       }
     });
 
-    stage.container().addEventListener('mouseenter', () => {
-      this.overStage = true;
-    });
+    // stage.container().addEventListener('mouseenter', () => {
+    //   this.overStage = true;
+    // });
 
-    stage.container().addEventListener('mouseleave', () => {
-      this.overStage = false;
-    });
+    // stage.container().addEventListener('mouseleave', () => {
+    //   this.overStage = false;
+    // });
 
     stage.on('mousedown', (e) => {
       const activeAction = this.instance.getActiveAction();
@@ -209,12 +209,13 @@ export class WeaveStagePanningPlugin extends WeavePlugin {
     });
 
     const handleWheel = (e: WheelEvent) => {
+      const stage = this.instance.getStage();
+
       if (
         !this.enabled ||
-        !this.overStage ||
+        !stage.isFocused() ||
         this.isCtrlOrMetaPressed ||
-        this.isSpaceKeyPressed ||
-        this.isMouseMiddleButtonPressed
+        !this.isSpaceKeyPressed
       ) {
         return;
       }
