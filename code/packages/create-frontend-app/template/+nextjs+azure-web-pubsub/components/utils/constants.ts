@@ -30,7 +30,20 @@ import {
   WeaveArrowNode,
   WeaveRegularPolygonNode,
   WeaveFrameNode,
+  WeaveStageGridPlugin,
+  WeaveNodesSelectionPlugin,
+  WeaveStagePanningPlugin,
+  WeaveStageResizePlugin,
+  WeaveStageZoomPlugin,
+  WeaveConnectedUsersPlugin,
+  WeaveUsersPointersPlugin,
+  WeaveUsersSelectionPlugin,
+  WeaveStageDropAreaPlugin,
+  WeaveCopyPasteNodesPlugin,
+  WeaveContextMenuPlugin,
+  WeaveNodesSnappingPlugin,
 } from '@inditextech/weave-sdk';
+import { type WeaveUser } from '@inditextech/weave-types';
 import { Inter } from 'next/font/google';
 import { ColorTokenNode } from '@/components/nodes/color-token/color-token';
 import { AlignElementsToolAction } from '@/components/actions/align-elements-tool/align-elements-tool';
@@ -153,6 +166,38 @@ const NODES = [
   new ColorTokenNode(),
 ];
 
+const PLUGINS = (getUser: () => WeaveUser) => [
+  new WeaveStageGridPlugin(),
+  new WeaveStagePanningPlugin(),
+  new WeaveStageResizePlugin(),
+  new WeaveStageZoomPlugin(),
+  new WeaveNodesSelectionPlugin(),
+  new WeaveNodesSnappingPlugin(),
+  new WeaveStageDropAreaPlugin(),
+  new WeaveCopyPasteNodesPlugin(),
+  new WeaveConnectedUsersPlugin({
+    config: {
+      getUser,
+    },
+  }),
+  new WeaveUsersPointersPlugin({
+    config: {
+      getUser,
+    },
+  }),
+  new WeaveUsersSelectionPlugin({
+    config: {
+      getUser,
+    },
+  }),
+  new WeaveContextMenuPlugin({
+    config: {
+      xOffset: 10,
+      yOffset: 10,
+    },
+  }),
+];
+
 const ACTIONS = [
   new WeaveMoveToolAction(),
   new WeaveSelectionToolAction(),
@@ -177,4 +222,4 @@ const ACTIONS = [
   new WeaveExportStageToolAction(),
 ];
 
-export { FONTS, NODES, ACTIONS };
+export { FONTS, NODES, ACTIONS, PLUGINS };
