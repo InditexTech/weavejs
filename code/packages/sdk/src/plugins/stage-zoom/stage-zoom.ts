@@ -496,7 +496,7 @@ export class WeaveStageZoomPlugin extends WeavePlugin {
         return;
       }
 
-      const scaleBy = 1.05;
+      const scaleBy = 1.025;
       const direction = e.deltaY > 0 ? 1 : -1;
       const newScale = direction > 0 ? oldScale / scaleBy : oldScale * scaleBy;
 
