@@ -35,11 +35,11 @@ import { WeaveProvider } from "@inditextech/weave-react";
 
 <TypeTable
   type={{
-    containerId: {
+    getContainer: {
       required: true,
       description:
-        "The id of the container where Weave.js canvases will be created",
-      type: "string",
+        "A function that returns an HTMLDivElement where Weave.js will setup",
+      type: "() => HTMLDivElement",
     },
     store: {
       required: true,
