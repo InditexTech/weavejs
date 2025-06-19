@@ -46,8 +46,8 @@ export class WeaveExportNodesToolAction extends WeaveAction {
 
   async trigger(
     cancelAction: () => void,
-    { nodes, options }: WeaveExportNodesActionParams
-  ): Promise<void> {
+    { nodes, options, download = true }: WeaveExportNodesActionParams
+  ): Promise<void | string> {
     if (!this.instance) {
       throw new Error('Instance not defined');
     }
@@ -63,6 +63,16 @@ export class WeaveExportNodesToolAction extends WeaveAction {
       ...this.defaultFormatOptions,
       ...options,
     };
+
+    if (!download) {
+      const img = await this.instance.exportNodes(nodes, this.options);
+      const base64URL = this.instance.imageToBase64(
+        img,
+        this.options.format ?? 'image/png'
+      );
+      this.cancelAction?.();
+      return base64URL;
+    }
 
     await this.exportNodes(nodes);
   }

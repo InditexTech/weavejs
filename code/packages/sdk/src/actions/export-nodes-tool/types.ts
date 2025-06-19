@@ -10,4 +10,5 @@ import {
 export type WeaveExportNodesActionParams = {
   nodes: WeaveElementInstance[];
   options?: WeaveExportNodesOptions;
+  download?: boolean;
 };
