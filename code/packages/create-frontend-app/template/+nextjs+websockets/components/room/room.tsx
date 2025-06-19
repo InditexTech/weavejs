@@ -5,7 +5,7 @@ import { Toaster } from '@/components/ui/sonner';
 import { useRouter } from 'next/navigation';
 import { WeaveUser, WEAVE_INSTANCE_STATUS } from '@inditextech/weave-types';
 import { useCollaborationRoom } from '@/store/store';
-import { ACTIONS, FONTS, NODES } from '@/components/utils/constants';
+import { ACTIONS, FONTS, NODES, PLUGINS } from '@/components/utils/constants';
 import { useWeave, WeaveProvider } from '@inditextech/weave-react';
 import { RoomLayout } from './room.layout';
 import { RoomLoader } from '../room-components/room-loader/room-loader';
@@ -161,11 +161,11 @@ export const Room = () => {
       {loadedParams && room && user && storeProvider && (
         <WeaveProvider
           containerId="weave"
-          getUser={getUser}
           store={storeProvider}
           fonts={FONTS}
           nodes={NODES}
           actions={ACTIONS}
+          plugins={PLUGINS(getUser)}
         >
           <UploadFile />
           <RoomLayout />

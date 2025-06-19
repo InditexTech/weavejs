@@ -5,26 +5,13 @@
 import React from 'react';
 import {
   Weave,
-  WeaveStageGridPlugin,
-  WeaveNodesSelectionPlugin,
-  WeaveStagePanningPlugin,
-  WeaveStageResizePlugin,
-  WeaveStageZoomPlugin,
-  WeaveConnectedUsersPlugin,
-  WeaveUsersPointersPlugin,
-  WeaveUsersSelectionPlugin,
-  WeaveStageDropAreaPlugin,
-  WeaveCopyPasteNodesPlugin,
   WeaveNode,
   WeaveAction,
   WeavePlugin,
   WeaveStore,
-  WeaveContextMenuPlugin,
-  WeaveNodesSnappingPlugin,
 } from '@inditextech/weave-sdk';
 import {
   type WeaveState,
-  type WeaveUser,
   type WeaveFont,
   type WeaveUndoRedoChange,
   type WeaveStatus,
@@ -35,7 +22,6 @@ import { useWeave } from './store';
 
 type WeaveProviderType = {
   containerId: string;
-  getUser: () => WeaveUser;
   fonts?: WeaveFont[];
   store: WeaveStore;
   nodes?: WeaveNode[];
@@ -49,7 +35,6 @@ type WeaveProviderType = {
 
 export const WeaveProvider = ({
   containerId,
-  getUser,
   store,
   nodes = [],
   actions = [],
@@ -148,44 +133,6 @@ export const WeaveProvider = ({
           for (const plugin of plugins) {
             instancePlugins.push(plugin);
           }
-        } else {
-          instancePlugins.push(new WeaveStageGridPlugin());
-          instancePlugins.push(new WeaveStagePanningPlugin());
-          instancePlugins.push(new WeaveStageResizePlugin());
-          instancePlugins.push(new WeaveStageZoomPlugin());
-          instancePlugins.push(new WeaveNodesSelectionPlugin());
-          instancePlugins.push(new WeaveNodesSnappingPlugin());
-          instancePlugins.push(new WeaveStageDropAreaPlugin());
-          instancePlugins.push(new WeaveCopyPasteNodesPlugin());
-          instancePlugins.push(
-            new WeaveConnectedUsersPlugin({
-              config: {
-                getUser,
-              },
-            })
-          );
-          instancePlugins.push(
-            new WeaveUsersPointersPlugin({
-              config: {
-                getUser,
-              },
-            })
-          );
-          instancePlugins.push(
-            new WeaveUsersSelectionPlugin({
-              config: {
-                getUser,
-              },
-            })
-          );
-          instancePlugins.push(
-            new WeaveContextMenuPlugin({
-              config: {
-                xOffset: 10,
-                yOffset: 10,
-              },
-            })
-          );
         }
 
         weaveInstanceRef.current = new Weave(

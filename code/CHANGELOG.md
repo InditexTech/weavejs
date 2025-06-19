@@ -13,6 +13,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- [#426](https://github.com/InditexTech/weavejs/issues/426) Don't set default plugins on React Helper
+
 ### Fixed
 
 - [#427](https://github.com/InditexTech/weavejs/issues/427) Fix activating area selector when context menu is activated and then cancelled
