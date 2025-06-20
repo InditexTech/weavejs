@@ -229,8 +229,8 @@ export function WhyInteractive(props: {
               control over the search UI.
             </p>
             <div className="flex flex-row items-center gap-1.5">
-              <Link href="/docs/headless/search">Check the docs</Link>
-              <Link href="/docs/ui/search">Customise UI?</Link>
+              <Link href="/weavejs/docs/headless/search">Check the docs</Link>
+              <Link href="/weavejs/docs/ui/search">Customise UI?</Link>
             </div>
           </WhyPanel>
         ) : null}
@@ -243,7 +243,7 @@ export function WhyInteractive(props: {
               Tailwind CSS. Works great with <b>Shadcn UI</b>.
             </p>
             {props.codeblockTheme}
-            <Link href="/docs/ui/theme">See Themes</Link>
+            <Link href="/weavejs/docs/ui/theme">See Themes</Link>
           </WhyPanel>
         ) : null}
 
@@ -263,8 +263,10 @@ export function WhyInteractive(props: {
             </p>
 
             <div className="mt-4 flex flex-row items-center gap-1.5">
-              <Link href="/docs/ui/components/auto-type-table">Type Table</Link>
-              <Link href="/docs/ui/openapi">OpenAPI Integration</Link>
+              <Link href="/weavejs/docs/ui/components/auto-type-table">
+                Type Table
+              </Link>
+              <Link href="/weavejs/docs/ui/openapi">OpenAPI Integration</Link>
             </div>
           </WhyPanel>
         ) : null}
@@ -278,7 +280,7 @@ export function WhyInteractive(props: {
               Zoomable Image.
             </p>
             {props.codeblockInteractive}
-            <Link href="/docs/ui/components">View Components</Link>
+            <Link href="/weavejs/docs/ui/components">View Components</Link>
           </WhyPanel>
         ) : null}
         {active === 4 ? (
@@ -310,7 +312,9 @@ export function WhyInteractive(props: {
               indexes, and integrate with different search solutions seamlessly.
             </p>
 
-            <Link href="/docs/headless/mdx/structure">See MDX Plugins</Link>
+            <Link href="/weavejs/docs/headless/mdx/structure">
+              See MDX Plugins
+            </Link>
           </WhyPanel>
         ) : null}
       </div>

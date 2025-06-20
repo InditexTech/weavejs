@@ -101,7 +101,7 @@ export function Features() {
             </>
           }
           className="overflow-hidden"
-          href="/docs/main/architecture"
+          href="/weavejs/docs/main/architecture"
           external
         >
           <div className="w-full mb-0 flex flex-col justify-center items-center">
@@ -133,7 +133,7 @@ export function Features() {
               </span>
             </>
           }
-          href="/docs/main/build"
+          href="/weavejs/docs/main/build"
         >
           <div className="w-full mb-0 flex flex-col justify-center items-center">
             <Image
@@ -161,7 +161,7 @@ export function Features() {
               </span>
             </>
           }
-          href="/docs/react"
+          href="/weavejs/docs/react"
         >
           <div className="w-full mb-0 flex flex-col justify-center items-center">
             <Image
@@ -191,7 +191,7 @@ export function Features() {
               </span>
             </>
           }
-          href="/docs/react"
+          href="/weavejs/docs/react"
         >
           <div className="w-full mb-0 flex flex-col justify-center items-center">
             <Image
