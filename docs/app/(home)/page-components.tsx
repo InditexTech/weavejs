@@ -133,7 +133,7 @@ export function Features() {
               </span>
             </>
           }
-          href="/weavejs/docs/main/build"
+          href="/docs/main/build"
         >
           <div className="w-full mb-0 flex flex-col justify-center items-center">
             <Image
@@ -161,7 +161,7 @@ export function Features() {
               </span>
             </>
           }
-          href="/weavejs/docs/react"
+          href="/docs/react"
         >
           <div className="w-full mb-0 flex flex-col justify-center items-center">
             <Image
@@ -191,7 +191,7 @@ export function Features() {
               </span>
             </>
           }
-          href="/weavejs/docs/react"
+          href="/docs/react"
         >
           <div className="w-full mb-0 flex flex-col justify-center items-center">
             <Image
