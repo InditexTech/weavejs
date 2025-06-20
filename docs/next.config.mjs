@@ -4,6 +4,7 @@ const withMDX = createMDX();
 
 /** @type {import('next').NextConfig} */
 const config = {
+  basePath: "/weavejs",
   output: "export",
   distDir: "dist",
   reactStrictMode: true,
