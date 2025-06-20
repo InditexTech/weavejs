@@ -74,7 +74,8 @@
     "npm": ">= 10.9.x"
   },
   "overrides": {
-    "rimraf": "6.0.1"
+    "rimraf": "6.0.1",
+    "yjs": "13.6.27"
   },
   "repository": "github:InditexTech/weavejs"
 }
