@@ -54,7 +54,7 @@
     "konva": "9.3.20",
     "ws": "8.18.1",
     "y-websocket": "3.0.0",
-    "yjs": "13.6.26"
+    "yjs": "13.6.27"
   },
   "devDependencies": {
     "@inditextech/weave-sdk": "0.31.0-SNAPSHOT",
