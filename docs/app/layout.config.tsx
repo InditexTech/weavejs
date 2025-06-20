@@ -47,7 +47,7 @@ export const baseOptions: BaseLayoutProps = {
     {
       type: "menu",
       text: "DOCUMENTATION",
-      url: "/weavejs/docs/main",
+      url: "/docs/main",
       items: [
         {
           menu: {
@@ -78,14 +78,14 @@ export const baseOptions: BaseLayoutProps = {
           icon: <Book strokeWidth={1} />,
           text: "Getting Started",
           description: "Learn how to start your project with Weave.js",
-          url: "/weavejs/docs/main/quickstart",
+          url: "/docs/main/quickstart",
         },
         {
           icon: <ComponentIcon strokeWidth={1} />,
           text: "Nodes",
           description:
             "Core building blocks of the collaborative interface: lines, rectangles, text, images, frames, etc. Use the provided ones or build your own.",
-          url: "/weavejs/docs/main/build/nodes",
+          url: "/docs/main/build/nodes",
           menu: {
             className: "lg:col-start-2",
           },
@@ -95,7 +95,7 @@ export const baseOptions: BaseLayoutProps = {
           text: "Plugins",
           description:
             "Extend and enhance the functionality of Weave.js. Add behavior to the canvas in a lightweight, composable, and easy way.",
-          url: "/weavejs/docs/main/build/plugins",
+          url: "/docs/main/build/plugins",
           menu: {
             className: "lg:col-start-2",
           },
@@ -105,7 +105,7 @@ export const baseOptions: BaseLayoutProps = {
           text: "Actions",
           description:
             "Handle user interactions and user-driven changes. Actions provide a structured, trackable way to make your visual tool truly collaborative.",
-          url: "/weavejs/docs/main/build/actions",
+          url: "/docs/main/build/actions",
           menu: {
             className: "lg:col-start-3 lg:row-start-1",
           },
@@ -115,7 +115,7 @@ export const baseOptions: BaseLayoutProps = {
           text: "Stores",
           description:
             "Stores allow keeping users in sync. They manage changes and the state of the canvas in real time. Simple and easy.",
-          url: "/weavejs/docs/main/build/stores",
+          url: "/docs/main/build/stores",
           menu: {
             className: "lg:col-start-3",
           },
