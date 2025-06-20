@@ -16,6 +16,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 - [#430](https://github.com/InditexTech/weavejs/issues/430) The fontStyle property is not applied to the textarea while writing a text node
+- [#431](https://github.com/InditexTech/weavejs/issues/431) Editing a rotated text looks broken
 
 ## [0.30.0] - 2025-06-19
 
