@@ -43,7 +43,7 @@
   },
   "dependencies": {
     "konva": "9.3.20",
-    "yjs": "13.6.26"
+    "yjs": "13.6.27"
   },
   "devDependencies": {
     "@typescript-eslint/eslint-plugin": "8.26.0",

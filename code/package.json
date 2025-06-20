@@ -56,6 +56,10 @@
     }
   ],
   "license": "Apache-2.0",
+  "dependencies": {
+    "konva": "9.3.20",
+    "yjs": "13.6.27"
+  },
   "devDependencies": {
     "@commitlint/cli": "19.4.0",
     "@commitlint/config-conventional": "19.2.2",
@@ -74,7 +78,9 @@
     "npm": ">= 10.9.x"
   },
   "overrides": {
-    "rimraf": "6.0.1"
+    "konva": "9.3.20",
+    "rimraf": "6.0.1",
+    "yjs": "13.6.27"
   },
   "repository": "github:InditexTech/weavejs"
 }

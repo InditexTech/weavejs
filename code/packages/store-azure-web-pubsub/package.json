@@ -57,7 +57,7 @@
     "reconnecting-websocket": "4.4.0",
     "uuid": "11.1.0",
     "ws": "8.18.1",
-    "yjs": "13.6.26"
+    "yjs": "13.6.27"
   },
   "devDependencies": {
     "@inditextech/weave-sdk": "0.31.0-SNAPSHOT",

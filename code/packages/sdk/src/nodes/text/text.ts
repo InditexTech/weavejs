@@ -317,6 +317,31 @@ export class WeaveTextNode extends WeaveNode {
     return { width, height };
   }
 
+  private mimicTextNode(textNode: Konva.Text, textArea: HTMLTextAreaElement) {
+    textArea.style.fontSize =
+      textNode.fontSize() * textNode.getAbsoluteScale().x + 'px';
+    textArea.rows = textNode.text().split('\n').length;
+    textArea.style.letterSpacing = `${textNode.letterSpacing()}`;
+    textArea.style.opacity = `${textNode.getAttrs().opacity}`;
+    textArea.style.lineHeight = `${textNode.lineHeight()}`;
+    textArea.style.fontFamily = textNode.fontFamily();
+    let fontWeight = 'normal';
+    let fontStyle = 'normal';
+    if ((textNode.fontStyle() ?? 'normal').indexOf('bold') !== -1) {
+      fontWeight = 'bold';
+    }
+    if ((textNode.fontStyle() ?? 'normal').indexOf('italic') !== -1) {
+      fontStyle = 'italic';
+    }
+    textArea.style.fontWeight = fontWeight;
+    textArea.style.backgroundColor = 'transparent';
+    textArea.style.fontStyle = fontStyle;
+    textArea.style.fontVariant = textNode.fontVariant();
+    textArea.style.textDecoration = textNode.textDecoration();
+    textArea.style.textAlign = textNode.align();
+    textArea.style.color = `${textNode.fill()}`;
+  }
+
   private createTextAreaDOM(textNode: Konva.Text, position: Vector2d) {
     const stage = this.instance.getStage();
 
@@ -407,9 +432,6 @@ export class WeaveTextNode extends WeaveNode {
         2 +
         'px';
     }
-    textArea.style.fontSize =
-      textNode.fontSize() * textNode.getAbsoluteScale().x + 'px';
-    textArea.rows = textNode.text().split('\n').length;
     textAreaContainer.style.border = 'solid 1px #1e40af';
     textArea.style.position = 'absolute';
     textArea.style.top = '0px';
@@ -418,7 +440,6 @@ export class WeaveTextNode extends WeaveNode {
     textArea.style.scrollBehavior = 'auto';
     textArea.style.caretColor = 'black';
     textArea.style.width = '100%';
-    textArea.style.letterSpacing = `${textNode.letterSpacing()}`;
     textArea.style.minHeight = 'auto';
     textArea.style.margin = '0px';
     textArea.style.padding = '0px';
@@ -428,24 +449,10 @@ export class WeaveTextNode extends WeaveNode {
     textArea.style.border = 'none';
     textArea.style.outline = 'none';
     textArea.style.resize = 'none';
-    textArea.style.lineHeight = `${textNode.lineHeight()}`;
-    textArea.style.fontFamily = textNode.fontFamily();
-    let fontWeight = 'normal';
-    let fontStyle = 'normal';
-    if ((textNode.fontStyle() ?? 'normal').indexOf('bold') !== -1) {
-      fontWeight = 'bold';
-    }
-    if ((textNode.fontStyle() ?? 'normal').indexOf('italic') !== -1) {
-      fontStyle = 'italic';
-    }
-    textArea.style.fontWeight = fontWeight;
     textArea.style.backgroundColor = 'transparent';
-    textArea.style.fontStyle = fontStyle;
-    textArea.style.fontVariant = textNode.fontVariant();
-    textArea.style.textDecoration = textNode.textDecoration();
     textAreaContainer.style.transformOrigin = 'left top';
-    textArea.style.textAlign = textNode.align();
-    textArea.style.color = `${textNode.fill()}`;
+    this.mimicTextNode(textNode, textArea);
+
     textArea.onfocus = () => {
       this.textAreaDomResize(textAreaContainer, textArea, textNode);
     };
@@ -615,13 +622,7 @@ export class WeaveTextNode extends WeaveNode {
     if (textNode.getAttrs().verticalAlign === 'bottom') {
       textAreaContainer.style.alignItems = 'end';
     }
-    textArea.style.fontSize =
-      textNode.fontSize() * textNode.getAbsoluteScale().x + 'px';
-    textArea.rows = textNode.text().split('\n').length;
-    textArea.style.lineHeight = `${textNode.lineHeight()}`;
-    textArea.style.fontFamily = textNode.fontFamily();
-    textArea.style.textAlign = textNode.align();
-    textArea.style.color = `${textNode.fill()}`;
+    this.mimicTextNode(textNode, textArea);
 
     this.textAreaDomResize(textAreaContainer, textArea, textNode);
     // call twice for side-effect
