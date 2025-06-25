@@ -667,6 +667,10 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
         return;
       }
 
+      if (this.instance.getActiveAction() !== 'selectionTool') {
+        return;
+      }
+
       const contextMenuPlugin = this.instance.getPlugin('contextMenu') as
         | WeaveContextMenuPlugin
         | undefined;
