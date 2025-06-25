@@ -3,29 +3,27 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import Konva from 'konva';
-import { Line } from 'konva/lib/shapes/Line';
 import { WeavePlugin } from '@/plugins/plugin';
 import {
   WEAVE_GRID_DEFAULT_COLOR,
   WEAVE_GRID_DEFAULT_ORIGIN_COLOR,
+  WEAVE_GRID_DEFAULT_STROKE,
+  WEAVE_GRID_DEFAULT_RADIUS,
   WEAVE_GRID_DEFAULT_SIZE,
   WEAVE_GRID_DEFAULT_TYPE,
   WEAVE_GRID_LAYER_ID,
   WEAVE_GRID_TYPES,
   WEAVE_STAGE_GRID_KEY,
+  WEAVE_GRID_DEFAULT_MAJOR_LINE_RATIO,
+  WEAVE_GRID_DEFAULT_MAJOR_DOT_RATIO,
 } from './constants';
 import {
   type WeaveStageGridPluginConfig,
   type WeaveStageGridPluginParams,
   type WeaveStageGridType,
 } from './types';
-import { Circle } from 'konva/lib/shapes/Circle';
 import type { KonvaEventObject } from 'konva/lib/Node';
 import { throttle } from 'lodash';
-
-function isZeroOrClose(value: number, tolerance: number = 1e-6): boolean {
-  return Math.abs(value) <= tolerance;
-}
 
 export class WeaveStageGridPlugin extends WeavePlugin {
   private moveToolActive: boolean;
@@ -167,19 +165,251 @@ export class WeaveStageGridPlugin extends WeavePlugin {
     return layer;
   }
 
-  private renderGrid(): void {
-    const layer = this.getLayer();
+  getAdaptiveSpacing(scale: number): number {
+    const baseGridSpacing = this.config.gridSize;
 
-    if (!layer) {
+    const minPixelSpacing = 8;
+    const maxPixelSpacing = 100;
+
+    let spacing = baseGridSpacing;
+    let pixelSpacing = spacing * scale;
+
+    // Zoomed out → spacing too small on screen, make grid coarser
+    while (pixelSpacing < minPixelSpacing) {
+      spacing *= 2;
+      pixelSpacing = spacing * scale;
+    }
+
+    // Zoomed in → spacing too big on screen, make grid finer
+    while (pixelSpacing > maxPixelSpacing && spacing > baseGridSpacing / 16) {
+      spacing /= 2;
+      pixelSpacing = spacing * scale;
+    }
+
+    // Snap to nearest power-of-two multiple of baseGridSpacing
+    const logFactor = Math.round(Math.log2(spacing / baseGridSpacing));
+    const snappedSpacing = baseGridSpacing * Math.pow(2, logFactor);
+
+    return snappedSpacing;
+  }
+
+  private getAdjustedSpacing(
+    startX: number,
+    endX: number,
+    startY: number,
+    endY: number,
+    baseSpacing = 50,
+    maxDotsPerAxis = 500
+  ) {
+    let spacing = baseSpacing;
+    let dotCountX = Math.ceil((endX - startX) / spacing);
+    let dotCountY = Math.ceil((endY - startY) / spacing);
+
+    while (
+      (dotCountX > maxDotsPerAxis || dotCountY > maxDotsPerAxis) &&
+      spacing < 1e6
+    ) {
+      spacing *= 2;
+      dotCountX = Math.ceil((endX - startX) / spacing);
+      dotCountY = Math.ceil((endY - startY) / spacing);
+    }
+
+    return spacing;
+  }
+
+  private renderGridLines(): void {
+    const stage = this.instance.getStage();
+    const gridLayer = this.getLayer();
+
+    if (!gridLayer) {
       return;
     }
 
-    layer.destroyChildren();
+    gridLayer.destroyChildren(); // Clear previous grid
 
     if (!this.enabled) {
       return;
     }
 
+    const scale = stage.scaleX();
+    const spacing = this.getAdaptiveSpacing(scale);
+    const invScale =
+      (this.config.gridStroke ?? WEAVE_GRID_DEFAULT_STROKE) / scale;
+
+    const offsetX = -stage.x() / stage.scaleX();
+    const offsetY = -stage.y() / stage.scaleY();
+
+    const margin = 2; // how many screen widths/heights to extend in each direction
+    const worldWidth = stage.width() * invScale;
+    const worldHeight = stage.height() * invScale;
+
+    const startX =
+      Math.floor((offsetX - margin * worldWidth) / spacing) * spacing;
+    const startY =
+      Math.floor((offsetY - margin * worldHeight) / spacing) * spacing;
+
+    // const startX =
+    //   Math.floor((offsetX - margin * worldWidth) / spacing) * spacing;
+    const endX = offsetX + (1 + margin) * worldWidth;
+
+    // const startY =
+    //   Math.floor((offsetY - margin * worldHeight) / spacing) * spacing;
+    const endY = offsetY + (1 + margin) * worldHeight;
+
+    const highlightEvery = 10;
+
+    for (let x = startX; x <= endX; x += spacing) {
+      const index = Math.round(x / spacing);
+      const isHighlight = index % highlightEvery === 0;
+      const isOrigin = Math.abs(x) < spacing / 2;
+
+      const line = new Konva.Line({
+        points: [x, startY, x, endY],
+        stroke: isOrigin ? this.config.gridOriginColor : this.config.gridColor,
+        strokeWidth:
+          !isHighlight && !isOrigin
+            ? invScale
+            : invScale *
+              (this.config.gridMajorRatio ??
+                WEAVE_GRID_DEFAULT_MAJOR_LINE_RATIO),
+        listening: false,
+      });
+      gridLayer.add(line);
+    }
+
+    for (let y = startY; y <= endY; y += spacing) {
+      const index = Math.round(y / spacing);
+      const isHighlight = index % highlightEvery === 0;
+      const isOrigin = Math.abs(y) < spacing / 2;
+
+      const line = new Konva.Line({
+        points: [startX, y, endX, y],
+        stroke: isOrigin ? this.config.gridOriginColor : this.config.gridColor,
+        strokeWidth: !isHighlight && !isOrigin ? invScale : invScale * 2,
+        listening: false,
+      });
+      gridLayer.add(line);
+    }
+  }
+
+  private renderGridDots(): void {
+    const stage = this.instance.getStage();
+    const gridLayer = this.getLayer();
+
+    if (!gridLayer) {
+      return;
+    }
+
+    gridLayer.destroyChildren(); // Clear previous grid
+
+    if (!this.enabled) {
+      return;
+    }
+
+    const scale = stage.scaleX();
+    const spacing = this.getAdaptiveSpacing(scale);
+    const invScale =
+      (this.config.gridDotRadius ?? WEAVE_GRID_DEFAULT_RADIUS) / scale;
+    const position = stage.position();
+
+    const offsetX = -position.x * invScale;
+    const offsetY = -position.y * invScale;
+
+    const margin = 2; // how many screen widths/heights to extend in each direction
+    const worldWidth = stage.width() * invScale;
+    const worldHeight = stage.height() * invScale;
+
+    let startX =
+      Math.floor((offsetX - margin * worldWidth) / spacing) * spacing;
+    const endX = offsetX + (1 + margin) * worldWidth;
+
+    let startY =
+      Math.floor((offsetY - margin * worldHeight) / spacing) * spacing;
+    const endY = offsetY + (1 + margin) * worldHeight;
+
+    let adjustedSpacing = spacing;
+    let dotCountX = Math.ceil((endX - startX) / adjustedSpacing);
+    let dotCountY = Math.ceil((endY - startY) / adjustedSpacing);
+
+    const maxDotsPerAxis = 500;
+    while (
+      (dotCountX > maxDotsPerAxis || dotCountY > maxDotsPerAxis) &&
+      adjustedSpacing < 1e6
+    ) {
+      adjustedSpacing *= 2;
+      dotCountX = Math.ceil((endX - startX) / adjustedSpacing);
+      dotCountY = Math.ceil((endY - startY) / adjustedSpacing);
+    }
+
+    this.getAdjustedSpacing(startX, endX, startY, endY, spacing);
+
+    startX =
+      Math.floor((offsetX - margin * worldWidth) / adjustedSpacing) *
+      adjustedSpacing;
+    startY =
+      Math.floor((offsetY - margin * worldHeight) / adjustedSpacing) *
+      adjustedSpacing;
+
+    const highlightEvery = 10;
+
+    const majorColor = this.config.gridColor;
+    const gridMajorRatio =
+      this.config.gridMajorRatio ?? WEAVE_GRID_DEFAULT_MAJOR_DOT_RATIO;
+
+    const majorShape = new Konva.Shape({
+      sceneFunc: function (context) {
+        context.beginPath();
+        for (let x = startX; x <= endX; x += adjustedSpacing) {
+          for (let y = startY; y <= endY; y += adjustedSpacing) {
+            if (Math.abs(x) < spacing / 2 || Math.abs(y) < spacing / 2)
+              continue;
+
+            const indexX = Math.round(x / spacing);
+            const indexY = Math.round(y / spacing);
+            const isHighlightX = indexX % highlightEvery === 0;
+            const isHighlightY = indexY % highlightEvery === 0;
+
+            const radius = !(isHighlightX || isHighlightY)
+              ? invScale
+              : invScale * gridMajorRatio;
+
+            context.moveTo(x + radius, y);
+            context.arc(x, y, radius, 0, Math.PI * 2, false);
+          }
+        }
+        context.fillStyle = majorColor;
+        context.fill();
+      },
+    });
+
+    gridLayer.add(majorShape);
+
+    const originColor = this.config.gridOriginColor;
+
+    const originShape = new Konva.Shape({
+      sceneFunc: function (context) {
+        context.beginPath();
+        for (let x = startX; x <= endX; x += adjustedSpacing) {
+          const radius = invScale * gridMajorRatio;
+
+          context.moveTo(x + radius, 0);
+          context.arc(x, 0, radius, 0, Math.PI * 2);
+        }
+        for (let y = startY; y <= endY; y += adjustedSpacing) {
+          const radius = invScale * gridMajorRatio;
+          if (Math.abs(y) < spacing / 2) continue; // skip center dot (already added)
+          context.moveTo(0 + radius, y);
+          context.arc(0, y, radius, 0, Math.PI * 2);
+        }
+        context.fillStyle = originColor;
+        context.fill();
+      },
+    });
+
+    gridLayer.add(originShape);
+  }
+
+  private renderGrid(): void {
     switch (this.config.type) {
       case WEAVE_GRID_TYPES.LINES:
         this.renderGridLines();
@@ -188,163 +418,7 @@ export class WeaveStageGridPlugin extends WeavePlugin {
         this.renderGridDots();
         break;
       default:
-        this.renderGridLines();
         break;
-    }
-  }
-
-  private round(number: number, step: number) {
-    return Math.round(number / step) * step;
-  }
-
-  private renderGridLines() {
-    const layer = this.getLayer();
-
-    if (!layer) {
-      return;
-    }
-
-    const stage = this.instance.getStage();
-
-    const stageXRound = this.round(stage.x(), this.config.gridSize) * -1;
-
-    const overflowX = this.round(
-      10 * this.config.gridSize,
-      this.config.gridSize
-    );
-    const overflowY = this.round(
-      10 * this.config.gridSize,
-      this.config.gridSize
-    );
-
-    const pointsX = [];
-    for (
-      let i = stageXRound - overflowX;
-      i < stageXRound + stage.width() + overflowX;
-      i += this.config.gridSize
-    ) {
-      pointsX.push({ real: i / stage.scaleX(), ref: i });
-    }
-
-    const stageYRound = this.round(stage.y(), this.config.gridSize) * -1;
-
-    const pointsY = [];
-    for (
-      let i = stageYRound - overflowY;
-      i < stageYRound + stage.height() + overflowY;
-      i += this.config.gridSize
-    ) {
-      pointsY.push({ real: i / stage.scaleY(), ref: i });
-    }
-
-    for (let index = 0; index < pointsX.length; index++) {
-      const { real: point, ref } = pointsX[index];
-
-      let color = this.config.gridColor;
-      if (point === 0) {
-        color = this.config.gridOriginColor;
-      }
-
-      layer.add(
-        new Line({
-          points: [
-            point,
-            (-stage.y() - overflowY) / stage.scaleY(),
-            point,
-            (-stage.y() + stage.height() + overflowY) / stage.scaleY(),
-          ],
-          stroke: color,
-          strokeWidth:
-            (isZeroOrClose(ref % (10 * this.config.gridSize)) ? 2.5 : 0.5) /
-            stage.scaleX(),
-          listening: false,
-        })
-      );
-    }
-
-    for (let index = 0; index < pointsY.length; index++) {
-      const { real: point, ref } = pointsY[index];
-
-      let color = this.config.gridColor;
-      if (point === 0) {
-        color = this.config.gridOriginColor;
-      }
-
-      layer.add(
-        new Line({
-          points: [
-            (-stage.x() - overflowX) / stage.scaleX(),
-            point,
-            (-stage.x() + stage.width() + overflowX) / stage.scaleX(),
-            point,
-          ],
-          stroke: color,
-          strokeWidth:
-            (isZeroOrClose(ref % (10 * this.config.gridSize)) ? 2.5 : 0.5) /
-            stage.scaleX(),
-          listening: false,
-        })
-      );
-    }
-  }
-
-  private renderGridDots() {
-    const layer = this.getLayer();
-
-    if (!layer) {
-      return;
-    }
-
-    const stage = this.instance.getStage();
-
-    const overflowX = 10 * this.config.gridSize;
-    const overflowY = 10 * this.config.gridSize;
-
-    const stageXRound = this.round(stage.x(), this.config.gridSize) * -1;
-
-    const pointsX = [];
-    for (
-      let i = stageXRound - overflowX;
-      i < stageXRound + stage.width() + overflowX;
-      i += this.config.gridSize
-    ) {
-      pointsX.push({ real: i / stage.scaleX(), ref: i });
-    }
-
-    const stageYRound = this.round(stage.y(), this.config.gridSize) * -1;
-
-    const pointsY = [];
-    for (
-      let i = stageYRound - overflowY;
-      i < stageYRound + stage.height() + overflowY;
-      i += this.config.gridSize
-    ) {
-      pointsY.push({ real: i / stage.scaleY(), ref: i });
-    }
-
-    for (let indexX = 0; indexX < pointsX.length; indexX++) {
-      const { real: pointX, ref: refX } = pointsX[indexX];
-
-      for (let indexY = 0; indexY < pointsY.length; indexY++) {
-        const { real: pointY, ref: refY } = pointsY[indexY];
-
-        let color = this.config.gridColor;
-        if (refX === 0 || refY === 0) {
-          color = this.config.gridOriginColor;
-        }
-
-        layer.add(
-          new Circle({
-            x: pointX,
-            y: pointY,
-            radius: (pointX === 0 || pointY === 0 ? 2.5 : 1.5) / stage.scaleX(),
-            fill: color,
-            stroke: color,
-            strokeWidth: 0,
-            listening: false,
-          })
-        );
-      }
     }
   }
 
