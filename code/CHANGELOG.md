@@ -17,6 +17,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - [#445](https://github.com/InditexTech/weavejs/issues/445) Improve the grid behavior
 
+### Fixed
+
+- [#449](https://github.com/InditexTech/weavejs/issues/449) Free draw tool incorrectly selects frame and switches cursor to hand when drawing inside a frame
+
 ## [0.30.1] - 2025-06-20
 
 \### Fixed
