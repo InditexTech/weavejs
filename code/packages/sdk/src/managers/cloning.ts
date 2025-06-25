@@ -138,8 +138,11 @@ export class WeaveCloningManager {
       if (nodePos.y < minPoint.y) {
         minPoint.y = nodePos.y;
       }
-      const serialized: WeaveStateElement = nodeHandler.serialize(node);
-      serializedNodes.push(serialized);
+
+      if (nodeHandler) {
+        const serialized: WeaveStateElement = nodeHandler.serialize(node);
+        serializedNodes.push(serialized);
+      }
     });
 
     newGroup.destroy();
@@ -258,9 +261,12 @@ export class WeaveCloningManager {
       const handler = this.instance.getNodeHandler<WeaveNode>(
         node.getAttrs().nodeType
       );
-      const stateNode = handler.serialize(node);
 
-      this.instance.addNode(stateNode, targetContainer.getAttrs().id);
+      if (handler) {
+        const stateNode = handler.serialize(node);
+        this.instance.addNode(stateNode, targetContainer.getAttrs().id);
+      }
+
       node.destroy();
     }
 

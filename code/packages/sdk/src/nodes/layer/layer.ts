@@ -42,6 +42,9 @@ export class WeaveLayerNode extends WeaveNode {
       const handler = this.instance.getNodeHandler<WeaveNode>(
         node.getAttr('nodeType')
       );
+      if (!handler) {
+        continue;
+      }
       childrenMapped.push(handler.serialize(node));
     }
 

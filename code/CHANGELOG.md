@@ -16,6 +16,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 - [#445](https://github.com/InditexTech/weavejs/issues/445) Improve the grid behavior
+- [#447](https://github.com/InditexTech/weavejs/issues/447) Avoid plugins to throw when not installed
 - [#448](https://github.com/InditexTech/weavejs/issues/448) Enable wheel pan without needing to hold the space bar
 
 ### Fixed

@@ -96,11 +96,11 @@ export abstract class WeaveNode implements WeaveNodeBase {
     const copyPastePlugin =
       this.instance.getPlugin<WeaveCopyPasteNodesPlugin>('copyPasteNodes');
 
-    if (!copyPastePlugin) {
-      throw new Error('WeaveCopyPasteNodesPlugin plugin not found');
+    if (copyPastePlugin) {
+      return copyPastePlugin.isPasting();
     }
 
-    return copyPastePlugin.isPasting();
+    return false;
   }
 
   setupDefaultNodeAugmentation(node: Konva.Node): void {
@@ -188,9 +188,11 @@ export abstract class WeaveNode implements WeaveNodeBase {
         const nodeHandler = this.instance.getNodeHandler<WeaveNode>(
           node.getAttrs().nodeType
         );
-        this.instance.updateNode(
-          nodeHandler.serialize(node as WeaveElementInstance)
-        );
+        if (nodeHandler) {
+          this.instance.updateNode(
+            nodeHandler.serialize(node as WeaveElementInstance)
+          );
+        }
       }
     };
 
@@ -218,9 +220,11 @@ export abstract class WeaveNode implements WeaveNodeBase {
       const nodeHandler = this.instance.getNodeHandler<WeaveNode>(
         node.getAttrs().nodeType
       );
-      this.instance.updateNode(
-        nodeHandler.serialize(node as WeaveElementInstance)
-      );
+      if (nodeHandler) {
+        this.instance.updateNode(
+          nodeHandler.serialize(node as WeaveElementInstance)
+        );
+      }
     });
 
     node.on('dragstart', (e) => {
@@ -254,9 +258,11 @@ export abstract class WeaveNode implements WeaveNodeBase {
         const nodeHandler = this.instance.getNodeHandler<WeaveNode>(
           node.getAttrs().nodeType
         );
-        this.instance.updateNode(
-          nodeHandler.serialize(node as WeaveElementInstance)
-        );
+        if (nodeHandler) {
+          this.instance.updateNode(
+            nodeHandler.serialize(node as WeaveElementInstance)
+          );
+        }
       }
     };
 

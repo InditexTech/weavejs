@@ -42,7 +42,7 @@ export const useWeaveEvents = (): void => {
 
   const onNodesChangeHandler = React.useCallback(
     (nodes: WeaveSelection[]) => {
-      if (nodes.length === 1 && node?.key !== nodes[0].node.key) {
+      if (nodes.length === 1 && node?.key !== nodes[0].node?.key) {
         setNode(nodes[0].node);
       }
       if (nodes.length === 0) {

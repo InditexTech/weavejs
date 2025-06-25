@@ -23,9 +23,13 @@ export class WeaveReconciler {
   }
 
   addNode(
-    parentInstance: WeaveElementInstance,
-    child: WeaveElementInstance
+    parentInstance: WeaveElementInstance | undefined,
+    child: WeaveElementInstance | undefined
   ): void {
+    if (!parentInstance || !child) {
+      return;
+    }
+
     const parentAttrs = parentInstance.getAttrs();
 
     const childInitialZIndex = child.getAttrs().initialZIndex;

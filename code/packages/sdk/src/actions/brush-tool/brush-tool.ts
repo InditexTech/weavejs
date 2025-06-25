@@ -122,15 +122,17 @@ export class WeaveBrushToolAction extends WeaveAction {
 
     const nodeHandler = this.instance.getNodeHandler<WeaveLineNode>('line');
 
-    const node = nodeHandler.create(this.strokeId, {
-      ...this.props,
-      strokeScaleEnabled: true,
-      x: this.clickPoint?.x ?? 0,
-      y: this.clickPoint?.y ?? 0,
-      points: [0, 0],
-    });
+    if (nodeHandler) {
+      const node = nodeHandler.create(this.strokeId, {
+        ...this.props,
+        strokeScaleEnabled: true,
+        x: this.clickPoint?.x ?? 0,
+        y: this.clickPoint?.y ?? 0,
+        points: [0, 0],
+      });
 
-    this.instance.addNode(node, this.container?.getAttrs().id);
+      this.instance.addNode(node, this.container?.getAttrs().id);
+    }
 
     this.setState(BRUSH_TOOL_STATE.DEFINE_STROKE);
   }
@@ -150,9 +152,11 @@ export class WeaveBrushToolAction extends WeaveAction {
         hitStrokeWidth: 10,
       });
 
-      this.instance.updateNode(
-        nodeHandler.serialize(tempStroke as WeaveElementInstance)
-      );
+      if (nodeHandler) {
+        this.instance.updateNode(
+          nodeHandler.serialize(tempStroke as WeaveElementInstance)
+        );
+      }
 
       this.clickPoint = null;
 
@@ -185,9 +189,11 @@ export class WeaveBrushToolAction extends WeaveAction {
 
       const nodeHandler = this.instance.getNodeHandler<WeaveLineNode>('line');
 
-      this.instance.updateNode(
-        nodeHandler.serialize(tempStroke as WeaveElementInstance)
-      );
+      if (nodeHandler) {
+        this.instance.updateNode(
+          nodeHandler.serialize(tempStroke as WeaveElementInstance)
+        );
+      }
     }
   }
 

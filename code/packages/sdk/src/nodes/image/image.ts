@@ -466,9 +466,11 @@ export class WeaveImageNode extends WeaveNode {
         const nodeHandler = this.instance.getNodeHandler<WeaveNode>(
           image.getAttrs().nodeType
         );
-        this.instance.updateNode(
-          nodeHandler.serialize(image as WeaveElementInstance)
-        );
+        if (nodeHandler) {
+          this.instance.updateNode(
+            nodeHandler.serialize(image as WeaveElementInstance)
+          );
+        }
       }
     };
 

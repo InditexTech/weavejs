@@ -41,8 +41,8 @@ export class WeaveRegisterManager {
     return this.actionsHandlers?.[actionName] as T;
   }
 
-  getNodeHandler(nodeType: string): WeaveNode | undefined {
-    return this.nodesHandlers?.[nodeType];
+  getNodeHandler<T>(nodeType: string): T | undefined {
+    return this.nodesHandlers?.[nodeType] as T;
   }
 
   registerPlugins(): void {

@@ -161,7 +161,7 @@ export class WeaveStagePanningPlugin extends WeavePlugin {
       stage.x(stage.x() - deltaX);
       stage.y(stage.y() - deltaY);
 
-      this.instance.emit('onStageMove', undefined);
+      this.instance.emitEvent('onStageMove');
     };
 
     stage.on('mousemove', throttle(handleMouseMove, 50));
@@ -205,7 +205,7 @@ export class WeaveStagePanningPlugin extends WeavePlugin {
       stage.x(stage.x() - deltaX);
       stage.y(stage.y() - deltaY);
 
-      this.instance.emit('onStageMove', undefined);
+      this.instance.emitEvent('onStageMove');
     });
 
     const handleWheel = (e: WheelEvent) => {
@@ -218,7 +218,7 @@ export class WeaveStagePanningPlugin extends WeavePlugin {
       stage.x(stage.x() - e.deltaX);
       stage.y(stage.y() - e.deltaY);
 
-      this.instance.emit('onStageMove', undefined);
+      this.instance.emitEvent('onStageMove');
     };
 
     window.addEventListener('wheel', throttle(handleWheel, 10));

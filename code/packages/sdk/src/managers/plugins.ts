@@ -34,12 +34,10 @@ export class WeavePluginsManager {
   isEnabled(pluginName: string): boolean {
     const plugins = this.instance.getPlugins();
 
-    if (!plugins[pluginName]) {
-      const msg = `Plugin with name [${pluginName}] not registered`;
-      this.logger.error(msg);
-      throw new Error(msg);
+    if (plugins[pluginName]) {
+      return plugins[pluginName].isEnabled();
     }
 
-    return plugins[pluginName].isEnabled?.();
+    return false;
   }
 }

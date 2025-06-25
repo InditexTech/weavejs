@@ -1,3 +1,5 @@
+'use client';
+
 import { Vector2d } from 'konva/lib/types';
 import { create } from 'zustand';
 import { ContextMenuOption } from '@/components/room-components/context-menu';

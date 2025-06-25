@@ -50,7 +50,7 @@ import { AlignElementsToolAction } from '@/components/actions/align-elements-too
 import { WEAVE_TRANSFORMER_ANCHORS } from '@inditextech/weave-types';
 import { ColorTokenToolAction } from '../actions/color-token-tool/color-token-tool';
 
-const FONTS = [
+const FONTS = () => [
   {
     id: 'Inter',
     name: 'Inter, sans-serif',
@@ -123,7 +123,7 @@ const inter = Inter({
   subsets: ['latin'],
 });
 
-const NODES = [
+const NODES = () => [
   new WeaveStageNode(),
   new WeaveLayerNode(),
   new WeaveGroupNode(),
@@ -198,7 +198,7 @@ const PLUGINS = (getUser: () => WeaveUser) => [
   }),
 ];
 
-const ACTIONS = [
+const ACTIONS = () => [
   new WeaveMoveToolAction(),
   new WeaveSelectionToolAction(),
   new WeaveEraserToolAction(),
