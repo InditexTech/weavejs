@@ -80,6 +80,11 @@ export abstract class WeaveNode implements WeaveNodeBase {
   getSelectionPlugin(): WeaveNodesSelectionPlugin {
     const selectionPlugin =
       this.instance.getPlugin<WeaveNodesSelectionPlugin>('nodesSelection');
+
+    if (!selectionPlugin) {
+      throw new Error('WeaveNodesSelectionPlugin plugin not found');
+    }
+
     return selectionPlugin;
   }
 
@@ -90,6 +95,11 @@ export abstract class WeaveNode implements WeaveNodeBase {
   isPasting(): boolean {
     const copyPastePlugin =
       this.instance.getPlugin<WeaveCopyPasteNodesPlugin>('copyPasteNodes');
+
+    if (!copyPastePlugin) {
+      throw new Error('WeaveCopyPasteNodesPlugin plugin not found');
+    }
+
     return copyPastePlugin.isPasting();
   }
 
@@ -108,6 +118,7 @@ export abstract class WeaveNode implements WeaveNodeBase {
 
     let selected: boolean = false;
     if (
+      selectionPlugin &&
       selectionPlugin.getSelectedNodes().length === 1 &&
       selectionPlugin.getSelectedNodes()[0].getAttrs().id === ele.getAttrs().id
     ) {

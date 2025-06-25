@@ -130,6 +130,11 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
   isPasting(): boolean {
     const copyPastePlugin =
       this.instance.getPlugin<WeaveCopyPasteNodesPlugin>('copyPasteNodes');
+
+    if (!copyPastePlugin) {
+      return false;
+    }
+
     return copyPastePlugin.isPasting();
   }
 
@@ -312,15 +317,6 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
           stage.container().style.cursor = actualCursor;
         });
       }
-
-      // const usersSelectionPlugin =
-      //   this.instance.getPlugin<WeaveUsersSelectionPlugin>(
-      //     WEAVE_USERS_SELECTION_KEY
-      //   );
-
-      // if (usersSelectionPlugin) {
-      //   usersSelectionPlugin.sendSelectionAwarenessInfo(this.tr);
-      // }
 
       tr.forceUpdate();
     });

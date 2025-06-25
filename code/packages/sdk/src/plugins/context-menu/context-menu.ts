@@ -85,7 +85,7 @@ export class WeaveContextMenuPlugin extends WeavePlugin {
 
     let nodes: WeaveSelection[] = [];
 
-    if (clickOnTransformer) {
+    if (clickOnTransformer && selectionPlugin) {
       const transformer = selectionPlugin.getTransformer();
 
       nodes = transformer

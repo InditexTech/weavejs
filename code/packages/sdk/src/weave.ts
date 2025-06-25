@@ -354,7 +354,7 @@ export class Weave extends Emittery {
     return this.registerManager.getPlugins();
   }
 
-  getPlugin<T>(pluginName: string) {
+  getPlugin<T>(pluginName: string): T | undefined {
     return this.registerManager.getPlugin(pluginName) as T;
   }
 
