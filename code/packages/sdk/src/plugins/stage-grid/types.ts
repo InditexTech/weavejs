@@ -9,6 +9,7 @@ export type WeaveStageGridPluginConfig = {
   gridColor: string;
   gridOriginColor: string;
   gridSize: number;
+  gridMajorEvery?: number;
   gridMajorRatio?: number;
   gridStroke?: number;
   gridDotRadius?: number;

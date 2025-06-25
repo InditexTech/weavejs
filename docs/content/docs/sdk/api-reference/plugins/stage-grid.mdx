@@ -40,10 +40,13 @@ type WeaveStageGridPluginConfig = {
   gridColor: string;
   gridOriginColor: string;
   gridSize: number;
+  gridMajorRatio?: number;
+  gridStroke?: number;
+  gridDotRadius?: number;
 };
 
 type WeaveStageGridPluginParams = {
-  config?: WeaveStageGridPluginConfig;
+  config?: Partial<WeaveStageGridPluginConfig>;
 };
 ```
 
@@ -67,7 +70,7 @@ For `WeaveStageGridPluginConfig`:
     ["type"]: {
       description: "Type of the grid to use by default.",
       type: "WeaveStageGridType",
-      default: "line",
+      default: "lines",
     },
     ["gridColor"]: {
       description: "Color of the grid (lines or dots)",
@@ -84,6 +87,30 @@ For `WeaveStageGridPluginConfig`:
         "A number in pixels that define the size of the grid separation.",
       type: "number",
       default: "50",
+    },
+    ["gridMajorEvery"]: {
+      description:
+        "A number that defines when to render the major lines, every N gridSize",
+      type: "number",
+      default: "10",
+    },
+    ["gridMajorRatio"]: {
+      description:
+        "A number that defines the size (ratio) of the references, for the type lines its a multiple for the stroke and for the dots its a multiple for the dot radius",
+      type: "number",
+      default: "type === 'lines' => 4, type === 'dots' => 2",
+    },
+    ["gridStroke"]: {
+      description:
+        "A number that defines the stroke base size of the grid lines when the type is lines",
+      type: "number",
+      default: "0.5",
+    },
+    ["gridDotRadius"]: {
+      description:
+        "A number that defines the dot radius base size of the grid when the type is dots",
+      type: "number",
+      default: "1",
     },
   }}
 />

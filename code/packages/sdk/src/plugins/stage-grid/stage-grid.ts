@@ -16,6 +16,7 @@ import {
   WEAVE_STAGE_GRID_KEY,
   WEAVE_GRID_DEFAULT_MAJOR_LINE_RATIO,
   WEAVE_GRID_DEFAULT_MAJOR_DOT_RATIO,
+  WEAVE_GRID_DEFAULT_MAJOR_EVERY,
 } from './constants';
 import {
   type WeaveStageGridPluginConfig,
@@ -247,16 +248,11 @@ export class WeaveStageGridPlugin extends WeavePlugin {
       Math.floor((offsetX - margin * worldWidth) / spacing) * spacing;
     const startY =
       Math.floor((offsetY - margin * worldHeight) / spacing) * spacing;
-
-    // const startX =
-    //   Math.floor((offsetX - margin * worldWidth) / spacing) * spacing;
     const endX = offsetX + (1 + margin) * worldWidth;
-
-    // const startY =
-    //   Math.floor((offsetY - margin * worldHeight) / spacing) * spacing;
     const endY = offsetY + (1 + margin) * worldHeight;
 
-    const highlightEvery = 10;
+    const highlightEvery =
+      this.config.gridMajorEvery ?? WEAVE_GRID_DEFAULT_MAJOR_EVERY;
 
     for (let x = startX; x <= endX; x += spacing) {
       const index = Math.round(x / spacing);
@@ -350,7 +346,8 @@ export class WeaveStageGridPlugin extends WeavePlugin {
       Math.floor((offsetY - margin * worldHeight) / adjustedSpacing) *
       adjustedSpacing;
 
-    const highlightEvery = 10;
+    const highlightEvery =
+      this.config.gridMajorEvery ?? WEAVE_GRID_DEFAULT_MAJOR_EVERY;
 
     const majorColor = this.config.gridColor;
     const gridMajorRatio =
