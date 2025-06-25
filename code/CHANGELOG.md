@@ -22,6 +22,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 - [#449](https://github.com/InditexTech/weavejs/issues/449) Free draw tool incorrectly selects frame and switches cursor to hand when drawing inside a frame
+- [#456](https://github.com/InditexTech/weavejs/issues/456) Fix invalid action `inditex/gha-workflowdispatch@v1` on release workflow
 
 ## [0.30.1] - 2025-06-20
 
