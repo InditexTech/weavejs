@@ -211,12 +211,7 @@ export class WeaveStagePanningPlugin extends WeavePlugin {
     const handleWheel = (e: WheelEvent) => {
       const stage = this.instance.getStage();
 
-      if (
-        !this.enabled ||
-        !stage.isFocused() ||
-        this.isCtrlOrMetaPressed ||
-        !this.isSpaceKeyPressed
-      ) {
+      if (!this.enabled || !stage.isFocused() || this.isCtrlOrMetaPressed) {
         return;
       }
 
