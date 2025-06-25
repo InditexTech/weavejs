@@ -132,16 +132,18 @@ export class WeaveEllipseToolAction extends WeaveAction {
     const nodeHandler =
       this.instance.getNodeHandler<WeaveEllipseNode>('ellipse');
 
-    const node = nodeHandler.create(this.ellipseId, {
-      ...this.props,
-      strokeScaleEnabled: true,
-      x: this.clickPoint?.x ?? 0 + this.props.radiusX,
-      y: this.clickPoint?.y ?? 0 + this.props.radiusY,
-      radiusX: 0,
-      radiusY: 0,
-    });
+    if (nodeHandler) {
+      const node = nodeHandler.create(this.ellipseId, {
+        ...this.props,
+        strokeScaleEnabled: true,
+        x: this.clickPoint?.x ?? 0 + this.props.radiusX,
+        y: this.clickPoint?.y ?? 0 + this.props.radiusY,
+        radiusX: 0,
+        radiusY: 0,
+      });
 
-    this.instance.addNode(node, this.container?.getAttrs().id);
+      this.instance.addNode(node, this.container?.getAttrs().id);
+    }
 
     this.setState(ELLIPSE_TOOL_STATE.DEFINING_SIZE);
   }
@@ -178,9 +180,11 @@ export class WeaveEllipseToolAction extends WeaveAction {
         radiusY: ellipseRadiusY,
       });
 
-      this.instance.updateNode(
-        nodeHandler.serialize(ellipse as WeaveElementInstance)
-      );
+      if (nodeHandler) {
+        this.instance.updateNode(
+          nodeHandler.serialize(ellipse as WeaveElementInstance)
+        );
+      }
     }
 
     this.cancelAction();
@@ -220,9 +224,11 @@ export class WeaveEllipseToolAction extends WeaveAction {
         radiusY: deltaY,
       });
 
-      this.instance.updateNode(
-        nodeHandler.serialize(ellipse as WeaveElementInstance)
-      );
+      if (nodeHandler) {
+        this.instance.updateNode(
+          nodeHandler.serialize(ellipse as WeaveElementInstance)
+        );
+      }
     }
   }
 

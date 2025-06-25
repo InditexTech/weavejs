@@ -21,13 +21,11 @@ export class WeaveActionsManager {
     return this.activeAction;
   }
 
-  triggerAction<T>(actionName: string, params?: T): unknown {
+  triggerAction<T, P>(actionName: string, params?: T): P | void {
     const actionsHandlers = this.instance.getActionsHandlers();
 
     if (!actionsHandlers[actionName]) {
-      const msg = `Action handler with name [${actionName}] not registered`;
-      this.logger.error(msg);
-      throw new Error(msg);
+      return;
     }
 
     if (typeof this.activeAction !== 'undefined') {
@@ -42,7 +40,7 @@ export class WeaveActionsManager {
 
     this.instance.emitEvent('onActiveActionChange', this.activeAction);
 
-    return payload;
+    return payload as P;
   }
 
   updatePropsAction(actionName: string, props: WeaveElementAttributes): void {

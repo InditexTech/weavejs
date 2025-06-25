@@ -80,6 +80,11 @@ export abstract class WeaveNode implements WeaveNodeBase {
   getSelectionPlugin(): WeaveNodesSelectionPlugin {
     const selectionPlugin =
       this.instance.getPlugin<WeaveNodesSelectionPlugin>('nodesSelection');
+
+    if (!selectionPlugin) {
+      throw new Error('WeaveNodesSelectionPlugin plugin not found');
+    }
+
     return selectionPlugin;
   }
 
@@ -90,7 +95,12 @@ export abstract class WeaveNode implements WeaveNodeBase {
   isPasting(): boolean {
     const copyPastePlugin =
       this.instance.getPlugin<WeaveCopyPasteNodesPlugin>('copyPasteNodes');
-    return copyPastePlugin.isPasting();
+
+    if (copyPastePlugin) {
+      return copyPastePlugin.isPasting();
+    }
+
+    return false;
   }
 
   setupDefaultNodeAugmentation(node: Konva.Node): void {
@@ -108,6 +118,7 @@ export abstract class WeaveNode implements WeaveNodeBase {
 
     let selected: boolean = false;
     if (
+      selectionPlugin &&
       selectionPlugin.getSelectedNodes().length === 1 &&
       selectionPlugin.getSelectedNodes()[0].getAttrs().id === ele.getAttrs().id
     ) {
@@ -177,9 +188,11 @@ export abstract class WeaveNode implements WeaveNodeBase {
         const nodeHandler = this.instance.getNodeHandler<WeaveNode>(
           node.getAttrs().nodeType
         );
-        this.instance.updateNode(
-          nodeHandler.serialize(node as WeaveElementInstance)
-        );
+        if (nodeHandler) {
+          this.instance.updateNode(
+            nodeHandler.serialize(node as WeaveElementInstance)
+          );
+        }
       }
     };
 
@@ -207,9 +220,11 @@ export abstract class WeaveNode implements WeaveNodeBase {
       const nodeHandler = this.instance.getNodeHandler<WeaveNode>(
         node.getAttrs().nodeType
       );
-      this.instance.updateNode(
-        nodeHandler.serialize(node as WeaveElementInstance)
-      );
+      if (nodeHandler) {
+        this.instance.updateNode(
+          nodeHandler.serialize(node as WeaveElementInstance)
+        );
+      }
     });
 
     node.on('dragstart', (e) => {
@@ -243,9 +258,11 @@ export abstract class WeaveNode implements WeaveNodeBase {
         const nodeHandler = this.instance.getNodeHandler<WeaveNode>(
           node.getAttrs().nodeType
         );
-        this.instance.updateNode(
-          nodeHandler.serialize(node as WeaveElementInstance)
-        );
+        if (nodeHandler) {
+          this.instance.updateNode(
+            nodeHandler.serialize(node as WeaveElementInstance)
+          );
+        }
       }
     };
 

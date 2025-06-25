@@ -18,36 +18,26 @@ export class WeavePluginsManager {
   enable(pluginName: string): void {
     const plugins = this.instance.getPlugins();
 
-    if (!plugins[pluginName]) {
-      const msg = `Plugin with name [${pluginName}] not registered`;
-      this.logger.error(msg);
-      throw new Error(msg);
+    if (plugins[pluginName]) {
+      plugins[pluginName].enable();
     }
-
-    plugins[pluginName].enable?.();
   }
 
   disable(pluginName: string): void {
     const plugins = this.instance.getPlugins();
 
-    if (!plugins[pluginName]) {
-      const msg = `Plugin with name [${pluginName}] not registered`;
-      this.logger.error(msg);
-      throw new Error(msg);
+    if (plugins[pluginName]) {
+      plugins[pluginName].disable();
     }
-
-    plugins[pluginName].disable?.();
   }
 
   isEnabled(pluginName: string): boolean {
     const plugins = this.instance.getPlugins();
 
-    if (!plugins[pluginName]) {
-      const msg = `Plugin with name [${pluginName}] not registered`;
-      this.logger.error(msg);
-      throw new Error(msg);
+    if (plugins[pluginName]) {
+      return plugins[pluginName].isEnabled();
     }
 
-    return plugins[pluginName].isEnabled?.();
+    return false;
   }
 }

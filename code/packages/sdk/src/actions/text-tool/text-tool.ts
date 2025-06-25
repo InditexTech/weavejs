@@ -118,14 +118,15 @@ export class WeaveTextToolAction extends WeaveAction {
 
     const nodeHandler = this.instance.getNodeHandler<WeaveTextNode>('text');
 
-    const node = nodeHandler.create(this.textId, {
-      ...this.props,
-      x: this.clickPoint?.x ?? 0,
-      y: this.clickPoint?.y ?? 0,
-      draggable: true,
-    });
-
-    this.instance.addNode(node, this.container?.getAttrs().id);
+    if (nodeHandler) {
+      const node = nodeHandler.create(this.textId, {
+        ...this.props,
+        x: this.clickPoint?.x ?? 0,
+        y: this.clickPoint?.y ?? 0,
+        draggable: true,
+      });
+      this.instance.addNode(node, this.container?.getAttrs().id);
+    }
 
     this.setState(TEXT_TOOL_STATE.FINISHED);
     this.cancelAction();

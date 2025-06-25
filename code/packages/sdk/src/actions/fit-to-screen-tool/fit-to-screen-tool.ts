@@ -17,16 +17,20 @@ export class WeaveFitToScreenToolAction extends WeaveAction {
   }
 
   private getStageZoomPlugin() {
-    return this.instance.getPlugin<WeaveStageZoomPlugin>('stageZoom');
-  }
+    const stageZoomPlugin =
+      this.instance.getPlugin<WeaveStageZoomPlugin>('stageZoom');
 
-  onInit(): void {
-    const stageZoomPlugin = this.getStageZoomPlugin();
     if (!stageZoomPlugin) {
       throw new Error(
         'WeaveFitToScreenToolAction requires the WeaveStageZoomPlugin to be loaded'
       );
     }
+
+    return stageZoomPlugin;
+  }
+
+  onInit(): void {
+    this.getStageZoomPlugin();
   }
 
   trigger(
@@ -35,7 +39,9 @@ export class WeaveFitToScreenToolAction extends WeaveAction {
   ): void {
     const stageZoomPlugin = this.getStageZoomPlugin();
 
-    stageZoomPlugin.fitToScreen();
+    if (stageZoomPlugin) {
+      stageZoomPlugin.fitToScreen();
+    }
 
     this.previousAction = params.previousAction;
     this.cancelAction = cancelAction;

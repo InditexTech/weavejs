@@ -55,8 +55,9 @@ import { WeaveNodesSelectionPlugin } from './plugins/nodes-selection/nodes-selec
 import type { StageConfig } from 'konva/lib/Stage';
 import type { WeaveStoreOnRoomLoadedEvent } from './stores/types';
 
-export class Weave extends Emittery {
+export class Weave {
   private id: string;
+  private emitter: Emittery;
   private config: WeaveConfig;
   private logger: WeaveLogger;
   private moduleLogger: Logger;
@@ -81,7 +82,7 @@ export class Weave extends Emittery {
   private exportManager: WeaveExportManager;
 
   constructor(weaveConfig: WeaveConfig, stageConfig: Konva.StageConfig) {
-    super();
+    this.emitter = new Emittery();
 
     Konva.showWarnings = false;
 
@@ -240,7 +241,7 @@ export class Weave extends Emittery {
     this.moduleLogger.info(`Destroying the instance`);
 
     // clear listeners
-    this.clearListeners();
+    this.emitter.clearListeners();
 
     this.status = WEAVE_INSTANCE_STATUS.IDLE;
     this.emitEvent('onInstanceStatus', this.status);
@@ -280,17 +281,17 @@ export class Weave extends Emittery {
 
   emitEvent<T>(event: string, payload?: T): void {
     this.moduleLogger.debug({ payload }, `Emitted event [${event}]`);
-    this.emit(event, payload);
+    this.emitter.emit(event, payload);
   }
 
   addEventListener<T>(event: string, callback: (payload: T) => void): void {
     this.moduleLogger.debug(`Listening event [${event}]`);
-    this.on(event, callback);
+    this.emitter.on(event, callback);
   }
 
   removeEventListener<T>(event: string, callback: (payload: T) => void): void {
     this.moduleLogger.debug(`Removing listening to event [${event}]`);
-    this.off(event, callback);
+    this.emitter.off(event, callback);
   }
 
   // LOGGING MANAGEMENT METHODS PROXIES
@@ -354,7 +355,7 @@ export class Weave extends Emittery {
     return this.registerManager.getPlugins();
   }
 
-  getPlugin<T>(pluginName: string) {
+  getPlugin<T>(pluginName: string): T | undefined {
     return this.registerManager.getPlugin(pluginName) as T;
   }
 
@@ -362,16 +363,16 @@ export class Weave extends Emittery {
     return this.registerManager.getNodesHandlers();
   }
 
-  getNodeHandler<T>(nodeType: string) {
-    return this.registerManager.getNodeHandler(nodeType) as T;
+  getNodeHandler<T>(nodeType: string): T | undefined {
+    return this.registerManager.getNodeHandler(nodeType);
   }
 
   getActionsHandlers(): Record<string, WeaveAction> {
     return this.registerManager.getActionsHandlers();
   }
 
-  getActionHandler<T>(actionName: string) {
-    return this.registerManager.getActionHandler(actionName) as T;
+  getActionHandler<T>(actionName: string): T | undefined {
+    return this.registerManager.getActionHandler(actionName);
   }
 
   getStore<T extends WeaveStore>() {
@@ -413,8 +414,8 @@ export class Weave extends Emittery {
     return this.actionsManager.getActiveAction();
   }
 
-  triggerAction<T>(actionName: string, params?: T): unknown {
-    return this.actionsManager.triggerAction<T>(actionName, params);
+  triggerAction<T, P>(actionName: string, params?: T): P | void {
+    return this.actionsManager.triggerAction<T, P>(actionName, params);
   }
 
   getPropsAction(actionName: string): WeaveElementAttributes {

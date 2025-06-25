@@ -134,15 +134,16 @@ export class WeaveRegularPolygonToolAction extends WeaveAction {
     const nodeHandler =
       this.instance.getNodeHandler<WeaveRegularPolygonNode>('regular-polygon');
 
-    const node = nodeHandler.create(this.regularPolygonId, {
-      ...this.props,
-      strokeScaleEnabled: true,
-      x: (this.clickPoint?.x ?? 0) + this.props.radius,
-      y: (this.clickPoint?.y ?? 0) + this.props.radius,
-      radius: 0,
-    });
-
-    this.instance.addNode(node, this.container?.getAttrs().id);
+    if (nodeHandler) {
+      const node = nodeHandler.create(this.regularPolygonId, {
+        ...this.props,
+        strokeScaleEnabled: true,
+        x: (this.clickPoint?.x ?? 0) + this.props.radius,
+        y: (this.clickPoint?.y ?? 0) + this.props.radius,
+        radius: 0,
+      });
+      this.instance.addNode(node, this.container?.getAttrs().id);
+    }
 
     this.setState(REGULAR_POLYGON_TOOL_STATE.DEFINING_SIZE);
   }
@@ -185,9 +186,11 @@ export class WeaveRegularPolygonToolAction extends WeaveAction {
         radius: newRadius,
       });
 
-      this.instance.updateNode(
-        nodeHandler.serialize(regularPolygon as WeaveElementInstance)
-      );
+      if (nodeHandler) {
+        this.instance.updateNode(
+          nodeHandler.serialize(regularPolygon as WeaveElementInstance)
+        );
+      }
     }
 
     this.cancelAction();
@@ -234,9 +237,11 @@ export class WeaveRegularPolygonToolAction extends WeaveAction {
         radius: deltaX,
       });
 
-      this.instance.updateNode(
-        nodeHandler.serialize(regularPolygon as WeaveElementInstance)
-      );
+      if (nodeHandler) {
+        this.instance.updateNode(
+          nodeHandler.serialize(regularPolygon as WeaveElementInstance)
+        );
+      }
     }
   }
 

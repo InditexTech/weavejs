@@ -142,15 +142,17 @@ export class WeaveArrowToolAction extends WeaveAction {
     const nodeHandler = this.instance.getNodeHandler<WeaveArrowNode>('arrow');
     const lineNodeHandler = this.instance.getNodeHandler<WeaveLineNode>('line');
 
-    const node = lineNodeHandler.create(this.arrowId, {
-      ...this.props,
-      strokeScaleEnabled: true,
-      x: this.clickPoint?.x ?? 0,
-      y: this.clickPoint?.y ?? 0,
-      points: [0, 0],
-    });
+    if (lineNodeHandler) {
+      const node = lineNodeHandler.create(this.arrowId, {
+        ...this.props,
+        strokeScaleEnabled: true,
+        x: this.clickPoint?.x ?? 0,
+        y: this.clickPoint?.y ?? 0,
+        points: [0, 0],
+      });
 
-    this.instance.addNode(node, this.container?.getAttrs().id);
+      this.instance.addNode(node, this.container?.getAttrs().id);
+    }
 
     this.tempPoint = new Konva.Circle({
       x: this.clickPoint?.x ?? 0,
@@ -163,15 +165,17 @@ export class WeaveArrowToolAction extends WeaveAction {
     });
     this.measureContainer?.add(this.tempPoint);
 
-    const tempArrow = nodeHandler.create(this.tempArrowId, {
-      ...this.props,
-      x: this.clickPoint?.x ?? 0,
-      y: this.clickPoint?.y ?? 0,
-      strokeScaleEnabled: true,
-      points: [0, 0],
-    });
+    if (nodeHandler) {
+      const tempArrow = nodeHandler.create(this.tempArrowId, {
+        ...this.props,
+        x: this.clickPoint?.x ?? 0,
+        y: this.clickPoint?.y ?? 0,
+        strokeScaleEnabled: true,
+        points: [0, 0],
+      });
 
-    this.instance.addNode(tempArrow, this.container?.getAttrs().id);
+      this.instance.addNode(tempArrow, this.container?.getAttrs().id);
+    }
 
     this.tempNextPoint = new Konva.Circle({
       x: this.clickPoint?.x ?? 0,
@@ -220,9 +224,11 @@ export class WeaveArrowToolAction extends WeaveAction {
       const lineNodeHandler =
         this.instance.getNodeHandler<WeaveLineNode>('line');
 
-      this.instance.updateNode(
-        lineNodeHandler.serialize(tempMainArrow as WeaveElementInstance)
-      );
+      if (lineNodeHandler) {
+        this.instance.updateNode(
+          lineNodeHandler.serialize(tempMainArrow as WeaveElementInstance)
+        );
+      }
 
       this.tempPoint.setAttrs({
         x: mousePoint.x,
@@ -241,9 +247,11 @@ export class WeaveArrowToolAction extends WeaveAction {
         points: [0, 0],
       });
 
-      this.instance.updateNode(
-        nodeHandler.serialize(tempArrow as WeaveElementInstance)
-      );
+      if (nodeHandler) {
+        this.instance.updateNode(
+          nodeHandler.serialize(tempArrow as WeaveElementInstance)
+        );
+      }
     }
 
     this.setState(ARROW_TOOL_STATE.DEFINING_SIZE);
@@ -280,9 +288,11 @@ export class WeaveArrowToolAction extends WeaveAction {
 
       const nodeHandler = this.instance.getNodeHandler<WeaveArrowNode>('arrow');
 
-      this.instance.updateNode(
-        nodeHandler.serialize(tempArrow as WeaveElementInstance)
-      );
+      if (nodeHandler) {
+        this.instance.updateNode(
+          nodeHandler.serialize(tempArrow as WeaveElementInstance)
+        );
+      }
 
       this.tempNextPoint.setAttrs({
         x: mousePoint.x,
@@ -333,16 +343,22 @@ export class WeaveArrowToolAction extends WeaveAction {
 
     if (tempArrow) {
       const nodeHandler = this.instance.getNodeHandler<WeaveArrowNode>('arrow');
-      this.instance.removeNode(
-        nodeHandler.serialize(tempArrow as WeaveElementInstance)
-      );
+
+      if (nodeHandler) {
+        this.instance.removeNode(
+          nodeHandler.serialize(tempArrow as WeaveElementInstance)
+        );
+      }
     }
 
     if (this.arrowId && tempMainArrow && tempMainArrow.points().length < 4) {
       const nodeHandler = this.instance.getNodeHandler<WeaveLineNode>('line');
-      this.instance.removeNode(
-        nodeHandler.serialize(tempMainArrow as WeaveElementInstance)
-      );
+
+      if (nodeHandler) {
+        this.instance.removeNode(
+          nodeHandler.serialize(tempMainArrow as WeaveElementInstance)
+        );
+      }
     }
 
     if (this.arrowId && tempMainArrow && tempMainArrow.points().length >= 4) {
@@ -350,18 +366,20 @@ export class WeaveArrowToolAction extends WeaveAction {
       const lineNodeHandler =
         this.instance.getNodeHandler<WeaveLineNode>('line');
 
-      const finalArrow = nodeHandler.create(this.arrowId, {
-        ...tempMainArrow.getAttrs(),
-        ...this.props,
-        strokeScaleEnabled: true,
-        strokeWidth: 1,
-        hitStrokeWidth: 16,
-      });
+      if (nodeHandler && lineNodeHandler) {
+        const finalArrow = nodeHandler.create(this.arrowId, {
+          ...tempMainArrow.getAttrs(),
+          ...this.props,
+          strokeScaleEnabled: true,
+          strokeWidth: 1,
+          hitStrokeWidth: 16,
+        });
 
-      this.instance.removeNode(
-        lineNodeHandler.serialize(tempMainArrow as WeaveElementInstance)
-      );
-      this.instance.addNode(finalArrow, this.container?.getAttrs().id);
+        this.instance.removeNode(
+          lineNodeHandler.serialize(tempMainArrow as WeaveElementInstance)
+        );
+        this.instance.addNode(finalArrow, this.container?.getAttrs().id);
+      }
     }
 
     const selectionPlugin =

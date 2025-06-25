@@ -89,7 +89,7 @@ export type WeaveState = {
 
 export type WeaveSelection = {
   instance: Konva.Shape | Konva.Group;
-  node: WeaveStateElement;
+  node: WeaveStateElement | undefined;
 };
 
 export type WeaveMousePointInfoSimple = {

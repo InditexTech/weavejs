@@ -160,12 +160,14 @@ export const Room = () => {
       </AnimatePresence>
       {loadedParams && room && user && storeProvider && (
         <WeaveProvider
-          containerId="weave"
+          getContainer={() => {
+            return document.getElementById('weave') as HTMLDivElement;
+          }}
           store={storeProvider}
           fonts={FONTS}
-          nodes={NODES}
-          actions={ACTIONS}
+          nodes={NODES()}
           plugins={PLUGINS(getUser)}
+          actions={ACTIONS()}
         >
           <UploadFile />
           <RoomLayout />

@@ -18,26 +18,34 @@ export class WeaveFitToSelectionToolAction extends WeaveAction {
   }
 
   private getNodesSelectionPlugin() {
-    return this.instance.getPlugin<WeaveNodesSelectionPlugin>('nodesSelection');
+    const nodesSelectionPlugin =
+      this.instance.getPlugin<WeaveNodesSelectionPlugin>('nodesSelection');
+
+    if (!nodesSelectionPlugin) {
+      throw new Error(
+        'WeaveFitToSelectionToolAction requires the WeaveNodesSelectionPlugin to be loaded'
+      );
+    }
+
+    return nodesSelectionPlugin;
   }
 
   private getStageZoomPlugin() {
-    return this.instance.getPlugin<WeaveStageZoomPlugin>('stageZoom');
+    const stageZoomPlugin =
+      this.instance.getPlugin<WeaveStageZoomPlugin>('stageZoom');
+
+    if (!stageZoomPlugin) {
+      throw new Error(
+        'WeaveFitToSelectionToolAction requires the WeaveStageZoomPlugin to be loaded'
+      );
+    }
+
+    return stageZoomPlugin;
   }
 
   onInit(): void {
-    const stageZoomPlugin = this.getStageZoomPlugin();
-    if (!stageZoomPlugin) {
-      throw new Error(
-        'WeaveFitToSelectionTool requires the WeaveStageZoomPlugin to be loaded'
-      );
-    }
-    const nodesSelectionPlugin = this.getNodesSelectionPlugin();
-    if (!nodesSelectionPlugin) {
-      throw new Error(
-        'WeaveFitToSelectionTool requires the WeaveNodeSelectionPlugin to be loaded'
-      );
-    }
+    this.getStageZoomPlugin();
+    this.getNodesSelectionPlugin();
   }
 
   trigger(

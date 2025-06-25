@@ -17,16 +17,20 @@ export class WeaveZoomInToolAction extends WeaveAction {
   }
 
   private getStageZoomPlugin() {
-    return this.instance.getPlugin<WeaveStageZoomPlugin>('stageZoom');
-  }
+    const stageZoomPlugin =
+      this.instance.getPlugin<WeaveStageZoomPlugin>('stageZoom');
 
-  onInit(): void {
-    const stageZoomPlugin = this.getStageZoomPlugin();
     if (!stageZoomPlugin) {
       throw new Error(
         'WeaveZoomInToolAction requires the WeaveStageZoomPlugin to be loaded'
       );
     }
+
+    return stageZoomPlugin;
+  }
+
+  onInit(): void {
+    this.getStageZoomPlugin();
   }
 
   trigger(cancelAction: () => void, params: WeaveZoomInToolActionParams): void {

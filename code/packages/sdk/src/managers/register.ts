@@ -33,32 +33,16 @@ export class WeaveRegisterManager {
     return this.actionsHandlers;
   }
 
-  getPlugin<T>(pluginName: string) {
-    if (!this.plugins[pluginName]) {
-      const msg = `Plugin with name [${pluginName}] is not registered`;
-      this.logger.error(msg);
-      throw new Error(msg);
-    }
-    return this.plugins[pluginName] as T;
+  getPlugin<T>(pluginName: string): T | undefined {
+    return this.plugins?.[pluginName] as T;
   }
 
-  getActionHandler<T>(actionName: string) {
-    if (!this.actionsHandlers[actionName]) {
-      const msg = `Action handler with name [${actionName}] is not registered`;
-      this.logger.error(msg);
-      throw new Error(msg);
-    }
-    return this.actionsHandlers[actionName] as T;
+  getActionHandler<T>(actionName: string): T | undefined {
+    return this.actionsHandlers?.[actionName] as T;
   }
 
-  getNodeHandler(nodeType: string): WeaveNode {
-    if (!this.nodesHandlers[nodeType]) {
-      const msg = `Node handler with type [${nodeType}] is not registered`;
-      this.logger.error(msg);
-      throw new Error(msg);
-    }
-
-    return this.nodesHandlers[nodeType];
+  getNodeHandler<T>(nodeType: string): T | undefined {
+    return this.nodesHandlers?.[nodeType] as T;
   }
 
   registerPlugins(): void {

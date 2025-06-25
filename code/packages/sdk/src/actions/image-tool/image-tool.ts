@@ -123,9 +123,12 @@ export class WeaveImageToolAction extends WeaveAction {
 
         const nodeHandler =
           this.instance.getNodeHandler<WeaveRectangleNode>('rectangle');
-        this.instance.updateNode(
-          nodeHandler.serialize(tempImage as WeaveElementInstance)
-        );
+
+        if (nodeHandler) {
+          this.instance.updateNode(
+            nodeHandler.serialize(tempImage as WeaveElementInstance)
+          );
+        }
       }
     });
 
@@ -200,21 +203,23 @@ export class WeaveImageToolAction extends WeaveAction {
         this.preloadImgs[this.imageId].width /
         this.preloadImgs[this.imageId].height;
 
-      const node = nodeHandler.create(this.tempImageId, {
-        x: (mousePos?.x ?? 0) + 5,
-        y: (mousePos?.y ?? 0) + 5,
-        width: 100 * aspectRatio,
-        height: 100,
-        opacity: 1,
-        adding: true,
-        imageURL: this.imageURL,
-        stroke: '#000000ff',
-        strokeWidth: 0,
-        strokeScaleEnabled: true,
-        listening: false,
-      });
+      if (nodeHandler) {
+        const node = nodeHandler.create(this.tempImageId, {
+          x: (mousePos?.x ?? 0) + 5,
+          y: (mousePos?.y ?? 0) + 5,
+          width: 100 * aspectRatio,
+          height: 100,
+          opacity: 1,
+          adding: true,
+          imageURL: this.imageURL,
+          stroke: '#000000ff',
+          strokeWidth: 0,
+          strokeScaleEnabled: true,
+          listening: false,
+        });
 
-      this.instance.addNode(node, this.container?.getAttrs().id);
+        this.instance.addNode(node, this.container?.getAttrs().id);
+      }
     }
 
     this.clickPoint = null;
@@ -245,32 +250,37 @@ export class WeaveImageToolAction extends WeaveAction {
 
       const nodeHandler = this.instance.getNodeHandler<WeaveImageNode>('image');
 
-      const node = nodeHandler.create(this.imageId, {
-        ...this.props,
-        x: this.clickPoint?.x ?? 0,
-        y: this.clickPoint?.y ?? 0,
-        opacity: 1,
-        adding: false,
-        imageURL: this.imageURL,
-        stroke: '#000000ff',
-        strokeWidth: 0,
-        strokeScaleEnabled: true,
-        imageWidth: this.preloadImgs[this.imageId].width,
-        imageHeight: this.preloadImgs[this.imageId].height,
-        imageInfo: {
-          width: this.preloadImgs[this.imageId].width,
-          height: this.preloadImgs[this.imageId].height,
-        },
-      });
+      if (nodeHandler) {
+        const node = nodeHandler.create(this.imageId, {
+          ...this.props,
+          x: this.clickPoint?.x ?? 0,
+          y: this.clickPoint?.y ?? 0,
+          opacity: 1,
+          adding: false,
+          imageURL: this.imageURL,
+          stroke: '#000000ff',
+          strokeWidth: 0,
+          strokeScaleEnabled: true,
+          imageWidth: this.preloadImgs[this.imageId].width,
+          imageHeight: this.preloadImgs[this.imageId].height,
+          imageInfo: {
+            width: this.preloadImgs[this.imageId].width,
+            height: this.preloadImgs[this.imageId].height,
+          },
+        });
 
-      this.instance.addNode(node, this.container?.getAttrs().id);
+        this.instance.addNode(node, this.container?.getAttrs().id);
+      }
 
       if (!position) {
         const imageNodeHandler =
           this.instance.getNodeHandler<WeaveImageNode>('image');
-        this.instance.removeNode(
-          imageNodeHandler.serialize(tempImage as WeaveElementInstance)
-        );
+
+        if (imageNodeHandler) {
+          this.instance.removeNode(
+            imageNodeHandler.serialize(tempImage as WeaveElementInstance)
+          );
+        }
       }
 
       this.setState(IMAGE_TOOL_STATE.FINISHED);
@@ -321,9 +331,12 @@ export class WeaveImageToolAction extends WeaveAction {
     if (tempImage) {
       const nodeHandler =
         this.instance.getNodeHandler<WeaveRectangleNode>('rectangle');
-      this.instance.removeNode(
-        nodeHandler.serialize(tempImage as WeaveElementInstance)
-      );
+
+      if (nodeHandler) {
+        this.instance.removeNode(
+          nodeHandler.serialize(tempImage as WeaveElementInstance)
+        );
+      }
     }
 
     const selectionPlugin =

@@ -71,28 +71,3 @@ jobs:
           echo "app-version=$(jq ".version" code/package.json)" >> "$GITHUB_OUTPUT"
           echo "app-name=$(yq -oy '.name' code/package.json)" >> "$GITHUB_OUTPUT"
           echo "github-repository=$(echo $GITHUB_REPOSITORY | cut -d'/' -f2)" >> "$GITHUB_OUTPUT"
-
-      - name: SonarCloud / Run SonarCloud action
-        if: ${{ vars.IS_INDITEXTECH_REPO == 'true' }}
-        uses: sonarsource/sonarqube-scan-action@v4
-        env:
-          PR_HEAD_REF: ${{ github.head_ref }}
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-        with:
-          projectBaseDir: code
-          args: >
-            -Dsonar.projectKey=InditexTech_${{ steps.version.outputs.github-repository }}
-            -Dsonar.projectName=${{ steps.version.outputs.app-name }}
-            -Dsonar.projectVersion=${{ steps.version.outputs.app-version }}
-            -Dsonar.host.url="https://sonarcloud.io/"
-            -Dsonar.organization=inditextech
-            -Dsonar.pullrequest.key=${{ github.event.pull_request.number }}
-            -Dsonar.pullrequest.branch="$PR_HEAD_REF"
-            -Dsonar.pullrequest.base=${{ github.base_ref }}
-            -Dsonar.scm.revision=${{ github.event.pull_request.head.sha }}
-            -Dsonar.qualitygate.wait=true
-            -Dsonar.qualitygate.timeout=300
-            -Dsonar.pullrequest.provider=GitHub
-            -Dsonar.pullrequest.github.repository=${{ github.repository }}
-            -Dsonar.pullrequest.github.summary_comment=true

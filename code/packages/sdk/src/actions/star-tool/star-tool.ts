@@ -132,17 +132,18 @@ export class WeaveStarToolAction extends WeaveAction {
 
     const nodeHandler = this.instance.getNodeHandler<WeaveStarNode>('star');
 
-    const node = nodeHandler.create(this.starId, {
-      ...this.props,
-      strokeScaleEnabled: true,
-      x: this.clickPoint?.x ?? 0 + this.props.outerRadius,
-      y: this.clickPoint?.y ?? 0 + this.props.outerRadius,
-      numPoints: 5,
-      innerRadius: 0,
-      outerRadius: 0,
-    });
-
-    this.instance.addNode(node, this.container?.getAttrs().id);
+    if (nodeHandler) {
+      const node = nodeHandler.create(this.starId, {
+        ...this.props,
+        strokeScaleEnabled: true,
+        x: this.clickPoint?.x ?? 0 + this.props.outerRadius,
+        y: this.clickPoint?.y ?? 0 + this.props.outerRadius,
+        numPoints: 5,
+        innerRadius: 0,
+        outerRadius: 0,
+      });
+      this.instance.addNode(node, this.container?.getAttrs().id);
+    }
 
     this.setState(STAR_TOOL_STATE.DEFINING_SIZE);
   }
@@ -178,9 +179,11 @@ export class WeaveStarToolAction extends WeaveAction {
         innerRadius: starInnerRadius,
       });
 
-      this.instance.updateNode(
-        nodeHandler.serialize(star as WeaveElementInstance)
-      );
+      if (nodeHandler) {
+        this.instance.updateNode(
+          nodeHandler.serialize(star as WeaveElementInstance)
+        );
+      }
     }
 
     this.cancelAction();
@@ -219,9 +222,11 @@ export class WeaveStarToolAction extends WeaveAction {
         innerRadius: deltaY,
       });
 
-      this.instance.updateNode(
-        nodeHandler.serialize(star as WeaveElementInstance)
-      );
+      if (nodeHandler) {
+        this.instance.updateNode(
+          nodeHandler.serialize(star as WeaveElementInstance)
+        );
+      }
     }
   }
 

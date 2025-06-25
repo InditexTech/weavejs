@@ -32,8 +32,10 @@ export class WeaveZIndexManager {
     const handler = this.instance.getNodeHandler<WeaveNode>(
       instance.getAttrs().nodeType
     );
-    const node = handler.serialize(instance);
-    this.instance.moveNode(node, WEAVE_NODE_POSITION.UP);
+    if (handler) {
+      const node = handler.serialize(instance);
+      this.instance.moveNode(node, WEAVE_NODE_POSITION.UP);
+    }
   }
 
   moveDown(instance: WeaveElementInstance): void {
@@ -48,8 +50,10 @@ export class WeaveZIndexManager {
     const handler = this.instance.getNodeHandler<WeaveNode>(
       instance.getAttrs().nodeType
     );
-    const node = handler.serialize(instance);
-    this.instance.moveNode(node, WEAVE_NODE_POSITION.DOWN);
+    if (handler) {
+      const node = handler.serialize(instance);
+      this.instance.moveNode(node, WEAVE_NODE_POSITION.DOWN);
+    }
   }
 
   sendToBack(instance: WeaveElementInstance): void {
@@ -64,8 +68,10 @@ export class WeaveZIndexManager {
     const handler = this.instance.getNodeHandler<WeaveNode>(
       instance.getAttrs().nodeType
     );
-    const node = handler.serialize(instance);
-    this.instance.moveNode(node, WEAVE_NODE_POSITION.BACK);
+    if (handler) {
+      const node = handler.serialize(instance);
+      this.instance.moveNode(node, WEAVE_NODE_POSITION.BACK);
+    }
   }
 
   bringToFront(instance: WeaveElementInstance): void {
@@ -78,8 +84,10 @@ export class WeaveZIndexManager {
     const handler = this.instance.getNodeHandler<WeaveNode>(
       instance.getAttrs().nodeType
     );
-    const node = handler.serialize(instance);
-    this.instance.updateNode(node);
-    this.instance.moveNode(node, WEAVE_NODE_POSITION.FRONT);
+    if (handler) {
+      const node = handler.serialize(instance);
+      this.instance.updateNode(node);
+      this.instance.moveNode(node, WEAVE_NODE_POSITION.FRONT);
+    }
   }
 }

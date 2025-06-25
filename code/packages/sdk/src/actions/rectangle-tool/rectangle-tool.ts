@@ -131,16 +131,17 @@ export class WeaveRectangleToolAction extends WeaveAction {
     const nodeHandler =
       this.instance.getNodeHandler<WeaveRectangleNode>('rectangle');
 
-    const node = nodeHandler.create(this.rectId, {
-      ...this.props,
-      strokeScaleEnabled: true,
-      x: this.clickPoint?.x ?? 0,
-      y: this.clickPoint?.y ?? 0,
-      width: 0,
-      height: 0,
-    });
-
-    this.instance.addNode(node, this.container?.getAttrs().id);
+    if (nodeHandler) {
+      const node = nodeHandler.create(this.rectId, {
+        ...this.props,
+        strokeScaleEnabled: true,
+        x: this.clickPoint?.x ?? 0,
+        y: this.clickPoint?.y ?? 0,
+        width: 0,
+        height: 0,
+      });
+      this.instance.addNode(node, this.container?.getAttrs().id);
+    }
 
     this.setState(RECTANGLE_TOOL_STATE.DEFINING_SIZE);
   }
@@ -177,9 +178,11 @@ export class WeaveRectangleToolAction extends WeaveAction {
         height: rectHeight,
       });
 
-      this.instance.updateNode(
-        nodeHandler.serialize(rectangle as WeaveElementInstance)
-      );
+      if (nodeHandler) {
+        this.instance.updateNode(
+          nodeHandler.serialize(rectangle as WeaveElementInstance)
+        );
+      }
     }
 
     this.cancelAction();
@@ -208,9 +211,11 @@ export class WeaveRectangleToolAction extends WeaveAction {
         height: deltaY,
       });
 
-      this.instance.updateNode(
-        nodeHandler.serialize(rectangle as WeaveElementInstance)
-      );
+      if (nodeHandler) {
+        this.instance.updateNode(
+          nodeHandler.serialize(rectangle as WeaveElementInstance)
+        );
+      }
     }
   }
 

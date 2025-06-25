@@ -324,9 +324,11 @@ export class WeaveCopyPasteNodesPlugin extends WeavePlugin {
   private getNodesSelectionPlugin() {
     const nodesSelectionPlugin =
       this.instance.getPlugin<WeaveNodesSelectionPlugin>('nodesSelection');
+
     if (!nodesSelectionPlugin) {
-      throw new Error('Nodes selection plugin not found');
+      throw new Error('WeaveNodesSelectionPlugin plugin not found');
     }
+
     return nodesSelectionPlugin;
   }
 

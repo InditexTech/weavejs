@@ -85,7 +85,7 @@ export class WeaveContextMenuPlugin extends WeavePlugin {
 
     let nodes: WeaveSelection[] = [];
 
-    if (clickOnTransformer) {
+    if (clickOnTransformer && selectionPlugin) {
       const transformer = selectionPlugin.getTransformer();
 
       nodes = transformer
@@ -97,10 +97,10 @@ export class WeaveContextMenuPlugin extends WeavePlugin {
 
           return {
             instance: node as WeaveElementInstance,
-            node: nodeHandler.serialize(node as WeaveElementInstance),
+            node: nodeHandler?.serialize(node as WeaveElementInstance),
           };
         })
-        .filter((node) => node !== undefined);
+        .filter((node) => typeof node !== 'undefined');
     }
 
     const containerRect = stage.container().getBoundingClientRect();

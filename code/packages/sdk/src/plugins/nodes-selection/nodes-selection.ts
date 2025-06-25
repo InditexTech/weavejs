@@ -130,6 +130,11 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
   isPasting(): boolean {
     const copyPastePlugin =
       this.instance.getPlugin<WeaveCopyPasteNodesPlugin>('copyPasteNodes');
+
+    if (!copyPastePlugin) {
+      return false;
+    }
+
     return copyPastePlugin.isPasting();
   }
 
@@ -290,6 +295,11 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
               const nodeHandler = this.instance.getNodeHandler<WeaveNode>(
                 node.getAttrs().nodeType
               );
+
+              if (!nodeHandler) {
+                return resolve();
+              }
+
               toUpdate.push(
                 nodeHandler.serialize(node as WeaveElementInstance)
               );
@@ -304,23 +314,14 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
           promises.push(nodeUpdatePromise(selectedNodes[i]));
         }
 
-        Promise.all(promises).then(() => {
-          if (toUpdate.length > 0) {
+        Promise.allSettled(promises).then((results) => {
+          if (results.length > 0) {
             this.instance.updateNodes(toUpdate);
           }
 
           stage.container().style.cursor = actualCursor;
         });
       }
-
-      // const usersSelectionPlugin =
-      //   this.instance.getPlugin<WeaveUsersSelectionPlugin>(
-      //     WEAVE_USERS_SELECTION_KEY
-      //   );
-
-      // if (usersSelectionPlugin) {
-      //   usersSelectionPlugin.sendSelectionAwarenessInfo(this.tr);
-      // }
 
       tr.forceUpdate();
     });
@@ -341,7 +342,7 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
 
     this.initialized = true;
 
-    this.instance.on(
+    this.instance.addEventListener(
       'onActiveActionChange',
       (activeAction: string | undefined) => {
         if (
@@ -356,22 +357,26 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
       }
     );
 
-    this.instance.on('onStateChange', () => {
+    this.instance.addEventListener('onStateChange', () => {
       this.triggerSelectedNodesEvent();
     });
-    this.instance.on('onNodeRemoved', (node: NodeSerializable) => {
-      const selectedNodes = this.getSelectedNodes();
-      const newSelectedNodes = selectedNodes.filter((actNode) => {
-        return actNode.getAttrs().id !== node.id;
-      });
 
-      this.tr.nodes(newSelectedNodes);
-      this.triggerSelectedNodesEvent();
+    this.instance.addEventListener(
+      'onNodeRemoved',
+      (node: NodeSerializable) => {
+        const selectedNodes = this.getSelectedNodes();
+        const newSelectedNodes = selectedNodes.filter((actNode) => {
+          return actNode.getAttrs().id !== node.id;
+        });
 
-      stage.container().tabIndex = 1;
-      stage.container().focus();
-      stage.container().style.cursor = 'default';
-    });
+        this.tr.nodes(newSelectedNodes);
+        this.triggerSelectedNodesEvent();
+
+        stage.container().tabIndex = 1;
+        stage.container().focus();
+        stage.container().style.cursor = 'default';
+      }
+    );
   }
 
   private getLayer() {
@@ -385,7 +390,7 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
       const nodeHandler = this.instance.getNodeHandler<WeaveNode>(nodeType);
       return {
         instance: node as Konva.Shape | Konva.Group,
-        node: nodeHandler.serialize(node as Konva.Shape | Konva.Group),
+        node: nodeHandler?.serialize(node as Konva.Shape | Konva.Group),
       };
     });
 
@@ -406,12 +411,14 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
 
   removeSelectedNodes(): void {
     const selectedNodes = this.getSelectedNodes();
-    const mappedSelectedNodes = selectedNodes.map((node) => {
-      const handler = this.instance.getNodeHandler<WeaveNode>(
-        node.getAttrs().nodeType
-      );
-      return handler.serialize(node);
-    });
+    const mappedSelectedNodes = selectedNodes
+      .map((node) => {
+        const handler = this.instance.getNodeHandler<WeaveNode>(
+          node.getAttrs().nodeType
+        );
+        return handler?.serialize(node);
+      })
+      .filter((node) => typeof node !== 'undefined');
     this.instance.removeNodes(mappedSelectedNodes);
     this.tr.nodes([]);
     this.triggerSelectedNodesEvent();
@@ -870,7 +877,7 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
       const nodeHandler = this.instance.getNodeHandler<WeaveNode>(nodeType);
       return {
         instance: node as Konva.Shape | Konva.Group,
-        node: nodeHandler.serialize(node as Konva.Shape | Konva.Group),
+        node: nodeHandler?.serialize(node as Konva.Shape | Konva.Group),
       };
     });
 

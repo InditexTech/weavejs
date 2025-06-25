@@ -51,10 +51,13 @@ export class WeaveEraserToolAction extends WeaveAction {
 
         const nodeType = realNode.getAttrs().nodeType;
         const nodeHandler = this.instance.getNodeHandler<WeaveNode>(nodeType);
-        const nodeSerialized = nodeHandler.serialize(
-          realNode as WeaveElementInstance
-        );
-        this.instance.removeNode(nodeSerialized);
+
+        if (nodeHandler) {
+          const nodeSerialized = nodeHandler.serialize(
+            realNode as WeaveElementInstance
+          );
+          this.instance.removeNode(nodeSerialized);
+        }
       }
     });
 
