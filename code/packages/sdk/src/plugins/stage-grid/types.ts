@@ -9,10 +9,14 @@ export type WeaveStageGridPluginConfig = {
   gridColor: string;
   gridOriginColor: string;
   gridSize: number;
+  gridMajorEvery?: number;
+  gridMajorRatio?: number;
+  gridStroke?: number;
+  gridDotRadius?: number;
 };
 
 export type WeaveStageGridPluginParams = {
-  config?: WeaveStageGridPluginConfig;
+  config?: Partial<WeaveStageGridPluginConfig>;
 };
 
 export type WeaveStageGridTypeKeys = keyof typeof WEAVE_GRID_TYPES;

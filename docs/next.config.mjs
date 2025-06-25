@@ -11,6 +11,16 @@ const config = {
   images: {
     unoptimized: true,
   },
+  async redirects() {
+    return [
+      {
+        source: "/",
+        destination: "/weavejs",
+        basePath: false,
+        permanent: false,
+      },
+    ];
+  },
 };
 
 export default withMDX(config);
