@@ -26,6 +26,7 @@ export class WeaveExportManager {
 
   exportNodes(
     nodes: WeaveElementInstance[],
+    boundingNodes: (nodes: Konva.Node[]) => Konva.Node[],
     options: WeaveExportNodesOptions
   ): Promise<HTMLImageElement> {
     return new Promise((resolve) => {
@@ -52,7 +53,7 @@ export class WeaveExportManager {
         .filter((node) => typeof node !== 'undefined');
 
       if (mainLayer) {
-        const bounds = getBoundingBox(stage, realNodes);
+        const bounds = getBoundingBox(stage, boundingNodes(realNodes));
 
         const scaleX = stage.scaleX();
         const scaleY = stage.scaleY();

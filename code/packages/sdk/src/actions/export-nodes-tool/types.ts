@@ -6,9 +6,11 @@ import {
   type WeaveElementInstance,
   type WeaveExportNodesOptions,
 } from '@inditextech/weave-types';
+import type Konva from 'konva';
 
 export type WeaveExportNodesActionParams = {
   nodes: WeaveElementInstance[];
+  boundingNodes?: (nodes: Konva.Node[]) => Konva.Node[];
   options?: WeaveExportNodesOptions;
   download?: boolean;
 };

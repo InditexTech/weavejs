@@ -13,6 +13,7 @@ import {
 import { WeaveAction } from '../action';
 import { EXPORT_STAGE_TOOL_ACTION_NAME } from './constants';
 import type { WeaveExportNodesActionParams } from '../export-nodes-tool/types';
+import type Konva from 'konva';
 
 export class WeaveExportStageToolAction extends WeaveAction {
   protected cancelAction!: () => void;
@@ -31,11 +32,14 @@ export class WeaveExportStageToolAction extends WeaveAction {
     return EXPORT_STAGE_TOOL_ACTION_NAME;
   }
 
-  private async exportStage() {
+  private async exportStage(
+    boundingNodes: (nodes: Konva.Node[]) => Konva.Node[]
+  ) {
     const mainLayer = this.instance.getMainLayer();
 
     const img = await this.instance.exportNodes(
       mainLayer?.getChildren() ?? [],
+      boundingNodes,
       this.options
     );
 
@@ -53,7 +57,7 @@ export class WeaveExportStageToolAction extends WeaveAction {
 
   async trigger(
     cancelAction: () => void,
-    { options }: WeaveExportNodesActionParams
+    { boundingNodes, options }: WeaveExportNodesActionParams
   ): Promise<void> {
     if (!this.instance) {
       throw new Error('Instance not defined');
@@ -70,7 +74,7 @@ export class WeaveExportStageToolAction extends WeaveAction {
       ...this.defaultFormatOptions,
       ...options,
     };
-    await this.exportStage();
+    await this.exportStage(boundingNodes ?? ((nodes) => nodes));
   }
 
   cleanup(): void {
