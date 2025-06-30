@@ -99,7 +99,7 @@ export class WeaveStagePanningPlugin extends WeavePlugin {
         enableMove = true;
       }
 
-      if (e && (e.evt.button === 2 || e.evt.buttons === 4)) {
+      if (!enableMove && e && e.evt.button === 1) {
         this.isMouseMiddleButtonPressed = true;
         enableMove = true;
       }
