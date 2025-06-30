@@ -7,6 +7,7 @@ import { WEAVE_STAGE_PANNING_KEY } from './constants';
 import type { KonvaEventObject } from 'konva/lib/Node';
 import type Konva from 'konva';
 import { throttle } from 'lodash';
+import type { Stage } from 'konva/lib/Stage';
 
 export class WeaveStagePanningPlugin extends WeavePlugin {
   private moveToolActive: boolean;
@@ -208,20 +209,21 @@ export class WeaveStagePanningPlugin extends WeavePlugin {
       this.instance.emitEvent('onStageMove');
     });
 
-    const handleWheel = (e: WheelEvent) => {
+    const handleWheel = (e: KonvaEventObject<WheelEvent, Stage>) => {
+      e.evt.preventDefault();
       const stage = this.instance.getStage();
 
       if (!this.enabled || !stage.isFocused() || this.isCtrlOrMetaPressed) {
         return;
       }
 
-      stage.x(stage.x() - e.deltaX);
-      stage.y(stage.y() - e.deltaY);
+      stage.x(stage.x() - e.evt.deltaX);
+      stage.y(stage.y() - e.evt.deltaY);
 
       this.instance.emitEvent('onStageMove');
     };
 
-    window.addEventListener('wheel', throttle(handleWheel, 10));
+    stage.on('wheel', throttle(handleWheel, 10));
   }
 
   enable(): void {
