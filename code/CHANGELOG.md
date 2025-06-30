@@ -15,6 +15,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- [#459](https://github.com/InditexTech/weavejs/issues/459) Panning with wheel event outside stage moves the stage
 - [#460](https://github.com/InditexTech/weavejs/issues/460) Export selection doesn't export image on base scale
 
 ## [0.31.0] - 2025-06-25
