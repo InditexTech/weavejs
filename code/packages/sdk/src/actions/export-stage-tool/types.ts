@@ -3,7 +3,9 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { type WeaveExportNodesOptions } from '@inditextech/weave-types';
+import type Konva from 'konva';
 
 export type WeaveExportStageActionParams = {
+  boundingNodes?: (nodes: Konva.Node[]) => Konva.Node[];
   options?: WeaveExportNodesOptions;
 };

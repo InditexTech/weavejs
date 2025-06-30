@@ -642,8 +642,9 @@ export class Weave {
 
   public async exportNodes(
     nodes: WeaveElementInstance[],
+    boundingNodes: (nodes: Konva.Node[]) => Konva.Node[],
     options: WeaveExportNodesOptions
   ): Promise<HTMLImageElement> {
-    return await this.exportManager.exportNodes(nodes, options);
+    return await this.exportManager.exportNodes(nodes, boundingNodes, options);
   }
 }

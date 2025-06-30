@@ -13,6 +13,7 @@ import {
 import { type WeaveExportNodesActionParams } from './types';
 import { WeaveAction } from '../action';
 import { EXPORT_NODES_TOOL_ACTION_NAME } from './constants';
+import type Konva from 'konva';
 
 export class WeaveExportNodesToolAction extends WeaveAction {
   protected cancelAction!: () => void;
@@ -31,8 +32,15 @@ export class WeaveExportNodesToolAction extends WeaveAction {
     return EXPORT_NODES_TOOL_ACTION_NAME;
   }
 
-  private async exportNodes(nodes: WeaveElementInstance[]) {
-    const img = await this.instance.exportNodes(nodes, this.options);
+  private async exportNodes(
+    nodes: WeaveElementInstance[],
+    boundingNodes: (nodes: Konva.Node[]) => Konva.Node[]
+  ): Promise<void> {
+    const img = await this.instance.exportNodes(
+      nodes,
+      boundingNodes ?? ((nodes) => nodes),
+      this.options
+    );
 
     const link = document.createElement('a');
     link.href = img.src;
@@ -46,7 +54,12 @@ export class WeaveExportNodesToolAction extends WeaveAction {
 
   async trigger(
     cancelAction: () => void,
-    { nodes, options, download = true }: WeaveExportNodesActionParams
+    {
+      nodes,
+      boundingNodes,
+      options,
+      download = true,
+    }: WeaveExportNodesActionParams
   ): Promise<void | string> {
     if (!this.instance) {
       throw new Error('Instance not defined');
@@ -65,7 +78,11 @@ export class WeaveExportNodesToolAction extends WeaveAction {
     };
 
     if (!download) {
-      const img = await this.instance.exportNodes(nodes, this.options);
+      const img = await this.instance.exportNodes(
+        nodes,
+        boundingNodes ?? ((nodes) => nodes),
+        this.options
+      );
       const base64URL = this.instance.imageToBase64(
         img,
         this.options.format ?? 'image/png'
@@ -74,7 +91,7 @@ export class WeaveExportNodesToolAction extends WeaveAction {
       return base64URL;
     }
 
-    await this.exportNodes(nodes);
+    await this.exportNodes(nodes, boundingNodes ?? ((nodes) => nodes));
   }
 
   cleanup(): void {
