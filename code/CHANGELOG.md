@@ -15,7 +15,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
-- [#460](https://github.com/InditexTech/weavejs/issues/460) Export selection to image on base scale (1)
+- [#460](https://github.com/InditexTech/weavejs/issues/460) Export selection doesn't export image on base scale
 
 ## [0.31.0] - 2025-06-25
 
