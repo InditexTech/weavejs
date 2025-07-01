@@ -135,7 +135,7 @@ export class WeaveStageGridPlugin extends WeavePlugin {
 
     stage.on('mousemove', throttle(handleMouseMove, 50));
 
-    stage.on('touchmove', (e) => {
+    stage.on('pointermove', (e) => {
       e.evt.preventDefault();
 
       if (!this.enabled) {

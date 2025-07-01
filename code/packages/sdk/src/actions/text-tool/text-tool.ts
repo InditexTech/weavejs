@@ -68,7 +68,7 @@ export class WeaveTextToolAction extends WeaveAction {
       }
     });
 
-    stage.on('click tap', (e) => {
+    stage.on('pointerclick', (e) => {
       e.evt.preventDefault();
 
       if (this.state === TEXT_TOOL_STATE.IDLE) {
@@ -81,7 +81,7 @@ export class WeaveTextToolAction extends WeaveAction {
       }
     });
 
-    stage.on('mousemove touchmove', (e) => {
+    stage.on('mousemove pointermove', (e) => {
       e.evt.preventDefault();
     });
 

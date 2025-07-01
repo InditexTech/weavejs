@@ -34,6 +34,7 @@ import { WEAVE_USERS_SELECTION_KEY } from '../users-selection/constants';
 import type { WeaveUsersSelectionPlugin } from '../users-selection/users-selection';
 import type { KonvaEventObject } from 'konva/lib/Node';
 import { throttle } from 'lodash';
+import type { Stage } from 'konva/lib/Stage';
 
 export class WeaveNodesSelectionPlugin extends WeavePlugin {
   private tr!: Konva.Transformer;
@@ -44,6 +45,7 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
   private defaultEnabledAnchors: string[];
   private selecting: boolean;
   private initialized: boolean;
+  private pointers: Record<string, PointerEvent>;
   onRender: undefined;
 
   constructor(params?: WeaveNodesSelectionPluginParams) {
@@ -110,6 +112,7 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
     this.selecting = false;
     this.initialized = false;
     this.enabled = false;
+    this.pointers = {};
   }
 
   getName(): string {
@@ -329,12 +332,12 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
     this.tr = tr;
     this.selectionRectangle = selectionRectangle;
 
-    this.tr.on('dblclick dbltap', (evt) => {
+    this.tr.on('pointerdblclick', (evt) => {
       evt.cancelBubble = true;
 
       if (this.tr.getNodes().length === 1) {
         const node = this.tr.getNodes()[0];
-        node.fire('dblclick');
+        node.fire('pointerdblclick');
       }
     });
 
@@ -440,7 +443,9 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
       }
     });
 
-    stage.on('mousedown touchstart', (e) => {
+    stage.on('pointerdown', (e: KonvaEventObject<PointerEvent, Stage>) => {
+      this.pointers[e.evt.pointerId] = e.evt;
+
       if (!this.initialized) {
         return;
       }
@@ -449,11 +454,14 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
         return;
       }
 
-      if (e.evt.button && e.evt.button !== 0) {
+      if (e.evt.pointerType === 'mouse' && e.evt.button !== 0) {
         return;
       }
 
-      if (e.evt.touches && e.evt.touches.length > 1) {
+      if (
+        e.evt.pointerType === 'touch' &&
+        Object.keys(this.pointers).length > 1
+      ) {
         return;
       }
 
@@ -492,7 +500,7 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
     });
 
     const handleMouseMove = (
-      e: KonvaEventObject<MouseEvent | TouchEvent, Konva.Stage>
+      e: KonvaEventObject<PointerEvent, Konva.Stage>
     ) => {
       if (!this.initialized) {
         return;
@@ -503,9 +511,8 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
       }
 
       if (
-        e.evt instanceof TouchEvent &&
-        e.evt.touches &&
-        e.evt.touches.length > 1
+        e.evt.pointerType === 'touch' &&
+        Object.keys(this.pointers).length > 1
       ) {
         return;
       }
@@ -541,9 +548,11 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
       });
     };
 
-    stage.on('mousemove touchmove', throttle(handleMouseMove, 50));
+    stage.on('mousemove pointermove', throttle(handleMouseMove, 50));
 
-    stage.on('mouseup touchend', (e) => {
+    stage.on('mouseup pointerup', (e) => {
+      delete this.pointers[e.evt.pointerId];
+
       if (!this.initialized) {
         return;
       }
@@ -553,9 +562,8 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
       }
 
       if (
-        e.evt instanceof TouchEvent &&
-        e.evt.touches &&
-        e.evt.touches.length > 1
+        e.evt.pointerType === 'touch' &&
+        Object.keys(this.pointers).length + 1 > 1
       ) {
         return;
       }
@@ -669,7 +677,7 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
       stage.container().focus();
     });
 
-    stage.on('click tap', (e) => {
+    stage.on('pointerclick', (e) => {
       if (!this.enabled) {
         return;
       }

@@ -70,7 +70,7 @@ export class WeaveBrushToolAction extends WeaveAction {
       }
     });
 
-    stage.on('mousedown touchstart', (e) => {
+    stage.on('mousedown pointerdown', (e) => {
       if (this.state !== BRUSH_TOOL_STATE.IDLE) {
         return;
       }
@@ -81,7 +81,7 @@ export class WeaveBrushToolAction extends WeaveAction {
       e.evt.stopPropagation();
     });
 
-    stage.on('mousemove touchmove', (e) => {
+    stage.on('mousemove pointermove', (e) => {
       if (this.state !== BRUSH_TOOL_STATE.DEFINE_STROKE) {
         return;
       }
@@ -92,7 +92,7 @@ export class WeaveBrushToolAction extends WeaveAction {
       e.evt.stopPropagation();
     });
 
-    stage.on('mouseup touchend', (e) => {
+    stage.on('mouseup pointerup', (e) => {
       if (this.state !== BRUSH_TOOL_STATE.DEFINE_STROKE) {
         return;
       }

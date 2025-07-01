@@ -76,7 +76,7 @@ export class WeaveRegularPolygonToolAction extends WeaveAction {
       }
     });
 
-    stage.on('mousedown touchstart', (e) => {
+    stage.on('mousedown pointerdown', (e) => {
       e.evt.preventDefault();
 
       if (this.state === REGULAR_POLYGON_TOOL_STATE.ADDING) {
@@ -86,7 +86,7 @@ export class WeaveRegularPolygonToolAction extends WeaveAction {
       }
     });
 
-    stage.on('mousemove touchmove', (e) => {
+    stage.on('mousemove pointermove', (e) => {
       e.evt.preventDefault();
 
       if (this.state === REGULAR_POLYGON_TOOL_STATE.DEFINING_SIZE) {
@@ -96,7 +96,7 @@ export class WeaveRegularPolygonToolAction extends WeaveAction {
       }
     });
 
-    stage.on('mouseup touchend', (e) => {
+    stage.on('mouseup pointerup', (e) => {
       e.evt.preventDefault();
 
       if (this.state === REGULAR_POLYGON_TOOL_STATE.DEFINING_SIZE) {

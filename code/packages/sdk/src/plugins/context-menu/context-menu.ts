@@ -18,6 +18,7 @@ import {
   WEAVE_CONTEXT_MENU_KEY,
   WEAVE_CONTEXT_MENU_X_OFFSET_DEFAULT,
   WEAVE_CONTEXT_MENU_Y_OFFSET_DEFAULT,
+  WEAVE_CONTEXT_MENU_TAP_HOLD_TIMEOUT,
 } from './constants';
 import type { WeaveNode } from '@/nodes/node';
 import { WEAVE_NODES_SELECTION_KEY } from '@/plugins/nodes-selection/constants';
@@ -28,6 +29,7 @@ export class WeaveContextMenuPlugin extends WeavePlugin {
   private contextMenuVisible: boolean;
   private tapHold: boolean;
   private tapHoldTimeout: number;
+  private pointers: Record<string, PointerEvent>;
   getLayerName = undefined;
   initLayer = undefined;
   onRender: undefined;
@@ -38,13 +40,14 @@ export class WeaveContextMenuPlugin extends WeavePlugin {
     this.touchTimer = undefined;
     this.tapHold = false;
     this.contextMenuVisible = false;
-    this.tapHoldTimeout = 500;
+    this.tapHoldTimeout = WEAVE_CONTEXT_MENU_TAP_HOLD_TIMEOUT;
     const { config } = params ?? {};
     this.config = {
       xOffset: WEAVE_CONTEXT_MENU_X_OFFSET_DEFAULT,
       yOffset: WEAVE_CONTEXT_MENU_Y_OFFSET_DEFAULT,
       ...config,
     };
+    this.pointers = {};
   }
 
   getName(): string {
@@ -141,17 +144,15 @@ export class WeaveContextMenuPlugin extends WeavePlugin {
   private initEvents() {
     const stage = this.instance.getStage();
 
-    stage.on('touchstart', (e) => {
+    stage.on('pointerdown', (e) => {
+      this.pointers[e.evt.pointerId] = e.evt;
+
       e.evt.preventDefault();
 
       if (
-        e.evt instanceof TouchEvent &&
-        e.evt.touches &&
-        e.evt.touches.length > 1
+        e.evt.pointerType === 'touch' &&
+        Object.keys(this.pointers).length > 1
       ) {
-        if (this.touchTimer) {
-          clearTimeout(this.touchTimer);
-        }
         return;
       }
 
@@ -161,30 +162,26 @@ export class WeaveContextMenuPlugin extends WeavePlugin {
       }, this.tapHoldTimeout);
     });
 
-    stage.on('touchmove', () => {
+    stage.on('pointermove', () => {
       if (this.touchTimer) {
         clearTimeout(this.touchTimer);
       }
     });
 
-    stage.on('touchend', (e) => {
+    stage.on('pointerup', (e) => {
+      delete this.pointers[e.evt.pointerId];
+
       e.evt.preventDefault();
 
       if (
-        e.evt instanceof TouchEvent &&
-        e.evt.touches &&
-        e.evt.touches.length > 1
+        e.evt.pointerType === 'touch' &&
+        Object.keys(this.pointers).length + 1 > 1
       ) {
-        if (this.touchTimer) {
-          clearTimeout(this.touchTimer);
-        }
         return;
       }
 
       if (this.touchTimer) {
         clearTimeout(this.touchTimer);
-      }
-      if (this.tapHold) {
         this.tapHold = false;
       }
     });

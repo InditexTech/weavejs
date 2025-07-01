@@ -157,7 +157,7 @@ export class WeaveStagePanningPlugin extends WeavePlugin {
 
     stage.on('mousemove', throttle(handleMouseMove, 50));
 
-    stage.on('touchstart', (e) => {
+    stage.on('pointerdown', (e) => {
       e.evt.preventDefault();
 
       const mousePos = stage.getPointerPosition();
@@ -166,7 +166,7 @@ export class WeaveStagePanningPlugin extends WeavePlugin {
       previousMouseY = mousePos?.y ?? 0;
     });
 
-    stage.on('touchmove', (e) => {
+    stage.on('pointermove', (e) => {
       e.evt.preventDefault();
 
       const activeAction = this.instance.getActiveAction();
