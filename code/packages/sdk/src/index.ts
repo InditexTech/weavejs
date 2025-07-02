@@ -99,6 +99,9 @@ export { WeaveExportStageToolAction } from './actions/export-stage-tool/export-s
 export * from './actions/export-stage-tool/types';
 export { WeaveExportNodesToolAction } from './actions/export-nodes-tool/export-nodes-tool';
 export * from './actions/export-nodes-tool/types';
+export { WeaveAlignNodesToolAction } from './actions/align-nodes-tool/align-nodes-tool';
+export * from './actions/align-nodes-tool/constants';
+export * from './actions/align-nodes-tool/types';
 
 // Provided Plugins
 export { WeaveStageGridPlugin } from './plugins/stage-grid/stage-grid';
