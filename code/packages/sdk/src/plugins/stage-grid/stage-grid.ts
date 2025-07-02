@@ -92,12 +92,10 @@ export class WeaveStageGridPlugin extends WeavePlugin {
 
       if (e && e.evt.button === 0 && activeAction === 'moveTool') {
         this.moveToolActive = true;
-        // e.cancelBubble = true;
       }
 
       if (e && (e.evt.button === 2 || e.evt.buttons === 4)) {
         this.isMouseMiddleButtonPressed = true;
-        // e.cancelBubble = true;
       }
     });
 
@@ -106,12 +104,10 @@ export class WeaveStageGridPlugin extends WeavePlugin {
 
       if (e && e.evt.button === 0 && activeAction === 'moveTool') {
         this.moveToolActive = false;
-        // e.cancelBubble = true;
       }
 
       if (e && (e.evt.button === 1 || e.evt.buttons === 0)) {
         this.isMouseMiddleButtonPressed = false;
-        // e.cancelBubble = true;
       }
     });
 

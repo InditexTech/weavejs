@@ -100,7 +100,6 @@ export class WeaveStagePanningPlugin extends WeavePlugin {
 
       if (enableMove) {
         this.enableMove();
-        // e.cancelBubble = true;
       }
     });
 
@@ -125,7 +124,6 @@ export class WeaveStagePanningPlugin extends WeavePlugin {
 
       if (disableMove) {
         this.disableMove();
-        // e.cancelBubble = true;
       }
     });
 
