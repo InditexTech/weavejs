@@ -15,6 +15,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- [#168](https://github.com/InditexTech/weavejs/issues/168) Tool to align nodes in the middle, top or bottom both vertically or horizontally
 - [#472](https://github.com/InditexTech/weavejs/issues/472) Expose whether the content is empty
 
 ## [0.33.0] - 2025-07-02

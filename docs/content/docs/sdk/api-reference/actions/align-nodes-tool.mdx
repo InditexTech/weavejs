@@ -1,0 +1,80 @@
+---
+title: WeaveAlignNodesToolAction
+description: Align selected nodes tool
+---
+
+import { TypeTable } from "fumadocs-ui/components/type-table";
+
+## Overview
+
+The [WeaveAlignNodesToolAction](https://github.com/InditexTech/weavejs/blob/main/code/packages/sdk/src/actions/align-nodes-tool/align-nodes-tool.ts)
+class that allows users to align selected nodes vertically or horizontally.
+
+The class extends the [WeaveAction](/docs/sdk/api-reference/actions/action) class.
+
+## Name
+
+This action `name` property value is `alignNodesTools`.
+
+## Import
+
+```shell
+import { WeaveAlignNodesToolAction } from "@inditextech/weave-sdk";
+```
+
+## Instantiation
+
+```ts
+new WeaveAlignNodesToolAction();
+```
+
+## TypeScript types
+
+```ts
+export type WeaveAlignNodesToolActionAlignToKeys =
+  keyof typeof ALIGN_NODES_ALIGN_TO;
+export type WeaveAlignNodesToolActionAlignTo =
+  (typeof ALIGN_NODES_ALIGN_TO)[WeaveAlignNodesToolActionAlignToKeys];
+
+export type WeaveAlignNodesToolActionTriggerParams = {
+  alignTo: WeaveAlignNodesToolActionAlignTo;
+  triggerSelectionTool?: boolean;
+};
+```
+
+## Constants
+
+```ts
+export const ALIGN_NODES_ALIGN_TO = {
+  ["LEFT_HORIZONTAL"]: "left-horizontal",
+  ["CENTER_HORIZONTAL"]: "center-horizontal",
+  ["RIGHT_HORIZONTAL"]: "right-horizontal",
+  ["TOP_VERTICAL"]: "top-vertical",
+  ["CENTER_VERTICAL"]: "center-vertical",
+  ["BOTTOM_VERTICAL"]: "bottom-vertical",
+} as const;
+```
+
+## Trigger function params
+
+```ts
+trigger(cancelAction: () => void, params?: WeaveAlignNodesToolActionTriggerParams): void;
+```
+
+For `WeaveAlignNodesToolActionTriggerParams`:
+
+<TypeTable
+  type={{
+    ["alignTo"]: {
+      required: true,
+      description: "The alignment value for the nodes.",
+      type: "WeaveAlignNodesToolActionAlignTo",
+    },
+    ["triggerSelectionTool"]: {
+      required: true,
+      description:
+        "Indicates if the selection tool needs to be triggered when then tool finishes.",
+      type: "boolean",
+    },
+  }}
+/>
