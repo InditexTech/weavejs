@@ -33,9 +33,7 @@ export class WeaveEraserToolAction extends WeaveAction {
   private setupEvents() {
     const stage = this.instance.getStage();
 
-    stage.on('click tap', (e) => {
-      e.evt.preventDefault();
-
+    stage.on('pointerclick', () => {
       if (!this.erasing) {
         return;
       }

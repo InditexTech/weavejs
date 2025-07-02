@@ -62,9 +62,7 @@ export class WeaveFrameToolAction extends WeaveAction {
       }
     });
 
-    stage.on('click tap', (e) => {
-      e.evt.preventDefault();
-
+    stage.on('pointerclick', () => {
       if (this.state === FRAME_TOOL_STATE.IDLE) {
         return;
       }

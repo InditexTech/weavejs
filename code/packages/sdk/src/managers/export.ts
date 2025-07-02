@@ -72,6 +72,7 @@ export class WeaveExportManager {
           y: unscaledBounds.y - padding,
           width: unscaledBounds.width + 2 * padding,
           height: unscaledBounds.height + 2 * padding,
+          strokeWidth: 0,
           fill: backgroundColor,
         });
 
@@ -92,10 +93,10 @@ export class WeaveExportManager {
         const backgroundRect = background.getClientRect();
 
         exportGroup.toImage({
-          x: backgroundRect.x,
-          y: backgroundRect.y,
-          width: backgroundRect.width,
-          height: backgroundRect.height,
+          x: Math.round(backgroundRect.x),
+          y: Math.round(backgroundRect.y),
+          width: Math.round(backgroundRect.width),
+          height: Math.round(backgroundRect.height),
           mimeType: format,
           pixelRatio,
           quality: options.quality ?? 1,

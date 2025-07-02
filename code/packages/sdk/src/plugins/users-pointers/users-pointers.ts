@@ -115,9 +115,7 @@ export class WeaveUsersPointersPlugin extends WeavePlugin {
       }
     );
 
-    stage.on('dragmove', (e) => {
-      e.evt.preventDefault();
-
+    stage.on('dragmove', () => {
       const userInfo = this.config.getUser();
       const mousePos = stage.getRelativePointerPosition();
 
@@ -130,8 +128,7 @@ export class WeaveUsersPointersPlugin extends WeavePlugin {
       }
     });
 
-    stage.on('pointermove', (e) => {
-      e.evt.preventDefault();
+    stage.on('pointermove', () => {
       const userInfo = this.config.getUser();
       const mousePos = stage.getRelativePointerPosition();
 

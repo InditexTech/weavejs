@@ -17,6 +17,7 @@ import type Konva from 'konva';
 
 export class WeaveExportNodesToolAction extends WeaveAction {
   protected cancelAction!: () => void;
+  protected triggerSelectionTool!: boolean;
   private defaultFormatOptions: WeaveExportNodesOptions = {
     format: WEAVE_EXPORT_FORMATS.PNG,
     padding: 0,
@@ -58,6 +59,7 @@ export class WeaveExportNodesToolAction extends WeaveAction {
       nodes,
       boundingNodes,
       options,
+      triggerSelectionTool = true,
       download = true,
     }: WeaveExportNodesActionParams
   ): Promise<void | string> {
@@ -70,6 +72,7 @@ export class WeaveExportNodesToolAction extends WeaveAction {
     stage.container().tabIndex = 1;
     stage.container().focus();
 
+    this.triggerSelectionTool = triggerSelectionTool;
     this.cancelAction = cancelAction;
 
     this.options = {
@@ -101,6 +104,8 @@ export class WeaveExportNodesToolAction extends WeaveAction {
     stage.container().click();
     stage.container().focus();
 
-    this.instance.triggerAction('selectionTool');
+    if (this.triggerSelectionTool) {
+      this.instance.triggerAction('selectionTool');
+    }
   }
 }

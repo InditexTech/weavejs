@@ -203,6 +203,8 @@ export class WeaveStateManager {
           parent.props.children.push(finalNode);
         }
 
+        this.instance.emitEvent('onNodeAdded', node);
+
         if (doRender) {
           this.instance.render();
         }
@@ -241,6 +243,8 @@ export class WeaveStateManager {
         nodeState.props = {
           ...nodeNew,
         };
+
+        this.instance.emitEvent('onNodeUpdated', node);
 
         if (doRender) {
           this.instance.render();
@@ -283,6 +287,8 @@ export class WeaveStateManager {
           );
           parentState.props.children = filteredChildren;
         }
+
+        this.instance.emitEvent('onNodeRemoved', node);
 
         if (doRender) {
           this.instance.render();

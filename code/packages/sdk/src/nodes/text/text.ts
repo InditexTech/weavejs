@@ -128,7 +128,7 @@ export class WeaveTextNode extends WeaveNode {
       }
     });
 
-    text.on('dblclick dbltap', (e) => {
+    text.on('pointerdblclick', (e) => {
       e.cancelBubble = true;
 
       if (this.editing) {
@@ -562,7 +562,7 @@ export class WeaveTextNode extends WeaveNode {
           'onStageMove',
           this.onStageMoveHandler(textNode).bind(this)
         );
-        window.removeEventListener('click', handleOutsideClick);
+        window.removeEventListener('pointerclick', handleOutsideClick);
         return;
       }
     };
@@ -614,16 +614,16 @@ export class WeaveTextNode extends WeaveNode {
 
         this.textArea.removeEventListener('keydown', handleKeyDown);
         this.textArea.removeEventListener('keyup', handleKeyUp);
-        window.removeEventListener('click', handleOutsideClick);
-        window.removeEventListener('touchstart', handleOutsideClick);
+        window.removeEventListener('pointerclick', handleOutsideClick);
+        window.removeEventListener('pointerdown', handleOutsideClick);
 
         return;
       }
     };
 
     setTimeout(() => {
-      window.addEventListener('click', handleOutsideClick);
-      window.addEventListener('touchstart', handleOutsideClick);
+      window.addEventListener('pointerclick', handleOutsideClick);
+      window.addEventListener('pointerdown', handleOutsideClick);
     }, 0);
 
     this.editing = true;

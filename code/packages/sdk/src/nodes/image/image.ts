@@ -244,7 +244,7 @@ export class WeaveImageNode extends WeaveNode {
 
     this.setupDefaultNodeEvents(image);
 
-    image.on('dblclick dbltap', (evt) => {
+    image.on('pointerdblclick', (evt) => {
       evt.cancelBubble = true;
 
       if (image.getAttrs().cropping ?? false) {

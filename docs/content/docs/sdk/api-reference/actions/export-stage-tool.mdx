@@ -47,26 +47,25 @@ type WeaveExportNodeOptions = {
   quality?: number;
 };
 
-type WeaveExportNodeActionParams = {
-  node: WeaveElementInstance;
-  options?: WeaveExportNodeOptions;
+type WeaveExportStageActionParams = {
+  boundingNodes?: (nodes: Konva.Node[]) => Konva.Node[];
+  options?: WeaveExportNodesOptions;
 };
 ```
 
 ## Trigger function params
 
 ```ts
-trigger(cancelAction: () => void, params?: WeaveExportNodeActionParams): Promise<void>;
+trigger(cancelAction: () => void, params?: WeaveExportStageActionParams): Promise<void>;
 ```
 
-For `WeaveExportNodeActionParams`:
+For `WeaveExportStageActionParams`:
 
 <TypeTable
   type={{
-    ["node"]: {
-      required: true,
-      description: "The node instance to export as image.",
-      type: "WeaveElementInstance",
+    ["boundingNodes"]: {
+      description: "A function that defines the bounding node",
+      type: "(nodes: Konva.Node[]) => Konva.Node[]",
     },
     ["options"]: {
       description: "The exported image options.",

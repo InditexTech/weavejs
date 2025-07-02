@@ -1,14 +1,14 @@
 ---
-title: WeaveExportNodeToolAction
-description: Export the selected node as an image
+title: WeaveExportNodesToolAction
+description: Export the selected nodes as an image
 ---
 
 import { TypeTable } from "fumadocs-ui/components/type-table";
 
 ## Overview
 
-The [WeaveExportNodeToolAction](https://github.com/InditexTech/weavejs/blob/main/code/packages/sdk/src/actions/export-node-tool/export-node-tool.ts)
-class that allows users to export a specific node or group of nodes from the canvas as a standalone image file (e.g., PNG or JPEG).
+The [WeaveExportNodesToolAction](https://github.com/InditexTech/weavejs/blob/main/code/packages/sdk/src/actions/export-nodes-tool/export-nodes-tool.ts)
+class that allows users to export a specific selection of nodes from the canvas as a standalone image file (e.g., PNG or JPEG).
 This action is especially useful when users want to extract visual components from the canvas for sharing, documentation, thumbnails,
 or reuse outside the app.
 
@@ -19,18 +19,18 @@ The class extends the [WeaveAction](/docs/sdk/api-reference/actions/action) clas
 
 ## Name
 
-This action `name` property value is `exportNodeTool`.
+This action `name` property value is `exportNodesTool`.
 
 ## Import
 
 ```shell
-import { WeaveExportNodeToolAction } from "@inditextech/weave-sdk";
+import { WeaveExportNodesToolAction } from "@inditextech/weave-sdk";
 ```
 
 ## Instantiation
 
 ```ts
-new WeaveExportNodeToolAction();
+new WeaveExportNodesToolAction();
 ```
 
 ## TypeScript types
@@ -49,19 +49,21 @@ type WeaveExportNodeOptions = {
   quality?: number;
 };
 
-type WeaveExportNodeActionParams = {
-  node: WeaveElementInstance;
-  options?: WeaveExportNodeOptions;
+type WeaveExportNodesActionParams = {
+  nodes: WeaveElementInstance[];
+  boundingNodes?: (nodes: Konva.Node[]) => Konva.Node[];
+  options?: WeaveExportNodesOptions;
+  download?: boolean;
 };
 ```
 
 ## Trigger function params
 
 ```ts
-trigger(cancelAction: () => void, params?: WeaveExportNodeActionParams): Promise<void>;
+trigger(cancelAction: () => void, params?: WeaveExportNodesActionParams): Promise<void>;
 ```
 
-For `WeaveExportNodeActionParams`:
+For `WeaveExportNodesActionParams`:
 
 <TypeTable
   type={{
@@ -70,9 +72,18 @@ For `WeaveExportNodeActionParams`:
       description: "The node instance to export as image.",
       type: "WeaveElementInstance",
     },
+    ["boundingNodes"]: {
+      description: "A function that defines the bounding node",
+      type: "(nodes: Konva.Node[]) => Konva.Node[]",
+    },
     ["options"]: {
       description: "The exported image options.",
       type: "WeaveExportNodeOptions",
+    },
+    ["download"]: {
+      description:
+        "If true, triggers a download, if false, return the image as dataURL",
+      type: "boolean",
     },
   }}
 />

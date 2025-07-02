@@ -12,5 +12,6 @@ export type WeaveExportNodesActionParams = {
   nodes: WeaveElementInstance[];
   boundingNodes?: (nodes: Konva.Node[]) => Konva.Node[];
   options?: WeaveExportNodesOptions;
+  triggerSelectionTool?: boolean;
   download?: boolean;
 };
