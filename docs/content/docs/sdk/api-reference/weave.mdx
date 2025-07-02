@@ -380,6 +380,14 @@ getElementsTree(): WeaveStateElement[]
 This method returns the children of the `mainLayer`. Useful to render a tree view of the elements
 in the canvas.
 
+#### isEmpty
+
+```ts
+isEmpty(): boolean
+```
+
+This method returns true if the mainLayer has no elements in it (its empty), false otherwise.
+
 ### Z-Index management
 
 #### moveUp
@@ -619,15 +627,6 @@ export type WeaveUndoRedoChange = {
   canUndo: boolean;
   redoStackLength: number;
   undoStackLength: number;
-};
-
-export type WeaveCallbacks = {
-  onRender?: () => void;
-  onRoomLoaded?: (loaded: boolean) => void;
-  onInstanceStatus?: (status: WeaveStatus) => void;
-  onActiveActionChange?: (actionName: string | undefined) => void;
-  onStateChange?: (state: WeaveState) => void;
-  onUndoManagerStatusChange?: (undoManagerStatus: WeaveUndoRedoChange) => void;
 };
 
 export type WeaveLoggerConfig = {
