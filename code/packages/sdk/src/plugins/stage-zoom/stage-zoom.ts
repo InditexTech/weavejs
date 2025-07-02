@@ -2,6 +2,7 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
+import { throttle } from 'lodash';
 import { WeavePlugin } from '@/plugins/plugin';
 import {
   type WeaveStageZoomPluginConfig,
@@ -15,13 +16,13 @@ import {
   WEAVE_STAGE_ZOOM_KEY,
 } from './constants';
 import type { Vector2d } from 'konva/lib/types';
-import { throttle } from 'lodash';
 import Hammer from 'hammerjs';
 import { getBoundingBox } from '@/utils';
+import type { KonvaEventObject } from 'konva/lib/Node';
+import type { Stage } from 'konva/lib/Stage';
 
 export class WeaveStageZoomPlugin extends WeavePlugin {
   private isCtrlOrMetaPressed: boolean;
-  private isSpaceKeyPressed: boolean;
   protected previousPointer!: string | null;
   getLayerName = undefined;
   initLayer = undefined;
@@ -48,7 +49,6 @@ export class WeaveStageZoomPlugin extends WeavePlugin {
       );
     }
 
-    this.isSpaceKeyPressed = false;
     this.isCtrlOrMetaPressed = false;
     this.updatedMinimumZoom = false;
     this.actualStep = this.config.zoomSteps.findIndex(
@@ -440,17 +440,11 @@ export class WeaveStageZoomPlugin extends WeavePlugin {
       if (e.ctrlKey || e.metaKey) {
         this.isCtrlOrMetaPressed = true;
       }
-      if (e.code === 'Space') {
-        this.isSpaceKeyPressed = true;
-      }
     });
 
     window.addEventListener('keyup', (e) => {
       if (!(e.ctrlKey || e.metaKey)) {
         this.isCtrlOrMetaPressed = false;
-      }
-      if (e.code === 'Space') {
-        this.isSpaceKeyPressed = false;
       }
     });
 
@@ -481,15 +475,17 @@ export class WeaveStageZoomPlugin extends WeavePlugin {
       this.setZoom(newScale, false, center);
     });
 
-    window.addEventListener('wheel', (e) => {
+    // Zoom with mouse wheel + ctrl / cmd
+    const handleWheel = (e: KonvaEventObject<WheelEvent, Stage>) => {
+      e.evt.preventDefault();
+
       const stage = this.instance.getStage();
 
-      if (
-        !this.enabled ||
-        !stage.isFocused() ||
-        !this.isCtrlOrMetaPressed ||
-        this.isSpaceKeyPressed
-      ) {
+      const performZoom =
+        this.isCtrlOrMetaPressed ||
+        (!this.isCtrlOrMetaPressed && e.evt.ctrlKey && e.evt.deltaMode === 0);
+
+      if (!this.enabled || !stage.isFocused() || !performZoom) {
         return;
       }
 
@@ -502,10 +498,12 @@ export class WeaveStageZoomPlugin extends WeavePlugin {
       }
 
       const scaleBy = 1.025;
-      const direction = e.deltaY > 0 ? 1 : -1;
+      const direction = e.evt.deltaY > 0 ? 1 : -1;
       const newScale = direction > 0 ? oldScale / scaleBy : oldScale * scaleBy;
 
       this.setZoom(newScale, false, pointer);
-    });
+    };
+
+    stage.on('wheel', handleWheel);
   }
 }
