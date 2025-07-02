@@ -536,6 +536,10 @@ export class Weave {
     return this.stateManager.getElementsTree();
   }
 
+  isEmpty(): boolean {
+    return this.getElementsTree().length === 0;
+  }
+
   // ZINDEX MANAGEMENT METHODS PROXIES
 
   moveUp(node: WeaveElementInstance): void {
