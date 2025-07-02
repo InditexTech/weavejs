@@ -143,6 +143,7 @@ export class WeaveStagePanningPlugin extends WeavePlugin {
       previousMouseX = mousePos?.x ?? 0;
       previousMouseY = mousePos?.y ?? 0;
 
+      // Pan with space pressed and no mouse buttons pressed
       if (
         !this.enabled ||
         !(
@@ -169,14 +170,20 @@ export class WeaveStagePanningPlugin extends WeavePlugin {
       previousMouseY = mousePos?.y ?? 0;
     });
 
+    // Pan with wheel mouse pressed
     const handleWheel = (e: KonvaEventObject<WheelEvent, Stage>) => {
+      e.evt.preventDefault();
+
       const stage = this.instance.getStage();
+
+      const performPanning = !this.isCtrlOrMetaPressed && !e.evt.ctrlKey;
 
       if (
         !this.enabled ||
         !stage.isFocused() ||
         this.isCtrlOrMetaPressed ||
-        e.evt.buttons === 4
+        e.evt.buttons === 4 ||
+        !performPanning
       ) {
         return;
       }
@@ -187,7 +194,7 @@ export class WeaveStagePanningPlugin extends WeavePlugin {
       this.instance.emitEvent('onStageMove');
     };
 
-    stage.on('wheel', throttle(handleWheel, 10));
+    stage.on('wheel', handleWheel);
   }
 
   enable(): void {
