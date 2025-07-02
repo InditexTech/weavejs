@@ -301,14 +301,12 @@ export abstract class WeaveNode implements WeaveNodeBase {
         const stage = this.instance.getStage();
         this.previousPointer = stage.container().style.cursor;
         stage.container().style.cursor = 'pointer';
-        // e.cancelBubble = true;
         return;
       }
       if (this.isPasting()) {
         const stage = this.instance.getStage();
         this.previousPointer = stage.container().style.cursor;
         stage.container().style.cursor = 'crosshair';
-        // e.cancelBubble = true;
         return;
       }
     });
@@ -323,14 +321,12 @@ export abstract class WeaveNode implements WeaveNodeBase {
         const stage = this.instance.getStage();
         stage.container().style.cursor = this.previousPointer ?? 'default';
         this.previousPointer = null;
-        // e.cancelBubble = true;
         return;
       }
       if (this.isPasting()) {
         const stage = this.instance.getStage();
         this.previousPointer = stage.container().style.cursor;
         stage.container().style.cursor = 'crosshair';
-        // e.cancelBubble = true;
         return;
       }
     });

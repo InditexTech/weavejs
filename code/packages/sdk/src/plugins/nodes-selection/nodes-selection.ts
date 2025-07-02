@@ -187,22 +187,6 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
     });
     selectionLayer?.add(tr);
 
-    // tr.on('pointerenter', (e) => {
-    //   if (!this.isPasting()) {
-    //     const stage = this.instance.getStage();
-    //     stage.container().style.cursor = 'grab';
-    //     e.cancelBubble = true;
-    //   }
-    // });
-
-    // tr.on('pointerleave', (e) => {
-    //   if (!this.isPasting()) {
-    //     const stage = this.instance.getStage();
-    //     stage.container().style.cursor = 'default';
-    //     e.cancelBubble = true;
-    //   }
-    // });
-
     tr.on('transformstart', () => {
       this.triggerSelectedNodesEvent();
     });
@@ -480,8 +464,6 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
         return;
       }
 
-      // e.evt.preventDefault();
-
       const intStage = this.instance.getStage();
 
       x1 = intStage.getRelativePointerPosition()?.x ?? 0;
@@ -537,8 +519,6 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
         this.cameFromSelectingMultiple = false;
         return;
       }
-
-      // e.evt.preventDefault();
 
       const intStage = this.instance.getStage();
 
@@ -598,8 +578,6 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
         this.cameFromSelectingMultiple = false;
         return;
       }
-
-      // e.evt.preventDefault();
 
       this.tr.nodes([]);
 

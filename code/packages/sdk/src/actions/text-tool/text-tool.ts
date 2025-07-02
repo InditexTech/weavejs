@@ -79,10 +79,6 @@ export class WeaveTextToolAction extends WeaveAction {
       }
     });
 
-    // stage.on('pointermove', (e) => {
-    //   e.evt.preventDefault();
-    // });
-
     this.initialized = true;
   }
 
