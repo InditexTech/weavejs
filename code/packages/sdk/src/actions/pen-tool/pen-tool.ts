@@ -74,14 +74,11 @@ export class WeavePenToolAction extends WeaveAction {
       }
     });
 
-    stage.on('pointerdblclick', (e) => {
-      e.evt.preventDefault();
+    stage.on('pointerdblclick', () => {
       this.cancelAction();
     });
 
-    stage.on('pointerclick', (e) => {
-      e.evt.preventDefault();
-
+    stage.on('pointerclick', () => {
       if (this.state === PEN_TOOL_STATE.IDLE) {
         return;
       }
@@ -97,9 +94,7 @@ export class WeavePenToolAction extends WeaveAction {
       }
     });
 
-    stage.on('mousemove pointermove', (e) => {
-      e.evt.preventDefault();
-
+    stage.on('pointermove', () => {
       this.handleMovement();
     });
 

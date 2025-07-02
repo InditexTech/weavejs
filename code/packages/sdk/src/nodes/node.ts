@@ -291,7 +291,7 @@ export abstract class WeaveNode implements WeaveNodeBase {
 
     this.previousPointer = null;
 
-    node.on('mouseenter', (e) => {
+    node.on('pointerenter', () => {
       const realNode = this.instance.getInstanceRecursive(node);
       if (
         this.isSelecting() &&
@@ -301,19 +301,19 @@ export abstract class WeaveNode implements WeaveNodeBase {
         const stage = this.instance.getStage();
         this.previousPointer = stage.container().style.cursor;
         stage.container().style.cursor = 'pointer';
-        e.cancelBubble = true;
+        // e.cancelBubble = true;
         return;
       }
       if (this.isPasting()) {
         const stage = this.instance.getStage();
         this.previousPointer = stage.container().style.cursor;
         stage.container().style.cursor = 'crosshair';
-        e.cancelBubble = true;
+        // e.cancelBubble = true;
         return;
       }
     });
 
-    node.on('mouseleave', (e) => {
+    node.on('pointerleave', () => {
       const realNode = this.instance.getInstanceRecursive(node);
       if (
         this.isSelecting() &&
@@ -323,14 +323,14 @@ export abstract class WeaveNode implements WeaveNodeBase {
         const stage = this.instance.getStage();
         stage.container().style.cursor = this.previousPointer ?? 'default';
         this.previousPointer = null;
-        e.cancelBubble = true;
+        // e.cancelBubble = true;
         return;
       }
       if (this.isPasting()) {
         const stage = this.instance.getStage();
         this.previousPointer = stage.container().style.cursor;
         stage.container().style.cursor = 'crosshair';
-        e.cancelBubble = true;
+        // e.cancelBubble = true;
         return;
       }
     });

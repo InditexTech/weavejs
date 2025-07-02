@@ -75,9 +75,7 @@ export class WeaveStarToolAction extends WeaveAction {
       }
     });
 
-    stage.on('mousedown pointerdown', (e) => {
-      e.evt.preventDefault();
-
+    stage.on('pointerdown', () => {
       if (this.state === STAR_TOOL_STATE.ADDING) {
         this.creating = true;
 
@@ -85,9 +83,7 @@ export class WeaveStarToolAction extends WeaveAction {
       }
     });
 
-    stage.on('mousemove pointermove', (e) => {
-      e.evt.preventDefault();
-
+    stage.on('pointermove', () => {
       if (this.state === STAR_TOOL_STATE.DEFINING_SIZE) {
         this.moved = true;
 
@@ -95,9 +91,7 @@ export class WeaveStarToolAction extends WeaveAction {
       }
     });
 
-    stage.on('mouseup pointerup', (e) => {
-      e.evt.preventDefault();
-
+    stage.on('pointerup', () => {
       if (this.state === STAR_TOOL_STATE.DEFINING_SIZE) {
         this.creating = false;
 

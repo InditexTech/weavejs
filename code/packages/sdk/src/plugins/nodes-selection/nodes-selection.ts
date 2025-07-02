@@ -44,6 +44,7 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
   private cameFromSelectingMultiple: boolean;
   private defaultEnabledAnchors: string[];
   private selecting: boolean;
+  private dragging: boolean;
   private initialized: boolean;
   private pointers: Record<string, PointerEvent>;
   onRender: undefined;
@@ -110,6 +111,7 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
     this.active = false;
     this.cameFromSelectingMultiple = false;
     this.selecting = false;
+    this.dragging = false;
     this.initialized = false;
     this.enabled = false;
     this.pointers = {};
@@ -185,21 +187,21 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
     });
     selectionLayer?.add(tr);
 
-    tr.on('mouseenter', (e) => {
-      if (!this.isPasting()) {
-        const stage = this.instance.getStage();
-        stage.container().style.cursor = 'grab';
-        e.cancelBubble = true;
-      }
-    });
+    // tr.on('pointerenter', (e) => {
+    //   if (!this.isPasting()) {
+    //     const stage = this.instance.getStage();
+    //     stage.container().style.cursor = 'grab';
+    //     e.cancelBubble = true;
+    //   }
+    // });
 
-    tr.on('mouseleave', (e) => {
-      if (!this.isPasting()) {
-        const stage = this.instance.getStage();
-        stage.container().style.cursor = 'default';
-        e.cancelBubble = true;
-      }
-    });
+    // tr.on('pointerleave', (e) => {
+    //   if (!this.isPasting()) {
+    //     const stage = this.instance.getStage();
+    //     stage.container().style.cursor = 'default';
+    //     e.cancelBubble = true;
+    //   }
+    // });
 
     tr.on('transformstart', () => {
       this.triggerSelectedNodesEvent();
@@ -216,6 +218,8 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
     });
 
     tr.on('dragstart', (e) => {
+      this.dragging = true;
+
       const stage = this.instance.getStage();
       if (stage.isMouseWheelPressed()) {
         e.cancelBubble = true;
@@ -270,6 +274,8 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
     tr.on('dragmove', throttle(handleDragMove, 50));
 
     tr.on('dragend', (e) => {
+      this.dragging = false;
+
       e.cancelBubble = true;
 
       const selectedNodes = tr.nodes();
@@ -332,8 +338,8 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
     this.tr = tr;
     this.selectionRectangle = selectionRectangle;
 
-    this.tr.on('pointerdblclick', (evt) => {
-      evt.cancelBubble = true;
+    this.tr.on('pointerdblclick', (e) => {
+      e.cancelBubble = true;
 
       if (this.tr.getNodes().length === 1) {
         const node = this.tr.getNodes()[0];
@@ -474,7 +480,7 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
         return;
       }
 
-      e.evt.preventDefault();
+      // e.evt.preventDefault();
 
       const intStage = this.instance.getStage();
 
@@ -532,7 +538,7 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
         return;
       }
 
-      e.evt.preventDefault();
+      // e.evt.preventDefault();
 
       const intStage = this.instance.getStage();
 
@@ -548,9 +554,9 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
       });
     };
 
-    stage.on('mousemove pointermove', throttle(handleMouseMove, 50));
+    stage.on('pointermove', throttle(handleMouseMove, 50));
 
-    stage.on('mouseup pointerup', (e) => {
+    stage.on('pointerup', (e) => {
       delete this.pointers[e.evt.pointerId];
 
       if (!this.initialized) {
@@ -558,6 +564,10 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
       }
 
       if (!this.active) {
+        return;
+      }
+
+      if (!this.selecting) {
         return;
       }
 
@@ -589,7 +599,7 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
         return;
       }
 
-      e.evt.preventDefault();
+      // e.evt.preventDefault();
 
       this.tr.nodes([]);
 
@@ -683,6 +693,10 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
       }
 
       if (this.instance.getActiveAction() !== 'selectionTool') {
+        return;
+      }
+
+      if (this.dragging) {
         return;
       }
 

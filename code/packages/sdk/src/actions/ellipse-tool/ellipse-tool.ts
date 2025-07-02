@@ -74,9 +74,7 @@ export class WeaveEllipseToolAction extends WeaveAction {
       }
     });
 
-    stage.on('mousedown pointerdown', (e) => {
-      e.evt.preventDefault();
-
+    stage.on('pointerdown', () => {
       if (this.state === ELLIPSE_TOOL_STATE.ADDING) {
         this.creating = true;
 
@@ -84,9 +82,7 @@ export class WeaveEllipseToolAction extends WeaveAction {
       }
     });
 
-    stage.on('mousemove pointermove', (e) => {
-      e.evt.preventDefault();
-
+    stage.on('pointermove', () => {
       if (this.state === ELLIPSE_TOOL_STATE.DEFINING_SIZE) {
         this.moved = true;
 
@@ -94,9 +90,7 @@ export class WeaveEllipseToolAction extends WeaveAction {
       }
     });
 
-    stage.on('mouseup pointerup', (e) => {
-      e.evt.preventDefault();
-
+    stage.on('pointerup', () => {
       if (this.state === ELLIPSE_TOOL_STATE.DEFINING_SIZE) {
         this.creating = false;
 

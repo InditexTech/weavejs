@@ -23,7 +23,6 @@ import {
   type WeaveStageGridPluginParams,
   type WeaveStageGridType,
 } from './types';
-import type { KonvaEventObject } from 'konva/lib/Node';
 import { throttle } from 'lodash';
 
 export class WeaveStageGridPlugin extends WeavePlugin {
@@ -88,37 +87,35 @@ export class WeaveStageGridPlugin extends WeavePlugin {
       }
     });
 
-    stage.on('mousedown', (e) => {
+    stage.on('pointerdown', (e) => {
       const activeAction = this.instance.getActiveAction();
 
       if (e && e.evt.button === 0 && activeAction === 'moveTool') {
         this.moveToolActive = true;
-        e.cancelBubble = true;
+        // e.cancelBubble = true;
       }
 
       if (e && (e.evt.button === 2 || e.evt.buttons === 4)) {
         this.isMouseMiddleButtonPressed = true;
-        e.cancelBubble = true;
+        // e.cancelBubble = true;
       }
     });
 
-    stage.on('mouseup', (e) => {
+    stage.on('pointerup', (e) => {
       const activeAction = this.instance.getActiveAction();
 
       if (e && e.evt.button === 0 && activeAction === 'moveTool') {
         this.moveToolActive = false;
-        e.cancelBubble = true;
+        // e.cancelBubble = true;
       }
 
       if (e && (e.evt.button === 1 || e.evt.buttons === 0)) {
         this.isMouseMiddleButtonPressed = false;
-        e.cancelBubble = true;
+        // e.cancelBubble = true;
       }
     });
 
-    const handleMouseMove = (e: KonvaEventObject<MouseEvent, Konva.Stage>) => {
-      e.evt.preventDefault();
-
+    const handleMouseMove = () => {
       if (
         !this.enabled ||
         !(
@@ -133,11 +130,9 @@ export class WeaveStageGridPlugin extends WeavePlugin {
       this.onRender();
     };
 
-    stage.on('mousemove', throttle(handleMouseMove, 50));
+    stage.on('pointermove', throttle(handleMouseMove, 50));
 
-    stage.on('pointermove', (e) => {
-      e.evt.preventDefault();
-
+    stage.on('pointermove', () => {
       if (!this.enabled) {
         return;
       }

@@ -68,9 +68,7 @@ export class WeaveTextToolAction extends WeaveAction {
       }
     });
 
-    stage.on('pointerclick', (e) => {
-      e.evt.preventDefault();
-
+    stage.on('pointerclick', () => {
       if (this.state === TEXT_TOOL_STATE.IDLE) {
         return;
       }
@@ -81,9 +79,9 @@ export class WeaveTextToolAction extends WeaveAction {
       }
     });
 
-    stage.on('mousemove pointermove', (e) => {
-      e.evt.preventDefault();
-    });
+    // stage.on('pointermove', (e) => {
+    //   e.evt.preventDefault();
+    // });
 
     this.initialized = true;
   }

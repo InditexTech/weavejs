@@ -15,7 +15,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- [#468](https://github.com/InditexTech/weavejs/issues/468) Avoid usage of touch events, encourage pointer events
+- [#468](https://github.com/InditexTech/weavejs/issues/468) Migrate to pointer events
 
 ## [0.32.0] - 2025-06-30
 

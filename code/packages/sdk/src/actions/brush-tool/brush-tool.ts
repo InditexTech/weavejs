@@ -70,36 +70,33 @@ export class WeaveBrushToolAction extends WeaveAction {
       }
     });
 
-    stage.on('mousedown pointerdown', (e) => {
+    stage.on('pointerdown', (e) => {
       if (this.state !== BRUSH_TOOL_STATE.IDLE) {
         return;
       }
 
       this.handleStartStroke();
 
-      e.evt.preventDefault();
       e.evt.stopPropagation();
     });
 
-    stage.on('mousemove pointermove', (e) => {
+    stage.on('pointermove', (e) => {
       if (this.state !== BRUSH_TOOL_STATE.DEFINE_STROKE) {
         return;
       }
 
       this.handleMovement();
 
-      e.evt.preventDefault();
       e.evt.stopPropagation();
     });
 
-    stage.on('mouseup pointerup', (e) => {
+    stage.on('pointerup', (e) => {
       if (this.state !== BRUSH_TOOL_STATE.DEFINE_STROKE) {
         return;
       }
 
       this.handleEndStroke();
 
-      e.evt.preventDefault();
       e.evt.stopPropagation();
     });
 

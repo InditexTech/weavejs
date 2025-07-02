@@ -36,13 +36,13 @@ export class WeaveStageNode extends WeaveNode {
       this.stageFocused = false;
     });
 
-    stage.on('mousedown', (e) => {
+    stage.on('pointerdown', (e) => {
       if (e.evt.button === 1) {
         this.wheelMousePressed = true;
       }
     });
 
-    stage.on('mouseup', (e) => {
+    stage.on('pointerup', (e) => {
       if (e.evt.button === 1) {
         this.wheelMousePressed = false;
       }

@@ -90,9 +90,7 @@ export class WeaveImageToolAction extends WeaveAction {
       }
     });
 
-    stage.on('pointerclick', (e) => {
-      e.evt.preventDefault();
-
+    stage.on('pointerclick', () => {
       if (this.state === IMAGE_TOOL_STATE.IDLE) {
         return;
       }
@@ -107,9 +105,7 @@ export class WeaveImageToolAction extends WeaveAction {
       }
     });
 
-    stage.on('mousemove pointermove', (e) => {
-      e.evt.preventDefault();
-
+    stage.on('pointermove', () => {
       const tempImage = this.instance
         .getStage()
         .findOne(`#${this.tempImageId}`);

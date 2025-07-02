@@ -147,8 +147,6 @@ export class WeaveContextMenuPlugin extends WeavePlugin {
     stage.on('pointerdown', (e) => {
       this.pointers[e.evt.pointerId] = e.evt;
 
-      e.evt.preventDefault();
-
       if (
         e.evt.pointerType === 'touch' &&
         Object.keys(this.pointers).length > 1
@@ -170,8 +168,6 @@ export class WeaveContextMenuPlugin extends WeavePlugin {
 
     stage.on('pointerup', (e) => {
       delete this.pointers[e.evt.pointerId];
-
-      e.evt.preventDefault();
 
       if (
         e.evt.pointerType === 'touch' &&
