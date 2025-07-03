@@ -663,7 +663,7 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
           node.getParent() as Konva.Node
         );
 
-        if (parent && parent.getAttrs().nodeId) {
+        if (parent?.getAttrs().nodeId) {
           parent = this.instance
             .getStage()
             .findOne(`#${parent.getAttrs().nodeId}`) as Konva.Node;
