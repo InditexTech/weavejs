@@ -82,13 +82,9 @@ export class WeaveContextMenuPlugin extends WeavePlugin {
       }
     }
 
-    if (target !== stage && !clickOnTransformer) {
-      return;
-    }
-
     let nodes: WeaveSelection[] = [];
 
-    if (clickOnTransformer && selectionPlugin) {
+    if (target !== stage && clickOnTransformer && selectionPlugin) {
       const transformer = selectionPlugin.getTransformer();
 
       nodes = transformer
@@ -104,6 +100,19 @@ export class WeaveContextMenuPlugin extends WeavePlugin {
           };
         })
         .filter((node) => typeof node !== 'undefined');
+    }
+
+    if (target !== stage && !clickOnTransformer) {
+      const nodeHandler = this.instance.getNodeHandler<WeaveNode>(
+        target.getAttrs().nodeType
+      );
+
+      nodes = [
+        {
+          instance: target as WeaveElementInstance,
+          node: nodeHandler?.serialize(target as WeaveElementInstance),
+        },
+      ];
     }
 
     const containerRect = stage.container().getBoundingClientRect();

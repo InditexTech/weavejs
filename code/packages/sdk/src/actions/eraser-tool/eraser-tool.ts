@@ -49,8 +49,9 @@ export class WeaveEraserToolAction extends WeaveAction {
 
         const nodeType = realNode.getAttrs().nodeType;
         const nodeHandler = this.instance.getNodeHandler<WeaveNode>(nodeType);
+        const isLocked = this.instance.allNodesLocked([realNode]);
 
-        if (nodeHandler) {
+        if (nodeHandler && !isLocked) {
           const nodeSerialized = nodeHandler.serialize(
             realNode as WeaveElementInstance
           );
