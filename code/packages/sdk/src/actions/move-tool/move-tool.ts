@@ -3,7 +3,10 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { WeaveAction } from '@/actions/action';
-import { type WeaveMoveToolActionState } from './types';
+import {
+  type WeaveMoveToolActionParams,
+  type WeaveMoveToolActionState,
+} from './types';
 import { MOVE_TOOL_ACTION_NAME, MOVE_TOOL_STATE } from './constants';
 import type { WeaveNodesSelectionPlugin } from '@/plugins/nodes-selection/nodes-selection';
 import { SELECTION_TOOL_ACTION_NAME } from '../selection-tool/constants';
@@ -12,6 +15,7 @@ export class WeaveMoveToolAction extends WeaveAction {
   protected initialized: boolean = false;
   protected state: WeaveMoveToolActionState;
   protected cancelAction!: () => void;
+  protected triggerSelectionTool!: boolean;
   onPropsChange = undefined;
   onInit = undefined;
 
@@ -55,7 +59,7 @@ export class WeaveMoveToolAction extends WeaveAction {
     this.setState(MOVE_TOOL_STATE.MOVING);
   }
 
-  trigger(cancelAction: () => void): void {
+  trigger(cancelAction: () => void, params?: WeaveMoveToolActionParams): void {
     if (!this.instance) {
       throw new Error('Instance not defined');
     }
@@ -68,6 +72,9 @@ export class WeaveMoveToolAction extends WeaveAction {
     stage.container().tabIndex = 1;
     stage.container().focus();
 
+    const { triggerSelectionTool = true } = params ?? {};
+
+    this.triggerSelectionTool = triggerSelectionTool;
     this.cancelAction = cancelAction;
 
     this.setMoving();
@@ -80,7 +87,7 @@ export class WeaveMoveToolAction extends WeaveAction {
 
     const selectionPlugin =
       this.instance.getPlugin<WeaveNodesSelectionPlugin>('nodesSelection');
-    if (selectionPlugin) {
+    if (selectionPlugin && this.triggerSelectionTool) {
       this.instance.triggerAction(SELECTION_TOOL_ACTION_NAME);
     }
 

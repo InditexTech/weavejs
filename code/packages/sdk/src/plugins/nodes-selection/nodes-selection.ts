@@ -637,7 +637,11 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
       });
 
       const selectedNodes = new Set<Konva.Node>();
-      const framesNodes = selected
+      const framesNodes = selected.filter((shape) => {
+        return shape.getAttrs().nodeType === 'frame';
+      });
+
+      const framesNodesIds = framesNodes
         .map((shape) => {
           if (
             shape.getAttrs().nodeType === 'frame' &&
@@ -649,11 +653,10 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
         })
         .filter((shape) => {
           return shape.getAttrs().nodeType === 'frame';
+        })
+        .map((shape) => {
+          return shape.getAttrs().id;
         });
-
-      const framesNodesIds = framesNodes.map((shape) => {
-        return shape.getAttrs().id;
-      });
       const otherNodes = selected.filter(
         (shape) => shape.getAttrs().nodeType !== 'frame'
       );

@@ -7,3 +7,7 @@ import { MOVE_TOOL_STATE } from './constants';
 export type WeaveMoveToolActionStateKeys = keyof typeof MOVE_TOOL_STATE;
 export type WeaveMoveToolActionState =
   (typeof MOVE_TOOL_STATE)[WeaveMoveToolActionStateKeys];
+
+export type WeaveMoveToolActionParams = {
+  triggerSelectionTool?: boolean;
+};
