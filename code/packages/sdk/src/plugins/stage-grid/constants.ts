@@ -11,8 +11,8 @@ export const WEAVE_GRID_TYPES = {
 
 export const WEAVE_GRID_DEFAULT_SIZE = 50;
 export const WEAVE_GRID_DEFAULT_TYPE = WEAVE_GRID_TYPES.LINES as string;
-export const WEAVE_GRID_DEFAULT_COLOR = 'rgba(0,0,0,0.2)';
-export const WEAVE_GRID_DEFAULT_ORIGIN_COLOR = 'rgba(255,0,0,0.2)';
+export const WEAVE_GRID_DEFAULT_COLOR = 'rgba(0,0,0,0.1)';
+export const WEAVE_GRID_DEFAULT_ORIGIN_COLOR = 'rgba(255,0,0,0.1)';
 export const WEAVE_GRID_DEFAULT_STROKE = 0.5;
 export const WEAVE_GRID_DEFAULT_MAJOR_LINE_RATIO = 4;
 export const WEAVE_GRID_DEFAULT_RADIUS = 1;

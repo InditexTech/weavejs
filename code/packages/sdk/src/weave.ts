@@ -608,9 +608,14 @@ export class Weave {
     if (selectionPlugin) {
       const stage = this.getStage();
       const instanceNodes: WeaveElementInstance[] = nodesIds.map((nodeId) => {
-        const nodeInstance = stage.findOne(
-          `#${nodeId}`
-        ) as WeaveElementInstance;
+        let nodeInstance = stage.findOne(`#${nodeId}`) as WeaveElementInstance;
+
+        if (nodeInstance && nodeInstance.getAttrs().nodeType === 'frame') {
+          nodeInstance = stage.findOne(
+            `#${nodeId}-selector-area`
+          ) as WeaveElementInstance;
+        }
+
         return nodeInstance;
       });
 
@@ -650,5 +655,95 @@ export class Weave {
     options: WeaveExportNodesOptions
   ): Promise<HTMLImageElement> {
     return await this.exportManager.exportNodes(nodes, boundingNodes, options);
+  }
+
+  // LOCK / UNLOCK METHODS
+
+  public allNodesLocked(nodes: Konva.Node[]): boolean {
+    let allNodesLocked = true;
+
+    for (const node of nodes) {
+      const nodeHandler = this.getNodeHandler<WeaveNode>(
+        node.getAttrs().nodeType
+      );
+
+      if (!nodeHandler) {
+        continue;
+      }
+
+      allNodesLocked = allNodesLocked && nodeHandler.isLocked(node);
+    }
+
+    return allNodesLocked;
+  }
+
+  public allNodesUnlocked(nodes: Konva.Node[]): boolean {
+    let allNodesUnlocked = true;
+
+    for (const node of nodes) {
+      const nodeHandler = this.getNodeHandler<WeaveNode>(
+        node.getAttrs().nodeType
+      );
+
+      if (!nodeHandler) {
+        continue;
+      }
+
+      allNodesUnlocked = allNodesUnlocked && !nodeHandler.isLocked(node);
+    }
+
+    return allNodesUnlocked;
+  }
+
+  public lockNode(node: Konva.Node): void {
+    const nodeHandler = this.getNodeHandler<WeaveNode>(
+      node.getAttrs().nodeType
+    );
+
+    if (!nodeHandler) {
+      return;
+    }
+
+    nodeHandler.lock(node);
+  }
+
+  public lockNodes(nodes: Konva.Node[]): void {
+    for (const node of nodes) {
+      const nodeHandler = this.getNodeHandler<WeaveNode>(
+        node.getAttrs().nodeType
+      );
+
+      if (!nodeHandler) {
+        continue;
+      }
+
+      nodeHandler.lock(node);
+    }
+  }
+
+  public unlockNode(node: Konva.Node): void {
+    const nodeHandler = this.getNodeHandler<WeaveNode>(
+      node.getAttrs().nodeType
+    );
+
+    if (!nodeHandler) {
+      return;
+    }
+
+    nodeHandler.unlock(node);
+  }
+
+  public unlockNodes(nodes: Konva.Node[]): void {
+    for (const node of nodes) {
+      const nodeHandler = this.getNodeHandler<WeaveNode>(
+        node.getAttrs().nodeType
+      );
+
+      if (!nodeHandler) {
+        continue;
+      }
+
+      nodeHandler.unlock(node);
+    }
   }
 }

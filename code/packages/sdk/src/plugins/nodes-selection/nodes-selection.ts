@@ -205,6 +205,7 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
       this.dragging = true;
 
       const stage = this.instance.getStage();
+
       if (stage.isMouseWheelPressed()) {
         e.cancelBubble = true;
         e.target.stopDrag();
@@ -636,26 +637,53 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
       });
 
       const selectedNodes = new Set<Konva.Node>();
-      const framesNodes = selected.filter(
-        (shape) => shape.getAttrs().nodeType === 'frame'
-      );
-      const framesNodesIds = selected.map((shape) => shape.getAttrs().id);
+      const framesNodes = selected
+        .map((shape) => {
+          if (
+            shape.getAttrs().nodeType === 'frame' &&
+            shape.getAttrs().nodeId
+          ) {
+            return stage.findOne(`#${shape.getAttrs().nodeId}`) as Konva.Group;
+          }
+          return shape;
+        })
+        .filter((shape) => {
+          return shape.getAttrs().nodeType === 'frame';
+        });
+
+      const framesNodesIds = framesNodes.map((shape) => {
+        return shape.getAttrs().id;
+      });
       const otherNodes = selected.filter(
         (shape) => shape.getAttrs().nodeType !== 'frame'
       );
 
       otherNodes.forEach((node) => {
-        const parent = this.instance.getInstanceRecursive(
+        let parent = this.instance.getInstanceRecursive(
           node.getParent() as Konva.Node
         );
-        if (!framesNodesIds.includes(parent?.getAttrs().id)) {
+
+        if (parent?.getAttrs().nodeId) {
+          parent = this.instance
+            .getStage()
+            .findOne(`#${parent.getAttrs().nodeId}`) as Konva.Node;
+        }
+
+        if (
+          parent &&
+          !framesNodesIds.includes(parent?.getAttrs().id) &&
+          // parent.getAttrs().nodeType !== 'frame' &&
+          !node.getAttrs().locked
+        ) {
           selectedNodes.add(node);
         }
       });
 
       framesNodes.forEach((node: Konva.Node) => {
         const frameNode: Konva.Group = node as Konva.Group;
-        selectedNodes.add(frameNode);
+        if (!frameNode.getAttrs().locked) {
+          selectedNodes.add(frameNode);
+        }
       });
 
       this.tr.nodes([...selectedNodes]);
@@ -768,6 +796,10 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
         return node.getAttrs().id === nodeTargeted.getAttrs().id;
       });
       const isSelected = nodeSelectedIndex !== -1;
+
+      if (nodeTargeted.getAttrs().locked) {
+        return;
+      }
 
       if (!metaPressed) {
         // if no key pressed and the node is not selected

@@ -546,6 +546,60 @@ exportNodes(
 This method exports the specified nodes as an image. You can define the
 exportation options.
 
+### Lock / Unlock management
+
+#### allNodesLocked
+
+```ts
+allNodesLocked(nodes: Konva.Node[]): boolean
+```
+
+This method return true if all nodes provided are not locked.
+
+#### allNodesUnlocked
+
+```ts
+allNodesUnlocked(nodes: Konva.Node[]): boolean
+```
+
+This method return true if all nodes provided are locked.
+
+#### lockNode
+
+```ts
+lockNode(node: Konva.Node): void
+```
+
+This method locks the provided node, locks means to set an attribute named `locked` to `true` and in
+that state, nodes cannot be selected, dragged or transformed.
+
+#### lockNodes
+
+```ts
+lockNodes(nodes: Konva.Node[]): void
+```
+
+This method locks the provided nodes, locks means to set an attribute named `locked` to `true` and in
+that state, nodes cannot be selected, dragged or transformed.
+
+#### unlockNode
+
+```ts
+unlockNode(node: Konva.Node): void
+```
+
+This method unlocks the provided node, unlocks means to set an attribute named `locked` to `false` and in
+that state, nodes can be selected, dragged or transformed.
+
+#### unlockNodes
+
+```ts
+unlockNodes(nodes: Konva.Node[]): void
+```
+
+This method unlocks the provided nodes, unlocks means to set an attribute named `locked` to `false` and in
+that state, nodes can be selected, dragged or transformed.
+
 ## TypeScript types
 
 ```ts

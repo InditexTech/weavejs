@@ -74,10 +74,6 @@ export class WeavePenToolAction extends WeaveAction {
       }
     });
 
-    stage.on('pointerdblclick', () => {
-      this.cancelAction();
-    });
-
     stage.on('pointerclick', () => {
       if (this.state === PEN_TOOL_STATE.IDLE) {
         return;

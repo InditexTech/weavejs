@@ -7,8 +7,11 @@ import {
   type WeaveElementInstance,
   type WeaveStateElement,
 } from '@/types';
+import type Konva from 'konva';
 
 export interface WeaveNodeBase {
+  getNodeType(): string;
+
   create(id: string, props: WeaveElementAttributes): WeaveStateElement;
 
   onRender(props: WeaveElementAttributes): WeaveElementInstance;
@@ -21,4 +24,20 @@ export interface WeaveNodeBase {
   onDestroy(instance: WeaveElementInstance): void;
 
   serialize(instance: WeaveElementInstance): WeaveStateElement;
+
+  setupDefaultNodeAugmentation(node: Konva.Node): void;
+
+  setupDefaultNodeEvents(node: Konva.Node): void;
+
+  isNodeSelected(ele: Konva.Node): boolean;
+
+  lock(instance: Konva.Node): void;
+
+  unlock(instance: Konva.Node): void;
+
+  isLocked(instance: Konva.Node): boolean;
+
+  isSelecting(): boolean;
+
+  isPasting(): boolean;
 }

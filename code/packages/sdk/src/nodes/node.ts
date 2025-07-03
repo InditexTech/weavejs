@@ -137,12 +137,14 @@ export abstract class WeaveNode implements WeaveNodeBase {
   }
 
   setupDefaultNodeEvents(node: Konva.Node): void {
-    this.previousPointer = null;
-
     this.instance.addEventListener<WeaveNodesSelectionPluginOnNodesChangeEvent>(
       'onNodesChange',
       () => {
-        if (this.isSelecting() && this.isNodeSelected(node)) {
+        if (
+          !this.isLocked(node as WeaveElementInstance) &&
+          this.isSelecting() &&
+          this.isNodeSelected(node)
+        ) {
           node.draggable(true);
           return;
         }
@@ -150,127 +152,73 @@ export abstract class WeaveNode implements WeaveNodeBase {
       }
     );
 
-    let transforming = false;
+    const isLocked = node.getAttrs().locked ?? false;
 
-    node.on('transformstart', () => {
-      transforming = true;
-    });
+    if (isLocked) {
+      node.off('transformstart');
+      node.off('transform');
+      node.off('transformend');
+      node.off('dragstart');
+      node.off('dragmove');
+      node.off('dragend');
+      node.off('pointerenter');
+      node.off('pointerleave');
+    } else {
+      let transforming = false;
 
-    const handleTransform = (e: KonvaEventObject<Event, Konva.Node>) => {
-      const node = e.target;
+      node.on('transformstart', () => {
+        transforming = true;
+      });
 
-      const nodesSelectionPlugin =
-        this.instance.getPlugin<WeaveNodesSelectionPlugin>('nodesSelection');
+      const handleTransform = (e: KonvaEventObject<Event, Konva.Node>) => {
+        const node = e.target;
 
-      const nodesSnappingPlugin =
-        this.instance.getPlugin<WeaveNodesSnappingPlugin>('nodesSnapping');
+        const nodesSelectionPlugin =
+          this.instance.getPlugin<WeaveNodesSelectionPlugin>('nodesSelection');
 
-      if (
-        nodesSelectionPlugin &&
-        this.isSelecting() &&
-        this.isNodeSelected(node)
-      ) {
-        nodesSelectionPlugin.getTransformer().forceUpdate();
-      }
+        const nodesSnappingPlugin =
+          this.instance.getPlugin<WeaveNodesSnappingPlugin>('nodesSnapping');
 
-      if (
-        nodesSnappingPlugin &&
-        transforming &&
-        this.isSelecting() &&
-        this.isNodeSelected(node)
-      ) {
-        nodesSnappingPlugin.evaluateGuidelines(e);
-      }
+        if (
+          nodesSelectionPlugin &&
+          this.isSelecting() &&
+          this.isNodeSelected(node)
+        ) {
+          nodesSelectionPlugin.getTransformer().forceUpdate();
+        }
 
-      if (this.isSelecting() && this.isNodeSelected(node)) {
-        this.scaleReset(node);
+        if (
+          nodesSnappingPlugin &&
+          transforming &&
+          this.isSelecting() &&
+          this.isNodeSelected(node)
+        ) {
+          nodesSnappingPlugin.evaluateGuidelines(e);
+        }
 
-        const nodeHandler = this.instance.getNodeHandler<WeaveNode>(
-          node.getAttrs().nodeType
-        );
-        if (nodeHandler) {
-          this.instance.updateNode(
-            nodeHandler.serialize(node as WeaveElementInstance)
+        if (this.isSelecting() && this.isNodeSelected(node)) {
+          this.scaleReset(node);
+
+          const nodeHandler = this.instance.getNodeHandler<WeaveNode>(
+            node.getAttrs().nodeType
           );
+          if (nodeHandler) {
+            this.instance.updateNode(
+              nodeHandler.serialize(node as WeaveElementInstance)
+            );
+          }
         }
-      }
-    };
+      };
 
-    node.on('transform', throttle(handleTransform, 100));
+      node.on('transform', throttle(handleTransform, 100));
 
-    node.on('transformend', (e) => {
-      const node = e.target;
+      node.on('transformend', (e) => {
+        const node = e.target;
 
-      transforming = false;
+        transforming = false;
 
-      const nodesSelectionPlugin =
-        this.instance.getPlugin<WeaveNodesSelectionPlugin>('nodesSelection');
-
-      const nodesSnappingPlugin =
-        this.instance.getPlugin<WeaveNodesSnappingPlugin>('nodesSnapping');
-
-      if (nodesSnappingPlugin) {
-        nodesSnappingPlugin.cleanupEvaluateGuidelines();
-      }
-
-      if (nodesSelectionPlugin) {
-        nodesSelectionPlugin.getTransformer().forceUpdate();
-      }
-
-      const nodeHandler = this.instance.getNodeHandler<WeaveNode>(
-        node.getAttrs().nodeType
-      );
-      if (nodeHandler) {
-        this.instance.updateNode(
-          nodeHandler.serialize(node as WeaveElementInstance)
-        );
-      }
-    });
-
-    node.on('dragstart', (e) => {
-      const stage = this.instance.getStage();
-      if (stage.isMouseWheelPressed()) {
-        e.cancelBubble = true;
-        node.stopDrag();
-        return;
-      }
-    });
-
-    const handleDragMove = (e: KonvaEventObject<DragEvent, Konva.Node>) => {
-      const stage = this.instance.getStage();
-      if (stage.isMouseWheelPressed()) {
-        e.cancelBubble = true;
-        node.stopDrag();
-        return;
-      }
-
-      if (this.isSelecting() && this.isNodeSelected(node)) {
-        clearContainerTargets(this.instance);
-
-        const layerToMove = checkIfOverContainer(this.instance, e.target);
-
-        if (layerToMove) {
-          layerToMove.fire(WEAVE_NODE_CUSTOM_EVENTS.onTargetEnter, {
-            bubbles: true,
-          });
-        }
-
-        const nodeHandler = this.instance.getNodeHandler<WeaveNode>(
-          node.getAttrs().nodeType
-        );
-        if (nodeHandler) {
-          this.instance.updateNode(
-            nodeHandler.serialize(node as WeaveElementInstance)
-          );
-        }
-      }
-    };
-
-    node.on('dragmove', throttle(handleDragMove, 100));
-
-    node.on('dragend', (e) => {
-      if (this.isSelecting() && this.isNodeSelected(node)) {
-        clearContainerTargets(this.instance);
+        const nodesSelectionPlugin =
+          this.instance.getPlugin<WeaveNodesSelectionPlugin>('nodesSelection');
 
         const nodesSnappingPlugin =
           this.instance.getPlugin<WeaveNodesSnappingPlugin>('nodesSnapping');
@@ -279,57 +227,105 @@ export abstract class WeaveNode implements WeaveNodeBase {
           nodesSnappingPlugin.cleanupEvaluateGuidelines();
         }
 
-        const containerToMove = moveNodeToContainer(this.instance, e.target);
+        if (nodesSelectionPlugin) {
+          nodesSelectionPlugin.getTransformer().forceUpdate();
+        }
 
-        if (containerToMove) {
+        const nodeHandler = this.instance.getNodeHandler<WeaveNode>(
+          node.getAttrs().nodeType
+        );
+        if (nodeHandler) {
+          this.instance.updateNode(
+            nodeHandler.serialize(node as WeaveElementInstance)
+          );
+        }
+      });
+
+      node.on('dragstart', (e) => {
+        const stage = this.instance.getStage();
+
+        if (stage.isMouseWheelPressed()) {
+          e.cancelBubble = true;
+          e.target.stopDrag();
+        }
+      });
+
+      const handleDragMove = (e: KonvaEventObject<DragEvent, Konva.Node>) => {
+        const stage = this.instance.getStage();
+
+        if (stage.isMouseWheelPressed()) {
+          e.cancelBubble = true;
+          e.target.stopDrag();
           return;
         }
 
-        this.instance.updateNode(this.serialize(node as WeaveElementInstance));
-      }
-    });
+        if (this.isSelecting() && this.isNodeSelected(node)) {
+          clearContainerTargets(this.instance);
 
-    this.previousPointer = null;
+          const layerToMove = checkIfOverContainer(this.instance, e.target);
 
-    node.on('pointerenter', () => {
-      const realNode = this.instance.getInstanceRecursive(node);
-      if (
-        this.isSelecting() &&
-        !this.isNodeSelected(realNode) &&
-        !this.isPasting()
-      ) {
-        const stage = this.instance.getStage();
-        this.previousPointer = stage.container().style.cursor;
-        stage.container().style.cursor = 'pointer';
-        return;
-      }
-      if (this.isPasting()) {
-        const stage = this.instance.getStage();
-        this.previousPointer = stage.container().style.cursor;
-        stage.container().style.cursor = 'crosshair';
-        return;
-      }
-    });
+          if (layerToMove) {
+            layerToMove.fire(WEAVE_NODE_CUSTOM_EVENTS.onTargetEnter, {
+              bubbles: true,
+            });
+          }
 
-    node.on('pointerleave', () => {
-      const realNode = this.instance.getInstanceRecursive(node);
-      if (
-        this.isSelecting() &&
-        !this.isNodeSelected(realNode) &&
-        !this.isPasting()
-      ) {
-        const stage = this.instance.getStage();
-        stage.container().style.cursor = this.previousPointer ?? 'default';
-        this.previousPointer = null;
-        return;
-      }
-      if (this.isPasting()) {
-        const stage = this.instance.getStage();
-        this.previousPointer = stage.container().style.cursor;
-        stage.container().style.cursor = 'crosshair';
-        return;
-      }
-    });
+          const nodeHandler = this.instance.getNodeHandler<WeaveNode>(
+            node.getAttrs().nodeType
+          );
+          if (nodeHandler) {
+            this.instance.updateNode(
+              nodeHandler.serialize(node as WeaveElementInstance)
+            );
+          }
+        }
+      };
+
+      node.on('dragmove', throttle(handleDragMove, 100));
+
+      node.on('dragend', (e) => {
+        if (this.isSelecting() && this.isNodeSelected(node)) {
+          clearContainerTargets(this.instance);
+
+          const nodesSnappingPlugin =
+            this.instance.getPlugin<WeaveNodesSnappingPlugin>('nodesSnapping');
+
+          if (nodesSnappingPlugin) {
+            nodesSnappingPlugin.cleanupEvaluateGuidelines();
+          }
+
+          const containerToMove = moveNodeToContainer(this.instance, e.target);
+
+          if (containerToMove) {
+            return;
+          }
+
+          this.instance.updateNode(
+            this.serialize(node as WeaveElementInstance)
+          );
+        }
+      });
+
+      node.on('pointerenter', (e) => {
+        const realNode = this.instance.getInstanceRecursive(node);
+        const isLocked = realNode.getAttrs().locked ?? false;
+        if (
+          this.isSelecting() &&
+          !this.isNodeSelected(realNode) &&
+          !this.isPasting()
+        ) {
+          const stage = this.instance.getStage();
+          stage.container().style.cursor = !isLocked ? 'pointer' : 'default';
+          e.cancelBubble = true;
+          return;
+        }
+        if (this.isPasting()) {
+          const stage = this.instance.getStage();
+          stage.container().style.cursor = 'crosshair';
+          e.cancelBubble = true;
+        }
+      });
+    }
   }
 
   create(key: string, props: WeaveElementAttributes): WeaveStateElement {
@@ -372,5 +368,53 @@ export abstract class WeaveNode implements WeaveNodeBase {
         children: [],
       },
     };
+  }
+
+  lock(instance: Konva.Node): void {
+    if (instance.getAttrs().nodeType !== this.getNodeType()) {
+      return;
+    }
+
+    instance.setAttrs({
+      locked: true,
+    });
+
+    this.instance.updateNode(this.serialize(instance as WeaveElementInstance));
+
+    const selectionPlugin = this.getSelectionPlugin();
+    if (selectionPlugin) {
+      const selectedNodes = selectionPlugin.getSelectedNodes();
+      const newSelectedNodes = selectedNodes.filter(
+        (node) => node.getAttrs().id !== instance.getAttrs().id
+      );
+      selectionPlugin.setSelectedNodes(newSelectedNodes);
+      selectionPlugin.getTransformer().forceUpdate();
+    }
+
+    this.setupDefaultNodeEvents(instance);
+
+    const stage = this.instance.getStage();
+    stage.container().style.cursor = 'default';
+  }
+
+  unlock(instance: Konva.Node): void {
+    if (instance.getAttrs().nodeType !== this.getNodeType()) {
+      return;
+    }
+
+    instance.setAttrs({
+      locked: false,
+    });
+
+    this.instance.updateNode(this.serialize(instance as WeaveElementInstance));
+
+    this.setupDefaultNodeEvents(instance);
+
+    const stage = this.instance.getStage();
+    stage.container().style.cursor = 'default';
+  }
+
+  isLocked(instance: Konva.Node): boolean {
+    return instance.getAttrs().locked ?? false;
   }
 }

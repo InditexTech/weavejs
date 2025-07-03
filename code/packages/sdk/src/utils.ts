@@ -73,6 +73,13 @@ export function moveNodeToContainer(
 ): Konva.Node | undefined {
   const nodeIntersected = instance.pointIntersectsContainerElement();
 
+  // check is node is locked
+  const isLocked = instance.allNodesLocked([node]);
+
+  if (isLocked) {
+    return;
+  }
+
   let nodeActualContainer: Konva.Node | undefined =
     node.getParent() as Konva.Node;
 
