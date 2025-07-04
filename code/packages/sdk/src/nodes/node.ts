@@ -378,6 +378,63 @@ export abstract class WeaveNode implements WeaveNodeBase {
     };
   }
 
+  show(instance: Konva.Node): void {
+    if (instance.getAttrs().nodeType !== this.getNodeType()) {
+      return;
+    }
+
+    instance.setAttrs({
+      visible: true,
+    });
+
+    this.instance.updateNode(this.serialize(instance as WeaveElementInstance));
+
+    this.setupDefaultNodeEvents(instance);
+
+    const stage = this.instance.getStage();
+    stage.container().style.cursor = 'default';
+  }
+
+  hide(instance: Konva.Node): void {
+    if (instance.getAttrs().nodeType !== this.getNodeType()) {
+      return;
+    }
+
+    instance.setAttrs({
+      visible: false,
+    });
+
+    const selectionPlugin = this.getSelectionPlugin();
+    if (selectionPlugin) {
+      const ids = [instance.getAttrs().id];
+
+      if (instance.getAttrs().nodeType === 'frame') {
+        ids.push(`${instance.getAttrs().id}-selector-area`);
+      }
+
+      const selectedNodes = selectionPlugin.getSelectedNodes();
+      const newSelectedNodes = selectedNodes.filter(
+        (node) => !ids.includes(node.getAttrs().id)
+      );
+      selectionPlugin.setSelectedNodes(newSelectedNodes);
+      selectionPlugin.getTransformer().forceUpdate();
+    }
+
+    this.instance.updateNode(this.serialize(instance as WeaveElementInstance));
+
+    this.setupDefaultNodeEvents(instance);
+
+    const stage = this.instance.getStage();
+    stage.container().style.cursor = 'default';
+  }
+
+  isVisible(instance: Konva.Node): boolean {
+    if (typeof instance.getAttrs().visible === 'undefined') {
+      return true;
+    }
+    return instance.getAttrs().visible ?? false;
+  }
+
   lock(instance: Konva.Node): void {
     if (instance.getAttrs().nodeType !== this.getNodeType()) {
       return;

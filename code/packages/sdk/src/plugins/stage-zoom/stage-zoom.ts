@@ -322,7 +322,14 @@ export class WeaveStageZoomPlugin extends WeavePlugin {
     stage.scale({ x: 1, y: 1 });
     stage.position({ x: 0, y: 0 });
 
-    const bounds = getBoundingBox(stage, mainLayer.getChildren());
+    let realNodes = mainLayer.getChildren();
+    realNodes = realNodes.filter(
+      (node) =>
+        typeof node.getAttrs().visible === 'undefined' ||
+        node.getAttrs().visible
+    );
+
+    const bounds = getBoundingBox(stage, realNodes);
 
     const stageWidth = stage.width();
     const stageHeight = stage.height();

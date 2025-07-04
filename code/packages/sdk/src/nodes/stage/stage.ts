@@ -37,21 +37,21 @@ export class WeaveStageNode extends WeaveNode {
     });
 
     Konva.Stage.prototype.allowActions = function (actions?: string[]) {
-      if (actions) {
+      if (typeof actions !== 'undefined') {
         this._allowActions = actions;
       }
       return this._allowActions;
     };
 
     Konva.Stage.prototype.allowSelectNodes = function (nodeTypes?: string[]) {
-      if (nodeTypes) {
+      if (typeof nodeTypes !== 'undefined') {
         this._allowSelectNodeTypes = nodeTypes;
       }
       return this._allowSelectNodeTypes;
     };
 
     Konva.Stage.prototype.allowSelection = function (allowSelection?: boolean) {
-      if (allowSelection) {
+      if (typeof allowSelection !== 'undefined') {
         this._allowSelection = allowSelection;
       }
       return this._allowSelection;
