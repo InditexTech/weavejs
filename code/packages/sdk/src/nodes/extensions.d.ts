@@ -33,6 +33,12 @@ declare module 'konva/lib/Node' {
 
 declare module 'konva/lib/Stage' {
   interface Stage {
+    _allowActions: string[];
+    _allowSelectNodeTypes: string[];
+    _allowSelection: boolean;
+    allowActions(actions?: string[]): string[];
+    allowSelectNodes(nodeTypes?: string[]): string[];
+    allowSelection(allowSelection?: boolean): boolean;
     isFocused(): boolean;
     isMouseWheelPressed(): boolean;
   }

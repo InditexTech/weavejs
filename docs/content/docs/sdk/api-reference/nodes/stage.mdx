@@ -60,3 +60,28 @@ isMouseWheelPressed(): boolean
 ```
 
 Function that indicates if the mouse wheel is being pressed or not.
+
+### allowSelection
+
+```ts
+allowSelection(allowSelection?: boolean): boolean
+```
+
+Function that set is selection is allowed (when SelectionTool is disabled), useful to build
+tools over the utilityLayer.
+
+### allowSelectNodes
+
+```ts
+allowSelectNodes(nodeTypes?: string[]): string[]
+```
+
+Function that set the nodes to listen for pointer when `allowSelection()` is active.
+
+### allowActions
+
+```ts
+allowActions(actions?: string[]): string[]
+```
+
+Function that set the actions to listen for pointer when `allowSelection()` is active.

@@ -36,8 +36,40 @@ export class WeaveStageNode extends WeaveNode {
       this.stageFocused = false;
     });
 
+    Konva.Stage.prototype.allowActions = function (actions?: string[]) {
+      if (actions) {
+        this._allowActions = actions;
+      }
+      return this._allowActions;
+    };
+
+    Konva.Stage.prototype.allowSelectNodes = function (nodeTypes?: string[]) {
+      if (nodeTypes) {
+        this._allowSelectNodeTypes = nodeTypes;
+      }
+      return this._allowSelectNodeTypes;
+    };
+
+    Konva.Stage.prototype.allowSelection = function (allowSelection?: boolean) {
+      if (allowSelection) {
+        this._allowSelection = allowSelection;
+      }
+      return this._allowSelection;
+    };
+
     stage.on('pointermove', (e) => {
-      if (e.target === stage) {
+      if (
+        stage.allowSelection() &&
+        !stage.allowActions().includes(this.instance.getActiveAction() ?? '') &&
+        !stage.allowSelectNodes().includes(e.target.getAttrs()?.nodeType ?? '')
+      ) {
+        const stage = this.instance.getStage();
+        stage.container().style.cursor = 'default';
+      }
+      if (
+        e.target === stage &&
+        this.instance.getActiveAction() === 'selectionTool'
+      ) {
         const stage = this.instance.getStage();
         stage.container().style.cursor = 'default';
       }
