@@ -267,9 +267,15 @@ export class WeaveFrameNode extends WeaveNode {
       e.cancelBubble = true;
     };
 
+    selectorArea.on('transformend', (e) => {
+      this.instance.emitEvent('onTransform', e.target);
+    });
+
     selectorArea.on('transform', throttle(handleSelectorAreaTransform, 50));
 
     selectorArea.on('transformend', (e) => {
+      this.instance.emitEvent('onTransform', null);
+
       const nodesSnappingPlugin =
         this.instance.getPlugin<WeaveNodesSnappingPlugin>('nodesSnapping');
 

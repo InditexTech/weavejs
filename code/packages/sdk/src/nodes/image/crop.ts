@@ -7,7 +7,6 @@ import { type WeaveElementInstance } from '@inditextech/weave-types';
 import { WeaveNodesSelectionPlugin } from '@/plugins/nodes-selection/nodes-selection';
 import { Weave } from '@/weave';
 import { WeaveImageNode } from './image';
-// import type { Vector2d } from 'konva/lib/types';
 
 export class WeaveImageCrop {
   private instance!: Weave;
@@ -187,7 +186,7 @@ export class WeaveImageCrop {
     });
     this.drawGridLines(0, 0, cropRect.width, cropRect.height);
 
-    this.cropRect.on('dragmove', () => {
+    const handleGridLines = () => {
       const cropRect = this.cropRect.getClientRect({
         relativeTo: this.cropGroup,
         skipStroke: true,
@@ -198,18 +197,22 @@ export class WeaveImageCrop {
         cropRect.width,
         cropRect.height
       );
+    };
+
+    this.cropRect.on('dragstart', (e) => {
+      this.instance.emitEvent('onDrag', e.target);
     });
-    this.cropRect.on('transform', () => {
-      const cropRect = this.cropRect.getClientRect({
-        relativeTo: this.cropGroup,
-        skipStroke: true,
-      });
-      this.drawGridLines(
-        cropRect.x,
-        cropRect.y,
-        cropRect.width,
-        cropRect.height
-      );
+    this.cropRect.on('dragmove', handleGridLines);
+    this.cropRect.on('dragend', () => {
+      this.instance.emitEvent('onDrag', null);
+    });
+
+    this.cropRect.on('transformstart', (e) => {
+      this.instance.emitEvent('onTransform', e.target);
+    });
+    this.cropRect.on('transform', handleGridLines);
+    this.cropRect.on('transformend', () => {
+      this.instance.emitEvent('onTransform', null);
     });
 
     this.transformer.nodes([this.cropRect]);

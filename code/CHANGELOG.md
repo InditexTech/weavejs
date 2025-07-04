@@ -16,6 +16,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 - [#479](https://github.com/InditexTech/weavejs/issues/479) Select correctly the frame nodes when selecting on area mode
+- [#481](https://github.com/InditexTech/weavejs/issues/481) Avoid context menu triggering on transform
 
 ## [0.34.0] - 2025-07-03
 
