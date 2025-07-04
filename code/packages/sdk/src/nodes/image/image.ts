@@ -406,6 +406,7 @@ export class WeaveImageNode extends WeaveNode {
       | undefined;
 
     const imageObj = new Image();
+    imageObj.crossOrigin = 'anonymous';
     imageObj.onerror = (error) => {
       console.error('Error loading image', imageProps.imageURL, error);
       imagePlaceholder?.setAttrs({
