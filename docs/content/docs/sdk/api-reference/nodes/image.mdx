@@ -45,7 +45,10 @@ new WeaveImageNode(params?: WeaveImageNodeParams);
 ```ts
 type WeaveNodeTransformerProperties = Konva.TransformerConfig;
 
+type ImageCrossOrigin = "anonymous" | "use-credentials";
+
 type WeaveImageProperties = {
+  crossOrigin: ImageCrossOrigin;
   transform: WeaveNodeTransformerProperties;
 };
 
@@ -89,6 +92,12 @@ For `WeaveImageProperties`:
 
 <TypeTable
   type={{
+    ["crossOrigin"]: {
+      description:
+        "Value of the property crossOrigin for the HTMLImageElement DOM element. Useful for CORS support.",
+      type: "ImageCrossOrigin",
+      default: "anonymous",
+    },
     ["transform"]: {
       description:
         "Setup the transform properties for the image (if can be resized, rotated, anchors, etc.).",

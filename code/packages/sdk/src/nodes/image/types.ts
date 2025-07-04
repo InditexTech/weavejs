@@ -3,6 +3,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import {
+  type ImageCrossOrigin,
   type WeaveElementAttributes,
   type WeaveNodeTransformerProperties,
 } from '@inditextech/weave-types';
@@ -21,6 +22,7 @@ export type ImageProps = WeaveElementAttributes & {
 };
 
 export type WeaveImageProperties = {
+  crossOrigin: ImageCrossOrigin;
   transform: WeaveNodeTransformerProperties;
 };
 

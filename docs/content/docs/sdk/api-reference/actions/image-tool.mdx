@@ -42,11 +42,19 @@ type WeaveImageToolActionOnEndLoadImageEvent = Error | undefined;
 
 type WeaveImageToolActionTriggerParams = {
   imageURL?: string;
+  options?: ImageOptions;
+  position?: Vector2d;
+};
+
+type ImageCrossOrigin = "anonymous" | "use-credentials";
+
+type ImageOptions = {
+  crossOrigin: ImageCrossOrigin;
 };
 
 type WeaveImageToolActionTriggerReturn =
   | {
-      finishUploadCallback: (imageURL: string) => void;
+      finishUploadCallback: (imageURL: string, options?: ImageOptions) => void;
     }
   | undefined;
 ```
@@ -65,6 +73,16 @@ For `WeaveImageToolActionTriggerParams`:
       description:
         "The URL of the image, if already uploaded to an external service. URL must the same as the application URL to avoid cross-origin issues. We recommend to proxy the images through the application.",
       type: "string",
+    },
+    ["options"]: {
+      description:
+        "The options for the HTMLImageElement DOM element. Useful for CORS support.",
+      type: "any",
+    },
+    ["position"]: {
+      description:
+        "Position the image in this coordinates provided by the vector.",
+      type: "Vector2d",
     },
   }}
 />

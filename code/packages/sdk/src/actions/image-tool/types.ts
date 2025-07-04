@@ -4,6 +4,7 @@
 
 import type { Vector2d } from 'konva/lib/types';
 import { IMAGE_TOOL_STATE } from './constants';
+import type { ImageCrossOrigin } from '@inditextech/weave-types';
 
 export type WeaveImageToolActionStateKeys = keyof typeof IMAGE_TOOL_STATE;
 export type WeaveImageToolActionState =
@@ -14,11 +15,16 @@ export type WeaveImageToolActionOnEndLoadImageEvent = Error | undefined;
 
 export type WeaveImageToolActionTriggerParams = {
   imageURL?: string;
+  options?: ImageOptions;
   position?: Vector2d;
+};
+
+export type ImageOptions = {
+  crossOrigin: ImageCrossOrigin;
 };
 
 export type WeaveImageToolActionTriggerReturn =
   | {
-      finishUploadCallback: (imageURL: string) => void;
+      finishUploadCallback: (imageURL: string, options: ImageOptions) => void;
     }
   | undefined;
