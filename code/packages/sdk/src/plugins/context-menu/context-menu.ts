@@ -22,6 +22,7 @@ import {
 } from './constants';
 import type { WeaveNode } from '@/nodes/node';
 import { WEAVE_NODES_SELECTION_KEY } from '@/plugins/nodes-selection/constants';
+import type Konva from 'konva';
 
 export class WeaveContextMenuPlugin extends WeavePlugin {
   private config: WeaveStageContextMenuPluginConfig;
@@ -30,6 +31,8 @@ export class WeaveContextMenuPlugin extends WeavePlugin {
   private tapHold: boolean;
   private tapHoldTimeout: number;
   private pointers: Record<string, PointerEvent>;
+  private dragging!: boolean;
+  private transforming!: boolean;
   getLayerName = undefined;
   initLayer = undefined;
   onRender: undefined;
@@ -153,8 +156,28 @@ export class WeaveContextMenuPlugin extends WeavePlugin {
   private initEvents() {
     const stage = this.instance.getStage();
 
+    this.instance.addEventListener('onDrag', (node: Konva.Node | null) => {
+      if (node) {
+        this.dragging = true;
+      } else {
+        this.dragging = false;
+      }
+    });
+
+    this.instance.addEventListener('onTransform', (node: Konva.Node | null) => {
+      if (node) {
+        this.transforming = true;
+      } else {
+        this.transforming = false;
+      }
+    });
+
     stage.on('pointerdown', (e) => {
       this.pointers[e.evt.pointerId] = e.evt;
+
+      if (e.evt.pointerType === 'mouse') {
+        return;
+      }
 
       if (
         e.evt.pointerType === 'touch' &&
@@ -165,11 +188,19 @@ export class WeaveContextMenuPlugin extends WeavePlugin {
 
       this.touchTimer = setTimeout(() => {
         this.tapHold = true;
+        if (this.touchTimer && (this.dragging || this.transforming)) {
+          clearTimeout(this.touchTimer);
+          return;
+        }
         this.triggerContextMenu(e.target);
       }, this.tapHoldTimeout);
     });
 
-    stage.on('pointermove', () => {
+    stage.on('pointermove', (e) => {
+      if (e.evt.pointerType === 'mouse') {
+        return;
+      }
+
       if (this.touchTimer) {
         clearTimeout(this.touchTimer);
       }
@@ -177,6 +208,10 @@ export class WeaveContextMenuPlugin extends WeavePlugin {
 
     stage.on('pointerup', (e) => {
       delete this.pointers[e.evt.pointerId];
+
+      if (e.evt.pointerType === 'mouse') {
+        return;
+      }
 
       if (
         e.evt.pointerType === 'touch' &&

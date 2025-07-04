@@ -166,8 +166,10 @@ export abstract class WeaveNode implements WeaveNodeBase {
     } else {
       let transforming = false;
 
-      node.on('transformstart', () => {
+      node.on('transformstart', (e) => {
         transforming = true;
+
+        this.instance.emitEvent('onTransform', e.target);
       });
 
       const handleTransform = (e: KonvaEventObject<Event, Konva.Node>) => {
@@ -215,6 +217,8 @@ export abstract class WeaveNode implements WeaveNodeBase {
       node.on('transformend', (e) => {
         const node = e.target;
 
+        this.instance.emitEvent('onTransform', null);
+
         transforming = false;
 
         const nodesSelectionPlugin =
@@ -243,6 +247,8 @@ export abstract class WeaveNode implements WeaveNodeBase {
 
       node.on('dragstart', (e) => {
         const stage = this.instance.getStage();
+
+        this.instance.emitEvent('onDrag', e.target);
 
         if (stage.isMouseWheelPressed()) {
           e.cancelBubble = true;
@@ -284,6 +290,8 @@ export abstract class WeaveNode implements WeaveNodeBase {
       node.on('dragmove', throttle(handleDragMove, 100));
 
       node.on('dragend', (e) => {
+        this.instance.emitEvent('onDrag', null);
+
         if (this.isSelecting() && this.isNodeSelected(node)) {
           clearContainerTargets(this.instance);
 

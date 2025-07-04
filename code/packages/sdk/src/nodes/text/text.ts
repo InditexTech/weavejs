@@ -95,7 +95,13 @@ export class WeaveTextNode extends WeaveNode {
       }
     };
 
+    text.on('transformstart', (e) => {
+      this.instance.emitEvent('onTransform', e.target);
+    });
     text.on('transform', throttle(handleTextTransform, 50));
+    text.on('transformend', () => {
+      this.instance.emitEvent('onTransform', null);
+    });
 
     window.addEventListener('keypress', (e) => {
       if (

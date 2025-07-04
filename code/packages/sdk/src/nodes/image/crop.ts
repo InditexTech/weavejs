@@ -187,6 +187,9 @@ export class WeaveImageCrop {
     });
     this.drawGridLines(0, 0, cropRect.width, cropRect.height);
 
+    this.cropRect.on('dragstart', (e) => {
+      this.instance.emitEvent('onDrag', e.target);
+    });
     this.cropRect.on('dragmove', () => {
       const cropRect = this.cropRect.getClientRect({
         relativeTo: this.cropGroup,
@@ -199,6 +202,13 @@ export class WeaveImageCrop {
         cropRect.height
       );
     });
+    this.cropRect.on('dragend', () => {
+      this.instance.emitEvent('onDrag', null);
+    });
+
+    this.cropRect.on('transformstart', (e) => {
+      this.instance.emitEvent('onTransform', e.target);
+    });
     this.cropRect.on('transform', () => {
       const cropRect = this.cropRect.getClientRect({
         relativeTo: this.cropGroup,
@@ -210,6 +220,9 @@ export class WeaveImageCrop {
         cropRect.width,
         cropRect.height
       );
+    });
+    this.cropRect.on('transformend', () => {
+      this.instance.emitEvent('onTransform', null);
     });
 
     this.transformer.nodes([this.cropRect]);
