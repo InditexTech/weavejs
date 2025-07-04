@@ -570,8 +570,8 @@ This method return true if all nodes provided are locked.
 lockNode(node: Konva.Node): void
 ```
 
-This method locks the provided node, locks means to set an attribute named `locked` to `true` and in
-that state, nodes cannot be selected, dragged or transformed.
+This method locks the provided node, lock means to set an attribute named `locked` to `true` and in
+that state, the node cannot be selected, dragged or transformed.
 
 #### lockNodes
 
@@ -579,8 +579,8 @@ that state, nodes cannot be selected, dragged or transformed.
 lockNodes(nodes: Konva.Node[]): void
 ```
 
-This method locks the provided nodes, locks means to set an attribute named `locked` to `true` and in
-that state, nodes cannot be selected, dragged or transformed.
+This method locks the provided nodes, lock means to set an attribute named `locked` to `true` and in
+that state, the nodes cannot be selected, dragged or transformed.
 
 #### unlockNode
 
@@ -588,8 +588,8 @@ that state, nodes cannot be selected, dragged or transformed.
 unlockNode(node: Konva.Node): void
 ```
 
-This method unlocks the provided node, unlocks means to set an attribute named `locked` to `false` and in
-that state, nodes can be selected, dragged or transformed.
+This method unlocks the provided node, unlock means to set an attribute named `locked` to `false` and in
+that state, the node can be selected, dragged or transformed.
 
 #### unlockNodes
 
@@ -597,8 +597,62 @@ that state, nodes can be selected, dragged or transformed.
 unlockNodes(nodes: Konva.Node[]): void
 ```
 
-This method unlocks the provided nodes, unlocks means to set an attribute named `locked` to `false` and in
-that state, nodes can be selected, dragged or transformed.
+This method unlocks the provided nodes, unlock means to set an attribute named `locked` to `false` and in
+that state, the nodes can be selected, dragged or transformed.
+
+### Visibility management
+
+#### allNodesVisible
+
+```ts
+allNodesVisible(nodes: Konva.Node[]): boolean
+```
+
+This method return true if all nodes provided are visible.
+
+#### allNodesHidden
+
+```ts
+allNodesHidden(nodes: Konva.Node[]): boolean
+```
+
+This method return true if all nodes provided are not visible.
+
+#### hideNode
+
+```ts
+hideNode(node: Konva.Node): void
+```
+
+This method hides (makes it invisible) the provided node, hidden means to set an attribute named `visible` to `false` and in
+that state, the node is hidden (not visible) from the canvas.
+
+#### hideNodes
+
+```ts
+hideNodes(nodes: Konva.Node[]): void
+```
+
+This method hides (makes them invisible) the provided nodes, hidden means to set an attribute named `visible` to `false` and in
+that state, nodes are hidden (not visible) from the canvas.
+
+#### showNode
+
+```ts
+showNode(node: Konva.Node): void
+```
+
+This method shows (makes it visible) the provided node, show means to set an attribute named `visible` to `true` and in
+that state, the node is shown (visible) on the canvas.
+
+#### showNodes
+
+```ts
+showNodes(nodes: Konva.Node[]): void
+```
+
+This method shows (makes them visible) the provided nodes, show means to set an attribute named `visible` to `true` and in
+that state, nodes are shown (visible) on the canvas.
 
 ## TypeScript types
 

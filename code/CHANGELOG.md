@@ -13,6 +13,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- [#478](https://github.com/InditexTech/weavejs/issues/478) API to handle nodes visibility
+
 ### Fixed
 
 - [#479](https://github.com/InditexTech/weavejs/issues/479) Select correctly the frame nodes when selecting on area mode

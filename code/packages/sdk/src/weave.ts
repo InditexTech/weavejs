@@ -746,4 +746,94 @@ export class Weave {
       nodeHandler.unlock(node);
     }
   }
+
+  // SHOW / HIDE METHODS
+
+  public allNodesVisible(nodes: Konva.Node[]): boolean {
+    let allNodesVisible = true;
+
+    for (const node of nodes) {
+      const nodeHandler = this.getNodeHandler<WeaveNode>(
+        node.getAttrs().nodeType
+      );
+
+      if (!nodeHandler) {
+        continue;
+      }
+
+      allNodesVisible = allNodesVisible && nodeHandler.isVisible(node);
+    }
+
+    return allNodesVisible;
+  }
+
+  public allNodesHidden(nodes: Konva.Node[]): boolean {
+    let allNodesHidden = true;
+
+    for (const node of nodes) {
+      const nodeHandler = this.getNodeHandler<WeaveNode>(
+        node.getAttrs().nodeType
+      );
+
+      if (!nodeHandler) {
+        continue;
+      }
+
+      allNodesHidden = allNodesHidden && !nodeHandler.isVisible(node);
+    }
+
+    return allNodesHidden;
+  }
+
+  public hideNode(node: Konva.Node): void {
+    const nodeHandler = this.getNodeHandler<WeaveNode>(
+      node.getAttrs().nodeType
+    );
+
+    if (!nodeHandler) {
+      return;
+    }
+
+    nodeHandler.hide(node);
+  }
+
+  public hideNodes(nodes: Konva.Node[]): void {
+    for (const node of nodes) {
+      const nodeHandler = this.getNodeHandler<WeaveNode>(
+        node.getAttrs().nodeType
+      );
+
+      if (!nodeHandler) {
+        continue;
+      }
+
+      nodeHandler.hide(node);
+    }
+  }
+
+  public showNode(node: Konva.Node): void {
+    const nodeHandler = this.getNodeHandler<WeaveNode>(
+      node.getAttrs().nodeType
+    );
+
+    if (!nodeHandler) {
+      return;
+    }
+
+    nodeHandler.show(node);
+  }
+
+  public showNodes(nodes: Konva.Node[]): void {
+    for (const node of nodes) {
+      const nodeHandler = this.getNodeHandler<WeaveNode>(
+        node.getAttrs().nodeType
+      );
+
+      if (!nodeHandler) {
+        continue;
+      }
+
+      nodeHandler.show(node);
+    }
+  }
 }
