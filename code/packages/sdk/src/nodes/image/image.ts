@@ -47,6 +47,7 @@ export class WeaveImageNode extends WeaveNode {
     const { config } = params ?? {};
 
     this.config = {
+      crossOrigin: config?.crossOrigin ?? 'anonymous',
       transform: {
         ...WEAVE_DEFAULT_TRANSFORM_PROPERTIES,
         ...config?.transform,
@@ -405,7 +406,10 @@ export class WeaveImageNode extends WeaveNode {
       | Konva.Image
       | undefined;
 
+    console.log('crossOrigin', this.config.crossOrigin);
+
     const imageObj = new Image();
+    imageObj.crossOrigin = this.config.crossOrigin;
     imageObj.onerror = (error) => {
       console.error('Error loading image', imageProps.imageURL, error);
       imagePlaceholder?.setAttrs({

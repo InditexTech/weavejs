@@ -11,6 +11,7 @@ import {
   type WeaveImageToolActionTriggerReturn,
   type WeaveImageToolActionOnEndLoadImageEvent,
   type WeaveImageToolActionOnStartLoadImageEvent,
+  type ImageOptions,
 } from './types';
 import { IMAGE_TOOL_ACTION_NAME, IMAGE_TOOL_STATE } from './constants';
 import { WeaveNodesSelectionPlugin } from '@/plugins/nodes-selection/nodes-selection';
@@ -135,8 +136,17 @@ export class WeaveImageToolAction extends WeaveAction {
     this.state = state;
   }
 
-  private loadImage(imageURL: string, position?: Vector2d) {
+  private loadImage(
+    imageURL: string,
+    options?: ImageOptions,
+    position?: Vector2d
+  ) {
     const stage = this.instance.getStage();
+
+    const imageOptions = {
+      crossOrigin: 'anonymous',
+      ...options,
+    };
 
     stage.container().style.cursor = 'crosshair';
     stage.container().focus();
@@ -145,6 +155,7 @@ export class WeaveImageToolAction extends WeaveAction {
     this.imageURL = imageURL;
 
     this.preloadImgs[this.imageId] = new Image();
+    this.preloadImgs[this.imageId].crossOrigin = imageOptions.crossOrigin;
     this.preloadImgs[this.imageId].onerror = () => {
       this.instance.emitEvent<WeaveImageToolActionOnEndLoadImageEvent>(
         'onImageLoadEnd',
@@ -306,7 +317,11 @@ export class WeaveImageToolAction extends WeaveAction {
     }
 
     if (params?.imageURL) {
-      this.loadImage(params.imageURL, params?.position ?? undefined);
+      this.loadImage(
+        params.imageURL,
+        params?.options ?? undefined,
+        params?.position ?? undefined
+      );
       return;
     }
 

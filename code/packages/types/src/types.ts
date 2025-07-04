@@ -275,3 +275,7 @@ export type WeaveNodeTransformerProperties = Konva.TransformerConfig;
 export type WeaveNodeConfiguration = {
   transform: Partial<WeaveNodeTransformerProperties>;
 };
+
+// Image api
+
+export type ImageCrossOrigin = 'anonymous' | 'use-credentials';
