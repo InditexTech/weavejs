@@ -43,7 +43,7 @@ const azureWebPubSubServer = new WeaveAzureWebPubsubServer(params: WeaveAzureWeb
     pubsubConfig: {
       required: true,
       description:
-        "An object defining the Azure Web PubSub params: endpoint, access key and hub name",
+        "An object defining the Azure Web PubSub params: endpoint, custom auth (token flow or key) and hub name. By default we promote the use of DefaultAzureCredential from the @azure/identity dependency.",
       type: "WeaveAzureWebPubsubConfig",
     },
     eventsHandlerConfig: {
@@ -106,9 +106,12 @@ type PersistRoom = (
 
 type FetchRoom = (roomId: string) => Promise<Uint8Array | null>;
 
-type WeaveAzureWebPubsubConfig = {
+type WeaveStoreAzureWebPubsubConfig = {
   endpoint: string;
-  key: string;
+  auth?: {
+    key?: string;
+    custom?: TokenCredential;
+  };
   hubName: string;
 };
 

@@ -406,8 +406,6 @@ export class WeaveImageNode extends WeaveNode {
       | Konva.Image
       | undefined;
 
-    console.log('crossOrigin', this.config.crossOrigin);
-
     const imageObj = new Image();
     imageObj.crossOrigin = this.config.crossOrigin;
     imageObj.onerror = (error) => {

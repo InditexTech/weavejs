@@ -50,7 +50,8 @@
     "version:release": "npm version $RELEASE_VERSION -m \"[npm-scripts] prepare release $RELEASE_VERSION\" --tag-version-prefix \"\""
   },
   "dependencies": {
-    "@azure/web-pubsub": "1.1.4",
+    "@azure/identity": "4.10.2",
+    "@azure/web-pubsub": "1.2.0",
     "@syncedstore/core": "0.6.0",
     "buffer": "6.0.3",
     "konva": "9.3.20",
