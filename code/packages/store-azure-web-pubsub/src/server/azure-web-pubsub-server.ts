@@ -3,6 +3,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { WebPubSubServiceClient, AzureKeyCredential } from '@azure/web-pubsub';
+import { DefaultAzureCredential, type TokenCredential } from '@azure/identity';
 import koa from 'koa';
 import Emittery from 'emittery';
 import {
@@ -42,7 +43,22 @@ export class WeaveAzureWebPubsubServer extends Emittery {
     this.persistRoom = persistRoom;
     this.fetchRoom = fetchRoom;
 
-    const credentials = new AzureKeyCredential(pubSubConfig.key ?? '');
+    let credentials: TokenCredential | AzureKeyCredential | null = null;
+    // Defined a custom credential
+    if (!credentials && pubSubConfig.auth?.custom) {
+      credentials = pubSubConfig.auth.custom;
+    }
+    // Defined a key credential (deprecated but supported for backward compatibility)
+    if (!credentials && typeof pubSubConfig.auth?.key !== 'undefined') {
+      console.warn(
+        'Using key-based authentication is deprecated. Consider using DefaultAzureCredential for better security.'
+      );
+      credentials = new AzureKeyCredential(pubSubConfig.auth.key);
+    }
+    // Use DefaultAzureCredential as fallback (recommended for production)
+    if (!credentials) {
+      credentials = new DefaultAzureCredential();
+    }
 
     this.syncClient = new WebPubSubServiceClient(
       pubSubConfig.endpoint,

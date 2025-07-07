@@ -2,11 +2,15 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
+import type { TokenCredential } from '@azure/identity';
 import * as Y from 'yjs';
 
 export type WeaveStoreAzureWebPubsubConfig = {
   endpoint: string;
-  key: string;
+  auth?: {
+    key?: string;
+    custom?: TokenCredential;
+  };
   hubName: string;
 };
 
