@@ -56,9 +56,7 @@ export class WeaveAzureWebPubsubServer extends Emittery {
       credentials = new AzureKeyCredential(pubSubConfig.auth.key);
     }
     // Use DefaultAzureCredential as fallback (recommended for production)
-    if (!credentials) {
-      credentials = new DefaultAzureCredential();
-    }
+    credentials ??= new DefaultAzureCredential();
 
     this.syncClient = new WebPubSubServiceClient(
       pubSubConfig.endpoint,
