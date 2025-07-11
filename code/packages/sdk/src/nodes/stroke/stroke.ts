@@ -41,8 +41,8 @@ export class WeaveStrokeNode extends WeaveNode {
     shape: Konva.Shape
   ) {
     context.strokeStyle = shape.getAttrs().stroke ?? 'black';
-    context.lineCap = shape.getAttrs().lineCap ?? 'round';
-    context.lineJoin = shape.getAttrs().lineJoin ?? 'round';
+    context.lineCap = 'round';
+    context.lineJoin = 'round';
 
     const l = strokeElements.length - 1;
     if (strokeElements.length >= 3) {
@@ -61,7 +61,6 @@ export class WeaveStrokeNode extends WeaveNode {
     } else {
       const point = strokeElements[l];
       context.lineWidth = point.lineWidth;
-      // context.strokeStyle = context.strokeStyle;
       context.beginPath();
       context.moveTo(point.x, point.y);
       context.stroke();
