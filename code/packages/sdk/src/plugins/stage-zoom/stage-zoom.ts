@@ -2,18 +2,20 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-import { throttle } from 'lodash';
+import { merge, throttle } from 'lodash';
 import { WeavePlugin } from '@/plugins/plugin';
 import {
   type WeaveStageZoomPluginConfig,
   type WeaveStageZoomPluginOnZoomChangeEvent,
   type WeaveStageZoomPluginParams,
+  type WeaveStageZoomType,
 } from './types';
 import Konva from 'konva';
 import { WeaveNodesSelectionPlugin } from '../nodes-selection/nodes-selection';
 import {
   WEAVE_STAGE_ZOOM_DEFAULT_CONFIG,
   WEAVE_STAGE_ZOOM_KEY,
+  WEAVE_STAGE_ZOOM_TYPE,
 } from './constants';
 import type { Vector2d } from 'konva/lib/types';
 import Hammer from 'hammerjs';
@@ -31,6 +33,13 @@ export class WeaveStageZoomPlugin extends WeavePlugin {
   private actualScale: number;
   private actualStep: number;
   private updatedMinimumZoom: boolean;
+  private zooming: boolean = false;
+  private zoomVelocity: number = 0;
+  private zoomInertiaType: WeaveStageZoomType =
+    WEAVE_STAGE_ZOOM_TYPE.MOUSE_WHEEL;
+  private initialScale: number = 0;
+  private lastTime: number = 0;
+  private center: { x: number; y: number } = { x: 0, y: 0 };
   defaultStep: number = 3;
 
   constructor(params?: WeaveStageZoomPluginParams) {
@@ -38,10 +47,7 @@ export class WeaveStageZoomPlugin extends WeavePlugin {
 
     const { config } = params ?? {};
 
-    this.config = {
-      ...WEAVE_STAGE_ZOOM_DEFAULT_CONFIG,
-      ...config,
-    };
+    this.config = merge(WEAVE_STAGE_ZOOM_DEFAULT_CONFIG, config);
 
     if (!this.config.zoomSteps.includes(this.config.defaultZoom)) {
       throw new Error(
@@ -461,25 +467,37 @@ export class WeaveStageZoomPlugin extends WeavePlugin {
     const sc = new Hammer.Manager(stageContainer);
     sc.add(new Hammer.Pinch({ threshold: 0, pointers: 2 }));
 
-    let initialScale: number | null = null;
-    let center: { x: number; y: number } = { x: 0, y: 0 };
-
-    sc.on('pinchstart', (ev: HammerInput) => {
-      initialScale = stage.scaleX(); // assume uniform scale
-      center = {
-        x: ev.center.x,
-        y: ev.center.y,
+    sc.on('pinchstart', (e: HammerInput) => {
+      this.initialScale = this.instance.getStage().scaleX();
+      this.center = {
+        x: e.center.x,
+        y: e.center.y,
       };
+
+      this.lastTime = performance.now();
     });
 
-    sc.on('pinchmove', (ev: HammerInput) => {
-      if (!initialScale) {
-        return;
-      }
+    sc.on('pinchmove', (e: HammerInput) => {
+      const now = performance.now();
 
-      const newScale = initialScale * ev.scale;
+      const newScale = Math.max(
+        this.config.zoomSteps[0],
+        Math.min(
+          this.config.zoomSteps[this.config.zoomSteps.length - 1],
+          this.initialScale * e.scale
+        )
+      );
+      this.setZoom(newScale, false, this.center);
 
-      this.setZoom(newScale, false, center);
+      const dt = now - this.lastTime;
+      this.zoomVelocity = (newScale - 1) / (dt * 16.6);
+      this.lastTime = now;
+    });
+
+    sc.on('pinchend', () => {
+      this.zooming = true;
+      this.zoomInertiaType = WEAVE_STAGE_ZOOM_TYPE.PINCH_ZOOM;
+      requestAnimationFrame(this.zoomTick.bind(this));
     });
 
     // Zoom with mouse wheel + ctrl / cmd
@@ -496,21 +514,59 @@ export class WeaveStageZoomPlugin extends WeavePlugin {
         return;
       }
 
-      const oldScale = stage.scaleX();
+      const delta = e.evt.deltaY > 0 ? 1 : -1;
+      this.zoomVelocity += delta;
 
-      const pointer = stage.getPointerPosition();
-
-      if (!pointer) {
-        return;
+      if (!this.zooming) {
+        this.zooming = true;
+        this.zoomInertiaType = WEAVE_STAGE_ZOOM_TYPE.MOUSE_WHEEL;
+        requestAnimationFrame(this.zoomTick.bind(this));
       }
-
-      const scaleBy = 1.025;
-      const direction = e.evt.deltaY > 0 ? 1 : -1;
-      const newScale = direction > 0 ? oldScale / scaleBy : oldScale * scaleBy;
-
-      this.setZoom(newScale, false, pointer);
     };
 
     stage.on('wheel', handleWheel);
+  }
+
+  getInertiaScale() {
+    const stage = this.instance.getStage();
+
+    let step = 1;
+    if (this.zoomInertiaType === WEAVE_STAGE_ZOOM_TYPE.MOUSE_WHEEL) {
+      step = this.config.zoomInertia.mouseWheelStep;
+    }
+
+    const oldScale = stage.scaleX();
+    let newScale = oldScale * (1 - this.zoomVelocity * step);
+    newScale = Math.max(
+      this.config.zoomSteps[0],
+      Math.min(
+        this.config.zoomSteps[this.config.zoomSteps.length - 1],
+        newScale
+      )
+    );
+
+    return newScale;
+  }
+
+  zoomTick() {
+    if (Math.abs(this.zoomVelocity) < 0.001) {
+      this.zooming = false;
+      return;
+    }
+
+    let pointer: Vector2d | null = this.center;
+    if (this.zoomInertiaType === WEAVE_STAGE_ZOOM_TYPE.MOUSE_WHEEL) {
+      const stage = this.instance.getStage();
+      pointer = stage.getPointerPosition();
+    }
+
+    if (!pointer) {
+      return;
+    }
+
+    this.setZoom(this.getInertiaScale(), false, pointer);
+    this.zoomVelocity *= this.config.zoomInertia.friction;
+
+    requestAnimationFrame(this.zoomTick.bind(this));
   }
 }
