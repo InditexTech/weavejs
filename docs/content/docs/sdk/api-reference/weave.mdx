@@ -322,8 +322,7 @@ to its parent if found.
 addNode(
   node: WeaveStateElement,
   parentId = 'mainLayer',
-  index: number | undefined = undefined,
-  doRender = true
+  index: number | undefined = undefined
 ): void
 ```
 
@@ -336,7 +335,7 @@ need it to just update the shared-state without refreshing the rendering life-cy
 #### updateNode
 
 ```ts
-updateNode(node: WeaveStateElement, doRender = true): void
+updateNode(node: WeaveStateElement): void
 ```
 
 This method updates a node on the shared-state.
@@ -346,7 +345,7 @@ If you need it to just update the shared-state without refreshing the rendering 
 #### removeNode
 
 ```ts
-removeNode(node: WeaveStateElement, doRender = true): void
+removeNode(node: WeaveStateElement): void
 ```
 
 This method removes a node from the shared-state.
@@ -356,7 +355,7 @@ If you need it to just update the shared-state without refreshing the rendering 
 #### removeNodes
 
 ```ts
-removeNodes(nodes: WeaveStateElement[], doRender = true): void
+removeNodes(nodes: WeaveStateElement[]): void
 ```
 
 This method removes a list of nodes from the shared-state.
@@ -364,7 +363,7 @@ This method removes a list of nodes from the shared-state.
 #### moveNode
 
 ```ts
-moveNode(node: WeaveStateElement, position: WeavePosition, doRender = true): void
+moveNode(node: WeaveStateElement, position: WeavePosition): void
 ```
 
 This method moves the node position relative to its parent on the shared-state.

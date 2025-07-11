@@ -69,9 +69,25 @@ export function checkIfOverContainer(
 
 export function moveNodeToContainer(
   instance: Weave,
-  node: Konva.Node
+  node: Konva.Node,
+  ignoreContainers: Konva.Node[] = []
 ): Konva.Node | undefined {
   const nodeIntersected = instance.pointIntersectsContainerElement();
+
+  let realNodeIntersected = nodeIntersected;
+  if (
+    realNodeIntersected &&
+    realNodeIntersected.getAttrs().nodeType === 'frame' &&
+    !realNodeIntersected.getAttrs().nodeId
+  ) {
+    realNodeIntersected = instance
+      .getStage()
+      .findOne(`#${realNodeIntersected.getAttrs().id}-selector-area`);
+  }
+
+  if (realNodeIntersected && ignoreContainers.includes(realNodeIntersected)) {
+    return undefined;
+  }
 
   // check is node is locked
   const isLocked = instance.allNodesLocked([node]);

@@ -56,6 +56,7 @@ export const augmentKonvaNodeClass = (
 export abstract class WeaveNode implements WeaveNodeBase {
   protected instance!: Weave;
   protected nodeType!: string;
+  protected didMove!: boolean;
   private logger!: Logger;
   protected previousPointer!: string | null;
 
@@ -246,7 +247,16 @@ export abstract class WeaveNode implements WeaveNodeBase {
       });
 
       node.on('dragstart', (e) => {
+        this.didMove = false;
+
         const stage = this.instance.getStage();
+
+        const isErasing = this.instance.getActiveAction() === 'eraseTool';
+
+        if (isErasing) {
+          e.target.stopDrag();
+          return;
+        }
 
         this.instance.emitEvent('onDrag', e.target);
 
@@ -257,7 +267,16 @@ export abstract class WeaveNode implements WeaveNodeBase {
       });
 
       const handleDragMove = (e: KonvaEventObject<DragEvent, Konva.Node>) => {
+        this.didMove = true;
+
         const stage = this.instance.getStage();
+
+        const isErasing = this.instance.getActiveAction() === 'eraseTool';
+
+        if (isErasing) {
+          e.target.stopDrag();
+          return;
+        }
 
         if (stage.isMouseWheelPressed()) {
           e.cancelBubble = true;
@@ -275,21 +294,23 @@ export abstract class WeaveNode implements WeaveNodeBase {
               bubbles: true,
             });
           }
-
-          const nodeHandler = this.instance.getNodeHandler<WeaveNode>(
-            node.getAttrs().nodeType
-          );
-          if (nodeHandler) {
-            this.instance.updateNode(
-              nodeHandler.serialize(node as WeaveElementInstance)
-            );
-          }
         }
       };
 
       node.on('dragmove', throttle(handleDragMove, 100));
 
       node.on('dragend', (e) => {
+        if (!this.didMove) {
+          return;
+        }
+
+        const isErasing = this.instance.getActiveAction() === 'eraseTool';
+
+        if (isErasing) {
+          e.target.stopDrag();
+          return;
+        }
+
         this.instance.emitEvent('onDrag', null);
 
         if (this.isSelecting() && this.isNodeSelected(node)) {
@@ -467,19 +488,37 @@ export abstract class WeaveNode implements WeaveNodeBase {
       return;
     }
 
-    instance.setAttrs({
+    let realInstance = instance;
+    if (instance.getAttrs().nodeId) {
+      realInstance = this.instance
+        .getStage()
+        .findOne(`#${instance.getAttrs().nodeId}`) as Konva.Node;
+    }
+
+    if (!realInstance) {
+      return;
+    }
+
+    realInstance.setAttrs({
       locked: false,
     });
 
-    this.instance.updateNode(this.serialize(instance as WeaveElementInstance));
+    this.instance.updateNode(
+      this.serialize(realInstance as WeaveElementInstance)
+    );
 
-    this.setupDefaultNodeEvents(instance);
+    this.setupDefaultNodeEvents(realInstance);
 
     const stage = this.instance.getStage();
     stage.container().style.cursor = 'default';
   }
 
   isLocked(instance: Konva.Node): boolean {
-    return instance.getAttrs().locked ?? false;
+    let realInstance = instance;
+    if (instance.getAttrs().nodeId === false) {
+      realInstance = this.instance.getInstanceRecursive(instance);
+    }
+
+    return realInstance.getAttrs().locked ?? false;
   }
 }
