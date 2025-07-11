@@ -509,12 +509,8 @@ export class Weave {
     }
   }
 
-  moveNode(
-    node: WeaveStateElement,
-    position: WeavePosition,
-    doRender = true
-  ): void {
-    this.stateManager.moveNode(node, position, doRender);
+  moveNode(node: WeaveStateElement, position: WeavePosition): void {
+    this.stateManager.moveNode(node, position);
   }
 
   getElementsTree(): WeaveStateElement[] {

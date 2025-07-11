@@ -51,12 +51,10 @@ export class WeaveBrushToolAction extends WeaveAction {
   }
 
   private getPointPressure(e: Konva.KonvaEventObject<PointerEvent>): number {
-    let pressure: number = 0.1;
+    let pressure: number = 1.0;
 
     if (e.evt instanceof PointerEvent && e.evt.pointerType === 'pen') {
       pressure = e.evt.pressure;
-    } else {
-      pressure = 1.0;
     }
 
     return pressure;

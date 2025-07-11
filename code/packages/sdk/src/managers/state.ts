@@ -289,11 +289,7 @@ export class WeaveStateManager {
     }
   }
 
-  moveNode(
-    node: WeaveStateElement,
-    position: WeavePosition,
-    doRender = true
-  ): void {
+  moveNode(node: WeaveStateElement, position: WeavePosition): void {
     const userName = this.instance.getStore().getUser().name;
 
     this.instance
@@ -304,7 +300,7 @@ export class WeaveStateManager {
 
         if (isEmpty(state.weave)) {
           const msg = `State is empty, cannot update the node`;
-          this.logger.warn({ node, doRender }, msg);
+          this.logger.warn({ node }, msg);
           return;
         }
 
@@ -314,7 +310,7 @@ export class WeaveStateManager {
         );
         if (!nodeState) {
           const msg = `Node with key [${node.key}] doesn't exists, cannot update it`;
-          this.logger.warn({ node, doRender }, msg);
+          this.logger.warn({ node }, msg);
           return;
         }
 
@@ -361,10 +357,6 @@ export class WeaveStateManager {
           }
 
           nodeParent.props.children = nodeParentNewChildren;
-
-          // if (doRender) {
-          //   this.instance.render();
-          // }
         }
       }, userName);
   }
