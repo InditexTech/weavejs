@@ -106,6 +106,7 @@ export class WeaveEraserToolAction extends WeaveAction {
     const selectionPlugin =
       this.instance.getPlugin<WeaveNodesSelectionPlugin>('nodesSelection');
     if (selectionPlugin) {
+      selectionPlugin.setSelectedNodes([]);
       selectionPlugin.disable();
     }
 

@@ -29,6 +29,7 @@ export class WeaveStageDropAreaPlugin extends WeavePlugin {
     const stage = this.instance.getStage();
 
     stage.container().addEventListener('dragover', (e) => {
+      e.preventDefault();
       e.stopPropagation();
     });
 

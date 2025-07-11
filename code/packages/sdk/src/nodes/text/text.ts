@@ -522,12 +522,7 @@ export class WeaveTextNode extends WeaveNode {
 
     const measures = textNode.measureSize(textNode.text());
     const px = 0 * stage.scaleX();
-    const py =
-      2 *
-      (measures.fontBoundingBoxAscent -
-        measures.hangingBaseline -
-        measures.fontBoundingBoxDescent) *
-      stage.scaleY();
+    const py = measures.actualBoundingBoxDescent * stage.scaleY();
     let transform = '';
     transform += 'translateX(' + px + 'px)';
     transform += 'translateY(' + py + 'px)';

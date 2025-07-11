@@ -25,6 +25,7 @@ import type { KonvaEventObject } from 'konva/lib/Node';
 import type { Rect } from 'konva/lib/shapes/Rect';
 import type { WeaveNodesSnappingPlugin } from '@/plugins/nodes-snapping/nodes-snapping';
 import { throttle } from 'lodash';
+import { clearContainerTargets } from '@/utils';
 
 export class WeaveFrameNode extends WeaveNode {
   private config: WeaveFrameProperties;
@@ -185,7 +186,32 @@ export class WeaveFrameNode extends WeaveNode {
       width: props.frameWidth,
       height: props.frameHeight,
       fill: 'transparent',
-      draggable: false,
+      draggable: true,
+    });
+
+    selectorArea.on('dragmove', () => {
+      if (this.isSelecting() && this.isNodeSelected(selectorArea)) {
+        clearContainerTargets(this.instance);
+        frame.setAbsolutePosition(selectorArea.getAbsolutePosition());
+        selectorArea.setAttrs({
+          x: 0,
+          y: 0,
+        });
+      }
+    });
+
+    selectorArea.on('dragend', () => {
+      if (this.isSelecting() && this.isNodeSelected(selectorArea)) {
+        clearContainerTargets(this.instance);
+        frame.setAbsolutePosition(selectorArea.getAbsolutePosition());
+        selectorArea.setAttrs({
+          x: 0,
+          y: 0,
+        });
+        this.instance.updateNode(
+          this.serialize(selectorArea as WeaveElementInstance)
+        );
+      }
     });
 
     selectorArea.getTransformerProperties = () => {
@@ -198,9 +224,6 @@ export class WeaveFrameNode extends WeaveNode {
         x: 0,
         y: 0,
       });
-      this.instance.updateNode(
-        this.serialize(selectorArea as WeaveElementInstance)
-      );
     };
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -310,28 +333,28 @@ export class WeaveFrameNode extends WeaveNode {
       width: props.frameWidth - borderWidth * 2,
       height: props.frameHeight - borderWidth * 2,
       strokeScaleEnabled: true,
+      clipFunc: (ctx) => {
+        const width =
+          (frameInternal.width() + borderWidth) * frameInternal.scaleX();
+        const height =
+          (frameInternal.height() + borderWidth) * frameInternal.scaleY();
+        ctx.rect(
+          -(borderWidth / 2) * frameInternal.scaleX(),
+          -(borderWidth / 2) * frameInternal.scaleY(),
+          width,
+          height
+        );
+      },
       draggable: false,
-    });
-
-    frameInternal.clipFunc((ctx) => {
-      const width =
-        (frameInternal.width() + borderWidth) * frameInternal.scaleX();
-      const height =
-        (frameInternal.height() + borderWidth) * frameInternal.scaleY();
-      ctx.rect(
-        -(borderWidth / 2) * frameInternal.scaleX(),
-        -(borderWidth / 2) * frameInternal.scaleY(),
-        width,
-        height
-      );
     });
 
     frameInternalGroup.add(frameInternal);
 
     this.setupDefaultNodeEvents(frame);
 
-    frame.on('dragmove', () => {});
-    frame.on('dragend', () => {});
+    frame.off('dragstart');
+    frame.off('dragmove');
+    frame.off('dragend');
 
     frame.on(WEAVE_NODE_CUSTOM_EVENTS.onTargetLeave, () => {
       background.setAttrs({

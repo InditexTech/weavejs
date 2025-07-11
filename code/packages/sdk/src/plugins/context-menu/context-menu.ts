@@ -31,6 +31,8 @@ export class WeaveContextMenuPlugin extends WeavePlugin {
   private tapHold: boolean;
   private tapHoldTimeout: number;
   private pointers: Record<string, PointerEvent>;
+  private onAction!: string | undefined;
+  private actualNode!: Konva.Node | null;
   private dragging!: boolean;
   private transforming!: boolean;
   getLayerName = undefined;
@@ -40,6 +42,9 @@ export class WeaveContextMenuPlugin extends WeavePlugin {
   constructor(params: WeaveStageContextMenuPluginParams) {
     super();
 
+    this.onAction = undefined;
+    this.dragging = false;
+    this.transforming = false;
     this.touchTimer = undefined;
     this.tapHold = false;
     this.contextMenuVisible = false;
@@ -156,7 +161,15 @@ export class WeaveContextMenuPlugin extends WeavePlugin {
   private initEvents() {
     const stage = this.instance.getStage();
 
+    this.instance.addEventListener(
+      'onActiveActionChange',
+      (activeAction: string | undefined) => {
+        this.onAction = activeAction;
+      }
+    );
+
     this.instance.addEventListener('onDrag', (node: Konva.Node | null) => {
+      this.actualNode = node;
       if (node) {
         this.dragging = true;
       } else {
@@ -165,6 +178,7 @@ export class WeaveContextMenuPlugin extends WeavePlugin {
     });
 
     this.instance.addEventListener('onTransform', (node: Konva.Node | null) => {
+      this.actualNode = node;
       if (node) {
         this.transforming = true;
       } else {
@@ -188,16 +202,45 @@ export class WeaveContextMenuPlugin extends WeavePlugin {
 
       this.touchTimer = setTimeout(() => {
         this.tapHold = true;
-        if (this.touchTimer && (this.dragging || this.transforming)) {
+
+        const actualActions = this.instance.getActiveAction();
+        if (actualActions !== 'selectionTool') {
+          return;
+        }
+
+        const shouldKillLongPressTimer =
+          this.touchTimer &&
+          (typeof this.onAction === 'undefined' ||
+            (typeof this.onAction !== 'undefined' &&
+              ['selectionTool'].includes(this.onAction))) &&
+          ((typeof this.dragging !== 'undefined' && this.dragging) ||
+            (typeof this.transforming !== 'undefined' && this.transforming));
+
+        if (shouldKillLongPressTimer) {
           clearTimeout(this.touchTimer);
           return;
         }
+
+        this.actualNode?.stopDrag();
+        delete this.pointers[e.evt.pointerId];
         this.triggerContextMenu(e.target);
       }, this.tapHoldTimeout);
     });
 
     stage.on('pointermove', (e) => {
-      if (e.evt.pointerType === 'mouse') {
+      if (['mouse'].includes(e.evt.pointerType)) {
+        return;
+      }
+
+      if (['pen'].includes(e.evt.pointerType) && e.evt.pressure === 0) {
+        return;
+      }
+
+      if (
+        ['pen'].includes(e.evt.pointerType) &&
+        ((e.evt.movementX >= -1 && e.evt.movementX <= 1) ||
+          (e.evt.movementY >= -1 && e.evt.movementY >= 1))
+      ) {
         return;
       }
 

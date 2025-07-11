@@ -10,7 +10,8 @@ import { WeaveAction } from '@/actions/action';
 import { type WeaveBrushToolActionState } from './types';
 import { BRUSH_TOOL_ACTION_NAME, BRUSH_TOOL_STATE } from './constants';
 import { WeaveNodesSelectionPlugin } from '@/plugins/nodes-selection/nodes-selection';
-import type { WeaveLineNode } from '@/nodes/line/line';
+import type { WeaveStrokeNode } from '@/nodes/stroke/stroke';
+import type { WeaveStrokePoint } from '@/nodes/stroke/types';
 
 export class WeaveBrushToolAction extends WeaveAction {
   protected initialized: boolean = false;
@@ -19,6 +20,7 @@ export class WeaveBrushToolAction extends WeaveAction {
   protected strokeId: string | null;
   protected container: Konva.Layer | Konva.Group | undefined;
   protected measureContainer: Konva.Layer | Konva.Group | undefined;
+  protected lineWidth: number = 0;
   protected cancelAction!: () => void;
   onPropsChange = undefined;
   onInit = undefined;
@@ -27,6 +29,7 @@ export class WeaveBrushToolAction extends WeaveAction {
     super();
 
     this.initialized = false;
+    this.lineWidth = 0;
     this.state = BRUSH_TOOL_STATE.INACTIVE;
     this.strokeId = null;
     this.clickPoint = null;
@@ -45,6 +48,18 @@ export class WeaveBrushToolAction extends WeaveAction {
       strokeWidth: 1,
       opacity: 1,
     };
+  }
+
+  private getPointPressure(e: Konva.KonvaEventObject<PointerEvent>): number {
+    let pressure: number = 0.1;
+
+    if (e.evt instanceof PointerEvent && e.evt.pointerType === 'pen') {
+      pressure = e.evt.pressure;
+    } else {
+      pressure = 1.0;
+    }
+
+    return pressure;
   }
 
   private setupEvents() {
@@ -70,27 +85,39 @@ export class WeaveBrushToolAction extends WeaveAction {
       }
     });
 
-    stage.on('pointerdown', (e) => {
+    const handlePointerDown = (e: Konva.KonvaEventObject<PointerEvent>) => {
       if (this.state !== BRUSH_TOOL_STATE.IDLE) {
         return;
       }
 
+      const pointPressure = this.getPointPressure(e);
+      this.lineWidth = Math.log(pointPressure + 1) * this.props.strokeWidth;
+
       this.handleStartStroke();
 
       e.evt.stopPropagation();
-    });
+    };
 
-    stage.on('pointermove', (e) => {
+    stage.on('pointerdown touchstart', handlePointerDown);
+
+    const handlePointerMove = (e: Konva.KonvaEventObject<PointerEvent>) => {
       if (this.state !== BRUSH_TOOL_STATE.DEFINE_STROKE) {
         return;
       }
 
+      const pointPressure = this.getPointPressure(e);
+      this.lineWidth =
+        Math.log(pointPressure + 1) * this.props.strokeWidth * 0.2 +
+        this.lineWidth * 0.8;
+
       this.handleMovement();
 
       e.evt.stopPropagation();
-    });
+    };
 
-    stage.on('pointerup', (e) => {
+    stage.on('pointermove touchmove', handlePointerMove);
+
+    const handlePointerUp = (e: Konva.KonvaEventObject<PointerEvent>) => {
       if (this.state !== BRUSH_TOOL_STATE.DEFINE_STROKE) {
         return;
       }
@@ -98,13 +125,45 @@ export class WeaveBrushToolAction extends WeaveAction {
       this.handleEndStroke();
 
       e.evt.stopPropagation();
-    });
+    };
+
+    stage.on('pointerup touchend', handlePointerUp);
 
     this.initialized = true;
   }
 
   private setState(state: WeaveBrushToolActionState) {
     this.state = state;
+  }
+
+  private getBoundingBox(strokeElements: WeaveStrokePoint[]) {
+    if (strokeElements.length === 0) {
+      return {
+        x: 0,
+        y: 0,
+        width: 0,
+        height: 0,
+      };
+    }
+
+    let minX = strokeElements[0].x;
+    let maxX = strokeElements[0].x;
+    let minY = strokeElements[0].y;
+    let maxY = strokeElements[0].y;
+
+    strokeElements.forEach((point) => {
+      minX = Math.min(minX, point.x);
+      maxX = Math.max(maxX, point.x);
+      minY = Math.min(minY, point.y);
+      maxY = Math.max(maxY, point.y);
+    });
+
+    return {
+      x: minX,
+      y: minY,
+      width: maxX - minX,
+      height: maxY - minY,
+    };
   }
 
   private handleStartStroke() {
@@ -117,51 +176,25 @@ export class WeaveBrushToolAction extends WeaveAction {
 
     this.strokeId = uuidv4();
 
-    const nodeHandler = this.instance.getNodeHandler<WeaveLineNode>('line');
+    const nodeHandler = this.instance.getNodeHandler<WeaveStrokeNode>('stroke');
 
     if (nodeHandler) {
       const node = nodeHandler.create(this.strokeId, {
         ...this.props,
         strokeScaleEnabled: true,
-        x: this.clickPoint?.x ?? 0,
-        y: this.clickPoint?.y ?? 0,
-        points: [0, 0],
+        x: 0,
+        y: 0,
+        width: 0,
+        height: 0,
+        strokeElements: [],
       });
+      const nodeInstance = nodeHandler.onRender(node.props);
+      this.container?.add(nodeInstance);
 
-      this.instance.addNode(node, this.container?.getAttrs().id);
+      // this.instance.addNode(node, this.container?.getAttrs().id);
     }
 
     this.setState(BRUSH_TOOL_STATE.DEFINE_STROKE);
-  }
-
-  private handleEndStroke() {
-    const stage = this.instance.getStage();
-
-    const tempStroke = this.instance.getStage().findOne(`#${this.strokeId}`) as
-      | Konva.Line
-      | undefined;
-
-    if (tempStroke) {
-      const nodeHandler = this.instance.getNodeHandler<WeaveLineNode>('line');
-
-      tempStroke.setAttrs({
-        ...this.props,
-        hitStrokeWidth: 10,
-      });
-
-      if (nodeHandler) {
-        this.instance.updateNode(
-          nodeHandler.serialize(tempStroke as WeaveElementInstance)
-        );
-      }
-
-      this.clickPoint = null;
-
-      stage.container().tabIndex = 1;
-      stage.container().focus();
-
-      this.setState(BRUSH_TOOL_STATE.IDLE);
-    }
   }
 
   private handleMovement() {
@@ -178,19 +211,86 @@ export class WeaveBrushToolAction extends WeaveAction {
         this.measureContainer
       );
 
-      tempStroke.points([
-        ...tempStroke.points(),
-        mousePoint.x - tempStroke.x(),
-        mousePoint.y - tempStroke.y(),
-      ]);
+      const newStrokeElements = [...tempStroke.getAttrs().strokeElements];
+      newStrokeElements.push({
+        x: mousePoint.x - tempStroke.x(),
+        y: mousePoint.y - tempStroke.y(),
+        lineWidth: this.lineWidth,
+      });
 
-      const nodeHandler = this.instance.getNodeHandler<WeaveLineNode>('line');
+      const box = this.getBoundingBox(newStrokeElements);
+
+      tempStroke.setAttrs({
+        width: box.width,
+        height: box.height,
+        x: 0,
+        y: 0,
+        strokeElements: newStrokeElements,
+      });
+
+      const nodeHandler =
+        this.instance.getNodeHandler<WeaveStrokeNode>('stroke');
 
       if (nodeHandler) {
-        this.instance.updateNode(
-          nodeHandler.serialize(tempStroke as WeaveElementInstance)
+        nodeHandler.onUpdate(
+          tempStroke as WeaveElementInstance,
+          tempStroke.getAttrs()
+        );
+        // this.instance.updateNode(
+        //   nodeHandler.serialize(tempStroke as WeaveElementInstance)
+        // );
+      }
+    }
+  }
+
+  private handleEndStroke() {
+    const stage = this.instance.getStage();
+
+    const tempStroke = this.instance.getStage().findOne(`#${this.strokeId}`) as
+      | Konva.Line
+      | undefined;
+
+    if (tempStroke) {
+      const nodeHandler =
+        this.instance.getNodeHandler<WeaveStrokeNode>('stroke');
+
+      if (nodeHandler) {
+        const box = this.getBoundingBox(tempStroke.getAttrs().strokeElements);
+
+        let newStrokeElements = [...tempStroke.getAttrs().strokeElements];
+        newStrokeElements = newStrokeElements.map((point) => ({
+          ...point,
+          x: point.x - box.x,
+          y: point.y - box.y,
+        }));
+
+        tempStroke.setAttrs({
+          width: box.width,
+          height: box.height,
+          x: box.x,
+          y: box.y,
+          strokeElements: newStrokeElements,
+        });
+
+        const realNode = this.instance
+          .getStage()
+          .findOne(`#${tempStroke.getAttrs().id}`);
+        if (realNode) {
+          realNode.destroy();
+        }
+
+        this.instance.addNode(
+          nodeHandler.serialize(tempStroke as WeaveElementInstance),
+          this.container?.getAttrs().id
         );
       }
+
+      this.clickPoint = null;
+
+      stage.container().tabIndex = 1;
+      stage.container().focus();
+
+      this.setState(BRUSH_TOOL_STATE.IDLE);
     }
   }
 

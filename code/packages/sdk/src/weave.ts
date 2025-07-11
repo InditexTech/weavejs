@@ -472,34 +472,23 @@ export class Weave {
   addNode(
     node: WeaveStateElement,
     parentId = 'mainLayer',
-    index: number | undefined = undefined,
-    doRender = true
+    index: number | undefined = undefined
   ): void {
-    this.stateManager.addNode(node, parentId, index, doRender);
+    this.stateManager.addNode(node, parentId, index);
   }
 
-  updateNode(node: WeaveStateElement, doRender = true): void {
-    this.stateManager.updateNode(node, doRender);
+  updateNode(node: WeaveStateElement): void {
+    this.stateManager.updateNode(node);
   }
 
-  updateNodes(nodes: WeaveStateElement[], doRender = true): void {
+  updateNodes(nodes: WeaveStateElement[]): void {
     for (const node of nodes) {
-      this.updateNode(node, false);
-    }
-
-    const selectionPlugin =
-      this.getPlugin<WeaveNodesSelectionPlugin>('nodesSelection');
-    if (selectionPlugin) {
-      selectionPlugin.setSelectedNodes([]);
-    }
-
-    if (doRender) {
-      this.render();
+      this.updateNode(node);
     }
   }
 
-  removeNode(node: WeaveStateElement, doRender = true): void {
-    this.stateManager.removeNode(node, doRender);
+  removeNode(node: WeaveStateElement): void {
+    this.stateManager.removeNode(node);
 
     const selectionPlugin =
       this.getPlugin<WeaveNodesSelectionPlugin>('nodesSelection');
@@ -508,19 +497,15 @@ export class Weave {
     }
   }
 
-  removeNodes(nodes: WeaveStateElement[], doRender = true): void {
+  removeNodes(nodes: WeaveStateElement[]): void {
     for (const node of nodes) {
-      this.removeNode(node, false);
+      this.removeNode(node);
     }
 
     const selectionPlugin =
       this.getPlugin<WeaveNodesSelectionPlugin>('nodesSelection');
     if (selectionPlugin) {
       selectionPlugin.setSelectedNodes([]);
-    }
-
-    if (doRender) {
-      this.render();
     }
   }
 
