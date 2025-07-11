@@ -159,9 +159,9 @@ export abstract class WeaveNode implements WeaveNodeBase {
       node.off('transformstart');
       node.off('transform');
       node.off('transformend');
-      // node.off('dragstart');
-      // node.off('dragmove');
-      // node.off('dragend');
+      node.off('dragstart');
+      node.off('dragmove');
+      node.off('dragend');
       node.off('pointerenter');
       node.off('pointerleave');
     } else {

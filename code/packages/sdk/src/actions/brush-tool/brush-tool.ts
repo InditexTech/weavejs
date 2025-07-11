@@ -188,8 +188,6 @@ export class WeaveBrushToolAction extends WeaveAction {
       });
       const nodeInstance = nodeHandler.onRender(node.props);
       this.container?.add(nodeInstance);
-
-      // this.instance.addNode(node, this.container?.getAttrs().id);
     }
 
     this.setState(BRUSH_TOOL_STATE.DEFINE_STROKE);
@@ -234,9 +232,6 @@ export class WeaveBrushToolAction extends WeaveAction {
           tempStroke as WeaveElementInstance,
           tempStroke.getAttrs()
         );
-        // this.instance.updateNode(
-        //   nodeHandler.serialize(tempStroke as WeaveElementInstance)
-        // );
       }
     }
   }

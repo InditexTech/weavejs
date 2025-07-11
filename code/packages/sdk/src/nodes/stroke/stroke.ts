@@ -19,7 +19,7 @@ import type {
 } from './types';
 
 export class WeaveStrokeNode extends WeaveNode {
-  private config: WeaveStrokeProperties;
+  private readonly config: WeaveStrokeProperties;
   protected nodeType: string = WEAVE_STROKE_NODE_TYPE;
 
   constructor(params?: WeaveStrokeNodeParams) {
@@ -125,11 +125,11 @@ export class WeaveStrokeNode extends WeaveNode {
     const strokeNode = node as Konva.Shape;
     const oldPoints = [...strokeNode.getAttrs().strokeElements];
     const newPoints = [];
-    for (let i = 0; i < oldPoints.length; i++) {
+    for (const actPoint of oldPoints) {
       const point = {
-        ...oldPoints[i],
-        x: oldPoints[i].x * strokeNode.scaleX(),
-        y: oldPoints[i].y * strokeNode.scaleY(),
+        ...actPoint,
+        x: actPoint.x * strokeNode.scaleX(),
+        y: actPoint.y * strokeNode.scaleY(),
       };
       newPoints.push(point);
     }

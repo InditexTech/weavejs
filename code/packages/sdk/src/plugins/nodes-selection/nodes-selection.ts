@@ -516,10 +516,6 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
         'onSelectionState',
         true
       );
-
-      // if (!(e.target instanceof Konva.Stage)) {
-      //   this.cameFromSelectingMultiple = true;
-      // }
     });
 
     const handleMouseMove = (
@@ -637,8 +633,6 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
         this.cameFromSelectingMultiple = false;
         return;
       }
-
-      // this.tr.nodes([]);
 
       this.selectionRectangle.visible(false);
       const shapes = stage.find((node: Konva.Node) => {
