@@ -90,4 +90,39 @@ export class WeaveZIndexManager {
       this.instance.moveNode(node, WEAVE_NODE_POSITION.FRONT);
     }
   }
+
+  sendToBackNodes(nodes: WeaveElementInstance[]): void {
+    this.logger.debug(
+      `Moving instance with id [${
+        instance.getAttrs().id
+      }], to bottom of z-index`
+    );
+
+    instance.moveToBottom();
+
+    const handler = this.instance.getNodeHandler<WeaveNode>(
+      instance.getAttrs().nodeType
+    );
+    if (handler) {
+      const node = handler.serialize(instance);
+      this.instance.moveNode(node, WEAVE_NODE_POSITION.BACK);
+    }
+  }
+
+  bringToFrontNodes(nodes: WeaveElementInstance[]): void {
+    this.logger.debug(
+      `Moving instance with id [${instance.getAttrs().id}], to top of z-index`
+    );
+
+    instance.moveToTop();
+
+    const handler = this.instance.getNodeHandler<WeaveNode>(
+      instance.getAttrs().nodeType
+    );
+    if (handler) {
+      const node = handler.serialize(instance);
+      this.instance.updateNode(node);
+      this.instance.moveNode(node, WEAVE_NODE_POSITION.FRONT);
+    }
+  }
 }
