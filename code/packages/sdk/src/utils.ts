@@ -32,8 +32,8 @@ export function resetScale(node: Konva.Node): void {
 // Container management functions
 
 export function clearContainerTargets(instance: Weave): void {
-  const getContainers = instance.getContainerNodes();
-  for (const container of getContainers) {
+  const containers = instance.getContainerNodes();
+  for (const container of containers) {
     container.fire(WEAVE_NODE_CUSTOM_EVENTS.onTargetLeave, { bubbles: true });
   }
 }

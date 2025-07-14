@@ -23,6 +23,8 @@ import {
 import type { WeaveNode } from '@/nodes/node';
 import { WEAVE_NODES_SELECTION_KEY } from '@/plugins/nodes-selection/constants';
 import type Konva from 'konva';
+import type { KonvaEventObject } from 'konva/lib/Node';
+import type { Stage } from 'konva/lib/Stage';
 
 export class WeaveContextMenuPlugin extends WeavePlugin {
   private config: WeaveStageContextMenuPluginConfig;
@@ -35,6 +37,7 @@ export class WeaveContextMenuPlugin extends WeavePlugin {
   private actualNode!: Konva.Node | null;
   private dragging!: boolean;
   private transforming!: boolean;
+  protected tapStart: { x: number; y: number; time: number } | null;
   getLayerName = undefined;
   initLayer = undefined;
   onRender: undefined;
@@ -48,6 +51,7 @@ export class WeaveContextMenuPlugin extends WeavePlugin {
     this.touchTimer = undefined;
     this.tapHold = false;
     this.contextMenuVisible = false;
+    this.tapStart = { x: 0, y: 0, time: 0 };
     this.tapHoldTimeout = WEAVE_CONTEXT_MENU_TAP_HOLD_TIMEOUT;
     const { config } = params ?? {};
     this.config = {
@@ -64,6 +68,36 @@ export class WeaveContextMenuPlugin extends WeavePlugin {
 
   onInit(): void {
     this.initEvents();
+  }
+
+  isPressed(e: KonvaEventObject<PointerEvent, Stage>): boolean {
+    return e.evt.buttons > 0;
+  }
+
+  setTapStart(e: KonvaEventObject<PointerEvent, Stage>): void {
+    this.tapStart = {
+      x: e.evt.clientX,
+      y: e.evt.clientY,
+      time: performance.now(),
+    };
+  }
+
+  checkMoved(e: KonvaEventObject<PointerEvent, Stage>): boolean {
+    if (!this.tapStart) {
+      return false;
+    }
+
+    const dx = e.evt.clientX - this.tapStart.x;
+    const dy = e.evt.clientY - this.tapStart.y;
+    const dist = Math.sqrt(dx * dx + dy * dy);
+
+    const LONG_PRESS_DISTANCE = 3; // px
+
+    if (dist < LONG_PRESS_DISTANCE) {
+      return false;
+    }
+
+    return true;
   }
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -187,6 +221,7 @@ export class WeaveContextMenuPlugin extends WeavePlugin {
     });
 
     stage.on('pointerdown', (e) => {
+      this.setTapStart(e);
       this.pointers[e.evt.pointerId] = e.evt;
 
       if (e.evt.pointerType === 'mouse') {
@@ -203,12 +238,15 @@ export class WeaveContextMenuPlugin extends WeavePlugin {
       this.touchTimer = setTimeout(() => {
         this.tapHold = true;
 
+        const moved = this.checkMoved(e);
+
         const actualActions = this.instance.getActiveAction();
         if (actualActions !== 'selectionTool') {
           return;
         }
 
         const shouldKillLongPressTimer =
+          moved &&
           this.touchTimer &&
           (typeof this.onAction === 'undefined' ||
             (typeof this.onAction !== 'undefined' &&
@@ -218,38 +256,29 @@ export class WeaveContextMenuPlugin extends WeavePlugin {
 
         if (shouldKillLongPressTimer) {
           clearTimeout(this.touchTimer);
-          return;
+        } else {
+          this.actualNode?.stopDrag();
+          delete this.pointers[e.evt.pointerId];
+          this.triggerContextMenu(e.target);
         }
-
-        this.actualNode?.stopDrag();
-        delete this.pointers[e.evt.pointerId];
-        this.triggerContextMenu(e.target);
       }, this.tapHoldTimeout);
     });
 
     stage.on('pointermove', (e) => {
-      if (['mouse'].includes(e.evt.pointerType)) {
+      if (e.evt.buttons === 0) {
         return;
       }
 
-      if (['pen'].includes(e.evt.pointerType) && e.evt.pressure === 0) {
-        return;
-      }
+      const moved = this.checkMoved(e);
 
-      if (
-        ['pen'].includes(e.evt.pointerType) &&
-        ((e.evt.movementX >= -1 && e.evt.movementX <= 1) ||
-          (e.evt.movementY >= -1 && e.evt.movementY >= 1))
-      ) {
-        return;
-      }
-
-      if (this.touchTimer) {
+      if (moved && this.touchTimer) {
         clearTimeout(this.touchTimer);
       }
     });
 
     stage.on('pointerup', (e) => {
+      this.checkMoved(e);
+
       delete this.pointers[e.evt.pointerId];
 
       if (e.evt.pointerType === 'mouse') {

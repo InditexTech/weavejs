@@ -118,16 +118,17 @@ export abstract class WeaveNode implements WeaveNodeBase {
     const selectionPlugin =
       this.instance.getPlugin<WeaveNodesSelectionPlugin>('nodesSelection');
 
-    let selected: boolean = false;
     if (
       selectionPlugin &&
-      selectionPlugin.getSelectedNodes().length === 1 &&
-      selectionPlugin.getSelectedNodes()[0].getAttrs().id === ele.getAttrs().id
+      selectionPlugin
+        ?.getSelectedNodes()
+        .map((node) => node.getAttrs().id)
+        .includes(ele.getAttrs().id)
     ) {
-      selected = true;
+      return true;
     }
 
-    return selected;
+    return false;
   }
 
   protected scaleReset(node: Konva.Node): void {
@@ -250,6 +251,11 @@ export abstract class WeaveNode implements WeaveNodeBase {
       node.on('dragstart', (e) => {
         this.didMove = false;
 
+        if (e.evt.buttons === 0) {
+          e.target.stopDrag();
+          return;
+        }
+
         const stage = this.instance.getStage();
 
         const isErasing = this.instance.getActiveAction() === 'eraseTool';
@@ -268,6 +274,11 @@ export abstract class WeaveNode implements WeaveNodeBase {
       });
 
       const handleDragMove = (e: KonvaEventObject<DragEvent, Konva.Node>) => {
+        if (e.evt.buttons === 0) {
+          e.target.stopDrag();
+          return;
+        }
+
         this.didMove = true;
 
         const stage = this.instance.getStage();
@@ -285,7 +296,11 @@ export abstract class WeaveNode implements WeaveNodeBase {
           return;
         }
 
-        if (this.isSelecting() && this.isNodeSelected(node)) {
+        if (
+          this.isSelecting() &&
+          this.isNodeSelected(node) &&
+          this.getSelectionPlugin().getSelectedNodes().length === 1
+        ) {
           clearContainerTargets(this.instance);
 
           const layerToMove = checkIfOverContainer(this.instance, e.target);
@@ -314,7 +329,11 @@ export abstract class WeaveNode implements WeaveNodeBase {
 
         this.instance.emitEvent('onDrag', null);
 
-        if (this.isSelecting() && this.isNodeSelected(node)) {
+        if (
+          this.isSelecting() &&
+          this.isNodeSelected(node) &&
+          this.getSelectionPlugin().getSelectedNodes().length === 1
+        ) {
           clearContainerTargets(this.instance);
 
           const nodesSnappingPlugin =

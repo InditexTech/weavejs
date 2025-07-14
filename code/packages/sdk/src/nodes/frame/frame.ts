@@ -186,10 +186,12 @@ export class WeaveFrameNode extends WeaveNode {
       width: props.frameWidth,
       height: props.frameHeight,
       fill: 'transparent',
-      draggable: true,
+      draggable: false,
     });
 
-    selectorArea.on('dragmove', () => {
+    selectorArea.on('dragmove', (e) => {
+      this.instance.emitEvent('onDrag', e.target);
+
       if (this.isSelecting() && this.isNodeSelected(selectorArea)) {
         clearContainerTargets(this.instance);
         frame.setAbsolutePosition(selectorArea.getAbsolutePosition());

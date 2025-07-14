@@ -129,11 +129,9 @@ export class WeaveStageGridPlugin extends WeavePlugin {
     stage.on('pointermove', throttle(handleMouseMove, 50));
 
     stage.on('pointermove', () => {
-      if (!this.enabled) {
-        return;
+      if (this.enabled) {
+        this.onRender();
       }
-
-      this.onRender();
     });
 
     window.addEventListener('wheel', () => {
