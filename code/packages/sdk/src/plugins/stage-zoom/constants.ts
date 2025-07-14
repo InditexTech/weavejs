@@ -15,6 +15,7 @@ export const WEAVE_STAGE_ZOOM_DEFAULT_CONFIG: WeaveStageZoomPluginConfig = {
   zoomInertia: {
     friction: 0.9,
     mouseWheelStep: 0.01,
+    trackpadStep: 0.005,
   },
   zoomSteps: [
     0.01, 0.05, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1, 1.25, 1.5, 1.75,

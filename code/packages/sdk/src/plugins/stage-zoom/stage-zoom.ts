@@ -34,6 +34,7 @@ export class WeaveStageZoomPlugin extends WeavePlugin {
   private actualStep: number;
   private updatedMinimumZoom: boolean;
   private zooming: boolean = false;
+  private isTrackpad: boolean = false;
   private zoomVelocity: number = 0;
   private zoomInertiaType: WeaveStageZoomType =
     WEAVE_STAGE_ZOOM_TYPE.MOUSE_WHEEL;
@@ -55,6 +56,7 @@ export class WeaveStageZoomPlugin extends WeavePlugin {
       );
     }
 
+    this.isTrackpad = false;
     this.isCtrlOrMetaPressed = false;
     this.updatedMinimumZoom = false;
     this.actualStep = this.config.zoomSteps.findIndex(
@@ -517,6 +519,8 @@ export class WeaveStageZoomPlugin extends WeavePlugin {
       const delta = e.evt.deltaY > 0 ? 1 : -1;
       this.zoomVelocity += delta;
 
+      this.isTrackpad = Math.abs(e.evt.deltaY) < 15 && e.evt.deltaMode === 0;
+
       if (!this.zooming) {
         this.zooming = true;
         this.zoomInertiaType = WEAVE_STAGE_ZOOM_TYPE.MOUSE_WHEEL;
@@ -531,8 +535,17 @@ export class WeaveStageZoomPlugin extends WeavePlugin {
     const stage = this.instance.getStage();
 
     let step = 1;
-    if (this.zoomInertiaType === WEAVE_STAGE_ZOOM_TYPE.MOUSE_WHEEL) {
+    if (
+      this.zoomInertiaType === WEAVE_STAGE_ZOOM_TYPE.MOUSE_WHEEL &&
+      !this.isTrackpad
+    ) {
       step = this.config.zoomInertia.mouseWheelStep;
+    }
+    if (
+      this.zoomInertiaType === WEAVE_STAGE_ZOOM_TYPE.MOUSE_WHEEL &&
+      this.isTrackpad
+    ) {
+      step = this.config.zoomInertia.trackpadStep;
     }
 
     const oldScale = stage.scaleX();
