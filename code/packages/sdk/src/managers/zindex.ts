@@ -59,7 +59,7 @@ export class WeaveZIndexManager {
   sendToBack(instances: WeaveElementInstance | WeaveElementInstance[]): void {
     const nodes = Array.isArray(instances) ? instances : [instances];
 
-    const nodesDescending = nodes.sort((a, b) => b.zIndex() - a.zIndex());
+    const nodesDescending = nodes.toSorted((a, b) => b.zIndex() - a.zIndex());
 
     for (const node of nodesDescending) {
       node.moveToBottom();
@@ -78,7 +78,7 @@ export class WeaveZIndexManager {
   bringToFront(instances: WeaveElementInstance | WeaveElementInstance[]): void {
     const nodes = Array.isArray(instances) ? instances : [instances];
 
-    const nodesAscending = nodes.sort((a, b) => a.zIndex() - b.zIndex());
+    const nodesAscending = nodes.toSorted((a, b) => a.zIndex() - b.zIndex());
 
     for (const node of nodesAscending) {
       node.moveToTop();
