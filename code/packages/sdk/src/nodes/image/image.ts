@@ -120,6 +120,31 @@ export class WeaveImageNode extends WeaveNode {
     }
   };
 
+  resetCrop = (imageNode: Konva.Group): void => {
+    const internalImage = imageNode?.findOne(
+      `#${imageNode.getAttrs().id}-image`
+    ) as Konva.Image | undefined;
+
+    const cropGroup = imageNode?.findOne(
+      `#${imageNode.getAttrs().id}-cropGroup`
+    ) as Konva.Group | undefined;
+
+    if (!internalImage || !cropGroup) {
+      return;
+    }
+
+    const imageCrop = new WeaveImageCrop(
+      this.instance,
+      this,
+      imageNode,
+      internalImage,
+      cropGroup
+    );
+
+    imageCrop.unCrop();
+    this.cachedCropInfo[imageNode.getAttrs().id ?? ''] = undefined;
+  };
+
   onRender(props: WeaveElementAttributes): WeaveElementInstance {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const imageProperties: any = props.imageProperties;

@@ -144,13 +144,21 @@ triggerCrop(imageNode: Konva.Group): void
 
 Function that when is called triggers the image cropping on the specified node.
 
-### triggerCrop
+### closeCrop
 
 ```ts
 closeCrop(imageNode: Konva.Group, type: WeaveImageCropEndType): void
 ```
 
 Function that when is called closes (accepted or canceled) the image cropping.
+
+### resetCrop
+
+```ts
+resetCrop(imageNode: Konva.Group): void
+```
+
+Function that when is called reset the image cropping to its original size.
 
 ## Konva.Node Augmentation
 
