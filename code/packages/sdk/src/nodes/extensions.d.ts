@@ -26,7 +26,9 @@ declare module 'konva/lib/Node' {
       width: number;
       height: number;
     };
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     updatePosition(position: Vector2d): void;
+    dblClick(): void;
     movedToContainer(container: Konva.Layer | Konva.Group): void;
   }
 }

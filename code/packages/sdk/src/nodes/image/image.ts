@@ -25,6 +25,8 @@ import { isEqual } from 'lodash';
 
 export class WeaveImageNode extends WeaveNode {
   private config: WeaveImageProperties;
+  protected tapStart: { x: number; y: number; time: number } | null;
+  protected lastTapTime: number;
   protected nodeType: string = WEAVE_IMAGE_NODE_TYPE;
   private imageCrop!: WeaveImageCrop | null;
   private cachedCropInfo!: Record<
@@ -46,6 +48,8 @@ export class WeaveImageNode extends WeaveNode {
 
     const { config } = params ?? {};
 
+    this.tapStart = { x: 0, y: 0, time: 0 };
+    this.lastTapTime = 0;
     this.config = {
       crossOrigin: config?.crossOrigin ?? 'anonymous',
       transform: {
@@ -96,6 +100,50 @@ export class WeaveImageNode extends WeaveNode {
       instance: image,
     });
   }
+
+  closeCrop = (imageNode: Konva.Group, type: WeaveImageCropEndType): void => {
+    if (!this.imageCrop) {
+      return;
+    }
+
+    if (type === WEAVE_IMAGE_CROP_END_TYPE.ACCEPT) {
+      this.imageCrop.accept();
+      this.instance.emitEvent<WeaveImageOnCropEndEvent>('onImageCropEnd', {
+        instance: imageNode,
+      });
+    }
+    if (type === WEAVE_IMAGE_CROP_END_TYPE.CANCEL) {
+      this.imageCrop.cancel();
+      this.instance.emitEvent<WeaveImageOnCropEndEvent>('onImageCropEnd', {
+        instance: imageNode,
+      });
+    }
+  };
+
+  resetCrop = (imageNode: Konva.Group): void => {
+    const internalImage: Konva.Image | undefined = imageNode.findOne(
+      `#${imageNode.getAttrs().id}-image`
+    );
+
+    const cropGroup: Konva.Group | undefined = imageNode.findOne(
+      `#${imageNode.getAttrs().id}-cropGroup`
+    );
+
+    if (!internalImage || !cropGroup) {
+      return;
+    }
+
+    const imageCrop = new WeaveImageCrop(
+      this.instance,
+      this,
+      imageNode,
+      internalImage,
+      cropGroup
+    );
+
+    imageCrop.unCrop();
+    this.cachedCropInfo[imageNode.getAttrs().id ?? ''] = undefined;
+  };
 
   onRender(props: WeaveElementAttributes): WeaveElementInstance {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -245,9 +293,7 @@ export class WeaveImageNode extends WeaveNode {
 
     this.setupDefaultNodeEvents(image);
 
-    image.on('pointerdblclick', (evt) => {
-      evt.cancelBubble = true;
-
+    image.dblClick = () => {
       if (image.getAttrs().cropping ?? false) {
         return;
       }
@@ -261,7 +307,7 @@ export class WeaveImageNode extends WeaveNode {
       }
 
       this.triggerCrop(image);
-    });
+    };
 
     const imageActionTool = this.getImageToolAction();
     const preloadImg = imageActionTool.getPreloadedImage(imageProps.id);
