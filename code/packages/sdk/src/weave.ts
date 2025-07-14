@@ -531,12 +531,12 @@ export class Weave {
     this.zIndexManager.moveDown(node);
   }
 
-  sendToBack(node: WeaveElementInstance): void {
-    this.zIndexManager.sendToBack(node);
+  sendToBack(nodes: WeaveElementInstance | WeaveElementInstance[]): void {
+    this.zIndexManager.sendToBack(nodes);
   }
 
-  bringToFront(node: WeaveElementInstance): void {
-    this.zIndexManager.bringToFront(node);
+  bringToFront(nodes: WeaveElementInstance | WeaveElementInstance[]): void {
+    this.zIndexManager.bringToFront(nodes);
   }
 
   // GROUP MANAGEMENT METHODS PROXIES

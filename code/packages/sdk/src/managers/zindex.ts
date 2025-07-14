@@ -56,38 +56,41 @@ export class WeaveZIndexManager {
     }
   }
 
-  sendToBack(instance: WeaveElementInstance): void {
-    this.logger.debug(
-      `Moving instance with id [${
-        instance.getAttrs().id
-      }], to bottom of z-index`
-    );
+  sendToBack(instances: WeaveElementInstance | WeaveElementInstance[]): void {
+    const nodes = Array.isArray(instances) ? instances : [instances];
 
-    instance.moveToBottom();
+    const nodesDescending = nodes.toSorted((a, b) => b.zIndex() - a.zIndex());
 
-    const handler = this.instance.getNodeHandler<WeaveNode>(
-      instance.getAttrs().nodeType
-    );
-    if (handler) {
-      const node = handler.serialize(instance);
-      this.instance.moveNode(node, WEAVE_NODE_POSITION.BACK);
+    for (const node of nodesDescending) {
+      node.moveToBottom();
+
+      const handler = this.instance.getNodeHandler<WeaveNode>(
+        node.getAttrs().nodeType
+      );
+      if (handler) {
+        const nodeState = handler.serialize(node);
+        this.instance.updateNode(nodeState);
+        this.instance.moveNode(nodeState, WEAVE_NODE_POSITION.BACK);
+      }
     }
   }
 
-  bringToFront(instance: WeaveElementInstance): void {
-    this.logger.debug(
-      `Moving instance with id [${instance.getAttrs().id}], to top of z-index`
-    );
+  bringToFront(instances: WeaveElementInstance | WeaveElementInstance[]): void {
+    const nodes = Array.isArray(instances) ? instances : [instances];
 
-    instance.moveToTop();
+    const nodesAscending = nodes.toSorted((a, b) => a.zIndex() - b.zIndex());
 
-    const handler = this.instance.getNodeHandler<WeaveNode>(
-      instance.getAttrs().nodeType
-    );
-    if (handler) {
-      const node = handler.serialize(instance);
-      this.instance.updateNode(node);
-      this.instance.moveNode(node, WEAVE_NODE_POSITION.FRONT);
+    for (const node of nodesAscending) {
+      node.moveToTop();
+
+      const handler = this.instance.getNodeHandler<WeaveNode>(
+        node.getAttrs().nodeType
+      );
+      if (handler) {
+        const nodeState = handler.serialize(node);
+        this.instance.updateNode(nodeState);
+        this.instance.moveNode(nodeState, WEAVE_NODE_POSITION.FRONT);
+      }
     }
   }
 }

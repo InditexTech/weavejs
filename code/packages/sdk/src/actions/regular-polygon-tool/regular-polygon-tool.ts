@@ -76,7 +76,9 @@ export class WeaveRegularPolygonToolAction extends WeaveAction {
       }
     });
 
-    stage.on('pointerdown', () => {
+    stage.on('pointerdown', (e) => {
+      this.setTapStart(e);
+
       if (this.state === REGULAR_POLYGON_TOOL_STATE.ADDING) {
         this.creating = true;
 
@@ -84,7 +86,9 @@ export class WeaveRegularPolygonToolAction extends WeaveAction {
       }
     });
 
-    stage.on('pointermove', () => {
+    stage.on('pointermove', (e) => {
+      if (!this.isPressed(e)) return;
+
       if (this.state === REGULAR_POLYGON_TOOL_STATE.DEFINING_SIZE) {
         this.moved = true;
 
@@ -92,7 +96,13 @@ export class WeaveRegularPolygonToolAction extends WeaveAction {
       }
     });
 
-    stage.on('pointerup', () => {
+    stage.on('pointerup', (e) => {
+      const isTap = this.isTap(e);
+
+      if (isTap) {
+        this.moved = false;
+      }
+
       if (this.state === REGULAR_POLYGON_TOOL_STATE.DEFINING_SIZE) {
         this.creating = false;
 
