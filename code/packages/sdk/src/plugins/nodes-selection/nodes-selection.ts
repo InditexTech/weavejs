@@ -41,7 +41,6 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
   private config!: WeaveNodesSelectionConfig;
   private selectionRectangle!: Konva.Rect;
   private active: boolean;
-  private cameFromSelectingMultiple: boolean;
   private defaultEnabledAnchors: string[];
   private selecting: boolean;
   private didMove: boolean;
@@ -110,7 +109,6 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
     this.tapStart = { x: 0, y: 0, time: 0 };
     this.lastTapTime = 0;
     this.active = false;
-    this.cameFromSelectingMultiple = false;
     this.didMove = false;
     this.selecting = false;
     this.initialized = false;
@@ -645,6 +643,7 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
 
       if (!this.selecting && moved) {
         this.tr.nodes(this.previousSelectedNodes);
+        this.triggerSelectedNodesEvent();
         return;
       }
 
@@ -690,7 +689,6 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
 
       if (!this.selectionRectangle.visible()) {
         this.hideSelectorArea();
-        // this.cameFromSelectingMultiple = false;
         return;
       }
 
@@ -867,18 +865,18 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
       return;
     }
 
-    if (this.cameFromSelectingMultiple) {
-      this.cameFromSelectingMultiple = false;
-      return;
-    }
-
     let selectedGroup: Konva.Node | undefined = undefined;
     const mousePos = stage.getPointerPosition();
 
     if (mousePos) {
       const allInter = stage.getAllIntersections(mousePos);
-      if (allInter && allInter.length === 1) {
-        selectedGroup = this.instance.getInstanceRecursive(allInter[0]);
+      const allInterFramesFiltered = allInter.filter(
+        (ele) => ele.getAttrs().nodeType !== 'frame'
+      );
+      if (allInterFramesFiltered.length === 1) {
+        selectedGroup = this.instance.getInstanceRecursive(
+          allInterFramesFiltered[0]
+        );
       }
     }
 

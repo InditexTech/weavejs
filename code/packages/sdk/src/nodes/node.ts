@@ -119,7 +119,6 @@ export abstract class WeaveNode implements WeaveNodeBase {
       this.instance.getPlugin<WeaveNodesSelectionPlugin>('nodesSelection');
 
     if (
-      selectionPlugin &&
       selectionPlugin
         ?.getSelectedNodes()
         .map((node) => node.getAttrs().id)
