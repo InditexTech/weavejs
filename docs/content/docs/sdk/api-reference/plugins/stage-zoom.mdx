@@ -55,10 +55,24 @@ type WeaveStageZoomPluginConfig = {
   fitToSelection: {
     padding: number;
   };
+  zoomInertia: {
+    friction: number;
+    mouseWheelStep: number;
+    trackpadStep: number;
+  };
+};
+
+type DeepPartial<T> = {
+  [P in keyof T]?: T[P] extends object
+    ? // eslint-disable-next-line @typescript-eslint/no-unsafe-function-type
+      T[P] extends Function
+      ? T[P]
+      : DeepPartial<T[P]>
+    : T[P];
 };
 
 type WeaveStageZoomPluginParams = {
-  config?: WeaveStageZoomPluginConfig;
+  config?: DeepPartial<WeaveStageZoomPluginConfig>;
 };
 ```
 
@@ -101,6 +115,24 @@ For `WeaveStageZoomPluginConfig`:
         "The default padding zoom when fitting elements to selection (in px).",
       type: "number",
       default: "40",
+    },
+    ["zoomInertia.friction"]: {
+      description:
+        "The friction applied to the zoom inertia feature. This smooths the stop of the zoom.",
+      type: "number",
+      default: "0.9",
+    },
+    ["zoomInertia.mouseWheelStep"]: {
+      description:
+        "The step (zooming) applied to the zoom inertia feature when using the mouse wheel (via the wheel event).",
+      type: "number",
+      default: "0.01",
+    },
+    ["zoomInertia.trackpadStep"]: {
+      description:
+        "The step (zooming) applied to the zoom inertia feature when using a trackpad (via the wheel event).",
+      type: "number",
+      default: "0.005",
     },
   }}
 />
