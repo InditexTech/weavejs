@@ -487,7 +487,6 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
     } else {
       this.setTapStart(e);
       this.lastTapTime = this.tapStart.time;
-      isDoubleTap = false;
     }
 
     return isDoubleTap;

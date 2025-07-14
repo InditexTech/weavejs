@@ -121,13 +121,13 @@ export class WeaveImageNode extends WeaveNode {
   };
 
   resetCrop = (imageNode: Konva.Group): void => {
-    const internalImage = imageNode?.findOne(
+    const internalImage: Konva.Image | undefined = imageNode.findOne(
       `#${imageNode.getAttrs().id}-image`
-    ) as Konva.Image | undefined;
+    );
 
-    const cropGroup = imageNode?.findOne(
+    const cropGroup: Konva.Group | undefined = imageNode.findOne(
       `#${imageNode.getAttrs().id}-cropGroup`
-    ) as Konva.Group | undefined;
+    );
 
     if (!internalImage || !cropGroup) {
       return;
