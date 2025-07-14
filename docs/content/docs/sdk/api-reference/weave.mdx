@@ -410,7 +410,7 @@ as other nodes in front of it.
 #### sendToBack
 
 ```ts
-sendToBack(node: WeaveElementInstance): void
+sendToBack(node: WeaveElementInstance | WeaveElementInstance[]): void
 ```
 
 This method moves down the node to the back of the z-axis, being the further node from the user perspective.
@@ -418,7 +418,7 @@ This method moves down the node to the back of the z-axis, being the further nod
 #### bringToFront
 
 ```ts
-bringToFront(node: WeaveElementInstance): void
+bringToFront(node: WeaveElementInstance | WeaveElementInstance[]): void
 ```
 
 This method brings up the node to the front of the z-axis, being the closest node from the user perspective.

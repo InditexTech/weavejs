@@ -17,7 +17,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - [#272](https://github.com/InditexTech/weavejs/issues/272) Apple Pencil support
 - [#488](https://github.com/InditexTech/weavejs/issues/488) Make zoom sensitivity configurable from the client and support inertia
-- [#489](https://github.com/InditexTech/weavejs/issues/489) Support multiple nodes API for bringToFront / bringToBack utilities
+- [#489](https://github.com/InditexTech/weavejs/issues/489) Support multiple nodes API for bringToFront / sendToBack utilities
 
 ## [0.37.0] - 2025-07-07
 
