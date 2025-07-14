@@ -91,9 +91,9 @@ export class WeaveContextMenuPlugin extends WeavePlugin {
     const dy = e.evt.clientY - this.tapStart.y;
     const dist = Math.sqrt(dx * dx + dy * dy);
 
-    const LONG_PRESS_DISTANCE = 3; // px
+    const MOVED_DISTANCE = 5; // px
 
-    if (dist < LONG_PRESS_DISTANCE) {
+    if (dist < MOVED_DISTANCE) {
       return false;
     }
 
@@ -104,58 +104,29 @@ export class WeaveContextMenuPlugin extends WeavePlugin {
   triggerContextMenu(target: any): void {
     const stage = this.instance.getStage();
 
-    const selectionPlugin = this.instance.getPlugin<WeaveNodesSelectionPlugin>(
-      WEAVE_NODES_SELECTION_KEY
-    );
-
-    let clickOnTransformer = false;
-    if (selectionPlugin) {
-      const transformer = selectionPlugin.getTransformer();
-      const box = transformer.getClientRect();
-      const mousePos = stage.getPointerPosition();
-      if (
-        mousePos &&
-        mousePos.x >= box.x &&
-        mousePos.x <= box.x + box.width &&
-        mousePos.y >= box.y &&
-        mousePos.y <= box.y + box.height
-      ) {
-        clickOnTransformer = true;
-      }
-    }
+    const selectionPlugin = this.getSelectionPlugin();
 
     let nodes: WeaveSelection[] = [];
 
-    if (target !== stage && clickOnTransformer && selectionPlugin) {
-      const transformer = selectionPlugin.getTransformer();
+    if (target !== stage) {
+      const realTarget = this.instance.getInstanceRecursive(target);
 
-      nodes = transformer
-        .getNodes()
-        .map((node) => {
-          const nodeHandler = this.instance.getNodeHandler<WeaveNode>(
-            node.getAttrs().nodeType
-          );
-
-          return {
-            instance: node as WeaveElementInstance,
-            node: nodeHandler?.serialize(node as WeaveElementInstance),
-          };
-        })
-        .filter((node) => typeof node !== 'undefined');
-    }
-
-    if (target !== stage && !clickOnTransformer) {
       const nodeHandler = this.instance.getNodeHandler<WeaveNode>(
-        target.getAttrs().nodeType
+        realTarget.getAttrs().nodeType
       );
 
       nodes = [
         {
-          instance: target as WeaveElementInstance,
-          node: nodeHandler?.serialize(target as WeaveElementInstance),
+          instance: realTarget as WeaveElementInstance,
+          node: nodeHandler?.serialize(realTarget as WeaveElementInstance),
         },
       ];
     }
+
+    if (this.contextMenuVisible) {
+      this.closeContextMenu();
+    }
+    selectionPlugin?.setSelectedNodes([...nodes.map((node) => node.instance)]);
 
     const containerRect = stage.container().getBoundingClientRect();
     const pointerPos = stage.getPointerPosition();
@@ -190,6 +161,41 @@ export class WeaveContextMenuPlugin extends WeavePlugin {
         visible: false,
       }
     );
+  }
+
+  private getSelectionPlugin(): WeaveNodesSelectionPlugin | undefined {
+    const selectionPlugin = this.instance.getPlugin<WeaveNodesSelectionPlugin>(
+      WEAVE_NODES_SELECTION_KEY
+    );
+
+    return selectionPlugin;
+  }
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  private getSelectedNode(e: any) {
+    const stage = this.instance.getStage();
+
+    let selectedGroup: Konva.Node | Stage = stage;
+
+    const allInter = stage.getAllIntersections({
+      x: e.evt.clientX,
+      y: e.evt.clientY,
+    });
+
+    if (allInter.length === 1) {
+      selectedGroup = this.instance.getInstanceRecursive(allInter[0]);
+    } else {
+      const allInterFramesFiltered = allInter.filter(
+        (ele) => ele.getAttrs().nodeType !== 'frame'
+      );
+      if (allInterFramesFiltered.length > 0) {
+        selectedGroup = this.instance.getInstanceRecursive(
+          allInterFramesFiltered[0]
+        );
+      }
+    }
+
+    return selectedGroup;
   }
 
   private initEvents() {
@@ -259,7 +265,9 @@ export class WeaveContextMenuPlugin extends WeavePlugin {
         } else {
           this.actualNode?.stopDrag();
           delete this.pointers[e.evt.pointerId];
-          this.triggerContextMenu(e.target);
+
+          const selectedGroup = this.getSelectedNode(e);
+          this.triggerContextMenu(selectedGroup);
         }
       }, this.tapHoldTimeout);
     });
@@ -305,7 +313,8 @@ export class WeaveContextMenuPlugin extends WeavePlugin {
         return;
       }
 
-      this.triggerContextMenu(e.target);
+      const selectedGroup = this.getSelectedNode(e);
+      this.triggerContextMenu(selectedGroup);
     });
 
     this.instance.addEventListener('onStageSelection', () => {

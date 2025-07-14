@@ -79,13 +79,9 @@ export abstract class WeaveNode implements WeaveNodeBase {
     return this.logger;
   }
 
-  getSelectionPlugin(): WeaveNodesSelectionPlugin {
+  getSelectionPlugin(): WeaveNodesSelectionPlugin | undefined {
     const selectionPlugin =
       this.instance.getPlugin<WeaveNodesSelectionPlugin>('nodesSelection');
-
-    if (!selectionPlugin) {
-      throw new Error('WeaveNodesSelectionPlugin plugin not found');
-    }
 
     return selectionPlugin;
   }
@@ -298,7 +294,7 @@ export abstract class WeaveNode implements WeaveNodeBase {
         if (
           this.isSelecting() &&
           this.isNodeSelected(node) &&
-          this.getSelectionPlugin().getSelectedNodes().length === 1
+          this.getSelectionPlugin()?.getSelectedNodes().length === 1
         ) {
           clearContainerTargets(this.instance);
 
@@ -331,7 +327,7 @@ export abstract class WeaveNode implements WeaveNodeBase {
         if (
           this.isSelecting() &&
           this.isNodeSelected(node) &&
-          this.getSelectionPlugin().getSelectedNodes().length === 1
+          this.getSelectionPlugin()?.getSelectedNodes().length === 1
         ) {
           clearContainerTargets(this.instance);
 
