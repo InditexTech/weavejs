@@ -51,6 +51,7 @@ export const augmentKonvaNodeClass = (
   Konva.Node.prototype.triggerCrop = function () {};
   Konva.Node.prototype.closeCrop = function () {};
   Konva.Node.prototype.resetCrop = function () {};
+  Konva.Node.prototype.dblClick = function () {};
 };
 
 export abstract class WeaveNode implements WeaveNodeBase {

@@ -48,6 +48,8 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
   private didMove: boolean;
   private dragging: boolean;
   private initialized: boolean;
+  protected tapStart: { x: number; y: number; time: number } | null;
+  protected lastTapTime: number;
   private pointers: Record<string, PointerEvent>;
   onRender: undefined;
 
@@ -110,6 +112,8 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
       'bottom-center',
       'bottom-right',
     ];
+    this.tapStart = { x: 0, y: 0, time: 0 };
+    this.lastTapTime = 0;
     this.active = false;
     this.cameFromSelectingMultiple = false;
     this.didMove = false;
@@ -448,6 +452,47 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
     this.triggerSelectedNodesEvent();
   }
 
+  isPressed(e: KonvaEventObject<PointerEvent, Stage>): boolean {
+    return e.evt.buttons > 0;
+  }
+
+  setTapStart(e: KonvaEventObject<PointerEvent, Stage>): void {
+    this.tapStart = {
+      x: e.evt.clientX,
+      y: e.evt.clientY,
+      time: performance.now(),
+    };
+  }
+
+  isDoubleTap(e: KonvaEventObject<PointerEvent, Stage>): boolean {
+    if (!this.tapStart) {
+      return false;
+    }
+
+    const dx = e.evt.clientX - this.tapStart.x;
+    const dy = e.evt.clientY - this.tapStart.y;
+    const dist = Math.sqrt(dx * dx + dy * dy);
+
+    const DOUBLE_TAP_DISTANCE = 10; // px
+    const DOUBLE_TAP_TIME = 300; // ms
+
+    let isDoubleTap = false;
+
+    if (
+      this.tapStart.time - this.lastTapTime < DOUBLE_TAP_TIME &&
+      dist < DOUBLE_TAP_DISTANCE
+    ) {
+      this.lastTapTime = 0;
+      isDoubleTap = true;
+    } else {
+      this.setTapStart(e);
+      this.lastTapTime = this.tapStart.time;
+      isDoubleTap = false;
+    }
+
+    return isDoubleTap;
+  }
+
   private initEvents() {
     let x1: number, y1: number, x2: number, y2: number;
     this.selecting = false;
@@ -465,6 +510,8 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
     });
 
     stage.on('pointerdown', (e: KonvaEventObject<PointerEvent, Stage>) => {
+      this.setTapStart(e);
+
       this.pointers[e.evt.pointerId] = e.evt;
 
       if (!this.initialized) {
@@ -521,6 +568,10 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
     const handleMouseMove = (
       e: KonvaEventObject<PointerEvent, Konva.Stage>
     ) => {
+      if (e.evt.buttons === 0) {
+        return;
+      }
+
       if (this.selectionTriggered) {
         this.selectionTriggered = false;
         this.selectionRectangle.setAttrs({
@@ -746,8 +797,9 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
         }
       });
 
+      const nodesArray = [...selectedNodes];
       this.selecting = false;
-      this.tr.nodes([...selectedNodes]);
+      this.tr.nodes(nodesArray);
       this.triggerSelectedNodesEvent();
 
       stage.container().tabIndex = 1;
@@ -755,6 +807,8 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
     });
 
     stage.on('pointerclick', (e) => {
+      const isDoubleTap = this.isDoubleTap(e);
+
       e.cancelBubble = true;
       this.selectionTriggered = false;
 
@@ -858,6 +912,11 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
       const isSelected = nodeSelectedIndex !== -1;
 
       if (nodeTargeted.getAttrs().locked) {
+        return;
+      }
+
+      if (isDoubleTap && !metaPressed) {
+        nodeTargeted.dblClick();
         return;
       }
 

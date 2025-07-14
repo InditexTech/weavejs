@@ -199,6 +199,21 @@ export class WeaveImageCrop {
       );
     };
 
+    this.instance.getStage().on('pointerdown', (e) => {
+      if (e.target === this.instance.getStage()) {
+        this.cancel();
+      }
+    });
+
+    this.instance.addEventListener(
+      'onActiveActionChange',
+      (activeAction: string | undefined) => {
+        if (typeof activeAction !== 'undefined') {
+          this.cancel();
+        }
+      }
+    );
+
     this.cropRect.on('dragstart', (e) => {
       this.instance.emitEvent('onDrag', e.target);
     });

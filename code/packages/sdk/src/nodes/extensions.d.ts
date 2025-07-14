@@ -27,6 +27,7 @@ declare module 'konva/lib/Node' {
       height: number;
     };
     updatePosition(position: Vector2d): void;
+    dblClick(): void;
     movedToContainer(container: Konva.Layer | Konva.Group): void;
   }
 }
