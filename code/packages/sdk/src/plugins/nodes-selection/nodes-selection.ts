@@ -965,7 +965,11 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
       return;
     }
 
-    if (!metaPressed) {
+    if (
+      !metaPressed &&
+      (!contextMenuPlugin ||
+        (contextMenuPlugin && !contextMenuPlugin.isContextMenuVisible()))
+    ) {
       // if no key pressed and the node is not selected
       // select just one
       this.tr.nodes([nodeTargeted]);

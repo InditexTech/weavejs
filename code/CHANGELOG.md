@@ -13,9 +13,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- [#496](https://github.com/InditexTech/weavejs/issues/496) Node should be selected when right-clicked
+
 ### Fixed
 
-- [#493](https://github.com/InditexTech/weavejs/issues/493)No automatic exit when the user switches to another tool when in crop mode
+- [#493](https://github.com/InditexTech/weavejs/issues/493) No automatic exit when the user switches to another tool when in crop mode
 
 ## [0.38.0] - 2025-07-14
 
