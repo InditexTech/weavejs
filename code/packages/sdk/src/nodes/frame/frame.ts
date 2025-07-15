@@ -93,14 +93,17 @@ export class WeaveFrameNode extends WeaveNode {
     const frame = new Konva.Group({
       ...frameParams,
       id,
+      isContainerPrincipal: true,
       containerId: `${id}-group-internal`,
       containerOffsetX: 0,
       containerOffsetY: borderWidth,
       width: props.frameWidth,
       height: props.frameHeight,
       fill: 'transparent',
+      selectorElement: `${id}-selector-area`,
       draggable: false,
       clip: undefined,
+      name: 'node',
     });
 
     frame.getRealClientRect = function (config) {
@@ -176,7 +179,6 @@ export class WeaveFrameNode extends WeaveNode {
     const selectorArea = new Konva.Rect({
       ...frameParams,
       id: `${id}-selector-area`,
-      name: 'node',
       nodeId: id,
       containerId: `${id}-group-internal`,
       x: 0,
@@ -186,30 +188,16 @@ export class WeaveFrameNode extends WeaveNode {
       width: props.frameWidth,
       height: props.frameHeight,
       fill: 'transparent',
+      containerElement: `${id}-group-internal`,
       draggable: false,
+      isContainerPrincipal: false,
+      selectorElement: undefined,
+      name: undefined,
     });
 
-    selectorArea.on('dragmove', (e) => {
-      this.instance.emitEvent('onDrag', e.target);
-
+    frame.on('dragend', () => {
       if (this.isSelecting() && this.isNodeSelected(selectorArea)) {
         clearContainerTargets(this.instance);
-        frame.setAbsolutePosition(selectorArea.getAbsolutePosition());
-        selectorArea.setAttrs({
-          x: 0,
-          y: 0,
-        });
-      }
-    });
-
-    selectorArea.on('dragend', () => {
-      if (this.isSelecting() && this.isNodeSelected(selectorArea)) {
-        clearContainerTargets(this.instance);
-        frame.setAbsolutePosition(selectorArea.getAbsolutePosition());
-        selectorArea.setAttrs({
-          x: 0,
-          y: 0,
-        });
         this.instance.updateNode(
           this.serialize(selectorArea as WeaveElementInstance)
         );
@@ -292,7 +280,7 @@ export class WeaveFrameNode extends WeaveNode {
       e.cancelBubble = true;
     };
 
-    selectorArea.on('transformend', (e) => {
+    selectorArea.on('transformstart', (e) => {
       this.instance.emitEvent('onTransform', e.target);
     });
 
@@ -335,6 +323,7 @@ export class WeaveFrameNode extends WeaveNode {
       width: props.frameWidth - borderWidth * 2,
       height: props.frameHeight - borderWidth * 2,
       strokeScaleEnabled: true,
+      selectorElement: `${id}-selector-area`,
       clipFunc: (ctx) => {
         const width =
           (frameInternal.width() + borderWidth) * frameInternal.scaleX();
@@ -352,11 +341,55 @@ export class WeaveFrameNode extends WeaveNode {
 
     frameInternalGroup.add(frameInternal);
 
+    const hitAreaSize = 10;
+
+    const selectionArea = new Konva.Rect({
+      ...frameParams,
+      x: 0,
+      y: 0,
+      width: props.frameWidth,
+      height: props.frameHeight,
+      hitFunc: function (ctx, shape) {
+        ctx.beginPath();
+        ctx.rect(0, 0, props.frameWidth - 2 * hitAreaSize, hitAreaSize);
+        ctx.rect(0, 0, hitAreaSize, props.frameHeight - 2 * hitAreaSize);
+        ctx.rect(
+          props.frameWidth - hitAreaSize,
+          hitAreaSize,
+          hitAreaSize,
+          props.frameHeight - 2 * hitAreaSize
+        );
+        ctx.rect(
+          hitAreaSize,
+          props.frameHeight - hitAreaSize,
+          props.frameWidth - 2 * hitAreaSize,
+          hitAreaSize
+        );
+        ctx.fillStrokeShape(shape);
+      },
+      fill: 'transparent',
+      id: `${id}-selection-area`,
+      nodeId: `${id}-selector-area`,
+      listening: true,
+      draggable: false,
+      name: undefined,
+    });
+
+    selectionArea.moveToTop();
+    frame.add(selectionArea);
+
+    this.setupDefaultNodeEvents(selectionArea);
+
+    selectionArea.off('transformstart');
+    selectionArea.off('transform');
+    selectionArea.off('transformend');
+    selectionArea.off('dragstart');
+    selectionArea.off('dragmove');
+    selectionArea.off('dragend');
+
     this.setupDefaultNodeEvents(frame);
 
-    frame.off('dragstart');
-    frame.off('dragmove');
-    frame.off('dragend');
+    frame.off('pointerover');
 
     frame.on(WEAVE_NODE_CUSTOM_EVENTS.onTargetLeave, () => {
       background.setAttrs({

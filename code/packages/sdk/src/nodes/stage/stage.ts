@@ -75,6 +75,16 @@ export class WeaveStageNode extends WeaveNode {
       }
     });
 
+    stage.on('pointerover', (e) => {
+      if (e.target !== stage && !e.target.getAttrs().nodeId) return;
+
+      const parent = (e.target as Konva.Node).getParent();
+      if (parent && parent instanceof Konva.Transformer) return;
+
+      this.hideHoverState();
+      stage.container().style.cursor = 'default';
+    });
+
     stage.on('pointerdown', (e) => {
       if (e.evt.button === 1) {
         this.wheelMousePressed = true;

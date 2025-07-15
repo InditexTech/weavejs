@@ -28,15 +28,11 @@ import type { Stage } from 'konva/lib/Stage';
 
 export class WeaveContextMenuPlugin extends WeavePlugin {
   private config: WeaveStageContextMenuPluginConfig;
-  private touchTimer: NodeJS.Timeout | undefined;
   private contextMenuVisible: boolean;
   private tapHold: boolean;
   private tapHoldTimeout: number;
   private pointers: Record<string, PointerEvent>;
-  private onAction!: string | undefined;
-  private actualNode!: Konva.Node | null;
-  private dragging!: boolean;
-  private transforming!: boolean;
+  private timer!: NodeJS.Timeout | null;
   protected tapStart: { x: number; y: number; time: number } | null;
   getLayerName = undefined;
   initLayer = undefined;
@@ -45,10 +41,7 @@ export class WeaveContextMenuPlugin extends WeavePlugin {
   constructor(params: WeaveStageContextMenuPluginParams) {
     super();
 
-    this.onAction = undefined;
-    this.dragging = false;
-    this.transforming = false;
-    this.touchTimer = undefined;
+    this.timer = null;
     this.tapHold = false;
     this.contextMenuVisible = false;
     this.tapStart = { x: 0, y: 0, time: 0 };
@@ -82,43 +75,22 @@ export class WeaveContextMenuPlugin extends WeavePlugin {
     };
   }
 
-  checkMoved(e: KonvaEventObject<PointerEvent, Stage>): boolean {
-    if (!this.tapStart) {
-      return false;
-    }
-
-    const dx = e.evt.clientX - this.tapStart.x;
-    const dy = e.evt.clientY - this.tapStart.y;
-    const dist = Math.sqrt(dx * dx + dy * dy);
-
-    const MOVED_DISTANCE = 5; // px
-
-    if (dist < MOVED_DISTANCE) {
-      return false;
-    }
-
-    return true;
-  }
-
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  triggerContextMenu(target: any): void {
+  triggerContextMenu(target: Konva.Node | undefined): void {
     const stage = this.instance.getStage();
 
     const selectionPlugin = this.getSelectionPlugin();
 
     let nodes: WeaveSelection[] = [];
 
-    if (target !== stage) {
-      const realTarget = this.instance.getInstanceRecursive(target);
-
+    if (target && target !== stage) {
       const nodeHandler = this.instance.getNodeHandler<WeaveNode>(
-        realTarget.getAttrs().nodeType
+        target.getAttrs().nodeType
       );
 
       nodes = [
         {
-          instance: realTarget as WeaveElementInstance,
-          node: nodeHandler?.serialize(realTarget as WeaveElementInstance),
+          instance: target as WeaveElementInstance,
+          node: nodeHandler?.serialize(target as WeaveElementInstance),
         },
       ];
     }
@@ -126,7 +98,9 @@ export class WeaveContextMenuPlugin extends WeavePlugin {
     if (this.contextMenuVisible) {
       this.closeContextMenu();
     }
+
     selectionPlugin?.setSelectedNodes([...nodes.map((node) => node.instance)]);
+    selectionPlugin?.getHoverTransformer().nodes([]);
 
     const containerRect = stage.container().getBoundingClientRect();
     const pointerPos = stage.getPointerPosition();
@@ -171,64 +145,48 @@ export class WeaveContextMenuPlugin extends WeavePlugin {
     return selectionPlugin;
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  private getSelectedNode(e: any) {
+  protected getTargetedNode() {
     const stage = this.instance.getStage();
 
-    let selectedGroup: Konva.Node | Stage = stage;
+    let selectedGroup: Konva.Node | undefined = undefined;
+    const mousePos = stage.getPointerPosition();
 
-    const allInter = stage.getAllIntersections({
-      x: e.evt.clientX,
-      y: e.evt.clientY,
-    });
-
-    if (allInter.length === 1) {
-      selectedGroup = this.instance.getInstanceRecursive(allInter[0]);
-    } else {
-      const allInterFramesFiltered = allInter.filter(
-        (ele) => ele.getAttrs().nodeType !== 'frame'
-      );
-      if (allInterFramesFiltered.length > 0) {
-        selectedGroup = this.instance.getInstanceRecursive(
-          allInterFramesFiltered[0]
+    if (mousePos) {
+      const allInter = stage.getAllIntersections(mousePos);
+      if (allInter.length === 1) {
+        selectedGroup = this.instance.getInstanceRecursive(allInter[0]);
+      } else {
+        const allInterContainersFiltered = allInter.filter(
+          (ele) => typeof ele.getAttrs().containerElement === 'undefined'
         );
+        if (allInterContainersFiltered.length > 0) {
+          selectedGroup = this.instance.getInstanceRecursive(
+            allInterContainersFiltered[0]
+          );
+        }
       }
     }
 
     return selectedGroup;
   }
 
+  cancelLongPressTimer() {
+    if (this.timer) {
+      clearTimeout(this.timer);
+      this.timer = null;
+    }
+  }
+
   private initEvents() {
     const stage = this.instance.getStage();
-
-    this.instance.addEventListener(
-      'onActiveActionChange',
-      (activeAction: string | undefined) => {
-        this.onAction = activeAction;
-      }
-    );
-
-    this.instance.addEventListener('onDrag', (node: Konva.Node | null) => {
-      this.actualNode = node;
-      if (node) {
-        this.dragging = true;
-      } else {
-        this.dragging = false;
-      }
-    });
-
-    this.instance.addEventListener('onTransform', (node: Konva.Node | null) => {
-      this.actualNode = node;
-      if (node) {
-        this.transforming = true;
-      } else {
-        this.transforming = false;
-      }
-    });
 
     stage.on('pointerdown', (e) => {
       this.setTapStart(e);
       this.pointers[e.evt.pointerId] = e.evt;
+
+      if (e.evt.buttons === 0) {
+        return;
+      }
 
       if (e.evt.pointerType === 'mouse') {
         return;
@@ -241,52 +199,26 @@ export class WeaveContextMenuPlugin extends WeavePlugin {
         return;
       }
 
-      this.touchTimer = setTimeout(() => {
-        this.tapHold = true;
+      if (this.timer) {
+        return;
+      }
 
-        const moved = this.checkMoved(e);
+      this.timer = setTimeout(() => {
+        this.tapHold = true;
 
         const actualActions = this.instance.getActiveAction();
         if (actualActions !== 'selectionTool') {
           return;
         }
 
-        const shouldKillLongPressTimer =
-          moved &&
-          this.touchTimer &&
-          (typeof this.onAction === 'undefined' ||
-            (typeof this.onAction !== 'undefined' &&
-              ['selectionTool'].includes(this.onAction))) &&
-          ((typeof this.dragging !== 'undefined' && this.dragging) ||
-            (typeof this.transforming !== 'undefined' && this.transforming));
+        delete this.pointers[e.evt.pointerId];
 
-        if (shouldKillLongPressTimer) {
-          clearTimeout(this.touchTimer);
-        } else {
-          this.actualNode?.stopDrag();
-          delete this.pointers[e.evt.pointerId];
-
-          const selectedGroup = this.getSelectedNode(e);
-          this.triggerContextMenu(selectedGroup);
-        }
+        const selectedGroup = this.getTargetedNode();
+        this.triggerContextMenu(selectedGroup);
       }, this.tapHoldTimeout);
     });
 
-    stage.on('pointermove', (e) => {
-      if (e.evt.buttons === 0) {
-        return;
-      }
-
-      const moved = this.checkMoved(e);
-
-      if (moved && this.touchTimer) {
-        clearTimeout(this.touchTimer);
-      }
-    });
-
     stage.on('pointerup', (e) => {
-      this.checkMoved(e);
-
       delete this.pointers[e.evt.pointerId];
 
       if (e.evt.pointerType === 'mouse') {
@@ -300,8 +232,9 @@ export class WeaveContextMenuPlugin extends WeavePlugin {
         return;
       }
 
-      if (this.touchTimer) {
-        clearTimeout(this.touchTimer);
+      if (this.timer) {
+        clearTimeout(this.timer);
+        this.timer = null;
         this.tapHold = false;
       }
     });
@@ -313,7 +246,7 @@ export class WeaveContextMenuPlugin extends WeavePlugin {
         return;
       }
 
-      const selectedGroup = this.getSelectedNode(e);
+      const selectedGroup = this.getTargetedNode();
       this.triggerContextMenu(selectedGroup);
     });
 

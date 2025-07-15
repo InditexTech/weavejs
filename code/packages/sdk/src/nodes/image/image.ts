@@ -276,6 +276,7 @@ export class WeaveImageNode extends WeaveNode {
       strokeScaleEnabled: true,
       draggable: false,
       visible: false,
+      name: undefined,
     });
 
     image.add(internalImage);

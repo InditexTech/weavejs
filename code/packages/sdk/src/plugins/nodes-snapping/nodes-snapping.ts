@@ -109,6 +109,7 @@ export class WeaveNodesSnappingPlugin extends WeavePlugin {
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   evaluateGuidelines(e: KonvaEventObject<any>): void {
+    const stage = this.instance.getStage();
     const utilityLayer = this.instance.getUtilityLayer();
 
     if (!this.enabled) {
@@ -150,6 +151,13 @@ export class WeaveNodesSnappingPlugin extends WeavePlugin {
 
     if (typeof node === 'undefined') {
       return;
+    }
+
+    if (node.getAttrs().selectorElement) {
+      const realNode = stage.findOne(
+        `#${node.getAttrs().selectorElement}`
+      ) as Konva.Node;
+      node = realNode;
     }
 
     // find possible snapping lines
@@ -204,11 +212,9 @@ export class WeaveNodesSnappingPlugin extends WeavePlugin {
           };
 
           n.setAbsolutePosition(newPos);
-          // n.fire('dragmove', { target: n, absPos }, true);
         });
       } else {
         node.absolutePosition(absPos);
-        // node.fire('dragmove', { target: node, absPos }, true);
       }
     }
     if (e.type === 'transform') {
@@ -300,13 +306,41 @@ export class WeaveNodesSnappingPlugin extends WeavePlugin {
       stage.height(),
     ];
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const nodesToCompare: any[] = [];
+
     // and we snap over edges and center of each object on the canvas
     stage.find('.node').forEach((guideItem) => {
-      if (skipNodes.includes(guideItem.getAttrs().id ?? '')) {
+      let realGuideItem = guideItem;
+      if (guideItem.getAttrs().selectorElement) {
+        const node = stage.findOne(
+          `#${guideItem.getAttrs().selectorElement}`
+        ) as Konva.Node;
+
+        if (node) {
+          realGuideItem = node;
+        }
+      }
+
+      if (realGuideItem.getParent()?.getAttrs().nodeType === 'group') {
         return;
       }
 
-      const box = guideItem.getClientRect({ skipStroke: true });
+      if (
+        skipNodes.includes(
+          realGuideItem.getParent()?.getAttrs().selectorElement ?? ''
+        )
+      ) {
+        return;
+      }
+
+      if (skipNodes.includes(realGuideItem.getAttrs().id ?? '')) {
+        return;
+      }
+
+      nodesToCompare.push(realGuideItem);
+
+      const box = realGuideItem.getClientRect({ skipStroke: true });
 
       // and we can snap to all edges of shapes
       vertical.push([box.x, box.x + box.width, box.x + box.width / 2]);

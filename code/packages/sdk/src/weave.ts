@@ -322,6 +322,10 @@ export class Weave {
     return this.stageManager.getMainLayer();
   }
 
+  getSelectionLayer(): Konva.Layer | undefined {
+    return this.stageManager.getSelectionLayer();
+  }
+
   getUtilityLayer(): Konva.Layer | undefined {
     return this.stageManager.getUtilityLayer();
   }
