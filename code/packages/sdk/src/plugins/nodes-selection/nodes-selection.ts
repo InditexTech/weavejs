@@ -1252,7 +1252,8 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
   }
 
   getContextMenuPlugin() {
-    const contextMenuPlugin = this.instance.getPlugin('contextMenu');
+    const contextMenuPlugin =
+      this.instance.getPlugin<WeaveContextMenuPlugin>('contextMenu');
     return contextMenuPlugin;
   }
 }
