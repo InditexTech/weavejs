@@ -306,9 +306,6 @@ export class WeaveNodesSnappingPlugin extends WeavePlugin {
       stage.height(),
     ];
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const nodesToCompare: any[] = [];
-
     // and we snap over edges and center of each object on the canvas
     stage.find('.node').forEach((guideItem) => {
       let realGuideItem = guideItem;
@@ -337,8 +334,6 @@ export class WeaveNodesSnappingPlugin extends WeavePlugin {
       if (skipNodes.includes(realGuideItem.getAttrs().id ?? '')) {
         return;
       }
-
-      nodesToCompare.push(realGuideItem);
 
       const box = realGuideItem.getClientRect({ skipStroke: true });
 

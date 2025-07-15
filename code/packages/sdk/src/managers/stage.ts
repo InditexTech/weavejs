@@ -45,9 +45,7 @@ export class WeaveStageManager {
 
   getSelectionLayer() {
     const stage = this.getStage();
-    return stage.findOne(`#${WEAVE_NODES_SELECTION_LAYER_ID}`) as
-      | Konva.Layer
-      | undefined;
+    return stage.findOne(`#${WEAVE_NODES_SELECTION_LAYER_ID}`);
   }
 
   getUtilityLayer() {

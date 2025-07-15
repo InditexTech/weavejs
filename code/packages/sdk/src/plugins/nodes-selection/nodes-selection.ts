@@ -481,7 +481,7 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
     }
 
     const dx = actual.x - init.x;
-    const dy = actual.y - actual.y;
+    const dy = actual.y - init.y;
     const dist = Math.sqrt(dx * dx + dy * dy);
 
     const MOVED_DISTANCE = 5; // px
@@ -1252,10 +1252,7 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
   }
 
   getContextMenuPlugin() {
-    const contextMenuPlugin = this.instance.getPlugin('contextMenu') as
-      | WeaveContextMenuPlugin
-      | undefined;
-
+    const contextMenuPlugin = this.instance.getPlugin('contextMenu');
     return contextMenuPlugin;
   }
 }
