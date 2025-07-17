@@ -116,7 +116,9 @@ export class WeaveCopyPasteNodesPlugin extends WeavePlugin {
         try {
           const continueToPaste = await this.readClipboardData();
           if (continueToPaste) {
-            const position = this.instance.getStage().getPointerPosition();
+            const position = this.instance
+              .getStage()
+              .getRelativePointerPosition();
 
             if (position) {
               this.state = COPY_PASTE_NODES_PLUGIN_STATE.PASTING;
@@ -136,7 +138,9 @@ export class WeaveCopyPasteNodesPlugin extends WeavePlugin {
           if (items && items.length === 1) {
             const item = items[0];
 
-            const position = this.instance.getStage().getPointerPosition();
+            const position = this.instance
+              .getStage()
+              .getRelativePointerPosition();
 
             if (position) {
               this.instance.emitEvent<WeaveCopyPasteNodesPluginOnPasteExternalEvent>(
