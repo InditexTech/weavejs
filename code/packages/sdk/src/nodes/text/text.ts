@@ -543,8 +543,6 @@ export class WeaveTextNode extends WeaveNode {
           );
         }
 
-        console.log({ text: this.textArea.value });
-
         textNode.text(this.textArea.value);
         this.removeTextAreaDOM(textNode);
         this.instance.removeEventListener(
@@ -675,11 +673,6 @@ export class WeaveTextNode extends WeaveNode {
       this.instance.disablePlugin('nodesSelection');
       tr.hide();
     }
-
-    console.log(
-      `Updating text area for text node ${textNode.id()}`,
-      this.editing
-    );
 
     if (this.editing) {
       textNode.visible(false);
