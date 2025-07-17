@@ -116,14 +116,8 @@ export class WeaveCopyPasteNodesPlugin extends WeavePlugin {
         try {
           const continueToPaste = await this.readClipboardData();
           if (continueToPaste) {
-            const position = this.instance
-              .getStage()
-              .getRelativePointerPosition();
-
-            if (position) {
-              this.state = COPY_PASTE_NODES_PLUGIN_STATE.PASTING;
-              this.handlePaste(position);
-            }
+            this.state = COPY_PASTE_NODES_PLUGIN_STATE.PASTING;
+            this.handlePaste();
           }
           // eslint-disable-next-line @typescript-eslint/no-unused-vars, no-empty
         } catch (ex) {
