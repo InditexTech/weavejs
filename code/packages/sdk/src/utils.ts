@@ -51,7 +51,6 @@ export function checkIfOverContainer(
         actualNode.getAttrs().isContainerPrincipal
       ) {
         containersInSelection.push(actualNode);
-        continue;
       }
     }
 

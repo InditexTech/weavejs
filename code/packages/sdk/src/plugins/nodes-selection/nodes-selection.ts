@@ -50,7 +50,6 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
   private selecting: boolean;
   private didMove: boolean;
   private initialized: boolean;
-  // private previousSelectedNodes: Konva.Node[];
   protected taps: number;
   protected isDoubleTap: boolean;
   protected tapStart: { x: number; y: number; time: number } | null;
@@ -109,7 +108,6 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
       'bottom-right',
     ];
     this.taps = 0;
-    // this.previousSelectedNodes = [];
     this.isDoubleTap = false;
     this.tapStart = { x: 0, y: 0, time: 0 };
     this.lastTapTime = 0;
@@ -579,8 +577,6 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
 
       this.pointers[e.evt.pointerId] = e.evt;
 
-      // this.previousSelectedNodes = this.tr.getNodes();
-
       if (!this.initialized) {
         return;
       }
@@ -618,7 +614,7 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
 
       const isStage = e.target instanceof Konva.Stage;
       const isTransformer = e.target?.getParent() instanceof Konva.Transformer;
-      const isTargetable = !(e.target.getAttrs().isTargetable === false);
+      const isTargetable = e.target.getAttrs().isTargetable !== false;
       const isContainerEmptyArea =
         typeof e.target.getAttrs().isContainerPrincipal !== 'undefined' &&
         !e.target.getAttrs().isContainerPrincipal;

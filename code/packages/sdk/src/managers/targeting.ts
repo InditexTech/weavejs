@@ -232,7 +232,6 @@ export class WeaveTargetingManager {
     mainLayer?.add(dummyRect);
 
     const intersectedNode = this.nodeIntersectsContainerElement(dummyRect);
-    // const intersectedNode = stage.getIntersection(relativeMousePointer);
     if (intersectedNode) {
       const containerOfNode = stage.findOne(
         `#${intersectedNode.getAttrs().containerId}`

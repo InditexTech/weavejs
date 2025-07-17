@@ -383,7 +383,7 @@ export abstract class WeaveNode implements WeaveNodeBase {
 
         const realNode = this.instance.getInstanceRecursive(node);
 
-        const isTargetable = !(e.target.getAttrs().isTargetable === false);
+        const isTargetable = e.target.getAttrs().isTargetable !== false;
         const isLocked = realNode.getAttrs().locked ?? false;
 
         // Node is locked

@@ -283,13 +283,13 @@ export class WeaveFrameNode extends WeaveNode {
       clip: undefined,
     });
 
-    const title = stage.findOne(`#${newProps.id}-title`) as
-      | Konva.Text
-      | undefined;
+    const title: Konva.Text | undefined = stage.findOne(
+      `#${newProps.id}-title`
+    );
 
-    const selectionArea = stage.findOne(`#${newProps.id}-selection-area`) as
-      | Konva.Rect
-      | undefined;
+    const selectionArea: Konva.Rect | undefined = stage.findOne(
+      `#${newProps.id}-selection-area`
+    );
 
     if (title && selectionArea) {
       title.text(newProps.title);
@@ -322,9 +322,9 @@ export class WeaveFrameNode extends WeaveNode {
 
     const mainNode = instance as Konva.Group | undefined;
 
-    const frameInternal = stage.findOne(`#${attrs.containerId}`) as
-      | Konva.Group
-      | undefined;
+    const frameInternal: Konva.Group | undefined = stage.findOne(
+      `#${attrs.containerId}`
+    );
 
     const childrenMapped: WeaveStateElement[] = [];
     if (frameInternal) {
