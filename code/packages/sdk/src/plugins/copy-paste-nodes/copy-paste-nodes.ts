@@ -207,7 +207,7 @@ export class WeaveCopyPasteNodesPlugin extends WeavePlugin {
           mousePoint.x + (node.props.x - this.toPaste.weaveMinPoint.x);
         node.props.y =
           mousePoint.y + (node.props.y - this.toPaste.weaveMinPoint.y);
-        this.instance.addNode(node, container?.getAttr('id'));
+        this.instance.addNode(node, container?.getAttrs().id);
 
         this.instance.emitEvent<WeaveCopyPasteNodesPluginOnPasteEvent>(
           'onPaste'
