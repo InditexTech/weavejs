@@ -15,7 +15,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
-- [#502](https://github.com/InditexTech/weavejs/issues/502) Remove unecessary console.log statements
+- [#502](https://github.com/InditexTech/weavejs/issues/502) Remove unnecessary console.log statements
 
 ## [0.39.0] - 2025-07-17
 
