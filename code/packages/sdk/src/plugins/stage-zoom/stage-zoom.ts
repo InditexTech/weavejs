@@ -309,6 +309,13 @@ export class WeaveStageZoomPlugin extends WeavePlugin {
     return scale;
   }
 
+  getSelectionPlugin(): WeaveNodesSelectionPlugin | undefined {
+    const selectionPlugin =
+      this.instance.getPlugin<WeaveNodesSelectionPlugin>('nodesSelection');
+
+    return selectionPlugin;
+  }
+
   fitToScreen(): void {
     if (!this.enabled) {
       return;
@@ -370,8 +377,7 @@ export class WeaveStageZoomPlugin extends WeavePlugin {
 
     const stage = this.instance.getStage();
 
-    const selectionPlugin =
-      this.instance.getPlugin<WeaveNodesSelectionPlugin>('nodesSelection');
+    const selectionPlugin = this.getSelectionPlugin();
 
     if (!selectionPlugin) {
       return;

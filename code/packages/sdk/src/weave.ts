@@ -567,13 +567,13 @@ export class Weave {
     return this.targetingManager.pointIntersectsElement(point);
   }
 
-  pointIntersectsContainerElement(
-    actualLayer?: Konva.Layer | Konva.Group,
-    point?: Vector2d
+  nodeIntersectsContainerElement(
+    node: Konva.Node | Konva.Transformer,
+    actualLayer?: Konva.Layer | Konva.Group
   ): Konva.Node | undefined {
-    return this.targetingManager.pointIntersectsContainerElement(
-      actualLayer,
-      point
+    return this.targetingManager.nodeIntersectsContainerElement(
+      node,
+      actualLayer
     );
   }
 
@@ -582,7 +582,7 @@ export class Weave {
   }
 
   getMousePointerRelativeToContainer(
-    container: Konva.Group | Konva.Layer
+    container: Konva.Node | Konva.Layer
   ): WeaveMousePointInfoSimple {
     return this.targetingManager.getMousePointerRelativeToContainer(container);
   }

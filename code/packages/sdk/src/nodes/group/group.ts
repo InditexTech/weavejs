@@ -34,6 +34,7 @@ export class WeaveGroupNode extends WeaveNode {
   onRender(props: WeaveElementAttributes): WeaveElementInstance {
     const group = new Konva.Group({
       ...props,
+      isContainerPrincipal: true,
       name: 'node',
     });
 

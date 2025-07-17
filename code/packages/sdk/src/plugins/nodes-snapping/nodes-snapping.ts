@@ -109,7 +109,6 @@ export class WeaveNodesSnappingPlugin extends WeavePlugin {
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   evaluateGuidelines(e: KonvaEventObject<any>): void {
-    const stage = this.instance.getStage();
     const utilityLayer = this.instance.getUtilityLayer();
 
     if (!this.enabled) {
@@ -151,13 +150,6 @@ export class WeaveNodesSnappingPlugin extends WeavePlugin {
 
     if (typeof node === 'undefined') {
       return;
-    }
-
-    if (node.getAttrs().selectorElement) {
-      const realNode = stage.findOne(
-        `#${node.getAttrs().selectorElement}`
-      ) as Konva.Node;
-      node = realNode;
     }
 
     // find possible snapping lines
@@ -284,6 +276,33 @@ export class WeaveNodesSnappingPlugin extends WeavePlugin {
     }
   }
 
+  private nodeIntersectsViewport(node: Konva.Node) {
+    const stage = this.instance.getStage();
+
+    const scale = stage.scaleX();
+    const stageWidth = stage.width() / scale;
+    const stageHeight = stage.height() / scale;
+
+    const viewportRect = {
+      x: -stage.x() / scale,
+      y: -stage.y() / scale,
+      width: stageWidth,
+      height: stageHeight,
+    };
+
+    if (!node.isVisible()) return false;
+
+    const box = node.getClientRect({ relativeTo: stage });
+
+    const intersects =
+      box.x + box.width > viewportRect.x &&
+      box.x < viewportRect.x + viewportRect.width &&
+      box.y + box.height > viewportRect.y &&
+      box.y < viewportRect.y + viewportRect.height;
+
+    return intersects;
+  }
+
   getLineGuideStops(skipNodes: string[]): LineGuideStop {
     const stage = this.instance.getStage();
 
@@ -308,34 +327,23 @@ export class WeaveNodesSnappingPlugin extends WeavePlugin {
 
     // and we snap over edges and center of each object on the canvas
     stage.find('.node').forEach((guideItem) => {
-      let realGuideItem = guideItem;
-      if (guideItem.getAttrs().selectorElement) {
-        const node = stage.findOne(
-          `#${guideItem.getAttrs().selectorElement}`
-        ) as Konva.Node;
-
-        if (node) {
-          realGuideItem = node;
-        }
-      }
-
-      if (realGuideItem.getParent()?.getAttrs().nodeType === 'group') {
+      if (guideItem.getParent()?.getAttrs().nodeType === 'group') {
         return;
       }
 
-      if (
-        skipNodes.includes(
-          realGuideItem.getParent()?.getAttrs().selectorElement ?? ''
-        )
-      ) {
+      if (skipNodes.includes(guideItem.getParent()?.getAttrs().nodeId)) {
         return;
       }
 
-      if (skipNodes.includes(realGuideItem.getAttrs().id ?? '')) {
+      if (skipNodes.includes(guideItem.getAttrs().id ?? '')) {
         return;
       }
 
-      const box = realGuideItem.getClientRect({ skipStroke: true });
+      if (!this.nodeIntersectsViewport(guideItem)) {
+        return;
+      }
+
+      const box = guideItem.getClientRect({ skipStroke: true });
 
       // and we can snap to all edges of shapes
       vertical.push([box.x, box.x + box.width, box.x + box.width / 2]);

@@ -61,44 +61,144 @@ export class WeaveTargetingManager {
     return intersectedNode;
   }
 
-  pointIntersectsContainerElement(
-    actualLayer?: Konva.Layer | Konva.Group,
-    point?: Vector2d
+  isBoundingBoxIntersecting(nodeA: Konva.Node, nodeB: Konva.Node) {
+    const stage = this.instance.getStage();
+    const a = nodeA.getClientRect({ relativeTo: stage });
+    const b = nodeB.getClientRect({ relativeTo: stage });
+
+    return !(
+      (
+        a.x + a.width < b.x || // A is to the left of B
+        a.x > b.x + b.width || // A is to the right of B
+        a.y + a.height < b.y || // A is above B
+        a.y > b.y + b.height
+      ) // A is below B
+    );
+  }
+
+  isNodesBoundingBoxIntersecting(nodes: Konva.Node[], nodeB: Konva.Node) {
+    const stage = this.instance.getStage();
+    const a = this.getBoundingBoxOfNodes(nodes);
+    const b = nodeB.getClientRect({ relativeTo: stage });
+
+    return !(
+      (
+        a.x + a.width < b.x || // A is to the left of B
+        a.x > b.x + b.width || // A is to the right of B
+        a.y + a.height < b.y || // A is above B
+        a.y > b.y + b.height
+      ) // A is below B
+    );
+  }
+
+  getBoundingBoxOfNodes(nodes: Konva.Node[]) {
+    const stage = this.instance.getStage();
+
+    if (!nodes || nodes.length === 0)
+      return {
+        x: 0,
+        y: 0,
+        width: 0,
+        height: 0,
+      };
+
+    const rects = nodes.map((node) =>
+      node.getClientRect({ relativeTo: stage })
+    );
+
+    const minX = Math.min(...rects.map((r) => r.x));
+    const minY = Math.min(...rects.map((r) => r.y));
+    const maxX = Math.max(...rects.map((r) => r.x + r.width));
+    const maxY = Math.max(...rects.map((r) => r.y + r.height));
+
+    return {
+      x: minX,
+      y: minY,
+      width: maxX - minX,
+      height: maxY - minY,
+    };
+  }
+
+  nodeIntersectsContainerElement(
+    node: Konva.Node | Konva.Transformer,
+    actualLayer?: Konva.Layer | Konva.Group
   ): Konva.Node | undefined {
     const stage = this.instance.getStage();
-    const relativeMousePointer = point
-      ? point
-      : stage.getPointerPosition() ?? { x: 0, y: 0 };
+    const containers = stage.find('.containerCapable');
 
-    const intersections = this.instance
-      .getMainLayer()
-      ?.getAllIntersections(relativeMousePointer);
+    const intersections: Konva.Node[] = [];
+
+    if (node instanceof Konva.Transformer) {
+      const transformerNodes = node.nodes();
+      const containersInSelection = [];
+      for (const actualNode of transformerNodes) {
+        if (actualNode.getParent()?.getAttrs().nodeId) {
+          const realParent = stage.findOne(
+            `#${actualNode.getParent()?.getAttrs().nodeId}`
+          );
+          if (realParent) {
+            containersInSelection.push(realParent.getAttrs().id ?? '');
+          }
+        }
+      }
+
+      const containersInSelectionSet = new Set(containersInSelection);
+      const uniqueContainersInSelection = Array.from(containersInSelectionSet);
+
+      for (const container of containers) {
+        const intersects = this.isNodesBoundingBoxIntersecting(
+          transformerNodes,
+          container
+        );
+
+        if (
+          intersects &&
+          !uniqueContainersInSelection.includes(container.getAttrs().id ?? '')
+        ) {
+          intersections.push(container);
+        }
+      }
+    } else {
+      let nodeActualContainer: Konva.Node | undefined =
+        node.getParent() as Konva.Node;
+
+      if (nodeActualContainer.getAttrs().nodeId) {
+        const realParent = stage.findOne(
+          `#${nodeActualContainer.getAttrs().nodeId}`
+        );
+
+        if (realParent) {
+          nodeActualContainer = realParent;
+        }
+      }
+
+      for (const container of containers) {
+        const intersects = this.isBoundingBoxIntersecting(node, container);
+        if (intersects && container.getAttrs().id !== node.getAttrs().id) {
+          intersections.push(container);
+        }
+      }
+    }
 
     let intersectedNode: Konva.Node | undefined = undefined;
-    if (intersections) {
-      for (const node of intersections) {
-        if (node.getAttrs().nodeId) {
-          const parent = stage.findOne(`#${node.getAttrs().nodeId}`);
-          if (!parent) {
-            continue;
-          }
-          const resolvedNode = this.resolveNode(parent);
-          if (
-            resolvedNode &&
-            resolvedNode.getAttrs().containerId &&
-            resolvedNode.getAttrs().id !== actualLayer?.getAttrs().id
-          ) {
-            intersectedNode = parent;
-          }
+    for (const node of intersections) {
+      if (node.getAttrs().nodeId) {
+        const parent = stage.findOne(`#${node.getAttrs().nodeId}`);
+        if (!parent) {
           continue;
         }
+        const resolvedNode = this.resolveNode(parent);
         if (
-          node.getAttrs().containerId &&
-          node.getAttrs().id !== actualLayer?.getAttrs().id
+          resolvedNode &&
+          resolvedNode.getAttrs().id !== actualLayer?.getAttrs().id
         ) {
-          intersectedNode = node;
-          continue;
+          intersectedNode = parent;
         }
+        continue;
+      }
+      if (node.getAttrs().id !== actualLayer?.getAttrs().id) {
+        intersectedNode = node;
+        continue;
       }
     }
 
@@ -112,9 +212,9 @@ export class WeaveTargetingManager {
 
     let relativeMousePointer = point
       ? point
-      : stage.getPointerPosition() ?? { x: 0, y: 0 };
+      : mainLayer?.getRelativePointerPosition() ?? { x: 0, y: 0 };
     let measureContainer: Konva.Layer | Konva.Group | undefined = mainLayer;
-    let container: Konva.Layer | Konva.Group | undefined = mainLayer;
+    let container: Konva.Layer | Konva.Node | undefined = mainLayer;
 
     const nodesSelection =
       this.instance.getPlugin<WeaveNodesSelectionPlugin>('nodesSelection');
@@ -123,36 +223,23 @@ export class WeaveTargetingManager {
       nodesSelection.disable();
     }
 
-    const intersectedNode = stage.getIntersection(relativeMousePointer);
+    const dummyRect = new Konva.Rect({
+      width: 10,
+      height: 10,
+      x: relativeMousePointer.x,
+      y: relativeMousePointer.y,
+    });
+    mainLayer?.add(dummyRect);
+
+    const intersectedNode = this.nodeIntersectsContainerElement(dummyRect);
+    // const intersectedNode = stage.getIntersection(relativeMousePointer);
     if (intersectedNode) {
-      const node = this.instance.getInstanceRecursive(intersectedNode, [
-        'group',
-      ]);
-
-      let nodeParent = null;
-      if (node.getParent()) {
-        nodeParent = this.instance.getInstanceRecursive(
-          node.getParent() as Konva.Node,
-          ['group']
-        );
-      }
-
-      if (node && node instanceof Konva.Group && node.getAttrs().containerId) {
-        measureContainer = (node as Konva.Group).findOne(
-          `#${node.getAttrs().containerId}`
-        ) as Konva.Group;
-        container = node;
-      }
-
-      if (
-        nodeParent &&
-        nodeParent instanceof Konva.Group &&
-        nodeParent.getAttrs().containerId
-      ) {
-        measureContainer = (nodeParent as Konva.Group).findOne(
-          `#${nodeParent.getAttrs().containerId}`
-        ) as Konva.Group;
-        container = nodeParent;
+      const containerOfNode = stage.findOne(
+        `#${intersectedNode.getAttrs().containerId}`
+      ) as Konva.Group | undefined;
+      if (containerOfNode) {
+        container = intersectedNode;
+        measureContainer = containerOfNode;
       }
     }
 
@@ -172,11 +259,13 @@ export class WeaveTargetingManager {
       nodesSelection.enable();
     }
 
+    dummyRect.destroy();
+
     return { mousePoint: relativeMousePointer, container, measureContainer };
   }
 
   getMousePointerRelativeToContainer(
-    container: Konva.Group | Konva.Layer
+    container: Konva.Node | Konva.Layer
   ): WeaveMousePointInfoSimple {
     const relativeMousePointer = container.getRelativePointerPosition() ?? {
       x: 0,

@@ -34,12 +34,21 @@ export class WeaveStageDropAreaPlugin extends WeavePlugin {
     });
 
     stage.container().addEventListener('drop', (e) => {
+      e.preventDefault();
       e.stopPropagation();
 
       this.instance.emitEvent<WeaveStageDropPluginOnStageDropEvent>(
         'onStageDrop',
         e
       );
+    });
+
+    // Safari: Prevent default page drop behavior
+    window.addEventListener('dragover', (e) => e.preventDefault(), {
+      passive: false,
+    });
+    window.addEventListener('drop', (e) => e.preventDefault(), {
+      passive: false,
     });
   }
 

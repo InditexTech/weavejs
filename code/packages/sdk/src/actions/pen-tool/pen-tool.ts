@@ -18,7 +18,7 @@ export class WeavePenToolAction extends WeaveAction {
   protected state: WeavePenToolActionState;
   protected lineId: string | null;
   protected tempLineId: string | null;
-  protected container: Konva.Layer | Konva.Group | undefined;
+  protected container: Konva.Layer | Konva.Node | undefined;
   protected measureContainer: Konva.Layer | Konva.Group | undefined;
   protected clickPoint: Vector2d | null;
   protected tempPoint: Konva.Circle | undefined;

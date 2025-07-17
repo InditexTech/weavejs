@@ -21,7 +21,7 @@ export class WeaveFrameToolAction extends WeaveAction {
   protected initialized: boolean = false;
   protected state: WeaveFrameToolActionState;
   protected frameId: string | null;
-  protected container: Konva.Layer | Konva.Group | undefined;
+  protected container: Konva.Layer | Konva.Node | undefined;
   protected clickPoint: Vector2d | null;
   protected cancelAction!: () => void;
   onPropsChange = undefined;

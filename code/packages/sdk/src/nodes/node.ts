@@ -25,6 +25,7 @@ import {
 import type { WeaveNodesSnappingPlugin } from '@/plugins/nodes-snapping/nodes-snapping';
 import { throttle } from 'lodash';
 import type { KonvaEventObject } from 'konva/lib/Node';
+import { WEAVE_STAGE_MODE } from './stage/constants';
 
 export const augmentKonvaStageClass = (): void => {
   Konva.Stage.prototype.isMouseWheelPressed = function () {
@@ -378,14 +379,11 @@ export abstract class WeaveNode implements WeaveNodeBase {
       node.on('pointerover', (e) => {
         e.cancelBubble = true;
 
-        let realNode = this.instance.getInstanceRecursive(node);
+        const stage = this.instance.getStage();
 
-        if (realNode.getAttrs().selectorElement) {
-          realNode = this.instance
-            .getStage()
-            .findOne(`#${realNode.getAttrs().selectorElement}`) as Konva.Node;
-        }
+        const realNode = this.instance.getInstanceRecursive(node);
 
+        const isTargetable = !(e.target.getAttrs().isTargetable === false);
         const isLocked = realNode.getAttrs().locked ?? false;
 
         // Node is locked
@@ -404,11 +402,17 @@ export abstract class WeaveNode implements WeaveNodeBase {
           this.isSelecting() &&
           !this.isNodeSelected(realNode) &&
           !this.isPasting() &&
-          !isLocked
+          isTargetable &&
+          !isLocked &&
+          stage.mode() === WEAVE_STAGE_MODE.normal
         ) {
           const stage = this.instance.getStage();
           stage.container().style.cursor = 'pointer';
           this.setHoverState(realNode);
+        }
+
+        if (!isTargetable) {
+          this.hideHoverState();
         }
 
         // We're on pasting mode

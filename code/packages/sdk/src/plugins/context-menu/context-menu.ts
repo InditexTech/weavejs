@@ -22,9 +22,10 @@ import {
 } from './constants';
 import type { WeaveNode } from '@/nodes/node';
 import { WEAVE_NODES_SELECTION_KEY } from '@/plugins/nodes-selection/constants';
-import type Konva from 'konva';
+import Konva from 'konva';
 import type { KonvaEventObject } from 'konva/lib/Node';
 import type { Stage } from 'konva/lib/Stage';
+import { Transformer } from 'konva/lib/shapes/Transformer';
 
 export class WeaveContextMenuPlugin extends WeavePlugin {
   private config: WeaveStageContextMenuPluginConfig;
@@ -75,7 +76,10 @@ export class WeaveContextMenuPlugin extends WeavePlugin {
     };
   }
 
-  triggerContextMenu(target: Konva.Node | undefined): void {
+  triggerContextMenu(
+    eventTarget: Konva.Node,
+    target: Konva.Node | undefined
+  ): void {
     const stage = this.instance.getStage();
 
     const selectionPlugin = this.getSelectionPlugin();
@@ -95,12 +99,34 @@ export class WeaveContextMenuPlugin extends WeavePlugin {
       ];
     }
 
+    const eventTargetParent = eventTarget.getParent();
+    if (eventTargetParent instanceof Konva.Transformer) {
+      nodes = eventTargetParent.nodes().map((node) => {
+        const nodeHandler = this.instance.getNodeHandler<WeaveNode>(
+          node.getAttrs().nodeType
+        );
+
+        return {
+          instance: node as WeaveElementInstance,
+          node: nodeHandler?.serialize(node as WeaveElementInstance),
+        };
+      });
+    }
+
     if (this.contextMenuVisible) {
       this.closeContextMenu();
     }
 
-    selectionPlugin?.setSelectedNodes([...nodes.map((node) => node.instance)]);
-    selectionPlugin?.getHoverTransformer().nodes([]);
+    if (
+      selectionPlugin &&
+      !(
+        eventTarget.getParent() instanceof Transformer &&
+        selectionPlugin.getSelectedNodes().length > 0
+      )
+    ) {
+      selectionPlugin.setSelectedNodes([...nodes.map((node) => node.instance)]);
+      selectionPlugin.getHoverTransformer().nodes([]);
+    }
 
     const containerRect = stage.container().getBoundingClientRect();
     const pointerPos = stage.getPointerPosition();
@@ -214,7 +240,7 @@ export class WeaveContextMenuPlugin extends WeavePlugin {
         delete this.pointers[e.evt.pointerId];
 
         const selectedGroup = this.getTargetedNode();
-        this.triggerContextMenu(selectedGroup);
+        this.triggerContextMenu(e.target, selectedGroup);
       }, this.tapHoldTimeout);
     });
 
@@ -247,7 +273,7 @@ export class WeaveContextMenuPlugin extends WeavePlugin {
       }
 
       const selectedGroup = this.getTargetedNode();
-      this.triggerContextMenu(selectedGroup);
+      this.triggerContextMenu(e.target, selectedGroup);
     });
 
     this.instance.addEventListener('onStageSelection', () => {

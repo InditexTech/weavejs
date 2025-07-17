@@ -19,7 +19,7 @@ export class WeaveArrowToolAction extends WeaveAction {
   protected state: WeaveArrowToolActionState;
   protected arrowId: string | null;
   protected tempArrowId: string | null;
-  protected container: Konva.Layer | Konva.Group | undefined;
+  protected container: Konva.Layer | Konva.Node | undefined;
   protected measureContainer: Konva.Layer | Konva.Group | undefined;
   protected clickPoint: Vector2d | null;
   protected tempPoint: Konva.Circle | undefined;

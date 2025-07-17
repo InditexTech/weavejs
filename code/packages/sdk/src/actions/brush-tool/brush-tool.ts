@@ -18,7 +18,7 @@ export class WeaveBrushToolAction extends WeaveAction {
   protected state: WeaveBrushToolActionState;
   protected clickPoint: Vector2d | null;
   protected strokeId: string | null;
-  protected container: Konva.Layer | Konva.Group | undefined;
+  protected container: Konva.Layer | Konva.Node | undefined;
   protected measureContainer: Konva.Layer | Konva.Group | undefined;
   protected lineWidth: number = 0;
   protected cancelAction!: () => void;
@@ -187,7 +187,7 @@ export class WeaveBrushToolAction extends WeaveAction {
         strokeElements: [],
       });
       const nodeInstance = nodeHandler.onRender(node.props);
-      this.container?.add(nodeInstance);
+      this.measureContainer?.add(nodeInstance);
     }
 
     this.setState(BRUSH_TOOL_STATE.DEFINE_STROKE);
