@@ -26,6 +26,7 @@ import Konva from 'konva';
 import type { KonvaEventObject } from 'konva/lib/Node';
 import type { Stage } from 'konva/lib/Stage';
 import { Transformer } from 'konva/lib/shapes/Transformer';
+import { getTargetedNode } from '@/utils';
 
 export class WeaveContextMenuPlugin extends WeavePlugin {
   private config: WeaveStageContextMenuPluginConfig;
@@ -171,31 +172,6 @@ export class WeaveContextMenuPlugin extends WeavePlugin {
     return selectionPlugin;
   }
 
-  protected getTargetedNode() {
-    const stage = this.instance.getStage();
-
-    let selectedGroup: Konva.Node | undefined = undefined;
-    const mousePos = stage.getPointerPosition();
-
-    if (mousePos) {
-      const allInter = stage.getAllIntersections(mousePos);
-      if (allInter.length === 1) {
-        selectedGroup = this.instance.getInstanceRecursive(allInter[0]);
-      } else {
-        const allInterContainersFiltered = allInter.filter(
-          (ele) => typeof ele.getAttrs().containerElement === 'undefined'
-        );
-        if (allInterContainersFiltered.length > 0) {
-          selectedGroup = this.instance.getInstanceRecursive(
-            allInterContainersFiltered[0]
-          );
-        }
-      }
-    }
-
-    return selectedGroup;
-  }
-
   cancelLongPressTimer() {
     if (this.timer) {
       clearTimeout(this.timer);
@@ -239,7 +215,7 @@ export class WeaveContextMenuPlugin extends WeavePlugin {
 
         delete this.pointers[e.evt.pointerId];
 
-        const selectedGroup = this.getTargetedNode();
+        const selectedGroup = getTargetedNode(this.instance);
         this.triggerContextMenu(e.target, selectedGroup);
       }, this.tapHoldTimeout);
     });
@@ -272,7 +248,7 @@ export class WeaveContextMenuPlugin extends WeavePlugin {
         return;
       }
 
-      const selectedGroup = this.getTargetedNode();
+      const selectedGroup = getTargetedNode(this.instance);
       this.triggerContextMenu(e.target, selectedGroup);
     });
 

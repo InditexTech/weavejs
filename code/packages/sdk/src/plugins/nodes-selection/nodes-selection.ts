@@ -28,6 +28,7 @@ import type { WeaveCopyPasteNodesPlugin } from '../copy-paste-nodes/copy-paste-n
 import {
   checkIfOverContainer,
   clearContainerTargets,
+  getTargetedNode,
   moveNodeToContainer,
 } from '@/utils';
 import { WEAVE_USERS_SELECTION_KEY } from '../users-selection/constants';
@@ -607,7 +608,7 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
         return;
       }
 
-      const selectedGroup = this.getTargetedNode();
+      const selectedGroup = getTargetedNode(this.instance);
 
       if (selectedGroup?.getParent() instanceof Konva.Transformer) {
         this.selecting = false;
@@ -957,7 +958,7 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
 
     this.hideHoverState();
 
-    const selectedGroup = this.getTargetedNode();
+    const selectedGroup = getTargetedNode(this.instance);
 
     if (!this.initialized) {
       return;
@@ -1139,31 +1140,6 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
     }
 
     this.triggerSelectedNodesEvent();
-  }
-
-  protected getTargetedNode() {
-    const stage = this.instance.getStage();
-
-    let selectedGroup: Konva.Node | undefined = undefined;
-    const mousePos = stage.getPointerPosition();
-
-    if (mousePos) {
-      const allInter = stage.getAllIntersections(mousePos);
-      if (allInter.length === 1) {
-        selectedGroup = this.instance.getInstanceRecursive(allInter[0]);
-      } else {
-        const allInterContainersFiltered = allInter.filter(
-          (ele) => typeof ele.getAttrs().containerElement === 'undefined'
-        );
-        if (allInterContainersFiltered.length > 0) {
-          selectedGroup = this.instance.getInstanceRecursive(
-            allInterContainersFiltered[0]
-          );
-        }
-      }
-    }
-
-    return selectedGroup;
   }
 
   getSelectedNodes() {

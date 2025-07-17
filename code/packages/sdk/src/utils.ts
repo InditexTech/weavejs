@@ -230,3 +230,25 @@ export function getBoundingBox(
     height: maxY - minY,
   };
 }
+
+export function getTargetedNode(instance: Weave): Konva.Node | undefined {
+  const stage = instance.getStage();
+  let selectedGroup: Konva.Node | undefined = undefined;
+  const mousePos = stage.getPointerPosition();
+  if (mousePos) {
+    const allInter = stage.getAllIntersections(mousePos);
+    if (allInter.length === 1) {
+      selectedGroup = instance.getInstanceRecursive(allInter[0]);
+    } else {
+      const allInterContainersFiltered = allInter.filter(
+        (ele) => typeof ele.getAttrs().containerElement === 'undefined'
+      );
+      if (allInterContainersFiltered.length > 0) {
+        selectedGroup = instance.getInstanceRecursive(
+          allInterContainersFiltered[0]
+        );
+      }
+    }
+  }
+  return selectedGroup;
+}
