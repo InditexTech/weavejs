@@ -131,7 +131,6 @@ export class WeaveContextMenuPlugin extends WeavePlugin {
 
     const containerRect = stage.container().getBoundingClientRect();
     const pointerPos = stage.getPointerPosition();
-    const pointerRelativePos = stage.getRelativePointerPosition();
 
     if (containerRect && pointerPos) {
       const point: Vector2d = {
@@ -146,7 +145,6 @@ export class WeaveContextMenuPlugin extends WeavePlugin {
         {
           selection: nodes,
           point,
-          relativePoint: pointerRelativePos ?? { x: 0, y: 0 },
           visible: true,
         }
       );
@@ -161,7 +159,6 @@ export class WeaveContextMenuPlugin extends WeavePlugin {
       {
         selection: [],
         point: { x: 0, y: 0 },
-        relativePoint: { x: 0, y: 0 },
         visible: false,
       }
     );
@@ -262,7 +259,6 @@ export class WeaveContextMenuPlugin extends WeavePlugin {
 
       const containerRect = stage.container().getBoundingClientRect();
       const pointerPos = stage.getPointerPosition();
-      const pointerRelativePos = stage.getRelativePointerPosition();
 
       if (containerRect && pointerPos) {
         const point: Vector2d = {
@@ -275,7 +271,6 @@ export class WeaveContextMenuPlugin extends WeavePlugin {
           {
             selection: [],
             point,
-            relativePoint: pointerRelativePos ?? { x: 0, y: 0 },
             visible: false,
           }
         );

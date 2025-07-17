@@ -593,13 +593,9 @@ export class Weave {
     if (selectionPlugin) {
       const stage = this.getStage();
       const instanceNodes: WeaveElementInstance[] = nodesIds.map((nodeId) => {
-        let nodeInstance = stage.findOne(`#${nodeId}`) as WeaveElementInstance;
-
-        if (nodeInstance && nodeInstance.getAttrs().nodeType === 'frame') {
-          nodeInstance = stage.findOne(
-            `#${nodeId}-selector-area`
-          ) as WeaveElementInstance;
-        }
+        const nodeInstance = stage.findOne(
+          `#${nodeId}`
+        ) as WeaveElementInstance;
 
         return nodeInstance;
       });
