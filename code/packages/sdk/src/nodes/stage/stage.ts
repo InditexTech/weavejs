@@ -8,7 +8,8 @@ import {
   type WeaveElementInstance,
 } from '@inditextech/weave-types';
 import { WeaveNode } from '../node';
-import { WEAVE_STAGE_NODE_TYPE } from './constants';
+import { WEAVE_STAGE_MODE, WEAVE_STAGE_NODE_TYPE } from './constants';
+import type { WeaveStageMode } from './types';
 
 export class WeaveStageNode extends WeaveNode {
   protected nodeType: string = WEAVE_STAGE_NODE_TYPE;
@@ -36,6 +37,13 @@ export class WeaveStageNode extends WeaveNode {
       this.stageFocused = false;
     });
 
+    Konva.Stage.prototype.mode = function (mode?: WeaveStageMode) {
+      if (typeof mode !== 'undefined') {
+        this._mode = mode;
+      }
+      return this._mode;
+    };
+
     Konva.Stage.prototype.allowActions = function (actions?: string[]) {
       if (typeof actions !== 'undefined') {
         this._allowActions = actions;
@@ -57,6 +65,8 @@ export class WeaveStageNode extends WeaveNode {
       return this._allowSelection;
     };
 
+    stage.mode(WEAVE_STAGE_MODE.normal);
+
     stage.on('pointermove', (e) => {
       if (
         stage.allowSelection() &&
@@ -73,6 +83,16 @@ export class WeaveStageNode extends WeaveNode {
         const stage = this.instance.getStage();
         stage.container().style.cursor = 'default';
       }
+    });
+
+    stage.on('pointerover', (e) => {
+      if (e.target !== stage && !e.target.getAttrs().nodeId) return;
+
+      const parent = (e.target as Konva.Node).getParent();
+      if (parent && parent instanceof Konva.Transformer) return;
+
+      this.hideHoverState();
+      stage.container().style.cursor = 'default';
     });
 
     stage.on('pointerdown', (e) => {

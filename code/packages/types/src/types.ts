@@ -94,7 +94,7 @@ export type WeaveSelection = {
 
 export type WeaveMousePointInfoSimple = {
   mousePoint: Vector2d;
-  container: Konva.Layer | Konva.Group | undefined;
+  container: Konva.Layer | Konva.Node | undefined;
 };
 
 export type WeaveMousePointInfo = WeaveMousePointInfoSimple & {

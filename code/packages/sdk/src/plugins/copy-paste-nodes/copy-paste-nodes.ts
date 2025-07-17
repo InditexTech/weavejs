@@ -116,12 +116,8 @@ export class WeaveCopyPasteNodesPlugin extends WeavePlugin {
         try {
           const continueToPaste = await this.readClipboardData();
           if (continueToPaste) {
-            const position = this.instance.getStage().getPointerPosition();
-
-            if (position) {
-              this.state = COPY_PASTE_NODES_PLUGIN_STATE.PASTING;
-              this.handlePaste(position);
-            }
+            this.state = COPY_PASTE_NODES_PLUGIN_STATE.PASTING;
+            this.handlePaste();
           }
           // eslint-disable-next-line @typescript-eslint/no-unused-vars, no-empty
         } catch (ex) {
@@ -136,7 +132,9 @@ export class WeaveCopyPasteNodesPlugin extends WeavePlugin {
           if (items && items.length === 1) {
             const item = items[0];
 
-            const position = this.instance.getStage().getPointerPosition();
+            const position = this.instance
+              .getStage()
+              .getRelativePointerPosition();
 
             if (position) {
               this.instance.emitEvent<WeaveCopyPasteNodesPluginOnPasteExternalEvent>(
@@ -184,9 +182,9 @@ export class WeaveCopyPasteNodesPlugin extends WeavePlugin {
     }
   }
 
-  private handlePaste(position: Vector2d) {
+  private handlePaste() {
     if (this.toPaste) {
-      const { mousePoint, container } = this.instance.getMousePointer(position);
+      const { mousePoint, container } = this.instance.getMousePointer();
 
       for (const element of Object.keys(this.toPaste.weave)) {
         const node = this.toPaste.weave[element];
@@ -203,7 +201,7 @@ export class WeaveCopyPasteNodesPlugin extends WeavePlugin {
           mousePoint.x + (node.props.x - this.toPaste.weaveMinPoint.x);
         node.props.y =
           mousePoint.y + (node.props.y - this.toPaste.weaveMinPoint.y);
-        this.instance.addNode(node, container?.getAttr('id'));
+        this.instance.addNode(node, container?.getAttrs().id);
 
         this.instance.emitEvent<WeaveCopyPasteNodesPluginOnPasteEvent>(
           'onPaste'
@@ -269,11 +267,11 @@ export class WeaveCopyPasteNodesPlugin extends WeavePlugin {
     await this.performCopy();
   }
 
-  async paste(position: Vector2d): Promise<void> {
+  async paste(): Promise<void> {
     try {
       const continueToPaste = await this.readClipboardData();
       if (continueToPaste) {
-        this.handlePaste(position);
+        this.handlePaste();
       }
     } catch (ex) {
       this.instance.emitEvent<WeaveCopyPasteNodesPluginOnPasteEvent>(
@@ -287,6 +285,7 @@ export class WeaveCopyPasteNodesPlugin extends WeavePlugin {
       if (items && items.length === 1) {
         const item = items[0];
 
+        const position = this.instance.getStage().getRelativePointerPosition();
         if (position) {
           this.instance.emitEvent<WeaveCopyPasteNodesPluginOnPasteExternalEvent>(
             'onPasteExternal',

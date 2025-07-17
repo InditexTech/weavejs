@@ -20,7 +20,7 @@ export class WeaveStarToolAction extends WeaveAction {
   protected creating: boolean;
   protected moved: boolean;
   protected clickPoint: Vector2d | null;
-  protected container!: Konva.Group | Konva.Layer | undefined;
+  protected container!: Konva.Layer | Konva.Node | undefined;
   protected cancelAction!: () => void;
   onPropsChange = undefined;
   onInit = undefined;

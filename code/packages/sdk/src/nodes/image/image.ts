@@ -22,6 +22,7 @@ import { WeaveImageCrop } from './crop';
 import { WEAVE_IMAGE_CROP_END_TYPE, WEAVE_IMAGE_NODE_TYPE } from './constants';
 import type { WeaveNodesSelectionPlugin } from '@/plugins/nodes-selection/nodes-selection';
 import { isEqual } from 'lodash';
+import { WEAVE_STAGE_MODE } from '../stage/constants';
 
 export class WeaveImageNode extends WeaveNode {
   private config: WeaveImageProperties;
@@ -65,6 +66,8 @@ export class WeaveImageNode extends WeaveNode {
   triggerCrop(imageNode: Konva.Group): void {
     const stage = this.instance.getStage();
 
+    stage.mode(WEAVE_STAGE_MODE.cropping);
+
     const image = stage.findOne(`#${imageNode.getAttrs().id}`) as
       | Konva.Group
       | undefined;
@@ -90,6 +93,7 @@ export class WeaveImageNode extends WeaveNode {
     );
 
     this.imageCrop.show(() => {
+      stage.mode(WEAVE_STAGE_MODE.normal);
       this.instance.emitEvent<WeaveImageOnCropEndEvent>('onImageCropEnd', {
         instance: image,
       });
@@ -105,6 +109,10 @@ export class WeaveImageNode extends WeaveNode {
     if (!this.imageCrop) {
       return;
     }
+
+    const stage = this.instance.getStage();
+
+    stage.mode(WEAVE_STAGE_MODE.normal);
 
     if (type === WEAVE_IMAGE_CROP_END_TYPE.ACCEPT) {
       this.imageCrop.accept();
@@ -186,36 +194,11 @@ export class WeaveImageNode extends WeaveNode {
     };
 
     image.triggerCrop = () => {
-      const stage = this.instance.getStage();
-      const image = stage.findOne(`#${id}`) as Konva.Group | undefined;
-
-      if (!image) {
-        return;
-      }
-
       this.triggerCrop(image);
     };
 
     image.closeCrop = (type: WeaveImageCropEndType) => {
-      const stage = this.instance.getStage();
-      const image = stage.findOne(`#${id}`) as Konva.Group | undefined;
-
-      if (!image || !this.imageCrop) {
-        return;
-      }
-
-      if (type === WEAVE_IMAGE_CROP_END_TYPE.ACCEPT) {
-        this.imageCrop.accept();
-        this.instance.emitEvent<WeaveImageOnCropEndEvent>('onImageCropEnd', {
-          instance: image,
-        });
-      }
-      if (type === WEAVE_IMAGE_CROP_END_TYPE.CANCEL) {
-        this.imageCrop.cancel();
-        this.instance.emitEvent<WeaveImageOnCropEndEvent>('onImageCropEnd', {
-          instance: image,
-        });
-      }
+      this.closeCrop(image, type);
     };
 
     image.resetCrop = () => {
@@ -276,6 +259,7 @@ export class WeaveImageNode extends WeaveNode {
       strokeScaleEnabled: true,
       draggable: false,
       visible: false,
+      name: undefined,
     });
 
     image.add(internalImage);

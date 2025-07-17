@@ -204,11 +204,9 @@ export class WeaveNodesSnappingPlugin extends WeavePlugin {
           };
 
           n.setAbsolutePosition(newPos);
-          // n.fire('dragmove', { target: n, absPos }, true);
         });
       } else {
         node.absolutePosition(absPos);
-        // node.fire('dragmove', { target: node, absPos }, true);
       }
     }
     if (e.type === 'transform') {
@@ -278,6 +276,33 @@ export class WeaveNodesSnappingPlugin extends WeavePlugin {
     }
   }
 
+  private nodeIntersectsViewport(node: Konva.Node) {
+    const stage = this.instance.getStage();
+
+    const scale = stage.scaleX();
+    const stageWidth = stage.width() / scale;
+    const stageHeight = stage.height() / scale;
+
+    const viewportRect = {
+      x: -stage.x() / scale,
+      y: -stage.y() / scale,
+      width: stageWidth,
+      height: stageHeight,
+    };
+
+    if (!node.isVisible()) return false;
+
+    const box = node.getClientRect({ relativeTo: stage });
+
+    const intersects =
+      box.x + box.width > viewportRect.x &&
+      box.x < viewportRect.x + viewportRect.width &&
+      box.y + box.height > viewportRect.y &&
+      box.y < viewportRect.y + viewportRect.height;
+
+    return intersects;
+  }
+
   getLineGuideStops(skipNodes: string[]): LineGuideStop {
     const stage = this.instance.getStage();
 
@@ -302,7 +327,19 @@ export class WeaveNodesSnappingPlugin extends WeavePlugin {
 
     // and we snap over edges and center of each object on the canvas
     stage.find('.node').forEach((guideItem) => {
+      if (guideItem.getParent()?.getAttrs().nodeType === 'group') {
+        return;
+      }
+
+      if (skipNodes.includes(guideItem.getParent()?.getAttrs().nodeId)) {
+        return;
+      }
+
       if (skipNodes.includes(guideItem.getAttrs().id ?? '')) {
+        return;
+      }
+
+      if (!this.nodeIntersectsViewport(guideItem)) {
         return;
       }
 

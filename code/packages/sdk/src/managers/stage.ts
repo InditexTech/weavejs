@@ -11,6 +11,7 @@ import {
   type WeaveElementInstance,
 } from '@inditextech/weave-types';
 import type { StageConfig } from 'konva/lib/Stage';
+import { WEAVE_NODES_SELECTION_LAYER_ID } from '@/plugins/nodes-selection/constants';
 
 export class WeaveStageManager {
   private instance: Weave;
@@ -37,16 +38,19 @@ export class WeaveStageManager {
     return this.stage;
   }
 
-  getMainLayer() {
+  getMainLayer(): Konva.Layer | undefined {
     const stage = this.getStage();
-    return stage.findOne(`#${WEAVE_NODE_LAYER_ID}`) as Konva.Layer | undefined;
+    return stage.findOne(`#${WEAVE_NODE_LAYER_ID}`);
   }
 
-  getUtilityLayer() {
+  getSelectionLayer(): Konva.Layer | undefined {
     const stage = this.getStage();
-    return stage.findOne(`#${WEAVE_UTILITY_LAYER_ID}`) as
-      | Konva.Layer
-      | undefined;
+    return stage.findOne(`#${WEAVE_NODES_SELECTION_LAYER_ID}`);
+  }
+
+  getUtilityLayer(): Konva.Layer | undefined {
+    const stage = this.getStage();
+    return stage.findOne(`#${WEAVE_UTILITY_LAYER_ID}`);
   }
 
   getInstanceRecursive(

@@ -16,6 +16,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - [#496](https://github.com/InditexTech/weavejs/issues/496) Node should be selected when right-clicked
+- [#497](https://github.com/InditexTech/weavejs/issues/497) Allow node movement without requiring prior selection
 
 ### Fixed
 

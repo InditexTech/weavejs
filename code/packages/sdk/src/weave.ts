@@ -322,6 +322,10 @@ export class Weave {
     return this.stageManager.getMainLayer();
   }
 
+  getSelectionLayer(): Konva.Layer | undefined {
+    return this.stageManager.getSelectionLayer();
+  }
+
   getUtilityLayer(): Konva.Layer | undefined {
     return this.stageManager.getUtilityLayer();
   }
@@ -563,13 +567,13 @@ export class Weave {
     return this.targetingManager.pointIntersectsElement(point);
   }
 
-  pointIntersectsContainerElement(
-    actualLayer?: Konva.Layer | Konva.Group,
-    point?: Vector2d
+  nodeIntersectsContainerElement(
+    node: Konva.Node | Konva.Transformer,
+    actualLayer?: Konva.Layer | Konva.Group
   ): Konva.Node | undefined {
-    return this.targetingManager.pointIntersectsContainerElement(
-      actualLayer,
-      point
+    return this.targetingManager.nodeIntersectsContainerElement(
+      node,
+      actualLayer
     );
   }
 
@@ -578,7 +582,7 @@ export class Weave {
   }
 
   getMousePointerRelativeToContainer(
-    container: Konva.Group | Konva.Layer
+    container: Konva.Node | Konva.Layer
   ): WeaveMousePointInfoSimple {
     return this.targetingManager.getMousePointerRelativeToContainer(container);
   }
@@ -589,13 +593,9 @@ export class Weave {
     if (selectionPlugin) {
       const stage = this.getStage();
       const instanceNodes: WeaveElementInstance[] = nodesIds.map((nodeId) => {
-        let nodeInstance = stage.findOne(`#${nodeId}`) as WeaveElementInstance;
-
-        if (nodeInstance && nodeInstance.getAttrs().nodeType === 'frame') {
-          nodeInstance = stage.findOne(
-            `#${nodeId}-selector-area`
-          ) as WeaveElementInstance;
-        }
+        const nodeInstance = stage.findOne(
+          `#${nodeId}`
+        ) as WeaveElementInstance;
 
         return nodeInstance;
       });

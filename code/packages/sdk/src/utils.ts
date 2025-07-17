@@ -40,11 +40,29 @@ export function clearContainerTargets(instance: Weave): void {
 
 export function checkIfOverContainer(
   instance: Weave,
-  node: Konva.Node
+  node: Konva.Node | Konva.Transformer
 ): Konva.Node | undefined {
-  const nodesIntersected = instance.pointIntersectsContainerElement(
-    node.getParent() as Konva.Layer | Konva.Group
-  );
+  if (node instanceof Konva.Transformer) {
+    const transformerNodes = node.nodes();
+    const containersInSelection = [];
+    for (const actualNode of transformerNodes) {
+      if (
+        typeof actualNode.getAttrs().isContainerPrincipal !== 'undefined' &&
+        actualNode.getAttrs().isContainerPrincipal
+      ) {
+        containersInSelection.push(actualNode);
+      }
+    }
+
+    const containersInSelectionSet = new Set(containersInSelection);
+    const uniqueContainersInSelection = Array.from(containersInSelectionSet);
+
+    if (uniqueContainersInSelection.length > 0) {
+      return undefined;
+    }
+  }
+
+  const intersectedNode = instance.nodeIntersectsContainerElement(node);
 
   let nodeActualContainer: Konva.Node | undefined =
     node.getParent() as Konva.Node;
@@ -58,10 +76,10 @@ export function checkIfOverContainer(
   // Move to container
   if (
     !node.getAttrs().containerId &&
-    nodesIntersected &&
-    nodeActualContainer?.getAttrs().id !== nodesIntersected.getAttrs().id
+    intersectedNode &&
+    nodeActualContainer?.getAttrs().id !== intersectedNode.getAttrs().id
   ) {
-    layerToMove = nodesIntersected;
+    layerToMove = intersectedNode;
   }
 
   return layerToMove;
@@ -69,25 +87,10 @@ export function checkIfOverContainer(
 
 export function moveNodeToContainer(
   instance: Weave,
-  node: Konva.Node,
-  ignoreContainers: Konva.Node[] = []
+  node: Konva.Node
 ): Konva.Node | undefined {
-  const nodeIntersected = instance.pointIntersectsContainerElement();
-
-  let realNodeIntersected = nodeIntersected;
-  if (
-    realNodeIntersected &&
-    realNodeIntersected.getAttrs().nodeType === 'frame' &&
-    !realNodeIntersected.getAttrs().nodeId
-  ) {
-    realNodeIntersected = instance
-      .getStage()
-      .findOne(`#${realNodeIntersected.getAttrs().id}-selector-area`);
-  }
-
-  if (realNodeIntersected && ignoreContainers.includes(realNodeIntersected)) {
-    return undefined;
-  }
+  const stage = instance.getStage();
+  const nodeIntersected = instance.nodeIntersectsContainerElement(node);
 
   // check is node is locked
   const isLocked = instance.allNodesLocked([node]);
@@ -99,25 +102,28 @@ export function moveNodeToContainer(
   let nodeActualContainer: Konva.Node | undefined =
     node.getParent() as Konva.Node;
 
+  if (nodeActualContainer.getAttrs().nodeId) {
+    const realParent = stage.findOne(
+      `#${nodeActualContainer.getAttrs().nodeId}`
+    );
+
+    if (realParent) {
+      nodeActualContainer = realParent;
+    }
+  }
+
   if (!nodeActualContainer) {
     return undefined;
   }
 
   const actualContainerAttrs = nodeActualContainer.getAttrs();
-  const nodeAttrs = node.getAttrs();
-
-  if (actualContainerAttrs.nodeId) {
-    nodeActualContainer = instance
-      .getStage()
-      .findOne(`#${actualContainerAttrs.nodeId}`);
-  }
 
   let layerToMove = undefined;
   // Move to container
   if (
-    !nodeAttrs.containerId &&
     nodeIntersected &&
-    actualContainerAttrs.id !== nodeIntersected.getAttrs().id
+    actualContainerAttrs.id !== nodeIntersected.getAttrs().id &&
+    !node.getAttrs().isContainerPrincipal
   ) {
     layerToMove = nodeIntersected;
   }
@@ -146,6 +152,7 @@ export function moveNodeToContainer(
     const nodeHandler = instance.getNodeHandler<WeaveNode>(
       node.getAttrs().nodeType
     );
+
     if (nodeHandler) {
       const actualNode = nodeHandler.serialize(node as WeaveElementInstance);
 
@@ -207,15 +214,6 @@ export function getBoundingBox(
   let maxY = -Infinity;
 
   for (const node of nodes) {
-    let realNode: Konva.Node | undefined = node;
-    if (realNode.getAttrs().containerId) {
-      realNode = stage.findOne(`#${realNode.getAttrs().containerId}`);
-    }
-
-    if (!realNode) {
-      continue;
-    }
-
     const box = node.getRealClientRect({ skipTransform: false });
 
     minX = Math.min(minX, box.x);
@@ -230,4 +228,26 @@ export function getBoundingBox(
     width: maxX - minX,
     height: maxY - minY,
   };
+}
+
+export function getTargetedNode(instance: Weave): Konva.Node | undefined {
+  const stage = instance.getStage();
+  let selectedGroup: Konva.Node | undefined = undefined;
+  const mousePos = stage.getPointerPosition();
+  if (mousePos) {
+    const allInter = stage.getAllIntersections(mousePos);
+    if (allInter.length === 1) {
+      selectedGroup = instance.getInstanceRecursive(allInter[0]);
+    } else {
+      const allInterContainersFiltered = allInter.filter(
+        (ele) => typeof ele.getAttrs().containerElement === 'undefined'
+      );
+      if (allInterContainersFiltered.length > 0) {
+        selectedGroup = instance.getInstanceRecursive(
+          allInterContainersFiltered[0]
+        );
+      }
+    }
+  }
+  return selectedGroup;
 }

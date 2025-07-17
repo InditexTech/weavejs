@@ -21,7 +21,7 @@ export class WeaveTextToolAction extends WeaveAction {
   protected initialCursor: string | null = null;
   protected state: WeaveTextToolActionState;
   protected textId: string | null;
-  protected container: Konva.Layer | Konva.Group | undefined;
+  protected container: Konva.Layer | Konva.Node | undefined;
   protected clickPoint: Vector2d | null;
   protected cancelAction!: () => void;
   onPropsChange = undefined;

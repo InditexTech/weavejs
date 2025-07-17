@@ -7,6 +7,8 @@ import { type WeaveElementInstance } from '@inditextech/weave-types';
 import { WeaveNodesSelectionPlugin } from '@/plugins/nodes-selection/nodes-selection';
 import { Weave } from '@/weave';
 import { WeaveImageNode } from './image';
+import type { WeaveImageOnCropEndEvent } from './types';
+import { WEAVE_STAGE_MODE } from '../stage/constants';
 
 export class WeaveImageCrop {
   private instance!: Weave;
@@ -200,7 +202,12 @@ export class WeaveImageCrop {
     };
 
     this.instance.getStage().on('pointerdown', (e) => {
-      if (e.target === this.instance.getStage()) {
+      const isStage = e.target instanceof Konva.Stage;
+      const isContainerEmptyArea =
+        typeof e.target.getAttrs().isContainerPrincipal !== 'undefined' &&
+        !e.target.getAttrs().isContainerPrincipal;
+
+      if (isStage || isContainerEmptyArea) {
         this.cancel();
       }
     });
@@ -267,6 +274,8 @@ export class WeaveImageCrop {
       this.handleClipEnd();
     }
 
+    const stage = this.instance.getStage();
+
     this.onClose();
 
     const utilityLayer = this.instance.getUtilityLayer();
@@ -300,6 +309,12 @@ export class WeaveImageCrop {
         selectionTransformer.forceUpdate();
       }, 0);
     }
+
+    stage.mode(WEAVE_STAGE_MODE.normal);
+
+    this.instance.emitEvent<WeaveImageOnCropEndEvent>('onImageCropEnd', {
+      instance: this.image,
+    });
   }
 
   private drawGridLines(x: number, y: number, width: number, height: number) {

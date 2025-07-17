@@ -25,6 +25,7 @@ import {
 import type { WeaveNodesSnappingPlugin } from '@/plugins/nodes-snapping/nodes-snapping';
 import { throttle } from 'lodash';
 import type { KonvaEventObject } from 'konva/lib/Node';
+import { WEAVE_STAGE_MODE } from './stage/constants';
 
 export const augmentKonvaStageClass = (): void => {
   Konva.Stage.prototype.isMouseWheelPressed = function () {
@@ -132,6 +133,31 @@ export abstract class WeaveNode implements WeaveNodeBase {
     // reset scale to 1
     node.scaleX(1);
     node.scaleY(1);
+  }
+
+  protected setHoverState(node: Konva.Node): void {
+    const selectionPlugin = this.getSelectionPlugin();
+
+    if (!selectionPlugin) {
+      return;
+    }
+
+    if (selectionPlugin.isAreaSelecting()) {
+      this.hideHoverState();
+      return;
+    }
+
+    selectionPlugin.getHoverTransformer().nodes([node]);
+  }
+
+  protected hideHoverState(): void {
+    const selectionPlugin = this.getSelectionPlugin();
+
+    if (!selectionPlugin) {
+      return;
+    }
+
+    selectionPlugin.getHoverTransformer().nodes([]);
   }
 
   setupDefaultNodeEvents(node: Konva.Node): void {
@@ -246,7 +272,7 @@ export abstract class WeaveNode implements WeaveNodeBase {
       node.on('dragstart', (e) => {
         this.didMove = false;
 
-        if (e.evt.buttons === 0) {
+        if (e.evt?.buttons === 0) {
           e.target.stopDrag();
           return;
         }
@@ -269,7 +295,7 @@ export abstract class WeaveNode implements WeaveNodeBase {
       });
 
       const handleDragMove = (e: KonvaEventObject<DragEvent, Konva.Node>) => {
-        if (e.evt.buttons === 0) {
+        if (e.evt?.buttons === 0) {
           e.target.stopDrag();
           return;
         }
@@ -350,23 +376,49 @@ export abstract class WeaveNode implements WeaveNodeBase {
         }
       });
 
-      node.on('pointerenter', (e) => {
+      node.on('pointerover', (e) => {
+        e.cancelBubble = true;
+
+        const stage = this.instance.getStage();
+
         const realNode = this.instance.getInstanceRecursive(node);
+
+        const isTargetable = e.target.getAttrs().isTargetable !== false;
         const isLocked = realNode.getAttrs().locked ?? false;
+
+        // Node is locked
         if (
           this.isSelecting() &&
           !this.isNodeSelected(realNode) &&
-          !this.isPasting()
+          !this.isPasting() &&
+          isLocked
         ) {
           const stage = this.instance.getStage();
-          stage.container().style.cursor = !isLocked ? 'pointer' : 'default';
-          e.cancelBubble = true;
-          return;
+          stage.container().style.cursor = 'default';
         }
+
+        // Node is not locked
+        if (
+          this.isSelecting() &&
+          !this.isNodeSelected(realNode) &&
+          !this.isPasting() &&
+          isTargetable &&
+          !isLocked &&
+          stage.mode() === WEAVE_STAGE_MODE.normal
+        ) {
+          const stage = this.instance.getStage();
+          stage.container().style.cursor = 'pointer';
+          this.setHoverState(realNode);
+        }
+
+        if (!isTargetable) {
+          this.hideHoverState();
+        }
+
+        // We're on pasting mode
         if (this.isPasting()) {
           const stage = this.instance.getStage();
           stage.container().style.cursor = 'crosshair';
-          e.cancelBubble = true;
         }
       });
     }

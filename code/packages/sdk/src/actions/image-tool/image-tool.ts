@@ -26,7 +26,7 @@ export class WeaveImageToolAction extends WeaveAction {
   protected state: WeaveImageToolActionState;
   protected imageId: string | null;
   protected tempImageId: string | null;
-  protected container: Konva.Layer | Konva.Group | undefined;
+  protected container: Konva.Layer | Konva.Node | undefined;
   protected imageURL: string | null;
   protected preloadImgs: Record<string, HTMLImageElement>;
   protected clickPoint: Vector2d | null;
@@ -68,7 +68,7 @@ export class WeaveImageToolAction extends WeaveAction {
     this.instance.addEventListener('onStageDrop', (e) => {
       if (window.weaveDragImageURL) {
         this.instance.getStage().setPointersPositions(e);
-        const position = this.instance.getStage().getPointerPosition();
+        const position = this.instance.getStage().getRelativePointerPosition();
         this.instance.triggerAction('imageTool', {
           imageURL: window.weaveDragImageURL,
           position,
@@ -194,8 +194,8 @@ export class WeaveImageToolAction extends WeaveAction {
     stage.container().focus();
 
     if (position) {
-      this.handleAdding(position);
       this.setState(IMAGE_TOOL_STATE.ADDING);
+      this.handleAdding(position);
       return;
     }
 
