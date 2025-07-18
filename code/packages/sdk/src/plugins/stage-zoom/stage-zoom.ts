@@ -22,6 +22,7 @@ import Hammer from 'hammerjs';
 import { getBoundingBox } from '@/utils';
 import type { KonvaEventObject } from 'konva/lib/Node';
 import type { Stage } from 'konva/lib/Stage';
+import type { WeaveContextMenuPlugin } from '../context-menu/context-menu';
 
 export class WeaveStageZoomPlugin extends WeavePlugin {
   private isCtrlOrMetaPressed: boolean;
@@ -488,6 +489,8 @@ export class WeaveStageZoomPlugin extends WeavePlugin {
     sc.on('pinchmove', (e: HammerInput) => {
       const now = performance.now();
 
+      this.getContextMenuPlugin()?.cancelLongPressTimer();
+
       const newScale = Math.max(
         this.config.zoomSteps[0],
         Math.min(
@@ -587,5 +590,11 @@ export class WeaveStageZoomPlugin extends WeavePlugin {
     this.zoomVelocity *= this.config.zoomInertia.friction;
 
     requestAnimationFrame(this.zoomTick.bind(this));
+  }
+
+  getContextMenuPlugin() {
+    const contextMenuPlugin =
+      this.instance.getPlugin<WeaveContextMenuPlugin>('contextMenu');
+    return contextMenuPlugin;
   }
 }

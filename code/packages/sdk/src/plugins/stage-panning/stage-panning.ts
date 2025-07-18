@@ -5,14 +5,15 @@
 import { WeavePlugin } from '@/plugins/plugin';
 import { WEAVE_STAGE_PANNING_KEY } from './constants';
 import type { KonvaEventObject } from 'konva/lib/Node';
-import { throttle } from 'lodash';
 import type { Stage } from 'konva/lib/Stage';
+import type { Vector2d } from 'konva/lib/types';
 
 export class WeaveStagePanningPlugin extends WeavePlugin {
   private moveToolActive: boolean;
   private isMouseMiddleButtonPressed: boolean;
   private isCtrlOrMetaPressed: boolean;
   private isSpaceKeyPressed: boolean;
+  private activePointers: Set<number>;
   protected previousPointer!: string | null;
   getLayerName = undefined;
   initLayer = undefined;
@@ -21,6 +22,7 @@ export class WeaveStagePanningPlugin extends WeavePlugin {
   constructor() {
     super();
 
+    this.activePointers = new Set();
     this.enabled = true;
     this.moveToolActive = false;
     this.isMouseMiddleButtonPressed = false;
@@ -54,9 +56,6 @@ export class WeaveStagePanningPlugin extends WeavePlugin {
   }
 
   private initEvents() {
-    let previousMouseX = Infinity;
-    let previousMouseY = Infinity;
-
     const stage = this.instance.getStage();
 
     window.addEventListener('keydown', (e) => {
@@ -79,7 +78,14 @@ export class WeaveStagePanningPlugin extends WeavePlugin {
       }
     });
 
+    let lastPos: Vector2d | null = null;
+    let isDragging = false;
+    let velocity = { x: 0, y: 0 };
+    let lastTime = 0;
+
     stage.on('pointerdown', (e) => {
+      this.activePointers.add(e.evt.pointerId);
+
       const activeAction = this.instance.getActiveAction();
 
       let enableMove = false;
@@ -99,49 +105,46 @@ export class WeaveStagePanningPlugin extends WeavePlugin {
       }
 
       if (enableMove) {
+        isDragging = true;
+        lastPos = stage.getPointerPosition();
+        lastTime = performance.now();
+        velocity = { x: 0, y: 0 };
         this.enableMove();
       }
     });
 
+    stage.on('pointercancel', () => {
+      lastPos = null;
+    });
+
     stage.on('pointerup', (e) => {
-      const activeAction = this.instance.getActiveAction();
+      this.activePointers.delete(e.evt.pointerId);
 
-      let disableMove = false;
-      if (
-        e &&
-        (e.evt.pointerType !== 'mouse' ||
-          (e.evt.pointerType === 'mouse' && e.evt.buttons === 0)) &&
-        activeAction === 'moveTool'
-      ) {
-        this.moveToolActive = false;
-        disableMove = true;
+      isDragging = false;
+
+      // Apply inertia
+      const decay = 0.95;
+      function animateInertia() {
+        velocity.x *= decay;
+        velocity.y *= decay;
+
+        if (Math.abs(velocity.x) < 0.01 && Math.abs(velocity.y) < 0.01) return;
+
+        stage.x(stage.x() + velocity.x * 16);
+        stage.y(stage.y() + velocity.y * 16);
+        stage.batchDraw();
+        requestAnimationFrame(animateInertia);
       }
 
-      if (e && e.evt.pointerType === 'mouse' && e.evt.buttons === 0) {
-        this.isMouseMiddleButtonPressed = false;
-        disableMove = true;
-      }
-
-      if (disableMove) {
-        this.disableMove();
-      }
+      requestAnimationFrame(animateInertia);
     });
 
     const handleMouseMove = () => {
-      const mousePos = stage.getPointerPosition();
-
-      if (previousMouseX === Infinity) {
-        previousMouseX = mousePos?.x ?? 0;
-      }
-      if (previousMouseY === Infinity) {
-        previousMouseY = mousePos?.y ?? 0;
+      if (this.activePointers.size !== 1) {
+        return;
       }
 
-      const deltaX = previousMouseX - (mousePos?.x ?? 0);
-      const deltaY = previousMouseY - (mousePos?.y ?? 0);
-
-      previousMouseX = mousePos?.x ?? 0;
-      previousMouseY = mousePos?.y ?? 0;
+      if (!isDragging) return;
 
       // Pan with space pressed and no mouse buttons pressed
       if (
@@ -155,20 +158,27 @@ export class WeaveStagePanningPlugin extends WeavePlugin {
         return;
       }
 
-      stage.x(stage.x() - deltaX);
-      stage.y(stage.y() - deltaY);
+      const pos = stage.getPointerPosition();
+      const now = performance.now();
+      const dt = now - lastTime;
+
+      if (pos && lastPos) {
+        const dx = pos.x - lastPos.x;
+        const dy = pos.y - lastPos.y;
+        velocity = { x: dx / dt, y: dy / dt };
+
+        stage.x(stage.x() + dx);
+        stage.y(stage.y() + dy);
+        stage.batchDraw();
+      }
+
+      lastPos = pos;
+      lastTime = now;
 
       this.instance.emitEvent('onStageMove');
     };
 
-    stage.on('pointermove', throttle(handleMouseMove, 50));
-
-    stage.on('pointerdown', () => {
-      const mousePos = stage.getPointerPosition();
-
-      previousMouseX = mousePos?.x ?? 0;
-      previousMouseY = mousePos?.y ?? 0;
-    });
+    stage.on('pointermove', handleMouseMove);
 
     // Pan with wheel mouse pressed
     const handleWheel = (e: KonvaEventObject<WheelEvent, Stage>) => {
@@ -195,6 +205,18 @@ export class WeaveStagePanningPlugin extends WeavePlugin {
     };
 
     stage.on('wheel', handleWheel);
+
+    stage.container().style.touchAction = 'none';
+    stage.container().style.userSelect = 'none';
+    stage.container().style.setProperty('-webkit-user-drag', 'none');
+
+    stage.getContent().addEventListener(
+      'touchmove',
+      function (e) {
+        e.preventDefault();
+      },
+      { passive: false }
+    );
   }
 
   enable(): void {
