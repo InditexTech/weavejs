@@ -25,7 +25,7 @@ import {
 import type { WeaveNodesSnappingPlugin } from '@/plugins/nodes-snapping/nodes-snapping';
 import { throttle } from 'lodash';
 import type { KonvaEventObject } from 'konva/lib/Node';
-import { WEAVE_STAGE_MODE } from './stage/constants';
+import { WEAVE_STAGE_DEFAULT_MODE } from './stage/constants';
 
 export const augmentKonvaStageClass = (): void => {
   Konva.Stage.prototype.isMouseWheelPressed = function () {
@@ -404,7 +404,7 @@ export abstract class WeaveNode implements WeaveNodeBase {
           !this.isPasting() &&
           isTargetable &&
           !isLocked &&
-          stage.mode() === WEAVE_STAGE_MODE.normal
+          stage.mode() === WEAVE_STAGE_DEFAULT_MODE
         ) {
           const stage = this.instance.getStage();
           stage.container().style.cursor = 'pointer';

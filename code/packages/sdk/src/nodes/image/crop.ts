@@ -8,7 +8,7 @@ import { WeaveNodesSelectionPlugin } from '@/plugins/nodes-selection/nodes-selec
 import { Weave } from '@/weave';
 import { WeaveImageNode } from './image';
 import type { WeaveImageOnCropEndEvent } from './types';
-import { WEAVE_STAGE_MODE } from '../stage/constants';
+import { WEAVE_STAGE_DEFAULT_MODE } from '../stage/constants';
 
 export class WeaveImageCrop {
   private instance!: Weave;
@@ -310,7 +310,7 @@ export class WeaveImageCrop {
       }, 0);
     }
 
-    stage.mode(WEAVE_STAGE_MODE.normal);
+    stage.mode(WEAVE_STAGE_DEFAULT_MODE);
 
     this.instance.emitEvent<WeaveImageOnCropEndEvent>('onImageCropEnd', {
       instance: this.image,
