@@ -13,7 +13,7 @@ export class WeaveStagePanningPlugin extends WeavePlugin {
   private isMouseMiddleButtonPressed: boolean;
   private isCtrlOrMetaPressed: boolean;
   private isSpaceKeyPressed: boolean;
-  private activePointers: Set<number>;
+  private readonly activePointers: Set<number>;
   protected previousPointer!: string | null;
   getLayerName = undefined;
   initLayer = undefined;
