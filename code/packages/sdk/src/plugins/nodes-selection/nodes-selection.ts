@@ -19,7 +19,6 @@ import {
   type WeaveNodesSelectionConfig,
   type WeaveNodesSelectionPluginOnNodesChangeEvent,
   type WeaveNodesSelectionPluginOnSelectionStateEvent,
-  // type WeaveNodesSelectionPluginOnStageSelectionEvent,
   type WeaveNodesSelectionPluginParams,
 } from './types';
 import { WeaveContextMenuPlugin } from '../context-menu/context-menu';
@@ -37,7 +36,7 @@ import type { KonvaEventObject } from 'konva/lib/Node';
 import { throttle } from 'lodash';
 import type { Stage } from 'konva/lib/Stage';
 import type { Vector2d } from 'konva/lib/types';
-import { WEAVE_STAGE_MODE } from '@/nodes/stage/constants';
+import { WEAVE_STAGE_DEFAULT_MODE } from '@/nodes/stage/constants';
 import type { WeaveNodesSnappingPlugin } from '../nodes-snapping/nodes-snapping';
 
 export class WeaveNodesSelectionPlugin extends WeavePlugin {
@@ -600,7 +599,7 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
         return;
       }
 
-      if (stage.mode() !== WEAVE_STAGE_MODE.normal) {
+      if (stage.mode() !== WEAVE_STAGE_DEFAULT_MODE) {
         return;
       }
 
@@ -714,7 +713,9 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
       this.checkDoubleTap(e);
       delete this.pointers[e.evt.pointerId];
 
-      this.getSnappingPlugin()?.cleanupEvaluateGuidelines();
+      if (stage.mode() === WEAVE_STAGE_DEFAULT_MODE) {
+        this.getSnappingPlugin()?.cleanupEvaluateGuidelines();
+      }
 
       const contextMenuPlugin = this.getContextMenuPlugin();
 

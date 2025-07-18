@@ -4,7 +4,4 @@
 
 export const WEAVE_STAGE_NODE_TYPE = 'stage';
 
-export const WEAVE_STAGE_MODE = {
-  ['normal']: 'normal',
-  ['cropping']: 'cropping',
-};
+export const WEAVE_STAGE_DEFAULT_MODE = 'default';

@@ -8,8 +8,7 @@ import {
   type WeaveElementInstance,
 } from '@inditextech/weave-types';
 import { WeaveNode } from '../node';
-import { WEAVE_STAGE_MODE, WEAVE_STAGE_NODE_TYPE } from './constants';
-import type { WeaveStageMode } from './types';
+import { WEAVE_STAGE_DEFAULT_MODE, WEAVE_STAGE_NODE_TYPE } from './constants';
 
 export class WeaveStageNode extends WeaveNode {
   protected nodeType: string = WEAVE_STAGE_NODE_TYPE;
@@ -37,7 +36,7 @@ export class WeaveStageNode extends WeaveNode {
       this.stageFocused = false;
     });
 
-    Konva.Stage.prototype.mode = function (mode?: WeaveStageMode) {
+    Konva.Stage.prototype.mode = function (mode?: string) {
       if (typeof mode !== 'undefined') {
         this._mode = mode;
       }
@@ -65,7 +64,7 @@ export class WeaveStageNode extends WeaveNode {
       return this._allowSelection;
     };
 
-    stage.mode(WEAVE_STAGE_MODE.normal);
+    stage.mode(WEAVE_STAGE_DEFAULT_MODE);
 
     stage.on('pointermove', (e) => {
       if (
