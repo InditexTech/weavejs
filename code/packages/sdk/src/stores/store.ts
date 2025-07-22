@@ -249,5 +249,7 @@ export abstract class WeaveStore implements WeaveStoreBase {
 
   abstract disconnect(): void;
 
+  abstract handleAwarenessChange(emit: boolean): void;
+
   abstract setAwarenessInfo(field: string, value: unknown): void;
 }

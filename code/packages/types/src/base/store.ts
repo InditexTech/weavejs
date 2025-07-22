@@ -18,9 +18,7 @@ export interface WeaveStoreBase {
 
   disconnect(): void;
 
-  // onAwarenessChange<K extends string, T>(
-  //   callback: (changes: WeaveAwarenessChange<K, T>[]) => void
-  // ): void;
+  handleAwarenessChange(emit: boolean): void;
 
   setAwarenessInfo(field: string, value: unknown): void;
 }
