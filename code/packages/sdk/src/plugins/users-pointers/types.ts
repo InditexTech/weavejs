@@ -31,6 +31,7 @@ export type WeaveUsersPointersPluginParams = {
 
 export type WeaveUserPointer = {
   user: string;
+  name: string;
   x: number;
   y: number;
 };

@@ -85,7 +85,7 @@ export class WeaveUsersSelectionPlugin extends WeavePlugin {
 
           if (
             change[WEAVE_USER_SELECTION_KEY] &&
-            selfUser.name !== change[WEAVE_USER_SELECTION_KEY].user
+            selfUser.id !== change[WEAVE_USER_SELECTION_KEY].user
           ) {
             const userSelection = change[WEAVE_USER_SELECTION_KEY];
             allActiveUsers.push(userSelection.user);
@@ -122,7 +122,7 @@ export class WeaveUsersSelectionPlugin extends WeavePlugin {
     const store = this.instance.getStore();
 
     store.setAwarenessInfo(WEAVE_USER_SELECTION_KEY, {
-      user: userInfo.name,
+      user: userInfo.id,
       nodes: tr.nodes().map((node) => node.getAttrs().id),
     });
   }

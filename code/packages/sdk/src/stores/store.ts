@@ -120,14 +120,16 @@ export abstract class WeaveStore implements WeaveStoreBase {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
       ) as AbstractType<any>;
 
+      console.log(`User: ${this.config.getUser().id}`);
+
       if (weaveStateValues) {
         this.undoManager = new UndoManager([weaveStateValues], {
           captureTimeout: 250,
-          trackedOrigins: new Set([this.config.getUser().name]),
+          trackedOrigins: new Set([this.config.getUser().id]),
           ...this.config?.undoManagerOptions,
         });
 
-        this.undoManager.addTrackedOrigin(this.config.getUser().name);
+        this.undoManager.addTrackedOrigin(this.config.getUser().id);
 
         this.undoManager.on('stack-item-added', () => {
           const change: WeaveUndoRedoChange = {
