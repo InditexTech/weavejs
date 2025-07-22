@@ -94,7 +94,7 @@ export class WeaveUsersPointersPlugin extends WeavePlugin {
 
           if (
             change[WEAVE_USER_POINTER_KEY] &&
-            selfUser.name !== change[WEAVE_USER_POINTER_KEY].user
+            selfUser.id !== change[WEAVE_USER_POINTER_KEY].user
           ) {
             const userPointer = change[WEAVE_USER_POINTER_KEY];
             allActiveUsers.push(userPointer.user);
@@ -121,7 +121,8 @@ export class WeaveUsersPointersPlugin extends WeavePlugin {
 
       if (mousePos) {
         store.setAwarenessInfo(WEAVE_USER_POINTER_KEY, {
-          user: userInfo.name,
+          user: userInfo.id,
+          name: userInfo.name,
           x: mousePos.x,
           y: mousePos.y,
         });
@@ -134,7 +135,8 @@ export class WeaveUsersPointersPlugin extends WeavePlugin {
 
       if (mousePos) {
         store.setAwarenessInfo(WEAVE_USER_POINTER_KEY, {
-          user: userInfo.name,
+          user: userInfo.id,
+          name: userInfo.name,
           x: mousePos.x,
           y: mousePos.y,
         });
@@ -204,7 +206,7 @@ export class WeaveUsersPointersPlugin extends WeavePlugin {
         id: `pointer_${userPointer.user}_userPointName`,
         x: separation,
         y: -circleRadius * 2 + backgroundPaddingY,
-        text: userPointer.user.trim(),
+        text: userPointer.name.trim(),
         fontSize: fontSize,
         fontFamily: fontFamily,
         lineHeight: 0.9,

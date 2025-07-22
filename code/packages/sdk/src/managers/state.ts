@@ -132,7 +132,7 @@ export class WeaveStateManager {
     parentId = 'mainLayer',
     index: number | undefined = undefined
   ): void {
-    const userName = this.instance.getStore().getUser().name;
+    const userId = this.instance.getStore().getUser().id;
 
     this.instance
       .getStore()
@@ -203,11 +203,11 @@ export class WeaveStateManager {
         }
 
         this.instance.emitEvent('onNodeAdded', node);
-      }, userName);
+      }, userId);
   }
 
   updateNode(node: WeaveStateElement): void {
-    const userName = this.instance.getStore().getUser().name;
+    const userId = this.instance.getStore().getUser().id;
 
     this.instance
       .getStore()
@@ -240,11 +240,11 @@ export class WeaveStateManager {
         };
 
         this.instance.emitEvent('onNodeUpdated', node);
-      }, userName);
+      }, userId);
   }
 
   removeNode(node: WeaveStateElement): void {
-    const userName = this.instance.getStore().getUser().name;
+    const userId = this.instance.getStore().getUser().id;
 
     this.instance
       .getStore()
@@ -280,7 +280,7 @@ export class WeaveStateManager {
         }
 
         this.instance.emitEvent('onNodeRemoved', node);
-      }, userName);
+      }, userId);
   }
 
   removeNodes(nodes: WeaveStateElement[]): void {
@@ -290,7 +290,7 @@ export class WeaveStateManager {
   }
 
   moveNode(node: WeaveStateElement, position: WeavePosition): void {
-    const userName = this.instance.getStore().getUser().name;
+    const userId = this.instance.getStore().getUser().id;
 
     this.instance
       .getStore()
@@ -358,7 +358,7 @@ export class WeaveStateManager {
 
           nodeParent.props.children = nodeParentNewChildren;
         }
-      }, userName);
+      }, userId);
   }
 
   getElementsTree(): WeaveStateElement[] {

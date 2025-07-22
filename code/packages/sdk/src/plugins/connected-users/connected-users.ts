@@ -47,7 +47,7 @@ export class WeaveConnectedUsersPlugin extends WeavePlugin {
     store.setAwarenessInfo(WEAVE_CONNECTED_USER_INFO_KEY, userInfo);
     this.instance.emitEvent<WeaveConnectedUsersChangeEvent>(
       'onConnectedUsersChange',
-      { [userInfo.name]: userInfo }
+      { [userInfo.id]: userInfo }
     );
 
     this.instance.addEventListener('onConnectionStatusChange', (status) => {
@@ -81,7 +81,7 @@ export class WeaveConnectedUsersPlugin extends WeavePlugin {
 
           if (change[WEAVE_CONNECTED_USER_INFO_KEY]) {
             const userInformation = change[WEAVE_CONNECTED_USER_INFO_KEY];
-            newConnectedUsers[userInformation.name] = userInformation;
+            newConnectedUsers[userInformation.id] = userInformation;
           }
         }
 

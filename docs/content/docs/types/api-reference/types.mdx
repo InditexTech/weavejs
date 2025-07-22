@@ -124,8 +124,10 @@ export type WeaveExportFileFormat =
 // User object format
 
 export type WeaveUser = {
+  id: string;
   name: string;
   email: string;
+  [key: string]: any;
 };
 
 // Font descriptor format

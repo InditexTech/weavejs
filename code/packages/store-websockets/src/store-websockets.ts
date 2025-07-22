@@ -105,7 +105,7 @@ export class WeaveStoreWebsockets extends WeaveStore {
     }
   }
 
-  setAwarenessInfo(field: string, value: unknown): void {
+  setAwarenessInfo<T>(field: string, value: T): void {
     const awareness = this.provider.awareness;
     awareness.setLocalStateField(field, value);
   }

@@ -167,10 +167,11 @@ export type WeaveExportFileFormat =
 // User object format
 
 export type WeaveUser = {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  [key: string]: any;
+  id: string;
   name: string;
   email: string;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  [key: string]: any;
 };
 
 // Font descriptor format
