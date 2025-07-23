@@ -57,11 +57,19 @@ export class WeaveStateSerializer {
       );
     }
 
-    const { children, ...restProps } = props;
+    let restProps: Record<string, unknown> = {};
+    let childrenNodes: React.ReactNode[] = [];
 
-    let childrenNodes = [];
-    if (children) {
-      childrenNodes = this.deserializeElement(children);
+    if (props.children) {
+      const { children, ...actRestProps } = props;
+
+      restProps = actRestProps;
+
+      if (children) {
+        childrenNodes = this.deserializeElement(children);
+      }
+    } else {
+      restProps = props;
     }
 
     return React.createElement(
