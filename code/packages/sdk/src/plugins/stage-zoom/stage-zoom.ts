@@ -23,6 +23,8 @@ import { getBoundingBox } from '@/utils';
 import type { KonvaEventObject } from 'konva/lib/Node';
 import type { Stage } from 'konva/lib/Stage';
 import type { WeaveContextMenuPlugin } from '../context-menu/context-menu';
+import type { WeaveStagePanningPlugin } from '../stage-panning/stage-panning';
+import type { WeaveStageGridPlugin } from '../stage-grid/stage-grid';
 
 export class WeaveStageZoomPlugin extends WeavePlugin {
   private isCtrlOrMetaPressed: boolean;
@@ -34,7 +36,9 @@ export class WeaveStageZoomPlugin extends WeavePlugin {
   private actualScale: number;
   private actualStep: number;
   private updatedMinimumZoom: boolean;
+  private pinching: boolean = false;
   private zooming: boolean = false;
+  private threshold: number;
   private isTrackpad: boolean = false;
   private zoomVelocity: number = 0;
   private zoomInertiaType: WeaveStageZoomType =
@@ -57,6 +61,8 @@ export class WeaveStageZoomPlugin extends WeavePlugin {
       );
     }
 
+    this.threshold = 0.2;
+    this.pinching = false;
     this.isTrackpad = false;
     this.isCtrlOrMetaPressed = false;
     this.updatedMinimumZoom = false;
@@ -310,13 +316,6 @@ export class WeaveStageZoomPlugin extends WeavePlugin {
     return scale;
   }
 
-  getSelectionPlugin(): WeaveNodesSelectionPlugin | undefined {
-    const selectionPlugin =
-      this.instance.getPlugin<WeaveNodesSelectionPlugin>('nodesSelection');
-
-    return selectionPlugin;
-  }
-
   fitToScreen(): void {
     if (!this.enabled) {
       return;
@@ -378,7 +377,7 @@ export class WeaveStageZoomPlugin extends WeavePlugin {
 
     const stage = this.instance.getStage();
 
-    const selectionPlugin = this.getSelectionPlugin();
+    const selectionPlugin = this.getNodesSelectionPlugin();
 
     if (!selectionPlugin) {
       return;
@@ -474,9 +473,16 @@ export class WeaveStageZoomPlugin extends WeavePlugin {
 
     const stageContainer = this.instance.getStage().container();
     const sc = new Hammer.Manager(stageContainer);
-    sc.add(new Hammer.Pinch({ threshold: 0, pointers: 2 }));
+    sc.add(new Hammer.Pinch({ threshold: this.threshold, pointers: 2 }));
 
     sc.on('pinchstart', (e: HammerInput) => {
+      if (this.getPanPlugin()?.isPanning()) {
+        this.pinching = false;
+        return;
+      }
+
+      this.getNodesSelectionPlugin()?.disable();
+
       this.initialScale = this.instance.getStage().scaleX();
       this.center = {
         x: e.center.x,
@@ -487,6 +493,13 @@ export class WeaveStageZoomPlugin extends WeavePlugin {
     });
 
     sc.on('pinchmove', (e: HammerInput) => {
+      if (this.getPanPlugin()?.isPanning()) {
+        this.pinching = false;
+        return;
+      }
+
+      this.pinching = true;
+
       const now = performance.now();
 
       this.getContextMenuPlugin()?.cancelLongPressTimer();
@@ -506,6 +519,15 @@ export class WeaveStageZoomPlugin extends WeavePlugin {
     });
 
     sc.on('pinchend', () => {
+      if (this.getPanPlugin()?.isPanning()) {
+        this.pinching = false;
+        this.zooming = false;
+        return;
+      }
+
+      this.getNodesSelectionPlugin()?.enable();
+
+      this.pinching = false;
       this.zooming = true;
       this.zoomInertiaType = WEAVE_STAGE_ZOOM_TYPE.PINCH_ZOOM;
       requestAnimationFrame(this.zoomTick.bind(this));
@@ -524,6 +546,8 @@ export class WeaveStageZoomPlugin extends WeavePlugin {
       if (!this.enabled || !stage.isFocused() || !performZoom) {
         return;
       }
+
+      this.getNodesSelectionPlugin()?.disable();
 
       const delta = e.evt.deltaY > 0 ? 1 : -1;
       this.zoomVelocity += delta;
@@ -586,10 +610,35 @@ export class WeaveStageZoomPlugin extends WeavePlugin {
       return;
     }
 
+    this.getNodesSelectionPlugin()?.enable();
+
     this.setZoom(this.getInertiaScale(), false, pointer);
     this.zoomVelocity *= this.config.zoomInertia.friction;
+    this.getStageGridPlugin()?.onRender();
 
     requestAnimationFrame(this.zoomTick.bind(this));
+  }
+
+  isPinching(): boolean {
+    return this.pinching;
+  }
+
+  getStageGridPlugin() {
+    const gridPlugin =
+      this.instance.getPlugin<WeaveStageGridPlugin>('stageGrid');
+    return gridPlugin;
+  }
+
+  getNodesSelectionPlugin() {
+    const selectionPlugin =
+      this.instance.getPlugin<WeaveNodesSelectionPlugin>('nodesSelection');
+    return selectionPlugin;
+  }
+
+  getPanPlugin() {
+    const panPlugin =
+      this.instance.getPlugin<WeaveStagePanningPlugin>('stagePanning');
+    return panPlugin;
   }
 
   getContextMenuPlugin() {

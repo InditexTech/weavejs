@@ -7,7 +7,11 @@ import Konva from 'konva';
 import { type Vector2d } from 'konva/lib/types';
 import { type WeaveElementInstance } from '@inditextech/weave-types';
 import { WeaveAction } from '@/actions/action';
-import { type WeaveRegularPolygonToolActionState } from './types';
+import {
+  type WeaveRegularPolygonToolActionOnAddedEvent,
+  type WeaveRegularPolygonToolActionOnAddingEvent,
+  type WeaveRegularPolygonToolActionState,
+} from './types';
 import {
   REGULAR_POLYGON_TOOL_ACTION_NAME,
   REGULAR_POLYGON_TOOL_STATE,
@@ -22,6 +26,7 @@ export class WeaveRegularPolygonToolAction extends WeaveAction {
   protected regularPolygonId: string | null;
   protected creating: boolean;
   protected moved: boolean;
+  protected pointers: Map<number, Vector2d>;
   protected clickPoint: Vector2d | null;
   protected container!: Konva.Layer | Konva.Node | undefined;
   protected cancelAction!: () => void;
@@ -31,6 +36,7 @@ export class WeaveRegularPolygonToolAction extends WeaveAction {
   constructor() {
     super();
 
+    this.pointers = new Map<number, Vector2d>();
     this.initialized = false;
     this.state = REGULAR_POLYGON_TOOL_STATE.IDLE;
     this.regularPolygonId = null;
@@ -79,6 +85,19 @@ export class WeaveRegularPolygonToolAction extends WeaveAction {
     stage.on('pointerdown', (e) => {
       this.setTapStart(e);
 
+      this.pointers.set(e.evt.pointerId, {
+        x: e.evt.clientX,
+        y: e.evt.clientY,
+      });
+
+      if (
+        this.pointers.size === 2 &&
+        this.instance.getActiveAction() === REGULAR_POLYGON_TOOL_ACTION_NAME
+      ) {
+        this.state = REGULAR_POLYGON_TOOL_STATE.ADDING;
+        return;
+      }
+
       if (this.state === REGULAR_POLYGON_TOOL_STATE.ADDING) {
         this.creating = true;
 
@@ -89,6 +108,16 @@ export class WeaveRegularPolygonToolAction extends WeaveAction {
     stage.on('pointermove', (e) => {
       if (!this.isPressed(e)) return;
 
+      if (!this.pointers.has(e.evt.pointerId)) return;
+
+      if (
+        this.pointers.size === 2 &&
+        this.instance.getActiveAction() === REGULAR_POLYGON_TOOL_ACTION_NAME
+      ) {
+        this.state = REGULAR_POLYGON_TOOL_STATE.ADDING;
+        return;
+      }
+
       if (this.state === REGULAR_POLYGON_TOOL_STATE.DEFINING_SIZE) {
         this.moved = true;
 
@@ -97,6 +126,8 @@ export class WeaveRegularPolygonToolAction extends WeaveAction {
     });
 
     stage.on('pointerup', (e) => {
+      this.pointers.delete(e.evt.pointerId);
+
       const isTap = this.isTap(e);
 
       if (isTap) {
@@ -122,6 +153,10 @@ export class WeaveRegularPolygonToolAction extends WeaveAction {
 
     stage.container().style.cursor = 'crosshair';
     stage.container().focus();
+
+    this.instance.emitEvent<WeaveRegularPolygonToolActionOnAddingEvent>(
+      'onAddingRegularPolygon'
+    );
 
     this.clickPoint = null;
     this.setState(REGULAR_POLYGON_TOOL_STATE.ADDING);
@@ -195,6 +230,10 @@ export class WeaveRegularPolygonToolAction extends WeaveAction {
           nodeHandler.serialize(regularPolygon as WeaveElementInstance)
         );
       }
+
+      this.instance.emitEvent<WeaveRegularPolygonToolActionOnAddedEvent>(
+        'onAddedRegularPolygon'
+      );
     }
 
     this.cancelAction();

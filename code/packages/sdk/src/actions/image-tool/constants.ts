@@ -7,6 +7,8 @@ export const IMAGE_TOOL_ACTION_NAME = 'imageTool';
 export const IMAGE_TOOL_STATE = {
   ['IDLE']: 'idle',
   ['UPLOADING']: 'uploading',
+  ['DEFINING_POSITION']: 'definingPosition',
+  ['SELECTED_POSITION']: 'selectedPosition',
   ['ADDING']: 'adding',
   ['FINISHED']: 'finished',
 } as const;

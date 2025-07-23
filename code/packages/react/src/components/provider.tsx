@@ -31,6 +31,7 @@ type WeaveProviderType = {
   customActions?: WeaveAction[];
   customPlugins?: WeavePlugin[];
   children: React.ReactNode;
+  logLevel?: 'debug' | 'info' | 'warn' | 'error';
 };
 
 export const WeaveProvider = ({
@@ -41,6 +42,7 @@ export const WeaveProvider = ({
   plugins = [],
   customPlugins = [],
   fonts = [],
+  logLevel = 'info',
   children,
 }: Readonly<WeaveProviderType>): React.JSX.Element => {
   const weaveInstanceRef = React.useRef<Weave | null>(null);
@@ -148,7 +150,7 @@ export const WeaveProvider = ({
             plugins: [...instancePlugins, ...customPlugins],
             fonts,
             logger: {
-              level: 'info',
+              level: logLevel,
             },
           },
           {

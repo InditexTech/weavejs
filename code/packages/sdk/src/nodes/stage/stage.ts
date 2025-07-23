@@ -25,6 +25,8 @@ export class WeaveStageNode extends WeaveNode {
     stage.isFocused = () => this.stageFocused;
     stage.isMouseWheelPressed = () => this.wheelMousePressed;
 
+    stage.position({ x: 0, y: 0 });
+
     const container = stage.container();
     container.setAttribute('tabindex', '0');
 
@@ -105,8 +107,6 @@ export class WeaveStageNode extends WeaveNode {
         this.wheelMousePressed = false;
       }
     });
-
-    stage.batchDraw();
 
     return stage;
   }

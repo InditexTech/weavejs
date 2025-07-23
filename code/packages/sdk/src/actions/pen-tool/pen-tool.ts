@@ -21,6 +21,7 @@ export class WeavePenToolAction extends WeaveAction {
   protected container: Konva.Layer | Konva.Node | undefined;
   protected measureContainer: Konva.Layer | Konva.Group | undefined;
   protected clickPoint: Vector2d | null;
+  protected pointers: Map<number, Vector2d>;
   protected tempPoint: Konva.Circle | undefined;
   protected tempNextPoint: Konva.Circle | undefined;
   protected cancelAction!: () => void;
@@ -30,6 +31,7 @@ export class WeavePenToolAction extends WeaveAction {
   constructor() {
     super();
 
+    this.pointers = new Map<number, Vector2d>();
     this.initialized = false;
     this.state = PEN_TOOL_STATE.IDLE;
     this.lineId = null;
@@ -74,25 +76,72 @@ export class WeavePenToolAction extends WeaveAction {
       }
     });
 
-    stage.on('pointerclick', () => {
-      if (this.state === PEN_TOOL_STATE.IDLE) {
+    stage.on('pointerdown', (e) => {
+      this.setTapStart(e);
+
+      this.pointers.set(e.evt.pointerId, {
+        x: e.evt.clientX,
+        y: e.evt.clientY,
+      });
+
+      if (
+        this.pointers.size === 2 &&
+        this.instance.getActiveAction() === PEN_TOOL_ACTION_NAME
+      ) {
+        this.state = PEN_TOOL_STATE.ADDING;
         return;
       }
 
       if (this.state === PEN_TOOL_STATE.ADDING) {
         this.handleAdding();
+      }
+    });
+
+    stage.on('pointermove', (e) => {
+      if (!this.isPressed(e)) return;
+
+      if (!this.pointers.has(e.evt.pointerId)) return;
+
+      if (
+        this.pointers.size === 2 &&
+        this.instance.getActiveAction() === PEN_TOOL_ACTION_NAME
+      ) {
+        this.state = PEN_TOOL_STATE.ADDING;
         return;
       }
 
       if (this.state === PEN_TOOL_STATE.DEFINING_SIZE) {
-        this.handleSettingSize();
-        return;
+        this.handleMovement();
       }
     });
 
-    stage.on('pointermove', () => {
-      this.handleMovement();
+    stage.on('pointerup', (e) => {
+      this.pointers.delete(e.evt.pointerId);
+
+      if (this.state === PEN_TOOL_STATE.DEFINING_SIZE) {
+        this.handleSettingSize();
+      }
     });
+
+    // stage.on('pointerclick', () => {
+    //   if (this.state === PEN_TOOL_STATE.IDLE) {
+    //     return;
+    //   }
+
+    //   if (this.state === PEN_TOOL_STATE.ADDING) {
+    //     this.handleAdding();
+    //     return;
+    //   }
+
+    //   if (this.state === PEN_TOOL_STATE.DEFINING_SIZE) {
+    //     this.handleSettingSize();
+    //     return;
+    //   }
+    // });
+
+    // stage.on('pointermove', () => {
+    //   this.handleMovement();
+    // });
 
     this.initialized = true;
   }

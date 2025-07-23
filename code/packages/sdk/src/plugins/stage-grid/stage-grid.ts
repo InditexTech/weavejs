@@ -87,6 +87,10 @@ export class WeaveStageGridPlugin extends WeavePlugin {
       }
     });
 
+    this.instance.addEventListener('onStageMove', () => {
+      this.onRender();
+    });
+
     stage.on('pointerdown', (e) => {
       const activeAction = this.instance.getActiveAction();
 
@@ -409,7 +413,9 @@ export class WeaveStageGridPlugin extends WeavePlugin {
   }
 
   onRender(): void {
-    this.renderGrid();
+    requestAnimationFrame(() => {
+      this.renderGrid();
+    });
   }
 
   enable(): void {

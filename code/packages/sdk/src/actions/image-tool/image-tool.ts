@@ -6,27 +6,30 @@ import { v4 as uuidv4 } from 'uuid';
 import { WeaveAction } from '@/actions/action';
 import { type Vector2d } from 'konva/lib/types';
 import {
+  type ImageOptions,
   type WeaveImageToolActionTriggerParams,
   type WeaveImageToolActionState,
   type WeaveImageToolActionTriggerReturn,
   type WeaveImageToolActionOnEndLoadImageEvent,
   type WeaveImageToolActionOnStartLoadImageEvent,
-  type ImageOptions,
+  type WeaveImageToolActionOnAddedEvent,
+  type WeaveImageToolActionOnAddingEvent,
 } from './types';
 import { IMAGE_TOOL_ACTION_NAME, IMAGE_TOOL_STATE } from './constants';
 import { WeaveNodesSelectionPlugin } from '@/plugins/nodes-selection/nodes-selection';
 import Konva from 'konva';
-import { type WeaveElementInstance } from '@inditextech/weave-types';
-import type { WeaveRectangleNode } from '@/nodes/rectangle/rectangle';
 import type { WeaveImageNode } from '@/nodes/image/image';
 
 export class WeaveImageToolAction extends WeaveAction {
   protected initialized: boolean = false;
   protected initialCursor: string | null = null;
   protected state: WeaveImageToolActionState;
+  protected cursorPadding: number = 5;
   protected imageId: string | null;
   protected tempImageId: string | null;
+  protected tempImageNode: Konva.Image | null;
   protected container: Konva.Layer | Konva.Node | undefined;
+  protected pointers: Map<number, Vector2d>;
   protected imageURL: string | null;
   protected preloadImgs: Record<string, HTMLImageElement>;
   protected clickPoint: Vector2d | null;
@@ -37,10 +40,12 @@ export class WeaveImageToolAction extends WeaveAction {
   constructor() {
     super();
 
+    this.pointers = new Map<number, Vector2d>();
     this.initialized = false;
     this.state = IMAGE_TOOL_STATE.IDLE;
     this.imageId = null;
     this.tempImageId = null;
+    this.tempImageNode = null;
     this.container = undefined;
     this.imageURL = null;
     this.preloadImgs = {};
@@ -91,41 +96,62 @@ export class WeaveImageToolAction extends WeaveAction {
       }
     });
 
-    stage.on('pointerclick', () => {
-      if (this.state === IMAGE_TOOL_STATE.IDLE) {
+    stage.on('pointerdown', (e) => {
+      this.setTapStart(e);
+
+      this.pointers.set(e.evt.pointerId, {
+        x: e.evt.clientX,
+        y: e.evt.clientY,
+      });
+
+      if (
+        this.pointers.size === 2 &&
+        this.instance.getActiveAction() === IMAGE_TOOL_ACTION_NAME
+      ) {
+        this.state = IMAGE_TOOL_STATE.DEFINING_POSITION;
         return;
       }
 
-      if (this.state === IMAGE_TOOL_STATE.UPLOADING) {
-        return;
-      }
-
-      if (this.state === IMAGE_TOOL_STATE.ADDING) {
-        this.handleAdding();
-        return;
+      if (this.state === IMAGE_TOOL_STATE.DEFINING_POSITION) {
+        this.state = IMAGE_TOOL_STATE.SELECTED_POSITION;
       }
     });
 
-    stage.on('pointermove', () => {
-      const tempImage = this.instance
-        .getStage()
-        .findOne(`#${this.tempImageId}`);
+    stage.on('pointermove', (e) => {
+      if (
+        this.pointers.size === 2 &&
+        this.instance.getActiveAction() === IMAGE_TOOL_ACTION_NAME
+      ) {
+        this.state = IMAGE_TOOL_STATE.DEFINING_POSITION;
+        return;
+      }
 
-      if (this.state === IMAGE_TOOL_STATE.ADDING && tempImage) {
+      if (
+        [
+          IMAGE_TOOL_STATE.DEFINING_POSITION as string,
+          IMAGE_TOOL_STATE.SELECTED_POSITION as string,
+        ].includes(this.state) &&
+        this.tempImageNode &&
+        this.instance.getActiveAction() === IMAGE_TOOL_ACTION_NAME &&
+        e.evt.pointerType === 'mouse'
+      ) {
+        stage.container().style.cursor = 'crosshair';
+        stage.container().focus();
+
         const mousePos = stage.getRelativePointerPosition();
-        tempImage.setAttrs({
-          x: (mousePos?.x ?? 0) + 2,
-          y: (mousePos?.y ?? 0) + 2,
+
+        this.tempImageNode.setAttrs({
+          x: (mousePos?.x ?? 0) + this.cursorPadding,
+          y: (mousePos?.y ?? 0) + this.cursorPadding,
         });
+      }
+    });
 
-        const nodeHandler =
-          this.instance.getNodeHandler<WeaveRectangleNode>('rectangle');
+    stage.on('pointerup', (e) => {
+      this.pointers.delete(e.evt.pointerId);
 
-        if (nodeHandler) {
-          this.instance.updateNode(
-            nodeHandler.serialize(tempImage as WeaveElementInstance)
-          );
-        }
+      if (this.state === IMAGE_TOOL_STATE.SELECTED_POSITION) {
+        this.handleAdding();
       }
     });
 
@@ -187,6 +213,10 @@ export class WeaveImageToolAction extends WeaveAction {
     );
   }
 
+  private isTouchDevice() {
+    return window.matchMedia('(pointer: coarse)').matches;
+  }
+
   private addImageNode(position?: Vector2d) {
     const stage = this.instance.getStage();
 
@@ -194,7 +224,7 @@ export class WeaveImageToolAction extends WeaveAction {
     stage.container().focus();
 
     if (position) {
-      this.setState(IMAGE_TOOL_STATE.ADDING);
+      this.setState(IMAGE_TOOL_STATE.SELECTED_POSITION);
       this.handleAdding(position);
       return;
     }
@@ -202,35 +232,39 @@ export class WeaveImageToolAction extends WeaveAction {
     if (this.imageId) {
       const mousePos = stage.getRelativePointerPosition();
 
-      const nodeHandler = this.instance.getNodeHandler<WeaveImageNode>('image');
-
       this.tempImageId = uuidv4();
 
       const aspectRatio =
         this.preloadImgs[this.imageId].width /
         this.preloadImgs[this.imageId].height;
 
-      if (nodeHandler) {
-        const node = nodeHandler.create(this.tempImageId, {
-          x: (mousePos?.x ?? 0) + 5,
-          y: (mousePos?.y ?? 0) + 5,
-          width: 100 * aspectRatio,
-          height: 100,
+      if (!this.tempImageNode && this.tempImageId && !this.isTouchDevice()) {
+        this.tempImageNode = new Konva.Image({
+          id: this.tempImageId,
+          x: (mousePos?.x ?? 0) + this.cursorPadding,
+          y: (mousePos?.y ?? 0) + this.cursorPadding,
+          width: 240 * aspectRatio * (1 / stage.scaleX()),
+          height: 240 * (1 / stage.scaleY()),
           opacity: 1,
           adding: true,
-          imageURL: this.imageURL,
+          image: this.preloadImgs[this.imageId],
           stroke: '#000000ff',
           strokeWidth: 0,
           strokeScaleEnabled: true,
           listening: false,
         });
 
-        this.instance.addNode(node, this.container?.getAttrs().id);
+        this.instance.getMainLayer()?.add(this.tempImageNode);
       }
+
+      this.instance.emitEvent<WeaveImageToolActionOnAddingEvent>(
+        'onAddingImage',
+        { imageURL: this.props.imageURL }
+      );
     }
 
     this.clickPoint = null;
-    this.setState(IMAGE_TOOL_STATE.ADDING);
+    this.setState(IMAGE_TOOL_STATE.DEFINING_POSITION);
   }
 
   private addImage(position?: Vector2d) {
@@ -242,14 +276,7 @@ export class WeaveImageToolAction extends WeaveAction {
   }
 
   private handleAdding(position?: Vector2d) {
-    const tempImage = this.instance.getStage().findOne(`#${this.tempImageId}`);
-
-    if (
-      this.imageId &&
-      this.imageURL &&
-      this.preloadImgs[this.imageId] &&
-      ((!position && tempImage) || position)
-    ) {
+    if (this.imageId && this.imageURL && this.preloadImgs[this.imageId]) {
       const { mousePoint, container } = this.instance.getMousePointer(position);
 
       this.clickPoint = mousePoint;
@@ -277,17 +304,11 @@ export class WeaveImageToolAction extends WeaveAction {
         });
 
         this.instance.addNode(node, this.container?.getAttrs().id);
-      }
 
-      if (!position) {
-        const imageNodeHandler =
-          this.instance.getNodeHandler<WeaveImageNode>('image');
-
-        if (imageNodeHandler) {
-          this.instance.removeNode(
-            imageNodeHandler.serialize(tempImage as WeaveElementInstance)
-          );
-        }
+        this.instance.emitEvent<WeaveImageToolActionOnAddedEvent>(
+          'onAddedImage',
+          { imageURL: this.props.imageURL }
+        );
       }
 
       this.setState(IMAGE_TOOL_STATE.FINISHED);
@@ -338,16 +359,8 @@ export class WeaveImageToolAction extends WeaveAction {
       delete this.preloadImgs[this.imageId];
     }
 
-    const tempImage = this.instance.getStage().findOne(`#${this.tempImageId}`);
-    if (tempImage) {
-      const nodeHandler =
-        this.instance.getNodeHandler<WeaveRectangleNode>('rectangle');
-
-      if (nodeHandler) {
-        this.instance.removeNode(
-          nodeHandler.serialize(tempImage as WeaveElementInstance)
-        );
-      }
+    if (this.tempImageNode) {
+      this.tempImageNode.destroy();
     }
 
     const selectionPlugin =

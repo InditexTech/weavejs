@@ -7,3 +7,6 @@ import { ELLIPSE_TOOL_STATE } from './constants';
 export type WeaveEllipseToolActionStateKeys = keyof typeof ELLIPSE_TOOL_STATE;
 export type WeaveEllipseToolActionState =
   (typeof ELLIPSE_TOOL_STATE)[WeaveEllipseToolActionStateKeys];
+
+export type WeaveEllipseToolActionOnAddingEvent = undefined;
+export type WeaveEllipseToolActionOnAddedEvent = undefined;

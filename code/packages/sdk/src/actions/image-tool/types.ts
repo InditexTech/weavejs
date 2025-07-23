@@ -12,6 +12,8 @@ export type WeaveImageToolActionState =
 
 export type WeaveImageToolActionOnStartLoadImageEvent = undefined;
 export type WeaveImageToolActionOnEndLoadImageEvent = Error | undefined;
+export type WeaveImageToolActionOnAddingEvent = { imageURL: string };
+export type WeaveImageToolActionOnAddedEvent = { imageURL: string };
 
 export type WeaveImageToolActionTriggerParams = {
   imageURL?: string;

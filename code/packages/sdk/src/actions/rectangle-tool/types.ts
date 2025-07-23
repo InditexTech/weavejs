@@ -8,3 +8,6 @@ export type WeaveRectangleToolActionStateKeys =
   keyof typeof RECTANGLE_TOOL_STATE;
 export type WeaveRectangleToolActionState =
   (typeof RECTANGLE_TOOL_STATE)[WeaveRectangleToolActionStateKeys];
+
+export type WeaveRectangleToolActionOnAddingEvent = undefined;
+export type WeaveRectangleToolActionOnAddedEvent = undefined;

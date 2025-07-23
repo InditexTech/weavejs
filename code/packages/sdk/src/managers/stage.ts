@@ -92,8 +92,6 @@ export class WeaveStageManager {
       ...props,
     });
 
-    stage.batchDraw();
-
     this.setStage(stage);
   }
 

@@ -7,3 +7,6 @@ import { STAR_TOOL_STATE } from './constants';
 export type WeaveStarToolActionStateKeys = keyof typeof STAR_TOOL_STATE;
 export type WeaveStarToolActionState =
   (typeof STAR_TOOL_STATE)[WeaveStarToolActionStateKeys];
+
+export type WeaveStarToolActionOnAddingEvent = undefined;
+export type WeaveStarToolActionOnAddedEvent = undefined;

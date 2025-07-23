@@ -381,6 +381,8 @@ export abstract class WeaveNode implements WeaveNodeBase {
 
         const stage = this.instance.getStage();
 
+        const isNodeSelectionEnabled = this.getSelectionPlugin()?.isEnabled();
+
         const realNode = this.instance.getInstanceRecursive(node);
 
         const isTargetable = e.target.getAttrs().isTargetable !== false;
@@ -388,6 +390,7 @@ export abstract class WeaveNode implements WeaveNodeBase {
 
         // Node is locked
         if (
+          isNodeSelectionEnabled &&
           this.isSelecting() &&
           !this.isNodeSelected(realNode) &&
           !this.isPasting() &&
@@ -399,6 +402,7 @@ export abstract class WeaveNode implements WeaveNodeBase {
 
         // Node is not locked
         if (
+          isNodeSelectionEnabled &&
           this.isSelecting() &&
           !this.isNodeSelected(realNode) &&
           !this.isPasting() &&
