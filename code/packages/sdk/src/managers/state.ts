@@ -132,12 +132,6 @@ export class WeaveStateManager {
     parentId = 'mainLayer',
     index: number | undefined = undefined
   ): void {
-    // const userId = this.instance.getStore().getUser().id;
-
-    // this.instance
-    //   .getStore()
-    //   .getDocument()
-    //   .transact(() => {
     const state = this.instance.getStore().getState();
 
     this.logger.info(
@@ -176,51 +170,43 @@ export class WeaveStateManager {
       'addNode: parent before init'
     );
 
-    let parentChildren = [];
-
-    if (parent.props.children) {
-      parentChildren = JSON.parse(JSON.stringify(parent.props.children));
-    }
+    const newChildren = JSON.parse(JSON.stringify(parent.props.children ?? []));
 
     this.logger.info(
       { parent: JSON.parse(JSON.stringify(parent)) },
       'addNode: parent before add'
     );
 
-    if (index && parentChildren) {
-      parentChildren.splice(index, 0, node);
-      parentChildren = parentChildren.map(
-        (actNode: WeaveStateElement, index: number) => {
-          return {
-            ...actNode,
-            props: {
-              ...actNode.props,
-              zIndex: index,
-            },
-          };
-        }
-      );
+    if (index) {
+      newChildren?.splice(index, 0, node);
+      for (let i = 0; i < newChildren.length; i++) {
+        newChildren[i].props.zIndex = i;
+      }
     }
-    if (!index && parent.props.children) {
-      const childrenAmount = parent.props.children.length;
-      let finalNode = JSON.parse(JSON.stringify(node));
-      finalNode = {
-        ...finalNode,
+
+    if (!index) {
+      const childrenAmount = newChildren.length;
+      node.props.zIndex = childrenAmount;
+
+      const nodeToAdd = {
+        ...node,
         props: {
-          ...finalNode.props,
+          ...node.props,
           zIndex: childrenAmount,
         },
       };
 
       this.logger.info(
-        { node: JSON.parse(JSON.stringify(finalNode)) },
+        { node: JSON.parse(JSON.stringify(nodeToAdd)) },
         'addNode: node to add'
       );
 
-      parentChildren.push(finalNode);
+      newChildren.push(nodeToAdd);
     }
 
-    parent.props.children = parentChildren;
+    if (typeof newChildren !== 'undefined') {
+      parent.props.children = newChildren;
+    }
 
     this.logger.info(
       { parent: JSON.parse(JSON.stringify(parent)) },
@@ -228,16 +214,9 @@ export class WeaveStateManager {
     );
 
     this.instance.emitEvent('onNodeAdded', node);
-    // }, userId);
   }
 
   updateNode(node: WeaveStateElement): void {
-    // const userId = this.instance.getStore().getUser().id;
-
-    // this.instance
-    //   .getStore()
-    //   .getDocument()
-    //   .transact(() => {
     const state = this.instance.getStore().getState();
 
     this.logger.info(
@@ -266,13 +245,16 @@ export class WeaveStateManager {
       'updateNode: before update'
     );
 
-    const nodeNew = JSON.parse(
-      JSON.stringify({ ...nodeState.props, ...node.props })
-    );
+    const newNode = JSON.parse(JSON.stringify(nodeState));
 
-    nodeState.props = {
-      ...nodeNew,
+    newNode.props = {
+      ...newNode.props,
+      ...node.props,
     };
+
+    if (typeof newNode.props !== 'undefined') {
+      nodeState.props = newNode.props;
+    }
 
     this.logger.info(
       { node: JSON.parse(JSON.stringify(nodeState)) },
@@ -280,16 +262,9 @@ export class WeaveStateManager {
     );
 
     this.instance.emitEvent('onNodeUpdated', node);
-    // }, userId);
   }
 
   removeNode(node: WeaveStateElement): void {
-    // const userId = this.instance.getStore().getUser().id;
-
-    // this.instance
-    //   .getStore()
-    //   .getDocument()
-    //   .transact(() => {
     const state = this.instance.getStore().getState();
 
     this.logger.info(
@@ -303,7 +278,7 @@ export class WeaveStateManager {
       return;
     }
 
-    const { node: nodeState, parent: parentState } = this.findNodeById(
+    const { node: nodeState, parent } = this.findNodeById(
       state.weave as WeaveStateElement,
       node.key
     );
@@ -314,31 +289,42 @@ export class WeaveStateManager {
       return;
     }
 
+    if (!parent) {
+      const msg = `Parent doesn't exists, cannot remove it`;
+      this.logger.warn({ node }, msg);
+      return;
+    }
+
     this.logger.info({ key: node.key }, 'removeNode: node to remove');
 
     this.logger.info(
-      { parent: JSON.parse(JSON.stringify(parentState)) },
+      { parent: JSON.parse(JSON.stringify(parent)) },
       'removeNode: parent before remove'
     );
 
-    if (parentState && parentState.props.children) {
-      const newChildren: WeaveStateElement[] = JSON.parse(
-        JSON.stringify(parentState.props.children)
-      );
-      const filteredChildren = newChildren.filter(
-        (actNode) => actNode.key !== node.key
-      );
+    const newChildren = JSON.parse(JSON.stringify(parent.props.children ?? []));
 
-      parentState.props.children = filteredChildren;
-
-      this.logger.info(
-        { parent: JSON.parse(JSON.stringify(parentState)) },
-        'removeNode: parent after remove'
-      );
+    for (let i = newChildren.length - 1; i >= 0; i--) {
+      if (newChildren[i].key === node.key) {
+        newChildren.splice(i, 1);
+        break;
+      }
     }
 
+    for (let i = 0; i < newChildren.length; i++) {
+      newChildren[i].props.zIndex = i;
+    }
+
+    if (typeof newChildren !== 'undefined') {
+      parent.props.children = newChildren;
+    }
+
+    this.logger.info(
+      { parent: JSON.parse(JSON.stringify(parent)) },
+      'removeNode: parent after remove'
+    );
+
     this.instance.emitEvent('onNodeRemoved', node);
-    // }, userId);
   }
 
   removeNodes(nodes: WeaveStateElement[]): void {
@@ -348,13 +334,12 @@ export class WeaveStateManager {
   }
 
   moveNode(node: WeaveStateElement, position: WeavePosition): void {
-    // const userId = this.instance.getStore().getUser().id;
-
-    // this.instance
-    //   .getStore()
-    //   .getDocument()
-    //   .transact(() => {
     const state = this.instance.getStore().getState();
+
+    this.logger.info(
+      { stage: JSON.parse(JSON.stringify(state)) },
+      'State before moveNode'
+    );
 
     if (isEmpty(state.weave)) {
       const msg = `State is empty, cannot update the node`;
@@ -362,7 +347,7 @@ export class WeaveStateManager {
       return;
     }
 
-    const { node: nodeState, parent: nodeParent } = this.findNodeById(
+    const { node: nodeState, parent } = this.findNodeById(
       state.weave as WeaveStateElement,
       node.key
     );
@@ -372,51 +357,49 @@ export class WeaveStateManager {
       return;
     }
 
-    if (nodeParent && nodeParent.props.children) {
-      let nodeParentNewChildren = JSON.parse(
-        JSON.stringify([...(nodeParent.props.children ?? [])])
-      );
-      const nodeNew = JSON.parse(JSON.stringify({ ...node }));
+    this.logger.info(
+      { parent: JSON.parse(JSON.stringify(parent)) },
+      'moveNode: parent before move'
+    );
 
-      const childrenAmount = nodeParentNewChildren.length;
-      const nodeIndex = nodeParentNewChildren.findIndex(
-        (n: WeaveStateElement) => n.key === nodeNew.key
+    if (parent && parent.props.children) {
+      const childrenAmount = parent.props.children.length;
+      const nodeIndex = parent.props.children.findIndex(
+        (child: WeaveStateElement) => child.key === node.key
       );
 
-      nodeParentNewChildren.splice(nodeIndex, 1);
+      const newChildren = JSON.parse(
+        JSON.stringify(parent.props.children ?? [])
+      );
+
+      newChildren.splice(nodeIndex, 1);
 
       if (position === WEAVE_NODE_POSITION.UP) {
-        nodeParentNewChildren.splice(nodeIndex + 1, 0, nodeNew);
+        newChildren.splice(nodeIndex + 1, 0, { ...node });
       }
       if (position === WEAVE_NODE_POSITION.DOWN) {
-        nodeParentNewChildren.splice(nodeIndex - 1, 0, nodeNew);
+        newChildren.splice(nodeIndex - 1, 0, { ...node });
       }
       if (position === WEAVE_NODE_POSITION.FRONT) {
-        nodeParentNewChildren.splice(childrenAmount - 1, 0, nodeNew);
+        newChildren.splice(childrenAmount - 1, 0, { ...node });
       }
       if (position === WEAVE_NODE_POSITION.BACK) {
-        nodeParentNewChildren.splice(0, 0, nodeNew);
+        newChildren.splice(0, 0, { ...node });
       }
 
-      nodeParentNewChildren = nodeParentNewChildren.map(
-        (actNode: WeaveStateElement, index: number) => {
-          return {
-            ...actNode,
-            props: {
-              ...actNode.props,
-              zIndex: index,
-            },
-          };
-        }
-      );
-
-      if (!nodeParent.props.children) {
-        nodeParent.props.children = [];
+      for (let i = 0; i < newChildren.length; i++) {
+        newChildren[i].props.zIndex = i;
       }
 
-      nodeParent.props.children = nodeParentNewChildren;
+      if (typeof newChildren !== 'undefined') {
+        parent.props.children = newChildren;
+      }
     }
-    // }, userId);
+
+    this.logger.info(
+      { parent: JSON.parse(JSON.stringify(parent)) },
+      'moveNode: parent after move'
+    );
   }
 
   getElementsTree(): WeaveStateElement[] {

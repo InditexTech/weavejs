@@ -9,6 +9,7 @@ import {
   WEAVE_NODE_POSITION,
 } from '@inditextech/weave-types';
 import type { WeaveNode } from '@/nodes/node';
+import type { WeaveNodesSelectionPlugin } from '@/plugins/nodes-selection/nodes-selection';
 
 export class WeaveZIndexManager {
   private instance: Weave;
@@ -18,6 +19,13 @@ export class WeaveZIndexManager {
     this.instance = instance;
     this.logger = this.instance.getChildLogger('zindex-manager');
     this.logger.debug('zIndex manager created');
+  }
+
+  protected getSelectionPlugin(): WeaveNodesSelectionPlugin | undefined {
+    const selectionPlugin =
+      this.instance.getPlugin<WeaveNodesSelectionPlugin>('nodesSelection');
+
+    return selectionPlugin;
   }
 
   moveUp(instance: WeaveElementInstance): void {
@@ -33,8 +41,8 @@ export class WeaveZIndexManager {
       instance.getAttrs().nodeType
     );
     if (handler) {
-      const node = handler.serialize(instance);
-      this.instance.moveNode(node, WEAVE_NODE_POSITION.UP);
+      const nodeState = handler.serialize(instance);
+      this.instance.moveNode(nodeState, WEAVE_NODE_POSITION.UP);
     }
   }
 
@@ -51,8 +59,8 @@ export class WeaveZIndexManager {
       instance.getAttrs().nodeType
     );
     if (handler) {
-      const node = handler.serialize(instance);
-      this.instance.moveNode(node, WEAVE_NODE_POSITION.DOWN);
+      const nodeState = handler.serialize(instance);
+      this.instance.moveNode(nodeState, WEAVE_NODE_POSITION.DOWN);
     }
   }
 
@@ -69,7 +77,7 @@ export class WeaveZIndexManager {
       );
       if (handler) {
         const nodeState = handler.serialize(node);
-        this.instance.updateNode(nodeState);
+        // this.instance.updateNode(nodeState);
         this.instance.moveNode(nodeState, WEAVE_NODE_POSITION.BACK);
       }
     }
@@ -88,7 +96,7 @@ export class WeaveZIndexManager {
       );
       if (handler) {
         const nodeState = handler.serialize(node);
-        this.instance.updateNode(nodeState);
+        // this.instance.updateNode(nodeState);
         this.instance.moveNode(nodeState, WEAVE_NODE_POSITION.FRONT);
       }
     }
