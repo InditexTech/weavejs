@@ -82,18 +82,22 @@ export class WeaveStoreAzureWebPubSubSyncHost extends Emittery {
     this._awareness.setLocalState(null);
 
     // const awarenessChangeHandler = ({ added, updated, removed }, conn) => {
-    const awarenessUpdateHandler = ({
-      added,
-      updated,
-      removed,
-    }: {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      added: any;
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      updated: any;
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      removed: any;
-    }) => {
+    const awarenessUpdateHandler = (
+      {
+        added,
+        updated,
+        removed,
+      }: {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        added: any;
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        updated: any;
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        removed: any;
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      },
+      origin: any
+    ) => {
       const changedClients = added.concat(added, updated, removed);
       const encoder = encoding.createEncoder();
       encoding.writeVarUint(encoder, messageAwareness);
@@ -102,27 +106,42 @@ export class WeaveStoreAzureWebPubSubSyncHost extends Emittery {
         awarenessProtocol.encodeAwarenessUpdate(this._awareness, changedClients)
       );
       const u8 = encoding.toUint8Array(encoder);
-      this.broadcast(this.topic, u8);
+      this.broadcast(this.topic, origin, u8);
     };
     this._awareness.on('update', awarenessUpdateHandler);
 
     // register update handler
-    const updateHandler = (update: Uint8Array) => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const updateHandler = (update: Uint8Array, origin: any) => {
       const encoder = encoding.createEncoder();
       encoding.writeVarUint(encoder, messageSync);
       syncProtocol.writeUpdate(encoder, update);
       const u8 = encoding.toUint8Array(encoder);
 
-      this.broadcast(this.topic, u8);
+      if (origin) {
+        const actualStateJSONString = JSON.stringify(
+          doc.getMap('weave').toJSON(),
+          null,
+          2
+        );
+
+        console.log(`=======================================`);
+        console.log(`State update from ${origin}`);
+        console.log(`=======================================`);
+        console.log(actualStateJSONString);
+        console.log(`=======================================`);
+      }
+
+      this.broadcast(this.topic, origin, u8);
     };
-    doc.on('update', updateHandler);
+    this.doc.on('update', updateHandler);
   }
 
   get awareness(): awarenessProtocol.Awareness {
     return this._awareness;
   }
 
-  sendInitAwarenessInfo(): void {
+  sendInitAwarenessInfo(origin: string): void {
     const encoderAwarenessState = encoding.createEncoder();
     encoding.writeVarUint(encoderAwarenessState, messageAwareness);
     encoding.writeVarUint8Array(
@@ -133,7 +152,7 @@ export class WeaveStoreAzureWebPubSubSyncHost extends Emittery {
       )
     );
     const u8 = encoding.toUint8Array(encoderAwarenessState);
-    this.broadcast(this.topic, u8);
+    this.broadcast(this.topic, origin, u8);
   }
 
   async start(): Promise<void> {
@@ -153,7 +172,7 @@ export class WeaveStoreAzureWebPubSubSyncHost extends Emittery {
           case MessageDataType.Init:
             this.onClientInit(group, event.data);
             this.onClientSync(group, event.data);
-            this.sendInitAwarenessInfo();
+            this.sendInitAwarenessInfo(event.data.f);
             return;
           case MessageDataType.Sync:
             this.onClientSync(group, event.data);
@@ -186,13 +205,14 @@ export class WeaveStoreAzureWebPubSubSyncHost extends Emittery {
     this._conn = conn;
   }
 
-  private broadcast(group: string, u8: Uint8Array) {
+  private broadcast(group: string, from: string, u8: Uint8Array) {
     this._conn?.send(
       JSON.stringify({
         type: MessageType.SendToGroup,
         group,
         noEcho: true,
         data: {
+          f: from,
           c: Buffer.from(u8).toString('base64'),
         },
       })
@@ -230,7 +250,7 @@ export class WeaveStoreAzureWebPubSubSyncHost extends Emittery {
       switch (messageType) {
         case syncProtocol.messageYjsSyncStep1:
           encoding.writeVarUint(encoder, syncProtocol.messageYjsSyncStep1);
-          syncProtocol.readSyncMessage(decoder, encoder, this.doc, null);
+          syncProtocol.readSyncMessage(decoder, encoder, this.doc, data.f);
           if (encoding.length(encoder) > 1) {
             this.send(group, data.f, encoding.toUint8Array(encoder));
           }

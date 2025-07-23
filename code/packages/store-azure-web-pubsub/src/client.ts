@@ -54,6 +54,7 @@ type MessageHandler = (
   encoder: encoding.Encoder,
   decoder: decoding.Decoder,
   client: WeaveStoreAzureWebPubSubSyncClient,
+  clientId: string,
   emitSynced: boolean,
   messageType: number
 ) => void;
@@ -69,6 +70,7 @@ messageHandlers[messageSyncStep1] = (
   encoder,
   decoder,
   client,
+  clientId,
   emitSynced,
   messageType
 ) => {
@@ -77,7 +79,7 @@ messageHandlers[messageSyncStep1] = (
     decoder,
     encoder,
     client.doc,
-    client
+    clientId
   );
   if (
     emitSynced &&
@@ -112,14 +114,15 @@ messageHandlers[messageAwareness] = (_, decoder, client) => {
 const readMessage = (
   client: WeaveStoreAzureWebPubSubSyncClient,
   buf: Uint8Array,
-  emitSynced: boolean
+  emitSynced: boolean,
+  clientId: string
 ): encoding.Encoder => {
   const decoder = decoding.createDecoder(buf);
   const encoder = encoding.createEncoder();
   const messageType = decoding.readVarUint(decoder);
   const messageHandler = messageHandlers[messageType];
   if (messageHandler) {
-    messageHandler(encoder, decoder, client, emitSynced, messageType);
+    messageHandler(encoder, decoder, client, clientId, emitSynced, messageType);
   } else {
     throw new Error(`unable to handle message with type: ${messageType}`);
   }
@@ -202,6 +205,15 @@ export class WeaveStoreAzureWebPubSubSyncClient extends Emittery {
         const encoder = encoding.createEncoder();
         encoding.writeVarUint(encoder, messageSyncStep1);
         syncProtocol.writeUpdate(encoder, update);
+
+        if (origin) {
+          const actualStateJSON = this.doc.getMap('weave').toJSON();
+
+          console.log(`State update from: ${origin}`, {
+            actualStateJSON,
+          });
+        }
+
         sendToControlGroup(
           this,
           topic,
@@ -252,6 +264,10 @@ export class WeaveStoreAzureWebPubSubSyncClient extends Emittery {
 
   get id(): string {
     return this._uuid;
+  }
+
+  getClientId(): string {
+    return this.id;
   }
 
   setupResyncInterval(): void {
@@ -392,7 +408,7 @@ export class WeaveStoreAzureWebPubSubSyncClient extends Emittery {
 
       const buf = Buffer.from(messageData.c, 'base64');
       // this._wsLastMessageReceived = Date.now();
-      const encoder = readMessage(this, buf, true);
+      const encoder = readMessage(this, buf, true, messageData.f);
       if (encoding.length(encoder) > 1) {
         sendToControlGroup(
           this,
