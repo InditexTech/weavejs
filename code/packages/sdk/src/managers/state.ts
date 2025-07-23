@@ -132,155 +132,213 @@ export class WeaveStateManager {
     parentId = 'mainLayer',
     index: number | undefined = undefined
   ): void {
-    const userId = this.instance.getStore().getUser().id;
+    // const userId = this.instance.getStore().getUser().id;
 
-    this.instance
-      .getStore()
-      .getDocument()
-      .transact(() => {
-        const state = this.instance.getStore().getState();
+    // this.instance
+    //   .getStore()
+    //   .getDocument()
+    //   .transact(() => {
+    const state = this.instance.getStore().getState();
 
-        if (isEmpty(state.weave)) {
-          const msg = `State is empty, cannot add the node`;
-          this.logger.warn({ node, parentId }, msg);
-          return;
-        }
+    this.logger.info(
+      { state: JSON.parse(JSON.stringify(state)) },
+      'State before addNode'
+    );
 
-        const { node: nodeState } = this.findNodeById(
-          state.weave as WeaveStateElement,
-          node.key
-        );
-        if (nodeState) {
-          const msg = `Node with key [${node.key}] already exists, cannot add it`;
-          this.logger.warn({ node, parentId }, msg);
-          return;
-        }
+    if (isEmpty(state.weave)) {
+      const msg = `State is empty, cannot add the node`;
+      this.logger.warn({ node, parentId }, msg);
+      return;
+    }
 
-        const { node: parent } = this.findNodeById(
-          state.weave as WeaveStateElement,
-          parentId
-        );
-        if (!parent) {
-          const msg = `Parent container with key [${node.key}] doesn't exists, cannot add it`;
-          this.logger.warn({ node, parentId }, msg);
-          return;
-        }
+    const { node: nodeState } = this.findNodeById(
+      state.weave as WeaveStateElement,
+      node.key
+    );
+    if (nodeState) {
+      const msg = `Node with key [${node.key}] already exists, cannot add it`;
+      this.logger.warn({ node, parentId }, msg);
+      return;
+    }
 
-        if (
-          !parent.props.children ||
-          typeof parent.props.children === 'undefined'
-        ) {
-          parent.props.children = [];
-        }
+    const { node: parent } = this.findNodeById(
+      state.weave as WeaveStateElement,
+      parentId
+    );
+    if (!parent) {
+      const msg = `Parent container with key [${node.key}] doesn't exists, cannot add it`;
+      this.logger.warn({ node, parentId }, msg);
+      return;
+    }
 
-        if (index) {
-          let parentChildren = JSON.parse(
-            JSON.stringify([...parent.props.children])
-          );
-          parentChildren.splice(index, 0, node);
-          parentChildren = parentChildren.map(
-            (actNode: WeaveStateElement, index: number) => {
-              return {
-                ...actNode,
-                props: {
-                  ...actNode.props,
-                  zIndex: index,
-                },
-              };
-            }
-          );
-          parent.props.children = parentChildren;
-        } else {
-          const childrenAmount = parent.props.children.length;
-          const finalNode = {
-            ...node,
+    this.logger.info(
+      { parent: JSON.parse(JSON.stringify(parent)) },
+      'addNode: parent before init'
+    );
+
+    let parentChildren = [];
+
+    if (parent.props.children) {
+      parentChildren = JSON.parse(JSON.stringify(parent.props.children));
+    }
+
+    this.logger.info(
+      { parent: JSON.parse(JSON.stringify(parent)) },
+      'addNode: parent before add'
+    );
+
+    if (index && parentChildren) {
+      parentChildren.splice(index, 0, node);
+      parentChildren = parentChildren.map(
+        (actNode: WeaveStateElement, index: number) => {
+          return {
+            ...actNode,
             props: {
-              ...node.props,
-              zIndex: childrenAmount,
+              ...actNode.props,
+              zIndex: index,
             },
           };
-          parent.props.children.push(finalNode);
         }
+      );
+    }
+    if (!index && parent.props.children) {
+      const childrenAmount = parent.props.children.length;
+      let finalNode = JSON.parse(JSON.stringify(node));
+      finalNode = {
+        ...finalNode,
+        props: {
+          ...finalNode.props,
+          zIndex: childrenAmount,
+        },
+      };
 
-        this.instance.emitEvent('onNodeAdded', node);
-      }, userId);
+      this.logger.info(
+        { node: JSON.parse(JSON.stringify(finalNode)) },
+        'addNode: node to add'
+      );
+
+      parentChildren.push(finalNode);
+    }
+
+    parent.props.children = parentChildren;
+
+    this.logger.info(
+      { parent: JSON.parse(JSON.stringify(parent)) },
+      'addNode: parent after add'
+    );
+
+    this.instance.emitEvent('onNodeAdded', node);
+    // }, userId);
   }
 
   updateNode(node: WeaveStateElement): void {
-    const userId = this.instance.getStore().getUser().id;
+    // const userId = this.instance.getStore().getUser().id;
 
-    this.instance
-      .getStore()
-      .getDocument()
-      .transact(() => {
-        const state = this.instance.getStore().getState();
+    // this.instance
+    //   .getStore()
+    //   .getDocument()
+    //   .transact(() => {
+    const state = this.instance.getStore().getState();
 
-        if (isEmpty(state.weave)) {
-          const msg = `State is empty, cannot update the node`;
-          this.logger.warn({ node }, msg);
-          return;
-        }
+    this.logger.info(
+      { state: JSON.parse(JSON.stringify(state)) },
+      'State before updateNode'
+    );
 
-        const { node: nodeState } = this.findNodeById(
-          state.weave as WeaveStateElement,
-          node.key
-        );
-        if (!nodeState) {
-          const msg = `Node with key [${node.key}] doesn't exists, cannot update it`;
-          this.logger.warn({ node }, msg);
-          return;
-        }
+    if (isEmpty(state.weave)) {
+      const msg = `State is empty, cannot update the node`;
+      this.logger.warn({ node }, msg);
+      return;
+    }
 
-        const nodeNew = JSON.parse(
-          JSON.stringify({ ...nodeState.props, ...node.props })
-        );
+    const { node: nodeState } = this.findNodeById(
+      state.weave as WeaveStateElement,
+      node.key
+    );
+    if (!nodeState) {
+      const msg = `Node with key [${node.key}] doesn't exists, cannot update it`;
+      this.logger.warn({ node }, msg);
+      return;
+    }
 
-        nodeState.props = {
-          ...nodeNew,
-        };
+    this.logger.info(
+      { node: JSON.parse(JSON.stringify(nodeState)) },
+      'updateNode: before update'
+    );
 
-        this.instance.emitEvent('onNodeUpdated', node);
-      }, userId);
+    const nodeNew = JSON.parse(
+      JSON.stringify({ ...nodeState.props, ...node.props })
+    );
+
+    nodeState.props = {
+      ...nodeNew,
+    };
+
+    this.logger.info(
+      { node: JSON.parse(JSON.stringify(nodeState)) },
+      'updateNode: after update'
+    );
+
+    this.instance.emitEvent('onNodeUpdated', node);
+    // }, userId);
   }
 
   removeNode(node: WeaveStateElement): void {
-    const userId = this.instance.getStore().getUser().id;
+    // const userId = this.instance.getStore().getUser().id;
 
-    this.instance
-      .getStore()
-      .getDocument()
-      .transact(() => {
-        const state = this.instance.getStore().getState();
+    // this.instance
+    //   .getStore()
+    //   .getDocument()
+    //   .transact(() => {
+    const state = this.instance.getStore().getState();
 
-        if (isEmpty(state.weave)) {
-          const msg = `State is empty, cannot update the node`;
-          this.logger.warn({ node }, msg);
-          return;
-        }
+    this.logger.info(
+      { stage: JSON.parse(JSON.stringify(state)) },
+      'State before removeNode'
+    );
 
-        const { node: nodeState, parent: parentState } = this.findNodeById(
-          state.weave as WeaveStateElement,
-          node.key
-        );
+    if (isEmpty(state.weave)) {
+      const msg = `State is empty, cannot update the node`;
+      this.logger.warn({ node }, msg);
+      return;
+    }
 
-        if (!nodeState) {
-          const msg = `Node with key [${node.key}] doesn't exists, cannot remove it`;
-          this.logger.warn({ node }, msg);
-          return;
-        }
+    const { node: nodeState, parent: parentState } = this.findNodeById(
+      state.weave as WeaveStateElement,
+      node.key
+    );
 
-        if (parentState) {
-          const newChildren: WeaveStateElement[] = JSON.parse(
-            JSON.stringify(parentState.props.children)
-          );
-          const filteredChildren = newChildren.filter(
-            (actNode) => actNode.key !== node.key
-          );
-          parentState.props.children = filteredChildren;
-        }
+    if (!nodeState) {
+      const msg = `Node with key [${node.key}] doesn't exists, cannot remove it`;
+      this.logger.warn({ node }, msg);
+      return;
+    }
 
-        this.instance.emitEvent('onNodeRemoved', node);
-      }, userId);
+    this.logger.info({ key: node.key }, 'removeNode: node to remove');
+
+    this.logger.info(
+      { parent: JSON.parse(JSON.stringify(parentState)) },
+      'removeNode: parent before remove'
+    );
+
+    if (parentState && parentState.props.children) {
+      const newChildren: WeaveStateElement[] = JSON.parse(
+        JSON.stringify(parentState.props.children)
+      );
+      const filteredChildren = newChildren.filter(
+        (actNode) => actNode.key !== node.key
+      );
+
+      parentState.props.children = filteredChildren;
+
+      this.logger.info(
+        { parent: JSON.parse(JSON.stringify(parentState)) },
+        'removeNode: parent after remove'
+      );
+    }
+
+    this.instance.emitEvent('onNodeRemoved', node);
+    // }, userId);
   }
 
   removeNodes(nodes: WeaveStateElement[]): void {
@@ -290,75 +348,75 @@ export class WeaveStateManager {
   }
 
   moveNode(node: WeaveStateElement, position: WeavePosition): void {
-    const userId = this.instance.getStore().getUser().id;
+    // const userId = this.instance.getStore().getUser().id;
 
-    this.instance
-      .getStore()
-      .getDocument()
-      .transact(() => {
-        const state = this.instance.getStore().getState();
+    // this.instance
+    //   .getStore()
+    //   .getDocument()
+    //   .transact(() => {
+    const state = this.instance.getStore().getState();
 
-        if (isEmpty(state.weave)) {
-          const msg = `State is empty, cannot update the node`;
-          this.logger.warn({ node }, msg);
-          return;
+    if (isEmpty(state.weave)) {
+      const msg = `State is empty, cannot update the node`;
+      this.logger.warn({ node }, msg);
+      return;
+    }
+
+    const { node: nodeState, parent: nodeParent } = this.findNodeById(
+      state.weave as WeaveStateElement,
+      node.key
+    );
+    if (!nodeState) {
+      const msg = `Node with key [${node.key}] doesn't exists, cannot update it`;
+      this.logger.warn({ node }, msg);
+      return;
+    }
+
+    if (nodeParent && nodeParent.props.children) {
+      let nodeParentNewChildren = JSON.parse(
+        JSON.stringify([...(nodeParent.props.children ?? [])])
+      );
+      const nodeNew = JSON.parse(JSON.stringify({ ...node }));
+
+      const childrenAmount = nodeParentNewChildren.length;
+      const nodeIndex = nodeParentNewChildren.findIndex(
+        (n: WeaveStateElement) => n.key === nodeNew.key
+      );
+
+      nodeParentNewChildren.splice(nodeIndex, 1);
+
+      if (position === WEAVE_NODE_POSITION.UP) {
+        nodeParentNewChildren.splice(nodeIndex + 1, 0, nodeNew);
+      }
+      if (position === WEAVE_NODE_POSITION.DOWN) {
+        nodeParentNewChildren.splice(nodeIndex - 1, 0, nodeNew);
+      }
+      if (position === WEAVE_NODE_POSITION.FRONT) {
+        nodeParentNewChildren.splice(childrenAmount - 1, 0, nodeNew);
+      }
+      if (position === WEAVE_NODE_POSITION.BACK) {
+        nodeParentNewChildren.splice(0, 0, nodeNew);
+      }
+
+      nodeParentNewChildren = nodeParentNewChildren.map(
+        (actNode: WeaveStateElement, index: number) => {
+          return {
+            ...actNode,
+            props: {
+              ...actNode.props,
+              zIndex: index,
+            },
+          };
         }
+      );
 
-        const { node: nodeState, parent: nodeParent } = this.findNodeById(
-          state.weave as WeaveStateElement,
-          node.key
-        );
-        if (!nodeState) {
-          const msg = `Node with key [${node.key}] doesn't exists, cannot update it`;
-          this.logger.warn({ node }, msg);
-          return;
-        }
+      if (!nodeParent.props.children) {
+        nodeParent.props.children = [];
+      }
 
-        if (nodeParent) {
-          let nodeParentNewChildren = JSON.parse(
-            JSON.stringify([...(nodeParent.props.children ?? [])])
-          );
-          const nodeNew = JSON.parse(JSON.stringify({ ...node }));
-
-          const childrenAmount = nodeParentNewChildren.length;
-          const nodeIndex = nodeParentNewChildren.findIndex(
-            (n: WeaveStateElement) => n.key === nodeNew.key
-          );
-
-          nodeParentNewChildren.splice(nodeIndex, 1);
-
-          if (position === WEAVE_NODE_POSITION.UP) {
-            nodeParentNewChildren.splice(nodeIndex + 1, 0, nodeNew);
-          }
-          if (position === WEAVE_NODE_POSITION.DOWN) {
-            nodeParentNewChildren.splice(nodeIndex - 1, 0, nodeNew);
-          }
-          if (position === WEAVE_NODE_POSITION.FRONT) {
-            nodeParentNewChildren.splice(childrenAmount - 1, 0, nodeNew);
-          }
-          if (position === WEAVE_NODE_POSITION.BACK) {
-            nodeParentNewChildren.splice(0, 0, nodeNew);
-          }
-
-          nodeParentNewChildren = nodeParentNewChildren.map(
-            (actNode: WeaveStateElement, index: number) => {
-              return {
-                ...actNode,
-                props: {
-                  ...actNode.props,
-                  zIndex: index,
-                },
-              };
-            }
-          );
-
-          if (!nodeParent.props.children) {
-            nodeParent.props.children = [];
-          }
-
-          nodeParent.props.children = nodeParentNewChildren;
-        }
-      }, userId);
+      nodeParent.props.children = nodeParentNewChildren;
+    }
+    // }, userId);
   }
 
   getElementsTree(): WeaveStateElement[] {
@@ -370,6 +428,10 @@ export class WeaveStateManager {
     );
 
     if (!mainLayer) {
+      return [];
+    }
+
+    if (!mainLayer.props?.children) {
       return [];
     }
 

@@ -120,8 +120,6 @@ export abstract class WeaveStore implements WeaveStoreBase {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
       ) as AbstractType<any>;
 
-      console.log(`User: ${this.config.getUser().id}`);
-
       if (weaveStateValues) {
         this.undoManager = new UndoManager([weaveStateValues], {
           captureTimeout: 250,
@@ -163,6 +161,8 @@ export abstract class WeaveStore implements WeaveStoreBase {
 
     observeDeep(this.getState(), () => {
       const newState: WeaveState = JSON.parse(JSON.stringify(this.getState()));
+
+      this.logger.info({ newState }, 'State changed');
 
       this.instance.emitEvent<WeaveStoreOnStateChangeEvent>(
         'onStateChange',
