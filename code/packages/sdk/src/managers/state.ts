@@ -177,42 +177,46 @@ export class WeaveStateManager {
       'addNode: parent before add'
     );
 
-    if (!parent.props.children) {
-      parent.props.children = [];
-    }
+    const doc = getYjsDoc(state);
 
-    if (index) {
-      parent.props.children.splice(index, 0, node);
-      for (let i = 0; i < parent.props.children.length; i++) {
-        parent.props.children[i].props.zIndex = i;
+    doc.transact(() => {
+      if (!parent.props.children) {
+        parent.props.children = [];
       }
-    }
 
-    if (!index) {
-      const childrenAmount = parent.props.children.length;
+      if (index) {
+        parent.props.children.splice(index, 0, node);
+        for (let i = 0; i < parent.props.children.length; i++) {
+          parent.props.children[i].props.zIndex = i;
+        }
+      }
 
-      const nodeToAdd = {
-        ...node,
-        props: {
-          ...node.props,
-          zIndex: childrenAmount,
-        },
-      };
+      if (!index) {
+        const childrenAmount = parent.props.children.length;
+
+        const nodeToAdd = {
+          ...node,
+          props: {
+            ...node.props,
+            zIndex: childrenAmount,
+          },
+        };
+
+        this.logger.info(
+          { node: JSON.parse(JSON.stringify(nodeToAdd)) },
+          'addNode: node to add'
+        );
+
+        parent.props.children.push(nodeToAdd);
+      }
 
       this.logger.info(
-        { node: JSON.parse(JSON.stringify(nodeToAdd)) },
-        'addNode: node to add'
+        { parent: JSON.parse(JSON.stringify(parent)) },
+        'addNode: parent after add'
       );
 
-      parent.props.children.push(nodeToAdd);
-    }
-
-    this.logger.info(
-      { parent: JSON.parse(JSON.stringify(parent)) },
-      'addNode: parent after add'
-    );
-
-    this.instance.emitEvent('onNodeAdded', node);
+      this.instance.emitEvent('onNodeAdded', node);
+    });
   }
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
