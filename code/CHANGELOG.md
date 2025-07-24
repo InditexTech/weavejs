@@ -13,6 +13,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- [#526](https://github.com/InditexTech/weavejs/issues/552620) Remaining tools movement on touch devices
+- [#508](https://github.com/InditexTech/weavejs/issues/552620) Check tools to avoid multiple pointers, also determine if tool allows to zoom and pan
+
 ## [0.42.2] - 2025-07-24
 
 ### Fixed

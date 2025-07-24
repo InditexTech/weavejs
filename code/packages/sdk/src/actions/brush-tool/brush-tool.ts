@@ -7,7 +7,11 @@ import { type WeaveElementInstance } from '@inditextech/weave-types';
 import Konva from 'konva';
 import { type Vector2d } from 'konva/lib/types';
 import { WeaveAction } from '@/actions/action';
-import { type WeaveBrushToolActionState } from './types';
+import {
+  type WeaveBrushToolActionOnAddedEvent,
+  type WeaveBrushToolActionOnAddingEvent,
+  type WeaveBrushToolActionState,
+} from './types';
 import { BRUSH_TOOL_ACTION_NAME, BRUSH_TOOL_STATE } from './constants';
 import { WeaveNodesSelectionPlugin } from '@/plugins/nodes-selection/nodes-selection';
 import type { WeaveStrokeNode } from '@/nodes/stroke/stroke';
@@ -317,6 +321,8 @@ export class WeaveBrushToolAction extends WeaveAction {
     this.props = this.initProps();
     this.setState(BRUSH_TOOL_STATE.IDLE);
 
+    this.instance.emitEvent<WeaveBrushToolActionOnAddingEvent>('onAddingBrush');
+
     stage.container().style.cursor = 'crosshair';
   }
 
@@ -324,6 +330,8 @@ export class WeaveBrushToolAction extends WeaveAction {
     const stage = this.instance.getStage();
 
     stage.container().style.cursor = 'default';
+
+    this.instance.emitEvent<WeaveBrushToolActionOnAddedEvent>('onAddedBrush');
 
     const selectionPlugin =
       this.instance.getPlugin<WeaveNodesSelectionPlugin>('nodesSelection');

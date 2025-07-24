@@ -5,9 +5,12 @@
 import { v4 as uuidv4 } from 'uuid';
 import Konva from 'konva';
 import { type Vector2d } from 'konva/lib/types';
-import { type WeaveElementInstance } from '@inditextech/weave-types';
 import { WeaveAction } from '@/actions/action';
-import { type WeavePenToolActionState } from './types';
+import {
+  type WeavePenToolActionOnAddedEvent,
+  type WeavePenToolActionOnAddingEvent,
+  type WeavePenToolActionState,
+} from './types';
 import { PEN_TOOL_ACTION_NAME, PEN_TOOL_STATE } from './constants';
 import { WeaveNodesSelectionPlugin } from '@/plugins/nodes-selection/nodes-selection';
 import type { WeaveLineNode } from '@/nodes/line/line';
@@ -18,6 +21,8 @@ export class WeavePenToolAction extends WeaveAction {
   protected state: WeavePenToolActionState;
   protected lineId: string | null;
   protected tempLineId: string | null;
+  protected tempMainLineNode: Konva.Line | null;
+  protected tempLineNode: Konva.Line | null;
   protected container: Konva.Layer | Konva.Node | undefined;
   protected measureContainer: Konva.Layer | Konva.Group | undefined;
   protected clickPoint: Vector2d | null;
@@ -36,6 +41,8 @@ export class WeavePenToolAction extends WeaveAction {
     this.state = PEN_TOOL_STATE.IDLE;
     this.lineId = null;
     this.tempLineId = null;
+    this.tempMainLineNode = null;
+    this.tempLineNode = null;
     this.container = undefined;
     this.measureContainer = undefined;
     this.clickPoint = null;
@@ -92,16 +99,16 @@ export class WeavePenToolAction extends WeaveAction {
         return;
       }
 
-      if (this.state === PEN_TOOL_STATE.ADDING) {
+      if (!this.tempMainLineNode && this.state === PEN_TOOL_STATE.ADDING) {
         this.handleAdding();
+      }
+
+      if (this.tempMainLineNode && this.state === PEN_TOOL_STATE.ADDING) {
+        this.state = PEN_TOOL_STATE.DEFINING_SIZE;
       }
     });
 
-    stage.on('pointermove', (e) => {
-      if (!this.isPressed(e)) return;
-
-      if (!this.pointers.has(e.evt.pointerId)) return;
-
+    stage.on('pointermove', () => {
       if (
         this.pointers.size === 2 &&
         this.instance.getActiveAction() === PEN_TOOL_ACTION_NAME
@@ -123,26 +130,6 @@ export class WeavePenToolAction extends WeaveAction {
       }
     });
 
-    // stage.on('pointerclick', () => {
-    //   if (this.state === PEN_TOOL_STATE.IDLE) {
-    //     return;
-    //   }
-
-    //   if (this.state === PEN_TOOL_STATE.ADDING) {
-    //     this.handleAdding();
-    //     return;
-    //   }
-
-    //   if (this.state === PEN_TOOL_STATE.DEFINING_SIZE) {
-    //     this.handleSettingSize();
-    //     return;
-    //   }
-    // });
-
-    // stage.on('pointermove', () => {
-    //   this.handleMovement();
-    // });
-
     this.initialized = true;
   }
 
@@ -154,6 +141,9 @@ export class WeavePenToolAction extends WeaveAction {
     const stage = this.instance.getStage();
 
     stage.container().style.cursor = 'crosshair';
+    stage.container().focus();
+
+    this.instance.emitEvent<WeavePenToolActionOnAddingEvent>('onAddingPen');
 
     this.tempPoint = undefined;
     this.tempNextPoint = undefined;
@@ -173,91 +163,73 @@ export class WeavePenToolAction extends WeaveAction {
     this.lineId = uuidv4();
     this.tempLineId = uuidv4();
 
-    const nodeHandler = this.instance.getNodeHandler<WeaveLineNode>('line');
-
-    if (nodeHandler) {
-      const node = nodeHandler.create(this.lineId, {
+    if (!this.tempLineNode) {
+      this.tempMainLineNode = new Konva.Line({
         ...this.props,
+        id: this.lineId,
         strokeScaleEnabled: true,
         x: this.clickPoint?.x ?? 0,
         y: this.clickPoint?.y ?? 0,
         points: [0, 0],
       });
-      this.instance.addNode(node, this.container?.getAttrs().id);
-    }
+      this.measureContainer?.add(this.tempMainLineNode);
 
-    this.tempPoint = new Konva.Circle({
-      x: this.clickPoint?.x ?? 0,
-      y: this.clickPoint?.y ?? 0,
-      radius: 5 / stage.scaleX(),
-      strokeScaleEnabled: true,
-      stroke: '#cccccc',
-      strokeWidth: 0,
-      fill: '#cccccc',
-    });
-    this.measureContainer?.add(this.tempPoint);
+      this.tempPoint = new Konva.Circle({
+        x: this.clickPoint?.x ?? 0,
+        y: this.clickPoint?.y ?? 0,
+        radius: 5 / stage.scaleX(),
+        strokeScaleEnabled: true,
+        stroke: '#cccccc',
+        strokeWidth: 0,
+        fill: '#cccccc',
+      });
+      this.measureContainer?.add(this.tempPoint);
 
-    if (nodeHandler) {
-      const tempLine = nodeHandler.create(this.tempLineId, {
+      this.tempLineNode = new Konva.Line({
         ...this.props,
+        id: this.tempLineId,
         x: this.clickPoint?.x ?? 0,
         y: this.clickPoint?.y ?? 0,
         strokeScaleEnabled: true,
         points: [0, 0],
       });
-      this.instance.addNode(tempLine, this.container?.getAttrs().id);
+      this.measureContainer?.add(this.tempLineNode);
+
+      this.tempNextPoint = new Konva.Circle({
+        x: this.clickPoint?.x ?? 0,
+        y: this.clickPoint?.y ?? 0,
+        radius: 5 / stage.scaleX(),
+        strokeScaleEnabled: true,
+        stroke: '#cccccc',
+        strokeWidth: 0,
+        fill: '#cccccc',
+      });
+      this.measureContainer?.add(this.tempNextPoint);
+
+      this.setState(PEN_TOOL_STATE.DEFINING_SIZE);
     }
-
-    this.tempNextPoint = new Konva.Circle({
-      x: this.clickPoint?.x ?? 0,
-      y: this.clickPoint?.y ?? 0,
-      radius: 5 / stage.scaleX(),
-      strokeScaleEnabled: true,
-      stroke: '#cccccc',
-      strokeWidth: 0,
-      fill: '#cccccc',
-    });
-    this.measureContainer?.add(this.tempNextPoint);
-
-    this.setState(PEN_TOOL_STATE.DEFINING_SIZE);
   }
 
   private handleSettingSize() {
-    const tempLine = this.instance.getStage().findOne(`#${this.tempLineId}`) as
-      | Konva.Line
-      | undefined;
-
-    const tempMainLine = this.instance.getStage().findOne(`#${this.lineId}`) as
-      | Konva.Line
-      | undefined;
-
     if (
       this.lineId &&
+      this.tempLineNode &&
+      this.tempMainLineNode &&
       this.tempPoint &&
       this.tempNextPoint &&
-      this.measureContainer &&
-      tempMainLine &&
-      tempLine
+      this.measureContainer
     ) {
       const { mousePoint } = this.instance.getMousePointerRelativeToContainer(
         this.measureContainer
       );
 
-      const newPoints = [...tempMainLine.points()];
-      newPoints.push(mousePoint.x - tempMainLine.x());
-      newPoints.push(mousePoint.y - tempMainLine.y());
-      tempMainLine.setAttrs({
+      const newPoints = [...this.tempMainLineNode.points()];
+      newPoints.push(mousePoint.x - this.tempMainLineNode.x());
+      newPoints.push(mousePoint.y - this.tempMainLineNode.y());
+      this.tempMainLineNode.setAttrs({
         ...this.props,
         points: newPoints,
       });
-
-      const nodeHandler = this.instance.getNodeHandler<WeaveLineNode>('line');
-
-      if (nodeHandler) {
-        this.instance.updateNode(
-          nodeHandler.serialize(tempMainLine as WeaveElementInstance)
-        );
-      }
 
       this.tempPoint.setAttrs({
         x: mousePoint.x,
@@ -269,21 +241,15 @@ export class WeavePenToolAction extends WeaveAction {
         y: mousePoint.y,
       });
 
-      tempLine.setAttrs({
+      this.tempLineNode.setAttrs({
         ...this.props,
         x: mousePoint.x,
         y: mousePoint.y,
         points: [0, 0],
       });
 
-      if (nodeHandler) {
-        this.instance.updateNode(
-          nodeHandler.serialize(tempLine as WeaveElementInstance)
-        );
-      }
+      this.setState(PEN_TOOL_STATE.DEFINING_SIZE);
     }
-
-    this.setState(PEN_TOOL_STATE.DEFINING_SIZE);
   }
 
   private handleMovement() {
@@ -291,37 +257,20 @@ export class WeavePenToolAction extends WeaveAction {
       return;
     }
 
-    const tempLine = this.instance.getStage().findOne(`#${this.tempLineId}`) as
-      | Konva.Line
-      | undefined;
-
-    if (
-      this.lineId &&
-      this.measureContainer &&
-      this.tempNextPoint &&
-      tempLine
-    ) {
+    if (this.tempLineNode && this.measureContainer && this.tempNextPoint) {
       const { mousePoint } = this.instance.getMousePointerRelativeToContainer(
         this.measureContainer
       );
 
-      tempLine.setAttrs({
+      this.tempLineNode.setAttrs({
         ...this.props,
         points: [
-          tempLine.points()[0],
-          tempLine.points()[1],
-          mousePoint.x - tempLine.x(),
-          mousePoint.y - tempLine.y(),
+          this.tempLineNode.points()[0],
+          this.tempLineNode.points()[1],
+          mousePoint.x - this.tempLineNode.x(),
+          mousePoint.y - this.tempLineNode.y(),
         ],
       });
-
-      const nodeHandler = this.instance.getNodeHandler<WeaveLineNode>('line');
-
-      if (nodeHandler) {
-        this.instance.updateNode(
-          nodeHandler.serialize(tempLine as WeaveElementInstance)
-        );
-      }
 
       this.tempNextPoint.setAttrs({
         x: mousePoint.x,
@@ -361,46 +310,26 @@ export class WeavePenToolAction extends WeaveAction {
 
     this.tempPoint?.destroy();
     this.tempNextPoint?.destroy();
+    this.tempLineNode?.destroy();
 
-    const tempLine = this.instance.getStage().findOne(`#${this.tempLineId}`) as
-      | Konva.Line
-      | undefined;
-
-    const tempMainLine = this.instance.getStage().findOne(`#${this.lineId}`) as
-      | Konva.Line
-      | undefined;
-
-    if (tempLine) {
-      const nodeHandler = this.instance.getNodeHandler<WeaveLineNode>('line');
-      if (nodeHandler) {
-        this.instance.removeNode(
-          nodeHandler.serialize(tempLine as WeaveElementInstance)
-        );
-      }
-    }
-
-    if (this.lineId && tempMainLine && tempMainLine.points().length < 4) {
-      const nodeHandler = this.instance.getNodeHandler<WeaveLineNode>('line');
-      if (nodeHandler) {
-        this.instance.removeNode(
-          nodeHandler.serialize(tempMainLine as WeaveElementInstance)
-        );
-      }
-    }
-
-    if (this.lineId && tempMainLine && tempMainLine.points().length >= 4) {
+    if (
+      this.lineId &&
+      this.tempMainLineNode &&
+      this.tempMainLineNode.points().length >= 4
+    ) {
       const nodeHandler = this.instance.getNodeHandler<WeaveLineNode>('line');
 
-      tempMainLine.setAttrs({
-        ...this.props,
-        strokeWidth: 1,
-        hitStrokeWidth: 16,
-      });
-
       if (nodeHandler) {
-        this.instance.updateNode(
-          nodeHandler.serialize(tempMainLine as WeaveElementInstance)
-        );
+        const clonedLine = this.tempMainLineNode.clone();
+        this.tempMainLineNode.destroy();
+        const node = nodeHandler.create(this.lineId, {
+          ...this.props,
+          ...clonedLine.getAttrs(),
+          hitStrokeWidth: 16,
+        });
+        this.instance.addNode(node, this.container?.getAttrs().id);
+
+        this.instance.emitEvent<WeavePenToolActionOnAddedEvent>('onAddedPen');
       }
     }
 
@@ -420,8 +349,11 @@ export class WeavePenToolAction extends WeaveAction {
     this.tempPoint = undefined;
     this.tempNextPoint = undefined;
     this.lineId = null;
+    this.tempMainLineNode = null;
     this.tempLineId = null;
+    this.tempLineNode = null;
     this.container = undefined;
+    this.measureContainer = undefined;
     this.clickPoint = null;
     this.setState(PEN_TOOL_STATE.IDLE);
   }

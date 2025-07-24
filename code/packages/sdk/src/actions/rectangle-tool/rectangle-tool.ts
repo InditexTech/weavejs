@@ -5,7 +5,6 @@
 import { v4 as uuidv4 } from 'uuid';
 import Konva from 'konva';
 import { type Vector2d } from 'konva/lib/types';
-import { type WeaveElementInstance } from '@inditextech/weave-types';
 import { WeaveAction } from '@/actions/action';
 import {
   type WeaveRectangleToolActionOnAddingEvent,
@@ -20,11 +19,12 @@ export class WeaveRectangleToolAction extends WeaveAction {
   protected initialized: boolean = false;
   protected state: WeaveRectangleToolActionState;
   protected rectId: string | null;
-  protected creating: boolean;
   protected moved: boolean;
+  protected tempRectNode: Konva.Rect | null;
   protected pointers: Map<number, Vector2d>;
   protected clickPoint: Vector2d | null;
   protected container!: Konva.Layer | Konva.Node | undefined;
+  protected measureContainer: Konva.Layer | Konva.Group | undefined;
   protected cancelAction!: () => void;
   onPropsChange = undefined;
   onInit = undefined;
@@ -36,9 +36,10 @@ export class WeaveRectangleToolAction extends WeaveAction {
     this.initialized = false;
     this.state = RECTANGLE_TOOL_STATE.IDLE;
     this.rectId = null;
-    this.creating = false;
+    this.tempRectNode = null;
     this.moved = false;
     this.container = undefined;
+    this.measureContainer = undefined;
     this.clickPoint = null;
     this.props = this.initProps();
   }
@@ -95,8 +96,6 @@ export class WeaveRectangleToolAction extends WeaveAction {
       }
 
       if (this.state === RECTANGLE_TOOL_STATE.ADDING) {
-        this.creating = true;
-
         this.handleAdding();
       }
     });
@@ -115,8 +114,6 @@ export class WeaveRectangleToolAction extends WeaveAction {
       }
 
       if (this.state === RECTANGLE_TOOL_STATE.DEFINING_SIZE) {
-        this.moved = true;
-
         this.handleMovement();
       }
     });
@@ -131,8 +128,6 @@ export class WeaveRectangleToolAction extends WeaveAction {
       }
 
       if (this.state === RECTANGLE_TOOL_STATE.DEFINING_SIZE) {
-        this.creating = false;
-
         this.handleSettingSize();
       }
     });
@@ -159,41 +154,36 @@ export class WeaveRectangleToolAction extends WeaveAction {
   }
 
   private handleAdding() {
-    const { mousePoint, container } = this.instance.getMousePointer();
+    const { mousePoint, container, measureContainer } =
+      this.instance.getMousePointer();
 
     this.clickPoint = mousePoint;
     this.container = container;
+    this.measureContainer = measureContainer;
 
     this.rectId = uuidv4();
 
-    const nodeHandler =
-      this.instance.getNodeHandler<WeaveRectangleNode>('rectangle');
-
-    if (nodeHandler) {
-      const node = nodeHandler.create(this.rectId, {
+    if (!this.tempRectNode) {
+      this.tempRectNode = new Konva.Rect({
         ...this.props,
+        id: this.rectId,
         strokeScaleEnabled: true,
         x: this.clickPoint?.x ?? 0,
         y: this.clickPoint?.y ?? 0,
         width: 0,
         height: 0,
       });
-      this.instance.addNode(node, this.container?.getAttrs().id);
+      this.measureContainer?.add(this.tempRectNode);
     }
 
     this.setState(RECTANGLE_TOOL_STATE.DEFINING_SIZE);
   }
 
   private handleSettingSize() {
-    const rectangle = this.instance.getStage().findOne(`#${this.rectId}`);
-
-    if (this.rectId && this.clickPoint && this.container && rectangle) {
+    if (this.rectId && this.tempRectNode && this.clickPoint && this.container) {
       const { mousePoint } = this.instance.getMousePointerRelativeToContainer(
         this.container
       );
-
-      const nodeHandler =
-        this.instance.getNodeHandler<WeaveRectangleNode>('rectangle');
 
       const rectPos: Vector2d = {
         x: this.clickPoint.x,
@@ -208,7 +198,7 @@ export class WeaveRectangleToolAction extends WeaveAction {
         rectHeight = Math.abs(this.clickPoint.y - mousePoint.y);
       }
 
-      rectangle.setAttrs({
+      this.tempRectNode.setAttrs({
         ...this.props,
         x: rectPos.x,
         y: rectPos.y,
@@ -216,10 +206,19 @@ export class WeaveRectangleToolAction extends WeaveAction {
         height: rectHeight,
       });
 
+      const nodeHandler =
+        this.instance.getNodeHandler<WeaveRectangleNode>('rectangle');
+
       if (nodeHandler) {
-        this.instance.updateNode(
-          nodeHandler.serialize(rectangle as WeaveElementInstance)
-        );
+        const clonedRectNode = this.tempRectNode.clone();
+        this.tempRectNode.destroy();
+
+        const node = nodeHandler.create(this.rectId, {
+          ...this.props,
+          ...clonedRectNode.getAttrs(),
+        });
+
+        this.instance.addNode(node, this.container?.getAttrs().id);
       }
 
       this.instance.emitEvent<WeaveRectangleToolActionOnAddingEvent>(
@@ -235,29 +234,25 @@ export class WeaveRectangleToolAction extends WeaveAction {
       return;
     }
 
-    const rectangle = this.instance.getStage().findOne(`#${this.rectId}`);
+    if (
+      this.rectId &&
+      this.tempRectNode &&
+      this.measureContainer &&
+      this.clickPoint
+    ) {
+      this.moved = true;
 
-    if (this.rectId && this.container && this.clickPoint && rectangle) {
       const { mousePoint } = this.instance.getMousePointerRelativeToContainer(
-        this.container
+        this.measureContainer
       );
 
       const deltaX = mousePoint.x - this.clickPoint?.x;
       const deltaY = mousePoint.y - this.clickPoint?.y;
 
-      const nodeHandler =
-        this.instance.getNodeHandler<WeaveRectangleNode>('rectangle');
-
-      rectangle.setAttrs({
+      this.tempRectNode.setAttrs({
         width: deltaX,
         height: deltaY,
       });
-
-      if (nodeHandler) {
-        this.instance.updateNode(
-          nodeHandler.serialize(rectangle as WeaveElementInstance)
-        );
-      }
     }
   }
 
@@ -302,9 +297,10 @@ export class WeaveRectangleToolAction extends WeaveAction {
     }
 
     this.rectId = null;
-    this.creating = false;
+    this.tempRectNode = null;
     this.moved = false;
     this.container = undefined;
+    this.measureContainer = undefined;
     this.clickPoint = null;
     this.setState(RECTANGLE_TOOL_STATE.IDLE);
   }

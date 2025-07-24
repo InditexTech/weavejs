@@ -10,6 +10,7 @@ import { WeaveAction } from '../action';
 import { WEAVE_NODE_LAYER_ID } from '@inditextech/weave-types';
 import { WeaveNodesSelectionPlugin } from '@/plugins/nodes-selection/nodes-selection';
 import {
+  type WeaveFrameToolActionOnAddingEvent,
   type WeaveFrameToolActionState,
   type WeaveFrameToolActionTriggerParams,
   type WeaveFrameToolProps,
@@ -86,6 +87,8 @@ export class WeaveFrameToolAction extends WeaveAction {
     stage.container().style.cursor = 'crosshair';
     stage.container().focus();
 
+    this.instance.emitEvent<WeaveFrameToolActionOnAddingEvent>('onAddingFrame');
+
     this.frameId = null;
     this.clickPoint = null;
     this.setState(FRAME_TOOL_STATE.ADDING);
@@ -114,6 +117,10 @@ export class WeaveFrameToolAction extends WeaveAction {
       });
 
       this.instance.addNode(node, this.container?.getAttrs().id);
+
+      this.instance.emitEvent<WeaveFrameToolActionOnAddingEvent>(
+        'onAddedFrame'
+      );
     }
 
     this.cancelAction?.();

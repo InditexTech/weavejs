@@ -21,3 +21,6 @@ export type WeaveFrameToolProps = {
   editing: boolean;
   opacity: number;
 };
+
+export type WeaveFrameToolActionOnAddingEvent = undefined;
+export type WeaveFrameToolActionOnAddedEvent = undefined;
