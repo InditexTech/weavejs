@@ -118,20 +118,6 @@ export class WeaveStoreAzureWebPubSubSyncHost extends Emittery {
       syncProtocol.writeUpdate(encoder, update);
       const u8 = encoding.toUint8Array(encoder);
 
-      if (origin) {
-        const actualStateJSONString = JSON.stringify(
-          doc.getMap('weave').toJSON(),
-          null,
-          2
-        );
-
-        console.log(`=======================================`);
-        console.log(`State update from ${origin}`);
-        console.log(`=======================================`);
-        console.log(actualStateJSONString);
-        console.log(`=======================================`);
-      }
-
       this.broadcast(this.topic, origin, u8);
     };
     this.doc.on('update', updateHandler);

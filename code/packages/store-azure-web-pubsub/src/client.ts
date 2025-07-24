@@ -206,14 +206,6 @@ export class WeaveStoreAzureWebPubSubSyncClient extends Emittery {
         encoding.writeVarUint(encoder, messageSyncStep1);
         syncProtocol.writeUpdate(encoder, update);
 
-        if (origin) {
-          const actualStateJSON = this.doc.getMap('weave').toJSON();
-
-          console.log(`State update from: ${origin}`, {
-            actualStateJSON,
-          });
-        }
-
         sendToControlGroup(
           this,
           topic,
