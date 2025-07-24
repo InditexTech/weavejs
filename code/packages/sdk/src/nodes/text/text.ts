@@ -168,7 +168,7 @@ export class WeaveTextNode extends WeaveNode {
         });
         resetScale(text);
         text.fontSize(text.fontSize() * text.scaleY());
-        this.instance.updateNode(this.serialize(text));
+        // this.instance.updateNode(this.serialize(text));
         e.cancelBubble = true;
       }
     });

@@ -225,14 +225,14 @@ export abstract class WeaveNode implements WeaveNodeBase {
         if (this.isSelecting() && this.isNodeSelected(node)) {
           this.scaleReset(node);
 
-          const nodeHandler = this.instance.getNodeHandler<WeaveNode>(
-            node.getAttrs().nodeType
-          );
-          if (nodeHandler) {
-            this.instance.updateNode(
-              nodeHandler.serialize(node as WeaveElementInstance)
-            );
-          }
+          // const nodeHandler = this.instance.getNodeHandler<WeaveNode>(
+          //   node.getAttrs().nodeType
+          // );
+          // if (nodeHandler) {
+          //   this.instance.updateNode(
+          //     nodeHandler.serialize(node as WeaveElementInstance)
+          //   );
+          // }
         }
       };
 

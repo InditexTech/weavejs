@@ -13,6 +13,30 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.42.0] - 2025-07-24
+
+### Added
+
+- [#520](https://github.com/InditexTech/weavejs/issues/520) Avoid merging state without references
+
+## [0.41.0] - 2025-07-23
+
+### Added
+
+- [#518](https://github.com/InditexTech/weavejs/issues/518) Added more loggin on azure web pubsub store
+
+## [0.40.2] - 2025-07-23
+
+### Fixed
+
+- [#516](https://github.com/InditexTech/weavejs/issues/516) Improve nodes state sync
+
+## [0.40.1] - 2025-07-23
+
+### Added
+
+- [#514](https://github.com/InditexTech/weavejs/issues/514) Logs to validate performance issues
+
 ## [0.40.0] - 2025-07-22
 
 ### Added
@@ -688,7 +712,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - [#24](https://github.com/InditexTech/weavejs/issues/24) Bug when loading rooms with text or images
 - [#18](https://github.com/InditexTech/weavejs/issues/18) Fix awareness not working on store-azure-web-pubsub
 
-[Unreleased]: https://github.com/InditexTech/weavejs/compare/0.40.0...HEAD
+[Unreleased]: https://github.com/InditexTech/weavejs/compare/0.42.0...HEAD
+
+[0.42.0]: https://github.com/InditexTech/weavejs/compare/0.41.0...0.42.0
+
+[0.41.0]: https://github.com/InditexTech/weavejs/compare/0.40.2...0.41.0
+
+[0.40.2]: https://github.com/InditexTech/weavejs/compare/0.40.1...0.40.2
+
+[0.40.1]: https://github.com/InditexTech/weavejs/compare/0.40.0...0.40.1
 
 [0.40.0]: https://github.com/InditexTech/weavejs/compare/0.39.3...0.40.0
 

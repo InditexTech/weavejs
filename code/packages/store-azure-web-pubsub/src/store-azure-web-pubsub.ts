@@ -69,6 +69,13 @@ export class WeaveStoreAzureWebPubsub extends WeaveStore {
     this.instance.emitEvent(name, payload);
   }
 
+  getClientId(): string | null {
+    if (this.provider) {
+      return this.provider.getClientId();
+    }
+    return null;
+  }
+
   async connect(): Promise<void> {
     const { fetchClient } = this.azureWebPubsubOptions;
 
