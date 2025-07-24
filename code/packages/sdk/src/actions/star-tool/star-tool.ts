@@ -7,7 +7,11 @@ import Konva from 'konva';
 import { type Vector2d } from 'konva/lib/types';
 import { type WeaveElementInstance } from '@inditextech/weave-types';
 import { WeaveAction } from '@/actions/action';
-import { type WeaveStarToolActionState } from './types';
+import {
+  type WeaveStarToolActionOnAddedEvent,
+  type WeaveStarToolActionOnAddingEvent,
+  type WeaveStarToolActionState,
+} from './types';
 import { STAR_TOOL_ACTION_NAME, STAR_TOOL_STATE } from './constants';
 import { WeaveNodesSelectionPlugin } from '@/plugins/nodes-selection/nodes-selection';
 import { SELECTION_TOOL_ACTION_NAME } from '../selection-tool/constants';
@@ -19,6 +23,7 @@ export class WeaveStarToolAction extends WeaveAction {
   protected starId: string | null;
   protected creating: boolean;
   protected moved: boolean;
+  protected pointers: Map<number, Vector2d>;
   protected clickPoint: Vector2d | null;
   protected container!: Konva.Layer | Konva.Node | undefined;
   protected cancelAction!: () => void;
@@ -28,6 +33,7 @@ export class WeaveStarToolAction extends WeaveAction {
   constructor() {
     super();
 
+    this.pointers = new Map<number, Vector2d>();
     this.initialized = false;
     this.state = STAR_TOOL_STATE.IDLE;
     this.starId = null;
@@ -78,6 +84,19 @@ export class WeaveStarToolAction extends WeaveAction {
     stage.on('pointerdown', (e) => {
       this.setTapStart(e);
 
+      this.pointers.set(e.evt.pointerId, {
+        x: e.evt.clientX,
+        y: e.evt.clientY,
+      });
+
+      if (
+        this.pointers.size === 2 &&
+        this.instance.getActiveAction() === STAR_TOOL_ACTION_NAME
+      ) {
+        this.state = STAR_TOOL_STATE.ADDING;
+        return;
+      }
+
       if (this.state === STAR_TOOL_STATE.ADDING) {
         this.creating = true;
 
@@ -88,6 +107,16 @@ export class WeaveStarToolAction extends WeaveAction {
     stage.on('pointermove', (e) => {
       if (!this.isPressed(e)) return;
 
+      if (!this.pointers.has(e.evt.pointerId)) return;
+
+      if (
+        this.pointers.size === 2 &&
+        this.instance.getActiveAction() === STAR_TOOL_ACTION_NAME
+      ) {
+        this.state = STAR_TOOL_STATE.ADDING;
+        return;
+      }
+
       if (this.state === STAR_TOOL_STATE.DEFINING_SIZE) {
         this.moved = true;
 
@@ -96,6 +125,8 @@ export class WeaveStarToolAction extends WeaveAction {
     });
 
     stage.on('pointerup', (e) => {
+      this.pointers.delete(e.evt.pointerId);
+
       const isTap = this.isTap(e);
 
       if (isTap) {
@@ -121,6 +152,8 @@ export class WeaveStarToolAction extends WeaveAction {
 
     stage.container().style.cursor = 'crosshair';
     stage.container().focus();
+
+    this.instance.emitEvent<WeaveStarToolActionOnAddingEvent>('onAddingStar');
 
     this.clickPoint = null;
     this.setState(STAR_TOOL_STATE.ADDING);
@@ -188,6 +221,8 @@ export class WeaveStarToolAction extends WeaveAction {
           nodeHandler.serialize(star as WeaveElementInstance)
         );
       }
+
+      this.instance.emitEvent<WeaveStarToolActionOnAddedEvent>('onAddedStar');
     }
 
     this.cancelAction();

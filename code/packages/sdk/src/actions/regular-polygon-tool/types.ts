@@ -8,3 +8,6 @@ export type WeaveRegularPolygonToolActionStateKeys =
   keyof typeof REGULAR_POLYGON_TOOL_STATE;
 export type WeaveRegularPolygonToolActionState =
   (typeof REGULAR_POLYGON_TOOL_STATE)[WeaveRegularPolygonToolActionStateKeys];
+
+export type WeaveRegularPolygonToolActionOnAddingEvent = undefined;
+export type WeaveRegularPolygonToolActionOnAddedEvent = undefined;

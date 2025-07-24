@@ -7,7 +7,11 @@ import Konva from 'konva';
 import { type Vector2d } from 'konva/lib/types';
 import { type WeaveElementInstance } from '@inditextech/weave-types';
 import { WeaveAction } from '@/actions/action';
-import { type WeaveEllipseToolActionState } from './types';
+import {
+  type WeaveEllipseToolActionOnAddedEvent,
+  type WeaveEllipseToolActionOnAddingEvent,
+  type WeaveEllipseToolActionState,
+} from './types';
 import { ELLIPSE_TOOL_ACTION_NAME, ELLIPSE_TOOL_STATE } from './constants';
 import { WeaveNodesSelectionPlugin } from '@/plugins/nodes-selection/nodes-selection';
 import { SELECTION_TOOL_ACTION_NAME } from '../selection-tool/constants';
@@ -19,6 +23,7 @@ export class WeaveEllipseToolAction extends WeaveAction {
   protected ellipseId: string | null;
   protected creating: boolean;
   protected moved: boolean;
+  protected pointers: Map<number, Vector2d>;
   protected clickPoint: Vector2d | null;
   protected container!: Konva.Layer | Konva.Node | undefined;
   protected cancelAction!: () => void;
@@ -28,6 +33,7 @@ export class WeaveEllipseToolAction extends WeaveAction {
   constructor() {
     super();
 
+    this.pointers = new Map<number, Vector2d>();
     this.initialized = false;
     this.state = ELLIPSE_TOOL_STATE.IDLE;
     this.ellipseId = null;
@@ -77,6 +83,19 @@ export class WeaveEllipseToolAction extends WeaveAction {
     stage.on('pointerdown', (e) => {
       this.setTapStart(e);
 
+      this.pointers.set(e.evt.pointerId, {
+        x: e.evt.clientX,
+        y: e.evt.clientY,
+      });
+
+      if (
+        this.pointers.size === 2 &&
+        this.instance.getActiveAction() === ELLIPSE_TOOL_ACTION_NAME
+      ) {
+        this.state = ELLIPSE_TOOL_STATE.ADDING;
+        return;
+      }
+
       if (this.state === ELLIPSE_TOOL_STATE.ADDING) {
         this.creating = true;
 
@@ -87,6 +106,16 @@ export class WeaveEllipseToolAction extends WeaveAction {
     stage.on('pointermove', (e) => {
       if (!this.isPressed(e)) return;
 
+      if (!this.pointers.has(e.evt.pointerId)) return;
+
+      if (
+        this.pointers.size === 2 &&
+        this.instance.getActiveAction() === ELLIPSE_TOOL_ACTION_NAME
+      ) {
+        this.state = ELLIPSE_TOOL_STATE.ADDING;
+        return;
+      }
+
       if (this.state === ELLIPSE_TOOL_STATE.DEFINING_SIZE) {
         this.moved = true;
 
@@ -95,6 +124,8 @@ export class WeaveEllipseToolAction extends WeaveAction {
     });
 
     stage.on('pointerup', (e) => {
+      this.pointers.delete(e.evt.pointerId);
+
       const isTap = this.isTap(e);
 
       if (isTap) {
@@ -120,6 +151,10 @@ export class WeaveEllipseToolAction extends WeaveAction {
 
     stage.container().style.cursor = 'crosshair';
     stage.container().focus();
+
+    this.instance.emitEvent<WeaveEllipseToolActionOnAddingEvent>(
+      'onAddingEllipse'
+    );
 
     this.clickPoint = null;
     this.setState(ELLIPSE_TOOL_STATE.ADDING);
@@ -189,6 +224,10 @@ export class WeaveEllipseToolAction extends WeaveAction {
           nodeHandler.serialize(ellipse as WeaveElementInstance)
         );
       }
+
+      this.instance.emitEvent<WeaveEllipseToolActionOnAddedEvent>(
+        'onAddedEllipse'
+      );
     }
 
     this.cancelAction();

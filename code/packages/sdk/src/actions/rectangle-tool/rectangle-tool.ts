@@ -7,7 +7,10 @@ import Konva from 'konva';
 import { type Vector2d } from 'konva/lib/types';
 import { type WeaveElementInstance } from '@inditextech/weave-types';
 import { WeaveAction } from '@/actions/action';
-import { type WeaveRectangleToolActionState } from './types';
+import {
+  type WeaveRectangleToolActionOnAddingEvent,
+  type WeaveRectangleToolActionState,
+} from './types';
 import { RECTANGLE_TOOL_ACTION_NAME, RECTANGLE_TOOL_STATE } from './constants';
 import { WeaveNodesSelectionPlugin } from '@/plugins/nodes-selection/nodes-selection';
 import { SELECTION_TOOL_ACTION_NAME } from '../selection-tool/constants';
@@ -19,6 +22,7 @@ export class WeaveRectangleToolAction extends WeaveAction {
   protected rectId: string | null;
   protected creating: boolean;
   protected moved: boolean;
+  protected pointers: Map<number, Vector2d>;
   protected clickPoint: Vector2d | null;
   protected container!: Konva.Layer | Konva.Node | undefined;
   protected cancelAction!: () => void;
@@ -28,6 +32,7 @@ export class WeaveRectangleToolAction extends WeaveAction {
   constructor() {
     super();
 
+    this.pointers = new Map<number, Vector2d>();
     this.initialized = false;
     this.state = RECTANGLE_TOOL_STATE.IDLE;
     this.rectId = null;
@@ -76,6 +81,19 @@ export class WeaveRectangleToolAction extends WeaveAction {
     stage.on('pointerdown', (e) => {
       this.setTapStart(e);
 
+      this.pointers.set(e.evt.pointerId, {
+        x: e.evt.clientX,
+        y: e.evt.clientY,
+      });
+
+      if (
+        this.pointers.size === 2 &&
+        this.instance.getActiveAction() === RECTANGLE_TOOL_ACTION_NAME
+      ) {
+        this.state = RECTANGLE_TOOL_STATE.ADDING;
+        return;
+      }
+
       if (this.state === RECTANGLE_TOOL_STATE.ADDING) {
         this.creating = true;
 
@@ -86,6 +104,16 @@ export class WeaveRectangleToolAction extends WeaveAction {
     stage.on('pointermove', (e) => {
       if (!this.isPressed(e)) return;
 
+      if (!this.pointers.has(e.evt.pointerId)) return;
+
+      if (
+        this.pointers.size === 2 &&
+        this.instance.getActiveAction() === RECTANGLE_TOOL_ACTION_NAME
+      ) {
+        this.state = RECTANGLE_TOOL_STATE.ADDING;
+        return;
+      }
+
       if (this.state === RECTANGLE_TOOL_STATE.DEFINING_SIZE) {
         this.moved = true;
 
@@ -94,6 +122,8 @@ export class WeaveRectangleToolAction extends WeaveAction {
     });
 
     stage.on('pointerup', (e) => {
+      this.pointers.delete(e.evt.pointerId);
+
       const isTap = this.isTap(e);
 
       if (isTap) {
@@ -119,6 +149,10 @@ export class WeaveRectangleToolAction extends WeaveAction {
 
     stage.container().style.cursor = 'crosshair';
     stage.container().focus();
+
+    this.instance.emitEvent<WeaveRectangleToolActionOnAddingEvent>(
+      'onAddingRectangle'
+    );
 
     this.clickPoint = null;
     this.setState(RECTANGLE_TOOL_STATE.ADDING);
@@ -187,6 +221,10 @@ export class WeaveRectangleToolAction extends WeaveAction {
           nodeHandler.serialize(rectangle as WeaveElementInstance)
         );
       }
+
+      this.instance.emitEvent<WeaveRectangleToolActionOnAddingEvent>(
+        'onAddedRectangle'
+      );
     }
 
     this.cancelAction();
