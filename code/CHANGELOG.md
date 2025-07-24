@@ -13,7 +13,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-### Added
+## [0.43.0] - 2025-07-24
+
+\### Added
 
 - [#526](https://github.com/InditexTech/weavejs/issues/552620) Remaining tools movement on touch devices
 - [#508](https://github.com/InditexTech/weavejs/issues/552620) Check tools to avoid multiple pointers, also determine if tool allows to zoom and pan
@@ -729,7 +731,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - [#24](https://github.com/InditexTech/weavejs/issues/24) Bug when loading rooms with text or images
 - [#18](https://github.com/InditexTech/weavejs/issues/18) Fix awareness not working on store-azure-web-pubsub
 
-[Unreleased]: https://github.com/InditexTech/weavejs/compare/0.42.2...HEAD
+[Unreleased]: https://github.com/InditexTech/weavejs/compare/0.43.0...HEAD
+
+[0.43.0]: https://github.com/InditexTech/weavejs/compare/0.42.2...0.43.0
 
 [0.42.2]: https://github.com/InditexTech/weavejs/compare/0.42.1...0.42.2
 
