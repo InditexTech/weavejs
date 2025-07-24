@@ -136,11 +136,6 @@ export class WeaveStateManager {
   ): void {
     const state = this.instance.getStore().getState();
 
-    this.logger.info(
-      { state: JSON.parse(JSON.stringify(state)) },
-      'State before addNode'
-    );
-
     if (isEmpty(state.weave)) {
       const msg = `State is empty, cannot add the node`;
       this.logger.warn({ node, parentId }, msg);
@@ -167,16 +162,6 @@ export class WeaveStateManager {
       return;
     }
 
-    this.logger.info(
-      { parent: JSON.parse(JSON.stringify(parent)) },
-      'addNode: parent before init'
-    );
-
-    this.logger.info(
-      { parent: JSON.parse(JSON.stringify(parent)) },
-      'addNode: parent before add'
-    );
-
     const doc = getYjsDoc(state);
 
     doc.transact(() => {
@@ -202,18 +187,8 @@ export class WeaveStateManager {
           },
         };
 
-        this.logger.info(
-          { node: JSON.parse(JSON.stringify(nodeToAdd)) },
-          'addNode: node to add'
-        );
-
         parent.props.children.push(nodeToAdd);
       }
-
-      this.logger.info(
-        { parent: JSON.parse(JSON.stringify(parent)) },
-        'addNode: parent after add'
-      );
 
       this.instance.emitEvent('onNodeAdded', node);
     });
@@ -280,11 +255,6 @@ export class WeaveStateManager {
   updateNode(node: WeaveStateElement): void {
     const state = this.instance.getStore().getState();
 
-    this.logger.info(
-      { state: JSON.parse(JSON.stringify(state)) },
-      'State before updateNode'
-    );
-
     if (isEmpty(state.weave)) {
       const msg = `State is empty, cannot update the node`;
       this.logger.warn({ node }, msg);
@@ -301,32 +271,17 @@ export class WeaveStateManager {
       return;
     }
 
-    this.logger.info(
-      { node: JSON.parse(JSON.stringify(nodeState)), toUpdate: node },
-      'updateNode: before update'
-    );
-
     const doc = getYjsDoc(state);
 
     doc.transact(() => {
       this.deepSyncSyncedStore(nodeState.props, node.props);
     });
 
-    this.logger.info(
-      { node: JSON.parse(JSON.stringify(nodeState)) },
-      'updateNode: after update'
-    );
-
     this.instance.emitEvent('onNodeUpdated', node);
   }
 
   removeNode(node: WeaveStateElement): void {
     const state = this.instance.getStore().getState();
-
-    this.logger.info(
-      { stage: JSON.parse(JSON.stringify(state)) },
-      'State before removeNode'
-    );
 
     if (isEmpty(state.weave)) {
       const msg = `State is empty, cannot update the node`;
@@ -351,13 +306,6 @@ export class WeaveStateManager {
       return;
     }
 
-    this.logger.info({ key: node.key }, 'removeNode: node to remove');
-
-    this.logger.info(
-      { parent: JSON.parse(JSON.stringify(parent)) },
-      'removeNode: parent before remove'
-    );
-
     const doc = getYjsDoc(state);
 
     doc.transact(() => {
@@ -373,11 +321,6 @@ export class WeaveStateManager {
           parent.props.children[i].props.zIndex = i;
         }
 
-        this.logger.info(
-          { parent: JSON.parse(JSON.stringify(parent)) },
-          'removeNode: parent after remove'
-        );
-
         this.instance.emitEvent('onNodeRemoved', node);
       }
     });
@@ -391,11 +334,6 @@ export class WeaveStateManager {
 
   moveNode(node: WeaveStateElement, position: WeavePosition): void {
     const state = this.instance.getStore().getState();
-
-    this.logger.info(
-      { stage: JSON.parse(JSON.stringify(state)) },
-      'State before moveNode'
-    );
 
     if (isEmpty(state.weave)) {
       const msg = `State is empty, cannot update the node`;
@@ -418,11 +356,6 @@ export class WeaveStateManager {
       this.logger.warn({ node }, msg);
       return;
     }
-
-    this.logger.info(
-      { parent: JSON.parse(JSON.stringify(parent)) },
-      'moveNode: parent before move'
-    );
 
     if (parent.props.children) {
       const childrenAmount = parent.props.children.length;
@@ -464,11 +397,6 @@ export class WeaveStateManager {
         }
       });
     }
-
-    this.logger.info(
-      { parent: JSON.parse(JSON.stringify(parent)) },
-      'moveNode: parent after move'
-    );
   }
 
   getElementsTree(): WeaveStateElement[] {

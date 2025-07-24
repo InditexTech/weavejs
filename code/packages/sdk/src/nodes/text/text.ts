@@ -168,7 +168,6 @@ export class WeaveTextNode extends WeaveNode {
         });
         resetScale(text);
         text.fontSize(text.fontSize() * text.scaleY());
-        // this.instance.updateNode(this.serialize(text));
         e.cancelBubble = true;
       }
     });
@@ -207,12 +206,12 @@ export class WeaveTextNode extends WeaveNode {
       height,
     });
 
-    if (
-      nextProps.width !== nodeInstance.getAttrs().width ||
-      nextProps.height !== nodeInstance.getAttrs().height
-    ) {
-      this.updateNode(nodeInstance);
-    }
+    // if (
+    //   nextProps.width !== nodeInstance.getAttrs().width ||
+    //   nextProps.height !== nodeInstance.getAttrs().height
+    // ) {
+    //   this.updateNode(nodeInstance);
+    // }
 
     if (this.editing) {
       this.updateTextAreaDOM(nodeInstance as Konva.Text);
