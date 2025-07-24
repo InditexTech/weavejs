@@ -10,3 +10,6 @@ export type WeaveTextToolActionState =
 
 export type WeaveTextLayoutKeys = keyof typeof TEXT_LAYOUT;
 export type WeaveTextLayout = (typeof TEXT_LAYOUT)[WeaveTextLayoutKeys];
+
+export type WeaveTextToolActionOnAddingEvent = undefined;
+export type WeaveTextToolActionOnAddedEvent = undefined;

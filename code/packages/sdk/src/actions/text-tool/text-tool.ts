@@ -5,7 +5,10 @@
 import { v4 as uuidv4 } from 'uuid';
 import { WeaveAction } from '@/actions/action';
 import { type Vector2d } from 'konva/lib/types';
-import { type WeaveTextToolActionState } from './types';
+import {
+  type WeaveTextToolActionOnAddingEvent,
+  type WeaveTextToolActionState,
+} from './types';
 import {
   TEXT_LAYOUT,
   TEXT_TOOL_ACTION_NAME,
@@ -15,6 +18,7 @@ import Konva from 'konva';
 import { WeaveNodesSelectionPlugin } from '@/plugins/nodes-selection/nodes-selection';
 import type { WeaveTextNode } from '@/nodes/text/text';
 import { SELECTION_TOOL_ACTION_NAME } from '../selection-tool/constants';
+import type { WeaveArrowToolActionOnAddingEvent } from '../arrow-tool/types';
 
 export class WeaveTextToolAction extends WeaveAction {
   protected initialized: boolean = false;
@@ -97,6 +101,9 @@ export class WeaveTextToolAction extends WeaveAction {
     }
 
     stage.container().style.cursor = 'crosshair';
+    stage.container().focus();
+
+    this.instance.emitEvent<WeaveTextToolActionOnAddingEvent>('onAddingText');
 
     this.clickPoint = null;
     this.setState(TEXT_TOOL_STATE.ADDING);
@@ -120,6 +127,10 @@ export class WeaveTextToolAction extends WeaveAction {
         draggable: true,
       });
       this.instance.addNode(node, this.container?.getAttrs().id);
+
+      this.instance.emitEvent<WeaveArrowToolActionOnAddingEvent>(
+        'onAddedArrow'
+      );
     }
 
     this.setState(TEXT_TOOL_STATE.FINISHED);

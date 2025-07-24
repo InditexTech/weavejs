@@ -163,6 +163,7 @@ export class WeaveStateManager {
     }
 
     const doc = getYjsDoc(state);
+    const userId = this.instance.getStore().getUser().id;
 
     doc.transact(() => {
       if (!parent.props.children) {
@@ -191,7 +192,7 @@ export class WeaveStateManager {
       }
 
       this.instance.emitEvent('onNodeAdded', node);
-    });
+    }, userId);
   }
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -272,10 +273,11 @@ export class WeaveStateManager {
     }
 
     const doc = getYjsDoc(state);
+    const userId = this.instance.getStore().getUser().id;
 
     doc.transact(() => {
       this.deepSyncSyncedStore(nodeState.props, node.props);
-    });
+    }, userId);
 
     this.instance.emitEvent('onNodeUpdated', node);
   }
@@ -307,6 +309,7 @@ export class WeaveStateManager {
     }
 
     const doc = getYjsDoc(state);
+    const userId = this.instance.getStore().getUser().id;
 
     doc.transact(() => {
       if (parent.props.children) {
@@ -323,7 +326,7 @@ export class WeaveStateManager {
 
         this.instance.emitEvent('onNodeRemoved', node);
       }
-    });
+    }, userId);
   }
 
   removeNodes(nodes: WeaveStateElement[]): void {
@@ -370,6 +373,7 @@ export class WeaveStateManager {
       }
 
       const doc = getYjsDoc(state);
+      const userId = this.instance.getStore().getUser().id;
 
       doc.transact(() => {
         if (parent.props.children) {
@@ -395,7 +399,7 @@ export class WeaveStateManager {
             parent.props.children[i].props.zIndex = i;
           }
         }
-      });
+      }, userId);
     }
   }
 

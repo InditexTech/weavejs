@@ -7,3 +7,6 @@ import { ARROW_TOOL_STATE } from './constants';
 export type WeaveArrowToolActionStateKeys = keyof typeof ARROW_TOOL_STATE;
 export type WeaveArrowToolActionState =
   (typeof ARROW_TOOL_STATE)[WeaveArrowToolActionStateKeys];
+
+export type WeaveArrowToolActionOnAddingEvent = undefined;
+export type WeaveArrowToolActionOnAddedEvent = undefined;
