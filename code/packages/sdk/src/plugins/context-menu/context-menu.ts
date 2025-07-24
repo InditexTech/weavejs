@@ -183,7 +183,7 @@ export class WeaveContextMenuPlugin extends WeavePlugin {
     const stage = this.instance.getStage();
 
     stage.on('pointerdown', (e) => {
-      e.evt.preventDefault();
+      // e.evt.preventDefault();
 
       this.setTapStart(e);
       this.pointers[e.evt.pointerId] = e.evt;
