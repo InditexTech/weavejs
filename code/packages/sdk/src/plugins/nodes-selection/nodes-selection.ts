@@ -62,7 +62,7 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
     const { config } = params ?? {};
 
     this.config = {
-      transformer: {
+      selection: {
         rotationSnaps: [0, 45, 90, 135, 180, 225, 270, 315, 360],
         rotationSnapTolerance: 3,
         ignoreStroke: true,
@@ -87,16 +87,27 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
           }
         },
         borderStroke: '#0074ffcc',
-        borderStrokeWidth: 3,
-        ...config?.transformer,
+        borderStrokeWidth: 1,
+        ...config?.selection,
       },
-      transformations: {
+      hover: {
+        borderStrokeWidth: 1,
+        ...config?.hover,
+      },
+      selectionArea: {
+        fill: '#93c5fd40',
+        stroke: '#1e40afff',
+        strokeWidth: 1,
+        dash: [12, 4],
+        ...config?.selectionArea,
+      },
+      behaviors: {
         singleSelection: { enabled: true },
         multipleSelection: { enabled: false },
-        ...config?.transformations,
+        ...config?.behaviors,
       },
     };
-    this.defaultEnabledAnchors = this.config.transformer?.enabledAnchors ?? [
+    this.defaultEnabledAnchors = this.config.selection?.enabledAnchors ?? [
       'top-left',
       'top-center',
       'top-right',
@@ -171,27 +182,31 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
     stage.container().tabIndex = 1;
     stage.container().focus();
 
+    console.log({ selectionArea: this.config.selectionArea });
+
     const selectionRectangle = new Konva.Rect({
-      fill: 'rgba(147, 197, 253, 0.25)',
-      stroke: '#1e40afff',
-      strokeWidth: 1 * stage.scaleX(),
-      dash: [12 * stage.scaleX(), 4 * stage.scaleX()],
+      ...this.config.selectionArea,
+      ...((this.config.selectionArea.strokeWidth as number) && {
+        strokeWidth:
+          (this.config.selectionArea.strokeWidth as number) / stage.scaleX(),
+      }),
+      ...(this.config.selectionArea.dash && {
+        dash: this.config.selectionArea.dash.map((d) => d / stage.scaleX()),
+      }),
       visible: false,
-      // disable events to not interrupt with events
       listening: false,
     });
     selectionLayer?.add(selectionRectangle);
 
     const tr = new Konva.Transformer({
       id: 'selectionTransformer',
-      ...this.config.transformer,
+      ...this.config.selection,
     });
     selectionLayer?.add(tr);
 
     const trHover = new Konva.Transformer({
       id: 'hoverTransformer',
-      ...this.config.transformer,
-      borderStrokeWidth: 3,
+      ...this.config.hover,
       rotateEnabled: false,
       resizeEnabled: false,
       enabledAnchors: [],
@@ -636,8 +651,12 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
       x2 = intStage.getRelativePointerPosition()?.x ?? 0;
       y2 = intStage.getRelativePointerPosition()?.y ?? 0;
 
-      this.selectionRectangle.strokeWidth(1 / stage.scaleX());
-      this.selectionRectangle.dash([12 / stage.scaleX(), 4 / stage.scaleX()]);
+      this.selectionRectangle.strokeWidth(
+        (this.config.selectionArea.strokeWidth as number) / stage.scaleX()
+      );
+      this.selectionRectangle.dash(
+        this.config.selectionArea.dash?.map((d) => d / stage.scaleX()) ?? []
+      );
       this.selectionRectangle.width(0);
       this.selectionRectangle.height(0);
       this.selecting = true;
@@ -880,29 +899,29 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
       const nodesArray = [...selectedNodes];
       if (
         (nodesArray.length > 1 &&
-          !this.config.transformations.multipleSelection.enabled) ||
+          !this.config.behaviors.multipleSelection.enabled) ||
         (nodesArray.length === 1 &&
-          !this.config.transformations.singleSelection.enabled)
+          !this.config.behaviors.singleSelection.enabled)
       ) {
         this.tr.enabledAnchors([]);
       }
       if (
         (nodesArray.length > 1 &&
-          this.config.transformations.multipleSelection.enabled) ||
+          this.config.behaviors.multipleSelection.enabled) ||
         (nodesArray.length === 1 &&
-          this.config.transformations.singleSelection.enabled)
+          this.config.behaviors.singleSelection.enabled)
       ) {
         this.tr.enabledAnchors(this.defaultEnabledAnchors);
       }
       if (nodesArray.length === 1) {
         this.tr.setAttrs({
-          ...this.config.transformer,
+          ...this.config.selection,
           ...nodesArray[0].getTransformerProperties(),
         });
         this.tr.forceUpdate();
       } else {
         this.tr.setAttrs({
-          ...this.config.transformer,
+          ...this.config.selection,
         });
         this.tr.forceUpdate();
       }
@@ -996,8 +1015,6 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
       return;
     }
 
-    let nodesSelected = 0;
-
     // do we pressed shift or ctrl?
     const metaPressed = e.evt.shiftKey || e.evt.ctrlKey || e.evt.metaKey;
     const nodeSelectedIndex = this.tr.nodes().findIndex((node) => {
@@ -1033,9 +1050,6 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
       // if no key pressed and the node is not selected
       // select just one
       this.tr.nodes([nodeTargeted]);
-
-      nodesSelected = this.tr.nodes().length;
-
       this.tr.show();
       areNodesSelected = true;
     }
@@ -1046,44 +1060,16 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
       // remove node from array
       nodes.splice(nodes.indexOf(nodeTargeted), 1);
       this.tr.nodes(nodes);
-
-      nodesSelected = this.tr.nodes().length;
-
       areNodesSelected = true;
     }
     if (metaPressed && !isSelected) {
       // add the node into selection
       const nodes = this.tr.nodes().concat([nodeTargeted]);
       this.tr.nodes(nodes);
-
-      nodesSelected = this.tr.nodes().length;
-
       areNodesSelected = true;
     }
 
-    if (
-      (nodesSelected > 1 &&
-        !this.config.transformations.multipleSelection.enabled) ||
-      (nodesSelected === 1 &&
-        !this.config.transformations.singleSelection.enabled)
-    ) {
-      this.tr.enabledAnchors([]);
-    }
-    if (
-      (nodesSelected > 1 &&
-        this.config.transformations.multipleSelection.enabled) ||
-      (nodesSelected === 1 &&
-        this.config.transformations.singleSelection.enabled)
-    ) {
-      this.tr.enabledAnchors(this.defaultEnabledAnchors);
-    }
-    if (nodesSelected === 1) {
-      this.tr.setAttrs({
-        ...this.config.transformer,
-        ...nodeTargeted.getTransformerProperties(),
-      });
-      this.tr.forceUpdate();
-    }
+    this.handleBehaviors();
 
     if (areNodesSelected) {
       stage.container().tabIndex = 1;
@@ -1102,39 +1088,40 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
     return this.trHover;
   }
 
-  setSelectedNodes(nodes: Konva.Node[]): void {
-    this.tr.setNodes(nodes);
-
-    const nodesSelected = nodes.length;
+  handleBehaviors(): void {
+    const nodes = this.getSelectedNodes();
+    const nodesSelected = this.getSelectedNodes().length;
 
     if (
-      (nodesSelected > 1 &&
-        !this.config.transformations.multipleSelection.enabled) ||
-      (nodesSelected === 1 &&
-        !this.config.transformations.singleSelection.enabled)
+      (nodesSelected > 1 && !this.config.behaviors.multipleSelection.enabled) ||
+      (nodesSelected === 1 && !this.config.behaviors.singleSelection.enabled)
     ) {
       this.tr.enabledAnchors([]);
     }
     if (
-      (nodesSelected > 1 &&
-        this.config.transformations.multipleSelection.enabled) ||
-      (nodesSelected === 1 &&
-        this.config.transformations.singleSelection.enabled)
+      (nodesSelected > 1 && this.config.behaviors.multipleSelection.enabled) ||
+      (nodesSelected === 1 && this.config.behaviors.singleSelection.enabled)
     ) {
       this.tr.enabledAnchors(this.defaultEnabledAnchors);
     }
     if (nodesSelected === 1) {
       this.tr.setAttrs({
-        ...this.config.transformer,
+        ...this.config.selection,
         ...nodes[0].getTransformerProperties(),
       });
       this.tr.forceUpdate();
     } else if (nodesSelected > 1) {
       this.tr.setAttrs({
-        ...this.config.transformer,
+        ...this.config.selection,
       });
       this.tr.forceUpdate();
     }
+  }
+
+  setSelectedNodes(nodes: Konva.Node[]): void {
+    this.tr.setNodes(nodes);
+
+    this.handleBehaviors();
 
     this.triggerSelectedNodesEvent();
   }
