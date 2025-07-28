@@ -24,7 +24,7 @@ export const WEAVE_FRAME_NODE_DEFAULT_CONFIG = {
     rotateEnabled: false,
     resizeEnabled: false,
     enabledAnchors: [] as string[],
-    borderStrokeWidth: 3,
+    borderStrokeWidth: 1,
     padding: 0,
   },
 };

@@ -9,7 +9,7 @@ export type WeaveNodesSelectionPluginOnSelectionStateEvent = boolean;
 export type WeaveNodesSelectionPluginOnNodesChangeEvent = WeaveSelection[];
 export type WeaveNodesSelectionPluginOnStageSelectionEvent = undefined;
 
-export type WeaveNodesSelectionTransformationsConfig = {
+export type WeaveNodesSelectionBehaviorsConfig = {
   singleSelection: {
     enabled: boolean;
   };
@@ -19,8 +19,10 @@ export type WeaveNodesSelectionTransformationsConfig = {
 };
 
 export type WeaveNodesSelectionConfig = {
-  transformer: Konva.TransformerConfig;
-  transformations: WeaveNodesSelectionTransformationsConfig;
+  selection: Konva.TransformerConfig;
+  hover: Konva.TransformerConfig;
+  selectionArea: Konva.RectConfig;
+  behaviors: WeaveNodesSelectionBehaviorsConfig;
 };
 
 export type WeaveNodesSelectionPluginConfig =
