@@ -16,6 +16,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - [#512](https://github.com/InditexTech/weavejs/issues/512) borderStrokeWidth is ignored when passed via WeaveNodesSelectionPlugin config
+- [#528](https://github.com/InditexTech/weavejs/issues/528) Improve Frame Selection UX
 
 ## [0.43.0] - 2025-07-24
 
