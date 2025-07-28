@@ -182,8 +182,6 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
     stage.container().tabIndex = 1;
     stage.container().focus();
 
-    console.log({ selectionArea: this.config.selectionArea });
-
     const selectionRectangle = new Konva.Rect({
       ...this.config.selectionArea,
       ...((this.config.selectionArea.strokeWidth as number) && {

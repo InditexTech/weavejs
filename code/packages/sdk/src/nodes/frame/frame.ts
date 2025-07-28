@@ -133,13 +133,16 @@ export class WeaveFrameNode extends WeaveNode {
 
     frameInternalGroup.add(background);
 
+    const stage = this.instance.getStage();
+
     const text = new Konva.Text({
       id: `${id}-title`,
       x: 0,
-      width: props.frameWidth,
-      fontSize,
+      width: props.frameWidth / stage.scaleX(),
+      fontSize: fontSize / stage.scaleX(),
       fontFamily,
       fontStyle,
+      verticalAlign: 'middle',
       align: 'left',
       text: props.title,
       fill: fontColor,
@@ -150,10 +153,8 @@ export class WeaveFrameNode extends WeaveNode {
     });
 
     const textMeasures = text.measureSize(text.getAttrs().text ?? '');
-    const textWidth = textMeasures.width;
-    const textHeight = textMeasures.height;
-    text.y(-textHeight - titleMargin);
-    text.width(textWidth);
+    const textHeight = textMeasures.height + (2 * titleMargin) / stage.scaleX();
+    text.y(-textHeight);
     text.height(textHeight);
 
     frameInternalGroup.add(text);
@@ -197,7 +198,7 @@ export class WeaveFrameNode extends WeaveNode {
       height: props.frameHeight,
       hitFunc: function (ctx, shape) {
         ctx.beginPath();
-        ctx.rect(0, -textHeight - titleMargin, textWidth, textHeight);
+        ctx.rect(0, -textHeight, props.frameWidth, textHeight);
         ctx.fillStrokeShape(shape);
       },
       fill: 'transparent',
@@ -243,6 +244,23 @@ export class WeaveFrameNode extends WeaveNode {
     selectionArea.off('dragend');
 
     this.setupDefaultNodeEvents(frame);
+
+    this.instance.addEventListener('onZoomChange', () => {
+      const stage = this.instance.getStage();
+      text.fontSize(fontSize / stage.scaleX());
+      text.width(props.frameWidth / stage.scaleX());
+      const textMeasures = text.measureSize(text.getAttrs().text ?? '');
+      const textHeight =
+        textMeasures.height + (2 * titleMargin) / stage.scaleX();
+      text.y(-textHeight);
+      text.height(textHeight);
+
+      selectionArea.hitFunc(function (ctx, shape) {
+        ctx.beginPath();
+        ctx.rect(0, -textHeight, props.frameWidth, textHeight);
+        ctx.fillStrokeShape(shape);
+      });
+    });
 
     frame.off('pointerover');
 
@@ -295,15 +313,14 @@ export class WeaveFrameNode extends WeaveNode {
       title.text(newProps.title);
 
       const textMeasures = title.measureSize(title.getAttrs().text ?? '');
-      const textWidth = textMeasures.width;
-      const textHeight = textMeasures.height;
-      title.y(-textHeight - titleMargin);
-      title.width(textWidth);
+      const textHeight =
+        textMeasures.height + (2 * titleMargin) / stage.scaleX();
+      title.y(-textHeight);
       title.height(textHeight);
 
       selectionArea.hitFunc(function (ctx, shape) {
         ctx.beginPath();
-        ctx.rect(0, -textHeight - titleMargin, textWidth, textHeight);
+        ctx.rect(0, -textHeight, nextProps.frameWidth, textHeight);
         ctx.fillStrokeShape(shape);
       });
     }
