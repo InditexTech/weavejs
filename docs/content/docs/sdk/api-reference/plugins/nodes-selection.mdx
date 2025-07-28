@@ -59,7 +59,7 @@ type WeaveNodesSelectionPluginOnSelectionStateEvent = boolean;
 type WeaveNodesSelectionPluginOnNodesChangeEvent = WeaveSelection[];
 type WeaveNodesSelectionPluginOnStageSelectionEvent = undefined;
 
-type WeaveNodesSelectionTransformationsConfig = {
+type WeaveNodesSelectionBehaviorsConfig = {
   singleSelection: {
     enabled: boolean;
   };
@@ -69,8 +69,10 @@ type WeaveNodesSelectionTransformationsConfig = {
 };
 
 type WeaveNodesSelectionConfig = {
-  transformer: Konva.TransformerConfig;
-  transformations: WeaveNodesSelectionTransformationsConfig;
+  selection: Konva.TransformerConfig;
+  hover: Konva.TransformerConfig;
+  selectionArea: Konva.RectConfig;
+  behaviors: WeaveNodesSelectionBehaviorsConfig;
 };
 
 type WeaveNodesSelectionPluginConfig = Partial<WeaveNodesSelectionConfig>;
@@ -97,13 +99,21 @@ For `WeaveNodesSelectionPluginConfig`:
 
 <TypeTable
   type={{
-    ["transformer"]: {
-      description: "Konva Transformer configuration.",
+    ["selection"]: {
+      description: "Selector config (Konva Transformer configuration).",
       type: "Konva.TransformerConfig",
     },
-    ["transformations"]: {
-      description: "Transformations configuration.",
-      type: "WeaveNodesSelectionTransformationsConfig",
+    ["hover"]: {
+      description: "Hover config (Konva Transformer configuration).",
+      type: "Konva.TransformerConfig",
+    },
+    ["selectionArea"]: {
+      description: "Selection Area style (Konva Rect configuration).",
+      type: "Konva.RectConfig",
+    },
+    ["behaviors"]: {
+      description: "Selection behaviors configuration.",
+      type: "WeaveNodesSelectionBehaviorsConfig",
     },
   }}
 />
