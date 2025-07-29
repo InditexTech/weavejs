@@ -43,6 +43,8 @@ new WeaveCopyPasteNodesPlugin();
 export const WEAVE_COPY_PASTE_PASTE_MODES = {
   ["INTERNAL"]: "internal",
   ["EXTERNAL"]: "external",
+  ["NOT_ALLOWED"]: "not-allowed",
+  ["CLIPBOARD_API_NOT_SUPPORTED"]: "clipboard-api-not-supported",
 } as const;
 
 type WeaveCopyPasteNodesPluginOnCopyEvent = Error | undefined;
@@ -102,6 +104,9 @@ the clipboard items to the provided callback in order to determine if our app ca
 elements on the clipboard, if the callback returns `true` then the method will return `external`.
 
 If there is nothing on the clipboard (internal or external), the method will return `not-allowed`
+
+If the [Clipboard API](https://developer.mozilla.org/en-US/docs/Web/API/Clipboard_API) is no supported
+the method will return `clipboard-api-not-supported`.
 
 ## Events
 

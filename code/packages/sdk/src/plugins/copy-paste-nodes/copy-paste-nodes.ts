@@ -343,7 +343,7 @@ export class WeaveCopyPasteNodesPlugin extends WeavePlugin {
       }
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (e) {
-      /* empty */
+      return WEAVE_COPY_PASTE_PASTE_MODES.CLIPBOARD_API_NOT_SUPPORTED;
     }
 
     try {
@@ -353,7 +353,7 @@ export class WeaveCopyPasteNodesPlugin extends WeavePlugin {
       }
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (e) {
-      /* empty */
+      return WEAVE_COPY_PASTE_PASTE_MODES.CLIPBOARD_API_NOT_SUPPORTED;
     }
 
     return WEAVE_COPY_PASTE_PASTE_MODES.NOT_ALLOWED;
