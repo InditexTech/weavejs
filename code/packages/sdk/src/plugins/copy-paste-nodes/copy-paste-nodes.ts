@@ -11,9 +11,11 @@ import {
 import {
   COPY_PASTE_NODES_PLUGIN_STATE,
   WEAVE_COPY_PASTE_NODES_KEY,
+  WEAVE_COPY_PASTE_PASTE_MODES,
 } from './constants';
 import { WeaveNodesSelectionPlugin } from '../nodes-selection/nodes-selection';
 import {
+  type WeaveCopyPastePasteMode,
   type WeaveCopyPasteNodesPluginOnCopyEvent,
   type WeaveCopyPasteNodesPluginOnPasteEvent,
   type WeaveCopyPasteNodesPluginOnPasteExternalEvent,
@@ -329,6 +331,40 @@ export class WeaveCopyPasteNodesPlugin extends WeavePlugin {
     }
 
     return nodesSelectionPlugin;
+  }
+
+  isClipboardApiEnabled(): boolean {
+    return (
+      typeof navigator !== 'undefined' &&
+      !!navigator.clipboard &&
+      typeof navigator.clipboard.readText === 'function' &&
+      window.isSecureContext
+    );
+  }
+
+  async getAvailablePasteMode(
+    canHandleExternal: (items: ClipboardItems) => Promise<boolean>
+  ): Promise<WeaveCopyPastePasteMode> {
+    if (!this.isClipboardApiEnabled()) {
+      return WEAVE_COPY_PASTE_PASTE_MODES.CLIPBOARD_API_NOT_SUPPORTED;
+    }
+
+    try {
+      const allowPaste = await this.readClipboardData();
+      if (allowPaste) {
+        return WEAVE_COPY_PASTE_PASTE_MODES.INTERNAL;
+      }
+
+      const items = await navigator.clipboard.read();
+      if (await canHandleExternal(items)) {
+        return WEAVE_COPY_PASTE_PASTE_MODES.EXTERNAL;
+      }
+    } catch (e) {
+      this.getLogger().error('Error reading clipboard data', e as Error);
+      return WEAVE_COPY_PASTE_PASTE_MODES.CLIPBOARD_API_ERROR;
+    }
+
+    return WEAVE_COPY_PASTE_PASTE_MODES.NOT_ALLOWED;
   }
 
   enable(): void {
