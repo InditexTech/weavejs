@@ -16,6 +16,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - [#495](https://github.com/InditexTech/weavejs/issues/495) Allow groups to be resized
+- [#513](https://github.com/InditexTech/weavejs/issues/513) When dragging objects to a frame should detect also that the mouse is over the frame, not just the intersection
 
 ## [0.44.0] - 2025-07-28
 
