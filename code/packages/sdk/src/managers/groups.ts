@@ -84,20 +84,7 @@ export class WeaveGroupsManager {
       parentId = undefined;
     }
 
-    // const allInSame = true;
-    // const nodeId = nodeInstance?.getParent()?.getAttrs().nodeId;
-    // for (const node of realNodes) {
-    //   const nodeInstance = stage.findOne(`#${node.props.id}`);
-    //   const nodeParentId = nodeInstance?.getParent()?.getAttrs().id;
-    //   if (nodeParentId !== parentId) {
-    //     allInSame = false;
-    //     break;
-    //   }
-    // }
-
     return { realNodes, parentId };
-
-    // return { allInSame, realNodes, nodeId, parentId };
   }
 
   group(nodes: WeaveStateElement[]): void {
@@ -221,7 +208,7 @@ export class WeaveGroupsManager {
 
     groupInstance.destroy();
 
-    const groupNode = stage.findOne(`#${groupId}`) as Konva.Group | undefined;
+    const groupNode = stage.findOne(`#${groupId}`);
 
     if (groupHandler && groupNode) {
       this.instance.updateNode(

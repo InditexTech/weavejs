@@ -66,7 +66,7 @@ export function containerOverCursor(instance: Weave): Konva.Node | undefined {
         node.getAttrs().nodeId
       ) {
         const realNode = stage.findOne(`#${node.getAttrs().nodeId}`);
-        if (realNode && realNode.getAttrs().isContainerPrincipal) {
+        if (realNode?.getAttrs().isContainerPrincipal) {
           nodesUnderPointer.add(realNode);
         }
       }
@@ -81,9 +81,8 @@ export function containerOverCursor(instance: Weave): Konva.Node | undefined {
   let layerToMove = undefined;
   // Move to container
   if (
-    nodes[0] &&
-    nodes[0].getAttrs().containerId &&
-    nodes[0].getAttrs().isContainerPrincipal
+    nodes[0]?.getAttrs().containerId &&
+    nodes[0]?.getAttrs().isContainerPrincipal
   ) {
     layerToMove = nodes[0];
   }
@@ -296,5 +295,8 @@ export function hasFrames(node: Konva.Node) {
 }
 
 export function intersectArrays<T>(arrays: T[][]): T[] {
-  return arrays.reduce((acc, arr) => acc.filter((val) => arr.includes(val)));
+  return arrays.reduce(
+    (acc, arr) => acc.filter((val) => arr.includes(val)),
+    arrays[0]
+  );
 }

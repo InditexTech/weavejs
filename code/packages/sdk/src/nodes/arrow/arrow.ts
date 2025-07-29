@@ -63,17 +63,16 @@ export class WeaveArrowNode extends WeaveNode {
   }
 
   scaleReset(node: Konva.Arrow): void {
-    const lineNode = node as Konva.Arrow;
-    const oldPoints = lineNode.points();
+    const oldPoints = node.points();
     const newPoints = [];
     for (let i = 0; i < oldPoints.length / 2; i++) {
       const point = {
-        x: oldPoints[i * 2] * lineNode.scaleX(),
-        y: oldPoints[i * 2 + 1] * lineNode.scaleY(),
+        x: oldPoints[i * 2] * node.scaleX(),
+        y: oldPoints[i * 2 + 1] * node.scaleY(),
       };
       newPoints.push(point.x, point.y);
     }
-    lineNode.points(newPoints);
+    node.points(newPoints);
 
     node.width(Math.max(5, node.width() * node.scaleX()));
     node.height(Math.max(5, node.height() * node.scaleY()));

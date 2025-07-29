@@ -142,5 +142,7 @@ export class WeaveGroupNode extends WeaveNode {
     };
   }
 
-  scaleReset(): void {}
+  scaleReset(): void {
+    // don't change anything
+  }
 }

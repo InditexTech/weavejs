@@ -52,7 +52,7 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
   private selecting: boolean;
   private didMove: boolean;
   private initialized: boolean;
-  private selectionOriginalConfig!: TransformerConfig;
+  private readonly selectionOriginalConfig!: TransformerConfig;
   protected taps: number;
   protected isDoubleTap: boolean;
   protected tapStart: { x: number; y: number; time: number } | null;
@@ -958,8 +958,7 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
     const newSelectedNodes = [];
 
     const actualSelectedNodes = this.tr.nodes();
-    for (let i = 0; i < actualSelectedNodes.length; i++) {
-      const node = actualSelectedNodes[i];
+    for (const node of actualSelectedNodes) {
       const existNode = this.instance
         .getStage()
         .findOne(`#${node.getAttrs().id}`);

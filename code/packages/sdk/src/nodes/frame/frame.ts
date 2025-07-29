@@ -382,5 +382,7 @@ export class WeaveFrameNode extends WeaveNode {
     };
   }
 
-  scaleReset(): void {}
+  scaleReset(): void {
+    // don't change anything
+  }
 }

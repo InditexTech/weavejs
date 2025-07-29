@@ -593,15 +593,9 @@ export class WeaveImageNode extends WeaveNode {
       },
     });
 
-    const placeholder = node.findOne(`#${node.getAttrs().id}-placeholder`) as
-      | Konva.Rect
-      | undefined;
-    const internalImage = node.findOne(`#${node.getAttrs().id}-image`) as
-      | Konva.Image
-      | undefined;
-    const cropGroup = node.findOne(`#${node.getAttrs().id}-cropGroup`) as
-      | Konva.Image
-      | undefined;
+    const placeholder = node.findOne(`#${node.getAttrs().id}-placeholder`);
+    const internalImage = node.findOne(`#${node.getAttrs().id}-image`);
+    const cropGroup = node.findOne(`#${node.getAttrs().id}-cropGroup`);
 
     if (placeholder) {
       placeholder.width(
