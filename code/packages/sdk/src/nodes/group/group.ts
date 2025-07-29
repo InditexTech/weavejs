@@ -4,7 +4,6 @@
 
 import Konva from 'konva';
 import {
-  WEAVE_DEFAULT_TRANSFORM_PROPERTIES,
   type WeaveElementAttributes,
   type WeaveElementInstance,
   type WeaveStateElement,
@@ -13,6 +12,7 @@ import { WeaveNode } from '../node';
 import { WEAVE_GROUP_NODE_TYPE } from './constants';
 import type { WeaveNodesSelectionPlugin } from '@/plugins/nodes-selection/nodes-selection';
 import type { WeaveGroupNodeParams, WeaveGroupProperties } from './types';
+import { intersectArrays } from '@/utils';
 
 export class WeaveGroupNode extends WeaveNode {
   private config: WeaveGroupProperties;
@@ -25,10 +25,33 @@ export class WeaveGroupNode extends WeaveNode {
 
     this.config = {
       transform: {
-        ...WEAVE_DEFAULT_TRANSFORM_PROPERTIES,
         ...config?.transform,
       },
     };
+  }
+
+  groupHasFrames(group: Konva.Group) {
+    const frameNodes = group.find((node: Konva.Node) => {
+      return node.getAttrs().nodeType === 'frame';
+    });
+
+    if (frameNodes.length === 0) {
+      return false;
+    } else {
+      return true;
+    }
+  }
+
+  groupHasImages(group: Konva.Group) {
+    const imageNodes = group.find((node: Konva.Node) => {
+      return node.getAttrs().nodeType === 'image';
+    });
+
+    if (imageNodes.length === 0) {
+      return false;
+    } else {
+      return true;
+    }
   }
 
   onRender(props: WeaveElementAttributes): WeaveElementInstance {
@@ -41,7 +64,28 @@ export class WeaveGroupNode extends WeaveNode {
     this.setupDefaultNodeAugmentation(group);
 
     group.getTransformerProperties = () => {
-      return this.config.transform;
+      const baseConfig = this.defaultGetTransformerProperties(
+        this.config.transform
+      );
+
+      return {
+        ...baseConfig,
+        enabledAnchors: group.allowedAnchors(),
+      };
+    };
+
+    group.allowedAnchors = () => {
+      const stage = this.instance.getStage();
+      const actualGroup = stage.findOne(`#${group.id()}`) as Konva.Group;
+
+      const children = actualGroup.getChildren();
+
+      const anchorsArrays = [];
+      for (const child of children) {
+        anchorsArrays.push(child.allowedAnchors());
+      }
+
+      return intersectArrays(anchorsArrays);
     };
 
     this.setupDefaultNodeEvents(group);
@@ -90,7 +134,13 @@ export class WeaveGroupNode extends WeaveNode {
         id: attrs.id ?? '',
         nodeType: attrs.nodeType,
         children: childrenMapped,
+        x: instance.x() ?? 0,
+        y: instance.y() ?? 0,
+        scaleX: instance.scaleX() ?? 1,
+        scaleY: instance.scaleY() ?? 1,
       },
     };
   }
+
+  scaleReset(): void {}
 }

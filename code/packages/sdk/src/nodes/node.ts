@@ -10,7 +10,6 @@ import {
   type WeaveNodeBase,
   WEAVE_NODE_CUSTOM_EVENTS,
   type WeaveNodeConfiguration,
-  WEAVE_DEFAULT_TRANSFORM_PROPERTIES,
 } from '@inditextech/weave-types';
 import { type Logger } from 'pino';
 import { WeaveNodesSelectionPlugin } from '@/plugins/nodes-selection/nodes-selection';
@@ -18,8 +17,9 @@ import Konva from 'konva';
 import { WeaveCopyPasteNodesPlugin } from '@/plugins/copy-paste-nodes/copy-paste-nodes';
 import type { WeaveNodesSelectionPluginOnNodesChangeEvent } from '@/plugins/nodes-selection/types';
 import {
-  checkIfOverContainer,
   clearContainerTargets,
+  containerOverCursor,
+  hasFrames,
   moveNodeToContainer,
 } from '@/utils';
 import type { WeaveNodesSnappingPlugin } from '@/plugins/nodes-snapping/nodes-snapping';
@@ -40,7 +40,6 @@ export const augmentKonvaNodeClass = (
 
   Konva.Node.prototype.getTransformerProperties = function () {
     return {
-      WEAVE_DEFAULT_TRANSFORM_PROPERTIES,
       ...transform,
     };
   };
@@ -104,7 +103,19 @@ export abstract class WeaveNode implements WeaveNodeBase {
 
   setupDefaultNodeAugmentation(node: Konva.Node): void {
     node.getTransformerProperties = () => {
-      return WEAVE_DEFAULT_TRANSFORM_PROPERTIES;
+      return this.defaultGetTransformerProperties({});
+    };
+    node.allowedAnchors = () => {
+      return [
+        'top-left',
+        'top-center',
+        'top-right',
+        'middle-right',
+        'middle-left',
+        'bottom-left',
+        'bottom-center',
+        'bottom-right',
+      ];
     };
     node.movedToContainer = () => {};
     node.updatePosition = () => {};
@@ -127,12 +138,14 @@ export abstract class WeaveNode implements WeaveNodeBase {
     return false;
   }
 
-  protected scaleReset(node: Konva.Node): void {
-    node.width(Math.max(5, node.width() * node.scaleX()));
-    node.height(Math.max(5, node.height() * node.scaleY()));
+  scaleReset(node: Konva.Node): void {
+    const scale = node.scale();
+
+    node.width(Math.max(5, node.width() * scale.x));
+    node.height(Math.max(5, node.height() * scale.y));
+
     // reset scale to 1
-    node.scaleX(1);
-    node.scaleY(1);
+    node.scale({ x: 1, y: 1 });
   }
 
   protected setHoverState(node: Konva.Node): void {
@@ -221,10 +234,6 @@ export abstract class WeaveNode implements WeaveNodeBase {
         ) {
           nodesSnappingPlugin.evaluateGuidelines(e);
         }
-
-        if (this.isSelecting() && this.isNodeSelected(node)) {
-          this.scaleReset(node);
-        }
       };
 
       node.on('transform', throttle(handleTransform, 100));
@@ -249,6 +258,8 @@ export abstract class WeaveNode implements WeaveNodeBase {
         if (nodesSelectionPlugin) {
           nodesSelectionPlugin.getTransformer().forceUpdate();
         }
+
+        this.scaleReset(node);
 
         const nodeHandler = this.instance.getNodeHandler<WeaveNode>(
           node.getAttrs().nodeType
@@ -315,9 +326,9 @@ export abstract class WeaveNode implements WeaveNodeBase {
         ) {
           clearContainerTargets(this.instance);
 
-          const layerToMove = checkIfOverContainer(this.instance, e.target);
+          const layerToMove = containerOverCursor(this.instance);
 
-          if (layerToMove) {
+          if (layerToMove && !hasFrames(node)) {
             layerToMove.fire(WEAVE_NODE_CUSTOM_EVENTS.onTargetEnter, {
               bubbles: true,
             });
@@ -355,10 +366,20 @@ export abstract class WeaveNode implements WeaveNodeBase {
             nodesSnappingPlugin.cleanupEvaluateGuidelines();
           }
 
-          const containerToMove = moveNodeToContainer(this.instance, e.target);
+          const layerToMove = containerOverCursor(this.instance);
+
+          let containerToMove: Konva.Layer | Konva.Node | undefined =
+            this.instance.getMainLayer();
+
+          if (layerToMove) {
+            containerToMove = layerToMove;
+            containerToMove.fire(WEAVE_NODE_CUSTOM_EVENTS.onTargetLeave, {
+              bubbles: true,
+            });
+          }
 
           if (containerToMove) {
-            return;
+            moveNodeToContainer(this.instance, e.target, containerToMove);
           }
 
           this.instance.updateNode(
@@ -582,5 +603,22 @@ export abstract class WeaveNode implements WeaveNodeBase {
     }
 
     return realInstance.getAttrs().locked ?? false;
+  }
+
+  protected defaultGetTransformerProperties(
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    nodeTransformConfig: any
+  ) {
+    const selectionPlugin =
+      this.instance.getPlugin<WeaveNodesSelectionPlugin>('nodesSelection');
+    let transformProperties = {};
+    if (selectionPlugin) {
+      transformProperties = {
+        ...transformProperties,
+        ...selectionPlugin.getSelectorConfig(),
+      };
+    }
+
+    return { ...transformProperties, ...nodeTransformConfig };
   }
 }

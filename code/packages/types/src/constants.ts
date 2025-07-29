@@ -68,7 +68,7 @@ export const WEAVE_DEFAULT_TRANSFORM_PROPERTIES: WeaveNodeTransformerProperties 
     rotateEnabled: true,
     resizeEnabled: true,
     enabledAnchors: WEAVE_DEFAULT_ENABLED_ANCHORS,
-    borderStrokeWidth: 1,
+    borderStrokeWidth: 2,
     padding: 0,
   };
 

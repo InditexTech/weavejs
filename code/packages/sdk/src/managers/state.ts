@@ -234,18 +234,7 @@ export class WeaveStateManager {
       return;
     }
 
-    // Truncate or extend
-    while (tgtArr.length > sourceArr.length) tgtArr.pop();
-    for (let i = 0; i < sourceArr.length; i++) {
-      const srcItem = sourceArr[i];
-      const tgtItem = tgtArr[i];
-
-      if (this.isObject(srcItem) && this.isObject(tgtItem)) {
-        this.deepSyncSyncedStore(tgtItem, srcItem);
-      } else if (tgtItem !== srcItem) {
-        tgtArr[i] = srcItem;
-      }
-    }
+    target[key] = [...sourceArr]; // copy existing array to avoid mutation
   }
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any

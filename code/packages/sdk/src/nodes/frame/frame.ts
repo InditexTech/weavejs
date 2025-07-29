@@ -98,6 +98,7 @@ export class WeaveFrameNode extends WeaveNode {
       fill: 'transparent',
       draggable: true,
       clip: undefined,
+      allowScaling: false,
       name: 'node containerCapable',
     });
 
@@ -109,7 +110,7 @@ export class WeaveFrameNode extends WeaveNode {
       y: 0,
       width: props.frameWidth,
       height: props.frameHeight,
-      strokeScaleEnabled: true,
+      strokeScaleEnabled: false,
       draggable: false,
     });
 
@@ -123,7 +124,7 @@ export class WeaveFrameNode extends WeaveNode {
       width: props.frameWidth,
       stroke: borderColor,
       strokeWidth: borderWidth,
-      strokeScaleEnabled: true,
+      strokeScaleEnabled: false,
       shadowForStrokeEnabled: false,
       height: props.frameHeight,
       fill: '#ffffffff',
@@ -147,7 +148,7 @@ export class WeaveFrameNode extends WeaveNode {
       text: props.title,
       fill: fontColor,
       strokeWidth: 0,
-      strokeScaleEnabled: true,
+      strokeScaleEnabled: false,
       listening: false,
       draggable: false,
     });
@@ -160,7 +161,11 @@ export class WeaveFrameNode extends WeaveNode {
     frameInternalGroup.add(text);
 
     frame.getTransformerProperties = () => {
-      return this.config.transform;
+      return this.defaultGetTransformerProperties(this.config.transform);
+    };
+
+    frame.allowedAnchors = () => {
+      return [];
     };
 
     const frameInternal = new Konva.Group({
@@ -170,7 +175,7 @@ export class WeaveFrameNode extends WeaveNode {
       y: borderWidth,
       width: props.frameWidth - borderWidth * 2,
       height: props.frameHeight - borderWidth * 2,
-      strokeScaleEnabled: true,
+      strokeScaleEnabled: false,
       clipFunc: (ctx) => {
         const width =
           (frameInternal.width() + borderWidth) * frameInternal.scaleX();
@@ -220,6 +225,7 @@ export class WeaveFrameNode extends WeaveNode {
         ctx.fillStrokeShape(shape);
       },
       fill: 'transparent',
+      nodeId: id,
       id: `${id}-container-area`,
       listening: false,
       draggable: false,
@@ -375,4 +381,6 @@ export class WeaveFrameNode extends WeaveNode {
       },
     };
   }
+
+  scaleReset(): void {}
 }

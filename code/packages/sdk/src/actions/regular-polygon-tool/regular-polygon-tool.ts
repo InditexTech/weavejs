@@ -176,7 +176,7 @@ export class WeaveRegularPolygonToolAction extends WeaveAction {
     if (nodeHandler) {
       const node = nodeHandler.create(this.regularPolygonId, {
         ...this.props,
-        strokeScaleEnabled: true,
+        strokeScaleEnabled: false,
         x: (this.clickPoint?.x ?? 0) + this.props.radius,
         y: (this.clickPoint?.y ?? 0) + this.props.radius,
         radius: 0,

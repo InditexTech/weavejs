@@ -11,6 +11,7 @@ declare module 'konva/lib/Node' {
     triggerCrop(): void;
     closeCrop(type: WeaveImageCropEndType): void;
     resetCrop(): void;
+    allowedAnchors(): string[];
     getRealClientRect(
       config?:
         | {

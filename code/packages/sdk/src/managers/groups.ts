@@ -6,6 +6,7 @@ import { isEmpty, orderBy } from 'lodash';
 import { v4 as uuidv4 } from 'uuid';
 import Konva from 'konva';
 import {
+  type WeaveElementInstance,
   type WeaveStateElement,
   WEAVE_NODE_LAYER_ID,
 } from '@inditextech/weave-types';
@@ -29,23 +30,74 @@ export class WeaveGroupsManager {
     const stage = this.instance.getStage();
 
     if (nodes.length === 0) {
-      return { allInSame: false, nodeId: undefined, parentId: undefined };
+      return { realNodes: [], parentId: undefined };
     }
 
-    let allInSame = true;
-    const nodeInstance = stage.findOne(`#${nodes[0].props.id}`);
-    const parentId = nodeInstance?.getParent()?.getAttrs().id;
-    const nodeId = nodeInstance?.getParent()?.getAttrs().nodeId;
-    for (const node of nodes) {
-      const nodeInstance = stage.findOne(`#${node.props.id}`);
-      const nodeParentId = nodeInstance?.getParent()?.getAttrs().id;
-      if (nodeParentId !== parentId) {
-        allInSame = false;
-        break;
+    const framesIds: string[] = [];
+    nodes.forEach((node: WeaveStateElement) => {
+      const nodeInstance = stage.findOne(`#${node.key}`);
+      if (nodeInstance && nodeInstance.getAttrs().nodeType === 'frame') {
+        framesIds.push(node.key);
+      }
+    });
+
+    let realNodes: WeaveStateElement[] = [];
+    if (framesIds.length > 0) {
+      for (const node of nodes) {
+        const nodeInstance = stage.findOne(`#${node.key}`);
+        if (framesIds.includes(node.key)) {
+          realNodes.push(node);
+        }
+        if (
+          !framesIds.includes(node.key) &&
+          nodeInstance &&
+          !framesIds.includes(nodeInstance.getParent()?.getAttrs().nodeId)
+        ) {
+          realNodes.push(node);
+        }
       }
     }
 
-    return { allInSame, nodeId, parentId };
+    if (realNodes.length === 0) {
+      realNodes = nodes;
+    }
+
+    const parentIds: string[] = [];
+    for (const node of realNodes) {
+      const nodeInstance = stage.findOne(`#${node.key}`);
+      if (nodeInstance) {
+        const parentId = nodeInstance.getParent()?.getAttrs().id;
+        if (parentId && !parentIds.includes(parentId)) {
+          parentIds.push(parentId);
+        }
+      }
+    }
+
+    const nodeInstance = stage.findOne(`#${realNodes[0].props.id}`);
+    const nodeId = nodeInstance?.getParent()?.getAttrs().nodeId;
+
+    let parentId = nodeInstance?.getParent()?.getAttrs().id;
+    if (parentIds.length === 1 && nodeId) {
+      parentId = nodeId;
+    }
+    if (parentIds.length > 1) {
+      parentId = undefined;
+    }
+
+    // const allInSame = true;
+    // const nodeId = nodeInstance?.getParent()?.getAttrs().nodeId;
+    // for (const node of realNodes) {
+    //   const nodeInstance = stage.findOne(`#${node.props.id}`);
+    //   const nodeParentId = nodeInstance?.getParent()?.getAttrs().id;
+    //   if (nodeParentId !== parentId) {
+    //     allInSame = false;
+    //     break;
+    //   }
+    // }
+
+    return { realNodes, parentId };
+
+    // return { allInSame, realNodes, nodeId, parentId };
   }
 
   group(nodes: WeaveStateElement[]): void {
@@ -60,15 +112,7 @@ export class WeaveGroupsManager {
       return;
     }
 
-    const { allInSame, nodeId, parentId } = this.allNodesInSameParent(nodes);
-
-    if (!allInSame) {
-      this.logger.warn(
-        { nodes },
-        'Not all nodes are in the same container, cannot group them'
-      );
-      return;
-    }
+    const { realNodes, parentId } = this.allNodesInSameParent(nodes);
 
     const selectionPlugin =
       this.instance.getPlugin<WeaveNodesSelectionPlugin>('nodesSelection');
@@ -102,10 +146,10 @@ export class WeaveGroupsManager {
       const groupNode = groupHandler.create(groupId, {
         draggable: true,
       });
-      this.instance.addNode(groupNode, nodeId ?? parentNodeId);
+      this.instance.addNode(groupNode, parentNodeId);
     }
 
-    const nodesWithZIndex = nodes
+    const nodesWithZIndex = realNodes
       .map((node) => {
         const instance = mainLayer?.findOne(`#${node.key}`) as
           | Konva.Shape
@@ -177,6 +221,14 @@ export class WeaveGroupsManager {
 
     groupInstance.destroy();
 
+    const groupNode = stage.findOne(`#${groupId}`) as Konva.Group | undefined;
+
+    if (groupHandler && groupNode) {
+      this.instance.updateNode(
+        groupHandler.serialize(groupNode as WeaveElementInstance)
+      );
+    }
+
     setTimeout(() => {
       const groupNode = stage.findOne(`#${groupId}`) as
         | Konva.Layer
@@ -247,14 +299,25 @@ export class WeaveGroupsManager {
     let newChildId = undefined;
     const children = [...konvaGroup.getChildren()];
     for (const child of children) {
-      const nodePos = child.getAbsolutePosition();
-      const nodeRotation = child.getAbsoluteRotation();
+      const absPos = child.getAbsolutePosition();
+      const absScale = child.getAbsoluteScale();
+      const absRotation = child.getAbsoluteRotation();
 
       child.moveTo(newLayer);
-      child.setAbsolutePosition(nodePos);
-      child.rotation(nodeRotation);
+
+      child.position({ x: 0, y: 0 });
+      child.scale({ x: 1, y: 1 });
+      child.rotation(0);
+      child.offset({ x: 0, y: 0 });
+
+      child.setAbsolutePosition(absPos);
+      child.scale({
+        x: absScale.x / stage.scaleX(),
+        y: absScale.y / stage.scaleY(),
+      });
+      child.rotation(absRotation);
+
       child.zIndex(newLayerChildrenAmount - 1 + child.zIndex());
-      child.setAttr('id', uuidv4());
       child.setAttr('draggable', true);
       newChildId = child.getAttrs().id;
 
@@ -262,9 +325,22 @@ export class WeaveGroupsManager {
         child.getAttrs().nodeType
       );
       if (handler) {
+        // Serialize the child node and add it to the instance
         const node = handler.serialize(child);
+        const newNodeId = uuidv4();
+        const oldId = node.key;
+
+        node.key = newNodeId;
+        node.props.id = newNodeId;
+        for (const prop of Object.keys(node.props)) {
+          if (typeof node.props[prop] === 'string') {
+            node.props[prop] = node.props[prop].replace(oldId, newNodeId);
+          }
+        }
+
         this.instance.addNode(node, nodeId ?? newLayer.getAttrs().id);
       }
+
       child.destroy();
     }
 
@@ -284,5 +360,27 @@ export class WeaveGroupsManager {
         selectionPlugin.setSelectedNodes([firstElement]);
       }
     }, 0);
+  }
+
+  extractTransformFromMatrix(m: number[]) {
+    const a = m[0],
+      b = m[1],
+      c = m[2],
+      d = m[3],
+      e = m[4],
+      f = m[5];
+
+    const scaleX = Math.sqrt(a * a + b * b);
+    const scaleY = Math.sqrt(c * c + d * d);
+
+    const rotation = Math.atan2(b, a) * (180 / Math.PI); // in degrees
+
+    return {
+      x: e,
+      y: f,
+      scaleX,
+      scaleY,
+      rotation,
+    };
   }
 }

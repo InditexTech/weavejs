@@ -4,7 +4,6 @@
 
 import Konva from 'konva';
 import {
-  WEAVE_DEFAULT_TRANSFORM_PROPERTIES,
   type WeaveElementAttributes,
   type WeaveElementInstance,
 } from '@inditextech/weave-types';
@@ -24,7 +23,6 @@ export class WeaveStarNode extends WeaveNode {
 
     this.config = {
       transform: {
-        ...WEAVE_DEFAULT_TRANSFORM_PROPERTIES,
         ...config?.transform,
       },
     };
@@ -44,11 +42,15 @@ export class WeaveStarNode extends WeaveNode {
     star.getTransformerProperties = () => {
       const stage = this.instance.getStage();
 
+      const baseConfig = this.defaultGetTransformerProperties(
+        this.config.transform
+      );
+
       const node = stage.findOne(`#${props.id}`) as Konva.Star | undefined;
 
       if (node && node.getAttrs().keepAspectRatio) {
         return {
-          ...this.config.transform,
+          ...baseConfig,
           enabledAnchors: [
             'top-left',
             'top-right',
@@ -59,7 +61,27 @@ export class WeaveStarNode extends WeaveNode {
         };
       }
 
-      return this.config.transform;
+      return baseConfig;
+    };
+
+    star.allowedAnchors = () => {
+      const stage = this.instance.getStage();
+      const actualStar = stage.findOne(`#${star.id()}`) as Konva.Star;
+
+      if (actualStar.getAttrs().keepAspectRatio) {
+        return ['top-left', 'top-right', 'bottom-left', 'bottom-right'];
+      }
+
+      return [
+        'top-left',
+        'top-center',
+        'top-right',
+        'middle-right',
+        'middle-left',
+        'bottom-left',
+        'bottom-center',
+        'bottom-right',
+      ];
     };
 
     this.setupDefaultNodeEvents(star);
@@ -85,17 +107,11 @@ export class WeaveStarNode extends WeaveNode {
     }
   }
 
-  protected scaleReset(node: Konva.Node): void {
-    const starNode = node as Konva.Star;
-    starNode.innerRadius(
-      Math.max(5, starNode.innerRadius() * starNode.scaleX())
-    );
-    starNode.outerRadius(
-      Math.max(5, starNode.outerRadius() * starNode.scaleY())
-    );
+  scaleReset(node: Konva.Star): void {
+    node.innerRadius(Math.max(5, node.innerRadius() * node.scaleX()));
+    node.outerRadius(Math.max(5, node.outerRadius() * node.scaleY()));
 
-    // reset scale to 1
-    node.scaleX(1);
-    node.scaleY(1);
+    // reset scale to
+    node.scale({ x: 1, y: 1 });
   }
 }

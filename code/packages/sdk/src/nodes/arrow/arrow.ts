@@ -4,7 +4,6 @@
 
 import Konva from 'konva';
 import {
-  WEAVE_DEFAULT_TRANSFORM_PROPERTIES,
   type WeaveElementAttributes,
   type WeaveElementInstance,
 } from '@inditextech/weave-types';
@@ -24,7 +23,6 @@ export class WeaveArrowNode extends WeaveNode {
 
     this.config = {
       transform: {
-        ...WEAVE_DEFAULT_TRANSFORM_PROPERTIES,
         ...config?.transform,
       },
     };
@@ -40,7 +38,7 @@ export class WeaveArrowNode extends WeaveNode {
     this.setupDefaultNodeAugmentation(line);
 
     line.getTransformerProperties = () => {
-      return this.config.transform;
+      return this.defaultGetTransformerProperties(this.config.transform);
     };
 
     this.setupDefaultNodeEvents(line);
@@ -64,27 +62,23 @@ export class WeaveArrowNode extends WeaveNode {
     }
   }
 
-  protected scaleReset(node: Konva.Node): void {
-    // for lines, adjust points to scale
-    if (node.getAttrs().nodeType === 'arrow') {
-      const arrowNode = node as Konva.Arrow;
-      const oldPoints = arrowNode.points();
-      const newPoints = [];
-      for (let i = 0; i < oldPoints.length / 2; i++) {
-        const point = {
-          x: oldPoints[i * 2] * arrowNode.scaleX(),
-          y: oldPoints[i * 2 + 1] * arrowNode.scaleY(),
-        };
-        newPoints.push(point.x, point.y);
-      }
-      arrowNode.points(newPoints);
+  scaleReset(node: Konva.Arrow): void {
+    const lineNode = node as Konva.Arrow;
+    const oldPoints = lineNode.points();
+    const newPoints = [];
+    for (let i = 0; i < oldPoints.length / 2; i++) {
+      const point = {
+        x: oldPoints[i * 2] * lineNode.scaleX(),
+        y: oldPoints[i * 2 + 1] * lineNode.scaleY(),
+      };
+      newPoints.push(point.x, point.y);
     }
+    lineNode.points(newPoints);
 
     node.width(Math.max(5, node.width() * node.scaleX()));
     node.height(Math.max(5, node.height() * node.scaleY()));
 
     // reset scale to 1
-    node.scaleX(1);
-    node.scaleY(1);
+    node.scale({ x: 1, y: 1 });
   }
 }

@@ -4,7 +4,6 @@
 
 import Konva from 'konva';
 import {
-  WEAVE_DEFAULT_TRANSFORM_PROPERTIES,
   type WeaveElementAttributes,
   type WeaveElementInstance,
   type WeaveStateElement,
@@ -29,7 +28,6 @@ export class WeaveStrokeNode extends WeaveNode {
 
     this.config = {
       transform: {
-        ...WEAVE_DEFAULT_TRANSFORM_PROPERTIES,
         ...config?.transform,
       },
     };
@@ -95,7 +93,7 @@ export class WeaveStrokeNode extends WeaveNode {
     this.setupDefaultNodeAugmentation(stroke);
 
     stroke.getTransformerProperties = () => {
-      return this.config.transform;
+      return this.defaultGetTransformerProperties(this.config.transform);
     };
 
     this.setupDefaultNodeEvents(stroke);
@@ -119,8 +117,7 @@ export class WeaveStrokeNode extends WeaveNode {
     }
   }
 
-  protected scaleReset(node: Konva.Node): void {
-    // adjust points to scale
+  scaleReset(node: Konva.Node): void {
     const strokeNode = node as Konva.Shape;
     const oldPoints = [...strokeNode.getAttrs().strokeElements];
     const newPoints = [];
@@ -140,8 +137,7 @@ export class WeaveStrokeNode extends WeaveNode {
     node.height(Math.max(5, node.height() * node.scaleY()));
 
     // reset scale to 1
-    node.scaleX(1);
-    node.scaleY(1);
+    node.scale({ x: 1, y: 1 });
   }
 
   serialize(instance: WeaveElementInstance): WeaveStateElement {
