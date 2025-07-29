@@ -11,9 +11,11 @@ import {
 import {
   COPY_PASTE_NODES_PLUGIN_STATE,
   WEAVE_COPY_PASTE_NODES_KEY,
+  WEAVE_COPY_PASTE_PASTE_MODES,
 } from './constants';
 import { WeaveNodesSelectionPlugin } from '../nodes-selection/nodes-selection';
 import {
+  type WeaveCopyPastePasteMode,
   type WeaveCopyPasteNodesPluginOnCopyEvent,
   type WeaveCopyPasteNodesPluginOnPasteEvent,
   type WeaveCopyPasteNodesPluginOnPasteExternalEvent,
@@ -329,6 +331,32 @@ export class WeaveCopyPasteNodesPlugin extends WeavePlugin {
     }
 
     return nodesSelectionPlugin;
+  }
+
+  async getAvailablePasteMode(
+    canHandleExternal: (items: ClipboardItems) => Promise<boolean>
+  ): Promise<WeaveCopyPastePasteMode> {
+    try {
+      const allowPaste = await this.readClipboardData();
+      if (allowPaste) {
+        return WEAVE_COPY_PASTE_PASTE_MODES.INTERNAL;
+      }
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    } catch (e) {
+      /* empty */
+    }
+
+    try {
+      const items = await navigator.clipboard.read();
+      if (await canHandleExternal(items)) {
+        return WEAVE_COPY_PASTE_PASTE_MODES.EXTERNAL;
+      }
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    } catch (e) {
+      /* empty */
+    }
+
+    return WEAVE_COPY_PASTE_PASTE_MODES.NOT_ALLOWED;
   }
 
   enable(): void {

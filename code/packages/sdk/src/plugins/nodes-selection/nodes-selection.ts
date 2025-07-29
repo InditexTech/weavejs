@@ -1005,7 +1005,7 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
 
     const contextMenuPlugin = this.getContextMenuPlugin();
 
-    if (contextMenuPlugin && contextMenuPlugin.isContextMenuVisible()) {
+    if (contextMenuPlugin?.isContextMenuVisible()) {
       this.selecting = false;
       return;
     }
@@ -1161,8 +1161,10 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
       };
     }
 
-    this.tr.setAttrs(transformerAttrs);
-    this.tr.forceUpdate();
+    if (this.tr) {
+      this.tr.setAttrs(transformerAttrs);
+      this.tr.forceUpdate();
+    }
   }
 
   setSelectedNodes(nodes: Konva.Node[]): void {

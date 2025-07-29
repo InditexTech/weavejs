@@ -3,7 +3,10 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import Konva from 'konva';
-import { COPY_PASTE_NODES_PLUGIN_STATE } from './constants';
+import {
+  COPY_PASTE_NODES_PLUGIN_STATE,
+  WEAVE_COPY_PASTE_PASTE_MODES,
+} from './constants';
 import {
   type NodeSerializable,
   type WeaveStateElement,
@@ -21,6 +24,11 @@ export type WeaveCopyPasteNodesPluginOnPasteExternalEvent = {
   item: ClipboardItem;
   position: Vector2d;
 };
+
+export type WeaveCopyPastePasteModeKeys =
+  keyof typeof WEAVE_COPY_PASTE_PASTE_MODES;
+export type WeaveCopyPastePasteMode =
+  (typeof WEAVE_COPY_PASTE_PASTE_MODES)[WeaveCopyPastePasteModeKeys];
 
 export type WeavePasteModel = {
   weaveInstanceId: string;

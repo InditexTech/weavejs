@@ -40,9 +40,19 @@ new WeaveCopyPasteNodesPlugin();
 ## TypeScript types
 
 ```ts
+export const WEAVE_COPY_PASTE_PASTE_MODES = {
+  ["INTERNAL"]: "internal",
+  ["EXTERNAL"]: "external",
+} as const;
+
 type WeaveCopyPasteNodesPluginOnCopyEvent = Error | undefined;
 type WeaveCopyPasteNodesPluginOnPasteEvent = Error | undefined;
 type WeaveCopyPasteNodesPluginOnPasteExternalEvent = ClipboardItem;
+
+type WeaveCopyPastePasteModeKeys = keyof typeof WEAVE_COPY_PASTE_PASTE_MODES;
+type WeaveCopyPastePasteMode =
+  | (typeof WEAVE_COPY_PASTE_PASTE_MODES)[WeaveCopyPastePasteModeKeys]
+  | undefined;
 
 type WeavePasteModel = {
   weaveInstanceId: string;
@@ -73,6 +83,25 @@ paste(): void
 ```
 
 This method paste onto the stage the contents of the clipboard ir are supported by Weave.js.
+
+### getAvailablePasteMode
+
+```ts
+async getAvailablePasteMode(
+  canHandleExternal: (items: ClipboardItems) => Promise<boolean>
+): Promise<WeaveCopyPastePasteMode>
+```
+
+This method determines the paste mode based on what's on the clipboard.
+
+If there is something on the Weave clipboard (meaning an user copy something on Weave or on other tab)
+will return `internal`.
+
+If there is something on the clipboard copied from an external site (not a Weave app), it will provide
+the clipboard items to the provided callback in order to determine if our app can manage the external
+elements on the clipboard, if the callback returns `true` then the method will return `external`.
+
+If there is nothing on the clipboard (internal or external), the method will return `not-allowed`
 
 ## Events
 
