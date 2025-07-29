@@ -4,7 +4,6 @@
 
 import Konva from 'konva';
 import {
-  WEAVE_DEFAULT_TRANSFORM_PROPERTIES,
   type WeaveElementAttributes,
   type WeaveElementInstance,
   type WeaveStateElement,
@@ -35,7 +34,6 @@ export class WeaveTextNode extends WeaveNode {
 
     this.config = {
       transform: {
-        ...WEAVE_DEFAULT_TRANSFORM_PROPERTIES,
         ...config?.transform,
       },
     };
@@ -63,24 +61,57 @@ export class WeaveTextNode extends WeaveNode {
       const stage = this.instance.getStage();
       const actualText = stage.findOne(`#${text.id()}`) as Konva.Text;
 
+      const baseConfig = this.defaultGetTransformerProperties(
+        this.config.transform
+      );
+
       if (actualText) {
         const attrs = actualText.getAttrs();
 
         if (attrs.layout === TEXT_LAYOUT.AUTO_ALL) {
           return {
+            ...baseConfig,
             resizeEnabled: false,
             enabledAnchors: [] as string[],
           };
         }
         if (attrs.layout === TEXT_LAYOUT.AUTO_HEIGHT) {
           return {
+            ...baseConfig,
             resizeEnabled: true,
             enabledAnchors: ['middle-right', 'middle-left'] as string[],
           };
         }
       }
 
-      return this.config.transform;
+      return baseConfig;
+    };
+
+    text.allowedAnchors = () => {
+      const stage = this.instance.getStage();
+      const actualText = stage.findOne(`#${text.id()}`) as Konva.Text;
+
+      if (actualText) {
+        const attrs = actualText.getAttrs();
+
+        if (attrs.layout === TEXT_LAYOUT.AUTO_ALL) {
+          return [];
+        }
+        if (attrs.layout === TEXT_LAYOUT.AUTO_HEIGHT) {
+          return ['middle-right', 'middle-left'];
+        }
+      }
+
+      return [
+        'top-left',
+        'top-center',
+        'top-right',
+        'middle-right',
+        'middle-left',
+        'bottom-left',
+        'bottom-center',
+        'bottom-right',
+      ];
     };
 
     text.setAttrs({
@@ -205,13 +236,6 @@ export class WeaveTextNode extends WeaveNode {
       width,
       height,
     });
-
-    // if (
-    //   nextProps.width !== nodeInstance.getAttrs().width ||
-    //   nextProps.height !== nodeInstance.getAttrs().height
-    // ) {
-    //   this.updateNode(nodeInstance);
-    // }
 
     if (this.editing) {
       this.updateTextAreaDOM(nodeInstance as Konva.Text);

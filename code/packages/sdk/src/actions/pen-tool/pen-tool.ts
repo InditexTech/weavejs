@@ -167,7 +167,7 @@ export class WeavePenToolAction extends WeaveAction {
       this.tempMainLineNode = new Konva.Line({
         ...this.props,
         id: this.lineId,
-        strokeScaleEnabled: true,
+        strokeScaleEnabled: false,
         x: this.clickPoint?.x ?? 0,
         y: this.clickPoint?.y ?? 0,
         points: [0, 0],
@@ -178,7 +178,7 @@ export class WeavePenToolAction extends WeaveAction {
         x: this.clickPoint?.x ?? 0,
         y: this.clickPoint?.y ?? 0,
         radius: 5 / stage.scaleX(),
-        strokeScaleEnabled: true,
+        strokeScaleEnabled: false,
         stroke: '#cccccc',
         strokeWidth: 0,
         fill: '#cccccc',
@@ -190,7 +190,7 @@ export class WeavePenToolAction extends WeaveAction {
         id: this.tempLineId,
         x: this.clickPoint?.x ?? 0,
         y: this.clickPoint?.y ?? 0,
-        strokeScaleEnabled: true,
+        strokeScaleEnabled: false,
         points: [0, 0],
       });
       this.measureContainer?.add(this.tempLineNode);
@@ -199,7 +199,7 @@ export class WeavePenToolAction extends WeaveAction {
         x: this.clickPoint?.x ?? 0,
         y: this.clickPoint?.y ?? 0,
         radius: 5 / stage.scaleX(),
-        strokeScaleEnabled: true,
+        strokeScaleEnabled: false,
         stroke: '#cccccc',
         strokeWidth: 0,
         fill: '#cccccc',

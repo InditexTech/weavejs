@@ -4,7 +4,6 @@
 
 import Konva from 'konva';
 import {
-  WEAVE_DEFAULT_TRANSFORM_PROPERTIES,
   type WeaveElementAttributes,
   type WeaveElementInstance,
 } from '@inditextech/weave-types';
@@ -26,10 +25,7 @@ export class WeaveRegularPolygonNode extends WeaveNode {
     const { config } = params ?? {};
 
     this.config = {
-      transform: {
-        ...WEAVE_DEFAULT_TRANSFORM_PROPERTIES,
-        ...config?.transform,
-      },
+      transform: { ...config?.transform },
     };
   }
 
@@ -44,8 +40,12 @@ export class WeaveRegularPolygonNode extends WeaveNode {
     this.setupDefaultNodeAugmentation(regularPolygon);
 
     regularPolygon.getTransformerProperties = () => {
+      const baseConfig = this.defaultGetTransformerProperties(
+        this.config.transform
+      );
+
       return {
-        ...this.config.transform,
+        ...baseConfig,
         enabledAnchors: [
           'top-left',
           'top-right',
@@ -54,6 +54,10 @@ export class WeaveRegularPolygonNode extends WeaveNode {
         ],
         keepRatio: true,
       };
+    };
+
+    regularPolygon.allowedAnchors = () => {
+      return ['top-left', 'top-right', 'bottom-left', 'bottom-right'];
     };
 
     this.setupDefaultNodeEvents(regularPolygon);
@@ -80,14 +84,10 @@ export class WeaveRegularPolygonNode extends WeaveNode {
     }
   }
 
-  protected scaleReset(node: Konva.Node): void {
-    const regularPolygonNode = node as Konva.RegularPolygon;
-    regularPolygonNode.radius(
-      Math.max(5, regularPolygonNode.radius() * regularPolygonNode.scaleX())
-    );
+  scaleReset(node: Konva.RegularPolygon): void {
+    node.radius(Math.max(5, node.radius() * node.scaleX()));
 
     // reset scale to 1
-    node.scaleX(1);
-    node.scaleY(1);
+    node.scale({ x: 1, y: 1 });
   }
 }

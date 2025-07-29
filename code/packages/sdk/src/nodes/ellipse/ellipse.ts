@@ -4,7 +4,6 @@
 
 import Konva from 'konva';
 import {
-  WEAVE_DEFAULT_TRANSFORM_PROPERTIES,
   type WeaveElementAttributes,
   type WeaveElementInstance,
 } from '@inditextech/weave-types';
@@ -24,7 +23,6 @@ export class WeaveEllipseNode extends WeaveNode {
 
     this.config = {
       transform: {
-        ...WEAVE_DEFAULT_TRANSFORM_PROPERTIES,
         ...config?.transform,
       },
     };
@@ -45,9 +43,13 @@ export class WeaveEllipseNode extends WeaveNode {
 
       const node = stage.findOne(`#${props.id}`) as Konva.Ellipse | undefined;
 
+      const baseConfig = this.defaultGetTransformerProperties(
+        this.config.transform
+      );
+
       if (node && node.getAttrs().keepAspectRatio) {
         return {
-          ...this.config.transform,
+          ...baseConfig,
           enabledAnchors: [
             'top-left',
             'top-right',
@@ -58,7 +60,27 @@ export class WeaveEllipseNode extends WeaveNode {
         };
       }
 
-      return this.config.transform;
+      return baseConfig;
+    };
+
+    ellipse.allowedAnchors = () => {
+      const stage = this.instance.getStage();
+      const actualEllipse = stage.findOne(`#${ellipse.id()}`) as Konva.Ellipse;
+
+      if (actualEllipse.getAttrs().keepAspectRatio) {
+        return ['top-left', 'top-right', 'bottom-left', 'bottom-right'];
+      }
+
+      return [
+        'top-left',
+        'top-center',
+        'top-right',
+        'middle-right',
+        'middle-left',
+        'bottom-left',
+        'bottom-center',
+        'bottom-right',
+      ];
     };
 
     this.setupDefaultNodeEvents(ellipse);
@@ -84,17 +106,11 @@ export class WeaveEllipseNode extends WeaveNode {
     }
   }
 
-  protected scaleReset(node: Konva.Node): void {
-    const ellipseNode = node as Konva.Ellipse;
-    ellipseNode.radiusX(
-      Math.max(5, ellipseNode.radiusX() * ellipseNode.scaleX())
-    );
-    ellipseNode.radiusY(
-      Math.max(5, ellipseNode.radiusY() * ellipseNode.scaleY())
-    );
+  scaleReset(node: Konva.Ellipse): void {
+    node.radiusX(Math.max(5, node.radiusX() * node.scaleX()));
+    node.radiusY(Math.max(5, node.radiusY() * node.scaleY()));
 
     // reset scale to 1
-    node.scaleX(1);
-    node.scaleY(1);
+    node.scale({ x: 1, y: 1 });
   }
 }

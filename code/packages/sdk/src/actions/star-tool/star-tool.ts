@@ -172,7 +172,7 @@ export class WeaveStarToolAction extends WeaveAction {
     if (nodeHandler) {
       const node = nodeHandler.create(this.starId, {
         ...this.props,
-        strokeScaleEnabled: true,
+        strokeScaleEnabled: false,
         x: this.clickPoint?.x ?? 0 + this.props.outerRadius,
         y: this.clickPoint?.y ?? 0 + this.props.outerRadius,
         numPoints: 5,

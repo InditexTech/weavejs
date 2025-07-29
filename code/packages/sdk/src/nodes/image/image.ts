@@ -4,7 +4,6 @@
 
 import Konva from 'konva';
 import {
-  WEAVE_DEFAULT_TRANSFORM_PROPERTIES,
   type WeaveElementAttributes,
   type WeaveElementInstance,
 } from '@inditextech/weave-types';
@@ -54,7 +53,6 @@ export class WeaveImageNode extends WeaveNode {
     this.config = {
       crossOrigin: config?.crossOrigin ?? 'anonymous',
       transform: {
-        ...WEAVE_DEFAULT_TRANSFORM_PROPERTIES,
         ...config?.transform,
       },
     };
@@ -222,7 +220,11 @@ export class WeaveImageNode extends WeaveNode {
     };
 
     image.getTransformerProperties = () => {
-      return this.config.transform;
+      return this.defaultGetTransformerProperties(this.config.transform);
+    };
+
+    image.allowedAnchors = () => {
+      return ['top-left', 'top-right', 'bottom-left', 'bottom-right'];
     };
 
     const imagePlaceholder = new Konva.Rect({
@@ -256,7 +258,7 @@ export class WeaveImageNode extends WeaveNode {
       rotation: 0,
       width: 0,
       height: 0,
-      strokeScaleEnabled: true,
+      strokeScaleEnabled: false,
       draggable: false,
       visible: false,
       name: undefined,
@@ -572,12 +574,11 @@ export class WeaveImageNode extends WeaveNode {
     return imageToolAction;
   }
 
-  protected scaleReset(node: Konva.Node): void {
+  scaleReset(node: Konva.Group): void {
+    const scale = node.scale();
+
     const widthNotNormalized = node.width();
     const heightNotNormalized = node.height();
-
-    node.width(Math.max(5, node.width() * node.scaleX()));
-    node.height(Math.max(5, node.height() * node.scaleY()));
 
     const uncroppedWidth = node.getAttrs().uncroppedImage
       ? node.getAttrs().uncroppedImage.width
@@ -592,8 +593,41 @@ export class WeaveImageNode extends WeaveNode {
       },
     });
 
+    const placeholder = node.findOne(`#${node.getAttrs().id}-placeholder`);
+    const internalImage = node.findOne(`#${node.getAttrs().id}-image`);
+    const cropGroup = node.findOne(`#${node.getAttrs().id}-cropGroup`);
+
+    if (placeholder) {
+      placeholder.width(
+        Math.max(5, placeholder.width() * placeholder.scaleX())
+      );
+      placeholder.height(
+        Math.max(5, placeholder.height() * placeholder.scaleY())
+      );
+      placeholder.scale({ x: 1, y: 1 });
+    }
+
+    if (internalImage) {
+      internalImage.width(
+        Math.max(5, internalImage.width() * internalImage.scaleX())
+      );
+      internalImage.height(
+        Math.max(5, internalImage.height() * internalImage.scaleY())
+      );
+      internalImage.scale({ x: 1, y: 1 });
+    }
+
+    if (cropGroup) {
+      cropGroup.width(Math.max(5, cropGroup.width() * cropGroup.scaleX()));
+      cropGroup.height(Math.max(5, cropGroup.height() * cropGroup.scaleY()));
+      cropGroup.scale({ x: 1, y: 1 });
+    }
+
+    node.width(Math.max(5, node.width() * scale.x));
+    node.height(Math.max(5, node.height() * scale.y));
+
     // reset scale to 1
-    node.scaleX(1);
-    node.scaleY(1);
+    node.scale({ x: 1, y: 1 });
+    this.instance.getMainLayer()?.batchDraw();
   }
 }

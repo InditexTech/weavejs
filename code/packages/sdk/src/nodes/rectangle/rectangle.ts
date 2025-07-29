@@ -4,7 +4,6 @@
 
 import Konva from 'konva';
 import {
-  WEAVE_DEFAULT_TRANSFORM_PROPERTIES,
   type WeaveElementAttributes,
   type WeaveElementInstance,
 } from '@inditextech/weave-types';
@@ -27,7 +26,6 @@ export class WeaveRectangleNode extends WeaveNode {
 
     this.config = {
       transform: {
-        ...WEAVE_DEFAULT_TRANSFORM_PROPERTIES,
         ...config?.transform,
       },
     };
@@ -37,12 +35,13 @@ export class WeaveRectangleNode extends WeaveNode {
     const rectangle = new Konva.Rect({
       ...props,
       name: 'node',
+      strokeScaleEnabled: false,
     });
 
     this.setupDefaultNodeAugmentation(rectangle);
 
     rectangle.getTransformerProperties = () => {
-      return this.config.transform;
+      return this.defaultGetTransformerProperties(this.config.transform);
     };
 
     this.setupDefaultNodeEvents(rectangle);
@@ -64,5 +63,15 @@ export class WeaveRectangleNode extends WeaveNode {
     if (nodesSelectionPlugin) {
       nodesSelectionPlugin.getTransformer().forceUpdate();
     }
+  }
+
+  scaleReset(node: Konva.Rect): void {
+    const scale = node.scale();
+
+    node.width(Math.max(5, node.width() * scale.x));
+    node.height(Math.max(5, node.height() * scale.y));
+
+    // reset scale to 1
+    node.scale({ x: 1, y: 1 });
   }
 }

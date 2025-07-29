@@ -6,7 +6,6 @@ import Konva from 'konva';
 import type { Weave } from './weave';
 import {
   WEAVE_NODE_CUSTOM_EVENTS,
-  WEAVE_NODE_LAYER_ID,
   type WeaveElementInstance,
 } from '@inditextech/weave-types';
 import type { WeaveNode } from './nodes/node';
@@ -38,48 +37,54 @@ export function clearContainerTargets(instance: Weave): void {
   }
 }
 
-export function checkIfOverContainer(
-  instance: Weave,
-  node: Konva.Node | Konva.Transformer
-): Konva.Node | undefined {
-  if (node instanceof Konva.Transformer) {
-    const transformerNodes = node.nodes();
-    const containersInSelection = [];
-    for (const actualNode of transformerNodes) {
-      if (
-        typeof actualNode.getAttrs().isContainerPrincipal !== 'undefined' &&
-        actualNode.getAttrs().isContainerPrincipal
-      ) {
-        containersInSelection.push(actualNode);
-      }
-    }
+export function containerOverCursor(instance: Weave): Konva.Node | undefined {
+  Konva.hitOnDragEnabled = true;
 
-    const containersInSelectionSet = new Set(containersInSelection);
-    const uniqueContainersInSelection = Array.from(containersInSelectionSet);
+  const stage = instance.getStage();
+  const cursorPosition = stage.getRelativePointerPosition();
 
-    if (uniqueContainersInSelection.length > 0) {
-      return undefined;
-    }
+  if (!cursorPosition) {
+    return undefined;
   }
 
-  const intersectedNode = instance.nodeIntersectsContainerElement(node);
+  const nodesUnderPointer = new Set<Konva.Node>();
 
-  let nodeActualContainer: Konva.Node | undefined =
-    node.getParent() as Konva.Node;
-  if (nodeActualContainer?.getAttrs().nodeId) {
-    nodeActualContainer = instance
-      .getStage()
-      .findOne(`#${nodeActualContainer.getAttrs().nodeId}`);
+  stage
+    .find('Shape')
+    .reverse()
+    .forEach((node) => {
+      if (!node.isVisible() || !(node instanceof Konva.Shape)) {
+        return;
+      }
+
+      const shapeRect = node.getClientRect({ relativeTo: stage });
+      if (
+        cursorPosition.x >= shapeRect.x &&
+        cursorPosition.x <= shapeRect.x + shapeRect.width &&
+        cursorPosition.y >= shapeRect.y &&
+        cursorPosition.y <= shapeRect.y + shapeRect.height &&
+        node.getAttrs().nodeId
+      ) {
+        const realNode = stage.findOne(`#${node.getAttrs().nodeId}`);
+        if (realNode?.getAttrs().isContainerPrincipal) {
+          nodesUnderPointer.add(realNode);
+        }
+      }
+    });
+
+  const nodes = Array.from(nodesUnderPointer);
+
+  if (nodes.length === 0) {
+    return undefined;
   }
 
   let layerToMove = undefined;
   // Move to container
   if (
-    !node.getAttrs().containerId &&
-    intersectedNode &&
-    nodeActualContainer?.getAttrs().id !== intersectedNode.getAttrs().id
+    nodes[0]?.getAttrs().containerId &&
+    nodes[0]?.getAttrs().isContainerPrincipal
   ) {
-    layerToMove = intersectedNode;
+    layerToMove = nodes[0];
   }
 
   return layerToMove;
@@ -87,10 +92,11 @@ export function checkIfOverContainer(
 
 export function moveNodeToContainer(
   instance: Weave,
-  node: Konva.Node
+  node: Konva.Node,
+  containerToMove: Konva.Layer | Konva.Node,
+  invalidOriginsTypes: string[] = ['frame']
 ): Konva.Node | undefined {
   const stage = instance.getStage();
-  const nodeIntersected = instance.nodeIntersectsContainerElement(node);
 
   // check is node is locked
   const isLocked = instance.allNodesLocked([node]);
@@ -119,17 +125,13 @@ export function moveNodeToContainer(
   const actualContainerAttrs = nodeActualContainer.getAttrs();
 
   let layerToMove = undefined;
+
   // Move to container
   if (
-    nodeIntersected &&
-    actualContainerAttrs.id !== nodeIntersected.getAttrs().id &&
-    !node.getAttrs().isContainerPrincipal
+    actualContainerAttrs.id !== containerToMove.getAttrs().id &&
+    !invalidOriginsTypes.includes(node.getAttrs().nodeType)
   ) {
-    layerToMove = nodeIntersected;
-  }
-  // Move to main layer
-  if (!nodeIntersected && actualContainerAttrs.id !== WEAVE_NODE_LAYER_ID) {
-    layerToMove = instance.getMainLayer();
+    layerToMove = containerToMove;
   }
 
   if (
@@ -235,7 +237,7 @@ export function getTargetedNode(instance: Weave): Konva.Node | undefined {
   let selectedGroup: Konva.Node | undefined = undefined;
   const mousePos = stage.getPointerPosition();
   if (mousePos) {
-    const allInter = stage.getAllIntersections(mousePos);
+    const allInter = stage.getAllIntersections(mousePos).reverse();
     if (allInter.length === 1) {
       selectedGroup = instance.getInstanceRecursive(allInter[0]);
     } else {
@@ -250,4 +252,51 @@ export function getTargetedNode(instance: Weave): Konva.Node | undefined {
     }
   }
   return selectedGroup;
+}
+
+export function hasImages(node: Konva.Node) {
+  if (node.getAttrs().nodeType === 'image') {
+    return true;
+  }
+
+  if (node.getAttrs().nodeType !== 'group') {
+    return false;
+  }
+
+  const nodes = (node as Konva.Group).find((node: Konva.Node) => {
+    return node.getAttrs().nodeType === 'image';
+  });
+
+  if (nodes.length === 0) {
+    return false;
+  } else {
+    return true;
+  }
+}
+
+export function hasFrames(node: Konva.Node) {
+  if (node.getAttrs().nodeType === 'frame') {
+    return true;
+  }
+
+  if (node.getAttrs().nodeType !== 'group') {
+    return false;
+  }
+
+  const nodes = (node as Konva.Group).find((node: Konva.Node) => {
+    return node.getAttrs().nodeType === 'frame';
+  });
+
+  if (nodes.length === 0) {
+    return false;
+  } else {
+    return true;
+  }
+}
+
+export function intersectArrays<T>(arrays: T[][]): T[] {
+  return arrays.reduce(
+    (acc, arr) => acc.filter((val) => arr.includes(val)),
+    arrays[0]
+  );
 }
