@@ -327,7 +327,7 @@ export abstract class WeaveNode implements WeaveNodeBase {
         ) {
           clearContainerTargets(this.instance);
 
-          const layerToMove = containerOverCursor(this.instance);
+          const layerToMove = containerOverCursor(this.instance, [node]);
 
           if (layerToMove && !hasFrames(node)) {
             layerToMove.fire(WEAVE_NODE_CUSTOM_EVENTS.onTargetEnter, {
@@ -367,7 +367,7 @@ export abstract class WeaveNode implements WeaveNodeBase {
             nodesSnappingPlugin.cleanupEvaluateGuidelines();
           }
 
-          const layerToMove = containerOverCursor(this.instance);
+          const layerToMove = containerOverCursor(this.instance, [node]);
 
           let containerToMove: Konva.Layer | Konva.Node | undefined =
             this.instance.getMainLayer();
@@ -380,7 +380,7 @@ export abstract class WeaveNode implements WeaveNodeBase {
           }
 
           let moved = false;
-          if (containerToMove) {
+          if (containerToMove && !hasFrames(node)) {
             moved = moveNodeToContainer(
               this.instance,
               e.target,

@@ -37,7 +37,10 @@ export function clearContainerTargets(instance: Weave): void {
   }
 }
 
-export function containerOverCursor(instance: Weave): Konva.Node | undefined {
+export function containerOverCursor(
+  instance: Weave,
+  ignoreNodes: Konva.Node[]
+): Konva.Node | undefined {
   Konva.hitOnDragEnabled = true;
 
   const stage = instance.getStage();
@@ -47,13 +50,17 @@ export function containerOverCursor(instance: Weave): Konva.Node | undefined {
     return undefined;
   }
 
-  const nodesUnderPointer = new Set<Konva.Node>();
+  const containerUnderPointer = new Set<Konva.Node>();
 
   stage
-    .find('Shape')
+    .find('.containerCapable')
     .reverse()
     .forEach((node) => {
-      if (!node.isVisible() || !(node instanceof Konva.Shape)) {
+      if (!node.isVisible()) {
+        return;
+      }
+
+      if (containsNodeDeep(ignoreNodes, node)) {
         return;
       }
 
@@ -62,17 +69,15 @@ export function containerOverCursor(instance: Weave): Konva.Node | undefined {
         cursorPosition.x >= shapeRect.x &&
         cursorPosition.x <= shapeRect.x + shapeRect.width &&
         cursorPosition.y >= shapeRect.y &&
-        cursorPosition.y <= shapeRect.y + shapeRect.height &&
-        node.getAttrs().nodeId
+        cursorPosition.y <= shapeRect.y + shapeRect.height
       ) {
-        const realNode = stage.findOne(`#${node.getAttrs().nodeId}`);
-        if (realNode?.getAttrs().isContainerPrincipal) {
-          nodesUnderPointer.add(realNode);
+        if (node?.getAttrs().isContainerPrincipal) {
+          containerUnderPointer.add(node);
         }
       }
     });
 
-  const nodes = Array.from(nodesUnderPointer);
+  const nodes = Array.from(containerUnderPointer);
 
   if (nodes.length === 0) {
     return undefined;
@@ -290,4 +295,27 @@ export function intersectArrays<T>(arrays: T[][]): T[] {
     (acc, arr) => acc.filter((val) => arr.includes(val)),
     arrays[0]
   );
+}
+
+export function isNodeInSelection(
+  node: Konva.Node,
+  nodes: Konva.Node[]
+): boolean {
+  return nodes.some((selectedNode) => selectedNode.id() === node.id());
+}
+
+export function containsNodeDeep(
+  nodes: Konva.Node[],
+  target: Konva.Node
+): boolean {
+  for (const node of nodes) {
+    if (node === target) return true;
+    if (
+      node.hasChildren?.() &&
+      containsNodeDeep((node as unknown as Konva.Group).getChildren(), target)
+    ) {
+      return true;
+    }
+  }
+  return false;
 }

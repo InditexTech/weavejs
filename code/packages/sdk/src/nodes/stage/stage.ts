@@ -70,12 +70,15 @@ export class WeaveStageNode extends WeaveNode {
 
     stage.mode(WEAVE_STAGE_DEFAULT_MODE);
 
-    stage.on('pointerdown', () => {
+    stage.on('pointerdown', (e) => {
+      if (e.evt.button === 1) {
+        this.wheelMousePressed = true;
+      }
+
       if (
         [MOVE_TOOL_ACTION_NAME].includes(this.instance.getActiveAction() ?? '')
       ) {
         stage.container().style.cursor = 'grabbing';
-        return;
       }
     });
 
@@ -100,12 +103,15 @@ export class WeaveStageNode extends WeaveNode {
       }
     });
 
-    stage.on('pointerup', () => {
+    stage.on('pointerup', (e) => {
       const activeAction = this.instance.getActiveAction();
+
+      if (e.evt.button === 1) {
+        this.wheelMousePressed = false;
+      }
 
       if ([MOVE_TOOL_ACTION_NAME].includes(activeAction ?? '')) {
         stage.container().style.cursor = 'grab';
-        return;
       }
     });
 
@@ -123,18 +129,6 @@ export class WeaveStageNode extends WeaveNode {
 
       this.hideHoverState();
       stage.container().style.cursor = 'default';
-    });
-
-    stage.on('pointerdown', (e) => {
-      if (e.evt.button === 1) {
-        this.wheelMousePressed = true;
-      }
-    });
-
-    stage.on('pointerup', (e) => {
-      if (e.evt.button === 1) {
-        this.wheelMousePressed = false;
-      }
     });
 
     return stage;

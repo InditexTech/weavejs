@@ -48,7 +48,6 @@ export class WeaveMoveToolAction extends WeaveAction {
         [MOVE_TOOL_ACTION_NAME].includes(this.instance.getActiveAction() ?? '')
       ) {
         stage.container().style.cursor = 'grabbing';
-        return;
       }
     });
 
@@ -57,7 +56,6 @@ export class WeaveMoveToolAction extends WeaveAction {
         [MOVE_TOOL_ACTION_NAME].includes(this.instance.getActiveAction() ?? '')
       ) {
         stage.container().style.cursor = 'grab';
-        return;
       }
     });
 
