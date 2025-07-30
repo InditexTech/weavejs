@@ -40,7 +40,6 @@ export class WeaveStageZoomPlugin extends WeavePlugin {
   private zoomVelocity: number = 0;
   private zoomInertiaType: WeaveStageZoomType =
     WEAVE_STAGE_ZOOM_TYPE.MOUSE_WHEEL;
-  private center: { x: number; y: number } = { x: 0, y: 0 };
   defaultStep: number = 3;
 
   constructor(params?: WeaveStageZoomPluginParams) {
@@ -558,7 +557,7 @@ export class WeaveStageZoomPlugin extends WeavePlugin {
               stage.scaleX() * (dist / lastDist)
             )
           );
-          this.setZoom(newScale, false, this.center);
+          this.setZoom(newScale, false, newCenter);
 
           const dx = newCenter.x - lastCenter.x;
           const dy = newCenter.y - lastCenter.y;
@@ -652,7 +651,7 @@ export class WeaveStageZoomPlugin extends WeavePlugin {
       return;
     }
 
-    let pointer: Vector2d | null = this.center;
+    let pointer: Vector2d | null = null;
     if (this.zoomInertiaType === WEAVE_STAGE_ZOOM_TYPE.MOUSE_WHEEL) {
       const stage = this.instance.getStage();
       pointer = stage.getPointerPosition();
