@@ -17,6 +17,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - [#535](https://github.com/InditexTech/weavejs/issues/535) Free draw tool lacks support for styles and post-editing stroke width
 
+### Fixed
+
+- [#537](https://github.com/InditexTech/weavejs/issues/537) Groupped frames broke on dragend
+
 ## [0.46.1] - 2025-07-30
 
 ### Fixed

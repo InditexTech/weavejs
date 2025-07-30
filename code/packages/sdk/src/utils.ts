@@ -95,14 +95,14 @@ export function moveNodeToContainer(
   node: Konva.Node,
   containerToMove: Konva.Layer | Konva.Node,
   invalidOriginsTypes: string[] = ['frame']
-): Konva.Node | undefined {
+): boolean {
   const stage = instance.getStage();
 
   // check is node is locked
   const isLocked = instance.allNodesLocked([node]);
 
   if (isLocked) {
-    return;
+    return false;
   }
 
   let nodeActualContainer: Konva.Node | undefined =
@@ -119,7 +119,7 @@ export function moveNodeToContainer(
   }
 
   if (!nodeActualContainer) {
-    return undefined;
+    return false;
   }
 
   const actualContainerAttrs = nodeActualContainer.getAttrs();
@@ -161,11 +161,11 @@ export function moveNodeToContainer(
       instance.removeNode(actualNode);
       instance.addNode(actualNode, layerToMoveAttrs.id);
 
-      return layerToMove;
+      return true;
     }
   }
 
-  return undefined;
+  return false;
 }
 
 export function getContrastTextColor(hex: string): 'white' | 'black' {
