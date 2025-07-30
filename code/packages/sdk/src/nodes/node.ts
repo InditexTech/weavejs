@@ -378,13 +378,20 @@ export abstract class WeaveNode implements WeaveNodeBase {
             });
           }
 
+          let moved = false;
           if (containerToMove) {
-            moveNodeToContainer(this.instance, e.target, containerToMove);
+            moved = moveNodeToContainer(
+              this.instance,
+              e.target,
+              containerToMove
+            );
           }
 
-          this.instance.updateNode(
-            this.serialize(node as WeaveElementInstance)
-          );
+          if (!moved) {
+            this.instance.updateNode(
+              this.serialize(node as WeaveElementInstance)
+            );
+          }
         }
       });
 
