@@ -17,11 +17,7 @@ export class WeaveStagePanningPlugin extends WeavePlugin {
   private isCtrlOrMetaPressed: boolean;
   private isSpaceKeyPressed: boolean;
   private pointers: Map<number, Vector2d>;
-  private lastCenter: Vector2d | null;
-  private pinching: boolean = false;
   private panning: boolean = false;
-  private threshold: number; // Minimum distance to start panning
-  private pointersDistanceDiffThreshold: number;
   protected previousPointer!: string | null;
   getLayerName = undefined;
   initLayer = undefined;
@@ -31,11 +27,7 @@ export class WeaveStagePanningPlugin extends WeavePlugin {
     super();
 
     this.pointers = new Map<number, { x: number; y: number }>();
-    this.lastCenter = null;
-    this.pinching = false;
     this.panning = false;
-    this.threshold = 5;
-    this.pointersDistanceDiffThreshold = 10;
     this.enabled = true;
     this.moveToolActive = false;
     this.isMouseMiddleButtonPressed = false;
@@ -91,19 +83,18 @@ export class WeaveStagePanningPlugin extends WeavePlugin {
       }
     });
 
-    let startPointersDistance: number | null = null;
-    let startCenter: Vector2d | null = null;
     let lastPos: Vector2d | null = null;
     let isDragging = false;
-    let velocity = { x: 0, y: 0 };
-    let lastTime = 0;
 
     stage.on('pointerdown', (e) => {
-      // stage.setPointersPositions(e.evt);
       this.pointers.set(e.evt.pointerId, {
         x: e.evt.clientX,
         y: e.evt.clientY,
       });
+
+      if (this.pointers.size > 1) {
+        return;
+      }
 
       const activeAction = this.instance.getActiveAction();
 
@@ -123,38 +114,9 @@ export class WeaveStagePanningPlugin extends WeavePlugin {
         enableMove = true;
       }
 
-      if (
-        e.evt.pointerType !== 'mouse' &&
-        this.pointers.size === 2 &&
-        !this.pinching &&
-        !this.panning
-      ) {
-        const center = this.getTouchCenter();
-
-        const [p1, p2] = Array.from(this.pointers.values());
-        const pointersDistance = this.getDistance(p1, p2);
-
-        if (!startCenter) {
-          startPointersDistance = pointersDistance;
-          startCenter = center;
-          this.lastCenter = center;
-          this.pinching = false;
-          this.panning = false;
-          velocity = { x: 0, y: 0 };
-        }
-
-        isDragging = true;
-        lastPos = stage.getPointerPosition();
-        lastTime = performance.now();
-        this.enableMove();
-        return;
-      }
-
       if (enableMove) {
         isDragging = true;
         lastPos = stage.getPointerPosition();
-        lastTime = performance.now();
-        velocity = { x: 0, y: 0 };
         this.enableMove();
       }
     });
@@ -163,92 +125,19 @@ export class WeaveStagePanningPlugin extends WeavePlugin {
       this.pointers.delete(e.evt.pointerId);
 
       lastPos = null;
-      this.lastCenter = null;
     });
 
     const handleMouseMove = (e: KonvaEventObject<PointerEvent, Stage>) => {
-      // stage.setPointersPositions(e.evt);
-
-      // if (!this.pointers.has(e.evt.pointerId)) return;
-
       this.pointers.set(e.evt.pointerId, {
         x: e.evt.clientX,
         y: e.evt.clientY,
       });
 
+      if (this.pointers.size > 1) {
+        return;
+      }
+
       if (!isDragging) return;
-
-      const center = this.getTouchCenter();
-
-      if (e.evt.pointerType !== 'mouse' && this.pointers.size !== 2) {
-        startCenter = null;
-        startPointersDistance = null;
-        this.pinching = false;
-        this.panning = false;
-      }
-
-      if (e.evt.pointerType !== 'mouse' && this.pointers.size === 2) {
-        this.getContextMenuPlugin()?.cancelLongPressTimer();
-
-        const [p1, p2] = Array.from(this.pointers.values());
-        const pointersDistance = this.getDistance(p1, p2);
-
-        if (!startCenter) {
-          startPointersDistance = pointersDistance;
-          startCenter = center;
-          this.lastCenter = center;
-          this.pinching = false;
-          this.panning = false;
-        }
-
-        if (center && startCenter && startPointersDistance && this.lastCenter) {
-          const now = performance.now();
-          const dt = now - lastTime;
-
-          const dx = center.x - startCenter.x;
-          const dy = center.y - startCenter.y;
-
-          const distanceCenters = Math.hypot(dx, dy);
-          const distanceChange = Math.abs(
-            pointersDistance - startPointersDistance
-          );
-
-          if (
-            !this.pinching &&
-            distanceCenters > this.threshold &&
-            distanceChange <= this.pointersDistanceDiffThreshold
-          ) {
-            this.panning = true;
-          }
-
-          if (
-            !this.panning &&
-            distanceCenters <= this.threshold &&
-            distanceChange > this.pointersDistanceDiffThreshold
-          ) {
-            this.pinching = true;
-          }
-
-          if (this.panning) {
-            this.getNodesSelectionPlugin()?.disable();
-
-            const dx = center.x - this.lastCenter.x;
-            const dy = center.y - this.lastCenter.y;
-            velocity = { x: dx / dt, y: dy / dt };
-
-            stage.x(stage.x() + dx);
-            stage.y(stage.y() + dy);
-
-            this.instance.emitEvent('onStageMove');
-          }
-
-          this.lastCenter = center;
-          lastTime = now;
-          return;
-        }
-      }
-
-      this.lastCenter = center;
 
       // Pan with space pressed and no mouse buttons pressed
       if (
@@ -263,70 +152,30 @@ export class WeaveStagePanningPlugin extends WeavePlugin {
       }
 
       this.getContextMenuPlugin()?.cancelLongPressTimer();
-      this.getNodesSelectionPlugin()?.disable();
 
       const pos = stage.getPointerPosition();
-      const now = performance.now();
-      const dt = now - lastTime;
 
       if (pos && lastPos) {
         const dx = pos.x - lastPos.x;
         const dy = pos.y - lastPos.y;
-        velocity = { x: dx / dt, y: dy / dt };
 
         stage.x(stage.x() + dx);
         stage.y(stage.y() + dy);
       }
 
       lastPos = pos;
-      lastTime = now;
 
       this.instance.emitEvent('onStageMove');
     };
 
     stage.on('pointermove', handleMouseMove);
 
-    // Apply inertia
-    const decay = 0.95;
-    const animateInertia = () => {
-      velocity.x *= decay;
-      velocity.y *= decay;
-
-      if (Math.abs(velocity.x) < 0.01 && Math.abs(velocity.y) < 0.01) {
-        return;
-      }
-
-      stage.x(stage.x() + velocity.x);
-      stage.y(stage.y() + velocity.y);
-
-      this.instance.emitEvent('onStageMove');
-
-      requestAnimationFrame(animateInertia);
-    };
-
     stage.on('pointerup', (e) => {
       this.pointers.delete(e.evt.pointerId);
 
-      if (e.evt.pointerType !== 'mouse' && this.pointers.size < 2) {
-        this.getNodesSelectionPlugin()?.enable();
-        isDragging = false;
-        startCenter = null;
-        startPointersDistance = null;
-        this.lastCenter = null;
-
-        this.pinching = false;
-        this.panning = false;
-
-        requestAnimationFrame(animateInertia);
-
-        return;
-      }
-
       isDragging = false;
 
-      this.pinching = false;
       this.panning = false;
-      requestAnimationFrame(animateInertia);
     });
 
     // Pan with wheel mouse pressed

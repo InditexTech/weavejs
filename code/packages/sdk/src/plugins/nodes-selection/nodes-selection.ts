@@ -629,11 +629,10 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
 
       this.pointers[e.evt.pointerId] = e.evt;
 
-      if (!this.initialized) {
-        return;
-      }
-
-      if (!this.active) {
+      if (
+        e.evt.pointerType === 'touch' &&
+        Object.keys(this.pointers).length > 1
+      ) {
         return;
       }
 
@@ -645,10 +644,11 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
         return;
       }
 
-      if (
-        e.evt.pointerType === 'touch' &&
-        Object.keys(this.pointers).length > 1
-      ) {
+      if (!this.initialized) {
+        return;
+      }
+
+      if (!this.active) {
         return;
       }
 
@@ -715,18 +715,18 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
         return;
       }
 
+      if (
+        e.evt.pointerType === 'touch' &&
+        Object.keys(this.pointers).length > 1
+      ) {
+        return;
+      }
+
       if (!this.initialized) {
         return;
       }
 
       if (!this.active) {
-        return;
-      }
-
-      if (
-        e.evt.pointerType === 'touch' &&
-        Object.keys(this.pointers).length > 1
-      ) {
         return;
       }
 
