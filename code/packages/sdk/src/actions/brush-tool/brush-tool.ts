@@ -24,7 +24,6 @@ export class WeaveBrushToolAction extends WeaveAction {
   protected strokeId: string | null;
   protected container: Konva.Layer | Konva.Node | undefined;
   protected measureContainer: Konva.Layer | Konva.Group | undefined;
-  protected lineWidth: number = 0;
   protected cancelAction!: () => void;
   onPropsChange = undefined;
   onInit = undefined;
@@ -33,7 +32,6 @@ export class WeaveBrushToolAction extends WeaveAction {
     super();
 
     this.initialized = false;
-    this.lineWidth = 0;
     this.state = BRUSH_TOOL_STATE.INACTIVE;
     this.strokeId = null;
     this.clickPoint = null;
@@ -93,9 +91,7 @@ export class WeaveBrushToolAction extends WeaveAction {
       }
 
       const pointPressure = this.getPointPressure(e);
-      this.lineWidth = Math.log(pointPressure + 1) * this.props.strokeWidth;
-
-      this.handleStartStroke();
+      this.handleStartStroke(pointPressure);
 
       e.evt.stopPropagation();
     };
@@ -108,11 +104,7 @@ export class WeaveBrushToolAction extends WeaveAction {
       }
 
       const pointPressure = this.getPointPressure(e);
-      this.lineWidth =
-        Math.log(pointPressure + 1) * this.props.strokeWidth * 0.2 +
-        this.lineWidth * 0.8;
-
-      this.handleMovement();
+      this.handleMovement(pointPressure);
 
       e.evt.stopPropagation();
     };
@@ -168,7 +160,7 @@ export class WeaveBrushToolAction extends WeaveAction {
     };
   }
 
-  private handleStartStroke() {
+  private handleStartStroke(pressure: number) {
     const { mousePoint, container, measureContainer } =
       this.instance.getMousePointer();
 
@@ -180,7 +172,14 @@ export class WeaveBrushToolAction extends WeaveAction {
 
     const nodeHandler = this.instance.getNodeHandler<WeaveStrokeNode>('stroke');
 
-    if (nodeHandler) {
+    if (nodeHandler && mousePoint && this.measureContainer) {
+      const newStrokeElements = [];
+      newStrokeElements.push({
+        x: mousePoint.x,
+        y: mousePoint.y,
+        pressure,
+      });
+
       const node = nodeHandler.create(this.strokeId, {
         ...this.props,
         strokeScaleEnabled: false,
@@ -188,7 +187,7 @@ export class WeaveBrushToolAction extends WeaveAction {
         y: 0,
         width: 0,
         height: 0,
-        strokeElements: [],
+        strokeElements: newStrokeElements,
       });
       const nodeInstance = nodeHandler.onRender(node.props);
       this.measureContainer?.add(nodeInstance);
@@ -197,7 +196,7 @@ export class WeaveBrushToolAction extends WeaveAction {
     this.setState(BRUSH_TOOL_STATE.DEFINE_STROKE);
   }
 
-  private handleMovement() {
+  private handleMovement(pressure: number) {
     if (this.state !== BRUSH_TOOL_STATE.DEFINE_STROKE) {
       return;
     }
@@ -215,7 +214,7 @@ export class WeaveBrushToolAction extends WeaveAction {
       newStrokeElements.push({
         x: mousePoint.x - tempStroke.x(),
         y: mousePoint.y - tempStroke.y(),
-        lineWidth: this.lineWidth,
+        pressure,
       });
 
       const box = this.getBoundingBox(newStrokeElements);

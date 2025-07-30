@@ -35,33 +35,31 @@ export class WeaveStrokeNode extends WeaveNode {
 
   private drawStroke(
     strokeElements: WeaveStrokePoint[],
+    prevLineWidth: number,
     context: Konva.Context,
     shape: Konva.Shape
-  ) {
-    context.strokeStyle = shape.getAttrs().stroke ?? 'black';
-    context.lineCap = 'round';
-    context.lineJoin = 'round';
+  ): number {
+    const strokeWidth = shape.getAttrs().strokeWidth ?? 1;
 
     const l = strokeElements.length - 1;
     if (strokeElements.length >= 3) {
-      const xc = (strokeElements[l].x + strokeElements[l - 1].x) / 2;
-      const yc = (strokeElements[l].y + strokeElements[l - 1].y) / 2;
-      context.lineWidth = strokeElements[l - 1].lineWidth;
+      const prevPoint = strokeElements[l - 1];
+      const actualPoint = strokeElements[l];
+      const xc = (actualPoint.x + prevPoint.x) / 2;
+      const yc = (actualPoint.y + prevPoint.y) / 2;
+      context.lineWidth =
+        Math.log(actualPoint.pressure + 1) * strokeWidth + prevLineWidth * 0.8;
       context.quadraticCurveTo(
         strokeElements[l - 1].x,
         strokeElements[l - 1].y,
         xc,
         yc
       );
-      context.stroke();
-      context.beginPath();
-      context.moveTo(xc, yc);
+      return context.lineWidth;
     } else {
       const point = strokeElements[l];
-      context.lineWidth = point.lineWidth;
-      context.beginPath();
-      context.moveTo(point.x, point.y);
-      context.stroke();
+      context.lineWidth = Math.log(point.pressure + 1) * strokeWidth;
+      return context.lineWidth;
     }
   }
 
@@ -72,15 +70,35 @@ export class WeaveStrokeNode extends WeaveNode {
       sceneFunc: (context, shape) => {
         context.beginPath();
 
+        context.strokeStyle = shape.getAttrs().stroke ?? 'black';
+        context.setLineDash(shape.getAttrs().dash || []);
+        context.lineCap = shape.getAttrs().lineCap ?? 'round';
+        context.lineJoin = shape.getAttrs().lineJoin ?? 'round';
+
         const strokeElements: WeaveStrokePoint[] =
           shape.getAttrs().strokeElements;
 
+        if (strokeElements.length === 0) {
+          return;
+        }
+
+        context.moveTo(strokeElements[0].x, strokeElements[0].y);
+
+        let prevLineWidth: number = 0;
         const strokePath: WeaveStrokePoint[] = [];
         strokeElements.forEach((point) => {
           strokePath.push(point);
-          this.drawStroke(strokePath, context, shape);
+          prevLineWidth = this.drawStroke(
+            strokePath,
+            prevLineWidth,
+            context,
+            shape
+          );
         });
+
+        context.strokeShape(shape);
       },
+      dashEnabled: false,
       hitFunc: (context, shape) => {
         context.beginPath();
         context.rect(0, 0, shape.width(), shape.height());

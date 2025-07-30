@@ -15,5 +15,5 @@ export type WeaveStrokeNodeParams = {
 export type WeaveStrokePoint = {
   x: number;
   y: number;
-  lineWidth: number;
+  pressure: number;
 };
