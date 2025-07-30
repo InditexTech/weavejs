@@ -308,7 +308,7 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
       if (this.isSelecting() && selectedNodes.length > 1) {
         clearContainerTargets(this.instance);
 
-        const layerToMove = containerOverCursor(this.instance);
+        const layerToMove = containerOverCursor(this.instance, selectedNodes);
 
         if (layerToMove && !selectionContainsFrames) {
           layerToMove.fire(WEAVE_NODE_CUSTOM_EVENTS.onTargetEnter, {
@@ -346,7 +346,7 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
         const toSelect: string[] = [];
         const toUpdate: WeaveStateElement[] = [];
 
-        const layerToMove = containerOverCursor(this.instance);
+        const layerToMove = containerOverCursor(this.instance, selectedNodes);
 
         const nodeUpdatePromise = (node: Konva.Node) => {
           return new Promise<void>((resolve) => {
@@ -373,8 +373,13 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
                 });
               }
 
+              let moved = false;
               if (containerToMove && !selectionContainsFrames) {
-                moveNodeToContainer(this.instance, node, containerToMove);
+                moved = moveNodeToContainer(
+                  this.instance,
+                  node,
+                  containerToMove
+                );
               }
 
               if (!nodeHandler) {
@@ -382,9 +387,12 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
               }
 
               toSelect.push(node.getAttrs().id ?? '');
-              toUpdate.push(
-                nodeHandler.serialize(node as WeaveElementInstance)
-              );
+
+              if (!moved) {
+                toUpdate.push(
+                  nodeHandler.serialize(node as WeaveElementInstance)
+                );
+              }
 
               resolve();
             }, 0);

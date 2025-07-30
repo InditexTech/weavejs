@@ -26,6 +26,7 @@ import type { WeaveNodesSnappingPlugin } from '@/plugins/nodes-snapping/nodes-sn
 import { throttle } from 'lodash';
 import type { KonvaEventObject } from 'konva/lib/Node';
 import { WEAVE_STAGE_DEFAULT_MODE } from './stage/constants';
+import { MOVE_TOOL_ACTION_NAME } from '@/actions/move-tool/constants';
 
 export const augmentKonvaStageClass = (): void => {
   Konva.Stage.prototype.isMouseWheelPressed = function () {
@@ -326,7 +327,7 @@ export abstract class WeaveNode implements WeaveNodeBase {
         ) {
           clearContainerTargets(this.instance);
 
-          const layerToMove = containerOverCursor(this.instance);
+          const layerToMove = containerOverCursor(this.instance, [node]);
 
           if (layerToMove && !hasFrames(node)) {
             layerToMove.fire(WEAVE_NODE_CUSTOM_EVENTS.onTargetEnter, {
@@ -366,7 +367,7 @@ export abstract class WeaveNode implements WeaveNodeBase {
             nodesSnappingPlugin.cleanupEvaluateGuidelines();
           }
 
-          const layerToMove = containerOverCursor(this.instance);
+          const layerToMove = containerOverCursor(this.instance, [node]);
 
           let containerToMove: Konva.Layer | Konva.Node | undefined =
             this.instance.getMainLayer();
@@ -379,7 +380,7 @@ export abstract class WeaveNode implements WeaveNodeBase {
           }
 
           let moved = false;
-          if (containerToMove) {
+          if (containerToMove && !hasFrames(node)) {
             moved = moveNodeToContainer(
               this.instance,
               e.target,
@@ -399,6 +400,7 @@ export abstract class WeaveNode implements WeaveNodeBase {
         e.cancelBubble = true;
 
         const stage = this.instance.getStage();
+        const activeAction = this.instance.getActiveAction();
 
         const isNodeSelectionEnabled = this.getSelectionPlugin()?.isEnabled();
 
@@ -406,6 +408,10 @@ export abstract class WeaveNode implements WeaveNodeBase {
 
         const isTargetable = e.target.getAttrs().isTargetable !== false;
         const isLocked = realNode.getAttrs().locked ?? false;
+
+        if ([MOVE_TOOL_ACTION_NAME].includes(activeAction ?? '')) {
+          return;
+        }
 
         // Node is locked
         if (

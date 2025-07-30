@@ -9,7 +9,6 @@ import type { Stage } from 'konva/lib/Stage';
 import type { Vector2d } from 'konva/lib/types';
 import type { WeaveStageZoomPlugin } from '../stage-zoom/stage-zoom';
 import type { WeaveContextMenuPlugin } from '../context-menu/context-menu';
-import type { WeaveNodesSelectionPlugin } from '../nodes-selection/nodes-selection';
 
 export class WeaveStagePanningPlugin extends WeavePlugin {
   private moveToolActive: boolean;
@@ -197,12 +196,9 @@ export class WeaveStagePanningPlugin extends WeavePlugin {
       }
 
       this.getContextMenuPlugin()?.cancelLongPressTimer();
-      this.getNodesSelectionPlugin()?.disable();
 
       stage.x(stage.x() - e.evt.deltaX);
       stage.y(stage.y() - e.evt.deltaY);
-
-      this.getNodesSelectionPlugin()?.enable();
 
       this.instance.emitEvent('onStageMove');
     };
@@ -241,12 +237,6 @@ export class WeaveStagePanningPlugin extends WeavePlugin {
       x: (p1.x + p2.x) / 2,
       y: (p1.y + p2.y) / 2,
     };
-  }
-
-  getNodesSelectionPlugin() {
-    const selectionPlugin =
-      this.instance.getPlugin<WeaveNodesSelectionPlugin>('nodesSelection');
-    return selectionPlugin;
   }
 
   getZoomPlugin() {
