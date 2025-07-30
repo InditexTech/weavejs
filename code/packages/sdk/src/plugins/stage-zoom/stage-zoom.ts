@@ -18,12 +18,10 @@ import {
   WEAVE_STAGE_ZOOM_TYPE,
 } from './constants';
 import type { Vector2d } from 'konva/lib/types';
-import Hammer from 'hammerjs';
 import { getBoundingBox } from '@/utils';
 import type { KonvaEventObject } from 'konva/lib/Node';
 import type { Stage } from 'konva/lib/Stage';
 import type { WeaveContextMenuPlugin } from '../context-menu/context-menu';
-import type { WeaveStagePanningPlugin } from '../stage-panning/stage-panning';
 import type { WeaveStageGridPlugin } from '../stage-grid/stage-grid';
 
 export class WeaveStageZoomPlugin extends WeavePlugin {
@@ -38,14 +36,10 @@ export class WeaveStageZoomPlugin extends WeavePlugin {
   private updatedMinimumZoom: boolean;
   private pinching: boolean = false;
   private zooming: boolean = false;
-  private threshold: number;
   private isTrackpad: boolean = false;
   private zoomVelocity: number = 0;
   private zoomInertiaType: WeaveStageZoomType =
     WEAVE_STAGE_ZOOM_TYPE.MOUSE_WHEEL;
-  private initialScale: number = 0;
-  private lastTime: number = 0;
-  private center: { x: number; y: number } = { x: 0, y: 0 };
   defaultStep: number = 3;
 
   constructor(params?: WeaveStageZoomPluginParams) {
@@ -61,7 +55,6 @@ export class WeaveStageZoomPlugin extends WeavePlugin {
       );
     }
 
-    this.threshold = 0.2;
     this.pinching = false;
     this.isTrackpad = false;
     this.isCtrlOrMetaPressed = false;
@@ -456,6 +449,17 @@ export class WeaveStageZoomPlugin extends WeavePlugin {
     this.enabled = false;
   }
 
+  getDistance(p1: Vector2d, p2: Vector2d) {
+    return Math.sqrt(Math.pow(p2.x - p1.x, 2) + Math.pow(p2.y - p1.y, 2));
+  }
+
+  getCenter(p1: Vector2d, p2: Vector2d) {
+    return {
+      x: (p1.x + p2.x) / 2,
+      y: (p1.y + p2.y) / 2,
+    };
+  }
+
   private initEvents() {
     window.addEventListener('keydown', (e) => {
       if (e.ctrlKey || e.metaKey) {
@@ -471,67 +475,116 @@ export class WeaveStageZoomPlugin extends WeavePlugin {
 
     const stage = this.instance.getStage();
 
-    const stageContainer = this.instance.getStage().container();
-    const sc = new Hammer.Manager(stageContainer);
-    sc.add(new Hammer.Pinch({ threshold: this.threshold, pointers: 2 }));
+    let lastCenter: Vector2d | null = null;
+    let lastDist = 0;
 
-    sc.on('pinchstart', (e: HammerInput) => {
-      if (this.getPanPlugin()?.isPanning()) {
+    stage.getContent().addEventListener(
+      'touchstart',
+      (e) => {
+        e.preventDefault();
+
+        if (e.touches.length === 2) {
+          e.preventDefault();
+          e.stopPropagation();
+
+          this.pinching = true;
+
+          const touch1 = e.touches[0];
+          const touch2 = e.touches[1];
+
+          const p1 = {
+            x: touch1.clientX,
+            y: touch1.clientY,
+          };
+          const p2 = {
+            x: touch2.clientX,
+            y: touch2.clientY,
+          };
+
+          if (!lastCenter) {
+            lastCenter = this.getCenter(p1, p2);
+            return;
+          }
+        }
+      },
+      { passive: false }
+    );
+
+    stage.getContent().addEventListener(
+      'touchmove',
+      (e) => {
+        e.preventDefault();
+
+        if (e.touches.length === 2) {
+          e.preventDefault();
+          e.stopPropagation();
+
+          this.getContextMenuPlugin()?.cancelLongPressTimer();
+
+          const touch1 = e.touches[0];
+          const touch2 = e.touches[1];
+
+          const p1 = {
+            x: touch1.clientX,
+            y: touch1.clientY,
+          };
+          const p2 = {
+            x: touch2.clientX,
+            y: touch2.clientY,
+          };
+
+          if (!lastCenter) {
+            lastCenter = this.getCenter(p1, p2);
+            return;
+          }
+          const newCenter = this.getCenter(p1, p2);
+
+          const dist = this.getDistance(p1, p2);
+
+          if (!lastDist) {
+            lastDist = dist;
+          }
+
+          const pointTo = {
+            x: (newCenter.x - stage.x()) / stage.scaleX(),
+            y: (newCenter.y - stage.y()) / stage.scaleX(),
+          };
+
+          const newScale = Math.max(
+            this.config.zoomSteps[0],
+            Math.min(
+              this.config.zoomSteps[this.config.zoomSteps.length - 1],
+              stage.scaleX() * (dist / lastDist)
+            )
+          );
+          this.setZoom(newScale, false, newCenter);
+
+          const dx = newCenter.x - lastCenter.x;
+          const dy = newCenter.y - lastCenter.y;
+
+          const newPos = {
+            x: newCenter.x - pointTo.x * newScale + dx,
+            y: newCenter.y - pointTo.y * newScale + dy,
+          };
+
+          stage.position(newPos);
+
+          lastDist = dist;
+          lastCenter = newCenter;
+        }
+      },
+      { passive: false }
+    );
+
+    stage.getContent().addEventListener(
+      'touchend',
+      () => {
         this.pinching = false;
-        return;
-      }
-
-      this.getNodesSelectionPlugin()?.disable();
-
-      this.initialScale = this.instance.getStage().scaleX();
-      this.center = {
-        x: e.center.x,
-        y: e.center.y,
-      };
-
-      this.lastTime = performance.now();
-    });
-
-    sc.on('pinchmove', (e: HammerInput) => {
-      if (this.getPanPlugin()?.isPanning()) {
-        this.pinching = false;
-        return;
-      }
-
-      this.pinching = true;
-
-      const now = performance.now();
-
-      this.getContextMenuPlugin()?.cancelLongPressTimer();
-
-      const newScale = Math.max(
-        this.config.zoomSteps[0],
-        Math.min(
-          this.config.zoomSteps[this.config.zoomSteps.length - 1],
-          this.initialScale * e.scale
-        )
-      );
-      this.setZoom(newScale, false, this.center);
-
-      const dt = now - this.lastTime;
-      this.zoomVelocity = (newScale - 1) / (dt * 16.6);
-      this.lastTime = now;
-    });
-
-    sc.on('pinchend', () => {
-      if (this.getPanPlugin()?.isPanning()) {
-        this.pinching = false;
-        this.zooming = false;
-        return;
-      }
-
-      this.getNodesSelectionPlugin()?.enable();
-
-      this.pinching = false;
-      this.zooming = true;
-      this.zoomInertiaType = WEAVE_STAGE_ZOOM_TYPE.PINCH_ZOOM;
-      requestAnimationFrame(this.zoomTick.bind(this));
-    });
+        lastDist = 0;
+        lastCenter = null;
+      },
+      { passive: false }
+    );
 
     // Zoom with mouse wheel + ctrl / cmd
     const handleWheel = (e: KonvaEventObject<WheelEvent, Stage>) => {
@@ -546,8 +599,6 @@ export class WeaveStageZoomPlugin extends WeavePlugin {
       if (!this.enabled || !stage.isFocused() || !performZoom) {
         return;
       }
-
-      this.getNodesSelectionPlugin()?.disable();
 
       const delta = e.evt.deltaY > 0 ? 1 : -1;
       this.zoomVelocity += delta;
@@ -600,7 +651,7 @@ export class WeaveStageZoomPlugin extends WeavePlugin {
       return;
     }
 
-    let pointer: Vector2d | null = this.center;
+    let pointer: Vector2d | null = null;
     if (this.zoomInertiaType === WEAVE_STAGE_ZOOM_TYPE.MOUSE_WHEEL) {
       const stage = this.instance.getStage();
       pointer = stage.getPointerPosition();
@@ -609,8 +660,6 @@ export class WeaveStageZoomPlugin extends WeavePlugin {
     if (!pointer) {
       return;
     }
-
-    this.getNodesSelectionPlugin()?.enable();
 
     this.setZoom(this.getInertiaScale(), false, pointer);
     this.zoomVelocity *= this.config.zoomInertia.friction;
@@ -633,12 +682,6 @@ export class WeaveStageZoomPlugin extends WeavePlugin {
     const selectionPlugin =
       this.instance.getPlugin<WeaveNodesSelectionPlugin>('nodesSelection');
     return selectionPlugin;
-  }
-
-  getPanPlugin() {
-    const panPlugin =
-      this.instance.getPlugin<WeaveStagePanningPlugin>('stagePanning');
-    return panPlugin;
   }
 
   getContextMenuPlugin() {
