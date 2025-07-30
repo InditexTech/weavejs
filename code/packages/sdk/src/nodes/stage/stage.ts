@@ -9,6 +9,8 @@ import {
 } from '@inditextech/weave-types';
 import { WeaveNode } from '../node';
 import { WEAVE_STAGE_DEFAULT_MODE, WEAVE_STAGE_NODE_TYPE } from './constants';
+import { MOVE_TOOL_ACTION_NAME } from '@/actions/move-tool/constants';
+import { SELECTION_TOOL_ACTION_NAME } from '@/actions/selection-tool/constants';
 
 export class WeaveStageNode extends WeaveNode {
   protected nodeType: string = WEAVE_STAGE_NODE_TYPE;
@@ -68,8 +70,20 @@ export class WeaveStageNode extends WeaveNode {
 
     stage.mode(WEAVE_STAGE_DEFAULT_MODE);
 
-    stage.on('pointermove', (e) => {
+    stage.on('pointerdown', () => {
       if (
+        [MOVE_TOOL_ACTION_NAME].includes(this.instance.getActiveAction() ?? '')
+      ) {
+        stage.container().style.cursor = 'grabbing';
+        return;
+      }
+    });
+
+    stage.on('pointermove', (e) => {
+      const activeAction = this.instance.getActiveAction();
+
+      if (
+        ![MOVE_TOOL_ACTION_NAME].includes(activeAction ?? '') &&
         stage.allowSelection() &&
         !stage.allowActions().includes(this.instance.getActiveAction() ?? '') &&
         !stage.allowSelectNodes().includes(e.target.getAttrs()?.nodeType ?? '')
@@ -79,14 +93,29 @@ export class WeaveStageNode extends WeaveNode {
       }
       if (
         e.target === stage &&
-        this.instance.getActiveAction() === 'selectionTool'
+        [SELECTION_TOOL_ACTION_NAME].includes(activeAction ?? '')
       ) {
         const stage = this.instance.getStage();
         stage.container().style.cursor = 'default';
       }
     });
 
+    stage.on('pointerup', () => {
+      const activeAction = this.instance.getActiveAction();
+
+      if ([MOVE_TOOL_ACTION_NAME].includes(activeAction ?? '')) {
+        stage.container().style.cursor = 'grab';
+        return;
+      }
+    });
+
     stage.on('pointerover', (e) => {
+      const activeAction = this.instance.getActiveAction();
+
+      if ([MOVE_TOOL_ACTION_NAME].includes(activeAction ?? '')) {
+        return;
+      }
+
       if (e.target !== stage && !e.target.getAttrs().nodeId) return;
 
       const parent = (e.target as Konva.Node).getParent();

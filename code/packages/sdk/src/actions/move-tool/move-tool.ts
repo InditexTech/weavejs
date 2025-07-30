@@ -43,6 +43,24 @@ export class WeaveMoveToolAction extends WeaveAction {
       }
     });
 
+    stage.on('pointerdown', () => {
+      if (
+        [MOVE_TOOL_ACTION_NAME].includes(this.instance.getActiveAction() ?? '')
+      ) {
+        stage.container().style.cursor = 'grabbing';
+        return;
+      }
+    });
+
+    stage.on('pointerup', () => {
+      if (
+        [MOVE_TOOL_ACTION_NAME].includes(this.instance.getActiveAction() ?? '')
+      ) {
+        stage.container().style.cursor = 'grab';
+        return;
+      }
+    });
+
     this.initialized = true;
   }
 
@@ -57,6 +75,16 @@ export class WeaveMoveToolAction extends WeaveAction {
     stage.container().focus();
 
     this.setState(MOVE_TOOL_STATE.MOVING);
+
+    const selectionPlugin =
+      this.instance.getPlugin<WeaveNodesSelectionPlugin>('nodesSelection');
+    if (selectionPlugin && !selectionPlugin.isEnabled()) {
+      const tr = selectionPlugin.getTransformer();
+      this.instance.enablePlugin('nodesSelection');
+      tr.listening(false);
+      tr.draggable(false);
+      tr.show();
+    }
   }
 
   trigger(cancelAction: () => void, params?: WeaveMoveToolActionParams): void {
@@ -87,6 +115,12 @@ export class WeaveMoveToolAction extends WeaveAction {
 
     const selectionPlugin =
       this.instance.getPlugin<WeaveNodesSelectionPlugin>('nodesSelection');
+    if (selectionPlugin) {
+      const tr = selectionPlugin.getTransformer();
+      tr.listening(true);
+      tr.draggable(true);
+    }
+
     if (selectionPlugin && this.triggerSelectionTool) {
       this.instance.triggerAction(SELECTION_TOOL_ACTION_NAME);
     }
