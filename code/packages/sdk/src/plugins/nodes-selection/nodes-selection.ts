@@ -465,8 +465,7 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
           return actNode.getAttrs().id !== node.id;
         });
 
-        this.tr.nodes(newSelectedNodes);
-        this.triggerSelectedNodesEvent();
+        this.setSelectedNodes(newSelectedNodes);
 
         stage.container().tabIndex = 1;
         stage.container().focus();
@@ -1161,10 +1160,7 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
       };
     }
 
-    if (this.tr) {
-      this.tr.setAttrs(transformerAttrs);
-      this.tr.forceUpdate();
-    }
+    this.tr.setAttrs(transformerAttrs);
   }
 
   setSelectedNodes(nodes: Konva.Node[]): void {
