@@ -24,7 +24,6 @@ export class WeaveBrushToolAction extends WeaveAction {
   protected strokeId: string | null;
   protected container: Konva.Layer | Konva.Node | undefined;
   protected measureContainer: Konva.Layer | Konva.Group | undefined;
-  // protected lineWidth: number = 0;
   protected cancelAction!: () => void;
   onPropsChange = undefined;
   onInit = undefined;
@@ -33,7 +32,6 @@ export class WeaveBrushToolAction extends WeaveAction {
     super();
 
     this.initialized = false;
-    // this.lineWidth = 0;
     this.state = BRUSH_TOOL_STATE.INACTIVE;
     this.strokeId = null;
     this.clickPoint = null;
@@ -175,8 +173,6 @@ export class WeaveBrushToolAction extends WeaveAction {
     const nodeHandler = this.instance.getNodeHandler<WeaveStrokeNode>('stroke');
 
     if (nodeHandler && mousePoint && this.measureContainer) {
-      // this.lineWidth = Math.log(pressure + 1) * this.props.strokeWidth;
-
       const newStrokeElements = [];
       newStrokeElements.push({
         x: mousePoint.x,
@@ -191,7 +187,7 @@ export class WeaveBrushToolAction extends WeaveAction {
         y: 0,
         width: 0,
         height: 0,
-        strokeElements: [],
+        strokeElements: newStrokeElements,
       });
       const nodeInstance = nodeHandler.onRender(node.props);
       this.measureContainer?.add(nodeInstance);
@@ -213,10 +209,6 @@ export class WeaveBrushToolAction extends WeaveAction {
       const { mousePoint } = this.instance.getMousePointerRelativeToContainer(
         this.measureContainer
       );
-
-      // this.lineWidth =
-      //   Math.log(pressure + 1) * this.props.strokeWidth * 0.2 +
-      //   this.lineWidth * 0.8;
 
       const newStrokeElements = [...tempStroke.getAttrs().strokeElements];
       newStrokeElements.push({
