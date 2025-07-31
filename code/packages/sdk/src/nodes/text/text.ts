@@ -726,7 +726,7 @@ export class WeaveTextNode extends WeaveNode {
         tr.nodes([textNode]);
         tr.show();
       }
-      this.instance.triggerAction('selectionTool');
+      this.instance.triggerAction(SELECTION_TOOL_ACTION_NAME);
     }
 
     stage.container().tabIndex = 1;

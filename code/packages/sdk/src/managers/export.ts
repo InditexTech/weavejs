@@ -12,7 +12,7 @@ import {
   WEAVE_EXPORT_FORMATS,
 } from '@inditextech/weave-types';
 import Konva from 'konva';
-import { getBoundingBox } from '@/utils';
+import { getExportBoundingBox } from '@/utils';
 
 export class WeaveExportManager {
   private instance: Weave;
@@ -40,20 +40,13 @@ export class WeaveExportManager {
       const stage = this.instance.getStage();
       const mainLayer = this.instance.getMainLayer();
 
-      const originalScale = stage.scale();
+      const originalPosition = { x: stage.x(), y: stage.y() };
+      const originalScale = { x: stage.scaleX(), y: stage.scaleY() };
+
       stage.scale({ x: 1, y: 1 });
 
-      const realNodes: Konva.Node[] = nodes
-        .map((node) => {
-          if (node.getAttrs().nodeId) {
-            return stage.findOne(`#${node.getAttrs().nodeId}`);
-          }
-          return node;
-        })
-        .filter((node) => typeof node !== 'undefined');
-
       if (mainLayer) {
-        const bounds = getBoundingBox(stage, boundingNodes(realNodes));
+        const bounds = getExportBoundingBox(stage, boundingNodes(nodes));
 
         const scaleX = stage.scaleX();
         const scaleY = stage.scaleY();
@@ -78,7 +71,7 @@ export class WeaveExportManager {
 
         exportGroup.add(background);
 
-        for (const node of realNodes) {
+        for (const node of nodes) {
           const clonedNode = node.clone({ id: uuidv4() });
           const absPos = node.getAbsolutePosition();
           clonedNode.absolutePosition({
@@ -102,7 +95,10 @@ export class WeaveExportManager {
           quality: options.quality ?? 1,
           callback: (img) => {
             exportGroup.destroy();
+
+            stage.position(originalPosition);
             stage.scale(originalScale);
+            stage.batchDraw();
 
             resolve(img);
           },

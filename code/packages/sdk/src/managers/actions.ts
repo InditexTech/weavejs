@@ -21,11 +21,17 @@ export class WeaveActionsManager {
     return this.activeAction;
   }
 
-  triggerAction<T, P>(actionName: string, params?: T): P | void {
+  triggerAction<T, P>(actionName: string, params?: T): P {
     const actionsHandlers = this.instance.getActionsHandlers();
 
-    if (!actionsHandlers[actionName]) {
-      return;
+    if (typeof actionName === 'undefined') {
+      throw new Error('Action name is required');
+    }
+
+    if (actionName && !actionsHandlers[actionName]) {
+      throw new Error(
+        `Action handler with name [${actionName}] not registered`
+      );
     }
 
     if (typeof this.activeAction !== 'undefined') {

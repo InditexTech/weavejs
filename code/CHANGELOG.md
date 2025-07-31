@@ -13,6 +13,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.48.0] - 2025-07-31
+
+### Changed
+
+- [#547](https://github.com/InditexTech/weavejs/issues/547) Update export tools API to return an image instead of opinionated result (download, etc.)
+
+### Fixed
+
+- [#544](https://github.com/InditexTech/weavejs/issues/544) fitToSelectionTool causes infinite zoom when node has zero width/height
+
 ## [0.47.1] - 2025-07-30
 
 ### Changed
@@ -773,7 +783,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - [#24](https://github.com/InditexTech/weavejs/issues/24) Bug when loading rooms with text or images
 - [#18](https://github.com/InditexTech/weavejs/issues/18) Fix awareness not working on store-azure-web-pubsub
 
-[Unreleased]: https://github.com/InditexTech/weavejs/compare/0.47.1...HEAD
+[Unreleased]: https://github.com/InditexTech/weavejs/compare/0.48.0...HEAD
+
+[0.48.0]: https://github.com/InditexTech/weavejs/compare/0.47.1...0.48.0
 
 [0.47.1]: https://github.com/InditexTech/weavejs/compare/0.47.0...0.47.1
 

@@ -2,18 +2,16 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-import { v4 as uuidv4 } from 'uuid';
 import {
-  type WeaveExportFormats,
   type WeaveExportNodesOptions,
   WEAVE_EXPORT_BACKGROUND_COLOR,
-  WEAVE_EXPORT_FILE_FORMAT,
   WEAVE_EXPORT_FORMATS,
 } from '@inditextech/weave-types';
 import { WeaveAction } from '../action';
 import { EXPORT_STAGE_TOOL_ACTION_NAME } from './constants';
 import type { WeaveExportNodesActionParams } from '../export-nodes-tool/types';
 import type Konva from 'konva';
+import { SELECTION_TOOL_ACTION_NAME } from '../selection-tool/constants';
 
 export class WeaveExportStageToolAction extends WeaveAction {
   protected cancelAction!: () => void;
@@ -34,31 +32,23 @@ export class WeaveExportStageToolAction extends WeaveAction {
 
   private async exportStage(
     boundingNodes: (nodes: Konva.Node[]) => Konva.Node[]
-  ) {
+  ): Promise<HTMLImageElement> {
     const mainLayer = this.instance.getMainLayer();
 
     const img = await this.instance.exportNodes(
+      // mainLayer?.find('.node') ?? [],
       mainLayer?.getChildren() ?? [],
       boundingNodes,
       this.options
     );
 
-    const link = document.createElement('a');
-    link.href = img.src;
-    link.download = `${uuidv4()}${
-      WEAVE_EXPORT_FILE_FORMAT[
-        (this.options.format as WeaveExportFormats) ?? WEAVE_EXPORT_FORMATS.PNG
-      ]
-    }`;
-    link.click();
-
-    this.cancelAction?.();
+    return img;
   }
 
   async trigger(
     cancelAction: () => void,
     { boundingNodes, options }: WeaveExportNodesActionParams
-  ): Promise<void> {
+  ): Promise<HTMLImageElement> {
     if (!this.instance) {
       throw new Error('Instance not defined');
     }
@@ -74,7 +64,12 @@ export class WeaveExportStageToolAction extends WeaveAction {
       ...this.defaultFormatOptions,
       ...options,
     };
-    await this.exportStage(boundingNodes ?? ((nodes) => nodes));
+
+    const img = await this.exportStage(boundingNodes ?? ((nodes) => nodes));
+
+    this.cancelAction?.();
+
+    return img;
   }
 
   cleanup(): void {
@@ -84,6 +79,6 @@ export class WeaveExportStageToolAction extends WeaveAction {
     stage.container().click();
     stage.container().focus();
 
-    this.instance.triggerAction('selectionTool');
+    this.instance.triggerAction(SELECTION_TOOL_ACTION_NAME);
   }
 }

@@ -139,7 +139,7 @@ export class WeaveFrameNode extends WeaveNode {
     const text = new Konva.Text({
       id: `${id}-title`,
       x: 0,
-      width: props.frameWidth / stage.scaleX(),
+      width: props.frameWidth,
       fontSize: fontSize / stage.scaleX(),
       fontFamily,
       fontStyle,
@@ -231,6 +231,16 @@ export class WeaveFrameNode extends WeaveNode {
       draggable: false,
     });
 
+    frame.getExportClientRect = (config) => {
+      const textBox = text.getClientRect(config);
+      const containerAreaBox = containerArea.getClientRect(config);
+      return {
+        x: textBox.x,
+        y: textBox.y,
+        width: containerAreaBox.width,
+        height: containerAreaBox.height + textBox.height,
+      };
+    };
     frame.getClientRect = (config) => {
       return containerArea.getClientRect(config);
     };
@@ -254,7 +264,7 @@ export class WeaveFrameNode extends WeaveNode {
     this.instance.addEventListener('onZoomChange', () => {
       const stage = this.instance.getStage();
       text.fontSize(fontSize / stage.scaleX());
-      text.width(props.frameWidth / stage.scaleX());
+      text.width(props.frameWidth);
       const textMeasures = text.measureSize(text.getAttrs().text ?? '');
       const textHeight =
         textMeasures.height + (2 * titleMargin) / stage.scaleX();

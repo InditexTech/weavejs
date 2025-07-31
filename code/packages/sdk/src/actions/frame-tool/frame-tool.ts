@@ -17,6 +17,7 @@ import {
 } from './types';
 import type { WeaveFrameNode } from '@/nodes/frame/frame';
 import { WEAVE_FRAME_NODE_DEFAULT_PROPS } from '@/nodes/frame/constants';
+import { SELECTION_TOOL_ACTION_NAME } from '../selection-tool/constants';
 
 export class WeaveFrameToolAction extends WeaveAction {
   protected initialized: boolean = false;
@@ -166,7 +167,7 @@ export class WeaveFrameToolAction extends WeaveAction {
       if (node) {
         selectionPlugin.setSelectedNodes([node]);
       }
-      this.instance.triggerAction('selectionTool');
+      this.instance.triggerAction(SELECTION_TOOL_ACTION_NAME);
     }
 
     this.frameId = null;

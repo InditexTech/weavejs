@@ -16,6 +16,7 @@ import { BRUSH_TOOL_ACTION_NAME, BRUSH_TOOL_STATE } from './constants';
 import { WeaveNodesSelectionPlugin } from '@/plugins/nodes-selection/nodes-selection';
 import type { WeaveStrokeNode } from '@/nodes/stroke/stroke';
 import type { WeaveStrokePoint } from '@/nodes/stroke/types';
+import { SELECTION_TOOL_ACTION_NAME } from '../selection-tool/constants';
 
 export class WeaveBrushToolAction extends WeaveAction {
   protected initialized: boolean = false;
@@ -102,6 +103,8 @@ export class WeaveBrushToolAction extends WeaveAction {
       if (this.state !== BRUSH_TOOL_STATE.DEFINE_STROKE) {
         return;
       }
+
+      stage.container().style.cursor = 'crosshair';
 
       const pointPressure = this.getPointPressure(e);
       this.handleMovement(pointPressure);
@@ -275,14 +278,17 @@ export class WeaveBrushToolAction extends WeaveAction {
           realNode.destroy();
         }
 
-        this.instance.addNode(
-          nodeHandler.serialize(tempStroke as WeaveElementInstance),
-          this.container?.getAttrs().id
-        );
+        if (tempStroke.getAttrs().strokeElements.length >= 3) {
+          this.instance.addNode(
+            nodeHandler.serialize(tempStroke as WeaveElementInstance),
+            this.container?.getAttrs().id
+          );
+        }
       }
 
       this.clickPoint = null;
 
+      stage.container().style.cursor = 'crosshair';
       stage.container().tabIndex = 1;
       stage.container().focus();
 
@@ -339,7 +345,7 @@ export class WeaveBrushToolAction extends WeaveAction {
       if (node) {
         selectionPlugin.setSelectedNodes([node]);
       }
-      this.instance.triggerAction('selectionTool');
+      this.instance.triggerAction(SELECTION_TOOL_ACTION_NAME);
     }
 
     this.clickPoint = null;

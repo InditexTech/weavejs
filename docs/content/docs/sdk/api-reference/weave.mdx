@@ -538,12 +538,14 @@ This method return the Fonts available on the Weave instance.
 ```ts
 exportNodes(
   nodes: WeaveElementInstance[],
+  boundingNodes: (nodes: Konva.Node[]) => Konva.Node[],
   options: WeaveExportNodeOptions
 ): Promise<HTMLImageElement>
 ```
 
 This method exports the specified nodes as an image. You can define the
-exportation options.
+exportation options and also define which nodes should be allowed on the bounding box
+calculations.
 
 ### Lock / Unlock management
 
