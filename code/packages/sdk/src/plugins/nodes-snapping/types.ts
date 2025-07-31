@@ -9,6 +9,7 @@ export type NodeSnapKeys = keyof typeof NODE_SNAP;
 export type NodeSnap = (typeof NODE_SNAP)[NodeSnapKeys];
 
 export type NodeSnappingEdge = {
+  nodeId: string;
   guide: number;
   offset: number;
   snap: NodeSnap;
@@ -25,6 +26,7 @@ export type LineGuideStop = {
 };
 
 export type LineGuide = {
+  nodeId: string;
   lineGuide: number;
   diff: number;
   snap: NodeSnap;
@@ -52,6 +54,7 @@ export type WeaveNodesSnappingPluginParams = {
 };
 
 export type DistanceInfoH = {
+  index: number;
   from: Konva.Node;
   to: Konva.Node;
   midY: number;
@@ -59,6 +62,7 @@ export type DistanceInfoH = {
 };
 
 export type DistanceInfoV = {
+  index: number;
   from: Konva.Node;
   to: Konva.Node;
   midX: number;

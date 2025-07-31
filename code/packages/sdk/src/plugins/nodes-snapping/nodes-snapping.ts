@@ -29,6 +29,8 @@ import type { KonvaEventObject } from 'konva/lib/Node';
 import type { WeaveNodesSelectionPlugin } from '../nodes-selection/nodes-selection';
 import type { Vector2d } from 'konva/lib/types';
 
+const SNAP_TOLERANCE = 10;
+
 export class WeaveNodesSnappingPlugin extends WeavePlugin {
   private guideLineConfig: Konva.LineConfig;
   private dragSnappingThreshold: number;
@@ -130,6 +132,7 @@ export class WeaveNodesSnappingPlugin extends WeavePlugin {
       return;
     }
 
+    const stage = this.instance.getStage();
     const nodesSelectionPlugin =
       this.instance.getPlugin<WeaveNodesSelectionPlugin>('nodesSelection');
 
@@ -184,8 +187,11 @@ export class WeaveNodesSnappingPlugin extends WeavePlugin {
 
     utilityLayer.destroyChildren();
 
+    const drawGuides = false;
+    const drawIntersectionGuides = true;
+
     // do nothing of no snapping
-    if (guides.length > 0) {
+    if (guides.length > 0 && drawGuides) {
       this.drawGuides(guides);
 
       if (e.type === 'dragmove') {
@@ -265,10 +271,74 @@ export class WeaveNodesSnappingPlugin extends WeavePlugin {
     }
 
     if (
-      horizontalIntersectedNodes.length > 0 ||
-      verticalIntersectedNodes.length > 0
+      (horizontalIntersectedNodes.length > 0 ||
+        verticalIntersectedNodes.length > 0) &&
+      drawIntersectionGuides
     ) {
-      this.drawSizeGuides(horizontalIntersectedNodes, verticalIntersectedNodes);
+      if (e.type === 'dragmove') {
+        const box = node.getClientRect({ relativeTo: stage });
+
+        const targetIndex = horizontalIntersectedNodes.findIndex(
+          (int) =>
+            int.from.getAttrs().id === node.getAttrs().id ||
+            int.to.getAttrs().id === node.getAttrs().id
+        );
+        const targetIntersections = horizontalIntersectedNodes.filter(
+          (int) =>
+            int.from.getAttrs().id === node.getAttrs().id ||
+            int.to.getAttrs().id === node.getAttrs().id
+        );
+
+        for (const intersection of horizontalIntersectedNodes) {
+          for (const targetIntersection of targetIntersections) {
+            if (
+              intersection.from.getAttrs().id === node.getAttrs().id ||
+              intersection.to.getAttrs().id === node.getAttrs().id
+            ) {
+              break;
+            }
+
+            if (
+              Math.abs(targetIntersection.distance - intersection.distance) <=
+              SNAP_TOLERANCE
+            ) {
+              this.drawSizeGuides(
+                horizontalIntersectedNodes,
+                verticalIntersectedNodes
+              );
+
+              let orientation = 1;
+              if (targetIndex < intersection.index) {
+                orientation = -1;
+              }
+
+              let diff = 0;
+              if (targetIntersection.distance > intersection.distance) {
+                diff =
+                  orientation *
+                  (targetIntersection.distance - intersection.distance);
+              }
+              if (targetIntersection.distance <= intersection.distance) {
+                diff =
+                  orientation *
+                  (intersection.distance - targetIntersection.distance);
+              }
+
+              const snapTargetX = Math.round(box.x) + diff;
+
+              console.log({
+                targetIndex,
+                intIndex: intersection.index,
+                snapTargetX,
+                diff,
+              });
+
+              node.x(snapTargetX);
+              break;
+            }
+          }
+        }
+      }
     }
   }
 
@@ -424,10 +494,11 @@ export class WeaveNodesSnappingPlugin extends WeavePlugin {
       }
 
       intersectedNodesWithDistances.push({
+        index: i,
         from: a,
         to: b,
         midX,
-        distance,
+        distance: Math.round(distance),
       });
     }
 
@@ -520,10 +591,11 @@ export class WeaveNodesSnappingPlugin extends WeavePlugin {
       }
 
       intersectedNodesWithDistances.push({
+        index: i,
         from: a,
         to: b,
         midY,
-        distance,
+        distance: Math.round(distance),
       });
     }
 
@@ -603,16 +675,19 @@ export class WeaveNodesSnappingPlugin extends WeavePlugin {
     const snappingEdges: NodeSnappingEdges = {
       vertical: [
         {
+          nodeId: node.getAttrs().id ?? '',
           guide: box.x,
           offset: Math.round(absPos.x - box.x),
           snap: NODE_SNAP.START,
         },
         {
+          nodeId: node.getAttrs().id ?? '',
           guide: box.x + box.width / 2,
           offset: Math.round(absPos.x - box.x - box.width / 2),
           snap: NODE_SNAP.CENTER,
         },
         {
+          nodeId: node.getAttrs().id ?? '',
           guide: box.x + box.width,
           offset: Math.round(absPos.x - box.x - box.width),
           snap: NODE_SNAP.END,
@@ -620,16 +695,19 @@ export class WeaveNodesSnappingPlugin extends WeavePlugin {
       ],
       horizontal: [
         {
+          nodeId: node.getAttrs().id ?? '',
           guide: Math.round(box.y),
           offset: Math.round(absPos.y - box.y),
           snap: NODE_SNAP.START,
         },
         {
+          nodeId: node.getAttrs().id ?? '',
           guide: Math.round(box.y + box.height / 2),
           offset: Math.round(absPos.y - box.y - box.height / 2),
           snap: NODE_SNAP.CENTER,
         },
         {
+          nodeId: node.getAttrs().id ?? '',
           guide: Math.round(box.y + box.height),
           offset: Math.round(absPos.y - box.y - box.height),
           snap: NODE_SNAP.END,
@@ -645,6 +723,8 @@ export class WeaveNodesSnappingPlugin extends WeavePlugin {
     itemBounds: NodeSnappingEdges,
     type: string
   ): Guide[] {
+    const resultMapV: Map<string, LineGuide> = new Map();
+    const resultMapH: Map<string, LineGuide> = new Map();
     const resultV: LineGuide[] = [];
     const resultH: LineGuide[] = [];
 
@@ -652,13 +732,19 @@ export class WeaveNodesSnappingPlugin extends WeavePlugin {
       itemBounds.vertical.forEach((itemBound) => {
         const diff = Math.abs(lineGuide - itemBound.guide);
         // if the distance between guild line and object snap point is close we can consider this for snapping
-        if (diff < this.dragSnappingThreshold) {
-          resultV.push({
+        if (
+          diff < this.dragSnappingThreshold &&
+          !resultMapV.has(itemBound.nodeId)
+        ) {
+          const guide = {
+            nodeId: itemBound.nodeId,
             lineGuide: lineGuide,
             diff: diff,
             snap: itemBound.snap,
             offset: itemBound.offset,
-          });
+          };
+          resultMapV.set(itemBound.nodeId, guide);
+          resultV.push(guide);
         }
       });
     });
@@ -666,13 +752,19 @@ export class WeaveNodesSnappingPlugin extends WeavePlugin {
     lineGuideStops.horizontal.forEach((lineGuide) => {
       itemBounds.horizontal.forEach((itemBound) => {
         const diff = Math.abs(lineGuide - itemBound.guide);
-        if (diff < this.dragSnappingThreshold) {
-          resultH.push({
+        if (
+          diff < this.dragSnappingThreshold &&
+          !resultMapH.has(itemBound.nodeId)
+        ) {
+          const guide = {
+            nodeId: itemBound.nodeId,
             lineGuide: lineGuide,
             diff: diff,
             snap: itemBound.snap,
             offset: itemBound.offset,
-          });
+          };
+          resultMapH.set(itemBound.nodeId, guide);
+          resultH.push(guide);
         }
       });
     });
@@ -790,7 +882,7 @@ export class WeaveNodesSnappingPlugin extends WeavePlugin {
           from,
           to,
           pairInfo.midY,
-          `${Math.round(pairInfo.distance)}px`
+          `${pairInfo.distance}`
         );
       });
       intersectionsV.forEach((pairInfo) => {
@@ -810,7 +902,7 @@ export class WeaveNodesSnappingPlugin extends WeavePlugin {
           from,
           to,
           pairInfo.midX,
-          `${Math.round(pairInfo.distance)}px`
+          `${pairInfo.distance}`
         );
       });
     }
@@ -855,7 +947,7 @@ export class WeaveNodesSnappingPlugin extends WeavePlugin {
         ctx.moveTo(x1, y);
         ctx.lineTo(x2, y);
         ctx.closePath();
-        ctx.strokeStyle = 'red';
+        ctx.strokeStyle = '#ff0000';
         ctx.lineWidth = 1;
         ctx.setLineDash([]);
         ctx.stroke();
@@ -878,7 +970,7 @@ export class WeaveNodesSnappingPlugin extends WeavePlugin {
 
         ctx.beginPath();
         ctx.rect(labelX, labelY, labelWidth, labelHeight);
-        ctx.fillStyle = 'red';
+        ctx.fillStyle = '#ff0000';
         ctx.fill();
 
         // Text
@@ -938,7 +1030,7 @@ export class WeaveNodesSnappingPlugin extends WeavePlugin {
         ctx.setLineDash([]);
         ctx.moveTo(x, y1);
         ctx.lineTo(x, y2);
-        ctx.strokeStyle = 'red';
+        ctx.strokeStyle = '#ff0000';
         ctx.lineWidth = 1;
         ctx.stroke();
         ctx.closePath();
@@ -961,7 +1053,7 @@ export class WeaveNodesSnappingPlugin extends WeavePlugin {
         // Background rect
         ctx.beginPath();
         ctx.rect(labelX, labelY, labelWidth, labelHeight);
-        ctx.fillStyle = 'red';
+        ctx.fillStyle = '#ff0000';
         ctx.fill();
 
         // Text
