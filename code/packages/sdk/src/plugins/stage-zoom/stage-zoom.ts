@@ -10,7 +10,6 @@ import {
   type WeaveStageZoomPluginParams,
   type WeaveStageZoomType,
 } from './types';
-import Konva from 'konva';
 import { WeaveNodesSelectionPlugin } from '../nodes-selection/nodes-selection';
 import {
   WEAVE_STAGE_ZOOM_DEFAULT_CONFIG,
@@ -314,18 +313,28 @@ export class WeaveStageZoomPlugin extends WeavePlugin {
       return;
     }
 
+    const stage = this.instance.getStage();
     const mainLayer = this.instance.getMainLayer();
 
     if (!mainLayer) {
       return;
     }
 
+    const container = stage.container();
+    const rect = container.getBoundingClientRect();
+    const containerWidth = rect.width;
+    const containerHeight = rect.height;
+
+    const centerPoint = {
+      x: containerWidth / 2,
+      y: containerHeight / 2,
+    };
+
     if (mainLayer?.getChildren().length === 0) {
+      stage.position(centerPoint);
       this.setZoom(this.config.zoomSteps[this.defaultStep]);
       return;
     }
-
-    const stage = this.instance.getStage();
 
     stage.scale({ x: 1, y: 1 });
     stage.position({ x: 0, y: 0 });
@@ -338,6 +347,12 @@ export class WeaveStageZoomPlugin extends WeavePlugin {
     );
 
     const bounds = getBoundingBox(stage, realNodes);
+
+    if (bounds.width === 0 || bounds.height === 0) {
+      stage.position(centerPoint);
+      this.setZoom(this.config.zoomSteps[this.defaultStep]);
+      return;
+    }
 
     const stageWidth = stage.width();
     const stageHeight = stage.height();
@@ -382,33 +397,18 @@ export class WeaveStageZoomPlugin extends WeavePlugin {
       return;
     }
 
-    let zoomTransformer = stage.findOne('#zoomTransformer') as
-      | Konva.Transformer
-      | undefined;
-    if (!zoomTransformer) {
-      zoomTransformer = new Konva.Transformer({
-        id: 'zoomTransformer',
-        clearBeforeDraw: true,
-        resizeEnabled: false,
-        ignoreStroke: true,
-        rotateEnabled: false,
-        enabledAnchors: [],
-        shouldOverdrawWholeArea: true,
-        scaleX: stage.scaleX(),
-        scaleY: stage.scaleY(),
-      });
-
-      const mainLayer = this.instance.getMainLayer();
-      mainLayer?.add(zoomTransformer);
-    }
-
     this.setZoom(1, false);
     stage.setAttrs({ x: 0, y: 0 });
 
-    zoomTransformer.setNodes(selectionPlugin.getTransformer().getNodes());
-    zoomTransformer.forceUpdate();
+    const box = getBoundingBox(
+      stage,
+      selectionPlugin.getTransformer().getNodes()
+    );
 
-    const box = zoomTransformer.__getNodeRect();
+    if (box.width === 0 || box.height === 0) {
+      return;
+    }
+
     const stageBox = {
       width: stage.width(),
       height: stage.height(),
@@ -437,8 +437,6 @@ export class WeaveStageZoomPlugin extends WeavePlugin {
     stage.position({ x: stageX, y: stageY });
 
     this.setZoom(scale, false);
-
-    zoomTransformer.destroy();
   }
 
   enable(): void {
