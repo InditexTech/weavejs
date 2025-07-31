@@ -13,6 +13,7 @@ export type WeaveStageGridPluginConfig = {
   gridMajorRatio?: number;
   gridStroke?: number;
   gridDotRadius?: number;
+  gridDotMaxDotsPerAxis: number;
 };
 
 export type WeaveStageGridPluginParams = {
