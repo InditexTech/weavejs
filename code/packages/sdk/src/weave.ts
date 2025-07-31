@@ -418,7 +418,7 @@ export class Weave {
     return this.actionsManager.getActiveAction();
   }
 
-  triggerAction<T, P>(actionName: string, params?: T): P | void {
+  triggerAction<T, P>(actionName: string, params?: T): P {
     return this.actionsManager.triggerAction<T, P>(actionName, params);
   }
 

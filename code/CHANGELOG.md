@@ -13,6 +13,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- [#547](https://github.com/InditexTech/weavejs/issues/547) Update export tools API to return an image instead of opinionated result (download, etc.)
+
 ### Fixed
 
 - [#544](https://github.com/InditexTech/weavejs/issues/544) fitToSelectionTool causes infinite zoom when node has zero width/height

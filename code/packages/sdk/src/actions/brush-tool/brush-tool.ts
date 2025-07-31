@@ -16,6 +16,7 @@ import { BRUSH_TOOL_ACTION_NAME, BRUSH_TOOL_STATE } from './constants';
 import { WeaveNodesSelectionPlugin } from '@/plugins/nodes-selection/nodes-selection';
 import type { WeaveStrokeNode } from '@/nodes/stroke/stroke';
 import type { WeaveStrokePoint } from '@/nodes/stroke/types';
+import { SELECTION_TOOL_ACTION_NAME } from '../selection-tool/constants';
 
 export class WeaveBrushToolAction extends WeaveAction {
   protected initialized: boolean = false;
@@ -344,7 +345,7 @@ export class WeaveBrushToolAction extends WeaveAction {
       if (node) {
         selectionPlugin.setSelectedNodes([node]);
       }
-      this.instance.triggerAction('selectionTool');
+      this.instance.triggerAction(SELECTION_TOOL_ACTION_NAME);
     }
 
     this.clickPoint = null;

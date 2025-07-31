@@ -17,6 +17,7 @@ import { WeaveNodesSelectionPlugin } from '@/plugins/nodes-selection/nodes-selec
 import type Konva from 'konva';
 import type { WeaveNode } from '@/nodes/node';
 import type { WeaveElementInstance } from '@inditextech/weave-types';
+import { SELECTION_TOOL_ACTION_NAME } from '../selection-tool/constants';
 
 export class WeaveAlignNodesToolAction extends WeaveAction {
   protected initialized: boolean = false;
@@ -465,7 +466,7 @@ export class WeaveAlignNodesToolAction extends WeaveAction {
 
   cleanup(): void {
     if (this.triggerSelectionTool) {
-      this.instance.triggerAction('selectionTool');
+      this.instance.triggerAction(SELECTION_TOOL_ACTION_NAME);
     }
 
     this.setState(ALIGN_NODES_TOOL_STATE.IDLE);

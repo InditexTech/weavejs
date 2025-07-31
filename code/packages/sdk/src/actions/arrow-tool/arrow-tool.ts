@@ -13,6 +13,7 @@ import {
 import { ARROW_TOOL_ACTION_NAME, ARROW_TOOL_STATE } from './constants';
 import { WeaveNodesSelectionPlugin } from '@/plugins/nodes-selection/nodes-selection';
 import type { WeaveArrowNode } from '@/nodes/arrow/arrow';
+import { SELECTION_TOOL_ACTION_NAME } from '../selection-tool/constants';
 
 export class WeaveArrowToolAction extends WeaveAction {
   protected initialized: boolean = false;
@@ -353,7 +354,7 @@ export class WeaveArrowToolAction extends WeaveAction {
       if (node) {
         selectionPlugin.setSelectedNodes([node]);
       }
-      this.instance.triggerAction('selectionTool');
+      this.instance.triggerAction(SELECTION_TOOL_ACTION_NAME);
     }
 
     stage.container().style.cursor = 'default';

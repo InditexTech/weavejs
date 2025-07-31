@@ -9,6 +9,7 @@ import type { Stage } from 'konva/lib/Stage';
 import type { Vector2d } from 'konva/lib/types';
 import type { WeaveStageZoomPlugin } from '../stage-zoom/stage-zoom';
 import type { WeaveContextMenuPlugin } from '../context-menu/context-menu';
+import { MOVE_TOOL_ACTION_NAME } from '@/actions/move-tool/constants';
 
 export class WeaveStagePanningPlugin extends WeavePlugin {
   private moveToolActive: boolean;
@@ -102,7 +103,7 @@ export class WeaveStagePanningPlugin extends WeavePlugin {
         e &&
         (e.evt.pointerType !== 'mouse' ||
           (e.evt.pointerType === 'mouse' && e.evt.buttons === 1)) &&
-        activeAction === 'moveTool'
+        activeAction === MOVE_TOOL_ACTION_NAME
       ) {
         this.moveToolActive = true;
         enableMove = true;
