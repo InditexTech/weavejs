@@ -41,6 +41,7 @@ import type { Vector2d } from 'konva/lib/types';
 import { WEAVE_STAGE_DEFAULT_MODE } from '@/nodes/stage/constants';
 import type { WeaveNodesSnappingPlugin } from '../nodes-snapping/nodes-snapping';
 import type { TransformerConfig } from 'konva/lib/shapes/Transformer';
+import { SELECTION_TOOL_ACTION_NAME } from '@/actions/selection-tool/constants';
 
 export class WeaveNodesSelectionPlugin extends WeavePlugin {
   private tr!: Konva.Transformer;
@@ -175,7 +176,7 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
   }
 
   isSelecting(): boolean {
-    return this.instance.getActiveAction() === 'selectionTool';
+    return this.instance.getActiveAction() === SELECTION_TOOL_ACTION_NAME;
   }
 
   isNodeSelected(ele: Konva.Node): boolean {
@@ -451,7 +452,7 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
       (activeAction: string | undefined) => {
         if (
           typeof activeAction !== 'undefined' &&
-          activeAction !== 'selectionTool'
+          activeAction !== SELECTION_TOOL_ACTION_NAME
         ) {
           this.active = false;
           return;
@@ -1006,7 +1007,7 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
       return;
     }
 
-    if (this.instance.getActiveAction() !== 'selectionTool') {
+    if (this.instance.getActiveAction() !== SELECTION_TOOL_ACTION_NAME) {
       return;
     }
 

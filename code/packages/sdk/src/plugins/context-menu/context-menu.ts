@@ -27,6 +27,7 @@ import type { KonvaEventObject } from 'konva/lib/Node';
 import type { Stage } from 'konva/lib/Stage';
 import { Transformer } from 'konva/lib/shapes/Transformer';
 import { getTargetedNode } from '@/utils';
+import { SELECTION_TOOL_ACTION_NAME } from '@/actions/selection-tool/constants';
 
 export class WeaveContextMenuPlugin extends WeavePlugin {
   private config: WeaveStageContextMenuPluginConfig;
@@ -211,7 +212,7 @@ export class WeaveContextMenuPlugin extends WeavePlugin {
         this.tapHold = true;
 
         const actualActions = this.instance.getActiveAction();
-        if (actualActions !== 'selectionTool') {
+        if (actualActions !== SELECTION_TOOL_ACTION_NAME) {
           return;
         }
 

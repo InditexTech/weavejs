@@ -202,6 +202,41 @@ export function stringToColor(str: string) {
   return color;
 }
 
+export function getExportBoundingBox(
+  stage: Konva.Stage,
+  nodes: Konva.Node[]
+): {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+} {
+  if (nodes.length === 0) {
+    return { x: 0, y: 0, width: 0, height: 0 };
+  }
+
+  let minX = Infinity;
+  let minY = Infinity;
+  let maxX = -Infinity;
+  let maxY = -Infinity;
+
+  for (const node of nodes) {
+    const box = node.getExportClientRect({ skipTransform: false });
+
+    minX = Math.min(minX, box.x);
+    minY = Math.min(minY, box.y);
+    maxX = Math.max(maxX, box.x + box.width);
+    maxY = Math.max(maxY, box.y + box.height);
+  }
+
+  return {
+    x: minX,
+    y: minY,
+    width: maxX - minX,
+    height: maxY - minY,
+  };
+}
+
 export function getBoundingBox(
   stage: Konva.Stage,
   nodes: Konva.Node[]

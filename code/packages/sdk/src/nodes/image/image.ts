@@ -22,6 +22,7 @@ import { WEAVE_IMAGE_CROP_END_TYPE, WEAVE_IMAGE_NODE_TYPE } from './constants';
 import type { WeaveNodesSelectionPlugin } from '@/plugins/nodes-selection/nodes-selection';
 import { isEqual } from 'lodash';
 import { WEAVE_STAGE_DEFAULT_MODE } from '../stage/constants';
+import { IMAGE_TOOL_ACTION_NAME } from '@/actions/image-tool/constants';
 
 export class WeaveImageNode extends WeaveNode {
   private config: WeaveImageProperties;
@@ -567,7 +568,9 @@ export class WeaveImageNode extends WeaveNode {
 
   private getImageToolAction() {
     const imageToolAction =
-      this.instance.getActionHandler<WeaveImageToolAction>('imageTool');
+      this.instance.getActionHandler<WeaveImageToolAction>(
+        IMAGE_TOOL_ACTION_NAME
+      );
     if (!imageToolAction) {
       throw new Error('Image Tool action not found');
     }

@@ -27,6 +27,7 @@ import { throttle } from 'lodash';
 import type { KonvaEventObject } from 'konva/lib/Node';
 import { WEAVE_STAGE_DEFAULT_MODE } from './stage/constants';
 import { MOVE_TOOL_ACTION_NAME } from '@/actions/move-tool/constants';
+import { SELECTION_TOOL_ACTION_NAME } from '@/actions/selection-tool/constants';
 
 export const augmentKonvaStageClass = (): void => {
   Konva.Stage.prototype.isMouseWheelPressed = function () {
@@ -43,6 +44,9 @@ export const augmentKonvaNodeClass = (
     return {
       ...transform,
     };
+  };
+  Konva.Node.prototype.getExportClientRect = function (config) {
+    return this.getClientRect(config);
   };
   Konva.Node.prototype.getRealClientRect = function (config) {
     return this.getClientRect(config);
@@ -88,7 +92,7 @@ export abstract class WeaveNode implements WeaveNodeBase {
   }
 
   isSelecting(): boolean {
-    return this.instance.getActiveAction() === 'selectionTool';
+    return this.instance.getActiveAction() === SELECTION_TOOL_ACTION_NAME;
   }
 
   isPasting(): boolean {

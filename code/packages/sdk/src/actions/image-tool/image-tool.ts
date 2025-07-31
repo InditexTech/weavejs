@@ -19,6 +19,7 @@ import { IMAGE_TOOL_ACTION_NAME, IMAGE_TOOL_STATE } from './constants';
 import { WeaveNodesSelectionPlugin } from '@/plugins/nodes-selection/nodes-selection';
 import Konva from 'konva';
 import type { WeaveImageNode } from '@/nodes/image/image';
+import { SELECTION_TOOL_ACTION_NAME } from '../selection-tool/constants';
 
 export class WeaveImageToolAction extends WeaveAction {
   protected initialized: boolean = false;
@@ -74,7 +75,7 @@ export class WeaveImageToolAction extends WeaveAction {
       if (window.weaveDragImageURL) {
         this.instance.getStage().setPointersPositions(e);
         const position = this.instance.getStage().getRelativePointerPosition();
-        this.instance.triggerAction('imageTool', {
+        this.instance.triggerAction(IMAGE_TOOL_ACTION_NAME, {
           imageURL: window.weaveDragImageURL,
           position,
         });
@@ -370,7 +371,7 @@ export class WeaveImageToolAction extends WeaveAction {
       if (node) {
         selectionPlugin.setSelectedNodes([node]);
       }
-      this.instance.triggerAction('selectionTool');
+      this.instance.triggerAction(SELECTION_TOOL_ACTION_NAME);
     }
 
     stage.container().style.cursor = 'default';

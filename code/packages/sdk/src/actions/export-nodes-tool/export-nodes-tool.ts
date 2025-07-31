@@ -2,18 +2,17 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-import { v4 as uuidv4 } from 'uuid';
 import {
   type WeaveExportNodesOptions,
   type WeaveElementInstance,
   WEAVE_EXPORT_BACKGROUND_COLOR,
-  WEAVE_EXPORT_FILE_FORMAT,
   WEAVE_EXPORT_FORMATS,
 } from '@inditextech/weave-types';
 import { type WeaveExportNodesActionParams } from './types';
 import { WeaveAction } from '../action';
 import { EXPORT_NODES_TOOL_ACTION_NAME } from './constants';
 import type Konva from 'konva';
+import { SELECTION_TOOL_ACTION_NAME } from '../selection-tool/constants';
 
 export class WeaveExportNodesToolAction extends WeaveAction {
   protected cancelAction!: () => void;
@@ -36,21 +35,14 @@ export class WeaveExportNodesToolAction extends WeaveAction {
   private async exportNodes(
     nodes: WeaveElementInstance[],
     boundingNodes: (nodes: Konva.Node[]) => Konva.Node[]
-  ): Promise<void> {
+  ): Promise<HTMLImageElement> {
     const img = await this.instance.exportNodes(
       nodes,
       boundingNodes ?? ((nodes) => nodes),
       this.options
     );
 
-    const link = document.createElement('a');
-    link.href = img.src;
-    link.download = `${uuidv4()}${
-      WEAVE_EXPORT_FILE_FORMAT[this.options.format ?? WEAVE_EXPORT_FORMATS.PNG]
-    }`;
-    link.click();
-
-    this.cancelAction?.();
+    return img;
   }
 
   async trigger(
@@ -60,9 +52,8 @@ export class WeaveExportNodesToolAction extends WeaveAction {
       boundingNodes,
       options,
       triggerSelectionTool = true,
-      download = true,
     }: WeaveExportNodesActionParams
-  ): Promise<void | string> {
+  ): Promise<HTMLImageElement> {
     if (!this.instance) {
       throw new Error('Instance not defined');
     }
@@ -80,21 +71,14 @@ export class WeaveExportNodesToolAction extends WeaveAction {
       ...options,
     };
 
-    if (!download) {
-      const img = await this.instance.exportNodes(
-        nodes,
-        boundingNodes ?? ((nodes) => nodes),
-        this.options
-      );
-      const base64URL = this.instance.imageToBase64(
-        img,
-        this.options.format ?? 'image/png'
-      );
-      this.cancelAction?.();
-      return base64URL;
-    }
+    const img = await this.exportNodes(
+      nodes,
+      boundingNodes ?? ((nodes) => nodes)
+    );
 
-    await this.exportNodes(nodes, boundingNodes ?? ((nodes) => nodes));
+    this.cancelAction?.();
+
+    return img;
   }
 
   cleanup(): void {
@@ -105,7 +89,7 @@ export class WeaveExportNodesToolAction extends WeaveAction {
     stage.container().focus();
 
     if (this.triggerSelectionTool) {
-      this.instance.triggerAction('selectionTool');
+      this.instance.triggerAction(SELECTION_TOOL_ACTION_NAME);
     }
   }
 }

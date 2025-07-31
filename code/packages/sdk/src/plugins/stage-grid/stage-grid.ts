@@ -24,6 +24,7 @@ import {
   type WeaveStageGridType,
 } from './types';
 import { throttle } from 'lodash';
+import { MOVE_TOOL_ACTION_NAME } from '@/actions/move-tool/constants';
 
 export class WeaveStageGridPlugin extends WeavePlugin {
   private moveToolActive: boolean;
@@ -94,7 +95,7 @@ export class WeaveStageGridPlugin extends WeavePlugin {
     stage.on('pointerdown', (e) => {
       const activeAction = this.instance.getActiveAction();
 
-      if (e && e.evt.button === 0 && activeAction === 'moveTool') {
+      if (e && e.evt.button === 0 && activeAction === MOVE_TOOL_ACTION_NAME) {
         this.moveToolActive = true;
       }
 
@@ -106,7 +107,7 @@ export class WeaveStageGridPlugin extends WeavePlugin {
     stage.on('pointerup', (e) => {
       const activeAction = this.instance.getActiveAction();
 
-      if (e && e.evt.button === 0 && activeAction === 'moveTool') {
+      if (e && e.evt.button === 0 && activeAction === MOVE_TOOL_ACTION_NAME) {
         this.moveToolActive = false;
       }
 
