@@ -43,6 +43,7 @@ type WeaveStageGridPluginConfig = {
   gridMajorRatio?: number;
   gridStroke?: number;
   gridDotRadius?: number;
+  gridDotMaxDotsPerAxis: number;
 };
 
 type WeaveStageGridPluginParams = {
@@ -111,6 +112,12 @@ For `WeaveStageGridPluginConfig`:
         "A number that defines the dot radius base size of the grid when the type is dots",
       type: "number",
       default: "1",
+    },
+    ["gridDotMaxDotsPerAxis"]: {
+      description:
+        "A number that defines the maximum dots per axis (for performance)",
+      type: "number",
+      default: "250",
     },
   }}
 />

@@ -17,6 +17,7 @@ import {
   WEAVE_GRID_DEFAULT_MAJOR_LINE_RATIO,
   WEAVE_GRID_DEFAULT_MAJOR_DOT_RATIO,
   WEAVE_GRID_DEFAULT_MAJOR_EVERY,
+  WEAVE_GRID_DEFAULT_DOT_MAX_DOTS_PER_AXIS,
 } from './constants';
 import {
   type WeaveStageGridPluginConfig,
@@ -45,6 +46,7 @@ export class WeaveStageGridPlugin extends WeavePlugin {
       gridColor: WEAVE_GRID_DEFAULT_COLOR,
       gridOriginColor: WEAVE_GRID_DEFAULT_ORIGIN_COLOR,
       gridSize: WEAVE_GRID_DEFAULT_SIZE,
+      gridDotMaxDotsPerAxis: WEAVE_GRID_DEFAULT_DOT_MAX_DOTS_PER_AXIS,
       ...config,
     };
   }
@@ -193,15 +195,15 @@ export class WeaveStageGridPlugin extends WeavePlugin {
     endX: number,
     startY: number,
     endY: number,
-    baseSpacing = 50,
-    maxDotsPerAxis = 500
+    baseSpacing = 50
   ) {
     let spacing = baseSpacing;
     let dotCountX = Math.ceil((endX - startX) / spacing);
     let dotCountY = Math.ceil((endY - startY) / spacing);
 
     while (
-      (dotCountX > maxDotsPerAxis || dotCountY > maxDotsPerAxis) &&
+      (dotCountX > this.config.gridDotMaxDotsPerAxis ||
+        dotCountY > this.config.gridDotMaxDotsPerAxis) &&
       spacing < 1e6
     ) {
       spacing *= 2;
@@ -321,9 +323,9 @@ export class WeaveStageGridPlugin extends WeavePlugin {
     let dotCountX = Math.ceil((endX - startX) / adjustedSpacing);
     let dotCountY = Math.ceil((endY - startY) / adjustedSpacing);
 
-    const maxDotsPerAxis = 500;
     while (
-      (dotCountX > maxDotsPerAxis || dotCountY > maxDotsPerAxis) &&
+      (dotCountX > this.config.gridDotMaxDotsPerAxis ||
+        dotCountY > this.config.gridDotMaxDotsPerAxis) &&
       adjustedSpacing < 1e6
     ) {
       adjustedSpacing *= 2;
@@ -332,6 +334,8 @@ export class WeaveStageGridPlugin extends WeavePlugin {
     }
 
     this.getAdjustedSpacing(startX, endX, startY, endY, spacing);
+
+    console.log({ dotCountX, dotCountY, adjustedSpacing });
 
     startX =
       Math.floor((offsetX - margin * worldWidth) / adjustedSpacing) *
