@@ -10,7 +10,6 @@ import {
   type WeaveStageZoomPluginParams,
   type WeaveStageZoomType,
 } from './types';
-// import Konva from 'konva';
 import { WeaveNodesSelectionPlugin } from '../nodes-selection/nodes-selection';
 import {
   WEAVE_STAGE_ZOOM_DEFAULT_CONFIG,
@@ -398,38 +397,13 @@ export class WeaveStageZoomPlugin extends WeavePlugin {
       return;
     }
 
-    // let zoomTransformer = stage.findOne('#zoomTransformer') as
-    //   | Konva.Transformer
-    //   | undefined;
-    // if (!zoomTransformer) {
-    //   zoomTransformer = new Konva.Transformer({
-    //     id: 'zoomTransformer',
-    //     clearBeforeDraw: true,
-    //     resizeEnabled: false,
-    //     ignoreStroke: true,
-    //     rotateEnabled: false,
-    //     enabledAnchors: [],
-    //     shouldOverdrawWholeArea: true,
-    //     scaleX: stage.scaleX(),
-    //     scaleY: stage.scaleY(),
-    //   });
-
-    //   const mainLayer = this.instance.getMainLayer();
-    //   mainLayer?.add(zoomTransformer);
-    // }
-
     this.setZoom(1, false);
     stage.setAttrs({ x: 0, y: 0 });
-
-    // zoomTransformer.setNodes(selectionPlugin.getTransformer().getNodes());
-    // zoomTransformer.forceUpdate();
 
     const box = getBoundingBox(
       stage,
       selectionPlugin.getTransformer().getNodes()
     );
-
-    // const box = zoomTransformer.__getNodeRect();
 
     if (box.width === 0 || box.height === 0) {
       return;
@@ -463,8 +437,6 @@ export class WeaveStageZoomPlugin extends WeavePlugin {
     stage.position({ x: stageX, y: stageY });
 
     this.setZoom(scale, false);
-
-    // zoomTransformer.destroy();
   }
 
   enable(): void {
