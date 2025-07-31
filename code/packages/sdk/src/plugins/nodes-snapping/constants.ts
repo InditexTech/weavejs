@@ -7,6 +7,8 @@ import type Konva from 'konva';
 export const WEAVE_NODES_SNAPPING_KEY = 'nodesSnapping';
 
 export const GUIDE_LINE_NAME = 'guide-line';
+export const GUIDE_HORIZONTAL_SCALE_LINE_NAME = 'guide-horizontal-scale-line';
+export const GUIDE_VERTICAL_SCALE_LINE_NAME = 'guide-vertical-scale-line';
 export const GUIDE_LINE_DEFAULT_CONFIG: Required<
   Pick<Konva.LineConfig, 'stroke' | 'strokeWidth' | 'dash'>
 > = {

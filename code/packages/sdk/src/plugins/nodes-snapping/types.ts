@@ -50,3 +50,24 @@ export type WeaveNodesSnappingPluginConfig = {
 export type WeaveNodesSnappingPluginParams = {
   config?: WeaveNodesSnappingPluginConfig;
 };
+
+export type DistanceInfoH = {
+  from: Konva.Node;
+  to: Konva.Node;
+  midY: number;
+  distance: number;
+};
+
+export type DistanceInfoV = {
+  from: Konva.Node;
+  to: Konva.Node;
+  midX: number;
+  distance: number;
+};
+
+export type BoundingBox = {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+};
