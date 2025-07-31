@@ -40,7 +40,9 @@ export class WeaveExportManager {
       const stage = this.instance.getStage();
       const mainLayer = this.instance.getMainLayer();
 
-      const originalScale = stage.scale();
+      const originalPosition = { x: stage.x(), y: stage.y() };
+      const originalScale = { x: stage.scaleX(), y: stage.scaleY() };
+
       stage.scale({ x: 1, y: 1 });
 
       const realNodes: Konva.Node[] = nodes
@@ -102,7 +104,10 @@ export class WeaveExportManager {
           quality: options.quality ?? 1,
           callback: (img) => {
             exportGroup.destroy();
+
+            stage.position(originalPosition);
             stage.scale(originalScale);
+            stage.batchDraw();
 
             resolve(img);
           },

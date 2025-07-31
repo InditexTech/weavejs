@@ -103,6 +103,8 @@ export class WeaveBrushToolAction extends WeaveAction {
         return;
       }
 
+      stage.container().style.cursor = 'crosshair';
+
       const pointPressure = this.getPointPressure(e);
       this.handleMovement(pointPressure);
 
@@ -275,14 +277,17 @@ export class WeaveBrushToolAction extends WeaveAction {
           realNode.destroy();
         }
 
-        this.instance.addNode(
-          nodeHandler.serialize(tempStroke as WeaveElementInstance),
-          this.container?.getAttrs().id
-        );
+        if (tempStroke.getAttrs().strokeElements.length >= 3) {
+          this.instance.addNode(
+            nodeHandler.serialize(tempStroke as WeaveElementInstance),
+            this.container?.getAttrs().id
+          );
+        }
       }
 
       this.clickPoint = null;
 
+      stage.container().style.cursor = 'crosshair';
       stage.container().tabIndex = 1;
       stage.container().focus();
 
