@@ -21,7 +21,8 @@ export type WeaveCopyPasteNodesPluginState =
 export type WeaveCopyPasteNodesPluginOnCopyEvent = Error | undefined;
 export type WeaveCopyPasteNodesPluginOnPasteEvent = Error | undefined;
 export type WeaveCopyPasteNodesPluginOnPasteExternalEvent = {
-  item: ClipboardItem;
+  items?: ClipboardItems;
+  dataList?: DataTransferItemList;
   position: Vector2d;
 };
 
