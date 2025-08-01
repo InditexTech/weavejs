@@ -154,6 +154,38 @@ export class WeaveNodesDistanceSnappingPlugin extends WeavePlugin {
     });
   }
 
+  private getPeers(
+    intersectedNodes: any[],
+    targetNode: Konva.Node,
+    prev: Konva.Node,
+    next: Konva.Node
+  ) {
+    const peers = intersectedNodes.filter((int) => {
+      if (prev && next) {
+        return (
+          int.to.getAttrs().id !== targetNode.getAttrs().id &&
+          int.from.getAttrs().id !== targetNode.getAttrs().id
+        );
+      }
+      if (!prev && next) {
+        return int.from.getAttrs().id !== targetNode.getAttrs().id;
+      }
+      return int.to.getAttrs().id !== targetNode.getAttrs().id;
+    });
+
+    let prevBox: BoundingBox | null = null;
+    if (prev) {
+      prevBox = this.getBoxClientRect(prev);
+    }
+
+    let nextBox: BoundingBox | null = null;
+    if (next) {
+      nextBox = this.getBoxClientRect(next);
+    }
+
+    return { prevBox, nextBox, peers };
+  }
+
   validateHorizontalSnapping(
     node: Konva.Node,
     visibleNodes: Konva.Node[],
@@ -168,28 +200,12 @@ export class WeaveNodesDistanceSnappingPlugin extends WeavePlugin {
     const prev = sortedHorizontalIntersectedNodes[targetIndex - 1];
     const next = sortedHorizontalIntersectedNodes[targetIndex + 1];
 
-    const peers = horizontalIntersectedNodes.filter((int) => {
-      if (prev && next) {
-        return (
-          int.to.getAttrs().id !== node.getAttrs().id &&
-          int.from.getAttrs().id !== node.getAttrs().id
-        );
-      }
-      if (!prev && next) {
-        return int.from.getAttrs().id !== node.getAttrs().id;
-      }
-      return int.to.getAttrs().id !== node.getAttrs().id;
-    });
-
-    let prevBox: BoundingBox | null = null;
-    if (prev) {
-      prevBox = this.getBoxClientRect(prev);
-    }
-
-    let nextBox: BoundingBox | null = null;
-    if (next) {
-      nextBox = this.getBoxClientRect(next);
-    }
+    const { prevBox, nextBox, peers } = this.getPeers(
+      horizontalIntersectedNodes,
+      node,
+      prev,
+      next
+    );
 
     // Check if we should exit current snap
     if (
@@ -318,28 +334,12 @@ export class WeaveNodesDistanceSnappingPlugin extends WeavePlugin {
     const prev = sortedVerticalIntersectedNodes[targetIndex - 1];
     const next = sortedVerticalIntersectedNodes[targetIndex + 1];
 
-    const peers = verticalIntersectedNodes.filter((int) => {
-      if (prev && next) {
-        return (
-          int.to.getAttrs().id !== node.getAttrs().id &&
-          int.from.getAttrs().id !== node.getAttrs().id
-        );
-      }
-      if (!prev && next) {
-        return int.from.getAttrs().id !== node.getAttrs().id;
-      }
-      return int.to.getAttrs().id !== node.getAttrs().id;
-    });
-
-    let prevBox: BoundingBox | null = null;
-    if (prev) {
-      prevBox = this.getBoxClientRect(prev);
-    }
-
-    let nextBox: BoundingBox | null = null;
-    if (next) {
-      nextBox = this.getBoxClientRect(next);
-    }
+    const { prevBox, nextBox, peers } = this.getPeers(
+      verticalIntersectedNodes,
+      node,
+      prev,
+      next
+    );
 
     // Exit snapping if needed
     if (
