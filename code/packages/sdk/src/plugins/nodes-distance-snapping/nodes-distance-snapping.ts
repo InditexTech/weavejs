@@ -27,8 +27,8 @@ import { getTargetAndSkipNodes, getVisibleNodesInViewport } from '@/utils';
 import type { Context } from 'konva/lib/Context';
 
 export class WeaveNodesDistanceSnappingPlugin extends WeavePlugin {
-  private enterSnappingTolerance: number;
-  private exitSnappingTolerance: number;
+  private readonly enterSnappingTolerance: number;
+  private readonly exitSnappingTolerance: number;
   private peerDistanceX: number | null = null;
   private peerDistanceY: number | null = null;
   private snapPositionX: number | null = null;

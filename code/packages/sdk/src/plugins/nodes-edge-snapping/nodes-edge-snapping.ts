@@ -25,9 +25,9 @@ import type { WeaveNodesSelectionPlugin } from '../nodes-selection/nodes-selecti
 import { getTargetAndSkipNodes, getVisibleNodesInViewport } from '@/utils';
 
 export class WeaveNodesEdgeSnappingPlugin extends WeavePlugin {
-  private guideLineConfig: Konva.LineConfig;
-  private dragSnappingThreshold: number;
-  private transformSnappingThreshold: number;
+  private readonly guideLineConfig: Konva.LineConfig;
+  private readonly dragSnappingThreshold: number;
+  private readonly transformSnappingThreshold: number;
   onRender: undefined;
 
   constructor(params?: Partial<WeaveNodesEdgeSnappingPluginParams>) {
@@ -382,8 +382,7 @@ export class WeaveNodesEdgeSnappingPlugin extends WeavePlugin {
 
     // find closest snap
     if (type === 'dragmove') {
-      const minV = resultV.sort((a, b) => a.diff - b.diff)[0];
-      const minH = resultH.sort((a, b) => a.diff - b.diff)[0];
+      const { minH, minV } = this.sortedGuides(resultH, resultV);
       if (minV) {
         guides.push({
           lineGuide: minV.lineGuide,
@@ -422,6 +421,13 @@ export class WeaveNodesEdgeSnappingPlugin extends WeavePlugin {
     }
 
     return guides;
+  }
+
+  private sortedGuides(resultH: LineGuide[], resultV: LineGuide[]) {
+    const minV = resultV.sort((a, b) => a.diff - b.diff)[0];
+    const minH = resultH.sort((a, b) => a.diff - b.diff)[0];
+
+    return { minH, minV };
   }
 
   drawGuides(guides: Guide[]): void {
