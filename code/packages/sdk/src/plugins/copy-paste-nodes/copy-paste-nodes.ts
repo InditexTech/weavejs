@@ -56,20 +56,7 @@ export class WeaveCopyPasteNodesPlugin extends WeavePlugin {
         navigator.clipboard
           .readText()
           .then((text) => {
-            try {
-              const object = JSON.parse(text);
-              if (object.weave && object.weaveMinPoint) {
-                this.toPaste = {
-                  weaveInstanceId: object.weaveInstanceId,
-                  weave: object.weave,
-                  weaveMinPoint: object.weaveMinPoint,
-                };
-              }
-              resolve(true);
-              // eslint-disable-next-line @typescript-eslint/no-unused-vars
-            } catch (_) {
-              resolve(false);
-            }
+            resolve(this.isWeaveData(text));
           })
           .catch((error) => {
             reject(error);
@@ -109,40 +96,21 @@ export class WeaveCopyPasteNodesPlugin extends WeavePlugin {
         return;
       }
       if (stage.isFocused() && e.key === 'v' && (e.ctrlKey || e.metaKey)) {
-        e.preventDefault();
+        const catcher = document.getElementById('paste-catcher');
+        catcher?.focus();
 
         if (!this.enabled) {
           return;
         }
 
         try {
-          const continueToPaste = await this.readClipboardData();
-          if (continueToPaste) {
-            this.state = COPY_PASTE_NODES_PLUGIN_STATE.PASTING;
-            this.handlePaste();
-          }
-          // eslint-disable-next-line @typescript-eslint/no-unused-vars, no-empty
-        } catch (ex) {
-          this.instance.emitEvent<WeaveCopyPasteNodesPluginOnPasteEvent>(
-            'onPaste',
-            ex as Error
-          );
-        }
-
-        try {
-          const items = await navigator.clipboard.read();
-          if (items && items.length === 1) {
-            const item = items[0];
-
-            const position = this.instance
-              .getStage()
-              .getRelativePointerPosition();
-
-            if (position) {
-              this.instance.emitEvent<WeaveCopyPasteNodesPluginOnPasteExternalEvent>(
-                'onPasteExternal',
-                { position, item }
-              );
+          if (this.isClipboardAPIAvailable()) {
+            const continueToPaste = await this.readClipboardData();
+            if (continueToPaste) {
+              this.state = COPY_PASTE_NODES_PLUGIN_STATE.PASTING;
+              this.handlePaste();
+              e.preventDefault();
+              return;
             }
           }
           // eslint-disable-next-line @typescript-eslint/no-unused-vars, no-empty
@@ -153,9 +121,72 @@ export class WeaveCopyPasteNodesPlugin extends WeavePlugin {
           );
         }
 
+        e.preventDefault();
+
         stage.container().focus();
         return;
       }
+    });
+
+    document.addEventListener('paste', async (e) => {
+      e.preventDefault();
+
+      const items = e.clipboardData?.items;
+
+      if (!items) return;
+
+      let hasWeaveData = false;
+
+      if (this.isClipboardAPIAvailable()) {
+        for (const item of items) {
+          if (item.type === 'text/plain') {
+            const text = await this.getTextFromClipboard(item);
+            if (this.isWeaveData(text)) {
+              hasWeaveData = true;
+              this.toPaste = JSON.parse(text);
+            }
+          }
+        }
+      }
+
+      if (hasWeaveData) {
+        this.handlePaste();
+        return;
+      }
+
+      // is external data, handle it on app...
+      const position = this.instance.getStage().getRelativePointerPosition();
+      if (position) {
+        this.instance.emitEvent<WeaveCopyPasteNodesPluginOnPasteExternalEvent>(
+          'onPasteExternal',
+          { position, dataList: items }
+        );
+      }
+    });
+  }
+
+  private isWeaveData(text: string): boolean {
+    try {
+      const object = JSON.parse(text);
+      if (object.weave && object.weaveMinPoint) {
+        this.toPaste = {
+          weaveInstanceId: object.weaveInstanceId,
+          weave: object.weave,
+          weaveMinPoint: object.weaveMinPoint,
+        };
+      }
+      return true;
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    } catch (_) {
+      return false;
+    }
+  }
+
+  private getTextFromClipboard(item: DataTransferItem): Promise<string> {
+    return new Promise((resolve) => {
+      item.getAsString((text) => {
+        resolve(text);
+      });
     });
   }
 
@@ -284,16 +315,13 @@ export class WeaveCopyPasteNodesPlugin extends WeavePlugin {
 
     try {
       const items = await navigator.clipboard.read();
-      if (items && items.length === 1) {
-        const item = items[0];
 
-        const position = this.instance.getStage().getRelativePointerPosition();
-        if (position) {
-          this.instance.emitEvent<WeaveCopyPasteNodesPluginOnPasteExternalEvent>(
-            'onPasteExternal',
-            { position, item }
-          );
-        }
+      const position = this.instance.getStage().getRelativePointerPosition();
+      if (position) {
+        this.instance.emitEvent<WeaveCopyPasteNodesPluginOnPasteExternalEvent>(
+          'onPasteExternal',
+          { position, items }
+        );
       }
       // eslint-disable-next-line @typescript-eslint/no-unused-vars, no-empty
     } catch (ex) {
@@ -373,5 +401,23 @@ export class WeaveCopyPasteNodesPlugin extends WeavePlugin {
 
   disable(): void {
     this.enabled = false;
+  }
+
+  isClipboardAPIAvailable() {
+    return !!navigator.clipboard;
+  }
+
+  detectBrowser() {
+    const ua = navigator.userAgent;
+
+    return {
+      isSafari: /^((?!chrome|android).)*safari/i.test(ua),
+      isFirefox: ua.toLowerCase().includes('firefox'),
+      isChrome:
+        ua.toLowerCase().includes('chrome') &&
+        !ua.toLowerCase().includes('edge'),
+      isEdge: ua.toLowerCase().includes('edg'),
+      isIOS: /iP(ad|hone|od)/.test(navigator.userAgent),
+    };
   }
 }
