@@ -4,18 +4,18 @@
 
 import type Konva from 'konva';
 
-export const WEAVE_NODES_SNAPPING_KEY = 'nodesSnapping';
+export const WEAVE_NODES_EDGE_SNAPPING_PLUGIN_KEY = 'nodesEdgeSnapping';
 
-export const GUIDE_LINE_NAME = 'guide-line';
+export const GUIDE_LINE_NAME = 'guide-edge-snapping-line';
 export const GUIDE_LINE_DEFAULT_CONFIG: Required<
   Pick<Konva.LineConfig, 'stroke' | 'strokeWidth' | 'dash'>
 > = {
-  stroke: 'rgb(0, 161, 255)',
+  stroke: '#ff0000',
   strokeWidth: 1,
-  dash: [4, 6],
+  dash: [],
 };
-export const GUIDE_LINE_DRAG_SNAPPING_THRESHOLD = 10;
-export const GUIDE_LINE_TRANSFORM_SNAPPING_THRESHOLD = 10;
+export const GUIDE_LINE_DRAG_SNAPPING_THRESHOLD = 3;
+export const GUIDE_LINE_TRANSFORM_SNAPPING_THRESHOLD = 3;
 
 export const GUIDE_ORIENTATION = {
   ['HORIZONTAL']: 'H',

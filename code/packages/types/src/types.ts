@@ -280,3 +280,12 @@ export type WeaveNodeConfiguration = {
 // Image api
 
 export type ImageCrossOrigin = 'anonymous' | 'use-credentials';
+
+// Measurement
+
+export type BoundingBox = {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+};

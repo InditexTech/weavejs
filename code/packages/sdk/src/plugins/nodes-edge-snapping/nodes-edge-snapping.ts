@@ -9,7 +9,7 @@ import {
   type LineGuide,
   type LineGuideStop,
   type NodeSnappingEdges,
-  type WeaveNodesSnappingPluginParams,
+  type WeaveNodesEdgeSnappingPluginParams,
 } from './types';
 import {
   GUIDE_LINE_DEFAULT_CONFIG,
@@ -18,19 +18,19 @@ import {
   GUIDE_LINE_TRANSFORM_SNAPPING_THRESHOLD,
   GUIDE_ORIENTATION,
   NODE_SNAP,
-  WEAVE_NODES_SNAPPING_KEY,
+  WEAVE_NODES_EDGE_SNAPPING_PLUGIN_KEY,
 } from './constants';
 import type { KonvaEventObject } from 'konva/lib/Node';
 import type { WeaveNodesSelectionPlugin } from '../nodes-selection/nodes-selection';
-import type { Vector2d } from 'konva/lib/types';
+import { getTargetAndSkipNodes, getVisibleNodesInViewport } from '@/utils';
 
-export class WeaveNodesSnappingPlugin extends WeavePlugin {
-  private guideLineConfig: Konva.LineConfig;
-  private dragSnappingThreshold: number;
-  private transformSnappingThreshold: number;
+export class WeaveNodesEdgeSnappingPlugin extends WeavePlugin {
+  private readonly guideLineConfig: Konva.LineConfig;
+  private readonly dragSnappingThreshold: number;
+  private readonly transformSnappingThreshold: number;
   onRender: undefined;
 
-  constructor(params?: Partial<WeaveNodesSnappingPluginParams>) {
+  constructor(params?: Partial<WeaveNodesEdgeSnappingPluginParams>) {
     super();
 
     const { config } = params ?? {};
@@ -46,7 +46,7 @@ export class WeaveNodesSnappingPlugin extends WeavePlugin {
   }
 
   getName(): string {
-    return WEAVE_NODES_SNAPPING_KEY;
+    return WEAVE_NODES_EDGE_SNAPPING_PLUGIN_KEY;
   }
 
   onInit(): void {
@@ -55,48 +55,6 @@ export class WeaveNodesSnappingPlugin extends WeavePlugin {
 
   setEnabled(enabled: boolean): void {
     this.enabled = enabled;
-  }
-
-  getSelectedNodesMetadata(transformer: Konva.Transformer): {
-    width: number;
-    height: number;
-    nodes: string[];
-  } {
-    const firstNode = transformer.getNodes()[0];
-    const firstNodeClientRect = firstNode.getClientRect();
-
-    const rectCoordsMin: Vector2d = {
-      x: firstNodeClientRect.x,
-      y: firstNodeClientRect.y,
-    };
-    const rectCoordsMax: Vector2d = {
-      x: firstNodeClientRect.x + firstNodeClientRect.width,
-      y: firstNodeClientRect.y + firstNodeClientRect.height,
-    };
-
-    const nodes = [];
-    for (const node of transformer.getNodes()) {
-      const clientRect = node.getClientRect();
-      if (clientRect.x < rectCoordsMin.x) {
-        rectCoordsMin.x = clientRect.x;
-      }
-      if (clientRect.y < rectCoordsMin.y) {
-        rectCoordsMin.y = clientRect.y;
-      }
-      if (clientRect.x + clientRect.width > rectCoordsMax.x) {
-        rectCoordsMax.x = clientRect.x + clientRect.width;
-      }
-      if (clientRect.y + clientRect.height > rectCoordsMax.y) {
-        rectCoordsMax.y = clientRect.y + clientRect.height;
-      }
-      nodes.push(node.getAttrs().id as string);
-    }
-
-    return {
-      width: rectCoordsMax.x - rectCoordsMin.x,
-      height: rectCoordsMax.y - rectCoordsMin.y,
-      nodes,
-    };
   }
 
   deleteGuides(): void {
@@ -119,136 +77,108 @@ export class WeaveNodesSnappingPlugin extends WeavePlugin {
       return;
     }
 
-    const nodesSelectionPlugin =
-      this.instance.getPlugin<WeaveNodesSelectionPlugin>('nodesSelection');
-
-    let skipNodes = [];
-    let node: Konva.Node | undefined = undefined;
-    if (
-      e.type === 'dragmove' &&
-      nodesSelectionPlugin &&
-      nodesSelectionPlugin.getTransformer().nodes().length === 1
-    ) {
-      node = nodesSelectionPlugin.getTransformer().nodes()[0];
-      skipNodes.push(node.getAttrs().id ?? '');
-    }
-    if (
-      e.type === 'dragmove' &&
-      nodesSelectionPlugin &&
-      nodesSelectionPlugin.getTransformer().nodes().length > 1
-    ) {
-      const { nodes } = this.getSelectedNodesMetadata(
-        nodesSelectionPlugin.getTransformer()
-      );
-      node = nodesSelectionPlugin.getTransformer();
-      skipNodes = [...nodes];
-    }
-    if (e.type === 'transform') {
-      node = e.target;
-      skipNodes.push(node.getAttrs().id ?? '');
-    }
+    const { targetNode: node, skipNodes } = getTargetAndSkipNodes(
+      this.instance,
+      e
+    );
 
     if (typeof node === 'undefined') {
       return;
     }
 
+    const visibleNodes = this.getVisibleNodes(skipNodes);
     // find possible snapping lines
-    const lineGuideStops = this.getLineGuideStops(skipNodes);
+    const lineGuideStops = this.getLineGuideStops(visibleNodes);
     // find snapping points of current object
     const itemBounds = this.getObjectSnappingEdges(node);
 
     // now find where can we snap current object
     const guides = this.getGuides(lineGuideStops, itemBounds, e.type);
 
-    utilityLayer.destroyChildren();
+    this.cleanupGuidelines();
 
     // do nothing of no snapping
-    if (!guides.length) {
-      return;
-    }
+    if (guides.length > 0) {
+      this.drawGuides(guides);
 
-    // clear all previous lines on the screen
-    utilityLayer.find(`.${GUIDE_LINE_NAME}`).forEach((l) => l.destroy());
-
-    this.drawGuides(guides);
-
-    if (e.type === 'dragmove') {
-      const orgAbsPos = node.absolutePosition();
-      const absPos = node.absolutePosition();
-      // now force object position
-      guides.forEach((lg) => {
-        switch (lg.orientation) {
-          case GUIDE_ORIENTATION.VERTICAL: {
-            absPos.x = lg.lineGuide + lg.offset;
-            break;
-          }
-          case GUIDE_ORIENTATION.HORIZONTAL: {
-            absPos.y = lg.lineGuide + lg.offset;
-            break;
-          }
-        }
-      });
-
-      const vecDiff = {
-        x: orgAbsPos.x - absPos.x,
-        y: orgAbsPos.y - absPos.y,
-      };
-
-      if (node instanceof Konva.Transformer) {
-        node.getNodes().forEach((n) => {
-          const nodeAbsPos = n.getAbsolutePosition();
-
-          const newPos = {
-            x: nodeAbsPos.x - vecDiff.x,
-            y: nodeAbsPos.y - vecDiff.y,
-          };
-
-          n.setAbsolutePosition(newPos);
-        });
-      } else {
-        node.absolutePosition(absPos);
-      }
-    }
-    if (e.type === 'transform') {
-      const nodesSelectionPlugin =
-        this.instance.getPlugin<WeaveNodesSelectionPlugin>('nodesSelection');
-
-      if (nodesSelectionPlugin) {
-        const transformer = nodesSelectionPlugin.getTransformer();
-
-        transformer.anchorDragBoundFunc((_, newAbsPos) => {
-          const finalPos = { ...newAbsPos };
-
-          for (const lg of guides) {
-            switch (lg.orientation) {
-              case GUIDE_ORIENTATION.VERTICAL: {
-                const distX = Math.sqrt(
-                  Math.pow(newAbsPos.x - lg.lineGuide, 2)
-                );
-                if (distX < this.transformSnappingThreshold) {
-                  finalPos.x = lg.lineGuide;
-                }
-                break;
-              }
-              case GUIDE_ORIENTATION.HORIZONTAL: {
-                const distY = Math.sqrt(
-                  Math.pow(newAbsPos.y - lg.lineGuide, 2)
-                );
-                if (distY < this.transformSnappingThreshold) {
-                  finalPos.y = lg.lineGuide;
-                }
-                break;
-              }
+      if (e.type === 'dragmove') {
+        const orgAbsPos = node.absolutePosition();
+        const absPos = node.absolutePosition();
+        // now force object position
+        guides.forEach((lg) => {
+          switch (lg.orientation) {
+            case GUIDE_ORIENTATION.VERTICAL: {
+              absPos.x = lg.lineGuide + lg.offset;
+              break;
+            }
+            case GUIDE_ORIENTATION.HORIZONTAL: {
+              absPos.y = lg.lineGuide + lg.offset;
+              break;
             }
           }
-
-          return finalPos;
         });
+
+        const vecDiff = {
+          x: orgAbsPos.x - absPos.x,
+          y: orgAbsPos.y - absPos.y,
+        };
+
+        if (node instanceof Konva.Transformer) {
+          node.getNodes().forEach((n) => {
+            const nodeAbsPos = n.getAbsolutePosition();
+
+            const newPos = {
+              x: nodeAbsPos.x - vecDiff.x,
+              y: nodeAbsPos.y - vecDiff.y,
+            };
+
+            n.setAbsolutePosition(newPos);
+          });
+        } else {
+          node.absolutePosition(absPos);
+        }
+      }
+      if (e.type === 'transform') {
+        const nodesSelectionPlugin =
+          this.instance.getPlugin<WeaveNodesSelectionPlugin>('nodesSelection');
+
+        if (nodesSelectionPlugin) {
+          const transformer = nodesSelectionPlugin.getTransformer();
+
+          transformer.anchorDragBoundFunc((_, newAbsPos) => {
+            const finalPos = { ...newAbsPos };
+
+            for (const lg of guides) {
+              switch (lg.orientation) {
+                case GUIDE_ORIENTATION.VERTICAL: {
+                  const distX = Math.sqrt(
+                    Math.pow(newAbsPos.x - lg.lineGuide, 2)
+                  );
+                  if (distX < this.transformSnappingThreshold) {
+                    finalPos.x = lg.lineGuide;
+                  }
+                  break;
+                }
+                case GUIDE_ORIENTATION.HORIZONTAL: {
+                  const distY = Math.sqrt(
+                    Math.pow(newAbsPos.y - lg.lineGuide, 2)
+                  );
+                  if (distY < this.transformSnappingThreshold) {
+                    finalPos.y = lg.lineGuide;
+                  }
+                  break;
+                }
+              }
+            }
+
+            return finalPos;
+          });
+        }
       }
     }
   }
 
-  cleanupEvaluateGuidelines(): void {
+  cleanupGuidelines(): void {
     const utilityLayer = this.instance.getUtilityLayer();
 
     if (!this.enabled) {
@@ -259,7 +189,7 @@ export class WeaveNodesSnappingPlugin extends WeavePlugin {
       return;
     }
 
-    utilityLayer.destroyChildren();
+    this.deleteGuides();
   }
 
   private initEvents() {
@@ -271,39 +201,12 @@ export class WeaveNodesSnappingPlugin extends WeavePlugin {
         this.evaluateGuidelines(e);
       });
       stage.on('dragend', () => {
-        this.cleanupEvaluateGuidelines();
+        this.cleanupGuidelines();
       });
     }
   }
 
-  private nodeIntersectsViewport(node: Konva.Node) {
-    const stage = this.instance.getStage();
-
-    const scale = stage.scaleX();
-    const stageWidth = stage.width() / scale;
-    const stageHeight = stage.height() / scale;
-
-    const viewportRect = {
-      x: -stage.x() / scale,
-      y: -stage.y() / scale,
-      width: stageWidth,
-      height: stageHeight,
-    };
-
-    if (!node.isVisible()) return false;
-
-    const box = node.getClientRect({ relativeTo: stage });
-
-    const intersects =
-      box.x + box.width > viewportRect.x &&
-      box.x < viewportRect.x + viewportRect.width &&
-      box.y + box.height > viewportRect.y &&
-      box.y < viewportRect.y + viewportRect.height;
-
-    return intersects;
-  }
-
-  getLineGuideStops(skipNodes: string[]): LineGuideStop {
+  getVisibleNodes(skipNodes: string[]) {
     const stage = this.instance.getStage();
 
     const nodesSelection =
@@ -313,46 +216,50 @@ export class WeaveNodesSnappingPlugin extends WeavePlugin {
       nodesSelection.getTransformer().hide();
     }
 
-    // we can snap to stage borders and the center of the stage
-    const vertical: (number | number[])[] = [
-      0,
-      stage.width() / 2,
-      stage.width(),
-    ];
-    const horizontal: (number | number[])[] = [
-      0,
-      stage.height() / 2,
-      stage.height(),
-    ];
+    const nodes = getVisibleNodesInViewport(
+      stage,
+      this.instance.getMainLayer()
+    );
+
+    const finalVisibleNodes: Konva.Node[] = [];
 
     // and we snap over edges and center of each object on the canvas
-    stage.find('.node').forEach((guideItem) => {
-      if (guideItem.getParent()?.getAttrs().nodeType === 'group') {
+    nodes.forEach((node) => {
+      if (node.getParent()?.getAttrs().nodeType === 'group') {
         return;
       }
 
-      if (skipNodes.includes(guideItem.getParent()?.getAttrs().nodeId)) {
+      if (skipNodes.includes(node.getParent()?.getAttrs().nodeId)) {
         return;
       }
 
-      if (skipNodes.includes(guideItem.getAttrs().id ?? '')) {
+      if (skipNodes.includes(node.getAttrs().id ?? '')) {
         return;
       }
 
-      if (!this.nodeIntersectsViewport(guideItem)) {
-        return;
-      }
-
-      const box = guideItem.getClientRect({ skipStroke: true });
-
-      // and we can snap to all edges of shapes
-      vertical.push([box.x, box.x + box.width, box.x + box.width / 2]);
-      horizontal.push([box.y, box.y + box.height, box.y + box.height / 2]);
+      finalVisibleNodes.push(node);
     });
 
     if (nodesSelection) {
       nodesSelection.getTransformer().show();
     }
+
+    return finalVisibleNodes;
+  }
+
+  getLineGuideStops(nodes: Konva.Node[]): LineGuideStop {
+    const vertical: (number | number[])[] = [];
+    const horizontal: (number | number[])[] = [];
+
+    nodes.forEach((guideItem) => {
+      const box = guideItem.getClientRect({
+        skipStroke: true,
+      });
+
+      // and we can snap to all edges of shapes
+      vertical.push([box.x, box.x + box.width, box.x + box.width / 2]);
+      horizontal.push([box.y, box.y + box.height, box.y + box.height / 2]);
+    });
 
     return {
       vertical: vertical.flat(),
@@ -377,16 +284,19 @@ export class WeaveNodesSnappingPlugin extends WeavePlugin {
     const snappingEdges: NodeSnappingEdges = {
       vertical: [
         {
+          nodeId: node.getAttrs().id ?? '',
           guide: box.x,
           offset: Math.round(absPos.x - box.x),
           snap: NODE_SNAP.START,
         },
         {
+          nodeId: node.getAttrs().id ?? '',
           guide: box.x + box.width / 2,
           offset: Math.round(absPos.x - box.x - box.width / 2),
           snap: NODE_SNAP.CENTER,
         },
         {
+          nodeId: node.getAttrs().id ?? '',
           guide: box.x + box.width,
           offset: Math.round(absPos.x - box.x - box.width),
           snap: NODE_SNAP.END,
@@ -394,16 +304,19 @@ export class WeaveNodesSnappingPlugin extends WeavePlugin {
       ],
       horizontal: [
         {
+          nodeId: node.getAttrs().id ?? '',
           guide: Math.round(box.y),
           offset: Math.round(absPos.y - box.y),
           snap: NODE_SNAP.START,
         },
         {
+          nodeId: node.getAttrs().id ?? '',
           guide: Math.round(box.y + box.height / 2),
           offset: Math.round(absPos.y - box.y - box.height / 2),
           snap: NODE_SNAP.CENTER,
         },
         {
+          nodeId: node.getAttrs().id ?? '',
           guide: Math.round(box.y + box.height),
           offset: Math.round(absPos.y - box.y - box.height),
           snap: NODE_SNAP.END,
@@ -419,6 +332,8 @@ export class WeaveNodesSnappingPlugin extends WeavePlugin {
     itemBounds: NodeSnappingEdges,
     type: string
   ): Guide[] {
+    const resultMapV: Map<string, LineGuide> = new Map();
+    const resultMapH: Map<string, LineGuide> = new Map();
     const resultV: LineGuide[] = [];
     const resultH: LineGuide[] = [];
 
@@ -426,13 +341,19 @@ export class WeaveNodesSnappingPlugin extends WeavePlugin {
       itemBounds.vertical.forEach((itemBound) => {
         const diff = Math.abs(lineGuide - itemBound.guide);
         // if the distance between guild line and object snap point is close we can consider this for snapping
-        if (diff < this.dragSnappingThreshold) {
-          resultV.push({
+        if (
+          diff < this.dragSnappingThreshold &&
+          !resultMapV.has(itemBound.nodeId)
+        ) {
+          const guide = {
+            nodeId: itemBound.nodeId,
             lineGuide: lineGuide,
             diff: diff,
             snap: itemBound.snap,
             offset: itemBound.offset,
-          });
+          };
+          resultMapV.set(itemBound.nodeId, guide);
+          resultV.push(guide);
         }
       });
     });
@@ -440,13 +361,19 @@ export class WeaveNodesSnappingPlugin extends WeavePlugin {
     lineGuideStops.horizontal.forEach((lineGuide) => {
       itemBounds.horizontal.forEach((itemBound) => {
         const diff = Math.abs(lineGuide - itemBound.guide);
-        if (diff < this.dragSnappingThreshold) {
-          resultH.push({
+        if (
+          diff < this.dragSnappingThreshold &&
+          !resultMapH.has(itemBound.nodeId)
+        ) {
+          const guide = {
+            nodeId: itemBound.nodeId,
             lineGuide: lineGuide,
             diff: diff,
             snap: itemBound.snap,
             offset: itemBound.offset,
-          });
+          };
+          resultMapH.set(itemBound.nodeId, guide);
+          resultH.push(guide);
         }
       });
     });
@@ -455,8 +382,7 @@ export class WeaveNodesSnappingPlugin extends WeavePlugin {
 
     // find closest snap
     if (type === 'dragmove') {
-      const minV = resultV.sort((a, b) => a.diff - b.diff)[0];
-      const minH = resultH.sort((a, b) => a.diff - b.diff)[0];
+      const { minH, minV } = this.sortedGuides(resultH, resultV);
       if (minV) {
         guides.push({
           lineGuide: minV.lineGuide,
@@ -495,6 +421,13 @@ export class WeaveNodesSnappingPlugin extends WeavePlugin {
     }
 
     return guides;
+  }
+
+  private sortedGuides(resultH: LineGuide[], resultV: LineGuide[]) {
+    const minV = resultV.toSorted((a, b) => a.diff - b.diff)[0];
+    const minH = resultH.toSorted((a, b) => a.diff - b.diff)[0];
+
+    return { minH, minV };
   }
 
   drawGuides(guides: Guide[]): void {

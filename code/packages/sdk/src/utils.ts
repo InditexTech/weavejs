@@ -9,6 +9,9 @@ import {
   type WeaveElementInstance,
 } from '@inditextech/weave-types';
 import type { WeaveNode } from './nodes/node';
+import type { Vector2d } from 'konva/lib/types';
+import type { WeaveNodesSelectionPlugin } from './plugins/nodes-selection/nodes-selection';
+import type { KonvaEventObject } from 'konva/lib/Node';
 
 export function resetScale(node: Konva.Node): void {
   node.width(
@@ -353,4 +356,126 @@ export function containsNodeDeep(
     }
   }
   return false;
+}
+
+export function getSelectedNodesMetadata(transformer: Konva.Transformer): {
+  width: number;
+  height: number;
+  nodes: string[];
+} {
+  const firstNode = transformer.getNodes()[0];
+  const firstNodeClientRect = firstNode.getClientRect();
+
+  const rectCoordsMin: Vector2d = {
+    x: firstNodeClientRect.x,
+    y: firstNodeClientRect.y,
+  };
+  const rectCoordsMax: Vector2d = {
+    x: firstNodeClientRect.x + firstNodeClientRect.width,
+    y: firstNodeClientRect.y + firstNodeClientRect.height,
+  };
+
+  const nodes = [];
+  for (const node of transformer.getNodes()) {
+    const clientRect = node.getClientRect();
+    if (clientRect.x < rectCoordsMin.x) {
+      rectCoordsMin.x = clientRect.x;
+    }
+    if (clientRect.y < rectCoordsMin.y) {
+      rectCoordsMin.y = clientRect.y;
+    }
+    if (clientRect.x + clientRect.width > rectCoordsMax.x) {
+      rectCoordsMax.x = clientRect.x + clientRect.width;
+    }
+    if (clientRect.y + clientRect.height > rectCoordsMax.y) {
+      rectCoordsMax.y = clientRect.y + clientRect.height;
+    }
+    nodes.push(node.getAttrs().id as string);
+  }
+
+  return {
+    width: rectCoordsMax.x - rectCoordsMin.x,
+    height: rectCoordsMax.y - rectCoordsMin.y,
+    nodes,
+  };
+}
+
+export function getTargetAndSkipNodes(
+  instance: Weave,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  e: KonvaEventObject<any, any>
+) {
+  const nodesSelectionPlugin =
+    instance.getPlugin<WeaveNodesSelectionPlugin>('nodesSelection');
+
+  let skipNodes = [];
+  let node: Konva.Node | undefined = undefined;
+  if (
+    e.type === 'dragmove' &&
+    nodesSelectionPlugin &&
+    nodesSelectionPlugin.getTransformer().nodes().length === 1
+  ) {
+    node = nodesSelectionPlugin.getTransformer().nodes()[0];
+    skipNodes.push(node.getAttrs().id ?? '');
+  }
+  if (
+    e.type === 'dragmove' &&
+    nodesSelectionPlugin &&
+    nodesSelectionPlugin.getTransformer().nodes().length > 1
+  ) {
+    const { nodes } = getSelectedNodesMetadata(
+      nodesSelectionPlugin.getTransformer()
+    );
+    node = nodesSelectionPlugin.getTransformer();
+    skipNodes = [...nodes];
+  }
+  if (e.type === 'transform') {
+    node = e.target;
+    skipNodes.push(node.getAttrs().id ?? '');
+  }
+
+  return { targetNode: node, skipNodes };
+}
+
+export function getVisibleNodesInViewport(
+  stage: Konva.Stage,
+  referenceLayer: Konva.Layer | Konva.Group | undefined
+) {
+  const scale = stage.scaleX();
+  const stagePos = stage.position();
+  const stageSize = {
+    width: stage.width(),
+    height: stage.height(),
+  };
+
+  // Calculate viewport rect in world coordinates
+  const viewRect = {
+    x: -stagePos.x / scale,
+    y: -stagePos.y / scale,
+    width: stageSize.width / scale,
+    height: stageSize.height / scale,
+  };
+
+  const visibleNodes: Konva.Node[] = [];
+
+  referenceLayer?.find('.node').forEach((node) => {
+    if (!node.isVisible()) return;
+
+    const box = node.getClientRect({
+      relativeTo: stage,
+      skipStroke: true,
+      skipShadow: true,
+    });
+    const intersects =
+      box.x + box.width > viewRect.x &&
+      box.x < viewRect.x + viewRect.width &&
+      box.y + box.height > viewRect.y &&
+      box.y < viewRect.y + viewRect.height;
+
+    if (intersects) {
+      visibleNodes.push(node);
+    }
+  });
+
+  return visibleNodes;
 }

@@ -17,7 +17,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- [#552](https://github.com/InditexTech/weavejs/issues/552) Add support for images copied from the file explorer
+- [#167](https://github.com/InditexTech/weavejs/issues/167) Plugin that render reference guides when distance of target node among closest peers is similar to those between nodes intersected vertically or horizontally
 
 ## [0.49.0] - 2025-07-31
 
