@@ -700,16 +700,6 @@ export class WeaveNodesDistanceSnappingPlugin extends WeavePlugin {
     return { intersectedNodes, intersectedNodesWithDistances };
   }
 
-  private getSortedNodesLeftToRight(nodes: Konva.Node[]): Konva.Node[] {
-    return nodes
-      .map((node) => ({
-        node,
-        x: this.getBoxClientRect(node).x,
-      }))
-      .sort((a, b) => a.x - b.x)
-      .map((entry) => entry.node);
-  }
-
   private getVisibleNodes(skipNodes: string[]) {
     const stage = this.instance.getStage();
 

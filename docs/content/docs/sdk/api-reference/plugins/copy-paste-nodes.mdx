@@ -50,7 +50,11 @@ export const WEAVE_COPY_PASTE_PASTE_MODES = {
 
 type WeaveCopyPasteNodesPluginOnCopyEvent = Error | undefined;
 type WeaveCopyPasteNodesPluginOnPasteEvent = Error | undefined;
-type WeaveCopyPasteNodesPluginOnPasteExternalEvent = ClipboardItem;
+type WeaveCopyPasteNodesPluginOnPasteExternalEvent = {
+  items?: ClipboardItems;
+  dataList?: DataTransferItemList;
+  position: Vector2d;
+};
 
 type WeaveCopyPastePasteModeKeys = keyof typeof WEAVE_COPY_PASTE_PASTE_MODES;
 type WeaveCopyPastePasteMode =
