@@ -244,6 +244,10 @@ export class WeaveContextMenuPlugin extends WeavePlugin {
       }
     });
 
+    window.addEventListener('contextmenu', (e) => {
+      e.preventDefault(); // Block the right-click menu entirely
+    });
+
     stage.on('contextmenu', (e) => {
       e.evt.preventDefault();
 
