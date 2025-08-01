@@ -424,8 +424,8 @@ export class WeaveNodesEdgeSnappingPlugin extends WeavePlugin {
   }
 
   private sortedGuides(resultH: LineGuide[], resultV: LineGuide[]) {
-    const minV = resultV.sort((a, b) => a.diff - b.diff)[0];
-    const minH = resultH.sort((a, b) => a.diff - b.diff)[0];
+    const minV = resultV.toSorted((a, b) => a.diff - b.diff)[0];
+    const minH = resultH.toSorted((a, b) => a.diff - b.diff)[0];
 
     return { minH, minV };
   }
