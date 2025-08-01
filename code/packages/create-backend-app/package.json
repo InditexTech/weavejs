@@ -1,6 +1,6 @@
 {
   "name": "create-weave-backend-app",
-  "version": "0.50.0-SNAPSHOT",
+  "version": "0.51.0-SNAPSHOT",
   "description": "Create a new backend artifact for site with Weave.js",
   "keywords": [
     "NextJs",
