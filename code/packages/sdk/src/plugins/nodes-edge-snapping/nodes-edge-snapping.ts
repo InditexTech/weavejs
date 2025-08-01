@@ -22,7 +22,7 @@ import {
 } from './constants';
 import type { KonvaEventObject } from 'konva/lib/Node';
 import type { WeaveNodesSelectionPlugin } from '../nodes-selection/nodes-selection';
-import { getTargetAndSkipNodes } from '@/utils';
+import { getTargetAndSkipNodes, getVisibleNodesInViewport } from '@/utils';
 
 export class WeaveNodesEdgeSnappingPlugin extends WeavePlugin {
   private guideLineConfig: Konva.LineConfig;
@@ -206,48 +206,9 @@ export class WeaveNodesEdgeSnappingPlugin extends WeavePlugin {
     }
   }
 
-  getVisibleNodesInViewport() {
-    const stage = this.instance.getStage();
-    const scale = stage.scaleX();
-    const stagePos = stage.position();
-    const stageSize = {
-      width: stage.width(),
-      height: stage.height(),
-    };
-
-    // Calculate viewport rect in world coordinates
-    const viewRect = {
-      x: -stagePos.x / scale,
-      y: -stagePos.y / scale,
-      width: stageSize.width / scale,
-      height: stageSize.height / scale,
-    };
-
-    const visibleNodes: Konva.Node[] = [];
-
-    stage.find('.node').forEach((node) => {
-      if (!node.isVisible()) return;
-
-      const box = node.getClientRect({
-        relativeTo: stage,
-        skipStroke: true,
-        skipShadow: true,
-      });
-      const intersects =
-        box.x + box.width > viewRect.x &&
-        box.x < viewRect.x + viewRect.width &&
-        box.y + box.height > viewRect.y &&
-        box.y < viewRect.y + viewRect.height;
-
-      if (intersects) {
-        visibleNodes.push(node);
-      }
-    });
-
-    return visibleNodes;
-  }
-
   getVisibleNodes(skipNodes: string[]) {
+    const stage = this.instance.getStage();
+
     const nodesSelection =
       this.instance.getPlugin<WeaveNodesSelectionPlugin>('nodesSelection');
 
@@ -255,7 +216,10 @@ export class WeaveNodesEdgeSnappingPlugin extends WeavePlugin {
       nodesSelection.getTransformer().hide();
     }
 
-    const nodes = this.getVisibleNodesInViewport();
+    const nodes = getVisibleNodesInViewport(
+      stage,
+      this.instance.getMainLayer()
+    );
 
     const finalVisibleNodes: Konva.Node[] = [];
 

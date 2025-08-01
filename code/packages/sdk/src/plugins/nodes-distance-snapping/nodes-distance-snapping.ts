@@ -23,7 +23,7 @@ import {
 import type { KonvaEventObject } from 'konva/lib/Node';
 import type { WeaveNodesSelectionPlugin } from '../nodes-selection/nodes-selection';
 import type { BoundingBox } from '@inditextech/weave-types';
-import { getTargetAndSkipNodes } from '@/utils';
+import { getTargetAndSkipNodes, getVisibleNodesInViewport } from '@/utils';
 
 export class WeaveNodesDistanceSnappingPlugin extends WeavePlugin {
   private enterSnappingTolerance: number;
@@ -557,43 +557,6 @@ export class WeaveNodesDistanceSnappingPlugin extends WeavePlugin {
     }
   }
 
-  getVisibleNodesInViewport() {
-    const stage = this.instance.getStage();
-    const scale = stage.scaleX();
-    const stagePos = stage.position();
-    const stageSize = {
-      width: stage.width(),
-      height: stage.height(),
-    };
-
-    // Calculate viewport rect in world coordinates
-    const viewRect = {
-      x: -stagePos.x / scale,
-      y: -stagePos.y / scale,
-      width: stageSize.width / scale,
-      height: stageSize.height / scale,
-    };
-
-    const visibleNodes: Konva.Node[] = [];
-
-    this.referenceLayer?.find('.node').forEach((node) => {
-      if (!node.isVisible()) return;
-
-      const box = this.getBoxClientRect(node);
-      const intersects =
-        box.x + box.width > viewRect.x &&
-        box.x < viewRect.x + viewRect.width &&
-        box.y + box.height > viewRect.y &&
-        box.y < viewRect.y + viewRect.height;
-
-      if (intersects) {
-        visibleNodes.push(node);
-      }
-    });
-
-    return visibleNodes;
-  }
-
   getVerticallyIntersectingNodes(targetNode: Konva.Node, nodes: Konva.Node[]) {
     const targetBox = this.getBoxClientRect(targetNode);
 
@@ -753,7 +716,7 @@ export class WeaveNodesDistanceSnappingPlugin extends WeavePlugin {
       nodesSelection.getTransformer().hide();
     }
 
-    const nodes = this.getVisibleNodesInViewport();
+    const nodes = getVisibleNodesInViewport(stage, this.referenceLayer);
 
     const finalVisibleNodes: Konva.Node[] = [];
 

@@ -436,3 +436,46 @@ export function getTargetAndSkipNodes(
 
   return { targetNode: node, skipNodes };
 }
+
+export function getVisibleNodesInViewport(
+  stage: Konva.Stage,
+  referenceLayer: Konva.Layer | Konva.Group | undefined
+) {
+  const scale = stage.scaleX();
+  const stagePos = stage.position();
+  const stageSize = {
+    width: stage.width(),
+    height: stage.height(),
+  };
+
+  // Calculate viewport rect in world coordinates
+  const viewRect = {
+    x: -stagePos.x / scale,
+    y: -stagePos.y / scale,
+    width: stageSize.width / scale,
+    height: stageSize.height / scale,
+  };
+
+  const visibleNodes: Konva.Node[] = [];
+
+  referenceLayer?.find('.node').forEach((node) => {
+    if (!node.isVisible()) return;
+
+    const box = node.getClientRect({
+      relativeTo: stage,
+      skipStroke: true,
+      skipShadow: true,
+    });
+    const intersects =
+      box.x + box.width > viewRect.x &&
+      box.x < viewRect.x + viewRect.width &&
+      box.y + box.height > viewRect.y &&
+      box.y < viewRect.y + viewRect.height;
+
+    if (intersects) {
+      visibleNodes.push(node);
+    }
+  });
+
+  return visibleNodes;
+}
