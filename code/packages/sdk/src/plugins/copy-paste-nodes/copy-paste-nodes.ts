@@ -162,8 +162,6 @@ export class WeaveCopyPasteNodesPlugin extends WeavePlugin {
           { position, dataList: items }
         );
       }
-
-      return;
     });
   }
 
