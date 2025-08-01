@@ -335,8 +335,6 @@ export class WeaveStageGridPlugin extends WeavePlugin {
 
     this.getAdjustedSpacing(startX, endX, startY, endY, spacing);
 
-    console.log({ dotCountX, dotCountY, adjustedSpacing });
-
     startX =
       Math.floor((offsetX - margin * worldWidth) / adjustedSpacing) *
       adjustedSpacing;
