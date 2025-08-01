@@ -22,8 +22,8 @@ import {
 } from './constants';
 import type { KonvaEventObject } from 'konva/lib/Node';
 import type { WeaveNodesSelectionPlugin } from '../nodes-selection/nodes-selection';
-import type { Vector2d } from 'konva/lib/types';
 import type { BoundingBox } from '@inditextech/weave-types';
+import { getTargetAndSkipNodes } from '@/utils';
 
 export class WeaveNodesDistanceSnappingPlugin extends WeavePlugin {
   private enterSnappingTolerance: number;
@@ -61,48 +61,6 @@ export class WeaveNodesDistanceSnappingPlugin extends WeavePlugin {
     this.enabled = enabled;
   }
 
-  getSelectedNodesMetadata(transformer: Konva.Transformer): {
-    width: number;
-    height: number;
-    nodes: string[];
-  } {
-    const firstNode = transformer.getNodes()[0];
-    const firstNodeClientRect = firstNode.getClientRect();
-
-    const rectCoordsMin: Vector2d = {
-      x: firstNodeClientRect.x,
-      y: firstNodeClientRect.y,
-    };
-    const rectCoordsMax: Vector2d = {
-      x: firstNodeClientRect.x + firstNodeClientRect.width,
-      y: firstNodeClientRect.y + firstNodeClientRect.height,
-    };
-
-    const nodes = [];
-    for (const node of transformer.getNodes()) {
-      const clientRect = node.getClientRect();
-      if (clientRect.x < rectCoordsMin.x) {
-        rectCoordsMin.x = clientRect.x;
-      }
-      if (clientRect.y < rectCoordsMin.y) {
-        rectCoordsMin.y = clientRect.y;
-      }
-      if (clientRect.x + clientRect.width > rectCoordsMax.x) {
-        rectCoordsMax.x = clientRect.x + clientRect.width;
-      }
-      if (clientRect.y + clientRect.height > rectCoordsMax.y) {
-        rectCoordsMax.y = clientRect.y + clientRect.height;
-      }
-      nodes.push(node.getAttrs().id as string);
-    }
-
-    return {
-      width: rectCoordsMax.x - rectCoordsMin.x,
-      height: rectCoordsMax.y - rectCoordsMin.y,
-      nodes,
-    };
-  }
-
   deleteGuides(): void {
     const utilityLayer = this.instance.getUtilityLayer();
 
@@ -130,34 +88,10 @@ export class WeaveNodesDistanceSnappingPlugin extends WeavePlugin {
       return;
     }
 
-    const nodesSelectionPlugin =
-      this.instance.getPlugin<WeaveNodesSelectionPlugin>('nodesSelection');
-
-    let skipNodes = [];
-    let node: Konva.Node | undefined = undefined;
-    if (
-      e.type === 'dragmove' &&
-      nodesSelectionPlugin &&
-      nodesSelectionPlugin.getTransformer().nodes().length === 1
-    ) {
-      node = nodesSelectionPlugin.getTransformer().nodes()[0];
-      skipNodes.push(node.getAttrs().id ?? '');
-    }
-    if (
-      e.type === 'dragmove' &&
-      nodesSelectionPlugin &&
-      nodesSelectionPlugin.getTransformer().nodes().length > 1
-    ) {
-      const { nodes } = this.getSelectedNodesMetadata(
-        nodesSelectionPlugin.getTransformer()
-      );
-      node = nodesSelectionPlugin.getTransformer();
-      skipNodes = [...nodes];
-    }
-    if (e.type === 'transform') {
-      node = e.target;
-      skipNodes.push(node.getAttrs().id ?? '');
-    }
+    const { targetNode: node, skipNodes } = getTargetAndSkipNodes(
+      this.instance,
+      e
+    );
 
     if (typeof node === 'undefined') {
       return;
