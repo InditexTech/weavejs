@@ -24,6 +24,7 @@ import type { KonvaEventObject } from 'konva/lib/Node';
 import type { WeaveNodesSelectionPlugin } from '../nodes-selection/nodes-selection';
 import type { BoundingBox } from '@inditextech/weave-types';
 import { getTargetAndSkipNodes, getVisibleNodesInViewport } from '@/utils';
+import type { Context } from 'konva/lib/Context';
 
 export class WeaveNodesDistanceSnappingPlugin extends WeavePlugin {
   private enterSnappingTolerance: number;
@@ -186,7 +187,7 @@ export class WeaveNodesDistanceSnappingPlugin extends WeavePlugin {
     return { prevBox, nextBox, peers };
   }
 
-  validateHorizontalSnapping(
+  private validateHorizontalSnapping(
     node: Konva.Node,
     visibleNodes: Konva.Node[],
     sortedHorizontalIntersectedNodes: Konva.Node[],
@@ -320,7 +321,7 @@ export class WeaveNodesDistanceSnappingPlugin extends WeavePlugin {
     }
   }
 
-  validateVerticalSnapping(
+  private validateVerticalSnapping(
     node: Konva.Node,
     visibleNodes: Konva.Node[],
     sortedVerticalIntersectedNodes: Konva.Node[],
@@ -463,7 +464,7 @@ export class WeaveNodesDistanceSnappingPlugin extends WeavePlugin {
     }
   }
 
-  setNodeClientRectX(node: Konva.Node, snappedClientX: number) {
+  private setNodeClientRectX(node: Konva.Node, snappedClientX: number) {
     if (node.getParent()?.getType() === 'Layer') {
       node.x(snappedClientX);
       return;
@@ -494,7 +495,7 @@ export class WeaveNodesDistanceSnappingPlugin extends WeavePlugin {
     node.position({ x: local.x, y: node.y() });
   }
 
-  setNodeClientRectY(node: Konva.Node, snappedClientY: number) {
+  private setNodeClientRectY(node: Konva.Node, snappedClientY: number) {
     if (node.getParent()?.getType() === 'Layer') {
       node.y(snappedClientY);
       return;
@@ -557,7 +558,10 @@ export class WeaveNodesDistanceSnappingPlugin extends WeavePlugin {
     }
   }
 
-  getVerticallyIntersectingNodes(targetNode: Konva.Node, nodes: Konva.Node[]) {
+  private getVerticallyIntersectingNodes(
+    targetNode: Konva.Node,
+    nodes: Konva.Node[]
+  ) {
     const targetBox = this.getBoxClientRect(targetNode);
 
     const intersectedNodes: Konva.Node[] = [];
@@ -625,7 +629,7 @@ export class WeaveNodesDistanceSnappingPlugin extends WeavePlugin {
     return { intersectedNodes, intersectedNodesWithDistances };
   }
 
-  getHorizontallyIntersectingNodes(
+  private getHorizontallyIntersectingNodes(
     targetNode: Konva.Node,
     nodes: Konva.Node[]
   ) {
@@ -696,7 +700,7 @@ export class WeaveNodesDistanceSnappingPlugin extends WeavePlugin {
     return { intersectedNodes, intersectedNodesWithDistances };
   }
 
-  getSortedNodesLeftToRight(nodes: Konva.Node[]): Konva.Node[] {
+  private getSortedNodesLeftToRight(nodes: Konva.Node[]): Konva.Node[] {
     return nodes
       .map((node) => ({
         node,
@@ -706,7 +710,7 @@ export class WeaveNodesDistanceSnappingPlugin extends WeavePlugin {
       .map((entry) => entry.node);
   }
 
-  getVisibleNodes(skipNodes: string[]) {
+  private getVisibleNodes(skipNodes: string[]) {
     const stage = this.instance.getStage();
 
     const nodesSelection =
@@ -764,7 +768,7 @@ export class WeaveNodesDistanceSnappingPlugin extends WeavePlugin {
     return finalVisibleNodes;
   }
 
-  drawSizeGuidesHorizontally(
+  private drawSizeGuidesHorizontally(
     intersectionsH: DistanceInfoH[],
     peerDistance: number
   ): void {
@@ -788,7 +792,7 @@ export class WeaveNodesDistanceSnappingPlugin extends WeavePlugin {
     }
   }
 
-  drawSizeGuidesVertically(
+  private drawSizeGuidesVertically(
     intersectionsV: DistanceInfoV[],
     peerDistance: number
   ): void {
@@ -812,13 +816,62 @@ export class WeaveNodesDistanceSnappingPlugin extends WeavePlugin {
     }
   }
 
-  renderHorizontalLineWithDistanceBetweenNodes(
+  private renderDistanceLabel(
+    ctx: Context,
+    stage: Konva.Stage | null,
+    labelText: string,
+    { canvasMidX, canvasMidY }: { canvasMidX: number; canvasMidY: number }
+  ) {
+    const scaleX = stage?.scaleX() || 1;
+    const scaleY = stage?.scaleY() || 1;
+
+    const fontSize = 12;
+    const fontFamily = 'Arial';
+    const padding = 6;
+
+    const tempText = new Konva.Text({
+      text: labelText,
+      fontSize,
+      fontFamily,
+      visible: false,
+    });
+    const textWidth = tempText.width();
+    const textHeight = tempText.height();
+
+    const labelWidth = textWidth + padding * 2;
+    const labelHeight = textHeight + padding * 2;
+
+    // Save, unscale, and draw fixed-size label
+    ctx.save();
+    ctx.scale(1 / scaleX, 1 / scaleY);
+
+    const labelX = canvasMidX - labelWidth / 2;
+    const labelY = canvasMidY - labelHeight / 2;
+
+    ctx.beginPath();
+    ctx.rect(labelX, labelY, labelWidth, labelHeight);
+    ctx.fillStyle = '#ff0000';
+    ctx.fill();
+
+    // Text
+    ctx.font = `bold ${fontSize}px ${fontFamily}`;
+    ctx.fillStyle = 'white';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(labelText, canvasMidX, labelY + labelHeight / 2);
+
+    ctx.restore();
+  }
+
+  private renderHorizontalLineWithDistanceBetweenNodes(
     from: BoundingBox,
     to: BoundingBox,
     midY: number,
     labelText: string
   ): void {
     const utilityLayer = this.instance.getUtilityLayer();
+
+    const renderLabel = this.renderDistanceLabel;
 
     const lineWithLabel = new Konva.Shape({
       name: GUIDE_HORIZONTAL_LINE_NAME,
@@ -830,22 +883,6 @@ export class WeaveNodesDistanceSnappingPlugin extends WeavePlugin {
         const x1 = from.x + from.width;
         const x2 = to.x;
         const y = midY;
-
-        const fontSize = 12;
-        const fontFamily = 'Arial';
-        const padding = 6;
-
-        const tempText = new Konva.Text({
-          text: labelText,
-          fontSize,
-          fontFamily,
-          visible: false,
-        });
-        const textWidth = tempText.width();
-        const textHeight = tempText.height();
-
-        const labelWidth = textWidth + padding * 2;
-        const labelHeight = textHeight + padding * 2;
 
         // Line
         ctx.beginPath();
@@ -866,26 +903,7 @@ export class WeaveNodesDistanceSnappingPlugin extends WeavePlugin {
         const canvasMidX = worldMidX * scaleX;
         const canvasMidY = worldMidY * scaleY;
 
-        // Save, unscale, and draw fixed-size label
-        ctx.save();
-        ctx.scale(1 / scaleX, 1 / scaleY);
-
-        const labelX = canvasMidX - labelWidth / 2;
-        const labelY = canvasMidY - labelHeight / 2;
-
-        ctx.beginPath();
-        ctx.rect(labelX, labelY, labelWidth, labelHeight);
-        ctx.fillStyle = '#ff0000';
-        ctx.fill();
-
-        // Text
-        ctx.font = `bold ${fontSize}px ${fontFamily}`;
-        ctx.fillStyle = 'white';
-        ctx.textAlign = 'center';
-        ctx.textBaseline = 'middle';
-        ctx.fillText(labelText, canvasMidX, labelY + labelHeight / 2);
-
-        ctx.restore();
+        renderLabel(ctx, stage, labelText, { canvasMidX, canvasMidY });
 
         ctx.fillStrokeShape(shape);
       },
@@ -895,13 +913,15 @@ export class WeaveNodesDistanceSnappingPlugin extends WeavePlugin {
     utilityLayer?.add(lineWithLabel);
   }
 
-  renderVerticalLineWithDistanceBetweenNodes(
+  private renderVerticalLineWithDistanceBetweenNodes(
     from: BoundingBox,
     to: BoundingBox,
     midX: number,
     labelText: string
   ): void {
     const utilityLayer = this.instance.getUtilityLayer();
+
+    const renderLabel = this.renderDistanceLabel;
 
     const lineWithLabel = new Konva.Shape({
       name: GUIDE_VERTICAL_LINE_NAME,
@@ -913,23 +933,6 @@ export class WeaveNodesDistanceSnappingPlugin extends WeavePlugin {
         const x = midX;
         const y1 = from.y + from.height;
         const y2 = to.y;
-
-        const fontSize = 12;
-        const fontFamily = 'Arial';
-        const padding = 6;
-
-        // Measure label text
-        const tempText = new Konva.Text({
-          text: labelText,
-          fontSize,
-          fontFamily,
-          visible: false,
-        });
-
-        const textWidth = tempText.width();
-        const textHeight = tempText.height();
-        const labelWidth = textWidth + padding * 2;
-        const labelHeight = textHeight + padding * 2;
 
         // === Draw vertical line ===
         ctx.beginPath();
@@ -949,27 +952,7 @@ export class WeaveNodesDistanceSnappingPlugin extends WeavePlugin {
         const canvasMidX = worldMidX * scaleX;
         const canvasMidY = worldMidY * scaleY;
 
-        // Draw label in screen space
-        ctx.save();
-        ctx.scale(1 / scaleX, 1 / scaleY);
-
-        const labelX = canvasMidX - labelWidth / 2;
-        const labelY = canvasMidY - labelHeight / 2;
-
-        // Background rect
-        ctx.beginPath();
-        ctx.rect(labelX, labelY, labelWidth, labelHeight);
-        ctx.fillStyle = '#ff0000';
-        ctx.fill();
-
-        // Text
-        ctx.font = `bold ${fontSize}px ${fontFamily}`;
-        ctx.fillStyle = 'white';
-        ctx.textAlign = 'center';
-        ctx.textBaseline = 'middle';
-        ctx.fillText(labelText, canvasMidX, labelY + labelHeight / 2);
-
-        ctx.restore();
+        renderLabel(ctx, stage, labelText, { canvasMidX, canvasMidY });
 
         ctx.fillStrokeShape(shape);
       },
