@@ -39,9 +39,13 @@ import { throttle } from 'lodash';
 import type { Stage } from 'konva/lib/Stage';
 import type { Vector2d } from 'konva/lib/types';
 import { WEAVE_STAGE_DEFAULT_MODE } from '@/nodes/stage/constants';
-import type { WeaveNodesSnappingPlugin } from '../nodes-snapping/nodes-snapping';
 import type { TransformerConfig } from 'konva/lib/shapes/Transformer';
 import { SELECTION_TOOL_ACTION_NAME } from '@/actions/selection-tool/constants';
+import { WEAVE_NODES_EDGE_SNAPPING_PLUGIN_KEY } from '../nodes-edge-snapping/constants';
+import { WEAVE_CONTEXT_MENU_PLUGIN_KEY } from '../context-menu/constants';
+import type { WeaveNodesEdgeSnappingPlugin } from '../nodes-edge-snapping/nodes-edge-snapping';
+import type { WeaveNodesDistanceSnappingPlugin } from '../nodes-distance-snapping/nodes-distance-snapping';
+import { WEAVE_NODES_DISTANCE_SNAPPING_PLUGIN_KEY } from '../nodes-distance-snapping/constants';
 
 export class WeaveNodesSelectionPlugin extends WeavePlugin {
   private tr!: Konva.Transformer;
@@ -779,7 +783,8 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
       delete this.pointers[e.evt.pointerId];
 
       if (stage.mode() === WEAVE_STAGE_DEFAULT_MODE) {
-        this.getSnappingPlugin()?.cleanupEvaluateGuidelines();
+        this.getNodesEdgeSnappingPlugin()?.cleanupGuidelines();
+        this.getNodesDistanceSnappingPlugin()?.cleanupGuidelines();
       }
 
       const contextMenuPlugin = this.getContextMenuPlugin();
@@ -1220,14 +1225,25 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
   }
 
   getContextMenuPlugin() {
-    const contextMenuPlugin =
-      this.instance.getPlugin<WeaveContextMenuPlugin>('contextMenu');
+    const contextMenuPlugin = this.instance.getPlugin<WeaveContextMenuPlugin>(
+      WEAVE_CONTEXT_MENU_PLUGIN_KEY
+    );
     return contextMenuPlugin;
   }
 
-  getSnappingPlugin() {
+  getNodesEdgeSnappingPlugin() {
     const snappingPlugin =
-      this.instance.getPlugin<WeaveNodesSnappingPlugin>('nodesSnapping');
+      this.instance.getPlugin<WeaveNodesEdgeSnappingPlugin>(
+        WEAVE_NODES_EDGE_SNAPPING_PLUGIN_KEY
+      );
+    return snappingPlugin;
+  }
+
+  getNodesDistanceSnappingPlugin() {
+    const snappingPlugin =
+      this.instance.getPlugin<WeaveNodesDistanceSnappingPlugin>(
+        WEAVE_NODES_DISTANCE_SNAPPING_PLUGIN_KEY
+      );
     return snappingPlugin;
   }
 

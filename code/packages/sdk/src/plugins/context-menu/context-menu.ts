@@ -15,7 +15,7 @@ import {
 import { type Vector2d } from 'konva/lib/types';
 import { WeaveNodesSelectionPlugin } from '../nodes-selection/nodes-selection';
 import {
-  WEAVE_CONTEXT_MENU_KEY,
+  WEAVE_CONTEXT_MENU_PLUGIN_KEY,
   WEAVE_CONTEXT_MENU_X_OFFSET_DEFAULT,
   WEAVE_CONTEXT_MENU_Y_OFFSET_DEFAULT,
   WEAVE_CONTEXT_MENU_TAP_HOLD_TIMEOUT,
@@ -59,7 +59,7 @@ export class WeaveContextMenuPlugin extends WeavePlugin {
   }
 
   getName(): string {
-    return WEAVE_CONTEXT_MENU_KEY;
+    return WEAVE_CONTEXT_MENU_PLUGIN_KEY;
   }
 
   onInit(): void {

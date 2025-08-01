@@ -22,12 +22,15 @@ import {
   hasFrames,
   moveNodeToContainer,
 } from '@/utils';
-import type { WeaveNodesSnappingPlugin } from '@/plugins/nodes-snapping/nodes-snapping';
+import type { WeaveNodesEdgeSnappingPlugin } from '@/plugins/nodes-edge-snapping/nodes-edge-snapping';
 import { throttle } from 'lodash';
 import type { KonvaEventObject } from 'konva/lib/Node';
 import { WEAVE_STAGE_DEFAULT_MODE } from './stage/constants';
 import { MOVE_TOOL_ACTION_NAME } from '@/actions/move-tool/constants';
 import { SELECTION_TOOL_ACTION_NAME } from '@/actions/selection-tool/constants';
+import { WEAVE_NODES_EDGE_SNAPPING_PLUGIN_KEY } from '@/plugins/nodes-edge-snapping/constants';
+import { WEAVE_NODES_DISTANCE_SNAPPING_PLUGIN_KEY } from '@/plugins/nodes-distance-snapping/constants';
+import type { WeaveNodesDistanceSnappingPlugin } from '@/plugins/nodes-distance-snapping/nodes-distance-snapping';
 
 export const augmentKonvaStageClass = (): void => {
   Konva.Stage.prototype.isMouseWheelPressed = function () {
@@ -220,8 +223,7 @@ export abstract class WeaveNode implements WeaveNodeBase {
         const nodesSelectionPlugin =
           this.instance.getPlugin<WeaveNodesSelectionPlugin>('nodesSelection');
 
-        const nodesSnappingPlugin =
-          this.instance.getPlugin<WeaveNodesSnappingPlugin>('nodesSnapping');
+        const nodesEdgeSnappingPlugin = this.getNodesEdgeSnappingPlugin();
 
         if (
           nodesSelectionPlugin &&
@@ -232,12 +234,12 @@ export abstract class WeaveNode implements WeaveNodeBase {
         }
 
         if (
-          nodesSnappingPlugin &&
+          nodesEdgeSnappingPlugin &&
           transforming &&
           this.isSelecting() &&
           this.isNodeSelected(node)
         ) {
-          nodesSnappingPlugin.evaluateGuidelines(e);
+          nodesEdgeSnappingPlugin.evaluateGuidelines(e);
         }
       };
 
@@ -253,11 +255,10 @@ export abstract class WeaveNode implements WeaveNodeBase {
         const nodesSelectionPlugin =
           this.instance.getPlugin<WeaveNodesSelectionPlugin>('nodesSelection');
 
-        const nodesSnappingPlugin =
-          this.instance.getPlugin<WeaveNodesSnappingPlugin>('nodesSnapping');
+        const nodesSnappingPlugin = this.getNodesEdgeSnappingPlugin();
 
         if (nodesSnappingPlugin) {
-          nodesSnappingPlugin.cleanupEvaluateGuidelines();
+          nodesSnappingPlugin.cleanupGuidelines();
         }
 
         if (nodesSelectionPlugin) {
@@ -364,11 +365,17 @@ export abstract class WeaveNode implements WeaveNodeBase {
         ) {
           clearContainerTargets(this.instance);
 
-          const nodesSnappingPlugin =
-            this.instance.getPlugin<WeaveNodesSnappingPlugin>('nodesSnapping');
+          const nodesEdgeSnappingPlugin = this.getNodesEdgeSnappingPlugin();
 
-          if (nodesSnappingPlugin) {
-            nodesSnappingPlugin.cleanupEvaluateGuidelines();
+          const nodesDistanceSnappingPlugin =
+            this.getNodesDistanceSnappingPlugin();
+
+          if (nodesEdgeSnappingPlugin) {
+            nodesEdgeSnappingPlugin.cleanupGuidelines();
+          }
+
+          if (nodesDistanceSnappingPlugin) {
+            nodesDistanceSnappingPlugin.cleanupGuidelines();
           }
 
           const layerToMove = containerOverCursor(this.instance, [node]);
@@ -637,5 +644,21 @@ export abstract class WeaveNode implements WeaveNodeBase {
     }
 
     return { ...transformProperties, ...nodeTransformConfig };
+  }
+
+  getNodesEdgeSnappingPlugin() {
+    const snappingPlugin =
+      this.instance.getPlugin<WeaveNodesEdgeSnappingPlugin>(
+        WEAVE_NODES_EDGE_SNAPPING_PLUGIN_KEY
+      );
+    return snappingPlugin;
+  }
+
+  getNodesDistanceSnappingPlugin() {
+    const snappingPlugin =
+      this.instance.getPlugin<WeaveNodesDistanceSnappingPlugin>(
+        WEAVE_NODES_DISTANCE_SNAPPING_PLUGIN_KEY
+      );
+    return snappingPlugin;
   }
 }

@@ -43,35 +43,12 @@ export type Guide = {
   snap: NodeSnap;
 };
 
-export type WeaveNodesSnappingPluginConfig = {
+export type WeaveNodesEdgeSnappingPluginConfig = {
   guideLine: Konva.LineConfig;
   dragSnappingThreshold: number;
   transformSnappingThreshold: number;
 };
 
-export type WeaveNodesSnappingPluginParams = {
-  config?: WeaveNodesSnappingPluginConfig;
-};
-
-export type DistanceInfoH = {
-  index: number;
-  from: Konva.Node;
-  to: Konva.Node;
-  midY: number;
-  distance: number;
-};
-
-export type DistanceInfoV = {
-  index: number;
-  from: Konva.Node;
-  to: Konva.Node;
-  midX: number;
-  distance: number;
-};
-
-export type BoundingBox = {
-  x: number;
-  y: number;
-  width: number;
-  height: number;
+export type WeaveNodesEdgeSnappingPluginParams = {
+  config?: WeaveNodesEdgeSnappingPluginConfig;
 };
