@@ -18,8 +18,6 @@ import {
 } from './constants';
 import type { Vector2d } from 'konva/lib/types';
 import { getBoundingBox, getClosestParentWithId } from '@/utils';
-// import type { KonvaEventObject } from 'konva/lib/Node';
-// import type { Stage } from 'konva/lib/Stage';
 import type { WeaveContextMenuPlugin } from '../context-menu/context-menu';
 import type { WeaveStageGridPlugin } from '../stage-grid/stage-grid';
 
