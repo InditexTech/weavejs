@@ -13,12 +13,16 @@ export type WeaveImageToolActionState =
 export type WeaveImageToolActionOnStartLoadImageEvent = undefined;
 export type WeaveImageToolActionOnEndLoadImageEvent = Error | undefined;
 export type WeaveImageToolActionOnAddingEvent = { imageURL: string };
-export type WeaveImageToolActionOnAddedEvent = { imageURL: string };
+export type WeaveImageToolActionOnAddedEvent = {
+  imageURL: string;
+  nodeId: string;
+};
 
 export type WeaveImageToolActionTriggerParams = {
   imageURL?: string;
   options?: ImageOptions;
   position?: Vector2d;
+  stagePosition?: Vector2d;
 };
 
 export type ImageOptions = {

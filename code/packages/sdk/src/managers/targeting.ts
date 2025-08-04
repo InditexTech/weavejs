@@ -11,6 +11,7 @@ import type {
   WeaveMousePointInfoSimple,
 } from '@inditextech/weave-types';
 import type { WeaveNodesSelectionPlugin } from '@/plugins/nodes-selection/nodes-selection';
+import { getBoundingBox } from '@/utils';
 
 export class WeaveTargetingManager {
   private instance: Weave;
@@ -78,7 +79,7 @@ export class WeaveTargetingManager {
 
   isNodesBoundingBoxIntersecting(nodes: Konva.Node[], nodeB: Konva.Node) {
     const stage = this.instance.getStage();
-    const a = this.getBoundingBoxOfNodes(nodes);
+    const a = getBoundingBox(stage, nodes);
     const b = nodeB.getClientRect({ relativeTo: stage });
 
     return !(
@@ -89,34 +90,6 @@ export class WeaveTargetingManager {
         a.y > b.y + b.height
       ) // A is below B
     );
-  }
-
-  getBoundingBoxOfNodes(nodes: Konva.Node[]) {
-    const stage = this.instance.getStage();
-
-    if (!nodes || nodes.length === 0)
-      return {
-        x: 0,
-        y: 0,
-        width: 0,
-        height: 0,
-      };
-
-    const rects = nodes.map((node) =>
-      node.getClientRect({ relativeTo: stage })
-    );
-
-    const minX = Math.min(...rects.map((r) => r.x));
-    const minY = Math.min(...rects.map((r) => r.y));
-    const maxX = Math.max(...rects.map((r) => r.x + r.width));
-    const maxY = Math.max(...rects.map((r) => r.y + r.height));
-
-    return {
-      x: minX,
-      y: minY,
-      width: maxX - minX,
-      height: maxY - minY,
-    };
   }
 
   nodeIntersectsContainerElement(
@@ -162,7 +135,7 @@ export class WeaveTargetingManager {
       let nodeActualContainer: Konva.Node | undefined =
         node.getParent() as Konva.Node;
 
-      if (nodeActualContainer.getAttrs().nodeId) {
+      if (nodeActualContainer?.getAttrs().nodeId) {
         const realParent = stage.findOne(
           `#${nodeActualContainer.getAttrs().nodeId}`
         );
@@ -210,9 +183,10 @@ export class WeaveTargetingManager {
     const stage = this.instance.getStage();
     const mainLayer = this.instance.getMainLayer();
 
-    let relativeMousePointer = point
-      ? point
-      : mainLayer?.getRelativePointerPosition() ?? { x: 0, y: 0 };
+    let relativeMousePointer =
+      typeof point !== 'undefined'
+        ? point
+        : mainLayer?.getRelativePointerPosition() ?? { x: 0, y: 0 };
     let measureContainer: Konva.Layer | Konva.Group | undefined = mainLayer;
     let container: Konva.Layer | Konva.Node | undefined = mainLayer;
 
@@ -242,12 +216,18 @@ export class WeaveTargetingManager {
       }
     }
 
-    if (container?.getAttrs().nodeType !== 'layer') {
+    if (
+      typeof point === 'undefined' &&
+      container?.getAttrs().nodeType !== 'layer'
+    ) {
       relativeMousePointer =
         measureContainer?.getRelativePointerPosition() ?? relativeMousePointer;
     }
 
-    if (container?.getAttrs().nodeType === 'layer') {
+    if (
+      typeof point === 'undefined' &&
+      container?.getAttrs().nodeType === 'layer'
+    ) {
       relativeMousePointer = measureContainer?.getRelativePointerPosition() ?? {
         x: 0,
         y: 0,

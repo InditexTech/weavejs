@@ -3,6 +3,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 export const WEAVE_COPY_PASTE_NODES_KEY = 'copyPasteNodes';
+export const WEAVE_COPY_PASTE_PASTE_CATCHER_ID = 'weave-paste-catcher';
 export const WEAVE_COPY_PASTE_PASTE_MODES = {
   ['INTERNAL']: 'internal',
   ['EXTERNAL']: 'external',

@@ -1,0 +1,103 @@
+---
+title: WeaveNodesDistanceSnappingPlugin
+description: Allow to snap nodes to distance guides among peers nodes of a target node
+---
+
+import { TypeTable } from "fumadocs-ui/components/type-table";
+
+## Overview
+
+The [WeaveNodesDistanceSnappingPlugin](https://github.com/InditexTech/weavejs/blob/main/code/packages/sdk/src/plugins/nodes-distance-snapping/nodes-distance-snapping.ts)
+class that enables smart snapping behavior when users move a target node, distance is relative to the peer nodes
+located (vertically or horizontally) to the target node. It helps align nodes with
+each other, improving layout precision and visual consistency across
+the canvas.
+
+The class extends the [WeavePlugin](/docs/sdk/api-reference/plugins/plugin) class
+
+## Name
+
+This plugin `name` property value is `nodesDistanceSnapping`.
+
+## Import
+
+```shell
+import { WeaveNodesDistanceSnappingPlugin } from "@inditextech/weave-sdk";
+```
+
+## Instantiation
+
+```ts
+new import { WeaveNodesDistanceSnappingPlugin } from "@inditextech/weave-sdk";
+(params?: WeaveNodesDistanceSnappingPluginParams);
+```
+
+## TypeScript types
+
+```ts
+const GUIDE_ENTER_SNAPPING_TOLERANCE = 3;
+const GUIDE_EXIT_SNAPPING_TOLERANCE = 5;
+
+type NodeSnapHorizontalKeys = keyof typeof NODE_SNAP_HORIZONTAL;
+type NodeSnapHorizontal = (typeof NODE_SNAP_HORIZONTAL)[NodeSnapHorizontalKeys];
+
+type NodeSnapVerticalKeys = keyof typeof NODE_SNAP_VERTICAL;
+type NodeSnapVertical = (typeof NODE_SNAP_VERTICAL)[NodeSnapVerticalKeys];
+
+type WeaveNodesDistanceSnappingPluginConfig = {
+  enterSnappingTolerance: number;
+  exitSnappingTolerance: number;
+};
+
+type WeaveNodesDistanceSnappingPluginParams = {
+  config?: WeaveNodesDistanceSnappingPluginConfig;
+};
+
+type DistanceInfoH = {
+  index: number;
+  from: Konva.Node;
+  to: Konva.Node;
+  midY: number;
+  distance: number;
+};
+
+type DistanceInfoV = {
+  index: number;
+  from: Konva.Node;
+  to: Konva.Node;
+  midX: number;
+  distance: number;
+};
+```
+
+## Parameters
+
+For `WeaveNodesDistanceSnappingPluginParams`:
+
+<TypeTable
+  type={{
+    ["config"]: {
+      description: "Config parameters for the plugin.",
+      type: "WeaveNodesDistanceSnappingPluginConfig",
+    },
+  }}
+/>
+
+For `WeaveNodesDistanceSnappingPluginConfig`:
+
+<TypeTable
+  type={{
+    ["enterSnappingTolerance"]: {
+      description:
+        "Drag snapping threshold (in px) to the guides (when entering snap).",
+      type: "number",
+      default: "3",
+    },
+    ["exitSnappingTolerance"]: {
+      description:
+        "Drag snapping threshold (in px) to the guides (when exiting snap).",
+      type: "number",
+      default: "3",
+    },
+  }}
+/>

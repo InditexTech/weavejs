@@ -6,6 +6,7 @@ import Konva from 'konva';
 import {
   type WeaveElementAttributes,
   type WeaveElementInstance,
+  type WeaveStateElement,
 } from '@inditextech/weave-types';
 import { WeaveNode } from '../node';
 import { WEAVE_REGULAR_POLYGON_NODE_TYPE } from './constants';
@@ -14,6 +15,7 @@ import type {
   WeaveRegularPolygonNodeParams,
   WeaveRegularPolygonProperties,
 } from './types';
+import type { Vector2d } from 'konva/lib/types';
 
 export class WeaveRegularPolygonNode extends WeaveNode {
   private config: WeaveRegularPolygonProperties;
@@ -89,5 +91,12 @@ export class WeaveRegularPolygonNode extends WeaveNode {
 
     // reset scale to 1
     node.scale({ x: 1, y: 1 });
+  }
+
+  realOffset(element: WeaveStateElement): Vector2d {
+    return {
+      x: element.props.radius,
+      y: element.props.radius,
+    };
   }
 }

@@ -4,4 +4,5 @@
 
 export type WeaveFitToSelectionToolActionParams = {
   previousAction: string;
+  smartZoom?: boolean;
 };

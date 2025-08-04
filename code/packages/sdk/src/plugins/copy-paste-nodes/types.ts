@@ -33,7 +33,14 @@ export type WeaveCopyPastePasteMode =
 
 export type WeavePasteModel = {
   weaveInstanceId: string;
-  weave: Record<string, WeaveStateElement>;
+  weave: Record<
+    string,
+    {
+      element: WeaveStateElement;
+      posRelativeToSelection: Vector2d;
+      containerId: string;
+    }
+  >;
   weaveMinPoint: Vector2d;
 };
 
