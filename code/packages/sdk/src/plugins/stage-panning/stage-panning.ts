@@ -10,6 +10,7 @@ import type { Vector2d } from 'konva/lib/types';
 import type { WeaveStageZoomPlugin } from '../stage-zoom/stage-zoom';
 import type { WeaveContextMenuPlugin } from '../context-menu/context-menu';
 import { MOVE_TOOL_ACTION_NAME } from '@/actions/move-tool/constants';
+import { getClosestParentWithId } from '@/utils';
 
 export class WeaveStagePanningPlugin extends WeavePlugin {
   private moveToolActive: boolean;
@@ -179,32 +180,33 @@ export class WeaveStagePanningPlugin extends WeavePlugin {
     });
 
     // Pan with wheel mouse pressed
-    const handleWheel = (e: KonvaEventObject<WheelEvent, Stage>) => {
-      e.evt.preventDefault();
+    const handleWheel = (e: WheelEvent) => {
+      const performPanning = !this.isCtrlOrMetaPressed && !e.ctrlKey;
 
-      const stage = this.instance.getStage();
+      const mouseX = e.clientX;
+      const mouseY = e.clientY;
 
-      const performPanning = !this.isCtrlOrMetaPressed && !e.evt.ctrlKey;
+      const elementUnderMouse = document.elementFromPoint(mouseX, mouseY);
 
       if (
         !this.enabled ||
-        !stage.isFocused() ||
         this.isCtrlOrMetaPressed ||
-        e.evt.buttons === 4 ||
-        !performPanning
+        e.buttons === 4 ||
+        !performPanning ||
+        getClosestParentWithId(elementUnderMouse) !== stage.container()
       ) {
         return;
       }
 
       this.getContextMenuPlugin()?.cancelLongPressTimer();
 
-      stage.x(stage.x() - e.evt.deltaX);
-      stage.y(stage.y() - e.evt.deltaY);
+      stage.x(stage.x() - e.deltaX);
+      stage.y(stage.y() - e.deltaY);
 
       this.instance.emitEvent('onStageMove');
     };
 
-    stage.on('wheel', handleWheel);
+    window.addEventListener('wheel', handleWheel, { passive: false });
 
     stage.container().style.touchAction = 'none';
     stage.container().style.userSelect = 'none';
