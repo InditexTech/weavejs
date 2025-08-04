@@ -90,7 +90,7 @@ export class WeaveCopyPasteNodesPlugin extends WeavePlugin {
       catcher.tabIndex = 0;
 
       const stageContainer = stage.container();
-      if (stageContainer && stageContainer.parentNode) {
+      if (stageContainer?.parentNode) {
         stageContainer.parentNode.appendChild(catcher);
       }
     }
@@ -361,7 +361,7 @@ export class WeaveCopyPasteNodesPlugin extends WeavePlugin {
 
       const parentNode = node.getParent();
       let parentId = parentNode?.getAttrs().id;
-      if (parentNode && parentNode.getAttrs().nodeId) {
+      if (parentNode?.getAttrs().nodeId) {
         const realParent = this.instance
           .getStage()
           .findOne(`#${parentNode.getAttrs().nodeId}`);
