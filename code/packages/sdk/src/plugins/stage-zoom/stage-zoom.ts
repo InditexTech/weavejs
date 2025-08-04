@@ -378,7 +378,7 @@ export class WeaveStageZoomPlugin extends WeavePlugin {
     this.setZoom(scale, false);
   }
 
-  fitToSelection(): void {
+  fitToSelection(smartZoom: boolean = false): void {
     if (!this.enabled) {
       return;
     }
@@ -397,9 +397,6 @@ export class WeaveStageZoomPlugin extends WeavePlugin {
       return;
     }
 
-    this.setZoom(1, false);
-    stage.setAttrs({ x: 0, y: 0 });
-
     const box = getBoundingBox(
       stage,
       selectionPlugin.getTransformer().getNodes()
@@ -408,6 +405,37 @@ export class WeaveStageZoomPlugin extends WeavePlugin {
     if (box.width === 0 || box.height === 0) {
       return;
     }
+
+    const container = stage.container();
+    const scale = stage.scale();
+    const viewportWidth = container.clientWidth;
+    const viewportHeight = container.clientHeight;
+
+    const visibleStageWidth = viewportWidth / scale.x;
+    const visibleStageHeight = viewportHeight / scale.y;
+
+    const fitsInView =
+      box.width + this.config.fitToSelection.padding * 2 <= visibleStageWidth &&
+      box.height + this.config.fitToSelection.padding * 2 <= visibleStageHeight;
+
+    const selectionCenter = {
+      x: box.x + box.width / 2,
+      y: box.y + box.height / 2,
+    };
+
+    if (smartZoom && fitsInView) {
+      // ✅ Only pan to center selection, keeping current scale
+      const newPosition = {
+        x: viewportWidth / 2 - selectionCenter.x * scale.x,
+        y: viewportHeight / 2 - selectionCenter.y * scale.y,
+      };
+
+      stage.position(newPosition);
+      return;
+    }
+
+    this.setZoom(1, false);
+    stage.setAttrs({ x: 0, y: 0 });
 
     const stageBox = {
       width: stage.width(),
@@ -421,22 +449,22 @@ export class WeaveStageZoomPlugin extends WeavePlugin {
 
     const scaleX = availableScreenWidth / box.width;
     const scaleY = availableScreenHeight / box.height;
-    const scale = Math.min(scaleX, scaleY);
+    const finalScale = Math.min(scaleX, scaleY);
 
-    stage.scale({ x: scale, y: scale });
+    stage.scale({ x: finalScale, y: finalScale });
 
     const selectionCenterX = box.x + box.width / 2;
     const selectionCenterY = box.y + box.height / 2;
 
-    const canvasCenterX = stage.width() / (2 * scale);
-    const canvasCenterY = stage.height() / (2 * scale);
+    const canvasCenterX = stage.width() / (2 * finalScale);
+    const canvasCenterY = stage.height() / (2 * finalScale);
 
-    const stageX = (canvasCenterX - selectionCenterX) * scale;
-    const stageY = (canvasCenterY - selectionCenterY) * scale;
+    const stageX = (canvasCenterX - selectionCenterX) * finalScale;
+    const stageY = (canvasCenterY - selectionCenterY) * finalScale;
 
     stage.position({ x: stageX, y: stageY });
 
-    this.setZoom(scale, false);
+    this.setZoom(finalScale, false);
   }
 
   enable(): void {

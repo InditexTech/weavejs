@@ -134,10 +134,12 @@ export class WeaveContextMenuPlugin extends WeavePlugin {
     const pointerPos = stage.getPointerPosition();
 
     if (containerRect && pointerPos) {
-      const point: Vector2d = {
+      const contextMenuPoint: Vector2d = {
         x: containerRect.left + pointerPos.x + (this.config.xOffset ?? 4),
         y: containerRect.top + pointerPos.y + (this.config.yOffset ?? 4),
       };
+
+      const clickPoint: Vector2d = pointerPos;
 
       this.contextMenuVisible = true;
 
@@ -145,7 +147,8 @@ export class WeaveContextMenuPlugin extends WeavePlugin {
         'onNodeContextMenu',
         {
           selection: nodes,
-          point,
+          contextMenuPoint,
+          clickPoint,
           visible: true,
         }
       );
@@ -159,7 +162,8 @@ export class WeaveContextMenuPlugin extends WeavePlugin {
       'onNodeContextMenu',
       {
         selection: [],
-        point: { x: 0, y: 0 },
+        contextMenuPoint: { x: 0, y: 0 },
+        clickPoint: { x: 0, y: 0 },
         visible: false,
       }
     );
@@ -244,10 +248,6 @@ export class WeaveContextMenuPlugin extends WeavePlugin {
       }
     });
 
-    window.addEventListener('contextmenu', (e) => {
-      e.preventDefault(); // Block the right-click menu entirely
-    });
-
     stage.on('contextmenu', (e) => {
       e.evt.preventDefault();
 
@@ -268,16 +268,19 @@ export class WeaveContextMenuPlugin extends WeavePlugin {
       const pointerPos = stage.getPointerPosition();
 
       if (containerRect && pointerPos) {
-        const point: Vector2d = {
+        const contextMenuPoint: Vector2d = {
           x: containerRect.left + pointerPos.x + (this.config.xOffset ?? 4),
           y: containerRect.top + pointerPos.y + (this.config.yOffset ?? 4),
         };
+
+        const clickPoint: Vector2d = pointerPos;
 
         this.instance.emitEvent<WeaveStageContextMenuPluginOnNodeContextMenuEvent>(
           'onNodeContextMenu',
           {
             selection: [],
-            point,
+            contextMenuPoint,
+            clickPoint,
             visible: false,
           }
         );

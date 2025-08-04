@@ -31,6 +31,7 @@ import { SELECTION_TOOL_ACTION_NAME } from '@/actions/selection-tool/constants';
 import { WEAVE_NODES_EDGE_SNAPPING_PLUGIN_KEY } from '@/plugins/nodes-edge-snapping/constants';
 import { WEAVE_NODES_DISTANCE_SNAPPING_PLUGIN_KEY } from '@/plugins/nodes-distance-snapping/constants';
 import type { WeaveNodesDistanceSnappingPlugin } from '@/plugins/nodes-distance-snapping/nodes-distance-snapping';
+import type { Vector2d } from 'konva/lib/types';
 
 export const augmentKonvaStageClass = (): void => {
   Konva.Stage.prototype.isMouseWheelPressed = function () {
@@ -334,7 +335,7 @@ export abstract class WeaveNode implements WeaveNodeBase {
 
           const layerToMove = containerOverCursor(this.instance, [node]);
 
-          if (layerToMove && !hasFrames(node)) {
+          if (layerToMove && !hasFrames(node) && node.isDragging()) {
             layerToMove.fire(WEAVE_NODE_CUSTOM_EVENTS.onTargetEnter, {
               bubbles: true,
             });
@@ -385,9 +386,6 @@ export abstract class WeaveNode implements WeaveNodeBase {
 
           if (layerToMove) {
             containerToMove = layerToMove;
-            containerToMove.fire(WEAVE_NODE_CUSTOM_EVENTS.onTargetLeave, {
-              bubbles: true,
-            });
           }
 
           let moved = false;
@@ -397,6 +395,12 @@ export abstract class WeaveNode implements WeaveNodeBase {
               e.target,
               containerToMove
             );
+          }
+
+          if (containerToMove) {
+            containerToMove.fire(WEAVE_NODE_CUSTOM_EVENTS.onTargetLeave, {
+              bubbles: true,
+            });
           }
 
           if (!moved) {
@@ -660,5 +664,13 @@ export abstract class WeaveNode implements WeaveNodeBase {
         WEAVE_NODES_DISTANCE_SNAPPING_PLUGIN_KEY
       );
     return snappingPlugin;
+  }
+
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  realOffset(instance: WeaveStateElement): Vector2d {
+    return {
+      x: 0,
+      y: 0,
+    };
   }
 }

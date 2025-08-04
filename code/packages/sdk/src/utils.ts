@@ -42,12 +42,14 @@ export function clearContainerTargets(instance: Weave): void {
 
 export function containerOverCursor(
   instance: Weave,
-  ignoreNodes: Konva.Node[]
+  ignoreNodes: Konva.Node[],
+  definedCursorPosition?: Vector2d
 ): Konva.Node | undefined {
   Konva.hitOnDragEnabled = true;
 
   const stage = instance.getStage();
-  const cursorPosition = stage.getRelativePointerPosition();
+  const cursorPosition =
+    definedCursorPosition ?? stage.getRelativePointerPosition();
 
   if (!cursorPosition) {
     return undefined;
@@ -259,7 +261,10 @@ export function getBoundingBox(
   let maxY = -Infinity;
 
   for (const node of nodes) {
-    const box = node.getRealClientRect({ skipTransform: false });
+    const box = node.getRealClientRect({
+      relativeTo: stage,
+      skipTransform: false,
+    });
 
     minX = Math.min(minX, box.x);
     minY = Math.min(minY, box.y);

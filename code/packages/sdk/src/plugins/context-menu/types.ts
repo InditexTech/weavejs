@@ -16,6 +16,7 @@ export type WeaveStageContextMenuPluginConfig = {
 
 export type WeaveStageContextMenuPluginOnNodeContextMenuEvent = {
   selection: WeaveSelection[];
-  point: Vector2d;
+  contextMenuPoint: Vector2d;
+  clickPoint: Vector2d;
   visible: boolean;
 };

@@ -373,9 +373,6 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
 
               if (layerToMove) {
                 containerToMove = layerToMove;
-                containerToMove.fire(WEAVE_NODE_CUSTOM_EVENTS.onTargetLeave, {
-                  bubbles: true,
-                });
               }
 
               let moved = false;
@@ -385,6 +382,12 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
                   node,
                   containerToMove
                 );
+              }
+
+              if (containerToMove) {
+                containerToMove.fire(WEAVE_NODE_CUSTOM_EVENTS.onTargetLeave, {
+                  bubbles: true,
+                });
               }
 
               if (!nodeHandler) {

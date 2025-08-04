@@ -12,6 +12,7 @@ declare module 'konva/lib/Node' {
     closeCrop(type: WeaveImageCropEndType): void;
     resetCrop(): void;
     allowedAnchors(): string[];
+    realTopLeftOffset(): Vector2d;
     getExportClientRect(
       config?:
         | {

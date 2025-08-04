@@ -175,10 +175,8 @@ export class WeaveImageToolAction extends WeaveAction {
       ...options,
     };
 
-    if (!position) {
-      stage.container().style.cursor = 'crosshair';
-      stage.container().focus();
-    }
+    stage.container().style.cursor = 'crosshair';
+    stage.container().focus();
 
     this.imageId = uuidv4();
     this.imageURL = imageURL;
@@ -223,10 +221,8 @@ export class WeaveImageToolAction extends WeaveAction {
   private addImageNode(position?: Vector2d) {
     const stage = this.instance.getStage();
 
-    if (!position) {
-      stage.container().style.cursor = 'crosshair';
-      stage.container().focus();
-    }
+    stage.container().style.cursor = 'crosshair';
+    stage.container().focus();
 
     if (position) {
       this.setState(IMAGE_TOOL_STATE.SELECTED_POSITION);
@@ -312,7 +308,7 @@ export class WeaveImageToolAction extends WeaveAction {
 
         this.instance.emitEvent<WeaveImageToolActionOnAddedEvent>(
           'onAddedImage',
-          { imageURL: this.props.imageURL }
+          { imageURL: this.props.imageURL, nodeId: this.imageId }
         );
       }
 

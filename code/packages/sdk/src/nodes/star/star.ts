@@ -6,11 +6,13 @@ import Konva from 'konva';
 import {
   type WeaveElementAttributes,
   type WeaveElementInstance,
+  type WeaveStateElement,
 } from '@inditextech/weave-types';
 import { WeaveNode } from '../node';
 import { WEAVE_STAR_NODE_TYPE } from './constants';
 import type { WeaveNodesSelectionPlugin } from '@/plugins/nodes-selection/nodes-selection';
 import type { WeaveStarNodeParams, WeaveStarProperties } from './types';
+import type { Vector2d } from 'konva/lib/types';
 
 export class WeaveStarNode extends WeaveNode {
   private config: WeaveStarProperties;
@@ -113,5 +115,12 @@ export class WeaveStarNode extends WeaveNode {
 
     // reset scale to
     node.scale({ x: 1, y: 1 });
+  }
+
+  realOffset(element: WeaveStateElement): Vector2d {
+    return {
+      x: element.props.outerRadius,
+      y: element.props.outerRadius,
+    };
   }
 }
