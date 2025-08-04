@@ -11,6 +11,7 @@ import type {
   WeaveMousePointInfoSimple,
 } from '@inditextech/weave-types';
 import type { WeaveNodesSelectionPlugin } from '@/plugins/nodes-selection/nodes-selection';
+import { getBoundingBox } from '@/utils';
 
 export class WeaveTargetingManager {
   private instance: Weave;
@@ -78,7 +79,7 @@ export class WeaveTargetingManager {
 
   isNodesBoundingBoxIntersecting(nodes: Konva.Node[], nodeB: Konva.Node) {
     const stage = this.instance.getStage();
-    const a = this.getBoundingBoxOfNodes(nodes);
+    const a = getBoundingBox(stage, nodes);
     const b = nodeB.getClientRect({ relativeTo: stage });
 
     return !(
@@ -89,34 +90,6 @@ export class WeaveTargetingManager {
         a.y > b.y + b.height
       ) // A is below B
     );
-  }
-
-  getBoundingBoxOfNodes(nodes: Konva.Node[]) {
-    const stage = this.instance.getStage();
-
-    if (!nodes || nodes.length === 0)
-      return {
-        x: 0,
-        y: 0,
-        width: 0,
-        height: 0,
-      };
-
-    const rects = nodes.map((node) =>
-      node.getClientRect({ relativeTo: stage })
-    );
-
-    const minX = Math.min(...rects.map((r) => r.x));
-    const minY = Math.min(...rects.map((r) => r.y));
-    const maxX = Math.max(...rects.map((r) => r.x + r.width));
-    const maxY = Math.max(...rects.map((r) => r.y + r.height));
-
-    return {
-      x: minX,
-      y: minY,
-      width: maxX - minX,
-      height: maxY - minY,
-    };
   }
 
   nodeIntersectsContainerElement(

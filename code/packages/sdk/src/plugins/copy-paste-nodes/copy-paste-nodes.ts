@@ -26,7 +26,7 @@ import {
 } from './types';
 import type { WeaveNode } from '@/nodes/node';
 import type { Vector2d } from 'konva/lib/types';
-import { containerOverCursor } from '@/utils';
+import { containerOverCursor, getBoundingBox } from '@/utils';
 
 export class WeaveCopyPasteNodesPlugin extends WeavePlugin {
   protected state: WeaveCopyPasteNodesPluginState;
@@ -324,40 +324,6 @@ export class WeaveCopyPasteNodesPlugin extends WeavePlugin {
     this.cancel();
   }
 
-  private getSelectionBoundingBoxRelativeToStage() {
-    const stage = this.instance.getStage();
-    const nodesSelectionPlugin = this.getNodesSelectionPlugin();
-
-    if (nodesSelectionPlugin) {
-      const transformer = nodesSelectionPlugin?.getTransformer();
-
-      const nodes = transformer.nodes();
-      if (!nodes.length) return null;
-
-      // Get clientRects relative to the stage for each node
-      const rects = nodes.map((node) =>
-        node.getClientRect({
-          relativeTo: stage,
-        })
-      );
-
-      // Compute bounding box union
-      const minX = Math.min(...rects.map((r) => r.x));
-      const minY = Math.min(...rects.map((r) => r.y));
-      const maxX = Math.max(...rects.map((r) => r.x + r.width));
-      const maxY = Math.max(...rects.map((r) => r.y + r.height));
-
-      return {
-        x: minX,
-        y: minY,
-        width: maxX - minX,
-        height: maxY - minY,
-      };
-    }
-
-    return null;
-  }
-
   private async performCopy() {
     if (!this.enabled) {
       return;
@@ -376,7 +342,7 @@ export class WeaveCopyPasteNodesPlugin extends WeavePlugin {
       return;
     }
 
-    const box = this.getSelectionBoundingBoxRelativeToStage();
+    const box = getBoundingBox(stage, selectedNodes);
 
     const copyClipboard: WeavePasteModel = {
       weaveInstanceId: this.instance.getId(),
