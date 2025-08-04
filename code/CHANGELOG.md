@@ -15,6 +15,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- [#553](https://github.com/InditexTech/weavejs/issues/553) Preserve zoom functionality when canvas loses focus
 - [#555](https://github.com/InditexTech/weavejs/issues/555) Improvements to copy / paste (homologate with Figma UX)
 
 ## [0.51.0] - 2025-08-01

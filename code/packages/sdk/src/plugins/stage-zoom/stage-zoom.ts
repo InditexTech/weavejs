@@ -17,9 +17,9 @@ import {
   WEAVE_STAGE_ZOOM_TYPE,
 } from './constants';
 import type { Vector2d } from 'konva/lib/types';
-import { getBoundingBox } from '@/utils';
-import type { KonvaEventObject } from 'konva/lib/Node';
-import type { Stage } from 'konva/lib/Stage';
+import { getBoundingBox, getClosestParentWithId } from '@/utils';
+// import type { KonvaEventObject } from 'konva/lib/Node';
+// import type { Stage } from 'konva/lib/Stage';
 import type { WeaveContextMenuPlugin } from '../context-menu/context-menu';
 import type { WeaveStageGridPlugin } from '../stage-grid/stage-grid';
 
@@ -613,23 +613,28 @@ export class WeaveStageZoomPlugin extends WeavePlugin {
     );
 
     // Zoom with mouse wheel + ctrl / cmd
-    const handleWheel = (e: KonvaEventObject<WheelEvent, Stage>) => {
-      e.evt.preventDefault();
-
-      const stage = this.instance.getStage();
-
+    const handleWheel = (e: WheelEvent) => {
       const performZoom =
         this.isCtrlOrMetaPressed ||
-        (!this.isCtrlOrMetaPressed && e.evt.ctrlKey && e.evt.deltaMode === 0);
+        (!this.isCtrlOrMetaPressed && e.ctrlKey && e.deltaMode === 0);
 
-      if (!this.enabled || !stage.isFocused() || !performZoom) {
+      const mouseX = e.clientX;
+      const mouseY = e.clientY;
+
+      const elementUnderMouse = document.elementFromPoint(mouseX, mouseY);
+
+      if (
+        !this.enabled ||
+        !performZoom ||
+        getClosestParentWithId(elementUnderMouse) !== stage.container()
+      ) {
         return;
       }
 
-      const delta = e.evt.deltaY > 0 ? 1 : -1;
+      const delta = e.deltaY > 0 ? 1 : -1;
       this.zoomVelocity += delta;
 
-      this.isTrackpad = Math.abs(e.evt.deltaY) < 15 && e.evt.deltaMode === 0;
+      this.isTrackpad = Math.abs(e.deltaY) < 15 && e.deltaMode === 0;
 
       if (!this.zooming) {
         this.zooming = true;
@@ -638,7 +643,7 @@ export class WeaveStageZoomPlugin extends WeavePlugin {
       }
     };
 
-    stage.on('wheel', handleWheel);
+    window.addEventListener('wheel', handleWheel, { passive: false });
   }
 
   getInertiaScale() {

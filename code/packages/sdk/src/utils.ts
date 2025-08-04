@@ -484,3 +484,13 @@ export function getVisibleNodesInViewport(
 
   return visibleNodes;
 }
+
+export function getClosestParentWithId(
+  el: HTMLElement | Element | null
+): HTMLElement | Element | null {
+  while (el) {
+    if (el.id) return el;
+    el = el.parentElement;
+  }
+  return null;
+}
