@@ -140,13 +140,7 @@ export class WeaveContextMenuPlugin extends WeavePlugin {
         y: containerRect.top + pointerPos.y + (this.config.yOffset ?? 4),
       };
 
-      const scale = stage.scale();
-      const position = stage.position();
-
-      const stageClickPoint = {
-        x: (pointerPos.x - position.x) / scale.x,
-        y: (pointerPos.y - position.y) / scale.y,
-      };
+      const stageClickPoint = this.getStageClickPoint(pointerPos);
 
       this.contextMenuVisible = true;
 
@@ -282,13 +276,7 @@ export class WeaveContextMenuPlugin extends WeavePlugin {
           y: containerRect.top + pointerPos.y + (this.config.yOffset ?? 4),
         };
 
-        const scale = stage.scale();
-        const position = stage.position();
-
-        const stageClickPoint = {
-          x: (pointerPos.x - position.x) / scale.x,
-          y: (pointerPos.y - position.y) / scale.y,
-        };
+        const stageClickPoint = this.getStageClickPoint(pointerPos);
 
         this.instance.emitEvent<WeaveStageContextMenuPluginOnNodeContextMenuEvent>(
           'onNodeContextMenu',
@@ -302,6 +290,20 @@ export class WeaveContextMenuPlugin extends WeavePlugin {
         );
       }
     });
+  }
+
+  private getStageClickPoint(pointerPos: Vector2d): Vector2d {
+    const stage = this.instance.getStage();
+
+    const scale = stage.scale();
+    const position = stage.position();
+
+    const stageClickPoint = {
+      x: (pointerPos.x - position.x) / scale.x,
+      y: (pointerPos.y - position.y) / scale.y,
+    };
+
+    return stageClickPoint;
   }
 
   isContextMenuVisible(): boolean {
