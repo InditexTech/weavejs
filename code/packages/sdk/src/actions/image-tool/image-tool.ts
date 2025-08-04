@@ -34,6 +34,7 @@ export class WeaveImageToolAction extends WeaveAction {
   protected imageURL: string | null;
   protected preloadImgs: Record<string, HTMLImageElement>;
   protected clickPoint: Vector2d | null;
+  protected forceMainContainer: boolean = false;
   protected cancelAction!: () => void;
   onPropsChange = undefined;
   update = undefined;
@@ -304,7 +305,12 @@ export class WeaveImageToolAction extends WeaveAction {
           },
         });
 
-        this.instance.addNode(node, this.container?.getAttrs().id);
+        this.instance.addNode(
+          node,
+          this.forceMainContainer
+            ? this.instance.getMainLayer()?.getAttrs().id
+            : this.container?.getAttrs().id
+        );
 
         this.instance.emitEvent<WeaveImageToolActionOnAddedEvent>(
           'onAddedImage',
@@ -337,6 +343,8 @@ export class WeaveImageToolAction extends WeaveAction {
     if (selectionPlugin) {
       selectionPlugin.setSelectedNodes([]);
     }
+
+    this.forceMainContainer = params?.forceMainContainer ?? false;
 
     if (params?.imageURL) {
       this.loadImage(
@@ -378,6 +386,7 @@ export class WeaveImageToolAction extends WeaveAction {
 
     this.initialCursor = null;
     this.imageId = null;
+    this.forceMainContainer = false;
     this.container = undefined;
     this.imageURL = null;
     this.clickPoint = null;

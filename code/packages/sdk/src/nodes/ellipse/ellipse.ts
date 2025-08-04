@@ -69,7 +69,7 @@ export class WeaveEllipseNode extends WeaveNode {
       const stage = this.instance.getStage();
       const actualEllipse = stage.findOne(`#${ellipse.id()}`) as Konva.Ellipse;
 
-      if (actualEllipse.getAttrs().keepAspectRatio) {
+      if (actualEllipse?.getAttrs().keepAspectRatio) {
         return ['top-left', 'top-right', 'bottom-left', 'bottom-right'];
       }
 

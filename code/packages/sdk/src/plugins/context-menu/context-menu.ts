@@ -132,14 +132,15 @@ export class WeaveContextMenuPlugin extends WeavePlugin {
 
     const containerRect = stage.container().getBoundingClientRect();
     const pointerPos = stage.getPointerPosition();
+    const relativeClickPoint = stage.getRelativePointerPosition();
 
-    if (containerRect && pointerPos) {
+    if (containerRect && pointerPos && relativeClickPoint) {
       const contextMenuPoint: Vector2d = {
         x: containerRect.left + pointerPos.x + (this.config.xOffset ?? 4),
         y: containerRect.top + pointerPos.y + (this.config.yOffset ?? 4),
       };
 
-      const clickPoint: Vector2d = pointerPos;
+      const stageClickPoint = this.getStageClickPoint(pointerPos);
 
       this.contextMenuVisible = true;
 
@@ -148,7 +149,8 @@ export class WeaveContextMenuPlugin extends WeavePlugin {
         {
           selection: nodes,
           contextMenuPoint,
-          clickPoint,
+          clickPoint: pointerPos,
+          stageClickPoint,
           visible: true,
         }
       );
@@ -164,6 +166,7 @@ export class WeaveContextMenuPlugin extends WeavePlugin {
         selection: [],
         contextMenuPoint: { x: 0, y: 0 },
         clickPoint: { x: 0, y: 0 },
+        stageClickPoint: { x: 0, y: 0 },
         visible: false,
       }
     );
@@ -273,19 +276,34 @@ export class WeaveContextMenuPlugin extends WeavePlugin {
           y: containerRect.top + pointerPos.y + (this.config.yOffset ?? 4),
         };
 
-        const clickPoint: Vector2d = pointerPos;
+        const stageClickPoint = this.getStageClickPoint(pointerPos);
 
         this.instance.emitEvent<WeaveStageContextMenuPluginOnNodeContextMenuEvent>(
           'onNodeContextMenu',
           {
             selection: [],
             contextMenuPoint,
-            clickPoint,
+            clickPoint: pointerPos,
+            stageClickPoint,
             visible: false,
           }
         );
       }
     });
+  }
+
+  private getStageClickPoint(pointerPos: Vector2d): Vector2d {
+    const stage = this.instance.getStage();
+
+    const scale = stage.scale();
+    const position = stage.position();
+
+    const stageClickPoint = {
+      x: (pointerPos.x - position.x) / scale.x,
+      y: (pointerPos.y - position.y) / scale.y,
+    };
+
+    return stageClickPoint;
   }
 
   isContextMenuVisible(): boolean {
