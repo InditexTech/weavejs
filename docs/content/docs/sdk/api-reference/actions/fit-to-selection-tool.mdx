@@ -38,6 +38,7 @@ new WeaveFitToSelectionToolAction();
 ```ts
 type WeaveFitToScreenToolActionParams = {
   previousAction: string;
+  smartZoom?: boolean;
 };
 ```
 
@@ -56,6 +57,12 @@ For `WeaveFitToSelectionToolActionParams`:
       description:
         "The action to trigger after the fit-to-selection action is completed.",
       type: "string",
+    },
+    ["smartZoom"]: {
+      required: false,
+      description:
+        "If true, when fit-zooming we will only tri to zoom if nodes bounding box is overflowing stage bounding box, if not, we just center the stage on the nodes selected.",
+      type: "boolean",
     },
   }}
 />
