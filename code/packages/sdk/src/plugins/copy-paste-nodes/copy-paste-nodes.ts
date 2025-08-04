@@ -245,7 +245,7 @@ export class WeaveCopyPasteNodesPlugin extends WeavePlugin {
     }
   }
 
-  private handlePaste(position?: Vector2d) {
+  private handlePaste(position?: Vector2d, relativePosition?: Vector2d) {
     const stage = this.instance.getStage();
 
     if (this.toPaste) {
@@ -266,7 +266,12 @@ export class WeaveCopyPasteNodesPlugin extends WeavePlugin {
         node.key = newNodeId;
         node.props.id = newNodeId;
         if (position) {
-          const container = containerOverCursor(this.instance, [], position);
+          const container = containerOverCursor(
+            this.instance,
+            [],
+            relativePosition
+          );
+
           let localPos = position;
           if (!container) {
             containerId = this.instance.getMainLayer()?.getAttrs().id ?? '';
@@ -403,14 +408,14 @@ export class WeaveCopyPasteNodesPlugin extends WeavePlugin {
     await this.performCopy();
   }
 
-  async paste(position?: Vector2d): Promise<void> {
+  async paste(position?: Vector2d, relativePosition?: Vector2d): Promise<void> {
     const stage = this.instance.getStage();
 
     try {
       const readText = await navigator.clipboard.readText();
       const continueToPaste = this.isWeaveData(readText);
       if (continueToPaste) {
-        this.handlePaste(position);
+        this.handlePaste(position, relativePosition);
         return;
       }
     } catch (ex) {

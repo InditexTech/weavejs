@@ -69,7 +69,7 @@ export function containerOverCursor(
         return;
       }
 
-      const shapeRect = node.getClientRect({ relativeTo: stage });
+      const shapeRect = getBoundingBox(stage, [node]);
       if (
         cursorPosition.x >= shapeRect.x &&
         cursorPosition.x <= shapeRect.x + shapeRect.width &&
