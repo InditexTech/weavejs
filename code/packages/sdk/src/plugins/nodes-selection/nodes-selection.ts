@@ -219,6 +219,7 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
     const tr = new Konva.Transformer({
       id: 'selectionTransformer',
       ...this.selectionOriginalConfig,
+      listening: true,
     });
     selectionLayer?.add(tr);
 
@@ -231,6 +232,57 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
       listening: false,
     });
     selectionLayer?.add(trHover);
+
+    stage.on('pointermove', () => {
+      if (
+        tr.nodes().length === 1 &&
+        tr.nodes()[0].getAttrs().isContainerPrincipal
+      ) {
+        const pos = stage.getPointerPosition();
+
+        if (!pos) {
+          return;
+        }
+
+        const shapeUnder = stage.getIntersection(pos);
+
+        if (!shapeUnder) {
+          tr.setAttrs({
+            listening: true,
+          });
+          tr.forceUpdate();
+        }
+        if (
+          shapeUnder &&
+          tr.getChildren().includes(shapeUnder) &&
+          shapeUnder.name() === 'back'
+        ) {
+          tr.setAttrs({
+            listening: false,
+          });
+          tr.forceUpdate();
+        }
+        if (
+          shapeUnder &&
+          (tr.nodes()[0] as Konva.Group).getChildren().includes(shapeUnder)
+        ) {
+          tr.setAttrs({
+            listening: false,
+          });
+          tr.forceUpdate();
+        }
+        if (
+          shapeUnder &&
+          !tr.getChildren().includes(shapeUnder) &&
+          (tr.nodes()[0] as Konva.Group).getChildren().includes(shapeUnder)
+        ) {
+          tr.setAttrs({
+            listening: true,
+          });
+          tr.forceUpdate();
+        }
+      }
+    });
 
     tr.on('transformstart', () => {
       this.triggerSelectedNodesEvent();
@@ -781,6 +833,10 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
     stage.on('pointermove', handleMouseMove);
 
     stage.on('pointerup', (e) => {
+      this.tr.setAttrs({
+        listening: true,
+      });
+
       const moved = this.checkMoved(e);
       this.checkDoubleTap(e);
       delete this.pointers[e.evt.pointerId];
