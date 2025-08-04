@@ -1,0 +1,136 @@
+---
+title: WeaveNodesEdgeSnappingPlugin
+description: Allow to snap nodes to guides and to themselves
+---
+
+import { TypeTable } from "fumadocs-ui/components/type-table";
+
+## Overview
+
+The [WeaveNodesEdgeSnappingPlugin](https://github.com/InditexTech/weavejs/blob/main/code/packages/sdk/src/plugins/nodes-edge-snapping/nodes-edge-snapping.ts)
+class that enables smart snapping behavior when users move or resize nodes. It helps align nodes with
+each other, grids, or guides automatically, improving layout precision and visual consistency across
+the canvas.
+
+Snapping provides users with subtle, intuitive assistance when organizing elements, making building
+clean and aligned interfaces much easier—especially in collaborative environments.
+
+The class extends the [WeavePlugin](/docs/sdk/api-reference/plugins/plugin) class
+
+## Name
+
+This plugin `name` property value is `nodesEdgeSnapping`.
+
+## Import
+
+```shell
+import { WeaveNodesEdgeSnappingPlugin } from "@inditextech/weave-sdk";
+```
+
+## Instantiation
+
+```ts
+new WeaveNodesEdgeSnappingPlugin(params?: WeaveNodesEdgeSnappingPluginParams);
+```
+
+## TypeScript types
+
+```ts
+const GUIDE_LINE_DEFAULT_CONFIG: Required<
+  Pick<Konva.LineConfig, "stroke" | "strokeWidth" | "dash">
+> = {
+  stroke: "#ff0000",
+  strokeWidth: 1,
+  dash: [],
+};
+const GUIDE_LINE_DRAG_SNAPPING_THRESHOLD = 3;
+const GUIDE_LINE_TRANSFORM_SNAPPING_THRESHOLD = 3;
+
+type NodeSnapKeys = keyof typeof NODE_SNAP;
+type NodeSnap = (typeof NODE_SNAP)[NodeSnapKeys];
+
+type NodeSnappingEdge = {
+  nodeId: string;
+  guide: number;
+  offset: number;
+  snap: NodeSnap;
+};
+
+type NodeSnappingEdges = {
+  vertical: NodeSnappingEdge[];
+  horizontal: NodeSnappingEdge[];
+};
+
+type LineGuideStop = {
+  vertical: number[];
+  horizontal: number[];
+};
+
+type LineGuide = {
+  nodeId: string;
+  lineGuide: number;
+  diff: number;
+  snap: NodeSnap;
+  offset: number;
+};
+
+type GuideOrientationKeys = keyof typeof GUIDE_ORIENTATION;
+type GuideOrientation = (typeof GUIDE_ORIENTATION)[GuideOrientationKeys];
+
+type Guide = {
+  lineGuide: number;
+  offset: number;
+  orientation: GuideOrientation;
+  snap: NodeSnap;
+};
+
+type WeaveNodesEdgeSnappingPluginConfig = {
+  guideLine: Konva.LineConfig;
+  dragSnappingThreshold: number;
+  transformSnappingThreshold: number;
+};
+
+type WeaveNodesEdgeSnappingPluginParams = {
+  config?: WeaveNodesEdgeSnappingPluginConfig;
+};
+```
+
+## Parameters
+
+For `WeaveNodesEdgeSnappingPluginParams`:
+
+<TypeTable
+  type={{
+    ["config"]: {
+      description: "Config parameters for the plugin.",
+      type: "WeaveNodesEdgeSnappingPluginConfig",
+    },
+  }}
+/>
+
+For `WeaveNodesEdgeSnappingPluginConfig`:
+
+<TypeTable
+  type={{
+    ["guideLine"]: {
+      description: "Guide lines configuration, extend from Konva.Line",
+      type: "Konva.LineConfig",
+      default: `{
+        stroke: "rgb(0, 161, 255)",
+        strokeWidth: 1,
+        dash: [4, 6]
+      }`,
+    },
+    ["dragSnappingThreshold"]: {
+      description: "Drag snapping threshold (in px) to the guides.",
+      type: "number",
+      default: "10",
+    },
+    ["transformSnappingThreshold"]: {
+      description:
+        "Transform (resize) snapping threshold (in px) to the guides.",
+      type: "number",
+      default: "10",
+    },
+  }}
+/>
