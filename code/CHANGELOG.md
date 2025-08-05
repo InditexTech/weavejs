@@ -16,6 +16,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 - [#562](https://github.com/InditexTech/weavejs/issues/562) Crop image tool fixes
+- [#564](https://github.com/InditexTech/weavejs/issues/564) While enter pressed user should be able to pan the canvas
 
 ## [0.52.1] - 2025-08-04
 

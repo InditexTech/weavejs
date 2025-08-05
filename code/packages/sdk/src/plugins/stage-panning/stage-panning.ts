@@ -11,6 +11,13 @@ import type { WeaveStageZoomPlugin } from '../stage-zoom/stage-zoom';
 import type { WeaveContextMenuPlugin } from '../context-menu/context-menu';
 import { MOVE_TOOL_ACTION_NAME } from '@/actions/move-tool/constants';
 import { getClosestParentWithId } from '@/utils';
+import type { WeaveNodesEdgeSnappingPlugin } from '../nodes-edge-snapping/nodes-edge-snapping';
+import type { WeaveNodesDistanceSnappingPlugin } from '../nodes-distance-snapping/nodes-distance-snapping';
+import type { WeaveNodesSelectionPlugin } from '../nodes-selection/nodes-selection';
+import { WEAVE_NODES_EDGE_SNAPPING_PLUGIN_KEY } from '../nodes-edge-snapping/constants';
+import { WEAVE_NODES_DISTANCE_SNAPPING_PLUGIN_KEY } from '../nodes-distance-snapping/constants';
+import { WEAVE_NODES_SELECTION_KEY } from '../nodes-selection/constants';
+import { WEAVE_CONTEXT_MENU_PLUGIN_KEY } from '../context-menu/constants';
 
 export class WeaveStagePanningPlugin extends WeavePlugin {
   private moveToolActive: boolean;
@@ -69,6 +76,11 @@ export class WeaveStagePanningPlugin extends WeavePlugin {
         this.isCtrlOrMetaPressed = true;
       }
       if (e.code === 'Space') {
+        this.getContextMenuPlugin()?.disable();
+        this.getNodesSelectionPlugin()?.disable();
+        this.getNodesEdgeSnappingPlugin()?.disable();
+        this.getNodesDistanceSnappingPlugin()?.disable();
+
         this.isSpaceKeyPressed = true;
         this.enableMove();
       }
@@ -79,6 +91,11 @@ export class WeaveStagePanningPlugin extends WeavePlugin {
         this.isCtrlOrMetaPressed = false;
       }
       if (e.code === 'Space') {
+        this.getContextMenuPlugin()?.enable();
+        this.getNodesSelectionPlugin()?.enable();
+        this.getNodesEdgeSnappingPlugin()?.enable();
+        this.getNodesDistanceSnappingPlugin()?.enable();
+
         this.isSpaceKeyPressed = false;
         this.disableMove();
       }
@@ -107,11 +124,18 @@ export class WeaveStagePanningPlugin extends WeavePlugin {
         activeAction === MOVE_TOOL_ACTION_NAME
       ) {
         this.moveToolActive = true;
-        enableMove = true;
       }
 
       if (!enableMove && e.evt.pointerType === 'mouse' && e.evt.buttons === 4) {
         this.isMouseMiddleButtonPressed = true;
+      }
+
+      if (
+        this.enabled &&
+        (this.isSpaceKeyPressed ||
+          this.moveToolActive ||
+          this.isMouseMiddleButtonPressed)
+      ) {
         enableMove = true;
       }
 
@@ -138,19 +162,23 @@ export class WeaveStagePanningPlugin extends WeavePlugin {
         return;
       }
 
+      if (this.isSpaceKeyPressed) {
+        stage.container().style.cursor = 'grabbing';
+      }
+
       if (!isDragging) return;
 
       // Pan with space pressed and no mouse buttons pressed
-      if (
-        !this.enabled ||
-        !(
-          this.isSpaceKeyPressed ||
-          this.isMouseMiddleButtonPressed ||
-          this.moveToolActive
-        )
-      ) {
-        return;
-      }
+      // if (
+      //   !this.enabled ||
+      //   !(
+      //     this.isSpaceKeyPressed ||
+      //     this.isMouseMiddleButtonPressed ||
+      //     this.moveToolActive
+      //   )
+      // ) {
+      //   return;
+      // }
 
       this.getContextMenuPlugin()?.cancelLongPressTimer();
 
@@ -249,9 +277,33 @@ export class WeaveStagePanningPlugin extends WeavePlugin {
   }
 
   getContextMenuPlugin() {
-    const contextMenuPlugin =
-      this.instance.getPlugin<WeaveContextMenuPlugin>('contextMenu');
+    const contextMenuPlugin = this.instance.getPlugin<WeaveContextMenuPlugin>(
+      WEAVE_CONTEXT_MENU_PLUGIN_KEY
+    );
     return contextMenuPlugin;
+  }
+
+  getNodesSelectionPlugin() {
+    const selectionPlugin = this.instance.getPlugin<WeaveNodesSelectionPlugin>(
+      WEAVE_NODES_SELECTION_KEY
+    );
+    return selectionPlugin;
+  }
+
+  getNodesEdgeSnappingPlugin() {
+    const snappingPlugin =
+      this.instance.getPlugin<WeaveNodesEdgeSnappingPlugin>(
+        WEAVE_NODES_EDGE_SNAPPING_PLUGIN_KEY
+      );
+    return snappingPlugin;
+  }
+
+  getNodesDistanceSnappingPlugin() {
+    const snappingPlugin =
+      this.instance.getPlugin<WeaveNodesDistanceSnappingPlugin>(
+        WEAVE_NODES_DISTANCE_SNAPPING_PLUGIN_KEY
+      );
+    return snappingPlugin;
   }
 
   enable(): void {
