@@ -525,6 +525,22 @@ export class Weave {
     return this.getElementsTree().length === 0;
   }
 
+  getNodeContainerId(node: WeaveElementInstance | Konva.Node): string {
+    const stage = this.getStage();
+    let nodeContainer = node.getParent()?.getAttrs().id ?? '';
+
+    if (typeof node.getParent()?.getAttrs().nodeId !== 'undefined') {
+      const realContainer = stage.findOne(
+        `#${node.getParent()?.getAttrs().nodeId}`
+      );
+      if (realContainer) {
+        nodeContainer = realContainer.getAttrs().id ?? '';
+      }
+    }
+
+    return nodeContainer;
+  }
+
   // ZINDEX MANAGEMENT METHODS PROXIES
 
   moveUp(node: WeaveElementInstance): void {
