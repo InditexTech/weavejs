@@ -868,7 +868,6 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
         this.taps = 0;
         this.lastTapTime = 0;
         this.tapStart = { x: 0, y: 0, time: 0 };
-        // this.isDoubleTap = true;
         this.hideSelectorArea();
         this.handleClickOrTap(e);
         return;

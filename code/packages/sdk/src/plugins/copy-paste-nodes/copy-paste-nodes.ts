@@ -162,8 +162,6 @@ export class WeaveCopyPasteNodesPlugin extends WeavePlugin {
               items: undefined,
             }
           );
-
-          return;
         }
       });
 
@@ -194,7 +192,6 @@ export class WeaveCopyPasteNodesPlugin extends WeavePlugin {
 
         if (hasWeaveData) {
           this.handlePaste();
-          return;
         }
       });
     }
