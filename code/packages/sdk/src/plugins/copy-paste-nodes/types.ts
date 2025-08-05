@@ -23,6 +23,7 @@ export type WeaveCopyPasteNodesPluginOnPasteEvent = Error | undefined;
 export type WeaveCopyPasteNodesPluginOnPasteExternalEvent = {
   items?: ClipboardItems;
   dataList?: DataTransferItemList;
+  positionCalculated: boolean;
   position: Vector2d;
 };
 

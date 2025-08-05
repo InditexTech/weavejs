@@ -13,6 +13,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+- [#562](https://github.com/InditexTech/weavejs/issues/562) Crop image enhancement improvements
+
 ## [0.52.1] - 2025-08-04
 
 ### Fixed

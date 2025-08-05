@@ -388,6 +388,7 @@ export class WeaveImageToolAction extends WeaveAction {
     this.imageId = null;
     this.forceMainContainer = false;
     this.container = undefined;
+    this.tempImageNode = null;
     this.imageURL = null;
     this.clickPoint = null;
     this.setState(IMAGE_TOOL_STATE.IDLE);

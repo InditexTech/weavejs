@@ -87,6 +87,8 @@ export class WeaveCopyPasteNodesPlugin extends WeavePlugin {
       catcher.style.zIndex = '-1';
       catcher.style.outline = 'none';
       catcher.style.opacity = '0';
+      catcher.onpaste = () => false;
+      catcher.oncontextmenu = () => false;
       catcher.tabIndex = 0;
 
       const stageContainer = stage.container();
@@ -126,12 +128,51 @@ export class WeaveCopyPasteNodesPlugin extends WeavePlugin {
     });
 
     if (catcher) {
-      catcher.addEventListener('paste', async (e) => {
+      document.addEventListener('paste', (e) => {
         e.preventDefault();
 
         const dataList: DataTransferItemList | undefined =
           e.clipboardData?.items;
+
+        if (!dataList) return;
+
+        if (dataList?.length > 0) {
+          // is external data, handle it on app...
+          const container = stage.container();
+          const scale = stage.scale();
+          const position = stage.position();
+
+          const width = container.clientWidth;
+          const height = container.clientHeight;
+
+          const centerX = (width / 2 - position.x) / scale.x;
+          const centerY = (height / 2 - position.y) / scale.y;
+
+          const pastePosition: Vector2d = {
+            x: centerX,
+            y: centerY,
+          };
+
+          this.instance.emitEvent<WeaveCopyPasteNodesPluginOnPasteExternalEvent>(
+            'onPasteExternal',
+            {
+              positionCalculated: true,
+              position: pastePosition,
+              dataList,
+              items: undefined,
+            }
+          );
+
+          return;
+        }
+      });
+
+      catcher.addEventListener('paste', async (e) => {
+        e.preventDefault();
+
         let items: ClipboardItems | undefined = undefined;
+
+        let hasWeaveData = false;
 
         if (!items) {
           if (this.isClipboardAPIAvailable()) {
@@ -139,11 +180,9 @@ export class WeaveCopyPasteNodesPlugin extends WeavePlugin {
           }
         }
 
-        if (!items && !dataList) {
+        if (!items || items.length === 0) {
           return;
         }
-
-        let hasWeaveData = false;
 
         if (this.isClipboardAPIAvailable()) {
           const readText = await navigator.clipboard.readText();
@@ -151,46 +190,12 @@ export class WeaveCopyPasteNodesPlugin extends WeavePlugin {
           if (continueToPaste) {
             hasWeaveData = true;
           }
-        } else {
-          for (const item of dataList ?? []) {
-            if (item.type === 'text/plain') {
-              const text = await this.getTextFromClipboard(item);
-              if (this.isWeaveData(text)) {
-                hasWeaveData = true;
-                this.toPaste = JSON.parse(text);
-              }
-            }
-          }
         }
 
         if (hasWeaveData) {
           this.handlePaste();
           return;
         }
-
-        const container = stage.container();
-        const scale = stage.scale();
-        const position = stage.position();
-
-        const width = container.clientWidth;
-        const height = container.clientHeight;
-
-        const centerX = (width / 2 - position.x) / scale.x;
-        const centerY = (height / 2 - position.y) / scale.y;
-
-        const pastePosition: Vector2d = {
-          x: centerX,
-          y: centerY,
-        };
-
-        // is external data, handle it on app...
-        // const position = stage.getRelativePointerPosition();
-        // if (position) {
-        this.instance.emitEvent<WeaveCopyPasteNodesPluginOnPasteExternalEvent>(
-          'onPasteExternal',
-          { position: pastePosition, dataList, items }
-        );
-        // }
       });
     }
   }
@@ -212,13 +217,13 @@ export class WeaveCopyPasteNodesPlugin extends WeavePlugin {
     }
   }
 
-  private getTextFromClipboard(item: DataTransferItem): Promise<string> {
-    return new Promise((resolve) => {
-      item.getAsString((text) => {
-        resolve(text);
-      });
-    });
-  }
+  // private getTextFromClipboard(item: DataTransferItem): Promise<string> {
+  //   return new Promise((resolve) => {
+  //     item.getAsString((text) => {
+  //       resolve(text);
+  //     });
+  //   });
+  // }
 
   private mapToPasteNodes() {
     const nodesSelectionPlugin = this.getNodesSelectionPlugin();
@@ -428,9 +433,12 @@ export class WeaveCopyPasteNodesPlugin extends WeavePlugin {
     try {
       const items = await navigator.clipboard.read();
 
-      let pastePosition = position;
+      let positionCalculated = false;
+      let pastePosition = relativePosition;
 
       if (typeof pastePosition === 'undefined') {
+        positionCalculated = true;
+
         const container = stage.container();
         const scale = stage.scale();
         const position = stage.position();
@@ -449,7 +457,7 @@ export class WeaveCopyPasteNodesPlugin extends WeavePlugin {
 
       this.instance.emitEvent<WeaveCopyPasteNodesPluginOnPasteExternalEvent>(
         'onPasteExternal',
-        { position: pastePosition, items }
+        { positionCalculated, position: pastePosition, items }
       );
       // eslint-disable-next-line @typescript-eslint/no-unused-vars, no-empty
     } catch (ex) {

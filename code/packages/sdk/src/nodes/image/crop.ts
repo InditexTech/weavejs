@@ -9,11 +9,17 @@ import { Weave } from '@/weave';
 import { WeaveImageNode } from './image';
 import type { WeaveImageOnCropEndEvent } from './types';
 import { WEAVE_STAGE_DEFAULT_MODE } from '../stage/constants';
+import type { WeaveNodesEdgeSnappingPlugin } from '@/plugins/nodes-edge-snapping/nodes-edge-snapping';
+import { WEAVE_NODES_EDGE_SNAPPING_PLUGIN_KEY } from '@/plugins/nodes-edge-snapping/constants';
+import { WEAVE_NODES_SELECTION_KEY } from '@/plugins/nodes-selection/constants';
+import { WEAVE_NODES_DISTANCE_SNAPPING_PLUGIN_KEY } from '@/plugins/nodes-distance-snapping/constants';
+import type { WeaveNodesDistanceSnappingPlugin } from '@/plugins/nodes-distance-snapping/nodes-distance-snapping';
 
 export class WeaveImageCrop {
   private instance!: Weave;
   private image!: Konva.Group;
   private internalImage!: Konva.Image;
+  private cropping: boolean;
   private cropImage!: Konva.Image;
   private cropGroup!: Konva.Group;
   private cropRect!: Konva.Rect;
@@ -37,25 +43,28 @@ export class WeaveImageCrop {
     this.image = image;
     this.internalImage = internalImage;
     this.cropGroup = clipGroup;
+    this.cropping = false;
     this.onClose = () => {};
     this.handleHide = this.hide.bind(this);
   }
 
   show(onClose: () => void): void {
     this.onClose = onClose;
+    this.cropping = true;
 
-    const nodeSnappingPlugin =
-      this.instance.getPlugin<WeaveNodesSelectionPlugin>('nodesSnapping');
-    if (nodeSnappingPlugin) {
-      this.instance.disablePlugin('nodesSnapping');
+    const nodeEdgeSnappingPlugin = this.getNodesEdgeSnappingPlugin();
+    if (nodeEdgeSnappingPlugin) {
+      nodeEdgeSnappingPlugin.disable();
     }
 
-    const selectionPlugin =
-      this.instance.getPlugin<WeaveNodesSelectionPlugin>('nodesSelection');
-    if (selectionPlugin) {
-      this.instance.disablePlugin('nodesSelection');
-      selectionPlugin.getTransformer().nodes([]);
-      selectionPlugin.getTransformer().hide();
+    const nodeDistanceSnappingPlugin = this.getNodesDistanceSnappingPlugin();
+    if (nodeDistanceSnappingPlugin) {
+      nodeDistanceSnappingPlugin.disable();
+    }
+
+    const nodesSelectionPlugin = this.getNodesSelectionPlugin();
+    if (nodesSelectionPlugin) {
+      nodesSelectionPlugin.disable();
     }
 
     this.image.setAttrs({ cropping: true });
@@ -202,6 +211,10 @@ export class WeaveImageCrop {
     };
 
     this.instance.getStage().on('pointerdown', (e) => {
+      if (!this.cropping) {
+        return;
+      }
+
       const isStage = e.target instanceof Konva.Stage;
       const isContainerEmptyArea =
         typeof e.target.getAttrs().isContainerPrincipal !== 'undefined' &&
@@ -268,6 +281,8 @@ export class WeaveImageCrop {
       return;
     }
 
+    this.cropping = false;
+
     this.image.setAttrs({ cropping: false });
 
     if (e.key === 'Enter') {
@@ -289,25 +304,21 @@ export class WeaveImageCrop {
     this.cropGroup.destroyChildren();
     this.cropGroup.hide();
 
-    const nodeSnappingPlugin =
-      this.instance.getPlugin<WeaveNodesSelectionPlugin>('nodesSnapping');
-    if (nodeSnappingPlugin) {
-      this.instance.enablePlugin('nodesSnapping');
+    const nodesEdgeSnappingPlugin = this.getNodesEdgeSnappingPlugin();
+    if (nodesEdgeSnappingPlugin) {
+      nodesEdgeSnappingPlugin.enable();
+    }
+
+    const nodesDistanceSnappingPlugin = this.getNodesDistanceSnappingPlugin();
+    if (nodesDistanceSnappingPlugin) {
+      nodesDistanceSnappingPlugin.enable();
     }
 
     this.internalImage.show();
 
-    const selectionPlugin =
-      this.instance.getPlugin<WeaveNodesSelectionPlugin>('nodesSelection');
-    if (selectionPlugin) {
-      this.instance.enablePlugin('nodesSelection');
-      const selectionTransformer = selectionPlugin.getTransformer();
-      selectionTransformer.nodes([this.image]);
-      selectionTransformer.show();
-      setTimeout(() => {
-        selectionPlugin.triggerSelectedNodesEvent();
-        selectionTransformer.forceUpdate();
-      }, 0);
+    const nodesSelectionPlugin = this.getNodesSelectionPlugin();
+    if (nodesSelectionPlugin) {
+      nodesSelectionPlugin.enable();
     }
 
     stage.mode(WEAVE_STAGE_DEFAULT_MODE);
@@ -495,5 +506,30 @@ export class WeaveImageCrop {
       x: a.x + t * ab.x,
       y: a.y + t * ab.y,
     };
+  }
+
+  private getNodesEdgeSnappingPlugin() {
+    const snappingEdgesPlugin =
+      this.instance.getPlugin<WeaveNodesEdgeSnappingPlugin>(
+        WEAVE_NODES_EDGE_SNAPPING_PLUGIN_KEY
+      );
+    return snappingEdgesPlugin;
+  }
+
+  private getNodesDistanceSnappingPlugin() {
+    const snappingDistancePlugin =
+      this.instance.getPlugin<WeaveNodesDistanceSnappingPlugin>(
+        WEAVE_NODES_DISTANCE_SNAPPING_PLUGIN_KEY
+      );
+    return snappingDistancePlugin;
+  }
+
+  private getNodesSelectionPlugin() {
+    const nodesSelectionPlugin =
+      this.instance.getPlugin<WeaveNodesSelectionPlugin>(
+        WEAVE_NODES_SELECTION_KEY
+      );
+
+    return nodesSelectionPlugin;
   }
 }
