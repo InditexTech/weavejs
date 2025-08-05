@@ -58,6 +58,7 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
   private didMove: boolean;
   private initialized: boolean;
   private readonly selectionOriginalConfig!: TransformerConfig;
+  private isSpaceKeyPressed: boolean;
   protected taps: number;
   protected isDoubleTap: boolean;
   protected tapStart: { x: number; y: number; time: number } | null;
@@ -137,6 +138,7 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
       'bottom-right',
     ];
     this.taps = 0;
+    this.isSpaceKeyPressed = false;
     this.isDoubleTap = false;
     this.tapStart = { x: 0, y: 0, time: 0 };
     this.lastTapTime = 0;
@@ -682,12 +684,21 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
     const stage = this.instance.getStage();
 
     stage.container().addEventListener('keydown', (e) => {
+      if (e.code === 'Space') {
+        this.isSpaceKeyPressed = true;
+      }
       if (
         (e.key === 'Backspace' || e.key === 'Delete') &&
         Object.keys(window.weaveTextEditing).length === 0
       ) {
         this.removeSelectedNodes();
         return;
+      }
+    });
+
+    stage.container().addEventListener('keyup', (e) => {
+      if (e.key === 'Space') {
+        this.isSpaceKeyPressed = false;
       }
     });
 
@@ -806,6 +817,10 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
 
       if (contextMenuPlugin && contextMenuPlugin.isContextMenuVisible()) {
         this.selecting = false;
+        return;
+      }
+
+      if (this.isSpaceKeyPressed) {
         return;
       }
 
