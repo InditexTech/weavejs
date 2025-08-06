@@ -494,3 +494,21 @@ export function getClosestParentWithId(
   }
   return null;
 }
+
+export function isInShadowDOM(el: HTMLElement | Element | null): boolean {
+  return el?.getRootNode() instanceof ShadowRoot;
+}
+
+export function getTopmostShadowHost(
+  el: HTMLElement | Element | null
+): ShadowRoot | null {
+  let current = el;
+  let root = current?.getRootNode();
+
+  while (root instanceof ShadowRoot) {
+    current = root.host;
+    root = current.getRootNode();
+  }
+
+  return current?.shadowRoot || null;
+}
