@@ -2,6 +2,7 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
+import _ from 'lodash';
 import Konva from 'konva';
 import { WeavePlugin } from '@/plugins/plugin';
 import {
@@ -10,8 +11,10 @@ import {
   type NodeSnapHorizontal,
   type NodeSnapVertical,
   type WeaveNodesDistanceSnappingPluginParams,
+  type WeaveNodesDistanceSnappingUIConfig,
 } from './types';
 import {
+  GUIDE_DISTANCE_LINE_DEFAULT_CONFIG,
   GUIDE_ENTER_SNAPPING_TOLERANCE,
   GUIDE_EXIT_SNAPPING_TOLERANCE,
   GUIDE_HORIZONTAL_LINE_NAME,
@@ -21,12 +24,12 @@ import {
   WEAVE_NODES_DISTANCE_SNAPPING_PLUGIN_KEY,
 } from './constants';
 import type { KonvaEventObject } from 'konva/lib/Node';
-import type { WeaveNodesSelectionPlugin } from '../nodes-selection/nodes-selection';
 import type { BoundingBox } from '@inditextech/weave-types';
-import { getTargetAndSkipNodes, getVisibleNodesInViewport } from '@/utils';
+import { getTargetAndSkipNodes, getVisibleNodes } from '@/utils';
 import type { Context } from 'konva/lib/Context';
 
 export class WeaveNodesDistanceSnappingPlugin extends WeavePlugin {
+  private readonly uiConfig: WeaveNodesDistanceSnappingUIConfig;
   private readonly enterSnappingTolerance: number;
   private readonly exitSnappingTolerance: number;
   private peerDistanceX: number | null = null;
@@ -47,6 +50,8 @@ export class WeaveNodesDistanceSnappingPlugin extends WeavePlugin {
       config?.enterSnappingTolerance ?? GUIDE_ENTER_SNAPPING_TOLERANCE;
     this.exitSnappingTolerance =
       config?.exitSnappingTolerance ?? GUIDE_EXIT_SNAPPING_TOLERANCE;
+
+    this.uiConfig = _.merge(GUIDE_DISTANCE_LINE_DEFAULT_CONFIG, config?.ui);
     this.enabled = true;
   }
 
@@ -77,8 +82,6 @@ export class WeaveNodesDistanceSnappingPlugin extends WeavePlugin {
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   evaluateGuidelines(e: KonvaEventObject<any>): void {
-    const stage = this.instance.getStage();
-    const mainLayer = this.instance.getMainLayer();
     const utilityLayer = this.instance.getUtilityLayer();
 
     if (!this.enabled) {
@@ -98,20 +101,22 @@ export class WeaveNodesDistanceSnappingPlugin extends WeavePlugin {
       return;
     }
 
-    if (node.getParent() === mainLayer) {
-      this.referenceLayer = mainLayer;
-    }
-    if (node.getParent()?.getAttrs().nodeId) {
-      const realNode = stage.findOne(
-        `#${node.getParent()?.getAttrs().nodeId}`
-      ) as Konva.Group;
+    const nodeParent = this.instance.getNodeContainer(node);
 
-      if (realNode) {
-        this.referenceLayer = realNode;
-      }
+    if (nodeParent === null) {
+      return;
     }
 
-    const visibleNodes = this.getVisibleNodes(skipNodes);
+    const stage = this.instance.getStage();
+    this.referenceLayer = nodeParent as unknown as Konva.Layer | Konva.Group;
+
+    const visibleNodes = getVisibleNodes(
+      this.instance,
+      stage,
+      nodeParent,
+      skipNodes,
+      this.referenceLayer
+    );
     // find horizontally intersecting nodes
     const {
       intersectedNodes: sortedHorizontalIntersectedNodes,
@@ -559,6 +564,18 @@ export class WeaveNodesDistanceSnappingPlugin extends WeavePlugin {
     }
   }
 
+  private isOverlapping(node1: Konva.Node, node2: Konva.Node) {
+    const box1 = this.getBoxClientRect(node1);
+    const box2 = this.getBoxClientRect(node2);
+
+    return !(
+      box1.x + box1.width <= box2.x ||
+      box2.x + box2.width <= box1.x ||
+      box1.y + box1.height <= box2.y ||
+      box2.y + box2.height <= box1.y
+    );
+  }
+
   private getVerticallyIntersectingNodes(
     targetNode: Konva.Node,
     nodes: Konva.Node[]
@@ -591,40 +608,45 @@ export class WeaveNodesDistanceSnappingPlugin extends WeavePlugin {
 
     const intersectedNodesWithDistances: DistanceInfoV[] = [];
 
-    for (let i = 0; i < intersectedNodes.length - 1; i++) {
-      const a = intersectedNodes[i];
-      const b = intersectedNodes[i + 1];
+    for (let i = 0; i < intersectedNodes.length; i++) {
+      for (let j = i + 1; j < intersectedNodes.length; j++) {
+        const nodeA = intersectedNodes[i];
+        const nodeB = intersectedNodes[j];
 
-      const boxA = this.getBoxClientRect(a);
-      const boxB = this.getBoxClientRect(b);
+        if (!this.isOverlapping(nodeA, nodeB)) {
+          console.log('AQUI?');
+          const boxA = this.getBoxClientRect(nodeA);
+          const boxB = this.getBoxClientRect(nodeB);
 
-      const aBottom = boxA.y + boxA.height;
-      const bTop = boxB.y;
+          const aBottom = boxA.y + boxA.height;
+          const bTop = boxB.y;
 
-      const distance = Math.abs(aBottom - bTop);
+          const distance = Math.abs(aBottom - bTop);
 
-      const left = Math.max(boxA.x, boxB.x);
-      const right = Math.min(boxA.x + boxA.width, boxB.x + boxB.width);
+          const left = Math.max(boxA.x, boxB.x);
+          const right = Math.min(boxA.x + boxA.width, boxB.x + boxB.width);
 
-      let midX;
+          let midX;
 
-      if (right > left) {
-        // Overlap in X → use middle of overlap region
-        midX = left + (right - left) / 2;
-      } else {
-        // No overlap → use average of horizontal centers
-        const aCenterX = boxA.x + boxA.width / 2;
-        const bCenterX = boxB.x + boxB.width / 2;
-        midX = (aCenterX + bCenterX) / 2;
+          if (right > left) {
+            // Overlap in X → use middle of overlap region
+            midX = left + (right - left) / 2;
+          } else {
+            // No overlap → use average of horizontal centers
+            const aCenterX = boxA.x + boxA.width / 2;
+            const bCenterX = boxB.x + boxB.width / 2;
+            midX = (aCenterX + bCenterX) / 2;
+          }
+
+          intersectedNodesWithDistances.push({
+            index: i,
+            from: nodeA,
+            to: nodeB,
+            midX,
+            distance: Math.round(distance),
+          });
+        }
       }
-
-      intersectedNodesWithDistances.push({
-        index: i,
-        from: a,
-        to: b,
-        midX,
-        distance: Math.round(distance),
-      });
     }
 
     return { intersectedNodes, intersectedNodesWithDistances };
@@ -662,101 +684,47 @@ export class WeaveNodesDistanceSnappingPlugin extends WeavePlugin {
 
     const intersectedNodesWithDistances: DistanceInfoH[] = [];
 
-    for (let i = 0; i < intersectedNodes.length - 1; i++) {
-      const a = intersectedNodes[i];
-      const b = intersectedNodes[i + 1];
+    for (let i = 0; i < intersectedNodes.length; i++) {
+      for (let j = i + 1; j < intersectedNodes.length; j++) {
+        const nodeA = intersectedNodes[i];
+        const nodeB = intersectedNodes[j];
 
-      const boxA = this.getBoxClientRect(a);
-      const boxB = this.getBoxClientRect(b);
+        if (!this.isOverlapping(nodeA, nodeB)) {
+          const boxA = this.getBoxClientRect(nodeA);
+          const boxB = this.getBoxClientRect(nodeB);
 
-      const aRight = boxA.x + boxA.width;
-      const bLeft = boxB.x;
+          const aRight = boxA.x + boxA.width;
+          const bLeft = boxB.x;
 
-      const distance = Math.abs(Math.round(aRight - bLeft));
+          const distance = Math.abs(Math.round(aRight - bLeft));
 
-      const top = Math.max(boxA.y, boxB.y);
-      const bottom = Math.min(boxA.y + boxA.height, boxB.y + boxB.height);
+          const top = Math.max(boxA.y, boxB.y);
+          const bottom = Math.min(boxA.y + boxA.height, boxB.y + boxB.height);
 
-      let midY;
+          let midY;
 
-      if (bottom > top) {
-        // They vertically overlap → use middle of overlapping area
-        midY = top + (bottom - top) / 2;
-      } else {
-        // No vertical overlap → use middle between vertical edges
-        const aCenterY = boxA.y + boxA.height / 2;
-        const bCenterY = boxB.y + boxB.height / 2;
-        midY = (aCenterY + bCenterY) / 2;
+          if (bottom > top) {
+            // They vertically overlap → use middle of overlapping area
+            midY = top + (bottom - top) / 2;
+          } else {
+            // No vertical overlap → use middle between vertical edges
+            const aCenterY = boxA.y + boxA.height / 2;
+            const bCenterY = boxB.y + boxB.height / 2;
+            midY = (aCenterY + bCenterY) / 2;
+          }
+
+          intersectedNodesWithDistances.push({
+            index: i,
+            from: nodeA,
+            to: nodeB,
+            midY,
+            distance: Math.round(distance),
+          });
+        }
       }
-
-      intersectedNodesWithDistances.push({
-        index: i,
-        from: a,
-        to: b,
-        midY,
-        distance,
-      });
     }
 
     return { intersectedNodes, intersectedNodesWithDistances };
-  }
-
-  private getVisibleNodes(skipNodes: string[]) {
-    const stage = this.instance.getStage();
-
-    const nodesSelection =
-      this.instance.getPlugin<WeaveNodesSelectionPlugin>('nodesSelection');
-
-    if (nodesSelection) {
-      nodesSelection.getTransformer().hide();
-    }
-
-    const nodes = getVisibleNodesInViewport(stage, this.referenceLayer);
-
-    const finalVisibleNodes: Konva.Node[] = [];
-
-    // and we snap over edges and center of each object on the canvas
-    nodes.forEach((node) => {
-      if (node.getParent()?.getAttrs().nodeType === 'group') {
-        return;
-      }
-
-      if (skipNodes.includes(node.getParent()?.getAttrs().nodeId)) {
-        return;
-      }
-
-      if (skipNodes.includes(node.getAttrs().id ?? '')) {
-        return;
-      }
-
-      if (
-        node.getParent() !== this.referenceLayer &&
-        !node.getParent()?.getAttrs().nodeId
-      ) {
-        return;
-      }
-
-      if (
-        node.getParent() !== this.referenceLayer &&
-        node.getParent()?.getAttrs().nodeId
-      ) {
-        const realNode = stage.findOne(
-          `#${node.getParent()?.getAttrs().nodeId}`
-        ) as Konva.Group;
-
-        if (realNode && realNode !== this.referenceLayer) {
-          return;
-        }
-      }
-
-      finalVisibleNodes.push(node);
-    });
-
-    if (nodesSelection) {
-      nodesSelection.getTransformer().show();
-    }
-
-    return finalVisibleNodes;
   }
 
   private drawSizeGuidesHorizontally(
@@ -811,45 +779,88 @@ export class WeaveNodesDistanceSnappingPlugin extends WeavePlugin {
     ctx: Context,
     stage: Konva.Stage | null,
     labelText: string,
-    { canvasMidX, canvasMidY }: { canvasMidX: number; canvasMidY: number }
+    orientation: 'horizontal' | 'vertical',
+    { canvasMidX, canvasMidY }: { canvasMidX: number; canvasMidY: number },
+    config: WeaveNodesDistanceSnappingUIConfig
   ) {
     const scaleX = stage?.scaleX() || 1;
     const scaleY = stage?.scaleY() || 1;
 
-    const fontSize = 12;
-    const fontFamily = 'Arial';
-    const padding = 6;
+    const fontSize = config.label.fontSize;
+    const fontFamily = config.label.fontFamily;
+    const fontStyle = config.label.fontStyle;
+    const cornerRadius = config.label.cornerRadius;
+    const linePadding = config.label.linePadding;
+    const fill = config.label.fill;
+    const height = config.label.height;
+    const paddingX = config.label.paddingX;
 
     const tempText = new Konva.Text({
       text: labelText,
       fontSize,
+      fontStyle,
       fontFamily,
       visible: false,
     });
     const textWidth = tempText.width();
-    const textHeight = tempText.height();
 
-    const labelWidth = textWidth + padding * 2;
-    const labelHeight = textHeight + padding * 2;
+    const labelWidth = textWidth + paddingX * 2;
+    const labelHeight = height;
 
     // Save, unscale, and draw fixed-size label
     ctx.save();
     ctx.scale(1 / scaleX, 1 / scaleY);
 
-    const labelX = canvasMidX - labelWidth / 2;
-    const labelY = canvasMidY - labelHeight / 2;
+    let labelX = canvasMidX - labelWidth / 2;
+    let labelY = canvasMidY + linePadding;
+
+    if (orientation === 'vertical') {
+      labelX = canvasMidX + linePadding;
+      labelY = canvasMidY - labelWidth / 2;
+    }
+
+    const r = Math.min(cornerRadius, labelWidth / 2, labelHeight / 2); // Clamp radius
 
     ctx.beginPath();
-    ctx.rect(labelX, labelY, labelWidth, labelHeight);
-    ctx.fillStyle = '#ff0000';
+    ctx.moveTo(labelX + r, labelY);
+    ctx.lineTo(labelX + labelWidth - r, labelY);
+    ctx.quadraticCurveTo(
+      labelX + labelWidth,
+      labelY,
+      labelX + labelWidth,
+      labelY + r
+    );
+    ctx.lineTo(labelX + labelWidth, labelY + labelHeight - r);
+    ctx.quadraticCurveTo(
+      labelX + labelWidth,
+      labelY + labelHeight,
+      labelX + labelWidth - r,
+      labelY + labelHeight
+    );
+    ctx.lineTo(labelX + r, labelY + labelHeight);
+    ctx.quadraticCurveTo(
+      labelX,
+      labelY + labelHeight,
+      labelX,
+      labelY + labelHeight - r
+    );
+    ctx.lineTo(labelX, labelY + r);
+    ctx.quadraticCurveTo(labelX, labelY, labelX + r, labelY);
+    ctx.closePath();
+    ctx.fillStyle = fill;
     ctx.fill();
 
+    // ctx.beginPath();
+    // ctx.rect(labelX, labelY, labelWidth, labelHeight);
+    // ctx.fillStyle = fill;
+    // ctx.fill();
+
     // Text
-    ctx.font = `bold ${fontSize}px ${fontFamily}`;
+    ctx.font = `${fontStyle} ${fontSize}px ${fontFamily}`;
     ctx.fillStyle = 'white';
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
-    ctx.fillText(labelText, canvasMidX, labelY + labelHeight / 2);
+    ctx.fillText(labelText, labelX + labelWidth / 2, labelY + labelHeight / 2);
 
     ctx.restore();
   }
@@ -863,6 +874,8 @@ export class WeaveNodesDistanceSnappingPlugin extends WeavePlugin {
     const utilityLayer = this.instance.getUtilityLayer();
 
     const renderLabel = this.renderDistanceLabel;
+
+    const uiConfig = this.uiConfig;
 
     const lineWithLabel = new Konva.Shape({
       name: GUIDE_HORIZONTAL_LINE_NAME,
@@ -880,8 +893,8 @@ export class WeaveNodesDistanceSnappingPlugin extends WeavePlugin {
         ctx.moveTo(x1, y);
         ctx.lineTo(x2, y);
         ctx.closePath();
-        ctx.strokeStyle = '#ff0000';
-        ctx.lineWidth = 1;
+        ctx.strokeStyle = uiConfig.line.stroke;
+        ctx.lineWidth = uiConfig.line.strokeWidth;
         ctx.setLineDash([]);
         ctx.stroke();
         ctx.closePath();
@@ -894,7 +907,14 @@ export class WeaveNodesDistanceSnappingPlugin extends WeavePlugin {
         const canvasMidX = worldMidX * scaleX;
         const canvasMidY = worldMidY * scaleY;
 
-        renderLabel(ctx, stage, labelText, { canvasMidX, canvasMidY });
+        renderLabel(
+          ctx,
+          stage,
+          labelText,
+          'horizontal',
+          { canvasMidX, canvasMidY },
+          uiConfig
+        );
 
         ctx.fillStrokeShape(shape);
       },
@@ -914,6 +934,8 @@ export class WeaveNodesDistanceSnappingPlugin extends WeavePlugin {
 
     const renderLabel = this.renderDistanceLabel;
 
+    const uiConfig = this.uiConfig;
+
     const lineWithLabel = new Konva.Shape({
       name: GUIDE_VERTICAL_LINE_NAME,
       sceneFunc: function (ctx, shape) {
@@ -930,8 +952,8 @@ export class WeaveNodesDistanceSnappingPlugin extends WeavePlugin {
         ctx.setLineDash([]);
         ctx.moveTo(x, y1);
         ctx.lineTo(x, y2);
-        ctx.strokeStyle = '#ff0000';
-        ctx.lineWidth = 1;
+        ctx.strokeStyle = uiConfig.line.stroke;
+        ctx.lineWidth = uiConfig.line.strokeWidth;
         ctx.stroke();
         ctx.closePath();
 
@@ -943,7 +965,14 @@ export class WeaveNodesDistanceSnappingPlugin extends WeavePlugin {
         const canvasMidX = worldMidX * scaleX;
         const canvasMidY = worldMidY * scaleY;
 
-        renderLabel(ctx, stage, labelText, { canvasMidX, canvasMidY });
+        renderLabel(
+          ctx,
+          stage,
+          labelText,
+          'vertical',
+          { canvasMidX, canvasMidY },
+          uiConfig
+        );
 
         ctx.fillStrokeShape(shape);
       },

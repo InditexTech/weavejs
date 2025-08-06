@@ -509,3 +509,71 @@ export function getTopmostShadowHost(el: DOMElement): ShadowRoot | null {
 
   return current?.shadowRoot || null;
 }
+
+export function getVisibleNodes(
+  instance: Weave,
+  stage: Konva.Stage,
+  nodeParent: Konva.Node,
+  skipNodes: string[],
+  referenceLayer: Konva.Layer | Konva.Group
+) {
+  const nodesSelection =
+    instance.getPlugin<WeaveNodesSelectionPlugin>('nodesSelection');
+
+  if (nodesSelection) {
+    nodesSelection.getTransformer().hide();
+  }
+
+  const nodes = getVisibleNodesInViewport(stage, referenceLayer);
+
+  const finalVisibleNodes: Konva.Node[] = [];
+
+  // and we snap over edges and center of each object on the canvas
+  nodes.forEach((node) => {
+    const actualNodeParent = instance.getNodeContainer(node);
+
+    if (actualNodeParent?.getAttrs().id !== nodeParent?.getAttrs().id) {
+      return;
+    }
+
+    if (node.getParent()?.getAttrs().nodeType === 'group') {
+      return;
+    }
+
+    if (skipNodes.includes(node.getParent()?.getAttrs().nodeId)) {
+      return;
+    }
+
+    if (skipNodes.includes(node.getAttrs().id ?? '')) {
+      return;
+    }
+
+    if (
+      node.getParent() !== referenceLayer &&
+      !node.getParent()?.getAttrs().nodeId
+    ) {
+      return;
+    }
+
+    if (
+      node.getParent() !== referenceLayer &&
+      node.getParent()?.getAttrs().nodeId
+    ) {
+      const realNode = stage.findOne(
+        `#${node.getParent()?.getAttrs().nodeId}`
+      ) as Konva.Group;
+
+      if (realNode && realNode !== referenceLayer) {
+        return;
+      }
+    }
+
+    finalVisibleNodes.push(node);
+  });
+
+  if (nodesSelection) {
+    nodesSelection.getTransformer().show();
+  }
+
+  return finalVisibleNodes;
+}

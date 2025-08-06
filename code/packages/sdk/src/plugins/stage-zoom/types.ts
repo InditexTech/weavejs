@@ -2,6 +2,7 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
+import type { DeepPartial } from '@inditextech/weave-types';
 import type { WEAVE_STAGE_ZOOM_TYPE } from './constants';
 
 export type WeaveStageZoomTypeKeys = keyof typeof WEAVE_STAGE_ZOOM_TYPE;
@@ -33,15 +34,6 @@ export type WeaveStageZoomPluginConfig = {
     mouseWheelStep: number;
     trackpadStep: number;
   };
-};
-
-type DeepPartial<T> = {
-  [P in keyof T]?: T[P] extends object
-    ? // eslint-disable-next-line @typescript-eslint/no-unsafe-function-type
-      T[P] extends Function
-      ? T[P]
-      : DeepPartial<T[P]>
-    : T[P];
 };
 
 export type WeaveStageZoomPluginParams = {

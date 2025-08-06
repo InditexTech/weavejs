@@ -35,6 +35,22 @@ new import { WeaveNodesDistanceSnappingPlugin } from "@inditextech/weave-sdk";
 ## TypeScript types
 
 ```ts
+const GUIDE_DISTANCE_LINE_DEFAULT_CONFIG: WeaveNodesDistanceSnappingUIConfig = {
+  line: {
+    stroke: "#E12D3C",
+    strokeWidth: 1,
+  },
+  label: {
+    linePadding: 10,
+    height: 20,
+    cornerRadius: 0,
+    fill: "#E12D3C",
+    fontStyle: "normal",
+    fontSize: 14,
+    fontFamily: "Arial",
+    paddingX: 4,
+  },
+};
 const GUIDE_ENTER_SNAPPING_TOLERANCE = 3;
 const GUIDE_EXIT_SNAPPING_TOLERANCE = 5;
 
@@ -47,10 +63,11 @@ type NodeSnapVertical = (typeof NODE_SNAP_VERTICAL)[NodeSnapVerticalKeys];
 type WeaveNodesDistanceSnappingPluginConfig = {
   enterSnappingTolerance: number;
   exitSnappingTolerance: number;
+  ui: WeaveNodesDistanceSnappingUIConfig;
 };
 
 type WeaveNodesDistanceSnappingPluginParams = {
-  config?: WeaveNodesDistanceSnappingPluginConfig;
+  config?: DeepPartial<WeaveNodesDistanceSnappingPluginConfig>;
 };
 
 type DistanceInfoH = {
@@ -67,6 +84,23 @@ type DistanceInfoV = {
   to: Konva.Node;
   midX: number;
   distance: number;
+};
+
+type WeaveNodesDistanceSnappingUIConfig = {
+  line: {
+    stroke: string;
+    strokeWidth: number;
+  };
+  label: {
+    height: number;
+    cornerRadius: number;
+    fill: string;
+    fontSize: number;
+    fontFamily: string;
+    fontStyle: string;
+    linePadding: number;
+    paddingX: number;
+  };
 };
 ```
 
@@ -98,6 +132,11 @@ For `WeaveNodesDistanceSnappingPluginConfig`:
         "Drag snapping threshold (in px) to the guides (when exiting snap).",
       type: "number",
       default: "3",
+    },
+    ["ui"]: {
+      description: "Distance lines and labels UI configuration.",
+      type: "WeaveNodesDistanceSnappingUIConfig",
+      default: "GUIDE_DISTANCE_LINE_DEFAULT_CONFIG",
     },
   }}
 />
