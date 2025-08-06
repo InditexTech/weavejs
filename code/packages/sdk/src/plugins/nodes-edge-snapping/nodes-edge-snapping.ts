@@ -22,7 +22,7 @@ import {
 } from './constants';
 import type { KonvaEventObject } from 'konva/lib/Node';
 import type { WeaveNodesSelectionPlugin } from '../nodes-selection/nodes-selection';
-import { getTargetAndSkipNodes, getVisibleNodesInViewport } from '@/utils';
+import { getTargetAndSkipNodes, getVisibleNodes } from '@/utils';
 
 export class WeaveNodesEdgeSnappingPlugin extends WeavePlugin {
   private readonly guideLineConfig: Konva.LineConfig;
@@ -92,7 +92,14 @@ export class WeaveNodesEdgeSnappingPlugin extends WeavePlugin {
       return;
     }
 
-    const visibleNodes = this.getVisibleNodes(nodeParent, skipNodes);
+    const stage = this.instance.getStage();
+    const visibleNodes = getVisibleNodes(
+      this.instance,
+      stage,
+      nodeParent,
+      skipNodes,
+      this.instance.getMainLayer() as Konva.Layer
+    );
     // find possible snapping lines
     const lineGuideStops = this.getLineGuideStops(visibleNodes);
     // find snapping points of current object
@@ -210,53 +217,6 @@ export class WeaveNodesEdgeSnappingPlugin extends WeavePlugin {
         this.cleanupGuidelines();
       });
     }
-  }
-
-  getVisibleNodes(nodeParent: Konva.Node, skipNodes: string[]) {
-    const stage = this.instance.getStage();
-
-    const nodesSelection =
-      this.instance.getPlugin<WeaveNodesSelectionPlugin>('nodesSelection');
-
-    if (nodesSelection) {
-      nodesSelection.getTransformer().hide();
-    }
-
-    const nodes = getVisibleNodesInViewport(
-      stage,
-      this.instance.getMainLayer()
-    );
-
-    const finalVisibleNodes: Konva.Node[] = [];
-
-    // and we snap over edges and center of each object on the canvas
-    nodes.forEach((node) => {
-      const actualNodeParent = this.instance.getNodeContainer(node);
-
-      if (actualNodeParent?.getAttrs().id !== nodeParent?.getAttrs().id) {
-        return;
-      }
-
-      if (node.getParent()?.getAttrs().nodeType === 'group') {
-        return;
-      }
-
-      if (skipNodes.includes(node.getParent()?.getAttrs().nodeId)) {
-        return;
-      }
-
-      if (skipNodes.includes(node.getAttrs().id ?? '')) {
-        return;
-      }
-
-      finalVisibleNodes.push(node);
-    });
-
-    if (nodesSelection) {
-      nodesSelection.getTransformer().show();
-    }
-
-    return finalVisibleNodes;
   }
 
   getLineGuideStops(nodes: Konva.Node[]): LineGuideStop {
