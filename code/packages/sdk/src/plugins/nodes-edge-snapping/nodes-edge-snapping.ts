@@ -86,7 +86,13 @@ export class WeaveNodesEdgeSnappingPlugin extends WeavePlugin {
       return;
     }
 
-    const visibleNodes = this.getVisibleNodes(skipNodes);
+    const nodeParent = this.instance.getNodeContainer(node);
+
+    if (nodeParent === null) {
+      return;
+    }
+
+    const visibleNodes = this.getVisibleNodes(nodeParent, skipNodes);
     // find possible snapping lines
     const lineGuideStops = this.getLineGuideStops(visibleNodes);
     // find snapping points of current object
@@ -206,7 +212,7 @@ export class WeaveNodesEdgeSnappingPlugin extends WeavePlugin {
     }
   }
 
-  getVisibleNodes(skipNodes: string[]) {
+  getVisibleNodes(nodeParent: Konva.Node, skipNodes: string[]) {
     const stage = this.instance.getStage();
 
     const nodesSelection =
@@ -225,6 +231,12 @@ export class WeaveNodesEdgeSnappingPlugin extends WeavePlugin {
 
     // and we snap over edges and center of each object on the canvas
     nodes.forEach((node) => {
+      const actualNodeParent = this.instance.getNodeContainer(node);
+
+      if (actualNodeParent?.getAttrs().id !== nodeParent?.getAttrs().id) {
+        return;
+      }
+
       if (node.getParent()?.getAttrs().nodeType === 'group') {
         return;
       }

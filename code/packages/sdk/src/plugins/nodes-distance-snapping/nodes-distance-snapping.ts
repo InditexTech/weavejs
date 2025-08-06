@@ -77,8 +77,6 @@ export class WeaveNodesDistanceSnappingPlugin extends WeavePlugin {
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   evaluateGuidelines(e: KonvaEventObject<any>): void {
-    const stage = this.instance.getStage();
-    const mainLayer = this.instance.getMainLayer();
     const utilityLayer = this.instance.getUtilityLayer();
 
     if (!this.enabled) {
@@ -98,20 +96,15 @@ export class WeaveNodesDistanceSnappingPlugin extends WeavePlugin {
       return;
     }
 
-    if (node.getParent() === mainLayer) {
-      this.referenceLayer = mainLayer;
-    }
-    if (node.getParent()?.getAttrs().nodeId) {
-      const realNode = stage.findOne(
-        `#${node.getParent()?.getAttrs().nodeId}`
-      ) as Konva.Group;
+    const nodeParent = this.instance.getNodeContainer(node);
 
-      if (realNode) {
-        this.referenceLayer = realNode;
-      }
+    if (nodeParent === null) {
+      return;
     }
 
-    const visibleNodes = this.getVisibleNodes(skipNodes);
+    this.referenceLayer = nodeParent as unknown as Konva.Layer | Konva.Group;
+
+    const visibleNodes = this.getVisibleNodes(nodeParent, skipNodes);
     // find horizontally intersecting nodes
     const {
       intersectedNodes: sortedHorizontalIntersectedNodes,
@@ -588,42 +581,65 @@ export class WeaveNodesDistanceSnappingPlugin extends WeavePlugin {
       return ay - by;
     });
 
+    const nodesThatOverlap: Konva.Node[] = [];
+    for (const node of intersectedNodes) {
+      const box = this.getBoxClientRect(node);
+      const overlapsAny = intersectedNodes.some((other) => {
+        const otherBox = this.getBoxClientRect(other);
+        return (
+          box.y < otherBox.y + otherBox.height &&
+          box.y + box.height > otherBox.y
+        );
+      });
+
+      if (overlapsAny) {
+        nodesThatOverlap.push(node);
+      }
+    }
+
+    const permutations = nodesThatOverlap.reduce((acc, node) => {
+      acc.push(intersectedNodes.filter((actNode) => actNode !== node));
+      return acc;
+    }, [] as Konva.Node[][]);
+
     const intersectedNodesWithDistances: DistanceInfoV[] = [];
 
-    for (let i = 0; i < intersectedNodes.length - 1; i++) {
-      const a = intersectedNodes[i];
-      const b = intersectedNodes[i + 1];
+    for (const actIntersectedNodes of permutations) {
+      for (let i = 0; i < actIntersectedNodes.length - 1; i++) {
+        const a = actIntersectedNodes[i];
+        const b = actIntersectedNodes[i + 1];
 
-      const boxA = this.getBoxClientRect(a);
-      const boxB = this.getBoxClientRect(b);
+        const boxA = this.getBoxClientRect(a);
+        const boxB = this.getBoxClientRect(b);
 
-      const aBottom = boxA.y + boxA.height;
-      const bTop = boxB.y;
+        const aBottom = boxA.y + boxA.height;
+        const bTop = boxB.y;
 
-      const distance = Math.abs(aBottom - bTop);
+        const distance = Math.abs(aBottom - bTop);
 
-      const left = Math.max(boxA.x, boxB.x);
-      const right = Math.min(boxA.x + boxA.width, boxB.x + boxB.width);
+        const left = Math.max(boxA.x, boxB.x);
+        const right = Math.min(boxA.x + boxA.width, boxB.x + boxB.width);
 
-      let midX;
+        let midX;
 
-      if (right > left) {
-        // Overlap in X → use middle of overlap region
-        midX = left + (right - left) / 2;
-      } else {
-        // No overlap → use average of horizontal centers
-        const aCenterX = boxA.x + boxA.width / 2;
-        const bCenterX = boxB.x + boxB.width / 2;
-        midX = (aCenterX + bCenterX) / 2;
+        if (right > left) {
+          // Overlap in X → use middle of overlap region
+          midX = left + (right - left) / 2;
+        } else {
+          // No overlap → use average of horizontal centers
+          const aCenterX = boxA.x + boxA.width / 2;
+          const bCenterX = boxB.x + boxB.width / 2;
+          midX = (aCenterX + bCenterX) / 2;
+        }
+
+        intersectedNodesWithDistances.push({
+          index: i,
+          from: a,
+          to: b,
+          midX,
+          distance: Math.round(distance),
+        });
       }
-
-      intersectedNodesWithDistances.push({
-        index: i,
-        from: a,
-        to: b,
-        midX,
-        distance: Math.round(distance),
-      });
     }
 
     return { intersectedNodes, intersectedNodesWithDistances };
@@ -659,48 +675,70 @@ export class WeaveNodesDistanceSnappingPlugin extends WeavePlugin {
       return ax - bx;
     });
 
+    const nodesThatOverlap: Konva.Node[] = [];
+    for (const node of intersectedNodes) {
+      const box = this.getBoxClientRect(node);
+      const overlapsAny = intersectedNodes.some((other) => {
+        const otherBox = this.getBoxClientRect(other);
+        return (
+          box.x < otherBox.x + otherBox.width && box.x + box.width > otherBox.x
+        );
+      });
+
+      if (overlapsAny) {
+        nodesThatOverlap.push(node);
+      }
+    }
+
+    const permutations = nodesThatOverlap.reduce((acc, node) => {
+      acc.push(intersectedNodes.filter((actNode) => actNode !== node));
+      return acc;
+    }, [] as Konva.Node[][]);
+
     const intersectedNodesWithDistances: DistanceInfoH[] = [];
 
-    for (let i = 0; i < intersectedNodes.length - 1; i++) {
-      const a = intersectedNodes[i];
-      const b = intersectedNodes[i + 1];
+    for (const actIntersectedNodes of permutations) {
+      for (let i = 0; i < actIntersectedNodes.length - 1; i++) {
+        const a = actIntersectedNodes[i];
+        const b = actIntersectedNodes[i + 1];
 
-      const boxA = this.getBoxClientRect(a);
-      const boxB = this.getBoxClientRect(b);
+        const boxA = this.getBoxClientRect(a);
+        const boxB = this.getBoxClientRect(b);
 
-      const aRight = boxA.x + boxA.width;
-      const bLeft = boxB.x;
+        const aRight = boxA.x + boxA.width;
+        const bLeft = boxB.x;
 
-      const distance = Math.abs(Math.round(aRight - bLeft));
+        const distance = Math.abs(Math.round(aRight - bLeft));
 
-      const top = Math.max(boxA.y, boxB.y);
-      const bottom = Math.min(boxA.y + boxA.height, boxB.y + boxB.height);
+        const top = Math.max(boxA.y, boxB.y);
+        const bottom = Math.min(boxA.y + boxA.height, boxB.y + boxB.height);
 
-      let midY;
+        let midY;
 
-      if (bottom > top) {
-        // They vertically overlap → use middle of overlapping area
-        midY = top + (bottom - top) / 2;
-      } else {
-        // No vertical overlap → use middle between vertical edges
-        const aCenterY = boxA.y + boxA.height / 2;
-        const bCenterY = boxB.y + boxB.height / 2;
-        midY = (aCenterY + bCenterY) / 2;
+        if (bottom > top) {
+          // They vertically overlap → use middle of overlapping area
+          midY = top + (bottom - top) / 2;
+        } else {
+          // No vertical overlap → use middle between vertical edges
+          const aCenterY = boxA.y + boxA.height / 2;
+          const bCenterY = boxB.y + boxB.height / 2;
+          midY = (aCenterY + bCenterY) / 2;
+        }
+
+        intersectedNodesWithDistances.push({
+          index: i,
+          from: a,
+          to: b,
+          midY,
+          distance,
+        });
       }
-
-      intersectedNodesWithDistances.push({
-        index: i,
-        from: a,
-        to: b,
-        midY,
-        distance,
-      });
     }
 
     return { intersectedNodes, intersectedNodesWithDistances };
   }
 
-  private getVisibleNodes(skipNodes: string[]) {
+  private getVisibleNodes(nodeParent: Konva.Node, skipNodes: string[]) {
     const stage = this.instance.getStage();
 
     const nodesSelection =
@@ -716,6 +754,12 @@ export class WeaveNodesDistanceSnappingPlugin extends WeavePlugin {
 
     // and we snap over edges and center of each object on the canvas
     nodes.forEach((node) => {
+      const actualNodeParent = this.instance.getNodeContainer(node);
+
+      if (actualNodeParent?.getAttrs().id !== nodeParent?.getAttrs().id) {
+        return;
+      }
+
       if (node.getParent()?.getAttrs().nodeType === 'group') {
         return;
       }
