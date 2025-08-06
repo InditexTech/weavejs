@@ -4,6 +4,7 @@
 
 import type Konva from 'konva';
 import { NODE_SNAP_HORIZONTAL, NODE_SNAP_VERTICAL } from './constants';
+import type { DeepPartial } from '@inditextech/weave-types';
 
 export type NodeSnapHorizontalKeys = keyof typeof NODE_SNAP_HORIZONTAL;
 export type NodeSnapHorizontal =
@@ -16,10 +17,11 @@ export type NodeSnapVertical =
 export type WeaveNodesDistanceSnappingPluginConfig = {
   enterSnappingTolerance: number;
   exitSnappingTolerance: number;
+  ui: WeaveNodesDistanceSnappingUIConfig;
 };
 
 export type WeaveNodesDistanceSnappingPluginParams = {
-  config?: WeaveNodesDistanceSnappingPluginConfig;
+  config?: DeepPartial<WeaveNodesDistanceSnappingPluginConfig>;
 };
 
 export type DistanceInfoH = {
@@ -36,4 +38,21 @@ export type DistanceInfoV = {
   to: Konva.Node;
   midX: number;
   distance: number;
+};
+
+export type WeaveNodesDistanceSnappingUIConfig = {
+  line: {
+    stroke: string;
+    strokeWidth: number;
+  };
+  label: {
+    height: number;
+    cornerRadius: number;
+    fill: string;
+    fontSize: number;
+    fontFamily: string;
+    fontStyle: string;
+    linePadding: number;
+    paddingX: number;
+  };
 };
