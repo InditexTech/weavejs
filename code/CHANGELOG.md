@@ -16,6 +16,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - [#567](https://github.com/InditexTech/weavejs/issues/568) Improve guides (edge and distance) plugins performance and UI
+- [#571](https://github.com/InditexTech/weavejs/issues/571) Include new node IDs in onPaste event
 
 ### Fixed
 

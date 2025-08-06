@@ -48,11 +48,17 @@ export const WEAVE_COPY_PASTE_PASTE_MODES = {
   ["CLIPBOARD_API_NOT_SUPPORTED"]: "clipboard-api-not-supported",
 } as const;
 
-type WeaveCopyPasteNodesPluginOnCopyEvent = Error | undefined;
-type WeaveCopyPasteNodesPluginOnPasteEvent = Error | undefined;
+export type WeaveCopyPasteNodesPluginOnCopyEvent =
+  | { error?: Error }
+  | undefined;
+export type WeaveCopyPasteNodesPluginOnPasteEvent = {
+  error?: Error;
+  pastedNodes?: string[];
+};
 type WeaveCopyPasteNodesPluginOnPasteExternalEvent = {
   items?: ClipboardItems;
   dataList?: DataTransferItemList;
+  positionCalculated: boolean;
   position: Vector2d;
 };
 
