@@ -26,7 +26,12 @@ import {
 } from './types';
 import type { WeaveNode } from '@/nodes/node';
 import type { Vector2d } from 'konva/lib/types';
-import { containerOverCursor, getBoundingBox } from '@/utils';
+import {
+  containerOverCursor,
+  getBoundingBox,
+  getTopmostShadowHost,
+  isInShadowDOM,
+} from '@/utils';
 
 export class WeaveCopyPasteNodesPlugin extends WeavePlugin {
   protected state: WeaveCopyPasteNodesPluginState;
@@ -98,8 +103,22 @@ export class WeaveCopyPasteNodesPlugin extends WeavePlugin {
     }
   }
 
+  private getCatcherElement(): HTMLElement | null {
+    const stage = this.instance.getStage();
+    let catcher = document.getElementById(WEAVE_COPY_PASTE_PASTE_CATCHER_ID);
+    if (isInShadowDOM(stage.container())) {
+      const shadowHost = getTopmostShadowHost(stage.container());
+      if (shadowHost) {
+        catcher = shadowHost.querySelector(
+          `#${WEAVE_COPY_PASTE_PASTE_CATCHER_ID}`
+        );
+      }
+    }
+    return catcher;
+  }
+
   private focusPasteCatcher() {
-    const catcher = document.getElementById(WEAVE_COPY_PASTE_PASTE_CATCHER_ID);
+    const catcher = this.getCatcherElement();
     catcher?.focus();
   }
 
@@ -108,7 +127,7 @@ export class WeaveCopyPasteNodesPlugin extends WeavePlugin {
 
     this.createPasteCatcher();
 
-    const catcher = document.getElementById(WEAVE_COPY_PASTE_PASTE_CATCHER_ID);
+    const catcher = this.getCatcherElement();
 
     window.addEventListener('keydown', async (e) => {
       if (stage.isFocused() && e.key === 'c' && (e.ctrlKey || e.metaKey)) {

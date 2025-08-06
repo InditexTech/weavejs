@@ -11,7 +11,7 @@ import {
 import { WeaveNode } from '@/nodes/node';
 import { type Vector2d } from 'konva/lib/types';
 import { WeaveNodesSelectionPlugin } from '@/plugins/nodes-selection/nodes-selection';
-import { resetScale } from '@/utils';
+import { getTopmostShadowHost, isInShadowDOM, resetScale } from '@/utils';
 import { WEAVE_TEXT_NODE_TYPE } from './constants';
 import { SELECTION_TOOL_ACTION_NAME } from '@/actions/selection-tool/constants';
 import { TEXT_LAYOUT } from '@/actions/text-tool/constants';
@@ -576,7 +576,7 @@ export class WeaveTextNode extends WeaveNode {
           'onStageMove',
           this.onStageMoveHandler(textNode).bind(this)
         );
-        window.removeEventListener('pointerclick', handleOutsideClick);
+        window.removeEventListener('pointerup', handleOutsideClick);
         return;
       }
     };
@@ -612,15 +612,26 @@ export class WeaveTextNode extends WeaveNode {
     this.textArea.tabIndex = 1;
     this.textArea.focus();
 
-    const handleOutsideClick = (e: Event) => {
+    const handleOutsideClick = (e: PointerEvent) => {
       e.stopPropagation();
 
       if (!this.textArea) {
         return;
       }
 
+      const mouseX = e.clientX;
+      const mouseY = e.clientY;
+
+      let elementUnderMouse = document.elementFromPoint(mouseX, mouseY);
+      if (isInShadowDOM(stage.container())) {
+        const shadowHost = getTopmostShadowHost(stage.container());
+        if (shadowHost) {
+          elementUnderMouse = shadowHost.elementFromPoint(mouseX, mouseY);
+        }
+      }
+
       let clickedOnCanvas = false;
-      if ((e.target as Element)?.id !== `${textNode.id()}`) {
+      if ((elementUnderMouse as Element)?.id !== `${textNode.id()}`) {
         clickedOnCanvas = true;
       }
 
@@ -630,7 +641,7 @@ export class WeaveTextNode extends WeaveNode {
 
         this.textArea.removeEventListener('keydown', handleKeyDown);
         this.textArea.removeEventListener('keyup', handleKeyUp);
-        window.removeEventListener('pointerclick', handleOutsideClick);
+        window.removeEventListener('pointerup', handleOutsideClick);
         window.removeEventListener('pointerdown', handleOutsideClick);
 
         return;
@@ -638,7 +649,7 @@ export class WeaveTextNode extends WeaveNode {
     };
 
     setTimeout(() => {
-      window.addEventListener('pointerclick', handleOutsideClick);
+      window.addEventListener('pointerup', handleOutsideClick);
       window.addEventListener('pointerdown', handleOutsideClick);
     }, 0);
 

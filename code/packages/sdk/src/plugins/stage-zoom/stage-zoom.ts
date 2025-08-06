@@ -17,7 +17,12 @@ import {
   WEAVE_STAGE_ZOOM_TYPE,
 } from './constants';
 import type { Vector2d } from 'konva/lib/types';
-import { getBoundingBox, getClosestParentWithId } from '@/utils';
+import {
+  getBoundingBox,
+  getClosestParentWithId,
+  getTopmostShadowHost,
+  isInShadowDOM,
+} from '@/utils';
 import type { WeaveContextMenuPlugin } from '../context-menu/context-menu';
 import type { WeaveStageGridPlugin } from '../stage-grid/stage-grid';
 
@@ -619,7 +624,13 @@ export class WeaveStageZoomPlugin extends WeavePlugin {
       const mouseX = e.clientX;
       const mouseY = e.clientY;
 
-      const elementUnderMouse = document.elementFromPoint(mouseX, mouseY);
+      let elementUnderMouse = document.elementFromPoint(mouseX, mouseY);
+      if (isInShadowDOM(stage.container())) {
+        const shadowHost = getTopmostShadowHost(stage.container());
+        if (shadowHost) {
+          elementUnderMouse = shadowHost.elementFromPoint(mouseX, mouseY);
+        }
+      }
 
       if (
         !this.enabled ||
@@ -628,6 +639,8 @@ export class WeaveStageZoomPlugin extends WeavePlugin {
       ) {
         return;
       }
+
+      e.preventDefault();
 
       const delta = e.deltaY > 0 ? 1 : -1;
       this.zoomVelocity += delta;
