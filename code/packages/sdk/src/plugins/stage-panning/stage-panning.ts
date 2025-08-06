@@ -26,8 +26,11 @@ import { WEAVE_CONTEXT_MENU_PLUGIN_KEY } from '../context-menu/constants';
 
 export class WeaveStagePanningPlugin extends WeavePlugin {
   private moveToolActive: boolean;
+  private isMouseLeftButtonPressed: boolean;
   private isMouseMiddleButtonPressed: boolean;
   private isCtrlOrMetaPressed: boolean;
+  private isDragging: boolean;
+  private enableMove: boolean;
   private isSpaceKeyPressed: boolean;
   private pointers: Map<number, Vector2d>;
   private panning: boolean = false;
@@ -41,8 +44,11 @@ export class WeaveStagePanningPlugin extends WeavePlugin {
 
     this.pointers = new Map<number, { x: number; y: number }>();
     this.panning = false;
+    this.isDragging = false;
+    this.enableMove = false;
     this.enabled = true;
     this.moveToolActive = false;
+    this.isMouseLeftButtonPressed = false;
     this.isMouseMiddleButtonPressed = false;
     this.isCtrlOrMetaPressed = false;
     this.isSpaceKeyPressed = false;
@@ -57,7 +63,7 @@ export class WeaveStagePanningPlugin extends WeavePlugin {
     this.initEvents();
   }
 
-  private enableMove() {
+  private setCursor() {
     const stage = this.instance.getStage();
     if (stage.container().style.cursor !== 'grabbing') {
       this.previousPointer = stage.container().style.cursor;
@@ -87,7 +93,7 @@ export class WeaveStagePanningPlugin extends WeavePlugin {
         this.getNodesDistanceSnappingPlugin()?.disable();
 
         this.isSpaceKeyPressed = true;
-        this.enableMove();
+        this.setCursor();
       }
     });
 
@@ -107,7 +113,6 @@ export class WeaveStagePanningPlugin extends WeavePlugin {
     });
 
     let lastPos: Vector2d | null = null;
-    let isDragging = false;
 
     stage.on('pointerdown', (e) => {
       this.pointers.set(e.evt.pointerId, {
@@ -121,33 +126,33 @@ export class WeaveStagePanningPlugin extends WeavePlugin {
 
       const activeAction = this.instance.getActiveAction();
 
-      let enableMove = false;
-      if (
-        e &&
-        (e.evt.pointerType !== 'mouse' ||
-          (e.evt.pointerType === 'mouse' && e.evt.buttons === 1)) &&
-        activeAction === MOVE_TOOL_ACTION_NAME
-      ) {
+      this.enableMove = false;
+
+      if (activeAction === MOVE_TOOL_ACTION_NAME) {
         this.moveToolActive = true;
       }
 
-      if (!enableMove && e.evt.pointerType === 'mouse' && e.evt.buttons === 4) {
+      if (e.evt.pointerType === 'mouse' && e.evt.buttons === 1) {
+        this.isMouseLeftButtonPressed = true;
+      }
+
+      if (e.evt.pointerType === 'mouse' && e.evt.buttons === 4) {
         this.isMouseMiddleButtonPressed = true;
       }
 
       if (
         this.enabled &&
         (this.isSpaceKeyPressed ||
-          this.moveToolActive ||
+          (this.moveToolActive && this.isMouseLeftButtonPressed) ||
           this.isMouseMiddleButtonPressed)
       ) {
-        enableMove = true;
+        this.enableMove = true;
       }
 
-      if (enableMove) {
-        isDragging = true;
+      if (this.enableMove) {
+        this.isDragging = true;
         lastPos = stage.getPointerPosition();
-        this.enableMove();
+        this.setCursor();
       }
     });
 
@@ -171,19 +176,7 @@ export class WeaveStagePanningPlugin extends WeavePlugin {
         stage.container().style.cursor = 'grabbing';
       }
 
-      if (!isDragging) return;
-
-      // Pan with space pressed and no mouse buttons pressed
-      // if (
-      //   !this.enabled ||
-      //   !(
-      //     this.isSpaceKeyPressed ||
-      //     this.isMouseMiddleButtonPressed ||
-      //     this.moveToolActive
-      //   )
-      // ) {
-      //   return;
-      // }
+      if (!this.isDragging) return;
 
       this.getContextMenuPlugin()?.cancelLongPressTimer();
 
@@ -207,7 +200,11 @@ export class WeaveStagePanningPlugin extends WeavePlugin {
     stage.on('pointerup', (e) => {
       this.pointers.delete(e.evt.pointerId);
 
-      isDragging = false;
+      this.isMouseLeftButtonPressed = false;
+      this.isMouseMiddleButtonPressed = false;
+      this.moveToolActive = false;
+      this.isDragging = false;
+      this.enableMove = false;
 
       this.panning = false;
     });
