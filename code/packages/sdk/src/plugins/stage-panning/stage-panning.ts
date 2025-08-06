@@ -10,7 +10,12 @@ import type { Vector2d } from 'konva/lib/types';
 import type { WeaveStageZoomPlugin } from '../stage-zoom/stage-zoom';
 import type { WeaveContextMenuPlugin } from '../context-menu/context-menu';
 import { MOVE_TOOL_ACTION_NAME } from '@/actions/move-tool/constants';
-import { getClosestParentWithId } from '@/utils';
+import {
+  getClosestParentWithId,
+  getTopmostShadowHost,
+  // getTopmostShadowHost,
+  isInShadowDOM,
+} from '@/utils';
 import type { WeaveNodesEdgeSnappingPlugin } from '../nodes-edge-snapping/nodes-edge-snapping';
 import type { WeaveNodesDistanceSnappingPlugin } from '../nodes-distance-snapping/nodes-distance-snapping';
 import type { WeaveNodesSelectionPlugin } from '../nodes-selection/nodes-selection';
@@ -214,7 +219,13 @@ export class WeaveStagePanningPlugin extends WeavePlugin {
       const mouseX = e.clientX;
       const mouseY = e.clientY;
 
-      const elementUnderMouse = document.elementFromPoint(mouseX, mouseY);
+      let elementUnderMouse = document.elementFromPoint(mouseX, mouseY);
+      if (isInShadowDOM(stage.container())) {
+        const shadowHost = getTopmostShadowHost(stage.container());
+        if (shadowHost) {
+          elementUnderMouse = shadowHost.elementFromPoint(mouseX, mouseY);
+        }
+      }
 
       if (
         !this.enabled ||
@@ -234,7 +245,7 @@ export class WeaveStagePanningPlugin extends WeavePlugin {
       this.instance.emitEvent('onStageMove');
     };
 
-    window.addEventListener('wheel', handleWheel, { passive: false });
+    window.addEventListener('wheel', handleWheel, { passive: true });
 
     stage.container().style.touchAction = 'none';
     stage.container().style.userSelect = 'none';

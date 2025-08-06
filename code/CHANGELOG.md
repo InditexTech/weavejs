@@ -13,6 +13,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.52.3] - 2025-08-06
+
+### Fixed
+
+- [#568](https://github.com/InditexTech/weavejs/issues/568) Some functionalities doesn't work when loaded on Shadow Dom
+
 ## [0.52.2] - 2025-08-05
 
 ### Fixed
@@ -822,7 +828,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - [#24](https://github.com/InditexTech/weavejs/issues/24) Bug when loading rooms with text or images
 - [#18](https://github.com/InditexTech/weavejs/issues/18) Fix awareness not working on store-azure-web-pubsub
 
-[Unreleased]: https://github.com/InditexTech/weavejs/compare/0.52.2...HEAD
+[Unreleased]: https://github.com/InditexTech/weavejs/compare/0.52.3...HEAD
+
+[0.52.3]: https://github.com/InditexTech/weavejs/compare/0.52.2...0.52.3
 
 [0.52.2]: https://github.com/InditexTech/weavejs/compare/0.52.1...0.52.2
 

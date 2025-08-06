@@ -149,6 +149,7 @@ export class WeaveNodesDistanceSnappingPlugin extends WeavePlugin {
   }
 
   private getPeers(
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     intersectedNodes: any[],
     targetNode: Konva.Node,
     prev: Konva.Node,

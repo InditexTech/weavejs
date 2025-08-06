@@ -12,6 +12,7 @@ import type { WeaveNode } from './nodes/node';
 import type { Vector2d } from 'konva/lib/types';
 import type { WeaveNodesSelectionPlugin } from './plugins/nodes-selection/nodes-selection';
 import type { KonvaEventObject } from 'konva/lib/Node';
+import type { DOMElement } from './types';
 
 export function resetScale(node: Konva.Node): void {
   node.width(
@@ -485,12 +486,26 @@ export function getVisibleNodesInViewport(
   return visibleNodes;
 }
 
-export function getClosestParentWithId(
-  el: HTMLElement | Element | null
-): HTMLElement | Element | null {
+export function getClosestParentWithId(el: DOMElement): DOMElement {
   while (el) {
     if (el.id) return el;
     el = el.parentElement;
   }
   return null;
+}
+
+export function isInShadowDOM(el: DOMElement): boolean {
+  return el?.getRootNode() instanceof ShadowRoot;
+}
+
+export function getTopmostShadowHost(el: DOMElement): ShadowRoot | null {
+  let current = el;
+  let root = current?.getRootNode();
+
+  while (root instanceof ShadowRoot) {
+    current = root.host;
+    root = current.getRootNode();
+  }
+
+  return current?.shadowRoot || null;
 }
