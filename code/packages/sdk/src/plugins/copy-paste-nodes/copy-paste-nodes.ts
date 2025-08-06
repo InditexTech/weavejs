@@ -333,13 +333,15 @@ export class WeaveCopyPasteNodesPlugin extends WeavePlugin {
         if (realNode) {
           nodesToSelect.push(realNode);
         }
-
-        this.instance.emitEvent<WeaveCopyPasteNodesPluginOnPasteEvent>(
-          'onPaste'
-        );
       }
 
-      this.instance.emitEvent('onPaste', undefined);
+      this.instance.emitEvent<WeaveCopyPasteNodesPluginOnPasteEvent>(
+        'onPaste',
+        {
+          error: undefined,
+          pastedNodes: nodesToSelect.map((n) => n.getAttrs().id ?? ''),
+        }
+      );
 
       const nodesSelectionPlugin = this.getNodesSelectionPlugin();
       nodesSelectionPlugin?.setSelectedNodes(nodesToSelect);
@@ -418,10 +420,9 @@ export class WeaveCopyPasteNodesPlugin extends WeavePlugin {
 
       this.instance.emitEvent<WeaveCopyPasteNodesPluginOnCopyEvent>('onCopy');
     } catch (ex) {
-      this.instance.emitEvent<WeaveCopyPasteNodesPluginOnCopyEvent>(
-        'onCopy',
-        ex as Error
-      );
+      this.instance.emitEvent<WeaveCopyPasteNodesPluginOnCopyEvent>('onCopy', {
+        error: ex as Error,
+      });
     }
   }
 
@@ -442,7 +443,7 @@ export class WeaveCopyPasteNodesPlugin extends WeavePlugin {
     } catch (ex) {
       this.instance.emitEvent<WeaveCopyPasteNodesPluginOnPasteEvent>(
         'onPaste',
-        ex as Error
+        { error: ex as Error }
       );
     }
 
@@ -479,7 +480,7 @@ export class WeaveCopyPasteNodesPlugin extends WeavePlugin {
     } catch (ex) {
       this.instance.emitEvent<WeaveCopyPasteNodesPluginOnPasteEvent>(
         'onPaste',
-        ex as Error
+        { error: ex as Error }
       );
     }
   }

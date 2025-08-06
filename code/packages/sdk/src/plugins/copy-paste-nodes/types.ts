@@ -18,8 +18,13 @@ export type WeaveCopyPasteNodesPluginStateKeys =
 export type WeaveCopyPasteNodesPluginState =
   (typeof COPY_PASTE_NODES_PLUGIN_STATE)[WeaveCopyPasteNodesPluginStateKeys];
 
-export type WeaveCopyPasteNodesPluginOnCopyEvent = Error | undefined;
-export type WeaveCopyPasteNodesPluginOnPasteEvent = Error | undefined;
+export type WeaveCopyPasteNodesPluginOnCopyEvent =
+  | { error?: Error }
+  | undefined;
+export type WeaveCopyPasteNodesPluginOnPasteEvent = {
+  error?: Error;
+  pastedNodes?: string[];
+};
 export type WeaveCopyPasteNodesPluginOnPasteExternalEvent = {
   items?: ClipboardItems;
   dataList?: DataTransferItemList;
