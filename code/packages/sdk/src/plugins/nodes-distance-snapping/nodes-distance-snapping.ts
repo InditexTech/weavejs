@@ -614,7 +614,6 @@ export class WeaveNodesDistanceSnappingPlugin extends WeavePlugin {
         const nodeB = intersectedNodes[j];
 
         if (!this.isOverlapping(nodeA, nodeB)) {
-          console.log('AQUI?');
           const boxA = this.getBoxClientRect(nodeA);
           const boxB = this.getBoxClientRect(nodeB);
 

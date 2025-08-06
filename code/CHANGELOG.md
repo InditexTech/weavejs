@@ -17,6 +17,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - [#567](https://github.com/InditexTech/weavejs/issues/568) Improve guides (edge and distance) plugins performance and UI
 
+### Fixed
+
+- [#570](https://github.com/InditexTech/weavejs/issues/570) Brush tool not activated after switching from Move tool
+
 ## [0.52.3] - 2025-08-06
 
 ### Fixed
