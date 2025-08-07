@@ -34,13 +34,13 @@ import { WeaveCopyPasteNodesPlugin } from "@inditextech/weave-sdk";
 ## Instantiation
 
 ```ts
-new WeaveCopyPasteNodesPlugin();
+new WeaveCopyPasteNodesPlugin(params?: WeaveCopyPasteNodesPluginParams);
 ```
 
 ## TypeScript types
 
 ```ts
-export const WEAVE_COPY_PASTE_PASTE_MODES = {
+const WEAVE_COPY_PASTE_PASTE_MODES = {
   ["INTERNAL"]: "internal",
   ["EXTERNAL"]: "external",
   ["NOT_ALLOWED"]: "not-allowed",
@@ -48,10 +48,16 @@ export const WEAVE_COPY_PASTE_PASTE_MODES = {
   ["CLIPBOARD_API_NOT_SUPPORTED"]: "clipboard-api-not-supported",
 } as const;
 
-export type WeaveCopyPasteNodesPluginOnCopyEvent =
-  | { error?: Error }
-  | undefined;
-export type WeaveCopyPasteNodesPluginOnPasteEvent = {
+const WEAVE_COPY_PASTE_CONFIG_DEFAULT = {
+  paddingOnPaste: {
+    enabled: false,
+    paddingX: 0,
+    paddingY: 0,
+  },
+} as const;
+
+type WeaveCopyPasteNodesPluginOnCopyEvent = { error?: Error } | undefined;
+type WeaveCopyPasteNodesPluginOnPasteEvent = {
   error?: Error;
   pastedNodes?: string[];
 };
@@ -77,7 +83,46 @@ type WeaveToPasteNode = {
   konvaNode: Konva.Node;
   node: NodeSerializable;
 };
+
+type PaddingOnPaste = {
+  enabled: boolean;
+  paddingX: number;
+  paddingY: number;
+};
+
+type WeaveCopyPasteNodesPluginConfig = {
+  paddingOnPaste: PaddingOnPaste;
+};
+
+type WeaveCopyPasteNodesPluginParams = {
+  config?: Partial<WeaveCopyPasteNodesPluginConfig>;
+};
 ```
+
+## Parameters
+
+For `WeaveCopyPasteNodesPlugin`:
+
+<TypeTable
+  type={{
+    ["config"]: {
+      description: "Config parameters for the plugin.",
+      type: "WeaveCopyPasteNodesPluginConfig",
+    },
+  }}
+/>
+
+For `WeaveCopyPasteNodesPluginConfig`:
+
+<TypeTable
+  type={{
+    ["paddingOnPaste"]: {
+      description: "Allows to add a padding when pasting internally.",
+      type: "PaddingOnPaste",
+      default: "{ enabled: false, paddingX: 0, paddingY: 0 }",
+    },
+  }}
+/>
 
 ## Methods
 

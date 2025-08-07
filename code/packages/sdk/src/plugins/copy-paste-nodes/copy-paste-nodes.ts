@@ -10,6 +10,7 @@ import {
 } from '@inditextech/weave-types';
 import {
   COPY_PASTE_NODES_PLUGIN_STATE,
+  WEAVE_COPY_PASTE_CONFIG_DEFAULT,
   WEAVE_COPY_PASTE_NODES_KEY,
   WEAVE_COPY_PASTE_PASTE_CATCHER_ID,
   WEAVE_COPY_PASTE_PASTE_MODES,
@@ -23,6 +24,8 @@ import {
   type WeaveCopyPasteNodesPluginState,
   type WeavePasteModel,
   type WeaveToPasteNode,
+  type WeaveCopyPasteNodesPluginParams,
+  type WeaveCopyPasteNodesPluginConfig,
 } from './types';
 import type { WeaveNode } from '@/nodes/node';
 import type { Vector2d } from 'konva/lib/types';
@@ -35,14 +38,26 @@ import {
 
 export class WeaveCopyPasteNodesPlugin extends WeavePlugin {
   protected state: WeaveCopyPasteNodesPluginState;
+  private config: WeaveCopyPasteNodesPluginConfig;
+  private lastInternalPasteSnapshot: string;
+  private actualInternalPaddingX: number;
+  private actualInternalPaddingY: number;
   private toPaste: WeavePasteModel | undefined;
   getLayerName: undefined;
   initLayer: undefined;
   onRender: undefined;
 
-  constructor() {
+  constructor(params?: Partial<WeaveCopyPasteNodesPluginParams>) {
     super();
 
+    this.config = {
+      ...WEAVE_COPY_PASTE_CONFIG_DEFAULT,
+      ...params?.config,
+    };
+
+    this.actualInternalPaddingX = 0;
+    this.actualInternalPaddingY = 0;
+    this.lastInternalPasteSnapshot = '';
     this.state = COPY_PASTE_NODES_PLUGIN_STATE.IDLE;
   }
 
@@ -120,6 +135,29 @@ export class WeaveCopyPasteNodesPlugin extends WeavePlugin {
   private focusPasteCatcher() {
     const catcher = this.getCatcherElement();
     catcher?.focus();
+  }
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  private checkIfInternalElementsAreNew(newData: string) {
+    if (!this.config.paddingOnPaste.enabled) {
+      return false;
+    }
+
+    if (this.lastInternalPasteSnapshot !== newData) {
+      this.lastInternalPasteSnapshot = newData;
+      return true;
+    }
+
+    return false;
+  }
+
+  private updateInternalPastePadding() {
+    if (this.config.paddingOnPaste.enabled) {
+      this.actualInternalPaddingX =
+        this.actualInternalPaddingX + this.config.paddingOnPaste.paddingX;
+      this.actualInternalPaddingY =
+        this.actualInternalPaddingY + this.config.paddingOnPaste.paddingY;
+    }
   }
 
   initEvents(): void {
@@ -272,6 +310,17 @@ export class WeaveCopyPasteNodesPlugin extends WeavePlugin {
     if (this.toPaste) {
       const nodesToSelect = [];
 
+      const newElements = this.checkIfInternalElementsAreNew(
+        JSON.stringify(this.toPaste)
+      );
+
+      if (this.config.paddingOnPaste.enabled && newElements) {
+        this.actualInternalPaddingX = 0;
+        this.actualInternalPaddingY = 0;
+      }
+
+      this.updateInternalPastePadding();
+
       for (const element of Object.keys(this.toPaste.weave)) {
         const node = this.toPaste.weave[element].element;
         const posRelativeToSelection =
@@ -301,8 +350,20 @@ export class WeaveCopyPasteNodesPlugin extends WeavePlugin {
             const stagePos = stage.position(); // stage position (pan)
 
             localPos = {
-              x: (localPos.x - stagePos.x) / scale,
-              y: (localPos.y - stagePos.y) / scale,
+              x:
+                (localPos.x -
+                  stagePos.x +
+                  (this.config.paddingOnPaste.enabled
+                    ? this.actualInternalPaddingX
+                    : 0)) /
+                scale,
+              y:
+                (localPos.y -
+                  stagePos.y +
+                  (this.config.paddingOnPaste.enabled
+                    ? this.actualInternalPaddingY
+                    : 0)) /
+                scale,
             };
           }
           if (container && container.getAttrs().nodeType === 'frame') {
@@ -325,6 +386,23 @@ export class WeaveCopyPasteNodesPlugin extends WeavePlugin {
             node.props.x = localPos.x + realOffset.x + posRelativeToSelection.x;
             node.props.y = localPos.y + realOffset.y + posRelativeToSelection.y;
           }
+        } else {
+          const nodeHandler = this.instance.getNodeHandler<WeaveNode>(
+            node.props.nodeType ?? ''
+          );
+
+          if (nodeHandler) {
+            node.props.x =
+              node.props.x +
+              (this.config.paddingOnPaste.enabled
+                ? this.actualInternalPaddingX
+                : 0);
+            node.props.y =
+              node.props.y +
+              (this.config.paddingOnPaste.enabled
+                ? this.actualInternalPaddingY
+                : 0);
+          }
         }
 
         this.instance.addNode(node, containerId);
@@ -345,6 +423,11 @@ export class WeaveCopyPasteNodesPlugin extends WeavePlugin {
 
       const nodesSelectionPlugin = this.getNodesSelectionPlugin();
       nodesSelectionPlugin?.setSelectedNodes(nodesToSelect);
+
+      this.instance?.triggerAction('fitToSelectionTool', {
+        previousAction: 'selectionTool',
+        smartZoom: true,
+      });
 
       this.toPaste = undefined;
     }
@@ -417,6 +500,10 @@ export class WeaveCopyPasteNodesPlugin extends WeavePlugin {
 
     try {
       await this.writeClipboardData(JSON.stringify(copyClipboard));
+
+      this.actualInternalPaddingX = 0;
+      this.actualInternalPaddingY = 0;
+      this.lastInternalPasteSnapshot = '';
 
       this.instance.emitEvent<WeaveCopyPasteNodesPluginOnCopyEvent>('onCopy');
     } catch (ex) {

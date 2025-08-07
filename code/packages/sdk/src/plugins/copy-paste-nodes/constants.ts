@@ -15,3 +15,10 @@ export const COPY_PASTE_NODES_PLUGIN_STATE = {
   ['IDLE']: 'idle',
   ['PASTING']: 'pasting',
 } as const;
+export const WEAVE_COPY_PASTE_CONFIG_DEFAULT = {
+  paddingOnPaste: {
+    enabled: false,
+    paddingX: 0,
+    paddingY: 0,
+  },
+} as const;
