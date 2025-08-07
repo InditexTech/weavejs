@@ -44,6 +44,13 @@ type WeaveUser = {
 
 type WeaveUsersPointersPluginConfig = {
   getUser: () => WeaveUser;
+  getUserBackgroundColor: (
+    user: WeaveUser
+  ) => string | CanvasGradient | undefined;
+  getUserForegroundColor: (
+    user: WeaveUser
+  ) => string | CanvasGradient | undefined;
+  ui?: WeaveUserPointersUIProperties;
 };
 
 type WeaveUserPointersUIProperties = {
@@ -87,6 +94,16 @@ For `WeaveUsersPointersPluginConfig`:
     ["getUser"]: {
       description: "A function that returns the actual instance user metadata.",
       type: "() => WeaveUser",
+    },
+    ["getUserBackgroundColor"]: {
+      description:
+        "A function that returns the color (#RGB or #RGBA) to use to set the pointer background color.",
+      type: "(user: WeaveUser) => string | CanvasGradient | undefined",
+    },
+    ["getUserForegroundColor"]: {
+      description:
+        "A function that returns the color (#RGB or #RGBA) to use to set the pointer foreground color.",
+      type: "(user: WeaveUser) => string | CanvasGradient | undefined",
     },
     ["ui"]: {
       description: "An object that defined the cursor properties (UI)",

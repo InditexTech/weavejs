@@ -43,6 +43,7 @@ type WeaveUser = {
 
 type WeaveUsersSelectionPluginConfig = {
   getUser: () => WeaveUser;
+  getUserColor: (user: WeaveUser) => string | CanvasGradient | undefined;
 };
 
 type WeaveUsersSelectionPluginParams = {
@@ -70,6 +71,11 @@ For `WeaveUsersSelectionPluginConfig`:
     ["getUser"]: {
       description: "A function that returns the actual instance user metadata.",
       type: "() => WeaveUser",
+    },
+    ["getUserColor"]: {
+      description:
+        "A function that returns the color (#RGB or #RGBA) to use to set the selector for the user.",
+      type: "(user: WeaveUser) => string | CanvasGradient | undefined",
     },
   }}
 />
