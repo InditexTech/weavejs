@@ -38,7 +38,7 @@ import {
 
 export class WeaveCopyPasteNodesPlugin extends WeavePlugin {
   protected state: WeaveCopyPasteNodesPluginState;
-  private config: WeaveCopyPasteNodesPluginConfig;
+  private readonly config: WeaveCopyPasteNodesPluginConfig;
   private lastInternalPasteSnapshot: string;
   private actualInternalPaddingX: number;
   private actualInternalPaddingY: number;
