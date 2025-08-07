@@ -194,7 +194,7 @@ export class WeaveCopyPasteNodesPlugin extends WeavePlugin {
         if (!dataList) return;
 
         if (dataList?.length > 0) {
-          this.sendExternalPasteEvent(dataList, undefined);
+          this.sendExternalPasteEvent(dataList);
         }
       });
 
