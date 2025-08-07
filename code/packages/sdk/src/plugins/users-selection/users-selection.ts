@@ -19,7 +19,7 @@ import {
 import { WeavePlugin } from '@/plugins/plugin';
 import Konva from 'konva';
 import { type Vector2d } from 'konva/lib/types';
-import { stringToColor } from '@/utils';
+import { memoize } from '@/utils';
 
 export class WeaveUsersSelectionPlugin extends WeavePlugin {
   private padding = 1;
@@ -32,6 +32,9 @@ export class WeaveUsersSelectionPlugin extends WeavePlugin {
     const { config } = params;
 
     this.config = config;
+
+    this.config.getUser = memoize(this.config.getUser);
+    this.config.getUserColor = memoize(this.config.getUserColor);
     this.usersSelection = {};
   }
 
@@ -122,6 +125,7 @@ export class WeaveUsersSelectionPlugin extends WeavePlugin {
     const store = this.instance.getStore();
 
     store.setAwarenessInfo(WEAVE_USER_SELECTION_KEY, {
+      rawUser: userInfo,
       user: userInfo.id,
       nodes: tr.nodes().map((node) => node.getAttrs().id),
     });
@@ -203,6 +207,8 @@ export class WeaveUsersSelectionPlugin extends WeavePlugin {
       });
       userSelectorNode.moveToBottom();
 
+      const userColor = this.config.getUserColor(userSelector.rawUser);
+
       const userSelectorRect = new Konva.Rect({
         x: -this.padding / stage.scaleX(),
         y: -this.padding / stage.scaleY(),
@@ -211,7 +217,7 @@ export class WeaveUsersSelectionPlugin extends WeavePlugin {
         height: (selectionRect.height + 2 * this.padding) / stage.scaleY(),
         fill: 'transparent',
         listening: false,
-        stroke: stringToColor(userSelector.user),
+        stroke: userColor,
         strokeWidth: 3,
         strokeScaleEnabled: false,
       });

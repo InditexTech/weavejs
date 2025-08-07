@@ -179,35 +179,6 @@ export function moveNodeToContainer(
   return false;
 }
 
-export function getContrastTextColor(hex: string): 'white' | 'black' {
-  // Remove "#" if present
-  const cleaned = hex.replace(/^#/, '');
-
-  // Parse R, G, B from hex
-  const r = parseInt(cleaned.slice(0, 2), 16);
-  const g = parseInt(cleaned.slice(2, 4), 16);
-  const b = parseInt(cleaned.slice(4, 6), 16);
-
-  // Calculate luminance (per W3C)
-  const luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
-
-  // Return black for light colors, white for dark
-  return luminance > 0.5 ? 'black' : 'white';
-}
-
-export function stringToColor(str: string) {
-  let hash = 0;
-  str.split('').forEach((char) => {
-    hash = char.charCodeAt(0) + ((hash << 5) - hash);
-  });
-  let color = '#';
-  for (let i = 0; i < 3; i++) {
-    const value = (hash >> (i * 8)) & 0xff;
-    color += value.toString(16).padStart(2, '0');
-  }
-  return color;
-}
-
 export function getExportBoundingBox(
   stage: Konva.Stage,
   nodes: Konva.Node[]
@@ -576,4 +547,19 @@ export function getVisibleNodes(
   }
 
   return finalVisibleNodes;
+}
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export function memoize<T extends (...args: any[]) => any>(fn: T): T {
+  const cache = new Map<string, ReturnType<T>>();
+
+  return function (...args: Parameters<T>): ReturnType<T> {
+    const key = JSON.stringify(args);
+    if (cache.has(key)) {
+      return cache.get(key)!;
+    }
+    const result = fn(...args);
+    cache.set(key, result);
+    return result;
+  } as T;
 }

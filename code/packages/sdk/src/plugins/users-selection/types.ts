@@ -7,6 +7,7 @@ import { WEAVE_USER_SELECTION_KEY } from './constants';
 
 export type WeaveUsersSelectionPluginConfig = {
   getUser: () => WeaveUser;
+  getUserColor: (user: WeaveUser) => string | CanvasGradient | undefined;
 };
 
 export type WeaveUsersSelectionPluginParams = {
@@ -14,6 +15,7 @@ export type WeaveUsersSelectionPluginParams = {
 };
 
 export type WeaveUserSelectionInfo = {
+  rawUser: WeaveUser;
   user: string;
   nodes: string[];
 };
