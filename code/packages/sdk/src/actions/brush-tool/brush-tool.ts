@@ -17,6 +17,7 @@ import { WeaveNodesSelectionPlugin } from '@/plugins/nodes-selection/nodes-selec
 import type { WeaveStrokeNode } from '@/nodes/stroke/stroke';
 import type { WeaveStrokePoint } from '@/nodes/stroke/types';
 import { SELECTION_TOOL_ACTION_NAME } from '../selection-tool/constants';
+import type { WeaveStageZoomPlugin } from '@/plugins/stage-zoom/stage-zoom';
 
 export class WeaveBrushToolAction extends WeaveAction {
   protected initialized: boolean = false;
@@ -91,6 +92,10 @@ export class WeaveBrushToolAction extends WeaveAction {
         return;
       }
 
+      if (this.getZoomPlugin()?.isPinching()) {
+        return;
+      }
+
       const pointPressure = this.getPointPressure(e);
       this.handleStartStroke(pointPressure);
 
@@ -101,6 +106,10 @@ export class WeaveBrushToolAction extends WeaveAction {
 
     const handlePointerMove = (e: Konva.KonvaEventObject<PointerEvent>) => {
       if (this.state !== BRUSH_TOOL_STATE.DEFINE_STROKE) {
+        return;
+      }
+
+      if (this.getZoomPlugin()?.isPinching()) {
         return;
       }
 
@@ -116,6 +125,10 @@ export class WeaveBrushToolAction extends WeaveAction {
 
     const handlePointerUp = (e: Konva.KonvaEventObject<PointerEvent>) => {
       if (this.state !== BRUSH_TOOL_STATE.DEFINE_STROKE) {
+        return;
+      }
+
+      if (this.getZoomPlugin()?.isPinching()) {
         return;
       }
 
@@ -350,5 +363,11 @@ export class WeaveBrushToolAction extends WeaveAction {
 
     this.clickPoint = null;
     this.setState(BRUSH_TOOL_STATE.INACTIVE);
+  }
+
+  getZoomPlugin() {
+    const zoomPlugin =
+      this.instance.getPlugin<WeaveStageZoomPlugin>('stageZoom');
+    return zoomPlugin;
   }
 }
