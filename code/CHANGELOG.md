@@ -17,6 +17,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - [#578](https://github.com/InditexTech/weavejs/issues/578) Allow to define user color in WeaveConnectedUsersPlugin & WeaveUsersSelectionPlugin
 
+### Fixed
+
+- [#580](https://github.com/InditexTech/weavejs/issues/580) Brush tool draws unintended strokes during pinch zoom
+
 ## [0.54.1] - 2025-08-07
 
 ### Fixed
