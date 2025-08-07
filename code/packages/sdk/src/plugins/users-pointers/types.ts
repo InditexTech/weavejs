@@ -22,6 +22,12 @@ export type WeaveUserPointersUIProperties = {
 
 export type WeaveUsersPointersPluginConfig = {
   getUser: () => WeaveUser;
+  getUserBackgroundColor: (
+    user: WeaveUser
+  ) => string | CanvasGradient | undefined;
+  getUserForegroundColor: (
+    user: WeaveUser
+  ) => string | CanvasGradient | undefined;
   ui?: WeaveUserPointersUIProperties;
 };
 
@@ -30,6 +36,7 @@ export type WeaveUsersPointersPluginParams = {
 };
 
 export type WeaveUserPointer = {
+  rawUser: WeaveUser;
   user: string;
   name: string;
   x: number;

@@ -20,7 +20,7 @@ import {
 } from './constants';
 import { WeavePlugin } from '@/plugins/plugin';
 import Konva from 'konva';
-import { getContrastTextColor, stringToColor } from '@/utils';
+import { memoize } from '@/utils';
 
 export class WeaveUsersPointersPlugin extends WeavePlugin {
   private usersPointers: Record<string, WeaveUserPointer>;
@@ -33,6 +33,15 @@ export class WeaveUsersPointersPlugin extends WeavePlugin {
     const { config } = params;
 
     this.config = config;
+
+    this.config.getUser = memoize(this.config.getUser);
+    this.config.getUserBackgroundColor = memoize(
+      this.config.getUserBackgroundColor
+    );
+    this.config.getUserForegroundColor = memoize(
+      this.config.getUserForegroundColor
+    );
+
     this.uiConfig = {
       ...WEAVE_USER_POINTERS_DEFAULT_PROPS,
       ...this.config.ui,
@@ -121,6 +130,7 @@ export class WeaveUsersPointersPlugin extends WeavePlugin {
 
       if (mousePos) {
         store.setAwarenessInfo(WEAVE_USER_POINTER_KEY, {
+          rawUser: userInfo,
           user: userInfo.id,
           name: userInfo.name,
           x: mousePos.x,
@@ -135,6 +145,7 @@ export class WeaveUsersPointersPlugin extends WeavePlugin {
 
       if (mousePos) {
         store.setAwarenessInfo(WEAVE_USER_POINTER_KEY, {
+          rawUser: userInfo,
           user: userInfo.id,
           name: userInfo.name,
           x: mousePos.x,
@@ -187,15 +198,19 @@ export class WeaveUsersPointersPlugin extends WeavePlugin {
         },
       } = this.uiConfig;
 
-      const userColor = stringToColor(userPointer.user);
-      const userContrastColor = getContrastTextColor(userColor);
+      const userBackgroundColor = this.config.getUserBackgroundColor(
+        userPointer.rawUser
+      );
+      const userForegroundColor = this.config.getUserForegroundColor(
+        userPointer.rawUser
+      );
 
       const userPointNode = new Konva.Circle({
         id: `pointer_${userPointer.user}_userPoint`,
         x: 0,
         y: 0,
         radius: circleRadius,
-        fill: userColor,
+        fill: userBackgroundColor,
         stroke: 'black',
         strokeWidth: circleStrokeWidth,
         strokeScaleEnabled: false,
@@ -210,7 +225,7 @@ export class WeaveUsersPointersPlugin extends WeavePlugin {
         fontSize: fontSize,
         fontFamily: fontFamily,
         lineHeight: 0.9,
-        fill: userContrastColor,
+        fill: userForegroundColor,
         align: 'center',
         verticalAlign: 'middle',
         listening: false,
@@ -230,7 +245,7 @@ export class WeaveUsersPointersPlugin extends WeavePlugin {
         width: textWidth + backgroundPaddingX * 2,
         height: textHeight + backgroundPaddingY * 2,
         cornerRadius: backgroundCornerRadius,
-        fill: userColor,
+        fill: userBackgroundColor,
         listening: false,
       });
 
