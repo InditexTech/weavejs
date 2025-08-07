@@ -185,7 +185,7 @@ export class WeaveCopyPasteNodesPlugin extends WeavePlugin {
     });
 
     if (catcher) {
-      document.addEventListener('paste', (e) => {
+      document.addEventListener('paste', async (e) => {
         e.preventDefault();
 
         const dataList: DataTransferItemList | undefined =
@@ -194,31 +194,7 @@ export class WeaveCopyPasteNodesPlugin extends WeavePlugin {
         if (!dataList) return;
 
         if (dataList?.length > 0) {
-          // is external data, handle it on app...
-          const container = stage.container();
-          const scale = stage.scale();
-          const position = stage.position();
-
-          const width = container.clientWidth;
-          const height = container.clientHeight;
-
-          const centerX = (width / 2 - position.x) / scale.x;
-          const centerY = (height / 2 - position.y) / scale.y;
-
-          const pastePosition: Vector2d = {
-            x: centerX,
-            y: centerY,
-          };
-
-          this.instance.emitEvent<WeaveCopyPasteNodesPluginOnPasteExternalEvent>(
-            'onPasteExternal',
-            {
-              positionCalculated: true,
-              position: pastePosition,
-              dataList,
-              items: undefined,
-            }
-          );
+          this.sendExternalPasteEvent(dataList);
         }
       });
 
@@ -249,9 +225,45 @@ export class WeaveCopyPasteNodesPlugin extends WeavePlugin {
 
         if (hasWeaveData) {
           this.handlePaste();
+          return;
         }
+
+        this.sendExternalPasteEvent(undefined, items);
       });
     }
+  }
+
+  private sendExternalPasteEvent(
+    dataList?: DataTransferItemList,
+    items?: ClipboardItems
+  ) {
+    const stage = this.instance.getStage();
+
+    // is external data, handle it on app...
+    const container = stage.container();
+    const scale = stage.scale();
+    const position = stage.position();
+
+    const width = container.clientWidth;
+    const height = container.clientHeight;
+
+    const centerX = (width / 2 - position.x) / scale.x;
+    const centerY = (height / 2 - position.y) / scale.y;
+
+    const pastePosition: Vector2d = {
+      x: centerX,
+      y: centerY,
+    };
+
+    this.instance.emitEvent<WeaveCopyPasteNodesPluginOnPasteExternalEvent>(
+      'onPasteExternal',
+      {
+        positionCalculated: true,
+        position: pastePosition,
+        dataList,
+        items,
+      }
+    );
   }
 
   private isWeaveData(text: string): boolean {
