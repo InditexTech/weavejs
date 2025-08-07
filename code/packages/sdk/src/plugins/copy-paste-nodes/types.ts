@@ -54,3 +54,17 @@ export type WeaveToPasteNode = {
   konvaNode: Konva.Node;
   node: NodeSerializable;
 };
+
+export type PaddingOnPaste = {
+  enabled: boolean;
+  paddingX: number;
+  paddingY: number;
+};
+
+export type WeaveCopyPasteNodesPluginConfig = {
+  paddingOnPaste: PaddingOnPaste;
+};
+
+export type WeaveCopyPasteNodesPluginParams = {
+  config?: Partial<WeaveCopyPasteNodesPluginConfig>;
+};
