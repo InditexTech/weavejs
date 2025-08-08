@@ -3,6 +3,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { Weave } from '@/weave';
+import merge from 'lodash/merge';
 import {
   type WeaveElementAttributes,
   type WeaveElementInstance,
@@ -112,7 +113,7 @@ export abstract class WeaveNode implements WeaveNodeBase {
 
   setupDefaultNodeAugmentation(node: Konva.Node): void {
     node.getTransformerProperties = () => {
-      return this.defaultGetTransformerProperties({});
+      return this.defaultGetTransformerProperties();
     };
     node.allowedAnchors = () => {
       return [
@@ -635,7 +636,7 @@ export abstract class WeaveNode implements WeaveNodeBase {
 
   protected defaultGetTransformerProperties(
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    nodeTransformConfig: any
+    nodeTransformConfig?: any
   ) {
     const selectionPlugin =
       this.instance.getPlugin<WeaveNodesSelectionPlugin>('nodesSelection');
@@ -647,7 +648,7 @@ export abstract class WeaveNode implements WeaveNodeBase {
       };
     }
 
-    return { ...transformProperties, ...nodeTransformConfig };
+    return merge(transformProperties, nodeTransformConfig ?? {});
   }
 
   getNodesEdgeSnappingPlugin() {
