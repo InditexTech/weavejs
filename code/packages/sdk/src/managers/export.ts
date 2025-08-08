@@ -13,6 +13,14 @@ import {
 } from '@inditextech/weave-types';
 import Konva from 'konva';
 import { getExportBoundingBox } from '@/utils';
+import type { WeaveNodesSelectionPlugin } from '@/plugins/nodes-selection/nodes-selection';
+import { WEAVE_NODES_SELECTION_KEY } from '@/plugins/nodes-selection/constants';
+import type { WeaveStageGridPlugin } from '@/plugins/stage-grid/stage-grid';
+import { WEAVE_STAGE_GRID_KEY } from '@/plugins/stage-grid/constants';
+import type { WeaveNodesEdgeSnappingPlugin } from '@/plugins/nodes-edge-snapping/nodes-edge-snapping';
+import { WEAVE_NODES_EDGE_SNAPPING_PLUGIN_KEY } from '@/plugins/nodes-edge-snapping/constants';
+import type { WeaveNodesDistanceSnappingPlugin } from '@/plugins/nodes-distance-snapping/nodes-distance-snapping';
+import { WEAVE_NODES_DISTANCE_SNAPPING_PLUGIN_KEY } from '@/plugins/nodes-distance-snapping/constants';
 
 export class WeaveExportManager {
   private instance: Weave;
@@ -36,6 +44,11 @@ export class WeaveExportManager {
         pixelRatio = 1,
         backgroundColor = WEAVE_EXPORT_BACKGROUND_COLOR,
       } = options;
+
+      this.getNodesSelectionPlugin()?.disable();
+      this.getNodesDistanceSnappingPlugin()?.disable();
+      this.getNodesEdgeSnappingPlugin()?.disable();
+      this.getStageGridPlugin()?.disable();
 
       const stage = this.instance.getStage();
       const mainLayer = this.instance.getMainLayer();
@@ -85,6 +98,8 @@ export class WeaveExportManager {
 
         const backgroundRect = background.getClientRect();
 
+        stage.batchDraw();
+
         exportGroup.toImage({
           x: Math.round(backgroundRect.x),
           y: Math.round(backgroundRect.y),
@@ -99,6 +114,11 @@ export class WeaveExportManager {
             stage.position(originalPosition);
             stage.scale(originalScale);
             stage.batchDraw();
+
+            this.getNodesSelectionPlugin()?.enable();
+            this.getNodesDistanceSnappingPlugin()?.enable();
+            this.getNodesEdgeSnappingPlugin()?.enable();
+            this.getStageGridPlugin()?.enable();
 
             resolve(img);
           },
@@ -122,5 +142,34 @@ export class WeaveExportManager {
     canvas.remove();
 
     return URL;
+  }
+
+  getNodesSelectionPlugin() {
+    const selectionPlugin = this.instance.getPlugin<WeaveNodesSelectionPlugin>(
+      WEAVE_NODES_SELECTION_KEY
+    );
+    return selectionPlugin;
+  }
+
+  getStageGridPlugin() {
+    const gridPlugin =
+      this.instance.getPlugin<WeaveStageGridPlugin>(WEAVE_STAGE_GRID_KEY);
+    return gridPlugin;
+  }
+
+  getNodesEdgeSnappingPlugin() {
+    const snappingPlugin =
+      this.instance.getPlugin<WeaveNodesEdgeSnappingPlugin>(
+        WEAVE_NODES_EDGE_SNAPPING_PLUGIN_KEY
+      );
+    return snappingPlugin;
+  }
+
+  getNodesDistanceSnappingPlugin() {
+    const snappingPlugin =
+      this.instance.getPlugin<WeaveNodesDistanceSnappingPlugin>(
+        WEAVE_NODES_DISTANCE_SNAPPING_PLUGIN_KEY
+      );
+    return snappingPlugin;
   }
 }
