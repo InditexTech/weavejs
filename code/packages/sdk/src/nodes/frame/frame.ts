@@ -158,11 +158,15 @@ export class WeaveFrameNode extends WeaveNode {
 
     frameInternalGroup.add(text);
 
-    frame.getTransformerProperties = () => {
-      return this.defaultGetTransformerProperties(this.config.transform);
+    const defaultTransformerProperties = this.defaultGetTransformerProperties(
+      this.config.transform
+    );
+
+    frame.getTransformerProperties = function () {
+      return defaultTransformerProperties;
     };
 
-    frame.allowedAnchors = () => {
+    frame.allowedAnchors = function () {
       return [];
     };
 

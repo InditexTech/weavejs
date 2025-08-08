@@ -40,18 +40,16 @@ export class WeaveEllipseNode extends WeaveNode {
 
     this.setupDefaultNodeAugmentation(ellipse);
 
-    ellipse.getTransformerProperties = () => {
-      const stage = this.instance.getStage();
+    const defaultTransformerProperties = this.defaultGetTransformerProperties(
+      this.config.transform
+    );
 
-      const node = stage.findOne(`#${props.id}`) as Konva.Ellipse | undefined;
+    ellipse.getTransformerProperties = function () {
+      const actualAttrs = this.getAttrs();
 
-      const baseConfig = this.defaultGetTransformerProperties(
-        this.config.transform
-      );
-
-      if (node && node.getAttrs().keepAspectRatio) {
+      if (actualAttrs.keepAspectRatio) {
         return {
-          ...baseConfig,
+          ...defaultTransformerProperties,
           enabledAnchors: [
             'top-left',
             'top-right',
@@ -62,14 +60,13 @@ export class WeaveEllipseNode extends WeaveNode {
         };
       }
 
-      return baseConfig;
+      return defaultTransformerProperties;
     };
 
-    ellipse.allowedAnchors = () => {
-      const stage = this.instance.getStage();
-      const actualEllipse = stage.findOne(`#${ellipse.id()}`) as Konva.Ellipse;
+    ellipse.allowedAnchors = function () {
+      const actualAttrs = this.getAttrs();
 
-      if (actualEllipse?.getAttrs()?.keepAspectRatio) {
+      if (actualAttrs.keepAspectRatio) {
         return ['top-left', 'top-right', 'bottom-left', 'bottom-right'];
       }
 

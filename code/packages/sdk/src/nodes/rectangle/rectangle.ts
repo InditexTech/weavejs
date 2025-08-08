@@ -40,8 +40,12 @@ export class WeaveRectangleNode extends WeaveNode {
 
     this.setupDefaultNodeAugmentation(rectangle);
 
-    rectangle.getTransformerProperties = () => {
-      return this.defaultGetTransformerProperties(this.config.transform);
+    const defaultTransformerProperties = this.defaultGetTransformerProperties(
+      this.config.transform
+    );
+
+    rectangle.getTransformerProperties = function () {
+      return defaultTransformerProperties;
     };
 
     this.setupDefaultNodeEvents(rectangle);

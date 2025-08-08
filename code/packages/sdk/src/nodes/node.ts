@@ -112,10 +112,12 @@ export abstract class WeaveNode implements WeaveNodeBase {
   }
 
   setupDefaultNodeAugmentation(node: Konva.Node): void {
-    node.getTransformerProperties = () => {
-      return this.defaultGetTransformerProperties();
+    const defaultTransformerProperties = this.defaultGetTransformerProperties();
+
+    node.getTransformerProperties = function () {
+      return defaultTransformerProperties;
     };
-    node.allowedAnchors = () => {
+    node.allowedAnchors = function () {
       return [
         'top-left',
         'top-center',
@@ -127,9 +129,9 @@ export abstract class WeaveNode implements WeaveNodeBase {
         'bottom-right',
       ];
     };
-    node.movedToContainer = () => {};
-    node.updatePosition = () => {};
-    node.resetCrop = () => {};
+    node.movedToContainer = function () {};
+    node.updatePosition = function () {};
+    node.resetCrop = function () {};
   }
 
   isNodeSelected(ele: Konva.Node): boolean {

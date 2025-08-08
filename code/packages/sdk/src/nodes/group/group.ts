@@ -63,22 +63,19 @@ export class WeaveGroupNode extends WeaveNode {
 
     this.setupDefaultNodeAugmentation(group);
 
-    group.getTransformerProperties = () => {
-      const baseConfig = this.defaultGetTransformerProperties(
-        this.config.transform
-      );
+    const defaultTransformerProperties = this.defaultGetTransformerProperties(
+      this.config.transform
+    );
 
+    group.getTransformerProperties = function () {
       return {
-        ...baseConfig,
+        ...defaultTransformerProperties,
         enabledAnchors: group.allowedAnchors(),
       };
     };
 
-    group.allowedAnchors = () => {
-      const stage = this.instance.getStage();
-      const actualGroup = stage.findOne(`#${group.id()}`) as Konva.Group;
-
-      const children = actualGroup.getChildren();
+    group.allowedAnchors = function () {
+      const children = this.getChildren();
 
       const anchorsArrays = [];
       for (const child of children) {
