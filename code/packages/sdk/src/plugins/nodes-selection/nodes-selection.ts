@@ -1235,7 +1235,11 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
 
     const currentAttrs = this.tr.getAttrs();
     Object.keys(currentAttrs).forEach((key) => {
-      this.tr.setAttr(key, undefined);
+      if (['rotationSnaps', 'enabledAnchors'].includes(key)) {
+        this.tr.setAttr(key, []);
+      } else {
+        this.tr.setAttr(key, undefined);
+      }
     });
 
     if (nodesSelected === 1) {

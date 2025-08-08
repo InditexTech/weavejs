@@ -16,6 +16,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 - [#583](https://github.com/InditexTech/weavejs/issues/583) Frames can be rotated (they shouldn't)
+- [#585](https://github.com/InditexTech/weavejs/issues/585) Canvas becomes unusable after drag original star shape into frame
 
 ## [0.55.0] - 2025-08-07
 

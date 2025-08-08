@@ -57,49 +57,39 @@ export class WeaveTextNode extends WeaveNode {
 
     this.setupDefaultNodeAugmentation(text);
 
-    text.getTransformerProperties = () => {
-      const stage = this.instance.getStage();
-      const actualText = stage.findOne(`#${text.id()}`) as Konva.Text;
+    const defaultTransformerProperties = this.defaultGetTransformerProperties(
+      this.config.transform
+    );
 
-      const baseConfig = this.defaultGetTransformerProperties(
-        this.config.transform
-      );
+    text.getTransformerProperties = function () {
+      const actualAttrs = this.getAttrs();
 
-      if (actualText) {
-        const attrs = actualText.getAttrs();
-
-        if (attrs.layout === TEXT_LAYOUT.AUTO_ALL) {
-          return {
-            ...baseConfig,
-            resizeEnabled: false,
-            enabledAnchors: [] as string[],
-          };
-        }
-        if (attrs.layout === TEXT_LAYOUT.AUTO_HEIGHT) {
-          return {
-            ...baseConfig,
-            resizeEnabled: true,
-            enabledAnchors: ['middle-right', 'middle-left'] as string[],
-          };
-        }
+      if (actualAttrs.layout === TEXT_LAYOUT.AUTO_ALL) {
+        return {
+          ...defaultTransformerProperties,
+          resizeEnabled: false,
+          enabledAnchors: [] as string[],
+        };
+      }
+      if (actualAttrs.layout === TEXT_LAYOUT.AUTO_HEIGHT) {
+        return {
+          ...defaultTransformerProperties,
+          resizeEnabled: true,
+          enabledAnchors: ['middle-right', 'middle-left'] as string[],
+        };
       }
 
-      return baseConfig;
+      return defaultTransformerProperties;
     };
 
-    text.allowedAnchors = () => {
-      const stage = this.instance.getStage();
-      const actualText = stage.findOne(`#${text.id()}`) as Konva.Text;
+    text.allowedAnchors = function () {
+      const actualAttrs = this.getAttrs();
 
-      if (actualText) {
-        const attrs = actualText.getAttrs();
-
-        if (attrs.layout === TEXT_LAYOUT.AUTO_ALL) {
-          return [];
-        }
-        if (attrs.layout === TEXT_LAYOUT.AUTO_HEIGHT) {
-          return ['middle-right', 'middle-left'];
-        }
+      if (actualAttrs.layout === TEXT_LAYOUT.AUTO_ALL) {
+        return [];
+      }
+      if (actualAttrs.layout === TEXT_LAYOUT.AUTO_HEIGHT) {
+        return ['middle-right', 'middle-left'];
       }
 
       return [

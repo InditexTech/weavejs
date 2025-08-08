@@ -219,11 +219,15 @@ export class WeaveImageNode extends WeaveNode {
       this.cachedCropInfo[image.getAttrs().id ?? ''] = undefined;
     };
 
-    image.getTransformerProperties = () => {
-      return this.defaultGetTransformerProperties(this.config.transform);
+    const defaultTransformerProperties = this.defaultGetTransformerProperties(
+      this.config.transform
+    );
+
+    image.getTransformerProperties = function () {
+      return defaultTransformerProperties;
     };
 
-    image.allowedAnchors = () => {
+    image.allowedAnchors = function () {
       return ['top-left', 'top-right', 'bottom-left', 'bottom-right'];
     };
 

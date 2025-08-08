@@ -41,13 +41,13 @@ export class WeaveRegularPolygonNode extends WeaveNode {
 
     this.setupDefaultNodeAugmentation(regularPolygon);
 
-    regularPolygon.getTransformerProperties = () => {
-      const baseConfig = this.defaultGetTransformerProperties(
-        this.config.transform
-      );
+    const defaultTransformerProperties = this.defaultGetTransformerProperties(
+      this.config.transform
+    );
 
+    regularPolygon.getTransformerProperties = function () {
       return {
-        ...baseConfig,
+        ...defaultTransformerProperties,
         enabledAnchors: [
           'top-left',
           'top-right',
@@ -58,7 +58,7 @@ export class WeaveRegularPolygonNode extends WeaveNode {
       };
     };
 
-    regularPolygon.allowedAnchors = () => {
+    regularPolygon.allowedAnchors = function () {
       return ['top-left', 'top-right', 'bottom-left', 'bottom-right'];
     };
 

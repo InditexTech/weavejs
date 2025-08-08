@@ -41,18 +41,16 @@ export class WeaveStarNode extends WeaveNode {
 
     this.setupDefaultNodeAugmentation(star);
 
-    star.getTransformerProperties = () => {
-      const stage = this.instance.getStage();
+    const defaultTransformerProperties = this.defaultGetTransformerProperties(
+      this.config.transform
+    );
 
-      const baseConfig = this.defaultGetTransformerProperties(
-        this.config.transform
-      );
+    star.getTransformerProperties = function () {
+      const actualAttrs = this.getAttrs();
 
-      const node = stage.findOne(`#${props.id}`) as Konva.Star | undefined;
-
-      if (node && node.getAttrs().keepAspectRatio) {
+      if (actualAttrs.keepAspectRatio) {
         return {
-          ...baseConfig,
+          ...defaultTransformerProperties,
           enabledAnchors: [
             'top-left',
             'top-right',
@@ -63,14 +61,13 @@ export class WeaveStarNode extends WeaveNode {
         };
       }
 
-      return baseConfig;
+      return defaultTransformerProperties;
     };
 
-    star.allowedAnchors = () => {
-      const stage = this.instance.getStage();
-      const actualStar = stage.findOne(`#${star.id()}`) as Konva.Star;
+    star.allowedAnchors = function () {
+      const actualAttrs = this.getAttrs();
 
-      if (actualStar.getAttrs().keepAspectRatio) {
+      if (actualAttrs.keepAspectRatio) {
         return ['top-left', 'top-right', 'bottom-left', 'bottom-right'];
       }
 

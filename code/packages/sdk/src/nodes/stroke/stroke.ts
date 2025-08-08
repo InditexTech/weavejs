@@ -110,8 +110,12 @@ export class WeaveStrokeNode extends WeaveNode {
 
     this.setupDefaultNodeAugmentation(stroke);
 
-    stroke.getTransformerProperties = () => {
-      return this.defaultGetTransformerProperties(this.config.transform);
+    const defaultTransformerProperties = this.defaultGetTransformerProperties(
+      this.config.transform
+    );
+
+    stroke.getTransformerProperties = function () {
+      return defaultTransformerProperties;
     };
 
     this.setupDefaultNodeEvents(stroke);
