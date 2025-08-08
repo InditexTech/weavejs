@@ -3,6 +3,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import Konva from 'konva';
+import merge from 'lodash/merge';
 import { WeaveNode } from '../node';
 import {
   type WeaveElementAttributes,
@@ -31,10 +32,7 @@ export class WeaveFrameNode extends WeaveNode {
 
     const { config } = params ?? {};
 
-    this.config = {
-      ...WEAVE_FRAME_NODE_DEFAULT_CONFIG,
-      ...config,
-    };
+    this.config = merge(WEAVE_FRAME_NODE_DEFAULT_CONFIG, config);
   }
 
   create(key: string, props: Partial<WeaveFrameAttributes>): WeaveStateElement {

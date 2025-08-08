@@ -35,7 +35,8 @@ import {
 import { WEAVE_USERS_SELECTION_KEY } from '../users-selection/constants';
 import type { WeaveUsersSelectionPlugin } from '../users-selection/users-selection';
 import type { KonvaEventObject } from 'konva/lib/Node';
-import { throttle } from 'lodash';
+import merge from 'lodash/merge';
+import throttle from 'lodash/throttle';
 import type { Stage } from 'konva/lib/Stage';
 import type { Vector2d } from 'konva/lib/types';
 import { WEAVE_STAGE_DEFAULT_MODE } from '@/nodes/stage/constants';
@@ -57,7 +58,6 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
   private selecting: boolean;
   private didMove: boolean;
   private initialized: boolean;
-  private readonly selectionOriginalConfig!: TransformerConfig;
   private isSpaceKeyPressed: boolean;
   protected taps: number;
   protected isDoubleTap: boolean;
@@ -76,6 +76,8 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
         rotationSnaps: [0, 45, 90, 135, 180, 225, 270, 315, 360],
         rotationSnapTolerance: 3,
         ignoreStroke: true,
+        rotateEnabled: true,
+        resizeEnabled: true,
         flipEnabled: false,
         keepRatio: true,
         useSingleNodeRotation: true,
@@ -148,7 +150,6 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
     this.initialized = false;
     this.enabled = false;
     this.pointers = {};
-    this.selectionOriginalConfig = { ...this.config.selection };
   }
 
   getName(): string {
@@ -220,7 +221,7 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
 
     const tr = new Konva.Transformer({
       id: 'selectionTransformer',
-      ...this.selectionOriginalConfig,
+      ...this.config.selection,
       listening: true,
     });
     selectionLayer?.add(tr);
@@ -1230,25 +1231,31 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
       this.tr.enabledAnchors(this.defaultEnabledAnchors);
     }
 
-    const anchorsArrays = [];
-    for (const node of nodes) {
-      anchorsArrays.push(node.allowedAnchors());
-    }
+    let transformerAttrs: TransformerConfig = { ...this.config.selection };
 
-    let transformerAttrs: TransformerConfig = {};
+    const currentAttrs = this.tr.getAttrs();
+    Object.keys(currentAttrs).forEach((key) => {
+      this.tr.setAttr(key, undefined);
+    });
+
     if (nodesSelected === 1) {
-      transformerAttrs = {
-        ...this.selectionOriginalConfig,
-        enabledAnchors: nodes[0].allowedAnchors(),
-      };
-    } else if (nodesSelected > 1) {
-      transformerAttrs = {
-        ...this.selectionOriginalConfig,
-        enabledAnchors: intersectArrays(anchorsArrays),
-      };
+      transformerAttrs = merge(
+        transformerAttrs,
+        nodes[0].getTransformerProperties()
+      );
+      transformerAttrs.enabledAnchors = nodes[0].allowedAnchors();
+    }
+    if (nodesSelected > 1) {
+      const anchorsArrays = [];
+      for (const node of nodes) {
+        anchorsArrays.push(node.allowedAnchors());
+      }
+
+      transformerAttrs.enabledAnchors = intersectArrays(anchorsArrays);
     }
 
     this.tr.setAttrs(transformerAttrs);
+    this.tr.forceUpdate();
   }
 
   setSelectedNodes(nodes: Konva.Node[]): void {
@@ -1322,6 +1329,6 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
   }
 
   getSelectorConfig(): TransformerConfig {
-    return this.selectionOriginalConfig;
+    return this.config.selection;
   }
 }
