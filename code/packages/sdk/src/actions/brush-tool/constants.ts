@@ -9,3 +9,7 @@ export const BRUSH_TOOL_STATE = {
   ['IDLE']: 'idle',
   ['DEFINE_STROKE']: 'defineStroke',
 } as const;
+
+export const BRUSH_TOOL_DEFAULT_CONFIG = {
+  interpolationSteps: 10,
+};

@@ -3,6 +3,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { v4 as uuidv4 } from 'uuid';
+import merge from 'lodash/merge';
 import { type WeaveElementInstance } from '@inditextech/weave-types';
 import Konva from 'konva';
 import { type Vector2d } from 'konva/lib/types';
@@ -10,9 +11,15 @@ import { WeaveAction } from '@/actions/action';
 import {
   type WeaveBrushToolActionOnAddedEvent,
   type WeaveBrushToolActionOnAddingEvent,
+  type WeaveBrushToolActionParams,
+  type WeaveBrushToolActionProperties,
   type WeaveBrushToolActionState,
 } from './types';
-import { BRUSH_TOOL_ACTION_NAME, BRUSH_TOOL_STATE } from './constants';
+import {
+  BRUSH_TOOL_ACTION_NAME,
+  BRUSH_TOOL_DEFAULT_CONFIG,
+  BRUSH_TOOL_STATE,
+} from './constants';
 import { WeaveNodesSelectionPlugin } from '@/plugins/nodes-selection/nodes-selection';
 import type { WeaveStrokeNode } from '@/nodes/stroke/stroke';
 import type { WeaveStrokePoint } from '@/nodes/stroke/types';
@@ -21,6 +28,7 @@ import type { WeaveStageZoomPlugin } from '@/plugins/stage-zoom/stage-zoom';
 import { isIOS } from '@/utils';
 
 export class WeaveBrushToolAction extends WeaveAction {
+  protected config: WeaveBrushToolActionProperties;
   protected initialized: boolean = false;
   protected state: WeaveBrushToolActionState;
   protected clickPoint: Vector2d | null;
@@ -28,12 +36,14 @@ export class WeaveBrushToolAction extends WeaveAction {
   protected container: Konva.Layer | Konva.Node | undefined;
   protected measureContainer: Konva.Layer | Konva.Group | undefined;
   protected cancelAction!: () => void;
+  protected rawPoints: WeaveStrokePoint[] = [];
   onPropsChange = undefined;
   onInit = undefined;
 
-  constructor() {
+  constructor(params?: WeaveBrushToolActionParams) {
     super();
 
+    this.config = merge(BRUSH_TOOL_DEFAULT_CONFIG, params?.config ?? {});
     this.initialized = false;
     this.state = BRUSH_TOOL_STATE.INACTIVE;
     this.strokeId = null;
@@ -233,6 +243,44 @@ export class WeaveBrushToolAction extends WeaveAction {
     this.setState(BRUSH_TOOL_STATE.DEFINE_STROKE);
   }
 
+  private catmullRom1D(
+    p0: number,
+    p1: number,
+    p2: number,
+    p3: number,
+    t: number
+  ) {
+    const t2 = t * t;
+    const t3 = t2 * t;
+    return (
+      0.5 *
+      (2 * p1 +
+        (-p0 + p2) * t +
+        (2 * p0 - 5 * p1 + 4 * p2 - p3) * t2 +
+        (-p0 + 3 * p1 - 3 * p2 + p3) * t3)
+    );
+  }
+
+  private smoothInterpolation(last4Points: WeaveStrokePoint[], steps: number) {
+    const [p0, p1, p2, p3] = last4Points;
+    const pts = [];
+    for (let i = 0; i <= steps; i++) {
+      const t = i / steps;
+      pts.push({
+        x: this.catmullRom1D(p0.x, p1.x, p2.x, p3.x, t),
+        y: this.catmullRom1D(p0.y, p1.y, p2.y, p3.y, t),
+        pressure: this.catmullRom1D(
+          p0.pressure,
+          p1.pressure,
+          p2.pressure,
+          p3.pressure,
+          t
+        ),
+      });
+    }
+    return pts;
+  }
+
   private handleMovement(pressure: number) {
     if (this.state !== BRUSH_TOOL_STATE.DEFINE_STROKE) {
       return;
@@ -247,13 +295,34 @@ export class WeaveBrushToolAction extends WeaveAction {
         this.measureContainer
       );
 
-      const newStrokeElements = [...tempStroke.getAttrs().strokeElements];
-
-      newStrokeElements.push({
+      const currentPoint: WeaveStrokePoint = {
         x: mousePoint.x - tempStroke.x(),
         y: mousePoint.y - tempStroke.y(),
         pressure,
-      });
+      };
+
+      this.rawPoints.push(currentPoint);
+
+      let newStrokeElements = [...tempStroke.getAttrs().strokeElements];
+
+      const smoothPoints = [];
+      if (isIOS()) {
+        if (this.rawPoints.length >= 4) {
+          const last4 = this.rawPoints.slice(-4);
+          const interpolatedPts = this.smoothInterpolation(
+            last4,
+            this.config.interpolationSteps
+          );
+          smoothPoints.push(...interpolatedPts);
+        } else {
+          // Not enough points yet — just push the raw point
+          smoothPoints.push(currentPoint);
+        }
+      } else {
+        smoothPoints.push(currentPoint);
+      }
+
+      newStrokeElements = [...newStrokeElements, ...smoothPoints];
 
       const box = this.getBoundingBox(newStrokeElements);
 
@@ -321,6 +390,7 @@ export class WeaveBrushToolAction extends WeaveAction {
         }
       }
 
+      this.rawPoints = [];
       this.clickPoint = null;
 
       stage.container().style.cursor = 'crosshair';
@@ -383,6 +453,7 @@ export class WeaveBrushToolAction extends WeaveAction {
       this.instance.triggerAction(SELECTION_TOOL_ACTION_NAME);
     }
 
+    this.rawPoints = [];
     this.clickPoint = null;
     this.setState(BRUSH_TOOL_STATE.INACTIVE);
   }

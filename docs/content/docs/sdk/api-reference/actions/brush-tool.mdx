@@ -3,6 +3,8 @@ title: WeaveBrushToolAction
 description: Paint freeform strokes on the canvas
 ---
 
+import { TypeTable } from "fumadocs-ui/components/type-table";
+
 ## Overview
 
 The [WeaveBrushToolAction](https://github.com/InditexTech/weavejs/blob/main/code/packages/sdk/src/actions/brush-tool/brush-tool.ts)
@@ -17,6 +19,10 @@ The class extends the [WeaveAction](/docs/sdk/api-reference/actions/action) clas
 
 This action `name` property value is `brushTool`.
 
+## Type
+
+This node `nodeType` property value is `stroke`.
+
 ## Import
 
 ```shell
@@ -26,5 +32,52 @@ import { WeaveBrushToolAction } from "@inditextech/weave-sdk";
 ## Instantiation
 
 ```ts
-new WeaveBrushToolAction();
+new WeaveBrushToolAction(params?: WeaveBrushToolActionParams);
+```
+
+## TypeScript types
+
+```ts
+type WeaveBrushToolActionProperties = {
+  interpolationSteps: number; // Number of steps for interpolation
+};
+
+type WeaveBrushToolActionParams = {
+  config: Partial<WeaveBrushToolActionProperties>;
+};
+```
+
+## Parameters
+
+For `WeaveBrushToolActionParams`:
+
+<TypeTable
+  type={{
+    ["config"]: {
+      required: true,
+      description: "Config parameters for the tool.",
+      type: "Partial<WeaveBrushToolActionParams>",
+    },
+  }}
+/>
+
+For `WeaveBrushToolActionParams`:
+
+<TypeTable
+  type={{
+    ["interpolationSteps"]: {
+      description:
+        "Number of interpolation steps for smooth curve on touch devices.",
+      type: "number",
+      default: "10",
+    },
+  }}
+/>
+
+## Default values
+
+```ts
+const BRUSH_TOOL_DEFAULT_CONFIG = {
+  interpolationSteps: 10,
+};
 ```
