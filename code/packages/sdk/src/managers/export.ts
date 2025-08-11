@@ -32,6 +32,28 @@ export class WeaveExportManager {
     this.logger.debug('Export manager created');
   }
 
+  private fitKonvaPixelRatio(
+    sw: number,
+    sh: number,
+    targetPR = 1,
+    maxArea = 16777216
+  ) {
+    if (sw <= 0 || sh <= 0) return { pixelRatio: 0, outW: 0, outH: 0 };
+
+    const desiredArea = sw * sh * targetPR * targetPR;
+    let pr = targetPR;
+
+    if (desiredArea > maxArea) {
+      pr = Math.sqrt(maxArea / (sw * sh));
+    }
+
+    // Integer canvas size Konva will create:
+    const outW = Math.max(1, Math.floor(sw * pr));
+    const outH = Math.max(1, Math.floor(sh * pr));
+
+    return { pixelRatio: pr, outW, outH };
+  }
+
   exportNodes(
     nodes: WeaveElementInstance[],
     boundingNodes: (nodes: Konva.Node[]) => Konva.Node[],
@@ -100,13 +122,19 @@ export class WeaveExportManager {
 
         stage.batchDraw();
 
+        const { pixelRatio: finalPixelRatio } = this.fitKonvaPixelRatio(
+          Math.round(backgroundRect.width),
+          Math.round(backgroundRect.height),
+          pixelRatio
+        );
+
         exportGroup.toImage({
           x: Math.round(backgroundRect.x),
           y: Math.round(backgroundRect.y),
           width: Math.round(backgroundRect.width),
           height: Math.round(backgroundRect.height),
           mimeType: format,
-          pixelRatio,
+          pixelRatio: finalPixelRatio,
           quality: options.quality ?? 1,
           callback: (img) => {
             exportGroup.destroy();
