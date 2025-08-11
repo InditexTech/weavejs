@@ -103,7 +103,8 @@ export class WeaveStrokeNode extends WeaveNode {
       right.push({ x: p.x - nx * w, y: p.y - ny * w });
     }
 
-    return left.concat(right.reverse());
+    const reversed = right.toReversed();
+    return left.concat(reversed);
   }
 
   // Split into dash segments
