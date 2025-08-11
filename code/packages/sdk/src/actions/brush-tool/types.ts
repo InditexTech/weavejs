@@ -10,3 +10,11 @@ export type WeaveBrushToolActionState =
 
 export type WeaveBrushToolActionOnAddingEvent = undefined;
 export type WeaveBrushToolActionOnAddedEvent = undefined;
+
+export type WeaveBrushToolActionProperties = {
+  interpolationSteps: number; // Number of steps for interpolation
+};
+
+export type WeaveBrushToolActionParams = {
+  config: Partial<WeaveBrushToolActionProperties>;
+};

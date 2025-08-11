@@ -563,3 +563,10 @@ export function memoize<T extends (...args: any[]) => any>(fn: T): T {
     return result;
   } as T;
 }
+
+export function isIOS() {
+  return (
+    /iPad|iPhone|iPod/.test(navigator.userAgent) ||
+    (navigator.userAgent.includes('Mac') && 'ontouchend' in document)
+  );
+}
