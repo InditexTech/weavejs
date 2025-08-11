@@ -15,6 +15,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- [#582](https://github.com/InditexTech/weavejs/issues/582) Brush tool looks choppy
 - [#591](https://github.com/InditexTech/weavejs/issues/591) Apply downsizing on export to avoid browsers hard-cap
 
 ## [0.55.2] - 2025-08-08

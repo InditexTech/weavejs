@@ -18,6 +18,7 @@ import type { WeaveStrokeNode } from '@/nodes/stroke/stroke';
 import type { WeaveStrokePoint } from '@/nodes/stroke/types';
 import { SELECTION_TOOL_ACTION_NAME } from '../selection-tool/constants';
 import type { WeaveStageZoomPlugin } from '@/plugins/stage-zoom/stage-zoom';
+import { isIOS } from '@/utils';
 
 export class WeaveBrushToolAction extends WeaveAction {
   protected initialized: boolean = false;
@@ -54,7 +55,9 @@ export class WeaveBrushToolAction extends WeaveAction {
     };
   }
 
-  private getPointPressure(e: Konva.KonvaEventObject<PointerEvent>): number {
+  private getPointPressure(
+    e: Konva.KonvaEventObject<PointerEvent | TouchEvent>
+  ): number {
     let pressure: number = 1.0;
 
     if (e.evt instanceof PointerEvent && e.evt.pointerType === 'pen') {
@@ -87,7 +90,9 @@ export class WeaveBrushToolAction extends WeaveAction {
       }
     });
 
-    const handlePointerDown = (e: Konva.KonvaEventObject<PointerEvent>) => {
+    const handlePointerDown = (
+      e: Konva.KonvaEventObject<PointerEvent | TouchEvent>
+    ) => {
       if (this.state !== BRUSH_TOOL_STATE.IDLE) {
         return;
       }
@@ -102,9 +107,15 @@ export class WeaveBrushToolAction extends WeaveAction {
       e.evt.stopPropagation();
     };
 
-    stage.on('pointerdown touchstart', handlePointerDown);
+    if (isIOS()) {
+      stage.on('touchstart', handlePointerDown);
+    } else {
+      stage.on('pointerdown', handlePointerDown);
+    }
 
-    const handlePointerMove = (e: Konva.KonvaEventObject<PointerEvent>) => {
+    const handlePointerMove = (
+      e: Konva.KonvaEventObject<PointerEvent | TouchEvent>
+    ) => {
       if (this.state !== BRUSH_TOOL_STATE.DEFINE_STROKE) {
         return;
       }
@@ -121,9 +132,15 @@ export class WeaveBrushToolAction extends WeaveAction {
       e.evt.stopPropagation();
     };
 
-    stage.on('pointermove touchmove', handlePointerMove);
+    if (isIOS()) {
+      stage.on('touchmove', handlePointerMove);
+    } else {
+      stage.on('pointermove', handlePointerMove);
+    }
 
-    const handlePointerUp = (e: Konva.KonvaEventObject<PointerEvent>) => {
+    const handlePointerUp = (
+      e: Konva.KonvaEventObject<PointerEvent | TouchEvent>
+    ) => {
       if (this.state !== BRUSH_TOOL_STATE.DEFINE_STROKE) {
         return;
       }
@@ -137,7 +154,11 @@ export class WeaveBrushToolAction extends WeaveAction {
       e.evt.stopPropagation();
     };
 
-    stage.on('pointerup touchend', handlePointerUp);
+    if (isIOS()) {
+      stage.on('touchend', handlePointerUp);
+    } else {
+      stage.on('pointerup', handlePointerUp);
+    }
 
     this.initialized = true;
   }
@@ -227,6 +248,7 @@ export class WeaveBrushToolAction extends WeaveAction {
       );
 
       const newStrokeElements = [...tempStroke.getAttrs().strokeElements];
+
       newStrokeElements.push({
         x: mousePoint.x - tempStroke.x(),
         y: mousePoint.y - tempStroke.y(),
