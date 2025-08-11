@@ -1236,9 +1236,9 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
     const currentAttrs = this.tr.getAttrs();
     Object.keys(currentAttrs).forEach((key) => {
       if (['rotationSnaps', 'enabledAnchors'].includes(key)) {
-        this.tr.setAttr(key, []);
+        this.tr?.setAttr(key, []);
       } else {
-        this.tr.setAttr(key, undefined);
+        this.tr?.setAttr(key, undefined);
       }
     });
 
@@ -1258,8 +1258,8 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
       transformerAttrs.enabledAnchors = intersectArrays(anchorsArrays);
     }
 
-    this.tr.setAttrs(transformerAttrs);
-    this.tr.forceUpdate();
+    this.tr?.setAttrs(transformerAttrs);
+    this.tr?.forceUpdate();
   }
 
   setSelectedNodes(nodes: Konva.Node[]): void {

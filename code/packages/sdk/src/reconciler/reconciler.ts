@@ -212,15 +212,27 @@ export class WeaveReconciler {
         beforeChild: WeaveElementInstance
       ): void {
         logger.debug({ parentInstance, child, beforeChild }, 'insertBefore ');
-        if (parentInstance instanceof Konva.Layer) {
-          parentInstance.add(child);
-          const beforeChildZIndex = beforeChild.zIndex();
-          child.zIndex(beforeChildZIndex - 1);
-        }
-        if (parentInstance instanceof Konva.Group) {
-          parentInstance.add(child);
-          const beforeChildZIndex = beforeChild.zIndex();
-          child.zIndex(beforeChildZIndex - 1);
+
+        if (
+          parentInstance instanceof Konva.Layer ||
+          parentInstance instanceof Konva.Group
+        ) {
+          const children = parentInstance.getChildren();
+
+          const fromIndex = children.indexOf(child);
+          const toIndex = children.indexOf(beforeChild);
+          if (fromIndex === -1 || toIndex === -1) return;
+
+          // Remove the item
+          children.splice(fromIndex, 1);
+
+          // If the removal was before the insertion point, the index shifts by -1
+          const adjustedIndex = fromIndex < toIndex ? toIndex - 1 : toIndex;
+
+          // Insert before the target
+          parentInstance.getChildren().splice(adjustedIndex, 0, child);
+
+          parentInstance.children = parentInstance.getChildren();
         }
       },
       appendChild(
