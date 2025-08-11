@@ -18,6 +18,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - [#582](https://github.com/InditexTech/weavejs/issues/582) Brush tool looks choppy
 - [#591](https://github.com/InditexTech/weavejs/issues/591) Apply downsizing on export to avoid browsers hard-cap
 
+### Fixed
+
+- [#593](https://github.com/InditexTech/weavejs/issues/593) "Send to Back" inside frame does not reorder correctly
+
 ## [0.55.2] - 2025-08-08
 
 ### Changed

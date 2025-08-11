@@ -35,8 +35,6 @@ export class WeaveZIndexManager {
       }], up one step of z-index`
     );
 
-    instance.moveUp();
-
     const handler = this.instance.getNodeHandler<WeaveNode>(
       instance.getAttrs().nodeType
     );
@@ -53,8 +51,6 @@ export class WeaveZIndexManager {
       }], down one step of z-index`
     );
 
-    instance.moveDown();
-
     const handler = this.instance.getNodeHandler<WeaveNode>(
       instance.getAttrs().nodeType
     );
@@ -70,14 +66,11 @@ export class WeaveZIndexManager {
     const nodesDescending = nodes.toSorted((a, b) => b.zIndex() - a.zIndex());
 
     for (const node of nodesDescending) {
-      node.moveToBottom();
-
       const handler = this.instance.getNodeHandler<WeaveNode>(
         node.getAttrs().nodeType
       );
       if (handler) {
         const nodeState = handler.serialize(node);
-        // this.instance.updateNode(nodeState);
         this.instance.moveNode(nodeState, WEAVE_NODE_POSITION.BACK);
       }
     }
@@ -89,14 +82,11 @@ export class WeaveZIndexManager {
     const nodesAscending = nodes.toSorted((a, b) => a.zIndex() - b.zIndex());
 
     for (const node of nodesAscending) {
-      node.moveToTop();
-
       const handler = this.instance.getNodeHandler<WeaveNode>(
         node.getAttrs().nodeType
       );
       if (handler) {
         const nodeState = handler.serialize(node);
-        // this.instance.updateNode(nodeState);
         this.instance.moveNode(nodeState, WEAVE_NODE_POSITION.FRONT);
       }
     }
