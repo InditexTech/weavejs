@@ -186,8 +186,6 @@ export class WeaveCopyPasteNodesPlugin extends WeavePlugin {
 
     if (catcher) {
       document.addEventListener('paste', async (e) => {
-        e.preventDefault();
-
         const dataList: DataTransferItemList | undefined =
           e.clipboardData?.items;
 
