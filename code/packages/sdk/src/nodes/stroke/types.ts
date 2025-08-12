@@ -5,9 +5,9 @@
 import type { WeaveNodeTransformerProperties } from '@inditextech/weave-types';
 
 export type WeaveStrokeProperties = {
-  smoothingFactor: number; // Factor for Catmull-Rom spline smoothing
+  splineResolution: number; // Spline resolution
   resamplingSpacing: number; // Spacing for resampling points
-  pressureScale: number; // Scale factor for pressure to width conversion
+  cachePixelRatio: number;
   transform?: WeaveNodeTransformerProperties;
 };
 

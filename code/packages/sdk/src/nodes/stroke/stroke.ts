@@ -4,6 +4,7 @@
 
 import merge from 'lodash/merge';
 import Konva from 'konva';
+import type { Context } from 'konva/lib/Context';
 import {
   type WeaveElementAttributes,
   type WeaveElementInstance,
@@ -20,7 +21,6 @@ import type {
   WeaveStrokePoint,
   WeaveStrokeProperties,
 } from './types';
-import type { Vector2d } from 'konva/lib/types';
 
 export class WeaveStrokeNode extends WeaveNode {
   private readonly config: WeaveStrokeProperties;
@@ -34,157 +34,168 @@ export class WeaveStrokeNode extends WeaveNode {
     this.config = merge(WEAVE_STROKE_NODE_DEFAULT_CONFIG, config);
   }
 
-  private resamplePoints(pts: WeaveStrokePoint[], spacing: number) {
+  private resamplePoints(
+    pts: WeaveStrokePoint[],
+    minDist = 2
+  ): WeaveStrokePoint[] {
     if (pts.length < 2) return pts;
-    const resampled = [pts[0]];
-
+    const result: WeaveStrokePoint[] = [pts[0]];
+    let last = pts[0];
     for (let i = 1; i < pts.length; i++) {
-      let last = resampled[resampled.length - 1];
-      const current = pts[i];
-      const segDist = this.dist(last, current);
-
-      if (segDist === 0) continue;
-
-      let remaining = segDist;
-      while (remaining >= spacing) {
-        const t = spacing / segDist;
-        const newPt = this.lerpPoint(last, current, t);
-        resampled.push(newPt);
-        last = newPt;
-        remaining = this.dist(last, current);
+      const dx = pts[i].x - last.x;
+      const dy = pts[i].y - last.y;
+      if (dx * dx + dy * dy >= minDist * minDist) {
+        result.push(pts[i]);
+        last = pts[i];
       }
     }
-    return resampled;
+    return result;
   }
 
-  private dist(a: Vector2d, b: Vector2d) {
-    const dx = b.x - a.x,
-      dy = b.y - a.y;
-    return Math.hypot(dx, dy);
-  }
+  private getSplinePoints(pts: WeaveStrokePoint[], resolution = 8) {
+    const result = [];
+    for (let i = -1; i < pts.length - 2; i++) {
+      const p0 = pts[Math.max(i, 0)];
+      const p1 = pts[i + 1];
+      const p2 = pts[i + 2];
+      const p3 = pts[Math.min(i + 3, pts.length - 1)];
 
-  // Interpolate between points
-  private lerpPoint(a: WeaveStrokePoint, b: WeaveStrokePoint, t: number) {
-    return {
-      x: a.x + (b.x - a.x) * t,
-      y: a.y + (b.y - a.y) * t,
-      pressure: a.pressure + (b.pressure - a.pressure) * t,
-    };
-  }
+      for (let t = 0; t < 1; t += 1 / resolution) {
+        const tt = t * t;
+        const ttt = tt * t;
 
-  // Build polygon for a given segment of centerline
-  private buildPolygonFromPressure(pts: WeaveStrokePoint[], baseWidth: number) {
-    if (pts.length < 2) return [];
+        const q1 = -ttt + 2 * tt - t;
+        const q2 = 3 * ttt - 5 * tt + 2;
+        const q3 = -3 * ttt + 4 * tt + t;
+        const q4 = ttt - tt;
 
-    const left = [];
-    const right = [];
-
-    for (let i = 0; i < pts.length; i++) {
-      const p = pts[i];
-      const w = (baseWidth + p.pressure * this.config.pressureScale) / 2;
-
-      let dx, dy;
-      if (i === 0) {
-        dx = pts[1].x - p.x;
-        dy = pts[1].y - p.y;
-      } else if (i === pts.length - 1) {
-        dx = p.x - pts[i - 1].x;
-        dy = p.y - pts[i - 1].y;
-      } else {
-        dx = pts[i + 1].x - pts[i - 1].x;
-        dy = pts[i + 1].y - pts[i - 1].y;
-      }
-
-      const len = Math.hypot(dx, dy) || 1;
-      const nx = -dy / len;
-      const ny = dx / len;
-
-      left.push({ x: p.x + nx * w, y: p.y + ny * w });
-      right.push({ x: p.x - nx * w, y: p.y - ny * w });
-    }
-
-    const reversed = right.toReversed();
-    return left.concat(reversed);
-  }
-
-  // Split into dash segments
-  private dashSegments(pts: WeaveStrokePoint[], pattern: number[]) {
-    const segments = [];
-    let patIndex = 0;
-    let patDist = pattern[patIndex];
-    let draw = true;
-    let segPts = [pts[0]];
-
-    for (let i = 1; i < pts.length; i++) {
-      let d = this.dist(pts[i - 1], pts[i]);
-
-      while (d >= patDist) {
-        const t = patDist / d;
-        const mid = this.lerpPoint(pts[i - 1], pts[i], t);
-        segPts.push(mid);
-
-        if (draw) segments.push(segPts);
-
-        draw = !draw;
-        patIndex = (patIndex + 1) % pattern.length;
-        patDist = pattern[patIndex];
-
-        segPts = [mid];
-        d -= patDist;
-        pts[i - 1] = mid;
-      }
-      segPts.push(pts[i]);
-      patDist -= d;
-    }
-    if (draw && segPts.length > 1) {
-      segments.push(segPts);
-    }
-    return segments;
-  }
-
-  private catmullRomSpline(pts: WeaveStrokePoint[], spacing: number) {
-    const curvePoints = [];
-
-    for (let i = 0; i < pts.length - 1; i++) {
-      const p0 = pts[i - 1] || pts[i];
-      const p1 = pts[i];
-      const p2 = pts[i + 1];
-      const p3 = pts[i + 2] || p2;
-
-      for (let t = 0; t < 1; t += spacing) {
-        const t2 = t * t;
-        const t3 = t2 * t;
-
-        const x =
-          0.5 *
-          (2 * p1.x +
-            (-p0.x + p2.x) * t +
-            (2 * p0.x - 5 * p1.x + 4 * p2.x - p3.x) * t2 +
-            (-p0.x + 3 * p1.x - 3 * p2.x + p3.x) * t3);
-
-        const y =
-          0.5 *
-          (2 * p1.y +
-            (-p0.y + p2.y) * t +
-            (2 * p0.y - 5 * p1.y + 4 * p2.y - p3.y) * t2 +
-            (-p0.y + 3 * p1.y - 3 * p2.y + p3.y) * t3);
-
+        const x = (q1 * p0.x + q2 * p1.x + q3 * p2.x + q4 * p3.x) / 2;
+        const y = (q1 * p0.y + q2 * p1.y + q3 * p2.y + q4 * p3.y) / 2;
         const pressure =
-          0.5 *
-          (2 * p1.pressure +
-            (-p0.pressure + p2.pressure) * t +
-            (2 * p0.pressure -
-              5 * p1.pressure +
-              4 * p2.pressure -
-              p3.pressure) *
-              t2 +
-            (-p0.pressure + 3 * p1.pressure - 3 * p2.pressure + p3.pressure) *
-              t3);
+          (q1 * p0.pressure +
+            q2 * p1.pressure +
+            q3 * p2.pressure +
+            q4 * p3.pressure) /
+          2;
 
-        curvePoints.push({ x, y, pressure });
+        result.push({ x, y, pressure });
       }
     }
-    return curvePoints;
+    result.push(pts[pts.length - 1]);
+    return result;
+  }
+
+  private drawRibbonWithDash(
+    ctx: Konva.Context,
+    pts: WeaveStrokePoint[],
+    baseW: number,
+    color: string | CanvasGradient,
+    dash: number[]
+  ) {
+    if (pts.length < 2) return;
+
+    const filtered = this.resamplePoints(pts, 2);
+    const centerline = this.getSplinePoints(filtered, 8);
+
+    let dashIndex = 0;
+    let dashOn = true;
+    let dashRemaining = dash.length ? dash[0] : Infinity;
+
+    let leftSide: WeaveStrokePoint[] = [];
+    let rightSide: WeaveStrokePoint[] = [];
+
+    for (let i = 0; i < centerline.length - 1; i++) {
+      const p0 = centerline[i];
+      const p1 = centerline[i + 1];
+      const dx = p1.x - p0.x;
+      const dy = p1.y - p0.y;
+      const segLen = Math.sqrt(dx * dx + dy * dy) || 1;
+      const nx = -dy / segLen;
+      const ny = dx / segLen;
+
+      const w0 = (baseW * p0.pressure) / 2;
+      const w1 = (baseW * p1.pressure) / 2;
+
+      let traveled = 0;
+
+      while (traveled < segLen) {
+        const step = Math.min(dashRemaining, segLen - traveled);
+        const t0 = traveled / segLen;
+        const t1 = (traveled + step) / segLen;
+
+        const x0 = p0.x + dx * t0;
+        const y0 = p0.y + dy * t0;
+        const x1 = p0.x + dx * t1;
+        const y1 = p0.y + dy * t1;
+
+        const pw0 = w0 + (w1 - w0) * t0;
+        const pw1 = w0 + (w1 - w0) * t1;
+
+        if (dashOn) {
+          // Add to current dash polygon
+          leftSide.push({ x: x0 + nx * pw0, y: y0 + ny * pw0, pressure: 1 });
+          rightSide.push({ x: x0 - nx * pw0, y: y0 - ny * pw0, pressure: 1 });
+
+          leftSide.push({ x: x1 + nx * pw1, y: y1 + ny * pw1, pressure: 1 });
+          rightSide.push({ x: x1 - nx * pw1, y: y1 - ny * pw1, pressure: 1 });
+        }
+
+        dashRemaining -= step;
+        if (dashRemaining <= 0) {
+          // Fill current dash polygon if it exists
+          if (dashOn && leftSide.length && rightSide.length) {
+            const smoothLeft = this.getSplinePoints(leftSide, 4);
+            const smoothRight = this.getSplinePoints(rightSide.reverse(), 4);
+
+            ctx.beginPath();
+            ctx.fillStyle = color;
+            ctx.moveTo(smoothLeft[0].x, smoothLeft[0].y);
+            for (const p of smoothLeft) ctx.lineTo(p.x, p.y);
+            for (const p of smoothRight) ctx.lineTo(p.x, p.y);
+            ctx.closePath();
+            ctx.fill();
+          }
+
+          // Reset for next dash segment
+          leftSide = [];
+          rightSide = [];
+
+          dashOn = !dashOn;
+          dashIndex = (dashIndex + 1) % dash.length;
+          dashRemaining = dash[dashIndex];
+        }
+
+        traveled += step;
+      }
+    }
+
+    // Fill the last dash polygon if needed
+    if (dashOn && leftSide.length && rightSide.length) {
+      const smoothLeft = this.getSplinePoints(leftSide, 4);
+      const smoothRight = this.getSplinePoints(rightSide.reverse(), 4);
+
+      ctx.beginPath();
+      ctx.fillStyle = color;
+      ctx.moveTo(smoothLeft[0].x, smoothLeft[0].y);
+      for (const p of smoothLeft) ctx.lineTo(p.x, p.y);
+      for (const p of smoothRight) ctx.lineTo(p.x, p.y);
+      ctx.closePath();
+      ctx.fill();
+    }
+  }
+
+  private drawShape(ctx: Context, shape: Konva.Shape) {
+    const strokeElements: WeaveStrokePoint[] = shape.getAttrs().strokeElements;
+
+    if (strokeElements.length === 0) {
+      return;
+    }
+
+    const color = shape.getAttrs().stroke ?? 'black';
+    const strokeWidth = shape.getAttrs().strokeWidth ?? 1;
+    const dash = shape.getAttrs().dash ?? [];
+
+    this.drawRibbonWithDash(ctx, strokeElements, strokeWidth, color, dash);
   }
 
   onRender(props: WeaveElementAttributes): WeaveElementInstance {
@@ -192,46 +203,7 @@ export class WeaveStrokeNode extends WeaveNode {
       ...props,
       name: 'node',
       sceneFunc: (ctx, shape) => {
-        const strokeElements: WeaveStrokePoint[] =
-          shape.getAttrs().strokeElements;
-
-        if (strokeElements.length === 0) {
-          return;
-        }
-
-        if (strokeElements.length < 2) return;
-
-        const color = shape.getAttrs().stroke ?? 'black';
-        const strokeWidth = shape.getAttrs().strokeWidth ?? 1;
-
-        const smoothPoints = this.catmullRomSpline(
-          strokeElements,
-          this.config.smoothingFactor
-        );
-        const evenlySpaced = this.resamplePoints(
-          smoothPoints,
-          this.config.resamplingSpacing
-        );
-        const dashes = this.dashSegments(
-          evenlySpaced,
-          shape.getAttrs().dash || []
-        );
-
-        dashes.forEach((segment) => {
-          const poly = this.buildPolygonFromPressure(segment, strokeWidth);
-          if (!poly.length) return;
-          ctx.beginPath();
-          ctx.moveTo(poly[0].x, poly[0].y);
-          for (let i = 1; i < poly.length; i++) {
-            ctx.lineTo(poly[i].x, poly[i].y);
-          }
-          ctx.strokeStyle = color; // dash color
-          ctx.lineCap = shape.getAttrs().lineCap ?? 'butt';
-          ctx.lineJoin = shape.getAttrs().lineJoin ?? 'miter';
-          ctx.closePath();
-          ctx.fillStyle = color;
-          ctx.fill();
-        });
+        this.drawShape(ctx, shape);
       },
       dashEnabled: false,
       hitFunc: (context, shape) => {
@@ -242,6 +214,10 @@ export class WeaveStrokeNode extends WeaveNode {
         context.fillStrokeShape(shape);
       },
     });
+
+    if (props.cacheStroke) {
+      stroke.cache({ pixelRatio: this.config.cachePixelRatio });
+    }
 
     this.setupDefaultNodeAugmentation(stroke);
 
@@ -262,9 +238,25 @@ export class WeaveStrokeNode extends WeaveNode {
     nodeInstance: WeaveElementInstance,
     nextProps: WeaveElementAttributes
   ): void {
+    const actAttrs = nodeInstance.getAttrs();
+    if (
+      actAttrs.stroke !== nextProps.stroke ||
+      actAttrs.strokeWidth !== nextProps.strokeWidth ||
+      actAttrs.dash !== nextProps.dash
+    ) {
+      nodeInstance.clearCache();
+    }
+
     nodeInstance.setAttrs({
       ...nextProps,
     });
+
+    if (nextProps.cacheStroke) {
+      (nodeInstance as Konva.Shape).sceneFunc((ctx, shape) => {
+        this.drawShape(ctx, shape);
+      });
+      nodeInstance.cache({ pixelRatio: this.config.cachePixelRatio });
+    }
 
     const nodesSelectionPlugin =
       this.instance.getPlugin<WeaveNodesSelectionPlugin>('nodesSelection');

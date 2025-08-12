@@ -5,7 +5,7 @@
 export const WEAVE_STROKE_NODE_TYPE = 'stroke';
 
 export const WEAVE_STROKE_NODE_DEFAULT_CONFIG = {
-  smoothingFactor: 0.1,
+  splineResolution: 8,
   resamplingSpacing: 2,
-  pressureScale: 1,
+  cachePixelRatio: 4,
 };

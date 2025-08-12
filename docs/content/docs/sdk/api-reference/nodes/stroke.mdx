@@ -38,9 +38,11 @@ new WeaveStrokeNode(params?: WeaveStrokeNodeParams);
 type WeaveNodeTransformerProperties = Konva.TransformerConfig;
 
 type WeaveStrokeProperties = {
-  smoothingFactor: number; // Factor for Catmull-Rom spline smoothing
+  splineResolution: number; // Spline resolution
   resamplingSpacing: number; // Spacing for resampling points
-  pressureScale: number; // Scale factor for pressure to width conversion
+  cache: {
+    pixelRatio: number;
+  };
   transform?: WeaveNodeTransformerProperties;
 };
 
@@ -73,19 +75,20 @@ For `WeaveStrokeNodeParams`:
 
 <TypeTable
   type={{
-    ["smoothingFactor"]: {
-      description: "Factor for Catmull-Rom spline smoothing",
+    ["splineResolution"]: {
+      description: "Resolution of the interpolated spline to smooth the curve",
       type: "number",
-      default: "0.1",
+      default: "8",
       ["resamplingSpacing"]: {
         description: "Spacing for resampling points.",
         type: "number",
         default: "2",
       },
-      ["pressureScale"]: {
-        description: "SetScale factor for pressure to width conversion.",
+      ["cachePixelRatio"]: {
+        description:
+          "Konva cache node property, for now the resolution to save the cached bitmap.",
         type: "number",
-        default: "1",
+        default: "4",
       },
       ["transform"]: {
         description:
@@ -101,8 +104,8 @@ For `WeaveStrokeNodeParams`:
 
 ```ts
 const WEAVE_STROKE_NODE_DEFAULT_CONFIG = {
-  smoothingFactor: 0.1,
+  splineResolution: 8,
   resamplingSpacing: 2,
-  pressureScale: 1,
+  cachePixelRatio: 4,
 };
 ```
