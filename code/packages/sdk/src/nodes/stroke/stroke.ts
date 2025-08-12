@@ -85,122 +85,6 @@ export class WeaveStrokeNode extends WeaveNode {
     return result;
   }
 
-  // Smooth edges separately
-  private smoothEdgePoints(edgePoints: WeaveStrokePoint[], resolution = 8) {
-    return this.getSplinePoints(edgePoints, resolution);
-  }
-
-  // Main ribbon drawing without dash support
-  private drawRibbonWithoutDash(
-    ctx: Context,
-    pts: WeaveStrokePoint[],
-    baseW: number,
-    color: string | CanvasGradient,
-    dash: number[]
-  ) {
-    if (pts.length < 2) return;
-
-    // Step 1: Smooth centerline
-    const filteredPoints = this.resamplePoints(
-      pts,
-      this.config.resamplingSpacing
-    ); // 2px spacing
-
-    if (filteredPoints.length < 2) return;
-
-    const centerline = this.getSplinePoints(
-      filteredPoints,
-      this.config.splineResolution
-    );
-
-    // Step 2: Generate left/right edges
-    const leftSide = [];
-    const rightSide = [];
-
-    let dashIndex = 0;
-    let dashOn = true;
-    let dashRemaining = dash && dash.length ? dash[0] : Infinity;
-
-    for (let i = 0; i < centerline.length - 1; i++) {
-      const p0 = centerline[i];
-      const p1 = centerline[i + 1];
-
-      const dx = p1.x - p0.x;
-      const dy = p1.y - p0.y;
-      const segLen = Math.sqrt(dx * dx + dy * dy) || 1;
-      const nx = -dy / segLen;
-      const ny = dx / segLen;
-
-      const w0 = (baseW * p0.pressure) / 2;
-      const w1 = (baseW * p1.pressure) / 2;
-
-      let remaining = segLen;
-      let fromX = p0.x;
-      let fromY = p0.y;
-
-      while (remaining > 0) {
-        const step = Math.min(dashRemaining, remaining);
-        const t = step / segLen;
-        const toX = fromX + dx * t;
-        const toY = fromY + dy * t;
-        const interpW =
-          w0 +
-          (w1 - w0) *
-            (Math.sqrt((fromX - p0.x) ** 2 + (fromY - p0.y) ** 2) / segLen);
-
-        if (dashOn) {
-          leftSide.push({
-            x: fromX + nx * interpW,
-            y: fromY + ny * interpW,
-            pressure: 1,
-          });
-          rightSide.push({
-            x: fromX - nx * interpW,
-            y: fromY - ny * interpW,
-            pressure: 1,
-          });
-
-          leftSide.push({
-            x: toX + nx * interpW,
-            y: toY + ny * interpW,
-            pressure: 1,
-          });
-          rightSide.push({
-            x: toX - nx * interpW,
-            y: toY - ny * interpW,
-            pressure: 1,
-          });
-        }
-
-        dashRemaining -= step;
-        if (dashRemaining <= 0) {
-          dashOn = !dashOn;
-          dashIndex = (dashIndex + 1) % dash.length;
-          dashRemaining = dash[dashIndex];
-        }
-
-        remaining -= step;
-        fromX = toX;
-        fromY = toY;
-      }
-    }
-
-    // Step 3: Smooth edges
-    const smoothLeft = this.smoothEdgePoints(leftSide, 6);
-    const smoothRight = this.smoothEdgePoints(rightSide.reverse(), 6);
-
-    // Step 4: Fill shape
-    if (smoothLeft.length) {
-      ctx.beginPath();
-      ctx.fillStyle = color;
-      ctx.moveTo(smoothLeft[0].x, smoothLeft[0].y);
-      for (const p of smoothLeft) ctx.lineTo(p.x, p.y);
-      for (const p of smoothRight) ctx.lineTo(p.x, p.y);
-      ctx.closePath();
-      ctx.fill();
-    }
-  }
-
   private drawRibbonWithDash(
     ctx: Konva.Context,
     pts: WeaveStrokePoint[],
@@ -311,11 +195,7 @@ export class WeaveStrokeNode extends WeaveNode {
     const strokeWidth = shape.getAttrs().strokeWidth ?? 1;
     const dash = shape.getAttrs().dash ?? [];
 
-    if (dash.length > 0) {
-      this.drawRibbonWithDash(ctx, strokeElements, strokeWidth, color, dash);
-    } else {
-      this.drawRibbonWithoutDash(ctx, strokeElements, strokeWidth, color, []);
-    }
+    this.drawRibbonWithDash(ctx, strokeElements, strokeWidth, color, dash);
   }
 
   onRender(props: WeaveElementAttributes): WeaveElementInstance {
