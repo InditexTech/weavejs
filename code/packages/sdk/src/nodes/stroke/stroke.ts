@@ -336,7 +336,7 @@ export class WeaveStrokeNode extends WeaveNode {
     });
 
     if (props.cacheStroke) {
-      stroke.cache({ pixelRatio: this.config.cache.pixelRatio });
+      stroke.cache({ pixelRatio: this.config.cachePixelRatio });
     }
 
     this.setupDefaultNodeAugmentation(stroke);
@@ -375,7 +375,7 @@ export class WeaveStrokeNode extends WeaveNode {
       (nodeInstance as Konva.Shape).sceneFunc((ctx, shape) => {
         this.drawShape(ctx, shape);
       });
-      nodeInstance.cache({ pixelRatio: this.config.cache.pixelRatio });
+      nodeInstance.cache({ pixelRatio: this.config.cachePixelRatio });
     }
 
     const nodesSelectionPlugin =

@@ -7,9 +7,7 @@ import type { WeaveNodeTransformerProperties } from '@inditextech/weave-types';
 export type WeaveStrokeProperties = {
   splineResolution: number; // Spline resolution
   resamplingSpacing: number; // Spacing for resampling points
-  cache: {
-    pixelRatio: number;
-  };
+  cachePixelRatio: number;
   transform?: WeaveNodeTransformerProperties;
 };
 
