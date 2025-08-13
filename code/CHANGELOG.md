@@ -13,6 +13,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- [#607](https://github.com/InditexTech/weavejs/issues/607) Allow to pan when selecting by area close to screen edges
+
 ### Fixed
 
 - [#604](https://github.com/InditexTech/weavejs/issues/604) Selection region stops working after pressing space key

@@ -18,10 +18,17 @@ export type WeaveNodesSelectionBehaviorsConfig = {
   };
 };
 
+export type WeaveNodesSelectionPanningOnSelectionConfig = {
+  edgeThreshold: number;
+  minScrollSpeed: number;
+  maxScrollSpeed: number;
+};
+
 export type WeaveNodesSelectionConfig = {
   selection: Konva.TransformerConfig;
   hover: Konva.TransformerConfig;
   selectionArea: Konva.RectConfig;
+  panningWhenSelection: WeaveNodesSelectionPanningOnSelectionConfig;
   behaviors: WeaveNodesSelectionBehaviorsConfig;
 };
 
