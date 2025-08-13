@@ -689,7 +689,7 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
         this.isSpaceKeyPressed = true;
       }
       if (
-        (e.key === 'Backspace' || e.key === 'Delete') &&
+        (e.code === 'Backspace' || e.code === 'Delete') &&
         Object.keys(window.weaveTextEditing).length === 0
       ) {
         this.removeSelectedNodes();
@@ -698,7 +698,7 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
     });
 
     stage.container().addEventListener('keyup', (e) => {
-      if (e.key === 'Space') {
+      if (e.code === 'Space') {
         this.isSpaceKeyPressed = false;
       }
     });
