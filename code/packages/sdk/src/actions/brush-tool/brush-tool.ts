@@ -210,7 +210,6 @@ export class WeaveBrushToolAction extends WeaveAction {
         width: 0,
         height: 0,
         strokeElements: newStrokeElements,
-        cacheStroke: false,
       });
       const nodeInstance = nodeHandler.onRender(node.props);
       this.measureContainer?.add(nodeInstance);
@@ -293,7 +292,6 @@ export class WeaveBrushToolAction extends WeaveAction {
           x: box.x,
           y: box.y,
           strokeElements: newStrokeElements,
-          cacheStroke: true,
         });
 
         const realNode = this.instance

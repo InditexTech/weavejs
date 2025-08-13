@@ -21,6 +21,7 @@ import type {
   WeaveStrokePoint,
   WeaveStrokeProperties,
 } from './types';
+import type { WeaveStageZoomPlugin } from '@/plugins/stage-zoom/stage-zoom';
 
 export class WeaveStrokeNode extends WeaveNode {
   private readonly config: WeaveStrokeProperties;
@@ -215,10 +216,6 @@ export class WeaveStrokeNode extends WeaveNode {
       },
     });
 
-    if (props.cacheStroke) {
-      stroke.cache({ pixelRatio: this.config.cachePixelRatio });
-    }
-
     this.setupDefaultNodeAugmentation(stroke);
 
     const defaultTransformerProperties = this.defaultGetTransformerProperties(
@@ -238,25 +235,9 @@ export class WeaveStrokeNode extends WeaveNode {
     nodeInstance: WeaveElementInstance,
     nextProps: WeaveElementAttributes
   ): void {
-    const actAttrs = nodeInstance.getAttrs();
-    if (
-      actAttrs.stroke !== nextProps.stroke ||
-      actAttrs.strokeWidth !== nextProps.strokeWidth ||
-      actAttrs.dash !== nextProps.dash
-    ) {
-      nodeInstance.clearCache();
-    }
-
     nodeInstance.setAttrs({
       ...nextProps,
     });
-
-    if (nextProps.cacheStroke) {
-      (nodeInstance as Konva.Shape).sceneFunc((ctx, shape) => {
-        this.drawShape(ctx, shape);
-      });
-      nodeInstance.cache({ pixelRatio: this.config.cachePixelRatio });
-    }
 
     const nodesSelectionPlugin =
       this.instance.getPlugin<WeaveNodesSelectionPlugin>('nodesSelection');
@@ -264,6 +245,12 @@ export class WeaveStrokeNode extends WeaveNode {
     if (nodesSelectionPlugin) {
       nodesSelectionPlugin.getTransformer().forceUpdate();
     }
+  }
+
+  getZoomPlugin() {
+    const zoomPlugin =
+      this.instance.getPlugin<WeaveStageZoomPlugin>('stageZoom');
+    return zoomPlugin;
   }
 
   scaleReset(node: Konva.Node): void {

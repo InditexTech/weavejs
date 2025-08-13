@@ -40,9 +40,6 @@ type WeaveNodeTransformerProperties = Konva.TransformerConfig;
 type WeaveStrokeProperties = {
   splineResolution: number; // Spline resolution
   resamplingSpacing: number; // Spacing for resampling points
-  cache: {
-    pixelRatio: number;
-  };
   transform?: WeaveNodeTransformerProperties;
 };
 
@@ -84,12 +81,6 @@ For `WeaveStrokeNodeParams`:
         type: "number",
         default: "2",
       },
-      ["cachePixelRatio"]: {
-        description:
-          "Konva cache node property, for now the resolution to save the cached bitmap.",
-        type: "number",
-        default: "4",
-      },
       ["transform"]: {
         description:
           "Setup the transform properties for the line (if can be resized, rotated, anchors, etc.).",
@@ -106,6 +97,5 @@ For `WeaveStrokeNodeParams`:
 const WEAVE_STROKE_NODE_DEFAULT_CONFIG = {
   splineResolution: 8,
   resamplingSpacing: 2,
-  cachePixelRatio: 4,
 };
 ```
