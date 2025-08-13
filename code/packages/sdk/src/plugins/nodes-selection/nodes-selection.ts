@@ -70,7 +70,7 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
   private y2!: number;
   private selectionStart: { x: number; y: number } | null = null;
   private panSpeed = { x: 0, y: 0 };
-  private panDirection = { x: 0, y: 0 };
+  private readonly panDirection = { x: 0, y: 0 };
   private pointers: Record<string, PointerEvent>;
   private panLoopId: number | null = null;
   onRender: undefined;
@@ -1296,18 +1296,16 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
 
     let transformerAttrs: TransformerConfig = { ...this.config.selection };
 
-    const currentAttrs = this.tr.getAttrs();
-    Object.keys(currentAttrs).forEach((key) => {
-      if (['rotationSnaps', 'enabledAnchors'].includes(key)) {
-        if (this.tr && this.tr.nodes().length > 0) {
+    if (this.tr && this.tr.nodes().length > 0) {
+      const currentAttrs = this.tr.getAttrs();
+      Object.keys(currentAttrs).forEach((key) => {
+        if (['rotationSnaps', 'enabledAnchors'].includes(key)) {
           this.tr.setAttr(key, []);
-        }
-      } else {
-        if (this.tr && this.tr.nodes().length > 0) {
+        } else {
           this.tr.setAttr(key, undefined);
         }
-      }
-    });
+      });
+    }
 
     if (nodesSelected === 1) {
       transformerAttrs = merge(
