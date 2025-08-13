@@ -140,10 +140,13 @@ export class WeaveStagePanningPlugin extends WeavePlugin {
         this.isMouseMiddleButtonPressed = true;
       }
 
+      const isTouchOrPen = ['touch', 'pen'].includes(e.evt.pointerType);
+
       if (
         this.enabled &&
         (this.isSpaceKeyPressed ||
-          (this.moveToolActive && this.isMouseLeftButtonPressed) ||
+          (this.moveToolActive &&
+            (this.isMouseLeftButtonPressed || isTouchOrPen)) ||
           this.isMouseMiddleButtonPressed)
       ) {
         this.enableMove = true;
@@ -163,6 +166,10 @@ export class WeaveStagePanningPlugin extends WeavePlugin {
     });
 
     const handleMouseMove = (e: KonvaEventObject<PointerEvent, Stage>) => {
+      if (['touch', 'pen'].includes(e.evt.pointerType) && e.evt.buttons !== 1) {
+        return;
+      }
+
       this.pointers.set(e.evt.pointerId, {
         x: e.evt.clientX,
         y: e.evt.clientY,

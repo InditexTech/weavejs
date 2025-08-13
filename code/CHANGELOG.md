@@ -21,6 +21,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - [#604](https://github.com/InditexTech/weavejs/issues/604) Selection region stops working after pressing space key
 - [#608](https://github.com/InditexTech/weavejs/issues/608) When adding a Text node that contains spaces (used the space key) selection stops working
+- [#612](https://github.com/InditexTech/weavejs/issues/612) Panning tool doesn't work on touch devices
 
 ## [0.57.1] - 2025-08-13
 
