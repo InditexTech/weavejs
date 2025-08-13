@@ -487,7 +487,7 @@ export function getVisibleNodes(
   nodeParent: Konva.Node,
   skipNodes: string[],
   referenceLayer: Konva.Layer | Konva.Group
-) {
+): Konva.Node[] {
   const nodesSelection =
     instance.getPlugin<WeaveNodesSelectionPlugin>('nodesSelection');
 
@@ -524,19 +524,6 @@ export function getVisibleNodes(
       !node.getParent()?.getAttrs().nodeId
     ) {
       return;
-    }
-
-    if (
-      node.getParent() !== referenceLayer &&
-      node.getParent()?.getAttrs().nodeId
-    ) {
-      const realNode = stage.findOne(
-        `#${node.getParent()?.getAttrs().nodeId}`
-      ) as Konva.Group;
-
-      if (realNode && realNode !== referenceLayer) {
-        return;
-      }
     }
 
     finalVisibleNodes.push(node);
