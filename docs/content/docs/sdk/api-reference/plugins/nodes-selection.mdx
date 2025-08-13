@@ -68,10 +68,17 @@ type WeaveNodesSelectionBehaviorsConfig = {
   };
 };
 
+type WeaveNodesSelectionPanningOnSelectionConfig = {
+  edgeThreshold: number;
+  minScrollSpeed: number;
+  maxScrollSpeed: number;
+};
+
 type WeaveNodesSelectionConfig = {
   selection: Konva.TransformerConfig;
   hover: Konva.TransformerConfig;
   selectionArea: Konva.RectConfig;
+  panningWhenSelection: WeaveNodesSelectionPanningOnSelectionConfig;
   behaviors: WeaveNodesSelectionBehaviorsConfig;
 };
 
@@ -111,9 +118,53 @@ For `WeaveNodesSelectionPluginConfig`:
       description: "Selection Area style (Konva Rect configuration).",
       type: "Konva.RectConfig",
     },
+    ["panningWhenSelection"]: {
+      description: "Panning when selecting by are configuration.",
+      type: "WeaveNodesSelectionPanningOnSelectionConfig",
+    },
     ["behaviors"]: {
-      description: "Selection behaviors configuration.",
+      description: "Selection anchors behaviors configuration.",
       type: "WeaveNodesSelectionBehaviorsConfig",
+    },
+  }}
+/>
+
+For `WeaveNodesSelectionPanningOnSelectionConfig`:
+
+<TypeTable
+  type={{
+    ["edgeThreshold"]: {
+      description:
+        "Stage edge threshold when to start panning when selecting by area.",
+      type: "number",
+      default: "50",
+    },
+    ["minScrollSpeed"]: {
+      description: "Panning minimum speed when scrolling on selecting by area.",
+      type: "number",
+      default: "1",
+    },
+    ["maxScrollSpeed"]: {
+      description: "Panning maximum speed when scrolling on selecting by area.",
+      type: "number",
+      default: "15",
+    },
+  }}
+/>
+
+For `WeaveNodesSelectionBehaviorsConfig`:
+
+<TypeTable
+  type={{
+    ["singleSelection.enabled"]: {
+      description: "Enables transformer anchor handles on single selection.",
+      type: "boolean",
+      default: "true",
+    },
+    ["multipleSelection.enabled"]: {
+      description: "Enables transformer anchor handles on multiple selection.",
+      type: "boolean",
+      default: "false",
     },
   }}
 />

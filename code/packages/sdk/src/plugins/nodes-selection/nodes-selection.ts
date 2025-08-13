@@ -12,6 +12,7 @@ import {
 import Konva from 'konva';
 import { WeavePlugin } from '@/plugins/plugin';
 import {
+  WEAVE_NODES_SELECTION_DEFAULT_CONFIG,
   WEAVE_NODES_SELECTION_KEY,
   WEAVE_NODES_SELECTION_LAYER_ID,
 } from './constants';
@@ -63,72 +64,25 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
   protected isDoubleTap: boolean;
   protected tapStart: { x: number; y: number; time: number } | null;
   protected lastTapTime: number;
+  private x1!: number;
+  private y1!: number;
+  private x2!: number;
+  private y2!: number;
+  private selectionStart: { x: number; y: number } | null = null;
+  private panSpeed = { x: 0, y: 0 };
+  private panDirection = { x: 0, y: 0 };
   private pointers: Record<string, PointerEvent>;
+  private panLoopId: number | null = null;
   onRender: undefined;
 
   constructor(params?: WeaveNodesSelectionPluginParams) {
     super();
 
-    const { config } = params ?? {};
+    this.config = merge(
+      WEAVE_NODES_SELECTION_DEFAULT_CONFIG,
+      params?.config ?? {}
+    );
 
-    this.config = {
-      selection: {
-        rotationSnaps: [0, 45, 90, 135, 180, 225, 270, 315, 360],
-        rotationSnapTolerance: 3,
-        ignoreStroke: true,
-        rotateEnabled: true,
-        resizeEnabled: true,
-        flipEnabled: false,
-        keepRatio: true,
-        useSingleNodeRotation: true,
-        shouldOverdrawWholeArea: true,
-        enabledAnchors: [
-          'top-left',
-          'top-center',
-          'top-right',
-          'middle-right',
-          'middle-left',
-          'bottom-left',
-          'bottom-center',
-          'bottom-right',
-        ],
-        anchorStyleFunc: (anchor) => {
-          anchor.stroke('#27272aff');
-          anchor.cornerRadius(12);
-          if (anchor.hasName('top-center') || anchor.hasName('bottom-center')) {
-            anchor.height(8);
-            anchor.offsetY(4);
-            anchor.width(32);
-            anchor.offsetX(16);
-          }
-          if (anchor.hasName('middle-left') || anchor.hasName('middle-right')) {
-            anchor.height(32);
-            anchor.offsetY(16);
-            anchor.width(8);
-            anchor.offsetX(4);
-          }
-        },
-        borderStroke: '#1a1aff',
-        borderStrokeWidth: 2,
-        ...config?.selection,
-      },
-      hover: {
-        borderStrokeWidth: 2,
-        ...config?.hover,
-      },
-      selectionArea: {
-        fill: '#1a1aff11',
-        stroke: '#1a1aff',
-        strokeWidth: 1,
-        dash: [12, 4],
-        ...config?.selectionArea,
-      },
-      behaviors: {
-        singleSelection: { enabled: true },
-        multipleSelection: { enabled: false },
-        ...config?.behaviors,
-      },
-    };
     this.defaultEnabledAnchors = this.config.selection?.enabledAnchors ?? [
       'top-left',
       'top-center',
@@ -150,6 +104,7 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
     this.initialized = false;
     this.enabled = false;
     this.pointers = {};
+    this.panLoopId = null;
   }
 
   getName(): string {
@@ -590,6 +545,103 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
     this.triggerSelectedNodesEvent();
   }
 
+  private updateSelectionRect() {
+    const stage = this.instance.getStage();
+
+    this.x2 = stage.getRelativePointerPosition()?.x ?? 0;
+    this.y2 = stage.getRelativePointerPosition()?.y ?? 0;
+
+    this.getTransformer().nodes([]);
+
+    this.selectionRectangle.setAttrs({
+      visible: true,
+      x: Math.min(this.x1, this.x2),
+      y: Math.min(this.y1, this.y2),
+      width: Math.abs(this.x2 - this.x1),
+      height: Math.abs(this.y2 - this.y1),
+    });
+  }
+
+  private getSpeedFromEdge(distanceFromEdge: number): number {
+    if (distanceFromEdge < this.config.panningWhenSelection.edgeThreshold) {
+      const factor =
+        1 - distanceFromEdge / this.config.panningWhenSelection.edgeThreshold; // 0..1
+      return (
+        this.config.panningWhenSelection.minScrollSpeed +
+        (this.config.panningWhenSelection.maxScrollSpeed -
+          this.config.panningWhenSelection.minScrollSpeed) *
+          factor
+      );
+    }
+    return 0;
+  }
+
+  private updatePanDirection() {
+    const stage = this.instance.getStage();
+    const pos = stage.getPointerPosition();
+    const viewWidth = stage.width();
+    const viewHeight = stage.height();
+
+    if (!pos) return;
+
+    const distLeft = pos.x;
+    const distRight = viewWidth - pos.x;
+    const distTop = pos.y;
+    const distBottom = viewHeight - pos.y;
+
+    this.panDirection.x = 0;
+    this.panDirection.y = 0;
+    this.panSpeed = { x: 0, y: 0 };
+
+    if (distLeft < this.config.panningWhenSelection.edgeThreshold) {
+      this.panDirection.x = 1;
+      this.panSpeed.x = this.getSpeedFromEdge(distLeft);
+    } else if (distRight < this.config.panningWhenSelection.edgeThreshold) {
+      this.panDirection.x = -1;
+      this.panSpeed.x = this.getSpeedFromEdge(distRight);
+    }
+
+    if (distTop < this.config.panningWhenSelection.edgeThreshold) {
+      this.panDirection.y = 1;
+      this.panSpeed.y = this.getSpeedFromEdge(distTop);
+    } else if (distBottom < this.config.panningWhenSelection.edgeThreshold) {
+      this.panDirection.y = -1;
+      this.panSpeed.y = this.getSpeedFromEdge(distBottom);
+    }
+  }
+
+  private stopPanLoop() {
+    if (this.panLoopId) {
+      cancelAnimationFrame(this.panLoopId);
+      this.panLoopId = null;
+    }
+  }
+
+  private panLoop() {
+    const stage = this.instance.getStage();
+
+    if (
+      this.isAreaSelecting() &&
+      (this.panDirection.x !== 0 || this.panDirection.y !== 0)
+    ) {
+      const scale = stage.scaleX(); // assuming uniform scaling
+      const stepX = (this.panSpeed.x || 0) / scale;
+      const stepY = (this.panSpeed.y || 0) / scale;
+
+      stage.x(stage.x() + this.panDirection.x * stepX);
+      stage.y(stage.y() + this.panDirection.y * stepY);
+
+      if (this.selectionStart) {
+        this.selectionStart.x += this.panDirection.x * stepX;
+        this.selectionStart.y += this.panDirection.y * stepY;
+      }
+
+      this.updateSelectionRect();
+    }
+
+    this.panLoopId = requestAnimationFrame(() => this.panLoop());
+  }
+
   private setTapStart(
     e: KonvaEventObject<PointerEvent | DragEvent, Stage | Konva.Transformer>
   ): void {
@@ -679,7 +731,6 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
   }
 
   private initEvents() {
-    let x1: number, y1: number, x2: number, y2: number;
     this.selecting = false;
 
     const stage = this.instance.getStage();
@@ -739,6 +790,7 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
 
       if (selectedGroup?.getParent() instanceof Konva.Transformer) {
         this.selecting = false;
+        this.stopPanLoop();
         this.hideSelectorArea();
         return;
       }
@@ -756,17 +808,27 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
 
       if (!isStage && !isContainerEmptyArea && isTargetable) {
         this.selecting = false;
+        this.stopPanLoop();
         this.hideSelectorArea();
         this.handleClickOrTap(e);
         return;
       }
 
+      this.panDirection.x = 0;
+      this.panDirection.y = 0;
+      this.panSpeed = { x: 0, y: 0 };
+
       const intStage = this.instance.getStage();
 
-      x1 = intStage.getRelativePointerPosition()?.x ?? 0;
-      y1 = intStage.getRelativePointerPosition()?.y ?? 0;
-      x2 = intStage.getRelativePointerPosition()?.x ?? 0;
-      y2 = intStage.getRelativePointerPosition()?.y ?? 0;
+      this.x1 = intStage.getRelativePointerPosition()?.x ?? 0;
+      this.y1 = intStage.getRelativePointerPosition()?.y ?? 0;
+      this.x2 = intStage.getRelativePointerPosition()?.x ?? 0;
+      this.y2 = intStage.getRelativePointerPosition()?.y ?? 0;
+
+      this.selectionStart = {
+        x: this.x1,
+        y: this.y1,
+      };
 
       this.selectionRectangle.strokeWidth(
         (this.config.selectionArea.strokeWidth as number) / stage.scaleX()
@@ -783,6 +845,10 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
         'onSelectionState',
         true
       );
+
+      if (!this.panLoopId) {
+        this.panLoopId = requestAnimationFrame(() => this.panLoop());
+      }
     });
 
     const handleMouseMove = (
@@ -818,6 +884,7 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
 
       if (contextMenuPlugin && contextMenuPlugin.isContextMenuVisible()) {
         this.selecting = false;
+        this.stopPanLoop();
         return;
       }
 
@@ -830,28 +897,20 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
         return;
       }
 
-      const intStage = this.instance.getStage();
-
-      x2 = intStage.getRelativePointerPosition()?.x ?? 0;
-      y2 = intStage.getRelativePointerPosition()?.y ?? 0;
-
-      this.getTransformer().nodes([]);
-
-      this.selectionRectangle.setAttrs({
-        visible: true,
-        x: Math.min(x1, x2),
-        y: Math.min(y1, y2),
-        width: Math.abs(x2 - x1),
-        height: Math.abs(y2 - y1),
-      });
+      this.updateSelectionRect();
+      this.updatePanDirection();
     };
 
     stage.on('pointermove', handleMouseMove);
+    this.panLoop();
 
     stage.on('pointerup', (e) => {
       this.tr.setAttrs({
         listening: true,
       });
+
+      this.selecting = false;
+      this.stopPanLoop();
 
       const moved = this.checkMoved(e);
       this.checkDoubleTap(e);
@@ -874,7 +933,6 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
         return;
       }
 
-      this.selecting = false;
       this.instance.emitEvent<WeaveNodesSelectionPluginOnSelectionStateEvent>(
         'onSelectionState',
         false
@@ -895,6 +953,7 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
         !e.target.getAttrs().isContainerPrincipal;
       if ((isStage || isContainerEmptyArea) && !moved) {
         this.selecting = false;
+        this.stopPanLoop();
         this.hideSelectorArea();
         this.getSelectionPlugin()?.setSelectedNodes([]);
         return;
@@ -910,6 +969,7 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
 
       if (contextMenuPlugin && contextMenuPlugin.isContextMenuVisible()) {
         this.selecting = false;
+        this.stopPanLoop();
         return;
       }
 
@@ -1022,6 +1082,8 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
       });
 
       this.selecting = false;
+      this.stopPanLoop();
+
       this.tr.nodes([...selectedNodes]);
 
       this.handleBehaviors();
@@ -1094,6 +1156,7 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
 
     if (contextMenuPlugin?.isContextMenuVisible()) {
       this.selecting = false;
+      this.stopPanLoop();
       return;
     }
 
@@ -1236,9 +1299,13 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
     const currentAttrs = this.tr.getAttrs();
     Object.keys(currentAttrs).forEach((key) => {
       if (['rotationSnaps', 'enabledAnchors'].includes(key)) {
-        this.tr?.setAttr(key, []);
+        if (this.tr && this.tr.nodes().length > 0) {
+          this.tr.setAttr(key, []);
+        }
       } else {
-        this.tr?.setAttr(key, undefined);
+        if (this.tr && this.tr.nodes().length > 0) {
+          this.tr.setAttr(key, undefined);
+        }
       }
     });
 
@@ -1258,8 +1325,10 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
       transformerAttrs.enabledAnchors = intersectArrays(anchorsArrays);
     }
 
-    this.tr?.setAttrs(transformerAttrs);
-    this.tr?.forceUpdate();
+    if (this.tr && this.tr.nodes().length > 0) {
+      this.tr.setAttrs(transformerAttrs);
+      this.tr.forceUpdate();
+    }
   }
 
   setSelectedNodes(nodes: Konva.Node[]): void {
