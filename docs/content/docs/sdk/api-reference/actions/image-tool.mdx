@@ -42,8 +42,11 @@ type WeaveImageToolActionOnEndLoadImageEvent = Error | undefined;
 
 type WeaveImageToolActionTriggerParams = {
   imageURL?: string;
+  imageId?: string;
   options?: ImageOptions;
   position?: Vector2d;
+  forceMainContainer?: boolean;
+  stagePosition?: Vector2d;
 };
 
 type ImageCrossOrigin = "anonymous" | "use-credentials";
@@ -74,6 +77,11 @@ For `WeaveImageToolActionTriggerParams`:
         "The URL of the image, if already uploaded to an external service. URL must the same as the application URL to avoid cross-origin issues. We recommend to proxy the images through the application.",
       type: "string",
     },
+    ["imageURL"]: {
+      description:
+        "An external Id for the image. It's saved as imageId prop on the node.",
+      type: "string",
+    },
     ["options"]: {
       description:
         "The options for the HTMLImageElement DOM element. Useful for CORS support.",
@@ -83,6 +91,11 @@ For `WeaveImageToolActionTriggerParams`:
       description:
         "Position the image in this coordinates provided by the vector.",
       type: "Vector2d",
+    },
+    ["forceMainContainer"]: {
+      description:
+        "Force the image to be added in the main container and not on the container identified by the pointer.",
+      type: "boolean",
     },
   }}
 />

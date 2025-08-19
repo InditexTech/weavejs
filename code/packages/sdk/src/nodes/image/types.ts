@@ -9,6 +9,7 @@ import {
 } from '@inditextech/weave-types';
 import type Konva from 'konva';
 import type { WEAVE_IMAGE_CROP_END_TYPE } from './constants';
+import type { WeaveImageNode } from './image';
 
 export type ImageProps = WeaveElementAttributes & {
   id: string;
@@ -23,7 +24,8 @@ export type ImageProps = WeaveElementAttributes & {
 
 export type WeaveImageProperties = {
   crossOrigin: ImageCrossOrigin;
-  transform: WeaveNodeTransformerProperties;
+  transform?: WeaveNodeTransformerProperties;
+  onDblClick?: (instance: WeaveImageNode, node: Konva.Group) => void;
 };
 
 export type WeaveImageNodeParams = {

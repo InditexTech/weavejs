@@ -18,8 +18,12 @@ import {
 } from './types';
 import { WeaveImageToolAction } from '@/actions/image-tool/image-tool';
 import { WeaveImageCrop } from './crop';
-import { WEAVE_IMAGE_CROP_END_TYPE, WEAVE_IMAGE_NODE_TYPE } from './constants';
-import { isEqual } from 'lodash';
+import {
+  WEAVE_IMAGE_CROP_END_TYPE,
+  WEAVE_IMAGE_DEFAULT_CONFIG,
+  WEAVE_IMAGE_NODE_TYPE,
+} from './constants';
+import { isEqual, merge } from 'lodash';
 import { WEAVE_STAGE_DEFAULT_MODE } from '../stage/constants';
 import { IMAGE_TOOL_ACTION_NAME } from '@/actions/image-tool/constants';
 
@@ -50,12 +54,7 @@ export class WeaveImageNode extends WeaveNode {
 
     this.tapStart = { x: 0, y: 0, time: 0 };
     this.lastTapTime = 0;
-    this.config = {
-      crossOrigin: config?.crossOrigin ?? 'anonymous',
-      transform: {
-        ...config?.transform,
-      },
-    };
+    this.config = merge(WEAVE_IMAGE_DEFAULT_CONFIG, config);
     this.imageCrop = null;
     this.cachedCropInfo = {};
     this.imageLoaded = false;
@@ -63,6 +62,14 @@ export class WeaveImageNode extends WeaveNode {
 
   triggerCrop(imageNode: Konva.Group): void {
     const stage = this.instance.getStage();
+
+    if (imageNode.getAttrs().cropping ?? false) {
+      return;
+    }
+
+    if (!(this.isSelecting() && this.isNodeSelected(imageNode))) {
+      return;
+    }
 
     stage.mode('cropping');
 
@@ -284,19 +291,7 @@ export class WeaveImageNode extends WeaveNode {
     this.setupDefaultNodeEvents(image);
 
     image.dblClick = () => {
-      if (image.getAttrs().cropping ?? false) {
-        return;
-      }
-
-      if (!internalImage.getAttr('image')) {
-        return;
-      }
-
-      if (!(this.isSelecting() && this.isNodeSelected(image))) {
-        return;
-      }
-
-      this.triggerCrop(image);
+      this.config.onDblClick?.(this, image);
     };
 
     const imageActionTool = this.getImageToolAction();

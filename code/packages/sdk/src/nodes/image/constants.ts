@@ -8,3 +8,7 @@ export const WEAVE_IMAGE_CROP_END_TYPE = {
   ['ACCEPT']: 'accept',
   ['CANCEL']: 'cancel',
 };
+
+export const WEAVE_IMAGE_DEFAULT_CONFIG = {
+  crossOrigin: 'anonymous',
+};
