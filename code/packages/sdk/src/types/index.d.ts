@@ -7,6 +7,7 @@ declare global {
     weave: Weave;
     weaveTextEditing: Record<string, string>;
     weaveDragImageURL: string | undefined;
+    weaveDragImageId: string | undefined;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     clipboardData: any;
   }

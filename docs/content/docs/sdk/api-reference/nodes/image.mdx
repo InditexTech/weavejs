@@ -49,7 +49,8 @@ type ImageCrossOrigin = "anonymous" | "use-credentials";
 
 type WeaveImageProperties = {
   crossOrigin: ImageCrossOrigin;
-  transform: WeaveNodeTransformerProperties;
+  transform?: WeaveNodeTransformerProperties;
+  onDblClick?: (instance: WeaveImageNode, node: Konva.Group) => void;
 };
 
 type WeaveImageNodeParams = {
@@ -102,7 +103,11 @@ For `WeaveImageProperties`:
       description:
         "Setup the transform properties for the image (if can be resized, rotated, anchors, etc.).",
       type: "object",
-      default: "check default values",
+    },
+    ["onDblClick"]: {
+      description:
+        "Setup an callback that is called when an user double-click (or double tap) on the node",
+      type: "(instance: WeaveImageNode, node: Konva.Group) => void",
     },
   }}
 />

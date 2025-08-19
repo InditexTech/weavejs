@@ -76,11 +76,14 @@ export class WeaveImageToolAction extends WeaveAction {
       if (window.weaveDragImageURL) {
         this.instance.getStage().setPointersPositions(e);
         const position = this.instance.getStage().getRelativePointerPosition();
+
         this.instance.triggerAction(IMAGE_TOOL_ACTION_NAME, {
           imageURL: window.weaveDragImageURL,
+          imageId: window.weaveDragImageId,
           position,
         });
         window.weaveDragImageURL = undefined;
+        window.weaveDragImageId = undefined;
       }
     });
   }
@@ -345,6 +348,12 @@ export class WeaveImageToolAction extends WeaveAction {
     }
 
     this.forceMainContainer = params?.forceMainContainer ?? false;
+
+    if (params?.imageId) {
+      this.updateProps({
+        imageId: params.imageId,
+      });
+    }
 
     if (params?.imageURL) {
       this.loadImage(

@@ -20,10 +20,10 @@ export type WeaveImageToolActionOnAddedEvent = {
 
 export type WeaveImageToolActionTriggerParams = {
   imageURL?: string;
+  imageId?: string;
   options?: ImageOptions;
   position?: Vector2d;
   forceMainContainer?: boolean;
-  stagePosition?: Vector2d;
 };
 
 export type ImageOptions = {
