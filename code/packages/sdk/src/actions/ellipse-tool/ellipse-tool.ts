@@ -80,6 +80,14 @@ export class WeaveEllipseToolAction extends WeaveAction {
       }
     });
 
+    stage.on('pointerover', () => {
+      if (this.state === ELLIPSE_TOOL_STATE.IDLE) return;
+
+      stage.container().style.cursor = 'crosshair';
+      stage.container().blur();
+      stage.container().focus();
+    });
+
     stage.on('pointerdown', (e) => {
       this.setTapStart(e);
 

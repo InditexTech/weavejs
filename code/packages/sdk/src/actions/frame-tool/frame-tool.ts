@@ -64,6 +64,14 @@ export class WeaveFrameToolAction extends WeaveAction {
       }
     });
 
+    stage.on('pointerover', () => {
+      if (this.state === FRAME_TOOL_STATE.IDLE) return;
+
+      stage.container().style.cursor = 'crosshair';
+      stage.container().blur();
+      stage.container().focus();
+    });
+
     stage.on('pointerclick', () => {
       if (this.state === FRAME_TOOL_STATE.IDLE) {
         return;

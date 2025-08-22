@@ -93,6 +93,14 @@ export class WeaveBrushToolAction extends WeaveAction {
       }
     });
 
+    stage.on('pointerover', () => {
+      if (this.state === BRUSH_TOOL_STATE.INACTIVE) return;
+
+      stage.container().style.cursor = 'crosshair';
+      stage.container().blur();
+      stage.container().focus();
+    });
+
     const handlePointerDown = (e: Konva.KonvaEventObject<PointerEvent>) => {
       if (this.state !== BRUSH_TOOL_STATE.IDLE) {
         return;
