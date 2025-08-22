@@ -11,7 +11,6 @@ import type { WeaveStageZoomPlugin } from '../stage-zoom/stage-zoom';
 import type { WeaveContextMenuPlugin } from '../context-menu/context-menu';
 import { MOVE_TOOL_ACTION_NAME } from '@/actions/move-tool/constants';
 import {
-  getClosestParentWithId,
   getTopmostShadowHost,
   // getTopmostShadowHost,
   isInShadowDOM,
@@ -236,7 +235,8 @@ export class WeaveStagePanningPlugin extends WeavePlugin {
         this.isCtrlOrMetaPressed ||
         e.buttons === 4 ||
         !performPanning ||
-        getClosestParentWithId(elementUnderMouse) !== stage.container()
+        this.instance.getClosestParentWithWeaveId(elementUnderMouse) !==
+          stage.container()
       ) {
         return;
       }

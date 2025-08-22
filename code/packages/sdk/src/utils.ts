@@ -457,14 +457,6 @@ export function getVisibleNodesInViewport(
   return visibleNodes;
 }
 
-export function getClosestParentWithId(el: DOMElement): DOMElement {
-  while (el) {
-    if (el.id) return el;
-    el = el.parentElement;
-  }
-  return null;
-}
-
 export function isInShadowDOM(el: DOMElement): boolean {
   return el?.getRootNode() instanceof ShadowRoot;
 }

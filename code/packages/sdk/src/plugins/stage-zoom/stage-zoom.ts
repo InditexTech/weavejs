@@ -17,12 +17,7 @@ import {
   WEAVE_STAGE_ZOOM_TYPE,
 } from './constants';
 import type { Vector2d } from 'konva/lib/types';
-import {
-  getBoundingBox,
-  getClosestParentWithId,
-  getTopmostShadowHost,
-  isInShadowDOM,
-} from '@/utils';
+import { getBoundingBox, getTopmostShadowHost, isInShadowDOM } from '@/utils';
 import type { WeaveContextMenuPlugin } from '../context-menu/context-menu';
 import type { WeaveStageGridPlugin } from '../stage-grid/stage-grid';
 
@@ -635,7 +630,8 @@ export class WeaveStageZoomPlugin extends WeavePlugin {
       if (
         !this.enabled ||
         !performZoom ||
-        getClosestParentWithId(elementUnderMouse) !== stage.container()
+        this.instance.getClosestParentWithWeaveId(elementUnderMouse) !==
+          stage.container()
       ) {
         return;
       }

@@ -88,6 +88,14 @@ export class WeaveArrowToolAction extends WeaveAction {
       }
     });
 
+    stage.on('pointerover', () => {
+      if (this.state === ARROW_TOOL_STATE.IDLE) return;
+
+      stage.container().style.cursor = 'crosshair';
+      stage.container().blur();
+      stage.container().focus();
+    });
+
     stage.on('pointerdown', (e) => {
       this.setTapStart(e);
 

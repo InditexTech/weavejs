@@ -54,6 +54,7 @@ import { WeavePluginsManager } from './managers/plugins';
 import { WeaveNodesSelectionPlugin } from './plugins/nodes-selection/nodes-selection';
 import type { StageConfig } from 'konva/lib/Stage';
 import type { WeaveStoreOnRoomLoadedEvent } from './stores/types';
+import type { DOMElement } from './types';
 
 export class Weave {
   private id: string;
@@ -347,6 +348,22 @@ export class Weave {
 
   getContainerNodes(): WeaveElementInstance[] {
     return this.stageManager.getContainerNodes();
+  }
+
+  getClosestParentWithWeaveId(el: DOMElement): DOMElement {
+    const weaveContainer = this.getStageConfiguration().container;
+    let weaveId: string | undefined = undefined;
+    if (weaveContainer instanceof HTMLElement) {
+      weaveId = weaveContainer.id;
+    }
+    if (typeof weaveContainer === 'string') {
+      weaveId = weaveContainer;
+    }
+    while (el) {
+      if (el.id && el.id === weaveId) return el;
+      el = el.parentElement;
+    }
+    return null;
   }
 
   // REGISTERS MANAGEMENT METHODS PROXIES

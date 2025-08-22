@@ -79,6 +79,14 @@ export class WeaveRectangleToolAction extends WeaveAction {
       }
     });
 
+    stage.on('pointerover', () => {
+      if (this.state === RECTANGLE_TOOL_STATE.IDLE) return;
+
+      stage.container().style.cursor = 'crosshair';
+      stage.container().blur();
+      stage.container().focus();
+    });
+
     stage.on('pointerdown', (e) => {
       this.setTapStart(e);
 

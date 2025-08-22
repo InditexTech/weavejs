@@ -415,8 +415,6 @@ export abstract class WeaveNode implements WeaveNodeBase {
       });
 
       node.on('pointerover', (e) => {
-        e.cancelBubble = true;
-
         const stage = this.instance.getStage();
         const activeAction = this.instance.getActiveAction();
 
@@ -441,6 +439,7 @@ export abstract class WeaveNode implements WeaveNodeBase {
         ) {
           const stage = this.instance.getStage();
           stage.container().style.cursor = 'default';
+          e.cancelBubble = true;
         }
 
         // Node is not locked
@@ -456,16 +455,19 @@ export abstract class WeaveNode implements WeaveNodeBase {
           const stage = this.instance.getStage();
           stage.container().style.cursor = 'pointer';
           this.setHoverState(realNode);
+          e.cancelBubble = true;
         }
 
         if (!isTargetable) {
           this.hideHoverState();
+          e.cancelBubble = true;
         }
 
         // We're on pasting mode
         if (this.isPasting()) {
           const stage = this.instance.getStage();
           stage.container().style.cursor = 'crosshair';
+          e.cancelBubble = true;
         }
       });
     }
