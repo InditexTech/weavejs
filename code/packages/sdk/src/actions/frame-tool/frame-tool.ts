@@ -54,7 +54,7 @@ export class WeaveFrameToolAction extends WeaveAction {
   private setupEvents() {
     const stage = this.instance.getStage();
 
-    stage.container().addEventListener('keydown', (e) => {
+    window.addEventListener('keydown', (e) => {
       if (
         e.key === 'Escape' &&
         this.instance.getActiveAction() === FRAME_TOOL_ACTION_NAME
@@ -64,12 +64,12 @@ export class WeaveFrameToolAction extends WeaveAction {
       }
     });
 
-    stage.on('pointerover', () => {
-      if (this.state === FRAME_TOOL_STATE.IDLE) return;
+    stage.on('pointermove', () => {
+      if (this.state === FRAME_TOOL_STATE.IDLE) {
+        return;
+      }
 
-      stage.container().style.cursor = 'crosshair';
-      stage.container().blur();
-      stage.container().focus();
+      this.setCursor();
     });
 
     stage.on('pointerclick', () => {
@@ -91,10 +91,8 @@ export class WeaveFrameToolAction extends WeaveAction {
   }
 
   private addFrame() {
-    const stage = this.instance.getStage();
-
-    stage.container().style.cursor = 'crosshair';
-    stage.container().focus();
+    this.setCursor();
+    this.setFocusStage();
 
     this.instance.emitEvent<WeaveFrameToolActionOnAddingEvent>('onAddingFrame');
 
@@ -182,5 +180,17 @@ export class WeaveFrameToolAction extends WeaveAction {
     this.container = undefined;
     this.clickPoint = null;
     this.setState(FRAME_TOOL_STATE.IDLE);
+  }
+
+  private setCursor() {
+    const stage = this.instance.getStage();
+    stage.container().style.cursor = 'crosshair';
+  }
+
+  private setFocusStage() {
+    const stage = this.instance.getStage();
+    stage.container().tabIndex = 1;
+    stage.container().blur();
+    stage.container().focus();
   }
 }

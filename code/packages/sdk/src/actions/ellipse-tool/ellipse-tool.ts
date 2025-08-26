@@ -63,7 +63,7 @@ export class WeaveEllipseToolAction extends WeaveAction {
   private setupEvents() {
     const stage = this.instance.getStage();
 
-    stage.container().addEventListener('keydown', (e) => {
+    window.addEventListener('keydown', (e) => {
       if (
         e.key === 'Enter' &&
         this.instance.getActiveAction() === ELLIPSE_TOOL_ACTION_NAME
@@ -78,14 +78,6 @@ export class WeaveEllipseToolAction extends WeaveAction {
         this.cancelAction();
         return;
       }
-    });
-
-    stage.on('pointerover', () => {
-      if (this.state === ELLIPSE_TOOL_STATE.IDLE) return;
-
-      stage.container().style.cursor = 'crosshair';
-      stage.container().blur();
-      stage.container().focus();
     });
 
     stage.on('pointerdown', (e) => {
@@ -112,6 +104,10 @@ export class WeaveEllipseToolAction extends WeaveAction {
     });
 
     stage.on('pointermove', (e) => {
+      if (this.state === ELLIPSE_TOOL_STATE.IDLE) return;
+
+      this.setCursor();
+
       if (!this.isPressed(e)) return;
 
       if (!this.pointers.has(e.evt.pointerId)) return;
@@ -155,10 +151,8 @@ export class WeaveEllipseToolAction extends WeaveAction {
   }
 
   private addEllipse() {
-    const stage = this.instance.getStage();
-
-    stage.container().style.cursor = 'crosshair';
-    stage.container().focus();
+    this.setCursor();
+    this.setFocusStage();
 
     this.instance.emitEvent<WeaveEllipseToolActionOnAddingEvent>(
       'onAddingEllipse'
@@ -329,5 +323,17 @@ export class WeaveEllipseToolAction extends WeaveAction {
     this.container = undefined;
     this.clickPoint = null;
     this.setState(ELLIPSE_TOOL_STATE.IDLE);
+  }
+
+  private setCursor() {
+    const stage = this.instance.getStage();
+    stage.container().style.cursor = 'crosshair';
+  }
+
+  private setFocusStage() {
+    const stage = this.instance.getStage();
+    stage.container().tabIndex = 1;
+    stage.container().blur();
+    stage.container().focus();
   }
 }

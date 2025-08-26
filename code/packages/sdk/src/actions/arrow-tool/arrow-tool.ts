@@ -71,7 +71,7 @@ export class WeaveArrowToolAction extends WeaveAction {
   private setupEvents() {
     const stage = this.instance.getStage();
 
-    stage.container().addEventListener('keydown', (e) => {
+    window.addEventListener('keydown', (e) => {
       if (
         e.key === 'Enter' &&
         this.instance.getActiveAction() === ARROW_TOOL_ACTION_NAME
@@ -86,14 +86,6 @@ export class WeaveArrowToolAction extends WeaveAction {
         this.cancelAction();
         return;
       }
-    });
-
-    stage.on('pointerover', () => {
-      if (this.state === ARROW_TOOL_STATE.IDLE) return;
-
-      stage.container().style.cursor = 'crosshair';
-      stage.container().blur();
-      stage.container().focus();
     });
 
     stage.on('pointerdown', (e) => {
@@ -122,6 +114,10 @@ export class WeaveArrowToolAction extends WeaveAction {
     });
 
     stage.on('pointermove', () => {
+      if (this.state === ARROW_TOOL_STATE.IDLE) return;
+
+      this.setCursor();
+
       if (
         this.pointers.size === 2 &&
         this.instance.getActiveAction() === ARROW_TOOL_ACTION_NAME
@@ -151,10 +147,8 @@ export class WeaveArrowToolAction extends WeaveAction {
   }
 
   private addArrow() {
-    const stage = this.instance.getStage();
-
-    stage.container().style.cursor = 'crosshair';
-    stage.container().focus();
+    this.setCursor();
+    this.setFocusStage();
 
     this.instance.emitEvent<WeaveArrowToolActionOnAddingEvent>('onAddingArrow');
 
@@ -378,5 +372,17 @@ export class WeaveArrowToolAction extends WeaveAction {
     this.measureContainer = undefined;
     this.clickPoint = null;
     this.setState(ARROW_TOOL_STATE.IDLE);
+  }
+
+  private setCursor() {
+    const stage = this.instance.getStage();
+    stage.container().style.cursor = 'crosshair';
+  }
+
+  private setFocusStage() {
+    const stage = this.instance.getStage();
+    stage.container().tabIndex = 1;
+    stage.container().blur();
+    stage.container().focus();
   }
 }
