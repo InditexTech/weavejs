@@ -10,13 +10,19 @@ export type WeaveCommentToolActionStateKeys =
 export type WeaveCommentToolActionState =
   (typeof WEAVE_COMMENT_TOOL_STATE)[WeaveCommentToolActionStateKeys];
 
-export type WeaveCommentToolActionConfig<T> = {
-  style: {
-    cursor: {
-      add: string;
-      block: string;
-    };
+export type WeaveCommentToolStyle = {
+  cursor: {
+    add: string;
+    block: string;
   };
+};
+
+export type WeaveCommentToolModel<T> = {
+  getCreateModel: () => DeepPartial<T>;
+};
+
+export type WeaveCommentToolActionConfig<T> = {
+  style: WeaveCommentToolStyle;
   getUser: () => WeaveUser;
   getUserBackgroundColor: (
     user: WeaveUser
@@ -24,9 +30,7 @@ export type WeaveCommentToolActionConfig<T> = {
   getUserForegroundColor: (
     user: WeaveUser
   ) => string | CanvasGradient | undefined;
-  model: {
-    getCreateModel: () => DeepPartial<T>;
-  };
+  model: WeaveCommentToolModel<T>;
 };
 
 export type WeaveCommentToolActionParams<T> = {

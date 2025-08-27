@@ -7,18 +7,18 @@ import { TypeTable } from "fumadocs-ui/components/type-table";
 
 ## Overview
 
-The [WeaveArrowNode](https://github.com/InditexTech/weavejs/blob/main/code/packages/sdk/src/nodes/arrow/arrow.ts)
-class represents a basic arrow shape within the Weave.js canvas.
+The [WeaveCommentNode](https://github.com/InditexTech/weavejs/blob/main/code/packages/sdk/src/nodes/comment/comment.ts)
+class represents a way to provide feedback to users and let them know where comments have been
+created on the Weave.js canvas.
 
-Built on top of Konva’s [Arrow](https://konvajs.org/api/Konva.Arrow.html) class shape under the hood, the WeaveArrowNode
-offers a simple yet powerful primitive that supports full interaction, styling, and real-time synchronization.
-
-Arrow are ideal for:
-
-- Point to important stuff on whiteboards.
-- Connect flows of ideas.
+It also provides a headless mechanism to render DOM nodes to create or view / manage the comment model.
 
 The class extends the [WeaveNode](/docs/sdk/api-reference/nodes/node) class
+
+<Callout title="Not shareable thought the room state" type="warning">
+  This node is intended and designed to be used standalone, it doesn't support
+  to be shared via the room state mechanism.
+</Callout>
 
 ## Type
 
@@ -27,79 +27,338 @@ This node `nodeType` property value is `arrow`.
 ## Import
 
 ```shell
-import { WeaveArrowNode } from "@inditextech/weave-sdk";
+import { WeaveCommentNode } from "@inditextech/weave-sdk";
 ```
 
 ## Instantiation
 
 ```ts
-new WeaveArrowNode(params?: WeaveArrowNodeParams);
+new WeaveCommentNode<T>(params: WeaveCommentNodeParams<T>);
 ```
 
 ## TypeScript types
 
 ```ts
-type WeaveNodeTransformerProperties = Konva.TransformerConfig;
+type WeaveCommentNodeCreateActionKeys =
+  keyof typeof WEAVE_COMMENT_CREATE_ACTION;
+type WeaveCommentNodeCreateAction =
+  (typeof WEAVE_COMMENT_CREATE_ACTION)[WeaveCommentNodeCreateActionKeys];
 
-type WeaveArrowProperties = {
-  transform: WeaveNodeTransformerProperties;
+type WeaveCommentNodeViewActionKeys = keyof typeof WEAVE_COMMENT_VIEW_ACTION;
+type WeaveCommentNodeViewAction =
+  (typeof WEAVE_COMMENT_VIEW_ACTION)[WeaveCommentNodeViewActionKeys];
+
+type WeaveCommentNodeActionKeys = keyof typeof WEAVE_COMMENT_NODE_ACTION;
+type WeaveCommentNodeAction =
+  (typeof WEAVE_COMMENT_NODE_ACTION)[WeaveCommentNodeActionKeys];
+
+type WeaveCommentStatusKeys = keyof typeof WEAVE_COMMENT_STATUS;
+type WeaveCommentStatus = (typeof WEAVE_COMMENT_STATUS)[WeaveCommentStatusKeys];
+
+type WeaveCommentNodeStyle = {
+  stroke: string;
+  strokeWidth: number;
+  shadowColor: string;
+  shadowBlur: number;
+  shadowOffsetX: number;
+  shadowOffsetY: number;
+  shadowOpacity: number;
+  contracted: {
+    width: number;
+    height: number;
+    circlePadding: number;
+    userName: {
+      fontFamily: string;
+      fontSize: number;
+      fontStyle: string;
+    };
+  };
+  expanded: {
+    width: number;
+    userNameLeftMargin: number;
+    dateLeftMargin: number;
+    contentTopMargin: number;
+    contentBottomMargin: number;
+    userName: {
+      fontFamily: string;
+      fontSize: number;
+      fontStyle: string;
+      color: string;
+    };
+    date: {
+      fontFamily: string;
+      fontSize: number;
+      fontStyle: string;
+      color: string;
+    };
+    content: {
+      maxLines: number;
+      fontFamily: string;
+      fontSize: number;
+      fontStyle: string;
+      color: string;
+    };
+  };
+  creating: {
+    paddingX: number;
+    paddingY: number;
+    stroke: string;
+    strokeWidth: number;
+  };
+  viewing: {
+    paddingX: number;
+    paddingY: number;
+    stroke: string;
+    strokeWidth: number;
+  };
 };
 
-type WeaveArrowNodeParams = {
-  config: Partial<WeaveArrowProperties>;
+type WeaveCommentNodeModel<T> = {
+  getDate: (comment: T) => string;
+  getId: (comment: T) => string;
+  getUserId: (comment: T) => string;
+  getStatus: (comment: T) => WeaveCommentStatus;
+  getUserShortName: (comment: T) => string;
+  getUserFullName: (comment: T) => string;
+  canUserDrag: (comment: T) => boolean;
+  getContent: (comment: T) => string;
+  setMarkResolved: (comment: T) => T;
+  setContent: (comment: T, content: string) => T;
+};
+
+type WeaveCommentNodeConfig<T> = {
+  style: WeaveCommentNodeStyle;
+  model: WeaveCommentNodeModel<T>;
+  formatDate: (date: string) => string;
+  createComment: (
+    ele: HTMLDivElement,
+    node: WeaveElementInstance,
+    finish: (
+      node: WeaveElementInstance,
+      content: string,
+      action: WeaveCommentNodeCreateAction
+    ) => void
+  ) => Promise<void>;
+  viewComment: (
+    ele: HTMLDivElement,
+    node: WeaveElementInstance,
+    finish: (
+      node: WeaveElementInstance,
+      content: string,
+      action: WeaveCommentNodeViewAction
+    ) => void
+  ) => Promise<void>;
+};
+
+type WeaveCommentNodeParams<T> = {
+  config: Pick<
+    WeaveCommentNodeConfig<T>,
+    "model" | "formatDate" | "createComment" | "viewComment"
+  > &
+    DeepPartial<Pick<WeaveCommentNodeConfig<T>, "style">>;
+};
+
+type WeaveCommentNodeOnFinishCreateEvent = {
+  node: WeaveElementInstance;
+  action: WeaveCommentNodeCreateAction;
+};
+
+type WeaveCommentNodeOnCreateCommentEvent = {
+  node: WeaveElementInstance;
+  position: Konva.Vector2d;
+  content: string;
+};
+
+type WeaveCommentNodeOnViewEvent = {
+  node: WeaveElementInstance;
+};
+
+type WeaveCommentNodeOnDragStartEvent = {
+  node: WeaveElementInstance;
+};
+
+type WeaveCommentNodeOnDragEndEvent = {
+  node: WeaveElementInstance;
 };
 ```
 
 ## Parameters
 
-For `WeaveArrowNodeParams`:
+For `WeaveCommentNodeParams<T>`:
 
 <TypeTable
   type={{
     ["config"]: {
       required: true,
       description: "Config parameters for the node.",
-      type: "Partial<WeaveArrowProperties>",
+      type: "Pick<WeaveCommentNodeConfig<T>, 'model' | 'formatDate' | 'createComment' | 'viewComment'> & DeepPartial<Pick<WeaveCommentNodeConfig<T>, 'style'>>",
     },
   }}
 />
 
-For `WeaveArrowProperties`:
+For `Pick<WeaveCommentNodeConfig<T>, 'model' | 'formatDate' | 'createComment' | 'viewComment'> & DeepPartial<Pick<WeaveCommentNodeConfig<T>, 'style'>>`:
 
 <TypeTable
   type={{
-    ["transform"]: {
+    ["style"]: {
       description:
-        "Setup the transform properties for the arrow (if can be resized, rotated, anchors, etc.).",
-      type: "object",
+        "Defines the node canvas UI style.",
+      type: "WeaveCommentNodeStyle",
       default: "check default values",
     },
-  }}
+    ["model"]: {
+      required: true,
+      description:
+        "Setup the Entity model ",
+      type: "WeaveCommentNodeModel<T>",
+    },
+    ["formatDate"]: {
+      required: true,
+      description:
+        "A function that formats the date when used on the canvas UI.",
+      type: "(date: string) => string",
+    },
+    ["createComment"]: {
+      required: true,
+      description:
+        "A callback that is called when the create comment overlay UI is needed to be render.",
+      type: "(ele: HTMLDivElement, node: WeaveElementInstance, finish: (node: WeaveElementInstance, content: string, action: WeaveCommentNodeCreateAction) => void) => Promise<void>",
+    },
+    ["viewComment"]: {
+      required: true,
+      description:
+        "A callback that is called when the view / manage comment overlay UI is needed to be render.",
+      type: "(ele: HTMLDivElement, node: WeaveElementInstance, finish: (node: WeaveElementInstance, content: string, action: WeaveCommentNodeViewAction) => void) => Promise<void>",
+    },
+
+}}
 />
 
 ## Default values
 
 ```ts
-const WEAVE_TRANSFORMER_ANCHORS = {
-  ["TOP_LEFT"]: "top-left",
-  ["TOP_CENTER"]: "top-center",
-  ["TOP_RIGHT"]: "top-right",
-  ["MIDDLE_RIGHT"]: "middle-right",
-  ["MIDDLE_LEFT"]: "middle-left",
-  ["BOTTOM_LEFT"]: "bottom-left",
-  ["BOTTOM_CENTER"]: "bottom-center",
-  ["BOTTOM_RIGHT"]: "bottom-right",
-};
+const WEAVE_COMMENT_STATUS = {
+  PENDING: "pending",
+  RESOLVED: "resolved",
+} as const;
 
-const WEAVE_DEFAULT_ENABLED_ANCHORS: string[] = Object.values(
-  WEAVE_TRANSFORMER_ANCHORS
-);
+const WEAVE_COMMENT_CREATE_ACTION = {
+  CREATE: "create",
+  CLOSE: "close",
+} as const;
 
-const WEAVE_DEFAULT_TRANSFORM_PROPERTIES: WeaveNodeTransformerProperties = {
-  rotateEnabled: true,
-  resizeEnabled: true,
-  enabledAnchors: WEAVE_DEFAULT_ENABLED_ANCHORS,
-  borderStrokeWidth: 3,
-  padding: 0,
+const WEAVE_COMMENT_VIEW_ACTION = {
+  REPLY: "reply",
+  MARK_RESOLVED: "markResolved",
+  EDIT: "edit",
+  DELETE: "delete",
+  CLOSE: "close",
+} as const;
+
+const WEAVE_COMMENT_NODE_ACTION = {
+  IDLE: "idle",
+  CREATING: "creating",
+  VIEWING: "viewing",
+} as const;
+
+const WEAVE_COMMENT_NODE_TYPE = "comment";
+
+const WEAVE_COMMENT_NODE_DEFAULTS = {
+  style: {
+    stroke: "#000000",
+    strokeWidth: 0,
+    shadowColor: "rgba(0,0,0,0.25)",
+    shadowBlur: 4,
+    shadowOffsetX: 0,
+    shadowOffsetY: 0,
+    shadowOpacity: 0.8,
+    contracted: {
+      width: 40,
+      height: 40,
+      circlePadding: 2,
+      userName: {
+        fontFamily: "arial, sans-serif",
+        fontSize: 14,
+        fontStyle: "normal",
+      },
+    },
+    expanded: {
+      width: 250,
+      userNameLeftMargin: 8,
+      dateLeftMargin: 8,
+      contentTopMargin: 8,
+      contentBottomMargin: 12,
+      userName: {
+        fontFamily: "arial, sans-serif",
+        fontSize: 12,
+        fontStyle: "bold",
+        color: "#000000",
+      },
+      date: {
+        fontFamily: "arial, sans-serif",
+        fontSize: 12,
+        fontStyle: "normal",
+        color: "#757575",
+      },
+      content: {
+        fontFamily: "arial, sans-serif",
+        fontSize: 12,
+        maxLines: 3,
+        fontStyle: "normal",
+        color: "#000000",
+      },
+    },
+    creating: {
+      paddingX: 8,
+      paddingY: -4,
+      stroke: "#1a1aff",
+      strokeWidth: 2,
+    },
+    viewing: {
+      paddingX: 8,
+      paddingY: -18,
+      stroke: "#1a1aff",
+      strokeWidth: 2,
+    },
+  },
+  formatDate: (date: string) => date,
 };
 ```
+
+## Events
+
+### onCommentFinishCreate
+
+```ts
+onCommentFinishCreate: WeaveCommentNodeOnFinishCreateEvent;
+```
+
+The `onCommentFinishCreate` event is called when the create loop is finished.
+
+### onCommentCreate
+
+```ts
+onCommentCreate: WeaveCommentNodeOnCreateCommentEvent;
+```
+
+The `onCommentCreate` event is called when a comment is created. Useful to initiate sync
+state with other peers.
+
+### onCommentView
+
+```ts
+onCommentView: WeaveCommentNodeOnViewEvent;
+```
+
+The `onCommentView` event is called when a comment overlay DOM is rendered on the UI.
+Used internally on the [Comment tool](/docs/main/build/actions/comment-tool) to handle it
+internal state machine.
+
+### onCommentDragEnd
+
+```ts
+onCommentDragEnd: WeaveCommentNodeOnDragEndEvent;
+```
+
+The `onCommentDragEnd` event is called when a comment finished a drag to change it's position.
+Useful to update the model with the new (x,y) coordinates for the new position.

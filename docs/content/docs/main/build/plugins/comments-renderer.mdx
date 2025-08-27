@@ -1,22 +1,21 @@
 ---
 title: Comments Renderer
-description: Get an structure with information about the connected users
+description: Render the comments of a room in a special layer
 ---
-
-![Connected Users plugin on use on the Weave.js showcase](/images/plugins/connected-users.gif)
 
 ## Introduction
 
-This plugin returns the list of users currently active in a collaborative session.
-It can provide the user name and email, helping participants stay aware of who’s
-online and interacting with the canvas.
+This plugin renders the provided comments (as a model) on a special layer on the canvas,
+this layer is not synced using the room state, is independent.
 
-<Callout title="UI Agnostic" type="info">
-  This plugin only returns an structure of the connected users to a
-  [room](/docs/main/glossary#room), it doesn't provide an UI.
-</Callout>
+Take into consideration, that the rendering is not automatic, meaning that if:
 
-## Usage
+- Other user adds, changes, or reply a comment
+- Yourself add, change or reply to a comment
+
+This will not trigger a re-render of the comments, you need to manually trigger the re-render
+when this actions happens, this is intended in order to decouple Weave internal and make the
+tool headless from all points of view: UI, Backend and Entity model.
 
 <div className="fd-steps">
 
@@ -43,7 +42,14 @@ const instance = new Weave({
   ...
   plugins: [
     ...,
-    new WeaveConnectedUsersPlugin(), // [!code ++]
+    new WeaveConnectedUsersPlugin({ // [!code ++]
+      config: { // [!code ++]
+        model, // here you define some utils to work with your Entity model // [!code ++]
+        getUser, // we need the current user model when creating // [!code ++]
+        getUserBackgroundColor, // define the background color associated to an user // [!code ++]
+        getUserForegroundColor, // define the foreground color associated to an user // [!code ++]
+      } // [!code ++]
+    }), // [!code ++]
   ]
 })
 ```
@@ -54,26 +60,10 @@ const instance = new Weave({
 
 ### Use the plugin
 
-Once the plugin is registered you can add a listener with the [Weave](/docs/sdk/api-reference/weave)
-instance [Events API](/docs/sdk/api-reference/weave#events) that listen to the event named `onConnectedUsersChange`.
+Once the plugin is registered you have an API to control when to render the comments:
 
-```ts
-// Import types
-import type {
-  WeaveConnectedUsers,
-  WeaveConnectedUsersChangeEvent,
-} from "@inditextech/weave-sdk";
-
-instance.addEventListener<WeaveConnectedUsersChangeEvent>(
-  "onConnectedUsersChange",
-  (users: WeaveConnectedUsers) => {
-    console.log(users);
-  }
-);
-```
-
-With this callback you can save this information on the UI state and render accordingly, whenever it
-changes your UI will remain updated.
+- `setComments(comments: T[]): void`: this function sets the comments to render, based on your Entity model.
+- `render(): void`: this function is the one that renders the comments on the room stage, call it whenever the comments changed.
 
 </div>
 

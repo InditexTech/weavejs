@@ -3,7 +3,7 @@ title: Comment Tool
 description: Allow users to comment on top of the stage content.
 ---
 
-![Comment Tool action on use on the Weave.js showcase](/images/actions/comment-tool.gif)
+![Comment Tool action on the Weave.js showcase](/images/actions/comment-tool.png)
 
 import { Accordion, Accordions } from "fumadocs-ui/components/accordion";
 import { Kbd } from "@/components/kbd";
@@ -11,13 +11,20 @@ import { Kbd } from "@/components/kbd";
 ## Introduction
 
 This action enables users to attach inline feedback on top of the stage content, useful to communicate
-with other peers on a collaborative canvas like Weave.
+and work collaborative with other peers..
 
-The Comment Tool only provides the handling of Weave internals, in order to make it work you need to provide:
+This tool is headless, this means that only provides the handling of Weave internals, in order
+to make it fully work you need to provide:
 
-- UI / UX
-- Comments store backend
+- The UI / UX for the app you're building
+- A backend to store / retrieve / manage the Comments
 - Comments replication among peers
+
+<Callout title="Showcase implementation example" type="info">
+  On the showcase we use Next.js (React) as UI, we provide some API's (CRUD) to
+  operate and query the comments, that are are stored on a database. We also
+  share changes with other peers via SSE.
+</Callout>
 
 ## Dependencies
 
@@ -37,7 +44,7 @@ This action needs registered on the Weave instance the following elements:
 Start by importing the action:
 
 ```ts
-import { WeaveAlignNodesToolAction } from "@inditextech/weave-sdk";
+import { WeaveCommentToolAction } from "@inditextech/weave-sdk";
 ```
 
 </div>
@@ -53,7 +60,14 @@ const instance = new Weave({
   ...
   actions: [
     ...,
-    new WeaveAlignNodesToolAction(), // [!code ++]
+    new WeaveCommentToolAction({ // [!code ++]
+      config: { // [!code ++]
+        model, // here you define some utils to work with your Entity model // [!code ++]
+        getUser, // we need the current user model when creating // [!code ++]
+        getUserBackgroundColor, // define the background color associated to an user // [!code ++]
+        getUserForegroundColor, // define the foreground color associated to an user // [!code ++]
+      } // [!code ++]
+    }), // [!code ++]
   ]
 })
 ```
@@ -67,7 +81,7 @@ const instance = new Weave({
 Setup on a button or any element on the UI the user can interact with on the action event:
 
 ```ts
-instance.triggerAction("alignNodesTool");
+instance.triggerAction("commentTool");
 ```
 
 ---
@@ -76,30 +90,28 @@ For example on a button on React:
 
 ```tsx
 import React from "react";
-import { ALIGN_NODES_ALIGN_TO } from "@inditextech/weave-sdk";
 import { useWeave } from "@inditextech/weave-react";
 
-const MyAlignNodesToolTriggerComponent = () => {
+const MyCommentToolTriggerComponent = () => {
   const instance = useWeave((state) => state.instance);
 
-  const alignNodesTool = React.useCallback(() => {
-    instance.triggerAction("alignNodesTool", {
-      alignTo: ALIGN_NODES_ALIGN_TO.TOP_VERTICAL,
-    });
+  const commentTool = React.useCallback(() => {
+    instance.triggerAction("commentTool");
   }, [instance]);
 
-  return <button onClick={alignNodesTool}>Align selected nodes to top</button>;
+  return <button onClick={commentTool}>Comment</button>;
 };
 ```
 
 ### Trigger the action
 
-Finally a final user:
+When an user triggers the action:
 
-- Select some elements on the stage.
-- trigger the UI element that launches the action.
-
-When the tool is triggered automatically the selected nodes will be aligned according to the passed params.
+- The mouse pointer is changed, indicating that it can now add comments.
+- When click or tap on the stage (if not a comment), then a callback function
+  is called so you can render your _create comment UI_.
+- After setting the comment, you can retrieve the comments and render them with the
+  [Comments renderer](/docs/main/build/plugins/comments-renderer) plugin.
 
 </div>
 

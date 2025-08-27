@@ -1,96 +1,99 @@
 ---
 title: WeaveCommentsRendererPlugin
-description: Get an structure with information about the connected users
+description: Render comment nodes on a special layer to manage and interact with them
 ---
 
 import { TypeTable } from "fumadocs-ui/components/type-table";
 
 ## Overview
 
-The [WeaveConnectedUsersPlugin](https://github.com/InditexTech/weavejs/blob/main/code/packages/sdk/src/plugins/connected-users/connected-users.ts)
-class represents a plugin that manages and returns information about users connected to a collaborative
-session. It tracks user presence through the shared store and provides metadata such as active users,
-their IDs, names, and statuses, enabling applications to build user lists, indicators, and collaborative
-awareness features.
-
-It enhances the multi-user experience by letting participants know who is connected, online, or active on
-the canvas in real time.
+The [WeaveCommentsRendererPlugin](https://github.com/InditexTech/weavejs/blob/main/code/packages/sdk/src/plugins/comments-renderer/comments-renderer.ts)
+class represents a plugin that renders a set of comments (headless based on the defined Entity model)
+on a special layer on the stage.
 
 The class extends the [WeavePlugin](/docs/sdk/api-reference/plugins/plugin) class
 
 ## Name
 
-This plugin `name` property value is `connectedUsers`.
+This plugin `name` property value is `commentsRenderer`.
 
 ## Import
 
 ```shell
-import { WeaveConnectedUsersPlugin } from "@inditextech/weave-sdk";
+import { WeaveCommentsRendererPlugin } from "@inditextech/weave-sdk";
 ```
 
 ## Instantiation
 
 ```ts
-new WeaveConnectedUsersPlugin(params: WeaveConnectedUsersPluginParams);
+new WeaveCommentsRendererPlugin<T>(params: WeaveConnectedUsersPluginParams<T>);
 ```
 
 ## TypeScript types
 
 ```ts
-type WeaveUser = {
-  [key: string]: any;
-  name: string;
-  email: string;
+type WeaveCommentsRendererModel<T> = {
+  getId: (comment: T) => string;
+  getUser: (comment: T) => WeaveUser;
+  getPosition: (comment: T) => Vector2d;
+  getStatus: (comment: T) => WeaveCommentStatus;
 };
 
-type WeaveConnectedUsers = {
-  [userName: string]: WeaveUser;
-};
-
-type WeaveConnectedUsersPluginConfig = {
+type WeaveCommentsRendererPluginConfig<T> = {
+  model: WeaveCommentsRendererModel<T>;
   getUser: () => WeaveUser;
+  getUserBackgroundColor: (
+    user: WeaveUser
+  ) => string | CanvasGradient | undefined;
+  getUserForegroundColor: (
+    user: WeaveUser
+  ) => string | CanvasGradient | undefined;
 };
 
-type WeaveConnectedUsersPluginParams = {
-  config: WeaveConnectedUsersPluginConfig;
+type WeaveCommentsRendererPluginParams<T> = {
+  config: WeaveCommentsRendererPluginConfig<T>;
 };
-
-type WeaveConnectedUsersChangeEvent = WeaveConnectedUsers;
 ```
 
 ## Parameters
 
-For `WeaveConnectedUsersPluginParams`:
+For `WeaveConnectedUsersPluginParams<T>`:
 
 <TypeTable
   type={{
     ["config"]: {
       required: true,
       description: "Config parameters for the plugin.",
-      type: "WeaveConnectedUsersPluginConfig",
+      type: "WeaveCommentsRendererPluginConfig<T>",
     },
   }}
 />
 
-For `WeaveConnectedUsersPluginConfig`:
+For `WeaveCommentsRendererPluginConfig<T>`:
 
 <TypeTable
   type={{
+    ["model"]: {
+      required: true,
+      description: "Setup the Entity model ",
+      type: "WeaveCommentsRendererModel<T>",
+    },
     ["getUser"]: {
       required: true,
-      description:
-        "A function that returns the instance user metadata, used to inform the actual connected user to other peers.",
+      description: "A function that return the actual user model",
       type: "() => WeaveUser",
+    },
+    ["getUserBackgroundColor"]: {
+      required: true,
+      description:
+        "A function that is called to define a user background color base on its model.",
+      type: "(user: WeaveUser) => string | CanvasGradient | undefined",
+    },
+    ["getUserForegroundColor"]: {
+      required: true,
+      description:
+        "A function that is called to define a user foreground color base on its model.",
+      type: "(user: WeaveUser) => string | CanvasGradient | undefined",
     },
   }}
 />
-
-## Events
-
-### onConnectedUsersChange
-
-```ts
-onConnectedUsersChange: WeaveConnectedUsersChangeEvent;
-```
-
-The `onConnectedUsersChange` event is called every time a user connect / disconnect from a room.
