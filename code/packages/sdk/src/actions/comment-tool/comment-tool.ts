@@ -64,12 +64,53 @@ export class WeaveCommentToolAction<T> extends WeaveAction {
   }
 
   extractCursorUrl(cursor: string): string | null {
-    // Match url("..."), url('...'), or url(...)
-    const regex = /url\((?:"([^"]+)"|'([^']+)'|([^)"']+))\)/i;
-    const match = regex.exec(cursor);
+    const lower = cursor.toLowerCase();
+    const start = lower.indexOf('url(');
+    if (start === -1) return null;
 
-    // pick the first non-null capture group
-    return match ? match[1] || match[2] || match[3] : null;
+    // slice inside url(...)
+    let i = start + 4; // after "url("
+    const len = cursor.length;
+
+    // skip whitespace
+    while (i < len && /\s/.test(cursor[i])) i++;
+
+    let quote: string | null = null;
+    if (cursor[i] === '"' || cursor[i] === "'") {
+      quote = cursor[i];
+      i++;
+    }
+
+    let buf = '';
+    for (; i < len; i++) {
+      const ch = cursor[i];
+      if (quote) {
+        if (ch === quote) {
+          i++; // consume closing quote
+          break;
+        }
+        buf += ch;
+      } else {
+        if (ch === ')') break;
+        buf += ch;
+      }
+    }
+
+    const url = buf.trim();
+    if (!url) return null;
+
+    return this.isAllowedUrl(url) ? url : null;
+  }
+
+  isAllowedUrl(value: string): boolean {
+    // Allow http/https
+    if (/^https?:\/\//i.test(value)) return true;
+
+    // Reject known dangerous schemes
+    if (/^(javascript|data|blob|ftp):/i.test(value)) return false;
+
+    // Otherwise treat as relative
+    return true;
   }
 
   preloadCursors() {
