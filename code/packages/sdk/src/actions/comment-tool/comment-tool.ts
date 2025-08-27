@@ -64,9 +64,12 @@ export class WeaveCommentToolAction<T> extends WeaveAction {
   }
 
   extractCursorUrl(cursor: string): string | null {
-    const regex = /url\(["']?(.*?)["']?\)/;
+    // Match url("..."), url('...'), or url(...)
+    const regex = /url\((?:"([^"]+)"|'([^']+)'|([^)"']+))\)/i;
     const match = regex.exec(cursor);
-    return match ? match[1] : null;
+
+    // pick the first non-null capture group
+    return match ? match[1] || match[2] || match[3] : null;
   }
 
   preloadCursors() {
