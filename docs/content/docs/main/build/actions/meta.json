@@ -1,8 +1,10 @@
 {
   "title": "Actions",
   "pages": [
+    "align-nodes-tool",
     "arrow-tool",
     "brush-tool",
+    "comment-tool",
     "ellipse-tool",
     "eraser-tool",
     "export-node-tool",

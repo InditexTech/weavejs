@@ -1,0 +1,61 @@
+---
+title: Comment
+description: Draw an arrow on the canvas
+---
+
+![Arrow on Weave.js showcase](/images/nodes/arrow.png)
+
+The Arrow node is a simple, versatile primitive shape used to render arrow
+elements on the canvas. Built on top of Konva’s [Arrow](https://konvajs.org/api/Konva.Arrow.html),
+it supports customizable properties such as position, several segments, fill color,
+stroke and more.
+
+They can also respond to interactions like dragging, resizing, or selection.
+
+## Usage
+
+<div className="fd-steps">
+
+<div className="[&_h3]:fd-step">
+
+### Import the Node
+
+Start by importing the node:
+
+```ts
+import { WeaveArrowNode } from "@inditextech/weave-sdk";
+```
+
+</div>
+
+<div className='[&_h3]:fd-step'>
+
+### Register the Node
+
+Then register the node on the [Weave](/docs/sdk/api-reference/weave) class instance.
+
+```ts
+const instance = new Weave({
+  ...
+  nodes: [
+    ...,
+    new WeaveArrowNode(), // [!code ++]
+  ]
+})
+```
+
+</div>
+
+<div className='[&_h3]:fd-step'>
+
+### Use the node
+
+Once the node is registered you can use it on [Actions](/docs/main/build/actions) or
+[Plugins](/docs/main/build/plugins) or even other [Nodes](/docs/main/build/nodes).
+
+We provide an action named [Arrow Tool](/docs/main/build/actions/arrow-tool) that
+allows users to add Arrow nodes to the application.
+
+</div>
+
+</div>

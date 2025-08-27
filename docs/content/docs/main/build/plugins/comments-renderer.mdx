@@ -1,0 +1,80 @@
+---
+title: Comments Renderer
+description: Get an structure with information about the connected users
+---
+
+![Connected Users plugin on use on the Weave.js showcase](/images/plugins/connected-users.gif)
+
+## Introduction
+
+This plugin returns the list of users currently active in a collaborative session.
+It can provide the user name and email, helping participants stay aware of who’s
+online and interacting with the canvas.
+
+<Callout title="UI Agnostic" type="info">
+  This plugin only returns an structure of the connected users to a
+  [room](/docs/main/glossary#room), it doesn't provide an UI.
+</Callout>
+
+## Usage
+
+<div className="fd-steps">
+
+<div className="[&_h3]:fd-step">
+
+### Import the Plugin
+
+Start by importing the plugin:
+
+```ts
+import { WeaveConnectedUsersPlugin } from "@inditextech/weave-sdk";
+```
+
+</div>
+
+<div className='[&_h3]:fd-step'>
+
+### Register the Plugin
+
+Then register the plugin on the [Weave](/docs/sdk/api-reference/weave) class instance.
+
+```ts
+const instance = new Weave({
+  ...
+  plugins: [
+    ...,
+    new WeaveConnectedUsersPlugin(), // [!code ++]
+  ]
+})
+```
+
+</div>
+
+<div className='[&_h3]:fd-step'>
+
+### Use the plugin
+
+Once the plugin is registered you can add a listener with the [Weave](/docs/sdk/api-reference/weave)
+instance [Events API](/docs/sdk/api-reference/weave#events) that listen to the event named `onConnectedUsersChange`.
+
+```ts
+// Import types
+import type {
+  WeaveConnectedUsers,
+  WeaveConnectedUsersChangeEvent,
+} from "@inditextech/weave-sdk";
+
+instance.addEventListener<WeaveConnectedUsersChangeEvent>(
+  "onConnectedUsersChange",
+  (users: WeaveConnectedUsers) => {
+    console.log(users);
+  }
+);
+```
+
+With this callback you can save this information on the UI state and render accordingly, whenever it
+changes your UI will remain updated.
+
+</div>
+
+</div>
