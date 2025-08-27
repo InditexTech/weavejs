@@ -91,7 +91,7 @@ export class WeaveImageToolAction extends WeaveAction {
   private setupEvents() {
     const stage = this.instance.getStage();
 
-    stage.container().addEventListener('keydown', (e) => {
+    window.addEventListener('keydown', (e) => {
       if (
         e.key === 'Escape' &&
         this.instance.getActiveAction() === IMAGE_TOOL_ACTION_NAME
@@ -123,6 +123,12 @@ export class WeaveImageToolAction extends WeaveAction {
     });
 
     stage.on('pointermove', (e) => {
+      if (this.state === IMAGE_TOOL_STATE.IDLE) {
+        return;
+      }
+
+      this.setCursor();
+
       if (
         this.pointers.size === 2 &&
         this.instance.getActiveAction() === IMAGE_TOOL_ACTION_NAME
@@ -140,9 +146,6 @@ export class WeaveImageToolAction extends WeaveAction {
         this.instance.getActiveAction() === IMAGE_TOOL_ACTION_NAME &&
         e.evt.pointerType === 'mouse'
       ) {
-        stage.container().style.cursor = 'crosshair';
-        stage.container().focus();
-
         const mousePos = stage.getRelativePointerPosition();
 
         this.tempImageNode.setAttrs({
@@ -172,15 +175,13 @@ export class WeaveImageToolAction extends WeaveAction {
     options?: ImageOptions,
     position?: Vector2d
   ) {
-    const stage = this.instance.getStage();
-
     const imageOptions = {
       crossOrigin: 'anonymous',
       ...options,
     };
 
-    stage.container().style.cursor = 'crosshair';
-    stage.container().focus();
+    this.setCursor();
+    this.setFocusStage();
 
     this.imageId = uuidv4();
     this.imageURL = imageURL;
@@ -225,8 +226,8 @@ export class WeaveImageToolAction extends WeaveAction {
   private addImageNode(position?: Vector2d) {
     const stage = this.instance.getStage();
 
-    stage.container().style.cursor = 'crosshair';
-    stage.container().focus();
+    this.setCursor();
+    this.setFocusStage();
 
     if (position) {
       this.setState(IMAGE_TOOL_STATE.SELECTED_POSITION);
@@ -401,5 +402,17 @@ export class WeaveImageToolAction extends WeaveAction {
     this.imageURL = null;
     this.clickPoint = null;
     this.setState(IMAGE_TOOL_STATE.IDLE);
+  }
+
+  private setCursor() {
+    const stage = this.instance.getStage();
+    stage.container().style.cursor = 'crosshair';
+  }
+
+  private setFocusStage() {
+    const stage = this.instance.getStage();
+    stage.container().tabIndex = 1;
+    stage.container().blur();
+    stage.container().focus();
   }
 }

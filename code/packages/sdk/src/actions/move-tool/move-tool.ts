@@ -33,7 +33,7 @@ export class WeaveMoveToolAction extends WeaveAction {
   private setupEvents() {
     const stage = this.instance.getStage();
 
-    stage.container().addEventListener('keydown', (e) => {
+    window.addEventListener('keydown', (e) => {
       if (
         e.key === 'Escape' &&
         this.instance.getActiveAction() === MOVE_TOOL_ACTION_NAME

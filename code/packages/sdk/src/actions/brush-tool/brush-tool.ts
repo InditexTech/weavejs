@@ -73,10 +73,7 @@ export class WeaveBrushToolAction extends WeaveAction {
   private setupEvents() {
     const stage = this.instance.getStage();
 
-    stage.container().tabIndex = 1;
-    stage.container().focus();
-
-    stage.container().addEventListener('keydown', (e) => {
+    window.addEventListener('keydown', (e) => {
       if (
         e.key === 'Enter' &&
         this.instance.getActiveAction() === BRUSH_TOOL_ACTION_NAME
@@ -111,6 +108,10 @@ export class WeaveBrushToolAction extends WeaveAction {
     stage.on('pointerdown', handlePointerDown);
 
     const handlePointerMove = (e: Konva.KonvaEventObject<PointerEvent>) => {
+      if (this.state === BRUSH_TOOL_STATE.INACTIVE) return;
+
+      this.setCursor();
+
       if (this.state !== BRUSH_TOOL_STATE.DEFINE_STROKE) {
         return;
       }
@@ -118,8 +119,6 @@ export class WeaveBrushToolAction extends WeaveAction {
       if (this.getZoomPlugin()?.isPinching()) {
         return;
       }
-
-      stage.container().style.cursor = 'crosshair';
 
       const pointPressure = this.getEventPressure(e);
       this.handleMovement(pointPressure);
@@ -266,8 +265,6 @@ export class WeaveBrushToolAction extends WeaveAction {
   }
 
   private handleEndStroke() {
-    const stage = this.instance.getStage();
-
     const tempStroke = this.instance.getStage().findOne(`#${this.strokeId}`) as
       | Konva.Line
       | undefined;
@@ -311,9 +308,8 @@ export class WeaveBrushToolAction extends WeaveAction {
 
       this.clickPoint = null;
 
-      stage.container().style.cursor = 'crosshair';
-      stage.container().tabIndex = 1;
-      stage.container().focus();
+      this.setCursor();
+      this.setFocusStage();
 
       this.setState(BRUSH_TOOL_STATE.IDLE);
     }
@@ -351,7 +347,8 @@ export class WeaveBrushToolAction extends WeaveAction {
 
     this.instance.emitEvent<WeaveBrushToolActionOnAddingEvent>('onAddingBrush');
 
-    stage.container().style.cursor = 'crosshair';
+    this.setCursor();
+    this.setFocusStage();
   }
 
   cleanup(): void {
@@ -379,5 +376,17 @@ export class WeaveBrushToolAction extends WeaveAction {
     const zoomPlugin =
       this.instance.getPlugin<WeaveStageZoomPlugin>('stageZoom');
     return zoomPlugin;
+  }
+
+  private setCursor() {
+    const stage = this.instance.getStage();
+    stage.container().style.cursor = 'crosshair';
+  }
+
+  private setFocusStage() {
+    const stage = this.instance.getStage();
+    stage.container().tabIndex = 1;
+    stage.container().blur();
+    stage.container().focus();
   }
 }

@@ -62,7 +62,7 @@ export class WeaveTextToolAction extends WeaveAction {
   private setupEvents() {
     const stage = this.instance.getStage();
 
-    stage.container().addEventListener('keydown', (e) => {
+    window.addEventListener('keydown', (e) => {
       if (
         e.key === 'Escape' &&
         this.instance.getActiveAction() === TEXT_TOOL_ACTION_NAME
@@ -70,6 +70,12 @@ export class WeaveTextToolAction extends WeaveAction {
         this.cancelAction();
         return;
       }
+    });
+
+    stage.on('pointermove', () => {
+      if (this.state === TEXT_TOOL_STATE.IDLE) return;
+
+      this.setCursor();
     });
 
     stage.on('pointerclick', () => {
@@ -91,8 +97,6 @@ export class WeaveTextToolAction extends WeaveAction {
   }
 
   private addText() {
-    const stage = this.instance.getStage();
-
     const selectionPlugin =
       this.instance.getPlugin<WeaveNodesSelectionPlugin>('nodesSelection');
     if (selectionPlugin) {
@@ -100,8 +104,8 @@ export class WeaveTextToolAction extends WeaveAction {
       tr.hide();
     }
 
-    stage.container().style.cursor = 'crosshair';
-    stage.container().focus();
+    this.setCursor();
+    this.setFocusStage();
 
     this.instance.emitEvent<WeaveTextToolActionOnAddingEvent>('onAddingText');
 
@@ -183,5 +187,17 @@ export class WeaveTextToolAction extends WeaveAction {
     this.container = undefined;
     this.clickPoint = null;
     this.setState(TEXT_TOOL_STATE.IDLE);
+  }
+
+  private setCursor() {
+    const stage = this.instance.getStage();
+    stage.container().style.cursor = 'crosshair';
+  }
+
+  private setFocusStage() {
+    const stage = this.instance.getStage();
+    stage.container().tabIndex = 1;
+    stage.container().blur();
+    stage.container().focus();
   }
 }

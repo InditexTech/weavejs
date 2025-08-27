@@ -62,7 +62,7 @@ export class WeaveRectangleToolAction extends WeaveAction {
   private setupEvents() {
     const stage = this.instance.getStage();
 
-    stage.container().addEventListener('keydown', (e) => {
+    window.addEventListener('keydown', (e) => {
       if (
         e.key === 'Enter' &&
         this.instance.getActiveAction() === RECTANGLE_TOOL_ACTION_NAME
@@ -77,6 +77,12 @@ export class WeaveRectangleToolAction extends WeaveAction {
         this.cancelAction();
         return;
       }
+    });
+
+    stage.on('pointermove', () => {
+      if (this.state === RECTANGLE_TOOL_STATE.IDLE) return;
+
+      this.setCursor();
     });
 
     stage.on('pointerdown', (e) => {
@@ -101,6 +107,10 @@ export class WeaveRectangleToolAction extends WeaveAction {
     });
 
     stage.on('pointermove', (e) => {
+      if (this.state === RECTANGLE_TOOL_STATE.IDLE) return;
+
+      this.setCursor();
+
       if (!this.isPressed(e)) return;
 
       if (!this.pointers.has(e.evt.pointerId)) return;
@@ -140,10 +150,8 @@ export class WeaveRectangleToolAction extends WeaveAction {
   }
 
   private addRectangle() {
-    const stage = this.instance.getStage();
-
-    stage.container().style.cursor = 'crosshair';
-    stage.container().focus();
+    this.setCursor();
+    this.setFocusStage();
 
     this.instance.emitEvent<WeaveRectangleToolActionOnAddingEvent>(
       'onAddingRectangle'
@@ -303,5 +311,17 @@ export class WeaveRectangleToolAction extends WeaveAction {
     this.measureContainer = undefined;
     this.clickPoint = null;
     this.setState(RECTANGLE_TOOL_STATE.IDLE);
+  }
+
+  private setCursor() {
+    const stage = this.instance.getStage();
+    stage.container().style.cursor = 'crosshair';
+  }
+
+  private setFocusStage() {
+    const stage = this.instance.getStage();
+    stage.container().tabIndex = 1;
+    stage.container().blur();
+    stage.container().focus();
   }
 }
