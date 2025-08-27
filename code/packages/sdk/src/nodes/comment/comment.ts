@@ -568,7 +568,7 @@ export class WeaveCommentNode<T> extends WeaveNode {
               }
             );
 
-            this.onUpdate(node as WeaveElementInstance, {
+            this.onUpdate(node, {
               commentModel: this.config.model.setContent(
                 node.getAttrs().commentModel ?? {},
                 content
@@ -841,7 +841,7 @@ export class WeaveCommentNode<T> extends WeaveNode {
     return container;
   }
 
-  private onZoomChangeHandler = (commentNode: Konva.Group) => () => {
+  private readonly onZoomChangeHandler = (commentNode: Konva.Group) => () => {
     if (!this.commentDomVisible) {
       return;
     }
@@ -869,7 +869,7 @@ export class WeaveCommentNode<T> extends WeaveNode {
     }
   }
 
-  private onStageMoveHandler = (commentNode: Konva.Group) => () => {
+  private readonly onStageMoveHandler = (commentNode: Konva.Group) => () => {
     if (!this.commentDomVisible) {
       return;
     }

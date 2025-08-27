@@ -9,8 +9,6 @@ import type {
   WeaveCommentToolActionState,
   WeaveCommentToolActionParams,
   WeaveCommentToolActionConfig,
-  WeaveCommentToolActionOnStartAddingEvent,
-  WeaveCommentToolActionOnFinishAddingEvent,
 } from './types';
 import {
   WEAVE_COMMENT_TOOL_ACTION_NAME,
@@ -30,7 +28,7 @@ import type { WeaveCommentsRendererPlugin } from '@/plugins/comments-renderer/co
 import { WEAVE_COMMENTS_RENDERER_KEY } from '@/plugins/comments-renderer/constants';
 
 export class WeaveCommentToolAction<T> extends WeaveAction {
-  private config!: WeaveCommentToolActionConfig<T>;
+  private readonly config!: WeaveCommentToolActionConfig<T>;
   protected initialized: boolean = false;
   protected state: WeaveCommentToolActionState;
   protected pointers: Map<number, Vector2d>;
@@ -66,7 +64,8 @@ export class WeaveCommentToolAction<T> extends WeaveAction {
   }
 
   extractCursorUrl(cursor: string): string | null {
-    const match = cursor.match(/url\(["']?(.*?)["']?\)/);
+    const regex = /url\(["']?(.*?)["']?\)/;
+    const match = regex.exec(cursor);
     return match ? match[1] : null;
   }
 
@@ -173,7 +172,6 @@ export class WeaveCommentToolAction<T> extends WeaveAction {
         this.state === WEAVE_COMMENT_TOOL_STATE.CREATING_COMMENT
       ) {
         this.setState(WEAVE_COMMENT_TOOL_STATE.ADDING);
-        return;
       }
     });
 
@@ -290,9 +288,7 @@ export class WeaveCommentToolAction<T> extends WeaveAction {
       this.setCursor();
     }
 
-    this.instance.emitEvent<WeaveCommentToolActionOnStartAddingEvent>(
-      'onStartAddingComment'
-    );
+    this.instance.emitEvent<undefined>('onStartAddingComment');
 
     this.commentId = null;
     this.clickPoint = null;
@@ -360,9 +356,7 @@ export class WeaveCommentToolAction<T> extends WeaveAction {
 
     stage.container().style.cursor = 'default';
 
-    this.instance.emitEvent<WeaveCommentToolActionOnFinishAddingEvent>(
-      'onFinishAddingComment'
-    );
+    this.instance.emitEvent<undefined>('onFinishAddingComment');
 
     const selectionPlugin =
       this.instance.getPlugin<WeaveNodesSelectionPlugin>('nodesSelection');

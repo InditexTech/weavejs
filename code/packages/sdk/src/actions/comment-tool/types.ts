@@ -36,6 +36,3 @@ export type WeaveCommentToolActionParams<T> = {
   > &
     DeepPartial<Pick<WeaveCommentToolActionConfig<T>, 'style'>>;
 };
-
-export type WeaveCommentToolActionOnStartAddingEvent = undefined;
-export type WeaveCommentToolActionOnFinishAddingEvent = undefined;

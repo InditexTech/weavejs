@@ -17,7 +17,7 @@ import { WeavePlugin } from '../plugin';
 import { WEAVE_COMMENT_TOOL_LAYER_NAME } from '@/actions/comment-tool/constants';
 
 export class WeaveCommentsRendererPlugin<T> extends WeavePlugin {
-  private config!: WeaveCommentsRendererPluginConfig<T>;
+  private readonly config!: WeaveCommentsRendererPluginConfig<T>;
   private comments: T[] = [];
   getLayerName = undefined;
   initLayer: undefined;
