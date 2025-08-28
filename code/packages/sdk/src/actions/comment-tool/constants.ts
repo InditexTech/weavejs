@@ -3,7 +3,6 @@
 // SPDX-License-Identifier: Apache-2.0
 
 export const WEAVE_COMMENT_TOOL_ACTION_NAME = 'commentTool';
-export const WEAVE_COMMENT_TOOL_LAYER_NAME = 'commentsLayer';
 
 export const WEAVE_COMMENT_TOOL_STATE = {
   ['IDLE']: 'idle',

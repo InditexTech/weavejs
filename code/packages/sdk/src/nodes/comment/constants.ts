@@ -74,13 +74,13 @@ export const WEAVE_COMMENT_NODE_DEFAULTS = {
       },
     },
     creating: {
-      paddingX: 8,
-      paddingY: -4,
+      paddingX: 16,
+      paddingY: -8,
       stroke: '#1a1aff',
       strokeWidth: 2,
     },
     viewing: {
-      paddingX: 8,
+      paddingX: 16,
       paddingY: -18,
       stroke: '#1a1aff',
       strokeWidth: 2,

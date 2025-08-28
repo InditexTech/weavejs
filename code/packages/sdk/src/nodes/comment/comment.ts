@@ -770,13 +770,19 @@ export class WeaveCommentNode<T> extends WeaveNode {
   ) {
     const stage = this.instance.getStage();
 
+    this.normalizeNodeSize(commentNode);
+
     const rect = commentNode.getClientRect({
       relativeTo: stage,
+      skipShadow: true,
+      skipStroke: true,
     });
 
     const scaleX = stage.scaleX();
     const scaleY = stage.scaleY();
     const stagePos = stage.position(); // panning offset
+
+    const widthContracted = this.config.style.contracted.width;
 
     // project node rect into DOM coords
     let paddingX = 8;
@@ -789,7 +795,8 @@ export class WeaveCommentNode<T> extends WeaveNode {
       paddingX = this.config.style.viewing.paddingX;
       paddingY = this.config.style.viewing.paddingY;
     }
-    const x = stagePos.x + rect.x * scaleX + rect.width * scaleX + paddingX;
+
+    const x = stagePos.x + rect.x * scaleX + widthContracted + paddingX;
     const y = stagePos.y + rect.y * scaleY + paddingY;
 
     const position: Vector2d = { x, y };
@@ -846,13 +853,10 @@ export class WeaveCommentNode<T> extends WeaveNode {
       return;
     }
 
-    const node = this.instance.getStage().findOne(`#${commentNode.id()}`) as
-      | Konva.Group
-      | undefined;
-
-    if (node) {
-      this.setCommentDOMPosition(node, commentNode.getAttrs().commentAction);
-    }
+    this.setCommentDOMPosition(
+      commentNode,
+      commentNode.getAttrs().commentAction
+    );
   };
 
   private normalizeNodeSize(node: Konva.Node) {
@@ -874,13 +878,10 @@ export class WeaveCommentNode<T> extends WeaveNode {
       return;
     }
 
-    const node = this.instance.getStage().findOne(`#${commentNode.id()}`) as
-      | Konva.Group
-      | undefined;
-
-    if (node) {
-      this.setCommentDOMPosition(node, commentNode.getAttrs().commentAction);
-    }
+    this.setCommentDOMPosition(
+      commentNode,
+      commentNode.getAttrs().commentAction
+    );
   };
 
   private openCommentDOM(commentNode: WeaveElementInstance) {

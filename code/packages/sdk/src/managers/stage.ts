@@ -12,6 +12,8 @@ import {
 } from '@inditextech/weave-types';
 import type { StageConfig } from 'konva/lib/Stage';
 import { WEAVE_NODES_SELECTION_LAYER_ID } from '@/plugins/nodes-selection/constants';
+import { WEAVE_GRID_LAYER_ID } from '@/plugins/stage-grid/constants';
+import { WEAVE_COMMENTS_TOOL_LAYER_ID } from '@/plugins/comments-renderer/constants';
 
 export class WeaveStageManager {
   private instance: Weave;
@@ -46,6 +48,16 @@ export class WeaveStageManager {
   getSelectionLayer(): Konva.Layer | undefined {
     const stage = this.getStage();
     return stage.findOne(`#${WEAVE_NODES_SELECTION_LAYER_ID}`);
+  }
+
+  getCommentsLayer(): Konva.Layer | undefined {
+    const stage = this.getStage();
+    return stage.findOne(`#${WEAVE_COMMENTS_TOOL_LAYER_ID}`);
+  }
+
+  getGridLayer(): Konva.Layer | undefined {
+    const stage = this.getStage();
+    return stage.findOne(`#${WEAVE_GRID_LAYER_ID}`);
   }
 
   getUtilityLayer(): Konva.Layer | undefined {

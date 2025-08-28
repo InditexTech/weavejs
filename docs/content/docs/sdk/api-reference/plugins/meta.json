@@ -11,6 +11,7 @@
     "nodes-distance-snapping",
     "stage-drop-area",
     "stage-grid",
+    "stage-minimap",
     "stage-panning",
     "stage-resize",
     "stage-zoom",

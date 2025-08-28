@@ -3,3 +3,4 @@
 // SPDX-License-Identifier: Apache-2.0
 
 export const WEAVE_COMMENTS_RENDERER_KEY = 'commentsRenderer';
+export const WEAVE_COMMENTS_TOOL_LAYER_ID = 'commentsLayer';

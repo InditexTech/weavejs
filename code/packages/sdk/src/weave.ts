@@ -327,6 +327,14 @@ export class Weave {
     return this.stageManager.getSelectionLayer();
   }
 
+  getCommentsLayer(): Konva.Layer | undefined {
+    return this.stageManager.getCommentsLayer();
+  }
+
+  getGridLayer(): Konva.Layer | undefined {
+    return this.stageManager.getGridLayer();
+  }
+
   getUtilityLayer(): Konva.Layer | undefined {
     return this.stageManager.getUtilityLayer();
   }
