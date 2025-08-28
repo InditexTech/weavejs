@@ -23,7 +23,6 @@ export function defaultInitialState(doc: Y.Doc): void {
     yjsLayer('gridLayer'),
     yjsLayer('mainLayer'),
     yjsLayer('selectionLayer'),
-    yjsLayer('commentsLayer'),
     yjsLayer('usersPointersLayer'),
     yjsLayer('utilityLayer'),
   ]);

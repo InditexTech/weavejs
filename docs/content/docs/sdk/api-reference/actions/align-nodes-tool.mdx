@@ -14,7 +14,7 @@ The class extends the [WeaveAction](/docs/sdk/api-reference/actions/action) clas
 
 ## Name
 
-This action `name` property value is `alignNodesTools`.
+This action `name` property value is `alignNodesTool`.
 
 ## Import
 
@@ -31,12 +31,11 @@ new WeaveAlignNodesToolAction();
 ## TypeScript types
 
 ```ts
-export type WeaveAlignNodesToolActionAlignToKeys =
-  keyof typeof ALIGN_NODES_ALIGN_TO;
-export type WeaveAlignNodesToolActionAlignTo =
+type WeaveAlignNodesToolActionAlignToKeys = keyof typeof ALIGN_NODES_ALIGN_TO;
+type WeaveAlignNodesToolActionAlignTo =
   (typeof ALIGN_NODES_ALIGN_TO)[WeaveAlignNodesToolActionAlignToKeys];
 
-export type WeaveAlignNodesToolActionTriggerParams = {
+type WeaveAlignNodesToolActionTriggerParams = {
   alignTo: WeaveAlignNodesToolActionAlignTo;
   triggerSelectionTool?: boolean;
 };
@@ -45,7 +44,7 @@ export type WeaveAlignNodesToolActionTriggerParams = {
 ## Constants
 
 ```ts
-export const ALIGN_NODES_ALIGN_TO = {
+const ALIGN_NODES_ALIGN_TO = {
   ["LEFT_HORIZONTAL"]: "left-horizontal",
   ["CENTER_HORIZONTAL"]: "center-horizontal",
   ["RIGHT_HORIZONTAL"]: "right-horizontal",

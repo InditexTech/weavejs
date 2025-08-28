@@ -1,0 +1,90 @@
+---
+title: Comment
+description: Give feedback and collaborate with other users.
+---
+
+![Comment on Weave.js showcase](/images/nodes/comment.png)
+
+The Comment node is a simple, versatile shape used to point to where an user added a
+comment to share with other peers, this node renders a shape that resembles an arrow
+pointing to some content on the stage.
+
+When clicked, a function is called in order to render an overlay with the comment
+information over a DOM node, on it anyone can deploy an UI / UX to:
+
+- Edit the comment content.
+- Render the comment replies.
+- Create a new reply.
+- Edit a reply.
+- Mark the comment as resolved.
+- Delete the comment
+
+<Callout title="Not shareable thought the room state" type="warning">
+  This node is intended and designed to be used standalone, it doesn't support
+  to be shared via the room state mechanism.
+</Callout>
+
+## Usage
+
+<div className="fd-steps">
+
+<div className="[&_h3]:fd-step">
+
+### Import the Node
+
+Start by importing the node:
+
+```ts
+import { WeaveCommentNode } from "@inditextech/weave-sdk";
+```
+
+</div>
+
+<div className='[&_h3]:fd-step'>
+
+### Register the Node
+
+Then register the node on the [Weave](/docs/sdk/api-reference/weave) class instance.
+
+```ts
+const instance = new Weave({
+  ...
+  nodes: [
+    ...,
+    new WeaveCommentNode({ // [!code ++]
+      config: { // [!code ++]
+        model, // here you define some utils to work with your Entity model // [!code ++]
+        formatDate, // define how to format the dates rendered by Weave.js // [!code ++]
+        createComment, // a callback that is called when you need to render the create comment UI // [!code ++]
+        viewComment, // a callback that is called when you need to render the view comment UI // [!code ++]
+      } // [!code ++]
+    }), // [!code ++]
+  ]
+})
+```
+
+<Callout title="UI configuration" type="info">
+  Check the [Comment Node](/docs/sdk/api-reference/nodes/comment) API to know
+  how it can be customized.
+</Callout>
+
+</div>
+
+<div className='[&_h3]:fd-step'>
+
+### Use the node
+
+Once the node is registered you can use
+
+- The [Comment tool](/docs/main/build/actions/comment-tool) action to manage the comments of a room.
+- The [Comments Renderer plugin](/docs/main/build/plugins/comments-renderer) to render the comments
+  on a special layer that is not shared using the room state mechanism.
+
+While the Comment nodes are rendered with the [Comments Renderer plugin](/docs/main/build/plugins/comments-renderer),
+interaction with the node is handled here, so if you want to for example view the comment
+details, when the Comment node is clicked a callback function is called, so you can render your
+Comment UI in order to handle that comment.
+
+</div>
+
+</div>

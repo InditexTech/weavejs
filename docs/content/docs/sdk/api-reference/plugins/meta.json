@@ -2,6 +2,7 @@
   "title": "Plugins",
   "pages": [
     "plugin",
+    "comments-renderer",
     "connected-users",
     "context-menu",
     "copy-paste-nodes",

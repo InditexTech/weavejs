@@ -1,0 +1,98 @@
+---
+title: Align Nodes Tool
+description: Select nodes and align among them
+---
+
+![Align Nodes Tool action on use on the Weave.js showcase](/images/actions/align-nodes-tool.gif)
+
+import { Accordion, Accordions } from "fumadocs-ui/components/accordion";
+import { Kbd } from "@/components/kbd";
+
+## Introduction
+
+This action enables users to users to align selected nodes vertically or horizontally.
+
+## Dependencies
+
+This action needs registered on the Weave instance the following elements:
+
+- [Nodes selection](/docs/main/build/plugins/nodes-selection) plugin
+
+## Usage
+
+<div className="fd-steps">
+
+<div className="[&_h3]:fd-step">
+
+### Import the Action
+
+Start by importing the action:
+
+```ts
+import { WeaveAlignNodesToolAction } from "@inditextech/weave-sdk";
+```
+
+</div>
+
+<div className='[&_h3]:fd-step'>
+
+### Register the Action
+
+Then register the action on the [Weave](/docs/sdk/api-reference/weave) class instance.
+
+```ts
+const instance = new Weave({
+  ...
+  actions: [
+    ...,
+    new WeaveAlignNodesToolAction(), // [!code ++]
+  ]
+})
+```
+
+</div>
+
+<div className='[&_h3]:fd-step'>
+
+### Setup the action trigger
+
+Setup on a button or any element on the UI the user can interact with on the action event:
+
+```ts
+instance.triggerAction("alignNodesTool");
+```
+
+---
+
+For example on a button on React:
+
+```tsx
+import React from "react";
+import { ALIGN_NODES_ALIGN_TO } from "@inditextech/weave-sdk";
+import { useWeave } from "@inditextech/weave-react";
+
+const MyAlignNodesToolTriggerComponent = () => {
+  const instance = useWeave((state) => state.instance);
+
+  const alignNodesTool = React.useCallback(() => {
+    instance.triggerAction("alignNodesTool", {
+      alignTo: ALIGN_NODES_ALIGN_TO.TOP_VERTICAL,
+    });
+  }, [instance]);
+
+  return <button onClick={alignNodesTool}>Align selected nodes to top</button>;
+};
+```
+
+### Trigger the action
+
+Finally a final user:
+
+- Select some elements on the stage.
+- trigger the UI element that launches the action.
+
+When the tool is triggered automatically the selected nodes will be aligned according to the passed params.
+
+</div>
+
+</div>

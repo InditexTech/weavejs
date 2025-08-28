@@ -1,0 +1,70 @@
+---
+title: Comments Renderer
+description: Render the comments of a room in a special layer
+---
+
+## Introduction
+
+This plugin renders the provided comments (as a model) on a special layer on the canvas,
+this layer is not synced using the room state, is independent.
+
+Take into consideration, that the rendering is not automatic, meaning that if:
+
+- Other user adds, changes, or reply a comment
+- Yourself add, change or reply to a comment
+
+This will not trigger a re-render of the comments, you need to manually trigger the re-render
+when this actions happens, this is intended in order to decouple Weave internal and make the
+tool headless from all points of view: UI, Backend and Entity model.
+
+<div className="fd-steps">
+
+<div className="[&_h3]:fd-step">
+
+### Import the Plugin
+
+Start by importing the plugin:
+
+```ts
+import { WeaveConnectedUsersPlugin } from "@inditextech/weave-sdk";
+```
+
+</div>
+
+<div className='[&_h3]:fd-step'>
+
+### Register the Plugin
+
+Then register the plugin on the [Weave](/docs/sdk/api-reference/weave) class instance.
+
+```ts
+const instance = new Weave({
+  ...
+  plugins: [
+    ...,
+    new WeaveConnectedUsersPlugin({ // [!code ++]
+      config: { // [!code ++]
+        model, // here you define some utils to work with your Entity model // [!code ++]
+        getUser, // we need the current user model when creating // [!code ++]
+        getUserBackgroundColor, // define the background color associated to an user // [!code ++]
+        getUserForegroundColor, // define the foreground color associated to an user // [!code ++]
+      } // [!code ++]
+    }), // [!code ++]
+  ]
+})
+```
+
+</div>
+
+<div className='[&_h3]:fd-step'>
+
+### Use the plugin
+
+Once the plugin is registered you have an API to control when to render the comments:
+
+- `setComments(comments: T[]): void`: this function sets the comments to render, based on your Entity model.
+- `render(): void`: this function is the one that renders the comments on the room stage, call it whenever the comments changed.
+
+</div>
+
+</div>

@@ -2,6 +2,7 @@
   "title": "Nodes",
   "pages": [
     "arrow",
+    "comment",
     "ellipse",
     "frame",
     "group",

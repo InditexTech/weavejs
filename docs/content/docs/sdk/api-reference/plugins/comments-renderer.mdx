@@ -1,0 +1,99 @@
+---
+title: WeaveCommentsRendererPlugin
+description: Render comment nodes on a special layer to manage and interact with them
+---
+
+import { TypeTable } from "fumadocs-ui/components/type-table";
+
+## Overview
+
+The [WeaveCommentsRendererPlugin](https://github.com/InditexTech/weavejs/blob/main/code/packages/sdk/src/plugins/comments-renderer/comments-renderer.ts)
+class represents a plugin that renders a set of comments (headless based on the defined Entity model)
+on a special layer on the stage.
+
+The class extends the [WeavePlugin](/docs/sdk/api-reference/plugins/plugin) class
+
+## Name
+
+This plugin `name` property value is `commentsRenderer`.
+
+## Import
+
+```shell
+import { WeaveCommentsRendererPlugin } from "@inditextech/weave-sdk";
+```
+
+## Instantiation
+
+```ts
+new WeaveCommentsRendererPlugin<T>(params: WeaveConnectedUsersPluginParams<T>);
+```
+
+## TypeScript types
+
+```ts
+type WeaveCommentsRendererModel<T> = {
+  getId: (comment: T) => string;
+  getUser: (comment: T) => WeaveUser;
+  getPosition: (comment: T) => Vector2d;
+  getStatus: (comment: T) => WeaveCommentStatus;
+};
+
+type WeaveCommentsRendererPluginConfig<T> = {
+  model: WeaveCommentsRendererModel<T>;
+  getUser: () => WeaveUser;
+  getUserBackgroundColor: (
+    user: WeaveUser
+  ) => string | CanvasGradient | undefined;
+  getUserForegroundColor: (
+    user: WeaveUser
+  ) => string | CanvasGradient | undefined;
+};
+
+type WeaveCommentsRendererPluginParams<T> = {
+  config: WeaveCommentsRendererPluginConfig<T>;
+};
+```
+
+## Parameters
+
+For `WeaveConnectedUsersPluginParams<T>`:
+
+<TypeTable
+  type={{
+    ["config"]: {
+      required: true,
+      description: "Config parameters for the plugin.",
+      type: "WeaveCommentsRendererPluginConfig<T>",
+    },
+  }}
+/>
+
+For `WeaveCommentsRendererPluginConfig<T>`:
+
+<TypeTable
+  type={{
+    ["model"]: {
+      required: true,
+      description: "Setup the Entity model ",
+      type: "WeaveCommentsRendererModel<T>",
+    },
+    ["getUser"]: {
+      required: true,
+      description: "A function that return the actual user model",
+      type: "() => WeaveUser",
+    },
+    ["getUserBackgroundColor"]: {
+      required: true,
+      description:
+        "A function that is called to define a user background color base on its model.",
+      type: "(user: WeaveUser) => string | CanvasGradient | undefined",
+    },
+    ["getUserForegroundColor"]: {
+      required: true,
+      description:
+        "A function that is called to define a user foreground color base on its model.",
+      type: "(user: WeaveUser) => string | CanvasGradient | undefined",
+    },
+  }}
+/>

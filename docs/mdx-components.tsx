@@ -10,9 +10,9 @@ type WrapperProps = {
 
 const Wrapper = ({ children }: Readonly<WrapperProps>) => {
   return (
-    <div className="p-5 prose-no-margin bg-gray-100/80 border dark:bg-gray-300git /20">
+    <span className="block p-5 prose-no-margin bg-gray-100/80 border dark:bg-gray-300/20">
       {children}
-    </div>
+    </span>
   );
 };
 

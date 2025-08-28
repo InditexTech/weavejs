@@ -13,6 +13,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- [#617](https://github.com/InditexTech/weavejs/issues/617) Comment tool, node and render plugin
+
 ### Changed
 
 - [#616](https://github.com/InditexTech/weavejs/issues/616) Improve mouse cursor handling on tools

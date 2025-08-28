@@ -49,6 +49,9 @@ export * from './nodes/frame/types';
 export { WeaveStrokeNode } from './nodes/stroke/stroke';
 export * from './nodes/stroke/constants';
 export * from './nodes/stroke/types';
+export { WeaveCommentNode } from './nodes/comment/comment';
+export * from './nodes/comment/constants';
+export * from './nodes/comment/types';
 
 // Provided Actions
 export { WeaveZoomOutToolAction } from './actions/zoom-out-tool/zoom-out-tool';
@@ -105,6 +108,9 @@ export * from './actions/export-nodes-tool/types';
 export { WeaveAlignNodesToolAction } from './actions/align-nodes-tool/align-nodes-tool';
 export * from './actions/align-nodes-tool/constants';
 export * from './actions/align-nodes-tool/types';
+export { WeaveCommentToolAction } from './actions/comment-tool/comment-tool';
+export * from './actions/comment-tool/constants';
+export * from './actions/comment-tool/types';
 
 // Provided Plugins
 export { WeaveStageGridPlugin } from './plugins/stage-grid/stage-grid';
@@ -138,3 +144,6 @@ export * from './plugins/nodes-edge-snapping/types';
 export { WeaveNodesDistanceSnappingPlugin } from './plugins/nodes-distance-snapping/nodes-distance-snapping';
 export * from './plugins/nodes-distance-snapping/constants';
 export * from './plugins/nodes-distance-snapping/types';
+export { WeaveCommentsRendererPlugin } from './plugins/comments-renderer/comments-renderer';
+export * from './plugins/comments-renderer/constants';
+export * from './plugins/comments-renderer/types';
