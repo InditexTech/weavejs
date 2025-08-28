@@ -21,7 +21,7 @@ import {
 import { useWeave } from './store';
 
 type WeaveProviderType = {
-  getContainer: () => HTMLDivElement;
+  getContainer: () => HTMLElement;
   fonts?: WeaveFont[];
   store: WeaveStore;
   nodes?: WeaveNode[];

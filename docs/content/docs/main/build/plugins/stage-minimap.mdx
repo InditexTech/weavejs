@@ -1,0 +1,66 @@
+---
+title: Stage minimap
+description: Renders a minimap from the main stage
+---
+
+## Introduction
+
+This plugin renders a minimap from the main stage, provides a scaled-down preview of the stage content,
+useful for quick navigation and orientation. It renders the entire stage (including padding) into a
+miniature view and overlays a viewport rectangle that indicates the currently visible region.
+
+Features:
+
+- Displays the full stage content, always fitted and centered within the minimap.
+- Overlays a live viewport rectangle that updates as the user pans or zooms the stage.
+
+Use it to give users a bird’s-eye view of complex or zoomed-in canvases, making navigation more intuitive.
+
+<div className="fd-steps">
+
+<div className="[&_h3]:fd-step">
+
+### Import the Plugin
+
+Start by importing the plugin:
+
+```ts
+import { WeaveStageMinimapPlugin } from "@inditextech/weave-sdk";
+```
+
+</div>
+
+<div className='[&_h3]:fd-step'>
+
+### Register the Plugin
+
+Then register the plugin on the [Weave](/docs/sdk/api-reference/weave) class instance.
+
+```ts
+const instance = new Weave({
+  ...
+  plugins: [
+    ...,
+    new WeaveStageMinimapPlugin({ // [!code ++]
+      config: { // [!code ++]
+        getContainer: () => HTMLElement; // Function to define where to mount the minimap // [!code ++]
+        id: string; // Id to identify the container of the minimap // [!code ++]
+        width: number; // Width of the minimap // [!code ++]
+        fitToContentPadding: number; // Sets a padding to the stage image generated, useful if you're setting a padding when fit to stage zooming // [!code ++]
+      } // [!code ++]
+    }), // [!code ++]
+  ]
+})
+```
+
+</div>
+
+<div className='[&_h3]:fd-step'>
+
+### Use the plugin
+
+Once the plugin is registered a minimap will be rendered on the provided container.
+
+</div>
+
+</div>

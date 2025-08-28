@@ -117,6 +117,7 @@ export { WeaveStageGridPlugin } from './plugins/stage-grid/stage-grid';
 export * from './plugins/stage-grid/constants';
 export * from './plugins/stage-grid/types';
 export { WeaveStagePanningPlugin } from './plugins/stage-panning/stage-panning';
+export { WeaveStageMinimapPlugin } from './plugins/stage-minimap/stage-minimap';
 export { WeaveStageResizePlugin } from './plugins/stage-resize/stage-resize';
 export { WeaveStageZoomPlugin } from './plugins/stage-zoom/stage-zoom';
 export * from './plugins/stage-zoom/types';

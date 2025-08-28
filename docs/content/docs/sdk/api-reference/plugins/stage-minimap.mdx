@@ -1,0 +1,103 @@
+---
+title: WeaveStageMinimapPlugin
+description: Provides a scaled-down preview of the stage content
+---
+
+import { TypeTable } from "fumadocs-ui/components/type-table";
+
+## Overview
+
+The [WeaveStageMinimapPlugin](https://github.com/InditexTech/weavejs/blob/main/code/packages/sdk/src/plugins/stage-minimap/stage-minimap.ts)
+class represents a plugin that renders a scaled-down preview of the stage content on a specified DOM node, useful for quick navigation and
+orientation. It renders the entire stage (including padding) into a miniature view and overlays a viewport rectangle that indicates the currently
+visible region.
+
+The class extends the [WeavePlugin](/docs/sdk/api-reference/plugins/plugin) class
+
+## Name
+
+This plugin `name` property value is `stageMinimap`.
+
+## Import
+
+```shell
+import { WeaveStageMinimapPlugin } from "@inditextech/weave-sdk";
+```
+
+## Instantiation
+
+```ts
+new WeaveStageMinimapPlugin(params: WeaveStageMinimapPluginParams);
+```
+
+## TypeScript types
+
+```ts
+type WeaveStageMinimapPluginStyle = {
+  viewportReference: Konva.RectConfig;
+};
+
+type WeaveStageMinimapPluginConfig = {
+  getContainer: () => HTMLElement;
+  id: string;
+  width: number;
+  fitToContentPadding: number;
+  style: WeaveStageMinimapPluginStyle;
+};
+
+type WeaveStageMinimapPluginParams = {
+  config: Pick<
+    WeaveStageMinimapPluginConfig,
+    "getContainer" | "id" | "width" | "fitToContentPadding"
+  > &
+    DeepPartial<Pick<WeaveStageMinimapPluginConfig, "style">>;
+};
+```
+
+## Parameters
+
+For `WeaveStageMinimapPluginParams`:
+
+<TypeTable
+  type={{
+    ["config"]: {
+      required: true,
+      description: "Config parameters for the plugin.",
+      type: "WeaveStageMinimapPluginConfig",
+    },
+  }}
+/>
+
+For `WeaveStageMinimapPluginConfig`:
+
+<TypeTable
+  type={{
+    ["getContainer"]: {
+      required: true,
+      description:
+        "A function that determines the DOM node where to render the minimap.",
+      type: "() => HTMLElement",
+    },
+    ["id"]: {
+      required: true,
+      description: "The id of the Konva stage container for the minimap.",
+      type: "string",
+    },
+    ["width"]: {
+      required: true,
+      description:
+        "The width of the minimap, by default, the height is calculated based on the aspect ratio of the window.",
+      type: "number",
+    },
+    ["fitToContentPadding"]: {
+      required: true,
+      description:
+        "Padding to apply to the stage generated image in order to make a 1:1 if you fit to content when zooming.",
+      type: "number",
+    },
+    ["style"]: {
+      description: "Style configuration for the minimap",
+      type: "WeaveStageMinimapPluginStyle",
+    },
+  }}
+/>

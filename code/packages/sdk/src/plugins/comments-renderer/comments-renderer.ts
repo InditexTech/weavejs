@@ -7,14 +7,16 @@ import type {
   WeaveCommentsRendererPluginParams,
   WeaveCommentsRendererPluginConfig,
 } from './types';
-import { WEAVE_COMMENTS_RENDERER_KEY } from './constants';
+import {
+  WEAVE_COMMENTS_RENDERER_KEY,
+  WEAVE_COMMENTS_TOOL_LAYER_ID,
+} from './constants';
 import {
   WEAVE_COMMENT_NODE_TYPE,
   WEAVE_COMMENT_STATUS,
 } from '@/nodes/comment/constants';
 import type { WeaveCommentNode } from '@/nodes/comment/comment';
 import { WeavePlugin } from '../plugin';
-import { WEAVE_COMMENT_TOOL_LAYER_NAME } from '@/actions/comment-tool/constants';
 
 export class WeaveCommentsRendererPlugin<T> extends WeavePlugin {
   private readonly config!: WeaveCommentsRendererPluginConfig<T>;
@@ -46,7 +48,7 @@ export class WeaveCommentsRendererPlugin<T> extends WeavePlugin {
   private initCommentsLayer(): Konva.Layer {
     const stage = this.instance.getStage();
     const commentsLayer = new Konva.Layer({
-      id: WEAVE_COMMENT_TOOL_LAYER_NAME,
+      id: WEAVE_COMMENTS_TOOL_LAYER_ID,
     });
     stage.add(commentsLayer);
 
@@ -149,7 +151,7 @@ export class WeaveCommentsRendererPlugin<T> extends WeavePlugin {
   }
 
   getCommentsLayer() {
-    const commentsLayerId = `#${WEAVE_COMMENT_TOOL_LAYER_NAME}`;
+    const commentsLayerId = `#${WEAVE_COMMENTS_TOOL_LAYER_ID}`;
     const commentLayer = this.instance.getStage()?.findOne(commentsLayerId) as
       | Konva.Layer
       | undefined;

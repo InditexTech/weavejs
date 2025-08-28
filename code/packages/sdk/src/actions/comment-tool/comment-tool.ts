@@ -340,7 +340,11 @@ export class WeaveCommentToolAction<T> extends WeaveAction {
   }
 
   private handleAdding() {
-    const { mousePoint } = this.instance.getMousePointer();
+    const mainLayer = this.instance.getMainLayer();
+
+    if (!mainLayer) return;
+
+    const mousePoint = mainLayer.getRelativePointerPosition();
 
     this.clickPoint = mousePoint;
 
@@ -349,7 +353,7 @@ export class WeaveCommentToolAction<T> extends WeaveAction {
     const nodeHandler =
       this.instance.getNodeHandler<WeaveCommentNode<T>>('comment');
 
-    if (nodeHandler) {
+    if (nodeHandler && this.clickPoint) {
       const node: Konva.Group = nodeHandler.onRender({
         id: this.commentId,
         x: this.clickPoint.x,
