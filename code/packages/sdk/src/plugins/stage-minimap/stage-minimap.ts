@@ -17,7 +17,7 @@ import { merge } from 'lodash';
 export class WeaveStageMinimapPlugin extends WeavePlugin {
   getLayerName = undefined;
   initLayer = undefined;
-  private config: WeaveStageMinimapPluginConfig;
+  private readonly config: WeaveStageMinimapPluginConfig;
   private minimapStage!: Konva.Stage;
   private minimapLayer!: Konva.Layer;
   private minimapStageImage!: Konva.Image;
