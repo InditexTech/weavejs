@@ -380,10 +380,13 @@ export function getSelectedNodesMetadata(transformer: Konva.Transformer): {
 export function getTargetAndSkipNodes(
   instance: Weave,
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  e: KonvaEventObject<any, any>
+  e: KonvaEventObject<any, any>,
+  forceTransformer: boolean = false
 ) {
   const nodesSelectionPlugin =
     instance.getPlugin<WeaveNodesSelectionPlugin>('nodesSelection');
+
+  if (!nodesSelectionPlugin) return { targetNode: undefined, skipNodes: [] };
 
   let skipNodes = [];
   let node: Konva.Node | undefined = undefined;
@@ -406,12 +409,21 @@ export function getTargetAndSkipNodes(
     node = nodesSelectionPlugin.getTransformer();
     skipNodes = [...nodes];
   }
+
   if (e.type === 'transform') {
     node = e.target;
     skipNodes.push(node.getAttrs().id ?? '');
+    skipNodes.push(
+      ...(node as Konva.Transformer)
+        .nodes()
+        .map((node) => node.getAttrs().id ?? '')
+    );
   }
 
-  return { targetNode: node, skipNodes };
+  return {
+    targetNode: forceTransformer ? nodesSelectionPlugin.getTransformer() : node,
+    skipNodes,
+  };
 }
 
 export function getVisibleNodesInViewport(

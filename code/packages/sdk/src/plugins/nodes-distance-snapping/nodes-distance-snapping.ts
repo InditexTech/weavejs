@@ -27,6 +27,7 @@ import type { KonvaEventObject } from 'konva/lib/Node';
 import type { BoundingBox } from '@inditextech/weave-types';
 import { getTargetAndSkipNodes, getVisibleNodes } from '@/utils';
 import type { Context } from 'konva/lib/Context';
+import type { WeaveNodesSelectionPlugin } from '../nodes-selection/nodes-selection';
 
 export class WeaveNodesDistanceSnappingPlugin extends WeavePlugin {
   private readonly uiConfig: WeaveNodesDistanceSnappingUIConfig;
@@ -94,14 +95,15 @@ export class WeaveNodesDistanceSnappingPlugin extends WeavePlugin {
 
     const { targetNode: node, skipNodes } = getTargetAndSkipNodes(
       this.instance,
-      e
+      e,
+      true
     );
 
     if (typeof node === 'undefined') {
       return;
     }
 
-    const nodeParent = this.instance.getNodeContainer(node);
+    const nodeParent = this.getSelectionParentNode();
 
     if (nodeParent === null) {
       return;
@@ -117,6 +119,7 @@ export class WeaveNodesDistanceSnappingPlugin extends WeavePlugin {
       skipNodes,
       this.referenceLayer
     );
+
     // find horizontally intersecting nodes
     const {
       intersectedNodes: sortedHorizontalIntersectedNodes,
@@ -151,13 +154,56 @@ export class WeaveNodesDistanceSnappingPlugin extends WeavePlugin {
     }
   }
 
-  private getBoxClientRect(node: Konva.Node): BoundingBox {
+  private getBoxClientRect(node: Konva.Node | Konva.Transformer): BoundingBox {
     const stage = this.instance.getStage();
-    return node.getClientRect({
+
+    const realNode = node;
+    if (node instanceof Konva.Transformer) {
+      let minX = Infinity;
+      let minY = Infinity;
+      let maxX = -Infinity;
+      let maxY = -Infinity;
+
+      node.nodes().forEach((node) => {
+        const box = node.getClientRect({
+          relativeTo: stage,
+          skipStroke: true,
+          skipShadow: true,
+        });
+        minX = Math.min(minX, box.x);
+        minY = Math.min(minY, box.y);
+        maxX = Math.max(maxX, box.x + box.width);
+        maxY = Math.max(maxY, box.y + box.height);
+      });
+
+      return {
+        x: minX,
+        y: minY,
+        width: maxX - minX,
+        height: maxY - minY,
+      };
+    }
+
+    return realNode.getClientRect({
       relativeTo: stage,
       skipStroke: true,
       skipShadow: true,
     });
+  }
+
+  private getSelectionParentNode() {
+    let nodeParent = null;
+
+    const nodesSelectionPlugin =
+      this.instance.getPlugin<WeaveNodesSelectionPlugin>('nodesSelection');
+
+    if (nodesSelectionPlugin) {
+      nodeParent = this.instance.getNodeContainer(
+        nodesSelectionPlugin.getTransformer().nodes()[0]
+      );
+    }
+
+    return nodeParent;
   }
 
   private getPeers(
@@ -258,7 +304,8 @@ export class WeaveNodesDistanceSnappingPlugin extends WeavePlugin {
         const newX = center - box.width / 2;
         // Snap targetNode to that position
         this.setNodeClientRectX(node, newX);
-        this.snapPositionX = node.x();
+        this.snapPositionX =
+          node instanceof Konva.Transformer ? newX : node.x();
         this.currentSizeSnapHorizontal = NODE_SNAP_HORIZONTAL.CENTER;
         const newBox = this.getBoxClientRect(node);
         this.peerDistanceX = Math.round(newBox.x - (prevBox.x + prevBox.width));
@@ -277,7 +324,15 @@ export class WeaveNodesDistanceSnappingPlugin extends WeavePlugin {
       this.peerDistanceX &&
       this.snapPositionX
     ) {
-      node.x(this.snapPositionX);
+      if (node instanceof Konva.Transformer) {
+        const box = this.getBoxClientRect(node);
+        const dx = this.snapPositionX - box.x;
+        node.nodes().forEach((n) => {
+          n.x(n.x() + dx);
+        });
+      } else {
+        node.x(this.snapPositionX);
+      }
 
       const { intersectedNodesWithDistances: newHorizontalIntersectedNodes } =
         this.getHorizontallyIntersectingNodes(node, visibleNodes);
@@ -300,7 +355,8 @@ export class WeaveNodesDistanceSnappingPlugin extends WeavePlugin {
         if (match) {
           const newX = prevBox.x + prevBox.width + match.distance;
           this.setNodeClientRectX(node, newX);
-          this.snapPositionX = node.x();
+          this.snapPositionX =
+            node instanceof Konva.Transformer ? newX : node.x();
           this.currentSizeSnapHorizontal = NODE_SNAP_HORIZONTAL.LEFT;
           const newBox = this.getBoxClientRect(node);
           this.peerDistanceX = Math.round(
@@ -319,7 +375,8 @@ export class WeaveNodesDistanceSnappingPlugin extends WeavePlugin {
       if (match) {
         const newX = nextBox.x - match.distance - box.width;
         this.setNodeClientRectX(node, newX);
-        this.snapPositionX = node.x();
+        this.snapPositionX =
+          node instanceof Konva.Transformer ? newX : node.x();
         const newBox = this.getBoxClientRect(node);
         this.peerDistanceX = Math.round(nextBox.x - (newBox.x + newBox.width));
         this.currentSizeSnapHorizontal = NODE_SNAP_HORIZONTAL.RIGHT;
@@ -390,7 +447,8 @@ export class WeaveNodesDistanceSnappingPlugin extends WeavePlugin {
         const center = (prevBox.y + prevBox.height + nextBox.y) / 2;
         const newY = center - box.height / 2;
         this.setNodeClientRectY(node, newY);
-        this.snapPositionY = node.y();
+        this.snapPositionY =
+          node instanceof Konva.Transformer ? newY : node.y();
         this.currentSizeSnapVertical = NODE_SNAP_VERTICAL.MIDDLE;
 
         const newBox = this.getBoxClientRect(node);
@@ -413,7 +471,15 @@ export class WeaveNodesDistanceSnappingPlugin extends WeavePlugin {
       this.peerDistanceY &&
       this.snapPositionY
     ) {
-      node.y(this.snapPositionY);
+      if (node instanceof Konva.Transformer) {
+        const box = this.getBoxClientRect(node);
+        const dy = this.snapPositionY - box.y;
+        node.nodes().forEach((n) => {
+          n.y(n.y() + dy);
+        });
+      } else {
+        node.y(this.snapPositionY);
+      }
 
       const { intersectedNodesWithDistances: newVerticalIntersectedNodes } =
         this.getVerticallyIntersectingNodes(node, visibleNodes);
@@ -438,7 +504,8 @@ export class WeaveNodesDistanceSnappingPlugin extends WeavePlugin {
         if (match) {
           const newY = prevBox.y + prevBox.height + match.distance;
           this.setNodeClientRectY(node, newY);
-          this.snapPositionY = node.y();
+          this.snapPositionY =
+            node instanceof Konva.Transformer ? newY : node.y();
           this.currentSizeSnapVertical = NODE_SNAP_VERTICAL.TOP;
 
           const newBox = this.getBoxClientRect(node);
@@ -460,7 +527,8 @@ export class WeaveNodesDistanceSnappingPlugin extends WeavePlugin {
       if (match) {
         const newY = nextBox.y - match.distance - box.height;
         this.setNodeClientRectY(node, newY);
-        this.snapPositionY = node.y();
+        this.snapPositionY =
+          node instanceof Konva.Transformer ? newY : node.y();
 
         const newBox = this.getBoxClientRect(node);
 
@@ -471,6 +539,17 @@ export class WeaveNodesDistanceSnappingPlugin extends WeavePlugin {
   }
 
   private setNodeClientRectX(node: Konva.Node, snappedClientX: number) {
+    if (node instanceof Konva.Transformer) {
+      const box = this.getBoxClientRect(node);
+      const dx = snappedClientX - box.x;
+      node.nodes().forEach((node) => {
+        node.x(node.x() + dx);
+      });
+      return;
+    } else {
+      node.x(snappedClientX);
+    }
+
     if (node.getParent()?.getType() === 'Layer') {
       node.x(snappedClientX);
       return;
@@ -502,6 +581,15 @@ export class WeaveNodesDistanceSnappingPlugin extends WeavePlugin {
   }
 
   private setNodeClientRectY(node: Konva.Node, snappedClientY: number) {
+    if (node instanceof Konva.Transformer) {
+      const box = this.getBoxClientRect(node);
+      const dy = snappedClientY - box.y;
+      node.nodes().forEach((node) => {
+        node.y(node.y() + dy);
+      });
+      return;
+    }
+
     if (node.getParent()?.getType() === 'Layer') {
       node.y(snappedClientY);
       return;
@@ -584,8 +672,26 @@ export class WeaveNodesDistanceSnappingPlugin extends WeavePlugin {
 
     const intersectedNodes: Konva.Node[] = [];
 
+    const nodesSelectionPlugin =
+      this.instance.getPlugin<WeaveNodesSelectionPlugin>('nodesSelection');
+
+    let targetNodes: string[] = [targetNode.getAttrs().id ?? ''];
+    if (
+      nodesSelectionPlugin &&
+      nodesSelectionPlugin.getTransformer().nodes().length > 1
+    ) {
+      targetNodes = [
+        targetNode.getAttrs().id ?? '',
+        ...nodesSelectionPlugin
+          .getTransformer()
+          .nodes()
+          .map((node) => node.getAttrs().id ?? ''),
+      ];
+    }
+
     nodes.forEach((node) => {
-      if (node === targetNode || !node.isVisible()) return false;
+      if (targetNodes.includes(node.getAttrs().id ?? '') || !node.isVisible())
+        return false;
 
       const box = this.getBoxClientRect(node);
 
@@ -659,8 +765,26 @@ export class WeaveNodesDistanceSnappingPlugin extends WeavePlugin {
 
     const intersectedNodes: Konva.Node[] = [];
 
+    const nodesSelectionPlugin =
+      this.instance.getPlugin<WeaveNodesSelectionPlugin>('nodesSelection');
+
+    let targetNodes: string[] = [targetNode.getAttrs().id ?? ''];
+    if (
+      nodesSelectionPlugin &&
+      nodesSelectionPlugin.getTransformer().nodes().length > 1
+    ) {
+      targetNodes = [
+        targetNode.getAttrs().id ?? '',
+        ...nodesSelectionPlugin
+          .getTransformer()
+          .nodes()
+          .map((node) => node.getAttrs().id ?? ''),
+      ];
+    }
+
     nodes.forEach((node) => {
-      if (node === targetNode || !node.isVisible()) return false;
+      if (targetNodes.includes(node.getAttrs().id ?? '') || !node.isVisible())
+        return false;
 
       const box = this.getBoxClientRect(node);
 

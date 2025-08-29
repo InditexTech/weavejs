@@ -15,6 +15,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- [#622](https://github.com/InditexTech/weavejs/issues/622) Support multiple nodes selection on nodes distance snapping and nodes edge snapping plugins
 - [#624](https://github.com/InditexTech/weavejs/issues/624) Support configuration of selection behavior
 
 ## [0.61.0] - 2025-08-28
