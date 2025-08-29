@@ -9,6 +9,12 @@ export type WeaveNodesSelectionPluginOnSelectionStateEvent = boolean;
 export type WeaveNodesSelectionPluginOnNodesChangeEvent = WeaveSelection[];
 export type WeaveNodesSelectionPluginOnStageSelectionEvent = undefined;
 
+export type WeaveNodesSelectionOnSelectionParams = {
+  resizeEnabled: boolean;
+  rotateEnabled: boolean;
+  enabledAnchors: string[];
+};
+
 export type WeaveNodesSelectionBehaviorsConfig = {
   singleSelection: {
     enabled: boolean;
@@ -16,6 +22,9 @@ export type WeaveNodesSelectionBehaviorsConfig = {
   multipleSelection: {
     enabled: boolean;
   };
+  onMultipleSelection?: (
+    selectedNodes: Konva.Node[]
+  ) => Partial<WeaveNodesSelectionOnSelectionParams>;
 };
 
 export type WeaveNodesSelectionPanningOnSelectionConfig = {
