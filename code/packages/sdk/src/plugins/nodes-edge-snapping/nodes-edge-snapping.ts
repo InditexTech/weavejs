@@ -86,7 +86,7 @@ export class WeaveNodesEdgeSnappingPlugin extends WeavePlugin {
       return;
     }
 
-    const nodeParent = this.instance.getNodeContainer(node);
+    const nodeParent = this.getSelectionParentNode(node);
 
     if (nodeParent === null) {
       return;
@@ -189,6 +189,32 @@ export class WeaveNodesEdgeSnappingPlugin extends WeavePlugin {
         }
       }
     }
+  }
+
+  private getSelectionParentNode(node: Konva.Node) {
+    let nodeParent = null;
+
+    const nodesSelectionPlugin =
+      this.instance.getPlugin<WeaveNodesSelectionPlugin>('nodesSelection');
+
+    if (
+      nodesSelectionPlugin &&
+      nodesSelectionPlugin.getTransformer().nodes().length > 1
+    ) {
+      if (nodesSelectionPlugin) {
+        nodeParent = this.instance.getNodeContainer(
+          nodesSelectionPlugin.getTransformer().nodes()[0]
+        );
+      }
+    }
+    if (
+      nodesSelectionPlugin &&
+      nodesSelectionPlugin.getTransformer().nodes().length === 1
+    ) {
+      nodeParent = this.instance.getNodeContainer(node);
+    }
+
+    return nodeParent;
   }
 
   cleanupGuidelines(): void {
