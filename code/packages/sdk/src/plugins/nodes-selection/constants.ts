@@ -2,8 +2,6 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-import type Konva from 'konva';
-
 export const WEAVE_NODES_SELECTION_KEY = 'nodesSelection';
 export const WEAVE_NODES_SELECTION_LAYER_ID = 'selectionLayer';
 
@@ -65,19 +63,7 @@ export const WEAVE_NODES_SELECTION_DEFAULT_CONFIG = {
   behaviors: {
     singleSelection: { enabled: true },
     multipleSelection: { enabled: false },
-    onMultipleSelection: (nodes: Konva.Node[]) => {
-      const containsFrames = nodes.some(
-        (node) => node.getAttrs().nodeType === 'frame'
-      );
-
-      if (containsFrames) {
-        return {
-          resizeEnabled: false,
-          rotateEnabled: false,
-          enabledAnchors: [],
-        };
-      }
-
+    onMultipleSelection: () => {
       return {
         resizeEnabled: true,
         rotateEnabled: true,
