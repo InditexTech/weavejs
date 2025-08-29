@@ -63,5 +63,21 @@ export const WEAVE_NODES_SELECTION_DEFAULT_CONFIG = {
   behaviors: {
     singleSelection: { enabled: true },
     multipleSelection: { enabled: false },
+    onMultipleSelection: () => {
+      return {
+        resizeEnabled: true,
+        rotateEnabled: true,
+        enabledAnchors: [
+          'top-left',
+          'top-center',
+          'top-right',
+          'middle-right',
+          'middle-left',
+          'bottom-left',
+          'bottom-center',
+          'bottom-right',
+        ],
+      };
+    },
   },
 };
