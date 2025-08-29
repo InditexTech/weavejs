@@ -59,6 +59,12 @@ type WeaveNodesSelectionPluginOnSelectionStateEvent = boolean;
 type WeaveNodesSelectionPluginOnNodesChangeEvent = WeaveSelection[];
 type WeaveNodesSelectionPluginOnStageSelectionEvent = undefined;
 
+type WeaveNodesSelectionOnSelectionParams = {
+  resizeEnabled: boolean;
+  rotateEnabled: boolean;
+  enabledAnchors: string[];
+};
+
 type WeaveNodesSelectionBehaviorsConfig = {
   singleSelection: {
     enabled: boolean;
@@ -66,6 +72,9 @@ type WeaveNodesSelectionBehaviorsConfig = {
   multipleSelection: {
     enabled: boolean;
   };
+  onMultipleSelection?: (
+    selectedNodes: Konva.Node[]
+  ) => Partial<WeaveNodesSelectionOnSelectionParams>;
 };
 
 type WeaveNodesSelectionPanningOnSelectionConfig = {
@@ -165,6 +174,11 @@ For `WeaveNodesSelectionBehaviorsConfig`:
       description: "Enables transformer anchor handles on multiple selection.",
       type: "boolean",
       default: "false",
+    },
+    ["onMultipleSelection"]: {
+      description:
+        "Function that allows to define the transformer behavior when multi-selecting nodes",
+      type: "(selectedNodes: Konva.Node[]) => Partial<WeaveNodesSelectionOnSelectionParams>",
     },
   }}
 />

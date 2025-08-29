@@ -1087,8 +1087,7 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
       this.tr.nodes([...selectedNodes]);
 
       this.handleBehaviors();
-
-      this.triggerSelectedNodesEvent();
+      this.handleMultipleSelectionBehavior();
 
       stage.container().tabIndex = 1;
       stage.container().focus();
@@ -1101,6 +1100,18 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
     this.instance.addEventListener('onUndoManagerStatusChange', () => {
       this.syncSelection();
     });
+  }
+
+  private handleMultipleSelectionBehavior() {
+    if (
+      this.tr.nodes().length > 1 &&
+      this.config.behaviors?.onMultipleSelection
+    ) {
+      const selectionBehavior = this.config.behaviors?.onMultipleSelection?.(
+        this.tr.nodes()
+      );
+      this.tr.setAttrs(selectionBehavior);
+    }
   }
 
   protected syncSelection(): void {
@@ -1259,6 +1270,7 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
     }
 
     this.handleBehaviors();
+    this.handleMultipleSelectionBehavior();
 
     if (areNodesSelected) {
       stage.container().tabIndex = 1;
