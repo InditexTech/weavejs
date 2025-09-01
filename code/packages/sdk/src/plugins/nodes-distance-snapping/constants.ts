@@ -13,7 +13,7 @@ export const GUIDE_DISTANCE_LINE_DEFAULT_CONFIG: WeaveNodesDistanceSnappingUICon
   {
     line: {
       stroke: '#E12D3C',
-      strokeWidth: 1,
+      strokeWidth: 0.5,
     },
     label: {
       linePadding: 10,

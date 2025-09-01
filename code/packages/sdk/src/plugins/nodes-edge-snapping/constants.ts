@@ -11,7 +11,7 @@ export const GUIDE_LINE_DEFAULT_CONFIG: Required<
   Pick<Konva.LineConfig, 'stroke' | 'strokeWidth' | 'dash'>
 > = {
   stroke: '#ff0000',
-  strokeWidth: 1,
+  strokeWidth: 0.5,
   dash: [],
 };
 export const GUIDE_LINE_DRAG_SNAPPING_THRESHOLD = 3;
