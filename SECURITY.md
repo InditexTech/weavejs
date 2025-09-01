@@ -17,7 +17,7 @@ fixing vulnerabilities and understand that sometimes more time is required to pr
 
 > [!CAUTION]
 > Do not file public issues on GitHub for security vulnerabilities
-* Let us know by submitting the finding through our [disclosure submission program](https://inditex.responsibledisclosure.com/)
+* Let us know by submitting the finding through our [disclosure submission program](https://vdp.inditex.com)
   as soon as possible, upon discovery of a potential security issue.
 * Once we've assessed your report, we will create a GitHub "security advisory", which will allow the reporter and
   Inditex team to work on the issue in a confidential manner. We will invite you as a collaborator to the advisory and any
