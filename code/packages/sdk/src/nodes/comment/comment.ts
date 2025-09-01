@@ -997,6 +997,14 @@ export class WeaveCommentNode<T> extends WeaveNode {
     });
   }
 
+  setCommentModel(commentNode: WeaveElementInstance, comment: T) {
+    commentNode.setAttrs({
+      commentModel: comment,
+    });
+
+    this.normalizeNodeSize(commentNode);
+  }
+
   focusOn(nodeId: string, duration = 0.5) {
     if (this.commentDomVisible && this.commentDomVisibleId) {
       const commentNode = this.instance
