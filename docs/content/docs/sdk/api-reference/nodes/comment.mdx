@@ -325,6 +325,57 @@ const WEAVE_COMMENT_NODE_DEFAULTS = {
 };
 ```
 
+## Methods
+
+### focusOn
+
+```ts
+focusOn(nodeId: string, duration = 0.5): void
+```
+
+This method focus the stage on the node with a nice animation. The animation duration can be tuned.
+
+### setCommentViewing
+
+```ts
+setCommentViewing(commentId: string | null): void
+```
+
+This method sets if a comment is actually on the `viewing` internal state for the DOM, passing the comment Id from
+the model that is visible. If null is passed the internal state is `idle`.
+
+### setCommentViewing
+
+```ts
+isCommentViewing(): boolean
+```
+
+This method returns true if the internal state of the DOM is `viewing'.
+
+### isCommentCreating
+
+```ts
+isCommentCreating(): boolean
+```
+
+This method returns true if the internal state of the DOM is `creating'.
+
+### getCommentId
+
+```ts
+getCommentId(node: WeaveElementInstance): string
+```
+
+Gets the comment Id from the node using the defined model functions.
+
+### setShowResolved
+
+```ts
+setShowResolved(show: boolean): void
+```
+
+If true, allow to render nodes that are on the `resolved` status.
+
 ## Events
 
 ### onCommentFinishCreate

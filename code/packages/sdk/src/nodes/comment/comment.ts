@@ -592,6 +592,10 @@ export class WeaveCommentNode<T> extends WeaveNode {
     }
 
     if (commentAction === WEAVE_COMMENT_NODE_ACTION.IDLE) {
+      this.commentDomAction = 'idle';
+      this.commentDomVisibleId = null;
+      this.commentDomVisible = false;
+
       const internalRect = commentNode.findOne(`#${commentNode.id()}-bg`);
       internalRect?.setAttrs({
         fill: '#FFFFFF',
@@ -993,18 +997,6 @@ export class WeaveCommentNode<T> extends WeaveNode {
     });
   }
 
-  afterCreatePersist(commentNode: WeaveElementInstance, comment: T) {
-    commentNode.setAttrs({
-      commentModel: comment,
-    });
-
-    this.normalizeNodeSize(commentNode);
-  }
-
-  open(commentNode: WeaveElementInstance) {
-    this.openCommentDOM(commentNode);
-  }
-
   focusOn(nodeId: string, duration = 0.5) {
     if (this.commentDomVisible && this.commentDomVisibleId) {
       const commentNode = this.instance
@@ -1048,6 +1040,12 @@ export class WeaveCommentNode<T> extends WeaveNode {
 
       tween.play();
     }
+  }
+
+  setCommentViewing(commentId: string | null) {
+    this.commentDomAction = commentId ? 'viewing' : 'idle';
+    this.commentDomVisible = !!commentId;
+    this.commentDomVisibleId = commentId;
   }
 
   isCommentViewing() {
