@@ -1017,7 +1017,7 @@ export class WeaveNodesDistanceSnappingPlugin extends WeavePlugin {
         ctx.lineTo(x2, y);
         ctx.closePath();
         ctx.strokeStyle = uiConfig.line.stroke;
-        ctx.lineWidth = uiConfig.line.strokeWidth;
+        ctx.lineWidth = uiConfig.line.strokeWidth / (stage?.scaleX() ?? 1);
         ctx.setLineDash([]);
         ctx.stroke();
         ctx.closePath();
@@ -1076,7 +1076,7 @@ export class WeaveNodesDistanceSnappingPlugin extends WeavePlugin {
         ctx.moveTo(x, y1);
         ctx.lineTo(x, y2);
         ctx.strokeStyle = uiConfig.line.stroke;
-        ctx.lineWidth = uiConfig.line.strokeWidth;
+        ctx.lineWidth = uiConfig.line.strokeWidth / (stage?.scaleX() ?? 1);
         ctx.stroke();
         ctx.closePath();
 

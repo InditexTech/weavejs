@@ -110,7 +110,7 @@ export class WeaveNodesEdgeSnappingPlugin extends WeavePlugin {
 
     this.cleanupGuidelines();
 
-    // do nothing of no snapping
+    // do nothing of snapping
     if (guides.length > 0) {
       this.drawGuides(guides);
 
@@ -340,8 +340,12 @@ export class WeaveNodesEdgeSnappingPlugin extends WeavePlugin {
         const diff = Math.abs(lineGuide - itemBound.guide);
         // if the distance between guild line and object snap point is close we can consider this for snapping
         if (
-          diff < this.dragSnappingThreshold &&
-          !resultMapV.has(itemBound.nodeId)
+          (diff < this.dragSnappingThreshold &&
+            !resultMapV.has(`${itemBound.snap}-${itemBound.offset}`) &&
+            type === 'transform') ||
+          (diff < this.dragSnappingThreshold &&
+            !resultMapV.has(itemBound.nodeId) &&
+            type !== 'transform')
         ) {
           const guide = {
             nodeId: itemBound.nodeId,
@@ -350,7 +354,13 @@ export class WeaveNodesEdgeSnappingPlugin extends WeavePlugin {
             snap: itemBound.snap,
             offset: itemBound.offset,
           };
-          resultMapV.set(itemBound.nodeId, guide);
+
+          if (type === 'transform') {
+            resultMapV.set(`${itemBound.snap}-${itemBound.offset}`, guide);
+          } else {
+            resultMapV.set(itemBound.nodeId, guide);
+          }
+
           resultV.push(guide);
         }
       });
@@ -360,8 +370,12 @@ export class WeaveNodesEdgeSnappingPlugin extends WeavePlugin {
       itemBounds.horizontal.forEach((itemBound) => {
         const diff = Math.abs(lineGuide - itemBound.guide);
         if (
-          diff < this.dragSnappingThreshold &&
-          !resultMapH.has(itemBound.nodeId)
+          (diff < this.dragSnappingThreshold &&
+            !resultMapH.has(`${itemBound.snap}-${itemBound.offset}`) &&
+            type === 'transform') ||
+          (diff < this.dragSnappingThreshold &&
+            !resultMapH.has(itemBound.nodeId) &&
+            type !== 'transform')
         ) {
           const guide = {
             nodeId: itemBound.nodeId,
@@ -370,7 +384,13 @@ export class WeaveNodesEdgeSnappingPlugin extends WeavePlugin {
             snap: itemBound.snap,
             offset: itemBound.offset,
           };
-          resultMapH.set(itemBound.nodeId, guide);
+
+          if (type === 'transform') {
+            resultMapH.set(`${itemBound.snap}-${itemBound.offset}`, guide);
+          } else {
+            resultMapH.set(itemBound.nodeId, guide);
+          }
+
           resultH.push(guide);
         }
       });
@@ -435,35 +455,45 @@ export class WeaveNodesEdgeSnappingPlugin extends WeavePlugin {
     if (utilityLayer) {
       guides.forEach((lg) => {
         if (lg.orientation === GUIDE_ORIENTATION.HORIZONTAL) {
+          const transform = stage.getAbsoluteTransform().copy().invert();
+          const left = transform.point({ x: 0, y: 0 });
+          const right = transform.point({ x: stage.width(), y: 0 });
+
           const line = new Konva.Line({
             ...this.guideLineConfig,
             strokeWidth:
               (this.guideLineConfig.strokeWidth ??
                 GUIDE_LINE_DEFAULT_CONFIG.strokeWidth) / stage.scaleX(),
+            strokeScaleEnabled: true,
             dash: this.guideLineConfig.dash?.map((e) => e / stage.scaleX()),
-            points: [-6000, 0, 6000, 0],
+            points: [left.x, 0, right.x, 0],
             name: GUIDE_LINE_NAME,
           });
           utilityLayer.add(line);
           line.absolutePosition({
-            x: 0,
+            x: stage.x(),
             y: lg.lineGuide,
           });
         }
         if (lg.orientation === GUIDE_ORIENTATION.VERTICAL) {
+          const transform = stage.getAbsoluteTransform().copy().invert();
+          const top = transform.point({ x: 0, y: 0 });
+          const bottom = transform.point({ x: 0, y: stage.height() });
+
           const line = new Konva.Line({
             ...this.guideLineConfig,
             strokeWidth:
               (this.guideLineConfig.strokeWidth ??
                 GUIDE_LINE_DEFAULT_CONFIG.strokeWidth) / stage.scaleX(),
+            strokeScaleEnabled: true,
             dash: this.guideLineConfig.dash?.map((e) => e / stage.scaleX()),
-            points: [0, -6000, 0, 6000],
+            points: [0, top.y, 0, bottom.y],
             name: GUIDE_LINE_NAME,
           });
           utilityLayer.add(line);
           line.absolutePosition({
             x: lg.lineGuide,
-            y: 0,
+            y: stage.y(),
           });
         }
       });

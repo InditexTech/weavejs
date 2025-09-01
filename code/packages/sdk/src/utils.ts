@@ -410,11 +410,12 @@ export function getTargetAndSkipNodes(
     skipNodes = [...nodes];
   }
 
-  if (e.type === 'transform') {
+  if (e.type === 'transform' && nodesSelectionPlugin) {
     node = e.target;
     skipNodes.push(node.getAttrs().id ?? '');
     skipNodes.push(
-      ...(node as Konva.Transformer)
+      ...nodesSelectionPlugin
+        .getTransformer()
         .nodes()
         .map((node) => node.getAttrs().id ?? '')
     );
