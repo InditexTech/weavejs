@@ -27,7 +27,3 @@ fixing vulnerabilities and understand that sometimes more time is required to pr
 * Details on the issue will be embargoed for 30 days to give users an oppurtunity to upgrade, after which we will
   coordinate disclosure with the researcher(s).
 * If you've contributed the fix, you will be credited for it.
-
-## Policy
-
-Find out more about our [responsible disclosure policy](https://inditex.responsibledisclosure.com/hc/en-us#vdp_policy)
