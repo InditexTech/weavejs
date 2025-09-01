@@ -17,7 +17,7 @@ fixing vulnerabilities and understand that sometimes more time is required to pr
 
 > [!CAUTION]
 > Do not file public issues on GitHub for security vulnerabilities
-* Let us know by submitting the finding through our [disclosure submission program](https://inditex.responsibledisclosure.com/)
+* Let us know by submitting the finding through our [disclosure submission program](https://vdp.inditex.com)
   as soon as possible, upon discovery of a potential security issue.
 * Once we've assessed your report, we will create a GitHub "security advisory", which will allow the reporter and
   Inditex team to work on the issue in a confidential manner. We will invite you as a collaborator to the advisory and any
@@ -27,7 +27,3 @@ fixing vulnerabilities and understand that sometimes more time is required to pr
 * Details on the issue will be embargoed for 30 days to give users an oppurtunity to upgrade, after which we will
   coordinate disclosure with the researcher(s).
 * If you've contributed the fix, you will be credited for it.
-
-## Policy
-
-Find out more about our [responsible disclosure policy](https://inditex.responsibledisclosure.com/hc/en-us#vdp_policy)
