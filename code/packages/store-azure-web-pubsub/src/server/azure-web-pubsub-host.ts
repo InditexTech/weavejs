@@ -9,10 +9,14 @@ import * as syncProtocol from 'y-protocols/sync';
 import * as awarenessProtocol from 'y-protocols/awareness';
 import ReconnectingWebSocket from 'reconnecting-websocket';
 
-import { WebPubSubServiceClient } from '@azure/web-pubsub';
+import {
+  WebPubSubServiceClient,
+  type ClientTokenResponse,
+} from '@azure/web-pubsub';
 import { WebSocket } from 'ws';
 import * as Y from 'yjs';
 
+const expirationTimeInMinutes = 60; // 1 hour
 const messageSync = 0;
 const messageAwareness = 1;
 const AzureWebPubSubJsonProtocol = 'json.webpubsub.azure.v1';
@@ -141,16 +145,31 @@ export class WeaveStoreAzureWebPubSubSyncHost extends Emittery {
     this.broadcast(this.topic, origin, u8);
   }
 
-  async start(): Promise<void> {
-    const url = await this.negotiate(this.topic);
-    const conn = new ReconnectingWebSocket(url, AzureWebPubSubJsonProtocol, {
-      WebSocket: this._polyfill,
-    });
-
+  async createWebSocket(): Promise<ReconnectingWebSocket> {
     const group = this.topic;
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    conn.onmessage = (e: any) => {
+    const { url } = await this.negotiate(this.topic);
+
+    const ws = new ReconnectingWebSocket(url, AzureWebPubSubJsonProtocol, {
+      WebSocket: this._polyfill,
+      // retry delay options
+      connectionTimeout: 4000,
+      maxRetries: Infinity,
+      maxReconnectionDelay: 8000,
+      minReconnectionDelay: 1000,
+    });
+
+    ws.addEventListener('open', () => {
+      this.emit('connected');
+      ws.send(
+        JSON.stringify({
+          type: MessageType.JoinGroup,
+          group: `${group}.host`,
+        })
+      );
+    });
+
+    ws.addEventListener('message', (e) => {
       const event: Message = JSON.parse(e.data.toString());
 
       if (event.type === 'message' && event.from === 'group') {
@@ -168,27 +187,33 @@ export class WeaveStoreAzureWebPubSubSyncHost extends Emittery {
             return;
         }
       }
-    };
+    });
 
-    conn.addEventListener('error', (error) => {
+    ws.addEventListener('close', (ev) => {
+      if (ev.code === 1008 && ws.readyState === WebSocket.OPEN) {
+        ws.close(); // ensure cleanup
+        this._conn = this.createWebSocket(); // start fresh with a new token
+      }
+    });
+
+    ws.addEventListener('error', (error) => {
       this.emit('error', error);
     });
 
-    conn.onclose = () => {
-      this.emit('close');
-    };
+    setTimeout(() => {
+      if (ws.readyState === WebSocket.OPEN) {
+        ws.close();
+        this._conn = this.createWebSocket(); // start fresh with a new token
+      }
+    }, expirationTimeInMinutes * 0.75 * 60 * 1000);
 
-    conn.onopen = () => {
-      this.emit('connected');
-      conn.send(
-        JSON.stringify({
-          type: MessageType.JoinGroup,
-          group: `${group}.host`,
-        })
-      );
-    };
+    this._conn = ws;
 
-    this._conn = conn;
+    return ws;
+  }
+
+  async start(): Promise<void> {
+    this._conn = await this.createWebSocket();
   }
 
   private broadcast(group: string, from: string, u8: Uint8Array) {
@@ -270,7 +295,7 @@ export class WeaveStoreAzureWebPubSubSyncHost extends Emittery {
     }
   }
 
-  private async negotiate(group: string): Promise<string> {
+  private async negotiate(group: string): Promise<ClientTokenResponse> {
     const roles = [
       `webpubsub.sendToGroup.${group}`,
       `webpubsub.joinLeaveGroup.${group}`,
@@ -278,9 +303,10 @@ export class WeaveStoreAzureWebPubSubSyncHost extends Emittery {
     ];
 
     const res = await this._client.getClientAccessToken({
+      expirationTimeInMinutes,
       userId: HostUserId,
       roles,
     });
-    return res.url;
+    return res;
   }
 }
