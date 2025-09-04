@@ -3,9 +3,9 @@
 // SPDX-License-Identifier: Apache-2.0
 
 export function watchMap<K, V>(
-  map = new Map<K, V>(),
+  onChange: (event: any) => void,
+  map = new Map<K, V>()
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  onChange: (event: any) => void
 ): Map<K, V> {
   const handler: ProxyHandler<Map<K, V>> = {
     get(target, prop, receiver) {

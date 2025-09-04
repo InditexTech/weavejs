@@ -84,7 +84,7 @@ export class Weave {
   private actionsManager: WeaveActionsManager;
   private exportManager: WeaveExportManager;
 
-  private asyncElements: Map<string, WeaveAsyncElement>;
+  private readonly asyncElements: Map<string, WeaveAsyncElement>;
 
   constructor(weaveConfig: WeaveConfig, stageConfig: Konva.StageConfig) {
     this.emitter = new Emittery();
@@ -95,9 +95,9 @@ export class Weave {
     this.id = uuidv4();
     this.initialized = false;
 
-    this.asyncElements = watchMap<string, WeaveAsyncElement>(new Map(), () => {
+    this.asyncElements = watchMap<string, WeaveAsyncElement>(() => {
       this.emitEvent('onAsyncElementChange');
-    });
+    }, new Map());
 
     // Save in memory the configuration provided
     this.config = merge({ serverSide: false }, weaveConfig);
