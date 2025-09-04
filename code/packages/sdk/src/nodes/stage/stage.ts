@@ -29,16 +29,18 @@ export class WeaveStageNode extends WeaveNode {
 
     stage.position({ x: 0, y: 0 });
 
-    const container = stage.container();
-    container.setAttribute('tabindex', '0');
+    if (!this.instance.isServerSide()) {
+      const container = stage.container();
+      container.setAttribute('tabindex', '0');
 
-    stage.container().addEventListener('focus', () => {
-      this.stageFocused = true;
-    });
+      stage.container().addEventListener('focus', () => {
+        this.stageFocused = true;
+      });
 
-    stage.container().addEventListener('blur', () => {
-      this.stageFocused = false;
-    });
+      stage.container().addEventListener('blur', () => {
+        this.stageFocused = false;
+      });
+    }
 
     Konva.Stage.prototype.mode = function (mode?: string) {
       if (typeof mode !== 'undefined') {
@@ -76,6 +78,7 @@ export class WeaveStageNode extends WeaveNode {
       }
 
       if (
+        !this.instance.isServerSide() &&
         [MOVE_TOOL_ACTION_NAME].includes(this.instance.getActiveAction() ?? '')
       ) {
         stage.container().style.cursor = 'grabbing';
@@ -86,6 +89,7 @@ export class WeaveStageNode extends WeaveNode {
       const activeAction = this.instance.getActiveAction();
 
       if (
+        !this.instance.isServerSide() &&
         ![MOVE_TOOL_ACTION_NAME].includes(activeAction ?? '') &&
         stage.allowSelection() &&
         !stage.allowActions().includes(this.instance.getActiveAction() ?? '') &&
@@ -110,7 +114,10 @@ export class WeaveStageNode extends WeaveNode {
         this.wheelMousePressed = false;
       }
 
-      if ([MOVE_TOOL_ACTION_NAME].includes(activeAction ?? '')) {
+      if (
+        !this.instance.isServerSide() &&
+        [MOVE_TOOL_ACTION_NAME].includes(activeAction ?? '')
+      ) {
         stage.container().style.cursor = 'grab';
       }
     });
@@ -128,7 +135,10 @@ export class WeaveStageNode extends WeaveNode {
       if (parent && parent instanceof Konva.Transformer) return;
 
       this.hideHoverState();
-      stage.container().style.cursor = 'default';
+
+      if (!this.instance.isServerSide()) {
+        stage.container().style.cursor = 'default';
+      }
     });
 
     return stage;

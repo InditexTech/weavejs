@@ -635,7 +635,7 @@ export class WeaveCopyPasteNodesPlugin extends WeavePlugin {
         return WEAVE_COPY_PASTE_PASTE_MODES.EXTERNAL;
       }
     } catch (e) {
-      this.getLogger().error('Error reading clipboard data', e as Error);
+      this.getLogger().error({ error: e }, 'Error reading clipboard data');
       return WEAVE_COPY_PASTE_PASTE_MODES.CLIPBOARD_API_ERROR;
     }
 

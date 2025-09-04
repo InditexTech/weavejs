@@ -158,6 +158,14 @@ export class WeaveImageNode extends WeaveNode {
     this.cachedCropInfo[imageNode.getAttrs().id ?? ''] = undefined;
   };
 
+  loadAsyncElement(nodeId: string) {
+    this.instance.loadAsyncElement(nodeId, 'image');
+  }
+
+  resolveAsyncElement(nodeId: string) {
+    this.instance.resolveAsyncElement(nodeId, 'image');
+  }
+
   onRender(props: WeaveElementAttributes): WeaveElementInstance {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const imageProperties: any = props.imageProperties;
@@ -296,6 +304,7 @@ export class WeaveImageNode extends WeaveNode {
 
     const imageActionTool = this.getImageToolAction();
     const preloadImg = imageActionTool.getPreloadedImage(imageProps.id);
+
     if (preloadImg) {
       imagePlaceholder?.setAttrs({
         width: imageProps.width ? imageProps.width : preloadImg.width,
@@ -427,10 +436,14 @@ export class WeaveImageNode extends WeaveNode {
       | Konva.Image
       | undefined;
 
+    const realImageURL =
+      this.config.urlTransformer?.(imageProps.imageURL ?? '') ??
+      imageProps.imageURL;
+
     const imageObj = new Image();
     imageObj.crossOrigin = this.config.crossOrigin;
     imageObj.onerror = (error) => {
-      console.error('Error loading image', imageProps.imageURL, error);
+      console.error('Error loading image', realImageURL, error);
       imagePlaceholder?.setAttrs({
         visible: true,
       });
@@ -438,6 +451,9 @@ export class WeaveImageNode extends WeaveNode {
         visible: false,
       });
     };
+
+    this.loadAsyncElement(imageProps.id);
+
     imageObj.onload = () => {
       if (image && imagePlaceholder && internalImage) {
         image.setAttrs({
@@ -486,6 +502,8 @@ export class WeaveImageNode extends WeaveNode {
 
         this.updateImageCrop(imageProps);
 
+        this.resolveAsyncElement(imageProps.id);
+
         const nodeHandler = this.instance.getNodeHandler<WeaveNode>(
           image.getAttrs().nodeType
         );
@@ -497,8 +515,8 @@ export class WeaveImageNode extends WeaveNode {
       }
     };
 
-    if (imageProps.imageURL) {
-      imageObj.src = imageProps.imageURL;
+    if (realImageURL) {
+      imageObj.src = realImageURL;
     }
   }
 

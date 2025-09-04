@@ -54,7 +54,9 @@ import { WeavePluginsManager } from './managers/plugins';
 import { WeaveNodesSelectionPlugin } from './plugins/nodes-selection/nodes-selection';
 import type { StageConfig } from 'konva/lib/Stage';
 import type { WeaveStoreOnRoomLoadedEvent } from './stores/types';
-import type { DOMElement } from './types';
+import type { DOMElement, WeaveAsyncElement } from './types';
+import { merge } from 'lodash';
+import { watchMap } from './watch-map';
 
 export class Weave {
   private id: string;
@@ -82,6 +84,8 @@ export class Weave {
   private actionsManager: WeaveActionsManager;
   private exportManager: WeaveExportManager;
 
+  private readonly asyncElements: Map<string, WeaveAsyncElement>;
+
   constructor(weaveConfig: WeaveConfig, stageConfig: Konva.StageConfig) {
     this.emitter = new Emittery();
 
@@ -91,8 +95,12 @@ export class Weave {
     this.id = uuidv4();
     this.initialized = false;
 
+    this.asyncElements = watchMap<string, WeaveAsyncElement>(() => {
+      this.emitEvent('onAsyncElementChange');
+    }, new Map());
+
     // Save in memory the configuration provided
-    this.config = weaveConfig;
+    this.config = merge({ serverSide: false }, weaveConfig);
     // Setup the logger
     this.logger = new WeaveLogger(
       this.config?.logger ?? {
@@ -128,15 +136,6 @@ export class Weave {
     this.exportManager = new WeaveExportManager(this);
     this.actionsManager = new WeaveActionsManager(this);
     this.pluginsManager = new WeavePluginsManager(this);
-
-    // Setup the instance on the weave global variable
-    if (!window.weave) {
-      window.weave = this;
-    }
-
-    // Initialize global window variables
-    window.weaveTextEditing = {};
-    window.weaveDragImageURL = undefined;
 
     // Render welcome log to console
     this.setupManager.welcomeLog();
@@ -197,6 +196,31 @@ export class Weave {
 
   async start(): Promise<void> {
     this.moduleLogger.info('Start instance');
+
+    if (!this.config.serverSide) {
+      // Setup the instance on the weave global variable
+      if (!window.weave) {
+        window.weave = this;
+      }
+
+      // Initialize global window variables
+      window.weaveTextEditing = {};
+      window.weaveDragImageURL = undefined;
+    }
+
+    if (this.config.serverSide) {
+      const { createCanvas, Image } = await import('canvas');
+
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      (globalThis as any).Image = Image;
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      (globalThis as any).document = {
+        createElement(tag: string) {
+          if (tag === 'canvas') return createCanvas(1, 1);
+          throw new Error(`Unsupported element: ${tag}`);
+        },
+      };
+    }
 
     this.emitEvent<WeaveStoreOnRoomLoadedEvent>('onRoomLoaded', false);
 
@@ -692,7 +716,27 @@ export class Weave {
     boundingNodes: (nodes: Konva.Node[]) => Konva.Node[],
     options: WeaveExportNodesOptions
   ): Promise<HTMLImageElement> {
-    return await this.exportManager.exportNodes(nodes, boundingNodes, options);
+    return await this.exportManager.exportNodesAsImage(
+      nodes,
+      boundingNodes,
+      options
+    );
+  }
+
+  public async exportNodesAsBuffer(
+    nodes: string[],
+    boundingNodes: (nodes: Konva.Node[]) => Konva.Node[],
+    options: WeaveExportNodesOptions
+  ): Promise<{
+    composites: { input: Buffer; left: number; top: number }[];
+    width: number;
+    height: number;
+  }> {
+    return await this.exportManager.exportNodesAsBuffer(
+      nodes,
+      boundingNodes,
+      options
+    );
   }
 
   // LOCK / UNLOCK METHODS
@@ -873,5 +917,37 @@ export class Weave {
 
       nodeHandler.show(node);
     }
+  }
+
+  public asyncElementsLoaded(): boolean {
+    return [...this.asyncElements.values()].every(
+      (el) => el.status === 'loaded'
+    );
+  }
+
+  public loadAsyncElement(nodeId: string, type: string): void {
+    let element = this.asyncElements.get(nodeId);
+    if (element) {
+      element.status = 'loading';
+    } else {
+      element = { type, status: 'loading' };
+    }
+
+    this.asyncElements.set(nodeId, element);
+  }
+
+  public resolveAsyncElement(nodeId: string, type: string): void {
+    let element = this.asyncElements.get(nodeId);
+    if (element) {
+      element.status = 'loaded';
+    } else {
+      element = { type, status: 'loaded' };
+    }
+
+    this.asyncElements.set(nodeId, element);
+  }
+
+  public isServerSide(): boolean {
+    return this.config.serverSide ?? false;
   }
 }

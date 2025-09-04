@@ -28,6 +28,7 @@ export type WeaveConfig = {
   plugins?: WeavePluginBase[];
   fonts?: WeaveFont[];
   logger?: WeaveLoggerConfig;
+  serverSide?: boolean;
 };
 
 // Base types

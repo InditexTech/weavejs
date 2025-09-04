@@ -36,7 +36,6 @@ export class WeaveExportStageToolAction extends WeaveAction {
     const mainLayer = this.instance.getMainLayer();
 
     const img = await this.instance.exportNodes(
-      // mainLayer?.find('.node') ?? [],
       mainLayer?.getChildren() ?? [],
       boundingNodes,
       this.options
