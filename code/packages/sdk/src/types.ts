@@ -5,3 +5,8 @@
 // DOM utils types
 
 export type DOMElement = HTMLElement | Element | null;
+
+export type WeaveAsyncElement = {
+  type: string;
+  status: 'loading' | 'loaded';
+};

@@ -11,6 +11,8 @@ import type Konva from 'konva';
 import type { WEAVE_IMAGE_CROP_END_TYPE } from './constants';
 import type { WeaveImageNode } from './image';
 
+export type URLTransformerFunction = (url: string) => string;
+
 export type ImageProps = WeaveElementAttributes & {
   id: string;
   width?: number;
@@ -25,6 +27,7 @@ export type ImageProps = WeaveElementAttributes & {
 export type WeaveImageProperties = {
   crossOrigin: ImageCrossOrigin;
   transform?: WeaveNodeTransformerProperties;
+  urlTransformer?: URLTransformerFunction;
   onDblClick?: (instance: WeaveImageNode, node: Konva.Group) => void;
 };
 

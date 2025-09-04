@@ -54,7 +54,7 @@ export class WeaveExportManager {
     return { pixelRatio: pr, outW, outH };
   }
 
-  exportNodes(
+  exportNodesAsImage(
     nodes: WeaveElementInstance[],
     boundingNodes: (nodes: Konva.Node[]) => Konva.Node[],
     options: WeaveExportNodesOptions
@@ -153,6 +153,161 @@ export class WeaveExportManager {
         });
       }
     });
+  }
+
+  async exportNodesAsBuffer(
+    nodes: string[],
+    boundingNodes: (nodes: Konva.Node[]) => Konva.Node[],
+    options: WeaveExportNodesOptions
+  ): Promise<{
+    composites: { input: Buffer; left: number; top: number }[];
+    width: number;
+    height: number;
+  }> {
+    const {
+      format = WEAVE_EXPORT_FORMATS.PNG,
+      padding = 0,
+      pixelRatio = 1,
+      backgroundColor = WEAVE_EXPORT_BACKGROUND_COLOR,
+    } = options;
+
+    this.getNodesSelectionPlugin()?.disable();
+    this.getNodesDistanceSnappingPlugin()?.disable();
+    this.getNodesEdgeSnappingPlugin()?.disable();
+    this.getStageGridPlugin()?.disable();
+
+    const stage = this.instance.getStage();
+    const mainLayer = this.instance.getMainLayer();
+
+    const originalPosition = { x: stage.x(), y: stage.y() };
+    const originalScale = { x: stage.scaleX(), y: stage.scaleY() };
+
+    stage.scale({ x: 1, y: 1 });
+
+    let realNodes = [...nodes];
+    if (nodes.length === 0) {
+      realNodes =
+        mainLayer?.getChildren().map((node) => node.getAttrs().id ?? '') ?? [];
+    }
+
+    const konvaNodes = [];
+    for (const nodeId of realNodes) {
+      const node = stage.findOne(`#${nodeId}`);
+      if (node) {
+        konvaNodes.push(node);
+      }
+    }
+
+    if (mainLayer) {
+      const bounds = getExportBoundingBox(stage, boundingNodes(konvaNodes));
+
+      const scaleX = stage.scaleX();
+      const scaleY = stage.scaleY();
+
+      const unscaledBounds = {
+        x: bounds.x / scaleX,
+        y: bounds.y / scaleY,
+        width: bounds.width / scaleX,
+        height: bounds.height / scaleY,
+      };
+
+      const exportGroup = new Konva.Group();
+
+      const background = new Konva.Rect({
+        x: unscaledBounds.x - padding,
+        y: unscaledBounds.y - padding,
+        width: unscaledBounds.width + 2 * padding,
+        height: unscaledBounds.height + 2 * padding,
+        strokeWidth: 0,
+        fill: backgroundColor,
+      });
+
+      exportGroup.add(background);
+
+      for (const node of konvaNodes) {
+        const clonedNode = node.clone({ id: uuidv4() });
+        const absPos = node.getAbsolutePosition();
+        clonedNode.absolutePosition({
+          x: absPos.x / scaleX,
+          y: absPos.y / scaleY,
+        });
+        exportGroup.add(clonedNode);
+      }
+
+      mainLayer.add(exportGroup);
+
+      const backgroundRect = background.getClientRect();
+
+      stage.batchDraw();
+
+      const composites: { input: Buffer; left: number; top: number }[] = [];
+
+      const maxRenderSize = 1920; // safe max for Cairo
+      const tileSize = Math.floor(maxRenderSize / pixelRatio);
+
+      const imageWidth = Math.round(backgroundRect.width);
+      const imageHeight = Math.round(backgroundRect.height);
+
+      let compositeX: number = 0;
+      let compositeY: number = 0;
+      for (
+        let y = Math.round(backgroundRect.y);
+        y < imageHeight;
+        y += tileSize
+      ) {
+        compositeX = 0;
+
+        for (
+          let x = Math.round(backgroundRect.x);
+          x < imageWidth;
+          x += tileSize
+        ) {
+          const width = Math.min(tileSize, imageWidth - x);
+          const height = Math.min(tileSize, imageHeight - y);
+
+          const canvas = (await exportGroup.toCanvas({
+            x,
+            y,
+            width: width,
+            height: height,
+            mimeType: format,
+            pixelRatio,
+            quality: options.quality ?? 1,
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          })) as any;
+
+          const buffer = canvas.toBuffer();
+
+          composites.push({
+            top: compositeY * pixelRatio,
+            left: compositeX * pixelRatio,
+            input: buffer,
+          });
+          compositeX = compositeX + tileSize;
+        }
+
+        compositeY = compositeY + tileSize;
+      }
+
+      exportGroup.destroy();
+
+      stage.position(originalPosition);
+      stage.scale(originalScale);
+      stage.batchDraw();
+
+      this.getNodesSelectionPlugin()?.enable();
+      this.getNodesDistanceSnappingPlugin()?.enable();
+      this.getNodesEdgeSnappingPlugin()?.enable();
+      this.getStageGridPlugin()?.enable();
+
+      return {
+        composites,
+        width: imageWidth * pixelRatio,
+        height: imageHeight * pixelRatio,
+      };
+    }
+
+    throw new Error('Failed to export nodes as data URL');
   }
 
   imageToBase64(img: HTMLImageElement, mimeType: string): string {

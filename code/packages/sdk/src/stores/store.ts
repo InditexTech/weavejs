@@ -20,7 +20,7 @@ import {
   getYjsDoc,
   getYjsValue,
 } from '@syncedstore/core';
-import { Doc, AbstractType, UndoManager } from 'yjs';
+import * as Y from 'yjs';
 import { type Logger } from 'pino';
 import type { WeaveNodesSelectionPlugin } from '@/plugins/nodes-selection/nodes-selection';
 import type {
@@ -38,9 +38,9 @@ export abstract class WeaveStore implements WeaveStoreBase {
 
   private state!: MappedTypeDescription<WeaveState>;
   private latestState: WeaveState;
-  private document: Doc;
+  private document: Y.Doc;
   private logger!: Logger;
-  private undoManager!: UndoManager;
+  private undoManager!: Y.UndoManager;
   private isRoomLoaded: boolean = false;
 
   constructor(config: WeaveStoreOptions) {
@@ -94,7 +94,7 @@ export abstract class WeaveStore implements WeaveStoreBase {
     return this.latestState;
   }
 
-  getDocument(): Doc {
+  getDocument(): Y.Doc {
     return this.document;
   }
 
@@ -104,6 +104,11 @@ export abstract class WeaveStore implements WeaveStoreBase {
 
   getStateJson(): WeaveState {
     return JSON.parse(JSON.stringify(this.state, undefined, 2)) as WeaveState;
+  }
+
+  getStateSnapshot(): Uint8Array {
+    const doc = this.getDocument();
+    return Y.encodeStateAsUpdate(doc);
   }
 
   setup(): void {
@@ -118,10 +123,10 @@ export abstract class WeaveStore implements WeaveStoreBase {
       const weaveStateValues = getYjsValue(
         this.getState().weave
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      ) as AbstractType<any>;
+      ) as Y.AbstractType<any>;
 
       if (weaveStateValues) {
-        this.undoManager = new UndoManager([weaveStateValues], {
+        this.undoManager = new Y.UndoManager([weaveStateValues], {
           captureTimeout: 250,
           trackedOrigins: new Set([this.config.getUser().id]),
           ...this.config?.undoManagerOptions,

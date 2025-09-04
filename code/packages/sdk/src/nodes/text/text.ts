@@ -126,36 +126,38 @@ export class WeaveTextNode extends WeaveNode {
       this.instance.emitEvent('onTransform', null);
     });
 
-    window.addEventListener('keypress', (e) => {
-      if (
-        e.key === 'Enter' &&
-        this.instance.getActiveAction() === SELECTION_TOOL_ACTION_NAME &&
-        !this.editing &&
-        e.target !== this.textArea
-      ) {
-        e.preventDefault();
+    if (!this.instance.getConfiguration().serverSide) {
+      window.addEventListener('keypress', (e) => {
+        if (
+          e.key === 'Enter' &&
+          this.instance.getActiveAction() === SELECTION_TOOL_ACTION_NAME &&
+          !this.editing &&
+          e.target !== this.textArea
+        ) {
+          e.preventDefault();
 
-        if (this.isSelecting() && this.isNodeSelected(text)) {
-          const nodesSelectionPlugin =
-            this.instance.getPlugin<WeaveNodesSelectionPlugin>(
-              'nodesSelection'
-            );
-          if (
-            nodesSelectionPlugin &&
-            nodesSelectionPlugin.getSelectedNodes().length === 1 &&
-            nodesSelectionPlugin.getSelectedNodes()[0].getAttrs().nodeType ===
-              WEAVE_TEXT_NODE_TYPE &&
-            !window.weaveTextEditing[
-              nodesSelectionPlugin.getSelectedNodes()[0].id()
-            ]
-          ) {
-            this.triggerEditMode(
-              nodesSelectionPlugin.getSelectedNodes()[0] as Konva.Text
-            );
+          if (this.isSelecting() && this.isNodeSelected(text)) {
+            const nodesSelectionPlugin =
+              this.instance.getPlugin<WeaveNodesSelectionPlugin>(
+                'nodesSelection'
+              );
+            if (
+              nodesSelectionPlugin &&
+              nodesSelectionPlugin.getSelectedNodes().length === 1 &&
+              nodesSelectionPlugin.getSelectedNodes()[0].getAttrs().nodeType ===
+                WEAVE_TEXT_NODE_TYPE &&
+              !window.weaveTextEditing[
+                nodesSelectionPlugin.getSelectedNodes()[0].id()
+              ]
+            ) {
+              this.triggerEditMode(
+                nodesSelectionPlugin.getSelectedNodes()[0] as Konva.Text
+              );
+            }
           }
         }
-      }
-    });
+      });
+    }
 
     text.dblClick = () => {
       if (this.editing) {
