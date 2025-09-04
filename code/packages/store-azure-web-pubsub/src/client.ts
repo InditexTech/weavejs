@@ -413,8 +413,6 @@ export class WeaveStoreAzureWebPubSubSyncClient extends Emittery {
       this._status = 'disconnected';
       this.emit('status', this._status);
 
-      console.log('AQUI?'); // --- IGNORE ---
-
       if (this._wsConnected) {
         if (this._resyncInterval) {
           clearInterval(this._resyncInterval);
@@ -435,7 +433,6 @@ export class WeaveStoreAzureWebPubSubSyncClient extends Emittery {
       if (ev.code === 1008 && websocket.readyState === WebSocket.OPEN) {
         websocket.close(); // ensure cleanup
         this.createWebSocket(); // start fresh with a new token
-        return;
       }
     };
 
