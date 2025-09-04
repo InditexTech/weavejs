@@ -242,32 +242,32 @@ export class WeaveExportManager {
 
       const composites: { input: Buffer; left: number; top: number }[] = [];
 
-      const maxRenderSize = 1920; // safe max for Cairo
-      const tileSize = Math.floor(maxRenderSize / pixelRatio);
-
       const imageWidth = Math.round(backgroundRect.width);
       const imageHeight = Math.round(backgroundRect.height);
 
-      let compositeX: number = 0;
-      let compositeY: number = 0;
-      for (
-        let y = Math.round(backgroundRect.y);
-        y < imageHeight;
-        y += tileSize
-      ) {
-        compositeX = 0;
+      const maxRenderSize = 1920; // safe max for Cairo
+      const cols = Math.ceil(imageWidth / maxRenderSize);
+      const rows = Math.ceil(imageHeight / maxRenderSize);
 
-        for (
-          let x = Math.round(backgroundRect.x);
-          x < imageWidth;
-          x += tileSize
-        ) {
-          const width = Math.min(tileSize, imageWidth - x);
-          const height = Math.min(tileSize, imageHeight - y);
+      const tileWidth = Math.floor(imageWidth / cols);
+      const tileHeight = Math.floor(imageHeight / rows);
+
+      let progress = 0;
+      let relativeProgress = 0;
+      const totalProgress = cols * rows;
+
+      console.log(
+        `Exporting image with size (${imageWidth}x${imageHeight}) in tiles of (${tileWidth}x${tileHeight})`
+      );
+
+      for (let y = 0; y < imageHeight; y += tileHeight) {
+        for (let x = 0; x < imageWidth; x += tileWidth) {
+          const width = Math.min(tileWidth, imageWidth - x);
+          const height = Math.min(tileHeight, imageHeight - y);
 
           const canvas = (await exportGroup.toCanvas({
-            x,
-            y,
+            x: Math.round(backgroundRect.x) + x,
+            y: Math.round(backgroundRect.y) + y,
             width: width,
             height: height,
             mimeType: format,
@@ -279,14 +279,16 @@ export class WeaveExportManager {
           const buffer = canvas.toBuffer();
 
           composites.push({
-            top: compositeY * pixelRatio,
-            left: compositeX * pixelRatio,
+            top: y * pixelRatio,
+            left: x * pixelRatio,
             input: buffer,
           });
-          compositeX = compositeX + tileSize;
-        }
 
-        compositeY = compositeY + tileSize;
+          progress = progress + 1;
+          relativeProgress = Math.round((progress / totalProgress) * 100);
+
+          this.logger.debug(`Export progress: ${relativeProgress}%`);
+        }
       }
 
       exportGroup.destroy();
