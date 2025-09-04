@@ -252,14 +252,6 @@ export class WeaveExportManager {
       const tileWidth = Math.floor(imageWidth / cols);
       const tileHeight = Math.floor(imageHeight / rows);
 
-      let progress = 0;
-      let relativeProgress = 0;
-      const totalProgress = cols * rows;
-
-      console.log(
-        `Exporting image with size (${imageWidth}x${imageHeight}) in tiles of (${tileWidth}x${tileHeight})`
-      );
-
       for (let y = 0; y < imageHeight; y += tileHeight) {
         for (let x = 0; x < imageWidth; x += tileWidth) {
           const width = Math.min(tileWidth, imageWidth - x);
@@ -283,11 +275,6 @@ export class WeaveExportManager {
             left: x * pixelRatio,
             input: buffer,
           });
-
-          progress = progress + 1;
-          relativeProgress = Math.round((progress / totalProgress) * 100);
-
-          this.logger.debug(`Export progress: ${relativeProgress}%`);
         }
       }
 
