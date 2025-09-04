@@ -304,7 +304,9 @@ export class WeaveStoreAzureWebPubSubSyncClient extends Emittery {
       const u8 = encoding.toUint8Array(encoder);
       sendToControlGroup(this, this.topic, MessageDataType.Awareness, u8);
       this._initialized = false;
-      this._ws.close();
+      if (this._ws.readyState === WebSocket.OPEN) {
+        this._ws.close();
+      }
     }
   }
 
@@ -327,11 +329,7 @@ export class WeaveStoreAzureWebPubSubSyncClient extends Emittery {
     }
   }
 
-  async start(): Promise<void> {
-    if (this._wsConnected || this._ws) {
-      return;
-    }
-
+  async createWebSocket(): Promise<ReconnectingWebSocket> {
     const websocket = new ReconnectingWebSocket(async () => {
       let url: string = 'https://error';
       let error: Error | null = null;
@@ -411,7 +409,7 @@ export class WeaveStoreAzureWebPubSubSyncClient extends Emittery {
       }
     };
 
-    websocket.onclose = () => {
+    websocket.onclose = (ev) => {
       this._status = 'disconnected';
       this.emit('status', this._status);
 
@@ -430,6 +428,11 @@ export class WeaveStoreAzureWebPubSubSyncClient extends Emittery {
           ),
           this
         );
+      }
+
+      if (ev.code === 1008 && websocket.readyState === WebSocket.OPEN) {
+        websocket.close(); // ensure cleanup
+        this.createWebSocket(); // start fresh with a new token
       }
     };
 
@@ -467,6 +470,16 @@ export class WeaveStoreAzureWebPubSubSyncClient extends Emittery {
         sendToControlGroup(this, this.topic, MessageDataType.Awareness, u8);
       }
     };
+
+    return websocket;
+  }
+
+  async start(): Promise<void> {
+    if (this._wsConnected || this._ws) {
+      return;
+    }
+
+    await this.createWebSocket();
   }
 }
 
