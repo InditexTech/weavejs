@@ -461,7 +461,7 @@ export class WeaveTextNode extends WeaveNode {
     }
     this.textAreaContainer.style.border = 'solid 1px #1e40af';
     this.textArea.style.position = 'absolute';
-    this.textArea.style.top = '0px';
+    this.textArea.style.top = '-30px';
     this.textArea.style.left = '0px';
     this.textArea.style.overscrollBehavior = 'contains';
     this.textArea.style.scrollBehavior = 'auto';
@@ -470,6 +470,7 @@ export class WeaveTextNode extends WeaveNode {
     this.textArea.style.minHeight = 'auto';
     this.textArea.style.margin = '0px';
     this.textArea.style.padding = '0px';
+    this.textArea.style.paddingTop = '20px';
     this.textArea.style.boxSizing = 'content-box';
     this.textArea.style.overflow = 'hidden';
     this.textArea.style.background = 'transparent';

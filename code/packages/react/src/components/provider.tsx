@@ -22,7 +22,7 @@ import { useWeave } from './store';
 
 type WeaveProviderType = {
   getContainer: () => HTMLElement;
-  fonts?: WeaveFont[];
+  fonts?: WeaveFont[] | (() => Promise<WeaveFont[]>);
   store: WeaveStore;
   nodes?: WeaveNode[];
   actions?: WeaveAction[];

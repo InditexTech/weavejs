@@ -21,12 +21,14 @@ import type { Vector2d } from 'konva/lib/types';
 
 // Configuration handling
 
+export type WeaveFontsPreloadFunction = () => Promise<WeaveFont[]>;
+
 export type WeaveConfig = {
   store: WeaveStoreBase;
   nodes?: WeaveNodeBase[];
   actions?: WeaveActionBase[];
   plugins?: WeavePluginBase[];
-  fonts?: WeaveFont[];
+  fonts?: WeaveFont[] | WeaveFontsPreloadFunction;
   logger?: WeaveLoggerConfig;
   serverSide?: boolean;
 };
