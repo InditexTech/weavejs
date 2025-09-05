@@ -241,7 +241,7 @@ export class Weave {
     this.status = WEAVE_INSTANCE_STATUS.LOADING_FONTS;
     this.emitEvent('onInstanceStatus', this.status);
 
-    // Start loading the fonts, this operation is asynchronous
+    // Start loading the fonts, this operation can be asynchronous
     await this.fontsManager.loadFonts();
     this.setupManager.setupLog();
 

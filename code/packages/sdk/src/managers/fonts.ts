@@ -2,7 +2,6 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-import FontFaceObserver from 'fontfaceobserver';
 import { type Logger } from 'pino';
 import { type WeaveFont } from '@inditextech/weave-types';
 import { Weave } from '@/weave';
@@ -18,39 +17,32 @@ export class WeaveFontsManager {
     this.logger.debug('Fonts manager created');
   }
 
-  async loadFont(font: WeaveFont, fontFamily: FontFaceObserver): Promise<void> {
-    return new Promise((resolve) => {
-      this.logger.debug(`Loading font with id [${font.id}]`);
-      fontFamily
-        .load()
-        .then(() => {
-          this.logger.debug(`Font with id [${font.id}] loaded`);
-          this.loadedFonts.push(font);
-          resolve();
-        })
-        .catch(() => {
-          this.logger.debug(`Font with id [${font.id}] failed to load`);
-          resolve();
-        });
-    });
-  }
-
   async loadFonts(): Promise<void> {
     this.logger.info('Loading fonts');
 
-    if (this.instance.getConfiguration().fonts) {
-      const fontPromises = [];
-      for (const font of this.instance.getConfiguration()?.fonts ?? []) {
-        const fontFamily = new FontFaceObserver(font.id);
-        fontPromises.push(this.loadFont(font, fontFamily));
-      }
+    const fontsConfig = this.instance.getConfiguration().fonts;
 
-      await Promise.allSettled(fontPromises);
+    if (!fontsConfig) {
+      this.logger.warn('No fonts defined');
+      return;
+    }
+
+    let fontsToLoad: WeaveFont[] = [];
+
+    if (fontsConfig && fontsConfig instanceof Function) {
+      fontsToLoad = await fontsConfig();
+    }
+    if (fontsConfig && fontsConfig instanceof Array) {
+      fontsToLoad = fontsConfig;
+    }
+
+    for (const font of fontsToLoad) {
+      this.loadedFonts.push(font);
     }
 
     this.logger.info('Fonts loaded');
 
-    this.instance.emitEvent('weaveFontsLoaded', {});
+    this.instance.emitEvent<WeaveFont[]>('onFontsLoaded', this.loadedFonts);
   }
 
   getFonts(): WeaveFont[] {
