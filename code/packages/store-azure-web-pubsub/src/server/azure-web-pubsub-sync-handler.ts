@@ -72,7 +72,7 @@ export default class WeaveAzureWebPubsubSyncHandler extends WebPubSubEventHandle
           roomsConnections: this.getConnectionsAmountPerRoom(),
         });
 
-        return res.success({ groups: [roomId] });
+        res.success();
       },
       onConnected: (req: ConnectedRequest) => {
         this._connections.set(req.context.connectionId, req.context);
