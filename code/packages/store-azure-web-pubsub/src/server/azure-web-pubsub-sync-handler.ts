@@ -57,20 +57,17 @@ export default class WeaveAzureWebPubsubSyncHandler extends WebPubSubEventHandle
       handleConnect: (req: ConnectRequest, res: ConnectResponseHandler) => {
         const roomId = req.queries?.group?.[0];
 
-        if (!roomId) {
-          console.warn('Missing or invalid roomId in connection request');
-          return res.fail(400, 'Missing or invalid roomId');
+        if (roomId) {
+          this._connectionGroup.set(req.context.connectionId, roomId);
+
+          this.eventsHub.emit('onConnect', {
+            roomId: roomId,
+            context: req.context,
+            connections: this.getConnectionsAmount(),
+            rooms: this.getRoomsAmount(),
+            roomsConnections: this.getConnectionsAmountPerRoom(),
+          });
         }
-
-        this._connectionGroup.set(req.context.connectionId, roomId);
-
-        this.eventsHub.emit('onConnect', {
-          roomId,
-          context: req.context,
-          connections: this.getConnectionsAmount(),
-          rooms: this.getRoomsAmount(),
-          roomsConnections: this.getConnectionsAmountPerRoom(),
-        });
 
         res.success();
       },
