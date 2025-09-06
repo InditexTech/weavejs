@@ -27,19 +27,21 @@ export default class WeaveAzureWebPubsubSyncHandler extends WebPubSubEventHandle
   // eslint-disable-next-line @typescript-eslint/naming-convention
   private _client: WebPubSubServiceClient;
   // eslint-disable-next-line @typescript-eslint/naming-convention
-  private _connectionGroup: Map<string, string> = new Map();
-  private _connections: Map<string, ConnectionContext> = new Map();
-  private _groupConnections: Map<string, string[]> = new Map();
+  private readonly _connectionGroup: Map<string, string> = new Map();
+  private readonly _connections: Map<string, ConnectionContext> = new Map();
+  private readonly _groupConnections: Map<string, string[]> = new Map();
   // eslint-disable-next-line @typescript-eslint/naming-convention
-  private _rooms: Map<string, Y.Doc> = new Map();
-  private _roomsSyncHost: Map<string, WeaveStoreAzureWebPubSubSyncHost> =
-    new Map();
+  private readonly _rooms: Map<string, Y.Doc> = new Map();
+  private readonly _roomsSyncHost: Map<
+    string,
+    WeaveStoreAzureWebPubSubSyncHost
+  > = new Map();
   // eslint-disable-next-line @typescript-eslint/naming-convention
   private _store_persistence: Map<string, NodeJS.Timeout> = new Map();
   private readonly syncOptions?: WeaveAzureWebPubsubSyncHandlerOptions;
   private initialState: FetchInitialState;
   private actualServer: WeaveAzureWebPubsubServer;
-  private eventsHub: Emittery<WeaveStoreAzureWebPubsubEvents> =
+  private readonly eventsHub: Emittery<WeaveStoreAzureWebPubsubEvents> =
     new Emittery<WeaveStoreAzureWebPubsubEvents>();
 
   constructor(
@@ -98,7 +100,7 @@ export default class WeaveAzureWebPubsubSyncHandler extends WebPubSubEventHandle
           });
         }
       },
-      onDisconnected: async (req: DisconnectedRequest) => {
+      onDisconnected: (req: DisconnectedRequest) => {
         this._connections.delete(req.context.connectionId);
 
         let roomId: string | null = null;
@@ -118,7 +120,7 @@ export default class WeaveAzureWebPubsubSyncHandler extends WebPubSubEventHandle
 
           this._connectionGroup.delete(req.context.connectionId);
 
-          await this.destroyRoomInstance(roomId);
+          this.destroyRoomInstance(roomId);
 
           this.eventsHub.emit('onDisconnected', {
             roomId,
