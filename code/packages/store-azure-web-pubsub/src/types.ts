@@ -4,14 +4,20 @@
 
 import type { TokenCredential } from '@azure/identity';
 import * as Y from 'yjs';
+import type { ConnectionContext } from './index.server';
 
 export type WeaveStoreAzureWebPubsubConfig = {
   endpoint: string;
+  hubName: string;
   auth?: {
     key?: string;
     custom?: TokenCredential;
   };
-  hubName: string;
+  persistIntervalMs?: number;
+};
+
+export type WeaveAzureWebPubsubSyncHandlerOptions = {
+  persistIntervalMs?: number;
 };
 
 export type WeaveStoreAzureWebPubsubOptions = {
@@ -36,3 +42,33 @@ export type PersistRoom = (
   actualState: Uint8Array<ArrayBufferLike>
 ) => Promise<void>;
 export type FetchRoom = (roomId: string) => Promise<Uint8Array | null>;
+
+export type WeaveStoreAzureWebPubsubEvents = {
+  onConnect: WeaveStoreAzureWebPubsubOnConnectEvent;
+  onConnected: WeaveStoreAzureWebPubsubOnConnectedEvent;
+  onDisconnected: WeaveStoreAzureWebPubsubOnDisconnectedEvent;
+};
+
+export type WeaveStoreAzureWebPubsubOnConnectEvent = {
+  roomId: string | null;
+  context: ConnectionContext;
+  connections: number;
+  rooms: number;
+  roomsConnections: Record<string, number>;
+};
+
+export type WeaveStoreAzureWebPubsubOnConnectedEvent = {
+  roomId: string | null;
+  context: ConnectionContext;
+  connections: number;
+  rooms: number;
+  roomsConnections: Record<string, number>;
+};
+
+export type WeaveStoreAzureWebPubsubOnDisconnectedEvent = {
+  roomId: string | null;
+  context: ConnectionContext;
+  connections: number;
+  rooms: number;
+  roomsConnections: Record<string, number>;
+};

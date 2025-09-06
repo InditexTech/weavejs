@@ -65,10 +65,11 @@ export class WeaveAzureWebPubsubServer extends Emittery {
     );
 
     this.syncHandler = new WeaveAzureWebPubsubSyncHandler(
+      pubSubConfig.hubName,
       this,
       this.syncClient,
       initialState,
-      pubSubConfig.hubName,
+      { persistIntervalMs: pubSubConfig.persistIntervalMs },
       eventsHandlerConfig
     );
   }
@@ -79,6 +80,10 @@ export class WeaveAzureWebPubsubServer extends Emittery {
 
   getExpressJsMiddleware(): RequestHandler {
     return this.syncHandler.getExpressJsMiddleware();
+  }
+
+  getSyncHandler(): WeaveAzureWebPubsubSyncHandler {
+    return this.syncHandler;
   }
 
   emitEvent<T>(event: string, payload?: T): void {

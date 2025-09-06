@@ -98,8 +98,8 @@ export class WeaveStoreAzureWebPubSubSyncHost extends Emittery {
         updated: any;
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         removed: any;
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
       },
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       origin: any
     ) => {
       const changedClients = added.concat(added, updated, removed);
@@ -214,6 +214,13 @@ export class WeaveStoreAzureWebPubSubSyncHost extends Emittery {
 
   async start(): Promise<void> {
     this._conn = await this.createWebSocket();
+  }
+
+  async stop(): Promise<void> {
+    if (this._conn.readyState === WebSocket.OPEN) {
+      this._conn?.close();
+      this._conn = null;
+    }
   }
 
   private broadcast(group: string, from: string, u8: Uint8Array) {
