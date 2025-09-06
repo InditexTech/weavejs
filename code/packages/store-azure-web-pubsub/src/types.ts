@@ -13,10 +13,16 @@ export type WeaveStoreAzureWebPubsubConfig = {
     key?: string;
     custom?: TokenCredential;
   };
+  connectionHandlers?: Pick<
+    WeaveAzureWebPubsubSyncHandlerOptions,
+    'getConnectionRoom' | 'getRoomConnections'
+  >;
   persistIntervalMs?: number;
 };
 
 export type WeaveAzureWebPubsubSyncHandlerOptions = {
+  getConnectionRoom?: (connectionId: string) => Promise<string | null>;
+  getRoomConnections?: (roomId: string) => Promise<string[]>;
   persistIntervalMs?: number;
 };
 
@@ -50,25 +56,16 @@ export type WeaveStoreAzureWebPubsubEvents = {
 };
 
 export type WeaveStoreAzureWebPubsubOnConnectEvent = {
-  roomId: string | null;
   context: ConnectionContext;
-  connections: number;
-  rooms: number;
-  roomsConnections: Record<string, number>;
+  queries: Record<string, string[]> | undefined;
 };
 
 export type WeaveStoreAzureWebPubsubOnConnectedEvent = {
-  roomId: string | null;
   context: ConnectionContext;
-  connections: number;
-  rooms: number;
-  roomsConnections: Record<string, number>;
+  queries?: Record<string, string[]>;
 };
 
 export type WeaveStoreAzureWebPubsubOnDisconnectedEvent = {
-  roomId: string | null;
   context: ConnectionContext;
-  connections: number;
-  rooms: number;
-  roomsConnections: Record<string, number>;
+  queries?: Record<string, string[]>;
 };
