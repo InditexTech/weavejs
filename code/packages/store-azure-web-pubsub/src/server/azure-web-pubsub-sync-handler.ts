@@ -49,10 +49,7 @@ export default class WeaveAzureWebPubsubSyncHandler extends WebPubSubEventHandle
   ) {
     super(hub, {
       ...eventHandlerOptions,
-      handleConnect: async (
-        req: ConnectRequest,
-        res: ConnectResponseHandler
-      ) => {
+      handleConnect: (req: ConnectRequest, res: ConnectResponseHandler) => {
         this.eventsHub.emit('onConnect', {
           context: req.context,
           queries: req.queries,
@@ -60,26 +57,17 @@ export default class WeaveAzureWebPubsubSyncHandler extends WebPubSubEventHandle
 
         res.success();
       },
-      onConnected: async (req: ConnectedRequest) => {
+      onConnected: (req: ConnectedRequest) => {
         this.eventsHub.emit('onConnected', {
           context: req.context,
         });
       },
-      onDisconnected: async (req: DisconnectedRequest) => {
+      onDisconnected: (req: DisconnectedRequest) => {
         this.eventsHub.emit('onDisconnected', {
           context: req.context,
         });
 
-        const connectionRoom = await this.syncOptions?.getConnectionRoom?.(
-          req.context.connectionId
-        );
-        const roomConnections = connectionRoom
-          ? await this.syncOptions?.getRoomConnections?.(connectionRoom)
-          : [];
-
-        if (connectionRoom && roomConnections?.length === 0) {
-          await this.destroyRoomInstance(connectionRoom);
-        }
+        this.handleConnectionDisconnection(req.context.connectionId);
       },
     });
 
@@ -162,6 +150,19 @@ export default class WeaveAzureWebPubsubSyncHandler extends WebPubSubEventHandle
       }, this.syncOptions?.persistIntervalMs ?? 5000);
 
       this._store_persistence.set(roomId, intervalId);
+    }
+  }
+
+  private async handleConnectionDisconnection(connectionId: string) {
+    const connectionRoom = await this.syncOptions?.getConnectionRoom?.(
+      connectionId
+    );
+    const roomConnections = connectionRoom
+      ? await this.syncOptions?.getRoomConnections?.(connectionRoom)
+      : [];
+
+    if (connectionRoom && roomConnections?.length === 0) {
+      await this.destroyRoomInstance(connectionRoom);
     }
   }
 
