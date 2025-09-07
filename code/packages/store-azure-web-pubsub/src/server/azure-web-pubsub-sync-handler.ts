@@ -16,11 +16,12 @@ import {
 import {
   type FetchInitialState,
   type WeaveAzureWebPubsubSyncHandlerOptions,
-  type WeaveStoreAzureWebPubsubEvents,
+  type WeaveStoreAzureWebPubsubOnConnectedEvent,
+  type WeaveStoreAzureWebPubsubOnConnectEvent,
+  type WeaveStoreAzureWebPubsubOnDisconnectedEvent,
 } from '@/types';
 import { WeaveStoreAzureWebPubSubSyncHost } from './azure-web-pubsub-host';
 import { WeaveAzureWebPubsubServer } from './azure-web-pubsub-server';
-import Emittery from 'emittery';
 
 export default class WeaveAzureWebPubsubSyncHandler extends WebPubSubEventHandler {
   // eslint-disable-next-line @typescript-eslint/naming-convention
@@ -36,8 +37,6 @@ export default class WeaveAzureWebPubsubSyncHandler extends WebPubSubEventHandle
   private readonly syncOptions?: WeaveAzureWebPubsubSyncHandlerOptions;
   private initialState: FetchInitialState;
   private actualServer: WeaveAzureWebPubsubServer;
-  private readonly eventsHub: Emittery<WeaveStoreAzureWebPubsubEvents> =
-    new Emittery<WeaveStoreAzureWebPubsubEvents>();
 
   constructor(
     hub: string,
@@ -50,22 +49,31 @@ export default class WeaveAzureWebPubsubSyncHandler extends WebPubSubEventHandle
     super(hub, {
       ...eventHandlerOptions,
       handleConnect: (req: ConnectRequest, res: ConnectResponseHandler) => {
-        this.eventsHub.emit('onConnect', {
-          context: req.context,
-          queries: req.queries,
-        });
+        this.actualServer.emitEvent<WeaveStoreAzureWebPubsubOnConnectEvent>(
+          'onConnect',
+          {
+            context: req.context,
+            queries: req.queries,
+          }
+        );
 
         res.success();
       },
       onConnected: (req: ConnectedRequest) => {
-        this.eventsHub.emit('onConnected', {
-          context: req.context,
-        });
+        this.actualServer.emitEvent<WeaveStoreAzureWebPubsubOnConnectedEvent>(
+          'onConnected',
+          {
+            context: req.context,
+          }
+        );
       },
       onDisconnected: (req: DisconnectedRequest) => {
-        this.eventsHub.emit('onDisconnected', {
-          context: req.context,
-        });
+        this.actualServer.emitEvent<WeaveStoreAzureWebPubsubOnDisconnectedEvent>(
+          'onDisconnected',
+          {
+            context: req.context,
+          }
+        );
 
         this.handleConnectionDisconnection(req.context.connectionId);
       },
@@ -75,20 +83,6 @@ export default class WeaveAzureWebPubsubSyncHandler extends WebPubSubEventHandle
     this.actualServer = server;
     this.initialState = initialState;
     this._client = client;
-  }
-
-  addEventListener(
-    event: keyof WeaveStoreAzureWebPubsubEvents,
-    callback: (payload: WeaveStoreAzureWebPubsubEvents[typeof event]) => void
-  ): void {
-    this.eventsHub.on(event, callback);
-  }
-
-  removeEventListener(
-    event: keyof WeaveStoreAzureWebPubsubEvents,
-    callback: (payload: WeaveStoreAzureWebPubsubEvents[typeof event]) => void
-  ): void {
-    this.eventsHub.off(event, callback);
   }
 
   private getNewYDoc() {
