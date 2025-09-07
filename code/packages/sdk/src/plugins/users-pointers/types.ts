@@ -28,11 +28,21 @@ export type WeaveUsersPointersPluginConfig = {
   getUserForegroundColor: (
     user: WeaveUser
   ) => string | CanvasGradient | undefined;
-  ui?: WeaveUserPointersUIProperties;
+  awarenessThrottleMs: number;
+  ui: WeaveUserPointersUIProperties;
 };
 
 export type WeaveUsersPointersPluginParams = {
-  config: WeaveUsersPointersPluginConfig;
+  config: Pick<
+    WeaveUsersPointersPluginConfig,
+    'getUser' | 'getUserBackgroundColor' | 'getUserForegroundColor'
+  > &
+    Partial<
+      Omit<
+        WeaveUsersPointersPluginConfig,
+        'getUser' | 'getUserBackgroundColor' | 'getUserForegroundColor'
+      >
+    >;
 };
 
 export type WeaveUserPointer = {
