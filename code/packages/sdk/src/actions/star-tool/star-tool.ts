@@ -245,8 +245,6 @@ export class WeaveStarToolAction extends WeaveAction {
       const deltaX = Math.abs(mousePoint.x - this.clickPoint?.x);
       const deltaY = Math.abs(mousePoint.y - this.clickPoint?.y);
 
-      const nodeHandler = this.instance.getNodeHandler<WeaveStarNode>('star');
-
       const starPos: Vector2d = {
         x: this.clickPoint.x,
         y: this.clickPoint.y,
@@ -262,12 +260,6 @@ export class WeaveStarToolAction extends WeaveAction {
         outerRadius: deltaX,
         innerRadius: deltaY,
       });
-
-      if (nodeHandler) {
-        this.instance.updateNode(
-          nodeHandler.serialize(star as WeaveElementInstance)
-        );
-      }
     }
   }
 
