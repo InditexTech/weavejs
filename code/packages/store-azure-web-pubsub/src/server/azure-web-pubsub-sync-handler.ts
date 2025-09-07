@@ -49,6 +49,13 @@ export default class WeaveAzureWebPubsubSyncHandler extends WebPubSubEventHandle
     super(hub, {
       ...eventHandlerOptions,
       handleConnect: (req: ConnectRequest, res: ConnectResponseHandler) => {
+        console.log('reached handleConnect', {
+          context: req.context,
+          queries: req.queries,
+        });
+
+        res.success();
+
         this.actualServer.emitEvent<WeaveStoreAzureWebPubsubOnConnectEvent>(
           'onConnect',
           {
@@ -56,10 +63,10 @@ export default class WeaveAzureWebPubsubSyncHandler extends WebPubSubEventHandle
             queries: req.queries,
           }
         );
-
-        res.success();
       },
       onConnected: (req: ConnectedRequest) => {
+        console.log('reached onConnected', { context: req.context });
+
         this.actualServer.emitEvent<WeaveStoreAzureWebPubsubOnConnectedEvent>(
           'onConnected',
           {
@@ -68,6 +75,8 @@ export default class WeaveAzureWebPubsubSyncHandler extends WebPubSubEventHandle
         );
       },
       onDisconnected: (req: DisconnectedRequest) => {
+        console.log('reached onDisconnected', { context: req.context });
+
         this.actualServer.emitEvent<WeaveStoreAzureWebPubsubOnDisconnectedEvent>(
           'onDisconnected',
           {
@@ -151,6 +160,11 @@ export default class WeaveAzureWebPubsubSyncHandler extends WebPubSubEventHandle
     const connectionRoom = await this.syncOptions?.getConnectionRoom?.(
       connectionId
     );
+
+    if (connectionRoom) {
+      await this.syncOptions?.removeConnection?.(connectionId);
+    }
+
     const roomConnections = connectionRoom
       ? await this.syncOptions?.getRoomConnections?.(connectionRoom)
       : [];

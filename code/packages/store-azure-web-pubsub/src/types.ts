@@ -21,6 +21,7 @@ export type WeaveStoreAzureWebPubsubConfig = {
 };
 
 export type WeaveAzureWebPubsubSyncHandlerOptions = {
+  removeConnection?: (connectionId: string) => Promise<void>;
   getConnectionRoom?: (connectionId: string) => Promise<string | null>;
   getRoomConnections?: (roomId: string) => Promise<string[]>;
   persistIntervalMs?: number;
