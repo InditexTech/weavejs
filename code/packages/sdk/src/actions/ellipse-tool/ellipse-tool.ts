@@ -250,9 +250,6 @@ export class WeaveEllipseToolAction extends WeaveAction {
       const deltaX = Math.abs(mousePoint.x - this.clickPoint?.x);
       const deltaY = Math.abs(mousePoint.y - this.clickPoint?.y);
 
-      const nodeHandler =
-        this.instance.getNodeHandler<WeaveEllipseNode>('ellipse');
-
       const ellipsePos: Vector2d = {
         x: this.clickPoint.x,
         y: this.clickPoint.y,
@@ -268,12 +265,6 @@ export class WeaveEllipseToolAction extends WeaveAction {
         radiusX: deltaX,
         radiusY: deltaY,
       });
-
-      if (nodeHandler) {
-        this.instance.updateNode(
-          nodeHandler.serialize(ellipse as WeaveElementInstance)
-        );
-      }
     }
   }
 
