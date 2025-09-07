@@ -77,14 +77,14 @@ export default class WeaveAzureWebPubsubSyncHandler extends WebPubSubEventHandle
       onDisconnected: (req: DisconnectedRequest) => {
         console.log('reached onDisconnected', { context: req.context });
 
+        this.handleConnectionDisconnection(req.context.connectionId);
+
         this.actualServer.emitEvent<WeaveStoreAzureWebPubsubOnDisconnectedEvent>(
           'onDisconnected',
           {
             context: req.context,
           }
         );
-
-        this.handleConnectionDisconnection(req.context.connectionId);
       },
     });
 
