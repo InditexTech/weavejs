@@ -563,9 +563,13 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
   }
 
   private getSpeedFromEdge(distanceFromEdge: number): number {
-    if (distanceFromEdge < this.config.panningWhenSelection.edgeThreshold) {
+    const stage = this.instance.getStage();
+
+    const scaledDistance = distanceFromEdge / stage.scaleX();
+
+    if (scaledDistance < this.config.panningWhenSelection.edgeThreshold) {
       const factor =
-        1 - distanceFromEdge / this.config.panningWhenSelection.edgeThreshold; // 0..1
+        1 - scaledDistance / this.config.panningWhenSelection.edgeThreshold; // 0..1
       return (
         this.config.panningWhenSelection.minScrollSpeed +
         (this.config.panningWhenSelection.maxScrollSpeed -
@@ -573,6 +577,7 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
           factor
       );
     }
+
     return 0;
   }
 

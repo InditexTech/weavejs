@@ -9,30 +9,30 @@ import {
 import {
   type WeaveUserPointer,
   type WeaveUserPointerKey,
-  type WeaveUserPointersUIProperties,
   type WeaveUsersPointersPluginConfig,
   type WeaveUsersPointersPluginParams,
 } from './types';
 import {
   WEAVE_USER_POINTER_KEY,
-  WEAVE_USER_POINTERS_DEFAULT_PROPS,
+  WEAVE_USERS_POINTERS_CONFIG_DEFAULT_PROPS,
   WEAVE_USERS_POINTERS_KEY,
 } from './constants';
 import { WeavePlugin } from '@/plugins/plugin';
 import Konva from 'konva';
 import { memoize } from '@/utils';
+import { merge, throttle } from 'lodash';
+import type { Vector2d } from 'konva/lib/types';
 
 export class WeaveUsersPointersPlugin extends WeavePlugin {
   private usersPointers: Record<string, WeaveUserPointer>;
   private config!: WeaveUsersPointersPluginConfig;
-  private uiConfig!: WeaveUserPointersUIProperties;
 
   constructor(params: WeaveUsersPointersPluginParams) {
     super();
 
     const { config } = params;
 
-    this.config = config;
+    this.config = merge(WEAVE_USERS_POINTERS_CONFIG_DEFAULT_PROPS, config);
 
     this.config.getUser = memoize(this.config.getUser);
     this.config.getUserBackgroundColor = memoize(
@@ -41,11 +41,6 @@ export class WeaveUsersPointersPlugin extends WeavePlugin {
     this.config.getUserForegroundColor = memoize(
       this.config.getUserForegroundColor
     );
-
-    this.uiConfig = {
-      ...WEAVE_USER_POINTERS_DEFAULT_PROPS,
-      ...this.config.ui,
-    };
 
     this.usersPointers = {};
   }
@@ -124,37 +119,41 @@ export class WeaveUsersPointersPlugin extends WeavePlugin {
       }
     );
 
+    const sendAwarenessUpdateThrottled = throttle(
+      this.sendAwarenessUpdate.bind(this),
+      this.config.awarenessThrottleMs
+    );
+
     stage.on('dragmove', () => {
-      const userInfo = this.config.getUser();
       const mousePos = stage.getRelativePointerPosition();
 
       if (mousePos) {
-        store.setAwarenessInfo(WEAVE_USER_POINTER_KEY, {
-          rawUser: userInfo,
-          user: userInfo.id,
-          name: userInfo.name,
-          x: mousePos.x,
-          y: mousePos.y,
-        });
+        sendAwarenessUpdateThrottled(mousePos);
       }
     });
 
     stage.on('pointermove', () => {
-      const userInfo = this.config.getUser();
       const mousePos = stage.getRelativePointerPosition();
 
       if (mousePos) {
-        store.setAwarenessInfo(WEAVE_USER_POINTER_KEY, {
-          rawUser: userInfo,
-          user: userInfo.id,
-          name: userInfo.name,
-          x: mousePos.x,
-          y: mousePos.y,
-        });
+        sendAwarenessUpdateThrottled(mousePos);
       }
     });
 
     this.renderPointers();
+  }
+
+  private sendAwarenessUpdate(mousePos: Vector2d) {
+    const store = this.instance.getStore();
+    const userInfo = this.config.getUser();
+
+    store.setAwarenessInfo(WEAVE_USER_POINTER_KEY, {
+      rawUser: userInfo,
+      user: userInfo.id,
+      name: userInfo.name,
+      x: mousePos.x,
+      y: mousePos.y,
+    });
   }
 
   private renderPointers() {
@@ -196,7 +195,7 @@ export class WeaveUsersPointersPlugin extends WeavePlugin {
           backgroundPaddingX,
           backgroundPaddingY,
         },
-      } = this.uiConfig;
+      } = this.config.ui;
 
       const userBackgroundColor = this.config.getUserBackgroundColor(
         userPointer.rawUser

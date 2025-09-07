@@ -262,11 +262,6 @@ export class WeaveRegularPolygonToolAction extends WeaveAction {
 
       const deltaX = Math.abs(mousePoint.x - this.clickPoint?.x);
 
-      const nodeHandler =
-        this.instance.getNodeHandler<WeaveRegularPolygonNode>(
-          'regular-polygon'
-        );
-
       const starPos: Vector2d = {
         x: this.clickPoint.x,
         y: this.clickPoint.y,
@@ -281,12 +276,6 @@ export class WeaveRegularPolygonToolAction extends WeaveAction {
         y: starPos.y + deltaX,
         radius: deltaX,
       });
-
-      if (nodeHandler) {
-        this.instance.updateNode(
-          nodeHandler.serialize(regularPolygon as WeaveElementInstance)
-        );
-      }
     }
   }
 

@@ -49,11 +49,6 @@ export default class WeaveAzureWebPubsubSyncHandler extends WebPubSubEventHandle
     super(hub, {
       ...eventHandlerOptions,
       handleConnect: (req: ConnectRequest, res: ConnectResponseHandler) => {
-        console.log('reached handleConnect', {
-          context: req.context,
-          queries: req.queries,
-        });
-
         res.success();
 
         this.syncOptions?.onConnect?.(req.context.connectionId, req.queries);
@@ -67,8 +62,6 @@ export default class WeaveAzureWebPubsubSyncHandler extends WebPubSubEventHandle
         );
       },
       onConnected: (req: ConnectedRequest) => {
-        console.log('reached onConnected', { context: req.context });
-
         this.syncOptions?.onConnected?.(req.context.connectionId);
 
         this.actualServer.emitEvent<WeaveStoreAzureWebPubsubOnConnectedEvent>(
@@ -79,8 +72,6 @@ export default class WeaveAzureWebPubsubSyncHandler extends WebPubSubEventHandle
         );
       },
       onDisconnected: (req: DisconnectedRequest) => {
-        console.log('reached onDisconnected', { context: req.context });
-
         this.handleConnectionDisconnection(req.context.connectionId);
 
         this.actualServer.emitEvent<WeaveStoreAzureWebPubsubOnDisconnectedEvent>(

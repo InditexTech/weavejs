@@ -217,7 +217,7 @@ export class WeaveStoreAzureWebPubSubSyncHost extends Emittery {
   }
 
   async stop(): Promise<void> {
-    if (this._conn.readyState === WebSocket.OPEN) {
+    if (this._conn?.readyState === WebSocket.OPEN) {
       this._conn?.close();
       this._conn = null;
     }
