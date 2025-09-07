@@ -15,12 +15,21 @@ export type WeaveStoreAzureWebPubsubConfig = {
   };
   connectionHandlers?: Pick<
     WeaveAzureWebPubsubSyncHandlerOptions,
-    'removeConnection' | 'getConnectionRoom' | 'getRoomConnections'
+    | 'onConnect'
+    | 'onConnected'
+    | 'removeConnection'
+    | 'getConnectionRoom'
+    | 'getRoomConnections'
   >;
   persistIntervalMs?: number;
 };
 
 export type WeaveAzureWebPubsubSyncHandlerOptions = {
+  onConnect?: (
+    connectionId: string,
+    queries: Record<string, string[]> | undefined
+  ) => Promise<void>;
+  onConnected?: (connectionId: string) => Promise<void>;
   removeConnection?: (connectionId: string) => Promise<void>;
   getConnectionRoom?: (connectionId: string) => Promise<string | null>;
   getRoomConnections?: (roomId: string) => Promise<string[]>;
