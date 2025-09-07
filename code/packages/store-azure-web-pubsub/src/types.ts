@@ -15,7 +15,7 @@ export type WeaveStoreAzureWebPubsubConfig = {
   };
   connectionHandlers?: Pick<
     WeaveAzureWebPubsubSyncHandlerOptions,
-    'getConnectionRoom' | 'getRoomConnections'
+    'removeConnection' | 'getConnectionRoom' | 'getRoomConnections'
   >;
   persistIntervalMs?: number;
 };
