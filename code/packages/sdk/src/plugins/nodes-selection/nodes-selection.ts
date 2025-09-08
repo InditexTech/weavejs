@@ -48,6 +48,8 @@ import { WEAVE_CONTEXT_MENU_PLUGIN_KEY } from '../context-menu/constants';
 import type { WeaveNodesEdgeSnappingPlugin } from '../nodes-edge-snapping/nodes-edge-snapping';
 import type { WeaveNodesDistanceSnappingPlugin } from '../nodes-distance-snapping/nodes-distance-snapping';
 import { WEAVE_NODES_DISTANCE_SNAPPING_PLUGIN_KEY } from '../nodes-distance-snapping/constants';
+import { WEAVE_STAGE_GRID_PLUGIN_KEY } from '../stage-grid/constants';
+import type { WeaveStageGridPlugin } from '../stage-grid/stage-grid';
 
 export class WeaveNodesSelectionPlugin extends WeavePlugin {
   private tr!: Konva.Transformer;
@@ -641,6 +643,7 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
         this.selectionStart.y += this.panDirection.y * stepY;
       }
 
+      this.getStageGridPlugin()?.onRender();
       this.updateSelectionRect();
     }
 
@@ -1398,6 +1401,13 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
       WEAVE_CONTEXT_MENU_PLUGIN_KEY
     );
     return contextMenuPlugin;
+  }
+
+  getStageGridPlugin() {
+    const gridPlugin = this.instance.getPlugin<WeaveStageGridPlugin>(
+      WEAVE_STAGE_GRID_PLUGIN_KEY
+    );
+    return gridPlugin;
   }
 
   getNodesEdgeSnappingPlugin() {
