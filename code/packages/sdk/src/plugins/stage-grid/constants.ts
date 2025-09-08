@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-export const WEAVE_STAGE_GRID_KEY = 'stageGrid';
+export const WEAVE_STAGE_GRID_PLUGIN_KEY = 'stageGrid';
 
 export const WEAVE_GRID_TYPES = {
   ['LINES']: 'lines',

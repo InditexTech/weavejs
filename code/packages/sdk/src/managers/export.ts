@@ -16,7 +16,7 @@ import { getExportBoundingBox } from '@/utils';
 import type { WeaveNodesSelectionPlugin } from '@/plugins/nodes-selection/nodes-selection';
 import { WEAVE_NODES_SELECTION_KEY } from '@/plugins/nodes-selection/constants';
 import type { WeaveStageGridPlugin } from '@/plugins/stage-grid/stage-grid';
-import { WEAVE_STAGE_GRID_KEY } from '@/plugins/stage-grid/constants';
+import { WEAVE_STAGE_GRID_PLUGIN_KEY } from '@/plugins/stage-grid/constants';
 import type { WeaveNodesEdgeSnappingPlugin } from '@/plugins/nodes-edge-snapping/nodes-edge-snapping';
 import { WEAVE_NODES_EDGE_SNAPPING_PLUGIN_KEY } from '@/plugins/nodes-edge-snapping/constants';
 import type { WeaveNodesDistanceSnappingPlugin } from '@/plugins/nodes-distance-snapping/nodes-distance-snapping';
@@ -324,8 +324,9 @@ export class WeaveExportManager {
   }
 
   getStageGridPlugin() {
-    const gridPlugin =
-      this.instance.getPlugin<WeaveStageGridPlugin>(WEAVE_STAGE_GRID_KEY);
+    const gridPlugin = this.instance.getPlugin<WeaveStageGridPlugin>(
+      WEAVE_STAGE_GRID_PLUGIN_KEY
+    );
     return gridPlugin;
   }
 

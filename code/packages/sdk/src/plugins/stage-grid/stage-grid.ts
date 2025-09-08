@@ -13,11 +13,11 @@ import {
   WEAVE_GRID_DEFAULT_TYPE,
   WEAVE_GRID_LAYER_ID,
   WEAVE_GRID_TYPES,
-  WEAVE_STAGE_GRID_KEY,
   WEAVE_GRID_DEFAULT_MAJOR_LINE_RATIO,
   WEAVE_GRID_DEFAULT_MAJOR_DOT_RATIO,
   WEAVE_GRID_DEFAULT_MAJOR_EVERY,
   WEAVE_GRID_DEFAULT_DOT_MAX_DOTS_PER_AXIS,
+  WEAVE_STAGE_GRID_PLUGIN_KEY,
 } from './constants';
 import {
   type WeaveStageGridPluginConfig,
@@ -52,7 +52,7 @@ export class WeaveStageGridPlugin extends WeavePlugin {
   }
 
   getName(): string {
-    return WEAVE_STAGE_GRID_KEY;
+    return WEAVE_STAGE_GRID_PLUGIN_KEY;
   }
 
   getLayerName(): string {
@@ -402,7 +402,7 @@ export class WeaveStageGridPlugin extends WeavePlugin {
     gridLayer.add(originShape);
   }
 
-  private renderGrid(): void {
+  renderGrid(): void {
     switch (this.config.type) {
       case WEAVE_GRID_TYPES.LINES:
         this.renderGridLines();

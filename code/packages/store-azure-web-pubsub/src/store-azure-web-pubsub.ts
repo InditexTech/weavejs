@@ -3,12 +3,16 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { WeaveStore } from '@inditextech/weave-sdk';
+import merge from 'lodash/merge';
 import {
   WEAVE_STORE_CONNECTION_STATUS,
   type WeaveStoreOptions,
 } from '@inditextech/weave-types';
 import { WeaveStoreAzureWebPubSubSyncClient } from './client';
-import { WEAVE_STORE_AZURE_WEB_PUBSUB } from './constants';
+import {
+  WEAVE_STORE_AZURE_WEB_PUBSUB,
+  WEAVE_STORE_AZURE_WEB_PUBSUB_DEFAULT_CONFIG,
+} from './constants';
 import { type WeaveStoreAzureWebPubsubOptions } from './types';
 
 export class WeaveStoreAzureWebPubsub extends WeaveStore {
@@ -28,7 +32,10 @@ export class WeaveStoreAzureWebPubsub extends WeaveStore {
 
     const { roomId } = azureWebPubsubOptions;
 
-    this.azureWebPubsubOptions = azureWebPubsubOptions;
+    this.azureWebPubsubOptions = merge(
+      WEAVE_STORE_AZURE_WEB_PUBSUB_DEFAULT_CONFIG,
+      azureWebPubsubOptions
+    );
     this.roomId = roomId;
 
     this.init();
@@ -43,7 +50,7 @@ export class WeaveStoreAzureWebPubsub extends WeaveStore {
       this.roomId,
       this.getDocument(),
       {
-        resyncInterval: 1000,
+        resyncInterval: this.azureWebPubsubOptions.resyncIntervalMs,
         tokenProvider: null,
       }
     );
