@@ -40,6 +40,7 @@ export type WeaveStoreAzureWebPubsubOptions = {
   roomId: string;
   url: string;
   fetchClient?: FetchClient;
+  resyncIntervalMs: number;
 };
 
 export type WeaveStoreAzureWebPubsubOnStoreFetchConnectionUrlEvent = {

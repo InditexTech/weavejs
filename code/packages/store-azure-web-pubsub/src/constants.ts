@@ -8,3 +8,7 @@ export const WEAVE_STORE_HORIZONTAL_SYNC_HANDLER_CLIENT_TYPE = {
   ['PUB']: 'pub',
   ['SUB']: 'sub',
 };
+
+export const WEAVE_STORE_AZURE_WEB_PUBSUB_DEFAULT_CONFIG = {
+  resyncIntervalMs: 15000,
+};
