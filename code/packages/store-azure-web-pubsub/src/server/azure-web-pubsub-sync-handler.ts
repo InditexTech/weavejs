@@ -3,7 +3,6 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import * as Y from 'yjs';
-import WebSocket from 'ws';
 import { WebPubSubServiceClient } from '@azure/web-pubsub';
 import {
   WebPubSubEventHandler,
@@ -36,7 +35,7 @@ export default class WeaveAzureWebPubsubSyncHandler extends WebPubSubEventHandle
   private _store_persistence: Map<string, NodeJS.Timeout> = new Map();
   private readonly syncOptions?: WeaveAzureWebPubsubSyncHandlerOptions;
   private initialState: FetchInitialState;
-  private actualServer: WeaveAzureWebPubsubServer;
+  private server: WeaveAzureWebPubsubServer;
 
   constructor(
     hub: string,
@@ -53,7 +52,7 @@ export default class WeaveAzureWebPubsubSyncHandler extends WebPubSubEventHandle
 
         this.syncOptions?.onConnect?.(req.context.connectionId, req.queries);
 
-        this.actualServer.emitEvent<WeaveStoreAzureWebPubsubOnConnectEvent>(
+        this.server.emitEvent<WeaveStoreAzureWebPubsubOnConnectEvent>(
           'onConnect',
           {
             context: req.context,
@@ -64,7 +63,7 @@ export default class WeaveAzureWebPubsubSyncHandler extends WebPubSubEventHandle
       onConnected: (req: ConnectedRequest) => {
         this.syncOptions?.onConnected?.(req.context.connectionId);
 
-        this.actualServer.emitEvent<WeaveStoreAzureWebPubsubOnConnectedEvent>(
+        this.server.emitEvent<WeaveStoreAzureWebPubsubOnConnectedEvent>(
           'onConnected',
           {
             context: req.context,
@@ -74,7 +73,7 @@ export default class WeaveAzureWebPubsubSyncHandler extends WebPubSubEventHandle
       onDisconnected: (req: DisconnectedRequest) => {
         this.handleConnectionDisconnection(req.context.connectionId);
 
-        this.actualServer.emitEvent<WeaveStoreAzureWebPubsubOnDisconnectedEvent>(
+        this.server.emitEvent<WeaveStoreAzureWebPubsubOnDisconnectedEvent>(
           'onDisconnected',
           {
             context: req.context,
@@ -84,7 +83,7 @@ export default class WeaveAzureWebPubsubSyncHandler extends WebPubSubEventHandle
     });
 
     this.syncOptions = syncHandlerOptions;
-    this.actualServer = server;
+    this.server = server;
     this.initialState = initialState;
     this._client = client;
   }
@@ -94,11 +93,13 @@ export default class WeaveAzureWebPubsubSyncHandler extends WebPubSubEventHandle
   }
 
   private async setupRoomInstance(roomId: string): Promise<void> {
-    const doc = this.getNewYDoc();
+    this._rooms.set(roomId, this.getNewYDoc());
+
+    const doc = this._rooms.get(roomId)!;
 
     let documentData = undefined;
-    if (this.actualServer && this.actualServer.fetchRoom) {
-      documentData = await this.actualServer.fetchRoom(roomId);
+    if (this.server && this.server.fetchRoom) {
+      documentData = await this.server.fetchRoom(roomId);
     }
 
     if (documentData) {
@@ -107,19 +108,19 @@ export default class WeaveAzureWebPubsubSyncHandler extends WebPubSubEventHandle
       this.initialState(doc);
     }
 
-    const connection = new WeaveStoreAzureWebPubSubSyncHost(
-      this._client,
+    this._roomsSyncHost.set(
       roomId,
-      doc,
-      {
-        // eslint-disable-next-line @typescript-eslint/naming-convention
-        WebSocketPolyfill: WebSocket,
-      }
+      new WeaveStoreAzureWebPubSubSyncHost(
+        this.server,
+        this._client,
+        roomId,
+        doc
+      )
     );
-    connection.start();
 
-    this._rooms.set(roomId, doc);
-    this._roomsSyncHost.set(roomId, connection);
+    const connection = this._roomsSyncHost.get(roomId)!;
+
+    await connection.start();
 
     await this.setupRoomInstancePersistence(roomId);
   }
@@ -133,8 +134,8 @@ export default class WeaveAzureWebPubsubSyncHandler extends WebPubSubEventHandle
       }
 
       const actualState = Y.encodeStateAsUpdate(doc);
-      if (this.actualServer && this.actualServer.persistRoom) {
-        await this.actualServer.persistRoom(roomId, actualState);
+      if (this.server && this.server.persistRoom) {
+        await this.server.persistRoom(roomId, actualState);
       }
     } catch (ex) {
       console.error(ex);
@@ -169,7 +170,7 @@ export default class WeaveAzureWebPubsubSyncHandler extends WebPubSubEventHandle
     }
   }
 
-  private async destroyRoomInstance(roomId: string): Promise<void> {
+  async destroyRoomInstance(roomId: string): Promise<void> {
     const intervalId = this._store_persistence.get(roomId);
     if (intervalId) {
       clearInterval(intervalId);
@@ -183,6 +184,7 @@ export default class WeaveAzureWebPubsubSyncHandler extends WebPubSubEventHandle
     const syncHost = this._roomsSyncHost.get(roomId);
     if (syncHost) {
       await syncHost.stop();
+      this._roomsSyncHost.delete(roomId);
     }
 
     this._rooms.delete(roomId);
@@ -192,6 +194,16 @@ export default class WeaveAzureWebPubsubSyncHandler extends WebPubSubEventHandle
     if (!this._rooms.has(roomId)) {
       await this.setupRoomInstance(roomId);
     }
+  }
+
+  getRoomsLoaded(): string[] {
+    return Array.from(this._rooms.keys());
+  }
+
+  getRoomSyncHost(
+    roomId: string
+  ): WeaveStoreAzureWebPubSubSyncHost | undefined {
+    return this._roomsSyncHost.get(roomId);
   }
 
   async clientConnect(roomId: string): Promise<string | null> {

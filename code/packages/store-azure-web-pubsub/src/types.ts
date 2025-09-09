@@ -2,6 +2,7 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
+import { WebSocket } from 'ws';
 import type { TokenCredential } from '@azure/identity';
 import * as Y from 'yjs';
 import type { ConnectionContext } from './index.server';
@@ -79,4 +80,33 @@ export type WeaveStoreAzureWebPubsubOnConnectedEvent = {
 export type WeaveStoreAzureWebPubsubOnDisconnectedEvent = {
   context: ConnectionContext;
   queries?: Record<string, string[]>;
+};
+
+export type WeaveStoreAzureWebPubsubOnWebsocketOpenEvent = {
+  group: string;
+  event: WebSocket.Event;
+};
+
+export type WeaveStoreAzureWebPubsubOnWebsocketJoinGroupEvent = {
+  group: string;
+};
+
+export type WeaveStoreAzureWebPubsubOnWebsocketMessageEvent = {
+  group: string;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  event: WebSocket.MessageEvent;
+};
+
+export type WeaveStoreAzureWebPubsubOnWebsocketCloseEvent = {
+  group: string;
+  event: CloseEvent;
+};
+
+export type WeaveStoreAzureWebPubsubOnWebsocketErrorEvent = {
+  group: string;
+  error: ErrorEvent;
+};
+
+export type WeaveStoreAzureWebPubsubOnWebsocketOnTokenRefreshEvent = {
+  group: string;
 };

@@ -2,12 +2,11 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-import Emittery from 'emittery';
 import * as decoding from 'lib0/decoding';
 import * as encoding from 'lib0/encoding';
 import * as syncProtocol from 'y-protocols/sync';
 import * as awarenessProtocol from 'y-protocols/awareness';
-import ReconnectingWebSocket from 'reconnecting-websocket';
+// import ReconnectingWebSocket from 'reconnecting-websocket';
 
 import {
   WebPubSubServiceClient,
@@ -15,6 +14,15 @@ import {
 } from '@azure/web-pubsub';
 import { WebSocket } from 'ws';
 import * as Y from 'yjs';
+import type { WeaveAzureWebPubsubServer } from './azure-web-pubsub-server';
+import type {
+  WeaveStoreAzureWebPubsubOnWebsocketCloseEvent,
+  WeaveStoreAzureWebPubsubOnWebsocketErrorEvent,
+  WeaveStoreAzureWebPubsubOnWebsocketJoinGroupEvent,
+  WeaveStoreAzureWebPubsubOnWebsocketMessageEvent,
+  WeaveStoreAzureWebPubsubOnWebsocketOnTokenRefreshEvent,
+  WeaveStoreAzureWebPubsubOnWebsocketOpenEvent,
+} from '@/types';
 
 const expirationTimeInMinutes = 60; // 1 hour
 const messageSync = 0;
@@ -52,34 +60,34 @@ export interface WebPubSubHostOptions {
   WebSocketPolyfill: any;
 }
 
-export class WeaveStoreAzureWebPubSubSyncHost extends Emittery {
+export class WeaveStoreAzureWebPubSubSyncHost {
+  private server: WeaveAzureWebPubsubServer;
   public doc: Y.Doc;
   public topic: string;
   public topicAwarenessChannel: string;
 
   private _client: WebPubSubServiceClient;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  private _polyfill: any;
+  // private _polyfill: any;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   private _conn: any;
 
   private _awareness: awarenessProtocol.Awareness;
 
   constructor(
+    server: WeaveAzureWebPubsubServer,
     client: WebPubSubServiceClient,
     topic: string,
-    doc: Y.Doc,
-    { WebSocketPolyfill = WebSocket }: WebPubSubHostOptions
+    doc: Y.Doc
   ) {
-    super();
-
+    this.server = server;
     this.doc = doc;
     this.topic = topic;
     this.topicAwarenessChannel = `${topic}-awareness`;
     this._client = client;
 
     this._conn = null;
-    this._polyfill = WebSocketPolyfill;
+    // this._polyfill = WebSocketPolyfill;
 
     // register awareness controller
     this._awareness = new awarenessProtocol.Awareness(this.doc);
@@ -145,75 +153,109 @@ export class WeaveStoreAzureWebPubSubSyncHost extends Emittery {
     this.broadcast(this.topic, origin, u8);
   }
 
-  async createWebSocket(): Promise<ReconnectingWebSocket> {
+  async createWebSocket(sleep: number = 0): Promise<void> {
     const group = this.topic;
 
     const { url } = await this.negotiate(this.topic);
 
-    const ws = new ReconnectingWebSocket(url, AzureWebPubSubJsonProtocol, {
-      WebSocket: this._polyfill,
-      // retry delay options
-      connectionTimeout: 4000,
-      maxRetries: Infinity,
-      maxReconnectionDelay: 8000,
-      minReconnectionDelay: 1000,
-    });
+    if (sleep && sleep > 0) {
+      await new Promise((resolve) => setTimeout(resolve, sleep));
+    }
 
-    ws.addEventListener('open', () => {
-      this.emit('connected');
-      ws.send(
-        JSON.stringify({
-          type: MessageType.JoinGroup,
-          group: `${group}.host`,
-        })
-      );
-    });
+    return new Promise((resolve) => {
+      const ws = new WebSocket(url, AzureWebPubSubJsonProtocol);
 
-    ws.addEventListener('message', (e) => {
-      const event: Message = JSON.parse(e.data.toString());
+      ws.addEventListener('open', (event) => {
+        this.server.emitEvent<WeaveStoreAzureWebPubsubOnWebsocketOpenEvent>(
+          'onWsOpen',
+          { group: `${group}.host`, event }
+        );
+        ws.send(
+          JSON.stringify({
+            type: MessageType.JoinGroup,
+            group: `${group}.host`,
+          })
+        );
+        this.server.emitEvent<WeaveStoreAzureWebPubsubOnWebsocketJoinGroupEvent>(
+          'onWsJoinGroup',
+          { group: `${group}.host` }
+        );
 
-      if (event.type === 'message' && event.from === 'group') {
-        switch (event.data.t) {
-          case MessageDataType.Init:
-            this.onClientInit(group, event.data);
-            this.onClientSync(group, event.data);
-            this.sendInitAwarenessInfo(event.data.f);
-            return;
-          case MessageDataType.Sync:
-            this.onClientSync(group, event.data);
-            return;
-          case MessageDataType.Awareness:
-            this.onAwareness(group, event.data);
-            return;
+        this._conn = ws;
+        resolve();
+      });
+
+      ws.addEventListener('message', (e) => {
+        this.server.emitEvent<WeaveStoreAzureWebPubsubOnWebsocketMessageEvent>(
+          'onWsMessage',
+          { group: `${group}.host`, event: e }
+        );
+
+        const event: Message = JSON.parse(e.data.toString());
+
+        if (event.type === 'message' && event.from === 'group') {
+          switch (event.data.t) {
+            case MessageDataType.Init:
+              this.onClientInit(group, event.data);
+              this.onClientSync(group, event.data);
+              this.sendInitAwarenessInfo(event.data.f);
+              return;
+            case MessageDataType.Sync:
+              this.onClientSync(group, event.data);
+              return;
+            case MessageDataType.Awareness:
+              this.onAwareness(group, event.data);
+              return;
+          }
         }
-      }
+      });
+
+      ws.addEventListener('close', (e) => {
+        this.server.emitEvent<WeaveStoreAzureWebPubsubOnWebsocketCloseEvent>(
+          'onWsClose',
+          {
+            group: `${group}.host`,
+            event: e as unknown as CloseEvent,
+          }
+        );
+
+        if (e.code === 1008 && ws.readyState === WebSocket.OPEN) {
+          ws.close(); // ensure cleanup
+          this.createWebSocket(); // start fresh with a new token
+        }
+      });
+
+      ws.addEventListener('error', (error) => {
+        this.server.emitEvent<WeaveStoreAzureWebPubsubOnWebsocketErrorEvent>(
+          'onWsError',
+          {
+            group: `${group}.host`,
+            error: error as unknown as ErrorEvent,
+          }
+        );
+
+        if (ws.readyState === WebSocket.OPEN) {
+          ws.close();
+        }
+
+        this.createWebSocket(20000);
+      });
+
+      setTimeout(() => {
+        if (ws.readyState === WebSocket.OPEN) {
+          ws.close();
+          this.server.emitEvent<WeaveStoreAzureWebPubsubOnWebsocketOnTokenRefreshEvent>(
+            'onWsTokenRefresh',
+            { group: `${group}.host` }
+          );
+          this.createWebSocket(); // start fresh with a new token
+        }
+      }, expirationTimeInMinutes * 0.75 * 60 * 1000);
     });
-
-    ws.addEventListener('close', (ev) => {
-      if (ev.code === 1008 && ws.readyState === WebSocket.OPEN) {
-        ws.close(); // ensure cleanup
-        this._conn = this.createWebSocket(); // start fresh with a new token
-      }
-    });
-
-    ws.addEventListener('error', (error) => {
-      this.emit('error', error);
-    });
-
-    setTimeout(() => {
-      if (ws.readyState === WebSocket.OPEN) {
-        ws.close();
-        this._conn = this.createWebSocket(); // start fresh with a new token
-      }
-    }, expirationTimeInMinutes * 0.75 * 60 * 1000);
-
-    this._conn = ws;
-
-    return ws;
   }
 
   async start(): Promise<void> {
-    this._conn = await this.createWebSocket();
+    await this.createWebSocket();
   }
 
   async stop(): Promise<void> {
@@ -223,8 +265,14 @@ export class WeaveStoreAzureWebPubSubSyncHost extends Emittery {
     }
   }
 
+  public simulateWebsocketError(): void {
+    if (this._conn) {
+      this._conn.emit('error', new Error('Simulated connection failure'));
+    }
+  }
+
   private broadcast(group: string, from: string, u8: Uint8Array) {
-    this._conn?.send(
+    this._conn?.send?.(
       JSON.stringify({
         type: MessageType.SendToGroup,
         group,
@@ -238,7 +286,7 @@ export class WeaveStoreAzureWebPubSubSyncHost extends Emittery {
   }
 
   private send(group: string, to: string, u8: Uint8Array) {
-    this._conn?.send(
+    this._conn?.send?.(
       JSON.stringify({
         type: MessageType.SendToGroup,
         group,
