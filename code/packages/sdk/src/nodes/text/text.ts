@@ -525,14 +525,14 @@ export class WeaveTextNode extends WeaveNode {
       this.textAreaContainer.style.transform = transform;
     }
 
-    const measures = textNode.measureSize(textNode.text());
-    const px = 0 * stage.scaleX();
-    const py = measures.actualBoundingBoxDescent * stage.scaleY();
-    let transform = '';
-    transform += 'translateX(' + px + 'px)';
-    transform += 'translateY(' + py + 'px)';
+    // const measures = textNode.measureSize(textNode.text());
+    // const px = 0 * stage.scaleX();
+    // const py = measures.actualBoundingBoxDescent * stage.scaleY();
+    // let transform = '';
+    // transform += 'translateX(0px)';
+    // transform += 'translateY(-1px)';
 
-    this.textArea.style.transform = transform;
+    // this.textArea.style.transform = transform;
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const handleKeyDown = (e: any) => {
