@@ -60,7 +60,7 @@ export interface WebPubSubHostOptions {
 }
 
 export class WeaveStoreAzureWebPubSubSyncHost {
-  private server: WeaveAzureWebPubsubServer;
+  private readonly server: WeaveAzureWebPubsubServer;
   public doc: Y.Doc;
   public topic: string;
   public topicAwarenessChannel: string;
