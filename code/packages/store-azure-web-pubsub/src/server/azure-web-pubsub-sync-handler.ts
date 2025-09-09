@@ -35,7 +35,7 @@ export default class WeaveAzureWebPubsubSyncHandler extends WebPubSubEventHandle
   private _store_persistence: Map<string, NodeJS.Timeout> = new Map();
   private readonly syncOptions?: WeaveAzureWebPubsubSyncHandlerOptions;
   private initialState: FetchInitialState;
-  private server: WeaveAzureWebPubsubServer;
+  private readonly server: WeaveAzureWebPubsubServer;
 
   constructor(
     hub: string,
@@ -98,7 +98,7 @@ export default class WeaveAzureWebPubsubSyncHandler extends WebPubSubEventHandle
     const doc = this._rooms.get(roomId)!;
 
     let documentData = undefined;
-    if (this.server && this.server.fetchRoom) {
+    if (this.server?.fetchRoom) {
       documentData = await this.server.fetchRoom(roomId);
     }
 
@@ -134,7 +134,7 @@ export default class WeaveAzureWebPubsubSyncHandler extends WebPubSubEventHandle
       }
 
       const actualState = Y.encodeStateAsUpdate(doc);
-      if (this.server && this.server.persistRoom) {
+      if (this.server?.persistRoom) {
         await this.server.persistRoom(roomId, actualState);
       }
     } catch (ex) {

@@ -6,7 +6,6 @@ import * as decoding from 'lib0/decoding';
 import * as encoding from 'lib0/encoding';
 import * as syncProtocol from 'y-protocols/sync';
 import * as awarenessProtocol from 'y-protocols/awareness';
-// import ReconnectingWebSocket from 'reconnecting-websocket';
 
 import {
   WebPubSubServiceClient,
@@ -68,8 +67,6 @@ export class WeaveStoreAzureWebPubSubSyncHost {
 
   private _client: WebPubSubServiceClient;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  // private _polyfill: any;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   private _conn: any;
 
   private _awareness: awarenessProtocol.Awareness;
@@ -87,7 +84,6 @@ export class WeaveStoreAzureWebPubSubSyncHost {
     this._client = client;
 
     this._conn = null;
-    // this._polyfill = WebSocketPolyfill;
 
     // register awareness controller
     this._awareness = new awarenessProtocol.Awareness(this.doc);
