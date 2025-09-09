@@ -26,7 +26,11 @@ export class WeaveStoreAzureWebPubsub extends WeaveStore {
 
   constructor(
     storeOptions: WeaveStoreOptions,
-    azureWebPubsubOptions: WeaveStoreAzureWebPubsubOptions
+    azureWebPubsubOptions: Pick<
+      WeaveStoreAzureWebPubsubOptions,
+      'roomId' | 'url'
+    > &
+      Partial<Omit<WeaveStoreAzureWebPubsubOptions, 'roomId' | 'url'>>
   ) {
     super(storeOptions);
 
