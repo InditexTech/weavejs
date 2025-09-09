@@ -16,6 +16,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 - [#658](https://github.com/InditexTech/weavejs/issues/658) Text node edition mode bugfixes
+- [#660](https://github.com/InditexTech/weavejs/issues/660) Improve Azure Web PubSub internal WS handling and externalize events
 
 ## [0.68.1] - 2025-09-08
 
