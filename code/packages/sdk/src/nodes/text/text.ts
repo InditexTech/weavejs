@@ -204,6 +204,25 @@ export class WeaveTextNode extends WeaveNode {
     nodeInstance: WeaveElementInstance,
     nextProps: WeaveElementAttributes
   ): void {
+    const actualFontFamily = nodeInstance.getAttrs().fontFamily;
+    const actualFontSize = nodeInstance.getAttrs().fontSize;
+    const actualFontStyle = nodeInstance.getAttrs().fontStyle;
+    const actualFontVariant = nodeInstance.getAttrs().fontVariant;
+    const actualTextDecoration = nodeInstance.getAttrs().textDecoration;
+    const actualLineHeight = nodeInstance.getAttrs().lineHeight;
+
+    let updateNeeded = false;
+    if (
+      actualFontFamily !== nextProps.fontFamily ||
+      actualFontSize !== nextProps.fontSize ||
+      actualFontStyle !== nextProps.fontStyle ||
+      actualFontVariant !== nextProps.fontVariant ||
+      actualTextDecoration !== nextProps.textDecoration ||
+      actualLineHeight !== nextProps.lineHeight
+    ) {
+      updateNeeded = true;
+    }
+
     nodeInstance.setAttrs({
       ...nextProps,
     });
@@ -223,11 +242,18 @@ export class WeaveTextNode extends WeaveNode {
       );
       height = textAreaHeight + 3.2;
     }
+    if (nextProps.layout === TEXT_LAYOUT.FIXED) {
+      updateNeeded = false;
+    }
 
     nodeInstance.setAttrs({
       width,
       height,
     });
+
+    if (updateNeeded) {
+      this.instance.updateNode(this.serialize(nodeInstance));
+    }
 
     if (this.editing) {
       this.updateTextAreaDOM(nodeInstance as Konva.Text);
