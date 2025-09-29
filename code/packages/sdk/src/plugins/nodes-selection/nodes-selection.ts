@@ -1097,8 +1097,12 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
       this.handleBehaviors();
       this.handleMultipleSelectionBehavior();
 
-      stage.container().tabIndex = 1;
-      stage.container().focus();
+      if (this.tr.nodes().length > 0) {
+        stage.container().tabIndex = 1;
+        stage.container().focus();
+      }
+
+      this.triggerSelectedNodesEvent();
     });
 
     this.instance.addEventListener('onStateChange', () => {
