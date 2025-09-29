@@ -16,6 +16,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 - [#666](https://github.com/InditexTech/weavejs/issues/666) Nodes selection event not triggering when selecting multiple by area
+- [#668](https://github.com/InditexTech/weavejs/issues/668) Frame tool doesn't allow to define the frame size when creating
 
 ## [0.69.1] - 2025-09-29
 

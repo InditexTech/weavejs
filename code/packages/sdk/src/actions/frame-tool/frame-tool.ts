@@ -45,6 +45,7 @@ export class WeaveFrameToolAction extends WeaveAction {
 
   initProps(params?: WeaveFrameToolActionTriggerParams): WeaveFrameToolProps {
     return {
+      ...params,
       title: params?.title ?? WEAVE_FRAME_NODE_DEFAULT_PROPS.title,
       editing: false,
       opacity: 1,
