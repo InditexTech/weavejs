@@ -213,6 +213,10 @@ export class WeaveReconciler {
       ): void {
         logger.debug({ parentInstance, child, beforeChild }, 'insertBefore ');
 
+        if (child.getParent() !== parentInstance) {
+          child.moveTo(parentInstance);
+        }
+
         if (
           parentInstance instanceof Konva.Layer ||
           parentInstance instanceof Konva.Group
@@ -221,6 +225,7 @@ export class WeaveReconciler {
 
           const fromIndex = actualChildren.indexOf(child);
           const toIndex = actualChildren.indexOf(beforeChild);
+
           if (fromIndex === -1 || toIndex === -1) return;
 
           // If the removal was before the insertion point, the index shifts by -1
