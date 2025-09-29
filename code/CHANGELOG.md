@@ -16,6 +16,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 - [#663](https://github.com/InditexTech/weavejs/issues/663) Check Frames undo / redo issues where nodes disappear
+- [#662](https://github.com/InditexTech/weavejs/issues/662) Recalculate Text node size when properties change
 
 ## [0.69.0] - 2025-09-09
 
