@@ -457,17 +457,17 @@ export class WeaveTextNode extends WeaveNode {
       textNode.getAttrs().layout === TEXT_LAYOUT.AUTO_ALL
     ) {
       const rect = textNode.getClientRect({ relativeTo: stage });
-      this.textAreaContainer.style.width = rect.width * stage.scaleX() + 'px';
+      this.textAreaContainer.style.width =
+        (rect.width + 1) * stage.scaleX() + 'px';
       this.textAreaContainer.style.height =
         (textNode.height() - textNode.padding() * 2) *
           textNode.getAbsoluteScale().x +
         'px';
     }
     if (textNode.getAttrs().layout === TEXT_LAYOUT.AUTO_HEIGHT) {
+      const rect = textNode.getClientRect({ relativeTo: stage });
       this.textAreaContainer.style.width =
-        (textNode.width() - textNode.padding() * 2) *
-          textNode.getAbsoluteScale().x +
-        'px';
+        (rect.width + 1) * stage.scaleX() + 'px';
       this.textAreaContainer.style.height =
         (textNode.height() - textNode.padding() * 2) *
           textNode.getAbsoluteScale().x +
@@ -517,7 +517,7 @@ export class WeaveTextNode extends WeaveNode {
     const correctionY =
       (typeof actualFont === 'undefined' ? 0 : actualFont.offsetY ?? 0) *
       stage.scaleX();
-    this.textArea.style.left = `${correctionX}px`;
+    this.textArea.style.left = `${correctionX - 1}px`;
     this.textArea.style.top = `${correctionY}px`;
 
     this.textArea.onfocus = () => {
