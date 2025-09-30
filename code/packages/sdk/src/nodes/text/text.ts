@@ -512,11 +512,9 @@ export class WeaveTextNode extends WeaveNode {
     const actualFont = loadedFonts.find((f) => f.name === fontFamily);
 
     const correctionX =
-      (typeof actualFont === 'undefined' ? 0 : actualFont.offsetX ?? 0) *
-      stage.scaleX();
+      (actualFont === undefined ? 0 : actualFont.offsetX ?? 0) * stage.scaleX();
     const correctionY =
-      (typeof actualFont === 'undefined' ? 0 : actualFont.offsetY ?? 0) *
-      stage.scaleX();
+      (actualFont === undefined ? 0 : actualFont.offsetY ?? 0) * stage.scaleX();
     this.textArea.style.left = `${correctionX - 1}px`;
     this.textArea.style.top = `${correctionY}px`;
 
