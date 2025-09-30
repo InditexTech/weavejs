@@ -182,6 +182,8 @@ export type WeaveUser = {
 export type WeaveFont = {
   id: string;
   name: string;
+  offsetX?: number;
+  offsetY?: number;
 };
 
 // Undo/redo manager handling

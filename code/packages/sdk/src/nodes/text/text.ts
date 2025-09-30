@@ -232,15 +232,15 @@ export class WeaveTextNode extends WeaveNode {
     if (nextProps.layout === TEXT_LAYOUT.AUTO_ALL) {
       const { width: textAreaWidth, height: textAreaHeight } =
         this.textRenderedSize(nextProps.text, nodeInstance as Konva.Text);
-      width = textAreaWidth + 3.2;
-      height = textAreaHeight + 3.2;
+      width = textAreaWidth;
+      height = textAreaHeight;
     }
     if (nextProps.layout === TEXT_LAYOUT.AUTO_HEIGHT) {
       const { height: textAreaHeight } = this.textRenderedSize(
         nextProps.text,
         nodeInstance as Konva.Text
       );
-      height = textAreaHeight + 3.2;
+      height = textAreaHeight;
     }
     if (nextProps.layout === TEXT_LAYOUT.FIXED) {
       updateNeeded = false;
@@ -332,12 +332,12 @@ export class WeaveTextNode extends WeaveNode {
     ) {
       this.textAreaContainer.style.height = 'auto';
       this.textAreaContainer.style.height =
-        this.textArea.scrollHeight + 1.6 * textNode.getAbsoluteScale().y + 'px';
+        this.textArea.scrollHeight + textNode.getAbsoluteScale().y + 'px';
     }
 
     this.textArea.style.height = 'auto';
     this.textArea.style.height =
-      this.textArea.scrollHeight + 1.6 * textNode.getAbsoluteScale().x + 'px';
+      this.textArea.scrollHeight + textNode.getAbsoluteScale().x + 'px';
     this.textArea.rows = this.textArea.value.split('\n').length;
   }
 
@@ -456,11 +456,11 @@ export class WeaveTextNode extends WeaveNode {
       !textNode.getAttrs().layout ||
       textNode.getAttrs().layout === TEXT_LAYOUT.AUTO_ALL
     ) {
-      this.textAreaContainer.style.width = this.textArea.scrollWidth + 'px';
+      const rect = textNode.getClientRect({ relativeTo: stage });
+      this.textAreaContainer.style.width = rect.width * stage.scaleX() + 'px';
       this.textAreaContainer.style.height =
         (textNode.height() - textNode.padding() * 2) *
           textNode.getAbsoluteScale().x +
-        2 +
         'px';
     }
     if (textNode.getAttrs().layout === TEXT_LAYOUT.AUTO_HEIGHT) {
@@ -471,7 +471,6 @@ export class WeaveTextNode extends WeaveNode {
       this.textAreaContainer.style.height =
         (textNode.height() - textNode.padding() * 2) *
           textNode.getAbsoluteScale().x +
-        2 +
         'px';
     }
     if (textNode.getAttrs().layout === TEXT_LAYOUT.FIXED) {
@@ -482,9 +481,9 @@ export class WeaveTextNode extends WeaveNode {
       this.textAreaContainer.style.height =
         (textNode.height() - textNode.padding() * 2) *
           textNode.getAbsoluteScale().x +
-        2 +
         'px';
     }
+
     this.textAreaContainer.style.border = 'solid 1px #1e40af';
     this.textArea.style.position = 'absolute';
     this.textArea.style.top = '0px';
@@ -503,9 +502,23 @@ export class WeaveTextNode extends WeaveNode {
     this.textArea.style.border = 'none';
     this.textArea.style.outline = 'none';
     this.textArea.style.resize = 'none';
+    this.textArea.style.overflow = 'hidden';
     this.textArea.style.backgroundColor = 'transparent';
     this.textAreaContainer.style.transformOrigin = 'left top';
     this.mimicTextNode(textNode);
+
+    const loadedFonts = this.instance.getFonts();
+    const fontFamily = this.textArea.style.fontFamily;
+    const actualFont = loadedFonts.find((f) => f.name === fontFamily);
+
+    const correctionX =
+      (typeof actualFont === 'undefined' ? 0 : actualFont.offsetX ?? 0) *
+      stage.scaleX();
+    const correctionY =
+      (typeof actualFont === 'undefined' ? 0 : actualFont.offsetY ?? 0) *
+      stage.scaleX();
+    this.textArea.style.left = `${correctionX}px`;
+    this.textArea.style.top = `${correctionY}px`;
 
     this.textArea.onfocus = () => {
       this.textAreaDomResize(textNode);
@@ -551,31 +564,39 @@ export class WeaveTextNode extends WeaveNode {
       this.textAreaContainer.style.transform = transform;
     }
 
+    const updateTextNodeSize = () => {
+      if (!this.textArea) {
+        return;
+      }
+
+      if (
+        !textNode.getAttrs().layout ||
+        textNode.getAttrs().layout === TEXT_LAYOUT.AUTO_ALL
+      ) {
+        const { width: textAreaWidth } = this.textRenderedSize(
+          this.textArea.value,
+          textNode
+        );
+
+        textNode.width(textAreaWidth);
+      }
+      if (
+        !textNode.getAttrs().layout ||
+        textNode.getAttrs().layout === TEXT_LAYOUT.AUTO_HEIGHT ||
+        textNode.getAttrs().layout === TEXT_LAYOUT.AUTO_ALL
+      ) {
+        textNode.height(
+          this.textArea.scrollHeight * (1 / textNode.getAbsoluteScale().x)
+        );
+      }
+    };
+
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const handleKeyDown = (e: any) => {
       if (this.textArea && textNode && e.key === 'Escape') {
         e.stopPropagation();
-        if (
-          !textNode.getAttrs().layout ||
-          textNode.getAttrs().layout === TEXT_LAYOUT.AUTO_ALL
-        ) {
-          const { width: textAreaWidth } = this.textRenderedSize(
-            this.textArea.value,
-            textNode
-          );
-          textNode.width(textAreaWidth + 3.2);
-        }
-        if (
-          !textNode.getAttrs().layout ||
-          textNode.getAttrs().layout === TEXT_LAYOUT.AUTO_HEIGHT ||
-          textNode.getAttrs().layout === TEXT_LAYOUT.AUTO_ALL
-        ) {
-          textNode.height(
-            (this.textArea.scrollHeight + 1.6) *
-              (1 / textNode.getAbsoluteScale().x)
-          );
-        }
 
+        updateTextNodeSize();
         textNode.text(this.textArea.value);
         this.removeTextAreaDOM(textNode);
         this.instance.removeEventListener(
@@ -587,6 +608,7 @@ export class WeaveTextNode extends WeaveNode {
           this.onStageMoveHandler(textNode).bind(this)
         );
         window.removeEventListener('pointerup', handleOutsideClick);
+        window.removeEventListener('pointerdown', handleOutsideClick);
         return;
       }
     };
@@ -607,9 +629,7 @@ export class WeaveTextNode extends WeaveNode {
           if (this.textAreaContainer) {
             this.textAreaContainer.style.height = 'auto';
             this.textAreaContainer.style.height =
-              this.textArea.scrollHeight +
-              1.6 * textNode.getAbsoluteScale().x +
-              'px';
+              this.textArea.scrollHeight + textNode.getAbsoluteScale().x + 'px';
           }
         }
         this.textAreaDomResize(textNode);
@@ -646,6 +666,7 @@ export class WeaveTextNode extends WeaveNode {
       }
 
       if (clickedOnCanvas) {
+        updateTextNodeSize();
         textNode.text(this.textArea.value);
         this.removeTextAreaDOM(textNode);
 
@@ -671,7 +692,6 @@ export class WeaveTextNode extends WeaveNode {
       return;
     }
 
-    const stage = this.instance.getStage();
     const textPosition = textNode.getClientRect();
     const position: Vector2d = {
       x: textPosition.x,
@@ -701,14 +721,6 @@ export class WeaveTextNode extends WeaveNode {
       const transform = 'rotate(' + rotation + 'deg)';
       this.textAreaContainer.style.transform = transform;
     }
-
-    const px = 0;
-    const py = -3 * stage.scaleY();
-    let transform = '';
-    transform += 'translateX(' + px + 'px)';
-    transform += 'translateY(' + py + 'px)';
-
-    this.textArea.style.transform = transform;
 
     const selectionPlugin =
       this.instance.getPlugin<WeaveNodesSelectionPlugin>('nodesSelection');

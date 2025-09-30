@@ -647,7 +647,9 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
       this.updateSelectionRect();
     }
 
-    this.panLoopId = requestAnimationFrame(() => this.panLoop());
+    if (this.isAreaSelecting()) {
+      this.panLoopId = requestAnimationFrame(() => this.panLoop());
+    }
   }
 
   private setTapStart(
@@ -854,9 +856,7 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
         true
       );
 
-      if (!this.panLoopId) {
-        this.panLoopId = requestAnimationFrame(() => this.panLoop());
-      }
+      this.panLoopId = requestAnimationFrame(() => this.panLoop());
     });
 
     const handleMouseMove = (
