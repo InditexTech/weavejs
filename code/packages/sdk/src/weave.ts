@@ -57,6 +57,8 @@ import type { WeaveStoreOnRoomLoadedEvent } from './stores/types';
 import type { DOMElement, WeaveAsyncElement } from './types';
 import { merge } from 'lodash';
 import { watchMap } from './watch-map';
+import { getBoundingBox } from './utils';
+import type { Container } from 'konva/lib/Container';
 
 export class Weave {
   private id: string;
@@ -604,6 +606,25 @@ export class Weave {
     }
 
     return nodeContainer;
+  }
+
+  getBoundingBox(
+    nodes: Konva.Node[],
+    config?:
+      | {
+          skipTransform?: boolean;
+          skipShadow?: boolean;
+          skipStroke?: boolean;
+          relativeTo?: Container;
+        }
+      | undefined
+  ): {
+    x: number;
+    y: number;
+    width: number;
+    height: number;
+  } {
+    return getBoundingBox(nodes, config);
   }
 
   // ZINDEX MANAGEMENT METHODS PROXIES
