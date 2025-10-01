@@ -1,0 +1,10 @@
+name: "CodeQL config"
+
+queries:
+  - uses: security-and-quality
+
+paths:
+  - code/packages
+paths-ignore:
+  - code/packages/create-backend-app/template/**
+  - code/packages/create-frontend-app/template/**
