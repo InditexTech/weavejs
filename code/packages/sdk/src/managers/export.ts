@@ -81,7 +81,7 @@ export class WeaveExportManager {
       stage.scale({ x: 1, y: 1 });
 
       if (mainLayer) {
-        const bounds = getExportBoundingBox(stage, boundingNodes(nodes));
+        const bounds = getExportBoundingBox(boundingNodes(nodes));
 
         const scaleX = stage.scaleX();
         const scaleY = stage.scaleY();
@@ -199,7 +199,7 @@ export class WeaveExportManager {
     }
 
     if (mainLayer) {
-      const bounds = getExportBoundingBox(stage, boundingNodes(konvaNodes));
+      const bounds = getExportBoundingBox(boundingNodes(konvaNodes));
 
       const scaleX = stage.scaleX();
       const scaleY = stage.scaleY();

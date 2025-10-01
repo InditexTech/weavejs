@@ -79,7 +79,9 @@ export class WeaveTargetingManager {
 
   isNodesBoundingBoxIntersecting(nodes: Konva.Node[], nodeB: Konva.Node) {
     const stage = this.instance.getStage();
-    const a = getBoundingBox(stage, nodes);
+    const a = getBoundingBox(nodes, {
+      relativeTo: stage,
+    });
     const b = nodeB.getClientRect({ relativeTo: stage });
 
     return !(

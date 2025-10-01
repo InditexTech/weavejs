@@ -463,7 +463,9 @@ export class WeaveCopyPasteNodesPlugin extends WeavePlugin {
       return;
     }
 
-    const box = getBoundingBox(stage, selectedNodes);
+    const box = getBoundingBox(selectedNodes, {
+      relativeTo: stage,
+    });
 
     const copyClipboard: WeavePasteModel = {
       weaveInstanceId: this.instance.getId(),

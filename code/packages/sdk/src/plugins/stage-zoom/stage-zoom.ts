@@ -344,7 +344,9 @@ export class WeaveStageZoomPlugin extends WeavePlugin {
         node.getAttrs().visible
     );
 
-    const bounds = getBoundingBox(stage, realNodes);
+    const bounds = getBoundingBox(realNodes, {
+      relativeTo: stage,
+    });
 
     if (bounds.width === 0 || bounds.height === 0) {
       stage.position(centerPoint);
@@ -395,10 +397,9 @@ export class WeaveStageZoomPlugin extends WeavePlugin {
       return;
     }
 
-    const box = getBoundingBox(
-      stage,
-      selectionPlugin.getTransformer().getNodes()
-    );
+    const box = getBoundingBox(selectionPlugin.getTransformer().getNodes(), {
+      relativeTo: stage,
+    });
 
     if (box.width === 0 || box.height === 0) {
       return;

@@ -13,6 +13,7 @@ import type { Vector2d } from 'konva/lib/types';
 import type { WeaveNodesSelectionPlugin } from './plugins/nodes-selection/nodes-selection';
 import type { KonvaEventObject } from 'konva/lib/Node';
 import type { DOMElement } from './types';
+import type { Container } from 'konva/lib/Container';
 
 export function resetScale(node: Konva.Node): void {
   node.width(
@@ -70,7 +71,9 @@ export function containerOverCursor(
         return;
       }
 
-      const shapeRect = getBoundingBox(stage, [node]);
+      const shapeRect = getBoundingBox([node], {
+        relativeTo: stage,
+      });
       if (
         cursorPosition.x >= shapeRect.x &&
         cursorPosition.x <= shapeRect.x + shapeRect.width &&
@@ -179,10 +182,7 @@ export function moveNodeToContainer(
   return false;
 }
 
-export function getExportBoundingBox(
-  stage: Konva.Stage,
-  nodes: Konva.Node[]
-): {
+export function getExportBoundingBox(nodes: Konva.Node[]): {
   x: number;
   y: number;
   width: number;
@@ -215,8 +215,15 @@ export function getExportBoundingBox(
 }
 
 export function getBoundingBox(
-  stage: Konva.Stage,
-  nodes: Konva.Node[]
+  nodes: Konva.Node[],
+  config?:
+    | {
+        skipTransform?: boolean;
+        skipShadow?: boolean;
+        skipStroke?: boolean;
+        relativeTo?: Container;
+      }
+    | undefined
 ): {
   x: number;
   y: number;
@@ -233,10 +240,7 @@ export function getBoundingBox(
   let maxY = -Infinity;
 
   for (const node of nodes) {
-    const box = node.getRealClientRect({
-      relativeTo: stage,
-      skipTransform: false,
-    });
+    const box = node.getRealClientRect(config);
 
     minX = Math.min(minX, box.x);
     minY = Math.min(minY, box.y);
