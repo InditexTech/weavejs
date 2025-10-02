@@ -35,7 +35,7 @@ export class WeaveRectangleNode extends WeaveNode {
     const rectangle = new Konva.Rect({
       ...props,
       name: 'node',
-      strokeScaleEnabled: false,
+      strokeScaleEnabled: true,
     });
 
     this.setupDefaultNodeAugmentation(rectangle);

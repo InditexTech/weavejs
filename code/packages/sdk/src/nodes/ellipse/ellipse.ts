@@ -36,6 +36,7 @@ export class WeaveEllipseNode extends WeaveNode {
       name: 'node',
       radiusX: props.radiusX,
       radiusY: props.radiusY,
+      strokeScaleEnabled: true,
     });
 
     this.setupDefaultNodeAugmentation(ellipse);

@@ -17,6 +17,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - [#678](https://github.com/InditexTech/weavejs/issues/678) Allow to change Frame background on the fly
 
+### Fixed
+
+- [#679](https://github.com/InditexTech/weavejs/issues/679) Nodes borders looks too big when zooming out
+
 ## [0.71.0] - 2025-10-01
 
 ### Changed

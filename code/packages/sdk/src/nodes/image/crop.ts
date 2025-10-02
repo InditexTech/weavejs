@@ -115,7 +115,7 @@ export class WeaveImageCrop {
       fill: 'rgba(0,0,0,0.2)',
       stroke: '#ff0000ff',
       strokeWidth: 0,
-      strokeScaleEnabled: false,
+      strokeScaleEnabled: true,
       draggable: true,
       rotation: 0,
     });
@@ -341,13 +341,13 @@ export class WeaveImageCrop {
         points: [x + stepX * i, y, x + stepX * i, y + height],
         stroke: '#0074ffcc',
         strokeWidth: 1,
-        strokeScaleEnabled: false,
+        strokeScaleEnabled: true,
       });
       const hLine = new Konva.Line({
         points: [x, y + stepY * i, x + width, y + stepY * i],
         stroke: '#0074ffcc',
         strokeWidth: 1,
-        strokeScaleEnabled: false,
+        strokeScaleEnabled: true,
       });
       this.grid.add(vLine, hLine);
     }

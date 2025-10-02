@@ -175,7 +175,7 @@ export class WeaveRectangleToolAction extends WeaveAction {
       this.tempRectNode = new Konva.Rect({
         ...this.props,
         id: this.rectId,
-        strokeScaleEnabled: false,
+        strokeScaleEnabled: true,
         x: this.clickPoint?.x ?? 0,
         y: this.clickPoint?.y ?? 0,
         width: 0,

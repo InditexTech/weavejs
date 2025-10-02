@@ -37,6 +37,7 @@ export class WeaveStarNode extends WeaveNode {
       numPoints: props.numPoints,
       innerRadius: props.innerRadius,
       outerRadius: props.outerRadius,
+      strokeScaleEnabled: true,
     });
 
     this.setupDefaultNodeAugmentation(star);

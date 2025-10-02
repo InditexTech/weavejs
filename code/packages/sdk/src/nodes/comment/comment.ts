@@ -112,7 +112,7 @@ export class WeaveCommentNode<T> extends WeaveNode {
       shadowOffsetX: this.config.style.shadowOffsetX,
       shadowOffsetY: this.config.style.shadowOffsetY,
       shadowOpacity: this.config.style.shadowOpacity,
-      strokeScaleEnabled: false,
+      strokeScaleEnabled: true,
       listening: true,
       draggable: false,
       hitFunc: (ctx: Konva.Context, shape: Konva.Shape) => {
