@@ -1,9 +1,6 @@
-paths:
-  - code
-  - docs
 paths-ignore:
-  - docs/**
-  - code/packages/store-azure-web-pubsub/dev-server/**
-  - code/packages/store-websockets/dev-server/**
-  - code/packages/create-backend-app/template/**
-  - code/packages/create-frontend-app/template/**
+  - "**/docs/**"
+  - "**/packages/store-azure-web-pubsub/dev-server/**"
+  - "**/packages/store-websockets/dev-server/**"
+  - "**/packages/create-backend-app/template/**"
+  - "**/packages/create-frontend-app/template/**"
