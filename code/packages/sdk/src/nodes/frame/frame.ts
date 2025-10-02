@@ -125,7 +125,7 @@ export class WeaveFrameNode extends WeaveNode {
       strokeScaleEnabled: false,
       shadowForStrokeEnabled: false,
       height: props.frameHeight,
-      fill: '#ffffffff',
+      fill: frameParams.frameBackground ?? '#ffffffff',
       listening: false,
       draggable: false,
     });
@@ -323,9 +323,19 @@ export class WeaveFrameNode extends WeaveNode {
       `#${newProps.id}-title`
     );
 
+    const background: Konva.Text | undefined = stage.findOne(
+      `#${newProps.id}-bg`
+    );
+
     const selectionArea: Konva.Rect | undefined = stage.findOne(
       `#${newProps.id}-selection-area`
     );
+
+    if (background) {
+      background.setAttrs({
+        fill: newProps.frameBackground ?? '#ffffffff',
+      });
+    }
 
     if (title && selectionArea) {
       title.text(newProps.title);

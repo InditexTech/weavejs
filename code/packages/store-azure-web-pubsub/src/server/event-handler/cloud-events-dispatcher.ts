@@ -466,7 +466,7 @@ export class CloudEventsDispatcher {
           ? await readSystemEventRequest<MqttConnectRequest>(request, origin)
           : await readSystemEventRequest<ConnectRequest>(request, origin);
         // service passes out query property, assign it to queries
-        connectRequest.queries = connectRequest.query;
+        connectRequest.queries = connectRequest.queries ?? {};
         logger.verbose(connectRequest);
         this.eventHandler.handleConnect!(
           connectRequest,
