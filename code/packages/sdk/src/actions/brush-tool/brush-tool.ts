@@ -203,7 +203,7 @@ export class WeaveBrushToolAction extends WeaveAction {
 
       const node = nodeHandler.create(this.strokeId, {
         ...this.props,
-        strokeScaleEnabled: false,
+        strokeScaleEnabled: true,
         x: 0,
         y: 0,
         width: 0,

@@ -32,6 +32,7 @@ export class WeaveLineNode extends WeaveNode {
     const line = new Konva.Line({
       ...props,
       name: 'node',
+      strokeScaleEnabled: true,
     });
 
     this.setupDefaultNodeAugmentation(line);

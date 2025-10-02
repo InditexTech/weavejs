@@ -37,6 +37,7 @@ export class WeaveRegularPolygonNode extends WeaveNode {
       name: 'node',
       sides: props.sides,
       radius: props.radius,
+      strokeScaleEnabled: true,
     });
 
     this.setupDefaultNodeAugmentation(regularPolygon);

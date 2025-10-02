@@ -108,7 +108,7 @@ export class WeaveFrameNode extends WeaveNode {
       y: 0,
       width: props.frameWidth,
       height: props.frameHeight,
-      strokeScaleEnabled: false,
+      strokeScaleEnabled: true,
       draggable: false,
     });
 
@@ -122,7 +122,7 @@ export class WeaveFrameNode extends WeaveNode {
       width: props.frameWidth,
       stroke: borderColor,
       strokeWidth: borderWidth,
-      strokeScaleEnabled: false,
+      strokeScaleEnabled: true,
       shadowForStrokeEnabled: false,
       height: props.frameHeight,
       fill: frameParams.frameBackground ?? '#ffffffff',
@@ -146,7 +146,7 @@ export class WeaveFrameNode extends WeaveNode {
       text: props.title,
       fill: fontColor,
       strokeWidth: 0,
-      strokeScaleEnabled: false,
+      strokeScaleEnabled: true,
       listening: false,
       draggable: false,
     });
@@ -177,7 +177,7 @@ export class WeaveFrameNode extends WeaveNode {
       y: borderWidth,
       width: props.frameWidth - borderWidth * 2,
       height: props.frameHeight - borderWidth * 2,
-      strokeScaleEnabled: false,
+      strokeScaleEnabled: true,
       clipFunc: (ctx) => {
         const width =
           (frameInternal.width() + borderWidth) * frameInternal.scaleX();

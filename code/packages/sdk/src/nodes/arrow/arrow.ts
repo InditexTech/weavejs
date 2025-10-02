@@ -33,6 +33,7 @@ export class WeaveArrowNode extends WeaveNode {
       ...props,
       name: 'node',
       points: props.points,
+      strokeScaleEnabled: true,
     });
 
     this.setupDefaultNodeAugmentation(line);

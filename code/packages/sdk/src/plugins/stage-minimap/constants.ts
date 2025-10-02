@@ -8,7 +8,7 @@ export const STAGE_MINIMAP_DEFAULT_CONFIG = {
   style: {
     viewportReference: {
       fill: 'rgba(0,0,0,0.2)',
-      strokeScaleEnabled: false,
+      strokeScaleEnabled: true,
       stroke: '#e12d3c',
       strokeWidth: 1,
     },
