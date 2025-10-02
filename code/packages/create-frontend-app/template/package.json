@@ -36,7 +36,7 @@
     "framer-motion": "^11.18.2",
     "lodash": "^4.17.21",
     "motion": "^12.4.7",
-    "next": "14.2.28",
+    "next": "14.2.32",
     "next-themes": "^0.4.6",
     "ogl": "^1.0.11",
     "onnxruntime-web": "^1.21.0-dev.20250206-d981b153d3",
