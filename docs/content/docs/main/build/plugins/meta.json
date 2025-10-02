@@ -9,10 +9,12 @@
     "nodes-snapping",
     "stage-drop-area",
     "stage-grid",
+    "stage-keyboard-move",
     "stage-panning",
     "stage-resize",
     "stage-zoom",
     "stage-minimap",
+    "stage-keyboard",
     "users-pointers",
     "users-selector"
   ]

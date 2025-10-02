@@ -12,7 +12,7 @@ import type {
   WeaveStageMinimapPluginConfig,
   WeaveStageMinimapPluginParams,
 } from './types';
-import { merge } from 'lodash';
+import { merge, throttle } from 'lodash';
 
 export class WeaveStageMinimapPlugin extends WeavePlugin {
   getLayerName = undefined;
@@ -111,7 +111,7 @@ export class WeaveStageMinimapPlugin extends WeavePlugin {
 
     this.hideLayers();
 
-    const pixelRatio = 0.5;
+    const pixelRatio = 0.1;
     const dataUrl = await stage.toDataURL({
       x: box.x,
       y: box.y,
@@ -213,10 +213,12 @@ export class WeaveStageMinimapPlugin extends WeavePlugin {
   }
 
   onInit(): void {
-    this.instance.addEventListener('onStateChange', async () => {
+    const throttledUpdateMinimap = throttle(async () => {
       await this.updateMinimapContent();
       this.updateMinimapViewportReference();
-    });
+    }, 100);
+
+    this.instance.addEventListener('onStateChange', throttledUpdateMinimap);
   }
 
   private showLayers() {

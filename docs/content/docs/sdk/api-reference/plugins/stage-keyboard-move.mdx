@@ -1,0 +1,68 @@
+---
+title: WeaveStageKeyboardMovePlugin
+description: Activates the movement by a delta of stage nodes using shift + keyboard arrow keys
+---
+
+import { TypeTable } from "fumadocs-ui/components/type-table";
+
+## Overview
+
+The [WeaveStageKeyboardMovePlugin](https://github.com/InditexTech/weavejs/blob/main/code/packages/sdk/src/plugins/stage-keyboard-move/stage-keyboard-move.ts)
+class that enables the movement of nodes by a delta (by default 5) when pressing shift + keyboard arrow keys.
+
+The class extends the [WeavePlugin](/docs/sdk/api-reference/plugins/plugin) class
+
+## Name
+
+This plugin `name` property value is `stageKeyboardMove`.
+
+## Import
+
+```shell
+import { WeaveStageKeyboardMovePlugin } from "@inditextech/weave-sdk";
+```
+
+## Instantiation
+
+```ts
+new WeaveStageKeyboardMovePlugin(params?: WeaveStageKeyboardMovePluginParams);
+```
+
+## TypeScript types
+
+```ts
+type WeaveMoveOrientation = "up" | "down" | "left" | "right";
+
+type WeaveStageKeyboardMovePluginConfig = {
+  movementDelta: number;
+};
+
+type WeaveStageKeyboardMovePluginParams = {
+  config?: WeaveStageKeyboardMovePluginConfig;
+};
+```
+
+## Parameters
+
+For `WeaveStageKeyboardMovePluginParams`:
+
+<TypeTable
+  type={{
+    ["config"]: {
+      description: "Config parameters for the plugin.",
+      type: "WeaveStageKeyboardMovePluginConfig",
+    },
+  }}
+/>
+
+For `WeaveStageKeyboardMovePluginConfig`:
+
+<TypeTable
+  type={{
+    ["movementDelta"]: {
+      description: "Delta to move the selected nodes.",
+      type: "number",
+      default: "5",
+    },
+  }}
+/>

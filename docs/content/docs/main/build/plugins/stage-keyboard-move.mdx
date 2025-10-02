@@ -1,0 +1,55 @@
+---
+title: Stage Keyboard Move
+description: Activates moving elements with shift + keyboard arrows
+---
+
+## Introduction
+
+This plugin automatically allows to move the selected nodes by a defined delta (by default 5)
+when pressing shift + keyboard arrows (up, down, left or right). The selected nodes WeaveEllipseToolAction
+move by the define delta each time a shift + keyboard arrow key is pressed.
+
+## Usage
+
+<div className="fd-steps">
+
+<div className="[&_h3]:fd-step">
+
+### Import the Plugin
+
+Start by importing the plugin:
+
+```ts
+import { WeaveStageKeyboardMovePlugin } from "@inditextech/weave-sdk";
+```
+
+</div>
+
+<div className='[&_h3]:fd-step'>
+
+### Register the Plugin
+
+Then register the plugin on the [Weave](/docs/sdk/api-reference/weave) class instance.
+
+```ts
+const instance = new Weave({
+  ...
+  plugins: [
+    ...,
+    new WeaveStageKeyboardMovePlugin(), // [!code ++]
+  ]
+})
+```
+
+</div>
+
+<div className='[&_h3]:fd-step'>
+
+### Use the plugin
+
+Once the plugin is registered, select the nodes you want and use shift + keyboard arrows to move
+then by the defined delta (by default 5).
+
+</div>
+
+</div>
