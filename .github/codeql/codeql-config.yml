@@ -1,3 +1,6 @@
+paths:
+  - code
+  - docs
 paths-ignore:
   - "docs/**"
   - "code/packages/store-azure-web-pubsub/dev-server/**"
