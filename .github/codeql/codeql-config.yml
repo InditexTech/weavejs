@@ -6,5 +6,6 @@ queries:
 paths:
   - code/packages
 paths-ignore:
+  - docs/**
   - code/packages/create-backend-app/template/**
   - code/packages/create-frontend-app/template/**
