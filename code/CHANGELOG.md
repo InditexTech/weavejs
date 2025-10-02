@@ -16,6 +16,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - [#678](https://github.com/InditexTech/weavejs/issues/678) Allow to change Frame background on the fly
+- [#680](https://github.com/InditexTech/weavejs/issues/680) Move elements with the keyboard arrow keys
 
 ### Fixed
 

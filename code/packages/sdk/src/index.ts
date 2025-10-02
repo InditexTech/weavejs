@@ -148,3 +148,5 @@ export * from './plugins/nodes-distance-snapping/types';
 export { WeaveCommentsRendererPlugin } from './plugins/comments-renderer/comments-renderer';
 export * from './plugins/comments-renderer/constants';
 export * from './plugins/comments-renderer/types';
+export { WeaveStageKeyboardMovePlugin } from './plugins/stage-keyboard-move/stage-keyboard-move';
+export * from './plugins/stage-keyboard-move/constants';

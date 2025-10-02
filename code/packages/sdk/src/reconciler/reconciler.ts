@@ -241,7 +241,7 @@ export class WeaveReconciler {
             });
           }
 
-          weaveInstance.getMainLayer()?.batchDraw();
+          // weaveInstance.getMainLayer()?.batchDraw();
         }
       },
       appendChild(

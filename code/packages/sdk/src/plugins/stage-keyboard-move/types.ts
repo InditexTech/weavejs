@@ -1,0 +1,13 @@
+// SPDX-FileCopyrightText: 2025 2025 INDUSTRIA DE DISEÑO TEXTIL S.A. (INDITEX S.A.)
+//
+// SPDX-License-Identifier: Apache-2.0
+
+export type WeaveMoveOrientation = 'up' | 'down' | 'left' | 'right';
+
+export type WeaveStageKeyboardMovePluginConfig = {
+  movementDelta: number;
+};
+
+export type WeaveStageKeyboardMovePluginParams = {
+  config?: WeaveStageKeyboardMovePluginConfig;
+};
