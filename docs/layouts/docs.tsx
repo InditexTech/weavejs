@@ -66,8 +66,7 @@ export function DocsLayout({
   nav: { transparentMode, ...nav } = {},
   sidebar = {},
   searchToggle,
-  disableThemeSwitch = false,
-  themeSwitch = { enabled: !disableThemeSwitch },
+  themeSwitch,
   i18n = false,
   children,
   ...props
