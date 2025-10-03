@@ -444,12 +444,15 @@ export class WeaveImageNode extends WeaveNode {
     imageObj.crossOrigin = this.config.crossOrigin;
     imageObj.onerror = (error) => {
       console.error('Error loading image', realImageURL, error);
+
       imagePlaceholder?.setAttrs({
         visible: true,
       });
       internalImage?.setAttrs({
         visible: false,
       });
+
+      this.resolveAsyncElement(imageProps.id);
     };
 
     this.loadAsyncElement(imageProps.id);
