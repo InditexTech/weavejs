@@ -21,6 +21,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 - [#679](https://github.com/InditexTech/weavejs/issues/679) Nodes borders looks too big when zooming out
+- [#688](https://github.com/InditexTech/weavejs/issues/688) Resolve async load not called when image fails to load
 
 ## [0.71.0] - 2025-10-01
 

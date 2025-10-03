@@ -35,6 +35,7 @@ import {
   getTopmostShadowHost,
   isInShadowDOM,
 } from '@/utils';
+import type { WeaveStageGridPlugin } from '../stage-grid/stage-grid';
 
 export class WeaveCopyPasteNodesPlugin extends WeavePlugin {
   protected state: WeaveCopyPasteNodesPluginState;
@@ -421,6 +422,8 @@ export class WeaveCopyPasteNodesPlugin extends WeavePlugin {
         if (realNode) {
           nodesToSelect.push(realNode);
         }
+
+        this.getStageGridPlugin()?.onRender();
       }
 
       this.instance.emitEvent<WeaveCopyPasteNodesPluginOnPasteEvent>(
@@ -668,5 +671,11 @@ export class WeaveCopyPasteNodesPlugin extends WeavePlugin {
       isEdge: ua.toLowerCase().includes('edg'),
       isIOS: /iP(ad|hone|od)/.test(navigator.userAgent),
     };
+  }
+
+  getStageGridPlugin() {
+    const gridPlugin =
+      this.instance.getPlugin<WeaveStageGridPlugin>('stageGrid');
+    return gridPlugin;
   }
 }
