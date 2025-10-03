@@ -1,6 +1,6 @@
 {
   "name": "@inditextech/weave-types",
-  "version": "0.72.0-SNAPSHOT",
+  "version": "0.73.0-SNAPSHOT",
   "type": "module",
   "license": "Apache-2.0",
   "author": "Jesus Manuel Piñeiro Cid <jesusmpc@inditex.com>",
