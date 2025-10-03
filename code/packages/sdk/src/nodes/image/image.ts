@@ -440,9 +440,13 @@ export class WeaveImageNode extends WeaveNode {
       this.config.urlTransformer?.(imageProps.imageURL ?? '') ??
       imageProps.imageURL;
 
+    this.loadAsyncElement(imageProps.id);
+
     const imageObj = new Image();
     imageObj.crossOrigin = this.config.crossOrigin;
     imageObj.onerror = (error) => {
+      this.resolveAsyncElement(imageProps.id);
+
       console.error('Error loading image', realImageURL, error);
 
       imagePlaceholder?.setAttrs({
@@ -451,11 +455,7 @@ export class WeaveImageNode extends WeaveNode {
       internalImage?.setAttrs({
         visible: false,
       });
-
-      this.resolveAsyncElement(imageProps.id);
     };
-
-    this.loadAsyncElement(imageProps.id);
 
     imageObj.onload = () => {
       if (image && imagePlaceholder && internalImage) {
