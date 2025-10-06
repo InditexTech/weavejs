@@ -2,10 +2,73 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-import { type WeaveNodeTransformerProperties } from '@inditextech/weave-types';
+import {
+  type ImageCrossOrigin,
+  type URLTransformerFunction,
+  type WeaveElementAttributes,
+  type WeaveNodeTransformerProperties,
+} from '@inditextech/weave-types';
+
+export type VideoProps = WeaveElementAttributes & {
+  id: string;
+  width: number;
+  height: number;
+  videoURL: string;
+  videoPlaceholderURL: string;
+  videoInfo?: {
+    width: number;
+    height: number;
+  };
+};
+
+export type WeaveVideoState = {
+  placeholderLoaded: boolean;
+  loaded: boolean;
+  playing: boolean;
+  paused: boolean;
+};
+
+export type VideoBackgroundStyle = {
+  color: string;
+  strokeWidth: number;
+  strokeColor: string;
+};
+
+export type VideoIconBackgroundStyle = {
+  color: string;
+  strokeWidth: number;
+  strokeColor: string;
+};
+
+export type VideoTrackStyle = {
+  color: string;
+};
+
+export type VideoIconStyle = {
+  internal: {
+    paddingX: number;
+    paddingY: number;
+  };
+  external: {
+    paddingX: number;
+    paddingY: number;
+  };
+  width: number;
+  height: number;
+  color: string;
+  dataURL: string;
+};
 
 export type WeaveVideoProperties = {
-  transform: WeaveNodeTransformerProperties;
+  crossOrigin: ImageCrossOrigin;
+  transform?: WeaveNodeTransformerProperties;
+  urlTransformer?: URLTransformerFunction;
+  style: {
+    track: VideoTrackStyle;
+    background: VideoBackgroundStyle;
+    iconBackground: VideoIconBackgroundStyle;
+    icon: VideoIconStyle;
+  };
 };
 
 export type WeaveVideoNodeParams = {
@@ -16,6 +79,10 @@ export type WeaveVideoOnVideoPlayEvent = {
   nodeId: string;
 };
 
-export type WeaveVideoOnStopEvent = {
+export type WeaveVideoOnVideoPauseEvent = {
+  nodeId: string;
+};
+
+export type WeaveVideoOnVideoStopEvent = {
   nodeId: string;
 };

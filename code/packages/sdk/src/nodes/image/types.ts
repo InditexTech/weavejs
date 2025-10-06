@@ -4,14 +4,13 @@
 
 import {
   type ImageCrossOrigin,
+  type URLTransformerFunction,
   type WeaveElementAttributes,
   type WeaveNodeTransformerProperties,
 } from '@inditextech/weave-types';
 import type Konva from 'konva';
 import type { WEAVE_IMAGE_CROP_END_TYPE } from './constants';
 import type { WeaveImageNode } from './image';
-
-export type URLTransformerFunction = (url: string) => string;
 
 export type ImageProps = WeaveElementAttributes & {
   id: string;

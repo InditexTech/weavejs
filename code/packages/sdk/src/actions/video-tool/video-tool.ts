@@ -6,13 +6,11 @@ import { v4 as uuidv4 } from 'uuid';
 import { WeaveAction } from '@/actions/action';
 import { type Vector2d } from 'konva/lib/types';
 import {
-  type VideoOptions,
   type WeaveVideoToolActionTriggerParams,
   type WeaveVideoToolActionState,
   type WeaveVideoToolActionTriggerReturn,
-  type WeaveVideoToolActionOnEndLoadImageEvent,
-  type WeaveVideoToolActionOnStartLoadImageEvent,
   type WeaveVideoToolActionOnAddedEvent,
+  type WeaveVideoToolDragParams,
   type WeaveVideoToolActionOnAddingEvent,
 } from './types';
 import { VIDEO_TOOL_ACTION_NAME, VIDEO_TOOL_STATE } from './constants';
@@ -27,12 +25,9 @@ export class WeaveVideoToolAction extends WeaveAction {
   protected state: WeaveVideoToolActionState;
   protected cursorPadding: number = 5;
   protected videoId: string | null;
-  protected tempVideoId: string | null;
-  protected tempVideoNode: Konva.Image | null;
   protected container: Konva.Layer | Konva.Node | undefined;
   protected pointers: Map<number, Vector2d>;
-  protected videoURL: string | null;
-  protected preloadVideos: Record<string, HTMLVideoElement>;
+  protected videoParams: WeaveVideoToolDragParams | null;
   protected clickPoint: Vector2d | null;
   protected forceMainContainer: boolean = false;
   protected cancelAction!: () => void;
@@ -46,11 +41,8 @@ export class WeaveVideoToolAction extends WeaveAction {
     this.initialized = false;
     this.state = VIDEO_TOOL_STATE.IDLE;
     this.videoId = null;
-    this.tempVideoId = null;
-    this.tempVideoNode = null;
     this.container = undefined;
-    this.videoURL = null;
-    this.preloadVideos = {};
+    this.videoParams = null;
     this.clickPoint = null;
   }
 
@@ -58,8 +50,14 @@ export class WeaveVideoToolAction extends WeaveAction {
     return VIDEO_TOOL_ACTION_NAME;
   }
 
-  getPreloadedVideo(videoId: string): HTMLVideoElement | undefined {
-    return this.preloadVideos?.[videoId];
+  getVideoSource(videoId: string): HTMLVideoElement | undefined {
+    const nodeHandler = this.instance.getNodeHandler<WeaveVideoNode>('video');
+
+    if (!nodeHandler) {
+      return undefined;
+    }
+
+    return nodeHandler.getVideoSource(videoId);
   }
 
   initProps() {
@@ -73,17 +71,18 @@ export class WeaveVideoToolAction extends WeaveAction {
 
   onInit(): void {
     this.instance.addEventListener('onStageDrop', (e) => {
-      if (window.weaveDragImageURL) {
+      if (window.weaveDragVideoId && window.weaveDragVideoParams) {
         this.instance.getStage().setPointersPositions(e);
         const position = this.instance.getStage().getRelativePointerPosition();
 
         this.instance.triggerAction(VIDEO_TOOL_ACTION_NAME, {
-          imageURL: window.weaveDragImageURL,
-          imageId: window.weaveDragImageId,
+          videoId: window.weaveDragVideoId,
+          videoParams: window.weaveDragVideoParams,
           position,
         });
-        window.weaveDragImageURL = undefined;
-        window.weaveDragImageId = undefined;
+
+        window.weaveDragVideoParams = undefined;
+        window.weaveDragVideoId = undefined;
       }
     });
   }
@@ -109,50 +108,17 @@ export class WeaveVideoToolAction extends WeaveAction {
         y: e.evt.clientY,
       });
 
-      if (
-        this.pointers.size === 2 &&
-        this.instance.getActiveAction() === VIDEO_TOOL_ACTION_NAME
-      ) {
-        this.state = VIDEO_TOOL_STATE.DEFINING_POSITION;
-        return;
-      }
-
       if (this.state === VIDEO_TOOL_STATE.DEFINING_POSITION) {
         this.state = VIDEO_TOOL_STATE.SELECTED_POSITION;
       }
     });
 
-    stage.on('pointermove', (e) => {
+    stage.on('pointermove', () => {
       if (this.state === VIDEO_TOOL_STATE.IDLE) {
         return;
       }
 
       this.setCursor();
-
-      if (
-        this.pointers.size === 2 &&
-        this.instance.getActiveAction() === VIDEO_TOOL_ACTION_NAME
-      ) {
-        this.state = VIDEO_TOOL_STATE.DEFINING_POSITION;
-        return;
-      }
-
-      if (
-        [
-          VIDEO_TOOL_STATE.DEFINING_POSITION as string,
-          VIDEO_TOOL_STATE.SELECTED_POSITION as string,
-        ].includes(this.state) &&
-        this.tempVideoNode &&
-        this.instance.getActiveAction() === VIDEO_TOOL_ACTION_NAME &&
-        e.evt.pointerType === 'mouse'
-      ) {
-        const mousePos = stage.getRelativePointerPosition();
-
-        this.tempVideoNode.setAttrs({
-          x: (mousePos?.x ?? 0) + this.cursorPadding,
-          y: (mousePos?.y ?? 0) + this.cursorPadding,
-        });
-      }
     });
 
     stage.on('pointerup', (e) => {
@@ -170,109 +136,25 @@ export class WeaveVideoToolAction extends WeaveAction {
     this.state = state;
   }
 
-  private loadVideo(
-    videoURL: string,
-    options?: VideoOptions,
+  private doVideoAdding(
+    videoParams: WeaveVideoToolDragParams,
     position?: Vector2d
   ) {
-    const imageOptions = {
-      crossOrigin: 'anonymous',
-      ...options,
-    };
-
-    this.setCursor();
-    this.setFocusStage();
-
     this.videoId = uuidv4();
-    this.videoURL = videoURL;
+    this.videoParams = videoParams;
 
-    this.preloadVideos[this.videoId] = document.createElement('video');
-    this.preloadVideos[this.videoId].crossOrigin = imageOptions.crossOrigin;
-    this.preloadVideos[this.videoId].onerror = () => {
-      this.instance.emitEvent<WeaveVideoToolActionOnEndLoadImageEvent>(
-        'onVideoLoadEnd',
-        new Error('Error loading video')
-      );
-      this.cancelAction();
-    };
-    this.preloadVideos[this.videoId].onloadedmetadata = () => {
-      this.instance.emitEvent<WeaveVideoToolActionOnEndLoadImageEvent>(
-        'onVideoLoadEnd',
-        undefined
-      );
+    this.setState(VIDEO_TOOL_STATE.DEFINING_POSITION);
 
-      console.log('AQUI VIDEO METADATA LOADED');
-
-      if (this.videoId) {
-        this.props = {
-          ...this.props,
-          videoURL: this.videoURL,
-          width: this.preloadVideos[this.videoId].videoWidth,
-          height: this.preloadVideos[this.videoId].videoHeight,
-        };
-      }
-
-      this.addVideoNode(position);
-    };
-
-    this.preloadVideos[this.videoId].src = videoURL;
-    this.instance.emitEvent<WeaveVideoToolActionOnStartLoadImageEvent>(
-      'onVideoLoadStart'
-    );
-  }
-
-  private isTouchDevice() {
-    return window.matchMedia('(pointer: coarse)').matches;
-  }
-
-  private addVideoNode(position?: Vector2d) {
-    const stage = this.instance.getStage();
-
-    this.setCursor();
-    this.setFocusStage();
-
-    if (position) {
-      this.setState(VIDEO_TOOL_STATE.SELECTED_POSITION);
-      this.handleAdding(position);
-      return;
-    }
-
-    if (this.videoId) {
-      const mousePos = stage.getRelativePointerPosition();
-
-      this.tempVideoId = uuidv4();
-
-      const aspectRatio =
-        this.preloadVideos[this.videoId].videoWidth /
-        this.preloadVideos[this.videoId].videoHeight;
-
-      if (!this.tempVideoNode && this.tempVideoId && !this.isTouchDevice()) {
-        this.tempVideoNode = new Konva.Image({
-          id: this.tempVideoId,
-          x: (mousePos?.x ?? 0) + this.cursorPadding,
-          y: (mousePos?.y ?? 0) + this.cursorPadding,
-          width: 240 * aspectRatio * (1 / stage.scaleX()),
-          height: 240 * (1 / stage.scaleY()),
-          opacity: 1,
-          adding: true,
-          image: this.preloadVideos[this.videoId],
-          stroke: '#000000ff',
-          strokeWidth: 0,
-          strokeScaleEnabled: true,
-          listening: false,
-        });
-
-        this.instance.getMainLayer()?.add(this.tempVideoNode);
-      }
+    if (!position) {
+      this.clickPoint = null;
 
       this.instance.emitEvent<WeaveVideoToolActionOnAddingEvent>(
         'onAddingVideo',
-        { videoURL: this.props.videoURL }
+        { videoURL: this.videoParams.url }
       );
+    } else {
+      this.handleAdding(position);
     }
-
-    this.clickPoint = null;
-    this.setState(VIDEO_TOOL_STATE.DEFINING_POSITION);
   }
 
   private addVideo(position?: Vector2d) {
@@ -284,7 +166,7 @@ export class WeaveVideoToolAction extends WeaveAction {
   }
 
   private handleAdding(position?: Vector2d) {
-    if (this.videoId && this.videoURL && this.preloadVideos[this.videoId]) {
+    if (this.videoId && this.videoParams) {
       const { mousePoint, container } = this.instance.getMousePointer(position);
 
       this.clickPoint = mousePoint;
@@ -299,16 +181,11 @@ export class WeaveVideoToolAction extends WeaveAction {
           y: this.clickPoint?.y ?? 0,
           opacity: 1,
           adding: false,
-          videoURL: this.videoURL,
+          videoPlaceholderURL: this.videoParams.placeholderUrl,
+          videoURL: this.videoParams.url,
           stroke: '#000000ff',
           strokeWidth: 0,
           strokeScaleEnabled: true,
-          videoWidth: this.preloadVideos[this.videoId].videoWidth,
-          videoHeight: this.preloadVideos[this.videoId].videoHeight,
-          videoInfo: {
-            width: this.preloadVideos[this.videoId].videoWidth,
-            height: this.preloadVideos[this.videoId].videoHeight,
-          },
         });
 
         this.instance.addNode(
@@ -320,7 +197,7 @@ export class WeaveVideoToolAction extends WeaveAction {
 
         this.instance.emitEvent<WeaveVideoToolActionOnAddedEvent>(
           'onAddedVideo',
-          { videoURL: this.props.videoURL, nodeId: this.videoId }
+          { videoURL: this.videoParams.url, nodeId: this.videoId }
         );
       }
 
@@ -358,33 +235,23 @@ export class WeaveVideoToolAction extends WeaveAction {
       });
     }
 
-    if (params?.videoURL) {
-      this.loadVideo(
-        params.videoURL,
-        params?.options ?? undefined,
-        params?.position ?? undefined
-      );
+    if (params?.videoParams) {
+      this.updateProps({
+        width: params.videoParams.width,
+        height: params.videoParams.height,
+      });
+      this.doVideoAdding(params.videoParams, params?.position ?? undefined);
       return;
     }
 
     this.props = this.initProps();
     this.addVideo();
 
-    console.log('AQUI ADDING VIDEO');
-
-    return { finishUploadCallback: this.loadVideo.bind(this) };
+    return { finishUploadCallback: this.doVideoAdding.bind(this) };
   }
 
   cleanup(): void {
     const stage = this.instance.getStage();
-
-    if (this.videoId) {
-      delete this.preloadVideos[this.videoId];
-    }
-
-    if (this.tempVideoNode) {
-      this.tempVideoNode.destroy();
-    }
 
     const selectionPlugin =
       this.instance.getPlugin<WeaveNodesSelectionPlugin>('nodesSelection');
@@ -402,8 +269,7 @@ export class WeaveVideoToolAction extends WeaveAction {
     this.videoId = null;
     this.forceMainContainer = false;
     this.container = undefined;
-    this.tempVideoNode = null;
-    this.videoURL = null;
+    this.videoParams = null;
     this.clickPoint = null;
     this.setState(VIDEO_TOOL_STATE.IDLE);
   }
@@ -411,12 +277,5 @@ export class WeaveVideoToolAction extends WeaveAction {
   private setCursor() {
     const stage = this.instance.getStage();
     stage.container().style.cursor = 'crosshair';
-  }
-
-  private setFocusStage() {
-    const stage = this.instance.getStage();
-    stage.container().tabIndex = 1;
-    stage.container().blur();
-    stage.container().focus();
   }
 }
