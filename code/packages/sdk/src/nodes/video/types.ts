@@ -41,6 +41,8 @@ export type VideoIconBackgroundStyle = {
 };
 
 export type VideoTrackStyle = {
+  resetOnEnd: boolean;
+  onlyOnHover: boolean;
   color: string;
   height: number;
 };
@@ -61,6 +63,7 @@ export type VideoIconStyle = {
 };
 
 export type VideoStyle = {
+  playPauseOnDblClick: boolean;
   track: VideoTrackStyle;
   background: VideoBackgroundStyle;
   iconBackground: VideoIconBackgroundStyle;

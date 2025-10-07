@@ -75,6 +75,8 @@ type VideoIconBackgroundStyle = {
 };
 
 type VideoTrackStyle = {
+  resetOnEnd: boolean;
+  onlyOnHover: boolean;
   color: string;
   height: number;
 };
@@ -94,16 +96,19 @@ type VideoIconStyle = {
   dataURL: string;
 };
 
+type VideoStyle = {
+  playPauseOnDblClick: boolean;
+  track: VideoTrackStyle;
+  background: VideoBackgroundStyle;
+  iconBackground: VideoIconBackgroundStyle;
+  icon: VideoIconStyle;
+};
+
 type WeaveVideoProperties = {
   crossOrigin: ImageCrossOrigin;
   transform?: WeaveNodeTransformerProperties;
   urlTransformer?: URLTransformerFunction;
-  style: {
-    track: VideoTrackStyle;
-    background: VideoBackgroundStyle;
-    iconBackground: VideoIconBackgroundStyle;
-    icon: VideoIconStyle;
-  };
+  style: VideoStyle;
 };
 
 type WeaveVideoNodeParams = {
@@ -170,14 +175,20 @@ For `WeaveVideoProperties`:
 const WEAVE_VIDEO_DEFAULT_CONFIG: WeaveVideoProperties = {
   crossOrigin: "anonymous",
   style: {
+    // Allows to double click to play or pause the video
+    playPauseOnDblClick: true,
     background: {
       color: "#C9C9C9FF",
       strokeWidth: 0,
       strokeColor: "#000000FF",
     },
     track: {
+      // After the video ends playback it will reset
+      resetOnEnd: true,
+      // Video playback progress is only showed when node is hovered
+      onlyOnHover: false,
       color: "#FF0033FF",
-      height: 3,
+      height: 5,
     },
     iconBackground: {
       color: "#FFFFFFFF",

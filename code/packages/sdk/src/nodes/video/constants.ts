@@ -9,14 +9,17 @@ export const WEAVE_VIDEO_NODE_TYPE = 'video';
 export const WEAVE_VIDEO_DEFAULT_CONFIG: WeaveVideoProperties = {
   crossOrigin: 'anonymous',
   style: {
+    playPauseOnDblClick: true,
     background: {
       color: '#C9C9C9FF',
       strokeWidth: 0,
       strokeColor: '#000000FF',
     },
     track: {
+      resetOnEnd: true,
+      onlyOnHover: false,
       color: '#FF0033FF',
-      height: 3,
+      height: 5,
     },
     iconBackground: {
       color: '#FFFFFFFF',

@@ -4,6 +4,7 @@
 
 import type { Vector2d } from 'konva/lib/types';
 import { VIDEO_TOOL_STATE } from './constants';
+
 export type WeaveVideoToolActionStateKeys = keyof typeof VIDEO_TOOL_STATE;
 export type WeaveVideoToolActionState =
   (typeof VIDEO_TOOL_STATE)[WeaveVideoToolActionStateKeys];
