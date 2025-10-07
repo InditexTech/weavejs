@@ -60,16 +60,18 @@ export type VideoIconStyle = {
   dataURL: string;
 };
 
+export type VideoStyle = {
+  track: VideoTrackStyle;
+  background: VideoBackgroundStyle;
+  iconBackground: VideoIconBackgroundStyle;
+  icon: VideoIconStyle;
+};
+
 export type WeaveVideoProperties = {
   crossOrigin: ImageCrossOrigin;
   transform?: WeaveNodeTransformerProperties;
   urlTransformer?: URLTransformerFunction;
-  style: {
-    track: VideoTrackStyle;
-    background: VideoBackgroundStyle;
-    iconBackground: VideoIconBackgroundStyle;
-    icon: VideoIconStyle;
-  };
+  style: VideoStyle;
 };
 
 export type WeaveVideoNodeParams = {

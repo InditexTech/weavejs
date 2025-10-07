@@ -1,0 +1,127 @@
+---
+title: WeaveVideoToolAction
+description: Add a video to the canvas
+---
+
+import { TypeTable } from "fumadocs-ui/components/type-table";
+
+## Overview
+
+The [WeaveVideoToolAction](https://github.com/InditexTech/weavejs/blob/main/code/packages/sdk/src/actions/video-tool/video-tool.ts)
+class that enables users to insert video nodes into the canvas. It provides
+an intuitive way to add visual content—either by selecting a video file, dragging
+and dropping, or integrating with an video picker—allowing users to enhance their
+collaborative workspace with rich media.
+
+Each interaction results in the creation of a [WeaveVideoNode](/docs/sdk/api-reference/nodes/video),
+which can be resized, moved, and synchronized across all connected users.
+
+The class extends the [WeaveAction](/docs/sdk/api-reference/actions/action) class.
+
+## Name
+
+This action `name` property value is `videoTool`.
+
+## Import
+
+```shell
+import { WeaveVideoToolAction } from "@inditextech/weave-sdk";
+```
+
+## Instantiation
+
+```ts
+new WeaveVideoToolAction();
+```
+
+## TypeScript types
+
+```ts
+type WeaveVideoToolActionStateKeys = keyof typeof VIDEO_TOOL_STATE;
+type WeaveVideoToolActionState =
+  (typeof VIDEO_TOOL_STATE)[WeaveVideoToolActionStateKeys];
+
+type WeaveVideoToolDragParams = {
+  placeholderUrl: string;
+  url: string;
+  width: number;
+  height: number;
+};
+
+type WeaveVideoToolActionTriggerParams = {
+  videoId?: string;
+  videoParams?: WeaveVideoToolDragParams;
+  position?: Vector2d;
+  forceMainContainer?: boolean;
+};
+
+type WeaveVideoToolActionTriggerVideoParams = {
+  videoPlaceholderURL: string;
+  videoURL: string;
+};
+
+type WeaveVideoToolActionTriggerReturn =
+  | {
+      finishUploadCallback: (
+        videoParams: WeaveVideoToolDragParams,
+        position?: Vector2d
+      ) => void;
+    }
+  | undefined;
+
+type WeaveVideoToolActionOnAddingEvent = { videoURL: string };
+type WeaveVideoToolActionOnAddedEvent = {
+  videoURL: string;
+  nodeId: string;
+};
+```
+
+## Trigger function params
+
+```ts
+trigger(cancelAction: () => void, params?: WeaveVideoToolActionTriggerParams): WeaveVideoToolActionTriggerReturn
+```
+
+For `WeaveVideoToolActionTriggerParams`:
+
+<TypeTable
+  type={{
+    ["videoId"]: {
+      description: "An id to relate the video outside Weave.js",
+      type: "string",
+    },
+    ["videoParams"]: {
+      description:
+        "Parameters for the video, for a video to be inserted, you need to define the video URL, video placeholder URL and its default width and height.",
+      type: "WeaveVideoToolDragParams",
+    },
+    ["position"]: {
+      description:
+        "Position the image in this coordinates provided by the vector.",
+      type: "Vector2d",
+    },
+    ["forceMainContainer"]: {
+      description:
+        "Force the image to be added in the main container and not on the container identified by the pointer.",
+      type: "boolean",
+    },
+  }}
+/>
+
+## Events
+
+### onAddingVideo
+
+```ts
+onAddingVideo: WeaveNodesSelectionPluginOnNodesChangeEvent;
+```
+
+The `onAddingVideo` event is called when the tool is ready to add a video.
+
+### onAddedVideo
+
+```ts
+onAddedVideo: WeaveVideoToolActionOnAddedEvent;
+```
+
+The `onAddedVideo` event is called when the video has been added to the canvas.

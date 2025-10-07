@@ -405,7 +405,7 @@ export class WeaveVideoNode extends WeaveNode {
 
       if (this.videoState[id]?.playing) {
         videoWasPlaying = true;
-        this.pause(videoGroup);
+        this.pause(id);
       }
 
       const videoIconGroup = node.findOne(`#${id}-video-icon-group`) as
@@ -439,7 +439,7 @@ export class WeaveVideoNode extends WeaveNode {
       }
 
       if (this.videoState[id]?.paused && videoWasPlaying) {
-        this.play(videoGroup);
+        this.play(id);
       }
 
       videoProgressWasVisible = false;
@@ -546,28 +546,28 @@ export class WeaveVideoNode extends WeaveNode {
     return this.videoState[nodeInstance.getAttrs().id ?? ''];
   }
 
-  play(nodeInstance: WeaveElementInstance): void {
-    const videoId = nodeInstance.getAttrs().id ?? '';
+  play(videoId: string): void {
+    const video = this.instance.getStage().findOne(`#${videoId}`) as
+      | Konva.Group
+      | undefined;
 
-    const videoPlaceholderNode = (nodeInstance as Konva.Group).findOne(
-      `#${videoId}-video-placeholder`
-    );
+    if (!video) {
+      return;
+    }
+
+    const videoPlaceholderNode = video.findOne(`#${videoId}-video-placeholder`);
 
     if (videoPlaceholderNode) {
       videoPlaceholderNode.hide();
     }
 
-    const videoIconGroup = (nodeInstance as Konva.Group).findOne(
-      `#${videoId}-video-icon-group`
-    );
+    const videoIconGroup = video.findOne(`#${videoId}-video-icon-group`);
 
     if (videoIconGroup) {
       videoIconGroup.hide();
     }
 
-    const videoNode = (nodeInstance as Konva.Group).findOne(
-      `#${videoId}-video`
-    );
+    const videoNode = video.findOne(`#${videoId}-video`);
 
     if (videoNode && this.videoSource[videoId]) {
       videoNode.show();
@@ -584,20 +584,22 @@ export class WeaveVideoNode extends WeaveNode {
     }
   }
 
-  pause(nodeInstance: WeaveElementInstance): void {
-    const videoId = nodeInstance.getAttrs().id ?? '';
+  pause(videoId: string): void {
+    const video = this.instance.getStage().findOne(`#${videoId}`) as
+      | Konva.Group
+      | undefined;
 
-    const videoIconGroup = (nodeInstance as Konva.Group).findOne(
-      `#${videoId}-video-icon-group`
-    );
+    if (!video) {
+      return;
+    }
+
+    const videoIconGroup = video.findOne(`#${videoId}-video-icon-group`);
 
     if (videoIconGroup) {
       videoIconGroup.show();
     }
 
-    const videoNode = (nodeInstance as Konva.Group).findOne(
-      `#${videoId}-video`
-    );
+    const videoNode = video.findOne(`#${videoId}-video`);
 
     if (videoNode && this.videoSource[videoId]) {
       this.videoSource[videoId].pause();
@@ -612,28 +614,28 @@ export class WeaveVideoNode extends WeaveNode {
     }
   }
 
-  stop(nodeInstance: WeaveElementInstance): void {
-    const videoId = nodeInstance.getAttrs().id ?? '';
+  stop(videoId: string): void {
+    const video = this.instance.getStage().findOne(`#${videoId}`) as
+      | Konva.Group
+      | undefined;
 
-    const videoPlaceholderNode = (nodeInstance as Konva.Group).findOne(
-      `#${videoId}-video-placeholder`
-    );
+    if (!video) {
+      return;
+    }
+
+    const videoPlaceholderNode = video.findOne(`#${videoId}-video-placeholder`);
 
     if (videoPlaceholderNode) {
       videoPlaceholderNode.show();
     }
 
-    const videoIconGroup = (nodeInstance as Konva.Group).findOne(
-      `#${videoId}-video-icon-group`
-    );
+    const videoIconGroup = video.findOne(`#${videoId}-video-icon-group`);
 
     if (videoIconGroup) {
       videoIconGroup.show();
     }
 
-    const videoNode = (nodeInstance as Konva.Group).findOne(
-      `#${videoId}-video`
-    );
+    const videoNode = video.findOne(`#${videoId}-video`);
 
     if (videoNode && this.videoSource[videoId]) {
       this.videoSource[videoId].currentTime = 0;

@@ -1,0 +1,255 @@
+---
+title: WeaveVideoNode
+description: Video node API Reference
+---
+
+import { TypeTable } from "fumadocs-ui/components/type-table";
+
+## Overview
+
+The [WeaveVideoNode](https://github.com/InditexTech/weavejs/blob/main/code/packages/sdk/src/nodes/video/video.ts)
+class represents a video element on the Weave.js collaborative canvas. It allows users to upload display, and
+play videos within a real-time shared environment, making it a key building block for visual storytelling,
+design workspaces, and multimedia collaboration.
+
+Built on top of Konva’s [Image](https://konvajs.org/api/Konva.Image.html) class shape under the hood, and the the
+[Animation](https://konvajs.org/api/Konva.Animation.html) class, WeaveVideoNode handles video loading (via callbacks),
+scaling, positioning, and real-time synchronization, ensuring a smooth collaborative experience even when working
+with dynamic media content.
+
+Videos are ideal for:
+
+- Building rich multimedia design spaces or creative whiteboards.
+- Enhancing collaborative diagrams with visual context and assets.
+
+The class extends the [WeaveNode](/docs/sdk/api-reference/nodes/node) class
+
+## Type
+
+This node `nodeType` property value is `video`.
+
+## Import
+
+```shell
+import { WeaveVideoNode } from "@inditextech/weave-sdk";
+```
+
+## Instantiation
+
+```ts
+new WeaveVideoNode(params?: WeaveVideoNodeParams);
+```
+
+## TypeScript types
+
+```ts
+type VideoProps = WeaveElementAttributes & {
+  id: string;
+  width: number;
+  height: number;
+  videoURL: string;
+  videoPlaceholderURL: string;
+  videoInfo?: {
+    width: number;
+    height: number;
+  };
+};
+
+type WeaveVideoState = {
+  placeholderLoaded: boolean;
+  loaded: boolean;
+  playing: boolean;
+  paused: boolean;
+};
+
+type VideoBackgroundStyle = {
+  color: string;
+  strokeWidth: number;
+  strokeColor: string;
+};
+
+type VideoIconBackgroundStyle = {
+  color: string;
+  strokeWidth: number;
+  strokeColor: string;
+};
+
+type VideoTrackStyle = {
+  color: string;
+  height: number;
+};
+
+type VideoIconStyle = {
+  internal: {
+    paddingX: number;
+    paddingY: number;
+  };
+  external: {
+    paddingX: number;
+    paddingY: number;
+  };
+  width: number;
+  height: number;
+  color: string;
+  dataURL: string;
+};
+
+type WeaveVideoProperties = {
+  crossOrigin: ImageCrossOrigin;
+  transform?: WeaveNodeTransformerProperties;
+  urlTransformer?: URLTransformerFunction;
+  style: {
+    track: VideoTrackStyle;
+    background: VideoBackgroundStyle;
+    iconBackground: VideoIconBackgroundStyle;
+    icon: VideoIconStyle;
+  };
+};
+
+type WeaveVideoNodeParams = {
+  config: Partial<WeaveVideoProperties>;
+};
+
+type WeaveVideoOnVideoPlayEvent = {
+  nodeId: string;
+};
+
+type WeaveVideoOnVideoPauseEvent = {
+  nodeId: string;
+};
+
+type WeaveVideoOnVideoStopEvent = {
+  nodeId: string;
+};
+```
+
+## Parameters
+
+For `WeaveVideoNodeParams`:
+
+<TypeTable
+  type={{
+    ["config"]: {
+      required: true,
+      description: "Config parameters for the node.",
+      type: "Partial<WeaveVideoProperties>",
+    },
+  }}
+/>
+
+For `WeaveVideoProperties`:
+
+<TypeTable
+  type={{
+    ["crossOrigin"]: {
+      description:
+        "Value of the property crossOrigin for the HTMLImageElement DOM element. Useful for CORS support.",
+      type: "ImageCrossOrigin",
+      default: "anonymous",
+    },
+    ["transform"]: {
+      description:
+        "Setup the transform properties for the image (if can be resized, rotated, anchors, etc.).",
+      type: "object",
+    },
+    ["urlTransformer"]: {
+      description:
+        "Setup a function that is called to transform the node URL, useful when rendering the stage server-side",
+      type: "URLTransformerFunction",
+    },
+    ["style"]: {
+      description: "Setup the style of the video",
+      type: "VideoStyle",
+    },
+  }}
+/>
+
+## Default values
+
+```ts
+const WEAVE_VIDEO_DEFAULT_CONFIG: WeaveVideoProperties = {
+  crossOrigin: "anonymous",
+  style: {
+    background: {
+      color: "#C9C9C9FF",
+      strokeWidth: 0,
+      strokeColor: "#000000FF",
+    },
+    track: {
+      color: "#FF0033FF",
+      height: 3,
+    },
+    iconBackground: {
+      color: "#FFFFFFFF",
+      strokeWidth: 0,
+      strokeColor: "#000000FF",
+    },
+    icon: {
+      internal: {
+        paddingX: 12,
+        paddingY: 8,
+      },
+      external: {
+        paddingX: 20,
+        paddingY: 20,
+      },
+      width: 24,
+      height: 24,
+      color: "#FFFFFFFF",
+      dataURL:
+        "data:image/png;base64,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",
+    },
+  },
+};
+```
+
+## Methods
+
+### getVideoState
+
+```ts
+getVideoState(nodeInstance: WeaveElementInstance): WeaveVideoState | undefined
+```
+
+Function that when is called returns the state of the internal video of the defined node.
+
+### play
+
+```ts
+play(videoId: string): void
+```
+
+Function that when is called start the video playback of the defined node.
+
+### pause
+
+```ts
+pause(videoId: string): void
+```
+
+Function that when is called pauses the video playback of the defined node.
+
+### stop
+
+```ts
+stop(videoId: string): void
+```
+
+Function that when is called stop the video playback of the defined node. Also reset the video to
+it's start origin.
+
+### areVideosPlaying
+
+```ts
+areVideosPlaying(): boolean
+```
+
+Function that when is called returns true if at least one video is playing back.
+
+### getVideoSource
+
+```ts
+getVideoSource(videoId: string): HTMLVideoElement | undefined
+```
+
+Function that when is called returns video source for the defined node.
