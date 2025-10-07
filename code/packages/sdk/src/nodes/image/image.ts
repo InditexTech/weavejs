@@ -555,8 +555,12 @@ export class WeaveImageNode extends WeaveNode {
         width: imageAttrs.cropInfo.width / cropScale,
         height: imageAttrs.cropInfo.height / cropScale,
       });
-      internalImage.width(imageAttrs.cropSize.width);
-      internalImage.height(imageAttrs.cropSize.height);
+      internalImage.width(
+        imageAttrs.cropSize.width * (actualScale / cropScale)
+      );
+      internalImage.height(
+        imageAttrs.cropSize.height * (actualScale / cropScale)
+      );
       this.cachedCropInfo[imageAttrs.id ?? ''] = imageAttrs.cropInfo;
     }
     if (
@@ -607,17 +611,6 @@ export class WeaveImageNode extends WeaveNode {
         height: uncroppedHeight * node.scaleY(),
       },
     });
-
-    if (node.getAttrs().cropSize) {
-      node.setAttrs({
-        cropSize: {
-          x: Math.max(5, node.getAttrs().cropSize.x * scale.x),
-          y: Math.max(5, node.getAttrs().cropSize.y * scale.y),
-          width: Math.max(5, node.getAttrs().cropSize.width * scale.x),
-          height: Math.max(5, node.getAttrs().cropSize.height * scale.y),
-        },
-      });
-    }
 
     const placeholder = node.findOne(`#${node.getAttrs().id}-placeholder`);
     const internalImage = node.findOne(`#${node.getAttrs().id}-image`);
