@@ -605,19 +605,26 @@ export class WeaveImageNode extends WeaveNode {
     ) {
       const actualScale =
         imageAttrs.uncroppedImage.width / imageAttrs.imageInfo.width;
+      const cropScale = imageAttrs.cropInfo
+        ? imageAttrs.cropInfo.scaleX
+        : actualScale;
       internalImage.width(imageAttrs.uncroppedImage.width);
       internalImage.height(imageAttrs.uncroppedImage.height);
       internalImage.rotation(0);
       internalImage.scaleX(1);
       internalImage.scaleY(1);
       internalImage.crop({
-        x: imageAttrs.cropInfo.x / actualScale,
-        y: imageAttrs.cropInfo.y / actualScale,
-        width: imageAttrs.cropInfo.width / actualScale,
-        height: imageAttrs.cropInfo.height / actualScale,
+        x: imageAttrs.cropInfo.x / cropScale,
+        y: imageAttrs.cropInfo.y / cropScale,
+        width: imageAttrs.cropInfo.width / cropScale,
+        height: imageAttrs.cropInfo.height / cropScale,
       });
-      internalImage.width(imageAttrs.cropSize.width);
-      internalImage.height(imageAttrs.cropSize.height);
+      internalImage.width(
+        imageAttrs.cropSize.width * (actualScale / cropScale)
+      );
+      internalImage.height(
+        imageAttrs.cropSize.height * (actualScale / cropScale)
+      );
       this.cachedCropInfo[imageAttrs.id ?? ''] = imageAttrs.cropInfo;
     }
     if (

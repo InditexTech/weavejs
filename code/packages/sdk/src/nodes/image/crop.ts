@@ -341,13 +341,13 @@ export class WeaveImageCrop {
         points: [x + stepX * i, y, x + stepX * i, y + height],
         stroke: '#0074ffcc',
         strokeWidth: 1,
-        strokeScaleEnabled: true,
+        strokeScaleEnabled: false,
       });
       const hLine = new Konva.Line({
         points: [x, y + stepY * i, x + width, y + stepY * i],
         stroke: '#0074ffcc',
         strokeWidth: 1,
-        strokeScaleEnabled: true,
+        strokeScaleEnabled: false,
       });
       this.grid.add(vLine, hLine);
     }

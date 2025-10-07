@@ -15,7 +15,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- [#681](https://github.com/InditexTech/weavejs/issues/681) Video node
+### Fixed
 
 ## [0.72.0] - 2025-10-03
 
