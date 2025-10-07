@@ -240,8 +240,6 @@ export class WeaveReconciler {
               zIndex: i,
             });
           }
-
-          // weaveInstance.getMainLayer()?.batchDraw();
         }
       },
       appendChild(

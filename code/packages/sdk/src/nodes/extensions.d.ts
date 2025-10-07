@@ -47,6 +47,8 @@ declare module 'konva/lib/Node' {
     updatePosition(position: Vector2d): void;
     dblClick(): void;
     movedToContainer(container: Konva.Layer | Konva.Group): void;
+    handleMouseover(): void;
+    handleMouseout(): void;
   }
 }
 
@@ -62,5 +64,7 @@ declare module 'konva/lib/Stage' {
     allowSelection(allowSelection?: boolean): boolean;
     isFocused(): boolean;
     isMouseWheelPressed(): boolean;
+    handleMouseover(): void;
+    handleMouseout(): void;
   }
 }

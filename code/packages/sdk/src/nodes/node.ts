@@ -132,6 +132,8 @@ export abstract class WeaveNode implements WeaveNodeBase {
     node.movedToContainer = function () {};
     node.updatePosition = function () {};
     node.resetCrop = function () {};
+    node.handleMouseover = function () {};
+    node.handleMouseout = function () {};
   }
 
   isNodeSelected(ele: Konva.Node): boolean {
@@ -413,6 +415,68 @@ export abstract class WeaveNode implements WeaveNodeBase {
           }
         }
       });
+
+      node.handleMouseover = () => {
+        const stage = this.instance.getStage();
+        const activeAction = this.instance.getActiveAction();
+
+        const isNodeSelectionEnabled = this.getSelectionPlugin()?.isEnabled();
+
+        const realNode = this.instance.getInstanceRecursive(node);
+
+        const isTargetable = realNode.getAttrs().isTargetable !== false;
+        const isLocked = realNode.getAttrs().locked ?? false;
+
+        if ([MOVE_TOOL_ACTION_NAME].includes(activeAction ?? '')) {
+          return;
+        }
+
+        // Node is locked
+        if (
+          isNodeSelectionEnabled &&
+          this.isSelecting() &&
+          !this.isNodeSelected(realNode) &&
+          !this.isPasting() &&
+          isLocked
+        ) {
+          const stage = this.instance.getStage();
+          stage.container().style.cursor = 'default';
+        }
+
+        // Node is not locked and not selected
+        if (
+          isNodeSelectionEnabled &&
+          this.isSelecting() &&
+          !this.isNodeSelected(realNode) &&
+          !this.isPasting() &&
+          isTargetable &&
+          !isLocked &&
+          stage.mode() === WEAVE_STAGE_DEFAULT_MODE
+        ) {
+          const stage = this.instance.getStage();
+          stage.container().style.cursor = 'pointer';
+        }
+
+        // Node is not locked and selected
+        if (
+          isNodeSelectionEnabled &&
+          this.isSelecting() &&
+          this.isNodeSelected(realNode) &&
+          !this.isPasting() &&
+          isTargetable &&
+          !isLocked &&
+          stage.mode() === WEAVE_STAGE_DEFAULT_MODE
+        ) {
+          const stage = this.instance.getStage();
+          stage.container().style.cursor = 'grab';
+        }
+
+        // We're on pasting mode
+        if (this.isPasting()) {
+          const stage = this.instance.getStage();
+          stage.container().style.cursor = 'crosshair';
+        }
+      };
 
       node.on('pointerover', (e) => {
         const stage = this.instance.getStage();

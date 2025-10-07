@@ -16,6 +16,7 @@ export const WEAVE_VIDEO_DEFAULT_CONFIG: WeaveVideoProperties = {
     },
     track: {
       color: '#FF0033FF',
+      height: 3,
     },
     iconBackground: {
       color: '#FFFFFFFF',

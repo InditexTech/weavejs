@@ -26,10 +26,10 @@ import { isServer } from '@/utils';
 export class WeaveVideoNode extends WeaveNode {
   private config: WeaveVideoProperties;
   private videoIconImage!: HTMLImageElement;
-  private videosState: Record<string, WeaveVideoState> = {};
-  private videosSourcesFrameId: Record<string, number> = {};
-  private videosSources: Record<string, HTMLVideoElement> = {};
-  private videosPlaceholder: Record<string, HTMLImageElement> = {};
+  private videoState: Record<string, WeaveVideoState> = {};
+  private videoSourceFrameId: Record<string, number> = {};
+  private videoSource: Record<string, HTMLVideoElement> = {};
+  private videoPlaceholder: Record<string, HTMLImageElement> = {};
   private anim!: Konva.Animation;
   protected nodeType: string = WEAVE_VIDEO_NODE_TYPE;
 
@@ -70,11 +70,11 @@ export class WeaveVideoNode extends WeaveNode {
       this.config.urlTransformer?.(videoProps.videoPlaceholderURL ?? '') ??
       videoProps.videoPlaceholderURL;
 
-    this.videosPlaceholder[id] = new Image();
-    this.videosPlaceholder[id].crossOrigin = this.config.crossOrigin;
-    this.videosPlaceholder[id].src = realVideoPlaceholderURL;
+    this.videoPlaceholder[id] = new Image();
+    this.videoPlaceholder[id].crossOrigin = this.config.crossOrigin;
+    this.videoPlaceholder[id].src = realVideoPlaceholderURL;
 
-    this.videosPlaceholder[id].onerror = (error) => {
+    this.videoPlaceholder[id].onerror = (error) => {
       console.error(
         'Error loading video placeholder',
         realVideoPlaceholderURL,
@@ -84,9 +84,9 @@ export class WeaveVideoNode extends WeaveNode {
       this.resolveAsyncElement(id);
     };
 
-    this.videosPlaceholder[id].onload = () => {
+    this.videoPlaceholder[id].onload = () => {
       videoPlaceholder.setAttrs({
-        image: this.videosPlaceholder[id],
+        image: this.videoPlaceholder[id],
       });
 
       const videoWidth = video.getAttrs().width ?? 0;
@@ -159,8 +159,8 @@ export class WeaveVideoNode extends WeaveNode {
 
     videoSource.addEventListener('loadeddata', () => {
       videoSource.currentTime = 0;
-      this.videosState[id] = {
-        ...this.videosState[id],
+      this.videoState[id] = {
+        ...this.videoState[id],
         loaded: true,
         playing: false,
         paused: false,
@@ -168,10 +168,9 @@ export class WeaveVideoNode extends WeaveNode {
     });
 
     const onFrame = () => {
-      const progress = this.videosSources[id].duration
+      const progress = this.videoSource[id].duration
         ? Math.min(
-            this.videosSources[id].currentTime /
-              this.videosSources[id].duration,
+            this.videoSource[id].currentTime / this.videoSource[id].duration,
             1
           )
         : 0;
@@ -180,18 +179,18 @@ export class WeaveVideoNode extends WeaveNode {
         width: (video.getAttrs().width ?? 0) * progress,
       });
 
-      this.videosSourcesFrameId[id] =
+      this.videoSourceFrameId[id] =
         videoSource.requestVideoFrameCallback(onFrame);
     };
 
     videoSource.addEventListener('play', () => {
-      this.videosSourcesFrameId[id] =
+      this.videoSourceFrameId[id] =
         videoSource.requestVideoFrameCallback(onFrame);
     });
 
     videoSource.addEventListener('stop', () => {
-      if (this.videosSourcesFrameId[id]) {
-        videoSource.cancelVideoFrameCallback(this.videosSourcesFrameId[id]);
+      if (this.videoSourceFrameId[id]) {
+        videoSource.cancelVideoFrameCallback(this.videoSourceFrameId[id]);
       }
     });
 
@@ -206,7 +205,7 @@ export class WeaveVideoNode extends WeaveNode {
     });
 
     videoSource.addEventListener('loadedmetadata', () => {
-      const videoSource = this.videosSources[id];
+      const videoSource = this.videoSource[id];
 
       const videoWidth = video.getAttrs().width ?? 0;
       const videoHeight = video.getAttrs().height ?? 0;
@@ -214,7 +213,7 @@ export class WeaveVideoNode extends WeaveNode {
       videoPlayer.setAttrs({
         image: videoSource,
       });
-      videoProgress.y(videoHeight - videoProgress.height());
+      videoProgress.y(videoHeight - this.config.style.track.height);
       const videoIconGroupWidth =
         this.config.style.icon.internal.paddingX * 2 +
         this.config.style.icon.width;
@@ -237,7 +236,7 @@ export class WeaveVideoNode extends WeaveNode {
       image: videoSource,
     });
 
-    this.videosSources[id] = videoSource;
+    this.videoSource[id] = videoSource;
   }
 
   onRender(props: WeaveElementAttributes): WeaveElementInstance {
@@ -304,7 +303,7 @@ export class WeaveVideoNode extends WeaveNode {
         id: `${id}-video-progress`,
         x: 0,
         y: 0,
-        height: 5,
+        height: this.config.style.track.height,
         strokeWidth: 0,
         fill: this.config.style.track.color,
         name: undefined,
@@ -389,8 +388,25 @@ export class WeaveVideoNode extends WeaveNode {
       return ['top-left', 'top-right', 'bottom-left', 'bottom-right'];
     };
 
+    let videoWasPlaying = false;
+    let videoProgressWasVisible = false;
+
     const handleTransformStart = (e: KonvaEventObject<Event, Konva.Node>) => {
       const node = e.target as Konva.Group;
+
+      const videoProgress = node.findOne(`#${id}-video-progress`) as
+        | Konva.Rect
+        | undefined;
+
+      if (videoProgress && videoProgress.isVisible()) {
+        videoProgressWasVisible = true;
+        videoProgress.hide();
+      }
+
+      if (this.videoState[id]?.playing) {
+        videoWasPlaying = true;
+        this.pause(videoGroup);
+      }
 
       const videoIconGroup = node.findOne(`#${id}-video-icon-group`) as
         | Konva.Group
@@ -406,6 +422,14 @@ export class WeaveVideoNode extends WeaveNode {
     const handleTransformEnd = (e: KonvaEventObject<Event, Konva.Node>) => {
       const node = e.target as Konva.Group;
 
+      const videoProgress = node.findOne(`#${id}-video-progress`) as
+        | Konva.Rect
+        | undefined;
+
+      if (videoProgress && videoProgressWasVisible) {
+        videoProgress.show();
+      }
+
       const videoIconGroup = node.findOne(`#${id}-video-icon-group`) as
         | Konva.Group
         | undefined;
@@ -413,6 +437,13 @@ export class WeaveVideoNode extends WeaveNode {
       if (videoIconGroup) {
         videoIconGroup.show();
       }
+
+      if (this.videoState[id]?.paused && videoWasPlaying) {
+        this.play(videoGroup);
+      }
+
+      videoProgressWasVisible = false;
+      videoWasPlaying = false;
     };
 
     videoGroup.on('transformend', handleTransformEnd);
@@ -441,9 +472,9 @@ export class WeaveVideoNode extends WeaveNode {
 
     this.loadPlaceholder(props, videoGroup);
 
-    const isLoaded = typeof this.videosSources[id] !== 'undefined';
+    const isLoaded = typeof this.videoSource[id] !== 'undefined';
     if (!isLoaded && !isServer()) {
-      this.videosState[id] = {
+      this.videoState[id] = {
         placeholderLoaded: false,
         loaded: false,
         playing: false,
@@ -454,8 +485,8 @@ export class WeaveVideoNode extends WeaveNode {
     }
     if (isLoaded && !isServer()) {
       videoGroup.setAttr('videoInfo', {
-        width: this.videosSources[id].videoWidth,
-        height: this.videosSources[id].videoHeight,
+        width: this.videoSource[id].videoWidth,
+        height: this.videoSource[id].videoHeight,
       });
 
       this.instance.updateNode(this.serialize(videoGroup));
@@ -464,46 +495,38 @@ export class WeaveVideoNode extends WeaveNode {
       this.instance.updateNode(this.serialize(videoGroup));
     }
 
-    this.instance.addEventListener(
-      'onMouseOverTransformer',
-      ({ node }: { node: Konva.Node | undefined }) => {
-        if (
-          id === node?.getAttrs().id &&
-          (this.videosState[id].playing || this.videosState[id].paused)
-        ) {
-          const videoProgress = videoGroup.findOne(`#${id}-video-progress`) as
-            | Konva.Rect
-            | undefined;
+    const defaultHandleMouseover = videoGroup.handleMouseover;
+    videoGroup.handleMouseover = () => {
+      defaultHandleMouseover.call(this);
 
-          videoProgress?.show();
-        }
-      }
-    );
-
-    this.instance.addEventListener('onMouseOutTransformer', () => {
-      const videoProgress = videoGroup.findOne(`#${id}-video-progress`) as
-        | Konva.Rect
-        | undefined;
-
-      videoProgress?.hide();
-    });
-
-    videoGroup.on('mouseover', () => {
-      if (this.videosState[id].playing || this.videosState[id].paused) {
+      if (this.videoState[id].loaded) {
         const videoProgress = videoGroup.findOne(`#${id}-video-progress`) as
           | Konva.Rect
           | undefined;
 
         videoProgress?.show();
       }
+    };
+
+    const defaultHandleMouseout = videoGroup.handleMouseout;
+    videoGroup.handleMouseout = () => {
+      defaultHandleMouseout.call(this);
+
+      if (this.videoState[id].loaded) {
+        const videoProgress = videoGroup.findOne(`#${id}-video-progress`) as
+          | Konva.Rect
+          | undefined;
+
+        videoProgress?.hide();
+      }
+    };
+
+    videoGroup.on('mouseover', () => {
+      videoGroup.handleMouseover();
     });
 
     videoGroup.on('mouseout', () => {
-      const videoProgress = videoGroup.findOne(`#${id}-video-progress`) as
-        | Konva.Rect
-        | undefined;
-
-      videoProgress?.hide();
+      videoGroup.handleMouseout();
     });
 
     return videoGroup;
@@ -520,7 +543,7 @@ export class WeaveVideoNode extends WeaveNode {
   getVideoState(
     nodeInstance: WeaveElementInstance
   ): WeaveVideoState | undefined {
-    return this.videosState[nodeInstance.getAttrs().id ?? ''];
+    return this.videoState[nodeInstance.getAttrs().id ?? ''];
   }
 
   play(nodeInstance: WeaveElementInstance): void {
@@ -546,14 +569,14 @@ export class WeaveVideoNode extends WeaveNode {
       `#${videoId}-video`
     );
 
-    if (videoNode && this.videosSources[videoId]) {
+    if (videoNode && this.videoSource[videoId]) {
       videoNode.show();
-      this.videosState[videoId] = {
-        ...this.videosState[videoId],
+      this.videoState[videoId] = {
+        ...this.videoState[videoId],
         playing: true,
         paused: false,
       };
-      this.videosSources[videoId].play();
+      this.videoSource[videoId].play();
       this.anim.start();
       this.instance.emitEvent<WeaveVideoOnVideoPlayEvent>('onVideoPlay', {
         nodeId: videoId,
@@ -576,10 +599,10 @@ export class WeaveVideoNode extends WeaveNode {
       `#${videoId}-video`
     );
 
-    if (videoNode && this.videosSources[videoId]) {
-      this.videosSources[videoId].pause();
-      this.videosState[videoId] = {
-        ...this.videosState[videoId],
+    if (videoNode && this.videoSource[videoId]) {
+      this.videoSource[videoId].pause();
+      this.videoState[videoId] = {
+        ...this.videoState[videoId],
         playing: false,
         paused: true,
       };
@@ -612,15 +635,15 @@ export class WeaveVideoNode extends WeaveNode {
       `#${videoId}-video`
     );
 
-    if (videoNode && this.videosSources[videoId]) {
-      this.videosSources[videoId].currentTime = 0;
-      this.videosState[videoId] = {
-        ...this.videosState[videoId],
+    if (videoNode && this.videoSource[videoId]) {
+      this.videoSource[videoId].currentTime = 0;
+      this.videoState[videoId] = {
+        ...this.videoState[videoId],
         playing: false,
         paused: false,
       };
       videoNode.hide();
-      this.videosSources[videoId].pause();
+      this.videoSource[videoId].pause();
       if (!this.areVideosPlaying()) {
         this.anim.stop();
       }
@@ -631,11 +654,11 @@ export class WeaveVideoNode extends WeaveNode {
   }
 
   areVideosPlaying(): boolean {
-    return Object.values(this.videosState).some((state) => state.playing);
+    return Object.values(this.videoState).some((state) => state.playing);
   }
 
   getVideoSource(videoId: string): HTMLVideoElement | undefined {
-    return this.videosSources[videoId];
+    return this.videoSource[videoId];
   }
 
   onUpdate(
@@ -673,10 +696,6 @@ export class WeaveVideoNode extends WeaveNode {
 
     const videoWidth = node.getAttrs().width ?? 0;
     const videoHeight = node.getAttrs().height ?? 0;
-
-    if (this.videosSources[id]) {
-      this.videosSources[id].currentTime = 0;
-    }
 
     bg.setAttrs({
       ...internalVideoProps,
@@ -735,11 +754,15 @@ export class WeaveVideoNode extends WeaveNode {
 
     const id = node.getAttr('id') as string;
 
+    const videoProgress = node.findOne(`#${id}-video-progress`) as
+      | Konva.Rect
+      | undefined;
+
     const videoIconGroup = node.findOne(`#${id}-video-icon-group`) as
       | Konva.Group
       | undefined;
 
-    if (videoIconGroup) {
+    if (videoIconGroup && videoProgress) {
       videoIconGroup.scaleX(1);
       videoIconGroup.scaleY(1);
 
@@ -766,6 +789,22 @@ export class WeaveVideoNode extends WeaveNode {
 
     node.width(Math.max(5, node.width() * scale.x));
     node.height(Math.max(5, node.height() * scale.y));
+
+    if (videoProgress) {
+      videoProgress.scaleX(1);
+      videoProgress.scaleY(1);
+
+      const progress = this.videoSource[id].duration
+        ? Math.min(
+            this.videoSource[id].currentTime / this.videoSource[id].duration,
+            1
+          )
+        : 0;
+
+      videoProgress.width((node.getAttrs().width ?? 0) * progress);
+      videoProgress.height(this.config.style.track.height);
+      videoProgress.y((node.getAttrs().height ?? 0) - videoProgress.height());
+    }
 
     // reset scale to 1
     node.scale({ x: 1, y: 1 });

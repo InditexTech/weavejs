@@ -42,6 +42,7 @@ export type VideoIconBackgroundStyle = {
 
 export type VideoTrackStyle = {
   color: string;
+  height: number;
 };
 
 export type VideoIconStyle = {

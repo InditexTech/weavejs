@@ -248,39 +248,30 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
       this.triggerSelectedNodesEvent();
     });
 
-    tr.on('mouseover', () => {
+    let nodeHovered: Konva.Node | undefined = undefined;
+
+    tr.on('mousemove', () => {
       const pointerPos = stage.getPointerPosition();
       if (!pointerPos) return;
 
+      this.disable();
       const shape = stage.getIntersection(pointerPos);
+      this.enable();
 
-      if (shape?.getParent() instanceof Konva.Transformer) {
-        const mousePos = stage.getPointerPosition();
-        const intersections = stage.getAllIntersections(mousePos);
-        const nodesIntersected = intersections.filter(
-          (ele) => ele.getAttrs().nodeType
-        );
-
-        let targetNode = null;
-        if (nodesIntersected.length > 0) {
-          targetNode = this.instance.getInstanceRecursive(
-            nodesIntersected[nodesIntersected.length - 1]
-          );
+      if (shape) {
+        const targetNode = this.instance.getInstanceRecursive(shape);
+        this.instance.getStage().handleMouseout();
+        if (targetNode?.handleMouseover) {
+          targetNode?.handleMouseover();
+          nodeHovered = targetNode as Konva.Node | undefined;
         }
-
-        this.instance.emitEvent('onMouseOverTransformer', {
-          node: targetNode,
-        });
-        return;
       }
-
-      this.instance.emitEvent('onMouseOverTransformer', {
-        node: undefined,
-      });
     });
 
     tr.on('mouseout', () => {
-      this.instance.emitEvent('onMouseOutTransformer');
+      this.instance.getStage().handleMouseover();
+      nodeHovered?.handleMouseout();
+      nodeHovered = undefined;
     });
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any

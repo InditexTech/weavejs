@@ -70,6 +70,12 @@ export class WeaveStageNode extends WeaveNode {
       return this._allowSelection;
     };
 
+    stage.handleMouseover = function () {
+      stage.container().style.cursor = 'default';
+    };
+
+    stage.handleMouseout = function () {};
+
     stage.mode(WEAVE_STAGE_DEFAULT_MODE);
 
     stage.on('pointerdown', (e) => {

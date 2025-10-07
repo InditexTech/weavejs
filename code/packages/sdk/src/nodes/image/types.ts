@@ -23,6 +23,11 @@ export type ImageProps = WeaveElementAttributes & {
   };
 };
 
+export type WeaveImageState = {
+  loaded: boolean;
+  error: boolean;
+};
+
 export type WeaveImageProperties = {
   crossOrigin: ImageCrossOrigin;
   transform?: WeaveNodeTransformerProperties;
