@@ -52,6 +52,9 @@ export * from './nodes/stroke/types';
 export { WeaveCommentNode } from './nodes/comment/comment';
 export * from './nodes/comment/constants';
 export * from './nodes/comment/types';
+export { WeaveVideoNode } from './nodes/video/video';
+export * from './nodes/video/constants';
+export * from './nodes/video/types';
 
 // Provided Actions
 export { WeaveZoomOutToolAction } from './actions/zoom-out-tool/zoom-out-tool';
@@ -111,6 +114,9 @@ export * from './actions/align-nodes-tool/types';
 export { WeaveCommentToolAction } from './actions/comment-tool/comment-tool';
 export * from './actions/comment-tool/constants';
 export * from './actions/comment-tool/types';
+export { WeaveVideoToolAction } from './actions/video-tool/video-tool';
+export * from './actions/video-tool/constants';
+export * from './actions/video-tool/types';
 
 // Provided Plugins
 export { WeaveStageGridPlugin } from './plugins/stage-grid/stage-grid';

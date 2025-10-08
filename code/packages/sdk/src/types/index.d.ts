@@ -8,6 +8,8 @@ declare global {
     weaveTextEditing: Record<string, string>;
     weaveDragImageURL: string | undefined;
     weaveDragImageId: string | undefined;
+    weaveDragVideoParams: WeaveVideoToolDragParams | undefined;
+    weaveDragVideoId: string | undefined;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     clipboardData: any;
   }

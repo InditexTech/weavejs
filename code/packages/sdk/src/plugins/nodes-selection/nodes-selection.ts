@@ -248,6 +248,32 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
       this.triggerSelectedNodesEvent();
     });
 
+    let nodeHovered: Konva.Node | undefined = undefined;
+
+    tr.on('mousemove', () => {
+      const pointerPos = stage.getPointerPosition();
+      if (!pointerPos) return;
+
+      this.disable();
+      const shape = stage.getIntersection(pointerPos);
+      this.enable();
+
+      if (shape) {
+        const targetNode = this.instance.getInstanceRecursive(shape);
+        this.instance.getStage().handleMouseout();
+        if (targetNode?.handleMouseover) {
+          targetNode?.handleMouseover();
+          nodeHovered = targetNode as Konva.Node | undefined;
+        }
+      }
+    });
+
+    tr.on('mouseout', () => {
+      this.instance.getStage().handleMouseover();
+      nodeHovered?.handleMouseout();
+      nodeHovered = undefined;
+    });
+
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const handleTransform = (e: any) => {
       const moved = this.checkMoved(e);

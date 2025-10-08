@@ -285,6 +285,7 @@ export type WeaveNodeConfiguration = {
 // Image api
 
 export type ImageCrossOrigin = 'anonymous' | 'use-credentials';
+export type URLTransformerFunction = (url: string) => string;
 
 // Measurement
 

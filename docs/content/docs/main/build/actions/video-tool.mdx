@@ -1,0 +1,165 @@
+---
+title: Video Tool
+description: Add a video to the canvas
+---
+
+![Video Tool action on use on the Weave.js showcase](/images/actions/video-tool.gif)
+
+## Introduction
+
+This action allows users to add videos to the canvas by selecting a video file, we support the
+following formats:
+
+- Container Formats: `.mp4`, `.mov`, `.m4v`
+- Video Codecs: `H.264` (MPEG-4 AVC), `HEVC` (H.265)
+- Audio Codecs: `AAC`
+
+Once added, a node is added showcasing that the node is a video. When adding a video you need to provide:
+
+- an URL for the video
+- an URL for an image placeholder, with is an still to showcase the content of the video.
+
+Once play is triggered the placeholder ir replaced by the real video, also on hover a progress bar is shown.
+
+## Dependencies
+
+This action needs also registered on the Weave instance the following:
+
+- [Video](/docs/main/build/nodes/video) node
+
+## Usage
+
+<div className="fd-steps">
+
+<div className="[&_h3]:fd-step">
+
+### Import the Action
+
+Start by importing the action:
+
+```ts
+import { WeaveVideoToolAction } from "@inditextech/weave-sdk";
+```
+
+</div>
+
+<div className='[&_h3]:fd-step'>
+
+### Register the Action
+
+Then register the action on the [Weave](/docs/sdk/api-reference/weave) class instance.
+
+```ts
+const instance = new Weave({
+  ...
+  actions: [
+    ...,
+    new WeaveVideoToolAction(), // [!code ++]
+  ]
+})
+```
+
+</div>
+
+<div className='[&_h3]:fd-step'>
+
+### Setup the action trigger
+
+Setup on a button or any element on the UI the user can interact with on the action event:
+
+```ts
+const { finishUploadCallback } = instance.triggerAction("videoTool");
+```
+
+On your end upload a video to your backend, probably on the backend extract a frame as placeholder.
+Once you have an URL for the video and the placeholder, call the `finishUploadCallback`, passing as parameter
+the both URLs.
+
+---
+
+For example on a button on React:
+
+```tsx
+import React from "react";
+import { useWeave } from "@inditextech/weave-react";
+
+const MyVideoToolTriggerComponent = () => {
+  const inputFileRef = React.useRef<any>(null);
+  const instance = useWeave((state) => state.instance);
+  const [showSelectFile, setShowSelectFile] = React.useState<boolean>(false);
+
+  React.useEffect(() => {
+    if (showSelectFile && inputFileRef.current) {
+      inputFileRef.current.click();
+      setShowSelectFile(false);
+    }
+  }, [instance, showSelectFile, setShowSelectFile]);
+
+  const handleUploadFile = React.useCallback(
+    async (file) => {
+      // Upload file to you storage / this is dummy, just an example
+      const { videoURL, videoPlaceholderURL, videoInfo } = await uploadImage(
+        file
+      );
+      const { finishUploadCallback } = instance.triggerAction("videoTool", {
+        videoId: videoInfo.id,
+        width: videoInfo.width,
+        height: videoInfo.height,
+      });
+      finishUploadCallback({
+        url: videoURL,
+        placeholderUrl: placeholderUrl,
+      });
+    },
+    [instance]
+  );
+
+  return (
+    <>
+      <input
+        type="file"
+        accept="video/mp4,video/quicktime"
+        name="video"
+        style={{ display: "none" }}
+        ref={inputFileRef}
+        onClick={() => {
+          inputFileRef.current.value = null;
+        }}
+        onChange={(e) => {
+          const file = e.target.files?.[0];
+          if (file) {
+            handleUploadFile(file);
+          }
+        }}
+      />
+      <button
+        onClick={() => {
+          setShowSelectFile(true);
+        }}
+      >
+        Image Tool
+      </button>
+    </>
+  );
+};
+```
+
+### Trigger the action
+
+Finally a final user trigger the UI element that launches the action.
+
+---
+
+When active the user:
+
+- Select the video to upload.
+- Video is uploaded with the API the developer choses or has available.
+- Once the video is uploaded, the user can click or touch on the canvas to place it.
+
+Then the video is added to the canvas as a fully functional node—ready.
+This action integrates seamlessly with Weave.js's real-time state system,
+ensuring the new element appears instantly for all connected users.
+
+</div>
+
+</div>

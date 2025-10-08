@@ -32,7 +32,6 @@ export class WeaveImageToolAction extends WeaveAction {
   protected container: Konva.Layer | Konva.Node | undefined;
   protected pointers: Map<number, Vector2d>;
   protected imageURL: string | null;
-  protected preloadImgs: Record<string, HTMLImageElement>;
   protected clickPoint: Vector2d | null;
   protected forceMainContainer: boolean = false;
   protected cancelAction!: () => void;
@@ -50,16 +49,11 @@ export class WeaveImageToolAction extends WeaveAction {
     this.tempImageNode = null;
     this.container = undefined;
     this.imageURL = null;
-    this.preloadImgs = {};
     this.clickPoint = null;
   }
 
   getName(): string {
     return IMAGE_TOOL_ACTION_NAME;
-  }
-
-  getPreloadedImage(imageId: string): HTMLImageElement | undefined {
-    return this.preloadImgs?.[imageId];
   }
 
   initProps() {
@@ -175,45 +169,48 @@ export class WeaveImageToolAction extends WeaveAction {
     options?: ImageOptions,
     position?: Vector2d
   ) {
-    const imageOptions = {
-      crossOrigin: 'anonymous',
-      ...options,
-    };
-
     this.setCursor();
     this.setFocusStage();
 
     this.imageId = uuidv4();
     this.imageURL = imageURL;
 
-    this.preloadImgs[this.imageId] = new Image();
-    this.preloadImgs[this.imageId].crossOrigin = imageOptions.crossOrigin;
-    this.preloadImgs[this.imageId].onerror = () => {
-      this.instance.emitEvent<WeaveImageToolActionOnEndLoadImageEvent>(
-        'onImageLoadEnd',
-        new Error('Error loading image')
-      );
+    const imageNodeHandler = this.getImageNodeHandler();
+
+    if (!imageNodeHandler) {
       this.cancelAction();
-    };
-    this.preloadImgs[this.imageId].onload = () => {
-      this.instance.emitEvent<WeaveImageToolActionOnEndLoadImageEvent>(
-        'onImageLoadEnd',
-        undefined
-      );
+      return;
+    }
 
-      if (this.imageId) {
-        this.props = {
-          ...this.props,
-          imageURL: this.imageURL,
-          width: this.preloadImgs[this.imageId].width,
-          height: this.preloadImgs[this.imageId].height,
-        };
-      }
+    imageNodeHandler.preloadImage(this.imageId, imageURL, {
+      onLoad: () => {
+        this.instance.emitEvent<WeaveImageToolActionOnEndLoadImageEvent>(
+          'onImageLoadEnd',
+          undefined
+        );
 
-      this.addImageNode(position);
-    };
+        const imageSource = imageNodeHandler.getImageSource(this.imageId!);
 
-    this.preloadImgs[this.imageId].src = imageURL;
+        if (imageSource && this.imageId) {
+          this.props = {
+            ...this.props,
+            imageURL: this.imageURL,
+            width: imageSource.width,
+            height: imageSource.height,
+          };
+        }
+
+        this.addImageNode(position);
+      },
+      onError: () => {
+        this.instance.emitEvent<WeaveImageToolActionOnEndLoadImageEvent>(
+          'onImageLoadEnd',
+          new Error('Error loading image')
+        );
+        this.cancelAction();
+      },
+    });
+
     this.instance.emitEvent<WeaveImageToolActionOnStartLoadImageEvent>(
       'onImageLoadStart'
     );
@@ -240,9 +237,21 @@ export class WeaveImageToolAction extends WeaveAction {
 
       this.tempImageId = uuidv4();
 
-      const aspectRatio =
-        this.preloadImgs[this.imageId].width /
-        this.preloadImgs[this.imageId].height;
+      const imageNodeHandler = this.getImageNodeHandler();
+
+      if (!imageNodeHandler) {
+        this.cancelAction();
+        return;
+      }
+
+      const imageSource = imageNodeHandler.getImageSource(this.imageId);
+
+      if (!imageSource) {
+        this.cancelAction();
+        return;
+      }
+
+      const aspectRatio = imageSource.width / imageSource.height;
 
       if (!this.tempImageNode && this.tempImageId && !this.isTouchDevice()) {
         this.tempImageNode = new Konva.Image({
@@ -253,7 +262,7 @@ export class WeaveImageToolAction extends WeaveAction {
           height: 240 * (1 / stage.scaleY()),
           opacity: 1,
           adding: true,
-          image: this.preloadImgs[this.imageId],
+          image: imageSource,
           stroke: '#000000ff',
           strokeWidth: 0,
           strokeScaleEnabled: true,
@@ -282,7 +291,21 @@ export class WeaveImageToolAction extends WeaveAction {
   }
 
   private handleAdding(position?: Vector2d) {
-    if (this.imageId && this.imageURL && this.preloadImgs[this.imageId]) {
+    if (this.imageId) {
+      const imageNodeHandler = this.getImageNodeHandler();
+
+      if (!imageNodeHandler) {
+        this.cancelAction();
+        return;
+      }
+
+      const imageSource = imageNodeHandler.getImageSource(this.imageId);
+
+      if (!imageSource) {
+        this.cancelAction();
+        return;
+      }
+
       const { mousePoint, container } = this.instance.getMousePointer(position);
 
       this.clickPoint = mousePoint;
@@ -301,11 +324,11 @@ export class WeaveImageToolAction extends WeaveAction {
           stroke: '#000000ff',
           strokeWidth: 0,
           strokeScaleEnabled: true,
-          imageWidth: this.preloadImgs[this.imageId].width,
-          imageHeight: this.preloadImgs[this.imageId].height,
+          imageWidth: imageSource.width,
+          imageHeight: imageSource.height,
           imageInfo: {
-            width: this.preloadImgs[this.imageId].width,
-            height: this.preloadImgs[this.imageId].height,
+            width: imageSource.width,
+            height: imageSource.height,
           },
         });
 
@@ -374,10 +397,6 @@ export class WeaveImageToolAction extends WeaveAction {
   cleanup(): void {
     const stage = this.instance.getStage();
 
-    if (this.imageId) {
-      delete this.preloadImgs[this.imageId];
-    }
-
     if (this.tempImageNode) {
       this.tempImageNode.destroy();
     }
@@ -402,6 +421,10 @@ export class WeaveImageToolAction extends WeaveAction {
     this.imageURL = null;
     this.clickPoint = null;
     this.setState(IMAGE_TOOL_STATE.IDLE);
+  }
+
+  private getImageNodeHandler() {
+    return this.instance.getNodeHandler<WeaveImageNode>('image');
   }
 
   private setCursor() {

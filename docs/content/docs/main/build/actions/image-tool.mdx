@@ -83,9 +83,9 @@ const MyImageToolTriggerComponent = () => {
   React.useEffect(() => {
     if (showSelectFile && inputFileRef.current) {
       inputFileRef.current.click();
-      setShowSelectFileImage(false);
+      setShowSelectFile(false);
     }
-  }, [instance, showSelectFile, setShowSelectFileImage]);
+  }, [instance, showSelectFile]);
 
   const handleUploadFile = React.useCallback(
     async (file) => {
@@ -117,7 +117,7 @@ const MyImageToolTriggerComponent = () => {
       />
       <button
         onClick={() => {
-          setShowSelectFileImage(true);
+          setShowSelectFile(true);
         }}
       >
         Image Tool
