@@ -3,6 +3,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import {
+  type DeepPartial,
   type ImageCrossOrigin,
   type URLTransformerFunction,
   type WeaveElementAttributes,
@@ -78,7 +79,7 @@ export type WeaveVideoProperties = {
 };
 
 export type WeaveVideoNodeParams = {
-  config: Partial<WeaveVideoProperties>;
+  config: DeepPartial<WeaveVideoProperties>;
 };
 
 export type WeaveVideoOnVideoPlayEvent = {
