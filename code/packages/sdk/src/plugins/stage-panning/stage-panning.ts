@@ -273,8 +273,7 @@ export class WeaveStagePanningPlugin extends WeavePlugin {
       const duration = 1000 / 60;
 
       if (
-        typeof this.targetScrollIntervals[e.target.getAttrs().id ?? ''] !==
-        'undefined'
+        this.targetScrollIntervals[e.target.getAttrs().id ?? ''] !== undefined
       ) {
         return;
       }
@@ -312,7 +311,7 @@ export class WeaveStagePanningPlugin extends WeavePlugin {
         duration
       );
 
-      if (typeof this.stageScrollInterval !== 'undefined') {
+      if (this.stageScrollInterval !== undefined) {
         return;
       }
 
