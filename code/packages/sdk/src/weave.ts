@@ -580,7 +580,7 @@ export class Weave {
     const stage = this.getStage();
     let nodeContainer = node.getParent()?.getAttrs().id ?? '';
 
-    if (typeof node.getParent()?.getAttrs().nodeId !== 'undefined') {
+    if (typeof node?.getParent()?.getAttrs().nodeId !== 'undefined') {
       const realContainer = stage.findOne(
         `#${node.getParent()?.getAttrs().nodeId}`
       );
@@ -594,9 +594,9 @@ export class Weave {
 
   getNodeContainer(node: WeaveElementInstance | Konva.Node): Konva.Node | null {
     const stage = this.getStage();
-    let nodeContainer: Konva.Node | null = node.getParent();
+    let nodeContainer: Konva.Node | null = node?.getParent();
 
-    if (typeof node.getParent()?.getAttrs().nodeId !== 'undefined') {
+    if (typeof node?.getParent()?.getAttrs().nodeId !== 'undefined') {
       const realContainer = stage.findOne(
         `#${node.getParent()?.getAttrs().nodeId}`
       );

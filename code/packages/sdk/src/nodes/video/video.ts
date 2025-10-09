@@ -292,6 +292,7 @@ export class WeaveVideoNode extends WeaveNode {
       fill: this.config.style.background.color,
       stroke: this.config.style.background.strokeColor,
       strokeWidth: this.config.style.background.strokeWidth,
+      nodeId: id,
     });
 
     videoGroup.add(bg);
@@ -306,6 +307,7 @@ export class WeaveVideoNode extends WeaveNode {
         draggable: false,
         image: undefined,
         name: undefined,
+        nodeId: id,
       });
 
       video.hide();
@@ -322,6 +324,7 @@ export class WeaveVideoNode extends WeaveNode {
         strokeWidth: 0,
         fill: this.config.style.track.color,
         name: undefined,
+        nodeId: id,
       });
 
       this.instance.addEventListener<WeaveStageZoomPluginOnZoomChangeEvent>(
@@ -348,6 +351,7 @@ export class WeaveVideoNode extends WeaveNode {
       draggable: false,
       image: undefined,
       name: undefined,
+      nodeId: id,
     });
 
     videoPlaceholder.show();
@@ -373,6 +377,7 @@ export class WeaveVideoNode extends WeaveNode {
       strokeWidth: this.config.style.iconBackground.strokeWidth,
       stroke: this.config.style.iconBackground.strokeColor,
       fill: this.config.style.iconBackground.color,
+      nodeId: id,
     });
 
     videoIconGroup.add(videoIconBg);
@@ -386,6 +391,7 @@ export class WeaveVideoNode extends WeaveNode {
       height: this.config.style.icon.height,
       fill: 'transparent',
       image: this.videoIconImage,
+      nodeId: id,
     });
 
     videoIconGroup.add(videoIcon);

@@ -13,11 +13,7 @@ import type { Vector2d } from 'konva/lib/types';
 import type { WeaveStageZoomPlugin } from '../stage-zoom/stage-zoom';
 import type { WeaveContextMenuPlugin } from '../context-menu/context-menu';
 import { MOVE_TOOL_ACTION_NAME } from '@/actions/move-tool/constants';
-import {
-  getTopmostShadowHost,
-  // getTopmostShadowHost,
-  isInShadowDOM,
-} from '@/utils';
+import { getTopmostShadowHost, isInShadowDOM } from '@/utils';
 import type { WeaveNodesEdgeSnappingPlugin } from '../nodes-edge-snapping/nodes-edge-snapping';
 import type { WeaveNodesDistanceSnappingPlugin } from '../nodes-distance-snapping/nodes-distance-snapping';
 import type { WeaveNodesSelectionPlugin } from '../nodes-selection/nodes-selection';
@@ -46,6 +42,10 @@ export class WeaveStagePanningPlugin extends WeavePlugin {
   private panning: boolean = false;
   protected previousPointer!: string | null;
   protected currentPointer: Konva.Vector2d | null = null;
+  protected stageScrollInterval: NodeJS.Timeout | undefined = undefined;
+  protected targetScrollIntervals: Record<string, NodeJS.Timeout | undefined> =
+    {};
+
   getLayerName = undefined;
   initLayer = undefined;
   onRender: undefined;
@@ -269,55 +269,54 @@ export class WeaveStagePanningPlugin extends WeavePlugin {
 
     window.addEventListener('wheel', handleWheel, { passive: true });
 
-    let stageScrollInterval: NodeJS.Timeout | undefined = undefined;
-    const targetScrollIntervals: Record<string, NodeJS.Timeout | undefined> =
-      {};
-
     stage.on('dragstart', (e) => {
       const duration = 1000 / 60;
 
       if (
-        typeof targetScrollIntervals[e.target.getAttrs().id ?? ''] !==
+        typeof this.targetScrollIntervals[e.target.getAttrs().id ?? ''] !==
         'undefined'
       ) {
         return;
       }
 
-      targetScrollIntervals[e.target.getAttrs().id ?? ''] = setInterval(() => {
-        const pos = stage.getPointerPosition();
-        const offset = this.config.edgePanOffset;
-        const speed = this.config.edgePanSpeed;
+      this.targetScrollIntervals[e.target.getAttrs().id ?? ''] = setInterval(
+        () => {
+          const pos = stage.getPointerPosition();
+          const offset = this.config.edgePanOffset;
+          const speed = this.config.edgePanSpeed;
 
-        if (!pos) return;
+          if (!pos) return;
 
-        const isNearLeft = pos.x < offset;
-        if (isNearLeft) {
-          e.target.x(e.target.x() - speed / stage.scaleX());
-        }
+          const isNearLeft = pos.x < offset;
+          if (isNearLeft) {
+            e.target.x(e.target.x() - speed / stage.scaleX());
+          }
 
-        const isNearRight = pos.x > stage.width() - offset;
-        if (isNearRight) {
-          e.target.x(e.target.x() + speed / stage.scaleX());
-        }
+          const isNearRight = pos.x > stage.width() - offset;
+          if (isNearRight) {
+            e.target.x(e.target.x() + speed / stage.scaleX());
+          }
 
-        const isNearTop = pos.y < offset;
-        if (isNearTop) {
-          e.target.y(e.target.y() - speed / stage.scaleX());
-        }
+          const isNearTop = pos.y < offset;
+          if (isNearTop) {
+            e.target.y(e.target.y() - speed / stage.scaleX());
+          }
 
-        const isNearBottom = pos.y > stage.height() - offset;
-        if (isNearBottom) {
-          e.target.y(e.target.y() + speed / stage.scaleX());
-        }
+          const isNearBottom = pos.y > stage.height() - offset;
+          if (isNearBottom) {
+            e.target.y(e.target.y() + speed / stage.scaleX());
+          }
 
-        this.getStageGridPlugin()?.renderGrid();
-      }, duration);
+          this.getStageGridPlugin()?.renderGrid();
+        },
+        duration
+      );
 
-      if (typeof stageScrollInterval !== 'undefined') {
+      if (typeof this.stageScrollInterval !== 'undefined') {
         return;
       }
 
-      stageScrollInterval = setInterval(() => {
+      this.stageScrollInterval = setInterval(() => {
         const pos = stage.getPointerPosition();
         const offset = this.config.edgePanOffset;
         const speed = this.config.edgePanSpeed;
@@ -364,14 +363,7 @@ export class WeaveStagePanningPlugin extends WeavePlugin {
     });
 
     stage.on('dragend', () => {
-      const intervals = Object.keys(targetScrollIntervals);
-      for (const key of intervals) {
-        clearInterval(targetScrollIntervals[key]);
-        targetScrollIntervals[key] = undefined;
-      }
-
-      clearInterval(stageScrollInterval);
-      stageScrollInterval = undefined;
+      this.cleanupEdgeMoveIntervals();
     });
 
     stage.container().style.touchAction = 'none';
@@ -452,6 +444,17 @@ export class WeaveStagePanningPlugin extends WeavePlugin {
 
   getCurrentPointer() {
     return this.currentPointer;
+  }
+
+  cleanupEdgeMoveIntervals() {
+    const intervals = Object.keys(this.targetScrollIntervals);
+    for (const key of intervals) {
+      clearInterval(this.targetScrollIntervals[key]);
+      this.targetScrollIntervals[key] = undefined;
+    }
+
+    clearInterval(this.stageScrollInterval);
+    this.stageScrollInterval = undefined;
   }
 
   enable(): void {

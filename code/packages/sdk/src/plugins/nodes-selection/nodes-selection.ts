@@ -50,6 +50,8 @@ import type { WeaveNodesDistanceSnappingPlugin } from '../nodes-distance-snappin
 import { WEAVE_NODES_DISTANCE_SNAPPING_PLUGIN_KEY } from '../nodes-distance-snapping/constants';
 import { WEAVE_STAGE_GRID_PLUGIN_KEY } from '../stage-grid/constants';
 import type { WeaveStageGridPlugin } from '../stage-grid/stage-grid';
+import type { WeaveStagePanningPlugin } from '../stage-panning/stage-panning';
+import { WEAVE_STAGE_PANNING_KEY } from '../stage-panning/constants';
 
 export class WeaveNodesSelectionPlugin extends WeavePlugin {
   private tr!: Konva.Transformer;
@@ -313,6 +315,12 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
         node.updatePosition(node.getAbsolutePosition());
       }
 
+      if (e.evt?.altKey) {
+        tr.stopDrag(e.evt);
+
+        e.cancelBubble = true;
+      }
+
       tr.forceUpdate();
     });
 
@@ -320,6 +328,8 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
       e: KonvaEventObject<DragEvent, Konva.Transformer>
     ) => {
       const actualPos = { x: e.target.x(), y: e.target.y() };
+
+      e.cancelBubble = true;
 
       if (initialPos) {
         const moved = this.checkMovedDrag(initialPos, actualPos);
@@ -337,8 +347,6 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
       }
 
       this.didMove = true;
-
-      e.cancelBubble = true;
 
       const selectedNodes = tr.nodes();
       let selectionContainsFrames = false;
@@ -372,12 +380,17 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
 
       e.cancelBubble = true;
 
+      this.instance.getCloningManager().cleanupClones();
+
+      this.getStagePanningPlugin()?.cleanupEdgeMoveIntervals();
+
       const selectedNodes = tr.nodes();
       let selectionContainsFrames = false;
       for (let i = 0; i < selectedNodes.length; i++) {
         const node = selectedNodes[i];
         selectionContainsFrames = selectionContainsFrames || hasFrames(node);
         node.updatePosition(node.getAbsolutePosition());
+        node.setAttrs({ isCloned: undefined });
       }
 
       if (this.isSelecting() && tr.nodes().length > 1) {
@@ -779,7 +792,9 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
         (e.code === 'Backspace' || e.code === 'Delete') &&
         Object.keys(window.weaveTextEditing).length === 0
       ) {
-        this.removeSelectedNodes();
+        Promise.resolve().then(() => {
+          this.removeSelectedNodes();
+        });
         return;
       }
     });
@@ -1448,6 +1463,13 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
         WEAVE_NODES_DISTANCE_SNAPPING_PLUGIN_KEY
       );
     return snappingPlugin;
+  }
+
+  getStagePanningPlugin() {
+    const stagePanning = this.instance.getPlugin<WeaveStagePanningPlugin>(
+      WEAVE_STAGE_PANNING_KEY
+    );
+    return stagePanning;
   }
 
   getSelectorConfig(): TransformerConfig {

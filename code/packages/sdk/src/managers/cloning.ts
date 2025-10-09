@@ -17,6 +17,7 @@ import type { WeaveNode } from '@/nodes/node';
 export class WeaveCloningManager {
   private instance: Weave;
   private logger: Logger;
+  private clones: Konva.Node[] = [];
 
   constructor(instance: Weave) {
     this.instance = instance;
@@ -313,5 +314,25 @@ export class WeaveCloningManager {
     this.instance.addNode(serializedNode, realParent?.getAttrs().id);
 
     return this.instance.getStage().findOne(`#${newNodeId}`);
+  }
+
+  addClone(node: Konva.Node) {
+    this.clones.push(node);
+  }
+
+  removeClone(node: Konva.Node) {
+    this.clones = this.clones.filter((c) => c !== node);
+  }
+
+  getClones() {
+    return this.clones;
+  }
+
+  isClone(node: Konva.Node) {
+    return this.clones.find((c) => c === node);
+  }
+
+  cleanupClones() {
+    this.clones = [];
   }
 }

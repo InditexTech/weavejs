@@ -211,6 +211,7 @@ export class WeaveFrameNode extends WeaveNode {
       },
       strokeWidth: 0,
       fill: 'transparent',
+      nodeId: id,
       id: `${id}-selection-area`,
       listening: true,
       draggable: true,
