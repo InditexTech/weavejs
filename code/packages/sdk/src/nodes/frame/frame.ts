@@ -12,6 +12,7 @@ import {
   WEAVE_NODE_CUSTOM_EVENTS,
 } from '@inditextech/weave-types';
 import {
+  WEAVE_FRAME_DEFAULT_BACKGROUND_COLOR,
   WEAVE_FRAME_NODE_DEFAULT_CONFIG,
   WEAVE_FRAME_NODE_DEFAULT_PROPS,
   WEAVE_FRAME_NODE_TYPE,
@@ -48,6 +49,9 @@ export class WeaveFrameNode extends WeaveNode {
         ...(props.title && { title: props.title }),
         ...(props.frameWidth && { frameWidth: props.frameWidth }),
         ...(props.frameHeight && { frameHeight: props.frameHeight }),
+        ...(props.frameBackground && {
+          frameBackground: props.frameBackground,
+        }),
         children: [],
       },
     };
@@ -72,10 +76,6 @@ export class WeaveFrameNode extends WeaveNode {
       onTargetEnter: {
         borderColor: onTargetEnterBorderColor,
         fill: onTargetEnterFill,
-      },
-      onTargetLeave: {
-        borderColor: onTargetLeaveBorderColor,
-        fill: onTargetLeaveFill,
       },
     } = this.config;
 
@@ -119,13 +119,14 @@ export class WeaveFrameNode extends WeaveNode {
       nodeId: id,
       x: 0,
       y: 0,
+      onTargetEnter: false,
       width: props.frameWidth,
       stroke: borderColor,
       strokeWidth: borderWidth,
       strokeScaleEnabled: true,
       shadowForStrokeEnabled: false,
       height: props.frameHeight,
-      fill: frameParams.frameBackground ?? '#ffffffff',
+      fill: frameParams.frameBackground ?? WEAVE_FRAME_DEFAULT_BACKGROUND_COLOR,
       listening: false,
       draggable: false,
     });
@@ -138,7 +139,7 @@ export class WeaveFrameNode extends WeaveNode {
       id: `${id}-title`,
       x: 0,
       width: props.frameWidth,
-      fontSize: fontSize / stage.scaleX(),
+      fontSize: fontSize,
       fontFamily,
       fontStyle,
       verticalAlign: 'middle',
@@ -208,6 +209,7 @@ export class WeaveFrameNode extends WeaveNode {
         ctx.rect(0, -textHeight, props.frameWidth, textHeight);
         ctx.fillStrokeShape(shape);
       },
+      strokeWidth: 0,
       fill: 'transparent',
       id: `${id}-selection-area`,
       listening: true,
@@ -226,6 +228,7 @@ export class WeaveFrameNode extends WeaveNode {
         ctx.rect(0, 0, props.frameWidth, props.frameHeight);
         ctx.fillStrokeShape(shape);
       },
+      strokeWidth: 0,
       fill: 'transparent',
       nodeId: id,
       id: `${id}-container-area`,
@@ -264,15 +267,6 @@ export class WeaveFrameNode extends WeaveNode {
     this.setupDefaultNodeEvents(frame);
 
     this.instance.addEventListener('onZoomChange', () => {
-      const stage = this.instance.getStage();
-      text.fontSize(fontSize / stage.scaleX());
-      text.width(props.frameWidth);
-      const textMeasures = text.measureSize(text.getAttrs().text ?? '');
-      const textHeight =
-        textMeasures.height + (2 * titleMargin) / stage.scaleX();
-      text.y(-textHeight);
-      text.height(textHeight);
-
       selectionArea.hitFunc(function (ctx, shape) {
         ctx.beginPath();
         ctx.rect(0, -textHeight, props.frameWidth, textHeight);
@@ -284,14 +278,17 @@ export class WeaveFrameNode extends WeaveNode {
 
     frame.on(WEAVE_NODE_CUSTOM_EVENTS.onTargetLeave, () => {
       background.setAttrs({
-        stroke: onTargetLeaveBorderColor,
+        onTargetEnter: false,
+        stroke: borderColor,
         strokeWidth: borderWidth,
-        fill: onTargetLeaveFill,
+        fill:
+          frameParams.frameBackground ?? WEAVE_FRAME_DEFAULT_BACKGROUND_COLOR,
       });
     });
 
     frame.on(WEAVE_NODE_CUSTOM_EVENTS.onTargetEnter, () => {
       background.setAttrs({
+        onTargetEnter: true,
         stroke: onTargetEnterBorderColor,
         strokeWidth: borderWidth,
         fill: onTargetEnterFill,
@@ -331,9 +328,9 @@ export class WeaveFrameNode extends WeaveNode {
       `#${newProps.id}-selection-area`
     );
 
-    if (background) {
+    if (background && !newProps.onTargetEnter) {
       background.setAttrs({
-        fill: newProps.frameBackground ?? '#ffffffff',
+        fill: newProps.frameBackground ?? WEAVE_FRAME_DEFAULT_BACKGROUND_COLOR,
       });
     }
 
@@ -341,8 +338,7 @@ export class WeaveFrameNode extends WeaveNode {
       title.text(newProps.title);
 
       const textMeasures = title.measureSize(title.getAttrs().text ?? '');
-      const textHeight =
-        textMeasures.height + (2 * titleMargin) / stage.scaleX();
+      const textHeight = textMeasures.height + 2 * titleMargin;
       title.y(-textHeight);
       title.height(textHeight);
 
@@ -391,6 +387,7 @@ export class WeaveFrameNode extends WeaveNode {
 
     const cleanedAttrs = { ...realAttrs };
     delete cleanedAttrs.draggable;
+    delete cleanedAttrs.onTargetEnter;
 
     return {
       key: realAttrs?.id ?? '',

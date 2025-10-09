@@ -8,17 +8,13 @@ export const WEAVE_FRAME_NODE_DEFAULT_CONFIG = {
   fontFamily: 'Arial',
   fontStyle: 'bold',
   fontSize: 20,
-  fontColor: '#000000ff',
+  fontColor: '#000000',
   titleMargin: 20,
-  borderColor: '#000000ff',
+  borderColor: '#000000',
   borderWidth: 1,
-  onTargetLeave: {
-    borderColor: '#000000ff',
-    fill: '#ffffffff',
-  },
   onTargetEnter: {
-    borderColor: '#ff6863ff',
-    fill: '#ffffffff',
+    borderColor: '#FF6863FF',
+    fill: '#FFFFFFFF',
   },
   transform: {
     rotateEnabled: false,
@@ -29,8 +25,11 @@ export const WEAVE_FRAME_NODE_DEFAULT_CONFIG = {
   },
 };
 
+export const WEAVE_FRAME_DEFAULT_BACKGROUND_COLOR = '#FFFFFFFF';
+
 export const WEAVE_FRAME_NODE_DEFAULT_PROPS = {
   title: 'Frame XXX',
   frameWidth: 1920,
   frameHeight: 1080,
+  frameBackground: WEAVE_FRAME_DEFAULT_BACKGROUND_COLOR,
 };

@@ -708,6 +708,10 @@ export class Weave {
 
   // CLONING MANAGEMENT METHODS PROXIES
 
+  getCloningManager(): WeaveCloningManager {
+    return this.cloningManager;
+  }
+
   nodesToGroupSerialized(instancesToClone: Konva.Node[]): WeaveSerializedGroup {
     return this.cloningManager.nodesToGroupSerialized(instancesToClone);
   }

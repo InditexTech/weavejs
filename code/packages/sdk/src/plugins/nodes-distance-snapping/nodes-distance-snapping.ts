@@ -1110,6 +1110,7 @@ export class WeaveNodesDistanceSnappingPlugin extends WeavePlugin {
   }
 
   disable(): void {
+    this.cleanupGuidelines();
     this.enabled = false;
   }
 }
