@@ -2,6 +2,7 @@
   "title": "Prerelease versions",
   "description": "Detailed changelog for Weave.js pre-release versions",
   "pages": [
+    "0.73.1",
     "0.73.0",
     "0.72.1",
     "0.72.0",
