@@ -916,10 +916,8 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
         this.hideSelectorArea();
       }
 
-      if (contextMenuPlugin && contextMenuPlugin.isContextMenuVisible()) {
-        this.selecting = false;
+      if (contextMenuPlugin?.isContextMenuVisible()) {
         this.stopPanLoop();
-        return;
       }
 
       if (this.isSpaceKeyPressed) {
@@ -1001,10 +999,8 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
         return;
       }
 
-      if (contextMenuPlugin && contextMenuPlugin.isContextMenuVisible()) {
-        this.selecting = false;
+      if (contextMenuPlugin?.isContextMenuVisible()) {
         this.stopPanLoop();
-        return;
       }
 
       if (!this.selectionRectangle.visible()) {
@@ -1204,9 +1200,7 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
     const contextMenuPlugin = this.getContextMenuPlugin();
 
     if (contextMenuPlugin?.isContextMenuVisible()) {
-      this.selecting = false;
       this.stopPanLoop();
-      return;
     }
 
     this.hideHoverState();
