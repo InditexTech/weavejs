@@ -293,6 +293,7 @@ export class WeaveVideoNode extends WeaveNode {
       stroke: this.config.style.background.strokeColor,
       strokeWidth: this.config.style.background.strokeWidth,
       nodeId: id,
+      rotation: 0,
     });
 
     videoGroup.add(bg);
@@ -308,6 +309,7 @@ export class WeaveVideoNode extends WeaveNode {
         image: undefined,
         name: undefined,
         nodeId: id,
+        rotation: 0,
       });
 
       video.hide();
@@ -325,6 +327,7 @@ export class WeaveVideoNode extends WeaveNode {
         fill: this.config.style.track.color,
         name: undefined,
         nodeId: id,
+        rotation: 0,
       });
 
       this.instance.addEventListener<WeaveStageZoomPluginOnZoomChangeEvent>(
@@ -352,6 +355,7 @@ export class WeaveVideoNode extends WeaveNode {
       image: undefined,
       name: undefined,
       nodeId: id,
+      rotation: 0,
     });
 
     videoPlaceholder.show();
@@ -378,6 +382,7 @@ export class WeaveVideoNode extends WeaveNode {
       stroke: this.config.style.iconBackground.strokeColor,
       fill: this.config.style.iconBackground.color,
       nodeId: id,
+      rotation: 0,
     });
 
     videoIconGroup.add(videoIconBg);
@@ -392,6 +397,7 @@ export class WeaveVideoNode extends WeaveNode {
       fill: 'transparent',
       image: this.videoIconImage,
       nodeId: id,
+      rotation: 0,
     });
 
     videoIconGroup.add(videoIcon);
@@ -763,6 +769,7 @@ export class WeaveVideoNode extends WeaveNode {
 
     bg.setAttrs({
       ...internalVideoProps,
+      rotation: 0,
       id: `${id}-bg`,
       x: 0,
       y: 0,
@@ -773,6 +780,7 @@ export class WeaveVideoNode extends WeaveNode {
     if (!isServer() && video) {
       video.setAttrs({
         ...internalVideoProps,
+        rotation: 0,
         id: `${id}-video`,
         x: 0,
         y: 0,
@@ -781,6 +789,7 @@ export class WeaveVideoNode extends WeaveNode {
     videoPlaceholder.setAttrs({
       ...internalVideoProps,
       id: `${id}-video-placeholder`,
+      rotation: 0,
       x: 0,
       y: 0,
     });
