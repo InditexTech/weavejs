@@ -13,6 +13,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.73.1] - 2025-10-09
+
+### Fixed
+
+- [#697](https://github.com/InditexTech/weavejs/issues/697) Context menu block UI when clicked on empty space
+
 ## [0.73.0] - 2025-10-08
 
 ### Added
@@ -1097,7 +1103,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - [#24](https://github.com/InditexTech/weavejs/issues/24) Bug when loading rooms with text or images
 - [#18](https://github.com/InditexTech/weavejs/issues/18) Fix awareness not working on store-azure-web-pubsub
 
-[Unreleased]: https://github.com/InditexTech/weavejs/compare/0.73.0...HEAD
+[Unreleased]: https://github.com/InditexTech/weavejs/compare/0.73.1...HEAD
+
+[0.73.1]: https://github.com/InditexTech/weavejs/compare/0.73.0...0.73.1
 
 [0.73.0]: https://github.com/InditexTech/weavejs/compare/0.72.1...0.73.0
 
