@@ -30,5 +30,50 @@ import { WeaveStagePanningPlugin } from "@inditextech/weave-sdk";
 ## Instantiation
 
 ```ts
-new WeaveStagePanningPlugin();
+new WeaveStagePanningPlugin(params?: WeaveStagePanningPluginParams);
 ```
+
+## TypeScript types
+
+```ts
+type WeaveStagePanningPluginParams = {
+  config?: Partial<WeaveStagePanningPluginConfig>;
+};
+
+type WeaveStagePanningPluginConfig = {
+  edgePanOffset: number;
+  edgePanSpeed: number;
+};
+```
+
+## Parameters
+
+For `WeaveStagePanningPluginParams`:
+
+<TypeTable
+  type={{
+    ["config"]: {
+      required: true,
+      description: "Config parameters for the plugin.",
+      type: "WeaveStagePanningPluginConfig",
+    },
+  }}
+/>
+
+For `WeaveStagePanningPluginConfig`:
+
+<TypeTable
+  type={{
+    ["edgePanOffset"]: {
+      description:
+        "The offset from stage borders where auto-panning happens when dragging nodes. In pixels.",
+      type: "number",
+      default: "50",
+    },
+    ["edgePanSpeed"]: {
+      description: "The speed of the auto-panning. In pixels.",
+      type: "number",
+      default: "10",
+    },
+  }}
+/>
