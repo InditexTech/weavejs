@@ -8,12 +8,16 @@ import { v4 as uuidv4 } from 'uuid';
 import { Weave } from '@/weave';
 import { type Vector2d } from 'konva/lib/types';
 import { type Logger } from 'pino';
-import { type WeaveStateElement } from '@inditextech/weave-types';
+import {
+  type WeaveElementInstance,
+  type WeaveStateElement,
+} from '@inditextech/weave-types';
 import type { WeaveNode } from '@/nodes/node';
 
 export class WeaveCloningManager {
   private instance: Weave;
   private logger: Logger;
+  private clones: Konva.Node[] = [];
 
   constructor(instance: Weave) {
     this.instance = instance;
@@ -271,5 +275,64 @@ export class WeaveCloningManager {
     }
 
     newGroup.destroy();
+  }
+
+  private recursivelyUpdateKeys(nodes: WeaveStateElement[]) {
+    for (const child of nodes) {
+      const newNodeId = uuidv4();
+      child.key = newNodeId;
+      child.props.id = newNodeId;
+      if (child.props.children) {
+        this.recursivelyUpdateKeys(child.props.children);
+      }
+    }
+  }
+
+  cloneNode(targetNode: Konva.Node): Konva.Node | undefined {
+    const nodeHandler = this.instance.getNodeHandler<WeaveNode>(
+      targetNode.getAttrs().nodeType
+    );
+
+    if (!nodeHandler) {
+      return undefined;
+    }
+
+    const parent: Konva.Container = targetNode.getParent() as Konva.Container;
+
+    const serializedNode = nodeHandler.serialize(
+      targetNode as WeaveElementInstance
+    );
+
+    this.recursivelyUpdateKeys(serializedNode.props.children ?? []);
+
+    const newNodeId = uuidv4();
+    serializedNode.key = newNodeId;
+    serializedNode.props.id = newNodeId;
+
+    const realParent = this.instance.getInstanceRecursive(parent);
+
+    this.instance.addNode(serializedNode, realParent?.getAttrs().id);
+
+    return this.instance.getStage().findOne(`#${newNodeId}`);
+  }
+
+  addClone(node: Konva.Node) {
+    this.clones.push(node);
+  }
+
+  removeClone(node: Konva.Node) {
+    this.clones = this.clones.filter((c) => c !== node);
+  }
+
+  getClones() {
+    return this.clones;
+  }
+
+  isClone(node: Konva.Node) {
+    return this.clones.find((c) => c === node);
+  }
+
+  cleanupClones() {
+    this.clones = [];
   }
 }

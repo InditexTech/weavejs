@@ -505,6 +505,7 @@ export class WeaveNodesEdgeSnappingPlugin extends WeavePlugin {
   }
 
   disable(): void {
+    this.cleanupGuidelines();
     this.enabled = false;
   }
 }

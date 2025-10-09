@@ -15,10 +15,6 @@ export type WeaveFrameProperties = {
   titleMargin: number;
   borderWidth: number;
   borderColor: string;
-  onTargetLeave: {
-    borderColor: string;
-    fill: string;
-  };
   onTargetEnter: {
     borderColor: string;
     fill: string;
@@ -30,6 +26,7 @@ export type WeaveFrameAttributes = WeaveElementAttributes & {
   title: string;
   frameWidth: number;
   frameHeight: number;
+  frameBackground: string;
 };
 
 export type WeaveFrameNodeParams = {

@@ -3,3 +3,8 @@
 // SPDX-License-Identifier: Apache-2.0
 
 export const WEAVE_STAGE_PANNING_KEY = 'stagePanning';
+
+export const WEAVE_STAGE_PANNING_DEFAULT_CONFIG = {
+  edgePanOffset: 50,
+  edgePanSpeed: 10,
+};

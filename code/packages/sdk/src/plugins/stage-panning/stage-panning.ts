@@ -3,18 +3,17 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { WeavePlugin } from '@/plugins/plugin';
-import { WEAVE_STAGE_PANNING_KEY } from './constants';
+import {
+  WEAVE_STAGE_PANNING_DEFAULT_CONFIG,
+  WEAVE_STAGE_PANNING_KEY,
+} from './constants';
 import type { KonvaEventObject } from 'konva/lib/Node';
 import type { Stage } from 'konva/lib/Stage';
 import type { Vector2d } from 'konva/lib/types';
 import type { WeaveStageZoomPlugin } from '../stage-zoom/stage-zoom';
 import type { WeaveContextMenuPlugin } from '../context-menu/context-menu';
 import { MOVE_TOOL_ACTION_NAME } from '@/actions/move-tool/constants';
-import {
-  getTopmostShadowHost,
-  // getTopmostShadowHost,
-  isInShadowDOM,
-} from '@/utils';
+import { getTopmostShadowHost, isInShadowDOM } from '@/utils';
 import type { WeaveNodesEdgeSnappingPlugin } from '../nodes-edge-snapping/nodes-edge-snapping';
 import type { WeaveNodesDistanceSnappingPlugin } from '../nodes-distance-snapping/nodes-distance-snapping';
 import type { WeaveNodesSelectionPlugin } from '../nodes-selection/nodes-selection';
@@ -22,8 +21,16 @@ import { WEAVE_NODES_EDGE_SNAPPING_PLUGIN_KEY } from '../nodes-edge-snapping/con
 import { WEAVE_NODES_DISTANCE_SNAPPING_PLUGIN_KEY } from '../nodes-distance-snapping/constants';
 import { WEAVE_NODES_SELECTION_KEY } from '../nodes-selection/constants';
 import { WEAVE_CONTEXT_MENU_PLUGIN_KEY } from '../context-menu/constants';
+import type { WeaveStageGridPlugin } from '../stage-grid/stage-grid';
+import type Konva from 'konva';
+import merge from 'lodash/merge';
+import type {
+  WeaveStagePanningPluginConfig,
+  WeaveStagePanningPluginParams,
+} from './types';
 
 export class WeaveStagePanningPlugin extends WeavePlugin {
+  private readonly config!: WeaveStagePanningPluginConfig;
   private moveToolActive: boolean;
   private isMouseLeftButtonPressed: boolean;
   private isMouseMiddleButtonPressed: boolean;
@@ -34,12 +41,22 @@ export class WeaveStagePanningPlugin extends WeavePlugin {
   private pointers: Map<number, Vector2d>;
   private panning: boolean = false;
   protected previousPointer!: string | null;
+  protected currentPointer: Konva.Vector2d | null = null;
+  protected stageScrollInterval: NodeJS.Timeout | undefined = undefined;
+  protected targetScrollIntervals: Record<string, NodeJS.Timeout | undefined> =
+    {};
+
   getLayerName = undefined;
   initLayer = undefined;
   onRender: undefined;
 
-  constructor() {
+  constructor(params?: WeaveStagePanningPluginParams) {
     super();
+
+    this.config = merge(
+      WEAVE_STAGE_PANNING_DEFAULT_CONFIG,
+      params?.config ?? {}
+    );
 
     this.pointers = new Map<number, { x: number; y: number }>();
     this.panning = false;
@@ -165,6 +182,9 @@ export class WeaveStagePanningPlugin extends WeavePlugin {
     });
 
     const handleMouseMove = (e: KonvaEventObject<PointerEvent, Stage>) => {
+      const pos = stage.getPointerPosition();
+      if (pos) this.currentPointer = pos;
+
       if (['touch', 'pen'].includes(e.evt.pointerType) && e.evt.buttons !== 1) {
         return;
       }
@@ -185,8 +205,6 @@ export class WeaveStagePanningPlugin extends WeavePlugin {
       if (!this.isDragging) return;
 
       this.getContextMenuPlugin()?.cancelLongPressTimer();
-
-      const pos = stage.getPointerPosition();
 
       if (pos && lastPos) {
         const dx = pos.x - lastPos.x;
@@ -250,6 +268,102 @@ export class WeaveStagePanningPlugin extends WeavePlugin {
     };
 
     window.addEventListener('wheel', handleWheel, { passive: true });
+
+    stage.on('dragstart', (e) => {
+      const duration = 1000 / 60;
+
+      if (
+        this.targetScrollIntervals[e.target.getAttrs().id ?? ''] !== undefined
+      ) {
+        return;
+      }
+
+      this.targetScrollIntervals[e.target.getAttrs().id ?? ''] = setInterval(
+        () => {
+          const pos = stage.getPointerPosition();
+          const offset = this.config.edgePanOffset;
+          const speed = this.config.edgePanSpeed;
+
+          if (!pos) return;
+
+          const isNearLeft = pos.x < offset / stage.scaleX();
+          if (isNearLeft) {
+            e.target.x(e.target.x() - speed / stage.scaleX());
+          }
+
+          const isNearRight = pos.x > stage.width() - offset / stage.scaleX();
+          if (isNearRight) {
+            e.target.x(e.target.x() + speed / stage.scaleX());
+          }
+
+          const isNearTop = pos.y < offset / stage.scaleY();
+          if (isNearTop) {
+            e.target.y(e.target.y() - speed / stage.scaleX());
+          }
+
+          const isNearBottom = pos.y > stage.height() - offset / stage.scaleY();
+          if (isNearBottom) {
+            e.target.y(e.target.y() + speed / stage.scaleX());
+          }
+
+          this.getStageGridPlugin()?.renderGrid();
+        },
+        duration
+      );
+
+      if (this.stageScrollInterval !== undefined) {
+        return;
+      }
+
+      this.stageScrollInterval = setInterval(() => {
+        const pos = stage.getPointerPosition();
+        const offset = this.config.edgePanOffset;
+        const speed = this.config.edgePanSpeed;
+
+        if (!pos) return;
+
+        let isOnBorder = false;
+
+        const isNearLeft = pos.x < offset;
+        if (isNearLeft) {
+          stage.x(stage.x() + speed);
+          isOnBorder = true;
+        }
+
+        const isNearRight = pos.x > stage.width() - offset;
+        if (isNearRight) {
+          stage.x(stage.x() - speed);
+          isOnBorder = true;
+        }
+
+        const isNearTop = pos.y < offset;
+        if (isNearTop) {
+          stage.y(stage.y() + speed);
+          isOnBorder = true;
+        }
+
+        const isNearBottom = pos.y > stage.height() - offset;
+        if (isNearBottom) {
+          stage.y(stage.y() - speed);
+          isOnBorder = true;
+        }
+
+        if (isOnBorder) {
+          this.getNodesEdgeSnappingPlugin()?.disable();
+          this.getNodesDistanceSnappingPlugin()?.disable();
+        }
+        if (!isOnBorder) {
+          this.getNodesEdgeSnappingPlugin()?.enable();
+          this.getNodesDistanceSnappingPlugin()?.enable();
+        }
+
+        this.getStageGridPlugin()?.renderGrid();
+      }, duration);
+    });
+
+    stage.on('dragend', () => {
+      this.cleanupEdgeMoveIntervals();
+    });
 
     stage.container().style.touchAction = 'none';
     stage.container().style.userSelect = 'none';
@@ -319,6 +433,27 @@ export class WeaveStagePanningPlugin extends WeavePlugin {
         WEAVE_NODES_DISTANCE_SNAPPING_PLUGIN_KEY
       );
     return snappingPlugin;
+  }
+
+  getStageGridPlugin() {
+    const gridPlugin =
+      this.instance.getPlugin<WeaveStageGridPlugin>('stageGrid');
+    return gridPlugin;
+  }
+
+  getCurrentPointer() {
+    return this.currentPointer;
+  }
+
+  cleanupEdgeMoveIntervals() {
+    const intervals = Object.keys(this.targetScrollIntervals);
+    for (const key of intervals) {
+      clearInterval(this.targetScrollIntervals[key]);
+      this.targetScrollIntervals[key] = undefined;
+    }
+
+    clearInterval(this.stageScrollInterval);
+    this.stageScrollInterval = undefined;
   }
 
   enable(): void {
