@@ -287,22 +287,22 @@ export class WeaveStagePanningPlugin extends WeavePlugin {
 
           if (!pos) return;
 
-          const isNearLeft = pos.x < offset;
+          const isNearLeft = pos.x < offset / stage.scaleX();
           if (isNearLeft) {
             e.target.x(e.target.x() - speed / stage.scaleX());
           }
 
-          const isNearRight = pos.x > stage.width() - offset;
+          const isNearRight = pos.x > stage.width() - offset / stage.scaleX();
           if (isNearRight) {
             e.target.x(e.target.x() + speed / stage.scaleX());
           }
 
-          const isNearTop = pos.y < offset;
+          const isNearTop = pos.y < offset / stage.scaleY();
           if (isNearTop) {
             e.target.y(e.target.y() - speed / stage.scaleX());
           }
 
-          const isNearBottom = pos.y > stage.height() - offset;
+          const isNearBottom = pos.y > stage.height() - offset / stage.scaleY();
           if (isNearBottom) {
             e.target.y(e.target.y() + speed / stage.scaleX());
           }
