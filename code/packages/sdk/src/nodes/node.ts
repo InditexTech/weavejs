@@ -283,7 +283,26 @@ export abstract class WeaveNode implements WeaveNodeBase {
         }
       });
 
-      let clone: Konva.Node | undefined = undefined;
+      const stage = this.instance.getStage();
+
+      let originalPosition: Vector2d | null = null;
+
+      this.instance.addEventListener('onSelectionState', (state) => {
+        const nodesSelectionPlugin = this.getSelectionPlugin();
+        const selectedNodes = nodesSelectionPlugin?.getSelectedNodes() ?? [];
+
+        if (
+          !state &&
+          selectedNodes?.some((n) => n.getAttrs().id === node.getAttrs().id)
+        ) {
+          originalPosition = node.getAbsolutePosition();
+        }
+      });
+
+      node.on('mousedown', (e) => {
+        const nodeTarget = e.target;
+        originalPosition = nodeTarget.getAbsolutePosition();
+      });
 
       node.on('dragstart', (e) => {
         const nodeTarget = e.target;
@@ -294,8 +313,6 @@ export abstract class WeaveNode implements WeaveNodeBase {
           nodeTarget.stopDrag();
           return;
         }
-
-        const stage = this.instance.getStage();
 
         const isErasing = this.instance.getActiveAction() === 'eraseTool';
 
@@ -318,13 +335,18 @@ export abstract class WeaveNode implements WeaveNodeBase {
         }
 
         if (e.evt?.altKey) {
+          nodeTarget.setAttrs({ isCloneOrigin: true });
+          nodeTarget.setAttrs({ isCloned: false });
           nodeTarget.stopDrag(e.evt);
 
           e.cancelBubble = true;
 
-          clone = this.instance.getCloningManager().cloneNode(realNodeTarget);
+          const clone = this.instance
+            .getCloningManager()
+            .cloneNode(realNodeTarget);
 
           if (clone && !this.instance.getCloningManager().isClone(clone)) {
+            clone.setAttrs({ isCloneOrigin: false });
             clone.setAttrs({ isCloned: true });
             this.instance.getCloningManager().addClone(clone);
           }
@@ -334,12 +356,12 @@ export abstract class WeaveNode implements WeaveNodeBase {
           const nodesSelectionPlugin = this.getNodesSelectionPlugin();
           nodesSelectionPlugin?.setSelectedNodes([]);
 
-          setTimeout(() => {
+          requestAnimationFrame(() => {
             nodesSelectionPlugin?.setSelectedNodes(
               this.instance.getCloningManager().getClones()
             );
             clone?.startDrag(e.evt);
-          }, 0);
+          });
         }
       });
 
@@ -374,7 +396,6 @@ export abstract class WeaveNode implements WeaveNodeBase {
 
         if (
           this.isSelecting() &&
-          // this.isNodeSelected(node) &&
           this.getSelectionPlugin()?.getSelectedNodes().length === 1
         ) {
           clearContainerTargets(this.instance);
@@ -402,8 +423,12 @@ export abstract class WeaveNode implements WeaveNodeBase {
 
         e.cancelBubble = true;
 
-        if (clone) {
-          clone = undefined;
+        if (nodeTarget.getAttrs().isCloneOrigin && originalPosition) {
+          nodeTarget.setAbsolutePosition(originalPosition);
+          nodeTarget.setAttrs({ isCloneOrigin: undefined });
+          nodeTarget.setAttrs({ isCloned: undefined });
+          originalPosition = null;
+          return;
         }
 
         if (!this.didMove) {
@@ -452,11 +477,7 @@ export abstract class WeaveNode implements WeaveNodeBase {
           }
 
           let moved = false;
-          if (
-            containerToMove &&
-            !hasFrames(node) &&
-            !realNodeTarget.getAttrs().isCloned
-          ) {
+          if (containerToMove && !hasFrames(node)) {
             moved = moveNodeToContainer(
               this.instance,
               realNodeTarget,
@@ -466,9 +487,8 @@ export abstract class WeaveNode implements WeaveNodeBase {
 
           if (realNodeTarget.getAttrs().isCloned) {
             this.instance.getCloningManager().removeClone(realNodeTarget);
+            originalPosition = realNodeTarget.getAbsolutePosition();
           }
-
-          realNodeTarget?.setAttrs({ isCloned: undefined });
 
           if (containerToMove) {
             containerToMove.fire(WEAVE_NODE_CUSTOM_EVENTS.onTargetLeave, {
@@ -482,6 +502,12 @@ export abstract class WeaveNode implements WeaveNodeBase {
             );
           }
         }
+
+        nodeTarget.setAttrs({ isCloned: undefined });
+        nodeTarget.setAttrs({ isCloneOrigin: undefined });
+        realNodeTarget.setAttrs({ isCloned: undefined });
+        realNodeTarget.setAttrs({ isCloneOrigin: undefined });
+        originalPosition = realNodeTarget.getAbsolutePosition();
       });
 
       node.handleMouseover = () => {

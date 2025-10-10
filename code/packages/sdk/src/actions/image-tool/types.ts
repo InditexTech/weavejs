@@ -32,6 +32,9 @@ export type ImageOptions = {
 
 export type WeaveImageToolActionTriggerReturn =
   | {
-      finishUploadCallback: (imageURL: string, options?: ImageOptions) => void;
+      finishUploadCallback: (
+        imageURL: string,
+        position?: Vector2d | undefined
+      ) => void;
     }
   | undefined;
