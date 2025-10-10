@@ -292,7 +292,17 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
       this.triggerSelectedNodesEvent();
     });
 
+    const nodesOriginalPositions: Record<string, Vector2d> = {};
     let initialPos: Vector2d | null = null;
+
+    tr.on('mousemove', () => {
+      const selectedNodes = tr.nodes();
+      for (let i = 0; i < selectedNodes.length; i++) {
+        const node = selectedNodes[i];
+        nodesOriginalPositions[node.getAttrs().id ?? ''] = node.position();
+        node.updatePosition(node.getAbsolutePosition());
+      }
+    });
 
     tr.on('dragstart', (e) => {
       initialPos = { x: e.target.x(), y: e.target.y() };
@@ -317,8 +327,6 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
 
       if (e.evt?.altKey) {
         tr.stopDrag(e.evt);
-
-        e.cancelBubble = true;
       }
 
       tr.forceUpdate();

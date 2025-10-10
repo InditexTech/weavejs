@@ -16,6 +16,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 - [#701](https://github.com/InditexTech/weavejs/issues/701) Fix Video node TS types issues and rotation
+- [#705](https://github.com/InditexTech/weavejs/issues/705) When ctrl + alt and drag, original node is moved a delta, but when reload its OK
 
 ## [0.74.0] - 2025-10-09
 
