@@ -293,8 +293,7 @@ export abstract class WeaveNode implements WeaveNodeBase {
 
         if (
           !state &&
-          selectedNodes &&
-          selectedNodes.some((n) => n.getAttrs().id === node.getAttrs().id)
+          selectedNodes?.some((n) => n.getAttrs().id === node.getAttrs().id)
         ) {
           originalPosition = node.getAbsolutePosition();
         }
@@ -394,10 +393,6 @@ export abstract class WeaveNode implements WeaveNodeBase {
         }
 
         const realNodeTarget: Konva.Node = this.getRealSelectedNode(nodeTarget);
-
-        // if (nodeTarget.getAttrs().isCloneOrigin && originalPosition) {
-        //   nodeTarget.setAbsolutePosition(originalPosition);
-        // }
 
         if (
           this.isSelecting() &&
