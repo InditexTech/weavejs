@@ -292,17 +292,7 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
       this.triggerSelectedNodesEvent();
     });
 
-    const nodesOriginalPositions: Record<string, Vector2d> = {};
     let initialPos: Vector2d | null = null;
-
-    tr.on('mousemove', () => {
-      const selectedNodes = tr.nodes();
-      for (let i = 0; i < selectedNodes.length; i++) {
-        const node = selectedNodes[i];
-        nodesOriginalPositions[node.getAttrs().id ?? ''] = node.position();
-        node.updatePosition(node.getAbsolutePosition());
-      }
-    });
 
     tr.on('dragstart', (e) => {
       initialPos = { x: e.target.x(), y: e.target.y() };
@@ -318,16 +308,6 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
       }
 
       e.cancelBubble = true;
-
-      const selectedNodes = tr.nodes();
-      for (let i = 0; i < selectedNodes.length; i++) {
-        const node = selectedNodes[i];
-        node.updatePosition(node.getAbsolutePosition());
-      }
-
-      if (e.evt?.altKey) {
-        tr.stopDrag(e.evt);
-      }
 
       tr.forceUpdate();
     });
@@ -398,7 +378,6 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
         const node = selectedNodes[i];
         selectionContainsFrames = selectionContainsFrames || hasFrames(node);
         node.updatePosition(node.getAbsolutePosition());
-        node.setAttrs({ isCloned: undefined });
       }
 
       if (this.isSelecting() && tr.nodes().length > 1) {
@@ -471,6 +450,8 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
           const nodeHandler = this.instance.getNodeHandler<WeaveNode>(
             selectedNodes[i].getAttrs().nodeType
           );
+
+          selectedNodes[i].setAttrs({ isCloned: undefined });
 
           if (nodeHandler) {
             this.instance.updateNode(
