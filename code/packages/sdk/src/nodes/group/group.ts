@@ -131,6 +131,8 @@ export class WeaveGroupNode extends WeaveNode {
         id: attrs.id ?? '',
         nodeType: attrs.nodeType,
         children: childrenMapped,
+        isCloned: undefined,
+        isCloneOrigin: undefined,
         x: instance.x() ?? 0,
         y: instance.y() ?? 0,
         scaleX: instance.scaleX() ?? 1,

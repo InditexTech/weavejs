@@ -395,6 +395,8 @@ export class WeaveFrameNode extends WeaveNode {
       type: realAttrs?.nodeType,
       props: {
         ...cleanedAttrs,
+        isCloned: undefined,
+        isCloneOrigin: undefined,
         id: realAttrs?.id ?? '',
         nodeType: realAttrs?.nodeType,
         children: childrenMapped,

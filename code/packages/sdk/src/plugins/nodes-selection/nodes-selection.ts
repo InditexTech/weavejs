@@ -451,8 +451,6 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
             selectedNodes[i].getAttrs().nodeType
           );
 
-          selectedNodes[i].setAttrs({ isCloned: undefined });
-
           if (nodeHandler) {
             this.instance.updateNode(
               nodeHandler.serialize(selectedNodes[i] as WeaveElementInstance)
@@ -474,6 +472,7 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
           const finalSelectedNodes: Konva.Node[] = [];
           toSelect.forEach((nodeId) => {
             const actNode = this.instance.getStage().findOne(`#${nodeId}`);
+
             if (actNode) {
               finalSelectedNodes.push(actNode);
             }
@@ -481,6 +480,10 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
           tr.nodes(finalSelectedNodes);
           tr.forceUpdate();
         }, 0);
+      }
+
+      for (const node of selectedNodes) {
+        node.setAttrs({ isCloned: undefined });
       }
 
       tr.forceUpdate();
