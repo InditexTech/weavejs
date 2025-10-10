@@ -581,7 +581,10 @@ export const getPositionRelativeToContainerOnPosition = (
   }
 
   const container = containerOverCursor(instance, [], position);
-  position = container?.getRelativePointerPosition();
+
+  if (container) {
+    position = container?.getRelativePointerPosition();
+  }
 
   if (!position) {
     return position;
