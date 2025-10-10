@@ -487,7 +487,6 @@ export abstract class WeaveNode implements WeaveNodeBase {
 
           if (realNodeTarget.getAttrs().isCloned) {
             this.instance.getCloningManager().removeClone(realNodeTarget);
-            originalPosition = realNodeTarget.getAbsolutePosition();
           }
 
           if (containerToMove) {
@@ -666,6 +665,8 @@ export abstract class WeaveNode implements WeaveNodeBase {
       type: attrs.nodeType,
       props: {
         ...cleanedAttrs,
+        isCloned: undefined,
+        isCloneOrigin: undefined,
         id: attrs.id ?? '',
         nodeType: attrs.nodeType,
         children: [],

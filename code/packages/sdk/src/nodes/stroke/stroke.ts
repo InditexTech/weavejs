@@ -289,6 +289,8 @@ export class WeaveStrokeNode extends WeaveNode {
       type: attrs.nodeType,
       props: {
         ...cleanedAttrs,
+        isCloned: undefined,
+        isCloneOrigin: undefined,
         id: attrs.id ?? '',
         nodeType: attrs.nodeType,
         children: [],
