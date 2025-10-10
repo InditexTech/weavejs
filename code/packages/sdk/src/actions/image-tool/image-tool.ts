@@ -6,7 +6,6 @@ import { v4 as uuidv4 } from 'uuid';
 import { WeaveAction } from '@/actions/action';
 import { type Vector2d } from 'konva/lib/types';
 import {
-  type ImageOptions,
   type WeaveImageToolActionTriggerParams,
   type WeaveImageToolActionState,
   type WeaveImageToolActionTriggerReturn,
@@ -20,6 +19,7 @@ import { WeaveNodesSelectionPlugin } from '@/plugins/nodes-selection/nodes-selec
 import Konva from 'konva';
 import type { WeaveImageNode } from '@/nodes/image/image';
 import { SELECTION_TOOL_ACTION_NAME } from '../selection-tool/constants';
+import { getPositionRelativeToContainerOnPosition } from '@/utils';
 
 export class WeaveImageToolAction extends WeaveAction {
   protected initialized: boolean = false;
@@ -69,7 +69,8 @@ export class WeaveImageToolAction extends WeaveAction {
     this.instance.addEventListener('onStageDrop', (e) => {
       if (window.weaveDragImageURL) {
         this.instance.getStage().setPointersPositions(e);
-        const position = this.instance.getStage().getRelativePointerPosition();
+        const position: Vector2d | null | undefined =
+          getPositionRelativeToContainerOnPosition(this.instance);
 
         this.instance.triggerAction(IMAGE_TOOL_ACTION_NAME, {
           imageURL: window.weaveDragImageURL,
@@ -164,11 +165,7 @@ export class WeaveImageToolAction extends WeaveAction {
     this.state = state;
   }
 
-  private loadImage(
-    imageURL: string,
-    options?: ImageOptions,
-    position?: Vector2d
-  ) {
+  private loadImage(imageURL: string, position?: Vector2d) {
     this.setCursor();
     this.setFocusStage();
 
@@ -380,11 +377,7 @@ export class WeaveImageToolAction extends WeaveAction {
     }
 
     if (params?.imageURL) {
-      this.loadImage(
-        params.imageURL,
-        params?.options ?? undefined,
-        params?.position ?? undefined
-      );
+      this.loadImage(params.imageURL, params?.position ?? undefined);
       return;
     }
 

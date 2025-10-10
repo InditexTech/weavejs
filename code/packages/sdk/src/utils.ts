@@ -568,3 +568,24 @@ export function isIOS() {
 }
 
 export const isServer = () => typeof window === 'undefined';
+
+export const getPositionRelativeToContainerOnPosition = (
+  instance: Weave
+): Vector2d | null | undefined => {
+  let position: Vector2d | null | undefined = instance
+    .getStage()
+    .getRelativePointerPosition();
+
+  if (!position) {
+    return position;
+  }
+
+  const container = containerOverCursor(instance, [], position);
+  position = container?.getRelativePointerPosition();
+
+  if (!position) {
+    return position;
+  }
+
+  return position;
+};
