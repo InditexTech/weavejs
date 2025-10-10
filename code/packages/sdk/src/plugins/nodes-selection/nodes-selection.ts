@@ -482,8 +482,7 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
         }, 0);
       }
 
-      for (let i = 0; i < selectedNodes.length; i++) {
-        const node = selectedNodes[i];
+      for (const node of selectedNodes) {
         node.setAttrs({ isCloned: undefined });
       }
 
