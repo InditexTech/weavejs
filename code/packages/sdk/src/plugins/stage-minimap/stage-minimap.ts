@@ -23,6 +23,7 @@ export class WeaveStageMinimapPlugin extends WeavePlugin {
   private minimapStageImage!: Konva.Image;
   private minimapViewportReference!: Konva.Rect;
   private initialized: boolean;
+  private offscreenWorker: Worker | null = null;
 
   constructor(params: WeaveStageMinimapPluginParams) {
     super();
@@ -104,55 +105,19 @@ export class WeaveStageMinimapPlugin extends WeavePlugin {
 
     if (box.width === 0 || box.height === 0) return;
 
-    box.x -= this.config.fitToContentPadding;
-    box.y -= this.config.fitToContentPadding;
-    box.width += this.config.fitToContentPadding * 2;
-    box.height += this.config.fitToContentPadding * 2;
-
     this.hideLayers();
 
-    const pixelRatio = 0.1;
-    const dataUrl = await stage.toDataURL({
+    const stageCanvas = stage.toCanvas({
+      pixelRatio: 1 / stage.scaleX(),
       x: box.x,
       y: box.y,
       width: box.width,
       height: box.height,
-      pixelRatio, // keep it light
     });
+    const imageBitmap = await createImageBitmap(stageCanvas);
 
     this.showLayers();
-
-    // Load into Konva.Image
-    const img = new window.Image();
-    img.onload = () => {
-      const actualImage = this.minimapStage.findOne('#minimapStageImage');
-      if (actualImage) {
-        actualImage.destroy();
-      }
-
-      const fitScale = Math.min(
-        this.minimapStage.width() / (box.width * pixelRatio),
-        this.minimapStage.height() / (box.height * pixelRatio)
-      );
-      const centerOffset = {
-        x: (this.minimapStage.width() - box.width * pixelRatio * fitScale) / 2,
-        y:
-          (this.minimapStage.height() - box.height * pixelRatio * fitScale) / 2,
-      };
-
-      this.minimapStageImage = new Konva.Image({
-        id: 'minimapStageImage',
-        image: img,
-        x: centerOffset.x,
-        y: centerOffset.y,
-        scaleX: fitScale,
-        scaleY: fitScale,
-        listening: false,
-      });
-      this.minimapLayer.add(this.minimapStageImage);
-      this.minimapStageImage.moveToBottom();
-    };
-    img.src = dataUrl;
+    this.offscreenWorker?.postMessage({ bitmap: imageBitmap }, [imageBitmap]); // transfer
   }
 
   private updateMinimapViewportReference() {
@@ -168,11 +133,6 @@ export class WeaveStageMinimapPlugin extends WeavePlugin {
     });
 
     if (box.width === 0 || box.height === 0) return;
-
-    box.x -= this.config.fitToContentPadding;
-    box.y -= this.config.fitToContentPadding;
-    box.width += this.config.fitToContentPadding * 2;
-    box.height += this.config.fitToContentPadding * 2;
 
     const fitScale = Math.min(
       this.minimapStage.width() / box.width,
@@ -219,6 +179,58 @@ export class WeaveStageMinimapPlugin extends WeavePlugin {
     }, 100);
 
     this.instance.addEventListener('onStateChange', throttledUpdateMinimap);
+
+    this.offscreenWorker = new Worker(new URL('./worker.js', import.meta.url), {
+      type: 'module',
+    });
+
+    this.offscreenWorker.onmessage = (e) => {
+      const width = e.data.width;
+      const height = e.data.height;
+
+      const blob = new Blob([e.data.buffer], { type: 'image/png' });
+      const url = URL.createObjectURL(blob);
+
+      const actualImage = this.minimapStage.findOne('#minimapStageImage');
+      if (actualImage) {
+        actualImage.destroy();
+      }
+
+      const fitScale = Math.min(
+        (this.minimapStage.width() - this.config.fitToContentPadding * 2) /
+          width,
+        (this.minimapStage.height() - this.config.fitToContentPadding * 2) /
+          height
+      );
+
+      const realWidth =
+        (width + this.config.fitToContentPadding * 2) * fitScale;
+      const realHeight =
+        (height + this.config.fitToContentPadding * 2) * fitScale;
+
+      const centerOffset = {
+        x: (this.minimapStage.width() - realWidth) / 2,
+        y: (this.minimapStage.height() - realHeight) / 2,
+      };
+
+      const image = new Image();
+      image.src = url;
+
+      this.minimapStageImage = new Konva.Image({
+        id: 'minimapStageImage',
+        image: image,
+        x: centerOffset.x,
+        y: centerOffset.y,
+        width,
+        height,
+        scaleX: fitScale,
+        scaleY: fitScale,
+        listening: false,
+      });
+      this.minimapLayer.add(this.minimapStageImage);
+      this.minimapStageImage.moveToBottom();
+      this.updateMinimapViewportReference();
+    };
   }
 
   private showLayers() {

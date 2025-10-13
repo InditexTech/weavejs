@@ -175,7 +175,9 @@ export class WeaveReconciler {
           newProps.height = rootContainer.getStageConfiguration().height;
         }
 
-        return handler.onRender(newProps);
+        const element = handler.onRender(newProps);
+
+        return element;
       },
       detachDeletedInstance(node: WeaveElementInstance): void {
         logger.debug({ node }, 'detachDeletedInstance');
