@@ -4,13 +4,24 @@
 
 import { defineConfig } from 'tsdown';
 
-export default defineConfig({
-  entry: {
-    sdk: './src/index.ts',
+export default defineConfig([
+  {
+    entry: {
+      sdk: './src/index.ts',
+    },
+    format: ['es', 'cjs'],
+    target: 'es2023',
+    clean: true,
+    dts: true,
+    platform: 'browser',
   },
-  format: ['es', 'cjs'],
-  target: 'es2023',
-  clean: true,
-  dts: true,
-  platform: 'browser',
-});
+  {
+    entry: {
+      worker: './src/plugins/stage-minimap/worker.ts',
+    },
+    format: ['esm'],
+    clean: true,
+    dts: true,
+    platform: 'browser',
+  },
+]);
