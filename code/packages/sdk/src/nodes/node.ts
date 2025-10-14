@@ -17,7 +17,6 @@ import Konva from 'konva';
 import { WeaveCopyPasteNodesPlugin } from '@/plugins/copy-paste-nodes/copy-paste-nodes';
 import type { WeaveNodesSelectionPluginOnNodesChangeEvent } from '@/plugins/nodes-selection/types';
 import {
-  cacheParentsRecursively,
   clearContainerTargets,
   containerOverCursor,
   hasFrames,
@@ -612,9 +611,8 @@ export abstract class WeaveNode implements WeaveNodeBase {
     };
   }
 
-  onAdd(nodeInstance: WeaveElementInstance): void {
-    cacheParentsRecursively(nodeInstance);
-  }
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  onAdd(nodeInstance: WeaveElementInstance): void {}
 
   abstract onRender(props: WeaveElementAttributes): WeaveElementInstance;
 

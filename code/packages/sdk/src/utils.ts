@@ -605,22 +605,6 @@ export const canComposite = (node: Konva.Node) => {
   );
 };
 
-export const cacheParentsRecursively = (node: Konva.Node) => {
-  const parent = node.getParent();
-
-  if (parent && canComposite(node)) {
-    if (parent.isCached()) {
-      parent.clearCache();
-    }
-
-    parent.cache();
-  }
-
-  if (parent) {
-    cacheParentsRecursively(parent);
-  }
-};
-
 export function mergeExceptArrays<TObject, TSource>(
   object: TObject,
   source: TSource

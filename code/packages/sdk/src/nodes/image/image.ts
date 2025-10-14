@@ -25,7 +25,7 @@ import {
 } from './constants';
 import { isEqual } from 'lodash';
 import { WEAVE_STAGE_DEFAULT_MODE } from '../stage/constants';
-import { cacheParentsRecursively, mergeExceptArrays } from '@/utils';
+import { mergeExceptArrays } from '@/utils';
 
 export class WeaveImageNode extends WeaveNode {
   private config: WeaveImageProperties;
@@ -566,8 +566,6 @@ export class WeaveImageNode extends WeaveNode {
           }
 
           this.resolveAsyncElement(id);
-
-          cacheParentsRecursively(image);
         }
       },
       onError: (error) => {
