@@ -563,14 +563,6 @@ export class WeaveVideoNode extends WeaveNode {
       }
     };
 
-    videoGroup.on('mouseover', () => {
-      videoGroup.handleMouseover();
-    });
-
-    videoGroup.on('mouseout', () => {
-      videoGroup.handleMouseout();
-    });
-
     videoGroup.dblClick = () => {
       if (
         this.config.style.playPauseOnDblClick &&
