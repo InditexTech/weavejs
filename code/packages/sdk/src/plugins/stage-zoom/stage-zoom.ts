@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-import { merge, throttle } from 'lodash';
+import { throttle } from 'lodash';
 import { WeavePlugin } from '@/plugins/plugin';
 import {
   type WeaveStageZoomPluginConfig,
@@ -17,7 +17,12 @@ import {
   WEAVE_STAGE_ZOOM_TYPE,
 } from './constants';
 import type { Vector2d } from 'konva/lib/types';
-import { getBoundingBox, getTopmostShadowHost, isInShadowDOM } from '@/utils';
+import {
+  getBoundingBox,
+  getTopmostShadowHost,
+  isInShadowDOM,
+  mergeExceptArrays,
+} from '@/utils';
 import type { WeaveContextMenuPlugin } from '../context-menu/context-menu';
 import type { WeaveStageGridPlugin } from '../stage-grid/stage-grid';
 
@@ -44,7 +49,7 @@ export class WeaveStageZoomPlugin extends WeavePlugin {
 
     const { config } = params ?? {};
 
-    this.config = merge(WEAVE_STAGE_ZOOM_DEFAULT_CONFIG, config);
+    this.config = mergeExceptArrays(WEAVE_STAGE_ZOOM_DEFAULT_CONFIG, config);
 
     if (!this.config.zoomSteps.includes(this.config.defaultZoom)) {
       throw new Error(

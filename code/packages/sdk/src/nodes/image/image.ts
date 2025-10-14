@@ -23,8 +23,9 @@ import {
   WEAVE_IMAGE_DEFAULT_CONFIG,
   WEAVE_IMAGE_NODE_TYPE,
 } from './constants';
-import { isEqual, merge } from 'lodash';
+import { isEqual } from 'lodash';
 import { WEAVE_STAGE_DEFAULT_MODE } from '../stage/constants';
+import { cacheParentsRecursively, mergeExceptArrays } from '@/utils';
 
 export class WeaveImageNode extends WeaveNode {
   private config: WeaveImageProperties;
@@ -55,7 +56,7 @@ export class WeaveImageNode extends WeaveNode {
 
     this.tapStart = { x: 0, y: 0, time: 0 };
     this.lastTapTime = 0;
-    this.config = merge(WEAVE_IMAGE_DEFAULT_CONFIG, config);
+    this.config = mergeExceptArrays(WEAVE_IMAGE_DEFAULT_CONFIG, config);
     this.imageCrop = null;
     this.cachedCropInfo = {};
     this.imageLoaded = false;
@@ -555,8 +556,6 @@ export class WeaveImageNode extends WeaveNode {
             error: false,
           };
 
-          this.resolveAsyncElement(id);
-
           const nodeHandler = this.instance.getNodeHandler<WeaveNode>(
             image.getAttrs().nodeType
           );
@@ -565,6 +564,10 @@ export class WeaveImageNode extends WeaveNode {
               nodeHandler.serialize(image as WeaveElementInstance)
             );
           }
+
+          this.resolveAsyncElement(id);
+
+          cacheParentsRecursively(image);
         }
       },
       onError: (error) => {

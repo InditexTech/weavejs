@@ -34,11 +34,21 @@ export class WeaveReconciler {
 
     const childInitialZIndex = child.getAttrs().initialZIndex;
 
+    const type = child.getAttrs().nodeType;
+
+    const handler = this.instance.getNodeHandler<WeaveNode>(type);
+
+    if (!handler) {
+      return;
+    }
+
     if (parentInstance instanceof Konva.Stage && child instanceof Konva.Layer) {
       parentInstance.add(child);
+      handler.onAdd?.(child);
     }
     if (parentInstance instanceof Konva.Layer) {
       parentInstance.add(child);
+      handler.onAdd?.(child);
     }
     if (
       parentInstance instanceof Konva.Group &&
@@ -48,12 +58,14 @@ export class WeaveReconciler {
         `#${parentAttrs.containerId}`
       ) as Konva.Group | undefined;
       realParent?.add(child);
+      handler.onAdd?.(child);
     }
     if (
       parentInstance instanceof Konva.Group &&
       typeof parentAttrs.containerId === 'undefined'
     ) {
       parentInstance.add(child);
+      handler.onAdd?.(child);
     }
 
     if (childInitialZIndex) {
@@ -64,7 +76,7 @@ export class WeaveReconciler {
   getConfig() {
     const weaveInstance = this.instance;
     const logger = this.logger;
-    const addNode = this.addNode;
+    const addNode = this.addNode.bind(this);
 
     return {
       noTimeout: -1,

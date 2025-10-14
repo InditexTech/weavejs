@@ -13,7 +13,11 @@ import type { Vector2d } from 'konva/lib/types';
 import type { WeaveStageZoomPlugin } from '../stage-zoom/stage-zoom';
 import type { WeaveContextMenuPlugin } from '../context-menu/context-menu';
 import { MOVE_TOOL_ACTION_NAME } from '@/actions/move-tool/constants';
-import { getTopmostShadowHost, isInShadowDOM } from '@/utils';
+import {
+  getTopmostShadowHost,
+  isInShadowDOM,
+  mergeExceptArrays,
+} from '@/utils';
 import type { WeaveNodesEdgeSnappingPlugin } from '../nodes-edge-snapping/nodes-edge-snapping';
 import type { WeaveNodesDistanceSnappingPlugin } from '../nodes-distance-snapping/nodes-distance-snapping';
 import type { WeaveNodesSelectionPlugin } from '../nodes-selection/nodes-selection';
@@ -23,7 +27,6 @@ import { WEAVE_NODES_SELECTION_KEY } from '../nodes-selection/constants';
 import { WEAVE_CONTEXT_MENU_PLUGIN_KEY } from '../context-menu/constants';
 import type { WeaveStageGridPlugin } from '../stage-grid/stage-grid';
 import type Konva from 'konva';
-import merge from 'lodash/merge';
 import type {
   WeaveStagePanningPluginConfig,
   WeaveStagePanningPluginParams,
@@ -53,7 +56,7 @@ export class WeaveStagePanningPlugin extends WeavePlugin {
   constructor(params?: WeaveStagePanningPluginParams) {
     super();
 
-    this.config = merge(
+    this.config = mergeExceptArrays(
       WEAVE_STAGE_PANNING_DEFAULT_CONFIG,
       params?.config ?? {}
     );

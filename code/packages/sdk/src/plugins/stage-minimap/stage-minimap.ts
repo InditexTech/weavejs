@@ -12,7 +12,8 @@ import type {
   WeaveStageMinimapPluginConfig,
   WeaveStageMinimapPluginParams,
 } from './types';
-import { merge, throttle } from 'lodash';
+import { throttle } from 'lodash';
+import { mergeExceptArrays } from '@/utils';
 
 export class WeaveStageMinimapPlugin extends WeavePlugin {
   getLayerName = undefined;
@@ -27,7 +28,10 @@ export class WeaveStageMinimapPlugin extends WeavePlugin {
 
   constructor(params: WeaveStageMinimapPluginParams) {
     super();
-    this.config = merge(STAGE_MINIMAP_DEFAULT_CONFIG, params.config);
+    this.config = mergeExceptArrays(
+      STAGE_MINIMAP_DEFAULT_CONFIG,
+      params.config
+    );
     this.initialized = false;
   }
 
@@ -180,9 +184,16 @@ export class WeaveStageMinimapPlugin extends WeavePlugin {
 
     this.instance.addEventListener('onStateChange', throttledUpdateMinimap);
 
-    this.offscreenWorker = new Worker(new URL('./worker.js', import.meta.url), {
-      type: 'module',
-    });
+    if (this.instance.getConfiguration().serverSide) {
+      return;
+    }
+
+    this.offscreenWorker = new Worker(
+      new URL('./stage-minimap.worker.js', import.meta.url),
+      {
+        type: 'module',
+      }
+    );
 
     this.offscreenWorker.onmessage = (e) => {
       const width = e.data.width;

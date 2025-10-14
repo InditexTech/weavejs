@@ -23,13 +23,13 @@ import type {
   WeaveCommentNodeOnDragEndEvent,
   WeaveCommentNodeOnCreateCommentEvent,
 } from './types';
-import { merge } from 'lodash';
 import { TextWithMaxLines } from './text-max-lines';
 import type {
   WeaveElementAttributes,
   WeaveElementInstance,
 } from '@inditextech/weave-types';
 import { WeaveNode } from '../node';
+import { mergeExceptArrays } from '@/utils';
 
 export class WeaveCommentNode<T> extends WeaveNode {
   protected nodeType = WEAVE_COMMENT_NODE_TYPE;
@@ -42,7 +42,7 @@ export class WeaveCommentNode<T> extends WeaveNode {
   constructor(params: WeaveCommentNodeParams<T>) {
     super();
 
-    this.config = merge(WEAVE_COMMENT_NODE_DEFAULTS, params.config);
+    this.config = mergeExceptArrays(WEAVE_COMMENT_NODE_DEFAULTS, params.config);
     this.commentDomVisibleId = null;
     this.commentDomVisible = false;
     this.commentDomAction = null;

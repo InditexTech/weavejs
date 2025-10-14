@@ -3,7 +3,6 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { v4 as uuidv4 } from 'uuid';
-import merge from 'lodash/merge';
 import { type WeaveElementInstance } from '@inditextech/weave-types';
 import Konva from 'konva';
 import { type Vector2d } from 'konva/lib/types';
@@ -25,6 +24,7 @@ import type { WeaveStrokeNode } from '@/nodes/stroke/stroke';
 import type { WeaveStrokePoint } from '@/nodes/stroke/types';
 import { SELECTION_TOOL_ACTION_NAME } from '../selection-tool/constants';
 import type { WeaveStageZoomPlugin } from '@/plugins/stage-zoom/stage-zoom';
+import { mergeExceptArrays } from '@/utils';
 
 export class WeaveBrushToolAction extends WeaveAction {
   protected config: WeaveBrushToolActionProperties;
@@ -32,6 +32,7 @@ export class WeaveBrushToolAction extends WeaveAction {
   protected state: WeaveBrushToolActionState;
   protected clickPoint: Vector2d | null;
   protected strokeId: string | null;
+  protected isEraser: boolean;
   protected container: Konva.Layer | Konva.Node | undefined;
   protected measureContainer: Konva.Layer | Konva.Group | undefined;
   protected cancelAction!: () => void;
@@ -41,12 +42,16 @@ export class WeaveBrushToolAction extends WeaveAction {
   constructor(params?: WeaveBrushToolActionParams) {
     super();
 
-    this.config = merge(BRUSH_TOOL_DEFAULT_CONFIG, params?.config ?? {});
+    this.config = mergeExceptArrays(
+      BRUSH_TOOL_DEFAULT_CONFIG,
+      params?.config ?? {}
+    );
     this.initialized = false;
     this.state = BRUSH_TOOL_STATE.INACTIVE;
     this.strokeId = null;
     this.clickPoint = null;
     this.container = undefined;
+    this.isEraser = false;
     this.measureContainer = undefined;
     this.props = this.initProps();
   }
@@ -203,6 +208,7 @@ export class WeaveBrushToolAction extends WeaveAction {
 
       const node = nodeHandler.create(this.strokeId, {
         ...this.props,
+        isEraser: this.isEraser,
         strokeScaleEnabled: true,
         x: 0,
         y: 0,
@@ -349,6 +355,10 @@ export class WeaveBrushToolAction extends WeaveAction {
 
     this.setCursor();
     this.setFocusStage();
+  }
+
+  onEraserMode(): boolean {
+    return this.isEraser;
   }
 
   cleanup(): void {

@@ -15,7 +15,6 @@ import {
   WEAVE_COMMENT_TOOL_DEFAULT_CONFIG,
   WEAVE_COMMENT_TOOL_STATE,
 } from './constants';
-import { merge } from 'lodash';
 import type {
   WeaveCommentNodeOnFinishCreateEvent,
   WeaveCommentNodeOnViewEvent,
@@ -26,6 +25,7 @@ import { WeaveAction } from '../action';
 import type { WeaveNodesSelectionPlugin } from '@/plugins/nodes-selection/nodes-selection';
 import type { WeaveCommentsRendererPlugin } from '@/plugins/comments-renderer/comments-renderer';
 import { WEAVE_COMMENTS_RENDERER_KEY } from '@/plugins/comments-renderer/constants';
+import { mergeExceptArrays } from '@/utils';
 
 export class WeaveCommentToolAction<T> extends WeaveAction {
   private readonly config!: WeaveCommentToolActionConfig<T>;
@@ -42,7 +42,7 @@ export class WeaveCommentToolAction<T> extends WeaveAction {
 
     const { config } = params ?? {};
 
-    this.config = merge(WEAVE_COMMENT_TOOL_DEFAULT_CONFIG, config);
+    this.config = mergeExceptArrays(WEAVE_COMMENT_TOOL_DEFAULT_CONFIG, config);
     this.pointers = new Map<number, Vector2d>();
     this.initialized = false;
     this.state = WEAVE_COMMENT_TOOL_STATE.IDLE;

@@ -2,7 +2,6 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-import _ from 'lodash';
 import Konva from 'konva';
 import { WeavePlugin } from '@/plugins/plugin';
 import {
@@ -25,7 +24,11 @@ import {
 } from './constants';
 import type { KonvaEventObject } from 'konva/lib/Node';
 import type { BoundingBox } from '@inditextech/weave-types';
-import { getTargetAndSkipNodes, getVisibleNodes } from '@/utils';
+import {
+  getTargetAndSkipNodes,
+  getVisibleNodes,
+  mergeExceptArrays,
+} from '@/utils';
 import type { Context } from 'konva/lib/Context';
 import type { WeaveNodesSelectionPlugin } from '../nodes-selection/nodes-selection';
 
@@ -52,7 +55,10 @@ export class WeaveNodesDistanceSnappingPlugin extends WeavePlugin {
     this.exitSnappingTolerance =
       config?.exitSnappingTolerance ?? GUIDE_EXIT_SNAPPING_TOLERANCE;
 
-    this.uiConfig = _.merge(GUIDE_DISTANCE_LINE_DEFAULT_CONFIG, config?.ui);
+    this.uiConfig = mergeExceptArrays(
+      GUIDE_DISTANCE_LINE_DEFAULT_CONFIG,
+      config?.ui
+    );
     this.enabled = true;
   }
 

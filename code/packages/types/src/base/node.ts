@@ -14,6 +14,8 @@ export interface WeaveNodeBase {
 
   create(id: string, props: WeaveElementAttributes): WeaveStateElement;
 
+  onAdd?(nodeInstance: WeaveElementInstance): void;
+
   onRender(props: WeaveElementAttributes): WeaveElementInstance;
 
   onUpdate(

@@ -12,6 +12,8 @@
       "email": "jesusmpc@inditex.com"
     }
   ],
+  "main": "./dist/sdk.cjs",
+  "module": "./dist/sdk.js",
   "exports": {
     "import": "./dist/sdk.js",
     "require": "./dist/sdk.cjs"

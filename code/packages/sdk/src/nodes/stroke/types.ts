@@ -7,6 +7,7 @@ import type { WeaveNodeTransformerProperties } from '@inditextech/weave-types';
 export type WeaveStrokeProperties = {
   splineResolution: number; // Spline resolution
   resamplingSpacing: number; // Spacing for resampling points
+  isEraser?: boolean; // Whether the stroke is an eraser
   transform?: WeaveNodeTransformerProperties;
 };
 

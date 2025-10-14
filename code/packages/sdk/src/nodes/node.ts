@@ -3,7 +3,6 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { Weave } from '@/weave';
-import merge from 'lodash/merge';
 import {
   type WeaveElementAttributes,
   type WeaveElementInstance,
@@ -18,9 +17,11 @@ import Konva from 'konva';
 import { WeaveCopyPasteNodesPlugin } from '@/plugins/copy-paste-nodes/copy-paste-nodes';
 import type { WeaveNodesSelectionPluginOnNodesChangeEvent } from '@/plugins/nodes-selection/types';
 import {
+  cacheParentsRecursively,
   clearContainerTargets,
   containerOverCursor,
   hasFrames,
+  mergeExceptArrays,
   moveNodeToContainer,
 } from '@/utils';
 import type { WeaveNodesEdgeSnappingPlugin } from '@/plugins/nodes-edge-snapping/nodes-edge-snapping';
@@ -517,8 +518,8 @@ export abstract class WeaveNode implements WeaveNodeBase {
 
         const realNode = this.instance.getInstanceRecursive(node);
 
-        const isTargetable = realNode.getAttrs().isTargetable !== false;
-        const isLocked = realNode.getAttrs().locked ?? false;
+        const isTargetable = node.getAttrs().isTargetable !== false;
+        const isLocked = node.getAttrs().locked ?? false;
 
         if ([MOVE_TOOL_ACTION_NAME].includes(activeAction ?? '')) {
           return;
@@ -528,7 +529,7 @@ export abstract class WeaveNode implements WeaveNodeBase {
         if (
           isNodeSelectionEnabled &&
           this.isSelecting() &&
-          !this.isNodeSelected(realNode) &&
+          !this.isNodeSelected(node) &&
           !this.isPasting() &&
           isLocked
         ) {
@@ -540,13 +541,14 @@ export abstract class WeaveNode implements WeaveNodeBase {
         if (
           isNodeSelectionEnabled &&
           this.isSelecting() &&
-          !this.isNodeSelected(realNode) &&
+          !this.isNodeSelected(node) &&
           !this.isPasting() &&
           isTargetable &&
           !isLocked &&
           stage.mode() === WEAVE_STAGE_DEFAULT_MODE
         ) {
           const stage = this.instance.getStage();
+          this.setHoverState(realNode);
           stage.container().style.cursor = 'pointer';
         }
 
@@ -554,7 +556,7 @@ export abstract class WeaveNode implements WeaveNodeBase {
         if (
           isNodeSelectionEnabled &&
           this.isSelecting() &&
-          this.isNodeSelected(realNode) &&
+          this.isNodeSelected(node) &&
           !this.isPasting() &&
           isTargetable &&
           !isLocked &&
@@ -562,6 +564,10 @@ export abstract class WeaveNode implements WeaveNodeBase {
         ) {
           const stage = this.instance.getStage();
           stage.container().style.cursor = 'grab';
+        }
+
+        if (!isTargetable) {
+          this.hideHoverState();
         }
 
         // We're on pasting mode
@@ -641,6 +647,10 @@ export abstract class WeaveNode implements WeaveNodeBase {
         children: [],
       },
     };
+  }
+
+  onAdd(nodeInstance: WeaveElementInstance): void {
+    cacheParentsRecursively(nodeInstance);
   }
 
   abstract onRender(props: WeaveElementAttributes): WeaveElementInstance;
@@ -811,7 +821,7 @@ export abstract class WeaveNode implements WeaveNodeBase {
       };
     }
 
-    return merge(transformProperties, nodeTransformConfig ?? {});
+    return mergeExceptArrays(transformProperties, nodeTransformConfig ?? {});
   }
 
   private getNodesSelectionPlugin() {
