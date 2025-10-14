@@ -513,6 +513,10 @@ export abstract class WeaveNode implements WeaveNodeBase {
         this.handleMouseOver(node);
       };
 
+      node.handleMouseout = () => {
+        this.handleMouseout(node);
+      };
+
       node.on('pointerover', (e) => {
         const doCancelBubble = this.handleMouseOver(e.target);
         if (doCancelBubble) {
@@ -528,8 +532,6 @@ export abstract class WeaveNode implements WeaveNodeBase {
 
     const isNodeSelectionEnabled = this.getSelectionPlugin()?.isEnabled();
 
-    const realNode = this.instance.getInstanceRecursive(node);
-
     const isTargetable = node.getAttrs().isTargetable !== false;
     const isLocked = node.getAttrs().locked ?? false;
 
@@ -537,6 +539,7 @@ export abstract class WeaveNode implements WeaveNodeBase {
       return false;
     }
 
+    let showHover = false;
     let cancelBubble = false;
 
     // Node is locked
@@ -563,7 +566,7 @@ export abstract class WeaveNode implements WeaveNodeBase {
       stage.mode() === WEAVE_STAGE_DEFAULT_MODE
     ) {
       const stage = this.instance.getStage();
-      this.setHoverState(realNode);
+      showHover = true;
       stage.container().style.cursor = 'pointer';
       cancelBubble = true;
     }
@@ -584,7 +587,6 @@ export abstract class WeaveNode implements WeaveNodeBase {
     }
 
     if (!isTargetable) {
-      this.hideHoverState();
       cancelBubble = true;
     }
 
@@ -595,7 +597,21 @@ export abstract class WeaveNode implements WeaveNodeBase {
       cancelBubble = true;
     }
 
+    if (showHover) {
+      this.setHoverState(node);
+    } else {
+      this.hideHoverState();
+    }
+
     return cancelBubble;
+  }
+
+  handleMouseout(node: Konva.Node) {
+    const realNode = this.instance.getInstanceRecursive(node);
+
+    if (realNode) {
+      this.hideHoverState();
+    }
   }
 
   create(key: string, props: WeaveElementAttributes): WeaveStateElement {

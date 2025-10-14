@@ -182,6 +182,7 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
       id: 'selectionTransformer',
       ...this.config.selection,
       listening: true,
+      shouldOverdrawWholeArea: true,
     });
     selectionLayer?.add(tr);
 
@@ -262,16 +263,30 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
 
       if (shape) {
         const targetNode = this.instance.getInstanceRecursive(shape);
-        targetNode?.handleMouseover();
-        if (targetNode) {
+        if (targetNode && targetNode !== nodeHovered) {
+          this.instance.getStage().handleMouseover();
+          nodeHovered?.handleMouseout();
+          targetNode?.handleMouseover();
           nodeHovered = targetNode as Konva.Node | undefined;
         }
+        targetNode?.handleMouseover();
       }
+    });
+
+    window.addEventListener('mouseout', () => {
+      if (nodeHovered) {
+        nodeHovered.handleMouseout();
+        nodeHovered = undefined;
+      }
+      this.instance.getStage().handleMouseover();
+    });
+
+    tr.on('mouseover', () => {
+      stage.container().style.cursor = 'grab';
     });
 
     tr.on('mouseout', () => {
       this.instance.getStage().handleMouseover();
-      nodeHovered?.handleMouseout();
       nodeHovered = undefined;
     });
 
@@ -1104,7 +1119,6 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
         if (
           parent &&
           !containerNodesIds.includes(parent?.getAttrs().id) &&
-          // parent.getAttrs().nodeType !== 'frame' &&
           !node.getAttrs().locked
         ) {
           selectedNodes.add(node);

@@ -13,6 +13,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- [#714](https://github.com/InditexTech/weavejs/issues/714) Cursor not refreshing when mouse over selection 
+
 ## [0.76.0] - 2025-10-14
 
 \### Changed
