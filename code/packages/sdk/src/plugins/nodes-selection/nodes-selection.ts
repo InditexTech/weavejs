@@ -273,14 +273,6 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
       }
     });
 
-    window.addEventListener('mouseout', () => {
-      if (nodeHovered) {
-        nodeHovered.handleMouseout();
-        nodeHovered = undefined;
-      }
-      this.instance.getStage().handleMouseover();
-    });
-
     tr.on('mouseover', () => {
       stage.container().style.cursor = 'grab';
     });
@@ -288,6 +280,14 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
     tr.on('mouseout', () => {
       this.instance.getStage().handleMouseover();
       nodeHovered = undefined;
+    });
+
+    window.addEventListener('mouseout', () => {
+      if (nodeHovered) {
+        nodeHovered.handleMouseout();
+        nodeHovered = undefined;
+      }
+      this.instance.getStage().handleMouseover();
     });
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
