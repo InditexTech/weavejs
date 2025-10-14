@@ -34,8 +34,6 @@ export class WeaveRectangleNode extends WeaveNode {
   onRender(props: WeaveElementAttributes): WeaveElementInstance {
     const rectangle = new Konva.Rect({
       ...props,
-      isCloned: undefined,
-      isCloneOrigin: undefined,
       name: 'node',
       strokeScaleEnabled: true,
     });

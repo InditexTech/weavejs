@@ -2,7 +2,6 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-import merge from 'lodash/merge';
 import Konva from 'konva';
 import type { Context } from 'konva/lib/Context';
 import {
@@ -22,6 +21,7 @@ import type {
   WeaveStrokeProperties,
 } from './types';
 import type { WeaveStageZoomPlugin } from '@/plugins/stage-zoom/stage-zoom';
+import { mergeExceptArrays } from '@/utils';
 
 export class WeaveStrokeNode extends WeaveNode {
   private readonly config: WeaveStrokeProperties;
@@ -32,7 +32,7 @@ export class WeaveStrokeNode extends WeaveNode {
 
     const { config } = params ?? {};
 
-    this.config = merge(WEAVE_STROKE_NODE_DEFAULT_CONFIG, config);
+    this.config = mergeExceptArrays(WEAVE_STROKE_NODE_DEFAULT_CONFIG, config);
   }
 
   private resamplePoints(
@@ -206,6 +206,8 @@ export class WeaveStrokeNode extends WeaveNode {
       sceneFunc: (ctx, shape) => {
         this.drawShape(ctx, shape);
       },
+      lineCap: 'round',
+      lineJoin: 'round',
       dashEnabled: false,
       hitFunc: (context, shape) => {
         context.beginPath();

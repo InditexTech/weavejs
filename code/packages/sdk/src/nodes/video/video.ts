@@ -7,7 +7,6 @@ import {
   type WeaveElementAttributes,
   type WeaveElementInstance,
 } from '@inditextech/weave-types';
-import { merge } from 'lodash';
 import { WeaveNode } from '../node';
 import { WEAVE_VIDEO_DEFAULT_CONFIG, WEAVE_VIDEO_NODE_TYPE } from './constants';
 import type { WeaveNodesSelectionPlugin } from '@/plugins/nodes-selection/nodes-selection';
@@ -21,7 +20,7 @@ import type {
   VideoProps,
 } from './types';
 import type { KonvaEventObject } from 'konva/lib/Node';
-import { isServer } from '@/utils';
+import { isServer, mergeExceptArrays } from '@/utils';
 import type { WeaveStageZoomPluginOnZoomChangeEvent } from '@/plugins/stage-zoom/types';
 
 export class WeaveVideoNode extends WeaveNode {
@@ -39,7 +38,7 @@ export class WeaveVideoNode extends WeaveNode {
 
     const { config } = params ?? {};
 
-    this.config = merge(WEAVE_VIDEO_DEFAULT_CONFIG, config);
+    this.config = mergeExceptArrays(WEAVE_VIDEO_DEFAULT_CONFIG, config);
   }
 
   private initVideoIcon() {

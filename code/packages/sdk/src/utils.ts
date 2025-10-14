@@ -3,6 +3,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import Konva from 'konva';
+import { mergeWith } from 'lodash';
 import type { Weave } from './weave';
 import {
   WEAVE_NODE_CUSTOM_EVENTS,
@@ -592,3 +593,28 @@ export const getPositionRelativeToContainerOnPosition = (
 
   return position;
 };
+
+export const canComposite = (node: Konva.Node) => {
+  const parent = node.getParent();
+
+  return (
+    parent &&
+    parent.getClassName() === 'Group' &&
+    parent.getAttrs().nodeType !== 'frame' &&
+    parent.getAttrs().nodeId === undefined
+  );
+};
+
+export function mergeExceptArrays<TObject, TSource>(
+  object: TObject,
+  source: TSource
+): TObject & TSource {
+  return mergeWith({}, object, source, (objValue, srcValue) => {
+    if (Array.isArray(objValue) && Array.isArray(srcValue)) {
+      // replace instead of merge
+      return srcValue;
+    }
+    // let lodash handle everything else
+    return undefined;
+  });
+}

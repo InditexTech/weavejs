@@ -19,8 +19,8 @@ import {
 } from './constants';
 import { WeavePlugin } from '@/plugins/plugin';
 import Konva from 'konva';
-import { memoize } from '@/utils';
-import { merge, throttle } from 'lodash';
+import { memoize, mergeExceptArrays } from '@/utils';
+import { throttle } from 'lodash';
 import type { Vector2d } from 'konva/lib/types';
 
 export class WeaveUsersPointersPlugin extends WeavePlugin {
@@ -32,7 +32,10 @@ export class WeaveUsersPointersPlugin extends WeavePlugin {
 
     const { config } = params;
 
-    this.config = merge(WEAVE_USERS_POINTERS_CONFIG_DEFAULT_PROPS, config);
+    this.config = mergeExceptArrays(
+      WEAVE_USERS_POINTERS_CONFIG_DEFAULT_PROPS,
+      config
+    );
 
     this.config.getUser = memoize(this.config.getUser);
     this.config.getUserBackgroundColor = memoize(

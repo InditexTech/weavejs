@@ -55,9 +55,8 @@ import { WeaveNodesSelectionPlugin } from './plugins/nodes-selection/nodes-selec
 import type { StageConfig } from 'konva/lib/Stage';
 import type { WeaveStoreOnRoomLoadedEvent } from './stores/types';
 import type { DOMElement, WeaveAsyncElement } from './types';
-import { merge } from 'lodash';
 import { watchMap } from './watch-map';
-import { getBoundingBox } from './utils';
+import { getBoundingBox, mergeExceptArrays } from './utils';
 import type { Container } from 'konva/lib/Container';
 
 export class Weave {
@@ -102,7 +101,7 @@ export class Weave {
     }, new Map());
 
     // Save in memory the configuration provided
-    this.config = merge({ serverSide: false }, weaveConfig);
+    this.config = mergeExceptArrays({ serverSide: false }, weaveConfig);
     // Setup the logger
     this.logger = new WeaveLogger(
       this.config?.logger ?? {

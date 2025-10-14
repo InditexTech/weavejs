@@ -3,7 +3,6 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { WeavePlugin } from '@/plugins/plugin';
-import merge from 'lodash/merge';
 import {
   WEAVE_STAGE_KEYBOARD_MOVE_DEFAULT_CONFIG,
   WEAVE_STAGE_KEYBOARD_MOVE_KEY,
@@ -15,6 +14,7 @@ import type {
   WeaveStageKeyboardMovePluginParams,
 } from './types';
 import type { WeaveNode } from '@/nodes/node';
+import { mergeExceptArrays } from '@/utils';
 
 export class WeaveStageKeyboardMovePlugin extends WeavePlugin {
   private config!: WeaveStageKeyboardMovePluginConfig;
@@ -25,7 +25,7 @@ export class WeaveStageKeyboardMovePlugin extends WeavePlugin {
   constructor(params?: WeaveStageKeyboardMovePluginParams) {
     super();
 
-    this.config = merge(
+    this.config = mergeExceptArrays(
       WEAVE_STAGE_KEYBOARD_MOVE_DEFAULT_CONFIG,
       params?.config ?? {}
     );

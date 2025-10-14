@@ -3,7 +3,6 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { Weave } from '@/weave';
-import merge from 'lodash/merge';
 import {
   type WeaveElementAttributes,
   type WeaveElementInstance,
@@ -21,6 +20,7 @@ import {
   clearContainerTargets,
   containerOverCursor,
   hasFrames,
+  mergeExceptArrays,
   moveNodeToContainer,
 } from '@/utils';
 import type { WeaveNodesEdgeSnappingPlugin } from '@/plugins/nodes-edge-snapping/nodes-edge-snapping';
@@ -510,124 +510,92 @@ export abstract class WeaveNode implements WeaveNodeBase {
       });
 
       node.handleMouseover = () => {
-        const stage = this.instance.getStage();
-        const activeAction = this.instance.getActiveAction();
-
-        const isNodeSelectionEnabled = this.getSelectionPlugin()?.isEnabled();
-
-        const realNode = this.instance.getInstanceRecursive(node);
-
-        const isTargetable = realNode.getAttrs().isTargetable !== false;
-        const isLocked = realNode.getAttrs().locked ?? false;
-
-        if ([MOVE_TOOL_ACTION_NAME].includes(activeAction ?? '')) {
-          return;
-        }
-
-        // Node is locked
-        if (
-          isNodeSelectionEnabled &&
-          this.isSelecting() &&
-          !this.isNodeSelected(realNode) &&
-          !this.isPasting() &&
-          isLocked
-        ) {
-          const stage = this.instance.getStage();
-          stage.container().style.cursor = 'default';
-        }
-
-        // Node is not locked and not selected
-        if (
-          isNodeSelectionEnabled &&
-          this.isSelecting() &&
-          !this.isNodeSelected(realNode) &&
-          !this.isPasting() &&
-          isTargetable &&
-          !isLocked &&
-          stage.mode() === WEAVE_STAGE_DEFAULT_MODE
-        ) {
-          const stage = this.instance.getStage();
-          stage.container().style.cursor = 'pointer';
-        }
-
-        // Node is not locked and selected
-        if (
-          isNodeSelectionEnabled &&
-          this.isSelecting() &&
-          this.isNodeSelected(realNode) &&
-          !this.isPasting() &&
-          isTargetable &&
-          !isLocked &&
-          stage.mode() === WEAVE_STAGE_DEFAULT_MODE
-        ) {
-          const stage = this.instance.getStage();
-          stage.container().style.cursor = 'grab';
-        }
-
-        // We're on pasting mode
-        if (this.isPasting()) {
-          const stage = this.instance.getStage();
-          stage.container().style.cursor = 'crosshair';
-        }
+        this.handleMouseOver(node);
       };
 
       node.on('pointerover', (e) => {
-        const stage = this.instance.getStage();
-        const activeAction = this.instance.getActiveAction();
-
-        const isNodeSelectionEnabled = this.getSelectionPlugin()?.isEnabled();
-
-        const realNode = this.instance.getInstanceRecursive(node);
-
-        const isTargetable = e.target.getAttrs().isTargetable !== false;
-        const isLocked = realNode.getAttrs().locked ?? false;
-
-        if ([MOVE_TOOL_ACTION_NAME].includes(activeAction ?? '')) {
-          return;
-        }
-
-        // Node is locked
-        if (
-          isNodeSelectionEnabled &&
-          this.isSelecting() &&
-          !this.isNodeSelected(realNode) &&
-          !this.isPasting() &&
-          isLocked
-        ) {
-          const stage = this.instance.getStage();
-          stage.container().style.cursor = 'default';
-          e.cancelBubble = true;
-        }
-
-        // Node is not locked
-        if (
-          isNodeSelectionEnabled &&
-          this.isSelecting() &&
-          !this.isNodeSelected(realNode) &&
-          !this.isPasting() &&
-          isTargetable &&
-          !isLocked &&
-          stage.mode() === WEAVE_STAGE_DEFAULT_MODE
-        ) {
-          const stage = this.instance.getStage();
-          stage.container().style.cursor = 'pointer';
-          this.setHoverState(realNode);
-          e.cancelBubble = true;
-        }
-
-        if (!isTargetable) {
-          this.hideHoverState();
-          e.cancelBubble = true;
-        }
-
-        // We're on pasting mode
-        if (this.isPasting()) {
-          const stage = this.instance.getStage();
-          stage.container().style.cursor = 'crosshair';
+        const doCancelBubble = this.handleMouseOver(e.target);
+        if (doCancelBubble) {
           e.cancelBubble = true;
         }
       });
     }
+  }
+
+  handleMouseOver(node: Konva.Node): boolean {
+    const stage = this.instance.getStage();
+    const activeAction = this.instance.getActiveAction();
+
+    const isNodeSelectionEnabled = this.getSelectionPlugin()?.isEnabled();
+
+    const realNode = this.instance.getInstanceRecursive(node);
+
+    const isTargetable = node.getAttrs().isTargetable !== false;
+    const isLocked = node.getAttrs().locked ?? false;
+
+    if ([MOVE_TOOL_ACTION_NAME].includes(activeAction ?? '')) {
+      return false;
+    }
+
+    let cancelBubble = false;
+
+    // Node is locked
+    if (
+      isNodeSelectionEnabled &&
+      this.isSelecting() &&
+      !this.isNodeSelected(node) &&
+      !this.isPasting() &&
+      isLocked
+    ) {
+      const stage = this.instance.getStage();
+      stage.container().style.cursor = 'default';
+      cancelBubble = true;
+    }
+
+    // Node is not locked and not selected
+    if (
+      isNodeSelectionEnabled &&
+      this.isSelecting() &&
+      !this.isNodeSelected(node) &&
+      !this.isPasting() &&
+      isTargetable &&
+      !isLocked &&
+      stage.mode() === WEAVE_STAGE_DEFAULT_MODE
+    ) {
+      const stage = this.instance.getStage();
+      this.setHoverState(realNode);
+      stage.container().style.cursor = 'pointer';
+      cancelBubble = true;
+    }
+
+    // Node is not locked and selected
+    if (
+      isNodeSelectionEnabled &&
+      this.isSelecting() &&
+      this.isNodeSelected(node) &&
+      !this.isPasting() &&
+      isTargetable &&
+      !isLocked &&
+      stage.mode() === WEAVE_STAGE_DEFAULT_MODE
+    ) {
+      const stage = this.instance.getStage();
+      stage.container().style.cursor = 'grab';
+      cancelBubble = true;
+    }
+
+    if (!isTargetable) {
+      this.hideHoverState();
+      cancelBubble = true;
+    }
+
+    // We're on pasting mode
+    if (this.isPasting()) {
+      const stage = this.instance.getStage();
+      stage.container().style.cursor = 'crosshair';
+      cancelBubble = true;
+    }
+
+    return cancelBubble;
   }
 
   create(key: string, props: WeaveElementAttributes): WeaveStateElement {
@@ -642,6 +610,9 @@ export abstract class WeaveNode implements WeaveNodeBase {
       },
     };
   }
+
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  onAdd(nodeInstance: WeaveElementInstance): void {}
 
   abstract onRender(props: WeaveElementAttributes): WeaveElementInstance;
 
@@ -811,7 +782,7 @@ export abstract class WeaveNode implements WeaveNodeBase {
       };
     }
 
-    return merge(transformProperties, nodeTransformConfig ?? {});
+    return mergeExceptArrays(transformProperties, nodeTransformConfig ?? {});
   }
 
   private getNodesSelectionPlugin() {

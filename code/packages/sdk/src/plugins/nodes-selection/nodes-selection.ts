@@ -31,12 +31,12 @@ import {
   getTargetedNode,
   hasFrames,
   intersectArrays,
+  mergeExceptArrays,
   moveNodeToContainer,
 } from '@/utils';
 import { WEAVE_USERS_SELECTION_KEY } from '../users-selection/constants';
 import type { WeaveUsersSelectionPlugin } from '../users-selection/users-selection';
 import type { KonvaEventObject } from 'konva/lib/Node';
-import merge from 'lodash/merge';
 import throttle from 'lodash/throttle';
 import type { Stage } from 'konva/lib/Stage';
 import type { Vector2d } from 'konva/lib/types';
@@ -82,7 +82,7 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
   constructor(params?: WeaveNodesSelectionPluginParams) {
     super();
 
-    this.config = merge(
+    this.config = mergeExceptArrays(
       WEAVE_NODES_SELECTION_DEFAULT_CONFIG,
       params?.config ?? {}
     );
@@ -262,9 +262,8 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
 
       if (shape) {
         const targetNode = this.instance.getInstanceRecursive(shape);
-        this.instance.getStage().handleMouseout();
-        if (targetNode?.handleMouseover) {
-          targetNode?.handleMouseover();
+        targetNode?.handleMouseover();
+        if (targetNode) {
           nodeHovered = targetNode as Konva.Node | undefined;
         }
       }
@@ -835,6 +834,7 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
         this.selecting = false;
         this.stopPanLoop();
         this.hideSelectorArea();
+        this.handleClickOrTap(e);
         return;
       }
 
@@ -1359,7 +1359,7 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
     }
 
     if (nodesSelected === 1) {
-      transformerAttrs = merge(
+      transformerAttrs = mergeExceptArrays(
         transformerAttrs,
         nodes[0].getTransformerProperties()
       );
