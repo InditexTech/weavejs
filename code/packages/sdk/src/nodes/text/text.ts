@@ -129,7 +129,7 @@ export class WeaveTextNode extends WeaveNode {
     if (!this.instance.getConfiguration().serverSide) {
       window.addEventListener('keypress', (e) => {
         if (
-          e.key === 'Enter' &&
+          e.code === 'Enter' &&
           this.instance.getActiveAction() === SELECTION_TOOL_ACTION_NAME &&
           !this.editing &&
           e.target !== this.textArea
@@ -593,7 +593,7 @@ export class WeaveTextNode extends WeaveNode {
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const handleKeyDown = (e: any) => {
-      if (this.textArea && textNode && e.key === 'Escape') {
+      if (this.textArea && textNode && e.code === 'Escape') {
         e.stopPropagation();
 
         updateTextNodeSize();

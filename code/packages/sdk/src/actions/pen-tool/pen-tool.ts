@@ -69,14 +69,14 @@ export class WeavePenToolAction extends WeaveAction {
 
     window.addEventListener('keydown', (e) => {
       if (
-        e.key === 'Enter' &&
+        e.code === 'Enter' &&
         this.instance.getActiveAction() === PEN_TOOL_ACTION_NAME
       ) {
         this.cancelAction();
         return;
       }
       if (
-        e.key === 'Escape' &&
+        e.code === 'Escape' &&
         this.instance.getActiveAction() === PEN_TOOL_ACTION_NAME
       ) {
         this.cancelAction();

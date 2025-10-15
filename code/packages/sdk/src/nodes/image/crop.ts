@@ -285,7 +285,7 @@ export class WeaveImageCrop {
 
     this.image.setAttrs({ cropping: false });
 
-    if (e.key === 'Enter') {
+    if (e.code === 'Enter') {
       this.handleClipEnd();
     }
 
