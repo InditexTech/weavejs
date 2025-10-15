@@ -849,7 +849,7 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
         this.selecting = false;
         this.stopPanLoop();
         this.hideSelectorArea();
-        this.handleClickOrTap(e);
+        // this.handleClickOrTap(e);
         return;
       }
 
@@ -1023,6 +1023,16 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
 
       if (contextMenuPlugin?.isContextMenuVisible()) {
         this.stopPanLoop();
+      }
+
+      const selectedGroup = getTargetedNode(this.instance);
+
+      if (!moved && selectedGroup?.getParent() instanceof Konva.Transformer) {
+        this.selecting = false;
+        this.stopPanLoop();
+        this.hideSelectorArea();
+        this.handleClickOrTap(e);
+        return;
       }
 
       if (!this.selectionRectangle.visible()) {

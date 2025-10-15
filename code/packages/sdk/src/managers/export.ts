@@ -155,6 +155,18 @@ export class WeaveExportManager {
     });
   }
 
+  unpremultiply(data: Uint8ClampedArray) {
+    for (let i = 0; i < data.length; i += 4) {
+      const a = data[i + 3];
+      if (a && a < 255) {
+        const alpha = a / 255;
+        data[i] = Math.min(255, Math.round(data[i] / alpha));
+        data[i + 1] = Math.min(255, Math.round(data[i + 1] / alpha));
+        data[i + 2] = Math.min(255, Math.round(data[i + 2] / alpha));
+      }
+    }
+  }
+
   async exportNodesAsBuffer(
     nodes: string[],
     boundingNodes: (nodes: Konva.Node[]) => Konva.Node[],
@@ -237,8 +249,6 @@ export class WeaveExportManager {
       mainLayer.add(exportGroup);
 
       const backgroundRect = background.getClientRect();
-
-      stage.batchDraw();
 
       const composites: { input: Buffer; left: number; top: number }[] = [];
 

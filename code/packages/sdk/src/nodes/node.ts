@@ -532,6 +532,8 @@ export abstract class WeaveNode implements WeaveNodeBase {
 
     const isNodeSelectionEnabled = this.getSelectionPlugin()?.isEnabled();
 
+    const realNode = this.instance.getInstanceRecursive(node);
+
     const isTargetable = node.getAttrs().isTargetable !== false;
     const isLocked = node.getAttrs().locked ?? false;
 
@@ -546,7 +548,7 @@ export abstract class WeaveNode implements WeaveNodeBase {
     if (
       isNodeSelectionEnabled &&
       this.isSelecting() &&
-      !this.isNodeSelected(node) &&
+      !this.isNodeSelected(realNode) &&
       !this.isPasting() &&
       isLocked
     ) {
@@ -559,7 +561,7 @@ export abstract class WeaveNode implements WeaveNodeBase {
     if (
       isNodeSelectionEnabled &&
       this.isSelecting() &&
-      !this.isNodeSelected(node) &&
+      !this.isNodeSelected(realNode) &&
       !this.isPasting() &&
       isTargetable &&
       !isLocked &&
@@ -575,13 +577,14 @@ export abstract class WeaveNode implements WeaveNodeBase {
     if (
       isNodeSelectionEnabled &&
       this.isSelecting() &&
-      this.isNodeSelected(node) &&
+      this.isNodeSelected(realNode) &&
       !this.isPasting() &&
       isTargetable &&
       !isLocked &&
       stage.mode() === WEAVE_STAGE_DEFAULT_MODE
     ) {
       const stage = this.instance.getStage();
+      showHover = true;
       stage.container().style.cursor = 'grab';
       cancelBubble = true;
     }
@@ -598,7 +601,7 @@ export abstract class WeaveNode implements WeaveNodeBase {
     }
 
     if (showHover) {
-      this.setHoverState(node);
+      this.setHoverState(realNode);
     } else {
       this.hideHoverState();
     }
