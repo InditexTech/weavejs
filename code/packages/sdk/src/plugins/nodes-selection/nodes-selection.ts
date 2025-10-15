@@ -849,7 +849,6 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
         this.selecting = false;
         this.stopPanLoop();
         this.hideSelectorArea();
-        // this.handleClickOrTap(e);
         return;
       }
 
