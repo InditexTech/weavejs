@@ -354,7 +354,7 @@ export class WeaveFrameNode extends WeaveNode {
       this.instance.getPlugin<WeaveNodesSelectionPlugin>('nodesSelection');
 
     if (nodesSelectionPlugin) {
-      nodesSelectionPlugin.getTransformer().forceUpdate();
+      nodesSelectionPlugin.getTransformer()?.forceUpdate();
     }
   }
 

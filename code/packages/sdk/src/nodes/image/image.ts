@@ -23,7 +23,6 @@ import {
   WEAVE_IMAGE_DEFAULT_CONFIG,
   WEAVE_IMAGE_NODE_TYPE,
 } from './constants';
-import { isEqual } from 'lodash';
 import { WEAVE_STAGE_DEFAULT_MODE } from '../stage/constants';
 import { mergeExceptArrays } from '@/utils';
 
@@ -35,18 +34,6 @@ export class WeaveImageNode extends WeaveNode {
   protected lastTapTime: number;
   protected nodeType: string = WEAVE_IMAGE_NODE_TYPE;
   private imageCrop!: WeaveImageCrop | null;
-  private cachedCropInfo!: Record<
-    string,
-    | {
-        scaleX: number;
-        scaleY: number;
-        x: number;
-        y: number;
-        width: number;
-        height: number;
-      }
-    | undefined
-  >;
   private imageLoaded: boolean;
 
   constructor(params?: WeaveImageNodeParams) {
@@ -58,7 +45,6 @@ export class WeaveImageNode extends WeaveNode {
     this.lastTapTime = 0;
     this.config = mergeExceptArrays(WEAVE_IMAGE_DEFAULT_CONFIG, config);
     this.imageCrop = null;
-    this.cachedCropInfo = {};
     this.imageLoaded = false;
   }
 
@@ -157,7 +143,6 @@ export class WeaveImageNode extends WeaveNode {
     );
 
     imageCrop.unCrop();
-    this.cachedCropInfo[imageNode.getAttrs().id ?? ''] = undefined;
   };
 
   loadAsyncElement(nodeId: string) {
@@ -204,8 +189,6 @@ export class WeaveImageNode extends WeaveNode {
       if (!image) {
         return;
       }
-
-      this.cachedCropInfo[image.getAttrs().id ?? ''] = undefined;
     };
 
     image.triggerCrop = () => {
@@ -233,7 +216,6 @@ export class WeaveImageNode extends WeaveNode {
       );
 
       imageCrop.unCrop();
-      this.cachedCropInfo[image.getAttrs().id ?? ''] = undefined;
     };
 
     const defaultTransformerProperties = this.defaultGetTransformerProperties(
@@ -305,43 +287,33 @@ export class WeaveImageNode extends WeaveNode {
     };
 
     if (this.imageSource[id]) {
-      imagePlaceholder?.setAttrs({
-        width: imageProps.width ? imageProps.width : this.imageSource[id].width,
-        height: imageProps.height
-          ? imageProps.height
-          : this.imageSource[id].height,
-        visible: false,
-      });
-      internalImage?.setAttrs({
-        width: imageProps.width ? imageProps.width : this.imageSource[id].width,
-        height: imageProps.height
-          ? imageProps.height
-          : this.imageSource[id].height,
+      imagePlaceholder.destroy();
+      internalImage.setAttrs({
+        width: this.imageSource[id].width,
+        height: this.imageSource[id].height,
         image: this.imageSource[id],
         visible: true,
       });
 
       this.imageLoaded = true;
 
+      image.setAttr('width', this.imageSource[id].width);
+      image.setAttr('height', this.imageSource[id].height);
+      image.setAttr('cropInfo', props.cropInfo ?? undefined);
       image.setAttr(
-        'width',
-        image.width() ? image.width() : this.imageSource[id].width
+        'uncroppedImage',
+        props.uncroppedImage ?? {
+          width: this.imageSource[id].width,
+          height: this.imageSource[id].height,
+        }
       );
-      image.setAttr(
-        'height',
-        image.height() ? image.height() : this.imageSource[id].height
-      );
-      image.setAttr('cropInfo', undefined);
-      image.setAttr('uncroppedImage', {
-        width: image.width() ? image.width() : this.imageSource[id].width,
-        height: image.height() ? image.height() : this.imageSource[id].height,
-      });
       image.setAttr('imageInfo', {
         width: this.imageSource[id].width,
         height: this.imageSource[id].height,
       });
       this.instance.updateNode(this.serialize(image));
     } else {
+      this.updatePlaceholderSize(image, imagePlaceholder);
       this.loadImage(imageProps, image);
     }
 
@@ -588,6 +560,30 @@ export class WeaveImageNode extends WeaveNode {
     });
   }
 
+  updatePlaceholderSize(
+    image: Konva.Group,
+    imagePlaceholder: Konva.Rect
+  ): void {
+    const imageAttrs = image.getAttrs();
+    if (!imageAttrs.adding && imageAttrs.cropInfo) {
+      const actualScale =
+        imageAttrs.uncroppedImage.width / imageAttrs.imageInfo.width;
+      const cropScale = imageAttrs.cropInfo
+        ? imageAttrs.cropInfo.scaleX
+        : actualScale;
+      imagePlaceholder.width(
+        imageAttrs.cropSize.width * (actualScale / cropScale)
+      );
+      imagePlaceholder.height(
+        imageAttrs.cropSize.height * (actualScale / cropScale)
+      );
+    }
+    if (!imageAttrs.adding && !imageAttrs.cropInfo) {
+      imagePlaceholder.width(imageAttrs.uncroppedImage.width);
+      imagePlaceholder.height(imageAttrs.uncroppedImage.height);
+    }
+  }
+
   updateImageCrop(nextProps: WeaveElementAttributes): void {
     const imageAttrs = nextProps;
 
@@ -597,13 +593,7 @@ export class WeaveImageNode extends WeaveNode {
       | Konva.Image
       | undefined;
 
-    if (
-      image &&
-      internalImage &&
-      !imageAttrs.adding &&
-      imageAttrs.cropInfo &&
-      !isEqual(imageAttrs.cropInfo, this.cachedCropInfo[imageAttrs.id ?? ''])
-    ) {
+    if (image && internalImage && !imageAttrs.adding && imageAttrs.cropInfo) {
       const actualScale =
         imageAttrs.uncroppedImage.width / imageAttrs.imageInfo.width;
       const cropScale = imageAttrs.cropInfo
@@ -626,15 +616,8 @@ export class WeaveImageNode extends WeaveNode {
       internalImage.height(
         imageAttrs.cropSize.height * (actualScale / cropScale)
       );
-      this.cachedCropInfo[imageAttrs.id ?? ''] = imageAttrs.cropInfo;
     }
-    if (
-      image &&
-      internalImage &&
-      !imageAttrs.adding &&
-      !imageAttrs.cropInfo &&
-      !isEqual(imageAttrs.cropInfo, this.cachedCropInfo[imageAttrs.id ?? ''])
-    ) {
+    if (image && internalImage && !imageAttrs.adding && !imageAttrs.cropInfo) {
       internalImage.width(imageAttrs.uncroppedImage.width);
       internalImage.height(imageAttrs.uncroppedImage.height);
       internalImage.rotation(0);
@@ -643,7 +626,6 @@ export class WeaveImageNode extends WeaveNode {
       internalImage.crop(undefined);
       internalImage.width(imageAttrs.uncroppedImage.width);
       internalImage.height(imageAttrs.uncroppedImage.height);
-      this.cachedCropInfo[imageAttrs.id ?? ''] = undefined;
     }
   }
 
