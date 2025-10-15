@@ -169,14 +169,14 @@ export class WeaveCopyPasteNodesPlugin extends WeavePlugin {
     const catcher = this.getCatcherElement();
 
     window.addEventListener('keydown', async (e) => {
-      if (stage.isFocused() && e.key === 'c' && (e.ctrlKey || e.metaKey)) {
+      if (stage.isFocused() && e.code === 'KeyC' && (e.ctrlKey || e.metaKey)) {
         e.preventDefault();
 
         await this.performCopy();
 
         return;
       }
-      if (stage.isFocused() && e.key === 'v' && (e.ctrlKey || e.metaKey)) {
+      if (stage.isFocused() && e.code === 'KeyV' && (e.ctrlKey || e.metaKey)) {
         this.focusPasteCatcher();
 
         if (!this.enabled) {

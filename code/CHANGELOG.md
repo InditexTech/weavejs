@@ -16,6 +16,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 - [#716](https://github.com/InditexTech/weavejs/issues/716) Cropped image fails to mantain correct cropping when moved between layers
+- [#718](https://github.com/InditexTech/weavejs/issues/718) Copy / paste not triggering when Caps Lock is active
 
 ## [0.76.1] - 2025-10-14
 

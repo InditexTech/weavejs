@@ -35,7 +35,7 @@ export class WeaveMoveToolAction extends WeaveAction {
 
     window.addEventListener('keydown', (e) => {
       if (
-        e.key === 'Escape' &&
+        e.code === 'Escape' &&
         this.instance.getActiveAction() === MOVE_TOOL_ACTION_NAME
       ) {
         this.cancelAction();

@@ -206,13 +206,16 @@ export class WeaveCommentToolAction<T> extends WeaveAction {
         return;
       }
 
-      if (e.key === 'Escape' && this.state == WEAVE_COMMENT_TOOL_STATE.ADDING) {
+      if (
+        e.code === 'Escape' &&
+        this.state == WEAVE_COMMENT_TOOL_STATE.ADDING
+      ) {
         this.cancelAction();
         return;
       }
 
       if (
-        e.key === 'Escape' &&
+        e.code === 'Escape' &&
         this.state === WEAVE_COMMENT_TOOL_STATE.CREATING_COMMENT
       ) {
         this.setState(WEAVE_COMMENT_TOOL_STATE.ADDING);

@@ -65,14 +65,14 @@ export class WeaveEllipseToolAction extends WeaveAction {
 
     window.addEventListener('keydown', (e) => {
       if (
-        e.key === 'Enter' &&
+        e.code === 'Enter' &&
         this.instance.getActiveAction() === ELLIPSE_TOOL_ACTION_NAME
       ) {
         this.cancelAction();
         return;
       }
       if (
-        e.key === 'Escape' &&
+        e.code === 'Escape' &&
         this.instance.getActiveAction() === ELLIPSE_TOOL_ACTION_NAME
       ) {
         this.cancelAction();

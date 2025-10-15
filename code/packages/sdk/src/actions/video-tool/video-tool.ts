@@ -94,7 +94,7 @@ export class WeaveVideoToolAction extends WeaveAction {
 
     window.addEventListener('keydown', (e) => {
       if (
-        e.key === 'Escape' &&
+        e.code === 'Escape' &&
         this.instance.getActiveAction() === VIDEO_TOOL_ACTION_NAME
       ) {
         this.cancelAction();
