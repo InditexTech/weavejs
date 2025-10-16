@@ -8,7 +8,7 @@ export default defineConfig({
   entry: {
     types: './src/index.ts',
   },
-  format: ['es'],
+  format: ['es', 'cjs'],
   target: 'es2023',
   clean: true,
   dts: true,

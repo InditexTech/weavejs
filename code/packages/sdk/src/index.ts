@@ -12,7 +12,10 @@ export { WeavePlugin } from './plugins/plugin';
 export * from './utils';
 
 // Exporting server side utils
-export { registerCanvasFonts } from './managers/export/utils.node';
+export {
+  registerCanvasFonts,
+  registerSkiaFonts,
+} from './managers/export/utils.node';
 export * from './managers/export/types';
 
 // Provided Nodes

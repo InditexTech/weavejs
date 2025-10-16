@@ -15,6 +15,13 @@ export type CanvasFontDefinition = {
 
 export type CanvasFonts = CanvasFontDefinition[];
 
+export type SkiaFontDefinition = {
+  family: string;
+  paths: string[];
+};
+
+export type SkiaFonts = SkiaFontDefinition[];
+
 export type RenderWeaveRoom = {
   instance: Weave;
   destroy: () => void;
