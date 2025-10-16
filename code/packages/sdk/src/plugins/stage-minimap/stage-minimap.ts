@@ -2,6 +2,7 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
+import path from 'path';
 import Konva from 'konva';
 import { WeavePlugin } from '@/plugins/plugin';
 import {
@@ -188,12 +189,10 @@ export class WeaveStageMinimapPlugin extends WeavePlugin {
       return;
     }
 
-    this.offscreenWorker = new Worker(
-      new URL('./stage-minimap.worker.js', import.meta.url),
-      {
-        type: 'module',
-      }
-    );
+    const workerPath = path.resolve(__dirname, './worker.js');
+    this.offscreenWorker = new Worker(workerPath, {
+      type: 'module',
+    });
 
     this.offscreenWorker.onmessage = (e) => {
       const width = e.data.width;
