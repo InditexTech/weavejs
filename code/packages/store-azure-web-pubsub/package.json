@@ -15,14 +15,15 @@
   "exports": {
     "./client": {
       "import": "./dist/client.js",
-      "require": "./dist/client.cjs"
+      "require": "./dist/client.cjs",
+      "types": "./dist/client.d.ts"
     },
     "./server": {
       "import": "./dist/server.js",
-      "require": "./dist/server.cjs"
+      "require": "./dist/server.cjs",
+      "types": "./dist/server.d.ts"
     }
   },
-  "types": "dist/store-azure-web-pubsub.d.ts",
   "files": [
     "dist"
   ],

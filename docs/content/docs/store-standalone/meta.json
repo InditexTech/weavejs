@@ -1,0 +1,13 @@
+{
+  "title": "Standalone Store",
+  "description": "Store implementation to render a Weave.js canvas in a direct way, just pass a room data.",
+  "icon": "DatabaseZap",
+  "root": true,
+  "pages": [
+    "---Introduction---",
+    "index",
+    "setup",
+    "---API Reference---",
+    "...api-reference"
+  ]
+}

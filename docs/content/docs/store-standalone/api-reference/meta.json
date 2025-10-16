@@ -1,0 +1,5 @@
+{
+  "title": "API Reference",
+  "description": "Store implementation useful when server-side rendering a Weave.js room.",
+  "pages": ["index"]
+}

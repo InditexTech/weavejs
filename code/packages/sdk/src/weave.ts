@@ -49,7 +49,7 @@ import { WeaveSetupManager } from './managers/setup';
 import { WeaveStageManager } from './managers/stage';
 import { WeaveActionsManager } from './managers/actions';
 import { WeaveStoreManager } from './managers/store';
-import { WeaveExportManager } from './managers/export';
+import { WeaveExportManager } from './managers/export/export';
 import { WeavePluginsManager } from './managers/plugins';
 import { WeaveNodesSelectionPlugin } from './plugins/nodes-selection/nodes-selection';
 import type { StageConfig } from 'konva/lib/Stage';
@@ -747,7 +747,7 @@ export class Weave {
     );
   }
 
-  public async exportNodesAsBuffer(
+  public async exportNodesServerSide(
     nodes: string[],
     boundingNodes: (nodes: Konva.Node[]) => Konva.Node[],
     options: WeaveExportNodesOptions
@@ -756,7 +756,7 @@ export class Weave {
     width: number;
     height: number;
   }> {
-    return await this.exportManager.exportNodesAsBuffer(
+    return await this.exportManager.exportNodesServerSide(
       nodes,
       boundingNodes,
       options

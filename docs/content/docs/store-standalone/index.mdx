@@ -1,0 +1,47 @@
+---
+title: Overview
+description: Getting started with Weave.js Standalone store
+---
+
+The Standalone Store is a store for Weave.js that directly render a Room passed to the store.
+Super useful when exporting server-side (mainly used this way), just pass the data of the room
+to export, render it, and then use the exporting utilities to generate the image of the room.
+
+## Usage
+
+<div className="fd-steps">
+
+<div className="[&_h3]:fd-step">
+
+Just use the store on a Weave instance on the server, to render it.
+
+```ts
+import { WeaveStoreStandalone } from "@inditextech/weave-store-standalone/server";
+
+const roomData = "MyRoomBinaryData";
+
+const store = new WeaveStoreStandalone(
+  {
+    roomData,
+  },
+  {
+    getUser: () => {
+      return {
+        id: "user-dummy",
+        name: "User Dummy",
+        email: "user@mail.com",
+      };
+    },
+  }
+);
+```
+
+Explanation:
+
+- **`(1)`**: Import the Weave.js store dependencies.
+- **`(2)`**: Define the room data to load (normally a Yjs binary)
+- **`(3)`**: Instantiate the `WeaveStoreStandalone` class.
+
+</div>
+
+</div>
