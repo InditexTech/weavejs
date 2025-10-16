@@ -12,6 +12,7 @@ import {
   WEAVE_NODE_POSITION,
   WEAVE_TRANSFORMER_ANCHORS,
   WEAVE_STORE_CONNECTION_STATUS,
+  WEAVE_KONVA_BACKEND,
 } from './constants';
 import { type WeaveNodeBase } from '@/base/node';
 import { type WeaveActionBase } from '@/base/action';
@@ -157,6 +158,7 @@ export type WeaveExportNodesOptions = {
   pixelRatio?: number;
   backgroundColor?: string;
   quality?: number;
+  backend?: WeaveKonvaBackend;
 };
 
 export type WeaveExportFormatKeys = keyof typeof WEAVE_EXPORT_FORMATS;
@@ -306,3 +308,7 @@ export type DeepPartial<T> = {
       : DeepPartial<T[P]>
     : T[P];
 };
+
+export type WeaveKonvaBackendKeys = keyof typeof WEAVE_KONVA_BACKEND;
+export type WeaveKonvaBackend =
+  (typeof WEAVE_KONVA_BACKEND)[WeaveKonvaBackendKeys];

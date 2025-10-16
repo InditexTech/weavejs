@@ -42,7 +42,7 @@
     "version:release": "npm version $RELEASE_VERSION -m \"[npm-scripts] prepare release $RELEASE_VERSION\" --tag-version-prefix \"\""
   },
   "dependencies": {
-    "konva": "9.3.20",
+    "konva": "10.0.2",
     "yjs": "13.6.27"
   },
   "devDependencies": {

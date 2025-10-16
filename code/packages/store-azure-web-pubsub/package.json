@@ -55,7 +55,7 @@
     "@azure/web-pubsub": "1.2.0",
     "@syncedstore/core": "0.6.0",
     "buffer": "6.0.3",
-    "konva": "9.3.20",
+    "konva": "10.0.2",
     "reconnecting-websocket": "4.4.0",
     "uuid": "11.1.0",
     "ws": "8.18.1",

@@ -22,6 +22,8 @@ export class WeaveStageNode extends WeaveNode {
       ...props,
     });
 
+    console.log(stage.width(), stage.height());
+
     this.wheelMousePressed = false;
 
     stage.isFocused = () => this.stageFocused;
