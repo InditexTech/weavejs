@@ -365,7 +365,7 @@ export class WeaveTextNode extends WeaveNode {
       }
       height = height + textSize.height * (textNode.lineHeight() ?? 1);
     }
-    return { width, height };
+    return { width: width * 1.01, height };
   }
 
   private mimicTextNode(textNode: Konva.Text) {
