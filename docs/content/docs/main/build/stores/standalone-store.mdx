@@ -1,0 +1,250 @@
+---
+title: Standalone
+description: Store that just renders a Weave.js room, useful for server-side image exporting
+---
+
+## Introduction
+
+The Standalone Store is store for Weave.js that directly renders a room, just pass the room
+data and it will render it.
+
+This store is ideal for server-side export of images.
+
+## Usage
+
+Check the [Standalone store](/docs/store-standalone) package API reference.
+
+## Use cases
+
+### Server-side image exporting
+
+Setup the store server-side for image exporting is pretty easy.
+
+<div className="fd-steps">
+
+<div className="[&_h3]:fd-step">
+ 
+#### Install dependencies
+
+First lets install the necessary dependencies on the backend-side:
+
+```shell
+npm install canvas yjs @inditextech/weave-types @inditextech/weave-sdk @inditextech/weave-store-standalone
+```
+
+</div>
+
+<div className="[&_h3]:fd-step">
+
+#### Setup Custom Fonts (optional)
+
+Weave.js exposes an utility to register custom fonts to be used on the server-side export, just
+define a function, call the utility `registerCanvasFonts` to register the fonts before launching
+the Weave.js instance.
+
+```ts
+import { Weave, registerCanvasFonts } from "@inditextech/weave-sdk"; // (1)
+
+const registerFonts = () => {
+  const fonts: CanvasFonts = [
+    // (2)
+    {
+      path: path.resolve(process.cwd(), "fonts/Impact.ttf"),
+      properties: {
+        family: "Impact",
+        weight: "400",
+        style: "normal",
+      },
+    },
+  ];
+
+  registerCanvasFonts(fonts); // (3)
+};
+```
+
+Explanation:
+
+- **`(1)`**: Import the Weave.js server-side export utils.
+- **`(2)`**: Define the fonts to register.
+- **`(3)`**: Register the fonts for usage.
+
+#### Setup the Weave instance
+
+Then setup your Weave instance for server-side rendering:
+
+```ts
+import { Weave } from "@inditextech/weave-sdk"; // (1)
+
+export type RenderWeaveRoom = {
+  instance: Weave;
+  destroy: () => void;
+};
+
+// (2)
+export const renderWeaveRoom = (roomData: string): Promise<RenderWeaveRoom> => {
+  let weave: Weave | undefined = undefined;
+
+  registerFonts(); // (3)
+
+  // (4)
+  const destroyWeaveRoom = () => {
+    if (weave) {
+      weave.destroy();
+    }
+  };
+
+  return new Promise((resolve) => {
+    const store = new WeaveStoreStandalone( // (5)
+      {
+        roomData,
+      },
+      {
+        getUser: () => {
+          return {
+            id: "user-dummy",
+            name: "User Dummy",
+            email: "user@mail.com",
+          };
+        },
+      }
+    );
+
+    weave = new Weave( // (6)
+      {
+        store,
+        nodes: getNodes(),
+        actions: getActions(),
+        plugins: [],
+        fonts: [],
+        logger: {
+          level: "info",
+        },
+        serverSide: true,
+      },
+      {
+        container: undefined,
+        width: 800,
+        height: 600,
+      }
+    );
+
+    let roomLoaded = false;
+
+    // (7)
+    weave.addEventListener("onRoomLoaded", async (status: boolean) => {
+      if (!weave) {
+        return;
+      }
+
+      if (status) {
+        roomLoaded = true;
+      }
+
+      if (roomLoaded && weave.asyncElementsLoaded()) {
+        resolve({ instance: weave, destroy: destroyWeaveRoom });
+      }
+    });
+
+    // (8)
+    weave.addEventListener("onAsyncElementChange", () => {
+      if (!weave) {
+        return;
+      }
+
+      if (roomLoaded && weave.asyncElementsLoaded()) {
+        resolve({ instance: weave, destroy: destroyWeaveRoom });
+      }
+    });
+
+    weave.start(); // (9)
+  });
+};
+```
+
+Explanation:
+
+- **`(1)`**: Import the necessary dependencies.
+- **`(2)`**: Setup a function that starts the Weave.js instance.
+- **`(3)`**: Register the fonts (if needed).
+- **`(4)`**: Define a callback to destroy the Weave.js instance once the server-side exports ends.
+- **`(5)`**: Define the Standalone store that will load the room that we pass from the frontend.
+- **`(6)`**: Define the Weave.js instance. Important to define the `serverSide` property to `true`.
+- **`(7)`**: Listen to the `onRoomLoaded` event, and when everything is loaded, both the room, and all async
+  elements of the room (images, videos, etc.), return the promise with the instance and the destroy callback.
+- **`(8)`**: Listen to the `onAsyncElementChange` event, and when everything is loaded, both the room, and all async
+  elements of the room (images, videos, etc.), return the promise with the instance and the destroy callback.
+- **`(9)`**: Start the Weave.js instance.
+
+#### Render a room and export it to an image
+
+After the function to render the Weave.j room is defined, then you can this function for example
+on an API endpoint (called from the frontend), that receives the room data to render, this endpoint
+controller can call a [Worker](https://nodejs.org/api/worker_threads.html) - to avoid blocking the
+main Node.js thread, we are not gonna explain here how Workers work on Node.js -, and in the worker
+for example you can:
+
+```ts
+// Worker code
+// (1)
+parentPort?.on("message", async ({ roomData, nodes }) => {
+  // (2)
+  const options = {
+    format: "image/png",
+    padding: 20,
+    pixelRatio: 1,
+    backgroundColor: "#FFFFFF",
+  };
+
+  const { instance, destroy } = await renderWeaveRoom(roomData); // (3)
+
+  // (4)
+  const { composites, width, height } = await instance.exportNodesServerSide(
+    nodes,
+    (nodes) => nodes,
+    {
+      format: options.format,
+      padding: options.padding,
+      pixelRatio: options.pixelRatio,
+      backgroundColor: options.backgroundColor,
+    }
+  );
+
+  destroy(); // (5)
+
+  try {
+    // (6)
+    const composedImage = sharp({
+      create: {
+        width,
+        height,
+        channels: 4,
+        background: { r: 0, g: 0, b: 0, alpha: 0 },
+      },
+    }).composite(composites);
+
+    // (7)
+    const imageBuffer = await composedImage.png().toBuffer();
+    // (8)
+    parentPort?.postMessage(imageBuffer, [imageBuffer.buffer as ArrayBuffer]);
+  } catch (error) {
+    parentPort?.postMessage((error as Error).message);
+  }
+});
+```
+
+Explanation:
+
+- **`(1)`**: Define the worker function to receive messages from the main thread.
+- **`(2)`**: Define the export image options (this can probably be passed as params to the worker).
+- **`(3)`**: Render the room with our previously defined `renderWeaveRoom` function.
+- **`(4)`**: Call the [`exportNodesServerSide`](/docs/sdk/api-reference/weave#exportnodesserverside) function on the Weave.js instance to perform the export, `nodes` can be
+  any node you want.
+- **`(5)`**: After render the image, destroy the Weave.js instance.
+- **`(6)`**: Compose the final image.
+- **`(7)`**: Transform it into a buffer.
+- **`(8)`**: Send the buffer back to the main worker, so it can finish for example zip it and
+  send it back to the client.
+
+</div>
+
+</div>

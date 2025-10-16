@@ -547,6 +547,26 @@ This method exports the specified nodes as an image. You can define the
 exportation options and also define which nodes should be allowed on the bounding box
 calculations.
 
+#### exportNodesServerSide
+
+```ts
+exportNodesServerSide(
+  nodes: WeaveElementInstance[],
+  boundingNodes: (nodes: Konva.Node[]) => Konva.Node[],
+  options: WeaveExportNodeOptions
+): Promise<{
+    composites: { input: Buffer; left: number; top: number }[];
+    width: number;
+    height: number;
+  }>
+```
+
+This method exports the specified nodes (normally server-side). You receive the final image
+width and height, and also the final image segments, the function renders using N segments
+in order to avoid OOM from the canvas side. With this information you can use a tool like
+[sharp](https://sharp.pixelplumbing.com/api-composite/) to composite the final image, and
+probably zip it to send it to the client.
+
 ### Lock / Unlock management
 
 #### allNodesLocked

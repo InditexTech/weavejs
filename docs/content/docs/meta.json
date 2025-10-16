@@ -5,6 +5,7 @@
     "react",
     "store-websockets",
     "store-azure-web-pubsub",
+    "store-standalone",
     "types"
   ]
 }

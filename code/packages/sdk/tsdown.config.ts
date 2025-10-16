@@ -17,7 +17,7 @@ export default defineConfig([
   },
   {
     entry: {
-      sdk: './src/index.ts',
+      sdk: './src/index.node.ts',
     },
     format: ['cjs'],
     target: 'es2023',

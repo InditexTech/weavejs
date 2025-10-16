@@ -1,0 +1,81 @@
+---
+title: WeaveStoreStandalone
+description: API reference for the WeaveStoreStandalone class
+---
+
+import { TypeTable } from "fumadocs-ui/components/type-table";
+
+## Overview
+
+The WeaveStoreStandalone is a client/server-side class in Weave.js Standalone store that
+provides a way to directly render a Room without any of the overhead of the collaboration,
+useful for example when server-side rendering a room for exporting it to an image.
+
+## Import
+
+```shell
+import { WeaveStoreStandalone } from "@inditextech/weave-store-standalone/server";
+```
+
+## Instantiation
+
+```ts
+const store = new WeaveStoreStandalone(params: WeaveStoreStandaloneParams);
+```
+
+## Parameters
+
+<TypeTable
+  type={{
+    roomData: {
+      required: true,
+      description: "The room to load",
+      type: "string",
+    },
+    initialState: {
+      description: "Array of nodes to register and use by the instance",
+      type: "initialState",
+      default: "FetchInitialState",
+    },
+  }}
+/>
+
+## TypeScript types
+
+```ts
+type FetchInitialState = (doc: Y.Doc) => void;
+
+type WeaveStoreStandaloneParams = {
+  roomData: string;
+  initialState?: FetchInitialState;
+};
+```
+
+## Shared-state initial value
+
+If not defined the `defaultInitialState` is used, which is nothing more than:
+
+<Mermaid
+  chart="
+flowchart TD;
+  Stage --> gridLayer;
+  Stage --> mainLayer;
+  Stage --> selectionLayer;
+  Stage --> usersPointersLayer;
+  Stage --> utilityLayer;"
+/>
+
+A [Stage](/docs/main/build/nodes/stage) node with 5 children [Layer](/docs/main/build/nodes/layer)
+nodes, in the specified order (bottom-to-top):
+
+- **gridLayer**: is the layer used by [WeaveStageGridPlugin](/docs/main/build/plugins/stage-grid)
+  to render the reference grid elements.
+- **mainLayer**: is the main layer where all the nodes added by the users live.
+- **selectionLayer**: is the layer used by [WeaveNodesSelectionPlugin](/docs/main/build/plugins/nodes-selection)
+  to render the selection overlay elements.
+- **usersPointersLayer**: is the layer used by [WeaveUsersPointersPlugin](/docs/main/build/plugins/users-pointers)
+  to render the users pointers overlay elements.
+- **utilityLayer**: is a wildcard layer defined that can be used by any plugin.
+
+Check out here the [code](https://github.com/InditexTech/weavejs/blob/main/code/packages/store-websockets/src/server/default-initial-state.ts)
+hat defines the `defaultInitialState` function.
