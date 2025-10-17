@@ -28,7 +28,6 @@ import {
   type WeaveCopyPasteNodesPluginConfig,
 } from './types';
 import type { WeaveNode } from '@/nodes/node';
-import type { Vector2d } from 'konva/lib/types';
 import {
   containerOverCursor,
   getBoundingBox,
@@ -36,6 +35,7 @@ import {
   isInShadowDOM,
 } from '@/utils';
 import type { WeaveStageGridPlugin } from '../stage-grid/stage-grid';
+import type Konva from 'konva';
 
 export class WeaveCopyPasteNodesPlugin extends WeavePlugin {
   protected state: WeaveCopyPasteNodesPluginState;
@@ -249,7 +249,7 @@ export class WeaveCopyPasteNodesPlugin extends WeavePlugin {
     const centerX = (width / 2 - position.x) / scale.x;
     const centerY = (height / 2 - position.y) / scale.y;
 
-    const pastePosition: Vector2d = {
+    const pastePosition: Konva.Vector2d = {
       x: centerX,
       y: centerY,
     };
@@ -315,7 +315,10 @@ export class WeaveCopyPasteNodesPlugin extends WeavePlugin {
     }
   }
 
-  private handlePaste(position?: Vector2d, relativePosition?: Vector2d) {
+  private handlePaste(
+    position?: Konva.Vector2d,
+    relativePosition?: Konva.Vector2d
+  ) {
     const stage = this.instance.getStage();
 
     if (this.toPaste) {
@@ -532,7 +535,10 @@ export class WeaveCopyPasteNodesPlugin extends WeavePlugin {
     await this.performCopy();
   }
 
-  async paste(position?: Vector2d, relativePosition?: Vector2d): Promise<void> {
+  async paste(
+    position?: Konva.Vector2d,
+    relativePosition?: Konva.Vector2d
+  ): Promise<void> {
     const stage = this.instance.getStage();
 
     try {

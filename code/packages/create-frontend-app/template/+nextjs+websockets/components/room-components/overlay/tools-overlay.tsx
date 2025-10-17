@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { Vector2d } from 'konva/lib/types';
+import Konva from 'konva';
 import { ToolbarButton } from '../toolbar/toolbar-button';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { postImage } from '@/api/post-image';
@@ -88,7 +88,7 @@ export function ToolsOverlay() {
       position,
       item,
     }: {
-      position: Vector2d;
+      position: Konva.Vector2d;
       item: ClipboardItem;
     }) => {
       let blob: Blob | null = null;

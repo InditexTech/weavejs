@@ -32,7 +32,6 @@ import { SELECTION_TOOL_ACTION_NAME } from '@/actions/selection-tool/constants';
 import { WEAVE_NODES_EDGE_SNAPPING_PLUGIN_KEY } from '@/plugins/nodes-edge-snapping/constants';
 import { WEAVE_NODES_DISTANCE_SNAPPING_PLUGIN_KEY } from '@/plugins/nodes-distance-snapping/constants';
 import type { WeaveNodesDistanceSnappingPlugin } from '@/plugins/nodes-distance-snapping/nodes-distance-snapping';
-import type { Vector2d } from 'konva/lib/types';
 
 export const augmentKonvaStageClass = (): void => {
   Konva.Stage.prototype.isMouseWheelPressed = function () {
@@ -285,7 +284,7 @@ export abstract class WeaveNode implements WeaveNodeBase {
 
       const stage = this.instance.getStage();
 
-      let originalPosition: Vector2d | null = null;
+      let originalPosition: Konva.Vector2d | null = null;
 
       this.instance.addEventListener('onSelectionState', (state) => {
         const nodesSelectionPlugin = this.getSelectionPlugin();
@@ -828,7 +827,7 @@ export abstract class WeaveNode implements WeaveNodeBase {
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  realOffset(instance: WeaveStateElement): Vector2d {
+  realOffset(instance: WeaveStateElement): Konva.Vector2d {
     return {
       x: 0,
       y: 0,

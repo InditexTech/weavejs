@@ -3,7 +3,6 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import Konva from 'konva';
-import { type Vector2d } from 'konva/lib/types';
 import {
   WEAVE_COMMENT_CREATE_ACTION,
   WEAVE_COMMENT_NODE_ACTION,
@@ -803,7 +802,7 @@ export class WeaveCommentNode<T> extends WeaveNode {
     const x = stagePos.x + rect.x * scaleX + widthContracted + paddingX;
     const y = stagePos.y + rect.y * scaleY + paddingY;
 
-    const position: Vector2d = { x, y };
+    const position: Konva.Vector2d = { x, y };
 
     const container = document.getElementById(`${commentNode.id()}_container`);
 

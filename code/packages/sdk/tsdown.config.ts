@@ -9,12 +9,25 @@ export default defineConfig([
     entry: {
       sdk: './src/index.ts',
     },
+    external: ['konva', 'yjs', 'canvas', 'skia-canvas'],
     format: ['es'],
     target: 'es2023',
     shims: true,
     clean: true,
     dts: true,
-    platform: 'neutral',
+    platform: 'browser',
+  },
+  {
+    entry: {
+      ['sdk.node']: './src/index.node.ts',
+    },
+    external: ['konva', 'yjs', 'canvas', 'skia-canvas'],
+    format: ['es'],
+    target: 'es2023',
+    shims: true,
+    clean: true,
+    dts: true,
+    platform: 'node',
   },
   {
     entry: {

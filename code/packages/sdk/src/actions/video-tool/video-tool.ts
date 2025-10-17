@@ -4,7 +4,6 @@
 
 import { v4 as uuidv4 } from 'uuid';
 import { WeaveAction } from '@/actions/action';
-import { type Vector2d } from 'konva/lib/types';
 import {
   type WeaveVideoToolActionTriggerParams,
   type WeaveVideoToolActionState,
@@ -27,9 +26,9 @@ export class WeaveVideoToolAction extends WeaveAction {
   protected cursorPadding: number = 5;
   protected videoId: string | null;
   protected container: Konva.Layer | Konva.Node | undefined;
-  protected pointers: Map<number, Vector2d>;
+  protected pointers: Map<number, Konva.Vector2d>;
   protected videoParams: WeaveVideoToolDragParams | null;
-  protected clickPoint: Vector2d | null;
+  protected clickPoint: Konva.Vector2d | null;
   protected forceMainContainer: boolean = false;
   protected cancelAction!: () => void;
   onPropsChange = undefined;
@@ -38,7 +37,7 @@ export class WeaveVideoToolAction extends WeaveAction {
   constructor() {
     super();
 
-    this.pointers = new Map<number, Vector2d>();
+    this.pointers = new Map<number, Konva.Vector2d>();
     this.initialized = false;
     this.state = VIDEO_TOOL_STATE.IDLE;
     this.videoId = null;
@@ -74,7 +73,7 @@ export class WeaveVideoToolAction extends WeaveAction {
     this.instance.addEventListener('onStageDrop', (e) => {
       if (window.weaveDragVideoId && window.weaveDragVideoParams) {
         this.instance.getStage().setPointersPositions(e);
-        const position: Vector2d | null | undefined =
+        const position: Konva.Vector2d | null | undefined =
           getPositionRelativeToContainerOnPosition(this.instance);
 
         this.instance.triggerAction(VIDEO_TOOL_ACTION_NAME, {
@@ -140,7 +139,7 @@ export class WeaveVideoToolAction extends WeaveAction {
 
   private doVideoAdding(
     videoParams: WeaveVideoToolDragParams,
-    position?: Vector2d
+    position?: Konva.Vector2d
   ) {
     this.videoId = uuidv4();
     this.videoParams = videoParams;
@@ -159,7 +158,7 @@ export class WeaveVideoToolAction extends WeaveAction {
     }
   }
 
-  private addVideo(position?: Vector2d) {
+  private addVideo(position?: Konva.Vector2d) {
     if (position) {
       this.clickPoint = position;
     }
@@ -167,7 +166,7 @@ export class WeaveVideoToolAction extends WeaveAction {
     this.setState(VIDEO_TOOL_STATE.UPLOADING);
   }
 
-  private handleAdding(position?: Vector2d) {
+  private handleAdding(position?: Konva.Vector2d) {
     if (this.videoId && this.videoParams) {
       const { mousePoint, container } = this.instance.getMousePointer(position);
 

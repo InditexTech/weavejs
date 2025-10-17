@@ -1,6 +1,6 @@
 'use client';
 
-import { Vector2d } from 'konva/lib/types';
+import Konva from 'konva';
 import { create } from 'zustand';
 import { ContextMenuOption } from '@/components/room-components/context-menu';
 import { WeaveElementAttributes } from '@inditextech/weave-types';
@@ -46,7 +46,7 @@ interface CollaborationRoomState {
   room: string | undefined;
   contextMenu: {
     show: boolean;
-    position: Vector2d;
+    position: Konva.Vector2d;
     options: ContextMenuOption[];
   };
   nodeProperties: {
@@ -68,7 +68,7 @@ interface CollaborationRoomState {
   setUser: (newUser: ShowcaseUser | undefined) => void;
   setRoom: (newRoom: string | undefined) => void;
   setContextMenuShow: (newContextMenuShow: boolean) => void;
-  setContextMenuPosition: (newContextMenuPosition: Vector2d) => void;
+  setContextMenuPosition: (newContextMenuPosition: Konva.Vector2d) => void;
   setContextMenuOptions: (newContextMenuOptions: ContextMenuOption[]) => void;
   setTransformingImage: (newTransformingImage: boolean) => void;
   setUploadingImage: (newUploadingImage: boolean) => void;

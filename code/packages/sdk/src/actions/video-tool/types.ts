@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-import type { Vector2d } from 'konva/lib/types';
+import Konva from 'konva';
 import { VIDEO_TOOL_STATE } from './constants';
 
 export type WeaveVideoToolActionStateKeys = keyof typeof VIDEO_TOOL_STATE;
@@ -19,7 +19,7 @@ export type WeaveVideoToolDragParams = {
 export type WeaveVideoToolActionTriggerParams = {
   videoId?: string;
   videoParams?: WeaveVideoToolDragParams;
-  position?: Vector2d;
+  position?: Konva.Vector2d;
   forceMainContainer?: boolean;
 };
 
@@ -32,7 +32,7 @@ export type WeaveVideoToolActionTriggerReturn =
   | {
       finishUploadCallback: (
         videoParams: WeaveVideoToolDragParams,
-        position?: Vector2d
+        position?: Konva.Vector2d
       ) => void;
     }
   | undefined;

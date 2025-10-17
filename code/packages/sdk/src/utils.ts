@@ -3,18 +3,16 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import Konva from 'konva';
-import { mergeWith } from 'lodash';
+import mergeWith from 'lodash/mergeWith';
 import type { Weave } from './weave';
 import {
   WEAVE_NODE_CUSTOM_EVENTS,
   type WeaveElementInstance,
 } from '@inditextech/weave-types';
 import type { WeaveNode } from './nodes/node';
-import type { Vector2d } from 'konva/lib/types';
 import type { WeaveNodesSelectionPlugin } from './plugins/nodes-selection/nodes-selection';
-import type { KonvaEventObject } from 'konva/lib/Node';
 import type { DOMElement } from './types';
-import type { Container } from 'konva/lib/Container';
+import type { KonvaEventObject } from 'konva/lib/Node';
 
 export function resetScale(node: Konva.Node): void {
   node.width(
@@ -46,7 +44,7 @@ export function clearContainerTargets(instance: Weave): void {
 export function containerOverCursor(
   instance: Weave,
   ignoreNodes: Konva.Node[],
-  definedCursorPosition?: Vector2d
+  definedCursorPosition?: Konva.Vector2d
 ): Konva.Node | undefined {
   Konva.hitOnDragEnabled = true;
 
@@ -222,7 +220,7 @@ export function getBoundingBox(
         skipTransform?: boolean;
         skipShadow?: boolean;
         skipStroke?: boolean;
-        relativeTo?: Container;
+        relativeTo?: Konva.Container;
       }
     | undefined
 ): {
@@ -348,11 +346,11 @@ export function getSelectedNodesMetadata(transformer: Konva.Transformer): {
   const firstNode = transformer.getNodes()[0];
   const firstNodeClientRect = firstNode.getClientRect();
 
-  const rectCoordsMin: Vector2d = {
+  const rectCoordsMin: Konva.Vector2d = {
     x: firstNodeClientRect.x,
     y: firstNodeClientRect.y,
   };
-  const rectCoordsMax: Vector2d = {
+  const rectCoordsMax: Konva.Vector2d = {
     x: firstNodeClientRect.x + firstNodeClientRect.width,
     y: firstNodeClientRect.y + firstNodeClientRect.height,
   };
@@ -572,8 +570,8 @@ export const isServer = () => typeof window === 'undefined';
 
 export const getPositionRelativeToContainerOnPosition = (
   instance: Weave
-): Vector2d | null | undefined => {
-  let position: Vector2d | null | undefined = instance
+): Konva.Vector2d | null | undefined => {
+  let position: Konva.Vector2d | null | undefined = instance
     .getStage()
     .getRelativePointerPosition();
 

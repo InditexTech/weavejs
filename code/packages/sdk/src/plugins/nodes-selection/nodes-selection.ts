@@ -39,7 +39,6 @@ import type { WeaveUsersSelectionPlugin } from '../users-selection/users-selecti
 import type { KonvaEventObject } from 'konva/lib/Node';
 import throttle from 'lodash/throttle';
 import type { Stage } from 'konva/lib/Stage';
-import type { Vector2d } from 'konva/lib/types';
 import { WEAVE_STAGE_DEFAULT_MODE } from '@/nodes/stage/constants';
 import type { TransformerConfig } from 'konva/lib/shapes/Transformer';
 import { SELECTION_TOOL_ACTION_NAME } from '@/actions/selection-tool/constants';
@@ -306,7 +305,7 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
       this.triggerSelectedNodesEvent();
     });
 
-    let initialPos: Vector2d | null = null;
+    let initialPos: Konva.Vector2d | null = null;
 
     tr.on('dragstart', (e) => {
       initialPos = { x: e.target.x(), y: e.target.y() };
@@ -707,7 +706,10 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
     };
   }
 
-  private checkMovedDrag(init: Vector2d, actual: Vector2d): boolean {
+  private checkMovedDrag(
+    init: Konva.Vector2d,
+    actual: Konva.Vector2d
+  ): boolean {
     if (!this.tapStart) {
       return false;
     }

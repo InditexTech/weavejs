@@ -2,14 +2,14 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-import type { Vector2d } from 'konva/lib/types';
 import { type WeaveUser } from '@inditextech/weave-types';
 import type { WeaveCommentStatus } from '@/nodes/comment/types';
+import type Konva from 'konva';
 
 export type WeaveCommentsRendererModel<T> = {
   getId: (comment: T) => string;
   getUser: (comment: T) => WeaveUser;
-  getPosition: (comment: T) => Vector2d;
+  getPosition: (comment: T) => Konva.Vector2d;
   getStatus: (comment: T) => WeaveCommentStatus;
 };
 

@@ -11,7 +11,6 @@ import {
   type NodeSerializable,
   type WeaveStateElement,
 } from '@inditextech/weave-types';
-import { type Vector2d } from 'konva/lib/types';
 
 export type WeaveCopyPasteNodesPluginStateKeys =
   keyof typeof COPY_PASTE_NODES_PLUGIN_STATE;
@@ -29,7 +28,7 @@ export type WeaveCopyPasteNodesPluginOnPasteExternalEvent = {
   items?: ClipboardItems;
   dataList?: DataTransferItemList;
   positionCalculated: boolean;
-  position: Vector2d;
+  position: Konva.Vector2d;
 };
 
 export type WeaveCopyPastePasteModeKeys =
@@ -43,11 +42,11 @@ export type WeavePasteModel = {
     string,
     {
       element: WeaveStateElement;
-      posRelativeToSelection: Vector2d;
+      posRelativeToSelection: Konva.Vector2d;
       containerId: string;
     }
   >;
-  weaveMinPoint: Vector2d;
+  weaveMinPoint: Konva.Vector2d;
 };
 
 export type WeaveToPasteNode = {

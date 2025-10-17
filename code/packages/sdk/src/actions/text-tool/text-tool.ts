@@ -4,7 +4,6 @@
 
 import { v4 as uuidv4 } from 'uuid';
 import { WeaveAction } from '@/actions/action';
-import { type Vector2d } from 'konva/lib/types';
 import {
   type WeaveTextToolActionOnAddingEvent,
   type WeaveTextToolActionState,
@@ -26,7 +25,7 @@ export class WeaveTextToolAction extends WeaveAction {
   protected state: WeaveTextToolActionState;
   protected textId: string | null;
   protected container: Konva.Layer | Konva.Node | undefined;
-  protected clickPoint: Vector2d | null;
+  protected clickPoint: Konva.Vector2d | null;
   protected cancelAction!: () => void;
   onPropsChange = undefined;
   onInit = undefined;

@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-import type { Vector2d } from 'konva/lib/types';
+import Konva from 'konva';
 import { IMAGE_TOOL_STATE } from './constants';
 import type { ImageCrossOrigin } from '@inditextech/weave-types';
 
@@ -22,7 +22,7 @@ export type WeaveImageToolActionTriggerParams = {
   imageURL?: string;
   imageId?: string;
   options?: ImageOptions;
-  position?: Vector2d;
+  position?: Konva.Vector2d;
   forceMainContainer?: boolean;
 };
 
@@ -34,7 +34,7 @@ export type WeaveImageToolActionTriggerReturn =
   | {
       finishUploadCallback: (
         imageURL: string,
-        position?: Vector2d | undefined
+        position?: Konva.Vector2d | undefined
       ) => void;
     }
   | undefined;

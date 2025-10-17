@@ -10,7 +10,7 @@ import { Weave } from '@/weave';
 import { type Logger } from 'pino';
 import type { WeaveActionPropsChangeEvent } from './types';
 import type { KonvaEventObject } from 'konva/lib/Node';
-import type { Stage } from 'konva/lib/Stage';
+import type Konva from 'konva';
 
 export abstract class WeaveAction implements WeaveActionBase {
   protected instance!: Weave;
@@ -68,11 +68,11 @@ export abstract class WeaveAction implements WeaveActionBase {
     return this.props;
   }
 
-  isPressed(e: KonvaEventObject<PointerEvent, Stage>): boolean {
+  isPressed(e: KonvaEventObject<PointerEvent, Konva.Stage>): boolean {
     return e.evt.buttons > 0;
   }
 
-  setTapStart(e: KonvaEventObject<PointerEvent, Stage>): void {
+  setTapStart(e: KonvaEventObject<PointerEvent, Konva.Stage>): void {
     this.tapStart = {
       x: e.evt.clientX,
       y: e.evt.clientY,
@@ -80,7 +80,7 @@ export abstract class WeaveAction implements WeaveActionBase {
     };
   }
 
-  isTap(e: KonvaEventObject<PointerEvent, Stage>): boolean {
+  isTap(e: KonvaEventObject<PointerEvent, Konva.Stage>): boolean {
     if (!this.tapStart) {
       return false;
     }

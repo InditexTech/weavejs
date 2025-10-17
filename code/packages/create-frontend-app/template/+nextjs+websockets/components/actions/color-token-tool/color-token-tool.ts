@@ -1,5 +1,4 @@
 import { v4 as uuidv4 } from 'uuid';
-import { Vector2d } from 'konva/lib/types';
 import {
   ColorTokenToolActionState,
   ColorTokenToolActionTriggerParams,
@@ -14,7 +13,7 @@ export class ColorTokenToolAction extends WeaveAction {
   protected state: ColorTokenToolActionState;
   protected colorTokenId: string | null;
   protected container: Konva.Layer | Konva.Group | undefined;
-  protected clickPoint: Vector2d | null;
+  protected clickPoint: Konva.Vector2d | null;
   protected cancelAction!: () => void;
   onPropsChange = undefined;
 
@@ -85,7 +84,7 @@ export class ColorTokenToolAction extends WeaveAction {
     this.state = state;
   }
 
-  private addColorToken(position?: Vector2d) {
+  private addColorToken(position?: Konva.Vector2d) {
     const stage = this.instance.getStage();
 
     stage.container().style.cursor = 'crosshair';
@@ -103,7 +102,7 @@ export class ColorTokenToolAction extends WeaveAction {
     this.setState(COLOR_TOKEN_TOOL_STATE.ADDING);
   }
 
-  private handleAdding(position?: Vector2d) {
+  private handleAdding(position?: Konva.Vector2d) {
     const { mousePoint, container } = this.instance.getMousePointer(position);
 
     this.clickPoint = mousePoint;

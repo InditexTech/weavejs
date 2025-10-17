@@ -9,7 +9,6 @@ import {
   type WeaveStateElement,
 } from '@inditextech/weave-types';
 import { WeaveNode } from '@/nodes/node';
-import { type Vector2d } from 'konva/lib/types';
 import { WeaveNodesSelectionPlugin } from '@/plugins/nodes-selection/nodes-selection';
 import { getTopmostShadowHost, isInShadowDOM, resetScale } from '@/utils';
 import { WEAVE_TEXT_NODE_TYPE } from './constants';
@@ -397,7 +396,7 @@ export class WeaveTextNode extends WeaveNode {
     this.textArea.style.color = `${textNode.fill()}`;
   }
 
-  private createTextAreaDOM(textNode: Konva.Text, position: Vector2d) {
+  private createTextAreaDOM(textNode: Konva.Text, position: Konva.Vector2d) {
     const stage = this.instance.getStage();
 
     // create textarea and style it
@@ -693,7 +692,7 @@ export class WeaveTextNode extends WeaveNode {
     }
 
     const textPosition = textNode.getClientRect();
-    const position: Vector2d = {
+    const position: Konva.Vector2d = {
       x: textPosition.x,
       y: textPosition.y,
     };
@@ -787,7 +786,7 @@ export class WeaveTextNode extends WeaveNode {
     const stageContainer = stage.container();
     const stageRect = stageContainer.getBoundingClientRect();
 
-    const areaPosition: Vector2d = {
+    const areaPosition: Konva.Vector2d = {
       x: stageRect.x + stageContainer.offsetLeft + textPosition.x,
       y: stageRect.y + stageContainer.offsetTop + textPosition.y,
     };

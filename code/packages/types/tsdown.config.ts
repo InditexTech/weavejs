@@ -8,6 +8,7 @@ export default defineConfig({
   entry: {
     types: './src/index.ts',
   },
+  external: ['konva', 'yjs'],
   format: ['es'],
   target: 'es2023',
   clean: true,

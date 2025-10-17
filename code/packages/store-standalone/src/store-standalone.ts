@@ -3,7 +3,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import * as Y from 'yjs';
-import { WeaveStore } from '@inditextech/weave-sdk';
+import { WeaveStore } from '@inditextech/weave-sdk/server';
 import { type WeaveStoreOptions } from '@inditextech/weave-types';
 import { WEAVE_STORE_STANDALONE } from './constants.js';
 import type { FetchInitialState, WeaveStoreStandaloneParams } from './types.js';

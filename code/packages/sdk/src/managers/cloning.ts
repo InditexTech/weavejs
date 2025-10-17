@@ -6,7 +6,6 @@ import { orderBy } from 'lodash';
 import Konva from 'konva';
 import { v4 as uuidv4 } from 'uuid';
 import { Weave } from '@/weave';
-import { type Vector2d } from 'konva/lib/types';
 import { type Logger } from 'pino';
 import {
   type WeaveElementInstance,
@@ -28,7 +27,7 @@ export class WeaveCloningManager {
   nodesToGroupSerialized(instancesToClone: Konva.Node[]):
     | {
         serializedNodes: WeaveStateElement[];
-        minPoint: Vector2d;
+        minPoint: Konva.Vector2d;
       }
     | undefined {
     if (instancesToClone.length === 0) {
@@ -127,7 +126,7 @@ export class WeaveCloningManager {
       clonedNode.rotation(nodeRotation);
     }
 
-    const minPoint: Vector2d = { x: Infinity, y: Infinity };
+    const minPoint: Konva.Vector2d = { x: Infinity, y: Infinity };
     const serializedNodes: WeaveStateElement[] = [];
     newGroup.getChildren().forEach((node) => {
       const nodeHandler = this.instance.getNodeHandler<WeaveNode>(
@@ -157,7 +156,7 @@ export class WeaveCloningManager {
   cloneNodes(
     instancesToClone: Konva.Node[],
     targetContainer: Konva.Group | Konva.Layer | undefined,
-    onPoint: Vector2d
+    onPoint: Konva.Vector2d
   ): void {
     if (instancesToClone.length === 0) {
       return;

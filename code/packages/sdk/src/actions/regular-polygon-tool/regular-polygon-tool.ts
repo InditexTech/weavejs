@@ -4,7 +4,6 @@
 
 import { v4 as uuidv4 } from 'uuid';
 import Konva from 'konva';
-import { type Vector2d } from 'konva/lib/types';
 import { type WeaveElementInstance } from '@inditextech/weave-types';
 import { WeaveAction } from '@/actions/action';
 import {
@@ -26,8 +25,8 @@ export class WeaveRegularPolygonToolAction extends WeaveAction {
   protected regularPolygonId: string | null;
   protected creating: boolean;
   protected moved: boolean;
-  protected pointers: Map<number, Vector2d>;
-  protected clickPoint: Vector2d | null;
+  protected pointers: Map<number, Konva.Vector2d>;
+  protected clickPoint: Konva.Vector2d | null;
   protected container!: Konva.Layer | Konva.Node | undefined;
   protected cancelAction!: () => void;
   onPropsChange = undefined;
@@ -36,7 +35,7 @@ export class WeaveRegularPolygonToolAction extends WeaveAction {
   constructor() {
     super();
 
-    this.pointers = new Map<number, Vector2d>();
+    this.pointers = new Map<number, Konva.Vector2d>();
     this.initialized = false;
     this.state = REGULAR_POLYGON_TOOL_STATE.IDLE;
     this.regularPolygonId = null;
@@ -209,7 +208,7 @@ export class WeaveRegularPolygonToolAction extends WeaveAction {
           'regular-polygon'
         );
 
-      const starPos: Vector2d = {
+      const starPos: Konva.Vector2d = {
         x: this.clickPoint.x,
         y: this.clickPoint.y,
       };
@@ -262,7 +261,7 @@ export class WeaveRegularPolygonToolAction extends WeaveAction {
 
       const deltaX = Math.abs(mousePoint.x - this.clickPoint?.x);
 
-      const starPos: Vector2d = {
+      const starPos: Konva.Vector2d = {
         x: this.clickPoint.x,
         y: this.clickPoint.y,
       };

@@ -12,7 +12,6 @@ import { WeaveNode } from '../node';
 import { WEAVE_ELLIPSE_NODE_TYPE } from './constants';
 import type { WeaveNodesSelectionPlugin } from '@/plugins/nodes-selection/nodes-selection';
 import type { WeaveEllipseNodeParams, WeaveEllipseProperties } from './types';
-import type { Vector2d } from 'konva/lib/types';
 
 export class WeaveEllipseNode extends WeaveNode {
   private config: WeaveEllipseProperties;
@@ -114,7 +113,7 @@ export class WeaveEllipseNode extends WeaveNode {
     node.scale({ x: 1, y: 1 });
   }
 
-  realOffset(element: WeaveStateElement): Vector2d {
+  realOffset(element: WeaveStateElement): Konva.Vector2d {
     return {
       x: element.props.radiusX,
       y: element.props.radiusY,

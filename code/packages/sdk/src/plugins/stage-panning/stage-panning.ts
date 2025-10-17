@@ -7,9 +7,6 @@ import {
   WEAVE_STAGE_PANNING_DEFAULT_CONFIG,
   WEAVE_STAGE_PANNING_KEY,
 } from './constants';
-import type { KonvaEventObject } from 'konva/lib/Node';
-import type { Stage } from 'konva/lib/Stage';
-import type { Vector2d } from 'konva/lib/types';
 import type { WeaveStageZoomPlugin } from '../stage-zoom/stage-zoom';
 import type { WeaveContextMenuPlugin } from '../context-menu/context-menu';
 import { MOVE_TOOL_ACTION_NAME } from '@/actions/move-tool/constants';
@@ -31,6 +28,7 @@ import type {
   WeaveStagePanningPluginConfig,
   WeaveStagePanningPluginParams,
 } from './types';
+import type { KonvaEventObject } from 'konva/lib/Node';
 
 export class WeaveStagePanningPlugin extends WeavePlugin {
   private readonly config!: WeaveStagePanningPluginConfig;
@@ -41,7 +39,7 @@ export class WeaveStagePanningPlugin extends WeavePlugin {
   private isDragging: boolean;
   private enableMove: boolean;
   private isSpaceKeyPressed: boolean;
-  private pointers: Map<number, Vector2d>;
+  private pointers: Map<number, Konva.Vector2d>;
   private panning: boolean = false;
   protected previousPointer!: string | null;
   protected currentPointer: Konva.Vector2d | null = null;
@@ -131,7 +129,7 @@ export class WeaveStagePanningPlugin extends WeavePlugin {
       }
     });
 
-    let lastPos: Vector2d | null = null;
+    let lastPos: Konva.Vector2d | null = null;
 
     stage.on('pointerdown', (e) => {
       this.pointers.set(e.evt.pointerId, {
@@ -184,7 +182,9 @@ export class WeaveStagePanningPlugin extends WeavePlugin {
       lastPos = null;
     });
 
-    const handleMouseMove = (e: KonvaEventObject<PointerEvent, Stage>) => {
+    const handleMouseMove = (
+      e: KonvaEventObject<PointerEvent, Konva.Stage>
+    ) => {
       const pos = stage.getPointerPosition();
       if (pos) this.currentPointer = pos;
 
@@ -385,7 +385,7 @@ export class WeaveStagePanningPlugin extends WeavePlugin {
     return this.panning;
   }
 
-  getDistance(p1: Vector2d, p2: Vector2d): number {
+  getDistance(p1: Konva.Vector2d, p2: Konva.Vector2d): number {
     const dx = p2.x - p1.x;
     const dy = p2.y - p1.y;
     return Math.hypot(dx, dy);
