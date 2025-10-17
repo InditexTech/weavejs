@@ -22,7 +22,7 @@
     "link": "nx run-many -t link",
     "lint": "nx run-many -t lint",
     "lint:fix": "nx run-many -t lint:fix",
-    "package": "nx run-many -t package",
+    "pack": "nx run-many -t pack",
     "prepare": "cd ../ && node code/.husky/install.mjs",
     "publish:snapshot": "nx run-many -t publish:snapshot -- --verbose --tag next --unsafe-perm",
     "release:perform": "nx run-many -t release:perform -- --verbose --unsafe-perm",
