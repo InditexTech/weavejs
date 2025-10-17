@@ -18,7 +18,6 @@ import {
 } from './constants';
 import { WeavePlugin } from '@/plugins/plugin';
 import Konva from 'konva';
-import { type Vector2d } from 'konva/lib/types';
 import { memoize } from '@/utils';
 
 export class WeaveUsersSelectionPlugin extends WeavePlugin {
@@ -145,8 +144,8 @@ export class WeaveUsersSelectionPlugin extends WeavePlugin {
   } {
     const stage = this.instance.getStage();
 
-    const maxPoint: Vector2d = { x: -Infinity, y: -Infinity };
-    const minPoint: Vector2d = { x: Infinity, y: Infinity };
+    const maxPoint: Konva.Vector2d = { x: -Infinity, y: -Infinity };
+    const minPoint: Konva.Vector2d = { x: Infinity, y: Infinity };
 
     for (const nodeId of nodes) {
       const node = stage.findOne(`#${nodeId}`);

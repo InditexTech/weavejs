@@ -3,7 +3,6 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { v4 as uuidv4 } from 'uuid';
-import { type Vector2d } from 'konva/lib/types';
 import { FRAME_TOOL_ACTION_NAME, FRAME_TOOL_STATE } from './constants';
 import Konva from 'konva';
 import { WeaveAction } from '../action';
@@ -24,7 +23,7 @@ export class WeaveFrameToolAction extends WeaveAction {
   protected state: WeaveFrameToolActionState;
   protected frameId: string | null;
   protected container: Konva.Layer | Konva.Node | undefined;
-  protected clickPoint: Vector2d | null;
+  protected clickPoint: Konva.Vector2d | null;
   protected cancelAction!: () => void;
   onPropsChange = undefined;
   onInit = undefined;

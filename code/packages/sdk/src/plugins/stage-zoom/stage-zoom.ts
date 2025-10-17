@@ -16,7 +16,7 @@ import {
   WEAVE_STAGE_ZOOM_KEY,
   WEAVE_STAGE_ZOOM_TYPE,
 } from './constants';
-import type { Vector2d } from 'konva/lib/types';
+import Konva from 'konva';
 import {
   getBoundingBox,
   getTopmostShadowHost,
@@ -96,7 +96,11 @@ export class WeaveStageZoomPlugin extends WeavePlugin {
     this.setZoom(this.config.zoomSteps[this.actualStep]);
   }
 
-  private setZoom(scale: number, centered: boolean = true, pointer?: Vector2d) {
+  private setZoom(
+    scale: number,
+    centered: boolean = true,
+    pointer?: Konva.Vector2d
+  ) {
     const stage = this.instance.getStage();
 
     const mainLayer = this.instance.getMainLayer();
@@ -222,7 +226,7 @@ export class WeaveStageZoomPlugin extends WeavePlugin {
     return this.config.zoomSteps.findIndex((scale) => scale === nextValue);
   }
 
-  zoomIn(pointer?: Vector2d): void {
+  zoomIn(pointer?: Konva.Vector2d): void {
     if (!this.enabled) {
       return;
     }
@@ -247,7 +251,7 @@ export class WeaveStageZoomPlugin extends WeavePlugin {
     );
   }
 
-  zoomOut(pointer?: Vector2d): void {
+  zoomOut(pointer?: Konva.Vector2d): void {
     if (!this.enabled) {
       return;
     }
@@ -479,11 +483,11 @@ export class WeaveStageZoomPlugin extends WeavePlugin {
     this.enabled = false;
   }
 
-  getDistance(p1: Vector2d, p2: Vector2d) {
+  getDistance(p1: Konva.Vector2d, p2: Konva.Vector2d) {
     return Math.sqrt(Math.pow(p2.x - p1.x, 2) + Math.pow(p2.y - p1.y, 2));
   }
 
-  getCenter(p1: Vector2d, p2: Vector2d) {
+  getCenter(p1: Konva.Vector2d, p2: Konva.Vector2d) {
     return {
       x: (p1.x + p2.x) / 2,
       y: (p1.y + p2.y) / 2,
@@ -505,7 +509,7 @@ export class WeaveStageZoomPlugin extends WeavePlugin {
 
     const stage = this.instance.getStage();
 
-    let lastCenter: Vector2d | null = null;
+    let lastCenter: Konva.Vector2d | null = null;
     let lastDist = 0;
 
     stage.getContent().addEventListener(
@@ -695,7 +699,7 @@ export class WeaveStageZoomPlugin extends WeavePlugin {
       return;
     }
 
-    let pointer: Vector2d | null = null;
+    let pointer: Konva.Vector2d | null = null;
     if (this.zoomInertiaType === WEAVE_STAGE_ZOOM_TYPE.MOUSE_WHEEL) {
       const stage = this.instance.getStage();
       pointer = stage.getPointerPosition();

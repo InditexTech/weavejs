@@ -4,7 +4,6 @@
 
 import { v4 as uuidv4 } from 'uuid';
 import Konva from 'konva';
-import { type Vector2d } from 'konva/lib/types';
 import type {
   WeaveCommentToolActionState,
   WeaveCommentToolActionParams,
@@ -31,9 +30,9 @@ export class WeaveCommentToolAction<T> extends WeaveAction {
   private readonly config!: WeaveCommentToolActionConfig<T>;
   protected initialized: boolean = false;
   protected state: WeaveCommentToolActionState;
-  protected pointers: Map<number, Vector2d>;
+  protected pointers: Map<number, Konva.Vector2d>;
   protected commentId: string | null;
-  protected clickPoint: Vector2d | null;
+  protected clickPoint: Konva.Vector2d | null;
   protected cancelAction!: () => void;
   onPropsChange = undefined;
 
@@ -43,7 +42,7 @@ export class WeaveCommentToolAction<T> extends WeaveAction {
     const { config } = params ?? {};
 
     this.config = mergeExceptArrays(WEAVE_COMMENT_TOOL_DEFAULT_CONFIG, config);
-    this.pointers = new Map<number, Vector2d>();
+    this.pointers = new Map<number, Konva.Vector2d>();
     this.initialized = false;
     this.state = WEAVE_COMMENT_TOOL_STATE.IDLE;
     this.commentId = null;

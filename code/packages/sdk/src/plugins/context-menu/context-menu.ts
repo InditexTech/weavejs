@@ -12,7 +12,6 @@ import {
   type WeaveElementInstance,
   type WeaveSelection,
 } from '@inditextech/weave-types';
-import { type Vector2d } from 'konva/lib/types';
 import { WeaveNodesSelectionPlugin } from '../nodes-selection/nodes-selection';
 import {
   WEAVE_CONTEXT_MENU_PLUGIN_KEY,
@@ -25,7 +24,6 @@ import { WEAVE_NODES_SELECTION_KEY } from '@/plugins/nodes-selection/constants';
 import Konva from 'konva';
 import type { KonvaEventObject } from 'konva/lib/Node';
 import type { Stage } from 'konva/lib/Stage';
-import { Transformer } from 'konva/lib/shapes/Transformer';
 import { getTargetedNode } from '@/utils';
 import { SELECTION_TOOL_ACTION_NAME } from '@/actions/selection-tool/constants';
 
@@ -122,7 +120,7 @@ export class WeaveContextMenuPlugin extends WeavePlugin {
     if (
       selectionPlugin &&
       !(
-        eventTarget.getParent() instanceof Transformer &&
+        eventTarget.getParent() instanceof Konva.Transformer &&
         selectionPlugin.getSelectedNodes().length > 0
       )
     ) {
@@ -135,7 +133,7 @@ export class WeaveContextMenuPlugin extends WeavePlugin {
     const relativeClickPoint = stage.getRelativePointerPosition();
 
     if (containerRect && pointerPos && relativeClickPoint) {
-      const contextMenuPoint: Vector2d = {
+      const contextMenuPoint: Konva.Vector2d = {
         x: containerRect.left + pointerPos.x + (this.config.xOffset ?? 4),
         y: containerRect.top + pointerPos.y + (this.config.yOffset ?? 4),
       };
@@ -271,7 +269,7 @@ export class WeaveContextMenuPlugin extends WeavePlugin {
       const pointerPos = stage.getPointerPosition();
 
       if (containerRect && pointerPos) {
-        const contextMenuPoint: Vector2d = {
+        const contextMenuPoint: Konva.Vector2d = {
           x: containerRect.left + pointerPos.x + (this.config.xOffset ?? 4),
           y: containerRect.top + pointerPos.y + (this.config.yOffset ?? 4),
         };
@@ -292,7 +290,7 @@ export class WeaveContextMenuPlugin extends WeavePlugin {
     });
   }
 
-  private getStageClickPoint(pointerPos: Vector2d): Vector2d {
+  private getStageClickPoint(pointerPos: Konva.Vector2d): Konva.Vector2d {
     const stage = this.instance.getStage();
 
     const scale = stage.scale();

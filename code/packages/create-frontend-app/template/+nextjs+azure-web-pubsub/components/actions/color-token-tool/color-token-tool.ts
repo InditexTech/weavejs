@@ -1,5 +1,5 @@
 import { v4 as uuidv4 } from 'uuid';
-import { Vector2d } from 'konva/lib/types';
+import { Vector2d } from 'konva';
 import {
   ColorTokenToolActionState,
   ColorTokenToolActionTriggerParams,

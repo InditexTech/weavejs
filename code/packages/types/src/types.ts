@@ -18,7 +18,6 @@ import { type WeaveNodeBase } from '@/base/node';
 import { type WeaveActionBase } from '@/base/action';
 import { type WeavePluginBase } from '@/base/plugin';
 import { type WeaveStoreBase } from '@/base/store';
-import type { Vector2d } from 'konva/lib/types';
 
 // Configuration handling
 
@@ -97,7 +96,7 @@ export type WeaveSelection = {
 };
 
 export type WeaveMousePointInfoSimple = {
-  mousePoint: Vector2d;
+  mousePoint: Konva.Vector2d;
   container: Konva.Layer | Konva.Node | undefined;
 };
 
@@ -108,7 +107,7 @@ export type WeaveMousePointInfo = WeaveMousePointInfoSimple & {
 export type WeaveSerializedGroup =
   | {
       serializedNodes: WeaveStateElement[];
-      minPoint: Vector2d;
+      minPoint: Konva.Vector2d;
     }
   | undefined;
 

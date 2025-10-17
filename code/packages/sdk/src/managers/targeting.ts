@@ -4,7 +4,6 @@
 
 import Konva from 'konva';
 import { Weave } from '@/weave';
-import { type Vector2d } from 'konva/lib/types';
 import { type Logger } from 'pino';
 import type {
   WeaveMousePointInfo,
@@ -45,7 +44,7 @@ export class WeaveTargetingManager {
     return undefined;
   }
 
-  pointIntersectsElement(point?: Vector2d): Konva.Node | null {
+  pointIntersectsElement(point?: Konva.Vector2d): Konva.Node | null {
     const stage = this.instance.getStage();
     const relativeMousePointer = point
       ? point
@@ -180,7 +179,7 @@ export class WeaveTargetingManager {
     return intersectedNode;
   }
 
-  getMousePointer(point?: Vector2d): WeaveMousePointInfo {
+  getMousePointer(point?: Konva.Vector2d): WeaveMousePointInfo {
     this.logger.debug({ point }, 'getMousePointer');
     const stage = this.instance.getStage();
     const mainLayer = this.instance.getMainLayer();

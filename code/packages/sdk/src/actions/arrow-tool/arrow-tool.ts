@@ -4,7 +4,6 @@
 
 import { v4 as uuidv4 } from 'uuid';
 import Konva from 'konva';
-import { type Vector2d } from 'konva/lib/types';
 import { WeaveAction } from '@/actions/action';
 import {
   type WeaveArrowToolActionOnAddingEvent,
@@ -25,8 +24,8 @@ export class WeaveArrowToolAction extends WeaveAction {
   protected tempArrowNode: Konva.Arrow | null;
   protected container: Konva.Layer | Konva.Node | undefined;
   protected measureContainer: Konva.Layer | Konva.Group | undefined;
-  protected clickPoint: Vector2d | null;
-  protected pointers: Map<number, Vector2d>;
+  protected clickPoint: Konva.Vector2d | null;
+  protected pointers: Map<number, Konva.Vector2d>;
   protected tempPoint: Konva.Circle | undefined;
   protected tempNextPoint: Konva.Circle | undefined;
   protected cancelAction!: () => void;
@@ -36,7 +35,7 @@ export class WeaveArrowToolAction extends WeaveAction {
   constructor() {
     super();
 
-    this.pointers = new Map<number, Vector2d>();
+    this.pointers = new Map<number, Konva.Vector2d>();
     this.initialized = false;
     this.state = ARROW_TOOL_STATE.IDLE;
     this.arrowId = null;

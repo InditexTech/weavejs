@@ -5,7 +5,6 @@
 import Emittery from 'emittery';
 import Konva from 'konva';
 import { v4 as uuidv4 } from 'uuid';
-import { type Vector2d } from 'konva/lib/types';
 import pino, { type Logger } from 'pino';
 import {
   type WeaveConfig,
@@ -57,7 +56,6 @@ import type { WeaveStoreOnRoomLoadedEvent } from './stores/types';
 import type { DOMElement, WeaveAsyncElement } from './types';
 import { watchMap } from './watch-map';
 import { getBoundingBox, mergeExceptArrays } from './utils';
-import type { Container } from 'konva/lib/Container';
 
 export class Weave {
   private id: string;
@@ -614,7 +612,7 @@ export class Weave {
           skipTransform?: boolean;
           skipShadow?: boolean;
           skipStroke?: boolean;
-          relativeTo?: Container;
+          relativeTo?: Konva.Container;
         }
       | undefined
   ): {
@@ -664,7 +662,7 @@ export class Weave {
     return undefined;
   }
 
-  pointIntersectsElement(point?: Vector2d): Konva.Node | null {
+  pointIntersectsElement(point?: Konva.Vector2d): Konva.Node | null {
     return this.targetingManager.pointIntersectsElement(point);
   }
 
@@ -678,7 +676,7 @@ export class Weave {
     );
   }
 
-  getMousePointer(point?: Vector2d): WeaveMousePointInfo {
+  getMousePointer(point?: Konva.Vector2d): WeaveMousePointInfo {
     return this.targetingManager.getMousePointer(point);
   }
 
@@ -718,7 +716,7 @@ export class Weave {
   cloneNodes(
     instancesToClone: Konva.Node[],
     targetContainer: Konva.Layer | Konva.Group | undefined,
-    onPoint: Vector2d
+    onPoint: Konva.Vector2d
   ): void {
     this.cloningManager.cloneNodes(instancesToClone, targetContainer, onPoint);
   }

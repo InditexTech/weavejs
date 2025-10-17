@@ -4,7 +4,6 @@
 
 import { v4 as uuidv4 } from 'uuid';
 import Konva from 'konva';
-import { type Vector2d } from 'konva/lib/types';
 import { WeaveAction } from '@/actions/action';
 import {
   type WeaveRectangleToolActionOnAddingEvent,
@@ -21,8 +20,8 @@ export class WeaveRectangleToolAction extends WeaveAction {
   protected rectId: string | null;
   protected moved: boolean;
   protected tempRectNode: Konva.Rect | null;
-  protected pointers: Map<number, Vector2d>;
-  protected clickPoint: Vector2d | null;
+  protected pointers: Map<number, Konva.Vector2d>;
+  protected clickPoint: Konva.Vector2d | null;
   protected container!: Konva.Layer | Konva.Node | undefined;
   protected measureContainer: Konva.Layer | Konva.Group | undefined;
   protected cancelAction!: () => void;
@@ -32,7 +31,7 @@ export class WeaveRectangleToolAction extends WeaveAction {
   constructor() {
     super();
 
-    this.pointers = new Map<number, Vector2d>();
+    this.pointers = new Map<number, Konva.Vector2d>();
     this.initialized = false;
     this.state = RECTANGLE_TOOL_STATE.IDLE;
     this.rectId = null;
@@ -193,7 +192,7 @@ export class WeaveRectangleToolAction extends WeaveAction {
         this.container
       );
 
-      const rectPos: Vector2d = {
+      const rectPos: Konva.Vector2d = {
         x: this.clickPoint.x,
         y: this.clickPoint.y,
       };

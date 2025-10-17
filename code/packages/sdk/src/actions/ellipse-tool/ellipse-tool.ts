@@ -4,7 +4,6 @@
 
 import { v4 as uuidv4 } from 'uuid';
 import Konva from 'konva';
-import { type Vector2d } from 'konva/lib/types';
 import { type WeaveElementInstance } from '@inditextech/weave-types';
 import { WeaveAction } from '@/actions/action';
 import {
@@ -23,8 +22,8 @@ export class WeaveEllipseToolAction extends WeaveAction {
   protected ellipseId: string | null;
   protected creating: boolean;
   protected moved: boolean;
-  protected pointers: Map<number, Vector2d>;
-  protected clickPoint: Vector2d | null;
+  protected pointers: Map<number, Konva.Vector2d>;
+  protected clickPoint: Konva.Vector2d | null;
   protected container!: Konva.Layer | Konva.Node | undefined;
   protected cancelAction!: () => void;
   onPropsChange = undefined;
@@ -33,7 +32,7 @@ export class WeaveEllipseToolAction extends WeaveAction {
   constructor() {
     super();
 
-    this.pointers = new Map<number, Vector2d>();
+    this.pointers = new Map<number, Konva.Vector2d>();
     this.initialized = false;
     this.state = ELLIPSE_TOOL_STATE.IDLE;
     this.ellipseId = null;
@@ -200,7 +199,7 @@ export class WeaveEllipseToolAction extends WeaveAction {
       const nodeHandler =
         this.instance.getNodeHandler<WeaveEllipseNode>('ellipse');
 
-      const ellipsePos: Vector2d = {
+      const ellipsePos: Konva.Vector2d = {
         x: this.clickPoint.x,
         y: this.clickPoint.y,
       };
@@ -250,7 +249,7 @@ export class WeaveEllipseToolAction extends WeaveAction {
       const deltaX = Math.abs(mousePoint.x - this.clickPoint?.x);
       const deltaY = Math.abs(mousePoint.y - this.clickPoint?.y);
 
-      const ellipsePos: Vector2d = {
+      const ellipsePos: Konva.Vector2d = {
         x: this.clickPoint.x,
         y: this.clickPoint.y,
       };

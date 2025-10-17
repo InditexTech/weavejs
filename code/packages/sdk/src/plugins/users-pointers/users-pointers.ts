@@ -21,7 +21,6 @@ import { WeavePlugin } from '@/plugins/plugin';
 import Konva from 'konva';
 import { memoize, mergeExceptArrays } from '@/utils';
 import { throttle } from 'lodash';
-import type { Vector2d } from 'konva/lib/types';
 
 export class WeaveUsersPointersPlugin extends WeavePlugin {
   private usersPointers: Record<string, WeaveUserPointer>;
@@ -146,7 +145,7 @@ export class WeaveUsersPointersPlugin extends WeavePlugin {
     this.renderPointers();
   }
 
-  private sendAwarenessUpdate(mousePos: Vector2d) {
+  private sendAwarenessUpdate(mousePos: Konva.Vector2d) {
     const store = this.instance.getStore();
     const userInfo = this.config.getUser();
 

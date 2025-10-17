@@ -4,7 +4,6 @@
 
 import { v4 as uuidv4 } from 'uuid';
 import { WeaveAction } from '@/actions/action';
-import { type Vector2d } from 'konva/lib/types';
 import {
   type WeaveImageToolActionTriggerParams,
   type WeaveImageToolActionState,
@@ -30,9 +29,9 @@ export class WeaveImageToolAction extends WeaveAction {
   protected tempImageId: string | null;
   protected tempImageNode: Konva.Image | null;
   protected container: Konva.Layer | Konva.Node | undefined;
-  protected pointers: Map<number, Vector2d>;
+  protected pointers: Map<number, Konva.Vector2d>;
   protected imageURL: string | null;
-  protected clickPoint: Vector2d | null;
+  protected clickPoint: Konva.Vector2d | null;
   protected forceMainContainer: boolean = false;
   protected cancelAction!: () => void;
   onPropsChange = undefined;
@@ -41,7 +40,7 @@ export class WeaveImageToolAction extends WeaveAction {
   constructor() {
     super();
 
-    this.pointers = new Map<number, Vector2d>();
+    this.pointers = new Map<number, Konva.Vector2d>();
     this.initialized = false;
     this.state = IMAGE_TOOL_STATE.IDLE;
     this.imageId = null;
@@ -69,7 +68,7 @@ export class WeaveImageToolAction extends WeaveAction {
     this.instance.addEventListener('onStageDrop', (e) => {
       if (window.weaveDragImageURL) {
         this.instance.getStage().setPointersPositions(e);
-        const position: Vector2d | null | undefined =
+        const position: Konva.Vector2d | null | undefined =
           getPositionRelativeToContainerOnPosition(this.instance);
 
         this.instance.triggerAction(IMAGE_TOOL_ACTION_NAME, {
@@ -165,7 +164,7 @@ export class WeaveImageToolAction extends WeaveAction {
     this.state = state;
   }
 
-  private loadImage(imageURL: string, position?: Vector2d) {
+  private loadImage(imageURL: string, position?: Konva.Vector2d) {
     this.setCursor();
     this.setFocusStage();
 
@@ -217,7 +216,7 @@ export class WeaveImageToolAction extends WeaveAction {
     return window.matchMedia('(pointer: coarse)').matches;
   }
 
-  private addImageNode(position?: Vector2d) {
+  private addImageNode(position?: Konva.Vector2d) {
     const stage = this.instance.getStage();
 
     this.setCursor();
@@ -279,7 +278,7 @@ export class WeaveImageToolAction extends WeaveAction {
     this.setState(IMAGE_TOOL_STATE.DEFINING_POSITION);
   }
 
-  private addImage(position?: Vector2d) {
+  private addImage(position?: Konva.Vector2d) {
     if (position) {
       this.clickPoint = position;
     }
@@ -287,7 +286,7 @@ export class WeaveImageToolAction extends WeaveAction {
     this.setState(IMAGE_TOOL_STATE.UPLOADING);
   }
 
-  private handleAdding(position?: Vector2d) {
+  private handleAdding(position?: Konva.Vector2d) {
     if (this.imageId) {
       const imageNodeHandler = this.getImageNodeHandler();
 

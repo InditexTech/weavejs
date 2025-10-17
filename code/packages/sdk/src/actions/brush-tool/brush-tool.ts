@@ -5,7 +5,6 @@
 import { v4 as uuidv4 } from 'uuid';
 import { type WeaveElementInstance } from '@inditextech/weave-types';
 import Konva from 'konva';
-import { type Vector2d } from 'konva/lib/types';
 import { WeaveAction } from '@/actions/action';
 import {
   type WeaveBrushToolActionOnAddedEvent,
@@ -30,7 +29,7 @@ export class WeaveBrushToolAction extends WeaveAction {
   protected config: WeaveBrushToolActionProperties;
   protected initialized: boolean = false;
   protected state: WeaveBrushToolActionState;
-  protected clickPoint: Vector2d | null;
+  protected clickPoint: Konva.Vector2d | null;
   protected strokeId: string | null;
   protected isEraser: boolean;
   protected container: Konva.Layer | Konva.Node | undefined;
