@@ -54,10 +54,8 @@
   },
   "dependencies": {
     "@syncedstore/core": "0.6.0",
-    "konva": "10.0.2",
     "ws": "8.18.1",
-    "y-websocket": "3.0.0",
-    "yjs": "13.6.27"
+    "y-websocket": "3.0.0"
   },
   "devDependencies": {
     "@inditextech/weave-sdk": "1.1.0-SNAPSHOT",
@@ -86,8 +84,10 @@
     "vitest-sonar-reporter": "2.0.0"
   },
   "peerDependencies": {
-    "@inditextech/weave-sdk": ">= 0.x",
-    "ioredis": ">= 5.6.1"
+    "@inditextech/weave-sdk": ">= 1.x",
+    "konva": "10.0.2",
+    "ioredis": ">= 5.6.1",
+    "yjs": "13.6.27"
   },
   "engines": {
     "node": "^18.12 || ^20.11 || ^22.11",
