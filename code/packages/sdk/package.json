@@ -1,6 +1,6 @@
 {
   "name": "@inditextech/weave-sdk",
-  "version": "0.78.0-SNAPSHOT",
+  "version": "1.0.0",
   "type": "module",
   "license": "Apache-2.0",
   "author": "Jesus Manuel Piñeiro Cid <jesusmpc@inditex.com>",
@@ -46,7 +46,7 @@
     "version:release": "npm version $RELEASE_VERSION -m \"[npm-scripts] prepare release $RELEASE_VERSION\" --tag-version-prefix \"\""
   },
   "dependencies": {
-    "@inditextech/weave-types": "0.78.0-SNAPSHOT",
+    "@inditextech/weave-types": "1.0.0",
     "@syncedstore/core": "0.6.0",
     "canvas": "3.2.0",
     "skia-canvas": "3.0.8",
