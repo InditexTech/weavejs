@@ -9,7 +9,7 @@ export default defineConfig([
     entry: {
       sdk: './src/index.ts',
     },
-    format: ['es', 'cjs'],
+    format: ['es'],
     target: 'es2023',
     shims: true,
     clean: true,
@@ -21,7 +21,7 @@ export default defineConfig([
       'stage-minimap.worker':
         './src/plugins/stage-minimap/stage-minimap.worker.ts',
     },
-    format: ['es', 'cjs'],
+    format: ['es'],
     target: 'es2023',
     clean: true,
     dts: true,

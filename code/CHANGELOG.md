@@ -15,7 +15,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- [#722](https://github.com/InditexTech/weavejs/issues/722) Update to Konva 10
+- [#722](https://github.com/InditexTech/weavejs/issues/722) Update to Konva 10 and removal of CommonJS support
 
 ## [0.77.0] - 2025-10-16
 
