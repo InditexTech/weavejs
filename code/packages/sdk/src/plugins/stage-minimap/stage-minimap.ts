@@ -188,12 +188,10 @@ export class WeaveStageMinimapPlugin extends WeavePlugin {
       return;
     }
 
-    this.offscreenWorker = new Worker(
-      new URL('./stage-minimap.worker.js', import.meta.url),
-      {
-        type: 'module',
-      }
-    );
+    const workerPath = new URL('./stage-minimap.worker.js', import.meta.url);
+    this.offscreenWorker = new Worker(workerPath, {
+      type: 'module',
+    });
 
     this.offscreenWorker.onmessage = (e) => {
       const width = e.data.width;

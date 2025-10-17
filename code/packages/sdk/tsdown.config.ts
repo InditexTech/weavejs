@@ -11,27 +11,17 @@ export default defineConfig([
     },
     format: ['es'],
     target: 'es2023',
-    clean: true,
-    dts: true,
-    platform: 'browser',
-  },
-  {
-    entry: {
-      sdk: './src/index.node.ts',
-    },
-    format: ['cjs'],
-    target: 'es2023',
     shims: true,
     clean: true,
     dts: true,
-    platform: 'node',
+    platform: 'neutral',
   },
   {
     entry: {
       'stage-minimap.worker':
         './src/plugins/stage-minimap/stage-minimap.worker.ts',
     },
-    format: ['es', 'cjs'],
+    format: ['es'],
     target: 'es2023',
     clean: true,
     dts: true,

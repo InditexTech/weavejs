@@ -78,3 +78,8 @@ export const WEAVE_STORE_CONNECTION_STATUS = {
   ['CONNECTED']: 'connected',
   ['DISCONNECTED']: 'disconnected',
 } as const;
+
+export const WEAVE_KONVA_BACKEND = {
+  ['CANVAS']: 'canvas',
+  ['SKIA']: 'skia',
+} as const;

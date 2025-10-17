@@ -10,6 +10,7 @@ import {
   type WeaveExportNodesOptions,
   WEAVE_EXPORT_BACKGROUND_COLOR,
   WEAVE_EXPORT_FORMATS,
+  WEAVE_KONVA_BACKEND,
 } from '@inditextech/weave-types';
 import Konva from 'konva';
 import { getExportBoundingBox } from '@/utils';
@@ -169,6 +170,7 @@ export class WeaveExportManager {
       padding = 0,
       pixelRatio = 1,
       backgroundColor = WEAVE_EXPORT_BACKGROUND_COLOR,
+      backend = 'canvas',
     } = options;
 
     this.getNodesSelectionPlugin()?.disable();
@@ -255,7 +257,7 @@ export class WeaveExportManager {
           const width = Math.min(tileWidth, imageWidth - x);
           const height = Math.min(tileHeight, imageHeight - y);
 
-          const canvas = (await exportGroup.toCanvas({
+          const canvas: any = await exportGroup.toCanvas({
             x: Math.round(backgroundRect.x) + x,
             y: Math.round(backgroundRect.y) + y,
             width: width,
@@ -264,9 +266,19 @@ export class WeaveExportManager {
             pixelRatio,
             quality: options.quality ?? 1,
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          })) as any;
+          });
 
-          const buffer = canvas.toBuffer();
+          let buffer: Buffer | null = null;
+          if (backend === WEAVE_KONVA_BACKEND.CANVAS) {
+            buffer = canvas.toBuffer();
+          }
+          if (backend === WEAVE_KONVA_BACKEND.SKIA) {
+            buffer = await canvas.toBuffer();
+          }
+
+          if (!buffer) {
+            throw new Error('Failed to generate image buffer');
+          }
 
           composites.push({
             top: y * pixelRatio,

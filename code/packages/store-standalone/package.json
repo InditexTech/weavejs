@@ -39,6 +39,7 @@
     "link": "npm link",
     "lint:fix": "npm run lint -- --fix",
     "lint": "eslint ./src",
+    "pack": "npm pack",
     "publish:snapshot": "npm publish",
     "release:perform": "npm publish --access public",
     "release:prepare": "npm run verify",
@@ -50,7 +51,7 @@
   },
   "dependencies": {
     "@syncedstore/core": "0.6.0",
-    "konva": "9.3.20",
+    "konva": "10.0.2",
     "yjs": "13.6.27"
   },
   "devDependencies": {
