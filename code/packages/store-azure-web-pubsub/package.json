@@ -56,11 +56,9 @@
     "@azure/web-pubsub": "1.2.0",
     "@syncedstore/core": "0.6.0",
     "buffer": "6.0.3",
-    "konva": "10.0.2",
     "reconnecting-websocket": "4.4.0",
     "uuid": "11.1.0",
-    "ws": "8.18.1",
-    "yjs": "13.6.27"
+    "ws": "8.18.1"
   },
   "devDependencies": {
     "@inditextech/weave-sdk": "1.1.0-SNAPSHOT",
@@ -96,8 +94,10 @@
     "vitest-sonar-reporter": "2.0.0"
   },
   "peerDependencies": {
-    "@inditextech/weave-sdk": ">= 0.x",
-    "ioredis": ">= 5.6.1"
+    "@inditextech/weave-sdk": ">= 1.x",
+    "konva": "10.0.2",
+    "ioredis": ">= 5.6.1",
+    "yjs": "13.6.27"
   },
   "engines": {
     "node": "^18.12 || ^20.11 || ^22.11",

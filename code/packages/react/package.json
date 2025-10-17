@@ -44,9 +44,7 @@
     "version:release": "npm version $RELEASE_VERSION -m \"[npm-scripts] prepare release $RELEASE_VERSION\" --tag-version-prefix \"\""
   },
   "dependencies": {
-    "@syncedstore/core": "0.6.0",
-    "konva": "10.0.2",
-    "yjs": "13.6.27"
+    "@syncedstore/core": "0.6.0"
   },
   "devDependencies": {
     "@inditextech/weave-sdk": "1.1.0-SNAPSHOT",
@@ -73,11 +71,13 @@
     "zustand": "5.0.3"
   },
   "peerDependencies": {
-    "@inditextech/weave-sdk": ">= 0.x",
+    "@inditextech/weave-sdk": ">= 1.x",
     "@types/react": ">= 18.3.1 && < 19",
     "@types/react-dom": ">= 18.3.0 && < 19",
+    "konva": "10.0.2",
     "react": ">= 18.2.0 && < 19",
-    "react-dom": ">= 18.2.0 && < 19"
+    "react-dom": ">= 18.2.0 && < 19",
+    "yjs": "13.6.27"
   },
   "engines": {
     "node": "^18.12 || ^20.11 || ^22.11",

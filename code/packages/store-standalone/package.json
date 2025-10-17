@@ -50,9 +50,7 @@
     "version:release": "npm version $RELEASE_VERSION -m \"[npm-scripts] prepare release $RELEASE_VERSION\" --tag-version-prefix \"\""
   },
   "dependencies": {
-    "@syncedstore/core": "0.6.0",
-    "konva": "10.0.2",
-    "yjs": "13.6.27"
+    "@syncedstore/core": "0.6.0"
   },
   "devDependencies": {
     "@inditextech/weave-sdk": "1.1.0-SNAPSHOT",
@@ -73,7 +71,9 @@
     "vitest-sonar-reporter": "2.0.0"
   },
   "peerDependencies": {
-    "@inditextech/weave-sdk": ">= 0.x"
+    "@inditextech/weave-sdk": ">= 1.x",
+    "konva": "10.0.2",
+    "yjs": "13.6.27"
   },
   "engines": {
     "node": "^18.12 || ^20.11 || ^22.11",
