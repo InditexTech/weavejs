@@ -204,6 +204,7 @@ export class WeaveImageToolAction extends WeaveAction {
           'onImageLoadEnd',
           new Error('Error loading image')
         );
+
         this.cancelAction();
       },
     });

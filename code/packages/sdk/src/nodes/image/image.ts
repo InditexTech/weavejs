@@ -34,7 +34,6 @@ export class WeaveImageNode extends WeaveNode {
   protected lastTapTime: number;
   protected nodeType: string = WEAVE_IMAGE_NODE_TYPE;
   private imageCrop!: WeaveImageCrop | null;
-  private imageLoaded: boolean;
 
   constructor(params?: WeaveImageNodeParams) {
     super();
@@ -45,7 +44,6 @@ export class WeaveImageNode extends WeaveNode {
     this.lastTapTime = 0;
     this.config = mergeExceptArrays(WEAVE_IMAGE_DEFAULT_CONFIG, config);
     this.imageCrop = null;
-    this.imageLoaded = false;
   }
 
   triggerCrop(imageNode: Konva.Group): void {
@@ -178,6 +176,8 @@ export class WeaveImageNode extends WeaveNode {
       ...internalImageProps,
       id,
       name: 'node',
+      loadedImage: false,
+      loadedImageError: false,
     });
 
     this.setupDefaultNodeAugmentation(image);
@@ -283,7 +283,9 @@ export class WeaveImageNode extends WeaveNode {
     this.setupDefaultNodeEvents(image);
 
     image.dblClick = () => {
-      this.config.onDblClick?.(this, image);
+      if (this.imageState[id]?.loaded && !this.imageState[id]?.error) {
+        this.config.onDblClick?.(this, image);
+      }
     };
 
     if (this.imageSource[id]) {
@@ -295,8 +297,7 @@ export class WeaveImageNode extends WeaveNode {
         visible: true,
       });
 
-      this.imageLoaded = true;
-
+      image.setAttr('width', this.imageSource[id].width);
       image.setAttr('width', this.imageSource[id].width);
       image.setAttr('height', this.imageSource[id].height);
       image.setAttr('cropInfo', props.cropInfo ?? undefined);
@@ -350,7 +351,8 @@ export class WeaveImageNode extends WeaveNode {
     delete internalImageProps.imageURL;
     delete internalImageProps.zIndex;
 
-    if (!this.imageLoaded) {
+    // Loading image
+    if (!this.imageState[id ?? '']?.loaded) {
       imagePlaceholder?.setAttrs({
         ...internalImageProps,
         ...(nodeAttrs.imageProperties ?? {}),
@@ -384,7 +386,47 @@ export class WeaveImageNode extends WeaveNode {
         zIndex: 1,
       });
     }
-    if (this.imageLoaded) {
+    // Loaded but image is corrupted
+    if (this.imageState[id ?? '']?.loaded && this.imageState[id ?? '']?.error) {
+      imagePlaceholder?.setAttrs({
+        ...internalImageProps,
+        ...(nodeAttrs.imageProperties ?? {}),
+        name: undefined,
+        id: `${id}-placeholder`,
+        nodeId: id,
+        x: 0,
+        y: 0,
+        scaleX: 1,
+        scaleY: 1,
+        rotation: 0,
+        visible: true,
+        fill: '#ccccccff',
+        strokeWidth: 0,
+        draggable: false,
+        zIndex: 0,
+      });
+      internalImage?.setAttrs({
+        ...internalImageProps,
+        ...(nodeAttrs.imageProperties ?? {}),
+        name: undefined,
+        id: `${id}-image`,
+        image: undefined,
+        nodeId: id,
+        x: 0,
+        y: 0,
+        scaleX: 1,
+        scaleY: 1,
+        rotation: 0,
+        visible: false,
+        draggable: false,
+        zIndex: 1,
+      });
+    }
+    // Loaded
+    if (
+      this.imageState[id ?? '']?.loaded &&
+      !this.imageState[id ?? '']?.error
+    ) {
       internalImage?.setAttrs({
         ...internalImageProps,
         ...(nodeAttrs.imageProperties ?? {}),
@@ -423,6 +465,9 @@ export class WeaveImageNode extends WeaveNode {
         error: true,
       };
 
+      delete this.imageSource[imageId];
+      delete this.imageState[imageId];
+
       onError(error);
     };
 
@@ -440,8 +485,12 @@ export class WeaveImageNode extends WeaveNode {
       error: false,
     };
 
-    if (realImageURL) {
-      this.imageSource[imageId].src = realImageURL;
+    try {
+      if (realImageURL) {
+        this.imageSource[imageId].src = realImageURL;
+      }
+    } catch (ex) {
+      console.error(ex);
     }
   }
 
@@ -490,16 +539,6 @@ export class WeaveImageNode extends WeaveNode {
           });
           internalImage.zIndex(0);
 
-          this.imageLoaded = true;
-
-          image.setAttrs({
-            width: imageProps.width
-              ? imageProps.width
-              : this.imageSource[id].width,
-            height: imageProps.height
-              ? imageProps.height
-              : this.imageSource[id].height,
-          });
           image.setAttr('imageInfo', {
             width: this.imageSource[id].width,
             height: this.imageSource[id].height,
@@ -546,6 +585,20 @@ export class WeaveImageNode extends WeaveNode {
           error: true,
         };
 
+        image.setAttrs({
+          image: undefined,
+          width: 100,
+          height: 100,
+          imageInfo: {
+            width: 100,
+            height: 100,
+          },
+          uncroppedImage: {
+            width: 100,
+            height: 100,
+          },
+        });
+
         this.resolveAsyncElement(id);
 
         console.error('Error loading image', realImageURL, error);
@@ -565,6 +618,11 @@ export class WeaveImageNode extends WeaveNode {
     imagePlaceholder: Konva.Rect
   ): void {
     const imageAttrs = image.getAttrs();
+
+    if (!imageAttrs.loadedImage) {
+      return;
+    }
+
     if (!imageAttrs.adding && imageAttrs.cropInfo) {
       const actualScale =
         imageAttrs.uncroppedImage.width / imageAttrs.imageInfo.width;
@@ -592,6 +650,10 @@ export class WeaveImageNode extends WeaveNode {
     const internalImage = image?.findOne(`#${imageAttrs.id}-image`) as
       | Konva.Image
       | undefined;
+
+    if (!imageAttrs.loadedImage) {
+      return;
+    }
 
     if (image && internalImage && !imageAttrs.adding && imageAttrs.cropInfo) {
       const actualScale =
