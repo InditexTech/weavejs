@@ -1,6 +1,6 @@
 {
   "name": "@inditextech/weave-store-websockets",
-  "version": "1.1.0-SNAPSHOT",
+  "version": "1.0.4",
   "type": "module",
   "license": "Apache-2.0",
   "author": "Jesus Manuel Piñeiro Cid <jesusmpc@inditex.com>",
@@ -58,7 +58,7 @@
     "y-websocket": "3.0.0"
   },
   "devDependencies": {
-    "@inditextech/weave-sdk": "1.1.0-SNAPSHOT",
+    "@inditextech/weave-sdk": "1.0.4",
     "@types/express": "^5.0.1",
     "@types/ioredis": "^4.28.10",
     "@types/koa": "^2.15.0",
