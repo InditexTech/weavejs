@@ -17,6 +17,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - [#742](https://github.com/InditexTech/weavejs/issues/742) Images not applying crop or resize
 
+## [0.77.1] - 2025-10-20
+
+### Fixed
+
+- [#735](https://github.com/InditexTech/weavejs/issues/735) Handle loading corrupted images on Image node
+
 ## [0.77.0] - 2025-10-16
 
 ### Added
