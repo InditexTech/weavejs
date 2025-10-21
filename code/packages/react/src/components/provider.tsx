@@ -3,13 +3,13 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import React from 'react';
-import {
-  Weave,
+import type {
   WeaveNode,
   WeaveAction,
   WeavePlugin,
   WeaveStore,
 } from '@inditextech/weave-sdk';
+import { Weave } from '@inditextech/weave-sdk';
 import {
   type WeaveState,
   type WeaveFont,
