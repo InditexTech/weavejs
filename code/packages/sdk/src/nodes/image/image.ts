@@ -442,7 +442,7 @@ export class WeaveImageNode extends WeaveNode {
         draggable: false,
         zIndex: 0,
       });
-      this.updateImageCrop(nextProps);
+      this.updateImageCrop(nodeInstance as Konva.Group, nextProps);
     }
   }
 
@@ -569,12 +569,12 @@ export class WeaveImageNode extends WeaveNode {
             });
           }
 
-          this.updateImageCrop(imageProps);
-
           this.imageState[id] = {
             loaded: true,
             error: false,
           };
+
+          this.updateImageCrop(image, imageProps);
 
           const nodeHandler = this.instance.getNodeHandler<WeaveNode>(
             image.getAttrs().nodeType
@@ -651,11 +651,9 @@ export class WeaveImageNode extends WeaveNode {
     }
   }
 
-  updateImageCrop(nextProps: WeaveElementAttributes): void {
+  updateImageCrop(image: Konva.Group, nextProps: WeaveElementAttributes): void {
     const imageAttrs = nextProps;
 
-    const stage = this.instance.getStage();
-    const image = stage.findOne(`#${imageAttrs.id}`) as Konva.Group | undefined;
     const internalImage = image?.findOne(`#${imageAttrs.id}-image`) as
       | Konva.Image
       | undefined;
