@@ -2,8 +2,8 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-import Konva from 'konva';
-import * as Y from 'yjs';
+import type Konva from 'konva';
+import type * as Y from 'yjs';
 import {
   STATE_ACTIONS,
   WEAVE_EXPORT_FORMATS,

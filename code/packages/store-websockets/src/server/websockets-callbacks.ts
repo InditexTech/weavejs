@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-import http from 'http';
+import http from 'node:http';
 import * as number from 'lib0/number';
 import { WSSharedDoc } from './websockets-utils';
 

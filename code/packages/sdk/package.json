@@ -15,7 +15,7 @@
   "main": "./dist/sdk.cjs",
   "module": "./dist/sdk.js",
   "exports": {
-    "./client": {
+    ".": {
       "import": "./dist/sdk.js",
       "require": "./dist/sdk.cjs"
     },

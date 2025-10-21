@@ -10,7 +10,7 @@ import type {
   WeaveNodesSelectionPluginOnSelectionStateEvent,
   WeaveStageZoomChanged,
   WeaveStageZoomPluginOnZoomChangeEvent,
-} from '@inditextech/weave-sdk/client';
+} from '@inditextech/weave-sdk';
 import type { WeaveSelection } from '@inditextech/weave-types';
 import React from 'react';
 

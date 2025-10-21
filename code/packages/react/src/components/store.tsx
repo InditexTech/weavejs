@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-import { Weave, type WeaveConnectedUsers } from '@inditextech/weave-sdk/client';
+import { Weave, type WeaveConnectedUsers } from '@inditextech/weave-sdk';
 import {
   WEAVE_INSTANCE_STATUS,
   type WeaveSelection,

@@ -12,7 +12,7 @@ import {
   type ClientTokenResponse,
 } from '@azure/web-pubsub';
 import { WebSocket } from 'ws';
-import * as Y from 'yjs';
+import Y from './../yjs';
 import type { WeaveAzureWebPubsubServer } from './azure-web-pubsub-server';
 import type {
   WeaveStoreAzureWebPubsubOnWebsocketCloseEvent,

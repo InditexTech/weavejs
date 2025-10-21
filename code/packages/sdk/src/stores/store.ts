@@ -20,7 +20,7 @@ import {
   getYjsDoc,
   getYjsValue,
 } from '@syncedstore/core';
-import * as Y from 'yjs';
+import Y from './../yjs';
 import { type Logger } from 'pino';
 import type { WeaveNodesSelectionPlugin } from '@/plugins/nodes-selection/nodes-selection';
 import type {

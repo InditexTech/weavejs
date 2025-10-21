@@ -5,7 +5,7 @@
 import Emittery from 'emittery';
 import { Buffer } from 'buffer';
 import { v4 as uuidv4 } from 'uuid';
-import { Doc } from 'yjs';
+import type { Doc } from 'yjs';
 import ReconnectingWebSocket from 'reconnecting-websocket';
 
 import * as encoding from 'lib0/encoding';

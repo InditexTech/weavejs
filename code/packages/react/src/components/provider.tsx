@@ -9,7 +9,7 @@ import {
   WeaveAction,
   WeavePlugin,
   WeaveStore,
-} from '@inditextech/weave-sdk/client';
+} from '@inditextech/weave-sdk';
 import {
   type WeaveState,
   type WeaveFont,
