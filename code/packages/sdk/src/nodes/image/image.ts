@@ -619,7 +619,7 @@ export class WeaveImageNode extends WeaveNode {
   ): void {
     const imageAttrs = image.getAttrs();
 
-    if (!imageAttrs.loadedImage) {
+    if (!this.imageState[imageAttrs.id ?? '']?.loaded) {
       return;
     }
 
@@ -651,7 +651,7 @@ export class WeaveImageNode extends WeaveNode {
       | Konva.Image
       | undefined;
 
-    if (!imageAttrs.loadedImage) {
+    if (!this.imageState[imageAttrs.id ?? '']?.loaded) {
       return;
     }
 
