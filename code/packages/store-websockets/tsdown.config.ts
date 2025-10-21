@@ -11,6 +11,7 @@ export default [
     },
     external: [
       '@inditextech/weave-sdk',
+      '@inditextech/weave-types',
       'node:crypto',
       'node:events',
       'node:http',
@@ -46,6 +47,7 @@ export default [
     },
     external: [
       '@inditextech/weave-sdk',
+      '@inditextech/weave-types',
       'node:crypto',
       'node:events',
       'node:http',

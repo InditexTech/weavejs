@@ -8,7 +8,14 @@ export default defineConfig({
   entry: {
     react: './src/index.ts',
   },
-  external: ['@inditextech/weave-sdk', 'konva', 'yjs', 'canvas', 'skia-canvas'],
+  external: [
+    '@inditextech/weave-types',
+    '@inditextech/weave-sdk',
+    'konva',
+    'yjs',
+    'canvas',
+    'skia-canvas',
+  ],
   format: ['es'],
   target: 'es2023',
   inputOptions: {

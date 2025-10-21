@@ -2,9 +2,9 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-import { WebSocket } from 'ws';
+import type { WebSocket } from 'ws';
 import type { TokenCredential } from '@azure/identity';
-import * as Y from 'yjs';
+import type { Doc } from 'yjs';
 import type { ConnectionContext } from './index.server';
 
 export type WeaveStoreAzureWebPubsubConfig = {
@@ -54,7 +54,7 @@ export type FetchClient = (
   init?: RequestInit
 ) => Promise<Response>;
 
-export type FetchInitialState = (doc: Y.Doc) => void;
+export type FetchInitialState = (doc: Doc) => void;
 export type PersistRoom = (
   roomId: string,
   actualState: Uint8Array<ArrayBufferLike>

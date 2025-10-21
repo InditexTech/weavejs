@@ -2,7 +2,8 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-import * as Y from 'yjs';
+import type { Doc } from 'yjs';
+import Y from './../yjs';
 
 const yjsLayer = function (id: string) {
   const newLayerMap = new Y.Map();
@@ -17,7 +18,7 @@ const yjsLayer = function (id: string) {
   return newLayerMap;
 };
 
-export function defaultInitialState(doc: Y.Doc): void {
+export function defaultInitialState(doc: Doc): void {
   const children = new Y.Array();
   children.insert(0, [
     yjsLayer('gridLayer'),

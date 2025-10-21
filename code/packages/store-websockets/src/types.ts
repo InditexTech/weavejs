@@ -2,8 +2,8 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-import * as Y from 'yjs';
-import { IncomingMessage } from 'http';
+import type { Doc } from 'yjs';
+import type { IncomingMessage } from 'http';
 
 export type WeaveStoreWebsocketsOptions = {
   roomId: string;
@@ -14,7 +14,7 @@ export type WeaveStoreWebsocketsOptions = {
 
 export type PerformUpgrade = (req: IncomingMessage) => Promise<boolean>;
 export type ExtractRoomId = (req: IncomingMessage) => string | undefined;
-export type FetchInitialState = (doc: Y.Doc) => void;
+export type FetchInitialState = (doc: Doc) => void;
 export type PersistRoom = (
   roomId: string,
   actualState: Uint8Array<ArrayBufferLike>

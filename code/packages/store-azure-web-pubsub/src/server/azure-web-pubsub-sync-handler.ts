@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-import * as Y from 'yjs';
+import Y from './../yjs';
 import { WebPubSubServiceClient } from '@azure/web-pubsub';
 import {
   WebPubSubEventHandler,

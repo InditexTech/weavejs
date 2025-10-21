@@ -9,7 +9,13 @@ export default defineConfig([
     entry: {
       sdk: './src/index.ts',
     },
-    external: ['konva', 'yjs', 'canvas', 'skia-canvas'],
+    external: [
+      '@inditextech/weave-types',
+      'konva',
+      'yjs',
+      'canvas',
+      'skia-canvas',
+    ],
     format: ['es'],
     target: 'es2023',
     shims: true,
@@ -21,7 +27,13 @@ export default defineConfig([
     entry: {
       ['sdk.node']: './src/index.node.ts',
     },
-    external: ['konva', 'yjs', 'canvas', 'skia-canvas'],
+    external: [
+      '@inditextech/weave-types',
+      'konva',
+      'yjs',
+      'canvas',
+      'skia-canvas',
+    ],
     format: ['es'],
     target: 'es2023',
     shims: true,

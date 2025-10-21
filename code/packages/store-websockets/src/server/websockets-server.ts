@@ -2,8 +2,8 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-import http from 'http';
-import https from 'https';
+import type { Server as HttpServer } from 'node:http';
+import type { Server as HttpsServer } from 'node:https';
 import Emittery from 'emittery';
 import { WebSocketServer } from 'ws';
 import { setServer, setupWSConnection } from './websockets-utils';
@@ -98,7 +98,7 @@ export class WeaveWebsocketsServer extends Emittery {
     this.off(event, callback);
   }
 
-  handleUpgrade(server: http.Server | https.Server): void {
+  handleUpgrade(server: HttpServer | HttpsServer): void {
     server.on('upgrade', async (request, socket, head) => {
       const continueToUpgrade = await this.performUpgrade(request);
 

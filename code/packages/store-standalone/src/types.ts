@@ -2,9 +2,9 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-import * as Y from 'yjs';
+import type { Doc } from 'yjs';
 
-export type FetchInitialState = (doc: Y.Doc) => void;
+export type FetchInitialState = (doc: Doc) => void;
 
 export type WeaveStoreStandaloneParams = {
   roomData: string;
