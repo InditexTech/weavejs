@@ -7,6 +7,7 @@
     "context-menu",
     "copy-paste-nodes",
     "nodes-selection",
+    "nodes-multi-selection-feedback",
     "nodes-edge-snapping",
     "nodes-distance-snapping",
     "stage-drop-area",

@@ -1,0 +1,61 @@
+---
+title: Nodes Multi-selection Feedback
+description: Activate support to provide more feedback to the user when multi-selecting nodes
+---
+
+![Nodes multi-selection plugin on use on the Weave.js showcase](/images/plugins/nodes-selection.gif)
+
+## Introduction
+
+This plugin enables more feedback to users when selecting multiple nodes on the canvas.
+
+## Usage
+
+<div className="fd-steps">
+
+<div className="[&_h3]:fd-step">
+
+### Import the Plugin
+
+Start by importing the plugin:
+
+```ts
+import { WeaveNodesMultiSelectionFeedbackPlugin } from "@inditextech/weave-sdk";
+```
+
+</div>
+
+<div className='[&_h3]:fd-step'>
+
+### Register the Plugin
+
+Then register the plugin on the [Weave](/docs/sdk/api-reference/weave) class instance.
+
+```ts
+const instance = new Weave({
+  ...
+  plugins: [
+    ...,
+    new WeaveNodesMultiSelectionFeedbackPlugin(), // [!code ++]
+  ]
+})
+```
+
+You can also:
+
+- Customize the transformer style.
+
+For more information check the [WeaveNodesMultiSelectionFeedbackPlugin](/docs/sdk/api-reference/plugins/nodes-multi-selection-feedback)
+plugin API.
+
+</div>
+
+<div className='[&_h3]:fd-step'>
+
+### Use the plugin
+
+Once the plugin is registered when multi-selection, more feedback is provided to the end user.
+
+</div>
+
+</div>

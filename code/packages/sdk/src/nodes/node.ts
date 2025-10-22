@@ -32,6 +32,8 @@ import { SELECTION_TOOL_ACTION_NAME } from '@/actions/selection-tool/constants';
 import { WEAVE_NODES_EDGE_SNAPPING_PLUGIN_KEY } from '@/plugins/nodes-edge-snapping/constants';
 import { WEAVE_NODES_DISTANCE_SNAPPING_PLUGIN_KEY } from '@/plugins/nodes-distance-snapping/constants';
 import type { WeaveNodesDistanceSnappingPlugin } from '@/plugins/nodes-distance-snapping/nodes-distance-snapping';
+import type { WeaveNodesMultiSelectionFeedbackPlugin } from '@/plugins/nodes-multi-selection-feedback/nodes-multi-selection-feedback';
+import { WEAVE_NODES_MULTI_SELECTION_FEEDBACK_PLUGIN_KEY } from '@/plugins/nodes-multi-selection-feedback/constants';
 
 export const augmentKonvaStageClass = (): void => {
   Konva.Stage.prototype.isMouseWheelPressed = function () {
@@ -133,6 +135,8 @@ export abstract class WeaveNode implements WeaveNodeBase {
     node.resetCrop = function () {};
     node.handleMouseover = function () {};
     node.handleMouseout = function () {};
+    node.handleSelectNode = function () {};
+    node.handleDeselectNode = function () {};
   }
 
   isNodeSelected(ele: Konva.Node): boolean {
@@ -219,6 +223,8 @@ export abstract class WeaveNode implements WeaveNodeBase {
       node.on('transformstart', (e) => {
         transforming = true;
 
+        this.getNodesSelectionFeedbackPlugin()?.hideSelectionHalo(node);
+
         this.instance.emitEvent('onTransform', e.target);
       });
 
@@ -272,6 +278,8 @@ export abstract class WeaveNode implements WeaveNodeBase {
 
         this.scaleReset(node);
 
+        this.getNodesSelectionFeedbackPlugin()?.hideSelectionHalo(node);
+
         const nodeHandler = this.instance.getNodeHandler<WeaveNode>(
           node.getAttrs().nodeType
         );
@@ -280,6 +288,8 @@ export abstract class WeaveNode implements WeaveNodeBase {
             nodeHandler.serialize(node as WeaveElementInstance)
           );
         }
+
+        this.getNodesSelectionPlugin()?.getHoverTransformer().forceUpdate();
       });
 
       const stage = this.instance.getStage();
@@ -305,6 +315,8 @@ export abstract class WeaveNode implements WeaveNodeBase {
 
       node.on('dragstart', (e) => {
         const nodeTarget = e.target;
+
+        this.getNodesSelectionFeedbackPlugin()?.hideSelectionHalo(nodeTarget);
 
         this.didMove = false;
 
@@ -420,6 +432,8 @@ export abstract class WeaveNode implements WeaveNodeBase {
       node.on('dragend', (e) => {
         const nodeTarget = e.target;
 
+        this.getNodesSelectionFeedbackPlugin()?.hideSelectionHalo(nodeTarget);
+
         e.cancelBubble = true;
 
         if (nodeTarget.getAttrs().isCloneOrigin && originalPosition) {
@@ -514,6 +528,14 @@ export abstract class WeaveNode implements WeaveNodeBase {
 
       node.handleMouseout = () => {
         this.handleMouseout(node);
+      };
+
+      node.handleSelectNode = () => {
+        this.getNodesSelectionFeedbackPlugin()?.createSelectionHalo(node);
+      };
+
+      node.handleDeselectNode = () => {
+        this.getNodesSelectionFeedbackPlugin()?.destroySelectionHalo(node);
       };
 
       node.on('pointerover', (e) => {
@@ -854,5 +876,13 @@ export abstract class WeaveNode implements WeaveNodeBase {
     }
 
     return realNodeTarget;
+  }
+
+  getNodesSelectionFeedbackPlugin() {
+    const selectionFeedbackPlugin =
+      this.instance.getPlugin<WeaveNodesMultiSelectionFeedbackPlugin>(
+        WEAVE_NODES_MULTI_SELECTION_FEEDBACK_PLUGIN_KEY
+      );
+    return selectionFeedbackPlugin;
   }
 }
