@@ -77,6 +77,36 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - [#722](https://github.com/InditexTech/weavejs/issues/722) Update to Konva 10 and removal of CommonJS support
 
+## [0.77.5] - 2025-10-22
+
+### Fixed
+
+- [#727](https://github.com/InditexTech/weavejs/issues/727) When moving an item close to the edge of the canvas it "moves" automatically
+
+## [0.77.4] - 2025-10-21
+
+### Fixed
+
+- [#748](https://github.com/InditexTech/weavejs/issues/748) Fix cropping programatically not calling and save
+
+## [0.77.3] - 2025-10-21
+
+### Fixed
+
+- [#745](https://github.com/InditexTech/weavejs/issues/745) Preset uncroppedImage information on image load
+
+## [0.77.2] - 2025-10-21
+
+### Fixed
+
+- [#742](https://github.com/InditexTech/weavejs/issues/742) Images not applying crop or resize
+
+## [0.77.1] - 2025-10-20
+
+### Fixed
+
+- [#735](https://github.com/InditexTech/weavejs/issues/735) Handle loading corrupted images on Image node
+
 ## [0.77.0] - 2025-10-16
 
 ### Added
