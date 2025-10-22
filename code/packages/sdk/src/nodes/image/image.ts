@@ -457,7 +457,7 @@ export class WeaveImageNode extends WeaveNode {
     const realImageURL =
       this.config.urlTransformer?.(imageURL ?? '') ?? imageURL;
 
-    this.imageSource[imageId] = new Image();
+    this.imageSource[imageId] = Konva.Util.createImageElement();
     this.imageSource[imageId].crossOrigin = this.config.crossOrigin;
     this.imageSource[imageId].onerror = (error) => {
       this.imageState[imageId] = {

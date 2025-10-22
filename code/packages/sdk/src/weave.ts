@@ -99,7 +99,7 @@ export class Weave {
     }, new Map());
 
     // Save in memory the configuration provided
-    this.config = mergeExceptArrays({ serverSide: false }, weaveConfig);
+    this.config = mergeExceptArrays({}, weaveConfig);
     // Setup the logger
     this.logger = new WeaveLogger(
       this.config?.logger ?? {
@@ -196,7 +196,7 @@ export class Weave {
   async start(): Promise<void> {
     this.moduleLogger.info('Start instance');
 
-    if (!this.config.serverSide) {
+    if (!this.isServerSide()) {
       // Setup the instance on the weave global variable
       if (!window.weave) {
         window.weave = this;
@@ -205,20 +205,6 @@ export class Weave {
       // Initialize global window variables
       window.weaveTextEditing = {};
       window.weaveDragImageURL = undefined;
-    }
-
-    if (this.config.serverSide) {
-      const { createCanvas, Image } = await import('canvas');
-
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      (globalThis as any).Image = Image;
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      (globalThis as any).document = {
-        createElement(tag: string) {
-          if (tag === 'canvas') return createCanvas(1, 1);
-          throw new Error(`Unsupported element: ${tag}`);
-        },
-      };
     }
 
     this.emitEvent<WeaveStoreOnRoomLoadedEvent>('onRoomLoaded', false);
@@ -970,6 +956,9 @@ export class Weave {
   }
 
   public isServerSide(): boolean {
-    return this.config.serverSide ?? false;
+    if (typeof window !== 'undefined') {
+      return window._weave_isServerSide === true;
+    }
+    return global._weave_isServerSide === true;
   }
 }

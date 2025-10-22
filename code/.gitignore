@@ -10,3 +10,6 @@ eslint-report.json
 .nx/workspace-data
 
 .npmrc
+
+verdaccio/config/htpasswd
+verdaccio/storage

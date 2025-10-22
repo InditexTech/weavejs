@@ -32,6 +32,10 @@
       "dependsOn": ["^test"],
       "cache": true
     },
+    "unpublish": {
+      "dependsOn": ["^unpublish"],
+      "cache": true
+    },
     "verify": {
       "dependsOn": ["^verify"],
       "cache": true

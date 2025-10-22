@@ -5,7 +5,9 @@
   "license": "Apache-2.0",
   "author": "Jesus Manuel Piñeiro Cid <jesusmpc@inditex.com>",
   "homepage": "https://inditextech.github.io/weavejs",
-  "repository": "github:InditexTech/weavejs",
+  "repository": {
+    "url": "git+https://github.com/InditexTech/weavejs.git"
+  },
   "maintainers": [
     {
       "name": "Jesus Manuel Piñeiro Cid",
@@ -39,6 +41,7 @@
     "test": "vitest --passWithNoTests --coverage --watch=false",
     "dev:test": "vitest --passWithNoTests --coverage",
     "types:check": "tsc --noEmit",
+    "unpublish": "npm unpublish --force",
     "verify": "npm run lint && npm run test && npm run build",
     "version:development": "npm version $(npm version minor)-SNAPSHOT",
     "version:release": "npm version $RELEASE_VERSION -m \"[npm-scripts] prepare release $RELEASE_VERSION\" --tag-version-prefix \"\""

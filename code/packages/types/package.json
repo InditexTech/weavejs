@@ -5,7 +5,9 @@
   "license": "Apache-2.0",
   "author": "Jesus Manuel Piñeiro Cid <jesusmpc@inditex.com>",
   "homepage": "https://inditextech.github.io/weavejs",
-  "repository": "github:InditexTech/weavejs",
+  "repository": {
+    "url": "git+https://github.com/InditexTech/weavejs.git"
+  },
   "maintainers": [
     {
       "name": "Jesus Manuel Piñeiro Cid",
@@ -27,6 +29,7 @@
     "bundle:analyze": "vite-bundle-visualizer",
     "check": "echo \"Monorepo test script\" && exit 0",
     "dev": "tsdown --watch",
+    "dev:test": "vitest --typecheck",
     "dist:tag": "npm dist-tag add \"$(jq -r .name package.json)@$(jq -r .version package.json)\" \"$PR_TAG\" --registry=\"$NPM_PUBLISHING_REGISTRY\" --verbose",
     "format": "prettier --write ./src",
     "link": "npm link",
@@ -37,7 +40,7 @@
     "release:perform": "npm publish --access public",
     "release:prepare": "npm run verify",
     "test": "vitest --typecheck --coverage --watch=false",
-    "dev:test": "vitest --typecheck",
+    "unpublish": "npm unpublish --force",
     "verify": "npm run lint && npm run test && npm run build",
     "version:development": "npm version $(npm version minor)-SNAPSHOT",
     "version:release": "npm version $RELEASE_VERSION -m \"[npm-scripts] prepare release $RELEASE_VERSION\" --tag-version-prefix \"\""
