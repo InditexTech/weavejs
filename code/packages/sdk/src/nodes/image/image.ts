@@ -442,7 +442,7 @@ export class WeaveImageNode extends WeaveNode {
         draggable: false,
         zIndex: 0,
       });
-      this.updateImageCrop(nextProps);
+      this.updateImageCrop(nodeInstance as Konva.Group, nextProps);
     }
   }
 
@@ -544,9 +544,18 @@ export class WeaveImageNode extends WeaveNode {
             height: this.imageSource[id].height,
           });
           this.scaleReset(image);
+
+          if (!imageProps.uncroppedImage) {
+            imageProps.uncroppedImage = {
+              width: this.imageSource[id].width,
+              height: this.imageSource[id].height,
+            };
+          }
+
           const imageRect = image.getClientRect({
             relativeTo: this.instance.getStage(),
           });
+
           if (imageProps.cropInfo && imageProps.uncroppedImage) {
             image.setAttr('uncroppedImage', {
               width: imageProps.uncroppedImage.width,
@@ -560,12 +569,12 @@ export class WeaveImageNode extends WeaveNode {
             });
           }
 
-          this.updateImageCrop(imageProps);
-
           this.imageState[id] = {
             loaded: true,
             error: false,
           };
+
+          this.updateImageCrop(image, imageProps);
 
           const nodeHandler = this.instance.getNodeHandler<WeaveNode>(
             image.getAttrs().nodeType
@@ -619,7 +628,7 @@ export class WeaveImageNode extends WeaveNode {
   ): void {
     const imageAttrs = image.getAttrs();
 
-    if (!imageAttrs.loadedImage) {
+    if (!this.imageState[imageAttrs.id ?? '']?.loaded) {
       return;
     }
 
@@ -642,16 +651,14 @@ export class WeaveImageNode extends WeaveNode {
     }
   }
 
-  updateImageCrop(nextProps: WeaveElementAttributes): void {
+  updateImageCrop(image: Konva.Group, nextProps: WeaveElementAttributes): void {
     const imageAttrs = nextProps;
 
-    const stage = this.instance.getStage();
-    const image = stage.findOne(`#${imageAttrs.id}`) as Konva.Group | undefined;
     const internalImage = image?.findOne(`#${imageAttrs.id}-image`) as
       | Konva.Image
       | undefined;
 
-    if (!imageAttrs.loadedImage) {
+    if (!this.imageState[imageAttrs.id ?? '']?.loaded) {
       return;
     }
 

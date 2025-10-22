@@ -13,6 +13,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.77.4] - 2025-10-21
+
+### Fixed
+
+- [#748](https://github.com/InditexTech/weavejs/issues/748) Fix cropping programatically not calling and save
+
+## [0.77.3] - 2025-10-21
+
+### Fixed
+
+- [#745](https://github.com/InditexTech/weavejs/issues/745) Preset uncroppedImage information on image load
+
+## [0.77.2] - 2025-10-21
+
+### Fixed
+
+- [#742](https://github.com/InditexTech/weavejs/issues/742) Images not applying crop or resize
+
 ## [0.77.1] - 2025-10-20
 
 ### Fixed
@@ -1171,7 +1189,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - [#24](https://github.com/InditexTech/weavejs/issues/24) Bug when loading rooms with text or images
 - [#18](https://github.com/InditexTech/weavejs/issues/18) Fix awareness not working on store-azure-web-pubsub
 
-[Unreleased]: https://github.com/InditexTech/weavejs/compare/0.77.1...HEAD
+[Unreleased]: https://github.com/InditexTech/weavejs/compare/0.77.4...HEAD
+
+[0.77.4]: https://github.com/InditexTech/weavejs/compare/0.77.3...0.77.4
+
+[0.77.3]: https://github.com/InditexTech/weavejs/compare/0.77.2...0.77.3
+
+[0.77.2]: https://github.com/InditexTech/weavejs/compare/0.77.1...0.77.2
 
 [0.77.1]: https://github.com/InditexTech/weavejs/compare/0.77.0...0.77.1
 
