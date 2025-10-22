@@ -184,7 +184,7 @@ export class WeaveStageMinimapPlugin extends WeavePlugin {
 
     this.instance.addEventListener('onStateChange', throttledUpdateMinimap);
 
-    if (this.instance.getConfiguration().serverSide) {
+    if (this.instance.isServerSide()) {
       return;
     }
 
@@ -222,7 +222,7 @@ export class WeaveStageMinimapPlugin extends WeavePlugin {
         y: (this.minimapStage.height() - realHeight) / 2,
       };
 
-      const image = new Image();
+      const image = Konva.Util.createImageElement();
       image.src = url;
 
       this.minimapStageImage = new Konva.Image({

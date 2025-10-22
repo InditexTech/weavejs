@@ -13,6 +13,10 @@ declare global {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     clipboardData: any;
   }
+  // eslint-disable-next-line no-var
+  var _weave_isServerSide: boolean;
+  // eslint-disable-next-line no-var
+  var _weave_serverSideBackend: 'skia' | 'canvas' | undefined;
 }
 
 declare module 'react-reconciler' {}

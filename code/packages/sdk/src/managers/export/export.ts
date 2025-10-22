@@ -170,7 +170,6 @@ export class WeaveExportManager {
       padding = 0,
       pixelRatio = 1,
       backgroundColor = WEAVE_EXPORT_BACKGROUND_COLOR,
-      backend = 'canvas',
     } = options;
 
     this.getNodesSelectionPlugin()?.disable();
@@ -257,6 +256,7 @@ export class WeaveExportManager {
           const width = Math.min(tileWidth, imageWidth - x);
           const height = Math.min(tileHeight, imageHeight - y);
 
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
           const canvas: any = await exportGroup.toCanvas({
             x: Math.round(backgroundRect.x) + x,
             y: Math.round(backgroundRect.y) + y,
@@ -265,14 +265,13 @@ export class WeaveExportManager {
             mimeType: format,
             pixelRatio,
             quality: options.quality ?? 1,
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
           });
 
           let buffer: Buffer | null = null;
-          if (backend === WEAVE_KONVA_BACKEND.CANVAS) {
+          if (global._weave_serverSideBackend === WEAVE_KONVA_BACKEND.CANVAS) {
             buffer = canvas.toBuffer();
           }
-          if (backend === WEAVE_KONVA_BACKEND.SKIA) {
+          if (global._weave_serverSideBackend === WEAVE_KONVA_BACKEND.SKIA) {
             buffer = await canvas.toBuffer();
           }
 

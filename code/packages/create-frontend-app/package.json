@@ -35,6 +35,7 @@
     "release:prepare": "npm run verify",
     "test": "echo \"No tests defined\" && exit 0",
     "types:check": "tsc --noEmit",
+    "unpublish": "npm unpublish --force",
     "verify": "npm run lint && npm run test && npm run build",
     "version:development": "npm version $(npm version minor)-SNAPSHOT",
     "version:release": "npm version $RELEASE_VERSION -m \"[npm-scripts] prepare release $RELEASE_VERSION\" --tag-version-prefix \"\""

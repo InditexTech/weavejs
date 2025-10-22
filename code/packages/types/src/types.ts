@@ -30,7 +30,6 @@ export type WeaveConfig = {
   plugins?: WeavePluginBase[];
   fonts?: WeaveFont[] | WeaveFontsPreloadFunction;
   logger?: WeaveLoggerConfig;
-  serverSide?: boolean;
 };
 
 // Base types
@@ -157,7 +156,6 @@ export type WeaveExportNodesOptions = {
   pixelRatio?: number;
   backgroundColor?: string;
   quality?: number;
-  backend?: WeaveKonvaBackend;
 };
 
 export type WeaveExportFormatKeys = keyof typeof WEAVE_EXPORT_FORMATS;

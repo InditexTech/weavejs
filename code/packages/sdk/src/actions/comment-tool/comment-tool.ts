@@ -129,7 +129,7 @@ export class WeaveCommentToolAction<T> extends WeaveAction {
     const actualCursor = stage.container().style.cursor;
 
     cursorUrls.forEach(({ src, cursor }) => {
-      const img = new Image();
+      const img = Konva.Util.createImageElement();
       img.onload = () => {
         stage.container().style.cursor = cursor;
         stage.container().style.cursor = actualCursor;

@@ -43,7 +43,7 @@ export class WeaveVideoNode extends WeaveNode {
 
   private initVideoIcon() {
     if (!this.videoIconImage) {
-      this.videoIconImage = new Image();
+      this.videoIconImage = Konva.Util.createImageElement();
       this.videoIconImage.src = this.config.style.icon.dataURL;
     }
   }
@@ -70,7 +70,7 @@ export class WeaveVideoNode extends WeaveNode {
       this.config.urlTransformer?.(videoProps.videoPlaceholderURL ?? '') ??
       videoProps.videoPlaceholderURL;
 
-    this.videoPlaceholder[id] = new Image();
+    this.videoPlaceholder[id] = Konva.Util.createImageElement();
     this.videoPlaceholder[id].crossOrigin = this.config.crossOrigin;
     this.videoPlaceholder[id].src = realVideoPlaceholderURL;
 
