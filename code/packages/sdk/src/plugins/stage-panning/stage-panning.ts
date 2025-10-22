@@ -44,8 +44,7 @@ export class WeaveStagePanningPlugin extends WeavePlugin {
   protected previousPointer!: string | null;
   protected currentPointer: Konva.Vector2d | null = null;
   protected stageScrollInterval: NodeJS.Timeout | undefined = undefined;
-  protected targetScrollIntervals: Record<string, NodeJS.Timeout | undefined> =
-    {};
+  protected panEdgeTargets: Record<string, Konva.Node | undefined> = {};
 
   getLayerName = undefined;
   initLayer = undefined;
@@ -275,44 +274,11 @@ export class WeaveStagePanningPlugin extends WeavePlugin {
     stage.on('dragstart', (e) => {
       const duration = 1000 / 60;
 
-      if (
-        this.targetScrollIntervals[e.target.getAttrs().id ?? ''] !== undefined
-      ) {
+      if (this.panEdgeTargets[e.target.getAttrs().id ?? ''] !== undefined) {
         return;
       }
 
-      this.targetScrollIntervals[e.target.getAttrs().id ?? ''] = setInterval(
-        () => {
-          const pos = stage.getPointerPosition();
-          const offset = this.config.edgePanOffset;
-          const speed = this.config.edgePanSpeed;
-
-          if (!pos) return;
-
-          const isNearLeft = pos.x < offset / stage.scaleX();
-          if (isNearLeft) {
-            e.target.x(e.target.x() - speed / stage.scaleX());
-          }
-
-          const isNearRight = pos.x > stage.width() - offset / stage.scaleX();
-          if (isNearRight) {
-            e.target.x(e.target.x() + speed / stage.scaleX());
-          }
-
-          const isNearTop = pos.y < offset / stage.scaleY();
-          if (isNearTop) {
-            e.target.y(e.target.y() - speed / stage.scaleX());
-          }
-
-          const isNearBottom = pos.y > stage.height() - offset / stage.scaleY();
-          if (isNearBottom) {
-            e.target.y(e.target.y() + speed / stage.scaleX());
-          }
-
-          this.getStageGridPlugin()?.renderGrid();
-        },
-        duration
-      );
+      this.panEdgeTargets[e.target.getAttrs().id ?? ''] = e.target;
 
       if (this.stageScrollInterval !== undefined) {
         return;
@@ -325,37 +291,57 @@ export class WeaveStagePanningPlugin extends WeavePlugin {
 
         if (!pos) return;
 
-        let isOnBorder = false;
+        let isNearLeft = false;
+        let isNearRight = false;
+        let isNearTop = false;
+        let isNearBottom = false;
 
-        const isNearLeft = pos.x < offset;
-        if (isNearLeft) {
-          stage.x(stage.x() + speed);
-          isOnBorder = true;
+        for (const targetId in this.panEdgeTargets) {
+          const target: Konva.Node = this.panEdgeTargets[
+            targetId
+          ] as Konva.Node;
+          isNearLeft = pos.x < offset * stage.scaleX();
+          if (isNearLeft) {
+            target.x(target.x() - speed / stage.scaleX());
+          }
+
+          isNearRight = pos.x > stage.width() - offset * stage.scaleX();
+          if (isNearRight) {
+            target.x(target.x() + speed / stage.scaleX());
+          }
+
+          isNearTop = pos.y < offset * stage.scaleY();
+          if (isNearTop) {
+            target.y(target.y() - speed / stage.scaleX());
+          }
+
+          isNearBottom = pos.y > stage.height() - offset * stage.scaleY();
+          if (isNearBottom) {
+            target.y(target.y() + speed / stage.scaleX());
+          }
         }
 
-        const isNearRight = pos.x > stage.width() - offset;
-        if (isNearRight) {
-          stage.x(stage.x() - speed);
-          isOnBorder = true;
+        this.getStageGridPlugin()?.renderGrid();
+
+        let dx = 0;
+        let dy = 0;
+
+        if (isNearLeft) dx = speed;
+        else if (isNearRight) dx = -speed;
+
+        if (isNearTop) dy = speed;
+        else if (isNearBottom) dy = -speed;
+
+        if (dx || dy) {
+          stage.x(stage.x() + dx);
+          stage.y(stage.y() + dy);
         }
 
-        const isNearTop = pos.y < offset;
-        if (isNearTop) {
-          stage.y(stage.y() + speed);
-          isOnBorder = true;
-        }
-
-        const isNearBottom = pos.y > stage.height() - offset;
-        if (isNearBottom) {
-          stage.y(stage.y() - speed);
-          isOnBorder = true;
-        }
-
-        if (isOnBorder) {
+        if (isNearLeft || isNearRight || isNearTop || isNearBottom) {
           this.getNodesEdgeSnappingPlugin()?.disable();
           this.getNodesDistanceSnappingPlugin()?.disable();
         }
-        if (!isOnBorder) {
+        if (!(isNearLeft || isNearRight || isNearTop || isNearBottom)) {
           this.getNodesEdgeSnappingPlugin()?.enable();
           this.getNodesDistanceSnappingPlugin()?.enable();
         }
@@ -449,12 +435,7 @@ export class WeaveStagePanningPlugin extends WeavePlugin {
   }
 
   cleanupEdgeMoveIntervals() {
-    const intervals = Object.keys(this.targetScrollIntervals);
-    for (const key of intervals) {
-      clearInterval(this.targetScrollIntervals[key]);
-      this.targetScrollIntervals[key] = undefined;
-    }
-
+    this.panEdgeTargets = {};
     clearInterval(this.stageScrollInterval);
     this.stageScrollInterval = undefined;
   }
