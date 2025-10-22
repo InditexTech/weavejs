@@ -269,15 +269,15 @@ export class WeaveImageCrop {
   }
 
   accept() {
-    this.hide({ key: 'Enter' } as KeyboardEvent);
+    this.hide({ code: 'Enter' } as KeyboardEvent);
   }
 
   cancel() {
-    this.hide({ key: 'Escape' } as KeyboardEvent);
+    this.hide({ code: 'Escape' } as KeyboardEvent);
   }
 
   private hide(e: KeyboardEvent) {
-    if (!['Enter', 'Escape'].includes(e.key)) {
+    if (!['Enter', 'Escape'].includes(e.code)) {
       return;
     }
 

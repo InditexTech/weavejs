@@ -125,7 +125,7 @@ export class WeaveTextNode extends WeaveNode {
       this.instance.emitEvent('onTransform', null);
     });
 
-    if (!this.instance.getConfiguration().serverSide) {
+    if (!this.instance.isServerSide()) {
       window.addEventListener('keypress', (e) => {
         if (
           e.code === 'Enter' &&
@@ -364,7 +364,7 @@ export class WeaveTextNode extends WeaveNode {
       }
       height = height + textSize.height * (textNode.lineHeight() ?? 1);
     }
-    return { width: width, height };
+    return { width: width * 1.01, height };
   }
 
   private mimicTextNode(textNode: Konva.Text) {

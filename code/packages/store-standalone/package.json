@@ -1,11 +1,13 @@
 {
   "name": "@inditextech/weave-store-standalone",
-  "version": "1.2.0-SNAPSHOT",
+  "version": "1.3.0-SNAPSHOT",
   "type": "module",
   "license": "Apache-2.0",
   "author": "Jesus Manuel Piñeiro Cid <jesusmpc@inditex.com>",
   "homepage": "https://inditextech.github.io/weavejs",
-  "repository": "github:InditexTech/weavejs",
+  "repository": {
+    "url": "git+https://github.com/InditexTech/weavejs.git"
+  },
   "maintainers": [
     {
       "name": "Jesus Manuel Piñeiro Cid",
@@ -45,13 +47,14 @@
     "release:prepare": "npm run verify",
     "test": "vitest --passWithNoTests --coverage --watch=false",
     "types:check": "tsc --noEmit",
+    "unpublish": "npm unpublish --force",
     "verify": "npm run lint && npm run test && npm run build",
     "version:development": "npm version $(npm version minor)-SNAPSHOT",
     "version:release": "npm version $RELEASE_VERSION -m \"[npm-scripts] prepare release $RELEASE_VERSION\" --tag-version-prefix \"\""
   },
   "dependencies": {
-    "@inditextech/weave-types": "1.2.0-SNAPSHOT",
-    "@inditextech/weave-sdk": "1.2.0-SNAPSHOT",
+    "@inditextech/weave-types": "1.3.0-SNAPSHOT",
+    "@inditextech/weave-sdk": "1.3.0-SNAPSHOT",
     "@syncedstore/core": "0.6.0"
   },
   "devDependencies": {

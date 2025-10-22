@@ -1,6 +1,6 @@
 {
   "name": "@inditextech/weave",
-  "version": "1.2.0-SNAPSHOT",
+  "version": "1.3.0-SNAPSHOT",
   "description": "Weave.js framework",
   "packageManager": "npm@10.2.4",
   "workspaces": [
@@ -24,12 +24,14 @@
     "lint:fix": "nx run-many -t lint:fix",
     "pack": "nx run-many -t pack",
     "prepare": "cd ../ && node code/.husky/install.mjs",
-    "publish:snapshot": "nx run-many -t publish:snapshot -- --verbose --tag next --unsafe-perm",
+    "publish:snapshot": "nx run-many --skip-nx-cache -t publish:snapshot -- --verbose --tag next --unsafe-perm",
     "release:perform": "nx run-many -t release:perform -- --verbose --unsafe-perm",
     "release:prepare": "nx run-many -t release:prepare",
     "release": "nx run-many -t release",
     "reset": "nx reset",
     "test": "nx run-many -t test",
+    "unpublish": "nx run-many --skip-nx-cache -t unpublish",
+    "verdaccio:setup": "node ./verdaccio.setup.js",
     "verify": "npm ci && nx run-many -t verify",
     "version:development": "export BUMP_DEVELOP_VERSION=$(npm version $(npm version minor)-SNAPSHOT) && nx release version --git-tag=false --git-commit=false $BUMP_DEVELOP_VERSION && npm version $(npm version minor)-SNAPSHOT && npm install",
     "version:release": "npm ci && nx release version --git-tag=false --git-commit=false $RELEASE_VERSION && npm version $RELEASE_VERSION"

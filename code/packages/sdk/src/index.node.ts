@@ -2,6 +2,9 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
+global._weave_isServerSide = true;
+global._weave_serverSideBackend = undefined;
+
 export { Weave } from './weave';
 export { WeaveStore } from './stores/store';
 export * from './stores/types';
@@ -11,12 +14,7 @@ export * from './actions/types';
 export { WeavePlugin } from './plugins/plugin';
 export * from './utils';
 
-// Exporting server side utils
-export {
-  registerCanvasFonts,
-  registerSkiaFonts,
-} from './managers/export/utils.node';
-export * from './managers/export/types';
+export * from './backend';
 
 // Provided Nodes
 export { WeaveStageNode } from './nodes/stage/stage';
