@@ -27,8 +27,8 @@ on:
           - "release-type/minor"
           - "release-type/patch"
 
-permissions:
-  id-token: write # Required for OIDC
+# permissions:
+#   id-token: write # Required for OIDC
 
 jobs:
   release:
@@ -113,15 +113,15 @@ jobs:
         with:
           tool_versions: ${{ env.TOOL_VERSIONS }}
 
-      # - name: NPM / Set npmrc
-      #   env:
-      #     NPM_AUTH: ${{ secrets.NPM_TOKEN }}
-      #     NPM_REGISTRY: "https://registry.npmjs.org/"
-      #   run: |
-      #     echo "registry=${NPM_REGISTRY}" >> /home/runner/.npmrc
-      #     echo "@inditextech:registry=${NPM_REGISTRY}" >> /home/runner/.npmrc
-      #     echo "//registry.npmjs.org/:_authToken=${NPM_AUTH}" >> /home/runner/.npmrc
-      #     echo "always-auth=true" >> /home/runner/.npmrc
+      - name: NPM / Set npmrc
+        env:
+          NPM_AUTH: ${{ secrets.NPM_TOKEN }}
+          NPM_REGISTRY: "https://registry.npmjs.org/"
+        run: |
+          echo "registry=${NPM_REGISTRY}" >> /home/runner/.npmrc
+          echo "@inditextech:registry=${NPM_REGISTRY}" >> /home/runner/.npmrc
+          echo "//registry.npmjs.org/:_authToken=${NPM_AUTH}" >> /home/runner/.npmrc
+          echo "always-auth=true" >> /home/runner/.npmrc
 
       - name: NPM / Create Cache Folders
         run: |
@@ -183,7 +183,7 @@ jobs:
       - name: NPM / Release Perform - Distribution Platform
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          # NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
         working-directory: code
         run: |
           npm run release:perform
