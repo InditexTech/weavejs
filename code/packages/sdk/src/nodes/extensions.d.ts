@@ -49,6 +49,8 @@ declare module 'konva/lib/Node' {
     movedToContainer(container: Konva.Layer | Konva.Group): void;
     handleMouseover(): void;
     handleMouseout(): void;
+    handleSelectNode(): void;
+    handleDeselectNode(): void;
   }
 }
 

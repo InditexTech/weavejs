@@ -2,8 +2,10 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-global._weave_isServerSide = true;
-global._weave_serverSideBackend = undefined;
+if (typeof window === 'undefined') {
+  global._weave_isServerSide = true;
+  global._weave_serverSideBackend = undefined;
+}
 
 export { Weave } from './weave';
 export { WeaveStore } from './stores/store';
@@ -139,6 +141,9 @@ export * from './plugins/stage-zoom/types';
 export { WeaveNodesSelectionPlugin } from './plugins/nodes-selection/nodes-selection';
 export * from './plugins/nodes-selection/constants';
 export * from './plugins/nodes-selection/types';
+export { WeaveNodesMultiSelectionFeedbackPlugin } from './plugins/nodes-multi-selection-feedback/nodes-multi-selection-feedback';
+export * from './plugins/nodes-multi-selection-feedback/constants';
+export * from './plugins/nodes-multi-selection-feedback/types';
 export { WeaveConnectedUsersPlugin } from './plugins/connected-users/connected-users';
 export * from './plugins/connected-users/types';
 export { WeaveUsersSelectionPlugin } from './plugins/users-selection/users-selection';

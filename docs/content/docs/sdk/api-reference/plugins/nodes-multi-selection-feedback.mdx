@@ -1,0 +1,99 @@
+---
+title: WeaveNodesMultiSelectionFeedbackPlugin
+description: Activate support to provide more feedback when multi-selecting nodes on the canvas
+---
+
+import { TypeTable } from "fumadocs-ui/components/type-table";
+
+## Overview
+
+The [WeaveNodesMultiSelectionFeedbackPlugin](https://github.com/InditexTech/weavejs/blob/main/code/packages/sdk/src/plugins/nodes-multi-selection-feedback/nodes-multi-selection-feedback.ts)
+class that provides feedback to the end-users when multi-selecting nodes on the canvas.
+
+Selection is a critical foundation for enabling further interactions like moving, grouping, deleting,
+copying, or applying bulk actions on nodes.
+
+The class extends the [WeavePlugin](/docs/sdk/api-reference/plugins/plugin) class
+
+## Name
+
+This plugin `name` property value is `nodesMultiSelectionFeedback`.
+
+## Import
+
+```shell
+import { WeaveNodesMultiSelectionFeedbackPlugin } from "@inditextech/weave-sdk";
+```
+
+## Instantiation
+
+```ts
+new WeaveNodesMultiSelectionFeedbackPlugin(params?: WeaveNodesMultiSelectionFeedbackPluginParams);
+```
+
+## TypeScript types
+
+```ts
+type WeaveNodesMultiSelectionFeedbackStyle = {
+  stroke: string;
+  strokeWidth: number;
+  fill: string;
+};
+
+type WeaveNodesMultiSelectionFeedbackConfig = {
+  style: WeaveNodesMultiSelectionFeedbackStyle;
+};
+
+type WeaveNodesMultiSelectionFeedbackPluginConfig =
+  DeepPartial<WeaveNodesMultiSelectionFeedbackConfig>;
+
+type WeaveNodesMultiSelectionFeedbackPluginParams = {
+  config?: WeaveNodesMultiSelectionFeedbackPluginConfig;
+};
+```
+
+## Parameters
+
+For `WeaveNodesMultiSelectionFeedbackPluginParams`:
+
+<TypeTable
+  type={{
+    ["config"]: {
+      description: "Config parameters for the plugin.",
+      type: "WeaveNodesMultiSelectionFeedbackPluginConfig",
+    },
+  }}
+/>
+
+For `WeaveNodesMultiSelectionFeedbackPluginConfig`:
+
+<TypeTable
+  type={{
+    ["style"]: {
+      description: "Selector config (Konva Transformer configuration).",
+      type: "WeaveNodesMultiSelectionFeedbackStyle",
+    },
+  }}
+/>
+
+For `WeaveNodesMultiSelectionFeedbackStyle`:
+
+<TypeTable
+  type={{
+    ["stroke"]: {
+      description: "The color of the stroke (edge)",
+      type: "string",
+      default: "#ff2c2cff",
+    },
+    ["strokeWidth"]: {
+      description: "The width of the stroke (edge)",
+      type: "number",
+      default: "2",
+    },
+    ["fill"]: {
+      description: "The fill of the selector",
+      type: "string",
+      default: "transparent",
+    },
+  }}
+/>

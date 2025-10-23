@@ -25,8 +25,10 @@ import { type Logger } from 'pino';
 import type { WeaveNodesSelectionPlugin } from '@/plugins/nodes-selection/nodes-selection';
 import type {
   WeaveStoreOnNodeChangeEvent,
+  WeaveStoreOnRedoChangeEvent,
   WeaveStoreOnRoomLoadedEvent,
   WeaveStoreOnStateChangeEvent,
+  WeaveStoreOnUndoChangeEvent,
   WeaveStoreOnUndoRedoChangeEvent,
 } from './types';
 
@@ -232,6 +234,8 @@ export abstract class WeaveStore implements WeaveStoreBase {
     }
 
     this.undoManager.undo();
+
+    this.instance.emitEvent<WeaveStoreOnUndoChangeEvent>('onUndoChange');
   }
 
   redoStateStep(): void {
@@ -240,6 +244,8 @@ export abstract class WeaveStore implements WeaveStoreBase {
     }
 
     this.undoManager.redo();
+
+    this.instance.emitEvent<WeaveStoreOnRedoChangeEvent>('onRedoChange');
   }
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any

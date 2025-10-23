@@ -8,6 +8,8 @@ import type {
   WeaveUndoRedoChange,
 } from '@inditextech/weave-types';
 
+export type WeaveStoreOnUndoChangeEvent = undefined;
+export type WeaveStoreOnRedoChangeEvent = undefined;
 export type WeaveStoreOnStateChangeEvent = WeaveState;
 export type WeaveStoreOnRoomLoadedEvent = boolean;
 export type WeaveStoreOnUndoRedoChangeEvent = WeaveUndoRedoChange;
