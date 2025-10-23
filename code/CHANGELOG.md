@@ -15,7 +15,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- [#719](https://github.com/InditexTech/weavejs/issues/719) Improve selection feedbac
+- [#719](https://github.com/InditexTech/weavejs/issues/719) Improve selection feedback
 
 ## [1.2.1] - 2025-10-22
 
