@@ -11,7 +11,7 @@ const pass = process.env.VERDACCIO_ADMIN_PASSWORD;
 
 if (!pass || pass.length === 0) {
   console.error(
-    '❌ [Verdaccio setup] VERDACCIO_ADMIN_PASSWORD environment variable is not set'
+    '❌ Verdaccio setup: VERDACCIO_ADMIN_PASSWORD environment variable is not set'
   );
   process.exit(1);
 }
@@ -34,5 +34,5 @@ fs.writeFileSync(
   line
 );
 
-console.log('✅ [Verdaccio setup] .htpasswd created @ verdaccio/config/.htpasswd');
+console.log('✅ Verdaccio setup: .htpasswd created @ verdaccio/config/.htpasswd');
 process.exit(0);
