@@ -178,6 +178,7 @@ export abstract class WeaveNode implements WeaveNodeBase {
     }
 
     selectionPlugin.getHoverTransformer().nodes([node]);
+    selectionPlugin.getHoverTransformer().moveToTop();
   }
 
   protected hideHoverState(): void {

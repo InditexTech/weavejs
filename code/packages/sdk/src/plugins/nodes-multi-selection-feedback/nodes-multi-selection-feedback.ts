@@ -57,7 +57,46 @@ export class WeaveNodesMultiSelectionFeedbackPlugin extends WeavePlugin {
   }
 
   cleanupSelectedHalos() {
-    this.selectedHalos = {};
+    const keys = Object.keys(this.selectedHalos);
+    keys.forEach((key) => {
+      this.selectedHalos[key].destroy();
+      delete this.selectedHalos[key];
+    });
+  }
+
+  private getNodeRectInfo(node: Konva.Node) {
+    const stage = node.getStage();
+    if (!stage) return null;
+
+    const clone = node.clone();
+
+    const box = clone.getClientRect({
+      skipTransform: true,
+      skipStroke: true,
+      relativeTo: node.getParent() ?? this.instance.getMainLayer(),
+    });
+    const localBox = clone.getClientRect({
+      skipTransform: true,
+      skipStroke: true,
+    });
+
+    const transform = clone.getAbsoluteTransform();
+
+    // Compute the four absolute corners of the box
+    const corners = [
+      { x: localBox.x, y: localBox.y },
+      { x: localBox.x + localBox.width, y: localBox.y },
+      { x: localBox.x + localBox.width, y: localBox.y + localBox.height },
+      { x: localBox.x, y: localBox.y + localBox.height },
+    ].map((p) => transform.point(p));
+
+    return {
+      x: corners[0].x,
+      y: corners[0].y,
+      width: box.width * clone.scaleX(),
+      height: box.height * clone.scaleY(),
+      rotation: clone.rotation(),
+    };
   }
 
   createSelectionHalo(node: Konva.Node): void {
@@ -67,21 +106,48 @@ export class WeaveNodesMultiSelectionFeedbackPlugin extends WeavePlugin {
       return;
     }
 
-    this.selectedHalos[nodeId] = new Konva.Rect({
-      id: `${nodeId}-selection-halo`,
-      name: 'selection-halo',
-      x: node.x(),
-      y: node.y(),
-      width: node.width(),
-      height: node.height(),
-      stroke: this.config.style.stroke,
-      strokeWidth: this.config.style.strokeWidth,
-      fill: this.config.style.fill,
-      draggable: false,
-      listening: false,
-    });
+    const info = this.getNodeRectInfo(node);
 
-    this.instance.getSelectionLayer()?.add(this.selectedHalos[nodeId]);
+    if (info) {
+      const parent = node.getParent();
+      // Is a Container (frame)
+      if (node.getAttrs().nodeId) {
+        const realParent = this.instance
+          .getStage()
+          .findOne(`#${node.getAttrs().nodeId}`);
+        if (realParent) {
+          info.x += realParent.x();
+          info.y += realParent.y();
+        }
+      }
+      // Its parent is a Container (frame)
+      if (parent && parent.getAttrs().nodeId) {
+        const realParent = this.instance
+          .getStage()
+          .findOne(`#${parent.getAttrs().nodeId}`);
+        if (realParent) {
+          info.x += realParent.x();
+          info.y += realParent.y();
+        }
+      }
+
+      this.selectedHalos[nodeId] = new Konva.Rect({
+        id: `${nodeId}-selection-halo`,
+        name: 'selection-halo',
+        x: info.x,
+        y: info.y,
+        width: info.width,
+        height: info.height,
+        rotation: info.rotation,
+        stroke: this.config.style.stroke,
+        strokeWidth: this.config.style.strokeWidth,
+        fill: this.config.style.fill,
+        draggable: false,
+        listening: false,
+      });
+
+      this.instance.getSelectionLayer()?.add(this.selectedHalos[nodeId]);
+    }
   }
 
   destroySelectionHalo(node: Konva.Node): void {
@@ -101,24 +167,6 @@ export class WeaveNodesMultiSelectionFeedbackPlugin extends WeavePlugin {
       );
       if (groupHalo) {
         groupHalo.hide();
-      }
-    }
-  }
-
-  handleSelectionHalo(node: Konva.Node): void {
-    const selectionLayer = this.instance.getSelectionLayer();
-
-    if (selectionLayer) {
-      const groupHalo = selectionLayer.findOne(
-        `#${node.getAttrs().id}-selection-halo`
-      );
-      if (groupHalo) {
-        groupHalo.rotation(node.rotation());
-        groupHalo.x(node.x());
-        groupHalo.y(node.y());
-        groupHalo.width(node.width());
-        groupHalo.height(node.height());
-        groupHalo.show();
       }
     }
   }

@@ -15,6 +15,10 @@ import { type Logger } from 'pino';
 import { WeaveNodesSelectionPlugin } from '@/plugins/nodes-selection/nodes-selection';
 import type { WeaveNode } from '@/nodes/node';
 import type { WeaveGroupNode } from '@/nodes/group/group';
+import {
+  WEAVE_NODES_MULTI_SELECTION_FEEDBACK_PLUGIN_KEY,
+  WeaveNodesMultiSelectionFeedbackPlugin,
+} from '@/index.node';
 
 export class WeaveGroupsManager {
   private instance: Weave;
@@ -217,6 +221,8 @@ export class WeaveGroupsManager {
     }
 
     setTimeout(() => {
+      this.getNodesMultiSelectionFeedbackPlugin()?.cleanupSelectedHalos();
+
       const groupNode = stage.findOne(`#${groupId}`) as
         | Konva.Layer
         | Konva.Group
@@ -338,6 +344,8 @@ export class WeaveGroupsManager {
     }
 
     setTimeout(() => {
+      this.getNodesMultiSelectionFeedbackPlugin()?.cleanupSelectedHalos();
+
       const firstElement = newLayer.findOne(`#${newChildId}`) as
         | Konva.Node
         | undefined;
@@ -369,5 +377,11 @@ export class WeaveGroupsManager {
       scaleY,
       rotation,
     };
+  }
+
+  getNodesMultiSelectionFeedbackPlugin() {
+    return this.instance.getPlugin<WeaveNodesMultiSelectionFeedbackPlugin>(
+      WEAVE_NODES_MULTI_SELECTION_FEEDBACK_PLUGIN_KEY
+    );
   }
 }

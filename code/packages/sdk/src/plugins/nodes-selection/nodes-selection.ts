@@ -274,6 +274,8 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
           nodeHovered = targetNode as Konva.Node | undefined;
         }
         targetNode?.handleMouseover();
+      } else {
+        nodeHovered?.handleMouseout();
       }
     });
 
