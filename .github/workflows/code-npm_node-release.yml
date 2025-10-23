@@ -176,7 +176,6 @@ jobs:
         env:
           RELEASE_VERSION: ${{ steps.update-changelog.outputs.version }}
         run: |
-          npm install -g npm@11.5.1
           npm run version:release
           npm run release:prepare
 
