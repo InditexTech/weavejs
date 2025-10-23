@@ -291,24 +291,14 @@ export class WeaveImageNode extends WeaveNode {
     if (this.imageSource[id]) {
       imagePlaceholder.destroy();
       internalImage.setAttrs({
-        width: this.imageSource[id].width,
-        height: this.imageSource[id].height,
         image: this.imageSource[id],
         visible: true,
       });
-
-      image.setAttr('width', this.imageSource[id].width);
-      image.setAttr('width', this.imageSource[id].width);
-      image.setAttr('height', this.imageSource[id].height);
-      image.setAttr('cropInfo', props.cropInfo ?? undefined);
-      image.setAttr(
-        'uncroppedImage',
-        props.uncroppedImage ?? {
-          width: this.imageSource[id].width,
-          height: this.imageSource[id].height,
-        }
-      );
       image.setAttr('imageInfo', {
+        width: this.imageSource[id].width,
+        height: this.imageSource[id].height,
+      });
+      internalImage.setAttr('imageInfo', {
         width: this.imageSource[id].width,
         height: this.imageSource[id].height,
       });
@@ -442,7 +432,7 @@ export class WeaveImageNode extends WeaveNode {
         draggable: false,
         zIndex: 0,
       });
-      this.updateImageCrop(nodeInstance as Konva.Group, nextProps);
+      this.updateImageCrop(nodeInstance as Konva.Group);
     }
   }
 
@@ -543,33 +533,18 @@ export class WeaveImageNode extends WeaveNode {
             width: this.imageSource[id].width,
             height: this.imageSource[id].height,
           });
-          this.scaleReset(image);
-
-          if (!imageProps.uncroppedImage) {
-            imageProps.uncroppedImage = {
-              width: this.imageSource[id].width,
-              height: this.imageSource[id].height,
-            };
-          }
+          // this.scaleReset(image);
 
           const imageRect = image.getClientRect({
             relativeTo: this.instance.getStage(),
           });
 
-          if (imageProps.cropInfo && imageProps.uncroppedImage) {
-            image.setAttr('uncroppedImage', {
-              width: imageProps.uncroppedImage.width,
-              height: imageProps.uncroppedImage.height,
-            });
-          }
-          if (!imageProps.cropInfo) {
+          if (!imageProps.cropInfo && !imageProps.uncroppedImage) {
             image.setAttr('uncroppedImage', {
               width: imageRect.width,
               height: imageRect.height,
             });
           }
-
-          this.updateImageCrop(image, imageProps);
 
           this.imageState[id] = {
             loaded: true,
@@ -584,6 +559,8 @@ export class WeaveImageNode extends WeaveNode {
               nodeHandler.serialize(image as WeaveElementInstance)
             );
           }
+
+          this.updateImageCrop(image);
 
           this.resolveAsyncElement(id);
         }
@@ -651,8 +628,8 @@ export class WeaveImageNode extends WeaveNode {
     }
   }
 
-  updateImageCrop(image: Konva.Group, nextProps: WeaveElementAttributes): void {
-    const imageAttrs = nextProps;
+  updateImageCrop(image: Konva.Group): void {
+    const imageAttrs = image.getAttrs();
 
     const internalImage = image?.findOne(`#${imageAttrs.id}-image`) as
       | Konva.Image
