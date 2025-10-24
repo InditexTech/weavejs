@@ -527,6 +527,10 @@ export function getVisibleNodes(
       return;
     }
 
+    if (node.getAttrs().nodeType === 'connector') {
+      return;
+    }
+
     if (
       node.getParent() !== referenceLayer &&
       !node.getParent()?.getAttrs().nodeId

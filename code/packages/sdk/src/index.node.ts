@@ -62,6 +62,12 @@ export * from './nodes/comment/types';
 export { WeaveVideoNode } from './nodes/video/video';
 export * from './nodes/video/constants';
 export * from './nodes/video/types';
+export { WeaveConnectorNode } from './nodes/connector/connector';
+export * from './nodes/connector/constants';
+export * from './nodes/connector/types';
+export { WeaveConnectorToolAction } from './actions/connector-tool/connector-tool';
+export * from './actions/connector-tool/constants';
+export * from './actions/connector-tool/types';
 
 // Provided Actions
 export { WeaveZoomOutToolAction } from './actions/zoom-out-tool/zoom-out-tool';

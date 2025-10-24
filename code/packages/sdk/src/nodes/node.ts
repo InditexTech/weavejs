@@ -177,7 +177,12 @@ export abstract class WeaveNode implements WeaveNodeBase {
       return;
     }
 
-    selectionPlugin.getHoverTransformer().nodes([node]);
+    if (node.getAttrs().nodeType === 'connector') {
+      selectionPlugin.getHoverTransformer().nodes([]);
+    } else {
+      selectionPlugin.getHoverTransformer().nodes([node]);
+    }
+
     selectionPlugin.getHoverTransformer().moveToTop();
   }
 
@@ -540,10 +545,20 @@ export abstract class WeaveNode implements WeaveNodeBase {
       };
 
       node.on('pointerover', (e) => {
+        const realNodeTarget: Konva.Node = this.getRealSelectedNode(e.target);
+        realNodeTarget?.handleMouseover?.();
+
         const doCancelBubble = this.handleMouseOver(e.target);
         if (doCancelBubble) {
           e.cancelBubble = true;
         }
+      });
+
+      node.on('pointerleave', (e) => {
+        const realNodeTarget: Konva.Node = this.getRealSelectedNode(e.target);
+        realNodeTarget?.handleMouseout?.();
+
+        this.handleMouseout(e.target);
       });
     }
   }
@@ -826,7 +841,7 @@ export abstract class WeaveNode implements WeaveNodeBase {
     return mergeExceptArrays(transformProperties, nodeTransformConfig ?? {});
   }
 
-  private getNodesSelectionPlugin() {
+  getNodesSelectionPlugin() {
     const nodesSelectionPlugin =
       this.instance.getPlugin<WeaveNodesSelectionPlugin>('nodesSelection');
 
@@ -873,6 +888,14 @@ export abstract class WeaveNode implements WeaveNodeBase {
         realNodeTarget = this.instance.getInstanceRecursive(
           nodesIntersected[nodesIntersected.length - 1]
         );
+      }
+    }
+
+    if (realNodeTarget.getAttrs().nodeId) {
+      const realNode = stage.findOne(`#${realNodeTarget.getAttrs().nodeId}`);
+
+      if (realNode) {
+        realNodeTarget = realNode;
       }
     }
 
