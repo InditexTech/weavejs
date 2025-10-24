@@ -142,6 +142,7 @@ export class WeaveNodesMultiSelectionFeedbackPlugin extends WeavePlugin {
         stroke: this.config.style.stroke,
         strokeWidth: this.config.style.strokeWidth,
         fill: this.config.style.fill,
+        strokeScaleEnabled: false,
         draggable: false,
         listening: false,
       });
