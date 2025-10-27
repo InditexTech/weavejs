@@ -302,6 +302,16 @@ export class WeaveImageNode extends WeaveNode {
         width: this.imageSource[id].width,
         height: this.imageSource[id].height,
       });
+      if (!image.getAttrs().uncroppedImage) {
+        image.setAttr('uncroppedImage', {
+          width: this.imageSource[id].width,
+          height: this.imageSource[id].height,
+        });
+      }
+      this.imageState[id] = {
+        loaded: true,
+        error: false,
+      };
       this.instance.updateNode(this.serialize(image));
     } else {
       this.updatePlaceholderSize(image, imagePlaceholder);
@@ -639,7 +649,13 @@ export class WeaveImageNode extends WeaveNode {
       return;
     }
 
-    if (image && internalImage && !imageAttrs.adding && imageAttrs.cropInfo) {
+    if (
+      image &&
+      internalImage &&
+      !imageAttrs.adding &&
+      imageAttrs.cropInfo &&
+      imageAttrs.uncroppedImage
+    ) {
       const actualScale =
         imageAttrs.uncroppedImage.width / imageAttrs.imageInfo.width;
       const cropScale = imageAttrs.cropInfo
@@ -663,7 +679,13 @@ export class WeaveImageNode extends WeaveNode {
         imageAttrs.cropSize.height * (actualScale / cropScale)
       );
     }
-    if (image && internalImage && !imageAttrs.adding && !imageAttrs.cropInfo) {
+    if (
+      image &&
+      internalImage &&
+      !imageAttrs.adding &&
+      !imageAttrs.cropInfo &&
+      imageAttrs.uncroppedImage
+    ) {
       internalImage.width(imageAttrs.uncroppedImage.width);
       internalImage.height(imageAttrs.uncroppedImage.height);
       internalImage.rotation(0);
