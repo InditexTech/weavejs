@@ -233,6 +233,8 @@ export class WeaveStagePanningPlugin extends WeavePlugin {
       this.enableMove = false;
 
       this.panning = false;
+
+      this.cleanupEdgeMoveIntervals();
     });
 
     // Pan with wheel mouse pressed
@@ -300,24 +302,24 @@ export class WeaveStagePanningPlugin extends WeavePlugin {
           const target: Konva.Node = this.panEdgeTargets[
             targetId
           ] as Konva.Node;
-          isNearLeft = pos.x < offset * stage.scaleX();
+          isNearLeft = pos.x < offset / stage.scaleX();
           if (isNearLeft) {
             target.x(target.x() - speed / stage.scaleX());
           }
 
-          isNearRight = pos.x > stage.width() - offset * stage.scaleX();
+          isNearRight = pos.x > stage.width() - offset / stage.scaleX();
           if (isNearRight) {
             target.x(target.x() + speed / stage.scaleX());
           }
 
-          isNearTop = pos.y < offset * stage.scaleY();
+          isNearTop = pos.y < offset;
           if (isNearTop) {
-            target.y(target.y() - speed / stage.scaleX());
+            target.y(target.y() - speed / stage.scaleY());
           }
 
-          isNearBottom = pos.y > stage.height() - offset * stage.scaleY();
+          isNearBottom = pos.y > stage.height() - offset;
           if (isNearBottom) {
-            target.y(target.y() + speed / stage.scaleX());
+            target.y(target.y() + speed / stage.scaleY());
           }
         }
 
