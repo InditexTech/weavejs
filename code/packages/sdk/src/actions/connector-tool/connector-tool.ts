@@ -23,18 +23,18 @@ export class WeaveConnectorToolAction extends WeaveAction {
   protected measureContainer: Konva.Layer | Konva.Group | undefined;
   protected clickPoint: Konva.Vector2d | null;
   protected pointers: Map<number, Konva.Vector2d>;
-  protected nodeSelected: string | undefined;
-  protected initialNodeId: string | undefined;
-  protected initialNodeAnchor: string | undefined;
-  protected initialAnchorNode: Konva.Node | undefined;
-  protected finalNodeId: string | undefined;
-  protected finalNodeAnchor: string | undefined;
-  protected finalAnchorNode: Konva.Node | undefined;
+  protected startPoint: Konva.Vector2d | undefined;
+  protected startNodeId: string | undefined;
+  protected startNodeAnchor: string | undefined;
+  protected startNode: Konva.Node | undefined;
+  protected endPoint: Konva.Vector2d | undefined;
+  protected endNodeId: string | undefined;
+  protected endNodeAnchor: string | undefined;
+  protected endNode: Konva.Node | undefined;
   protected tempPoint: Konva.Circle | undefined;
   protected tempNextPoint: Konva.Circle | undefined;
   protected connectorId: string | undefined;
   protected cancelAction!: () => void;
-  protected overHandle: boolean;
   onPropsChange = undefined;
   onInit = undefined;
 
@@ -43,13 +43,14 @@ export class WeaveConnectorToolAction extends WeaveAction {
 
     this.pointers = new Map<number, Konva.Vector2d>();
     this.initialized = false;
-    this.initialNodeId = undefined;
-    this.initialNodeAnchor = undefined;
-    this.finalNodeId = undefined;
-    this.finalNodeAnchor = undefined;
-    this.initialAnchorNode = undefined;
-    this.finalAnchorNode = undefined;
-    this.overHandle = false;
+    this.startPoint = undefined;
+    this.startNodeId = undefined;
+    this.startNodeAnchor = undefined;
+    this.startNode = undefined;
+    this.endPoint = undefined;
+    this.endNodeId = undefined;
+    this.endNodeAnchor = undefined;
+    this.endNode = undefined;
     this.state = CONNECTOR_TOOL_STATE.IDLE;
     this.connectorId = undefined;
     this.container = undefined;
@@ -113,11 +114,17 @@ export class WeaveConnectorToolAction extends WeaveAction {
 
       if (shape) {
         const targetNode = this.instance.getInstanceRecursive(shape);
-        if (nodeHovered && targetNode !== nodeHovered) {
+        if (
+          !nodeHovered ||
+          (nodeHovered &&
+            ['connector'].includes(targetNode.getAttrs().nodeType) &&
+            targetNode &&
+            targetNode !== nodeHovered)
+        ) {
           this.hideAllConnectorAnchors();
+          this.showConnectorAnchors(targetNode);
+          nodeHovered = targetNode;
         }
-        this.showConnectorAnchors(targetNode);
-        nodeHovered = targetNode;
       } else {
         this.hideAllConnectorAnchors();
         nodeHovered = undefined;
@@ -130,6 +137,88 @@ export class WeaveConnectorToolAction extends WeaveAction {
       }
 
       this.setCursor();
+    });
+
+    stage.on('pointerclick', () => {
+      if (
+        !(
+          this.state === CONNECTOR_TOOL_STATE.SELECTING_INITIAL ||
+          this.state === CONNECTOR_TOOL_STATE.SELECTING_FINAL
+        )
+      ) {
+        return;
+      }
+
+      if (this.state === CONNECTOR_TOOL_STATE.SELECTING_INITIAL) {
+        // const { mousePoint, container, measureContainer } =
+        const { mousePoint, container } = this.instance.getMousePointer();
+
+        console.log('Selecting connector start point', {
+          mousePoint,
+          container,
+        });
+
+        const radius = 7;
+
+        const circle = new Konva.Circle({
+          x: mousePoint.x,
+          y: mousePoint.y,
+          radius: (radius * 1.5) / this.instance.getStage().scaleX(),
+          strokeScaleEnabled: false,
+          stroke: '#000000',
+          strokeWidth: 1,
+          fill: '#1a1aff',
+          name: 'connector-anchor-selected',
+          draggable: false,
+          listening: true,
+        });
+
+        this.instance.getSelectionLayer()?.add(circle);
+        circle.moveToTop();
+        this.hideAllConnectorAnchors();
+        this.startNode = circle;
+
+        this.startPoint = mousePoint;
+        this.setState(CONNECTOR_TOOL_STATE.SELECTING_FINAL);
+        return;
+      }
+
+      if (this.state === CONNECTOR_TOOL_STATE.SELECTING_FINAL) {
+        // const { mousePoint, container, measureContainer } =
+        const { mousePoint, container } = this.instance.getMousePointer();
+
+        console.log('Selecting connector end point', {
+          mousePoint,
+          container,
+        });
+
+        const radius = 7;
+
+        const circle = new Konva.Circle({
+          x: mousePoint.x,
+          y: mousePoint.y,
+          radius: (radius * 1.5) / this.instance.getStage().scaleX(),
+          strokeScaleEnabled: false,
+          stroke: '#000000',
+          strokeWidth: 1,
+          fill: '#1a1aff',
+          name: 'connector-anchor-selected',
+          draggable: false,
+          listening: true,
+        });
+
+        this.instance.getSelectionLayer()?.add(circle);
+        circle.moveToTop();
+        this.hideAllConnectorAnchors();
+        this.endNode = circle;
+
+        this.endPoint = mousePoint;
+        this.setState(CONNECTOR_TOOL_STATE.ADDED);
+        this.saveConnector();
+        return;
+      }
+
+      console.log('Click on stage while adding connector');
     });
 
     stage.on('pointerup', (e) => {
@@ -151,12 +240,14 @@ export class WeaveConnectorToolAction extends WeaveAction {
       'onAddingConnector'
     );
 
-    this.initialNodeId = undefined;
-    this.initialNodeAnchor = undefined;
-    this.finalNodeId = undefined;
-    this.finalNodeAnchor = undefined;
-    this.initialAnchorNode = undefined;
-    this.finalAnchorNode = undefined;
+    this.startPoint = undefined;
+    this.startNodeId = undefined;
+    this.startNodeAnchor = undefined;
+    this.startNode = undefined;
+    this.endPoint = undefined;
+    this.endNodeId = undefined;
+    this.endNodeAnchor = undefined;
+    this.endNode = undefined;
 
     this.tempPoint = undefined;
     this.tempNextPoint = undefined;
@@ -165,12 +256,19 @@ export class WeaveConnectorToolAction extends WeaveAction {
   }
 
   private saveConnector() {
-    if (
-      !this.initialNodeId ||
-      !this.initialNodeAnchor ||
-      !this.finalNodeId ||
-      !this.finalNodeAnchor
-    ) {
+    console.log('Saving connector...', {
+      startPoint: this.startPoint,
+      endPoint: this.endPoint,
+      startNodeId: this.startNodeId,
+      endNodeId: this.endNodeId,
+      startNodeAnchor: this.startNodeAnchor,
+      endNodeAnchor: this.endNodeAnchor,
+    });
+    if (!this.startPoint && !(this.startNodeId && this.startNodeAnchor)) {
+      return;
+    }
+
+    if (!this.endPoint && !(this.endNodeId && this.endNodeAnchor)) {
       return;
     }
 
@@ -185,10 +283,12 @@ export class WeaveConnectorToolAction extends WeaveAction {
 
     const node = nodeHandler.create(this.connectorId, {
       ...this.props,
-      initialNodeId: this.initialNodeId,
-      initialNodeAnchor: this.initialNodeAnchor,
-      finalNodeId: this.finalNodeId,
-      finalNodeAnchor: this.finalNodeAnchor,
+      startPoint: this.startPoint,
+      startNodeId: this.startNodeId,
+      startNodeAnchor: this.startNodeAnchor,
+      endPoint: this.endPoint,
+      endNodeId: this.endNodeId,
+      endNodeAnchor: this.endNodeAnchor,
       hitStrokeWidth: 16,
     });
     this.instance.addNode(node, this.container?.getAttrs().id);
@@ -231,12 +331,12 @@ export class WeaveConnectorToolAction extends WeaveAction {
 
     this.hideAllConnectorAnchors();
 
-    if (this.initialAnchorNode) {
-      this.initialAnchorNode.destroy();
+    if (this.startNode) {
+      this.startNode.destroy();
     }
 
-    if (this.finalAnchorNode) {
-      this.finalAnchorNode.destroy();
+    if (this.endNode) {
+      this.endNode.destroy();
     }
 
     const selectionPlugin =
@@ -252,12 +352,14 @@ export class WeaveConnectorToolAction extends WeaveAction {
     stage.container().style.cursor = 'default';
 
     this.initialCursor = null;
-    this.initialNodeId = undefined;
-    this.initialNodeAnchor = undefined;
-    this.finalNodeId = undefined;
-    this.finalNodeAnchor = undefined;
-    this.initialAnchorNode = undefined;
-    this.finalAnchorNode = undefined;
+    this.startPoint = undefined;
+    this.startNodeId = undefined;
+    this.startNodeAnchor = undefined;
+    this.startNode = undefined;
+    this.endPoint = undefined;
+    this.endNodeId = undefined;
+    this.endNodeAnchor = undefined;
+    this.endNode = undefined;
     this.tempPoint = undefined;
     this.tempNextPoint = undefined;
     this.container = undefined;
@@ -282,21 +384,15 @@ export class WeaveConnectorToolAction extends WeaveAction {
     return this.instance.getPlugin<WeaveNodesSelectionPlugin>('nodesSelection');
   }
 
-  protected showConnectorAnchors(node: Konva.Node): void {
-    if (this.nodeSelected === node.getAttrs().id) {
-      return;
-    }
-
-    const clone = node.clone();
-
-    this.nodeSelected = node.getAttrs().id;
-
-    const localBox = clone.getClientRect({
+  protected getNodeAnchors(
+    node: Konva.Node
+  ): { name: string; point: Konva.Vector2d }[] {
+    const localBox = node.getClientRect({
       skipTransform: true,
       skipStroke: true,
     });
 
-    const transform = clone.getAbsoluteTransform();
+    const transform = node.getAbsoluteTransform();
 
     // Compute the four absolute corners of the box
     const corners = [
@@ -329,6 +425,18 @@ export class WeaveConnectorToolAction extends WeaveAction {
     anchors.push({ name: 'right', point: rightMid });
     anchors.push({ name: 'bottom', point: bottomMid });
     anchors.push({ name: 'left', point: leftMid });
+
+    return anchors;
+  }
+
+  protected showConnectorAnchors(node: Konva.Node): void {
+    if (node.getAttrs().nodeType === 'connector') {
+      return;
+    }
+
+    const clone = node.clone();
+
+    const anchors = this.getNodeAnchors(clone);
 
     for (const anchor of anchors) {
       const radius = 7;
@@ -366,7 +474,7 @@ export class WeaveConnectorToolAction extends WeaveAction {
           this.instance.getSelectionLayer()?.add(selectedAnchor);
           selectedAnchor.moveToTop();
           this.hideAllConnectorAnchors();
-          this.initialAnchorNode = selectedAnchor;
+          this.startNode = selectedAnchor;
 
           this.instance.addEventListener('onZoomChange', () => {
             selectedAnchor!.setAttrs({
@@ -384,8 +492,8 @@ export class WeaveConnectorToolAction extends WeaveAction {
             }
           }
 
-          this.initialNodeId = node.getAttrs().id;
-          this.initialNodeAnchor = circle.getAttrs().anchorPosition;
+          this.startNodeId = node.getAttrs().id;
+          this.startNodeAnchor = circle.getAttrs().anchorPosition;
           this.setState(CONNECTOR_TOOL_STATE.SELECTING_FINAL);
           return;
         }
@@ -399,7 +507,7 @@ export class WeaveConnectorToolAction extends WeaveAction {
           this.instance.getSelectionLayer()?.add(selectedAnchor);
           selectedAnchor.moveToTop();
           this.hideAllConnectorAnchors();
-          this.finalAnchorNode = selectedAnchor;
+          this.endNode = selectedAnchor;
 
           this.instance.addEventListener('onZoomChange', () => {
             selectedAnchor!.setAttrs({
@@ -407,15 +515,14 @@ export class WeaveConnectorToolAction extends WeaveAction {
             });
           });
 
-          this.finalNodeId = node.getAttrs().id;
-          this.finalNodeAnchor = circle.getAttrs().anchorPosition;
+          this.endNodeId = node.getAttrs().id;
+          this.endNodeAnchor = circle.getAttrs().anchorPosition;
           this.setState(CONNECTOR_TOOL_STATE.ADDED);
           this.saveConnector();
         }
       });
 
       circle.on('pointermove pointerover', (e) => {
-        this.overHandle = true;
         circle.setAttrs({
           fill: '#ff2c2cff',
         });
@@ -425,7 +532,6 @@ export class WeaveConnectorToolAction extends WeaveAction {
       });
 
       circle.on('pointerleave', () => {
-        this.overHandle = false;
         circle.setAttrs({
           fill: '#ffffffff',
         });
@@ -443,8 +549,6 @@ export class WeaveConnectorToolAction extends WeaveAction {
   }
 
   private hideAllConnectorAnchors(): void {
-    this.nodeSelected = undefined;
-
     const selectionLayer = this.instance.getSelectionLayer();
     if (selectionLayer) {
       const anchors = selectionLayer.find('.connector-anchor');

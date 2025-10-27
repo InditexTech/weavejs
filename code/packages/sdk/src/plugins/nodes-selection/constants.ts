@@ -15,7 +15,7 @@ export const WEAVE_NODES_SELECTION_DEFAULT_CONFIG = {
     flipEnabled: false,
     keepRatio: true,
     useSingleNodeRotation: true,
-    shouldOverdrawWholeArea: false,
+    shouldOverdrawWholeArea: true,
     enabledAnchors: [
       'top-left',
       'top-center',

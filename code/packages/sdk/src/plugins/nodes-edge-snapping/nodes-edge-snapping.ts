@@ -77,12 +77,20 @@ export class WeaveNodesEdgeSnappingPlugin extends WeavePlugin {
       return;
     }
 
+    if (e.target.getAttrs().name?.indexOf('disableDistanceSnapping') !== -1) {
+      return;
+    }
+
     const { targetNode: node, skipNodes } = getTargetAndSkipNodes(
       this.instance,
       e
     );
 
     if (typeof node === 'undefined') {
+      return;
+    }
+
+    if (node.getAttrs().name?.indexOf('disableEdgeSnapping') !== -1) {
       return;
     }
 
