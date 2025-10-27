@@ -16,6 +16,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 - [#761](https://github.com/InditexTech/weavejs/issues/761) Set uncropped image properties when adding new images to the stage that are preloaded
+- [#762](https://github.com/InditexTech/weavejs/issues/762) Disable correctly the stage on-edge panning
 
 ## [1.3.0] - 2025-10-23
 
