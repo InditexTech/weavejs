@@ -211,6 +211,7 @@ export default class WeaveAzureWebPubsubSyncHandler extends WebPubSubEventHandle
       await this.getHostConnection(roomId);
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (ex) {
+      console.log(ex);
       return null;
     }
 

@@ -41,6 +41,7 @@ export abstract class WeaveStore implements WeaveStoreBase {
   private state!: MappedTypeDescription<WeaveState>;
   private latestState: WeaveState;
   private document: Y.Doc;
+
   private logger!: Logger;
   private undoManager!: Y.UndoManager;
   private isRoomLoaded: boolean = false;
@@ -98,6 +99,19 @@ export abstract class WeaveStore implements WeaveStoreBase {
 
   getDocument(): Y.Doc {
     return this.document;
+  }
+
+  loadDocument(roomData: Uint8Array): void {
+    Y.applyUpdate(this.document, roomData);
+
+    if (!this.isRoomLoaded) {
+      this.isRoomLoaded = true;
+
+      this.instance.emitEvent<WeaveStoreOnRoomLoadedEvent>(
+        'onRoomLoaded',
+        this.isRoomLoaded
+      );
+    }
   }
 
   getState(): MappedTypeDescription<WeaveState> {
@@ -197,15 +211,6 @@ export abstract class WeaveStore implements WeaveStoreBase {
         }
       }
 
-      if (!this.isRoomLoaded && !isEmpty(this.state.weave)) {
-        this.instance.setupRenderer();
-        this.isRoomLoaded = true;
-
-        this.instance.emitEvent<WeaveStoreOnRoomLoadedEvent>(
-          'onRoomLoaded',
-          this.isRoomLoaded
-        );
-      }
       if (this.isRoomLoaded && !isEmpty(this.state.weave)) {
         this.instance.render();
       }
