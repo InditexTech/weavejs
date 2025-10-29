@@ -52,8 +52,6 @@ export class WeaveStoreAzureWebPubsub extends WeaveStore {
     super.setup();
 
     this.loadRoomData();
-
-    // this.instance.setupRenderer();
   }
 
   private loadRoomData() {
@@ -90,7 +88,10 @@ export class WeaveStoreAzureWebPubsub extends WeaveStore {
     });
 
     this.provider.on('status', (status) => {
-      if (status === WEAVE_STORE_CONNECTION_STATUS.CONNECTED) {
+      if (
+        status === WEAVE_STORE_CONNECTION_STATUS.CONNECTED &&
+        !this.instance.getRenderer().isInitialized()
+      ) {
         this.instance.setupRenderer();
       }
 

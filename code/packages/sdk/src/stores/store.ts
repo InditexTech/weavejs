@@ -195,8 +195,7 @@ export abstract class WeaveStore implements WeaveStoreBase {
 
       if (
         this.isRoomLoaded &&
-        nodesSelectionPlugin &&
-        nodesSelectionPlugin.getSelectedNodes().length === 1
+        nodesSelectionPlugin?.getSelectedNodes().length === 1
       ) {
         const selectedNode = nodesSelectionPlugin.getSelectedNodes()[0];
         const nodeInfo = this.instance.getNode(

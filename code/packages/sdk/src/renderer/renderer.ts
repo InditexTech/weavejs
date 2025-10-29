@@ -10,6 +10,7 @@ import { type WeaveElementInstance } from '@inditextech/weave-types';
 
 export class WeaveRenderer {
   private instance: Weave;
+  private initialized: boolean;
   private reconciler: WeaveReconciler;
   private serializer: WeaveStateSerializer;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -29,6 +30,7 @@ export class WeaveRenderer {
     reconciler: WeaveReconciler,
     serializer: WeaveStateSerializer
   ) {
+    this.initialized = false;
     this.instance = instance;
     this.reconciler = reconciler;
     this.serializer = serializer;
@@ -54,6 +56,12 @@ export class WeaveRenderer {
     this.root.onUncaughtError = function (error: Error) {
       console.error(error);
     };
+
+    this.initialized = true;
+  }
+
+  isInitialized(): boolean {
+    return this.initialized;
   }
 
   render(callback?: () => void): void {
