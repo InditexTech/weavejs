@@ -32,11 +32,11 @@ const store = new WeaveStoreAzureWebPubsub(storeData: Uint8Array | null, storeOp
 
 <TypeTable
   type={{
-    ["storeData"]: {
+    ["initialRoomData"]: {
       required: true,
       description:
         "If the room is not new, the actual data (snapshot) of the room",
-      type: "Uint8Array | null",
+      type: "Uint8Array | undefined",
     },
     ["storeOptions.getUser"]: {
       required: true,

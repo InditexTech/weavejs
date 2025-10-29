@@ -18,7 +18,7 @@ import { type WeaveStoreAzureWebPubsubOptions } from './types';
 export class WeaveStoreAzureWebPubsub extends WeaveStore {
   private azureWebPubsubOptions: WeaveStoreAzureWebPubsubOptions;
   private roomId: string;
-  private initialRoomData: Uint8Array | null = null;
+  private initialRoomData: Uint8Array | undefined;
   protected provider!: WeaveStoreAzureWebPubSubSyncClient;
   protected name: string = WEAVE_STORE_AZURE_WEB_PUBSUB;
   protected supportsUndoManager = true;
@@ -26,7 +26,7 @@ export class WeaveStoreAzureWebPubsub extends WeaveStore {
   protected awarenessCallback!: (changes: any) => void;
 
   constructor(
-    storeData: Uint8Array | null,
+    initialRoomData: Uint8Array | undefined,
     storeOptions: WeaveStoreOptions,
     azureWebPubsubOptions: Pick<
       WeaveStoreAzureWebPubsubOptions,
@@ -43,7 +43,7 @@ export class WeaveStoreAzureWebPubsub extends WeaveStore {
       azureWebPubsubOptions
     );
     this.roomId = roomId;
-    this.initialRoomData = storeData;
+    this.initialRoomData = initialRoomData;
 
     this.init();
   }
@@ -59,7 +59,7 @@ export class WeaveStoreAzureWebPubsub extends WeaveStore {
   private loadRoomData() {
     if (this.initialRoomData) {
       this.loadDocument(this.initialRoomData);
-      this.initialRoomData = null;
+      this.initialRoomData = undefined;
     }
   }
 
