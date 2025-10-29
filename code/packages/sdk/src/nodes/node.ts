@@ -34,6 +34,7 @@ import { WEAVE_NODES_DISTANCE_SNAPPING_PLUGIN_KEY } from '@/plugins/nodes-distan
 import type { WeaveNodesDistanceSnappingPlugin } from '@/plugins/nodes-distance-snapping/nodes-distance-snapping';
 import type { WeaveNodesMultiSelectionFeedbackPlugin } from '@/plugins/nodes-multi-selection-feedback/nodes-multi-selection-feedback';
 import { WEAVE_NODES_MULTI_SELECTION_FEEDBACK_PLUGIN_KEY } from '@/plugins/nodes-multi-selection-feedback/constants';
+import type { WeaveNodeChangedContainerEvent } from './types';
 
 export const augmentKonvaStageClass = (): void => {
   Konva.Stage.prototype.isMouseWheelPressed = function () {
@@ -319,6 +320,9 @@ export abstract class WeaveNode implements WeaveNodeBase {
         originalPosition = nodeTarget.getAbsolutePosition();
       });
 
+      let originalNode: Konva.Node | null | undefined = undefined;
+      let originalContainer: Konva.Node | null | undefined = undefined;
+
       node.on('dragstart', (e) => {
         const nodeTarget = e.target;
 
@@ -349,6 +353,14 @@ export abstract class WeaveNode implements WeaveNodeBase {
 
         if (realNodeTarget.getAttrs().isCloned) {
           return;
+        }
+
+        originalNode = realNodeTarget.clone();
+        originalContainer = realNodeTarget.getParent();
+        if (originalContainer?.getAttrs().nodeId) {
+          originalContainer = stage.findOne(
+            `#${originalContainer.getAttrs().nodeId}`
+          );
         }
 
         if (e.evt?.altKey) {
@@ -469,57 +481,76 @@ export abstract class WeaveNode implements WeaveNodeBase {
           this.isSelecting() &&
           this.getSelectionPlugin()?.getSelectedNodes().length === 1
         ) {
-          clearContainerTargets(this.instance);
+          this.instance.stateTransactional(() => {
+            clearContainerTargets(this.instance);
 
-          const nodesEdgeSnappingPlugin = this.getNodesEdgeSnappingPlugin();
+            const nodesEdgeSnappingPlugin = this.getNodesEdgeSnappingPlugin();
 
-          const nodesDistanceSnappingPlugin =
-            this.getNodesDistanceSnappingPlugin();
+            const nodesDistanceSnappingPlugin =
+              this.getNodesDistanceSnappingPlugin();
 
-          if (nodesEdgeSnappingPlugin) {
-            nodesEdgeSnappingPlugin.cleanupGuidelines();
-          }
+            if (nodesEdgeSnappingPlugin) {
+              nodesEdgeSnappingPlugin.cleanupGuidelines();
+            }
 
-          if (nodesDistanceSnappingPlugin) {
-            nodesDistanceSnappingPlugin.cleanupGuidelines();
-          }
+            if (nodesDistanceSnappingPlugin) {
+              nodesDistanceSnappingPlugin.cleanupGuidelines();
+            }
 
-          const layerToMove = containerOverCursor(this.instance, [
-            realNodeTarget,
-          ]);
-
-          let containerToMove: Konva.Layer | Konva.Node | undefined =
-            this.instance.getMainLayer();
-
-          if (layerToMove) {
-            containerToMove = layerToMove;
-          }
-
-          let moved = false;
-          if (containerToMove && !hasFrames(node)) {
-            moved = moveNodeToContainer(
-              this.instance,
+            const layerToMove = containerOverCursor(this.instance, [
               realNodeTarget,
-              containerToMove
-            );
-          }
+            ]);
 
-          if (realNodeTarget.getAttrs().isCloned) {
-            this.instance.getCloningManager().removeClone(realNodeTarget);
-          }
+            let containerToMove: Konva.Layer | Konva.Node | undefined =
+              this.instance.getMainLayer();
 
-          if (containerToMove) {
-            containerToMove.fire(WEAVE_NODE_CUSTOM_EVENTS.onTargetLeave, {
-              bubbles: true,
-            });
-          }
+            if (layerToMove) {
+              containerToMove = layerToMove;
+            }
 
-          if (!moved) {
-            this.instance.updateNode(
-              this.serialize(realNodeTarget as WeaveElementInstance)
-            );
-          }
+            let moved = false;
+            if (containerToMove && !hasFrames(node)) {
+              moved = moveNodeToContainer(
+                this.instance,
+                realNodeTarget,
+                containerToMove,
+                originalNode!,
+                originalContainer!
+              );
+
+              if (moved) {
+                this.instance.emitEvent<WeaveNodeChangedContainerEvent>(
+                  'onNodeChangedContainer',
+                  {
+                    originalNode,
+                    newNode: realNodeTarget,
+                    originalContainer,
+                    newContainer: containerToMove,
+                  }
+                );
+              }
+            }
+
+            if (realNodeTarget.getAttrs().isCloned) {
+              this.instance.getCloningManager().removeClone(realNodeTarget);
+            }
+
+            if (containerToMove) {
+              containerToMove.fire(WEAVE_NODE_CUSTOM_EVENTS.onTargetLeave, {
+                bubbles: true,
+              });
+            }
+
+            if (!moved) {
+              this.instance.updateNodeNT(
+                this.serialize(realNodeTarget as WeaveElementInstance)
+              );
+            }
+          });
         }
+
+        originalNode = undefined;
+        originalContainer = undefined;
 
         nodeTarget.setAttrs({ isCloned: undefined });
         nodeTarget.setAttrs({ isCloneOrigin: undefined });

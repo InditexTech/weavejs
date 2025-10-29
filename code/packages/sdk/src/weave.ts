@@ -56,6 +56,7 @@ import type { WeaveStoreOnRoomLoadedEvent } from './stores/types';
 import type { DOMElement, WeaveAsyncElement } from './types';
 import { watchMap } from './watch-map';
 import { getBoundingBox, mergeExceptArrays } from './utils';
+import type { WeaveConnectorNode } from './nodes/connector/connector';
 
 export class Weave {
   private id: string;
@@ -512,21 +513,71 @@ export class Weave {
     parentId = 'mainLayer',
     index: number | undefined = undefined
   ): void {
+    this.stateTransactional(() => {
+      this.stateManager.addNode(node, parentId, index);
+    });
+  }
+
+  addNodeNT(
+    node: WeaveStateElement,
+    parentId = 'mainLayer',
+    index: number | undefined = undefined
+  ): void {
     this.stateManager.addNode(node, parentId, index);
   }
 
   updateNode(node: WeaveStateElement): void {
+    this.stateTransactional(() => {
+      this.stateManager.updateNode(node);
+    });
+  }
+
+  updateNodeNT(node: WeaveStateElement): void {
     this.stateManager.updateNode(node);
   }
 
   updateNodes(nodes: WeaveStateElement[]): void {
-    for (const node of nodes) {
-      this.updateNode(node);
-    }
+    this.stateTransactional(() => {
+      this.stateManager.updateNodes(nodes);
+    });
+  }
+
+  updateNodesNT(nodes: WeaveStateElement[]): void {
+    this.stateManager.updateNodes(nodes);
   }
 
   removeNode(node: WeaveStateElement): void {
+    this.stateTransactional(() => {
+      this.stateManager.removeNode(node);
+
+      const connectorHandler =
+        this.getNodeHandler<WeaveConnectorNode>('connector');
+
+      const nodeInstance = this.getStage().findOne(`#${node.key}`);
+
+      if (connectorHandler && nodeInstance) {
+        connectorHandler.nodeRemovedTN(nodeInstance);
+      }
+
+      const selectionPlugin =
+        this.getPlugin<WeaveNodesSelectionPlugin>('nodesSelection');
+      if (selectionPlugin) {
+        selectionPlugin.setSelectedNodes([]);
+      }
+    });
+  }
+
+  removeNodeNT(node: WeaveStateElement): void {
     this.stateManager.removeNode(node);
+
+    const connectorHandler =
+      this.getNodeHandler<WeaveConnectorNode>('connector');
+
+    const nodeInstance = this.getStage().findOne(`#${node.key}`);
+
+    if (connectorHandler && nodeInstance) {
+      connectorHandler.nodeRemovedTN(nodeInstance);
+    }
 
     const selectionPlugin =
       this.getPlugin<WeaveNodesSelectionPlugin>('nodesSelection');
@@ -536,8 +587,22 @@ export class Weave {
   }
 
   removeNodes(nodes: WeaveStateElement[]): void {
+    this.stateTransactional(() => {
+      for (const node of nodes) {
+        this.removeNodeNT(node);
+      }
+
+      const selectionPlugin =
+        this.getPlugin<WeaveNodesSelectionPlugin>('nodesSelection');
+      if (selectionPlugin) {
+        selectionPlugin.setSelectedNodes([]);
+      }
+    });
+  }
+
+  removeNodesNT(nodes: WeaveStateElement[]): void {
     for (const node of nodes) {
-      this.removeNode(node);
+      this.removeNodeNT(node);
     }
 
     const selectionPlugin =
@@ -548,6 +613,12 @@ export class Weave {
   }
 
   moveNode(node: WeaveStateElement, position: WeavePosition): void {
+    this.stateTransactional(() => {
+      this.stateManager.moveNode(node, position);
+    });
+  }
+
+  moveNodeNT(node: WeaveStateElement, position: WeavePosition): void {
     this.stateManager.moveNode(node, position);
   }
 
@@ -608,6 +679,10 @@ export class Weave {
     height: number;
   } {
     return getBoundingBox(nodes, config);
+  }
+
+  stateTransactional(callback: () => void): void {
+    this.stateManager.stateTransactional(callback);
   }
 
   // ZINDEX MANAGEMENT METHODS PROXIES

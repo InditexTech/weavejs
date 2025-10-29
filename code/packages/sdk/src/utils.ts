@@ -13,6 +13,7 @@ import type { WeaveNode } from './nodes/node';
 import type { WeaveNodesSelectionPlugin } from './plugins/nodes-selection/nodes-selection';
 import type { DOMElement } from './types';
 import type { KonvaEventObject } from 'konva/lib/Node';
+import type { WeaveConnectorNode } from './index.node';
 
 export function resetScale(node: Konva.Node): void {
   node.width(
@@ -107,6 +108,8 @@ export function moveNodeToContainer(
   instance: Weave,
   node: Konva.Node,
   containerToMove: Konva.Layer | Konva.Node,
+  originalNode: Konva.Node | null | undefined,
+  originalContainer: Konva.Node | null | undefined,
   invalidOriginsTypes: string[] = ['frame']
 ): boolean {
   const stage = instance.getStage();
@@ -171,8 +174,20 @@ export function moveNodeToContainer(
     if (nodeHandler) {
       const actualNode = nodeHandler.serialize(node as WeaveElementInstance);
 
-      instance.removeNode(actualNode);
-      instance.addNode(actualNode, layerToMoveAttrs.id);
+      const connectorHandler =
+        instance.getNodeHandler<WeaveConnectorNode>('connector');
+
+      if (connectorHandler && originalNode && originalContainer) {
+        connectorHandler.nodeMoveToContainerTN(
+          node,
+          layerToMove,
+          originalNode,
+          originalContainer
+        );
+      }
+
+      instance.removeNodeNT(actualNode);
+      instance.addNodeNT(actualNode, layerToMoveAttrs.id);
 
       return true;
     }

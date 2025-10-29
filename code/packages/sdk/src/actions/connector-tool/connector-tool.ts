@@ -112,20 +112,24 @@ export class WeaveConnectorToolAction extends WeaveAction {
       const shape = stage.getIntersection(pointerPos);
       this.getNodesSelectionPlugin()?.enable();
 
+      let targetNode: Konva.Node | undefined = undefined;
+
       if (shape) {
-        const targetNode = this.instance.getInstanceRecursive(shape);
+        targetNode = this.instance.getInstanceRecursive(shape);
         if (
           !nodeHovered ||
           (nodeHovered &&
-            ['connector'].includes(targetNode.getAttrs().nodeType) &&
             targetNode &&
+            !['connector'].includes(targetNode.getAttrs().nodeType) &&
             targetNode !== nodeHovered)
         ) {
           this.hideAllConnectorAnchors();
           this.showConnectorAnchors(targetNode);
           nodeHovered = targetNode;
         }
-      } else {
+      }
+
+      if (!targetNode) {
         this.hideAllConnectorAnchors();
         nodeHovered = undefined;
       }
@@ -151,12 +155,7 @@ export class WeaveConnectorToolAction extends WeaveAction {
 
       if (this.state === CONNECTOR_TOOL_STATE.SELECTING_INITIAL) {
         // const { mousePoint, container, measureContainer } =
-        const { mousePoint, container } = this.instance.getMousePointer();
-
-        console.log('Selecting connector start point', {
-          mousePoint,
-          container,
-        });
+        const { mousePoint } = this.instance.getMousePointer();
 
         const radius = 7;
 
@@ -185,12 +184,7 @@ export class WeaveConnectorToolAction extends WeaveAction {
 
       if (this.state === CONNECTOR_TOOL_STATE.SELECTING_FINAL) {
         // const { mousePoint, container, measureContainer } =
-        const { mousePoint, container } = this.instance.getMousePointer();
-
-        console.log('Selecting connector end point', {
-          mousePoint,
-          container,
-        });
+        const { mousePoint } = this.instance.getMousePointer();
 
         const radius = 7;
 
@@ -217,8 +211,6 @@ export class WeaveConnectorToolAction extends WeaveAction {
         this.saveConnector();
         return;
       }
-
-      console.log('Click on stage while adding connector');
     });
 
     stage.on('pointerup', (e) => {
@@ -256,14 +248,6 @@ export class WeaveConnectorToolAction extends WeaveAction {
   }
 
   private saveConnector() {
-    console.log('Saving connector...', {
-      startPoint: this.startPoint,
-      endPoint: this.endPoint,
-      startNodeId: this.startNodeId,
-      endNodeId: this.endNodeId,
-      startNodeAnchor: this.startNodeAnchor,
-      endNodeAnchor: this.endNodeAnchor,
-    });
     if (!this.startPoint && !(this.startNodeId && this.startNodeAnchor)) {
       return;
     }
@@ -385,11 +369,24 @@ export class WeaveConnectorToolAction extends WeaveAction {
   }
 
   protected getNodeAnchors(
-    node: Konva.Node
+    node: Konva.Node,
+    parent: Konva.Node
   ): { name: string; point: Konva.Vector2d }[] {
+    const stage = this.instance.getStage();
+
+    let nodeParent: Konva.Node | null | undefined = parent;
+    if (nodeParent?.getAttrs().nodeId) {
+      nodeParent = stage.findOne(`#${nodeParent.getAttrs().nodeId}`);
+    }
+
+    let isInContainer = false;
+    if (nodeParent !== this.instance.getMainLayer()) {
+      isInContainer = true;
+    }
+
     const localBox = node.getClientRect({
+      relativeTo: stage,
       skipTransform: true,
-      skipStroke: true,
     });
 
     const transform = node.getAbsoluteTransform();
@@ -421,6 +418,18 @@ export class WeaveConnectorToolAction extends WeaveAction {
       y: (corners[3].y + corners[0].y) / 2,
     };
 
+    if (isInContainer && nodeParent) {
+      const containerAbsPos = nodeParent.position();
+      topMid.x += containerAbsPos.x || 0;
+      topMid.y += containerAbsPos.y || 0;
+      rightMid.x += containerAbsPos.x || 0;
+      rightMid.y += containerAbsPos.y || 0;
+      bottomMid.x += containerAbsPos.x || 0;
+      bottomMid.y += containerAbsPos.y || 0;
+      leftMid.x += containerAbsPos.x || 0;
+      leftMid.y += containerAbsPos.y || 0;
+    }
+
     anchors.push({ name: 'top', point: topMid });
     anchors.push({ name: 'right', point: rightMid });
     anchors.push({ name: 'bottom', point: bottomMid });
@@ -436,7 +445,7 @@ export class WeaveConnectorToolAction extends WeaveAction {
 
     const clone = node.clone();
 
-    const anchors = this.getNodeAnchors(clone);
+    const anchors = this.getNodeAnchors(clone, node.getParent()!);
 
     for (const anchor of anchors) {
       const radius = 7;
@@ -469,7 +478,7 @@ export class WeaveConnectorToolAction extends WeaveAction {
           selectedAnchor.setAttrs({
             name: 'connector-anchor-selected',
             fill: '#1a1aff',
-            radius: (radius * 1.5) / this.instance.getStage().scaleX(),
+            // radius: (radius * 1.5) / this.instance.getStage().scaleX(),
           });
           this.instance.getSelectionLayer()?.add(selectedAnchor);
           selectedAnchor.moveToTop();
@@ -478,7 +487,7 @@ export class WeaveConnectorToolAction extends WeaveAction {
 
           this.instance.addEventListener('onZoomChange', () => {
             selectedAnchor!.setAttrs({
-              radius: (radius * 1.5) / this.instance.getStage().scaleX(),
+              radius: radius / this.instance.getStage().scaleX(),
             });
           });
 
@@ -502,7 +511,7 @@ export class WeaveConnectorToolAction extends WeaveAction {
           selectedAnchor.setAttrs({
             name: 'connector-anchor-selected',
             fill: '#1a1aff',
-            radius: (radius * 1.5) / this.instance.getStage().scaleX(),
+            // radius: (radius * 1.5) / this.instance.getStage().scaleX(),
           });
           this.instance.getSelectionLayer()?.add(selectedAnchor);
           selectedAnchor.moveToTop();
@@ -511,7 +520,7 @@ export class WeaveConnectorToolAction extends WeaveAction {
 
           this.instance.addEventListener('onZoomChange', () => {
             selectedAnchor!.setAttrs({
-              radius: (radius * 1.5) / this.instance.getStage().scaleX(),
+              radius: radius / this.instance.getStage().scaleX(),
             });
           });
 

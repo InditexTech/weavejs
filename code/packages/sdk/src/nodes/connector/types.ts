@@ -13,6 +13,16 @@ export type WeaveConnectorNodeParams = {
   config: Partial<WeaveConnectorProperties>;
 };
 
+export type WeaveConnectorAnchor = {
+  name: string;
+  point: Konva.Vector2d;
+};
+
+export type WeaveAnchorSnap = {
+  name: string | undefined;
+  position: Konva.Vector2d;
+};
+
 export type WeaveConnectorInfo =
   | {
       type: 'node';

@@ -83,6 +83,30 @@ export class WeaveReconciler {
     }
   }
 
+  updateNode(
+    instance: WeaveElementInstance,
+    type: string,
+    prevProps: WeaveElementAttributes,
+    nextProps: WeaveElementAttributes
+  ) {
+    if (!isEqual(prevProps, nextProps)) {
+      const handler = this.instance.getNodeHandler<WeaveNode>(type);
+
+      if (!handler) {
+        return;
+      }
+
+      handler.onUpdate(instance, nextProps);
+
+      const childZIndex = nextProps.zIndex;
+      if (childZIndex) {
+        instance.zIndex(childZIndex as number);
+      }
+
+      this.instance.emitEvent('onNodeRenderedUpdated', instance);
+    }
+  }
+
   removeNode(node: WeaveElementInstance) {
     this.instance.emitEvent('onNodeRenderedRemoved', node);
   }
@@ -91,6 +115,7 @@ export class WeaveReconciler {
     const weaveInstance = this.instance;
     const logger = this.logger;
     const addNode = this.addNode.bind(this);
+    const updateNode = this.updateNode.bind(this);
     const removeNode = this.removeNode.bind(this);
 
     return {
@@ -327,20 +352,7 @@ export class WeaveReconciler {
           return;
         }
 
-        if (!isEqual(prevProps, nextProps)) {
-          const handler = weaveInstance.getNodeHandler<WeaveNode>(type);
-
-          if (!handler) {
-            return;
-          }
-
-          handler.onUpdate(instance, nextProps);
-
-          const childZIndex = nextProps.zIndex;
-          if (childZIndex) {
-            instance.zIndex(childZIndex as number);
-          }
-        }
+        updateNode(instance, type, prevProps, nextProps);
       },
       removeChildFromContainer(): void {
         logger.debug('removeChildFromContainer');
