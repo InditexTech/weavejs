@@ -111,7 +111,7 @@ jobs:
         if: steps.asdf-cache.outputs.cache-hit != 'true'
         with:
           tool_versions: ${{ env.TOOL_VERSIONS }}
-          asdf_branch: ${{ env.ASDF_BRANCH_VERSION }}
+          asdf_version: ${{ env.ASDF_BRANCH_VERSION }}
 
       - name: NPM / Set npmrc
         env:
