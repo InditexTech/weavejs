@@ -70,6 +70,7 @@ export class WeaveRenderer {
     }
 
     const elementsTree = this.serializer.deserialize(actualState.weave);
+
     this.renderer?.updateContainer(elementsTree, this.root, null, callback);
   }
 }
