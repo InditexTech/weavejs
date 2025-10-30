@@ -206,14 +206,8 @@ export default class WeaveAzureWebPubsubSyncHandler extends WebPubSubEventHandle
     return this._roomsSyncHost.get(roomId);
   }
 
-  async clientConnect(roomId: string): Promise<string | null> {
-    try {
-      await this.getHostConnection(roomId);
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    } catch (ex) {
-      console.log(ex);
-      return null;
-    }
+  async clientConnect(roomId: string): Promise<string> {
+    await this.getHostConnection(roomId);
 
     const token = await this._client.getClientAccessToken({
       groups: [roomId],

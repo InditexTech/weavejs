@@ -1487,6 +1487,10 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
   }
 
   getSelectedNodes() {
+    if (!this.tr) {
+      return [];
+    }
+
     return this.tr.nodes() as (Konva.Group | Konva.Shape)[];
   }
 

@@ -31,6 +31,7 @@ import type {
   WeaveStoreOnUndoChangeEvent,
   WeaveStoreOnUndoRedoChangeEvent,
 } from './types';
+import { defaultInitialState } from './default-initial-state';
 
 export abstract class WeaveStore implements WeaveStoreBase {
   protected instance!: Weave;
@@ -44,10 +45,11 @@ export abstract class WeaveStore implements WeaveStoreBase {
 
   private logger!: Logger;
   private undoManager!: Y.UndoManager;
-  private isRoomLoaded: boolean = false;
+  private isRoomLoaded: boolean;
 
   constructor(config: WeaveStoreOptions) {
     this.config = config;
+    this.isRoomLoaded = false;
     this.latestState = {
       weave: {},
     };
@@ -73,10 +75,7 @@ export abstract class WeaveStore implements WeaveStoreBase {
       .getMainLogger()
       .info(`Store with name [${this.getName()}] registered`);
 
-    this.instance.emitEvent<WeaveStoreOnRoomLoadedEvent>(
-      'onRoomLoaded',
-      this.isRoomLoaded
-    );
+    this.emitOnRoomLoadedEvent();
 
     return this;
   }
@@ -103,14 +102,13 @@ export abstract class WeaveStore implements WeaveStoreBase {
 
   loadDocument(roomData: Uint8Array): void {
     Y.applyUpdate(this.document, roomData);
+  }
 
-    if (!this.isRoomLoaded) {
-      this.isRoomLoaded = true;
-
-      this.instance.emitEvent<WeaveStoreOnRoomLoadedEvent>(
-        'onRoomLoaded',
-        this.isRoomLoaded
-      );
+  loadDefaultDocument(setupDefaultDocument?: (doc: Y.Doc) => void): void {
+    if (setupDefaultDocument) {
+      setupDefaultDocument(this.getDocument());
+    } else {
+      defaultInitialState(this.getDocument());
     }
   }
 
@@ -127,13 +125,17 @@ export abstract class WeaveStore implements WeaveStoreBase {
     return Y.encodeStateAsUpdate(doc);
   }
 
-  setup(): void {
-    this.isRoomLoaded = false;
-
+  private emitOnRoomLoadedEvent(): void {
     this.instance.emitEvent<WeaveStoreOnRoomLoadedEvent>(
       'onRoomLoaded',
       this.isRoomLoaded
     );
+  }
+
+  setup(): void {
+    this.isRoomLoaded = false;
+
+    this.emitOnRoomLoadedEvent();
 
     if (this.supportsUndoManager) {
       const weaveStateValues = getYjsValue(
@@ -210,6 +212,12 @@ export abstract class WeaveStore implements WeaveStoreBase {
         }
       }
 
+      if (!this.isRoomLoaded && !isEmpty(this.state.weave)) {
+        this.instance.setupRenderer();
+        this.isRoomLoaded = true;
+
+        this.emitOnRoomLoadedEvent();
+      }
       if (this.isRoomLoaded && !isEmpty(this.state.weave)) {
         this.instance.render();
       }
