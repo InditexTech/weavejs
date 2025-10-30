@@ -19,20 +19,22 @@ const yjsLayer = function (id: string) {
 };
 
 export function defaultInitialState(doc: Doc): void {
-  const children = new Y.Array();
-  children.insert(0, [
-    yjsLayer('gridLayer'),
-    yjsLayer('mainLayer'),
-    yjsLayer('selectionLayer'),
-    yjsLayer('usersPointersLayer'),
-    yjsLayer('utilityLayer'),
-  ]);
+  doc.transact(() => {
+    const children = new Y.Array();
+    children.insert(0, [
+      yjsLayer('gridLayer'),
+      yjsLayer('mainLayer'),
+      yjsLayer('selectionLayer'),
+      yjsLayer('usersPointersLayer'),
+      yjsLayer('utilityLayer'),
+    ]);
 
-  const stageProps = new Y.Map();
-  stageProps.set('id', 'stage');
-  stageProps.set('children', children);
+    const stageProps = new Y.Map();
+    stageProps.set('id', 'stage');
+    stageProps.set('children', children);
 
-  doc.getMap('weave').set('key', 'stage');
-  doc.getMap('weave').set('type', 'stage');
-  doc.getMap('weave').set('props', stageProps);
+    doc.getMap('weave').set('key', 'stage');
+    doc.getMap('weave').set('type', 'stage');
+    doc.getMap('weave').set('props', stageProps);
+  });
 }
