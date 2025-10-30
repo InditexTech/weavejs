@@ -77,7 +77,7 @@ jobs:
           } >> "$GITHUB_ENV"
 
       - name: Setup asdf environment
-        uses: asdf-vm/actions/install@v4
+        uses: asdf-vm/actions/install@1902764435ca0dd2f3388eea723a4f92a4eb8302 # v4.0.0
         # https://github.com/asdf-vm/actions/issues/356
         if: steps.asdf-cache.outputs.cache-hit != 'true'
         with:
