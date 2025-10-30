@@ -39,7 +39,7 @@ jobs:
       || vars.DEVELOPMENT_FLOW == 'trunk-based-development' ))
     runs-on: ubuntu-24.04
     env:
-      ASDF_BRANCH_VERSION: v0.18.0
+      ASDF_BRANCH_VERSION: 0.18.0
     steps:
       - name: Get input parameters
         run: |
