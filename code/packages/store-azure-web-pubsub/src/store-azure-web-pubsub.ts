@@ -13,11 +13,16 @@ import {
   WEAVE_STORE_AZURE_WEB_PUBSUB,
   WEAVE_STORE_AZURE_WEB_PUBSUB_DEFAULT_CONFIG,
 } from './constants';
-import { type WeaveStoreAzureWebPubsubOptions } from './types';
+import {
+  type FetchInitialState,
+  type WeaveStoreAzureWebPubsubOptions,
+} from './types';
 
 export class WeaveStoreAzureWebPubsub extends WeaveStore {
   private azureWebPubsubOptions: WeaveStoreAzureWebPubsubOptions;
   private roomId: string;
+  private started: boolean;
+  private initialRoomData: Uint8Array | FetchInitialState | undefined;
   protected provider!: WeaveStoreAzureWebPubSubSyncClient;
   protected name: string = WEAVE_STORE_AZURE_WEB_PUBSUB;
   protected supportsUndoManager = true;
@@ -25,6 +30,7 @@ export class WeaveStoreAzureWebPubsub extends WeaveStore {
   protected awarenessCallback!: (changes: any) => void;
 
   constructor(
+    initialRoomData: Uint8Array | FetchInitialState | undefined,
     storeOptions: WeaveStoreOptions,
     azureWebPubsubOptions: Pick<
       WeaveStoreAzureWebPubsubOptions,
@@ -41,8 +47,28 @@ export class WeaveStoreAzureWebPubsub extends WeaveStore {
       azureWebPubsubOptions
     );
     this.roomId = roomId;
+    this.initialRoomData = initialRoomData;
+    this.started = false;
 
     this.init();
+  }
+
+  setup(): void {
+    super.setup();
+  }
+
+  private loadRoomInitialData() {
+    if (this.initialRoomData && this.initialRoomData instanceof Uint8Array) {
+      this.loadDocument(this.initialRoomData);
+    }
+    if (this.initialRoomData && typeof this.initialRoomData === 'function') {
+      this.loadDefaultDocument(this.initialRoomData);
+    }
+    if (!this.initialRoomData) {
+      this.loadDefaultDocument();
+    }
+
+    this.initialRoomData = undefined;
   }
 
   private init() {
@@ -73,6 +99,11 @@ export class WeaveStoreAzureWebPubsub extends WeaveStore {
 
     this.provider.on('status', (status) => {
       this.handleConnectionStatusChange(status);
+
+      if (status === WEAVE_STORE_CONNECTION_STATUS.CONNECTED && !this.started) {
+        this.loadRoomInitialData();
+        this.started = true;
+      }
     });
   }
 

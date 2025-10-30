@@ -267,32 +267,55 @@ export class WeaveStoreAzureWebPubSubSyncHost {
     }
   }
 
+  private safeSend(data: string) {
+    const MAX_BYTES = 64 * 1024; // 64 KB
+
+    const bytes = new TextEncoder().encode(data);
+
+    if (bytes.byteLength > MAX_BYTES) {
+      console.warn(
+        `Message too large: ${bytes.byteLength} bytes (limit ${MAX_BYTES}). Skipping send.`
+      );
+      return false;
+    }
+
+    return true;
+  }
+
   private broadcast(group: string, from: string, u8: Uint8Array) {
-    this._conn?.send?.(
-      JSON.stringify({
-        type: MessageType.SendToGroup,
-        group,
-        noEcho: true,
-        data: {
-          f: from,
-          c: Buffer.from(u8).toString('base64'),
-        },
-      })
-    );
+    const payload = JSON.stringify({
+      type: MessageType.SendToGroup,
+      group,
+      noEcho: true,
+      data: {
+        f: from,
+        c: Buffer.from(u8).toString('base64'),
+      },
+    });
+
+    if (!this.safeSend(payload)) {
+      return;
+    }
+
+    this._conn?.send?.(payload);
   }
 
   private send(group: string, to: string, u8: Uint8Array) {
-    this._conn?.send?.(
-      JSON.stringify({
-        type: MessageType.SendToGroup,
-        group,
-        noEcho: true,
-        data: {
-          t: to,
-          c: Buffer.from(u8).toString('base64'),
-        },
-      })
-    );
+    const payload = JSON.stringify({
+      type: MessageType.SendToGroup,
+      group,
+      noEcho: true,
+      data: {
+        t: to,
+        c: Buffer.from(u8).toString('base64'),
+      },
+    });
+
+    if (!this.safeSend(payload)) {
+      return;
+    }
+
+    this._conn?.send?.(payload);
   }
 
   private onClientInit(group: string, data: MessageData) {

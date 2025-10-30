@@ -312,7 +312,6 @@ export class WeaveImageNode extends WeaveNode {
         loaded: true,
         error: false,
       };
-      this.instance.updateNode(this.serialize(image));
     } else {
       this.updatePlaceholderSize(image, imagePlaceholder);
       this.loadImage(imageProps, image);
@@ -560,15 +559,6 @@ export class WeaveImageNode extends WeaveNode {
             loaded: true,
             error: false,
           };
-
-          const nodeHandler = this.instance.getNodeHandler<WeaveNode>(
-            image.getAttrs().nodeType
-          );
-          if (nodeHandler) {
-            this.instance.updateNode(
-              nodeHandler.serialize(image as WeaveElementInstance)
-            );
-          }
 
           this.updateImageCrop(image);
 

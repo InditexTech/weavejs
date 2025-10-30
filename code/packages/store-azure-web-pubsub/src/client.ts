@@ -369,7 +369,10 @@ export class WeaveStoreAzureWebPubSubSyncClient extends Emittery {
     this._initialized = false;
     this.synced = false;
 
-    websocket.addEventListener('error', () => {
+    websocket.addEventListener('error', (e) => {
+      if (e) {
+        console.error('Websocket error', e);
+      }
       if (this._initialized && websocket.retryCount > 0) {
         this._status = 'connecting';
         this.emit('status', this._status);
@@ -483,13 +486,32 @@ export class WeaveStoreAzureWebPubSubSyncClient extends Emittery {
   }
 }
 
+function safeSend(data: string) {
+  const MAX_BYTES = 64 * 1024; // 64 KB
+
+  const bytes = new TextEncoder().encode(data);
+
+  if (bytes.byteLength > MAX_BYTES) {
+    console.warn(
+      `Message too large: ${bytes.byteLength} bytes (limit ${MAX_BYTES}). Skipping send.`
+    );
+    return false;
+  }
+
+  return true;
+}
+
 function joinGroup(client: WeaveStoreAzureWebPubSubSyncClient, group: string) {
-  client.ws?.send(
-    JSON.stringify({
-      type: MessageType.JoinGroup,
-      group,
-    })
-  );
+  const payload = JSON.stringify({
+    type: MessageType.JoinGroup,
+    group,
+  });
+
+  if (!safeSend(payload)) {
+    return;
+  }
+
+  client.ws?.send(payload);
 }
 
 function sendToControlGroup(
@@ -498,15 +520,19 @@ function sendToControlGroup(
   type: string,
   u8: Uint8Array
 ) {
-  client.ws?.send(
-    JSON.stringify({
-      type: MessageType.SendToGroup,
-      group: `${group}.host`,
-      data: {
-        t: type,
-        f: client.id,
-        c: Buffer.from(u8).toString('base64'),
-      },
-    })
-  );
+  const payload = JSON.stringify({
+    type: MessageType.SendToGroup,
+    group: `${group}.host`,
+    data: {
+      t: type,
+      f: client.id,
+      c: Buffer.from(u8).toString('base64'),
+    },
+  });
+
+  if (!safeSend(payload)) {
+    return;
+  }
+
+  client.ws?.send(payload);
 }
