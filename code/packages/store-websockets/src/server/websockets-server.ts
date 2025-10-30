@@ -16,7 +16,7 @@ import {
 } from '../types';
 import { WeaveHorizontalSyncHandlerRedis } from './horizontal-sync-handler/redis/client';
 import type { WeaveStoreHorizontalSyncConfig } from '@inditextech/weave-types';
-import { defaultInitialState } from '@inditextech/weave-sdk';
+import { defaultInitialState } from '@inditextech/weave-sdk/server';
 
 type WeaveWebsocketsServerParams = {
   initialState?: FetchInitialState;
