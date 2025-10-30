@@ -38,6 +38,8 @@ jobs:
       && (contains(join(github.event.pull_request.labels.*.name, ', '), 'release-type')
       || vars.DEVELOPMENT_FLOW == 'trunk-based-development' ))
     runs-on: ubuntu-24.04
+    env:
+      ASDF_BRANCH_VERSION: v0.18.0
     steps:
       - name: Get input parameters
         run: |
@@ -92,10 +94,8 @@ jobs:
         uses: actions/cache@v4
         continue-on-error: true
         with:
-          path: ~/.asdf/data
-          key: ${{ runner.os }}-asdf-${{ hashFiles('code/.tool-versions') }}
-          restore-keys: |
-            ${{ runner.os }}-asdf-
+          path: ~/.asdf
+          key: ${{ runner.os }}-asdf-${{ env.ASDF_BRANCH_VERSION }}-${{ hashFiles('code/.tool-versions') }}
 
       - name: Save tool-versions content
         run: |
@@ -106,12 +106,12 @@ jobs:
           } >> "$GITHUB_ENV"
 
       - name: Setup asdf environment
-        uses:
-          asdf-vm/actions/install@v3
-          # https://github.com/asdf-vm/actions/issues/356
+        uses: asdf-vm/actions/install@v4
+        # https://github.com/asdf-vm/actions/issues/356
         if: steps.asdf-cache.outputs.cache-hit != 'true'
         with:
           tool_versions: ${{ env.TOOL_VERSIONS }}
+          asdf_branch: ${{ env.ASDF_BRANCH_VERSION }}
 
       - name: NPM / Set npmrc
         env:
@@ -126,7 +126,6 @@ jobs:
       - name: NPM / Create Cache Folders
         run: |
           mkdir -p "$HOME"/.npm
-          mkdir -p "$HOME"/.asdf/data
 
       - name: Setup patch release type version
         if: contains(env.RELEASE_LABELS, 'release-type/hotfix')
