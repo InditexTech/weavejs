@@ -61,7 +61,7 @@ export class WeaveStoreAzureWebPubsub extends WeaveStore {
     if (this.initialRoomData && this.initialRoomData instanceof Uint8Array) {
       this.loadDocument(this.initialRoomData);
     }
-    if (this.initialRoomData && this.initialRoomData instanceof Function) {
+    if (this.initialRoomData && typeof this.initialRoomData === 'function') {
       this.loadDefaultDocument(this.initialRoomData);
     }
     if (!this.initialRoomData) {
