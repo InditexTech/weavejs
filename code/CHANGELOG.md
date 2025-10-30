@@ -13,6 +13,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.3.1] - 2025-10-27
+
 ### Fixed
 
 - [#761](https://github.com/InditexTech/weavejs/issues/761) Set uncropped image properties when adding new images to the stage that are preloaded
@@ -1278,7 +1280,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - [#24](https://github.com/InditexTech/weavejs/issues/24) Bug when loading rooms with text or images
 - [#18](https://github.com/InditexTech/weavejs/issues/18) Fix awareness not working on store-azure-web-pubsub
 
-[Unreleased]: https://github.com/InditexTech/weavejs/compare/1.3.0...HEAD
+[Unreleased]: https://github.com/InditexTech/weavejs/compare/1.3.1...HEAD
+[1.3.1]: https://github.com/InditexTech/weavejs/compare/1.3.0...1.3.1
 [1.3.0]: https://github.com/InditexTech/weavejs/compare/1.2.2...1.3.0
 [1.2.2]: https://github.com/InditexTech/weavejs/compare/1.2.1...1.2.2
 [1.2.1]: https://github.com/InditexTech/weavejs/compare/1.2.0...1.2.1
