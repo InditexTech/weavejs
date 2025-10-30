@@ -3,11 +3,10 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import Y from './yjs';
-import { WeaveStore } from '@inditextech/weave-sdk/server';
+import { defaultInitialState, WeaveStore } from '@inditextech/weave-sdk/server';
 import { type WeaveStoreOptions } from '@inditextech/weave-types';
 import { WEAVE_STORE_STANDALONE } from './constants.js';
 import type { FetchInitialState, WeaveStoreStandaloneParams } from './types.js';
-import { defaultInitialState } from './default-initial-state.js';
 
 export class WeaveStoreStandalone extends WeaveStore {
   private roomData: string;
