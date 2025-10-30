@@ -13,9 +13,9 @@ import {
   type WeaveStoreAzureWebPubsubConfig,
 } from '../types';
 import WeaveAzureWebPubsubSyncHandler from './azure-web-pubsub-sync-handler';
-import { defaultInitialState } from './default-initial-state';
 import type { WebPubSubEventHandlerOptions } from './event-handler';
 import type { RequestHandler } from 'express';
+import { defaultInitialState } from '@inditextech/weave-sdk/server';
 
 type WeaveAzureWebPubsubServerParams = {
   initialState?: FetchInitialState;

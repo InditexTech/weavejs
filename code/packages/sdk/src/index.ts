@@ -7,6 +7,7 @@ window._weave_serverSideBackend = undefined;
 
 export { Weave } from './weave';
 export { WeaveStore } from './stores/store';
+export { defaultInitialState } from './stores/default-initial-state';
 export * from './stores/types';
 export { WeaveNode } from './nodes/node';
 export * from './nodes/types';

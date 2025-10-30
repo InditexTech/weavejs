@@ -7,7 +7,6 @@ import type { Server as HttpsServer } from 'node:https';
 import Emittery from 'emittery';
 import { WebSocketServer } from 'ws';
 import { setServer, setupWSConnection } from './websockets-utils';
-import { defaultInitialState } from './default-initial-state';
 import {
   type FetchInitialState,
   type PerformUpgrade,
@@ -17,6 +16,7 @@ import {
 } from '../types';
 import { WeaveHorizontalSyncHandlerRedis } from './horizontal-sync-handler/redis/client';
 import type { WeaveStoreHorizontalSyncConfig } from '@inditextech/weave-types';
+import { defaultInitialState } from '@inditextech/weave-sdk/server';
 
 type WeaveWebsocketsServerParams = {
   initialState?: FetchInitialState;

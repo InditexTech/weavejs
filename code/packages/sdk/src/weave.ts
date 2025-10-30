@@ -142,6 +142,10 @@ export class Weave {
   }
 
   // INSTANCE MANAGEMENT METHODS
+  getRenderer(): WeaveRenderer {
+    return this.renderer;
+  }
+
   setupRenderer(): void {
     // Initialize the renderer
     this.renderer.init();

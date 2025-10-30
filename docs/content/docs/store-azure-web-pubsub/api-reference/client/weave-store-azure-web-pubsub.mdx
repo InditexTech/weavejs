@@ -25,13 +25,19 @@ import { WeaveStoreAzureWebPubsub } from "@inditextech/weave-store-azure-web-pub
 ## Instantiation
 
 ```ts
-const store = new WeaveStoreAzureWebPubsub(storeOptions: WeaveStoreOptions, azureWebPubsubOptions: WeaveStoreAzureWebPubsubOptions);
+const store = new WeaveStoreAzureWebPubsub(storeData: Uint8Array | null, storeOptions: WeaveStoreOptions, azureWebPubsubOptions: WeaveStoreAzureWebPubsubOptions);
 ```
 
 ## Parameters
 
 <TypeTable
   type={{
+    ["initialRoomData"]: {
+      required: true,
+      description:
+        "If the room is not new, the actual data (snapshot) of the room",
+      type: "Uint8Array | undefined",
+    },
     ["storeOptions.getUser"]: {
       required: true,
       description:
