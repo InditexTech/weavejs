@@ -219,6 +219,8 @@ export abstract class WeaveStore implements WeaveStoreBase {
         this.isRoomLoaded = true;
 
         this.emitOnRoomLoadedEvent();
+
+        return;
       }
       if (this.isRoomLoaded && !isEmpty(this.state.weave)) {
         this.instance.render();
