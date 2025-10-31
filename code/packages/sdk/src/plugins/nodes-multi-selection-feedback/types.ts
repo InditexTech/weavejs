@@ -9,6 +9,7 @@ export type WeaveNodesMultiSelectionFeedbackStyle = {
   strokeWidth: number;
   fill: string;
 };
+
 export type WeaveNodesMultiSelectionFeedbackConfig = {
   style: WeaveNodesMultiSelectionFeedbackStyle;
 };

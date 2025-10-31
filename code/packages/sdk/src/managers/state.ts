@@ -162,37 +162,32 @@ export class WeaveStateManager {
       return;
     }
 
-    const doc = getYjsDoc(state);
-    const userId = this.instance.getStore().getUser().id;
+    if (!parent.props.children) {
+      parent.props.children = [];
+    }
 
-    doc.transact(() => {
-      if (!parent.props.children) {
-        parent.props.children = [];
+    if (index) {
+      parent.props.children.splice(index, 0, node);
+      for (let i = 0; i < parent.props.children.length; i++) {
+        parent.props.children[i].props.zIndex = i;
       }
+    }
 
-      if (index) {
-        parent.props.children.splice(index, 0, node);
-        for (let i = 0; i < parent.props.children.length; i++) {
-          parent.props.children[i].props.zIndex = i;
-        }
-      }
+    if (!index) {
+      const childrenAmount = parent.props.children.length;
 
-      if (!index) {
-        const childrenAmount = parent.props.children.length;
+      const nodeToAdd = {
+        ...node,
+        props: {
+          ...node.props,
+          zIndex: childrenAmount,
+        },
+      };
 
-        const nodeToAdd = {
-          ...node,
-          props: {
-            ...node.props,
-            zIndex: childrenAmount,
-          },
-        };
+      parent.props.children.push(nodeToAdd);
+    }
 
-        parent.props.children.push(nodeToAdd);
-      }
-
-      this.instance.emitEvent('onNodeAdded', node);
-    }, userId);
+    this.instance.emitEvent('onNodeAdded', node);
   }
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -261,14 +256,26 @@ export class WeaveStateManager {
       return;
     }
 
+    this.deepSyncSyncedStore(nodeState.props, node.props);
+
+    this.instance.emitEvent('onNodeUpdated', node);
+  }
+
+  updateNodes(nodes: WeaveStateElement[]): void {
+    for (const node of nodes) {
+      this.updateNode(node);
+    }
+  }
+
+  stateTransactional(callback: () => void): void {
+    const state = this.instance.getStore().getState();
+
     const doc = getYjsDoc(state);
     const userId = this.instance.getStore().getUser().id;
 
     doc.transact(() => {
-      this.deepSyncSyncedStore(nodeState.props, node.props);
+      callback();
     }, userId);
-
-    this.instance.emitEvent('onNodeUpdated', node);
   }
 
   removeNode(node: WeaveStateElement): void {
@@ -297,30 +304,19 @@ export class WeaveStateManager {
       return;
     }
 
-    const doc = getYjsDoc(state);
-    const userId = this.instance.getStore().getUser().id;
-
-    doc.transact(() => {
-      if (parent.props.children) {
-        for (let i = parent.props.children.length - 1; i >= 0; i--) {
-          if (parent.props.children[i].key === node.key) {
-            parent.props.children.splice(i, 1);
-            break;
-          }
+    if (parent.props.children) {
+      for (let i = parent.props.children.length - 1; i >= 0; i--) {
+        if (parent.props.children[i].key === node.key) {
+          parent.props.children.splice(i, 1);
+          break;
         }
-
-        for (let i = 0; i < parent.props.children.length; i++) {
-          parent.props.children[i].props.zIndex = i;
-        }
-
-        this.instance.emitEvent('onNodeRemoved', node);
       }
-    }, userId);
-  }
 
-  removeNodes(nodes: WeaveStateElement[]): void {
-    for (const node of nodes) {
-      this.removeNode(node);
+      for (let i = 0; i < parent.props.children.length; i++) {
+        parent.props.children[i].props.zIndex = i;
+      }
+
+      this.instance.emitEvent('onNodeRemoved', node);
     }
   }
 
@@ -361,34 +357,29 @@ export class WeaveStateManager {
         return;
       }
 
-      const doc = getYjsDoc(state);
-      const userId = this.instance.getStore().getUser().id;
+      if (parent.props.children) {
+        const item = JSON.parse(
+          JSON.stringify(parent.props.children[nodeIndex])
+        );
+        parent.props.children.splice(nodeIndex, 1);
 
-      doc.transact(() => {
-        if (parent.props.children) {
-          const item = JSON.parse(
-            JSON.stringify(parent.props.children[nodeIndex])
-          );
-          parent.props.children.splice(nodeIndex, 1);
-
-          if (item && position === WEAVE_NODE_POSITION.UP) {
-            parent.props.children.splice(nodeIndex + 1, 0, item);
-          }
-          if (item && position === WEAVE_NODE_POSITION.DOWN) {
-            parent.props.children.splice(nodeIndex - 1, 0, item);
-          }
-          if (item && position === WEAVE_NODE_POSITION.FRONT) {
-            parent.props.children.splice(childrenAmount - 1, 0, item);
-          }
-          if (item && position === WEAVE_NODE_POSITION.BACK) {
-            parent.props.children.splice(0, 0, item);
-          }
-
-          for (let i = 0; i < parent.props.children.length; i++) {
-            parent.props.children[i].props.zIndex = i;
-          }
+        if (item && position === WEAVE_NODE_POSITION.UP) {
+          parent.props.children.splice(nodeIndex + 1, 0, item);
         }
-      }, userId);
+        if (item && position === WEAVE_NODE_POSITION.DOWN) {
+          parent.props.children.splice(nodeIndex - 1, 0, item);
+        }
+        if (item && position === WEAVE_NODE_POSITION.FRONT) {
+          parent.props.children.splice(childrenAmount - 1, 0, item);
+        }
+        if (item && position === WEAVE_NODE_POSITION.BACK) {
+          parent.props.children.splice(0, 0, item);
+        }
+
+        for (let i = 0; i < parent.props.children.length; i++) {
+          parent.props.children[i].props.zIndex = i;
+        }
+      }
     }
   }
 
