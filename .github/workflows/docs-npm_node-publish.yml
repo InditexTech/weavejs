@@ -36,6 +36,8 @@ jobs:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
+    env:
+      ASDF_BRANCH_VERSION: 0.18.0
     steps:
       - name: Get input parameters
         run: |
@@ -63,10 +65,8 @@ jobs:
         uses: actions/cache@v4
         continue-on-error: true
         with:
-          path: ~/.asdf/data
-          key: ${{ runner.os }}-asdf-${{ hashFiles('docs/.tool-versions') }}
-          restore-keys: |
-            ${{ runner.os }}-asdf-
+          path: ~/.asdf
+          key: ${{ runner.os }}-asdf-${{ env.ASDF_BRANCH_VERSION }}-${{ hashFiles('docs/.tool-versions') }}
 
       - name: Save tool-versions content
         run: |
@@ -77,12 +77,12 @@ jobs:
           } >> "$GITHUB_ENV"
 
       - name: Setup asdf environment
-        uses:
-          asdf-vm/actions/install@v3
-          # https://github.com/asdf-vm/actions/issues/356
+        uses: asdf-vm/actions/install@1902764435ca0dd2f3388eea723a4f92a4eb8302 # v4.0.0
+        # https://github.com/asdf-vm/actions/issues/356
         if: steps.asdf-cache.outputs.cache-hit != 'true'
         with:
           tool_versions: ${{ env.TOOL_VERSIONS }}
+          asdf_version: ${{ env.ASDF_BRANCH_VERSION }}
 
       - name: NPM / Set npmrc
         env:
@@ -97,7 +97,6 @@ jobs:
       - name: NPM / Create Cache Folders
         run: |
           mkdir -p "$HOME"/.npm
-          mkdir -p "$HOME"/.asdf/data
 
       - name: NPM / Build
         working-directory: docs
