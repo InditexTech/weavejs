@@ -312,6 +312,7 @@ export class WeaveImageNode extends WeaveNode {
         loaded: true,
         error: false,
       };
+      this.updateImageCrop(image);
     } else {
       this.updatePlaceholderSize(image, imagePlaceholder);
       this.loadImage(imageProps, image);
