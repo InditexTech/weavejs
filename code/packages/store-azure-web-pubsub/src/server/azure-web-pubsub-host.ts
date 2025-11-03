@@ -68,8 +68,19 @@ export class WeaveStoreAzureWebPubSubSyncHost {
   private _client: WebPubSubServiceClient;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   private _conn: any;
+  private _reconnectAttempts: number = 0;
+  private _forceClose: boolean = false;
 
-  private _awareness: awarenessProtocol.Awareness;
+  private _awareness!: awarenessProtocol.Awareness;
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  private _updateHandler: (update: any, origin: any) => void;
+  private _awarenessUpdateHandler: (
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    { added, updated, removed }: { added: any; updated: any; removed: any },
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    origin: any
+  ) => void;
 
   constructor(
     server: WeaveAzureWebPubsubServer,
@@ -87,10 +98,9 @@ export class WeaveStoreAzureWebPubSubSyncHost {
 
     // register awareness controller
     this._awareness = new awarenessProtocol.Awareness(this.doc);
-    this._awareness.setLocalState(null);
 
     // const awarenessChangeHandler = ({ added, updated, removed }, conn) => {
-    const awarenessUpdateHandler = (
+    this._awarenessUpdateHandler = (
       {
         added,
         updated,
@@ -106,29 +116,40 @@ export class WeaveStoreAzureWebPubSubSyncHost {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       origin: any
     ) => {
-      const changedClients = added.concat(added, updated, removed);
-      const encoder = encoding.createEncoder();
-      encoding.writeVarUint(encoder, messageAwareness);
-      encoding.writeVarUint8Array(
-        encoder,
-        awarenessProtocol.encodeAwarenessUpdate(this._awareness, changedClients)
-      );
-      const u8 = encoding.toUint8Array(encoder);
-      this.broadcast(this.topic, origin, u8);
+      try {
+        const changedClients = added.concat(added, updated, removed);
+        const encoder = encoding.createEncoder();
+        encoding.writeVarUint(encoder, messageAwareness);
+        const payload = awarenessProtocol.encodeAwarenessUpdate(
+          this._awareness,
+          changedClients
+        );
+        encoding.writeVarUint8Array(encoder, payload);
+        const u8 = encoding.toUint8Array(encoder);
+        this.broadcast(this.topic, origin, u8);
+      } catch (err) {
+        console.error('Error in awareness update handler:', err);
+      }
     };
-    this._awareness.on('update', awarenessUpdateHandler);
+
+    this._awareness.on('update', this._awarenessUpdateHandler);
 
     // register update handler
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const updateHandler = (update: Uint8Array, origin: any) => {
-      const encoder = encoding.createEncoder();
-      encoding.writeVarUint(encoder, messageSync);
-      syncProtocol.writeUpdate(encoder, update);
-      const u8 = encoding.toUint8Array(encoder);
+    this._updateHandler = (update: Uint8Array, origin: any) => {
+      try {
+        const encoder = encoding.createEncoder();
+        encoding.writeVarUint(encoder, messageSync);
+        syncProtocol.writeUpdate(encoder, update);
+        const u8 = encoding.toUint8Array(encoder);
 
-      this.broadcast(this.topic, origin, u8);
+        this.broadcast(this.topic, origin, u8);
+      } catch (err) {
+        console.error('Error in document update handler:', err);
+      }
     };
-    this.doc.on('update', updateHandler);
+
+    this.doc.on('update', this._updateHandler);
   }
 
   get awareness(): awarenessProtocol.Awareness {
@@ -136,6 +157,7 @@ export class WeaveStoreAzureWebPubSubSyncHost {
   }
 
   sendInitAwarenessInfo(origin: string): void {
+    if (!this._awareness) return;
     const encoderAwarenessState = encoding.createEncoder();
     encoding.writeVarUint(encoderAwarenessState, messageAwareness);
     encoding.writeVarUint8Array(
@@ -149,14 +171,12 @@ export class WeaveStoreAzureWebPubSubSyncHost {
     this.broadcast(this.topic, origin, u8);
   }
 
-  async createWebSocket(sleep: number = 0): Promise<void> {
+  async createWebSocket(): Promise<void> {
     const group = this.topic;
 
     const { url } = await this.negotiate(this.topic);
 
-    if (sleep && sleep > 0) {
-      await new Promise((resolve) => setTimeout(resolve, sleep));
-    }
+    this._reconnectAttempts++;
 
     return new Promise((resolve) => {
       const ws = new WebSocket(url, AzureWebPubSubJsonProtocol);
@@ -215,9 +235,13 @@ export class WeaveStoreAzureWebPubSubSyncHost {
           }
         );
 
-        if (e.code === 1008 && ws.readyState === WebSocket.OPEN) {
-          ws.close(); // ensure cleanup
-          this.createWebSocket(); // start fresh with a new token
+        if (this._forceClose) {
+          return;
+        } else {
+          const timeout = 1000 * Math.pow(1.5, this._reconnectAttempts);
+          setTimeout(() => {
+            this.createWebSocket(); // start fresh with a new token
+          }, timeout);
         }
       });
 
@@ -231,10 +255,8 @@ export class WeaveStoreAzureWebPubSubSyncHost {
         );
 
         if (ws.readyState === WebSocket.OPEN) {
-          ws.close();
+          ws.close(); // ensure cleanup
         }
-
-        this.createWebSocket(20000);
       });
 
       setTimeout(() => {
@@ -255,6 +277,7 @@ export class WeaveStoreAzureWebPubSubSyncHost {
   }
 
   async stop(): Promise<void> {
+    this._forceClose = true;
     if (this._conn?.readyState === WebSocket.OPEN) {
       this._conn?.close();
       this._conn = null;
@@ -283,39 +306,47 @@ export class WeaveStoreAzureWebPubSubSyncHost {
   }
 
   private broadcast(group: string, from: string, u8: Uint8Array) {
-    const payload = JSON.stringify({
-      type: MessageType.SendToGroup,
-      group,
-      noEcho: true,
-      data: {
-        f: from,
-        c: Buffer.from(u8).toString('base64'),
-      },
-    });
+    try {
+      const payload = JSON.stringify({
+        type: MessageType.SendToGroup,
+        group,
+        noEcho: true,
+        data: {
+          f: from,
+          c: Buffer.from(u8).toString('base64'),
+        },
+      });
 
-    if (!this.safeSend(payload)) {
-      return;
+      if (!this.safeSend(payload)) {
+        return;
+      }
+
+      this._conn?.send?.(payload);
+    } catch (ex) {
+      console.error('Error broadcasting message:', ex);
     }
-
-    this._conn?.send?.(payload);
   }
 
   private send(group: string, to: string, u8: Uint8Array) {
-    const payload = JSON.stringify({
-      type: MessageType.SendToGroup,
-      group,
-      noEcho: true,
-      data: {
-        t: to,
-        c: Buffer.from(u8).toString('base64'),
-      },
-    });
+    try {
+      const payload = JSON.stringify({
+        type: MessageType.SendToGroup,
+        group,
+        noEcho: true,
+        data: {
+          t: to,
+          c: Buffer.from(u8).toString('base64'),
+        },
+      });
 
-    if (!this.safeSend(payload)) {
-      return;
+      if (!this.safeSend(payload)) {
+        return;
+      }
+
+      this._conn?.send?.(payload);
+    } catch (ex) {
+      console.error('Error sending message:', ex);
     }
-
-    this._conn?.send?.(payload);
   }
 
   private onClientInit(group: string, data: MessageData) {
@@ -356,6 +387,8 @@ export class WeaveStoreAzureWebPubSubSyncHost {
       const decoder = decoding.createDecoder(buf);
       decoding.readVarUint(decoder); // skip the message type
       const update = decoding.readVarUint8Array(decoder);
+
+      if (!this._awareness) return;
 
       awarenessProtocol.applyAwarenessUpdate(
         this._awareness,

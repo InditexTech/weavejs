@@ -38,6 +38,7 @@ export enum MessageDataType {
 }
 
 export interface MessageData {
+  group: string;
   t: string; // type / target uuid
   f: string; // origin uuid
   c: string; // base64 encoded binary data
@@ -45,6 +46,7 @@ export interface MessageData {
 
 export interface Message {
   type: string;
+  fromUserId: string;
   from: string;
   group: string;
   data: MessageData;
@@ -120,6 +122,9 @@ const readMessage = (
   const decoder = decoding.createDecoder(buf);
   const encoder = encoding.createEncoder();
   const messageType = decoding.readVarUint(decoder);
+  if (messageType === 0) {
+    client.saveLastSyncResponse();
+  }
   const messageHandler = messageHandlers[messageType];
   if (messageHandler) {
     messageHandler(encoder, decoder, client, clientId, emitSynced, messageType);
@@ -141,9 +146,11 @@ export class WeaveStoreAzureWebPubSubSyncClient extends Emittery {
   private _wsConnected: boolean;
   private _synced: boolean;
   private _resyncInterval!: NodeJS.Timeout | null;
+  private _resyncCheckInterval!: NodeJS.Timeout | null;
+  private _lastReceivedSyncResponse!: number | null;
   private _connectionRetries: number;
   private _uuid: string;
-  private _awareness: awarenessProtocol.Awareness;
+  private _awareness!: awarenessProtocol.Awareness;
   private _options: ClientOptions;
   private _initialized: boolean;
 
@@ -193,10 +200,12 @@ export class WeaveStoreAzureWebPubSubSyncClient extends Emittery {
     this._synced = false;
     this._ws = null;
 
-    const awareness = new awarenessProtocol.Awareness(doc);
-    this._awareness = awareness;
-
     this._resyncInterval = null;
+    this._resyncCheckInterval = null;
+    this._lastReceivedSyncResponse = null;
+
+    const awareness = new awarenessProtocol.Awareness(this.doc);
+    this._awareness = awareness;
 
     // register text update handler
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -214,6 +223,7 @@ export class WeaveStoreAzureWebPubSubSyncClient extends Emittery {
         );
       }
     };
+
     this.doc.on('update', this._updateHandler);
 
     // register awareness update handler
@@ -224,8 +234,9 @@ export class WeaveStoreAzureWebPubSubSyncClient extends Emittery {
       encoding.writeVarUint(encoder, messageAwareness);
       encoding.writeVarUint8Array(
         encoder,
-        awarenessProtocol.encodeAwarenessUpdate(awareness, changedClients)
+        awarenessProtocol.encodeAwarenessUpdate(this.awareness, changedClients)
       );
+
       sendToControlGroup(
         this,
         topic,
@@ -233,7 +244,11 @@ export class WeaveStoreAzureWebPubSubSyncClient extends Emittery {
         encoding.toUint8Array(encoder)
       );
     };
-    awareness.on('update', this._awarenessUpdateHandler);
+
+    this._awareness.on('update', this._awarenessUpdateHandler);
+
+    // this._awareness.on('update', this._awarenessUpdateHandler);
+    // this.doc.on('update', this._updateHandler);
   }
 
   get awareness(): awarenessProtocol.Awareness {
@@ -262,6 +277,11 @@ export class WeaveStoreAzureWebPubSubSyncClient extends Emittery {
     return this.id;
   }
 
+  saveLastSyncResponse(): void {
+    const now = new Date();
+    this._lastReceivedSyncResponse = now.getTime();
+  }
+
   setupResyncInterval(): void {
     if (this._options.resyncInterval > 0) {
       this._resyncInterval = setInterval(() => {
@@ -278,19 +298,60 @@ export class WeaveStoreAzureWebPubSubSyncClient extends Emittery {
           );
         }
       }, this._options.resyncInterval);
+
+      this._resyncCheckInterval = setInterval(() => {
+        if (!this._lastReceivedSyncResponse) {
+          return;
+        }
+
+        const resyncInSeconds = this._options.resyncInterval / 1000;
+        const resyncLimitInSeconds = resyncInSeconds + 5;
+        const now = new Date();
+        const diffInSeconds =
+          (now.getTime() - this._lastReceivedSyncResponse) / 1000;
+
+        if (
+          diffInSeconds > resyncLimitInSeconds &&
+          this._ws?.readyState === WebSocket.OPEN
+        ) {
+          // if last received sync response is older than resync interval + 5s, assume connection lost
+          this._ws.dispatchEvent(
+            new CustomEvent('error', {
+              cancelable: false,
+              bubbles: false,
+              detail: new Error('No sync response'),
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            }) as any
+          );
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          (this._ws as any)._ws.close();
+        }
+      }, this._options.resyncInterval + 5000);
     }
   }
 
-  destroy(): void {
+  cleanupResyncInterval(): void {
     if (this._resyncInterval) {
       clearInterval(this._resyncInterval);
+      this._resyncInterval = null;
     }
-    this.stop();
-    this.doc.off('update', this._updateHandler);
+
+    if (this._resyncCheckInterval) {
+      clearInterval(this._resyncCheckInterval);
+      this._resyncCheckInterval = null;
+    }
   }
 
-  stop(): void {
+  simulateWebsocketError(): void {
+    if (this._ws) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      (this._ws as any)._ws.close(4000, 'Simulated error for testing');
+    }
+  }
+
+  disconnect(): void {
     if (this._ws !== null) {
+      // broadcast message with local awareness state set to null (indicating disconnect)
       const encoder = encoding.createEncoder();
       encoding.writeVarUint(encoder, messageAwareness);
       encoding.writeVarUint8Array(
@@ -303,20 +364,48 @@ export class WeaveStoreAzureWebPubSubSyncClient extends Emittery {
       );
       const u8 = encoding.toUint8Array(encoder);
       sendToControlGroup(this, this.topic, MessageDataType.Awareness, u8);
+
+      // update awareness (all users except local left)
+      awarenessProtocol.removeAwarenessStates(
+        this.awareness,
+        Array.from(this.awareness.getStates().keys()).filter(
+          (client) => client !== this.doc.clientID
+        ),
+        this
+      );
+
       this._initialized = false;
-      if (this._ws.readyState === WebSocket.OPEN) {
-        this._ws.close();
-      }
+
+      this._ws.close();
     }
+
+    this.cleanupResyncInterval();
+    this._wsConnected = false;
+    this._ws = null;
   }
 
   setFetchClient(fetchClient: FetchClient = window.fetch): void {
     this._fetchClient = fetchClient.bind(window);
   }
 
-  async fetchConnectionUrl(): Promise<string> {
+  async fetchConnectionUrl(
+    connectionUrlExtraParams?: Record<string, string>
+  ): Promise<string> {
     try {
-      const res = await this._fetchClient(this._url);
+      const connectionURL = new URL(
+        this._url,
+        isRelativeUrl(this._url) ? window.location.origin : undefined
+      );
+      if (connectionUrlExtraParams) {
+        const extraParamsKeys = Object.keys(connectionUrlExtraParams);
+        for (const key of extraParamsKeys) {
+          if (connectionURL.searchParams.has(key)) {
+            connectionURL.searchParams.delete(key);
+          }
+          connectionURL.searchParams.append(key, connectionUrlExtraParams[key]);
+        }
+      }
+      const res = await this._fetchClient(connectionURL.toString());
       if (res.ok) {
         const data = (await res.json()) as { url: string };
         return data.url;
@@ -329,7 +418,9 @@ export class WeaveStoreAzureWebPubSubSyncClient extends Emittery {
     }
   }
 
-  async createWebSocket(): Promise<ReconnectingWebSocket> {
+  async createWebSocket(
+    connectionUrlExtraParams?: Record<string, string>
+  ): Promise<ReconnectingWebSocket> {
     const websocket = new ReconnectingWebSocket(async () => {
       let url: string = 'https://error';
       let error: Error | null = null;
@@ -342,7 +433,7 @@ export class WeaveStoreAzureWebPubSubSyncClient extends Emittery {
             error: null,
           }
         );
-        url = await this.fetchConnectionUrl();
+        url = await this.fetchConnectionUrl(connectionUrlExtraParams);
       } catch (ex) {
         error = ex as Error;
       } finally {
@@ -370,9 +461,8 @@ export class WeaveStoreAzureWebPubSubSyncClient extends Emittery {
     this.synced = false;
 
     websocket.addEventListener('error', (e) => {
-      if (e) {
-        console.error('Websocket error', e);
-      }
+      console.error('WebSocket error', e);
+
       if (this._initialized && websocket.retryCount > 0) {
         this._status = 'connecting';
         this.emit('status', this._status);
@@ -380,6 +470,10 @@ export class WeaveStoreAzureWebPubSubSyncClient extends Emittery {
       }
       this._status = 'error';
       this.emit('status', this._status);
+
+      // if (websocket.readyState === WebSocket.OPEN) {
+      //   websocket.close(); // ensure cleanup
+      // }
     });
 
     websocket.onmessage = (event) => {
@@ -400,7 +494,6 @@ export class WeaveStoreAzureWebPubSubSyncClient extends Emittery {
       }
 
       const buf = Buffer.from(messageData.c, 'base64');
-      // this._wsLastMessageReceived = Date.now();
       const encoder = readMessage(this, buf, true, messageData.f);
       if (encoding.length(encoder) > 1) {
         sendToControlGroup(
@@ -412,16 +505,12 @@ export class WeaveStoreAzureWebPubSubSyncClient extends Emittery {
       }
     };
 
-    websocket.onclose = (ev) => {
+    websocket.onclose = () => {
       this._status = 'disconnected';
       this.emit('status', this._status);
 
       if (this._wsConnected) {
-        if (this._resyncInterval) {
-          clearInterval(this._resyncInterval);
-        }
-
-        this._resyncInterval = null;
+        this.cleanupResyncInterval();
         this._wsConnected = false;
         this.synced = false;
         awarenessProtocol.removeAwarenessStates(
@@ -431,11 +520,6 @@ export class WeaveStoreAzureWebPubSubSyncClient extends Emittery {
           ),
           this
         );
-      }
-
-      if (ev.code === 1008 && websocket.readyState === WebSocket.OPEN) {
-        websocket.close(); // ensure cleanup
-        this.createWebSocket(); // start fresh with a new token
       }
     };
 
@@ -459,6 +543,17 @@ export class WeaveStoreAzureWebPubSubSyncClient extends Emittery {
       const u8 = encoding.toUint8Array(encoder);
       sendToControlGroup(this, this.topic, MessageDataType.Init, u8);
 
+      // broadcast local state
+      const encoderState = encoding.createEncoder();
+      encoding.writeVarUint(encoderState, messageSyncStep1);
+      syncProtocol.writeSyncStep2(encoderState, this.doc);
+      sendToControlGroup(this, this.topic, MessageDataType.Init, u8);
+
+      // write queryAwareness
+      const encoderAwarenessQuery = encoding.createEncoder();
+      encoding.writeVarUint(encoderAwarenessQuery, messageQueryAwareness);
+      sendToControlGroup(this, this.topic, MessageDataType.Init, u8);
+
       // broadcast awareness state
       if (this.awareness.getLocalState() !== null) {
         const encoderAwarenessState = encoding.createEncoder();
@@ -469,20 +564,23 @@ export class WeaveStoreAzureWebPubSubSyncClient extends Emittery {
             this.doc.clientID,
           ])
         );
-        const u8 = encoding.toUint8Array(encoder);
-        sendToControlGroup(this, this.topic, MessageDataType.Awareness, u8);
+        const u82 = encoding.toUint8Array(encoder);
+
+        sendToControlGroup(this, this.topic, MessageDataType.Awareness, u82);
       }
     };
 
     return websocket;
   }
 
-  async start(): Promise<void> {
+  async connect(
+    connectionUrlExtraParams?: Record<string, string>
+  ): Promise<void> {
     if (this._wsConnected || this._ws) {
       return;
     }
 
-    await this.createWebSocket();
+    await this.createWebSocket(connectionUrlExtraParams);
   }
 }
 
@@ -535,4 +633,8 @@ function sendToControlGroup(
   }
 
   client.ws?.send(payload);
+}
+
+function isRelativeUrl(url: string) {
+  return !/^[a-zA-Z][a-zA-Z\d+\-.]*:/.test(url);
 }

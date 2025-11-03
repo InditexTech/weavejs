@@ -24,6 +24,7 @@ import { WEAVE_NODES_SELECTION_KEY } from '../nodes-selection/constants';
 import { WEAVE_CONTEXT_MENU_PLUGIN_KEY } from '../context-menu/constants';
 import type { WeaveStageGridPlugin } from '../stage-grid/stage-grid';
 import type Konva from 'konva';
+import { throttle } from 'lodash';
 import type {
   WeaveStagePanningPluginConfig,
   WeaveStagePanningPluginParams,
@@ -221,7 +222,7 @@ export class WeaveStagePanningPlugin extends WeavePlugin {
       this.instance.emitEvent('onStageMove');
     };
 
-    stage.on('pointermove', handleMouseMove);
+    stage.on('pointermove', throttle(handleMouseMove, 50));
 
     stage.on('pointerup', (e) => {
       this.pointers.delete(e.evt.pointerId);

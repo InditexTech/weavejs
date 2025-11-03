@@ -141,17 +141,17 @@ export class WeaveStageGridPlugin extends WeavePlugin {
       }
     });
 
-    window.addEventListener('wheel', () => {
-      if (
-        !this.enabled ||
-        this.isSpaceKeyPressed ||
-        this.isMouseMiddleButtonPressed
-      ) {
-        return;
-      }
+    // window.addEventListener('wheel', () => {
+    //   if (
+    //     !this.enabled ||
+    //     this.isSpaceKeyPressed ||
+    //     this.isMouseMiddleButtonPressed
+    //   ) {
+    //     return;
+    //   }
 
-      this.onRender();
-    });
+    //   this.onRender();
+    // });
   }
 
   getLayer(): Konva.Layer | undefined {

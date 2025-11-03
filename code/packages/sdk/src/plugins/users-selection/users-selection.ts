@@ -66,7 +66,18 @@ export class WeaveUsersSelectionPlugin extends WeavePlugin {
   }
 
   onInit(): void {
+    const store = this.instance.getStore();
     const stage = this.instance.getStage();
+
+    this.instance.addEventListener(
+      'onStoreConnectionStatusChange',
+      (status) => {
+        if (status === 'disconnected') {
+          this.usersSelection = {};
+          store.setAwarenessInfo(WEAVE_USER_SELECTION_KEY, undefined);
+        }
+      }
+    );
 
     this.instance.addEventListener(
       'onAwarenessChange',
@@ -79,7 +90,6 @@ export class WeaveUsersSelectionPlugin extends WeavePlugin {
         const selfUser = this.config.getUser();
 
         const allActiveUsers = [];
-
         for (const change of changes) {
           if (!change[WEAVE_USER_SELECTION_KEY]) {
             continue;
