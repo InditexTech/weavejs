@@ -22,6 +22,7 @@ import type {
   WeaveStoreAzureWebPubsubOnWebsocketOnTokenRefreshEvent,
   WeaveStoreAzureWebPubsubOnWebsocketOpenEvent,
 } from '@/types';
+import type WeaveAzureWebPubsubSyncHandler from './azure-web-pubsub-sync-handler';
 
 const expirationTimeInMinutes = 60; // 1 hour
 const messageSync = 0;
@@ -61,6 +62,7 @@ export interface WebPubSubHostOptions {
 
 export class WeaveStoreAzureWebPubSubSyncHost {
   private readonly server: WeaveAzureWebPubsubServer;
+  private readonly syncHandler: WeaveAzureWebPubsubSyncHandler;
   public doc: Y.Doc;
   public topic: string;
   public topicAwarenessChannel: string;
@@ -84,11 +86,13 @@ export class WeaveStoreAzureWebPubSubSyncHost {
 
   constructor(
     server: WeaveAzureWebPubsubServer,
+    syncHandler: WeaveAzureWebPubsubSyncHandler,
     client: WebPubSubServiceClient,
     topic: string,
     doc: Y.Doc
   ) {
     this.server = server;
+    this.syncHandler = syncHandler;
     this.doc = doc;
     this.topic = topic;
     this.topicAwarenessChannel = `${topic}-awareness`;
@@ -144,6 +148,10 @@ export class WeaveStoreAzureWebPubSubSyncHost {
         const u8 = encoding.toUint8Array(encoder);
 
         this.broadcast(this.topic, origin, u8);
+
+        if (!this.syncHandler.isPersistingOnInterval()) {
+          this.syncHandler.persistRoomTask(this.topic);
+        }
       } catch (err) {
         console.error('Error in document update handler:', err);
       }

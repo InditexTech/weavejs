@@ -10,23 +10,17 @@ import type { WEAVE_STORE_AZURE_WEB_PUBSUB_CONNECTION_STATUS } from './constants
 import type { WeaveStoreAzureWebPubSubSyncClient } from './client';
 import type { Encoder } from 'lib0/encoding';
 import type { Decoder } from 'lib0/decoding';
+import type { DeepPartial } from '@inditextech/weave-types';
 
 export type WeaveStoreAzureWebPubsubConfig = {
   endpoint: string;
+  persistIntervalMs?: number;
   hubName: string;
   auth?: {
     key?: string;
     custom?: TokenCredential;
   };
-  connectionHandlers?: Pick<
-    WeaveAzureWebPubsubSyncHandlerOptions,
-    | 'onConnect'
-    | 'onConnected'
-    | 'removeConnection'
-    | 'getConnectionRoom'
-    | 'getRoomConnections'
-  >;
-  persistIntervalMs?: number;
+  connectionHandlers?: DeepPartial<WeaveAzureWebPubsubSyncHandlerOptions>;
 };
 
 export type WeaveAzureWebPubsubSyncHandlerOptions = {
