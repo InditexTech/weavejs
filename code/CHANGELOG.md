@@ -16,6 +16,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 - [#773](https://github.com/InditexTech/weavejs/issues/773) Setup doc events correctly when client re-connects
+- [#775](https://github.com/InditexTech/weavejs/issues/775) Line break not working after leaving and joining again a room
 
 ## [2.0.2] - 2025-10-31
 
