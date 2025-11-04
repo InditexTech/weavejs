@@ -85,9 +85,13 @@ export class WeaveStoreAzureWebPubsub extends WeaveStore {
       }
     );
 
+    const awareness = this.provider.awareness;
+    awareness.on('update', this.handleAwarenessChange.bind(this));
+    awareness.on('change', this.handleAwarenessChange.bind(this));
+
     window.addEventListener('beforeunload', () => {
       const awareness = this.provider.awareness;
-      awareness.destroy();
+      if (awareness) awareness.destroy();
     });
 
     this.provider.on('error', () => {
@@ -118,28 +122,29 @@ export class WeaveStoreAzureWebPubsub extends WeaveStore {
     return null;
   }
 
-  async connect(): Promise<void> {
+  async connect(extraParams?: Record<string, string>): Promise<void> {
     const { fetchClient } = this.azureWebPubsubOptions;
-
-    const awareness = this.provider.awareness;
-    awareness.on('update', this.handleAwarenessChange.bind(this));
-    awareness.on('change', this.handleAwarenessChange.bind(this));
 
     this.provider.setFetchClient(fetchClient ?? window.fetch);
 
-    await this.provider.start();
+    await this.provider.connect(extraParams);
   }
 
   disconnect(): void {
-    const awareness = this.provider.awareness;
-    awareness.destroy();
-    awareness.off('update', this.handleAwarenessChange.bind(this));
-    awareness.off('change', this.handleAwarenessChange.bind(this));
-
-    this.provider.destroy();
+    this.provider.disconnect();
   }
 
+  simulateWebsocketError(): void {
+    this.provider.simulateWebsocketError();
+  }
+
+  destroy(): void {}
+
   handleAwarenessChange(emit: boolean = true): void {
+    if (!this.instance) {
+      return;
+    }
+
     const awareness = this.provider.awareness;
     const values = Array.from(awareness.getStates().values());
     values.splice(awareness.clientID, 1);

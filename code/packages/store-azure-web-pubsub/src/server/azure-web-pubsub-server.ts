@@ -11,6 +11,7 @@ import {
   type PersistRoom,
   type FetchRoom,
   type WeaveStoreAzureWebPubsubConfig,
+  type WeaveStoreAzureWebPubSubSyncHostClientConnectOptions,
 } from '../types';
 import WeaveAzureWebPubsubSyncHandler from './azure-web-pubsub-sync-handler';
 import type { WebPubSubEventHandlerOptions } from './event-handler';
@@ -101,7 +102,10 @@ export class WeaveAzureWebPubsubServer extends Emittery {
     this.off(event, callback);
   }
 
-  async clientConnect(roomId: string): Promise<string | null> {
-    return await this.syncHandler.clientConnect(roomId);
+  async clientConnect(
+    roomId: string,
+    connectionOptions?: WeaveStoreAzureWebPubSubSyncHostClientConnectOptions
+  ): Promise<string | null> {
+    return await this.syncHandler.clientConnect(roomId, connectionOptions);
   }
 }

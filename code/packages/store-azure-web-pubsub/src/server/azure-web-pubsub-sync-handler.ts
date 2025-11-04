@@ -18,6 +18,7 @@ import {
   type WeaveStoreAzureWebPubsubOnConnectedEvent,
   type WeaveStoreAzureWebPubsubOnConnectEvent,
   type WeaveStoreAzureWebPubsubOnDisconnectedEvent,
+  type WeaveStoreAzureWebPubSubSyncHostClientConnectOptions,
 } from '@/types';
 import { WeaveStoreAzureWebPubSubSyncHost } from './azure-web-pubsub-host';
 import { WeaveAzureWebPubsubServer } from './azure-web-pubsub-server';
@@ -206,7 +207,10 @@ export default class WeaveAzureWebPubsubSyncHandler extends WebPubSubEventHandle
     return this._roomsSyncHost.get(roomId);
   }
 
-  async clientConnect(roomId: string): Promise<string> {
+  async clientConnect(
+    roomId: string,
+    connectionOptions?: WeaveStoreAzureWebPubSubSyncHostClientConnectOptions
+  ): Promise<string> {
     await this.getHostConnection(roomId);
 
     const token = await this._client.getClientAccessToken({
@@ -215,6 +219,7 @@ export default class WeaveAzureWebPubsubSyncHandler extends WebPubSubEventHandle
         `webpubsub.joinLeaveGroup.${roomId}`,
         `webpubsub.sendToGroup.${roomId}.host`,
       ],
+      ...connectionOptions,
     });
 
     const finalURL = `${token.url}&group=${roomId}`;

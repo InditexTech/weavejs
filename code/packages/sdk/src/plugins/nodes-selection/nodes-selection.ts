@@ -1023,7 +1023,7 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
       this.updatePanDirection();
     };
 
-    stage.on('pointermove', handleMouseMove);
+    stage.on('pointermove', throttle(handleMouseMove, 50));
     this.panLoop();
 
     stage.on('pointerup', (e) => {
