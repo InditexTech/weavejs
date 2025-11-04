@@ -149,7 +149,9 @@ export class WeaveStoreAzureWebPubSubSyncHost {
 
         this.broadcast(this.topic, origin, u8);
 
-        this.syncHandler.persistRoomTask(this.topic);
+        if (!this.syncHandler.isPersistingOnInterval()) {
+          this.syncHandler.persistRoomTask(this.topic);
+        }
       } catch (err) {
         console.error('Error in document update handler:', err);
       }

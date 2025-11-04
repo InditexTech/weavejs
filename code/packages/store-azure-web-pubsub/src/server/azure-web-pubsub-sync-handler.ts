@@ -89,6 +89,12 @@ export default class WeaveAzureWebPubsubSyncHandler extends WebPubSubEventHandle
     this.server = server;
     this.initialState = initialState;
     this._client = client;
+
+    if (this.isPersistingOnInterval()) {
+      console.warn(
+        `Room persistence defined via interval, be aware that this can lead to data loss. Consider persisting on document updates instead.`
+      );
+    }
   }
 
   private getNewYDoc() {
@@ -125,6 +131,24 @@ export default class WeaveAzureWebPubsubSyncHandler extends WebPubSubEventHandle
     const connection = this._roomsSyncHost.get(roomId)!;
 
     await connection.start();
+
+    if (this.isPersistingOnInterval()) {
+      this.setupRoomInstancePersistence(roomId);
+    }
+  }
+
+  isPersistingOnInterval(): boolean {
+    return typeof this.syncOptions?.persistIntervalMs !== 'undefined';
+  }
+
+  private async setupRoomInstancePersistence(roomId: string) {
+    if (!this._store_persistence.has(roomId)) {
+      const intervalId = setInterval(async () => {
+        await this.persistRoomTask(roomId);
+      }, this.syncOptions?.persistIntervalMs ?? 5000);
+
+      this._store_persistence.set(roomId, intervalId);
+    }
   }
 
   async persistRoomTask(roomId: string): Promise<void> {
@@ -138,7 +162,7 @@ export default class WeaveAzureWebPubsubSyncHandler extends WebPubSubEventHandle
       const actualState = Y.encodeStateAsUpdate(doc);
 
       const savedRoomData = this.lastRoomState.get(roomId);
-      if (savedRoomData) {
+      if (savedRoomData && !this.isPersistingOnInterval()) {
         const savedStateJson = getStateAsJson(savedRoomData);
         const savedHash = hashJson(savedStateJson);
         const actualStateJson = getStateAsJson(actualState);
@@ -148,9 +172,9 @@ export default class WeaveAzureWebPubsubSyncHandler extends WebPubSubEventHandle
         if (same) {
           return;
         }
-      }
 
-      this.lastRoomState.set(roomId, actualState);
+        this.lastRoomState.set(roomId, actualState);
+      }
 
       if (this.server?.persistRoom) {
         await this.server.persistRoom(roomId, actualState);
@@ -179,11 +203,13 @@ export default class WeaveAzureWebPubsubSyncHandler extends WebPubSubEventHandle
   }
 
   async destroyRoomInstance(roomId: string): Promise<void> {
-    const intervalId = this._store_persistence.get(roomId);
-    if (intervalId) {
-      clearInterval(intervalId);
+    if (this.isPersistingOnInterval()) {
+      const intervalId = this._store_persistence.get(roomId);
+      if (intervalId) {
+        clearInterval(intervalId);
+      }
+      this._store_persistence.delete(roomId);
     }
-    this._store_persistence.delete(roomId);
 
     // flush document to storage
     await this.persistRoomTask(roomId);

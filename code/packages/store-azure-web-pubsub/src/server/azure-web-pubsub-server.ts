@@ -71,6 +71,9 @@ export class WeaveAzureWebPubsubServer extends Emittery {
       this.syncClient,
       initialState,
       {
+        ...(pubSubConfig.persistIntervalMs && {
+          persistIntervalMs: pubSubConfig.persistIntervalMs,
+        }),
         ...pubSubConfig.connectionHandlers,
       },
       eventsHandlerConfig
