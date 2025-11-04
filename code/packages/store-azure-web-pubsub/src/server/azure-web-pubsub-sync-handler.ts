@@ -38,7 +38,10 @@ export default class WeaveAzureWebPubsubSyncHandler extends WebPubSubEventHandle
   private readonly syncOptions?: WeaveAzureWebPubsubSyncHandlerOptions;
   private initialState: FetchInitialState;
   private readonly server: WeaveAzureWebPubsubServer;
-  private lastRoomState = new Map<string, Uint8Array<ArrayBufferLike>>();
+  private readonly roomsLastState = new Map<
+    string,
+    Uint8Array<ArrayBufferLike>
+  >();
 
   constructor(
     hub: string,
@@ -161,19 +164,21 @@ export default class WeaveAzureWebPubsubSyncHandler extends WebPubSubEventHandle
 
       const actualState = Y.encodeStateAsUpdate(doc);
 
-      const savedRoomData = this.lastRoomState.get(roomId);
-      if (savedRoomData && !this.isPersistingOnInterval()) {
-        const savedStateJson = getStateAsJson(savedRoomData);
-        const savedHash = hashJson(savedStateJson);
-        const actualStateJson = getStateAsJson(actualState);
-        const actualHash = hashJson(actualStateJson);
-        const same = savedHash === actualHash;
+      if (!this.isPersistingOnInterval()) {
+        const savedRoomData = this.roomsLastState.get(roomId);
+        if (savedRoomData) {
+          const savedStateJson = getStateAsJson(savedRoomData);
+          const savedHash = hashJson(savedStateJson);
+          const actualStateJson = getStateAsJson(actualState);
+          const actualHash = hashJson(actualStateJson);
+          const same = savedHash === actualHash;
 
-        if (same) {
-          return;
+          if (same) {
+            return;
+          }
+
+          this.roomsLastState.set(roomId, actualState);
         }
-
-        this.lastRoomState.set(roomId, actualState);
       }
 
       if (this.server?.persistRoom) {
@@ -213,7 +218,9 @@ export default class WeaveAzureWebPubsubSyncHandler extends WebPubSubEventHandle
 
     // flush document to storage
     await this.persistRoomTask(roomId);
-    this.lastRoomState.delete(roomId);
+    if (!this.isPersistingOnInterval()) {
+      this.roomsLastState.delete(roomId);
+    }
 
     // stop sync host
     const syncHost = this._roomsSyncHost.get(roomId);

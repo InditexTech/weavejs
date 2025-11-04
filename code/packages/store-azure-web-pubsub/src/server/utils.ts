@@ -3,7 +3,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import Y from './../yjs';
-import crypto from 'crypto';
+import crypto from 'node:crypto';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function getStateAsJson(actualState: Uint8Array<ArrayBufferLike>): any {
