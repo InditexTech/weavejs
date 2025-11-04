@@ -140,18 +140,6 @@ export class WeaveStageGridPlugin extends WeavePlugin {
         this.onRender();
       }
     });
-
-    window.addEventListener('wheel', () => {
-      if (
-        !this.enabled ||
-        this.isSpaceKeyPressed ||
-        this.isMouseMiddleButtonPressed
-      ) {
-        return;
-      }
-
-      this.onRender();
-    });
   }
 
   getLayer(): Konva.Layer | undefined {

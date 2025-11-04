@@ -79,11 +79,14 @@ export class WeaveUsersPointersPlugin extends WeavePlugin {
     const store = this.instance.getStore();
     const stage = this.instance.getStage();
 
-    this.instance.addEventListener('onConnectionStatusChange', (status) => {
-      if (status === 'disconnected') {
-        store.setAwarenessInfo(WEAVE_USER_POINTER_KEY, undefined);
+    this.instance.addEventListener(
+      'onStoreConnectionStatusChange',
+      (status) => {
+        if (status === 'disconnected') {
+          store.setAwarenessInfo(WEAVE_USER_POINTER_KEY, undefined);
+        }
       }
-    });
+    );
 
     this.instance.addEventListener(
       'onAwarenessChange',
