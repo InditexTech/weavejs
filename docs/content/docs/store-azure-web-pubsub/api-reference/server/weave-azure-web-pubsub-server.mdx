@@ -108,11 +108,19 @@ type FetchRoom = (roomId: string) => Promise<Uint8Array | null>;
 
 type WeaveStoreAzureWebPubsubConfig = {
   endpoint: string;
+  hubName: string;
   auth?: {
     key?: string;
     custom?: TokenCredential;
   };
-  hubName: string;
+  connectionHandlers?: Pick<
+    WeaveAzureWebPubsubSyncHandlerOptions,
+    | "onConnect"
+    | "onConnected"
+    | "removeConnection"
+    | "getConnectionRoom"
+    | "getRoomConnections"
+  >;
 };
 
 type WeaveAzureWebPubsubServerParams = {

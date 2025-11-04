@@ -22,6 +22,7 @@ import {
 } from '@/types';
 import { WeaveStoreAzureWebPubSubSyncHost } from './azure-web-pubsub-host';
 import { WeaveAzureWebPubsubServer } from './azure-web-pubsub-server';
+import { getStateAsJson, hashJson } from './utils';
 
 export default class WeaveAzureWebPubsubSyncHandler extends WebPubSubEventHandler {
   // eslint-disable-next-line @typescript-eslint/naming-convention
@@ -37,6 +38,7 @@ export default class WeaveAzureWebPubsubSyncHandler extends WebPubSubEventHandle
   private readonly syncOptions?: WeaveAzureWebPubsubSyncHandlerOptions;
   private initialState: FetchInitialState;
   private readonly server: WeaveAzureWebPubsubServer;
+  private lastRoomState = new Map<string, Uint8Array<ArrayBufferLike>>();
 
   constructor(
     hub: string,
@@ -113,6 +115,7 @@ export default class WeaveAzureWebPubsubSyncHandler extends WebPubSubEventHandle
       roomId,
       new WeaveStoreAzureWebPubSubSyncHost(
         this.server,
+        this,
         this._client,
         roomId,
         doc
@@ -122,11 +125,9 @@ export default class WeaveAzureWebPubsubSyncHandler extends WebPubSubEventHandle
     const connection = this._roomsSyncHost.get(roomId)!;
 
     await connection.start();
-
-    await this.setupRoomInstancePersistence(roomId);
   }
 
-  private async persistRoomTask(roomId: string): Promise<void> {
+  async persistRoomTask(roomId: string): Promise<void> {
     try {
       const doc = this._rooms.get(roomId);
 
@@ -135,21 +136,27 @@ export default class WeaveAzureWebPubsubSyncHandler extends WebPubSubEventHandle
       }
 
       const actualState = Y.encodeStateAsUpdate(doc);
+
+      const savedRoomData = this.lastRoomState.get(roomId);
+      if (savedRoomData) {
+        const savedStateJson = getStateAsJson(savedRoomData);
+        const savedHash = hashJson(savedStateJson);
+        const actualStateJson = getStateAsJson(actualState);
+        const actualHash = hashJson(actualStateJson);
+        const same = savedHash === actualHash;
+
+        if (same) {
+          return;
+        }
+      }
+
+      this.lastRoomState.set(roomId, actualState);
+
       if (this.server?.persistRoom) {
         await this.server.persistRoom(roomId, actualState);
       }
     } catch (ex) {
       console.error(ex);
-    }
-  }
-
-  private async setupRoomInstancePersistence(roomId: string) {
-    if (!this._store_persistence.has(roomId)) {
-      const intervalId = setInterval(async () => {
-        await this.persistRoomTask(roomId);
-      }, this.syncOptions?.persistIntervalMs ?? 5000);
-
-      this._store_persistence.set(roomId, intervalId);
     }
   }
 
@@ -180,6 +187,7 @@ export default class WeaveAzureWebPubsubSyncHandler extends WebPubSubEventHandle
 
     // flush document to storage
     await this.persistRoomTask(roomId);
+    this.lastRoomState.delete(roomId);
 
     // stop sync host
     const syncHost = this._roomsSyncHost.get(roomId);

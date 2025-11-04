@@ -198,7 +198,6 @@ export const WeaveProvider = ({
     setStatus(WEAVE_INSTANCE_STATUS.IDLE);
     setRoomLoaded(false);
     initWeave();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
 
     return () => {
       weaveInstanceRef.current?.removeEventListener(
@@ -231,6 +230,8 @@ export const WeaveProvider = ({
         onActiveActionChangeHandler
       );
 
+      setStatus(WEAVE_INSTANCE_STATUS.IDLE);
+      setRoomLoaded(false);
       weaveInstanceRef.current?.destroy();
       weaveInstanceRef.current = null;
     };
