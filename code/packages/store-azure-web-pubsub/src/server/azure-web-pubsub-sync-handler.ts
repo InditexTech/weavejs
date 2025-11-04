@@ -141,7 +141,7 @@ export default class WeaveAzureWebPubsubSyncHandler extends WebPubSubEventHandle
   }
 
   isPersistingOnInterval(): boolean {
-    return typeof this.syncOptions?.persistIntervalMs !== 'undefined';
+    return this.syncOptions?.persistIntervalMs !== undefined;
   }
 
   private async setupRoomInstancePersistence(roomId: string) {
