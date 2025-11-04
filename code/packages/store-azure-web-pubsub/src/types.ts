@@ -6,6 +6,10 @@ import type { WebSocket } from 'ws';
 import type { TokenCredential } from '@azure/identity';
 import type { Doc } from 'yjs';
 import type { ConnectionContext } from './index.server';
+import type { WEAVE_STORE_AZURE_WEB_PUBSUB_CONNECTION_STATUS } from './constants';
+import type { WeaveStoreAzureWebPubSubSyncClient } from './client';
+import type { Encoder } from 'lib0/encoding';
+import type { Decoder } from 'lib0/decoding';
 
 export type WeaveStoreAzureWebPubsubConfig = {
   endpoint: string;
@@ -114,3 +118,51 @@ export type WeaveStoreAzureWebPubsubOnWebsocketOnTokenRefreshEvent = {
 export type WeaveStoreAzureWebPubSubSyncHostClientConnectOptions = {
   expirationTimeInMinutes?: number;
 };
+
+// Client types
+
+export type WeaveStoreAzureWebPubSubSyncClientConnectionStatusKeys =
+  keyof typeof WEAVE_STORE_AZURE_WEB_PUBSUB_CONNECTION_STATUS;
+export type WeaveStoreAzureWebPubSubSyncClientConnectionStatus =
+  (typeof WEAVE_STORE_AZURE_WEB_PUBSUB_CONNECTION_STATUS)[WeaveStoreAzureWebPubSubSyncClientConnectionStatusKeys];
+
+export enum MessageType {
+  System = 'system',
+  JoinGroup = 'joinGroup',
+  SendToGroup = 'sendToGroup',
+}
+
+export enum MessageDataType {
+  Init = 'init',
+  Sync = 'sync',
+  Awareness = 'awareness',
+}
+
+export interface MessageData {
+  group: string;
+  t: string; // type / target uuid
+  f: string; // origin uuid
+  c: string; // base64 encoded binary data
+}
+
+export interface Message {
+  type: string;
+  fromUserId: string;
+  from: string;
+  group: string;
+  data: MessageData;
+}
+
+export type MessageHandler = (
+  encoder: Encoder,
+  decoder: Decoder,
+  client: WeaveStoreAzureWebPubSubSyncClient,
+  clientId: string,
+  emitSynced: boolean,
+  messageType: number
+) => void;
+
+export interface WeaveStoreAzureWebPubSubSyncClientOptions {
+  resyncInterval: number;
+  tokenProvider: Promise<string> | null;
+}

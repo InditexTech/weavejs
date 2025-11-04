@@ -651,7 +651,6 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
         return handler?.serialize(node);
       })
       .filter((node) => typeof node !== 'undefined');
-    console.log('Removing selected nodes:', mappedSelectedNodes);
     this.instance.removeNodes(mappedSelectedNodes);
     this.tr.nodes([]);
     this.triggerSelectedNodesEvent();
@@ -755,7 +754,6 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
 
       this.getStageGridPlugin()?.onRender();
       this.updateSelectionRect();
-      this.updatePanDirection();
     }
 
     if (this.isAreaSelecting()) {

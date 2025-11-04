@@ -13,58 +13,24 @@ import * as decoding from 'lib0/decoding';
 import * as syncProtocol from 'y-protocols/sync';
 import * as awarenessProtocol from 'y-protocols/awareness';
 import {
+  MessageDataType,
+  MessageType,
+  type WeaveStoreAzureWebPubSubSyncClientOptions,
   type FetchClient,
+  type Message,
+  type MessageHandler,
   type WeaveStoreAzureWebPubsubOnStoreFetchConnectionUrlEvent,
+  type WeaveStoreAzureWebPubSubSyncClientConnectionStatus,
 } from './types';
 import type { WeaveStoreAzureWebPubsub } from './store-azure-web-pubsub';
 import { WEAVE_STORE_CONNECTION_STATUS } from '@inditextech/weave-types';
+import { WEAVE_STORE_AZURE_WEB_PUBSUB_CONNECTION_STATUS } from './constants';
 
 const messageSyncStep1 = 0;
 const messageAwareness = 1;
 const messageQueryAwareness = 3;
 
 const AzureWebPubSubJsonProtocol = 'json.webpubsub.azure.v1';
-
-export enum MessageType {
-  System = 'system',
-  JoinGroup = 'joinGroup',
-  SendToGroup = 'sendToGroup',
-}
-
-export enum MessageDataType {
-  Init = 'init',
-  Sync = 'sync',
-  Awareness = 'awareness',
-}
-
-export interface MessageData {
-  group: string;
-  t: string; // type / target uuid
-  f: string; // origin uuid
-  c: string; // base64 encoded binary data
-}
-
-export interface Message {
-  type: string;
-  fromUserId: string;
-  from: string;
-  group: string;
-  data: MessageData;
-}
-
-type MessageHandler = (
-  encoder: encoding.Encoder,
-  decoder: decoding.Decoder,
-  client: WeaveStoreAzureWebPubSubSyncClient,
-  clientId: string,
-  emitSynced: boolean,
-  messageType: number
-) => void;
-
-export interface ClientOptions {
-  resyncInterval: number;
-  tokenProvider: Promise<string> | null;
-}
 
 const messageHandlers: MessageHandler[] = [];
 
@@ -142,7 +108,7 @@ export class WeaveStoreAzureWebPubSubSyncClient extends Emittery {
   private _ws: ReconnectingWebSocket | null;
   private _url: string;
   private _fetchClient: FetchClient;
-  private _status: 'connected' | 'connecting' | 'disconnected' | 'error';
+  private _status: WeaveStoreAzureWebPubSubSyncClientConnectionStatus;
   private _wsConnected: boolean;
   private _synced: boolean;
   private _resyncInterval!: NodeJS.Timeout | null;
@@ -151,7 +117,7 @@ export class WeaveStoreAzureWebPubSubSyncClient extends Emittery {
   private _connectionRetries: number;
   private _uuid: string;
   private _awareness!: awarenessProtocol.Awareness;
-  private _options: ClientOptions;
+  private _options: WeaveStoreAzureWebPubSubSyncClientOptions;
   private _initialized: boolean;
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -175,7 +141,7 @@ export class WeaveStoreAzureWebPubSubSyncClient extends Emittery {
     url: string,
     topic: string,
     doc: Doc,
-    options: ClientOptions = {
+    options: WeaveStoreAzureWebPubSubSyncClientOptions = {
       resyncInterval: 15 * 1000,
       tokenProvider: null,
     }
@@ -192,7 +158,7 @@ export class WeaveStoreAzureWebPubSubSyncClient extends Emittery {
     this._url = url;
     this._uuid = uuidv4();
 
-    this._status = 'disconnected';
+    this._status = WEAVE_STORE_AZURE_WEB_PUBSUB_CONNECTION_STATUS.DISCONNECTED;
     this._wsConnected = false;
     this._initialized = false;
 
@@ -280,6 +246,7 @@ export class WeaveStoreAzureWebPubSubSyncClient extends Emittery {
   saveLastSyncResponse(): void {
     const now = new Date();
     this._lastReceivedSyncResponse = now.getTime();
+    this.instance.emitEvent('onSyncResponse', this._lastReceivedSyncResponse);
   }
 
   setupResyncInterval(): void {
@@ -345,7 +312,10 @@ export class WeaveStoreAzureWebPubSubSyncClient extends Emittery {
   simulateWebsocketError(): void {
     if (this._ws) {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      (this._ws as any)._ws.close(4000, 'Simulated error for testing');
+      (this._ws as any)._ws.close(
+        4000,
+        new Error('Simulated error for testing')
+      );
     }
   }
 
@@ -464,16 +434,15 @@ export class WeaveStoreAzureWebPubSubSyncClient extends Emittery {
       console.error('WebSocket error', e);
 
       if (this._initialized && websocket.retryCount > 0) {
-        this._status = 'connecting';
-        this.emit('status', this._status);
+        this.setAndEmitStatusInfo(
+          WEAVE_STORE_AZURE_WEB_PUBSUB_CONNECTION_STATUS.CONNECTING
+        );
         return;
       }
-      this._status = 'error';
-      this.emit('status', this._status);
 
-      // if (websocket.readyState === WebSocket.OPEN) {
-      //   websocket.close(); // ensure cleanup
-      // }
+      this.setAndEmitStatusInfo(
+        WEAVE_STORE_AZURE_WEB_PUBSUB_CONNECTION_STATUS.ERROR
+      );
     });
 
     websocket.onmessage = (event) => {
@@ -506,8 +475,15 @@ export class WeaveStoreAzureWebPubSubSyncClient extends Emittery {
     };
 
     websocket.onclose = () => {
-      this._status = 'disconnected';
-      this.emit('status', this._status);
+      if ((this._ws?.retryCount ?? 0) > 0) {
+        this.setAndEmitStatusInfo(
+          WEAVE_STORE_AZURE_WEB_PUBSUB_CONNECTION_STATUS.CONNECTING
+        );
+      } else {
+        this.setAndEmitStatusInfo(
+          WEAVE_STORE_AZURE_WEB_PUBSUB_CONNECTION_STATUS.DISCONNECTED
+        );
+      }
 
       if (this._wsConnected) {
         this.cleanupResyncInterval();
@@ -524,9 +500,10 @@ export class WeaveStoreAzureWebPubSubSyncClient extends Emittery {
     };
 
     websocket.onopen = () => {
-      // this._wsLastMessageReceived = Date.now();
-      this._status = 'connected';
-      this.emit('status', this._status);
+      this.setAndEmitStatusInfo(
+        WEAVE_STORE_AZURE_WEB_PUBSUB_CONNECTION_STATUS.CONNECTED
+      );
+
       this._wsConnected = true;
       this._initialized = true;
 
@@ -570,7 +547,18 @@ export class WeaveStoreAzureWebPubSubSyncClient extends Emittery {
       }
     };
 
+    this.setAndEmitStatusInfo(
+      WEAVE_STORE_AZURE_WEB_PUBSUB_CONNECTION_STATUS.CONNECTING
+    );
+
     return websocket;
+  }
+
+  setAndEmitStatusInfo(
+    status: WeaveStoreAzureWebPubSubSyncClientConnectionStatus
+  ): void {
+    this._status = status;
+    this.emit('status', this._status);
   }
 
   async connect(
