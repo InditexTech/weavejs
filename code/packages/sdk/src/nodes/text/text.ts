@@ -50,7 +50,7 @@ export class WeaveTextNode extends WeaveNode {
     clonedText.destroy();
   }
 
-  private handleKeyPress = (e: KeyboardEvent) => {
+  private readonly handleKeyPress = (e: KeyboardEvent) => {
     if (
       e.code === 'Enter' &&
       this.instance.getActiveAction() === SELECTION_TOOL_ACTION_NAME &&
