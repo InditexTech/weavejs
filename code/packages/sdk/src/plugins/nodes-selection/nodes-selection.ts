@@ -1461,12 +1461,12 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
         transformerAttrs,
         nodes[0].getTransformerProperties()
       );
-      transformerAttrs.enabledAnchors = nodes[0].allowedAnchors();
+      transformerAttrs.enabledAnchors = nodes[0]?.allowedAnchors() ?? [];
     }
     if (nodesSelected > 1) {
       const anchorsArrays = [];
       for (const node of nodes) {
-        anchorsArrays.push(node.allowedAnchors());
+        anchorsArrays.push(node?.allowedAnchors() ?? []);
       }
 
       transformerAttrs.enabledAnchors = intersectArrays(anchorsArrays);
