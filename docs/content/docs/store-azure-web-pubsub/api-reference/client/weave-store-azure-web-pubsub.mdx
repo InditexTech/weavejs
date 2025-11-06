@@ -25,7 +25,7 @@ import { WeaveStoreAzureWebPubsub } from "@inditextech/weave-store-azure-web-pub
 ## Instantiation
 
 ```ts
-const store = new WeaveStoreAzureWebPubsub(storeData: Uint8Array | null, storeOptions: WeaveStoreOptions, azureWebPubsubOptions: WeaveStoreAzureWebPubsubOptions);
+const store = new WeaveStoreAzureWebPubsub(initialRoomData: Uint8Array | FetchInitialState | undefined, storeOptions: WeaveStoreOptions, azureWebPubsubOptions: WeaveStoreAzureWebPubsubOptions);
 ```
 
 ## Parameters
@@ -35,8 +35,8 @@ const store = new WeaveStoreAzureWebPubsub(storeData: Uint8Array | null, storeOp
     ["initialRoomData"]: {
       required: true,
       description:
-        "If the room is not new, the actual data (snapshot) of the room",
-      type: "Uint8Array | undefined",
+        "If the room is not new, the actual data (snapshot) of the room in binary form.",
+      type: "Uint8Array | FetchInitialState | undefined",
     },
     ["storeOptions.getUser"]: {
       required: true,

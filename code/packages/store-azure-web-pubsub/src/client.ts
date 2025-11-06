@@ -620,9 +620,6 @@ function safeSend(data: string) {
   const bytes = new TextEncoder().encode(data);
 
   if (bytes.byteLength > MAX_BYTES) {
-    console.warn(
-      `Message too large: ${bytes.byteLength} bytes (limit ${MAX_BYTES}). Chunking.`
-    );
     return false;
   }
 
