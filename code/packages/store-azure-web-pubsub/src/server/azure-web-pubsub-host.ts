@@ -80,7 +80,7 @@ export class WeaveStoreAzureWebPubSubSyncHost {
 
   private _awareness!: awarenessProtocol.Awareness;
 
-  private _chunkedMessages: Record<string, string[]>;
+  private _chunkedMessages: Map<string, string[]>;
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   private _updateHandler: (update: any, origin: any) => void;
@@ -104,7 +104,7 @@ export class WeaveStoreAzureWebPubSubSyncHost {
     this.topic = topic;
     this.topicAwarenessChannel = `${topic}-awareness`;
     this._client = client;
-    this._chunkedMessages = {};
+    this._chunkedMessages = new Map();
 
     this._conn = null;
 
@@ -232,23 +232,27 @@ export class WeaveStoreAzureWebPubSubSyncHost {
             event.data.totalChunks &&
             event.data.type === 'chunk'
           ) {
-            if (!this._chunkedMessages[event.data.payloadId]) {
-              this._chunkedMessages[event.data.payloadId] = Array(
-                event.data.totalChunks
+            if (!this._chunkedMessages.has(event.data.payloadId)) {
+              this._chunkedMessages.set(
+                event.data.payloadId,
+                Array(event.data.totalChunks)
               );
             }
             if (event.data.c) {
-              this._chunkedMessages[event.data.payloadId][event.data.index] =
-                event.data.c;
+              this._chunkedMessages.get(event.data.payloadId)![
+                event.data.index
+              ] = event.data.c;
             }
             return;
           }
 
           let joined: string | undefined = undefined;
           if (event.data.payloadId && event.data.type === 'end') {
-            if (this._chunkedMessages[event.data.payloadId]) {
-              joined = this._chunkedMessages[event.data.payloadId].join('');
-              delete this._chunkedMessages[event.data.payloadId];
+            if (this._chunkedMessages.has(event.data.payloadId)) {
+              joined = this._chunkedMessages
+                .get(event.data.payloadId)!
+                .join('');
+              this._chunkedMessages.delete(event.data.payloadId);
             }
           }
 

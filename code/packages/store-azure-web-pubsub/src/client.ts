@@ -119,7 +119,7 @@ export class WeaveStoreAzureWebPubSubSyncClient extends Emittery {
   private _awareness!: awarenessProtocol.Awareness;
   private _options: WeaveStoreAzureWebPubSubSyncClientOptions;
   private _initialized: boolean;
-  private _chunkedMessages: Record<string, string[]>;
+  private _chunkedMessages: Map<string, string[]>;
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   private _updateHandler: (update: any, origin: any) => void;
@@ -162,7 +162,7 @@ export class WeaveStoreAzureWebPubSubSyncClient extends Emittery {
     this._status = WEAVE_STORE_AZURE_WEB_PUBSUB_CONNECTION_STATUS.DISCONNECTED;
     this._wsConnected = false;
     this._initialized = false;
-    this._chunkedMessages = {};
+    this._chunkedMessages = new Map();
 
     this._connectionRetries = 0;
     this._synced = false;
@@ -470,22 +470,23 @@ export class WeaveStoreAzureWebPubSubSyncClient extends Emittery {
         messageData.totalChunks &&
         messageData.type === 'chunk'
       ) {
-        if (!this._chunkedMessages[messageData.payloadId]) {
-          this._chunkedMessages[messageData.payloadId] = Array(
-            messageData.totalChunks
+        if (!this._chunkedMessages.has(messageData.payloadId)) {
+          this._chunkedMessages.set(
+            messageData.payloadId,
+            Array(messageData.totalChunks)
           );
         }
         if (messageData.c) {
-          this._chunkedMessages[messageData.payloadId][messageData.index] =
+          this._chunkedMessages.get(messageData.payloadId)![messageData.index] =
             messageData.c;
         }
       }
 
       let joined: string | undefined = undefined;
       if (messageData.payloadId && messageData.type === 'end') {
-        if (this._chunkedMessages[messageData.payloadId]) {
-          joined = this._chunkedMessages[messageData.payloadId].join('');
-          delete this._chunkedMessages[event.data.payloadId];
+        if (this._chunkedMessages.has(messageData.payloadId)) {
+          joined = this._chunkedMessages.get(messageData.payloadId)!.join('');
+          this._chunkedMessages.delete(messageData.payloadId);
         }
       }
 
