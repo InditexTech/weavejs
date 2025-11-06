@@ -46,6 +46,7 @@ declare module 'konva/lib/Node' {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     updatePosition(position: Vector2d): void;
     dblClick(): void;
+    isSelectable(): boolean;
     movedToContainer(container: Konva.Layer | Konva.Group): void;
     handleMouseover(): void;
     handleMouseout(): void;

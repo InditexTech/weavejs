@@ -99,6 +99,10 @@ export class WeaveNodesDistanceSnappingPlugin extends WeavePlugin {
       return;
     }
 
+    if (e.target.getAttrs().name?.indexOf('disableDistanceSnapping') !== -1) {
+      return;
+    }
+
     const { targetNode: node, skipNodes } = getTargetAndSkipNodes(
       this.instance,
       e,
@@ -106,6 +110,10 @@ export class WeaveNodesDistanceSnappingPlugin extends WeavePlugin {
     );
 
     if (typeof node === 'undefined') {
+      return;
+    }
+
+    if (node.getAttrs().name?.indexOf('disableDistanceSnapping') !== -1) {
       return;
     }
 
