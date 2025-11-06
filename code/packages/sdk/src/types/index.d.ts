@@ -4,6 +4,8 @@
 
 declare global {
   interface Window {
+    Konva: typeof import('konva') | undefined;
+    '__ $YJS$ __': typeof import('yjs') | undefined;
     weave: Weave;
     weaveTextEditing: Record<string, string>;
     weaveDragImageURL: string | undefined;

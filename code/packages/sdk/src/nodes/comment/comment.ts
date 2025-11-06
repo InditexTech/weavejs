@@ -22,7 +22,7 @@ import type {
   WeaveCommentNodeOnDragEndEvent,
   WeaveCommentNodeOnCreateCommentEvent,
 } from './types';
-import { TextWithMaxLines } from './text-max-lines';
+import { CreateTextWithMaxLines } from './text-max-lines';
 import type {
   WeaveElementAttributes,
   WeaveElementInstance,
@@ -271,7 +271,7 @@ export class WeaveCommentNode<T> extends WeaveNode {
       commentParams.commentModel
     );
 
-    const internalComment = new TextWithMaxLines({
+    const internalComment = new (CreateTextWithMaxLines())({
       id: `${id}-comment`,
       x: widthContracted - 2 * circlePaddingContracted + userNameLeftMargin,
       text: commentContent,
