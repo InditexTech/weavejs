@@ -13,6 +13,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- [#786](https://github.com/InditexTech/weavejs/issues/786) Handle big messages as chunks on Azure Web PubSub store
+
 ### Changed
 
 - [#784](https://github.com/InditexTech/weavejs/issues/782) Improve state transactional operations

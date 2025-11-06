@@ -2,6 +2,7 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
+import crypto from 'node:crypto';
 import * as decoding from 'lib0/decoding';
 import * as encoding from 'lib0/encoding';
 import * as syncProtocol from 'y-protocols/sync';
@@ -14,45 +15,26 @@ import {
 import { WebSocket } from 'ws';
 import Y from './../yjs';
 import type { WeaveAzureWebPubsubServer } from './azure-web-pubsub-server';
-import type {
-  WeaveStoreAzureWebPubsubOnWebsocketCloseEvent,
-  WeaveStoreAzureWebPubsubOnWebsocketErrorEvent,
-  WeaveStoreAzureWebPubsubOnWebsocketJoinGroupEvent,
-  WeaveStoreAzureWebPubsubOnWebsocketMessageEvent,
-  WeaveStoreAzureWebPubsubOnWebsocketOnTokenRefreshEvent,
-  WeaveStoreAzureWebPubsubOnWebsocketOpenEvent,
+import {
+  MessageDataType,
+  MessageType,
+  type Message,
+  type MessageData,
+  type WeaveStoreAzureWebPubsubOnWebsocketCloseEvent,
+  type WeaveStoreAzureWebPubsubOnWebsocketErrorEvent,
+  type WeaveStoreAzureWebPubsubOnWebsocketJoinGroupEvent,
+  type WeaveStoreAzureWebPubsubOnWebsocketMessageEvent,
+  type WeaveStoreAzureWebPubsubOnWebsocketOnTokenRefreshEvent,
+  type WeaveStoreAzureWebPubsubOnWebsocketOpenEvent,
 } from '@/types';
 import type WeaveAzureWebPubsubSyncHandler from './azure-web-pubsub-sync-handler';
+import { handleChunkedMessage } from '@/utils';
 
 const expirationTimeInMinutes = 60; // 1 hour
 const messageSync = 0;
 const messageAwareness = 1;
 const AzureWebPubSubJsonProtocol = 'json.webpubsub.azure.v1';
 
-export enum MessageType {
-  System = 'system',
-  JoinGroup = 'joinGroup',
-  SendToGroup = 'sendToGroup',
-}
-
-export enum MessageDataType {
-  Init = 'init',
-  Sync = 'sync',
-  Awareness = 'awareness',
-}
-
-export interface MessageData {
-  t: string; // type / target uuid
-  f: string; // origin uuid
-  c: string; // base64 encoded binary data
-}
-
-export interface Message {
-  type: string;
-  from: string;
-  group: string;
-  data: MessageData;
-}
 const HostUserId = 'host';
 
 export interface WebPubSubHostOptions {
@@ -74,6 +56,8 @@ export class WeaveStoreAzureWebPubSubSyncHost {
   private _forceClose: boolean = false;
 
   private _awareness!: awarenessProtocol.Awareness;
+
+  private _chunkedMessages: Map<string, string[]>;
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   private _updateHandler: (update: any, origin: any) => void;
@@ -97,6 +81,7 @@ export class WeaveStoreAzureWebPubSubSyncHost {
     this.topic = topic;
     this.topicAwarenessChannel = `${topic}-awareness`;
     this._client = client;
+    this._chunkedMessages = new Map();
 
     this._conn = null;
 
@@ -218,17 +203,30 @@ export class WeaveStoreAzureWebPubSubSyncHost {
         const event: Message = JSON.parse(e.data.toString());
 
         if (event.type === 'message' && event.from === 'group') {
+          const joinedMessagePayload = handleChunkedMessage(
+            this._chunkedMessages,
+            event.data
+          );
+
           switch (event.data.t) {
             case MessageDataType.Init:
               this.onClientInit(group, event.data);
-              this.onClientSync(group, event.data);
+              this.onClientSync(
+                group,
+                event.data.f,
+                joinedMessagePayload ?? event.data.c
+              );
               this.sendInitAwarenessInfo(event.data.f);
               return;
             case MessageDataType.Sync:
-              this.onClientSync(group, event.data);
+              this.onClientSync(
+                group,
+                event.data.f,
+                joinedMessagePayload ?? event.data.c
+              );
               return;
             case MessageDataType.Awareness:
-              this.onAwareness(group, event.data);
+              this.onAwareness(group, event.data.c);
               return;
           }
         }
@@ -304,13 +302,56 @@ export class WeaveStoreAzureWebPubSubSyncHost {
     const bytes = new TextEncoder().encode(data);
 
     if (bytes.byteLength > MAX_BYTES) {
-      console.warn(
-        `Message too large: ${bytes.byteLength} bytes (limit ${MAX_BYTES}). Skipping send.`
-      );
       return false;
     }
 
     return true;
+  }
+
+  private chunkString(str: string, size: number) {
+    const chunks = [];
+    for (let i = 0; i < str.length; i += size) {
+      chunks.push(str.slice(i, i + size));
+    }
+    return chunks;
+  }
+  private chunkedBroadcast(group: string, from: string, u8: Uint8Array) {
+    const base64Data = Buffer.from(u8).toString('base64');
+
+    const CHUNK_SIZE = 60 * 1024; // 60 KB
+    const chunks = this.chunkString(base64Data, CHUNK_SIZE);
+    const payloadId = crypto.randomUUID();
+
+    for (let i = 0; i < chunks.length; i++) {
+      const payload = JSON.stringify({
+        type: MessageType.SendToGroup,
+        group,
+        noEcho: true,
+        data: {
+          payloadId,
+          type: 'chunk',
+          index: i,
+          totalChunks: chunks.length,
+          f: from,
+          c: chunks[i],
+        },
+      });
+
+      this._conn?.send?.(payload);
+    }
+
+    const payload = JSON.stringify({
+      type: MessageType.SendToGroup,
+      group,
+      noEcho: true,
+      data: {
+        payloadId,
+        type: 'end',
+        f: from,
+      },
+    });
+
+    this._conn?.send?.(payload);
   }
 
   private broadcast(group: string, from: string, u8: Uint8Array) {
@@ -326,6 +367,7 @@ export class WeaveStoreAzureWebPubSubSyncHost {
       });
 
       if (!this.safeSend(payload)) {
+        this.chunkedBroadcast(group, from, u8);
         return;
       }
 
@@ -333,6 +375,45 @@ export class WeaveStoreAzureWebPubSubSyncHost {
     } catch (ex) {
       console.error('Error broadcasting message:', ex);
     }
+  }
+
+  private chunkedSend(group: string, to: string, u8: Uint8Array) {
+    const base64Data = Buffer.from(u8).toString('base64');
+
+    const CHUNK_SIZE = 60 * 1024; // 60 KB
+    const chunks = this.chunkString(base64Data, CHUNK_SIZE);
+    const payloadId = crypto.randomUUID();
+
+    for (let i = 0; i < chunks.length; i++) {
+      const payload = JSON.stringify({
+        type: MessageType.SendToGroup,
+        group,
+        noEcho: true,
+        data: {
+          payloadId,
+          type: 'chunk',
+          index: i,
+          totalChunks: chunks.length,
+          t: to,
+          c: chunks[i],
+        },
+      });
+
+      this._conn?.send?.(payload);
+    }
+
+    const payload = JSON.stringify({
+      type: MessageType.SendToGroup,
+      group,
+      noEcho: true,
+      data: {
+        payloadId,
+        type: 'end',
+        t: to,
+      },
+    });
+
+    this._conn?.send?.(payload);
   }
 
   private send(group: string, to: string, u8: Uint8Array) {
@@ -348,6 +429,7 @@ export class WeaveStoreAzureWebPubSubSyncHost {
       });
 
       if (!this.safeSend(payload)) {
+        this.chunkedSend(group, to, u8);
         return;
       }
 
@@ -365,18 +447,18 @@ export class WeaveStoreAzureWebPubSubSyncHost {
     this.send(group, data.f, u8);
   }
 
-  private onClientSync(group: string, data: MessageData) {
+  private onClientSync(group: string, from: string, data: string) {
     try {
-      const buf = Buffer.from(data.c, 'base64');
+      const buf = Buffer.from(data, 'base64');
       const encoder = encoding.createEncoder();
       const decoder = decoding.createDecoder(buf);
       const messageType = decoding.readVarUint(decoder);
       switch (messageType) {
         case syncProtocol.messageYjsSyncStep1:
           encoding.writeVarUint(encoder, syncProtocol.messageYjsSyncStep1);
-          syncProtocol.readSyncMessage(decoder, encoder, this.doc, data.f);
+          syncProtocol.readSyncMessage(decoder, encoder, this.doc, from);
           if (encoding.length(encoder) > 1) {
-            this.send(group, data.f, encoding.toUint8Array(encoder));
+            this.send(group, from, encoding.toUint8Array(encoder));
           }
           break;
       }
@@ -389,9 +471,9 @@ export class WeaveStoreAzureWebPubSubSyncHost {
 
   // private onAwareness(group: string, data: MessageData) {
   // eslint-disable-next-line @typescript-eslint/naming-convention
-  private onAwareness(_: string, data: MessageData) {
+  private onAwareness(_: string, data: string) {
     try {
-      const buf = Buffer.from(data.c, 'base64');
+      const buf = Buffer.from(data, 'base64');
       const decoder = decoding.createDecoder(buf);
       decoding.readVarUint(decoder); // skip the message type
       const update = decoding.readVarUint8Array(decoder);
