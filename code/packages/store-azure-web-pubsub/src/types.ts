@@ -133,6 +133,10 @@ export enum MessageDataType {
 }
 
 export interface MessageData {
+  payloadId?: string;
+  index?: number;
+  type?: 'chunk' | 'end';
+  totalChunks?: number;
   group: string;
   t: string; // type / target uuid
   f: string; // origin uuid

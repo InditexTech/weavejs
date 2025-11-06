@@ -119,6 +119,7 @@ export class WeaveStoreAzureWebPubSubSyncClient extends Emittery {
   private _awareness!: awarenessProtocol.Awareness;
   private _options: WeaveStoreAzureWebPubSubSyncClientOptions;
   private _initialized: boolean;
+  private _chunkedMessages: Record<string, string[]>;
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   private _updateHandler: (update: any, origin: any) => void;
@@ -161,6 +162,7 @@ export class WeaveStoreAzureWebPubSubSyncClient extends Emittery {
     this._status = WEAVE_STORE_AZURE_WEB_PUBSUB_CONNECTION_STATUS.DISCONNECTED;
     this._wsConnected = false;
     this._initialized = false;
+    this._chunkedMessages = {};
 
     this._connectionRetries = 0;
     this._synced = false;
@@ -272,13 +274,13 @@ export class WeaveStoreAzureWebPubSubSyncClient extends Emittery {
         }
 
         const resyncInSeconds = this._options.resyncInterval / 1000;
-        const resyncLimitInSeconds = resyncInSeconds + 5;
+        const resyncWindowLimitInSeconds = resyncInSeconds + 10; // twice size window and 10 seconds grace period
         const now = new Date();
         const diffInSeconds =
           (now.getTime() - this._lastReceivedSyncResponse) / 1000;
 
         if (
-          diffInSeconds > resyncLimitInSeconds &&
+          diffInSeconds > resyncWindowLimitInSeconds &&
           this._ws?.readyState === WebSocket.OPEN
         ) {
           // if last received sync response is older than resync interval + 5s, assume connection lost
@@ -462,7 +464,47 @@ export class WeaveStoreAzureWebPubSubSyncClient extends Emittery {
         return;
       }
 
-      const buf = Buffer.from(messageData.c, 'base64');
+      if (
+        messageData.payloadId &&
+        messageData.index !== undefined &&
+        messageData.totalChunks &&
+        messageData.type === 'chunk'
+      ) {
+        if (!this._chunkedMessages[messageData.payloadId]) {
+          this._chunkedMessages[messageData.payloadId] = Array(
+            messageData.totalChunks
+          );
+        }
+        if (messageData.c) {
+          this._chunkedMessages[messageData.payloadId][messageData.index] =
+            messageData.c;
+        }
+      }
+
+      let joined: string | undefined = undefined;
+      if (messageData.payloadId && messageData.type === 'end') {
+        if (this._chunkedMessages[messageData.payloadId]) {
+          joined = this._chunkedMessages[messageData.payloadId].join('');
+          delete this._chunkedMessages[event.data.payloadId];
+        }
+      }
+
+      if (messageData.type === 'chunk') {
+        return;
+      }
+
+      let buf: Buffer | undefined = undefined;
+      if (messageData.c) {
+        buf = Buffer.from(messageData.c, 'base64');
+      }
+      if (joined) {
+        buf = Buffer.from(joined, 'base64');
+      }
+
+      if (!buf) {
+        return;
+      }
+
       const encoder = readMessage(this, buf, true, messageData.f);
       if (encoding.length(encoder) > 1) {
         sendToControlGroup(
@@ -579,7 +621,7 @@ function safeSend(data: string) {
 
   if (bytes.byteLength > MAX_BYTES) {
     console.warn(
-      `Message too large: ${bytes.byteLength} bytes (limit ${MAX_BYTES}). Skipping send.`
+      `Message too large: ${bytes.byteLength} bytes (limit ${MAX_BYTES}). Chunking.`
     );
     return false;
   }
@@ -609,6 +651,7 @@ function sendToControlGroup(
   const payload = JSON.stringify({
     type: MessageType.SendToGroup,
     group: `${group}.host`,
+    noEcho: true,
     data: {
       t: type,
       f: client.id,
@@ -617,8 +660,63 @@ function sendToControlGroup(
   });
 
   if (!safeSend(payload)) {
+    sendToControlGroupChunked(client, group, type, u8);
     return;
   }
+
+  client.ws?.send(payload);
+}
+
+function chunkString(str: string, size: number) {
+  const chunks = [];
+  for (let i = 0; i < str.length; i += size) {
+    chunks.push(str.slice(i, i + size));
+  }
+  return chunks;
+}
+
+function sendToControlGroupChunked(
+  client: WeaveStoreAzureWebPubSubSyncClient,
+  group: string,
+  type: string,
+  u8: Uint8Array
+) {
+  const base64Data = Buffer.from(u8).toString('base64');
+
+  const CHUNK_SIZE = 60 * 1024; // 60 KB
+  const chunks = chunkString(base64Data, CHUNK_SIZE);
+  const payloadId = uuidv4();
+
+  for (let i = 0; i < chunks.length; i++) {
+    const payload = JSON.stringify({
+      type: MessageType.SendToGroup,
+      group: `${group}.host`,
+      noEcho: true,
+      data: {
+        payloadId,
+        type: 'chunk',
+        totalChunks: chunks.length,
+        index: i,
+        t: type,
+        f: client.id,
+        c: chunks[i],
+      },
+    });
+
+    client.ws?.send(payload);
+  }
+
+  const payload = JSON.stringify({
+    type: MessageType.SendToGroup,
+    group: `${group}.host`,
+    noEcho: true,
+    data: {
+      payloadId,
+      type: 'end',
+      f: client.id,
+      t: type,
+    },
+  });
 
   client.ws?.send(payload);
 }
