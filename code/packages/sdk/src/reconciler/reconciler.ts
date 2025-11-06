@@ -42,13 +42,17 @@ export class WeaveReconciler {
       return;
     }
 
+    let nodeAdded = false;
+
     if (parentInstance instanceof Konva.Stage && child instanceof Konva.Layer) {
       parentInstance.add(child);
       handler.onAdd?.(child);
+      nodeAdded = true;
     }
     if (parentInstance instanceof Konva.Layer) {
       parentInstance.add(child);
       handler.onAdd?.(child);
+      nodeAdded = true;
     }
     if (
       parentInstance instanceof Konva.Group &&
@@ -59,6 +63,7 @@ export class WeaveReconciler {
       ) as Konva.Group | undefined;
       realParent?.add(child);
       handler.onAdd?.(child);
+      nodeAdded = true;
     }
     if (
       parentInstance instanceof Konva.Group &&
@@ -66,17 +71,52 @@ export class WeaveReconciler {
     ) {
       parentInstance.add(child);
       handler.onAdd?.(child);
+      nodeAdded = true;
     }
 
     if (childInitialZIndex) {
       child.zIndex(childInitialZIndex);
     }
+
+    if (nodeAdded) {
+      this.instance.emitEvent('onNodeRenderedAdded', child);
+    }
+  }
+
+  updateNode(
+    instance: WeaveElementInstance,
+    type: string,
+    prevProps: WeaveElementAttributes,
+    nextProps: WeaveElementAttributes
+  ) {
+    if (!isEqual(prevProps, nextProps)) {
+      const handler = this.instance.getNodeHandler<WeaveNode>(type);
+
+      if (!handler) {
+        return;
+      }
+
+      handler.onUpdate(instance, nextProps);
+
+      const childZIndex = nextProps.zIndex;
+      if (childZIndex) {
+        instance.zIndex(childZIndex as number);
+      }
+
+      this.instance.emitEvent('onNodeRenderedUpdated', instance);
+    }
+  }
+
+  removeNode(node: WeaveElementInstance) {
+    this.instance.emitEvent('onNodeRenderedRemoved', node);
   }
 
   getConfig() {
     const weaveInstance = this.instance;
     const logger = this.logger;
     const addNode = this.addNode.bind(this);
+    const updateNode = this.updateNode.bind(this);
+    const removeNode = this.removeNode.bind(this);
 
     return {
       noTimeout: -1,
@@ -312,20 +352,7 @@ export class WeaveReconciler {
           return;
         }
 
-        if (!isEqual(prevProps, nextProps)) {
-          const handler = weaveInstance.getNodeHandler<WeaveNode>(type);
-
-          if (!handler) {
-            return;
-          }
-
-          handler.onUpdate(instance, nextProps);
-
-          const childZIndex = nextProps.zIndex;
-          if (childZIndex) {
-            instance.zIndex(childZIndex as number);
-          }
-        }
+        updateNode(instance, type, prevProps, nextProps);
       },
       removeChildFromContainer(): void {
         logger.debug('removeChildFromContainer');
@@ -342,6 +369,7 @@ export class WeaveReconciler {
         }
 
         handler.onDestroy(child);
+        removeNode(child);
       },
     };
   }
