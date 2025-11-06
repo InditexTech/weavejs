@@ -270,6 +270,11 @@ export class Weave {
       stage.destroy();
     }
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    (globalThis as any).Konva = undefined;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    (globalThis as any)['__ $YJS$ __'] = undefined;
+
     this.moduleLogger.info(`Instance destroyed`);
   }
 

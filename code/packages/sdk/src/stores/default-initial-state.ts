@@ -3,7 +3,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import type { Doc } from 'yjs';
-import * as Y from 'yjs';
+import Y from './../yjs.js';
 
 const yjsLayer = function (id: string) {
   const newLayerMap = new Y.Map();
