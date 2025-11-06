@@ -187,6 +187,36 @@ export class WeaveStoreAzureWebPubSubSyncHost {
     this.broadcast(this.topic, origin, u8);
   }
 
+  handleChunkedMessage(messageData: MessageData): string | undefined {
+    if (
+      messageData.payloadId &&
+      messageData.index !== undefined &&
+      messageData.totalChunks &&
+      messageData.type === 'chunk'
+    ) {
+      if (!this._chunkedMessages.has(messageData.payloadId)) {
+        this._chunkedMessages.set(
+          messageData.payloadId,
+          new Array(messageData.totalChunks)
+        );
+      }
+      if (messageData.c) {
+        this._chunkedMessages.get(messageData.payloadId)![messageData.index] =
+          messageData.c;
+      }
+    }
+
+    let joined: string | undefined = undefined;
+    if (messageData.payloadId && messageData.type === 'end') {
+      if (this._chunkedMessages.has(messageData.payloadId)) {
+        joined = this._chunkedMessages.get(messageData.payloadId)!.join('');
+        this._chunkedMessages.delete(messageData.payloadId);
+      }
+    }
+
+    return joined;
+  }
+
   async createWebSocket(): Promise<void> {
     const group = this.topic;
 
@@ -226,44 +256,24 @@ export class WeaveStoreAzureWebPubSubSyncHost {
         const event: Message = JSON.parse(e.data.toString());
 
         if (event.type === 'message' && event.from === 'group') {
-          if (
-            event.data.payloadId &&
-            event.data.index !== undefined &&
-            event.data.totalChunks &&
-            event.data.type === 'chunk'
-          ) {
-            if (!this._chunkedMessages.has(event.data.payloadId)) {
-              this._chunkedMessages.set(
-                event.data.payloadId,
-                Array(event.data.totalChunks)
-              );
-            }
-            if (event.data.c) {
-              this._chunkedMessages.get(event.data.payloadId)![
-                event.data.index
-              ] = event.data.c;
-            }
-            return;
-          }
-
-          let joined: string | undefined = undefined;
-          if (event.data.payloadId && event.data.type === 'end') {
-            if (this._chunkedMessages.has(event.data.payloadId)) {
-              joined = this._chunkedMessages
-                .get(event.data.payloadId)!
-                .join('');
-              this._chunkedMessages.delete(event.data.payloadId);
-            }
-          }
+          const joinedMessagePayload = this.handleChunkedMessage(event.data);
 
           switch (event.data.t) {
             case MessageDataType.Init:
               this.onClientInit(group, event.data);
-              this.onClientSync(group, event.data.f, joined ?? event.data.c);
+              this.onClientSync(
+                group,
+                event.data.f,
+                joinedMessagePayload ?? event.data.c
+              );
               this.sendInitAwarenessInfo(event.data.f);
               return;
             case MessageDataType.Sync:
-              this.onClientSync(group, event.data.f, joined ?? event.data.c);
+              this.onClientSync(
+                group,
+                event.data.f,
+                joinedMessagePayload ?? event.data.c
+              );
               return;
             case MessageDataType.Awareness:
               this.onAwareness(group, event.data.c);

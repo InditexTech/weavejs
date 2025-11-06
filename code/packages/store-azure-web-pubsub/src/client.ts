@@ -21,6 +21,7 @@ import {
   type MessageHandler,
   type WeaveStoreAzureWebPubsubOnStoreFetchConnectionUrlEvent,
   type WeaveStoreAzureWebPubSubSyncClientConnectionStatus,
+  type MessageData,
 } from './types';
 import type { WeaveStoreAzureWebPubsub } from './store-azure-web-pubsub';
 import { WEAVE_STORE_CONNECTION_STATUS } from '@inditextech/weave-types';
@@ -390,6 +391,52 @@ export class WeaveStoreAzureWebPubSubSyncClient extends Emittery {
     }
   }
 
+  handleChunkedMessage(messageData: MessageData): string | undefined {
+    if (
+      messageData.payloadId &&
+      messageData.index !== undefined &&
+      messageData.totalChunks &&
+      messageData.type === 'chunk'
+    ) {
+      if (!this._chunkedMessages.has(messageData.payloadId)) {
+        this._chunkedMessages.set(
+          messageData.payloadId,
+          new Array(messageData.totalChunks)
+        );
+      }
+      if (messageData.c) {
+        this._chunkedMessages.get(messageData.payloadId)![messageData.index] =
+          messageData.c;
+      }
+    }
+
+    let joined: string | undefined = undefined;
+    if (messageData.payloadId && messageData.type === 'end') {
+      if (this._chunkedMessages.has(messageData.payloadId)) {
+        joined = this._chunkedMessages.get(messageData.payloadId)!.join('');
+        this._chunkedMessages.delete(messageData.payloadId);
+      }
+    }
+
+    return joined;
+  }
+
+  handleMessageBufferData(
+    normalMessagePayload: string | undefined,
+    joinedMessagePayload: string | undefined
+  ): Buffer | undefined {
+    let buf: Buffer | undefined = undefined;
+
+    if (normalMessagePayload) {
+      buf = Buffer.from(normalMessagePayload, 'base64');
+    }
+    if (joinedMessagePayload) {
+      buf = Buffer.from(joinedMessagePayload, 'base64');
+    }
+
+    return buf;
+  }
+
   async createWebSocket(
     connectionUrlExtraParams?: Record<string, string>
   ): Promise<ReconnectingWebSocket> {
@@ -464,49 +511,24 @@ export class WeaveStoreAzureWebPubSubSyncClient extends Emittery {
         return;
       }
 
-      if (
-        messageData.payloadId &&
-        messageData.index !== undefined &&
-        messageData.totalChunks &&
-        messageData.type === 'chunk'
-      ) {
-        if (!this._chunkedMessages.has(messageData.payloadId)) {
-          this._chunkedMessages.set(
-            messageData.payloadId,
-            Array(messageData.totalChunks)
-          );
-        }
-        if (messageData.c) {
-          this._chunkedMessages.get(messageData.payloadId)![messageData.index] =
-            messageData.c;
-        }
-      }
-
-      let joined: string | undefined = undefined;
-      if (messageData.payloadId && messageData.type === 'end') {
-        if (this._chunkedMessages.has(messageData.payloadId)) {
-          joined = this._chunkedMessages.get(messageData.payloadId)!.join('');
-          this._chunkedMessages.delete(messageData.payloadId);
-        }
-      }
+      const joinedMessagePayload = this.handleChunkedMessage(messageData);
 
       if (messageData.type === 'chunk') {
+        // skip processed chunked message
         return;
       }
 
-      let buf: Buffer | undefined = undefined;
-      if (messageData.c) {
-        buf = Buffer.from(messageData.c, 'base64');
-      }
-      if (joined) {
-        buf = Buffer.from(joined, 'base64');
-      }
+      const buffer = this.handleMessageBufferData(
+        messageData.c,
+        joinedMessagePayload
+      );
 
-      if (!buf) {
+      if (!buffer) {
+        // no buffer found, ignore message
         return;
       }
 
-      const encoder = readMessage(this, buf, true, messageData.f);
+      const encoder = readMessage(this, buffer, true, messageData.f);
       if (encoding.length(encoder) > 1) {
         sendToControlGroup(
           this,
