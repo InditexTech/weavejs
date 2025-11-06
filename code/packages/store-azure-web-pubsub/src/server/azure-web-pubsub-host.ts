@@ -15,49 +15,26 @@ import {
 import { WebSocket } from 'ws';
 import Y from './../yjs';
 import type { WeaveAzureWebPubsubServer } from './azure-web-pubsub-server';
-import type {
-  WeaveStoreAzureWebPubsubOnWebsocketCloseEvent,
-  WeaveStoreAzureWebPubsubOnWebsocketErrorEvent,
-  WeaveStoreAzureWebPubsubOnWebsocketJoinGroupEvent,
-  WeaveStoreAzureWebPubsubOnWebsocketMessageEvent,
-  WeaveStoreAzureWebPubsubOnWebsocketOnTokenRefreshEvent,
-  WeaveStoreAzureWebPubsubOnWebsocketOpenEvent,
+import {
+  MessageDataType,
+  MessageType,
+  type Message,
+  type MessageData,
+  type WeaveStoreAzureWebPubsubOnWebsocketCloseEvent,
+  type WeaveStoreAzureWebPubsubOnWebsocketErrorEvent,
+  type WeaveStoreAzureWebPubsubOnWebsocketJoinGroupEvent,
+  type WeaveStoreAzureWebPubsubOnWebsocketMessageEvent,
+  type WeaveStoreAzureWebPubsubOnWebsocketOnTokenRefreshEvent,
+  type WeaveStoreAzureWebPubsubOnWebsocketOpenEvent,
 } from '@/types';
 import type WeaveAzureWebPubsubSyncHandler from './azure-web-pubsub-sync-handler';
+import { handleChunkedMessage } from '@/utils';
 
 const expirationTimeInMinutes = 60; // 1 hour
 const messageSync = 0;
 const messageAwareness = 1;
 const AzureWebPubSubJsonProtocol = 'json.webpubsub.azure.v1';
 
-export enum MessageType {
-  System = 'system',
-  JoinGroup = 'joinGroup',
-  SendToGroup = 'sendToGroup',
-}
-
-export enum MessageDataType {
-  Init = 'init',
-  Sync = 'sync',
-  Awareness = 'awareness',
-}
-
-export interface MessageData {
-  payloadId?: string;
-  index?: number;
-  type?: 'chunk' | 'end';
-  totalChunks?: number;
-  t: string; // type / target uuid
-  f: string; // origin uuid
-  c: string; // base64 encoded binary data
-}
-
-export interface Message {
-  type: string;
-  from: string;
-  group: string;
-  data: MessageData;
-}
 const HostUserId = 'host';
 
 export interface WebPubSubHostOptions {
@@ -187,36 +164,6 @@ export class WeaveStoreAzureWebPubSubSyncHost {
     this.broadcast(this.topic, origin, u8);
   }
 
-  handleChunkedMessage(messageData: MessageData): string | undefined {
-    if (
-      messageData.payloadId &&
-      messageData.index !== undefined &&
-      messageData.totalChunks &&
-      messageData.type === 'chunk'
-    ) {
-      if (!this._chunkedMessages.has(messageData.payloadId)) {
-        this._chunkedMessages.set(
-          messageData.payloadId,
-          new Array(messageData.totalChunks)
-        );
-      }
-      if (messageData.c) {
-        this._chunkedMessages.get(messageData.payloadId)![messageData.index] =
-          messageData.c;
-      }
-    }
-
-    let joined: string | undefined = undefined;
-    if (messageData.payloadId && messageData.type === 'end') {
-      if (this._chunkedMessages.has(messageData.payloadId)) {
-        joined = this._chunkedMessages.get(messageData.payloadId)!.join('');
-        this._chunkedMessages.delete(messageData.payloadId);
-      }
-    }
-
-    return joined;
-  }
-
   async createWebSocket(): Promise<void> {
     const group = this.topic;
 
@@ -256,7 +203,10 @@ export class WeaveStoreAzureWebPubSubSyncHost {
         const event: Message = JSON.parse(e.data.toString());
 
         if (event.type === 'message' && event.from === 'group') {
-          const joinedMessagePayload = this.handleChunkedMessage(event.data);
+          const joinedMessagePayload = handleChunkedMessage(
+            this._chunkedMessages,
+            event.data
+          );
 
           switch (event.data.t) {
             case MessageDataType.Init:
