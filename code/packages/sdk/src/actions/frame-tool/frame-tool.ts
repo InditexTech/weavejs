@@ -25,6 +25,7 @@ export class WeaveFrameToolAction extends WeaveAction {
   protected container: Konva.Layer | Konva.Node | undefined;
   protected clickPoint: Konva.Vector2d | null;
   protected cancelAction!: () => void;
+  protected templateId: string | null = null;
   onPropsChange = undefined;
   onInit = undefined;
 
@@ -49,6 +50,10 @@ export class WeaveFrameToolAction extends WeaveAction {
       editing: false,
       opacity: 1,
     };
+  }
+
+  setTemplateToUse(templateId: string | null): void {
+    this.templateId = templateId;
   }
 
   private setupEvents() {
@@ -77,7 +82,7 @@ export class WeaveFrameToolAction extends WeaveAction {
         return;
       }
 
-      if (this.state === FRAME_TOOL_STATE.ADDING) {
+      if (this.state === FRAME_TOOL_STATE.ADDING && this.templateId === null) {
         this.handleAdding();
         return;
       }
@@ -96,6 +101,7 @@ export class WeaveFrameToolAction extends WeaveAction {
 
     this.instance.emitEvent<WeaveFrameToolActionOnAddingEvent>('onAddingFrame');
 
+    this.templateId = null;
     this.frameId = null;
     this.clickPoint = null;
     this.setState(FRAME_TOOL_STATE.ADDING);
@@ -179,6 +185,7 @@ export class WeaveFrameToolAction extends WeaveAction {
     this.frameId = null;
     this.container = undefined;
     this.clickPoint = null;
+    this.templateId = null;
     this.setState(FRAME_TOOL_STATE.IDLE);
   }
 

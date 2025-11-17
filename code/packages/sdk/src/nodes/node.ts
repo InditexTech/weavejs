@@ -137,6 +137,9 @@ export abstract class WeaveNode implements WeaveNodeBase {
     node.handleMouseout = function () {};
     node.handleSelectNode = function () {};
     node.handleDeselectNode = function () {};
+    node.canMoveToContainer = function () {
+      return true;
+    };
   }
 
   isNodeSelected(ele: Konva.Node): boolean {
@@ -172,7 +175,11 @@ export abstract class WeaveNode implements WeaveNodeBase {
       return;
     }
 
-    if (selectionPlugin.isAreaSelecting()) {
+    if (
+      (selectionPlugin.getSelectedNodes().length === 1 &&
+        node === selectionPlugin.getSelectedNodes()[0]) ||
+      selectionPlugin.isAreaSelecting()
+    ) {
       this.hideHoverState();
       return;
     }
@@ -314,6 +321,9 @@ export abstract class WeaveNode implements WeaveNodeBase {
         originalPosition = nodeTarget.getAbsolutePosition();
       });
 
+      let originalOpacity: number | undefined = undefined;
+      const DRAG_OPACITY: number = 0.75;
+
       node.on('dragstart', (e) => {
         const nodeTarget = e.target;
 
@@ -345,6 +355,9 @@ export abstract class WeaveNode implements WeaveNodeBase {
         if (realNodeTarget.getAttrs().isCloned) {
           return;
         }
+
+        originalOpacity = realNodeTarget.opacity();
+        realNodeTarget.opacity(DRAG_OPACITY);
 
         if (e.evt?.altKey) {
           nodeTarget.setAttrs({ isCloneOrigin: true });
@@ -419,10 +432,11 @@ export abstract class WeaveNode implements WeaveNodeBase {
           if (
             layerToMove &&
             !hasFrames(realNodeTarget) &&
-            realNodeTarget.isDragging()
+            realNodeTarget.isDragging() &&
+            !realNodeTarget.getAttrs().lockToContainer
           ) {
             layerToMove.fire(WEAVE_NODE_CUSTOM_EVENTS.onTargetEnter, {
-              bubbles: true,
+              node: realNodeTarget,
             });
           }
         }
@@ -460,9 +474,14 @@ export abstract class WeaveNode implements WeaveNodeBase {
 
         const realNodeTarget: Konva.Node = this.getRealSelectedNode(nodeTarget);
 
+        realNodeTarget.setAttrs({ opacity: originalOpacity });
+        originalOpacity = undefined;
+
         if (
           this.isSelecting() &&
-          this.getSelectionPlugin()?.getSelectedNodes().length === 1
+          this.getSelectionPlugin()?.getSelectedNodes().length === 1 &&
+          (realNodeTarget.getAttrs().lockToContainer === undefined ||
+            !realNodeTarget.getAttrs().lockToContainer)
         ) {
           clearContainerTargets(this.instance);
 
@@ -505,7 +524,7 @@ export abstract class WeaveNode implements WeaveNodeBase {
 
           if (containerToMove) {
             containerToMove.fire(WEAVE_NODE_CUSTOM_EVENTS.onTargetLeave, {
-              bubbles: true,
+              node: realNodeTarget,
             });
           }
 
@@ -514,6 +533,31 @@ export abstract class WeaveNode implements WeaveNodeBase {
               this.serialize(realNodeTarget as WeaveElementInstance)
             );
           }
+        }
+
+        if (
+          this.isSelecting() &&
+          this.getSelectionPlugin()?.getSelectedNodes().length === 1 &&
+          realNodeTarget.getAttrs().lockToContainer
+        ) {
+          clearContainerTargets(this.instance);
+
+          const nodesEdgeSnappingPlugin = this.getNodesEdgeSnappingPlugin();
+
+          const nodesDistanceSnappingPlugin =
+            this.getNodesDistanceSnappingPlugin();
+
+          if (nodesEdgeSnappingPlugin) {
+            nodesEdgeSnappingPlugin.cleanupGuidelines();
+          }
+
+          if (nodesDistanceSnappingPlugin) {
+            nodesDistanceSnappingPlugin.cleanupGuidelines();
+          }
+
+          this.instance.updateNode(
+            this.serialize(realNodeTarget as WeaveElementInstance)
+          );
         }
 
         nodeTarget.setAttrs({ isCloned: undefined });
@@ -826,14 +870,14 @@ export abstract class WeaveNode implements WeaveNodeBase {
     return mergeExceptArrays(transformProperties, nodeTransformConfig ?? {});
   }
 
-  private getNodesSelectionPlugin() {
+  protected getNodesSelectionPlugin() {
     const nodesSelectionPlugin =
       this.instance.getPlugin<WeaveNodesSelectionPlugin>('nodesSelection');
 
     return nodesSelectionPlugin;
   }
 
-  getNodesEdgeSnappingPlugin() {
+  protected getNodesEdgeSnappingPlugin() {
     const snappingPlugin =
       this.instance.getPlugin<WeaveNodesEdgeSnappingPlugin>(
         WEAVE_NODES_EDGE_SNAPPING_PLUGIN_KEY
@@ -841,7 +885,7 @@ export abstract class WeaveNode implements WeaveNodeBase {
     return snappingPlugin;
   }
 
-  getNodesDistanceSnappingPlugin() {
+  protected getNodesDistanceSnappingPlugin() {
     const snappingPlugin =
       this.instance.getPlugin<WeaveNodesDistanceSnappingPlugin>(
         WEAVE_NODES_DISTANCE_SNAPPING_PLUGIN_KEY
