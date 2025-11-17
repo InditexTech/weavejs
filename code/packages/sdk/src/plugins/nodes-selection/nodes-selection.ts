@@ -313,6 +313,8 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
     });
 
     let initialPos: Konva.Vector2d | null = null;
+    const originalNodeOpacity: Record<string, number | undefined> = {};
+    const DRAG_OPACITY: number = 0.75;
 
     tr.on('dragstart', (e) => {
       initialPos = { x: e.target.x(), y: e.target.y() };
@@ -325,6 +327,14 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
         e.cancelBubble = true;
         e.target.stopDrag();
         return;
+      }
+
+      const nodes = tr.nodes();
+      if (nodes.length > 1) {
+        for (const node of nodes) {
+          originalNodeOpacity[node.getAttrs().id ?? ''] = node.opacity();
+          node.opacity(DRAG_OPACITY);
+        }
       }
 
       e.cancelBubble = true;
@@ -371,7 +381,7 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
 
         if (layerToMove && !selectionContainsFrames) {
           layerToMove.fire(WEAVE_NODE_CUSTOM_EVENTS.onTargetEnter, {
-            bubbles: true,
+            node: undefined,
           });
         }
       }
@@ -400,6 +410,14 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
         node.updatePosition(node.getAbsolutePosition());
       }
 
+      const nodes = tr.nodes();
+      if (nodes.length > 1) {
+        for (const node of nodes) {
+          node.opacity(originalNodeOpacity[node.getAttrs().id ?? '']);
+          delete originalNodeOpacity[node.getAttrs().id ?? ''];
+        }
+      }
+
       if (this.isSelecting() && tr.nodes().length > 1) {
         const actualCursor = stage.container().style.cursor;
         stage.container().style.cursor = 'wait';
@@ -414,6 +432,13 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
         const nodeUpdatePromise = (node: Konva.Node) => {
           return new Promise<void>((resolve) => {
             setTimeout(() => {
+              if (
+                node.getAttrs().lockToContainer === undefined ||
+                !node.getAttrs().lockToContainer
+              ) {
+                return resolve();
+              }
+
               clearContainerTargets(this.instance);
 
               const nodeHandler = this.instance.getNodeHandler<WeaveNode>(
@@ -444,7 +469,7 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
 
               if (containerToMove) {
                 containerToMove.fire(WEAVE_NODE_CUSTOM_EVENTS.onTargetLeave, {
-                  bubbles: true,
+                  node: undefined,
                 });
               }
 

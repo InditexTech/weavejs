@@ -296,6 +296,10 @@ export class WeaveFrameNode extends WeaveNode {
       });
     });
 
+    frame.canMoveToContainer = function (): boolean {
+      return true;
+    };
+
     return frame;
   }
 

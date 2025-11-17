@@ -19,6 +19,10 @@ export class WeaveLayerNode extends WeaveNode {
       ...props,
     });
 
+    layer.canMoveToContainer = function (): boolean {
+      return true;
+    };
+
     return layer;
   }
 
