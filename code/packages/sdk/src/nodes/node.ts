@@ -356,7 +356,10 @@ export abstract class WeaveNode implements WeaveNodeBase {
           return;
         }
 
-        if (this.getNodesSelectionPlugin()?.getSelectedNodes().length === 1) {
+        if (
+          this.getNodesSelectionPlugin()?.getSelectedNodes().length === 1 &&
+          realNodeTarget.getAttr('dragStartOpacity') === undefined
+        ) {
           realNodeTarget.setAttr('dragStartOpacity', realNodeTarget.opacity());
           realNodeTarget.opacity(
             this.getNodesSelectionPlugin()?.getDragOpacity()
@@ -483,7 +486,10 @@ export abstract class WeaveNode implements WeaveNodeBase {
 
         const realNodeTarget: Konva.Node = this.getRealSelectedNode(nodeTarget);
 
-        if (this.getNodesSelectionPlugin()?.getSelectedNodes().length === 1) {
+        if (
+          this.getNodesSelectionPlugin()?.getSelectedNodes().length === 1 &&
+          realNodeTarget.getAttr('dragStartOpacity') !== undefined
+        ) {
           const originalNodeOpacity =
             realNodeTarget.getAttr('dragStartOpacity') ?? 1;
           realNodeTarget.setAttrs({ opacity: originalNodeOpacity });
