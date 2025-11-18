@@ -340,7 +340,7 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
         for (const node of nodes) {
           const originalNodeOpacity = node.getAttrs().opacity ?? 1;
           node.setAttr('dragStartOpacity', originalNodeOpacity);
-          node.opacity(this.config.style.dragOpacity);
+          node.opacity(this.getDragOpacity());
         }
       }
 
@@ -1640,5 +1640,9 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
 
   getSelectorConfig(): TransformerConfig {
     return this.config.selection;
+  }
+
+  getDragOpacity(): number {
+    return this.config.style.dragOpacity;
   }
 }

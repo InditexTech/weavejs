@@ -324,9 +324,6 @@ export abstract class WeaveNode implements WeaveNodeBase {
         originalPosition = nodeTarget.getAbsolutePosition();
       });
 
-      // let originalOpacity: number | undefined = undefined;
-      // const DRAG_OPACITY: number = 0.75;
-
       node.on('dragstart', (e) => {
         const nodeTarget = e.target;
 
@@ -361,7 +358,9 @@ export abstract class WeaveNode implements WeaveNodeBase {
 
         if (this.getNodesSelectionPlugin()?.getSelectedNodes().length === 1) {
           realNodeTarget.setAttr('dragStartOpacity', realNodeTarget.opacity());
-          realNodeTarget.opacity(0.75);
+          realNodeTarget.opacity(
+            this.getNodesSelectionPlugin()?.getDragOpacity()
+          );
         }
 
         if (e.evt?.altKey) {
