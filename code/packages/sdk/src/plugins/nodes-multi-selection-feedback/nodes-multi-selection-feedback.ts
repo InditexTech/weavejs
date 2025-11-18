@@ -99,13 +99,7 @@ export class WeaveNodesMultiSelectionFeedbackPlugin extends WeavePlugin {
     };
   }
 
-  createSelectionHalo(node: Konva.Node): void {
-    const nodeId: string = node.getAttrs().id ?? '';
-
-    if (this.selectedHalos[nodeId]) {
-      return;
-    }
-
+  private getNodeInfo(node: Konva.Node) {
     const info = this.getNodeRectInfo(node);
 
     if (info) {
@@ -130,7 +124,21 @@ export class WeaveNodesMultiSelectionFeedbackPlugin extends WeavePlugin {
           info.y += realParent.y();
         }
       }
+    }
 
+    return info;
+  }
+
+  createSelectionHalo(node: Konva.Node): void {
+    const nodeId: string = node.getAttrs().id ?? '';
+
+    if (this.selectedHalos[nodeId]) {
+      return;
+    }
+
+    const info = this.getNodeInfo(node);
+
+    if (info) {
       this.selectedHalos[nodeId] = new Konva.Rect({
         id: `${nodeId}-selection-halo`,
         name: 'selection-halo',
@@ -165,31 +173,9 @@ export class WeaveNodesMultiSelectionFeedbackPlugin extends WeavePlugin {
       return;
     }
 
-    const info = this.getNodeRectInfo(node);
+    const info = this.getNodeInfo(node);
 
     if (info) {
-      const parent = node.getParent();
-      // Is a Container (frame)
-      if (node.getAttrs().nodeId) {
-        const realParent = this.instance
-          .getStage()
-          .findOne(`#${node.getAttrs().nodeId}`);
-        if (realParent) {
-          info.x += realParent.x();
-          info.y += realParent.y();
-        }
-      }
-      // Its parent is a Container (frame)
-      if (parent && parent.getAttrs().nodeId) {
-        const realParent = this.instance
-          .getStage()
-          .findOne(`#${parent.getAttrs().nodeId}`);
-        if (realParent) {
-          info.x += realParent.x();
-          info.y += realParent.y();
-        }
-      }
-
       const selectionLayer = this.instance.getSelectionLayer();
 
       if (!selectionLayer) return;
