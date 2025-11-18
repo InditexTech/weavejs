@@ -723,6 +723,10 @@ export abstract class WeaveNode implements WeaveNodeBase {
     nodeInstance.destroy();
   }
 
+  onDestroyInstance() {
+    // Do nothing by default
+  }
+
   serialize(instance: WeaveElementInstance): WeaveStateElement {
     const attrs = instance.getAttrs();
 

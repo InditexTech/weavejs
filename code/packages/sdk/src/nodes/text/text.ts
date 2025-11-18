@@ -14,7 +14,12 @@ import { getTopmostShadowHost, isInShadowDOM, resetScale } from '@/utils';
 import { WEAVE_TEXT_NODE_TYPE } from './constants';
 import { SELECTION_TOOL_ACTION_NAME } from '@/actions/selection-tool/constants';
 import { TEXT_LAYOUT } from '@/actions/text-tool/constants';
-import type { WeaveTextNodeParams, WeaveTextProperties } from './types';
+import type {
+  WeaveTextNodeOnEnterTextNodeEditMode,
+  WeaveTextNodeOnExitTextNodeEditMode,
+  WeaveTextNodeParams,
+  WeaveTextProperties,
+} from './types';
 import type { KonvaEventObject } from 'konva/lib/Node';
 import { throttle } from 'lodash';
 
@@ -93,21 +98,6 @@ export class WeaveTextNode extends WeaveNode {
     if (!this.instance.isServerSide() && !this.keyPressHandler) {
       this.keyPressHandler = this.handleKeyPress.bind(this);
       window.addEventListener('keypress', this.keyPressHandler);
-
-      this.instance.addEventListener(
-        'onStoreConnectionStatusChange',
-        (status) => {
-          if (!this.keyPressHandler) {
-            return;
-          }
-
-          if (status !== 'connected' && this.keyPressHandler) {
-            window.removeEventListener('keypress', this.keyPressHandler);
-          } else if (status === 'connected' && this.keyPressHandler) {
-            window.addEventListener('keypress', this.keyPressHandler);
-          }
-        }
-      );
     }
   }
 
@@ -794,6 +784,11 @@ export class WeaveTextNode extends WeaveNode {
     stage.container().tabIndex = 1;
     stage.container().click();
     stage.container().focus();
+
+    this.instance.emitEvent<WeaveTextNodeOnExitTextNodeEditMode>(
+      'onExitTextNodeEditMode',
+      { node: textNode }
+    );
   }
 
   private triggerEditMode(textNode: Konva.Text) {
@@ -822,5 +817,18 @@ export class WeaveTextNode extends WeaveNode {
     };
 
     this.createTextAreaDOM(textNode, areaPosition);
+
+    this.instance.emitEvent<WeaveTextNodeOnEnterTextNodeEditMode>(
+      'onEnterTextNodeEditMode',
+      { node: textNode }
+    );
+  }
+
+  onDestroyInstance(): void {
+    super.onDestroyInstance();
+    if (!this.instance.isServerSide() && this.keyPressHandler) {
+      window.removeEventListener('keypress', this.keyPressHandler);
+      this.keyPressHandler = undefined;
+    }
   }
 }
