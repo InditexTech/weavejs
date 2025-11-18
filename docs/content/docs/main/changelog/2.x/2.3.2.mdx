@@ -1,0 +1,12 @@
+---
+title: v2.3.2
+description: Fixes cleanup of window events when instance is destroyed (for example on Text Node when editing)
+---
+
+## Metadata
+
+- **Release date**: 2025-11-18
+
+### Fixed
+
+- [#794](https://github.com/InditexTech/weavejs/issues/794) When instance is destroyed, window events that are defined on node handlers are not cleaned up
