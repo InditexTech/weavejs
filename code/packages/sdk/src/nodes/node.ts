@@ -286,7 +286,10 @@ export abstract class WeaveNode implements WeaveNodeBase {
 
         this.scaleReset(node);
 
-        this.getNodesSelectionFeedbackPlugin()?.hideSelectionHalo(node);
+        if (this.getSelectionPlugin()?.getSelectedNodes().length === 1) {
+          this.getNodesSelectionFeedbackPlugin()?.showSelectionHalo(node);
+          this.getNodesSelectionFeedbackPlugin()?.updateSelectionHalo(node);
+        }
 
         const nodeHandler = this.instance.getNodeHandler<WeaveNode>(
           node.getAttrs().nodeType
@@ -321,9 +324,6 @@ export abstract class WeaveNode implements WeaveNodeBase {
         originalPosition = nodeTarget.getAbsolutePosition();
       });
 
-      let originalOpacity: number | undefined = undefined;
-      const DRAG_OPACITY: number = 0.75;
-
       node.on('dragstart', (e) => {
         const nodeTarget = e.target;
 
@@ -356,8 +356,12 @@ export abstract class WeaveNode implements WeaveNodeBase {
           return;
         }
 
-        originalOpacity = realNodeTarget.opacity();
-        realNodeTarget.opacity(DRAG_OPACITY);
+        if (this.getNodesSelectionPlugin()?.getSelectedNodes().length === 1) {
+          realNodeTarget.setAttr('dragStartOpacity', realNodeTarget.opacity());
+          realNodeTarget.opacity(
+            this.getNodesSelectionPlugin()?.getDragOpacity()
+          );
+        }
 
         if (e.evt?.altKey) {
           nodeTarget.setAttrs({ isCloneOrigin: true });
@@ -447,7 +451,12 @@ export abstract class WeaveNode implements WeaveNodeBase {
       node.on('dragend', (e) => {
         const nodeTarget = e.target;
 
-        this.getNodesSelectionFeedbackPlugin()?.hideSelectionHalo(nodeTarget);
+        if (this.getSelectionPlugin()?.getSelectedNodes().length === 1) {
+          this.getNodesSelectionFeedbackPlugin()?.showSelectionHalo(nodeTarget);
+          this.getNodesSelectionFeedbackPlugin()?.updateSelectionHalo(
+            nodeTarget
+          );
+        }
 
         e.cancelBubble = true;
 
@@ -474,8 +483,12 @@ export abstract class WeaveNode implements WeaveNodeBase {
 
         const realNodeTarget: Konva.Node = this.getRealSelectedNode(nodeTarget);
 
-        realNodeTarget.setAttrs({ opacity: originalOpacity });
-        originalOpacity = undefined;
+        if (this.getNodesSelectionPlugin()?.getSelectedNodes().length === 1) {
+          const originalNodeOpacity =
+            realNodeTarget.getAttr('dragStartOpacity') ?? 1;
+          realNodeTarget.setAttrs({ opacity: originalNodeOpacity });
+          realNodeTarget.setAttr('dragStartOpacity', undefined);
+        }
 
         if (
           this.isSelecting() &&

@@ -309,12 +309,18 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
     tr.on('transform', throttle(handleTransform, 50));
 
     tr.on('transformend', () => {
+      if (tr.nodes().length > 1) {
+        const nodes = tr.nodes();
+        for (const node of nodes) {
+          this.getNodesSelectionFeedbackPlugin()?.showSelectionHalo(node);
+          this.getNodesSelectionFeedbackPlugin()?.updateSelectionHalo(node);
+        }
+      }
+
       this.triggerSelectedNodesEvent();
     });
 
     let initialPos: Konva.Vector2d | null = null;
-    const originalNodeOpacity: Record<string, number | undefined> = {};
-    const DRAG_OPACITY: number = 0.75;
 
     tr.on('dragstart', (e) => {
       initialPos = { x: e.target.x(), y: e.target.y() };
@@ -332,8 +338,9 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
       const nodes = tr.nodes();
       if (nodes.length > 1) {
         for (const node of nodes) {
-          originalNodeOpacity[node.getAttrs().id ?? ''] = node.opacity();
-          node.opacity(DRAG_OPACITY);
+          const originalNodeOpacity = node.getAttrs().opacity ?? 1;
+          node.setAttr('dragStartOpacity', originalNodeOpacity);
+          node.opacity(this.getDragOpacity());
         }
       }
 
@@ -398,6 +405,14 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
 
       e.cancelBubble = true;
 
+      if (tr.nodes().length > 1) {
+        const nodes = tr.nodes();
+        for (const node of nodes) {
+          this.getNodesSelectionFeedbackPlugin()?.showSelectionHalo(node);
+          this.getNodesSelectionFeedbackPlugin()?.updateSelectionHalo(node);
+        }
+      }
+
       this.instance.getCloningManager().cleanupClones();
 
       this.getStagePanningPlugin()?.cleanupEdgeMoveIntervals();
@@ -413,8 +428,9 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
       const nodes = tr.nodes();
       if (nodes.length > 1) {
         for (const node of nodes) {
-          node.opacity(originalNodeOpacity[node.getAttrs().id ?? '']);
-          delete originalNodeOpacity[node.getAttrs().id ?? ''];
+          const dragStartOpacity = node.getAttr('dragStartOpacity') ?? 1;
+          node.opacity(dragStartOpacity);
+          node.setAttr('dragStartOpacity', undefined);
         }
       }
 
@@ -432,54 +448,77 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
         const nodeUpdatePromise = (node: Konva.Node) => {
           return new Promise<void>((resolve) => {
             setTimeout(() => {
-              if (
-                node.getAttrs().lockToContainer === undefined ||
-                !node.getAttrs().lockToContainer
-              ) {
-                return resolve();
-              }
+              const isLockedToContainer = node.getAttrs().lockToContainer;
+              // not locked
+              if (!isLockedToContainer) {
+                clearContainerTargets(this.instance);
 
-              clearContainerTargets(this.instance);
-
-              const nodeHandler = this.instance.getNodeHandler<WeaveNode>(
-                node.getAttrs().nodeType
-              );
-
-              if (nodeHandler) {
-                this.instance.updateNode(
-                  nodeHandler.serialize(node as WeaveElementInstance)
+                const nodeHandler = this.instance.getNodeHandler<WeaveNode>(
+                  node.getAttrs().nodeType
                 );
+
+                if (nodeHandler) {
+                  this.instance.updateNode(
+                    nodeHandler.serialize(node as WeaveElementInstance)
+                  );
+                }
+
+                let containerToMove: Konva.Layer | Konva.Node | undefined =
+                  this.instance.getMainLayer();
+
+                if (layerToMove) {
+                  containerToMove = layerToMove;
+                }
+
+                let moved = false;
+                if (containerToMove && !selectionContainsFrames) {
+                  moved = moveNodeToContainer(
+                    this.instance,
+                    node,
+                    containerToMove
+                  );
+                }
+
+                if (containerToMove) {
+                  containerToMove.fire(WEAVE_NODE_CUSTOM_EVENTS.onTargetLeave, {
+                    node: undefined,
+                  });
+                }
+
+                if (!nodeHandler) {
+                  return resolve();
+                }
+
+                toSelect.push(node.getAttrs().id ?? '');
+
+                if (!moved) {
+                  toUpdate.push(
+                    nodeHandler.serialize(node as WeaveElementInstance)
+                  );
+                }
               }
 
-              let containerToMove: Konva.Layer | Konva.Node | undefined =
-                this.instance.getMainLayer();
+              if (isLockedToContainer) {
+                clearContainerTargets(this.instance);
 
-              if (layerToMove) {
-                containerToMove = layerToMove;
-              }
+                toSelect.push(node.getAttrs().id ?? '');
 
-              let moved = false;
-              if (containerToMove && !selectionContainsFrames) {
-                moved = moveNodeToContainer(
-                  this.instance,
-                  node,
-                  containerToMove
+                const nodeHandler = this.instance.getNodeHandler<WeaveNode>(
+                  node.getAttrs().nodeType
                 );
-              }
 
-              if (containerToMove) {
-                containerToMove.fire(WEAVE_NODE_CUSTOM_EVENTS.onTargetLeave, {
-                  node: undefined,
-                });
-              }
+                if (nodeHandler) {
+                  this.instance.updateNode(
+                    nodeHandler.serialize(node as WeaveElementInstance)
+                  );
+                }
 
-              if (!nodeHandler) {
-                return resolve();
-              }
+                if (!nodeHandler) {
+                  return resolve();
+                }
 
-              toSelect.push(node.getAttrs().id ?? '');
+                toSelect.push(node.getAttrs().id ?? '');
 
-              if (!moved) {
                 toUpdate.push(
                   nodeHandler.serialize(node as WeaveElementInstance)
                 );
@@ -511,20 +550,20 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
           }
 
           stage.container().style.cursor = actualCursor;
+
+          setTimeout(() => {
+            const finalSelectedNodes: Konva.Node[] = [];
+            toSelect.forEach((nodeId) => {
+              const actNode = this.instance.getStage().findOne(`#${nodeId}`);
+
+              if (actNode) {
+                finalSelectedNodes.push(actNode);
+              }
+            });
+            tr.nodes(finalSelectedNodes);
+            tr.forceUpdate();
+          }, 0);
         });
-
-        setTimeout(() => {
-          const finalSelectedNodes: Konva.Node[] = [];
-          toSelect.forEach((nodeId) => {
-            const actNode = this.instance.getStage().findOne(`#${nodeId}`);
-
-            if (actNode) {
-              finalSelectedNodes.push(actNode);
-            }
-          });
-          tr.nodes(finalSelectedNodes);
-          tr.forceUpdate();
-        }, 0);
       }
 
       for (const node of selectedNodes) {
@@ -1601,5 +1640,9 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
 
   getSelectorConfig(): TransformerConfig {
     return this.config.selection;
+  }
+
+  getDragOpacity(): number {
+    return this.config.style.dragOpacity;
   }
 }
