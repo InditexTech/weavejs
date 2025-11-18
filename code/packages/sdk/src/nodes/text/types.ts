@@ -21,3 +21,6 @@ export type WeaveTextProperties = {
 export type WeaveTextNodeParams = {
   config: Partial<WeaveTextProperties>;
 };
+
+export type WeaveTextNodeOnEnterTextNodeEditMode = { node: Konva.Text };
+export type WeaveTextNodeOnExitTextNodeEditMode = { node: Konva.Text };

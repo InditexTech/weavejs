@@ -264,6 +264,12 @@ export class Weave {
     const store = this.storeManager.getStore();
     store.disconnect();
 
+    const nodeHandlers = this.registerManager.getNodesHandlers();
+    for (const nodeHandlerKey of Object.keys(nodeHandlers)) {
+      const nodeHandler = nodeHandlers[nodeHandlerKey];
+      nodeHandler?.onDestroyInstance();
+    }
+
     // destroy the stage from memory
     const stage = this.getStage();
     if (stage) {
