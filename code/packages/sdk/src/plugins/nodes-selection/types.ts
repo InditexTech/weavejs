@@ -39,6 +39,11 @@ export type WeaveNodesSelectionConfig = {
   selectionArea: Konva.RectConfig;
   panningWhenSelection: WeaveNodesSelectionPanningOnSelectionConfig;
   behaviors: WeaveNodesSelectionBehaviorsConfig;
+  style: WeaveNodesSelectionStyleConfig;
+};
+
+export type WeaveNodesSelectionStyleConfig = {
+  dragOpacity: number;
 };
 
 export type WeaveNodesSelectionPluginConfig =

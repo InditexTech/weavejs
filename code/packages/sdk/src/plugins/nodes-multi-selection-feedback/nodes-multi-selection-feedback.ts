@@ -158,6 +158,69 @@ export class WeaveNodesMultiSelectionFeedbackPlugin extends WeavePlugin {
     }
   }
 
+  updateSelectionHalo(node: Konva.Node): void {
+    const nodeId: string = node.getAttrs().id ?? '';
+
+    if (!this.selectedHalos[nodeId]) {
+      return;
+    }
+
+    const info = this.getNodeRectInfo(node);
+
+    if (info) {
+      const parent = node.getParent();
+      // Is a Container (frame)
+      if (node.getAttrs().nodeId) {
+        const realParent = this.instance
+          .getStage()
+          .findOne(`#${node.getAttrs().nodeId}`);
+        if (realParent) {
+          info.x += realParent.x();
+          info.y += realParent.y();
+        }
+      }
+      // Its parent is a Container (frame)
+      if (parent && parent.getAttrs().nodeId) {
+        const realParent = this.instance
+          .getStage()
+          .findOne(`#${parent.getAttrs().nodeId}`);
+        if (realParent) {
+          info.x += realParent.x();
+          info.y += realParent.y();
+        }
+      }
+
+      const selectionLayer = this.instance.getSelectionLayer();
+
+      if (!selectionLayer) return;
+
+      const groupHalo = selectionLayer.findOne(
+        `#${node.getAttrs().id}-selection-halo`
+      );
+
+      groupHalo?.setAttrs({
+        x: info.x,
+        y: info.y,
+        width: info.width,
+        height: info.height,
+        rotation: info.rotation,
+      });
+    }
+  }
+
+  showSelectionHalo(node: Konva.Node): void {
+    const selectionLayer = this.instance.getSelectionLayer();
+
+    if (selectionLayer) {
+      const groupHalo = selectionLayer.findOne(
+        `#${node.getAttrs().id}-selection-halo`
+      );
+      if (groupHalo) {
+        groupHalo.show();
+      }
+    }
+  }
+
   hideSelectionHalo(node: Konva.Node): void {
     const selectionLayer = this.instance.getSelectionLayer();
 
