@@ -411,6 +411,11 @@ export function getTargetAndSkipNodes(
   ) {
     node = nodesSelectionPlugin.getTransformer().nodes()[0];
     skipNodes.push(node.getAttrs().id ?? '');
+
+    if (node.getAttr('eventTarget')) {
+      node = e.target;
+      skipNodes.push(e.target.getAttrs().id ?? '');
+    }
   }
   if (
     e.type === 'dragmove' &&

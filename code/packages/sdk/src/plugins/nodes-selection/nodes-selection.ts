@@ -268,14 +268,14 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
       if (shape) {
         const targetNode = this.instance.getInstanceRecursive(shape);
         if (targetNode && targetNode !== nodeHovered) {
-          this.instance.getStage().handleMouseover();
-          nodeHovered?.handleMouseout();
-          targetNode?.handleMouseover();
+          this.instance.getStage().handleMouseover?.();
+          nodeHovered?.handleMouseout?.();
+          targetNode?.handleMouseover?.();
           nodeHovered = targetNode as Konva.Node | undefined;
         }
-        targetNode?.handleMouseover();
+        targetNode?.handleMouseover?.();
       } else {
-        nodeHovered?.handleMouseout();
+        nodeHovered?.handleMouseout?.();
       }
     });
 
@@ -284,16 +284,16 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
     });
 
     tr.on('mouseout', () => {
-      this.instance.getStage().handleMouseover();
+      this.instance.getStage().handleMouseover?.();
       nodeHovered = undefined;
     });
 
     window.addEventListener('mouseout', () => {
       if (nodeHovered) {
-        nodeHovered.handleMouseout();
+        nodeHovered?.handleMouseout?.();
         nodeHovered = undefined;
       }
-      this.instance.getStage().handleMouseover();
+      this.instance.getStage().handleMouseover?.();
     });
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -845,7 +845,7 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
 
     const dx = actual.x - init.x;
     const dy = actual.y - init.y;
-    const dist = Math.sqrt(dx * dx + dy * dy);
+    const dist = Math.hypot(dx, dy);
 
     const MOVED_DISTANCE = 5; // px
 
@@ -865,7 +865,7 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
 
     const dx = e.evt.clientX - this.tapStart.x;
     const dy = e.evt.clientY - this.tapStart.y;
-    const dist = Math.sqrt(dx * dx + dy * dy);
+    const dist = Math.hypot(dx, dy);
 
     const MOVED_DISTANCE = 5; // px
 
@@ -884,7 +884,7 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
     const now = performance.now();
     const dx = e.evt.clientX - this.tapStart.x;
     const dy = e.evt.clientY - this.tapStart.y;
-    const dist = Math.sqrt(dx * dx + dy * dy);
+    const dist = Math.hypot(dx, dy);
 
     const DOUBLE_TAP_DISTANCE = 10; // px
     const DOUBLE_TAP_TIME = 300; // ms

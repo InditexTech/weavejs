@@ -267,6 +267,8 @@ export abstract class WeaveNode implements WeaveNodeBase {
       node.on('transformend', (e) => {
         const node = e.target;
 
+        e.target.setAttr('strokeScaleEnabled', true);
+
         this.instance.emitEvent('onTransform', null);
 
         transforming = false;

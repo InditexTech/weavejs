@@ -45,7 +45,12 @@ new WeaveLineNode(params?: WeaveLineNodeParams);
 type WeaveNodeTransformerProperties = Konva.TransformerConfig;
 
 type WeaveLineProperties = {
-  transform: WeaveNodeTransformerProperties;
+  transform?: WeaveNodeTransformerProperties;
+  snapAngles: {
+    angles: number[]; // Angles for snapping in degrees
+    activateThreshold: number;
+    releaseThreshold: number;
+  };
 };
 
 type WeaveLineNodeParams = {
@@ -77,6 +82,22 @@ For `WeaveLineProperties`:
       type: "object",
       default: "check default values",
     },
+    ["snapAngles.angles"]: {
+      description:
+        "Array of angles (in degrees) to snap the line to when shift is pressed.",
+      type: "number",
+      default: "10",
+    },
+    ["snapAngles.activateThreshold"]: {
+      description: "Activation threshold for the angle snapping utility.",
+      type: "number",
+      default: "5",
+    },
+    ["snapAngles.releaseThreshold"]: {
+      description: "Release threshold for the angle snapping utility.",
+      type: "number",
+      default: "10",
+    },
   }}
 />
 
@@ -104,5 +125,13 @@ const WEAVE_DEFAULT_TRANSFORM_PROPERTIES: WeaveNodeTransformerProperties = {
   enabledAnchors: WEAVE_DEFAULT_ENABLED_ANCHORS,
   borderStrokeWidth: 3,
   padding: 0,
+};
+
+const WEAVE_LINE_NODE_DEFAULT_CONFIG = {
+  snapAngles: {
+    angles: [0, 45, 90, 135, 180, 225, 270, 315],
+    activateThreshold: 5,
+    releaseThreshold: 10,
+  },
 };
 ```

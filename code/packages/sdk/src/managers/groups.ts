@@ -365,8 +365,8 @@ export class WeaveGroupsManager {
       e = m[4],
       f = m[5];
 
-    const scaleX = Math.sqrt(a * a + b * b);
-    const scaleY = Math.sqrt(c * c + d * d);
+    const scaleX = Math.hypot(a, b);
+    const scaleY = Math.hypot(c, d);
 
     const rotation = Math.atan2(b, a) * (180 / Math.PI); // in degrees
 
