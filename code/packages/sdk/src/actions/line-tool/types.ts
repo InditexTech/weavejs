@@ -8,9 +8,6 @@ export type WeaveLineToolActionStateKeys = keyof typeof LINE_TOOL_STATE;
 export type WeaveLineToolActionState =
   (typeof LINE_TOOL_STATE)[WeaveLineToolActionStateKeys];
 
-export type WeaveLineToolActionOnAddingEvent = undefined;
-export type WeaveLineToolActionOnAddedEvent = undefined;
-
 export type WeaveLineToolActionProperties = {
   snapAngles: {
     angles: number[]; // Angles for snapping in degrees

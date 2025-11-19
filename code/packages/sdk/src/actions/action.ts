@@ -87,7 +87,7 @@ export abstract class WeaveAction implements WeaveActionBase {
 
     const dx = e.evt.clientX - this.tapStart.x;
     const dy = e.evt.clientY - this.tapStart.y;
-    const dist = Math.sqrt(dx * dx + dy * dy);
+    const dist = Math.hypot(dx, dy);
     const dt = performance.now() - this.tapStart.time;
 
     const TAP_DISTANCE = 10; // px

@@ -10,7 +10,7 @@ export interface GreedySnapConfig {
 
 export class GreedySnapper {
   private snappedAngle: number | null = null;
-  private config: GreedySnapConfig;
+  private readonly config: GreedySnapConfig;
 
   constructor(config: GreedySnapConfig) {
     this.config = config;

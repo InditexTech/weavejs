@@ -6,8 +6,6 @@ import { v4 as uuidv4 } from 'uuid';
 import Konva from 'konva';
 import { WeaveAction } from '@/actions/action';
 import {
-  type WeaveLineToolActionOnAddedEvent,
-  type WeaveLineToolActionOnAddingEvent,
   type WeaveLineToolActionParams,
   type WeaveLineToolActionProperties,
   type WeaveLineToolActionState,
@@ -50,10 +48,6 @@ export class WeaveLineToolAction extends WeaveAction {
       LINE_TOOL_DEFAULT_CONFIG,
       params?.config ?? {}
     );
-
-    // this.config.snapAngles = this.config.snapAngles.map(
-    //   (angle) => (angle * Math.PI) / 180
-    // );
 
     this.pointers = new Map<number, Konva.Vector2d>();
     this.initialized = false;
@@ -188,7 +182,7 @@ export class WeaveLineToolAction extends WeaveAction {
     this.setCursor();
     this.setFocusStage();
 
-    this.instance.emitEvent<WeaveLineToolActionOnAddingEvent>('onAddingLine');
+    this.instance.emitEvent<undefined>('onAddingLine');
 
     this.shiftPressed = false;
     this.clickPoint = null;
@@ -252,7 +246,7 @@ export class WeaveLineToolAction extends WeaveAction {
       const angleDeg = (angle * 180) / Math.PI;
       const snapped = this.snapper.apply(angleDeg);
 
-      const dist = Math.sqrt(dx * dx + dy * dy);
+      const dist = Math.hypot(dx, dy);
       const rad = (snapped * Math.PI) / 180;
       dx = Math.cos(rad) * dist;
       dy = Math.sin(rad) * dist;
@@ -279,9 +273,7 @@ export class WeaveLineToolAction extends WeaveAction {
       );
 
       const pos: Konva.Vector2d = this.defineFinalPoint();
-      const newPoints = [...this.tempMainLineNode.points()];
-      newPoints.push(pos.x);
-      newPoints.push(pos.y);
+      const newPoints = [...this.tempMainLineNode.points(), pos.x, pos.y];
       this.tempMainLineNode.setAttrs({
         ...this.props,
         points: newPoints,
@@ -349,11 +341,7 @@ export class WeaveLineToolAction extends WeaveAction {
 
     this.tempLineNode?.destroy();
 
-    if (
-      this.lineId &&
-      this.tempMainLineNode &&
-      this.tempMainLineNode.points().length === 4
-    ) {
+    if (this.lineId && this.tempMainLineNode?.points().length === 4) {
       const nodeHandler = this.instance.getNodeHandler<WeaveLineNode>('line');
 
       if (nodeHandler) {
@@ -367,7 +355,7 @@ export class WeaveLineToolAction extends WeaveAction {
         });
         this.instance.addNode(node, this.container?.getAttrs().id);
 
-        this.instance.emitEvent<WeaveLineToolActionOnAddedEvent>('onAddedLine');
+        this.instance.emitEvent<undefined>('onAddedLine');
       }
     }
 

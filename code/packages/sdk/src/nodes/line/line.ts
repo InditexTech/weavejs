@@ -63,9 +63,9 @@ export class WeaveLineNode extends WeaveNode {
       return {
         ...defaultTransformerProperties,
         ignoreStroke: true,
-        rotateEnabled: this.points().length === 4 ? false : true,
-        keepRatio: this.points().length === 4 ? false : true,
-        flipEnabled: this.points().length === 4 ? true : false,
+        rotateEnabled: this.points().length !== 4,
+        keepRatio: this.points().length !== 4,
+        flipEnabled: this.points().length === 4,
         shiftBehavior: this.points().length === 4 ? 'none' : 'default',
       };
     };
@@ -173,7 +173,7 @@ export class WeaveLineNode extends WeaveNode {
       const angleDeg = (angle * 180) / Math.PI;
       const snapped = this.snapper.apply(angleDeg);
 
-      const dist = Math.sqrt(dx * dx + dy * dy);
+      const dist = Math.hypot(dx, dy);
       const rad = (snapped * Math.PI) / 180;
       dx = Math.cos(rad) * dist;
       dy = Math.sin(rad) * dist;

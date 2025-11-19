@@ -112,7 +112,7 @@ export class WeaveStrokeNode extends WeaveNode {
       const p1 = centerline[i + 1];
       const dx = p1.x - p0.x;
       const dy = p1.y - p0.y;
-      const segLen = Math.sqrt(dx * dx + dy * dy) || 1;
+      const segLen = Math.hypot(dx, dy) || 1;
       const nx = -dy / segLen;
       const ny = dx / segLen;
 
