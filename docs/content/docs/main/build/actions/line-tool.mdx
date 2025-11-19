@@ -1,0 +1,105 @@
+---
+title: Line Tool
+description: Add a simple line to the canvas
+---
+
+import { Kbd } from "@/components/kbd";
+
+![Pen Tool action on use on the Weave.js showcase](/images/actions/line-tool.gif)
+
+## Introduction
+
+This action allows users to draw a simple line on the canvas by click-and-drag. Also when the
+user press shift, the line is snapped to a defined set of angles.
+
+Each line is captured as a Line Node with configurable styling, and is instantly
+synchronized across all connected users.
+
+## Dependencies
+
+This action needs registered on the Weave instance the following elements:
+
+- [Line](/docs/main/build/nodes/line) node
+
+## Usage
+
+<div className="fd-steps">
+
+<div className="[&_h3]:fd-step">
+
+### Import the Action
+
+Start by importing the action:
+
+```ts
+import { WeaveLineToolAction } from "@inditextech/weave-sdk";
+```
+
+</div>
+
+<div className='[&_h3]:fd-step'>
+
+### Register the Action
+
+Then register the action on the [Weave](/docs/sdk/api-reference/weave) class instance.
+
+```ts
+const instance = new Weave({
+  ...
+  actions: [
+    ...,
+    new WeaveLineToolAction(), // [!code ++]
+  ]
+})
+```
+
+</div>
+
+<div className='[&_h3]:fd-step'>
+
+### Setup the action trigger
+
+Setup on a button or any element on the UI the user can interact with on the action event:
+
+```ts
+instance.triggerAction("lineTool");
+```
+
+---
+
+For example on a button on React:
+
+```tsx
+import React from "react";
+import { useWeave } from "@inditextech/weave-react";
+
+const MyLineToolTriggerComponent = () => {
+  const instance = useWeave((state) => state.instance);
+
+  const triggerTool = React.useCallback(() => {
+    instance.triggerAction("lineTool");
+  }, [instance]);
+
+  return <button onClick={triggerTool}>Line Tool</button>;
+};
+```
+
+### Trigger the action
+
+Finally a final user trigger the UI element that launches the action.
+
+---
+
+When active the user will follow this steps:
+
+- **Click** or **Touch** on the canvas and drag to define the line.
+- Release **Click** or **Touch** to add the defined line to the canvas.
+
+You can also press **Shift** to snap the line to a set of predefined angles.
+
+This action integrates seamlessly with Weave.js's real-time state system,
+ensuring the new element appears instantly for all connected users.
+
+</div>
+
+</div>

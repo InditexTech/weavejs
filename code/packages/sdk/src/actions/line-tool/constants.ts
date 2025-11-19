@@ -2,9 +2,16 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-export const WEAVE_LINE_NODE_TYPE = 'line';
+export const LINE_TOOL_ACTION_NAME = 'lineTool';
 
-export const WEAVE_LINE_NODE_DEFAULT_CONFIG = {
+export const LINE_TOOL_STATE = {
+  ['IDLE']: 'idle',
+  ['ADDING']: 'adding',
+  ['DEFINING_SIZE']: 'definingSize',
+  ['ADDED']: 'added',
+} as const;
+
+export const LINE_TOOL_DEFAULT_CONFIG = {
   snapAngles: {
     angles: [0, 45, 90, 135, 180, 225, 270, 315],
     activateThreshold: 5,

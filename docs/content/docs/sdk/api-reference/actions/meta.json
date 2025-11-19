@@ -8,6 +8,7 @@
     "rectangle-tool",
     "ellipse-tool",
     "regular-polygon-tool",
+    "line-tool",
     "pen-tool",
     "brush-tool",
     "text-tool",

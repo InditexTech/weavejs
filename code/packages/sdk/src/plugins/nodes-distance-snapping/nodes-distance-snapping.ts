@@ -99,6 +99,10 @@ export class WeaveNodesDistanceSnappingPlugin extends WeavePlugin {
       return;
     }
 
+    if (e.target.getAttr('edgeDistanceDisableOnDrag')) {
+      return;
+    }
+
     const { targetNode: node, skipNodes } = getTargetAndSkipNodes(
       this.instance,
       e,

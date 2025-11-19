@@ -211,7 +211,16 @@ export class WeaveNodesEdgeSnappingPlugin extends WeavePlugin {
       nodesSelectionPlugin &&
       nodesSelectionPlugin.getTransformer().nodes().length === 1
     ) {
-      nodeParent = this.instance.getNodeContainer(node);
+      if (node.getAttrs().targetNode) {
+        const targetNodeId = node.getAttrs().targetNode;
+        const targetNode = this.instance.getStage().findOne(`#${targetNodeId}`);
+
+        if (targetNode) {
+          nodeParent = this.instance.getNodeContainer(targetNode);
+        }
+      } else {
+        nodeParent = this.instance.getNodeContainer(node);
+      }
     }
 
     return nodeParent;
