@@ -77,7 +77,7 @@ export class WeaveNodesEdgeSnappingPlugin extends WeavePlugin {
       return;
     }
 
-    if (e.target.getAttrs().name?.indexOf('disableDistanceSnapping') !== -1) {
+    if (e.target.getAttr('edgeSnappingDisableOnDrag')) {
       return;
     }
 
@@ -87,10 +87,6 @@ export class WeaveNodesEdgeSnappingPlugin extends WeavePlugin {
     );
 
     if (typeof node === 'undefined') {
-      return;
-    }
-
-    if (node.getAttrs().name?.indexOf('disableEdgeSnapping') !== -1) {
       return;
     }
 
@@ -219,7 +215,16 @@ export class WeaveNodesEdgeSnappingPlugin extends WeavePlugin {
       nodesSelectionPlugin &&
       nodesSelectionPlugin.getTransformer().nodes().length === 1
     ) {
-      nodeParent = this.instance.getNodeContainer(node);
+      if (node.getAttrs().targetNode) {
+        const targetNodeId = node.getAttrs().targetNode;
+        const targetNode = this.instance.getStage().findOne(`#${targetNodeId}`);
+
+        if (targetNode) {
+          nodeParent = this.instance.getNodeContainer(targetNode);
+        }
+      } else {
+        nodeParent = this.instance.getNodeContainer(node);
+      }
     }
 
     return nodeParent;

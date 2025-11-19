@@ -93,6 +93,8 @@ export class WeaveStrokeNode extends WeaveNode {
     color: string | CanvasGradient,
     dash: number[]
   ) {
+    if (!pts) return;
+
     if (pts.length < 2) return;
 
     const filtered = this.resamplePoints(pts, 2);
@@ -110,7 +112,7 @@ export class WeaveStrokeNode extends WeaveNode {
       const p1 = centerline[i + 1];
       const dx = p1.x - p0.x;
       const dy = p1.y - p0.y;
-      const segLen = Math.sqrt(dx * dx + dy * dy) || 1;
+      const segLen = Math.hypot(dx, dy) || 1;
       const nx = -dy / segLen;
       const ny = dx / segLen;
 
@@ -188,7 +190,7 @@ export class WeaveStrokeNode extends WeaveNode {
   private drawShape(ctx: Context, shape: Konva.Shape) {
     const strokeElements: WeaveStrokePoint[] = shape.getAttrs().strokeElements;
 
-    if (strokeElements.length === 0) {
+    if (strokeElements?.length === 0) {
       return;
     }
 

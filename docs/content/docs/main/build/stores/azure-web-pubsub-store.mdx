@@ -124,8 +124,10 @@ the connection when the user tries to join a room. This is done:
 import { WeaveStoreAzureWebPubsub } from "@inditextech/weave-store-azure-web-pubsub/client"; // (1)
 
 const roomId = "MyRoom"; // (2)
+const roomData: Uint8Array | undefined = undefined;
 
 const store = new WeaveStoreAzureWebPubsub( // (3)
+  roomData,
   {
     getUser, // (4)
     undoManagerOptions: {

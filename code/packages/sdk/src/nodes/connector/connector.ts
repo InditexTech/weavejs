@@ -635,7 +635,7 @@ export class WeaveConnectorNode extends WeaveNode {
 
     startNodeHandler = new Konva.Circle({
       id: `${connector.getAttrs().id}-startNodeHandler`,
-      name: 'startNodeHandler disableEdgeSnapping disableDistanceSnapping',
+      name: 'startNodeHandler edgeSnappingDisableOnDrag edgeDistanceDisableOnDrag',
       x: connectorLine.points()[0],
       y: connectorLine.points()[1],
       radius: radius / this.instance.getStage().scaleX(),
@@ -856,7 +856,7 @@ export class WeaveConnectorNode extends WeaveNode {
 
     endNodeHandler = new Konva.Circle({
       id: `${connector.getAttrs().id}-endNodeHandler`,
-      name: 'endNodeHandler disableEdgeSnapping disableDistanceSnapping',
+      name: 'endNodeHandler edgeSnappingDisableOnDrag edgeDistanceDisableOnDrag',
       x: connectorLine.points()[connectorLine.points().length - 2],
       y: connectorLine.points()[connectorLine.points().length - 1],
       radius: radius / this.instance.getStage().scaleX(),

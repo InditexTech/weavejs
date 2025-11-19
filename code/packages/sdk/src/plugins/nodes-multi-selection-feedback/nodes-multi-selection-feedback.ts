@@ -99,13 +99,7 @@ export class WeaveNodesMultiSelectionFeedbackPlugin extends WeavePlugin {
     };
   }
 
-  createSelectionHalo(node: Konva.Node): void {
-    const nodeId: string = node.getAttrs().id ?? '';
-
-    if (this.selectedHalos[nodeId]) {
-      return;
-    }
-
+  private getNodeInfo(node: Konva.Node) {
     const info = this.getNodeRectInfo(node);
 
     if (info) {
@@ -130,7 +124,21 @@ export class WeaveNodesMultiSelectionFeedbackPlugin extends WeavePlugin {
           info.y += realParent.y();
         }
       }
+    }
 
+    return info;
+  }
+
+  createSelectionHalo(node: Konva.Node): void {
+    const nodeId: string = node.getAttrs().id ?? '';
+
+    if (this.selectedHalos[nodeId]) {
+      return;
+    }
+
+    const info = this.getNodeInfo(node);
+
+    if (info) {
       this.selectedHalos[nodeId] = new Konva.Rect({
         id: `${nodeId}-selection-halo`,
         name: 'selection-halo',
@@ -156,6 +164,47 @@ export class WeaveNodesMultiSelectionFeedbackPlugin extends WeavePlugin {
     if (this.selectedHalos[nodeId]) {
       this.selectedHalos[nodeId].destroy();
       delete this.selectedHalos[nodeId];
+    }
+  }
+
+  updateSelectionHalo(node: Konva.Node): void {
+    const nodeId: string = node.getAttrs().id ?? '';
+
+    if (!this.selectedHalos[nodeId]) {
+      return;
+    }
+
+    const info = this.getNodeInfo(node);
+
+    if (info) {
+      const selectionLayer = this.instance.getSelectionLayer();
+
+      if (!selectionLayer) return;
+
+      const groupHalo = selectionLayer.findOne(
+        `#${node.getAttrs().id}-selection-halo`
+      );
+
+      groupHalo?.setAttrs({
+        x: info.x,
+        y: info.y,
+        width: info.width,
+        height: info.height,
+        rotation: info.rotation,
+      });
+    }
+  }
+
+  showSelectionHalo(node: Konva.Node): void {
+    const selectionLayer = this.instance.getSelectionLayer();
+
+    if (selectionLayer) {
+      const groupHalo = selectionLayer.findOne(
+        `#${node.getAttrs().id}-selection-halo`
+      );
+      if (groupHalo) {
+        groupHalo.show();
+      }
     }
   }
 

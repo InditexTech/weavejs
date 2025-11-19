@@ -14,7 +14,12 @@ import { getTopmostShadowHost, isInShadowDOM, resetScale } from '@/utils';
 import { WEAVE_TEXT_NODE_TYPE } from './constants';
 import { SELECTION_TOOL_ACTION_NAME } from '@/actions/selection-tool/constants';
 import { TEXT_LAYOUT } from '@/actions/text-tool/constants';
-import type { WeaveTextNodeParams, WeaveTextProperties } from './types';
+import type {
+  WeaveTextNodeOnEnterTextNodeEditMode,
+  WeaveTextNodeOnExitTextNodeEditMode,
+  WeaveTextNodeParams,
+  WeaveTextProperties,
+} from './types';
 import type { KonvaEventObject } from 'konva/lib/Node';
 import { throttle } from 'lodash';
 
@@ -25,6 +30,7 @@ export class WeaveTextNode extends WeaveNode {
   private textAreaSuperContainer: HTMLDivElement | null = null;
   private textAreaContainer: HTMLDivElement | null = null;
   private textArea: HTMLTextAreaElement | null = null;
+  private keyPressHandler: ((e: KeyboardEvent) => void) | undefined;
 
   constructor(params?: WeaveTextNodeParams) {
     super();
@@ -37,6 +43,7 @@ export class WeaveTextNode extends WeaveNode {
       },
     };
 
+    this.keyPressHandler = undefined;
     this.editing = false;
     this.textArea = null;
   }
@@ -46,6 +53,52 @@ export class WeaveTextNode extends WeaveNode {
     clonedText.setAttr('triggerEditMode', undefined);
     this.instance.updateNode(this.serialize(clonedText));
     clonedText.destroy();
+  }
+
+  private readonly handleKeyPress = (e: KeyboardEvent) => {
+    if (
+      e.code === 'Enter' &&
+      this.instance.getActiveAction() === SELECTION_TOOL_ACTION_NAME &&
+      !this.editing &&
+      e.target !== this.textArea
+    ) {
+      e.preventDefault();
+
+      const selectionPlugin =
+        this.instance.getPlugin<WeaveNodesSelectionPlugin>('nodesSelection');
+
+      const nodeSelected: Konva.Node | null =
+        selectionPlugin?.getSelectedNodes().length === 1 &&
+        selectionPlugin?.getSelectedNodes()[0].getAttrs().nodeType ===
+          WEAVE_TEXT_NODE_TYPE
+          ? selectionPlugin?.getSelectedNodes()[0]
+          : null;
+
+      if (this.isSelecting() && nodeSelected) {
+        const nodesSelectionPlugin =
+          this.instance.getPlugin<WeaveNodesSelectionPlugin>('nodesSelection');
+        if (
+          nodesSelectionPlugin &&
+          nodesSelectionPlugin.getSelectedNodes().length === 1 &&
+          nodesSelectionPlugin.getSelectedNodes()[0].getAttrs().nodeType ===
+            WEAVE_TEXT_NODE_TYPE &&
+          !window.weaveTextEditing[
+            nodesSelectionPlugin.getSelectedNodes()[0].id()
+          ]
+        ) {
+          this.triggerEditMode(
+            nodesSelectionPlugin.getSelectedNodes()[0] as Konva.Text
+          );
+        }
+      }
+    }
+  };
+
+  onAdd(): void {
+    if (!this.instance.isServerSide() && !this.keyPressHandler) {
+      this.keyPressHandler = this.handleKeyPress.bind(this);
+      window.addEventListener('keypress', this.keyPressHandler);
+    }
   }
 
   onRender(props: WeaveElementAttributes): WeaveElementInstance {
@@ -124,39 +177,6 @@ export class WeaveTextNode extends WeaveNode {
     text.on('transformend', () => {
       this.instance.emitEvent('onTransform', null);
     });
-
-    if (!this.instance.isServerSide()) {
-      window.addEventListener('keypress', (e) => {
-        if (
-          e.code === 'Enter' &&
-          this.instance.getActiveAction() === SELECTION_TOOL_ACTION_NAME &&
-          !this.editing &&
-          e.target !== this.textArea
-        ) {
-          e.preventDefault();
-
-          if (this.isSelecting() && this.isNodeSelected(text)) {
-            const nodesSelectionPlugin =
-              this.instance.getPlugin<WeaveNodesSelectionPlugin>(
-                'nodesSelection'
-              );
-            if (
-              nodesSelectionPlugin &&
-              nodesSelectionPlugin.getSelectedNodes().length === 1 &&
-              nodesSelectionPlugin.getSelectedNodes()[0].getAttrs().nodeType ===
-                WEAVE_TEXT_NODE_TYPE &&
-              !window.weaveTextEditing[
-                nodesSelectionPlugin.getSelectedNodes()[0].id()
-              ]
-            ) {
-              this.triggerEditMode(
-                nodesSelectionPlugin.getSelectedNodes()[0] as Konva.Text
-              );
-            }
-          }
-        }
-      });
-    }
 
     text.dblClick = () => {
       if (this.editing) {
@@ -764,6 +784,11 @@ export class WeaveTextNode extends WeaveNode {
     stage.container().tabIndex = 1;
     stage.container().click();
     stage.container().focus();
+
+    this.instance.emitEvent<WeaveTextNodeOnExitTextNodeEditMode>(
+      'onExitTextNodeEditMode',
+      { node: textNode }
+    );
   }
 
   private triggerEditMode(textNode: Konva.Text) {
@@ -792,5 +817,18 @@ export class WeaveTextNode extends WeaveNode {
     };
 
     this.createTextAreaDOM(textNode, areaPosition);
+
+    this.instance.emitEvent<WeaveTextNodeOnEnterTextNodeEditMode>(
+      'onEnterTextNodeEditMode',
+      { node: textNode }
+    );
+  }
+
+  onDestroyInstance(): void {
+    super.onDestroyInstance();
+    if (!this.instance.isServerSide() && this.keyPressHandler) {
+      window.removeEventListener('keypress', this.keyPressHandler);
+      this.keyPressHandler = undefined;
+    }
   }
 }

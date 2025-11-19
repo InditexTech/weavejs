@@ -96,6 +96,7 @@ type WeaveCopyPasteNodesPluginConfig = {
 
 type WeaveCopyPasteNodesPluginParams = {
   config?: Partial<WeaveCopyPasteNodesPluginConfig>;
+  getImageBase64: (instance: Weave, nodes: Konva.Node[]) => Promise<string>;
 };
 ```
 
@@ -108,6 +109,11 @@ For `WeaveCopyPasteNodesPlugin`:
     ["config"]: {
       description: "Config parameters for the plugin.",
       type: "WeaveCopyPasteNodesPluginConfig",
+    },
+    ["getImageBase64"]: {
+      description:
+        "A function that is called to get the image (as Base64 URL) from the nodes provided, used to set the image onto the clipboard to it can be pasted on external apps.",
+      type: "(instance: Weave, nodes: Konva.Node[]) => Promise<string>",
     },
   }}
 />

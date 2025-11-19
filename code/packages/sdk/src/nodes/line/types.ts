@@ -5,7 +5,12 @@
 import type { WeaveNodeTransformerProperties } from '@inditextech/weave-types';
 
 export type WeaveLineProperties = {
-  transform: WeaveNodeTransformerProperties;
+  transform?: WeaveNodeTransformerProperties;
+  snapAngles: {
+    angles: number[]; // Angles for snapping in degrees
+    activateThreshold: number;
+    releaseThreshold: number;
+  };
 };
 
 export type WeaveLineNodeParams = {

@@ -330,7 +330,14 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
         return;
       }
 
-      e.cancelBubble = true;
+      const nodes = tr.nodes();
+      if (nodes.length > 1) {
+        for (const node of nodes) {
+          const originalNodeOpacity = node.getAttrs().opacity ?? 1;
+          node.setAttr('dragStartOpacity', originalNodeOpacity);
+          node.opacity(this.getDragOpacity());
+        }
+      }
 
       const selectedNodes = tr.nodes();
       for (let i = 0; i < selectedNodes.length; i++) {
@@ -345,6 +352,8 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
         originalNodes[node.getAttrs().id ?? ''] = originalNode;
         originalContainers[node.getAttrs().id ?? ''] = originalContainer;
       }
+
+      e.cancelBubble = true;
 
       tr.forceUpdate();
     });
@@ -410,6 +419,14 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
 
       e.cancelBubble = true;
 
+      if (tr.nodes().length > 1) {
+        const nodes = tr.nodes();
+        for (const node of nodes) {
+          this.getNodesSelectionFeedbackPlugin()?.showSelectionHalo(node);
+          this.getNodesSelectionFeedbackPlugin()?.updateSelectionHalo(node);
+        }
+      }
+
       this.instance.getCloningManager().cleanupClones();
 
       this.getStagePanningPlugin()?.cleanupEdgeMoveIntervals();
@@ -420,6 +437,15 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
         const node = selectedNodes[i];
         selectionContainsFrames = selectionContainsFrames || hasFrames(node);
         node.updatePosition(node.getAbsolutePosition());
+      }
+
+      const nodes = tr.nodes();
+      if (nodes.length > 1) {
+        for (const node of nodes) {
+          const dragStartOpacity = node.getAttr('dragStartOpacity') ?? 1;
+          node.opacity(dragStartOpacity);
+          node.setAttr('dragStartOpacity', undefined);
+        }
       }
 
       if (this.isSelecting() && tr.nodes().length > 1) {
@@ -435,60 +461,90 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
           const layerToMove = containerOverCursor(this.instance, selectedNodes);
 
           const nodeUpdate = (node: Konva.Node) => {
-            clearContainerTargets(this.instance);
+            const isLockedToContainer = node.getAttrs().lockToContainer;
+            // not locked
+            if (!isLockedToContainer) {
+              clearContainerTargets(this.instance);
 
-            const nodeHandler = this.instance.getNodeHandler<WeaveNode>(
-              node.getAttrs().nodeType
-            );
-
-            let containerToMove: Konva.Layer | Konva.Node | undefined =
-              this.instance.getMainLayer();
-
-            if (layerToMove) {
-              containerToMove = layerToMove;
-            }
-
-            let moved = false;
-            if (containerToMove && !selectionContainsFrames) {
-              moved = moveNodeToContainer(
-                this.instance,
-                node,
-                containerToMove,
-                originalNodes[node.getAttrs().id ?? ''],
-                originalContainers[node.getAttrs().id ?? '']
+              const nodeHandler = this.instance.getNodeHandler<WeaveNode>(
+                node.getAttrs().nodeType
               );
 
-              if (moved) {
-                this.instance.emitEvent<WeaveNodeChangedContainerEvent>(
-                  'onNodeChangedContainer',
-                  {
-                    originalNode:
-                      originalNodes[node.getAttrs().id ?? ''] ?? null,
-                    originalContainer:
-                      originalContainers[node.getAttrs().id ?? ''] ?? null,
-                    newNode: node,
-                    newContainer: containerToMove,
-                  }
+              let containerToMove: Konva.Layer | Konva.Node | undefined =
+                this.instance.getMainLayer();
+
+              if (layerToMove) {
+                containerToMove = layerToMove;
+              }
+
+              let moved = false;
+              if (containerToMove && !selectionContainsFrames) {
+                moved = moveNodeToContainer(
+                  this.instance,
+                  node,
+                  containerToMove,
+                  originalNodes[node.getAttrs().id ?? ''],
+                  originalContainers[node.getAttrs().id ?? '']
+                );
+
+                if (moved) {
+                  this.instance.emitEvent<WeaveNodeChangedContainerEvent>(
+                    'onNodeChangedContainer',
+                    {
+                      originalNode:
+                        originalNodes[node.getAttrs().id ?? ''] ?? null,
+                      originalContainer:
+                        originalContainers[node.getAttrs().id ?? ''] ?? null,
+                      newNode: node,
+                      newContainer: containerToMove,
+                    }
+                  );
+                }
+
+                delete originalNodes[node.getAttrs().id ?? ''];
+                delete originalContainers[node.getAttrs().id ?? ''];
+              }
+
+              if (containerToMove) {
+                containerToMove.fire(WEAVE_NODE_CUSTOM_EVENTS.onTargetLeave, {
+                  bubbles: true,
+                });
+              }
+
+              if (!nodeHandler) {
+                return;
+              }
+
+              toSelect.push(node.getAttrs().id ?? '');
+
+              if (!moved) {
+                toUpdate.push(
+                  nodeHandler.serialize(node as WeaveElementInstance)
+                );
+              }
+            }
+
+            if (isLockedToContainer) {
+              clearContainerTargets(this.instance);
+
+              toSelect.push(node.getAttrs().id ?? '');
+
+              const nodeHandler = this.instance.getNodeHandler<WeaveNode>(
+                node.getAttrs().nodeType
+              );
+
+              if (nodeHandler) {
+                this.instance.updateNode(
+                  nodeHandler.serialize(node as WeaveElementInstance)
                 );
               }
 
-              delete originalNodes[node.getAttrs().id ?? ''];
-              delete originalContainers[node.getAttrs().id ?? ''];
-            }
+              if (!nodeHandler) {
+                return;
+              }
 
-            if (containerToMove) {
-              containerToMove.fire(WEAVE_NODE_CUSTOM_EVENTS.onTargetLeave, {
-                bubbles: true,
-              });
-            }
+              toSelect.push(node.getAttrs().id ?? '');
 
-            if (!nodeHandler) {
-              return;
-            }
-
-            toSelect.push(node.getAttrs().id ?? '');
-
-            if (!moved) {
               toUpdate.push(
                 nodeHandler.serialize(node as WeaveElementInstance)
               );
@@ -1593,5 +1649,9 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
 
   getSelectorConfig(): TransformerConfig {
     return this.config.selection;
+  }
+
+  getDragOpacity(): number {
+    return this.config.style.dragOpacity;
   }
 }

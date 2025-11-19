@@ -6,23 +6,21 @@ import type { WebSocket } from 'ws';
 import type { TokenCredential } from '@azure/identity';
 import type { Doc } from 'yjs';
 import type { ConnectionContext } from './index.server';
+import type { WEAVE_STORE_AZURE_WEB_PUBSUB_CONNECTION_STATUS } from './constants';
+import type { WeaveStoreAzureWebPubSubSyncClient } from './client';
+import type { Encoder } from 'lib0/encoding';
+import type { Decoder } from 'lib0/decoding';
+import type { DeepPartial } from '@inditextech/weave-types';
 
 export type WeaveStoreAzureWebPubsubConfig = {
   endpoint: string;
+  persistIntervalMs?: number;
   hubName: string;
   auth?: {
     key?: string;
     custom?: TokenCredential;
   };
-  connectionHandlers?: Pick<
-    WeaveAzureWebPubsubSyncHandlerOptions,
-    | 'onConnect'
-    | 'onConnected'
-    | 'removeConnection'
-    | 'getConnectionRoom'
-    | 'getRoomConnections'
-  >;
-  persistIntervalMs?: number;
+  connectionHandlers?: DeepPartial<WeaveAzureWebPubsubSyncHandlerOptions>;
 };
 
 export type WeaveAzureWebPubsubSyncHandlerOptions = {
@@ -110,3 +108,59 @@ export type WeaveStoreAzureWebPubsubOnWebsocketErrorEvent = {
 export type WeaveStoreAzureWebPubsubOnWebsocketOnTokenRefreshEvent = {
   group: string;
 };
+
+export type WeaveStoreAzureWebPubSubSyncHostClientConnectOptions = {
+  expirationTimeInMinutes?: number;
+};
+
+// Client types
+
+export type WeaveStoreAzureWebPubSubSyncClientConnectionStatusKeys =
+  keyof typeof WEAVE_STORE_AZURE_WEB_PUBSUB_CONNECTION_STATUS;
+export type WeaveStoreAzureWebPubSubSyncClientConnectionStatus =
+  (typeof WEAVE_STORE_AZURE_WEB_PUBSUB_CONNECTION_STATUS)[WeaveStoreAzureWebPubSubSyncClientConnectionStatusKeys];
+
+export enum MessageType {
+  System = 'system',
+  JoinGroup = 'joinGroup',
+  SendToGroup = 'sendToGroup',
+}
+
+export enum MessageDataType {
+  Init = 'init',
+  Sync = 'sync',
+  Awareness = 'awareness',
+}
+
+export interface MessageData {
+  payloadId?: string;
+  index?: number;
+  type?: 'chunk' | 'end';
+  totalChunks?: number;
+  group: string;
+  t: string; // type / target uuid
+  f: string; // origin uuid
+  c: string; // base64 encoded binary data
+}
+
+export interface Message {
+  type: string;
+  fromUserId: string;
+  from: string;
+  group: string;
+  data: MessageData;
+}
+
+export type MessageHandler = (
+  encoder: Encoder,
+  decoder: Decoder,
+  client: WeaveStoreAzureWebPubSubSyncClient,
+  clientId: string,
+  emitSynced: boolean,
+  messageType: number
+) => void;
+
+export interface WeaveStoreAzureWebPubSubSyncClientOptions {
+  resyncInterval: number;
+  tokenProvider: Promise<string> | null;
+}

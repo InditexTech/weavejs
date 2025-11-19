@@ -38,7 +38,7 @@ export function resetScale(node: Konva.Node): void {
 export function clearContainerTargets(instance: Weave): void {
   const containers = instance.getContainerNodes();
   for (const container of containers) {
-    container.fire(WEAVE_NODE_CUSTOM_EVENTS.onTargetLeave, { bubbles: true });
+    container.fire(WEAVE_NODE_CUSTOM_EVENTS.onTargetLeave, { node: undefined });
   }
 }
 
@@ -121,6 +121,12 @@ export function moveNodeToContainer(
     return false;
   }
 
+  const canMoveToLayer = containerToMove.canMoveToContainer(node);
+
+  if (!canMoveToLayer) {
+    return false;
+  }
+
   let nodeActualContainer: Konva.Node | undefined =
     node.getParent() as Konva.Node;
 
@@ -166,6 +172,11 @@ export function moveNodeToContainer(
     node.x(node.x() - (layerToMoveAttrs.containerOffsetX ?? 0));
     node.y(node.y() - (layerToMoveAttrs.containerOffsetY ?? 0));
     node.movedToContainer(layerToMove);
+
+    instance.emitEvent('onNodeMovedToContainer', {
+      node: node.clone(),
+      container: layerToMove,
+    });
 
     const nodeHandler = instance.getNodeHandler<WeaveNode>(
       node.getAttrs().nodeType
@@ -415,6 +426,11 @@ export function getTargetAndSkipNodes(
   ) {
     node = nodesSelectionPlugin.getTransformer().nodes()[0];
     skipNodes.push(node.getAttrs().id ?? '');
+
+    if (node.getAttr('eventTarget')) {
+      node = e.target;
+      skipNodes.push(e.target.getAttrs().id ?? '');
+    }
   }
   if (
     e.type === 'dragmove' &&
@@ -636,8 +652,19 @@ export function mergeExceptArrays<TObject, TSource>(
   });
 }
 
-// Export server side utils
+export function getStageClickPoint(
+  instance: Weave,
+  pointerPos: Konva.Vector2d
+): Konva.Vector2d {
+  const stage = instance.getStage();
 
-// Register font in node environment using canvas backend
+  const scale = stage.scale();
+  const position = stage.position();
 
-//
+  const stageClickPoint = {
+    x: (pointerPos.x - position.x) / scale.x,
+    y: (pointerPos.y - position.y) / scale.y,
+  };
+
+  return stageClickPoint;
+}

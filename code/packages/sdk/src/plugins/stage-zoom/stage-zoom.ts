@@ -484,7 +484,7 @@ export class WeaveStageZoomPlugin extends WeavePlugin {
   }
 
   getDistance(p1: Konva.Vector2d, p2: Konva.Vector2d) {
-    return Math.sqrt(Math.pow(p2.x - p1.x, 2) + Math.pow(p2.y - p1.y, 2));
+    return Math.hypot(p2.x - p1.x, p2.y - p1.y);
   }
 
   getCenter(p1: Konva.Vector2d, p2: Konva.Vector2d) {
@@ -620,33 +620,13 @@ export class WeaveStageZoomPlugin extends WeavePlugin {
       { passive: false }
     );
 
+    let doZoom = false;
+
     // Zoom with mouse wheel + ctrl / cmd
     const handleWheel = (e: WheelEvent) => {
-      const performZoom =
-        this.isCtrlOrMetaPressed ||
-        (!this.isCtrlOrMetaPressed && e.ctrlKey && e.deltaMode === 0);
-
-      const mouseX = e.clientX;
-      const mouseY = e.clientY;
-
-      let elementUnderMouse = document.elementFromPoint(mouseX, mouseY);
-      if (isInShadowDOM(stage.container())) {
-        const shadowHost = getTopmostShadowHost(stage.container());
-        if (shadowHost) {
-          elementUnderMouse = shadowHost.elementFromPoint(mouseX, mouseY);
-        }
-      }
-
-      if (
-        !this.enabled ||
-        !performZoom ||
-        this.instance.getClosestParentWithWeaveId(elementUnderMouse) !==
-          stage.container()
-      ) {
+      if (!doZoom) {
         return;
       }
-
-      e.preventDefault();
 
       const delta = e.deltaY > 0 ? 1 : -1;
       this.zoomVelocity += delta;
@@ -660,7 +640,42 @@ export class WeaveStageZoomPlugin extends WeavePlugin {
       }
     };
 
-    window.addEventListener('wheel', handleWheel, { passive: false });
+    window.addEventListener(
+      'wheel',
+      (e) => {
+        const performZoom =
+          this.isCtrlOrMetaPressed ||
+          (!this.isCtrlOrMetaPressed && e.ctrlKey && e.deltaMode === 0);
+
+        const mouseX = e.clientX;
+        const mouseY = e.clientY;
+
+        let elementUnderMouse = document.elementFromPoint(mouseX, mouseY);
+        if (isInShadowDOM(stage.container())) {
+          const shadowHost = getTopmostShadowHost(stage.container());
+          if (shadowHost) {
+            elementUnderMouse = shadowHost.elementFromPoint(mouseX, mouseY);
+          }
+        }
+
+        if (
+          !this.enabled ||
+          !performZoom ||
+          this.instance.getClosestParentWithWeaveId(elementUnderMouse) !==
+            stage.container()
+        ) {
+          doZoom = false;
+          return;
+        }
+
+        e.preventDefault();
+
+        doZoom = true;
+      },
+      { passive: false }
+    );
+
+    window.addEventListener('wheel', handleWheel, { passive: true });
   }
 
   getInertiaScale() {
@@ -711,7 +726,6 @@ export class WeaveStageZoomPlugin extends WeavePlugin {
 
     this.setZoom(this.getInertiaScale(), false, pointer);
     this.zoomVelocity *= this.config.zoomInertia.friction;
-    this.getStageGridPlugin()?.onRender();
 
     requestAnimationFrame(this.zoomTick.bind(this));
   }

@@ -138,6 +138,9 @@ export abstract class WeaveNode implements WeaveNodeBase {
     node.handleMouseout = function () {};
     node.handleSelectNode = function () {};
     node.handleDeselectNode = function () {};
+    node.canMoveToContainer = function () {
+      return true;
+    };
   }
 
   isNodeSelected(ele: Konva.Node): boolean {
@@ -173,7 +176,11 @@ export abstract class WeaveNode implements WeaveNodeBase {
       return;
     }
 
-    if (selectionPlugin.isAreaSelecting()) {
+    if (
+      (selectionPlugin.getSelectedNodes().length === 1 &&
+        node === selectionPlugin.getSelectedNodes()[0]) ||
+      selectionPlugin.isAreaSelecting()
+    ) {
       this.hideHoverState();
       return;
     }
@@ -266,6 +273,8 @@ export abstract class WeaveNode implements WeaveNodeBase {
       node.on('transformend', (e) => {
         const node = e.target;
 
+        e.target.setAttr('strokeScaleEnabled', true);
+
         this.instance.emitEvent('onTransform', null);
 
         transforming = false;
@@ -285,7 +294,10 @@ export abstract class WeaveNode implements WeaveNodeBase {
 
         this.scaleReset(node);
 
-        this.getNodesSelectionFeedbackPlugin()?.hideSelectionHalo(node);
+        if (this.getSelectionPlugin()?.getSelectedNodes().length === 1) {
+          this.getNodesSelectionFeedbackPlugin()?.showSelectionHalo(node);
+          this.getNodesSelectionFeedbackPlugin()?.updateSelectionHalo(node);
+        }
 
         const nodeHandler = this.instance.getNodeHandler<WeaveNode>(
           node.getAttrs().nodeType
@@ -363,6 +375,16 @@ export abstract class WeaveNode implements WeaveNodeBase {
           );
         }
 
+        if (
+          this.getNodesSelectionPlugin()?.getSelectedNodes().length === 1 &&
+          realNodeTarget.getAttr('dragStartOpacity') === undefined
+        ) {
+          realNodeTarget.setAttr('dragStartOpacity', realNodeTarget.opacity());
+          realNodeTarget.opacity(
+            this.getNodesSelectionPlugin()?.getDragOpacity()
+          );
+        }
+
         if (e.evt?.altKey) {
           nodeTarget.setAttrs({ isCloneOrigin: true });
           nodeTarget.setAttrs({ isCloned: false });
@@ -436,10 +458,11 @@ export abstract class WeaveNode implements WeaveNodeBase {
           if (
             layerToMove &&
             !hasFrames(realNodeTarget) &&
-            realNodeTarget.isDragging()
+            realNodeTarget.isDragging() &&
+            !realNodeTarget.getAttrs().lockToContainer
           ) {
             layerToMove.fire(WEAVE_NODE_CUSTOM_EVENTS.onTargetEnter, {
-              bubbles: true,
+              node: realNodeTarget,
             });
           }
         }
@@ -450,7 +473,12 @@ export abstract class WeaveNode implements WeaveNodeBase {
       node.on('dragend', (e) => {
         const nodeTarget = e.target;
 
-        this.getNodesSelectionFeedbackPlugin()?.hideSelectionHalo(nodeTarget);
+        if (this.getSelectionPlugin()?.getSelectedNodes().length === 1) {
+          this.getNodesSelectionFeedbackPlugin()?.showSelectionHalo(nodeTarget);
+          this.getNodesSelectionFeedbackPlugin()?.updateSelectionHalo(
+            nodeTarget
+          );
+        }
 
         e.cancelBubble = true;
 
@@ -478,8 +506,20 @@ export abstract class WeaveNode implements WeaveNodeBase {
         const realNodeTarget: Konva.Node = this.getRealSelectedNode(nodeTarget);
 
         if (
+          this.getNodesSelectionPlugin()?.getSelectedNodes().length === 1 &&
+          realNodeTarget.getAttr('dragStartOpacity') !== undefined
+        ) {
+          const originalNodeOpacity =
+            realNodeTarget.getAttr('dragStartOpacity') ?? 1;
+          realNodeTarget.setAttrs({ opacity: originalNodeOpacity });
+          realNodeTarget.setAttr('dragStartOpacity', undefined);
+        }
+
+        if (
           this.isSelecting() &&
-          this.getSelectionPlugin()?.getSelectedNodes().length === 1
+          this.getSelectionPlugin()?.getSelectedNodes().length === 1 &&
+          (realNodeTarget.getAttrs().lockToContainer === undefined ||
+            !realNodeTarget.getAttrs().lockToContainer)
         ) {
           this.instance.stateTransactional(() => {
             clearContainerTargets(this.instance);
@@ -712,6 +752,10 @@ export abstract class WeaveNode implements WeaveNodeBase {
     nodeInstance.destroy();
   }
 
+  onDestroyInstance() {
+    // Do nothing by default
+  }
+
   serialize(instance: WeaveElementInstance): WeaveStateElement {
     const attrs = instance.getAttrs();
 
@@ -872,14 +916,14 @@ export abstract class WeaveNode implements WeaveNodeBase {
     return mergeExceptArrays(transformProperties, nodeTransformConfig ?? {});
   }
 
-  getNodesSelectionPlugin() {
+  protected getNodesSelectionPlugin() {
     const nodesSelectionPlugin =
       this.instance.getPlugin<WeaveNodesSelectionPlugin>('nodesSelection');
 
     return nodesSelectionPlugin;
   }
 
-  getNodesEdgeSnappingPlugin() {
+  protected getNodesEdgeSnappingPlugin() {
     const snappingPlugin =
       this.instance.getPlugin<WeaveNodesEdgeSnappingPlugin>(
         WEAVE_NODES_EDGE_SNAPPING_PLUGIN_KEY
@@ -887,7 +931,7 @@ export abstract class WeaveNode implements WeaveNodeBase {
     return snappingPlugin;
   }
 
-  getNodesDistanceSnappingPlugin() {
+  protected getNodesDistanceSnappingPlugin() {
     const snappingPlugin =
       this.instance.getPlugin<WeaveNodesDistanceSnappingPlugin>(
         WEAVE_NODES_DISTANCE_SNAPPING_PLUGIN_KEY

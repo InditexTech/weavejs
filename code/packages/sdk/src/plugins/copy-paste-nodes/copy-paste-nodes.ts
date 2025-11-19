@@ -33,13 +33,19 @@ import {
   getBoundingBox,
   getTopmostShadowHost,
   isInShadowDOM,
+  mergeExceptArrays,
 } from '@/utils';
 import type { WeaveStageGridPlugin } from '../stage-grid/stage-grid';
 import type Konva from 'konva';
+import type { Weave } from '@/weave';
 
 export class WeaveCopyPasteNodesPlugin extends WeavePlugin {
   protected state: WeaveCopyPasteNodesPluginState;
   private readonly config: WeaveCopyPasteNodesPluginConfig;
+  private readonly getImageBase64!: (
+    instance: Weave,
+    nodes: Konva.Node[]
+  ) => Promise<string>;
   private lastInternalPasteSnapshot: string;
   private actualInternalPaddingX: number;
   private actualInternalPaddingY: number;
@@ -48,13 +54,14 @@ export class WeaveCopyPasteNodesPlugin extends WeavePlugin {
   initLayer: undefined;
   onRender: undefined;
 
-  constructor(params?: Partial<WeaveCopyPasteNodesPluginParams>) {
+  constructor(params: WeaveCopyPasteNodesPluginParams) {
     super();
 
-    this.config = {
-      ...WEAVE_COPY_PASTE_CONFIG_DEFAULT,
-      ...params?.config,
-    };
+    this.getImageBase64 = params.getImageBase64;
+    this.config = mergeExceptArrays(
+      WEAVE_COPY_PASTE_CONFIG_DEFAULT,
+      params?.config
+    );
 
     this.actualInternalPaddingX = 0;
     this.actualInternalPaddingY = 0;
@@ -70,15 +77,23 @@ export class WeaveCopyPasteNodesPlugin extends WeavePlugin {
     this.initEvents();
   }
 
-  private writeClipboardData(data: string) {
+  private writeClipboardData(base64Data: string, data: string) {
     return new Promise<void>((resolve, reject) => {
       setTimeout(async () => {
         if (typeof navigator.clipboard === 'undefined') {
           return reject(new Error('Clipboard API not supported'));
         }
 
+        const res = await fetch(base64Data);
+        const imageBlob = await res.blob();
+        const textBlob = new Blob([data], { type: 'text/plain' });
+        const item = new ClipboardItem({
+          [imageBlob.type]: imageBlob,
+          [textBlob.type]: textBlob,
+        });
+
         navigator.clipboard
-          .writeText(data)
+          .write([item])
           .then(() => {
             resolve();
           })
@@ -172,7 +187,7 @@ export class WeaveCopyPasteNodesPlugin extends WeavePlugin {
       if (stage.isFocused() && e.code === 'KeyC' && (e.ctrlKey || e.metaKey)) {
         e.preventDefault();
 
-        await this.performCopy();
+        await this.handleCopy();
 
         return;
       }
@@ -281,14 +296,6 @@ export class WeaveCopyPasteNodesPlugin extends WeavePlugin {
       return false;
     }
   }
-
-  // private getTextFromClipboard(item: DataTransferItem): Promise<string> {
-  //   return new Promise((resolve) => {
-  //     item.getAsString((text) => {
-  //       resolve(text);
-  //     });
-  //   });
-  // }
 
   private mapToPasteNodes() {
     const nodesSelectionPlugin = this.getNodesSelectionPlugin();
@@ -451,10 +458,12 @@ export class WeaveCopyPasteNodesPlugin extends WeavePlugin {
     this.cancel();
   }
 
-  private async performCopy() {
+  private async handleCopy() {
     if (!this.enabled) {
       return;
     }
+
+    this.instance.emitEvent<undefined>('onPrepareCopy');
 
     const stage = this.instance.getStage();
 
@@ -517,7 +526,14 @@ export class WeaveCopyPasteNodesPlugin extends WeavePlugin {
     }
 
     try {
-      await this.writeClipboardData(JSON.stringify(copyClipboard));
+      const imageBase64Data = await this.getImageBase64(
+        this.instance,
+        selectedNodes
+      );
+      await this.writeClipboardData(
+        imageBase64Data,
+        JSON.stringify(copyClipboard)
+      );
 
       this.actualInternalPaddingX = 0;
       this.actualInternalPaddingY = 0;
@@ -532,7 +548,7 @@ export class WeaveCopyPasteNodesPlugin extends WeavePlugin {
   }
 
   async copy(): Promise<void> {
-    await this.performCopy();
+    await this.handleCopy();
   }
 
   async paste(

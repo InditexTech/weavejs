@@ -13,6 +13,71 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.5.0] - 2025-11-19
+
+\### Added
+
+- [#798](https://github.com/InditexTech/weavejs/issues/798) Copy / Paste images to/from external applications
+
+## [2.4.0] - 2025-11-19
+
+\### Added
+
+- [#789](https://github.com/InditexTech/weavejs/issues/789) Support a simpler line drawing tool
+
+## [2.3.3] - 2025-11-18
+
+### Fixed
+
+- [#796](https://github.com/InditexTech/weavejs/issues/796) Opacity is not the original when dragging ends in some cases
+
+## [2.3.2] - 2025-11-18
+
+### Fixed
+
+- [#794](https://github.com/InditexTech/weavejs/issues/794) When instance is destroyed, window events that are defined on node handlers are not cleaned up
+
+## [2.3.1] - 2025-11-18
+
+### Fixed
+
+- [#792](https://github.com/InditexTech/weavejs/issues/792) Multi-selection feedback not updating correctly when dragging or transforming
+
+## [2.3.0] - 2025-11-17
+
+### Added
+
+- [#790](https://github.com/InditexTech/weavejs/issues/790) Handle nodes when moving to or from a container (lock and define it can move to a container)
+
+## [2.2.0] - 2025-11-06
+
+### Added
+
+- [#786](https://github.com/InditexTech/weavejs/issues/786) Handle big messages as chunks on Azure Web PubSub store
+
+### Changed
+
+- [#784](https://github.com/InditexTech/weavejs/issues/782) Improve state transactional operations
+
+## [2.1.1] - 2025-11-06
+
+### Fixed
+
+- [#782](https://github.com/InditexTech/weavejs/issues/782) Cleanup Konva / Yjs from global on instance destroy
+
+## [2.1.0] - 2025-11-04
+
+### Changed
+
+- [#777](https://github.com/InditexTech/weavejs/issues/777) Improve persistence with Azure Web PubSub storage
+
+## [2.0.3] - 2025-11-04
+
+### Fixed
+
+- [#773](https://github.com/InditexTech/weavejs/issues/773) Setup doc events correctly when client re-connects
+- [#775](https://github.com/InditexTech/weavejs/issues/775) Line break not working after leaving and joining again a room
+
 ## [2.0.2] - 2025-10-31
 
 ### Fixed
@@ -1296,7 +1361,27 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - [#24](https://github.com/InditexTech/weavejs/issues/24) Bug when loading rooms with text or images
 - [#18](https://github.com/InditexTech/weavejs/issues/18) Fix awareness not working on store-azure-web-pubsub
 
-[Unreleased]: https://github.com/InditexTech/weavejs/compare/2.0.2...HEAD
+[Unreleased]: https://github.com/InditexTech/weavejs/compare/2.5.0...HEAD
+
+[2.5.0]: https://github.com/InditexTech/weavejs/compare/2.4.0...2.5.0
+
+[2.4.0]: https://github.com/InditexTech/weavejs/compare/2.3.3...2.4.0
+
+[2.3.3]: https://github.com/InditexTech/weavejs/compare/2.3.2...2.3.3
+
+[2.3.2]: https://github.com/InditexTech/weavejs/compare/2.3.1...2.3.2
+
+[2.3.1]: https://github.com/InditexTech/weavejs/compare/2.3.0...2.3.1
+
+[2.3.0]: https://github.com/InditexTech/weavejs/compare/2.2.0...2.3.0
+
+[2.2.0]: https://github.com/InditexTech/weavejs/compare/2.1.1...2.2.0
+
+[2.1.1]: https://github.com/InditexTech/weavejs/compare/2.1.0...2.1.1
+
+[2.1.0]: https://github.com/InditexTech/weavejs/compare/2.0.3...2.1.0
+
+[2.0.3]: https://github.com/InditexTech/weavejs/compare/2.0.2...2.0.3
 
 [2.0.2]: https://github.com/InditexTech/weavejs/compare/2.0.1...2.0.2
 
