@@ -42,7 +42,7 @@ import type { Weave } from '@/weave';
 export class WeaveCopyPasteNodesPlugin extends WeavePlugin {
   protected state: WeaveCopyPasteNodesPluginState;
   private readonly config: WeaveCopyPasteNodesPluginConfig;
-  private getImageBase64!: (
+  private readonly getImageBase64!: (
     instance: Weave,
     nodes: Konva.Node[]
   ) => Promise<string>;
