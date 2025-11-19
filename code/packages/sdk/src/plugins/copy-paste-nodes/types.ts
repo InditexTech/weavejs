@@ -11,6 +11,7 @@ import {
   type NodeSerializable,
   type WeaveStateElement,
 } from '@inditextech/weave-types';
+import type { Weave } from '@/weave';
 
 export type WeaveCopyPasteNodesPluginStateKeys =
   keyof typeof COPY_PASTE_NODES_PLUGIN_STATE;
@@ -66,4 +67,5 @@ export type WeaveCopyPasteNodesPluginConfig = {
 
 export type WeaveCopyPasteNodesPluginParams = {
   config?: Partial<WeaveCopyPasteNodesPluginConfig>;
+  getImageBase64: (instance: Weave, nodes: Konva.Node[]) => Promise<string>;
 };
