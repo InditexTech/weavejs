@@ -56,6 +56,7 @@ import type { WeaveStoreOnRoomLoadedEvent } from './stores/types';
 import type { DOMElement, WeaveAsyncElement } from './types';
 import { watchMap } from './watch-map';
 import { getBoundingBox, mergeExceptArrays } from './utils';
+import type { WeaveConnectorNode } from './nodes/connector/connector';
 
 export class Weave {
   private id: string;
@@ -564,6 +565,15 @@ export class Weave {
     this.stateTransactional(() => {
       this.stateManager.removeNode(node);
 
+      const connectorHandler =
+        this.getNodeHandler<WeaveConnectorNode>('connector');
+
+      const nodeInstance = this.getStage().findOne(`#${node.key}`);
+
+      if (connectorHandler && nodeInstance) {
+        connectorHandler.nodeRemovedTN(nodeInstance);
+      }
+
       const selectionPlugin =
         this.getPlugin<WeaveNodesSelectionPlugin>('nodesSelection');
       if (selectionPlugin) {
@@ -574,6 +584,15 @@ export class Weave {
 
   removeNodeNT(node: WeaveStateElement): void {
     this.stateManager.removeNode(node);
+
+    const connectorHandler =
+      this.getNodeHandler<WeaveConnectorNode>('connector');
+
+    const nodeInstance = this.getStage().findOne(`#${node.key}`);
+
+    if (connectorHandler && nodeInstance) {
+      connectorHandler.nodeRemovedTN(nodeInstance);
+    }
 
     const selectionPlugin =
       this.getPlugin<WeaveNodesSelectionPlugin>('nodesSelection');

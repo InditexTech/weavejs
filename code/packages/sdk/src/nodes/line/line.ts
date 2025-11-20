@@ -67,6 +67,7 @@ export class WeaveLineNode extends WeaveNode {
         keepRatio: this.points().length !== 4,
         flipEnabled: this.points().length === 4,
         shiftBehavior: this.points().length === 4 ? 'none' : 'default',
+        shouldOverdrawWholeArea: this.points().length !== 4,
       };
     };
 
