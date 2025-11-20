@@ -4,6 +4,12 @@
 
 import type Konva from 'konva';
 import type { WeaveNodeTransformerProperties } from '@inditextech/weave-types';
+import type { WEAVE_CONNECTOR_NODE_LINE_TYPE } from './constants';
+
+export type WeaveConnectorLineTypeKeys =
+  keyof typeof WEAVE_CONNECTOR_NODE_LINE_TYPE;
+export type WeaveConnectorLineType =
+  (typeof WEAVE_CONNECTOR_NODE_LINE_TYPE)[WeaveConnectorLineTypeKeys];
 
 export type WeaveConnectorProperties = {
   transform: WeaveNodeTransformerProperties;

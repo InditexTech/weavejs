@@ -187,8 +187,6 @@ export abstract class WeaveStore implements WeaveStoreBase {
 
       this.logger.debug({ newState }, 'State changed');
 
-      console.log('State changed', newState);
-
       this.instance.emitEvent<WeaveStoreOnStateChangeEvent>(
         'onStateChange',
         newState

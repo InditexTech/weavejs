@@ -183,22 +183,24 @@ export function moveNodeToContainer(
     );
 
     if (nodeHandler) {
-      const actualNode = nodeHandler.serialize(node as WeaveElementInstance);
+      instance.stateTransactional(() => {
+        const actualNode = nodeHandler.serialize(node as WeaveElementInstance);
 
-      const connectorHandler =
-        instance.getNodeHandler<WeaveConnectorNode>('connector');
+        const connectorHandler =
+          instance.getNodeHandler<WeaveConnectorNode>('connector');
 
-      if (connectorHandler && originalNode && originalContainer) {
-        connectorHandler.nodeMoveToContainerTN(
-          node,
-          layerToMove,
-          originalNode,
-          originalContainer
-        );
-      }
+        if (connectorHandler && originalNode && originalContainer) {
+          connectorHandler.nodeMoveToContainerTN(
+            node,
+            layerToMove,
+            originalNode,
+            originalContainer
+          );
+        }
 
-      instance.removeNodeNT(actualNode);
-      instance.addNodeNT(actualNode, layerToMoveAttrs.id);
+        instance.removeNodeNT(actualNode);
+        instance.addNodeNT(actualNode, layerToMoveAttrs.id);
+      });
 
       return true;
     }

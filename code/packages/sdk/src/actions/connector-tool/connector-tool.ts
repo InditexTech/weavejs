@@ -14,6 +14,7 @@ import { CONNECTOR_TOOL_ACTION_NAME, CONNECTOR_TOOL_STATE } from './constants';
 import { WeaveNodesSelectionPlugin } from '@/plugins/nodes-selection/nodes-selection';
 import type { WeaveConnectorNode } from '@/nodes/connector/connector';
 import { SELECTION_TOOL_ACTION_NAME } from '../selection-tool/constants';
+import { WEAVE_CONNECTOR_NODE_LINE_TYPE } from '@/nodes/connector/constants';
 
 export class WeaveConnectorToolAction extends WeaveAction {
   protected initialized: boolean = false;
@@ -267,6 +268,8 @@ export class WeaveConnectorToolAction extends WeaveAction {
 
     const node = nodeHandler.create(this.connectorId, {
       ...this.props,
+      lineType: WEAVE_CONNECTOR_NODE_LINE_TYPE.STRAIGHT,
+      curvedControlPoint: undefined,
       startPoint: this.startPoint,
       startNodeId: this.startNodeId,
       startNodeAnchor: this.startNodeAnchor,
@@ -354,7 +357,7 @@ export class WeaveConnectorToolAction extends WeaveAction {
 
   private setCursor() {
     const stage = this.instance.getStage();
-    stage.container().style.cursor = 'crosshair';
+    stage.container().style.cursor = 'move';
   }
 
   private setFocusStage() {
@@ -536,7 +539,7 @@ export class WeaveConnectorToolAction extends WeaveAction {
           fill: '#ff2c2cff',
         });
         prevCursor = this.instance.getStage().container().style.cursor;
-        this.instance.getStage().container().style.cursor = 'crosshair';
+        this.instance.getStage().container().style.cursor = 'move';
         e.cancelBubble = true;
       });
 

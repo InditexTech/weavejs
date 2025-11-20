@@ -9,12 +9,16 @@ import {
   type WeaveStateElement,
 } from '@inditextech/weave-types';
 import { WeaveNode } from '../node';
-import { WEAVE_CONNECTOR_NODE_TYPE } from './constants';
+import {
+  WEAVE_CONNECTOR_NODE_LINE_TYPE,
+  WEAVE_CONNECTOR_NODE_TYPE,
+} from './constants';
 import type { WeaveNodesSelectionPlugin } from '@/plugins/nodes-selection/nodes-selection';
 import type {
   WeaveAnchorSnap,
   WeaveConnectorAnchor,
   WeaveConnectorInfo,
+  WeaveConnectorLineType,
   WeaveConnectorNodeParams,
   WeaveConnectorProperties,
 } from './types';
@@ -153,7 +157,15 @@ export class WeaveConnectorNode extends WeaveNode {
     );
 
     connectorLine?.setAttrs({
-      points: this.stageToGroupPoints(linePoints),
+      points: this.stageToGroupPoints(connector, linePoints),
+    });
+
+    const connectorLineSelector = connector.findOne<Konva.Line>(
+      `#${connector.getAttrs().id}-selectionClone`
+    );
+
+    connectorLineSelector?.setAttrs({
+      points: this.stageToGroupPoints(connector, linePoints),
     });
   }
 
@@ -190,13 +202,59 @@ export class WeaveConnectorNode extends WeaveNode {
     return this.instance.getStage().findOne(`#${nodeId}`);
   }
 
-  private stageToGroupPoints(points: number[]) {
-    const firstPoint = { x: points[0], y: points[1] };
+  private quadraticToCubic(
+    x0: number,
+    y0: number,
+    cx: number,
+    cy: number,
+    x1: number,
+    y1: number
+  ) {
+    const c1x = x0 + (2 / 3) * (cx - x0);
+    const c1y = y0 + (2 / 3) * (cy - y0);
+
+    const c2x = x1 + (2 / 3) * (cx - x1);
+    const c2y = y1 + (2 / 3) * (cy - y1);
+
+    return [x0, y0, c1x, c1y, c2x, c2y, x1, y1];
+  }
+
+  private stageToGroupPoints(connector: Konva.Group, points: number[]) {
+    let linePoints: number[] = points;
+
+    if (
+      connector.getAttrs().lineType ===
+        WEAVE_CONNECTOR_NODE_LINE_TYPE.STRAIGHT &&
+      linePoints.length > 4
+    ) {
+      linePoints = [
+        points[0],
+        points[1],
+        points[points.length - 2],
+        points[points.length - 1],
+      ];
+    }
+
+    if (
+      connector.getAttrs().lineType === WEAVE_CONNECTOR_NODE_LINE_TYPE.CURVED &&
+      connector.getAttrs().curvedControlPoint
+    ) {
+      linePoints = this.quadraticToCubic(
+        points[0],
+        points[1],
+        connector.getAttrs().curvedControlPoint.x,
+        connector.getAttrs().curvedControlPoint.y,
+        points[points.length - 2],
+        points[points.length - 1]
+      );
+    }
+
+    const firstPoint = { x: linePoints[0], y: linePoints[1] };
     const result = [];
-    for (let i = 0; i < points.length; i += 2) {
+    for (let i = 0; i < linePoints.length; i += 2) {
       const pt = {
-        x: points[i] - firstPoint.x,
-        y: points[i + 1] - firstPoint.y,
+        x: linePoints[i] - firstPoint.x,
+        y: linePoints[i + 1] - firstPoint.y,
       };
       result.push(pt.x, pt.y);
     }
@@ -214,8 +272,18 @@ export class WeaveConnectorNode extends WeaveNode {
       draggable: false,
     });
 
+    if (!connector.getAttrs().lineType) {
+      connector.setAttrs({
+        lineType: WEAVE_CONNECTOR_NODE_LINE_TYPE.STRAIGHT,
+        curvedControlPoint: undefined,
+      });
+    }
+
     const stroke = 'black';
     const strokeWidth = 1;
+
+    const isBezier =
+      connector.getAttrs().lineType === WEAVE_CONNECTOR_NODE_LINE_TYPE.CURVED;
 
     const connectorLine = new Konva.Line({
       id: `${props.id}-line`,
@@ -223,7 +291,8 @@ export class WeaveConnectorNode extends WeaveNode {
       points: [],
       stroke,
       strokeWidth,
-      hitStrokeWidth: strokeWidth + 4,
+      bezier: isBezier,
+      hitStrokeWidth: strokeWidth + 8,
       strokeScaleEnabled: true,
       draggable: false,
     });
@@ -372,14 +441,13 @@ export class WeaveConnectorNode extends WeaveNode {
 
     this.setupDefaultNodeAugmentation(connector);
 
-    const defaultTransformerProperties = this.defaultGetTransformerProperties({
-      ...this.config.transform,
-      rotateEnabled: false,
-      borderStroke: 'transparent',
-    });
-
-    connector.getTransformerProperties = function () {
-      return defaultTransformerProperties;
+    connector.getTransformerProperties = () => {
+      return this.defaultGetTransformerProperties({
+        ...this.config.transform,
+        rotateEnabled: false,
+        shouldOverdrawWholeArea: false,
+        borderStroke: 'transparent',
+      });
     };
 
     this.setupDefaultNodeEvents(connector);
@@ -426,9 +494,18 @@ export class WeaveConnectorNode extends WeaveNode {
           selectedNodes[0].getAttrs().id === connector.getAttrs().id
         ) {
           this.teardownSelection(connector);
+          this.teardownCurvedLine(connector);
+
           this.setupSelection(connector);
+          if (
+            connector.getAttrs().lineType ===
+            WEAVE_CONNECTOR_NODE_LINE_TYPE.CURVED
+          ) {
+            this.setupCurvedLine(connector);
+          }
         } else {
           this.teardownSelection(connector);
+          this.teardownCurvedLine(connector);
         }
       }
     });
@@ -585,6 +662,76 @@ export class WeaveConnectorNode extends WeaveNode {
     }
   }
 
+  private setupCurvedLine(connector: Konva.Group) {
+    const connectorLine = connector.findOne<Konva.Line>(
+      `#${connector.getAttrs().id}-line`
+    );
+
+    if (
+      !connectorLine ||
+      connector.getAttrs().lineType !== WEAVE_CONNECTOR_NODE_LINE_TYPE.CURVED
+    ) {
+      return;
+    }
+
+    let curvedControlNodeHandler = this.instance
+      .getSelectionLayer()
+      ?.findOne<Konva.Circle>(
+        `#${connector.getAttrs().id}-curvedControlNodeHandler`
+      );
+
+    if (curvedControlNodeHandler) {
+      return;
+    }
+
+    const radius = 7;
+
+    curvedControlNodeHandler = new Konva.Circle({
+      id: `${connector.getAttrs().id}-curvedControlNodeHandler`,
+      name: 'curvedControlNodeHandler',
+      x: connector.getAttrs().curvedControlPoint.x,
+      y: connector.getAttrs().curvedControlPoint.y,
+      edgeSnappingDisableOnDrag: true,
+      edgeDistanceDisableOnDrag: true,
+      radius: radius / this.instance.getStage().scaleX(),
+      strokeScaleEnabled: false,
+      stroke: '#000000',
+      strokeWidth: 1,
+      fill: '#ffffff',
+      draggable: true,
+    });
+
+    curvedControlNodeHandler.on('pointermove pointerover', () => {
+      this.instance.getStage().container().style.cursor = 'move';
+    });
+
+    curvedControlNodeHandler.on('dragmove', (e) => {
+      connector.setAttrs({
+        curvedControlPoint: e.target.position(),
+      });
+
+      this.updateLinePosition(connector);
+    });
+
+    curvedControlNodeHandler.on('dragend', (e) => {
+      connector.setAttrs({
+        curvedControlPoint: e.target.position(),
+      });
+
+      this.updateLinePosition(connector);
+
+      this.instance.updateNodeNT(this.serialize(connector));
+    });
+
+    this.instance.addEventListener('onZoomChange', () => {
+      curvedControlNodeHandler!.setAttrs({
+        radius: radius / this.instance.getStage().scaleX(),
+      });
+    });
+
+    this.instance.getSelectionLayer()?.add(curvedControlNodeHandler);
+  }
+
   private setupSelection(connector: Konva.Group) {
     const connectorLine = connector.findOne<Konva.Line>(
       `#${connector.getAttrs().id}-line`
@@ -635,9 +782,11 @@ export class WeaveConnectorNode extends WeaveNode {
 
     startNodeHandler = new Konva.Circle({
       id: `${connector.getAttrs().id}-startNodeHandler`,
-      name: 'startNodeHandler edgeSnappingDisableOnDrag edgeDistanceDisableOnDrag',
+      name: 'startNodeHandler',
       x: connectorLine.points()[0],
       y: connectorLine.points()[1],
+      edgeSnappingDisableOnDrag: true,
+      edgeDistanceDisableOnDrag: true,
       radius: radius / this.instance.getStage().scaleX(),
       strokeScaleEnabled: false,
       stroke: '#000000',
@@ -647,8 +796,7 @@ export class WeaveConnectorNode extends WeaveNode {
     });
 
     startNodeHandler.on('pointermove pointerover', () => {
-      this.instance.getStage().container().style.cursor = 'crosshair';
-      // e.cancelBubble = true;
+      this.instance.getStage().container().style.cursor = 'move';
     });
 
     startNodeHandler.on('dragstart', () => {
@@ -856,10 +1004,12 @@ export class WeaveConnectorNode extends WeaveNode {
 
     endNodeHandler = new Konva.Circle({
       id: `${connector.getAttrs().id}-endNodeHandler`,
-      name: 'endNodeHandler edgeSnappingDisableOnDrag edgeDistanceDisableOnDrag',
+      name: 'endNodeHandler',
       x: connectorLine.points()[connectorLine.points().length - 2],
       y: connectorLine.points()[connectorLine.points().length - 1],
       radius: radius / this.instance.getStage().scaleX(),
+      edgeSnappingDisableOnDrag: true,
+      edgeDistanceDisableOnDrag: true,
       strokeScaleEnabled: false,
       stroke: '#000000',
       strokeWidth: 1,
@@ -868,8 +1018,7 @@ export class WeaveConnectorNode extends WeaveNode {
     });
 
     endNodeHandler.on('pointermove pointerover', () => {
-      this.instance.getStage().container().style.cursor = 'crosshair';
-      // e.cancelBubble = true;
+      this.instance.getStage().container().style.cursor = 'move';
     });
 
     endNodeHandler.on('dragstart', () => {
@@ -1080,6 +1229,13 @@ export class WeaveConnectorNode extends WeaveNode {
     endNodeHandler.moveToTop();
   }
 
+  private teardownCurvedLine(connector: Konva.Group) {
+    const curvedControlNodeHandler = this.instance
+      .getSelectionLayer()
+      ?.findOne<Konva.Circle>(`#${connector.id()}-curvedControlNodeHandler`);
+    curvedControlNodeHandler?.destroy();
+  }
+
   private teardownSelection(
     connector: Konva.Group,
     onlyConnector: boolean = false
@@ -1245,7 +1401,7 @@ export class WeaveConnectorNode extends WeaveNode {
           fill: '#ff2c2cff',
         });
         prevCursor = this.instance.getStage().container().style.cursor;
-        this.instance.getStage().container().style.cursor = 'crosshair';
+        this.instance.getStage().container().style.cursor = 'move';
         e.cancelBubble = true;
       });
 
@@ -1414,5 +1570,61 @@ export class WeaveConnectorNode extends WeaveNode {
         children: [],
       },
     };
+  }
+
+  changeConnectorType(connector: Konva.Group, type: WeaveConnectorLineType) {
+    if (type === WEAVE_CONNECTOR_NODE_LINE_TYPE.STRAIGHT) {
+      const connectorLine = connector.findOne<Konva.Line>(
+        `#${connector.getAttrs().id}-line`
+      );
+
+      if (!connectorLine) {
+        return;
+      }
+
+      connectorLine.setAttrs({
+        bezier: false,
+      });
+
+      connector.setAttrs({
+        lineType: WEAVE_CONNECTOR_NODE_LINE_TYPE.STRAIGHT,
+        curvedControlPoint: undefined,
+      });
+    }
+    if (type === WEAVE_CONNECTOR_NODE_LINE_TYPE.CURVED) {
+      const connectorLine = connector.findOne<Konva.Line>(
+        `#${connector.getAttrs().id}-line`
+      );
+
+      if (!connectorLine) {
+        return;
+      }
+
+      const connectorPos = connector.position();
+      const points = connectorLine.points();
+
+      const defaultControlPoint = {
+        x: connectorPos.x + (points[0] + points[points.length - 2]) / 2,
+        y: connectorPos.y + (points[1] + points[points.length - 1]) / 2,
+      };
+
+      connectorLine.setAttrs({
+        bezier: true,
+      });
+
+      connector.setAttrs({
+        lineType: WEAVE_CONNECTOR_NODE_LINE_TYPE.CURVED,
+        curvedControlPoint: defaultControlPoint,
+      });
+    }
+    if (type === WEAVE_CONNECTOR_NODE_LINE_TYPE.ELBOW) {
+      connector.setAttrs({
+        lineType: WEAVE_CONNECTOR_NODE_LINE_TYPE.ELBOW,
+        curvedControlPoint: undefined,
+      });
+    }
+
+    this.updateLinePosition(connector);
+    this.instance.updateNodeNT(this.serialize(connector));
   }
 }
