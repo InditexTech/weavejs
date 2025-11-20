@@ -80,7 +80,7 @@ export class WeaveCopyPasteNodesPlugin extends WeavePlugin {
   private writeClipboardImage(base64Data: string) {
     return new Promise<void>((resolve, reject) => {
       setTimeout(async () => {
-        if (typeof navigator.clipboard === 'undefined') {
+        if (navigator.clipboard === undefined) {
           return reject(new Error('Clipboard API not supported'));
         }
 
@@ -105,7 +105,7 @@ export class WeaveCopyPasteNodesPlugin extends WeavePlugin {
   private writeClipboardData(data: string) {
     return new Promise<void>((resolve, reject) => {
       setTimeout(async () => {
-        if (typeof navigator.clipboard === 'undefined') {
+        if (navigator.clipboard === undefined) {
           return reject(new Error('Clipboard API not supported'));
         }
 
@@ -480,50 +480,31 @@ export class WeaveCopyPasteNodesPlugin extends WeavePlugin {
     this.cancel();
   }
 
-  private async handleCopy(toImage?: true) {
-    if (!this.enabled) {
-      return;
+  private async finishHandleCopy() {
+    this.actualInternalPaddingX = 0;
+    this.actualInternalPaddingY = 0;
+    this.lastInternalPasteSnapshot = '';
+
+    this.instance.emitEvent<WeaveCopyPasteNodesPluginOnCopyEvent>('onCopy');
+  }
+
+  private async handleCopyAsImage(selectedNodes: Konva.Node[]) {
+    try {
+      const imageBase64Data = await this.getImageBase64(
+        this.instance,
+        selectedNodes
+      );
+      await this.writeClipboardImage(imageBase64Data);
+      this.finishHandleCopy();
+    } catch (ex) {
+      this.instance.emitEvent<WeaveCopyPasteNodesPluginOnCopyEvent>('onCopy', {
+        error: ex as Error,
+      });
     }
+  }
 
-    this.instance.emitEvent<undefined>('onPrepareCopy');
-
+  private async handleCopyAsWeaveData(selectedNodes: Konva.Node[]) {
     const stage = this.instance.getStage();
-
-    stage.container().style.cursor = 'default';
-    stage.container().focus();
-
-    this.setState(COPY_PASTE_NODES_PLUGIN_STATE.IDLE);
-
-    const nodesSelectionPlugin = this.getNodesSelectionPlugin();
-    const selectedNodes = nodesSelectionPlugin?.getSelectedNodes();
-    if (!selectedNodes || selectedNodes.length === 0) {
-      return;
-    }
-
-    if (toImage) {
-      try {
-        const imageBase64Data = await this.getImageBase64(
-          this.instance,
-          selectedNodes
-        );
-        await this.writeClipboardImage(imageBase64Data);
-
-        this.actualInternalPaddingX = 0;
-        this.actualInternalPaddingY = 0;
-        this.lastInternalPasteSnapshot = '';
-
-        this.instance.emitEvent<WeaveCopyPasteNodesPluginOnCopyEvent>('onCopy');
-      } catch (ex) {
-        this.instance.emitEvent<WeaveCopyPasteNodesPluginOnCopyEvent>(
-          'onCopy',
-          {
-            error: ex as Error,
-          }
-        );
-      }
-
-      return;
-    }
 
     const box = getBoundingBox(selectedNodes, {
       relativeTo: stage,
@@ -574,17 +555,40 @@ export class WeaveCopyPasteNodesPlugin extends WeavePlugin {
 
     try {
       await this.writeClipboardData(JSON.stringify(copyClipboard));
-
-      this.actualInternalPaddingX = 0;
-      this.actualInternalPaddingY = 0;
-      this.lastInternalPasteSnapshot = '';
-
-      this.instance.emitEvent<WeaveCopyPasteNodesPluginOnCopyEvent>('onCopy');
+      this.finishHandleCopy();
     } catch (ex) {
       this.instance.emitEvent<WeaveCopyPasteNodesPluginOnCopyEvent>('onCopy', {
         error: ex as Error,
       });
     }
+  }
+
+  private async handleCopy(toImage?: true) {
+    if (!this.enabled) {
+      return;
+    }
+
+    this.instance.emitEvent<undefined>('onPrepareCopy');
+
+    const stage = this.instance.getStage();
+
+    stage.container().style.cursor = 'default';
+    stage.container().focus();
+
+    this.setState(COPY_PASTE_NODES_PLUGIN_STATE.IDLE);
+
+    const nodesSelectionPlugin = this.getNodesSelectionPlugin();
+    const selectedNodes = nodesSelectionPlugin?.getSelectedNodes();
+    if (!selectedNodes || selectedNodes.length === 0) {
+      return;
+    }
+
+    if (toImage) {
+      await this.handleCopyAsImage(selectedNodes);
+      return;
+    }
+
+    await this.handleCopyAsWeaveData(selectedNodes);
   }
 
   async copy(toImage?: true): Promise<void> {
