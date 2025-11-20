@@ -6,6 +6,7 @@ import { WeavePlugin } from '@/plugins/plugin';
 import { v4 as uuidv4 } from 'uuid';
 import {
   type NodeSerializable,
+  type WeaveElementInstance,
   type WeaveStateElement,
 } from '@inditextech/weave-types';
 import {
@@ -540,7 +541,9 @@ export class WeaveCopyPasteNodesPlugin extends WeavePlugin {
         continue;
       }
 
-      const serializedNode = nodeHandler.serialize(node);
+      const serializedNode = nodeHandler.serialize(
+        node as WeaveElementInstance
+      );
       const nodeBox = node.getClientRect({ relativeTo: stage });
 
       copyClipboard.weave[serializedNode.key ?? ''] = {
