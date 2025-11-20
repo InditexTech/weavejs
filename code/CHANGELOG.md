@@ -13,6 +13,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.6.0] - 2025-11-20
+
+### Fixed
+
+- [#802](https://github.com/InditexTech/weavejs/issues/802) Don't copy to clipboard Weave.js data and image data, make separate API
+
 ## [2.5.0] - 2025-11-19
 
 \### Added
@@ -1361,7 +1367,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - [#24](https://github.com/InditexTech/weavejs/issues/24) Bug when loading rooms with text or images
 - [#18](https://github.com/InditexTech/weavejs/issues/18) Fix awareness not working on store-azure-web-pubsub
 
-[Unreleased]: https://github.com/InditexTech/weavejs/compare/2.5.0...HEAD
+[Unreleased]: https://github.com/InditexTech/weavejs/compare/2.6.0...HEAD
+
+[2.6.0]: https://github.com/InditexTech/weavejs/compare/2.5.0...2.6.0
 
 [2.5.0]: https://github.com/InditexTech/weavejs/compare/2.4.0...2.5.0
 
