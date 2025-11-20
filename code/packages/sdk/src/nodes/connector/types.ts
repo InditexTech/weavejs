@@ -39,3 +39,5 @@ export type WeaveConnectorInfo =
       type: 'point';
       point: Konva.Vector2d;
     };
+
+export type WeaveConnectorPointPosition = 'top' | 'bottom' | 'left' | 'right';

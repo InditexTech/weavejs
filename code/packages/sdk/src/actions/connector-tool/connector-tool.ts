@@ -276,6 +276,10 @@ export class WeaveConnectorToolAction extends WeaveAction {
       endPoint: this.endPoint,
       endNodeId: this.endNodeId,
       endNodeAnchor: this.endNodeAnchor,
+      pointerAtBeginning: false,
+      pointerAtEnd: false,
+      pointerLength: 10,
+      pointerWidth: 10,
       hitStrokeWidth: 16,
     });
     this.instance.addNode(node, this.container?.getAttrs().id);
