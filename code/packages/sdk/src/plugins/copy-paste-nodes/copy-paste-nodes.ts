@@ -6,6 +6,7 @@ import { WeavePlugin } from '@/plugins/plugin';
 import { v4 as uuidv4 } from 'uuid';
 import {
   type NodeSerializable,
+  type WeaveElementInstance,
   type WeaveStateElement,
 } from '@inditextech/weave-types';
 import {
@@ -77,18 +78,40 @@ export class WeaveCopyPasteNodesPlugin extends WeavePlugin {
     this.initEvents();
   }
 
-  private writeClipboardData(base64Data: string, data: string) {
+  private writeClipboardImage(base64Data: string) {
     return new Promise<void>((resolve, reject) => {
       setTimeout(async () => {
-        if (typeof navigator.clipboard === 'undefined') {
+        if (navigator.clipboard === undefined) {
           return reject(new Error('Clipboard API not supported'));
         }
 
         const res = await fetch(base64Data);
         const imageBlob = await res.blob();
-        const textBlob = new Blob([data], { type: 'text/plain' });
         const item = new ClipboardItem({
           [imageBlob.type]: imageBlob,
+        });
+
+        navigator.clipboard
+          .write([item])
+          .then(() => {
+            resolve();
+          })
+          .catch((error) => {
+            reject(error);
+          });
+      });
+    });
+  }
+
+  private writeClipboardData(data: string) {
+    return new Promise<void>((resolve, reject) => {
+      setTimeout(async () => {
+        if (navigator.clipboard === undefined) {
+          return reject(new Error('Clipboard API not supported'));
+        }
+
+        const textBlob = new Blob([data], { type: 'text/plain' });
+        const item = new ClipboardItem({
           [textBlob.type]: textBlob,
         });
 
@@ -458,25 +481,31 @@ export class WeaveCopyPasteNodesPlugin extends WeavePlugin {
     this.cancel();
   }
 
-  private async handleCopy() {
-    if (!this.enabled) {
-      return;
+  private async finishHandleCopy() {
+    this.actualInternalPaddingX = 0;
+    this.actualInternalPaddingY = 0;
+    this.lastInternalPasteSnapshot = '';
+
+    this.instance.emitEvent<WeaveCopyPasteNodesPluginOnCopyEvent>('onCopy');
+  }
+
+  private async handleCopyAsImage(selectedNodes: Konva.Node[]) {
+    try {
+      const imageBase64Data = await this.getImageBase64(
+        this.instance,
+        selectedNodes
+      );
+      await this.writeClipboardImage(imageBase64Data);
+      this.finishHandleCopy();
+    } catch (ex) {
+      this.instance.emitEvent<WeaveCopyPasteNodesPluginOnCopyEvent>('onCopy', {
+        error: ex as Error,
+      });
     }
+  }
 
-    this.instance.emitEvent<undefined>('onPrepareCopy');
-
+  private async handleCopyAsWeaveData(selectedNodes: Konva.Node[]) {
     const stage = this.instance.getStage();
-
-    stage.container().style.cursor = 'default';
-    stage.container().focus();
-
-    this.setState(COPY_PASTE_NODES_PLUGIN_STATE.IDLE);
-
-    const nodesSelectionPlugin = this.getNodesSelectionPlugin();
-    const selectedNodes = nodesSelectionPlugin?.getSelectedNodes();
-    if (!selectedNodes || selectedNodes.length === 0) {
-      return;
-    }
 
     const box = getBoundingBox(selectedNodes, {
       relativeTo: stage,
@@ -512,7 +541,9 @@ export class WeaveCopyPasteNodesPlugin extends WeavePlugin {
         continue;
       }
 
-      const serializedNode = nodeHandler.serialize(node);
+      const serializedNode = nodeHandler.serialize(
+        node as WeaveElementInstance
+      );
       const nodeBox = node.getClientRect({ relativeTo: stage });
 
       copyClipboard.weave[serializedNode.key ?? ''] = {
@@ -526,20 +557,8 @@ export class WeaveCopyPasteNodesPlugin extends WeavePlugin {
     }
 
     try {
-      const imageBase64Data = await this.getImageBase64(
-        this.instance,
-        selectedNodes
-      );
-      await this.writeClipboardData(
-        imageBase64Data,
-        JSON.stringify(copyClipboard)
-      );
-
-      this.actualInternalPaddingX = 0;
-      this.actualInternalPaddingY = 0;
-      this.lastInternalPasteSnapshot = '';
-
-      this.instance.emitEvent<WeaveCopyPasteNodesPluginOnCopyEvent>('onCopy');
+      await this.writeClipboardData(JSON.stringify(copyClipboard));
+      this.finishHandleCopy();
     } catch (ex) {
       this.instance.emitEvent<WeaveCopyPasteNodesPluginOnCopyEvent>('onCopy', {
         error: ex as Error,
@@ -547,8 +566,36 @@ export class WeaveCopyPasteNodesPlugin extends WeavePlugin {
     }
   }
 
-  async copy(): Promise<void> {
-    await this.handleCopy();
+  private async handleCopy(toImage?: true) {
+    if (!this.enabled) {
+      return;
+    }
+
+    this.instance.emitEvent<undefined>('onPrepareCopy');
+
+    const stage = this.instance.getStage();
+
+    stage.container().style.cursor = 'default';
+    stage.container().focus();
+
+    this.setState(COPY_PASTE_NODES_PLUGIN_STATE.IDLE);
+
+    const nodesSelectionPlugin = this.getNodesSelectionPlugin();
+    const selectedNodes = nodesSelectionPlugin?.getSelectedNodes();
+    if (!selectedNodes || selectedNodes.length === 0) {
+      return;
+    }
+
+    if (toImage) {
+      await this.handleCopyAsImage(selectedNodes);
+      return;
+    }
+
+    await this.handleCopyAsWeaveData(selectedNodes);
+  }
+
+  async copy(toImage?: true): Promise<void> {
+    await this.handleCopy(toImage);
   }
 
   async paste(
