@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState } from "react";
 
 export function useMounted() {
   const [mounted, setMounted] = useState(false);

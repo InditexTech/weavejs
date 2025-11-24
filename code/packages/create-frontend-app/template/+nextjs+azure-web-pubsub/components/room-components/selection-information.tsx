@@ -1,7 +1,7 @@
-'use client';
+"use client";
 
-import React from 'react';
-import { useWeave } from '@inditextech/weave-react';
+import React from "react";
+import { useWeave } from "@inditextech/weave-react";
 
 export const SelectionInformation = () => {
   const instance = useWeave((state) => state.instance);
@@ -33,13 +33,13 @@ export const SelectionInformation = () => {
                 height: box.height * stage.scaleY(),
                 callback(img) {
                   const containerNode = document.getElementById(
-                    `selection_${node.node.key}_image_container`
+                    `selection_${node.node.key}_image_container`,
                   );
                   if (containerNode) {
-                    containerNode.innerHTML = '';
-                    img.style.width = '100%';
-                    img.style.height = '100%';
-                    img.style.objectFit = 'contain';
+                    containerNode.innerHTML = "";
+                    img.style.width = "100%";
+                    img.style.height = "100%";
+                    img.style.objectFit = "contain";
                     containerNode.appendChild(img);
                   }
                 },

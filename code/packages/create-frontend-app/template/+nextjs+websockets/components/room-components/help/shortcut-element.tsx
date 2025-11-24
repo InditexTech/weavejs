@@ -1,6 +1,6 @@
-import React from 'react';
-import { SYSTEM_OS } from '@/lib/utils';
-import { useGetOs } from '../hooks/use-get-os';
+import React from "react";
+import { SYSTEM_OS } from "@/lib/utils";
+import { useGetOs } from "../hooks/use-get-os";
 
 type ShortcutElement = {
   shortcuts: Record<string, string>;

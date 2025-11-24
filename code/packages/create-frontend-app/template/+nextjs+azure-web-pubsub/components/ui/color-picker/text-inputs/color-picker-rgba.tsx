@@ -1,8 +1,8 @@
-import { Input } from '@/components/ui/input';
-import { cn } from '@/lib/utils';
-import Color from 'color';
-import { type HTMLAttributes, useCallback, useEffect, useState } from 'react';
-import { useColorPicker } from '../context/color-picker-context';
+import { Input } from "@/components/ui/input";
+import { cn } from "@/lib/utils";
+import Color from "color";
+import { type HTMLAttributes, useCallback, useEffect, useState } from "react";
+import { useColorPicker } from "../context/color-picker-context";
 
 export type ColorPickerFormatEditorProps = HTMLAttributes<HTMLDivElement>;
 
@@ -35,25 +35,25 @@ export const ColorPickerRGBAInput = ({
       setColor(newColor);
     } catch (error) {
       setError(true);
-      console.error('Invalid color value', error);
+      console.error("Invalid color value", error);
     }
   }, [actualValue, setColor]);
 
   const handleKeyDown = useCallback(
     (e: React.KeyboardEvent<HTMLInputElement>) => {
-      if (e.key === 'Enter') {
+      if (e.key === "Enter") {
         e.preventDefault();
         e.stopPropagation();
         const input = e.target as HTMLInputElement;
         input.blur();
       }
     },
-    []
+    [],
   );
 
   return (
     <div
-      className={cn('relative flex items-center gap-0.5', className)}
+      className={cn("relative flex items-center gap-0.5", className)}
       {...props}
     >
       <Input
@@ -65,9 +65,9 @@ export const ColorPickerRGBAInput = ({
         maxLength={25}
         aria-label="RGBA color value"
         className={cn(
-          'h-8 rounded-none !text-[14px] font-normal text-black !border-black text-right focus:outline-none bg-transparent',
-          error && 'border-red-500',
-          !error && 'border-zinc-200'
+          "h-8 rounded-none !text-[14px] font-normal text-black !border-black text-right focus:outline-none bg-transparent",
+          error && "border-red-500",
+          !error && "border-zinc-200",
         )}
       />
     </div>

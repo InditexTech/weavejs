@@ -1,6 +1,6 @@
-import { motion } from 'framer-motion';
-import { rightElementVariants } from './variants';
-import { SelectionInformation } from '../selection-information';
+import { motion } from "framer-motion";
+import { rightElementVariants } from "./variants";
+import { SelectionInformation } from "../selection-information";
 
 function OverlayAnimationWrapper({
   children,

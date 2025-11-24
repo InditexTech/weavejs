@@ -1,62 +1,100 @@
-'use client';
+"use client";
 
-import React from 'react';
-import { useInfiniteQuery, useMutation } from '@tanstack/react-query';
-import { Plus, Trash, X } from 'lucide-react';
-import { useWeave } from '@inditextech/weave-react';
-import { useCollaborationRoom } from '@/store/store';
-import { getImages } from '@/api/get-images';
-import { postImage } from '@/api/post-image';
-import { delImage } from '@/api/del-image';
-import { SIDEBAR_ELEMENTS } from '@/lib/constants';
+import React from "react";
+import Masonry from "react-responsive-masonry";
+import { useInfiniteQuery, useMutation } from "@tanstack/react-query";
+import { Plus, Trash } from "lucide-react";
+import { useWeave } from "@inditextech/weave-react";
+import { useCollaborationRoom } from "@/store/store";
+import { getImages } from "@/api/get-images";
+import { postImage } from "@/api/post-image";
+import { delImage } from "@/api/del-image";
+import {
+  WeaveStateElement,
+  WeaveElementAttributes,
+} from "@inditextech/weave-types";
+import { SIDEBAR_ELEMENTS } from "@/lib/constants";
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
-} from '@/components/ui/tooltip';
-import { ScrollArea } from '@/components/ui/scroll-area';
-import { SidebarSelector } from '../sidebar-selector';
+} from "@/components/ui/tooltip";
+import { Badge } from "@/components/ui/badge";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { SidebarSelector } from "../sidebar-selector";
 
 export const ImagesLibrary = () => {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const inputFileRef = React.useRef<any>(null);
 
   const instance = useWeave((state) => state.instance);
+  const appState = useWeave((state) => state.appState);
 
   const room = useCollaborationRoom((state) => state.room);
-  const sidebarLeftActive = useCollaborationRoom(
-    (state) => state.sidebar.left.active
-  );
-  const setSidebarActive = useCollaborationRoom(
-    (state) => state.setSidebarActive
-  );
+  const sidebarActive = useCollaborationRoom((state) => state.sidebar.active);
 
   const mutationUpload = useMutation({
     mutationFn: async (file: File) => {
-      return await postImage(room ?? '', file);
+      return await postImage(room ?? "", file);
     },
   });
 
   const mutationDelete = useMutation({
     mutationFn: async (imageId: string) => {
-      return await delImage(room ?? '', imageId);
+      return await delImage(room ?? "", imageId);
     },
   });
 
   const query = useInfiniteQuery({
-    queryKey: ['getImages', room],
+    queryKey: ["getImages", room],
     queryFn: async ({ pageParam }) => {
       if (!room) {
         return [];
       }
-      return await getImages(room ?? '', 20, pageParam);
+      return await getImages(room ?? "", 20, pageParam);
     },
-    initialPageParam: '',
+    initialPageParam: "",
     getNextPageParam: (lastPage) => lastPage.continuationToken,
   });
 
-  const linearData = React.useMemo(() => {
+  const appImages = React.useMemo(() => {
+    function extractImages(
+      images: WeaveStateElement[],
+      node: WeaveStateElement,
+    ) {
+      if (node.props && node.props.nodeType === "image" && node.props.imageId) {
+        images.push(node);
+      }
+      if (node.props && node.props.children) {
+        for (const child of node.props.children) {
+          extractImages(images, child);
+        }
+      }
+    }
+
+    const mainStateProps: WeaveElementAttributes = appState.weave
+      .props as WeaveElementAttributes;
+
+    const mainStateChildren: WeaveStateElement[] | undefined =
+      mainStateProps?.children;
+    const mainLayerElement: WeaveStateElement | undefined =
+      mainStateChildren?.find((child: WeaveStateElement) => {
+        return child.key === "mainLayer";
+      });
+
+    const images: WeaveStateElement[] = [];
+
+    if (typeof mainLayerElement === "undefined") {
+      return images;
+    }
+
+    extractImages(images, mainLayerElement);
+
+    return images;
+  }, [appState]);
+
+  const images = React.useMemo(() => {
     return query.data?.pages.flatMap((page) => page.images) ?? [];
   }, [query.data]);
 
@@ -64,7 +102,7 @@ export const ImagesLibrary = () => {
     return null;
   }
 
-  if (sidebarLeftActive !== SIDEBAR_ELEMENTS.images) {
+  if (sidebarActive !== SIDEBAR_ELEMENTS.images) {
     return null;
   }
 
@@ -116,27 +154,20 @@ export const ImagesLibrary = () => {
               </TooltipContent>
             </Tooltip>
           </TooltipProvider>
-          <button
-            className="cursor-pointer flex justify-center items-center w-[20px] h-[40px] text-center bg-transparent hover:text-[#c9c9c9]"
-            onClick={() => {
-              setSidebarActive(null);
-            }}
-          >
-            <X size={20} strokeWidth={1} />
-          </button>
         </div>
       </div>
       <ScrollArea className="w-full h-[calc(100%-95px)] overflow-auto">
         <div className="flex flex-col gap-2 w-full">
           <div
-            className="grid grid-cols-2 gap-2 w-full weaveDraggable p-[24px]"
+            className="grid grid-cols-1 gap-0 w-full weaveDraggable"
             onDragStart={(e) => {
               if (e.target instanceof HTMLImageElement) {
                 window.weaveDragImageURL = e.target.src;
+                window.weaveDragImageId = e.target.dataset.imageId;
               }
             }}
           >
-            {linearData.length === 0 && (
+            {images.length === 0 && (
               <div className="col-span-2 w-full mt-[24px] flex flex-col justify-center items-center text-sm text-center font-inter font-light">
                 <b className="font-normal text-[18px]">No images uploaded</b>
                 <span className="text-[14px]">
@@ -144,37 +175,59 @@ export const ImagesLibrary = () => {
                 </span>
               </div>
             )}
-            {linearData.length > 0 &&
-              linearData.map((image) => {
-                const imageUrl = `${process.env.NEXT_PUBLIC_API_ENDPOINT}/${process.env.NEXT_PUBLIC_API_ENDPOINT_HUB_NAME}/rooms/${room}/images/${image}`;
+            {images.length > 0 && (
+              <Masonry sequential columnsCount={2} gutter="1px">
+                {images.map((image) => {
+                  const appImage = appImages.find(
+                    (appImage) => appImage.props.imageId === image,
+                  );
 
-                return (
-                  <div
-                    key={image}
-                    className="group w-full h-[100px] bg-light-background-1 object-cover cursor-pointer border border-zinc-200 relative"
-                  >
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img
-                      className="w-full h-full object-cover"
-                      draggable="true"
-                      src={imageUrl}
-                      alt="An image"
-                    />
-                    <button
-                      className="absolute bottom-[8px] right-[8px] bg-white p-2 border border-zinc-200 rounded hidden group-hover:block cursor-pointer"
-                      onClick={() => {
-                        mutationDelete.mutate(image, {
-                          onSuccess: () => {
-                            query.refetch();
-                          },
-                        });
-                      }}
+                  console.log("appImage", image, appImages, appImage);
+
+                  const imageUrl = `${process.env.NEXT_PUBLIC_API_ENDPOINT}/rooms/${room}/images/${image}`;
+
+                  return (
+                    <div
+                      key={image}
+                      className="group w-full h-full bg-light-background-1 object-cover cursor-pointer border border-zinc-200 relative"
                     >
-                      <Trash size={16} />
-                    </button>
-                  </div>
-                );
-              })}
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img
+                        className="w-full h-full object-cover"
+                        draggable="true"
+                        src={imageUrl}
+                        data-image-id={image}
+                        alt="An image"
+                      />
+                      {typeof appImage !== "undefined" && (
+                        <div className="absolute right-0 bottom-0 hidden group-hover:flex gap-1 justify-start items-end p-2">
+                          <Badge
+                            className="px-1 font-inter tabular-nums rounded font-inter text-[11px]"
+                            variant="default"
+                          >
+                            IN USE
+                          </Badge>
+                        </div>
+                      )}
+                      {typeof appImage === "undefined" && (
+                        <button
+                          className="absolute bottom-[8px] right-[8px] bg-white p-2 border border-zinc-200 rounded hidden group-hover:block cursor-pointer"
+                          onClick={() => {
+                            mutationDelete.mutate(image, {
+                              onSuccess: () => {
+                                query.refetch();
+                              },
+                            });
+                          }}
+                        >
+                          <Trash size={16} />
+                        </button>
+                      )}
+                    </div>
+                  );
+                })}
+              </Masonry>
+            )}
           </div>
         </div>
       </ScrollArea>

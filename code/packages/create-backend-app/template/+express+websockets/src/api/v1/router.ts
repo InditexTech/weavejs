@@ -7,6 +7,7 @@ import { postUploadImageController } from './controllers/postUploadImage.js'
 import { delImageController } from './controllers/delImage.js'
 import { getImagesController } from './controllers/getImages.js'
 import { postRemoveBackgroundController } from './controllers/postRemoveBackground.js'
+import { postExportToImageController } from './controllers/postExportToImage.js'
 
 const router: Router = Router()
 
@@ -24,7 +25,7 @@ export function setupApiV1Router(app: Express) {
   router.get(`/health`, getHealthController())
 
   // Room handling API
-  router.get(`/sync/rooms/:roomId`, getRoomConnectController())
+  router.get(`/rooms/:roomId/connect`, getRoomConnectController())
 
   // Images handling API
   router.get(`/rooms/:roomId/images`, getImagesController())
@@ -39,6 +40,9 @@ export function setupApiV1Router(app: Express) {
     postUploadImageController()
   )
   router.delete(`/rooms/:roomId/images/:imageId`, delImageController())
+
+  // Render Canvas API
+  router.post(`/export`, postExportToImageController())
 
   app.use('/api/v1', router)
 }

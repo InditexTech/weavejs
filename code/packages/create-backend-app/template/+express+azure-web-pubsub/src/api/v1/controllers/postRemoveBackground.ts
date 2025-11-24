@@ -1,4 +1,3 @@
-import fs from 'node:fs'
 import path from 'node:path'
 import { Request, Response } from 'express'
 import { removeBackground } from '@imgly/background-removal-node'
@@ -36,7 +35,7 @@ export const postRemoveBackgroundController = () => {
           const data = await myBlobToUIntDemo(blob)
           const fileNameRemoved = `${fileName}-removed`
           await persistenceHandler.persist(fileNameRemoved, 'image/png', data)
-          fs.rmSync(filePathDownload)
+          // fs.rmSync(filePathDownload)
 
           res.status(201).json({
             status: 'Image created OK',

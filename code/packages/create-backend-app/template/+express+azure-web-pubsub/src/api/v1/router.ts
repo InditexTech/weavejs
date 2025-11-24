@@ -1,6 +1,5 @@
 import { Express, Router } from 'express'
 import multer from 'multer'
-import { getAzureWebPubsubServer } from '@/store'
 import { getHealthController } from './controllers/getHealth.js'
 import { getRoomConnectController } from './controllers/getRoomConnect.js'
 import { getImageController } from './controllers/getImage.js'
@@ -8,6 +7,8 @@ import { postUploadImageController } from './controllers/postUploadImage.js'
 import { delImageController } from './controllers/delImage.js'
 import { getImagesController } from './controllers/getImages.js'
 import { postRemoveBackgroundController } from './controllers/postRemoveBackground.js'
+import { postExportToImageController } from './controllers/postExportToImage.js'
+import { getRoomController } from './controllers/getRoom.js'
 
 const router: Router = Router()
 
@@ -25,7 +26,7 @@ export function setupApiV1Router(app: Express) {
   router.get(`/health`, getHealthController())
 
   // Room handling API
-  router.use(getAzureWebPubsubServer().getMiddleware())
+  router.get(`/rooms/:roomId`, getRoomController())
   router.get(`/rooms/:roomId/connect`, getRoomConnectController())
 
   // Images handling API
@@ -41,6 +42,9 @@ export function setupApiV1Router(app: Express) {
     postUploadImageController()
   )
   router.delete(`/rooms/:roomId/images/:imageId`, delImageController())
+
+  // Render Canvas API
+  router.post(`/export`, postExportToImageController())
 
   app.use('/api/v1', router)
 }

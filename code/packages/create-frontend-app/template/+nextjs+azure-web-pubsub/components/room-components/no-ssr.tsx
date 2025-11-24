@@ -2,10 +2,10 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-'use client';
+"use client";
 
-import React from 'react';
-import { useMounted } from '@/components/room-components/hooks/use-mounted.tsx';
+import React from "react";
+import { useMounted } from "@/components/room-components/hooks/use-mounted.tsx";
 
 export function NoSsr({ children }) {
   const mounted = useMounted();

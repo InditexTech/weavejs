@@ -1,14 +1,14 @@
-'use client';
+"use client";
 
-import React from 'react';
-import { WeaveStateElement } from '@inditextech/weave-types';
-import { Check, X, Crop, RotateCcw } from 'lucide-react';
-import { useWeave } from '@inditextech/weave-react';
-import { useCollaborationRoom } from '@/store/store';
-import { InputNumber } from '../inputs/input-number';
-import Konva from 'konva';
-import { ToggleIconButton } from '../toggle-icon-button';
-import { WeaveImageOnCropStartEvent } from '@inditextech/weave-sdk';
+import React from "react";
+import { WeaveStateElement } from "@inditextech/weave-types";
+import { Check, X, Crop, RotateCcw } from "lucide-react";
+import { useWeave } from "@inditextech/weave-react";
+import { useCollaborationRoom } from "@/store/store";
+import { InputNumber } from "../inputs/input-number";
+import Konva from "konva";
+import { ToggleIconButton } from "../toggle-icon-button";
+import { WeaveImageOnCropStartEvent } from "@inditextech/weave-sdk";
 
 export function CropProperties() {
   const instance = useWeave((state) => state.instance);
@@ -17,11 +17,11 @@ export function CropProperties() {
   const [isCropping, setIsCropping] = React.useState(false);
 
   const nodePropertiesAction = useCollaborationRoom(
-    (state) => state.nodeProperties.action
+    (state) => state.nodeProperties.action,
   );
 
   const actualNode = React.useMemo(() => {
-    if (node && nodePropertiesAction === 'update') {
+    if (node && nodePropertiesAction === "update") {
       return node;
     }
     return undefined;
@@ -30,12 +30,12 @@ export function CropProperties() {
   const updateElement = React.useCallback(
     (updatedNode: WeaveStateElement) => {
       if (!instance) return;
-      if (nodePropertiesAction === 'update') {
+      if (nodePropertiesAction === "update") {
         instance.updateNode(updatedNode);
         return;
       }
     },
-    [instance, nodePropertiesAction]
+    [instance, nodePropertiesAction],
   );
 
   const actualNodeInstance: Konva.Node | undefined = React.useMemo(() => {
@@ -45,7 +45,7 @@ export function CropProperties() {
     if (!stage) return undefined;
 
     const node: Konva.Group | undefined = stage.findOne(
-      `#${actualNode.key}`
+      `#${actualNode.key}`,
     ) as Konva.Group | undefined;
 
     if (!node) return undefined;
@@ -71,18 +71,18 @@ export function CropProperties() {
       }
     };
 
-    instance.addEventListener('onImageCropStart', handleCropStart);
-    instance.addEventListener('onImageCropEnd', handleCropEnd);
+    instance.addEventListener("onImageCropStart", handleCropStart);
+    instance.addEventListener("onImageCropEnd", handleCropEnd);
 
     return () => {
-      instance.removeEventListener('onImageCropStart', handleCropStart);
-      instance.removeEventListener('onImageCropEnd', handleCropEnd);
+      instance.removeEventListener("onImageCropStart", handleCropStart);
+      instance.removeEventListener("onImageCropEnd", handleCropEnd);
     };
   }, [instance, actualNodeInstance]);
 
   if (!instance || !actualNode) return null;
 
-  if (!['image'].includes(actualNode.type)) {
+  if (!["image"].includes(actualNode.type)) {
     return null;
   }
 
@@ -101,7 +101,7 @@ export function CropProperties() {
                 className="flex items-center justify-center cursor-pointer p-1 hover:bg-[#f0f0f0]"
                 onClick={(e) => {
                   e.stopPropagation();
-                  actualNodeInstance.closeCrop('accept');
+                  actualNodeInstance.closeCrop("accept");
                 }}
               >
                 <Check size={20} strokeWidth={1} />
@@ -110,7 +110,7 @@ export function CropProperties() {
                 className="flex items-center justify-center cursor-pointer p-1 hover:bg-[#f0f0f0]"
                 onClick={(e) => {
                   e.stopPropagation();
-                  actualNodeInstance.closeCrop('cancel');
+                  actualNodeInstance.closeCrop("cancel");
                 }}
               >
                 <X size={20} strokeWidth={1} />

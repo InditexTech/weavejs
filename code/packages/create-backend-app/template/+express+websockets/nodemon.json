@@ -1,0 +1,6 @@
+{
+  "watch": ["src"],
+  "ext": "ts,js,json",
+  "ignore": ["dist"],
+  "exec": "npm run build && npm run copy:assets && npm run copy:fonts && npm run start:dev"
+}

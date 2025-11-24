@@ -1,5 +1,5 @@
-import React from 'react';
-import { ShortcutElement } from './shortcut-element';
+import React from "react";
+import { ShortcutElement } from "./shortcut-element";
 
 type HelpShortcutElement = {
   icon: React.ReactElement;

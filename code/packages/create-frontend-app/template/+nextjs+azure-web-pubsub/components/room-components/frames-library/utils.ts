@@ -1,5 +1,5 @@
-import { Weave } from '@inditextech/weave-sdk';
-import Konva from 'konva';
+import { Weave } from "@inditextech/weave-sdk";
+import Konva from "konva";
 
 export type PresentationImage = {
   img: HTMLImageElement;
@@ -16,11 +16,11 @@ export const toImageAsync = (
     y: number;
     width: number;
     height: number;
-  }
+  },
 ): Promise<HTMLImageElement> => {
   return new Promise((resolve) => {
     node.toImage({
-      mimeType: 'image/png',
+      mimeType: "image/png",
       quality: 1,
       pixelRatio: properties.pixelRatio ?? 1,
       x: properties.x,
@@ -37,7 +37,7 @@ export const toImageAsync = (
 
 export async function generatePresentation(
   instance: Weave,
-  framesAvailable: Konva.Node[]
+  framesAvailable: Konva.Node[],
 ) {
   const stage = instance.getStage();
 
@@ -57,7 +57,7 @@ export async function generatePresentation(
       img,
       width: img.width,
       height: img.height,
-      alt: 'A frame image',
+      alt: "A frame image",
     });
   }
 

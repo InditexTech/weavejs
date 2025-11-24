@@ -1,12 +1,12 @@
-import { v4 as uuidv4 } from 'uuid';
+import { v4 as uuidv4 } from "uuid";
 import {
   ColorTokenToolActionState,
   ColorTokenToolActionTriggerParams,
-} from './types';
-import { COLOR_TOKEN_TOOL_STATE } from './constants';
-import { WeaveAction, WeaveNodesSelectionPlugin } from '@inditextech/weave-sdk';
-import Konva from 'konva';
-import { ColorTokenNode } from '@/components/nodes/color-token/color-token';
+} from "./types";
+import { COLOR_TOKEN_TOOL_STATE } from "./constants";
+import { WeaveAction, WeaveNodesSelectionPlugin } from "@inditextech/weave-sdk";
+import Konva from "konva";
+import { ColorTokenNode } from "@/components/nodes/color-token/color-token";
 
 export class ColorTokenToolAction extends WeaveAction {
   protected initialized: boolean = false;
@@ -28,12 +28,12 @@ export class ColorTokenToolAction extends WeaveAction {
   }
 
   getName(): string {
-    return 'colorTokenTool';
+    return "colorTokenTool";
   }
 
   initProps() {
     return {
-      colorToken: '#000000',
+      colorToken: "#000000",
       width: 300,
       height: 300,
       opacity: 1,
@@ -41,11 +41,11 @@ export class ColorTokenToolAction extends WeaveAction {
   }
 
   onInit() {
-    this.instance.addEventListener('onStageDrop', (e) => {
+    this.instance.addEventListener("onStageDrop", (e) => {
       if (window.colorTokenDragColor) {
         this.instance.getStage().setPointersPositions(e);
         const position = this.instance.getStage().getPointerPosition();
-        this.instance.triggerAction('colorTokenTool', {
+        this.instance.triggerAction("colorTokenTool", {
           color: window.colorTokenDragColor,
           position,
         });
@@ -57,14 +57,14 @@ export class ColorTokenToolAction extends WeaveAction {
   private setupEvents() {
     const stage = this.instance.getStage();
 
-    stage.container().addEventListener('keydown', (e) => {
-      if (e.key === 'Escape') {
+    stage.container().addEventListener("keydown", (e) => {
+      if (e.key === "Escape") {
         this.cancelAction();
         return;
       }
     });
 
-    stage.on('click tap', (e) => {
+    stage.on("click tap", (e) => {
       e.evt.preventDefault();
 
       if (this.state === COLOR_TOKEN_TOOL_STATE.IDLE) {
@@ -87,7 +87,7 @@ export class ColorTokenToolAction extends WeaveAction {
   private addColorToken(position?: Konva.Vector2d) {
     const stage = this.instance.getStage();
 
-    stage.container().style.cursor = 'crosshair';
+    stage.container().style.cursor = "crosshair";
     stage.container().blur();
     stage.container().focus();
 
@@ -111,7 +111,7 @@ export class ColorTokenToolAction extends WeaveAction {
     this.colorTokenId = uuidv4();
 
     const nodeHandler =
-      this.instance.getNodeHandler<ColorTokenNode>('color-token');
+      this.instance.getNodeHandler<ColorTokenNode>("color-token");
 
     const node = nodeHandler.create(this.colorTokenId, {
       ...this.props,
@@ -126,10 +126,10 @@ export class ColorTokenToolAction extends WeaveAction {
 
   trigger(
     cancelAction: () => void,
-    params?: ColorTokenToolActionTriggerParams
+    params?: ColorTokenToolActionTriggerParams,
   ) {
     if (!this.instance) {
-      throw new Error('Instance not defined');
+      throw new Error("Instance not defined");
     }
 
     if (!this.initialized) {
@@ -154,16 +154,16 @@ export class ColorTokenToolAction extends WeaveAction {
   cleanup() {
     const stage = this.instance.getStage();
 
-    stage.container().style.cursor = 'default';
+    stage.container().style.cursor = "default";
 
     const selectionPlugin =
-      this.instance.getPlugin<WeaveNodesSelectionPlugin>('nodesSelection');
+      this.instance.getPlugin<WeaveNodesSelectionPlugin>("nodesSelection");
     if (selectionPlugin) {
       const node = stage.findOne(`#${this.colorTokenId}`);
       if (node) {
         selectionPlugin.setSelectedNodes([node]);
       }
-      this.instance.triggerAction('selectionTool');
+      this.instance.triggerAction("selectionTool");
     }
 
     this.colorTokenId = null;

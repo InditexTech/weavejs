@@ -1,9 +1,9 @@
-'use client';
+"use client";
 
-import { AnimatePresence, motion } from 'framer-motion';
-import { Logo } from '@/components/utils/logo';
-import React from 'react';
-import ScrollVelocity from '@/components/ui/reactbits/TextAnimations/ScrollVelocity/ScrollVelocity';
+import { AnimatePresence, motion } from "framer-motion";
+import { Logo } from "@/components/utils/logo";
+import React from "react";
+import ScrollVelocity from "@/components/ui/reactbits/TextAnimations/ScrollVelocity/ScrollVelocity";
 
 type RoomLoaderProps = {
   roomId?: string;
@@ -14,12 +14,12 @@ type RoomLoaderProps = {
 const containerVariants = {
   hidden: {
     opacity: 1,
-    filter: 'blur(10px)',
+    filter: "blur(10px)",
     transition: { duration: 2, ease: [0.25, 0.1, 0.25, 1], staggerChildren: 0 },
   },
   visible: {
     opacity: 1,
-    filter: 'blur(0)',
+    filter: "blur(0)",
     transition: {
       duration: 1,
       ease: [0.25, 0.1, 0.25, 1],
@@ -30,12 +30,12 @@ const containerVariants = {
 
 const childVariants = {
   hidden: {
-    filter: 'blur(10px)',
+    filter: "blur(10px)",
     opacity: 0,
     transition: { duration: 0.2, ease: [0.25, 0.1, 0.25, 1] },
   },
   visible: {
-    filter: 'blur(0)',
+    filter: "blur(0)",
     opacity: 1,
     transition: { duration: 1, ease: [0.25, 0.1, 0.25, 1] },
   },
@@ -57,9 +57,9 @@ export function RoomLoader({
       <div className="absolute top-0 left-[-100px] right-[-100px] bottom-0 flex justify-center items-center">
         <ScrollVelocity
           texts={[
-            'collaborative - easy to use - extensible - visual - open source -',
-            'this is weave.js - this is weave.js - this is weave.js - this is weave.js -',
-            'intuitive - free - html5 canvas - real time - powerful -',
+            "collaborative - easy to use - extensible - visual - open source -",
+            "this is weave.js - this is weave.js - this is weave.js - this is weave.js -",
+            "intuitive - free - html5 canvas - real time - powerful -",
           ]}
           velocity={150}
           numCopies={20}

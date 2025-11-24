@@ -1,7 +1,9 @@
-import { useCollaborationRoom } from '@/store/store';
-import { WeaveUser } from '@inditextech/weave-types';
-import { WeaveStoreAzureWebPubsub } from '@inditextech/weave-store-azure-web-pubsub/client';
-import React from 'react';
+import { useCollaborationRoom } from "@/store/store";
+import { WeaveUser } from "@inditextech/weave-types";
+import { WeaveStoreAzureWebPubsub } from "@inditextech/weave-store-azure-web-pubsub/client";
+import React from "react";
+import { useQueryClient, useQuery } from "@tanstack/react-query";
+import { getRoom } from "@/api/get-room";
 
 function useGetAzureWebPubsubProvider({
   loadedParams,
@@ -10,12 +12,28 @@ function useGetAzureWebPubsubProvider({
   loadedParams: boolean;
   getUser: () => WeaveUser;
 }) {
+  const [wsProvider, setWsProvider] =
+    React.useState<WeaveStoreAzureWebPubsub | null>(null);
   const room = useCollaborationRoom((state) => state.room);
   const user = useCollaborationRoom((state) => state.user);
 
-  const wsProvider = React.useMemo(() => {
-    if (loadedParams && room && user) {
+  const { data: roomData, isFetched } = useQuery({
+    queryKey: ["roomData", room ?? ""],
+    queryFn: () => {
+      return getRoom(room ?? "");
+    },
+    initialData: undefined,
+    staleTime: 0,
+    retry: false,
+    enabled: typeof room !== "undefined" && typeof user !== "undefined",
+  });
+
+  const queryClient = useQueryClient();
+
+  React.useEffect(() => {
+    if (loadedParams && isFetched && room && user && !wsProvider) {
       const store = new WeaveStoreAzureWebPubsub(
+        roomData,
         {
           getUser,
           undoManagerOptions: {
@@ -24,15 +42,23 @@ function useGetAzureWebPubsubProvider({
         },
         {
           roomId: room,
-          url: `${process.env.NEXT_PUBLIC_API_ENDPOINT}/${process.env.NEXT_PUBLIC_API_ENDPOINT_HUB_NAME}/rooms/${room}/connect`,
-        }
+
+          url: `${process.env.NEXT_PUBLIC_API_ENDPOINT}/rooms/${room}/connect`,
+        },
       );
 
-      return store;
+      setWsProvider(store);
     }
-
-    return null;
-  }, [getUser, loadedParams, room, user]);
+  }, [
+    getUser,
+    isFetched,
+    wsProvider,
+    roomData,
+    queryClient,
+    loadedParams,
+    room,
+    user,
+  ]);
 
   return wsProvider;
 }

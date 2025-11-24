@@ -110,16 +110,19 @@ function createPackageJson(projectName: string, options: Options): object {
       ...pick(localVersions, [
         '@inditextech/weave-sdk',
         '@inditextech/weave-store-azure-web-pubsub',
+        '@inditextech/weave-store-standalone',
       ]),
       ...pick(versionPkg.dependencies, [
         '@dotenvx/dotenvx',
         '@imgly/background-removal-node',
+        'archiver',
         'cors',
         'dotenv',
         'express',
         'helmet',
         'morgan',
         'multer',
+        'p-queue',
         'pino',
         'pino-http',
         'pino-pretty',
@@ -133,6 +136,7 @@ function createPackageJson(projectName: string, options: Options): object {
     const devDependencies = {
       ...pick(versionPkg.devDependencies, [
         '@eslint/js',
+        '@types/archiver',
         '@types/cors',
         '@types/express',
         '@types/morgan',
@@ -144,6 +148,7 @@ function createPackageJson(projectName: string, options: Options): object {
         'eslint',
         'eslint-config-prettier',
         'globals',
+        'make-dir-cli',
         'nodemon',
         'prettier',
         'tsc-alias',
@@ -154,20 +159,23 @@ function createPackageJson(projectName: string, options: Options): object {
     };
 
     return {
+      ...versionPkg,
       name: projectName,
-      type: 'module',
       scripts: {
         build:
-          'tsc && tsc-alias -p tsconfig.json && mkdir -p ./dist/public && mkdir -p ./dist/temp && cp-cli ./public ./dist/public && cp-cli ./package.json ./dist/package.json',
-        copyAssets:
-          'mkdir -p ./public && cp-cli node_modules/@imgly/background-removal-node/dist/. public',
-        dev: 'nodemon --exec "dotenvx run -- tsx src/server.ts"',
+          'tsc && tsc-alias -p tsconfig.json && make-dir ./dist/public && make-dir ./dist/temp && cp-cli ./public ./dist/public && cp-cli ./package.json ./dist/package.json',
+        ['copy:assets']:
+          'make-dir ./public && cp-cli node_modules/@imgly/background-removal-node/dist/. public',
+        ['copy:fonts']: 'cp-cli fonts/. dist/fonts',
+        dev: 'nodemon',
         format: 'prettier --write "src/**/*.{ts,tsx}"',
         lint: 'eslint ./src',
-        postinstall: 'npm run copyAssets',
-        start: 'dotenvx run -- tsx server.js',
+        postinstall: 'npm run copy:assets',
+        start:
+          'node --experimental-specifier-resolution=node --loader --env-file=.env ts-node/esm dist/server.js',
+        ['start:dev']:
+          'cp-cli .env ./dist/.env && cd dist && NODE_ENV=development NODE_OPTIONS="--max-old-space-size=4096" node --env-file=.env ./server.js',
       },
-      private: true,
       dependencies: sortObjectKeys(dependencies),
       devDependencies: sortObjectKeys(devDependencies),
     };
@@ -177,12 +185,14 @@ function createPackageJson(projectName: string, options: Options): object {
     ...pick(versionPkg.dependencies, [
       '@dotenvx/dotenvx',
       '@imgly/background-removal-node',
+      'archiver',
       'cors',
       'dotenv',
       'express',
       'helmet',
       'morgan',
       'multer',
+      'p-queue',
       'pino',
       'pino-http',
       'pino-pretty',
@@ -194,12 +204,14 @@ function createPackageJson(projectName: string, options: Options): object {
     ...pick(localVersions, [
       '@inditextech/weave-sdk',
       '@inditextech/weave-store-websockets',
+      '@inditextech/weave-store-standalone',
     ]),
   };
 
   const devDependencies = {
     ...pick(versionPkg.devDependencies, [
       '@eslint/js',
+      '@types/archiver',
       '@types/cors',
       '@types/express',
       '@types/morgan',
@@ -211,6 +223,7 @@ function createPackageJson(projectName: string, options: Options): object {
       'eslint',
       'eslint-config-prettier',
       'globals',
+      'make-dir-cli',
       'nodemon',
       'prettier',
       'tsc-alias',
@@ -221,19 +234,22 @@ function createPackageJson(projectName: string, options: Options): object {
   };
 
   return {
+    ...versionPkg,
     name: projectName,
-    version: '0.0.0',
-    private: true,
     scripts: {
       build:
-        'tsc && tsc-alias -p tsconfig.json && mkdir -p ./dist/public && mkdir -p ./dist/temp && cp-cli ./public ./dist/public && cp-cli ./package.json ./dist/package.json',
-      copyAssets:
-        'mkdir -p ./public && cp-cli node_modules/@imgly/background-removal-node/dist/. public',
-      dev: 'nodemon --exec "dotenvx run -- tsx src/server.ts"',
+        'tsc && tsc-alias -p tsconfig.json && make-dir ./dist/public && make-dir ./dist/temp && cp-cli ./public ./dist/public && cp-cli ./package.json ./dist/package.json',
+      ['copy:assets']:
+        'make-dir ./public && cp-cli node_modules/@imgly/background-removal-node/dist/. public',
+      ['copy:fonts']: 'cp-cli fonts/. dist/fonts',
+      dev: 'nodemon',
       format: 'prettier --write "src/**/*.{ts,tsx}"',
       lint: 'eslint ./src',
-      postinstall: 'npm run copyAssets',
-      start: 'dotenvx run -- tsx server.js',
+      postinstall: 'npm run copy:assets',
+      start:
+        'node --experimental-specifier-resolution=node --loader --env-file=.env ts-node/esm dist/server.js',
+      ['start:dev']:
+        'cp-cli .env ./dist/.env && cd dist && NODE_ENV=development NODE_OPTIONS="--max-old-space-size=4096" node --env-file=.env ./server.js',
     },
     dependencies: sortObjectKeys(dependencies),
     devDependencies: sortObjectKeys(devDependencies),

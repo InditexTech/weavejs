@@ -1,7 +1,7 @@
-'use client';
+"use client";
 
-import React from 'react';
-import { NumberInput } from './number-input';
+import React from "react";
+import { NumberInput } from "./number-input";
 
 type InputNumberProps = {
   label?: string;
@@ -22,21 +22,21 @@ export const InputNumber = ({
 }: Readonly<InputNumberProps>) => {
   const handleKeyDown = React.useCallback(
     (e: React.KeyboardEvent<HTMLInputElement>) => {
-      if (e.key === 'Enter') {
+      if (e.key === "Enter") {
         e.preventDefault();
         e.stopPropagation();
         const input = e.target as HTMLInputElement;
         input.blur();
       }
     },
-    []
+    [],
   );
 
   const handleOnValueChange = React.useCallback(
     (numberValue: number | undefined) => {
       onChange?.(numberValue ?? 0);
     },
-    [onChange]
+    [onChange],
   );
 
   return (

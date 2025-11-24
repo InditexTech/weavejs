@@ -2,6 +2,7 @@ import { setupApp } from './app.js'
 import { getLogger, setupLogger } from './logger/logger.js'
 import { validateServiceConfig } from './validate.js'
 import { setupStore } from './store.js'
+import { setupWorkers } from './workers/workers.js'
 
 // Setup service logger
 setupLogger()
@@ -13,6 +14,9 @@ const config = validateServiceConfig()
 if (!config) {
   process.exit(1)
 }
+
+// Setup node.js workers
+await setupWorkers()
 
 // Init application
 const app = setupApp()

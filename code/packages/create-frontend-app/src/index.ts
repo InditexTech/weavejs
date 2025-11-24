@@ -16,11 +16,14 @@ import pc from 'picocolors';
 import { getPackageManager } from './auto-install';
 import { type Template, create } from './create-app';
 import { cwd } from './constants';
+import packageJson from '../package.json' assert { type: 'json' };
 
 const manager = getPackageManager();
 
 async function main(): Promise<void> {
-  intro(pc.bgCyan(pc.bold('Create Weave.js Frontend App')));
+  intro(
+    pc.bgCyan(pc.bold(`Create Weave.js Frontend App [${packageJson.version}]`))
+  );
 
   const options = await group(
     {

@@ -1,24 +1,24 @@
-'use client';
+"use client";
 
-import React from 'react';
-import { Avatar as AvatarUI, AvatarFallback } from '@/components/ui/avatar';
+import React from "react";
+import { Avatar as AvatarUI, AvatarFallback } from "@/components/ui/avatar";
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
-} from '@/components/ui/tooltip';
-import { useCollaborationRoom } from '@/store/store';
-import { ChevronDown } from 'lucide-react';
+} from "@/components/ui/tooltip";
+import { useCollaborationRoom } from "@/store/store";
+import { ChevronDown } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
-import { useWeave } from '@inditextech/weave-react';
-import { cn } from '@/lib/utils';
-import { getUserShort, stringToColor } from '../utils/users';
+} from "@/components/ui/dropdown-menu";
+import { useWeave } from "@inditextech/weave-react";
+import { cn } from "@/lib/utils";
+import { getUserShort, stringToColor } from "../utils/users";
 
 export const ConnectedUsers = () => {
   const connectedUsers = useWeave((state) => state.users);
@@ -29,14 +29,14 @@ export const ConnectedUsers = () => {
 
   const connectedUserKey = React.useMemo(() => {
     const filterOwnUser = Object.keys(connectedUsers).filter(
-      (actUser) => actUser === user?.name
+      (actUser) => actUser === user?.name,
     );
     return filterOwnUser?.[0];
   }, [user, connectedUsers]);
 
   const { showUsers, restUsers } = React.useMemo(() => {
     const filterOwnUser = Object.keys(connectedUsers).filter(
-      (actUser) => actUser !== user?.name
+      (actUser) => actUser !== user?.name,
     );
     return {
       showUsers: filterOwnUser.slice(0, 4),
@@ -64,7 +64,7 @@ export const ConnectedUsers = () => {
                 <button className="cursor-pointer rounded-none">
                   <AvatarUI className="w-[32px] h-[32px] bg-muted font-light text-[13] leading-[18px]">
                     <AvatarFallback className="bg-transparent uppercase">
-                      {getUserShort(user?.name ?? '')}
+                      {getUserShort(user?.name ?? "")}
                     </AvatarFallback>
                   </AvatarUI>
                 </button>
@@ -76,7 +76,7 @@ export const ConnectedUsers = () => {
               >
                 <div
                   className="w-[16px] h-[16px]"
-                  style={{ background: stringToColor(user?.name ?? '') }}
+                  style={{ background: stringToColor(user?.name ?? "") }}
                 ></div>
                 <p className="font-inter text-xs">{user?.name}</p>
               </TooltipContent>
@@ -90,7 +90,7 @@ export const ConnectedUsers = () => {
                   <button className="cursor-pointer">
                     <AvatarUI className="w-[32px] h-[32px] bg-muted font-light text-[13] leading-[18px]">
                       <AvatarFallback className="bg-transparent uppercase">
-                        {getUserShort(userInfo?.name ?? '')}
+                        {getUserShort(userInfo?.name ?? "")}
                       </AvatarFallback>
                     </AvatarUI>
                   </button>
@@ -102,7 +102,7 @@ export const ConnectedUsers = () => {
                 >
                   <div
                     className="w-[16px] h-[16px]"
-                    style={{ background: stringToColor(userInfo?.name ?? '') }}
+                    style={{ background: stringToColor(userInfo?.name ?? "") }}
                   ></div>
                   <p className="font-inter text-xs">{userInfo.name}</p>
                 </TooltipContent>
@@ -118,11 +118,11 @@ export const ConnectedUsers = () => {
                   >
                     <DropdownMenuTrigger
                       className={cn(
-                        'rounded-full cursor-pointer p-1 !bg-muted hover:bg-accent focus:outline-none',
+                        "rounded-full cursor-pointer p-1 !bg-muted hover:bg-accent focus:outline-none",
                         {
-                          ['bg-accent']: menuOpen,
-                          ['bg-white']: !menuOpen,
-                        }
+                          ["bg-accent"]: menuOpen,
+                          ["bg-white"]: !menuOpen,
+                        },
                       )}
                     >
                       <ChevronDown
@@ -148,12 +148,12 @@ export const ConnectedUsers = () => {
                             <div
                               className="w-[16px] h-[16px]"
                               style={{
-                                background: stringToColor(userInfo?.name ?? ''),
+                                background: stringToColor(userInfo?.name ?? ""),
                               }}
                             ></div>
                             <AvatarUI className="w-[32px] h-[32px] bg-muted font-light text-[13] leading-[18px]">
                               <AvatarFallback className="bg-transparent uppercase">
-                                {getUserShort(userInfo?.name ?? '')}
+                                {getUserShort(userInfo?.name ?? "")}
                               </AvatarFallback>
                             </AvatarUI>
                             {userInfo?.name}

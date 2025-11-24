@@ -1,16 +1,16 @@
-'use client';
+"use client";
 
-import React from 'react';
-import { colorIsLight } from '@/lib/utils';
+import React from "react";
+import { colorIsLight } from "@/lib/utils";
 
 type ColorTokenProps = {
   color: string;
 };
 
 export const ColorToken = ({ color }: Readonly<ColorTokenProps>) => {
-  let forefrontColor = '#ffffff';
+  let forefrontColor = "#ffffff";
   if (colorIsLight(color)) {
-    forefrontColor = '#000000';
+    forefrontColor = "#000000";
   }
 
   return (

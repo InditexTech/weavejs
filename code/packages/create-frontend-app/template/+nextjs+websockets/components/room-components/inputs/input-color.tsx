@@ -1,7 +1,7 @@
-'use client';
+"use client";
 
-import React from 'react';
-import { Input } from '@/components/ui/input';
+import React from "react";
+import { Input } from "@/components/ui/input";
 import {
   ColorPicker,
   ColorPickerAlpha,
@@ -10,12 +10,12 @@ import {
   ColorPickerHue,
   ColorPickerFormatSelector,
   ColorPickerSaturation,
-} from '@/components/ui/color-picker';
+} from "@/components/ui/color-picker";
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
-} from '@/components/ui/popover';
+} from "@/components/ui/popover";
 
 type InputColorProps = {
   label?: string;
@@ -35,7 +35,7 @@ export const InputColor = ({
 
   const handleKeyDown = React.useCallback(
     (e: React.KeyboardEvent<HTMLInputElement>) => {
-      if (e.key === 'Enter') {
+      if (e.key === "Enter") {
         e.preventDefault();
         e.stopPropagation();
         const input = e.target as HTMLInputElement;
@@ -43,14 +43,14 @@ export const InputColor = ({
         setEnterPressed(true);
       }
     },
-    []
+    [],
   );
 
   const handleOnChange = React.useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
-      setEditedValue(e.target.value === '' ? '#ffffff' : e.target.value);
+      setEditedValue(e.target.value === "" ? "#ffffff" : e.target.value);
     },
-    []
+    [],
   );
 
   React.useEffect(() => {
@@ -112,7 +112,7 @@ export const InputColor = ({
           <Input
             type="text"
             className="w-full py-0 h-[40px] rounded-none !text-[14px] !border-black font-normal text-black text-right focus:outline-none bg-transparent shadow-none"
-            value={value ?? '#000000ff'}
+            value={value ?? "#000000ff"}
             onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
               if (enterPressed) {
                 onChange?.(e.target.value);
@@ -121,7 +121,7 @@ export const InputColor = ({
             }}
             onFocus={() => {
               setEditing(true);
-              setEditedValue(value ?? '#000000ff');
+              setEditedValue(value ?? "#000000ff");
               window.weaveOnFieldFocus = true;
             }}
           />

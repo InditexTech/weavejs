@@ -1,7 +1,7 @@
-import { useCollaborationRoom } from '@/store/store';
-import { WeaveUser } from '@inditextech/weave-types';
-import { WeaveStoreWebsockets } from '@inditextech/weave-store-websockets/client';
-import React from 'react';
+import { useCollaborationRoom } from "@/store/store";
+import { WeaveUser } from "@inditextech/weave-types";
+import { WeaveStoreWebsockets } from "@inditextech/weave-store-websockets/client";
+import React from "react";
 
 function useGetWebsocketsProvider({
   loadedParams,
@@ -25,9 +25,9 @@ function useGetWebsocketsProvider({
         {
           roomId: room,
           wsOptions: {
-            serverUrl: `${process.env.NEXT_PUBLIC_API_ENDPOINT}/sync/rooms`,
+            serverUrl: `${process.env.NEXT_PUBLIC_API_ENDPOINT}/rooms/${room}/connect`,
           },
-        }
+        },
       );
     }
 

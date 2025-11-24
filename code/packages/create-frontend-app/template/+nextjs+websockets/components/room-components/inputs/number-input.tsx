@@ -1,9 +1,9 @@
-import React from 'react';
-import { NumericFormat, NumericFormatProps } from 'react-number-format';
-import { Input } from '@/components/ui/input';
+import React from "react";
+import { NumericFormat, NumericFormatProps } from "react-number-format";
+import { Input } from "@/components/ui/input";
 
 export interface NumberInputProps
-  extends Omit<NumericFormatProps, 'value' | 'onValueChange'> {
+  extends Omit<NumericFormatProps, "value" | "onValueChange"> {
   label?: string;
   stepper?: number;
   thousandSeparator?: string;
@@ -34,12 +34,12 @@ export const NumberInput = React.forwardRef<HTMLInputElement, NumberInputProps>(
       value,
       ...props
     },
-    ref
+    ref,
   ) => {
     const editingRef = React.useRef<HTMLInputElement>(null);
     const [editing, setEditing] = React.useState<boolean>(false);
     const [editedValue, setEditedValue] = React.useState<number | undefined>(
-      defaultValue
+      defaultValue,
     );
 
     const handleChange = React.useCallback(
@@ -49,7 +49,7 @@ export const NumberInput = React.forwardRef<HTMLInputElement, NumberInputProps>(
 
         setEditedValue(newValue);
       },
-      []
+      [],
     );
 
     const handleBlur = React.useCallback(() => {
@@ -135,7 +135,7 @@ export const NumberInput = React.forwardRef<HTMLInputElement, NumberInputProps>(
         </div>
       </div>
     );
-  }
+  },
 );
 
-NumberInput.displayName = 'NumberInput';
+NumberInput.displayName = "NumberInput";

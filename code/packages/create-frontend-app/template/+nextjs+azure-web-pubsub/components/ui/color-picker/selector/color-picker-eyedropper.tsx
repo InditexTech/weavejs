@@ -1,9 +1,9 @@
-import { Button } from '@/components/ui/button';
-import { cn } from '@/lib/utils';
-import Color from 'color';
-import { PipetteIcon } from 'lucide-react';
-import { type ComponentProps, useCallback, useEffect, useState } from 'react';
-import { useColorPicker } from '../context/color-picker-context';
+import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
+import Color from "color";
+import { PipetteIcon } from "lucide-react";
+import { type ComponentProps, useCallback, useEffect, useState } from "react";
+import { useColorPicker } from "../context/color-picker-context";
 
 export type ColorPickerEyeDropperProps = ComponentProps<typeof Button>;
 
@@ -21,12 +21,12 @@ export const ColorPickerEyeDropper = ({
 
   useEffect(() => {
     // @ts-expect-error - EyeDropper API is experimental
-    setIsSupported(typeof EyeDropper !== 'undefined');
+    setIsSupported(typeof EyeDropper !== "undefined");
   }, []);
 
   const handleEyeDropper = useCallback(async () => {
     if (!isSupported) {
-      console.warn('EyeDropper API is not supported in this browser');
+      console.warn("EyeDropper API is not supported in this browser");
       return;
     }
 
@@ -49,8 +49,8 @@ export const ColorPickerEyeDropper = ({
         setColor(newColor);
       }, 50);
     } catch (error) {
-      if (error instanceof Error && !error.message.includes('aborted')) {
-        console.error('EyeDropper failed:', error);
+      if (error instanceof Error && !error.message.includes("aborted")) {
+        console.error("EyeDropper failed:", error);
       }
     } finally {
       setTimeout(() => setIsActive(false), 100);
@@ -71,9 +71,9 @@ export const ColorPickerEyeDropper = ({
         title="Pick color from screen"
         aria-label="Pick color from screen"
         className={cn(
-          'rounded-none border-none bg-black hover:bg-[#c9c9c9] hover:text-black cursor-pointer shrink-0 text-white',
-          isActive && 'opacity-50 cursor-not-allowed',
-          className
+          "rounded-none border-none bg-black hover:bg-[#c9c9c9] hover:text-black cursor-pointer shrink-0 text-white",
+          isActive && "opacity-50 cursor-not-allowed",
+          className,
         )}
         {...props}
       >

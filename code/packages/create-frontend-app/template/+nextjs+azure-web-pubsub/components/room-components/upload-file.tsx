@@ -1,35 +1,37 @@
-import React from 'react';
-import { useCollaborationRoom } from '@/store/store';
-import { useMutation } from '@tanstack/react-query';
-import { postImage } from '@/api/post-image';
-import { useWeave } from '@inditextech/weave-react';
+import React from "react";
+import { useCollaborationRoom } from "@/store/store";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { postImage } from "@/api/post-image";
+import { useWeave } from "@inditextech/weave-react";
 
 export function UploadFile() {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const inputFileRef = React.useRef<any>(null);
 
+  const queryClient = useQueryClient();
+
   const instance = useWeave((state) => state.instance);
 
   const room = useCollaborationRoom((state) => state.room);
   const showSelectFile = useCollaborationRoom(
-    (state) => state.images.showSelectFile
+    (state) => state.images.showSelectFile,
   );
   const setUploadingImage = useCollaborationRoom(
-    (state) => state.setUploadingImage
+    (state) => state.setUploadingImage,
   );
   const setShowSelectFileImage = useCollaborationRoom(
-    (state) => state.setShowSelectFileImage
+    (state) => state.setShowSelectFileImage,
   );
 
   const mutationUpload = useMutation({
     mutationFn: async (file: File) => {
-      return await postImage(room ?? '', file);
+      return await postImage(room ?? "", file);
     },
   });
 
   const handleUploadFile = React.useCallback(
     (file: File) => {
-      if (!['image/jpeg', 'image/png'].includes(file.type)) {
+      if (!["image/jpeg", "image/png"].includes(file.type)) {
         return;
       }
 
@@ -39,21 +41,28 @@ export function UploadFile() {
           onSuccess: (data) => {
             if (instance) {
               inputFileRef.current.value = null;
-              const room = data.fileName.split('/')[0];
-              const imageId = data.fileName.split('/')[1];
+              const room = data.fileName.split("/")[0];
+              const imageId = data.fileName.split("/")[1];
+
+              const queryKey = ["getImages", room];
+              queryClient.invalidateQueries({ queryKey });
 
               const { finishUploadCallback } = instance.triggerAction(
-                'imageTool'
+                "imageTool",
                 // eslint-disable-next-line @typescript-eslint/no-explicit-any
               ) as any;
 
+              instance.updatePropsAction("imageTool", {
+                imageId,
+              });
+
               finishUploadCallback?.(
-                `${process.env.NEXT_PUBLIC_API_ENDPOINT}/weavejs/rooms/${room}/images/${imageId}`
+                `${process.env.NEXT_PUBLIC_API_ENDPOINT}/rooms/${room}/images/${imageId}`,
               );
             }
           },
           onError: () => {
-            console.error('Error uploading image');
+            console.error("Error uploading image");
           },
           onSettled: () => {
             setUploadingImage(false);
@@ -61,7 +70,7 @@ export function UploadFile() {
         });
       }
     },
-    [instance, mutationUpload, setUploadingImage]
+    [queryClient, instance, mutationUpload, setUploadingImage],
   );
 
   React.useEffect(() => {
@@ -72,7 +81,7 @@ export function UploadFile() {
 
       if (e.dataTransfer?.items) {
         [...e.dataTransfer?.items].forEach((item) => {
-          if (item.kind === 'file') {
+          if (item.kind === "file") {
             const file = item.getAsFile();
             if (file) {
               handleUploadFile(file);
@@ -90,12 +99,12 @@ export function UploadFile() {
     };
 
     if (instance) {
-      instance.addEventListener('onStageDrop', onStageDrop);
+      instance.addEventListener("onStageDrop", onStageDrop);
     }
 
     if (showSelectFile && inputFileRef.current) {
-      inputFileRef.current.addEventListener('cancel', () => {
-        instance?.cancelAction('imageTool');
+      inputFileRef.current.addEventListener("cancel", () => {
+        instance?.cancelAction("imageTool");
       });
       inputFileRef.current.click();
       setShowSelectFileImage(false);
@@ -103,7 +112,7 @@ export function UploadFile() {
 
     return () => {
       if (instance) {
-        instance.removeEventListener('onStageDrop', onStageDrop);
+        instance.removeEventListener("onStageDrop", onStageDrop);
       }
     };
   }, [

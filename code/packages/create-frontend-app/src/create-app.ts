@@ -130,6 +130,7 @@ function createPackageJson(projectName: string, options: Options): object {
         'react-dom',
         'react-hook-form',
         'react-number-format',
+        'react-responsive-masonry',
         'sharp',
         'sonner',
         'tailwind-merge',
@@ -142,7 +143,6 @@ function createPackageJson(projectName: string, options: Options): object {
       ]),
       ...pick(localVersions, [
         '@inditextech/weave-react',
-        '@inditextech/weave-sdk',
         '@inditextech/weave-store-azure-web-pubsub',
       ]),
     };
@@ -157,12 +157,14 @@ function createPackageJson(projectName: string, options: Options): object {
         '@types/node',
         '@types/react',
         '@types/react-dom',
+        '@types/react-responsive-masonry',
         '@vitejs/plugin-react',
         'eslint',
         'eslint-config-next',
         'eslint-config-prettier',
         'jsdom',
         'lucide-react',
+        'prettier',
         'tailwindcss',
         'typescript',
         'vite-tsconfig-paths',
@@ -170,12 +172,13 @@ function createPackageJson(projectName: string, options: Options): object {
     };
 
     return {
+      ...versionPkg,
       name: projectName,
-      version: '0.0.0',
-      private: true,
       scripts: {
         build: 'next build',
         dev: 'next dev --experimental-https',
+        format:
+          'prettier --write ./api ./app ./assets ./components ./lib ./store next.config.js',
         lint: 'next lint',
         start: 'next start',
       },
@@ -224,6 +227,7 @@ function createPackageJson(projectName: string, options: Options): object {
       'react-dom',
       'react-hook-form',
       'react-number-format',
+      'react-responsive-masonry',
       'sharp',
       'sonner',
       'tailwind-merge',
@@ -236,7 +240,6 @@ function createPackageJson(projectName: string, options: Options): object {
     ]),
     ...pick(localVersions, [
       '@inditextech/weave-react',
-      '@inditextech/weave-sdk',
       '@inditextech/weave-store-websockets',
     ]),
   };
@@ -251,12 +254,14 @@ function createPackageJson(projectName: string, options: Options): object {
       '@types/node',
       '@types/react',
       '@types/react-dom',
+      '@types/react-responsive-masonry',
       '@vitejs/plugin-react',
       'eslint',
       'eslint-config-next',
       'eslint-config-prettier',
       'jsdom',
       'lucide-react',
+      'prettier',
       'tailwindcss',
       'typescript',
       'vite-tsconfig-paths',
@@ -264,12 +269,13 @@ function createPackageJson(projectName: string, options: Options): object {
   };
 
   return {
+    ...versionPkg,
     name: projectName,
-    version: '0.0.0',
-    private: true,
     scripts: {
       build: 'next build',
       dev: 'next dev --experimental-https',
+      format:
+        'prettier --write ./api ./app ./assets ./components ./lib ./store next.config.js',
       lint: 'next lint',
       start: 'next start',
     },

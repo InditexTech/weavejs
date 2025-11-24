@@ -1,17 +1,17 @@
-import { WeaveNode } from '@inditextech/weave-sdk';
+import { WeaveNode } from "@inditextech/weave-sdk";
 import {
   WeaveElementAttributes,
   WeaveElementInstance,
-} from '@inditextech/weave-types';
-import Konva from 'konva';
-import { Inter } from 'next/font/google';
+} from "@inditextech/weave-types";
+import Konva from "konva";
+import { Inter } from "next/font/google";
 
-export const COLOR_TOKEN_NODE_TYPE = 'color-token';
+export const COLOR_TOKEN_NODE_TYPE = "color-token";
 
 const inter = Inter({
   preload: true,
-  variable: '--inter',
-  subsets: ['latin'],
+  variable: "--inter",
+  subsets: ["latin"],
 });
 
 export class ColorTokenNode extends WeaveNode {
@@ -20,7 +20,7 @@ export class ColorTokenNode extends WeaveNode {
   onRender(props: WeaveElementAttributes) {
     const { id } = props;
 
-    const colorTokenColor = props.colorToken ?? '#DEFFA0';
+    const colorTokenColor = props.colorToken ?? "#DEFFA0";
 
     const colorTokenParams = {
       ...props,
@@ -31,7 +31,7 @@ export class ColorTokenNode extends WeaveNode {
       ...colorTokenParams,
       width: colorTokenParams.width,
       height: colorTokenParams.height,
-      name: 'node',
+      name: "node",
     });
 
     this.setupDefaultNodeAugmentation(colorTokenNode);
@@ -42,11 +42,11 @@ export class ColorTokenNode extends WeaveNode {
       id: `${id}-colorToken`,
       x: 0,
       y: 0,
-      fill: '#FFFFFFFF',
+      fill: "#FFFFFFFF",
       width: colorTokenParams.width,
       height: colorTokenParams.height,
       strokeScaleEnabled: true,
-      stroke: 'black',
+      stroke: "black",
       strokeWidth: 2,
     });
 
@@ -75,14 +75,14 @@ export class ColorTokenNode extends WeaveNode {
       y: 260,
       fontSize: 20,
       fontFamily: inter.style.fontFamily,
-      fill: '#CCCCCCFF',
+      fill: "#CCCCCCFF",
       strokeEnabled: false,
-      stroke: '#000000FF',
+      stroke: "#000000FF",
       strokeWidth: 1,
       text: `${colorTokenColor}`,
       width: (colorTokenParams.width ?? 0) - 40,
       height: 20,
-      align: 'left',
+      align: "left",
       listening: false,
       draggable: false,
     });
@@ -96,7 +96,7 @@ export class ColorTokenNode extends WeaveNode {
 
   onUpdate(
     nodeInstance: WeaveElementInstance,
-    nextProps: WeaveElementAttributes
+    nextProps: WeaveElementAttributes,
   ) {
     const { id, colorToken } = nextProps;
 
@@ -108,7 +108,7 @@ export class ColorTokenNode extends WeaveNode {
       zIndex: nodeInstanceZIndex,
     });
 
-    const colorTokenColor = colorToken ?? '#DEFFA0';
+    const colorTokenColor = colorToken ?? "#DEFFA0";
 
     const colorTokenNode1 = colorTokenNode.findOne(`#${id}-colorToken-1`);
     if (colorTokenNode1) {
@@ -118,7 +118,7 @@ export class ColorTokenNode extends WeaveNode {
     }
     const colorTokenCode = colorTokenNode.findOne(`#${id}-colorToken-code`);
     if (colorTokenCode) {
-      colorTokenCode.setAttr('text', `${colorTokenColor}`);
+      colorTokenCode.setAttr("text", `${colorTokenColor}`);
     }
   }
 }

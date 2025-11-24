@@ -1,6 +1,6 @@
-import { WeaveAction, WeaveNode } from '@inditextech/weave-sdk';
-import { WeaveElementInstance, WeaveSelection } from '@inditextech/weave-types';
-import Konva from 'konva';
+import { WeaveAction, WeaveNode } from "@inditextech/weave-sdk";
+import { WeaveElementInstance, WeaveSelection } from "@inditextech/weave-types";
+import Konva from "konva";
 
 export class AlignElementsToolAction extends WeaveAction {
   protected cancelAction!: () => void;
@@ -8,7 +8,7 @@ export class AlignElementsToolAction extends WeaveAction {
   onInit = undefined;
 
   getName(): string {
-    return 'alignElementsTool';
+    return "alignElementsTool";
   }
 
   private alignElements(nodes: WeaveSelection[], gap: number) {
@@ -45,7 +45,7 @@ export class AlignElementsToolAction extends WeaveAction {
 
       if (prevInstance) {
         const handler = this.instance.getNodeHandler<WeaveNode>(
-          instance.getAttrs().nodeType
+          instance.getAttrs().nodeType,
         );
         const node = handler.serialize(instance as WeaveElementInstance);
 
@@ -74,10 +74,10 @@ export class AlignElementsToolAction extends WeaveAction {
 
   trigger(
     cancelAction: () => void,
-    { gap = 20, nodes }: { gap: number; nodes: WeaveSelection[] }
+    { gap = 20, nodes }: { gap: number; nodes: WeaveSelection[] },
   ) {
     if (!this.instance) {
-      throw new Error('Instance not defined');
+      throw new Error("Instance not defined");
     }
 
     const stage = this.instance.getStage();

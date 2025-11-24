@@ -1,5 +1,5 @@
-import { ColorInstance } from 'color';
-import { createContext, useContext } from 'react';
+import { ColorInstance } from "color";
+import { createContext, useContext } from "react";
 
 interface ColorPickerContextValue {
   mode: string;
@@ -21,7 +21,7 @@ export const useColorPicker = () => {
   const context = useContext(ColorPickerContext);
 
   if (!context) {
-    throw new Error('useColorPicker must be used within a ColorPickerProvider');
+    throw new Error("useColorPicker must be used within a ColorPickerProvider");
   }
 
   return context;
