@@ -14,6 +14,7 @@
     "stage-panning",
     "stage-resize",
     "stage-zoom",
+    "stage-minimap",
     "stage-keyboard",
     "users-pointers",
     "users-selector"
