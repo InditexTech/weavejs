@@ -1,6 +1,6 @@
-import { useWeave } from '@inditextech/weave-react';
-import { WEAVE_STORE_CONNECTION_STATUS } from '@inditextech/weave-types';
-import React from 'react';
+import { useWeave } from "@inditextech/weave-react";
+import { WEAVE_STORE_CONNECTION_STATUS } from "@inditextech/weave-types";
+import React from "react";
 
 const canDetectKeyboard = () => {
   const editingTextNodes =
@@ -12,7 +12,7 @@ export const useKeyDown = (
   callback: () => void,
   keys: string[],
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  modifiers: (event: any) => boolean = () => true
+  modifiers: (event: any) => boolean = () => true,
 ) => {
   const weaveConnectionStatus = useWeave((state) => state.connection.status);
 
@@ -31,13 +31,13 @@ export const useKeyDown = (
         callback();
       }
     },
-    [callback, keys, weaveConnectionStatus, modifiers]
+    [callback, keys, weaveConnectionStatus, modifiers],
   );
 
   React.useEffect(() => {
-    document.addEventListener('keydown', onKeyDown);
+    document.addEventListener("keydown", onKeyDown);
     return () => {
-      document.removeEventListener('keydown', onKeyDown);
+      document.removeEventListener("keydown", onKeyDown);
     };
   }, [onKeyDown]);
 };

@@ -1,17 +1,17 @@
-import type { Metadata, Viewport } from 'next';
-import { Inter } from 'next/font/google';
-import './globals.css';
-import { AppProviders } from './providers';
+import type { Metadata, Viewport } from "next";
+import { Inter } from "next/font/google";
+import "./globals.css";
+import { AppProviders } from "./providers";
 
 const inter = Inter({
-  weight: '400',
+  weight: "400",
   preload: true,
-  variable: '--inter',
-  subsets: ['latin'],
+  variable: "--inter",
+  subsets: ["latin"],
 });
 
 export const viewport: Viewport = {
-  width: 'device-width',
+  width: "device-width",
   initialScale: 1,
   maximumScale: 1,
   userScalable: false,
@@ -20,8 +20,8 @@ export const viewport: Viewport = {
 };
 
 export const metadata: Metadata = {
-  title: 'WeaveJS Playground',
-  description: 'This is a playground for WeaveJS',
+  title: "WeaveJS Playground",
+  description: "This is a playground for WeaveJS",
 };
 
 export default function RootLayout({

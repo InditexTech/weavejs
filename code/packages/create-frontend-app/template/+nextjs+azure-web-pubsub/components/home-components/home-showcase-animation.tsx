@@ -1,7 +1,7 @@
-'use client';
+"use client";
 
-import type React from 'react';
-import { motion } from 'framer-motion';
+import type React from "react";
+import { motion } from "framer-motion";
 
 const draw = {
   hidden: { pathLength: 0, opacity: 0 },
@@ -11,7 +11,7 @@ const draw = {
       pathLength: 1,
       opacity: 1,
       transition: {
-        pathLength: { delay, type: 'spring', duration: 1.5, bounce: 0 },
+        pathLength: { delay, type: "spring", duration: 1.5, bounce: 0 },
         opacity: { delay, duration: 0.01 },
       },
     };
@@ -104,7 +104,7 @@ export const HomeShowCaseAnimation: React.FC = () => {
         transition={{
           duration: 5,
           repeat: Number.POSITIVE_INFINITY,
-          repeatType: 'reverse',
+          repeatType: "reverse",
         }}
       />
       <motion.circle
@@ -119,7 +119,7 @@ export const HomeShowCaseAnimation: React.FC = () => {
         transition={{
           duration: 4,
           repeat: Number.POSITIVE_INFINITY,
-          repeatType: 'reverse',
+          repeatType: "reverse",
         }}
       />
     </motion.svg>

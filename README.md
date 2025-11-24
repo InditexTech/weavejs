@@ -38,6 +38,8 @@ SPDX-License-Identifier: Apache-2.0
 
 ## About The Project
 
+> [!NOTE] > **Disclaimer:** Weave.js is been used in Inditex internal production apps for the past 8 months. Our tools and documentation need more battle testing in the open source world. Weave.js will remove this disclaimer when we're happy with the developer experience.
+
 https://github.com/user-attachments/assets/347ad22a-6bb5-425d-87b5-f09c56b57273
 
 Weave.js is a powerful headless framework for building end-to-end collaborative whiteboard applications. Aimed at developers, it provides all the building blocks to develop visual collaborative canvas applications, while handling user interactions to enable real-time collaboration among multiple users.

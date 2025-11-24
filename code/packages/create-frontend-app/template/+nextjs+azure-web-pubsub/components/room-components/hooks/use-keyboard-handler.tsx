@@ -1,18 +1,18 @@
-'use client';
+"use client";
 
-import React from 'react';
-import { useWeave } from '@inditextech/weave-react';
-import { SidebarActive, useCollaborationRoom } from '@/store/store';
-import { useKeyDown } from '../hooks/use-key-down';
-import { SYSTEM_OS } from '@/lib/utils';
-import { useGetOs } from '../hooks/use-get-os';
+import React from "react";
+import { useWeave } from "@inditextech/weave-react";
+import { SidebarActive, useCollaborationRoom } from "@/store/store";
+import { useKeyDown } from "../hooks/use-key-down";
+import { SYSTEM_OS } from "@/lib/utils";
+import { useGetOs } from "../hooks/use-get-os";
 import {
   WeaveExportNodesActionParams,
   WeaveExportStageActionParams,
   WeaveNodesSelectionPlugin,
   WeaveUsersPointersPlugin,
-} from '@inditextech/weave-sdk';
-import { SIDEBAR_ELEMENTS } from '@/lib/constants';
+} from "@inditextech/weave-sdk";
+import { SIDEBAR_ELEMENTS } from "@/lib/constants";
 
 export function useKeyboardHandler() {
   const os = useGetOs();
@@ -24,10 +24,10 @@ export function useKeyboardHandler() {
   const showUI = useCollaborationRoom((state) => state.ui.show);
   const setShowUi = useCollaborationRoom((state) => state.setShowUi);
   const setSidebarActive = useCollaborationRoom(
-    (state) => state.setSidebarActive
+    (state) => state.setSidebarActive,
   );
   const setShowSelectFileImage = useCollaborationRoom(
-    (state) => state.setShowSelectFileImage
+    (state) => state.setShowSelectFileImage,
   );
 
   const triggerTool = React.useCallback(
@@ -39,27 +39,27 @@ export function useKeyboardHandler() {
         instance.cancelAction(toolName);
       }
     },
-    [instance, actualAction]
+    [instance, actualAction],
   );
 
   const sidebarToggle = React.useCallback(
     (element: SidebarActive) => {
       setSidebarActive(element);
     },
-    [setSidebarActive]
+    [setSidebarActive],
   );
 
   const handleTriggerAction = React.useCallback(
     (actionName: string, actionParams: unknown) => {
       if (instance) {
-        const triggerSelection = actualAction === 'selectionTool';
+        const triggerSelection = actualAction === "selectionTool";
         instance.triggerAction(actionName, actionParams);
         if (triggerSelection) {
-          instance.triggerAction('selectionTool', actionParams);
+          instance.triggerAction("selectionTool", actionParams);
         }
       }
     },
-    [instance, actualAction]
+    [instance, actualAction],
   );
 
   const handlePrintToConsoleState = React.useCallback(() => {
@@ -73,72 +73,72 @@ export function useKeyboardHandler() {
 
   /* Keyboard shortcuts toolbar */
   useKeyDown(() => {
-    triggerTool('moveTool');
-  }, ['KeyM']);
+    triggerTool("moveTool");
+  }, ["KeyM"]);
 
   useKeyDown(() => {
-    triggerTool('selectionTool');
-  }, ['KeyS']);
+    triggerTool("selectionTool");
+  }, ["KeyS"]);
 
   useKeyDown(() => {
-    triggerTool('eraserTool');
-  }, ['KeyD']);
+    triggerTool("eraserTool");
+  }, ["KeyD"]);
 
   useKeyDown(
     () => {
-      triggerTool('frameTool');
+      triggerTool("frameTool");
     },
-    ['KeyF'],
-    (e) => !(e.ctrlKey || e.metaKey)
+    ["KeyF"],
+    (e) => !(e.ctrlKey || e.metaKey),
   );
 
   useKeyDown(() => {
-    triggerTool('rectangleTool');
-  }, ['KeyR']);
+    triggerTool("rectangleTool");
+  }, ["KeyR"]);
 
   useKeyDown(() => {
-    triggerTool('ellipseTool');
-  }, ['KeyE']);
+    triggerTool("ellipseTool");
+  }, ["KeyE"]);
 
   useKeyDown(() => {
-    triggerTool('regularPolygonTool');
-  }, ['KeyP']);
+    triggerTool("regularPolygonTool");
+  }, ["KeyP"]);
 
   useKeyDown(() => {
-    triggerTool('penTool');
-  }, ['KeyL']);
+    triggerTool("penTool");
+  }, ["KeyL"]);
 
   useKeyDown(() => {
-    triggerTool('brushTool');
-  }, ['KeyB']);
+    triggerTool("brushTool");
+  }, ["KeyB"]);
 
   useKeyDown(() => {
-    triggerTool('textTool');
-  }, ['KeyT']);
+    triggerTool("textTool");
+  }, ["KeyT"]);
 
   useKeyDown(
     () => {
-      triggerTool('imageTool');
+      triggerTool("imageTool");
       setShowSelectFileImage(true);
     },
-    ['KeyI'],
-    (e) => !(e.ctrlKey || e.metaKey)
+    ["KeyI"],
+    (e) => !(e.ctrlKey || e.metaKey),
   );
 
   useKeyDown(() => {
-    triggerTool('starTool');
-  }, ['KeyJ']);
+    triggerTool("starTool");
+  }, ["KeyJ"]);
 
   useKeyDown(() => {
-    triggerTool('arrowTool');
-  }, ['KeyA']);
+    triggerTool("arrowTool");
+  }, ["KeyA"]);
 
   useKeyDown(
     () => {
-      triggerTool('colorTokenTool');
+      triggerTool("colorTokenTool");
     },
-    ['KeyP'],
-    (e) => !(e.ctrlKey || e.metaKey)
+    ["KeyP"],
+    (e) => !(e.ctrlKey || e.metaKey),
   );
 
   useKeyDown(
@@ -148,8 +148,8 @@ export function useKeyboardHandler() {
         actualStore.undoStateStep();
       }
     },
-    ['KeyZ'],
-    (e) => ([SYSTEM_OS.MAC as string].includes(os) ? e.metaKey : e.ctrlKey)
+    ["KeyZ"],
+    (e) => ([SYSTEM_OS.MAC as string].includes(os) ? e.metaKey : e.ctrlKey),
   );
 
   useKeyDown(
@@ -159,8 +159,8 @@ export function useKeyboardHandler() {
         actualStore.redoStateStep();
       }
     },
-    ['KeyY'],
-    (e) => ([SYSTEM_OS.MAC as string].includes(os) ? e.metaKey : e.ctrlKey)
+    ["KeyY"],
+    (e) => ([SYSTEM_OS.MAC as string].includes(os) ? e.metaKey : e.ctrlKey),
   );
 
   /* Keyboard shortcuts visibility */
@@ -169,26 +169,27 @@ export function useKeyboardHandler() {
     () => {
       setShowUi(!showUI);
     },
-    ['IntlBackslash'],
-    (e) => ([SYSTEM_OS.MAC as string].includes(os) ? e.metaKey : e.ctrlKey)
+    ["IntlBackslash"],
+    (e) => ([SYSTEM_OS.MAC as string].includes(os) ? e.metaKey : e.ctrlKey),
   );
 
   useKeyDown(
     () => {
       if (instance) {
         const usersPointersPlugin =
-          instance.getPlugin<WeaveUsersPointersPlugin>('usersPointers');
+          instance.getPlugin<WeaveUsersPointersPlugin>("usersPointers");
         if (usersPointersPlugin && usersPointersPlugin.isEnabled()) {
           usersPointersPlugin.disable();
-        } else {
+        }
+        if (usersPointersPlugin && !usersPointersPlugin.isEnabled()) {
           usersPointersPlugin.enable();
         }
       }
     },
-    ['KeyU'],
+    ["KeyU"],
     (e) =>
       e.altKey &&
-      ([SYSTEM_OS.MAC as string].includes(os) ? e.metaKey : e.ctrlKey)
+      ([SYSTEM_OS.MAC as string].includes(os) ? e.metaKey : e.ctrlKey),
   );
 
   /* Keyboard shortcuts selection */
@@ -197,30 +198,30 @@ export function useKeyboardHandler() {
     () => {
       if (instance) {
         const selectionPlugin =
-          instance.getPlugin<WeaveNodesSelectionPlugin>('nodesSelection');
+          instance.getPlugin<WeaveNodesSelectionPlugin>("nodesSelection");
         if (selectionPlugin) {
           selectionPlugin.selectAll();
         }
       }
     },
-    ['KeyA'],
+    ["KeyA"],
     (e) =>
       e.shiftKey &&
-      ([SYSTEM_OS.MAC as string].includes(os) ? e.metaKey : e.ctrlKey)
+      ([SYSTEM_OS.MAC as string].includes(os) ? e.metaKey : e.ctrlKey),
   );
 
   useKeyDown(
     () => {
       if (instance) {
         const selectionPlugin =
-          instance.getPlugin<WeaveNodesSelectionPlugin>('nodesSelection');
+          instance.getPlugin<WeaveNodesSelectionPlugin>("nodesSelection");
         if (selectionPlugin) {
           selectionPlugin.selectNone();
         }
       }
     },
-    ['Escape'],
-    (e) => e.shiftKey
+    ["Escape"],
+    (e) => e.shiftKey,
   );
 
   /* Keyboard shortcuts editing */
@@ -228,39 +229,42 @@ export function useKeyboardHandler() {
   useKeyDown(
     () => {
       if (instance && selectedNodes.length === 1) {
-        instance.triggerAction<WeaveExportNodesActionParams>('exportNodeTool', {
-          nodes: selectedNodes.map((node) => node.instance),
-          options: {
-            padding: 20,
-            pixelRatio: 2,
+        instance.triggerAction<WeaveExportNodesActionParams, void>(
+          "exportNodeTool",
+          {
+            nodes: selectedNodes.map((node) => node.instance),
+            options: {
+              padding: 20,
+              pixelRatio: 2,
+            },
           },
-        });
+        );
       }
     },
-    ['KeyE'],
+    ["KeyE"],
     (e) =>
       e.shiftKey &&
-      ([SYSTEM_OS.MAC as string].includes(os) ? e.metaKey : e.ctrlKey)
+      ([SYSTEM_OS.MAC as string].includes(os) ? e.metaKey : e.ctrlKey),
   );
 
   useKeyDown(
     () => {
       if (instance) {
-        instance.triggerAction<WeaveExportStageActionParams>(
-          'exportStageTool',
+        instance.triggerAction<WeaveExportStageActionParams, void>(
+          "exportStageTool",
           {
             options: {
               padding: 20,
               pixelRatio: 2,
             },
-          }
+          },
         );
       }
     },
-    ['KeyV'],
+    ["KeyV"],
     (e) =>
       e.shiftKey &&
-      ([SYSTEM_OS.MAC as string].includes(os) ? e.metaKey : e.ctrlKey)
+      ([SYSTEM_OS.MAC as string].includes(os) ? e.metaKey : e.ctrlKey),
   );
 
   /* Keyboard shortcuts arrange */
@@ -271,8 +275,8 @@ export function useKeyboardHandler() {
         instance.bringToFront(selectedNodes[0].instance);
       }
     },
-    ['BracketRight'],
-    (e) => !([SYSTEM_OS.MAC as string].includes(os) ? e.metaKey : e.ctrlKey)
+    ["BracketRight"],
+    (e) => !([SYSTEM_OS.MAC as string].includes(os) ? e.metaKey : e.ctrlKey),
   );
 
   useKeyDown(
@@ -281,8 +285,8 @@ export function useKeyboardHandler() {
         instance.moveUp(selectedNodes[0].instance);
       }
     },
-    ['BracketRight'],
-    (e) => ([SYSTEM_OS.MAC as string].includes(os) ? e.metaKey : e.ctrlKey)
+    ["BracketRight"],
+    (e) => ([SYSTEM_OS.MAC as string].includes(os) ? e.metaKey : e.ctrlKey),
   );
 
   useKeyDown(
@@ -291,8 +295,8 @@ export function useKeyboardHandler() {
         instance.moveDown(selectedNodes[0].instance);
       }
     },
-    ['BracketLeft'],
-    (e) => ([SYSTEM_OS.MAC as string].includes(os) ? e.metaKey : e.ctrlKey)
+    ["BracketLeft"],
+    (e) => ([SYSTEM_OS.MAC as string].includes(os) ? e.metaKey : e.ctrlKey),
   );
 
   useKeyDown(
@@ -301,20 +305,26 @@ export function useKeyboardHandler() {
         instance.sendToBack(selectedNodes[0].instance);
       }
     },
-    ['BracketLeft'],
-    (e) => !([SYSTEM_OS.MAC as string].includes(os) ? e.metaKey : e.ctrlKey)
+    ["BracketLeft"],
+    (e) => !([SYSTEM_OS.MAC as string].includes(os) ? e.metaKey : e.ctrlKey),
   );
 
   useKeyDown(
     () => {
       if (instance && selectedNodes.length > 1) {
-        instance.group(selectedNodes.map((n) => n.node));
+        const existingSelectedNodes = [];
+        for (const n of selectedNodes) {
+          if (n.node) {
+            existingSelectedNodes.push(n.node);
+          }
+        }
+        instance.group(existingSelectedNodes);
       }
     },
-    ['KeyG'],
+    ["KeyG"],
     (e) =>
       e.shiftKey &&
-      ([SYSTEM_OS.MAC as string].includes(os) ? e.metaKey : e.ctrlKey)
+      ([SYSTEM_OS.MAC as string].includes(os) ? e.metaKey : e.ctrlKey),
   );
 
   useKeyDown(
@@ -322,15 +332,15 @@ export function useKeyboardHandler() {
       if (
         instance &&
         selectedNodes.length === 1 &&
-        selectedNodes[0].node.type === 'group'
+        selectedNodes[0]?.node?.type === "group"
       ) {
         instance.unGroup(selectedNodes[0].node);
       }
     },
-    ['KeyU'],
+    ["KeyU"],
     (e) =>
       e.shiftKey &&
-      ([SYSTEM_OS.MAC as string].includes(os) ? e.metaKey : e.ctrlKey)
+      ([SYSTEM_OS.MAC as string].includes(os) ? e.metaKey : e.ctrlKey),
   );
 
   /* Keyboard shortcuts sidebars */
@@ -339,76 +349,76 @@ export function useKeyboardHandler() {
     () => {
       sidebarToggle(SIDEBAR_ELEMENTS.images);
     },
-    ['KeyI'],
+    ["KeyI"],
     (e) =>
       e.altKey &&
-      ([SYSTEM_OS.MAC as string].includes(os) ? e.metaKey : e.ctrlKey)
+      ([SYSTEM_OS.MAC as string].includes(os) ? e.metaKey : e.ctrlKey),
   );
 
   useKeyDown(
     () => {
       sidebarToggle(SIDEBAR_ELEMENTS.colorTokens);
     },
-    ['KeyO'],
+    ["KeyO"],
     (e) =>
       e.altKey &&
-      ([SYSTEM_OS.MAC as string].includes(os) ? e.metaKey : e.ctrlKey)
+      ([SYSTEM_OS.MAC as string].includes(os) ? e.metaKey : e.ctrlKey),
   );
 
   useKeyDown(
     () => {
       sidebarToggle(SIDEBAR_ELEMENTS.frames);
     },
-    ['KeyF'],
+    ["KeyF"],
     (e) =>
       e.altKey &&
-      ([SYSTEM_OS.MAC as string].includes(os) ? e.metaKey : e.ctrlKey)
+      ([SYSTEM_OS.MAC as string].includes(os) ? e.metaKey : e.ctrlKey),
   );
 
   useKeyDown(
     () => {
-      sidebarToggle(SIDEBAR_ELEMENTS.nodesTree);
+      sidebarToggle(null);
     },
-    ['KeyE'],
+    ["KeyE"],
     (e) =>
       e.altKey &&
-      ([SYSTEM_OS.MAC as string].includes(os) ? e.metaKey : e.ctrlKey)
+      ([SYSTEM_OS.MAC as string].includes(os) ? e.metaKey : e.ctrlKey),
   );
 
   /* Keyboard shortcuts zoom */
 
   useKeyDown(
     () => {
-      handleTriggerAction('zoomInTool', { previousAction: actualAction });
+      handleTriggerAction("zoomInTool", { previousAction: actualAction });
     },
-    ['BracketRight'],
-    (e) => ([SYSTEM_OS.MAC as string].includes(os) ? e.metaKey : e.ctrlKey)
+    ["BracketRight"],
+    (e) => ([SYSTEM_OS.MAC as string].includes(os) ? e.metaKey : e.ctrlKey),
   );
 
   useKeyDown(
     () => {
-      handleTriggerAction('zoomOutTool', { previousAction: actualAction });
+      handleTriggerAction("zoomOutTool", { previousAction: actualAction });
     },
-    ['Slash'],
-    (e) => ([SYSTEM_OS.MAC as string].includes(os) ? e.metaKey : e.ctrlKey)
+    ["Slash"],
+    (e) => ([SYSTEM_OS.MAC as string].includes(os) ? e.metaKey : e.ctrlKey),
   );
 
   useKeyDown(
     () => {
-      handleTriggerAction('fitToScreenTool', { previousAction: actualAction });
+      handleTriggerAction("fitToScreenTool", { previousAction: actualAction });
     },
-    ['Digit1'],
-    (e) => e.shiftKey
+    ["Digit1"],
+    (e) => e.shiftKey,
   );
 
   useKeyDown(
     () => {
-      handleTriggerAction('fitToSelectionTool', {
+      handleTriggerAction("fitToSelectionTool", {
         previousAction: actualAction,
       });
     },
-    ['Digit2'],
-    (e) => e.shiftKey
+    ["Digit2"],
+    (e) => e.shiftKey,
   );
 
   /* Keyboard shortcuts utility */
@@ -417,9 +427,9 @@ export function useKeyboardHandler() {
     () => {
       handlePrintToConsoleState();
     },
-    ['KeyC'],
+    ["KeyC"],
     (e) =>
       e.altKey &&
-      ([SYSTEM_OS.MAC as string].includes(os) ? e.metaKey : e.ctrlKey)
+      ([SYSTEM_OS.MAC as string].includes(os) ? e.metaKey : e.ctrlKey),
   );
 }

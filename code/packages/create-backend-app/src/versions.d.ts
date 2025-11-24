@@ -3,5 +3,6 @@ export const versions: {
   '@inditextech/weave-sdk': string;
   '@inditextech/weave-store-websockets': string;
   '@inditextech/weave-store-azure-web-pubsub': string;
+  '@inditextech/weave-store-standalone': string;
   '@inditextech/weave-react': string;
 };

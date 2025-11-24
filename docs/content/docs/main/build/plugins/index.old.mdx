@@ -1,0 +1,258 @@
+---
+title: Plugins
+description: Plugins maintained by Weave.js team
+---
+
+## Introduction
+
+Plugins are the modular pieces that extend and enhance the functionality of Weave.js.
+They allow you to add behavior to the canvas: like selection, zooming, snapping, panning,
+keyboard shortcuts, and more, without modifying the core system.
+
+Plugins are designed to be lightweight, composable, and easy to integrate, making it simple
+to build rich, interactive experiences. Whether you're enabling multi-selection, managing
+drag-and-drop, or integrating custom logic, Plugins are how you supercharge your canvas with
+reusable, context-aware features.
+
+Weave.js includes a set of built-in plugins, but you can also create your own to tailor
+functionality to your specific application needs.
+
+## Plugin lifecycle
+
+Weave.js plugin lifecycle is pretty simple:
+
+<Mermaid
+  chart={`
+stateDiagram-v2
+  A: Weave instance is started
+  B: Plugins are registered
+  C: getName() is called on each plugin
+  D: Rendering cycle begins
+  E: First render completed
+  F: onInit() is called on each plugin
+  G: Subsequent renders
+  H: onRender() is called on each plugin
+  [*] --> A
+  A --> B
+  state B {
+    C --> [*]
+  }
+  B --> D
+  state D {
+    E --> F
+    F --> G
+  }
+  state G {
+    H --> [*]
+  }
+  G --> G
+  D --> [*]`}
+/>
+
+<Callout title="Decoupled from the lifecycle">
+
+The following methods are called outside the lifecycle:
+
+- When an user wants to disable the plugin, the `disable` method is called.
+- When an user wants to enable the plugin, the `enable` method is called.
+
+</Callout>
+
+## Available plugins
+
+Weave.js team maintain a set of **plugins**, think of them as added functionality to
+build visual collaborative applications. This are the plugins:
+
+### Awareness & Presence
+
+<Cards>
+
+<Card href="/docs/main/build/plugins/connected-users" title='Connected Users'>
+
+Gives the list of users currently active in a collaborative session. Ideal as source
+information to paint the user list on the UI.
+
+</Card>
+
+<Card href="/docs/main/build/plugins/users-pointers" title='Users Pointers'>
+
+Displays real-time cursors or pointers for all connected users on the canvas.
+
+</Card>
+
+<Card href="/docs/main/build/plugins/users-selector" title='Users Selector'>
+
+Displays real-time the user selection for all connected users on the canvas.
+
+</Card>
+
+</Cards>
+
+### Collaboration
+
+<Cards>
+
+<Card href="/docs/main/build/plugins/comments-renderer" title='Comments Renderer'>
+
+Renders the provided comments on a special layer in order to enable interactivity.
+
+</Card>
+
+</Cards>
+
+### UX
+
+<Cards>
+
+<Card href="/docs/main/build/plugins/context-menu" title='Context Menu'>
+
+Adds custom right-click menus to the canvas, enabling users to access context-specific
+actions
+
+</Card>
+
+<Card href="/docs/main/build/plugins/copy-paste-nodes" title='Copy & Paste Nodes'>
+
+Enables users to copy & paste selected nodes using familiar keyboard shortcuts like
+Ctrl/Cmd + C and Ctrl/Cmd + V or through actions on the context menu.
+
+</Card>
+
+<Card href="/docs/main/build/plugins/nodes-selection" title='Nodes Selection'>
+
+Enables users to select one or multiple nodes on the canvas through clicks,
+shift-clicks, or drag-selection (marquee).
+
+</Card>
+
+<Card href="/docs/main/build/plugins/nodes-multi-selection-feedback" title='Nodes Multi-Selection'>
+
+Enables more feedback to end-users when multi-selecting.
+
+</Card>
+
+<Card href="/docs/main/build/plugins/nodes-snapping" title='Nodes Snapping'>
+
+Adds smart alignment assistance by enabling nodes to snap to guides or other nodes as they
+are moved or resized.
+
+</Card>
+
+</Cards>
+
+### Stage
+
+<Cards>
+
+<Card href="/docs/main/build/plugins/stage-drop-area" title='Stage Drop Area'>
+
+Enables drag-and-drop support on the canvas, allowing users to drop elements—such as
+shapes, files, or custom components—directly onto the canvas.
+
+</Card>
+
+<Card href="/docs/main/build/plugins/stage-grid" title='Stage Grid'>
+
+Adds a visual background grid to the canvas stage, helping users align and position
+elements more precisely.
+
+</Card>
+
+<Card href="/docs/main/build/plugins/stage-keyboard-move" title='Stage Keyboard Move'>
+
+Enables to move selected nodes by a delta when pressing shift + keyboard arrows.
+
+</Card>
+
+<Card href="/docs/main/build/plugins/stage-panning" title='Stage Panning'>
+
+Enables users to navigate the canvas by dragging to move around the Stage.
+
+</Card>
+
+<Card href="/docs/main/build/plugins/stage-resize" title='Stage Resize'>
+
+Automatically adjusts the canvas size to fit its container or the browser window,
+ensuring a responsive and adaptive user experience.
+
+</Card>
+
+<Card href="/docs/main/build/plugins/stage-zoom" title='Stage Zoom'>
+
+Enables smooth zooming in and out of the canvas, allowing users to focus on details
+or get an overview of the entire workspace.
+
+</Card>
+
+<Card href="/docs/main/build/plugins/stage-minimap" title="Stage Minimap">
+  Provides a scaled-down preview of the room content, useful for quick
+  navigation and orientation.
+</Card>
+
+</Cards>
+
+## Custom Plugins
+
+Developers can also build their own **plugins**, empowering this way their applications
+with new features closer to the needs of their applications.
+
+For this we provide an extension mechanism that allows to define your own plugins and use them
+on your application.
+
+### WeavePlugin class
+
+In Weave.js a Plugin is a class that extends the
+[WeavePlugin](https://github.com/InditexTech/weavejs/blob/main/code/packages/sdk/src/plugins/plugin.ts)
+abstract class, and implements a set of methods that define the Plugin behavior.
+
+<Callout title="Access the Weave instance">
+
+You can access Weave.js main instance via `this.instance`.
+
+</Callout>
+
+To build a plugin, create a class that extends the [WeavePlugin](https://github.com/InditexTech/weavejs/blob/main/code/packages/sdk/src/plugins/plugin.ts)
+abstract class, and implement the following methods:
+
+#### getName
+
+```ts
+getName(): string
+```
+
+The `getName` method returns the name of the plugin, used as an identifier
+on the Weave instance. The name of the plugin must be unique among other plugins.
+
+#### onInit
+
+```ts
+onInit?(): void
+```
+
+The `onInit` method is optional, and is called after the first render of the
+Weave instance. It's a good place to initialize the plugin state, events, etc.
+
+#### onRender
+
+```ts
+onRender?(): void
+```
+
+The `onRender` method is optional, and is called on every render of the Weave
+instance. It's a good place to update the plugin and render it's changes.
+
+#### enable
+
+```ts
+enable(): void
+```
+
+The `enable` method is called when the user wants to enable the plugin.
+
+#### disable
+
+```ts
+disable(): void
+```
+
+The `enable` method is called when the user wants to disable the plugin.

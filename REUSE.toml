@@ -32,6 +32,7 @@ path = [
     "code/packages/store-websockets/nginx.conf",
     "code/.husky/**",
     "code/verdaccio/**",
+    "code/.eslintignore",
     "code/.prettierignore",
     "code/.prettierrc",
     "code/.tool-versions",

@@ -1,7 +1,11 @@
 import path from 'path'
 import fs from 'fs/promises'
+import { fileURLToPath } from 'node:url'
 import { WeaveAzureWebPubsubServer } from '@inditextech/weave-store-azure-web-pubsub/server'
-import { createFolder, existsFolder } from '@/utils'
+import { createFolder, existsFolder } from '@/utils.js'
+
+const __filename = fileURLToPath(import.meta.url)
+const __dirname = path.dirname(__filename)
 
 const endpoint = process.env.WEAVE_AZURE_WEB_PUBSUB_ENDPOINT
 const key = process.env.WEAVE_AZURE_WEB_PUBSUB_KEY
@@ -23,9 +27,8 @@ export const getAzureWebPubsubServer = () => {
 
 export const setupStore = () => {
   azureWebPubsubServer = new WeaveAzureWebPubsubServer({
-    pubsubConfig: {
+    pubSubConfig: {
       endpoint,
-      key,
       hubName
     },
     fetchRoom: async (docName: string) => {
@@ -48,6 +51,8 @@ export const setupStore = () => {
       actualState: Uint8Array<ArrayBufferLike>
     ) => {
       try {
+        console.log(`Persisting room ${docName}...`)
+
         const roomsFolder = path.join(__dirname, 'rooms')
 
         if (!(await existsFolder(roomsFolder))) {
@@ -68,6 +73,7 @@ export const setupStore = () => {
         }
 
         const roomsFile = path.join(roomsFolder, docName)
+        console.log(`Persisting room ${roomsFile}...`)
         await fs.writeFile(roomsFile, actualState)
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
       } catch (_) {

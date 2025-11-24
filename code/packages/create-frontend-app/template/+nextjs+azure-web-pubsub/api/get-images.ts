@@ -1,7 +1,7 @@
 export const getImages = async (
   roomId: string,
   pageSize: number,
-  page: string | undefined
+  page: string | undefined,
 ) => {
   let endpoint = `${process.env.NEXT_PUBLIC_API_ENDPOINT}/rooms/${roomId}/images?pageSize=${pageSize}`;
 

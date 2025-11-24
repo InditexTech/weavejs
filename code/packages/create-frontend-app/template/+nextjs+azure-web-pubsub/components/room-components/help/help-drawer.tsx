@@ -1,33 +1,33 @@
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   DropdownMenuItem,
   DropdownMenuShortcut,
-} from '@/components/ui/dropdown-menu';
+} from "@/components/ui/dropdown-menu";
 import {
   Drawer,
   DrawerClose,
   DrawerContent,
   DrawerHeader,
   DrawerTitle,
-} from '@/components/ui/drawer';
-import { Keyboard, XIcon } from 'lucide-react';
-import { SYSTEM_OS } from '@/lib/utils';
-import { HelpTools } from './help-tools';
-import React from 'react';
-import { useGetOs } from '../hooks/use-get-os';
-import { HelpZoom } from './help-zoom';
-import { HelpView } from './help-view';
-import { HelpSelection } from './help-selection';
-import { HelpEdit } from './help-edit';
-import { HelpArrange } from './help-arrange';
-import { useCollaborationRoom } from '@/store/store';
-import { DRAWER_ELEMENTS } from '@/lib/constants';
+} from "@/components/ui/drawer";
+import { Keyboard, XIcon } from "lucide-react";
+import { SYSTEM_OS } from "@/lib/utils";
+import { HelpTools } from "./help-tools";
+import React from "react";
+import { useGetOs } from "../hooks/use-get-os";
+import { HelpZoom } from "./help-zoom";
+import { HelpView } from "./help-view";
+import { HelpSelection } from "./help-selection";
+import { HelpEdit } from "./help-edit";
+import { HelpArrange } from "./help-arrange";
+import { useCollaborationRoom } from "@/store/store";
+import { DRAWER_ELEMENTS } from "@/lib/constants";
 
 export const HelpDrawerTrigger = () => {
   const os = useGetOs();
 
   const keyboardShortcutsVisible = useCollaborationRoom(
-    (state) => state.drawer.keyboardShortcuts.visible
+    (state) => state.drawer.keyboardShortcuts.visible,
   );
   const setShowDrawer = useCollaborationRoom((state) => state.setShowDrawer);
 
@@ -36,14 +36,14 @@ export const HelpDrawerTrigger = () => {
       onClick={() => {
         setShowDrawer(
           DRAWER_ELEMENTS.keyboardShortcuts,
-          !keyboardShortcutsVisible
+          !keyboardShortcutsVisible,
         );
       }}
       className="w-full text-foreground cursor-pointer hover:rounded-none"
     >
       <Keyboard /> Keyboard shortcuts
       <DropdownMenuShortcut>
-        {[SYSTEM_OS.MAC as string].includes(os) ? '⌘ K' : 'Ctrl K'}
+        {[SYSTEM_OS.MAC as string].includes(os) ? "⌘ K" : "Ctrl K"}
       </DropdownMenuShortcut>
     </DropdownMenuItem>
   );
@@ -51,7 +51,7 @@ export const HelpDrawerTrigger = () => {
 
 export const HelpDrawer = () => {
   const keyboardShortcutsVisible = useCollaborationRoom(
-    (state) => state.drawer.keyboardShortcuts.visible
+    (state) => state.drawer.keyboardShortcuts.visible,
   );
   const setShowDrawer = useCollaborationRoom((state) => state.setShowDrawer);
 

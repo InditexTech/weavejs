@@ -14,7 +14,6 @@ import { ColorTokenProperties } from '../node-properties/color-token-properties'
 import { FrameProperties } from '../node-properties/frame-properties';
 import { CropProperties } from '../node-properties/crop-properties';
 import { SIDEBAR_ELEMENTS } from '@/lib/constants';
-import { X } from 'lucide-react';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { WeaveSelection } from '@inditextech/weave-types';
 import { MetaProperties } from '../node-properties/meta-properties';
@@ -22,6 +21,7 @@ import { EllipseProperties } from '../node-properties/ellipse-properties';
 import { StarProperties } from '../node-properties/star-properties';
 import { ArrowProperties } from '../node-properties/arrow-properties';
 import { RegularPolygonProperties } from '../node-properties/regular-polygon-properties';
+import { SidebarSelector } from '../sidebar-selector';
 
 export const NodeProperties = () => {
   const instance = useWeave((state) => state.instance);
@@ -29,11 +29,12 @@ export const NodeProperties = () => {
   const node = useWeave((state) => state.selection.node);
   const setNode = useWeave((state) => state.setNode);
 
-  const sidebarRightActive = useCollaborationRoom(
-    (state) => state.sidebar.right.active
-  );
+  const sidebarActive = useCollaborationRoom((state) => state.sidebar.active);
   const setSidebarActive = useCollaborationRoom(
     (state) => state.setSidebarActive
+  );
+  const setPreviousSidebarActive = useCollaborationRoom(
+    (state) => state.setPreviousSidebarActive
   );
   const setNodePropertiesAction = useCollaborationRoom(
     (state) => state.setNodePropertiesAction
@@ -60,12 +61,12 @@ export const NodeProperties = () => {
       ].includes(actualAction)
     ) {
       setNodePropertiesAction('create');
-      setSidebarActive(SIDEBAR_ELEMENTS.nodeProperties, 'right');
+      setSidebarActive(SIDEBAR_ELEMENTS.nodeProperties);
     }
 
     if (!actualAction && !node) {
       setNodePropertiesAction(undefined);
-      setSidebarActive(null, 'right');
+      setSidebarActive(null);
     }
 
     if (node) {
@@ -84,15 +85,13 @@ export const NodeProperties = () => {
       case 'regular-polygon':
         return 'Regular Polygon';
       case 'line':
-        return 'Vector path';
+        return 'Line';
+      case 'stroke':
+        return 'Stroke';
       case 'text':
         return 'Text';
       case 'image':
         return 'Image';
-      case 'star':
-        return 'Star';
-      case 'arrow':
-        return 'Arrow';
       case 'color-token':
         return 'Color Token';
       case 'frame':
@@ -109,11 +108,11 @@ export const NodeProperties = () => {
       case 'ellipseTool':
         return 'Ellipse';
       case 'regularPolygonTool':
-        return 'RegularPolygon';
+        return 'Regular Polygon';
       case 'brushTool':
-        return 'Vector path';
-      case 'penTool':
-        return 'Vector path';
+        return 'Stroke';
+      case 'lineTool':
+        return 'Line';
       case 'imageTool':
         return 'Image';
       case 'starTool':
@@ -136,25 +135,36 @@ export const NodeProperties = () => {
       actionType === 'Unknown' &&
       nodeType === 'Unknown'
     ) {
-      setSidebarActive(null, 'right');
+      setSidebarActive(null);
       return;
     }
-    if (nodePropertiesAction === 'create' && actionType) {
-      setSidebarActive(SIDEBAR_ELEMENTS.nodeProperties, 'right');
+    if (
+      sidebarActive !== SIDEBAR_ELEMENTS.nodeProperties &&
+      nodePropertiesAction === 'create' &&
+      actionType
+    ) {
+      setSidebarActive(SIDEBAR_ELEMENTS.nodeProperties);
       return;
     }
-    if (node && nodePropertiesAction === 'update' && nodeType) {
-      setSidebarActive(SIDEBAR_ELEMENTS.nodeProperties, 'right');
+    if (
+      sidebarActive !== SIDEBAR_ELEMENTS.nodeProperties &&
+      node &&
+      nodePropertiesAction === 'update' &&
+      nodeType
+    ) {
+      setSidebarActive(SIDEBAR_ELEMENTS.nodeProperties);
       return;
     }
-    setSidebarActive(null, 'right');
+    if (!node && sidebarActive === SIDEBAR_ELEMENTS.nodeProperties) {
+      setPreviousSidebarActive();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     actualAction,
     actionType,
     nodeType,
     nodePropertiesAction,
     node,
-    sidebarRightActive,
     setSidebarActive,
   ]);
 
@@ -180,7 +190,7 @@ export const NodeProperties = () => {
     return nodeType;
   }, [nodeType, actionType, nodePropertiesAction]);
 
-  if (sidebarRightActive !== 'nodeProperties') {
+  if (sidebarActive !== 'nodeProperties') {
     return null;
   }
 
@@ -188,37 +198,7 @@ export const NodeProperties = () => {
     <div className="w-full h-full">
       <div className="w-full px-[24px] py-[29px] bg-white flex justify-between items-center border-b border-[#c9c9c9]">
         <div className="flex justify-between font-inter font-light text-[24px] items-center text-md pl-2 uppercase">
-          {title}
-        </div>
-        <div className="flex justify-end items-center gap-1">
-          <button
-            className="cursor-pointer bg-transparent hover:bg-accent p-[2px]"
-            onClick={() => {
-              if (!instance) return;
-              if (
-                actualAction &&
-                [
-                  'rectangleTool',
-                  'ellipseTool',
-                  'regularPolygonTool',
-                  'brushTool',
-                  'penTool',
-                  'imageTool',
-                  'starTool',
-                  'arrowTool',
-                  'colorTokenTool',
-                  'frameTool',
-                ].includes(actualAction)
-              ) {
-                instance.cancelAction(actualAction);
-              }
-              instance.selectNodesByKey([]);
-              setNodePropertiesAction(undefined);
-              setSidebarActive(null, 'right');
-            }}
-          >
-            <X size={16} strokeWidth={1} />
-          </button>
+          <SidebarSelector title={title} />
         </div>
       </div>
       <ScrollArea className="w-full h-[calc(100%-95px)]">

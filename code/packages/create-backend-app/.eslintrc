@@ -11,5 +11,9 @@
   },
   "rules": {
     "@typescript-eslint/no-explicit-any": "warn"
-  }
+  },
+  "ignorePatterns": [
+    "template/+express+websockets/**/*",
+    "template/+express+azure-web-pubsub/**/*"
+  ]
 }

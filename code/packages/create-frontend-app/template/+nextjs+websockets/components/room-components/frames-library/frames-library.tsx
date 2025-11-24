@@ -1,10 +1,10 @@
-import { BlendMode, PDFDocument } from 'pdf-lib';
-import { WeaveSelection, WeaveStateElement } from '@inditextech/weave-types';
-import React from 'react';
-import Konva from 'konva';
-import { Checkbox } from '@/components/ui/checkbox';
-import { useCollaborationRoom } from '@/store/store';
-import { useWeave } from '@inditextech/weave-react';
+import { BlendMode, PDFDocument } from "pdf-lib";
+import { WeaveSelection, WeaveStateElement } from "@inditextech/weave-types";
+import React from "react";
+import Konva from "konva";
+import { Checkbox } from "@/components/ui/checkbox";
+import { useCollaborationRoom } from "@/store/store";
+import { useWeave } from "@inditextech/weave-react";
 import {
   Loader2Icon,
   AlignStartHorizontal,
@@ -15,33 +15,27 @@ import {
   SquareCheck,
   StepBack,
   StepForward,
-  X,
   XIcon,
-} from 'lucide-react';
-import { generatePresentation, PresentationImage, toImageAsync } from './utils';
-import { FrameImage } from './frames-library.image';
-import { FramePresentationImage } from './frames-library.presentation-image';
-import { SIDEBAR_ELEMENTS } from '@/lib/constants';
+} from "lucide-react";
+import { generatePresentation, PresentationImage, toImageAsync } from "./utils";
+import { FrameImage } from "./frames-library.image";
+import { FramePresentationImage } from "./frames-library.presentation-image";
+import { SIDEBAR_ELEMENTS } from "@/lib/constants";
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
-} from '@/components/ui/tooltip';
-import { ScrollArea } from '@/components/ui/scroll-area';
-import { SidebarSelector } from '../sidebar-selector';
+} from "@/components/ui/tooltip";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { SidebarSelector } from "../sidebar-selector";
 
 export const FramesLibrary = () => {
   const instance = useWeave((state) => state.instance);
   const appState = useWeave((state) => state.appState);
   const selectedNodes = useWeave((state) => state.selection.nodes);
 
-  const sidebarLeftActive = useCollaborationRoom(
-    (state) => state.sidebar.left.active
-  );
-  const setSidebarActive = useCollaborationRoom(
-    (state) => state.setSidebarActive
-  );
+  const sidebarActive = useCollaborationRoom((state) => state.sidebar.active);
 
   const [presentationMode, setPresentationMode] =
     React.useState<boolean>(false);
@@ -66,7 +60,7 @@ export const FramesLibrary = () => {
 
     const nodes = instance.findNodesByType(
       appState.weave as WeaveStateElement,
-      'frame'
+      "frame",
     );
 
     const frames: Konva.Node[] = [];
@@ -82,7 +76,7 @@ export const FramesLibrary = () => {
   const selectedNodesAllFrame = React.useMemo(() => {
     let allFrame = true;
     for (const node of selectedNodes) {
-      if (node.node.type !== 'frame') {
+      if (node?.node?.type !== "frame") {
         allFrame = false;
         break;
       }
@@ -95,14 +89,14 @@ export const FramesLibrary = () => {
       return;
     }
 
-    instance.triggerAction<{ gap: number; nodes: WeaveSelection[] }>(
-      'alignElementsTool',
+    instance.triggerAction<{ gap: number; nodes: WeaveSelection[] }, void>(
+      "alignElementsTool",
       {
         gap: 20,
         nodes: selectedNodes,
-      }
+      },
     );
-    instance.triggerAction('selectionTool');
+    instance.triggerAction("selectionTool");
   }, [instance, selectedNodes]);
 
   const exportFramesHandler = React.useCallback(async () => {
@@ -114,7 +108,7 @@ export const FramesLibrary = () => {
 
     let framesToRender = selectedFrames;
     if (framesToRender.length === 0) {
-      framesToRender = framesAvailable.map((e) => e.getAttrs().id ?? '');
+      framesToRender = framesAvailable.map((e) => e.getAttrs().id ?? "");
     }
 
     const pages: { title: string; image: string }[] = [];
@@ -150,9 +144,9 @@ export const FramesLibrary = () => {
 
     const pdfDataUri = await pdfDoc.saveAsBase64({ dataUri: true });
 
-    const link = document.createElement('a');
+    const link = document.createElement("a");
     link.href = pdfDataUri;
-    link.download = 'test.pdf';
+    link.download = "test.pdf";
     link.click();
   }, [instance, selectedFrames, framesAvailable]);
 
@@ -182,7 +176,7 @@ export const FramesLibrary = () => {
     return null;
   }
 
-  if (sidebarLeftActive !== SIDEBAR_ELEMENTS.frames) {
+  if (sidebarActive !== SIDEBAR_ELEMENTS.frames) {
     return null;
   }
 
@@ -252,7 +246,7 @@ export const FramesLibrary = () => {
                       if (selectedFrames.length === 0) {
                         const frames = framesAvailable.map((frame) => {
                           const attrs = frame.getAttrs();
-                          return attrs.id ?? '';
+                          return attrs.id ?? "";
                         });
                         setSelectedFrames(frames);
                       } else {
@@ -296,14 +290,6 @@ export const FramesLibrary = () => {
                 </TooltipContent>
               </Tooltip>
             </TooltipProvider>
-            <button
-              className="cursor-pointer bg-transparent w-[20px] h-[40px] hover:text-[#c9c9c9]"
-              onClick={() => {
-                setSidebarActive(null);
-              }}
-            >
-              <X size={20} strokeWidth={1} />
-            </button>
           </div>
         </div>
         <ScrollArea className="w-full h-[calc(100%-95px)]">
@@ -337,10 +323,10 @@ export const FramesLibrary = () => {
                         onCheckedChange={() => {
                           setSelectedFrames((prev) => {
                             const newElements = new Set(prev);
-                            if (newElements.has(attrs.id ?? '')) {
-                              newElements.delete(attrs.id ?? '');
+                            if (newElements.has(attrs.id ?? "")) {
+                              newElements.delete(attrs.id ?? "");
                             } else {
-                              newElements.add(attrs.id ?? '');
+                              newElements.add(attrs.id ?? "");
                             }
                             return Array.from(newElements);
                           });

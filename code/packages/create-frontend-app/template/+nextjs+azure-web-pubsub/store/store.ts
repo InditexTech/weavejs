@@ -1,17 +1,18 @@
-'use client';
+"use client";
 
-import Konva from 'konva';
-import { create } from 'zustand';
-import { ContextMenuOption } from '@/components/room-components/context-menu';
-import { WeaveElementAttributes } from '@inditextech/weave-types';
-import { DRAWER_ELEMENTS, SIDEBAR_ELEMENTS } from '@/lib/constants';
+import Konva from "konva";
+import { create } from "zustand";
+import { ContextMenuOption } from "@/components/room-components/context-menu";
+import { WeaveElementAttributes } from "@inditextech/weave-types";
+import { DRAWER_ELEMENTS, SIDEBAR_ELEMENTS } from "@/lib/constants";
 
 type ShowcaseUser = {
+  id: string;
   name: string;
   email: string;
 };
 
-type NodePropertiesAction = 'create' | 'update' | undefined;
+type NodePropertiesAction = "create" | "update" | undefined;
 
 type FinishUploadCallback = (imageURL: string) => void;
 
@@ -35,11 +36,13 @@ interface CollaborationRoomState {
     };
   };
   sidebar: {
-    left: {
-      active: SidebarActive;
-    };
-    right: {
-      active: SidebarActive;
+    previouslyActive: SidebarActive;
+    active: SidebarActive;
+  };
+  export: {
+    nodes: string[]; // node ids
+    config: {
+      visible: boolean;
     };
   };
   user: ShowcaseUser | undefined;
@@ -63,7 +66,7 @@ interface CollaborationRoomState {
   setShowUi: (newShowUI: boolean) => void;
   setFetchConnectionUrlLoading: (newLoading: boolean) => void;
   setFetchConnectionUrlError: (
-    newFetchConnectionUrlError: Error | null
+    newFetchConnectionUrlError: Error | null,
   ) => void;
   setUser: (newUser: ShowcaseUser | undefined) => void;
   setRoom: (newRoom: string | undefined) => void;
@@ -75,19 +78,19 @@ interface CollaborationRoomState {
   setShowSelectFileImage: (newShowSelectFileImage: boolean) => void;
   setLoadingImage: (newLoadingImage: boolean) => void;
   setFinishUploadCallbackImage: (
-    newFinishUploadCallbackImage: FinishUploadCallback | null
+    newFinishUploadCallbackImage: FinishUploadCallback | null,
   ) => void;
   setNodePropertiesAction: (
-    newNodePropertiesAction: NodePropertiesAction
+    newNodePropertiesAction: NodePropertiesAction,
   ) => void;
   setNodePropertiesCreateProps: (
-    newNodePropertiesCreateProps: WeaveElementAttributes | undefined
+    newNodePropertiesCreateProps: WeaveElementAttributes | undefined,
   ) => void;
-  setSidebarActive: (
-    newSidebarActive: SidebarActive,
-    position?: 'left' | 'right'
-  ) => void;
+  setPreviousSidebarActive: () => void;
+  setSidebarActive: (newSidebarActive: SidebarActive) => void;
   setShowDrawer: (drawerKey: DrawerKey, newOpen: boolean) => void;
+  setExportNodes: (newNodes: string[]) => void;
+  setExportConfigVisible: (newVisible: boolean) => void;
 }
 
 export const useCollaborationRoom = create<CollaborationRoomState>()((set) => ({
@@ -101,15 +104,17 @@ export const useCollaborationRoom = create<CollaborationRoomState>()((set) => ({
   user: undefined,
   room: undefined,
   sidebar: {
-    left: {
-      active: null,
-    },
-    right: {
-      active: null,
-    },
+    previouslyActive: null,
+    active: null,
   },
   drawer: {
     keyboardShortcuts: {
+      visible: false,
+    },
+  },
+  export: {
+    nodes: [],
+    config: {
       visible: false,
     },
   },
@@ -225,15 +230,35 @@ export const useCollaborationRoom = create<CollaborationRoomState>()((set) => ({
         createProps: newNodePropertiesCreateProps,
       },
     })),
-  setSidebarActive: (newSidebarActive, position = 'left') =>
+  setPreviousSidebarActive: () =>
+    set((state) => {
+      if (
+        state.sidebar.previouslyActive === state.sidebar.active &&
+        state.sidebar.previouslyActive === SIDEBAR_ELEMENTS.nodeProperties
+      ) {
+        return {
+          ...state,
+          sidebar: {
+            previouslyActive: state.sidebar.active,
+            active: null,
+          },
+        };
+      }
+
+      return {
+        ...state,
+        sidebar: {
+          previouslyActive: state.sidebar.active,
+          active: state.sidebar.previouslyActive,
+        },
+      };
+    }),
+  setSidebarActive: (newSidebarActive) =>
     set((state) => ({
       ...state,
       sidebar: {
-        ...state.sidebar,
-        [position]: {
-          ...state.sidebar[position],
-          active: newSidebarActive,
-        },
+        previouslyActive: state.sidebar.active,
+        active: newSidebarActive,
       },
     })),
   setShowDrawer: (drawerKey, newOpen) =>
@@ -244,6 +269,25 @@ export const useCollaborationRoom = create<CollaborationRoomState>()((set) => ({
         [drawerKey]: {
           ...state.drawer[drawerKey],
           visible: newOpen,
+        },
+      },
+    })),
+  setExportNodes: (newNodes: string[]) =>
+    set((state) => ({
+      ...state,
+      export: {
+        ...state.export,
+        nodes: newNodes,
+      },
+    })),
+  setExportConfigVisible: (newVisible: boolean) =>
+    set((state) => ({
+      ...state,
+      export: {
+        ...state.export,
+        config: {
+          ...state.export.config,
+          visible: newVisible,
         },
       },
     })),

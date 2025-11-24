@@ -4,16 +4,16 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select';
-import { cn } from '@/lib/utils';
-import { type ComponentProps } from 'react';
-import { useColorPicker } from '../context/color-picker-context';
+} from "@/components/ui/select";
+import { cn } from "@/lib/utils";
+import { type ComponentProps } from "react";
+import { useColorPicker } from "../context/color-picker-context";
 
 export type ColorPickerFormatSelectorProps = ComponentProps<
   typeof SelectTrigger
 >;
 
-const formats = ['hex', 'rgba'];
+const formats = ["hex", "rgba"];
 
 /**
  * ColorPickerFormatSelector component
@@ -29,8 +29,8 @@ export const ColorPickerFormatSelector = ({
     <Select value={mode} onValueChange={setMode}>
       <SelectTrigger
         className={cn(
-          'h-8 !text-[14px] border-black rounded-none font-normal text-black',
-          className
+          "h-8 !text-[14px] border-black rounded-none font-normal text-black",
+          className,
         )}
         data-size="sm"
         aria-label="Color format"

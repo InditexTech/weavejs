@@ -5,11 +5,11 @@ import {
   useMemo,
   useRef,
   useState,
-} from 'react';
-import { useColorPicker } from '../context/color-picker-context';
-import { cn } from '@/lib/utils';
-import Color from 'color';
-import { hslToRgb, rgbToHsl } from '../utils';
+} from "react";
+import { useColorPicker } from "../context/color-picker-context";
+import { cn } from "@/lib/utils";
+import Color from "color";
+import { hslToRgb, rgbToHsl } from "../utils";
 
 export type ColorPickerSaturationProps = HTMLAttributes<HTMLDivElement>;
 
@@ -28,7 +28,7 @@ export const ColorPickerSaturation = ({
   const renderGradient = useCallback(() => {
     if (canvasRef.current) {
       const canvas = canvasRef.current;
-      const ctx = canvas.getContext('2d', {
+      const ctx = canvas.getContext("2d", {
         willReadFrequently: true,
       });
       if (ctx && containerRef.current) {
@@ -76,17 +76,17 @@ export const ColorPickerSaturation = ({
       setPosition({ x: x, y: y });
       setColor(Color.rgb(r, g, b));
     },
-    [hue, setColor]
+    [hue, setColor],
   );
 
   useEffect(() => {
     if (isDragging) {
       const onPointerUp = () => setIsDragging(false);
-      window.addEventListener('pointermove', handlePointerMove);
-      window.addEventListener('pointerup', onPointerUp);
+      window.addEventListener("pointermove", handlePointerMove);
+      window.addEventListener("pointerup", onPointerUp);
       return () => {
-        window.removeEventListener('pointermove', handlePointerMove);
-        window.removeEventListener('pointerup', onPointerUp);
+        window.removeEventListener("pointermove", handlePointerMove);
+        window.removeEventListener("pointerup", onPointerUp);
       };
     }
   }, [isDragging, handlePointerMove]);
@@ -110,8 +110,8 @@ export const ColorPickerSaturation = ({
       <div
         ref={containerRef}
         className={cn(
-          'relative aspect-[4/3] w-full cursor-crosshair rounded-none',
-          className
+          "relative aspect-[4/3] w-full cursor-crosshair rounded-none",
+          className,
         )}
         style={{
           background: `linear-gradient(0deg, rgb(0,0,0), transparent),linear-gradient(90deg, rgb(255,255,255), hsl(${hue},100%,50%))`,
@@ -128,10 +128,10 @@ export const ColorPickerSaturation = ({
           style={{
             left: `${position.x}px`,
             top: `${position.y}px`,
-            boxShadow: '0 0 0 2px black',
+            boxShadow: "0 0 0 2px black",
           }}
         />
-        <canvas ref={canvasRef} style={{ display: 'none' }} />
+        <canvas ref={canvasRef} style={{ display: "none" }} />
       </div>
     </>
   );

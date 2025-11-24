@@ -1,9 +1,9 @@
-import _ from 'lodash';
-import React from 'react';
-import Image from 'next/image';
-import Konva from 'konva';
-import { toImageAsync } from './utils';
-import { useWeave } from '@inditextech/weave-react';
+import _ from "lodash";
+import React from "react";
+import Image from "next/image";
+import Konva from "konva";
+import { toImageAsync } from "./utils";
+import { useWeave } from "@inditextech/weave-react";
 
 type FrameImageProps = {
   node: Konva.Group;
@@ -41,7 +41,7 @@ export const FrameImage = ({ node }: Readonly<FrameImageProps>) => {
             height={1080}
             alt="A frame image"
             className="w-auto h-full"
-          />
+          />,
         );
       } catch (ex) {
         console.error(ex);
@@ -55,10 +55,10 @@ export const FrameImage = ({ node }: Readonly<FrameImageProps>) => {
       debouncedLoadImage();
     };
 
-    instance?.addEventListener('onStateChange', eventHandler);
+    instance?.addEventListener("onStateChange", eventHandler);
 
     return () => {
-      instance?.removeEventListener('onStateChange', eventHandler);
+      instance?.removeEventListener("onStateChange", eventHandler);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [instance]);

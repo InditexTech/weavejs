@@ -7,9 +7,9 @@ import {
   Square,
   SwatchBook,
   Type,
-} from 'lucide-react';
-import { SYSTEM_OS } from '@/lib/utils';
-import { HelpShortcutElement } from './help-shortcut-element';
+} from "lucide-react";
+import { SYSTEM_OS } from "@/lib/utils";
+import { HelpShortcutElement } from "./help-shortcut-element";
 
 export const HelpTools = () => {
   return (
@@ -19,16 +19,16 @@ export const HelpTools = () => {
           icon={<MousePointer />}
           label="Select tool"
           shortcuts={{
-            [SYSTEM_OS.MAC]: 'S',
-            [SYSTEM_OS.OTHER]: 'S',
+            [SYSTEM_OS.MAC]: "S",
+            [SYSTEM_OS.OTHER]: "S",
           }}
         />
         <HelpShortcutElement
           icon={<Frame />}
           label="Frame tool"
           shortcuts={{
-            [SYSTEM_OS.MAC]: 'F',
-            [SYSTEM_OS.OTHER]: 'F',
+            [SYSTEM_OS.MAC]: "F",
+            [SYSTEM_OS.OTHER]: "F",
           }}
         />
       </div>
@@ -37,40 +37,40 @@ export const HelpTools = () => {
           icon={<Square />}
           label="Rectangle tool"
           shortcuts={{
-            [SYSTEM_OS.MAC]: 'R',
-            [SYSTEM_OS.OTHER]: 'R',
+            [SYSTEM_OS.MAC]: "R",
+            [SYSTEM_OS.OTHER]: "R",
           }}
         />
         <HelpShortcutElement
           icon={<PenTool />}
           label="Pen tool"
           shortcuts={{
-            [SYSTEM_OS.MAC]: 'L',
-            [SYSTEM_OS.OTHER]: 'L',
+            [SYSTEM_OS.MAC]: "L",
+            [SYSTEM_OS.OTHER]: "L",
           }}
         />
         <HelpShortcutElement
           icon={<Brush />}
           label="Brush tool"
           shortcuts={{
-            [SYSTEM_OS.MAC]: 'B',
-            [SYSTEM_OS.OTHER]: 'B',
+            [SYSTEM_OS.MAC]: "B",
+            [SYSTEM_OS.OTHER]: "B",
           }}
         />
         <HelpShortcutElement
           icon={<Type />}
           label="Text tool"
           shortcuts={{
-            [SYSTEM_OS.MAC]: 'T',
-            [SYSTEM_OS.OTHER]: 'T',
+            [SYSTEM_OS.MAC]: "T",
+            [SYSTEM_OS.OTHER]: "T",
           }}
         />
         <HelpShortcutElement
           icon={<ImagePlus />}
           label="Image tool"
           shortcuts={{
-            [SYSTEM_OS.MAC]: 'I',
-            [SYSTEM_OS.OTHER]: 'I',
+            [SYSTEM_OS.MAC]: "I",
+            [SYSTEM_OS.OTHER]: "I",
           }}
         />
       </div>
@@ -79,8 +79,8 @@ export const HelpTools = () => {
           icon={<SwatchBook />}
           label="Color Token tool"
           shortcuts={{
-            [SYSTEM_OS.MAC]: 'P',
-            [SYSTEM_OS.OTHER]: 'P',
+            [SYSTEM_OS.MAC]: "P",
+            [SYSTEM_OS.OTHER]: "P",
           }}
         />
       </div>

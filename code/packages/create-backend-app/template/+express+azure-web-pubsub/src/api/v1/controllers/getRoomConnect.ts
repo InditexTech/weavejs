@@ -1,5 +1,5 @@
 import { Request, Response } from 'express'
-import { getAzureWebPubsubServer } from '@/store'
+import { getAzureWebPubsubServer } from '@/store.js'
 
 export const getRoomConnectController =
   () =>

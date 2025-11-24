@@ -1,25 +1,25 @@
-'use client';
+"use client";
 
-import React from 'react';
-import { cn } from '@/lib/utils';
+import React from "react";
+import { cn } from "@/lib/utils";
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
-} from '@/components/ui/tooltip';
-import { useWeave } from '@inditextech/weave-react';
+} from "@/components/ui/tooltip";
+import { useWeave } from "@inditextech/weave-react";
 
 type ToolbarButtonProps = {
   className?: string;
-  variant?: 'rounded' | 'squared';
+  variant?: "rounded" | "squared";
   icon: React.ReactNode;
   onClick: () => void;
   active?: boolean;
   disabled?: boolean;
   label?: React.ReactNode;
-  tooltipSide?: 'top' | 'bottom' | 'left' | 'right';
-  tooltipAlign?: 'start' | 'center' | 'end';
+  tooltipSide?: "top" | "bottom" | "left" | "right";
+  tooltipAlign?: "start" | "center" | "end";
 };
 
 export const ToolbarButton = React.forwardRef<
@@ -30,15 +30,15 @@ export const ToolbarButton = React.forwardRef<
     {
       className,
       icon,
-      variant = 'rounded',
-      label = 'tool',
+      variant = "rounded",
+      label = "tool",
       onClick,
       disabled = false,
       active = false,
-      tooltipSide = 'right',
-      tooltipAlign = 'center',
+      tooltipSide = "right",
+      tooltipAlign = "center",
     },
-    forwardedRef
+    forwardedRef,
   ) => {
     const selectionActive = useWeave((state) => state.selection.active);
 
@@ -49,17 +49,17 @@ export const ToolbarButton = React.forwardRef<
             <button
               ref={forwardedRef}
               className={cn(
-                '!pointer-events-none relative cursor-pointer h-[40px] flex justify-center items-center',
+                "!pointer-events-none relative cursor-pointer h-[40px] flex justify-center items-center",
                 {
-                  ['hover:bg-[#f0f0f0]']: variant === 'rounded',
-                  ['hover:text-[#666666]']: variant === 'squared',
-                  ['!pointer-events-auto']: !selectionActive,
-                  ['!pointer-events-none']: selectionActive,
-                  ['bg-[#2e2e2e] text-white hover:text-[#666666]']: active,
-                  ['pointer-events-none cursor-default text-black opacity-50']:
+                  ["hover:bg-[#f0f0f0]"]: variant === "rounded",
+                  ["hover:text-[#666666]"]: variant === "squared",
+                  ["!pointer-events-auto"]: !selectionActive,
+                  ["!pointer-events-none"]: selectionActive,
+                  ["bg-[#2e2e2e] text-white hover:text-[#666666]"]: active,
+                  ["pointer-events-none cursor-default text-black opacity-50"]:
                     disabled,
                 },
-                className
+                className,
               )}
               disabled={disabled}
               onClick={onClick}
@@ -78,7 +78,7 @@ export const ToolbarButton = React.forwardRef<
         </Tooltip>
       </TooltipProvider>
     );
-  }
+  },
 );
 
-ToolbarButton.displayName = 'ToolbarButton';
+ToolbarButton.displayName = "ToolbarButton";

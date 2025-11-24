@@ -1,12 +1,12 @@
-'use client';
+"use client";
 
-import React from 'react';
-import { WeaveStateElement } from '@inditextech/weave-types';
-import { useWeave } from '@inditextech/weave-react';
-import { useCollaborationRoom } from '@/store/store';
-import { InputNumber } from '../inputs/input-number';
-import { ToggleIconButton } from '../toggle-icon-button';
-import { Scaling } from 'lucide-react';
+import React from "react";
+import { WeaveStateElement } from "@inditextech/weave-types";
+import { useWeave } from "@inditextech/weave-react";
+import { useCollaborationRoom } from "@/store/store";
+import { InputNumber } from "../inputs/input-number";
+import { ToggleIconButton } from "../toggle-icon-button";
+import { Scaling } from "lucide-react";
 
 export function StarProperties() {
   const instance = useWeave((state) => state.instance);
@@ -14,26 +14,26 @@ export function StarProperties() {
   const actualAction = useWeave((state) => state.actions.actual);
 
   const nodePropertiesAction = useCollaborationRoom(
-    (state) => state.nodeProperties.action
+    (state) => state.nodeProperties.action,
   );
 
   const nodeCreateProps = useCollaborationRoom(
-    (state) => state.nodeProperties.createProps
+    (state) => state.nodeProperties.createProps,
   );
 
   const [maintainAspectRatio, setMaintainAspectRatio] = React.useState(false);
 
   const actualNode = React.useMemo(() => {
-    if (actualAction && nodePropertiesAction === 'create') {
+    if (actualAction && nodePropertiesAction === "create") {
       return {
-        key: 'creating',
-        type: 'undefined',
+        key: "creating",
+        type: "undefined",
         props: {
           ...nodeCreateProps,
         },
       };
     }
-    if (node && nodePropertiesAction === 'update') {
+    if (node && nodePropertiesAction === "update") {
       return node;
     }
     return undefined;
@@ -42,18 +42,18 @@ export function StarProperties() {
   const updateElement = React.useCallback(
     (updatedNode: WeaveStateElement) => {
       if (!instance) return;
-      if (actualAction && nodePropertiesAction === 'create') {
+      if (actualAction && nodePropertiesAction === "create") {
         instance.updatePropsAction(actualAction, updatedNode.props);
       }
-      if (nodePropertiesAction === 'update') {
+      if (nodePropertiesAction === "update") {
         instance.updateNode(updatedNode);
       }
     },
-    [instance, actualAction, nodePropertiesAction]
+    [instance, actualAction, nodePropertiesAction],
   );
 
   React.useEffect(() => {
-    if (actualNode && typeof actualNode.props.keepAspectRatio !== 'undefined') {
+    if (actualNode && typeof actualNode.props.keepAspectRatio !== "undefined") {
       setMaintainAspectRatio(actualNode.props.keepAspectRatio);
     }
   }, [actualNode]);
@@ -66,13 +66,13 @@ export function StarProperties() {
 
   if (
     actualAction &&
-    ['selectionTool'].includes(actualAction) &&
-    !['star'].includes(actualNode.type)
+    ["selectionTool"].includes(actualAction) &&
+    !["star"].includes(actualNode.type)
   ) {
     return null;
   }
 
-  if (actualAction && !['selectionTool', 'starTool'].includes(actualAction)) {
+  if (actualAction && !["selectionTool", "starTool"].includes(actualAction)) {
     return null;
   }
 
@@ -117,7 +117,7 @@ export function StarProperties() {
             <InputNumber
               label="Outer Radius"
               value={actualNode.props.outerRadius ?? 0.0}
-              disabled={actualNode.type === 'frame'}
+              disabled={actualNode.type === "frame"}
               onChange={(value) => {
                 let newInnerRadius = actualNode.props.innerRadius;
                 let newOuterRadius = value;

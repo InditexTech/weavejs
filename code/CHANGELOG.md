@@ -19,6 +19,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- [#804](https://github.com/InditexTech/weavejs/issues/804) Polish create-apps and docs
 - [#808](https://github.com/InditexTech/weavejs/issues/808) Homologate Websockets store to load initial room state as the Azure Web PubSub does
 
 ### Fixed

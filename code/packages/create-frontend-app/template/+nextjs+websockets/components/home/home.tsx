@@ -1,10 +1,10 @@
-'use client';
+"use client";
 
-import React from 'react';
-import { Toaster } from '@/components/ui/sonner';
-import { motion } from 'motion/react';
-import { Logo } from '@/components/utils/logo';
-import LoginForm from '../home-components/login-form';
+import React from "react";
+import { Toaster } from "@/components/ui/sonner";
+import { motion } from "motion/react";
+import { Logo } from "@/components/utils/logo";
+import LoginForm from "../home-components/login-form";
 
 export const Home = () => {
   return (

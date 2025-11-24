@@ -1,13 +1,13 @@
-'use client';
+"use client";
 
-import React from 'react';
-import { WeaveStateElement } from '@inditextech/weave-types';
-import { useWeave } from '@inditextech/weave-react';
-import { useCollaborationRoom } from '@/store/store';
-import { InputNumber } from '../inputs/input-number';
-import { ToggleIconButton } from '../toggle-icon-button';
-import { Scaling } from 'lucide-react';
-import { cn } from '@/lib/utils';
+import React from "react";
+import { WeaveStateElement } from "@inditextech/weave-types";
+import { useWeave } from "@inditextech/weave-react";
+import { useCollaborationRoom } from "@/store/store";
+import { InputNumber } from "../inputs/input-number";
+import { ToggleIconButton } from "../toggle-icon-button";
+import { Scaling } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 export function SizeProperties() {
   const instance = useWeave((state) => state.instance);
@@ -15,26 +15,26 @@ export function SizeProperties() {
   const actualAction = useWeave((state) => state.actions.actual);
 
   const nodePropertiesAction = useCollaborationRoom(
-    (state) => state.nodeProperties.action
+    (state) => state.nodeProperties.action,
   );
 
   const nodeCreateProps = useCollaborationRoom(
-    (state) => state.nodeProperties.createProps
+    (state) => state.nodeProperties.createProps,
   );
 
   const [maintainAspectRatio, setMaintainAspectRatio] = React.useState(true);
 
   const actualNode = React.useMemo(() => {
-    if (actualAction && nodePropertiesAction === 'create') {
+    if (actualAction && nodePropertiesAction === "create") {
       return {
-        key: 'creating',
-        type: 'undefined',
+        key: "creating",
+        type: "undefined",
         props: {
           ...nodeCreateProps,
         },
       };
     }
-    if (node && nodePropertiesAction === 'update') {
+    if (node && nodePropertiesAction === "update") {
       return node;
     }
     return undefined;
@@ -43,21 +43,21 @@ export function SizeProperties() {
   const updateElement = React.useCallback(
     (updatedNode: WeaveStateElement) => {
       if (!instance) return;
-      if (actualAction && nodePropertiesAction === 'create') {
+      if (actualAction && nodePropertiesAction === "create") {
         instance.updatePropsAction(actualAction, updatedNode.props);
       }
-      if (nodePropertiesAction === 'update') {
+      if (nodePropertiesAction === "update") {
         instance.updateNode(updatedNode);
       }
     },
-    [instance, actualAction, nodePropertiesAction]
+    [instance, actualAction, nodePropertiesAction],
   );
 
   React.useEffect(() => {
-    if (actualNode && actualNode.type === 'image') {
+    if (actualNode && actualNode.type === "image") {
       setMaintainAspectRatio(true);
     }
-    if (actualNode && typeof actualNode.props.keepAspectRatio !== 'undefined') {
+    if (actualNode && typeof actualNode.props.keepAspectRatio !== "undefined") {
       setMaintainAspectRatio(actualNode.props.keepAspectRatio);
     }
   }, [actualNode]);
@@ -70,15 +70,15 @@ export function SizeProperties() {
 
   if (
     actualAction &&
-    ['selectionTool'].includes(actualAction) &&
-    ['ellipse', 'regular-polygon', 'star'].includes(actualNode.type)
+    ["selectionTool"].includes(actualAction) &&
+    ["ellipse", "regular-polygon", "star"].includes(actualNode.type)
   ) {
     return null;
   }
 
   if (
     actualAction &&
-    !['selectionTool', 'rectangleTool', 'imageTool'].includes(actualAction)
+    !["selectionTool", "rectangleTool", "imageTool"].includes(actualAction)
   ) {
     return null;
   }
@@ -93,20 +93,20 @@ export function SizeProperties() {
         </div>
       </div>
       <div className="grid grid-cols-1 gap-3 w-full">
-        {actualNode.type === 'text' && (
+        {actualNode.type === "text" && (
           <div className="w-full flex justify-between items-center gap-4 col-span-2">
             <div className="w-full flex justify-evenly items-center gap-1">
               <ToggleIconButton
                 kind="switch"
                 className="w-full"
                 icon={<div className="text-[12px] uppercase">Auto width</div>}
-                pressed={(actualNode.props.layout ?? 'auto-all') === 'auto-all'}
+                pressed={(actualNode.props.layout ?? "auto-all") === "auto-all"}
                 onClick={() => {
                   const updatedNode: WeaveStateElement = {
                     ...actualNode,
                     props: {
                       ...actualNode.props,
-                      layout: 'auto-all',
+                      layout: "auto-all",
                     },
                   };
                   updateElement(updatedNode);
@@ -117,14 +117,14 @@ export function SizeProperties() {
                 className="w-full"
                 icon={<div className="text-[12px] uppercase">Auto height</div>}
                 pressed={
-                  (actualNode.props.layout ?? 'auto-all') === 'auto-height'
+                  (actualNode.props.layout ?? "auto-all") === "auto-height"
                 }
                 onClick={() => {
                   const updatedNode: WeaveStateElement = {
                     ...actualNode,
                     props: {
                       ...actualNode.props,
-                      layout: 'auto-height',
+                      layout: "auto-height",
                     },
                   };
                   updateElement(updatedNode);
@@ -134,13 +134,13 @@ export function SizeProperties() {
                 kind="switch"
                 className="w-full"
                 icon={<div className="text-[12px] uppercase">Fixed size</div>}
-                pressed={(actualNode.props.layout ?? 'auto-all') === 'fixed'}
+                pressed={(actualNode.props.layout ?? "auto-all") === "fixed"}
                 onClick={() => {
                   const updatedNode: WeaveStateElement = {
                     ...actualNode,
                     props: {
                       ...actualNode.props,
-                      layout: 'fixed',
+                      layout: "fixed",
                     },
                   };
                   updateElement(updatedNode);
@@ -150,18 +150,18 @@ export function SizeProperties() {
           </div>
         )}
         <div
-          className={cn('grid gap-3 w-full', {
-            ['grid-cols-3']: ['update'].includes(nodePropertiesAction),
-            ['grid-cols-2']: !['update'].includes(nodePropertiesAction),
+          className={cn("grid gap-3 w-full", {
+            ["grid-cols-3"]: ["update"].includes(nodePropertiesAction),
+            ["grid-cols-2"]: !["update"].includes(nodePropertiesAction),
           })}
         >
           <InputNumber
             label="Width"
             value={actualNode.props.width ?? 0.0}
-            disabled={actualNode.type === 'frame'}
+            disabled={actualNode.type === "frame"}
             onChange={(value) => {
-              const isImage = actualNode.type === 'image';
-              const isText = actualNode.type === 'text';
+              const isImage = actualNode.type === "image";
+              const isText = actualNode.type === "text";
 
               let newWidth = value;
               let newHeight = actualNode.props.height;
@@ -194,7 +194,7 @@ export function SizeProperties() {
                       height: newHeight,
                     },
                   }),
-                  ...(isText && { layout: 'fixed' }),
+                  ...(isText && { layout: "fixed" }),
                   width: newWidth,
                   height: newHeight,
                 },
@@ -205,10 +205,10 @@ export function SizeProperties() {
           <InputNumber
             label="Height"
             value={actualNode.props.height ?? 0.0}
-            disabled={actualNode.type === 'frame'}
+            disabled={actualNode.type === "frame"}
             onChange={(value) => {
-              const isImage = actualNode.type === 'image';
-              const isText = actualNode.type === 'text';
+              const isImage = actualNode.type === "image";
+              const isText = actualNode.type === "text";
 
               let newWidth = actualNode.props.width;
               let newHeight = value;
@@ -241,7 +241,7 @@ export function SizeProperties() {
                       height: newHeight,
                     },
                   }),
-                  ...(isText && { layout: 'fixed' }),
+                  ...(isText && { layout: "fixed" }),
                   width: newWidth,
                   height: newHeight,
                 },
@@ -249,11 +249,11 @@ export function SizeProperties() {
               updateElement(updatedNode);
             }}
           />
-          {['update'].includes(nodePropertiesAction) && (
+          {["update"].includes(nodePropertiesAction) && (
             <InputNumber
               label="Scale (%)"
               value={(actualNode.props.scaleX ?? 1) * 100}
-              disabled={actualNode.type === 'frame'}
+              disabled={actualNode.type === "frame"}
               onChange={(value) => {
                 const updatedNode: WeaveStateElement = {
                   ...actualNode,
@@ -269,9 +269,9 @@ export function SizeProperties() {
           )}
 
           <div
-            className={cn('w-full flex justify-between items-center gap-4', {
-              ['col-span-3']: ['update'].includes(nodePropertiesAction),
-              ['col-span-2']: !['update'].includes(nodePropertiesAction),
+            className={cn("w-full flex justify-between items-center gap-4", {
+              ["col-span-3"]: ["update"].includes(nodePropertiesAction),
+              ["col-span-2"]: !["update"].includes(nodePropertiesAction),
             })}
           >
             <div className="text-[12px] text-[#757575] font-inter font-light text-nowrap">
@@ -280,7 +280,7 @@ export function SizeProperties() {
             <div className="w-full flex justify-end items-center gap-1">
               <ToggleIconButton
                 kind="switch"
-                disabled={actualNode.type === 'image'}
+                disabled={actualNode.type === "image"}
                 icon={<Scaling size={20} strokeWidth={1} />}
                 pressed={maintainAspectRatio}
                 onClick={() => {

@@ -1,10 +1,10 @@
-'use client';
+"use client";
 
-import React from 'react';
-import { WeaveStateElement } from '@inditextech/weave-types';
-import { useWeave } from '@inditextech/weave-react';
-import { useCollaborationRoom } from '@/store/store';
-import { InputColor } from '../inputs/input-color';
+import React from "react";
+import { WeaveStateElement } from "@inditextech/weave-types";
+import { useWeave } from "@inditextech/weave-react";
+import { useCollaborationRoom } from "@/store/store";
+import { InputColor } from "../inputs/input-color";
 
 export function ColorTokenProperties() {
   const instance = useWeave((state) => state.instance);
@@ -12,24 +12,24 @@ export function ColorTokenProperties() {
   const actualAction = useWeave((state) => state.actions.actual);
 
   const nodePropertiesAction = useCollaborationRoom(
-    (state) => state.nodeProperties.action
+    (state) => state.nodeProperties.action,
   );
 
   const nodeCreateProps = useCollaborationRoom(
-    (state) => state.nodeProperties.createProps
+    (state) => state.nodeProperties.createProps,
   );
 
   const actualNode = React.useMemo(() => {
-    if (actualAction && nodePropertiesAction === 'create') {
+    if (actualAction && nodePropertiesAction === "create") {
       return {
-        key: 'creating',
-        type: 'undefined',
+        key: "creating",
+        type: "undefined",
         props: {
           ...nodeCreateProps,
         },
       };
     }
-    if (node && nodePropertiesAction === 'update') {
+    if (node && nodePropertiesAction === "update") {
       return node;
     }
     return undefined;
@@ -38,14 +38,14 @@ export function ColorTokenProperties() {
   const updateElement = React.useCallback(
     (updatedNode: WeaveStateElement) => {
       if (!instance) return;
-      if (actualAction && nodePropertiesAction === 'create') {
+      if (actualAction && nodePropertiesAction === "create") {
         instance.updatePropsAction(actualAction, updatedNode.props);
       }
-      if (nodePropertiesAction === 'update') {
+      if (nodePropertiesAction === "update") {
         instance.updateNode(updatedNode);
       }
     },
-    [instance, actualAction, nodePropertiesAction]
+    [instance, actualAction, nodePropertiesAction],
   );
 
   if (!instance || !actualNode) return null;
@@ -54,15 +54,15 @@ export function ColorTokenProperties() {
 
   if (
     actualAction &&
-    ['selectionTool'].includes(actualAction) &&
-    !['color-token'].includes(actualNode.type)
+    ["selectionTool"].includes(actualAction) &&
+    !["color-token"].includes(actualNode.type)
   ) {
     return null;
   }
 
   if (
     actualAction &&
-    !['selectionTool', 'colorTokenTool'].includes(actualAction)
+    !["selectionTool", "colorTokenTool"].includes(actualAction)
   )
     return null;
 

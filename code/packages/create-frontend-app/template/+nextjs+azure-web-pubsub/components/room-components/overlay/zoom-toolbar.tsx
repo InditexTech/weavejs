@@ -1,12 +1,12 @@
-'use client';
+"use client";
 
-import React from 'react';
-import { SYSTEM_OS } from '@/lib/utils';
-import { useWeave } from '@inditextech/weave-react';
-import { Fullscreen, Maximize, ZoomIn, ZoomOut } from 'lucide-react';
-import { ToolbarButton } from '../toolbar/toolbar-button';
-import { ShortcutElement } from '../help/shortcut-element';
-import { WEAVE_STORE_CONNECTION_STATUS } from '@inditextech/weave-types';
+import React from "react";
+import { SYSTEM_OS } from "@/lib/utils";
+import { useWeave } from "@inditextech/weave-react";
+import { Fullscreen, Maximize, ZoomIn, ZoomOut } from "lucide-react";
+import { ToolbarButton } from "../toolbar/toolbar-button";
+import { ShortcutElement } from "../help/shortcut-element";
+import { WEAVE_STORE_CONNECTION_STATUS } from "@inditextech/weave-types";
 
 export function ZoomToolbar() {
   const instance = useWeave((state) => state.instance);
@@ -20,14 +20,14 @@ export function ZoomToolbar() {
   const handleTriggerActionWithParams = React.useCallback(
     (actionName: string, params: unknown) => {
       if (instance) {
-        const triggerSelection = actualAction === 'selectionTool';
+        const triggerSelection = actualAction === "selectionTool";
         instance.triggerAction(actionName, params);
         if (triggerSelection) {
-          instance.triggerAction('selectionTool');
+          instance.triggerAction("selectionTool");
         }
       }
     },
-    [instance, actualAction]
+    [instance, actualAction],
   );
 
   return (
@@ -43,7 +43,7 @@ export function ZoomToolbar() {
                   WEAVE_STORE_CONNECTION_STATUS.CONNECTED
               }
               onClick={() => {
-                handleTriggerActionWithParams('zoomInTool', {
+                handleTriggerActionWithParams("zoomInTool", {
                   previousAction: actualAction,
                 });
               }}
@@ -52,8 +52,8 @@ export function ZoomToolbar() {
                   <p>Zoom in</p>
                   <ShortcutElement
                     shortcuts={{
-                      [SYSTEM_OS.MAC]: '⌘ +',
-                      [SYSTEM_OS.OTHER]: 'Ctrl +',
+                      [SYSTEM_OS.MAC]: "⌘ +",
+                      [SYSTEM_OS.OTHER]: "Ctrl +",
                     }}
                   />
                 </div>
@@ -70,7 +70,7 @@ export function ZoomToolbar() {
                   WEAVE_STORE_CONNECTION_STATUS.CONNECTED
               }
               onClick={() => {
-                handleTriggerActionWithParams('zoomOutTool', {
+                handleTriggerActionWithParams("zoomOutTool", {
                   previousAction: actualAction,
                 });
               }}
@@ -79,8 +79,8 @@ export function ZoomToolbar() {
                   <p>Zoom out</p>
                   <ShortcutElement
                     shortcuts={{
-                      [SYSTEM_OS.MAC]: '⌘ -',
-                      [SYSTEM_OS.OTHER]: 'Ctrl -',
+                      [SYSTEM_OS.MAC]: "⌘ -",
+                      [SYSTEM_OS.OTHER]: "Ctrl -",
                     }}
                   />
                 </div>
@@ -96,7 +96,7 @@ export function ZoomToolbar() {
                 WEAVE_STORE_CONNECTION_STATUS.CONNECTED
               }
               onClick={() => {
-                handleTriggerActionWithParams('fitToScreenTool', {
+                handleTriggerActionWithParams("fitToScreenTool", {
                   previousAction: actualAction,
                 });
               }}
@@ -105,8 +105,8 @@ export function ZoomToolbar() {
                   <p>Fit to screen</p>
                   <ShortcutElement
                     shortcuts={{
-                      [SYSTEM_OS.MAC]: '⇧ 1',
-                      [SYSTEM_OS.OTHER]: '⇧ 1',
+                      [SYSTEM_OS.MAC]: "⇧ 1",
+                      [SYSTEM_OS.OTHER]: "⇧ 1",
                     }}
                   />
                 </div>
@@ -122,7 +122,7 @@ export function ZoomToolbar() {
                 WEAVE_STORE_CONNECTION_STATUS.CONNECTED
               }
               onClick={() => {
-                handleTriggerActionWithParams('fitToSelectionTool', {
+                handleTriggerActionWithParams("fitToSelectionTool", {
                   previousAction: actualAction,
                 });
               }}
@@ -131,8 +131,8 @@ export function ZoomToolbar() {
                   <p>Fit to selection</p>
                   <ShortcutElement
                     shortcuts={{
-                      [SYSTEM_OS.MAC]: '⇧ 2',
-                      [SYSTEM_OS.OTHER]: '⇧ 2',
+                      [SYSTEM_OS.MAC]: "⇧ 2",
+                      [SYSTEM_OS.OTHER]: "⇧ 2",
                     }}
                   />
                 </div>

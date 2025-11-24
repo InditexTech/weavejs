@@ -16,11 +16,16 @@ import pc from 'picocolors';
 import { getPackageManager } from './auto-install';
 import { type Template, create } from './create-app';
 import { cwd } from './constants';
+import packageJson from '../package.json' assert { type: 'json' };
 
 const manager = getPackageManager();
 
 async function main(): Promise<void> {
-  intro(pc.bgCyan(pc.bold('Create Weave.js Backend Service')));
+  intro(
+    pc.bgCyan(
+      pc.bold(`Create Weave.js Backend Service [${packageJson.version}]`)
+    )
+  );
 
   const options = await group(
     {
@@ -46,22 +51,6 @@ async function main(): Promise<void> {
             },
           ],
         }),
-      // src: (v) => {
-      //   if (!v.results.template?.startsWith('+next')) return;
-
-      //   return confirm({
-      //     message: 'Use `/src` directory?',
-      //     initialValue: false,
-      //   });
-      // },
-      // eslint: (v) => {
-      //   if (!v.results.template?.startsWith('+next')) return;
-
-      //   return confirm({
-      //     message: 'Add default ESLint configuration?',
-      //     initialValue: false,
-      //   });
-      // },
       installDeps: () =>
         confirm({
           message: `Do you want to install packages automatically? (detected as ${manager})`,
@@ -111,7 +100,7 @@ async function main(): Promise<void> {
 
   await create({
     packageManager: manager,
-    template: options.template,
+    template: options.template as Template,
     outputDir: dest,
     installDeps: options.installDeps,
     log: (message) => {

@@ -1,13 +1,12 @@
-'use client';
+"use client";
 
-import React from 'react';
-import { useWeave } from '@inditextech/weave-react';
-import { useCollaborationRoom } from '@/store/store';
-import { ColorToken } from './color-token';
-import { SIDEBAR_ELEMENTS } from '@/lib/constants';
-import { X } from 'lucide-react';
-import { ScrollArea } from '@/components/ui/scroll-area';
-import { SidebarSelector } from '../sidebar-selector';
+import React from "react";
+import { useWeave } from "@inditextech/weave-react";
+import { useCollaborationRoom } from "@/store/store";
+import { ColorToken } from "./color-token";
+import { SIDEBAR_ELEMENTS } from "@/lib/constants";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { SidebarSelector } from "../sidebar-selector";
 
 type ColorTokenElement = {
   id: string;
@@ -17,23 +16,18 @@ type ColorTokenElement = {
 export const ColorTokensLibrary = () => {
   const instance = useWeave((state) => state.instance);
 
-  const sidebarLeftActive = useCollaborationRoom(
-    (state) => state.sidebar.left.active
-  );
-  const setSidebarActive = useCollaborationRoom(
-    (state) => state.setSidebarActive
-  );
+  const sidebarActive = useCollaborationRoom((state) => state.sidebar.active);
 
   const commonColorTokens: ColorTokenElement[] = React.useMemo(() => {
     return [
-      { id: '1', color: '#28282D' },
-      { id: '2', color: '#00656B' },
-      { id: '3', color: '#D79D00' },
-      { id: '4', color: '#3073B7' },
-      { id: '5', color: '#953640' },
-      { id: '6', color: '#C5AECF' },
-      { id: '7', color: '#46295A' },
-      { id: '8', color: '#79797C' },
+      { id: "1", color: "#28282D" },
+      { id: "2", color: "#00656B" },
+      { id: "3", color: "#D79D00" },
+      { id: "4", color: "#3073B7" },
+      { id: "5", color: "#953640" },
+      { id: "6", color: "#C5AECF" },
+      { id: "7", color: "#46295A" },
+      { id: "8", color: "#79797C" },
     ];
   }, []);
 
@@ -41,7 +35,7 @@ export const ColorTokensLibrary = () => {
     return null;
   }
 
-  if (sidebarLeftActive !== SIDEBAR_ELEMENTS.colorTokens) {
+  if (sidebarActive !== SIDEBAR_ELEMENTS.colorTokens) {
     return null;
   }
 
@@ -50,16 +44,6 @@ export const ColorTokensLibrary = () => {
       <div className="w-full px-[24px] py-[27px] bg-white flex justify-between items-center border-b border-[#c9c9c9]">
         <div className="flex justify-between font-inter font-light items-center text-[24px] uppercase">
           <SidebarSelector title="Color Tokens" />
-        </div>
-        <div className="flex justify-end items-center gap-1">
-          <button
-            className="cursor-pointer bg-transparent hover:bg-accent p-2"
-            onClick={() => {
-              setSidebarActive(null);
-            }}
-          >
-            <X size={16} />
-          </button>
         </div>
       </div>
       <ScrollArea className="w-full h-[calc(100%-95px)]">

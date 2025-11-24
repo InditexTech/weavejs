@@ -1,7 +1,7 @@
-'use client';
+"use client";
 
-import React from 'react';
-import { Input } from '@/components/ui/input';
+import React from "react";
+import { Input } from "@/components/ui/input";
 
 type InputTextProps = {
   label: string;
@@ -21,7 +21,7 @@ export const InputText = ({
 
   const handleKeyDown = React.useCallback(
     (e: React.KeyboardEvent<HTMLInputElement>) => {
-      if (e.key === 'Enter') {
+      if (e.key === "Enter") {
         e.preventDefault();
         e.stopPropagation();
         const input = e.target as HTMLInputElement;
@@ -29,14 +29,14 @@ export const InputText = ({
         setEnterPressed(true);
       }
     },
-    []
+    [],
   );
 
   const handleOnChange = React.useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
       setEditedValue(e.target.value);
     },
-    []
+    [],
   );
 
   React.useEffect(() => {

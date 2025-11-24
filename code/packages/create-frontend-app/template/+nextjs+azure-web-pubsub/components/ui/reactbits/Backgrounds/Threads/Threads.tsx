@@ -2,8 +2,8 @@
 	Installed from https://reactbits.dev/ts/tailwind/
 */
 
-import React, { useEffect, useRef } from 'react';
-import { Renderer, Program, Mesh, Triangle, Color } from 'ogl';
+import React, { useEffect, useRef } from "react";
+import { Renderer, Program, Mesh, Triangle, Color } from "ogl";
 
 interface ThreadsProps {
   color?: [number, number, number];
@@ -160,7 +160,7 @@ const Threads: React.FC<ThreadsProps> = ({
           value: new Color(
             gl.canvas.width,
             gl.canvas.height,
-            gl.canvas.width / gl.canvas.height
+            gl.canvas.width / gl.canvas.height,
           ),
         },
         uColor: { value: new Color(...color) },
@@ -179,7 +179,7 @@ const Threads: React.FC<ThreadsProps> = ({
       program.uniforms.iResolution.value.g = clientHeight;
       program.uniforms.iResolution.value.b = clientWidth / clientHeight;
     }
-    window.addEventListener('resize', resize);
+    window.addEventListener("resize", resize);
     resize();
 
     const currentMouse = [0.5, 0.5];
@@ -195,8 +195,8 @@ const Threads: React.FC<ThreadsProps> = ({
       targetMouse = [0.5, 0.5];
     }
     if (enableMouseInteraction) {
-      container.addEventListener('mousemove', handleMouseMove);
-      container.addEventListener('mouseleave', handleMouseLeave);
+      container.addEventListener("mousemove", handleMouseMove);
+      container.addEventListener("mouseleave", handleMouseLeave);
     }
 
     function update(t: number) {
@@ -220,14 +220,14 @@ const Threads: React.FC<ThreadsProps> = ({
     return () => {
       if (animationFrameId.current)
         cancelAnimationFrame(animationFrameId.current);
-      window.removeEventListener('resize', resize);
+      window.removeEventListener("resize", resize);
 
       if (enableMouseInteraction) {
-        container.removeEventListener('mousemove', handleMouseMove);
-        container.removeEventListener('mouseleave', handleMouseLeave);
+        container.removeEventListener("mousemove", handleMouseMove);
+        container.removeEventListener("mouseleave", handleMouseLeave);
       }
       if (container.contains(gl.canvas)) container.removeChild(gl.canvas);
-      gl.getExtension('WEBGL_lose_context')?.loseContext();
+      gl.getExtension("WEBGL_lose_context")?.loseContext();
     };
   }, [color, amplitude, distance, enableMouseInteraction]);
 

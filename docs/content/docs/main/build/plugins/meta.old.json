@@ -1,0 +1,22 @@
+{
+  "title": "Plugins",
+  "pages": [
+    "comments-renderer",
+    "connected-users",
+    "context-menu",
+    "copy-paste-nodes",
+    "nodes-selection",
+    "nodes-multi-selection-feedback",
+    "nodes-snapping",
+    "stage-drop-area",
+    "stage-grid",
+    "stage-keyboard-move",
+    "stage-panning",
+    "stage-resize",
+    "stage-zoom",
+    "stage-minimap",
+    "stage-keyboard",
+    "users-pointers",
+    "users-selector"
+  ]
+}
