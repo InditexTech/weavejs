@@ -466,7 +466,7 @@ export class WeaveLineNode extends WeaveNode {
     const stage = this.instance.getStage();
 
     let parentPosition: Konva.Vector2d = { x: 0, y: 0 };
-    if (typeof line?.getParent()?.getAttrs().nodeId !== 'undefined') {
+    if (line?.getParent()?.getAttrs().nodeId !== undefined) {
       const realContainer = stage.findOne(
         `#${line.getParent()?.getAttrs().nodeId}`
       );
