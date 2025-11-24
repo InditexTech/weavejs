@@ -13,9 +13,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- [#809](https://github.com/InditexTech/weavejs/issues/806) Center alignment guides during element drag for a frame in Weave canvas
+
 ### Changed
 
 - [#804](https://github.com/InditexTech/weavejs/issues/804) Polish create-apps and docs
+- [#808](https://github.com/InditexTech/weavejs/issues/808) Homologate Websockets store to load initial room state as the Azure Web PubSub does
+
+### Fixed
+
+- [#806](https://github.com/InditexTech/weavejs/issues/806) Line size handlers not positioned correctly inside a frame
 
 ## [2.6.0] - 2025-11-20
 
