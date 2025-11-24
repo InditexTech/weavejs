@@ -1,9 +1,9 @@
-import { useCollaborationRoom } from "@/store/store";
-import { WeaveUser } from "@inditextech/weave-types";
-import { WeaveStoreAzureWebPubsub } from "@inditextech/weave-store-azure-web-pubsub/client";
-import React from "react";
-import { useQueryClient, useQuery } from "@tanstack/react-query";
-import { getRoom } from "@/api/get-room";
+import { useCollaborationRoom } from '@/store/store';
+import { WeaveUser } from '@inditextech/weave-types';
+import { WeaveStoreAzureWebPubsub } from '@inditextech/weave-store-azure-web-pubsub/client';
+import React from 'react';
+import { useQueryClient, useQuery } from '@tanstack/react-query';
+import { getRoom } from '@/api/get-room';
 
 function useGetAzureWebPubsubProvider({
   loadedParams,
@@ -12,20 +12,20 @@ function useGetAzureWebPubsubProvider({
   loadedParams: boolean;
   getUser: () => WeaveUser;
 }) {
-  const [wsProvider, setWsProvider] =
+  const [storeProvider, setStoreProvider] =
     React.useState<WeaveStoreAzureWebPubsub | null>(null);
   const room = useCollaborationRoom((state) => state.room);
   const user = useCollaborationRoom((state) => state.user);
 
   const { data: roomData, isFetched } = useQuery({
-    queryKey: ["roomData", room ?? ""],
+    queryKey: ['roomData', room ?? ''],
     queryFn: () => {
-      return getRoom(room ?? "");
+      return getRoom(room ?? '');
     },
     initialData: undefined,
     staleTime: 0,
     retry: false,
-    enabled: typeof room !== "undefined" && typeof user !== "undefined",
+    enabled: typeof room !== 'undefined' && typeof user !== 'undefined',
   });
 
   const queryClient = useQueryClient();
@@ -44,15 +44,15 @@ function useGetAzureWebPubsubProvider({
           roomId: room,
 
           url: `${process.env.NEXT_PUBLIC_API_ENDPOINT}/rooms/${room}/connect`,
-        },
+        }
       );
 
-      setWsProvider(store);
+      setStoreProvider(store);
     }
   }, [
     getUser,
     isFetched,
-    wsProvider,
+    storeProvider,
     roomData,
     queryClient,
     loadedParams,
@@ -60,7 +60,7 @@ function useGetAzureWebPubsubProvider({
     user,
   ]);
 
-  return wsProvider;
+  return storeProvider;
 }
 
 export default useGetAzureWebPubsubProvider;

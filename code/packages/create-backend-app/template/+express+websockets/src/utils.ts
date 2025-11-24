@@ -17,6 +17,20 @@ export const getFileContents = async (
   }
 }
 
+export const existFile = async (filePath: string) => {
+  try {
+    const stats = await fs.stat(filePath)
+    return stats.isFile()
+  } catch (err) {
+    console.error(
+      `Error reading file ${filePath}: ${
+        err instanceof Error ? err.message : err
+      }`
+    )
+    return false
+  }
+}
+
 export const existsFolder = async (folderPath: string) => {
   try {
     const stats = await fs.stat(folderPath)

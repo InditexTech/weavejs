@@ -8,6 +8,7 @@ import { delImageController } from './controllers/delImage.js'
 import { getImagesController } from './controllers/getImages.js'
 import { postRemoveBackgroundController } from './controllers/postRemoveBackground.js'
 import { postExportToImageController } from './controllers/postExportToImage.js'
+import { getRoomController } from './controllers/getRoom.js'
 
 const router: Router = Router()
 
@@ -25,6 +26,7 @@ export function setupApiV1Router(app: Express) {
   router.get(`/health`, getHealthController())
 
   // Room handling API
+  router.get(`/rooms/:roomId`, getRoomController())
   router.get(`/rooms/:roomId/connect`, getRoomConnectController())
 
   // Images handling API
