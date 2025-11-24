@@ -8,18 +8,23 @@ import {
   type WeaveStoreOptions,
 } from '@inditextech/weave-types';
 import { WEAVE_STORE_WEBSOCKETS } from './constants';
-import { type WeaveStoreWebsocketsOptions } from './types';
+import {
+  type FetchInitialState,
+  type WeaveStoreWebsocketsOptions,
+} from './types';
 import { WebsocketProvider } from 'y-websocket';
 
 export class WeaveStoreWebsockets extends WeaveStore {
   private websocketOptions: WeaveStoreWebsocketsOptions;
   private roomId: string;
-  private initialized!: boolean;
+  private initialRoomData: Uint8Array | FetchInitialState | undefined;
+  private started: boolean;
   protected provider!: WebsocketProvider;
   protected name: string = WEAVE_STORE_WEBSOCKETS;
   protected supportsUndoManager = true;
 
   constructor(
+    initialRoomData: Uint8Array | FetchInitialState | undefined,
     storeOptions: WeaveStoreOptions,
     websocketOptions: WeaveStoreWebsocketsOptions
   ) {
@@ -29,8 +34,28 @@ export class WeaveStoreWebsockets extends WeaveStore {
 
     this.websocketOptions = websocketOptions;
     this.roomId = roomId;
+    this.initialRoomData = initialRoomData;
+    this.started = false;
 
     this.init();
+  }
+
+  setup(): void {
+    super.setup();
+  }
+
+  private loadRoomInitialData() {
+    if (this.initialRoomData && this.initialRoomData instanceof Uint8Array) {
+      this.loadDocument(this.initialRoomData);
+    }
+    if (this.initialRoomData && typeof this.initialRoomData === 'function') {
+      this.loadDefaultDocument(this.initialRoomData);
+    }
+    if (!this.initialRoomData) {
+      this.loadDefaultDocument();
+    }
+
+    this.initialRoomData = undefined;
   }
 
   private init() {
@@ -38,7 +63,6 @@ export class WeaveStoreWebsockets extends WeaveStore {
       wsOptions: { serverUrl },
     } = this.websocketOptions;
 
-    this.initialized = false;
     this.provider = new WebsocketProvider(
       serverUrl,
       this.roomId,
@@ -51,13 +75,15 @@ export class WeaveStoreWebsockets extends WeaveStore {
 
     this.provider.on('status', ({ status }) => {
       this.handleConnectionStatusChange(status);
-      if (!this.initialized && status === 'connected') {
-        this.initialized = true;
+
+      if (status === WEAVE_STORE_CONNECTION_STATUS.CONNECTED && !this.started) {
+        this.loadRoomInitialData();
+        this.started = true;
       }
     });
 
     this.provider.on('connection-close', () => {
-      if (this.initialized) {
+      if (this.started) {
         this.handleConnectionStatusChange(
           WEAVE_STORE_CONNECTION_STATUS.CONNECTING
         );
@@ -69,7 +95,7 @@ export class WeaveStoreWebsockets extends WeaveStore {
     });
 
     this.provider.on('connection-error', () => {
-      if (this.initialized) {
+      if (this.started) {
         this.handleConnectionStatusChange(
           WEAVE_STORE_CONNECTION_STATUS.DISCONNECTED
         );

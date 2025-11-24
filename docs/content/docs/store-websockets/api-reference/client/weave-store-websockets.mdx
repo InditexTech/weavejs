@@ -24,13 +24,19 @@ import { WeaveStoreWebsockets } from "@inditextech/weave-store-websockets/client
 ## Instantiation
 
 ```ts
-const store = new WeaveStoreWebsockets(storeOptions: WeaveStoreOptions, websocketOptions: WeaveStoreWebsocketsOptions);
+const store = new WeaveStoreWebsockets(initialRoomData: Uint8Array | FetchInitialState | undefined, storeOptions: WeaveStoreOptions, websocketOptions: WeaveStoreWebsocketsOptions);
 ```
 
 ## Parameters
 
 <TypeTable
   type={{
+    ["initialRoomData"]: {
+      required: true,
+      description:
+        "If the room is not new, the actual data (snapshot) of the room in binary form.",
+      type: "Uint8Array | FetchInitialState | undefined",
+    },
     ["storeOptions.getUser"]: {
       required: true,
       description:
@@ -95,6 +101,8 @@ type WeaveStoreWebsocketsOptions = {
   };
   callbacks?: WeaveStoreWebsocketsCallbacks;
 };
+
+type FetchInitialState = (doc: Doc) => void;
 ```
 
 ## Events
