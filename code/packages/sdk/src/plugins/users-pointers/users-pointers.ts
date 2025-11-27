@@ -60,7 +60,6 @@ export class WeaveUsersPointersPlugin extends WeavePlugin {
 
     const layer = new Konva.Layer({
       id: this.getLayerName(),
-      draggable: false,
       listening: false,
     });
 
@@ -138,20 +137,13 @@ export class WeaveUsersPointersPlugin extends WeavePlugin {
       }
     });
 
-    const handleOnPointerMove = () => {
+    stage.on('pointermove', () => {
       const mousePos = stage.getRelativePointerPosition();
 
       if (mousePos) {
         sendAwarenessUpdateThrottled(mousePos);
       }
-    };
-
-    const throttledHandleOnPointerMove = throttle(
-      handleOnPointerMove,
-      this.config.awarenessThrottleMs
-    );
-
-    stage.on('pointermove', throttledHandleOnPointerMove);
+    });
 
     this.renderPointers();
   }
@@ -192,7 +184,6 @@ export class WeaveUsersPointersPlugin extends WeavePlugin {
         x: userPointer.x,
         y: userPointer.y,
         opacity: 1,
-        draggable: false,
         listening: false,
         scaleX: 1 / stage.scaleX(),
         scaleY: 1 / stage.scaleY(),
@@ -227,7 +218,6 @@ export class WeaveUsersPointersPlugin extends WeavePlugin {
         stroke: 'black',
         strokeWidth: circleStrokeWidth,
         strokeScaleEnabled: false,
-        draggable: false,
         listening: false,
       });
 
@@ -242,7 +232,6 @@ export class WeaveUsersPointersPlugin extends WeavePlugin {
         fill: userForegroundColor,
         align: 'center',
         verticalAlign: 'middle',
-        draggable: false,
         listening: false,
         strokeScaleEnabled: false,
         ellipsis: true,
@@ -261,7 +250,6 @@ export class WeaveUsersPointersPlugin extends WeavePlugin {
         height: textHeight + backgroundPaddingY * 2,
         cornerRadius: backgroundCornerRadius,
         fill: userBackgroundColor,
-        draggable: false,
         listening: false,
       });
 
