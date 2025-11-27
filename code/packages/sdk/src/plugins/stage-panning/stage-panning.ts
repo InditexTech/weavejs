@@ -272,7 +272,9 @@ export class WeaveStagePanningPlugin extends WeavePlugin {
       this.instance.emitEvent('onStageMove');
     };
 
-    window.addEventListener('wheel', handleWheel, { passive: true });
+    const handleWheelThrottled = throttle(handleWheel, 20);
+
+    window.addEventListener('wheel', handleWheelThrottled, { passive: true });
 
     stage.on('dragstart', (e) => {
       const duration = 1000 / 60;

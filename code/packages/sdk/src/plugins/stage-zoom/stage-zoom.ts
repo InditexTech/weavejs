@@ -622,6 +622,43 @@ export class WeaveStageZoomPlugin extends WeavePlugin {
 
     let doZoom = false;
 
+    const handleWheelImmediate = (e: WheelEvent) => {
+      const performZoom =
+        this.isCtrlOrMetaPressed ||
+        (!this.isCtrlOrMetaPressed && e.ctrlKey && e.deltaMode === 0);
+
+      const mouseX = e.clientX;
+      const mouseY = e.clientY;
+
+      let elementUnderMouse = document.elementFromPoint(mouseX, mouseY);
+      if (isInShadowDOM(stage.container())) {
+        const shadowHost = getTopmostShadowHost(stage.container());
+        if (shadowHost) {
+          elementUnderMouse = shadowHost.elementFromPoint(mouseX, mouseY);
+        }
+      }
+
+      if (
+        !this.enabled ||
+        !performZoom ||
+        this.instance.getClosestParentWithWeaveId(elementUnderMouse) !==
+          stage.container()
+      ) {
+        doZoom = false;
+        return;
+      }
+
+      e.preventDefault();
+
+      doZoom = true;
+    };
+
+    // const throttledHandleWheelImmediate = throttle(handleWheelImmediate, 30);
+
+    window.addEventListener('wheel', handleWheelImmediate, {
+      passive: false,
+    });
+
     // Zoom with mouse wheel + ctrl / cmd
     const handleWheel = (e: WheelEvent) => {
       if (!doZoom) {
@@ -640,42 +677,9 @@ export class WeaveStageZoomPlugin extends WeavePlugin {
       }
     };
 
-    window.addEventListener(
-      'wheel',
-      (e) => {
-        const performZoom =
-          this.isCtrlOrMetaPressed ||
-          (!this.isCtrlOrMetaPressed && e.ctrlKey && e.deltaMode === 0);
+    const throttledHandleWheel = throttle(handleWheel, 30);
 
-        const mouseX = e.clientX;
-        const mouseY = e.clientY;
-
-        let elementUnderMouse = document.elementFromPoint(mouseX, mouseY);
-        if (isInShadowDOM(stage.container())) {
-          const shadowHost = getTopmostShadowHost(stage.container());
-          if (shadowHost) {
-            elementUnderMouse = shadowHost.elementFromPoint(mouseX, mouseY);
-          }
-        }
-
-        if (
-          !this.enabled ||
-          !performZoom ||
-          this.instance.getClosestParentWithWeaveId(elementUnderMouse) !==
-            stage.container()
-        ) {
-          doZoom = false;
-          return;
-        }
-
-        e.preventDefault();
-
-        doZoom = true;
-      },
-      { passive: false }
-    );
-
-    window.addEventListener('wheel', handleWheel, { passive: true });
+    window.addEventListener('wheel', throttledHandleWheel, { passive: true });
   }
 
   getInertiaScale() {
