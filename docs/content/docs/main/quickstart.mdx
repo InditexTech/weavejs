@@ -13,7 +13,7 @@ In this quickstart, you will learn how to set up your first real-time collaborat
 
 ## Prerequisites
 
-Before you begin, ensure that you meet the [requirements](/docs/main/requirements).
+Before you begin, ensure you meet the [requirements](/docs/main/requirements).
 
 ## What you will set up
 
@@ -31,7 +31,7 @@ Before you begin, ensure that you meet the [requirements](/docs/main/requirement
 First, create the backend server that will handle all the real-time synchronization using a Weave.js Store provider.
 In this case, we use the [Weave.js Store WebSockets](/docs/main/build/stores/websockets-store).
 
-Open a terminal on your preferred folder and execute the following command:
+Open a terminal in your preferred folder and execute the following command:
 
 ```bash tab="pnpm"
 pnpm create weave-backend-app
@@ -45,7 +45,7 @@ npm create weave-backend-app
 yarn create weave-backend-app
 ```
 
-This command will launch Weave.js create backend CLI with the following steps:
+The CLI will prompt you with the following:
 
 1. **Project name:**  The folder name where the backend project will be created (e.g. `my-service`).
 2. **Select the store:**  For this quickstart, select the store named:
@@ -54,7 +54,7 @@ This command will launch Weave.js create backend CLI with the following steps:
 
 3. **Install dependencies automatically:** Select **YES**.  This will install the necessary dependencies of the project.
 
-After the CLI finishes execute the following:
+Once complete, start the server:
 
 ```bash tab="pnpm"
 cd [backend-project-name]
@@ -71,7 +71,7 @@ cd [backend-project-name]
 yarn run dev
 ```
 
-This will start the backend server at `http://localhost:8080`. 
+This will start the backend server at `http://localhost:8080`.
 
 To verify everything is running correctly, open a browser and enter the URL `http://localhost:8080/api/v1/health`.
 
@@ -90,7 +90,7 @@ You should see the following response:
 Now let's create the frontend application on top of Next.js and powered by Weave.js.
 This will render the UI and canvas with live updates.
 
-Open a terminal on the same parent folder as the backend side project and execute the following command:
+Open a new terminal in the same parent folder as the backend project and execute the following command:
 
 ```bash tab="pnpm"
 pnpm create weave-frontend-app
@@ -104,7 +104,7 @@ npm create weave-frontend-app
 yarn create weave-frontend-app
 ```
 
-This command will launch Weave.js create frontend CLI with the following steps:
+The CLI will prompt you with the following:
 
 1. **Project name:**  The folder name where the frontend project will be created (e.g. `my-app`).
 
@@ -112,9 +112,9 @@ This command will launch Weave.js create frontend CLI with the following steps:
 
     **Express.js: Weave.js Websockets Store**
 
-3. **Install dependencies automatically:** Select **YES**.  This will install the necessary dependencies of the project.
+3. **Install dependencies automatically:** Select **YES**.
 
-After the CLI finishes execute the following:
+Once complete, start the frontend application:
 
 ```bash tab="pnpm"
 cd [frontend-project-name]
@@ -135,11 +135,12 @@ This will start the Next.js frontend application at `http://localhost:3030`.
 
 <Callout title="Self-signed certificate warning">
 When running `npm run dev`, you might see a warning about self-signed certificates.
-This is expected, Next.js is setting up HTTPS for local development and may prompt for your system password. 
+This is expected, Next.js is setting up HTTPS for local development and may prompt for your system password.
 It is a one-time setup.
 </Callout>
 
-Open a browser and navigate to `http://localhost:3030`. You should see the following screen (please be patient, as Next.js may take a moment to compile the pages):
+Open a browser and navigate to `http://localhost:3030`.
+You should see the room entry page (Next.js may take a moment to compile):
 
 <div className="flex justify-center items-center *:max-w-[600px] bg-gradient-to-br from-fd-primary/10 rounded-xl border">
   ![Enter room page of the Weave.js project](/images/enter-room.png)
@@ -149,9 +150,9 @@ Open a browser and navigate to `http://localhost:3030`. You should see the follo
 
 <div className="[&_h3]:fd-step">
 
-### Run the application
+### Join a room and interact with the canvas
 
-To run the collaborative tool, follow these steps:
+To start using the canvas, follow these steps:
 
 1. Enter the room name you want to join.
 2. Type your username.
@@ -163,16 +164,16 @@ Once the room is loaded (note that pages may take some time to compile), you sho
   ![Room page of the Weave.js project](/images/room.png)
 </div>
 
-Try adding a rectangle and enjoy!
-
+Add shapes, draw elements, or interact with objects on the canvas.
+Changes are synchronized in real time across all participants in the room.
 </div>
 
 </div>
 
 ## Next steps
 
-Now that you have completed the quickstart, you are ready to dive deeper into Weave.js and unlock its full potential. 
-Here are some of our recommended next steps:
+Now that you have completed the quickstart, you are ready to dive deeper into Weave.js and unlock its full potential.
+Here are some recommended next steps:
 
 ### Explore the building blocks
 
