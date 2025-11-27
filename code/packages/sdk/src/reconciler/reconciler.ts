@@ -268,7 +268,7 @@ export class WeaveReconciler {
         logger.debug({ parentInstance, child, beforeChild }, 'insertBefore ');
 
         if (child.getParent() !== parentInstance) {
-          child.moveTo(parentInstance);
+          addNode(parentInstance, child);
         }
 
         if (
@@ -277,23 +277,8 @@ export class WeaveReconciler {
         ) {
           const actualChildren = parentInstance.getChildren();
 
-          const fromIndex = actualChildren.indexOf(child);
           const toIndex = actualChildren.indexOf(beforeChild);
-
-          if (fromIndex === -1 || toIndex === -1) return;
-
-          // If the removal was before the insertion point, the index shifts by -1
-          const adjustedIndex = fromIndex < toIndex ? toIndex - 1 : toIndex;
-
-          child.setZIndex(adjustedIndex);
-
-          const children = parentInstance.getChildren();
-          for (let i = 0; i < children.length; i++) {
-            const child = children[i];
-            child.setAttrs({
-              zIndex: i,
-            });
-          }
+          child.setZIndex(toIndex);
         }
       },
       appendChild(

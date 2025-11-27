@@ -347,6 +347,7 @@ export class WeaveStateManager {
 
     if (parent.props.children) {
       const childrenAmount = parent.props.children.length;
+
       const nodeIndex = parent.props.children.findIndex(
         (child: WeaveStateElement) => child.key === node.key
       );
@@ -363,11 +364,33 @@ export class WeaveStateManager {
         );
         parent.props.children.splice(nodeIndex, 1);
 
-        if (item && position === WEAVE_NODE_POSITION.UP) {
+        if (
+          item &&
+          position === WEAVE_NODE_POSITION.UP &&
+          nodeIndex + 1 < childrenAmount
+        ) {
           parent.props.children.splice(nodeIndex + 1, 0, item);
         }
-        if (item && position === WEAVE_NODE_POSITION.DOWN) {
+        if (
+          item &&
+          position === WEAVE_NODE_POSITION.UP &&
+          nodeIndex + 1 >= childrenAmount
+        ) {
+          parent.props.children.splice(childrenAmount - 1, 0, item);
+        }
+        if (
+          item &&
+          position === WEAVE_NODE_POSITION.DOWN &&
+          nodeIndex - 1 >= 0
+        ) {
           parent.props.children.splice(nodeIndex - 1, 0, item);
+        }
+        if (
+          item &&
+          position === WEAVE_NODE_POSITION.DOWN &&
+          nodeIndex - 1 < 0
+        ) {
+          parent.props.children.splice(0, 0, item);
         }
         if (item && position === WEAVE_NODE_POSITION.FRONT) {
           parent.props.children.splice(childrenAmount - 1, 0, item);

@@ -39,7 +39,6 @@ export class WeaveZIndexManager {
       instance.getAttrs().nodeType
     );
     if (handler) {
-      instance.moveUp();
       const nodeState = handler.serialize(instance);
       this.instance.moveNode(nodeState, WEAVE_NODE_POSITION.UP);
     }
@@ -56,7 +55,6 @@ export class WeaveZIndexManager {
       instance.getAttrs().nodeType
     );
     if (handler) {
-      instance.moveDown();
       const nodeState = handler.serialize(instance);
       this.instance.moveNode(nodeState, WEAVE_NODE_POSITION.DOWN);
     }
@@ -72,7 +70,6 @@ export class WeaveZIndexManager {
         node.getAttrs().nodeType
       );
       if (handler) {
-        node.moveToBottom();
         const nodeState = handler.serialize(node);
         this.instance.moveNode(nodeState, WEAVE_NODE_POSITION.BACK);
       }
@@ -89,7 +86,6 @@ export class WeaveZIndexManager {
         node.getAttrs().nodeType
       );
       if (handler) {
-        node.moveToTop();
         const nodeState = handler.serialize(node);
         this.instance.moveNode(nodeState, WEAVE_NODE_POSITION.FRONT);
       }
