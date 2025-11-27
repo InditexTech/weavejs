@@ -67,6 +67,8 @@ export class WeaveStageGridPlugin extends WeavePlugin {
       listening: false,
     });
 
+    layer.moveToBottom();
+
     stage.add(layer);
   }
 
@@ -404,9 +406,7 @@ export class WeaveStageGridPlugin extends WeavePlugin {
   }
 
   onRender(): void {
-    requestAnimationFrame(() => {
-      this.renderGrid();
-    });
+    this.renderGrid();
   }
 
   enable(): void {
