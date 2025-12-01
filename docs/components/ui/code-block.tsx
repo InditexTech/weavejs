@@ -15,7 +15,8 @@ export async function CodeBlock({ code, lang, wrapper }: CodeBlockProps) {
       dark: "vesper",
     },
     components: {
-      pre: Base.Pre,
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      pre: Base.Pre as any,
     },
   });
 

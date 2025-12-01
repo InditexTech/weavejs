@@ -21,22 +21,6 @@ To set up the Room page in your Next.js project, follow these steps:
 
 <div className="[&_h3]:fd-step">
  
-### Define the page component
-
-To set up the **Room** page component, follow these steps:
-
-- On the `app` folder, create a folder named `room`.
-- On the `app/room` folder, create a folder named `[roomId]`.
-- On the `app/room/[roomId]` folder, create a file named `page.tsx` with the following content:
-
-  <include lang="tsx" meta='title="app/room/[roomId]/page.tsx"'>
-    ../../../examples/manual-installation/app/room/roomId/page.tsx
-  </include>
-
-</div>
-
-<div className="[&_h3]:fd-step">
- 
 ### Install the UI building block components
 
 Set up the necessary [Shadcn/UI](https://ui.shadcn.com/docs) components for the `Room` page.
@@ -68,7 +52,7 @@ In the root directory of your project, follow these steps:
 
 <div className="[&_h3]:fd-step">
  
-### Define a constants file
+### Define Weave.js Nodes, Actions & Plugins to use
 
 Let's define a set of constants that will define the **Weave.js** Nodes, Plugins, and Actions that we will use.
 
@@ -78,7 +62,7 @@ Follow these steps:
 - On the `components/utils` folder, create a file named `constants.ts` with the following content:
 
   <include lang="ts" meta='title="components/utils/constants.ts"'>
-    ../../../examples/manual-installation/components/utils/constants.ts
+    ../../../../../manual-installation/components/utils/constants.ts
   </include>
 
   File explanation:
@@ -89,6 +73,18 @@ Follow these steps:
   - **`(4)`**: Define the actions we will use in this example.
   - **`(5)`**: Define the custom plugins we will use in this example. By default the [WeaveProvider](/docs/react/api-reference/providers/weave-provider)
     pre-defines a set of plugins. In this case, we can override them or add extra plugins.
+
+</div>
+
+<div className="[&_h3]:fd-step">
+ 
+### Define some front utils to use
+
+Replace the content of the `lib/utils.ts` with the following content:
+
+<include lang="ts" meta='title="components/utils/constants.ts"'>
+  ../../../../../manual-installation/lib/utils.ts
+</include>
 
 </div>
 
@@ -109,7 +105,7 @@ On the `hooks` folder, create a file named `use-handle-route-params.ts` with
 the following content:
 
 <include lang="tsx" meta='title="hooks/use-handle-route-params.ts"'>
-  ../../../examples/manual-installation/hooks/use-handle-route-params.ts
+  ../../../../../manual-installation/hooks/use-handle-route-params.ts
 </include>
 
 This hook helps us handling the route params with Next.js to extract the roomId where
@@ -119,24 +115,34 @@ we want to connect to.
 
 #### useGetWebsocketsStore hook
 
+Let's create a hook that will handle the store instance, it's main responsibilities are:
+
+- Fetch de initial data of the room where we want to connect
+- Instantiate Weave.js store
+
 On the `hooks` folder, create a file named `use-get-websockets-store.ts` with the following
 content:
 
 <include lang="tsx" meta='title="hooks/use-get-websockets-store.ts"'>
-  ../../../examples/manual-installation/hooks/use-get-websockets-store.ts
+  ../../../../../manual-installation/hooks/use-get-websockets-store.ts
 </include>
 
 This hook is a helper to setup the Websocket Store of Weave.js.
 
----
-
-#### useContextMenu
-
-On the `hooks` folder, create a file named `use-context-menu.tsx` with the following
+Now let's setup a function that will call the API we will define next, lets create an `api`
+folder on the root of the project and inside lets create a file named `get-room.ts` with the following
 content:
 
-<include lang="tsx" meta='title="hooks/use-context-menu.tsx"'>
-  ../../../examples/manual-installation/hooks/use-context-menu.tsx
+<include lang="ts" meta='title="api/get-room.ts"'>
+  ../../../../../manual-installation/api/get-room.ts
+</include>
+
+Finally we need to implement the API to fetch the persisted room (in this case on the local file system),
+for this we need to create the following folders `/api/rooms/[roomId]` on the `app` folder, once
+created on the `[roomId]` folder let's create a `route.ts` file with the following content:
+
+<include lang="ts" meta='title="app/api/rooms/[roomId]/route.ts"'>
+  ../../../../../manual-installation/app/api/rooms/[roomId]/route.ts
 </include>
 
 </div>
@@ -149,7 +155,6 @@ Set up the following directories to organize our components:
 
 - On the `components` folder, create a `room` folder.
 - On the `components` folder, create an `overlays` folder.
-- On the `components` folder, create a `context-menu` folder.
 
 ---
 
@@ -158,7 +163,7 @@ Set up the following directories to organize our components:
 On the `components/room` folder, create a file named `room.tsx` with the following content:
 
 <include lang="tsx" meta='title="components/room/room.tsx"'>
-  ../../../examples/manual-installation/components/room/room.tsx
+  ../../../../../manual-installation/components/room/room.tsx
 </include>
 
 ---
@@ -168,7 +173,7 @@ On the `components/room` folder, create a file named `room.tsx` with the followi
 On the `components/room` folder, create a file named `room.layout.tsx` with the following content:
 
 <include lang="tsx" meta='title="components/room/room.layout.tsx"'>
-  ../../../examples/manual-installation/components/room/room.layout.tsx
+  ../../../../../manual-installation/components/room/room.layout.tsx
 </include>
 
 ---
@@ -178,7 +183,7 @@ On the `components/room` folder, create a file named `room.layout.tsx` with the 
 On the `components/room` folder, create a file named `room.loader.tsx` with the following content:
 
 <include lang="tsx" meta='title="components/room/room.loader.tsx"'>
-  ../../../examples/manual-installation/components/room/room.loader.tsx
+  ../../../../../manual-installation/components/room/room.loader.tsx
 </include>
 
 ---
@@ -188,7 +193,7 @@ On the `components/room` folder, create a file named `room.loader.tsx` with the 
 On the `components/overlays` folder, create a file named `connected-users.tsx` with the following content:
 
 <include lang="tsx" meta='title="components/overlays/connected-users.tsx"'>
-  ../../../examples/manual-installation/components/overlays/connected-users.tsx
+  ../../../../../manual-installation/components/overlays/connected-users.tsx
 </include>
 
 ---
@@ -198,7 +203,7 @@ On the `components/overlays` folder, create a file named `connected-users.tsx` w
 On the `components/overlays` folder, create a file named `connection-status.tsx` with the following content:
 
 <include lang="tsx" meta='title="components/overlays/connection-status.tsx"'>
-  ../../../examples/manual-installation/components/overlays/connection-status.tsx
+  ../../../../../manual-installation/components/overlays/connection-status.tsx
 </include>
 
 ---
@@ -211,7 +216,7 @@ On the `components/overlays` folder, create a file named `room-information-overl
   lang="tsx"
   meta='title="components/overlays/room-information-overlay.tsx"'
 >
-  ../../../examples/manual-installation/components/overlays/room-information-overlay.tsx
+  ../../../../../manual-installation/components/overlays/room-information-overlay.tsx
 </include>
 
 ---
@@ -221,7 +226,7 @@ On the `components/overlays` folder, create a file named `room-information-overl
 On the `components/overlays` folder, create a file named `room-users-overlay.tsx` with the following content:
 
 <include lang="tsx" meta='title="components/overlays/room-users-overlay.tsx"'>
-  ../../../examples/manual-installation/components/overlays/room-users-overlay.tsx
+  ../../../../../manual-installation/components/overlays/room-users-overlay.tsx
 </include>
 
 ---
@@ -231,7 +236,7 @@ On the `components/overlays` folder, create a file named `room-users-overlay.tsx
 On the `components/overlays` folder, create a file named `toolbar-button.tsx` with the following content:
 
 <include lang="tsx" meta='title="components/overlays/toolbar-button.tsx"'>
-  ../../../examples/manual-installation/components/overlays/toolbar-button.tsx
+  ../../../../../manual-installation/components/overlays/toolbar-button.tsx
 </include>
 
 ---
@@ -241,7 +246,7 @@ On the `components/overlays` folder, create a file named `toolbar-button.tsx` wi
 On the `components/overlays` folder, create a file named `toolbar.tsx` with the following content:
 
 <include lang="tsx" meta='title="components/overlays/toolbar.tsx"'>
-  ../../../examples/manual-installation/components/overlays/toolbar.tsx
+  ../../../../../manual-installation/components/overlays/toolbar.tsx
 </include>
 
 ---
@@ -251,7 +256,7 @@ On the `components/overlays` folder, create a file named `toolbar.tsx` with the 
 On the `components/overlays` folder, create a file named `tools-overlay.tsx` with the following content:
 
 <include lang="tsx" meta='title="components/overlays/tools-overlay.tsx"'>
-  ../../../examples/manual-installation/components/overlays/tools-overlay.tsx
+  ../../../../../manual-installation/components/overlays/tools-overlay.tsx
 </include>
 
 ---
@@ -261,30 +266,24 @@ On the `components/overlays` folder, create a file named `tools-overlay.tsx` wit
 On the `components/overlays` folder, create a file named `zoom-handler-overlay.tsx` with the following content:
 
 <include lang="tsx" meta='title="components/overlays/zoom-handler-overlay.tsx"'>
-  ../../../examples/manual-installation/components/overlays/zoom-handler-overlay.tsx
-</include>
-
----
-
-#### ContextMenu
-
-On the `components/context-menu` folder, create a file named `context-menu` with the following content:
-
-<include lang="tsx" meta='title="components/context-menu/context-menu.tsx"'>
-  ../../../examples/manual-installation/components/context-menu/context-menu.tsx
+  ../../../../../manual-installation/components/overlays/zoom-handler-overlay.tsx
 </include>
 
 </div>
 
 <div className="[&_h3]:fd-step">
  
-### Add Context Menu support to the global state
+### Define the page component
 
-Add the following changes to the `store/store.ts` file, to maintain the state of the Context Menu.
+To set up the **Room** page component, follow these steps:
 
-<include lang="tsx" meta='title="store/store.ts"'>
-  ../../../examples/manual-installation/store/store.mod-1.ts
-</include>
+- On the `app` folder, create a folder named `room`.
+- On the `app/rooms` folder, create a folder named `[roomId]`.
+- On the `app/rooms/[roomId]` folder, create a file named `page.tsx` with the following content:
+
+  <include lang="tsx" meta='title="app/rooms/[roomId]/page.tsx"'>
+    ../../../../../manual-installation/app/rooms/[roomId]/page.tsx
+  </include>
 
 </div>
 

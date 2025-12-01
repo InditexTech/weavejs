@@ -1,0 +1,66 @@
+import { IncomingMessage } from "http"; // [!code ++]
+import express, { Request, Response } from "express";
+import next from "next";
+import { WeaveWebsocketsServer } from "@inditextech/weave-store-websockets/server"; // (1) [!code ++]
+import { fetchRoom, persistRoom } from "./weave/persistence"; // (2) [!code ++]
+
+const VALID_ROOM_WEBSOCKET_URL = /\/rooms\/(.*)\/connect/; // (3) [!code ++]
+
+const port = parseInt(process.env.PORT || "3000", 10);
+const dev = process.env.NODE_ENV !== "production";
+const app = next({ dev });
+const handle = app.getRequestHandler();
+
+app.prepare().then(() => {
+  const app = express();
+
+  app.get("/{*splat}", (req: Request, res: Response) => {
+    return handle(req, res);
+  });
+
+  app.get("/api/rooms/:roomId", async (req: Request, res: Response) => { // (4) [!code ++]
+    const buffer = await fetchRoom(req.params.roomId); // [!code ++]
+ // [!code ++]
+    if (!buffer) { // [!code ++]
+      return res.status(404).send("Room not found"); // [!code ++]
+    } // [!code ++]
+ // [!code ++]
+    res.setHeader("Content-Type", "application/octet-stream"); // [!code ++]
+    res.setHeader( // [!code ++]
+      "Content-Disposition", // [!code ++]
+      `attachment; filename="${req.params.roomId}"` // [!code ++]
+    ); // [!code ++]
+ // [!code ++]
+    res.setHeader("Content-Type", "image/png"); // [!code ++]
+    res.send(buffer); // [!code ++]
+  }); // [!code ++]
+
+  app.listen(port, (err: Error | undefined) => { // [!code --]
+  const server = app.listen(port, (err: Error | undefined) => { // [!code ++]
+    if (err) throw err;
+    console.log(
+      `> Server listening at http://localhost:${port} as ${
+        dev ? "development" : process.env.NODE_ENV
+      }`
+    );
+  }); // (5)
+
+  const weaveWebsocketsServerConfig = { // [!code ++]
+    performUpgrade: async (request: IncomingMessage) => { // [!code ++]
+      return VALID_ROOM_WEBSOCKET_URL.test(request.url ?? ""); // [!code ++]
+    }, // (7) [!code ++]
+    extractRoomId: (request: IncomingMessage) => { // [!code ++]
+      const match = request.url?.match(VALID_ROOM_WEBSOCKET_URL); // [!code ++]
+      if (match) { // [!code ++]
+        return match[1]; // [!code ++]
+      } // [!code ++]
+      return undefined; // [!code ++]
+    }, // (8) [!code ++]
+    fetchRoom, // (9) [!code ++]
+    persistRoom, // (10) [!code ++]
+  }; // (6) [!code ++]
+
+  const wss = new WeaveWebsocketsServer(weaveWebsocketsServerConfig); // (11) [!code ++]
+
+  wss.handleUpgrade(server); // (12) [!code ++]
+});
