@@ -13,6 +13,7 @@ const handle = app.getRequestHandler();
 
 app.prepare().then(() => {
   const app = express();
+  app.disable("x-powered-by");
 
   app.get("/{*splat}", (req: Request, res: Response) => {
     return handle(req, res);
