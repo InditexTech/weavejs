@@ -1,11 +1,11 @@
-import { useCollaborationRoom } from '@/store/store';
-import { WeaveUser } from '@inditextech/weave-types';
-import { WeaveStoreWebsockets } from '@inditextech/weave-store-websockets/client';
-import React from 'react';
-import { useQueryClient, useQuery } from '@tanstack/react-query';
-import { getRoom } from '@/api/get-room';
+import { useCollaborationRoom } from "@/store/store";
+import { WeaveUser } from "@inditextech/weave-types";
+import { WeaveStoreWebsockets } from "@inditextech/weave-store-websockets/client";
+import React from "react";
+import { useQueryClient, useQuery } from "@tanstack/react-query";
+import { getRoom } from "@/api/get-room";
 
-function useGetWebsocketsProvider({
+function useGetWebsocketsStore({
   loadedParams,
   getUser,
 }: {
@@ -18,14 +18,14 @@ function useGetWebsocketsProvider({
   const user = useCollaborationRoom((state) => state.user);
 
   const { data: roomData, isFetched } = useQuery({
-    queryKey: ['roomData', room ?? ''],
+    queryKey: ["roomData", room ?? ""],
     queryFn: () => {
-      return getRoom(room ?? '');
+      return getRoom(room ?? "");
     },
     initialData: undefined,
     staleTime: 0,
     retry: false,
-    enabled: typeof room !== 'undefined' && typeof user !== 'undefined',
+    enabled: typeof room !== "undefined" && typeof user !== "undefined",
   });
 
   const queryClient = useQueryClient();
@@ -43,7 +43,7 @@ function useGetWebsocketsProvider({
         {
           roomId: room,
           wsOptions: {
-            serverUrl: `${process.env.NEXT_PUBLIC_API_ENDPOINT}/rooms/${room}/connect`,
+            serverUrl: `/rooms/${room}/connect`,
           },
         }
       );
@@ -64,4 +64,4 @@ function useGetWebsocketsProvider({
   return storeProvider;
 }
 
-export default useGetWebsocketsProvider;
+export default useGetWebsocketsStore;

@@ -23,15 +23,29 @@ To set up Weave.js backend over our Next.js project (on a single artifact), foll
 
 <div className="[&_h3]:fd-step">
  
-### Install the Weave.js backend dependencies
+#### Install Weave.js SDK
 
-First, let's install the **Weave.js** websocket store dependencies.
-
-On your root project folder, execute the following command:
+Located on your root project folder, install the **Weave.js SDK** by
+executing the following command:
 
 ```shell
-npm install ws @inditextech/weave-store-websockets
+npm install @inditextech/weave-sdk
 ```
+
+</div>
+
+<div className="[&_h3]:fd-step">
+ 
+#### Install Weave.js Store
+
+Located on your root project folder, install the **Weave.js Store** by
+executing the following command:
+
+```shell
+npm install @inditextech/weave-store-websockets ws
+```
+
+In this case we're using the WebSockets store.
 
 </div>
 
@@ -65,7 +79,7 @@ npm install cross-env express
 - Dependencies only needed on the local development environment or build time:
 
 ```shell
-npm install -D ts-node nodemon @types/express
+npm install -D tsx nodemon @types/express
 ```
 
 ---
@@ -80,16 +94,10 @@ npm install -D ts-node nodemon @types/express
 
 Then, set up the TypeScript configuration for the server part:
 
-- Create a `tsconfig.server.json` file on the root of your project with the following content:
-
-  <include lang="json" meta='title="tsconfig.server.json"'>
-    ../../examples/manual-installation/tsconfig.server.json
-  </include>
-
 - Set up the transpilation of the server files from TypeScript to JavaScript. Create a `nodemon.json` file on the root of your project with the following content:
 
   <include lang="json" meta='title="nodemon.json"'>
-    ../../examples/manual-installation/nodemon.json
+    ../../../../manual-installation/nodemon.json
   </include>
 
 ---
@@ -101,7 +109,7 @@ Then, set up the Next.js configuration:
 - Create a `next.config.mjs` file on the root of your project with the following content:
 
   <include lang="json" meta='title="next.config.mjs"'>
-    ../../examples/manual-installation/next.config.mjs
+    ../../../../manual-installation/next.config.mjs
   </include>
 
 ---
@@ -116,7 +124,7 @@ Then, set up the Next.js configuration:
 Define the custom server logic by creating a file named `server.ts` on the root of your project with the following content:
 
 <include lang="ts" meta='title="server.ts"'>
-  ../../examples/manual-installation/server.ts
+  ../../../../manual-installation/server.mod-0
 </include>
 
 ---
@@ -137,7 +145,7 @@ Change the scripts definitions with the following content:
     "build": "next build", // [!code --]
     "build": "next build && tsc --project tsconfig.server.json", // [!code ++]
     "start": "next start", // [!code --]
-    "start": "cross-env NODE_ENV=production node dist/server.js" // [!code ++]
+    "start": "cross-env NODE_ENV=production node dist/server.js", // [!code ++]
     ...
   },
   ...
@@ -176,10 +184,10 @@ We need to:
 In this step, we will define the persistence logic for the shared-state.
 In this case, we use the file system as our persistence layer.
 
-Create a `persistence.ts` file on the project root and set its content to:
+Create a folder named `weave` on the project room, inside create a `persistence.ts` file and set its content to:
 
 <include lang="ts" meta='title="persistence.ts"'>
-  ../../examples/manual-installation/persistence.ts
+  ../../../../manual-installation/weave/persistence.ts
 </include>
 
 File explanation:
@@ -200,7 +208,7 @@ On the custom server file `server.ts`, add the necessary logic to use the `@indi
 You can replace the contents of `server.ts` with this content:
 
 <include lang="ts" meta='title="server.ts"'>
-  ../../examples/manual-installation/server.mod-1.ts
+  ../../../../manual-installation/server.mod-1
 </include>
 
 Changes explanation:
@@ -208,15 +216,16 @@ Changes explanation:
 - **`(1)`**: Import **Weave.js** Websockets store dependency.
 - **`(2)`**: Import persistence handlers previously defined.
 - **`(3)`**: Define a regex to identify the **Weave.js** Websockets connection URI.
-- **`(4)`**: Extract the underlying HTTP server.
-- **`(5)`**: Define the configuration for the [WeaveWebsocketsServer](/docs/store-websockets/api-reference/server/weave-websockets-server) class.
-- **`(6)`**: Define the property `performUpgrade`, this indicates which URIs are valid for the Websocket upgrade protocol
+- **`(4)`**: Define an endpoint to fetch the initial content of a room.
+- **`(5)`**: Extract the underlying HTTP server.
+- **`(6)`**: Define the configuration for the [WeaveWebsocketsServer](/docs/store-websockets/api-reference/server/weave-websockets-server) class.
+- **`(7)`**: Define the property `performUpgrade`, this indicates which URIs are valid for the Websocket upgrade protocol
   (upgrade from HTTP to WEBSOCKETS)
-- **`(7)`**: Define the property `extractRoomId`, this indicates how to extract the room ID from the Websocket connection URI.
-- **`(8)`**: Use the previous `fetchRoom` function for persistence management.
-- **`(9)`**: Use the previous `persistRoom` function for persistence management.
-- **`(10)`**: Instantiate the [WeaveWebsocketsServer](/docs/store-websockets/api-reference/server/weave-websockets-server) class.
-- **`(11)`**: Attach the **Weave.js** Websockets server to the HTTP server.
+- **`(8)`**: Define the property `extractRoomId`, this indicates how to extract the room ID from the Websocket connection URI.
+- **`(9)`**: Use the previous `fetchRoom` function for persistence management.
+- **`(10)`**: Use the previous `persistRoom` function for persistence management.
+- **`(11)`**: Instantiate the [WeaveWebsocketsServer](/docs/store-websockets/api-reference/server/weave-websockets-server) class.
+- **`(12)`**: Attach the **Weave.js** Websockets server to the HTTP server.
 
 </div>
 

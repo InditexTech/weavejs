@@ -31,7 +31,7 @@ function useGetAzureWebPubsubProvider({
   const queryClient = useQueryClient();
 
   React.useEffect(() => {
-    if (loadedParams && isFetched && room && user && !wsProvider) {
+    if (loadedParams && isFetched && room && user && !storeProvider) {
       const store = new WeaveStoreAzureWebPubsub(
         roomData,
         {

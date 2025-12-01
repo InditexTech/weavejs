@@ -2,8 +2,8 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-window._weave_isServerSide = false;
-window._weave_serverSideBackend = undefined;
+globalThis._weave_isServerSide = false;
+globalThis._weave_serverSideBackend = undefined;
 
 export { Weave } from './weave';
 export { WeaveStore } from './stores/store';

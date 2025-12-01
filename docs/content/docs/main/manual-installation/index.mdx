@@ -49,7 +49,68 @@ Run the following command, and when prompted, accept all the default values:
 npx create-next-app@next-14
 ```
 
-When finished, navigate to the project folder and start the development server by running the following command:
+When finished, navigate to the app folder and:
+
+- Delete the `node_modules` folder.
+- Delete the `package-lock.json` file.
+
+Update add the following on the the `package.json` file:
+
+- Add type to "module:
+
+```json
+{
+  ...
+  "type": "module",
+  ...
+}
+```
+
+- Add the `overrides` section to the `package.json` file in order to
+  force the use of React `18.2.0` version:
+
+```json
+{
+  ...
+  "devDependencies": {
+    ...
+  },
+  "overrides": {
+    "react": "18.2.0",
+    "react-dom": "18.2.0"
+  }
+}
+```
+
+- Set strict dependencies for `react` and `react-dom` to version `18.2.0`, and
+  version `18.3.7` for`@types/react` and `@types/react-dom` as follows:
+
+```json
+{
+  ...
+  "dependencies": {
+    ...
+    "react": "18.2.0",
+    "react-dom": "18.2.0",
+    ...
+  },
+  "devDependencies": {
+    ...
+    "@types/react": "18.3.7",
+    "@types/react-dom": "18.3.7",
+    ...
+  },
+  ...
+}
+```
+
+Now execute a new install of the dependencies
+
+```shell
+npm install
+```
+
+Navigate to the project folder and start the development server by running the following command:
 
 ```shell
 npm run dev
@@ -62,17 +123,6 @@ You should be able now to open your Next.js base app on a browser by navigating 
   safely ignore this issue since it is specific to the template and does not
   impact the functionality of Weave.js.
 </Callout>
-
----
-
-#### Install Weave.js SDK
-
-Located on your root project folder, install the **Weave.js SDK** by
-executing the following command:
-
-```shell
-npm install @inditextech/weave-sdk
-```
 
 </div>
 
