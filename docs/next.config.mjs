@@ -11,6 +11,9 @@ const config = {
   images: {
     unoptimized: true,
   },
+  eslint: {
+    dirs: ["app", "components", "content", "layouts", "lib", "src"],
+  },
   async redirects() {
     return [
       {

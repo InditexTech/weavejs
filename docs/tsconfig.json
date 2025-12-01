@@ -32,10 +32,8 @@
     "new-types.d.ts",
     "next-env.d.ts",
     "dist/types/**/*.ts",
-    "manual-installation-project/server.ts.mod-1",
     "content/docs/examples/manual-installation/store/store.mod-1",
-    "manual-installation/server.ts",
     "content/docs/examples/manual-installation/server.mod-1"
   ],
-  "exclude": ["node_modules", "content/docs/examples"]
+  "exclude": ["node_modules", "content/docs/examples", "manual-installation"]
 }
