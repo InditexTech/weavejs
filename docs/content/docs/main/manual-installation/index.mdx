@@ -1,11 +1,11 @@
 ---
 title: Manual installation
-description: Integrate Weave.js to a new or existing Next.js project
+description: Integrate Weave.js into a new or existing Next.js project
 ---
 
 import { Step, Steps } from "fumadocs-ui/components/steps";
 
-In this guide, we will manually integrate Weave.js into a [Next.js](https://nextjs.org/docs) application.
+In this guide, you will manually integrate Weave.js into a [Next.js](https://nextjs.org/docs) application.
 
 <Callout title="Why Next.js?" type="note">
 
@@ -25,7 +25,7 @@ Before you begin, ensure that you meet the [requirements](/docs/main/requirement
 
 <Callout title="Next.js version used" type="info">
   Weave.js is not compatible with React 19, which is included in Next.js 15. For
-  this reason, we will use **Next.js 14**.
+  this reason, this guide uses **Next.js 14**.
 </Callout>
 
 ## Step by step
@@ -116,7 +116,7 @@ Navigate to the project folder and start the development server by running the f
 npm run dev
 ```
 
-You should be able now to open your Next.js base app on a browser by navigating to `http://localhost:3000`.
+Open `http://localhost:3000` in your browser to see the Next.js base app.
 
 <Callout title="Failed to load images" type="warn">
   Some images in the default Next.js template may not load correctly. You can
@@ -127,7 +127,7 @@ You should be able now to open your Next.js base app on a browser by navigating 
 </div>
 
 <div className='[&_h3]:fd-step'>
- 
+
 ### Set up the backend
 
 Follow the steps to [set up the backend](/docs/main/manual-installation/backend) of the application.
@@ -135,7 +135,7 @@ Follow the steps to [set up the backend](/docs/main/manual-installation/backend)
 </div>
 
 <div className='[&_h3]:fd-step'>
- 
+
 ### Set up the frontend
 
 Follow the steps to [set up the frontend](/docs/main/manual-installation/frontend) of the application.
@@ -143,7 +143,7 @@ Follow the steps to [set up the frontend](/docs/main/manual-installation/fronten
 </div>
 
 <div className='[&_h3]:fd-step'>
- 
+
 ### Run the project
 
 If you have completed all the previous steps, you should have a working project.
@@ -154,7 +154,7 @@ To run the project, use the following command:
 npm run dev
 ```
 
-On a browser navigate to `http://localhost:3000`.
+In a browser, navigate to `http://localhost:3000`.
 
 You will see the **Enter Room** page:
 
@@ -164,7 +164,7 @@ You will see the **Enter Room** page:
 
 On it, enter a _room name_ and your _username_, then click on the **ENTER THE ROOM** button.
 
-Once the **Room** loads, you will be able to:
+Once the **Room** loads, you can:
 
 <div className="flex justify-center items-center *:max-w-[600px] bg-gradient-to-br from-fd-primary/10 rounded-xl border">
   ![Room page](/images/room.png)
@@ -174,7 +174,8 @@ Once the **Room** loads, you will be able to:
 - Zoom and pan the canvas.
 - Create a simple node, such as a [Rectangle](/docs/main/build/nodes/rectangle).
 
-Next, try opening another tab with a different username and the same room name and make some changes.
+Next, try opening another tab.
+Use a different username and the same room name and make some changes.
 In the first tab, you should see the changes made by this new user.
 
 Congratulations! You have a working Weave.js application.
