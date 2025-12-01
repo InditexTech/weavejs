@@ -10,6 +10,12 @@ export const fetchRoom = async (docName: string) => {
   try {
     const roomsFolder = path.join(__dirname, "rooms");
     const roomsFile = path.join(roomsFolder, docName);
+
+    const roomsFileCheck = path.resolve(roomsFolder, docName);
+    if (!roomsFileCheck.startsWith(path.resolve(roomsFolder))) {
+      throw new Error("Path escape detected");
+    }
+
     return await fs.readFile(roomsFile);
   } catch (e) {
     console.error(e);
