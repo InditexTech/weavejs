@@ -12,7 +12,7 @@ To build the collaborative canvas interface, you will create two pages:
 
 <Callout title="Opinionated tools" type="note">
 This guide uses some opinionated tools and libraries (like shadcn/ui for UI components) to demonstrate the integration.
-Adapt or replace these tools tomatch your project's needs and preferences.
+Adapt or replace these tools to match your project's needs and preferences.
 </Callout>
 
 ## Prerequisites
@@ -41,13 +41,23 @@ This example uses the Weave.js React wrapper.
 
 <div className="[&_h3]:fd-step">
 
-### Install frontend dependencies
+### Install the additional frontend dependencies
 
-Located on your project folder, install the frontend dependencies:
+From the project root, install supporting frontend libraries:
 
 ```shell
-npm install boring-avatars lucide-react @tanstack/react-query
+npm install boring-avatars class-variance-authority clsx @hookform/resolvers lucide-react react-hook-form tailwindcss-animate tailwind-merge @tanstack/react-query zod
 ```
+
+These packages provide auxiliary functionality such as:
+
+* **Form handling:** `react-hook-form`, `@hookform/resolvers`, `zod`
+
+* **UI utilities:** `clsx`, `class-variance-authority`, `tailwind-merge`, `tailwindcss-animate`
+
+* **Icons and avatars:** `lucide-react`, `boring-avatars`
+
+* **State management:** `@tanstack/react-query`
 
 </div>
 
@@ -55,24 +65,47 @@ npm install boring-avatars lucide-react @tanstack/react-query
 
 ### Set up a global state store for the UI
 
-Start by creating a global state store to handle the UI state.
+Create a global state store to handle the UI state.
 This store manages the current user, room ID, and UI visibility state across the application.
 Use
 [Zustand](https://zustand.docs.pmnd.rs/getting-started/introduction) for this.
 
-- First, install the [Zustand](https://zustand.docs.pmnd.rs/getting-started/introduction) dependency:
+- Install the [Zustand](https://zustand.docs.pmnd.rs/getting-started/introduction) dependency:
 
   ```shell
   npm install zustand
   ```
 
-- Create a `store/store.ts` file in the root folder of your project and set its content to:
+- Create a `store/store.ts` file in the project root folder and set its content to:
 
   <include lang="ts" meta='title="store/store.ts"'>
     ../../../../../manual-installation/store/store.ts
   </include>
 
 </div>
+
+<div className="[&_h3]:fd-step">
+
+### Configure utility functions
+
+Create a `lib/utils.ts` file in the project root folder to provide utility functions used throughout the UI components.
+
+Create the file with the following content:
+
+<include lang="ts" meta='title="lib/utils.ts"'>
+  ../../../../../manual-installation/lib/utils.ts
+</include>
+
+</div>
+
+This file includes:
+
+- **`cn` function:** Merges Tailwind CSS class names with proper conflict resolution using `clsx` and `tailwind-merge`. This ensures that when you combine multiple class strings, conflicting Tailwind utilities are resolved correctly (e.g., `p-4` and `p-2` will result in `p-2`).
+
+- **`getContrastTextColor` function:** Determines whether white or black text provides better contrast against a given hex color background. It calculates the relative luminance of the color using the W3C standard formula and returns the appropriate text color for readability.
+
+- **`stringToColor` function:** Generates a consistent hex color from any string input using a hash function. This is useful for creating deterministic color assignments (like avatar backgrounds) based on user names or other identifiers.
+
 
 <div className="[&_h3]:fd-step">
 

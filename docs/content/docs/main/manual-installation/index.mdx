@@ -56,7 +56,7 @@ When finished, navigate to the app folder and:
 
 Update add the following on the the `package.json` file:
 
-- Add type to "module:
+- Add the `type` property and set it to `module`:
 
 ```json
 {
@@ -102,13 +102,24 @@ Update add the following on the the `package.json` file:
   },
   ...
 }
-```
+``
 
-Now execute a new install of the dependencies
+Now execute a new install of the dependencies:
 
 ```shell
 npm install
 ```
+
+Set `"baseUrl": "."` in `tsconfig.json` to simplify module imports:
+
+```json
+{
+  "compilerOptions": {
+    "baseUrl": ".",
+    // ...
+}
+```
+
 
 Navigate to the project folder and start the development server by running the following command:
 

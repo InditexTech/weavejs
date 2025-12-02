@@ -68,7 +68,7 @@ For more details, refer to the [backend showcase implementation](https://github.
 
 #### Dependencies installation
 
-To start, install the necessary dependencies for the custom server with the following commands:
+Install the necessary dependencies for the custom server with the following commands:
 
 - Dependencies needed on runtime:
 
@@ -92,21 +92,21 @@ npm install -D tsx nodemon @types/express
   file changes.
 </Callout>
 
-Then, set up the TypeScript configuration for the server:
+Set up the transpilation of the server files from TypeScript
 
-- Set up the transpilation of the server files from TypeScript to JavaScript. Create a `nodemon.json` file on the root of your project with:
+Create a `nodemon.json` file on the project root with:
 
-  <include lang="json" meta='title="nodemon.json"'>
-    ../../../../manual-installation/nodemon.json
-  </include>
+<include lang="json" meta='title="nodemon.json"'>
+  ../../../../manual-installation/nodemon.json
+</include>
 
 ---
 
 #### Next.js configuration
 
-Then, set up the Next.js configuration:
+Set up the Next.js configuration:
 
-- Create a `next.config.mjs` file in the root of your project with:
+- Create a `next.config.mjs` file in the project root with:
 
   <include lang="json" meta='title="next.config.mjs"'>
     ../../../../manual-installation/next.config.mjs
@@ -121,7 +121,7 @@ Then, set up the Next.js configuration:
   Node.js, as the underlying server for the custom server.
 </Callout>
 
-Define the custom server logic by creating a file named `server.ts` in the root of your project with:
+Define the custom server logic by creating a file named `server.ts` in the project root with:
 
 <include lang="ts" meta='title="server.ts"'>
   ../../../../manual-installation/server.mod-0

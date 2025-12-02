@@ -29,7 +29,7 @@ Before you begin, ensure you meet the [requirements](/docs/main/requirements).
 ### Scaffold the backend project
 
 First, create the backend server that will handle all the real-time synchronization using a Weave.js Store provider.
-In this case, we use the [Weave.js Store WebSockets](/docs/main/build/stores/websockets-store).
+In this case, use the [Weave.js Store WebSockets](/docs/main/build/stores/websockets-store).
 
 Open a terminal in your preferred folder and execute the following command:
 
@@ -47,7 +47,7 @@ yarn create weave-backend-app
 
 The CLI will prompt you with the following:
 
-1. **Project name:**  The folder name where the backend project will be created (e.g. `my-service`).
+1. **Project name:**  The folder name for the backend project (e.g. `my-service`).
 2. **Select the store:**  For this quickstart, select the store named:
 
     **Express.js: Weave.js Websockets Store**
@@ -87,7 +87,7 @@ You should see the following response:
 
 ### Scaffold the frontend project
 
-Now create the frontend application on top of Next.js and powered by Weave.js.
+Now, create the frontend application on top of Next.js and powered by Weave.js.
 This project will render the UI and canvas with live updates.
 
 Open a new terminal in the same parent folder as the backend project and execute the following command:
@@ -106,7 +106,7 @@ yarn create weave-frontend-app
 
 The CLI will prompt you with the following:
 
-1. **Project name:**  The folder name where the frontend project will be created (e.g. `my-app`).
+1. **Project name:**  The folder name for the frontend project (e.g. `my-app`).
 
 2. **Select the store:**  For this quickstart, select the store named:
 
@@ -135,7 +135,7 @@ This will start the Next.js frontend application at `http://localhost:3030`.
 
 <Callout title="Self-signed certificate warning">
 When running `npm run dev`, you might see a warning about self-signed certificates.
-This is expected, Next.js is setting up HTTPS for local development and may prompt for your system password.
+This is expected. Next.js is setting up HTTPS for local development, and may prompt for your system password.
 It is a one-time setup.
 </Callout>
 
@@ -177,7 +177,7 @@ Here are some recommended next steps:
 
 ### Explore the building blocks
 
-To learn how to build modular and interactive tools, explore how Weave.js is structured under the hood and get familiar with core concepts like:
+To learn how to build modular and interactive tools, explore how Weave.js is structured under the hood, and get familiar with core concepts like:
 
 - [Nodes](/docs/main/build/nodes)
 - [Plugins](/docs/main/build/plugins)

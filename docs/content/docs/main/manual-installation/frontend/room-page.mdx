@@ -70,20 +70,8 @@ Follow these steps:
   - **`(2)`**: Set up the fonts available on **Weave.js**.
   - **`(3)`**: Define the nodes used in this example.
   - **`(4)`**: Define the actions used in this example.
-  - **`(5)`**: Define the custom plugins used in this example. By default the [WeaveProvider](/docs/react/api-reference/providers/weave-provider)
-    pre-defines a set of plugins. In this case, which can be overriden or extended here.
-
-</div>
-
-<div className="[&_h3]:fd-step">
-
-### Define some front utils to use
-
-Replace the content of the `lib/utils.ts` with:
-
-<include lang="ts" meta='title="components/utils/constants.ts"'>
-  ../../../../../manual-installation/lib/utils.ts
-</include>
+  - **`(5)`**: Define the custom plugins used in this example. By default, the [WeaveProvider](/docs/react/api-reference/providers/weave-provider)
+    predefines a set of plugins. In this case, which can be overridden or extended here.
 
 </div>
 
@@ -117,14 +105,13 @@ Create a hook to manage the store instance. Its main responsibilities are:
 - Fetch the initial data for the room to connect
 - Instantiate Weave.js store
 
-In the `hooks` folder, create a file named `use-get-websockets-store.ts` with the following
-content:
+In the `hooks` folder, create a file named `use-get-websockets-store.ts` with:
 
 <include lang="tsx" meta='title="hooks/use-get-websockets-store.ts"'>
   ../../../../../manual-installation/hooks/use-get-websockets-store.ts
 </include>
 
-This hook is a helper to setup the Websocket Store of Weave.js.
+This hook is a helper to set up the Websocket Store of Weave.js.
 
 Next, create a function to call the API.
 Create an `api` folder in the project root.
@@ -134,7 +121,7 @@ Create inside it a file named `get-room.ts` with:
   ../../../../../manual-installation/api/get-room.ts
 </include>
 
-Finally, implement the API to fetch the persisted room (in this case on the local file system).
+Finally, implement the API to fetch the persisted room (in this case, on the local file system).
 Create the folders `/api/rooms/[roomId]` inside the `app` directory.
 Inside the `[roomId]` folder, add a `route.ts` file with:
 
@@ -150,8 +137,8 @@ Inside the `[roomId]` folder, add a `route.ts` file with:
 
 Set up the following directories to organize our components:
 
-- On the `components` folder, create a `room` folder.
-- On the `components` folder, create an `overlays` folder.
+- In the `components` folder, create a `room` folder.
+- In the `components` folder, create an `overlays` folder.
 
 ---
 
@@ -274,7 +261,7 @@ In the `components/overlays` folder, create a file named `zoom-handler-overlay.t
 
 To set up the **Room** page component, follow these steps:
 
-- On the `app` folder, create a folder named `room`.
+- On the `app` folder, create a folder named `rooms`.
 - On the `app/rooms` folder, create a folder named `[roomId]`.
 - On the `app/rooms/[roomId]` folder, create a file named `page.tsx` with:
 
