@@ -128,7 +128,7 @@ import { WeaveStoreWebsockets } from "@inditextech/weave-store-websockets/client
 // metadata of the user of the instance
 const getUser = () => { email: "user-email@domain.com", name: "User name" };
 
-// Define the id of the room that we will connect to
+// Define the id of the room that to connect to
 const roomId = "my-room";
 
 // Instantiate the store
@@ -152,23 +152,23 @@ const store = new WeaveStoreWebsockets(
 
 #### 3. Instantiate the Weave class
 
-The [Weave](/docs/sdk/api-reference/weave) class is the central object in a Weave.js collaborative canvas. It
-represents the active canvas environment. Essentially, it's the core controller and API
-that orchestrates everything happening on the canvas — from element creation to user input
-and shared state updates. To instantiate the Weave class you need to:
+The [Weave](/docs/sdk/api-reference/weave) class is the central object in a Weave.js collaborative canvas.
+It represents the active canvas environment and acts as the core controller and API, orchestrating everything
+from element creation to user input and shared state updates.
+
+To instantiate the Weave class:
 
 - Define on which container element the collaborative application will run.
-- Define which [Store](/docs/main/build/stores) you'll use to connect to the backend and handle
-  the shared-state.
+- Define which [Store](/docs/main/build/stores) to use for backend connection and shared-state handling.
 
-Optionally you can also:
+Optionally, you can also:
 
-- Register which kind of [Nodes](/docs/main/build/nodes) you application will be using.
-- Register which kind of [Plugins](/docs/main/build/plugins) you application will be using.
-- Register which kind of [Actions](/docs/main/build/actions) you application will be using.
-- Define which fonts the canvas has access to.
+- Register which [Nodes](/docs/main/build/nodes) the application will use.
+- Register which [Plugins](/docs/main/build/plugins) the application will use.
+- Register which [Actions](/docs/main/build/actions) the application will use.
+- Define which fonts are available in the canvas.
 
-For this example this is the instantiation of the Weave class:
+For this example, this is the instantiation of the Weave class:
 
 ```ts
 // Import the Weave class dependency and two important nodes Stage and Layer
@@ -191,17 +191,17 @@ const myWeaveInstance = new Weave(
 );
 ```
 
-As you can see we are instantiating the class but we're not registering any:
+The class is instantiated without registering any:
 
 - [Actions](/docs/main/build/actions), or
 - [Plugins](/docs/main/build/plugins)
 
-Also we're just registering the [Stage](/docs/main/build/nodes/stage) and [Layer](/docs/main/build/nodes/layer) nodes,
-this mainly because we define them on the Store [initial state](/docs/store-websockets/api-reference/server/weave-websockets-server#shared-state-initial-value).
+Only the [Stage](/docs/main/build/nodes/stage) and [Layer](/docs/main/build/nodes/layer) nodes are registered,
+because they are already defined in the Store [initial state](/docs/store-websockets/api-reference/server/weave-websockets-server#shared-state-initial-value).
 
 <Callout title="What this means?" type="info">
 
-This means that we will render the application, but final users will not be able to do nothing with it, yet.
+This means the application will render, but users will not be able to interact with it yet.
 
 </ Callout>
 

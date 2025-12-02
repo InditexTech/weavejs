@@ -5,11 +5,11 @@ description: Learn how to set up the backend of a Weave.js app on Next.js
 
 In this guide, you will learn how to set up the backend infrastructure for a collaborative application using Weave.js.
 
-To make the backend functional, we need to set up a Next.js
+To make the backend functional, you will set up a Next.js
 [custom server](https://nextjs.org/docs/14/pages/building-your-application/configuring/custom-server)
 to later integrate Weave.js Websockets store.
 
-The store will handle the shared-state management, client networking, persistence, and awareness events.
+The store manages shared state, client networking, persistence, and awareness events.
 
 ## Prerequisites
 
@@ -22,10 +22,10 @@ To set up Weave.js backend over our Next.js project (on a single artifact), foll
 <div className="fd-steps">
 
 <div className="[&_h3]:fd-step">
- 
+
 #### Install Weave.js SDK
 
-Located on your root project folder, install the **Weave.js SDK** by
+From the project root folder, install the **Weave.js SDK** by
 executing the following command:
 
 ```shell
@@ -35,27 +35,27 @@ npm install @inditextech/weave-sdk
 </div>
 
 <div className="[&_h3]:fd-step">
- 
+
 #### Install Weave.js Store
 
-Located on your root project folder, install the **Weave.js Store** by
+From the project root folder, install the **Weave.js Store** by
 executing the following command:
 
 ```shell
 npm install @inditextech/weave-store-websockets ws
 ```
 
-In this case we're using the WebSockets store.
+This example uses the WebSockets store.
 
 </div>
 
 <div className="[&_h3]:fd-step">
- 
+
 ### Set up the Next.js custom server
 
-To have a frontend and backend on the same artifact on top of Next.js we need to implement
+To have a frontend and backend on the same artifact on top of Next.js you will implement
 a [custom server](https://nextjs.org/docs/14/pages/building-your-application/configuring/custom-server)
-on Next.js, and later on, include the necessary Weave.js backend logic.
+on Next.js and the necessary Weave.js backend logic.
 
 <Callout title="Not recommended for production" type="warn">
   For production environments, you should consider using a separate backend server to handle the Weave.js backend logic.
@@ -68,7 +68,7 @@ For more details, refer to the [backend showcase implementation](https://github.
 
 #### Dependencies installation
 
-To start, install the necessary dependencies for the custom server with the following commands:
+Install the necessary dependencies for the custom server with the following commands:
 
 - Dependencies needed on runtime:
 
@@ -92,21 +92,21 @@ npm install -D tsx nodemon @types/express
   file changes.
 </Callout>
 
-Then, set up the TypeScript configuration for the server part:
+Set up the transpilation of the server files from TypeScript
 
-- Set up the transpilation of the server files from TypeScript to JavaScript. Create a `nodemon.json` file on the root of your project with the following content:
+Create a `nodemon.json` file on the project root with:
 
-  <include lang="json" meta='title="nodemon.json"'>
-    ../../../../manual-installation/nodemon.json
-  </include>
+<include lang="json" meta='title="nodemon.json"'>
+  ../../../../manual-installation/nodemon.json
+</include>
 
 ---
 
 #### Next.js configuration
 
-Then, set up the Next.js configuration:
+Set up the Next.js configuration:
 
-- Create a `next.config.mjs` file on the root of your project with the following content:
+- Create a `next.config.mjs` file in the project root with:
 
   <include lang="json" meta='title="next.config.mjs"'>
     ../../../../manual-installation/next.config.mjs
@@ -121,7 +121,7 @@ Then, set up the Next.js configuration:
   Node.js, as the underlying server for the custom server.
 </Callout>
 
-Define the custom server logic by creating a file named `server.ts` on the root of your project with the following content:
+Define the custom server logic by creating a file named `server.ts` in the project root with:
 
 <include lang="ts" meta='title="server.ts"'>
   ../../../../manual-installation/server.mod-0
@@ -131,9 +131,9 @@ Define the custom server logic by creating a file named `server.ts` on the root 
 
 #### Custom server tooling
 
-To properly use the custom server both locally and during the build process, we need to customize the dependent scripts in your `package.json`: specifically the `dev`, `build`, and `start` scripts.
+To properly use the custom server both locally and during the build process, update the dependent scripts in your `package.json`, specifically `dev`, `build`, and `start`.
 
-Change the scripts definitions with the following content:
+Change the scripts definitions with:
 
 ```json
 {
@@ -154,25 +154,25 @@ Change the scripts definitions with the following content:
 
 Finally, test that the Next.js project keeps starting with the new custom server configuration.
 
-On the project root folder, run the following command:
+From the project root folder, run the following command:
 
 ```shell
 npm run dev
 ```
 
-Navigate to `http://localhost:3000` on a browser.
+Navigate to `http://localhost:3000` in a browser.
 You should still see the Next.js default application running and the console should have no errors at all.
 
 </div>
 
 <div className="[&_h3]:fd-step">
- 
+
 ### Integrate Weave.js into the backend
 
-Now that the Next.js custom server is completely set up, let's add the necessary Weave.js backend logic.
-For that, we will use the [Websockets store](/docs/main/build/stores/websockets-store) library: (`@inditextech/weave-store-websockets`).
+Now that the Next.js custom server is completely set up, add the necessary Weave.js backend logic.
+Use the [Websockets store](/docs/main/build/stores/websockets-store) library (`@inditextech/weave-store-websockets`).
 
-We need to:
+You need to:
 
 - Define how to handle the persistence of the shared-state.
 - Instantiate the [WeaveWebsocketsServer](/docs/store-websockets/api-reference/server/weave-websockets-server) class from the library `@inditextech/weave-store-websockets` and configure it.
@@ -181,31 +181,29 @@ We need to:
 
 #### Set up the shared-state persistence handlers
 
-In this step, we will define the persistence logic for the shared-state.
-In this case, we use the file system as our persistence layer.
+Define the persistence logic for the shared-state.
+For this example, use the file system as our persistence layer.
 
-Create a folder named `weave` on the project room, inside create a `persistence.ts` file and set its content to:
+Create a folder named `weave` on the project root.
+Inside create a `persistence.ts` file with:
 
 <include lang="ts" meta='title="persistence.ts"'>
   ../../../../manual-installation/weave/persistence.ts
 </include>
 
-File explanation:
+Changes explanation:
 
 - **`(1)`**: Import necessary Node.js dependencies to handle the file system.
 - **`(2)`**: `fetchRoom` function fetches a previously saved shared-state of a room by its ID from the file system.
-- **`(3)`**: `persistRoom` function persist the shared-state of a room by its ID onto the file system.
+- **`(3)`**: `persistRoom` function persists the shared-state of a room by its ID onto the file system.
 
 ---
 
 #### Set up the Weave.js Websockets store
 
-Finally, set up the Weave.js store handler.
-In this case, we use the Websockets transport.
+Finally, set up the Weave.js store handler using the WebSockets transport.
 
-On the custom server file `server.ts`, add the necessary logic to use the `@inditextech/weave-store-websockets` store handler.
-
-You can replace the contents of `server.ts` with this content:
+In `server.ts`, replace the contents with the following to integrate the `@inditextech/weave-store-websockets` store handler:
 
 <include lang="ts" meta='title="server.ts"'>
   ../../../../manual-installation/server.mod-1
@@ -220,7 +218,7 @@ Changes explanation:
 - **`(5)`**: Extract the underlying HTTP server.
 - **`(6)`**: Define the configuration for the [WeaveWebsocketsServer](/docs/store-websockets/api-reference/server/weave-websockets-server) class.
 - **`(7)`**: Define the property `performUpgrade`, this indicates which URIs are valid for the Websocket upgrade protocol
-  (upgrade from HTTP to WEBSOCKETS)
+  (upgrade from HTTP to WEBSOCKETS).
 - **`(8)`**: Define the property `extractRoomId`, this indicates how to extract the room ID from the Websocket connection URI.
 - **`(9)`**: Use the previous `fetchRoom` function for persistence management.
 - **`(10)`**: Use the previous `persistRoom` function for persistence management.
@@ -231,17 +229,17 @@ Changes explanation:
 
 <div className="[&_h3]:fd-step">
 
-### Run the project
+### Verify the backend setup
 
 Finally, test that the project keeps starting with the changes made to the custom server.
 
-On the project root folder, run the following command:
+From the project root folder, run the following command:
 
 ```shell
 npm run dev
 ```
 
-Navigate to `http://localhost:3000` on a browser.
+Navigate to `http://localhost:3000` in a browser.
 
 You should still see the Next.js default application running and the console should have no errors at all.
 
@@ -251,4 +249,4 @@ You should still see the Next.js default application running and the console sho
 
 ### Next steps
 
-Let's now [set up the frontend](/docs/main/manual-installation/frontend) of the application.
+[Set up the frontend](/docs/main/manual-installation/frontend) of the application.
