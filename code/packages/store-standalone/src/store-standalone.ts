@@ -12,7 +12,7 @@ import { WEAVE_STORE_STANDALONE } from './constants.js';
 import type { FetchInitialState, WeaveStoreStandaloneParams } from './types.js';
 
 export class WeaveStoreStandalone extends WeaveStore {
-  private roomData: string | undefined;
+  private readonly roomData: string | undefined;
   private initialState: FetchInitialState;
   protected name: string = WEAVE_STORE_STANDALONE;
   protected supportsUndoManager = true;
@@ -28,7 +28,7 @@ export class WeaveStoreStandalone extends WeaveStore {
   }
 
   async connect(): Promise<void> {
-    if (this.roomData !== undefined) {
+    if (this.roomData) {
       const roomDataSnapshot = Buffer.from(this.roomData, 'base64');
       Y.applyUpdate(this.getDocument(), roomDataSnapshot);
     } else {
