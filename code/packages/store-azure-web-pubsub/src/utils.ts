@@ -40,15 +40,39 @@ export function handleChunkedMessage(
 export function handleMessageBufferData(
   normalMessagePayload: string | undefined,
   joinedMessagePayload: string | undefined
-): Buffer | undefined {
-  let buf: Buffer | undefined = undefined;
+): Uint8Array<ArrayBufferLike> | undefined {
+  let buf: Uint8Array<ArrayBufferLike> | undefined = undefined;
 
   if (normalMessagePayload) {
-    buf = Buffer.from(normalMessagePayload, 'base64');
+    buf = base64ToUint8Array(normalMessagePayload);
   }
   if (joinedMessagePayload) {
-    buf = Buffer.from(joinedMessagePayload, 'base64');
+    buf = base64ToUint8Array(joinedMessagePayload);
   }
 
   return buf;
+}
+
+export function base64ToUint8Array(
+  base64: string
+): Uint8Array<ArrayBufferLike> {
+  const binary = atob(base64);
+  const len = binary.length;
+  const bytes = new Uint8Array(len);
+
+  for (let i = 0; i < len; i++) {
+    bytes[i] = binary.charCodeAt(i);
+  }
+  return bytes;
+}
+
+export function uint8ToBase64(u8: Uint8Array<ArrayBufferLike>): string {
+  let binary = '';
+  const CHUNK = 0x8000; // 32k chunks
+
+  for (let i = 0; i < u8.length; i += CHUNK) {
+    binary += String.fromCharCode(...u8.subarray(i, i + CHUNK));
+  }
+
+  return btoa(binary);
 }

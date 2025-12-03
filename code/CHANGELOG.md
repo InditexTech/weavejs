@@ -21,6 +21,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 - [#825](https://github.com/InditexTech/weavejs/issues/825) Improve usability of standalone store
+- [#828](https://github.com/InditexTech/weavejs/issues/828) Remove Buffer dependency on browser client for Azure Web PubSub store
 
 ### Fixed
 
