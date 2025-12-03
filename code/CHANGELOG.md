@@ -16,6 +16,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - [#830](https://github.com/InditexTech/weavejs/issues/830) Expose a function to zoom to an specific scale when using the WeaveStageZoomPlugin
+- [#831](https://github.com/InditexTech/weavejs/issues/831) Add an API to convert from JSON to Yjs binary and viceversa
 
 ### Changed
 
