@@ -47,12 +47,27 @@ export const mapJsonToYjsArray = (jsonData: any) => {
   return array;
 };
 
-export const mapJsonToYjsBinary = (jsonData: WeaveState) => {
+export const mapJsonToYjsElements = (jsonData: any) => {
   if (isArray(jsonData)) {
     return mapJsonToYjsArray(jsonData);
   } else if (isObject(jsonData)) {
     return mapJsonToYjsMap(jsonData);
   }
+};
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export const weavejsToYjsBinary = (weavejsData: WeaveState) => {
+  const doc = new Y.Doc();
+
+  doc.getMap('weave').set('key', weavejsData.weave.key);
+  doc.getMap('weave').set('type', weavejsData.weave.type);
+  doc
+    .getMap('weave')
+    .set('props', mapJsonToYjsElements(weavejsData.weave.props));
+
+  const actualState = Y.encodeStateAsUpdate(doc);
+
+  return actualState;
 };
 
 export function getJSONFromYjsBinary(actualState: Uint8Array<ArrayBufferLike>) {
