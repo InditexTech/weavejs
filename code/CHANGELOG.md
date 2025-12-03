@@ -17,6 +17,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - [#825](https://github.com/InditexTech/weavejs/issues/825) Improve usability of standalone store
 
+### Fixed
+
+- [#829](https://github.com/InditexTech/weavejs/issues/829) Cropping fails to activate
+
 ## [2.8.1] - 2025-12-01
 
 ### Changed
