@@ -61,7 +61,7 @@ export function base64ToUint8Array(
   const bytes = new Uint8Array(len);
 
   for (let i = 0; i < len; i++) {
-    bytes[i] = binary.charCodeAt(i);
+    bytes[i] = binary.codePointAt(i)!;
   }
   return bytes;
 }
@@ -71,7 +71,7 @@ export function uint8ToBase64(u8: Uint8Array<ArrayBufferLike>): string {
   const CHUNK = 0x8000; // 32k chunks
 
   for (let i = 0; i < u8.length; i += CHUNK) {
-    binary += String.fromCharCode(...u8.subarray(i, i + CHUNK));
+    binary += String.fromCodePoint(...u8.subarray(i, i + CHUNK));
   }
 
   return btoa(binary);
