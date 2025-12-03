@@ -13,6 +13,7 @@ export { WeaveNode } from './nodes/node';
 export { WeaveAction } from './actions/action';
 export * from './actions/types';
 export { WeavePlugin } from './plugins/plugin';
+export * from './utils/mapping';
 export * from './utils';
 
 // Provided Nodes
