@@ -13,6 +13,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- [#830](https://github.com/InditexTech/weavejs/issues/830) Expose a function to zoom to an specific scale when using the WeaveStageZoomPlugin
+
 ### Changed
 
 - [#825](https://github.com/InditexTech/weavejs/issues/825) Improve usability of standalone store
