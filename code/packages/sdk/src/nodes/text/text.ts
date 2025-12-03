@@ -792,8 +792,6 @@ export class WeaveTextNode extends WeaveNode {
   }
 
   private triggerEditMode(textNode: Konva.Text) {
-    const stage = this.instance.getStage();
-
     this.editing = true;
 
     textNode.visible(false);
@@ -808,12 +806,9 @@ export class WeaveTextNode extends WeaveNode {
 
     const textPosition = textNode.absolutePosition();
 
-    const stageContainer = stage.container();
-    const stageRect = stageContainer.getBoundingClientRect();
-
     const areaPosition: Konva.Vector2d = {
-      x: stageRect.x + stageContainer.offsetLeft + textPosition.x,
-      y: stageRect.y + stageContainer.offsetTop + textPosition.y,
+      x: textPosition.x,
+      y: textPosition.y,
     };
 
     this.createTextAreaDOM(textNode, areaPosition);

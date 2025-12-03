@@ -24,6 +24,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- [#827](https://github.com/InditexTech/weavejs/issues/827) Fix text editing position by taking into account canvas parent offset from window
 - [#829](https://github.com/InditexTech/weavejs/issues/829) Cropping fails to activate
 
 ## [2.8.1] - 2025-12-01
