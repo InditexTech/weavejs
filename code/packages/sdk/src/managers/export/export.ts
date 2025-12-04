@@ -268,10 +268,14 @@ export class WeaveExportManager {
           });
 
           let buffer: Buffer | null = null;
-          if (global._weave_serverSideBackend === WEAVE_KONVA_BACKEND.CANVAS) {
+          if (
+            globalThis._weave_serverSideBackend === WEAVE_KONVA_BACKEND.CANVAS
+          ) {
             buffer = canvas.toBuffer();
           }
-          if (global._weave_serverSideBackend === WEAVE_KONVA_BACKEND.SKIA) {
+          if (
+            globalThis._weave_serverSideBackend === WEAVE_KONVA_BACKEND.SKIA
+          ) {
             buffer = await canvas.toBuffer();
           }
 
