@@ -86,6 +86,12 @@ export class Weave {
   private readonly asyncElements: Map<string, WeaveAsyncElement>;
 
   constructor(weaveConfig: WeaveConfig, stageConfig: Konva.StageConfig) {
+    globalThis._weave_isServerSide = false;
+    globalThis._weave_serverSideBackend = undefined;
+    if (typeof window === 'undefined') {
+      globalThis._weave_isServerSide = true;
+    }
+
     this.emitter = new Emittery();
 
     Konva.showWarnings = false;
@@ -1027,9 +1033,6 @@ export class Weave {
   }
 
   public isServerSide(): boolean {
-    if (typeof window !== 'undefined') {
-      return window._weave_isServerSide === true;
-    }
-    return global._weave_isServerSide === true;
+    return globalThis._weave_isServerSide === true;
   }
 }
