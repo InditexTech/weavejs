@@ -86,12 +86,10 @@ export class Weave {
   private readonly asyncElements: Map<string, WeaveAsyncElement>;
 
   constructor(weaveConfig: WeaveConfig, stageConfig: Konva.StageConfig) {
-    if (typeof window !== 'undefined') {
-      globalThis._weave_isServerSide = false;
-      globalThis._weave_serverSideBackend = undefined;
-    } else {
+    globalThis._weave_isServerSide = false;
+    globalThis._weave_serverSideBackend = undefined;
+    if (typeof window === 'undefined') {
       globalThis._weave_isServerSide = true;
-      globalThis._weave_serverSideBackend = undefined;
     }
 
     this.emitter = new Emittery();
