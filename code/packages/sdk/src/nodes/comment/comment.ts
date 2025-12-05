@@ -1014,20 +1014,9 @@ export class WeaveCommentNode<T> extends WeaveNode {
   }
 
   focusOn(nodeId: string, duration = 0.5) {
-    if (
-      this.commentDomVisible &&
-      this.commentDomVisibleId &&
-      this.commentDomVisibleId !== nodeId
-    ) {
-      const commentNode = this.instance
-        .getStage()
-        .findOne(`#${this.commentDomVisibleId}`);
-
-      if (commentNode) {
-        this.closeCommentDOM(commentNode as WeaveElementInstance);
-        this.contractNode(commentNode as Konva.Group);
-      }
-    }
+    const stage = this.instance.getStage();
+    const stageActualX = stage.x();
+    const stageActualY = stage.y();
 
     const node = this.instance.getStage().findOne(`#${nodeId}`);
 
@@ -1047,6 +1036,21 @@ export class WeaveCommentNode<T> extends WeaveNode {
       // target position (pan so node is in center of viewport)
       const targetX = stageWidth / 2 - nodeCenterX * scale;
       const targetY = stageHeight / 2 - nodeCenterY * scale;
+
+      if (
+        this.commentDomVisible &&
+        this.commentDomVisibleId &&
+        (targetX !== stageActualX || targetY !== stageActualY)
+      ) {
+        const commentNode = this.instance
+          .getStage()
+          .findOne(`#${this.commentDomVisibleId}`);
+
+        if (commentNode) {
+          this.closeCommentDOM(commentNode as WeaveElementInstance);
+          this.contractNode(commentNode as Konva.Group);
+        }
+      }
 
       const tween = new Konva.Tween({
         node: stage,
