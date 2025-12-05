@@ -898,6 +898,12 @@ export class WeaveCommentNode<T> extends WeaveNode {
       commentAction: WEAVE_COMMENT_NODE_ACTION.VIEWING,
     });
 
+    if (
+      this.commentDomVisible &&
+      this.commentDomVisibleId === commentNode.id()
+    ) {
+      return;
+    }
     this.commentDomAction = WEAVE_COMMENT_NODE_ACTION.VIEWING;
     this.commentDomVisibleId = commentNode.id();
     this.commentDomVisible = true;
@@ -987,6 +993,9 @@ export class WeaveCommentNode<T> extends WeaveNode {
       this.expandNode(commentNode as Konva.Group);
     }
 
+    this.commentDomVisible = false;
+    this.commentDomVisibleId = null;
+
     commentNode.setAttrs({
       commentAction: WEAVE_COMMENT_NODE_ACTION.IDLE,
     });
@@ -1005,10 +1014,15 @@ export class WeaveCommentNode<T> extends WeaveNode {
   }
 
   focusOn(nodeId: string, duration = 0.5) {
-    if (this.commentDomVisible && this.commentDomVisibleId) {
+    if (
+      this.commentDomVisible &&
+      this.commentDomVisibleId &&
+      this.commentDomVisibleId !== nodeId
+    ) {
       const commentNode = this.instance
         .getStage()
         .findOne(`#${this.commentDomVisibleId}`);
+
       if (commentNode) {
         this.closeCommentDOM(commentNode as WeaveElementInstance);
         this.contractNode(commentNode as Konva.Group);
