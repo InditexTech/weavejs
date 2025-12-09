@@ -104,6 +104,14 @@ export class WeaveStageManager {
       ...props,
     });
 
+    const realContainer = stage.container();
+    if (
+      realContainer !== undefined &&
+      realContainer.style?.position !== 'relative'
+    ) {
+      realContainer.style.position = 'relative';
+    }
+
     this.setStage(stage);
   }
 

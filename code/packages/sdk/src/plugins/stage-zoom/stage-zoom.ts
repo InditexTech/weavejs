@@ -96,11 +96,7 @@ export class WeaveStageZoomPlugin extends WeavePlugin {
     this.setZoom(this.config.zoomSteps[this.actualStep]);
   }
 
-  private setZoom(
-    scale: number,
-    centered: boolean = true,
-    pointer?: Konva.Vector2d
-  ) {
+  setZoom(scale: number, centered: boolean = true, pointer?: Konva.Vector2d) {
     const stage = this.instance.getStage();
 
     const mainLayer = this.instance.getMainLayer();

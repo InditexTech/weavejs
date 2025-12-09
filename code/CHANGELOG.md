@@ -13,6 +13,53 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.9.5] - 2025-12-05
+
+### Fixed
+
+- [#845](https://github.com/InditexTech/weavejs/issues/845) Avoid flick comment node when the stage position haven't changed
+
+## [2.9.4] - 2025-12-05
+
+### Fixed
+
+- [#843](https://github.com/InditexTech/weavejs/issues/843) Comment node when opened and trigger onFocus on same is positioning on (0,0)
+
+## [2.9.3] - 2025-12-05
+
+### Fixed
+
+- [#841](https://github.com/InditexTech/weavejs/issues/841) Force relative on weave dom node to avoid offsets when positioning internal elements
+
+## [2.9.2] - 2025-12-04
+
+### Fixed
+
+- [#839](https://github.com/InditexTech/weavejs/issues/839) Race condition when setting canvas backend on server-side
+
+## [2.9.1] - 2025-12-04
+
+### Fixed
+
+- [#837](https://github.com/InditexTech/weavejs/issues/837) Avoid race condition when using globalThis
+
+## [2.9.0] - 2025-12-03
+
+\### Added
+
+- [#830](https://github.com/InditexTech/weavejs/issues/830) Expose a function to zoom to an specific scale when using the WeaveStageZoomPlugin
+- [#831](https://github.com/InditexTech/weavejs/issues/831) Add an API to convert from JSON to Yjs binary and viceversa
+
+### Changed
+
+- [#825](https://github.com/InditexTech/weavejs/issues/825) Improve usability of standalone store
+- [#828](https://github.com/InditexTech/weavejs/issues/828) Remove Buffer dependency on browser client for Azure Web PubSub store
+
+### Fixed
+
+- [#827](https://github.com/InditexTech/weavejs/issues/827) Fix text editing position by taking into account canvas parent offset from window
+- [#829](https://github.com/InditexTech/weavejs/issues/829) Cropping fails to activate
+
 ## [2.8.1] - 2025-12-01
 
 ### Changed
@@ -1400,7 +1447,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - [#24](https://github.com/InditexTech/weavejs/issues/24) Bug when loading rooms with text or images
 - [#18](https://github.com/InditexTech/weavejs/issues/18) Fix awareness not working on store-azure-web-pubsub
 
-[Unreleased]: https://github.com/InditexTech/weavejs/compare/2.8.1...HEAD
+[Unreleased]: https://github.com/InditexTech/weavejs/compare/2.9.5...HEAD
+
+[2.9.5]: https://github.com/InditexTech/weavejs/compare/2.9.4...2.9.5
+
+[2.9.4]: https://github.com/InditexTech/weavejs/compare/2.9.3...2.9.4
+
+[2.9.3]: https://github.com/InditexTech/weavejs/compare/2.9.2...2.9.3
+
+[2.9.2]: https://github.com/InditexTech/weavejs/compare/2.9.1...2.9.2
+
+[2.9.1]: https://github.com/InditexTech/weavejs/compare/2.9.0...2.9.1
+
+[2.9.0]: https://github.com/InditexTech/weavejs/compare/2.8.1...2.9.0
 
 [2.8.1]: https://github.com/InditexTech/weavejs/compare/2.8.0...2.8.1
 
