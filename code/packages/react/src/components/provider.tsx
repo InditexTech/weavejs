@@ -17,6 +17,7 @@ import {
   type WeaveStatus,
   WEAVE_INSTANCE_STATUS,
   type WeaveStoreConnectionStatus,
+  type WeavePerformanceConfig,
 } from '@inditextech/weave-types';
 import { useWeave } from './store';
 
@@ -27,6 +28,7 @@ type WeaveProviderType = {
   nodes?: WeaveNode[];
   actions?: WeaveAction[];
   plugins?: WeavePlugin[];
+  performance?: WeavePerformanceConfig;
   customNodes?: WeaveNode[];
   customActions?: WeaveAction[];
   customPlugins?: WeavePlugin[];
@@ -43,6 +45,7 @@ export const WeaveProvider = ({
   customPlugins = [],
   fonts = [],
   logLevel = 'info',
+  performance,
   children,
 }: Readonly<WeaveProviderType>): React.JSX.Element => {
   const weaveInstanceRef = React.useRef<Weave | null>(null);
@@ -149,6 +152,7 @@ export const WeaveProvider = ({
             actions,
             plugins: [...instancePlugins, ...customPlugins],
             fonts,
+            performance,
             logger: {
               level: logLevel,
             },
