@@ -19,7 +19,7 @@ export const setupUpscaleStage = (instance: Weave, stage: Konva.Stage) => {
     };
 
     const finalOptions = merge({}, defaultOptions, {
-      ...(config.performance?.upscale ?? {}),
+      ...config.performance?.upscale,
     });
 
     const realContainer = stage.container();
