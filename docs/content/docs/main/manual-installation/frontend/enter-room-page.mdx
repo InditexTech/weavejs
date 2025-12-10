@@ -5,12 +5,11 @@ description: Learn how to set up the Enter Room page on Next.js
 
 import { Separator } from "@/components/separator";
 
-In this guide, we will walk through the process of building the **Enter Room page**:
+In this guide, you will build the **Enter Room page**:
 
 ![Enter room page](/images/enter-room-manual.png)
 
 This page allows users to define the room they wish to join and set their username.
-Let's build it step by step.
 
 ## Prerequisites
 
@@ -23,15 +22,14 @@ To set up the **Enter Room** page in your Next.js project, follow these steps:
 <div className="fd-steps">
 
 <div className="[&_h3]:fd-step">
- 
+
 ### Install the UI building block components
 
 Set up the necessary [Shadcn/UI](https://ui.shadcn.com/docs) components for the **Enter Room** page.
 
-We will be using the [Shadcn/UI CLI](https://ui.shadcn.com/docs/cli) to install the UI components. Accept
-all the defaults from the CLI options.
+Use the [Shadcn/UI CLI](https://ui.shadcn.com/docs/cli) and accept all the default options.
 
-In the root directory of your project, follow these steps (accept all the defaults):
+From the project root folder, follow these steps:
 
 - Install the [Form](https://ui.shadcn.com/docs/components/form) component:
 
@@ -48,12 +46,12 @@ In the root directory of your project, follow these steps (accept all the defaul
 </div>
 
 <div className="[&_h3]:fd-step">
- 
+
 ### Define the base styles
 
-Now, let's tune up a little bit the styling of the **Enter Room** page.
+Adjust the styling of the **Enter Room** page.
 
-Replace the contents of the `app/globals.css` file with the following content:
+Replace the contents of `app/globals.css` with:
 
 <include lang="css" meta='title="app/globals.css"'>
   ../../../../../manual-installation/app/globals.css
@@ -62,16 +60,16 @@ Replace the contents of the `app/globals.css` file with the following content:
 </div>
 
 <div className="[&_h3]:fd-step">
- 
+
 ### Set up the page React component
 
-Create a `home` folder on the `components` folder.
+Create a `home` folder in the `components` folder.
 
 ---
 
 #### Home component
 
-On the `components/home` folder, create a file named `home.tsx` with the following content:
+In the `components/home` folder, create a file named `home.tsx` with:
 
 <include lang="tsx" meta='title="components/home/home.tsx"'>
   ../../../../../manual-installation/components/home/home.tsx
@@ -81,7 +79,7 @@ On the `components/home` folder, create a file named `home.tsx` with the followi
 
 #### LoginForm component
 
-On the `components/home` folder, create a file named `login-form.tsx` with the following content:
+In the `components/home` folder, create a file named `login-form.tsx` with:
 
 <include lang="tsx" meta='title="components/home/login-form.tsx"'>
   ../../../../../manual-installation/components/home/login-form.tsx
@@ -90,10 +88,10 @@ On the `components/home` folder, create a file named `login-form.tsx` with the f
 </div>
 
 <div className="[&_h3]:fd-step">
- 
+
 ### Define the page component
 
-Replace the contents of the file `app/page.tsx` with the following content:
+Replace the contents of the file `app/page.tsx` with:
 
 <include lang="tsx" meta='title="app/page.tsx"'>
   ../../../../../manual-installation/app/page.tsx
@@ -111,7 +109,8 @@ Once the **Enter Room** page setup is complete, run the project by executing the
 npm run dev
 ```
 
-Navigate to `http://localhost:3000` on a browser. You should see the following:
+Navigate to `http://localhost:3000` in a browser.
+You should see the following:
 
 <div className="flex justify-center items-center *:max-w-[500px] bg-gradient-to-br from-fd-primary/10 rounded-xl border">
   ![Enter room page](/images/enter-room-manual.png)
@@ -123,4 +122,4 @@ Navigate to `http://localhost:3000` on a browser. You should see the following:
 
 ## Next steps
 
-Let's now set up the [Room page](/docs/main/manual-installation/frontend/room-page) of the Next.js application.
+Set up the [Room page](/docs/main/manual-installation/frontend/room-page) of the Next.js application.
