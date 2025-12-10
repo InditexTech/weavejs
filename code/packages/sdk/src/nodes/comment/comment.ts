@@ -626,14 +626,18 @@ export class WeaveCommentNode<T> extends WeaveNode {
     const widthExpanded = this.config.style.expanded.width;
     const circlePaddingContracted = this.config.style.contracted.circlePadding;
 
+    const stage = this.instance.getStage();
+    const upscaleScale = stage.getAttr('upscaleScale');
+
     const internalCircleBigName = commentNode.findOne(
       `#${commentNode.id()}-circle-big-name`
     ) as Konva.Circle | undefined;
     const internalComment = commentNode.findOne(`#${commentNode.id()}-comment`);
 
     const heightExpanded =
-      (internalCircleBigName?.getClientRect().height ?? 0) +
-      (internalComment?.getClientRect().height ?? 0) +
+      ((internalCircleBigName?.getClientRect().height ?? 0) +
+        (internalComment?.getClientRect().height ?? 0)) *
+        upscaleScale +
       12;
 
     const background = commentNode.findOne(`#${commentNode.id()}-bg`);
@@ -799,8 +803,14 @@ export class WeaveCommentNode<T> extends WeaveNode {
       paddingY = this.config.style.viewing.paddingY;
     }
 
-    const x = stagePos.x + rect.x * scaleX + widthContracted + paddingX;
-    const y = stagePos.y + rect.y * scaleY + paddingY;
+    const upscaleScale = stage.getAttr('upscaleScale');
+    const x =
+      stagePos.x * upscaleScale +
+      rect.x * scaleX * upscaleScale +
+      widthContracted +
+      paddingX;
+    const y =
+      stagePos.y * upscaleScale + rect.y * scaleY * upscaleScale + paddingY;
 
     const position: Konva.Vector2d = { x, y };
 
@@ -863,11 +873,19 @@ export class WeaveCommentNode<T> extends WeaveNode {
   };
 
   private normalizeNodeSize(node: Konva.Node) {
+    const stage = this.instance.getStage();
+
+    const upscaleScale = stage.getAttr('upscaleScale');
+
     const abs = node.getAbsoluteScale();
     node.scale({
-      x: node.scaleX() / abs.x,
-      y: node.scaleY() / abs.y,
+      x: node.scaleX() / upscaleScale / abs.x,
+      y: node.scaleY() / upscaleScale / abs.y,
     });
+
+    // if (node instanceof Konva.Text) {
+    //   node.fontSize(node.fontSize() * upscaleScale);
+    // }
 
     if (node instanceof Konva.Group) {
       node
