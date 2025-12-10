@@ -883,10 +883,6 @@ export class WeaveCommentNode<T> extends WeaveNode {
       y: node.scaleY() / upscaleScale / abs.y,
     });
 
-    // if (node instanceof Konva.Text) {
-    //   node.fontSize(node.fontSize() * upscaleScale);
-    // }
-
     if (node instanceof Konva.Group) {
       node
         .getChildren()
