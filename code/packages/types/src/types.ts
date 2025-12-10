@@ -23,6 +23,17 @@ import { type WeaveStoreBase } from '@/base/store';
 
 export type WeaveFontsPreloadFunction = () => Promise<WeaveFont[]>;
 
+export type WeavePerformanceConfig = {
+  upscale?: Partial<WeaveUpscaleConfig>;
+};
+
+export type WeaveUpscaleConfig = {
+  enabled?: boolean;
+  multiplier?: number;
+  baseWidth?: number;
+  baseHeight?: number;
+};
+
 export type WeaveConfig = {
   store: WeaveStoreBase;
   nodes?: WeaveNodeBase[];
@@ -30,6 +41,7 @@ export type WeaveConfig = {
   plugins?: WeavePluginBase[];
   fonts?: WeaveFont[] | WeaveFontsPreloadFunction;
   logger?: WeaveLoggerConfig;
+  performance?: WeavePerformanceConfig;
 };
 
 // Base types

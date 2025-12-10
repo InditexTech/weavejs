@@ -4,6 +4,7 @@
 
 import { WeavePlugin } from '@/plugins/plugin';
 import { WEAVE_STAGE_RESIZE_KEY } from './constants';
+import { setupUpscaleStage } from '@/utils/upscale';
 
 export class WeaveStageResizePlugin extends WeavePlugin {
   getLayerName = undefined;
@@ -24,12 +25,7 @@ export class WeaveStageResizePlugin extends WeavePlugin {
     }
 
     if (containerParent) {
-      const containerBoundBox = stage.container().getBoundingClientRect();
-
-      const containerWidth = containerBoundBox.width;
-      const containerHeight = containerBoundBox.height;
-      stage.width(containerWidth);
-      stage.height(containerHeight);
+      setupUpscaleStage(this.instance, stage);
 
       const plugins = this.instance.getPlugins();
       for (const pluginId of Object.keys(plugins)) {

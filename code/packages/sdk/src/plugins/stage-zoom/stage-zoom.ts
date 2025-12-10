@@ -359,14 +359,21 @@ export class WeaveStageZoomPlugin extends WeavePlugin {
       return;
     }
 
+    const upscaleScale = stage.getAttr('upscaleScale');
     const stageWidth = stage.width();
     const stageHeight = stage.height();
 
     // Calculate scale needed to fit content + padding
     const scaleX =
-      (stageWidth - this.config.fitToScreen.padding * 2) / bounds.width;
+      (stageWidth -
+        // diffX -
+        (this.config.fitToScreen.padding * 2) / upscaleScale) /
+      bounds.width;
     const scaleY =
-      (stageHeight - this.config.fitToScreen.padding * 2) / bounds.height;
+      (stageHeight -
+        // diffY -
+        (this.config.fitToScreen.padding * 2) / upscaleScale) /
+      bounds.height;
     const scale = Math.min(scaleX, scaleY);
 
     // Center content in the stage
@@ -412,11 +419,11 @@ export class WeaveStageZoomPlugin extends WeavePlugin {
 
     const container = stage.container();
     const scale = stage.scale();
-    const viewportWidth = container.clientWidth;
-    const viewportHeight = container.clientHeight;
+    const containerWidth = container.clientWidth;
+    const containerHeight = container.clientHeight;
 
-    const visibleStageWidth = viewportWidth / scale.x;
-    const visibleStageHeight = viewportHeight / scale.y;
+    const visibleStageWidth = containerWidth / scale.x;
+    const visibleStageHeight = containerHeight / scale.y;
 
     const fitsInView =
       box.width + this.config.fitToSelection.padding * 2 <= visibleStageWidth &&
@@ -430,8 +437,8 @@ export class WeaveStageZoomPlugin extends WeavePlugin {
     if (smartZoom && fitsInView) {
       // ✅ Only pan to center selection, keeping current scale
       const newPosition = {
-        x: viewportWidth / 2 - selectionCenter.x * scale.x,
-        y: viewportHeight / 2 - selectionCenter.y * scale.y,
+        x: containerWidth / 2 - selectionCenter.x * scale.x,
+        y: containerHeight / 2 - selectionCenter.y * scale.y,
       };
 
       stage.position(newPosition);
@@ -441,15 +448,16 @@ export class WeaveStageZoomPlugin extends WeavePlugin {
     this.setZoom(1, false);
     stage.setAttrs({ x: 0, y: 0 });
 
+    const upscaleScale = stage.getAttr('upscaleScale');
     const stageBox = {
       width: stage.width(),
       height: stage.height(),
     };
 
     const availableScreenWidth =
-      stageBox.width - 2 * this.config.fitToSelection.padding;
+      stageBox.width - (2 * this.config.fitToSelection.padding) / upscaleScale;
     const availableScreenHeight =
-      stageBox.height - 2 * this.config.fitToSelection.padding;
+      stageBox.height - (2 * this.config.fitToSelection.padding) / upscaleScale;
 
     const scaleX = availableScreenWidth / box.width;
     const scaleY = availableScreenHeight / box.height;

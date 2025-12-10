@@ -19,8 +19,16 @@ export class WeaveSetupManager {
     const logDisable = this.instance.getLogger().getDisabled();
     const logLevel = this.instance.getLogger().getLevel();
 
+    const configuration = this.instance.getConfiguration();
+
     const params = [
-      `%cWEAVE.JS%c\nversion: ${version}\nlog disabled: ${logDisable}\nlog level: ${logLevel}`,
+      `%cWEAVE.JS%c\nversion: ${version}\nlog disabled: ${logDisable}\nlog level: ${logLevel}\n\nupscaling enabled [${
+        configuration.performance?.upscale?.enabled ?? false
+      }], base width [${
+        configuration.performance?.upscale?.baseWidth ?? 1920
+      }] base height [${
+        configuration.performance?.upscale?.baseHeight ?? 1080
+      }] multiplier [${configuration.performance?.upscale?.multiplier ?? 1}]`,
       `color: black; font-size: 20px; font-weight: bold; padding: 2px; margin-bottom: 12px;`,
       `color: black;`,
     ];
