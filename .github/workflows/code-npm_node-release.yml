@@ -177,8 +177,7 @@ jobs:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
         working-directory: code
         run: |
-          npm run release:perform:create-frontend
-          npm run release:perform:create-backend
+          npm run release:perform
 
       - name: Release / Commit and Tag
         env:
