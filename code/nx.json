@@ -24,10 +24,6 @@
       "dependsOn": ["^release:prepare"],
       "cache": true
     },
-    "release:perform": {
-      "dependsOn": ["^release:perform"],
-      "cache": true
-    },
     "test": {
       "dependsOn": ["^test"],
       "cache": true
