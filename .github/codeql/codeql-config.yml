@@ -1,6 +1,7 @@
 paths:
   - code
 paths-ignore:
+  - "code/verdaccio.setup.js"
   - "code/packages/store-azure-web-pubsub/dev-server"
   - "code/packages/store-websockets/dev-server"
   - "code/packages/create-backend-app/template"
