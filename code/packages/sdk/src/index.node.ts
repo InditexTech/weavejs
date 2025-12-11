@@ -58,6 +58,8 @@ export * from './nodes/comment/types';
 export { WeaveVideoNode } from './nodes/video/video';
 export * from './nodes/video/constants';
 export * from './nodes/video/types';
+export { WeaveMeasureNode } from './nodes/measure/measure';
+export * from './nodes/measure/constants';
 
 // Provided Actions
 export { WeaveZoomOutToolAction } from './actions/zoom-out-tool/zoom-out-tool';
@@ -120,6 +122,9 @@ export * from './actions/comment-tool/types';
 export { WeaveVideoToolAction } from './actions/video-tool/video-tool';
 export * from './actions/video-tool/constants';
 export * from './actions/video-tool/types';
+export { WeaveMeasureToolAction } from './actions/measure-tool/measure-tool';
+export * from './actions/measure-tool/constants';
+export * from './actions/measure-tool/types';
 
 // Provided Plugins
 export { WeaveStageGridPlugin } from './plugins/stage-grid/stage-grid';
