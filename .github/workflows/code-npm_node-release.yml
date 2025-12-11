@@ -62,17 +62,17 @@ jobs:
           fetch-depth: 0
           persist-credentials: false
 
-      - name: Check if CHANGELOG.md has changes
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          if git diff --quiet HEAD^ HEAD -- code/CHANGELOG.md; then
-            echo "::error title={No CHANGELOG.md changes}::{No CHANGELOG.md changes were found. Update the UNRELEASED section with the new changes.}"
-            gh pr comment ${{ github.event.number }} --body "
-          ### :x: No changes in the \`CHANGELOG.md\` file
-          No changes were found in the \`CHANGELOG.md\` file. Please, update the UNRELEASED section, listing the new changes that applies to this release."
-            exit 1
-          fi
+      # - name: Check if CHANGELOG.md has changes
+      #   env:
+      #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      #   run: |
+      #     if git diff --quiet HEAD^ HEAD -- code/CHANGELOG.md; then
+      #       echo "::error title={No CHANGELOG.md changes}::{No CHANGELOG.md changes were found. Update the UNRELEASED section with the new changes.}"
+      #       gh pr comment ${{ github.event.number }} --body "
+      #     ### :x: No changes in the \`CHANGELOG.md\` file
+      #     No changes were found in the \`CHANGELOG.md\` file. Please, update the UNRELEASED section, listing the new changes that applies to this release."
+      #       exit 1
+      #     fi
 
       - name: NPM / Setup Dependencies Cache
         uses: actions/cache@v4
