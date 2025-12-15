@@ -1,0 +1,83 @@
+---
+title: WeaveMeasureToolAction
+description: Add measure nodes to the canvas
+---
+
+import { TypeTable } from "fumadocs-ui/components/type-table";
+
+## Overview
+
+The [WeaveMeasureToolAction](https://github.com/InditexTech/weavejs/blob/main/code/packages/sdk/src/actions/measure-tool/measure-tool.ts)
+class that allows users to add measure to the canvas by click-and-click to define the measure points.
+
+The class extends the [WeaveAction](/docs/sdk/api-reference/actions/action) class.
+
+## Name
+
+This action `name` property value is `measureTool`.
+
+## Import
+
+```shell
+import { WeaveMeasureToolAction } from "@inditextech/weave-sdk";
+```
+
+## Instantiation
+
+```ts
+new WeaveMeasureToolAction(params?: WeaveMeasureToolActionParams);
+```
+
+## TypeScript types
+
+```ts
+type WeaveMeasureToolActionStateKeys = keyof typeof MEASURE_TOOL_STATE;
+type WeaveMeasureToolActionState =
+  (typeof MEASURE_TOOL_STATE)[WeaveMeasureToolActionStateKeys];
+
+type WeaveMeasureToolProperties = {
+  style: {
+    stroke: string;
+  };
+};
+
+type WeaveMeasureToolParams = {
+  config: DeepPartial<WeaveMeasureToolProperties>;
+};
+```
+
+## Parameters
+
+For `WeaveMeasureToolActionParams`:
+
+<TypeTable
+  type={{
+    ["config"]: {
+      required: true,
+      description: "Config parameters for the tool.",
+      type: "Partial<WeaveMeasureToolActionProperties>",
+    },
+  }}
+/>
+
+For `WeaveMeasureToolActionProperties`:
+
+<TypeTable
+  type={{
+    ["style.stroke"]: {
+      description: "Color for the crosshair cursor",
+      type: "string",
+      default: "#FF3366",
+    },
+  }}
+/>
+
+## Default values
+
+```ts
+const WEAVE_MEASURE_TOOL_DEFAULT_CONFIG: WeaveMeasureToolProperties = {
+  style: {
+    stroke: "#FF3366",
+  },
+};
+```

@@ -18,6 +18,7 @@
     "frame-tool",
     "comment-tool",
     "align-nodes-tool",
+    "measure-tool",
     "export-node-tool",
     "export-stage-tool",
     "fit-to-screen-tool",

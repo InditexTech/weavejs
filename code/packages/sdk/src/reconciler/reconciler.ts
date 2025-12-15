@@ -229,6 +229,8 @@ export class WeaveReconciler {
 
         const element = handler.onRender(newProps);
 
+        hostContext.emitEvent('onNodeRenderedAdded', element);
+
         return element;
       },
       detachDeletedInstance(node: WeaveElementInstance): void {
