@@ -1,0 +1,216 @@
+---
+title: WeaveMeasureNode
+description: Measure node API Reference
+---
+
+import { TypeTable } from "fumadocs-ui/components/type-table";
+
+## Overview
+
+The [WeaveMeasureNode](https://github.com/InditexTech/weavejs/blob/main/code/packages/sdk/src/nodes/measure/measure.ts)
+class represents visually the distance (scaled) between two points on a Weave.js canvas.
+
+In order to render a scaled distance from pixels to real distance on the real world, it needs:
+
+- A measure unit, e.g. meters, centimeters, milimeters, or inches.
+- A reference measure. A distance you previously know based on the measure unit.
+- A reference distance. The distance between two points on the canvas that represent the reference
+
+The class extends the [WeaveNode](/docs/sdk/api-reference/nodes/node) class
+
+## Type
+
+This node `nodeType` property value is `measure`.
+
+## Import
+
+```shell
+import { WeaveMeasureNode } from "@inditextech/weave-sdk";
+```
+
+## Instantiation
+
+```ts
+new WeaveMeasureNode(params?: WeaveMeasureNodeParams);
+```
+
+## TypeScript types
+
+```ts
+type WeaveMeasureNodeProperties = {
+  style: {
+    separationLine: {
+      padding: number;
+      strokeWidth: number;
+      dash: number[];
+      stroke: string;
+    };
+    text: {
+      padding: number;
+      fontSize: number;
+      fontFamily: string;
+      fill: string;
+    };
+    intersectionCircle: {
+      radius: number;
+      fill: string;
+    };
+    measureLine: {
+      stroke: string;
+      dash: number[];
+      strokeWidth: number;
+    };
+    handler: {
+      noSpaceSeparationMultiplier: number;
+      spaceSeparationMultiplier: number;
+    };
+  };
+};
+
+type WeaveMeasureNodeParams = {
+  config: DeepPartial<WeaveMeasureNodeProperties>;
+};
+```
+
+## Parameters
+
+For `WeaveMeasureNodeParams`:
+
+<TypeTable
+  type={{
+    ["config"]: {
+      required: true,
+      description: "Config parameters for the node.",
+      type: "Partial<WeaveMeasureProperties>",
+    },
+  }}
+/>
+
+For `WeaveMeasureProperties`:
+
+<TypeTable
+  type={{
+    ["style.separationLine.padding"]: {
+      description:
+        "Defines the padding (in px) from the separator end to put the measure line",
+      type: "number",
+      default: "0",
+    },
+    ["style.separationLine.strokeWidth"]: {
+      description: "Width of the separation line",
+      type: "number",
+      default: "1",
+    },
+    ["style.separationLine.dash"]: {
+      description:
+        "Defines the dashing properties of the separation line as Konva does",
+      type: "number[]",
+      default: "[]",
+    },
+    ["style.separationLine.stroke"]: {
+      description: "Defines the line color",
+      type: "string",
+      default: "#FF3366",
+    },
+    ["style.separationLine.stroke"]: {
+      description: "Defines the line color",
+      type: "string",
+      default: "#FF3366",
+    },
+    ["style.text.padding"]: {
+      description:
+        "Defines the padding from the measure line to the measure text",
+      type: "number",
+      default: "10",
+    },
+    ["style.text.frontSize"]: {
+      description: "Defines the measure text font size",
+      type: "number",
+      default: "14",
+    },
+    ["style.text.frontFamily"]: {
+      description: "Defines the measure text font family",
+      type: "string",
+      default: "monospace",
+    },
+    ["style.text.fill"]: {
+      description: "Defines the measure text color",
+      type: "string",
+      default: "#FF3366",
+    },
+    ["style.intersectionCircle.radius"]: {
+      description:
+        "Defines the intersection circle between the separator line and the measure line radius",
+      type: "number",
+      default: "3",
+    },
+    ["style.intersectionCircle.fill"]: {
+      description:
+        "Defines the intersection circle between the separator line and the measure line color",
+      type: "string",
+      default: "#FF3366",
+    },
+    ["style.measureLine.stroke"]: {
+      description: "Defines the measure line color",
+      type: "string",
+      default: "#FF3366",
+    },
+    ["style.measureLine.dash"]: {
+      description:
+        "Defines the dashing properties of the measure line as Konva does",
+      type: "string",
+      default: "#FF3366",
+    },
+    ["style.measureLine.strokeWidth"]: {
+      description: "Width of the measure line",
+      type: "number",
+      default: "1",
+    },
+    ["style.handler.noSpaceSeparationMultiplier"]: {
+      description:
+        "Multiplier of separation for the separation handler when the text doesn't fit on the measure line space",
+      type: "number",
+      default: "2.5",
+    },
+    ["style.handler.spaceSeparationMultiplier"]: {
+      description:
+        "Multiplier of separation for the separation handler when the text fit on the measure line space",
+      type: "number",
+      default: "1.5",
+    },
+  }}
+/>
+
+## Default values
+
+```ts
+const WEAVE_MEASURE_NODE_DEFAULT_CONFIG: WeaveMeasureNodeProperties = {
+  style: {
+    separationLine: {
+      padding: 0,
+      strokeWidth: 1,
+      dash: [],
+      stroke: "#FF3366",
+    },
+    text: {
+      padding: 10,
+      fontSize: 14,
+      fontFamily: "monospace",
+      fill: "#FF3366",
+    },
+    intersectionCircle: {
+      radius: 3,
+      fill: "#FF3366",
+    },
+    measureLine: {
+      stroke: "#FF3366",
+      dash: [4, 4],
+      strokeWidth: 1,
+    },
+    handler: {
+      noSpaceSeparationMultiplier: 2.5,
+      spaceSeparationMultiplier: 1.5,
+    },
+  },
+};
+```
