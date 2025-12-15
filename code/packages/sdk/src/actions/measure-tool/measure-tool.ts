@@ -68,7 +68,6 @@ export class WeaveMeasureToolAction extends WeaveAction {
         this.instance.getActiveAction() === MEASURE_TOOL_ACTION_NAME
       ) {
         this.cancelAction();
-        return;
       }
     });
 
@@ -98,7 +97,6 @@ export class WeaveMeasureToolAction extends WeaveAction {
 
       if (this.state === MEASURE_TOOL_STATE.SET_TO) {
         this.handleSetTo();
-        return;
       }
     });
 
