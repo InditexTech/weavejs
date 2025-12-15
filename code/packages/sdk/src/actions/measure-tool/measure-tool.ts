@@ -9,7 +9,7 @@ import { WeaveNodesSelectionPlugin } from '@/plugins/nodes-selection/nodes-selec
 import { SELECTION_TOOL_ACTION_NAME } from '../selection-tool/constants';
 import type { WeaveMeasureToolActionState } from './types';
 import { MEASURE_TOOL_ACTION_NAME, MEASURE_TOOL_STATE } from './constants';
-import type { WeaveMeasureNode } from '@/index.node';
+import { moveNodeToContainer, type WeaveMeasureNode } from '@/index';
 
 export class WeaveMeasureToolAction extends WeaveAction {
   protected initialized: boolean = false;
@@ -18,8 +18,11 @@ export class WeaveMeasureToolAction extends WeaveAction {
   protected measureId: string | null;
   protected container: Konva.Layer | Konva.Node | undefined;
   protected clickPoint: Konva.Vector2d | null;
+  protected crosshairCursor: Konva.Group | null;
   protected firstPoint: Konva.Circle | null;
+  protected color: string = '#FF3366';
   protected measureLine: Konva.Line | null;
+  protected measureContainer: Konva.Layer | Konva.Group | undefined;
   protected cancelAction!: () => void;
   onPropsChange = undefined;
   onInit = undefined;
@@ -32,8 +35,10 @@ export class WeaveMeasureToolAction extends WeaveAction {
     this.measureId = null;
     this.container = undefined;
     this.clickPoint = null;
+    this.crosshairCursor = null;
     this.firstPoint = null;
     this.measureLine = null;
+    this.measureContainer = undefined;
     this.props = this.initProps();
   }
 
@@ -43,12 +48,13 @@ export class WeaveMeasureToolAction extends WeaveAction {
 
   initProps() {
     return {
-      separation: 100,
-      separationOrientation: 1,
+      orientation: -1,
+      separation: 0,
       textPadding: 20,
-      separationPadding: 30,
+      separationPadding: 0,
       unit: 'cms',
-      unitPerPixel: 100,
+      unitPerPixel: 10,
+      color: this.color,
       strokeEnabled: false,
     };
   }
@@ -68,6 +74,14 @@ export class WeaveMeasureToolAction extends WeaveAction {
 
     stage.on('pointermove', () => {
       if (this.state === MEASURE_TOOL_STATE.IDLE) return;
+
+      if (this.state === MEASURE_TOOL_STATE.SET_TO) {
+        const finalPoint = this.defineFinalPoint();
+
+        if (this.measureLine && this.firstPoint) {
+          this.measureLine.points([0, 0, finalPoint.x, finalPoint.y]);
+        }
+      }
 
       this.setCursor();
     });
@@ -103,6 +117,7 @@ export class WeaveMeasureToolAction extends WeaveAction {
       tr.hide();
     }
 
+    this.buildCrosshairCursor();
     this.setCursor();
     this.setFocusStage();
 
@@ -110,49 +125,111 @@ export class WeaveMeasureToolAction extends WeaveAction {
     this.setState(MEASURE_TOOL_STATE.SET_FROM);
   }
 
+  private buildCrosshairCursor(): void {
+    const stage = this.instance.getStage();
+    const { mousePoint } = this.instance.getMousePointer();
+
+    this.crosshairCursor = new Konva.Group({
+      x: mousePoint?.x,
+      y: mousePoint?.y,
+      scale: { x: 1 / stage.scaleX(), y: 1 / stage.scaleY() },
+      listening: false,
+      draggable: false,
+    });
+
+    const crosshairSize = 60;
+
+    const lineH = new Konva.Line({
+      points: [0, 0, crosshairSize, 0],
+      x: -1 * (crosshairSize / 2),
+      y: 0,
+      stroke: this.color,
+      strokeWidth: 1,
+    });
+
+    const lineV = new Konva.Line({
+      points: [0, 0, 0, crosshairSize],
+      x: 0,
+      y: (-1 * crosshairSize) / 2,
+      stroke: this.color,
+      strokeWidth: 1,
+    });
+
+    this.crosshairCursor.add(lineH);
+    this.crosshairCursor.add(lineV);
+
+    this.instance.getStage().on('pointermove.measureTool', () => {
+      const pos = this.instance.getStage().getRelativePointerPosition();
+      if (this.crosshairCursor && pos) {
+        this.crosshairCursor.position(pos);
+        this.crosshairCursor.moveToTop();
+      }
+    });
+
+    this.instance.getUtilityLayer()?.add(this.crosshairCursor);
+  }
+
   private handleSetFrom() {
-    const { mousePoint, container } = this.instance.getMousePointer();
+    const stage = this.instance.getStage();
+    const realMousePoint = stage.getRelativePointerPosition();
+    const { container, measureContainer } = this.instance.getMousePointer();
 
-    this.clickPoint = mousePoint;
+    this.clickPoint = realMousePoint;
     this.container = container;
-
-    this.measureId = uuidv4();
+    this.measureContainer = measureContainer;
 
     this.firstPoint = new Konva.Circle({
       x: this.clickPoint?.x ?? 0,
       y: this.clickPoint?.y ?? 0,
-      radius: 5,
-      fill: 'red',
-      id: `${this.measureId}_from`,
-      draggable: true,
+      radius: 6,
+      fill: '#FFFFFF',
+      stroke: '#000000',
+      scale: { x: 1 / stage.scaleX(), y: 1 / stage.scaleY() },
+      strokeWidth: 1,
+      listening: false,
+      draggable: false,
     });
 
     this.measureLine = new Konva.Line({
-      points: [this.clickPoint?.x ?? 0, this.clickPoint?.y ?? 0],
-      stroke: 'red',
-      strokeWidth: 2,
-      id: `${this.measureId}_line`,
+      x: this.clickPoint?.x,
+      y: this.clickPoint?.y,
+      points: [0, 0],
+      scale: { x: 1 / stage.scaleX(), y: 1 / stage.scaleY() },
+      stroke: this.color,
+      dashed: [4, 4],
+      strokeWidth: 1,
+      listening: false,
       draggable: false,
     });
 
     this.instance.getUtilityLayer()?.add(this.firstPoint);
     this.instance.getUtilityLayer()?.add(this.measureLine);
 
+    this.firstPoint.moveToTop();
+    this.measureLine.moveToBottom();
+
     this.setState(MEASURE_TOOL_STATE.SET_TO);
   }
 
   private handleSetTo() {
-    const { mousePoint, container } = this.instance.getMousePointer();
+    const stage = this.instance.getStage();
+    const realMousePoint = stage.getRelativePointerPosition();
+    const { container } = this.instance.getMousePointer();
 
-    this.clickPoint = mousePoint;
+    this.clickPoint = realMousePoint;
     this.container = container;
 
     const nodeHandler =
       this.instance.getNodeHandler<WeaveMeasureNode>('measure');
 
-    if (nodeHandler && this.measureId && this.firstPoint) {
+    if (nodeHandler && this.firstPoint) {
+      this.measureId = uuidv4();
+
       const node = nodeHandler.create(this.measureId, {
         ...this.props,
+        id: this.measureId,
+        x: 0,
+        y: 0,
         fromPoint: {
           x: this.firstPoint.x(),
           y: this.firstPoint.y(),
@@ -161,19 +238,43 @@ export class WeaveMeasureToolAction extends WeaveAction {
           x: this.clickPoint?.x ?? 0,
           y: this.clickPoint?.y ?? 0,
         },
-        separation: 100,
-        separationOrientation: 1,
-        textPadding: 20,
-        separationPadding: 30,
-        unit: 'cms',
-        unitPerPixel: 100,
         draggable: true,
       });
-      this.instance.addNode(node, this.container?.getAttrs().id);
-    }
 
-    this.setState(MEASURE_TOOL_STATE.FINISHED);
-    this.cancelAction();
+      this.instance.addOnceEventListener(
+        'onNodeRenderedAdded',
+        (child: Konva.Node) => {
+          if (child.getAttrs().id === this.measureId) {
+            if (
+              typeof this.measureContainer !== 'undefined' &&
+              this.measureContainer?.id() !== 'mainLayer'
+            ) {
+              const nodeInstance = this.instance
+                .getMainLayer()
+                ?.findOne(`#${this.measureId}`);
+
+              const stage = this.instance.getStage();
+              let realContainer = this.measureContainer;
+              if (realContainer?.getAttrs().nodeId !== undefined) {
+                realContainer = stage.findOne(
+                  `#${realContainer?.getAttrs().nodeId}`
+                ) as Konva.Layer | Konva.Group;
+              }
+
+              if (nodeInstance) {
+                moveNodeToContainer(this.instance, nodeInstance, realContainer);
+              }
+            }
+
+            this.cancelAction();
+          }
+        }
+      );
+
+      this.instance.addNode(node, 'mainLayer');
+
+      this.setState(MEASURE_TOOL_STATE.FINISHED);
+    }
   }
 
   trigger(cancelAction: () => void): void {
@@ -202,6 +303,8 @@ export class WeaveMeasureToolAction extends WeaveAction {
 
     stage.container().style.cursor = 'default';
 
+    this.instance.getStage().off('pointermove.measureTool');
+
     const selectionPlugin =
       this.instance.getPlugin<WeaveNodesSelectionPlugin>('nodesSelection');
     if (selectionPlugin) {
@@ -212,6 +315,9 @@ export class WeaveMeasureToolAction extends WeaveAction {
       this.instance.triggerAction(SELECTION_TOOL_ACTION_NAME);
     }
 
+    if (this.crosshairCursor) {
+      this.crosshairCursor.destroy();
+    }
     if (this.firstPoint) {
       this.firstPoint.destroy();
     }
@@ -223,12 +329,14 @@ export class WeaveMeasureToolAction extends WeaveAction {
     this.measureId = null;
     this.container = undefined;
     this.clickPoint = null;
+    this.firstPoint = null;
+    this.measureLine = null;
     this.setState(MEASURE_TOOL_STATE.IDLE);
   }
 
   private setCursor() {
     const stage = this.instance.getStage();
-    stage.container().style.cursor = 'crosshair';
+    stage.container().style.cursor = 'none';
   }
 
   private setFocusStage() {
@@ -236,5 +344,23 @@ export class WeaveMeasureToolAction extends WeaveAction {
     stage.container().tabIndex = 1;
     stage.container().blur();
     stage.container().focus();
+  }
+
+  private defineFinalPoint(): Konva.Vector2d {
+    if (!this.measureLine || !this.measureContainer) {
+      return { x: 0, y: 0 };
+    }
+
+    const stage = this.instance.getStage();
+    const realMousePoint = this.instance
+      .getStage()
+      .getRelativePointerPosition();
+
+    const pos: Konva.Vector2d = { x: 0, y: 0 };
+
+    pos.x = ((realMousePoint?.x ?? 0) - this.measureLine.x()) * stage.scaleX();
+    pos.y = ((realMousePoint?.y ?? 0) - this.measureLine.y()) * stage.scaleY();
+
+    return pos;
   }
 }

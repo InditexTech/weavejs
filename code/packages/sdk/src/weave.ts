@@ -319,6 +319,11 @@ export class Weave {
     this.emitter.on(event, callback);
   }
 
+  addOnceEventListener<T>(event: string, callback: (payload: T) => void): void {
+    this.moduleLogger.debug(`Listening once event [${event}]`);
+    this.emitter.once(event).then(callback);
+  }
+
   removeEventListener<T>(event: string, callback: (payload: T) => void): void {
     this.moduleLogger.debug(`Removing listening to event [${event}]`);
     this.emitter.off(event, callback);

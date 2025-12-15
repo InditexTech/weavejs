@@ -43,6 +43,7 @@ export const WEAVE_NODES_SELECTION_DEFAULT_CONFIG = {
         anchor.offsetX(4);
       }
     },
+    anchorSize: 12,
     borderStroke: '#1a1aff',
     borderStrokeWidth: 2,
   },
