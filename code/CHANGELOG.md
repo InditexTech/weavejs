@@ -17,6 +17,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - [#847](https://github.com/InditexTech/weavejs/issues/847) Measure tool & action
 
+### Fixed
+
+- [#853](https://github.com/InditexTech/weavejs/issues/853) Fix issue with resize plugin when no upscaling is defined not changing stage size
+
 ## [2.10.0] - 2025-12-11
 
 \### Added
