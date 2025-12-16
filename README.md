@@ -38,7 +38,8 @@ SPDX-License-Identifier: Apache-2.0
 
 ## About The Project
 
-> [!NOTE] > **Disclaimer:** Weave.js is been used in Inditex internal production apps for the past 8 months. Our tools and documentation need more battle testing in the open source world. Weave.js will remove this disclaimer when we're happy with the developer experience.
+> [!NOTE]
+> **Disclaimer:** Weave.js has been used in Inditex internal production apps for the past 4 months. Our documentation need more battle testing in the open source world. Weave.js will remove this disclaimer when we're happy with the DX.
 
 https://github.com/user-attachments/assets/347ad22a-6bb5-425d-87b5-f09c56b57273
 
