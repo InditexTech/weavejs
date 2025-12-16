@@ -108,8 +108,8 @@ export function moveNodeToContainer(
   instance: Weave,
   node: Konva.Node,
   containerToMove: Konva.Layer | Konva.Node,
-  originalNode: Konva.Node | null | undefined,
-  originalContainer: Konva.Node | null | undefined,
+  originalNode?: Konva.Node | null,
+  originalContainer?: Konva.Node | null,
   invalidOriginsTypes: string[] = ['frame']
 ): boolean {
   const stage = instance.getStage();
