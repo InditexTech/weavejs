@@ -1,12 +1,12 @@
-'use client';
+"use client";
 
-import React from 'react';
-import { WeaveStateElement } from '@inditextech/weave-types';
-import { useWeave } from '@inditextech/weave-react';
-import { useCollaborationRoom } from '@/store/store';
-import { InputNumber } from '../inputs/input-number';
-import { ToggleIconButton } from '../toggle-icon-button';
-import { Scaling } from 'lucide-react';
+import React from "react";
+import { WeaveStateElement } from "@inditextech/weave-types";
+import { useWeave } from "@inditextech/weave-react";
+import { useCollaborationRoom } from "@/store/store";
+import { InputNumber } from "../inputs/input-number";
+import { ToggleIconButton } from "../toggle-icon-button";
+import { Scaling } from "lucide-react";
 
 export function EllipseProperties() {
   const instance = useWeave((state) => state.instance);
@@ -14,26 +14,26 @@ export function EllipseProperties() {
   const actualAction = useWeave((state) => state.actions.actual);
 
   const nodePropertiesAction = useCollaborationRoom(
-    (state) => state.nodeProperties.action
+    (state) => state.nodeProperties.action,
   );
 
   const nodeCreateProps = useCollaborationRoom(
-    (state) => state.nodeProperties.createProps
+    (state) => state.nodeProperties.createProps,
   );
 
   const [maintainAspectRatio, setMaintainAspectRatio] = React.useState(false);
 
   const actualNode = React.useMemo(() => {
-    if (actualAction && nodePropertiesAction === 'create') {
+    if (actualAction && nodePropertiesAction === "create") {
       return {
-        key: 'creating',
-        type: 'undefined',
+        key: "creating",
+        type: "undefined",
         props: {
           ...nodeCreateProps,
         },
       };
     }
-    if (node && nodePropertiesAction === 'update') {
+    if (node && nodePropertiesAction === "update") {
       return node;
     }
     return undefined;
@@ -42,18 +42,18 @@ export function EllipseProperties() {
   const updateElement = React.useCallback(
     (updatedNode: WeaveStateElement) => {
       if (!instance) return;
-      if (actualAction && nodePropertiesAction === 'create') {
+      if (actualAction && nodePropertiesAction === "create") {
         instance.updatePropsAction(actualAction, updatedNode.props);
       }
-      if (nodePropertiesAction === 'update') {
+      if (nodePropertiesAction === "update") {
         instance.updateNode(updatedNode);
       }
     },
-    [instance, actualAction, nodePropertiesAction]
+    [instance, actualAction, nodePropertiesAction],
   );
 
   React.useEffect(() => {
-    if (actualNode && typeof actualNode.props.keepAspectRatio !== 'undefined') {
+    if (actualNode && typeof actualNode.props.keepAspectRatio !== "undefined") {
       setMaintainAspectRatio(actualNode.props.keepAspectRatio);
     }
   }, [actualNode]);
@@ -66,15 +66,15 @@ export function EllipseProperties() {
 
   if (
     actualAction &&
-    ['selectionTool'].includes(actualAction) &&
-    !['ellipse'].includes(actualNode.type)
+    ["selectionTool"].includes(actualAction) &&
+    !["ellipse"].includes(actualNode.type)
   ) {
     return null;
   }
 
   if (
     actualAction &&
-    !['selectionTool', 'ellipseTool'].includes(actualAction)
+    !["selectionTool", "ellipseTool"].includes(actualAction)
   ) {
     return null;
   }

@@ -240,11 +240,13 @@ export class WeaveLineNode extends WeaveNode {
           return;
         }
 
+        const parentPosition = this.getParentPosition(draggedLine);
+
         const pos: Vector2d = this.defineFinalPoint(
           startHandle,
           {
-            x: draggedLine.x() + draggedLine.points()[2],
-            y: draggedLine.y() + draggedLine.points()[3],
+            x: parentPosition.x + draggedLine.x() + draggedLine.points()[2],
+            y: parentPosition.y + draggedLine.y() + draggedLine.points()[3],
           },
           e
         );
@@ -252,8 +254,8 @@ export class WeaveLineNode extends WeaveNode {
         startHandle.position(pos);
 
         draggedLine.points([
-          pos.x - draggedLine.x(),
-          pos.y - draggedLine.y(),
+          pos.x - parentPosition.x - draggedLine.x(),
+          pos.y - parentPosition.y - draggedLine.y(),
           x2,
           y2,
         ]);
@@ -271,10 +273,17 @@ export class WeaveLineNode extends WeaveNode {
           return;
         }
 
+        const parentPosition = this.getParentPosition(draggedLine);
+
         const { x, y } = startHandle.position();
         const [, , x2, y2] = draggedLine.points();
 
-        draggedLine.points([x - draggedLine.x(), y - draggedLine.y(), x2, y2]);
+        draggedLine.points([
+          x - parentPosition.x - draggedLine.x(),
+          y - parentPosition.y - draggedLine.y(),
+          x2,
+          y2,
+        ]);
 
         this.instance.updateNode(this.serialize(draggedLine));
 
@@ -338,11 +347,13 @@ export class WeaveLineNode extends WeaveNode {
           return;
         }
 
+        const parentPosition = this.getParentPosition(draggedLine);
+
         const pos: Vector2d = this.defineFinalPoint(
           endHandle,
           {
-            x: draggedLine.x() + draggedLine.points()[0],
-            y: draggedLine.y() + draggedLine.points()[1],
+            x: parentPosition.x + draggedLine.x() + draggedLine.points()[0],
+            y: parentPosition.y + draggedLine.y() + draggedLine.points()[1],
           },
           e
         );
@@ -352,8 +363,8 @@ export class WeaveLineNode extends WeaveNode {
         draggedLine.points([
           x1,
           y1,
-          pos.x - draggedLine.x(),
-          pos.y - draggedLine.y(),
+          pos.x - parentPosition.x - draggedLine.x(),
+          pos.y - parentPosition.y - draggedLine.y(),
         ]);
       });
 
@@ -369,10 +380,17 @@ export class WeaveLineNode extends WeaveNode {
           return;
         }
 
+        const parentPosition = this.getParentPosition(draggedLine);
+
         const { x, y } = endHandle.position();
         const [x1, y1] = draggedLine.points();
 
-        draggedLine.points([x1, y1, x - draggedLine.x(), y - draggedLine.y()]);
+        draggedLine.points([
+          x1,
+          y1,
+          x - parentPosition.x - draggedLine.x(),
+          y - parentPosition.y - draggedLine.y(),
+        ]);
 
         this.instance.updateNode(this.serialize(draggedLine));
 
@@ -393,18 +411,20 @@ export class WeaveLineNode extends WeaveNode {
       return;
     }
 
+    const parentPosition = this.getParentPosition(line);
+
     const lineId = line.getAttrs().id;
     this.startHandle.setAttr('lineId', lineId);
     this.startHandle.setAttr('targetNode', lineId);
-    this.startHandle.x(line.x() + x1);
-    this.startHandle.y(line.y() + y1);
+    this.startHandle.x(parentPosition.x + line.x() + x1);
+    this.startHandle.y(parentPosition.y + line.y() + y1);
     this.startHandle.visible(true);
     this.startHandle.moveToTop();
 
     this.endHandle.setAttr('lineId', lineId);
     this.endHandle.setAttr('targetNode', lineId);
-    this.endHandle.x(line.x() + x2);
-    this.endHandle.y(line.y() + y2);
+    this.endHandle.x(parentPosition.x + line.x() + x2);
+    this.endHandle.y(parentPosition.y + line.y() + y2);
     this.endHandle.visible(true);
     this.endHandle.moveToTop();
   }
@@ -441,5 +461,24 @@ export class WeaveLineNode extends WeaveNode {
 
     // reset scale to 1
     node.scale({ x: 1, y: 1 });
+  }
+
+  private getParentPosition(line: Konva.Line): Konva.Vector2d {
+    const stage = this.instance.getStage();
+
+    let parentPosition: Konva.Vector2d = { x: 0, y: 0 };
+    if (line?.getParent()?.getAttrs().nodeId !== undefined) {
+      const realContainer = stage.findOne(
+        `#${line.getParent()?.getAttrs().nodeId}`
+      );
+      if (realContainer) {
+        parentPosition = {
+          x: realContainer.x() ?? 0,
+          y: realContainer.y() ?? 0,
+        };
+      }
+    }
+
+    return parentPosition;
   }
 }

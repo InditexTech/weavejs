@@ -1,7 +1,7 @@
-import Color, { ColorInstance } from 'color';
-import { HTMLAttributes, useEffect, useRef, useState } from 'react';
-import { ColorPickerContext } from './context/color-picker-context';
-import { cn } from '@/lib/utils';
+import Color, { ColorInstance } from "color";
+import { HTMLAttributes, useEffect, useRef, useState } from "react";
+import { ColorPickerContext } from "./context/color-picker-context";
+import { cn } from "@/lib/utils";
 
 export type ColorPickerProps = HTMLAttributes<HTMLDivElement> & {
   /** The current color value in #RRGGBBAA format */
@@ -25,7 +25,7 @@ export const ColorPicker = ({
   const initialColor = Color(value);
 
   const [color, setColor] = useState<ColorInstance>(initialColor);
-  const [mode, setMode] = useState('hex');
+  const [mode, setMode] = useState("hex");
 
   const lastValue = useRef(Color(initialColor).hexa());
 
@@ -59,8 +59,8 @@ export const ColorPicker = ({
     >
       <div
         className={cn(
-          'grid w-full gap-4 rounded-none transition-opacity duration-150',
-          className
+          "grid w-full gap-4 rounded-none transition-opacity duration-150",
+          className,
         )}
         {...props}
       />

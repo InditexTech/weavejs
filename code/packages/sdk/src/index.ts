@@ -2,9 +2,6 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-window._weave_isServerSide = false;
-window._weave_serverSideBackend = undefined;
-
 export { Weave } from './weave';
 export { WeaveStore } from './stores/store';
 export { defaultInitialState } from './stores/default-initial-state';
@@ -14,6 +11,7 @@ export * from './nodes/types';
 export { WeaveAction } from './actions/action';
 export * from './actions/types';
 export { WeavePlugin } from './plugins/plugin';
+export * from './utils/mapping';
 export * from './utils';
 
 // Provided Nodes
@@ -60,6 +58,8 @@ export * from './nodes/comment/types';
 export { WeaveVideoNode } from './nodes/video/video';
 export * from './nodes/video/constants';
 export * from './nodes/video/types';
+export { WeaveMeasureNode } from './nodes/measure/measure';
+export * from './nodes/measure/constants';
 export { WeaveConnectorNode } from './nodes/connector/connector';
 export * from './nodes/connector/constants';
 export * from './nodes/connector/types';
@@ -128,6 +128,9 @@ export * from './actions/comment-tool/types';
 export { WeaveVideoToolAction } from './actions/video-tool/video-tool';
 export * from './actions/video-tool/constants';
 export * from './actions/video-tool/types';
+export { WeaveMeasureToolAction } from './actions/measure-tool/measure-tool';
+export * from './actions/measure-tool/constants';
+export * from './actions/measure-tool/types';
 export { WeaveConnectorToolAction } from './actions/connector-tool/connector-tool';
 export * from './actions/connector-tool/constants';
 export * from './actions/connector-tool/types';

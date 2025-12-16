@@ -1,7 +1,7 @@
-'use client';
+"use client";
 
-import { motion } from 'framer-motion';
-import { Logo } from '../utils/logo';
+import { motion } from "framer-motion";
+import { Logo } from "../utils/logo";
 
 type RoomLoaderProps = {
   content: string;
@@ -17,7 +17,7 @@ export function RoomError({ content }: Readonly<RoomLoaderProps>) {
         transition={{
           duration: 2,
           repeat: Number.POSITIVE_INFINITY,
-          ease: 'linear',
+          ease: "linear",
         }}
       >
         <Logo kind="large" variant="no-text" />

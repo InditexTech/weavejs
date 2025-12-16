@@ -1,6 +1,6 @@
-import React from 'react';
-import Image from 'next/image';
-import { PresentationImage } from './utils';
+import React from "react";
+import Image from "next/image";
+import { PresentationImage } from "./utils";
 
 type FramePresentationImageProps = {
   presentationImage: PresentationImage;

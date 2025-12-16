@@ -1,20 +1,20 @@
-'use client';
+"use client";
 
-import React from 'react';
-import { useWeave } from '@inditextech/weave-react';
-import { useCollaborationRoom } from '@/store/store';
-import { InputNumber } from '../inputs/input-number';
+import React from "react";
+import { useWeave } from "@inditextech/weave-react";
+import { useCollaborationRoom } from "@/store/store";
+import { InputNumber } from "../inputs/input-number";
 
 export function ImageProperties() {
   const instance = useWeave((state) => state.instance);
   const node = useWeave((state) => state.selection.node);
 
   const nodePropertiesAction = useCollaborationRoom(
-    (state) => state.nodeProperties.action
+    (state) => state.nodeProperties.action,
   );
 
   const actualNode = React.useMemo(() => {
-    if (node && nodePropertiesAction === 'update') {
+    if (node && nodePropertiesAction === "update") {
       return node;
     }
     return undefined;
@@ -22,7 +22,7 @@ export function ImageProperties() {
 
   if (!instance || !actualNode) return null;
 
-  if (!['image'].includes(actualNode.type)) {
+  if (!["image"].includes(actualNode.type)) {
     return null;
   }
 

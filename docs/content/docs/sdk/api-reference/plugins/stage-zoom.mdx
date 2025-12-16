@@ -162,6 +162,15 @@ zoomToStep(index: number): void
 
 This method set the defined step index as zoom.
 
+### setZoom
+
+```ts
+setZoom(scale: number, centered: boolean = true, pointer?: Konva.Vector2d): void
+```
+
+This method set the defined zoom as scale, the zoom by default is centered on screen and if a pointer is provided
+will use that pointer as zoom center.
+
 ## Events
 
 ### onZoomChange

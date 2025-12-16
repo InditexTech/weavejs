@@ -87,6 +87,11 @@ export class Weave {
   private readonly asyncElements: Map<string, WeaveAsyncElement>;
 
   constructor(weaveConfig: WeaveConfig, stageConfig: Konva.StageConfig) {
+    globalThis._weave_isServerSide = false;
+    if (typeof window === 'undefined') {
+      globalThis._weave_isServerSide = true;
+    }
+
     this.emitter = new Emittery();
 
     Konva.showWarnings = false;
@@ -313,6 +318,11 @@ export class Weave {
   addEventListener<T>(event: string, callback: (payload: T) => void): void {
     this.moduleLogger.debug(`Listening event [${event}]`);
     this.emitter.on(event, callback);
+  }
+
+  addOnceEventListener<T>(event: string, callback: (payload: T) => void): void {
+    this.moduleLogger.debug(`Listening once event [${event}]`);
+    this.emitter.once(event).then(callback);
   }
 
   removeEventListener<T>(event: string, callback: (payload: T) => void): void {
@@ -1046,9 +1056,6 @@ export class Weave {
   }
 
   public isServerSide(): boolean {
-    if (typeof window !== 'undefined') {
-      return window._weave_isServerSide === true;
-    }
-    return global._weave_isServerSide === true;
+    return globalThis._weave_isServerSide === true;
   }
 }

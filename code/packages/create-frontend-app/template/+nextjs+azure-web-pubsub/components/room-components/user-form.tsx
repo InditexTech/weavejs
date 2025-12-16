@@ -1,28 +1,28 @@
-'use client';
+"use client";
 
-import React from 'react';
-import { motion } from 'motion/react';
-import { z } from 'zod';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { useForm } from 'react-hook-form';
+import React from "react";
+import { motion } from "motion/react";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
 import {
   Form,
   FormControl,
   FormField,
   FormItem,
   FormMessage,
-} from '@/components/ui/form';
-import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
-import { useCollaborationRoom } from '@/store/store';
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { useCollaborationRoom } from "@/store/store";
 
 const formSchema = z
   .object({
     username: z
       .string()
       .trim()
-      .min(1, { message: 'The username is required' })
-      .max(50, { message: 'The username must be maximum 50 characters long' }),
+      .min(1, { message: "The username is required" })
+      .max(50, { message: "The username must be maximum 50 characters long" }),
   })
   .required();
 
@@ -33,12 +33,13 @@ function UserForm() {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      username: '',
+      username: "",
     },
   });
 
   function onSubmit(values: z.infer<typeof formSchema>) {
     const userMapped = {
+      id: values.username,
       name: values.username,
       email: `${values.username}@weavejs.com`,
     };

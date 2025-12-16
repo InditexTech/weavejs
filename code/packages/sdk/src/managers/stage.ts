@@ -93,16 +93,28 @@ export class WeaveStageManager {
   }
 
   initStage(): void {
+    const container = this.instance.getStageConfiguration().container;
+    const containerWidth = this.instance.getStageConfiguration().width ?? 1;
+    const containerHeight = this.instance.getStageConfiguration().height ?? 1;
+
     const props = {
-      container: this.instance.getStageConfiguration().container,
-      width: this.instance.getStageConfiguration().width,
-      height: this.instance.getStageConfiguration().height,
+      container,
+      width: containerWidth,
+      height: containerHeight,
       id: 'stage',
       initialZIndex: undefined,
     };
     const stage = new Konva.Stage({
       ...props,
     });
+
+    const realContainer = stage.container();
+    if (
+      realContainer !== undefined &&
+      realContainer.style?.position !== 'relative'
+    ) {
+      realContainer.style.position = 'relative';
+    }
 
     this.setStage(stage);
   }

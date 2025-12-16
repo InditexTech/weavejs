@@ -419,7 +419,7 @@ export class WeaveImageCrop {
       return;
     }
 
-    const imageAttrs = this.internalImage.getAttrs();
+    const imageAttrs = this.image.getAttrs();
     const actualScale =
       imageAttrs.uncroppedImage.width / imageAttrs.imageInfo.width;
 

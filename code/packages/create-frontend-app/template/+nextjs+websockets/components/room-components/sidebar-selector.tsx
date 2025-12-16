@@ -1,6 +1,6 @@
-'use client';
+"use client";
 
-import React from 'react';
+import React from "react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -9,8 +9,8 @@ import {
   DropdownMenuShortcut,
   DropdownMenuGroup,
   DropdownMenuLabel,
-} from '@/components/ui/dropdown-menu';
-import { cn, SYSTEM_OS } from '@/lib/utils';
+} from "@/components/ui/dropdown-menu";
+import { cn, SYSTEM_OS } from "@/lib/utils";
 import {
   SwatchBook,
   ListTree,
@@ -18,9 +18,11 @@ import {
   Images,
   ChevronDown,
   ChevronUp,
-} from 'lucide-react';
-import { SidebarActive, useCollaborationRoom } from '@/store/store';
-import { SIDEBAR_ELEMENTS } from '@/lib/constants';
+  SquareMousePointer,
+} from "lucide-react";
+import { SidebarActive, useCollaborationRoom } from "@/store/store";
+import { SIDEBAR_ELEMENTS } from "@/lib/constants";
+import { useWeave } from "@inditextech/weave-react";
 
 type SidebarSelectorProps = {
   title: string;
@@ -29,26 +31,28 @@ type SidebarSelectorProps = {
 export const SidebarSelector = ({ title }: Readonly<SidebarSelectorProps>) => {
   const [menuOpen, setMenuOpen] = React.useState(false);
 
+  const node = useWeave((state) => state.selection.node);
+
   const setSidebarActive = useCollaborationRoom(
-    (state) => state.setSidebarActive
+    (state) => state.setSidebarActive,
   );
 
   const sidebarToggle = React.useCallback(
     (element: SidebarActive) => {
       setSidebarActive(element);
     },
-    [setSidebarActive]
+    [setSidebarActive],
   );
 
   return (
     <DropdownMenu onOpenChange={(open: boolean) => setMenuOpen(open)}>
       <DropdownMenuTrigger
         className={cn(
-          'flex gap-2 rounded-none h-[40px] font-inter font-light text-[24px] hover:text-[#c9c9c9] justify-start items-center uppercase cursor-pointer focus:outline-none',
+          "flex gap-2 rounded-none h-[40px] font-inter font-light text-[24px] hover:text-[#c9c9c9] justify-start items-center uppercase cursor-pointer focus:outline-none",
           {
-            ['font-light text-[#c9c9c9]']: menuOpen,
-            ['font-light']: !menuOpen,
-          }
+            ["font-light text-[#c9c9c9]"]: menuOpen,
+            ["font-light"]: !menuOpen,
+          },
         )}
       >
         <span>{title}</span>
@@ -69,6 +73,16 @@ export const SidebarSelector = ({ title }: Readonly<SidebarSelectorProps>) => {
           Sidebars
         </DropdownMenuLabel>
         <DropdownMenuGroup>
+          {node && (
+            <DropdownMenuItem
+              className="text-foreground cursor-pointer hover:rounded-none w-full"
+              onClick={() => {
+                sidebarToggle(SIDEBAR_ELEMENTS.nodeProperties);
+              }}
+            >
+              <SquareMousePointer /> Selection
+            </DropdownMenuItem>
+          )}
           <DropdownMenuItem
             className="text-foreground cursor-pointer hover:rounded-none w-full"
             onClick={() => {
@@ -77,7 +91,7 @@ export const SidebarSelector = ({ title }: Readonly<SidebarSelectorProps>) => {
           >
             <Images /> Images
             <DropdownMenuShortcut>
-              {SYSTEM_OS.MAC ? '⌥ ⌘ I' : 'Alt Ctrl I'}
+              {SYSTEM_OS.MAC ? "⌥ ⌘ I" : "Alt Ctrl I"}
             </DropdownMenuShortcut>
           </DropdownMenuItem>
           <DropdownMenuItem
@@ -88,7 +102,7 @@ export const SidebarSelector = ({ title }: Readonly<SidebarSelectorProps>) => {
           >
             <Projector /> Frames
             <DropdownMenuShortcut>
-              {SYSTEM_OS.MAC ? '⌥ ⌘ F' : 'Alt Ctrl F'}
+              {SYSTEM_OS.MAC ? "⌥ ⌘ F" : "Alt Ctrl F"}
             </DropdownMenuShortcut>
           </DropdownMenuItem>
           <DropdownMenuItem
@@ -99,18 +113,18 @@ export const SidebarSelector = ({ title }: Readonly<SidebarSelectorProps>) => {
           >
             <SwatchBook /> Color tokens
             <DropdownMenuShortcut>
-              {SYSTEM_OS.MAC ? '⌥ ⌘ O' : 'Alt Ctrl O'}
+              {SYSTEM_OS.MAC ? "⌥ ⌘ O" : "Alt Ctrl O"}
             </DropdownMenuShortcut>
           </DropdownMenuItem>
           <DropdownMenuItem
             className="text-foreground cursor-pointer hover:rounded-none w-full"
             onClick={() => {
-              sidebarToggle(SIDEBAR_ELEMENTS.nodesTree);
+              sidebarToggle(null);
             }}
           >
             <ListTree /> Elements tree
             <DropdownMenuShortcut>
-              {SYSTEM_OS.MAC ? '⌥ ⌘ E' : 'Alt Ctrl E'}
+              {SYSTEM_OS.MAC ? "⌥ ⌘ E" : "Alt Ctrl E"}
             </DropdownMenuShortcut>
           </DropdownMenuItem>
         </DropdownMenuGroup>

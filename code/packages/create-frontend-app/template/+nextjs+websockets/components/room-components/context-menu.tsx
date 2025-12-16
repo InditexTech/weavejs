@@ -1,7 +1,7 @@
-'use client';
+"use client";
 
-import React from 'react';
-import { cn } from '@/lib/utils';
+import React from "react";
+import { cn } from "@/lib/utils";
 
 type ContextMenuButtonProps = {
   label: React.ReactNode;
@@ -12,17 +12,17 @@ type ContextMenuButtonProps = {
 
 export type ContextMenuOption = {
   id: string;
-  type: 'button' | 'divider';
+  type: "button" | "divider";
 } & (
   | {
-      type: 'button';
+      type: "button";
       label: string | React.ReactNode;
       icon?: React.ReactNode;
       disabled?: boolean;
       onClick: () => void;
     }
   | {
-      type: 'divider';
+      type: "divider";
     }
 );
 
@@ -42,11 +42,11 @@ function ContextMenuButton({
   return (
     <button
       className={cn(
-        '!cursor-pointer w-[calc(100%-8px)] flex justify-between items-center gap-2 font-inter text-sm text-left whitespace-nowrap m-1 text-foreground px-2 py-1.5',
+        "!cursor-pointer w-[calc(100%-8px)] flex justify-between items-center gap-2 font-inter text-sm text-left whitespace-nowrap m-1 text-foreground px-2 py-1.5",
         {
-          ['hover:bg-accent']: !disabled,
-          ['!cursor-default hover:bg-white text-muted-foreground']: disabled,
-        }
+          ["hover:bg-accent"]: !disabled,
+          ["!cursor-default hover:bg-white text-muted-foreground"]: disabled,
+        },
       )}
       disabled={disabled}
       onClick={onClick}
@@ -72,11 +72,11 @@ export const ContextMenuRender = ({
 
       X = Math.max(
         20,
-        Math.min(X, window.innerWidth - boundingRect.width - 20)
+        Math.min(X, window.innerWidth - boundingRect.width - 20),
       );
       Y = Math.max(
         20,
-        Math.min(Y, window.innerHeight - boundingRect.height - 20)
+        Math.min(Y, window.innerHeight - boundingRect.height - 20),
       );
 
       ref.current.style.top = `${Y}px`;
@@ -107,12 +107,12 @@ export const ContextMenuRender = ({
       }
     }
 
-    window.addEventListener('click', checkIfClickedOutside);
-    window.addEventListener('touchstart', checkIfTouchOutside);
+    window.addEventListener("click", checkIfClickedOutside);
+    window.addEventListener("touchstart", checkIfTouchOutside);
 
     return () => {
-      window.removeEventListener('click', checkIfClickedOutside);
-      window.removeEventListener('touchstart', checkIfTouchOutside);
+      window.removeEventListener("click", checkIfClickedOutside);
+      window.removeEventListener("touchstart", checkIfTouchOutside);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -122,14 +122,14 @@ export const ContextMenuRender = ({
       ref={ref}
       className="fixed w-[300px] bg-white flex flex-col border border-[#c9c9c9] shadow-none"
       style={{
-        display: show ? 'block' : 'none',
+        display: show ? "block" : "none",
         top: `${position.y}px`,
         left: `${position.x}px`,
         zIndex: 10,
       }}
     >
       {options.map((option) => {
-        if (option.type === 'button') {
+        if (option.type === "button") {
           return (
             <ContextMenuButton
               key={option.id}
@@ -140,7 +140,7 @@ export const ContextMenuRender = ({
             />
           );
         }
-        if (option.type === 'divider') {
+        if (option.type === "divider") {
           return (
             <div key={option.id} className="w-full h-[1px] bg-accent"></div>
           );

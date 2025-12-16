@@ -1,6 +1,6 @@
 {
   "name": "create-weave-backend-app",
-  "version": "2.7.0-SNAPSHOT",
+  "version": "2.12.0-SNAPSHOT",
   "description": "Create a new backend artifact for site with Weave.js",
   "keywords": [
     "NextJs",
@@ -49,6 +49,8 @@
     "@types/cross-spawn": "^6.0.6",
     "@types/node": "22.14.1",
     "fast-glob": "^3.3.3",
+    "eslint": "8.57.1",
+    "eslint-config-eslint": "11.0.0",
     "tsdown": "^0.10.2"
   },
   "engines": {
@@ -62,6 +64,7 @@
       "@inditextech/weave-react",
       "@inditextech/weave-sdk",
       "@inditextech/weave-store-azure-web-pubsub",
+      "@inditextech/weave-store-standalone",
       "@inditextech/weave-store-websockets",
       "@inditextech/weave-types"
     ]

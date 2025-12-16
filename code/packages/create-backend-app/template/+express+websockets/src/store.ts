@@ -2,9 +2,9 @@ import path from 'path'
 import fs from 'fs/promises'
 import http from 'http'
 import { WeaveWebsocketsServer } from '@inditextech/weave-store-websockets/server'
-import { createFolder, existsFolder } from '@/utils'
+import { createFolder, existsFolder } from '@/utils.js'
 
-const VALID_ROOM_WEBSOCKET_URL = /\/sync\/rooms\/(.*)/
+const VALID_ROOM_WEBSOCKET_URL = /\/rooms\/(.*)\/connect/
 
 export const setupStore = (server: http.Server) => {
   const wss = new WeaveWebsocketsServer({

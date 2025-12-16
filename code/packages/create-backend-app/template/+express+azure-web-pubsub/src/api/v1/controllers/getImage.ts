@@ -18,8 +18,8 @@ export const getImageController = () => {
     const filePath = await persistenceHandler.getFilePath(fileName)
 
     if (filePath) {
-      const mimeType = await persistenceHandler.getMimeType(fileName)
-      res.setHeader('Content-Type', mimeType)
+      // const mimeType = await persistenceHandler.getMimeType(fileName)
+      // res.setHeader('Content-Type', mimeType)
       res.sendFile(filePath, (err) => {
         if (err) {
           console.error('File not found or error sending file:', err.message)

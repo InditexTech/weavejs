@@ -5,17 +5,17 @@ import {
   CommandInput,
   CommandItem,
   CommandList,
-} from '@/components/ui/command';
+} from "@/components/ui/command";
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
-} from '@/components/ui/popover';
-import { Check, ChevronDown } from 'lucide-react';
+} from "@/components/ui/popover";
+import { Check, ChevronDown } from "lucide-react";
 
-import { Button } from '@/components/ui/button';
-import React from 'react';
-import { FONTS } from '@/components/utils/constants';
+import { Button } from "@/components/ui/button";
+import React from "react";
+import { FONTS } from "@/components/utils/constants";
 
 function InputFontFamily({
   value,
@@ -78,7 +78,7 @@ function InputFontFamily({
                 </span>
               </CommandEmpty>
               <CommandGroup>
-                {FONTS.map((font) => (
+                {FONTS().map((font) => (
                   <CommandItem
                     key={font.id}
                     value={font.name}

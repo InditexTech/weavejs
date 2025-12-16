@@ -1,17 +1,16 @@
 import {
+  WeaveContextMenuPlugin,
   WeaveCopyPasteNodesPlugin,
-  WeaveExportNodesActionParams,
   WeaveStageContextMenuPluginOnNodeContextMenuEvent,
-} from '@inditextech/weave-sdk';
-import { WeaveSelection } from '@inditextech/weave-types';
-import { useCollaborationRoom } from '@/store/store';
-import React from 'react';
-import { SIDEBAR_ELEMENTS } from '@/lib/constants';
-import { useWeave } from '@inditextech/weave-react';
-import { ContextMenuOption } from '../context-menu';
-import { ShortcutElement } from '../help/shortcut-element';
-import { SYSTEM_OS } from '@/lib/utils';
-import Konva from 'konva';
+} from "@inditextech/weave-sdk";
+import { WeaveSelection } from "@inditextech/weave-types";
+import { useCollaborationRoom } from "@/store/store";
+import React from "react";
+import { useWeave } from "@inditextech/weave-react";
+import { ContextMenuOption } from "../context-menu";
+import { ShortcutElement } from "../help/shortcut-element";
+import { SYSTEM_OS } from "@/lib/utils";
+import Konva from "konva";
 import {
   ClipboardCopy,
   ClipboardPaste,
@@ -24,36 +23,36 @@ import {
   ArrowDown,
   ImageDown,
   ImageMinus,
-} from 'lucide-react';
-import { useMutation } from '@tanstack/react-query';
-import { postRemoveBackground } from '@/api/post-remove-background';
+} from "lucide-react";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { postRemoveBackground } from "@/api/post-remove-background";
 
 function useContextMenu() {
   const instance = useWeave((state) => state.instance);
 
   const room = useCollaborationRoom((state) => state.room);
-  const contextMenuPosition = useCollaborationRoom(
-    (state) => state.contextMenu.position
-  );
   const setContextMenuShow = useCollaborationRoom(
-    (state) => state.setContextMenuShow
+    (state) => state.setContextMenuShow,
   );
   const setContextMenuPosition = useCollaborationRoom(
-    (state) => state.setContextMenuPosition
+    (state) => state.setContextMenuPosition,
   );
   const setContextMenuOptions = useCollaborationRoom(
-    (state) => state.setContextMenuOptions
-  );
-  const setSidebarActive = useCollaborationRoom(
-    (state) => state.setSidebarActive
+    (state) => state.setContextMenuOptions,
   );
   const setTransformingImage = useCollaborationRoom(
-    (state) => state.setTransformingImage
+    (state) => state.setTransformingImage,
   );
+  const setExportNodes = useCollaborationRoom((state) => state.setExportNodes);
+  const setExportConfigVisible = useCollaborationRoom(
+    (state) => state.setExportConfigVisible,
+  );
+
+  const queryClient = useQueryClient();
 
   const mutationUpload = useMutation({
     mutationFn: async (imageId: string) => {
-      return await postRemoveBackground(room ?? '', imageId);
+      return await postRemoveBackground(room ?? "", imageId);
     },
   });
 
@@ -63,11 +62,15 @@ function useContextMenu() {
       canUnGroup,
       nodes,
       canGroup,
+      clickPoint,
+      stageClickPoint,
     }: {
       actActionActive: string | undefined;
       canUnGroup: boolean;
       canGroup: boolean;
       nodes: WeaveSelection[];
+      clickPoint: Konva.Vector2d;
+      stageClickPoint: Konva.Vector2d;
     }): ContextMenuOption[] => {
       if (!instance) return [];
 
@@ -76,15 +79,15 @@ function useContextMenu() {
       if (nodes.length > 0) {
         // EXPORT
         options.push({
-          id: 'export',
-          type: 'button',
+          id: "export",
+          type: "button",
           label: (
             <div className="w-full flex justify-between items-center">
               <div>Export as image</div>
               <ShortcutElement
                 shortcuts={{
-                  [SYSTEM_OS.MAC]: '⇧ ⌘ E',
-                  [SYSTEM_OS.OTHER]: '⇧ Ctrl E',
+                  [SYSTEM_OS.MAC]: "⇧ ⌘ E",
+                  [SYSTEM_OS.OTHER]: "⇧ Ctrl E",
                 }}
               />
             </div>
@@ -92,74 +95,85 @@ function useContextMenu() {
           icon: <ImageDown size={16} />,
           disabled: nodes.length <= 0,
           onClick: () => {
-            instance.triggerAction<WeaveExportNodesActionParams>(
-              'exportNodesTool',
-              {
-                nodes: nodes.map((n) => n.instance),
-                options: {
-                  padding: 20,
-                  pixelRatio: 2,
-                },
-              }
-            );
+            setExportNodes(nodes.map((n) => n.node?.key ?? ""));
+            setExportConfigVisible(true);
             setContextMenuShow(false);
           },
         });
         // SEPARATOR
         options.push({
-          id: 'div-0',
-          type: 'divider',
+          id: "div-0",
+          type: "divider",
         });
 
         // COPY
         options.push({
-          id: 'copy',
-          type: 'button',
+          id: "copy",
+          type: "button",
           label: (
             <div className="w-full flex justify-between items-center">
               <div>Copy</div>
               <ShortcutElement
                 shortcuts={{
-                  [SYSTEM_OS.MAC]: '⌘ C',
-                  [SYSTEM_OS.OTHER]: 'Ctrl C',
+                  [SYSTEM_OS.MAC]: "⌘ C",
+                  [SYSTEM_OS.OTHER]: "Ctrl C",
                 }}
               />
             </div>
           ),
           icon: <ClipboardCopy size={16} />,
-          disabled: !['selectionTool'].includes(actActionActive ?? ''),
+          disabled: !["selectionTool"].includes(actActionActive ?? ""),
           onClick: async () => {
             const weaveCopyPasteNodesPlugin =
-              instance.getPlugin<WeaveCopyPasteNodesPlugin>('copyPasteNodes');
+              instance.getPlugin<WeaveCopyPasteNodesPlugin>("copyPasteNodes");
             if (weaveCopyPasteNodesPlugin) {
               await weaveCopyPasteNodesPlugin.copy();
             }
             setContextMenuShow(false);
           },
         });
+        options.push({
+          id: "copy-as-image",
+          type: "button",
+          label: (
+            <div className="w-full flex justify-between items-center">
+              <div>Copy as image</div>
+            </div>
+          ),
+          icon: <ClipboardCopy size={16} />,
+          disabled: !["selectionTool"].includes(actActionActive ?? ""),
+          onClick: async () => {
+            setContextMenuShow(false);
+            const weaveCopyPasteNodesPlugin =
+              instance.getPlugin<WeaveCopyPasteNodesPlugin>("copyPasteNodes");
+            if (weaveCopyPasteNodesPlugin) {
+              await weaveCopyPasteNodesPlugin.copy(true);
+            }
+          },
+        });
       }
       // PASTE
       options.push({
-        id: 'paste',
-        type: 'button',
+        id: "paste",
+        type: "button",
         label: (
           <div className="w-full flex justify-between items-center">
-            <div>Paste</div>
+            <div>Paste here</div>
             <ShortcutElement
               shortcuts={{
-                [SYSTEM_OS.MAC]: '⌘ P',
-                [SYSTEM_OS.OTHER]: 'Ctrl P',
+                [SYSTEM_OS.MAC]: "⌘ P",
+                [SYSTEM_OS.OTHER]: "Ctrl P",
               }}
             />
           </div>
         ),
         icon: <ClipboardPaste size={16} />,
-        disabled: !['selectionTool'].includes(actActionActive ?? ''),
+        disabled: !["selectionTool"].includes(actActionActive ?? ""),
         onClick: async () => {
           const weaveCopyPasteNodesPlugin =
-            instance.getPlugin<WeaveCopyPasteNodesPlugin>('copyPasteNodes');
+            instance.getPlugin<WeaveCopyPasteNodesPlugin>("copyPasteNodes");
           if (weaveCopyPasteNodesPlugin) {
-            await weaveCopyPasteNodesPlugin.paste(contextMenuPosition);
+            weaveCopyPasteNodesPlugin.paste(clickPoint, stageClickPoint);
             setContextMenuShow(false);
           }
         },
@@ -167,22 +181,22 @@ function useContextMenu() {
       if (nodes.length > 0) {
         // SEPARATOR
         options.push({
-          id: 'div-1',
-          type: 'divider',
+          id: "div-1",
+          type: "divider",
         });
       }
       if (nodes.length > 0) {
         // BRING TO FRONT
         options.push({
-          id: 'bring-to-front',
-          type: 'button',
+          id: "bring-to-front",
+          type: "button",
           label: (
             <div className="w-full flex justify-between items-center">
               <div>Bring to front</div>
               <ShortcutElement
                 shortcuts={{
-                  [SYSTEM_OS.MAC]: ']',
-                  [SYSTEM_OS.OTHER]: ']',
+                  [SYSTEM_OS.MAC]: "]",
+                  [SYSTEM_OS.OTHER]: "]",
                 }}
               />
             </div>
@@ -196,15 +210,15 @@ function useContextMenu() {
         });
         // MOVE UP
         options.push({
-          id: 'move-up',
-          type: 'button',
+          id: "move-up",
+          type: "button",
           label: (
             <div className="w-full flex justify-between items-center">
               <div>Move up</div>
               <ShortcutElement
                 shortcuts={{
-                  [SYSTEM_OS.MAC]: '⌘ ]',
-                  [SYSTEM_OS.OTHER]: 'Ctrl ]',
+                  [SYSTEM_OS.MAC]: "⌘ ]",
+                  [SYSTEM_OS.OTHER]: "Ctrl ]",
                 }}
               />
             </div>
@@ -218,15 +232,15 @@ function useContextMenu() {
         });
         // MOVE DOWN
         options.push({
-          id: 'move-down',
-          type: 'button',
+          id: "move-down",
+          type: "button",
           label: (
             <div className="w-full flex justify-between items-center">
               <div>Move down</div>
               <ShortcutElement
                 shortcuts={{
-                  [SYSTEM_OS.MAC]: '⌘ [',
-                  [SYSTEM_OS.OTHER]: 'Ctrl [',
+                  [SYSTEM_OS.MAC]: "⌘ [",
+                  [SYSTEM_OS.OTHER]: "Ctrl [",
                 }}
               />
             </div>
@@ -240,15 +254,15 @@ function useContextMenu() {
         });
         // SEND TO BACK
         options.push({
-          id: 'send-to-back',
-          type: 'button',
+          id: "send-to-back",
+          type: "button",
           label: (
             <div className="w-full flex justify-between items-center">
               <div>Send to back</div>
               <ShortcutElement
                 shortcuts={{
-                  [SYSTEM_OS.MAC]: '[',
-                  [SYSTEM_OS.OTHER]: '[',
+                  [SYSTEM_OS.MAC]: "[",
+                  [SYSTEM_OS.OTHER]: "[",
                 }}
               />
             </div>
@@ -263,22 +277,22 @@ function useContextMenu() {
       }
       if (nodes.length > 0) {
         options.push({
-          id: 'div-2',
-          type: 'divider',
+          id: "div-2",
+          type: "divider",
         });
       }
       if (nodes.length > 0) {
         // GROUP
         options.push({
-          id: 'group',
-          type: 'button',
+          id: "group",
+          type: "button",
           label: (
             <div className="w-full flex justify-between items-center">
               <div>Group</div>
               <ShortcutElement
                 shortcuts={{
-                  [SYSTEM_OS.MAC]: '⇧ ⌘ G',
-                  [SYSTEM_OS.OTHER]: '⇧ Ctrl G',
+                  [SYSTEM_OS.MAC]: "⇧ ⌘ G",
+                  [SYSTEM_OS.OTHER]: "⇧ Ctrl G",
                 }}
               />
             </div>
@@ -286,21 +300,27 @@ function useContextMenu() {
           icon: <Group size={16} />,
           disabled: !canGroup,
           onClick: () => {
-            instance.group(nodes.map((n) => n.node));
+            const existingSelectedNodes = [];
+            for (const n of nodes) {
+              if (n.node) {
+                existingSelectedNodes.push(n.node);
+              }
+            }
+            instance.group(existingSelectedNodes);
             setContextMenuShow(false);
           },
         });
         // UNGROUP
         options.push({
-          id: 'ungroup',
-          type: 'button',
+          id: "ungroup",
+          type: "button",
           label: (
             <div className="w-full flex justify-between items-center">
               <div>Un-group</div>
               <ShortcutElement
                 shortcuts={{
-                  [SYSTEM_OS.MAC]: '⇧ ⌘ U',
-                  [SYSTEM_OS.OTHER]: '⇧ Ctrl U',
+                  [SYSTEM_OS.MAC]: "⇧ ⌘ U",
+                  [SYSTEM_OS.OTHER]: "⇧ Ctrl U",
                 }}
               />
             </div>
@@ -308,6 +328,7 @@ function useContextMenu() {
           icon: <Ungroup size={16} />,
           disabled: !canUnGroup,
           onClick: () => {
+            if (!nodes[0].node) return;
             instance.unGroup(nodes[0].node);
             setContextMenuShow(false);
           },
@@ -316,22 +337,22 @@ function useContextMenu() {
       if (nodes.length > 0) {
         // SEPARATOR
         options.push({
-          id: 'div-3',
-          type: 'divider',
+          id: "div-3",
+          type: "divider",
         });
       }
       if (nodes.length > 0) {
         // DELETE
         options.push({
-          id: 'delete',
-          type: 'button',
+          id: "delete",
+          type: "button",
           label: (
             <div className="w-full flex justify-between items-center">
               <div>Delete</div>
               <ShortcutElement
                 shortcuts={{
-                  [SYSTEM_OS.MAC]: 'Del',
-                  [SYSTEM_OS.OTHER]: 'Del',
+                  [SYSTEM_OS.MAC]: "Del",
+                  [SYSTEM_OS.OTHER]: "Del",
                 }}
               />
             </div>
@@ -339,7 +360,9 @@ function useContextMenu() {
           icon: <Trash size={16} />,
           onClick: () => {
             for (const node of nodes) {
-              instance.removeNode(node.node);
+              if (node.node) {
+                instance.removeNode(node.node);
+              }
             }
 
             setContextMenuShow(false);
@@ -347,45 +370,48 @@ function useContextMenu() {
         });
       }
 
-      if (nodes.length === 1 && nodes[0].node.type === 'image') {
+      if (nodes.length === 1 && nodes[0]?.node?.type === "image") {
         options.unshift({
-          id: 'div-image',
-          type: 'divider',
+          id: "div-image",
+          type: "divider",
         });
         options.unshift({
-          id: 'removeBackground',
-          type: 'button',
-          label: 'Remove background',
+          id: "removeBackground",
+          type: "button",
+          label: "Remove background",
           icon: <ImageMinus size={16} />,
           onClick: () => {
             if (instance) {
               const nodeImage = nodes[0].instance as Konva.Group | undefined;
               if (nodeImage) {
                 const nodeImageInternal = nodeImage?.findOne(
-                  `#${nodeImage.getAttrs().id}-image`
+                  `#${nodeImage.getAttrs().id}-image`,
                 );
                 const imageTokens = nodeImageInternal
-                  ?.getAttr('image')
-                  .src.split('/');
+                  ?.getAttr("image")
+                  .src.split("/");
                 const imageId = imageTokens[imageTokens.length - 1];
                 setTransformingImage(true);
                 mutationUpload.mutate(imageId, {
                   // eslint-disable-next-line @typescript-eslint/no-explicit-any
                   onSuccess: (data: any) => {
-                    const room = data.fileName.split('/')[0];
-                    const imageId = data.fileName.split('/')[1];
+                    const room = data.fileName.split("/")[0];
+                    const imageId = data.fileName.split("/")[1];
+
+                    const queryKey = ["getImages", room];
+                    queryClient.invalidateQueries({ queryKey });
 
                     const { finishUploadCallback } = instance.triggerAction(
-                      'imageTool'
+                      "imageTool",
                       // eslint-disable-next-line @typescript-eslint/no-explicit-any
                     ) as any;
 
                     finishUploadCallback(
-                      `${process.env.NEXT_PUBLIC_API_ENDPOINT}/weavejs/rooms/${room}/images/${imageId}`
+                      `${process.env.NEXT_PUBLIC_API_ENDPOINT}/rooms/${room}/images/${imageId}`,
                     );
                   },
                   onError: () => {
-                    console.error('Error uploading image');
+                    console.error("Error uploading image");
                   },
                   onSettled: () => {
                     setTransformingImage(false);
@@ -401,42 +427,50 @@ function useContextMenu() {
       return options;
     },
     [
+      queryClient,
       instance,
-      contextMenuPosition,
       mutationUpload,
       setTransformingImage,
       setContextMenuShow,
-    ]
+      setExportConfigVisible,
+      setExportNodes,
+    ],
   );
 
   const onNodeContextMenuHandler = React.useCallback(
-    ({
+    async ({
       selection,
-      point,
+      contextMenuPoint,
+      clickPoint,
+      stageClickPoint,
       visible,
     }: WeaveStageContextMenuPluginOnNodeContextMenuEvent) => {
       if (!instance) return;
 
       const canGroup = selection.length > 1;
       const canUnGroup =
-        selection.length === 1 && selection[0].node.type === 'group';
+        selection.length === 1 && selection[0]?.node?.type === "group";
 
       const actActionActive = instance.getActiveAction();
 
-      if (visible) {
-        setSidebarActive(SIDEBAR_ELEMENTS.nodeProperties, 'right');
-      }
-
-      setContextMenuShow(visible);
-      setContextMenuPosition(point);
-
-      const contextMenu = getContextMenu({
+      const contextMenu = await getContextMenu({
         actActionActive,
         canUnGroup,
         nodes: selection,
         canGroup,
+        clickPoint,
+        stageClickPoint,
       });
-      setContextMenuOptions(contextMenu);
+
+      if (contextMenu.length > 0) {
+        setContextMenuShow(visible);
+        setContextMenuPosition(contextMenuPoint);
+        setContextMenuOptions(contextMenu);
+      } else {
+        const contextMenuPlugin =
+          instance?.getPlugin<WeaveContextMenuPlugin>("contextMenu");
+        contextMenuPlugin?.closeContextMenu();
+      }
     },
     [
       instance,
@@ -444,19 +478,18 @@ function useContextMenu() {
       setContextMenuOptions,
       setContextMenuPosition,
       setContextMenuShow,
-      setSidebarActive,
-    ]
+    ],
   );
 
   React.useEffect(() => {
     if (!instance) return;
 
-    instance.addEventListener('onNodeContextMenu', onNodeContextMenuHandler);
+    instance.addEventListener("onNodeContextMenu", onNodeContextMenuHandler);
 
     return () => {
       instance.removeEventListener(
-        'onNodeContextMenu',
-        onNodeContextMenuHandler
+        "onNodeContextMenu",
+        onNodeContextMenuHandler,
       );
     };
   }, [instance, onNodeContextMenuHandler]);

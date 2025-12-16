@@ -4,6 +4,8 @@
 
 import { WeavePlugin } from '@/plugins/plugin';
 import { WEAVE_STAGE_RESIZE_KEY } from './constants';
+import { setupUpscaleStage } from '@/utils/upscale';
+import { throttle } from 'lodash';
 
 export class WeaveStageResizePlugin extends WeavePlugin {
   getLayerName = undefined;
@@ -24,12 +26,14 @@ export class WeaveStageResizePlugin extends WeavePlugin {
     }
 
     if (containerParent) {
-      const containerBoundBox = stage.container().getBoundingClientRect();
+      const upscaleScale = stage.getAttr('upscaleScale');
 
-      const containerWidth = containerBoundBox.width;
-      const containerHeight = containerBoundBox.height;
-      stage.width(containerWidth);
-      stage.height(containerHeight);
+      if (upscaleScale === 1) {
+        stage.width((containerParent as HTMLElement).clientWidth);
+        stage.height((containerParent as HTMLElement).clientHeight);
+      }
+
+      setupUpscaleStage(this.instance, stage);
 
       const plugins = this.instance.getPlugins();
       for (const pluginId of Object.keys(plugins)) {
@@ -40,14 +44,18 @@ export class WeaveStageResizePlugin extends WeavePlugin {
   }
 
   onInit(): void {
+    const throttledResize = throttle(() => {
+      this.resizeStage();
+    }, 100);
+
     // Resize when window is resized
     window.addEventListener('resize', () => {
-      this.resizeStage();
+      throttledResize();
     });
 
     // Resize when stage container is resized
     const resizeObserver = new ResizeObserver(() => {
-      this.resizeStage();
+      throttledResize();
     });
 
     const stage = this.instance.getStage();

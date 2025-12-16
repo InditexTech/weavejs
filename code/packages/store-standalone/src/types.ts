@@ -7,6 +7,6 @@ import type { Doc } from 'yjs';
 export type FetchInitialState = (doc: Doc) => void;
 
 export type WeaveStoreStandaloneParams = {
-  roomData: string;
+  roomData: string | undefined;
   initialState?: FetchInitialState;
 };

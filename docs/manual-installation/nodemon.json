@@ -1,0 +1,6 @@
+{
+  "watch": ["**/*.{ts,tsx}", "next.config.mjs", "persistence.ts", "server.ts"],
+  "ignore": ["node_modules/**/*"],
+  "exec": "tsx server.ts",
+  "ext": "js ts"
+}

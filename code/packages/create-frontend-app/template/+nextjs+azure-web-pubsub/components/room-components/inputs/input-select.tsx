@@ -5,16 +5,16 @@ import {
   CommandInput,
   CommandItem,
   CommandList,
-} from '@/components/ui/command';
+} from "@/components/ui/command";
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
-} from '@/components/ui/popover';
-import { Check, ChevronDown } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { useEffect, useRef, useState } from 'react';
-import React from 'react';
+} from "@/components/ui/popover";
+import { Check, ChevronDown } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { useEffect, useRef, useState } from "react";
+import React from "react";
 
 function InputSelect({
   hideSearch = false,
@@ -68,7 +68,7 @@ function InputSelect({
             className="w-full pl-3 h-[40px] rounded-none !text-[14px] !border-black text-black justify-between font-normal bg-transparent shadow-none"
           >
             {options.find((option) => option.value === selectedOption)?.label ??
-              '-'}
+              "-"}
             {!disabled && (
               <ChevronDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
             )}

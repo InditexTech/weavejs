@@ -3,7 +3,6 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import Emittery from 'emittery';
-import { Buffer } from 'buffer';
 import { v4 as uuidv4 } from 'uuid';
 import type { Doc } from 'yjs';
 import ReconnectingWebSocket from 'reconnecting-websocket';
@@ -25,7 +24,11 @@ import {
 import type { WeaveStoreAzureWebPubsub } from './store-azure-web-pubsub';
 import { WEAVE_STORE_CONNECTION_STATUS } from '@inditextech/weave-types';
 import { WEAVE_STORE_AZURE_WEB_PUBSUB_CONNECTION_STATUS } from './constants';
-import { handleChunkedMessage, handleMessageBufferData } from './utils';
+import {
+  handleChunkedMessage,
+  handleMessageBufferData,
+  uint8ToBase64,
+} from './utils';
 
 const messageSyncStep1 = 0;
 const messageAwareness = 1;
@@ -632,7 +635,7 @@ function sendToControlGroup(
     data: {
       t: type,
       f: client.id,
-      c: Buffer.from(u8).toString('base64'),
+      c: uint8ToBase64(u8),
     },
   });
 
@@ -658,7 +661,7 @@ function sendToControlGroupChunked(
   type: string,
   u8: Uint8Array
 ) {
-  const base64Data = Buffer.from(u8).toString('base64');
+  const base64Data = uint8ToBase64(u8);
 
   const CHUNK_SIZE = 60 * 1024; // 60 KB
   const chunks = chunkString(base64Data, CHUNK_SIZE);

@@ -86,6 +86,10 @@ export class WeaveNodesEdgeSnappingPlugin extends WeavePlugin {
       e
     );
 
+    if (node?.getAttr('edgeSnappingDisable')) {
+      return;
+    }
+
     if (typeof node === 'undefined') {
       return;
     }
@@ -105,7 +109,7 @@ export class WeaveNodesEdgeSnappingPlugin extends WeavePlugin {
       this.instance.getMainLayer() as Konva.Layer
     );
     // find possible snapping lines
-    const lineGuideStops = this.getLineGuideStops(visibleNodes);
+    const lineGuideStops = this.getLineGuideStops(nodeParent, visibleNodes);
     // find snapping points of current object
     const itemBounds = this.getObjectSnappingEdges(node);
 
@@ -196,7 +200,7 @@ export class WeaveNodesEdgeSnappingPlugin extends WeavePlugin {
   }
 
   private getSelectionParentNode(node: Konva.Node) {
-    let nodeParent = null;
+    let nodeParent: Konva.Node | null = null;
 
     const nodesSelectionPlugin =
       this.instance.getPlugin<WeaveNodesSelectionPlugin>('nodesSelection');
@@ -258,9 +262,17 @@ export class WeaveNodesEdgeSnappingPlugin extends WeavePlugin {
     }
   }
 
-  getLineGuideStops(nodes: Konva.Node[]): LineGuideStop {
+  getLineGuideStops(parent: Konva.Node, nodes: Konva.Node[]): LineGuideStop {
     const vertical: (number | number[])[] = [];
     const horizontal: (number | number[])[] = [];
+
+    if (parent.getAttrs().id !== this.instance.getMainLayer()?.getAttrs().id) {
+      const parentBox = parent.getClientRect({ skipStroke: true });
+
+      // we can snap to parent edges
+      vertical.push([parentBox.x + parentBox.width / 2]);
+      horizontal.push([parentBox.y + parentBox.height / 2]);
+    }
 
     nodes.forEach((guideItem) => {
       const box = guideItem.getClientRect({

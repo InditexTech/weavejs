@@ -1,12 +1,12 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-'use client';
+"use client";
 
-import { cn } from '@/lib/utils';
-import { Range, Root, Thumb, Track } from '@radix-ui/react-slider';
-import { type HTMLAttributes, useCallback, useState } from 'react';
-import { useColorPicker } from '../context/color-picker-context';
-import Color from 'color';
-import { changeHue } from '../utils';
+import { cn } from "@/lib/utils";
+import { Range, Root, Thumb, Track } from "@radix-ui/react-slider";
+import { type HTMLAttributes, useCallback, useState } from "react";
+import { useColorPicker } from "../context/color-picker-context";
+import Color from "color";
+import { changeHue } from "../utils";
 
 export type ColorPickerHueProps = HTMLAttributes<HTMLDivElement>;
 
@@ -30,7 +30,7 @@ export const ColorPickerHue = ({
       const newColor = changeHue(r, g, b, hue);
       setColor(Color(newColor));
     },
-    [color, setHueValue]
+    [color, setColor, setHueValue],
   );
 
   const onValueCommit = useCallback(
@@ -39,7 +39,7 @@ export const ColorPickerHue = ({
       const newColor = changeHue(r, g, b, hue);
       setColor(Color(newColor));
     },
-    [color, setColor]
+    [color, setColor],
   );
 
   return (
@@ -48,8 +48,8 @@ export const ColorPickerHue = ({
       max={360}
       step={1}
       className={cn(
-        'relative flex h-5 w-full touch-none items-center transition-opacity duration-200',
-        className
+        "relative flex h-5 w-full touch-none items-center transition-opacity duration-200",
+        className,
       )}
       onValueChange={onValueChange}
       onValueCommit={onValueCommit}

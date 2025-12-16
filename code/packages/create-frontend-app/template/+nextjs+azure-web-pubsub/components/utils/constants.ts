@@ -5,7 +5,7 @@ import {
   WeaveBrushToolAction,
   WeaveFrameToolAction,
   WeaveImageToolAction,
-  WeavePenToolAction,
+  WeaveLineToolAction,
   WeaveRectangleToolAction,
   WeaveEllipseToolAction,
   WeaveTextToolAction,
@@ -24,6 +24,7 @@ import {
   WeaveRectangleNode,
   WeaveEllipseNode,
   WeaveLineNode,
+  WeaveStrokeNode,
   WeaveTextNode,
   WeaveImageNode,
   WeaveStarNode,
@@ -41,86 +42,89 @@ import {
   WeaveStageDropAreaPlugin,
   WeaveCopyPasteNodesPlugin,
   WeaveContextMenuPlugin,
-  WeaveNodesSnappingPlugin,
-} from '@inditextech/weave-sdk';
-import { type WeaveUser } from '@inditextech/weave-types';
-import { Inter } from 'next/font/google';
-import { ColorTokenNode } from '@/components/nodes/color-token/color-token';
-import { AlignElementsToolAction } from '@/components/actions/align-elements-tool/align-elements-tool';
-import { WEAVE_TRANSFORMER_ANCHORS } from '@inditextech/weave-types';
-import { ColorTokenToolAction } from '../actions/color-token-tool/color-token-tool';
+  WeaveNodesMultiSelectionFeedbackPlugin,
+} from "@inditextech/weave-sdk";
+import { type WeaveUser } from "@inditextech/weave-types";
+import { Inter } from "next/font/google";
+import { ColorTokenNode } from "@/components/nodes/color-token/color-token";
+import { AlignElementsToolAction } from "@/components/actions/align-elements-tool/align-elements-tool";
+import { WEAVE_TRANSFORMER_ANCHORS } from "@inditextech/weave-types";
+import { ColorTokenToolAction } from "../actions/color-token-tool/color-token-tool";
+import { stringToColor } from "./users";
+import { getContrastTextColor } from "@/lib/utils";
+import { getImageBase64 } from "./images";
 
 const FONTS = () => [
   {
-    id: 'Inter',
-    name: 'Inter, sans-serif',
+    id: "Inter",
+    name: "Inter, sans-serif",
   },
   {
-    id: 'Arial',
-    name: 'Arial, sans-serif',
+    id: "Arial",
+    name: "Arial, sans-serif",
   },
   {
-    id: 'Helvetica',
-    name: 'Helvetica, sans-serif',
+    id: "Helvetica",
+    name: "Helvetica, sans-serif",
   },
   {
-    id: 'TimesNewRoman',
-    name: 'Times New Roman, serif',
+    id: "TimesNewRoman",
+    name: "Times New Roman, serif",
   },
   {
-    id: 'Times',
-    name: 'Times, serif',
+    id: "Times",
+    name: "Times, serif",
   },
   {
-    id: 'CourierNew',
-    name: 'Courier New, monospace',
+    id: "CourierNew",
+    name: "Courier New, monospace",
   },
   {
-    id: 'Courier',
-    name: 'Courier, monospace',
+    id: "Courier",
+    name: "Courier, monospace",
   },
   {
-    id: 'Verdana',
-    name: 'Verdana, sans-serif',
+    id: "Verdana",
+    name: "Verdana, sans-serif",
   },
   {
-    id: 'Georgia',
-    name: 'Georgia, serif',
+    id: "Georgia",
+    name: "Georgia, serif",
   },
   {
-    id: 'Palatino',
-    name: 'Palatino, serif',
+    id: "Palatino",
+    name: "Palatino, serif",
   },
   {
-    id: 'Garamond',
-    name: 'Garamond, serif',
+    id: "Garamond",
+    name: "Garamond, serif",
   },
   {
-    id: 'Bookman',
-    name: 'Bookman, serif',
+    id: "Bookman",
+    name: "Bookman, serif",
   },
   {
-    id: 'ComicSansMS',
-    name: 'Comic Sans MS, cursive',
+    id: "ComicSansMS",
+    name: "Comic Sans MS, cursive",
   },
   {
-    id: 'TrebuchetMS',
-    name: 'Trebuchet MS, sans-serif',
+    id: "TrebuchetMS",
+    name: "Trebuchet MS, sans-serif",
   },
   {
-    id: 'ArialBlack',
-    name: 'Arial Black, sans-serif',
+    id: "ArialBlack",
+    name: "Arial Black, sans-serif",
   },
   {
-    id: 'Impact',
-    name: 'Impact, sans-serif',
+    id: "Impact",
+    name: "Impact, sans-serif",
   },
 ];
 
 const inter = Inter({
   preload: true,
-  variable: '--inter',
-  subsets: ['latin'],
+  variable: "--inter",
+  subsets: ["latin"],
 });
 
 const NODES = () => [
@@ -130,6 +134,7 @@ const NODES = () => [
   new WeaveRectangleNode(),
   new WeaveEllipseNode(),
   new WeaveLineNode(),
+  new WeaveStrokeNode(),
   new WeaveTextNode(),
   new WeaveImageNode({
     config: {
@@ -150,9 +155,9 @@ const NODES = () => [
   new WeaveFrameNode({
     config: {
       fontFamily: inter.style.fontFamily,
-      fontStyle: 'normal',
+      fontStyle: "normal",
       fontSize: 32,
-      fontColor: '#000000ff',
+      fontColor: "#000000ff",
       titleMargin: 10,
       transform: {
         rotateEnabled: false,
@@ -172,9 +177,29 @@ const PLUGINS = (getUser: () => WeaveUser) => [
   new WeaveStageResizePlugin(),
   new WeaveStageZoomPlugin(),
   new WeaveNodesSelectionPlugin(),
-  new WeaveNodesSnappingPlugin(),
   new WeaveStageDropAreaPlugin(),
-  new WeaveCopyPasteNodesPlugin(),
+  new WeaveCopyPasteNodesPlugin({
+    config: {
+      paddingOnPaste: {
+        enabled: true,
+        paddingX: 20,
+        paddingY: 20,
+      },
+    },
+    getImageBase64: async (instance, nodes) => {
+      try {
+        const res = await getImageBase64({
+          instance: instance,
+          nodes: nodes.map((node) => node.getAttrs().id ?? ""),
+          options: { format: "image/png", padding: 0, pixelRatio: 1 },
+        });
+        return res.url;
+      } catch (error) {
+        console.error("Error getting image base64:", error);
+        throw error;
+      }
+    },
+  }),
   new WeaveConnectedUsersPlugin({
     config: {
       getUser,
@@ -183,11 +208,18 @@ const PLUGINS = (getUser: () => WeaveUser) => [
   new WeaveUsersPointersPlugin({
     config: {
       getUser,
+      getUserBackgroundColor: (user: WeaveUser) =>
+        stringToColor(user?.name ?? "#000000"),
+      getUserForegroundColor: (user: WeaveUser) => {
+        const bgColor = stringToColor(user?.name ?? "#ffffff");
+        return getContrastTextColor(bgColor);
+      },
     },
   }),
   new WeaveUsersSelectionPlugin({
     config: {
       getUser,
+      getUserColor: (user: WeaveUser) => stringToColor(user?.name ?? "#000000"),
     },
   }),
   new WeaveContextMenuPlugin({
@@ -196,6 +228,7 @@ const PLUGINS = (getUser: () => WeaveUser) => [
       yOffset: 10,
     },
   }),
+  new WeaveNodesMultiSelectionFeedbackPlugin(),
 ];
 
 const ACTIONS = () => [
@@ -204,7 +237,7 @@ const ACTIONS = () => [
   new WeaveEraserToolAction(),
   new WeaveRectangleToolAction(),
   new WeaveEllipseToolAction(),
-  new WeavePenToolAction(),
+  new WeaveLineToolAction(),
   new WeaveBrushToolAction(),
   new WeaveImageToolAction(),
   new WeaveFrameToolAction(),

@@ -626,14 +626,18 @@ export class WeaveCommentNode<T> extends WeaveNode {
     const widthExpanded = this.config.style.expanded.width;
     const circlePaddingContracted = this.config.style.contracted.circlePadding;
 
+    const stage = this.instance.getStage();
+    const upscaleScale = stage.getAttr('upscaleScale');
+
     const internalCircleBigName = commentNode.findOne(
       `#${commentNode.id()}-circle-big-name`
     ) as Konva.Circle | undefined;
     const internalComment = commentNode.findOne(`#${commentNode.id()}-comment`);
 
     const heightExpanded =
-      (internalCircleBigName?.getClientRect().height ?? 0) +
-      (internalComment?.getClientRect().height ?? 0) +
+      ((internalCircleBigName?.getClientRect().height ?? 0) +
+        (internalComment?.getClientRect().height ?? 0)) *
+        upscaleScale +
       12;
 
     const background = commentNode.findOne(`#${commentNode.id()}-bg`);
@@ -799,8 +803,14 @@ export class WeaveCommentNode<T> extends WeaveNode {
       paddingY = this.config.style.viewing.paddingY;
     }
 
-    const x = stagePos.x + rect.x * scaleX + widthContracted + paddingX;
-    const y = stagePos.y + rect.y * scaleY + paddingY;
+    const upscaleScale = stage.getAttr('upscaleScale');
+    const x =
+      stagePos.x * upscaleScale +
+      rect.x * scaleX * upscaleScale +
+      widthContracted +
+      paddingX;
+    const y =
+      stagePos.y * upscaleScale + rect.y * scaleY * upscaleScale + paddingY;
 
     const position: Konva.Vector2d = { x, y };
 
@@ -863,10 +873,14 @@ export class WeaveCommentNode<T> extends WeaveNode {
   };
 
   private normalizeNodeSize(node: Konva.Node) {
+    const stage = this.instance.getStage();
+
+    const upscaleScale = stage.getAttr('upscaleScale');
+
     const abs = node.getAbsoluteScale();
     node.scale({
-      x: node.scaleX() / abs.x,
-      y: node.scaleY() / abs.y,
+      x: node.scaleX() / upscaleScale / abs.x,
+      y: node.scaleY() / upscaleScale / abs.y,
     });
 
     if (node instanceof Konva.Group) {
@@ -898,6 +912,12 @@ export class WeaveCommentNode<T> extends WeaveNode {
       commentAction: WEAVE_COMMENT_NODE_ACTION.VIEWING,
     });
 
+    if (
+      this.commentDomVisible &&
+      this.commentDomVisibleId === commentNode.id()
+    ) {
+      return;
+    }
     this.commentDomAction = WEAVE_COMMENT_NODE_ACTION.VIEWING;
     this.commentDomVisibleId = commentNode.id();
     this.commentDomVisible = true;
@@ -987,6 +1007,9 @@ export class WeaveCommentNode<T> extends WeaveNode {
       this.expandNode(commentNode as Konva.Group);
     }
 
+    this.commentDomVisible = false;
+    this.commentDomVisibleId = null;
+
     commentNode.setAttrs({
       commentAction: WEAVE_COMMENT_NODE_ACTION.IDLE,
     });
@@ -1005,15 +1028,9 @@ export class WeaveCommentNode<T> extends WeaveNode {
   }
 
   focusOn(nodeId: string, duration = 0.5) {
-    if (this.commentDomVisible && this.commentDomVisibleId) {
-      const commentNode = this.instance
-        .getStage()
-        .findOne(`#${this.commentDomVisibleId}`);
-      if (commentNode) {
-        this.closeCommentDOM(commentNode as WeaveElementInstance);
-        this.contractNode(commentNode as Konva.Group);
-      }
-    }
+    const stage = this.instance.getStage();
+    const stageActualX = stage.x();
+    const stageActualY = stage.y();
 
     const node = this.instance.getStage().findOne(`#${nodeId}`);
 
@@ -1033,6 +1050,21 @@ export class WeaveCommentNode<T> extends WeaveNode {
       // target position (pan so node is in center of viewport)
       const targetX = stageWidth / 2 - nodeCenterX * scale;
       const targetY = stageHeight / 2 - nodeCenterY * scale;
+
+      if (
+        this.commentDomVisible &&
+        this.commentDomVisibleId &&
+        (targetX !== stageActualX || targetY !== stageActualY)
+      ) {
+        const commentNode = this.instance
+          .getStage()
+          .findOne(`#${this.commentDomVisibleId}`);
+
+        if (commentNode) {
+          this.closeCommentDOM(commentNode as WeaveElementInstance);
+          this.contractNode(commentNode as Konva.Group);
+        }
+      }
 
       const tween = new Konva.Tween({
         node: stage,

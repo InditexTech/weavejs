@@ -1,4 +1,4 @@
-import { cn } from "@/content/docs/examples/manual-installation/lib/utils";
+import { cn } from "@/lib/utils";
 import { ReactNode } from "react";
 
 type TagColor =

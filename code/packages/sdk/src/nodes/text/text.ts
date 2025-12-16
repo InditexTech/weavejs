@@ -452,6 +452,8 @@ export class WeaveTextNode extends WeaveNode {
 
     window.weaveTextEditing[textNode.id()] = 'editing';
 
+    const upscaleScale = stage.getAttr('upscaleScale');
+
     // apply many styles to match text on canvas as close as possible
     // remember that text rendering on canvas and on the textarea can be different
     // and sometimes it is hard to make it 100% the same. But we will try...
@@ -470,8 +472,8 @@ export class WeaveTextNode extends WeaveNode {
       this.textAreaContainer.style.alignItems = 'end';
     }
     this.textAreaContainer.style.position = 'absolute';
-    this.textAreaContainer.style.top = position.y + 'px';
-    this.textAreaContainer.style.left = position.x + 'px';
+    this.textAreaContainer.style.top = position.y * upscaleScale + 'px';
+    this.textAreaContainer.style.left = position.x * upscaleScale + 'px';
 
     if (
       !textNode.getAttrs().layout ||
@@ -792,8 +794,6 @@ export class WeaveTextNode extends WeaveNode {
   }
 
   private triggerEditMode(textNode: Konva.Text) {
-    const stage = this.instance.getStage();
-
     this.editing = true;
 
     textNode.visible(false);
@@ -808,12 +808,9 @@ export class WeaveTextNode extends WeaveNode {
 
     const textPosition = textNode.absolutePosition();
 
-    const stageContainer = stage.container();
-    const stageRect = stageContainer.getBoundingClientRect();
-
     const areaPosition: Konva.Vector2d = {
-      x: stageRect.x + stageContainer.offsetLeft + textPosition.x,
-      y: stageRect.y + stageContainer.offsetTop + textPosition.y,
+      x: textPosition.x,
+      y: textPosition.y,
     };
 
     this.createTextAreaDOM(textNode, areaPosition);

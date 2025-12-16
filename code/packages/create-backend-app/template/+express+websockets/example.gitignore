@@ -30,8 +30,8 @@ vite.config.ts*
 .env*
 .npmrc
 
-images
-images-mimetype
-rooms
-temp
-public
+/images/
+/images-mimetype/
+/rooms
+/temp
+/public

@@ -1,27 +1,28 @@
-'use client';
+"use client";
 
-import React from 'react';
-import { ContextMenuRender } from '@/components/room-components/context-menu';
-import { useCollaborationRoom } from '@/store/store';
-import { RoomHeader } from '@/components/room-components/overlay/room-header';
-import { ToolsOverlay } from '@/components/room-components/overlay/tools-overlay';
-import { useWeave, useWeaveEvents } from '@inditextech/weave-react';
+import React from "react";
+import { ContextMenuRender } from "@/components/room-components/context-menu";
+import { useCollaborationRoom } from "@/store/store";
+import { RoomHeader } from "@/components/room-components/overlay/room-header";
+import { ToolsOverlay } from "@/components/room-components/overlay/tools-overlay";
+import { useWeave, useWeaveEvents } from "@inditextech/weave-react";
 import {
   WEAVE_INSTANCE_STATUS,
   WEAVE_STORE_CONNECTION_STATUS,
-} from '@inditextech/weave-types';
-import { Logo } from '../utils/logo';
-import { AnimatePresence, motion } from 'framer-motion';
-import { cn } from '@/lib/utils';
-import { ImagesLibrary } from '../room-components/images-library/images-library';
-import { FramesLibrary } from '../room-components/frames-library/frames-library';
-import { ColorTokensLibrary } from '../room-components/color-tokens-library/color-tokens-library';
-import { ElementsTree } from '../room-components/elements-tree/elements-tree';
-import { NodeProperties } from '../room-components/overlay/node-properties';
-import { SIDEBAR_ELEMENTS } from '@/lib/constants';
-import { WeaveActionPropsChangeEvent } from '@inditextech/weave-sdk';
-import useContextMenu from '../room-components/hooks/use-context-menu';
-import useCopyPaste from '../room-components/hooks/use-copy-paste';
+} from "@inditextech/weave-types";
+import { Logo } from "../utils/logo";
+import { AnimatePresence, motion } from "framer-motion";
+import { cn } from "@/lib/utils";
+import { ImagesLibrary } from "../room-components/images-library/images-library";
+import { FramesLibrary } from "../room-components/frames-library/frames-library";
+import { ColorTokensLibrary } from "../room-components/color-tokens-library/color-tokens-library";
+import { ElementsTree } from "../room-components/elements-tree/elements-tree";
+import { NodeProperties } from "../room-components/overlay/node-properties";
+import { SIDEBAR_ELEMENTS } from "@/lib/constants";
+import { WeaveActionPropsChangeEvent } from "@inditextech/weave-sdk";
+import useContextMenu from "../room-components/hooks/use-context-menu";
+import useCopyPaste from "../room-components/hooks/use-copy-paste";
+import { ExportConfigDialog } from "../room-components/overlay/export-config";
 
 export const RoomLayout = () => {
   useWeaveEvents();
@@ -33,36 +34,30 @@ export const RoomLayout = () => {
   const roomLoaded = useWeave((state) => state.room.loaded);
   const weaveConnectionStatus = useWeave((state) => state.connection.status);
 
-  const sidebarLeftActive = useCollaborationRoom(
-    (state) => state.sidebar.left.active
-  );
-  const sidebarRightActive = useCollaborationRoom(
-    (state) => state.sidebar.right.active
-  );
   const contextMenuShow = useCollaborationRoom(
-    (state) => state.contextMenu.show
+    (state) => state.contextMenu.show,
   );
   const contextMenuPosition = useCollaborationRoom(
-    (state) => state.contextMenu.position
+    (state) => state.contextMenu.position,
   );
   const contextMenuOptions = useCollaborationRoom(
-    (state) => state.contextMenu.options
+    (state) => state.contextMenu.options,
   );
   const setContextMenuShow = useCollaborationRoom(
-    (state) => state.setContextMenuShow
+    (state) => state.setContextMenuShow,
   );
   const transformingImage = useCollaborationRoom(
-    (state) => state.images.transforming
+    (state) => state.images.transforming,
   );
   const uploadingImage = useCollaborationRoom(
-    (state) => state.images.uploading
+    (state) => state.images.uploading,
   );
   const loadingImage = useCollaborationRoom((state) => state.images.loading);
   const setLoadingImage = useCollaborationRoom(
-    (state) => state.setLoadingImage
+    (state) => state.setLoadingImage,
   );
   const setNodePropertiesCreateProps = useCollaborationRoom(
-    (state) => state.setNodePropertiesCreateProps
+    (state) => state.setNodePropertiesCreateProps,
   );
 
   React.useEffect(() => {
@@ -78,8 +73,8 @@ export const RoomLayout = () => {
       stage.x(stage.width() / 2);
       stage.y(stage.height() / 2);
     } else {
-      instance.triggerAction('fitToScreenTool', {
-        previousAction: 'selectionTool',
+      instance.triggerAction("fitToScreenTool", {
+        previousAction: "selectionTool",
       });
     }
   }, [instance, status, roomLoaded]);
@@ -99,15 +94,15 @@ export const RoomLayout = () => {
       setLoadingImage(false);
     };
 
-    instance.addEventListener('onPropsChange', handlePropsChange);
-    instance.addEventListener('onImageLoadStart', handleImageLoadStart);
-    instance.addEventListener('onImageLoadEnd', handleImageLoadEnd);
+    instance.addEventListener("onPropsChange", handlePropsChange);
+    instance.addEventListener("onImageLoadStart", handleImageLoadStart);
+    instance.addEventListener("onImageLoadEnd", handleImageLoadEnd);
 
     return () => {
       if (instance) {
-        instance.removeEventListener('onPropsChange', handlePropsChange);
-        instance.removeEventListener('onImageLoadStart', handlePropsChange);
-        instance.removeEventListener('onImageLoadEnd', handlePropsChange);
+        instance.removeEventListener("onPropsChange", handlePropsChange);
+        instance.removeEventListener("onImageLoadStart", handlePropsChange);
+        instance.removeEventListener("onImageLoadEnd", handlePropsChange);
       }
     };
   }, [instance, setLoadingImage, setNodePropertiesCreateProps]);
@@ -128,53 +123,18 @@ export const RoomLayout = () => {
         }}
         className="w-full h-full flex flex-col relative overflow-hidden"
       >
-        <section
-          id="sidebar-left"
-          className={cn(
-            'bg-white absolute top-0 left-0 bottom-0 border-r border-[#c9c9c9] z-1 overflow-hidden',
-            {
-              ['w-0']: sidebarLeftActive === null,
-              ['w-[370px]']: sidebarLeftActive !== null,
-            }
-          )}
-        >
-          <AnimatePresence>
-            <ImagesLibrary key={SIDEBAR_ELEMENTS.images} />
-            <FramesLibrary key={SIDEBAR_ELEMENTS.frames} />
-            <ColorTokensLibrary key={SIDEBAR_ELEMENTS.colorTokens} />
-            <ElementsTree key={SIDEBAR_ELEMENTS.nodesTree} />
-            {weaveConnectionStatus !==
-              WEAVE_STORE_CONNECTION_STATUS.CONNECTED && (
-              <div className="absolute top-0 left-0 right-0 bottom-0">
-                <div className="w-full h-full bg-black/50 flex justify-center items-center pointer-events-none"></div>
-              </div>
-            )}
-          </AnimatePresence>
-        </section>
-        <section
-          className={cn(
-            'absolute top-0 left-0 right-0 bottom-0 flex z-0 overflow-hidden',
-            {
-              ['left-[370px]']: sidebarLeftActive !== null,
-              ['right-[370px]']: sidebarRightActive !== null,
-              ['w-[calc(100%-370px)]']:
-                sidebarLeftActive !== null || sidebarRightActive !== null,
-              ['w-[calc(100%-740px)]']:
-                sidebarLeftActive !== null && sidebarRightActive !== null,
-            }
-          )}
-        >
+        <section className="absolute w-[calc(100%-370px)] top-0 left-0 right-0 bottom-0 flex z-0 overflow-hidden">
           <RoomHeader />
           <div
             id="weave"
             tabIndex={0}
-            className={cn('w-full h-full relative overflow-hidden', {
-              ['pointer-events-none']:
+            className={cn("w-full h-full relative overflow-hidden", {
+              ["pointer-events-none"]:
                 weaveConnectionStatus !==
                   WEAVE_STORE_CONNECTION_STATUS.CONNECTED ||
                 status !== WEAVE_INSTANCE_STATUS.RUNNING ||
                 !roomLoaded,
-              ['pointer-events-auto']:
+              ["pointer-events-auto"]:
                 status === WEAVE_INSTANCE_STATUS.RUNNING && roomLoaded,
             })}
           ></div>
@@ -203,12 +163,6 @@ export const RoomLayout = () => {
                 position={contextMenuPosition}
                 options={contextMenuOptions}
               />
-              {/* <div className="absolute top-[104px] left-[12px] right-[12px] flex justify-center items-center pointer-events-none">
-                      <div className="max-w-[320px] text-center bg-transparent bg-white/50 p-1 font-inter font-light text-[10px] text-zinc-600">
-                        To pan the canvas, keep the mouse wheel or the space bar
-                        pressed while dragging or use the hand tool.
-                      </div>
-                    </div> */}
               <ToolsOverlay />
               {transformingImage && (
                 <div className="bg-black/25 flex justify-center items-center absolute top-0 left-0 right-0 bottom-0">
@@ -244,14 +198,14 @@ export const RoomLayout = () => {
         <section
           id="sidebar-right"
           className={cn(
-            'bg-white absolute top-0 right-0 bottom-0 border-l border-[#c9c9c9] z-0 overflow-hidden',
-            {
-              ['w-0']: sidebarRightActive === null,
-              ['w-[370px]']: sidebarRightActive !== null,
-            }
+            "w-[370px] bg-white absolute top-0 right-0 bottom-0 border-l border-[#c9c9c9] z-0 overflow-hidden",
           )}
         >
-          <NodeProperties />
+          <NodeProperties key={SIDEBAR_ELEMENTS.nodeProperties} />
+          <ImagesLibrary key={SIDEBAR_ELEMENTS.images} />
+          <FramesLibrary key={SIDEBAR_ELEMENTS.frames} />
+          <ColorTokensLibrary key={SIDEBAR_ELEMENTS.colorTokens} />
+          <ElementsTree />
           {weaveConnectionStatus !==
             WEAVE_STORE_CONNECTION_STATUS.CONNECTED && (
             <div className="absolute top-0 left-0 right-0 bottom-0">
@@ -259,6 +213,11 @@ export const RoomLayout = () => {
             </div>
           )}
         </section>
+        {status === WEAVE_INSTANCE_STATUS.RUNNING && roomLoaded && (
+          <>
+            <ExportConfigDialog />
+          </>
+        )}
       </motion.div>
     </AnimatePresence>
   );
