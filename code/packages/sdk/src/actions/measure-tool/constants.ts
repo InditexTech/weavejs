@@ -2,6 +2,8 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
+import type { WeaveMeasureToolProperties } from './types';
+
 export const MEASURE_TOOL_ACTION_NAME = 'measureTool';
 
 export const MEASURE_TOOL_STATE = {
@@ -10,3 +12,9 @@ export const MEASURE_TOOL_STATE = {
   ['SET_TO']: 'set_to',
   ['FINISHED']: 'finished',
 } as const;
+
+export const WEAVE_MEASURE_TOOL_DEFAULT_CONFIG: WeaveMeasureToolProperties = {
+  style: {
+    stroke: '#FF3366',
+  },
+};

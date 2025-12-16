@@ -8,18 +8,33 @@ import {
   type WeaveElementInstance,
 } from '@inditextech/weave-types';
 import { WeaveNode } from '../node';
-import { WEAVE_MEASURE_NODE_TYPE } from './constants';
+import {
+  WEAVE_MEASURE_NODE_DEFAULT_CONFIG,
+  WEAVE_MEASURE_NODE_TYPE,
+} from './constants';
 import type { WeaveNodesSelectionPluginOnNodesChangeEvent } from '@/plugins/nodes-selection/types';
 import type { WeaveNodesSelectionPlugin } from '@/plugins/nodes-selection/nodes-selection';
 import type { WeaveStageZoomPluginOnZoomChangeEvent } from '@/plugins/stage-zoom/types';
 import type { Vector2d } from 'konva/lib/types';
-
-const HANDLE_SPACE_SEPARATION_MULTIPLIER = 1.5;
-const HANDLE_NO_SPACE_SEPARATION_MULTIPLIER = 2.5;
+import type {
+  WeaveMeasureNodeParams,
+  WeaveMeasureNodeProperties,
+} from './types';
+import { mergeExceptArrays } from '@/utils';
 
 export class WeaveMeasureNode extends WeaveNode {
+  private readonly config: WeaveMeasureNodeProperties;
   protected nodeType: string = WEAVE_MEASURE_NODE_TYPE;
   protected handlePointCircleRadius: number = 6;
+
+  constructor(params?: Partial<WeaveMeasureNodeParams>) {
+    super();
+
+    this.config = mergeExceptArrays(
+      WEAVE_MEASURE_NODE_DEFAULT_CONFIG,
+      params?.config ?? {}
+    );
+  }
 
   onRender(props: WeaveElementAttributes): WeaveElementInstance {
     const measure = new Konva.Group({
@@ -28,15 +43,17 @@ export class WeaveMeasureNode extends WeaveNode {
       draggable: false,
     });
 
-    const color = props.color || '#FF3366';
     const fromPoint = props.fromPoint as { x: number; y: number };
     const toPoint = props.toPoint as { x: number; y: number };
     const separation = props.separation ?? 100;
     const orientation = props.orientation ?? -1;
-    const textPadding = props.textPadding ?? 20;
-    const separationPadding = props.separationPadding ?? 30;
     const unit = props.unit ?? 'cms';
     const unitPerPixel = props.unitPerPixel ?? 100;
+
+    const measureLine = this.config.style.measureLine;
+    const intersectionCircle = this.config.style.intersectionCircle;
+    const separationLine = this.config.style.separationLine;
+    const textConfig = this.config.style.text;
 
     // Perpendicular line to an imaginary line draw from 'fromPoint' to 'toPoint',
     // this perpendicular line is drawn from 'fromPoint' a given distance defined
@@ -45,7 +62,7 @@ export class WeaveMeasureNode extends WeaveNode {
       fromPoint,
       toPoint,
       fromPoint,
-      (separation + separationPadding) * orientation
+      (separation + separationLine.padding) * orientation
     );
 
     const linePerpFrom = new Konva.Line({
@@ -58,9 +75,9 @@ export class WeaveMeasureNode extends WeaveNode {
         fromFinalPerp.left.x,
         fromFinalPerp.left.y,
       ],
-      stroke: color,
-      strokeWidth: 1,
-      dash: [4, 4],
+      stroke: separationLine.stroke,
+      strokeWidth: separationLine.strokeWidth,
+      dash: separationLine.dash,
     });
 
     measure.add(linePerpFrom);
@@ -72,7 +89,7 @@ export class WeaveMeasureNode extends WeaveNode {
       fromPoint,
       toPoint,
       toPoint,
-      (separation + separationPadding) * orientation
+      (separation + separationLine.padding) * orientation
     );
 
     const linePerpTo = new Konva.Line({
@@ -80,9 +97,9 @@ export class WeaveMeasureNode extends WeaveNode {
       nodeId: props.id,
       nodeType: WEAVE_MEASURE_NODE_TYPE,
       points: [toPoint.x, toPoint.y, toFinalPerp.left.x, toFinalPerp.left.y],
-      stroke: color,
-      strokeWidth: 1,
-      dash: [4, 4],
+      stroke: separationLine.stroke,
+      strokeWidth: separationLine.strokeWidth,
+      dash: separationLine.dash,
     });
 
     measure.add(linePerpTo);
@@ -101,8 +118,8 @@ export class WeaveMeasureNode extends WeaveNode {
       nodeType: WEAVE_MEASURE_NODE_TYPE,
       x: fromPerp.left.x,
       y: fromPerp.left.y,
-      radius: 3,
-      fill: color,
+      radius: intersectionCircle.radius,
+      fill: intersectionCircle.fill,
     });
 
     measure.add(fromCircle);
@@ -121,8 +138,8 @@ export class WeaveMeasureNode extends WeaveNode {
       nodeType: WEAVE_MEASURE_NODE_TYPE,
       x: toPerp.left.x,
       y: toPerp.left.y,
-      radius: 3,
-      fill: color,
+      radius: intersectionCircle.radius,
+      fill: intersectionCircle.fill,
     });
 
     measure.add(toCircle);
@@ -139,11 +156,11 @@ export class WeaveMeasureNode extends WeaveNode {
       x: midPoint.x,
       y: midPoint.y,
       text,
-      fontFamily: 'monospace',
-      fontSize: 14,
+      fontFamily: textConfig.fontFamily,
+      fontSize: textConfig.fontSize,
       verticalAlign: 'middle',
       align: 'center',
-      fill: color,
+      fill: textConfig.fill,
     });
 
     const angle = this.getAngle(fromPoint, toPoint);
@@ -160,7 +177,7 @@ export class WeaveMeasureNode extends WeaveNode {
         fromPerp.left,
         toPerp.left,
         midPoint,
-        textSize.height * orientation
+        (textSize.height + separationLine.padding) * orientation
       );
       measureText.x(perpPointTextMid.left.x);
       measureText.y(perpPointTextMid.left.y);
@@ -175,7 +192,7 @@ export class WeaveMeasureNode extends WeaveNode {
       toPerp.left,
       textSize.width > this.distanceBetweenPoints(fromPerp.left, toPerp.left)
         ? 0
-        : textOffsetX + textPadding,
+        : textOffsetX + textConfig.padding,
       false
     );
 
@@ -186,7 +203,7 @@ export class WeaveMeasureNode extends WeaveNode {
       toPerp.left,
       textSize.width > this.distanceBetweenPoints(fromPerp.left, toPerp.left)
         ? 0
-        : textOffsetX + textPadding,
+        : textOffsetX + textConfig.padding,
       true
     );
 
@@ -202,8 +219,9 @@ export class WeaveMeasureNode extends WeaveNode {
         pointLeftText.x,
         pointLeftText.y,
       ],
-      stroke: color,
-      strokeWidth: 1,
+      dash: measureLine.dash,
+      stroke: measureLine.stroke,
+      strokeWidth: measureLine.strokeWidth,
     });
 
     // A line draw from the 'toPoint' perpendicular line circle center to the pointRightText
@@ -218,8 +236,9 @@ export class WeaveMeasureNode extends WeaveNode {
         toPerp.left.x,
         toPerp.left.y,
       ],
-      stroke: color,
-      strokeWidth: 1,
+      dash: measureLine.dash,
+      stroke: measureLine.stroke,
+      strokeWidth: measureLine.strokeWidth,
     });
 
     measure.add(measureText);
@@ -402,15 +421,14 @@ export class WeaveMeasureNode extends WeaveNode {
       (textSize?.width ?? 0) >
       this.distanceBetweenPoints(fromPerp.left, toPerp.left);
 
+    const multiplier = isTextBiggerThanMeasureSpace
+      ? this.config.style.handler.noSpaceSeparationMultiplier
+      : this.config.style.handler.spaceSeparationMultiplier;
     const separatorPoint = this.perpendicularPoint(
       fromPerp.left,
       toPerp.left,
       pointMidMeasure,
-      (isTextBiggerThanMeasureSpace
-        ? HANDLE_NO_SPACE_SEPARATION_MULTIPLIER
-        : HANDLE_SPACE_SEPARATION_MULTIPLIER) *
-        (textSize?.height ?? 0) *
-        orientation
+      multiplier * (textSize?.height ?? 0) * orientation
     );
 
     const moveSeparationRect = new Konva.Rect({
@@ -548,15 +566,15 @@ export class WeaveMeasureNode extends WeaveNode {
         (textSize?.width ?? 0) >
         this.distanceBetweenPoints(fromPerp.left, toPerp.left);
 
+      const multiplier = isTextBiggerThanMeasureSpace
+        ? this.config.style.handler.noSpaceSeparationMultiplier
+        : this.config.style.handler.spaceSeparationMultiplier;
+
       const separatorPoint = this.perpendicularPoint(
         fromPoint,
         toPoint,
         midPoint,
-        (isTextBiggerThanMeasureSpace
-          ? HANDLE_NO_SPACE_SEPARATION_MULTIPLIER
-          : HANDLE_SPACE_SEPARATION_MULTIPLIER) *
-          (textSize?.height ?? 0) *
-          orientation
+        multiplier * (textSize?.height ?? 0) * orientation
       );
 
       const pointInLine = this.projectPointToLine(
@@ -570,12 +588,7 @@ export class WeaveMeasureNode extends WeaveNode {
           fromPoint,
           toPoint,
           separatorPoint.left,
-          ((isTextBiggerThanMeasureSpace
-            ? HANDLE_NO_SPACE_SEPARATION_MULTIPLIER
-            : HANDLE_SPACE_SEPARATION_MULTIPLIER) *
-            (textSize?.height ?? 0) +
-            1) *
-            orientation
+          (multiplier * (textSize?.height ?? 0) + 1) * orientation
         );
         moveSeparationRect.position(point);
         originalSeparationHandlerPosition = point;
@@ -615,15 +628,15 @@ export class WeaveMeasureNode extends WeaveNode {
       const toPoint = node.getAttrs().toPoint as Konva.Vector2d;
       const midPoint = this.midPoint(fromPoint, toPoint);
 
+      const multiplier = isTextBiggerThanMeasureSpace
+        ? this.config.style.handler.noSpaceSeparationMultiplier
+        : this.config.style.handler.spaceSeparationMultiplier;
+
       const separatorPoint = this.perpendicularPoint(
         fromPoint,
         toPoint,
         midPoint,
-        (isTextBiggerThanMeasureSpace
-          ? HANDLE_NO_SPACE_SEPARATION_MULTIPLIER
-          : HANDLE_SPACE_SEPARATION_MULTIPLIER) *
-          (textSize?.height ?? 0) *
-          orientation
+        multiplier * (textSize?.height ?? 0) * orientation
       );
 
       const pointInLine = this.projectPointToLine(
@@ -729,15 +742,15 @@ export class WeaveMeasureNode extends WeaveNode {
         (textSize?.width ?? 0) >
         this.distanceBetweenPoints(fromPerp.left, toPerp.left);
 
+      const multiplier = isTextBiggerThanMeasureSpace
+        ? this.config.style.handler.noSpaceSeparationMultiplier
+        : this.config.style.handler.spaceSeparationMultiplier;
+
       const separatorPoint = this.perpendicularPoint(
         fromPerp.left,
         toPerp.left,
         pointMidMeasure,
-        (isTextBiggerThanMeasureSpace
-          ? HANDLE_NO_SPACE_SEPARATION_MULTIPLIER
-          : HANDLE_SPACE_SEPARATION_MULTIPLIER) *
-          (textSize?.height ?? 0) *
-          orientation
+        multiplier * (textSize?.height ?? 0) * orientation
       );
 
       moveSeparationRect.x(separatorPoint.left.x);
@@ -852,16 +865,17 @@ export class WeaveMeasureNode extends WeaveNode {
     const toPoint = nextProps.toPoint as { x: number; y: number };
     const separation = nextProps.separation ?? 100;
     const orientation = nextProps.orientation ?? -1;
-    const textPadding = nextProps.textPadding ?? 20;
-    const separationPadding = nextProps.separationPadding ?? 30;
     const unit = nextProps.unit ?? 'cms';
     const unitPerPixel = nextProps.unitPerPixel ?? 100;
+
+    const separationLine = this.config.style.separationLine;
+    const textConfig = this.config.style.text;
 
     const fromFinalPerp = this.perpendicularPoint(
       fromPoint,
       toPoint,
       fromPoint,
-      (separation + separationPadding) * orientation
+      (separation + separationLine.padding) * orientation
     );
 
     const linePerpFrom = measure.findOne(
@@ -878,7 +892,7 @@ export class WeaveMeasureNode extends WeaveNode {
       fromPoint,
       toPoint,
       toPoint,
-      (separation + separationPadding) * orientation
+      (separation + separationLine.padding) * orientation
     );
 
     const linePerpTo = measure.findOne(
@@ -948,7 +962,7 @@ export class WeaveMeasureNode extends WeaveNode {
         fromPerp.left,
         toPerp.left,
         midPoint,
-        textSize.height * orientation
+        (textSize.height + separationLine.padding) * orientation
       );
       measureText.x(perpPointTextMid.left.x);
       measureText.y(perpPointTextMid.left.y);
@@ -959,7 +973,7 @@ export class WeaveMeasureNode extends WeaveNode {
       toPerp.left,
       textSize.width > this.distanceBetweenPoints(fromPerp.left, toPerp.left)
         ? 0
-        : textOffsetX + textPadding,
+        : textOffsetX + textConfig.padding,
       false
     );
 
@@ -968,7 +982,7 @@ export class WeaveMeasureNode extends WeaveNode {
       toPerp.left,
       textSize.width > this.distanceBetweenPoints(fromPerp.left, toPerp.left)
         ? 0
-        : textOffsetX + textPadding,
+        : textOffsetX + textConfig.padding,
       true
     );
 
@@ -1027,24 +1041,20 @@ export class WeaveMeasureNode extends WeaveNode {
       const isTextBiggerThanMeasureSpace =
         textSize.width > this.distanceBetweenPoints(fromPerp.left, toPerp.left);
 
+      const multiplier = isTextBiggerThanMeasureSpace
+        ? this.config.style.handler.noSpaceSeparationMultiplier
+        : this.config.style.handler.spaceSeparationMultiplier;
+
       const separatorPoint = this.perpendicularPoint(
         fromPerp.left,
         toPerp.left,
         pointMidMeasure,
-        (isTextBiggerThanMeasureSpace
-          ? HANDLE_NO_SPACE_SEPARATION_MULTIPLIER
-          : HANDLE_SPACE_SEPARATION_MULTIPLIER) *
-          textSize.height *
-          orientation
+        multiplier * textSize.height * orientation
       );
 
       moveSeparationRect.x(separatorPoint.left.x);
       moveSeparationRect.y(separatorPoint.left.y);
       moveSeparationRect.rotation(angle);
-
-      // this.destroySelectionHandlers(measure);
-      // this.createSelectionHandlers(measure);
-      // this.updateSelectionHandlers(measure);
     }
   }
 

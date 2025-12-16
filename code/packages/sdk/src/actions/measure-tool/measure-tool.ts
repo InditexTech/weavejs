@@ -7,11 +7,25 @@ import { WeaveAction } from '@/actions/action';
 import Konva from 'konva';
 import { WeaveNodesSelectionPlugin } from '@/plugins/nodes-selection/nodes-selection';
 import { SELECTION_TOOL_ACTION_NAME } from '../selection-tool/constants';
-import type { WeaveMeasureToolActionState } from './types';
-import { MEASURE_TOOL_ACTION_NAME, MEASURE_TOOL_STATE } from './constants';
-import { moveNodeToContainer, type WeaveMeasureNode } from '@/index';
+import type {
+  WeaveMeasureToolActionState,
+  WeaveMeasureToolParams,
+  WeaveMeasureToolProperties,
+} from './types';
+import {
+  MEASURE_TOOL_ACTION_NAME,
+  MEASURE_TOOL_STATE,
+  WEAVE_MEASURE_TOOL_DEFAULT_CONFIG,
+} from './constants';
+import {
+  mergeExceptArrays,
+  moveNodeToContainer,
+  type WeaveMeasureNode,
+  type WeaveStageZoomPluginOnZoomChangeEvent,
+} from '@/index';
 
 export class WeaveMeasureToolAction extends WeaveAction {
+  private readonly config!: WeaveMeasureToolProperties;
   protected initialized: boolean = false;
   protected initialCursor: string | null = null;
   protected state: WeaveMeasureToolActionState;
@@ -20,15 +34,19 @@ export class WeaveMeasureToolAction extends WeaveAction {
   protected clickPoint: Konva.Vector2d | null;
   protected crosshairCursor: Konva.Group | null;
   protected firstPoint: Konva.Circle | null;
-  protected color: string = '#FF3366';
   protected measureLine: Konva.Line | null;
   protected measureContainer: Konva.Layer | Konva.Group | undefined;
   protected cancelAction!: () => void;
   onPropsChange = undefined;
   onInit = undefined;
 
-  constructor() {
+  constructor(params?: WeaveMeasureToolParams) {
     super();
+
+    this.config = mergeExceptArrays(
+      WEAVE_MEASURE_TOOL_DEFAULT_CONFIG,
+      params?.config ?? {}
+    );
 
     this.initialized = false;
     this.state = MEASURE_TOOL_STATE.IDLE;
@@ -50,12 +68,8 @@ export class WeaveMeasureToolAction extends WeaveAction {
     return {
       orientation: -1,
       separation: 0,
-      textPadding: 20,
-      separationPadding: 0,
-      unit: 'cms',
+      unit: 'cm',
       unitPerPixel: 10,
-      color: this.color,
-      strokeEnabled: false,
     };
   }
 
@@ -115,6 +129,19 @@ export class WeaveMeasureToolAction extends WeaveAction {
       tr.hide();
     }
 
+    this.instance.addEventListener<WeaveStageZoomPluginOnZoomChangeEvent>(
+      'onZoomChange',
+      () => {
+        if (this.crosshairCursor) {
+          const stage = this.instance.getStage();
+          this.crosshairCursor.scale({
+            x: 1 / stage.scaleX(),
+            y: 1 / stage.scaleY(),
+          });
+        }
+      }
+    );
+
     this.buildCrosshairCursor();
     this.setCursor();
     this.setFocusStage();
@@ -141,7 +168,7 @@ export class WeaveMeasureToolAction extends WeaveAction {
       points: [0, 0, crosshairSize, 0],
       x: -1 * (crosshairSize / 2),
       y: 0,
-      stroke: this.color,
+      stroke: this.config.style.stroke,
       strokeWidth: 1,
     });
 
@@ -149,7 +176,7 @@ export class WeaveMeasureToolAction extends WeaveAction {
       points: [0, 0, 0, crosshairSize],
       x: 0,
       y: (-1 * crosshairSize) / 2,
-      stroke: this.color,
+      stroke: this.config.style.stroke,
       strokeWidth: 1,
     });
 
@@ -193,7 +220,7 @@ export class WeaveMeasureToolAction extends WeaveAction {
       y: this.clickPoint?.y,
       points: [0, 0],
       scale: { x: 1 / stage.scaleX(), y: 1 / stage.scaleY() },
-      stroke: this.color,
+      stroke: this.config.style.stroke,
       dashed: [4, 4],
       strokeWidth: 1,
       listening: false,
