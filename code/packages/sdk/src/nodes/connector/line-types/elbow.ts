@@ -3,7 +3,27 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import type Konva from 'konva';
-import type { WeaveConnectorPointPosition } from './types.js';
+import type { WeaveConnectorPointPosition } from '../types.js';
+import { WEAVE_CONNECTOR_NODE_LINE_TYPE } from '../constants.js';
+
+export const setConnectorTypeElbow = (connector: Konva.Group) => {
+  const connectorLine = connector.findOne<Konva.Line>(
+    `#${connector.getAttrs().id}-line`
+  );
+
+  if (!connectorLine) {
+    return;
+  }
+
+  connectorLine.setAttrs({
+    bezier: false,
+  });
+
+  connector.setAttrs({
+    lineType: WEAVE_CONNECTOR_NODE_LINE_TYPE.ELBOW,
+    curvedControlPoint: undefined,
+  });
+};
 
 function createElbowPath(
   p1: Konva.Vector2d,
@@ -29,7 +49,7 @@ function createElbowPath(
       p2Pos &&
       ['top', 'bottom'].includes(p2Pos)
     ) {
-      return [p1, { x: p1.x, y: p1.y }, p2];
+      return [p1, { x: p2.x, y: p1.y }, p2];
     }
     if (
       p1Pos &&

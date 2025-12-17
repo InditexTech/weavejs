@@ -3,20 +3,88 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import type Konva from 'konva';
-import type { WeaveNodeTransformerProperties } from '@inditextech/weave-types';
-import type { WEAVE_CONNECTOR_NODE_LINE_TYPE } from './constants';
+import type {
+  DeepPartial,
+  WeaveNodeTransformerProperties,
+} from '@inditextech/weave-types';
+import type {
+  WEAVE_CONNECTOR_NODE_LINE_TYPE,
+  WEAVE_CONNECTOR_NODE_DECORATOR_TYPE,
+  WEAVE_CONNECTOR_NODE_DECORATOR_ORIGIN,
+} from './constants';
 
 export type WeaveConnectorLineTypeKeys =
   keyof typeof WEAVE_CONNECTOR_NODE_LINE_TYPE;
 export type WeaveConnectorLineType =
   (typeof WEAVE_CONNECTOR_NODE_LINE_TYPE)[WeaveConnectorLineTypeKeys];
 
-export type WeaveConnectorProperties = {
-  transform: WeaveNodeTransformerProperties;
+export type WeaveConnectorNodeDecoratorTypeKeys =
+  keyof typeof WEAVE_CONNECTOR_NODE_DECORATOR_TYPE;
+export type WeaveConnectorNodeDecoratorType =
+  (typeof WEAVE_CONNECTOR_NODE_DECORATOR_TYPE)[WeaveConnectorNodeDecoratorTypeKeys];
+
+export type WeaveConnectorNodeDecoratorOriginKeys =
+  keyof typeof WEAVE_CONNECTOR_NODE_DECORATOR_ORIGIN;
+export type WeaveConnectorNodeDecoratorOrigin =
+  (typeof WEAVE_CONNECTOR_NODE_DECORATOR_ORIGIN)[WeaveConnectorNodeDecoratorOriginKeys];
+
+export type WeaveConnectorNodeProperties = {
+  style: {
+    line: {
+      stroke: string;
+      strokeWidth: number;
+      tension: number;
+      lineCap: 'butt' | 'round' | 'square';
+      lineJoin: 'bevel' | 'round' | 'miter';
+      dash: number[];
+      hitStrokeWidth: number;
+    };
+    anchorNode: {
+      radius: number;
+      stroke: string;
+      strokeWidth: number;
+      anchoredFill: string;
+      hoveredFill: string;
+      fill: string;
+    };
+    pointsHandler: {
+      radius: number;
+      stroke: string;
+      strokeWidth: number;
+      fill: string;
+    };
+    curvedControl: {
+      radius: number;
+      stroke: string;
+      strokeWidth: number;
+      fill: string;
+    };
+    dot: {
+      radius: number;
+      stroke: string;
+      strokeWidth: number;
+    };
+    arrow: {
+      size: number;
+      stroke: string;
+      strokeWidth: number;
+    };
+    selection: {
+      color: string;
+    };
+  };
+  handlerSnapping: {
+    activateThreshold: number;
+    releaseThreshold: number;
+  };
+  lineType: WeaveConnectorLineType;
+  startNodeDecoratorType: WeaveConnectorNodeDecoratorType;
+  endNodeDecoratorType: WeaveConnectorNodeDecoratorType;
+  transform?: WeaveNodeTransformerProperties;
 };
 
 export type WeaveConnectorNodeParams = {
-  config: Partial<WeaveConnectorProperties>;
+  config: DeepPartial<WeaveConnectorNodeProperties>;
 };
 
 export type WeaveConnectorAnchor = {

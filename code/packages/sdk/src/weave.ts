@@ -56,7 +56,6 @@ import type { WeaveStoreOnRoomLoadedEvent } from './stores/types';
 import type { DOMElement, WeaveAsyncElement } from './types';
 import { watchMap } from './watch-map';
 import { getBoundingBox, mergeExceptArrays } from './utils';
-import type { WeaveConnectorNode } from './nodes/connector/connector';
 
 export class Weave {
   private id: string;
@@ -83,6 +82,9 @@ export class Weave {
   private pluginsManager: WeavePluginsManager;
   private actionsManager: WeaveActionsManager;
   private exportManager: WeaveExportManager;
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  private registeredHooks: Map<string, (params: any) => void> = new Map();
 
   private readonly asyncElements: Map<string, WeaveAsyncElement>;
 
@@ -575,14 +577,16 @@ export class Weave {
     this.stateTransactional(() => {
       this.stateManager.removeNode(node);
 
-      const connectorHandler =
-        this.getNodeHandler<WeaveConnectorNode>('connector');
-
-      const nodeInstance = this.getStage().findOne(`#${node.key}`);
-
-      if (connectorHandler && nodeInstance) {
-        connectorHandler.nodeRemovedTN(nodeInstance);
-      }
+      this.runPhaseHooks<{
+        node: Konva.Node;
+      }>('onRemoveNode', (hook) => {
+        const nodeInstance = this.getStage().findOne(`#${node.key}`);
+        if (nodeInstance) {
+          hook({
+            node: nodeInstance,
+          });
+        }
+      });
 
       const selectionPlugin =
         this.getPlugin<WeaveNodesSelectionPlugin>('nodesSelection');
@@ -595,14 +599,16 @@ export class Weave {
   removeNodeNT(node: WeaveStateElement): void {
     this.stateManager.removeNode(node);
 
-    const connectorHandler =
-      this.getNodeHandler<WeaveConnectorNode>('connector');
-
-    const nodeInstance = this.getStage().findOne(`#${node.key}`);
-
-    if (connectorHandler && nodeInstance) {
-      connectorHandler.nodeRemovedTN(nodeInstance);
-    }
+    this.runPhaseHooks<{
+      node: Konva.Node;
+    }>('onRemoveNode', (hook) => {
+      const nodeInstance = this.getStage().findOne(`#${node.key}`);
+      if (nodeInstance) {
+        hook({
+          node: nodeInstance,
+        });
+      }
+    });
 
     const selectionPlugin =
       this.getPlugin<WeaveNodesSelectionPlugin>('nodesSelection');
@@ -1057,5 +1063,33 @@ export class Weave {
 
   public isServerSide(): boolean {
     return globalThis._weave_isServerSide === true;
+  }
+
+  registerHook<T>(hookName: string, hook: (params: T) => void): void {
+    const exists = this.registeredHooks.has(hookName);
+    if (!exists) {
+      this.registeredHooks.set(hookName, hook);
+    }
+  }
+
+  runPhaseHooks<T>(
+    phaseName: string,
+    execution: (hook: (params: T) => void) => void
+  ): void {
+    const hooks = [...this.registeredHooks.keys()]
+      .filter((key) => key.startsWith(`${phaseName}:`))
+      .map((key) => this.registeredHooks.get(key) as (params: T) => void);
+
+    for (const hook of hooks) {
+      execution(hook);
+    }
+  }
+
+  getHook<T>(hookName: string): T | undefined {
+    return this.registeredHooks.get(hookName) as T;
+  }
+
+  unregisterHook(hookName: string): void {
+    this.registeredHooks.delete(hookName);
   }
 }

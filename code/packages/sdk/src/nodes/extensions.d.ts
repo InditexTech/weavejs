@@ -52,6 +52,7 @@ declare module 'konva/lib/Node' {
     handleMouseout(): void;
     handleSelectNode(): void;
     handleDeselectNode(): void;
+    canBeHovered(): boolean;
     canMoveToContainer(node: Konva.Node): boolean;
   }
   interface Layer {

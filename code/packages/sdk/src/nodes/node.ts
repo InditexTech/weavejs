@@ -138,6 +138,9 @@ export abstract class WeaveNode implements WeaveNodeBase {
     node.handleMouseout = function () {};
     node.handleSelectNode = function () {};
     node.handleDeselectNode = function () {};
+    node.canBeHovered = function () {
+      return true;
+    };
     node.canMoveToContainer = function () {
       return true;
     };
@@ -185,10 +188,10 @@ export abstract class WeaveNode implements WeaveNodeBase {
       return;
     }
 
-    if (node.getAttrs().nodeType === 'connector') {
-      selectionPlugin.getHoverTransformer().nodes([]);
-    } else {
+    if (node.canBeHovered()) {
       selectionPlugin.getHoverTransformer().nodes([node]);
+    } else {
+      selectionPlugin.getHoverTransformer().nodes([]);
     }
 
     selectionPlugin.getHoverTransformer().moveToTop();
@@ -568,6 +571,14 @@ export abstract class WeaveNode implements WeaveNodeBase {
                     newContainer: containerToMove,
                   }
                 );
+
+                this.instance.runPhaseHooks<{
+                  nodes: Konva.Node[];
+                }>('onMoveNodesToContainer', (hook) => {
+                  hook({
+                    nodes: [realNodeTarget],
+                  });
+                });
               }
             }
 

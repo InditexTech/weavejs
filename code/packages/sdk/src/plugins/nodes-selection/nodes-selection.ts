@@ -559,6 +559,14 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
             this.instance.updateNodesNT(toUpdate);
           }
 
+          this.instance.runPhaseHooks<{
+            nodes: Konva.Node[];
+          }>('onMoveNodesToContainer', (hook) => {
+            hook({
+              nodes: selectedNodes,
+            });
+          });
+
           stage.container().style.cursor = actualCursor;
 
           const finalSelectedNodes: Konva.Node[] = [];
