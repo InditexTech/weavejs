@@ -341,7 +341,13 @@ export class WeaveLineToolAction extends WeaveAction {
 
     this.tempLineNode?.destroy();
 
-    if (this.lineId && this.tempMainLineNode?.points().length === 4) {
+    let nodeCreated = false;
+
+    if (
+      this.lineId &&
+      this.tempMainLineNode?.points().length === 4 &&
+      !this.tempMainLineNode?.points().every((coord) => coord === 0)
+    ) {
       const nodeHandler = this.instance.getNodeHandler<WeaveLineNode>('line');
 
       if (nodeHandler) {
@@ -356,12 +362,14 @@ export class WeaveLineToolAction extends WeaveAction {
         this.instance.addNode(node, this.container?.getAttrs().id);
 
         this.instance.emitEvent<undefined>('onAddedLine');
+
+        nodeCreated = true;
       }
     }
 
     const selectionPlugin =
       this.instance.getPlugin<WeaveNodesSelectionPlugin>('nodesSelection');
-    if (selectionPlugin) {
+    if (nodeCreated && selectionPlugin) {
       const node = stage.findOne(`#${this.lineId}`);
       if (node) {
         selectionPlugin.setSelectedNodes([node]);

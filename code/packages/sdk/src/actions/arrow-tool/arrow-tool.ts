@@ -185,9 +185,9 @@ export class WeaveArrowToolAction extends WeaveAction {
         y: this.clickPoint?.y ?? 0,
         radius: 5 / stage.scaleX(),
         strokeScaleEnabled: true,
-        stroke: '#cccccc',
-        strokeWidth: 0,
-        fill: '#cccccc',
+        stroke: '#000000',
+        strokeWidth: 1,
+        fill: '#ffffff',
       });
       this.measureContainer?.add(this.tempPoint);
 
@@ -206,11 +206,14 @@ export class WeaveArrowToolAction extends WeaveAction {
         y: this.clickPoint?.y ?? 0,
         radius: 5 / stage.scaleX(),
         strokeScaleEnabled: true,
-        stroke: '#cccccc',
-        strokeWidth: 0,
-        fill: '#cccccc',
+        stroke: '#000000',
+        strokeWidth: 1,
+        fill: '#ffffff',
       });
       this.measureContainer?.add(this.tempNextPoint);
+
+      this.tempPoint.moveToTop();
+      this.tempNextPoint.moveToTop();
 
       this.setState(ARROW_TOOL_STATE.DEFINING_SIZE);
     }
