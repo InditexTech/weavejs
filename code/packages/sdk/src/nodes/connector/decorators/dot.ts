@@ -11,7 +11,7 @@ import {
   WEAVE_CONNECTOR_NODE_DECORATOR_ORIGIN,
   WEAVE_CONNECTOR_NODE_LINE_TYPE,
 } from '../constants';
-import { getAngleDeg, movePointParallelToLine } from '../utils';
+import { getAngleDeg, positionDecorator } from '../utils';
 
 export const setupNodeDecoratorDot = (
   config: WeaveConnectorNodeProperties,
@@ -23,8 +23,6 @@ export const setupNodeDecoratorDot = (
 
   const lineType =
     connectorAttrs.lineType ?? WEAVE_CONNECTOR_NODE_LINE_TYPE.STRAIGHT;
-
-  const linePoints = line.points();
 
   let actualDecorator = connector.findOne(
     `#${connector.getAttrs().id}-${origin}NodeDecorator`
@@ -109,110 +107,13 @@ export const setupNodeDecoratorDot = (
         : toPoint.y ?? 0,
   });
 
-  const moveDistance = radius;
-
-  let moveOrigin = fromPoint;
-  let moveTarget = toPoint;
-  if (
-    WEAVE_CONNECTOR_NODE_LINE_TYPE.STRAIGHT === lineType &&
-    origin === WEAVE_CONNECTOR_NODE_DECORATOR_ORIGIN.START
-  ) {
-    moveOrigin = fromPoint;
-    moveTarget = toPoint;
-  }
-  if (
-    WEAVE_CONNECTOR_NODE_LINE_TYPE.STRAIGHT === lineType &&
-    origin === WEAVE_CONNECTOR_NODE_DECORATOR_ORIGIN.END
-  ) {
-    moveOrigin = toPoint;
-    moveTarget = fromPoint;
-  }
-  if (
-    WEAVE_CONNECTOR_NODE_LINE_TYPE.ELBOW === lineType &&
-    origin === WEAVE_CONNECTOR_NODE_DECORATOR_ORIGIN.START
-  ) {
-    moveOrigin = fromPoint;
-    moveTarget = {
-      x: line.x() + linePoints[2],
-      y: line.y() + linePoints[3],
-    };
-  }
-  if (
-    WEAVE_CONNECTOR_NODE_LINE_TYPE.ELBOW === lineType &&
-    origin === WEAVE_CONNECTOR_NODE_DECORATOR_ORIGIN.END
-  ) {
-    moveOrigin = toPoint;
-    moveTarget = {
-      x: line.x() + linePoints[linePoints.length - 4],
-      y: line.y() + linePoints[linePoints.length - 3],
-    };
-  }
-  if (
-    WEAVE_CONNECTOR_NODE_LINE_TYPE.CURVED === lineType &&
-    origin === WEAVE_CONNECTOR_NODE_DECORATOR_ORIGIN.START
-  ) {
-    moveOrigin = fromPoint;
-    moveTarget = controlPoint;
-  }
-  if (
-    WEAVE_CONNECTOR_NODE_LINE_TYPE.CURVED === lineType &&
-    origin === WEAVE_CONNECTOR_NODE_DECORATOR_ORIGIN.END
-  ) {
-    moveOrigin = toPoint;
-    moveTarget = controlPoint;
-  }
-
-  const movedPosition = movePointParallelToLine(
-    moveOrigin,
-    moveTarget,
-    moveOrigin,
-    moveDistance
+  positionDecorator(
+    fromPoint,
+    toPoint,
+    radius,
+    connector,
+    line,
+    origin,
+    actualDecorator
   );
-  const movedPosition2 = movePointParallelToLine(
-    moveOrigin,
-    moveTarget,
-    moveOrigin,
-    moveDistance * 2
-  );
-  actualDecorator.x(movedPosition.x);
-  actualDecorator.y(movedPosition.y);
-
-  const decoratorSelector = connector.findOne(
-    `#${connector.getAttrs().id}-${origin}NodeDecorator-selectionClone`
-  );
-
-  decoratorSelector?.setAttrs({
-    x: actualDecorator.x(),
-    y: actualDecorator.y(),
-    rotation: actualDecorator.rotation(),
-  });
-
-  const selectionLine = connector.findOne<Konva.Line>(
-    `#${connector.getAttrs().id}-selectionClone`
-  );
-
-  const clonedPoints = [...linePoints];
-  if (origin === WEAVE_CONNECTOR_NODE_DECORATOR_ORIGIN.START) {
-    clonedPoints[0] = movedPosition2.x - movedPosition.x;
-    clonedPoints[1] = movedPosition2.y - movedPosition.y;
-    clonedPoints[clonedPoints.length - 2] = linePoints[linePoints.length - 2];
-    clonedPoints[clonedPoints.length - 1] = linePoints[linePoints.length - 1];
-  }
-  if (origin === WEAVE_CONNECTOR_NODE_DECORATOR_ORIGIN.END) {
-    clonedPoints[0] = linePoints[0];
-    clonedPoints[1] = linePoints[1];
-    clonedPoints[clonedPoints.length - 2] =
-      clonedPoints[clonedPoints.length - 2] +
-      (movedPosition2.x - movedPosition.x);
-    clonedPoints[clonedPoints.length - 1] =
-      clonedPoints[clonedPoints.length - 1] +
-      (movedPosition2.y - movedPosition.y);
-  }
-
-  line?.setAttrs({
-    points: clonedPoints,
-  });
-  selectionLine?.setAttrs({
-    points: clonedPoints,
-  });
 };
