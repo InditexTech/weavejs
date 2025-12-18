@@ -31,12 +31,8 @@ export const setupNodeDecoratorDot = (
   ) as Konva.Circle | undefined;
 
   const fromPoint = {
-    x:
-      connector.getAttrs().startAnchorPosition.x -
-      connector.getAttrs().startAnchorPosition.x,
-    y:
-      connector.getAttrs().startAnchorPosition.y -
-      connector.getAttrs().startAnchorPosition.y,
+    x: 0,
+    y: 0,
   };
   const toPoint = {
     x:
