@@ -317,6 +317,10 @@ export class WeaveMeasureNode extends WeaveNode {
 
     this.setupDefaultNodeEvents(measure);
 
+    measure.getNodeAnchors = function () {
+      return [];
+    };
+
     return measure;
   }
 

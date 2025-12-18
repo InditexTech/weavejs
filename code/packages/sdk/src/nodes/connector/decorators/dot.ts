@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: 2025 2025 INDUSTRIA DE DISEÑO TEXTIL S.A. (INDITEX S.A.)
+// // SPDX-FileCopyrightText: 2025 2025 INDUSTRIA DE DISEÑO TEXTIL S.A. (INDITEX S.A.)
 //
 // SPDX-License-Identifier: Apache-2.0
 
@@ -26,34 +26,25 @@ export const setupNodeDecoratorDot = (
 
   const linePoints = line.points();
 
-  const position = {
-    x:
-      line.x() +
-      linePoints[
-        origin === WEAVE_CONNECTOR_NODE_DECORATOR_ORIGIN.START
-          ? 0
-          : linePoints.length - 2
-      ],
-    y:
-      line.y() +
-      linePoints[
-        origin === WEAVE_CONNECTOR_NODE_DECORATOR_ORIGIN.START
-          ? 1
-          : linePoints.length - 1
-      ],
-  };
-
   let actualDecorator = connector.findOne(
     `#${connector.getAttrs().id}-${origin}NodeDecorator`
   ) as Konva.Circle;
 
   const fromPoint = {
-    x: line.x() + linePoints[0],
-    y: line.y() + linePoints[1],
+    x:
+      connector.getAttrs().startAnchorPosition.x -
+      connector.getAttrs().startAnchorPosition.x,
+    y:
+      connector.getAttrs().startAnchorPosition.y -
+      connector.getAttrs().startAnchorPosition.y,
   };
   const toPoint = {
-    x: line.x() + linePoints[linePoints.length - 2],
-    y: line.y() + linePoints[linePoints.length - 1],
+    x:
+      connector.getAttrs().endAnchorPosition.x -
+      connector.getAttrs().startAnchorPosition.x,
+    y:
+      connector.getAttrs().endAnchorPosition.y -
+      connector.getAttrs().startAnchorPosition.y,
   };
   const controlPoint = {
     x: connector.getAttrs()?.curvedControlPoint?.x ?? 0,
@@ -65,13 +56,13 @@ export const setupNodeDecoratorDot = (
     lineType === WEAVE_CONNECTOR_NODE_LINE_TYPE.CURVED &&
     origin === WEAVE_CONNECTOR_NODE_DECORATOR_ORIGIN.START
   ) {
-    angleDeg = getAngleDeg(position, controlPoint);
+    angleDeg = getAngleDeg(fromPoint, controlPoint);
   }
   if (
     lineType === WEAVE_CONNECTOR_NODE_LINE_TYPE.CURVED &&
     origin === WEAVE_CONNECTOR_NODE_DECORATOR_ORIGIN.END
   ) {
-    angleDeg = getAngleDeg(controlPoint, position);
+    angleDeg = getAngleDeg(controlPoint, toPoint);
   }
 
   const fill =
@@ -87,8 +78,14 @@ export const setupNodeDecoratorDot = (
   if (!actualDecorator) {
     const decorator = new Konva.Circle({
       id: `${connector.getAttrs().id}-${origin}NodeDecorator`,
-      x: position?.x ?? 0,
-      y: position?.y ?? 0,
+      x:
+        origin === WEAVE_CONNECTOR_NODE_DECORATOR_ORIGIN.START
+          ? fromPoint.x ?? 0
+          : toPoint.x ?? 0,
+      y:
+        origin === WEAVE_CONNECTOR_NODE_DECORATOR_ORIGIN.START
+          ? fromPoint.y ?? 0
+          : toPoint.y ?? 0,
       stroke,
       strokeWidth,
       radius,
@@ -102,8 +99,17 @@ export const setupNodeDecoratorDot = (
     actualDecorator = decorator;
   } else {
     actualDecorator.setAttrs({
-      x: position?.x ?? 0,
-      y: position?.y ?? 0,
+      stroke,
+      strokeWidth,
+      radius,
+      x:
+        origin === WEAVE_CONNECTOR_NODE_DECORATOR_ORIGIN.START
+          ? fromPoint.x ?? 0
+          : toPoint.x ?? 0,
+      y:
+        origin === WEAVE_CONNECTOR_NODE_DECORATOR_ORIGIN.START
+          ? fromPoint.y ?? 0
+          : toPoint.y ?? 0,
     });
   }
 
@@ -129,7 +135,7 @@ export const setupNodeDecoratorDot = (
     WEAVE_CONNECTOR_NODE_LINE_TYPE.ELBOW === lineType &&
     origin === WEAVE_CONNECTOR_NODE_DECORATOR_ORIGIN.START
   ) {
-    moveOrigin = position;
+    moveOrigin = fromPoint;
     moveTarget = {
       x: line.x() + linePoints[2],
       y: line.y() + linePoints[3],
@@ -139,22 +145,38 @@ export const setupNodeDecoratorDot = (
     WEAVE_CONNECTOR_NODE_LINE_TYPE.ELBOW === lineType &&
     origin === WEAVE_CONNECTOR_NODE_DECORATOR_ORIGIN.END
   ) {
-    moveOrigin = position;
+    moveOrigin = toPoint;
     moveTarget = {
       x: line.x() + linePoints[linePoints.length - 4],
       y: line.y() + linePoints[linePoints.length - 3],
     };
   }
-  if (WEAVE_CONNECTOR_NODE_LINE_TYPE.CURVED === lineType) {
-    moveOrigin = position;
+  if (
+    WEAVE_CONNECTOR_NODE_LINE_TYPE.CURVED === lineType &&
+    origin === WEAVE_CONNECTOR_NODE_DECORATOR_ORIGIN.START
+  ) {
+    moveOrigin = fromPoint;
+    moveTarget = controlPoint;
+  }
+  if (
+    WEAVE_CONNECTOR_NODE_LINE_TYPE.CURVED === lineType &&
+    origin === WEAVE_CONNECTOR_NODE_DECORATOR_ORIGIN.END
+  ) {
+    moveOrigin = toPoint;
     moveTarget = controlPoint;
   }
 
   const movedPosition = movePointParallelToLine(
     moveOrigin,
     moveTarget,
-    position,
+    moveOrigin,
     moveDistance
+  );
+  const movedPosition2 = movePointParallelToLine(
+    moveOrigin,
+    moveTarget,
+    moveOrigin,
+    moveDistance * 2
   );
   actualDecorator.x(movedPosition.x);
   actualDecorator.y(movedPosition.y);
@@ -167,5 +189,34 @@ export const setupNodeDecoratorDot = (
     x: actualDecorator.x(),
     y: actualDecorator.y(),
     rotation: actualDecorator.rotation(),
+  });
+
+  const selectionLine = connector.findOne<Konva.Line>(
+    `#${connector.getAttrs().id}-selectionClone`
+  );
+
+  const clonedPoints = [...linePoints];
+  if (origin === WEAVE_CONNECTOR_NODE_DECORATOR_ORIGIN.START) {
+    clonedPoints[0] = movedPosition2.x - movedPosition.x;
+    clonedPoints[1] = movedPosition2.y - movedPosition.y;
+    clonedPoints[clonedPoints.length - 2] = linePoints[linePoints.length - 2];
+    clonedPoints[clonedPoints.length - 1] = linePoints[linePoints.length - 1];
+  }
+  if (origin === WEAVE_CONNECTOR_NODE_DECORATOR_ORIGIN.END) {
+    clonedPoints[0] = linePoints[0];
+    clonedPoints[1] = linePoints[1];
+    clonedPoints[clonedPoints.length - 2] =
+      clonedPoints[clonedPoints.length - 2] +
+      (movedPosition2.x - movedPosition.x);
+    clonedPoints[clonedPoints.length - 1] =
+      clonedPoints[clonedPoints.length - 1] +
+      (movedPosition2.y - movedPosition.y);
+  }
+
+  line?.setAttrs({
+    points: clonedPoints,
+  });
+  selectionLine?.setAttrs({
+    points: clonedPoints,
   });
 };

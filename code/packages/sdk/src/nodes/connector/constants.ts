@@ -38,7 +38,7 @@ export const WEAVE_CONNECTOR_NODE_DEFAULT_CONFIG: WeaveConnectorNodeProperties =
         strokeWidth: 1,
         tension: 0,
         lineCap: 'butt',
-        lineJoin: 'bevel',
+        lineJoin: 'miter',
         dash: [],
         hitStrokeWidth: 10,
       },

@@ -147,14 +147,16 @@ export class WeaveConnectorToolAction extends WeaveAction {
         this.state === CONNECTOR_TOOL_STATE.SELECTING_FINAL &&
         this.tempLineNode
       ) {
-        const { mousePoint } = this.instance.getMousePointer();
+        const stageMousePoint = this.instance
+          .getStage()
+          .getRelativePointerPosition();
 
         this.tempLineNode.setAttrs({
           points: [
             this.tempLineNode.points()[0],
             this.tempLineNode.points()[1],
-            mousePoint.x - this.tempLineNode.x(),
-            mousePoint.y - this.tempLineNode.y(),
+            stageMousePoint!.x - this.tempLineNode.x(),
+            stageMousePoint!.y - this.tempLineNode.y(),
           ],
         });
       }
@@ -174,13 +176,16 @@ export class WeaveConnectorToolAction extends WeaveAction {
 
       if (this.state === CONNECTOR_TOOL_STATE.SELECTING_INITIAL) {
         const { mousePoint } = this.instance.getMousePointer();
+        const stageMousePoint = this.instance
+          .getStage()
+          .getRelativePointerPosition();
 
         const radius = 7;
 
         this.tempLineNode = new Konva.Line({
           strokeScaleEnabled: true,
-          x: mousePoint.x,
-          y: mousePoint.y,
+          x: stageMousePoint!.x,
+          y: stageMousePoint!.y,
           points: [0, 0],
           stroke: '#000000',
           strokeWidth: 1,
@@ -277,11 +282,24 @@ export class WeaveConnectorToolAction extends WeaveAction {
   }
 
   private saveConnector() {
+    const stage = this.instance.getStage();
+
     if (!this.startPoint && !(this.startNodeId && this.startNodeAnchor)) {
       return;
     }
 
     if (!this.endPoint && !(this.endNodeId && this.endNodeAnchor)) {
+      return;
+    }
+
+    const startNode = stage.findOne(`#${this.startNodeId}`);
+    const endNode = stage.findOne(`#${this.endNodeId}`);
+
+    if (
+      startNode?.getParent()?.getAttrs().id !==
+      endNode?.getParent()?.getAttrs().id
+    ) {
+      this.cancelAction();
       return;
     }
 
@@ -405,84 +423,8 @@ export class WeaveConnectorToolAction extends WeaveAction {
     return this.instance.getPlugin<WeaveNodesSelectionPlugin>('nodesSelection');
   }
 
-  protected getNodeAnchors(
-    node: Konva.Node,
-    parent: Konva.Node
-  ): { name: string; point: Konva.Vector2d }[] {
-    const stage = this.instance.getStage();
-
-    let nodeParent: Konva.Node | null | undefined = parent;
-    if (nodeParent?.getAttrs().nodeId) {
-      nodeParent = stage.findOne(`#${nodeParent.getAttrs().nodeId}`);
-    }
-
-    let isInContainer = false;
-    if (nodeParent !== this.instance.getMainLayer()) {
-      isInContainer = true;
-    }
-
-    const localBox = node.getClientRect({
-      relativeTo: stage,
-      skipTransform: true,
-    });
-
-    const transform = node.getAbsoluteTransform();
-
-    // Compute the four absolute corners of the box
-    const corners = [
-      { x: localBox.x, y: localBox.y },
-      { x: localBox.x + localBox.width, y: localBox.y },
-      { x: localBox.x + localBox.width, y: localBox.y + localBox.height },
-      { x: localBox.x, y: localBox.y + localBox.height },
-    ].map((p) => transform.point(p));
-
-    const anchors = [];
-
-    const topMid = {
-      x: (corners[0].x + corners[1].x) / 2,
-      y: (corners[0].y + corners[1].y) / 2,
-    };
-    const rightMid = {
-      x: (corners[1].x + corners[2].x) / 2,
-      y: (corners[1].y + corners[2].y) / 2,
-    };
-    const bottomMid = {
-      x: (corners[2].x + corners[3].x) / 2,
-      y: (corners[2].y + corners[3].y) / 2,
-    };
-    const leftMid = {
-      x: (corners[3].x + corners[0].x) / 2,
-      y: (corners[3].y + corners[0].y) / 2,
-    };
-
-    if (isInContainer && nodeParent) {
-      const containerAbsPos = nodeParent.position();
-      topMid.x += containerAbsPos.x || 0;
-      topMid.y += containerAbsPos.y || 0;
-      rightMid.x += containerAbsPos.x || 0;
-      rightMid.y += containerAbsPos.y || 0;
-      bottomMid.x += containerAbsPos.x || 0;
-      bottomMid.y += containerAbsPos.y || 0;
-      leftMid.x += containerAbsPos.x || 0;
-      leftMid.y += containerAbsPos.y || 0;
-    }
-
-    anchors.push({ name: 'top', point: topMid });
-    anchors.push({ name: 'right', point: rightMid });
-    anchors.push({ name: 'bottom', point: bottomMid });
-    anchors.push({ name: 'left', point: leftMid });
-
-    return anchors;
-  }
-
   protected showConnectorAnchors(node: Konva.Node): void {
-    if (node.getAttrs().nodeType === 'connector') {
-      return;
-    }
-
-    const clone = node.clone();
-
-    const anchors = this.getNodeAnchors(clone, node.getParent()!);
+    const anchors = node.getNodeAnchors();
 
     for (const anchor of anchors) {
       const radius = 7;
@@ -515,7 +457,6 @@ export class WeaveConnectorToolAction extends WeaveAction {
           selectedAnchor.setAttrs({
             name: 'connector-anchor-selected',
             fill: '#ffffff',
-            // radius: (radius * 1.5) / this.instance.getStage().scaleX(),
           });
           this.instance.getSelectionLayer()?.add(selectedAnchor);
           selectedAnchor.moveToTop();
@@ -601,8 +542,6 @@ export class WeaveConnectorToolAction extends WeaveAction {
       this.instance.getSelectionLayer()?.add(circle);
       circle.moveToTop();
     }
-
-    clone.destroy();
   }
 
   private hideAllConnectorAnchors(): void {
@@ -612,21 +551,4 @@ export class WeaveConnectorToolAction extends WeaveAction {
       anchors.forEach((anchor) => anchor.destroy());
     }
   }
-
-  // private defineFinalPoint(): Konva.Vector2d {
-  //   if (!this.tempLineNode || !this.measureContainer) {
-  //     return { x: 0, y: 0 };
-  //   }
-
-  //   const { mousePoint } = this.instance.getMousePointerRelativeToContainer(
-  //     this.measureContainer
-  //   );
-
-  //   const pos: Konva.Vector2d = { x: 0, y: 0 };
-
-  //   pos.x = mousePoint.x - this.tempLineNode.x();
-  //   pos.y = mousePoint.y - this.tempLineNode.y();
-
-  //   return pos;
-  // }
 }

@@ -154,6 +154,10 @@ export class WeaveLineNode extends WeaveNode {
       this.instance.addEventListener('onNodesChange', this.handleNodeChanges);
     }
 
+    line.getNodeAnchors = function () {
+      return [];
+    };
+
     return line;
   }
 

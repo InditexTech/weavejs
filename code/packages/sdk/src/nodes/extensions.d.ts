@@ -3,6 +3,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import 'konva';
+import type Konva from 'konva';
 import 'konva/lib/Node';
 
 declare module 'konva/lib/Node' {
@@ -53,7 +54,9 @@ declare module 'konva/lib/Node' {
     handleSelectNode(): void;
     handleDeselectNode(): void;
     canBeHovered(): boolean;
+    canDrag(): boolean;
     canMoveToContainer(node: Konva.Node): boolean;
+    getNodeAnchors(): WeaveConnectorAnchor[];
   }
   interface Layer {
     canMoveToContainer(node: Konva.Node): boolean;

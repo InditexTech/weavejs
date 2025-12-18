@@ -48,6 +48,10 @@ export class WeaveArrowNode extends WeaveNode {
 
     this.setupDefaultNodeEvents(line);
 
+    line.getNodeAnchors = function () {
+      return [];
+    };
+
     return line;
   }
 

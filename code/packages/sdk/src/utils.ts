@@ -170,7 +170,7 @@ export function moveNodeToContainer(
     node.rotation(nodeRotation);
     node.x(node.x() - (layerToMoveAttrs.containerOffsetX ?? 0));
     node.y(node.y() - (layerToMoveAttrs.containerOffsetY ?? 0));
-    node.movedToContainer(layerToMove);
+    node.movedToContainer(layerToMove as Konva.Layer | Konva.Group);
 
     instance.emitEvent('onNodeMovedToContainer', {
       node: node.clone(),
