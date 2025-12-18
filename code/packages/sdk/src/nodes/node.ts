@@ -161,19 +161,17 @@ export abstract class WeaveNode implements WeaveNodeBase {
         return [];
       }
 
-      const node = this.clone();
-
       let isInContainer = false;
       if (nodeParent !== actInstance.getMainLayer()) {
         isInContainer = true;
       }
 
-      const localBox = node.getClientRect({
-        relativeTo: stage,
+      const localBox = this.getClientRect({
+        // relativeTo: stage,
         skipTransform: true,
       });
 
-      const transform = node.getAbsoluteTransform();
+      const transform = this.getAbsoluteTransform();
 
       // Compute the four absolute corners of the box
       const corners = [
@@ -204,20 +202,22 @@ export abstract class WeaveNode implements WeaveNodeBase {
 
       if (isInContainer && nodeParent) {
         const containerAbsPos = nodeParent.position();
-        topMid.x += containerAbsPos.x || 0;
-        topMid.y += containerAbsPos.y || 0;
-        rightMid.x += containerAbsPos.x || 0;
-        rightMid.y += containerAbsPos.y || 0;
-        bottomMid.x += containerAbsPos.x || 0;
-        bottomMid.y += containerAbsPos.y || 0;
-        leftMid.x += containerAbsPos.x || 0;
-        leftMid.y += containerAbsPos.y || 0;
+        topMid.x += containerAbsPos.x * stage.scaleX() || 0;
+        topMid.y += containerAbsPos.y * stage.scaleX() || 0;
+        rightMid.x += containerAbsPos.x * stage.scaleX() || 0;
+        rightMid.y += containerAbsPos.y * stage.scaleX() || 0;
+        bottomMid.x += containerAbsPos.x * stage.scaleX() || 0;
+        bottomMid.y += containerAbsPos.y * stage.scaleX() || 0;
+        leftMid.x += containerAbsPos.x * stage.scaleX() || 0;
+        leftMid.y += containerAbsPos.y * stage.scaleX() || 0;
       }
 
-      anchors.push({ name: 'top', point: topMid });
-      anchors.push({ name: 'right', point: rightMid });
-      anchors.push({ name: 'bottom', point: bottomMid });
-      anchors.push({ name: 'left', point: leftMid });
+      anchors.push(
+        { name: 'top', point: topMid },
+        { name: 'right', point: rightMid },
+        { name: 'bottom', point: bottomMid },
+        { name: 'left', point: leftMid }
+      );
 
       return anchors;
     };

@@ -6,17 +6,23 @@ import { v4 as uuidv4 } from 'uuid';
 import Konva from 'konva';
 import { WeaveAction } from '@/actions/action';
 import {
-  type WeaveConnectorToolActionOnAddedEvent,
-  type WeaveConnectorToolActionOnAddingEvent,
+  type WeaveConnectorToolActionParams,
+  type WeaveConnectorToolActionProperties,
   type WeaveConnectorToolActionState,
 } from './types';
-import { CONNECTOR_TOOL_ACTION_NAME, CONNECTOR_TOOL_STATE } from './constants';
+import {
+  CONNECTOR_TOOL_ACTION_NAME,
+  CONNECTOR_TOOL_DEFAULT_CONFIG,
+  CONNECTOR_TOOL_STATE,
+} from './constants';
 import { WeaveNodesSelectionPlugin } from '@/plugins/nodes-selection/nodes-selection';
 import type { WeaveConnectorNode } from '@/nodes/connector/connector';
 import { SELECTION_TOOL_ACTION_NAME } from '../selection-tool/constants';
 import { WEAVE_CONNECTOR_NODE_LINE_TYPE } from '@/nodes/connector/constants';
+import { mergeExceptArrays } from '@/utils';
 
 export class WeaveConnectorToolAction extends WeaveAction {
+  protected readonly config!: WeaveConnectorToolActionProperties;
   protected initialized: boolean = false;
   protected initialCursor: string | null = null;
   protected tempLineNode: Konva.Line | null;
@@ -40,8 +46,13 @@ export class WeaveConnectorToolAction extends WeaveAction {
   onPropsChange = undefined;
   onInit = undefined;
 
-  constructor() {
+  constructor(params?: WeaveConnectorToolActionParams) {
     super();
+
+    this.config = mergeExceptArrays(
+      CONNECTOR_TOOL_DEFAULT_CONFIG,
+      params?.config
+    );
 
     this.pointers = new Map<number, Konva.Vector2d>();
     this.initialized = false;
@@ -92,7 +103,6 @@ export class WeaveConnectorToolAction extends WeaveAction {
         this.instance.getActiveAction() === CONNECTOR_TOOL_ACTION_NAME
       ) {
         this.cancelAction();
-        return;
       }
     });
 
@@ -180,15 +190,16 @@ export class WeaveConnectorToolAction extends WeaveAction {
           .getStage()
           .getRelativePointerPosition();
 
-        const radius = 7;
+        const radius = this.config.style.anchor.radius;
 
         this.tempLineNode = new Konva.Line({
           strokeScaleEnabled: true,
           x: stageMousePoint!.x,
           y: stageMousePoint!.y,
           points: [0, 0],
-          stroke: '#000000',
-          strokeWidth: 1,
+          stroke: this.config.style.line.stroke,
+          strokeWidth: this.config.style.line.strokeWidth,
+          dash: this.config.style.line.dash,
         });
         this.instance.getSelectionLayer()?.add(this.tempLineNode);
 
@@ -197,9 +208,9 @@ export class WeaveConnectorToolAction extends WeaveAction {
           y: mousePoint.y,
           radius: radius / this.instance.getStage().scaleX(),
           strokeScaleEnabled: false,
-          stroke: '#000000',
-          strokeWidth: 1,
-          fill: '#ffffff',
+          stroke: this.config.style.anchor.stroke,
+          strokeWidth: this.config.style.anchor.strokeWidth,
+          fill: this.config.style.anchor.fill,
           name: 'connector-anchor-selected',
           draggable: false,
           listening: true,
@@ -220,16 +231,16 @@ export class WeaveConnectorToolAction extends WeaveAction {
         // const { mousePoint, container, measureContainer } =
         const { mousePoint } = this.instance.getMousePointer();
 
-        const radius = 7;
+        const radius = this.config.style.anchor.radius;
 
         const circle = new Konva.Circle({
           x: mousePoint.x,
           y: mousePoint.y,
           radius: (radius * 1.5) / this.instance.getStage().scaleX(),
           strokeScaleEnabled: false,
-          stroke: '#000000',
-          strokeWidth: 1,
-          fill: '#1a1aff',
+          stroke: this.config.style.anchor.stroke,
+          strokeWidth: this.config.style.anchor.strokeWidth,
+          fill: this.config.style.anchor.selectedFill,
           name: 'connector-anchor-selected',
           draggable: false,
           listening: true,
@@ -243,7 +254,6 @@ export class WeaveConnectorToolAction extends WeaveAction {
         this.endPoint = mousePoint;
         this.setState(CONNECTOR_TOOL_STATE.ADDED);
         this.saveConnector();
-        return;
       }
     });
 
@@ -262,9 +272,7 @@ export class WeaveConnectorToolAction extends WeaveAction {
     this.setCursor();
     this.setFocusStage();
 
-    this.instance.emitEvent<WeaveConnectorToolActionOnAddingEvent>(
-      'onAddingConnector'
-    );
+    this.instance.emitEvent<undefined>('onAddingConnector');
 
     this.startPoint = undefined;
     this.startNodeId = undefined;
@@ -322,17 +330,11 @@ export class WeaveConnectorToolAction extends WeaveAction {
       endPoint: this.endPoint,
       endNodeId: this.endNodeId,
       endNodeAnchor: this.endNodeAnchor,
-      pointerAtBeginning: false,
-      pointerAtEnd: false,
-      pointerLength: 10,
-      pointerWidth: 10,
       hitStrokeWidth: 16,
     });
     this.instance.addNode(node, this.container?.getAttrs().id);
 
-    this.instance.emitEvent<WeaveConnectorToolActionOnAddedEvent>(
-      'onAddedConnector'
-    );
+    this.instance.emitEvent<undefined>('onAddedConnector');
 
     this.cancelAction();
   }
@@ -424,20 +426,32 @@ export class WeaveConnectorToolAction extends WeaveAction {
   }
 
   protected showConnectorAnchors(node: Konva.Node): void {
+    const stage = this.instance.getStage();
     const anchors = node.getNodeAnchors();
 
     for (const anchor of anchors) {
-      const radius = 7;
+      const radius = this.config.style.anchor.radius;
+
+      let parent: Konva.Container | null | undefined = node.getParent();
+      if (parent?.getAttrs().nodeId) {
+        parent = stage.findOne(`#${parent.getAttrs().nodeId}`) as
+          | Konva.Container
+          | undefined;
+      }
 
       const circle = new Konva.Circle({
-        x: anchor.point.x,
-        y: anchor.point.y,
+        x:
+          node.x() -
+          (node.getAbsolutePosition().x - anchor.point.x) / stage.scaleX(),
+        y:
+          node.y() -
+          (node.getAbsolutePosition().y - anchor.point.y) / stage.scaleY(),
         anchorPosition: anchor.name,
         radius: radius / this.instance.getStage().scaleX(),
         strokeScaleEnabled: false,
-        stroke: '#000000',
-        strokeWidth: 1,
-        fill: '#ffffff',
+        stroke: this.config.style.anchor.stroke,
+        strokeWidth: this.config.style.anchor.strokeWidth,
+        fill: this.config.style.anchor.fill,
         name: `connector-anchor`,
         draggable: false,
         listening: true,
@@ -456,7 +470,7 @@ export class WeaveConnectorToolAction extends WeaveAction {
           const selectedAnchor = circle.clone();
           selectedAnchor.setAttrs({
             name: 'connector-anchor-selected',
-            fill: '#ffffff',
+            fill: this.config.style.anchor.fill,
           });
           this.instance.getSelectionLayer()?.add(selectedAnchor);
           selectedAnchor.moveToTop();
@@ -470,7 +484,7 @@ export class WeaveConnectorToolAction extends WeaveAction {
           });
 
           const parent = node.getParent();
-          if (parent && parent.getAttrs().nodeId) {
+          if (parent?.getAttrs()?.nodeId) {
             const realParent = this.instance
               .getStage()
               .findOne(`#${parent.getAttrs().nodeId}`);
@@ -487,8 +501,9 @@ export class WeaveConnectorToolAction extends WeaveAction {
             x: selectedAnchor.x(),
             y: selectedAnchor.y(),
             points: [0, 0],
-            stroke: '#000000',
-            strokeWidth: 1,
+            dash: this.config.style.line.dash,
+            stroke: this.config.style.line.stroke,
+            strokeWidth: this.config.style.line.strokeWidth,
           });
           this.instance.getSelectionLayer()?.add(this.tempLineNode);
 
@@ -499,8 +514,7 @@ export class WeaveConnectorToolAction extends WeaveAction {
           const selectedAnchor = circle.clone();
           selectedAnchor.setAttrs({
             name: 'connector-anchor-selected',
-            fill: '#1a1aff',
-            // radius: (radius * 1.5) / this.instance.getStage().scaleX(),
+            fill: this.config.style.anchor.selectedFill,
           });
           this.instance.getSelectionLayer()?.add(selectedAnchor);
           selectedAnchor.moveToTop();
@@ -521,8 +535,21 @@ export class WeaveConnectorToolAction extends WeaveAction {
       });
 
       circle.on('pointermove pointerover', (e) => {
+        if (
+          this.state === CONNECTOR_TOOL_STATE.SELECTING_FINAL &&
+          this.tempLineNode
+        ) {
+          this.tempLineNode.setAttrs({
+            points: [
+              this.tempLineNode.points()[0],
+              this.tempLineNode.points()[1],
+              circle.position().x - this.tempLineNode.x(),
+              circle.position().y - this.tempLineNode.y(),
+            ],
+          });
+        }
         circle.setAttrs({
-          fill: '#ff2c2cff',
+          fill: this.config.style.anchor.hoveredFill,
         });
         prevCursor = this.instance.getStage().container().style.cursor;
         this.instance.getStage().container().style.cursor = 'move';
@@ -531,7 +558,7 @@ export class WeaveConnectorToolAction extends WeaveAction {
 
       circle.on('pointerleave', () => {
         circle.setAttrs({
-          fill: '#ffffffff',
+          fill: this.config.style.anchor.fill,
         });
         if (prevCursor) {
           this.instance.getStage().container().style.cursor = prevCursor;

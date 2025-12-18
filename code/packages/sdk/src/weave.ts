@@ -84,7 +84,8 @@ export class Weave {
   private exportManager: WeaveExportManager;
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  private registeredHooks: Map<string, (params: any) => void> = new Map();
+  private readonly registeredHooks: Map<string, (params: any) => void> =
+    new Map();
 
   private readonly asyncElements: Map<string, WeaveAsyncElement>;
 

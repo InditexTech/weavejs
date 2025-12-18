@@ -29,6 +29,8 @@ export const snapToAnchors = (
   dragAnchors: WeaveConnectorAnchor[],
   snapDist = 10
 ): WeaveAnchorSnap => {
+  const stage = instance.getStage();
+
   let anchorPosition = { x: 0, y: 0 };
   let minDist = snapDist; // track closest snap
   let anchorName: string | undefined = undefined;
@@ -42,8 +44,8 @@ export const snapToAnchors = (
 
   if (isInContainer && dragNodeContainer) {
     const containerAbsPos = dragNodeContainer.position();
-    a.x += containerAbsPos.x || 0;
-    a.y += containerAbsPos.y || 0;
+    a.x += containerAbsPos.x * stage.scaleX() || 0;
+    a.y += containerAbsPos.y * stage.scaleY() || 0;
   }
 
   for (const aKey in dragAnchors) {
@@ -53,6 +55,8 @@ export const snapToAnchors = (
     const dy = b.point.y - a.y;
     const dist = Math.hypot(dx, dy);
 
+    console.log('Comparing drag anchor', a, 'to', b.point, dist);
+
     if (dist < minDist && dist < snapDist) {
       minDist = dist;
       anchorName = b.name;
@@ -60,8 +64,12 @@ export const snapToAnchors = (
         ...b.point,
         ...(isInContainer &&
           dragNodeContainer && {
-            x: b.point.x - (dragNodeContainer.position().x || 0),
-            y: b.point.y - (dragNodeContainer.position().y || 0),
+            x:
+              b.point.x -
+              (dragNodeContainer.position().x * stage.scaleX() || 0),
+            y:
+              b.point.y -
+              (dragNodeContainer.position().y * stage.scaleY() || 0),
           }),
       };
     }
@@ -126,8 +134,7 @@ export const showConnectorAnchors = (
     return;
   }
 
-  const clone = node.clone();
-
+  const stage = instance.getStage();
   const anchors = node.getNodeAnchors();
 
   for (const anchor of anchors) {
@@ -136,8 +143,12 @@ export const showConnectorAnchors = (
     const circle = new Konva.Circle({
       id: `${node.getAttrs().id}-${anchor.name}-connector-anchor`,
       name: 'connector-anchor',
-      x: anchor.point.x,
-      y: anchor.point.y,
+      x:
+        node.x() -
+        (node.getAbsolutePosition().x - anchor.point.x) / stage.scaleX(),
+      y:
+        node.y() -
+        (node.getAbsolutePosition().y - anchor.point.y) / stage.scaleY(),
       anchorPosition: anchor.name,
       radius: radius / instance.getStage().scaleX(),
       strokeScaleEnabled: false,
@@ -178,6 +189,4 @@ export const showConnectorAnchors = (
     instance.getSelectionLayer()?.add(circle);
     circle.moveToTop();
   }
-
-  clone.destroy();
 };

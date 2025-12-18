@@ -28,7 +28,7 @@ export const setupNodeDecoratorDot = (
 
   let actualDecorator = connector.findOne(
     `#${connector.getAttrs().id}-${origin}NodeDecorator`
-  ) as Konva.Circle;
+  ) as Konva.Circle | undefined;
 
   const fromPoint = {
     x:
@@ -97,21 +97,21 @@ export const setupNodeDecoratorDot = (
     decorator.moveToTop();
 
     actualDecorator = decorator;
-  } else {
-    actualDecorator.setAttrs({
-      stroke,
-      strokeWidth,
-      radius,
-      x:
-        origin === WEAVE_CONNECTOR_NODE_DECORATOR_ORIGIN.START
-          ? fromPoint.x ?? 0
-          : toPoint.x ?? 0,
-      y:
-        origin === WEAVE_CONNECTOR_NODE_DECORATOR_ORIGIN.START
-          ? fromPoint.y ?? 0
-          : toPoint.y ?? 0,
-    });
   }
+
+  actualDecorator.setAttrs({
+    stroke,
+    strokeWidth,
+    radius,
+    x:
+      origin === WEAVE_CONNECTOR_NODE_DECORATOR_ORIGIN.START
+        ? fromPoint.x ?? 0
+        : toPoint.x ?? 0,
+    y:
+      origin === WEAVE_CONNECTOR_NODE_DECORATOR_ORIGIN.START
+        ? fromPoint.y ?? 0
+        : toPoint.y ?? 0,
+  });
 
   const moveDistance = radius;
 

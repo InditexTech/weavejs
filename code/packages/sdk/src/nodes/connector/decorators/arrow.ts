@@ -28,7 +28,7 @@ export const setupNodeDecoratorArrow = (
 
   let actualDecorator = connector.findOne(
     `#${connector.getAttrs().id}-${origin}NodeDecorator`
-  ) as Konva.Line;
+  ) as Konva.Line | undefined;
 
   const fromPoint = {
     x:
@@ -119,22 +119,22 @@ export const setupNodeDecoratorArrow = (
     decorator.moveToTop();
 
     actualDecorator = decorator;
-  } else {
-    actualDecorator.setAttrs({
-      stroke,
-      strokeWidth,
-      points: [0, 0, size, size / 2, 0, size],
-      x:
-        origin === WEAVE_CONNECTOR_NODE_DECORATOR_ORIGIN.START
-          ? fromPoint.x ?? 0
-          : toPoint.x ?? 0,
-      y:
-        origin === WEAVE_CONNECTOR_NODE_DECORATOR_ORIGIN.START
-          ? fromPoint.y ?? 0
-          : toPoint.y ?? 0,
-      rotation: angleDeg,
-    });
   }
+
+  actualDecorator.setAttrs({
+    stroke,
+    strokeWidth,
+    points: [0, 0, size, size / 2, 0, size],
+    x:
+      origin === WEAVE_CONNECTOR_NODE_DECORATOR_ORIGIN.START
+        ? fromPoint.x ?? 0
+        : toPoint.x ?? 0,
+    y:
+      origin === WEAVE_CONNECTOR_NODE_DECORATOR_ORIGIN.START
+        ? fromPoint.y ?? 0
+        : toPoint.y ?? 0,
+    rotation: angleDeg,
+  });
 
   actualDecorator.offsetX(size / 2);
   actualDecorator.offsetY(size / 2);
