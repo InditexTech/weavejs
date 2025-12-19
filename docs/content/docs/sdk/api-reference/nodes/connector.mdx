@@ -1,0 +1,372 @@
+---
+title: WeaveConnectorNode
+description: Connector node API Reference
+---
+
+import { TypeTable } from "fumadocs-ui/components/type-table";
+
+## Overview
+
+The [WeaveConnectorNode](https://github.com/InditexTech/weavejs/blob/main/code/packages/sdk/src/nodes/connector/connector.ts)
+class represents a line that connects two nodes pre-defined anchor points, the line is sticked to both nodes,
+if anyone of them moves, the line automatically adjusts and moves also.
+
+The class extends the [WeaveNode](/docs/sdk/api-reference/nodes/node) class
+
+## Type
+
+This node `nodeType` property value is `connector`.
+
+## Import
+
+```shell
+import { WeaveConnectorNode } from "@inditextech/weave-sdk";
+```
+
+## Instantiation
+
+```ts
+new WeaveConnectorNode(params?: WeaveConnectorNodeParams);
+```
+
+## TypeScript types
+
+```ts
+type WeaveConnectorLineTypeKeys = keyof typeof WEAVE_CONNECTOR_NODE_LINE_TYPE;
+type WeaveConnectorLineType =
+  (typeof WEAVE_CONNECTOR_NODE_LINE_TYPE)[WeaveConnectorLineTypeKeys];
+
+type WeaveConnectorNodeDecoratorTypeKeys =
+  keyof typeof WEAVE_CONNECTOR_NODE_DECORATOR_TYPE;
+type WeaveConnectorNodeDecoratorType =
+  (typeof WEAVE_CONNECTOR_NODE_DECORATOR_TYPE)[WeaveConnectorNodeDecoratorTypeKeys];
+
+type WeaveConnectorNodeDecoratorOriginKeys =
+  keyof typeof WEAVE_CONNECTOR_NODE_DECORATOR_ORIGIN;
+type WeaveConnectorNodeDecoratorOrigin =
+  (typeof WEAVE_CONNECTOR_NODE_DECORATOR_ORIGIN)[WeaveConnectorNodeDecoratorOriginKeys];
+
+type WeaveConnectorNodeProperties = {
+  style: {
+    line: {
+      stroke: string;
+      strokeWidth: number;
+      tension: number;
+      lineCap: "butt" | "round" | "square";
+      lineJoin: "bevel" | "round" | "miter";
+      dash: number[];
+      hitStrokeWidth: number;
+    };
+    anchorNode: {
+      radius: number;
+      stroke: string;
+      strokeWidth: number;
+      anchoredFill: string;
+      hoveredFill: string;
+      fill: string;
+    };
+    pointsHandler: {
+      radius: number;
+      stroke: string;
+      strokeWidth: number;
+      fill: string;
+    };
+    curvedControl: {
+      radius: number;
+      stroke: string;
+      strokeWidth: number;
+      fill: string;
+    };
+    dot: {
+      radius: number;
+      stroke: string;
+      strokeWidth: number;
+    };
+    arrow: {
+      size: number;
+      stroke: string;
+      strokeWidth: number;
+    };
+    selection: {
+      color: string;
+    };
+  };
+  handlerSnapping: {
+    activateThreshold: number;
+    releaseThreshold: number;
+  };
+  lineType: WeaveConnectorLineType;
+  startNodeDecoratorType: WeaveConnectorNodeDecoratorType;
+  endNodeDecoratorType: WeaveConnectorNodeDecoratorType;
+  transform?: WeaveNodeTransformerProperties;
+};
+
+type WeaveConnectorNodeParams = {
+  config: DeepPartial<WeaveConnectorNodeProperties>;
+};
+
+type WeaveConnectorAnchor = {
+  name: string;
+  point: Konva.Vector2d;
+};
+
+type WeaveAnchorSnap = {
+  name: string | undefined;
+  position: Konva.Vector2d;
+};
+
+type WeaveConnectorInfo =
+  | {
+      type: "node";
+      node: Konva.Node;
+      anchor: string;
+    }
+  | {
+      type: "point";
+      point: Konva.Vector2d;
+    };
+
+type WeaveConnectorPointPosition = "top" | "bottom" | "left" | "right";
+```
+
+## Parameters
+
+For `WeaveConnectorNodeParams`:
+
+<TypeTable
+  type={{
+    ["config"]: {
+      required: true,
+      description: "Config parameters for the node.",
+      type: "DeepPartial<WeaveConnectorNodeProperties>",
+    },
+  }}
+/>
+
+For `WeaveConnectorNodeProperties`:
+
+<TypeTable
+  type={{
+    ["style.line.stroke"]: {
+      description: "Defines stroke (color) of the connector line",
+      type: "number",
+      default: "#000000",
+    },
+    ["style.line.strokeWidth"]: {
+      description: "Width of the line",
+      type: "number",
+      default: "1",
+    },
+    ["style.line.lineCap"]: {
+      description:
+        "Defines the line-cap (how the line is terminated at their ends) of the line",
+      type: "'butt' | 'round' | 'square'",
+      default: "butt",
+    },
+    ["style.line.lineJoin"]: {
+      description:
+        "Defines the line-join (how the line is connected - when multi segments like an elbow) of the line",
+      type: "'bevel' | 'round' | 'miter'",
+      default: "miter",
+    },
+    ["style.line.dash"]: {
+      description: "Defines the dashing properties of the line",
+      type: "number[]",
+      default: "[]",
+    },
+    ["style.line.hitStrokeWidth"]: {
+      description:
+        "Defines the line hit stroke (making easies to select the line)",
+      type: "number",
+      default: "10",
+    },
+    ["style.anchorNode.radius"]: {
+      description: "Defines the anchor node radius",
+      type: "number",
+      default: "7",
+    },
+    ["style.anchorNode.stroke"]: {
+      description: "Defines the anchor border color",
+      type: "string",
+      default: "#000000",
+    },
+    ["style.anchorNode.strokeWidth"]: {
+      description: "Defines the anchor border size",
+      type: "number",
+      default: "1",
+    },
+    ["style.anchorNode.anchoredFill"]: {
+      description: "Defines the anchor fill color when selected (anchored)",
+      type: "string",
+      default: "#ff2c2c",
+    },
+    ["style.anchorNode.hoveredFill"]: {
+      description: "Defines the anchor fill color when hovered",
+      type: "string",
+      default: "#ff2c2c",
+    },
+    ["style.anchorNode.fill"]: {
+      description: "Defines the anchor fill color (normal state)",
+      type: "string",
+      default: "#ffffff",
+    },
+    ["style.pointsHandler.radius"]: {
+      description:
+        "Defines the handlers (that allow to move the connector) radius",
+      type: "number",
+      default: "7",
+    },
+    ["style.pointsHandler.stroke"]: {
+      description: "Defines the handlers border color",
+      type: "string",
+      default: "#000000",
+    },
+    ["style.pointsHandler.strokeWidth"]: {
+      description: "Defines the handlers border size",
+      type: "number",
+      default: "1",
+    },
+    ["style.pointsHandler.fill"]: {
+      description: "Defines the handlers fill color",
+      type: "string",
+      default: "#ffffff",
+    },
+    ["style.curvedControl.radius"]: {
+      description: "Defines the handler (for the curved line control) radius",
+      type: "number",
+      default: "7",
+    },
+    ["style.curvedControl.stroke"]: {
+      description: "Defines the handler border color",
+      type: "string",
+      default: "#000000",
+    },
+    ["style.curvedControl.strokeWidth"]: {
+      description: "Defines the handler border size",
+      type: "number",
+      default: "1",
+    },
+    ["style.curvedControl.fill"]: {
+      description: "Defines the handler fill color",
+      type: "string",
+      default: "#ffffff",
+    },
+    ["style.selection.color"]: {
+      description: "The color when an connector is selected",
+      type: "string",
+      default: "#1a1aff",
+    },
+    ["style.dot.radius"]: {
+      description: "The radius of the start and end line dot decorator",
+      type: "number",
+      default: "4",
+    },
+    ["style.dot.stroke"]: {
+      description: "The border color for the line dot decorator",
+      type: "number",
+      default: "#000000",
+    },
+    ["style.dot.strokeWidth"]: {
+      description: "The border size for the line dot decorator",
+      type: "number",
+      default: "1",
+    },
+    ["style.arrow.size"]: {
+      description: "The size of the start and end line arrow decorator",
+      type: "number",
+      default: "10",
+    },
+    ["style.arrow.stroke"]: {
+      description: "The border color for the line arrow decorator",
+      type: "number",
+      default: "#000000",
+    },
+    ["style.arrow.strokeWidth"]: {
+      description: "The border size for the line arrow decorator",
+      type: "number",
+      default: "1",
+    },
+    ["handlerSnapping.activateThreshold"]: {
+      description: "Amount of pixels to activate the snapping to an anchor",
+      type: "number",
+      default: "20",
+    },
+    ["handlerSnapping.releaseThreshold"]: {
+      description: "Amount of pixels to de-activate the snapping to an anchor",
+      type: "number",
+      default: "25",
+    },
+    ["lineType"]: {
+      description: "Default line type",
+      type: "striWeaveConnectorLineTypeng",
+      default: "WEAVE_CONNECTOR_NODE_LINE_TYPE.STRAIGHT",
+    },
+    ["startNodeDecoratorType"]: {
+      description: "Default start-line decorator type",
+      type: "WeaveConnectorNodeDecoratorType",
+      default: "WEAVE_CONNECTOR_NODE_DECORATOR_TYPE.NONE",
+    },
+    ["endNodeDecoratorType"]: {
+      description: "Default end-line decorator type",
+      type: "WeaveConnectorNodeDecoratorType",
+      default: "WEAVE_CONNECTOR_NODE_DECORATOR_TYPE.NONE",
+    },
+  }}
+/>
+
+## Default values
+
+```ts
+const WEAVE_CONNECTOR_NODE_DEFAULT_CONFIG: WeaveConnectorNodeProperties = {
+  style: {
+    line: {
+      stroke: "#000000",
+      strokeWidth: 1,
+      lineCap: "butt",
+      lineJoin: "miter",
+      dash: [],
+      hitStrokeWidth: 10,
+    },
+    anchorNode: {
+      radius: 7,
+      stroke: "#000000",
+      strokeWidth: 1,
+      anchoredFill: "#ff2c2c",
+      hoveredFill: "#ff2c2cff",
+      fill: "#ffffff",
+    },
+    pointsHandler: {
+      radius: 7,
+      stroke: "#000000",
+      strokeWidth: 1,
+      fill: "#ffffff",
+    },
+    curvedControl: {
+      radius: 7,
+      stroke: "#000000",
+      strokeWidth: 1,
+      fill: "#ffffff",
+    },
+    selection: {
+      color: "#1a1aff",
+    },
+    dot: {
+      radius: 4,
+      stroke: "#000000",
+      strokeWidth: 0,
+    },
+    arrow: {
+      size: 10,
+      stroke: "#000000",
+      strokeWidth: 0,
+    },
+  },
+  handlerSnapping: {
+    activateThreshold: 20,
+    releaseThreshold: 25,
+  },
+  lineType: WEAVE_CONNECTOR_NODE_LINE_TYPE.STRAIGHT,
+  startNodeDecoratorType: WEAVE_CONNECTOR_NODE_DECORATOR_TYPE.NONE,
+  endNodeDecoratorType: WEAVE_CONNECTOR_NODE_DECORATOR_TYPE.NONE,
+};
+```
