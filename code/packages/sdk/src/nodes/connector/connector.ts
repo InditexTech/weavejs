@@ -581,37 +581,36 @@ export class WeaveConnectorNode extends WeaveNode {
 
     this.instance.stateTransactional(() => {
       for (const connector of connectorsToUpdate) {
-        let connectorParent = connector.getParent();
+        let connectorParent: Konva.Node | null | undefined =
+          connector.getParent();
         if (connectorParent?.getAttrs().nodeId) {
           connectorParent = stage.findOne(
             `#${connectorParent.getAttrs().nodeId}`
-          ) as Konva.Layer | Konva.Group;
+          );
         }
 
         const connectorNodeStart = stage.findOne(
           `#${connector.getAttrs().startNodeId}`
         );
 
-        let realConnectorNodeStartParent = connectorNodeStart?.getParent();
+        let realConnectorNodeStartParent: Konva.Node | null | undefined =
+          connectorNodeStart?.getParent();
         if (connectorNodeStart?.getAttrs().nodeId) {
           realConnectorNodeStartParent = this.instance
             .getStage()
-            .findOne(`#${connectorNodeStart.getAttrs().nodeId}`) as
-            | Konva.Layer
-            | Konva.Group;
+            .findOne(`#${connectorNodeStart.getAttrs().nodeId}`);
         }
 
         const connectorNodeEnd = stage.findOne(
           `#${connector.getAttrs().endNodeId}`
         );
 
-        let realConnectorNodeEndParent = connectorNodeEnd?.getParent();
+        let realConnectorNodeEndParent: Konva.Node | null | undefined =
+          connectorNodeEnd?.getParent();
         if (connectorNodeEnd?.getAttrs().nodeId) {
           realConnectorNodeEndParent = this.instance
             .getStage()
-            .findOne(`#${connectorNodeEnd.getAttrs().nodeId}`) as
-            | Konva.Layer
-            | Konva.Group;
+            .findOne(`#${connectorNodeEnd.getAttrs().nodeId}`);
         }
 
         // Connector's nodes are on the same container but different than connector's one
@@ -629,7 +628,7 @@ export class WeaveConnectorNode extends WeaveNode {
           moveNodeToContainer(
             this.instance,
             connector,
-            realConnectorNodeStartParent
+            realConnectorNodeStartParent as Konva.Layer | Konva.Group
           );
           continue;
         }
@@ -655,13 +654,6 @@ export class WeaveConnectorNode extends WeaveNode {
   private handleNodeRemoved(node: Konva.Node) {
     const stage = this.instance.getStage();
 
-    let nodeParent = node.getParent();
-    if (nodeParent?.getAttrs().nodeId) {
-      nodeParent = stage.findOne(`#${nodeParent.getAttrs().nodeId}`) as
-        | Konva.Layer
-        | Konva.Group;
-    }
-
     const connectors = stage
       .find<Konva.Group>(`.node`)
       .filter(
@@ -671,9 +663,7 @@ export class WeaveConnectorNode extends WeaveNode {
             n.getAttrs().endNodeId === node.getAttrs().id)
       );
 
-    for (let i = 0; i < connectors.length; i++) {
-      const connector = connectors[i];
-
+    for (const connector of connectors) {
       let connectorParent: Konva.Node | null | undefined =
         connector.getParent();
       if (connectorParent?.getAttrs().nodeId) {
@@ -929,7 +919,7 @@ export class WeaveConnectorNode extends WeaveNode {
         const targetPos = node.getAbsolutePosition();
         const dx = anchorPosition.x - targetPos.x;
         const dy = anchorPosition.y - targetPos.y;
-        const distance = Math.sqrt(dx * dx + dy * dy);
+        const distance = Math.hypot(dx, dy);
 
         if (distance > SNAP_OUT_DISTANCE) {
           anchorNode?.setAttrs({
@@ -950,7 +940,7 @@ export class WeaveConnectorNode extends WeaveNode {
         const { name, position } = snapToAnchors(
           this.instance,
           node,
-          nodeParent!,
+          nodeParent,
           hoveredNodeAnchors,
           SNAP_DISTANCE
         );
@@ -1118,7 +1108,7 @@ export class WeaveConnectorNode extends WeaveNode {
       ...nextProps,
     });
 
-    if (typeof nextProps.initialized === 'undefined') {
+    if (nextProps?.initialized === undefined) {
       nodeInstance.setAttrs({
         initialized: false,
       });
@@ -1333,8 +1323,8 @@ export class WeaveConnectorNode extends WeaveNode {
       );
 
       const elbowLinePoints = [];
-      for (let i = 0; i < elbowPoints.length; i++) {
-        elbowLinePoints.push(elbowPoints[i]!.x, elbowPoints[i]!.y);
+      for (const elbowPoint of elbowPoints) {
+        elbowLinePoints.push(elbowPoint.x, elbowPoint.y);
       }
 
       linePoints = elbowLinePoints;

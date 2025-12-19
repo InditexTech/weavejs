@@ -628,7 +628,7 @@ export abstract class WeaveNode implements WeaveNodeBase {
               realNodeTarget,
             ]);
 
-            let containerToMove: Konva.Layer | Konva.Node | undefined =
+            let containerToMove: Konva.Layer | Konva.Group | undefined =
               this.instance.getMainLayer();
 
             if (layerToMove) {
@@ -641,8 +641,8 @@ export abstract class WeaveNode implements WeaveNodeBase {
                 this.instance,
                 realNodeTarget,
                 containerToMove,
-                originalNode!,
-                originalContainer!
+                originalNode,
+                originalContainer
               );
 
               if (moved) {

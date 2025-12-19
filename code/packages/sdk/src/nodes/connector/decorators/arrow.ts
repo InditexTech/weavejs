@@ -28,7 +28,7 @@ export const setupNodeDecoratorArrow = (
 
   let actualDecorator = connector.findOne(
     `#${connector.getAttrs().id}-${origin}NodeDecorator`
-  ) as Konva.Line | undefined;
+  );
 
   const fromPoint = {
     x: 0,
@@ -146,6 +146,6 @@ export const setupNodeDecoratorArrow = (
     connector,
     line,
     origin,
-    actualDecorator
+    actualDecorator as Konva.Shape
   );
 };

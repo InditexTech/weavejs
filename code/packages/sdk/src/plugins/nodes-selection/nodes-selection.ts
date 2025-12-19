@@ -340,8 +340,7 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
       }
 
       const selectedNodes = tr.nodes();
-      for (let i = 0; i < selectedNodes.length; i++) {
-        const node = selectedNodes[i];
+      for (const node of selectedNodes) {
         const originalNode = node.clone();
         let originalContainer: Konva.Node | null | undefined = node.getParent();
         if (originalContainer?.getAttrs().nodeId) {
@@ -470,7 +469,7 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
                 node.getAttrs().nodeType
               );
 
-              let containerToMove: Konva.Layer | Konva.Node | undefined =
+              let containerToMove: Konva.Layer | Konva.Group | undefined =
                 this.instance.getMainLayer();
 
               if (layerToMove) {
@@ -862,7 +861,7 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
 
     const dx = actual.x - init.x;
     const dy = actual.y - init.y;
-    const dist = Math.sqrt(dx * dx + dy * dy);
+    const dist = Math.hypot(dx, dy);
 
     const MOVED_DISTANCE = 5; // px
 
@@ -882,7 +881,7 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
 
     const dx = e.evt.clientX - this.tapStart.x;
     const dy = e.evt.clientY - this.tapStart.y;
-    const dist = Math.sqrt(dx * dx + dy * dy);
+    const dist = Math.hypot(dx, dy);
 
     const MOVED_DISTANCE = 5; // px
 
@@ -901,7 +900,7 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
     const now = performance.now();
     const dx = e.evt.clientX - this.tapStart.x;
     const dy = e.evt.clientY - this.tapStart.y;
-    const dist = Math.sqrt(dx * dx + dy * dy);
+    const dist = Math.hypot(dx, dy);
 
     const DOUBLE_TAP_DISTANCE = 10; // px
     const DOUBLE_TAP_TIME = 300; // ms

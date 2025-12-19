@@ -26,7 +26,7 @@ export const setupNodeDecoratorDot = (
 
   let actualDecorator = connector.findOne(
     `#${connector.getAttrs().id}-${origin}NodeDecorator`
-  ) as Konva.Circle | undefined;
+  );
 
   const fromPoint = {
     x: 0,
@@ -114,6 +114,6 @@ export const setupNodeDecoratorDot = (
     connector,
     line,
     origin,
-    actualDecorator
+    actualDecorator as Konva.Shape
   );
 };

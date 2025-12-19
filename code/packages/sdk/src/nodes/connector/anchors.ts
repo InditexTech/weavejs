@@ -25,7 +25,7 @@ export const hideAllConnectorAnchors = (instance: Weave): void => {
 export const snapToAnchors = (
   instance: Weave,
   dragNode: Konva.Node,
-  dragNodeContainer: Konva.Node | null,
+  dragNodeContainer: Konva.Node | null | undefined,
   dragAnchors: WeaveConnectorNodeAnchor[],
   snapDist = 10
 ): WeaveAnchorSnap => {

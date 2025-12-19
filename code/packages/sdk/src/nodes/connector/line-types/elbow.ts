@@ -36,34 +36,26 @@ function createElbowPath(
 
   if (p1Pos && p2Pos) {
     if (
-      p1Pos &&
       ['top', 'bottom'].includes(p1Pos) &&
-      p2Pos &&
       ['left', 'right'].includes(p2Pos)
     ) {
       return [p1, { x: p1.x, y: p2.y }, p2];
     }
     if (
-      p1Pos &&
       ['left', 'right'].includes(p1Pos) &&
-      p2Pos &&
       ['top', 'bottom'].includes(p2Pos)
     ) {
       return [p1, { x: p2.x, y: p1.y }, p2];
     }
     if (
-      p1Pos &&
       ['left', 'right'].includes(p1Pos) &&
-      p2Pos &&
       ['left', 'right'].includes(p2Pos)
     ) {
       const x = (p1.x + p2.x) / 2;
       return [p1, { x, y: p1.y }, { x, y: p2.y }, p2];
     }
     if (
-      p1Pos &&
       ['top', 'bottom'].includes(p1Pos) &&
-      p2Pos &&
       ['top', 'bottom'].includes(p2Pos)
     ) {
       const y = (p1.y + p2.y) / 2;

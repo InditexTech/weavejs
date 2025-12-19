@@ -432,11 +432,9 @@ export class WeaveConnectorToolAction extends WeaveAction {
     for (const anchor of anchors) {
       const radius = this.config.style.anchor.radius;
 
-      let parent: Konva.Container | null | undefined = node.getParent();
+      let parent: Konva.Node | null | undefined = node.getParent();
       if (parent?.getAttrs().nodeId) {
-        parent = stage.findOne(`#${parent.getAttrs().nodeId}`) as
-          | Konva.Container
-          | undefined;
+        parent = stage.findOne(`#${parent.getAttrs().nodeId}`);
       }
 
       const circle = new Konva.Circle({

@@ -45,7 +45,7 @@ export function containerOverCursor(
   instance: Weave,
   ignoreNodes: Konva.Node[],
   definedCursorPosition?: Konva.Vector2d
-): Konva.Node | undefined {
+): Konva.Group | undefined {
   Konva.hitOnDragEnabled = true;
 
   const stage = instance.getStage();
@@ -56,7 +56,7 @@ export function containerOverCursor(
     return undefined;
   }
 
-  const containerUnderPointer = new Set<Konva.Node>();
+  const containerUnderPointer = new Set<Konva.Group | Konva.Layer>();
 
   stage
     .find('.containerCapable')
@@ -80,7 +80,7 @@ export function containerOverCursor(
         cursorPosition.y <= shapeRect.y + shapeRect.height
       ) {
         if (node?.getAttrs().isContainerPrincipal) {
-          containerUnderPointer.add(node);
+          containerUnderPointer.add(node as Konva.Group | Konva.Layer);
         }
       }
     });
@@ -91,7 +91,7 @@ export function containerOverCursor(
     return undefined;
   }
 
-  let layerToMove = undefined;
+  let layerToMove: Konva.Layer | Konva.Group | undefined = undefined;
   // Move to container
   if (
     nodes[0]?.getAttrs().containerId &&
@@ -106,7 +106,7 @@ export function containerOverCursor(
 export function moveNodeToContainer(
   instance: Weave,
   node: Konva.Node,
-  containerToMove: Konva.Layer | Konva.Node,
+  containerToMove: Konva.Layer | Konva.Group,
   originalNode?: Konva.Node | null,
   originalContainer?: Konva.Node | null,
   invalidOriginsTypes: string[] = ['frame']
@@ -170,7 +170,7 @@ export function moveNodeToContainer(
     node.rotation(nodeRotation);
     node.x(node.x() - (layerToMoveAttrs.containerOffsetX ?? 0));
     node.y(node.y() - (layerToMoveAttrs.containerOffsetY ?? 0));
-    node.movedToContainer(layerToMove as Konva.Layer | Konva.Group);
+    node.movedToContainer(layerToMove);
 
     instance.emitEvent('onNodeMovedToContainer', {
       node: node.clone(),
