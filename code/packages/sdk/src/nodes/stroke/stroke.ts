@@ -232,6 +232,10 @@ export class WeaveStrokeNode extends WeaveNode {
 
     this.setupDefaultNodeEvents(stroke);
 
+    stroke.getNodeAnchors = function () {
+      return [];
+    };
+
     return stroke;
   }
 

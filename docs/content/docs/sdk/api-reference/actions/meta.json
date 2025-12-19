@@ -11,6 +11,7 @@
     "line-tool",
     "pen-tool",
     "brush-tool",
+    "connector-tool",
     "text-tool",
     "image-tool",
     "video-tool",

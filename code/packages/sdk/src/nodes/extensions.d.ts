@@ -3,6 +3,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import 'konva';
+import type Konva from 'konva';
 import 'konva/lib/Node';
 
 declare module 'konva/lib/Node' {
@@ -46,12 +47,16 @@ declare module 'konva/lib/Node' {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     updatePosition(position: Vector2d): void;
     dblClick(): void;
+    isSelectable(): boolean;
     movedToContainer(container: Konva.Layer | Konva.Group): void;
     handleMouseover(): void;
     handleMouseout(): void;
     handleSelectNode(): void;
     handleDeselectNode(): void;
+    canBeHovered(): boolean;
+    canDrag(): boolean;
     canMoveToContainer(node: Konva.Node): boolean;
+    getNodeAnchors(): WeaveConnectorAnchor[];
   }
   interface Layer {
     canMoveToContainer(node: Konva.Node): boolean;

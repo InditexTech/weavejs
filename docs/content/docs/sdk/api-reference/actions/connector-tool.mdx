@@ -1,0 +1,157 @@
+---
+title: WeaveConnectorToolAction
+description: Add connector nodes to the canvas
+---
+
+import { TypeTable } from "fumadocs-ui/components/type-table";
+
+## Overview
+
+The [WeaveConnectorToolAction](https://github.com/InditexTech/weavejs/blob/main/code/packages/sdk/src/actions/connector-tool/connector-tool.ts)
+class allows users to add connector to the canvas by click-and-click onto pre-defined anchors on the canvas elements.
+
+The class extends the [WeaveAction](/docs/sdk/api-reference/actions/action) class.
+
+## Name
+
+This action `name` property value is `connectorTool`.
+
+## Import
+
+```shell
+import { WeaveConnectorToolAction } from "@inditextech/weave-sdk";
+```
+
+## Instantiation
+
+```ts
+new WeaveConnectorToolAction(params?: WeaveConnectorToolActionParams);
+```
+
+## TypeScript types
+
+```ts
+type WeaveConnectorToolActionStateKeys = keyof typeof CONNECTOR_TOOL_STATE;
+type WeaveConnectorToolActionState =
+  (typeof CONNECTOR_TOOL_STATE)[WeaveConnectorToolActionStateKeys];
+
+type WeaveConnectorToolActionProperties = {
+  style: {
+    anchor: {
+      radius: number;
+      stroke: string;
+      strokeWidth: number;
+      fill: string;
+      selectedFill: string;
+      hoveredFill: string;
+    };
+    line: {
+      stroke: string;
+      strokeWidth: number;
+      dash: number[];
+    };
+  };
+};
+
+type WeaveConnectorToolActionParams = {
+  config: DeepPartial<WeaveConnectorToolActionProperties>;
+};
+```
+
+## Parameters
+
+For `WeaveConnectorToolActionParams`:
+
+<TypeTable
+  type={{
+    ["config"]: {
+      required: true,
+      description: "Config parameters for the tool.",
+      type: "Partial<WeaveConnectorToolActionProperties>",
+    },
+  }}
+/>
+
+For `WeaveConnectorToolActionProperties`:
+
+<TypeTable
+  type={{
+    ["style.anchor.radius"]: {
+      description: "The anchor radius",
+      type: "number",
+      default: "7",
+    },
+    ["style.anchor.stroke"]: {
+      description: "The anchor border color",
+      type: "string",
+      default: "#000000",
+    },
+    ["style.anchor.strokeWidth"]: {
+      description: "The anchor border size (px)",
+      type: "string",
+      default: "1",
+    },
+    ["style.anchor.fill"]: {
+      description: "The anchor fill color",
+      type: "string",
+      default: "#FFFFFF",
+    },
+    ["style.anchor.selectedFill"]: {
+      description: "The anchor fill color when selected",
+      type: "string",
+      default: "#1a1aff",
+    },
+    ["style.anchor.hoveredFill"]: {
+      description: "The anchor fill color when hovered",
+      type: "string",
+      default: "#ff2c2c",
+    },
+    ["style.line.stroke"]: {
+      description:
+        "The temporary connecting line when selecting the end anchor, this defines the border color",
+      type: "string",
+      default: "#000000",
+    },
+    ["style.line.strokeWidth"]: {
+      description: "The temporary connecting line border size",
+      type: "string",
+      default: "1",
+    },
+    ["style.line.dash"]: {
+      description: "The temporary connecting line dash pattern",
+      type: "string",
+      default: "[]",
+    },
+  }}
+/>
+
+## Default values
+
+```ts
+const CONNECTOR_TOOL_ACTION_NAME = "connectorTool";
+
+const CONNECTOR_TOOL_STATE = {
+  ["IDLE"]: "idle",
+  ["SELECTING_INITIAL"]: "selecting_initial",
+  ["SELECTING_FINAL"]: "selecting_final",
+  ["ADDED"]: "added",
+} as const;
+
+const CONNECTOR_TOOL_DEFAULT_CONFIG: WeaveConnectorToolActionProperties = {
+  style: {
+    anchor: {
+      radius: 7,
+      stroke: "#000000",
+      strokeWidth: 1,
+      fill: "#FFFFFF",
+      selectedFill: "#1a1aff",
+      hoveredFill: "#ff2c2c",
+    },
+    line: {
+      stroke: "#000000",
+      strokeWidth: 1,
+      dash: [],
+    },
+  },
+};
+```

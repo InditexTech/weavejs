@@ -10,13 +10,14 @@
     "ellipse",
     "regular-polygon",
     "line",
-    "measure",
+    "connector",
     "stroke",
     "text",
     "image",
     "video",
     "star",
     "arrow",
-    "comment"
+    "comment",
+    "measure"
   ]
 }

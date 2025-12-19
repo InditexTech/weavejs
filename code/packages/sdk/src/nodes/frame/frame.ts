@@ -300,6 +300,10 @@ export class WeaveFrameNode extends WeaveNode {
       return true;
     };
 
+    frame.getNodeAnchors = function () {
+      return [];
+    };
+
     return frame;
   }
 

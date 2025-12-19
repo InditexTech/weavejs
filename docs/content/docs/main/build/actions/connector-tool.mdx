@@ -1,0 +1,99 @@
+---
+title: Connector Tool
+description: Add connectors to the canvas
+---
+
+![Connector Tool action on use on the Weave.js showcase](/images/actions/connector-tool.gif)
+
+## Introduction
+
+This action enables users to create new connector nodes on the canvas.
+
+## Dependencies
+
+This action needs registered on the Weave instance the following element:
+
+- [Connector](/docs/main/build/nodes/connector) node
+
+## Usage
+
+<div className="fd-steps">
+
+<div className="[&_h3]:fd-step">
+
+### Import the Action
+
+Start by importing the action:
+
+```ts
+import { WeaveConnectorToolAction } from "@inditextech/weave-sdk";
+```
+
+</div>
+
+<div className='[&_h3]:fd-step'>
+
+### Register the Action
+
+Then register the action on the [Weave](/docs/sdk/api-reference/weave) class instance.
+
+```ts
+const instance = new Weave({
+  ...
+  actions: [
+    ...,
+    new WeaveConnectorToolAction(), // [!code ++]
+  ]
+})
+```
+
+</div>
+
+<div className='[&_h3]:fd-step'>
+
+### Setup the action trigger
+
+Setup on a button or any element on the UI the user can interact with on the action event:
+
+```ts
+instance.triggerAction("connectorTool");
+```
+
+---
+
+For example on a button on React:
+
+```tsx
+import React from "react";
+import { useWeave } from "@inditextech/weave-react";
+
+const MyConnectorToolTriggerComponent = () => {
+  const instance = useWeave((state) => state.instance);
+
+  const triggerTool = React.useCallback(() => {
+    instance.triggerAction("connectorTool");
+  }, [instance]);
+
+  return <button onClick={triggerTool}>Connector Tool</button>;
+};
+```
+
+### Trigger the action
+
+Finally a final user trigger the UI element that launches the action.
+
+---
+
+When active the user can follow this steps:
+
+- **Hover** on a node to see their anchor points.
+- **Click** on an anchor point, it will define the start point for the connector.
+- **Click** on another anchor point, it will define the end point for the connector.
+
+Then the connector node is added to the canvas as a fully functional node.
+This action integrates seamlessly with Weave.js's real-time state system,
+ensuring the new element appears instantly for all connected users.
+
+</div>
+
+</div>

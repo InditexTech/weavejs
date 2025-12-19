@@ -443,6 +443,10 @@ export class WeaveCommentNode<T> extends WeaveNode {
       this.normalizeNodeSize(commentNode);
     });
 
+    commentNode.getNodeAnchors = function () {
+      return [];
+    };
+
     return commentNode;
   }
 
