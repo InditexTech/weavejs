@@ -4,7 +4,7 @@
 
 import type Konva from 'konva';
 import {
-  WEAVE_CONNECTOR_NODE_DECORATOR_ORIGIN,
+  WEAVE_CONNECTOR_NODE_LINE_ORIGIN,
   WEAVE_CONNECTOR_NODE_LINE_TYPE,
 } from './constants';
 
@@ -78,21 +78,21 @@ export const positionDecorator = (
   let moveTarget = toPoint;
   if (
     WEAVE_CONNECTOR_NODE_LINE_TYPE.STRAIGHT === lineType &&
-    origin === WEAVE_CONNECTOR_NODE_DECORATOR_ORIGIN.START
+    origin === WEAVE_CONNECTOR_NODE_LINE_ORIGIN.START
   ) {
     moveOrigin = fromPoint;
     moveTarget = toPoint;
   }
   if (
     WEAVE_CONNECTOR_NODE_LINE_TYPE.STRAIGHT === lineType &&
-    origin === WEAVE_CONNECTOR_NODE_DECORATOR_ORIGIN.END
+    origin === WEAVE_CONNECTOR_NODE_LINE_ORIGIN.END
   ) {
     moveOrigin = toPoint;
     moveTarget = fromPoint;
   }
   if (
     WEAVE_CONNECTOR_NODE_LINE_TYPE.ELBOW === lineType &&
-    origin === WEAVE_CONNECTOR_NODE_DECORATOR_ORIGIN.START
+    origin === WEAVE_CONNECTOR_NODE_LINE_ORIGIN.START
   ) {
     moveOrigin = fromPoint;
     moveTarget = {
@@ -102,7 +102,7 @@ export const positionDecorator = (
   }
   if (
     WEAVE_CONNECTOR_NODE_LINE_TYPE.ELBOW === lineType &&
-    origin === WEAVE_CONNECTOR_NODE_DECORATOR_ORIGIN.END
+    origin === WEAVE_CONNECTOR_NODE_LINE_ORIGIN.END
   ) {
     moveOrigin = toPoint;
     moveTarget = {
@@ -112,14 +112,14 @@ export const positionDecorator = (
   }
   if (
     WEAVE_CONNECTOR_NODE_LINE_TYPE.CURVED === lineType &&
-    origin === WEAVE_CONNECTOR_NODE_DECORATOR_ORIGIN.START
+    origin === WEAVE_CONNECTOR_NODE_LINE_ORIGIN.START
   ) {
     moveOrigin = fromPoint;
     moveTarget = controlPoint;
   }
   if (
     WEAVE_CONNECTOR_NODE_LINE_TYPE.CURVED === lineType &&
-    origin === WEAVE_CONNECTOR_NODE_DECORATOR_ORIGIN.END
+    origin === WEAVE_CONNECTOR_NODE_LINE_ORIGIN.END
   ) {
     moveOrigin = toPoint;
     moveTarget = controlPoint;
@@ -155,13 +155,13 @@ export const positionDecorator = (
   );
 
   const clonedPoints = [...linePoints];
-  if (origin === WEAVE_CONNECTOR_NODE_DECORATOR_ORIGIN.START) {
+  if (origin === WEAVE_CONNECTOR_NODE_LINE_ORIGIN.START) {
     clonedPoints[0] = movedPosition2.x - movedPosition.x;
     clonedPoints[1] = movedPosition2.y - movedPosition.y;
     clonedPoints[clonedPoints.length - 2] = linePoints[linePoints.length - 2];
     clonedPoints[clonedPoints.length - 1] = linePoints[linePoints.length - 1];
   }
-  if (origin === WEAVE_CONNECTOR_NODE_DECORATOR_ORIGIN.END) {
+  if (origin === WEAVE_CONNECTOR_NODE_LINE_ORIGIN.END) {
     clonedPoints[0] = linePoints[0];
     clonedPoints[1] = linePoints[1];
     clonedPoints[clonedPoints.length - 2] =

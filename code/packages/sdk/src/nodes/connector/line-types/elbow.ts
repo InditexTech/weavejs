@@ -3,7 +3,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import type Konva from 'konva';
-import type { WeaveConnectorPointPosition } from '../types.js';
+import type { WeaveConnectorNodeAnchorPosition } from '../types.js';
 import { WEAVE_CONNECTOR_NODE_LINE_TYPE } from '../constants.js';
 
 export const setConnectorTypeElbow = (connector: Konva.Group) => {
@@ -27,9 +27,9 @@ export const setConnectorTypeElbow = (connector: Konva.Group) => {
 
 function createElbowPath(
   p1: Konva.Vector2d,
-  p1Pos: WeaveConnectorPointPosition | undefined,
+  p1Pos: WeaveConnectorNodeAnchorPosition | undefined,
   p2: Konva.Vector2d,
-  p2Pos: WeaveConnectorPointPosition | undefined
+  p2Pos: WeaveConnectorNodeAnchorPosition | undefined
 ) {
   const dx = Math.abs(p1.x - p2.x);
   const dy = Math.abs(p1.y - p2.y);
@@ -82,9 +82,9 @@ function createElbowPath(
 
 export function createElbowConnector(
   p1: Konva.Vector2d,
-  p1Pos: WeaveConnectorPointPosition | undefined,
+  p1Pos: WeaveConnectorNodeAnchorPosition | undefined,
   p2: Konva.Vector2d,
-  p2Pos: WeaveConnectorPointPosition | undefined
+  p2Pos: WeaveConnectorNodeAnchorPosition | undefined
 ) {
   return createElbowPath(p1, p1Pos, p2, p2Pos);
 }

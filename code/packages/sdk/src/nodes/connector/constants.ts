@@ -13,7 +13,7 @@ export const WEAVE_CONNECTOR_NODE_ANCHOR_ORIGIN = {
   ['RIGHT']: 'right',
 };
 
-export const WEAVE_CONNECTOR_NODE_DECORATOR_ORIGIN = {
+export const WEAVE_CONNECTOR_NODE_LINE_ORIGIN = {
   ['START']: 'start',
   ['END']: 'end',
 };
@@ -47,7 +47,7 @@ export const WEAVE_CONNECTOR_NODE_DEFAULT_CONFIG: WeaveConnectorNodeProperties =
         stroke: '#000000',
         strokeWidth: 1,
         anchoredFill: '#ff2c2c',
-        hoveredFill: '#ff2c2cff',
+        hoveredFill: '#ff2c2c',
         fill: '#ffffff',
       },
       pointsHandler: {

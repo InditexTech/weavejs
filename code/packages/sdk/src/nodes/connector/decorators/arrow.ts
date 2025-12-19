@@ -4,11 +4,11 @@
 
 import Konva from 'konva';
 import type {
-  WeaveConnectorNodeDecoratorOrigin,
+  WeaveConnectorNodeLineOrigin,
   WeaveConnectorNodeProperties,
 } from '../types';
 import {
-  WEAVE_CONNECTOR_NODE_DECORATOR_ORIGIN,
+  WEAVE_CONNECTOR_NODE_LINE_ORIGIN,
   WEAVE_CONNECTOR_NODE_LINE_TYPE,
 } from '../constants';
 import { getAngleDeg, positionDecorator } from '../utils';
@@ -17,7 +17,7 @@ export const setupNodeDecoratorArrow = (
   config: WeaveConnectorNodeProperties,
   connector: Konva.Group,
   line: Konva.Line,
-  origin: WeaveConnectorNodeDecoratorOrigin
+  origin: WeaveConnectorNodeLineOrigin
 ) => {
   const connectorAttrs = connector.getAttrs();
 
@@ -50,7 +50,7 @@ export const setupNodeDecoratorArrow = (
   let angleDeg = getAngleDeg(fromPoint, toPoint);
   if (
     lineType === WEAVE_CONNECTOR_NODE_LINE_TYPE.ELBOW &&
-    origin === WEAVE_CONNECTOR_NODE_DECORATOR_ORIGIN.START
+    origin === WEAVE_CONNECTOR_NODE_LINE_ORIGIN.START
   ) {
     angleDeg = getAngleDeg(fromPoint, {
       x: line.x() + linePoints[2],
@@ -59,7 +59,7 @@ export const setupNodeDecoratorArrow = (
   }
   if (
     lineType === WEAVE_CONNECTOR_NODE_LINE_TYPE.ELBOW &&
-    origin === WEAVE_CONNECTOR_NODE_DECORATOR_ORIGIN.END
+    origin === WEAVE_CONNECTOR_NODE_LINE_ORIGIN.END
   ) {
     angleDeg = getAngleDeg(
       {
@@ -71,13 +71,13 @@ export const setupNodeDecoratorArrow = (
   }
   if (
     lineType === WEAVE_CONNECTOR_NODE_LINE_TYPE.CURVED &&
-    origin === WEAVE_CONNECTOR_NODE_DECORATOR_ORIGIN.START
+    origin === WEAVE_CONNECTOR_NODE_LINE_ORIGIN.START
   ) {
     angleDeg = getAngleDeg(fromPoint, controlPoint);
   }
   if (
     lineType === WEAVE_CONNECTOR_NODE_LINE_TYPE.CURVED &&
-    origin === WEAVE_CONNECTOR_NODE_DECORATOR_ORIGIN.END
+    origin === WEAVE_CONNECTOR_NODE_LINE_ORIGIN.END
   ) {
     angleDeg = getAngleDeg(controlPoint, toPoint);
   }
@@ -96,11 +96,11 @@ export const setupNodeDecoratorArrow = (
     const decorator = new Konva.Line({
       id: `${connector.getAttrs().id}-${origin}NodeDecorator`,
       x:
-        origin === WEAVE_CONNECTOR_NODE_DECORATOR_ORIGIN.START
+        origin === WEAVE_CONNECTOR_NODE_LINE_ORIGIN.START
           ? fromPoint.x ?? 0
           : toPoint.x ?? 0,
       y:
-        origin === WEAVE_CONNECTOR_NODE_DECORATOR_ORIGIN.START
+        origin === WEAVE_CONNECTOR_NODE_LINE_ORIGIN.START
           ? fromPoint.y ?? 0
           : toPoint.y ?? 0,
       stroke,
@@ -122,11 +122,11 @@ export const setupNodeDecoratorArrow = (
     strokeWidth,
     points: [0, 0, size, size / 2, 0, size],
     x:
-      origin === WEAVE_CONNECTOR_NODE_DECORATOR_ORIGIN.START
+      origin === WEAVE_CONNECTOR_NODE_LINE_ORIGIN.START
         ? fromPoint.x ?? 0
         : toPoint.x ?? 0,
     y:
-      origin === WEAVE_CONNECTOR_NODE_DECORATOR_ORIGIN.START
+      origin === WEAVE_CONNECTOR_NODE_LINE_ORIGIN.START
         ? fromPoint.y ?? 0
         : toPoint.y ?? 0,
     rotation: angleDeg,
@@ -135,7 +135,7 @@ export const setupNodeDecoratorArrow = (
   actualDecorator.offsetX(size / 2);
   actualDecorator.offsetY(size / 2);
 
-  if (origin === WEAVE_CONNECTOR_NODE_DECORATOR_ORIGIN.START) {
+  if (origin === WEAVE_CONNECTOR_NODE_LINE_ORIGIN.START) {
     actualDecorator.scaleX(-1);
   }
 

@@ -4,7 +4,7 @@
 
 import Konva from 'konva';
 import type {
-  WeaveConnectorNodeDecoratorOrigin,
+  WeaveConnectorNodeLineOrigin,
   WeaveConnectorNodeProperties,
 } from '../types';
 
@@ -12,7 +12,7 @@ export const setupNodeDecoratorNone = (
   config: WeaveConnectorNodeProperties,
   connector: Konva.Group,
   line: Konva.Line,
-  origin: WeaveConnectorNodeDecoratorOrigin
+  origin: WeaveConnectorNodeLineOrigin
 ) => {
   const actualDecorator = connector.findOne(
     `#${connector.getAttrs().id}-${origin}NodeDecorator`

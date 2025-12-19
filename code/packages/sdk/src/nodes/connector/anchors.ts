@@ -5,7 +5,7 @@
 import Konva from 'konva';
 import type {
   WeaveAnchorSnap,
-  WeaveConnectorAnchor,
+  WeaveConnectorNodeAnchor,
   WeaveConnectorNodeProperties,
 } from './types';
 import type { Weave } from '@/weave';
@@ -26,7 +26,7 @@ export const snapToAnchors = (
   instance: Weave,
   dragNode: Konva.Node,
   dragNodeContainer: Konva.Node | null,
-  dragAnchors: WeaveConnectorAnchor[],
+  dragAnchors: WeaveConnectorNodeAnchor[],
   snapDist = 10
 ): WeaveAnchorSnap => {
   const stage = instance.getStage();
@@ -54,8 +54,6 @@ export const snapToAnchors = (
     const dx = b.point.x - a.x;
     const dy = b.point.y - a.y;
     const dist = Math.hypot(dx, dy);
-
-    console.log('Comparing drag anchor', a, 'to', b.point, dist);
 
     if (dist < minDist && dist < snapDist) {
       minDist = dist;

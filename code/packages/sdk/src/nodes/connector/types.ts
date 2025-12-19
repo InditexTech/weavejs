@@ -10,23 +10,23 @@ import type {
 import type {
   WEAVE_CONNECTOR_NODE_LINE_TYPE,
   WEAVE_CONNECTOR_NODE_DECORATOR_TYPE,
-  WEAVE_CONNECTOR_NODE_DECORATOR_ORIGIN,
+  WEAVE_CONNECTOR_NODE_LINE_ORIGIN,
 } from './constants';
 
-export type WeaveConnectorLineTypeKeys =
+export type WeaveConnectorNodeLineTypeKeys =
   keyof typeof WEAVE_CONNECTOR_NODE_LINE_TYPE;
-export type WeaveConnectorLineType =
-  (typeof WEAVE_CONNECTOR_NODE_LINE_TYPE)[WeaveConnectorLineTypeKeys];
+export type WeaveConnectorNodeLineType =
+  (typeof WEAVE_CONNECTOR_NODE_LINE_TYPE)[WeaveConnectorNodeLineTypeKeys];
 
 export type WeaveConnectorNodeDecoratorTypeKeys =
   keyof typeof WEAVE_CONNECTOR_NODE_DECORATOR_TYPE;
 export type WeaveConnectorNodeDecoratorType =
   (typeof WEAVE_CONNECTOR_NODE_DECORATOR_TYPE)[WeaveConnectorNodeDecoratorTypeKeys];
 
-export type WeaveConnectorNodeDecoratorOriginKeys =
-  keyof typeof WEAVE_CONNECTOR_NODE_DECORATOR_ORIGIN;
-export type WeaveConnectorNodeDecoratorOrigin =
-  (typeof WEAVE_CONNECTOR_NODE_DECORATOR_ORIGIN)[WeaveConnectorNodeDecoratorOriginKeys];
+export type WeaveConnectorNodeLineOriginKeys =
+  keyof typeof WEAVE_CONNECTOR_NODE_LINE_ORIGIN;
+export type WeaveConnectorNodeLineOrigin =
+  (typeof WEAVE_CONNECTOR_NODE_LINE_ORIGIN)[WeaveConnectorNodeLineOriginKeys];
 
 export type WeaveConnectorNodeProperties = {
   style: {
@@ -77,7 +77,7 @@ export type WeaveConnectorNodeProperties = {
     activateThreshold: number;
     releaseThreshold: number;
   };
-  lineType: WeaveConnectorLineType;
+  lineType: WeaveConnectorNodeLineType;
   startNodeDecoratorType: WeaveConnectorNodeDecoratorType;
   endNodeDecoratorType: WeaveConnectorNodeDecoratorType;
   transform?: WeaveNodeTransformerProperties;
@@ -87,7 +87,7 @@ export type WeaveConnectorNodeParams = {
   config: DeepPartial<WeaveConnectorNodeProperties>;
 };
 
-export type WeaveConnectorAnchor = {
+export type WeaveConnectorNodeAnchor = {
   name: string;
   point: Konva.Vector2d;
 };
@@ -97,7 +97,7 @@ export type WeaveAnchorSnap = {
   position: Konva.Vector2d;
 };
 
-export type WeaveConnectorInfo =
+export type WeaveConnectorNodeInfo =
   | {
       type: 'node';
       node: Konva.Node;
@@ -108,4 +108,8 @@ export type WeaveConnectorInfo =
       point: Konva.Vector2d;
     };
 
-export type WeaveConnectorPointPosition = 'top' | 'bottom' | 'left' | 'right';
+export type WeaveConnectorNodeAnchorPosition =
+  | 'top'
+  | 'bottom'
+  | 'left'
+  | 'right';

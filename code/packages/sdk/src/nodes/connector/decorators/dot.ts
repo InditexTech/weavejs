@@ -4,11 +4,11 @@
 
 import Konva from 'konva';
 import type {
-  WeaveConnectorNodeDecoratorOrigin,
+  WeaveConnectorNodeLineOrigin,
   WeaveConnectorNodeProperties,
 } from '../types';
 import {
-  WEAVE_CONNECTOR_NODE_DECORATOR_ORIGIN,
+  WEAVE_CONNECTOR_NODE_LINE_ORIGIN,
   WEAVE_CONNECTOR_NODE_LINE_TYPE,
 } from '../constants';
 import { getAngleDeg, positionDecorator } from '../utils';
@@ -17,7 +17,7 @@ export const setupNodeDecoratorDot = (
   config: WeaveConnectorNodeProperties,
   connector: Konva.Group,
   line: Konva.Line,
-  origin: WeaveConnectorNodeDecoratorOrigin
+  origin: WeaveConnectorNodeLineOrigin
 ) => {
   const connectorAttrs = connector.getAttrs();
 
@@ -48,13 +48,13 @@ export const setupNodeDecoratorDot = (
   let angleDeg = 0;
   if (
     lineType === WEAVE_CONNECTOR_NODE_LINE_TYPE.CURVED &&
-    origin === WEAVE_CONNECTOR_NODE_DECORATOR_ORIGIN.START
+    origin === WEAVE_CONNECTOR_NODE_LINE_ORIGIN.START
   ) {
     angleDeg = getAngleDeg(fromPoint, controlPoint);
   }
   if (
     lineType === WEAVE_CONNECTOR_NODE_LINE_TYPE.CURVED &&
-    origin === WEAVE_CONNECTOR_NODE_DECORATOR_ORIGIN.END
+    origin === WEAVE_CONNECTOR_NODE_LINE_ORIGIN.END
   ) {
     angleDeg = getAngleDeg(controlPoint, toPoint);
   }
@@ -73,11 +73,11 @@ export const setupNodeDecoratorDot = (
     const decorator = new Konva.Circle({
       id: `${connector.getAttrs().id}-${origin}NodeDecorator`,
       x:
-        origin === WEAVE_CONNECTOR_NODE_DECORATOR_ORIGIN.START
+        origin === WEAVE_CONNECTOR_NODE_LINE_ORIGIN.START
           ? fromPoint.x ?? 0
           : toPoint.x ?? 0,
       y:
-        origin === WEAVE_CONNECTOR_NODE_DECORATOR_ORIGIN.START
+        origin === WEAVE_CONNECTOR_NODE_LINE_ORIGIN.START
           ? fromPoint.y ?? 0
           : toPoint.y ?? 0,
       stroke,
@@ -98,11 +98,11 @@ export const setupNodeDecoratorDot = (
     strokeWidth,
     radius,
     x:
-      origin === WEAVE_CONNECTOR_NODE_DECORATOR_ORIGIN.START
+      origin === WEAVE_CONNECTOR_NODE_LINE_ORIGIN.START
         ? fromPoint.x ?? 0
         : toPoint.x ?? 0,
     y:
-      origin === WEAVE_CONNECTOR_NODE_DECORATOR_ORIGIN.START
+      origin === WEAVE_CONNECTOR_NODE_LINE_ORIGIN.START
         ? fromPoint.y ?? 0
         : toPoint.y ?? 0,
   });

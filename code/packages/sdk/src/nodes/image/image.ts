@@ -144,11 +144,11 @@ export class WeaveImageNode extends WeaveNode {
   };
 
   loadAsyncElement(nodeId: string) {
-    this.instance.loadAsyncElement(nodeId, 'image');
+    this.instance.loadAsyncElement(nodeId, WEAVE_IMAGE_NODE_TYPE);
   }
 
   resolveAsyncElement(nodeId: string) {
-    this.instance.resolveAsyncElement(nodeId, 'image');
+    this.instance.resolveAsyncElement(nodeId, WEAVE_IMAGE_NODE_TYPE);
   }
 
   onRender(props: WeaveElementAttributes): WeaveElementInstance {
