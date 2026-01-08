@@ -651,7 +651,6 @@ export class WeaveTextNode extends WeaveNode {
     };
 
     const cancelEditMode = () => {
-      // updateTextNodeSize();
       textNode.setAttr('cancelEditMode', undefined);
       this.removeTextAreaDOM(textNode);
       this.instance.removeEventListener(
