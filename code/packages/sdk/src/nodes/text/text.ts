@@ -49,10 +49,16 @@ export class WeaveTextNode extends WeaveNode {
   }
 
   private updateNode(nodeInstance: WeaveElementInstance) {
-    const clonedText = nodeInstance.clone();
-    clonedText.setAttr('triggerEditMode', undefined);
-    this.instance.updateNode(this.serialize(clonedText));
-    clonedText.destroy();
+    const actNode = this.instance
+      .getStage()
+      .findOne<Konva.Text>(`#${nodeInstance.id()}`);
+    if (actNode) {
+      const clonedText = actNode.clone();
+      clonedText.setAttr('triggerEditMode', undefined);
+      clonedText.setAttr('cancelEditMode', undefined);
+      this.instance.updateNode(this.serialize(clonedText));
+      clonedText.destroy();
+    }
   }
 
   private readonly handleKeyPress = (e: KeyboardEvent) => {
@@ -216,6 +222,15 @@ export class WeaveTextNode extends WeaveNode {
 
     text.setAttr('triggerEditMode', this.triggerEditMode.bind(this));
 
+    this.instance.addEventListener(
+      'onNodeRenderedAdded',
+      (node: Konva.Node) => {
+        if (node.id() === text.id() && node.getParent() !== text.getParent()) {
+          text.getAttr('cancelEditMode')?.();
+        }
+      }
+    );
+
     return text;
   }
 
@@ -292,6 +307,7 @@ export class WeaveTextNode extends WeaveNode {
     const cleanedAttrs = { ...attrs };
     delete cleanedAttrs.draggable;
     delete cleanedAttrs.triggerEditMode;
+    delete cleanedAttrs.cancelEditMode;
     delete cleanedAttrs.measureMultilineText;
 
     return {
@@ -633,6 +649,24 @@ export class WeaveTextNode extends WeaveNode {
         return;
       }
     };
+
+    const cancelEditMode = () => {
+      // updateTextNodeSize();
+      textNode.setAttr('cancelEditMode', undefined);
+      this.removeTextAreaDOM(textNode);
+      this.instance.removeEventListener(
+        'onZoomChange',
+        this.onZoomChangeHandler(textNode).bind(this)
+      );
+      this.instance.removeEventListener(
+        'onStageMove',
+        this.onStageMoveHandler(textNode).bind(this)
+      );
+      window.removeEventListener('pointerup', handleOutsideClick);
+      window.removeEventListener('pointerdown', handleOutsideClick);
+    };
+
+    textNode.setAttr('cancelEditMode', cancelEditMode.bind(this));
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const handleKeyUp = () => {

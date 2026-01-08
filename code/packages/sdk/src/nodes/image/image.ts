@@ -320,6 +320,20 @@ export class WeaveImageNode extends WeaveNode {
 
     image.setAttr('imageURL', imageProps.imageURL);
 
+    this.instance.addEventListener(
+      'onNodeRenderedAdded',
+      (node: Konva.Node) => {
+        if (
+          node.id() === image.id() &&
+          node.getParent() !== image.getParent()
+        ) {
+          if (this.imageCrop) {
+            this.closeCrop(image, WEAVE_IMAGE_CROP_END_TYPE.CANCEL);
+          }
+        }
+      }
+    );
+
     return image;
   }
 
