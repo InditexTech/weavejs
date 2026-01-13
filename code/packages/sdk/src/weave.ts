@@ -85,9 +85,9 @@ export class Weave {
   private pluginsManager: WeavePluginsManager;
   private actionsManager: WeaveActionsManager;
   private exportManager: WeaveExportManager;
-  private mutexManager: WeaveMutexManager;
-  private asyncManager: WeaveAsyncManager;
-  private hooksManager: WeaveHooksManager;
+  private readonly mutexManager: WeaveMutexManager;
+  private readonly asyncManager: WeaveAsyncManager;
+  private readonly hooksManager: WeaveHooksManager;
 
   constructor(weaveConfig: WeaveConfig, stageConfig: Konva.StageConfig) {
     globalThis._weave_isServerSide = false;
