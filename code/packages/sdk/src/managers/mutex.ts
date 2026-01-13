@@ -129,73 +129,35 @@ export class WeaveMutexManager {
     }: { nodeIds: string[]; operation: string; metadata?: T },
     user: WeaveUser
   ): boolean {
-    const userMutexKey = this.getUserMutexKey(user);
-
-    if (this.userMutexLocked.has(userMutexKey)) {
-      return false;
-    }
-
-    const preLockedNodes: string[] = [];
-    for (const nodeId of nodeIds) {
-      const nodeMutexKey = this.getNodeMutexKey(nodeId);
-
-      if (!this.nodeMutexLocked.has(nodeMutexKey)) {
-        this.nodeMutexLocked.set(nodeMutexKey, {
-          user,
-          operation,
-          metadata,
-        });
-
-        const nodeInstance = this.instance.getStage().findOne(`#${nodeId}`);
-        if (nodeInstance) {
-          nodeInstance.lockMutex(user);
-        }
-
-        preLockedNodes.push(nodeMutexKey);
-      } else {
-        break;
-      }
-    }
-
-    if (
-      preLockedNodes.length === nodeIds.length &&
-      !this.userMutexLocked.has(userMutexKey)
-    ) {
-      this.userMutexLocked.set(userMutexKey, {
-        user,
+    return this.setMutexLock(
+      {
         nodeIds,
         operation,
         metadata,
-      });
-
-      this.instance.emitEvent('onMutexLockChange', {
-        locks: [...this.userMutexLocked.keys()],
-      });
-
-      return true;
-    }
-
-    if (preLockedNodes.length !== nodeIds.length) {
-      this.userMutexLocked.delete(userMutexKey);
-      for (const nodeMutexKey of preLockedNodes) {
-        this.nodeMutexLocked.delete(nodeMutexKey);
-      }
-    }
-
-    return false;
+      },
+      user,
+      false
+    );
   }
 
-  setMutexLock<T>({
-    nodeIds,
-    operation,
-    metadata,
-  }: {
-    nodeIds: string[];
-    operation: string;
-    metadata?: T;
-  }): boolean {
+  setMutexLock<T>(
+    {
+      nodeIds,
+      operation,
+      metadata,
+    }: {
+      nodeIds: string[];
+      operation: string;
+      metadata?: T;
+    },
+    userInfo: WeaveUser | undefined = undefined,
+    sendAwareness: boolean = true
+  ): boolean {
     const store = this.instance.getStore();
-    const user = store.getUser();
+    let user = store.getUser();
+    if (typeof userInfo !== 'undefined') {
+      user = userInfo;
+    }
 
     const userMutexKey = this.getUserMutexKey(user);
 
@@ -236,12 +198,14 @@ export class WeaveMutexManager {
         metadata,
       });
 
-      store.setAwarenessInfo(this.WEAVE_USER_MUTEX_LOCK_KEY, {
-        user,
-        nodeIds,
-        operation,
-        metadata,
-      });
+      if (sendAwareness) {
+        store.setAwarenessInfo(this.WEAVE_USER_MUTEX_LOCK_KEY, {
+          user,
+          nodeIds,
+          operation,
+          metadata,
+        });
+      }
 
       this.instance.emitEvent('onMutexLockChange', {
         locks: [...this.userMutexLocked.keys()],
@@ -261,33 +225,18 @@ export class WeaveMutexManager {
   }
 
   releaseMutexLockRemote(user: WeaveUser): void {
-    const userMutexKey = this.getUserMutexKey(user);
-
-    if (this.userMutexLocked.has(userMutexKey)) {
-      const nodeIds = this.userMutexLocked.get(userMutexKey)!.nodeIds;
-
-      for (const nodeId of nodeIds) {
-        const nodeMutexKey = this.getNodeMutexKey(nodeId);
-
-        this.nodeMutexLocked.delete(nodeMutexKey);
-
-        const nodeInstance = this.instance.getStage().findOne(`#${nodeId}`);
-        if (nodeInstance) {
-          nodeInstance.releaseMutex();
-        }
-      }
-
-      this.userMutexLocked.delete(userMutexKey);
-
-      this.instance.emitEvent('onMutexLockChange', {
-        locks: [...this.userMutexLocked.keys()],
-      });
-    }
+    this.releaseMutexLock(user, false);
   }
 
-  releaseMutexLock(): void {
+  releaseMutexLock(
+    userInfo: WeaveUser | undefined = undefined,
+    sendAwareness: boolean = true
+  ): void {
     const store = this.instance.getStore();
-    const user = store.getUser();
+    let user = store.getUser();
+    if (typeof userInfo !== 'undefined') {
+      user = userInfo;
+    }
 
     const userMutexKey = this.getUserMutexKey(user);
 
@@ -307,7 +256,9 @@ export class WeaveMutexManager {
 
       this.userMutexLocked.delete(userMutexKey);
 
-      store.setAwarenessInfo(this.WEAVE_USER_MUTEX_LOCK_KEY, undefined);
+      if (sendAwareness) {
+        store.setAwarenessInfo(this.WEAVE_USER_MUTEX_LOCK_KEY, undefined);
+      }
 
       this.instance.emitEvent('onMutexLockChange', {
         locks: [...this.userMutexLocked.keys()],
