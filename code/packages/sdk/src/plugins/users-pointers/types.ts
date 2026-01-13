@@ -18,10 +18,12 @@ export type WeaveUserPointersUIProperties = {
     backgroundPaddingX: number;
     backgroundPaddingY: number;
   };
+  operationSeparation: number;
 };
 
 export type WeaveUsersPointersPluginConfig = {
   getUser: () => WeaveUser;
+  getOperationName?: (operation: string) => string;
   getUserBackgroundColor: (
     user: WeaveUser
   ) => string | CanvasGradient | undefined;

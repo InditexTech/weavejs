@@ -349,16 +349,16 @@ export class WeaveArrowToolAction extends WeaveAction {
           'onAddedArrow'
         );
       }
-    }
 
-    const selectionPlugin =
-      this.instance.getPlugin<WeaveNodesSelectionPlugin>('nodesSelection');
-    if (selectionPlugin) {
-      const node = stage.findOne(`#${this.arrowId}`);
-      if (node) {
-        selectionPlugin.setSelectedNodes([node]);
+      const selectionPlugin =
+        this.instance.getPlugin<WeaveNodesSelectionPlugin>('nodesSelection');
+      if (selectionPlugin) {
+        const node = stage.findOne(`#${this.arrowId}`);
+        if (node) {
+          selectionPlugin.setSelectedNodes([node]);
+        }
+        this.instance.triggerAction(SELECTION_TOOL_ACTION_NAME);
       }
-      this.instance.triggerAction(SELECTION_TOOL_ACTION_NAME);
     }
 
     stage.container().style.cursor = 'default';

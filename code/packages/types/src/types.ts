@@ -13,6 +13,7 @@ import {
   WEAVE_TRANSFORMER_ANCHORS,
   WEAVE_STORE_CONNECTION_STATUS,
   WEAVE_KONVA_BACKEND,
+  WEAVE_ASYNC_STATUS,
 } from './constants';
 import { type WeaveNodeBase } from '@/base/node';
 import { type WeaveActionBase } from '@/base/action';
@@ -321,3 +322,29 @@ export type DeepPartial<T> = {
 export type WeaveKonvaBackendKeys = keyof typeof WEAVE_KONVA_BACKEND;
 export type WeaveKonvaBackend =
   (typeof WEAVE_KONVA_BACKEND)[WeaveKonvaBackendKeys];
+
+// Async element types
+
+export type WeaveAsyncStatusKeys = keyof typeof WEAVE_ASYNC_STATUS;
+export type WeaveAsyncStatus =
+  (typeof WEAVE_ASYNC_STATUS)[WeaveAsyncStatusKeys];
+
+export type WeaveAsyncElement = {
+  type: string;
+  status: WeaveAsyncStatus;
+};
+
+// Mutex model types
+
+export type WeaveUserMutexLock<T> = {
+  user: WeaveUser;
+  nodeIds: string[];
+  operation: string;
+  metadata?: T;
+};
+
+export type WeaveNodeMutexLock<T> = {
+  user: WeaveUser;
+  operation: string;
+  metadata?: T;
+};

@@ -57,6 +57,8 @@ declare module 'konva/lib/Node' {
     canDrag(): boolean;
     canMoveToContainer(node: Konva.Node): boolean;
     getNodeAnchors(): WeaveConnectorAnchor[];
+    lockMutex(user: WeaveUser): void;
+    releaseMutex(): void;
   }
   interface Layer {
     canMoveToContainer(node: Konva.Node): boolean;

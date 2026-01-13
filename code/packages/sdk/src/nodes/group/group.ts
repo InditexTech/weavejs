@@ -123,11 +123,16 @@ export class WeaveGroupNode extends WeaveNode {
       childrenMapped.push(handler.serialize(node));
     }
 
+    const cleanedAttrs = { ...attrs };
+    delete cleanedAttrs.mutexLocked;
+    delete cleanedAttrs.mutexUserId;
+    delete cleanedAttrs.draggable;
+
     return {
       key: attrs.id ?? '',
       type: attrs.nodeType,
       props: {
-        ...attrs,
+        ...cleanedAttrs,
         id: attrs.id ?? '',
         nodeType: attrs.nodeType,
         sceneFunc: undefined,

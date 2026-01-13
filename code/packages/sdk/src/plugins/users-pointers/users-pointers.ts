@@ -4,6 +4,7 @@
 
 import {
   type WeaveAwarenessChange,
+  type WeaveUserMutexLock,
   WEAVE_AWARENESS_LAYER_ID,
 } from '@inditextech/weave-types';
 import {
@@ -25,6 +26,7 @@ import { throttle } from 'lodash';
 export class WeaveUsersPointersPlugin extends WeavePlugin {
   private usersPointers: Record<string, WeaveUserPointer>;
   private config!: WeaveUsersPointersPluginConfig;
+  private usersOperations: Record<string, WeaveUserMutexLock<unknown>>;
 
   constructor(params: WeaveUsersPointersPluginParams) {
     super();
@@ -45,6 +47,7 @@ export class WeaveUsersPointersPlugin extends WeavePlugin {
     );
 
     this.usersPointers = {};
+    this.usersOperations = {};
   }
 
   getName(): string {
@@ -153,6 +156,21 @@ export class WeaveUsersPointersPlugin extends WeavePlugin {
 
     stage.on('pointermove', throttledHandleOnPointerMove);
 
+    const handleUsersLocksChange = ({ locks }: { locks: string[] }) => {
+      const actUsersLocks: Record<string, WeaveUserMutexLock<unknown>> = {};
+      for (const lockKey of locks) {
+        const mutexInfo = this.instance?.getLockDetails(lockKey);
+        if (mutexInfo) {
+          actUsersLocks[lockKey] = mutexInfo;
+        }
+      }
+      this.usersOperations = actUsersLocks;
+
+      this.renderPointers();
+    };
+
+    this.instance.addEventListener('onMutexLockChange', handleUsersLocksChange);
+
     this.renderPointers();
   }
 
@@ -209,7 +227,9 @@ export class WeaveUsersPointersPlugin extends WeavePlugin {
           backgroundPaddingX,
           backgroundPaddingY,
         },
+        operationSeparation,
       } = this.config.ui;
+      const getOperationName = this.config.getOperationName!;
 
       const userBackgroundColor = this.config.getUserBackgroundColor(
         userPointer.rawUser
@@ -272,6 +292,52 @@ export class WeaveUsersPointersPlugin extends WeavePlugin {
       userPointerNode.add(userPointNode);
       userPointerNode.add(userNameBackground);
       userPointerNode.add(userNameNode);
+
+      if (this.usersOperations[userPointer.user]) {
+        const userOperationNode = new Konva.Text({
+          id: `pointer_${userPointer.user}_userPointOperation`,
+          x: separation,
+          y:
+            -circleRadius * 2 +
+            backgroundPaddingY +
+            operationSeparation +
+            textHeight +
+            backgroundPaddingY * 2,
+          text: getOperationName(
+            this.usersOperations[userPointer.user].operation
+          ),
+          fontSize: fontSize,
+          fontFamily: fontFamily,
+          lineHeight: 0.9,
+          fill: userForegroundColor,
+          align: 'center',
+          verticalAlign: 'middle',
+          draggable: false,
+          listening: false,
+          strokeScaleEnabled: false,
+          ellipsis: true,
+        });
+
+        const textOperationWidth = userOperationNode.getTextWidth();
+        const textOperationHeight = userOperationNode.getTextHeight();
+        userOperationNode.width(textOperationWidth + backgroundPaddingX * 2);
+        userOperationNode.height(textOperationHeight + backgroundPaddingY * 2);
+
+        const userOperationBackground = new Konva.Rect({
+          id: `pointer_${userPointer.user}_userPointOperationRect`,
+          x: separation,
+          y: -backgroundPaddingY + 4 + userNameBackground.height(),
+          width: textOperationWidth + backgroundPaddingX * 2,
+          height: textOperationHeight + backgroundPaddingY * 2,
+          cornerRadius: backgroundCornerRadius,
+          fill: userBackgroundColor,
+          draggable: false,
+          listening: false,
+        });
+
+        userPointerNode.add(userOperationBackground);
+        userPointerNode.add(userOperationNode);
+      }
 
       pointersLayer?.add(userPointerNode);
     }
