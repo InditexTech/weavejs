@@ -13,13 +13,13 @@ import { type Logger } from 'pino';
 import { WEAVE_CONNECTED_USER_INFO_KEY } from '@/plugins/connected-users/constants';
 
 export class WeaveMutexManager {
-  private instance: Weave;
-  private logger: Logger;
+  private readonly instance: Weave;
+  private readonly logger: Logger;
   private readonly userMutexLocked: Map<string, WeaveUserMutexLock<unknown>> =
     new Map();
   private readonly nodeMutexLocked: Map<string, WeaveNodeMutexLock<unknown>> =
     new Map();
-  private WEAVE_USER_MUTEX_LOCK_KEY = 'userMutexLock';
+  private readonly WEAVE_USER_MUTEX_LOCK_KEY = 'userMutexLock';
 
   constructor(instance: Weave) {
     this.instance = instance;

@@ -6,8 +6,8 @@ import { Weave } from '@/weave';
 import { type Logger } from 'pino';
 
 export class WeaveHooksManager {
-  private instance: Weave;
-  private logger: Logger;
+  private readonly instance: Weave;
+  private readonly logger: Logger;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   private readonly registeredHooks: Map<string, (params: any) => void> =
     new Map();

@@ -11,9 +11,9 @@ import { type Logger } from 'pino';
 import { watchMap } from './watch-map';
 
 export class WeaveAsyncManager {
-  private instance: Weave;
-  private logger: Logger;
-  private asyncElements: Map<string, WeaveAsyncElement>;
+  private readonly instance: Weave;
+  private readonly logger: Logger;
+  private readonly asyncElements: Map<string, WeaveAsyncElement>;
 
   constructor(instance: Weave) {
     this.instance = instance;
