@@ -288,6 +288,8 @@ export class WeaveStrokeNode extends WeaveNode {
     const attrs = instance.getAttrs();
 
     const cleanedAttrs = { ...attrs };
+    delete cleanedAttrs.mutexLocked;
+    delete cleanedAttrs.mutexUserId;
     delete cleanedAttrs.draggable;
     delete cleanedAttrs.sceneFunc;
     delete cleanedAttrs.hitFunc;

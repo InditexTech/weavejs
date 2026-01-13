@@ -24,6 +24,7 @@ import {
   type WeaveNodeConfiguration,
   type WeaveStoreConnectionStatus,
   WEAVE_STORE_CONNECTION_STATUS,
+  type WeaveUserMutexLock,
 } from '@inditextech/weave-types';
 import { WeaveStore } from './stores/store';
 import {
@@ -50,12 +51,14 @@ import { WeaveActionsManager } from './managers/actions';
 import { WeaveStoreManager } from './managers/store';
 import { WeaveExportManager } from './managers/export/export';
 import { WeavePluginsManager } from './managers/plugins';
+import { WeaveMutexManager } from './managers/mutex';
 import { WeaveNodesSelectionPlugin } from './plugins/nodes-selection/nodes-selection';
 import type { StageConfig } from 'konva/lib/Stage';
 import type { WeaveStoreOnRoomLoadedEvent } from './stores/types';
-import type { DOMElement, WeaveAsyncElement } from './types';
-import { watchMap } from './watch-map';
+import type { DOMElement } from './types';
 import { getBoundingBox, mergeExceptArrays } from './utils';
+import { WeaveAsyncManager } from './managers/async/async';
+import { WeaveHooksManager } from './managers/hooks';
 
 export class Weave {
   private id: string;
@@ -82,12 +85,9 @@ export class Weave {
   private pluginsManager: WeavePluginsManager;
   private actionsManager: WeaveActionsManager;
   private exportManager: WeaveExportManager;
-
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  private readonly registeredHooks: Map<string, (params: any) => void> =
-    new Map();
-
-  private readonly asyncElements: Map<string, WeaveAsyncElement>;
+  private mutexManager: WeaveMutexManager;
+  private asyncManager: WeaveAsyncManager;
+  private hooksManager: WeaveHooksManager;
 
   constructor(weaveConfig: WeaveConfig, stageConfig: Konva.StageConfig) {
     globalThis._weave_isServerSide = false;
@@ -102,10 +102,6 @@ export class Weave {
     // Setup instance id
     this.id = uuidv4();
     this.initialized = false;
-
-    this.asyncElements = watchMap<string, WeaveAsyncElement>(() => {
-      this.emitEvent('onAsyncElementChange');
-    }, new Map());
 
     // Save in memory the configuration provided
     this.config = mergeExceptArrays({}, weaveConfig);
@@ -144,6 +140,9 @@ export class Weave {
     this.exportManager = new WeaveExportManager(this);
     this.actionsManager = new WeaveActionsManager(this);
     this.pluginsManager = new WeavePluginsManager(this);
+    this.mutexManager = new WeaveMutexManager(this);
+    this.asyncManager = new WeaveAsyncManager(this);
+    this.hooksManager = new WeaveHooksManager(this);
 
     // Render welcome log to console
     this.setupManager.welcomeLog();
@@ -1034,63 +1033,78 @@ export class Weave {
     }
   }
 
+  // ASYNC ELEMENTS METHODS
+
   public asyncElementsLoaded(): boolean {
-    return [...this.asyncElements.values()].every(
-      (el) => el.status === 'loaded'
-    );
+    return this.asyncManager.asyncElementsLoaded();
   }
 
   public loadAsyncElement(nodeId: string, type: string): void {
-    let element = this.asyncElements.get(nodeId);
-    if (element) {
-      element.status = 'loading';
-    } else {
-      element = { type, status: 'loading' };
-    }
-
-    this.asyncElements.set(nodeId, element);
+    this.asyncManager.loadAsyncElement(nodeId, type);
   }
 
   public resolveAsyncElement(nodeId: string, type: string): void {
-    let element = this.asyncElements.get(nodeId);
-    if (element) {
-      element.status = 'loaded';
-    } else {
-      element = { type, status: 'loaded' };
-    }
-
-    this.asyncElements.set(nodeId, element);
+    this.asyncManager.resolveAsyncElement(nodeId, type);
   }
 
   public isServerSide(): boolean {
     return globalThis._weave_isServerSide === true;
   }
 
+  // HOOKS MANAGEMENT METHODS
+
   registerHook<T>(hookName: string, hook: (params: T) => void): void {
-    const exists = this.registeredHooks.has(hookName);
-    if (!exists) {
-      this.registeredHooks.set(hookName, hook);
-    }
+    this.hooksManager.registerHook<T>(hookName, hook);
   }
 
   runPhaseHooks<T>(
     phaseName: string,
     execution: (hook: (params: T) => void) => void
   ): void {
-    const hooks = [...this.registeredHooks.keys()]
-      .filter((key) => key.startsWith(`${phaseName}:`))
-      .map((key) => this.registeredHooks.get(key) as (params: T) => void);
-
-    for (const hook of hooks) {
-      execution(hook);
-    }
+    this.hooksManager.runPhaseHooks<T>(phaseName, execution);
   }
 
   getHook<T>(hookName: string): T | undefined {
-    return this.registeredHooks.get(hookName) as T;
+    return this.hooksManager.getHook<T>(hookName);
   }
 
   unregisterHook(hookName: string): void {
-    this.registeredHooks.delete(hookName);
+    this.hooksManager.unregisterHook(hookName);
+  }
+
+  // MUTEX MANAGEMENT METHODS
+
+  async acquireMutexLock(
+    { nodeIds, operation }: { nodeIds: string[]; operation: string },
+    action: () => void | Promise<void>
+  ): Promise<void> {
+    return await this.mutexManager.acquireMutexLock(
+      { nodeIds, operation },
+      action
+    );
+  }
+
+  setMutexLock<T>({
+    nodeIds,
+    operation,
+    metadata,
+  }: {
+    nodeIds: string[];
+    operation: string;
+    metadata?: T;
+  }): boolean {
+    return this.mutexManager.setMutexLock<T>({
+      nodeIds,
+      operation,
+      metadata,
+    });
+  }
+
+  releaseMutexLock(): void {
+    this.mutexManager.releaseMutexLock();
+  }
+
+  getLockDetails<T>(lockId: string): WeaveUserMutexLock<T> | undefined {
+    return this.mutexManager.getUserMutexLock<T>(lockId);
   }
 }

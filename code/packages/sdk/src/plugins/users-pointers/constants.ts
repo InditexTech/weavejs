@@ -25,5 +25,7 @@ export const WEAVE_USERS_POINTERS_CONFIG_DEFAULT_PROPS = {
       backgroundPaddingX: 8,
       backgroundPaddingY: 4,
     },
+    operationSeparation: 4,
   },
+  getOperationName: (operation: string) => operation,
 };

@@ -305,6 +305,8 @@ export class WeaveTextNode extends WeaveNode {
     const attrs = instance.getAttrs();
 
     const cleanedAttrs = { ...attrs };
+    delete cleanedAttrs.mutexLocked;
+    delete cleanedAttrs.mutexUserId;
     delete cleanedAttrs.draggable;
     delete cleanedAttrs.triggerEditMode;
     delete cleanedAttrs.cancelEditMode;
@@ -557,6 +559,17 @@ export class WeaveTextNode extends WeaveNode {
     this.textArea.style.left = `${correctionX - 1}px`;
     this.textArea.style.top = `${correctionY}px`;
 
+    const updateTextNode = () => {
+      if (!this.textArea) {
+        return;
+      }
+
+      updateTextNodeSize();
+      textNode.text(this.textArea.value);
+      textNode.visible(true);
+      this.instance.updateNode(this.serialize(textNode));
+    };
+
     this.textArea.onfocus = () => {
       this.textAreaDomResize(textNode);
     };
@@ -568,9 +581,11 @@ export class WeaveTextNode extends WeaveNode {
     };
     this.textArea.onpaste = () => {
       this.textAreaDomResize(textNode);
+      updateTextNode();
     };
     this.textArea.oninput = () => {
       this.textAreaDomResize(textNode);
+      updateTextNode();
     };
     // lock internal scroll
     this.textAreaSuperContainer.addEventListener('scroll', () => {
@@ -792,6 +807,8 @@ export class WeaveTextNode extends WeaveNode {
   }
 
   private removeTextAreaDOM(textNode: Konva.Text) {
+    this.instance.releaseMutexLock();
+
     this.editing = false;
     const stage = this.instance.getStage();
 
@@ -827,6 +844,15 @@ export class WeaveTextNode extends WeaveNode {
   }
 
   private triggerEditMode(textNode: Konva.Text) {
+    const lockAcquired = this.instance.setMutexLock({
+      nodeIds: [textNode.id()],
+      operation: 'text-edit',
+    });
+
+    if (!lockAcquired) {
+      return;
+    }
+
     this.editing = true;
 
     textNode.visible(false);

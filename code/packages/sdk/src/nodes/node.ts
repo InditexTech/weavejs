@@ -10,6 +10,7 @@ import {
   type WeaveNodeBase,
   WEAVE_NODE_CUSTOM_EVENTS,
   type WeaveNodeConfiguration,
+  type WeaveUser,
 } from '@inditextech/weave-types';
 import { type Logger } from 'pino';
 import { WeaveNodesSelectionPlugin } from '@/plugins/nodes-selection/nodes-selection';
@@ -221,6 +222,23 @@ export abstract class WeaveNode implements WeaveNodeBase {
 
       return anchors;
     };
+    node.lockMutex = function (user: WeaveUser) {
+      const actUser = actInstance.getStore().getUser();
+      this.setAttrs({ mutexLocked: true, mutexUserId: user.id });
+
+      const selectionPlugin =
+        actInstance.getPlugin<WeaveNodesSelectionPlugin>('nodesSelection');
+      if (selectionPlugin && actUser.id !== user.id) {
+        const selectedNodes = selectionPlugin.getSelectedNodes();
+        const filteredNodes = selectedNodes.filter(
+          (n) => n.getAttrs().id !== this.getAttrs().id
+        );
+        selectionPlugin.setSelectedNodes(filteredNodes);
+      }
+    };
+    node.releaseMutex = function () {
+      this.setAttrs({ mutexLocked: false, mutexUserId: undefined });
+    };
   }
 
   isNodeSelected(ele: Konva.Node): boolean {
@@ -317,9 +335,21 @@ export abstract class WeaveNode implements WeaveNodeBase {
       node.on('transformstart', (e) => {
         transforming = true;
 
+        if (e.target.getAttrs().strokeScaleEnabled !== false) {
+          e.target.setAttr('strokeScaleEnabled', false);
+          e.target.setAttr('_revertStrokeScaleEnabled', true);
+        }
+
         this.getNodesSelectionFeedbackPlugin()?.hideSelectionHalo(node);
 
         this.instance.emitEvent('onTransform', e.target);
+
+        if (this.getSelectionPlugin()?.getSelectedNodes().length === 1) {
+          this.instance.setMutexLock({
+            nodeIds: [e.target.id()],
+            operation: 'node-transform',
+          });
+        }
       });
 
       const handleTransform = (e: KonvaEventObject<Event, Konva.Node>) => {
@@ -353,7 +383,14 @@ export abstract class WeaveNode implements WeaveNodeBase {
       node.on('transformend', (e) => {
         const node = e.target;
 
-        e.target.setAttr('strokeScaleEnabled', true);
+        if (this.getSelectionPlugin()?.getSelectedNodes().length === 1) {
+          this.instance.releaseMutexLock();
+        }
+
+        if (e.target.getAttrs()._revertStrokeScaleEnabled === true) {
+          e.target.setAttr('strokeScaleEnabled', true);
+        }
+        e.target.setAttr('_revertStrokeScaleEnabled', undefined);
 
         this.instance.emitEvent('onTransform', null);
 
@@ -501,6 +538,13 @@ export abstract class WeaveNode implements WeaveNodeBase {
             clone?.startDrag(e.evt);
           });
         }
+
+        if (this.getNodesSelectionPlugin()?.getSelectedNodes().length === 1) {
+          this.instance.setMutexLock({
+            nodeIds: [e.target.id()],
+            operation: 'node-drag',
+          });
+        }
       });
 
       const handleDragMove = (e: KonvaEventObject<DragEvent, Konva.Node>) => {
@@ -561,6 +605,7 @@ export abstract class WeaveNode implements WeaveNodeBase {
         const nodeTarget = e.target;
 
         if (this.getSelectionPlugin()?.getSelectedNodes().length === 1) {
+          this.instance.releaseMutexLock();
           this.getNodesSelectionFeedbackPlugin()?.showSelectionHalo(nodeTarget);
           this.getNodesSelectionFeedbackPlugin()?.updateSelectionHalo(
             nodeTarget
@@ -731,6 +776,7 @@ export abstract class WeaveNode implements WeaveNodeBase {
 
   handleMouseOver(node: Konva.Node): boolean {
     const stage = this.instance.getStage();
+    const user = this.instance.getStore().getUser();
     const activeAction = this.instance.getActiveAction();
 
     const isNodeSelectionEnabled = this.getSelectionPlugin()?.isEnabled();
@@ -739,6 +785,9 @@ export abstract class WeaveNode implements WeaveNodeBase {
 
     const isTargetable = node.getAttrs().isTargetable !== false;
     const isLocked = node.getAttrs().locked ?? false;
+    const isMutexLocked =
+      realNode.getAttrs().mutexLocked &&
+      realNode.getAttrs().mutexUserId !== user.id;
 
     if ([MOVE_TOOL_ACTION_NAME].includes(activeAction ?? '')) {
       return false;
@@ -747,15 +796,14 @@ export abstract class WeaveNode implements WeaveNodeBase {
     let showHover = false;
     let cancelBubble = false;
 
-    // Node is locked
+    // Node is locked or is mutex locked by another user
     if (
       isNodeSelectionEnabled &&
       this.isSelecting() &&
       !this.isNodeSelected(realNode) &&
       !this.isPasting() &&
-      isLocked
+      (isLocked || isMutexLocked)
     ) {
-      const stage = this.instance.getStage();
       stage.container().style.cursor = 'default';
       cancelBubble = true;
     }
@@ -767,10 +815,9 @@ export abstract class WeaveNode implements WeaveNodeBase {
       !this.isNodeSelected(realNode) &&
       !this.isPasting() &&
       isTargetable &&
-      !isLocked &&
+      !(isLocked || isMutexLocked) &&
       stage.mode() === WEAVE_STAGE_DEFAULT_MODE
     ) {
-      const stage = this.instance.getStage();
       showHover = true;
       stage.container().style.cursor = 'pointer';
       cancelBubble = true;
@@ -783,10 +830,9 @@ export abstract class WeaveNode implements WeaveNodeBase {
       this.isNodeSelected(realNode) &&
       !this.isPasting() &&
       isTargetable &&
-      !isLocked &&
+      !(isLocked || isMutexLocked) &&
       stage.mode() === WEAVE_STAGE_DEFAULT_MODE
     ) {
-      const stage = this.instance.getStage();
       showHover = true;
       stage.container().style.cursor = 'grab';
       cancelBubble = true;
@@ -798,7 +844,6 @@ export abstract class WeaveNode implements WeaveNodeBase {
 
     // We're on pasting mode
     if (this.isPasting()) {
-      const stage = this.instance.getStage();
       stage.container().style.cursor = 'crosshair';
       cancelBubble = true;
     }
@@ -855,6 +900,8 @@ export abstract class WeaveNode implements WeaveNodeBase {
     const attrs = instance.getAttrs();
 
     const cleanedAttrs = { ...attrs };
+    delete cleanedAttrs.mutexLocked;
+    delete cleanedAttrs.mutexUserId;
     delete cleanedAttrs.draggable;
 
     return {

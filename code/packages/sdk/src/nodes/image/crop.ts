@@ -323,6 +323,8 @@ export class WeaveImageCrop {
 
     stage.mode(WEAVE_STAGE_DEFAULT_MODE);
 
+    this.instance.releaseMutexLock();
+
     this.instance.emitEvent<WeaveImageOnCropEndEvent>('onImageCropEnd', {
       instance: this.image,
     });

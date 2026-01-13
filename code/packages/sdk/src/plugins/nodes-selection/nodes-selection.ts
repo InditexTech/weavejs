@@ -254,6 +254,22 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
 
     tr.on('transformstart', () => {
       this.triggerSelectedNodesEvent();
+
+      const selectedNodes = tr.nodes();
+
+      for (const node of selectedNodes) {
+        if (node.getAttrs().strokeScaleEnabled !== false) {
+          node.setAttr('strokeScaleEnabled', false);
+          node.setAttr('_revertStrokeScaleEnabled', true);
+        }
+      }
+
+      if (this.getSelectedNodes().length > 1) {
+        this.instance.setMutexLock({
+          nodeIds: selectedNodes.map((node) => node.id()),
+          operation: 'nodes-transform',
+        });
+      }
     });
 
     let nodeHovered: Konva.Node | undefined = undefined;
@@ -310,6 +326,19 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
     tr.on('transform', throttle(handleTransform, 50));
 
     tr.on('transformend', () => {
+      if (this.getSelectedNodes().length > 1) {
+        this.instance.releaseMutexLock();
+      }
+
+      const selectedNodes = tr.nodes();
+
+      for (const node of selectedNodes) {
+        if (node.getAttrs()._revertStrokeScaleEnabled === true) {
+          node.setAttr('strokeScaleEnabled', true);
+        }
+        node.setAttr('_revertStrokeScaleEnabled', undefined);
+      }
+
       this.triggerSelectedNodesEvent();
     });
 
@@ -355,6 +384,13 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
       e.cancelBubble = true;
 
       tr.forceUpdate();
+
+      if (this.getSelectedNodes().length > 1) {
+        this.instance.setMutexLock({
+          nodeIds: selectedNodes.map((node) => node.id()),
+          operation: 'nodes-drag',
+        });
+      }
     });
 
     const handleDragMove = (
@@ -414,6 +450,10 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
     tr.on('dragend', (e) => {
       if (!this.didMove) {
         return;
+      }
+
+      if (this.getSelectedNodes().length > 1) {
+        this.instance.releaseMutexLock();
       }
 
       e.cancelBubble = true;
@@ -1438,7 +1478,13 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
     });
     const isSelected = nodeSelectedIndex !== -1;
 
-    if (nodeTargeted.getAttrs().locked) {
+    const user = this.instance.getStore().getUser();
+    const isLocked = nodeTargeted.getAttrs().locked ?? false;
+    const isMutexLocked =
+      nodeTargeted.getAttrs().mutexLocked &&
+      nodeTargeted.getAttrs().mutexUserId !== user.id;
+
+    if (isLocked || isMutexLocked) {
       return;
     }
 

@@ -395,6 +395,8 @@ export class WeaveFrameNode extends WeaveNode {
     const realAttrs = mainNode?.getAttrs();
 
     const cleanedAttrs = { ...realAttrs };
+    delete cleanedAttrs.mutexLocked;
+    delete cleanedAttrs.mutexUserId;
     delete cleanedAttrs.draggable;
     delete cleanedAttrs.onTargetEnter;
 

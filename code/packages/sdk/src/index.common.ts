@@ -12,6 +12,7 @@ export { WeaveAction } from './actions/action';
 export * from './actions/types';
 export { WeavePlugin } from './plugins/plugin';
 export * from './utils';
+export * from './types';
 
 // Provided Nodes
 export { WeaveStageNode } from './nodes/stage/stage';

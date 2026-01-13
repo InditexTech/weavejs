@@ -57,6 +57,15 @@ export class WeaveImageNode extends WeaveNode {
       return;
     }
 
+    const lockAcquired = this.instance.setMutexLock({
+      nodeIds: [imageNode.id()],
+      operation: 'image-crop',
+    });
+
+    if (!lockAcquired) {
+      return;
+    }
+
     stage.mode('cropping');
 
     const image = stage.findOne(`#${imageNode.getAttrs().id}`) as
