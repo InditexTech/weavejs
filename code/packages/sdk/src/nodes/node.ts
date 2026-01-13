@@ -36,6 +36,8 @@ import type { WeaveNodesDistanceSnappingPlugin } from '@/plugins/nodes-distance-
 import type { WeaveNodesMultiSelectionFeedbackPlugin } from '@/plugins/nodes-multi-selection-feedback/nodes-multi-selection-feedback';
 import { WEAVE_NODES_MULTI_SELECTION_FEEDBACK_PLUGIN_KEY } from '@/plugins/nodes-multi-selection-feedback/constants';
 import type { WeaveNodeChangedContainerEvent } from './types';
+import type { WeaveUsersPresencePlugin } from '@/plugins/users-presence/users-presence';
+import { WEAVE_USERS_PRESENCE_PLUGIN_KEY } from '@/plugins/users-presence/constants';
 
 export const augmentKonvaStageClass = (): void => {
   Konva.Stage.prototype.isMouseWheelPressed = function () {
@@ -376,6 +378,17 @@ export abstract class WeaveNode implements WeaveNodeBase {
         ) {
           nodesEdgeSnappingPlugin.evaluateGuidelines(e);
         }
+
+        this.getUsersPresencePlugin()?.setPresence(node.id(), {
+          x: node.x(),
+          y: node.y(),
+          width: node.width(),
+          height: node.height(),
+          scaleX: node.scaleX(),
+          scaleY: node.scaleY(),
+          rotation: node.rotation(),
+          strokeScaleEnabled: false,
+        });
       };
 
       node.on('transform', throttle(handleTransform, 100));
@@ -386,6 +399,8 @@ export abstract class WeaveNode implements WeaveNodeBase {
         if (this.getSelectionPlugin()?.getSelectedNodes().length === 1) {
           this.instance.releaseMutexLock();
         }
+
+        this.getUsersPresencePlugin()?.removePresence(node.id());
 
         if (e.target.getAttrs()._revertStrokeScaleEnabled === true) {
           e.target.setAttr('strokeScaleEnabled', true);
@@ -582,6 +597,11 @@ export abstract class WeaveNode implements WeaveNodeBase {
         ) {
           clearContainerTargets(this.instance);
 
+          this.getUsersPresencePlugin()?.setPresence(realNodeTarget.id(), {
+            x: realNodeTarget.x(),
+            y: realNodeTarget.y(),
+          });
+
           const layerToMove = containerOverCursor(this.instance, [
             realNodeTarget,
           ]);
@@ -636,6 +656,7 @@ export abstract class WeaveNode implements WeaveNodeBase {
         this.instance.emitEvent('onDrag', null);
 
         const realNodeTarget: Konva.Node = this.getRealSelectedNode(nodeTarget);
+        this.getUsersPresencePlugin()?.removePresence(realNodeTarget.id());
 
         if (
           this.getNodesSelectionPlugin()?.getSelectedNodes().length === 1 &&
@@ -1125,5 +1146,13 @@ export abstract class WeaveNode implements WeaveNodeBase {
         WEAVE_NODES_MULTI_SELECTION_FEEDBACK_PLUGIN_KEY
       );
     return selectionFeedbackPlugin;
+  }
+
+  getUsersPresencePlugin() {
+    const usersPresencePlugin =
+      this.instance.getPlugin<WeaveUsersPresencePlugin>(
+        WEAVE_USERS_PRESENCE_PLUGIN_KEY
+      );
+    return usersPresencePlugin;
   }
 }

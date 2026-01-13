@@ -54,6 +54,8 @@ import { WEAVE_STAGE_PANNING_KEY } from '../stage-panning/constants';
 import type { WeaveNodesMultiSelectionFeedbackPlugin } from '../nodes-multi-selection-feedback/nodes-multi-selection-feedback';
 import { WEAVE_NODES_MULTI_SELECTION_FEEDBACK_PLUGIN_KEY } from '../nodes-multi-selection-feedback/constants';
 import type { WeaveNodeChangedContainerEvent } from '@/nodes/types';
+import type { WeaveUsersPresencePlugin } from '../users-presence/users-presence';
+import { WEAVE_USERS_PRESENCE_PLUGIN_KEY } from '../users-presence/constants';
 
 export class WeaveNodesSelectionPlugin extends WeavePlugin {
   private tr!: Konva.Transformer;
@@ -321,6 +323,21 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
       }
 
       this.triggerSelectedNodesEvent();
+
+      if (this.getUsersPresencePlugin()) {
+        for (const node of tr.nodes()) {
+          this.getUsersPresencePlugin()?.setPresence(node.id(), {
+            x: node.x(),
+            y: node.y(),
+            width: node.width(),
+            height: node.height(),
+            scaleX: node.scaleX(),
+            scaleY: node.scaleY(),
+            rotation: node.rotation(),
+            strokeScaleEnabled: false,
+          });
+        }
+      }
     };
 
     tr.on('transform', throttle(handleTransform, 50));
@@ -337,6 +354,10 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
           node.setAttr('strokeScaleEnabled', true);
         }
         node.setAttr('_revertStrokeScaleEnabled', undefined);
+
+        if (this.getUsersPresencePlugin()) {
+          this.getUsersPresencePlugin()?.removePresence(node.id());
+        }
       }
 
       this.triggerSelectedNodesEvent();
@@ -435,6 +456,15 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
 
         const layerToMove = containerOverCursor(this.instance, selectedNodes);
 
+        if (this.getUsersPresencePlugin()) {
+          for (const node of selectedNodes) {
+            this.getUsersPresencePlugin()?.setPresence(node.id(), {
+              x: node.x(),
+              y: node.y(),
+            });
+          }
+        }
+
         if (layerToMove && !selectionContainsFrames) {
           layerToMove.fire(WEAVE_NODE_CUSTOM_EVENTS.onTargetEnter, {
             bubbles: true,
@@ -463,6 +493,8 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
         for (const node of nodes) {
           this.getNodesSelectionFeedbackPlugin()?.showSelectionHalo(node);
           this.getNodesSelectionFeedbackPlugin()?.updateSelectionHalo(node);
+
+          this.getUsersPresencePlugin()?.removePresence(node.id());
         }
       }
 
@@ -1698,6 +1730,14 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
       WEAVE_STAGE_PANNING_KEY
     );
     return stagePanning;
+  }
+
+  getUsersPresencePlugin() {
+    const usersPresencePlugin =
+      this.instance.getPlugin<WeaveUsersPresencePlugin>(
+        WEAVE_USERS_PRESENCE_PLUGIN_KEY
+      );
+    return usersPresencePlugin;
   }
 
   getSelectorConfig(): TransformerConfig {
