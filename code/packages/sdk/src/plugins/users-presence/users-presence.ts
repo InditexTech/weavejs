@@ -20,6 +20,7 @@ import type {
   WeaveElementInstance,
 } from '@inditextech/weave-types';
 import type { WeaveNode } from '@/nodes/node';
+import type Konva from 'konva';
 
 export class WeaveUsersPresencePlugin extends WeavePlugin {
   private readonly config!: WeaveUsersPresencePluginConfig;
@@ -43,8 +44,28 @@ export class WeaveUsersPresencePlugin extends WeavePlugin {
     return WEAVE_USERS_PRESENCE_PLUGIN_KEY;
   }
 
+  private registerHooks(): void {
+    this.instance.registerHook<{
+      node: Konva.Node;
+      presenceData: Record<string, unknown>;
+    }>('onPresenceUpdate:usersPresencePlugin', ({ node, presenceData }) => {
+      const nodeHandler = this.instance.getNodeHandler<WeaveNode>(
+        node.getAttrs().nodeType
+      );
+
+      const newProps = {
+        ...node.getAttrs(),
+        ...presenceData,
+      };
+
+      nodeHandler?.onUpdate(node as WeaveElementInstance, newProps);
+    });
+  }
+
   onInit(): void {
     const stage = this.instance.getStage();
+
+    this.registerHooks();
 
     this.instance.addEventListener(
       'onAwarenessChange',
@@ -75,18 +96,15 @@ export class WeaveUsersPresencePlugin extends WeavePlugin {
 
             const nodeInstance = stage.findOne(`#${presenceInfo.nodeId}`);
             if (nodeInstance) {
-              const newProps = {
-                ...nodeInstance.getAttrs(),
-                ...(presenceInfo.attrs as Record<string, unknown>),
-              };
-
-              const nodeHandler = this.instance.getNodeHandler<WeaveNode>(
-                nodeInstance.getAttrs().nodeType
-              );
-              nodeHandler?.onUpdate(
-                nodeInstance as WeaveElementInstance,
-                newProps
-              );
+              this.instance.runPhaseHooks<{
+                node: Konva.Node;
+                presenceData: Record<string, unknown>;
+              }>('onPresenceUpdate', (hook) => {
+                hook({
+                  node: nodeInstance,
+                  presenceData: presenceInfo.attrs as Record<string, unknown>,
+                });
+              });
             }
           }
         }

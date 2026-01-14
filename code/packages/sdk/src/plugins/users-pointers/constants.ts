@@ -11,7 +11,7 @@ export const WEAVE_DEFAULT_USER_INFO_FUNCTION = () => ({
 });
 
 export const WEAVE_USERS_POINTERS_CONFIG_DEFAULT_PROPS = {
-  awarenessThrottleMs: 100,
+  awarenessThrottleMs: 50,
   ui: {
     separation: 8,
     pointer: {
