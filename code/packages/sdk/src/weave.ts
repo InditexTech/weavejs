@@ -25,6 +25,7 @@ import {
   type WeaveStoreConnectionStatus,
   WEAVE_STORE_CONNECTION_STATUS,
   type WeaveUserMutexLock,
+  type WeaveNodeMutexLock,
 } from '@inditextech/weave-types';
 import { WeaveStore } from './stores/store';
 import {
@@ -51,7 +52,7 @@ import { WeaveActionsManager } from './managers/actions';
 import { WeaveStoreManager } from './managers/store';
 import { WeaveExportManager } from './managers/export/export';
 import { WeavePluginsManager } from './managers/plugins';
-import { WeaveMutexManager } from './managers/mutex';
+import { WeaveMutexManager } from './managers/mutex/mutex';
 import { WeaveNodesSelectionPlugin } from './plugins/nodes-selection/nodes-selection';
 import type { StageConfig } from 'konva/lib/Stage';
 import type { WeaveStoreOnRoomLoadedEvent } from './stores/types';
@@ -1106,5 +1107,9 @@ export class Weave {
 
   getLockDetails<T>(lockId: string): WeaveUserMutexLock<T> | undefined {
     return this.mutexManager.getUserMutexLock<T>(lockId);
+  }
+
+  getNodeMutexLock<T>(nodeId: string): WeaveNodeMutexLock<T> | undefined {
+    return this.mutexManager.getNodeMutexLock<T>(nodeId);
   }
 }

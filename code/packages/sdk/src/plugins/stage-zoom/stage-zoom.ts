@@ -25,6 +25,7 @@ import {
 } from '@/utils';
 import type { WeaveContextMenuPlugin } from '../context-menu/context-menu';
 import type { WeaveStageGridPlugin } from '../stage-grid/stage-grid';
+import { DEFAULT_THROTTLE_MS } from '@/constants';
 
 export class WeaveStageZoomPlugin extends WeavePlugin {
   private isCtrlOrMetaPressed: boolean;
@@ -91,7 +92,7 @@ export class WeaveStageZoomPlugin extends WeavePlugin {
       }
     };
 
-    mainLayer?.on('draw', throttle(handleDraw, 50));
+    mainLayer?.on('draw', throttle(handleDraw, DEFAULT_THROTTLE_MS));
 
     this.setZoom(this.config.zoomSteps[this.actualStep]);
   }
@@ -390,32 +391,11 @@ export class WeaveStageZoomPlugin extends WeavePlugin {
     this.setZoom(scale, false);
   }
 
-  fitToSelection(smartZoom: boolean = false): void {
-    if (!this.enabled) {
-      return;
-    }
-
+  private fitToElements(
+    box: { x: number; y: number; width: number; height: number },
+    smartZoom: boolean = false
+  ): void {
     const stage = this.instance.getStage();
-
-    const selectionPlugin = this.getNodesSelectionPlugin();
-
-    if (!selectionPlugin) {
-      return;
-    }
-
-    const nodes = selectionPlugin.getTransformer().getNodes();
-
-    if (nodes.length === 0) {
-      return;
-    }
-
-    const box = getBoundingBox(selectionPlugin.getTransformer().getNodes(), {
-      relativeTo: stage,
-    });
-
-    if (box.width === 0 || box.height === 0) {
-      return;
-    }
 
     const container = stage.container();
     const scale = stage.scale();
@@ -477,6 +457,62 @@ export class WeaveStageZoomPlugin extends WeavePlugin {
     stage.position({ x: stageX, y: stageY });
 
     this.setZoom(finalScale, false);
+  }
+
+  fitToNodes(nodes: string[], smartZoom: boolean = false): void {
+    if (!this.enabled) {
+      return;
+    }
+
+    const stage = this.instance.getStage();
+
+    if (nodes.length === 0) {
+      return;
+    }
+
+    const nodesInstances = nodes
+      .map((nodeId) => this.instance.getStage().findOne(`#${nodeId}`))
+      .filter((node): node is Konva.Node => node !== null);
+
+    const box = getBoundingBox(nodesInstances, {
+      relativeTo: stage,
+    });
+
+    if (box.width === 0 || box.height === 0) {
+      return;
+    }
+
+    this.fitToElements(box, smartZoom);
+  }
+
+  fitToSelection(smartZoom: boolean = false): void {
+    if (!this.enabled) {
+      return;
+    }
+
+    const stage = this.instance.getStage();
+
+    const selectionPlugin = this.getNodesSelectionPlugin();
+
+    if (!selectionPlugin) {
+      return;
+    }
+
+    const nodes = selectionPlugin.getTransformer().getNodes();
+
+    if (nodes.length === 0) {
+      return;
+    }
+
+    const box = getBoundingBox(selectionPlugin.getTransformer().getNodes(), {
+      relativeTo: stage,
+    });
+
+    if (box.width === 0 || box.height === 0) {
+      return;
+    }
+
+    this.fitToElements(box, smartZoom);
   }
 
   enable(): void {
@@ -657,8 +693,6 @@ export class WeaveStageZoomPlugin extends WeavePlugin {
       doZoom = true;
     };
 
-    // const throttledHandleWheelImmediate = throttle(handleWheelImmediate, 30);
-
     window.addEventListener('wheel', handleWheelImmediate, {
       passive: false,
     });
@@ -681,7 +715,8 @@ export class WeaveStageZoomPlugin extends WeavePlugin {
       }
     };
 
-    const throttledHandleWheel = throttle(handleWheel, 30);
+    // CAREFUL: previously was 30ms
+    const throttledHandleWheel = throttle(handleWheel, DEFAULT_THROTTLE_MS);
 
     window.addEventListener('wheel', throttledHandleWheel, { passive: true });
   }

@@ -14,6 +14,9 @@ export { WeavePlugin } from './plugins/plugin';
 export * from './utils';
 export * from './types';
 
+// Managers
+export * from './managers/mutex/types';
+
 // Provided Nodes
 export { WeaveStageNode } from './nodes/stage/stage';
 export * from './nodes/stage/constants';
@@ -162,6 +165,9 @@ export * from './plugins/users-selection/types';
 export { WeaveUsersPointersPlugin } from './plugins/users-pointers/users-pointers';
 export * from './plugins/users-pointers/constants';
 export * from './plugins/users-pointers/types';
+export { WeaveUsersPresencePlugin } from './plugins/users-presence/users-presence';
+export * from './plugins/users-presence/constants';
+export * from './plugins/users-presence/types';
 export { WeaveContextMenuPlugin } from './plugins/context-menu/context-menu';
 export * from './plugins/context-menu/types';
 export { WeaveStageDropAreaPlugin } from './plugins/stage-drop-area/stage-drop-area';

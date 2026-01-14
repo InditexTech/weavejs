@@ -22,6 +22,7 @@ import type {
 } from './types';
 import type { KonvaEventObject } from 'konva/lib/Node';
 import { throttle } from 'lodash';
+import { DEFAULT_THROTTLE_MS } from '@/constants';
 
 export class WeaveTextNode extends WeaveNode {
   private config: WeaveTextProperties;
@@ -179,7 +180,7 @@ export class WeaveTextNode extends WeaveNode {
     text.on('transformstart', (e) => {
       this.instance.emitEvent('onTransform', e.target);
     });
-    text.on('transform', throttle(handleTextTransform, 50));
+    text.on('transform', throttle(handleTextTransform, DEFAULT_THROTTLE_MS));
     text.on('transformend', () => {
       this.instance.emitEvent('onTransform', null);
     });

@@ -11,6 +11,7 @@ import {
 import { Weave } from '@/weave';
 import { type Logger } from 'pino';
 import { WEAVE_CONNECTED_USER_INFO_KEY } from '@/plugins/connected-users/constants';
+import type { WeaveMutexLockChangeEvent } from './types';
 
 export class WeaveMutexManager {
   private readonly instance: Weave;
@@ -68,7 +69,6 @@ export class WeaveMutexManager {
             continue;
           }
           if (
-            typeof change[this.WEAVE_USER_MUTEX_LOCK_KEY] !== 'undefined' &&
             change[WEAVE_CONNECTED_USER_INFO_KEY] &&
             actUser.id !== change[WEAVE_CONNECTED_USER_INFO_KEY].id
           ) {
@@ -108,10 +108,18 @@ export class WeaveMutexManager {
     return undefined;
   }
 
+  getNodeMutexLock<T>(nodeMutexKey: string): WeaveUserMutexLock<T> | undefined {
+    if (this.nodeMutexLocked.get(nodeMutexKey)) {
+      return this.nodeMutexLocked.get(nodeMutexKey) as WeaveUserMutexLock<T>;
+    }
+
+    return undefined;
+  }
+
   getUserMutexKey(user?: WeaveUser): string {
     const store = this.instance.getStore();
     let userInfo = store.getUser();
-    if (typeof user !== 'undefined') {
+    if (user !== undefined) {
       userInfo = user;
     }
     return userInfo.id;
@@ -155,7 +163,7 @@ export class WeaveMutexManager {
   ): boolean {
     const store = this.instance.getStore();
     let user = store.getUser();
-    if (typeof userInfo !== 'undefined') {
+    if (userInfo !== undefined) {
       user = userInfo;
     }
 
@@ -169,7 +177,9 @@ export class WeaveMutexManager {
     for (const nodeId of nodeIds) {
       const nodeMutexKey = this.getNodeMutexKey(nodeId);
 
-      if (!this.nodeMutexLocked.has(nodeMutexKey)) {
+      if (this.nodeMutexLocked.has(nodeMutexKey)) {
+        break;
+      } else {
         this.nodeMutexLocked.set(nodeMutexKey, {
           user,
           operation,
@@ -182,8 +192,6 @@ export class WeaveMutexManager {
         }
 
         preLockedNodes.push(nodeMutexKey);
-      } else {
-        break;
       }
     }
 
@@ -207,7 +215,7 @@ export class WeaveMutexManager {
         });
       }
 
-      this.instance.emitEvent('onMutexLockChange', {
+      this.instance.emitEvent<WeaveMutexLockChangeEvent>('onMutexLockChange', {
         locks: [...this.userMutexLocked.keys()],
       });
 
@@ -234,7 +242,7 @@ export class WeaveMutexManager {
   ): void {
     const store = this.instance.getStore();
     let user = store.getUser();
-    if (typeof userInfo !== 'undefined') {
+    if (userInfo !== undefined) {
       user = userInfo;
     }
 

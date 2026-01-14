@@ -6,6 +6,7 @@ import { WeavePlugin } from '@/plugins/plugin';
 import { WEAVE_STAGE_RESIZE_KEY } from './constants';
 import { setupUpscaleStage } from '@/utils/upscale';
 import { throttle } from 'lodash';
+import { DEFAULT_THROTTLE_MS } from '@/constants';
 
 export class WeaveStageResizePlugin extends WeavePlugin {
   getLayerName = undefined;
@@ -46,7 +47,7 @@ export class WeaveStageResizePlugin extends WeavePlugin {
   onInit(): void {
     const throttledResize = throttle(() => {
       this.resizeStage();
-    }, 100);
+    }, DEFAULT_THROTTLE_MS);
 
     // Resize when window is resized
     window.addEventListener('resize', () => {

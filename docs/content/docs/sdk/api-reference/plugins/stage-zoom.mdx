@@ -171,6 +171,32 @@ setZoom(scale: number, centered: boolean = true, pointer?: Konva.Vector2d): void
 This method set the defined zoom as scale, the zoom by default is centered on screen and if a pointer is provided
 will use that pointer as zoom center.
 
+### fitToScreen
+
+```ts
+fitToScreen(): void
+```
+
+This method fits the zoom so all elements on the canvas are visible on the user screen or viewport.
+
+### fitToNodes
+
+```ts
+fitToNodes(nodes: string[], smartZoom: boolean = false): void
+```
+
+This method fits the zoom so all elements Id defined on the `nodes` parameter are visible on the user screen or
+viewport. If `smartZoom` is true, no scaling is done, only panning to the center of the defined elements.
+
+### fitToSelection
+
+```ts
+fitToSelection(smartZoom: boolean = false): void
+```
+
+This method fits the zoom so all selected elements (uses the WeaveNodesSelectionPlugin) are visible on the user
+screen or viewport. If `smartZoom` is true, no scaling is done, only panning to the center of the defined elements.
+
 ## Events
 
 ### onZoomChange

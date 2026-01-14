@@ -14,6 +14,7 @@ import type {
 } from './types';
 import { throttle } from 'lodash';
 import { mergeExceptArrays } from '@/utils';
+import { DEFAULT_THROTTLE_MS } from '@/constants';
 
 export class WeaveStageMinimapPlugin extends WeavePlugin {
   getLayerName = undefined;
@@ -180,7 +181,7 @@ export class WeaveStageMinimapPlugin extends WeavePlugin {
     const throttledUpdateMinimap = throttle(async () => {
       await this.updateMinimapContent();
       this.updateMinimapViewportReference();
-    }, 100);
+    }, DEFAULT_THROTTLE_MS);
 
     this.instance.addEventListener('onStateChange', throttledUpdateMinimap);
 

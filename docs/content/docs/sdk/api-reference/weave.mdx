@@ -675,6 +675,136 @@ showNodes(nodes: Konva.Node[]): void
 This method shows (makes them visible) the provided nodes, show means to set an attribute named `visible` to `true` and in
 that state, nodes are shown (visible) on the canvas.
 
+### Async loading management
+
+#### asyncElementsLoaded
+
+```ts
+asyncElementsLoaded(): boolean
+```
+
+This method return true if all defined async elements have the `loaded` state.
+
+#### loadAsyncElement
+
+```ts
+loadAsyncElement(nodeId: string, type: string): void
+```
+
+This method defines the node defined by `nodeId` - the id of the element - and `type` - the node type - an async element
+to the `loading` state.
+
+#### resolveAsyncElement
+
+```ts
+resolveAsyncElement(nodeId: string, type: string): void
+```
+
+This method defines the node defined by `nodeId` - the id of the element - and `type` - the node type - an async element
+to the `loaded` state.
+
+### Hooks management
+
+#### registerHook
+
+```ts
+registerHook<T>(hookName: string, hook: (params: T) => void): void
+```
+
+This method register a hook, the `hookName` has the format `phaseName:instanceName`, so when registering multiple hooks
+of the same `phaseName` we can distinguish them by `instanceName`. `hook` is the code to execute when the hook is called.
+
+#### runPhaseHooks
+
+```ts
+runPhaseHooks<T>(
+  phaseName: string,
+  execution: (hook: (params: T) => void) => void
+): void
+```
+
+This method runs the `execution` callback, the callback receives the instance `hook` function registered for the hooks
+defined by `phaseName:instanceName`.
+
+#### getHook
+
+```ts
+getHook<T>(hookName: string): T | undefined
+```
+
+This method return a registered hook, the `hookName` has the format `phaseName:instanceName`. If the `hookName` is not
+registered Then it returns `undefined`.
+
+#### unregisterHook
+
+```ts
+unregisterHook(hookName: string): void
+```
+
+This method un-registers a hook, the `hookName` has the format `phaseName:instanceName`. If no hook by `hookName` is found
+then no actions are performed.
+
+### Mutex operations management
+
+#### acquireMutexLock
+
+```ts
+async acquireMutexLock(
+  { nodeIds, operation }: { nodeIds: string[]; operation: string },
+  action: () => void | Promise<void>
+): Promise<void>
+```
+
+This method is an utility that allows an user to perform a mutex set of actions defined by a function, automatically
+managing the call to `setMutexLock` before the defined function is called and calling `releaseMutexLock` after the
+function returns.
+
+#### setMutexLock
+
+```ts
+setMutexLock<T>({
+  nodeIds,
+  operation,
+  metadata,
+}: {
+  nodeIds: string[];
+  operation: string;
+  metadata?: T;
+}): boolean
+```
+
+This method lock a set of nodes for a named operation for an undetermined time associated to an user. All other users
+cannot interact or use the defined nodes. Custom metadata can be passed for the lock operation. An user can only have a
+single lock at one time.
+
+If the lock is acquired then it returns `true` otherwise `false`.
+
+The lock id is the user id.
+
+#### releaseMutexLock
+
+```ts
+releaseMutexLock(): void
+```
+
+This method un-locks a user lock, if the user that calls this method has a lock, then this lock is released.
+
+#### getLockDetails
+
+```ts
+getLockDetails<T>(lockId: string): WeaveUserMutexLock<T> | undefined
+```
+
+This method returns the lock details if the lock specified exists.
+
+#### getNodeMutexLock
+
+```ts
+getNodeMutexLock<T>(nodeId: string): WeaveNodeMutexLock<T> | undefined
+```
+
+Internally Weave.js also manages a model of the nodes locked, this method returns the lock details of a particular node.
+
 ## TypeScript types
 
 ```ts
