@@ -69,7 +69,6 @@ export class WeaveMutexManager {
             continue;
           }
           if (
-            typeof change[this.WEAVE_USER_MUTEX_LOCK_KEY] !== 'undefined' &&
             change[WEAVE_CONNECTED_USER_INFO_KEY] &&
             actUser.id !== change[WEAVE_CONNECTED_USER_INFO_KEY].id
           ) {
@@ -120,7 +119,7 @@ export class WeaveMutexManager {
   getUserMutexKey(user?: WeaveUser): string {
     const store = this.instance.getStore();
     let userInfo = store.getUser();
-    if (typeof user !== 'undefined') {
+    if (user !== undefined) {
       userInfo = user;
     }
     return userInfo.id;
@@ -164,7 +163,7 @@ export class WeaveMutexManager {
   ): boolean {
     const store = this.instance.getStore();
     let user = store.getUser();
-    if (typeof userInfo !== 'undefined') {
+    if (userInfo !== undefined) {
       user = userInfo;
     }
 
@@ -178,7 +177,9 @@ export class WeaveMutexManager {
     for (const nodeId of nodeIds) {
       const nodeMutexKey = this.getNodeMutexKey(nodeId);
 
-      if (!this.nodeMutexLocked.has(nodeMutexKey)) {
+      if (this.nodeMutexLocked.has(nodeMutexKey)) {
+        break;
+      } else {
         this.nodeMutexLocked.set(nodeMutexKey, {
           user,
           operation,
@@ -191,8 +192,6 @@ export class WeaveMutexManager {
         }
 
         preLockedNodes.push(nodeMutexKey);
-      } else {
-        break;
       }
     }
 
@@ -243,7 +242,7 @@ export class WeaveMutexManager {
   ): void {
     const store = this.instance.getStore();
     let user = store.getUser();
-    if (typeof userInfo !== 'undefined') {
+    if (userInfo !== undefined) {
       user = userInfo;
     }
 
