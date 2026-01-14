@@ -22,7 +22,7 @@ import type {
 import type { WeaveNode } from '@/nodes/node';
 
 export class WeaveUsersPresencePlugin extends WeavePlugin {
-  private config!: WeaveUsersPresencePluginConfig;
+  private readonly config!: WeaveUsersPresencePluginConfig;
   private userPresence: WeaveUserPresenceInformation = {};
   onRender = undefined;
 
@@ -44,7 +44,6 @@ export class WeaveUsersPresencePlugin extends WeavePlugin {
   }
 
   onInit(): void {
-    // const store = this.instance.getStore();
     const stage = this.instance.getStage();
 
     this.instance.addEventListener(
@@ -61,12 +60,13 @@ export class WeaveUsersPresencePlugin extends WeavePlugin {
           }
 
           const userPresence = change[WEAVE_USER_PRESENCE_KEY];
+          const nodes = Object.keys(userPresence);
 
-          if (Object.keys(userPresence).length === 0) {
+          if (nodes.length === 0) {
             continue;
           }
 
-          for (const nodeId of Object.keys(userPresence)) {
+          for (const nodeId of nodes) {
             const presenceInfo = userPresence[nodeId];
 
             if (this.config.getUser().id === presenceInfo.userId) {
@@ -75,19 +75,18 @@ export class WeaveUsersPresencePlugin extends WeavePlugin {
 
             const nodeInstance = stage.findOne(`#${presenceInfo.nodeId}`);
             if (nodeInstance) {
+              const newProps = {
+                ...nodeInstance.getAttrs(),
+                ...(presenceInfo.attrs as Record<string, unknown>),
+              };
+
               const nodeHandler = this.instance.getNodeHandler<WeaveNode>(
                 nodeInstance.getAttrs().nodeType
               );
-              if (nodeHandler) {
-                const newProps = {
-                  ...nodeInstance.getAttrs(),
-                  ...(presenceInfo.attrs as Record<string, unknown>),
-                };
-                nodeHandler.onUpdate(
-                  nodeInstance as WeaveElementInstance,
-                  newProps
-                );
-              }
+              nodeHandler?.onUpdate(
+                nodeInstance as WeaveElementInstance,
+                newProps
+              );
             }
           }
         }
