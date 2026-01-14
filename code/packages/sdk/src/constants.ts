@@ -2,4 +2,4 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-export const DEFAULT_THROTTLE_MS = 100;
+export const DEFAULT_THROTTLE_MS = 50;

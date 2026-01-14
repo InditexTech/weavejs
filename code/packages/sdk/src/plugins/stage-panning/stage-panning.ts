@@ -6,6 +6,7 @@ import { WeavePlugin } from '@/plugins/plugin';
 import {
   WEAVE_STAGE_PANNING_DEFAULT_CONFIG,
   WEAVE_STAGE_PANNING_KEY,
+  WEAVE_STAGE_PANNING_THROTTLE_MS,
 } from './constants';
 import type { WeaveStageZoomPlugin } from '../stage-zoom/stage-zoom';
 import type { WeaveContextMenuPlugin } from '../context-menu/context-menu';
@@ -273,8 +274,10 @@ export class WeaveStagePanningPlugin extends WeavePlugin {
       this.instance.emitEvent('onStageMove');
     };
 
-    // CAREFUL: previously was 20ms
-    const handleWheelThrottled = throttle(handleWheel, DEFAULT_THROTTLE_MS);
+    const handleWheelThrottled = throttle(
+      handleWheel,
+      WEAVE_STAGE_PANNING_THROTTLE_MS
+    );
 
     window.addEventListener('wheel', handleWheelThrottled, { passive: true });
 
