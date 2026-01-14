@@ -117,6 +117,24 @@ export class WeaveContextMenuPlugin extends WeavePlugin {
       this.closeContextMenu();
     }
 
+    // Check if nodes are locked by other users
+    let allNodesUnlocked = true;
+    const actUser = this.instance.getStore().getUser();
+    for (const node of nodes) {
+      const mutexInfo = this.instance.getNodeMutexLock<unknown>(
+        node.node?.key ?? ''
+      );
+
+      if (mutexInfo && mutexInfo.user.id !== actUser.id) {
+        allNodesUnlocked = false;
+        break;
+      }
+    }
+
+    if (!allNodesUnlocked) {
+      return;
+    }
+
     if (
       selectionPlugin &&
       !(
@@ -132,7 +150,7 @@ export class WeaveContextMenuPlugin extends WeavePlugin {
     const pointerPos = stage.getPointerPosition();
     const relativeClickPoint = stage.getRelativePointerPosition();
 
-    if (containerRect && pointerPos && relativeClickPoint) {
+    if (containerRect && pointerPos && relativeClickPoint && allNodesUnlocked) {
       const contextMenuPoint: Konva.Vector2d = {
         x: containerRect.left + pointerPos.x + (this.config.xOffset ?? 4),
         y: containerRect.top + pointerPos.y + (this.config.yOffset ?? 4),
