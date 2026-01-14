@@ -2,6 +2,8 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
+import { DEFAULT_THROTTLE_MS } from '@/constants';
+
 export const WEAVE_USERS_POINTERS_KEY = 'usersPointers';
 export const WEAVE_USER_POINTER_KEY = 'userPointer';
 
@@ -11,7 +13,7 @@ export const WEAVE_DEFAULT_USER_INFO_FUNCTION = () => ({
 });
 
 export const WEAVE_USERS_POINTERS_CONFIG_DEFAULT_PROPS = {
-  awarenessThrottleMs: 50,
+  awarenessThrottleMs: DEFAULT_THROTTLE_MS,
   ui: {
     separation: 8,
     pointer: {

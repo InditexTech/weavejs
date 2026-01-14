@@ -56,6 +56,7 @@ import { WEAVE_NODES_MULTI_SELECTION_FEEDBACK_PLUGIN_KEY } from '../nodes-multi-
 import type { WeaveNodeChangedContainerEvent } from '@/nodes/types';
 import type { WeaveUsersPresencePlugin } from '../users-presence/users-presence';
 import { WEAVE_USERS_PRESENCE_PLUGIN_KEY } from '../users-presence/constants';
+import { DEFAULT_THROTTLE_MS } from '@/constants';
 
 export class WeaveNodesSelectionPlugin extends WeavePlugin {
   private tr!: Konva.Transformer;
@@ -340,7 +341,7 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
       }
     };
 
-    tr.on('transform', throttle(handleTransform, 50));
+    tr.on('transform', throttle(handleTransform, DEFAULT_THROTTLE_MS));
 
     tr.on('transformend', () => {
       if (this.getSelectedNodes().length > 1) {

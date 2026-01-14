@@ -25,6 +25,7 @@ import {
 } from '@/utils';
 import type { WeaveContextMenuPlugin } from '../context-menu/context-menu';
 import type { WeaveStageGridPlugin } from '../stage-grid/stage-grid';
+import { DEFAULT_THROTTLE_MS } from '@/constants';
 
 export class WeaveStageZoomPlugin extends WeavePlugin {
   private isCtrlOrMetaPressed: boolean;
@@ -91,7 +92,7 @@ export class WeaveStageZoomPlugin extends WeavePlugin {
       }
     };
 
-    mainLayer?.on('draw', throttle(handleDraw, 50));
+    mainLayer?.on('draw', throttle(handleDraw, DEFAULT_THROTTLE_MS));
 
     this.setZoom(this.config.zoomSteps[this.actualStep]);
   }
@@ -692,8 +693,6 @@ export class WeaveStageZoomPlugin extends WeavePlugin {
       doZoom = true;
     };
 
-    // const throttledHandleWheelImmediate = throttle(handleWheelImmediate, 30);
-
     window.addEventListener('wheel', handleWheelImmediate, {
       passive: false,
     });
@@ -716,7 +715,8 @@ export class WeaveStageZoomPlugin extends WeavePlugin {
       }
     };
 
-    const throttledHandleWheel = throttle(handleWheel, 30);
+    // CAREFUL: previously was 30ms
+    const throttledHandleWheel = throttle(handleWheel, DEFAULT_THROTTLE_MS);
 
     window.addEventListener('wheel', throttledHandleWheel, { passive: true });
   }

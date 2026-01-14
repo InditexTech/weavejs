@@ -2,9 +2,11 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
+import { DEFAULT_THROTTLE_MS } from '@/constants';
+
 export const WEAVE_USER_PRESENCE_KEY = 'userPresence';
 export const WEAVE_USERS_PRESENCE_PLUGIN_KEY = 'usersPresence';
 
 export const WEAVE_USERS_PRESENCE_CONFIG_DEFAULT_PROPS = {
-  awarenessThrottleMs: 100,
+  awarenessThrottleMs: DEFAULT_THROTTLE_MS,
 };

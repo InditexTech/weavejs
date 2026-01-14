@@ -26,6 +26,7 @@ import {
 } from './types';
 import { throttle } from 'lodash';
 import { MOVE_TOOL_ACTION_NAME } from '@/actions/move-tool/constants';
+import { DEFAULT_THROTTLE_MS } from '@/constants';
 
 export class WeaveStageGridPlugin extends WeavePlugin {
   private moveToolActive: boolean;
@@ -135,7 +136,7 @@ export class WeaveStageGridPlugin extends WeavePlugin {
       this.onRender();
     };
 
-    stage.on('pointermove', throttle(handleMouseMove, 50));
+    stage.on('pointermove', throttle(handleMouseMove, DEFAULT_THROTTLE_MS));
 
     stage.on('pointermove', () => {
       if (this.enabled) {

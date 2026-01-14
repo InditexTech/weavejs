@@ -30,6 +30,7 @@ import type {
   WeaveStagePanningPluginParams,
 } from './types';
 import type { KonvaEventObject } from 'konva/lib/Node';
+import { DEFAULT_THROTTLE_MS } from '@/constants';
 
 export class WeaveStagePanningPlugin extends WeavePlugin {
   private readonly config!: WeaveStagePanningPluginConfig;
@@ -222,7 +223,7 @@ export class WeaveStagePanningPlugin extends WeavePlugin {
       this.instance.emitEvent('onStageMove');
     };
 
-    stage.on('pointermove', throttle(handleMouseMove, 50));
+    stage.on('pointermove', throttle(handleMouseMove, DEFAULT_THROTTLE_MS));
 
     stage.on('pointerup', (e) => {
       this.pointers.delete(e.evt.pointerId);
@@ -272,7 +273,8 @@ export class WeaveStagePanningPlugin extends WeavePlugin {
       this.instance.emitEvent('onStageMove');
     };
 
-    const handleWheelThrottled = throttle(handleWheel, 20);
+    // CAREFUL: previously was 20ms
+    const handleWheelThrottled = throttle(handleWheel, DEFAULT_THROTTLE_MS);
 
     window.addEventListener('wheel', handleWheelThrottled, { passive: true });
 

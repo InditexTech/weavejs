@@ -38,6 +38,7 @@ import { WEAVE_NODES_MULTI_SELECTION_FEEDBACK_PLUGIN_KEY } from '@/plugins/nodes
 import type { WeaveNodeChangedContainerEvent } from './types';
 import type { WeaveUsersPresencePlugin } from '@/plugins/users-presence/users-presence';
 import { WEAVE_USERS_PRESENCE_PLUGIN_KEY } from '@/plugins/users-presence/constants';
+import { DEFAULT_THROTTLE_MS } from '@/constants';
 
 export const augmentKonvaStageClass = (): void => {
   Konva.Stage.prototype.isMouseWheelPressed = function () {
@@ -391,7 +392,7 @@ export abstract class WeaveNode implements WeaveNodeBase {
         });
       };
 
-      node.on('transform', throttle(handleTransform, 100));
+      node.on('transform', throttle(handleTransform, DEFAULT_THROTTLE_MS));
 
       node.on('transformend', (e) => {
         const node = e.target;
@@ -619,7 +620,7 @@ export abstract class WeaveNode implements WeaveNodeBase {
         }
       };
 
-      node.on('dragmove', throttle(handleDragMove, 100));
+      node.on('dragmove', throttle(handleDragMove, DEFAULT_THROTTLE_MS));
 
       node.on('dragend', (e) => {
         const nodeTarget = e.target;
