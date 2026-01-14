@@ -390,6 +390,91 @@ export class WeaveStageZoomPlugin extends WeavePlugin {
     this.setZoom(scale, false);
   }
 
+  fitToNodes(nodes: string[], smartZoom: boolean = false): void {
+    if (!this.enabled) {
+      return;
+    }
+
+    const stage = this.instance.getStage();
+
+    if (nodes.length === 0) {
+      return;
+    }
+
+    const nodesInstances = nodes
+      .map((nodeId) => this.instance.getStage().findOne(`#${nodeId}`))
+      .filter((node): node is Konva.Node => node !== null);
+
+    const box = getBoundingBox(nodesInstances, {
+      relativeTo: stage,
+    });
+
+    if (box.width === 0 || box.height === 0) {
+      return;
+    }
+
+    const container = stage.container();
+    const scale = stage.scale();
+    const containerWidth = container.clientWidth;
+    const containerHeight = container.clientHeight;
+
+    const visibleStageWidth = containerWidth / scale.x;
+    const visibleStageHeight = containerHeight / scale.y;
+
+    const fitsInView =
+      box.width + this.config.fitToSelection.padding * 2 <= visibleStageWidth &&
+      box.height + this.config.fitToSelection.padding * 2 <= visibleStageHeight;
+
+    const selectionCenter = {
+      x: box.x + box.width / 2,
+      y: box.y + box.height / 2,
+    };
+
+    if (smartZoom && fitsInView) {
+      // ✅ Only pan to center selection, keeping current scale
+      const newPosition = {
+        x: containerWidth / 2 - selectionCenter.x * scale.x,
+        y: containerHeight / 2 - selectionCenter.y * scale.y,
+      };
+
+      stage.position(newPosition);
+      return;
+    }
+
+    this.setZoom(1, false);
+    stage.setAttrs({ x: 0, y: 0 });
+
+    const upscaleScale = stage.getAttr('upscaleScale');
+    const stageBox = {
+      width: stage.width(),
+      height: stage.height(),
+    };
+
+    const availableScreenWidth =
+      stageBox.width - (2 * this.config.fitToSelection.padding) / upscaleScale;
+    const availableScreenHeight =
+      stageBox.height - (2 * this.config.fitToSelection.padding) / upscaleScale;
+
+    const scaleX = availableScreenWidth / box.width;
+    const scaleY = availableScreenHeight / box.height;
+    const finalScale = Math.min(scaleX, scaleY);
+
+    stage.scale({ x: finalScale, y: finalScale });
+
+    const selectionCenterX = box.x + box.width / 2;
+    const selectionCenterY = box.y + box.height / 2;
+
+    const canvasCenterX = stage.width() / (2 * finalScale);
+    const canvasCenterY = stage.height() / (2 * finalScale);
+
+    const stageX = (canvasCenterX - selectionCenterX) * finalScale;
+    const stageY = (canvasCenterY - selectionCenterY) * finalScale;
+
+    stage.position({ x: stageX, y: stageY });
+
+    this.setZoom(finalScale, false);
+  }
+
   fitToSelection(smartZoom: boolean = false): void {
     if (!this.enabled) {
       return;
