@@ -16,6 +16,7 @@
     "stage-zoom",
     "stage-keyboard",
     "users-pointers",
+    "users-presence",
     "users-selector"
   ]
 }

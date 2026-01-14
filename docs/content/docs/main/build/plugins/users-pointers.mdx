@@ -39,11 +39,31 @@ import { WeaveUsersPointersPlugin } from "@inditextech/weave-sdk";
 Then register the plugin on the [Weave](/docs/sdk/api-reference/weave) class instance.
 
 ```ts
+const getUser = () => { // [!code ++]
+  id: 'user-id', // [!code ++]
+  email: 'useremail@corp.com', // [!code ++]
+  name: 'User' // [!code ++]
+} // [!code ++]
+
+const getUserBackgroundColor = (user: WeaveUser) => // [!code ++]
+  getUserBackgroundColor(user?.name ?? "#000000") // [!code ++]
+
+const getUserForegroundColor = (user: WeaveUser) => { // [!code ++]
+  const bgColor = getUserBackgroundColor(user?.name ?? "#000000"); // [!code ++]
+  return getContrastColor(bgColor); // [!code ++]
+} // [!code ++]
+
 const instance = new Weave({
   ...
   plugins: [
     ...,
-    new WeaveUsersPointersPlugin(), // [!code ++]
+    new WeaveUsersPointersPlugin({ // [!code ++]
+      config: { // [!code ++]
+        getUser, // [!code ++]
+        getUserBackgroundColor, // [!code ++]
+        getUserForegroundColor, // [!code ++]
+      }, // [!code ++]
+    }), // [!code ++]
   ]
 })
 ```

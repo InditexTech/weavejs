@@ -1,0 +1,73 @@
+---
+title: Users Presence
+description: Showcase what the users are doing on the canvas
+---
+
+![Users showcase plugin on use on the Weave.js showcase](/images/plugins/users-presence.gif)
+
+## Introduction
+
+This plugin displays in real-time what connected users are doing on the canvas. For example
+when an user drags/moves an element, the dragging movement will be displayed, and not just the
+final result of the user operation.
+
+As today we support:
+
+- Dragging of nodes
+- Transforming of nodes
+
+## Usage
+
+<div className="fd-steps">
+
+<div className="[&_h3]:fd-step">
+
+### Import the Plugin
+
+Start by importing the plugin:
+
+```ts
+import { WeaveUsersPresencePlugin } from "@inditextech/weave-sdk";
+```
+
+</div>
+
+<div className='[&_h3]:fd-step'>
+
+### Register the Plugin
+
+Then register the plugin on the [Weave](/docs/sdk/api-reference/weave) class instance.
+
+```ts
+const getUser = () => { // [!code ++]
+  id: 'user-id', // [!code ++]
+  email: 'useremail@corp.com', // [!code ++]
+  name: 'User' // [!code ++]
+}
+
+const instance = new Weave({
+  ...
+  plugins: [
+    ...,
+    new WeaveUsersPresencePlugin({ // [!code ++]
+      config: { // [!code ++]
+        getUser, // [!code ++]
+      }, // [!code ++]
+    }), // [!code ++]
+  ]
+})
+```
+
+</div>
+
+<div className='[&_h3]:fd-step'>
+
+### Use the plugin
+
+Once the plugin is registered if more than one users are connected to the [room](/docs/main/glossary#room),
+instance, users will be able to see the other users operations in real-time, and the others users can see
+theirs.
+
+</div>
+
+</div>

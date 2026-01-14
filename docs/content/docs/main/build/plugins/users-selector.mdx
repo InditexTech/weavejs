@@ -39,11 +39,24 @@ import { WeaveUsersSelectionPlugin } from "@inditextech/weave-sdk";
 Then register the plugin on the [Weave](/docs/sdk/api-reference/weave) class instance.
 
 ```ts
+const getUser = () => { // [!code ++]
+  id: 'user-id', // [!code ++]
+  email: 'useremail@corp.com', // [!code ++]
+  name: 'User' // [!code ++]
+}
+
+const getUserColor = (user: WeaveUser) => getUserBackgroundColor(user?.name ?? "#000000") // [!code ++]
+
 const instance = new Weave({
   ...
   plugins: [
     ...,
-    new WeaveUsersSelectionPlugin(), // [!code ++]
+    new WeaveUsersSelectionPlugin({ // [!code ++]
+      config: { // [!code ++]
+        getUser, // [!code ++]
+        getUserColor, // [!code ++]
+      }, // [!code ++]
+    }), // [!code ++]
   ]
 })
 ```

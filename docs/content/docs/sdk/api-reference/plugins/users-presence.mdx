@@ -1,0 +1,88 @@
+---
+title: WeaveUsersPresencePlugin
+description: Showcase what users are doing in real-time on the canvas
+---
+
+import { TypeTable } from "fumadocs-ui/components/type-table";
+
+## Overview
+
+The [WeaveUsersPresencePlugin](https://github.com/InditexTech/weavejs/blob/main/code/packages/sdk/src/plugins/users-presence/users-presence.ts)
+class that enables real-time sharing of operations data (drag, transform, etc.) across all
+connected users on the collaborative canvas. It will then display this changes as awareness
+without merging them on the room state.
+
+This plugin helps create a shared sense of presence, making collaborative tools feel dynamic,
+interactive, and truly multi-user.
+
+The class extends the [WeavePlugin](/docs/sdk/api-reference/plugins/plugin) class
+
+## Name
+
+This plugin `name` property value is `usersPresence`.
+
+## Import
+
+```shell
+import { WeaveUsersPresencePlugin } from "@inditextech/weave-sdk";
+```
+
+## Instantiation
+
+```ts
+new WeaveUsersPresencePlugin(params: WeaveUsersPresencePluginParams);
+```
+
+## TypeScript types
+
+```ts
+type WeaveUser = {
+  [key: string]: any;
+  name: string;
+  email: string;
+};
+
+type WeaveUsersPresencePluginConfig = {
+  awarenessThrottleMs: number;
+  getUser: () => WeaveUser;
+};
+
+type WeaveUsersPresencePluginParams = {
+  config: Pick<WeaveUsersPresencePluginConfig, "getUser"> &
+    Partial<Omit<WeaveUsersPresencePluginConfig, "getUser">>;
+};
+
+type WeaveUserPresenceInformation = Record<string, WeaveUserPresence<unknown>>;
+
+type WeaveUserPresence<T> = {
+  userId: string;
+  nodeId: string;
+  attrs: T;
+};
+
+type WeaveUserPresenceKey = typeof WEAVE_USER_PRESENCE_KEY;
+```
+
+## Parameters
+
+For `WeaveUsersPresencePluginParams`:
+
+<TypeTable
+  type={{
+    ["config"]: {
+      description: "Config parameters for the plugin.",
+      type: "WeaveUsersPresencePluginConfig",
+    },
+  }}
+/>
+
+For `WeaveUsersPresencePluginConfig`:
+
+<TypeTable
+  type={{
+    ["getUser"]: {
+      description: "A function that returns the actual instance user metadata.",
+      type: "() => WeaveUser",
+    },
+  }}
+/>

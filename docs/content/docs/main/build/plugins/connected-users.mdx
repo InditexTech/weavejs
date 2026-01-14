@@ -39,11 +39,21 @@ import { WeaveConnectedUsersPlugin } from "@inditextech/weave-sdk";
 Then register the plugin on the [Weave](/docs/sdk/api-reference/weave) class instance.
 
 ```ts
+const getUser = () => { // [!code ++]
+  id: 'user-id', // [!code ++]
+  email: 'useremail@corp.com', // [!code ++]
+  name: 'User' // [!code ++]
+} // [!code ++]
+
 const instance = new Weave({
   ...
   plugins: [
     ...,
-    new WeaveConnectedUsersPlugin(), // [!code ++]
+    new WeaveConnectedUsersPlugin({ // [!code ++]
+      config: { // [!code ++]
+        getUser, // [!code ++]
+      }, // [!code ++]
+    }), // [!code ++]
   ]
 })
 ```

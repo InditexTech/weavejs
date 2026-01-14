@@ -6,7 +6,6 @@ import { type WeaveUser } from '@inditextech/weave-types';
 import type { WEAVE_USER_PRESENCE_KEY } from './constants';
 
 export type WeaveUsersPresencePluginConfig = {
-  awarenessThrottleMs: number;
   getUser: () => WeaveUser;
 };
 
