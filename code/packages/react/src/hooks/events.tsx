@@ -6,6 +6,7 @@ import { useWeave } from '@/components/store';
 import type {
   WeaveConnectedUsers,
   WeaveConnectedUsersChangeEvent,
+  WeaveMutexLockChangeEvent,
   WeaveNodesSelectionPluginOnNodesChangeEvent,
   WeaveNodesSelectionPluginOnSelectionStateEvent,
   WeaveStageZoomChanged,
@@ -24,6 +25,7 @@ export const useWeaveEvents = (): void => {
   const setSelectedNodes = useWeave((state) => state.setSelectedNodes);
   const setNode = useWeave((state) => state.setNode);
   const setUsers = useWeave((state) => state.setUsers);
+  const setUsersLocks = useWeave((state) => state.setUsersLocks);
 
   const onSelectionStateHandler = React.useCallback((active: boolean) => {
     setSelectionActive(active);
@@ -49,17 +51,34 @@ export const useWeaveEvents = (): void => {
         setNode(undefined);
       }
       setSelectedNodes(nodes);
-      // eslint-disable-next-line react-hooks/exhaustive-deps
     },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [node]
   );
 
   const onConnectedUsersChangedHandler = React.useCallback(
     (users: WeaveConnectedUsers) => {
       setUsers(users);
-      // eslint-disable-next-line react-hooks/exhaustive-deps
     },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     []
+  );
+
+  const onMutexLockChangeHandler = React.useCallback(
+    ({ locks }: { locks: string[] }) => {
+      if (!instance) return;
+
+      const actUsersLocks: Record<string, unknown> = {};
+      for (const lockKey of locks) {
+        const mutexInfo = instance?.getLockDetails(lockKey);
+        if (mutexInfo) {
+          actUsersLocks[lockKey] = mutexInfo;
+        }
+      }
+      setUsersLocks(actUsersLocks);
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [instance]
   );
 
   React.useEffect(() => {
@@ -81,6 +100,10 @@ export const useWeaveEvents = (): void => {
       'onConnectedUsersChange',
       onConnectedUsersChangedHandler
     );
+    instance.addEventListener<WeaveMutexLockChangeEvent>(
+      'onMutexLockChange',
+      onMutexLockChangeHandler
+    );
 
     return () => {
       instance.removeEventListener<WeaveNodesSelectionPluginOnSelectionStateEvent>(
@@ -98,6 +121,14 @@ export const useWeaveEvents = (): void => {
       instance.removeEventListener<WeaveConnectedUsersChangeEvent>(
         'onConnectedUsersChange',
         onConnectedUsersChangedHandler
+      );
+      instance.removeEventListener<WeaveConnectedUsersChangeEvent>(
+        'onConnectedUsersChange',
+        onConnectedUsersChangedHandler
+      );
+      instance.removeEventListener<WeaveMutexLockChangeEvent>(
+        'onMutexLockChange',
+        onMutexLockChangeHandler
       );
     };
   }, [instance]);

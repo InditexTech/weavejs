@@ -27,6 +27,7 @@ interface WeaveRuntimeState {
     canUndo: boolean;
     canRedo: boolean;
   };
+  usersLocks: Record<string, unknown>;
   zoom: {
     value: number;
     canZoomIn: boolean;
@@ -49,6 +50,7 @@ interface WeaveRuntimeState {
   setUsers: (newUsers: WeaveConnectedUsers) => void;
   setCanUndo: (newCanUndo: boolean) => void;
   setCanRedo: (newCanRedo: boolean) => void;
+  setUsersLocks: (newUsersLocks: Record<string, unknown>) => void;
   setZoom: (newZoom: number) => void;
   setCanZoomIn: (newCanZoomIn: boolean) => void;
   setCanZoomOut: (newCanZoomOut: boolean) => void;
@@ -74,6 +76,7 @@ export const useWeave: UseBoundStore<StoreApi<WeaveRuntimeState>> =
       canUndo: false,
       canRedo: false,
     },
+    usersLocks: {},
     zoom: {
       value: 1,
       canZoomIn: false,
@@ -119,6 +122,8 @@ export const useWeave: UseBoundStore<StoreApi<WeaveRuntimeState>> =
         ...state,
         undoRedo: { ...state.undoRedo, canRedo: newCanRedo },
       })),
+    setUsersLocks: (newUsersLocks) =>
+      set((state) => ({ ...state, usersLocks: newUsersLocks })),
     setZoom: (newZoom) =>
       set((state) => ({ ...state, zoom: { ...state.zoom, value: newZoom } })),
     setCanZoomIn: (newCanZoomIn) =>
