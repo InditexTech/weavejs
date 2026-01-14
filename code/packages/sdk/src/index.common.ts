@@ -14,6 +14,9 @@ export { WeavePlugin } from './plugins/plugin';
 export * from './utils';
 export * from './types';
 
+// Managers
+export * from './managers/mutex/types';
+
 // Provided Nodes
 export { WeaveStageNode } from './nodes/stage/stage';
 export * from './nodes/stage/constants';

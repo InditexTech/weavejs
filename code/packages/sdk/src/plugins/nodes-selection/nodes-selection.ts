@@ -1179,6 +1179,9 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
     this.panLoop();
 
     stage.on('pointerup', (e) => {
+      const store = this.instance.getStore();
+      const actUser = store.getUser();
+
       this.tr.setAttrs({
         listening: true,
       });
@@ -1273,6 +1276,12 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
       const box = this.selectionRectangle.getClientRect();
       this.selectionRectangle.visible(false);
       const selected = shapes.filter((shape) => {
+        // Check if mutex lock exists and if exist don't let it select the shape
+        const shapeMutex = this.instance.getNodeMutexLock(shape.id());
+        if (shapeMutex && shapeMutex.user.id !== actUser.id) {
+          return false;
+        }
+
         let parent = this.instance.getInstanceRecursive(
           shape.getParent() as Konva.Node
         );

@@ -11,6 +11,7 @@ import {
 import { Weave } from '@/weave';
 import { type Logger } from 'pino';
 import { WEAVE_CONNECTED_USER_INFO_KEY } from '@/plugins/connected-users/constants';
+import type { WeaveMutexLockChangeEvent } from './types';
 
 export class WeaveMutexManager {
   private readonly instance: Weave;
@@ -103,6 +104,14 @@ export class WeaveMutexManager {
   getUserMutexLock<T>(userMutexKey: string): WeaveUserMutexLock<T> | undefined {
     if (this.userMutexLocked.get(userMutexKey)) {
       return this.userMutexLocked.get(userMutexKey) as WeaveUserMutexLock<T>;
+    }
+
+    return undefined;
+  }
+
+  getNodeMutexLock<T>(nodeMutexKey: string): WeaveUserMutexLock<T> | undefined {
+    if (this.nodeMutexLocked.get(nodeMutexKey)) {
+      return this.nodeMutexLocked.get(nodeMutexKey) as WeaveUserMutexLock<T>;
     }
 
     return undefined;
@@ -207,7 +216,7 @@ export class WeaveMutexManager {
         });
       }
 
-      this.instance.emitEvent('onMutexLockChange', {
+      this.instance.emitEvent<WeaveMutexLockChangeEvent>('onMutexLockChange', {
         locks: [...this.userMutexLocked.keys()],
       });
 
