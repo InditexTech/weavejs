@@ -1,6 +1,6 @@
 {
   "name": "@inditextech/weave-sdk",
-  "version": "2.13.0-SNAPSHOT",
+  "version": "2.13.0",
   "type": "module",
   "license": "Apache-2.0",
   "author": "Jesus Manuel Piñeiro Cid <jesusmpc@inditex.com>",
@@ -55,7 +55,7 @@
     "version:release": "npm version $RELEASE_VERSION -m \"[npm-scripts] prepare release $RELEASE_VERSION\" --tag-version-prefix \"\""
   },
   "dependencies": {
-    "@inditextech/weave-types": "2.13.0-SNAPSHOT",
+    "@inditextech/weave-types": "2.13.0",
     "@syncedstore/core": "0.6.0",
     "pino": "9.6.0",
     "pino-pretty": "13.0.0",
