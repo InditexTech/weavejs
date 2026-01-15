@@ -4,6 +4,13 @@
 
 import type { WeaveNodeTransformerProperties } from './types';
 
+export const WEAVE_LOG_LEVEL = {
+  ['DEBUG']: 'debug',
+  ['INFO']: 'info',
+  ['WARN']: 'warn',
+  ['ERROR']: 'error',
+} as const;
+
 export const WEAVE_NODE_LAYER_ID = 'mainLayer';
 export const WEAVE_AWARENESS_LAYER_ID = 'usersPointersLayer';
 export const WEAVE_UTILITY_LAYER_ID = 'utilityLayer';

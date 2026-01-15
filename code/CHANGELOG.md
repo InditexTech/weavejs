@@ -13,6 +13,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- [#870](https://github.com/InditexTech/weavejs/issues/870) Change log level per child logger
+
 ### Fixed
 
 - [#867](https://github.com/InditexTech/weavejs/issues/867) Sometimes the app gets blocked (relative to mutex operations)

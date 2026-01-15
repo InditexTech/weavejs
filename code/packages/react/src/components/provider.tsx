@@ -18,6 +18,7 @@ import {
   WEAVE_INSTANCE_STATUS,
   type WeaveStoreConnectionStatus,
   type WeavePerformanceConfig,
+  type WeaveChildLoggerLevel,
 } from '@inditextech/weave-types';
 import { useWeave } from './store';
 
@@ -29,11 +30,9 @@ type WeaveProviderType = {
   actions?: WeaveAction[];
   plugins?: WeavePlugin[];
   performance?: WeavePerformanceConfig;
-  customNodes?: WeaveNode[];
-  customActions?: WeaveAction[];
-  customPlugins?: WeavePlugin[];
   children: React.ReactNode;
   logLevel?: 'debug' | 'info' | 'warn' | 'error';
+  logModules?: WeaveChildLoggerLevel[];
 };
 
 export const WeaveProvider = ({
@@ -42,9 +41,9 @@ export const WeaveProvider = ({
   nodes = [],
   actions = [],
   plugins = [],
-  customPlugins = [],
   fonts = [],
   logLevel = 'info',
+  logModules = [],
   performance,
   children,
 }: Readonly<WeaveProviderType>): React.JSX.Element => {
@@ -121,40 +120,17 @@ export const WeaveProvider = ({
       const weaveEleClientRect = weaveEle?.getBoundingClientRect();
 
       if (weaveEle && !weaveInstanceRef.current) {
-        // Defining instance nodes
-        const instanceNodes: WeaveNode[] = [];
-        if (nodes.length > 0) {
-          for (const node of nodes) {
-            instanceNodes.push(node);
-          }
-        }
-
-        // Defining instance plugins
-        const instanceActions: WeaveAction[] = [];
-        if (actions.length > 0) {
-          for (const action of actions) {
-            instanceActions.push(action);
-          }
-        }
-
-        // Defining instance plugins
-        const instancePlugins: WeavePlugin[] = [];
-        if (plugins.length > 0) {
-          for (const plugin of plugins) {
-            instancePlugins.push(plugin);
-          }
-        }
-
         weaveInstanceRef.current = new Weave(
           {
             store,
             nodes,
             actions,
-            plugins: [...instancePlugins, ...customPlugins],
+            plugins,
             fonts,
             performance,
             logger: {
               level: logLevel,
+              modules: logModules,
             },
           },
           {

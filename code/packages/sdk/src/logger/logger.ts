@@ -4,19 +4,26 @@
 
 import { isEqual } from 'lodash';
 import pino, { type Logger } from 'pino';
-import { type WeaveLoggerConfig } from '@inditextech/weave-types';
+import {
+  WEAVE_LOG_LEVEL,
+  type WeaveLoggerConfig,
+  type WeaveLogLevel,
+} from '@inditextech/weave-types';
+import type { Weave } from '@/weave';
 
 export class WeaveLogger {
+  private readonly instance: Weave;
   private config: WeaveLoggerConfig;
   private disabled: boolean;
   private logger: Logger;
 
-  constructor(config: WeaveLoggerConfig) {
+  constructor(instance: Weave, config: WeaveLoggerConfig) {
+    this.instance = instance;
     this.config = config;
     this.disabled = this.config.disabled ?? false;
     this.logger = pino({
       name: 'weave.js',
-      level: this.config.level ?? 'error',
+      level: this.config.level ?? WEAVE_LOG_LEVEL.ERROR,
       browser: {
         write: {
           warn: (o) => {
@@ -111,8 +118,24 @@ export class WeaveLogger {
   }
 
   getChildLogger(name: string): pino.Logger<never, boolean> {
-    return this.logger.child({
-      name,
-    });
+    const configuration = this.instance.getConfiguration();
+    const modulesLogging = configuration.logger?.modules ?? [];
+
+    let childLoggerLevel = configuration.logger?.level ?? WEAVE_LOG_LEVEL.ERROR;
+    for (const moduleLevel of modulesLogging) {
+      const [moduleName, level] = moduleLevel.split(':');
+      if (name === moduleName) {
+        childLoggerLevel = level as WeaveLogLevel;
+      }
+    }
+
+    return this.logger.child(
+      {
+        name,
+      },
+      {
+        level: childLoggerLevel,
+      }
+    );
   }
 }
