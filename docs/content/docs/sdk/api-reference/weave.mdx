@@ -55,28 +55,29 @@ const instance = new Weave(weaveConfig: WeaveConfig, stageConfig: Konva.StageCon
         "An array that defines the Nodes instances to be registered on the instance",
       type: "WeaveNodeBase[]",
     },
-    ["weaveConfig.plugins"]: {
-      description:
-        "An array that defines the Plugins instances to be registered on the instance",
-      type: "WeavePluginBase[]",
-    },
     ["weaveConfig.actions"]: {
       description:
         "An array that defines the Actions instances to be registered on the instance",
       type: "WeaveActionBase[]",
+    },
+    ["weaveConfig.plugins"]: {
+      description:
+        "An array that defines the Plugins instances to be registered on the instance",
+      type: "WeavePluginBase[]",
     },
     ["weaveConfig.fonts"]: {
       description:
         "An array that defines the Fonts to be registered and used on the instance",
       type: "WeaveFont[]",
     },
-    ["weaveConfig.callbacks"]: {
-      description: "Callbacks defined for the instance",
-      type: "WeaveCallbacks[]",
-    },
     ["weaveConfig.logger"]: {
       description: "Weave logger configuration",
       type: "WeaveLoggerConfig",
+    },
+    ["weaveConfig.performance"]: {
+      description:
+        "Weave performance fine-tunning configuration for the instance",
+      type: "WeavePerformanceConfig",
     },
     ["stageConfig"]: {
       required: true,
