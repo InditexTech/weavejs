@@ -12,7 +12,7 @@ import {
 import type { Weave } from '@/weave';
 
 export class WeaveLogger {
-  private instance: Weave;
+  private readonly instance: Weave;
   private config: WeaveLoggerConfig;
   private disabled: boolean;
   private logger: Logger;
