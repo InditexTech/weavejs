@@ -4,13 +4,9 @@
 
 import { isEqual } from 'lodash';
 import { WeavePlugin } from '@/plugins/plugin';
-import {
-  type WeaveAwarenessChange,
-  type WeaveUser,
-} from '@inditextech/weave-types';
+import { type WeaveUser } from '@inditextech/weave-types';
 import {
   type WeaveConnectedUsersPluginParams,
-  type WeaveConnectedUserInfoKey,
   type WeaveConnectedUsersPluginConfig,
   type WeaveConnectedUsersChangeEvent,
 } from './types';
@@ -62,42 +58,31 @@ export class WeaveConnectedUsersPlugin extends WeavePlugin {
       }
     );
 
-    this.instance.addEventListener(
-      'onAwarenessChange',
-      (
-        changes: WeaveAwarenessChange<WeaveConnectedUserInfoKey, WeaveUser>[]
-      ) => {
-        if (!this.enabled) {
-          this.connectedUsers = {};
-          this.instance.emitEvent<WeaveConnectedUsersChangeEvent>(
-            'onConnectedUsersChange',
-            {}
-          );
-          return;
-        }
-
-        const newConnectedUsers: Record<string, WeaveUser> = {};
-        for (const change of changes) {
-          if (!change[WEAVE_CONNECTED_USER_INFO_KEY]) {
-            continue;
-          }
-
-          if (change[WEAVE_CONNECTED_USER_INFO_KEY]) {
-            const userInformation = change[WEAVE_CONNECTED_USER_INFO_KEY];
-            newConnectedUsers[userInformation.id] = userInformation;
-          }
-        }
-
-        if (!isEqual(this.connectedUsers, newConnectedUsers)) {
-          this.instance.emitEvent<WeaveConnectedUsersChangeEvent>(
-            'onConnectedUsersChange',
-            newConnectedUsers
-          );
-        }
-
-        this.connectedUsers = newConnectedUsers;
+    this.instance.addEventListener('onUsersChange', () => {
+      if (!this.enabled) {
+        this.instance.emitEvent<WeaveConnectedUsersChangeEvent>(
+          'onConnectedUsersChange',
+          {}
+        );
+        return;
       }
-    );
+
+      const actualUsers = this.instance.getUsers();
+
+      const newUsers: Record<string, WeaveUser> = {};
+      for (const user of actualUsers) {
+        newUsers[user.id] = user;
+      }
+
+      if (!isEqual(this.connectedUsers, newUsers)) {
+        this.instance.emitEvent<WeaveConnectedUsersChangeEvent>(
+          'onConnectedUsersChange',
+          newUsers
+        );
+      }
+
+      this.connectedUsers = newUsers;
+    });
   }
 
   enable(): void {
