@@ -14,7 +14,7 @@ import { WEAVE_USER_INFO_KEY } from './constants';
 export class WeaveUsersManager {
   private readonly instance: Weave;
   private readonly logger: Logger;
-  private connectedUsers: Map<string, WeaveUser>;
+  private readonly connectedUsers: Map<string, WeaveUser>;
 
   constructor(instance: Weave) {
     this.instance = instance;

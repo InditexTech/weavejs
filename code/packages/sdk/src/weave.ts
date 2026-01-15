@@ -88,7 +88,7 @@ export class Weave {
   private pluginsManager: WeavePluginsManager;
   private actionsManager: WeaveActionsManager;
   private exportManager: WeaveExportManager;
-  private usersManager: WeaveUsersManager;
+  private readonly usersManager: WeaveUsersManager;
   private readonly mutexManager: WeaveMutexManager;
   private readonly asyncManager: WeaveAsyncManager;
   private readonly hooksManager: WeaveHooksManager;
