@@ -108,6 +108,7 @@ export class Weave {
     this.config = mergeExceptArrays({}, weaveConfig);
     // Setup the logger
     this.logger = new WeaveLogger(
+      this,
       this.config?.logger ?? {
         disabled: false,
         level: 'error',

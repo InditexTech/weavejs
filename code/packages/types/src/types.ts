@@ -14,6 +14,7 @@ import {
   WEAVE_STORE_CONNECTION_STATUS,
   WEAVE_KONVA_BACKEND,
   WEAVE_ASYNC_STATUS,
+  WEAVE_LOG_LEVEL,
 } from './constants';
 import { type WeaveNodeBase } from '@/base/node';
 import { type WeaveActionBase } from '@/base/action';
@@ -147,9 +148,15 @@ export type WeaveElementInstance = Konva.Layer | Konva.Group | Konva.Shape;
 
 // Logger handling
 
+export type WeaveLogLevelLeys = keyof typeof WEAVE_LOG_LEVEL;
+export type WeaveLogLevel = (typeof WEAVE_LOG_LEVEL)[WeaveLogLevelLeys];
+
+export type WeaveChildLoggerLevel = `${string}:${WeaveLogLevel}`;
+
 export type WeaveLoggerConfig = {
   disabled?: boolean;
-  level?: 'debug' | 'info' | 'warn' | 'error';
+  level?: WeaveLogLevel;
+  modules?: WeaveChildLoggerLevel[];
 };
 
 // zIndex handling

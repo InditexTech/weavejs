@@ -31,6 +31,21 @@ hook to access the API of the Weave instance.
 import { WeaveProvider } from "@inditextech/weave-react";
 ```
 
+## types
+
+```ts
+export type WeavePerformanceConfig = {
+  upscale?: Partial<WeaveUpscaleConfig>;
+};
+
+export type WeaveUpscaleConfig = {
+  enabled?: boolean;
+  multiplier?: number;
+  baseWidth?: number;
+  baseHeight?: number;
+};
+```
+
 ## Props
 
 <TypeTable
@@ -67,27 +82,31 @@ import { WeaveProvider } from "@inditextech/weave-react";
       type: "WeaveAction[]",
       default: "[]",
     },
-    customNodes: {
-      description: "Array of custom nodes to register and use by the instance",
-      type: "WeaveNode[]",
-      default: "[]",
-    },
     customPlugins: {
       description:
         "Array of custom plugins to register and use by the instance",
       type: "WeavePlugin[]",
       default: "[]",
     },
-    customActions: {
-      description:
-        "Array of custom actions to register and use by the instance",
-      type: "WeaveAction[]",
-      default: "[]",
-    },
     fonts: {
       description: "Array that define the fonts to use on the canvas",
       type: "WeaveFont[]",
       default: "[]",
+    },
+    logLevel: {
+      description: "Global log level of Weave.js instance",
+      type: "WeaveLogLevel",
+      default: "info",
+    },
+    logModules: {
+      description:
+        "Define a custom log level Weave.js internal modules, nodes, actions and plugins. When defining a custom level, the format is 'moduleName:level'",
+      type: "WeaveChildLoggerLevel[]",
+      default: "[]",
+    },
+    performance: {
+      description: "Options to fine-tune performance of Weave.js instance",
+      type: "WeavePerformanceConfig",
     },
   }}
 />
