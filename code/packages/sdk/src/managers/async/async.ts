@@ -8,7 +8,7 @@ import {
 } from '@inditextech/weave-types';
 import { Weave } from '@/weave';
 import { type Logger } from 'pino';
-import { watchMap } from './watch-map';
+import { watchMap } from '@/utils/watch-map';
 
 export class WeaveAsyncManager {
   private readonly instance: Weave;

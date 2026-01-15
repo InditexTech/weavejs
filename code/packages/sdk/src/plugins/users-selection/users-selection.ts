@@ -8,7 +8,6 @@ import {
 } from '@inditextech/weave-types';
 import {
   type WeaveUserSelectionInfo,
-  type WeaveUserSelectionKey,
   type WeaveUsersSelectionPluginConfig,
   type WeaveUsersSelectionPluginParams,
 } from './types';
@@ -81,42 +80,41 @@ export class WeaveUsersSelectionPlugin extends WeavePlugin {
 
     this.instance.addEventListener(
       'onAwarenessChange',
-      (
-        changes: WeaveAwarenessChange<
-          WeaveUserSelectionKey,
-          WeaveUserSelectionInfo
-        >[]
-      ) => {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      (changes: WeaveAwarenessChange<string, any>[]) => {
         const selfUser = this.config.getUser();
 
-        const allActiveUsers = [];
         for (const change of changes) {
-          if (!change[WEAVE_USER_SELECTION_KEY]) {
-            continue;
-          }
-
           if (
             change[WEAVE_USER_SELECTION_KEY] &&
             selfUser.id !== change[WEAVE_USER_SELECTION_KEY].user
           ) {
             const userSelection = change[WEAVE_USER_SELECTION_KEY];
-            allActiveUsers.push(userSelection.user);
             this.usersSelection[userSelection.user] = userSelection;
           }
-        }
-
-        const allNodesSelections = Object.keys(this.usersSelection);
-        const inactiveUsers = allNodesSelections.filter(
-          (user) => !allNodesSelections.includes(user)
-        );
-
-        for (let i = 0; i < inactiveUsers.length; i++) {
-          delete this.usersSelection[inactiveUsers[i]];
         }
 
         this.renderSelectors();
       }
     );
+
+    this.instance.addEventListener('onUsersChange', () => {
+      const actualUsers = this.instance.getUsers();
+      const usersWithSelection = Object.keys(this.usersSelection);
+
+      let hasChanges = false;
+      for (const userId of usersWithSelection) {
+        const userExists = actualUsers.find((user) => user.id === userId);
+        if (userExists === undefined) {
+          delete this.usersSelection[userId];
+          hasChanges = true;
+        }
+      }
+
+      if (hasChanges) {
+        this.renderSelectors();
+      }
+    });
 
     stage.on('dragstart dragmove dragend', () => {
       this.renderSelectors();

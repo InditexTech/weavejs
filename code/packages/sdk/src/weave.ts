@@ -26,6 +26,7 @@ import {
   WEAVE_STORE_CONNECTION_STATUS,
   type WeaveUserMutexLock,
   type WeaveNodeMutexLock,
+  type WeaveUser,
 } from '@inditextech/weave-types';
 import { WeaveStore } from './stores/store';
 import {
@@ -60,6 +61,7 @@ import type { DOMElement } from './types';
 import { getBoundingBox, mergeExceptArrays } from './utils';
 import { WeaveAsyncManager } from './managers/async/async';
 import { WeaveHooksManager } from './managers/hooks';
+import { WeaveUsersManager } from './managers/users/users';
 
 export class Weave {
   private id: string;
@@ -86,6 +88,7 @@ export class Weave {
   private pluginsManager: WeavePluginsManager;
   private actionsManager: WeaveActionsManager;
   private exportManager: WeaveExportManager;
+  private readonly usersManager: WeaveUsersManager;
   private readonly mutexManager: WeaveMutexManager;
   private readonly asyncManager: WeaveAsyncManager;
   private readonly hooksManager: WeaveHooksManager;
@@ -142,6 +145,7 @@ export class Weave {
     this.exportManager = new WeaveExportManager(this);
     this.actionsManager = new WeaveActionsManager(this);
     this.pluginsManager = new WeavePluginsManager(this);
+    this.usersManager = new WeaveUsersManager(this);
     this.mutexManager = new WeaveMutexManager(this);
     this.asyncManager = new WeaveAsyncManager(this);
     this.hooksManager = new WeaveHooksManager(this);
@@ -1112,5 +1116,10 @@ export class Weave {
 
   getNodeMutexLock<T>(nodeId: string): WeaveNodeMutexLock<T> | undefined {
     return this.mutexManager.getNodeMutexLock<T>(nodeId);
+  }
+
+  // USERS MANAGEMENT METHODS
+  getUsers(): WeaveUser[] {
+    return this.usersManager.getUsers();
   }
 }
