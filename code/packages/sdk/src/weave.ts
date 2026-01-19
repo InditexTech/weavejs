@@ -392,16 +392,7 @@ export class Weave {
     this.cleanupTransactionIdToInstance(node);
   }
 
-  getNodeActualProps(node: WeaveStateElement): WeaveElementAttributes {
-    const realNode = this.getStage().findOne(`#${node.key}`);
-    if (realNode) {
-      return realNode.getAttrs();
-    }
-
-    return {};
-  }
-
-  setTransactionIdToInstance(node: WeaveStateElement): void {
+  private setTransactionIdToInstance(node: WeaveStateElement): void {
     const realNode = this.getStage().findOne(`#${node.key}`);
     if (realNode) {
       node.props.transactionId = uuidv4();
@@ -409,14 +400,14 @@ export class Weave {
     }
   }
 
-  cleanupTransactionIdToInstance(node: WeaveStateElement): void {
+  private cleanupTransactionIdToInstance(node: WeaveStateElement): void {
     const realNode = this.getStage().findOne(`#${node.key}`);
     if (realNode) {
       realNode.setAttr('transactionId', undefined);
     }
   }
 
-  decorateWithZIndex(node: WeaveStateElement): WeaveStateElement {
+  private decorateWithZIndex(node: WeaveStateElement): WeaveStateElement {
     const realNode = this.getStage().findOne(`#${node.key}`);
     if (realNode) {
       const zIndex = realNode.zIndex();
@@ -637,32 +628,8 @@ export class Weave {
       overrideUserChangeType?: WeaveNodeChangeType;
     } = DEFAULT_ADD_NODE_OPTIONS
   ): void {
-    const { index, emitUserChangeEvent, overrideUserChangeType } =
-      mergeExceptArrays(DEFAULT_ADD_NODE_OPTIONS, options);
-
     this.stateTransactional(() => {
-      if (emitUserChangeEvent) {
-        this.setTransactionIdToInstance(node);
-      }
-
-      this.stateManager.addNode(node, parentId, index);
-
-      if (emitUserChangeEvent) {
-        const handleSendEvent = (addedNode: WeaveElementInstance) => {
-          if (node.props.transactionId === addedNode.getAttrs().transactionId) {
-            const decoratedNode = this.decorateWithZIndex(node);
-            this.emitUserChangeEvent(
-              { node: decoratedNode, parentId },
-              overrideUserChangeType !== undefined
-                ? overrideUserChangeType
-                : WEAVE_NODE_CHANGE_TYPE.CREATE
-            );
-            this.removeEventListener('onNodeRenderedAdded', handleSendEvent);
-          }
-        };
-
-        this.addEventListener('onNodeRenderedAdded', handleSendEvent);
-      }
+      this.addNodeNT(node, parentId, options);
     });
   }
 
@@ -706,34 +673,8 @@ export class Weave {
     node: WeaveStateElement,
     options: { emitUserChangeEvent?: boolean } = DEFAULT_UPDATE_NODE_OPTIONS
   ): void {
-    const { emitUserChangeEvent } = mergeExceptArrays(
-      DEFAULT_UPDATE_NODE_OPTIONS,
-      options
-    );
-
     this.stateTransactional(() => {
-      if (emitUserChangeEvent) {
-        this.setTransactionIdToInstance(node);
-      }
-
-      this.stateManager.updateNode(node);
-
-      if (emitUserChangeEvent) {
-        const handleSendEvent = (updatedNode: WeaveElementInstance) => {
-          if (
-            node.props.transactionId === updatedNode.getAttrs().transactionId
-          ) {
-            const decoratedNode = this.decorateWithZIndex(node);
-            this.emitUserChangeEvent(
-              { node: decoratedNode },
-              WEAVE_NODE_CHANGE_TYPE.UPDATE
-            );
-            this.removeEventListener('onNodeRenderedUpdated', handleSendEvent);
-          }
-        };
-
-        this.addEventListener('onNodeRenderedUpdated', handleSendEvent);
-      }
+      this.updateNodeNT(node, options);
     });
   }
 
@@ -772,48 +713,8 @@ export class Weave {
     nodes: WeaveStateElement[],
     options: { emitUserChangeEvent?: boolean } = DEFAULT_UPDATE_NODE_OPTIONS
   ): void {
-    const { emitUserChangeEvent } = mergeExceptArrays(
-      DEFAULT_UPDATE_NODE_OPTIONS,
-      options
-    );
     this.stateTransactional(() => {
-      const transactionsIds: Record<string, string> = {};
-      if (emitUserChangeEvent) {
-        for (const node of nodes) {
-          this.setTransactionIdToInstance(node);
-          transactionsIds[node.key] = node.props.transactionId;
-        }
-      }
-
-      this.stateManager.updateNodes(nodes);
-
-      if (emitUserChangeEvent) {
-        const handleSendEvent = (updatedNode: WeaveElementInstance) => {
-          for (const node of nodes) {
-            if (
-              transactionsIds[node.key] === updatedNode.getAttrs().transactionId
-            ) {
-              const decoratedNode = this.decorateWithZIndex(node);
-              this.emitUserChangeEvent(
-                {
-                  node: decoratedNode,
-                },
-                WEAVE_NODE_CHANGE_TYPE.UPDATE
-              );
-              delete transactionsIds[node.key];
-              if (Object.keys(transactionsIds).length === 0) {
-                this.removeEventListener(
-                  'onNodeRenderedUpdated',
-                  handleSendEvent
-                );
-              }
-              break;
-            }
-          }
-        };
-
-        this.addEventListener('onNodeRenderedUpdated', handleSendEvent);
-      }
+      this.updateNodesNT(nodes, options);
     });
   }
 
@@ -869,55 +770,8 @@ export class Weave {
     node: WeaveStateElement,
     options: { emitUserChangeEvent?: boolean } = DEFAULT_REMOVE_NODE_OPTIONS
   ): void {
-    const { emitUserChangeEvent } = mergeExceptArrays(
-      DEFAULT_REMOVE_NODE_OPTIONS,
-      options
-    );
-
     this.stateTransactional(() => {
-      let parentId: string | undefined = undefined;
-      let decoratedNode: WeaveStateElement | undefined = undefined;
-
-      if (emitUserChangeEvent) {
-        this.setTransactionIdToInstance(node);
-        decoratedNode = this.decorateWithZIndex(node);
-        parentId = this.getContainerByNodeId(node.key);
-      }
-
-      this.stateManager.removeNode(node);
-
-      if (decoratedNode && emitUserChangeEvent) {
-        const handleSendEvent = (removedNode: WeaveElementInstance) => {
-          if (
-            node.props.transactionId === removedNode.getAttrs().transactionId
-          ) {
-            this.emitUserChangeEvent(
-              { node: decoratedNode, parentId },
-              WEAVE_NODE_CHANGE_TYPE.DELETE
-            );
-            this.removeEventListener('onNodeRenderedRemoved', handleSendEvent);
-          }
-        };
-
-        this.addEventListener('onNodeRenderedRemoved', handleSendEvent);
-      }
-
-      this.runPhaseHooks<{
-        node: Konva.Node;
-      }>('onRemoveNode', (hook) => {
-        const nodeInstance = this.getStage().findOne(`#${node.key}`);
-        if (nodeInstance) {
-          hook({
-            node: nodeInstance,
-          });
-        }
-      });
-
-      const selectionPlugin =
-        this.getPlugin<WeaveNodesSelectionPlugin>('nodesSelection');
-      if (selectionPlugin) {
-        selectionPlugin.setSelectedNodes([]);
-      }
+      this.removeNodeNT(node, options);
     });
   }
 
@@ -978,15 +832,7 @@ export class Weave {
     options: { emitUserChangeEvent?: boolean } = DEFAULT_REMOVE_NODE_OPTIONS
   ): void {
     this.stateTransactional(() => {
-      for (const node of nodes) {
-        this.removeNodeNT(node, options);
-      }
-
-      const selectionPlugin =
-        this.getPlugin<WeaveNodesSelectionPlugin>('nodesSelection');
-      if (selectionPlugin) {
-        selectionPlugin.setSelectedNodes([]);
-      }
+      this.removeNodesNT(nodes, options);
     });
   }
 
@@ -1010,33 +856,8 @@ export class Weave {
     position: WeavePosition,
     options: { emitUserChangeEvent?: boolean } = DEFAULT_MOVE_NODE_OPTIONS
   ): void {
-    const { emitUserChangeEvent } = mergeExceptArrays(
-      DEFAULT_MOVE_NODE_OPTIONS,
-      options
-    );
-
     this.stateTransactional(() => {
-      if (emitUserChangeEvent) {
-        this.setTransactionIdToInstance(node);
-      }
-
-      this.updateNodeNT(node, { emitUserChangeEvent: false });
-      this.stateManager.zMoveNode(node, position);
-
-      if (emitUserChangeEvent) {
-        const handleSendEvent = (movedNode: WeaveElementInstance) => {
-          if (node.props.transactionId === movedNode.getAttrs().transactionId) {
-            const decoratedNode = this.decorateWithZIndex(node);
-            this.emitUserChangeEvent(
-              { node: decoratedNode },
-              WEAVE_NODE_CHANGE_TYPE.UPDATE
-            );
-            this.removeEventListener('onNodeRenderedUpdated', handleSendEvent);
-          }
-        };
-
-        this.addEventListener('onNodeRenderedUpdated', handleSendEvent);
-      }
+      this.zMoveNodeNT(node, position, options);
     });
   }
 
