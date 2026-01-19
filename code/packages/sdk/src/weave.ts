@@ -661,7 +661,7 @@ export class Weave {
           const decoratedNode = this.decorateWithZIndex(node);
           this.emitUserChangeEvent(
             { node: decoratedNode, parentId },
-            overrideUserChangeType !== undefined
+            overrideUserChangeType
               ? overrideUserChangeType
               : WEAVE_NODE_CHANGE_TYPE.CREATE
           );
