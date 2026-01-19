@@ -320,7 +320,7 @@ export class WeaveStateManager {
     }
   }
 
-  moveNode(node: WeaveStateElement, position: WeavePosition): void {
+  zMoveNode(node: WeaveStateElement, position: WeavePosition): void {
     const state = this.instance.getStore().getState();
 
     if (isEmpty(state.weave)) {

@@ -185,8 +185,6 @@ export abstract class WeaveStore implements WeaveStoreBase {
     observeDeep(this.getState(), () => {
       const newState: WeaveState = JSON.parse(JSON.stringify(this.getState()));
 
-      this.logger.debug({ newState }, 'State changed');
-
       this.instance.emitEvent<WeaveStoreOnStateChangeEvent>(
         'onStateChange',
         newState

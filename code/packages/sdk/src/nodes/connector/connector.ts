@@ -633,7 +633,7 @@ export class WeaveConnectorNode extends WeaveNode {
           continue;
         }
 
-        // Connector's nodes are on different containers, lets remove te connector
+        // Connector's nodes are on different containers, lets remove the connector
         if (
           connectorParent &&
           realConnectorNodeStartParent &&

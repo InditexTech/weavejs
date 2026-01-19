@@ -95,3 +95,9 @@ export const WEAVE_ASYNC_STATUS = {
   ['LOADING']: 'loading',
   ['LOADED']: 'loaded',
 };
+
+export const WEAVE_NODE_CHANGE_TYPE = {
+  ['CREATE']: 'create',
+  ['UPDATE']: 'update',
+  ['DELETE']: 'delete',
+} as const;

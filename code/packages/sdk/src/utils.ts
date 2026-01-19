@@ -6,6 +6,7 @@ import Konva from 'konva';
 import mergeWith from 'lodash/mergeWith';
 import type { Weave } from './weave';
 import {
+  WEAVE_NODE_CHANGE_TYPE,
   WEAVE_NODE_CUSTOM_EVENTS,
   type WeaveElementInstance,
 } from '@inditextech/weave-types';
@@ -187,8 +188,11 @@ export function moveNodeToContainer(
       instance.stateTransactional(() => {
         const actualNode = nodeHandler.serialize(node as WeaveElementInstance);
 
-        instance.removeNodeNT(actualNode);
-        instance.addNodeNT(actualNode, layerToMoveAttrs.id);
+        instance.removeNodeNT(actualNode, { emitUserChangeEvent: false });
+        instance.addNodeNT(actualNode, layerToMoveAttrs.id, {
+          emitUserChangeEvent: true,
+          overrideUserChangeType: WEAVE_NODE_CHANGE_TYPE.UPDATE,
+        });
       });
 
       return true;
