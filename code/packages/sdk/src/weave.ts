@@ -29,6 +29,7 @@ import {
   type WeaveUser,
   type WeaveNodeChangeType,
   WEAVE_NODE_CHANGE_TYPE,
+  type WeaveUserChangeEvent,
 } from '@inditextech/weave-types';
 import { WeaveStore } from './stores/store';
 import {
@@ -58,7 +59,10 @@ import { WeavePluginsManager } from './managers/plugins';
 import { WeaveMutexManager } from './managers/mutex/mutex';
 import { WeaveNodesSelectionPlugin } from './plugins/nodes-selection/nodes-selection';
 import type { StageConfig } from 'konva/lib/Stage';
-import type { WeaveStoreOnRoomLoadedEvent } from './stores/types';
+import type {
+  WeaveInstanceStatusEvent,
+  WeaveStoreOnRoomLoadedEvent,
+} from './stores/types';
 import type { DOMElement } from './types';
 import { getBoundingBox, mergeExceptArrays } from './utils';
 import { WeaveAsyncManager } from './managers/async/async';
@@ -187,7 +191,7 @@ export class Weave {
       this.initialized = true;
 
       this.status = WEAVE_INSTANCE_STATUS.RUNNING;
-      this.emitEvent('onInstanceStatus', this.status);
+      this.emitEvent<WeaveInstanceStatusEvent>('onInstanceStatus', this.status);
     });
   }
 
@@ -208,14 +212,14 @@ export class Weave {
   ): void {
     if (!this.initialized && status === WEAVE_STORE_CONNECTION_STATUS.ERROR) {
       this.status = WEAVE_INSTANCE_STATUS.CONNECTING_ERROR;
-      this.emitEvent('onInstanceStatus', this.status);
+      this.emitEvent<WeaveInstanceStatusEvent>('onInstanceStatus', this.status);
     }
     if (
       status === WEAVE_STORE_CONNECTION_STATUS.CONNECTED &&
       !this.initialized
     ) {
       this.status = WEAVE_INSTANCE_STATUS.LOADING_ROOM;
-      this.emitEvent('onInstanceStatus', this.status);
+      this.emitEvent<WeaveInstanceStatusEvent>('onInstanceStatus', this.status);
     }
   }
 
@@ -236,7 +240,7 @@ export class Weave {
     this.emitEvent<WeaveStoreOnRoomLoadedEvent>('onRoomLoaded', false);
 
     this.status = WEAVE_INSTANCE_STATUS.STARTING;
-    this.emitEvent('onInstanceStatus', this.status);
+    this.emitEvent<WeaveInstanceStatusEvent>('onInstanceStatus', this.status);
 
     // Register all the nodes, plugins and actions that come from the configuration
     this.registerManager.registerNodesHandlers();
@@ -250,7 +254,7 @@ export class Weave {
     this.storeManager.registerStore(this.config.store as WeaveStore);
 
     this.status = WEAVE_INSTANCE_STATUS.LOADING_FONTS;
-    this.emitEvent('onInstanceStatus', this.status);
+    this.emitEvent<WeaveInstanceStatusEvent>('onInstanceStatus', this.status);
 
     // Start loading the fonts, this operation can be asynchronous
     await this.fontsManager.loadFonts();
@@ -260,7 +264,7 @@ export class Weave {
     this.stageManager.initStage();
 
     this.status = WEAVE_INSTANCE_STATUS.CONNECTING_TO_ROOM;
-    this.emitEvent('onInstanceStatus', this.status);
+    this.emitEvent<WeaveInstanceStatusEvent>('onInstanceStatus', this.status);
     // Setup and connect to the store
     const store = this.storeManager.getStore();
 
@@ -280,7 +284,7 @@ export class Weave {
     this.emitter.clearListeners();
 
     this.status = WEAVE_INSTANCE_STATUS.IDLE;
-    this.emitEvent('onInstanceStatus', this.status);
+    this.emitEvent<WeaveInstanceStatusEvent>('onInstanceStatus', this.status);
 
     // disconnect from the store
     const store = this.storeManager.getStore();
@@ -383,12 +387,12 @@ export class Weave {
       return;
     }
 
-    this.emitEvent<{
-      user: WeaveUser;
-      changeType: WeaveNodeChangeType;
-      node: WeaveStateElement;
-      parent: WeaveStateElement;
-    }>('onUserChange', { user, changeType, parent, node });
+    this.emitEvent<WeaveUserChangeEvent>('onUserChange', {
+      user,
+      changeType,
+      parent,
+      node,
+    });
     this.cleanupTransactionIdToInstance(node);
   }
 
@@ -585,13 +589,13 @@ export class Weave {
   update(newState: WeaveState): void {
     this.getStore().setState(newState);
     this.renderer.render(() => {
-      this.emitEvent('onRender', {});
+      this.emitEvent<undefined>('onRender');
     });
   }
 
   render(): void {
     this.renderer.render(() => {
-      this.emitEvent('onRender', {});
+      this.emitEvent<undefined>('onRender');
     });
   }
 

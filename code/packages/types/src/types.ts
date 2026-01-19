@@ -362,12 +362,9 @@ export type WeaveNodeChangeTypeKeys = keyof typeof WEAVE_NODE_CHANGE_TYPE;
 export type WeaveNodeChangeType =
   (typeof WEAVE_NODE_CHANGE_TYPE)[WeaveNodeChangeTypeKeys];
 
-export type WeavePropsChange =
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  | { type: 'added'; path: string; value: any }
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  | { type: 'removed'; path: string; value: any }
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  | { type: 'modified'; path: string; before: any; after: any }
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  | { type: 'moved'; from: string; to: string; value: any };
+export type WeaveUserChangeEvent = {
+  user: WeaveUser;
+  changeType: WeaveNodeChangeType;
+  node: WeaveStateElement;
+  parent: WeaveStateElement;
+};
