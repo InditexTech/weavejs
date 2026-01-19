@@ -1063,14 +1063,6 @@ export class Weave {
     return this.cloningManager.nodesToGroupSerialized(instancesToClone);
   }
 
-  // cloneNodes(
-  //   instancesToClone: Konva.Node[],
-  //   targetContainer: Konva.Layer | Konva.Group | undefined,
-  //   onPoint: Konva.Vector2d
-  // ): void {
-  //   this.cloningManager.cloneNodes(instancesToClone, targetContainer, onPoint);
-  // }
-
   // FONTS MANAGEMENT METHODS PROXIES
 
   getFonts(): WeaveFont[] {
