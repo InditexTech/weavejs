@@ -15,6 +15,7 @@ import {
   WEAVE_KONVA_BACKEND,
   WEAVE_ASYNC_STATUS,
   WEAVE_LOG_LEVEL,
+  WEAVE_NODE_CHANGE_TYPE,
 } from './constants';
 import { type WeaveNodeBase } from '@/base/node';
 import { type WeaveActionBase } from '@/base/action';
@@ -354,4 +355,16 @@ export type WeaveNodeMutexLock<T> = {
   user: WeaveUser;
   operation: string;
   metadata?: T;
+};
+
+// Node handling
+export type WeaveNodeChangeTypeKeys = keyof typeof WEAVE_NODE_CHANGE_TYPE;
+export type WeaveNodeChangeType =
+  (typeof WEAVE_NODE_CHANGE_TYPE)[WeaveNodeChangeTypeKeys];
+
+export type WeaveUserChangeEvent = {
+  user: WeaveUser;
+  changeType: WeaveNodeChangeType;
+  node: WeaveStateElement;
+  parent: WeaveStateElement;
 };

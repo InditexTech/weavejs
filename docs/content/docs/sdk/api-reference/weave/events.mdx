@@ -1,0 +1,69 @@
+---
+title: Events
+description: Weave instance emitted events
+---
+
+## onRender
+
+```ts
+instance.addEventListener('onRender', () => void);
+```
+
+The `onRender` event is triggered each time the room is rendered, this means each time the nodes reconciler detects a
+change, being a change made by the actual instance user or a remote user of the room.
+
+## onInstanceStatus
+
+```ts
+const WEAVE_INSTANCE_STATUS = {
+  ['IDLE']: 'idle',
+  ['STARTING']: 'starting',
+  ['LOADING_FONTS']: 'loadingFonts',
+  ['CONNECTING_TO_ROOM']: 'connectingToRoom',
+  ['CONNECTING_ERROR']: 'connectingError',
+  ['LOADING_ROOM']: 'loadingRoom',
+  ['RUNNING']: 'running',
+} as const;
+
+type WeaveStatusKeys = keyof typeof WEAVE_INSTANCE_STATUS;
+type WeaveStatus = (typeof WEAVE_INSTANCE_STATUS)[WeaveStatusKeys];
+
+instance.addEventListener('onInstanceStatus', (status: WeaveStatus) => void);
+```
+
+The `onInstanceStatus` event is triggered each time the Weave.js instance change it's internal status.
+
+## onRoomLoaded
+
+```ts
+type WeaveStoreOnRoomLoadedEvent = boolean;
+
+instance.addEventListener('onRoomLoaded', (roomLoaded: WeaveStoreOnRoomLoadedEvent) => void);
+```
+
+The `onRoomLoaded` event is triggered internally by Weave.js providing information about the room is loaded or not.
+
+## onUserChange
+
+```ts
+const WEAVE_NODE_CHANGE_TYPE = {
+  ['CREATE']: 'create',
+  ['UPDATE']: 'update',
+  ['DELETE']: 'delete',
+} as const;
+
+type WeaveNodeChangeTypeKeys = keyof typeof WEAVE_NODE_CHANGE_TYPE;
+type WeaveNodeChangeType = (typeof WEAVE_NODE_CHANGE_TYPE)[WeaveNodeChangeTypeKeys];
+
+type WeaveUserChangeEvent = {
+  user: WeaveUser;
+  changeType: WeaveNodeChangeType;
+  node: WeaveStateElement;
+  parent: WeaveStateElement;
+}
+
+instance.addEventListener('onUserChange', (e: WeaveUserChangeEvent) => void);
+```
+
+The `onUserChange` event is triggered each time the user of the Weave.js instance adds, modifies or removes a node from
+the room.

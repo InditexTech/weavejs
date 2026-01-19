@@ -137,7 +137,9 @@ export class WeaveGroupsManager {
       const groupNode = groupHandler.create(groupId, {
         draggable: true,
       });
-      this.instance.addNode(groupNode, parentNodeId);
+      this.instance.addNode(groupNode, parentNodeId, {
+        emitUserChangeEvent: false,
+      });
     }
 
     const nodesWithZIndex = realNodes
@@ -177,7 +179,9 @@ export class WeaveGroupsManager {
 
           if (handler) {
             const stateNode = handler.serialize(konvaGroup);
-            this.instance.addNode(stateNode, groupId);
+            this.instance.addNode(stateNode, groupId, {
+              emitUserChangeEvent: false,
+            });
           }
         }
         continue;
@@ -203,7 +207,9 @@ export class WeaveGroupsManager {
 
         if (handler) {
           const stateNode = handler.serialize(konvaNode);
-          this.instance.addNode(stateNode, groupId);
+          this.instance.addNode(stateNode, groupId, {
+            emitUserChangeEvent: false,
+          });
         }
       }
     }
@@ -340,7 +346,7 @@ export class WeaveGroupsManager {
     const groupHandler = this.instance.getNodeHandler<WeaveNode>('group');
     if (groupHandler) {
       const groupNode = groupHandler.serialize(konvaGroup);
-      this.instance.removeNode(groupNode);
+      this.instance.removeNode(groupNode, { emitUserChangeEvent: false });
     }
 
     setTimeout(() => {

@@ -153,129 +153,6 @@ export class WeaveCloningManager {
     return { serializedNodes, minPoint };
   }
 
-  cloneNodes(
-    instancesToClone: Konva.Node[],
-    targetContainer: Konva.Group | Konva.Layer | undefined,
-    onPoint: Konva.Vector2d
-  ): void {
-    if (instancesToClone.length === 0) {
-      return;
-    }
-
-    if (!targetContainer) {
-      return;
-    }
-
-    const groupId = uuidv4();
-    const newGroup = new Konva.Group({
-      id: groupId,
-    });
-
-    targetContainer.add(newGroup);
-
-    const nodesWithZIndex = instancesToClone
-      .map((node) => ({ node, zIndex: node.zIndex() }))
-      .filter((node) => node.zIndex !== -1);
-
-    const sortedNodesByZIndex = orderBy(
-      nodesWithZIndex,
-      ['zIndex'],
-      ['asc']
-    ).map((node) => node.node);
-
-    for (const [index, node] of sortedNodesByZIndex.entries()) {
-      const nodeAttrs = node.getAttrs();
-
-      if (nodeAttrs.type === 'group') {
-        const clonedNode: Konva.Group = node.clone({
-          id: uuidv4(),
-          type: 'group',
-        });
-
-        const nodePos = clonedNode.getAbsolutePosition();
-        const nodeRotation = clonedNode.getAbsoluteRotation();
-
-        const parent = node.getParent();
-        if (
-          parent &&
-          parent.getAttrs().nodeId &&
-          !parent.getAttrs().containerId
-        ) {
-          const realParent = this.instance
-            .getStage()
-            .findOne(`#${parent.getAttrs().nodeId}`);
-          if (realParent) {
-            nodePos.x += realParent.x();
-            nodePos.y += realParent.y();
-          }
-        }
-
-        clonedNode.moveTo(newGroup);
-        clonedNode.zIndex(index);
-        clonedNode.setAbsolutePosition(nodePos);
-        clonedNode.rotation(nodeRotation);
-
-        continue;
-      }
-
-      const clonedNode = node.clone({
-        id: uuidv4(),
-      });
-
-      const nodePos = clonedNode.getAbsolutePosition();
-      const nodeRotation = clonedNode.getAbsoluteRotation();
-
-      const parent = node.getParent();
-      if (
-        parent &&
-        parent.getAttrs().nodeId &&
-        !parent.getAttrs().containerId
-      ) {
-        const realParent = this.instance
-          .getStage()
-          .findOne(`#${parent.getAttrs().nodeId}`);
-        if (realParent) {
-          nodePos.x += realParent.x();
-          nodePos.y += realParent.y();
-        }
-      }
-
-      clonedNode.moveTo(newGroup);
-      clonedNode.zIndex(index);
-      clonedNode.setAbsolutePosition(nodePos);
-      clonedNode.rotation(nodeRotation);
-    }
-
-    const actualPos = newGroup.getClientRect({ relativeTo: targetContainer });
-
-    newGroup.x(onPoint.x - actualPos.x);
-    newGroup.y(onPoint.y - actualPos.y);
-
-    const groupChildren = [...newGroup.getChildren()];
-    for (const [index, node] of groupChildren.entries()) {
-      const nodePos = node.getAbsolutePosition();
-      const nodeRotation = node.getAbsoluteRotation();
-
-      node.moveTo(targetContainer);
-      node.zIndex(index);
-      node.setAbsolutePosition(nodePos);
-      node.rotation(nodeRotation);
-
-      const handler = this.instance.getNodeHandler<WeaveNode>(
-        node.getAttrs().nodeType
-      );
-
-      if (handler) {
-        const stateNode = handler.serialize(node);
-        this.instance.addNode(stateNode, targetContainer.getAttrs().id);
-      }
-
-      node.destroy();
-    }
-
-    newGroup.destroy();
-  }
-
   private recursivelyUpdateKeys(nodes: WeaveStateElement[]) {
     for (const child of nodes) {
       const newNodeId = uuidv4();
@@ -310,7 +187,9 @@ export class WeaveCloningManager {
 
     const realParent = this.instance.getInstanceRecursive(parent);
 
-    this.instance.addNode(serializedNode, realParent?.getAttrs().id);
+    this.instance.addNode(serializedNode, realParent?.getAttrs().id, {
+      emitUserChangeEvent: false,
+    });
 
     return this.instance.getStage().findOne(`#${newNodeId}`);
   }

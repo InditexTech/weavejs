@@ -40,7 +40,7 @@ export class WeaveZIndexManager {
     );
     if (handler) {
       const nodeState = handler.serialize(instance);
-      this.instance.moveNode(nodeState, WEAVE_NODE_POSITION.UP);
+      this.instance.zMoveNode(nodeState, WEAVE_NODE_POSITION.UP);
     }
   }
 
@@ -56,7 +56,7 @@ export class WeaveZIndexManager {
     );
     if (handler) {
       const nodeState = handler.serialize(instance);
-      this.instance.moveNode(nodeState, WEAVE_NODE_POSITION.DOWN);
+      this.instance.zMoveNode(nodeState, WEAVE_NODE_POSITION.DOWN);
     }
   }
 
@@ -71,7 +71,7 @@ export class WeaveZIndexManager {
       );
       if (handler) {
         const nodeState = handler.serialize(node);
-        this.instance.moveNode(nodeState, WEAVE_NODE_POSITION.BACK);
+        this.instance.zMoveNode(nodeState, WEAVE_NODE_POSITION.BACK);
       }
     }
   }
@@ -87,7 +87,7 @@ export class WeaveZIndexManager {
       );
       if (handler) {
         const nodeState = handler.serialize(node);
-        this.instance.moveNode(nodeState, WEAVE_NODE_POSITION.FRONT);
+        this.instance.zMoveNode(nodeState, WEAVE_NODE_POSITION.FRONT);
       }
     }
   }

@@ -509,6 +509,19 @@ nodesToGroupSerialized(instancesToClone: Konva.Node[]): {
 This method maps a Konva node instances list to its serialized form (the one used on the
 shared-state). Also returns the minimum point for all the nodes on the list.
 
+#### cloneNodes
+
+```ts
+cloneNodes(
+  instancesToClone: Konva.Node[],
+  targetContainer: Konva.Layer | Konva.Group | undefined,
+  onPoint: Vector2d
+): void
+```
+
+This method clone the Konva nodes instances defined in the list to the target container defined
+on the point provided.
+
 ### Fonts management
 
 #### getFonts

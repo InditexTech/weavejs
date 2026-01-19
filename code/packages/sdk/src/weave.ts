@@ -27,6 +27,9 @@ import {
   type WeaveUserMutexLock,
   type WeaveNodeMutexLock,
   type WeaveUser,
+  type WeaveNodeChangeType,
+  WEAVE_NODE_CHANGE_TYPE,
+  type WeaveUserChangeEvent,
 } from '@inditextech/weave-types';
 import { WeaveStore } from './stores/store';
 import {
@@ -56,12 +59,21 @@ import { WeavePluginsManager } from './managers/plugins';
 import { WeaveMutexManager } from './managers/mutex/mutex';
 import { WeaveNodesSelectionPlugin } from './plugins/nodes-selection/nodes-selection';
 import type { StageConfig } from 'konva/lib/Stage';
-import type { WeaveStoreOnRoomLoadedEvent } from './stores/types';
+import type {
+  WeaveInstanceStatusEvent,
+  WeaveStoreOnRoomLoadedEvent,
+} from './stores/types';
 import type { DOMElement } from './types';
 import { getBoundingBox, mergeExceptArrays } from './utils';
 import { WeaveAsyncManager } from './managers/async/async';
 import { WeaveHooksManager } from './managers/hooks';
 import { WeaveUsersManager } from './managers/users/users';
+import {
+  DEFAULT_ADD_NODE_OPTIONS,
+  DEFAULT_MOVE_NODE_OPTIONS,
+  DEFAULT_REMOVE_NODE_OPTIONS,
+  DEFAULT_UPDATE_NODE_OPTIONS,
+} from './constants';
 
 export class Weave {
   private id: string;
@@ -179,7 +191,7 @@ export class Weave {
       this.initialized = true;
 
       this.status = WEAVE_INSTANCE_STATUS.RUNNING;
-      this.emitEvent('onInstanceStatus', this.status);
+      this.emitEvent<WeaveInstanceStatusEvent>('onInstanceStatus', this.status);
     });
   }
 
@@ -200,14 +212,14 @@ export class Weave {
   ): void {
     if (!this.initialized && status === WEAVE_STORE_CONNECTION_STATUS.ERROR) {
       this.status = WEAVE_INSTANCE_STATUS.CONNECTING_ERROR;
-      this.emitEvent('onInstanceStatus', this.status);
+      this.emitEvent<WeaveInstanceStatusEvent>('onInstanceStatus', this.status);
     }
     if (
       status === WEAVE_STORE_CONNECTION_STATUS.CONNECTED &&
       !this.initialized
     ) {
       this.status = WEAVE_INSTANCE_STATUS.LOADING_ROOM;
-      this.emitEvent('onInstanceStatus', this.status);
+      this.emitEvent<WeaveInstanceStatusEvent>('onInstanceStatus', this.status);
     }
   }
 
@@ -228,7 +240,7 @@ export class Weave {
     this.emitEvent<WeaveStoreOnRoomLoadedEvent>('onRoomLoaded', false);
 
     this.status = WEAVE_INSTANCE_STATUS.STARTING;
-    this.emitEvent('onInstanceStatus', this.status);
+    this.emitEvent<WeaveInstanceStatusEvent>('onInstanceStatus', this.status);
 
     // Register all the nodes, plugins and actions that come from the configuration
     this.registerManager.registerNodesHandlers();
@@ -242,7 +254,7 @@ export class Weave {
     this.storeManager.registerStore(this.config.store as WeaveStore);
 
     this.status = WEAVE_INSTANCE_STATUS.LOADING_FONTS;
-    this.emitEvent('onInstanceStatus', this.status);
+    this.emitEvent<WeaveInstanceStatusEvent>('onInstanceStatus', this.status);
 
     // Start loading the fonts, this operation can be asynchronous
     await this.fontsManager.loadFonts();
@@ -252,7 +264,7 @@ export class Weave {
     this.stageManager.initStage();
 
     this.status = WEAVE_INSTANCE_STATUS.CONNECTING_TO_ROOM;
-    this.emitEvent('onInstanceStatus', this.status);
+    this.emitEvent<WeaveInstanceStatusEvent>('onInstanceStatus', this.status);
     // Setup and connect to the store
     const store = this.storeManager.getStore();
 
@@ -272,7 +284,7 @@ export class Weave {
     this.emitter.clearListeners();
 
     this.status = WEAVE_INSTANCE_STATUS.IDLE;
-    this.emitEvent('onInstanceStatus', this.status);
+    this.emitEvent<WeaveInstanceStatusEvent>('onInstanceStatus', this.status);
 
     // disconnect from the store
     const store = this.storeManager.getStore();
@@ -336,6 +348,76 @@ export class Weave {
   removeEventListener<T>(event: string, callback: (payload: T) => void): void {
     this.moduleLogger.debug(`Removing listening to event [${event}]`);
     this.emitter.off(event, callback);
+  }
+
+  emitUserChangeEvent(
+    data: {
+      node: WeaveStateElement;
+      parentId?: string;
+    },
+    changeType: WeaveNodeChangeType
+  ): void {
+    const stage = this.getStage();
+    const user = this.getStore().getUser();
+
+    const node = data.node;
+
+    let parent: WeaveStateElement | undefined = undefined;
+    let nodeParent: Konva.Node | null | undefined = undefined;
+    if (nodeParent === undefined && data?.parentId !== undefined && stage) {
+      nodeParent = stage.findOne(`#${data.parentId}`);
+    }
+    if (nodeParent === undefined && data?.parentId === undefined && stage) {
+      const parentNode = stage.findOne(`#${node.key}`);
+      if (parentNode) {
+        nodeParent = this.getNodeContainer(parentNode);
+      }
+    }
+
+    if (nodeParent !== undefined) {
+      const handler = this.getNodeHandler<WeaveNode>(
+        nodeParent?.getAttrs().nodeType
+      );
+      if (handler) {
+        parent = handler.serialize(nodeParent as WeaveElementInstance);
+      }
+    }
+
+    if (!parent) {
+      return;
+    }
+
+    this.emitEvent<WeaveUserChangeEvent>('onUserChange', {
+      user,
+      changeType,
+      parent,
+      node,
+    });
+    this.cleanupTransactionIdToInstance(node);
+  }
+
+  private setTransactionIdToInstance(node: WeaveStateElement): void {
+    const realNode = this.getStage().findOne(`#${node.key}`);
+    if (realNode) {
+      node.props.transactionId = uuidv4();
+      realNode.setAttr('transactionId', node.props.transactionId);
+    }
+  }
+
+  private cleanupTransactionIdToInstance(node: WeaveStateElement): void {
+    const realNode = this.getStage().findOne(`#${node.key}`);
+    if (realNode) {
+      realNode.setAttr('transactionId', undefined);
+    }
+  }
+
+  private decorateWithZIndex(node: WeaveStateElement): WeaveStateElement {
+    const realNode = this.getStage().findOne(`#${node.key}`);
+    if (realNode) {
+      const zIndex = realNode.zIndex();
+      node.props = { ...node.props, zIndex };
+    }
+    return node;
   }
 
   // LOGGING MANAGEMENT METHODS PROXIES
@@ -507,13 +589,13 @@ export class Weave {
   update(newState: WeaveState): void {
     this.getStore().setState(newState);
     this.renderer.render(() => {
-      this.emitEvent('onRender', {});
+      this.emitEvent<undefined>('onRender');
     });
   }
 
   render(): void {
     this.renderer.render(() => {
-      this.emitEvent('onRender', {});
+      this.emitEvent<undefined>('onRender');
     });
   }
 
@@ -544,66 +626,190 @@ export class Weave {
   addNode(
     node: WeaveStateElement,
     parentId = 'mainLayer',
-    index: number | undefined = undefined
+    options: {
+      index?: number;
+      emitUserChangeEvent?: boolean;
+      overrideUserChangeType?: WeaveNodeChangeType;
+    } = DEFAULT_ADD_NODE_OPTIONS
   ): void {
     this.stateTransactional(() => {
-      this.stateManager.addNode(node, parentId, index);
+      this.addNodeNT(node, parentId, options);
     });
   }
 
   addNodeNT(
     node: WeaveStateElement,
     parentId = 'mainLayer',
-    index: number | undefined = undefined
+    options: {
+      index?: number;
+      emitUserChangeEvent?: boolean;
+      overrideUserChangeType?: WeaveNodeChangeType;
+    } = DEFAULT_ADD_NODE_OPTIONS
   ): void {
+    const { index, emitUserChangeEvent, overrideUserChangeType } =
+      mergeExceptArrays(DEFAULT_ADD_NODE_OPTIONS, options);
+
+    if (emitUserChangeEvent) {
+      this.setTransactionIdToInstance(node);
+    }
+
     this.stateManager.addNode(node, parentId, index);
-  }
 
-  updateNode(node: WeaveStateElement): void {
-    this.stateTransactional(() => {
-      this.stateManager.updateNode(node);
-    });
-  }
-
-  updateNodeNT(node: WeaveStateElement): void {
-    this.stateManager.updateNode(node);
-  }
-
-  updateNodes(nodes: WeaveStateElement[]): void {
-    this.stateTransactional(() => {
-      this.stateManager.updateNodes(nodes);
-    });
-  }
-
-  updateNodesNT(nodes: WeaveStateElement[]): void {
-    this.stateManager.updateNodes(nodes);
-  }
-
-  removeNode(node: WeaveStateElement): void {
-    this.stateTransactional(() => {
-      this.stateManager.removeNode(node);
-
-      this.runPhaseHooks<{
-        node: Konva.Node;
-      }>('onRemoveNode', (hook) => {
-        const nodeInstance = this.getStage().findOne(`#${node.key}`);
-        if (nodeInstance) {
-          hook({
-            node: nodeInstance,
-          });
+    if (emitUserChangeEvent) {
+      const handleSendEvent = (addedNode: WeaveElementInstance) => {
+        if (node.props.transactionId === addedNode.getAttrs().transactionId) {
+          const decoratedNode = this.decorateWithZIndex(node);
+          this.emitUserChangeEvent(
+            { node: decoratedNode, parentId },
+            overrideUserChangeType ?? WEAVE_NODE_CHANGE_TYPE.CREATE
+          );
+          this.removeEventListener('onNodeRenderedAdded', handleSendEvent);
         }
-      });
+      };
 
-      const selectionPlugin =
-        this.getPlugin<WeaveNodesSelectionPlugin>('nodesSelection');
-      if (selectionPlugin) {
-        selectionPlugin.setSelectedNodes([]);
-      }
+      this.addEventListener('onNodeRenderedAdded', handleSendEvent);
+    }
+  }
+
+  updateNode(
+    node: WeaveStateElement,
+    options: { emitUserChangeEvent?: boolean } = DEFAULT_UPDATE_NODE_OPTIONS
+  ): void {
+    this.stateTransactional(() => {
+      this.updateNodeNT(node, options);
     });
   }
 
-  removeNodeNT(node: WeaveStateElement): void {
+  updateNodeNT(
+    node: WeaveStateElement,
+    options: { emitUserChangeEvent?: boolean } = DEFAULT_UPDATE_NODE_OPTIONS
+  ): void {
+    const { emitUserChangeEvent } = mergeExceptArrays(
+      DEFAULT_UPDATE_NODE_OPTIONS,
+      options
+    );
+
+    if (emitUserChangeEvent) {
+      this.setTransactionIdToInstance(node);
+    }
+
+    this.stateManager.updateNode(node);
+
+    if (emitUserChangeEvent) {
+      const handleSendEvent = (updatedNode: WeaveElementInstance) => {
+        if (node.props.transactionId === updatedNode.getAttrs().transactionId) {
+          const decoratedNode = this.decorateWithZIndex(node);
+          this.emitUserChangeEvent(
+            { node: decoratedNode },
+            WEAVE_NODE_CHANGE_TYPE.UPDATE
+          );
+          this.removeEventListener('onNodeRenderedUpdated', handleSendEvent);
+        }
+      };
+
+      this.addEventListener('onNodeRenderedUpdated', handleSendEvent);
+    }
+  }
+
+  updateNodes(
+    nodes: WeaveStateElement[],
+    options: { emitUserChangeEvent?: boolean } = DEFAULT_UPDATE_NODE_OPTIONS
+  ): void {
+    this.stateTransactional(() => {
+      this.updateNodesNT(nodes, options);
+    });
+  }
+
+  updateNodesNT(
+    nodes: WeaveStateElement[],
+    options: { emitUserChangeEvent?: boolean } = DEFAULT_UPDATE_NODE_OPTIONS
+  ): void {
+    const { emitUserChangeEvent } = mergeExceptArrays(
+      DEFAULT_UPDATE_NODE_OPTIONS,
+      options
+    );
+
+    const transactionsIds: Record<string, string> = {};
+    if (emitUserChangeEvent) {
+      for (const node of nodes) {
+        this.setTransactionIdToInstance(node);
+        transactionsIds[node.key] = node.props.transactionId;
+      }
+    }
+
+    this.stateManager.updateNodes(nodes);
+
+    if (emitUserChangeEvent) {
+      const handleSendEvent = (updatedNode: WeaveElementInstance) => {
+        for (const node of nodes) {
+          if (
+            transactionsIds[node.key] === updatedNode.getAttrs().transactionId
+          ) {
+            const decoratedNode = this.decorateWithZIndex(node);
+            this.emitUserChangeEvent(
+              {
+                node: decoratedNode,
+              },
+              WEAVE_NODE_CHANGE_TYPE.UPDATE
+            );
+            delete transactionsIds[node.key];
+            if (Object.keys(transactionsIds).length === 0) {
+              this.removeEventListener(
+                'onNodeRenderedUpdated',
+                handleSendEvent
+              );
+            }
+            break;
+          }
+        }
+      };
+
+      this.addEventListener('onNodeRenderedUpdated', handleSendEvent);
+    }
+  }
+
+  removeNode(
+    node: WeaveStateElement,
+    options: { emitUserChangeEvent?: boolean } = DEFAULT_REMOVE_NODE_OPTIONS
+  ): void {
+    this.stateTransactional(() => {
+      this.removeNodeNT(node, options);
+    });
+  }
+
+  removeNodeNT(
+    node: WeaveStateElement,
+    options: { emitUserChangeEvent?: boolean } = DEFAULT_REMOVE_NODE_OPTIONS
+  ): void {
+    const { emitUserChangeEvent } = mergeExceptArrays(
+      DEFAULT_REMOVE_NODE_OPTIONS,
+      options
+    );
+
+    let parentId: string | undefined = undefined;
+    let decoratedNode: WeaveStateElement | undefined = undefined;
+
+    if (emitUserChangeEvent) {
+      this.setTransactionIdToInstance(node);
+      decoratedNode = this.decorateWithZIndex(node);
+      parentId = this.getContainerByNodeId(node.key);
+    }
+
     this.stateManager.removeNode(node);
+
+    if (decoratedNode && emitUserChangeEvent) {
+      const handleSendEvent = (removedNode: WeaveElementInstance) => {
+        if (node.props.transactionId === removedNode.getAttrs().transactionId) {
+          this.emitUserChangeEvent(
+            { node: decoratedNode, parentId },
+            WEAVE_NODE_CHANGE_TYPE.DELETE
+          );
+          this.removeEventListener('onNodeRenderedRemoved', handleSendEvent);
+        }
+      };
+
+      this.addEventListener('onNodeRenderedRemoved', handleSendEvent);
+    }
 
     this.runPhaseHooks<{
       node: Konva.Node;
@@ -623,23 +829,21 @@ export class Weave {
     }
   }
 
-  removeNodes(nodes: WeaveStateElement[]): void {
+  removeNodes(
+    nodes: WeaveStateElement[],
+    options: { emitUserChangeEvent?: boolean } = DEFAULT_REMOVE_NODE_OPTIONS
+  ): void {
     this.stateTransactional(() => {
-      for (const node of nodes) {
-        this.removeNodeNT(node);
-      }
-
-      const selectionPlugin =
-        this.getPlugin<WeaveNodesSelectionPlugin>('nodesSelection');
-      if (selectionPlugin) {
-        selectionPlugin.setSelectedNodes([]);
-      }
+      this.removeNodesNT(nodes, options);
     });
   }
 
-  removeNodesNT(nodes: WeaveStateElement[]): void {
+  removeNodesNT(
+    nodes: WeaveStateElement[],
+    options: { emitUserChangeEvent?: boolean } = DEFAULT_REMOVE_NODE_OPTIONS
+  ): void {
     for (const node of nodes) {
-      this.removeNodeNT(node);
+      this.removeNodeNT(node, options);
     }
 
     const selectionPlugin =
@@ -649,14 +853,47 @@ export class Weave {
     }
   }
 
-  moveNode(node: WeaveStateElement, position: WeavePosition): void {
+  zMoveNode(
+    node: WeaveStateElement,
+    position: WeavePosition,
+    options: { emitUserChangeEvent?: boolean } = DEFAULT_MOVE_NODE_OPTIONS
+  ): void {
     this.stateTransactional(() => {
-      this.stateManager.moveNode(node, position);
+      this.zMoveNodeNT(node, position, options);
     });
   }
 
-  moveNodeNT(node: WeaveStateElement, position: WeavePosition): void {
-    this.stateManager.moveNode(node, position);
+  zMoveNodeNT(
+    node: WeaveStateElement,
+    position: WeavePosition,
+    options: { emitUserChangeEvent?: boolean } = DEFAULT_MOVE_NODE_OPTIONS
+  ): void {
+    const { emitUserChangeEvent } = mergeExceptArrays(
+      DEFAULT_MOVE_NODE_OPTIONS,
+      options
+    );
+
+    if (emitUserChangeEvent) {
+      this.setTransactionIdToInstance(node);
+    }
+
+    this.updateNodeNT(node, { emitUserChangeEvent: false });
+    this.stateManager.zMoveNode(node, position);
+
+    if (emitUserChangeEvent) {
+      const handleSendEvent = (movedNode: WeaveElementInstance) => {
+        if (node.props.transactionId === movedNode.getAttrs().transactionId) {
+          const decoratedNode = this.decorateWithZIndex(node);
+          this.emitUserChangeEvent(
+            { node: decoratedNode },
+            WEAVE_NODE_CHANGE_TYPE.UPDATE
+          );
+          this.removeEventListener('onNodeRenderedUpdated', handleSendEvent);
+        }
+      };
+
+      this.addEventListener('onNodeRenderedUpdated', handleSendEvent);
+    }
   }
 
   getElementsTree(): WeaveStateElement[] {
@@ -665,6 +902,19 @@ export class Weave {
 
   isEmpty(): boolean {
     return this.getElementsTree().length === 0;
+  }
+
+  getContainerByNodeId(nodeId: string): string | undefined {
+    let parentId: string | undefined = undefined;
+    const nodeParent = this.getStage().findOne(`#${nodeId}`);
+    if (nodeParent) {
+      const parent = this.getNodeContainer(nodeParent);
+      if (parent) {
+        parentId = parent.getAttrs().id;
+      }
+    }
+
+    return parentId;
   }
 
   getNodeContainerId(node: WeaveElementInstance | Konva.Node): string {
@@ -809,14 +1059,6 @@ export class Weave {
 
   nodesToGroupSerialized(instancesToClone: Konva.Node[]): WeaveSerializedGroup {
     return this.cloningManager.nodesToGroupSerialized(instancesToClone);
-  }
-
-  cloneNodes(
-    instancesToClone: Konva.Node[],
-    targetContainer: Konva.Layer | Konva.Group | undefined,
-    onPoint: Konva.Vector2d
-  ): void {
-    this.cloningManager.cloneNodes(instancesToClone, targetContainer, onPoint);
   }
 
   // FONTS MANAGEMENT METHODS PROXIES
