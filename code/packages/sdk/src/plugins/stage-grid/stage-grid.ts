@@ -32,6 +32,10 @@ export class WeaveStageGridPlugin extends WeavePlugin {
   private moveToolActive: boolean;
   private isMouseMiddleButtonPressed: boolean;
   private isSpaceKeyPressed: boolean;
+  private actStageZoomX: number = 1;
+  private actStageZoomY: number = 1;
+  private actStagePosX: number = 0;
+  private actStagePosY: number = 0;
   private config!: WeaveStageGridPluginConfig;
 
   constructor(params?: Partial<WeaveStageGridPluginParams>) {
@@ -343,6 +347,7 @@ export class WeaveStageGridPlugin extends WeavePlugin {
     const majorShape = new Konva.Shape({
       sceneFunc: function (context) {
         context.beginPath();
+
         for (let x = startX; x <= endX; x += adjustedSpacing) {
           for (let y = startY; y <= endY; y += adjustedSpacing) {
             if (Math.abs(x) < spacing / 2 || Math.abs(y) < spacing / 2)
@@ -393,7 +398,35 @@ export class WeaveStageGridPlugin extends WeavePlugin {
     gridLayer.add(originShape);
   }
 
+  private hasStageChanged(): boolean {
+    const stage = this.instance.getStage();
+    const actualScaleX = stage.scaleX();
+    const actualScaleY = stage.scaleY();
+    const actualPosX = stage.x();
+    const actualPosY = stage.y();
+
+    if (
+      this.actStageZoomX === actualScaleX &&
+      this.actStageZoomY === actualScaleY &&
+      this.actStagePosX === actualPosX &&
+      this.actStagePosY === actualPosY
+    ) {
+      return false;
+    }
+
+    this.actStageZoomX = actualScaleX;
+    this.actStageZoomY = actualScaleY;
+    this.actStagePosX = actualPosX;
+    this.actStagePosY = actualPosY;
+
+    return true;
+  }
+
   renderGrid(): void {
+    if (!this.hasStageChanged()) {
+      return;
+    }
+
     switch (this.config.type) {
       case WEAVE_GRID_TYPES.LINES:
         this.renderGridLines();
