@@ -449,6 +449,13 @@ export class WeaveCopyPasteNodesPlugin extends WeavePlugin {
           }
         }
 
+        const containerNode = this.instance
+          .getStage()
+          .findOne(`#${containerId}`);
+        if (!containerNode) {
+          containerId = this.instance.getMainLayer()?.getAttrs().id ?? '';
+        }
+
         this.instance.addNode(node, containerId);
 
         const realNode = this.instance.getStage().findOne(`#${newNodeId}`);
