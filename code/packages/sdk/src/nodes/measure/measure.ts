@@ -464,7 +464,9 @@ export class WeaveMeasureNode extends WeaveNode {
     crosshairTo.moveToBottom();
     moveSeparationRect.moveToTop();
 
-    moveFromCircle.on('dragstart', () => {
+    moveFromCircle.on('dragstart', (e) => {
+      e.cancelBubble = true;
+
       moveFromCircle.visible(false);
       moveToCircle.visible(false);
       moveSeparationRect.visible(false);
@@ -472,6 +474,8 @@ export class WeaveMeasureNode extends WeaveNode {
     });
 
     moveFromCircle.on('dragmove', (e) => {
+      e.cancelBubble = true;
+
       const actCircle = e.target as Konva.Circle;
       const realNode = e.target.getParent() as Konva.Group;
 
@@ -489,6 +493,8 @@ export class WeaveMeasureNode extends WeaveNode {
     });
 
     moveFromCircle.on('dragend', (e) => {
+      e.cancelBubble = true;
+
       const actCircle = e.target as Konva.Circle;
       const realNode = e.target.getParent() as Konva.Group;
 
@@ -508,7 +514,9 @@ export class WeaveMeasureNode extends WeaveNode {
       );
     });
 
-    moveToCircle.on('dragstart', () => {
+    moveToCircle.on('dragstart', (e) => {
+      e.cancelBubble = true;
+
       moveFromCircle.visible(false);
       moveToCircle.visible(false);
       moveSeparationRect.visible(false);
@@ -516,6 +524,8 @@ export class WeaveMeasureNode extends WeaveNode {
     });
 
     moveToCircle.on('dragmove', (e) => {
+      e.cancelBubble = true;
+
       const actCircle = e.target as Konva.Circle;
       const realNode = e.target.getParent() as Konva.Group;
 
@@ -533,6 +543,8 @@ export class WeaveMeasureNode extends WeaveNode {
     });
 
     moveToCircle.on('dragend', (e) => {
+      e.cancelBubble = true;
+
       const actCircle = e.target as Konva.Circle;
       const realNode = e.target.getParent() as Konva.Group;
 
@@ -553,12 +565,16 @@ export class WeaveMeasureNode extends WeaveNode {
     });
 
     let originalSeparationHandlerPosition = { x: 0, y: 0 };
-    moveSeparationRect.on('dragstart', () => {
+    moveSeparationRect.on('dragstart', (e) => {
+      e.cancelBubble = true;
+
       const pos = moveSeparationRect.position();
       originalSeparationHandlerPosition = pos;
     });
 
     moveSeparationRect.on('dragmove', (e) => {
+      e.cancelBubble = true;
+
       const pos = e.target.position();
       const realNode = e.target.getParent() as Konva.Group;
 
@@ -625,6 +641,8 @@ export class WeaveMeasureNode extends WeaveNode {
     });
 
     moveSeparationRect.on('dragend', (e) => {
+      e.cancelBubble = true;
+
       const pos = e.target.position();
       const realNode = e.target.getParent() as Konva.Group;
 
