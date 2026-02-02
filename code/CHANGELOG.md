@@ -16,6 +16,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 - [#886](https://github.com/InditexTech/weavejs/issues/886) Avoid bubble events when dragging control elements on the measure node
+- [#888](https://github.com/InditexTech/weavejs/issues/888) Moving an element causes it to jump or move in an uncontrolled way when zooming out
 - [#889](https://github.com/InditexTech/weavejs/issues/889) Right-clicking on a locked node with WeaveContextMenuPlugin active selects the node
 
 ## [2.15.2] - 2026-01-21

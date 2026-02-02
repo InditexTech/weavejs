@@ -24,7 +24,7 @@ import { WEAVE_NODES_DISTANCE_SNAPPING_PLUGIN_KEY } from '../nodes-distance-snap
 import { WEAVE_NODES_SELECTION_KEY } from '../nodes-selection/constants';
 import { WEAVE_CONTEXT_MENU_PLUGIN_KEY } from '../context-menu/constants';
 import type { WeaveStageGridPlugin } from '../stage-grid/stage-grid';
-import type Konva from 'konva';
+import Konva from 'konva';
 import { throttle } from 'lodash';
 import type {
   WeaveStagePanningPluginConfig,
@@ -297,9 +297,18 @@ export class WeaveStagePanningPlugin extends WeavePlugin {
       this.stageScrollInterval = setInterval(() => {
         const pos = stage.getPointerPosition();
         const offset = this.config.edgePanOffset;
-        const speed = this.config.edgePanSpeed;
 
         if (!pos) return;
+
+        const { width, height } = stage.size();
+        const scale = stage.scaleX();
+        const speed = Math.max(
+          this.config.edgePanMinSpeed,
+          Math.min(
+            this.config.edgePanMaxSpeed,
+            this.config.edgePanSpeed / scale
+          )
+        );
 
         let isNearLeft = false;
         let isNearRight = false;
@@ -310,12 +319,12 @@ export class WeaveStagePanningPlugin extends WeavePlugin {
           const target: Konva.Node = this.panEdgeTargets[
             targetId
           ] as Konva.Node;
-          isNearLeft = pos.x < offset / stage.scaleX();
+          isNearLeft = pos.x < offset;
           if (isNearLeft) {
             target.x(target.x() - speed / stage.scaleX());
           }
 
-          isNearRight = pos.x > stage.width() - offset / stage.scaleX();
+          isNearRight = pos.x > width - offset;
           if (isNearRight) {
             target.x(target.x() + speed / stage.scaleX());
           }
@@ -325,7 +334,7 @@ export class WeaveStagePanningPlugin extends WeavePlugin {
             target.y(target.y() - speed / stage.scaleY());
           }
 
-          isNearBottom = pos.y > stage.height() - offset;
+          isNearBottom = pos.y > height - offset;
           if (isNearBottom) {
             target.y(target.y() + speed / stage.scaleY());
           }
