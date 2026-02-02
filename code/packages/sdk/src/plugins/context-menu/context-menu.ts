@@ -117,21 +117,28 @@ export class WeaveContextMenuPlugin extends WeavePlugin {
       this.closeContextMenu();
     }
 
-    // Check if nodes are locked by other users
+    // Check if nodes are locked or mutex by other users
+    let allNodesMutexUnlocked = true;
     let allNodesUnlocked = true;
     const actUser = this.instance.getStore().getUser();
     for (const node of nodes) {
+      const locked = node.instance.getAttrs().locked;
       const mutexInfo = this.instance.getNodeMutexLock<unknown>(
         node.node?.key ?? ''
       );
 
-      if (mutexInfo && mutexInfo.user.id !== actUser.id) {
+      if (locked) {
         allNodesUnlocked = false;
+        break;
+      }
+
+      if (mutexInfo && mutexInfo.user.id !== actUser.id) {
+        allNodesMutexUnlocked = false;
         break;
       }
     }
 
-    if (!allNodesUnlocked) {
+    if (!allNodesMutexUnlocked || !allNodesUnlocked) {
       return;
     }
 
