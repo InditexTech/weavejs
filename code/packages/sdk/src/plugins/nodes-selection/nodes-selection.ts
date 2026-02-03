@@ -1078,7 +1078,7 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
       const isTransformer = e.target?.getParent() instanceof Konva.Transformer;
       const isTargetable = e.target.getAttrs().isTargetable !== false;
       const isContainerEmptyArea =
-        typeof e.target.getAttrs().isContainerPrincipal !== 'undefined' &&
+        e.target.getAttrs().isContainerPrincipal !== undefined &&
         !e.target.getAttrs().isContainerPrincipal;
 
       if (isTransformer) {
@@ -1227,7 +1227,7 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
 
       const isStage = e.target instanceof Konva.Stage;
       const isContainerEmptyArea =
-        typeof e.target.getAttrs().isContainerPrincipal !== 'undefined' &&
+        e.target.getAttrs().isContainerPrincipal !== undefined &&
         !e.target.getAttrs().isContainerPrincipal;
       if ((isStage || isContainerEmptyArea) && !moved) {
         this.selecting = false;
@@ -1536,7 +1536,7 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
       const isStage = parent instanceof Konva.Stage;
       const isMainLayer = parent === mainLayer;
       const isContainerEmptyArea =
-        typeof e.target.getAttrs().isContainerPrincipal !== 'undefined' &&
+        e.target.getAttrs().isContainerPrincipal !== undefined &&
         !e.target.getAttrs().isContainerPrincipal;
 
       if (isStage || isMainLayer || isContainerEmptyArea) {
