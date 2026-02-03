@@ -15,7 +15,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
-- [#893](https://github.com/InditexTech/weavejs/issues/893) When click on locked node if anything is selected then selection is not cleared
+- [#893](https://github.com/InditexTech/weavejs/issues/893) When click on a locked node if anything is selected selection is not cleared
 
 ## [2.15.3] - 2026-02-02
 
