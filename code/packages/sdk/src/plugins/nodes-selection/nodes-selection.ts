@@ -1527,6 +1527,22 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
       nodeTargeted.getAttrs().mutexUserId !== user.id;
 
     if (isLocked || isMutexLocked) {
+      // check if clicked on empty area of container
+      const parent = this.instance.getInstanceRecursive(
+        nodeTargeted.getParent() as Konva.Node
+      );
+
+      const mainLayer = this.instance.getMainLayer();
+      const isStage = parent instanceof Konva.Stage;
+      const isMainLayer = parent === mainLayer;
+      const isContainerEmptyArea =
+        typeof e.target.getAttrs().isContainerPrincipal !== 'undefined' &&
+        !e.target.getAttrs().isContainerPrincipal;
+
+      if (isStage || isMainLayer || isContainerEmptyArea) {
+        this.getSelectionPlugin()?.setSelectedNodes([]);
+      }
+
       return;
     }
 
