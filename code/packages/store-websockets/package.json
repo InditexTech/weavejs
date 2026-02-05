@@ -1,6 +1,6 @@
 {
   "name": "@inditextech/weave-store-websockets",
-  "version": "2.17.0-SNAPSHOT",
+  "version": "2.17.0",
   "type": "module",
   "license": "Apache-2.0",
   "author": "Jesus Manuel Piñeiro Cid <jesusmpc@inditex.com>",
@@ -56,8 +56,8 @@
     "version:release": "npm version $RELEASE_VERSION -m \"[npm-scripts] prepare release $RELEASE_VERSION\" --tag-version-prefix \"\""
   },
   "dependencies": {
-    "@inditextech/weave-types": "2.17.0-SNAPSHOT",
-    "@inditextech/weave-sdk": "2.17.0-SNAPSHOT",
+    "@inditextech/weave-types": "2.17.0",
+    "@inditextech/weave-sdk": "2.17.0",
     "@syncedstore/core": "0.6.0",
     "ws": "8.18.1",
     "y-websocket": "3.0.0"
