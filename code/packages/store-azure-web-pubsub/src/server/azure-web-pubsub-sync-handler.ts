@@ -248,6 +248,11 @@ export default class WeaveAzureWebPubsubSyncHandler extends WebPubSubEventHandle
     return this._roomsSyncHost.get(roomId);
   }
 
+  async getRoomDocument(roomId: string): Promise<Y.Doc> {
+    await this.getHostConnection(roomId);
+    return this._rooms.get(roomId)!;
+  }
+
   async clientConnect(
     roomId: string,
     connectionOptions?: WeaveStoreAzureWebPubSubSyncHostClientConnectOptions
