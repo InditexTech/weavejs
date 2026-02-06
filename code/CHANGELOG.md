@@ -16,6 +16,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - [#897](https://github.com/InditexTech/weavejs/issues/897) Expose getExportBoundingBox function to make easy export of frames nodes
+- [#899](https://github.com/InditexTech/weavejs/issues/899) Define frame node internal area export bounding bounds
 
 ## [2.17.0] - 2026-02-05
 
