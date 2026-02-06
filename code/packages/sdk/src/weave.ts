@@ -64,7 +64,11 @@ import type {
   WeaveStoreOnRoomLoadedEvent,
 } from './stores/types';
 import type { DOMElement } from './types';
-import { getBoundingBox, mergeExceptArrays } from './utils';
+import {
+  getBoundingBox,
+  getExportBoundingBox,
+  mergeExceptArrays,
+} from './utils';
 import { WeaveAsyncManager } from './managers/async/async';
 import { WeaveHooksManager } from './managers/hooks';
 import { WeaveUsersManager } from './managers/users/users';
@@ -1099,6 +1103,22 @@ export class Weave {
       boundingNodes,
       options
     );
+  }
+
+  public getExportBoundingBox(nodesIds: string[]): {
+    x: number;
+    y: number;
+    width: number;
+    height: number;
+  } {
+    const nodes = [];
+    for (const nodeId of nodesIds) {
+      const nodeInstance = this.getStage().findOne(`#${nodeId}`);
+      if (nodeInstance) {
+        nodes.push(nodeInstance);
+      }
+    }
+    return getExportBoundingBox(nodes);
   }
 
   // LOCK / UNLOCK METHODS
