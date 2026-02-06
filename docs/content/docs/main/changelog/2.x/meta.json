@@ -2,6 +2,7 @@
   "title": "2.x versions",
   "description": "Detailed changelog for Weave.js 2.x versions",
   "pages": [
+    "2.18.0",
     "2.17.0",
     "2.16.0",
     "2.15.3",
