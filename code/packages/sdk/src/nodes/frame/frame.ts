@@ -237,6 +237,16 @@ export class WeaveFrameNode extends WeaveNode {
       draggable: false,
     });
 
+    frameInternal.getExportClientRect = (config) => {
+      const containerAreaBox = containerArea.getClientRect(config);
+      return {
+        x: containerAreaBox.x,
+        y: containerAreaBox.y,
+        width: containerAreaBox.width,
+        height: containerAreaBox.height,
+      };
+    };
+
     frame.getExportClientRect = (config) => {
       const textBox = text.getClientRect(config);
       const containerAreaBox = containerArea.getClientRect(config);
