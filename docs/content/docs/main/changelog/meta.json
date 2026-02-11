@@ -1,5 +1,5 @@
 {
   "title": "Changelog",
   "description": "Detailed changelog for Weave.js versions",
-  "pages": ["prerelease", "1.x"]
+  "pages": ["2.x", "1.x", "prerelease"]
 }

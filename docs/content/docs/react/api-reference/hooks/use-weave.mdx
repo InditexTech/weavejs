@@ -36,6 +36,11 @@ interface WeaveRuntimeState {
   room: {
     loaded: boolean;
   };
+  asyncElements: {
+    loaded: number;
+    total: number;
+    allLoaded: boolean;
+  };
   users: WeaveConnectedUsersChanged;
   undoRedo: {
     canUndo: boolean;
@@ -60,6 +65,8 @@ interface WeaveRuntimeState {
   setAppState: (newAppState: WeaveState) => void;
   setConnectionStatus: (newConnectionStatus: string) => void;
   setRoomLoaded: (newStatus: boolean) => void;
+  setAsyncElements: (loaded: number, total: number) => void;
+  setAsyncElementsAllLoaded: (allLoaded: boolean) => void;
   setUsers: (newUsers: WeaveConnectedUsersChanged) => void;
   setCanUndo: (newCanUndo: boolean) => void;
   setCanRedo: (newCanRedo: boolean) => void;
@@ -75,9 +82,9 @@ interface WeaveRuntimeState {
 
 ## Usage
 
-Being the store based on Zustand, usage is pretty straight-forward, we just
-instantiate the hook and we pass a function as parameter, that receives the state
-as parameter and from there we can reduce to the part of the state we need,
+Being the store based on [Zustand](https://zustand.docs.pmnd.rs/getting-started/introduction),
+usage is pretty straight-forward, we just instantiate the hook and we pass a function as parameter,
+that receives the state as parameter and from there we can reduce to the part of the state we need,
 like this:
 
 ```tsx

@@ -3,6 +3,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import {
+  type DeepPartial,
   type ImageCrossOrigin,
   type URLTransformerFunction,
   type WeaveElementAttributes,
@@ -29,6 +30,9 @@ export type WeaveImageState = {
 };
 
 export type WeaveImageProperties = {
+  performance: {
+    caching: boolean;
+  };
   crossOrigin: ImageCrossOrigin;
   transform?: WeaveNodeTransformerProperties;
   urlTransformer?: URLTransformerFunction;
@@ -36,7 +40,7 @@ export type WeaveImageProperties = {
 };
 
 export type WeaveImageNodeParams = {
-  config: Partial<WeaveImageProperties>;
+  config: DeepPartial<WeaveImageProperties>;
 };
 
 export type WeaveImageCropEndTypeKeys = keyof typeof WEAVE_IMAGE_CROP_END_TYPE;

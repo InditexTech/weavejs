@@ -48,18 +48,17 @@ type WeaveNodeTransformerProperties = Konva.TransformerConfig;
 type ImageCrossOrigin = "anonymous" | "use-credentials";
 
 type WeaveImageProperties = {
+  performance: {
+    caching: boolean;
+  };
   crossOrigin: ImageCrossOrigin;
   transform?: WeaveNodeTransformerProperties;
+  urlTransformer?: URLTransformerFunction;
   onDblClick?: (instance: WeaveImageNode, node: Konva.Group) => void;
 };
 
 type WeaveImageNodeParams = {
-  config: Partial<WeaveImageProperties>;
-};
-
-const WEAVE_IMAGE_CROP_END_TYPE = {
-  ["ACCEPT"]: "accept",
-  ["CANCEL"]: "cancel",
+  config: DeepPartial<WeaveImageProperties>;
 };
 
 type WeaveImageCropEndTypeKeys = keyof typeof WEAVE_IMAGE_CROP_END_TYPE;
@@ -93,6 +92,12 @@ For `WeaveImageProperties`:
 
 <TypeTable
   type={{
+    ["performance.caching"]: {
+      description:
+        "Boolean that enables image nodes caching, increasing the performance of the canvas.",
+      type: "boolean",
+      default: "false",
+    },
     ["crossOrigin"]: {
       description:
         "Value of the property crossOrigin for the HTMLImageElement DOM element. Useful for CORS support.",
@@ -103,6 +108,11 @@ For `WeaveImageProperties`:
       description:
         "Setup the transform properties for the image (if can be resized, rotated, anchors, etc.).",
       type: "object",
+    },
+    ["urlTransformer"]: {
+      description:
+        "Function that receives the actual image node URL, and returns an URL. Useful for transformations of the URL.",
+      type: "(url: string) => string",
     },
     ["onDblClick"]: {
       description:
@@ -115,27 +125,18 @@ For `WeaveImageProperties`:
 ## Default values
 
 ```ts
-const WEAVE_TRANSFORMER_ANCHORS = {
-  ["TOP_LEFT"]: "top-left",
-  ["TOP_CENTER"]: "top-center",
-  ["TOP_RIGHT"]: "top-right",
-  ["MIDDLE_RIGHT"]: "middle-right",
-  ["MIDDLE_LEFT"]: "middle-left",
-  ["BOTTOM_LEFT"]: "bottom-left",
-  ["BOTTOM_CENTER"]: "bottom-center",
-  ["BOTTOM_RIGHT"]: "bottom-right",
+const WEAVE_IMAGE_NODE_TYPE = "image";
+
+const WEAVE_IMAGE_CROP_END_TYPE = {
+  ["ACCEPT"]: "accept",
+  ["CANCEL"]: "cancel",
 };
 
-const WEAVE_DEFAULT_ENABLED_ANCHORS: string[] = Object.values(
-  WEAVE_TRANSFORMER_ANCHORS
-);
-
-const WEAVE_DEFAULT_TRANSFORM_PROPERTIES: WeaveNodeTransformerProperties = {
-  rotateEnabled: true,
-  resizeEnabled: true,
-  enabledAnchors: WEAVE_DEFAULT_ENABLED_ANCHORS,
-  borderStrokeWidth: 3,
-  padding: 0,
+const WEAVE_IMAGE_DEFAULT_CONFIG: WeaveImageProperties = {
+  performance: {
+    caching: false,
+  },
+  crossOrigin: "anonymous",
 };
 ```
 

@@ -2,6 +2,8 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
+import type { WeaveImageProperties } from './types';
+
 export const WEAVE_IMAGE_NODE_TYPE = 'image';
 
 export const WEAVE_IMAGE_CROP_END_TYPE = {
@@ -9,6 +11,9 @@ export const WEAVE_IMAGE_CROP_END_TYPE = {
   ['CANCEL']: 'cancel',
 };
 
-export const WEAVE_IMAGE_DEFAULT_CONFIG = {
+export const WEAVE_IMAGE_DEFAULT_CONFIG: WeaveImageProperties = {
+  performance: {
+    caching: false,
+  },
   crossOrigin: 'anonymous',
 };
