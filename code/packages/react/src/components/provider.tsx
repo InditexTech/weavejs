@@ -58,6 +58,10 @@ export const WeaveProvider = ({
   const setCanRedo = useWeave((state) => state.setCanRedo);
   const setActualAction = useWeave((state) => state.setActualAction);
   const setConnectionStatus = useWeave((state) => state.setConnectionStatus);
+  const setAsyncElements = useWeave((state) => state.setAsyncElements);
+  const setAsyncElementsAllLoaded = useWeave(
+    (state) => state.setAsyncElementsAllLoaded
+  );
 
   const onInstanceStatusHandler = React.useCallback(
     (status: WeaveStatus) => {
@@ -104,6 +108,22 @@ export const WeaveProvider = ({
   const onActiveActionChangeHandler = React.useCallback(
     (actionName: string | undefined) => {
       setActualAction(actionName);
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [selectedNodes]
+  );
+
+  const onAsyncElementsLoadingHandler = React.useCallback(
+    ({ loaded, total }: { loaded: number; total: number }) => {
+      setAsyncElements(loaded, total);
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [selectedNodes]
+  );
+
+  const onAsyncElementsLoadedHandler = React.useCallback(
+    () => {
+      setAsyncElementsAllLoaded(true);
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [selectedNodes]
@@ -170,6 +190,16 @@ export const WeaveProvider = ({
           onActiveActionChangeHandler
         );
 
+        weaveInstanceRef.current.addEventListener(
+          'onAsyncElementsLoading',
+          onAsyncElementsLoadingHandler
+        );
+
+        weaveInstanceRef.current.addEventListener(
+          'onAsyncElementsLoaded',
+          onAsyncElementsLoadedHandler
+        );
+
         setInstance(weaveInstanceRef.current);
         weaveInstanceRef.current.start();
       }
@@ -208,6 +238,16 @@ export const WeaveProvider = ({
       weaveInstanceRef.current?.removeEventListener(
         'onActiveActionChange',
         onActiveActionChangeHandler
+      );
+
+      weaveInstanceRef.current?.removeEventListener(
+        'onAsyncElementsLoading',
+        onAsyncElementsLoadingHandler
+      );
+
+      weaveInstanceRef.current?.removeEventListener(
+        'onAsyncElementsLoaded',
+        onAsyncElementsLoadedHandler
       );
 
       setStatus(WEAVE_INSTANCE_STATUS.IDLE);

@@ -67,6 +67,8 @@ export class WeaveImageCrop {
       nodesSelectionPlugin.disable();
     }
 
+    this.node.clearCache(this.image as WeaveElementInstance);
+
     this.image.setAttrs({ cropping: true });
 
     const imageAttrs = this.image.getAttrs();
@@ -325,6 +327,8 @@ export class WeaveImageCrop {
 
     this.instance.releaseMutexLock();
 
+    this.node.cacheNode(this.image as WeaveElementInstance);
+
     this.instance.emitEvent<WeaveImageOnCropEndEvent>('onImageCropEnd', {
       instance: this.image,
     });
@@ -394,6 +398,8 @@ export class WeaveImageCrop {
     this.instance.updateNode(
       this.node.serialize(this.image as WeaveElementInstance)
     );
+
+    this.node.cacheNode(this.image as WeaveElementInstance);
   }
 
   handleClipEnd() {

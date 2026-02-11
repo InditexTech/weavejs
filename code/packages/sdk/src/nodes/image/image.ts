@@ -28,6 +28,7 @@ import { mergeExceptArrays } from '@/utils';
 
 export class WeaveImageNode extends WeaveNode {
   private config: WeaveImageProperties;
+  protected imageBitmapCache: Record<string, ImageBitmap> = {};
   protected imageSource: Record<string, HTMLImageElement> = {};
   protected imageState: Record<string, WeaveImageState> = {};
   protected tapStart: { x: number; y: number; time: number } | null;
@@ -44,6 +45,12 @@ export class WeaveImageNode extends WeaveNode {
     this.lastTapTime = 0;
     this.config = mergeExceptArrays(WEAVE_IMAGE_DEFAULT_CONFIG, config);
     this.imageCrop = null;
+  }
+
+  onRegister(): void {
+    this.logger.info(
+      `image caching enabled: ${this.config.performance.caching}`
+    );
   }
 
   triggerCrop(imageNode: Konva.Group): void {
@@ -299,8 +306,11 @@ export class WeaveImageNode extends WeaveNode {
 
     if (this.imageSource[id]) {
       imagePlaceholder.destroy();
+
+      const imageSource: HTMLImageElement | ImageBitmap = this.imageSource[id];
+
       internalImage.setAttrs({
-        image: this.imageSource[id],
+        image: imageSource,
         visible: true,
       });
       image.setAttr('imageInfo', {
@@ -327,6 +337,12 @@ export class WeaveImageNode extends WeaveNode {
       this.loadImage(imageProps, image);
     }
 
+    if (this.config.performance.caching) {
+      image.on('transformend', () => {
+        this.cacheNode(image);
+      });
+    }
+
     image.setAttr('imageURL', imageProps.imageURL);
 
     this.instance.addEventListener(
@@ -343,7 +359,22 @@ export class WeaveImageNode extends WeaveNode {
       }
     );
 
+    this.cacheNode(image);
+
     return image;
+  }
+
+  clearCache(nodeInstance: WeaveElementInstance): void {
+    if (this.config.performance.caching) {
+      nodeInstance.clearCache();
+    }
+  }
+
+  cacheNode(nodeInstance: WeaveElementInstance): void {
+    if (this.config.performance.caching) {
+      nodeInstance.clearCache();
+      nodeInstance.cache();
+    }
   }
 
   onUpdate(
@@ -467,6 +498,8 @@ export class WeaveImageNode extends WeaveNode {
       });
       this.updateImageCrop(nodeInstance as Konva.Group);
     }
+
+    this.cacheNode(nodeInstance);
   }
 
   preloadImage(
@@ -494,7 +527,7 @@ export class WeaveImageNode extends WeaveNode {
       onError(error);
     };
 
-    this.imageSource[imageId].onload = () => {
+    this.imageSource[imageId].onload = async () => {
       this.imageState[imageId] = {
         loaded: true,
         error: false,
@@ -546,6 +579,10 @@ export class WeaveImageNode extends WeaveNode {
               : this.imageSource[id].height,
           });
           imagePlaceholder.destroy();
+
+          const imageSource: HTMLImageElement | ImageBitmap =
+            this.imageSource[id];
+
           internalImage.setAttrs({
             width: imageProps.width
               ? imageProps.width
@@ -553,7 +590,7 @@ export class WeaveImageNode extends WeaveNode {
             height: imageProps.height
               ? imageProps.height
               : this.imageSource[id].height,
-            image: this.imageSource[id],
+            image: imageSource,
             visible: true,
           });
           internalImage.setAttr('imageInfo', {
@@ -587,6 +624,8 @@ export class WeaveImageNode extends WeaveNode {
           this.updateImageCrop(image);
 
           this.resolveAsyncElement(id);
+
+          this.cacheNode(image);
         }
       },
       onError: (error) => {
@@ -619,6 +658,8 @@ export class WeaveImageNode extends WeaveNode {
         internalImage?.setAttrs({
           visible: false,
         });
+
+        this.cacheNode(image);
       },
     });
   }

@@ -1302,7 +1302,6 @@ export class Weave {
   }
 
   // ASYNC ELEMENTS METHODS
-
   public asyncElementsLoaded(): boolean {
     return this.asyncManager.asyncElementsLoaded();
   }

@@ -9,11 +9,13 @@ import {
 import { Weave } from '@/weave';
 import { type Logger } from 'pino';
 import { watchMap } from '@/utils/watch-map';
+import type { WeaveAsyncElementsLoadingEvent } from './types';
 
 export class WeaveAsyncManager {
   private readonly instance: Weave;
   private readonly logger: Logger;
   private readonly asyncElements: Map<string, WeaveAsyncElement>;
+  private asyncElementsLoadedEventEmitted = false;
 
   constructor(instance: Weave) {
     this.instance = instance;
@@ -31,6 +33,16 @@ export class WeaveAsyncManager {
     );
   }
 
+  public getAmountAsyncElements(): number {
+    return [...this.asyncElements.values()].length;
+  }
+
+  public getAmountAsyncElementsLoaded(): number {
+    return [...this.asyncElements.values()].filter(
+      (el) => el.status === WEAVE_ASYNC_STATUS.LOADED
+    ).length;
+  }
+
   public loadAsyncElement(nodeId: string, type: string): void {
     let element = this.asyncElements.get(nodeId);
     if (element) {
@@ -40,6 +52,14 @@ export class WeaveAsyncManager {
     }
 
     this.asyncElements.set(nodeId, element);
+
+    this.instance.emitEvent<WeaveAsyncElementsLoadingEvent>(
+      'onAsyncElementsLoading',
+      {
+        loaded: this.getAmountAsyncElementsLoaded(),
+        total: this.getAmountAsyncElements(),
+      }
+    );
   }
 
   public resolveAsyncElement(nodeId: string, type: string): void {
@@ -51,5 +71,21 @@ export class WeaveAsyncManager {
     }
 
     this.asyncElements.set(nodeId, element);
+
+    this.instance.emitEvent<WeaveAsyncElementsLoadingEvent>(
+      'onAsyncElementsLoading',
+      {
+        loaded: this.getAmountAsyncElementsLoaded(),
+        total: this.getAmountAsyncElements(),
+      }
+    );
+
+    if (!this.asyncElementsLoadedEventEmitted) {
+      const allLoaded = this.asyncElementsLoaded();
+      if (allLoaded) {
+        this.instance.emitEvent('onAsyncElementsLoaded');
+        this.asyncElementsLoadedEventEmitted = true;
+      }
+    }
   }
 }

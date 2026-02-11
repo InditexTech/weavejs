@@ -232,6 +232,11 @@ export class WeaveTextNode extends WeaveNode {
       }
     );
 
+    if (!this.instance.isServerSide() && !this.keyPressHandler) {
+      this.keyPressHandler = this.handleKeyPress.bind(this);
+      window.addEventListener('keypress', this.keyPressHandler);
+    }
+
     return text;
   }
 

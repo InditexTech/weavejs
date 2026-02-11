@@ -13,6 +13,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- [#903](https://github.com/InditexTech/weavejs/issues/903) Improve Image node by enabling caching
+
 ## [2.18.1] - 2026-02-10
 
 ### Fixed
