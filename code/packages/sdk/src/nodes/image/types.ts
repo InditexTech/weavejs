@@ -29,10 +29,14 @@ export type WeaveImageState = {
   error: boolean;
 };
 
-export type WeaveImageCache = {
-  enabled: boolean;
-  pixelRatio?: number;
-};
+export type WeaveImageCache =
+  | {
+      enabled: false;
+    }
+  | {
+      enabled: true;
+      pixelRatio: number;
+    };
 
 export type WeaveImageProperties = {
   performance: {
