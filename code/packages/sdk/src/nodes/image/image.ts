@@ -49,7 +49,7 @@ export class WeaveImageNode extends WeaveNode {
 
   onRegister(): void {
     this.logger.info(
-      `image caching enabled: ${this.config.performance.caching}`
+      `image caching enabled: ${this.config.performance.cache.enabled}`
     );
   }
 
@@ -337,7 +337,7 @@ export class WeaveImageNode extends WeaveNode {
       this.loadImage(imageProps, image);
     }
 
-    if (this.config.performance.caching) {
+    if (this.config.performance.cache.enabled) {
       image.on('transformend', () => {
         this.cacheNode(image);
       });
@@ -365,15 +365,17 @@ export class WeaveImageNode extends WeaveNode {
   }
 
   clearCache(nodeInstance: WeaveElementInstance): void {
-    if (this.config.performance.caching) {
+    if (this.config.performance.cache.enabled) {
       nodeInstance.clearCache();
     }
   }
 
   cacheNode(nodeInstance: WeaveElementInstance): void {
-    if (this.config.performance.caching) {
+    if (this.config.performance.cache.enabled) {
       nodeInstance.clearCache();
-      nodeInstance.cache();
+      nodeInstance.cache({
+        pixelRatio: this.config.performance.cache.pixelRatio,
+      });
     }
   }
 

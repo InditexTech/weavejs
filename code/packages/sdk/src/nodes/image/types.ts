@@ -29,9 +29,14 @@ export type WeaveImageState = {
   error: boolean;
 };
 
+export type WeaveImageCache = {
+  enabled: boolean;
+  pixelRatio?: number;
+};
+
 export type WeaveImageProperties = {
   performance: {
-    caching: boolean;
+    cache: WeaveImageCache;
   };
   crossOrigin: ImageCrossOrigin;
   transform?: WeaveNodeTransformerProperties;
