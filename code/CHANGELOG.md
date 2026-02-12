@@ -17,6 +17,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - [#906](https://github.com/InditexTech/weavejs/issues/906) When using image cache, allow a config to set cached images pixel-ratio
 
+### Fixed
+
+- [#907](https://github.com/InditexTech/weavejs/issues/907) When using brush tool and cancel tool via escape the brush is still active drawing strokes
+
 ## [2.19.0] - 2026-02-11
 
 ### Added
