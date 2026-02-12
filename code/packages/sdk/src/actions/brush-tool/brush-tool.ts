@@ -101,17 +101,19 @@ export class WeaveBrushToolAction extends WeaveAction {
         this.instance.getActiveAction() === BRUSH_TOOL_ACTION_NAME
       ) {
         this.isSpacePressed = true;
+        return;
       }
       if (
         e.code === 'Escape' &&
         this.instance.getActiveAction() === BRUSH_TOOL_ACTION_NAME
       ) {
         this.cancelAction();
-        return;
       }
     });
 
     const handlePointerDown = (e: Konva.KonvaEventObject<PointerEvent>) => {
+      if (this.state === BRUSH_TOOL_STATE.INACTIVE) return;
+
       if (this.state !== BRUSH_TOOL_STATE.IDLE) {
         return;
       }

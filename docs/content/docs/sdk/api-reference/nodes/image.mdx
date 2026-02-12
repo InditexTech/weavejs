@@ -47,9 +47,18 @@ type WeaveNodeTransformerProperties = Konva.TransformerConfig;
 
 type ImageCrossOrigin = "anonymous" | "use-credentials";
 
+type WeaveImageCache =
+  | {
+      enabled: false;
+    }
+  | {
+      enabled: true;
+      pixelRatio: number;
+    };
+
 type WeaveImageProperties = {
   performance: {
-    caching: boolean;
+    cache: WeaveImageCache;
   };
   crossOrigin: ImageCrossOrigin;
   transform?: WeaveNodeTransformerProperties;
@@ -92,11 +101,16 @@ For `WeaveImageProperties`:
 
 <TypeTable
   type={{
-    ["performance.caching"]: {
+    ["performance.cache.enabled"]: {
       description:
         "Boolean that enables image nodes caching, increasing the performance of the canvas.",
       type: "boolean",
       default: "false",
+    },
+    ["performance.cache.pixelRatio"]: {
+      description:
+        "Pixel ratio of the generated cache image, recommended value is 4",
+      type: "number",
     },
     ["crossOrigin"]: {
       description:
