@@ -13,7 +13,9 @@ export const WEAVE_IMAGE_CROP_END_TYPE = {
 
 export const WEAVE_IMAGE_DEFAULT_CONFIG: WeaveImageProperties = {
   performance: {
-    caching: false,
+    cache: {
+      enabled: false,
+    },
   },
   crossOrigin: 'anonymous',
 };
