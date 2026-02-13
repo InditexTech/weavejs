@@ -1159,4 +1159,6 @@ export abstract class WeaveNode implements WeaveNodeBase {
       );
     return usersPresencePlugin;
   }
+
+  abstract getIsAsync(): boolean;
 }
