@@ -875,4 +875,8 @@ export class WeaveVideoNode extends WeaveNode {
     // reset scale to 1
     node.scale({ x: 1, y: 1 });
   }
+
+  getIsAsync(): boolean {
+    return true;
+  }
 }

@@ -194,6 +194,10 @@ export class WeaveImageNode extends WeaveNode {
       name: 'node',
       loadedImage: false,
       loadedImageError: false,
+      // ...(internalImageProps.dragStartOpacity && {
+      //   dragStartOpacity: undefined,
+      //   opacity: internalImageProps.dragStartOpacity,
+      // }),
     });
 
     this.setupDefaultNodeAugmentation(image);
@@ -814,5 +818,9 @@ export class WeaveImageNode extends WeaveNode {
 
     // reset scale to 1
     node.scale({ x: 1, y: 1 });
+  }
+
+  getIsAsync(): boolean {
+    return true;
   }
 }
