@@ -46,7 +46,7 @@ export class WeaveAsyncManager {
 
     const traverse = (element: WeaveStateElement) => {
       const nodeHandler = this.instance.getNodeHandler<WeaveNode>(element.type);
-      if (nodeHandler && nodeHandler.getIsAsync()) {
+      if (nodeHandler?.getIsAsync()) {
         asyncElements.push(element);
       }
 
