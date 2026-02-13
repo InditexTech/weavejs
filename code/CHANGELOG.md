@@ -16,6 +16,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 - [#911](https://github.com/InditexTech/weavejs/issues/911) Trigger onAsyncElementsLoaded event when the room has no async elements to load, like a new room
+- [#913](https://github.com/InditexTech/weavejs/issues/913) Node keeps drag opacity when cloned via pressing alt key
 
 ## [2.20.0] - 2026-02-12
 
