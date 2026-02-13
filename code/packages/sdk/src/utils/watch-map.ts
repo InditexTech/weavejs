@@ -3,6 +3,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 export function watchMap<K, V>(
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   onChange: (event: any) => void,
   map = new Map<K, V>()
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
