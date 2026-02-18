@@ -13,6 +13,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.20.1] - 2026-02-13
+
+### Fixed
+
+- [#911](https://github.com/InditexTech/weavejs/issues/911) Trigger onAsyncElementsLoaded event when the room has no async elements to load, like a new room
+- [#913](https://github.com/InditexTech/weavejs/issues/913) Node keeps drag opacity when cloned via pressing alt key
+
 ## [2.20.0] - 2026-02-12
 
 ### Added
@@ -1576,7 +1583,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - [#24](https://github.com/InditexTech/weavejs/issues/24) Bug when loading rooms with text or images
 - [#18](https://github.com/InditexTech/weavejs/issues/18) Fix awareness not working on store-azure-web-pubsub
 
-[Unreleased]: https://github.com/InditexTech/weavejs/compare/2.20.0...HEAD
+[Unreleased]: https://github.com/InditexTech/weavejs/compare/2.20.1...HEAD
+
+[2.20.1]: https://github.com/InditexTech/weavejs/compare/2.20.0...2.20.1
 
 [2.20.0]: https://github.com/InditexTech/weavejs/compare/2.19.0...2.20.0
 

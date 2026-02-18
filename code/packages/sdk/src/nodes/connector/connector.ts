@@ -1344,4 +1344,8 @@ export class WeaveConnectorNode extends WeaveNode {
 
     return result;
   };
+
+  getIsAsync(): boolean {
+    return true;
+  }
 }

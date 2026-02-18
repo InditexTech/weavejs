@@ -508,14 +508,6 @@ export abstract class WeaveNode implements WeaveNodeBase {
           return;
         }
 
-        originalNode = realNodeTarget.clone();
-        originalContainer = realNodeTarget.getParent();
-        if (originalContainer?.getAttrs().nodeId) {
-          originalContainer = stage.findOne(
-            `#${originalContainer.getAttrs().nodeId}`
-          );
-        }
-
         if (
           this.getNodesSelectionPlugin()?.getSelectedNodes().length === 1 &&
           realNodeTarget.getAttr('dragStartOpacity') === undefined
@@ -523,6 +515,14 @@ export abstract class WeaveNode implements WeaveNodeBase {
           realNodeTarget.setAttr('dragStartOpacity', realNodeTarget.opacity());
           realNodeTarget.opacity(
             this.getNodesSelectionPlugin()?.getDragOpacity()
+          );
+        }
+
+        originalNode = realNodeTarget.clone();
+        originalContainer = realNodeTarget.getParent();
+        if (originalContainer?.getAttrs().nodeId) {
+          originalContainer = stage.findOne(
+            `#${originalContainer.getAttrs().nodeId}`
           );
         }
 
@@ -537,9 +537,16 @@ export abstract class WeaveNode implements WeaveNodeBase {
             .getCloningManager()
             .cloneNode(realNodeTarget);
 
+          const originalNodeOpacity =
+            realNodeTarget.getAttr('dragStartOpacity') ?? 1;
+          realNodeTarget.setAttrs({ opacity: originalNodeOpacity });
+          realNodeTarget.setAttr('dragStartOpacity', undefined);
+
           if (clone && !this.instance.getCloningManager().isClone(clone)) {
-            clone.setAttrs({ isCloneOrigin: false });
-            clone.setAttrs({ isCloned: true });
+            clone.setAttrs({
+              isCloneOrigin: false,
+              isCloned: true,
+            });
             this.instance.getCloningManager().addClone(clone);
           }
 
@@ -1158,5 +1165,9 @@ export abstract class WeaveNode implements WeaveNodeBase {
         WEAVE_USERS_PRESENCE_PLUGIN_KEY
       );
     return usersPresencePlugin;
+  }
+
+  getIsAsync(): boolean {
+    return false;
   }
 }
