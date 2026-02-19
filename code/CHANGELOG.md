@@ -15,6 +15,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- [#917](https://github.com/InditexTech/weavejs/issues/917) Avoid cache image onRender method
 - [#918](https://github.com/InditexTech/weavejs/issues/918) Clamp fitToScreen and fitToSelection to steps limits
 
 ## [2.20.1] - 2026-02-13
