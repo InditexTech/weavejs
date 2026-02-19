@@ -111,6 +111,11 @@ export class WeaveStageZoomPlugin extends WeavePlugin {
       stage.scale(actScale);
 
       this.actualScale = scale;
+      this.actualStep = this.findClosestStepIndex(
+        oldScale < scale ? 'zoomOut' : 'zoomIn'
+      );
+
+      this.actualScale = scale;
 
       if (centered) {
         const stageCenter = {
@@ -177,7 +182,7 @@ export class WeaveStageZoomPlugin extends WeavePlugin {
     );
 
     if (actualZoomIsStep === -1) {
-      this.actualStep = this.findClosestStepIndex('zoomOut');
+      this.actualStep = this.findClosestStepIndex('zoomIn');
     }
 
     return this.actualStep - 1 >= 0;
@@ -192,7 +197,7 @@ export class WeaveStageZoomPlugin extends WeavePlugin {
       (scale) => scale === this.actualScale
     );
     if (actualZoomIsStep === -1) {
-      this.actualStep = this.findClosestStepIndex('zoomIn');
+      this.actualStep = this.findClosestStepIndex('zoomOut');
     }
 
     return this.actualStep + 1 < this.config.zoomSteps.length;
@@ -312,7 +317,14 @@ export class WeaveStageZoomPlugin extends WeavePlugin {
     return scale;
   }
 
-  fitToScreen(): void {
+  fitToScreen(options?: { overrideZoom: boolean }): void {
+    const finalOptions = mergeExceptArrays(
+      {
+        overrideZoom: true,
+      },
+      options
+    );
+
     if (!this.enabled) {
       return;
     }
@@ -365,16 +377,30 @@ export class WeaveStageZoomPlugin extends WeavePlugin {
     const stageHeight = stage.height();
 
     // Calculate scale needed to fit content + padding
-    const scaleX =
+    let scaleX =
       (stageWidth -
         // diffX -
         (this.config.fitToScreen.padding * 2) / upscaleScale) /
       bounds.width;
-    const scaleY =
+    let scaleY =
       (stageHeight -
         // diffY -
         (this.config.fitToScreen.padding * 2) / upscaleScale) /
       bounds.height;
+
+    if (!finalOptions.overrideZoom) {
+      scaleX = this.clamp(
+        scaleX,
+        this.config.zoomSteps[0],
+        this.config.zoomSteps[this.config.zoomSteps.length - 1]
+      );
+      scaleY = this.clamp(
+        scaleY,
+        this.config.zoomSteps[0],
+        this.config.zoomSteps[this.config.zoomSteps.length - 1]
+      );
+    }
+
     const scale = Math.min(scaleX, scaleY);
 
     // Center content in the stage
@@ -393,8 +419,16 @@ export class WeaveStageZoomPlugin extends WeavePlugin {
 
   private fitToElements(
     box: { x: number; y: number; width: number; height: number },
-    smartZoom: boolean = false
+    options?: { smartZoom?: boolean; overrideZoom?: boolean }
   ): void {
+    const finalOptions = mergeExceptArrays(
+      {
+        smartZoom: false,
+        overrideZoom: true,
+      },
+      options
+    );
+
     const stage = this.instance.getStage();
 
     const container = stage.container();
@@ -414,7 +448,7 @@ export class WeaveStageZoomPlugin extends WeavePlugin {
       y: box.y + box.height / 2,
     };
 
-    if (smartZoom && fitsInView) {
+    if (finalOptions.smartZoom && fitsInView) {
       // ✅ Only pan to center selection, keeping current scale
       const newPosition = {
         x: containerWidth / 2 - selectionCenter.x * scale.x,
@@ -439,8 +473,22 @@ export class WeaveStageZoomPlugin extends WeavePlugin {
     const availableScreenHeight =
       stageBox.height - (2 * this.config.fitToSelection.padding) / upscaleScale;
 
-    const scaleX = availableScreenWidth / box.width;
-    const scaleY = availableScreenHeight / box.height;
+    let scaleX = availableScreenWidth / box.width;
+    let scaleY = availableScreenHeight / box.height;
+
+    if (!finalOptions.overrideZoom) {
+      scaleX = this.clamp(
+        scaleX,
+        this.config.zoomSteps[0],
+        this.config.zoomSteps[this.config.zoomSteps.length - 1]
+      );
+      scaleY = this.clamp(
+        scaleY,
+        this.config.zoomSteps[0],
+        this.config.zoomSteps[this.config.zoomSteps.length - 1]
+      );
+    }
+
     const finalScale = Math.min(scaleX, scaleY);
 
     stage.scale({ x: finalScale, y: finalScale });
@@ -459,7 +507,18 @@ export class WeaveStageZoomPlugin extends WeavePlugin {
     this.setZoom(finalScale, false);
   }
 
-  fitToNodes(nodes: string[], smartZoom: boolean = false): void {
+  fitToNodes(
+    nodes: string[],
+    options?: { smartZoom?: boolean; overrideZoom?: boolean }
+  ): void {
+    const finalOptions = mergeExceptArrays(
+      {
+        smartZoom: false,
+        overrideZoom: true,
+      },
+      options
+    );
+
     if (!this.enabled) {
       return;
     }
@@ -482,10 +541,21 @@ export class WeaveStageZoomPlugin extends WeavePlugin {
       return;
     }
 
-    this.fitToElements(box, smartZoom);
+    this.fitToElements(box, finalOptions);
   }
 
-  fitToSelection(smartZoom: boolean = false): void {
+  fitToSelection(options?: {
+    smartZoom?: boolean;
+    overrideZoom?: boolean;
+  }): void {
+    const finalOptions = mergeExceptArrays(
+      {
+        smartZoom: false,
+        overrideZoom: true,
+      },
+      options
+    );
+
     if (!this.enabled) {
       return;
     }
@@ -512,7 +582,7 @@ export class WeaveStageZoomPlugin extends WeavePlugin {
       return;
     }
 
-    this.fitToElements(box, smartZoom);
+    this.fitToElements(box, finalOptions);
   }
 
   enable(): void {
@@ -793,5 +863,13 @@ export class WeaveStageZoomPlugin extends WeavePlugin {
     const contextMenuPlugin =
       this.instance.getPlugin<WeaveContextMenuPlugin>('contextMenu');
     return contextMenuPlugin;
+  }
+
+  getZoomSteps() {
+    return this.config.zoomSteps;
+  }
+
+  private clamp(value: number, min: number, max: number): number {
+    return Math.min(Math.max(value, min), max);
   }
 }
