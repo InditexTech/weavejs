@@ -194,6 +194,7 @@ export class WeaveImageNode extends WeaveNode {
       name: 'node',
       loadedImage: false,
       loadedImageError: false,
+      perfectDrawEnabled: false,
       // ...(internalImageProps.dragStartOpacity && {
       //   dragStartOpacity: undefined,
       //   opacity: internalImageProps.dragStartOpacity,
@@ -285,6 +286,7 @@ export class WeaveImageNode extends WeaveNode {
       draggable: false,
       visible: false,
       name: undefined,
+      perfectDrawEnabled: false,
     });
 
     image.add(internalImage);
@@ -362,8 +364,6 @@ export class WeaveImageNode extends WeaveNode {
         }
       }
     );
-
-    this.cacheNode(image);
 
     return image;
   }
