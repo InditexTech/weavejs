@@ -363,8 +363,6 @@ export class WeaveImageNode extends WeaveNode {
       }
     );
 
-    this.cacheNode(image);
-
     return image;
   }
 
