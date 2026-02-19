@@ -174,28 +174,31 @@ will use that pointer as zoom center.
 ### fitToScreen
 
 ```ts
-fitToScreen(): void
+fitToScreen(options?: { overrideZoom: boolean }): void
 ```
 
-This method fits the zoom so all elements on the canvas are visible on the user screen or viewport.
+This method fits the zoom so all elements on the canvas are visible on the user screen or viewport. By default it
+overrides zoom steps, pass `overrideZoom` to `false` to clamp to zoom steps minimum and maximum values.
 
 ### fitToNodes
 
 ```ts
-fitToNodes(nodes: string[], smartZoom: boolean = false): void
+fitToNodes(nodes: string[], options?: { smartZoom?: boolean; overrideZoom?: boolean }): void
 ```
 
 This method fits the zoom so all elements Id defined on the `nodes` parameter are visible on the user screen or
-viewport. If `smartZoom` is true, no scaling is done, only panning to the center of the defined elements.
+viewport. If `smartZoom` is true, no scaling is done, only panning to the center of the defined elements. By default
+it overrides zoom steps, pass `overrideZoom` to `false` to clamp to zoom steps minimum and maximum values.
 
 ### fitToSelection
 
 ```ts
-fitToSelection(smartZoom: boolean = false): void
+fitToSelection(smartZoom?: boolean, overrideZoom?: boolean;): void
 ```
 
 This method fits the zoom so all selected elements (uses the WeaveNodesSelectionPlugin) are visible on the user
 screen or viewport. If `smartZoom` is true, no scaling is done, only panning to the center of the defined elements.
+By default it overrides zoom steps, pass `overrideZoom` to `false` to clamp to zoom steps minimum and maximum values.
 
 ## Events
 
