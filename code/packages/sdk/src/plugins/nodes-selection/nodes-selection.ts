@@ -1409,7 +1409,6 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
       const selectionBehavior = this.config.behaviors?.onMultipleSelection?.(
         this.tr.nodes()
       );
-      console.log('selectionBehavior', selectionBehavior);
       this.tr.setAttrs(selectionBehavior);
       this.tr.forceUpdate();
     }

@@ -294,6 +294,7 @@ export class WeaveStrokeNode extends WeaveNode {
     delete cleanedAttrs.sceneFunc;
     delete cleanedAttrs.hitFunc;
     delete cleanedAttrs.overridesMouseControl;
+    delete cleanedAttrs.dragBoundFunc;
 
     return {
       key: attrs.id ?? '',

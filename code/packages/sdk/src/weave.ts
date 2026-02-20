@@ -30,6 +30,7 @@ import {
   type WeaveNodeChangeType,
   WEAVE_NODE_CHANGE_TYPE,
   type WeaveUserChangeEvent,
+  type DeepPartial,
 } from '@inditextech/weave-types';
 import { WeaveStore } from './stores/store';
 import {
@@ -77,6 +78,7 @@ import {
   DEFAULT_MOVE_NODE_OPTIONS,
   DEFAULT_REMOVE_NODE_OPTIONS,
   DEFAULT_UPDATE_NODE_OPTIONS,
+  WEAVE_DEFAULT_CONFIG,
 } from './constants';
 
 export class Weave {
@@ -109,7 +111,11 @@ export class Weave {
   private readonly asyncManager: WeaveAsyncManager;
   private readonly hooksManager: WeaveHooksManager;
 
-  constructor(weaveConfig: WeaveConfig, stageConfig: Konva.StageConfig) {
+  constructor(
+    weaveConfig: Pick<WeaveConfig, 'store'> &
+      DeepPartial<Omit<WeaveConfig, 'store'>>,
+    stageConfig: Konva.StageConfig
+  ) {
     globalThis._weave_isServerSide = false;
     if (typeof window === 'undefined') {
       globalThis._weave_isServerSide = true;
@@ -124,7 +130,7 @@ export class Weave {
     this.initialized = false;
 
     // Save in memory the configuration provided
-    this.config = mergeExceptArrays({}, weaveConfig);
+    this.config = mergeExceptArrays(WEAVE_DEFAULT_CONFIG, weaveConfig);
     // Setup the logger
     this.logger = new WeaveLogger(
       this,

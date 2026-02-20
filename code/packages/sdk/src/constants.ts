@@ -19,3 +19,9 @@ export const DEFAULT_REMOVE_NODE_OPTIONS = {
 export const DEFAULT_MOVE_NODE_OPTIONS = {
   emitUserChangeEvent: true,
 };
+
+export const WEAVE_DEFAULT_CONFIG = {
+  behaviors: {
+    axisLockThreshold: 5,
+  },
+};
