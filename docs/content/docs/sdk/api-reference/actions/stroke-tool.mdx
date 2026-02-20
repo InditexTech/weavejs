@@ -1,40 +1,48 @@
 ---
-title: WeaveLineToolAction (deprecated)
-description: Add a simple line to the canvas
+title: WeaveStrokeToolAction
+description: Add a single segment stroke to the canvas
 ---
 
 import { TypeTable } from "fumadocs-ui/components/type-table";
 
 ## Overview
 
-The [WeaveLineToolAction](https://github.com/InditexTech/weavejs/blob/main/code/packages/sdk/src/actions/line-tool/line-tool.ts)
+The [WeaveStrokeToolAction](https://github.com/InditexTech/weavejs/blob/main/code/packages/sdk/src/actions/stroke-tool/stroke-tool.ts)
 class that allows users to draw a precise, vector-based line by click-and-drag to define the line.
 
-The line becomes a [WeaveLineNode](/docs/sdk/api-reference/nodes/line),
+The line becomes a [WeaveStrokeSingleNode](/docs/sdk/api-reference/nodes/stroke-single),
 synced in real time across all collaborators.
 
 The class extends the [WeaveAction](/docs/sdk/api-reference/actions/action) class.
 
 ## Name
 
-This action `name` property value is `lineTool`.
+This action `name` property value is `strokeTool`.
+
+## Aliases
+
+This action `name` property value is `arrowTool`.
 
 ## Import
 
 ```shell
-import { WeaveLineToolAction } from "@inditextech/weave-sdk";
+import { WeaveStrokeToolAction } from "@inditextech/weave-sdk";
 ```
 
 ## Instantiation
 
 ```ts
-new WeaveLineToolAction(params?: WeaveLineToolActionParams);
+new WeaveStrokeToolAction(params?: WeaveStrokeToolActionParams);
 ```
 
 ## TypeScript types
 
 ```ts
-type WeaveLineToolActionProperties = {
+type WeaveStrokeToolActionStateKeys = keyof typeof WEAVE_STROKE_TOOL_STATE;
+type WeaveStrokeToolActionState =
+  (typeof WEAVE_STROKE_TOOL_STATE)[WeaveStrokeToolActionStateKeys];
+
+type WeaveStrokeToolActionProperties = {
   snapAngles: {
     angles: number[]; // Angles for snapping in degrees
     activateThreshold: number;
@@ -42,26 +50,29 @@ type WeaveLineToolActionProperties = {
   };
 };
 
-type WeaveLineToolActionParams = {
-  config: Partial<WeaveLineToolActionProperties>;
+type WeaveStrokeToolActionParams = {
+  config: Partial<WeaveStrokeToolActionProperties>;
 };
+
+type WeaveStrokeToolActionOnAddingEvent = { actionName: string };
+type WeaveStrokeToolActionOnAddedEvent = { actionName: string };
 ```
 
 ## Parameters
 
-For `WeaveLineToolActionParams`:
+For `WeaveStrokeToolActionParams`:
 
 <TypeTable
   type={{
     ["config"]: {
       required: true,
       description: "Config parameters for the tool.",
-      type: "Partial<WeaveLineToolActionProperties>",
+      type: "Partial<WeaveStrokeToolActionProperties>",
     },
   }}
 />
 
-For `WeaveLineToolActionProperties`:
+For `WeaveStrokeToolActionProperties`:
 
 <TypeTable
   type={{
@@ -87,7 +98,7 @@ For `WeaveLineToolActionProperties`:
 ## Default values
 
 ```ts
-const LINE_TOOL_DEFAULT_CONFIG = {
+const WEAVE_STROKE_TOOL_DEFAULT_CONFIG = {
   snapAngles: {
     angles: [0, 45, 90, 135, 180, 225, 270, 315],
     activateThreshold: 5,

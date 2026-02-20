@@ -254,6 +254,7 @@ export class WeaveConnectorNode extends WeaveNode {
       startInfoLoaded: false,
       endInfoLoaded: false,
       draggable: false,
+      overridesMouseControl: true,
     });
 
     if (!connector.getAttrs().lineType) {
@@ -1219,6 +1220,7 @@ export class WeaveConnectorNode extends WeaveNode {
     delete cleanedAttrs.initialized;
     delete cleanedAttrs.startInfoLoaded;
     delete cleanedAttrs.endInfoLoaded;
+    delete cleanedAttrs.overridesMouseControl;
 
     return {
       key: attrs.id ?? '',

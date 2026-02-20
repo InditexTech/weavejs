@@ -28,18 +28,18 @@ build visual collaborative applications. This are the nodes:
 
 <Cards>
 
-<Card href="/docs/main/build/nodes/stage" title='Stage'>
-
-The Stage node is the root canvas container in Weave.js. It serves as the entry point
-for rendering all other visual or layout Nodes and manages the overall coordinate system.
-
-</Card>
-
 <Card href="/docs/main/build/nodes/layer" title='Layer'>
 
 The Layer node is a logical container within the Stage. It allows you to separate visual
 elements, for example: background grids, interactive elements, or UI overlays, into
 distinct rendering layers.
+
+</Card>
+
+<Card href="/docs/main/build/nodes/stage" title='Stage'>
+
+The Stage node is the root canvas container in Weave.js. It serves as the entry point
+for rendering all other visual or layout Nodes and manages the overall coordinate system.
 
 </Card>
 
@@ -63,6 +63,14 @@ comment replies or actions.
 
 <Cards>
 
+<Card href="/docs/main/build/nodes/frame" title='Frame'>
+
+The Frame node is a container-like visual element used to group and organize other
+nodes within a pre-defined boundary. It functions as a structured layout region, often
+used to represent panels, sections, or modular components on the canvas.
+
+</Card>
+
 <Card href="/docs/main/build/nodes/group" title='Group'>
 
 The Group node is a container for organizing multiple nodes into a single, movable
@@ -72,25 +80,17 @@ unified object.
 
 </Card>
 
-<Card href="/docs/main/build/nodes/frame" title='Frame'>
-
-The Frame node is a container-like visual element used to group and organize other
-nodes within a pre-defined boundary. It functions as a structured layout region, often
-used to represent panels, sections, or modular components on the canvas.
-
-</Card>
-
 </Cards>
 
 ### Drawing
 
 <Cards>
 
-<Card href="/docs/main/build/nodes/rectangle" title='Rectangle'>
+<Card href="/docs/main/build/nodes/connector" title='Connector'>
 
-The Rectangle node is a simple, versatile primitive shape used to render rectangular
-elements on the canvas. It supports customizable properties such as position, size, fill color,
-stroke, corner radius and more.
+The Connector node is complex node that draw a line between two nodes anchor points, when
+the any one of the nodes move, the line is updated, mainly being always sticked to the node
+anchor point.
 
 </Card>
 
@@ -102,6 +102,21 @@ fill color, stroke and more.
 
 </Card>
 
+<Card href="/docs/main/build/nodes/image" title='Image'>
+
+The Image Node allows you to render images directly onto the canvas. It supports
+properties like position, scale, opacity, and filters.
+
+</Card>
+
+<Card href="/docs/main/build/nodes/rectangle" title='Rectangle'>
+
+The Rectangle node is a simple, versatile primitive shape used to render rectangular
+elements on the canvas. It supports customizable properties such as position, size, fill color,
+stroke, corner radius and more.
+
+</Card>
+
 <Card href="/docs/main/build/nodes/regular-polygon" title='Regular Polygon'>
 
 The Regular Polygon node is a simple, versatile primitive shape used to render regular polygons
@@ -110,11 +125,18 @@ fill color, stroke and more.
 
 </Card>
 
-<Card href="/docs/main/build/nodes/line" title='Line'>
+<Card href="/docs/main/build/nodes/stroke" title='Stroke'>
 
-The Line node represents a customizable straight or curved line on the canvas.
-It supports features like multiple points, stroke color, width, dash patterns, and
-smoothing options.
+The Stroke node represents a customizable free line on the canvas.
+It supports features like stroke color, width and dash patterns.
+
+</Card>
+
+<Card href="/docs/main/build/nodes/stroke-single" title='Stroke Single'>
+
+The Stroke node represents a customizable single-segment line on the canvas.
+It supports features like stroke color, width, dash patterns, and
+the possibility to define the line tips format: arrow, circle and square.
 
 </Card>
 
@@ -122,19 +144,6 @@ smoothing options.
 
 The Text node is used to display editable or static text on the canvas. It supports
 rich styling options including font size, family, color, alignment, and line height.
-
-</Card>
-
-<Card href="/docs/main/build/nodes/image" title='Image'>
-
-The Image Node allows you to render images directly onto the canvas. It supports
-properties like position, scale, opacity, and filters.
-
-</Card>
-
-<Card href="/docs/main/build/nodes/video" title='Video'>
-
-The Video Node allows you to render and play videos directly onto the canvas.
 
 </Card>
 
@@ -146,7 +155,19 @@ fill color, stroke and more.
 
 </Card>
 
-<Card href="/docs/main/build/nodes/star" title='Arrow'>
+<Card href="/docs/main/build/nodes/video" title='Video'>
+
+The Video Node allows you to render and play videos directly onto the canvas.
+
+</Card>
+
+</Cards>
+
+#### Deprecated
+
+<Cards>
+
+<Card href="/docs/main/build/nodes/star" title='Arrow (deprecated)'>
 
 The Arrow node is a simple, versatile primitive shape used to render arrow elements on
 the canvas. It supports customizable properties such as position, several segments,
@@ -154,11 +175,11 @@ fill color, stroke and more.
 
 </Card>
 
-<Card href="/docs/main/build/nodes/connector" title='Connector'>
+<Card href="/docs/main/build/nodes/line" title='Line (deprecated)'>
 
-The Connector node is complex node that draw a line between two nodes anchor points, when
-the any one of the nodes move, the line is updated, mainly being always sticked to the node
-anchor point.
+The Line node represents a customizable straight or curved line on the canvas.
+It supports features like multiple points, stroke color, width, dash patterns, and
+smoothing options.
 
 </Card>
 

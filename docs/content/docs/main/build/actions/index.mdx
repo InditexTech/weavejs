@@ -84,6 +84,13 @@ the canvas to build visual collaborative applications. This are the actions:
 
 <Cards>
 
+<Card href="/docs/main/build/actions/eraser-tool" title='Eraser Tool'>
+
+Allows users to erase (delete) elements of the canvas. When enabled the user can click on an
+element and it will be erased.
+
+</Card>
+
 <Card href="/docs/main/build/actions/move-tool" title='Move Tool'>
 
 Allows users to enable/disable the panning of canvas. When enabled the user can pan the canvas
@@ -95,13 +102,6 @@ at its will.
 
 Allows users to enable/disable the selection mode of the canvas. When enabled the users can
 select nodes, move then, resize them, etc.
-
-</Card>
-
-<Card href="/docs/main/build/actions/eraser-tool" title='Eraser Tool'>
-
-Allows users to erase (delete) elements of the canvas. When enabled the user can click on an
-element and it will be erased.
 
 </Card>
 
@@ -123,69 +123,9 @@ Enables users to add comments on top of the stage, helpful to make collaborative
 
 <Cards>
 
-<Card href="/docs/main/build/actions/rectangle-tool" title='Rectangle Tool'>
-
-Enables users to create new rectangle nodes on the canvas.
-
-</Card>
-
-<Card href="/docs/main/build/actions/ellipse-tool" title='Ellipse Tool'>
-
-Enables users to create new ellipse nodes on the canvas.
-
-</Card>
-
-<Card href="/docs/main/build/actions/regular-polygon-tool" title='Regular Polygon Tool'>
-
-Enables users to create new regular polygons nodes on the canvas.
-
-</Card>
-
-<Card href="/docs/main/build/actions/line-tool" title='Line Tool'>
-
-Enables users to create a simple line on the canvas.
-
-</Card>
-
-<Card href="/docs/main/build/actions/pen-tool" title='Pen Tool'>
-
-Enables users to create continuos lines on the canvas with N segments on the canvas.
-
-</Card>
-
 <Card href="/docs/main/build/actions/brush-tool" title='Brush Tool'>
 
 Enables users to paint freeform strokes on the canvas, similar to a digital brush.
-
-</Card>
-
-<Card href="/docs/main/build/actions/image-tool" title='Image Tool'>
-
-Enables users to add images to the canvas by selecting a file.
-
-</Card>
-
-<Card href="/docs/main/build/actions/video-tool" title='Video Tool'>
-
-Enables users to add videos to the canvas by selecting a file.
-
-</Card>
-
-<Card href="/docs/main/build/actions/text-tool" title='Text Tool'>
-
-Enables users to add new text nodes to the canvas by clicking or touching on it.
-
-</Card>
-
-<Card href="/docs/main/build/actions/star-tool" title='Star Tool'>
-
-Enables users to add new star nodes to the canvas by clicking or touching on it.
-
-</Card>
-
-<Card href="/docs/main/build/actions/arrow-tool" title='Arrow Tool'>
-
-Enables users to add new arrow nodes to the canvas by clicking or touching on it.
 
 </Card>
 
@@ -196,9 +136,81 @@ anchor points.
 
 </Card>
 
+<Card href="/docs/main/build/actions/ellipse-tool" title='Ellipse Tool'>
+
+Enables users to create new ellipse nodes on the canvas.
+
+</Card>
+
+<Card href="/docs/main/build/actions/image-tool" title='Image Tool'>
+
+Enables users to add images to the canvas by selecting a file.
+
+</Card>
+
 <Card href="/docs/main/build/actions/measure-tool" title='Measure Tool'>
 
 Enables users to add new measure nodes to the canvas by clicking or touching on it.
+
+</Card>
+
+<Card href="/docs/main/build/actions/rectangle-tool" title='Rectangle Tool'>
+
+Enables users to create new rectangle nodes on the canvas.
+
+</Card>
+
+<Card href="/docs/main/build/actions/regular-polygon-tool" title='Regular Polygon Tool'>
+
+Enables users to create new regular polygons nodes on the canvas.
+
+</Card>
+
+<Card href="/docs/main/build/actions/star-tool" title='Star Tool'>
+
+Enables users to add new star nodes to the canvas by clicking or touching on it.
+
+</Card>
+
+<Card href="/docs/main/build/actions/stroke-tool" title='Stroke Tool'>
+
+Enables users to create a single-stroke line on the canvas. With the possibility to define the stoke tips format.
+
+</Card>
+
+<Card href="/docs/main/build/actions/text-tool" title='Text Tool'>
+
+Enables users to add new text nodes to the canvas by clicking or touching on it.
+
+</Card>
+
+<Card href="/docs/main/build/actions/video-tool" title='Video Tool'>
+
+Enables users to add videos to the canvas by selecting a file.
+
+</Card>
+
+</Cards>
+
+#### Deprecated
+
+<Cards>
+
+<Card href="/docs/main/build/actions/arrow-tool" title='Arrow Tool (deprecated)'>
+
+Enables users to add new arrow nodes to the canvas by clicking or touching on it.
+
+</Card>
+
+<Card href="/docs/main/build/actions/line-tool" title='Line Tool (deprecated)'>
+
+Enables users to create a simple line on the canvas.
+
+</Card>
+
+<Card href="/docs/main/build/actions/pen-tool" title='Pen Tool (deprecated)'>
+
+Enables users to create continuos lines on the canvas with N segments on the canvas.
 
 </Card>
 
@@ -232,19 +244,7 @@ Allows users to users to align selected nodes vertically or horizontally.
 
 <Cards>
 
-<Card href="/docs/main/build/actions/zoom-in-tool" title='Zoom In Tool'>
-
-Enables users to incrementally zoom into the canvas, providing a more detailed view of
-content.
-
-</Card>
-
-<Card href="/docs/main/build/actions/zoom-out-tool" title='Zoom Out Tool'>
-
-Enables users to incrementally zoom out the canvas, providing a more general view of
-content.
-
-</Card><Card href="/docs/main/build/actions/fit-to-screen-tool" title='Fit to Screen Tool'>
+<Card href="/docs/main/build/actions/fit-to-screen-tool" title='Fit to Screen Tool'>
 
 Automatically adjusts the zoom and position of the canvas to ensure all visible nodes
 fit neatly within the viewport.
@@ -258,22 +258,36 @@ fit neatly within the viewport.
 
 </Card>
 
+<Card href="/docs/main/build/actions/zoom-in-tool" title='Zoom In Tool'>
+
+Enables users to incrementally zoom into the canvas, providing a more detailed view of
+content.
+
+</Card>
+
+<Card href="/docs/main/build/actions/zoom-out-tool" title='Zoom Out Tool'>
+
+Enables users to incrementally zoom out the canvas, providing a more general view of
+content.
+
+</Card>
+
 </Cards>
 
 ### Export Tools
 
 <Cards>
 
-<Card href="/docs/main/build/actions/export-stage-tool" title='Export Stage Tool'>
+<Card href="/docs/main/build/actions/export-node-tool" title='Export Node Tool'>
 
-Automatically adjusts the zoom and position of the canvas to ensure all visible nodes
+Automatically adjusts the zoom and position of the canvas to ensure all selected nodes
 fit neatly within the viewport, and then proceeds to export the viewport as an image.
 
 </Card>
 
-<Card href="/docs/main/build/actions/export-node-tool" title='Export Node Tool'>
+<Card href="/docs/main/build/actions/export-stage-tool" title='Export Stage Tool'>
 
-Automatically adjusts the zoom and position of the canvas to ensure all selected nodes
+Automatically adjusts the zoom and position of the canvas to ensure all visible nodes
 fit neatly within the viewport, and then proceeds to export the viewport as an image.
 
 </Card>
