@@ -48,6 +48,13 @@ Enables users to directly comment and give feedback on the stage.
 
 <Cards>
 
+<Card href="/docs/sdk/api-reference/actions/eraser-tool" title='WeaveEraserToolAction'>
+
+Allows users to erase (delete) elements of the canvas. When enabled the user can click on an
+element and it will be erased.
+
+</Card>
+
 <Card href="/docs/sdk/api-reference/actions/move-tool" title='WeaveMoveToolAction'>
 
 Allows users to enable/disable the panning of canvas. When enabled the user can pan the canvas
@@ -59,13 +66,6 @@ at its will.
 
 Allows users to enable/disable the selection mode of the canvas. When enabled the users can
 select nodes, move then, resize them, etc.
-
-</Card>
-
-<Card href="/docs/sdk/api-reference/actions/eraser-tool" title='WeaveEraserToolAction'>
-
-Allows users to erase (delete) elements of the canvas. When enabled the user can click on an
-element and it will be erased.
 
 </Card>
 
@@ -87,69 +87,9 @@ Allows users to align selected nodes.
 
 <Cards>
 
-<Card href="/docs/sdk/api-reference/actions/rectangle-tool" title='WeaveRectangleToolAction'>
-
-Enables users to create new rectangle nodes on the canvas.
-
-</Card>
-
-<Card href="/docs/sdk/api-reference/actions/ellipse-tool" title='WeaveEllipseToolAction'>
-
-Enables users to create new ellipses nodes on the canvas.
-
-</Card>
-
-<Card href="/docs/sdk/api-reference/actions/regular-polygon-tool" title='WeaveRegularPolygonToolAction'>
-
-Enables users to create new regular polygons nodes on the canvas.
-
-</Card>
-
-<Card href="/docs/sdk/api-reference/actions/line-tool" title='WeaveLineToolAction'>
-
-Enables users to create a simple line on the canvas.
-
-</Card>
-
-<Card href="/docs/sdk/api-reference/actions/pen-tool" title='WeavePenToolAction'>
-
-Enables users to create continuos lines on the canvas with N segments on the canvas.
-
-</Card>
-
 <Card href="/docs/sdk/api-reference/actions/brush-tool" title='WeaveBrushToolAction'>
 
 Enables users to paint freeform strokes on the canvas, similar to a digital brush.
-
-</Card>
-
-<Card href="/docs/sdk/api-reference/actions/image-tool" title='WeaveImageToolAction'>
-
-Enables users to add images to the canvas by selecting a file.
-
-</Card>
-
-<Card href="/docs/sdk/api-reference/actions/video-tool" title='WeaveVideoToolAction'>
-
-Enables users to add videos to the canvas by selecting a file.
-
-</Card>
-
-<Card href="/docs/sdk/api-reference/actions/text-tool" title='WeaveTextToolAction'>
-
-Enables users to add new text nodes to the canvas by clicking or touching on it.
-
-</Card>
-
-<Card href="/docs/sdk/api-reference/actions/star-tool" title='WeaveStarToolAction'>
-
-Enables users to add new star nodes to the canvas by clicking or touching on it.
-
-</Card>
-
-<Card href="/docs/sdk/api-reference/actions/arrow-tool" title='WeaveArrowToolAction'>
-
-Enables users to add new arrow nodes to the canvas by clicking or touching on it.
 
 </Card>
 
@@ -159,6 +99,83 @@ Enables users to add new connector nodes to the canvas by clicking or touching o
 pre-defined anchors.
 
 </Card>
+
+<Card href="/docs/sdk/api-reference/actions/ellipse-tool" title='WeaveEllipseToolAction'>
+
+Enables users to create new ellipses nodes on the canvas.
+
+</Card>
+
+<Card href="/docs/sdk/api-reference/actions/image-tool" title='WeaveImageToolAction'>
+
+Enables users to add images to the canvas by selecting a file.
+
+</Card>
+
+<Card href="/docs/sdk/api-reference/actions/rectangle-tool" title='WeaveRectangleToolAction'>
+
+Enables users to create new rectangle nodes on the canvas.
+
+</Card>
+<Card href="/docs/sdk/api-reference/actions/regular-polygon-tool" title='WeaveRegularPolygonToolAction'>
+
+Enables users to create new regular polygons nodes on the canvas.
+
+</Card>
+
+<Card href="/docs/sdk/api-reference/actions/star-tool" title='WeaveStarToolAction'>
+
+Enables users to add new star nodes to the canvas by clicking or touching on it.
+
+</Card>
+
+<Card href="/docs/sdk/api-reference/actions/stroke-tool" title='WeaveStrokeToolAction'>
+
+Enables users to create a single-stroke line on the canvas.
+
+</Card>
+
+<Card href="/docs/sdk/api-reference/actions/text-tool" title='WeaveTextToolAction'>
+
+Enables users to add new text nodes to the canvas by clicking or touching on it.
+
+</Card>
+
+<Card href="/docs/sdk/api-reference/actions/video-tool" title='WeaveVideoToolAction'>
+
+Enables users to add videos to the canvas by selecting a file.
+
+</Card>
+
+</Cards>
+
+#### Deprecated
+
+<Cards>
+
+<Card href="/docs/sdk/api-reference/actions/arrow-tool" title='WeaveArrowToolAction (deprecated)'>
+
+Enables users to add new arrow nodes to the canvas by clicking or touching on it.
+
+</Card>
+
+<Card href="/docs/sdk/api-reference/actions/line-tool" title='WeaveLineToolAction (deprecated)'>
+
+Enables users to create a single-stroke line on the canvas.
+
+</Card>
+
+<Card href="/docs/sdk/api-reference/actions/pen-tool" title='WeavePenToolAction (deprecated)'>
+
+Enables users to create continuos lines on the canvas with N segments on the canvas.
+
+</Card>
+
+</Cards>
+
+### Support Tools
+
+<Cards>
 
 <Card href="/docs/sdk/api-reference/actions/measure-tool" title='WeaveMeasureToolAction'>
 
@@ -184,19 +201,7 @@ Enables users to create frame nodes by clicking on the canvas.
 
 <Cards>
 
-<Card href="/docs/sdk/api-reference/actions/zoom-in-tool" title='WeaveZoomInToolAction'>
-
-Enables users to incrementally zoom into the canvas, providing a more detailed view of
-content.
-
-</Card>
-
-<Card href="/docs/sdk/api-reference/actions/zoom-out-tool" title='WeaveZoomOutToolAction'>
-
-Enables users to incrementally zoom out the canvas, providing a more general view of
-content.
-
-</Card><Card href="/docs/sdk/api-reference/actions/fit-to-screen-tool" title='WeaveFitToScreenToolAction'>
+<Card href="/docs/sdk/api-reference/actions/fit-to-screen-tool" title='WeaveFitToScreenToolAction'>
 
 Automatically adjusts the zoom and position of the canvas to ensure all visible nodes
 fit neatly within the viewport.
@@ -210,22 +215,36 @@ fit neatly within the viewport.
 
 </Card>
 
+<Card href="/docs/sdk/api-reference/actions/zoom-in-tool" title='WeaveZoomInToolAction'>
+
+Enables users to incrementally zoom into the canvas, providing a more detailed view of
+content.
+
+</Card>
+
+<Card href="/docs/sdk/api-reference/actions/zoom-out-tool" title='WeaveZoomOutToolAction'>
+
+Enables users to incrementally zoom out the canvas, providing a more general view of
+content.
+
+</Card>
+
 </Cards>
 
 ### Export Tools
 
 <Cards>
 
-<Card href="/docs/sdk/api-reference/actions/export-stage-tool" title='WeaveExportStageToolAction'>
+<Card href="/docs/sdk/api-reference/actions/export-node-tool" title='WeaveExportNodeToolAction'>
 
-Automatically adjusts the zoom and position of the canvas to ensure all visible nodes
+Automatically adjusts the zoom and position of the canvas to ensure all selected nodes
 fit neatly within the viewport, and then proceeds to export the viewport as an image.
 
 </Card>
 
-<Card href="/docs/sdk/api-reference/actions/export-node-tool" title='WeaveExportNodeToolAction'>
+<Card href="/docs/sdk/api-reference/actions/export-stage-tool" title='WeaveExportStageToolAction'>
 
-Automatically adjusts the zoom and position of the canvas to ensure all selected nodes
+Automatically adjusts the zoom and position of the canvas to ensure all visible nodes
 fit neatly within the viewport, and then proceeds to export the viewport as an image.
 
 </Card>

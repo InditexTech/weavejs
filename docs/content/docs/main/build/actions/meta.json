@@ -2,7 +2,6 @@
   "title": "Actions",
   "pages": [
     "align-nodes-tool",
-    "arrow-tool",
     "brush-tool",
     "connector-tool",
     "comment-tool",
@@ -16,15 +15,17 @@
     "image-tool",
     "measure-tool",
     "move-tool",
-    "line-tool",
-    "pen-tool",
     "rectangle-tool",
     "regular-polygon-tool",
     "selection-tool",
     "star-tool",
+    "stroke-tool",
     "text-tool",
     "video-tool",
     "zoom-in-tool",
-    "zoom-out-tool"
+    "zoom-out-tool",
+    "arrow-tool",
+    "line-tool",
+    "pen-tool"
   ]
 }

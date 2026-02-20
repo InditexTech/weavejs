@@ -289,13 +289,13 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
         const targetNode = this.instance.getInstanceRecursive(shape);
         if (targetNode && targetNode !== nodeHovered) {
           this.instance.getStage().handleMouseover();
-          nodeHovered?.handleMouseout();
-          targetNode?.handleMouseover();
+          nodeHovered?.handleMouseout?.();
+          targetNode?.handleMouseover?.();
           nodeHovered = targetNode as Konva.Node | undefined;
         }
-        targetNode?.handleMouseover();
+        targetNode?.handleMouseover?.();
       } else {
-        nodeHovered?.handleMouseout();
+        nodeHovered?.handleMouseout?.();
       }
     });
 
@@ -304,7 +304,7 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
     });
 
     tr.on('mouseout', () => {
-      this.instance.getStage().handleMouseover();
+      this.instance.getStage().handleMouseover?.();
       nodeHovered = undefined;
     });
 
@@ -313,7 +313,7 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
         nodeHovered.handleMouseout();
         nodeHovered = undefined;
       }
-      this.instance.getStage().handleMouseover();
+      this.instance.getStage().handleMouseover?.();
     });
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -1409,7 +1409,9 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
       const selectionBehavior = this.config.behaviors?.onMultipleSelection?.(
         this.tr.nodes()
       );
+      console.log('selectionBehavior', selectionBehavior);
       this.tr.setAttrs(selectionBehavior);
+      this.tr.forceUpdate();
     }
   }
 
@@ -1653,7 +1655,10 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
         anchorsArrays.push(node.allowedAnchors());
       }
 
-      transformerAttrs.enabledAnchors = intersectArrays(anchorsArrays);
+      const enabledAnchors = intersectArrays(anchorsArrays);
+
+      transformerAttrs.enabledAnchors = enabledAnchors;
+      this.tr.enabledAnchors(transformerAttrs.enabledAnchors);
     }
 
     if (this.tr && this.tr.nodes().length > 0) {

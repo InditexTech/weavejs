@@ -281,6 +281,7 @@ export class WeaveVideoNode extends WeaveNode {
       id,
       name: 'node',
       strokeScaleEnabled: true,
+      // overridesMouseControl: true,
     });
 
     const bg = new Konva.Rect({
@@ -629,7 +630,7 @@ export class WeaveVideoNode extends WeaveNode {
         playing: true,
         paused: false,
       };
-      this.videoSource[videoId].play();
+      this.videoSource[videoId]?.play?.();
       this.anim.start();
       this.instance.emitEvent<WeaveVideoOnVideoPlayEvent>('onVideoPlay', {
         nodeId: videoId,
