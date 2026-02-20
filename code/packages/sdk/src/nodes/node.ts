@@ -287,7 +287,7 @@ export abstract class WeaveNode implements WeaveNodeBase {
       return;
     }
 
-    if (node.canBeHovered()) {
+    if (node?.canBeHovered?.()) {
       selectionPlugin.getHoverTransformer().nodes([node]);
     } else {
       selectionPlugin.getHoverTransformer().nodes([]);
@@ -307,34 +307,41 @@ export abstract class WeaveNode implements WeaveNodeBase {
   }
 
   setupDefaultNodeEvents(node: Konva.Node): void {
-    this.instance.addEventListener<WeaveNodesSelectionPluginOnNodesChangeEvent>(
-      'onNodesChange',
-      () => {
-        if (
-          !this.isLocked(node as WeaveElementInstance) &&
-          this.isSelecting() &&
-          this.isNodeSelected(node)
-        ) {
-          node.draggable(true);
-          return;
-        }
-        node.draggable(false);
+    const handleNodesChange = () => {
+      if (
+        !this.isLocked(node as WeaveElementInstance) &&
+        this.isSelecting() &&
+        this.isNodeSelected(node)
+      ) {
+        node.draggable(true);
+        return;
       }
-    );
+      node.draggable(false);
+    };
 
     const isLocked = node.getAttrs().locked ?? false;
 
     if (isLocked) {
+      this.instance.removeEventListener<WeaveNodesSelectionPluginOnNodesChangeEvent>(
+        'onNodesChange',
+        handleNodesChange
+      );
+
       node.off('transformstart');
       node.off('transform');
       node.off('transformend');
       node.off('dragstart');
       node.off('dragmove');
       node.off('dragend');
-      node.off('pointerenter');
+      node.off('pointerover');
       node.off('pointerleave');
     } else {
       let transforming = false;
+
+      this.instance.addEventListener<WeaveNodesSelectionPluginOnNodesChangeEvent>(
+        'onNodesChange',
+        handleNodesChange
+      );
 
       node.on('transformstart', (e) => {
         transforming = true;
@@ -769,13 +776,15 @@ export abstract class WeaveNode implements WeaveNodeBase {
         originalPosition = realNodeTarget.getAbsolutePosition();
       });
 
-      node.handleMouseover = () => {
-        this.handleMouseOver(node);
-      };
+      if (!node.getAttrs().overridesMouseControl) {
+        node.handleMouseover = () => {
+          this.handleMouseOver(node);
+        };
 
-      node.handleMouseout = () => {
-        this.handleMouseout(node);
-      };
+        node.handleMouseout = () => {
+          this.handleMouseout(node);
+        };
+      }
 
       node.handleSelectNode = () => {
         this.getNodesSelectionFeedbackPlugin()?.createSelectionHalo(node);
@@ -932,9 +941,11 @@ export abstract class WeaveNode implements WeaveNodeBase {
     const attrs = instance.getAttrs();
 
     const cleanedAttrs = { ...attrs };
+    delete cleanedAttrs.isSelected;
     delete cleanedAttrs.mutexLocked;
     delete cleanedAttrs.mutexUserId;
     delete cleanedAttrs.draggable;
+    delete cleanedAttrs.overridesMouseControl;
 
     return {
       key: attrs.id ?? '',

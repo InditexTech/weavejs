@@ -330,10 +330,17 @@ export function hasFrames(node: Konva.Node) {
 }
 
 export function intersectArrays<T>(arrays: T[][]): T[] {
-  return arrays.reduce(
-    (acc, arr) => acc.filter((val) => arr.includes(val)),
-    arrays[0]
-  );
+  if (arrays.length === 0) return [];
+
+  // If any array is empty → result is empty
+  if (arrays.some((arr) => arr.length === 0)) {
+    return [];
+  }
+
+  // Start from the smallest array for better performance
+  const sorted = [...arrays].sort((a, b) => a.length - b.length);
+
+  return sorted[0].filter((item) => sorted.every((arr) => arr.includes(item)));
 }
 
 export function isNodeInSelection(

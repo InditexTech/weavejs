@@ -127,6 +127,7 @@ export class WeaveGroupNode extends WeaveNode {
     delete cleanedAttrs.mutexLocked;
     delete cleanedAttrs.mutexUserId;
     delete cleanedAttrs.draggable;
+    delete cleanedAttrs.overridesMouseControl;
 
     return {
       key: attrs.id ?? '',

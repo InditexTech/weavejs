@@ -39,18 +39,18 @@ The WeaveNode node is the abstract class that defines the blueprint of a node in
 
 <Cards>
 
-<Card href="/docs/sdk/api-reference/nodes/stage" title='WeaveStageNode'>
-
-The WeaveStageNode node is the root canvas container in Weave.js. It serves as the entry point
-for rendering all other visual or layout Nodes and manages the overall coordinate system.
-
-</Card>
-
 <Card href="/docs/sdk/api-reference/nodes/layer" title='WeaveLayerNode'>
 
 The WeaveLayerNode node is a logical container within the Stage. It allows you to separate visual
 elements, for example: background grids, interactive elements, or UI overlays, into
 distinct rendering layers.
+
+</Card>
+
+<Card href="/docs/sdk/api-reference/nodes/stage" title='WeaveStageNode'>
+
+The WeaveStageNode node is the root canvas container in Weave.js. It serves as the entry point
+for rendering all other visual or layout Nodes and manages the overall coordinate system.
 
 </Card>
 
@@ -74,6 +74,14 @@ view / manage already created comments.
 
 <Cards>
 
+<Card href="/docs/sdk/api-reference/nodes/frame" title='WeaveFrameNode'>
+
+The WeaveFrameNode node is a container-like visual element used to group and organize other
+nodes within a pre-defined boundary. It functions as a structured layout region, often
+used to represent panels, sections, or modular components on the canvas.
+
+</Card>
+
 <Card href="/docs/sdk/api-reference/nodes/group" title='WeaveGroupNode'>
 
 The WeaveGroupNode node is a container for organizing multiple nodes into a single, movable
@@ -83,25 +91,16 @@ unified object.
 
 </Card>
 
-<Card href="/docs/sdk/api-reference/nodes/frame" title='WeaveFrameNode'>
-
-The WeaveFrameNode node is a container-like visual element used to group and organize other
-nodes within a pre-defined boundary. It functions as a structured layout region, often
-used to represent panels, sections, or modular components on the canvas.
-
-</Card>
-
 </Cards>
 
 ### Drawing
 
 <Cards>
 
-<Card href="/docs/sdk/api-reference/nodes/rectangle" title='WeaveRectangleNode'>
+<Card href="/docs/sdk/api-reference/nodes/connector" title='WeaveConnectorNode'>
 
-The WeaveRectangleNode node is a simple, versatile primitive shape used to render rectangular
-elements on the canvas. It supports customizable properties such as position, size, fill color,
-stroke, corner radius and more.
+The WeaveConnectorNode node is a complex node that display a sticky line between two nodes predefined
+anchor points.
 
 </Card>
 
@@ -113,37 +112,6 @@ stroke and more.
 
 </Card>
 
-<Card href="/docs/sdk/api-reference/nodes/regular-polygon" title='WeaveRegularPolygonNode'>
-
-The WeaveRegularPolygonNode node is a simple, versatile primitive shape used to render regular polygons
-elements on the canvas. It supports customizable properties such as position, radius, sides, fill color,
-stroke and more.
-
-</Card>
-
-<Card href="/docs/sdk/api-reference/nodes/line" title='WeaveLineNode'>
-
-The WeaveLineNode node represents a customizable straight or curved line on the canvas.
-It supports features like multiple points, stroke color, width, dash patterns, and
-smoothing options.
-
-</Card>
-
-<Card href="/docs/sdk/api-reference/nodes/stroke" title='WeaveStrokeNode'>
-
-The WeaveStrokeNode node represents a customizable free-hand continuous line on the canvas.
-It supports features like stroke color, width, dash patterns, pressure (if hardware delivers) and
-smoothing options.
-
-</Card>
-
-<Card href="/docs/sdk/api-reference/nodes/text" title='WeaveTextNode'>
-
-The WeaveTextNode node is used to display editable or static text on the canvas. It supports
-rich styling options including font size, family, color, alignment, and line height.
-
-</Card>
-
 <Card href="/docs/sdk/api-reference/nodes/image" title='WeaveImageNode'>
 
 The WeaveImageNode node allows you to render images directly onto the canvas. It supports
@@ -151,9 +119,19 @@ properties like position, scale, opacity, and filters.
 
 </Card>
 
-<Card href="/docs/sdk/api-reference/nodes/video" title='WeaveVideoNode'>
+<Card href="/docs/sdk/api-reference/nodes/rectangle" title='WeaveRectangleNode'>
 
-The WeaveVideoNode node allows you to render and play videos directly onto the canvas.
+The WeaveRectangleNode node is a simple, versatile primitive shape used to render rectangular
+elements on the canvas. It supports customizable properties such as position, size, fill color,
+stroke, corner radius and more.
+
+</Card>
+
+<Card href="/docs/sdk/api-reference/nodes/regular-polygon" title='WeaveRegularPolygonNode'>
+
+The WeaveRegularPolygonNode node is a simple, versatile primitive shape used to render regular polygons
+elements on the canvas. It supports customizable properties such as position, radius, sides, fill color,
+stroke and more.
 
 </Card>
 
@@ -165,7 +143,41 @@ fill color, stroke and more.
 
 </Card>
 
-<Card href="/docs/sdk/api-reference/nodes/arrow" title='WeaveArrowNode'>
+<Card href="/docs/sdk/api-reference/nodes/stroke" title='WeaveStrokeNode'>
+
+The WeaveStrokeNode node represents the recommended way to render free-hand lines on the canvas.
+It supports features like stroke color, width, dash patterns.
+
+</Card>
+
+<Card href="/docs/sdk/api-reference/nodes/stroke-single" title='WeaveStrokeSingleNode'>
+
+The WeaveStrokeSingleNode node represents the recommended way to render single-stroke lines on the canvas.
+It supports features like stroke color, width, dash patterns and you can define also the line tips as:
+arrow, circle or square.
+
+</Card>
+
+<Card href="/docs/sdk/api-reference/nodes/text" title='WeaveTextNode'>
+
+The WeaveTextNode node is used to display editable or static text on the canvas. It supports
+rich styling options including font size, family, color, alignment, and line height.
+
+</Card>
+
+<Card href="/docs/sdk/api-reference/nodes/video" title='WeaveVideoNode'>
+
+The WeaveVideoNode node allows you to render and play videos directly onto the canvas.
+
+</Card>
+
+</Cards>
+
+#### Deprecated
+
+<Cards>
+
+<Card href="/docs/sdk/api-reference/nodes/arrow" title='WeaveArrowNode (deprecated)'>
 
 The WeaveArrowNode node is a simple, versatile primitive shape used to render arrow
 elements on the canvas. It supports customizable properties such as position, several segments,
@@ -173,10 +185,11 @@ fill color, stroke and more.
 
 </Card>
 
-<Card href="/docs/sdk/api-reference/nodes/connector" title='WeaveConnectorNode'>
+<Card href="/docs/sdk/api-reference/nodes/line" title='WeaveLineNode (deprecated)'>
 
-The WeaveConnectorNode node is a complex node that display a sticky line between two nodes predefined
-anchor points.
+The WeaveLineNode node represents a customizable straight or curved line on the canvas.
+It supports features like multiple points, stroke color, width, dash patterns, and
+smoothing options.
 
 </Card>
 

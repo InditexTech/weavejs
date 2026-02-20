@@ -409,6 +409,7 @@ export class WeaveFrameNode extends WeaveNode {
     delete cleanedAttrs.mutexUserId;
     delete cleanedAttrs.draggable;
     delete cleanedAttrs.onTargetEnter;
+    delete cleanedAttrs.overridesMouseControl;
 
     return {
       key: realAttrs?.id ?? '',

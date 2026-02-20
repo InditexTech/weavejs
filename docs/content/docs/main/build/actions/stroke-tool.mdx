@@ -1,25 +1,25 @@
 ---
-title: Line Tool (deprecated)
+title: Stroke Tool
 description: Add a simple line to the canvas
 ---
 
 import { Kbd } from "@/components/kbd";
 
-![Pen Tool action on use on the Weave.js showcase](/images/actions/line-tool.gif)
+![Stroke Tool action on use on the Weave.js showcase](/images/actions/stroke-tool.gif)
 
 ## Introduction
 
-This action allows users to draw a simple line on the canvas by click-and-drag. Also when the
+This action allows users to draw a single-segment line on the canvas by click-and-drag. Also when the
 user press shift, the line is snapped to a defined set of angles.
 
-Each line is captured as a Line Node with configurable styling, and is instantly
-synchronized across all connected users.
+Each line is captured as a StrokeV2 Node with configurable styling, and is instantly
+synchronized across all connected users. Support to define the stroke tips are possible.
 
 ## Dependencies
 
 This action needs registered on the Weave instance the following elements:
 
-- [Line](/docs/main/build/nodes/line) node
+- [Stroke Single](/docs/main/build/nodes/stroke-single) node
 
 ## Usage
 
@@ -32,7 +32,7 @@ This action needs registered on the Weave instance the following elements:
 Start by importing the action:
 
 ```ts
-import { WeaveLineToolAction } from "@inditextech/weave-sdk";
+import { WeaveStrokeToolAction } from "@inditextech/weave-sdk";
 ```
 
 </div>
@@ -48,7 +48,7 @@ const instance = new Weave({
   ...
   actions: [
     ...,
-    new WeaveLineToolAction(), // [!code ++]
+    new WeaveStrokeToolAction(), // [!code ++]
   ]
 })
 ```
@@ -73,14 +73,14 @@ For example on a button on React:
 import React from "react";
 import { useWeave } from "@inditextech/weave-react";
 
-const MyLineToolTriggerComponent = () => {
+const MyStrokeToolTriggerComponent = () => {
   const instance = useWeave((state) => state.instance);
 
   const triggerTool = React.useCallback(() => {
-    instance.triggerAction("lineTool");
+    instance.triggerAction("strokeTool");
   }, [instance]);
 
-  return <button onClick={triggerTool}>Line Tool</button>;
+  return <button onClick={triggerTool}>Stroke Tool</button>;
 };
 ```
 

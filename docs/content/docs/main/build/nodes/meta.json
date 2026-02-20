@@ -1,7 +1,6 @@
 {
   "title": "Nodes",
   "pages": [
-    "arrow",
     "connector",
     "comment",
     "ellipse",
@@ -9,13 +8,16 @@
     "group",
     "image",
     "layer",
-    "line",
     "measure",
     "rectangle",
     "regular-polygon",
     "stage",
     "star",
+    "stroke",
+    "stroke-single",
     "text",
-    "video"
+    "video",
+    "arrow",
+    "line"
   ]
 }
