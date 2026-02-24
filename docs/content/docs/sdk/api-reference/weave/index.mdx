@@ -79,6 +79,12 @@ const instance = new Weave(weaveConfig: WeaveConfig, stageConfig: Konva.StageCon
         "Weave performance fine-tunning configuration for the instance",
       type: "WeavePerformanceConfig",
     },
+    ["weaveConfig.behaviors.axisLockThreshold"]: {
+      description:
+        "Threshold (in px) to activate locking to axis when dragging and shift key pressed",
+      type: "number",
+      default: "5",
+    },
     ["stageConfig"]: {
       required: true,
       description:
@@ -133,7 +139,7 @@ const WEAVE_TRANSFORMER_ANCHORS = {
 };
 
 const WEAVE_DEFAULT_ENABLED_ANCHORS: string[] = Object.values(
-  WEAVE_TRANSFORMER_ANCHORS
+  WEAVE_TRANSFORMER_ANCHORS,
 );
 
 const defaultNodeConfig: WeaveNodeConfiguration = {
@@ -877,7 +883,7 @@ export declare interface WeaveStoreBase {
   connect(): void;
   disconnect(): void;
   onAwarenessChange<K extends string, T>(
-    callback: (changes: WeaveAwarenessChange<K, T>[]) => void
+    callback: (changes: WeaveAwarenessChange<K, T>[]) => void,
   ): void;
   setAwarenessInfo(field: string, value: unknown): void;
 }
@@ -887,7 +893,7 @@ export declare interface WeaveNodeBase {
   createInstance(props: WeaveElementAttributes): WeaveElementInstance;
   updateInstance(
     instance: WeaveElementInstance,
-    nextProps: WeaveElementAttributes
+    nextProps: WeaveElementAttributes,
   ): void;
   removeInstance(instance: WeaveElementInstance): void;
   toNode(instance: WeaveElementInstance): WeaveStateElement;
