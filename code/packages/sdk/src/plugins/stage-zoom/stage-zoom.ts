@@ -165,6 +165,8 @@ export class WeaveStageZoomPlugin extends WeavePlugin {
         canZoomOut: this.canZoomOut(),
       };
 
+      stage.fire('onZoomChange', {}, true);
+
       this.instance.emitEvent<WeaveStageZoomPluginOnZoomChangeEvent>(
         'onZoomChange',
         callbackParams

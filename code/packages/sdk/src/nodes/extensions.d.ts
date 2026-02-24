@@ -79,5 +79,6 @@ declare module 'konva/lib/Stage' {
     isMouseWheelPressed(): boolean;
     handleMouseover(): void;
     handleMouseout(): void;
+    isCmdCtrlPressed(): boolean;
   }
 }
