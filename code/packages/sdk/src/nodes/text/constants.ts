@@ -2,4 +2,16 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
+import { WEAVE_NODES_SELECTION_DEFAULT_CONFIG } from '@/plugins/nodes-selection/constants';
+import type { WeaveTextProperties } from './types';
+
 export const WEAVE_TEXT_NODE_TYPE = 'text';
+
+export const WEAVE_TEXT_NODE_DEFAULT_CONFIG: WeaveTextProperties = {
+  transform: {
+    ...WEAVE_NODES_SELECTION_DEFAULT_CONFIG.selection,
+  },
+  outline: {
+    enabled: false,
+  },
+};

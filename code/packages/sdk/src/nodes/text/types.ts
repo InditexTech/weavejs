@@ -4,6 +4,7 @@
 
 import Konva from 'konva';
 import {
+  type DeepPartial,
   type NodeSerializable,
   type WeaveNodeTransformerProperties,
 } from '@inditextech/weave-types';
@@ -14,12 +15,22 @@ export type TextSerializable = Konva.TextConfig &
     id: string;
   };
 
+export type WeaveTextOutlineProperties =
+  | {
+      enabled: true;
+      color: string;
+      width: number;
+    }
+  | {
+      enabled: false;
+    };
+
 export type WeaveTextProperties = {
   transform: WeaveNodeTransformerProperties;
+  outline: WeaveTextOutlineProperties;
 };
-
 export type WeaveTextNodeParams = {
-  config: Partial<WeaveTextProperties>;
+  config: DeepPartial<WeaveTextProperties>;
 };
 
 export type WeaveTextNodeOnEnterTextNodeEditMode = { node: Konva.Text };
