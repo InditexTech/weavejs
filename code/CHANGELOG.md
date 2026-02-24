@@ -15,7 +15,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- [#915](https://github.com/InditexTech/weavejs/issues/915) on the urlTransform property of Image nodes also inform the node
+- [#915](https://github.com/InditexTech/weavejs/issues/915) On the urlTransform property of Image nodes also inform the node
 - [#928](https://github.com/InditexTech/weavejs/issues/928) Always-on text outline
 - [#935](https://github.com/InditexTech/weavejs/issues/935) Adjust crop when image is downscaled while maintaining aspect ratio
 

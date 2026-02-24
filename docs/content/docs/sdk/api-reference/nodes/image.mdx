@@ -68,13 +68,18 @@ type WeaveImageCache =
       pixelRatio: number;
     };
 
+type WeaveImageURLTransformerFunction = (
+  url: string,
+  node?: Konva.Node,
+) => string;
+
 type WeaveImageProperties = {
   performance: {
     cache: WeaveImageCache;
   };
   crossOrigin: ImageCrossOrigin;
   transform?: WeaveNodeTransformerProperties;
-  urlTransformer?: URLTransformerFunction;
+  urlTransformer?: WeaveImageURLTransformerFunction;
   onDblClick?: (instance: WeaveImageNode, node: Konva.Group) => void;
   cropMode: {
     grid: {
