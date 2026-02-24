@@ -13,6 +13,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- [#9307](https://github.com/InditexTech/weavejs/issues/930) Avoid setup window events when stage node is setuped
+
 ## [2.21.0] - 2026-02-24
 
 ### Added

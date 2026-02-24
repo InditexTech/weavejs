@@ -342,7 +342,7 @@ export class WeaveArrowToolAction extends WeaveAction {
           ...clonedLine.getAttrs(),
           hitStrokeWidth: 16,
         });
-
+        delete finalArrow.props.dragBoundFunc;
         this.instance.addNode(finalArrow, this.container?.getAttrs().id);
 
         this.instance.emitEvent<WeaveArrowToolActionOnAddingEvent>(

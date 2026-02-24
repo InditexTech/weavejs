@@ -31,8 +31,8 @@ export class WeaveStrokeToolAction extends WeaveAction {
   protected config: WeaveStrokeToolActionProperties;
   protected state: WeaveStrokeToolActionState;
   protected arrowId: string | null;
-  protected tempArrowId: string | null;
-  protected tempArrowNode: Konva.Group | null;
+  protected tempLineId: string | null;
+  protected tempLineNode: Konva.Group | null;
   protected container: Konva.Layer | Konva.Node | undefined;
   protected measureContainer: Konva.Layer | Konva.Group | undefined;
   protected clickPoint: Konva.Vector2d | null;
@@ -57,8 +57,8 @@ export class WeaveStrokeToolAction extends WeaveAction {
     this.state = WEAVE_STROKE_TOOL_STATE.IDLE;
     this.arrowId = null;
     this.shiftPressed = false;
-    this.tempArrowId = null;
-    this.tempArrowNode = null;
+    this.tempLineId = null;
+    this.tempLineNode = null;
     this.container = undefined;
     this.snappedAngle = null;
     this.measureContainer = undefined;
@@ -146,14 +146,11 @@ export class WeaveStrokeToolAction extends WeaveAction {
         return;
       }
 
-      if (
-        !this.tempArrowNode &&
-        this.state === WEAVE_STROKE_TOOL_STATE.ADDING
-      ) {
+      if (!this.tempLineNode && this.state === WEAVE_STROKE_TOOL_STATE.ADDING) {
         this.handleAdding();
       }
 
-      if (this.tempArrowNode && this.state === WEAVE_STROKE_TOOL_STATE.ADDING) {
+      if (this.tempLineNode && this.state === WEAVE_STROKE_TOOL_STATE.ADDING) {
         this.state = WEAVE_STROKE_TOOL_STATE.DEFINING_SIZE;
       }
     });
@@ -219,28 +216,28 @@ export class WeaveStrokeToolAction extends WeaveAction {
     this.measureContainer = measureContainer;
 
     this.arrowId = uuidv4();
-    this.tempArrowId = uuidv4();
+    this.tempLineId = uuidv4();
 
     const nodeHandler = this.instance.getNodeHandler<WeaveStrokeSingleNode>(
       WEAVE_STROKE_SINGLE_NODE_TYPE
     );
 
-    if (!this.tempArrowNode && nodeHandler) {
-      this.tempArrowNode = nodeHandler.onRender({
+    if (!this.tempLineNode && nodeHandler) {
+      this.tempLineNode = nodeHandler.onRender({
         ...this.props,
         x: this.clickPoint?.x ?? 0,
         y: this.clickPoint?.y ?? 0,
         strokeScaleEnabled: true,
         linePoints: [0, 0, 1, 1],
       }) as Konva.Group;
-      this.measureContainer?.add(this.tempArrowNode);
+      this.measureContainer?.add(this.tempLineNode);
 
       this.setState(WEAVE_STROKE_TOOL_STATE.DEFINING_SIZE);
     }
   }
 
   private defineFinalPoint(): Konva.Vector2d {
-    if (!this.tempArrowNode || !this.measureContainer) {
+    if (!this.tempLineNode || !this.measureContainer) {
       return { x: 0, y: 0 };
     }
 
@@ -251,10 +248,10 @@ export class WeaveStrokeToolAction extends WeaveAction {
     const pos: Konva.Vector2d = { x: 0, y: 0 };
 
     if (this.shiftPressed) {
-      const linePoints = this.tempArrowNode.getAttrs().linePoints as number[];
+      const linePoints = this.tempLineNode.getAttrs().linePoints as number[];
 
-      let dx = mousePoint.x - (this.tempArrowNode.x() + linePoints[0]);
-      let dy = mousePoint.y - (this.tempArrowNode.y() + linePoints[1]);
+      let dx = mousePoint.x - (this.tempLineNode.x() + linePoints[0]);
+      let dy = mousePoint.y - (this.tempLineNode.y() + linePoints[1]);
 
       const angle = Math.atan2(dy, dx);
       const angleDeg = (angle * 180) / Math.PI;
@@ -268,15 +265,15 @@ export class WeaveStrokeToolAction extends WeaveAction {
       pos.x = linePoints[0] + dx;
       pos.y = linePoints[1] + dy;
     } else {
-      pos.x = mousePoint.x - this.tempArrowNode.x();
-      pos.y = mousePoint.y - this.tempArrowNode.y();
+      pos.x = mousePoint.x - this.tempLineNode.x();
+      pos.y = mousePoint.y - this.tempLineNode.y();
     }
 
     return pos;
   }
 
   private handleSettingSize() {
-    if (this.arrowId && this.tempArrowNode && this.measureContainer) {
+    if (this.arrowId && this.tempLineNode && this.measureContainer) {
       this.cancelAction();
     }
   }
@@ -290,15 +287,15 @@ export class WeaveStrokeToolAction extends WeaveAction {
       WEAVE_STROKE_SINGLE_NODE_TYPE
     );
 
-    if (this.tempArrowNode && this.measureContainer && nodeHandler) {
+    if (this.tempLineNode && this.measureContainer && nodeHandler) {
       const pos: Konva.Vector2d = this.defineFinalPoint();
 
-      const linePoints = this.tempArrowNode.getAttrs().linePoints as number[];
-      this.tempArrowNode.setAttrs({
+      const linePoints = this.tempLineNode.getAttrs().linePoints as number[];
+      this.tempLineNode.setAttrs({
         ...this.props,
         linePoints: [linePoints[0], linePoints[1], pos.x, pos.y],
       });
-      nodeHandler.updateLine(this.tempArrowNode);
+      nodeHandler.updateLine(this.tempLineNode);
     }
   }
 
@@ -331,14 +328,14 @@ export class WeaveStrokeToolAction extends WeaveAction {
   cleanup(): void {
     const stage = this.instance.getStage();
 
-    this.tempArrowNode?.destroy();
+    this.tempLineNode?.destroy();
 
     let nodeCreated = false;
 
     if (
       this.arrowId &&
-      this.tempArrowNode?.getAttrs().linePoints.length === 4 &&
-      !this.tempArrowNode
+      this.tempLineNode?.getAttrs().linePoints.length === 4 &&
+      !this.tempLineNode
         ?.getAttrs()
         .linePoints.every((coord: number) => coord === 0)
     ) {
@@ -347,15 +344,17 @@ export class WeaveStrokeToolAction extends WeaveAction {
       );
 
       if (nodeHandler) {
-        const clonedArrow = this.tempArrowNode.clone();
-        this.tempArrowNode.destroy();
+        const clonedLine = this.tempLineNode.clone();
+        this.tempLineNode.destroy();
 
-        const node = nodeHandler.create(this.arrowId, {
+        const finalLine = nodeHandler.create(this.arrowId, {
           ...this.props,
-          ...clonedArrow.getAttrs(),
+          ...clonedLine.getAttrs(),
           hitStrokeWidth: 16,
         });
-        this.instance.addNode(node, this.container?.getAttrs().id);
+        delete finalLine.props.dragBoundFunc;
+        console.log('node', finalLine);
+        this.instance.addNode(finalLine, this.container?.getAttrs().id);
 
         this.instance.emitEvent<WeaveStrokeToolActionOnAddedEvent>(
           'onAddedStroke',
@@ -383,8 +382,8 @@ export class WeaveStrokeToolAction extends WeaveAction {
 
     this.initialCursor = null;
     this.arrowId = null;
-    this.tempArrowId = null;
-    this.tempArrowNode = null;
+    this.tempLineId = null;
+    this.tempLineNode = null;
     this.container = undefined;
     this.measureContainer = undefined;
     this.clickPoint = null;
