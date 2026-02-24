@@ -318,6 +318,7 @@ export class WeaveTextNode extends WeaveNode {
     delete cleanedAttrs.cancelEditMode;
     delete cleanedAttrs.measureMultilineText;
     delete cleanedAttrs.overridesMouseControl;
+    delete cleanedAttrs.dragBoundFunc;
 
     return {
       key: attrs.id ?? '',

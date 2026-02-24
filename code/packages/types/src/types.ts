@@ -45,6 +45,9 @@ export type WeaveConfig = {
   fonts?: WeaveFont[] | WeaveFontsPreloadFunction;
   logger?: WeaveLoggerConfig;
   performance?: WeavePerformanceConfig;
+  behaviors: {
+    axisLockThreshold: number;
+  };
 };
 
 // Base types

@@ -15,7 +15,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- [#905](https://github.com/InditexTech/weavejs/issues/905) Non-segmentary Arrow Tool and customizable arrow head
+- [#905](https://github.com/InditexTech/weavejs/issues/905) Unified stroke tool with single stroke and customizable tips
+- [#923](https://github.com/InditexTech/weavejs/issues/923) Constrain node dragging to horizontal/vertical axes when holding “Shift” key
 
 ## [2.20.2] - 2026-02-19
 
