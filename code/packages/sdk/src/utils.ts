@@ -188,6 +188,8 @@ export function moveNodeToContainer(
       instance.stateTransactional(() => {
         const actualNode = nodeHandler.serialize(node as WeaveElementInstance);
 
+        console.log('actualNode', actualNode);
+
         instance.removeNodeNT(actualNode, { emitUserChangeEvent: false });
         instance.addNodeNT(actualNode, layerToMoveAttrs.id, {
           emitUserChangeEvent: true,
@@ -619,7 +621,17 @@ export const getPositionRelativeToContainerOnPosition = (
   const container = containerOverCursor(instance, [], position);
 
   if (container) {
-    position = container?.getRelativePointerPosition();
+    if (container.getAttrs().containerId) {
+      const containerNode = container.findOne(
+        `#${container.getAttrs().containerId}`
+      ) as Konva.Group;
+
+      if (containerNode) {
+        position = containerNode?.getRelativePointerPosition();
+      }
+    } else {
+      position = container?.getRelativePointerPosition();
+    }
   }
 
   if (!position) {
