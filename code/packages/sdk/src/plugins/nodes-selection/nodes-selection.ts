@@ -68,6 +68,7 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
   private selecting: boolean;
   private didMove: boolean;
   private initialized: boolean;
+  private isCtrlMetaPressed: boolean;
   private isSpaceKeyPressed: boolean;
   protected taps: number;
   protected isDoubleTap: boolean;
@@ -106,6 +107,7 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
       'bottom-right',
     ];
     this.taps = 0;
+    this.isCtrlMetaPressed = false;
     this.isSpaceKeyPressed = false;
     this.isDoubleTap = false;
     this.tapStart = { x: 0, y: 0, time: 0 };
@@ -125,6 +127,10 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
 
   getLayerName(): string {
     return WEAVE_NODES_SELECTION_LAYER_ID;
+  }
+
+  getConfiguration(): WeaveNodesSelectionConfig {
+    return this.config;
   }
 
   initLayer(): void {
@@ -1011,6 +1017,9 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
     const stage = this.instance.getStage();
 
     stage.container().addEventListener('keydown', (e) => {
+      if (e.ctrlKey || e.metaKey) {
+        this.isCtrlMetaPressed = true;
+      }
       if (e.code === 'Space') {
         this.isSpaceKeyPressed = true;
       }
@@ -1026,6 +1035,9 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
     });
 
     stage.container().addEventListener('keyup', (e) => {
+      if (e.ctrlKey || e.metaKey) {
+        this.isCtrlMetaPressed = false;
+      }
       if (e.code === 'Space') {
         this.isSpaceKeyPressed = false;
       }
@@ -1118,6 +1130,14 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
       this.selectionRectangle.width(0);
       this.selectionRectangle.height(0);
       this.selecting = true;
+
+      if (this.isCtrlMetaPressed) {
+        const nodesSelected = this.tr.nodes();
+        for (const node of nodesSelected) {
+          node.fire('onSelectionCleared', { bubbles: true });
+        }
+      }
+
       this.tr.nodes([]);
 
       this.instance.emitEvent<WeaveNodesSelectionPluginOnSelectionStateEvent>(
@@ -1565,6 +1585,10 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
     if (this.isDoubleTap && !metaPressed) {
       this.isDoubleTap = false;
       nodeTargeted.dblClick();
+      return;
+    }
+
+    if (stage.isCmdCtrlPressed()) {
       return;
     }
 

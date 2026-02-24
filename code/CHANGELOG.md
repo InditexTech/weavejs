@@ -17,6 +17,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - [#905](https://github.com/InditexTech/weavejs/issues/905) Unified stroke tool with single stroke and customizable tips
 - [#923](https://github.com/InditexTech/weavejs/issues/923) Constrain node dragging to horizontal/vertical axes when holding “Shift” key
+- [#925](https://github.com/InditexTech/weavejs/issues/925) Allow to crop image by pressing cmd/ctrl on corners
 
 ## [2.20.2] - 2026-02-19
 

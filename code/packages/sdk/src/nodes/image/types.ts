@@ -10,7 +10,10 @@ import {
   type WeaveNodeTransformerProperties,
 } from '@inditextech/weave-types';
 import type Konva from 'konva';
-import type { WEAVE_IMAGE_CROP_END_TYPE } from './constants';
+import type {
+  WEAVE_IMAGE_CROP_ANCHOR_POSITION,
+  WEAVE_IMAGE_CROP_END_TYPE,
+} from './constants';
 import type { WeaveImageNode } from './image';
 
 export type ImageProps = WeaveElementAttributes & {
@@ -46,6 +49,23 @@ export type WeaveImageProperties = {
   transform?: WeaveNodeTransformerProperties;
   urlTransformer?: URLTransformerFunction;
   onDblClick?: (instance: WeaveImageNode, node: Konva.Group) => void;
+  cropMode: {
+    gridLines: {
+      enabled: boolean;
+    };
+    overlay: {
+      fill: string;
+    };
+    selection: {
+      enabledAnchors: WeaveImageCropAnchorPosition[];
+      borderStroke: string;
+      borderStrokeWidth: number;
+      anchorStyleFunc: (
+        node: Konva.Rect,
+        position: WeaveImageCropAnchorPosition
+      ) => void;
+    };
+  };
 };
 
 export type WeaveImageNodeParams = {
@@ -58,8 +78,25 @@ export type WeaveImageCropEndType =
 
 export type WeaveImageOnCropStartEvent = {
   instance: Konva.Group;
+  cmdCtrlTriggered: boolean;
 };
 
 export type WeaveImageOnCropEndEvent = {
   instance: Konva.Group;
+};
+
+export type WeaveImageCropAnchorPositionKeys =
+  keyof typeof WEAVE_IMAGE_CROP_ANCHOR_POSITION;
+export type WeaveImageCropAnchorPosition =
+  (typeof WEAVE_IMAGE_CROP_ANCHOR_POSITION)[WeaveImageCropAnchorPositionKeys];
+
+export type WeaveImageTriggerCropOptions = {
+  cmdCtrl:
+    | {
+        triggered: true;
+        corner: WeaveImageCropAnchorPosition;
+      }
+    | {
+        triggered: false;
+      };
 };

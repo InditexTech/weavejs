@@ -43,9 +43,21 @@ new WeaveImageNode(params?: WeaveImageNodeParams);
 ## TypeScript types
 
 ```ts
-type WeaveNodeTransformerProperties = Konva.TransformerConfig;
+type ImageProps = WeaveElementAttributes & {
+  id: string;
+  width?: number;
+  height?: number;
+  imageURL?: string;
+  imageInfo?: {
+    width: number;
+    height: number;
+  };
+};
 
-type ImageCrossOrigin = "anonymous" | "use-credentials";
+type WeaveImageState = {
+  loaded: boolean;
+  error: boolean;
+};
 
 type WeaveImageCache =
   | {
@@ -64,6 +76,20 @@ type WeaveImageProperties = {
   transform?: WeaveNodeTransformerProperties;
   urlTransformer?: URLTransformerFunction;
   onDblClick?: (instance: WeaveImageNode, node: Konva.Group) => void;
+  cropMode: {
+    grid: {
+      enabled: boolean;
+    };
+    selection: {
+      enabledAnchors: WeaveImageCropAnchorPosition[];
+      borderStroke: string;
+      borderStrokeWidth: number;
+      anchorStyleFunc: (
+        node: Konva.Rect,
+        position: WeaveImageCropAnchorPosition,
+      ) => void;
+    };
+  };
 };
 
 type WeaveImageNodeParams = {
@@ -76,10 +102,27 @@ type WeaveImageCropEndType =
 
 type WeaveImageOnCropStartEvent = {
   instance: Konva.Group;
+  cmdCtrlTriggered: boolean;
 };
 
 type WeaveImageOnCropEndEvent = {
   instance: Konva.Group;
+};
+
+type WeaveImageCropAnchorPositionKeys =
+  keyof typeof WEAVE_IMAGE_CROP_ANCHOR_POSITION;
+type WeaveImageCropAnchorPosition =
+  (typeof WEAVE_IMAGE_CROP_ANCHOR_POSITION)[WeaveImageCropAnchorPositionKeys];
+
+type WeaveImageTriggerCropOptions = {
+  cmdCtrl:
+    | {
+        triggered: true;
+        corner: WeaveImageCropAnchorPosition;
+      }
+    | {
+        triggered: false;
+      };
 };
 ```
 
@@ -133,6 +176,33 @@ For `WeaveImageProperties`:
         "Setup an callback that is called when an user double-click (or double tap) on the node",
       type: "(instance: WeaveImageNode, node: Konva.Group) => void",
     },
+    ["cropMode.gridLines.enabled"]: {
+      description:
+        "Enables / disables the rendering of the internal grid lines when cropping mode is activated",
+      type: "boolean",
+      default: "true",
+    },
+    ["cropMode.selection.enabledAnchors"]: {
+      description: "List of active anchors for cropping",
+      type: "WeaveImageCropAnchorPosition[]",
+      default:
+        "['top-left','top-center','top-right','middle-right','middle-left','bottom-left','bottom-center','bottom-right']",
+    },
+    ["cropMode.selection.borderStroke"]: {
+      description: "Crop anchor stroke color",
+      type: "string",
+      default: "#1a1aff",
+    },
+    ["cropMode.selection.borderStrokeWidth"]: {
+      description: "Crop anchor stroke width (px)",
+      type: "number",
+      default: "2",
+    },
+    ["cropMode.selection.anchorStyleFunc"]: {
+      description:
+        "Function that allows to fully customize an anchor, it receives the anchor to customize and it's position",
+      type: "(anchor: Konva.Rect, position: ) => void",
+    },
   }}
 />
 
@@ -146,11 +216,53 @@ const WEAVE_IMAGE_CROP_END_TYPE = {
   ["CANCEL"]: "cancel",
 };
 
+const WEAVE_IMAGE_CROP_ANCHOR_POSITION = {
+  ["TOP_LEFT"]: "top-left",
+  ["TOP_RIGHT"]: "top-right",
+  ["BOTTOM_LEFT"]: "bottom-left",
+  ["BOTTOM_RIGHT"]: "bottom-right",
+  ["TOP_CENTER"]: "top-center",
+  ["MIDDLE_LEFT"]: "middle-left",
+  ["MIDDLE_RIGHT"]: "middle-right",
+  ["BOTTOM_CENTER"]: "bottom-center",
+} as const;
+
 const WEAVE_IMAGE_DEFAULT_CONFIG: WeaveImageProperties = {
   performance: {
-    caching: false,
+    cache: {
+      enabled: false,
+    },
   },
   crossOrigin: "anonymous",
+  cropMode: {
+    gridLines: {
+      enabled: true,
+    },
+    selection: {
+      enabledAnchors: [
+        "top-left",
+        "top-center",
+        "top-right",
+        "middle-right",
+        "middle-left",
+        "bottom-left",
+        "bottom-center",
+        "bottom-right",
+      ],
+      borderStroke: "#1a1aff",
+      borderStrokeWidth: 2,
+      anchorStyleFunc: (anchor: Konva.Rect) => {
+        anchor.width(12);
+        anchor.height(12);
+        anchor.offsetX(6);
+        anchor.offsetY(6);
+        anchor.fill("white");
+        anchor.stroke("black");
+        anchor.strokeWidth(1);
+        anchor.cornerRadius(0);
+      },
+    },
+  },
 };
 ```
 
@@ -159,7 +271,7 @@ const WEAVE_IMAGE_DEFAULT_CONFIG: WeaveImageProperties = {
 ### triggerCrop
 
 ```ts
-triggerCrop(imageNode: Konva.Group): void
+triggerCrop(imageNode: Konva.Group, options: WeaveImageTriggerCropOptions): void
 ```
 
 Function that when is called triggers the image cropping on the specified node.

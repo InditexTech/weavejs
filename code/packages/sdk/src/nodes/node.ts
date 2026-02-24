@@ -883,6 +883,11 @@ export abstract class WeaveNode implements WeaveNodeBase {
 
   handleMouseOver(node: Konva.Node): boolean {
     const stage = this.instance.getStage();
+
+    if (stage?.isCmdCtrlPressed?.()) {
+      return false;
+    }
+
     const user = this.instance.getStore().getUser();
     const activeAction = this.instance.getActiveAction();
 
@@ -965,6 +970,12 @@ export abstract class WeaveNode implements WeaveNodeBase {
   }
 
   handleMouseout(node: Konva.Node) {
+    const stage = this.instance.getStage();
+
+    if (stage?.isCmdCtrlPressed?.()) {
+      return;
+    }
+
     const realNode = this.instance.getInstanceRecursive(node);
 
     if (realNode) {

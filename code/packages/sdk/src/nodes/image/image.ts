@@ -10,15 +10,18 @@ import {
 import { WeaveNode } from '../node';
 import {
   type ImageProps,
+  type WeaveImageCropAnchorPosition,
   type WeaveImageCropEndType,
   type WeaveImageNodeParams,
   type WeaveImageOnCropEndEvent,
   type WeaveImageOnCropStartEvent,
   type WeaveImageProperties,
   type WeaveImageState,
+  type WeaveImageTriggerCropOptions,
 } from './types';
 import { WeaveImageCrop } from './crop';
 import {
+  WEAVE_IMAGE_CROP_ANCHOR_POSITION,
   WEAVE_IMAGE_CROP_END_TYPE,
   WEAVE_IMAGE_DEFAULT_CONFIG,
   WEAVE_IMAGE_NODE_TYPE,
@@ -44,7 +47,12 @@ export class WeaveImageNode extends WeaveNode {
     this.tapStart = { x: 0, y: 0, time: 0 };
     this.lastTapTime = 0;
     this.config = mergeExceptArrays(WEAVE_IMAGE_DEFAULT_CONFIG, config);
+
     this.imageCrop = null;
+  }
+
+  getConfiguration(): WeaveImageProperties {
+    return this.config;
   }
 
   onRegister(): void {
@@ -53,14 +61,20 @@ export class WeaveImageNode extends WeaveNode {
     );
   }
 
-  triggerCrop(imageNode: Konva.Group): void {
+  triggerCrop(
+    imageNode: Konva.Group,
+    options: WeaveImageTriggerCropOptions
+  ): void {
     const stage = this.instance.getStage();
 
     if (imageNode.getAttrs().cropping ?? false) {
       return;
     }
 
-    if (!(this.isSelecting() && this.isNodeSelected(imageNode))) {
+    if (
+      !(this.isSelecting() && this.isNodeSelected(imageNode)) &&
+      !options.cmdCtrl.triggered
+    ) {
       return;
     }
 
@@ -105,10 +119,11 @@ export class WeaveImageNode extends WeaveNode {
         instance: image,
       });
       this.imageCrop = null;
-    });
+    }, options);
 
     this.instance.emitEvent<WeaveImageOnCropStartEvent>('onImageCropStart', {
       instance: image,
+      cmdCtrlTriggered: options.cmdCtrl.triggered,
     });
   }
 
@@ -194,6 +209,7 @@ export class WeaveImageNode extends WeaveNode {
       name: 'node',
       loadedImage: false,
       loadedImageError: false,
+      cropping: false,
       // ...(internalImageProps.dragStartOpacity && {
       //   dragStartOpacity: undefined,
       //   opacity: internalImageProps.dragStartOpacity,
@@ -212,7 +228,11 @@ export class WeaveImageNode extends WeaveNode {
     };
 
     image.triggerCrop = () => {
-      this.triggerCrop(image);
+      this.triggerCrop(image, {
+        cmdCtrl: {
+          triggered: false,
+        },
+      });
     };
 
     image.closeCrop = (type: WeaveImageCropEndType) => {
@@ -363,6 +383,64 @@ export class WeaveImageNode extends WeaveNode {
       }
     );
 
+    image.on('onCmdCtrlPressed', () => {
+      const transformer = this.getSelectionPlugin()?.getTransformer();
+
+      if (!transformer) {
+        return;
+      }
+
+      transformer.hide();
+
+      const utilityLayer = this.instance.getUtilityLayer();
+
+      if (!utilityLayer) {
+        return;
+      }
+
+      utilityLayer?.destroyChildren();
+
+      this.renderCropMode(utilityLayer, image);
+
+      utilityLayer?.show();
+    });
+
+    image.on('onCmdCtrlReleased', () => {
+      const transformer = this.getSelectionPlugin()?.getTransformer();
+
+      if (!transformer) {
+        return;
+      }
+
+      transformer.show();
+
+      const utilityLayer = this.instance.getUtilityLayer();
+
+      if (!utilityLayer) {
+        return;
+      }
+
+      utilityLayer?.destroyChildren();
+    });
+
+    image.on('onSelectionCleared', () => {
+      const transformer = this.getSelectionPlugin()?.getTransformer();
+
+      if (!transformer) {
+        return;
+      }
+
+      transformer.show();
+
+      const utilityLayer = this.instance.getUtilityLayer();
+
+      if (!utilityLayer) {
+        return;
+      }
+
+      utilityLayer?.destroyChildren();
+    });
+
     return image;
   }
 
@@ -379,6 +457,210 @@ export class WeaveImageNode extends WeaveNode {
         pixelRatio: this.config.performance.cache.pixelRatio,
       });
     }
+  }
+
+  private renderCropBorder(layer: Konva.Layer, node: Konva.Group) {
+    const stage = this.instance.getStage();
+    const stageScale = stage.scaleX();
+
+    const transform = node.getAbsoluteTransform().copy();
+
+    const w = node.width();
+    const h = node.height();
+
+    const offsetX = node.offsetX();
+    const offsetY = node.offsetY();
+
+    const localCorners = [
+      { x: 0, y: 0 }, // top-left
+      { x: w, y: 0 }, // top-right
+      { x: w, y: h }, // bottom-right
+      { x: 0, y: h }, // bottom-left
+    ];
+
+    const absoluteCorners = localCorners.map((p) =>
+      transform.point({
+        x: p.x - offsetX,
+        y: p.y - offsetY,
+      })
+    );
+
+    const rect = new Konva.Rect({
+      width: absoluteCorners[1].x - absoluteCorners[0].x,
+      height: absoluteCorners[2].y - absoluteCorners[0].y,
+      fill: 'transparent',
+      strokeWidth: 2,
+      stroke: '#1a1aff',
+      draggable: false,
+      listening: false,
+      rotation: node.rotation(),
+    });
+
+    layer.add(rect);
+
+    rect.setAbsolutePosition(absoluteCorners[0]);
+
+    rect.scale({
+      x: 1 / stageScale,
+      y: 1 / stageScale,
+    });
+
+    stage.on('scaleXChange scaleYChange', () => {
+      const scale = stage.scaleX();
+
+      rect.scale({
+        x: 1 / scale,
+        y: 1 / scale,
+      });
+    });
+  }
+
+  private renderCropAnchor(
+    position: WeaveImageCropAnchorPosition,
+    node: Konva.Group,
+    layer: Konva.Layer,
+    onClick: () => void
+  ) {
+    const transform = node.getAbsoluteTransform().copy();
+
+    const stage = this.instance.getStage();
+    const stageScale = stage.scaleX();
+
+    const w = node.width();
+    const h = node.height();
+
+    const offsetX = node.offsetX();
+    const offsetY = node.offsetY();
+
+    const localCorners = [
+      { x: 0, y: 0 }, // top-left
+      { x: w, y: 0 }, // top-right
+      { x: w, y: h }, // bottom-right
+      { x: 0, y: h }, // bottom-left
+      { x: w / 2, y: 0 }, // top-center
+      { x: w, y: h / 2 }, // middle-right
+      { x: 0, y: h / 2 }, // middle-left
+      { x: w / 2, y: h }, // bottom-center
+    ];
+
+    const absoluteCorners = localCorners.map((p) =>
+      transform.point({
+        x: p.x - offsetX,
+        y: p.y - offsetY,
+      })
+    );
+
+    const anchor = new Konva.Rect({
+      draggable: false,
+      rotation: node.rotation(),
+    });
+
+    this.config.cropMode.selection.anchorStyleFunc(anchor, position);
+
+    layer.add(anchor);
+
+    anchor.scale({
+      x: 1 / stageScale,
+      y: 1 / stageScale,
+    });
+
+    stage.on('scaleXChange scaleYChange', () => {
+      const scale = stage.scaleX();
+
+      anchor.scale({
+        x: 1 / scale,
+        y: 1 / scale,
+      });
+    });
+
+    if (position === WEAVE_IMAGE_CROP_ANCHOR_POSITION.TOP_LEFT) {
+      anchor.setAbsolutePosition(absoluteCorners[0]);
+    }
+    if (position === WEAVE_IMAGE_CROP_ANCHOR_POSITION.TOP_RIGHT) {
+      anchor.setAbsolutePosition(absoluteCorners[1]);
+    }
+    if (position === WEAVE_IMAGE_CROP_ANCHOR_POSITION.BOTTOM_RIGHT) {
+      anchor.setAbsolutePosition(absoluteCorners[2]);
+    }
+    if (position === WEAVE_IMAGE_CROP_ANCHOR_POSITION.BOTTOM_LEFT) {
+      anchor.setAbsolutePosition(absoluteCorners[3]);
+    }
+    if (position === WEAVE_IMAGE_CROP_ANCHOR_POSITION.TOP_CENTER) {
+      anchor.setAbsolutePosition(absoluteCorners[4]);
+    }
+    if (position === WEAVE_IMAGE_CROP_ANCHOR_POSITION.MIDDLE_RIGHT) {
+      anchor.setAbsolutePosition(absoluteCorners[5]);
+    }
+    if (position === WEAVE_IMAGE_CROP_ANCHOR_POSITION.MIDDLE_LEFT) {
+      anchor.setAbsolutePosition(absoluteCorners[6]);
+    }
+    if (position === WEAVE_IMAGE_CROP_ANCHOR_POSITION.BOTTOM_CENTER) {
+      anchor.setAbsolutePosition(absoluteCorners[7]);
+    }
+
+    anchor.on('pointerover', () => {
+      if (
+        position === WEAVE_IMAGE_CROP_ANCHOR_POSITION.BOTTOM_LEFT ||
+        position === WEAVE_IMAGE_CROP_ANCHOR_POSITION.TOP_RIGHT
+      ) {
+        this.instance.getStage().container().style.cursor = 'nesw-resize';
+      }
+      if (
+        position === WEAVE_IMAGE_CROP_ANCHOR_POSITION.TOP_LEFT ||
+        position === WEAVE_IMAGE_CROP_ANCHOR_POSITION.BOTTOM_RIGHT
+      ) {
+        this.instance.getStage().container().style.cursor = 'nwse-resize';
+      }
+      if (
+        position === WEAVE_IMAGE_CROP_ANCHOR_POSITION.MIDDLE_RIGHT ||
+        position === WEAVE_IMAGE_CROP_ANCHOR_POSITION.MIDDLE_LEFT
+      ) {
+        this.instance.getStage().container().style.cursor = 'ew-resize';
+      }
+      if (
+        position === WEAVE_IMAGE_CROP_ANCHOR_POSITION.TOP_CENTER ||
+        position === WEAVE_IMAGE_CROP_ANCHOR_POSITION.BOTTOM_CENTER
+      ) {
+        this.instance.getStage().container().style.cursor = 'ns-resize';
+      }
+    });
+
+    anchor.on('pointerdown', () => {
+      onClick();
+    });
+
+    return anchor;
+  }
+
+  private renderCropAnchors(layer: Konva.Layer, node: Konva.Group) {
+    const anchors = [
+      WEAVE_IMAGE_CROP_ANCHOR_POSITION.TOP_LEFT,
+      WEAVE_IMAGE_CROP_ANCHOR_POSITION.TOP_RIGHT,
+      WEAVE_IMAGE_CROP_ANCHOR_POSITION.BOTTOM_RIGHT,
+      WEAVE_IMAGE_CROP_ANCHOR_POSITION.BOTTOM_LEFT,
+      WEAVE_IMAGE_CROP_ANCHOR_POSITION.TOP_CENTER,
+      WEAVE_IMAGE_CROP_ANCHOR_POSITION.MIDDLE_RIGHT,
+      WEAVE_IMAGE_CROP_ANCHOR_POSITION.BOTTOM_CENTER,
+      WEAVE_IMAGE_CROP_ANCHOR_POSITION.MIDDLE_LEFT,
+    ];
+
+    for (const anchor of anchors) {
+      if (this.config.cropMode.selection.enabledAnchors.includes(anchor)) {
+        this.renderCropAnchor(anchor, node, layer, () => {
+          this.triggerCrop(node, {
+            cmdCtrl: {
+              triggered: true,
+              corner: anchor,
+            },
+          });
+        });
+      }
+    }
+  }
+
+  renderCropMode(layer: Konva.Layer, node: Konva.Group): void {
+    this.renderCropBorder(layer, node);
+    this.renderCropAnchors(layer, node);
   }
 
   onUpdate(
@@ -510,12 +792,17 @@ export class WeaveImageNode extends WeaveNode {
     imageId: string,
     imageURL: string,
     {
+      node,
       onLoad,
       onError,
-    }: { onLoad: () => void; onError: (error: string | Event) => void }
+    }: {
+      onLoad: () => void;
+      onError: (error: string | Event) => void;
+      node?: Konva.Group;
+    }
   ): void {
     const realImageURL =
-      this.config.urlTransformer?.(imageURL ?? '') ?? imageURL;
+      this.config.urlTransformer?.(imageURL ?? '', node) ?? imageURL;
 
     this.imageSource[imageId] = Konva.Util.createImageElement();
     this.imageSource[imageId].crossOrigin = this.config.crossOrigin;
@@ -566,12 +853,13 @@ export class WeaveImageNode extends WeaveNode {
       | undefined;
 
     const realImageURL =
-      this.config.urlTransformer?.(imageProps.imageURL ?? '') ??
+      this.config.urlTransformer?.(imageProps.imageURL ?? '', image) ??
       imageProps.imageURL;
 
     this.loadAsyncElement(id);
 
     this.preloadImage(id, realImageURL ?? '', {
+      node: image,
       onLoad: () => {
         if (image && imagePlaceholder && internalImage) {
           image.setAttrs({
