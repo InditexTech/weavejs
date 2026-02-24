@@ -166,6 +166,10 @@ export class WeaveStageNode extends WeaveNode {
       return;
     }
 
+    if (this.instance.isServerSide()) {
+      return;
+    }
+
     window.addEventListener('keydown', (e) => {
       if (e.ctrlKey || e.metaKey) {
         this.isCmdCtrlPressed = true;
