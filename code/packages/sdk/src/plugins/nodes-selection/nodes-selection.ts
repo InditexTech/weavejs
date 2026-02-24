@@ -982,7 +982,7 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
     const dist = Math.hypot(dx, dy);
 
     const DOUBLE_TAP_DISTANCE = 10; // px
-    const DOUBLE_TAP_TIME = 300; // ms
+    const DOUBLE_TAP_TIME = 400; // ms
 
     this.isDoubleTap = false;
 
@@ -1513,9 +1513,11 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
     // Check if clicked on transformer
     if (nodeTargeted.getParent() instanceof Konva.Transformer) {
       const mousePos = stage.getPointerPosition();
-      const intersections = stage.getAllIntersections(mousePos);
+      const intersections = stage.getAllIntersections(
+        mousePos ?? { x: 0, y: 0 }
+      );
       const nodesIntersected = intersections.filter(
-        (ele) => ele.getAttrs().nodeType
+        (ele) => ele.getAttrs().nodeType !== undefined
       );
 
       let targetNode = null;

@@ -353,7 +353,6 @@ export class WeaveStrokeToolAction extends WeaveAction {
           hitStrokeWidth: 16,
         });
         delete finalLine.props.dragBoundFunc;
-        console.log('node', finalLine);
         this.instance.addNode(finalLine, this.container?.getAttrs().id);
 
         this.instance.emitEvent<WeaveStrokeToolActionOnAddedEvent>(

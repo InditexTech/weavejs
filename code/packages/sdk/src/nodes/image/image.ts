@@ -71,10 +71,7 @@ export class WeaveImageNode extends WeaveNode {
       return;
     }
 
-    if (
-      !(this.isSelecting() && this.isNodeSelected(imageNode)) &&
-      !options.cmdCtrl.triggered
-    ) {
+    if (!(this.isSelecting() && this.isNodeSelected(imageNode))) {
       return;
     }
 
@@ -337,24 +334,33 @@ export class WeaveImageNode extends WeaveNode {
         image: imageSource,
         visible: true,
       });
+
+      let sourceImageWidth = this.imageSource[id].width;
+      let sourceImageHeight = this.imageSource[id].height;
+      if (image.getAttrs().imageInfo) {
+        sourceImageWidth = image.getAttrs().imageInfo.width;
+        sourceImageHeight = image.getAttrs().imageInfo.height;
+      }
+
       image.setAttr('imageInfo', {
-        width: this.imageSource[id].width,
-        height: this.imageSource[id].height,
+        width: sourceImageWidth,
+        height: sourceImageHeight,
       });
       internalImage.setAttr('imageInfo', {
-        width: this.imageSource[id].width,
-        height: this.imageSource[id].height,
+        width: sourceImageWidth,
+        height: sourceImageHeight,
       });
       if (!image.getAttrs().uncroppedImage) {
         image.setAttr('uncroppedImage', {
-          width: this.imageSource[id].width,
-          height: this.imageSource[id].height,
+          width: sourceImageWidth,
+          height: sourceImageHeight,
         });
       }
       this.imageState[id] = {
         loaded: true,
         error: false,
       };
+
       this.updateImageCrop(image);
     } else {
       this.updatePlaceholderSize(image, imagePlaceholder);
@@ -792,7 +798,6 @@ export class WeaveImageNode extends WeaveNode {
     imageId: string,
     imageURL: string,
     {
-      node,
       onLoad,
       onError,
     }: {
@@ -801,9 +806,6 @@ export class WeaveImageNode extends WeaveNode {
       node?: Konva.Group;
     }
   ): void {
-    const realImageURL =
-      this.config.urlTransformer?.(imageURL ?? '', node) ?? imageURL;
-
     this.imageSource[imageId] = Konva.Util.createImageElement();
     this.imageSource[imageId].crossOrigin = this.config.crossOrigin;
     this.imageSource[imageId].onerror = (error) => {
@@ -833,8 +835,8 @@ export class WeaveImageNode extends WeaveNode {
     };
 
     try {
-      if (realImageURL) {
-        this.imageSource[imageId].src = realImageURL;
+      if (imageURL) {
+        this.imageSource[imageId].src = imageURL;
       }
     } catch (ex) {
       console.error(ex);
@@ -859,7 +861,6 @@ export class WeaveImageNode extends WeaveNode {
     this.loadAsyncElement(id);
 
     this.preloadImage(id, realImageURL ?? '', {
-      node: image,
       onLoad: () => {
         if (image && imagePlaceholder && internalImage) {
           image.setAttrs({
@@ -885,15 +886,23 @@ export class WeaveImageNode extends WeaveNode {
             image: imageSource,
             visible: true,
           });
+
+          let sourceImageWidth = this.imageSource[id].width;
+          let sourceImageHeight = this.imageSource[id].height;
+          if (image.getAttrs().imageInfo) {
+            sourceImageWidth = image.getAttrs().imageInfo.width;
+            sourceImageHeight = image.getAttrs().imageInfo.height;
+          }
+
           internalImage.setAttr('imageInfo', {
-            width: this.imageSource[id].width,
-            height: this.imageSource[id].height,
+            width: sourceImageWidth,
+            height: sourceImageHeight,
           });
           internalImage.zIndex(0);
 
           image.setAttr('imageInfo', {
-            width: this.imageSource[id].width,
-            height: this.imageSource[id].height,
+            width: sourceImageWidth,
+            height: sourceImageHeight,
           });
           // this.scaleReset(image);
 
@@ -1003,6 +1012,13 @@ export class WeaveImageNode extends WeaveNode {
       imageAttrs.cropInfo &&
       imageAttrs.uncroppedImage
     ) {
+      const originalImageInfo = imageAttrs.imageInfo;
+      const actualImageInfo = this.imageSource[imageAttrs.id ?? ''];
+
+      const originalActualDiffScale = originalImageInfo
+        ? actualImageInfo.width / originalImageInfo.width
+        : 1;
+
       const actualScale =
         imageAttrs.uncroppedImage.width / imageAttrs.imageInfo.width;
       const cropScale = imageAttrs.cropInfo
@@ -1014,10 +1030,12 @@ export class WeaveImageNode extends WeaveNode {
       internalImage.scaleX(1);
       internalImage.scaleY(1);
       internalImage.crop({
-        x: imageAttrs.cropInfo.x / cropScale,
-        y: imageAttrs.cropInfo.y / cropScale,
-        width: imageAttrs.cropInfo.width / cropScale,
-        height: imageAttrs.cropInfo.height / cropScale,
+        x: (imageAttrs.cropInfo.x / cropScale) * originalActualDiffScale,
+        y: (imageAttrs.cropInfo.y / cropScale) * originalActualDiffScale,
+        width:
+          (imageAttrs.cropInfo.width / cropScale) * originalActualDiffScale,
+        height:
+          (imageAttrs.cropInfo.height / cropScale) * originalActualDiffScale,
       });
       internalImage.width(
         imageAttrs.cropSize.width * (actualScale / cropScale)
