@@ -1061,6 +1061,10 @@ export class Weave {
     }
   }
 
+  getRealSelectedNode = (nodeTarget: Konva.Node) => {
+    return this.targetingManager.getRealSelectedNode(nodeTarget);
+  };
+
   // CLONING MANAGEMENT METHODS PROXIES
 
   getCloningManager(): WeaveCloningManager {

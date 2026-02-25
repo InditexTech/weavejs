@@ -73,7 +73,7 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
   protected taps: number;
   protected isDoubleTap: boolean;
   protected tapStart: { x: number; y: number; time: number } | null;
-  protected lastTapTime: number;
+  protected tapTimeoutId: NodeJS.Timeout | null;
   private x1!: number;
   private y1!: number;
   private x2!: number;
@@ -110,8 +110,7 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
     this.isCtrlMetaPressed = false;
     this.isSpaceKeyPressed = false;
     this.isDoubleTap = false;
-    this.tapStart = { x: 0, y: 0, time: 0 };
-    this.lastTapTime = 0;
+    this.tapStart = null;
     this.active = false;
     this.didMove = false;
     this.selecting = false;
@@ -119,6 +118,7 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
     this.enabled = false;
     this.pointers = {};
     this.panLoopId = null;
+    this.tapTimeoutId = null;
   }
 
   getName(): string {
@@ -725,10 +725,6 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
       }
     );
 
-    this.instance.addEventListener('onStateChange', () => {
-      this.triggerSelectedNodesEvent();
-    });
-
     this.instance.addEventListener(
       'onNodeRemoved',
       (node: NodeSerializable) => {
@@ -923,6 +919,12 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
   private setTapStart(
     e: KonvaEventObject<PointerEvent | DragEvent, Stage | Konva.Transformer>
   ): void {
+    this.taps = this.taps + 1;
+
+    if (this.tapStart) {
+      return;
+    }
+
     this.tapStart = {
       x: e.evt.clientX,
       y: e.evt.clientY,
@@ -977,29 +979,31 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
     }
 
     const now = performance.now();
+
     const dx = e.evt.clientX - this.tapStart.x;
     const dy = e.evt.clientY - this.tapStart.y;
     const dist = Math.hypot(dx, dy);
 
     const DOUBLE_TAP_DISTANCE = 10; // px
-    const DOUBLE_TAP_TIME = 400; // ms
+    const DOUBLE_TAP_TIME = 500; // ms
 
-    this.isDoubleTap = false;
+    if (this.tapTimeoutId) {
+      clearTimeout(this.tapTimeoutId);
+    }
+
+    this.tapTimeoutId = setTimeout(() => {
+      this.taps = 0;
+      this.tapStart = null;
+    }, DOUBLE_TAP_TIME + 5);
 
     if (
-      this.taps >= 1 &&
-      now - this.lastTapTime < DOUBLE_TAP_TIME &&
+      this.taps > 1 &&
+      now - this.tapStart.time < DOUBLE_TAP_TIME &&
       dist < DOUBLE_TAP_DISTANCE
     ) {
       this.taps = 0;
-      this.lastTapTime = 0;
-      this.tapStart = { x: 0, y: 0, time: 0 };
+      this.tapStart = null;
       this.isDoubleTap = true;
-    } else {
-      this.setTapStart(e);
-      this.taps = this.taps + 1;
-      this.lastTapTime = now;
-      this.isDoubleTap = false;
     }
   }
 
@@ -1237,9 +1241,6 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
       );
 
       if (this.isDoubleTap) {
-        this.taps = 0;
-        this.lastTapTime = 0;
-        this.tapStart = { x: 0, y: 0, time: 0 };
         this.hideSelectorArea();
         this.handleClickOrTap(e);
         return;
@@ -1510,29 +1511,15 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
         ? selectedGroup
         : e.target;
 
-    // Check if clicked on transformer
-    if (nodeTargeted.getParent() instanceof Konva.Transformer) {
-      const mousePos = stage.getPointerPosition();
-      const intersections = stage.getAllIntersections(
-        mousePos ?? { x: 0, y: 0 }
-      );
-      const nodesIntersected = intersections.filter(
-        (ele) => ele.getAttrs().nodeType !== undefined
-      );
-
-      let targetNode = null;
-      if (nodesIntersected.length > 0) {
-        targetNode = this.instance.getInstanceRecursive(
-          nodesIntersected[nodesIntersected.length - 1]
-        );
-      }
-
-      if (targetNode && targetNode.getAttrs().nodeType) {
-        nodeTargeted = targetNode;
-      }
+    if (e.target === this.instance.getStage()) {
+      this.getNodesSelectionFeedbackPlugin()?.cleanupSelectedHalos();
+      return;
     }
 
+    nodeTargeted = this.instance.getRealSelectedNode(nodeTargeted);
+
     if (!nodeTargeted.getAttrs().nodeType) {
+      this.isDoubleTap = false;
       return;
     }
 

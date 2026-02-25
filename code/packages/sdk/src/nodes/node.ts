@@ -316,6 +316,7 @@ export abstract class WeaveNode implements WeaveNodeBase {
         node.draggable(true);
         return;
       }
+
       node.draggable(false);
     };
 
@@ -1213,33 +1214,7 @@ export abstract class WeaveNode implements WeaveNodeBase {
   }
 
   private getRealSelectedNode(nodeTarget: Konva.Node) {
-    const stage = this.instance.getStage();
-
-    let realNodeTarget: Konva.Node = nodeTarget;
-
-    if (nodeTarget.getParent() instanceof Konva.Transformer) {
-      const mousePos = stage.getPointerPosition();
-      const intersections = stage.getAllIntersections(mousePos);
-      const nodesIntersected = intersections.filter(
-        (ele) => ele.getAttrs().nodeType
-      );
-
-      if (nodesIntersected.length > 0) {
-        realNodeTarget = this.instance.getInstanceRecursive(
-          nodesIntersected[nodesIntersected.length - 1]
-        );
-      }
-    }
-
-    if (realNodeTarget.getAttrs().nodeId) {
-      const realNode = stage.findOne(`#${realNodeTarget.getAttrs().nodeId}`);
-
-      if (realNode) {
-        realNodeTarget = realNode;
-      }
-    }
-
-    return realNodeTarget;
+    return this.instance.getRealSelectedNode(nodeTarget);
   }
 
   getNodesSelectionFeedbackPlugin() {
