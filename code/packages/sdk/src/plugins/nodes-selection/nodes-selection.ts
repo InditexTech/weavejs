@@ -1004,7 +1004,6 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
       this.taps = 0;
       this.tapStart = null;
       this.isDoubleTap = true;
-      return;
     }
   }
 
