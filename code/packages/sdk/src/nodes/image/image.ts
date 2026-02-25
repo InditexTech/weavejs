@@ -25,6 +25,7 @@ import {
   WEAVE_IMAGE_CROP_END_TYPE,
   WEAVE_IMAGE_DEFAULT_CONFIG,
   WEAVE_IMAGE_NODE_TYPE,
+  WEAVE_STAGE_IMAGE_CROPPING_MODE,
 } from './constants';
 import { WEAVE_STAGE_DEFAULT_MODE } from '../stage/constants';
 import { mergeExceptArrays } from '@/utils';
@@ -84,7 +85,7 @@ export class WeaveImageNode extends WeaveNode {
       return;
     }
 
-    stage.mode('cropping');
+    stage.mode(WEAVE_STAGE_IMAGE_CROPPING_MODE);
 
     const image = stage.findOne(`#${imageNode.getAttrs().id}`) as
       | Konva.Group

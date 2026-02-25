@@ -72,6 +72,7 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
   private isSpaceKeyPressed: boolean;
   protected taps: number;
   protected isDoubleTap: boolean;
+  protected previousTap: { x: number; y: number; time: number } | null;
   protected tapStart: { x: number; y: number; time: number } | null;
   protected tapTimeoutId: NodeJS.Timeout | null;
   private x1!: number;
@@ -111,6 +112,7 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
     this.isSpaceKeyPressed = false;
     this.isDoubleTap = false;
     this.tapStart = null;
+    this.previousTap = null;
     this.active = false;
     this.didMove = false;
     this.selecting = false;
@@ -807,7 +809,7 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
       })
       .filter((node) => typeof node !== 'undefined');
     this.instance.removeNodes(mappedSelectedNodes);
-    this.tr.nodes([]);
+    this.selectNone();
     this.triggerSelectedNodesEvent();
   }
 
@@ -817,7 +819,7 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
     this.x2 = stage.getRelativePointerPosition()?.x ?? 0;
     this.y2 = stage.getRelativePointerPosition()?.y ?? 0;
 
-    this.getTransformer().nodes([]);
+    this.selectNone();
 
     this.selectionRectangle.setAttrs({
       visible: true,
@@ -921,10 +923,6 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
   ): void {
     this.taps = this.taps + 1;
 
-    if (this.tapStart) {
-      return;
-    }
-
     this.tapStart = {
       x: e.evt.clientX,
       y: e.evt.clientY,
@@ -974,18 +972,18 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
   }
 
   private checkDoubleTap(e: KonvaEventObject<PointerEvent, Stage>): void {
-    if (!this.tapStart) {
+    if (!this.previousTap) {
       return;
     }
 
     const now = performance.now();
 
-    const dx = e.evt.clientX - this.tapStart.x;
-    const dy = e.evt.clientY - this.tapStart.y;
+    const dx = e.evt.clientX - this.previousTap.x;
+    const dy = e.evt.clientY - this.previousTap.y;
     const dist = Math.hypot(dx, dy);
 
     const DOUBLE_TAP_DISTANCE = 10; // px
-    const DOUBLE_TAP_TIME = 500; // ms
+    const DOUBLE_TAP_TIME = 300; // ms
 
     if (this.tapTimeoutId) {
       clearTimeout(this.tapTimeoutId);
@@ -998,7 +996,7 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
 
     if (
       this.taps > 1 &&
-      now - this.tapStart.time < DOUBLE_TAP_TIME &&
+      now - this.previousTap.time < DOUBLE_TAP_TIME &&
       dist < DOUBLE_TAP_DISTANCE
     ) {
       this.taps = 0;
@@ -1142,7 +1140,7 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
         }
       }
 
-      this.tr.nodes([]);
+      this.selectNone();
 
       this.instance.emitEvent<WeaveNodesSelectionPluginOnSelectionStateEvent>(
         'onSelectionState',
@@ -1217,6 +1215,12 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
       const moved = this.checkMoved(e);
       this.checkDoubleTap(e);
       delete this.pointers[e.evt.pointerId];
+
+      this.previousTap = this.tapStart;
+
+      if (stage.mode() !== WEAVE_STAGE_DEFAULT_MODE) {
+        return;
+      }
 
       if (stage.mode() === WEAVE_STAGE_DEFAULT_MODE) {
         this.getNodesEdgeSnappingPlugin()?.cleanupGuidelines();
@@ -1436,6 +1440,12 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
   }
 
   protected syncSelection(): void {
+    const stageMode = this.instance.getStage().mode();
+
+    if (![WEAVE_STAGE_DEFAULT_MODE].includes(stageMode)) {
+      return;
+    }
+
     const newSelectedNodes = [];
 
     const actualSelectedNodes = this.tr.nodes();

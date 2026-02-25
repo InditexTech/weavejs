@@ -23,6 +23,7 @@ export class WeaveStageNode extends WeaveNode {
   onRender(props: WeaveElementAttributes): WeaveElementInstance {
     const stage = new Konva.Stage({
       ...props,
+      mode: 'default',
     });
 
     setupUpscaleStage(this.instance, stage);

@@ -16,6 +16,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - [#937](https://github.com/InditexTech/weavejs/issues/937) Improve performance of selection
+- [#938](https://github.com/InditexTech/weavejs/issues/938) Improve performance of text node when editing
 
 ## [2.22.0] - 2026-02-24
 
