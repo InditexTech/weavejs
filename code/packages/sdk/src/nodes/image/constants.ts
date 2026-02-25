@@ -7,6 +7,8 @@ import type { WeaveImageProperties } from './types';
 
 export const WEAVE_IMAGE_NODE_TYPE = 'image';
 
+export const WEAVE_STAGE_IMAGE_CROPPING_MODE = 'image-cropping';
+
 export const WEAVE_IMAGE_CROP_END_TYPE = {
   ['ACCEPT']: 'accept',
   ['CANCEL']: 'cancel',
