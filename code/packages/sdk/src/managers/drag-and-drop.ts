@@ -9,7 +9,8 @@ export class WeaveDragAndDropManager {
   private readonly instance: Weave;
   private readonly logger: Logger;
   private dragStarted!: string | null;
-  private properties: unknown | null;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  private properties: any;
 
   constructor(instance: Weave) {
     this.instance = instance;

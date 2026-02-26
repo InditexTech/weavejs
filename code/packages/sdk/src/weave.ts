@@ -1419,6 +1419,6 @@ export class Weave {
   }
 
   getDragProperties<T>(): T | null {
-    return this.dragAndDropManager.getDragProperties() as T | null;
+    return this.dragAndDropManager.getDragProperties();
   }
 }
