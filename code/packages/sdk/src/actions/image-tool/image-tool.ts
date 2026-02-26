@@ -40,8 +40,6 @@ export class WeaveImageToolAction extends WeaveAction {
   protected imageURL: string | null;
   protected clickPoint: Konva.Vector2d | null;
   protected forceMainContainer: boolean = false;
-  protected dragAndDropProperties: WeaveImageToolDragAndDropProperties | null =
-    null;
   protected cancelAction!: () => void;
   onPropsChange = undefined;
   update = undefined;
@@ -76,21 +74,25 @@ export class WeaveImageToolAction extends WeaveAction {
   onInit(): void {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     this.instance.addEventListener('onStageDrop', (e: any) => {
-      if (this.dragAndDropProperties?.imageURL) {
+      const dragId = this.instance.getDragStartedId();
+      const dragProperties =
+        this.instance.getDragProperties<WeaveImageToolDragAndDropProperties>();
+
+      if (dragProperties && dragId === IMAGE_TOOL_ACTION_NAME) {
         this.instance.getStage().setPointersPositions(e);
         const position: Konva.Vector2d | null | undefined =
           getPositionRelativeToContainerOnPosition(this.instance);
 
         this.instance.triggerAction(IMAGE_TOOL_ACTION_NAME, {
-          imageURL: this.dragAndDropProperties.imageURL,
-          ...(this.dragAndDropProperties.imageId && {
-            imageId: this.dragAndDropProperties.imageId,
+          imageURL: dragProperties.imageURL,
+          ...(dragProperties.imageId && {
+            imageId: dragProperties.imageId,
           }),
-          ...(this.dragAndDropProperties.imageWidth && {
-            imageWidth: this.dragAndDropProperties.imageWidth,
+          ...(dragProperties.imageWidth && {
+            imageWidth: dragProperties.imageWidth,
           }),
-          ...(this.dragAndDropProperties.imageHeight && {
-            imageHeight: this.dragAndDropProperties.imageHeight,
+          ...(dragProperties.imageHeight && {
+            imageHeight: dragProperties.imageHeight,
           }),
           position,
         });
@@ -488,7 +490,7 @@ export class WeaveImageToolAction extends WeaveAction {
 
     stage.container().style.cursor = 'default';
 
-    this.dragAndDropProperties = null;
+    this.instance.endDrag(IMAGE_TOOL_ACTION_NAME);
 
     this.initialCursor = null;
     this.imageId = null;
@@ -517,6 +519,9 @@ export class WeaveImageToolAction extends WeaveAction {
   }
 
   setDragAndDropProperties(properties: WeaveImageToolDragAndDropProperties) {
-    this.dragAndDropProperties = properties;
+    this.instance.startDrag(IMAGE_TOOL_ACTION_NAME);
+    this.instance.setDragProperties<WeaveImageToolDragAndDropProperties>(
+      properties
+    );
   }
 }

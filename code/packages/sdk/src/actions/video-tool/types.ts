@@ -23,11 +23,6 @@ export type WeaveVideoToolActionTriggerParams = {
   forceMainContainer?: boolean;
 };
 
-export type WeaveVideoToolActionTriggerVideoParams = {
-  videoPlaceholderURL: string;
-  videoURL: string;
-};
-
 export type WeaveVideoToolActionTriggerReturn =
   | {
       finishUploadCallback: (
@@ -41,4 +36,9 @@ export type WeaveVideoToolActionOnAddingEvent = { videoURL: string };
 export type WeaveVideoToolActionOnAddedEvent = {
   videoURL: string;
   nodeId: string;
+};
+
+export type WeaveVideoToolDragAndDropProperties = {
+  videoId: string;
+  videoParams: WeaveVideoToolDragParams;
 };
