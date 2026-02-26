@@ -77,6 +77,11 @@ type WeaveImageProperties = {
   performance: {
     cache: WeaveImageCache;
   };
+  style: {
+    placeholder: {
+      fill: string;
+    };
+  };
   crossOrigin: ImageCrossOrigin;
   transform?: WeaveNodeTransformerProperties;
   urlTransformer?: WeaveImageURLTransformerFunction;
@@ -157,8 +162,14 @@ For `WeaveImageProperties`:
     },
     ["performance.cache.pixelRatio"]: {
       description:
-        "Pixel ratio of the generated cache image, recommended value is 4",
+        "Pixel ratio of the generated cache image, recommended value is 2.",
       type: "number",
+    },
+    ["style.placeholder.fill"]: {
+      description:
+        "Fill color of the placeholder rectangle to paint while the image is loaded.",
+      type: "string",
+      default: "#aaaaaa",
     },
     ["crossOrigin"]: {
       description:
@@ -236,6 +247,11 @@ const WEAVE_IMAGE_DEFAULT_CONFIG: WeaveImageProperties = {
   performance: {
     cache: {
       enabled: false,
+    },
+  },
+  style: {
+    placeholder: {
+      fill: "#aaaaaa",
     },
   },
   crossOrigin: "anonymous",
