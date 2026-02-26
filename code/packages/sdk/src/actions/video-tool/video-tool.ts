@@ -31,8 +31,6 @@ export class WeaveVideoToolAction extends WeaveAction {
   protected videoParams: WeaveVideoToolDragParams | null;
   protected clickPoint: Konva.Vector2d | null;
   protected forceMainContainer: boolean = false;
-  protected dragAndDropProperties: WeaveVideoToolDragAndDropProperties | null =
-    null;
   protected cancelAction!: () => void;
   onPropsChange = undefined;
   update = undefined;
@@ -74,16 +72,18 @@ export class WeaveVideoToolAction extends WeaveAction {
 
   onInit(): void {
     this.instance.addEventListener('onStageDrop', (e) => {
-      if (this.dragAndDropProperties) {
+      const dragId = this.instance.getDragStartedId();
+      const dragProperties =
+        this.instance.getDragProperties<WeaveVideoToolDragAndDropProperties>();
+
+      if (dragProperties && dragId === VIDEO_TOOL_ACTION_NAME) {
         this.instance.getStage().setPointersPositions(e);
         const position: Konva.Vector2d | null | undefined =
           getPositionRelativeToContainerOnPosition(this.instance);
 
-        console.log('Drop position relative to container: ', position);
-
         this.instance.triggerAction(VIDEO_TOOL_ACTION_NAME, {
-          videoId: this.dragAndDropProperties.videoId,
-          videoParams: this.dragAndDropProperties.videoParams,
+          videoId: dragProperties.videoId,
+          videoParams: dragProperties.videoParams,
           position,
         });
       }
@@ -239,7 +239,6 @@ export class WeaveVideoToolAction extends WeaveAction {
     }
 
     if (params?.videoParams) {
-      console.log('Triggering video adding with params: ', params.videoParams);
       this.updateProps({
         width: params.videoParams.width,
         height: params.videoParams.height,
@@ -287,6 +286,8 @@ export class WeaveVideoToolAction extends WeaveAction {
 
   setDragAndDropProperties(properties: WeaveVideoToolDragAndDropProperties) {
     this.instance.startDrag(VIDEO_TOOL_ACTION_NAME);
-    this.dragAndDropProperties = properties;
+    this.instance.setDragProperties<WeaveVideoToolDragAndDropProperties>(
+      properties
+    );
   }
 }

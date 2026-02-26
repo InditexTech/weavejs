@@ -9,12 +9,14 @@ export class WeaveDragAndDropManager {
   private instance: Weave;
   private logger: Logger;
   private dragStarted!: string | null;
+  private properties: unknown | null;
 
   constructor(instance: Weave) {
     this.instance = instance;
     this.logger = this.instance.getChildLogger('drag-and-drop-manager');
     this.logger.debug('Drag and drop manager created');
     this.dragStarted = null;
+    this.properties = null;
   }
 
   getDragStartedId(): string | null {
@@ -31,6 +33,21 @@ export class WeaveDragAndDropManager {
     }
 
     this.dragStarted = id;
+    this.properties = null;
+  }
+
+  getDragProperties<T>(): T | null {
+    return this.properties as T | null;
+  }
+
+  setDragProperties<T>(properties: T) {
+    if (this.dragStarted === null) {
+      throw new Error(
+        'Trying to set drag and drop properties without starting drag'
+      );
+    }
+
+    this.properties = properties;
   }
 
   endDrag(id: string) {
@@ -41,5 +58,6 @@ export class WeaveDragAndDropManager {
     }
 
     this.dragStarted = null;
+    this.properties = null;
   }
 }

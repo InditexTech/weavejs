@@ -1413,4 +1413,12 @@ export class Weave {
   endDrag(id: string): void {
     this.dragAndDropManager.endDrag(id);
   }
+
+  setDragProperties<T>(properties: T): void {
+    this.dragAndDropManager.setDragProperties<T>(properties);
+  }
+
+  getDragProperties<T>(): T | null {
+    return this.dragAndDropManager.getDragProperties() as T | null;
+  }
 }
