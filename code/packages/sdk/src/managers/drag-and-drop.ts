@@ -6,8 +6,8 @@ import { Weave } from '@/weave';
 import { type Logger } from 'pino';
 
 export class WeaveDragAndDropManager {
-  private instance: Weave;
-  private logger: Logger;
+  private readonly instance: Weave;
+  private readonly logger: Logger;
   private dragStarted!: string | null;
   private properties: unknown | null;
 
