@@ -44,3 +44,10 @@ export type WeaveImageToolActionTriggerReturn =
       finishUploadCallback: (nodeId: string, imageURL: string) => void;
     }
   | undefined;
+
+export type WeaveImageToolDragAndDropProperties = {
+  imageURL: string;
+  imageWidth: number;
+  imageHeight: number;
+  imageId?: string;
+};

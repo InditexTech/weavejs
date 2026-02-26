@@ -13,6 +13,7 @@ import {
   type WeaveImageToolActionOnAddedEvent,
   type WeaveImageToolActionOnAddingEvent,
   type WeaveImageToolActionLoadFrom,
+  type WeaveImageToolDragAndDropProperties,
 } from './types';
 import {
   IMAGE_TOOL_ACTION_NAME,
@@ -39,6 +40,8 @@ export class WeaveImageToolAction extends WeaveAction {
   protected imageURL: string | null;
   protected clickPoint: Konva.Vector2d | null;
   protected forceMainContainer: boolean = false;
+  protected dragAndDropProperties: WeaveImageToolDragAndDropProperties | null =
+    null;
   protected cancelAction!: () => void;
   onPropsChange = undefined;
   update = undefined;
@@ -73,22 +76,21 @@ export class WeaveImageToolAction extends WeaveAction {
   onInit(): void {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     this.instance.addEventListener('onStageDrop', (e: any) => {
-      if (
-        window.weaveDragImageURL &&
-        window.weaveDragTool === IMAGE_TOOL_ACTION_NAME
-      ) {
+      if (this.dragAndDropProperties?.imageURL) {
         this.instance.getStage().setPointersPositions(e);
         const position: Konva.Vector2d | null | undefined =
           getPositionRelativeToContainerOnPosition(this.instance);
 
         this.instance.triggerAction(IMAGE_TOOL_ACTION_NAME, {
-          imageURL: window.weaveDragImageURL,
-          imageId: window.weaveDragImageId,
-          ...(window.weaveDragImageWidth && {
-            imageWidth: window.weaveDragImageWidth,
+          imageURL: this.dragAndDropProperties.imageURL,
+          ...(this.dragAndDropProperties.imageId && {
+            imageId: this.dragAndDropProperties.imageId,
           }),
-          ...(window.weaveDragImageHeight && {
-            imageHeight: window.weaveDragImageHeight,
+          ...(this.dragAndDropProperties.imageWidth && {
+            imageWidth: this.dragAndDropProperties.imageWidth,
+          }),
+          ...(this.dragAndDropProperties.imageHeight && {
+            imageHeight: this.dragAndDropProperties.imageHeight,
           }),
           position,
         });
@@ -486,10 +488,7 @@ export class WeaveImageToolAction extends WeaveAction {
 
     stage.container().style.cursor = 'default';
 
-    window.weaveDragImageURL = undefined;
-    window.weaveDragImageWidth = undefined;
-    window.weaveDragImageHeight = undefined;
-    window.weaveDragImageId = undefined;
+    this.dragAndDropProperties = null;
 
     this.initialCursor = null;
     this.imageId = null;
@@ -515,5 +514,9 @@ export class WeaveImageToolAction extends WeaveAction {
     stage.container().tabIndex = 1;
     stage.container().blur();
     stage.container().focus();
+  }
+
+  setDragAndDropProperties(properties: WeaveImageToolDragAndDropProperties) {
+    this.dragAndDropProperties = properties;
   }
 }
