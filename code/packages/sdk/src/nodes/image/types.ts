@@ -45,6 +45,11 @@ export type WeaveImageProperties = {
   performance: {
     cache: WeaveImageCache;
   };
+  style: {
+    placeholder: {
+      fill: string;
+    };
+  };
   crossOrigin: ImageCrossOrigin;
   transform?: WeaveNodeTransformerProperties;
   urlTransformer?: URLTransformerFunction;

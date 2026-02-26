@@ -244,7 +244,6 @@ export class Weave {
 
       // Initialize global window variables
       window.weaveTextEditing = {};
-      window.weaveDragImageURL = undefined;
     }
 
     this.emitEvent<WeaveStoreOnRoomLoadedEvent>('onRoomLoaded', false);

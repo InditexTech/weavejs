@@ -31,6 +31,11 @@ export const WEAVE_IMAGE_DEFAULT_CONFIG: WeaveImageProperties = {
       enabled: false,
     },
   },
+  style: {
+    placeholder: {
+      fill: '#aaaaaa',
+    },
+  },
   crossOrigin: 'anonymous',
   cropMode: {
     gridLines: {

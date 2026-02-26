@@ -8,8 +8,6 @@ declare global {
     '__ $YJS$ __': typeof import('yjs') | undefined;
     weave: Weave;
     weaveTextEditing: Record<string, string>;
-    weaveDragImageURL: string | undefined;
-    weaveDragImageId: string | undefined;
     weaveDragVideoParams: WeaveVideoToolDragParams | undefined;
     weaveDragVideoId: string | undefined;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
