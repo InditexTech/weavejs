@@ -37,6 +37,7 @@ export class WeaveImageNode extends WeaveNode {
   protected imageState: Record<string, WeaveImageState> = {};
   protected tapStart: { x: number; y: number; time: number } | null;
   protected lastTapTime: number;
+  protected imageIconSource: HTMLImageElement | null = null;
   protected nodeType: string = WEAVE_IMAGE_NODE_TYPE;
   private imageCrop!: WeaveImageCrop | null;
 
@@ -279,7 +280,7 @@ export class WeaveImageNode extends WeaveNode {
       rotation: 0,
       width: imageProps.width || 0,
       height: imageProps.height || 0,
-      fill: '#ccccccff',
+      fill: this.config.style.placeholder.fill,
       strokeWidth: 0,
       draggable: false,
       visible: true,
