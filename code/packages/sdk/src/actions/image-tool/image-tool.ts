@@ -488,6 +488,8 @@ export class WeaveImageToolAction extends WeaveAction {
 
     stage.container().style.cursor = 'default';
 
+    this.instance.endDrag(IMAGE_TOOL_ACTION_NAME);
+
     this.dragAndDropProperties = null;
 
     this.initialCursor = null;
@@ -517,6 +519,7 @@ export class WeaveImageToolAction extends WeaveAction {
   }
 
   setDragAndDropProperties(properties: WeaveImageToolDragAndDropProperties) {
+    this.instance.startDrag(IMAGE_TOOL_ACTION_NAME);
     this.dragAndDropProperties = properties;
   }
 }

@@ -11,6 +11,7 @@ import {
   type WeaveVideoToolActionOnAddedEvent,
   type WeaveVideoToolDragParams,
   type WeaveVideoToolActionOnAddingEvent,
+  type WeaveVideoToolDragAndDropProperties,
 } from './types';
 import { VIDEO_TOOL_ACTION_NAME, VIDEO_TOOL_STATE } from './constants';
 import { WeaveNodesSelectionPlugin } from '@/plugins/nodes-selection/nodes-selection';
@@ -30,6 +31,8 @@ export class WeaveVideoToolAction extends WeaveAction {
   protected videoParams: WeaveVideoToolDragParams | null;
   protected clickPoint: Konva.Vector2d | null;
   protected forceMainContainer: boolean = false;
+  protected dragAndDropProperties: WeaveVideoToolDragAndDropProperties | null =
+    null;
   protected cancelAction!: () => void;
   onPropsChange = undefined;
   update = undefined;
@@ -71,19 +74,18 @@ export class WeaveVideoToolAction extends WeaveAction {
 
   onInit(): void {
     this.instance.addEventListener('onStageDrop', (e) => {
-      if (window.weaveDragVideoId && window.weaveDragVideoParams) {
+      if (this.dragAndDropProperties) {
         this.instance.getStage().setPointersPositions(e);
         const position: Konva.Vector2d | null | undefined =
           getPositionRelativeToContainerOnPosition(this.instance);
 
+        console.log('Drop position relative to container: ', position);
+
         this.instance.triggerAction(VIDEO_TOOL_ACTION_NAME, {
-          videoId: window.weaveDragVideoId,
-          videoParams: window.weaveDragVideoParams,
+          videoId: this.dragAndDropProperties.videoId,
+          videoParams: this.dragAndDropProperties.videoParams,
           position,
         });
-
-        window.weaveDragVideoParams = undefined;
-        window.weaveDragVideoId = undefined;
       }
     });
   }
@@ -237,6 +239,7 @@ export class WeaveVideoToolAction extends WeaveAction {
     }
 
     if (params?.videoParams) {
+      console.log('Triggering video adding with params: ', params.videoParams);
       this.updateProps({
         width: params.videoParams.width,
         height: params.videoParams.height,
@@ -264,6 +267,8 @@ export class WeaveVideoToolAction extends WeaveAction {
       this.instance.triggerAction(SELECTION_TOOL_ACTION_NAME);
     }
 
+    this.instance.endDrag(VIDEO_TOOL_ACTION_NAME);
+
     stage.container().style.cursor = 'default';
 
     this.initialCursor = null;
@@ -278,5 +283,10 @@ export class WeaveVideoToolAction extends WeaveAction {
   private setCursor() {
     const stage = this.instance.getStage();
     stage.container().style.cursor = 'crosshair';
+  }
+
+  setDragAndDropProperties(properties: WeaveVideoToolDragAndDropProperties) {
+    this.instance.startDrag(VIDEO_TOOL_ACTION_NAME);
+    this.dragAndDropProperties = properties;
   }
 }

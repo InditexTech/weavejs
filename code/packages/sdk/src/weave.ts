@@ -80,6 +80,7 @@ import {
   DEFAULT_UPDATE_NODE_OPTIONS,
   WEAVE_DEFAULT_CONFIG,
 } from './constants';
+import { WeaveDragAndDropManager } from './managers/drag-and-drop';
 
 export class Weave {
   private id: string;
@@ -110,6 +111,7 @@ export class Weave {
   private readonly mutexManager: WeaveMutexManager;
   private readonly asyncManager: WeaveAsyncManager;
   private readonly hooksManager: WeaveHooksManager;
+  private readonly dragAndDropManager: WeaveDragAndDropManager;
 
   constructor(
     weaveConfig: Pick<WeaveConfig, 'store'> &
@@ -171,6 +173,7 @@ export class Weave {
     this.mutexManager = new WeaveMutexManager(this);
     this.asyncManager = new WeaveAsyncManager(this);
     this.hooksManager = new WeaveHooksManager(this);
+    this.dragAndDropManager = new WeaveDragAndDropManager(this);
 
     // Render welcome log to console
     this.setupManager.welcomeLog();
@@ -1391,5 +1394,23 @@ export class Weave {
   // USERS MANAGEMENT METHODS
   getUsers(): WeaveUser[] {
     return this.usersManager.getUsers();
+  }
+
+  // DRAG AND DROP MANAGEMENT METHODS
+
+  getDragStartedId(): string | null {
+    return this.dragAndDropManager.getDragStartedId();
+  }
+
+  isDragStarted(): boolean {
+    return this.dragAndDropManager.isDragStarted();
+  }
+
+  startDrag(id: string): void {
+    this.dragAndDropManager.startDrag(id);
+  }
+
+  endDrag(id: string): void {
+    this.dragAndDropManager.endDrag(id);
   }
 }
