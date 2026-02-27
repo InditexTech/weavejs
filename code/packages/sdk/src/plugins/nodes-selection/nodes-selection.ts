@@ -1025,10 +1025,7 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
       if (e.code === 'Space') {
         this.isSpaceKeyPressed = true;
       }
-      if (
-        (e.code === 'Backspace' || e.code === 'Delete') &&
-        Object.keys(window.weaveTextEditing).length === 0
-      ) {
+      if (e.code === 'Backspace' || e.code === 'Delete') {
         Promise.resolve().then(() => {
           this.removeSelectedNodes();
         });

@@ -244,9 +244,6 @@ export class Weave {
       if (!window.weave) {
         window.weave = this;
       }
-
-      // Initialize global window variables
-      window.weaveTextEditing = {};
     }
 
     this.emitEvent<WeaveStoreOnRoomLoadedEvent>('onRoomLoaded', false);

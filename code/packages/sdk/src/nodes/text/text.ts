@@ -90,9 +90,7 @@ export class WeaveTextNode extends WeaveNode {
           nodesSelectionPlugin.getSelectedNodes().length === 1 &&
           nodesSelectionPlugin.getSelectedNodes()[0].getAttrs().nodeType ===
             WEAVE_TEXT_NODE_TYPE &&
-          !window.weaveTextEditing[
-            nodesSelectionPlugin.getSelectedNodes()[0].id()
-          ]
+          !this.editing
         ) {
           this.triggerEditMode(
             nodesSelectionPlugin.getSelectedNodes()[0] as Konva.Text
@@ -485,8 +483,6 @@ export class WeaveTextNode extends WeaveNode {
       this.onStageMoveHandler(textNode).bind(this)
     );
 
-    window.weaveTextEditing[textNode.id()] = 'editing';
-
     const upscaleScale = stage.getAttr('upscaleScale');
 
     // apply many styles to match text on canvas as close as possible
@@ -592,10 +588,12 @@ export class WeaveTextNode extends WeaveNode {
     this.textArea.onfocus = () => {
       this.textAreaDomResize(textNode);
     };
-    this.textArea.onkeydown = () => {
+    this.textArea.onkeydown = (e) => {
+      e.stopPropagation();
       this.textAreaDomResize(textNode);
     };
-    this.textArea.onkeyup = () => {
+    this.textArea.onkeyup = (e) => {
+      e.stopPropagation();
       this.textAreaDomResize(textNode);
     };
     this.textArea.onpaste = () => {
@@ -832,8 +830,6 @@ export class WeaveTextNode extends WeaveNode {
 
     this.editing = false;
     const stage = this.instance.getStage();
-
-    delete window.weaveTextEditing[textNode.id()];
 
     if (this.textAreaSuperContainer) {
       this.textAreaSuperContainer.remove();
