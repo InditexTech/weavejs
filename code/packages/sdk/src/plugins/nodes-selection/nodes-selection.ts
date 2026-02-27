@@ -352,17 +352,22 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
 
       if (this.getUsersPresencePlugin()) {
         for (const node of tr.nodes()) {
-          this.getUsersPresencePlugin()?.setPresence(node.id(), {
-            x: node.x(),
-            y: node.y(),
-            width: node.width(),
-            height: node.height(),
-            scaleX: node.scaleX(),
-            scaleY: node.scaleY(),
-            rotation: node.rotation(),
-            strokeScaleEnabled: false,
-          });
+          this.getUsersPresencePlugin()?.setPresence(
+            node.id(),
+            {
+              x: node.x(),
+              y: node.y(),
+              width: node.width(),
+              height: node.height(),
+              scaleX: node.scaleX(),
+              scaleY: node.scaleY(),
+              rotation: node.rotation(),
+              strokeScaleEnabled: false,
+            },
+            false
+          );
         }
+        this.getUsersPresencePlugin()?.forceSendPresence();
       }
     };
 
@@ -443,12 +448,6 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
       }
     });
 
-    // const forceSendPresence = () => {
-    //   this.getUsersPresencePlugin()?.forceSendPresence();
-    // };
-
-    // const sendPresenceThrottled = throttle(forceSendPresence, 250);
-
     const handleDragMove = (
       e: KonvaEventObject<DragEvent, Konva.Transformer>
     ) => {
@@ -503,7 +502,6 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
               false
             );
           }
-          // sendPresenceThrottled();
           this.getUsersPresencePlugin()?.forceSendPresence();
         }
 
