@@ -92,275 +92,281 @@ export class WeaveGroupsManager {
   }
 
   group(nodes: WeaveStateElement[]): void {
-    this.logger.debug({ nodes }, 'Grouping nodes');
+    this.instance.stateTransactional(() => {
+      this.logger.debug({ nodes }, 'Grouping nodes');
 
-    const stage = this.instance.getStage();
-    const state = this.instance.getStore().getState();
-    const mainLayer = this.instance.getMainLayer();
+      const stage = this.instance.getStage();
+      const state = this.instance.getStore().getState();
+      const mainLayer = this.instance.getMainLayer();
 
-    if (isEmpty(state.weave)) {
-      this.logger.warn({ nodes }, 'State is empty, cannot group nodes');
-      return;
-    }
+      if (isEmpty(state.weave)) {
+        this.logger.warn({ nodes }, 'State is empty, cannot group nodes');
+        return;
+      }
 
-    const { realNodes, parentId } = this.allNodesInSameParent(nodes);
+      const { realNodes, parentId } = this.allNodesInSameParent(nodes);
 
-    const selectionPlugin =
-      this.instance.getPlugin<WeaveNodesSelectionPlugin>('nodesSelection');
-    if (selectionPlugin) {
-      const tr = selectionPlugin.getTransformer();
-      tr.hide();
-      selectionPlugin.setSelectedNodes([]);
-    }
+      const selectionPlugin =
+        this.instance.getPlugin<WeaveNodesSelectionPlugin>('nodesSelection');
+      if (selectionPlugin) {
+        const tr = selectionPlugin.getTransformer();
+        tr.hide();
+        selectionPlugin.setSelectedNodes([]);
+      }
 
-    let parentNodeId = parentId ?? WEAVE_NODE_LAYER_ID;
-    if (typeof parentNodeId === 'undefined') {
-      parentNodeId = WEAVE_NODE_LAYER_ID;
-    }
+      let parentNodeId = parentId ?? WEAVE_NODE_LAYER_ID;
+      if (typeof parentNodeId === 'undefined') {
+        parentNodeId = WEAVE_NODE_LAYER_ID;
+      }
 
-    const parentLayer = stage.findOne(`#${parentNodeId}`) as
-      | Konva.Layer
-      | Konva.Group
-      | undefined;
+      const parentLayer = stage.findOne(`#${parentNodeId}`) as
+        | Konva.Layer
+        | Konva.Group
+        | undefined;
 
-    const groupId = uuidv4();
-    const groupInstance = new Konva.Group({
-      id: uuidv4(),
-      nodeType: 'group',
-      draggable: true,
-    });
-
-    parentLayer?.add(groupInstance);
-
-    const groupHandler = this.instance.getNodeHandler<WeaveGroupNode>('group');
-    if (groupHandler) {
-      const groupNode = groupHandler.create(groupId, {
+      const groupId = uuidv4();
+      const groupInstance = new Konva.Group({
+        id: uuidv4(),
+        nodeType: 'group',
         draggable: true,
       });
-      this.instance.addNode(groupNode, parentNodeId, {
-        emitUserChangeEvent: false,
-      });
-    }
 
-    const nodesWithZIndex = realNodes
-      .map((node) => {
-        const instance = mainLayer?.findOne(`#${node.key}`) as
+      parentLayer?.add(groupInstance);
+
+      const groupHandler =
+        this.instance.getNodeHandler<WeaveGroupNode>('group');
+      if (groupHandler) {
+        const groupNode = groupHandler.create(groupId, {
+          draggable: true,
+        });
+        this.instance.addNodeNT(groupNode, parentNodeId, {
+          emitUserChangeEvent: false,
+        });
+      }
+
+      const nodesWithZIndex = realNodes
+        .map((node) => {
+          const instance = mainLayer?.findOne(`#${node.key}`) as
+            | Konva.Shape
+            | Konva.Group
+            | undefined;
+          return { node, zIndex: instance?.zIndex() ?? -1 };
+        })
+        .filter((node) => node.zIndex !== -1);
+
+      const sortedNodesByZIndex = orderBy(
+        nodesWithZIndex,
+        ['zIndex'],
+        ['asc']
+      ).map((node) => node.node);
+
+      for (const [index, node] of sortedNodesByZIndex.entries()) {
+        if (node.type === 'group') {
+          const groupChild = node as WeaveStateElement;
+          const konvaGroup = mainLayer?.findOne(`#${groupChild.key}`) as
+            | Konva.Group
+            | undefined;
+          if (konvaGroup) {
+            const nodePos = konvaGroup.getAbsolutePosition();
+            const nodeRotation = konvaGroup.getAbsoluteRotation();
+
+            konvaGroup.moveTo(groupInstance);
+            konvaGroup.setAbsolutePosition(nodePos);
+            konvaGroup.rotation(nodeRotation);
+            konvaGroup.zIndex(index);
+            konvaGroup.setAttr('id', uuidv4());
+            konvaGroup.setAttr('draggable', false);
+
+            const handler =
+              this.instance.getNodeHandler<WeaveGroupNode>('group');
+
+            if (handler) {
+              const stateNode = handler.serialize(konvaGroup);
+              this.instance.addNodeNT(stateNode, groupId, {
+                emitUserChangeEvent: false,
+              });
+            }
+          }
+          continue;
+        }
+
+        const konvaNode = mainLayer?.findOne(`#${node.key}`) as
           | Konva.Shape
-          | Konva.Group
           | undefined;
-        return { node, zIndex: instance?.zIndex() ?? -1 };
-      })
-      .filter((node) => node.zIndex !== -1);
+        if (konvaNode) {
+          const nodePos = konvaNode.getAbsolutePosition();
+          const nodeRotation = konvaNode.getAbsoluteRotation();
 
-    const sortedNodesByZIndex = orderBy(
-      nodesWithZIndex,
-      ['zIndex'],
-      ['asc']
-    ).map((node) => node.node);
+          konvaNode.moveTo(groupInstance);
+          konvaNode.setAbsolutePosition(nodePos);
+          konvaNode.rotation(nodeRotation);
+          konvaNode.zIndex(index);
+          konvaNode.setAttr('id', uuidv4());
+          konvaNode.setAttr('draggable', false);
 
-    for (const [index, node] of sortedNodesByZIndex.entries()) {
-      if (node.type === 'group') {
-        const groupChild = node as WeaveStateElement;
-        const konvaGroup = mainLayer?.findOne(`#${groupChild.key}`) as
-          | Konva.Group
-          | undefined;
-        if (konvaGroup) {
-          const nodePos = konvaGroup.getAbsolutePosition();
-          const nodeRotation = konvaGroup.getAbsoluteRotation();
-
-          konvaGroup.moveTo(groupInstance);
-          konvaGroup.setAbsolutePosition(nodePos);
-          konvaGroup.rotation(nodeRotation);
-          konvaGroup.zIndex(index);
-          konvaGroup.setAttr('id', uuidv4());
-          konvaGroup.setAttr('draggable', false);
-
-          const handler = this.instance.getNodeHandler<WeaveGroupNode>('group');
+          const handler = this.instance.getNodeHandler<WeaveNode>(
+            konvaNode.getAttrs().nodeType
+          );
 
           if (handler) {
-            const stateNode = handler.serialize(konvaGroup);
-            this.instance.addNode(stateNode, groupId, {
+            const stateNode = handler.serialize(konvaNode);
+            this.instance.addNodeNT(stateNode, groupId, {
               emitUserChangeEvent: false,
             });
           }
         }
-        continue;
       }
 
-      const konvaNode = mainLayer?.findOne(`#${node.key}`) as
-        | Konva.Shape
-        | undefined;
-      if (konvaNode) {
-        const nodePos = konvaNode.getAbsolutePosition();
-        const nodeRotation = konvaNode.getAbsoluteRotation();
+      this.instance.removeNodes(sortedNodesByZIndex);
 
-        konvaNode.moveTo(groupInstance);
-        konvaNode.setAbsolutePosition(nodePos);
-        konvaNode.rotation(nodeRotation);
-        konvaNode.zIndex(index);
-        konvaNode.setAttr('id', uuidv4());
-        konvaNode.setAttr('draggable', false);
+      groupInstance.destroy();
 
-        const handler = this.instance.getNodeHandler<WeaveNode>(
-          konvaNode.getAttrs().nodeType
+      const groupNode = stage.findOne(`#${groupId}`);
+
+      if (groupHandler && groupNode) {
+        this.instance.updateNodeNT(
+          groupHandler.serialize(groupNode as WeaveElementInstance)
         );
+      }
 
-        if (handler) {
-          const stateNode = handler.serialize(konvaNode);
-          this.instance.addNode(stateNode, groupId, {
-            emitUserChangeEvent: false,
-          });
+      setTimeout(() => {
+        this.getNodesMultiSelectionFeedbackPlugin()?.cleanupSelectedHalos();
+
+        const groupNode = stage.findOne(`#${groupId}`) as
+          | Konva.Layer
+          | Konva.Group
+          | undefined;
+        const selectionPlugin =
+          this.instance.getPlugin<WeaveNodesSelectionPlugin>('nodesSelection');
+        if (groupNode && selectionPlugin) {
+          const tr = selectionPlugin.getTransformer();
+          selectionPlugin.setSelectedNodes([groupNode]);
+          tr.show();
+          tr.forceUpdate();
         }
-      }
-    }
-
-    this.instance.removeNodes(sortedNodesByZIndex);
-
-    groupInstance.destroy();
-
-    const groupNode = stage.findOne(`#${groupId}`);
-
-    if (groupHandler && groupNode) {
-      this.instance.updateNode(
-        groupHandler.serialize(groupNode as WeaveElementInstance)
-      );
-    }
-
-    setTimeout(() => {
-      this.getNodesMultiSelectionFeedbackPlugin()?.cleanupSelectedHalos();
-
-      const groupNode = stage.findOne(`#${groupId}`) as
-        | Konva.Layer
-        | Konva.Group
-        | undefined;
-      const selectionPlugin =
-        this.instance.getPlugin<WeaveNodesSelectionPlugin>('nodesSelection');
-      if (groupNode && selectionPlugin) {
-        const tr = selectionPlugin.getTransformer();
-        selectionPlugin.setSelectedNodes([groupNode]);
-        tr.show();
-        tr.forceUpdate();
-      }
-    }, 0);
+      }, 0);
+    });
   }
 
   unGroup(group: WeaveStateElement): void {
-    this.logger.debug({ group }, 'Un-grouping group');
+    this.instance.stateTransactional(() => {
+      this.logger.debug({ group }, 'Un-grouping group');
 
-    const stage = this.instance.getStage();
-    const konvaGroup = stage.findOne(`#${group.props.id}`) as
-      | Konva.Group
-      | undefined;
+      const stage = this.instance.getStage();
+      const konvaGroup = stage.findOne(`#${group.props.id}`) as
+        | Konva.Group
+        | undefined;
 
-    if (!konvaGroup) {
-      this.logger.debug(
-        { group },
-        "Group instance doesn't exists, cannot un-group"
-      );
-      return;
-    }
+      if (!konvaGroup) {
+        this.logger.debug(
+          { group },
+          "Group instance doesn't exists, cannot un-group"
+        );
+        return;
+      }
 
-    let nodeId: string | undefined = undefined;
-    let newLayer: Konva.Layer | Konva.Group | undefined =
-      this.instance.getMainLayer();
-    if (
-      konvaGroup.getParent() &&
-      konvaGroup.getParent() instanceof Konva.Group &&
-      konvaGroup.getParent()?.getAttrs().nodeId
-    ) {
-      nodeId = konvaGroup.getParent()?.getAttrs().nodeId;
-      newLayer = konvaGroup.getParent() as Konva.Group;
-    }
-    if (
-      konvaGroup.getParent() &&
-      konvaGroup.getParent() instanceof Konva.Group &&
-      !konvaGroup.getParent()?.getAttrs().nodeId
-    ) {
-      newLayer = konvaGroup.getParent() as Konva.Group;
-    }
-    if (
-      konvaGroup.getParent() &&
-      konvaGroup.getParent() instanceof Konva.Layer
-    ) {
-      newLayer = konvaGroup.getParent() as Konva.Layer;
-    }
+      let nodeId: string | undefined = undefined;
+      let newLayer: Konva.Layer | Konva.Group | undefined =
+        this.instance.getMainLayer();
+      if (
+        konvaGroup.getParent() &&
+        konvaGroup.getParent() instanceof Konva.Group &&
+        konvaGroup.getParent()?.getAttrs().nodeId
+      ) {
+        nodeId = konvaGroup.getParent()?.getAttrs().nodeId;
+        newLayer = konvaGroup.getParent() as Konva.Group;
+      }
+      if (
+        konvaGroup.getParent() &&
+        konvaGroup.getParent() instanceof Konva.Group &&
+        !konvaGroup.getParent()?.getAttrs().nodeId
+      ) {
+        newLayer = konvaGroup.getParent() as Konva.Group;
+      }
+      if (
+        konvaGroup.getParent() &&
+        konvaGroup.getParent() instanceof Konva.Layer
+      ) {
+        newLayer = konvaGroup.getParent() as Konva.Layer;
+      }
 
-    if (!newLayer) {
-      this.logger.debug(
-        { group },
-        "Group target container doesn't exists, cannot un-group"
-      );
-      return;
-    }
+      if (!newLayer) {
+        this.logger.debug(
+          { group },
+          "Group target container doesn't exists, cannot un-group"
+        );
+        return;
+      }
 
-    const newLayerChildrenAmount = newLayer?.getChildren().length ?? 0;
+      const newLayerChildrenAmount = newLayer?.getChildren().length ?? 0;
 
-    let newChildId = undefined;
-    const children = [...konvaGroup.getChildren()];
-    for (const child of children) {
-      const absPos = child.getAbsolutePosition();
-      const absScale = child.getAbsoluteScale();
-      const absRotation = child.getAbsoluteRotation();
+      let newChildId = undefined;
+      const children = [...konvaGroup.getChildren()];
+      for (const child of children) {
+        const absPos = child.getAbsolutePosition();
+        const absScale = child.getAbsoluteScale();
+        const absRotation = child.getAbsoluteRotation();
 
-      child.moveTo(newLayer);
+        child.moveTo(newLayer);
 
-      child.position({ x: 0, y: 0 });
-      child.scale({ x: 1, y: 1 });
-      child.rotation(0);
-      child.offset({ x: 0, y: 0 });
+        child.position({ x: 0, y: 0 });
+        child.scale({ x: 1, y: 1 });
+        child.rotation(0);
+        child.offset({ x: 0, y: 0 });
 
-      child.setAbsolutePosition(absPos);
-      child.scale({
-        x: absScale.x / stage.scaleX(),
-        y: absScale.y / stage.scaleY(),
-      });
-      child.rotation(absRotation);
+        child.setAbsolutePosition(absPos);
+        child.scale({
+          x: absScale.x / stage.scaleX(),
+          y: absScale.y / stage.scaleY(),
+        });
+        child.rotation(absRotation);
 
-      child.zIndex(newLayerChildrenAmount - 1 + child.zIndex());
-      child.setAttr('draggable', true);
-      newChildId = child.getAttrs().id;
+        child.zIndex(newLayerChildrenAmount - 1 + child.zIndex());
+        child.setAttr('draggable', true);
+        newChildId = child.getAttrs().id;
 
-      const handler = this.instance.getNodeHandler<WeaveNode>(
-        child.getAttrs().nodeType
-      );
-      if (handler) {
-        // Serialize the child node and add it to the instance
-        const node = handler.serialize(child);
-        const newNodeId = uuidv4();
-        const oldId = node.key;
+        const handler = this.instance.getNodeHandler<WeaveNode>(
+          child.getAttrs().nodeType
+        );
+        if (handler) {
+          // Serialize the child node and add it to the instance
+          const node = handler.serialize(child);
+          const newNodeId = uuidv4();
+          const oldId = node.key;
 
-        node.key = newNodeId;
-        node.props.id = newNodeId;
-        for (const prop of Object.keys(node.props)) {
-          if (typeof node.props[prop] === 'string') {
-            node.props[prop] = node.props[prop].replace(oldId, newNodeId);
+          node.key = newNodeId;
+          node.props.id = newNodeId;
+          for (const prop of Object.keys(node.props)) {
+            if (typeof node.props[prop] === 'string') {
+              node.props[prop] = node.props[prop].replace(oldId, newNodeId);
+            }
           }
+
+          this.instance.addNodeNT(node, nodeId ?? newLayer.getAttrs().id);
         }
 
-        this.instance.addNode(node, nodeId ?? newLayer.getAttrs().id);
+        child.destroy();
       }
 
-      child.destroy();
-    }
-
-    const groupHandler = this.instance.getNodeHandler<WeaveNode>('group');
-    if (groupHandler) {
-      const groupNode = groupHandler.serialize(konvaGroup);
-      this.instance.removeNode(groupNode, { emitUserChangeEvent: false });
-    }
-
-    setTimeout(() => {
-      this.getNodesMultiSelectionFeedbackPlugin()?.cleanupSelectedHalos();
-
-      const firstElement = newLayer.findOne(`#${newChildId}`) as
-        | Konva.Node
-        | undefined;
-      const selectionPlugin =
-        this.instance.getPlugin<WeaveNodesSelectionPlugin>('nodesSelection');
-      if (firstElement && selectionPlugin) {
-        selectionPlugin.setSelectedNodes([firstElement]);
+      const groupHandler = this.instance.getNodeHandler<WeaveNode>('group');
+      if (groupHandler) {
+        const groupNode = groupHandler.serialize(konvaGroup);
+        this.instance.removeNodeNT(groupNode, { emitUserChangeEvent: false });
       }
-    }, 0);
+
+      setTimeout(() => {
+        this.getNodesMultiSelectionFeedbackPlugin()?.cleanupSelectedHalos();
+
+        const firstElement = newLayer.findOne(`#${newChildId}`) as
+          | Konva.Node
+          | undefined;
+        const selectionPlugin =
+          this.instance.getPlugin<WeaveNodesSelectionPlugin>('nodesSelection');
+        if (firstElement && selectionPlugin) {
+          selectionPlugin.setSelectedNodes([firstElement]);
+        }
+      }, 0);
+    });
   }
 
   extractTransformFromMatrix(m: number[]) {
