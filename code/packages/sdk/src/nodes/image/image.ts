@@ -209,10 +209,6 @@ export class WeaveImageNode extends WeaveNode {
       loadedImage: false,
       loadedImageError: false,
       cropping: false,
-      // ...(internalImageProps.dragStartOpacity && {
-      //   dragStartOpacity: undefined,
-      //   opacity: internalImageProps.dragStartOpacity,
-      // }),
     });
 
     this.setupDefaultNodeAugmentation(image);
