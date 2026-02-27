@@ -17,6 +17,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - [#941](https://github.com/InditexTech/weavejs/issues/941) Improve Image Tool UX (Async persistence + Simplified Upload Flow)
 - [#943](https://github.com/InditexTech/weavejs/issues/943) Avoid usage of window.weave global properties on Video Tool
+- [#944](https://github.com/InditexTech/weavejs/issues/944) Avoid usage of window.weave global properties on Text Tool
 - [#948](https://github.com/InditexTech/weavejs/issues/948) Improve performance of group / un-group operations
 
 ## [2.23.0] - 2026-02-25
