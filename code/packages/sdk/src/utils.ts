@@ -191,6 +191,7 @@ export function moveNodeToContainer(
         instance.removeNodeNT(actualNode, { emitUserChangeEvent: false });
         instance.addNodeNT(actualNode, layerToMoveAttrs.id, {
           emitUserChangeEvent: true,
+          // emitUserChangeEvent: false,
           overrideUserChangeType: WEAVE_NODE_CHANGE_TYPE.UPDATE,
         });
       });

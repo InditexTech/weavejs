@@ -410,8 +410,6 @@ export abstract class WeaveNode implements WeaveNodeBase {
           this.instance.releaseMutexLock();
         }
 
-        this.getUsersPresencePlugin()?.removePresence(node.id());
-
         if (e.target.getAttrs()._revertStrokeScaleEnabled === true) {
           e.target.setAttr('strokeScaleEnabled', true);
         }
@@ -485,6 +483,11 @@ export abstract class WeaveNode implements WeaveNodeBase {
 
         this.getNodesSelectionFeedbackPlugin()?.hideSelectionHalo(nodeTarget);
 
+        this.getSelectionPlugin()?.saveDragSelectedNodes();
+        if (this.getSelectionPlugin()?.getDragSelectedNodes().length === 1) {
+          this.getSelectionPlugin()?.setNodesOpacityOnDrag();
+        }
+
         const canMove = nodeTarget.canDrag();
 
         if (!canMove) {
@@ -533,16 +536,6 @@ export abstract class WeaveNode implements WeaveNodeBase {
           isShiftPressed = false;
         }
 
-        if (
-          this.getNodesSelectionPlugin()?.getSelectedNodes().length === 1 &&
-          realNodeTarget.getAttr('dragStartOpacity') === undefined
-        ) {
-          realNodeTarget.setAttr('dragStartOpacity', realNodeTarget.opacity());
-          realNodeTarget.opacity(
-            this.getNodesSelectionPlugin()?.getDragOpacity()
-          );
-        }
-
         originalNode = realNodeTarget.clone();
         originalContainer = realNodeTarget.getParent();
         if (originalContainer?.getAttrs().nodeId) {
@@ -561,11 +554,6 @@ export abstract class WeaveNode implements WeaveNodeBase {
           const clone = this.instance
             .getCloningManager()
             .cloneNode(realNodeTarget);
-
-          const originalNodeOpacity =
-            realNodeTarget.getAttr('dragStartOpacity') ?? 1;
-          realNodeTarget.setAttrs({ opacity: originalNodeOpacity });
-          realNodeTarget.setAttr('dragStartOpacity', undefined);
 
           if (clone && !this.instance.getCloningManager().isClone(clone)) {
             clone.setAttrs({
@@ -709,6 +697,10 @@ export abstract class WeaveNode implements WeaveNodeBase {
         lockedAxis = null;
         isShiftPressed = false;
 
+        if (this.getSelectionPlugin()?.getDragSelectedNodes().length === 1) {
+          this.getSelectionPlugin()?.restoreNodesOpacityOnDrag();
+        }
+
         if (this.getSelectionPlugin()?.getSelectedNodes().length === 1) {
           this.instance.releaseMutexLock();
           this.getNodesSelectionFeedbackPlugin()?.showSelectionHalo(nodeTarget);
@@ -741,17 +733,6 @@ export abstract class WeaveNode implements WeaveNodeBase {
         this.instance.emitEvent('onDrag', null);
 
         const realNodeTarget: Konva.Node = this.getRealSelectedNode(nodeTarget);
-        this.getUsersPresencePlugin()?.removePresence(realNodeTarget.id());
-
-        if (
-          this.getNodesSelectionPlugin()?.getSelectedNodes().length === 1 &&
-          realNodeTarget.getAttr('dragStartOpacity') !== undefined
-        ) {
-          const originalNodeOpacity =
-            realNodeTarget.getAttr('dragStartOpacity') ?? 1;
-          realNodeTarget.setAttrs({ opacity: originalNodeOpacity });
-          realNodeTarget.setAttr('dragStartOpacity', undefined);
-        }
 
         if (
           this.isSelecting() &&

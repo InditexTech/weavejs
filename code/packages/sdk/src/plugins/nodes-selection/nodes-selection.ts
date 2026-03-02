@@ -86,6 +86,8 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
   private panLoopId: number | null = null;
   private prevSelectedNodes: Konva.Node[] = [];
   private handledClickOrTap: boolean = false;
+  private dragInProcess: boolean = false;
+  private dragSelectedNodes: Konva.Node[] = [];
 
   onRender: undefined;
 
@@ -121,6 +123,8 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
     this.pointers = {};
     this.panLoopId = null;
     this.tapTimeoutId = null;
+    this.dragSelectedNodes = [];
+    this.dragInProcess = false;
   }
 
   getName(): string {
@@ -212,7 +216,11 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
     });
     selectionLayer?.add(trHover);
 
-    stage.on('pointermove', () => {
+    const handlePointerMoveInit = () => {
+      if (this.dragInProcess) {
+        return;
+      }
+
       if (
         tr.nodes().length === 1 &&
         tr.nodes()[0].getAttrs().isContainerPrincipal
@@ -261,7 +269,12 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
           tr.forceUpdate();
         }
       }
-    });
+    };
+
+    stage.on(
+      'pointermove',
+      throttle(handlePointerMoveInit, DEFAULT_THROTTLE_MS)
+    );
 
     tr.on('transformstart', () => {
       this.triggerSelectedNodesEvent();
@@ -286,6 +299,10 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
     let nodeHovered: Konva.Node | undefined = undefined;
 
     tr.on('mousemove', () => {
+      if (this.dragInProcess) {
+        return;
+      }
+
       const pointerPos = stage.getPointerPosition();
       if (!pointerPos) return;
 
@@ -335,17 +352,22 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
 
       if (this.getUsersPresencePlugin()) {
         for (const node of tr.nodes()) {
-          this.getUsersPresencePlugin()?.setPresence(node.id(), {
-            x: node.x(),
-            y: node.y(),
-            width: node.width(),
-            height: node.height(),
-            scaleX: node.scaleX(),
-            scaleY: node.scaleY(),
-            rotation: node.rotation(),
-            strokeScaleEnabled: false,
-          });
+          this.getUsersPresencePlugin()?.setPresence(
+            node.id(),
+            {
+              x: node.x(),
+              y: node.y(),
+              width: node.width(),
+              height: node.height(),
+              scaleX: node.scaleX(),
+              scaleY: node.scaleY(),
+              rotation: node.rotation(),
+              strokeScaleEnabled: false,
+            },
+            false
+          );
         }
+        this.getUsersPresencePlugin()?.forceSendPresence();
       }
     };
 
@@ -363,10 +385,6 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
           node.setAttr('strokeScaleEnabled', true);
         }
         node.setAttr('_revertStrokeScaleEnabled', undefined);
-
-        if (this.getUsersPresencePlugin()) {
-          this.getUsersPresencePlugin()?.removePresence(node.id());
-        }
       }
 
       this.triggerSelectedNodesEvent();
@@ -377,25 +395,32 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
     let originalContainers: Record<string, Konva.Node | null | undefined> = {};
 
     tr.on('dragstart', (e) => {
+      this.dragInProcess = true;
+
+      tr.visible(false);
+
+      const mainLayer = this.instance.getMainLayer();
+
+      if (!mainLayer) {
+        return;
+      }
+
       initialPos = { x: e.target.x(), y: e.target.y() };
 
       this.didMove = false;
 
       const stage = this.instance.getStage();
 
+      this.saveDragSelectedNodes();
+
+      if (this.getDragSelectedNodes().length > 1) {
+        this.setNodesOpacityOnDrag();
+      }
+
       if (stage.isMouseWheelPressed()) {
         e.cancelBubble = true;
         e.target.stopDrag();
         return;
-      }
-
-      const nodes = tr.nodes();
-      if (nodes.length > 1) {
-        for (const node of nodes) {
-          const originalNodeOpacity = node.getAttrs().opacity ?? 1;
-          node.setAttr('dragStartOpacity', originalNodeOpacity);
-          node.opacity(this.getDragOpacity());
-        }
       }
 
       const selectedNodes = tr.nodes();
@@ -465,13 +490,19 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
 
         const layerToMove = containerOverCursor(this.instance, selectedNodes);
 
-        if (this.getUsersPresencePlugin()) {
+        if (this.getUsersPresencePlugin() && this.dragInProcess) {
+          console.log('sending presence user');
           for (const node of selectedNodes) {
-            this.getUsersPresencePlugin()?.setPresence(node.id(), {
-              x: node.x(),
-              y: node.y(),
-            });
+            this.getUsersPresencePlugin()?.setPresence(
+              node.id(),
+              {
+                x: node.x(),
+                y: node.y(),
+              },
+              false
+            );
           }
+          this.getUsersPresencePlugin()?.forceSendPresence();
         }
 
         if (layerToMove && !selectionContainsFrames) {
@@ -484,9 +515,26 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
       tr.forceUpdate();
     };
 
-    tr.on('dragmove', handleDragMove);
+    tr.on('dragmove', throttle(handleDragMove, DEFAULT_THROTTLE_MS));
 
     tr.on('dragend', (e) => {
+      this.dragInProcess = false;
+
+      const mainLayer = this.instance.getMainLayer();
+
+      if (!mainLayer) {
+        return;
+      }
+
+      tr.visible(true);
+
+      this.instance.getSelectionLayer()?.hitGraphEnabled(true);
+      this.instance.getMainLayer()?.hitGraphEnabled(true);
+
+      if (this.getDragSelectedNodes().length > 1) {
+        this.restoreNodesOpacityOnDrag();
+      }
+
       if (!this.didMove) {
         return;
       }
@@ -496,16 +544,6 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
       }
 
       e.cancelBubble = true;
-
-      if (tr.nodes().length > 1) {
-        const nodes = tr.nodes();
-        for (const node of nodes) {
-          this.getNodesSelectionFeedbackPlugin()?.showSelectionHalo(node);
-          this.getNodesSelectionFeedbackPlugin()?.updateSelectionHalo(node);
-
-          this.getUsersPresencePlugin()?.removePresence(node.id());
-        }
-      }
 
       this.instance.getCloningManager().cleanupClones();
 
@@ -517,15 +555,6 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
         const node = selectedNodes[i];
         selectionContainsFrames = selectionContainsFrames || hasFrames(node);
         node.updatePosition(node.getAbsolutePosition());
-      }
-
-      const nodes = tr.nodes();
-      if (nodes.length > 1) {
-        for (const node of nodes) {
-          const dragStartOpacity = node.getAttr('dragStartOpacity') ?? 1;
-          node.opacity(dragStartOpacity);
-          node.setAttr('dragStartOpacity', undefined);
-        }
       }
 
       if (this.isSelecting() && tr.nodes().length > 1) {
@@ -612,12 +641,6 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
               const nodeHandler = this.instance.getNodeHandler<WeaveNode>(
                 node.getAttrs().nodeType
               );
-
-              if (nodeHandler) {
-                this.instance.updateNode(
-                  nodeHandler.serialize(node as WeaveElementInstance)
-                );
-              }
 
               if (!nodeHandler) {
                 return;
@@ -1195,7 +1218,7 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
       this.updatePanDirection();
     };
 
-    stage.on('pointermove', handleMouseMove);
+    stage.on('pointermove', throttle(handleMouseMove, DEFAULT_THROTTLE_MS));
     this.panLoop();
 
     stage.on('pointerup', (e) => {
@@ -1792,6 +1815,30 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
 
   getSelectorConfig(): TransformerConfig {
     return this.config.selection;
+  }
+
+  saveDragSelectedNodes(): void {
+    this.dragSelectedNodes = this.tr.nodes();
+  }
+
+  getDragSelectedNodes(): Konva.Node[] {
+    return this.dragSelectedNodes;
+  }
+
+  setNodesOpacityOnDrag(): void {
+    for (const node of this.dragSelectedNodes) {
+      const originalNodeOpacity = node.getAttrs().opacity ?? 1;
+      node.setAttr('dragStartOpacity', originalNodeOpacity);
+      node.opacity(this.getDragOpacity());
+    }
+  }
+
+  restoreNodesOpacityOnDrag() {
+    for (const node of this.dragSelectedNodes) {
+      const dragStartOpacity = node.getAttr('dragStartOpacity') ?? 1;
+      node.opacity(dragStartOpacity);
+      node.setAttr('dragStartOpacity', undefined);
+    }
   }
 
   getDragOpacity(): number {
