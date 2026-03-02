@@ -4,7 +4,6 @@
 
 import { isEqual } from 'lodash';
 import Konva from 'konva';
-import { DefaultEventPriority } from './constants';
 import {
   type WeaveElementInstance,
   type WeaveElementAttributes,
@@ -12,8 +11,9 @@ import {
 import { Weave } from '@/weave';
 import { type Logger } from 'pino';
 import type { WeaveNode } from '@/nodes/node';
+import { DefaultEventPriority } from './constants';
 
-export class WeaveReconciler {
+export class WeaveReactReconcilerReconciler {
   private instance: Weave;
   private logger: Logger;
 

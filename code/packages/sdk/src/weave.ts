@@ -40,8 +40,6 @@ import {
 } from './nodes/node';
 import { WeaveAction } from './actions/action';
 import { WeavePlugin } from './plugins/plugin';
-import { WeaveReconciler } from './reconciler/reconciler';
-import { WeaveStateSerializer } from './state-serializer/state-serializer';
 import { WeaveRenderer } from './renderer/renderer';
 import { WeaveGroupsManager } from './managers/groups';
 import { WeaveLogger } from './logger/logger';
@@ -81,6 +79,8 @@ import {
   WEAVE_DEFAULT_CONFIG,
 } from './constants';
 import { WeaveDragAndDropManager } from './managers/drag-and-drop';
+import { WeaveSimpleRenderer } from './renderer/simple-renderer/renderer';
+// import { WeaveReactReconcilerRenderer } from './renderer/react-reconciler/renderer';
 
 export class Weave {
   private id: string;
@@ -88,8 +88,6 @@ export class Weave {
   private config: WeaveConfig;
   private logger: WeaveLogger;
   private moduleLogger: Logger;
-  private reconciler: WeaveReconciler;
-  private stateSerializer: WeaveStateSerializer;
   private renderer: WeaveRenderer;
   private initialized: boolean = false;
 
@@ -144,16 +142,11 @@ export class Weave {
     // Setup a child logger for this module
     this.moduleLogger = this.logger.getChildLogger('main');
 
-    // Instantiate the state serializer
-    this.stateSerializer = new WeaveStateSerializer();
-    // Instantiate the reconciler
-    this.reconciler = new WeaveReconciler(this);
     // Instantiate the renderer
-    this.renderer = new WeaveRenderer(
-      this,
-      this.reconciler,
-      this.stateSerializer
-    );
+    // this.renderer = new WeaveReactReconcilerRenderer();
+    // this.renderer.register(this);
+    this.renderer = new WeaveSimpleRenderer();
+    this.renderer.register(this);
 
     // Instantiate the managers
     this.setupManager = new WeaveSetupManager(this);
@@ -1010,6 +1003,10 @@ export class Weave {
   }
 
   // TARGETING MANAGEMENT METHODS PROXIES
+
+  getTargetingManager(): WeaveTargetingManager {
+    return this.targetingManager;
+  }
 
   resolveNode(node: Konva.Node): WeaveElementInstance | undefined {
     const resolvedNode = this.targetingManager.resolveNode(node);

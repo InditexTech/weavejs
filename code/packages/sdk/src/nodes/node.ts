@@ -22,7 +22,7 @@ import {
   containerOverCursor,
   hasFrames,
   mergeExceptArrays,
-  moveNodeToContainer,
+  moveNodeToContainerNT,
 } from '@/utils';
 import type { WeaveNodesEdgeSnappingPlugin } from '@/plugins/nodes-edge-snapping/nodes-edge-snapping';
 import { throttle } from 'lodash';
@@ -279,6 +279,14 @@ export abstract class WeaveNode implements WeaveNodeBase {
     }
 
     if (
+      this.getSelectionPlugin()?.isDragging() ||
+      this.getSelectionPlugin()?.isTransforming()
+    ) {
+      this.hideHoverState();
+      return;
+    }
+
+    if (
       (selectionPlugin.getSelectedNodes().length === 1 &&
         node === selectionPlugin.getSelectedNodes()[0]) ||
       selectionPlugin.isAreaSelecting()
@@ -344,6 +352,7 @@ export abstract class WeaveNode implements WeaveNodeBase {
         handleNodesChange
       );
 
+      node.off('transformstart');
       node.on('transformstart', (e) => {
         transforming = true;
 
@@ -401,8 +410,10 @@ export abstract class WeaveNode implements WeaveNodeBase {
         });
       };
 
+      node.off('transform');
       node.on('transform', throttle(handleTransform, DEFAULT_THROTTLE_MS));
 
+      node.off('transformend');
       node.on('transformend', (e) => {
         const node = e.target;
 
@@ -478,8 +489,11 @@ export abstract class WeaveNode implements WeaveNodeBase {
       let lockedAxis: 'x' | 'y' | null = null;
       let isShiftPressed: boolean = false;
 
+      node.off('dragstart');
       node.on('dragstart', (e) => {
         const nodeTarget = e.target;
+
+        e.cancelBubble = true;
 
         this.getNodesSelectionFeedbackPlugin()?.hideSelectionHalo(nodeTarget);
 
@@ -653,6 +667,7 @@ export abstract class WeaveNode implements WeaveNodeBase {
         }
       };
 
+      node.off('dragmove');
       node.on('dragmove', throttle(handleDragMove, DEFAULT_THROTTLE_MS));
 
       node.dragBoundFunc((pos) => {
@@ -690,6 +705,7 @@ export abstract class WeaveNode implements WeaveNodeBase {
         }
       });
 
+      node.off('dragend');
       node.on('dragend', (e) => {
         const nodeTarget = e.target;
 
@@ -769,7 +785,7 @@ export abstract class WeaveNode implements WeaveNodeBase {
 
             let moved = false;
             if (containerToMove && !hasFrames(node)) {
-              moved = moveNodeToContainer(
+              moved = moveNodeToContainerNT(
                 this.instance,
                 realNodeTarget,
                 containerToMove,
@@ -795,6 +811,13 @@ export abstract class WeaveNode implements WeaveNodeBase {
                     nodes: [realNodeTarget],
                   });
                 });
+
+                const selectionPlugin = this.getSelectionPlugin();
+
+                if (selectionPlugin) {
+                  selectionPlugin.setSelectedNodes([realNodeTarget]);
+                  selectionPlugin.getTransformer().forceUpdate();
+                }
               }
             }
 

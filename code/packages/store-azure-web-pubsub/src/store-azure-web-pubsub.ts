@@ -78,11 +78,11 @@ export class WeaveStoreAzureWebPubsub extends WeaveStore {
       this,
       url,
       this.roomId,
-      this.getDocument(),
-      {
-        resyncInterval: this.azureWebPubsubOptions.resyncIntervalMs,
-        tokenProvider: null,
-      }
+      this.getDocument()
+      // {
+      //   resyncInterval: this.azureWebPubsubOptions.resyncIntervalMs,
+      //   tokenProvider: null,
+      // }
     );
 
     const awareness = this.provider.awareness;

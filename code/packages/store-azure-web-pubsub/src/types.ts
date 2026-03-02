@@ -160,7 +160,7 @@ export type MessageHandler = (
   messageType: number
 ) => void;
 
-export interface WeaveStoreAzureWebPubSubSyncClientOptions {
-  resyncInterval: number;
-  tokenProvider: Promise<string> | null;
-}
+// export interface WeaveStoreAzureWebPubSubSyncClientOptions {
+//   resyncInterval: number;
+//   tokenProvider: Promise<string> | null;
+// }
