@@ -859,6 +859,33 @@ export abstract class WeaveNode implements WeaveNodeBase {
         };
       }
 
+      node.on('xChange yChange', () => {
+        const nodeSelectionPlugin = this.getSelectionPlugin();
+
+        if (!nodeSelectionPlugin) return;
+
+        if (
+          nodeSelectionPlugin.isDragging() ||
+          nodeSelectionPlugin.isTransforming()
+        )
+          return;
+
+        const selectedNodes = nodeSelectionPlugin.getSelectedNodes() ?? [];
+
+        let selected = false;
+        for (const selectedNode of selectedNodes) {
+          if (selectedNode.getAttrs().id === node.getAttrs().id) {
+            selected = true;
+            break;
+          }
+        }
+
+        if (selected) {
+          node.handleDeselectNode();
+          node.handleSelectNode();
+        }
+      });
+
       node.handleSelectNode = () => {
         this.getNodesSelectionFeedbackPlugin()?.createSelectionHalo(node);
       };

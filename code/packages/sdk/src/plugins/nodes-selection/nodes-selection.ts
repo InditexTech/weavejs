@@ -285,6 +285,7 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
       const selectedNodes = tr.nodes();
 
       for (const node of selectedNodes) {
+        node.handleMouseout();
         if (node.getAttrs().strokeScaleEnabled !== false) {
           node.setAttr('strokeScaleEnabled', false);
           node.setAttr('_revertStrokeScaleEnabled', true);
@@ -386,11 +387,16 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
       const selectedNodes = tr.nodes();
 
       for (const node of selectedNodes) {
+        node.handleDeselectNode();
+        node.handleSelectNode();
+
         if (node.getAttrs()._revertStrokeScaleEnabled === true) {
           node.setAttr('strokeScaleEnabled', true);
         }
         node.setAttr('_revertStrokeScaleEnabled', undefined);
       }
+
+      tr.forceUpdate();
 
       this.triggerSelectedNodesEvent();
     });
@@ -693,8 +699,6 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
         }
 
         this.setSelectedNodes(finalSelectedNodes);
-        tr.forceUpdate();
-
         tr.forceUpdate();
       }
     });
@@ -1565,6 +1569,7 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
         : e.target;
 
     if (e.target === this.instance.getStage()) {
+      this.isDoubleTap = false;
       this.getNodesSelectionFeedbackPlugin()?.cleanupSelectedHalos();
       return;
     }
