@@ -642,12 +642,6 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
                 node.getAttrs().nodeType
               );
 
-              // if (nodeHandler) {
-              //   this.instance.updateNodeNT(
-              //     nodeHandler.serialize(node as WeaveElementInstance)
-              //   );
-              // }
-
               if (!nodeHandler) {
                 return;
               }
@@ -1828,7 +1822,7 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
   }
 
   getDragSelectedNodes(): Konva.Node[] {
-    return this.dragSelectedNodes as Konva.Node[];
+    return this.dragSelectedNodes;
   }
 
   setNodesOpacityOnDrag(): void {

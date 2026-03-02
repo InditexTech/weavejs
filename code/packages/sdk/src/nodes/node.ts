@@ -733,7 +733,6 @@ export abstract class WeaveNode implements WeaveNodeBase {
         this.instance.emitEvent('onDrag', null);
 
         const realNodeTarget: Konva.Node = this.getRealSelectedNode(nodeTarget);
-        // this.getUsersPresencePlugin()?.removePresence(realNodeTarget.id());
 
         if (
           this.isSelecting() &&
