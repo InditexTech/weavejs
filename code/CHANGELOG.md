@@ -20,6 +20,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - [#944](https://github.com/InditexTech/weavejs/issues/944) Avoid usage of window.weave global properties on Text Tool
 - [#948](https://github.com/InditexTech/weavejs/issues/948) Improve performance of group / un-group operations
 - [#950](https://github.com/InditexTech/weavejs/issues/950) Improve performance of drag / transform operations
+- [#953](https://github.com/InditexTech/weavejs/issues/953) Refactor to support different state renderer and reconciler
 
 ## [2.23.0] - 2026-02-25
 
