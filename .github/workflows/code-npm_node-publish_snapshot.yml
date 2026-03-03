@@ -140,3 +140,30 @@ jobs:
           const pkgs = JSON.parse(require('fs').readFileSync(0, 'utf8'));
           pkgs.forEach(p => console.log(p.name + ' → ' + p.version));
           "
+
+      - name: Result / Comment on PR
+        if: always()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const status = '${{ job.status }}';
+
+            const body = status === 'success'
+              ? [
+                  "✅ Pre-release published successfully.",
+                  "",
+                  "📦 Version: \`${process.env.SNAPSHOT_VERSION}\`"
+                  "🏷 Tag: `next`"
+                ]
+              : [
+                  "`❌ Pre-release publish failed.",
+                  "",
+                  "Please check the workflow logs for details."
+                ]
+
+            await github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body
+            });¡
