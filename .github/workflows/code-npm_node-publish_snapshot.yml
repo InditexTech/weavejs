@@ -1,6 +1,6 @@
 ---
 name: code-npm-publish-snapshot
-run-name: "Publish snapshot for ${{ github.ref }}"
+run-name: "Publish snapshot for ${{ github.event.issue.title }}"
 
 concurrency: code-publish-snapshot-${{ github.ref }}
 
@@ -24,9 +24,10 @@ jobs:
       - name: Get input parameters
         run: |
           RELEASE_LABELS="${{ join(github.event.issue.labels.*.name, ', ') }}"
-            if [[ $RELEASE_LABELS != *release-type/* ]]; then
-              RELEASE_LABELS="$RELEASE_LABELS, release-type/minor"
-            fi
+          if [[ $RELEASE_LABELS != *release-type/* ]]; then
+            RELEASE_LABELS="$RELEASE_LABELS, release-type/minor"
+          fi
+          echo "RELEASE_LABELS=$RELEASE_LABELS" >> "$GITHUB_ENV"
           BASELINE_BRANCH=${{ github.ref }}
           echo "BASELINE_BRANCH=${BASELINE_BRANCH#refs/heads/}" >> "$GITHUB_ENV"
 
@@ -152,11 +153,11 @@ jobs:
               ? [
                   "✅ Pre-release published successfully.",
                   "",
-                  "📦 Version: \`${process.env.SNAPSHOT_VERSION}\`"
+                  `📦 Version: \`${process.env.SNAPSHOT_VERSION}\``,
                   "🏷 Tag: `next`"
                 ]
               : [
-                  "`❌ Pre-release publish failed.",
+                  "❌ Pre-release publish failed.",
                   "",
                   "Please check the workflow logs for details."
                 ]
@@ -165,5 +166,5 @@ jobs:
               issue_number: context.issue.number,
               owner: context.repo.owner,
               repo: context.repo.repo,
-              body
-            });¡
+              body: body.join("\n")
+            });
