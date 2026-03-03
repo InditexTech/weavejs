@@ -1,6 +1,6 @@
 ---
 name: code-npm-publish-snapshot
-run-name: "Publish snapshot for ${{ github.event.issue.title }}"
+run-name: "Publish snapshot: ${{ github.event.issue.title }}"
 
 concurrency: code-publish-snapshot-${{ github.ref }}
 
@@ -118,9 +118,8 @@ jobs:
         env:
           RELEASE_VERSION: ${{ steps.update-changelog.outputs.version }}
         run: |
-          SHORT_SHA=$(git rev-parse --short HEAD)
           CLEAN_VERSION=$(echo "$RELEASE_VERSION" | sed -E 's/-.*$//')
-          PRE_RELEASE_VERSION="${CLEAN_VERSION}-SNAPSHOT.${SHORT_SHA}"
+          PRE_RELEASE_VERSION="${CLEAN_VERSION}-SNAPSHOT.${{ github.run_number }}.${{ github.run_attempt }}"
           echo "SNAPSHOT_VERSION=$PRE_RELEASE_VERSION" >> "$GITHUB_ENV"
 
       - name: NPM / Prepare snapshot
@@ -137,10 +136,7 @@ jobs:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
         working-directory: code
         run: |
-          npm query .workspace --json | node -e "
-          const pkgs = JSON.parse(require('fs').readFileSync(0, 'utf8'));
-          pkgs.forEach(p => console.log(p.name + ' → ' + p.version));
-          "
+          npm run publish:snapshot
 
       - name: Result / Comment on PR
         if: always()
@@ -153,8 +149,8 @@ jobs:
               ? [
                   "✅ Pre-release published successfully.",
                   "",
-                  `📦 Version: \`${process.env.SNAPSHOT_VERSION}\``,
-                  "🏷 Tag: `next`"
+                  `- Version: \`${process.env.SNAPSHOT_VERSION}\``,
+                  "- Tag: `next`"
                 ]
               : [
                   "❌ Pre-release publish failed.",
