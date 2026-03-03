@@ -16,7 +16,7 @@ jobs:
     name: Publish Snapshot
     if: >
       github.event.issue.pull_request != null &&
-      github.event.comment.body == '/perform-prerelease'
+      github.event.comment.body == '/publish-snapshot'
     runs-on: ubuntu-24.04
     env:
       ASDF_BRANCH_VERSION: 0.18.0
