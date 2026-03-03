@@ -9,6 +9,7 @@ import type {
   WeavePlugin,
   WeaveRenderer,
   WeaveStore,
+  WeavePerformanceConfig,
 } from '@inditextech/weave-sdk';
 import { Weave } from '@inditextech/weave-sdk';
 import {
@@ -18,7 +19,6 @@ import {
   type WeaveStatus,
   WEAVE_INSTANCE_STATUS,
   type WeaveStoreConnectionStatus,
-  type WeavePerformanceConfig,
   type WeaveChildLoggerLevel,
 } from '@inditextech/weave-types';
 import { useWeave } from './store';
@@ -63,7 +63,7 @@ export const WeaveProvider = ({
   const setConnectionStatus = useWeave((state) => state.setConnectionStatus);
   const setAsyncElements = useWeave((state) => state.setAsyncElements);
   const setAsyncElementsAllLoaded = useWeave(
-    (state) => state.setAsyncElementsAllLoaded,
+    (state) => state.setAsyncElementsAllLoaded
   );
 
   const onInstanceStatusHandler = React.useCallback(
@@ -71,7 +71,7 @@ export const WeaveProvider = ({
       setStatus(status);
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [],
+    []
   );
 
   const onStoreConnectionStatusChangeHandler = React.useCallback(
@@ -79,7 +79,7 @@ export const WeaveProvider = ({
       setConnectionStatus(status);
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [],
+    []
   );
 
   const onRoomLoadedHandler = React.useCallback(
@@ -87,7 +87,7 @@ export const WeaveProvider = ({
       setRoomLoaded(status);
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [],
+    []
   );
 
   const onStateChangeHandler = React.useCallback(
@@ -95,7 +95,7 @@ export const WeaveProvider = ({
       setAppState(state);
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [selectedNodes],
+    [selectedNodes]
   );
 
   const onUndoManagerStatusChangeHandler = React.useCallback(
@@ -105,7 +105,7 @@ export const WeaveProvider = ({
       setCanRedo(canRedo);
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [],
+    []
   );
 
   const onActiveActionChangeHandler = React.useCallback(
@@ -113,7 +113,7 @@ export const WeaveProvider = ({
       setActualAction(actionName);
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [selectedNodes],
+    [selectedNodes]
   );
 
   const onAsyncElementsLoadingHandler = React.useCallback(
@@ -121,7 +121,7 @@ export const WeaveProvider = ({
       setAsyncElements(loaded, total);
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [selectedNodes],
+    [selectedNodes]
   );
 
   const onAsyncElementsLoadedHandler = React.useCallback(
@@ -129,7 +129,7 @@ export const WeaveProvider = ({
       setAsyncElementsAllLoaded(true);
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [selectedNodes],
+    [selectedNodes]
   );
 
   React.useEffect(() => {
@@ -161,47 +161,47 @@ export const WeaveProvider = ({
             container: weaveEle as HTMLDivElement,
             width: weaveEleClientRect?.width ?? 1920,
             height: weaveEleClientRect?.height ?? 1080,
-          },
+          }
         );
 
         weaveInstanceRef.current.addEventListener(
           'onInstanceStatus',
-          onInstanceStatusHandler,
+          onInstanceStatusHandler
         );
 
         weaveInstanceRef.current.addEventListener(
           'onStoreConnectionStatusChange',
-          onStoreConnectionStatusChangeHandler,
+          onStoreConnectionStatusChangeHandler
         );
 
         weaveInstanceRef.current.addEventListener(
           'onRoomLoaded',
-          onRoomLoadedHandler,
+          onRoomLoadedHandler
         );
 
         weaveInstanceRef.current.addEventListener(
           'onStateChange',
-          onStateChangeHandler,
+          onStateChangeHandler
         );
 
         weaveInstanceRef.current.addEventListener(
           'onUndoManagerStatusChange',
-          onUndoManagerStatusChangeHandler,
+          onUndoManagerStatusChangeHandler
         );
 
         weaveInstanceRef.current.addEventListener(
           'onActiveActionChange',
-          onActiveActionChangeHandler,
+          onActiveActionChangeHandler
         );
 
         weaveInstanceRef.current.addEventListener(
           'onAsyncElementsLoading',
-          onAsyncElementsLoadingHandler,
+          onAsyncElementsLoadingHandler
         );
 
         weaveInstanceRef.current.addEventListener(
           'onAsyncElementsLoaded',
-          onAsyncElementsLoadedHandler,
+          onAsyncElementsLoadedHandler
         );
 
         setInstance(weaveInstanceRef.current);
@@ -216,42 +216,42 @@ export const WeaveProvider = ({
     return () => {
       weaveInstanceRef.current?.removeEventListener(
         'onInstanceStatus',
-        onInstanceStatusHandler,
+        onInstanceStatusHandler
       );
 
       weaveInstanceRef.current?.removeEventListener(
         'onStoreConnectionStatusChange',
-        onStoreConnectionStatusChangeHandler,
+        onStoreConnectionStatusChangeHandler
       );
 
       weaveInstanceRef.current?.removeEventListener(
         'onRoomLoaded',
-        onRoomLoadedHandler,
+        onRoomLoadedHandler
       );
 
       weaveInstanceRef.current?.removeEventListener(
         'onStateChange',
-        onStateChangeHandler,
+        onStateChangeHandler
       );
 
       weaveInstanceRef.current?.removeEventListener(
         'onUndoManagerStatusChange',
-        onUndoManagerStatusChangeHandler,
+        onUndoManagerStatusChangeHandler
       );
 
       weaveInstanceRef.current?.removeEventListener(
         'onActiveActionChange',
-        onActiveActionChangeHandler,
+        onActiveActionChangeHandler
       );
 
       weaveInstanceRef.current?.removeEventListener(
         'onAsyncElementsLoading',
-        onAsyncElementsLoadingHandler,
+        onAsyncElementsLoadingHandler
       );
 
       weaveInstanceRef.current?.removeEventListener(
         'onAsyncElementsLoaded',
-        onAsyncElementsLoadedHandler,
+        onAsyncElementsLoadedHandler
       );
 
       setStatus(WEAVE_INSTANCE_STATUS.IDLE);

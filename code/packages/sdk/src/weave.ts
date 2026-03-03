@@ -7,7 +7,6 @@ import Konva from 'konva';
 import { v4 as uuidv4 } from 'uuid';
 import pino, { type Logger } from 'pino';
 import {
-  type WeaveConfig,
   type WeaveStateElement,
   type WeaveState,
   type WeaveElementInstance,
@@ -62,7 +61,7 @@ import type {
   WeaveInstanceStatusEvent,
   WeaveStoreOnRoomLoadedEvent,
 } from './stores/types';
-import type { DOMElement } from './types';
+import type { DOMElement, WeaveConfig } from './types';
 import {
   getBoundingBox,
   getExportBoundingBox,
@@ -141,7 +140,7 @@ export class Weave {
     this.moduleLogger = this.logger.getChildLogger('main');
 
     // Register the renderer
-    this.renderer = this.config.renderer as WeaveRenderer;
+    this.renderer = this.config.renderer;
     this.renderer.register(this);
 
     // Instantiate the managers

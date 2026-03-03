@@ -2,14 +2,8 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-export abstract class WeaveRendererBase {
-  protected name!: string;
+export interface WeaveRendererBase {
+  init(): void;
 
-  getName(): string {
-    return this.name;
-  }
-
-  abstract init(): void;
-
-  abstract render(callback?: () => void): void;
+  render(callback?: () => void): void;
 }
