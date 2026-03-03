@@ -21,6 +21,7 @@ import { type WeaveNodeBase } from '@/base/node';
 import { type WeaveActionBase } from '@/base/action';
 import { type WeavePluginBase } from '@/base/plugin';
 import { type WeaveStoreBase } from '@/base/store';
+import { type WeaveRendererBase } from '@/base/renderer';
 
 // Configuration handling
 
@@ -39,6 +40,7 @@ export type WeaveUpscaleConfig = {
 
 export type WeaveConfig = {
   store: WeaveStoreBase;
+  renderer: WeaveRendererBase;
   nodes?: WeaveNodeBase[];
   actions?: WeaveActionBase[];
   plugins?: WeavePluginBase[];

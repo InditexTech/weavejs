@@ -3,16 +3,27 @@
 // SPDX-License-Identifier: Apache-2.0
 
 export { Weave } from './weave';
-export { WeaveStore } from './stores/store';
-export { defaultInitialState } from './stores/default-initial-state';
-export * from './stores/types';
+
+// Nodes base class and types
 export { WeaveNode } from './nodes/node';
 export * from './nodes/types';
+
+// Action base class and types
 export { WeaveAction } from './actions/action';
 export * from './actions/types';
+
+// Plugin base class and types
 export { WeavePlugin } from './plugins/plugin';
 export * from './utils';
 export * from './types';
+
+// Store
+export { WeaveStore } from './stores/store';
+export { defaultInitialState } from './stores/default-initial-state';
+export * from './stores/types';
+
+// Renderer
+export { WeaveRenderer } from './renderer/renderer';
 
 // Managers
 export * from './managers/mutex/types';

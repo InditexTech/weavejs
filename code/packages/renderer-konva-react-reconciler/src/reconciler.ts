@@ -8,10 +8,9 @@ import {
   type WeaveElementInstance,
   type WeaveElementAttributes,
 } from '@inditextech/weave-types';
-import { Weave } from '@/weave';
 import { type Logger } from 'pino';
-import type { WeaveNode } from '@/nodes/node';
 import { DefaultEventPriority } from './constants';
+import { Weave, type WeaveNode } from '@inditextech/weave-sdk';
 
 export class WeaveReactReconcilerReconciler {
   private readonly instance: Weave;

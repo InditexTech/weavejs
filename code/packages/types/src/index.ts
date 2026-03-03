@@ -6,5 +6,6 @@ export * from './constants';
 export * from './base/action';
 export * from './base/node';
 export * from './base/plugin';
+export * from './base/renderer';
 export * from './base/store';
 export * from './types';

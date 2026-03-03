@@ -3,14 +3,13 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import ReactReconciler, { type Reconciler } from 'react-reconciler';
-import { Weave } from '@/weave';
-import { WeaveStateSerializer } from '@/state-serializer/state-serializer';
 import { type WeaveElementInstance } from '@inditextech/weave-types';
-import { WeaveRenderer } from '../renderer';
 import { WeaveReactReconcilerReconciler } from './reconciler';
+import { Weave, WeaveRenderer } from '@inditextech/weave-sdk';
+import { WeaveStateSerializer } from './state-serializer/state-serializer';
 
-export class WeaveReactReconcilerRenderer extends WeaveRenderer {
-  protected name = 'react-reconciler-renderer';
+export class WeaveKonvaReactReconcilerRenderer extends WeaveRenderer {
+  protected name = 'konva-react-reconciler-renderer';
   private reconciler!: WeaveReactReconcilerReconciler;
   private serializer!: WeaveStateSerializer;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any

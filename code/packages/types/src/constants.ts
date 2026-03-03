@@ -101,3 +101,5 @@ export const WEAVE_NODE_CHANGE_TYPE = {
   ['UPDATE']: 'update',
   ['DELETE']: 'delete',
 } as const;
+
+export const WEAVE_ROOT_NODE_TYPE = 'stage';

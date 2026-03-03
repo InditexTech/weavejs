@@ -2,13 +2,13 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-import type {
-  WeaveElementAttributes,
-  WeaveElementInstance,
-  WeaveState,
-  WeaveStateElement,
+import {
+  WEAVE_ROOT_NODE_TYPE,
+  type WeaveElementAttributes,
+  type WeaveElementInstance,
+  type WeaveState,
+  type WeaveStateElement,
 } from '@inditextech/weave-types';
-import { WeaveRenderer } from '../renderer';
 import Konva from 'konva';
 import { isEqual } from 'lodash';
 import type { Stage } from 'konva/lib/Stage';
@@ -16,9 +16,10 @@ import type { Layer } from 'konva/lib/Layer';
 import type { Group } from 'konva/lib/Group';
 import type { RendererInstruction } from './types';
 import { SIMPLE_RECONCILER } from './reconciler';
+import { WeaveRenderer } from '@inditextech/weave-sdk';
 
-export class WeaveSimpleRenderer extends WeaveRenderer {
-  protected name = 'simple-renderer';
+export class WeaveKonvaBaseRenderer extends WeaveRenderer {
+  protected name = 'konva-base-renderer';
   private actualState!: WeaveState;
   private readonly reconciler = SIMPLE_RECONCILER;
 
@@ -54,6 +55,10 @@ export class WeaveSimpleRenderer extends WeaveRenderer {
     }, 0);
   }
 
+  getReconciler() {
+    return this.reconciler;
+  }
+
   deriveRendererInstructions(
     prevState: WeaveState,
     nextState: WeaveState
@@ -71,7 +76,7 @@ export class WeaveSimpleRenderer extends WeaveRenderer {
       this.createSubtree({
         kind: 'CREATE_SUBTREE',
         element: nextRoot!,
-        parentKey: '__ROOT__',
+        parentKey: WEAVE_ROOT_NODE_TYPE,
         index: 0,
       });
       return;
@@ -83,7 +88,7 @@ export class WeaveSimpleRenderer extends WeaveRenderer {
     if (prevHasRoot && !nextHasRoot) {
       this.remove({
         kind: 'REMOVE',
-        parentKey: '__ROOT__',
+        parentKey: WEAVE_ROOT_NODE_TYPE,
         key: prevRoot!.key,
       });
       return;
@@ -223,7 +228,7 @@ export class WeaveSimpleRenderer extends WeaveRenderer {
   }
 
   buildSubtree(
-    parentInstance: WeaveElementInstance,
+    parentInstance: WeaveElementInstance | undefined,
     element: WeaveStateElement,
     index: number
   ): void {
@@ -275,12 +280,11 @@ export class WeaveSimpleRenderer extends WeaveRenderer {
 
     const stage = this.instance.getStage();
 
-    let parentInstance: Stage | Layer | Group = stage;
-    if (instruction.parentKey !== 'stage') {
-      parentInstance = stage.findOne(`#${instruction.parentKey}`) as
-        | Stage
-        | Layer
-        | Group;
+    let parentInstance: WeaveElementInstance | undefined = undefined;
+    if (instruction.parentKey !== WEAVE_ROOT_NODE_TYPE) {
+      parentInstance = stage.findOne<WeaveElementInstance>(
+        `#${instruction.parentKey}`
+      );
     }
 
     this.buildSubtree(parentInstance, instruction.element, instruction.index);

@@ -79,8 +79,6 @@ import {
   WEAVE_DEFAULT_CONFIG,
 } from './constants';
 import { WeaveDragAndDropManager } from './managers/drag-and-drop';
-import { WeaveSimpleRenderer } from './renderer/simple-renderer/renderer';
-// import { WeaveReactReconcilerRenderer } from './renderer/react-reconciler/renderer';
 
 export class Weave {
   private id: string;
@@ -112,8 +110,8 @@ export class Weave {
   private readonly dragAndDropManager: WeaveDragAndDropManager;
 
   constructor(
-    weaveConfig: Pick<WeaveConfig, 'store'> &
-      DeepPartial<Omit<WeaveConfig, 'store'>>,
+    weaveConfig: Pick<WeaveConfig, 'store' | 'renderer'> &
+      DeepPartial<Omit<WeaveConfig, 'store' | 'renderer'>>,
     stageConfig: Konva.StageConfig
   ) {
     globalThis._weave_isServerSide = false;
@@ -142,10 +140,8 @@ export class Weave {
     // Setup a child logger for this module
     this.moduleLogger = this.logger.getChildLogger('main');
 
-    // Instantiate the renderer
-    // this.renderer = new WeaveReactReconcilerRenderer();
-    // this.renderer.register(this);
-    this.renderer = new WeaveSimpleRenderer();
+    // Register the renderer
+    this.renderer = this.config.renderer as WeaveRenderer;
     this.renderer.register(this);
 
     // Instantiate the managers

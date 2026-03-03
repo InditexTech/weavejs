@@ -1,5 +1,5 @@
 {
-  "name": "@inditextech/weave-sdk",
+  "name": "@inditextech/weave-renderer-konva-react-reconciler",
   "version": "2.24.0-SNAPSHOT",
   "type": "module",
   "license": "Apache-2.0",
@@ -14,19 +14,19 @@
       "email": "jesusmpc@inditex.com"
     }
   ],
-  "main": "./dist/sdk.cjs",
-  "module": "./dist/sdk.js",
+  "main": "./dist/renderer-konva-react-reconciler.cjs",
+  "module": "./dist/renderer-konva-react-reconciler.js",
   "exports": {
     ".": {
-      "import": "./dist/sdk.js",
-      "require": "./dist/sdk.cjs"
+      "import": "./dist/renderer-konva-react-reconciler.js",
+      "require": "./dist/renderer-konva-react-reconciler.cjs"
     },
     "./server": {
-      "import": "./dist/sdk.node.js",
-      "require": "./dist/sdk.node.cjs"
+      "import": "./dist/renderer-konva-react-reconciler.node.js",
+      "require": "./dist/renderer-konva-react-reconciler.node.cjs"
     }
   },
-  "types": "dist/sdk.d.ts",
+  "types": "dist/renderer-konva-react-reconciler.d.ts",
   "files": [
     "dist"
   ],
@@ -55,14 +55,14 @@
     "version:release": "npm version $RELEASE_VERSION -m \"[npm-scripts] prepare release $RELEASE_VERSION\" --tag-version-prefix \"\""
   },
   "dependencies": {
+    "@inditextech/weave-sdk": "2.24.0-SNAPSHOT",
     "@inditextech/weave-types": "2.24.0-SNAPSHOT",
     "@syncedstore/core": "0.6.0",
     "pino": "9.6.0",
-    "pino-pretty": "13.0.0"
+    "pino-pretty": "13.0.0",
+    "react-reconciler": "~0.28.0"
   },
   "devDependencies": {
-    "@types/fontfaceobserver": "2.1.3",
-    "@types/hammerjs": "^2.0.46",
     "@types/lodash": "4.17.15",
     "@types/node": "^22.15.3",
     "@types/react-reconciler": "0.28.9",
@@ -70,23 +70,20 @@
     "@typescript-eslint/parser": "8.26.0",
     "@vitest/coverage-v8": "1.6.1",
     "@vitest/ui": "1.6.1",
-    "emittery": "1.1.0",
     "eslint": "8.57.1",
     "eslint-config-eslint": "11.0.0",
-    "fontfaceobserver": "2.3.0",
-    "globals": "15.14.0",
-    "hammerjs": "^2.0.8",
     "lodash": "4.17.21",
     "tsdown": "^0.10.2",
     "typescript-eslint": "8.22.0",
     "uuid": "11.0.5",
     "vitest": "1.6.1",
-    "vitest-sonar-reporter": "2.0.0",
-    "yjs-types": "0.0.1"
+    "vitest-sonar-reporter": "2.0.0"
   },
   "peerDependencies": {
+    "@types/react": ">= 18.3.1 && < 19",
     "canvas": "3.2.0",
     "konva": "10.0.2",
+    "react": ">= 18.2.0 && < 19",
     "skia-canvas": "3.0.8",
     "yjs": "13.6.27"
   },
@@ -96,6 +93,7 @@
   },
   "nx": {
     "implicitDependencies": [
+      "@inditextech/weave-sdk",
       "@inditextech/weave-types"
     ]
   }

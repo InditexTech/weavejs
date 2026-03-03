@@ -3,22 +3,18 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { Weave } from '@/weave';
+import { WeaveRendererBase } from '@inditextech/weave-types';
 import type { Logger } from 'pino';
 
-export abstract class WeaveRenderer {
+export abstract class WeaveRenderer extends WeaveRendererBase {
   protected instance!: Weave;
-  protected name!: string;
   protected logger!: Logger;
-
-  getName(): string {
-    return this.name;
-  }
 
   getLogger(): Logger {
     return this.logger;
   }
 
-  register(instance: Weave): WeaveRenderer {
+  register(instance: Weave): this {
     this.instance = instance;
     this.logger = this.instance.getChildLogger(this.getName());
 
@@ -28,8 +24,4 @@ export abstract class WeaveRenderer {
 
     return this;
   }
-
-  abstract init(): void;
-
-  abstract render(callback?: () => void): void;
 }

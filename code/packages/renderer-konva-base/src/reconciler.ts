@@ -2,12 +2,11 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
+import { Weave, type WeaveNode } from '@inditextech/weave-sdk';
 import type {
   WeaveElementAttributes,
   WeaveElementInstance,
 } from '@inditextech/weave-types';
-import { Weave } from '@/weave';
-import type { WeaveNode } from '@/nodes/node';
 import Konva from 'konva';
 import { isEqual } from 'lodash';
 
@@ -79,9 +78,9 @@ export const SIMPLE_RECONCILER = {
         parent instanceof Konva.Group &&
         parentAttrs.containerId !== undefined
       ) {
-        const realParent = parent.findOne(`#${parentAttrs.containerId}`) as
-          | Konva.Group
-          | undefined;
+        const realParent = parent.findOne<Konva.Group>(
+          `#${parentAttrs.containerId}`
+        );
         realParent?.add(child);
         handler.onAdd?.(child);
         nodeAdded = true;
@@ -110,7 +109,7 @@ export const SIMPLE_RECONCILER = {
   },
   removeChild(
     instance: Weave,
-    parent: WeaveElementInstance,
+    parent: WeaveElementInstance | undefined,
     child: WeaveElementInstance
   ) {
     const type = child.getAttrs().nodeType;
