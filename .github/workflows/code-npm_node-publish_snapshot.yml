@@ -23,7 +23,7 @@ jobs:
     steps:
       - name: Get input parameters
         run: |
-          RELEASE_LABELS="${{ join(github.event.pull_request.labels.*.name, ', ') }}"
+          RELEASE_LABELS="${{ join(github.event.issue.labels.*.name, ', ') }}"
             if [[ $RELEASE_LABELS != *release-type/* ]]; then
               RELEASE_LABELS="$RELEASE_LABELS, release-type/minor"
             fi
@@ -112,7 +112,7 @@ jobs:
           keep-unreleased-section: true
           tag-prefix: ""
 
-      - name: Setup snapshot version
+      - name: Define snapshot version
         working-directory: code
         env:
           RELEASE_VERSION: ${{ steps.update-changelog.outputs.version }}
@@ -120,12 +120,12 @@ jobs:
           SHORT_SHA=$(git rev-parse --short HEAD)
           CLEAN_VERSION=$(echo "$RELEASE_VERSION" | sed -E 's/-.*$//')
           PRE_RELEASE_VERSION="${CLEAN_VERSION}-SNAPSHOT.${SHORT_SHA}"
-          echo "RELEASE_VERSION=$PRE_RELEASE_VERSION" >> "$GITHUB_ENV"
+          echo "SNAPSHOT_VERSION=$PRE_RELEASE_VERSION" >> "$GITHUB_ENV"
 
       - name: NPM / Prepare snapshot
         working-directory: code
         env:
-          RELEASE_VERSION: ${{ steps.update-changelog.outputs.version }}
+          RELEASE_VERSION: ${{ env.SNAPSHOT_VERSION }}
         run: |
           npm run version:release
           npm run release:prepare
@@ -140,3 +140,30 @@ jobs:
           const pkgs = JSON.parse(require('fs').readFileSync(0, 'utf8'));
           pkgs.forEach(p => console.log(p.name + ' → ' + p.version));
           "
+
+      - name: Result / Comment on PR
+        if: always()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const status = '${{ job.status }}';
+
+            const body = status === 'success'
+              ? [
+                  "✅ Pre-release published successfully.",
+                  "",
+                  "📦 Version: \`${process.env.SNAPSHOT_VERSION}\`"
+                  "🏷 Tag: `next`"
+                ]
+              : [
+                  "`❌ Pre-release publish failed.",
+                  "",
+                  "Please check the workflow logs for details."
+                ]
+
+            await github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body
+            });¡
