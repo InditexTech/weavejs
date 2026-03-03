@@ -70,7 +70,7 @@
     "@nx/js": "19.8.5",
     "@swc-node/register": "1.10.9",
     "@swc/core": "1.13.3",
-    "@swc/helpers": "0.5.15",
+    "@swc/helpers": "0.5.17",
     "husky": "9.1.4",
     "npkill": "0.12.2",
     "nx": "19.5.7",
