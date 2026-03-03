@@ -31,10 +31,10 @@ jobs:
           BASELINE_BRANCH=${{ github.ref }}
           echo "BASELINE_BRANCH=${BASELINE_BRANCH#refs/heads/}" >> "$GITHUB_ENV"
 
-      - name: Checkout merge commit
+      - name: Checkout PR branch
         uses: actions/checkout@v4
         with:
-          ref: ${{ env.BASELINE_BRANCH }}
+          ref: refs/pull/${{ github.event.issue.number }}/head
           fetch-depth: 0
           persist-credentials: false
 
