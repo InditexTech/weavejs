@@ -136,10 +136,7 @@ jobs:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
         working-directory: code
         run: |
-          npm query .workspace --json | node -e "
-          const pkgs = JSON.parse(require('fs').readFileSync(0, 'utf8'));
-          pkgs.forEach(p => console.log(p.name + ' → ' + p.version));
-          "
+          npm run publish:snapshot
 
       - name: Result / Comment on PR
         if: always()
@@ -152,8 +149,8 @@ jobs:
               ? [
                   "✅ Pre-release published successfully.",
                   "",
-                  `📦 Version: \`${process.env.SNAPSHOT_VERSION}\``,
-                  "🏷 Tag: `next`"
+                  `- Version: \`${process.env.SNAPSHOT_VERSION}\``,
+                  "- Tag: `next`"
                 ]
               : [
                   "❌ Pre-release publish failed.",
