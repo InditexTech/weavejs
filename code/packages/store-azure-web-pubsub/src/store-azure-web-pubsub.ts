@@ -9,10 +9,7 @@ import {
   type WeaveStoreOptions,
 } from '@inditextech/weave-types';
 import { WeaveStoreAzureWebPubSubSyncClient } from './client';
-import {
-  WEAVE_STORE_AZURE_WEB_PUBSUB,
-  WEAVE_STORE_AZURE_WEB_PUBSUB_DEFAULT_CONFIG,
-} from './constants';
+import { WEAVE_STORE_AZURE_WEB_PUBSUB } from './constants';
 import {
   type FetchInitialState,
   type WeaveStoreAzureWebPubsubOptions,
@@ -42,10 +39,7 @@ export class WeaveStoreAzureWebPubsub extends WeaveStore {
 
     const { roomId } = azureWebPubsubOptions;
 
-    this.azureWebPubsubOptions = merge(
-      WEAVE_STORE_AZURE_WEB_PUBSUB_DEFAULT_CONFIG,
-      azureWebPubsubOptions
-    );
+    this.azureWebPubsubOptions = merge({}, azureWebPubsubOptions);
     this.roomId = roomId;
     this.initialRoomData = initialRoomData;
     this.started = false;
@@ -78,11 +72,7 @@ export class WeaveStoreAzureWebPubsub extends WeaveStore {
       this,
       url,
       this.roomId,
-      this.getDocument(),
-      {
-        resyncInterval: this.azureWebPubsubOptions.resyncIntervalMs,
-        tokenProvider: null,
-      }
+      this.getDocument()
     );
 
     const awareness = this.provider.awareness;
