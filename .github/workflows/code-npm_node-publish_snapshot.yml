@@ -23,7 +23,7 @@ jobs:
     steps:
       - name: Get input parameters
         run: |
-          RELEASE_LABELS="${{ join(github.event.pull_request.labels.*.name, ', ') }}"
+          RELEASE_LABELS="${{ join(github.event.issue.labels.*.name, ', ') }}"
             if [[ $RELEASE_LABELS != *release-type/* ]]; then
               RELEASE_LABELS="$RELEASE_LABELS, release-type/minor"
             fi
