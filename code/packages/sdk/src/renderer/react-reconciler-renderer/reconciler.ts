@@ -14,8 +14,8 @@ import type { WeaveNode } from '@/nodes/node';
 import { DefaultEventPriority } from './constants';
 
 export class WeaveReactReconcilerReconciler {
-  private instance: Weave;
-  private logger: Logger;
+  private readonly instance: Weave;
+  private readonly logger: Logger;
 
   constructor(instance: Weave) {
     this.instance = instance;
@@ -56,7 +56,7 @@ export class WeaveReactReconcilerReconciler {
     }
     if (
       parentInstance instanceof Konva.Group &&
-      typeof parentAttrs.containerId !== 'undefined'
+      parentAttrs.containerId !== undefined
     ) {
       const realParent = parentInstance.findOne(
         `#${parentAttrs.containerId}`
@@ -67,7 +67,7 @@ export class WeaveReactReconcilerReconciler {
     }
     if (
       parentInstance instanceof Konva.Group &&
-      typeof parentAttrs.containerId === 'undefined'
+      parentAttrs.containerId === undefined
     ) {
       parentInstance.add(child);
       handler.onAdd?.(child);

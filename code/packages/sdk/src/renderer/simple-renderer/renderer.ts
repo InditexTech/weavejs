@@ -20,7 +20,7 @@ import { SIMPLE_RECONCILER } from './reconciler';
 export class WeaveSimpleRenderer extends WeaveRenderer {
   protected name = 'simple-renderer';
   private actualState!: WeaveState;
-  private reconciler = SIMPLE_RECONCILER;
+  private readonly reconciler = SIMPLE_RECONCILER;
 
   constructor() {
     super();

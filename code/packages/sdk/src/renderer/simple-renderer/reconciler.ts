@@ -77,7 +77,7 @@ export const SIMPLE_RECONCILER = {
       }
       if (
         parent instanceof Konva.Group &&
-        typeof parentAttrs.containerId !== 'undefined'
+        parentAttrs.containerId !== undefined
       ) {
         const realParent = parent.findOne(`#${parentAttrs.containerId}`) as
           | Konva.Group
@@ -88,7 +88,7 @@ export const SIMPLE_RECONCILER = {
       }
       if (
         parent instanceof Konva.Group &&
-        typeof parentAttrs.containerId === 'undefined'
+        parentAttrs.containerId === undefined
       ) {
         parent.add(child);
         handler.onAdd?.(child);
