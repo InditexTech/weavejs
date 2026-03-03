@@ -1,6 +1,6 @@
 ---
 name: code-npm-publish-snapshot
-run-name: "Publish snapshot for ${{ github.event.issue.title }}"
+run-name: "Publish snapshot: ${{ github.event.issue.title }}"
 
 concurrency: code-publish-snapshot-${{ github.ref }}
 
