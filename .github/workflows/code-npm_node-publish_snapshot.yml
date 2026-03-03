@@ -24,9 +24,10 @@ jobs:
       - name: Get input parameters
         run: |
           RELEASE_LABELS="${{ join(github.event.issue.labels.*.name, ', ') }}"
-            if [[ $RELEASE_LABELS != *release-type/* ]]; then
-              RELEASE_LABELS="$RELEASE_LABELS, release-type/minor"
-            fi
+          if [[ $RELEASE_LABELS != *release-type/* ]]; then
+            RELEASE_LABELS="$RELEASE_LABELS, release-type/minor"
+          fi
+          echo "RELEASE_LABELS=$RELEASE_LABELS" >> "$GITHUB_ENV"
           BASELINE_BRANCH=${{ github.ref }}
           echo "BASELINE_BRANCH=${BASELINE_BRANCH#refs/heads/}" >> "$GITHUB_ENV"
 
