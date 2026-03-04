@@ -1078,6 +1078,22 @@ export class Weave {
     return this.exportManager.imageToBase64(img, mimeType);
   }
 
+  public async exportNodesServerSide(
+    nodes: string[],
+    boundingNodes: (nodes: Konva.Node[]) => Konva.Node[],
+    options: WeaveExportNodesOptions
+  ): Promise<{
+    composites: { input: Buffer; left: number; top: number }[];
+    width: number;
+    height: number;
+  }> {
+    return await this.exportManager.exportNodesServerSide(
+      nodes,
+      boundingNodes,
+      options
+    );
+  }
+
   public async exportNodes(
     nodes: WeaveElementInstance[],
     boundingNodes: (nodes: Konva.Node[]) => Konva.Node[],
