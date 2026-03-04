@@ -19,14 +19,16 @@
   "exports": {
     ".": {
       "import": "./dist/sdk.js",
-      "require": "./dist/sdk.cjs"
+      "require": "./dist/sdk.cjs",
+      "types": "./dist/types.d.ts"
     },
     "./server": {
       "import": "./dist/sdk.node.js",
-      "require": "./dist/sdk.node.cjs"
+      "require": "./dist/sdk.node.cjs",
+      "types": "./dist/types.d.ts"
     }
   },
-  "types": "dist/sdk.d.ts",
+  "types": "dist/types.d.ts",
   "files": [
     "dist"
   ],

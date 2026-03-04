@@ -9,14 +9,7 @@ export default defineConfig([
     entry: {
       ['renderer-konva-react-reconciler']: './src/index.ts',
     },
-    external: [
-      '@inditextech/weave-sdk',
-      '@inditextech/weave-types',
-      'konva',
-      'yjs',
-      'canvas',
-      'skia-canvas',
-    ],
+    external: ['@inditextech/weave-sdk', '@inditextech/weave-types', 'konva'],
     format: ['es'],
     target: 'es2023',
     shims: true,
@@ -28,14 +21,7 @@ export default defineConfig([
     entry: {
       ['renderer-konva-react-reconciler.node']: './src/index.node.ts',
     },
-    external: [
-      '@inditextech/weave-sdk',
-      '@inditextech/weave-types',
-      'konva',
-      'yjs',
-      'canvas',
-      'skia-canvas',
-    ],
+    external: ['@inditextech/weave-sdk', '@inditextech/weave-types', 'konva'],
     format: ['es'],
     target: 'es2023',
     shims: true,
