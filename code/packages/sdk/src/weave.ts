@@ -1090,22 +1090,6 @@ export class Weave {
     );
   }
 
-  public async exportNodesServerSide(
-    nodes: string[],
-    boundingNodes: (nodes: Konva.Node[]) => Konva.Node[],
-    options: WeaveExportNodesOptions
-  ): Promise<{
-    composites: { input: Buffer; left: number; top: number }[];
-    width: number;
-    height: number;
-  }> {
-    return await this.exportManager.exportNodesServerSide(
-      nodes,
-      boundingNodes,
-      options
-    );
-  }
-
   public getExportBoundingBox(nodesIds: string[]): {
     x: number;
     y: number;

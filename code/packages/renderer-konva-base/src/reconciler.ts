@@ -64,12 +64,16 @@ export const SIMPLE_RECONCILER = {
 
       let nodeAdded = false;
 
-      if (parent instanceof Konva.Stage && child instanceof Konva.Layer) {
+      if (
+        parent instanceof Konva.Stage &&
+        child instanceof Konva.Layer &&
+        !child.isAncestorOf(parent)
+      ) {
         parent.add(child);
         handler.onAdd?.(child);
         nodeAdded = true;
       }
-      if (parent instanceof Konva.Layer) {
+      if (parent instanceof Konva.Layer && !child.isAncestorOf(parent)) {
         parent.add(child);
         handler.onAdd?.(child);
         nodeAdded = true;
@@ -81,13 +85,16 @@ export const SIMPLE_RECONCILER = {
         const realParent = parent.findOne<Konva.Group>(
           `#${parentAttrs.containerId}`
         );
-        realParent?.add(child);
-        handler.onAdd?.(child);
-        nodeAdded = true;
+        if (realParent && !child.isAncestorOf(realParent)) {
+          realParent?.add(child);
+          handler.onAdd?.(child);
+          nodeAdded = true;
+        }
       }
       if (
         parent instanceof Konva.Group &&
-        parentAttrs.containerId === undefined
+        parentAttrs.containerId === undefined &&
+        !child.isAncestorOf(parent)
       ) {
         parent.add(child);
         handler.onAdd?.(child);

@@ -27,8 +27,8 @@ export const GUIDE_DISTANCE_LINE_DEFAULT_CONFIG: WeaveNodesDistanceSnappingUICon
     },
   };
 
-export const GUIDE_ENTER_SNAPPING_TOLERANCE = 3;
-export const GUIDE_EXIT_SNAPPING_TOLERANCE = 5;
+export const GUIDE_ENTER_SNAPPING_TOLERANCE = 4;
+export const GUIDE_EXIT_SNAPPING_TOLERANCE = 8;
 
 export const NODE_SNAP_HORIZONTAL = {
   ['LEFT']: 'left',

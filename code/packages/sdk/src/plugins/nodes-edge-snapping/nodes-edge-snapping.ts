@@ -101,13 +101,13 @@ export class WeaveNodesEdgeSnappingPlugin extends WeavePlugin {
     }
 
     const stage = this.instance.getStage();
-    const visibleNodes = getVisibleNodes(
-      this.instance,
+    const visibleNodes = getVisibleNodes({
+      instance: this.instance,
       stage,
       nodeParent,
       skipNodes,
-      this.instance.getMainLayer() as Konva.Layer
-    );
+      referenceLayer: this.instance.getMainLayer() as Konva.Layer,
+    });
     // find possible snapping lines
     const lineGuideStops = this.getLineGuideStops(nodeParent, visibleNodes);
     // find snapping points of current object

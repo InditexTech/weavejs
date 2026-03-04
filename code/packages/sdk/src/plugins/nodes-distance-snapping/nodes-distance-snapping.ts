@@ -31,6 +31,8 @@ import {
 } from '@/utils';
 import type { Context } from 'konva/lib/Context';
 import type { WeaveNodesSelectionPlugin } from '../nodes-selection/nodes-selection';
+import { throttle } from 'lodash';
+import { DEFAULT_THROTTLE_MS } from '@/constants';
 
 export class WeaveNodesDistanceSnappingPlugin extends WeavePlugin {
   private readonly uiConfig: WeaveNodesDistanceSnappingUIConfig;
@@ -43,6 +45,9 @@ export class WeaveNodesDistanceSnappingPlugin extends WeavePlugin {
   private currentSizeSnapHorizontal: NodeSnapHorizontal | null = null;
   private currentSizeSnapVertical: NodeSnapVertical | null = null;
   private referenceLayer: Konva.Layer | Konva.Group | undefined;
+  private dragStartBox: BoundingBox | null = null;
+  private dragStartAbsPos: { x: number; y: number } | null = null;
+  private cachedPeerBoxes: Map<string, BoundingBox> | null = null;
   onRender: undefined;
 
   constructor(params?: Partial<WeaveNodesDistanceSnappingPluginParams>) {
@@ -122,13 +127,13 @@ export class WeaveNodesDistanceSnappingPlugin extends WeavePlugin {
     const stage = this.instance.getStage();
     this.referenceLayer = nodeParent as unknown as Konva.Layer | Konva.Group;
 
-    const visibleNodes = getVisibleNodes(
-      this.instance,
+    const visibleNodes = getVisibleNodes({
+      instance: this.instance,
       stage,
       nodeParent,
       skipNodes,
-      this.referenceLayer
-    );
+      referenceLayer: this.referenceLayer,
+    });
 
     // find horizontally intersecting nodes
     const {
@@ -238,12 +243,16 @@ export class WeaveNodesDistanceSnappingPlugin extends WeavePlugin {
 
     let prevBox: BoundingBox | null = null;
     if (prev) {
-      prevBox = this.getBoxClientRect(prev);
+      prevBox =
+        this.cachedPeerBoxes?.get(prev.getAttrs().id ?? '') ??
+        this.getBoxClientRect(prev);
     }
 
     let nextBox: BoundingBox | null = null;
     if (next) {
-      nextBox = this.getBoxClientRect(next);
+      nextBox =
+        this.cachedPeerBoxes?.get(next.getAttrs().id ?? '') ??
+        this.getBoxClientRect(next);
     }
 
     return { prevBox, nextBox, peers };
@@ -255,7 +264,19 @@ export class WeaveNodesDistanceSnappingPlugin extends WeavePlugin {
     sortedHorizontalIntersectedNodes: Konva.Node[],
     horizontalIntersectedNodes: DistanceInfoH[]
   ) {
-    const box = this.getBoxClientRect(node);
+    let box = this.getBoxClientRect(node);
+
+    if (this.dragStartBox && this.dragStartAbsPos) {
+      const currentAbs = node.getAbsolutePosition();
+      const dx = currentAbs.x - this.dragStartAbsPos.x;
+      const dy = currentAbs.y - this.dragStartAbsPos.y;
+
+      box = {
+        ...this.dragStartBox,
+        x: this.dragStartBox.x + dx,
+        y: this.dragStartBox.y + dy,
+      };
+    }
 
     const targetIndex = sortedHorizontalIntersectedNodes.findIndex(
       (actNode) => actNode.getAttrs().id === node.getAttrs().id
@@ -276,7 +297,7 @@ export class WeaveNodesDistanceSnappingPlugin extends WeavePlugin {
       prev &&
       prevBox
     ) {
-      const dist = Math.round(box.x - (prevBox.x + prevBox.width));
+      const dist = box.x - (prevBox.x + prevBox.width);
       const match = peers.find(
         (d) => Math.abs(d.distance - dist) <= this.exitSnappingTolerance
       );
@@ -288,7 +309,7 @@ export class WeaveNodesDistanceSnappingPlugin extends WeavePlugin {
       next &&
       nextBox
     ) {
-      const dist = Math.round(nextBox.x - (box.x + box.width));
+      const dist = nextBox.x - (box.x + box.width);
       const match = peers.find(
         (d) => Math.abs(d.distance - dist) <= this.exitSnappingTolerance
       );
@@ -318,7 +339,7 @@ export class WeaveNodesDistanceSnappingPlugin extends WeavePlugin {
           node instanceof Konva.Transformer ? newX : node.x();
         this.currentSizeSnapHorizontal = NODE_SNAP_HORIZONTAL.CENTER;
         const newBox = this.getBoxClientRect(node);
-        this.peerDistanceX = Math.round(newBox.x - (prevBox.x + prevBox.width));
+        this.peerDistanceX = newBox.x - (prevBox.x + prevBox.width);
       }
 
       if (
@@ -329,11 +350,7 @@ export class WeaveNodesDistanceSnappingPlugin extends WeavePlugin {
       }
     }
 
-    if (
-      this.currentSizeSnapHorizontal &&
-      this.peerDistanceX &&
-      this.snapPositionX
-    ) {
+    if (this.currentSizeSnapHorizontal && this.snapPositionX !== null) {
       if (node instanceof Konva.Transformer) {
         const box = this.getBoxClientRect(node);
         const dx = this.snapPositionX - box.x;
@@ -344,12 +361,14 @@ export class WeaveNodesDistanceSnappingPlugin extends WeavePlugin {
         node.x(this.snapPositionX);
       }
 
-      const { intersectedNodesWithDistances: newHorizontalIntersectedNodes } =
-        this.getHorizontallyIntersectingNodes(node, visibleNodes);
-      this.drawSizeGuidesHorizontally(
-        newHorizontalIntersectedNodes,
-        this.peerDistanceX
-      );
+      if (this.peerDistanceX !== null) {
+        const { intersectedNodesWithDistances: newHorizontalIntersectedNodes } =
+          this.getHorizontallyIntersectingNodes(node, visibleNodes);
+        this.drawSizeGuidesHorizontally(
+          newHorizontalIntersectedNodes,
+          this.peerDistanceX
+        );
+      }
 
       return;
     }
@@ -358,7 +377,7 @@ export class WeaveNodesDistanceSnappingPlugin extends WeavePlugin {
       prev &&
       prevBox &&
       (() => {
-        const dist = Math.round(box.x - (prevBox.x + prevBox.width));
+        const dist = box.x - (prevBox.x + prevBox.width);
         const match = peers.find(
           (d) => Math.abs(d.distance - dist) <= this.enterSnappingTolerance
         );
@@ -369,16 +388,14 @@ export class WeaveNodesDistanceSnappingPlugin extends WeavePlugin {
             node instanceof Konva.Transformer ? newX : node.x();
           this.currentSizeSnapHorizontal = NODE_SNAP_HORIZONTAL.LEFT;
           const newBox = this.getBoxClientRect(node);
-          this.peerDistanceX = Math.round(
-            newBox.x - (prevBox.x + prevBox.width)
-          );
+          this.peerDistanceX = newBox.x - (prevBox.x + prevBox.width);
           return true;
         }
         return false;
       })();
 
     if (!canSnapLeft && next && nextBox) {
-      const dist = Math.round(nextBox.x - (box.x + box.width));
+      const dist = nextBox.x - (box.x + box.width);
       const match = peers.find(
         (d) => Math.abs(d.distance - dist) <= this.enterSnappingTolerance
       );
@@ -388,7 +405,7 @@ export class WeaveNodesDistanceSnappingPlugin extends WeavePlugin {
         this.snapPositionX =
           node instanceof Konva.Transformer ? newX : node.x();
         const newBox = this.getBoxClientRect(node);
-        this.peerDistanceX = Math.round(nextBox.x - (newBox.x + newBox.width));
+        this.peerDistanceX = nextBox.x - (newBox.x + newBox.width);
         this.currentSizeSnapHorizontal = NODE_SNAP_HORIZONTAL.RIGHT;
       }
     }
@@ -400,7 +417,19 @@ export class WeaveNodesDistanceSnappingPlugin extends WeavePlugin {
     sortedVerticalIntersectedNodes: Konva.Node[],
     verticalIntersectedNodes: DistanceInfoV[]
   ) {
-    const box = this.getBoxClientRect(node);
+    let box = this.getBoxClientRect(node);
+
+    if (this.dragStartBox && this.dragStartAbsPos) {
+      const currentAbs = node.getAbsolutePosition();
+      const dx = currentAbs.x - this.dragStartAbsPos.x;
+      const dy = currentAbs.y - this.dragStartAbsPos.y;
+
+      box = {
+        ...this.dragStartBox,
+        x: this.dragStartBox.x + dx,
+        y: this.dragStartBox.y + dy,
+      };
+    }
 
     const targetIndex = sortedVerticalIntersectedNodes.findIndex(
       (actNode) => actNode.getAttrs().id === node.getAttrs().id
@@ -421,7 +450,7 @@ export class WeaveNodesDistanceSnappingPlugin extends WeavePlugin {
       prev &&
       prevBox
     ) {
-      const dist = Math.round(box.y - (prevBox.y + prevBox.height));
+      const dist = box.y - (prevBox.y + prevBox.height);
       const match = peers.find(
         (d) => Math.abs(d.distance - dist) <= this.exitSnappingTolerance
       );
@@ -433,7 +462,7 @@ export class WeaveNodesDistanceSnappingPlugin extends WeavePlugin {
       next &&
       nextBox
     ) {
-      const dist = Math.round(nextBox.y - (box.y + box.height));
+      const dist = nextBox.y - (box.y + box.height);
       const match = peers.find(
         (d) => Math.abs(d.distance - dist) <= this.exitSnappingTolerance
       );
@@ -463,9 +492,7 @@ export class WeaveNodesDistanceSnappingPlugin extends WeavePlugin {
 
         const newBox = this.getBoxClientRect(node);
 
-        this.peerDistanceY = Math.round(
-          newBox.y - (prevBox.y + prevBox.height)
-        );
+        this.peerDistanceY = newBox.y - (prevBox.y + prevBox.height);
       }
 
       if (
@@ -476,11 +503,7 @@ export class WeaveNodesDistanceSnappingPlugin extends WeavePlugin {
       }
     }
 
-    if (
-      this.currentSizeSnapVertical &&
-      this.peerDistanceY &&
-      this.snapPositionY
-    ) {
+    if (this.currentSizeSnapVertical && this.snapPositionY !== null) {
       if (node instanceof Konva.Transformer) {
         const box = this.getBoxClientRect(node);
         const dy = this.snapPositionY - box.y;
@@ -491,13 +514,15 @@ export class WeaveNodesDistanceSnappingPlugin extends WeavePlugin {
         node.y(this.snapPositionY);
       }
 
-      const { intersectedNodesWithDistances: newVerticalIntersectedNodes } =
-        this.getVerticallyIntersectingNodes(node, visibleNodes);
+      if (this.peerDistanceY !== null) {
+        const { intersectedNodesWithDistances: newVerticalIntersectedNodes } =
+          this.getVerticallyIntersectingNodes(node, visibleNodes);
 
-      this.drawSizeGuidesVertically(
-        newVerticalIntersectedNodes,
-        this.peerDistanceY
-      );
+        this.drawSizeGuidesVertically(
+          newVerticalIntersectedNodes,
+          this.peerDistanceY
+        );
+      }
 
       return;
     }
@@ -507,7 +532,7 @@ export class WeaveNodesDistanceSnappingPlugin extends WeavePlugin {
       prev &&
       prevBox &&
       (() => {
-        const dist = Math.round(box.y - (prevBox.y + prevBox.height));
+        const dist = box.y - (prevBox.y + prevBox.height);
         const match = peers.find(
           (d) => Math.abs(d.distance - dist) <= this.enterSnappingTolerance
         );
@@ -520,9 +545,7 @@ export class WeaveNodesDistanceSnappingPlugin extends WeavePlugin {
 
           const newBox = this.getBoxClientRect(node);
 
-          this.peerDistanceY = Math.round(
-            newBox.y - (prevBox.y + prevBox.height)
-          );
+          this.peerDistanceY = newBox.y - (prevBox.y + prevBox.height);
           return true;
         }
         return false;
@@ -530,7 +553,7 @@ export class WeaveNodesDistanceSnappingPlugin extends WeavePlugin {
 
     // Snap to bottom
     if (!canSnapTop && next && nextBox) {
-      const dist = Math.round(nextBox.y - (box.y + box.height));
+      const dist = nextBox.y - (box.y + box.height);
       const match = peers.find(
         (d) => Math.abs(d.distance - dist) <= this.enterSnappingTolerance
       );
@@ -542,7 +565,7 @@ export class WeaveNodesDistanceSnappingPlugin extends WeavePlugin {
 
         const newBox = this.getBoxClientRect(node);
 
-        this.peerDistanceY = Math.round(nextBox.y - (newBox.y + newBox.height));
+        this.peerDistanceY = nextBox.y - (newBox.y + newBox.height);
         this.currentSizeSnapVertical = NODE_SNAP_VERTICAL.BOTTOM;
       }
     }
@@ -649,22 +672,101 @@ export class WeaveNodesDistanceSnappingPlugin extends WeavePlugin {
     const utilityLayer = this.instance.getUtilityLayer();
 
     if (utilityLayer) {
-      stage.on('dragmove', (e) => {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const handleDragMove = (e: KonvaEventObject<any>) => {
         this.evaluateGuidelines(e);
-      });
-      stage.on('dragend', () => {
+      };
+
+      stage.on('dragstart', (e) => {
+        const utilityLayer = this.instance.getUtilityLayer();
+
+        if (!this.enabled) {
+          return;
+        }
+
+        if (!utilityLayer) {
+          return;
+        }
+
+        if (e.target.getAttr('edgeDistanceDisableOnDrag')) {
+          return;
+        }
+
+        const { targetNode: node, skipNodes } = getTargetAndSkipNodes(
+          this.instance,
+          e,
+          true
+        );
+
+        if (typeof node === 'undefined') {
+          return;
+        }
+
+        const nodeParent = this.getSelectionParentNode();
+
+        if (nodeParent === null) {
+          return;
+        }
+
+        const stage = this.instance.getStage();
+        this.referenceLayer = nodeParent as unknown as
+          | Konva.Layer
+          | Konva.Group;
+
+        const visibleNodes = getVisibleNodes({
+          instance: this.instance,
+          stage,
+          nodeParent,
+          skipNodes,
+          referenceLayer: this.referenceLayer,
+        });
+
+        this.cachedPeerBoxes = new Map();
+
+        visibleNodes.forEach((n) => {
+          this.cachedPeerBoxes!.set(
+            n.getAttrs().id ?? '',
+            this.getBoxClientRect(n)
+          );
+        });
+
+        this.dragStartBox = this.getBoxClientRect(node);
+        this.dragStartAbsPos = node.getAbsolutePosition();
+
+        this.currentSizeSnapHorizontal = null;
+        this.currentSizeSnapVertical = null;
+        this.snapPositionX = null;
+        this.snapPositionY = null;
         this.peerDistanceX = null;
         this.peerDistanceY = null;
-        this.currentSizeSnapVertical = null;
+      });
+      stage.on('dragmove', throttle(handleDragMove, DEFAULT_THROTTLE_MS));
+      stage.on('dragend', () => {
+        this.cachedPeerBoxes = null;
+        this.dragStartBox = null;
+        this.dragStartAbsPos = null;
         this.currentSizeSnapHorizontal = null;
+        this.currentSizeSnapVertical = null;
+        this.snapPositionX = null;
+        this.snapPositionY = null;
+        this.peerDistanceX = null;
+        this.peerDistanceY = null;
         this.cleanupGuidelines();
       });
     }
   }
 
   private isOverlapping(node1: Konva.Node, node2: Konva.Node) {
-    const box1 = this.getBoxClientRect(node1);
-    const box2 = this.getBoxClientRect(node2);
+    const id1 = node1.getAttrs().id ?? '';
+    const box1 =
+      this.cachedPeerBoxes?.get(id1) !== undefined
+        ? (this.cachedPeerBoxes?.get(id1) as BoundingBox)
+        : this.getBoxClientRect(node1);
+    const id2 = node2.getAttrs().id ?? '';
+    const box2 =
+      this.cachedPeerBoxes?.get(id2) !== undefined
+        ? (this.cachedPeerBoxes?.get(id2) as BoundingBox)
+        : this.getBoxClientRect(node2);
 
     return !(
       box1.x + box1.width <= box2.x ||
@@ -703,7 +805,9 @@ export class WeaveNodesDistanceSnappingPlugin extends WeavePlugin {
       if (targetNodes.includes(node.getAttrs().id ?? '') || !node.isVisible())
         return false;
 
-      const box = this.getBoxClientRect(node);
+      const box =
+        this.cachedPeerBoxes?.get(node.getAttrs().id ?? '') ??
+        this.getBoxClientRect(node);
 
       const horizontalOverlap =
         box.x + box.width > targetBox.x &&
@@ -796,7 +900,9 @@ export class WeaveNodesDistanceSnappingPlugin extends WeavePlugin {
       if (targetNodes.includes(node.getAttrs().id ?? '') || !node.isVisible())
         return false;
 
-      const box = this.getBoxClientRect(node);
+      const box =
+        this.cachedPeerBoxes?.get(node.getAttrs().id ?? '') ??
+        this.getBoxClientRect(node);
 
       const verticalOverlap =
         box.y + box.height > targetBox.y &&
@@ -829,7 +935,7 @@ export class WeaveNodesDistanceSnappingPlugin extends WeavePlugin {
           const aRight = boxA.x + boxA.width;
           const bLeft = boxB.x;
 
-          const distance = Math.abs(Math.round(aRight - bLeft));
+          const distance = Math.abs(aRight - bLeft);
 
           const top = Math.max(boxA.y, boxB.y);
           const bottom = Math.min(boxA.y + boxA.height, boxB.y + boxB.height);
@@ -1122,5 +1228,9 @@ export class WeaveNodesDistanceSnappingPlugin extends WeavePlugin {
   disable(): void {
     this.cleanupGuidelines();
     this.enabled = false;
+  }
+
+  getNodeSelectionPlugin(): WeaveNodesSelectionPlugin | undefined {
+    return this.instance.getPlugin<WeaveNodesSelectionPlugin>('nodesSelection');
   }
 }

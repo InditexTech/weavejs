@@ -502,7 +502,7 @@ export abstract class WeaveNode implements WeaveNodeBase {
           this.getSelectionPlugin()?.setNodesOpacityOnDrag();
         }
 
-        const canMove = nodeTarget.canDrag();
+        const canMove = nodeTarget?.canDrag() ?? false;
 
         if (!canMove) {
           nodeTarget.stopDrag();

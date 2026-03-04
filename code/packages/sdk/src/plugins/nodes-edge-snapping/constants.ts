@@ -14,8 +14,8 @@ export const GUIDE_LINE_DEFAULT_CONFIG: Required<
   strokeWidth: 0.5,
   dash: [],
 };
-export const GUIDE_LINE_DRAG_SNAPPING_THRESHOLD = 3;
-export const GUIDE_LINE_TRANSFORM_SNAPPING_THRESHOLD = 3;
+export const GUIDE_LINE_DRAG_SNAPPING_THRESHOLD = 5;
+export const GUIDE_LINE_TRANSFORM_SNAPPING_THRESHOLD = 5;
 
 export const GUIDE_ORIENTATION = {
   ['HORIZONTAL']: 'H',

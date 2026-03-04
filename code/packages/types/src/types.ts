@@ -170,11 +170,14 @@ export type WeaveUser = {
 
 // Font descriptor format
 
+export type WeaveFontStyle = 'normal' | 'italic' | 'bold' | number;
+
 export type WeaveFont = {
   id: string;
   name: string;
   offsetX?: number;
   offsetY?: number;
+  supportedStyles?: WeaveFontStyle[];
 };
 
 // Undo/redo manager handling

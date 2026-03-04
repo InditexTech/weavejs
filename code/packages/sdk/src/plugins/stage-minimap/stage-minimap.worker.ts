@@ -5,6 +5,10 @@
 globalThis.onmessage = async (e: MessageEvent) => {
   const { bitmap } = e.data;
 
+  if (bitmap.width === 0 && bitmap.height === 0) {
+    return;
+  }
+
   const canvas = new OffscreenCanvas(bitmap.width, bitmap.height);
   const ctx = canvas.getContext('2d')!;
   ctx.drawImage(bitmap, 0, 0);

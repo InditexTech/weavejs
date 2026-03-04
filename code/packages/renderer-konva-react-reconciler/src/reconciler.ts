@@ -43,12 +43,19 @@ export class WeaveReactReconcilerReconciler {
 
     let nodeAdded = false;
 
-    if (parentInstance instanceof Konva.Stage && child instanceof Konva.Layer) {
+    if (
+      parentInstance instanceof Konva.Stage &&
+      child instanceof Konva.Layer &&
+      !child.isAncestorOf(parentInstance)
+    ) {
       parentInstance.add(child);
       handler.onAdd?.(child);
       nodeAdded = true;
     }
-    if (parentInstance instanceof Konva.Layer) {
+    if (
+      parentInstance instanceof Konva.Layer &&
+      !child.isAncestorOf(parentInstance)
+    ) {
       parentInstance.add(child);
       handler.onAdd?.(child);
       nodeAdded = true;
@@ -60,13 +67,17 @@ export class WeaveReactReconcilerReconciler {
       const realParent = parentInstance.findOne(
         `#${parentAttrs.containerId}`
       ) as Konva.Group | undefined;
-      realParent?.add(child);
-      handler.onAdd?.(child);
-      nodeAdded = true;
+
+      if (realParent && !child.isAncestorOf(realParent)) {
+        realParent?.add(child);
+        handler.onAdd?.(child);
+        nodeAdded = true;
+      }
     }
     if (
       parentInstance instanceof Konva.Group &&
-      parentAttrs.containerId === undefined
+      parentAttrs.containerId === undefined &&
+      !child.isAncestorOf(parentInstance)
     ) {
       parentInstance.add(child);
       handler.onAdd?.(child);
