@@ -18,15 +18,16 @@
   "module": "./dist/renderer-konva-base.js",
   "exports": {
     ".": {
+      "types": "./dist/types.d.ts",
       "import": "./dist/renderer-konva-base.js",
       "require": "./dist/renderer-konva-base.cjs"
     },
     "./server": {
+      "types": "./dist/types.d.ts",
       "import": "./dist/renderer-konva-base.node.js",
       "require": "./dist/renderer-konva-base.node.cjs"
     }
   },
-  "types": "dist/renderer-konva-base.d.ts",
   "files": [
     "dist"
   ],

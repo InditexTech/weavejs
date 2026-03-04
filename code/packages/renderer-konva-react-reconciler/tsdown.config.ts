@@ -7,7 +7,7 @@ import { defineConfig } from 'tsdown';
 export default defineConfig([
   {
     entry: {
-      ['renderer-konva-react-reconciler']: './src/index.ts',
+      types: './src/index.ts',
     },
     external: ['@inditextech/weave-sdk', '@inditextech/weave-types', 'konva'],
     format: ['es'],
@@ -19,6 +19,18 @@ export default defineConfig([
   },
   {
     entry: {
+      ['renderer-konva-react-reconciler']: './src/index.ts',
+    },
+    external: ['@inditextech/weave-sdk', '@inditextech/weave-types', 'konva'],
+    format: ['es'],
+    target: 'es2023',
+    shims: true,
+    clean: true,
+    dts: false,
+    platform: 'browser',
+  },
+  {
+    entry: {
       ['renderer-konva-react-reconciler.node']: './src/index.node.ts',
     },
     external: ['@inditextech/weave-sdk', '@inditextech/weave-types', 'konva'],
@@ -26,7 +38,7 @@ export default defineConfig([
     target: 'es2023',
     shims: true,
     clean: true,
-    dts: true,
+    dts: false,
     platform: 'node',
   },
 ]);

@@ -18,15 +18,16 @@
   "module": "./dist/renderer-konva-react-reconciler.js",
   "exports": {
     ".": {
+      "types": "./dist/types.d.ts",
       "import": "./dist/renderer-konva-react-reconciler.js",
       "require": "./dist/renderer-konva-react-reconciler.cjs"
     },
     "./server": {
+      "types": "./dist/types.d.ts",
       "import": "./dist/renderer-konva-react-reconciler.node.js",
       "require": "./dist/renderer-konva-react-reconciler.node.cjs"
     }
   },
-  "types": "dist/renderer-konva-react-reconciler.d.ts",
   "files": [
     "dist"
   ],
