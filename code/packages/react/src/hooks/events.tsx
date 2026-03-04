@@ -50,6 +50,9 @@ export const useWeaveEvents = (): void => {
       if (nodes.length === 0) {
         setNode(undefined);
       }
+      if (nodes.length > 1) {
+        setNode(undefined);
+      }
       setSelectedNodes(nodes);
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
