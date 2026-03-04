@@ -55,16 +55,11 @@ type WeaveVideoToolActionTriggerParams = {
   forceMainContainer?: boolean;
 };
 
-type WeaveVideoToolActionTriggerVideoParams = {
-  videoPlaceholderURL: string;
-  videoURL: string;
-};
-
 type WeaveVideoToolActionTriggerReturn =
   | {
       finishUploadCallback: (
         videoParams: WeaveVideoToolDragParams,
-        position?: Vector2d
+        position?: Vector2d,
       ) => void;
     }
   | undefined;
@@ -108,6 +103,15 @@ For `WeaveVideoToolActionTriggerParams`:
   }}
 />
 
+### Drag & Drop from the same application
+
+When you implement drag & drop of a video loaded on a HTMLVideoElement that is located on the same application,
+on the `onDragStart` event you must call the `setDragAndDropProperties` method of the tool and define the following
+properties:
+
+- `videoId`: the video id (external resource id) associated to the image.
+- `videoParams`: the video parameters: video placeholder URL, video URL, video width and video height
+
 ## Events
 
 ### onAddingVideo
@@ -125,3 +129,13 @@ onAddedVideo: WeaveVideoToolActionOnAddedEvent;
 ```
 
 The `onAddedVideo` event is called when the video has been added to the canvas.
+
+## Methods
+
+### setDragAndDropProperties
+
+```ts
+setDragAndDropProperties(properties: WeaveVideoToolDragAndDropProperties): void
+```
+
+The `setDragAndDropProperties` method set the necessary properties when drag & drop videos that are inside the application.

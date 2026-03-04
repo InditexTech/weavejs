@@ -13,6 +13,107 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- [#941](https://github.com/InditexTech/weavejs/issues/941) Improve Image Tool UX (Async persistence + Simplified Upload Flow)
+- [#943](https://github.com/InditexTech/weavejs/issues/943) Avoid usage of window.weave global properties on Video Tool
+- [#944](https://github.com/InditexTech/weavejs/issues/944) Avoid usage of window.weave global properties on Text Tool
+- [#948](https://github.com/InditexTech/weavejs/issues/948) Improve performance of group / un-group operations
+- [#950](https://github.com/InditexTech/weavejs/issues/950) Improve performance of drag / transform operations
+- [#956](https://github.com/InditexTech/weavejs/issues/956) Avoid heartbeat mechanism on Azure Web Pubsub store
+
+## [2.23.0] - 2026-02-25
+
+### Added
+
+- [#937](https://github.com/InditexTech/weavejs/issues/937) Improve performance of selection
+- [#938](https://github.com/InditexTech/weavejs/issues/938) Improve performance of text node when editing
+
+## [2.22.0] - 2026-02-24
+
+### Added
+
+- [#915](https://github.com/InditexTech/weavejs/issues/915) On the urlTransform property of Image nodes also inform the node
+- [#928](https://github.com/InditexTech/weavejs/issues/928) Always-on text outline
+- [#935](https://github.com/InditexTech/weavejs/issues/935) Adjust crop when image is downscaled while maintaining aspect ratio
+
+## [2.21.1] - 2026-02-24
+
+### Fixed
+
+- [#9307](https://github.com/InditexTech/weavejs/issues/930) Avoid setup window events on Stage node initialization
+
+## [2.21.0] - 2026-02-24
+
+### Added
+
+- [#905](https://github.com/InditexTech/weavejs/issues/905) Unified stroke tool with single stroke and customizable tips
+- [#923](https://github.com/InditexTech/weavejs/issues/923) Constrain node dragging to horizontal/vertical axes when holding “Shift” key
+- [#925](https://github.com/InditexTech/weavejs/issues/925) Allow to crop image by pressing cmd/ctrl on corners
+
+## [2.20.2] - 2026-02-19
+
+### Fixed
+
+- [#917](https://github.com/InditexTech/weavejs/issues/917) Avoid cache image onRender method
+- [#918](https://github.com/InditexTech/weavejs/issues/918) Clamp fitToScreen and fitToSelection to steps limits
+
+## [2.20.1] - 2026-02-13
+
+### Fixed
+
+- [#911](https://github.com/InditexTech/weavejs/issues/911) Trigger onAsyncElementsLoaded event when the room has no async elements to load, like a new room
+- [#913](https://github.com/InditexTech/weavejs/issues/913) Node keeps drag opacity when cloned via pressing alt key
+
+## [2.20.0] - 2026-02-12
+
+### Added
+
+- [#906](https://github.com/InditexTech/weavejs/issues/906) When using image cache, allow a config to set cached images pixel-ratio
+
+### Fixed
+
+- [#907](https://github.com/InditexTech/weavejs/issues/907) When using brush tool and cancel tool via escape the brush is still active drawing strokes
+
+## [2.19.0] - 2026-02-11
+
+### Added
+
+- [#903](https://github.com/InditexTech/weavejs/issues/903) Improve Image node by enabling caching
+
+## [2.18.1] - 2026-02-10
+
+### Fixed
+
+- [#901](https://github.com/InditexTech/weavejs/issues/901) Panning occurs while drawing a stroke with the brush tool
+
+## [2.18.0] - 2026-02-06
+
+### Added
+
+- [#897](https://github.com/InditexTech/weavejs/issues/897) Expose getExportBoundingBox function to make easy export of frames nodes
+- [#899](https://github.com/InditexTech/weavejs/issues/899) Define frame node internal area export bounding bounds
+
+## [2.17.0] - 2026-02-05
+
+### Added
+
+- [#895](https://github.com/InditexTech/weavejs/issues/895) API to get the document of a store
+
+## [2.16.0] - 2026-02-05
+
+### Fixed
+
+- [#893](https://github.com/InditexTech/weavejs/issues/893) When click on a locked node if anything is selected selection is not cleared
+
+## [2.15.3] - 2026-02-02
+
+### Fixed
+
+- [#886](https://github.com/InditexTech/weavejs/issues/886) Avoid bubble events when dragging control elements on the measure node
+- [#888](https://github.com/InditexTech/weavejs/issues/888) Moving an element causes it to jump or move in an uncontrolled way when zooming out
+- [#889](https://github.com/InditexTech/weavejs/issues/889) Right-clicking on a locked node with WeaveContextMenuPlugin active selects the node
+
 ## [2.15.2] - 2026-01-21
 
 ### Fixed
@@ -1527,422 +1628,220 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - [#24](https://github.com/InditexTech/weavejs/issues/24) Bug when loading rooms with text or images
 - [#18](https://github.com/InditexTech/weavejs/issues/18) Fix awareness not working on store-azure-web-pubsub
 
-<<<<<<< HEAD
-[Unreleased]: https://github.com/InditexTech/weavejs/compare/2.6.0...HEAD
-=========================================================================
-
-<<<<<<< HEAD
-
-> > > > > > > main
-> > > > > > > [2.6.0]: https://github.com/InditexTech/weavejs/compare/2.5.0...2.6.0 > > > > > > > [2.5.0]: https://github.com/InditexTech/weavejs/compare/2.4.0...2.5.0 > > > > > > > [2.4.0]: https://github.com/InditexTech/weavejs/compare/2.3.3...2.4.0 > > > > > > > [2.3.3]: https://github.com/InditexTech/weavejs/compare/2.3.2...2.3.3 > > > > > > > [2.3.2]: https://github.com/InditexTech/weavejs/compare/2.3.1...2.3.2 > > > > > > > [2.3.1]: https://github.com/InditexTech/weavejs/compare/2.3.0...2.3.1 > > > > > > > [2.3.0]: https://github.com/InditexTech/weavejs/compare/2.2.0...2.3.0 > > > > > > > [2.2.0]: https://github.com/InditexTech/weavejs/compare/2.1.1...2.2.0 > > > > > > > [2.1.1]: https://github.com/InditexTech/weavejs/compare/2.1.0...2.1.1 > > > > > > > [2.1.0]: https://github.com/InditexTech/weavejs/compare/2.0.3...2.1.0 > > > > > > > [2.0.3]: https://github.com/InditexTech/weavejs/compare/2.0.2...2.0.3 > > > > > > > [2.0.2]: https://github.com/InditexTech/weavejs/compare/2.0.1...2.0.2 > > > > > > > [2.0.1]: https://github.com/InditexTech/weavejs/compare/2.0.0...2.0.1 > > > > > > > [2.0.0]: https://github.com/InditexTech/weavejs/compare/1.3.0...2.0.0 > > > > > > > [1.3.0]: https://github.com/InditexTech/weavejs/compare/1.2.2...1.3.0 > > > > > > > [1.2.2]: https://github.com/InditexTech/weavejs/compare/1.2.1...1.2.2 > > > > > > > [1.2.1]: https://github.com/InditexTech/weavejs/compare/1.2.0...1.2.1 > > > > > > > [1.2.0]: https://github.com/InditexTech/weavejs/compare/1.1.3...1.2.0 > > > > > > > [1.1.3]: https://github.com/InditexTech/weavejs/compare/1.1.2...1.1.3 > > > > > > > [1.1.2]: https://github.com/InditexTech/weavejs/compare/1.1.1...1.1.2 > > > > > > > [1.1.1]: https://github.com/InditexTech/weavejs/compare/1.1.0...1.1.1 > > > > > > > [1.1.0]: https://github.com/InditexTech/weavejs/compare/1.0.4...1.1.0 > > > > > > > [1.0.4]: https://github.com/InditexTech/weavejs/compare/1.0.3...1.0.4 > > > > > > > [1.0.3]: https://github.com/InditexTech/weavejs/compare/1.0.2...1.0.3 > > > > > > > [1.0.2]: https://github.com/InditexTech/weavejs/compare/1.0.1...1.0.2 > > > > > > > [1.0.1]: https://github.com/InditexTech/weavejs/compare/1.0.0...1.0.1 > > > > > > > [1.0.0]: https://github.com/InditexTech/weavejs/compare/0.77.5...1.0.0 > > > > > > > [0.77.5]: https://github.com/InditexTech/weavejs/compare/0.77.4...0.77.5 > > > > > > > [0.77.4]: https://github.com/InditexTech/weavejs/compare/0.77.3...0.77.4 > > > > > > > [0.77.3]: https://github.com/InditexTech/weavejs/compare/0.77.2...0.77.3 > > > > > > > [0.77.2]: https://github.com/InditexTech/weavejs/compare/0.77.1...0.77.2 > > > > > > > [0.77.1]: https://github.com/InditexTech/weavejs/compare/0.77.0...0.77.1 > > > > > > > [0.77.0]: https://github.com/InditexTech/weavejs/compare/0.76.3...0.77.0 > > > > > > > [0.76.3]: https://github.com/InditexTech/weavejs/compare/0.76.2...0.76.3 > > > > > > > [0.76.2]: https://github.com/InditexTech/weavejs/compare/0.76.1...0.76.2 > > > > > > > [0.76.1]: https://github.com/InditexTech/weavejs/compare/0.76.0...0.76.1 > > > > > > > [0.76.0]: https://github.com/InditexTech/weavejs/compare/0.75.0...0.76.0 > > > > > > > [0.75.0]: https://github.com/InditexTech/weavejs/compare/0.74.3...0.75.0 > > > > > > > [0.74.3]: https://github.com/InditexTech/weavejs/compare/0.74.2...0.74.3 > > > > > > > [0.74.2]: https://github.com/InditexTech/weavejs/compare/0.74.1...0.74.2 > > > > > > > [0.74.1]: https://github.com/InditexTech/weavejs/compare/0.74.0...0.74.1 > > > > > > > [0.74.0]: https://github.com/InditexTech/weavejs/compare/0.73.1...0.74.0 > > > > > > > [0.73.1]: https://github.com/InditexTech/weavejs/compare/0.73.0...0.73.1 > > > > > > > [0.73.0]: https://github.com/InditexTech/weavejs/compare/0.72.1...0.73.0 > > > > > > > [0.72.1]: https://github.com/InditexTech/weavejs/compare/0.72.0...0.72.1 > > > > > > > [0.72.0]: https://github.com/InditexTech/weavejs/compare/0.71.0...0.72.0 > > > > > > > [0.71.0]: https://github.com/InditexTech/weavejs/compare/0.70.0...0.71.0 > > > > > > > [0.70.0]: https://github.com/InditexTech/weavejs/compare/0.69.2...0.70.0 > > > > > > > [0.69.2]: https://github.com/InditexTech/weavejs/compare/0.69.1...0.69.2 > > > > > > > [0.69.1]: https://github.com/InditexTech/weavejs/compare/0.69.0...0.69.1 > > > > > > > [0.69.0]: https://github.com/InditexTech/weavejs/compare/0.68.1...0.69.0 > > > > > > > [0.68.1]: https://github.com/InditexTech/weavejs/compare/0.68.0...0.68.1 > > > > > > > [0.68.0]: https://github.com/InditexTech/weavejs/compare/0.67.5...0.68.0 > > > > > > > [0.67.5]: https://github.com/InditexTech/weavejs/compare/0.67.4...0.67.5 > > > > > > > [0.67.4]: https://github.com/InditexTech/weavejs/compare/0.67.3...0.67.4 > > > > > > > [0.67.3]: https://github.com/InditexTech/weavejs/compare/0.67.2...0.67.3 > > > > > > > [0.67.2]: https://github.com/InditexTech/weavejs/compare/0.67.1...0.67.2 > > > > > > > [0.67.1]: https://github.com/InditexTech/weavejs/compare/0.67.0...0.67.1 > > > > > > > [0.67.0]: https://github.com/InditexTech/weavejs/compare/0.66.0...0.67.0 > > > > > > > [0.66.0]: https://github.com/InditexTech/weavejs/compare/0.64.0...0.66.0 > > > > > > > [0.64.0]: https://github.com/InditexTech/weavejs/compare/0.62.4...0.64.0 > > > > > > > [0.62.4]: https://github.com/InditexTech/weavejs/compare/0.62.3...0.62.4 > > > > > > > [0.62.3]: https://github.com/InditexTech/weavejs/compare/0.62.2...0.62.3 > > > > > > > [0.62.2]: https://github.com/InditexTech/weavejs/compare/0.62.1...0.62.2 > > > > > > > [0.62.1]: https://github.com/InditexTech/weavejs/compare/0.62.0...0.62.1 > > > > > > > [0.62.0]: https://github.com/InditexTech/weavejs/compare/0.61.0...0.62.0 > > > > > > > [0.61.0]: https://github.com/InditexTech/weavejs/compare/0.60.0...0.61.0 > > > > > > > [0.60.0]: https://github.com/InditexTech/weavejs/compare/0.59.0...0.60.0 > > > > > > > [0.59.0]: https://github.com/InditexTech/weavejs/compare/0.58.0...0.59.0 > > > > > > > [0.58.0]: https://github.com/InditexTech/weavejs/compare/0.57.1...0.58.0 > > > > > > > [0.57.1]: https://github.com/InditexTech/weavejs/compare/0.57.0...0.57.1 > > > > > > > [0.57.0]: https://github.com/InditexTech/weavejs/compare/0.56.2...0.57.0 > > > > > > > [0.56.2]: https://github.com/InditexTech/weavejs/compare/0.56.1...0.56.2 > > > > > > > [0.56.1]: https://github.com/InditexTech/weavejs/compare/0.56.0...0.56.1 > > > > > > > [0.56.0]: https://github.com/InditexTech/weavejs/compare/0.55.2...0.56.0 > > > > > > > [0.55.2]: https://github.com/InditexTech/weavejs/compare/0.55.1...0.55.2 > > > > > > > [0.55.1]: https://github.com/InditexTech/weavejs/compare/0.55.0...0.55.1 > > > > > > > [0.55.0]: https://github.com/InditexTech/weavejs/compare/0.54.1...0.55.0 > > > > > > > [0.54.1]: https://github.com/InditexTech/weavejs/compare/0.54.0...0.54.1 > > > > > > > [0.54.0]: https://github.com/InditexTech/weavejs/compare/0.53.0...0.54.0 > > > > > > > [0.53.0]: https://github.com/InditexTech/weavejs/compare/0.52.3...0.53.0 > > > > > > > [0.52.3]: https://github.com/InditexTech/weavejs/compare/0.52.2...0.52.3 > > > > > > > [0.52.2]: https://github.com/InditexTech/weavejs/compare/0.52.1...0.52.2 > > > > > > > [0.52.1]: https://github.com/InditexTech/weavejs/compare/0.52.0...0.52.1 > > > > > > > [0.52.0]: https://github.com/InditexTech/weavejs/compare/0.51.0...0.52.0 > > > > > > > [0.51.0]: https://github.com/InditexTech/weavejs/compare/0.50.0...0.51.0 > > > > > > > [0.50.0]: https://github.com/InditexTech/weavejs/compare/0.49.0...0.50.0 > > > > > > > [0.49.0]: https://github.com/InditexTech/weavejs/compare/0.48.0...0.49.0 > > > > > > > [0.48.0]: https://github.com/InditexTech/weavejs/compare/0.47.1...0.48.0 > > > > > > > [0.47.1]: https://github.com/InditexTech/weavejs/compare/0.47.0...0.47.1 > > > > > > > [0.47.0]: https://github.com/InditexTech/weavejs/compare/0.46.1...0.47.0 > > > > > > > [0.46.1]: https://github.com/InditexTech/weavejs/compare/0.46.0...0.46.1 > > > > > > > [0.46.0]: https://github.com/InditexTech/weavejs/compare/0.45.0...0.46.0 > > > > > > > [0.45.0]: https://github.com/InditexTech/weavejs/compare/0.44.0...0.45.0 > > > > > > > [0.44.0]: https://github.com/InditexTech/weavejs/compare/0.43.0...0.44.0 > > > > > > > [0.43.0]: https://github.com/InditexTech/weavejs/compare/0.42.2...0.43.0 > > > > > > > [0.42.2]: https://github.com/InditexTech/weavejs/compare/0.42.1...0.42.2 > > > > > > > [0.42.1]: https://github.com/InditexTech/weavejs/compare/0.42.0...0.42.1 > > > > > > > [0.42.0]: https://github.com/InditexTech/weavejs/compare/0.41.0...0.42.0 > > > > > > > [0.41.0]: https://github.com/InditexTech/weavejs/compare/0.40.2...0.41.0 > > > > > > > [0.40.2]: https://github.com/InditexTech/weavejs/compare/0.40.1...0.40.2 > > > > > > > [0.40.1]: https://github.com/InditexTech/weavejs/compare/0.40.0...0.40.1 > > > > > > > [0.40.0]: https://github.com/InditexTech/weavejs/compare/0.39.3...0.40.0 > > > > > > > [0.39.3]: https://github.com/InditexTech/weavejs/compare/0.39.2...0.39.3 > > > > > > > [0.39.2]: https://github.com/InditexTech/weavejs/compare/0.39.1...0.39.2 > > > > > > > [0.39.1]: https://github.com/InditexTech/weavejs/compare/0.39.0...0.39.1 > > > > > > > [0.39.0]: https://github.com/InditexTech/weavejs/compare/0.38.0...0.39.0 > > > > > > > [0.38.0]: https://github.com/InditexTech/weavejs/compare/0.37.0...0.38.0 > > > > > > > [0.37.0]: https://github.com/InditexTech/weavejs/compare/0.36.0...0.37.0 > > > > > > > [0.36.0]: https://github.com/InditexTech/weavejs/compare/0.35.0...0.36.0 > > > > > > > [0.35.0]: https://github.com/InditexTech/weavejs/compare/0.34.0...0.35.0 > > > > > > > [0.34.0]: https://github.com/InditexTech/weavejs/compare/0.33.0...0.34.0 > > > > > > > [0.33.0]: https://github.com/InditexTech/weavejs/compare/0.32.0...0.33.0 > > > > > > > [0.32.0]: https://github.com/InditexTech/weavejs/compare/0.31.1...0.32.0 > > > > > > > [0.31.1]: https://github.com/InditexTech/weavejs/compare/0.31.0...0.31.1 > > > > > > > [0.31.0]: https://github.com/InditexTech/weavejs/compare/0.30.1...0.31.0 > > > > > > > [0.30.1]: https://github.com/InditexTech/weavejs/compare/0.30.0...0.30.1 > > > > > > > [0.30.0]: https://github.com/InditexTech/weavejs/compare/0.29.1...0.30.0 > > > > > > > [0.29.1]: https://github.com/InditexTech/weavejs/compare/0.29.0...0.29.1 > > > > > > > [0.29.0]: https://github.com/InditexTech/weavejs/compare/0.28.0...0.29.0 > > > > > > > [0.28.0]: https://github.com/InditexTech/weavejs/compare/0.27.4...0.28.0 > > > > > > > [0.27.4]: https://github.com/InditexTech/weavejs/compare/0.27.3...0.27.4 > > > > > > > [0.27.3]: https://github.com/InditexTech/weavejs/compare/0.27.2...0.27.3 > > > > > > > [0.27.2]: https://github.com/InditexTech/weavejs/compare/0.27.1...0.27.2 > > > > > > > [0.27.1]: https://github.com/InditexTech/weavejs/compare/0.27.0...0.27.1 > > > > > > > [0.27.0]: https://github.com/InditexTech/weavejs/compare/0.26.2...0.27.0 > > > > > > > [0.26.2]: https://github.com/InditexTech/weavejs/compare/0.26.1...0.26.2 > > > > > > > [0.26.1]: https://github.com/InditexTech/weavejs/compare/0.26.0...0.26.1 > > > > > > > [0.26.0]: https://github.com/InditexTech/weavejs/compare/0.25.0...0.26.0 > > > > > > > [0.25.0]: https://github.com/InditexTech/weavejs/compare/0.24.1...0.25.0 > > > > > > > [0.24.1]: https://github.com/InditexTech/weavejs/compare/0.24.0...0.24.1 > > > > > > > [0.24.0]: https://github.com/InditexTech/weavejs/compare/0.23.1...0.24.0 > > > > > > > [0.23.1]: https://github.com/InditexTech/weavejs/compare/0.23.0...0.23.1 > > > > > > > [0.23.0]: https://github.com/InditexTech/weavejs/compare/0.22.1...0.23.0 > > > > > > > [0.22.1]: https://github.com/InditexTech/weavejs/compare/0.22.0...0.22.1 > > > > > > > [0.22.0]: https://github.com/InditexTech/weavejs/compare/0.21.2...0.22.0 > > > > > > > [0.21.2]: https://github.com/InditexTech/weavejs/compare/0.21.1...0.21.2 > > > > > > > [0.21.1]: https://github.com/InditexTech/weavejs/compare/0.21.0...0.21.1 > > > > > > > [0.21.0]: https://github.com/InditexTech/weavejs/compare/0.20.4...0.21.0 > > > > > > > [0.20.4]: https://github.com/InditexTech/weavejs/compare/0.20.3...0.20.4 > > > > > > > [0.20.3]: https://github.com/InditexTech/weavejs/compare/0.20.2...0.20.3 > > > > > > > [0.20.2]: https://github.com/InditexTech/weavejs/compare/0.20.1...0.20.2 > > > > > > > [0.20.1]: https://github.com/InditexTech/weavejs/compare/0.20.0...0.20.1 > > > > > > > [0.20.0]: https://github.com/InditexTech/weavejs/compare/0.19.0...0.20.0 > > > > > > > [0.19.0]: https://github.com/InditexTech/weavejs/compare/0.18.0...0.19.0 > > > > > > > [0.18.0]: https://github.com/InditexTech/weavejs/compare/0.17.0...0.18.0 > > > > > > > [0.17.0]: https://github.com/InditexTech/weavejs/compare/0.16.2...0.17.0 > > > > > > > [0.16.2]: https://github.com/InditexTech/weavejs/compare/0.16.1...0.16.2 > > > > > > > [0.16.1]: https://github.com/InditexTech/weavejs/compare/0.16.0...0.16.1 > > > > > > > [0.16.0]: https://github.com/InditexTech/weavejs/compare/0.15.0...0.16.0 > > > > > > > [0.15.0]: https://github.com/InditexTech/weavejs/compare/0.14.3...0.15.0 > > > > > > > [0.14.3]: https://github.com/InditexTech/weavejs/compare/0.14.2...0.14.3 > > > > > > > [0.14.2]: https://github.com/InditexTech/weavejs/compare/0.14.1...0.14.2 > > > > > > > [0.14.1]: https://github.com/InditexTech/weavejs/compare/0.14.0...0.14.1 > > > > > > > [0.14.0]: https://github.com/InditexTech/weavejs/compare/0.13.1...0.14.0 > > > > > > > [0.13.1]: https://github.com/InditexTech/weavejs/compare/0.13.0...0.13.1 > > > > > > > [0.13.0]: https://github.com/InditexTech/weavejs/compare/0.12.1...0.13.0 > > > > > > > [0.12.1]: https://github.com/InditexTech/weavejs/compare/0.12.0...0.12.1 > > > > > > > [0.12.0]: https://github.com/InditexTech/weavejs/compare/0.11.0...0.12.0 > > > > > > > [0.11.0]: https://github.com/InditexTech/weavejs/compare/0.10.3...0.11.0 > > > > > > > [0.10.3]: https://github.com/InditexTech/weavejs/compare/0.10.2...0.10.3 > > > > > > > [0.10.2]: https://github.com/InditexTech/weavejs/compare/0.10.1...0.10.2 > > > > > > > [0.10.1]: https://github.com/InditexTech/weavejs/compare/0.10.0...0.10.1 > > > > > > > [0.10.0]: https://github.com/InditexTech/weavejs/compare/0.9.3...0.10.0 > > > > > > > [0.9.3]: https://github.com/InditexTech/weavejs/compare/0.9.2...0.9.3 > > > > > > > [0.9.2]: https://github.com/InditexTech/weavejs/compare/0.9.1...0.9.2 > > > > > > > [0.9.1]: https://github.com/InditexTech/weavejs/compare/0.9.0...0.9.1 > > > > > > > [0.9.0]: https://github.com/InditexTech/weavejs/compare/0.8.0...0.9.0 > > > > > > > [0.8.0]: https://github.com/InditexTech/weavejs/compare/0.7.1...0.8.0 > > > > > > > [0.7.1]: https://github.com/InditexTech/weavejs/compare/0.7.0...0.7.1 > > > > > > > [0.7.0]: https://github.com/InditexTech/weavejs/compare/0.6.0...0.7.0 > > > > > > > [0.6.0]: https://github.com/InditexTech/weavejs/compare/0.5.0...0.6.0 > > > > > > > [0.5.0]: https://github.com/InditexTech/weavejs/compare/0.4.0...0.5.0 > > > > > > > [0.4.0]: https://github.com/InditexTech/weavejs/compare/0.3.3...0.4.0 > > > > > > > [0.3.3]: https://github.com/InditexTech/weavejs/compare/0.3.2...0.3.3 > > > > > > > [0.3.2]: https://github.com/InditexTech/weavejs/compare/0.3.1...0.3.2 > > > > > > > [0.3.1]: https://github.com/InditexTech/weavejs/compare/0.3.0...0.3.1 > > > > > > > [0.3.0]: https://github.com/InditexTech/weavejs/compare/0.2.1...0.3.0 > > > > > > > [0.2.1]: https://github.com/InditexTech/weavejs/compare/0.2.0...0.2.1 > > > > > > > [0.2.0]: https://github.com/InditexTech/weavejs/compare/0.1.1...0.2.0 > > > > > > > [0.1.1]: https://github.com/InditexTech/weavejs/compare/0.1.0...0.1.1 > > > > > > > [0.1.0]: https://github.com/InditexTech/weavejs/releases/tag/0.1.0
-> > > > > > > =================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================
-> > > > > > >
-> > > > > > > main
-
-[Unreleased]: https://github.com/InditexTech/weavejs/compare/2.15.2...HEAD
-
+[Unreleased]: https://github.com/InditexTech/weavejs/compare/2.23.0...HEAD
+[2.23.0]: https://github.com/InditexTech/weavejs/compare/2.22.0...2.23.0
+[2.22.0]: https://github.com/InditexTech/weavejs/compare/2.21.1...2.22.0
+[2.21.1]: https://github.com/InditexTech/weavejs/compare/2.21.0...2.21.1
+[2.21.0]: https://github.com/InditexTech/weavejs/compare/2.20.2...2.21.0
+[2.20.2]: https://github.com/InditexTech/weavejs/compare/2.20.1...2.20.2
+[2.20.1]: https://github.com/InditexTech/weavejs/compare/2.20.0...2.20.1
+[2.20.0]: https://github.com/InditexTech/weavejs/compare/2.19.0...2.20.0
+[2.19.0]: https://github.com/InditexTech/weavejs/compare/2.18.1...2.19.0
+[2.18.1]: https://github.com/InditexTech/weavejs/compare/2.18.0...2.18.1
+[2.18.0]: https://github.com/InditexTech/weavejs/compare/2.17.0...2.18.0
+[2.17.0]: https://github.com/InditexTech/weavejs/compare/2.16.0...2.17.0
+[2.16.0]: https://github.com/InditexTech/weavejs/compare/2.15.3...2.16.0
+[2.15.3]: https://github.com/InditexTech/weavejs/compare/2.15.2...2.15.3
 [2.15.2]: https://github.com/InditexTech/weavejs/compare/2.15.1...2.15.2
-
 [2.15.1]: https://github.com/InditexTech/weavejs/compare/2.15.0...2.15.1
-
 [2.15.0]: https://github.com/InditexTech/weavejs/compare/2.14.0...2.15.0
-
 [2.14.0]: https://github.com/InditexTech/weavejs/compare/2.13.1...2.14.0
-
 [2.13.1]: https://github.com/InditexTech/weavejs/compare/2.13.0...2.13.1
-
 [2.13.0]: https://github.com/InditexTech/weavejs/compare/2.12.1...2.13.0
-
 [2.12.1]: https://github.com/InditexTech/weavejs/compare/2.12.0...2.12.1
-
 [2.12.0]: https://github.com/InditexTech/weavejs/compare/2.11.1...2.12.0
-
 [2.11.1]: https://github.com/InditexTech/weavejs/compare/2.11.0...2.11.1
-
 [2.11.0]: https://github.com/InditexTech/weavejs/compare/2.10.0...2.11.0
-
 [2.10.0]: https://github.com/InditexTech/weavejs/compare/2.9.5...2.10.0
-
 [2.9.5]: https://github.com/InditexTech/weavejs/compare/2.9.4...2.9.5
-
 [2.9.4]: https://github.com/InditexTech/weavejs/compare/2.9.3...2.9.4
-
 [2.9.3]: https://github.com/InditexTech/weavejs/compare/2.9.2...2.9.3
-
 [2.9.2]: https://github.com/InditexTech/weavejs/compare/2.9.1...2.9.2
-
 [2.9.1]: https://github.com/InditexTech/weavejs/compare/2.9.0...2.9.1
-
 [2.9.0]: https://github.com/InditexTech/weavejs/compare/2.8.1...2.9.0
-
 [2.8.1]: https://github.com/InditexTech/weavejs/compare/2.8.0...2.8.1
-
 [2.8.0]: https://github.com/InditexTech/weavejs/compare/2.7.1...2.8.0
-
 [2.7.1]: https://github.com/InditexTech/weavejs/compare/2.7.0...2.7.1
-
 [2.7.0]: https://github.com/InditexTech/weavejs/compare/2.6.0...2.7.0
-
 [2.6.0]: https://github.com/InditexTech/weavejs/compare/2.5.0...2.6.0
-
 [2.5.0]: https://github.com/InditexTech/weavejs/compare/2.4.0...2.5.0
-
 [2.4.0]: https://github.com/InditexTech/weavejs/compare/2.3.3...2.4.0
-
 [2.3.3]: https://github.com/InditexTech/weavejs/compare/2.3.2...2.3.3
-
 [2.3.2]: https://github.com/InditexTech/weavejs/compare/2.3.1...2.3.2
-
 [2.3.1]: https://github.com/InditexTech/weavejs/compare/2.3.0...2.3.1
-
 [2.3.0]: https://github.com/InditexTech/weavejs/compare/2.2.0...2.3.0
-
 [2.2.0]: https://github.com/InditexTech/weavejs/compare/2.1.1...2.2.0
-
 [2.1.1]: https://github.com/InditexTech/weavejs/compare/2.1.0...2.1.1
-
 [2.1.0]: https://github.com/InditexTech/weavejs/compare/2.0.3...2.1.0
-
 [2.0.3]: https://github.com/InditexTech/weavejs/compare/2.0.2...2.0.3
-
 [2.0.2]: https://github.com/InditexTech/weavejs/compare/2.0.1...2.0.2
-
 [2.0.1]: https://github.com/InditexTech/weavejs/compare/2.0.0...2.0.1
-
 [2.0.0]: https://github.com/InditexTech/weavejs/compare/1.3.0...2.0.0
-
 [1.3.0]: https://github.com/InditexTech/weavejs/compare/1.2.2...1.3.0
-
 [1.2.2]: https://github.com/InditexTech/weavejs/compare/1.2.1...1.2.2
-
 [1.2.1]: https://github.com/InditexTech/weavejs/compare/1.2.0...1.2.1
-
 [1.2.0]: https://github.com/InditexTech/weavejs/compare/1.1.3...1.2.0
-
 [1.1.3]: https://github.com/InditexTech/weavejs/compare/1.1.2...1.1.3
-
 [1.1.2]: https://github.com/InditexTech/weavejs/compare/1.1.1...1.1.2
-
 [1.1.1]: https://github.com/InditexTech/weavejs/compare/1.1.0...1.1.1
-
 [1.1.0]: https://github.com/InditexTech/weavejs/compare/1.0.4...1.1.0
-
 [1.0.4]: https://github.com/InditexTech/weavejs/compare/1.0.3...1.0.4
-
 [1.0.3]: https://github.com/InditexTech/weavejs/compare/1.0.2...1.0.3
-
 [1.0.2]: https://github.com/InditexTech/weavejs/compare/1.0.1...1.0.2
-
 [1.0.1]: https://github.com/InditexTech/weavejs/compare/1.0.0...1.0.1
-
 [1.0.0]: https://github.com/InditexTech/weavejs/compare/0.77.5...1.0.0
-
 [0.77.5]: https://github.com/InditexTech/weavejs/compare/0.77.4...0.77.5
-
 [0.77.4]: https://github.com/InditexTech/weavejs/compare/0.77.3...0.77.4
-
 [0.77.3]: https://github.com/InditexTech/weavejs/compare/0.77.2...0.77.3
-
 [0.77.2]: https://github.com/InditexTech/weavejs/compare/0.77.1...0.77.2
-
 [0.77.1]: https://github.com/InditexTech/weavejs/compare/0.77.0...0.77.1
-
 [0.77.0]: https://github.com/InditexTech/weavejs/compare/0.76.3...0.77.0
-
 [0.76.3]: https://github.com/InditexTech/weavejs/compare/0.76.2...0.76.3
-
 [0.76.2]: https://github.com/InditexTech/weavejs/compare/0.76.1...0.76.2
-
 [0.76.1]: https://github.com/InditexTech/weavejs/compare/0.76.0...0.76.1
-
 [0.76.0]: https://github.com/InditexTech/weavejs/compare/0.75.0...0.76.0
-
 [0.75.0]: https://github.com/InditexTech/weavejs/compare/0.74.3...0.75.0
-
 [0.74.3]: https://github.com/InditexTech/weavejs/compare/0.74.2...0.74.3
-
 [0.74.2]: https://github.com/InditexTech/weavejs/compare/0.74.1...0.74.2
-
 [0.74.1]: https://github.com/InditexTech/weavejs/compare/0.74.0...0.74.1
-
 [0.74.0]: https://github.com/InditexTech/weavejs/compare/0.73.1...0.74.0
-
 [0.73.1]: https://github.com/InditexTech/weavejs/compare/0.73.0...0.73.1
-
 [0.73.0]: https://github.com/InditexTech/weavejs/compare/0.72.1...0.73.0
-
 [0.72.1]: https://github.com/InditexTech/weavejs/compare/0.72.0...0.72.1
-
 [0.72.0]: https://github.com/InditexTech/weavejs/compare/0.71.0...0.72.0
-
 [0.71.0]: https://github.com/InditexTech/weavejs/compare/0.70.0...0.71.0
-
 [0.70.0]: https://github.com/InditexTech/weavejs/compare/0.69.2...0.70.0
-
 [0.69.2]: https://github.com/InditexTech/weavejs/compare/0.69.1...0.69.2
-
 [0.69.1]: https://github.com/InditexTech/weavejs/compare/0.69.0...0.69.1
-
 [0.69.0]: https://github.com/InditexTech/weavejs/compare/0.68.1...0.69.0
-
 [0.68.1]: https://github.com/InditexTech/weavejs/compare/0.68.0...0.68.1
-
 [0.68.0]: https://github.com/InditexTech/weavejs/compare/0.67.5...0.68.0
-
 [0.67.5]: https://github.com/InditexTech/weavejs/compare/0.67.4...0.67.5
-
 [0.67.4]: https://github.com/InditexTech/weavejs/compare/0.67.3...0.67.4
-
 [0.67.3]: https://github.com/InditexTech/weavejs/compare/0.67.2...0.67.3
-
 [0.67.2]: https://github.com/InditexTech/weavejs/compare/0.67.1...0.67.2
-
 [0.67.1]: https://github.com/InditexTech/weavejs/compare/0.67.0...0.67.1
-
 [0.67.0]: https://github.com/InditexTech/weavejs/compare/0.66.0...0.67.0
-
 [0.66.0]: https://github.com/InditexTech/weavejs/compare/0.64.0...0.66.0
-
 [0.64.0]: https://github.com/InditexTech/weavejs/compare/0.62.4...0.64.0
-
 [0.62.4]: https://github.com/InditexTech/weavejs/compare/0.62.3...0.62.4
-
 [0.62.3]: https://github.com/InditexTech/weavejs/compare/0.62.2...0.62.3
-
 [0.62.2]: https://github.com/InditexTech/weavejs/compare/0.62.1...0.62.2
-
 [0.62.1]: https://github.com/InditexTech/weavejs/compare/0.62.0...0.62.1
-
 [0.62.0]: https://github.com/InditexTech/weavejs/compare/0.61.0...0.62.0
-
 [0.61.0]: https://github.com/InditexTech/weavejs/compare/0.60.0...0.61.0
-
 [0.60.0]: https://github.com/InditexTech/weavejs/compare/0.59.0...0.60.0
-
 [0.59.0]: https://github.com/InditexTech/weavejs/compare/0.58.0...0.59.0
-
 [0.58.0]: https://github.com/InditexTech/weavejs/compare/0.57.1...0.58.0
-
 [0.57.1]: https://github.com/InditexTech/weavejs/compare/0.57.0...0.57.1
-
 [0.57.0]: https://github.com/InditexTech/weavejs/compare/0.56.2...0.57.0
-
 [0.56.2]: https://github.com/InditexTech/weavejs/compare/0.56.1...0.56.2
-
 [0.56.1]: https://github.com/InditexTech/weavejs/compare/0.56.0...0.56.1
-
 [0.56.0]: https://github.com/InditexTech/weavejs/compare/0.55.2...0.56.0
-
 [0.55.2]: https://github.com/InditexTech/weavejs/compare/0.55.1...0.55.2
-
 [0.55.1]: https://github.com/InditexTech/weavejs/compare/0.55.0...0.55.1
-
 [0.55.0]: https://github.com/InditexTech/weavejs/compare/0.54.1...0.55.0
-
 [0.54.1]: https://github.com/InditexTech/weavejs/compare/0.54.0...0.54.1
-
 [0.54.0]: https://github.com/InditexTech/weavejs/compare/0.53.0...0.54.0
-
 [0.53.0]: https://github.com/InditexTech/weavejs/compare/0.52.3...0.53.0
-
 [0.52.3]: https://github.com/InditexTech/weavejs/compare/0.52.2...0.52.3
-
 [0.52.2]: https://github.com/InditexTech/weavejs/compare/0.52.1...0.52.2
-
 [0.52.1]: https://github.com/InditexTech/weavejs/compare/0.52.0...0.52.1
-
 [0.52.0]: https://github.com/InditexTech/weavejs/compare/0.51.0...0.52.0
-
 [0.51.0]: https://github.com/InditexTech/weavejs/compare/0.50.0...0.51.0
-
 [0.50.0]: https://github.com/InditexTech/weavejs/compare/0.49.0...0.50.0
-
 [0.49.0]: https://github.com/InditexTech/weavejs/compare/0.48.0...0.49.0
-
 [0.48.0]: https://github.com/InditexTech/weavejs/compare/0.47.1...0.48.0
-
 [0.47.1]: https://github.com/InditexTech/weavejs/compare/0.47.0...0.47.1
-
 [0.47.0]: https://github.com/InditexTech/weavejs/compare/0.46.1...0.47.0
-
 [0.46.1]: https://github.com/InditexTech/weavejs/compare/0.46.0...0.46.1
-
 [0.46.0]: https://github.com/InditexTech/weavejs/compare/0.45.0...0.46.0
-
 [0.45.0]: https://github.com/InditexTech/weavejs/compare/0.44.0...0.45.0
-
 [0.44.0]: https://github.com/InditexTech/weavejs/compare/0.43.0...0.44.0
-
 [0.43.0]: https://github.com/InditexTech/weavejs/compare/0.42.2...0.43.0
-
 [0.42.2]: https://github.com/InditexTech/weavejs/compare/0.42.1...0.42.2
-
 [0.42.1]: https://github.com/InditexTech/weavejs/compare/0.42.0...0.42.1
-
 [0.42.0]: https://github.com/InditexTech/weavejs/compare/0.41.0...0.42.0
-
 [0.41.0]: https://github.com/InditexTech/weavejs/compare/0.40.2...0.41.0
-
 [0.40.2]: https://github.com/InditexTech/weavejs/compare/0.40.1...0.40.2
-
 [0.40.1]: https://github.com/InditexTech/weavejs/compare/0.40.0...0.40.1
-
 [0.40.0]: https://github.com/InditexTech/weavejs/compare/0.39.3...0.40.0
-
 [0.39.3]: https://github.com/InditexTech/weavejs/compare/0.39.2...0.39.3
-
 [0.39.2]: https://github.com/InditexTech/weavejs/compare/0.39.1...0.39.2
-
 [0.39.1]: https://github.com/InditexTech/weavejs/compare/0.39.0...0.39.1
-
 [0.39.0]: https://github.com/InditexTech/weavejs/compare/0.38.0...0.39.0
-
 [0.38.0]: https://github.com/InditexTech/weavejs/compare/0.37.0...0.38.0
-
 [0.37.0]: https://github.com/InditexTech/weavejs/compare/0.36.0...0.37.0
-
 [0.36.0]: https://github.com/InditexTech/weavejs/compare/0.35.0...0.36.0
-
 [0.35.0]: https://github.com/InditexTech/weavejs/compare/0.34.0...0.35.0
-
 [0.34.0]: https://github.com/InditexTech/weavejs/compare/0.33.0...0.34.0
-
 [0.33.0]: https://github.com/InditexTech/weavejs/compare/0.32.0...0.33.0
-
 [0.32.0]: https://github.com/InditexTech/weavejs/compare/0.31.1...0.32.0
-
 [0.31.1]: https://github.com/InditexTech/weavejs/compare/0.31.0...0.31.1
-
 [0.31.0]: https://github.com/InditexTech/weavejs/compare/0.30.1...0.31.0
-
 [0.30.1]: https://github.com/InditexTech/weavejs/compare/0.30.0...0.30.1
-
 [0.30.0]: https://github.com/InditexTech/weavejs/compare/0.29.1...0.30.0
-
 [0.29.1]: https://github.com/InditexTech/weavejs/compare/0.29.0...0.29.1
-
 [0.29.0]: https://github.com/InditexTech/weavejs/compare/0.28.0...0.29.0
-
 [0.28.0]: https://github.com/InditexTech/weavejs/compare/0.27.4...0.28.0
-
 [0.27.4]: https://github.com/InditexTech/weavejs/compare/0.27.3...0.27.4
-
 [0.27.3]: https://github.com/InditexTech/weavejs/compare/0.27.2...0.27.3
-
 [0.27.2]: https://github.com/InditexTech/weavejs/compare/0.27.1...0.27.2
-
 [0.27.1]: https://github.com/InditexTech/weavejs/compare/0.27.0...0.27.1
-
 [0.27.0]: https://github.com/InditexTech/weavejs/compare/0.26.2...0.27.0
-
 [0.26.2]: https://github.com/InditexTech/weavejs/compare/0.26.1...0.26.2
-
 [0.26.1]: https://github.com/InditexTech/weavejs/compare/0.26.0...0.26.1
-
 [0.26.0]: https://github.com/InditexTech/weavejs/compare/0.25.0...0.26.0
-
 [0.25.0]: https://github.com/InditexTech/weavejs/compare/0.24.1...0.25.0
-
 [0.24.1]: https://github.com/InditexTech/weavejs/compare/0.24.0...0.24.1
-
 [0.24.0]: https://github.com/InditexTech/weavejs/compare/0.23.1...0.24.0
-
 [0.23.1]: https://github.com/InditexTech/weavejs/compare/0.23.0...0.23.1
-
 [0.23.0]: https://github.com/InditexTech/weavejs/compare/0.22.1...0.23.0
-
 [0.22.1]: https://github.com/InditexTech/weavejs/compare/0.22.0...0.22.1
-
 [0.22.0]: https://github.com/InditexTech/weavejs/compare/0.21.2...0.22.0
-
 [0.21.2]: https://github.com/InditexTech/weavejs/compare/0.21.1...0.21.2
-
 [0.21.1]: https://github.com/InditexTech/weavejs/compare/0.21.0...0.21.1
-
 [0.21.0]: https://github.com/InditexTech/weavejs/compare/0.20.4...0.21.0
-
 [0.20.4]: https://github.com/InditexTech/weavejs/compare/0.20.3...0.20.4
-
 [0.20.3]: https://github.com/InditexTech/weavejs/compare/0.20.2...0.20.3
-
 [0.20.2]: https://github.com/InditexTech/weavejs/compare/0.20.1...0.20.2
-
 [0.20.1]: https://github.com/InditexTech/weavejs/compare/0.20.0...0.20.1
-
 [0.20.0]: https://github.com/InditexTech/weavejs/compare/0.19.0...0.20.0
-
 [0.19.0]: https://github.com/InditexTech/weavejs/compare/0.18.0...0.19.0
-
 [0.18.0]: https://github.com/InditexTech/weavejs/compare/0.17.0...0.18.0
-
 [0.17.0]: https://github.com/InditexTech/weavejs/compare/0.16.2...0.17.0
-
 [0.16.2]: https://github.com/InditexTech/weavejs/compare/0.16.1...0.16.2
-
 [0.16.1]: https://github.com/InditexTech/weavejs/compare/0.16.0...0.16.1
-
 [0.16.0]: https://github.com/InditexTech/weavejs/compare/0.15.0...0.16.0
-
 [0.15.0]: https://github.com/InditexTech/weavejs/compare/0.14.3...0.15.0
-
 [0.14.3]: https://github.com/InditexTech/weavejs/compare/0.14.2...0.14.3
-
 [0.14.2]: https://github.com/InditexTech/weavejs/compare/0.14.1...0.14.2
-
 [0.14.1]: https://github.com/InditexTech/weavejs/compare/0.14.0...0.14.1
-
 [0.14.0]: https://github.com/InditexTech/weavejs/compare/0.13.1...0.14.0
-
 [0.13.1]: https://github.com/InditexTech/weavejs/compare/0.13.0...0.13.1
-
 [0.13.0]: https://github.com/InditexTech/weavejs/compare/0.12.1...0.13.0
-
 [0.12.1]: https://github.com/InditexTech/weavejs/compare/0.12.0...0.12.1
-
 [0.12.0]: https://github.com/InditexTech/weavejs/compare/0.11.0...0.12.0
-
 [0.11.0]: https://github.com/InditexTech/weavejs/compare/0.10.3...0.11.0
-
 [0.10.3]: https://github.com/InditexTech/weavejs/compare/0.10.2...0.10.3
-
 [0.10.2]: https://github.com/InditexTech/weavejs/compare/0.10.1...0.10.2
-
 [0.10.1]: https://github.com/InditexTech/weavejs/compare/0.10.0...0.10.1
-
 [0.10.0]: https://github.com/InditexTech/weavejs/compare/0.9.3...0.10.0
-
 [0.9.3]: https://github.com/InditexTech/weavejs/compare/0.9.2...0.9.3
-
 [0.9.2]: https://github.com/InditexTech/weavejs/compare/0.9.1...0.9.2
-
 [0.9.1]: https://github.com/InditexTech/weavejs/compare/0.9.0...0.9.1
-
 [0.9.0]: https://github.com/InditexTech/weavejs/compare/0.8.0...0.9.0
-
 [0.8.0]: https://github.com/InditexTech/weavejs/compare/0.7.1...0.8.0
-
 [0.7.1]: https://github.com/InditexTech/weavejs/compare/0.7.0...0.7.1
-
 [0.7.0]: https://github.com/InditexTech/weavejs/compare/0.6.0...0.7.0
-
 [0.6.0]: https://github.com/InditexTech/weavejs/compare/0.5.0...0.6.0
-
 [0.5.0]: https://github.com/InditexTech/weavejs/compare/0.4.0...0.5.0
-
 [0.4.0]: https://github.com/InditexTech/weavejs/compare/0.3.3...0.4.0
-
 [0.3.3]: https://github.com/InditexTech/weavejs/compare/0.3.2...0.3.3
-
 [0.3.2]: https://github.com/InditexTech/weavejs/compare/0.3.1...0.3.2
-
 [0.3.1]: https://github.com/InditexTech/weavejs/compare/0.3.0...0.3.1
-
 [0.3.0]: https://github.com/InditexTech/weavejs/compare/0.2.1...0.3.0
-
 [0.2.1]: https://github.com/InditexTech/weavejs/compare/0.2.0...0.2.1
-
 [0.2.0]: https://github.com/InditexTech/weavejs/compare/0.1.1...0.2.0
-
 [0.1.1]: https://github.com/InditexTech/weavejs/compare/0.1.0...0.1.1
-
 [0.1.0]: https://github.com/InditexTech/weavejs/releases/tag/0.1.0

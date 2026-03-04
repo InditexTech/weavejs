@@ -30,6 +30,7 @@ import {
   type WeaveNodeChangeType,
   WEAVE_NODE_CHANGE_TYPE,
   type WeaveUserChangeEvent,
+  type DeepPartial,
 } from '@inditextech/weave-types';
 import { WeaveStore } from './stores/store';
 import {
@@ -64,7 +65,11 @@ import type {
   WeaveStoreOnRoomLoadedEvent,
 } from './stores/types';
 import type { DOMElement } from './types';
-import { getBoundingBox, mergeExceptArrays } from './utils';
+import {
+  getBoundingBox,
+  getExportBoundingBox,
+  mergeExceptArrays,
+} from './utils';
 import { WeaveAsyncManager } from './managers/async/async';
 import { WeaveHooksManager } from './managers/hooks';
 import { WeaveUsersManager } from './managers/users/users';
@@ -73,7 +78,9 @@ import {
   DEFAULT_MOVE_NODE_OPTIONS,
   DEFAULT_REMOVE_NODE_OPTIONS,
   DEFAULT_UPDATE_NODE_OPTIONS,
+  WEAVE_DEFAULT_CONFIG,
 } from './constants';
+import { WeaveDragAndDropManager } from './managers/drag-and-drop';
 
 export class Weave {
   private id: string;
@@ -104,8 +111,13 @@ export class Weave {
   private readonly mutexManager: WeaveMutexManager;
   private readonly asyncManager: WeaveAsyncManager;
   private readonly hooksManager: WeaveHooksManager;
+  private readonly dragAndDropManager: WeaveDragAndDropManager;
 
-  constructor(weaveConfig: WeaveConfig, stageConfig: Konva.StageConfig) {
+  constructor(
+    weaveConfig: Pick<WeaveConfig, 'store'> &
+      DeepPartial<Omit<WeaveConfig, 'store'>>,
+    stageConfig: Konva.StageConfig
+  ) {
     globalThis._weave_isServerSide = false;
     if (typeof window === 'undefined') {
       globalThis._weave_isServerSide = true;
@@ -120,7 +132,7 @@ export class Weave {
     this.initialized = false;
 
     // Save in memory the configuration provided
-    this.config = mergeExceptArrays({}, weaveConfig);
+    this.config = mergeExceptArrays(WEAVE_DEFAULT_CONFIG, weaveConfig);
     // Setup the logger
     this.logger = new WeaveLogger(
       this,
@@ -161,6 +173,7 @@ export class Weave {
     this.mutexManager = new WeaveMutexManager(this);
     this.asyncManager = new WeaveAsyncManager(this);
     this.hooksManager = new WeaveHooksManager(this);
+    this.dragAndDropManager = new WeaveDragAndDropManager(this);
 
     // Render welcome log to console
     this.setupManager.welcomeLog();
@@ -231,10 +244,6 @@ export class Weave {
       if (!window.weave) {
         window.weave = this;
       }
-
-      // Initialize global window variables
-      window.weaveTextEditing = {};
-      window.weaveDragImageURL = undefined;
     }
 
     this.emitEvent<WeaveStoreOnRoomLoadedEvent>('onRoomLoaded', false);
@@ -1051,6 +1060,10 @@ export class Weave {
     }
   }
 
+  getRealSelectedNode = (nodeTarget: Konva.Node) => {
+    return this.targetingManager.getRealSelectedNode(nodeTarget);
+  };
+
   // CLONING MANAGEMENT METHODS PROXIES
 
   getCloningManager(): WeaveCloningManager {
@@ -1099,6 +1112,22 @@ export class Weave {
       boundingNodes,
       options
     );
+  }
+
+  public getExportBoundingBox(nodesIds: string[]): {
+    x: number;
+    y: number;
+    width: number;
+    height: number;
+  } {
+    const nodes = [];
+    for (const nodeId of nodesIds) {
+      const nodeInstance = this.getStage().findOne(`#${nodeId}`);
+      if (nodeInstance) {
+        nodes.push(nodeInstance);
+      }
+    }
+    return getExportBoundingBox(nodes);
   }
 
   // LOCK / UNLOCK METHODS
@@ -1282,7 +1311,6 @@ export class Weave {
   }
 
   // ASYNC ELEMENTS METHODS
-
   public asyncElementsLoaded(): boolean {
     return this.asyncManager.asyncElementsLoaded();
   }
@@ -1363,5 +1391,31 @@ export class Weave {
   // USERS MANAGEMENT METHODS
   getUsers(): WeaveUser[] {
     return this.usersManager.getUsers();
+  }
+
+  // DRAG AND DROP MANAGEMENT METHODS
+
+  getDragStartedId(): string | null {
+    return this.dragAndDropManager.getDragStartedId();
+  }
+
+  isDragStarted(): boolean {
+    return this.dragAndDropManager.isDragStarted();
+  }
+
+  startDrag(id: string): void {
+    this.dragAndDropManager.startDrag(id);
+  }
+
+  endDrag(id: string): void {
+    this.dragAndDropManager.endDrag(id);
+  }
+
+  setDragProperties<T>(properties: T): void {
+    this.dragAndDropManager.setDragProperties<T>(properties);
+  }
+
+  getDragProperties<T>(): T | null {
+    return this.dragAndDropManager.getDragProperties();
   }
 }

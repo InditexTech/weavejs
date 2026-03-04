@@ -5,6 +5,12 @@
 export interface WeaveActionBase {
   onInit?(): void;
 
+  getName(): string;
+
+  hasAliases(): boolean;
+
+  getAliases(): string[];
+
   trigger(cancelAction: () => void, params?: unknown): unknown;
 
   internalUpdate?(): void;

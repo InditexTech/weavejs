@@ -47,6 +47,7 @@ export const mapJsonToYjsArray = (jsonData: any) => {
   return array;
 };
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const mapJsonToYjsElements = (jsonData: any) => {
   if (isArray(jsonData)) {
     return mapJsonToYjsArray(jsonData);

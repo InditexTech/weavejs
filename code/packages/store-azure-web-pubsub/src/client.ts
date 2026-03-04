@@ -14,7 +14,7 @@ import * as awarenessProtocol from 'y-protocols/awareness';
 import {
   MessageDataType,
   MessageType,
-  type WeaveStoreAzureWebPubSubSyncClientOptions,
+  // type WeaveStoreAzureWebPubSubSyncClientOptions,
   type FetchClient,
   type Message,
   type MessageHandler,
@@ -115,13 +115,13 @@ export class WeaveStoreAzureWebPubSubSyncClient extends Emittery {
   private _status: WeaveStoreAzureWebPubSubSyncClientConnectionStatus;
   private _wsConnected: boolean;
   private _synced: boolean;
-  private _resyncInterval!: NodeJS.Timeout | null;
-  private _resyncCheckInterval!: NodeJS.Timeout | null;
+  // private _resyncInterval!: NodeJS.Timeout | null;
+  // private _resyncCheckInterval!: NodeJS.Timeout | null;
   private _lastReceivedSyncResponse!: number | null;
   private _connectionRetries: number;
   private _uuid: string;
   private _awareness!: awarenessProtocol.Awareness;
-  private _options: WeaveStoreAzureWebPubSubSyncClientOptions;
+  // private _options: WeaveStoreAzureWebPubSubSyncClientOptions;
   private _initialized: boolean;
   private _chunkedMessages: Map<string, string[]>;
 
@@ -145,16 +145,11 @@ export class WeaveStoreAzureWebPubSubSyncClient extends Emittery {
     instance: WeaveStoreAzureWebPubsub,
     url: string,
     topic: string,
-    doc: Doc,
-    options: WeaveStoreAzureWebPubSubSyncClientOptions = {
-      resyncInterval: 15 * 1000,
-      tokenProvider: null,
-    }
+    doc: Doc
   ) {
     super();
 
     this.instance = instance;
-    this._options = options;
 
     this.doc = doc;
     this.topic = topic;
@@ -172,8 +167,6 @@ export class WeaveStoreAzureWebPubSubSyncClient extends Emittery {
     this._synced = false;
     this._ws = null;
 
-    this._resyncInterval = null;
-    this._resyncCheckInterval = null;
     this._lastReceivedSyncResponse = null;
 
     const awareness = new awarenessProtocol.Awareness(this.doc);
@@ -199,7 +192,6 @@ export class WeaveStoreAzureWebPubSubSyncClient extends Emittery {
     this.doc.on('update', this._updateHandler);
 
     // register awareness update handler
-    // this._awarenessUpdateHandler = ({ added, updated, removed }, origin) => {
     this._awarenessUpdateHandler = ({ added, updated, removed }) => {
       const changedClients = added.concat(updated).concat(removed);
       const encoder = encoding.createEncoder();
@@ -218,9 +210,6 @@ export class WeaveStoreAzureWebPubSubSyncClient extends Emittery {
     };
 
     this._awareness.on('update', this._awarenessUpdateHandler);
-
-    // this._awareness.on('update', this._awarenessUpdateHandler);
-    // this.doc.on('update', this._updateHandler);
   }
 
   get awareness(): awarenessProtocol.Awareness {
@@ -253,66 +242,6 @@ export class WeaveStoreAzureWebPubSubSyncClient extends Emittery {
     const now = new Date();
     this._lastReceivedSyncResponse = now.getTime();
     this.instance.emitEvent('onSyncResponse', this._lastReceivedSyncResponse);
-  }
-
-  setupResyncInterval(): void {
-    if (this._options.resyncInterval > 0) {
-      this._resyncInterval = setInterval(() => {
-        if (this._ws && this._wsConnected) {
-          // resend sync step 1
-          const encoder = encoding.createEncoder();
-          encoding.writeVarUint(encoder, messageSyncStep1);
-          syncProtocol.writeSyncStep1(encoder, this.doc);
-          sendToControlGroup(
-            this,
-            this.topic,
-            MessageDataType.Sync,
-            encoding.toUint8Array(encoder)
-          );
-        }
-      }, this._options.resyncInterval);
-
-      this._resyncCheckInterval = setInterval(() => {
-        if (!this._lastReceivedSyncResponse) {
-          return;
-        }
-
-        const resyncInSeconds = this._options.resyncInterval / 1000;
-        const resyncWindowLimitInSeconds = resyncInSeconds + 10; // twice size window and 10 seconds grace period
-        const now = new Date();
-        const diffInSeconds =
-          (now.getTime() - this._lastReceivedSyncResponse) / 1000;
-
-        if (
-          diffInSeconds > resyncWindowLimitInSeconds &&
-          this._ws?.readyState === WebSocket.OPEN
-        ) {
-          // if last received sync response is older than resync interval + 5s, assume connection lost
-          this._ws.dispatchEvent(
-            new CustomEvent('error', {
-              cancelable: false,
-              bubbles: false,
-              detail: new Error('No sync response'),
-              // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            }) as any
-          );
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          (this._ws as any)._ws.close();
-        }
-      }, this._options.resyncInterval + 5000);
-    }
-  }
-
-  cleanupResyncInterval(): void {
-    if (this._resyncInterval) {
-      clearInterval(this._resyncInterval);
-      this._resyncInterval = null;
-    }
-
-    if (this._resyncCheckInterval) {
-      clearInterval(this._resyncCheckInterval);
-      this._resyncCheckInterval = null;
-    }
   }
 
   simulateWebsocketError(): void {
@@ -355,7 +284,6 @@ export class WeaveStoreAzureWebPubSubSyncClient extends Emittery {
       this._ws.close();
     }
 
-    this.cleanupResyncInterval();
     this._wsConnected = false;
     this._ws = null;
   }
@@ -511,7 +439,6 @@ export class WeaveStoreAzureWebPubSubSyncClient extends Emittery {
       }
 
       if (this._wsConnected) {
-        this.cleanupResyncInterval();
         this._wsConnected = false;
         this.synced = false;
         awarenessProtocol.removeAwarenessStates(
@@ -533,8 +460,6 @@ export class WeaveStoreAzureWebPubSubSyncClient extends Emittery {
       this._initialized = true;
 
       this._connectionRetries = this._connectionRetries++;
-
-      this.setupResyncInterval();
 
       joinGroup(this, this.topic);
 

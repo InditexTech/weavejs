@@ -106,5 +106,17 @@ export class WeaveRegisterManager {
 
     action.register(this.instance);
     this.actionsHandlers[actionName] = action;
+
+    if (action.hasAliases()) {
+      const aliases = action.getAliases();
+      for (const alias of aliases) {
+        if (this.actionsHandlers[alias]) {
+          const msg = `Action handler with name [${alias}] already exists`;
+          this.logger.error(msg);
+          throw new Error(msg);
+        }
+        this.actionsHandlers[alias] = action;
+      }
+    }
   }
 }

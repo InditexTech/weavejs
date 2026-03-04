@@ -3,7 +3,9 @@ title: Events
 description: Weave instance emitted events
 ---
 
-## onRender
+## Instance events
+
+### onRender
 
 ```ts
 instance.addEventListener('onRender', () => void);
@@ -12,7 +14,7 @@ instance.addEventListener('onRender', () => void);
 The `onRender` event is triggered each time the room is rendered, this means each time the nodes reconciler detects a
 change, being a change made by the actual instance user or a remote user of the room.
 
-## onInstanceStatus
+### onInstanceStatus
 
 ```ts
 const WEAVE_INSTANCE_STATUS = {
@@ -33,7 +35,7 @@ instance.addEventListener('onInstanceStatus', (status: WeaveStatus) => void);
 
 The `onInstanceStatus` event is triggered each time the Weave.js instance change it's internal status.
 
-## onRoomLoaded
+### onRoomLoaded
 
 ```ts
 type WeaveStoreOnRoomLoadedEvent = boolean;
@@ -43,7 +45,7 @@ instance.addEventListener('onRoomLoaded', (roomLoaded: WeaveStoreOnRoomLoadedEve
 
 The `onRoomLoaded` event is triggered internally by Weave.js providing information about the room is loaded or not.
 
-## onUserChange
+### onUserChange
 
 ```ts
 const WEAVE_NODE_CHANGE_TYPE = {
@@ -67,3 +69,28 @@ instance.addEventListener('onUserChange', (e: WeaveUserChangeEvent) => void);
 
 The `onUserChange` event is triggered each time the user of the Weave.js instance adds, modifies or removes a node from
 the room.
+
+## Async Elements management
+
+### onAsyncElementsLoading
+
+```ts
+type WeaveAsyncElementsLoadingEvent = {
+  loaded: number;
+  total: number;
+};
+
+instance.addEventListener('onAsyncElementsLoading', ({ loaded: number; total: number; }) => void);
+```
+
+The `onAsyncElementsLoading` event is triggered internally by Weave.js providing information about the the async elements
+loading progress. An Async element are resources that are loaded asynchronously like images or videos for example.
+
+### onAsyncElementsLoaded
+
+```ts
+instance.addEventListener('onAsyncElementsLoaded', () => void);
+```
+
+The `onAsyncElementsLoaded` event is triggered internally by Weave.js that is emitted only one time after a room is loaded
+and all its async elements are fully loaded.

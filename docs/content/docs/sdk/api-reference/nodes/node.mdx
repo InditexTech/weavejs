@@ -101,20 +101,77 @@ isNodeSelected(ele: Konva.Node): boolean
 
 This method returns `true` if the specified node is selected, `false` otherwise.
 
-## Abstract Methods
-
-### createNode
+### show
 
 ```ts
-createNode(key: string, props: WeaveElementAttributes): WeaveStateElement
+show(instance: Konva.Node): void
+```
+
+This method makes a node visible on the stage. In this context visible means that the node is rendered,
+not that is visible on the viewport.
+
+### hide
+
+```ts
+hide(instance: Konva.Node): void
+```
+
+This method makes a node invisible on the stage.
+
+### isVisible
+
+```ts
+isVisible(instance: Konva.Node): boolean
+```
+
+This method returns `true` if the provided node is visible.
+
+### lock
+
+```ts
+unlock(instance: Konva.Node): void
+```
+
+This method locks a node. In this context locking a node means that the node is no longer interactable.
+
+### unlock
+
+```ts
+unlock(instance: Konva.Node): void
+```
+
+This method unlocks a node.
+
+### isLocked
+
+```ts
+isLocked(instance: Konva.Node): boolean
+```
+
+This method returns `true` if the provided node is locked.
+
+## Abstract Methods
+
+### create
+
+```ts
+create(key: string, props: WeaveElementAttributes): WeaveStateElement
 ```
 
 This method creates a JSON model of the node, based on the previous explained model.
 
-### createInstance
+### onAdd
 
 ```ts
-createInstance(props: WeaveElementAttributes): WeaveElementInstance
+onAdd(props: WeaveElementAttributes): WeaveElementInstance
+```
+
+This method is called when a node instance is added to the stage via the internal reconciler.
+
+### onRender
+
+```ts
+onRender(props: WeaveElementAttributes): WeaveElementInstance
 ```
 
 This method converts the node JSON model representation into a Konva instance. This is
@@ -123,33 +180,41 @@ the ideal place to initialize events related to the node for example.
 This method is used by the internal React Reconciler to handler the rendering of the
 stage.
 
-### updateInstance
+### onUpdate
 
 ```ts
 updateInstance(
-  instance: WeaveElementInstance,
+  nodeInstance: WeaveElementInstance,
   nextProps: WeaveElementAttributes
 ): void
 ```
 
 This method updates a rendered instance of Konva, that represents a node.
 
-### removeInstance
+### onDestroy
 
 ```ts
-removeInstance(instance: WeaveElementInstance): void
+onDestroy(nodeInstance: WeaveElementInstance): void
 ```
 
 This method destroys the Konva instance rendered, that represents a node.
 
+### onDestroyInstance
+
+```ts
+onDestroyInstance(): void
+```
+
+This method is called when the Weave.js instance is destroyed, is useful for cleanup purposes.
+
 ### toNode
 
 ```ts
-toNode(instance: WeaveElementInstance): WeaveStateElement
+serialize(instance: WeaveElementInstance): WeaveStateElement
 ```
 
 This method returns the JSON model representation of the provided Konva instance
-that is handled by this Node definition.
+that is handled by this Node definition. It's a serialization from Konva instance to JSON model.
 
 ## Konva.Node Augmentation
 

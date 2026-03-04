@@ -17,6 +17,7 @@ import WeaveAzureWebPubsubSyncHandler from './azure-web-pubsub-sync-handler';
 import type { WebPubSubEventHandlerOptions } from './event-handler';
 import type { RequestHandler } from 'express';
 import { defaultInitialState } from '@inditextech/weave-sdk/server';
+import type Y from '@/yjs';
 
 type WeaveAzureWebPubsubServerParams = {
   initialState?: FetchInitialState;
@@ -102,6 +103,10 @@ export class WeaveAzureWebPubsubServer extends Emittery {
 
   removeEventListener<T>(event: string, callback: (payload: T) => void): void {
     this.off(event, callback);
+  }
+
+  async getRoomDocument(roomId: string): Promise<Y.Doc> {
+    return await this.syncHandler.getRoomDocument(roomId);
   }
 
   async clientConnect(

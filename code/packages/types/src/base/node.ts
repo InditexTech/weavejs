@@ -42,4 +42,6 @@ export interface WeaveNodeBase {
   isSelecting(): boolean;
 
   isPasting(): boolean;
+
+  getIsAsync(): boolean;
 }

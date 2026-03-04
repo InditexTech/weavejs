@@ -54,7 +54,10 @@ export class WeaveFitToSelectionToolAction extends WeaveAction {
   ): void {
     const stageZoomPlugin = this.getStageZoomPlugin();
 
-    stageZoomPlugin.fitToSelection(params?.smartZoom ?? false);
+    stageZoomPlugin.fitToSelection({
+      smartZoom: params?.smartZoom ?? false,
+      overrideZoom: params?.overrideZoom ?? true,
+    });
 
     this.previousAction = params.previousAction;
     this.cancelAction = cancelAction;

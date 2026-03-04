@@ -31,6 +31,7 @@ export class WeaveBrushToolAction extends WeaveAction {
   protected state: WeaveBrushToolActionState;
   protected clickPoint: Konva.Vector2d | null;
   protected strokeId: string | null;
+  protected isSpacePressed: boolean = false;
   protected isEraser: boolean;
   protected container: Konva.Layer | Konva.Node | undefined;
   protected measureContainer: Konva.Layer | Konva.Group | undefined;
@@ -53,6 +54,7 @@ export class WeaveBrushToolAction extends WeaveAction {
     this.isEraser = false;
     this.measureContainer = undefined;
     this.props = this.initProps();
+    this.isSpacePressed = false;
   }
 
   getName(): string {
@@ -77,6 +79,15 @@ export class WeaveBrushToolAction extends WeaveAction {
   private setupEvents() {
     const stage = this.instance.getStage();
 
+    window.addEventListener('keyup', (e) => {
+      if (
+        e.code === 'Space' &&
+        this.instance.getActiveAction() === BRUSH_TOOL_ACTION_NAME
+      ) {
+        this.isSpacePressed = false;
+      }
+    });
+
     window.addEventListener('keydown', (e) => {
       if (
         e.code === 'Enter' &&
@@ -86,20 +97,36 @@ export class WeaveBrushToolAction extends WeaveAction {
         return;
       }
       if (
+        e.code === 'Space' &&
+        this.instance.getActiveAction() === BRUSH_TOOL_ACTION_NAME
+      ) {
+        this.isSpacePressed = true;
+        return;
+      }
+      if (
         e.code === 'Escape' &&
         this.instance.getActiveAction() === BRUSH_TOOL_ACTION_NAME
       ) {
         this.cancelAction();
-        return;
       }
     });
 
     const handlePointerDown = (e: Konva.KonvaEventObject<PointerEvent>) => {
+      if (this.state === BRUSH_TOOL_STATE.INACTIVE) return;
+
       if (this.state !== BRUSH_TOOL_STATE.IDLE) {
         return;
       }
 
       if (this.getZoomPlugin()?.isPinching()) {
+        return;
+      }
+
+      if (this.isSpacePressed) {
+        return;
+      }
+
+      if (e.evt.button !== 0) {
         return;
       }
 
@@ -389,6 +416,11 @@ export class WeaveBrushToolAction extends WeaveAction {
 
   private setCursor() {
     const stage = this.instance.getStage();
+
+    if (this.isSpacePressed) {
+      return;
+    }
+
     stage.container().style.cursor = 'crosshair';
   }
 

@@ -22,6 +22,11 @@ interface WeaveRuntimeState {
   room: {
     loaded: boolean;
   };
+  asyncElements: {
+    loaded: number;
+    total: number;
+    allLoaded: boolean;
+  };
   users: WeaveConnectedUsers;
   undoRedo: {
     canUndo: boolean;
@@ -47,6 +52,8 @@ interface WeaveRuntimeState {
   setAppState: (newAppState: WeaveState) => void;
   setConnectionStatus: (newConnectionStatus: string) => void;
   setRoomLoaded: (newStatus: boolean) => void;
+  setAsyncElements: (loaded: number, total: number) => void;
+  setAsyncElementsAllLoaded: (allLoaded: boolean) => void;
   setUsers: (newUsers: WeaveConnectedUsers) => void;
   setCanUndo: (newCanUndo: boolean) => void;
   setCanRedo: (newCanRedo: boolean) => void;
@@ -67,6 +74,11 @@ export const useWeave: UseBoundStore<StoreApi<WeaveRuntimeState>> =
     status: WEAVE_INSTANCE_STATUS.IDLE,
     room: {
       loaded: false,
+    },
+    asyncElements: {
+      loaded: 0,
+      total: 0,
+      allLoaded: false,
     },
     connection: {
       status: 'disconnected',
@@ -110,6 +122,23 @@ export const useWeave: UseBoundStore<StoreApi<WeaveRuntimeState>> =
       set((state) => ({
         ...state,
         room: { ...state.room, loaded: newStatus },
+      })),
+    setAsyncElements: (loaded, total) =>
+      set((state) => ({
+        ...state,
+        asyncElements: {
+          ...state.asyncElements,
+          loaded,
+          total,
+        },
+      })),
+    setAsyncElementsAllLoaded: (allLoaded) =>
+      set((state) => ({
+        ...state,
+        asyncElements: {
+          ...state.asyncElements,
+          allLoaded,
+        },
       })),
     setUsers: (newUsers) => set((state) => ({ ...state, users: newUsers })),
     setCanUndo: (newCanUndo) =>

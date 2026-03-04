@@ -3,8 +3,13 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import Konva from 'konva';
-import { IMAGE_TOOL_STATE } from './constants';
+import { IMAGE_TOOL_LOAD_FROM, IMAGE_TOOL_STATE } from './constants';
 import type { ImageCrossOrigin } from '@inditextech/weave-types';
+
+export type WeaveImageToolActionLoadFromKeys =
+  keyof typeof IMAGE_TOOL_LOAD_FROM;
+export type WeaveImageToolActionLoadFrom =
+  (typeof IMAGE_TOOL_LOAD_FROM)[WeaveImageToolActionLoadFromKeys];
 
 export type WeaveImageToolActionStateKeys = keyof typeof IMAGE_TOOL_STATE;
 export type WeaveImageToolActionState =
@@ -19,7 +24,10 @@ export type WeaveImageToolActionOnAddedEvent = {
 };
 
 export type WeaveImageToolActionTriggerParams = {
+  imageData?: string;
   imageURL?: string;
+  imageWidth?: number;
+  imageHeight?: number;
   imageId?: string;
   options?: ImageOptions;
   position?: Konva.Vector2d;
@@ -32,9 +40,14 @@ export type ImageOptions = {
 
 export type WeaveImageToolActionTriggerReturn =
   | {
-      finishUploadCallback: (
-        imageURL: string,
-        position?: Konva.Vector2d | undefined
-      ) => void;
+      nodeId: string;
+      finishUploadCallback: (nodeId: string, imageURL: string) => void;
     }
   | undefined;
+
+export type WeaveImageToolDragAndDropProperties = {
+  imageURL: string;
+  imageWidth: number;
+  imageHeight: number;
+  imageId?: string;
+};

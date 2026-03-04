@@ -37,19 +37,32 @@ new WeaveImageToolAction();
 ## TypeScript types
 
 ```ts
+type WeaveImageToolActionLoadFromKeys = keyof typeof IMAGE_TOOL_LOAD_FROM;
+type WeaveImageToolActionLoadFrom =
+  (typeof IMAGE_TOOL_LOAD_FROM)[WeaveImageToolActionLoadFromKeys];
+
+type WeaveImageToolActionStateKeys = keyof typeof IMAGE_TOOL_STATE;
+type WeaveImageToolActionState =
+  (typeof IMAGE_TOOL_STATE)[WeaveImageToolActionStateKeys];
+
 type WeaveImageToolActionOnStartLoadImageEvent = undefined;
 type WeaveImageToolActionOnEndLoadImageEvent = Error | undefined;
-
-type WeaveImageToolActionTriggerParams = {
-  imageURL?: string;
-  imageId?: string;
-  options?: ImageOptions;
-  position?: Vector2d;
-  forceMainContainer?: boolean;
-  stagePosition?: Vector2d;
+type WeaveImageToolActionOnAddingEvent = { imageURL: string };
+type WeaveImageToolActionOnAddedEvent = {
+  imageURL: string;
+  nodeId: string;
 };
 
-type ImageCrossOrigin = "anonymous" | "use-credentials";
+type WeaveImageToolActionTriggerParams = {
+  imageData?: string;
+  imageURL?: string;
+  imageWidth?: number;
+  imageHeight?: number;
+  imageId?: string;
+  options?: ImageOptions;
+  position?: Konva.Vector2d;
+  forceMainContainer?: boolean;
+};
 
 type ImageOptions = {
   crossOrigin: ImageCrossOrigin;
@@ -57,7 +70,8 @@ type ImageOptions = {
 
 type WeaveImageToolActionTriggerReturn =
   | {
-      finishUploadCallback: (imageURL: string, options?: ImageOptions) => void;
+      nodeId: string;
+      finishUploadCallback: (nodeId: string, imageURL: string) => void;
     }
   | undefined;
 ```
@@ -65,19 +79,34 @@ type WeaveImageToolActionTriggerReturn =
 ## Trigger function params
 
 ```ts
-trigger(cancelAction: () => void, params?: WeaveImageToolActionTriggerParams): void;
+trigger(cancelAction: () => void, params?: WeaveImageToolActionTriggerParams): WeaveImageToolActionTriggerReturn;
 ```
 
 For `WeaveImageToolActionTriggerParams`:
 
 <TypeTable
   type={{
-    ["imageURL"]: {
+    ["imageData"]: {
       description:
-        "The URL of the image, if already uploaded to an external service. URL must the same as the application URL to avoid cross-origin issues. We recommend to proxy the images through the application.",
+        "The dataURL of the image. Must be provided when adding images from a file-picker, on external paste images or when drag-and-drop images from the file-system",
       type: "string",
     },
     ["imageURL"]: {
+      description:
+        "The URL of the image already uploaded to an external service. URL must the same as the application URL to avoid cross-origin issues. We recommend to proxy the images through the application. Must be provided when drag & drop from the same application.",
+      type: "string",
+    },
+    ["imageWidth"]: {
+      description:
+        "The width of the image without transformations, must be provided when drag and drop images from the same application (as this normally already have been persisted).",
+      type: "string",
+    },
+    ["imageHeight"]: {
+      description:
+        "The height of the image without transformations, must be provided when drag and drop images from the same application (as this normally already have been persisted).",
+      type: "string",
+    },
+    ["imageId"]: {
       description:
         "An external Id for the image. It's saved as imageId prop on the node.",
       type: "string",
@@ -100,6 +129,22 @@ For `WeaveImageToolActionTriggerParams`:
   }}
 />
 
+When triggering the tool, a `WeaveImageToolActionTriggerReturn` object is returned, this object contains:
+
+- `nodeId`: is the Id of the node added to the canvas.
+- `finishUploadCallback`: a callback function to call to save on the node the persisted Image URL. This function receives the `nodeId` and the persisted image URL.
+
+### Drag & Drop from the same application
+
+When you implement drag & drop of an image loaded on a HTMLImageElement that is located on the same application,
+on the `onDragStart` event you must call the `setDragAndDropProperties` method of the tool and define the following
+properties:
+
+- `imageURL`: the image URL to add to the canvas.
+- `imageId`: the image id (external resource id) associated to the image.
+- `imageWidth`: the image real width (without any transformations).
+- `imageHeight`: the image real height (without any transformations).
+
 ## Events
 
 ### onImageLoadStart
@@ -117,3 +162,13 @@ onImageLoadEnd: WeaveNodesSelectionPluginOnNodesChangeEvent;
 ```
 
 The `onImageLoadEnd` event is called when the image ended loading into the canvas.
+
+## Methods
+
+### setDragAndDropProperties
+
+```ts
+setDragAndDropProperties(properties: WeaveImageToolDragAndDropProperties): void
+```
+
+The `setDragAndDropProperties` method set the necessary properties when drag & drop images that are inside the application.

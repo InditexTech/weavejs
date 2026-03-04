@@ -67,8 +67,10 @@ export class WeaveVideoNode extends WeaveNode {
     }
 
     const realVideoPlaceholderURL =
-      this.config.urlTransformer?.(videoProps.videoPlaceholderURL ?? '') ??
-      videoProps.videoPlaceholderURL;
+      this.config.urlTransformer?.(
+        videoProps.videoPlaceholderURL ?? '',
+        video
+      ) ?? videoProps.videoPlaceholderURL;
 
     this.videoPlaceholder[id] = Konva.Util.createImageElement();
     this.videoPlaceholder[id].crossOrigin = this.config.crossOrigin;
@@ -151,7 +153,7 @@ export class WeaveVideoNode extends WeaveNode {
     }
 
     const realVideoURL =
-      this.config.urlTransformer?.(videoProps.videoURL ?? '') ??
+      this.config.urlTransformer?.(videoProps.videoURL ?? '', video) ??
       videoProps.videoURL;
     if (realVideoURL) {
       videoSource.src = realVideoURL;
@@ -281,6 +283,7 @@ export class WeaveVideoNode extends WeaveNode {
       id,
       name: 'node',
       strokeScaleEnabled: true,
+      // overridesMouseControl: true,
     });
 
     const bg = new Konva.Rect({
@@ -629,7 +632,7 @@ export class WeaveVideoNode extends WeaveNode {
         playing: true,
         paused: false,
       };
-      this.videoSource[videoId].play();
+      this.videoSource[videoId]?.play?.();
       this.anim.start();
       this.instance.emitEvent<WeaveVideoOnVideoPlayEvent>('onVideoPlay', {
         nodeId: videoId,
@@ -874,5 +877,9 @@ export class WeaveVideoNode extends WeaveNode {
 
     // reset scale to 1
     node.scale({ x: 1, y: 1 });
+  }
+
+  getIsAsync(): boolean {
+    return true;
   }
 }

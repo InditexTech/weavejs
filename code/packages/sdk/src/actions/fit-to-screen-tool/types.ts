@@ -4,4 +4,5 @@
 
 export type WeaveFitToScreenToolActionParams = {
   previousAction: string;
+  overrideZoom?: boolean;
 };

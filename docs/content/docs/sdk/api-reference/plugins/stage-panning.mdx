@@ -42,7 +42,9 @@ type WeaveStagePanningPluginParams = {
 
 type WeaveStagePanningPluginConfig = {
   edgePanOffset: number;
+  edgePanMinSpeed: number;
   edgePanSpeed: number;
+  edgePanMaxSpeed: number;
 };
 ```
 
@@ -68,12 +70,22 @@ For `WeaveStagePanningPluginConfig`:
       description:
         "The offset from stage borders where auto-panning happens when dragging nodes. In pixels.",
       type: "number",
-      default: "50",
+      default: "25",
+    },
+    ["edgePanMinSpeed"]: {
+      description: "The minimum speed of the auto-panning. In pixels.",
+      type: "number",
+      default: "2",
     },
     ["edgePanSpeed"]: {
-      description: "The speed of the auto-panning. In pixels.",
+      description: "The base speed of the auto-panning. In pixels.",
       type: "number",
       default: "10",
+    },
+    ["edgePanMaxSpeed"]: {
+      description: "The maximum speed of the auto-panning. In pixels.",
+      type: "number",
+      default: "30",
     },
   }}
 />

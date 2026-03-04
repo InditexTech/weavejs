@@ -6,7 +6,7 @@ import type { Server as HttpServer } from 'node:http';
 import type { Server as HttpsServer } from 'node:https';
 import Emittery from 'emittery';
 import { WebSocketServer } from 'ws';
-import { setServer, setupWSConnection } from './websockets-utils';
+import { getYDoc, setServer, setupWSConnection } from './websockets-utils';
 import {
   type FetchInitialState,
   type PerformUpgrade,
@@ -17,6 +17,7 @@ import {
 import { WeaveHorizontalSyncHandlerRedis } from './horizontal-sync-handler/redis/client';
 import type { WeaveStoreHorizontalSyncConfig } from '@inditextech/weave-types';
 import { defaultInitialState } from '@inditextech/weave-sdk/server';
+import type Y from '@/yjs';
 
 type WeaveWebsocketsServerParams = {
   initialState?: FetchInitialState;
@@ -96,6 +97,14 @@ export class WeaveWebsocketsServer extends Emittery {
 
   removeEventListener<T>(event: string, callback: (payload: T) => void): void {
     this.off(event, callback);
+  }
+
+  async getRoomDocument(roomId: string): Promise<Y.Doc> {
+    return (await getYDoc(
+      roomId,
+      this.initialState,
+      this.horizontalSyncHandler
+    )) as Y.Doc;
   }
 
   handleUpgrade(server: HttpServer | HttpsServer): void {

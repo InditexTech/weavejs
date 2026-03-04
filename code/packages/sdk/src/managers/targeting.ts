@@ -254,4 +254,34 @@ export class WeaveTargetingManager {
 
     return { mousePoint: relativeMousePointer, container };
   }
+
+  getRealSelectedNode = (nodeTarget: Konva.Node) => {
+    const stage = this.instance.getStage();
+
+    let realNodeTarget: Konva.Node = nodeTarget;
+
+    if (nodeTarget.getParent() instanceof Konva.Transformer) {
+      const mousePos = stage.getPointerPosition();
+
+      const transformerLayer = nodeTarget.getParent()?.getParent();
+
+      transformerLayer?.listening(false);
+      const nodeIntersected = stage.getIntersection(mousePos ?? { x: 0, y: 0 });
+      transformerLayer?.listening(true);
+
+      if (nodeIntersected) {
+        realNodeTarget = nodeIntersected;
+      }
+    }
+
+    if (realNodeTarget.getAttrs().nodeId) {
+      const realNode = stage.findOne(`#${realNodeTarget.getAttrs().nodeId}`);
+
+      if (realNode) {
+        realNodeTarget = realNode;
+      }
+    }
+
+    return realNodeTarget;
+  };
 }

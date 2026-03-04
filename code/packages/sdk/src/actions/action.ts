@@ -43,6 +43,14 @@ export abstract class WeaveAction implements WeaveActionBase {
     return this.name;
   }
 
+  hasAliases(): boolean {
+    return false;
+  }
+
+  getAliases(): string[] {
+    return [];
+  }
+
   getLogger(): Logger {
     return this.logger;
   }

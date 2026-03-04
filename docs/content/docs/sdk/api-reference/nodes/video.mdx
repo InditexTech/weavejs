@@ -104,6 +104,8 @@ type VideoStyle = {
   icon: VideoIconStyle;
 };
 
+type URLTransformerFunction = (url: string, node?: Konva.Node) => string;
+
 type WeaveVideoProperties = {
   crossOrigin: ImageCrossOrigin;
   transform?: WeaveNodeTransformerProperties;

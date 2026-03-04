@@ -56,6 +56,8 @@ export class WeaveLayerNode extends WeaveNode {
     delete cleanedAttrs.mutexLocked;
     delete cleanedAttrs.mutexUserId;
     delete cleanedAttrs.draggable;
+    delete cleanedAttrs.overridesMouseControl;
+    delete cleanedAttrs.dragBoundFunc;
 
     return {
       key: attrs.id ?? '',

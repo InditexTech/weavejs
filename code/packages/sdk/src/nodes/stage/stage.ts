@@ -17,10 +17,13 @@ export class WeaveStageNode extends WeaveNode {
   protected nodeType: string = WEAVE_STAGE_NODE_TYPE;
   protected stageFocused: boolean = false;
   protected wheelMousePressed: boolean = false;
+  private isCmdCtrlPressed: boolean = false;
+  protected globalEventsInitialized: boolean = false;
 
   onRender(props: WeaveElementAttributes): WeaveElementInstance {
     const stage = new Konva.Stage({
       ...props,
+      mode: 'default',
     });
 
     setupUpscaleStage(this.instance, stage);
@@ -150,8 +153,72 @@ export class WeaveStageNode extends WeaveNode {
       }
     });
 
+    stage.isCmdCtrlPressed = () => this.isCmdCtrlPressed;
+
+    this.setupEvents();
+
     return stage;
   }
 
   onUpdate(): void {}
+
+  setupEvents() {
+    if (this.globalEventsInitialized) {
+      return;
+    }
+
+    if (this.instance.isServerSide()) {
+      return;
+    }
+
+    window.addEventListener('keydown', (e) => {
+      if (e.ctrlKey || e.metaKey) {
+        this.isCmdCtrlPressed = true;
+
+        this.instance.getStage().container().style.cursor = 'default';
+
+        const transformer = this.getSelectionPlugin()?.getTransformer();
+
+        if (!transformer) {
+          return;
+        }
+
+        if (
+          transformer.nodes().length === 0 ||
+          transformer.nodes().length > 1
+        ) {
+          return;
+        }
+
+        const selectedNode = transformer.nodes()[0];
+        selectedNode.fire('onCmdCtrlPressed');
+      }
+    });
+
+    window.addEventListener('keyup', (e) => {
+      if (!e.ctrlKey && !e.metaKey) {
+        this.isCmdCtrlPressed = false;
+
+        this.instance.getStage().container().style.cursor = 'default';
+
+        const transformer = this.getSelectionPlugin()?.getTransformer();
+
+        if (!transformer) {
+          return;
+        }
+
+        if (
+          transformer.nodes().length === 0 ||
+          transformer.nodes().length > 1
+        ) {
+          return;
+        }
+
+        const selectedNode = transformer.nodes()[0];
+        selectedNode.fire('onCmdCtrlReleased');
+      }
+    });
+
+    this.globalEventsInitialized = true;
+  }
 }

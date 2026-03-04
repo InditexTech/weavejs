@@ -45,6 +45,9 @@ export type WeaveConfig = {
   fonts?: WeaveFont[] | WeaveFontsPreloadFunction;
   logger?: WeaveLoggerConfig;
   performance?: WeavePerformanceConfig;
+  behaviors: {
+    axisLockThreshold: number;
+  };
 };
 
 // Base types
@@ -305,7 +308,7 @@ export type WeaveNodeConfiguration = {
 // Image api
 
 export type ImageCrossOrigin = 'anonymous' | 'use-credentials';
-export type URLTransformerFunction = (url: string) => string;
+export type URLTransformerFunction = (url: string, node?: Konva.Node) => string;
 
 // Measurement
 

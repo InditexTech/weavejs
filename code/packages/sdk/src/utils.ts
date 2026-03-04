@@ -191,6 +191,7 @@ export function moveNodeToContainer(
         instance.removeNodeNT(actualNode, { emitUserChangeEvent: false });
         instance.addNodeNT(actualNode, layerToMoveAttrs.id, {
           emitUserChangeEvent: true,
+          // emitUserChangeEvent: false,
           overrideUserChangeType: WEAVE_NODE_CHANGE_TYPE.UPDATE,
         });
       });
@@ -330,10 +331,17 @@ export function hasFrames(node: Konva.Node) {
 }
 
 export function intersectArrays<T>(arrays: T[][]): T[] {
-  return arrays.reduce(
-    (acc, arr) => acc.filter((val) => arr.includes(val)),
-    arrays[0]
-  );
+  if (arrays.length === 0) return [];
+
+  // If any array is empty → result is empty
+  if (arrays.some((arr) => arr.length === 0)) {
+    return [];
+  }
+
+  // Start from the smallest array for better performance
+  const sorted = [...arrays].sort((a, b) => a.length - b.length);
+
+  return sorted[0].filter((item) => sorted.every((arr) => arr.includes(item)));
 }
 
 export function isNodeInSelection(
@@ -612,7 +620,17 @@ export const getPositionRelativeToContainerOnPosition = (
   const container = containerOverCursor(instance, [], position);
 
   if (container) {
-    position = container?.getRelativePointerPosition();
+    if (container.getAttrs().containerId) {
+      const containerNode = container.findOne(
+        `#${container.getAttrs().containerId}`
+      ) as Konva.Group;
+
+      if (containerNode) {
+        position = containerNode?.getRelativePointerPosition();
+      }
+    } else {
+      position = container?.getRelativePointerPosition();
+    }
   }
 
   if (!position) {

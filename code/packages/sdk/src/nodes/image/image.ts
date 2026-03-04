@@ -10,28 +10,34 @@ import {
 import { WeaveNode } from '../node';
 import {
   type ImageProps,
+  type WeaveImageCropAnchorPosition,
   type WeaveImageCropEndType,
   type WeaveImageNodeParams,
   type WeaveImageOnCropEndEvent,
   type WeaveImageOnCropStartEvent,
   type WeaveImageProperties,
   type WeaveImageState,
+  type WeaveImageTriggerCropOptions,
 } from './types';
 import { WeaveImageCrop } from './crop';
 import {
+  WEAVE_IMAGE_CROP_ANCHOR_POSITION,
   WEAVE_IMAGE_CROP_END_TYPE,
   WEAVE_IMAGE_DEFAULT_CONFIG,
   WEAVE_IMAGE_NODE_TYPE,
+  WEAVE_STAGE_IMAGE_CROPPING_MODE,
 } from './constants';
 import { WEAVE_STAGE_DEFAULT_MODE } from '../stage/constants';
 import { mergeExceptArrays } from '@/utils';
 
 export class WeaveImageNode extends WeaveNode {
   private config: WeaveImageProperties;
+  protected imageBitmapCache: Record<string, ImageBitmap> = {};
   protected imageSource: Record<string, HTMLImageElement> = {};
   protected imageState: Record<string, WeaveImageState> = {};
   protected tapStart: { x: number; y: number; time: number } | null;
   protected lastTapTime: number;
+  protected imageIconSource: HTMLImageElement | null = null;
   protected nodeType: string = WEAVE_IMAGE_NODE_TYPE;
   private imageCrop!: WeaveImageCrop | null;
 
@@ -43,10 +49,24 @@ export class WeaveImageNode extends WeaveNode {
     this.tapStart = { x: 0, y: 0, time: 0 };
     this.lastTapTime = 0;
     this.config = mergeExceptArrays(WEAVE_IMAGE_DEFAULT_CONFIG, config);
+
     this.imageCrop = null;
   }
 
-  triggerCrop(imageNode: Konva.Group): void {
+  getConfiguration(): WeaveImageProperties {
+    return this.config;
+  }
+
+  onRegister(): void {
+    this.logger.info(
+      `image caching enabled: ${this.config.performance.cache.enabled}`
+    );
+  }
+
+  triggerCrop(
+    imageNode: Konva.Group,
+    options: WeaveImageTriggerCropOptions
+  ): void {
     const stage = this.instance.getStage();
 
     if (imageNode.getAttrs().cropping ?? false) {
@@ -66,7 +86,7 @@ export class WeaveImageNode extends WeaveNode {
       return;
     }
 
-    stage.mode('cropping');
+    stage.mode(WEAVE_STAGE_IMAGE_CROPPING_MODE);
 
     const image = stage.findOne(`#${imageNode.getAttrs().id}`) as
       | Konva.Group
@@ -98,10 +118,11 @@ export class WeaveImageNode extends WeaveNode {
         instance: image,
       });
       this.imageCrop = null;
-    });
+    }, options);
 
     this.instance.emitEvent<WeaveImageOnCropStartEvent>('onImageCropStart', {
       instance: image,
+      cmdCtrlTriggered: options.cmdCtrl.triggered,
     });
   }
 
@@ -187,6 +208,7 @@ export class WeaveImageNode extends WeaveNode {
       name: 'node',
       loadedImage: false,
       loadedImageError: false,
+      cropping: false,
     });
 
     this.setupDefaultNodeAugmentation(image);
@@ -201,7 +223,11 @@ export class WeaveImageNode extends WeaveNode {
     };
 
     image.triggerCrop = () => {
-      this.triggerCrop(image);
+      this.triggerCrop(image, {
+        cmdCtrl: {
+          triggered: false,
+        },
+      });
     };
 
     image.closeCrop = (type: WeaveImageCropEndType) => {
@@ -250,7 +276,7 @@ export class WeaveImageNode extends WeaveNode {
       rotation: 0,
       width: imageProps.width || 0,
       height: imageProps.height || 0,
-      fill: '#ccccccff',
+      fill: this.config.style.placeholder.fill,
       strokeWidth: 0,
       draggable: false,
       visible: true,
@@ -299,32 +325,50 @@ export class WeaveImageNode extends WeaveNode {
 
     if (this.imageSource[id]) {
       imagePlaceholder.destroy();
+
+      const imageSource: HTMLImageElement | ImageBitmap = this.imageSource[id];
+
       internalImage.setAttrs({
-        image: this.imageSource[id],
+        image: imageSource,
         visible: true,
       });
+
+      let sourceImageWidth = this.imageSource[id].width;
+      let sourceImageHeight = this.imageSource[id].height;
+      if (image.getAttrs().imageInfo) {
+        sourceImageWidth = image.getAttrs().imageInfo.width;
+        sourceImageHeight = image.getAttrs().imageInfo.height;
+      }
+
       image.setAttr('imageInfo', {
-        width: this.imageSource[id].width,
-        height: this.imageSource[id].height,
+        width: sourceImageWidth,
+        height: sourceImageHeight,
       });
       internalImage.setAttr('imageInfo', {
-        width: this.imageSource[id].width,
-        height: this.imageSource[id].height,
+        width: sourceImageWidth,
+        height: sourceImageHeight,
       });
       if (!image.getAttrs().uncroppedImage) {
         image.setAttr('uncroppedImage', {
-          width: this.imageSource[id].width,
-          height: this.imageSource[id].height,
+          width: sourceImageWidth,
+          height: sourceImageHeight,
         });
       }
       this.imageState[id] = {
         loaded: true,
         error: false,
       };
+
       this.updateImageCrop(image);
     } else {
       this.updatePlaceholderSize(image, imagePlaceholder);
       this.loadImage(imageProps, image);
+    }
+
+    if (this.config.performance.cache.enabled) {
+      image.on('transformend', () => {
+        this.cacheNode(image);
+      });
     }
 
     image.setAttr('imageURL', imageProps.imageURL);
@@ -343,7 +387,284 @@ export class WeaveImageNode extends WeaveNode {
       }
     );
 
+    image.on('onCmdCtrlPressed', () => {
+      const transformer = this.getSelectionPlugin()?.getTransformer();
+
+      if (!transformer) {
+        return;
+      }
+
+      transformer.hide();
+
+      const utilityLayer = this.instance.getUtilityLayer();
+
+      if (!utilityLayer) {
+        return;
+      }
+
+      utilityLayer?.destroyChildren();
+
+      this.renderCropMode(utilityLayer, image);
+
+      utilityLayer?.show();
+    });
+
+    image.on('onCmdCtrlReleased', () => {
+      const transformer = this.getSelectionPlugin()?.getTransformer();
+
+      if (!transformer) {
+        return;
+      }
+
+      transformer.show();
+
+      const utilityLayer = this.instance.getUtilityLayer();
+
+      if (!utilityLayer) {
+        return;
+      }
+
+      utilityLayer?.destroyChildren();
+    });
+
+    image.on('onSelectionCleared', () => {
+      const transformer = this.getSelectionPlugin()?.getTransformer();
+
+      if (!transformer) {
+        return;
+      }
+
+      transformer.show();
+
+      const utilityLayer = this.instance.getUtilityLayer();
+
+      if (!utilityLayer) {
+        return;
+      }
+
+      utilityLayer?.destroyChildren();
+    });
+
     return image;
+  }
+
+  clearCache(nodeInstance: WeaveElementInstance): void {
+    if (this.config.performance.cache.enabled) {
+      nodeInstance.clearCache();
+    }
+  }
+
+  cacheNode(nodeInstance: WeaveElementInstance): void {
+    if (this.config.performance.cache.enabled) {
+      nodeInstance.clearCache();
+      nodeInstance.cache({
+        pixelRatio: this.config.performance.cache.pixelRatio,
+      });
+    }
+  }
+
+  private renderCropBorder(layer: Konva.Layer, node: Konva.Group) {
+    const stage = this.instance.getStage();
+    const stageScale = stage.scaleX();
+
+    const transform = node.getAbsoluteTransform().copy();
+
+    const w = node.width();
+    const h = node.height();
+
+    const offsetX = node.offsetX();
+    const offsetY = node.offsetY();
+
+    const localCorners = [
+      { x: 0, y: 0 }, // top-left
+      { x: w, y: 0 }, // top-right
+      { x: w, y: h }, // bottom-right
+      { x: 0, y: h }, // bottom-left
+    ];
+
+    const absoluteCorners = localCorners.map((p) =>
+      transform.point({
+        x: p.x - offsetX,
+        y: p.y - offsetY,
+      })
+    );
+
+    const rect = new Konva.Rect({
+      width: absoluteCorners[1].x - absoluteCorners[0].x,
+      height: absoluteCorners[2].y - absoluteCorners[0].y,
+      fill: 'transparent',
+      strokeWidth: 2,
+      stroke: '#1a1aff',
+      draggable: false,
+      listening: false,
+      rotation: node.rotation(),
+    });
+
+    layer.add(rect);
+
+    rect.setAbsolutePosition(absoluteCorners[0]);
+
+    rect.scale({
+      x: 1 / stageScale,
+      y: 1 / stageScale,
+    });
+
+    stage.on('scaleXChange scaleYChange', () => {
+      const scale = stage.scaleX();
+
+      rect.scale({
+        x: 1 / scale,
+        y: 1 / scale,
+      });
+    });
+  }
+
+  private renderCropAnchor(
+    position: WeaveImageCropAnchorPosition,
+    node: Konva.Group,
+    layer: Konva.Layer,
+    onClick: () => void
+  ) {
+    const transform = node.getAbsoluteTransform().copy();
+
+    const stage = this.instance.getStage();
+    const stageScale = stage.scaleX();
+
+    const w = node.width();
+    const h = node.height();
+
+    const offsetX = node.offsetX();
+    const offsetY = node.offsetY();
+
+    const localCorners = [
+      { x: 0, y: 0 }, // top-left
+      { x: w, y: 0 }, // top-right
+      { x: w, y: h }, // bottom-right
+      { x: 0, y: h }, // bottom-left
+      { x: w / 2, y: 0 }, // top-center
+      { x: w, y: h / 2 }, // middle-right
+      { x: 0, y: h / 2 }, // middle-left
+      { x: w / 2, y: h }, // bottom-center
+    ];
+
+    const absoluteCorners = localCorners.map((p) =>
+      transform.point({
+        x: p.x - offsetX,
+        y: p.y - offsetY,
+      })
+    );
+
+    const anchor = new Konva.Rect({
+      draggable: false,
+      rotation: node.rotation(),
+    });
+
+    this.config.cropMode.selection.anchorStyleFunc(anchor, position);
+
+    layer.add(anchor);
+
+    anchor.scale({
+      x: 1 / stageScale,
+      y: 1 / stageScale,
+    });
+
+    stage.on('scaleXChange scaleYChange', () => {
+      const scale = stage.scaleX();
+
+      anchor.scale({
+        x: 1 / scale,
+        y: 1 / scale,
+      });
+    });
+
+    if (position === WEAVE_IMAGE_CROP_ANCHOR_POSITION.TOP_LEFT) {
+      anchor.setAbsolutePosition(absoluteCorners[0]);
+    }
+    if (position === WEAVE_IMAGE_CROP_ANCHOR_POSITION.TOP_RIGHT) {
+      anchor.setAbsolutePosition(absoluteCorners[1]);
+    }
+    if (position === WEAVE_IMAGE_CROP_ANCHOR_POSITION.BOTTOM_RIGHT) {
+      anchor.setAbsolutePosition(absoluteCorners[2]);
+    }
+    if (position === WEAVE_IMAGE_CROP_ANCHOR_POSITION.BOTTOM_LEFT) {
+      anchor.setAbsolutePosition(absoluteCorners[3]);
+    }
+    if (position === WEAVE_IMAGE_CROP_ANCHOR_POSITION.TOP_CENTER) {
+      anchor.setAbsolutePosition(absoluteCorners[4]);
+    }
+    if (position === WEAVE_IMAGE_CROP_ANCHOR_POSITION.MIDDLE_RIGHT) {
+      anchor.setAbsolutePosition(absoluteCorners[5]);
+    }
+    if (position === WEAVE_IMAGE_CROP_ANCHOR_POSITION.MIDDLE_LEFT) {
+      anchor.setAbsolutePosition(absoluteCorners[6]);
+    }
+    if (position === WEAVE_IMAGE_CROP_ANCHOR_POSITION.BOTTOM_CENTER) {
+      anchor.setAbsolutePosition(absoluteCorners[7]);
+    }
+
+    anchor.on('pointerover', () => {
+      if (
+        position === WEAVE_IMAGE_CROP_ANCHOR_POSITION.BOTTOM_LEFT ||
+        position === WEAVE_IMAGE_CROP_ANCHOR_POSITION.TOP_RIGHT
+      ) {
+        this.instance.getStage().container().style.cursor = 'nesw-resize';
+      }
+      if (
+        position === WEAVE_IMAGE_CROP_ANCHOR_POSITION.TOP_LEFT ||
+        position === WEAVE_IMAGE_CROP_ANCHOR_POSITION.BOTTOM_RIGHT
+      ) {
+        this.instance.getStage().container().style.cursor = 'nwse-resize';
+      }
+      if (
+        position === WEAVE_IMAGE_CROP_ANCHOR_POSITION.MIDDLE_RIGHT ||
+        position === WEAVE_IMAGE_CROP_ANCHOR_POSITION.MIDDLE_LEFT
+      ) {
+        this.instance.getStage().container().style.cursor = 'ew-resize';
+      }
+      if (
+        position === WEAVE_IMAGE_CROP_ANCHOR_POSITION.TOP_CENTER ||
+        position === WEAVE_IMAGE_CROP_ANCHOR_POSITION.BOTTOM_CENTER
+      ) {
+        this.instance.getStage().container().style.cursor = 'ns-resize';
+      }
+    });
+
+    anchor.on('pointerdown', () => {
+      onClick();
+    });
+
+    return anchor;
+  }
+
+  private renderCropAnchors(layer: Konva.Layer, node: Konva.Group) {
+    const anchors = [
+      WEAVE_IMAGE_CROP_ANCHOR_POSITION.TOP_LEFT,
+      WEAVE_IMAGE_CROP_ANCHOR_POSITION.TOP_RIGHT,
+      WEAVE_IMAGE_CROP_ANCHOR_POSITION.BOTTOM_RIGHT,
+      WEAVE_IMAGE_CROP_ANCHOR_POSITION.BOTTOM_LEFT,
+      WEAVE_IMAGE_CROP_ANCHOR_POSITION.TOP_CENTER,
+      WEAVE_IMAGE_CROP_ANCHOR_POSITION.MIDDLE_RIGHT,
+      WEAVE_IMAGE_CROP_ANCHOR_POSITION.BOTTOM_CENTER,
+      WEAVE_IMAGE_CROP_ANCHOR_POSITION.MIDDLE_LEFT,
+    ];
+
+    for (const anchor of anchors) {
+      if (this.config.cropMode.selection.enabledAnchors.includes(anchor)) {
+        this.renderCropAnchor(anchor, node, layer, () => {
+          this.triggerCrop(node, {
+            cmdCtrl: {
+              triggered: true,
+              corner: anchor,
+            },
+          });
+        });
+      }
+    }
+  }
+
+  renderCropMode(layer: Konva.Layer, node: Konva.Group): void {
+    this.renderCropBorder(layer, node);
+    this.renderCropAnchors(layer, node);
   }
 
   onUpdate(
@@ -467,6 +788,8 @@ export class WeaveImageNode extends WeaveNode {
       });
       this.updateImageCrop(nodeInstance as Konva.Group);
     }
+
+    this.cacheNode(nodeInstance);
   }
 
   preloadImage(
@@ -475,11 +798,12 @@ export class WeaveImageNode extends WeaveNode {
     {
       onLoad,
       onError,
-    }: { onLoad: () => void; onError: (error: string | Event) => void }
+    }: {
+      onLoad: () => void;
+      onError: (error: string | Event) => void;
+      node?: Konva.Group;
+    }
   ): void {
-    const realImageURL =
-      this.config.urlTransformer?.(imageURL ?? '') ?? imageURL;
-
     this.imageSource[imageId] = Konva.Util.createImageElement();
     this.imageSource[imageId].crossOrigin = this.config.crossOrigin;
     this.imageSource[imageId].onerror = (error) => {
@@ -494,7 +818,7 @@ export class WeaveImageNode extends WeaveNode {
       onError(error);
     };
 
-    this.imageSource[imageId].onload = () => {
+    this.imageSource[imageId].onload = async () => {
       this.imageState[imageId] = {
         loaded: true,
         error: false,
@@ -509,8 +833,8 @@ export class WeaveImageNode extends WeaveNode {
     };
 
     try {
-      if (realImageURL) {
-        this.imageSource[imageId].src = realImageURL;
+      if (imageURL) {
+        this.imageSource[imageId].src = imageURL;
       }
     } catch (ex) {
       console.error(ex);
@@ -529,7 +853,7 @@ export class WeaveImageNode extends WeaveNode {
       | undefined;
 
     const realImageURL =
-      this.config.urlTransformer?.(imageProps.imageURL ?? '') ??
+      this.config.urlTransformer?.(imageProps.imageURL ?? '', image) ??
       imageProps.imageURL;
 
     this.loadAsyncElement(id);
@@ -546,6 +870,10 @@ export class WeaveImageNode extends WeaveNode {
               : this.imageSource[id].height,
           });
           imagePlaceholder.destroy();
+
+          const imageSource: HTMLImageElement | ImageBitmap =
+            this.imageSource[id];
+
           internalImage.setAttrs({
             width: imageProps.width
               ? imageProps.width
@@ -553,18 +881,26 @@ export class WeaveImageNode extends WeaveNode {
             height: imageProps.height
               ? imageProps.height
               : this.imageSource[id].height,
-            image: this.imageSource[id],
+            image: imageSource,
             visible: true,
           });
+
+          let sourceImageWidth = this.imageSource[id].width;
+          let sourceImageHeight = this.imageSource[id].height;
+          if (image.getAttrs().imageInfo) {
+            sourceImageWidth = image.getAttrs().imageInfo.width;
+            sourceImageHeight = image.getAttrs().imageInfo.height;
+          }
+
           internalImage.setAttr('imageInfo', {
-            width: this.imageSource[id].width,
-            height: this.imageSource[id].height,
+            width: sourceImageWidth,
+            height: sourceImageHeight,
           });
           internalImage.zIndex(0);
 
           image.setAttr('imageInfo', {
-            width: this.imageSource[id].width,
-            height: this.imageSource[id].height,
+            width: sourceImageWidth,
+            height: sourceImageHeight,
           });
           // this.scaleReset(image);
 
@@ -587,6 +923,8 @@ export class WeaveImageNode extends WeaveNode {
           this.updateImageCrop(image);
 
           this.resolveAsyncElement(id);
+
+          this.cacheNode(image);
         }
       },
       onError: (error) => {
@@ -619,6 +957,8 @@ export class WeaveImageNode extends WeaveNode {
         internalImage?.setAttrs({
           visible: false,
         });
+
+        this.cacheNode(image);
       },
     });
   }
@@ -670,6 +1010,13 @@ export class WeaveImageNode extends WeaveNode {
       imageAttrs.cropInfo &&
       imageAttrs.uncroppedImage
     ) {
+      const originalImageInfo = imageAttrs.imageInfo;
+      const actualImageInfo = this.imageSource[imageAttrs.id ?? ''];
+
+      const originalActualDiffScale = originalImageInfo
+        ? actualImageInfo.width / originalImageInfo.width
+        : 1;
+
       const actualScale =
         imageAttrs.uncroppedImage.width / imageAttrs.imageInfo.width;
       const cropScale = imageAttrs.cropInfo
@@ -681,10 +1028,12 @@ export class WeaveImageNode extends WeaveNode {
       internalImage.scaleX(1);
       internalImage.scaleY(1);
       internalImage.crop({
-        x: imageAttrs.cropInfo.x / cropScale,
-        y: imageAttrs.cropInfo.y / cropScale,
-        width: imageAttrs.cropInfo.width / cropScale,
-        height: imageAttrs.cropInfo.height / cropScale,
+        x: (imageAttrs.cropInfo.x / cropScale) * originalActualDiffScale,
+        y: (imageAttrs.cropInfo.y / cropScale) * originalActualDiffScale,
+        width:
+          (imageAttrs.cropInfo.width / cropScale) * originalActualDiffScale,
+        height:
+          (imageAttrs.cropInfo.height / cropScale) * originalActualDiffScale,
       });
       internalImage.width(
         imageAttrs.cropSize.width * (actualScale / cropScale)
@@ -771,5 +1120,9 @@ export class WeaveImageNode extends WeaveNode {
 
     // reset scale to 1
     node.scale({ x: 1, y: 1 });
+  }
+
+  getIsAsync(): boolean {
+    return true;
   }
 }

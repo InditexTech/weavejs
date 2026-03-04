@@ -15,16 +15,11 @@ import {
 } from './constants';
 import { WeavePlugin } from '@/plugins/plugin';
 import { mergeExceptArrays } from '@/utils';
-import type {
-  WeaveAwarenessChange,
-  WeaveElementInstance,
-} from '@inditextech/weave-types';
-import type { WeaveNode } from '@/nodes/node';
-import type Konva from 'konva';
+import type { WeaveAwarenessChange } from '@inditextech/weave-types';
 
 export class WeaveUsersPresencePlugin extends WeavePlugin {
   private readonly config!: WeaveUsersPresencePluginConfig;
-  private userPresence: WeaveUserPresenceInformation = {};
+  private userPresence: WeaveUserPresenceInformation;
   onRender = undefined;
 
   constructor(params: WeaveUsersPresencePluginParams) {
@@ -44,28 +39,8 @@ export class WeaveUsersPresencePlugin extends WeavePlugin {
     return WEAVE_USERS_PRESENCE_PLUGIN_KEY;
   }
 
-  private registerHooks(): void {
-    this.instance.registerHook<{
-      node: Konva.Node;
-      presenceData: Record<string, unknown>;
-    }>('onPresenceUpdate:usersPresencePlugin', ({ node, presenceData }) => {
-      const nodeHandler = this.instance.getNodeHandler<WeaveNode>(
-        node.getAttrs().nodeType
-      );
-
-      const newProps = {
-        ...node.getAttrs(),
-        ...presenceData,
-      };
-
-      nodeHandler?.onUpdate(node as WeaveElementInstance, newProps);
-    });
-  }
-
   onInit(): void {
     const stage = this.instance.getStage();
-
-    this.registerHooks();
 
     this.instance.addEventListener(
       'onAwarenessChange',
@@ -95,16 +70,13 @@ export class WeaveUsersPresencePlugin extends WeavePlugin {
             }
 
             const nodeInstance = stage.findOne(`#${presenceInfo.nodeId}`);
+
             if (nodeInstance) {
-              this.instance.runPhaseHooks<{
-                node: Konva.Node;
-                presenceData: Record<string, unknown>;
-              }>('onPresenceUpdate', (hook) => {
-                hook({
-                  node: nodeInstance,
-                  presenceData: presenceInfo.attrs as Record<string, unknown>,
-                });
-              });
+              const newProps = {
+                ...nodeInstance.getAttrs(),
+                ...(presenceInfo.attrs as Record<string, unknown>),
+              };
+              nodeInstance.setAttrs(newProps);
             }
           }
         }
@@ -117,7 +89,7 @@ export class WeaveUsersPresencePlugin extends WeavePlugin {
     store.setAwarenessInfo(WEAVE_USER_PRESENCE_KEY, this.userPresence);
   }
 
-  setPresence<T>(nodeId: string, attrs: T) {
+  setPresence<T>(nodeId: string, attrs: T, forceUpdate = true) {
     const userInfo = this.config.getUser();
 
     this.userPresence[nodeId] = {
@@ -126,15 +98,25 @@ export class WeaveUsersPresencePlugin extends WeavePlugin {
       attrs,
     };
 
-    this.sendPresence();
+    if (forceUpdate) {
+      this.sendPresence();
+
+      setTimeout(() => {
+        if (this.userPresence) {
+          this.userPresence = {};
+          this.sendPresence();
+        }
+      }, 250);
+    }
   }
 
-  removePresence(nodeId: string) {
-    if (this.userPresence[nodeId]) {
-      delete this.userPresence[nodeId];
-    }
-
+  forceSendPresence() {
     this.sendPresence();
+
+    setTimeout(() => {
+      this.userPresence = {};
+      this.sendPresence();
+    }, 250);
   }
 
   enable(): void {

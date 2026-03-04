@@ -5,4 +5,5 @@
 export type WeaveFitToSelectionToolActionParams = {
   previousAction: string;
   smartZoom?: boolean;
+  overrideZoom?: boolean;
 };

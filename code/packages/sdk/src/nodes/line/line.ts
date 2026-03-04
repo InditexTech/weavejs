@@ -89,20 +89,7 @@ export class WeaveLineNode extends WeaveNode {
     });
 
     line.allowedAnchors = function () {
-      if (this.points().length !== 4) {
-        return [
-          'top-left',
-          'top-center',
-          'top-right',
-          'middle-right',
-          'middle-left',
-          'bottom-left',
-          'bottom-center',
-          'bottom-right',
-        ];
-      }
-
-      return [];
+      return ['top-left', 'top-right', 'bottom-left', 'bottom-right'];
     };
 
     this.setupDefaultNodeEvents(line);

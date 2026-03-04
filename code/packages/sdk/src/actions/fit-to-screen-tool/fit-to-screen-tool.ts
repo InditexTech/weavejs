@@ -40,7 +40,9 @@ export class WeaveFitToScreenToolAction extends WeaveAction {
     const stageZoomPlugin = this.getStageZoomPlugin();
 
     if (stageZoomPlugin) {
-      stageZoomPlugin.fitToScreen();
+      stageZoomPlugin.fitToScreen({
+        overrideZoom: params?.overrideZoom ?? true,
+      });
     }
 
     this.previousAction = params.previousAction;
