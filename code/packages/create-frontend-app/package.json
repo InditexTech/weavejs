@@ -51,7 +51,7 @@
     "fast-glob": "^3.3.3"
   },
   "engines": {
-    "node": "^18.12 || ^20.11 || ^22.11"
+    "node": ">=18.12"
   },
   "publishConfig": {
     "access": "public"

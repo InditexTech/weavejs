@@ -54,7 +54,8 @@
     "tsdown": "^0.10.2"
   },
   "engines": {
-    "node": "^18.12 || ^20.11 || ^22.11"
+    "node": ">=18.12",
+    "npm": ">= 8.19.x"
   },
   "publishConfig": {
     "access": "public"
