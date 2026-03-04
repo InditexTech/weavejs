@@ -7,7 +7,7 @@ import { defineConfig } from 'tsdown';
 export default defineConfig([
   {
     entry: {
-      types: './src/index.ts',
+      types: './src/index.types.ts',
     },
     external: ['@inditextech/weave-sdk', '@inditextech/weave-types', 'konva'],
     format: ['es'],
