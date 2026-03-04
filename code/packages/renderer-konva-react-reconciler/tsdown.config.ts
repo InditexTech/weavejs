@@ -10,6 +10,7 @@ export default defineConfig([
       ['renderer-konva-react-reconciler']: './src/index.ts',
     },
     external: [
+      '@inditextech/weave-sdk',
       '@inditextech/weave-types',
       'konva',
       'yjs',
@@ -28,6 +29,7 @@ export default defineConfig([
       ['renderer-konva-react-reconciler.node']: './src/index.node.ts',
     },
     external: [
+      '@inditextech/weave-sdk',
       '@inditextech/weave-types',
       'konva',
       'yjs',
