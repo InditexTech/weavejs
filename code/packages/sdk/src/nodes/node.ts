@@ -314,7 +314,17 @@ export abstract class WeaveNode implements WeaveNodeBase {
     selectionPlugin.getHoverTransformer().nodes([]);
   }
 
-  setupDefaultNodeEvents(node: Konva.Node): void {
+  setupDefaultNodeEvents(
+    node: Konva.Node,
+    options: { performScaleReset: boolean } = { performScaleReset: true }
+  ): void {
+    const { performScaleReset } = mergeExceptArrays(
+      {
+        performScaleReset: true,
+      },
+      options
+    );
+
     const handleNodesChange = () => {
       if (
         !this.isLocked(node as WeaveElementInstance) &&
@@ -443,7 +453,9 @@ export abstract class WeaveNode implements WeaveNodeBase {
           nodesSelectionPlugin.getTransformer().forceUpdate();
         }
 
-        this.scaleReset(node);
+        if (performScaleReset) {
+          this.scaleReset(node);
+        }
 
         if (this.getSelectionPlugin()?.getSelectedNodes().length === 1) {
           this.getNodesSelectionFeedbackPlugin()?.showSelectionHalo(node);
@@ -454,9 +466,14 @@ export abstract class WeaveNode implements WeaveNodeBase {
           node.getAttrs().nodeType
         );
         if (nodeHandler) {
-          this.instance.updateNode(
-            nodeHandler.serialize(node as WeaveElementInstance)
-          );
+          const shouldUpdateOnTransform =
+            node.getAttrs().shouldUpdateOnTransform ?? true;
+
+          if (shouldUpdateOnTransform) {
+            this.instance.updateNode(
+              nodeHandler.serialize(node as WeaveElementInstance)
+            );
+          }
         }
 
         this.getNodesSelectionPlugin()?.getHoverTransformer().forceUpdate();

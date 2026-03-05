@@ -17,3 +17,10 @@ export const WEAVE_TEXT_NODE_DEFAULT_CONFIG: WeaveTextProperties = {
     enabled: false,
   },
 };
+
+export const TEXT_LAYOUT = {
+  ['SMART']: 'smart',
+  ['AUTO_ALL']: 'auto-all',
+  ['AUTO_HEIGHT']: 'auto-height',
+  ['FIXED']: 'fixed',
+} as const;

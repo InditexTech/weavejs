@@ -196,7 +196,7 @@ export class WeaveStageNode extends WeaveNode {
     });
 
     window.addEventListener('keyup', (e) => {
-      if (!e.ctrlKey && !e.metaKey) {
+      if (!(e.ctrlKey || e.metaKey)) {
         this.isCmdCtrlPressed = false;
 
         this.instance.getStage().container().style.cursor = 'default';
