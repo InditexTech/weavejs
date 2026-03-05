@@ -305,11 +305,12 @@ export class WeaveTextNode extends WeaveNode {
         !smartFixedHeight
       ) {
         const scaleX = text.scaleX();
-        text.width(text.width() * scaleX);
+        text.width(Math.ceil(text.width() * scaleX) + 1);
         text.scaleX(1);
         text.scaleY(1);
         text.height(undefined);
         text.getLayer()?.batchDraw();
+        text.height(Math.ceil(text.height()) + 1);
       }
 
       if (
@@ -320,7 +321,7 @@ export class WeaveTextNode extends WeaveNode {
           this.isNodeSelected(text))
       ) {
         text.setAttrs({
-          width: text.width() * text.scaleX(),
+          width: Math.ceil(text.width() * text.scaleX()) + 1,
           scaleX: 1,
         });
         resetScale(text);
@@ -328,11 +329,13 @@ export class WeaveTextNode extends WeaveNode {
       }
 
       text.setAttr('shouldUpdateOnTransform', false);
+
+      text.getLayer()?.batchDraw();
     };
 
     text.on('transform', throttle(handleTextTransform, DEFAULT_THROTTLE_MS));
 
-    text.on('transformend', () => {
+    const handleTransformEnd = () => {
       this.instance.emitEvent('onTransform', null);
 
       let definedSmartWidth = false;
@@ -352,8 +355,8 @@ export class WeaveTextNode extends WeaveNode {
         )
       ) {
         text.setAttrs({
-          width: text.width() * text.scaleX(),
-          height: text.height() * text.scaleY(),
+          width: Math.ceil(text.width() * text.scaleX() + 1),
+          height: Math.ceil(text.height() * text.scaleY() + 1),
           fontSize: text.fontSize() * text.scaleY(),
           scaleX: 1,
           scaleY: 1,
@@ -383,11 +386,11 @@ export class WeaveTextNode extends WeaveNode {
         text.setAttr('smartFixedWidth', true);
         smartFixedWidth = true;
         definedSmartWidth = true;
-        const scaleX = text.scaleX();
-        text.width(text.width() * scaleX);
+        text.width(Math.ceil(text.width() * text.scaleX()) + 1);
         text.scaleX(1);
         text.height(undefined);
         text.getLayer()?.batchDraw();
+        text.height(Math.ceil(text.height()) + 1);
       }
 
       if (
@@ -396,8 +399,7 @@ export class WeaveTextNode extends WeaveNode {
         smartFixedWidth &&
         !definedSmartWidth
       ) {
-        const scaleX = text.scaleX();
-        text.width(text.width() * scaleX);
+        text.width(Math.ceil(text.width() * text.scaleX()) + 1);
         text.scaleX(1);
       }
 
@@ -407,8 +409,7 @@ export class WeaveTextNode extends WeaveNode {
         smartFixedHeight &&
         !definedSmartHeight
       ) {
-        const scaleX = text.scaleX();
-        text.width(text.width() * scaleX);
+        text.width(Math.ceil(text.width() * text.scaleX()) + 1);
         text.scaleX(1);
       }
 
@@ -422,16 +423,18 @@ export class WeaveTextNode extends WeaveNode {
         text.setAttr('smartFixedWidth', true);
         text.setAttr('smartFixedHeight', true);
 
-        const scaleX = text.scaleX();
-        text.width(text.width() * scaleX);
+        text.width(Math.ceil(text.width() * text.scaleX()) + 1);
         text.scaleX(1);
 
-        const scaleY = text.scaleY();
-        text.height(text.height() * scaleY);
+        text.height(Math.ceil(text.height() * text.scaleY()) + 1);
         text.scaleY(1);
       }
 
       this.instance.updateNode(this.serialize(text));
+    };
+
+    text.on('transformend', () => {
+      handleTransformEnd();
     });
 
     this.instance.addEventListener(
@@ -495,7 +498,24 @@ export class WeaveTextNode extends WeaveNode {
       width = textAreaWidth;
       height = textAreaHeight;
     }
-    if (nextProps.layout === TEXT_LAYOUT.SMART) {
+    if (
+      nextProps.layout === TEXT_LAYOUT.SMART &&
+      !nextProps.smartFixedWidth &&
+      !nextProps.smartFixedHeight
+    ) {
+      const { width: textAreaWidth, height: textAreaHeight } =
+        this.textRenderedSize(nextProps.text, nodeInstance as Konva.Text);
+      width = textAreaWidth;
+      height = textAreaHeight;
+    }
+    if (nextProps.layout === TEXT_LAYOUT.SMART && nextProps.smartFixedWidth) {
+      height = undefined;
+    }
+    if (
+      nextProps.layout === TEXT_LAYOUT.SMART &&
+      nextProps.smartFixedWidth &&
+      nextProps.smartFixedHeight
+    ) {
       updateNeeded = false;
     }
     if (nextProps.layout === TEXT_LAYOUT.AUTO_HEIGHT) {
@@ -1158,12 +1178,23 @@ export class WeaveTextNode extends WeaveNode {
     }
   }
 
-  resetSmartLayout(textNode: Konva.Text) {
-    if (textNode.getAttrs().layout === TEXT_LAYOUT.SMART) {
+  resetSmartLayout(
+    textNode: Konva.Text,
+    axis: 'width' | 'height' | undefined = undefined
+  ) {
+    if (textNode.getAttrs().layout === TEXT_LAYOUT.SMART && !axis) {
       textNode.setAttr('smartFixedWidth', false);
       textNode.setAttr('smartFixedHeight', false);
-
-      this.instance.updateNode(this.serialize(textNode));
     }
+
+    if (textNode.getAttrs().layout === TEXT_LAYOUT.SMART && axis === 'width') {
+      textNode.setAttr('smartFixedWidth', false);
+    }
+
+    if (textNode.getAttrs().layout === TEXT_LAYOUT.SMART && axis === 'height') {
+      textNode.setAttr('smartFixedHeight', false);
+    }
+
+    this.instance.updateNode(this.serialize(textNode));
   }
 }
