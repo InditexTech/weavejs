@@ -349,9 +349,13 @@ export class WeaveCopyPasteNodesPlugin extends WeavePlugin {
     position?: Konva.Vector2d,
     relativePosition?: Konva.Vector2d
   ) {
-    const stage = this.instance.getStage();
+    this.instance.stateTransactional(() => {
+      const stage = this.instance.getStage();
 
-    if (this.toPaste) {
+      if (!this.toPaste) {
+        return;
+      }
+
       const nodesToSelect = [];
 
       const newElements = this.checkIfInternalElementsAreNew(
@@ -369,7 +373,16 @@ export class WeaveCopyPasteNodesPlugin extends WeavePlugin {
         const node = this.toPaste.weave[element].element;
         const posRelativeToSelection =
           this.toPaste.weave[element].posRelativeToSelection;
-        let containerId = this.toPaste.weave[element].containerId;
+        let containerId: string | undefined =
+          this.toPaste.weave[element]?.containerId;
+
+        const nodeHandler = this.instance.getNodeHandler<WeaveNode>(
+          node.props.nodeType ?? ''
+        );
+
+        if (!nodeHandler) {
+          continue;
+        }
 
         if (node.props.children) {
           this.recursivelyUpdateKeys(node.props.children);
@@ -379,6 +392,7 @@ export class WeaveCopyPasteNodesPlugin extends WeavePlugin {
         delete node.props.containerId;
         node.key = newNodeId;
         node.props.id = newNodeId;
+
         if (position) {
           const container = containerOverCursor(
             this.instance,
@@ -387,6 +401,7 @@ export class WeaveCopyPasteNodesPlugin extends WeavePlugin {
           );
 
           let localPos = position;
+
           if (!container) {
             containerId = this.instance.getMainLayer()?.getAttrs().id ?? '';
 
@@ -420,47 +435,37 @@ export class WeaveCopyPasteNodesPlugin extends WeavePlugin {
               .point(position);
           }
 
-          const nodeHandler = this.instance.getNodeHandler<WeaveNode>(
-            node.props.nodeType ?? ''
-          );
+          const realOffset = nodeHandler.realOffset(node);
 
-          if (nodeHandler) {
-            const realOffset = nodeHandler.realOffset(node);
-
-            node.props.x = localPos.x + realOffset.x + posRelativeToSelection.x;
-            node.props.y = localPos.y + realOffset.y + posRelativeToSelection.y;
-          }
-        } else {
-          const nodeHandler = this.instance.getNodeHandler<WeaveNode>(
-            node.props.nodeType ?? ''
-          );
-
-          if (nodeHandler) {
-            node.props.x =
-              node.props.x +
-              (this.config.paddingOnPaste.enabled
-                ? this.actualInternalPaddingX
-                : 0);
-            node.props.y =
-              node.props.y +
-              (this.config.paddingOnPaste.enabled
-                ? this.actualInternalPaddingY
-                : 0);
-          }
+          node.props.x = localPos.x + realOffset.x + posRelativeToSelection.x;
+          node.props.y = localPos.y + realOffset.y + posRelativeToSelection.y;
+        }
+        if (!position) {
+          node.props.x =
+            node.props.x +
+            (this.config.paddingOnPaste.enabled
+              ? this.actualInternalPaddingX
+              : 0);
+          node.props.y =
+            node.props.y +
+            (this.config.paddingOnPaste.enabled
+              ? this.actualInternalPaddingY
+              : 0);
         }
 
-        const containerNode = this.instance
-          .getStage()
-          .findOne(`#${containerId}`);
+        let containerNode = this.instance.getStage().findOne(`#${containerId}`);
         if (!containerNode) {
           containerId = this.instance.getMainLayer()?.getAttrs().id ?? '';
+          containerNode = this.instance.getMainLayer();
         }
 
-        this.instance.addNode(node, containerId);
+        if (containerId) {
+          this.instance.addNodeNT(node, containerId);
 
-        const realNode = this.instance.getStage().findOne(`#${newNodeId}`);
-        if (realNode) {
-          nodesToSelect.push(realNode);
+          const realNode = this.instance.getStage().findOne(`#${newNodeId}`);
+          if (realNode) {
+            nodesToSelect.push(realNode);
+          }
         }
 
         this.getStageGridPlugin()?.onRender();
@@ -483,9 +488,9 @@ export class WeaveCopyPasteNodesPlugin extends WeavePlugin {
       });
 
       this.toPaste = undefined;
-    }
 
-    this.cancel();
+      this.cancel();
+    });
   }
 
   private async finishHandleCopy() {
@@ -524,7 +529,14 @@ export class WeaveCopyPasteNodesPlugin extends WeavePlugin {
       weaveMinPoint: { x: 0, y: 0 },
     };
 
-    for (const node of selectedNodes) {
+    const selectedNodesSortedByZIndexAsc = [...selectedNodes].sort((a, b) => {
+      const aZ = a.getZIndex() ?? 0;
+      const bZ = b.getZIndex() ?? 0;
+
+      return aZ - bZ;
+    });
+
+    for (const node of selectedNodesSortedByZIndexAsc) {
       const nodeHandler = this.instance.getNodeHandler<WeaveNode>(
         node.getAttrs().nodeType
       );
