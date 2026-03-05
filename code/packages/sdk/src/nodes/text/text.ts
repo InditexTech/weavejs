@@ -52,7 +52,7 @@ export class WeaveTextNode extends WeaveNode {
   }
 
   private initEvents() {
-    if (!this.eventsInitialized) {
+    if (!this.eventsInitialized && !globalThis._weave_isServerSide) {
       window.addEventListener('keydown', (e) => {
         if (e.ctrlKey || e.metaKey) {
           this.isCtrlMetaPressed = true;
@@ -60,6 +60,23 @@ export class WeaveTextNode extends WeaveNode {
 
         const nodesSelectionPlugin = this.getNodesSelectionPlugin();
         const selectedNodes = nodesSelectionPlugin?.getSelectedNodes() ?? [];
+
+        if (
+          selectedNodes.length === 1 &&
+          selectedNodes[0].getAttrs().nodeType === WEAVE_TEXT_NODE_TYPE &&
+          selectedNodes[0].getAttrs().layout === TEXT_LAYOUT.FIXED
+        ) {
+          nodesSelectionPlugin?.getTransformer()?.keepRatio(false);
+        }
+
+        if (
+          selectedNodes.length === 1 &&
+          selectedNodes[0].getAttrs().nodeType === WEAVE_TEXT_NODE_TYPE &&
+          selectedNodes[0].getAttrs().layout === TEXT_LAYOUT.FIXED &&
+          this.isCtrlMetaPressed
+        ) {
+          nodesSelectionPlugin?.getTransformer()?.keepRatio(true);
+        }
 
         if (
           selectedNodes.length === 1 &&
@@ -281,9 +298,26 @@ export class WeaveTextNode extends WeaveNode {
       const smartFixedHeight = text.getAttr('smartFixedHeight') ?? false;
 
       if (
-        !this.isCtrlMetaPressed &&
-        this.isSelecting() &&
-        this.isNodeSelected(text)
+        [TEXT_LAYOUT.AUTO_HEIGHT, TEXT_LAYOUT.SMART].includes(
+          text.getAttrs().layout
+        ) &&
+        ['middle-right', 'middle-left'].includes(actualAnchor ?? '') &&
+        !smartFixedHeight
+      ) {
+        const scaleX = text.scaleX();
+        text.width(text.width() * scaleX);
+        text.scaleX(1);
+        text.scaleY(1);
+        text.height(undefined);
+        text.getLayer()?.batchDraw();
+      }
+
+      if (
+        (this.isCtrlMetaPressed &&
+          text.getAttrs().layout === TEXT_LAYOUT.FIXED) ||
+        (!this.isCtrlMetaPressed &&
+          this.isSelecting() &&
+          this.isNodeSelected(text))
       ) {
         text.setAttrs({
           width: text.width() * text.scaleX(),
@@ -291,25 +325,6 @@ export class WeaveTextNode extends WeaveNode {
         });
         resetScale(text);
         text.fontSize(text.fontSize() * text.scaleY());
-      }
-
-      if (
-        [TEXT_LAYOUT.AUTO_HEIGHT, TEXT_LAYOUT.SMART].includes(
-          text.getAttrs().layout
-        ) &&
-        ['middle-right', 'middle-left'].includes(actualAnchor ?? '') &&
-        !smartFixedHeight
-      ) {
-        text.setAttr('shouldUpdateOnTransform', false);
-        const scaleX = text.scaleX();
-        text.width(text.width() * scaleX);
-        text.scaleX(1);
-        text.scaleY(1);
-
-        resetScale(text);
-        text.fontSize(text.fontSize() * text.scaleY());
-
-        text.height(undefined);
       }
 
       text.setAttr('shouldUpdateOnTransform', false);
@@ -573,7 +588,7 @@ export class WeaveTextNode extends WeaveNode {
         textNode
       );
       this.textAreaContainer.style.width =
-        textAreaWidth * textNode.getAbsoluteScale().x + 2 + 'px';
+        textAreaWidth * textNode.getAbsoluteScale().x + 1 + 'px';
     }
     if (
       !textNode.getAttrs().layout ||
@@ -718,7 +733,7 @@ export class WeaveTextNode extends WeaveNode {
       this.textAreaContainer.style.width =
         (rect.width + 2) * stage.scaleX() + 'px';
       this.textAreaContainer.style.height =
-        (textNode.height() - textNode.padding() * 2 + 2) *
+        (textNode.height() - textNode.padding() * 2 + 1) *
           textNode.getAbsoluteScale().x +
         'px';
     }
@@ -730,7 +745,7 @@ export class WeaveTextNode extends WeaveNode {
       this.textAreaContainer.style.width =
         (rect.width + 2) * stage.scaleX() + 'px';
       this.textAreaContainer.style.height =
-        (textNode.height() - textNode.padding() * 2 + 2) *
+        (textNode.height() - textNode.padding() * 2 + 1) *
           textNode.getAbsoluteScale().x +
         'px';
     }
@@ -746,13 +761,13 @@ export class WeaveTextNode extends WeaveNode {
 
       if (textNode.getAttrs().smartFixedWidth) {
         this.textAreaContainer.style.width =
-          (textNode.width() - textNode.padding() * 2 + 2) *
+          (textNode.width() - textNode.padding() * 2 + 1) *
             textNode.getAbsoluteScale().x +
           'px';
       }
 
       this.textAreaContainer.style.height =
-        (textNode.height() - textNode.padding() * 2 + 2) *
+        (textNode.height() - textNode.padding() * 2 + 1) *
           textNode.getAbsoluteScale().x +
         'px';
     }
