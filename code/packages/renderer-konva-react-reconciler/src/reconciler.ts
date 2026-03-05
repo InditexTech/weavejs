@@ -4,18 +4,17 @@
 
 import { isEqual } from 'lodash';
 import Konva from 'konva';
-import { DefaultEventPriority } from './constants';
 import {
   type WeaveElementInstance,
   type WeaveElementAttributes,
 } from '@inditextech/weave-types';
-import { Weave } from '@/weave';
 import { type Logger } from 'pino';
-import type { WeaveNode } from '@/nodes/node';
+import { DefaultEventPriority } from './constants';
+import { Weave, type WeaveNode } from '@inditextech/weave-sdk';
 
-export class WeaveReconciler {
-  private instance: Weave;
-  private logger: Logger;
+export class WeaveReactReconcilerReconciler {
+  private readonly instance: Weave;
+  private readonly logger: Logger;
 
   constructor(instance: Weave) {
     this.instance = instance;
@@ -44,30 +43,41 @@ export class WeaveReconciler {
 
     let nodeAdded = false;
 
-    if (parentInstance instanceof Konva.Stage && child instanceof Konva.Layer) {
+    if (
+      parentInstance instanceof Konva.Stage &&
+      child instanceof Konva.Layer &&
+      !child.isAncestorOf(parentInstance)
+    ) {
       parentInstance.add(child);
       handler.onAdd?.(child);
       nodeAdded = true;
     }
-    if (parentInstance instanceof Konva.Layer) {
+    if (
+      parentInstance instanceof Konva.Layer &&
+      !child.isAncestorOf(parentInstance)
+    ) {
       parentInstance.add(child);
       handler.onAdd?.(child);
       nodeAdded = true;
     }
     if (
       parentInstance instanceof Konva.Group &&
-      typeof parentAttrs.containerId !== 'undefined'
+      parentAttrs.containerId !== undefined
     ) {
       const realParent = parentInstance.findOne(
         `#${parentAttrs.containerId}`
       ) as Konva.Group | undefined;
-      realParent?.add(child);
-      handler.onAdd?.(child);
-      nodeAdded = true;
+
+      if (realParent && !child.isAncestorOf(realParent)) {
+        realParent?.add(child);
+        handler.onAdd?.(child);
+        nodeAdded = true;
+      }
     }
     if (
       parentInstance instanceof Konva.Group &&
-      typeof parentAttrs.containerId === 'undefined'
+      parentAttrs.containerId === undefined &&
+      !child.isAncestorOf(parentInstance)
     ) {
       parentInstance.add(child);
       handler.onAdd?.(child);

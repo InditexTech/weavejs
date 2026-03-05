@@ -311,6 +311,10 @@ export class WeaveExportManager {
   }
 
   imageToBase64(img: HTMLImageElement, mimeType: string): string {
+    if (img.naturalWidth === 0 && img.naturalHeight === 0) {
+      throw new Error('Image has no content');
+    }
+
     const canvas = document.createElement('canvas');
     canvas.width = img.naturalWidth;
     canvas.height = img.naturalHeight;

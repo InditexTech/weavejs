@@ -70,7 +70,7 @@ export class WeaveGroupNode extends WeaveNode {
     group.getTransformerProperties = function () {
       return {
         ...defaultTransformerProperties,
-        enabledAnchors: group.allowedAnchors(),
+        enabledAnchors: group?.allowedAnchors() ?? [],
       };
     };
 
@@ -79,7 +79,7 @@ export class WeaveGroupNode extends WeaveNode {
 
       const anchorsArrays = [];
       for (const child of children) {
-        anchorsArrays.push(child.allowedAnchors());
+        anchorsArrays.push(child?.allowedAnchors() ?? []);
       }
 
       return intersectArrays(anchorsArrays);

@@ -25,7 +25,7 @@
     "lint:fix": "nx run-many -t lint:fix",
     "pack": "nx run-many -t pack",
     "prepare": "cd ../ && node code/.husky/install.mjs",
-    "publish:snapshot": "nx run-many --skip-nx-cache -t publish:snapshot -- --verbose --tag next --unsafe-perm",
+    "publish:snapshot": "nx run-many -t publish:snapshot -- --verbose --unsafe-perm",
     "release:perform": "nx run-many -t release:perform -- --verbose --unsafe-perm",
     "release:prepare": "nx run-many -t release:prepare",
     "release": "nx run-many -t release",
@@ -69,8 +69,8 @@
     "@commitlint/config-conventional": "19.2.2",
     "@nx/js": "19.8.5",
     "@swc-node/register": "1.10.9",
-    "@swc/core": "1.11.7",
-    "@swc/helpers": "0.5.15",
+    "@swc/core": "1.13.3",
+    "@swc/helpers": "0.5.17",
     "husky": "9.1.4",
     "npkill": "0.12.2",
     "nx": "19.5.7",
@@ -78,8 +78,8 @@
     "typescript": "5.7.3"
   },
   "engines": {
-    "node": ">= 22.11.x",
-    "npm": ">= 10.9.x"
+    "node": ">= 22.17.1",
+    "npm": ">= 10.9.2"
   },
   "overrides": {
     "esbuild": "0.25.0",

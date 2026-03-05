@@ -2,75 +2,35 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-import ReactReconciler, { type Reconciler } from 'react-reconciler';
 import { Weave } from '@/weave';
-import { WeaveStateSerializer } from '@/state-serializer/state-serializer';
-import { WeaveReconciler } from '@/reconciler/reconciler';
-import { type WeaveElementInstance } from '@inditextech/weave-types';
+import { type WeaveRendererBase } from '@inditextech/weave-types';
+import type { Logger } from 'pino';
 
-export class WeaveRenderer {
-  private instance: Weave;
-  private reconciler: WeaveReconciler;
-  private serializer: WeaveStateSerializer;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  private renderer: Reconciler<
-    Weave,
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    any,
-    null,
-    WeaveElementInstance,
-    WeaveElementInstance
-  > | null;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  private root: any;
+export abstract class WeaveRenderer implements WeaveRendererBase {
+  protected instance!: Weave;
+  protected logger!: Logger;
+  protected name!: string;
 
-  constructor(
-    instance: Weave,
-    reconciler: WeaveReconciler,
-    serializer: WeaveStateSerializer
-  ) {
+  getName(): string {
+    return this.name;
+  }
+
+  getLogger(): Logger {
+    return this.logger;
+  }
+
+  register(instance: Weave): this {
     this.instance = instance;
-    this.reconciler = reconciler;
-    this.serializer = serializer;
-    this.renderer = null;
+    this.logger = this.instance.getChildLogger(this.getName());
+
+    this.instance
+      .getMainLogger()
+      .info(`Renderer with name [${this.getName()}] registered`);
+
+    return this;
   }
 
-  init(): void {
-    this.renderer = ReactReconciler(this.reconciler.getConfig());
+  abstract init(): void;
 
-    this.root = this.renderer.createContainer(
-      this.instance,
-      0,
-      null,
-      true,
-      null,
-      '',
-      (error: Error) => {
-        console.error(error);
-      },
-      null
-    );
-
-    this.root.onUncaughtError = function (error: Error) {
-      console.error(error);
-    };
-  }
-
-  render(callback?: () => void): void {
-    const actualState = JSON.parse(
-      JSON.stringify(this.instance.getStore().getState())
-    );
-
-    if (
-      !actualState?.weave?.key ||
-      !actualState?.weave?.type ||
-      !actualState?.weave?.props
-    ) {
-      return;
-    }
-
-    const elementsTree = this.serializer.deserialize(actualState.weave);
-
-    this.renderer?.updateContainer(elementsTree, this.root, null, callback);
-  }
+  abstract render(callback?: () => void): void;
 }

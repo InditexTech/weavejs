@@ -11,6 +11,9 @@ path = [
     "REUSE.toml",
     "repolinter.json",
 
+    # Sonar Qube configuration
+    "**/sonar-project.properties",
+
     # repeated files licensing
     "**/.gitignore",
     "**/tsconfig.json",

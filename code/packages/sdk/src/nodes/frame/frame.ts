@@ -23,6 +23,7 @@ import type {
 } from './types';
 import type { WeaveNodesSelectionPlugin } from '@/plugins/nodes-selection/nodes-selection';
 import { mergeExceptArrays } from '@/utils';
+import { GroupFrame } from './group-frame';
 
 export class WeaveFrameNode extends WeaveNode {
   private config: WeaveFrameProperties;
@@ -83,7 +84,7 @@ export class WeaveFrameNode extends WeaveNode {
       ...restProps,
     };
 
-    const frame = new Konva.Group({
+    const frame = new GroupFrame({
       ...frameParams,
       id,
       isContainerPrincipal: true,
@@ -256,9 +257,6 @@ export class WeaveFrameNode extends WeaveNode {
         width: containerAreaBox.width,
         height: containerAreaBox.height + textBox.height,
       };
-    };
-    frame.getClientRect = (config) => {
-      return containerArea.getClientRect(config);
     };
 
     frame.add(containerArea);

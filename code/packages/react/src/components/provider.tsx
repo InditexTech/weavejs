@@ -7,7 +7,9 @@ import type {
   WeaveNode,
   WeaveAction,
   WeavePlugin,
+  WeaveRenderer,
   WeaveStore,
+  WeavePerformanceConfig,
 } from '@inditextech/weave-sdk';
 import { Weave } from '@inditextech/weave-sdk';
 import {
@@ -17,7 +19,6 @@ import {
   type WeaveStatus,
   WEAVE_INSTANCE_STATUS,
   type WeaveStoreConnectionStatus,
-  type WeavePerformanceConfig,
   type WeaveChildLoggerLevel,
 } from '@inditextech/weave-types';
 import { useWeave } from './store';
@@ -26,6 +27,7 @@ type WeaveProviderType = {
   getContainer: () => HTMLElement;
   fonts?: WeaveFont[] | (() => Promise<WeaveFont[]>);
   store: WeaveStore;
+  renderer: WeaveRenderer;
   nodes?: WeaveNode[];
   actions?: WeaveAction[];
   plugins?: WeavePlugin[];
@@ -38,6 +40,7 @@ type WeaveProviderType = {
 export const WeaveProvider = ({
   getContainer,
   store,
+  renderer,
   nodes = [],
   actions = [],
   plugins = [],
@@ -143,6 +146,7 @@ export const WeaveProvider = ({
         weaveInstanceRef.current = new Weave(
           {
             store,
+            renderer,
             nodes,
             actions,
             plugins,

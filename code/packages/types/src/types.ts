@@ -17,38 +17,6 @@ import {
   WEAVE_LOG_LEVEL,
   WEAVE_NODE_CHANGE_TYPE,
 } from './constants';
-import { type WeaveNodeBase } from '@/base/node';
-import { type WeaveActionBase } from '@/base/action';
-import { type WeavePluginBase } from '@/base/plugin';
-import { type WeaveStoreBase } from '@/base/store';
-
-// Configuration handling
-
-export type WeaveFontsPreloadFunction = () => Promise<WeaveFont[]>;
-
-export type WeavePerformanceConfig = {
-  upscale?: Partial<WeaveUpscaleConfig>;
-};
-
-export type WeaveUpscaleConfig = {
-  enabled?: boolean;
-  multiplier?: number;
-  baseWidth?: number;
-  baseHeight?: number;
-};
-
-export type WeaveConfig = {
-  store: WeaveStoreBase;
-  nodes?: WeaveNodeBase[];
-  actions?: WeaveActionBase[];
-  plugins?: WeavePluginBase[];
-  fonts?: WeaveFont[] | WeaveFontsPreloadFunction;
-  logger?: WeaveLoggerConfig;
-  performance?: WeavePerformanceConfig;
-  behaviors: {
-    axisLockThreshold: number;
-  };
-};
 
 // Base types
 
@@ -202,11 +170,14 @@ export type WeaveUser = {
 
 // Font descriptor format
 
+export type WeaveFontStyle = 'normal' | 'italic' | 'bold' | number;
+
 export type WeaveFont = {
   id: string;
   name: string;
   offsetX?: number;
   offsetY?: number;
+  supportedStyles?: WeaveFontStyle[];
 };
 
 // Undo/redo manager handling

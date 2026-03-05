@@ -7,7 +7,7 @@ import { defineConfig } from 'tsdown';
 export default defineConfig([
   {
     entry: {
-      sdk: './src/index.ts',
+      types: './src/index.types.ts',
     },
     external: [
       '@inditextech/weave-types',
@@ -25,6 +25,24 @@ export default defineConfig([
   },
   {
     entry: {
+      sdk: './src/index.ts',
+    },
+    external: [
+      '@inditextech/weave-types',
+      'konva',
+      'yjs',
+      'canvas',
+      'skia-canvas',
+    ],
+    format: ['es'],
+    target: 'es2023',
+    shims: true,
+    clean: true,
+    dts: false,
+    platform: 'browser',
+  },
+  {
+    entry: {
       ['sdk.node']: './src/index.node.ts',
     },
     external: [
@@ -38,7 +56,7 @@ export default defineConfig([
     target: 'es2023',
     shims: true,
     clean: true,
-    dts: true,
+    dts: false,
     platform: 'node',
   },
   {
@@ -49,7 +67,7 @@ export default defineConfig([
     format: ['es'],
     target: 'es2023',
     clean: true,
-    dts: true,
+    dts: false,
     platform: 'browser',
   },
 ]);

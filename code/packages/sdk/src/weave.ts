@@ -7,7 +7,6 @@ import Konva from 'konva';
 import { v4 as uuidv4 } from 'uuid';
 import pino, { type Logger } from 'pino';
 import {
-  type WeaveConfig,
   type WeaveStateElement,
   type WeaveState,
   type WeaveElementInstance,
@@ -40,8 +39,6 @@ import {
 } from './nodes/node';
 import { WeaveAction } from './actions/action';
 import { WeavePlugin } from './plugins/plugin';
-import { WeaveReconciler } from './reconciler/reconciler';
-import { WeaveStateSerializer } from './state-serializer/state-serializer';
 import { WeaveRenderer } from './renderer/renderer';
 import { WeaveGroupsManager } from './managers/groups';
 import { WeaveLogger } from './logger/logger';
@@ -64,7 +61,7 @@ import type {
   WeaveInstanceStatusEvent,
   WeaveStoreOnRoomLoadedEvent,
 } from './stores/types';
-import type { DOMElement } from './types';
+import type { DOMElement, WeaveConfig } from './types';
 import {
   getBoundingBox,
   getExportBoundingBox,
@@ -88,8 +85,6 @@ export class Weave {
   private config: WeaveConfig;
   private logger: WeaveLogger;
   private moduleLogger: Logger;
-  private reconciler: WeaveReconciler;
-  private stateSerializer: WeaveStateSerializer;
   private renderer: WeaveRenderer;
   private initialized: boolean = false;
 
@@ -114,8 +109,8 @@ export class Weave {
   private readonly dragAndDropManager: WeaveDragAndDropManager;
 
   constructor(
-    weaveConfig: Pick<WeaveConfig, 'store'> &
-      DeepPartial<Omit<WeaveConfig, 'store'>>,
+    weaveConfig: Pick<WeaveConfig, 'store' | 'renderer'> &
+      DeepPartial<Omit<WeaveConfig, 'store' | 'renderer'>>,
     stageConfig: Konva.StageConfig
   ) {
     globalThis._weave_isServerSide = false;
@@ -144,16 +139,9 @@ export class Weave {
     // Setup a child logger for this module
     this.moduleLogger = this.logger.getChildLogger('main');
 
-    // Instantiate the state serializer
-    this.stateSerializer = new WeaveStateSerializer();
-    // Instantiate the reconciler
-    this.reconciler = new WeaveReconciler(this);
-    // Instantiate the renderer
-    this.renderer = new WeaveRenderer(
-      this,
-      this.reconciler,
-      this.stateSerializer
-    );
+    // Register the renderer
+    this.renderer = this.config.renderer;
+    this.renderer.register(this);
 
     // Instantiate the managers
     this.setupManager = new WeaveSetupManager(this);
@@ -1011,6 +999,10 @@ export class Weave {
 
   // TARGETING MANAGEMENT METHODS PROXIES
 
+  getTargetingManager(): WeaveTargetingManager {
+    return this.targetingManager;
+  }
+
   resolveNode(node: Konva.Node): WeaveElementInstance | undefined {
     const resolvedNode = this.targetingManager.resolveNode(node);
     if (resolvedNode) {
@@ -1086,18 +1078,6 @@ export class Weave {
     return this.exportManager.imageToBase64(img, mimeType);
   }
 
-  public async exportNodes(
-    nodes: WeaveElementInstance[],
-    boundingNodes: (nodes: Konva.Node[]) => Konva.Node[],
-    options: WeaveExportNodesOptions
-  ): Promise<HTMLImageElement> {
-    return await this.exportManager.exportNodesAsImage(
-      nodes,
-      boundingNodes,
-      options
-    );
-  }
-
   public async exportNodesServerSide(
     nodes: string[],
     boundingNodes: (nodes: Konva.Node[]) => Konva.Node[],
@@ -1108,6 +1088,18 @@ export class Weave {
     height: number;
   }> {
     return await this.exportManager.exportNodesServerSide(
+      nodes,
+      boundingNodes,
+      options
+    );
+  }
+
+  public async exportNodes(
+    nodes: WeaveElementInstance[],
+    boundingNodes: (nodes: Konva.Node[]) => Konva.Node[],
+    options: WeaveExportNodesOptions
+  ): Promise<HTMLImageElement> {
+    return await this.exportManager.exportNodesAsImage(
       nodes,
       boundingNodes,
       options

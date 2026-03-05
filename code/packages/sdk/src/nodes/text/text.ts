@@ -409,6 +409,11 @@ export class WeaveTextNode extends WeaveNode {
   ): { width: number; height: number } {
     let width = 0;
     let height = 0;
+
+    if (!text) {
+      return { width: 1, height: 1 };
+    }
+
     const lines = text.split('\n');
     for (const line of lines) {
       const textSize = textNode.measureSize(line);

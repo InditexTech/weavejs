@@ -112,6 +112,30 @@ export function moveNodeToContainer(
   originalContainer?: Konva.Node | null,
   invalidOriginsTypes: string[] = ['frame']
 ): boolean {
+  let moved = false;
+
+  instance.stateTransactional(() => {
+    moved = moveNodeToContainerNT(
+      instance,
+      node,
+      containerToMove,
+      originalNode,
+      originalContainer,
+      invalidOriginsTypes
+    );
+  });
+
+  return moved;
+}
+
+export function moveNodeToContainerNT(
+  instance: Weave,
+  node: Konva.Node,
+  containerToMove: Konva.Layer | Konva.Group,
+  originalNode?: Konva.Node | null,
+  originalContainer?: Konva.Node | null,
+  invalidOriginsTypes: string[] = ['frame']
+): boolean {
   const stage = instance.getStage();
 
   // check is node is locked
@@ -185,15 +209,13 @@ export function moveNodeToContainer(
     );
 
     if (nodeHandler) {
-      instance.stateTransactional(() => {
-        const actualNode = nodeHandler.serialize(node as WeaveElementInstance);
+      const actualNode = nodeHandler.serialize(node as WeaveElementInstance);
 
-        instance.removeNodeNT(actualNode, { emitUserChangeEvent: false });
-        instance.addNodeNT(actualNode, layerToMoveAttrs.id, {
-          emitUserChangeEvent: true,
-          // emitUserChangeEvent: false,
-          overrideUserChangeType: WEAVE_NODE_CHANGE_TYPE.UPDATE,
-        });
+      instance.removeNodeNT(actualNode, { emitUserChangeEvent: false });
+      instance.addNodeNT(actualNode, layerToMoveAttrs.id, {
+        // emitUserChangeEvent: true,
+        emitUserChangeEvent: false,
+        overrideUserChangeType: WEAVE_NODE_CHANGE_TYPE.UPDATE,
       });
 
       return true;
@@ -523,20 +545,19 @@ export function getTopmostShadowHost(el: DOMElement): ShadowRoot | null {
   return current?.shadowRoot || null;
 }
 
-export function getVisibleNodes(
-  instance: Weave,
-  stage: Konva.Stage,
-  nodeParent: Konva.Node,
-  skipNodes: string[],
-  referenceLayer: Konva.Layer | Konva.Group
-): Konva.Node[] {
-  const nodesSelection =
-    instance.getPlugin<WeaveNodesSelectionPlugin>('nodesSelection');
-
-  if (nodesSelection) {
-    nodesSelection.getTransformer().hide();
-  }
-
+export function getVisibleNodes({
+  instance,
+  stage,
+  nodeParent,
+  skipNodes,
+  referenceLayer,
+}: {
+  instance: Weave;
+  stage: Konva.Stage;
+  nodeParent: Konva.Node;
+  skipNodes: string[];
+  referenceLayer: Konva.Layer | Konva.Group;
+}): Konva.Node[] {
   const nodes = getVisibleNodesInViewport(stage, referenceLayer);
 
   const finalVisibleNodes: Konva.Node[] = [];
@@ -574,10 +595,6 @@ export function getVisibleNodes(
 
     finalVisibleNodes.push(node);
   });
-
-  if (nodesSelection) {
-    nodesSelection.getTransformer().show();
-  }
 
   return finalVisibleNodes;
 }
