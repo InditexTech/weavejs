@@ -13,6 +13,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- [#962](https://github.com/InditexTech/weavejs/issues/962) Validate transactionality when pasting Weave.js nodes
+
 ## [3.0.0] - 2026-03-05
 
 ### Changed
@@ -24,7 +28,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - [#950](https://github.com/InditexTech/weavejs/issues/950) Improve performance of drag / transform operations
 - [#953](https://github.com/InditexTech/weavejs/issues/953) Refactor to support different state renderer and reconciler
 - [#956](https://github.com/InditexTech/weavejs/issues/956) Avoid heartbeat mechanism on Azure Web Pubsub store
-- [#962](https://github.com/InditexTech/weavejs/issues/962) Validate transactionality when pasting Weave.js nodes
 
 ## [2.23.0] - 2026-02-25
 
