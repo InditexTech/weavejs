@@ -352,144 +352,142 @@ export class WeaveCopyPasteNodesPlugin extends WeavePlugin {
     this.instance.stateTransactional(() => {
       const stage = this.instance.getStage();
 
-      if (this.toPaste) {
-        const nodesToSelect = [];
-
-        const newElements = this.checkIfInternalElementsAreNew(
-          JSON.stringify(this.toPaste)
-        );
-
-        if (this.config.paddingOnPaste.enabled && newElements) {
-          this.actualInternalPaddingX = 0;
-          this.actualInternalPaddingY = 0;
-        }
-
-        this.updateInternalPastePadding();
-
-        for (const element of Object.keys(this.toPaste.weave)) {
-          const node = this.toPaste.weave[element].element;
-          const posRelativeToSelection =
-            this.toPaste.weave[element].posRelativeToSelection;
-          let containerId = this.toPaste.weave[element].containerId;
-
-          if (node.props.children) {
-            this.recursivelyUpdateKeys(node.props.children);
-          }
-
-          const newNodeId = uuidv4();
-          delete node.props.containerId;
-          node.key = newNodeId;
-          node.props.id = newNodeId;
-          if (position) {
-            const container = containerOverCursor(
-              this.instance,
-              [],
-              relativePosition
-            );
-
-            let localPos = position;
-            if (!container) {
-              containerId = this.instance.getMainLayer()?.getAttrs().id ?? '';
-
-              const scale = stage.scaleX(); // assume uniform scale
-              const stagePos = stage.position(); // stage position (pan)
-
-              localPos = {
-                x:
-                  (localPos.x -
-                    stagePos.x +
-                    (this.config.paddingOnPaste.enabled
-                      ? this.actualInternalPaddingX
-                      : 0)) /
-                  scale,
-                y:
-                  (localPos.y -
-                    stagePos.y +
-                    (this.config.paddingOnPaste.enabled
-                      ? this.actualInternalPaddingY
-                      : 0)) /
-                  scale,
-              };
-            }
-            if (container && container.getAttrs().nodeType === 'frame') {
-              containerId = container.getAttrs().id ?? '';
-
-              localPos = container
-                .getAbsoluteTransform()
-                .copy()
-                .invert()
-                .point(position);
-            }
-
-            const nodeHandler = this.instance.getNodeHandler<WeaveNode>(
-              node.props.nodeType ?? ''
-            );
-
-            if (nodeHandler) {
-              const realOffset = nodeHandler.realOffset(node);
-
-              node.props.x =
-                localPos.x + realOffset.x + posRelativeToSelection.x;
-              node.props.y =
-                localPos.y + realOffset.y + posRelativeToSelection.y;
-            }
-          } else {
-            const nodeHandler = this.instance.getNodeHandler<WeaveNode>(
-              node.props.nodeType ?? ''
-            );
-
-            if (nodeHandler) {
-              node.props.x =
-                node.props.x +
-                (this.config.paddingOnPaste.enabled
-                  ? this.actualInternalPaddingX
-                  : 0);
-              node.props.y =
-                node.props.y +
-                (this.config.paddingOnPaste.enabled
-                  ? this.actualInternalPaddingY
-                  : 0);
-            }
-          }
-
-          let containerNode = this.instance
-            .getStage()
-            .findOne(`#${containerId}`);
-          if (!containerNode) {
-            containerId = this.instance.getMainLayer()?.getAttrs().id ?? '';
-            containerNode = this.instance.getMainLayer();
-          }
-
-          if (containerId) {
-            this.instance.addNodeNT(node, containerId);
-
-            const realNode = this.instance.getStage().findOne(`#${newNodeId}`);
-            if (realNode) {
-              nodesToSelect.push(realNode);
-            }
-          }
-
-          this.getStageGridPlugin()?.onRender();
-        }
-
-        this.instance.emitEvent<WeaveCopyPasteNodesPluginOnPasteEvent>(
-          'onPaste',
-          {
-            error: undefined,
-            pastedNodes: nodesToSelect.map((n) => n.getAttrs().id ?? ''),
-          }
-        );
-
-        const nodesSelectionPlugin = this.getNodesSelectionPlugin();
-        nodesSelectionPlugin?.setSelectedNodes(nodesToSelect);
-
-        this.instance?.triggerAction('fitToSelectionTool', {
-          previousAction: 'selectionTool',
-          smartZoom: true,
-        });
-
-        this.toPaste = undefined;
+      if (!this.toPaste) {
+        return;
       }
+
+      const nodesToSelect = [];
+
+      const newElements = this.checkIfInternalElementsAreNew(
+        JSON.stringify(this.toPaste)
+      );
+
+      if (this.config.paddingOnPaste.enabled && newElements) {
+        this.actualInternalPaddingX = 0;
+        this.actualInternalPaddingY = 0;
+      }
+
+      this.updateInternalPastePadding();
+
+      for (const element of Object.keys(this.toPaste.weave)) {
+        const node = this.toPaste.weave[element].element;
+        const posRelativeToSelection =
+          this.toPaste.weave[element].posRelativeToSelection;
+        let containerId: string | undefined =
+          this.toPaste.weave[element]?.containerId;
+
+        const nodeHandler = this.instance.getNodeHandler<WeaveNode>(
+          node.props.nodeType ?? ''
+        );
+
+        if (!nodeHandler) {
+          continue;
+        }
+
+        if (node.props.children) {
+          this.recursivelyUpdateKeys(node.props.children);
+        }
+
+        const newNodeId = uuidv4();
+        delete node.props.containerId;
+        node.key = newNodeId;
+        node.props.id = newNodeId;
+
+        if (position) {
+          const container = containerOverCursor(
+            this.instance,
+            [],
+            relativePosition
+          );
+
+          let localPos = position;
+
+          if (!container) {
+            containerId = this.instance.getMainLayer()?.getAttrs().id ?? '';
+
+            const scale = stage.scaleX(); // assume uniform scale
+            const stagePos = stage.position(); // stage position (pan)
+
+            localPos = {
+              x:
+                (localPos.x -
+                  stagePos.x +
+                  (this.config.paddingOnPaste.enabled
+                    ? this.actualInternalPaddingX
+                    : 0)) /
+                scale,
+              y:
+                (localPos.y -
+                  stagePos.y +
+                  (this.config.paddingOnPaste.enabled
+                    ? this.actualInternalPaddingY
+                    : 0)) /
+                scale,
+            };
+          }
+          if (container && container.getAttrs().nodeType === 'frame') {
+            containerId = container.getAttrs().id ?? '';
+
+            localPos = container
+              .getAbsoluteTransform()
+              .copy()
+              .invert()
+              .point(position);
+          }
+
+          const realOffset = nodeHandler.realOffset(node);
+
+          node.props.x = localPos.x + realOffset.x + posRelativeToSelection.x;
+          node.props.y = localPos.y + realOffset.y + posRelativeToSelection.y;
+        }
+        if (!position) {
+          node.props.x =
+            node.props.x +
+            (this.config.paddingOnPaste.enabled
+              ? this.actualInternalPaddingX
+              : 0);
+          node.props.y =
+            node.props.y +
+            (this.config.paddingOnPaste.enabled
+              ? this.actualInternalPaddingY
+              : 0);
+        }
+
+        let containerNode = this.instance.getStage().findOne(`#${containerId}`);
+        if (!containerNode) {
+          containerId = this.instance.getMainLayer()?.getAttrs().id ?? '';
+          containerNode = this.instance.getMainLayer();
+        }
+
+        if (containerId) {
+          this.instance.addNodeNT(node, containerId);
+
+          const realNode = this.instance.getStage().findOne(`#${newNodeId}`);
+          if (realNode) {
+            nodesToSelect.push(realNode);
+          }
+        }
+
+        this.getStageGridPlugin()?.onRender();
+      }
+
+      this.instance.emitEvent<WeaveCopyPasteNodesPluginOnPasteEvent>(
+        'onPaste',
+        {
+          error: undefined,
+          pastedNodes: nodesToSelect.map((n) => n.getAttrs().id ?? ''),
+        }
+      );
+
+      const nodesSelectionPlugin = this.getNodesSelectionPlugin();
+      nodesSelectionPlugin?.setSelectedNodes(nodesToSelect);
+
+      this.instance?.triggerAction('fitToSelectionTool', {
+        previousAction: 'selectionTool',
+        smartZoom: true,
+      });
+
+      this.toPaste = undefined;
 
       this.cancel();
     });
@@ -531,7 +529,14 @@ export class WeaveCopyPasteNodesPlugin extends WeavePlugin {
       weaveMinPoint: { x: 0, y: 0 },
     };
 
-    for (const node of selectedNodes) {
+    const selectedNodesSortedByZIndexAsc = [...selectedNodes].sort((a, b) => {
+      const aZ = a.getZIndex() ?? 0;
+      const bZ = b.getZIndex() ?? 0;
+
+      return aZ - bZ;
+    });
+
+    for (const node of selectedNodesSortedByZIndexAsc) {
       const nodeHandler = this.instance.getNodeHandler<WeaveNode>(
         node.getAttrs().nodeType
       );
