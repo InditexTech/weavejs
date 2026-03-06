@@ -20,6 +20,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 - [#962](https://github.com/InditexTech/weavejs/issues/962) Validate transactionality when pasting Weave.js nodes
+- [#966](https://github.com/InditexTech/weavejs/issues/966) Grid type change not rendered until zoom / pan interaction
 
 ## [3.0.0] - 2026-03-05
 
