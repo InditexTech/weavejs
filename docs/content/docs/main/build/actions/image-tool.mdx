@@ -89,12 +89,26 @@ const MyImageToolTriggerComponent = () => {
 
   const handleUploadFile = React.useCallback(
     async (file) => {
-      // Upload file to you storage / this is dummy, just an example
-      const imageURL = await uploadImage(file);
-      const { finishUploadCallback } = instance.triggerAction("imageTool");
-      finishUploadCallback(imageURL);
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        const { nodeID, finishUploadCallback } = instance.triggerAction(
+          "imageTool",
+          {
+            imageData: reader.result as string,
+          },
+        );
+
+        // Upload file to you storage / this is dummy, just an example
+        const imageURL = await uploadImage(file);
+
+        finishUploadCallback(nodeId, imageURL);
+      };
+      reader.onerror = () => {
+        // handle error
+      };
+      reader.readAsDataURL(file);
     },
-    [instance]
+    [instance],
   );
 
   return (

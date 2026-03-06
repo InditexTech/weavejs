@@ -1,0 +1,328 @@
+---
+title: v3.0.0
+description: Focus on **performance, architecture flexibility, and cleaner integration APIs**.
+---
+
+## 🚀 Focus on performance, flexibility, and a cleaner UX.
+
+**Release date:** March 5, 2026
+
+This release focuses on **performance, architecture flexibility, and cleaner integration APIs**.
+Several internal improvements significantly improve **canvas interaction performance**, while architectural refactors make Weave.js **more extensible and framework-agnostic**.
+
+In addition, some tools were updated to **remove reliance on global browser state** and improve **media handling workflows**.
+
+---
+
+## Changes
+
+### Improved Image Tool UX
+
+The Image Tool workflow has been redesigned to provide a **simpler and more responsive upload experience**.
+
+- **Async persistence** for uploaded images, upload now is performed async from adding the image to the canvas
+- Simplified **image upload** flow
+- **Faster visual feedback** when inserting images
+- **Reduced UI blocking** during upload or persistence operations
+- **Removed global** `window.weave` properties.
+
+Images can now be inserted and manipulated on the canvas while persistence happens asynchronously, improving responsiveness in collaborative environments.
+
+[https://github.com/InditexTech/weavejs/issues/941](https://github.com/InditexTech/weavejs/issues/941)
+
+---
+
+### Removed global `window.weave` dependency from Video Tool
+
+The Video Tool no longer relies on **global `window.weave` properties**.
+
+- Easier integration with **framework-based applications**
+- Better compatibility with **SSR and modular environments**
+
+Video tool configuration must now be passed explicitly instead of relying on global variables.
+
+[https://github.com/InditexTech/weavejs/issues/943](https://github.com/InditexTech/weavejs/issues/943)
+
+---
+
+### Removed global `window.weave` dependency from Text Tool
+
+The Text Tool has been updated to remove usage of global configuration via `window.weave`.
+
+- Easier integration with **framework-based applications**
+- Better compatibility with **SSR and modular environments**
+
+This aligns the Text Tool with the architecture used across other tools.
+
+[https://github.com/InditexTech/weavejs/issues/944](https://github.com/InditexTech/weavejs/issues/944)
+
+---
+
+### Improved performance of group / un-group operations
+
+Grouping and un-grouping nodes has been optimized to handle **large selections more efficiently**.
+
+- Reduced processing overhead during group creation
+- Faster un-group operations
+- Improved performance when manipulating **large node collections**
+
+These improvements are especially noticeable when working with **large collaborative canvases**.
+
+[https://github.com/InditexTech/weavejs/issues/948](https://github.com/InditexTech/weavejs/issues/948)
+
+---
+
+### Improved drag and transform performance
+
+Canvas interaction performance has been improved during **dragging and transformation operations**.
+
+- Smoother dragging with many nodes on the canvas
+- Reduced layout recalculations
+- Optimized transformer update logic
+
+These changes significantly improve usability in **large or complex scenes**.
+
+[https://github.com/InditexTech/weavejs/issues/950](https://github.com/InditexTech/weavejs/issues/950)
+
+---
+
+### Renderer and reconciler architecture refactor
+
+Weave.js now supports **different state renderers and reconcilers**, making the rendering pipeline more flexible.
+
+- Decoupled state reconciling from rendering implementation
+- Ability to plug in **custom renderers / reconcilers**
+- Cleaner internal architecture
+
+As today we provide two renderer / reconcilers, bot over Konva.js in two new packages:
+
+#### `@inditextech/weave-renderer-konva-base`
+
+A simplified renderer without the React Reconciler overhead. Super-performant. (Recommended).
+
+#### `@inditextech/weave-renderer-konva-react-reconciler`
+
+The React Reconciler renderer previously provider on past versions.
+
+This change enables future integrations beyond the current renderer implementation.
+
+[https://github.com/InditexTech/weavejs/issues/953](https://github.com/InditexTech/weavejs/issues/953)
+
+---
+
+### Removed heartbeat mechanism from Azure Web PubSub store
+
+The **heartbeat mechanism** previously used in the Azure Web PubSub store has been removed. This mechanism introduced problems
+specially when switching tabs due that `setTimeout` and `setInterval` apis are not executed when tab is not focused.
+
+[https://github.com/InditexTech/weavejs/issues/956](https://github.com/InditexTech/weavejs/issues/956)
+
+---
+
+## Breaking Changes
+
+### Provide Image data to Image Tool
+
+The Image Tool no longer fetches the image automatically from an URL.
+
+Instead, the **image data (dataURL) must be passed explicitly via the `imageData` option** when triggering the tool.
+
+#### Before (v2.x)
+
+```ts
+# After user picks the image to add from filesystem
+
+const persistedImageURL = await uploadImage(...);
+
+const { nodeId, finishUploadCallback } = instance.triggerAction("imageTool",
+  {
+    imageId: resourceId,
+    imageURL: persistedImageURL,
+    ...
+  },
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+) as any;
+
+```
+
+For Drag & Drop, normally on the `onDragStart` event we setup the same info on the `weaveDragImageURL` and `weaveDragImageId`
+properties on the `window` object.
+
+```ts
+<div
+  ...
+  onStartDrag={() => {
+    window.weaveDragImageId = // dragged image id probably from data-*
+    window.weaveDragImageURL = // dragged image URL probably from data-*
+  }}
+  ...
+>
+  ...
+</div>
+```
+
+#### After (v3.0.0)
+
+Applications are now responsible for **retrieving the image data** and passing it to the tool call:
+
+```ts
+# After user picks the image to add from filesystem
+
+const instance = new Weave(...); // Weave Instance
+
+const resourceId = "my-resource-id";
+
+const reader = new FileReader();
+reader.onloadend = () => {
+  const { nodeId, finishUploadCallback } = instance.triggerAction("imageTool",
+    {
+      imageId: resourceId,
+      imageData: reader.result as string,
+      ...
+    },
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  ) as any;
+
+  // Perform upload to application persistence
+  const persistedImageURL = await uploadImage(...);
+
+  finishUploadCallback?.(
+    nodeId,
+    persistedImageURL
+  );
+}
+reader.onerror = () => {
+  // Handle error
+};
+reader.readAsDataURL(file);
+
+const roomId = "my-room";
+const store = new AzureWebPubSubStore(
+  {
+    getUser: ...
+  },
+  {
+    roomId,
+    ...
+});
+```
+
+For Drag & Drop, now the Image Tool provides an API to inform the URL and Id properties, take into account that
+you now also need to pass the original image real width and height (without any scaling process):
+
+```ts
+<div
+  ...
+  onStartDrag={() => {
+    const imageTool = instance.getActionHandler(
+      IMAGE_TOOL_ACTION_NAME,
+    ) as WeaveImageToolAction | undefined;
+
+    if (!imageTool) {
+      return;
+    }
+
+    imageTool.setDragAndDropProperties({
+      imageURL: e.target.src,
+      imageId: e.target.dataset.imageId,
+      imageWidth: e.target.naturalWidth,
+      imageHeight: e.target.naturalHeight,
+    });
+  }}
+  ...
+>
+  ...
+</div>
+```
+
+### Define a renderer on the Weave.js instance
+
+Weave instance no defines a renderer / reconciler.
+
+Instead, you need to define a renderer / reconciler and pass it down to the Weave.js instance.
+
+#### Before (v2.x)
+
+```ts
+# Without React
+
+const store = new WeaveStore();
+
+const weaveEle = // Weave DOM element
+
+const weaveEleClientRect = weaveEle?.getBoundingClientRect();
+
+const instance = new Weave({
+  store,
+  ...
+}, {
+  container: weaveEle as HTMLDivElement,
+  width: weaveEleClientRect?.width ?? 1920,
+  height: weaveEleClientRect?.height ?? 1080,
+});
+
+# With the React helper
+
+const store = new WeaveStore();
+
+<WeaveProvider
+  getContainer={() => {
+    return document?.getElementById("weave") as HTMLDivElement;
+  }}
+  store={store}
+  ...
+>
+  ...
+</WeaveProvider>
+```
+
+#### Before (v3.0.0)
+
+```ts
+# Without React
+
+const store = new WeaveStore();
+
+const weaveEle = // Weave DOM element
+
+const weaveEleClientRect = weaveEle?.getBoundingClientRect();
+
+const reactReconcilerRenderer = new WeaveKonvaReactReconcilerRenderer();
+// const baseRenderer = new WeaveKonvaBaseRenderer();
+
+const instance = new Weave({
+  store,
+  renderer: reactReconcilerRenderer,
+  ...
+}, {
+  container: weaveEle as HTMLDivElement,
+  width: weaveEleClientRect?.width ?? 1920,
+  height: weaveEleClientRect?.height ?? 1080,
+});
+
+# With the React helper
+
+const store = new WeaveStore();
+
+const reactReconcilerRenderer = new WeaveKonvaReactReconcilerRenderer();
+// const baseRenderer = new WeaveKonvaBaseRenderer();
+
+<WeaveProvider
+  getContainer={() => {
+    return document?.getElementById("weave") as HTMLDivElement;
+  }}
+  store={store}
+  renderer: reactReconcilerRenderer,
+  ...
+>
+  ...
+</WeaveProvider>
+```
+
+## Migration steps
+
+1. Update your Image Tools (from filesystem or when drag & drop).
+2. Instantiate a renderer / reconciler and pass it on the `renderer` property of Weave.js constructor or React provider.
+
+This change gives applications **full control over renderer / reconciler**, simplifies and streamlines the Image Tool UX and allows
+Weave.js to **scale better with large rooms**.

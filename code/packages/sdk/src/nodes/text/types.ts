@@ -8,6 +8,7 @@ import {
   type NodeSerializable,
   type WeaveNodeTransformerProperties,
 } from '@inditextech/weave-types';
+import type { TEXT_LAYOUT } from './constants';
 
 export type TextSerializable = Konva.TextConfig &
   NodeSerializable & {
@@ -35,3 +36,6 @@ export type WeaveTextNodeParams = {
 
 export type WeaveTextNodeOnEnterTextNodeEditMode = { node: Konva.Text };
 export type WeaveTextNodeOnExitTextNodeEditMode = { node: Konva.Text };
+
+export type WeaveTextLayoutKeys = keyof typeof TEXT_LAYOUT;
+export type WeaveTextLayout = (typeof TEXT_LAYOUT)[WeaveTextLayoutKeys];

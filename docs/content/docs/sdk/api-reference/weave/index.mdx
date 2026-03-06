@@ -50,6 +50,12 @@ const instance = new Weave(weaveConfig: WeaveConfig, stageConfig: Konva.StageCon
         "The store to use to handle the real-time shared-state events and communication",
       type: "WeaveStoreBase",
     },
+    ["weaveConfig.renderer"]: {
+      required: true,
+      description:
+        "The renderer to use to handle the real-time reconciliation of the shared state",
+      type: "WeaveRendererBase",
+    },
     ["weaveConfig.nodes"]: {
       description:
         "An array that defines the Nodes instances to be registered on the instance",

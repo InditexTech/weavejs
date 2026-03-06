@@ -8,16 +8,13 @@ import {
   type WeaveTextToolActionOnAddingEvent,
   type WeaveTextToolActionState,
 } from './types';
-import {
-  TEXT_LAYOUT,
-  TEXT_TOOL_ACTION_NAME,
-  TEXT_TOOL_STATE,
-} from './constants';
+import { TEXT_TOOL_ACTION_NAME, TEXT_TOOL_STATE } from './constants';
 import Konva from 'konva';
 import { WeaveNodesSelectionPlugin } from '@/plugins/nodes-selection/nodes-selection';
 import type { WeaveTextNode } from '@/nodes/text/text';
 import { SELECTION_TOOL_ACTION_NAME } from '../selection-tool/constants';
 import type { WeaveArrowToolActionOnAddingEvent } from '../arrow-tool/types';
+import { TEXT_LAYOUT } from '@/nodes/text/constants';
 
 export class WeaveTextToolAction extends WeaveAction {
   protected initialized: boolean = false;
@@ -48,7 +45,7 @@ export class WeaveTextToolAction extends WeaveAction {
   initProps() {
     return {
       text: '',
-      layout: TEXT_LAYOUT.AUTO_ALL,
+      layout: TEXT_LAYOUT.SMART,
       fontSize: 20,
       fontFamily: 'Arial, sans-serif',
       fill: '#000000',

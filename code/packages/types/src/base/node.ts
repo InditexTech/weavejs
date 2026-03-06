@@ -29,7 +29,10 @@ export interface WeaveNodeBase {
 
   setupDefaultNodeAugmentation(node: Konva.Node): void;
 
-  setupDefaultNodeEvents(node: Konva.Node): void;
+  setupDefaultNodeEvents(
+    node: Konva.Node,
+    { performScaleReset }: { performScaleReset: boolean }
+  ): void;
 
   isNodeSelected(ele: Konva.Node): boolean;
 

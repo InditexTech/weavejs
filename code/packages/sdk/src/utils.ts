@@ -558,6 +558,13 @@ export function getVisibleNodes({
   skipNodes: string[];
   referenceLayer: Konva.Layer | Konva.Group;
 }): Konva.Node[] {
+  const nodesSelection =
+    instance.getPlugin<WeaveNodesSelectionPlugin>('nodesSelection');
+
+  if (nodesSelection) {
+    nodesSelection.getTransformer().hide();
+  }
+
   const nodes = getVisibleNodesInViewport(stage, referenceLayer);
 
   const finalVisibleNodes: Konva.Node[] = [];
@@ -595,6 +602,10 @@ export function getVisibleNodes({
 
     finalVisibleNodes.push(node);
   });
+
+  if (nodesSelection) {
+    nodesSelection.getTransformer().show();
+  }
 
   return finalVisibleNodes;
 }

@@ -13,6 +13,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- [964](https://github.com/InditexTech/weavejs/issues/964) New smart layout and UX for the Text Node
+
 ### Fixed
 
 - [#962](https://github.com/InditexTech/weavejs/issues/962) Validate transactionality when pasting Weave.js nodes

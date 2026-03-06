@@ -282,9 +282,6 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
 
       this.triggerSelectedNodesEvent();
 
-      tr.visible(false);
-      tr.forceUpdate();
-
       const selectedNodes = tr.nodes();
 
       for (const node of selectedNodes) {
@@ -383,9 +380,6 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
     tr.on('transformend', () => {
       this.transformInProcess = false;
 
-      tr.visible(true);
-      tr.forceUpdate();
-
       if (this.getSelectedNodes().length > 1) {
         this.instance.releaseMutexLock();
       }
@@ -414,9 +408,6 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
 
     tr.on('dragstart', (e) => {
       this.dragInProcess = true;
-
-      tr.visible(false);
-      tr.forceUpdate();
 
       const mainLayer = this.instance.getMainLayer();
 
@@ -537,9 +528,6 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
 
     tr.on('dragend', (e) => {
       this.dragInProcess = false;
-
-      tr.visible(true);
-      tr.forceUpdate();
 
       const mainLayer = this.instance.getMainLayer();
 
@@ -1095,7 +1083,7 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
     });
 
     stage.container().addEventListener('keyup', (e) => {
-      if (e.ctrlKey || e.metaKey) {
+      if (!(e.ctrlKey || e.metaKey)) {
         this.isCtrlMetaPressed = false;
       }
       if (e.code === 'Space') {
@@ -1468,8 +1456,8 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
 
       this.tr.nodes([...selectedNodes]);
 
-      this.handleBehaviors();
       this.handleMultipleSelectionBehavior();
+      this.handleBehaviors();
 
       if (this.tr.nodes().length > 0) {
         stage.container().tabIndex = 1;
@@ -1677,8 +1665,8 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
       areNodesSelected = true;
     }
 
-    this.handleBehaviors();
     this.handleMultipleSelectionBehavior();
+    this.handleBehaviors();
 
     if (areNodesSelected) {
       stage.container().tabIndex = 1;
@@ -1743,12 +1731,17 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
       const enabledAnchors = intersectArrays(anchorsArrays);
 
       transformerAttrs.enabledAnchors = enabledAnchors;
-      this.tr.enabledAnchors(transformerAttrs.enabledAnchors);
     }
 
     if (this.tr && this.tr.nodes().length > 0) {
+      if (transformerAttrs.enabledAnchors?.length === 0) {
+        transformerAttrs.resizeEnabled = false;
+      }
+
       this.tr.setAttrs(transformerAttrs);
       this.tr.forceUpdate();
+
+      this.tr.getLayer()?.batchDraw();
     }
   }
 

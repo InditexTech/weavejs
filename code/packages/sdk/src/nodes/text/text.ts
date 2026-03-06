@@ -12,19 +12,18 @@ import { WeaveNode } from '@/nodes/node';
 import { WeaveNodesSelectionPlugin } from '@/plugins/nodes-selection/nodes-selection';
 import { getTopmostShadowHost, isInShadowDOM, resetScale } from '@/utils';
 import {
+  TEXT_LAYOUT,
   WEAVE_STAGE_TEXT_EDITION_MODE,
   WEAVE_TEXT_NODE_DEFAULT_CONFIG,
   WEAVE_TEXT_NODE_TYPE,
 } from './constants';
 import { SELECTION_TOOL_ACTION_NAME } from '@/actions/selection-tool/constants';
-import { TEXT_LAYOUT } from '@/actions/text-tool/constants';
 import type {
   WeaveTextNodeOnEnterTextNodeEditMode,
   WeaveTextNodeOnExitTextNodeEditMode,
   WeaveTextNodeParams,
   WeaveTextProperties,
 } from './types';
-import type { KonvaEventObject } from 'konva/lib/Node';
 import { merge, throttle } from 'lodash';
 import { DEFAULT_THROTTLE_MS } from '@/constants';
 import { WEAVE_STAGE_DEFAULT_MODE } from '../stage/constants';
@@ -37,6 +36,8 @@ export class WeaveTextNode extends WeaveNode {
   private textAreaContainer: HTMLDivElement | null = null;
   private textArea: HTMLTextAreaElement | null = null;
   private keyPressHandler: ((e: KeyboardEvent) => void) | undefined;
+  private eventsInitialized: boolean = false;
+  private isCtrlMetaPressed: boolean = false;
 
   constructor(params?: WeaveTextNodeParams) {
     super();
@@ -48,6 +49,24 @@ export class WeaveTextNode extends WeaveNode {
     this.keyPressHandler = undefined;
     this.editing = false;
     this.textArea = null;
+  }
+
+  private initEvents() {
+    if (!this.eventsInitialized && !globalThis._weave_isServerSide) {
+      window.addEventListener('keydown', (e) => {
+        if (e.ctrlKey || e.metaKey) {
+          this.isCtrlMetaPressed = true;
+        }
+      });
+
+      window.addEventListener('keyup', (e) => {
+        if (!(e.ctrlKey || e.metaKey)) {
+          this.isCtrlMetaPressed = false;
+        }
+      });
+
+      this.eventsInitialized = true;
+    }
   }
 
   private updateNode(nodeInstance: WeaveElementInstance) {
@@ -108,6 +127,8 @@ export class WeaveTextNode extends WeaveNode {
   }
 
   onRender(props: WeaveElementAttributes): WeaveElementInstance {
+    this.initEvents();
+
     const text = new Konva.Text({
       ...props,
       name: 'node',
@@ -131,6 +152,14 @@ export class WeaveTextNode extends WeaveNode {
     text.getTransformerProperties = function () {
       const actualAttrs = this.getAttrs();
 
+      if (actualAttrs.layout === TEXT_LAYOUT.SMART) {
+        return {
+          ...defaultTransformerProperties,
+          resizeEnabled: true,
+          keepRatio: false,
+          enabledAnchors: [] as string[],
+        };
+      }
       if (actualAttrs.layout === TEXT_LAYOUT.AUTO_ALL) {
         return {
           ...defaultTransformerProperties,
@@ -152,6 +181,16 @@ export class WeaveTextNode extends WeaveNode {
     text.allowedAnchors = function () {
       const actualAttrs = this.getAttrs();
 
+      if (actualAttrs.layout === TEXT_LAYOUT.SMART) {
+        return [
+          'top-left',
+          'top-right',
+          'middle-right',
+          'middle-left',
+          'bottom-left',
+          'bottom-right',
+        ];
+      }
       if (actualAttrs.layout === TEXT_LAYOUT.AUTO_ALL) {
         return [];
       }
@@ -175,22 +214,8 @@ export class WeaveTextNode extends WeaveNode {
       measureMultilineText: this.measureMultilineText(text),
     });
 
-    this.setupDefaultNodeEvents(text);
-
-    const handleTextTransform = (e: KonvaEventObject<Event, Konva.Text>) => {
-      const node = e.target;
-
-      if (this.isSelecting() && this.isNodeSelected(node)) {
-        e.cancelBubble = true;
-      }
-    };
-
-    text.on('transformstart', (e) => {
-      this.instance.emitEvent('onTransform', e.target);
-    });
-    text.on('transform', throttle(handleTextTransform, DEFAULT_THROTTLE_MS));
-    text.on('transformend', () => {
-      this.instance.emitEvent('onTransform', null);
+    this.setupDefaultNodeEvents(text, {
+      performScaleReset: false,
     });
 
     text.dblClick = () => {
@@ -205,19 +230,144 @@ export class WeaveTextNode extends WeaveNode {
       this.triggerEditMode(text as Konva.Text);
     };
 
-    text.on('transform', (e) => {
-      if (this.isSelecting() && this.isNodeSelected(text)) {
-        text.setAttrs({
-          width: text.width() * text.scaleX(),
-          scaleX: 1,
-        });
-        resetScale(text);
-        text.fontSize(text.fontSize() * text.scaleY());
-        e.cancelBubble = true;
+    text.setAttr('triggerEditMode', this.triggerEditMode.bind(this));
+
+    let actualAnchor: string | null | undefined = undefined;
+
+    text.on('transformstart', (e) => {
+      this.instance.emitEvent('onTransform', e.target);
+
+      actualAnchor = this.getNodesSelectionPlugin()
+        ?.getTransformer()
+        ?.getActiveAnchor();
+
+      if (
+        (text.getAttrs().layout === TEXT_LAYOUT.SMART &&
+          ['top-left', 'top-right', 'bottom-left', 'bottom-right'].includes(
+            actualAnchor ?? ''
+          )) ||
+        (text.getAttrs().layout === TEXT_LAYOUT.FIXED && this.isCtrlMetaPressed)
+      ) {
+        this.getNodesSelectionPlugin()?.getTransformer()?.keepRatio(true);
+      } else {
+        this.getNodesSelectionPlugin()?.getTransformer()?.keepRatio(false);
       }
+
+      if (
+        [TEXT_LAYOUT.AUTO_HEIGHT, TEXT_LAYOUT.SMART].includes(
+          text.getAttrs().layout
+        ) &&
+        ['middle-right', 'middle-left'].includes(actualAnchor ?? '')
+      ) {
+        text.wrap('word');
+        text.height(undefined);
+      }
+
+      e.cancelBubble = true;
     });
 
-    text.setAttr('triggerEditMode', this.triggerEditMode.bind(this));
+    const handleTextTransform = () => {
+      if (
+        [TEXT_LAYOUT.AUTO_HEIGHT, TEXT_LAYOUT.SMART].includes(
+          text.getAttrs().layout
+        ) &&
+        ['middle-right', 'middle-left'].includes(actualAnchor ?? '')
+      ) {
+        text.width(text.width() * text.scaleX());
+        text.scaleX(1);
+        text.scaleY(1);
+        text.height(undefined);
+        text.getLayer()?.batchDraw();
+      }
+
+      if (
+        (this.isSelecting() &&
+          this.isNodeSelected(text) &&
+          ![TEXT_LAYOUT.SMART].includes(text.getAttrs().layout)) ||
+        (this.isSelecting() &&
+          this.isNodeSelected(text) &&
+          [TEXT_LAYOUT.SMART].includes(text.getAttrs().layout) &&
+          !['top-left', 'top-right', 'bottom-left', 'bottom-right'].includes(
+            actualAnchor ?? ''
+          ))
+      ) {
+        text.width(text.width() * text.scaleX());
+        resetScale(text);
+        text.fontSize(text.fontSize() * text.scaleY());
+      }
+
+      text.setAttr('shouldUpdateOnTransform', false);
+
+      text.getLayer()?.batchDraw();
+    };
+
+    text.on('transform', throttle(handleTextTransform, DEFAULT_THROTTLE_MS));
+
+    const handleTransformEnd = () => {
+      this.instance.emitEvent('onTransform', null);
+
+      let definedSmartWidth = false;
+
+      let smartFixedWidth = text.getAttr('smartFixedWidth') ?? false;
+
+      if (
+        ![TEXT_LAYOUT.SMART].includes(text.getAttrs().layout) &&
+        !['top-left', 'top-right', 'bottom-left', 'bottom-right'].includes(
+          actualAnchor ?? ''
+        )
+      ) {
+        this.scaleReset(text);
+      }
+
+      if (
+        [TEXT_LAYOUT.SMART].includes(text.getAttrs().layout) &&
+        ['top-left', 'top-right', 'bottom-left', 'bottom-right'].includes(
+          actualAnchor ?? ''
+        )
+      ) {
+        text.setAttrs({
+          width: Math.ceil(text.width() * text.scaleX()),
+          height: Math.ceil(text.height() * text.scaleY()),
+          fontSize: text.fontSize() * text.scaleY(),
+          scaleX: 1,
+          scaleY: 1,
+        });
+      }
+
+      if (
+        [TEXT_LAYOUT.AUTO_HEIGHT, TEXT_LAYOUT.SMART].includes(
+          text.getAttrs().layout
+        ) &&
+        ['middle-right', 'middle-left'].includes(actualAnchor ?? '') &&
+        !smartFixedWidth &&
+        !definedSmartWidth
+      ) {
+        text.setAttr('smartFixedWidth', true);
+        smartFixedWidth = true;
+        definedSmartWidth = true;
+        text.width(Math.ceil(text.width() * text.scaleX()));
+        text.scaleX(1);
+        text.height(undefined);
+        text.getLayer()?.batchDraw();
+        text.height(Math.ceil(text.height()));
+      }
+
+      if (
+        [TEXT_LAYOUT.SMART].includes(text.getAttrs().layout) &&
+        ['middle-right', 'middle-left'].includes(actualAnchor ?? '') &&
+        smartFixedWidth &&
+        !definedSmartWidth
+      ) {
+        text.width(Math.ceil(text.width() * text.scaleX()));
+        text.scaleX(1);
+      }
+
+      this.instance.updateNode(this.serialize(text));
+    };
+
+    text.on('transformend', () => {
+      handleTransformEnd();
+    });
 
     this.instance.addEventListener(
       'onNodeRenderedAdded',
@@ -280,12 +430,19 @@ export class WeaveTextNode extends WeaveNode {
       width = textAreaWidth;
       height = textAreaHeight;
     }
-    if (nextProps.layout === TEXT_LAYOUT.AUTO_HEIGHT) {
-      const { height: textAreaHeight } = this.textRenderedSize(
+    if (nextProps.layout === TEXT_LAYOUT.SMART && !nextProps.smartFixedWidth) {
+      const { width: textAreaWidth } = this.textRenderedSize(
         nextProps.text,
         nodeInstance as Konva.Text
       );
-      height = textAreaHeight;
+      width = textAreaWidth;
+      height = undefined;
+    }
+    if (nextProps.layout === TEXT_LAYOUT.SMART && nextProps.smartFixedWidth) {
+      height = undefined;
+    }
+    if (nextProps.layout === TEXT_LAYOUT.AUTO_HEIGHT) {
+      height = undefined;
     }
     if (nextProps.layout === TEXT_LAYOUT.FIXED) {
       updateNeeded = false;
@@ -325,6 +482,7 @@ export class WeaveTextNode extends WeaveNode {
     delete cleanedAttrs.cancelEditMode;
     delete cleanedAttrs.measureMultilineText;
     delete cleanedAttrs.overridesMouseControl;
+    delete cleanedAttrs.shouldUpdateOnTransform;
     delete cleanedAttrs.dragBoundFunc;
 
     return {
@@ -364,25 +522,22 @@ export class WeaveTextNode extends WeaveNode {
 
     if (
       !textNode.getAttrs().layout ||
-      textNode.getAttrs().layout === TEXT_LAYOUT.AUTO_ALL
+      textNode.getAttrs().layout === TEXT_LAYOUT.AUTO_ALL ||
+      (textNode.getAttrs().layout === TEXT_LAYOUT.SMART &&
+        !textNode.getAttrs().smartFixedWidth)
     ) {
       const { width: textAreaWidth } = this.textRenderedSize(
         this.textArea.value,
         textNode
       );
       this.textAreaContainer.style.width =
-        textAreaWidth * textNode.getAbsoluteScale().x + 2 + 'px';
-    }
-    if (
-      !textNode.getAttrs().layout ||
-      textNode.getAttrs().layout === TEXT_LAYOUT.AUTO_HEIGHT
-    ) {
-      this.textAreaContainer.style.height = 'auto';
+        textAreaWidth * textNode.getAbsoluteScale().x + 1 + 'px';
     }
     if (
       !textNode.getAttrs().layout ||
       textNode.getAttrs().layout === TEXT_LAYOUT.AUTO_ALL ||
-      textNode.getAttrs().layout === TEXT_LAYOUT.AUTO_HEIGHT
+      textNode.getAttrs().layout === TEXT_LAYOUT.AUTO_HEIGHT ||
+      textNode.getAttrs().layout === TEXT_LAYOUT.SMART
     ) {
       this.textAreaContainer.style.height = 'auto';
       this.textAreaContainer.style.height =
@@ -512,23 +667,47 @@ export class WeaveTextNode extends WeaveNode {
     this.textAreaContainer.style.left = position.x * upscaleScale + 'px';
 
     if (
+      textNode.getAttrs().layout === TEXT_LAYOUT.SMART &&
+      !textNode.getAttrs().smartFixedWidth
+    ) {
+      const rect = textNode.getClientRect({ relativeTo: stage });
+      this.textAreaContainer.style.width =
+        (rect.width + 2) * stage.scaleX() + 'px';
+      this.textAreaContainer.style.height =
+        (textNode.height() - textNode.padding() * 2 + 1) *
+          textNode.getAbsoluteScale().x +
+        'px';
+    }
+    if (
       !textNode.getAttrs().layout ||
       textNode.getAttrs().layout === TEXT_LAYOUT.AUTO_ALL
     ) {
       const rect = textNode.getClientRect({ relativeTo: stage });
       this.textAreaContainer.style.width =
-        (rect.width + 1) * stage.scaleX() + 'px';
+        (rect.width + 2) * stage.scaleX() + 'px';
       this.textAreaContainer.style.height =
-        (textNode.height() - textNode.padding() * 2) *
+        (textNode.height() - textNode.padding() * 2 + 1) *
           textNode.getAbsoluteScale().x +
         'px';
     }
-    if (textNode.getAttrs().layout === TEXT_LAYOUT.AUTO_HEIGHT) {
+    if (
+      textNode.getAttrs().layout === TEXT_LAYOUT.AUTO_HEIGHT ||
+      (textNode.getAttrs().layout === TEXT_LAYOUT.SMART &&
+        textNode.getAttrs().smartFixedWidth)
+    ) {
       const rect = textNode.getClientRect({ relativeTo: stage });
       this.textAreaContainer.style.width =
-        (rect.width + 1) * stage.scaleX() + 'px';
+        (rect.width + 10) * stage.scaleX() + 'px';
+
+      if (textNode.getAttrs().smartFixedWidth) {
+        this.textAreaContainer.style.width =
+          (textNode.width() - textNode.padding() * 2 + 1) *
+            textNode.getAbsoluteScale().x +
+          'px';
+      }
+
       this.textAreaContainer.style.height =
-        (textNode.height() - textNode.padding() * 2) *
+        (textNode.height() - textNode.padding() * 2 + 1) *
           textNode.getAbsoluteScale().x +
         'px';
     }
@@ -645,7 +824,9 @@ export class WeaveTextNode extends WeaveNode {
 
       if (
         !textNode.getAttrs().layout ||
-        textNode.getAttrs().layout === TEXT_LAYOUT.AUTO_ALL
+        textNode.getAttrs().layout === TEXT_LAYOUT.AUTO_ALL ||
+        (textNode.getAttrs().layout === TEXT_LAYOUT.SMART &&
+          !textNode.getAttrs().smartFixedWidth)
       ) {
         const { width: textAreaWidth } = this.textRenderedSize(
           this.textArea.value,
@@ -657,7 +838,8 @@ export class WeaveTextNode extends WeaveNode {
       if (
         !textNode.getAttrs().layout ||
         textNode.getAttrs().layout === TEXT_LAYOUT.AUTO_HEIGHT ||
-        textNode.getAttrs().layout === TEXT_LAYOUT.AUTO_ALL
+        textNode.getAttrs().layout === TEXT_LAYOUT.AUTO_ALL ||
+        textNode.getAttrs().layout === TEXT_LAYOUT.SMART
       ) {
         textNode.height(
           this.textArea.scrollHeight * (1 / textNode.getAbsoluteScale().x)
@@ -783,14 +965,17 @@ export class WeaveTextNode extends WeaveNode {
       return;
     }
 
-    const textPosition = textNode.getClientRect();
+    const stage = this.instance.getStage();
+    const upscaleScale = stage.getAttr('upscaleScale');
+
+    const textPosition = textNode.absolutePosition();
     const position: Konva.Vector2d = {
       x: textPosition.x,
       y: textPosition.y,
     };
 
-    this.textAreaContainer.style.top = position.y + 'px';
-    this.textAreaContainer.style.left = position.x + 'px';
+    this.textAreaContainer.style.top = position.y * upscaleScale + 'px';
+    this.textAreaContainer.style.left = position.x * upscaleScale + 'px';
 
     if (textNode.getAttrs().verticalAlign === 'top') {
       this.textAreaContainer.style.alignItems = 'start';
@@ -904,5 +1089,16 @@ export class WeaveTextNode extends WeaveNode {
       window.removeEventListener('keypress', this.keyPressHandler);
       this.keyPressHandler = undefined;
     }
+  }
+
+  resetSmartLayout(textNode: Konva.Text) {
+    textNode.setAttr('smartFixedWidth', undefined);
+    const { width: textAreaWidth } = this.textRenderedSize(
+      textNode.text(),
+      textNode
+    );
+    textNode.width(textAreaWidth);
+
+    this.instance.updateNode(this.serialize(textNode));
   }
 }
