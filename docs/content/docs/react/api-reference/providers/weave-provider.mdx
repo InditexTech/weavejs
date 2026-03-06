@@ -62,6 +62,12 @@ export type WeaveUpscaleConfig = {
         "Weave.js Store to use to handle the real-time communication",
       type: "WeaveStore",
     },
+    renderer: {
+      required: true,
+      description:
+        "Weave.js Renderer to use to handle the real-time reconciliation of the shared state",
+      type: "WeaveRenderer",
+    },
     children: {
       required: true,
       description: "Child nodes to render",

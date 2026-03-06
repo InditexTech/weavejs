@@ -123,6 +123,8 @@ client using the [WeaveStoreWebsockets](/docs/store-websockets) store:
 ```ts
 // Import the store dependency, in this case the client one.
 import { WeaveStoreWebsockets } from "@inditextech/weave-store-websockets/client";
+// Import the renderer dependency, in this case the base one.
+import { WeaveKonvaBaseRenderer } from "@inditextech/weave-renderer-konva-base";
 
 // Define a function needed by the store that provides
 // metadata of the user of the instance
@@ -146,6 +148,9 @@ const store = new WeaveStoreWebsockets(
     },
   }
 );
+
+// Instantiate the renderer
+const renderer = new WeaveKonvaBaseRenderer();
 ```
 
 ---
@@ -160,6 +165,7 @@ To instantiate the Weave class:
 
 - Define on which container element the collaborative application will run.
 - Define which [Store](/docs/main/build/stores) to use for backend connection and shared-state handling.
+- Define which Renderer to use for reconciliation of the shared state.
 
 Optionally, you can also:
 
@@ -181,13 +187,14 @@ const myWeaveInstance = new Weave(
   {
     // We pass the store instantiated previously
     store,
+    renderer,
     nodes: [new WeaveStageNode(), new WeaveLayerNode()],
   },
   {
     container: containerId,
     width: 1920,
     height: 1080,
-  }
+  },
 );
 ```
 
@@ -225,6 +232,7 @@ Putting all together this will be all the code to setup Weave.js on the frontend
 ```ts
 import { Weave, WeaveStageNode, WeaveLayerNode } from "@inditextech/weave-sdk";
 import { WeaveStoreWebsockets } from "@inditextech/weave-store-websockets/client";
+import { WeaveKonvaBaseRenderer } from "@inditextech/weave-renderer-konva-base";
 
 const getUser = () => { email: "user-email@domain.com", name: "User name" };
 
@@ -242,10 +250,13 @@ const store = new WeaveStoreWebsockets(
   }
 );
 
+const renderer = new WeaveKonvaBaseRenderer();
+
 const myWeaveInstance = new Weave(
   {
     // We pass the store instantiated previously
     store,
+    renderer,
     nodes: [
       new WeaveStageNode(),
       new WeaveLayerNode(),
