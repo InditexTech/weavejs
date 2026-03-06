@@ -1095,7 +1095,7 @@ export class WeaveTextNode extends WeaveNode {
     textNode.setAttr('smartFixedWidth', undefined);
     const { width: textAreaWidth } = this.textRenderedSize(
       textNode.text(),
-      textNode as Konva.Text
+      textNode
     );
     textNode.width(textAreaWidth);
 
