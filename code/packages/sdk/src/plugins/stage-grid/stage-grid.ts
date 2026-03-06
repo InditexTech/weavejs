@@ -37,6 +37,7 @@ export class WeaveStageGridPlugin extends WeavePlugin {
   private actStagePosX: number = 0;
   private actStagePosY: number = 0;
   private config!: WeaveStageGridPluginConfig;
+  private forceStageChange: boolean;
 
   constructor(params?: Partial<WeaveStageGridPluginParams>) {
     super();
@@ -54,6 +55,7 @@ export class WeaveStageGridPlugin extends WeavePlugin {
       gridDotMaxDotsPerAxis: WEAVE_GRID_DEFAULT_DOT_MAX_DOTS_PER_AXIS,
       ...config,
     };
+    this.forceStageChange = false;
   }
 
   getName(): string {
@@ -399,6 +401,11 @@ export class WeaveStageGridPlugin extends WeavePlugin {
   }
 
   private hasStageChanged(): boolean {
+    if (this.forceStageChange) {
+      this.forceStageChange = false;
+      return true;
+    }
+
     const stage = this.instance.getStage();
     const actualScaleX = stage.scaleX();
     const actualScaleY = stage.scaleY();
@@ -461,6 +468,7 @@ export class WeaveStageGridPlugin extends WeavePlugin {
 
   setType(type: WeaveStageGridType): void {
     this.config.type = type;
+    this.forceStageChange = true;
     this.onRender();
   }
 }
