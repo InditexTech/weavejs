@@ -1,0 +1,72 @@
+---
+title: v2.0.0
+description: Improved scalability when using the Azure Web PubSub store
+---
+
+## 🚀 Azure Web PubSub store performance improvements
+
+**Release date:** October 30, 2025
+
+This release improves scalability when using the **Azure Web PubSub store**, enabling applications to handle **very large collaborative rooms** more efficiently.
+
+---
+
+## Changed
+
+### Improved room loading for Azure Web PubSub Store
+
+The **Azure Web PubSub Store** has been updated to improve how large rooms are initialized.
+
+Room data loading has been decoupled from the store implementation, allowing applications to control **how and where room state is fetched**. This enables better scalability when working with **large collaborative documents**.
+
+[https://github.com/InditexTech/weavejs/issues/765](https://github.com/InditexTech/weavejs/issues/765)
+
+---
+
+## Breaking Changes
+
+### `initialRoomData` must now be provided when creating the store
+
+The store no longer fetches room data automatically.
+
+Instead, the **initial room state must be passed explicitly via the `initialRoomData` option** when creating the store.
+
+#### Before (v1.x)
+
+```ts
+const roomId = "my-room";
+const store = new AzureWebPubSubStore(
+  {
+    getUser: ...
+  },
+  {
+    roomId,
+    ...
+});
+```
+
+The store internally fetched and reconstructed the room state.
+
+#### After (v2.0.0)
+
+Applications are now responsible for **retrieving the room data** and passing it to the store:
+
+```ts
+const roomId = "my-room";
+const roomData = await.fetch(...);
+const store = new AzureWebPubSubStore(roomData,
+  {
+    getUser: ...
+  },
+  {
+    roomId,
+    ...
+});
+```
+
+## Migration steps
+
+1. Fetch the room state from your persistence layer (database, blob storage, etc.).
+2. Pass the retrieved state using the `initialRoomData` constructor option.
+
+This change gives applications **full control over room loading strategies** and allows Weave.js to **scale better with large rooms**.
