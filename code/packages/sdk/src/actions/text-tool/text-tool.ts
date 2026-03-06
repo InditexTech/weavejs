@@ -45,7 +45,7 @@ export class WeaveTextToolAction extends WeaveAction {
   initProps() {
     return {
       text: '',
-      layout: TEXT_LAYOUT.AUTO_ALL,
+      layout: TEXT_LAYOUT.SMART,
       fontSize: 20,
       fontFamily: 'Arial, sans-serif',
       fill: '#000000',

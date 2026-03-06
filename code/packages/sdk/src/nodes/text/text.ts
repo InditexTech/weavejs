@@ -57,44 +57,6 @@ export class WeaveTextNode extends WeaveNode {
         if (e.ctrlKey || e.metaKey) {
           this.isCtrlMetaPressed = true;
         }
-
-        const nodesSelectionPlugin = this.getNodesSelectionPlugin();
-        const selectedNodes = nodesSelectionPlugin?.getSelectedNodes() ?? [];
-
-        if (
-          selectedNodes.length === 1 &&
-          selectedNodes[0].getAttrs().nodeType === WEAVE_TEXT_NODE_TYPE &&
-          selectedNodes[0].getAttrs().layout === TEXT_LAYOUT.FIXED
-        ) {
-          nodesSelectionPlugin?.getTransformer()?.keepRatio(false);
-        }
-
-        if (
-          selectedNodes.length === 1 &&
-          selectedNodes[0].getAttrs().nodeType === WEAVE_TEXT_NODE_TYPE &&
-          selectedNodes[0].getAttrs().layout === TEXT_LAYOUT.FIXED &&
-          this.isCtrlMetaPressed
-        ) {
-          nodesSelectionPlugin?.getTransformer()?.keepRatio(true);
-        }
-
-        if (
-          selectedNodes.length === 1 &&
-          selectedNodes[0].getAttrs().nodeType === WEAVE_TEXT_NODE_TYPE &&
-          selectedNodes[0].getAttrs().layout === TEXT_LAYOUT.SMART &&
-          this.isCtrlMetaPressed
-        ) {
-          nodesSelectionPlugin?.getTransformer()?.keepRatio(true);
-        }
-
-        if (
-          selectedNodes.length === 1 &&
-          selectedNodes[0].getAttrs().nodeType === WEAVE_TEXT_NODE_TYPE &&
-          selectedNodes[0].getAttrs().layout === TEXT_LAYOUT.SMART &&
-          !this.isCtrlMetaPressed
-        ) {
-          nodesSelectionPlugin?.getTransformer()?.keepRatio(false);
-        }
       });
 
       window.addEventListener('keyup', (e) => {
@@ -222,12 +184,10 @@ export class WeaveTextNode extends WeaveNode {
       if (actualAttrs.layout === TEXT_LAYOUT.SMART) {
         return [
           'top-left',
-          'top-center',
           'top-right',
           'middle-right',
           'middle-left',
           'bottom-left',
-          'bottom-center',
           'bottom-right',
         ];
       }
@@ -282,6 +242,18 @@ export class WeaveTextNode extends WeaveNode {
         ?.getActiveAnchor();
 
       if (
+        (text.getAttrs().layout === TEXT_LAYOUT.SMART &&
+          ['top-left', 'top-right', 'bottom-left', 'bottom-right'].includes(
+            actualAnchor ?? ''
+          )) ||
+        (text.getAttrs().layout === TEXT_LAYOUT.FIXED && this.isCtrlMetaPressed)
+      ) {
+        this.getNodesSelectionPlugin()?.getTransformer()?.keepRatio(true);
+      } else {
+        this.getNodesSelectionPlugin()?.getTransformer()?.keepRatio(false);
+      }
+
+      if (
         [TEXT_LAYOUT.AUTO_HEIGHT, TEXT_LAYOUT.SMART].includes(
           text.getAttrs().layout
         ) &&
@@ -295,35 +267,31 @@ export class WeaveTextNode extends WeaveNode {
     });
 
     const handleTextTransform = () => {
-      const smartFixedHeight = text.getAttr('smartFixedHeight') ?? false;
-
       if (
         [TEXT_LAYOUT.AUTO_HEIGHT, TEXT_LAYOUT.SMART].includes(
           text.getAttrs().layout
         ) &&
-        ['middle-right', 'middle-left'].includes(actualAnchor ?? '') &&
-        !smartFixedHeight
+        ['middle-right', 'middle-left'].includes(actualAnchor ?? '')
       ) {
-        const scaleX = text.scaleX();
-        text.width(Math.ceil(text.width() * scaleX) + 1);
+        text.width(text.width() * text.scaleX());
         text.scaleX(1);
         text.scaleY(1);
         text.height(undefined);
         text.getLayer()?.batchDraw();
-        text.height(Math.ceil(text.height()) + 1);
       }
 
       if (
-        (this.isCtrlMetaPressed &&
-          text.getAttrs().layout === TEXT_LAYOUT.FIXED) ||
-        (!this.isCtrlMetaPressed &&
-          this.isSelecting() &&
-          this.isNodeSelected(text))
+        (this.isSelecting() &&
+          this.isNodeSelected(text) &&
+          ![TEXT_LAYOUT.SMART].includes(text.getAttrs().layout)) ||
+        (this.isSelecting() &&
+          this.isNodeSelected(text) &&
+          [TEXT_LAYOUT.SMART].includes(text.getAttrs().layout) &&
+          !['top-left', 'top-right', 'bottom-left', 'bottom-right'].includes(
+            actualAnchor ?? ''
+          ))
       ) {
-        text.setAttrs({
-          width: Math.ceil(text.width() * text.scaleX()) + 1,
-          scaleX: 1,
-        });
+        text.width(text.width() * text.scaleX());
         resetScale(text);
         text.fontSize(text.fontSize() * text.scaleY());
       }
@@ -339,24 +307,27 @@ export class WeaveTextNode extends WeaveNode {
       this.instance.emitEvent('onTransform', null);
 
       let definedSmartWidth = false;
-      let definedSmartHeight = false;
 
       let smartFixedWidth = text.getAttr('smartFixedWidth') ?? false;
-      let smartFixedHeight = text.getAttr('smartFixedHeight') ?? false;
 
-      if (!this.isCtrlMetaPressed) {
+      if (
+        ![TEXT_LAYOUT.SMART].includes(text.getAttrs().layout) &&
+        !['top-left', 'top-right', 'bottom-left', 'bottom-right'].includes(
+          actualAnchor ?? ''
+        )
+      ) {
         this.scaleReset(text);
       }
 
       if (
-        this.isCtrlMetaPressed &&
+        [TEXT_LAYOUT.SMART].includes(text.getAttrs().layout) &&
         ['top-left', 'top-right', 'bottom-left', 'bottom-right'].includes(
           actualAnchor ?? ''
         )
       ) {
         text.setAttrs({
-          width: Math.ceil(text.width() * text.scaleX() + 1),
-          height: Math.ceil(text.height() * text.scaleY() + 1),
+          width: Math.ceil(text.width() * text.scaleX()),
+          height: Math.ceil(text.height() * text.scaleY()),
           fontSize: text.fontSize() * text.scaleY(),
           scaleX: 1,
           scaleY: 1,
@@ -364,33 +335,21 @@ export class WeaveTextNode extends WeaveNode {
       }
 
       if (
-        [TEXT_LAYOUT.SMART].includes(text.getAttrs().layout) &&
-        ['top-center', 'bottom-center'].includes(actualAnchor ?? '') &&
-        !smartFixedHeight &&
-        !definedSmartHeight
-      ) {
-        text.setAttr('smartFixedHeight', true);
-        smartFixedHeight = true;
-        definedSmartHeight = true;
-      }
-
-      if (
         [TEXT_LAYOUT.AUTO_HEIGHT, TEXT_LAYOUT.SMART].includes(
           text.getAttrs().layout
         ) &&
         ['middle-right', 'middle-left'].includes(actualAnchor ?? '') &&
-        !smartFixedHeight &&
         !smartFixedWidth &&
         !definedSmartWidth
       ) {
         text.setAttr('smartFixedWidth', true);
         smartFixedWidth = true;
         definedSmartWidth = true;
-        text.width(Math.ceil(text.width() * text.scaleX()) + 1);
+        text.width(Math.ceil(text.width() * text.scaleX()));
         text.scaleX(1);
         text.height(undefined);
         text.getLayer()?.batchDraw();
-        text.height(Math.ceil(text.height()) + 1);
+        text.height(Math.ceil(text.height()));
       }
 
       if (
@@ -399,35 +358,8 @@ export class WeaveTextNode extends WeaveNode {
         smartFixedWidth &&
         !definedSmartWidth
       ) {
-        text.width(Math.ceil(text.width() * text.scaleX()) + 1);
+        text.width(Math.ceil(text.width() * text.scaleX()));
         text.scaleX(1);
-      }
-
-      if (
-        [TEXT_LAYOUT.SMART].includes(text.getAttrs().layout) &&
-        ['top-center', 'bottom-center'].includes(actualAnchor ?? '') &&
-        smartFixedHeight &&
-        !definedSmartHeight
-      ) {
-        text.width(Math.ceil(text.width() * text.scaleX()) + 1);
-        text.scaleX(1);
-      }
-
-      if (
-        !this.isCtrlMetaPressed &&
-        [TEXT_LAYOUT.SMART].includes(text.getAttrs().layout) &&
-        ['top-left', 'top-right', 'bottom-left', 'bottom-right'].includes(
-          actualAnchor ?? ''
-        )
-      ) {
-        text.setAttr('smartFixedWidth', true);
-        text.setAttr('smartFixedHeight', true);
-
-        text.width(Math.ceil(text.width() * text.scaleX()) + 1);
-        text.scaleX(1);
-
-        text.height(Math.ceil(text.height() * text.scaleY()) + 1);
-        text.scaleY(1);
       }
 
       this.instance.updateNode(this.serialize(text));
@@ -498,28 +430,19 @@ export class WeaveTextNode extends WeaveNode {
       width = textAreaWidth;
       height = textAreaHeight;
     }
-    if (
-      nextProps.layout === TEXT_LAYOUT.SMART &&
-      !nextProps.smartFixedWidth &&
-      !nextProps.smartFixedHeight
-    ) {
-      const { width: textAreaWidth, height: textAreaHeight } =
-        this.textRenderedSize(nextProps.text, nodeInstance as Konva.Text);
+    if (nextProps.layout === TEXT_LAYOUT.SMART && !nextProps.smartFixedWidth) {
+      const { width: textAreaWidth } = this.textRenderedSize(
+        nextProps.text,
+        nodeInstance as Konva.Text
+      );
       width = textAreaWidth;
-      height = textAreaHeight;
+      height = undefined;
     }
     if (nextProps.layout === TEXT_LAYOUT.SMART && nextProps.smartFixedWidth) {
       height = undefined;
     }
-    if (
-      nextProps.layout === TEXT_LAYOUT.SMART &&
-      nextProps.smartFixedWidth &&
-      nextProps.smartFixedHeight
-    ) {
-      updateNeeded = false;
-    }
     if (nextProps.layout === TEXT_LAYOUT.AUTO_HEIGHT) {
-      updateNeeded = false;
+      height = undefined;
     }
     if (nextProps.layout === TEXT_LAYOUT.FIXED) {
       updateNeeded = false;
@@ -614,8 +537,7 @@ export class WeaveTextNode extends WeaveNode {
       !textNode.getAttrs().layout ||
       textNode.getAttrs().layout === TEXT_LAYOUT.AUTO_ALL ||
       textNode.getAttrs().layout === TEXT_LAYOUT.AUTO_HEIGHT ||
-      (textNode.getAttrs().layout === TEXT_LAYOUT.SMART &&
-        !textNode.getAttrs().smartFixedHeight)
+      textNode.getAttrs().layout === TEXT_LAYOUT.SMART
     ) {
       this.textAreaContainer.style.height = 'auto';
       this.textAreaContainer.style.height =
@@ -746,8 +668,7 @@ export class WeaveTextNode extends WeaveNode {
 
     if (
       textNode.getAttrs().layout === TEXT_LAYOUT.SMART &&
-      !textNode.getAttrs().smartFixedWidth &&
-      !textNode.getAttrs().smartFixedHeight
+      !textNode.getAttrs().smartFixedWidth
     ) {
       const rect = textNode.getClientRect({ relativeTo: stage });
       this.textAreaContainer.style.width =
@@ -772,8 +693,7 @@ export class WeaveTextNode extends WeaveNode {
     if (
       textNode.getAttrs().layout === TEXT_LAYOUT.AUTO_HEIGHT ||
       (textNode.getAttrs().layout === TEXT_LAYOUT.SMART &&
-        textNode.getAttrs().smartFixedWidth &&
-        !textNode.getAttrs().smartFixedHeight)
+        textNode.getAttrs().smartFixedWidth)
     ) {
       const rect = textNode.getClientRect({ relativeTo: stage });
       this.textAreaContainer.style.width =
@@ -791,12 +711,7 @@ export class WeaveTextNode extends WeaveNode {
           textNode.getAbsoluteScale().x +
         'px';
     }
-    if (
-      textNode.getAttrs().layout === TEXT_LAYOUT.FIXED ||
-      (textNode.getAttrs().layout === TEXT_LAYOUT.SMART &&
-        textNode.getAttrs().smartFixedWidth &&
-        textNode.getAttrs().smartFixedHeight)
-    ) {
+    if (textNode.getAttrs().layout === TEXT_LAYOUT.FIXED) {
       this.textAreaContainer.style.width =
         (textNode.width() - textNode.padding() * 2) *
           textNode.getAbsoluteScale().x +
@@ -911,8 +826,7 @@ export class WeaveTextNode extends WeaveNode {
         !textNode.getAttrs().layout ||
         textNode.getAttrs().layout === TEXT_LAYOUT.AUTO_ALL ||
         (textNode.getAttrs().layout === TEXT_LAYOUT.SMART &&
-          !textNode.getAttrs().smartFixedWidth &&
-          !textNode.getAttrs().smartFixedHeight)
+          !textNode.getAttrs().smartFixedWidth)
       ) {
         const { width: textAreaWidth } = this.textRenderedSize(
           this.textArea.value,
@@ -925,8 +839,7 @@ export class WeaveTextNode extends WeaveNode {
         !textNode.getAttrs().layout ||
         textNode.getAttrs().layout === TEXT_LAYOUT.AUTO_HEIGHT ||
         textNode.getAttrs().layout === TEXT_LAYOUT.AUTO_ALL ||
-        (textNode.getAttrs().layout === TEXT_LAYOUT.SMART &&
-          !textNode.getAttrs().smartFixedHeight)
+        textNode.getAttrs().layout === TEXT_LAYOUT.SMART
       ) {
         textNode.height(
           this.textArea.scrollHeight * (1 / textNode.getAbsoluteScale().x)
@@ -1178,22 +1091,13 @@ export class WeaveTextNode extends WeaveNode {
     }
   }
 
-  resetSmartLayout(
-    textNode: Konva.Text,
-    axis: 'width' | 'height' | undefined = undefined
-  ) {
-    if (textNode.getAttrs().layout === TEXT_LAYOUT.SMART && !axis) {
-      textNode.setAttr('smartFixedWidth', false);
-      textNode.setAttr('smartFixedHeight', false);
-    }
-
-    if (textNode.getAttrs().layout === TEXT_LAYOUT.SMART && axis === 'width') {
-      textNode.setAttr('smartFixedWidth', false);
-    }
-
-    if (textNode.getAttrs().layout === TEXT_LAYOUT.SMART && axis === 'height') {
-      textNode.setAttr('smartFixedHeight', false);
-    }
+  resetSmartLayout(textNode: Konva.Text) {
+    textNode.setAttr('smartFixedWidth', undefined);
+    const { width: textAreaWidth } = this.textRenderedSize(
+      textNode.text(),
+      textNode as Konva.Text
+    );
+    textNode.width(textAreaWidth);
 
     this.instance.updateNode(this.serialize(textNode));
   }

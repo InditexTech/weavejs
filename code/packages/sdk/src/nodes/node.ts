@@ -904,7 +904,15 @@ export abstract class WeaveNode implements WeaveNodeBase {
       });
 
       node.handleSelectNode = () => {
-        this.getNodesSelectionFeedbackPlugin()?.createSelectionHalo(node);
+        const transformer = this.getNodesSelectionPlugin()?.getTransformer();
+
+        if (!transformer) {
+          return;
+        }
+
+        if (transformer.nodes().length > 1) {
+          this.getNodesSelectionFeedbackPlugin()?.createSelectionHalo(node);
+        }
       };
 
       node.handleDeselectNode = () => {
