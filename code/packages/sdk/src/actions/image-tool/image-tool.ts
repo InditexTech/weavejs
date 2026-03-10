@@ -241,7 +241,6 @@ export class WeaveImageToolAction extends WeaveAction {
         imageNodeHandler.preloadFallbackImage(
           actualImageId,
           reader.result as string,
-          false,
           {
             onLoad: () => {
               this.instance.emitEvent<WeaveImageToolActionOnEndLoadImageEvent>(
