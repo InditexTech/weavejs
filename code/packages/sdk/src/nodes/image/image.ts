@@ -1030,7 +1030,6 @@ export class WeaveImageNode extends WeaveNode {
               width: sourceImageWidth,
               height: sourceImageHeight,
             });
-            // this.scaleReset(image);
 
             const imageRect = image.getClientRect({
               relativeTo: this.instance.getStage(),
@@ -1046,7 +1045,10 @@ export class WeaveImageNode extends WeaveNode {
             const stage = this.instance.getStage();
 
             if (!loadFallback) {
-              if (stage.container().style.cursor === 'wait') {
+              if (
+                !this.instance.isServerSide() &&
+                stage.container().style.cursor === 'wait'
+              ) {
                 stage.container().style.cursor = 'pointer';
               }
 
