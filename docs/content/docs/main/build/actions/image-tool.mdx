@@ -60,7 +60,7 @@ const instance = new Weave({
 Setup on a button or any element on the UI the user can interact with on the action event:
 
 ```ts
-const { finishUploadCallback } = instance.triggerAction("imageTool");
+const { nodeId, finishUploadCallback } = instance.triggerAction("imageTool");
 ```
 
 Then select the image to upload (by showcasing a file select to the end user), and when the user
@@ -89,24 +89,19 @@ const MyImageToolTriggerComponent = () => {
 
   const handleUploadFile = React.useCallback(
     async (file) => {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        const { nodeID, finishUploadCallback } = instance.triggerAction(
-          "imageTool",
-          {
-            imageData: reader.result as string,
-          },
-        );
+      const { nodeID, finishUploadCallback } = instance.triggerAction(
+        "imageTool",
+        {
+          type: WEAVE_IMAGE_TOOL_UPLOAD_TYPE.FILE,
+          imageFile: file,
+          imageDownscaleRatio: 0.1,
+        },
+      );
 
-        // Upload file to you storage / this is dummy, just an example
-        const imageURL = await uploadImage(file);
+      // Upload file to you storage / this is dummy, just an example
+      const imageURL = await uploadImage(file);
 
-        finishUploadCallback(nodeId, imageURL);
-      };
-      reader.onerror = () => {
-        // handle error
-      };
-      reader.readAsDataURL(file);
+      finishUploadCallback(nodeId, imageURL);
     },
     [instance],
   );

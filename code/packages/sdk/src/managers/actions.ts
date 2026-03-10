@@ -46,6 +46,7 @@ export class WeaveActionsManager {
       this.activeAction = actionName;
     }
 
+    actionsHandlers[actionName].setForceExecution(forceExecution);
     const payload = actionsHandlers[actionName].trigger(
       this.cancelActionCallback(actionName),
       params

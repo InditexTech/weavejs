@@ -188,6 +188,7 @@ export * from './plugins/users-presence/types';
 export { WeaveContextMenuPlugin } from './plugins/context-menu/context-menu';
 export * from './plugins/context-menu/types';
 export { WeaveStageDropAreaPlugin } from './plugins/stage-drop-area/stage-drop-area';
+export * from './plugins/stage-drop-area/constants';
 export * from './plugins/stage-drop-area/types';
 export { WeaveCopyPasteNodesPlugin } from './plugins/copy-paste-nodes/copy-paste-nodes';
 export * from './plugins/copy-paste-nodes/constants';

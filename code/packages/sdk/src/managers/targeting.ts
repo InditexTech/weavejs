@@ -191,11 +191,16 @@ export class WeaveTargetingManager {
     let measureContainer: Konva.Layer | Konva.Group | undefined = mainLayer;
     let container: Konva.Layer | Konva.Node | undefined = mainLayer;
 
+    const utilityLayer = this.instance.getUtilityLayer();
+    if (utilityLayer) {
+      utilityLayer.visible(false);
+    }
+
     const nodesSelection =
       this.instance.getPlugin<WeaveNodesSelectionPlugin>('nodesSelection');
 
     if (nodesSelection) {
-      nodesSelection.disable();
+      nodesSelection.getTransformer().visible(false);
     }
 
     const dummyRect = new Konva.Rect({
@@ -235,8 +240,12 @@ export class WeaveTargetingManager {
       };
     }
 
+    if (utilityLayer) {
+      utilityLayer.visible(true);
+    }
+
     if (nodesSelection) {
-      nodesSelection.enable();
+      nodesSelection.getTransformer().visible(true);
     }
 
     dummyRect.destroy();

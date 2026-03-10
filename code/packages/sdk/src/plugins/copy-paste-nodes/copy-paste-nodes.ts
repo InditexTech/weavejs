@@ -224,17 +224,6 @@ export class WeaveCopyPasteNodesPlugin extends WeavePlugin {
     });
 
     if (catcher) {
-      document.addEventListener('paste', async (e) => {
-        const dataList: DataTransferItemList | undefined =
-          e.clipboardData?.items;
-
-        if (!dataList) return;
-
-        if (dataList?.length > 0) {
-          this.sendExternalPasteEvent(dataList);
-        }
-      });
-
       catcher.addEventListener('paste', async (e) => {
         e.preventDefault();
 

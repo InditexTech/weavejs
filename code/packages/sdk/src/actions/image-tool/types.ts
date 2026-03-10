@@ -3,18 +3,21 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import Konva from 'konva';
-import { IMAGE_TOOL_LOAD_FROM, IMAGE_TOOL_STATE } from './constants';
+import {
+  WEAVE_IMAGE_TOOL_UPLOAD_TYPE,
+  WEAVE_IMAGE_TOOL_STATE,
+} from './constants';
 import type { ImageCrossOrigin } from '@inditextech/weave-types';
 import type { DeepPartial } from '@inditextech/weave-types';
 
-export type WeaveImageToolActionLoadFromKeys =
-  keyof typeof IMAGE_TOOL_LOAD_FROM;
-export type WeaveImageToolActionLoadFrom =
-  (typeof IMAGE_TOOL_LOAD_FROM)[WeaveImageToolActionLoadFromKeys];
+export type WeaveImageToolActionUploadTypeKeys =
+  keyof typeof WEAVE_IMAGE_TOOL_UPLOAD_TYPE;
+export type WeaveImageToolActionUploadType =
+  (typeof WEAVE_IMAGE_TOOL_UPLOAD_TYPE)[WeaveImageToolActionUploadTypeKeys];
 
-export type WeaveImageToolActionStateKeys = keyof typeof IMAGE_TOOL_STATE;
+export type WeaveImageToolActionStateKeys = keyof typeof WEAVE_IMAGE_TOOL_STATE;
 export type WeaveImageToolActionState =
-  (typeof IMAGE_TOOL_STATE)[WeaveImageToolActionStateKeys];
+  (typeof WEAVE_IMAGE_TOOL_STATE)[WeaveImageToolActionStateKeys];
 
 export type WeaveImageToolActionOnStartLoadImageEvent = undefined;
 export type WeaveImageToolActionOnEndLoadImageEvent = Error | undefined;
@@ -29,17 +32,21 @@ export type WeaveImageToolActionTriggerCommonParams = {
   options?: ImageOptions;
   position?: Konva.Vector2d;
   forceMainContainer?: boolean;
+  multiCall?: boolean;
 };
 
 export type WeaveImageToolActionTriggerParams = (
   | {
-      type: 'file';
+      type: typeof WEAVE_IMAGE_TOOL_UPLOAD_TYPE.FILE;
       imageFile: File;
       imageDownscaleRatio: number;
     }
   | {
-      type: 'imageURL';
+      type: typeof WEAVE_IMAGE_TOOL_UPLOAD_TYPE.IMAGE_URL;
       imageURL: string;
+      imageFallback: string;
+      imageWidth: number;
+      imageHeight: number;
     }
 ) &
   WeaveImageToolActionTriggerCommonParams;
@@ -57,6 +64,7 @@ export type WeaveImageToolActionTriggerReturn =
 
 export type WeaveImageToolDragAndDropProperties = {
   imageURL: string;
+  imageFallback: string;
   imageWidth: number;
   imageHeight: number;
   imageId?: string;
@@ -65,7 +73,15 @@ export type WeaveImageToolDragAndDropProperties = {
 export type WeaveImageToolActionConfig = {
   style: {
     cursor: {
-      padding: 5;
+      padding: number;
+      imageThumbnail: {
+        width: number;
+        height: number;
+        shadowColor: string;
+        shadowBlur: number;
+        shadowOffset: Konva.Vector2d;
+        shadowOpacity: number;
+      };
     };
   };
 };
