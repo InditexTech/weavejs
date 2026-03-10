@@ -32,6 +32,10 @@ import { WEAVE_IMAGE_TOOL_ACTION_NAME } from '../image-tool/constants';
 import type { WeaveNodesSelectionPlugin } from '@/plugins/nodes-selection/nodes-selection';
 import type { WeaveImageNode } from '@/nodes/image/image';
 import { SELECTION_TOOL_ACTION_NAME } from '../selection-tool/constants';
+import type {
+  WeaveImageToolActionTriggerParams,
+  WeaveImageToolActionTriggerReturn,
+} from '../image-tool/types';
 
 export class WeaveImagesToolAction extends WeaveAction {
   private readonly config: WeaveImagesToolActionParams;
@@ -129,7 +133,6 @@ export class WeaveImagesToolAction extends WeaveAction {
         this.instance.getActiveAction() === WEAVE_IMAGES_TOOL_ACTION_NAME
       ) {
         this.cancelAction();
-        return;
       }
     });
 
@@ -383,7 +386,10 @@ export class WeaveImagesToolAction extends WeaveAction {
         const downscaleRatio = this.imagesDownscaleRatio[i];
         const resourceId = this.imagesIds[i];
 
-        const { nodeId, finishUploadCallback } = this.instance.triggerAction(
+        const result = this.instance.triggerAction<
+          WeaveImageToolActionTriggerParams,
+          WeaveImageToolActionTriggerReturn
+        >(
           WEAVE_IMAGE_TOOL_ACTION_NAME,
           {
             type: 'file',
@@ -397,10 +403,9 @@ export class WeaveImagesToolAction extends WeaveAction {
             forceMainContainer: this.forceMainContainer,
           },
           true
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        ) as any;
+        );
 
-        this.nodesIds.push(nodeId);
+        this.nodesIds.push(result?.nodeId ?? '');
 
         maxHeight = Math.max(maxHeight, this.imagesSize[i].height);
 
@@ -416,8 +421,8 @@ export class WeaveImagesToolAction extends WeaveAction {
           const room = data.image.roomId;
           const imageId = data.image.imageId;
 
-          finishUploadCallback?.(
-            nodeId,
+          result?.finishUploadCallback?.(
+            result?.nodeId ?? '',
             `${process.env.NEXT_PUBLIC_API_ENDPOINT}/weavejs/rooms/${room}/images/${imageId}`
           );
         };
@@ -451,7 +456,10 @@ export class WeaveImagesToolAction extends WeaveAction {
         const imageSize = this.imagesSize[i];
         const resourceId = this.imagesIds[i];
 
-        const { nodeId } = this.instance.triggerAction(
+        const result = this.instance.triggerAction<
+          WeaveImageToolActionTriggerParams,
+          WeaveImageToolActionTriggerReturn
+        >(
           WEAVE_IMAGE_TOOL_ACTION_NAME,
           {
             type: 'imageURL',
@@ -470,7 +478,7 @@ export class WeaveImagesToolAction extends WeaveAction {
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
         ) as any;
 
-        this.nodesIds.push(nodeId);
+        this.nodesIds.push(result?.nodeId ?? '');
 
         maxHeight = Math.max(maxHeight, this.imagesSize[i].height);
 

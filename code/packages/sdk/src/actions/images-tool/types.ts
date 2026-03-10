@@ -19,11 +19,6 @@ export type WeaveImagesToolActionStateKeys =
 export type WeaveImagesToolActionState =
   (typeof WEAVE_IMAGES_TOOL_STATE)[WeaveImagesToolActionStateKeys];
 
-export type WeaveImagesToolActionOnStartLoadImageEvent = undefined;
-export type WeaveImagesToolActionOnEndLoadImageEvent = Error | undefined;
-export type WeaveImagesToolActionOnAddingImageEvent = { imagesURL: string[] };
-export type WeaveImagesToolActionOnAddedImageEvent = { imagesURL: string[] };
-
 export type ImageInfo = {
   imageId: string;
   url: string;
