@@ -588,7 +588,6 @@ export class WeaveImageToolAction extends WeaveAction {
     }
 
     this.initialCursor = null;
-    this.imageId = null;
     this.forceMainContainer = false;
     this.container = undefined;
     this.tempImageNode = null;
