@@ -267,15 +267,15 @@ export class WeaveStateManager {
     }
   }
 
-  stateTransactional(callback: () => void): void {
+  stateTransactional(callback: () => void, origin?: string): void {
     const state = this.instance.getStore().getState();
 
     const doc = getYjsDoc(state);
-    const userId = this.instance.getStore().getUser().id;
+    const transactionOrigin = origin ?? this.instance.getStore().getUser().id;
 
     doc.transact(() => {
       callback();
-    }, userId);
+    }, transactionOrigin);
   }
 
   removeNode(node: WeaveStateElement): void {

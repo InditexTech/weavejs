@@ -53,16 +53,28 @@ type WeaveImageToolActionOnAddedEvent = {
   nodeId: string;
 };
 
-type WeaveImageToolActionTriggerParams = {
-  imageData?: string;
-  imageURL?: string;
-  imageWidth?: number;
-  imageHeight?: number;
+type WeaveImageToolActionTriggerCommonParams = {
   imageId?: string;
   options?: ImageOptions;
   position?: Konva.Vector2d;
   forceMainContainer?: boolean;
 };
+
+type WeaveImageToolActionTriggerParams = (
+  | {
+      type: typeof WEAVE_IMAGE_TOOL_UPLOAD_TYPE.FILE;
+      imageFile: File;
+      imageDownscaleRatio: number;
+    }
+  | {
+      type: typeof WEAVE_IMAGE_TOOL_UPLOAD_TYPE.IMAGE_URL;
+      imageURL: string;
+      imageFallback: string;
+      imageWidth: number;
+      imageHeight: number;
+    }
+) &
+  WeaveImageToolActionTriggerCommonParams;
 
 type ImageOptions = {
   crossOrigin: ImageCrossOrigin;
@@ -77,9 +89,30 @@ type WeaveImageToolActionTriggerReturn =
 
 type WeaveImageToolDragAndDropProperties = {
   imageURL: string;
+  imageFallback: string;
   imageWidth: number;
   imageHeight: number;
   imageId?: string;
+};
+
+type WeaveImageToolActionConfig = {
+  style: {
+    cursor: {
+      padding: number;
+      imageThumbnail: {
+        width: number;
+        height: number;
+        shadowColor: string;
+        shadowBlur: number;
+        shadowOffset: Konva.Vector2d;
+        shadowOpacity: number;
+      };
+    };
+  };
+};
+
+type WeaveImageToolActionParams = {
+  config: DeepPartial<WeaveImageToolActionConfig>;
 };
 ```
 
@@ -93,14 +126,27 @@ For `WeaveImageToolActionTriggerParams`:
 
 <TypeTable
   type={{
-    ["imageData"]: {
-      description:
-        "The dataURL of the image. Must be provided when adding images from a file-picker, on external paste images or when drag-and-drop images from the file-system",
+    ["type"]: {
+      description: "The type of the upload image, can be 'file' or 'imageURL'",
       type: "string",
+    },
+    ["imageFile"]: {
+      description:
+        "The File of the image. Must be provided when adding images from a file-picker, on external paste images or when drag-and-drop images from the file-system",
+      type: "File",
+    },
+    ["imageDownscaleRatio"]: {
+      description: "The downscale ratio to apply to the uploaded file",
+      type: "number",
     },
     ["imageURL"]: {
       description:
         "The URL of the image already uploaded to an external service. URL must the same as the application URL to avoid cross-origin issues. We recommend to proxy the images through the application. Must be provided when drag & drop from the same application.",
+      type: "string",
+    },
+    ["imageFallback"]: {
+      description:
+        "A dataURL of a fallback image to display while the real image is loaded asynchronously.",
       type: "string",
     },
     ["imageWidth"]: {
@@ -148,6 +194,7 @@ on the `onDragStart` event you must call the `setDragAndDropProperties` method o
 properties:
 
 - `imageURL`: the image URL to add to the canvas.
+- `imageFallback`: the fallback image (as dataURL) to set while the final image is asynchronously loaded.
 - `imageId`: the image id (external resource id) associated to the image.
 - `imageWidth`: the image real width (without any transformations).
 - `imageHeight`: the image real height (without any transformations).

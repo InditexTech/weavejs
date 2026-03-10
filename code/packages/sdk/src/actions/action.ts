@@ -15,6 +15,7 @@ import type Konva from 'konva';
 export abstract class WeaveAction implements WeaveActionBase {
   protected instance!: Weave;
   protected name!: string;
+  protected forceExecution!: boolean;
   protected tapStart: { x: number; y: number; time: number } | null;
   props!: WeaveElementAttributes;
   private logger!: Logger;
@@ -45,6 +46,10 @@ export abstract class WeaveAction implements WeaveActionBase {
 
   hasAliases(): boolean {
     return false;
+  }
+
+  setForceExecution(forceExecution: boolean) {
+    this.forceExecution = forceExecution;
   }
 
   getAliases(): string[] {

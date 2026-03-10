@@ -3,17 +3,20 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import Konva from 'konva';
-import { IMAGE_TOOL_LOAD_FROM, IMAGE_TOOL_STATE } from './constants';
-import type { ImageCrossOrigin } from '@inditextech/weave-types';
+import {
+  WEAVE_IMAGE_TOOL_UPLOAD_TYPE,
+  WEAVE_IMAGE_TOOL_STATE,
+} from './constants';
+import type { DeepPartial, ImageCrossOrigin } from '@inditextech/weave-types';
 
-export type WeaveImageToolActionLoadFromKeys =
-  keyof typeof IMAGE_TOOL_LOAD_FROM;
-export type WeaveImageToolActionLoadFrom =
-  (typeof IMAGE_TOOL_LOAD_FROM)[WeaveImageToolActionLoadFromKeys];
+export type WeaveImageToolActionUploadTypeKeys =
+  keyof typeof WEAVE_IMAGE_TOOL_UPLOAD_TYPE;
+export type WeaveImageToolActionUploadType =
+  (typeof WEAVE_IMAGE_TOOL_UPLOAD_TYPE)[WeaveImageToolActionUploadTypeKeys];
 
-export type WeaveImageToolActionStateKeys = keyof typeof IMAGE_TOOL_STATE;
+export type WeaveImageToolActionStateKeys = keyof typeof WEAVE_IMAGE_TOOL_STATE;
 export type WeaveImageToolActionState =
-  (typeof IMAGE_TOOL_STATE)[WeaveImageToolActionStateKeys];
+  (typeof WEAVE_IMAGE_TOOL_STATE)[WeaveImageToolActionStateKeys];
 
 export type WeaveImageToolActionOnStartLoadImageEvent = undefined;
 export type WeaveImageToolActionOnEndLoadImageEvent = Error | undefined;
@@ -23,16 +26,28 @@ export type WeaveImageToolActionOnAddedEvent = {
   nodeId: string;
 };
 
-export type WeaveImageToolActionTriggerParams = {
-  imageData?: string;
-  imageURL?: string;
-  imageWidth?: number;
-  imageHeight?: number;
+export type WeaveImageToolActionTriggerCommonParams = {
   imageId?: string;
   options?: ImageOptions;
   position?: Konva.Vector2d;
   forceMainContainer?: boolean;
 };
+
+export type WeaveImageToolActionTriggerParams = (
+  | {
+      type: typeof WEAVE_IMAGE_TOOL_UPLOAD_TYPE.FILE;
+      imageFile: File;
+      imageDownscaleRatio: number;
+    }
+  | {
+      type: typeof WEAVE_IMAGE_TOOL_UPLOAD_TYPE.IMAGE_URL;
+      imageURL: string;
+      imageFallback: string;
+      imageWidth: number;
+      imageHeight: number;
+    }
+) &
+  WeaveImageToolActionTriggerCommonParams;
 
 export type ImageOptions = {
   crossOrigin: ImageCrossOrigin;
@@ -47,7 +62,28 @@ export type WeaveImageToolActionTriggerReturn =
 
 export type WeaveImageToolDragAndDropProperties = {
   imageURL: string;
+  imageFallback: string;
   imageWidth: number;
   imageHeight: number;
   imageId?: string;
+};
+
+export type WeaveImageToolActionConfig = {
+  style: {
+    cursor: {
+      padding: number;
+      imageThumbnail: {
+        width: number;
+        height: number;
+        shadowColor: string;
+        shadowBlur: number;
+        shadowOffset: Konva.Vector2d;
+        shadowOpacity: number;
+      };
+    };
+  };
+};
+
+export type WeaveImageToolActionParams = {
+  config: DeepPartial<WeaveImageToolActionConfig>;
 };
