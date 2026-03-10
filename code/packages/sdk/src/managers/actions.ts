@@ -38,7 +38,7 @@ export class WeaveActionsManager {
       );
     }
 
-    if (typeof this.activeAction !== 'undefined' && !forceExecution) {
+    if (this.activeAction !== undefined && !forceExecution) {
       this.cancelAction(this.activeAction);
     }
 

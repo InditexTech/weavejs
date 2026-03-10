@@ -148,7 +148,7 @@ export abstract class WeaveNode implements WeaveNodeBase {
 
       if (
         this.isSelecting() &&
-        (selectedNodes as Konva.Node[]).includes(node as Konva.Node)
+        (selectedNodes as Konva.Node[]).includes(node)
       ) {
         return 'grab';
       }

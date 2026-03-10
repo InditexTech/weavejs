@@ -227,7 +227,7 @@ export class WeaveImageToolAction extends WeaveAction {
       return;
     }
 
-    const actualImageId = this.imageId as string;
+    const actualImageId = this.imageId;
 
     if (imageData instanceof File && downscalingRatio) {
       const realImageSize = await this.getImageSizeFromFile(imageData);

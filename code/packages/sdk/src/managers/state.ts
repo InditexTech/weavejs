@@ -271,9 +271,7 @@ export class WeaveStateManager {
     const state = this.instance.getStore().getState();
 
     const doc = getYjsDoc(state);
-    const transactionOrigin = !origin
-      ? this.instance.getStore().getUser().id
-      : origin;
+    const transactionOrigin = origin ?? this.instance.getStore().getUser().id;
 
     doc.transact(() => {
       callback();

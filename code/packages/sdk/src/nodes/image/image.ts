@@ -223,7 +223,7 @@ export class WeaveImageNode extends WeaveNode {
     this.setupDefaultNodeAugmentation(image);
 
     image.defineMousePointer = () => {
-      if (this.imageState[id] && this.imageState[id].status === 'loading') {
+      if (this.imageState[id]?.status === 'loading') {
         return 'wait';
       }
 
@@ -820,8 +820,6 @@ export class WeaveImageNode extends WeaveNode {
   preloadFallbackImage(
     imageId: string,
     imageURL: string,
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    loadingTryout = false,
     {
       onLoad,
       onError,
@@ -871,7 +869,6 @@ export class WeaveImageNode extends WeaveNode {
   preloadImage(
     imageId: string,
     imageURL: string,
-    loadingTryout = false,
     {
       onLoad,
       onError,
@@ -879,7 +876,8 @@ export class WeaveImageNode extends WeaveNode {
       onLoad: () => void;
       onError: (error: string | Event) => void;
       node?: Konva.Group;
-    }
+    },
+    loadingTryout = false
   ): void {
     const imageURLToLoad = imageURL ?? 'http://localhost/false-image';
 
@@ -958,195 +956,193 @@ export class WeaveImageNode extends WeaveNode {
 
     this.loadAsyncElement(id);
 
-    preloadFunction(id, realImageURL ?? '', loadTryout, {
-      onLoad: () => {
-        if (useFallback) {
-          this.tryoutTimeoutId = setTimeout(() => {
-            const node = this.instance.getStage().findOne(`#${id}`) as
-              | Konva.Group
-              | undefined;
-
-            if (node) {
-              this.imageTryoutAttempts[id] =
-                (this.imageTryoutAttempts[id] ?? 0) + 1;
-              this.loadImage(node.getAttrs(), node, false, true);
-            }
-          }, this.config.imageLoading.retryDelayMs);
-        }
-
-        if (loadTryout && this.tryoutTimeoutId) {
-          clearTimeout(this.tryoutTimeoutId);
-          this.tryoutTimeoutId = null;
-        }
-
-        if (image && internalImage) {
-          image.setAttrs({
-            width: imageProps.width
-              ? imageProps.width
-              : this.imageSource[id].width,
-            height: imageProps.height
-              ? imageProps.height
-              : this.imageSource[id].height,
-          });
-          imagePlaceholder?.destroy();
-
-          const imageSource: HTMLImageElement | ImageBitmap = loadFallback
-            ? this.imageFallback[id]
-            : this.imageSource[id];
-
-          internalImage.setAttrs({
-            width: imageProps.width
-              ? imageProps.width
-              : this.imageSource[id].width,
-            height: imageProps.height
-              ? imageProps.height
-              : this.imageSource[id].height,
-            image: imageSource,
-            visible: true,
-          });
-
-          let sourceImageWidth = imageProps.width
-            ? imageProps.width
-            : this.imageSource[id].width;
-          let sourceImageHeight = imageProps.height
-            ? imageProps.height
-            : this.imageSource[id].height;
-          if (image.getAttrs().imageInfo) {
-            sourceImageWidth = image.getAttrs().imageInfo.width;
-            sourceImageHeight = image.getAttrs().imageInfo.height;
-          }
-
-          internalImage.setAttr('imageInfo', {
-            width: sourceImageWidth,
-            height: sourceImageHeight,
-          });
-          internalImage.zIndex(0);
-
-          image.setAttr('imageInfo', {
-            width: sourceImageWidth,
-            height: sourceImageHeight,
-          });
-          // this.scaleReset(image);
-
-          const imageRect = image.getClientRect({
-            relativeTo: this.instance.getStage(),
-          });
-
-          if (!imageProps.cropInfo && !imageProps.uncroppedImage) {
-            image.setAttr('uncroppedImage', {
-              width: imageRect.width,
-              height: imageRect.height,
-            });
-          }
-
-          const stage = this.instance.getStage();
-
-          if (!loadFallback) {
-            if (stage.container().style.cursor === 'wait') {
-              stage.container().style.cursor = 'pointer';
-            }
-
-            this.imageState[id] = {
-              status: 'loaded',
-              loaded: true,
-              error: false,
-            };
-          }
-
-          this.updateImageCrop(image);
-
-          this.resolveAsyncElement(id);
-
-          this.cacheNode(image);
-        }
-      },
-      onError: (error) => {
-        if (!this.config.useFallbackImage) {
-          this.tryoutTimeoutId = setTimeout(() => {
-            const node = this.instance.getStage().findOne(`#${id}`) as
-              | Konva.Group
-              | undefined;
-
-            if (node) {
-              this.imageTryoutAttempts[id] =
-                (this.imageTryoutAttempts[id] ?? 0) + 1;
-              this.loadImage(node.getAttrs(), node, false, true);
-            }
-          }, this.config.imageLoading.retryDelayMs);
-        }
-
-        if (loadTryout) {
-          const tryoutAttempts = this.imageTryoutAttempts[id] ?? 0;
-          if (tryoutAttempts < this.config.imageLoading.maxRetryAttempts) {
+    preloadFunction(
+      id,
+      realImageURL ?? '',
+      {
+        onLoad: () => {
+          if (useFallback) {
             this.tryoutTimeoutId = setTimeout(() => {
-              const node = this.instance.getStage().findOne(`#${id}`) as
-                | Konva.Group
-                | undefined;
+              const node = this.instance.getStage().findOne(`#${id}`);
+
               if (node) {
-                this.imageTryoutAttempts[id] = tryoutAttempts + 1;
-                this.loadImage(node.getAttrs(), node, false, true);
+                this.imageTryoutAttempts[id] =
+                  (this.imageTryoutAttempts[id] ?? 0) + 1;
+                this.loadImage(
+                  node.getAttrs(),
+                  node as Konva.Group,
+                  false,
+                  true
+                );
               }
             }, this.config.imageLoading.retryDelayMs);
           }
-          return;
-        }
 
-        if (
-          this.config.useFallbackImage &&
-          !useFallback &&
-          !loadTryout &&
-          imageProps.imageFallback
-        ) {
-          this.loadImage(
-            {
-              ...params,
-            },
-            image,
-            true
-          );
-          return;
-        }
+          if (loadTryout && this.tryoutTimeoutId) {
+            clearTimeout(this.tryoutTimeoutId);
+            this.tryoutTimeoutId = null;
+          }
 
-        this.imageState[id] = {
-          status: 'error',
-          loaded: false,
-          error: true,
-        };
+          if (image && internalImage) {
+            image.setAttrs({
+              width: imageProps.width
+                ? imageProps.width
+                : this.imageSource[id].width,
+              height: imageProps.height
+                ? imageProps.height
+                : this.imageSource[id].height,
+            });
+            imagePlaceholder?.destroy();
 
-        image.setAttrs({
-          image: undefined,
-        });
+            const imageSource: HTMLImageElement | ImageBitmap = loadFallback
+              ? this.imageFallback[id]
+              : this.imageSource[id];
 
-        // if (this.config.useFallbackImage) {
-        //   image.setAttrs({
-        //     image: undefined,
-        //     width: 100,
-        //     height: 100,
-        //     imageInfo: {
-        //       width: 100,
-        //       height: 100,
-        //     },
-        //     uncroppedImage: {
-        //       width: 100,
-        //       height: 100,
-        //     },
-        //   });
-        // }
+            internalImage.setAttrs({
+              width: imageProps.width
+                ? imageProps.width
+                : this.imageSource[id].width,
+              height: imageProps.height
+                ? imageProps.height
+                : this.imageSource[id].height,
+              image: imageSource,
+              visible: true,
+            });
 
-        this.resolveAsyncElement(id);
+            let sourceImageWidth = imageProps.width
+              ? imageProps.width
+              : this.imageSource[id].width;
+            let sourceImageHeight = imageProps.height
+              ? imageProps.height
+              : this.imageSource[id].height;
+            if (image.getAttrs().imageInfo) {
+              sourceImageWidth = image.getAttrs().imageInfo.width;
+              sourceImageHeight = image.getAttrs().imageInfo.height;
+            }
 
-        console.error('Error loading image', realImageURL, error);
+            internalImage.setAttr('imageInfo', {
+              width: sourceImageWidth,
+              height: sourceImageHeight,
+            });
+            internalImage.zIndex(0);
 
-        imagePlaceholder?.setAttrs({
-          visible: true,
-        });
-        internalImage?.setAttrs({
-          visible: false,
-        });
+            image.setAttr('imageInfo', {
+              width: sourceImageWidth,
+              height: sourceImageHeight,
+            });
+            // this.scaleReset(image);
 
-        this.cacheNode(image);
+            const imageRect = image.getClientRect({
+              relativeTo: this.instance.getStage(),
+            });
+
+            if (!imageProps.cropInfo && !imageProps.uncroppedImage) {
+              image.setAttr('uncroppedImage', {
+                width: imageRect.width,
+                height: imageRect.height,
+              });
+            }
+
+            const stage = this.instance.getStage();
+
+            if (!loadFallback) {
+              if (stage.container().style.cursor === 'wait') {
+                stage.container().style.cursor = 'pointer';
+              }
+
+              this.imageState[id] = {
+                status: 'loaded',
+                loaded: true,
+                error: false,
+              };
+            }
+
+            this.updateImageCrop(image);
+
+            this.resolveAsyncElement(id);
+
+            this.cacheNode(image);
+          }
+        },
+        onError: (error) => {
+          if (!this.config.useFallbackImage) {
+            this.tryoutTimeoutId = setTimeout(() => {
+              const node = this.instance.getStage().findOne(`#${id}`);
+
+              if (node) {
+                this.imageTryoutAttempts[id] =
+                  (this.imageTryoutAttempts[id] ?? 0) + 1;
+                this.loadImage(
+                  node.getAttrs(),
+                  node as Konva.Group,
+                  false,
+                  true
+                );
+              }
+            }, this.config.imageLoading.retryDelayMs);
+          }
+
+          if (loadTryout) {
+            const tryoutAttempts = this.imageTryoutAttempts[id] ?? 0;
+            if (tryoutAttempts < this.config.imageLoading.maxRetryAttempts) {
+              this.tryoutTimeoutId = setTimeout(() => {
+                const node = this.instance.getStage().findOne(`#${id}`);
+                if (node) {
+                  this.imageTryoutAttempts[id] = tryoutAttempts + 1;
+                  this.loadImage(
+                    node.getAttrs(),
+                    node as Konva.Group,
+                    false,
+                    true
+                  );
+                }
+              }, this.config.imageLoading.retryDelayMs);
+            }
+            return;
+          }
+
+          if (
+            this.config.useFallbackImage &&
+            !useFallback &&
+            !loadTryout &&
+            imageProps.imageFallback
+          ) {
+            this.loadImage(
+              {
+                ...params,
+              },
+              image,
+              true
+            );
+            return;
+          }
+
+          this.imageState[id] = {
+            status: 'error',
+            loaded: false,
+            error: true,
+          };
+
+          image.setAttrs({
+            image: undefined,
+          });
+
+          this.resolveAsyncElement(id);
+
+          console.error('Error loading image', realImageURL, error);
+
+          imagePlaceholder?.setAttrs({
+            visible: true,
+          });
+          internalImage?.setAttrs({
+            visible: false,
+          });
+
+          this.cacheNode(image);
+        },
       },
-    });
+      loadTryout
+    );
   }
 
   updatePlaceholderSize(
@@ -1334,9 +1330,7 @@ export class WeaveImageNode extends WeaveNode {
 
   forceLoadImage(nodeInstance: WeaveElementInstance): void {
     const nodeId = nodeInstance.getAttrs().id ?? '';
-    const node = this.instance.getStage().findOne(`#${nodeId}`) as
-      | Konva.Group
-      | undefined;
+    const node = this.instance.getStage().findOne(`#${nodeId}`);
 
     if (this.tryoutTimeoutId) {
       clearTimeout(this.tryoutTimeoutId);
@@ -1344,7 +1338,7 @@ export class WeaveImageNode extends WeaveNode {
     }
 
     if (node) {
-      this.loadImage(node.getAttrs(), node, false, false);
+      this.loadImage(node.getAttrs(), node as Konva.Group, false, false);
     }
   }
 

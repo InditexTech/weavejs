@@ -7,8 +7,7 @@ import {
   WEAVE_IMAGE_TOOL_UPLOAD_TYPE,
   WEAVE_IMAGE_TOOL_STATE,
 } from './constants';
-import type { ImageCrossOrigin } from '@inditextech/weave-types';
-import type { DeepPartial } from '@inditextech/weave-types';
+import type { DeepPartial, ImageCrossOrigin } from '@inditextech/weave-types';
 
 export type WeaveImageToolActionUploadTypeKeys =
   keyof typeof WEAVE_IMAGE_TOOL_UPLOAD_TYPE;
@@ -32,7 +31,6 @@ export type WeaveImageToolActionTriggerCommonParams = {
   options?: ImageOptions;
   position?: Konva.Vector2d;
   forceMainContainer?: boolean;
-  multiCall?: boolean;
 };
 
 export type WeaveImageToolActionTriggerParams = (
