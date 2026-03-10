@@ -21,7 +21,11 @@ export class WeaveActionsManager {
     return this.activeAction;
   }
 
-  triggerAction<T, P>(actionName: string, params?: T): P {
+  triggerAction<T, P>(
+    actionName: string,
+    params?: T,
+    forceExecution: boolean = false
+  ): P {
     const actionsHandlers = this.instance.getActionsHandlers();
 
     if (typeof actionName === 'undefined') {
@@ -34,17 +38,22 @@ export class WeaveActionsManager {
       );
     }
 
-    if (typeof this.activeAction !== 'undefined') {
+    if (typeof this.activeAction !== 'undefined' && !forceExecution) {
       this.cancelAction(this.activeAction);
     }
 
-    this.activeAction = actionName;
+    if (!forceExecution) {
+      this.activeAction = actionName;
+    }
+
     const payload = actionsHandlers[actionName].trigger(
       this.cancelActionCallback(actionName),
       params
     );
 
-    this.instance.emitEvent('onActiveActionChange', this.activeAction);
+    if (!forceExecution) {
+      this.instance.emitEvent('onActiveActionChange', this.activeAction);
+    }
 
     return payload as P;
   }

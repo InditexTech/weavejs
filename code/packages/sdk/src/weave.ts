@@ -565,8 +565,16 @@ export class Weave {
     return this.actionsManager.getActiveAction();
   }
 
-  triggerAction<T, P>(actionName: string, params?: T): P {
-    return this.actionsManager.triggerAction<T, P>(actionName, params);
+  triggerAction<T, P>(
+    actionName: string,
+    params?: T,
+    forceExecution: boolean = false
+  ): P {
+    return this.actionsManager.triggerAction<T, P>(
+      actionName,
+      params,
+      forceExecution
+    );
   }
 
   getPropsAction(actionName: string): WeaveElementAttributes {
@@ -624,14 +632,17 @@ export class Weave {
     node: WeaveStateElement,
     parentId = 'mainLayer',
     options: {
+      origin?: string;
       index?: number;
       emitUserChangeEvent?: boolean;
       overrideUserChangeType?: WeaveNodeChangeType;
     } = DEFAULT_ADD_NODE_OPTIONS
   ): void {
+    const { origin, ...restOptions } = options;
+
     this.stateTransactional(() => {
-      this.addNodeNT(node, parentId, options);
-    });
+      this.addNodeNT(node, parentId, restOptions);
+    }, origin);
   }
 
   addNodeNT(
@@ -670,16 +681,23 @@ export class Weave {
 
   updateNode(
     node: WeaveStateElement,
-    options: { emitUserChangeEvent?: boolean } = DEFAULT_UPDATE_NODE_OPTIONS
+    options: {
+      origin?: string;
+      emitUserChangeEvent?: boolean;
+    } = DEFAULT_UPDATE_NODE_OPTIONS
   ): void {
+    const { origin, ...restOptions } = options;
+
     this.stateTransactional(() => {
-      this.updateNodeNT(node, options);
-    });
+      this.updateNodeNT(node, restOptions);
+    }, origin);
   }
 
   updateNodeNT(
     node: WeaveStateElement,
-    options: { emitUserChangeEvent?: boolean } = DEFAULT_UPDATE_NODE_OPTIONS
+    options: {
+      emitUserChangeEvent?: boolean;
+    } = DEFAULT_UPDATE_NODE_OPTIONS
   ): void {
     const { emitUserChangeEvent } = mergeExceptArrays(
       DEFAULT_UPDATE_NODE_OPTIONS,
@@ -710,16 +728,23 @@ export class Weave {
 
   updateNodes(
     nodes: WeaveStateElement[],
-    options: { emitUserChangeEvent?: boolean } = DEFAULT_UPDATE_NODE_OPTIONS
+    options: {
+      origin?: string;
+      emitUserChangeEvent?: boolean;
+    } = DEFAULT_UPDATE_NODE_OPTIONS
   ): void {
+    const { origin, ...restOptions } = options;
+
     this.stateTransactional(() => {
-      this.updateNodesNT(nodes, options);
-    });
+      this.updateNodesNT(nodes, restOptions);
+    }, origin);
   }
 
   updateNodesNT(
     nodes: WeaveStateElement[],
-    options: { emitUserChangeEvent?: boolean } = DEFAULT_UPDATE_NODE_OPTIONS
+    options: {
+      emitUserChangeEvent?: boolean;
+    } = DEFAULT_UPDATE_NODE_OPTIONS
   ): void {
     const { emitUserChangeEvent } = mergeExceptArrays(
       DEFAULT_UPDATE_NODE_OPTIONS,
@@ -767,16 +792,23 @@ export class Weave {
 
   removeNode(
     node: WeaveStateElement,
-    options: { emitUserChangeEvent?: boolean } = DEFAULT_REMOVE_NODE_OPTIONS
+    options: {
+      origin?: string;
+      emitUserChangeEvent?: boolean;
+    } = DEFAULT_REMOVE_NODE_OPTIONS
   ): void {
+    const { origin, ...restOptions } = options;
+
     this.stateTransactional(() => {
-      this.removeNodeNT(node, options);
-    });
+      this.removeNodeNT(node, restOptions);
+    }, origin);
   }
 
   removeNodeNT(
     node: WeaveStateElement,
-    options: { emitUserChangeEvent?: boolean } = DEFAULT_REMOVE_NODE_OPTIONS
+    options: {
+      emitUserChangeEvent?: boolean;
+    } = DEFAULT_REMOVE_NODE_OPTIONS
   ): void {
     const { emitUserChangeEvent } = mergeExceptArrays(
       DEFAULT_REMOVE_NODE_OPTIONS,
@@ -828,16 +860,23 @@ export class Weave {
 
   removeNodes(
     nodes: WeaveStateElement[],
-    options: { emitUserChangeEvent?: boolean } = DEFAULT_REMOVE_NODE_OPTIONS
+    options: {
+      origin?: string;
+      emitUserChangeEvent?: boolean;
+    } = DEFAULT_REMOVE_NODE_OPTIONS
   ): void {
+    const { origin, ...restOptions } = options;
+
     this.stateTransactional(() => {
-      this.removeNodesNT(nodes, options);
-    });
+      this.removeNodesNT(nodes, restOptions);
+    }, origin);
   }
 
   removeNodesNT(
     nodes: WeaveStateElement[],
-    options: { emitUserChangeEvent?: boolean } = DEFAULT_REMOVE_NODE_OPTIONS
+    options: {
+      emitUserChangeEvent?: boolean;
+    } = DEFAULT_REMOVE_NODE_OPTIONS
   ): void {
     for (const node of nodes) {
       this.removeNodeNT(node, options);
@@ -853,17 +892,24 @@ export class Weave {
   zMoveNode(
     node: WeaveStateElement,
     position: WeavePosition,
-    options: { emitUserChangeEvent?: boolean } = DEFAULT_MOVE_NODE_OPTIONS
+    options: {
+      origin?: string;
+      emitUserChangeEvent?: boolean;
+    } = DEFAULT_MOVE_NODE_OPTIONS
   ): void {
+    const { origin, ...restOptions } = options;
+
     this.stateTransactional(() => {
-      this.zMoveNodeNT(node, position, options);
-    });
+      this.zMoveNodeNT(node, position, restOptions);
+    }, origin);
   }
 
   zMoveNodeNT(
     node: WeaveStateElement,
     position: WeavePosition,
-    options: { emitUserChangeEvent?: boolean } = DEFAULT_MOVE_NODE_OPTIONS
+    options: {
+      emitUserChangeEvent?: boolean;
+    } = DEFAULT_MOVE_NODE_OPTIONS
   ): void {
     const { emitUserChangeEvent } = mergeExceptArrays(
       DEFAULT_MOVE_NODE_OPTIONS,
@@ -965,8 +1011,8 @@ export class Weave {
     return getBoundingBox(nodes, config);
   }
 
-  stateTransactional(callback: () => void): void {
-    this.stateManager.stateTransactional(callback);
+  stateTransactional(callback: () => void, origin?: string): void {
+    this.stateManager.stateTransactional(callback, origin);
   }
 
   // ZINDEX MANAGEMENT METHODS PROXIES

@@ -53,6 +53,7 @@ declare module 'konva/lib/Node' {
     handleMouseout(): void;
     handleSelectNode(): void;
     handleDeselectNode(): void;
+    defineMousePointer(): string;
     canBeHovered(): boolean;
     canDrag(): boolean;
     canMoveToContainer(node: Konva.Node): boolean;

@@ -5,6 +5,7 @@
 import Konva from 'konva';
 import { IMAGE_TOOL_LOAD_FROM, IMAGE_TOOL_STATE } from './constants';
 import type { ImageCrossOrigin } from '@inditextech/weave-types';
+import type { DeepPartial } from '@inditextech/weave-types';
 
 export type WeaveImageToolActionLoadFromKeys =
   keyof typeof IMAGE_TOOL_LOAD_FROM;
@@ -23,16 +24,25 @@ export type WeaveImageToolActionOnAddedEvent = {
   nodeId: string;
 };
 
-export type WeaveImageToolActionTriggerParams = {
-  imageData?: string;
-  imageURL?: string;
-  imageWidth?: number;
-  imageHeight?: number;
+export type WeaveImageToolActionTriggerCommonParams = {
   imageId?: string;
   options?: ImageOptions;
   position?: Konva.Vector2d;
   forceMainContainer?: boolean;
 };
+
+export type WeaveImageToolActionTriggerParams = (
+  | {
+      type: 'file';
+      imageFile: File;
+      imageDownscaleRatio: number;
+    }
+  | {
+      type: 'imageURL';
+      imageURL: string;
+    }
+) &
+  WeaveImageToolActionTriggerCommonParams;
 
 export type ImageOptions = {
   crossOrigin: ImageCrossOrigin;
@@ -50,4 +60,16 @@ export type WeaveImageToolDragAndDropProperties = {
   imageWidth: number;
   imageHeight: number;
   imageId?: string;
+};
+
+export type WeaveImageToolActionConfig = {
+  style: {
+    cursor: {
+      padding: 5;
+    };
+  };
+};
+
+export type WeaveImageToolActionParams = {
+  config: DeepPartial<WeaveImageToolActionConfig>;
 };

@@ -92,8 +92,6 @@ export class WeaveRegisterManager {
         this.registerActionHandler(action as WeaveAction);
       }
     }
-
-    this.logger.info(`Actions handlers registered`);
   }
 
   registerActionHandler(action: WeaveAction): void {

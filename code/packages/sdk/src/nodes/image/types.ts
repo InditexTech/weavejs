@@ -28,6 +28,7 @@ export type ImageProps = WeaveElementAttributes & {
 };
 
 export type WeaveImageState = {
+  status: 'loaded' | 'loading' | 'error-fallback' | 'error' | 'idle';
   loaded: boolean;
   error: boolean;
 };
@@ -50,8 +51,13 @@ export type WeaveImageProperties = {
       fill: string;
     };
   };
+  imageLoading: {
+    maxRetryAttempts: number;
+    retryDelayMs: number;
+  };
   crossOrigin: ImageCrossOrigin;
   transform?: WeaveNodeTransformerProperties;
+  useFallbackImage?: boolean;
   urlTransformer?: URLTransformerFunction;
   onDblClick?: (instance: WeaveImageNode, node: Konva.Group) => void;
   cropMode: {

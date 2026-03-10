@@ -143,6 +143,18 @@ export abstract class WeaveNode implements WeaveNodeBase {
     node.handleMouseout = function () {};
     node.handleSelectNode = function () {};
     node.handleDeselectNode = function () {};
+    node.defineMousePointer = () => {
+      const selectedNodes = this.getSelectionPlugin()?.getSelectedNodes() ?? [];
+
+      if (
+        this.isSelecting() &&
+        (selectedNodes as Konva.Node[]).includes(node as Konva.Node)
+      ) {
+        return 'grab';
+      }
+
+      return 'pointer';
+    };
     node.canBeHovered = function () {
       return true;
     };
@@ -988,7 +1000,8 @@ export abstract class WeaveNode implements WeaveNodeBase {
       stage.mode() === WEAVE_STAGE_DEFAULT_MODE
     ) {
       showHover = true;
-      stage.container().style.cursor = 'pointer';
+      stage.container().style.cursor =
+        realNode?.defineMousePointer() ?? 'pointer';
       cancelBubble = true;
     }
 
@@ -1003,7 +1016,7 @@ export abstract class WeaveNode implements WeaveNodeBase {
       stage.mode() === WEAVE_STAGE_DEFAULT_MODE
     ) {
       showHover = true;
-      stage.container().style.cursor = 'grab';
+      stage.container().style.cursor = realNode?.defineMousePointer() ?? 'grab';
       cancelBubble = true;
     }
 

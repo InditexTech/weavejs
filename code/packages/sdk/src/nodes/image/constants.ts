@@ -36,7 +36,12 @@ export const WEAVE_IMAGE_DEFAULT_CONFIG: WeaveImageProperties = {
       fill: '#aaaaaa',
     },
   },
+  imageLoading: {
+    maxRetryAttempts: 15,
+    retryDelayMs: 2000,
+  },
   crossOrigin: 'anonymous',
+  useFallbackImage: true,
   cropMode: {
     gridLines: {
       enabled: true,
