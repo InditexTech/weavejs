@@ -446,8 +446,7 @@ export function getTargetAndSkipNodes(
   let node: Konva.Node | undefined = undefined;
   if (
     e.type === 'dragmove' &&
-    nodesSelectionPlugin &&
-    nodesSelectionPlugin.getTransformer().nodes().length === 1
+    nodesSelectionPlugin?.getTransformer().nodes().length === 1
   ) {
     node = nodesSelectionPlugin.getTransformer().nodes()[0];
     skipNodes.push(node.getAttrs().id ?? '');
@@ -672,10 +671,9 @@ export const canComposite = (node: Konva.Node) => {
   const parent = node.getParent();
 
   return (
-    parent &&
-    parent.getClassName() === 'Group' &&
-    parent.getAttrs().nodeType !== 'frame' &&
-    parent.getAttrs().nodeId === undefined
+    parent?.getClassName() === 'Group' &&
+    parent?.getAttrs().nodeType !== 'frame' &&
+    parent?.getAttrs().nodeId === undefined
   );
 };
 

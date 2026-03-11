@@ -20,7 +20,6 @@ export type WeaveImagesToolActionStateKeys =
 export type WeaveImagesToolActionState =
   (typeof WEAVE_IMAGES_TOOL_STATE)[WeaveImagesToolActionStateKeys];
 
-export type WeaveImagesToolActionOnAddingEvent = undefined;
 export type WeaveImagesToolActionOnAddedEvent = {
   nodesIds: string[];
 };

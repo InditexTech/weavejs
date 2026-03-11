@@ -19,7 +19,6 @@ import {
   type WeaveImagesToolActionUploadFunction,
   type WeaveImagesToolActionOnStartUploadingFunction,
   type WeaveImagesToolActionOnFinishedUploadingFunction,
-  type WeaveImagesToolActionOnAddingEvent,
   type WeaveImagesToolActionOnAddedEvent,
 } from './types';
 import {
@@ -348,9 +347,7 @@ export class WeaveImagesToolAction extends WeaveAction {
 
       this.instance.getUtilityLayer()?.add(this.tempPointerFeedbackNode);
 
-      this.instance.emitEvent<WeaveImagesToolActionOnAddingEvent>(
-        'onAddingImages'
-      );
+      this.instance.emitEvent<undefined>('onAddingImages');
     }
 
     this.clickPoint = null;
