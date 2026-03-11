@@ -18,8 +18,8 @@ import {
 import { WeaveNodesSelectionPlugin } from '@/plugins/nodes-selection/nodes-selection';
 import type { WeaveLineNode } from '@/nodes/line/line';
 import { SELECTION_TOOL_ACTION_NAME } from '../selection-tool/constants';
-import { mergeExceptArrays } from '@/utils';
-import { GreedySnapper } from '@/utils/greedy-snapper';
+import { mergeExceptArrays } from '@/utils/utils';
+import { GreedySnapper } from '@/internal-utils/greedy-snapper';
 
 export class WeaveLineToolAction extends WeaveAction {
   protected initialized: boolean = false;

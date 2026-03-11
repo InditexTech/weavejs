@@ -20,7 +20,7 @@ import {
 } from './constants';
 import { WeavePlugin } from '@/plugins/plugin';
 import Konva from 'konva';
-import { memoize, mergeExceptArrays } from '@/utils';
+import { memoize, mergeExceptArrays } from '@/utils/utils';
 import { throttle } from 'lodash';
 
 export class WeaveUsersPointersPlugin extends WeavePlugin {

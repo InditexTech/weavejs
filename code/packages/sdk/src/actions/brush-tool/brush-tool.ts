@@ -23,7 +23,7 @@ import type { WeaveStrokeNode } from '@/nodes/stroke/stroke';
 import type { WeaveStrokePoint } from '@/nodes/stroke/types';
 import { SELECTION_TOOL_ACTION_NAME } from '../selection-tool/constants';
 import type { WeaveStageZoomPlugin } from '@/plugins/stage-zoom/stage-zoom';
-import { mergeExceptArrays } from '@/utils';
+import { mergeExceptArrays } from '@/utils/utils';
 
 export class WeaveBrushToolAction extends WeaveAction {
   protected config: WeaveBrushToolActionProperties;

@@ -28,7 +28,7 @@ import type {
   WeaveElementInstance,
 } from '@inditextech/weave-types';
 import { WeaveNode } from '../node';
-import { mergeExceptArrays } from '@/utils';
+import { mergeExceptArrays } from '@/utils/utils';
 
 export class WeaveCommentNode<T> extends WeaveNode {
   protected nodeType = WEAVE_COMMENT_NODE_TYPE;

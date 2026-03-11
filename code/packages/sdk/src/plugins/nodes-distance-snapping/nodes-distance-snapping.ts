@@ -28,7 +28,7 @@ import {
   getTargetAndSkipNodes,
   getVisibleNodes,
   mergeExceptArrays,
-} from '@/utils';
+} from '@/utils/utils';
 import type { Context } from 'konva/lib/Context';
 import type { WeaveNodesSelectionPlugin } from '../nodes-selection/nodes-selection';
 import { throttle } from 'lodash';

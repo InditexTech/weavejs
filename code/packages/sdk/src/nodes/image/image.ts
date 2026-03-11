@@ -28,7 +28,7 @@ import {
   WEAVE_STAGE_IMAGE_CROPPING_MODE,
 } from './constants';
 import { WEAVE_STAGE_DEFAULT_MODE } from '../stage/constants';
-import { mergeExceptArrays } from '@/utils';
+import { mergeExceptArrays } from '@/utils/utils';
 
 export class WeaveImageNode extends WeaveNode {
   private config: WeaveImageProperties;

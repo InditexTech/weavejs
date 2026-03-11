@@ -14,6 +14,13 @@ import {
   type WeaveImagesToolActionParams,
   type WeaveImagesToolDragAndDropProperties,
   type WeaveImagesToolActionUploadType,
+  type WeaveImagesFile,
+  type WeaveImagesURL,
+  type WeaveImagesToolActionUploadFunction,
+  type WeaveImagesToolActionOnStartUploadingFunction,
+  type WeaveImagesToolActionOnFinishedUploadingFunction,
+  type WeaveImagesToolActionOnAddingEvent,
+  type WeaveImagesToolActionOnAddedEvent,
 } from './types';
 import {
   WEAVE_IMAGES_TOOL_ACTION_NAME,
@@ -21,21 +28,26 @@ import {
   WEAVE_IMAGES_TOOL_STATE,
   WEAVE_IMAGES_TOOL_UPLOAD_TYPE,
 } from './constants';
-import { sleep } from '@/utils/generic';
+import { sleep } from '@/internal-utils/generic';
 import { WeaveAction } from '../action';
 import {
   getPositionRelativeToContainerOnPosition,
   mergeExceptArrays,
-} from '@/utils';
+} from '@/utils/utils';
 import type { WeaveImageToolAction } from '../image-tool/image-tool';
-import { WEAVE_IMAGE_TOOL_ACTION_NAME } from '../image-tool/constants';
+import {
+  WEAVE_IMAGE_TOOL_ACTION_NAME,
+  WEAVE_IMAGE_TOOL_UPLOAD_TYPE,
+} from '../image-tool/constants';
 import type { WeaveNodesSelectionPlugin } from '@/plugins/nodes-selection/nodes-selection';
 import type { WeaveImageNode } from '@/nodes/image/image';
 import { SELECTION_TOOL_ACTION_NAME } from '../selection-tool/constants';
 import type {
+  WeaveImageToolActionOnImageUploadedEvent,
   WeaveImageToolActionTriggerParams,
   WeaveImageToolActionTriggerReturn,
 } from '../image-tool/types';
+import { loadImageSource } from '@/utils/image';
 
 export class WeaveImagesToolAction extends WeaveAction {
   private readonly config: WeaveImagesToolActionParams;
@@ -46,20 +58,15 @@ export class WeaveImagesToolAction extends WeaveAction {
   protected tempPointerFeedbackNode: Konva.Group | null;
   protected container: Konva.Layer | Konva.Group | undefined;
   protected nodesIds: string[] = [];
-  protected imagesIds: string[] = [];
-  protected imagesSize: { width: number; height: number }[] = [];
-  protected imagesDownscaleRatio: number[] = [];
-  protected imagesFallback: string[] = [];
-  protected images: File[] | null = null;
-  protected imagesURLs: string[] | null = null;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  protected uploadImageFunction!: any;
+  protected imagesFile: WeaveImagesFile[] = [];
+  protected imagesURL: WeaveImagesURL[] = [];
   protected preloadImgs: Record<string, HTMLImageElement>;
   protected clickPoint: Vector2d | null;
   protected forceMainContainer: boolean = false;
   protected cancelAction!: () => void;
-  private onStartUploading: () => void = () => {};
-  private onFinishedUploading: () => void = () => {};
+  private uploadImageFunction!: WeaveImagesToolActionUploadFunction;
+  private onStartUploading!: WeaveImagesToolActionOnStartUploadingFunction;
+  private onFinishedUploading!: WeaveImagesToolActionOnFinishedUploadingFunction;
   private uploadType: WeaveImagesToolActionUploadType | null = null;
   onPropsChange = undefined;
   update = undefined;
@@ -76,7 +83,8 @@ export class WeaveImagesToolAction extends WeaveAction {
     this.initialized = false;
     this.tempPointerFeedbackNode = null;
     this.state = WEAVE_IMAGES_TOOL_STATE.IDLE;
-    this.images = [];
+    this.imagesFile = [];
+    this.imagesURL = [];
     this.container = undefined;
     this.preloadImgs = {};
     this.uploadType = null;
@@ -101,8 +109,7 @@ export class WeaveImagesToolAction extends WeaveAction {
   }
 
   onInit(): void {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    this.instance.addEventListener('onStageDrop', (e: any) => {
+    this.instance.addEventListener('onStageDrop', (e: DragEvent) => {
       const dragId = this.instance.getDragStartedId();
       const dragProperties =
         this.instance.getDragProperties<WeaveImagesToolDragAndDropProperties>();
@@ -112,14 +119,21 @@ export class WeaveImagesToolAction extends WeaveAction {
         const position: Konva.Vector2d | null | undefined =
           getPositionRelativeToContainerOnPosition(this.instance);
 
-        this.instance.triggerAction(WEAVE_IMAGES_TOOL_ACTION_NAME, {
-          type: WEAVE_IMAGES_TOOL_UPLOAD_TYPE.IMAGE_URL,
-          imagesURLs: dragProperties.imagesURls,
-          imagesSize: dragProperties.imagesSize,
-          imagesFallback: dragProperties.imagesFallback,
-          imagesIds: dragProperties.imagesIds,
-          position,
-        });
+        if (!position) {
+          return;
+        }
+
+        this.instance.triggerAction<WeaveImagesToolActionTriggerParams, void>(
+          WEAVE_IMAGES_TOOL_ACTION_NAME,
+          {
+            type: WEAVE_IMAGES_TOOL_UPLOAD_TYPE.IMAGE_URL,
+            images: dragProperties.imagesURL,
+            position,
+            ...(dragProperties.forceMainContainer && {
+              forceMainContainer: dragProperties.forceMainContainer,
+            }),
+          }
+        );
       }
     });
   }
@@ -221,7 +235,7 @@ export class WeaveImagesToolAction extends WeaveAction {
     if (
       !this.tempPointerFeedbackNode &&
       !this.isTouchDevice() &&
-      this.images &&
+      this.imagesFile &&
       this.uploadType === WEAVE_IMAGES_TOOL_UPLOAD_TYPE.FILE
     ) {
       const mousePos = stage.getRelativePointerPosition();
@@ -236,12 +250,12 @@ export class WeaveImagesToolAction extends WeaveAction {
         listening: false,
       });
 
-      const imagesTop3 = this.images.slice(0, 3) ?? [];
+      const imagesTop3 = this.imagesFile.slice(0, 3) ?? [];
       let maxWidth = 0;
       let maxHeight = 0;
       let position: Konva.Vector2d = { x: 0, y: 0 };
       for (const image of imagesTop3) {
-        const imageSource = await this.loadImageSource(image);
+        const imageSource = await loadImageSource(image.file);
 
         const maxImageWidth = this.config.style.cursor.imageThumbnails.width;
         const maxImageHeight = this.config.style.cursor.imageThumbnails.height;
@@ -288,7 +302,7 @@ export class WeaveImagesToolAction extends WeaveAction {
         imageNode.moveToBottom();
       }
 
-      if (this.images.length > 3) {
+      if (this.imagesFile.length > 3) {
         const paddingX = this.config.style.moreImages.paddingX;
         const paddingY = this.config.style.moreImages.paddingY;
         const fontSize = this.config.style.moreImages.fontSize;
@@ -298,7 +312,7 @@ export class WeaveImagesToolAction extends WeaveAction {
         const backgroundOpacity =
           this.config.style.moreImages.backgroundOpacity;
 
-        const text = `and ${this.images.length - 3} more image(s)`;
+        const text = `and ${this.imagesFile.length - 3} more image(s)`;
         const textNode = new Konva.Text({
           x:
             maxWidth +
@@ -333,6 +347,10 @@ export class WeaveImagesToolAction extends WeaveAction {
       }
 
       this.instance.getUtilityLayer()?.add(this.tempPointerFeedbackNode);
+
+      this.instance.emitEvent<WeaveImagesToolActionOnAddingEvent>(
+        'onAddingImages'
+      );
     }
 
     this.clickPoint = null;
@@ -358,7 +376,7 @@ export class WeaveImagesToolAction extends WeaveAction {
       y: this.clickPoint?.y ?? 0,
     };
 
-    if (!this.images && !this.imagesURLs) {
+    if (!this.imagesFile && !this.imagesURL) {
       return;
     }
 
@@ -374,28 +392,56 @@ export class WeaveImagesToolAction extends WeaveAction {
     const imagesPadding = this.config.style.images.padding;
     const layoutColumns = this.config.layout.columns;
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const uploadImagesPromises: any[] = [];
     let imagePositionX = originPoint.x;
     let imagePositionY = originPoint.y;
     let maxHeight = 0;
 
-    if (this.uploadType === WEAVE_IMAGES_TOOL_UPLOAD_TYPE.FILE && this.images) {
-      for (let i = 0; i < this.images.length; i++) {
-        const file = this.images[i];
-        const downscaleRatio = this.imagesDownscaleRatio[i];
-        const resourceId = this.imagesIds[i];
+    if (
+      this.uploadType === WEAVE_IMAGES_TOOL_UPLOAD_TYPE.FILE &&
+      this.imagesFile
+    ) {
+      const imagesToUpload = this.imagesFile.length;
+      let imagesUploaded = 0;
 
-        const result = this.instance.triggerAction<
+      await this.onStartUploading();
+
+      const handleUploadImage = async () => {
+        imagesUploaded++;
+
+        if (imagesUploaded >= imagesToUpload) {
+          await this.onFinishedUploading();
+          this.instance.removeEventListener(
+            'onImageUploaded',
+            handleUploadImage
+          );
+        }
+      };
+
+      this.instance.addEventListener<WeaveImageToolActionOnImageUploadedEvent>(
+        'onImageUploaded',
+        handleUploadImage
+      );
+
+      for (let i = 0; i < this.imagesFile.length; i++) {
+        const imageFile = this.imagesFile[i];
+
+        const { imageId, width, height, ...restImageFile } = imageFile;
+
+        const uploadImageFunctionInternal = async () => {
+          const imageURL = await this.uploadImageFunction(imageFile.file);
+          return imageURL;
+        };
+
+        const { nodeId } = this.instance.triggerAction<
           WeaveImageToolActionTriggerParams,
           WeaveImageToolActionTriggerReturn
         >(
           WEAVE_IMAGE_TOOL_ACTION_NAME,
           {
-            type: 'file',
-            imageFile: file,
-            imageDownscaleRatio: downscaleRatio,
-            imageId: resourceId,
+            type: WEAVE_IMAGE_TOOL_UPLOAD_TYPE.FILE,
+            image: restImageFile,
+            uploadImageFunction: uploadImageFunctionInternal,
+            ...(imageId && { imageId }),
             position: {
               x: imagePositionX,
               y: imagePositionY,
@@ -405,29 +451,16 @@ export class WeaveImagesToolAction extends WeaveAction {
           true
         );
 
-        this.nodesIds.push(result?.nodeId ?? '');
+        this.nodesIds.push(nodeId);
 
-        maxHeight = Math.max(maxHeight, this.imagesSize[i].height);
+        maxHeight = Math.max(maxHeight, height);
 
-        imagePositionX += imagesPadding + this.imagesSize[i].width;
+        imagePositionX += imagesPadding + width;
         if ((i + 1) % layoutColumns === 0) {
           imagePositionX = originPoint.x;
           imagePositionY = imagePositionY + maxHeight + imagesPadding;
           maxHeight = 0;
         }
-
-        const uploadImageFunction = async () => {
-          const data = await this.uploadImageFunction.mutateAsync(file);
-          const room = data.image.roomId;
-          const imageId = data.image.imageId;
-
-          result?.finishUploadCallback?.(
-            result?.nodeId ?? '',
-            `${process.env.NEXT_PUBLIC_API_ENDPOINT}/weavejs/rooms/${room}/images/${imageId}`
-          );
-        };
-
-        uploadImagesPromises.push(uploadImageFunction);
 
         while (
           imageToolActionHandler.getActualState() !==
@@ -437,37 +470,33 @@ export class WeaveImagesToolAction extends WeaveAction {
         }
       }
 
-      const uploadImages = async () => {
-        this.onStartUploading();
-        await Promise.allSettled(uploadImagesPromises.map((fn) => fn()));
-        this.onFinishedUploading();
-      };
-
-      uploadImages();
+      this.instance.emitEvent<WeaveImagesToolActionOnAddedEvent>(
+        'onAddedImages',
+        { nodesIds: this.nodesIds }
+      );
     }
 
     if (
       this.uploadType === WEAVE_IMAGES_TOOL_UPLOAD_TYPE.IMAGE_URL &&
-      this.imagesURLs
+      this.imagesURL
     ) {
-      for (let i = 0; i < this.imagesURLs.length; i++) {
-        const imageURL = this.imagesURLs[i];
-        const imageFallback = this.imagesFallback[i];
-        const imageSize = this.imagesSize[i];
-        const resourceId = this.imagesIds[i];
+      for (let i = 0; i < this.imagesURL.length; i++) {
+        const imageURL = this.imagesURL[i];
 
-        const result = this.instance.triggerAction<
+        const { imageId, options, ...restImageURL } = imageURL;
+
+        const imageURLElement = restImageURL;
+
+        const { nodeId } = this.instance.triggerAction<
           WeaveImageToolActionTriggerParams,
           WeaveImageToolActionTriggerReturn
         >(
           WEAVE_IMAGE_TOOL_ACTION_NAME,
           {
-            type: 'imageURL',
-            imageURL: imageURL,
-            imageFallback: imageFallback,
-            imageWidth: imageSize.width,
-            imageHeight: imageSize.height,
-            imageId: resourceId,
+            type: WEAVE_IMAGE_TOOL_UPLOAD_TYPE.IMAGE_URL,
+            image: imageURLElement,
+            ...(imageId && { imageId }),
+            ...(options && { options }),
             position: {
               x: imagePositionX,
               y: imagePositionY,
@@ -475,14 +504,13 @@ export class WeaveImagesToolAction extends WeaveAction {
             forceMainContainer: this.forceMainContainer,
           },
           true
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        ) as any;
+        );
 
-        this.nodesIds.push(result?.nodeId ?? '');
+        this.nodesIds.push(nodeId);
 
-        maxHeight = Math.max(maxHeight, this.imagesSize[i].height);
+        maxHeight = Math.max(maxHeight, imageURL.height);
 
-        imagePositionX += imagesPadding + this.imagesSize[i].width;
+        imagePositionX += imagesPadding + imageURL.width;
         if ((i + 1) % layoutColumns === 0) {
           imagePositionX = originPoint.x;
           imagePositionY = imagePositionY + maxHeight + imagesPadding;
@@ -496,6 +524,11 @@ export class WeaveImagesToolAction extends WeaveAction {
           await sleep(10);
         }
       }
+
+      this.instance.emitEvent<WeaveImagesToolActionOnAddedEvent>(
+        'onAddedImages',
+        { nodesIds: this.nodesIds }
+      );
     }
 
     this.setState(WEAVE_IMAGES_TOOL_STATE.FINISHED);
@@ -535,15 +568,13 @@ export class WeaveImagesToolAction extends WeaveAction {
       this.onFinishedUploading = params.onFinishedUploading;
       this.uploadImageFunction = params.uploadImageFunction;
       this.nodesIds = [];
-      this.images = params.images;
-      this.imagesDownscaleRatio = params.imagesDownscaleRatio;
+      this.imagesFile = params.images;
     }
 
     if (params.type === WEAVE_IMAGES_TOOL_UPLOAD_TYPE.IMAGE_URL) {
       this.uploadType = WEAVE_IMAGES_TOOL_UPLOAD_TYPE.IMAGE_URL;
       this.nodesIds = [];
-      this.imagesURLs = params.imagesURLs;
-      this.imagesFallback = params.imagesFallback;
+      this.imagesURL = params.images;
     }
 
     if (
@@ -555,9 +586,6 @@ export class WeaveImagesToolAction extends WeaveAction {
       this.cancelAction();
       return;
     }
-
-    this.imagesIds = params.imagesIds;
-    this.imagesSize = params.imagesSize;
 
     this.addImages(params?.position);
   }
@@ -625,46 +653,6 @@ export class WeaveImagesToolAction extends WeaveAction {
     stage.container().tabIndex = 1;
     stage.container().blur();
     stage.container().focus();
-  }
-
-  getImageSizeFromFile(file: File): Promise<{ width: number; height: number }> {
-    return new Promise((resolve, reject) => {
-      const img = new Image();
-      const url = URL.createObjectURL(file);
-
-      img.onload = () => {
-        resolve({
-          width: img.naturalWidth,
-          height: img.naturalHeight,
-        });
-        URL.revokeObjectURL(url);
-      };
-
-      img.onerror = reject;
-      img.src = url;
-    });
-  }
-
-  private loadImageSource(image: File): Promise<HTMLImageElement> {
-    return new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        const imageSource = Konva.Util.createImageElement();
-        imageSource.crossOrigin = 'anonymous';
-        imageSource.onerror = (error) => {
-          reject(error);
-        };
-        imageSource.onload = async () => {
-          resolve(imageSource);
-        };
-
-        imageSource.src = reader.result as string;
-      };
-      reader.onerror = () => {
-        reject(new Error('Failed to read image file'));
-      };
-      reader.readAsDataURL(image);
-    });
   }
 
   private isTouchDevice() {

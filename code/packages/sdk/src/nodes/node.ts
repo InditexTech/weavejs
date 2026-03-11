@@ -23,7 +23,7 @@ import {
   hasFrames,
   mergeExceptArrays,
   moveNodeToContainerNT,
-} from '@/utils';
+} from '@/utils/utils';
 import type { WeaveNodesEdgeSnappingPlugin } from '@/plugins/nodes-edge-snapping/nodes-edge-snapping';
 import { throttle } from 'lodash';
 import type { KonvaEventObject } from 'konva/lib/Node';

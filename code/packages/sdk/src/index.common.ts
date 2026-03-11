@@ -14,7 +14,12 @@ export * from './actions/types';
 
 // Plugin base class and types
 export { WeavePlugin } from './plugins/plugin';
-export * from './utils';
+
+// Public utils
+export * from './utils/utils';
+export * from './utils/image';
+
+// Types
 export * from './types';
 
 // Store

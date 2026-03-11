@@ -14,7 +14,7 @@ import {
   WEAVE_USER_PRESENCE_KEY,
 } from './constants';
 import { WeavePlugin } from '@/plugins/plugin';
-import { mergeExceptArrays } from '@/utils';
+import { mergeExceptArrays } from '@/utils/utils';
 import type { WeaveAwarenessChange } from '@inditextech/weave-types';
 
 export class WeaveUsersPresencePlugin extends WeavePlugin {

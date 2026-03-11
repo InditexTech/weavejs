@@ -10,7 +10,7 @@ import {
 } from '@inditextech/weave-types';
 import { WeaveNode } from '@/nodes/node';
 import { WeaveNodesSelectionPlugin } from '@/plugins/nodes-selection/nodes-selection';
-import { getTopmostShadowHost, isInShadowDOM, resetScale } from '@/utils';
+import { getTopmostShadowHost, isInShadowDOM, resetScale } from '@/utils/utils';
 import {
   TEXT_LAYOUT,
   WEAVE_STAGE_TEXT_EDITION_MODE,

@@ -4,16 +4,16 @@
 
 import Konva from 'konva';
 import mergeWith from 'lodash/mergeWith';
-import type { Weave } from './weave';
 import {
   WEAVE_NODE_CHANGE_TYPE,
   WEAVE_NODE_CUSTOM_EVENTS,
   type WeaveElementInstance,
 } from '@inditextech/weave-types';
-import type { WeaveNode } from './nodes/node';
-import type { WeaveNodesSelectionPlugin } from './plugins/nodes-selection/nodes-selection';
-import type { DOMElement } from './types';
 import type { KonvaEventObject } from 'konva/lib/Node';
+import type { Weave } from '@/weave';
+import type { WeaveNode } from '@/nodes/node';
+import type { WeaveNodesSelectionPlugin } from '@/plugins/nodes-selection/nodes-selection';
+import type { DOMElement } from '@/types';
 
 export function resetScale(node: Konva.Node): void {
   node.width(

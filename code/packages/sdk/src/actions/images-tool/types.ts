@@ -8,6 +8,7 @@ import {
   WEAVE_IMAGES_TOOL_UPLOAD_TYPE,
 } from './constants';
 import Konva from 'konva';
+import type { ImageOptions } from '../image-tool/types';
 
 export type WeaveImagesToolActionUploadTypeKeys =
   keyof typeof WEAVE_IMAGES_TOOL_UPLOAD_TYPE;
@@ -19,6 +20,11 @@ export type WeaveImagesToolActionStateKeys =
 export type WeaveImagesToolActionState =
   (typeof WEAVE_IMAGES_TOOL_STATE)[WeaveImagesToolActionStateKeys];
 
+export type WeaveImagesToolActionOnAddingEvent = undefined;
+export type WeaveImagesToolActionOnAddedEvent = {
+  nodesIds: string[];
+};
+
 export type ImageInfo = {
   imageId: string;
   url: string;
@@ -26,27 +32,46 @@ export type ImageInfo = {
 
 export type WeaveImagesToolActionTriggerCommonParams = {
   position?: Vector2d;
-  forceMainContainer: boolean;
+  forceMainContainer?: boolean;
+};
+
+export type WeaveImagesToolActionInternalUploadFunction = () => Promise<void>;
+export type WeaveImagesToolActionUploadFunction = (
+  file: File
+) => Promise<string>;
+export type WeaveImagesToolActionOnStartUploadingFunction =
+  () => void | Promise<void>;
+export type WeaveImagesToolActionOnFinishedUploadingFunction =
+  () => void | Promise<void>;
+
+export type WeaveImagesFile = {
+  file: File;
+  downscaleRatio: number;
+  width: number;
+  height: number;
+  imageId?: string;
+};
+
+export type WeaveImagesURL = {
+  url: string;
+  fallback: string;
+  width: number;
+  height: number;
+  options?: ImageOptions;
+  imageId?: string;
 };
 
 export type WeaveImagesToolActionTriggerParams = (
   | {
       type: typeof WEAVE_IMAGES_TOOL_UPLOAD_TYPE.FILE;
-      images: File[];
-      imagesSize: { width: number; height: number }[];
-      imagesDownscaleRatio: number[];
-      imagesIds: string[];
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      uploadImageFunction: any;
-      onStartUploading: () => void;
-      onFinishedUploading: () => void;
+      images: WeaveImagesFile[];
+      uploadImageFunction: WeaveImagesToolActionUploadFunction;
+      onStartUploading: WeaveImagesToolActionOnStartUploadingFunction;
+      onFinishedUploading: WeaveImagesToolActionOnFinishedUploadingFunction;
     }
   | {
       type: typeof WEAVE_IMAGES_TOOL_UPLOAD_TYPE.IMAGE_URL;
-      imagesURLs: string[];
-      imagesSize: { width: number; height: number }[];
-      imagesFallback: string[];
-      imagesIds: string[];
+      images: WeaveImagesURL[];
     }
 ) &
   WeaveImagesToolActionTriggerCommonParams;
@@ -85,8 +110,5 @@ export type WeaveImagesToolActionParams = {
 };
 
 export type WeaveImagesToolDragAndDropProperties = {
-  imagesURls: string[];
-  imagesFallback: string[];
-  imagesSize: { width: number; height: number }[];
-  imagesIds: string[];
-};
+  imagesURL: WeaveImagesURL[];
+} & Omit<WeaveImagesToolActionTriggerCommonParams, 'position'>;

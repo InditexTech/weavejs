@@ -3,5 +3,5 @@
 // SPDX-License-Identifier: Apache-2.0
 
 export * from './index.common';
-export * from './utils/mapping';
+export * from './internal-utils/mapping';
 export * from './backend';

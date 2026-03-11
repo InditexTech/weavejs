@@ -7,8 +7,15 @@ description: Add an image to the canvas
 
 ## Introduction
 
-This action allows users to add images to the canvas by selecting a file. Once added,
-the image is rendered as an Image Node, ready for positioning, resizing, and collaboration.
+This action allows users to add images to the canvas by:
+
+- Selecting a file and add it to the canvas on a position of its choice.
+- Drag & Drop an Image from the same application to the canvas and add it to the canvas on a position of its choice.
+- Drag & Drop an external Image to the canvas and add it to the canvas on a position of its choice.
+- Copy / pasting an external Image to the canvas.
+
+Once added, the image is rendered as an Image Node, ready for positioning, resizing,
+and collaboration.
 
 This action supports various image formats: jpeg, gif & png. Ideal for visual
 references, diagrams, or creative content.
@@ -60,12 +67,13 @@ const instance = new Weave({
 Setup on a button or any element on the UI the user can interact with on the action event:
 
 ```ts
-const { nodeId, finishUploadCallback } = instance.triggerAction("imageTool");
+const { nodeId } = instance.triggerAction("imageTool");
 ```
 
 Then select the image to upload (by showcasing a file select to the end user), and when the user
-selects an image, call the `finishUploadCallback`, passing as parameter the URL where the image
-can be accessed.
+selects an image, the user can select where to put the image on the canvas, and when added, the image
+is uploaded asynchronously using the defined `uploadImageFunction` that has the following signature:
+`(file: File) => Promise<string>`.
 
 ---
 
@@ -74,6 +82,11 @@ For example on a button on React:
 ```tsx
 import React from "react";
 import { useWeave } from "@inditextech/weave-react";
+import {
+  WEAVE_IMAGE_TOOL_UPLOAD_TYPE,
+  WeaveImageToolActionTriggerParams,
+  WeaveImageToolActionTriggerReturn,
+} from "@inditextech/weave-sdk";
 
 const MyImageToolTriggerComponent = () => {
   const inputFileRef = React.useRef<any>(null);
@@ -88,20 +101,23 @@ const MyImageToolTriggerComponent = () => {
   }, [instance, showSelectFile]);
 
   const handleUploadFile = React.useCallback(
-    async (file) => {
-      const { nodeID, finishUploadCallback } = instance.triggerAction(
-        "imageTool",
-        {
-          type: WEAVE_IMAGE_TOOL_UPLOAD_TYPE.FILE,
-          imageFile: file,
-          imageDownscaleRatio: 0.1,
+    async (file: File) => {
+      const uploadImageFunction = async (file: File) => {
+        const imageURL = await uploadImage(file);
+        return imageURL;
+      };
+
+      instance.triggerAction<
+        WeaveImageToolActionTriggerParams,
+        WeaveImageToolActionTriggerReturn
+      >("imageTool", {
+        type: WEAVE_IMAGE_TOOL_UPLOAD_TYPE.FILE,
+        image: {
+          file,
+          downscaleRatio,
         },
-      );
-
-      // Upload file to you storage / this is dummy, just an example
-      const imageURL = await uploadImage(file);
-
-      finishUploadCallback(nodeId, imageURL);
+        uploadImageFunction,
+      });
     },
     [instance],
   );
@@ -146,7 +162,7 @@ When active the user:
 
 - Select the image to upload.
 - Image is uploaded with the API the developer choses or has available.
-- Once the image is uploaded, the user can click or touch on the canvas to place it.
+- Once the image is uploaded, the user can click or touch on the canvas to place it where it wants.
 
 Then the image is added to the canvas as a fully functional node—ready.
 This action integrates seamlessly with Weave.js's real-time state system,

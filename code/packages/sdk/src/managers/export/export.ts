@@ -13,7 +13,7 @@ import {
   WEAVE_KONVA_BACKEND,
 } from '@inditextech/weave-types';
 import Konva from 'konva';
-import { getExportBoundingBox } from '@/utils';
+import { getExportBoundingBox } from '@/utils/utils';
 import type { WeaveNodesSelectionPlugin } from '@/plugins/nodes-selection/nodes-selection';
 import { WEAVE_NODES_SELECTION_KEY } from '@/plugins/nodes-selection/constants';
 import type { WeaveStageGridPlugin } from '@/plugins/stage-grid/stage-grid';

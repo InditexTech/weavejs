@@ -20,8 +20,8 @@ import {
 } from './constants';
 import { WeaveNodesSelectionPlugin } from '@/plugins/nodes-selection/nodes-selection';
 import { SELECTION_TOOL_ACTION_NAME } from '../selection-tool/constants';
-import { mergeExceptArrays } from '@/utils';
-import { GreedySnapper } from '@/utils/greedy-snapper';
+import { mergeExceptArrays } from '@/utils/utils';
+import { GreedySnapper } from '@/internal-utils/greedy-snapper';
 import type { WeaveStrokeSingleNode } from '@/nodes/stroke-single/stroke-single';
 import { WEAVE_STROKE_SINGLE_NODE_TYPE } from '@/nodes/stroke-single/constants';
 

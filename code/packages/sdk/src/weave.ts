@@ -66,7 +66,7 @@ import {
   getBoundingBox,
   getExportBoundingBox,
   mergeExceptArrays,
-} from './utils';
+} from './utils/utils';
 import { WeaveAsyncManager } from './managers/async/async';
 import { WeaveHooksManager } from './managers/hooks';
 import { WeaveUsersManager } from './managers/users/users';

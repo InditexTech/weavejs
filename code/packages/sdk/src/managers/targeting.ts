@@ -10,7 +10,7 @@ import type {
   WeaveMousePointInfoSimple,
 } from '@inditextech/weave-types';
 import type { WeaveNodesSelectionPlugin } from '@/plugins/nodes-selection/nodes-selection';
-import { getBoundingBox } from '@/utils';
+import { getBoundingBox } from '@/utils/utils';
 
 export class WeaveTargetingManager {
   private instance: Weave;
