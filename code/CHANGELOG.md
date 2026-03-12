@@ -15,7 +15,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- [969](https://github.com/InditexTech/weavejs/issues/969) New tool to upload multiple images
+- [#969](https://github.com/InditexTech/weavejs/issues/969) New tool to upload multiple images
 
 ### Changed
 
@@ -25,7 +25,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- [964](https://github.com/InditexTech/weavejs/issues/964) New smart layout and UX for the Text Node
+- [#964](https://github.com/InditexTech/weavejs/issues/964) New smart layout and UX for the Text Node
 
 ### Fixed
 

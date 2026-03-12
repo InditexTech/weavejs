@@ -93,6 +93,7 @@ export class WeaveBrushToolAction extends WeaveAction {
         e.code === 'Enter' &&
         this.instance.getActiveAction() === BRUSH_TOOL_ACTION_NAME
       ) {
+        e.stopPropagation();
         this.cancelAction();
         return;
       }
@@ -100,6 +101,7 @@ export class WeaveBrushToolAction extends WeaveAction {
         e.code === 'Space' &&
         this.instance.getActiveAction() === BRUSH_TOOL_ACTION_NAME
       ) {
+        e.stopPropagation();
         this.isSpacePressed = true;
         return;
       }
@@ -107,6 +109,7 @@ export class WeaveBrushToolAction extends WeaveAction {
         e.code === 'Escape' &&
         this.instance.getActiveAction() === BRUSH_TOOL_ACTION_NAME
       ) {
+        e.stopPropagation();
         this.cancelAction();
       }
     });

@@ -975,7 +975,7 @@ export class WeaveImageNode extends WeaveNode {
             }, this.config.imageLoading.retryDelayMs);
           }
 
-          if (loadTryout && this.imageTryoutIds[id]) {
+          if (useFallback && loadTryout && this.imageTryoutIds[id]) {
             clearTimeout(this.imageTryoutIds[id]);
             delete this.imageTryoutIds[id];
           }
