@@ -31,17 +31,15 @@ import { WEAVE_STAGE_DEFAULT_MODE } from '../stage/constants';
 import { mergeExceptArrays } from '@/utils/utils';
 
 export class WeaveImageNode extends WeaveNode {
-  private config: WeaveImageProperties;
+  protected config: WeaveImageProperties;
   protected imageBitmapCache: Record<string, ImageBitmap> = {};
   protected imageSource: Record<string, HTMLImageElement> = {};
   protected imageFallback: Record<string, HTMLImageElement> = {};
   protected imageState: Record<string, WeaveImageState> = {};
   protected imageTryoutAttempts: Record<string, number> = {};
+  protected imageTryoutIds: Record<string, NodeJS.Timeout> = {};
   protected tapStart: { x: number; y: number; time: number } | null;
-  protected lastTapTime: number;
-  protected imageIconSource: HTMLImageElement | null = null;
-  private imageCrop!: WeaveImageCrop | null;
-  private tryoutTimeoutId: NodeJS.Timeout | null;
+  protected imageCrop!: WeaveImageCrop | null;
   protected nodeType: string = WEAVE_IMAGE_NODE_TYPE;
 
   constructor(params?: WeaveImageNodeParams) {
@@ -50,14 +48,13 @@ export class WeaveImageNode extends WeaveNode {
     const { config } = params ?? {};
 
     this.tapStart = { x: 0, y: 0, time: 0 };
-    this.lastTapTime = 0;
     this.config = mergeExceptArrays(WEAVE_IMAGE_DEFAULT_CONFIG, config);
 
     this.imageCrop = null;
-    this.tryoutTimeoutId = null;
     this.imageBitmapCache = {};
     this.imageSource = {};
     this.imageState = {};
+    this.imageTryoutIds = {};
     this.imageTryoutAttempts = {};
     this.imageFallback = {};
   }
@@ -962,7 +959,7 @@ export class WeaveImageNode extends WeaveNode {
       {
         onLoad: () => {
           if (useFallback) {
-            this.tryoutTimeoutId = setTimeout(() => {
+            this.imageTryoutIds[id] = setTimeout(() => {
               const node = this.instance.getStage().findOne(`#${id}`);
 
               if (node) {
@@ -978,9 +975,9 @@ export class WeaveImageNode extends WeaveNode {
             }, this.config.imageLoading.retryDelayMs);
           }
 
-          if (loadTryout && this.tryoutTimeoutId) {
-            clearTimeout(this.tryoutTimeoutId);
-            this.tryoutTimeoutId = null;
+          if (loadTryout && this.imageTryoutIds[id]) {
+            clearTimeout(this.imageTryoutIds[id]);
+            delete this.imageTryoutIds[id];
           }
 
           if (image && internalImage) {
@@ -1068,7 +1065,7 @@ export class WeaveImageNode extends WeaveNode {
         },
         onError: (error) => {
           if (!this.config.useFallbackImage) {
-            this.tryoutTimeoutId = setTimeout(() => {
+            this.imageTryoutIds[id] = setTimeout(() => {
               const node = this.instance.getStage().findOne(`#${id}`);
 
               if (node) {
@@ -1087,7 +1084,7 @@ export class WeaveImageNode extends WeaveNode {
           if (loadTryout) {
             const tryoutAttempts = this.imageTryoutAttempts[id] ?? 0;
             if (tryoutAttempts < this.config.imageLoading.maxRetryAttempts) {
-              this.tryoutTimeoutId = setTimeout(() => {
+              this.imageTryoutIds[id] = setTimeout(() => {
                 const node = this.instance.getStage().findOne(`#${id}`);
                 if (node) {
                   this.imageTryoutAttempts[id] = tryoutAttempts + 1;
@@ -1334,9 +1331,9 @@ export class WeaveImageNode extends WeaveNode {
     const nodeId = nodeInstance.getAttrs().id ?? '';
     const node = this.instance.getStage().findOne(`#${nodeId}`);
 
-    if (this.tryoutTimeoutId) {
-      clearTimeout(this.tryoutTimeoutId);
-      this.tryoutTimeoutId = null;
+    if (this.imageTryoutIds[nodeId]) {
+      clearTimeout(this.imageTryoutIds[nodeId]);
+      delete this.imageTryoutIds[nodeId];
     }
 
     if (node) {
