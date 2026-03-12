@@ -2,8 +2,6 @@
 name: code-npm-publish-release-and-snapshot
 run-name: "Publish workflow: ${{ github.event_name }}"
 
-concurrency: code-publish-${{ github.ref }}
-
 on:
   issue_comment:
     types: [created]
@@ -29,15 +27,15 @@ on:
           - "release-type/minor"
           - "release-type/patch"
 
-permissions:
-  id-token: write
-  contents: write
-  issues: write
-  pull-requests: write
-
 jobs:
   publish-snapshot:
     name: Publish Snapshot
+    concurrency: code-publish-snapshot-${{ github.ref }}
+    permissions:
+      id-token: write
+      contents: read
+      issues: write
+      pull-requests: write
     if: >
       github.event_name == 'issue_comment' &&
       github.event.issue.pull_request != null &&
@@ -131,6 +129,10 @@ jobs:
           echo "registry=${NPM_REGISTRY}" >> /home/runner/.npmrc
           echo "@inditextech:registry=${NPM_REGISTRY}" >> /home/runner/.npmrc
 
+      - name: NPM / Create Cache Folders
+        run: |
+          mkdir -p "$HOME"/.npm
+
       - name: Setup patch release type version
         if: contains(env.RELEASE_LABELS, 'release-type/hotfix')
           || contains(env.RELEASE_LABELS, 'release-type/multi-hotfix')
@@ -180,6 +182,7 @@ jobs:
       - name: NPM / Publish Snapshot - Distribution Platform
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NPM_CONFIG_PROVENANCE: "false"
         working-directory: code
         run: |
           npm run publish:snapshot
@@ -213,6 +216,12 @@ jobs:
 
   release:
     name: Release
+    concurrency: code-release-${{ github.ref }}
+    permissions:
+      id-token: write
+      contents: write
+      issues: write
+      pull-requests: write
     if: github.event_name == 'workflow_dispatch'
       || (github.event_name == 'pull_request' && github.event.pull_request.merged == true
       && !contains(join(github.event.pull_request.labels.*.name, ', '), 'skip-release')
