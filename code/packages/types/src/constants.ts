@@ -92,6 +92,7 @@ export const WEAVE_KONVA_BACKEND = {
 } as const;
 
 export const WEAVE_ASYNC_STATUS = {
+  ['NOT_LOADED']: 'not-loaded',
   ['LOADING']: 'loading',
   ['LOADED']: 'loaded',
 };

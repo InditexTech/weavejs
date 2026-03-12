@@ -27,9 +27,21 @@ export class WeaveStoreStandalone extends WeaveStore {
     this.initialState = initialState ?? defaultInitialState;
   }
 
+  private snapshotToJSON(roomDataSnapshot: Uint8Array) {
+    const tempDoc = new Y.Doc();
+
+    Y.applyUpdate(tempDoc, roomDataSnapshot);
+    const actualStateString = JSON.stringify(tempDoc.getMap('weave').toJSON());
+    const actualStateJson = JSON.parse(actualStateString);
+
+    return actualStateJson;
+  }
+
   async connect(): Promise<void> {
     if (this.roomData) {
       const roomDataSnapshot = Buffer.from(this.roomData, 'base64');
+      const json = this.snapshotToJSON(roomDataSnapshot);
+      this.instance.checkForAsyncElements(json);
       Y.applyUpdate(this.getDocument(), roomDataSnapshot);
     } else {
       this.initialState(this.getDocument());
