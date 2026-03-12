@@ -1,10 +1,12 @@
 ---
-name: code-npm-release
-run-name: "Release labeled ${{ inputs.RELEASE_TYPE || 'in PR' }}"
+name: code-npm-publish-release-and-snapshot
+run-name: "Publish workflow: ${{ github.event_name }}"
 
-concurrency: code-release-${{ github.ref }}
+concurrency: code-publish-${{ github.ref }}
 
 on:
+  issue_comment:
+    types: [created]
   pull_request:
     types: [closed]
     branches: ["main", "main-*"]
@@ -27,14 +29,193 @@ on:
           - "release-type/minor"
           - "release-type/patch"
 
-# permissions:
-#   id-token: write # Required for OIDC
+permissions:
+  id-token: write
+  contents: write
+  issues: write
+  pull-requests: write
 
 jobs:
+  publish-snapshot:
+    name: Publish Snapshot
+    if: >
+      github.event_name == 'issue_comment' &&
+      github.event.issue.pull_request != null &&
+      github.event.comment.body == '/publish-snapshot'
+    runs-on: ubuntu-24.04
+    env:
+      ASDF_BRANCH_VERSION: 0.18.0
+    steps:
+      - name: Validate admin permissions
+        id: permission-check
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const { data } = await github.rest.repos.getCollaboratorPermissionLevel({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              username: context.actor
+            });
+
+            const permission = data.permission;
+            core.info(`User permission level: ${permission}`);
+
+            if (permission !== 'admin') {
+              core.setFailed(`User @${context.actor} is not a repository admin.`);
+            }
+
+      - name: Get input parameters
+        run: |
+          RELEASE_LABELS="${{ join(github.event.issue.labels.*.name, ', ') }}"
+          if [[ $RELEASE_LABELS != *release-type/* ]]; then
+            RELEASE_LABELS="$RELEASE_LABELS, release-type/minor"
+          fi
+          echo "RELEASE_LABELS=$RELEASE_LABELS" >> "$GITHUB_ENV"
+
+      - name: Checkout PR branch
+        uses: actions/checkout@v4
+        with:
+          ref: refs/pull/${{ github.event.issue.number }}/head
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: NPM / Setup Dependencies Cache
+        uses: actions/cache@v4
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-node-${{ hashFiles('code/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-
+
+      - name: Setup asdf Cache
+        id: asdf-cache
+        uses: actions/cache@v4
+        continue-on-error: true
+        with:
+          path: ~/.asdf
+          key: ${{ runner.os }}-asdf-${{ env.ASDF_BRANCH_VERSION }}-${{ hashFiles('code/.tool-versions') }}
+
+      - name: Save tool-versions content
+        run: |
+          {
+            echo "TOOL_VERSIONS<<EOF"
+            cat code/.tool-versions
+            echo "EOF"
+          } >> "$GITHUB_ENV"
+
+      - name: Setup asdf environment
+        uses: asdf-vm/actions/install@1902764435ca0dd2f3388eea723a4f92a4eb8302 # v4.0.0
+        with:
+          tool_versions: ${{ env.TOOL_VERSIONS }}
+          asdf_version: ${{ env.ASDF_BRANCH_VERSION }}
+
+      - name: NPM / Ensure minimum npm version for trusted publishing
+        run: |
+          CURRENT_NPM=$(npm --version)
+          REQUIRED_NPM="11.5.1"
+          if printf '%s\n%s\n' "$REQUIRED_NPM" "$CURRENT_NPM" | sort -V -C; then
+            echo "npm $CURRENT_NPM already meets the minimum requirement ($REQUIRED_NPM). Skipping upgrade."
+          else
+            echo "npm $CURRENT_NPM is below the minimum requirement ($REQUIRED_NPM). Upgrading…"
+            npm install -g npm@^11.5.1 --registry="https://registry.npmjs.org/"
+          fi
+          echo "node path: $(command -v node)"
+          echo "npm path: $(command -v npm)"
+          node --version
+          npm --version
+
+      - name: NPM / Set npmrc registry
+        env:
+          NPM_REGISTRY: "https://registry.npmjs.org/"
+        run: |
+          echo "registry=${NPM_REGISTRY}" >> /home/runner/.npmrc
+          echo "@inditextech:registry=${NPM_REGISTRY}" >> /home/runner/.npmrc
+
+      - name: Setup patch release type version
+        if: contains(env.RELEASE_LABELS, 'release-type/hotfix')
+          || contains(env.RELEASE_LABELS, 'release-type/multi-hotfix')
+          || contains(env.RELEASE_LABELS, 'release-type/patch')
+        run: echo "RELEASE_VERSION=patch" >> "$GITHUB_ENV"
+
+      - name: Setup minor release type version
+        if: contains(env.RELEASE_LABELS, 'release-type/minor')
+        run: echo "RELEASE_VERSION=minor" >> "$GITHUB_ENV"
+
+      - name: Setup minor release type version when no label set and TBD
+        if: ${{ !contains(env.RELEASE_LABELS, 'release-type') && vars.DEVELOPMENT_FLOW == 'trunk-based-development' }}
+        run: echo "RELEASE_VERSION=minor" >> "$GITHUB_ENV"
+
+      - name: Setup major release type version
+        if: contains(env.RELEASE_LABELS, 'release-type/major')
+        run: echo "RELEASE_VERSION=major" >> "$GITHUB_ENV"
+
+      - name: Update CHANGELOG.md
+        id: update-changelog
+        uses: release-flow/keep-a-changelog-action@v3.0.0
+        with:
+          command: bump
+          version: ${{ env.RELEASE_VERSION }}
+          changelog: code/CHANGELOG.md
+          fail-on-empty-release-notes: false
+          keep-unreleased-section: true
+          tag-prefix: ""
+
+      - name: Define snapshot version
+        working-directory: code
+        env:
+          RELEASE_VERSION: ${{ steps.update-changelog.outputs.version }}
+        run: |
+          CLEAN_VERSION=$(echo "$RELEASE_VERSION" | sed -E 's/-.*$//')
+          PRE_RELEASE_VERSION="${CLEAN_VERSION}-SNAPSHOT.${{ github.run_number }}.${{ github.run_attempt }}"
+          echo "SNAPSHOT_VERSION=$PRE_RELEASE_VERSION" >> "$GITHUB_ENV"
+
+      - name: NPM / Prepare snapshot
+        working-directory: code
+        env:
+          RELEASE_VERSION: ${{ env.SNAPSHOT_VERSION }}
+        run: |
+          npm run version:release
+          npm run release:prepare
+
+      - name: NPM / Publish Snapshot - Distribution Platform
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        working-directory: code
+        run: |
+          npm run publish:snapshot
+
+      - name: Result / Comment on PR
+        if: always()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const status = '${{ job.status }}';
+
+            const body = status === 'success'
+              ? [
+                  "✅ Pre-release published successfully.",
+                  "",
+                  `- Version: \`${process.env.SNAPSHOT_VERSION}\``,
+                  "- Tag: `next`"
+                ]
+              : [
+                  "❌ Pre-release publish failed.",
+                  "",
+                  "Please check the workflow logs for details."
+                ]
+
+            await github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: body.join("\n")
+            });
+
   release:
     name: Release
     if: github.event_name == 'workflow_dispatch'
-      || (github.event.pull_request.merged == true && !contains(join(github.event.pull_request.labels.*.name, ', '), 'skip-release')
+      || (github.event_name == 'pull_request' && github.event.pull_request.merged == true
+      && !contains(join(github.event.pull_request.labels.*.name, ', '), 'skip-release')
       && (contains(join(github.event.pull_request.labels.*.name, ', '), 'release-type')
       || vars.DEVELOPMENT_FLOW == 'trunk-based-development' ))
     runs-on: ubuntu-24.04
@@ -80,18 +261,6 @@ jobs:
           fetch-depth: 0
           persist-credentials: false
 
-      # - name: Check if CHANGELOG.md has changes
-      #   env:
-      #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      #   run: |
-      #     if git diff --quiet HEAD^ HEAD -- code/CHANGELOG.md; then
-      #       echo "::error title={No CHANGELOG.md changes}::{No CHANGELOG.md changes were found. Update the UNRELEASED section with the new changes.}"
-      #       gh pr comment ${{ github.event.number }} --body "
-      #     ### :x: No changes in the \`CHANGELOG.md\` file
-      #     No changes were found in the \`CHANGELOG.md\` file. Please, update the UNRELEASED section, listing the new changes that applies to this release."
-      #       exit 1
-      #     fi
-
       - name: NPM / Setup Dependencies Cache
         uses: actions/cache@v4
         with:
@@ -118,21 +287,31 @@ jobs:
 
       - name: Setup asdf environment
         uses: asdf-vm/actions/install@1902764435ca0dd2f3388eea723a4f92a4eb8302 # v4.0.0
-        # https://github.com/asdf-vm/actions/issues/356
-        if: steps.asdf-cache.outputs.cache-hit != 'true'
         with:
           tool_versions: ${{ env.TOOL_VERSIONS }}
           asdf_version: ${{ env.ASDF_BRANCH_VERSION }}
 
-      - name: NPM / Set npmrc
+      - name: NPM / Ensure minimum npm version for trusted publishing
+        run: |
+          CURRENT_NPM=$(npm --version)
+          REQUIRED_NPM="11.5.1"
+          if printf '%s\n%s\n' "$REQUIRED_NPM" "$CURRENT_NPM" | sort -V -C; then
+            echo "npm $CURRENT_NPM already meets the minimum requirement ($REQUIRED_NPM). Skipping upgrade."
+          else
+            echo "npm $CURRENT_NPM is below the minimum requirement ($REQUIRED_NPM). Upgrading…"
+            npm install -g npm@^11.5.1 --registry="https://registry.npmjs.org/"
+          fi
+          echo "node path: $(command -v node)"
+          echo "npm path: $(command -v npm)"
+          node --version
+          npm --version
+
+      - name: NPM / Set npmrc registry
         env:
-          NPM_AUTH: ${{ secrets.NPM_TOKEN }}
           NPM_REGISTRY: "https://registry.npmjs.org/"
         run: |
           echo "registry=${NPM_REGISTRY}" >> /home/runner/.npmrc
           echo "@inditextech:registry=${NPM_REGISTRY}" >> /home/runner/.npmrc
-          echo "//registry.npmjs.org/:_authToken=${NPM_AUTH}" >> /home/runner/.npmrc
-          echo "always-auth=true" >> /home/runner/.npmrc
 
       - name: NPM / Create Cache Folders
         run: |
@@ -156,19 +335,35 @@ jobs:
         if: contains(env.RELEASE_LABELS, 'release-type/major')
         run: echo "RELEASE_VERSION=major" >> "$GITHUB_ENV"
 
-      - name: Prepare committer information and set GPG key
+      - name: Prepare committer information
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          SCM_COMMITTER_PGP_KEY: ${{ secrets.CI_GPG_SECRET_KEY }}
+          GPG_PRIVATE_KEY: ${{ secrets.CI_GPG_SECRET_KEY }}
+          GPG_PASSPHRASE: ${{ secrets.CI_GPG_SECRET_KEY_PASSWORD }}
         run: |
           git config --global credential.helper store
           cat <<EOT >> ~/.git-credentials
           https://ci-user:$GITHUB_TOKEN@github.com
           EOT
 
-          echo "$SCM_COMMITTER_PGP_KEY" | gpg --batch --import
-          git config user.name "InditexTech CI"
+          # GPG: non-interactive signing setup
+          mkdir -p ~/.gnupg && chmod 700 ~/.gnupg
+          printf 'allow-loopback-pinentry\nallow-preset-passphrase\n' > ~/.gnupg/gpg-agent.conf
+          printf 'use-agent\npinentry-mode loopback\n' > ~/.gnupg/gpg.conf
+          gpgconf --kill gpg-agent || true
+          echo "$GPG_PRIVATE_KEY" | gpg --batch --import
+          KEY_DATA=$(gpg --list-secret-keys --with-colons)
+          echo "$KEY_DATA" | awk -F: '/^grp:/ {print $10}' | while read -r GRIP; do
+            /usr/lib/gnupg/gpg-preset-passphrase --preset "$GRIP" <<< "$GPG_PASSPHRASE"
+          done
+
+          # Git: identity and signing
+          FPR=$(echo "$KEY_DATA" | awk -F: '/^fpr:/ {print $10; exit}')
+          git config user.name "srvcosoitxtech"
           git config user.email "oso@inditex.com"
+          git config user.signingkey "$FPR"
+          git config commit.gpgsign true
+          git config tag.gpgsign true
 
       - name: Update CHANGELOG.md
         id: update-changelog
@@ -192,10 +387,11 @@ jobs:
       - name: NPM / Release Perform - Distribution Platform
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+          NPM_CONFIG_PROVENANCE: "false"
         working-directory: code
         run: |
-          npm run release:perform
+          set -o pipefail
+          npm run release:perform 2>&1 | tee /tmp/release-perform.log
 
       - name: Release / Commit and Tag
         env:
@@ -203,8 +399,8 @@ jobs:
         working-directory: code
         run: |
           git commit -i CHANGELOG.md -m "chore: Update CHANGELOG with ${{ steps.update-changelog.outputs.version }} version" --no-verify
-          git commit -i package.json package-lock.json -m "[npm-scripts] Release ${{ steps.update-changelog.outputs.version }}" --no-verify
-          git tag ${{ steps.update-changelog.outputs.version }}
+          git commit -i package.json package-lock.json packages/*/package.json -m "[npm-scripts] Release ${{ steps.update-changelog.outputs.version }}" --no-verify
+          git tag -a -m "Release ${{ steps.update-changelog.outputs.version }}" ${{ steps.update-changelog.outputs.version }}
           git push --atomic --no-verify origin HEAD ${{ steps.update-changelog.outputs.version }}
 
       - name: NPM / Set next development version
@@ -217,7 +413,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         working-directory: code
         run: |
-          git commit -i package.json package-lock.json -m "[npm-scripts] prepare for next development iteration" --no-verify
+          git commit -i package.json package-lock.json packages/*/package.json -m "[npm-scripts] prepare for next development iteration" --no-verify
           git push --no-verify origin HEAD
 
       - name: Next Development Iteration / Create Sync Branch PR into Develop
