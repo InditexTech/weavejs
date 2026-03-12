@@ -21,6 +21,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - [#968](https://github.com/InditexTech/weavejs/issues/968) Improve API and UX of the Image Tool
 
+### Fixed
+
+- [#972](https://github.com/InditexTech/weavejs/issues/972) Avoid race conditions on Standalone Store with async elements
+
 ## [3.1.0] - 2026-03-06
 
 ### Added

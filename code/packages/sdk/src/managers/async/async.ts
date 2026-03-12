@@ -29,16 +29,17 @@ export class WeaveAsyncManager {
     this.asyncElements = watchMap<string, WeaveAsyncElement>(() => {
       this.instance.emitEvent('onAsyncElementChange');
     }, new Map());
+  }
 
-    this.instance.addEventListener('onRoomLoaded', (isRoomLoaded) => {
-      if (!isRoomLoaded) return;
-
-      const roomHasResourcesToLoad = this.roomHasResourcesToLoad();
-      if (!roomHasResourcesToLoad && !this.asyncElementsLoadedEventEmitted) {
-        this.instance.emitEvent('onAsyncElementsLoaded');
-        this.asyncElementsLoadedEventEmitted = true;
-      }
-    });
+  checkForAsyncElements(elements?: WeaveState): void {
+    const amountAsyncResourcesExtracted = this.extractAsyncResources(elements);
+    if (
+      amountAsyncResourcesExtracted === 0 &&
+      !this.asyncElementsLoadedEventEmitted
+    ) {
+      this.instance.emitEvent('onAsyncElementsLoaded');
+      this.asyncElementsLoadedEventEmitted = true;
+    }
   }
 
   private extractAsyncElements(state: WeaveState): WeaveStateElement[] {
@@ -75,13 +76,31 @@ export class WeaveAsyncManager {
     return asyncElements;
   }
 
-  private roomHasResourcesToLoad(): boolean {
+  private extractAsyncResources(elements?: WeaveState): number {
     const roomData = this.instance.getStore().getState();
-    const jsonRoomData = JSON.parse(JSON.stringify(roomData));
+    let jsonRoomData = JSON.parse(JSON.stringify(roomData));
+
+    if (elements) {
+      jsonRoomData = elements;
+    }
 
     const asyncElements = this.extractAsyncElements(jsonRoomData);
 
-    return asyncElements.length > 0;
+    for (const element of asyncElements) {
+      const elementId = element.props?.id;
+      if (!elementId) {
+        continue;
+      }
+
+      if (!this.asyncElements.has(elementId)) {
+        this.asyncElements.set(elementId, {
+          type: element.type,
+          status: WEAVE_ASYNC_STATUS.NOT_LOADED,
+        });
+      }
+    }
+
+    return asyncElements.length;
   }
 
   public asyncElementsLoaded(): boolean {
