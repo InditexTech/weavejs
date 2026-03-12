@@ -116,7 +116,7 @@ jobs:
             echo "npm $CURRENT_NPM already meets the minimum requirement ($REQUIRED_NPM). Skipping upgrade."
           else
             echo "npm $CURRENT_NPM is below the minimum requirement ($REQUIRED_NPM). Upgrading…"
-            npm install -g npm@^11.5.1 --registry="https://registry.npmjs.org/"
+            sudo npm install -g npm@^11.5.1 --registry="https://registry.npmjs.org/"
           fi
           echo "node path: $(command -v node)"
           echo "npm path: $(command -v npm)"
@@ -310,7 +310,7 @@ jobs:
             echo "npm $CURRENT_NPM already meets the minimum requirement ($REQUIRED_NPM). Skipping upgrade."
           else
             echo "npm $CURRENT_NPM is below the minimum requirement ($REQUIRED_NPM). Upgrading…"
-            npm install -g npm@^11.5.1 --registry="https://registry.npmjs.org/"
+            sudo npm install -g npm@^11.5.1 --registry="https://registry.npmjs.org/"
           fi
           echo "node path: $(command -v node)"
           echo "npm path: $(command -v npm)"
