@@ -103,6 +103,7 @@ jobs:
 
       - name: Setup asdf environment
         uses: asdf-vm/actions/install@1902764435ca0dd2f3388eea723a4f92a4eb8302 # v4.0.0
+        if: steps.asdf-cache.outputs.cache-hit != 'true'
         with:
           tool_versions: ${{ env.TOOL_VERSIONS }}
           asdf_version: ${{ env.ASDF_BRANCH_VERSION }}
@@ -296,6 +297,7 @@ jobs:
 
       - name: Setup asdf environment
         uses: asdf-vm/actions/install@1902764435ca0dd2f3388eea723a4f92a4eb8302 # v4.0.0
+        if: steps.asdf-cache.outputs.cache-hit != 'true'
         with:
           tool_versions: ${{ env.TOOL_VERSIONS }}
           asdf_version: ${{ env.ASDF_BRANCH_VERSION }}
@@ -445,7 +447,7 @@ jobs:
               --body "**Automated Pull Request**"
           fi
 
-      - name: Github Release / Create
+      - name: GitHub Release / Create
         uses: ncipollo/release-action@2c591bcc8ecdcd2db72b97d6147f871fcd833ba5
         id: github-release
         continue-on-error: true
@@ -474,7 +476,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: >
-          gh pr comment ${{ github.event.number }} --body "An error occurred creating the Github Release.
+          gh pr comment ${{ github.event.number }} --body "An error occurred creating the GitHub Release.
           Don't panic! Your artifacts were successfully uploaded to the InditexTech npmjs registry and the new release tag was created.
           You can manually complete the release by creating it in the [releases](https://github.com/${{ github.repository }}/releases)
           page."
