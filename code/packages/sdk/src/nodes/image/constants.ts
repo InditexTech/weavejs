@@ -35,6 +35,9 @@ export const WEAVE_IMAGE_DEFAULT_CONFIG: WeaveImageProperties = {
     placeholder: {
       fill: '#aaaaaa',
     },
+    cursor: {
+      loading: 'wait',
+    },
   },
   imageLoading: {
     maxRetryAttempts: 15,

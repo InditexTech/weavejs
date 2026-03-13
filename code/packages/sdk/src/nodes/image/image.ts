@@ -59,11 +59,63 @@ export class WeaveImageNode extends WeaveNode {
     this.imageFallback = {};
   }
 
+  preloadCursors() {
+    return new Promise<void>((resolve) => {
+      (async () => {
+        const cursors = Object.keys(this.config.style.cursor);
+
+        const cursorUrls = [];
+
+        const cursorFallback = {
+          loading: 'wait',
+        };
+
+        for (const cursorKey of cursors) {
+          const cursorValue =
+            this.config.style.cursor[
+              cursorKey as keyof typeof this.config.style.cursor
+            ];
+
+          const { preload, cursor } = this.extractCursorUrl(
+            cursorValue,
+            cursorFallback[cursorKey as keyof typeof cursorFallback]
+          );
+
+          if (preload) {
+            cursorUrls.push({
+              src: cursor,
+            });
+          }
+        }
+
+        if (cursorUrls.length > 0) {
+          const promises = cursorUrls.map(({ src }) => {
+            new Promise<void>((resolveInt, rejectInt) => {
+              const img = Konva.Util.createImageElement();
+              img.onload = () => {
+                resolveInt();
+              };
+              img.onerror = () => {
+                rejectInt();
+              };
+              img.src = src;
+            });
+          });
+
+          await Promise.allSettled(promises);
+        }
+
+        resolve();
+      })();
+    });
+  }
+
   getConfiguration(): WeaveImageProperties {
     return this.config;
   }
 
-  onRegister(): void {
+  async onRegister(): Promise<void> {
+    await this.preloadCursors();
     this.logger.info(
       `image caching enabled: ${this.config.performance.cache.enabled}`
     );
@@ -221,7 +273,7 @@ export class WeaveImageNode extends WeaveNode {
 
     image.defineMousePointer = () => {
       if (this.imageState[id]?.status === 'loading') {
-        return 'wait';
+        return this.config.style.cursor.loading;
       }
 
       const selectedNodes = this.getSelectionPlugin()?.getSelectedNodes() ?? [];
@@ -895,6 +947,9 @@ export class WeaveImageNode extends WeaveNode {
     };
 
     this.imageSource[imageId].onload = async () => {
+      const stage = this.instance.getStage();
+      stage.container().style.cursor = 'pointer';
+
       this.imageState[imageId] = {
         status: 'loaded',
         loaded: true,
@@ -1039,16 +1094,7 @@ export class WeaveImageNode extends WeaveNode {
               });
             }
 
-            const stage = this.instance.getStage();
-
             if (!loadFallback) {
-              if (
-                !this.instance.isServerSide() &&
-                stage.container().style.cursor === 'wait'
-              ) {
-                stage.container().style.cursor = 'pointer';
-              }
-
               this.imageState[id] = {
                 status: 'loaded',
                 loaded: true,
@@ -1154,19 +1200,6 @@ export class WeaveImageNode extends WeaveNode {
       return;
     }
 
-    if (!imageAttrs.adding && imageAttrs.cropInfo) {
-      const actualScale =
-        imageAttrs.uncroppedImage.width / imageAttrs.imageInfo.width;
-      const cropScale = imageAttrs.cropInfo
-        ? imageAttrs.cropInfo.scaleX
-        : actualScale;
-      imagePlaceholder.width(
-        imageAttrs.cropSize.width * (actualScale / cropScale)
-      );
-      imagePlaceholder.height(
-        imageAttrs.cropSize.height * (actualScale / cropScale)
-      );
-    }
     if (!imageAttrs.adding && !imageAttrs.cropInfo) {
       imagePlaceholder.width(imageAttrs.uncroppedImage.width);
       imagePlaceholder.height(imageAttrs.uncroppedImage.height);
@@ -1348,5 +1381,76 @@ export class WeaveImageNode extends WeaveNode {
     delete this.imageTryoutAttempts[nodeId];
     delete this.imageFallback[nodeId];
     nodeInstance.destroy();
+  }
+
+  extractCursorUrl(
+    cursor: string,
+    fallback: string
+  ): { preload: boolean; cursor: string } {
+    const lower = cursor.toLowerCase();
+    const start = lower.indexOf('url(');
+    if (start === -1)
+      return {
+        preload: false,
+        cursor,
+      };
+
+    // slice inside url(...)
+    let i = start + 4; // after "url("
+    const len = cursor.length;
+
+    // skip whitespace
+    while (i < len && /\s/.test(cursor[i])) i++;
+
+    let quote: string | null = null;
+    if (cursor[i] === '"' || cursor[i] === "'") {
+      quote = cursor[i];
+      i++;
+    }
+
+    let buf = '';
+    for (; i < len; i++) {
+      const ch = cursor[i];
+      if (quote) {
+        if (ch === quote) {
+          i++; // consume closing quote
+          break;
+        }
+        buf += ch;
+      } else {
+        if (ch === ')') break;
+        buf += ch;
+      }
+    }
+
+    const url = buf.trim();
+    if (!url)
+      return {
+        preload: false,
+        cursor: fallback,
+      };
+
+    if (!this.isAllowedUrl(url)) {
+      return {
+        preload: false,
+        cursor: fallback,
+      };
+    }
+
+    return {
+      preload: true,
+      cursor: url,
+    };
+  }
+
+  isAllowedUrl(value: string): boolean {
+    // Allow http/https
+    if (/^https?:\/\//i.test(value)) return true;
+
+    // Reject known dangerous schemes
+    if (/^(javascript|data|blob|ftp):/i.test(value)) return false;
+
+    // Otherwise treat as relative
+    return true;
   }
 }

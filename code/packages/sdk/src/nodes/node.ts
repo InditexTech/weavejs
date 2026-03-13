@@ -77,10 +77,10 @@ export abstract class WeaveNode implements WeaveNodeBase {
   protected logger!: Logger;
   protected previousPointer!: string | null;
 
-  register(instance: Weave): WeaveNode {
+  async register(instance: Weave): Promise<WeaveNode> {
     this.instance = instance;
     this.logger = this.instance.getChildLogger(this.getNodeType());
-    this.onRegister();
+    await this.onRegister();
     this.instance
       .getChildLogger(`node-${this.getNodeType()}`)
       .debug(`Node with type [${this.getNodeType()}] registered`);
@@ -1066,7 +1066,9 @@ export abstract class WeaveNode implements WeaveNodeBase {
     };
   }
 
-  onRegister(): void {}
+  async onRegister(): Promise<void> {
+    return Promise.resolve();
+  }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   onAdd(nodeInstance: WeaveElementInstance): void {}

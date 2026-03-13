@@ -50,6 +50,9 @@ export type WeaveImageProperties = {
     placeholder: {
       fill: string;
     };
+    cursor: {
+      loading: string;
+    };
   };
   imageLoading: {
     maxRetryAttempts: number;
