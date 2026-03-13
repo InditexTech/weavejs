@@ -113,7 +113,7 @@ export class WeaveVideoNode extends WeaveNode {
 
       const nodesSelectionPlugin = this.getNodeSelectionPlugin();
       if (nodesSelectionPlugin) {
-        nodesSelectionPlugin.getTransformer().forceUpdate();
+        nodesSelectionPlugin.getTransformer()?.forceUpdate();
       }
 
       this.resolveAsyncElement(id);
@@ -806,7 +806,7 @@ export class WeaveVideoNode extends WeaveNode {
 
     const nodesSelectionPlugin = this.getNodeSelectionPlugin();
     if (nodesSelectionPlugin) {
-      nodesSelectionPlugin.getTransformer().forceUpdate();
+      nodesSelectionPlugin.getTransformer()?.forceUpdate();
     }
   }
 
