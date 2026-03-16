@@ -21,7 +21,7 @@ export function loadImageSource(
       const imageSource = Konva.Util.createImageElement();
       imageSource.crossOrigin = crossOrigin;
       imageSource.onerror = () => {
-        reject();
+        reject(new Error('Failed to load image source'));
       };
       imageSource.onload = async () => {
         resolve(imageSource);

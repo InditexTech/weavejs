@@ -319,7 +319,7 @@ export class WeaveImageToolAction extends WeaveAction {
       let imageSource = imageNodeHandler.getImageSource(nodeId);
       if (uploadType === 'file') {
         imageSource = imageNodeHandler.getFallbackImageSource(nodeId);
-        imageSource ??= await this.loadImageSource(
+        imageSource ??= await this.loadImageDataURL(
           this.imageAction[nodeId].props.imageFallback
         );
       }
@@ -390,7 +390,7 @@ export class WeaveImageToolAction extends WeaveAction {
       let imageSource = imageNodeHandler.getImageSource(nodeId);
       if (uploadType === WEAVE_IMAGE_TOOL_UPLOAD_TYPE.FILE) {
         imageSource = imageNodeHandler.getFallbackImageSource(nodeId);
-        imageSource ??= await this.loadImageSource(
+        imageSource ??= await this.loadImageDataURL(
           this.imageAction[nodeId].props.imageFallback
         );
       }
@@ -649,7 +649,7 @@ export class WeaveImageToolAction extends WeaveAction {
     return this.state;
   }
 
-  private loadImageSource(imageDataURL: string): Promise<HTMLImageElement> {
+  private loadImageDataURL(imageDataURL: string): Promise<HTMLImageElement> {
     return new Promise((resolve, reject) => {
       const imageEle = Konva.Util.createImageElement();
       imageEle.onerror = (error) => {
