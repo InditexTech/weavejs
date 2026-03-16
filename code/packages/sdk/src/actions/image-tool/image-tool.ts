@@ -448,6 +448,8 @@ export class WeaveImageToolAction extends WeaveAction {
           },
         });
 
+        console.log('add image', node);
+
         this.instance.addNode(
           node,
           this.forceMainContainer
@@ -519,6 +521,8 @@ export class WeaveImageToolAction extends WeaveAction {
     this.imageFile = null;
     this.imageURL = null;
     this.imageId = uuidv4();
+
+    console.log('add image', { id: this.imageId });
 
     this.props = this.initProps();
 

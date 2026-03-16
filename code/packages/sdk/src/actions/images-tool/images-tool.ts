@@ -267,9 +267,12 @@ export class WeaveImagesToolAction extends WeaveAction {
         const shadowOpacity =
           this.config.style.cursor.imageThumbnails.shadowOpacity;
 
-        const aspectRatio = imageSource.width / imageSource.height || 1;
-        const imageWidth = maxImageWidth * aspectRatio * (1 / stage.scaleX());
-        const imageHeight = maxImageHeight * (1 / stage.scaleY());
+        const scale = Math.min(
+          maxImageWidth / imageSource.width,
+          maxImageHeight / imageSource.height
+        );
+        const imageWidth = imageSource.width * scale * (1 / stage.scaleX());
+        const imageHeight = imageSource.height * scale * (1 / stage.scaleY());
 
         const imageNode = new Konva.Image({
           x: position.x,
@@ -289,7 +292,7 @@ export class WeaveImagesToolAction extends WeaveAction {
           shadowOpacity,
         });
 
-        maxWidth = position.x + imageWidth;
+        maxWidth = Math.max(maxWidth, position.x + imageWidth);
         maxHeight = Math.max(maxHeight, position.y + imageHeight);
 
         position = {
@@ -448,8 +451,6 @@ export class WeaveImagesToolAction extends WeaveAction {
           true
         );
 
-        this.nodesIds.push(nodeId);
-
         maxHeight = Math.max(maxHeight, height);
 
         imagePositionX += imagesPadding + width;
@@ -458,6 +459,8 @@ export class WeaveImagesToolAction extends WeaveAction {
           imagePositionY = imagePositionY + maxHeight + imagesPadding;
           maxHeight = 0;
         }
+
+        this.nodesIds.push(nodeId);
 
         while (
           imageToolActionHandler.getActualState() !==
