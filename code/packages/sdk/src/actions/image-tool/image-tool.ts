@@ -536,9 +536,7 @@ export class WeaveImageToolAction extends WeaveAction {
     };
 
     if (params?.imageId) {
-      this.updateProps({
-        imageId: params.imageId,
-      });
+      this.imageAction[nodeId].imageId = params.imageId;
     }
 
     if (this.forceExecution) {
@@ -568,11 +566,12 @@ export class WeaveImageToolAction extends WeaveAction {
       this.imageAction[nodeId].uploadType =
         WEAVE_IMAGE_TOOL_UPLOAD_TYPE.IMAGE_URL;
       this.imageAction[nodeId].imageURL = params.image;
-      this.updateProps({
+      this.imageAction[nodeId].props = {
+        ...this.imageAction[nodeId].props,
         imageFallback: params.image.fallback,
         width: params.image.width,
         height: params.image.height,
-      });
+      };
       this.loadImage(nodeId, {
         type: WEAVE_IMAGE_TOOL_UPLOAD_TYPE.IMAGE_URL,
         image: params.image,
