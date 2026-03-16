@@ -68,7 +68,7 @@ export class WeaveImageNode extends WeaveNode {
           resolveInt();
         };
         img.onerror = () => {
-          rejectInt();
+          rejectInt(new Error(`Failed to load cursor image: ${src}`));
         };
         img.src = src;
       });
