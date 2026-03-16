@@ -13,6 +13,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- [#976](https://github.com/InditexTech/weavejs/issues/976) Avoid calling frontend api on server-side on the Image node
+
 ## [3.2.0] - 2026-03-16
 
 ### Added
