@@ -470,8 +470,8 @@ export function getTargetAndSkipNodes(
 
   if (e.type === 'transform' && nodesSelectionPlugin) {
     node = e.target;
-    skipNodes.push(node.getAttrs().id ?? '');
     skipNodes.push(
+      node.getAttrs().id ?? '',
       ...nodesSelectionPlugin
         .getTransformer()
         .nodes()
