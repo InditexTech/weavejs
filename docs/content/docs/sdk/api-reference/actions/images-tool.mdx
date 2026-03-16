@@ -54,6 +54,10 @@ type WeaveImagesToolActionStateKeys = keyof typeof WEAVE_IMAGES_TOOL_STATE;
 type WeaveImagesToolActionState =
   (typeof WEAVE_IMAGES_TOOL_STATE)[WeaveImagesToolActionStateKeys];
 
+type WeaveImagesToolActionOnAddedEvent = {
+  nodesIds: string[];
+};
+
 type ImageInfo = {
   imageId: string;
   url: string;

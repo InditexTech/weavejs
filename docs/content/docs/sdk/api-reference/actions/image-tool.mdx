@@ -52,9 +52,6 @@ type WeaveImageToolActionStateKeys = keyof typeof WEAVE_IMAGE_TOOL_STATE;
 type WeaveImageToolActionState =
   (typeof WEAVE_IMAGE_TOOL_STATE)[WeaveImageToolActionStateKeys];
 
-type WeaveImageToolActionOnStartLoadImageEvent = undefined;
-type WeaveImageToolActionOnEndLoadImageEvent = Error | undefined;
-type WeaveImageToolActionOnAddingEvent = { imageURL: string };
 type WeaveImageToolActionOnAddedEvent = {
   nodeId: string;
 };
@@ -62,8 +59,12 @@ type WeaveImageToolActionOnImageUploadedEvent = {
   imageURL: string;
   nodeId: string;
 };
+type WeaveImageToolActionOnImageUploadedErrorEvent = {
+  error: unknown;
+};
 
 type WeaveImageToolActionTriggerCommonParams = {
+  nodeId?: string;
   imageId?: string;
   options?: ImageOptions;
   position?: Konva.Vector2d;
