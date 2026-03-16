@@ -66,7 +66,7 @@ import {
   getBoundingBox,
   getExportBoundingBox,
   mergeExceptArrays,
-} from './utils';
+} from './utils/utils';
 import { WeaveAsyncManager } from './managers/async/async';
 import { WeaveHooksManager } from './managers/hooks';
 import { WeaveUsersManager } from './managers/users/users';
@@ -240,7 +240,7 @@ export class Weave {
     this.emitEvent<WeaveInstanceStatusEvent>('onInstanceStatus', this.status);
 
     // Register all the nodes, plugins and actions that come from the configuration
-    this.registerManager.registerNodesHandlers();
+    await this.registerManager.registerNodesHandlers();
     // Augment the Konva classes
     this.augmentKonvaStageClass();
     this.augmentKonvaNodeClass();

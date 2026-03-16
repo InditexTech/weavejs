@@ -33,7 +33,7 @@ import {
   intersectArrays,
   mergeExceptArrays,
   moveNodeToContainerNT,
-} from '@/utils';
+} from '@/utils/utils';
 import { WEAVE_USERS_SELECTION_KEY } from '../users-selection/constants';
 import type { WeaveUsersSelectionPlugin } from '../users-selection/users-selection';
 import type { KonvaEventObject } from 'konva/lib/Node';

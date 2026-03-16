@@ -1,0 +1,232 @@
+---
+title: WeaveImagesToolAction
+description: Add multiple image to the canvas
+---
+
+import { TypeTable } from "fumadocs-ui/components/type-table";
+
+## Overview
+
+The [WeaveImagesToolAction](https://github.com/InditexTech/weavejs/blob/main/code/packages/sdk/src/actions/images-tool/images-tool.ts)
+class that enables users to:
+
+- Selecting multiple files and add it to the canvas on a position of its choice.
+- Drag & Drop multiple Images from the same application to the canvas.
+- Drag & Drop multiple external Image to the canvas.
+
+When adding multiple images the images are added on a grid format, the amount of columns is fixed
+and configurable.
+
+It provides an intuitive way to add visual content—either by selecting an image file, dragging
+and dropping, or integrating with an image picker—allowing users to enhance their
+collaborative workspace with rich media.
+
+Each interaction results in the creation of a [WeaveImageNode](/docs/sdk/api-reference/nodes/image),
+which can be resized, moved, and synchronized across all connected users.
+
+The class extends the [WeaveAction](/docs/sdk/api-reference/actions/action) class.
+
+## Name
+
+This action `name` property value is `imagesTool`.
+
+## Import
+
+```shell
+import { WeaveImagesToolAction } from "@inditextech/weave-sdk";
+```
+
+## Instantiation
+
+```ts
+new WeaveImagesToolAction();
+```
+
+## TypeScript types
+
+```tsx
+type WeaveImagesToolActionUploadTypeKeys =
+  keyof typeof WEAVE_IMAGES_TOOL_UPLOAD_TYPE;
+type WeaveImagesToolActionUploadType =
+  (typeof WEAVE_IMAGES_TOOL_UPLOAD_TYPE)[WeaveImagesToolActionUploadTypeKeys];
+
+type WeaveImagesToolActionStateKeys = keyof typeof WEAVE_IMAGES_TOOL_STATE;
+type WeaveImagesToolActionState =
+  (typeof WEAVE_IMAGES_TOOL_STATE)[WeaveImagesToolActionStateKeys];
+
+type WeaveImagesToolActionOnAddedEvent = {
+  nodesIds: string[];
+};
+
+type ImageInfo = {
+  imageId: string;
+  url: string;
+};
+
+type WeaveImagesToolActionTriggerCommonParams = {
+  position?: Vector2d;
+  forceMainContainer?: boolean;
+};
+
+type WeaveImagesToolActionInternalUploadFunction = () => Promise<void>;
+type WeaveImagesToolActionUploadFunction = (file: File) => Promise<string>;
+type WeaveImagesToolActionOnStartUploadingFunction = () => void | Promise<void>;
+type WeaveImagesToolActionOnFinishedUploadingFunction =
+  () => void | Promise<void>;
+
+type WeaveImagesFile = {
+  file: File;
+  downscaleRatio: number;
+  width: number;
+  height: number;
+  imageId?: string;
+};
+
+type WeaveImagesURL = {
+  url: string;
+  fallback: string;
+  width: number;
+  height: number;
+  options?: ImageOptions;
+  imageId?: string;
+};
+
+type WeaveImagesToolActionTriggerParams = (
+  | {
+      type: typeof WEAVE_IMAGES_TOOL_UPLOAD_TYPE.FILE;
+      images: WeaveImagesFile[];
+      uploadImageFunction: WeaveImagesToolActionUploadFunction;
+      onStartUploading: WeaveImagesToolActionOnStartUploadingFunction;
+      onFinishedUploading: WeaveImagesToolActionOnFinishedUploadingFunction;
+    }
+  | {
+      type: typeof WEAVE_IMAGES_TOOL_UPLOAD_TYPE.IMAGE_URL;
+      images: WeaveImagesURL[];
+    }
+) &
+  WeaveImagesToolActionTriggerCommonParams;
+
+type WeaveImagesToolActionParams = {
+  style: {
+    cursor: {
+      padding: number;
+      imageThumbnails: {
+        padding: number;
+        width: number;
+        height: number;
+
+        shadowColor: string;
+        shadowBlur: number;
+        shadowOffset: Konva.Vector2d;
+        shadowOpacity: number;
+      };
+    };
+    moreImages: {
+      paddingX: number;
+      paddingY: number;
+      fontSize: number;
+      fontFamily: string;
+      textColor: string;
+      backgroundColor: string;
+      backgroundOpacity: number;
+    };
+    images: {
+      padding: number;
+    };
+  };
+  layout: {
+    columns: number;
+  };
+};
+
+type WeaveImagesToolDragAndDropProperties = {
+  imagesURL: WeaveImagesURL[];
+} & Omit<WeaveImagesToolActionTriggerCommonParams, "position">;
+```
+
+## Trigger function params
+
+```ts
+trigger(cancelAction: () => void, params?: WeaveImagesToolActionTriggerParams): void;
+```
+
+For `WeaveImagesToolActionTriggerParams`:
+
+<TypeTable
+  type={{
+    ["type"]: {
+      description: "The type of the upload image, can be 'file' or 'imageURL'",
+      type: "string",
+    },
+    ["images"]: {
+      description:
+        "An array of the WeaveImagesFile metadata of the image, must be provided when adding images from a file-picker, on external paste images or when drag-and-drop images from the file-system. If dragging images that are already uploaded use WeaveImagesURL instead.",
+      type: "WeaveImagesFile[] | WeaveImagesURL[]",
+    },
+    ["uploadImageFunction"]: {
+      description:
+        "An image that will upload the provided files. The function is called once per file.",
+      type: "WeaveImagesToolActionUploadFunction",
+    },
+    ["onStartUploading"]: {
+      description:
+        "A callback that is called when the images started uploading.",
+      type: "WeaveImagesToolActionOnStartUploadingFunction",
+    },
+    ["onFinishedUploading"]: {
+      description:
+        "A callback that is called when the images finished uploading.",
+      type: "WeaveImagesToolActionOnFinishedUploadingFunction",
+    },
+    ["position"]: {
+      description:
+        "Position the image in this coordinates provided by the vector.",
+      type: "Vector2d",
+    },
+    ["forceMainContainer"]: {
+      description:
+        "Force the image to be added in the main container and not on the container identified by the pointer.",
+      type: "boolean",
+    },
+  }}
+/>
+
+When triggering the tool nothing is returned.
+
+### Drag & Drop from the same application
+
+When you implement drag & drop of multiple images loaded on a HTMLImageElement that is located on the same application,
+on the `onDragStart` event you must call the `setDragAndDropProperties` method of the tool and define the following
+properties:
+
+- `imagesURL`: an array `WeaveImagesURL[]` of images metadata to add to the canvas.
+- `forceMainContainer`: (optional) defines if we should force to add the images on the main stage instead for example A
+  frame.
+
+## Events
+
+### onAddingImages
+
+```ts
+onAddingImages: undefined;
+```
+
+The `onAddingImage` event is called previously the image is added to the canvas, when the user is selecting its position.
+
+### onAddedImages
+
+```ts
+onAddedImages: WeaveImagesToolActionOnAddedEvent;
+```
+
+The `onAddedImage` event is called when the image is added to the canvas.
+
+## Methods
+
+### setDragAndDropProperties
+
+```ts
+setDragAndDropProperties(properties: WeaveImageToolDragAndDropProperties): void
+```
+
+The `setDragAndDropProperties` method set the necessary properties when drag & drop images that are inside the application.

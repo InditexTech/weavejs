@@ -21,7 +21,7 @@ import type {
   WeaveStrokeProperties,
 } from './types';
 import type { WeaveStageZoomPlugin } from '@/plugins/stage-zoom/stage-zoom';
-import { mergeExceptArrays } from '@/utils';
+import { mergeExceptArrays } from '@/utils/utils';
 
 export class WeaveStrokeNode extends WeaveNode {
   private readonly config: WeaveStrokeProperties;

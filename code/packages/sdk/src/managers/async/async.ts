@@ -11,7 +11,7 @@ import {
 } from '@inditextech/weave-types';
 import { Weave } from '@/weave';
 import { type Logger } from 'pino';
-import { watchMap } from '@/utils/watch-map';
+import { watchMap } from '@/internal-utils/watch-map';
 import type { WeaveAsyncElementsLoadingEvent } from './types';
 import type { WeaveNode } from '@/index.node';
 

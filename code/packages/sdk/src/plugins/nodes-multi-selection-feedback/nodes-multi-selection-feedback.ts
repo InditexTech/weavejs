@@ -9,7 +9,7 @@ import {
   WEAVE_NODES_MULTI_SELECTION_FEEDBACK_PLUGIN_KEY,
   WEAVE_NODES_MULTI_SELECTION_FEEDBACK_PLUGIN_LAYER_ID,
 } from './constants';
-import { mergeExceptArrays } from '@/utils';
+import { mergeExceptArrays } from '@/utils/utils';
 import type {
   WeaveNodesMultiSelectionFeedbackConfig,
   WeaveNodesMultiSelectionFeedbackPluginParams,

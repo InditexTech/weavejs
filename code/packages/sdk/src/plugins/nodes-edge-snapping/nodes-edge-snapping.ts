@@ -22,7 +22,7 @@ import {
 } from './constants';
 import type { KonvaEventObject } from 'konva/lib/Node';
 import type { WeaveNodesSelectionPlugin } from '../nodes-selection/nodes-selection';
-import { getTargetAndSkipNodes, getVisibleNodes } from '@/utils';
+import { getTargetAndSkipNodes, getVisibleNodes } from '@/utils/utils';
 
 export class WeaveNodesEdgeSnappingPlugin extends WeavePlugin {
   private readonly guideLineConfig: Konva.LineConfig;

@@ -13,7 +13,7 @@ import type {
   WeaveStageMinimapPluginParams,
 } from './types';
 import { throttle } from 'lodash';
-import { mergeExceptArrays } from '@/utils';
+import { mergeExceptArrays } from '@/utils/utils';
 import { DEFAULT_THROTTLE_MS } from '@/constants';
 
 export class WeaveStageMinimapPlugin extends WeavePlugin {

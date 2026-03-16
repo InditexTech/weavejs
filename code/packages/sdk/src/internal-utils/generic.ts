@@ -2,5 +2,6 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-export * from './index.common';
-export * from './internal-utils/mapping';
+export function sleep(ms: number): Promise<void> {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}

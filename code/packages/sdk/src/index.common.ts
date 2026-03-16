@@ -14,7 +14,12 @@ export * from './actions/types';
 
 // Plugin base class and types
 export { WeavePlugin } from './plugins/plugin';
-export * from './utils';
+
+// Public utils
+export * from './utils/utils';
+export * from './utils/image';
+
+// Types
 export * from './types';
 
 // Store
@@ -120,6 +125,9 @@ export * from './actions/text-tool/types';
 export { WeaveImageToolAction } from './actions/image-tool/image-tool';
 export * from './actions/image-tool/constants';
 export * from './actions/image-tool/types';
+export { WeaveImagesToolAction } from './actions/images-tool/images-tool';
+export * from './actions/images-tool/constants';
+export * from './actions/images-tool/types';
 export { WeaveStarToolAction } from './actions/star-tool/star-tool';
 export * from './actions/star-tool/constants';
 export * from './actions/star-tool/types';

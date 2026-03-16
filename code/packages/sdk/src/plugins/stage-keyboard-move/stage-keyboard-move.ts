@@ -14,7 +14,7 @@ import type {
   WeaveStageKeyboardMovePluginParams,
 } from './types';
 import type { WeaveNode } from '@/nodes/node';
-import { mergeExceptArrays } from '@/utils';
+import { mergeExceptArrays } from '@/utils/utils';
 
 export class WeaveStageKeyboardMovePlugin extends WeavePlugin {
   private config!: WeaveStageKeyboardMovePluginConfig;

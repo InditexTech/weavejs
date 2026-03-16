@@ -15,7 +15,7 @@ import {
   getTopmostShadowHost,
   isInShadowDOM,
   mergeExceptArrays,
-} from '@/utils';
+} from '@/utils/utils';
 import type { WeaveNodesEdgeSnappingPlugin } from '../nodes-edge-snapping/nodes-edge-snapping';
 import type { WeaveNodesDistanceSnappingPlugin } from '../nodes-distance-snapping/nodes-distance-snapping';
 import type { WeaveNodesSelectionPlugin } from '../nodes-selection/nodes-selection';

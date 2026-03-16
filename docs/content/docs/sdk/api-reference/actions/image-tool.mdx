@@ -8,8 +8,14 @@ import { TypeTable } from "fumadocs-ui/components/type-table";
 ## Overview
 
 The [WeaveImageToolAction](https://github.com/InditexTech/weavejs/blob/main/code/packages/sdk/src/actions/image-tool/image-tool.ts)
-class that enables users to insert image nodes into the canvas. It provides
-an intuitive way to add visual content—either by selecting an image file, dragging
+class that enables users to:
+
+- Selecting a file and add it to the canvas on a position of its choice.
+- Drag & Drop an Image from the same application to the canvas and add it to the canvas on a position of its choice.
+- Drag & Drop an external Image to the canvas and add it to the canvas on a position of its choice.
+- Copy / pasting an external Image to the canvas.
+
+It provides an intuitive way to add visual content—either by selecting an image file, dragging
 and dropping, or integrating with an image picker—allowing users to enhance their
 collaborative workspace with rich media.
 
@@ -37,41 +43,57 @@ new WeaveImageToolAction();
 ## TypeScript types
 
 ```ts
-type WeaveImageToolActionLoadFromKeys = keyof typeof IMAGE_TOOL_LOAD_FROM;
-type WeaveImageToolActionLoadFrom =
-  (typeof IMAGE_TOOL_LOAD_FROM)[WeaveImageToolActionLoadFromKeys];
+type WeaveImageToolActionUploadTypeKeys =
+  keyof typeof WEAVE_IMAGE_TOOL_UPLOAD_TYPE;
+type WeaveImageToolActionUploadType =
+  (typeof WEAVE_IMAGE_TOOL_UPLOAD_TYPE)[WeaveImageToolActionUploadTypeKeys];
 
-type WeaveImageToolActionStateKeys = keyof typeof IMAGE_TOOL_STATE;
+type WeaveImageToolActionStateKeys = keyof typeof WEAVE_IMAGE_TOOL_STATE;
 type WeaveImageToolActionState =
-  (typeof IMAGE_TOOL_STATE)[WeaveImageToolActionStateKeys];
+  (typeof WEAVE_IMAGE_TOOL_STATE)[WeaveImageToolActionStateKeys];
 
-type WeaveImageToolActionOnStartLoadImageEvent = undefined;
-type WeaveImageToolActionOnEndLoadImageEvent = Error | undefined;
-type WeaveImageToolActionOnAddingEvent = { imageURL: string };
 type WeaveImageToolActionOnAddedEvent = {
+  nodeId: string;
+};
+type WeaveImageToolActionOnImageUploadedEvent = {
   imageURL: string;
   nodeId: string;
 };
+type WeaveImageToolActionOnImageUploadedErrorEvent = {
+  error: unknown;
+};
 
 type WeaveImageToolActionTriggerCommonParams = {
+  nodeId?: string;
   imageId?: string;
   options?: ImageOptions;
   position?: Konva.Vector2d;
   forceMainContainer?: boolean;
 };
 
+type WeaveImageFile = {
+  file: File;
+  downscaleRatio: number;
+};
+
+type WeaveImageURL = {
+  url: string;
+  fallback: string;
+  width: number;
+  height: number;
+};
+
+type WeaveImageToolActionUploadFunction = (file: File) => Promise<string>;
+
 type WeaveImageToolActionTriggerParams = (
   | {
       type: typeof WEAVE_IMAGE_TOOL_UPLOAD_TYPE.FILE;
-      imageFile: File;
-      imageDownscaleRatio: number;
+      image: WeaveImageFile;
+      uploadImageFunction: WeaveImageToolActionUploadFunction;
     }
   | {
       type: typeof WEAVE_IMAGE_TOOL_UPLOAD_TYPE.IMAGE_URL;
-      imageURL: string;
-      imageFallback: string;
-      imageWidth: number;
-      imageHeight: number;
+      image: WeaveImageURL;
     }
 ) &
   WeaveImageToolActionTriggerCommonParams;
@@ -80,20 +102,13 @@ type ImageOptions = {
   crossOrigin: ImageCrossOrigin;
 };
 
-type WeaveImageToolActionTriggerReturn =
-  | {
-      nodeId: string;
-      finishUploadCallback: (nodeId: string, imageURL: string) => void;
-    }
-  | undefined;
+type WeaveImageToolActionTriggerReturn = {
+  nodeId: string;
+};
 
 type WeaveImageToolDragAndDropProperties = {
-  imageURL: string;
-  imageFallback: string;
-  imageWidth: number;
-  imageHeight: number;
-  imageId?: string;
-};
+  imageURL: WeaveImageURL;
+} & Omit<WeaveImageToolActionTriggerCommonParams, "position">;
 
 type WeaveImageToolActionConfig = {
   style: {
@@ -128,36 +143,16 @@ For `WeaveImageToolActionTriggerParams`:
   type={{
     ["type"]: {
       description: "The type of the upload image, can be 'file' or 'imageURL'",
-      type: "string",
+      type: "WeaveImageToolActionUploadType",
     },
-    ["imageFile"]: {
+    ["image"]: {
       description:
-        "The File of the image. Must be provided when adding images from a file-picker, on external paste images or when drag-and-drop images from the file-system",
-      type: "File",
+        "The metadata of the file image to add, when adding images from a file-picker, on external paste images or when drag-and-drop images from the file-system. If dragging an image that are already uploaded use WeaveImageURL instead.",
+      type: "WeaveImageFile | WeaveImageURL",
     },
-    ["imageDownscaleRatio"]: {
-      description: "The downscale ratio to apply to the uploaded file",
-      type: "number",
-    },
-    ["imageURL"]: {
-      description:
-        "The URL of the image already uploaded to an external service. URL must the same as the application URL to avoid cross-origin issues. We recommend to proxy the images through the application. Must be provided when drag & drop from the same application.",
-      type: "string",
-    },
-    ["imageFallback"]: {
-      description:
-        "A dataURL of a fallback image to display while the real image is loaded asynchronously.",
-      type: "string",
-    },
-    ["imageWidth"]: {
-      description:
-        "The width of the image without transformations, must be provided when drag and drop images from the same application (as this normally already have been persisted).",
-      type: "string",
-    },
-    ["imageHeight"]: {
-      description:
-        "The height of the image without transformations, must be provided when drag and drop images from the same application (as this normally already have been persisted).",
-      type: "string",
+    ["uploadImageFunction"]: {
+      description: "An image that will upload the provided file.",
+      type: "WeaveImageToolActionUploadFunction",
     },
     ["imageId"]: {
       description:
@@ -185,7 +180,6 @@ For `WeaveImageToolActionTriggerParams`:
 When triggering the tool, a `WeaveImageToolActionTriggerReturn` object is returned, this object contains:
 
 - `nodeId`: is the Id of the node added to the canvas.
-- `finishUploadCallback`: a callback function to call to save on the node the persisted Image URL. This function receives the `nodeId` and the persisted image URL.
 
 ### Drag & Drop from the same application
 
@@ -193,29 +187,46 @@ When you implement drag & drop of an image loaded on a HTMLImageElement that is 
 on the `onDragStart` event you must call the `setDragAndDropProperties` method of the tool and define the following
 properties:
 
-- `imageURL`: the image URL to add to the canvas.
-- `imageFallback`: the fallback image (as dataURL) to set while the final image is asynchronously loaded.
-- `imageId`: the image id (external resource id) associated to the image.
-- `imageWidth`: the image real width (without any transformations).
-- `imageHeight`: the image real height (without any transformations).
+- `imageURL`: the image `WeaveImageURL` metadata of the image to add.
+- `imageId`: (optional) the image id (external resource id) associated to the image.
+- `forceMainContainer`: (optional) defines if we should force to add the images on the main stage instead for example A
+  frame.
+
+Then when dropping on the canvas, the image will be added.
 
 ## Events
 
-### onImageLoadStart
+### onAddingImage
 
 ```ts
-onImageLoadStart: WeaveNodesSelectionPluginOnNodesChangeEvent;
+onAddingImage: WeaveImageToolActionOnAddingEvent;
 ```
 
-The `onImageLoadStart` event is called when the image is stated to load onto the canvas.
+The `onAddingImage` event is called previously the image is added to the canvas, when the user is selecting its position.
 
-### onImageLoadEnd
+### onAddedImage
 
 ```ts
-onImageLoadEnd: WeaveNodesSelectionPluginOnNodesChangeEvent;
+onAddedImage: WeaveImageToolActionOnAddedEvent;
 ```
 
-The `onImageLoadEnd` event is called when the image ended loading into the canvas.
+The `onAddedImage` event is called when the image is added to the canvas.
+
+### onImageUploaded
+
+```ts
+onImageUploaded: WeaveImageToolActionOnImageUploadedEvent;
+```
+
+The `onImageUploaded` event is called when the image ended uploading.
+
+### onImageUploadedError
+
+```ts
+onImageUploadedError: WeaveImageToolActionOnImageUploadedErrorEvent;
+```
+
+The `onImageUploadedError` event is called when the image ended uploading with error.
 
 ## Methods
 

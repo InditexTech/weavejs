@@ -20,7 +20,7 @@ import type {
   VideoProps,
 } from './types';
 import type { KonvaEventObject } from 'konva/lib/Node';
-import { isServer, mergeExceptArrays } from '@/utils';
+import { isServer, mergeExceptArrays } from '@/utils/utils';
 import type { WeaveStageZoomPluginOnZoomChangeEvent } from '@/plugins/stage-zoom/types';
 
 export class WeaveVideoNode extends WeaveNode {
@@ -113,7 +113,7 @@ export class WeaveVideoNode extends WeaveNode {
 
       const nodesSelectionPlugin = this.getNodeSelectionPlugin();
       if (nodesSelectionPlugin) {
-        nodesSelectionPlugin.getTransformer().forceUpdate();
+        nodesSelectionPlugin.getTransformer()?.forceUpdate();
       }
 
       this.resolveAsyncElement(id);
@@ -806,7 +806,7 @@ export class WeaveVideoNode extends WeaveNode {
 
     const nodesSelectionPlugin = this.getNodeSelectionPlugin();
     if (nodesSelectionPlugin) {
-      nodesSelectionPlugin.getTransformer().forceUpdate();
+      nodesSelectionPlugin.getTransformer()?.forceUpdate();
     }
   }
 

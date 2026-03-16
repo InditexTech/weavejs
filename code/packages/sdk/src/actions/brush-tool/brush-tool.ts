@@ -23,7 +23,7 @@ import type { WeaveStrokeNode } from '@/nodes/stroke/stroke';
 import type { WeaveStrokePoint } from '@/nodes/stroke/types';
 import { SELECTION_TOOL_ACTION_NAME } from '../selection-tool/constants';
 import type { WeaveStageZoomPlugin } from '@/plugins/stage-zoom/stage-zoom';
-import { mergeExceptArrays } from '@/utils';
+import { mergeExceptArrays } from '@/utils/utils';
 
 export class WeaveBrushToolAction extends WeaveAction {
   protected config: WeaveBrushToolActionProperties;
@@ -93,6 +93,7 @@ export class WeaveBrushToolAction extends WeaveAction {
         e.code === 'Enter' &&
         this.instance.getActiveAction() === BRUSH_TOOL_ACTION_NAME
       ) {
+        e.stopPropagation();
         this.cancelAction();
         return;
       }
@@ -100,6 +101,7 @@ export class WeaveBrushToolAction extends WeaveAction {
         e.code === 'Space' &&
         this.instance.getActiveAction() === BRUSH_TOOL_ACTION_NAME
       ) {
+        e.stopPropagation();
         this.isSpacePressed = true;
         return;
       }
@@ -107,6 +109,7 @@ export class WeaveBrushToolAction extends WeaveAction {
         e.code === 'Escape' &&
         this.instance.getActiveAction() === BRUSH_TOOL_ACTION_NAME
       ) {
+        e.stopPropagation();
         this.cancelAction();
       }
     });

@@ -35,7 +35,7 @@ import {
   getTopmostShadowHost,
   isInShadowDOM,
   mergeExceptArrays,
-} from '@/utils';
+} from '@/utils/utils';
 import type { WeaveStageGridPlugin } from '../stage-grid/stage-grid';
 import type Konva from 'konva';
 import type { Weave } from '@/weave';

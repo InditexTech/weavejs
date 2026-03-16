@@ -21,8 +21,8 @@ import type {
   WeaveStrokeSingleNodeTipSide,
   WeaveStrokeSingleProperties,
 } from './types';
-import { mergeExceptArrays } from '@/utils';
-import { GreedySnapper } from '@/utils/greedy-snapper';
+import { mergeExceptArrays } from '@/utils/utils';
+import { GreedySnapper } from '@/internal-utils/greedy-snapper';
 import type { WeaveBaseLineTipManager } from './base.line-tip-manager';
 import { WeaveArrowLineTipManager } from './line-tip-managers/arrow.line-tip-manager';
 import { WeaveCircleLineTipManager } from './line-tip-managers/circle.line-tip-manager';

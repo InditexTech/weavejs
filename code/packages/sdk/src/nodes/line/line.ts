@@ -15,8 +15,8 @@ import {
 } from './constants';
 import type { WeaveNodesSelectionPlugin } from '@/plugins/nodes-selection/nodes-selection';
 import type { WeaveLineNodeParams, WeaveLineProperties } from './types';
-import { mergeExceptArrays } from '@/utils';
-import { GreedySnapper } from '@/utils/greedy-snapper';
+import { mergeExceptArrays } from '@/utils/utils';
+import { GreedySnapper } from '@/internal-utils/greedy-snapper';
 import type { Vector2d } from 'konva/lib/types';
 
 export class WeaveLineNode extends WeaveNode {

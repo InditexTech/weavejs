@@ -11,7 +11,7 @@ import { WeaveNode } from '../node';
 import { WEAVE_STAGE_DEFAULT_MODE, WEAVE_STAGE_NODE_TYPE } from './constants';
 import { MOVE_TOOL_ACTION_NAME } from '@/actions/move-tool/constants';
 import { SELECTION_TOOL_ACTION_NAME } from '@/actions/selection-tool/constants';
-import { setupUpscaleStage } from '@/utils/upscale';
+import { setupUpscaleStage } from '@/internal-utils/upscale';
 
 export class WeaveStageNode extends WeaveNode {
   protected nodeType: string = WEAVE_STAGE_NODE_TYPE;

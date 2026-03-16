@@ -20,7 +20,7 @@ import type {
   WeaveMeasureNodeParams,
   WeaveMeasureNodeProperties,
 } from './types';
-import { mergeExceptArrays } from '@/utils';
+import { mergeExceptArrays } from '@/utils/utils';
 
 export class WeaveMeasureNode extends WeaveNode {
   private readonly config: WeaveMeasureNodeProperties;
