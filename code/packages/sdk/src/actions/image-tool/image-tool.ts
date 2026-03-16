@@ -319,12 +319,9 @@ export class WeaveImageToolAction extends WeaveAction {
       let imageSource = imageNodeHandler.getImageSource(nodeId);
       if (uploadType === 'file') {
         imageSource = imageNodeHandler.getFallbackImageSource(nodeId);
-
-        if (!imageSource) {
-          imageSource = await this.loadImageSource(
-            this.imageAction[nodeId].props.imageFallback
-          );
-        }
+        imageSource ??= await this.loadImageSource(
+          this.imageAction[nodeId].props.imageFallback
+        );
       }
 
       if (!imageSource) {
@@ -393,12 +390,9 @@ export class WeaveImageToolAction extends WeaveAction {
       let imageSource = imageNodeHandler.getImageSource(nodeId);
       if (uploadType === WEAVE_IMAGE_TOOL_UPLOAD_TYPE.FILE) {
         imageSource = imageNodeHandler.getFallbackImageSource(nodeId);
-
-        if (!imageSource) {
-          imageSource = await this.loadImageSource(
-            this.imageAction[nodeId].props.imageFallback
-          );
-        }
+        imageSource ??= await this.loadImageSource(
+          this.imageAction[nodeId].props.imageFallback
+        );
       }
 
       if (!imageSource && !position) {

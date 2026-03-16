@@ -90,7 +90,9 @@ export class WeaveImageNode extends WeaveNode {
         }
 
         if (cursorUrls.length > 0) {
-          const promises = cursorUrls.map(({ src }) => {
+          const cursorsPreloading = [];
+
+          const promiseHandler = (src: string) =>
             new Promise<void>((resolveInt, rejectInt) => {
               const img = Konva.Util.createImageElement();
               img.onload = () => {
@@ -101,9 +103,12 @@ export class WeaveImageNode extends WeaveNode {
               };
               img.src = src;
             });
-          });
 
-          await Promise.allSettled(promises);
+          for (const { src } of cursorUrls) {
+            cursorsPreloading.push(promiseHandler(src));
+          }
+
+          await Promise.allSettled(cursorsPreloading);
         }
 
         resolve();
