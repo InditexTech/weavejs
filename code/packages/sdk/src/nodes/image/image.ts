@@ -954,7 +954,10 @@ export class WeaveImageNode extends WeaveNode {
 
     this.imageSource[imageId].onload = async () => {
       const stage = this.instance.getStage();
-      stage.container().style.cursor = 'pointer';
+
+      if (!this.instance.isServerSide()) {
+        stage.container().style.cursor = 'pointer';
+      }
 
       this.imageState[imageId] = {
         status: 'loaded',
