@@ -18,7 +18,6 @@ export type WeaveImageToolActionStateKeys = keyof typeof WEAVE_IMAGE_TOOL_STATE;
 export type WeaveImageToolActionState =
   (typeof WEAVE_IMAGE_TOOL_STATE)[WeaveImageToolActionStateKeys];
 
-export type WeaveImageToolActionOnAddingEvent = { imageURL: string };
 export type WeaveImageToolActionOnAddedEvent = {
   nodeId: string;
 };
@@ -31,6 +30,7 @@ export type WeaveImageToolActionOnImageUploadedErrorEvent = {
 };
 
 export type WeaveImageToolActionTriggerCommonParams = {
+  nodeId?: string;
   imageId?: string;
   options?: ImageOptions;
   position?: Konva.Vector2d;
