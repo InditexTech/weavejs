@@ -17,7 +17,7 @@ import {
 } from './constants';
 import { WeavePlugin } from '@/plugins/plugin';
 import Konva from 'konva';
-import { memoize } from '@/utils';
+import { memoize } from '@/utils/utils';
 
 export class WeaveUsersSelectionPlugin extends WeavePlugin {
   private padding = 1;

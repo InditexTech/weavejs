@@ -24,7 +24,7 @@ import { WeaveAction } from '../action';
 import type { WeaveNodesSelectionPlugin } from '@/plugins/nodes-selection/nodes-selection';
 import type { WeaveCommentsRendererPlugin } from '@/plugins/comments-renderer/comments-renderer';
 import { WEAVE_COMMENTS_RENDERER_KEY } from '@/plugins/comments-renderer/constants';
-import { mergeExceptArrays } from '@/utils';
+import { mergeExceptArrays } from '@/utils/utils';
 
 export class WeaveCommentToolAction<T> extends WeaveAction {
   private readonly config!: WeaveCommentToolActionConfig<T>;

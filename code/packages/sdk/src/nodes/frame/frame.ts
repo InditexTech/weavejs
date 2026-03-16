@@ -22,7 +22,7 @@ import type {
   WeaveFrameProperties,
 } from './types';
 import type { WeaveNodesSelectionPlugin } from '@/plugins/nodes-selection/nodes-selection';
-import { mergeExceptArrays } from '@/utils';
+import { mergeExceptArrays } from '@/utils/utils';
 import { GroupFrame } from './group-frame';
 
 export class WeaveFrameNode extends WeaveNode {

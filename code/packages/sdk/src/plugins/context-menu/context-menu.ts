@@ -24,7 +24,7 @@ import { WEAVE_NODES_SELECTION_KEY } from '@/plugins/nodes-selection/constants';
 import Konva from 'konva';
 import type { KonvaEventObject } from 'konva/lib/Node';
 import type { Stage } from 'konva/lib/Stage';
-import { getTargetedNode } from '@/utils';
+import { getTargetedNode } from '@/utils/utils';
 import { SELECTION_TOOL_ACTION_NAME } from '@/actions/selection-tool/constants';
 
 export class WeaveContextMenuPlugin extends WeavePlugin {

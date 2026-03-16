@@ -68,7 +68,7 @@ export class WeaveFitToSelectionToolAction extends WeaveAction {
   cleanup(): void {
     const stage = this.instance.getStage();
 
-    if (this.previousAction) {
+    if (this.previousAction !== undefined) {
       this.instance.triggerAction(this.previousAction);
     }
 

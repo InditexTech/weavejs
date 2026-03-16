@@ -54,7 +54,9 @@ export class WeaveFitToScreenToolAction extends WeaveAction {
   cleanup(): void {
     const stage = this.instance.getStage();
 
-    this.instance.triggerAction(this.previousAction);
+    if (this.previousAction !== undefined) {
+      this.instance.triggerAction(this.previousAction);
+    }
 
     stage.container().style.cursor = 'default';
   }

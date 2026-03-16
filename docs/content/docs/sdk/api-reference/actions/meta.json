@@ -1,5 +1,4 @@
 {
-  "title": "Actions",
   "pages": [
     "action",
     "align-nodes-tool",
@@ -14,6 +13,7 @@
     "fit-to-selection-tool",
     "frame-tool",
     "image-tool",
+    "images-tool",
     "measure-tool",
     "move-tool",
     "rectangle-tool",
@@ -28,5 +28,6 @@
     "arrow-tool",
     "line-tool",
     "pen-tool"
-  ]
+  ],
+  "title": "Actions"
 }

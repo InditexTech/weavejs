@@ -22,7 +22,7 @@ import {
   getTopmostShadowHost,
   isInShadowDOM,
   mergeExceptArrays,
-} from '@/utils';
+} from '@/utils/utils';
 import type { WeaveContextMenuPlugin } from '../context-menu/context-menu';
 import type { WeaveStageGridPlugin } from '../stage-grid/stage-grid';
 import { DEFAULT_THROTTLE_MS } from '@/constants';

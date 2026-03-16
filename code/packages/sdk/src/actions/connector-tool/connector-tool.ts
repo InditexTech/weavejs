@@ -19,7 +19,7 @@ import { WeaveNodesSelectionPlugin } from '@/plugins/nodes-selection/nodes-selec
 import type { WeaveConnectorNode } from '@/nodes/connector/connector';
 import { SELECTION_TOOL_ACTION_NAME } from '../selection-tool/constants';
 import { WEAVE_CONNECTOR_NODE_LINE_TYPE } from '@/nodes/connector/constants';
-import { mergeExceptArrays } from '@/utils';
+import { mergeExceptArrays } from '@/utils/utils';
 
 export class WeaveConnectorToolAction extends WeaveAction {
   protected readonly config!: WeaveConnectorToolActionProperties;

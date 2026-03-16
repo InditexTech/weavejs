@@ -62,18 +62,18 @@ export class WeaveRegisterManager {
     this.plugins[pluginName] = plugin;
   }
 
-  registerNodesHandlers(): void {
+  async registerNodesHandlers(): Promise<void> {
     const config = this.instance.getConfiguration();
     if (config.nodes) {
       for (const node of config.nodes) {
-        this.registerNodeHandler(node as WeaveNode);
+        await this.registerNodeHandler(node as WeaveNode);
       }
     }
 
     this.logger.info(`Nodes handlers registered`);
   }
 
-  registerNodeHandler(node: WeaveNode): void {
+  async registerNodeHandler(node: WeaveNode): Promise<void> {
     const nodeType = node.getNodeType();
     if (this.nodesHandlers[nodeType]) {
       const msg = `Node handler with type [${nodeType}] already exists`;
@@ -81,7 +81,7 @@ export class WeaveRegisterManager {
       throw new Error(msg);
     }
 
-    node.register(this.instance);
+    await node.register(this.instance);
     this.nodesHandlers[nodeType] = node;
   }
 

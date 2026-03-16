@@ -4,16 +4,16 @@
 
 import Konva from 'konva';
 import mergeWith from 'lodash/mergeWith';
-import type { Weave } from './weave';
 import {
   WEAVE_NODE_CHANGE_TYPE,
   WEAVE_NODE_CUSTOM_EVENTS,
   type WeaveElementInstance,
 } from '@inditextech/weave-types';
-import type { WeaveNode } from './nodes/node';
-import type { WeaveNodesSelectionPlugin } from './plugins/nodes-selection/nodes-selection';
-import type { DOMElement } from './types';
 import type { KonvaEventObject } from 'konva/lib/Node';
+import type { Weave } from '@/weave';
+import type { WeaveNode } from '@/nodes/node';
+import type { WeaveNodesSelectionPlugin } from '@/plugins/nodes-selection/nodes-selection';
+import type { DOMElement } from '@/types';
 
 export function resetScale(node: Konva.Node): void {
   node.width(
@@ -446,8 +446,7 @@ export function getTargetAndSkipNodes(
   let node: Konva.Node | undefined = undefined;
   if (
     e.type === 'dragmove' &&
-    nodesSelectionPlugin &&
-    nodesSelectionPlugin.getTransformer().nodes().length === 1
+    nodesSelectionPlugin?.getTransformer().nodes().length === 1
   ) {
     node = nodesSelectionPlugin.getTransformer().nodes()[0];
     skipNodes.push(node.getAttrs().id ?? '');
@@ -471,8 +470,8 @@ export function getTargetAndSkipNodes(
 
   if (e.type === 'transform' && nodesSelectionPlugin) {
     node = e.target;
-    skipNodes.push(node.getAttrs().id ?? '');
     skipNodes.push(
+      node.getAttrs().id ?? '',
       ...nodesSelectionPlugin
         .getTransformer()
         .nodes()
@@ -672,10 +671,9 @@ export const canComposite = (node: Konva.Node) => {
   const parent = node.getParent();
 
   return (
-    parent &&
-    parent.getClassName() === 'Group' &&
-    parent.getAttrs().nodeType !== 'frame' &&
-    parent.getAttrs().nodeId === undefined
+    parent?.getClassName() === 'Group' &&
+    parent?.getAttrs().nodeType !== 'frame' &&
+    parent?.getAttrs().nodeId === undefined
   );
 };
 

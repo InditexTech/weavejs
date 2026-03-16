@@ -18,33 +18,50 @@ export type WeaveImageToolActionStateKeys = keyof typeof WEAVE_IMAGE_TOOL_STATE;
 export type WeaveImageToolActionState =
   (typeof WEAVE_IMAGE_TOOL_STATE)[WeaveImageToolActionStateKeys];
 
-export type WeaveImageToolActionOnStartLoadImageEvent = undefined;
-export type WeaveImageToolActionOnEndLoadImageEvent = Error | undefined;
-export type WeaveImageToolActionOnAddingEvent = { imageURL: string };
 export type WeaveImageToolActionOnAddedEvent = {
+  nodeId: string;
+};
+export type WeaveImageToolActionOnImageUploadedEvent = {
   imageURL: string;
   nodeId: string;
 };
+export type WeaveImageToolActionOnImageUploadedErrorEvent = {
+  error: unknown;
+};
 
 export type WeaveImageToolActionTriggerCommonParams = {
+  nodeId?: string;
   imageId?: string;
   options?: ImageOptions;
   position?: Konva.Vector2d;
   forceMainContainer?: boolean;
 };
 
+export type WeaveImageFile = {
+  file: File;
+  downscaleRatio: number;
+};
+
+export type WeaveImageURL = {
+  url: string;
+  fallback: string;
+  width: number;
+  height: number;
+};
+
+export type WeaveImageToolActionUploadFunction = (
+  file: File
+) => Promise<string>;
+
 export type WeaveImageToolActionTriggerParams = (
   | {
       type: typeof WEAVE_IMAGE_TOOL_UPLOAD_TYPE.FILE;
-      imageFile: File;
-      imageDownscaleRatio: number;
+      image: WeaveImageFile;
+      uploadImageFunction: WeaveImageToolActionUploadFunction;
     }
   | {
       type: typeof WEAVE_IMAGE_TOOL_UPLOAD_TYPE.IMAGE_URL;
-      imageURL: string;
-      imageFallback: string;
-      imageWidth: number;
-      imageHeight: number;
+      image: WeaveImageURL;
     }
 ) &
   WeaveImageToolActionTriggerCommonParams;
@@ -53,20 +70,13 @@ export type ImageOptions = {
   crossOrigin: ImageCrossOrigin;
 };
 
-export type WeaveImageToolActionTriggerReturn =
-  | {
-      nodeId: string;
-      finishUploadCallback: (nodeId: string, imageURL: string) => void;
-    }
-  | undefined;
+export type WeaveImageToolActionTriggerReturn = {
+  nodeId: string;
+};
 
 export type WeaveImageToolDragAndDropProperties = {
-  imageURL: string;
-  imageFallback: string;
-  imageWidth: number;
-  imageHeight: number;
-  imageId?: string;
-};
+  imageURL: WeaveImageURL;
+} & Omit<WeaveImageToolActionTriggerCommonParams, 'position'>;
 
 export type WeaveImageToolActionConfig = {
   style: {

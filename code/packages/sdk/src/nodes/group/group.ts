@@ -12,7 +12,7 @@ import { WeaveNode } from '../node';
 import { WEAVE_GROUP_NODE_TYPE } from './constants';
 import type { WeaveNodesSelectionPlugin } from '@/plugins/nodes-selection/nodes-selection';
 import type { WeaveGroupNodeParams, WeaveGroupProperties } from './types';
-import { intersectArrays } from '@/utils';
+import { intersectArrays } from '@/utils/utils';
 
 export class WeaveGroupNode extends WeaveNode {
   private config: WeaveGroupProperties;

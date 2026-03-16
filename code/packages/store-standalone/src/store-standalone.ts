@@ -6,6 +6,7 @@ import Y from './yjs';
 import { defaultInitialState, WeaveStore } from '@inditextech/weave-sdk';
 import {
   WEAVE_STORE_CONNECTION_STATUS,
+  type WeaveState,
   type WeaveStoreOptions,
 } from '@inditextech/weave-types';
 import { WEAVE_STORE_STANDALONE } from './constants.js';
@@ -27,14 +28,14 @@ export class WeaveStoreStandalone extends WeaveStore {
     this.initialState = initialState ?? defaultInitialState;
   }
 
-  private snapshotToJSON(roomDataSnapshot: Uint8Array) {
+  private snapshotToJSON(roomDataSnapshot: Uint8Array): WeaveState {
     const tempDoc = new Y.Doc();
 
     Y.applyUpdate(tempDoc, roomDataSnapshot);
     const actualStateString = JSON.stringify(tempDoc.getMap('weave').toJSON());
     const actualStateJson = JSON.parse(actualStateString);
 
-    return actualStateJson;
+    return { weave: actualStateJson };
   }
 
   async connect(): Promise<void> {

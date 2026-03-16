@@ -29,7 +29,7 @@ import {
   createElbowConnector,
   setConnectorTypeElbow,
 } from './line-types/elbow';
-import { mergeExceptArrays, moveNodeToContainer } from '@/utils';
+import { mergeExceptArrays, moveNodeToContainer } from '@/utils/utils';
 import { setupNodeDecoratorDot } from './decorators/dot';
 import { setupNodeDecoratorArrow } from './decorators/arrow';
 import { setupNodeDecoratorNone } from './decorators/none';
