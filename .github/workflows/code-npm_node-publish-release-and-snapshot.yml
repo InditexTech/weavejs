@@ -197,13 +197,13 @@ jobs:
 
             const body = status === 'success'
               ? [
-                  "✅ Pre-release published successfully.",
+                  "### :rocket: Pre-release snapshot published",
                   "",
                   `- Version: \`${process.env.SNAPSHOT_VERSION}\``,
                   "- Tag: `next`"
                 ]
               : [
-                  "❌ Pre-release publish failed.",
+                  "### :x: Pre-release snapshot publish failed",
                   "",
                   "Please check the workflow logs for details."
                 ]
