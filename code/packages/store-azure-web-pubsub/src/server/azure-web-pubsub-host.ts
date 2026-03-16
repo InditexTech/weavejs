@@ -208,6 +208,11 @@ export class WeaveStoreAzureWebPubSubSyncHost {
             event.data
           );
 
+          if (event.data.type === 'chunk') {
+            // skip processed chunked message
+            return;
+          }
+
           switch (event.data.t) {
             case MessageDataType.Init:
               this.onClientInit(group, event.data);
