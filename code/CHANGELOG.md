@@ -13,6 +13,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.2.1] - 2026-03-16
+
 ### Fixed
 
 - [#976](https://github.com/InditexTech/weavejs/issues/976) Avoid calling frontend api on server-side on the Image node
@@ -1660,7 +1662,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - [#24](https://github.com/InditexTech/weavejs/issues/24) Bug when loading rooms with text or images
 - [#18](https://github.com/InditexTech/weavejs/issues/18) Fix awareness not working on store-azure-web-pubsub
 
-[Unreleased]: https://github.com/InditexTech/weavejs/compare/3.2.0...HEAD
+[Unreleased]: https://github.com/InditexTech/weavejs/compare/3.2.1...HEAD
+
+[3.2.1]: https://github.com/InditexTech/weavejs/compare/3.2.0...3.2.1
 
 [3.2.0]: https://github.com/InditexTech/weavejs/compare/3.1.0...3.2.0
 
