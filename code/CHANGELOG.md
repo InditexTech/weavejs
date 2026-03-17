@@ -16,6 +16,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 - [#979](https://github.com/InditexTech/weavejs/issues/979) Avoid race conditions when moving Images to containers
+- [#980](https://github.com/InditexTech/weavejs/issues/980) Avoid race conditions when copy / paste
 
 ## [3.2.1] - 2026-03-16
 

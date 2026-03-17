@@ -345,7 +345,7 @@ export class WeaveCopyPasteNodesPlugin extends WeavePlugin {
         return;
       }
 
-      const nodesToSelect = [];
+      const nodesToSelect: string[] = [];
 
       const newElements = this.checkIfInternalElementsAreNew(
         JSON.stringify(this.toPaste)
@@ -357,6 +357,52 @@ export class WeaveCopyPasteNodesPlugin extends WeavePlugin {
       }
 
       this.updateInternalPastePadding();
+
+      const nodesToAddCount = Object.keys(this.toPaste.weave).length;
+      let nodesAddedCount = 0;
+      const handleOnNodeAdded = (node: Konva.Node) => {
+        if (nodesToSelect.includes(node.getAttrs().id ?? '')) {
+          nodesAddedCount = nodesAddedCount + 1;
+        }
+
+        if (nodesAddedCount >= nodesToAddCount) {
+          const realNodes = [];
+
+          for (const id of nodesToSelect) {
+            const realNode = this.instance.getStage().findOne(`#${id}`);
+            if (realNode) {
+              realNodes.push(realNode);
+            }
+          }
+
+          const nodesSelectionPlugin = this.getNodesSelectionPlugin();
+          nodesSelectionPlugin?.setSelectedNodes(realNodes);
+
+          this.instance?.triggerAction('fitToSelectionTool', {
+            previousAction: 'selectionTool',
+            smartZoom: true,
+          });
+
+          this.instance.emitEvent<WeaveCopyPasteNodesPluginOnPasteEvent>(
+            'onPaste',
+            {
+              error: undefined,
+              pastedNodes: realNodes.map((n) => n.getAttrs().id ?? ''),
+            }
+          );
+
+          this.instance.removeEventListener(
+            'onNodeRenderedAdded',
+            handleOnNodeAdded
+          );
+
+          this.toPaste = undefined;
+
+          this.cancel();
+        }
+      };
+
+      this.instance.addEventListener('onNodeRenderedAdded', handleOnNodeAdded);
 
       for (const element of Object.keys(this.toPaste.weave)) {
         const node = this.toPaste.weave[element].element;
@@ -449,36 +495,12 @@ export class WeaveCopyPasteNodesPlugin extends WeavePlugin {
         }
 
         if (containerId) {
+          nodesToSelect.push(newNodeId);
           this.instance.addNodeNT(node, containerId);
-
-          const realNode = this.instance.getStage().findOne(`#${newNodeId}`);
-          if (realNode) {
-            nodesToSelect.push(realNode);
-          }
         }
 
         this.getStageGridPlugin()?.onRender();
       }
-
-      this.instance.emitEvent<WeaveCopyPasteNodesPluginOnPasteEvent>(
-        'onPaste',
-        {
-          error: undefined,
-          pastedNodes: nodesToSelect.map((n) => n.getAttrs().id ?? ''),
-        }
-      );
-
-      const nodesSelectionPlugin = this.getNodesSelectionPlugin();
-      nodesSelectionPlugin?.setSelectedNodes(nodesToSelect);
-
-      this.instance?.triggerAction('fitToSelectionTool', {
-        previousAction: 'selectionTool',
-        smartZoom: true,
-      });
-
-      this.toPaste = undefined;
-
-      this.cancel();
     });
   }
 
