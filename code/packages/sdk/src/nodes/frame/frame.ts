@@ -408,6 +408,7 @@ export class WeaveFrameNode extends WeaveNode {
     delete cleanedAttrs.draggable;
     delete cleanedAttrs.onTargetEnter;
     delete cleanedAttrs.overridesMouseControl;
+    delete cleanedAttrs.onMoveContainer;
     delete cleanedAttrs.dragBoundFunc;
 
     return {

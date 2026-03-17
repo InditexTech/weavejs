@@ -246,6 +246,8 @@ export class WeaveImageNode extends WeaveNode {
   }
 
   onRender(props: WeaveElementAttributes): WeaveElementInstance {
+    // this.initGlobalEvents();
+
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const imageProperties: any = props.imageProperties;
     const imageProps = props as ImageProps;
@@ -270,8 +272,6 @@ export class WeaveImageNode extends WeaveNode {
       ...internalImageProps,
       id,
       name: 'node',
-      loadedImage: false,
-      loadedImageError: false,
       cropping: false,
     });
 
@@ -947,8 +947,6 @@ export class WeaveImageNode extends WeaveNode {
         };
       }
 
-      delete this.imageSource[imageId];
-
       onError(error);
     };
 
@@ -1385,8 +1383,15 @@ export class WeaveImageNode extends WeaveNode {
 
   onDestroy(nodeInstance: WeaveElementInstance) {
     const nodeId = nodeInstance.getAttrs().id ?? '';
-    delete this.imageSource[nodeId];
-    delete this.imageState[nodeId];
+
+    const isMoveContainer = nodeInstance.getAttr('onMoveContainer');
+    nodeInstance.setAttr('onMoveContainer', undefined);
+
+    if (!isMoveContainer) {
+      delete this.imageSource[nodeId];
+      delete this.imageState[nodeId];
+    }
+
     delete this.imageTryoutAttempts[nodeId];
     delete this.imageFallback[nodeId];
     nodeInstance.destroy();

@@ -209,8 +209,8 @@ export function moveNodeToContainerNT(
     );
 
     if (nodeHandler) {
+      node.setAttrs({ onMoveContainer: true });
       const actualNode = nodeHandler.serialize(node as WeaveElementInstance);
-
       instance.removeNodeNT(actualNode, { emitUserChangeEvent: false });
       instance.addNodeNT(actualNode, layerToMoveAttrs.id, {
         // emitUserChangeEvent: true,

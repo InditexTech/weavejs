@@ -483,6 +483,7 @@ export class WeaveTextNode extends WeaveNode {
     delete cleanedAttrs.measureMultilineText;
     delete cleanedAttrs.overridesMouseControl;
     delete cleanedAttrs.shouldUpdateOnTransform;
+    delete cleanedAttrs.onMoveContainer;
     delete cleanedAttrs.dragBoundFunc;
 
     return {
