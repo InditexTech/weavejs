@@ -172,7 +172,7 @@ export class WeaveStageNode extends WeaveNode {
     }
 
     window.addEventListener('keydown', (e) => {
-      if (e.ctrlKey || e.metaKey) {
+      if (this.isOnlyCtrlOrMeta(e)) {
         this.isCmdCtrlPressed = true;
 
         this.instance.getStage().container().style.cursor = 'default';
@@ -220,5 +220,17 @@ export class WeaveStageNode extends WeaveNode {
     });
 
     this.globalEventsInitialized = true;
+  }
+
+  private isOnlyCtrlOrMeta(event: KeyboardEvent): boolean {
+    const isCtrl = event.ctrlKey;
+    const isMeta = event.metaKey;
+
+    const noOtherModifiers = !event.shiftKey && !event.altKey;
+
+    // Ensure the actual key pressed is Ctrl or Meta
+    const isOnlyModifierKey = event.key === 'Control' || event.key === 'Meta';
+
+    return (isCtrl || isMeta) && noOtherModifiers && isOnlyModifierKey;
   }
 }

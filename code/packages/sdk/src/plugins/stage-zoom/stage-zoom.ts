@@ -360,8 +360,9 @@ export class WeaveStageZoomPlugin extends WeavePlugin {
     let realNodes = mainLayer.getChildren();
     realNodes = realNodes.filter(
       (node) =>
-        typeof node.getAttrs().visible === 'undefined' ||
-        node.getAttrs().visible
+        (typeof node.getAttrs().visible === 'undefined' ||
+          node.getAttrs().visible) &&
+        node.getAttrs().name?.indexOf('node') !== -1
     );
 
     const bounds = getBoundingBox(realNodes, {

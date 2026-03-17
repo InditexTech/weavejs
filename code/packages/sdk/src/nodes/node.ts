@@ -1097,6 +1097,7 @@ export abstract class WeaveNode implements WeaveNodeBase {
     delete cleanedAttrs.mutexUserId;
     delete cleanedAttrs.draggable;
     delete cleanedAttrs.overridesMouseControl;
+    delete cleanedAttrs.onMoveContainer;
     delete cleanedAttrs.dragBoundFunc;
 
     return {
