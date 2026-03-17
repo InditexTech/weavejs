@@ -15,7 +15,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
-- [#983](https://github.com/InditexTech/weavejs/issues/983) imageId is not propagating onto the node
+- [#983](https://github.com/InditexTech/weavejs/issues/983) imageId is not propagating onto the node when using ImageTool or ImagesTool
 
 ## [3.2.2] - 2026-03-17
 
