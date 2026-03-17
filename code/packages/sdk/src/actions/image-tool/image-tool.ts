@@ -440,6 +440,9 @@ export class WeaveImageToolAction extends WeaveAction {
             width: imageWidth,
             height: imageHeight,
           },
+          ...(this.imageAction[nodeId].imageId && {
+            imageId: this.imageAction[nodeId].imageId,
+          }),
         });
 
         this.instance.addNode(
