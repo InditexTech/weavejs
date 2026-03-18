@@ -245,6 +245,16 @@ export class WeaveStrokeSingleNode extends WeaveNode {
   }
 
   private setupHandles(): void {
+    if (!this.startHandle) {
+      this.setupHandle('start');
+    }
+
+    if (!this.endHandle) {
+      this.setupHandle('end');
+    }
+  }
+
+  private setupHandle(side: 'start' | 'end'): void {
     const handleDragStart = (e: KonvaEventObject<DragEvent, Circle>) => {
       const tr = this.instance
         .getPlugin<WeaveNodesSelectionPlugin>('nodesSelection')
@@ -273,7 +283,7 @@ export class WeaveStrokeSingleNode extends WeaveNode {
       this.instance.emitEvent('onDrag', e.target);
     };
 
-    const handleDragMove =
+    const handleDragPosition =
       (side: 'start' | 'end') => (e: KonvaEventObject<DragEvent, Circle>) => {
         const draggedTarget = e.target;
         const strokeId = draggedTarget.getAttr('strokeId');
@@ -344,15 +354,14 @@ export class WeaveStrokeSingleNode extends WeaveNode {
         this.setupSelection(draggedStroke);
       };
 
+    const handleDragMove =
+      (side: 'start' | 'end') => (e: KonvaEventObject<DragEvent, Circle>) => {
+        handleDragPosition(side)(e);
+      };
+
     const handleDragEnd =
       (side: 'start' | 'end') => (e: KonvaEventObject<DragEvent, Circle>) => {
-        const tr = this.instance
-          .getPlugin<WeaveNodesSelectionPlugin>('nodesSelection')
-          ?.getTransformer();
-
-        if (tr) {
-          tr.show();
-        }
+        handleDragPosition(side)(e);
 
         const draggedTarget = e.target;
         const strokeId = draggedTarget.getAttr('strokeId');
@@ -364,134 +373,47 @@ export class WeaveStrokeSingleNode extends WeaveNode {
         if (!draggedStroke) {
           return;
         }
-
-        const internalLine = draggedStroke.findOne(
-          `#${draggedStroke.getAttrs().id}-line`
-        ) as Konva.Line;
-
-        if (!internalLine) {
-          return;
-        }
-
-        const points = draggedStroke.getAttrs().linePoints as number[];
-        if (points.length !== 4) {
-          return;
-        }
-
-        this.teardownSelection();
-
-        const newLinePoint = this.getLinePointFromHandle(draggedStroke, e);
-
-        const pos: Konva.Vector2d = this.getDragPoint(
-          draggedStroke,
-          newLinePoint,
-          side
-        );
-
-        if (side === 'start') {
-          draggedStroke.setAttrs({
-            linePoints: [pos.x, pos.y, points[2], points[3]],
-          });
-        } else {
-          draggedStroke.setAttrs({
-            linePoints: [points[0], points[1], pos.x, pos.y],
-          });
-        }
-
-        this.positionHandle(
-          draggedStroke,
-          WEAVE_STROKE_SINGLE_NODE_TIP_SIDE.START
-        );
-
-        this.positionHandle(
-          draggedStroke,
-          WEAVE_STROKE_SINGLE_NODE_TIP_SIDE.END
-        );
-
-        const tipStartStyle = draggedStroke.getAttrs().tipStartStyle ?? 'none';
-        this.tipManagers[tipStartStyle]?.update(
-          draggedStroke as Konva.Group,
-          WEAVE_STROKE_SINGLE_NODE_TIP_SIDE.START
-        );
-
-        const tipEndStyle = draggedStroke.getAttrs().tipEndStyle ?? 'none';
-        this.tipManagers[tipEndStyle]?.update(
-          draggedStroke as Konva.Group,
-          WEAVE_STROKE_SINGLE_NODE_TIP_SIDE.END
-        );
-
-        this.setupSelection(draggedStroke);
 
         this.instance.updateNode(this.serialize(draggedStroke));
 
         this.instance.emitEvent('onDrag', null);
       };
 
-    if (!this.startHandle) {
-      const startHandle = new Konva.Circle({
-        id: 'line-start-handle',
-        radius: 5,
-        fill: '#ffffff',
-        stroke: '#000000',
-        strokeWidth: 1,
-        edgeDistanceDisableOnDrag: true,
-        scaleX: 1 / this.instance.getStage().scaleX(),
-        scaleY: 1 / this.instance.getStage().scaleY(),
-        draggable: true,
-      });
+    const handle = new Konva.Circle({
+      id: `line-${side}-handle`,
+      radius: 5,
+      fill: '#ffffff',
+      stroke: '#000000',
+      strokeWidth: 1,
+      edgeDistanceDisableOnDrag: true,
+      scaleX: 1 / this.instance.getStage().scaleX(),
+      scaleY: 1 / this.instance.getStage().scaleY(),
+      draggable: true,
+    });
 
-      startHandle.on('pointerover', () => {
-        this.instance.getStage().container().style.cursor = 'move';
-      });
+    handle.on('pointerover', () => {
+      this.instance.getStage().container().style.cursor = 'move';
+    });
 
-      startHandle.on('pointerout', () => {
-        this.instance.getStage().container().style.cursor = 'default';
-      });
+    handle.on('pointerout', () => {
+      this.instance.getStage().container().style.cursor = 'default';
+    });
 
-      startHandle.on('dragstart', handleDragStart);
+    handle.on('dragstart', handleDragStart);
 
-      startHandle.on('dragmove', handleDragMove('start'));
+    handle.on('dragmove', handleDragMove(side));
 
-      startHandle.on('dragend', handleDragEnd('start'));
+    handle.on('dragend', handleDragEnd(side));
 
-      this.startHandle = startHandle;
+    if (side === 'start') {
+      this.startHandle = handle;
       this.startHandle.visible(false);
-
-      this.instance.getSelectionLayer()?.add(this.startHandle);
-    }
-
-    if (!this.endHandle) {
-      const endHandle = new Konva.Circle({
-        id: 'line-end-handle',
-        radius: 5,
-        fill: '#ffffff',
-        stroke: '#000000',
-        strokeWidth: 1,
-        edgeDistanceDisableOnDrag: true,
-        scaleX: 1 / this.instance.getStage().scaleX(),
-        scaleY: 1 / this.instance.getStage().scaleY(),
-        draggable: true,
-      });
-
-      endHandle.on('pointerover', () => {
-        this.instance.getStage().container().style.cursor = 'move';
-      });
-
-      endHandle.on('pointerout', () => {
-        this.instance.getStage().container().style.cursor = 'default';
-      });
-
-      endHandle.on('dragstart', handleDragStart);
-
-      endHandle.on('dragmove', handleDragMove('end'));
-
-      endHandle.on('dragend', handleDragEnd('end'));
-
-      this.endHandle = endHandle;
+    } else {
+      this.endHandle = handle;
       this.endHandle.visible(false);
-
-      this.instance.getSelectionLayer()?.add(this.endHandle);
     }
+
+    this.instance.getSelectionLayer()?.add(handle);
   }
 
   private showHandles(stroke: Konva.Group): void {
