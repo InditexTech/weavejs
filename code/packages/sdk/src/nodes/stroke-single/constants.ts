@@ -7,8 +7,8 @@ export const WEAVE_STROKE_SINGLE_NODE_TYPE = 'stroke-single';
 export const WEAVE_STROKE_SINGLE_NODE_DEFAULT_CONFIG = {
   snapAngles: {
     angles: [0, 45, 90, 135, 180, 225, 270, 315],
-    activateThreshold: 5,
-    releaseThreshold: 10,
+    activateThreshold: 3,
+    releaseThreshold: 4,
   },
 };
 
