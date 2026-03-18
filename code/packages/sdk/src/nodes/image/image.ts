@@ -12,6 +12,7 @@ import {
   type ImageProps,
   type WeaveImageCropAnchorPosition,
   type WeaveImageCropEndType,
+  type WeaveImageCursors,
   type WeaveImageNodeParams,
   type WeaveImageOnCropEndEvent,
   type WeaveImageOnCropStartEvent,
@@ -29,7 +30,7 @@ import {
 } from './constants';
 import { WEAVE_STAGE_DEFAULT_MODE } from '../stage/constants';
 import { mergeExceptArrays } from '@/utils/utils';
-import { extractCursorUrl } from './utils';
+import { doPreloadCursors } from '@/utils/cursors';
 
 export class WeaveImageNode extends WeaveNode {
   protected config: WeaveImageProperties;
@@ -42,6 +43,10 @@ export class WeaveImageNode extends WeaveNode {
   protected tapStart: { x: number; y: number; time: number } | null;
   protected imageCrop!: WeaveImageCrop | null;
   protected nodeType: string = WEAVE_IMAGE_NODE_TYPE;
+  private readonly cursorsFallback: WeaveImageCursors = {
+    loading: 'wait',
+  };
+  protected cursors: Record<string, string> = {};
 
   constructor(params?: WeaveImageNodeParams) {
     super();
@@ -61,55 +66,23 @@ export class WeaveImageNode extends WeaveNode {
   }
 
   preloadCursors() {
-    const promiseHandler = (src: string) =>
-      new Promise<void>((resolveInt, rejectInt) => {
-        const img = Konva.Util.createImageElement();
-        img.onload = () => {
-          resolveInt();
-        };
-        img.onerror = () => {
-          rejectInt(new Error(`Failed to load cursor image: ${src}`));
-        };
-        img.src = src;
-      });
-
     return new Promise<void>((resolve) => {
       (async () => {
-        const cursors = Object.keys(this.config.style.cursor);
-
-        const cursorUrls = [];
-
-        const cursorFallback = {
-          loading: 'wait',
-        };
-
-        for (const cursorKey of cursors) {
-          const cursorValue =
-            this.config.style.cursor[
-              cursorKey as keyof typeof this.config.style.cursor
-            ];
-
-          const { preload, cursor } = extractCursorUrl(
-            cursorValue,
-            cursorFallback[cursorKey as keyof typeof cursorFallback]
-          );
-
-          if (preload) {
-            cursorUrls.push({
-              src: cursor,
-            });
+        await doPreloadCursors(
+          this.config.style.cursor,
+          (state, cursor) => {
+            this.cursors[state] = cursor;
+          },
+          (state) => {
+            return (
+              this.cursorsFallback[state as keyof WeaveImageCursors] ||
+              'default'
+            );
+          },
+          () => {
+            this.cursors = {};
           }
-        }
-
-        if (cursorUrls.length > 0) {
-          const cursorsPreloading = [];
-
-          for (const { src } of cursorUrls) {
-            cursorsPreloading.push(promiseHandler(src));
-          }
-
-          await Promise.allSettled(cursorsPreloading);
-        }
+        );
 
         resolve();
       })();
@@ -279,7 +252,7 @@ export class WeaveImageNode extends WeaveNode {
 
     image.defineMousePointer = () => {
       if (this.imageState[id]?.status === 'loading') {
-        return this.config.style.cursor.loading;
+        return this.cursors['loading'];
       }
 
       const selectedNodes = this.getSelectionPlugin()?.getSelectedNodes() ?? [];
@@ -401,18 +374,27 @@ export class WeaveImageNode extends WeaveNode {
       }
     };
 
-    if (this.imageSource[id] && imageProps.imageURL) {
+    const hasFinalImageLoaded = this.imageSource[id] && imageProps.imageURL;
+    const hasFallbackAndFinalImageNotLoaded =
+      !imageProps.imageURL &&
+      this.imageFallback[id] &&
+      this.config.useFallbackImage;
+
+    if (hasFinalImageLoaded || hasFallbackAndFinalImageNotLoaded) {
       imagePlaceholder?.destroy();
 
-      const imageSource: HTMLImageElement | ImageBitmap = this.imageSource[id];
+      const imageSource: HTMLImageElement | ImageBitmap =
+        hasFallbackAndFinalImageNotLoaded
+          ? this.imageFallback[id]
+          : this.imageSource[id];
 
       internalImage.setAttrs({
         image: imageSource,
         visible: true,
       });
 
-      let sourceImageWidth = this.imageSource[id].width;
-      let sourceImageHeight = this.imageSource[id].height;
+      let sourceImageWidth = imageSource.width;
+      let sourceImageHeight = imageSource.height;
       if (image.getAttrs().imageInfo) {
         sourceImageWidth = image.getAttrs().imageInfo.width;
         sourceImageHeight = image.getAttrs().imageInfo.height;
@@ -434,7 +416,7 @@ export class WeaveImageNode extends WeaveNode {
       }
 
       this.imageState[id] = {
-        status: 'loaded',
+        status: hasFallbackAndFinalImageNotLoaded ? 'loading' : 'loaded',
         loaded: true,
         error: false,
       };
@@ -1387,13 +1369,18 @@ export class WeaveImageNode extends WeaveNode {
     const isMoveContainer = nodeInstance.getAttr('onMoveContainer');
     nodeInstance.setAttr('onMoveContainer', undefined);
 
+    if (this.imageTryoutIds[nodeId]) {
+      clearTimeout(this.imageTryoutIds[nodeId]);
+      delete this.imageTryoutIds[nodeId];
+    }
+
     if (!isMoveContainer) {
       delete this.imageSource[nodeId];
       delete this.imageState[nodeId];
+      delete this.imageTryoutAttempts[nodeId];
+      delete this.imageFallback[nodeId];
     }
 
-    delete this.imageTryoutAttempts[nodeId];
-    delete this.imageFallback[nodeId];
     nodeInstance.destroy();
   }
 }

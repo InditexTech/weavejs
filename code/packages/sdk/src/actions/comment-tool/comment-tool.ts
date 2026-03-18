@@ -25,6 +25,7 @@ import type { WeaveNodesSelectionPlugin } from '@/plugins/nodes-selection/nodes-
 import type { WeaveCommentsRendererPlugin } from '@/plugins/comments-renderer/comments-renderer';
 import { WEAVE_COMMENTS_RENDERER_KEY } from '@/plugins/comments-renderer/constants';
 import { mergeExceptArrays } from '@/utils/utils';
+import { extractCursorUrl } from '@/utils/cursors';
 
 export class WeaveCommentToolAction<T> extends WeaveAction {
   private readonly config!: WeaveCommentToolActionConfig<T>;
@@ -62,69 +63,27 @@ export class WeaveCommentToolAction<T> extends WeaveAction {
     };
   }
 
-  extractCursorUrl(cursor: string): string | null {
-    const lower = cursor.toLowerCase();
-    const start = lower.indexOf('url(');
-    if (start === -1) return null;
-
-    // slice inside url(...)
-    let i = start + 4; // after "url("
-    const len = cursor.length;
-
-    // skip whitespace
-    while (i < len && /\s/.test(cursor[i])) i++;
-
-    let quote: string | null = null;
-    if (cursor[i] === '"' || cursor[i] === "'") {
-      quote = cursor[i];
-      i++;
-    }
-
-    let buf = '';
-    for (; i < len; i++) {
-      const ch = cursor[i];
-      if (quote) {
-        if (ch === quote) {
-          i++; // consume closing quote
-          break;
-        }
-        buf += ch;
-      } else {
-        if (ch === ')') break;
-        buf += ch;
-      }
-    }
-
-    const url = buf.trim();
-    if (!url) return null;
-
-    return this.isAllowedUrl(url) ? url : null;
-  }
-
-  isAllowedUrl(value: string): boolean {
-    // Allow http/https
-    if (/^https?:\/\//i.test(value)) return true;
-
-    // Reject known dangerous schemes
-    if (/^(javascript|data|blob|ftp):/i.test(value)) return false;
-
-    // Otherwise treat as relative
-    return true;
-  }
-
   preloadCursors() {
     const stage = this.instance.getStage();
 
-    const cursorUrls = [
-      {
-        src: this.extractCursorUrl(this.config.style.cursor.add) ?? '',
-        cursor: this.config.style.cursor.add,
-      },
-      {
-        src: this.extractCursorUrl(this.config.style.cursor.block) ?? '',
-        cursor: this.config.style.cursor.block,
-      },
-    ];
+    const cursorUrls = [];
+
+    for (const cursorKey in this.config.style.cursor) {
+      const cursorValue =
+        this.config.style.cursor[
+          cursorKey as keyof typeof this.config.style.cursor
+        ];
+
+      const { preload, cursor } =
+        extractCursorUrl(this.config.style.cursor.add) ?? '';
+
+      if (preload) {
+        cursorUrls.push({
+          src: cursor,
+          cursor: cursorValue,
+        });
+      }
+    }
 
     const actualCursor = stage.container().style.cursor;
 

@@ -42,6 +42,10 @@ export type WeaveImageCache =
       pixelRatio: number;
     };
 
+export type WeaveImageCursors = {
+  loading: string;
+};
+
 export type WeaveImageProperties = {
   performance: {
     cache: WeaveImageCache;
@@ -50,9 +54,7 @@ export type WeaveImageProperties = {
     placeholder: {
       fill: string;
     };
-    cursor: {
-      loading: string;
-    };
+    cursor: WeaveImageCursors;
   };
   imageLoading: {
     maxRetryAttempts: number;

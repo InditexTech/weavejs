@@ -175,6 +175,7 @@ export * from './plugins/stage-minimap/constants';
 export * from './plugins/stage-minimap/types';
 export { WeaveStageResizePlugin } from './plugins/stage-resize/stage-resize';
 export { WeaveStageZoomPlugin } from './plugins/stage-zoom/stage-zoom';
+export * from './plugins/stage-zoom/constants';
 export * from './plugins/stage-zoom/types';
 export { WeaveNodesSelectionPlugin } from './plugins/nodes-selection/nodes-selection';
 export * from './plugins/nodes-selection/constants';
