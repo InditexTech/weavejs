@@ -42,7 +42,7 @@ export class WeaveStrokeSingleNode extends WeaveNode {
     [WEAVE_STROKE_SINGLE_NODE_TIP_TYPE.SQUARE]: new WeaveSquareLineTipManager(),
     [WEAVE_STROKE_SINGLE_NODE_TIP_TYPE.NONE]: new WeaveNoneLineTipManager(),
   };
-  private snapper!: GreedySnapper;
+  private readonly snapper!: GreedySnapper;
   private shiftPressed!: boolean;
   private eventsInitialized!: boolean;
 
@@ -395,7 +395,7 @@ export class WeaveStrokeSingleNode extends WeaveNode {
         );
 
         draggedStroke.setAttrs({
-          linePoints: [pos.x, pos.y, points[2] as number, points[3] as number],
+          linePoints: [pos.x, pos.y, points[2], points[3]],
         });
 
         this.positionHandle(
@@ -516,7 +516,7 @@ export class WeaveStrokeSingleNode extends WeaveNode {
         );
 
         draggedStroke.setAttrs({
-          linePoints: [points[0] as number, points[1] as number, pos.x, pos.y],
+          linePoints: [points[0], points[1], pos.x, pos.y],
         });
 
         this.positionHandle(
@@ -583,7 +583,7 @@ export class WeaveStrokeSingleNode extends WeaveNode {
         );
 
         draggedStroke.setAttrs({
-          linePoints: [points[0] as number, points[1] as number, pos.x, pos.y],
+          linePoints: [points[0], points[1], pos.x, pos.y],
         });
 
         this.positionHandle(
@@ -783,23 +783,14 @@ export class WeaveStrokeSingleNode extends WeaveNode {
 
     for (const node of internalNodes) {
       const internalNode = node.clone();
-      if (internalNode.getClassName().indexOf('lineTip') === -1) {
-        internalNode.setAttrs({
-          name: 'hoverClone',
-          fill: '#1a1aff',
-          stroke: '#1a1aff',
-          listening: false,
-          draggable: false,
-        });
-      } else {
-        internalNode.setAttrs({
-          name: 'hoverClone',
-          fill: '#1a1aff',
-          stroke: '#1a1aff',
-          listening: false,
-          draggable: false,
-        });
-      }
+
+      internalNode.setAttrs({
+        name: 'hoverClone',
+        fill: '#1a1aff',
+        stroke: '#1a1aff',
+        listening: false,
+        draggable: false,
+      });
 
       instance.add(internalNode);
       internalNode.moveToTop();
