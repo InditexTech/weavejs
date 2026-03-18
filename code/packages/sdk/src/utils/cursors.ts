@@ -51,8 +51,7 @@ export const doPreloadCursors = async (
       }[] = [];
 
       for (const cursorKey of cursors) {
-        const cursorValue =
-          cursorsToPreload[cursorKey as keyof typeof cursorsToPreload];
+        const cursorValue = cursorsToPreload[cursorKey];
 
         const { preload, cursor } = extractCursorUrl(cursorValue);
 
@@ -107,11 +106,11 @@ export const extractCursorUrl = (
   let buf = '';
   for (; i < len; i++) {
     const ch = cursor[i];
+    if (quote && ch === quote) {
+      i++; // consume closing quote
+      break;
+    }
     if (quote) {
-      if (ch === quote) {
-        i++; // consume closing quote
-        break;
-      }
       buf += ch;
     } else {
       if (ch === ')') break;
@@ -120,13 +119,7 @@ export const extractCursorUrl = (
   }
 
   const url = buf.trim();
-  if (!url)
-    return {
-      preload: false,
-      cursor: null,
-    };
-
-  if (!isAllowedUrl(url)) {
+  if (!url || (url && !isAllowedUrl(url))) {
     return {
       preload: false,
       cursor: null,
