@@ -99,7 +99,7 @@ export class WeaveArrowLineTipManager extends WeaveBaseLineTipManager {
 
     const triangle = new Konva.Line({
       id: `${instance.getAttrs().id}-tip-${point}`,
-      name: 'lineTip',
+      name: 'lineTip stroke-internal',
       nodeId: instance.getAttrs().id,
       closed: true,
       stroke,

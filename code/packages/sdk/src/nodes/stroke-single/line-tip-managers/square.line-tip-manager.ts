@@ -85,7 +85,7 @@ export class WeaveSquareLineTipManager extends WeaveBaseLineTipManager {
 
     const square = new Konva.Rect({
       id: `${instance.getAttrs().id}-tip-${point}`,
-      name: 'lineTip',
+      name: 'lineTip stroke-internal',
       nodeId: instance.getAttrs().id,
       width: width,
       height: width,

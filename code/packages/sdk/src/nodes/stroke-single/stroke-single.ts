@@ -28,10 +28,11 @@ import { WeaveArrowLineTipManager } from './line-tip-managers/arrow.line-tip-man
 import { WeaveCircleLineTipManager } from './line-tip-managers/circle.line-tip-manager';
 import { WeaveNoneLineTipManager } from './line-tip-managers/none.line-tip-manager';
 import { WeaveSquareLineTipManager } from './line-tip-managers/square.line-tip-manager';
+import type { KonvaEventObject } from 'konva/lib/Node';
+import type { Circle } from 'konva/lib/shapes/Circle';
 
 export class WeaveStrokeSingleNode extends WeaveNode {
   private config: WeaveStrokeSingleProperties;
-  protected snapper: GreedySnapper;
   protected startHandle: Konva.Circle | null = null;
   protected endHandle: Konva.Circle | null = null;
   protected handleNodeChanges: ((nodes: WeaveSelection[]) => void) | null;
@@ -43,6 +44,9 @@ export class WeaveStrokeSingleNode extends WeaveNode {
     [WEAVE_STROKE_SINGLE_NODE_TIP_TYPE.SQUARE]: new WeaveSquareLineTipManager(),
     [WEAVE_STROKE_SINGLE_NODE_TIP_TYPE.NONE]: new WeaveNoneLineTipManager(),
   };
+  private readonly snapper!: GreedySnapper;
+  private shiftPressed!: boolean;
+  private eventsInitialized!: boolean;
 
   constructor(params?: WeaveStrokeSingleNodeParams) {
     super();
@@ -55,14 +59,38 @@ export class WeaveStrokeSingleNode extends WeaveNode {
     this.handleNodeChanges = null;
     this.handleZoomChanges = null;
 
+    this.shiftPressed = false;
     this.snapper = new GreedySnapper({
       snapAngles: this.config.snapAngles.angles,
       activateThreshold: this.config.snapAngles.activateThreshold,
       releaseThreshold: this.config.snapAngles.releaseThreshold,
     });
+    this.eventsInitialized = false;
+  }
+
+  initEvents(): void {
+    if (this.eventsInitialized) {
+      return;
+    }
+
+    window.addEventListener('keydown', (e) => {
+      if (e.key === 'Shift') {
+        this.shiftPressed = true;
+      }
+    });
+
+    window.addEventListener('keyup', (e) => {
+      if (e.key === 'Shift') {
+        this.shiftPressed = false;
+      }
+    });
+
+    this.eventsInitialized = true;
   }
 
   onRender(props: WeaveElementAttributes): WeaveElementInstance {
+    this.initEvents();
+
     const stroke = new Konva.Group({
       ...props,
       name: `node ${WEAVE_STROKE_SINGLE_NODE_TYPE}`,
@@ -75,7 +103,7 @@ export class WeaveStrokeSingleNode extends WeaveNode {
       ...props,
       id: `${stroke.getAttrs().id}-line`,
       nodeId: stroke.getAttrs().id,
-      name: undefined,
+      name: 'stroke-internal',
       x: 0,
       y: 0,
       strokeScaleEnabled: true,
@@ -105,6 +133,8 @@ export class WeaveStrokeSingleNode extends WeaveNode {
       };
     };
 
+    this.setupDefaultNodeEvents(stroke);
+
     let originalStartHandleVisibility: boolean | null = null;
     let originalEndHandleVisibility: boolean | null = null;
 
@@ -121,8 +151,6 @@ export class WeaveStrokeSingleNode extends WeaveNode {
       originalStartHandleVisibility = null;
       originalEndHandleVisibility = null;
     });
-
-    this.setupDefaultNodeEvents(stroke);
 
     if (!this.handleZoomChanges) {
       this.handleZoomChanges = () => {
@@ -149,21 +177,12 @@ export class WeaveStrokeSingleNode extends WeaveNode {
 
         if (
           nodes.length === 1 &&
-          nodes[0].instance.getAttrs().nodeType ===
-            WEAVE_STROKE_SINGLE_NODE_TYPE
+          nodes[0].node?.type === WEAVE_STROKE_SINGLE_NODE_TYPE
         ) {
-          const strokeSelected = this.instance
-            .getStage()
-            .findOne(`#${nodes[0].instance.getAttrs().id}`) as Konva.Group;
-
-          if (!strokeSelected) {
-            return;
-          }
-
           this.setupHandles();
-          this.showHandles(strokeSelected);
+          this.showHandles(nodes[0].instance as Konva.Group);
 
-          this.setupSelection(strokeSelected, true);
+          this.setupSelection(nodes[0].instance as Konva.Group, true);
         } else {
           this.startHandle?.setAttr('strokeId', undefined);
           this.startHandle?.visible(false);
@@ -227,236 +246,45 @@ export class WeaveStrokeSingleNode extends WeaveNode {
 
   private setupHandles(): void {
     if (!this.startHandle) {
-      const startHandle = new Konva.Circle({
-        id: 'line-start-handle',
-        radius: 5,
-        fill: '#ffffff',
-        stroke: '#000000',
-        strokeWidth: 1,
-        edgeDistanceDisableOnDrag: true,
-        scaleX: 1 / this.instance.getStage().scaleX(),
-        scaleY: 1 / this.instance.getStage().scaleY(),
-        draggable: true,
-      });
-
-      startHandle.on('pointerover', () => {
-        this.instance.getStage().container().style.cursor = 'move';
-      });
-
-      startHandle.on('pointerout', () => {
-        this.instance.getStage().container().style.cursor = 'default';
-      });
-
-      startHandle.on('dragstart', (e) => {
-        const tr = this.instance
-          .getPlugin<WeaveNodesSelectionPlugin>('nodesSelection')
-          ?.getTransformer();
-
-        if (tr) {
-          tr.hide();
-        }
-
-        const strokeId = e.target.getAttr('strokeId');
-
-        const stroke = this.instance
-          .getStage()
-          .findOne(`#${strokeId}`) as Konva.Group;
-
-        if (!stroke) {
-          return;
-        }
-
-        const points = stroke.getAttrs().linePoints as number[];
-
-        if (points.length === 4) {
-          stroke.setAttr('eventTarget', true);
-        }
-
-        this.instance.emitEvent('onDrag', e.target);
-      });
-
-      startHandle.on('dragmove', (e) => {
-        const draggedTarget = e.target;
-        const strokeId = draggedTarget.getAttr('strokeId');
-
-        const draggedStroke = this.instance
-          .getStage()
-          .findOne(`#${strokeId}`) as Konva.Group;
-
-        if (!draggedStroke) {
-          return;
-        }
-
-        const internalLine = draggedStroke.findOne(
-          `#${draggedStroke.getAttrs().id}-line`
-        ) as Konva.Line;
-
-        if (!internalLine) {
-          return;
-        }
-
-        const points = draggedStroke.getAttrs().linePoints as number[];
-        if (points.length !== 4) {
-          return;
-        }
-
-        this.teardownSelection();
-
-        const newLinePoint = this.getLinePointFromHandle(draggedStroke, e);
-
-        draggedStroke.setAttrs({
-          linePoints: [newLinePoint.x, newLinePoint.y, points[2], points[3]],
-        });
-
-        this.positionHandle(
-          draggedStroke,
-          WEAVE_STROKE_SINGLE_NODE_TIP_SIDE.START
-        );
-
-        const tipStartStyle = draggedStroke.getAttrs().tipStartStyle ?? 'none';
-        this.tipManagers[tipStartStyle]?.update(
-          draggedStroke as Konva.Group,
-          WEAVE_STROKE_SINGLE_NODE_TIP_SIDE.START
-        );
-
-        const tipEndStyle = draggedStroke.getAttrs().tipEndStyle ?? 'none';
-        this.tipManagers[tipEndStyle]?.update(
-          draggedStroke as Konva.Group,
-          WEAVE_STROKE_SINGLE_NODE_TIP_SIDE.END
-        );
-
-        this.setupSelection(draggedStroke);
-      });
-
-      startHandle.on('dragend', (e) => {
-        const tr = this.instance
-          .getPlugin<WeaveNodesSelectionPlugin>('nodesSelection')
-          ?.getTransformer();
-
-        if (tr) {
-          tr.show();
-        }
-
-        const draggedTarget = e.target;
-        const strokeId = draggedTarget.getAttr('strokeId');
-
-        const draggedStroke = this.instance
-          .getStage()
-          .findOne(`#${strokeId}`) as Konva.Group;
-
-        if (!draggedStroke) {
-          return;
-        }
-
-        const internalLine = draggedStroke.findOne(
-          `#${draggedStroke.getAttrs().id}-line`
-        ) as Konva.Line;
-
-        if (!internalLine) {
-          return;
-        }
-
-        const points = draggedStroke.getAttrs().linePoints as number[];
-        if (points.length !== 4) {
-          return;
-        }
-
-        this.teardownSelection();
-
-        const newLinePoint = this.getLinePointFromHandle(draggedStroke, e);
-
-        draggedStroke.setAttrs({
-          linePoints: [
-            newLinePoint.x,
-            newLinePoint.y,
-            points[2] as number,
-            points[3] as number,
-          ],
-        });
-
-        this.positionHandle(
-          draggedStroke,
-          WEAVE_STROKE_SINGLE_NODE_TIP_SIDE.START
-        );
-
-        const tipStartStyle = draggedStroke.getAttrs().tipStartStyle ?? 'none';
-        this.tipManagers[tipStartStyle]?.update(
-          draggedStroke as Konva.Group,
-          WEAVE_STROKE_SINGLE_NODE_TIP_SIDE.START
-        );
-
-        const tipEndStyle = draggedStroke.getAttrs().tipEndStyle ?? 'none';
-        this.tipManagers[tipEndStyle]?.update(
-          draggedStroke as Konva.Group,
-          WEAVE_STROKE_SINGLE_NODE_TIP_SIDE.END
-        );
-
-        this.setupSelection(draggedStroke);
-
-        this.instance.updateNode(this.serialize(draggedStroke));
-
-        this.instance.emitEvent('onDrag', null);
-      });
-
-      this.startHandle = startHandle;
-      this.startHandle.visible(false);
-
-      this.instance.getSelectionLayer()?.add(this.startHandle);
+      this.setupHandle('start');
     }
 
     if (!this.endHandle) {
-      const endHandle = new Konva.Circle({
-        id: 'line-end-handle',
-        radius: 5,
-        fill: '#ffffff',
-        stroke: '#000000',
-        strokeWidth: 1,
-        edgeDistanceDisableOnDrag: true,
-        scaleX: 1 / this.instance.getStage().scaleX(),
-        scaleY: 1 / this.instance.getStage().scaleY(),
-        draggable: true,
-      });
+      this.setupHandle('end');
+    }
+  }
 
-      endHandle.on('pointerover', () => {
-        this.instance.getStage().container().style.cursor = 'move';
-      });
+  private setupHandle(side: 'start' | 'end'): void {
+    const handleDragStart = (e: KonvaEventObject<DragEvent, Circle>) => {
+      const tr = this.instance
+        .getPlugin<WeaveNodesSelectionPlugin>('nodesSelection')
+        ?.getTransformer();
 
-      endHandle.on('pointerout', () => {
-        this.instance.getStage().container().style.cursor = 'default';
-      });
+      if (tr) {
+        tr.hide();
+      }
 
-      endHandle.on('dragstart', (e) => {
-        const tr = this.instance
-          .getPlugin<WeaveNodesSelectionPlugin>('nodesSelection')
-          ?.getTransformer();
+      const strokeId = e.target.getAttr('strokeId');
 
-        if (tr) {
-          tr.hide();
-        }
+      const stroke = this.instance
+        .getStage()
+        .findOne(`#${strokeId}`) as Konva.Group;
 
-        const strokeId = e.target.getAttr('strokeId');
+      if (!stroke) {
+        return;
+      }
 
-        const draggedStroke = this.instance
-          .getStage()
-          .findOne(`#${strokeId}`) as Konva.Group;
+      const points = stroke.getAttrs().linePoints as number[];
 
-        if (!draggedStroke) {
-          return;
-        }
+      if (points.length === 4) {
+        stroke.setAttr('eventTarget', true);
+      }
 
-        const points = draggedStroke.getAttrs().linePoints as number[];
-        if (points.length !== 4) {
-          return;
-        }
+      this.instance.emitEvent('onDrag', e.target);
+    };
 
-        if (points.length === 4) {
-          draggedStroke.setAttr('eventTarget', true);
-        }
-
-        this.instance.emitEvent('onDrag', e.target);
-      });
-
-      endHandle.on('dragmove', (e) => {
+    const handleDragPosition =
+      (side: 'start' | 'end') => (e: KonvaEventObject<DragEvent, Circle>) => {
         const draggedTarget = e.target;
         const strokeId = draggedTarget.getAttr('strokeId');
 
@@ -485,14 +313,26 @@ export class WeaveStrokeSingleNode extends WeaveNode {
 
         const newLinePoint = this.getLinePointFromHandle(draggedStroke, e);
 
-        draggedStroke.setAttrs({
-          linePoints: [
-            points[0] as number,
-            points[1] as number,
-            newLinePoint.x,
-            newLinePoint.y,
-          ],
-        });
+        const pos: Konva.Vector2d = this.getDragPoint(
+          draggedStroke,
+          newLinePoint,
+          side
+        );
+
+        if (side === 'start') {
+          draggedStroke.setAttrs({
+            linePoints: [pos.x, pos.y, points[2], points[3]],
+          });
+        } else {
+          draggedStroke.setAttrs({
+            linePoints: [points[0], points[1], pos.x, pos.y],
+          });
+        }
+
+        this.positionHandle(
+          draggedStroke,
+          WEAVE_STROKE_SINGLE_NODE_TIP_SIDE.START
+        );
 
         this.positionHandle(
           draggedStroke,
@@ -512,16 +352,16 @@ export class WeaveStrokeSingleNode extends WeaveNode {
         );
 
         this.setupSelection(draggedStroke);
-      });
+      };
 
-      endHandle.on('dragend', (e) => {
-        const tr = this.instance
-          .getPlugin<WeaveNodesSelectionPlugin>('nodesSelection')
-          ?.getTransformer();
+    const handleDragMove =
+      (side: 'start' | 'end') => (e: KonvaEventObject<DragEvent, Circle>) => {
+        handleDragPosition(side)(e);
+      };
 
-        if (tr) {
-          tr.show();
-        }
+    const handleDragEnd =
+      (side: 'start' | 'end') => (e: KonvaEventObject<DragEvent, Circle>) => {
+        handleDragPosition(side)(e);
 
         const draggedTarget = e.target;
         const strokeId = draggedTarget.getAttr('strokeId');
@@ -533,62 +373,47 @@ export class WeaveStrokeSingleNode extends WeaveNode {
         if (!draggedStroke) {
           return;
         }
-
-        const internalLine = draggedStroke.findOne(
-          `#${draggedStroke.getAttrs().id}-line`
-        ) as Konva.Line;
-
-        if (!internalLine) {
-          return;
-        }
-
-        const points = draggedStroke.getAttrs().linePoints as number[];
-        if (points.length !== 4) {
-          return;
-        }
-
-        this.teardownSelection();
-
-        const newLinePoint = this.getLinePointFromHandle(draggedStroke, e);
-
-        draggedStroke.setAttrs({
-          linePoints: [
-            points[0] as number,
-            points[1] as number,
-            newLinePoint.x,
-            newLinePoint.y,
-          ],
-        });
-
-        this.positionHandle(
-          draggedStroke,
-          WEAVE_STROKE_SINGLE_NODE_TIP_SIDE.END
-        );
-
-        const tipStartStyle = draggedStroke.getAttrs().tipStartStyle ?? 'none';
-        this.tipManagers[tipStartStyle]?.update(
-          draggedStroke as Konva.Group,
-          WEAVE_STROKE_SINGLE_NODE_TIP_SIDE.START
-        );
-
-        const tipEndStyle = draggedStroke.getAttrs().tipEndStyle ?? 'none';
-        this.tipManagers[tipEndStyle]?.update(
-          draggedStroke as Konva.Group,
-          WEAVE_STROKE_SINGLE_NODE_TIP_SIDE.END
-        );
-
-        this.setupSelection(draggedStroke);
 
         this.instance.updateNode(this.serialize(draggedStroke));
 
         this.instance.emitEvent('onDrag', null);
-      });
+      };
 
-      this.endHandle = endHandle;
+    const handle = new Konva.Circle({
+      id: `line-${side}-handle`,
+      radius: 5,
+      fill: '#ffffff',
+      stroke: '#000000',
+      strokeWidth: 1,
+      edgeDistanceDisableOnDrag: true,
+      scaleX: 1 / this.instance.getStage().scaleX(),
+      scaleY: 1 / this.instance.getStage().scaleY(),
+      draggable: true,
+    });
+
+    handle.on('pointerover', () => {
+      this.instance.getStage().container().style.cursor = 'move';
+    });
+
+    handle.on('pointerout', () => {
+      this.instance.getStage().container().style.cursor = 'default';
+    });
+
+    handle.on('dragstart', handleDragStart);
+
+    handle.on('dragmove', handleDragMove(side));
+
+    handle.on('dragend', handleDragEnd(side));
+
+    if (side === 'start') {
+      this.startHandle = handle;
+      this.startHandle.visible(false);
+    } else {
+      this.endHandle = handle;
       this.endHandle.visible(false);
-
-      this.instance.getSelectionLayer()?.add(this.endHandle);
     }
+
+    this.instance.getSelectionLayer()?.add(handle);
   }
 
   private showHandles(stroke: Konva.Group): void {
@@ -638,7 +463,7 @@ export class WeaveStrokeSingleNode extends WeaveNode {
 
     if (internalLine) {
       internalLine.setAttrs({
-        name: undefined,
+        name: 'stroke-internal',
         dash: nextProps.dash,
         fill: nextProps.fill,
         stroke: nextProps.stroke,
@@ -753,26 +578,22 @@ export class WeaveStrokeSingleNode extends WeaveNode {
       return;
     }
 
-    const internalLine = instance.findOne(
-      `#${instance.getAttrs().id}-line`
-    ) as Konva.Line;
+    const internalNodes = instance.find('.stroke-internal');
 
-    if (!internalLine) {
-      return;
+    for (const node of internalNodes) {
+      const internalNode = node.clone();
+
+      internalNode.setAttrs({
+        name: 'hoverClone',
+        fill: '#1a1aff',
+        stroke: '#1a1aff',
+        listening: false,
+        draggable: false,
+      });
+
+      instance.add(internalNode);
+      internalNode.moveToTop();
     }
-
-    const internalLineHover = internalLine.clone();
-    internalLineHover.setAttrs({
-      name: 'hoverClone',
-      stroke: '#1a1aff',
-      listening: false,
-      draggable: false,
-      strokeWidth: 1,
-      points: instance.getAttrs().linePoints as number[],
-      strokeScaleEnabled: false,
-    });
-    instance.add(internalLineHover);
-    internalLineHover.moveToTop();
   }
 
   private teardownSelection() {
@@ -808,5 +629,41 @@ export class WeaveStrokeSingleNode extends WeaveNode {
       instance as Konva.Group,
       WEAVE_STROKE_SINGLE_NODE_TIP_SIDE.END
     );
+  }
+
+  private getDragPoint(
+    draggedStroke: Konva.Group,
+    newLinePoint: Konva.Vector2d,
+    dragFrom: 'start' | 'end'
+  ): Konva.Vector2d {
+    const pos: Konva.Vector2d = { x: 0, y: 0 };
+
+    const linePoints = draggedStroke.getAttrs().linePoints as number[];
+    const fixed =
+      dragFrom === 'start'
+        ? { x: linePoints[2], y: linePoints[3] } // end
+        : { x: linePoints[0], y: linePoints[1] }; // start
+
+    if (this.shiftPressed) {
+      let dx = newLinePoint.x - fixed.x;
+      let dy = newLinePoint.y - fixed.y;
+
+      const angle = Math.atan2(dy, dx);
+      const angleDeg = (angle * 180) / Math.PI;
+      const snapped = this.snapper.apply(angleDeg);
+
+      const dist = Math.hypot(dx, dy);
+      const rad = (snapped * Math.PI) / 180;
+      dx = Math.cos(rad) * dist;
+      dy = Math.sin(rad) * dist;
+
+      pos.x = fixed.x + dx;
+      pos.y = fixed.y + dy;
+    } else {
+      pos.x = newLinePoint.x;
+      pos.y = newLinePoint.y;
+    }
+
+    return pos;
   }
 }

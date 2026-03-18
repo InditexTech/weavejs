@@ -77,7 +77,7 @@ export class WeaveCircleLineTipManager extends WeaveBaseLineTipManager {
 
     const circle = new Konva.Circle({
       id: `${instance.getAttrs().id}-tip-${point}`,
-      name: 'lineTip',
+      name: 'lineTip stroke-internal',
       nodeId: instance.getAttrs().id,
       radius,
       stroke: 'black',

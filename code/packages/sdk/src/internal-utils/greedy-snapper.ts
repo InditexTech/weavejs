@@ -20,6 +20,11 @@ export class GreedySnapper {
     this.snappedAngle = null;
   }
 
+  angleDiff(a: number, b: number) {
+    const diff = Math.abs(a - b) % 360;
+    return diff > 180 ? 360 - diff : diff;
+  }
+
   apply(angleDeg: number): number {
     const { snapAngles, activateThreshold, releaseThreshold } = this.config;
 
@@ -28,7 +33,7 @@ export class GreedySnapper {
 
     // ---- Already snapped: check release threshold ----
     if (this.snappedAngle !== null) {
-      const diff = Math.abs(normalized - this.snappedAngle);
+      const diff = this.angleDiff(normalized, this.snappedAngle);
       if (diff > releaseThreshold) {
         this.snappedAngle = null; // release lock
         return normalized;
