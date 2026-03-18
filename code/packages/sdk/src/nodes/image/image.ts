@@ -43,7 +43,7 @@ export class WeaveImageNode extends WeaveNode {
   protected tapStart: { x: number; y: number; time: number } | null;
   protected imageCrop!: WeaveImageCrop | null;
   protected nodeType: string = WEAVE_IMAGE_NODE_TYPE;
-  private cursorsFallback: WeaveImageCursors = {
+  private readonly cursorsFallback: WeaveImageCursors = {
     loading: 'wait',
   };
   protected cursors: Record<string, string> = {};
