@@ -1387,13 +1387,18 @@ export class WeaveImageNode extends WeaveNode {
     const isMoveContainer = nodeInstance.getAttr('onMoveContainer');
     nodeInstance.setAttr('onMoveContainer', undefined);
 
+    if (this.imageTryoutIds[nodeId]) {
+      clearTimeout(this.imageTryoutIds[nodeId]);
+      delete this.imageTryoutIds[nodeId];
+    }
+
     if (!isMoveContainer) {
       delete this.imageSource[nodeId];
       delete this.imageState[nodeId];
+      delete this.imageTryoutAttempts[nodeId];
+      delete this.imageFallback[nodeId];
     }
 
-    delete this.imageTryoutAttempts[nodeId];
-    delete this.imageFallback[nodeId];
     nodeInstance.destroy();
   }
 }
