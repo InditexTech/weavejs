@@ -53,14 +53,18 @@ export const doPreloadCursors = async (
       for (const cursorKey of cursors) {
         const cursorValue = cursorsToPreload[cursorKey];
 
-        const { preload, cursor } = extractCursorUrl(cursorValue);
+        if (hasValidUrl(cursorValue)) {
+          const { preload, cursor } = extractCursorUrl(cursorValue);
 
-        if (preload) {
-          cursorUrls.push({
-            state: cursorKey,
-            value: cursorValue,
-            src: cursor,
-          });
+          if (preload) {
+            cursorUrls.push({
+              state: cursorKey,
+              value: cursorValue,
+              src: cursor,
+            });
+          }
+        } else {
+          setCursor(cursorKey, cursorValue);
         }
       }
 
@@ -130,6 +134,10 @@ export const extractCursorUrl = (
     preload: true,
     cursor: url,
   };
+};
+
+export const hasValidUrl = (value: string): boolean => {
+  return /url\(["']?.+?["']?\)/i.test(value);
 };
 
 export const isAllowedUrl = (value: string): boolean => {
