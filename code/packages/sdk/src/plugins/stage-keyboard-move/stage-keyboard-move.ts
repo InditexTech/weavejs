@@ -21,6 +21,7 @@ export class WeaveStageKeyboardMovePlugin extends WeavePlugin {
   getLayerName = undefined;
   initLayer = undefined;
   onRender: undefined;
+  initialize = undefined;
 
   constructor(params?: WeaveStageKeyboardMovePluginParams) {
     super();

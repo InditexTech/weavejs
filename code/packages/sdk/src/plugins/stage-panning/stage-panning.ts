@@ -35,19 +35,19 @@ import { DEFAULT_THROTTLE_MS } from '@/constants';
 
 export class WeaveStagePanningPlugin extends WeavePlugin {
   private readonly config!: WeaveStagePanningPluginConfig;
-  private moveToolActive: boolean;
-  private isMouseLeftButtonPressed: boolean;
-  private isMouseMiddleButtonPressed: boolean;
-  private isCtrlOrMetaPressed: boolean;
-  private isDragging: boolean;
-  private enableMove: boolean;
-  private isSpaceKeyPressed: boolean;
-  private pointers: Map<number, Konva.Vector2d>;
-  private panning: boolean = false;
+  private moveToolActive!: boolean;
+  private isMouseLeftButtonPressed!: boolean;
+  private isMouseMiddleButtonPressed!: boolean;
+  private isCtrlOrMetaPressed!: boolean;
+  private isDragging!: boolean;
+  private enableMove!: boolean;
+  private isSpaceKeyPressed!: boolean;
+  private pointers!: Map<number, Konva.Vector2d>;
+  private panning!: boolean;
   protected previousPointer!: string | null;
-  protected currentPointer: Konva.Vector2d | null = null;
-  protected stageScrollInterval: NodeJS.Timeout | undefined = undefined;
-  protected panEdgeTargets: Record<string, Konva.Node | undefined> = {};
+  protected currentPointer!: Konva.Vector2d | null;
+  protected stageScrollInterval: NodeJS.Timeout | undefined;
+  protected panEdgeTargets!: Record<string, Konva.Node | undefined>;
 
   getLayerName = undefined;
   initLayer = undefined;
@@ -61,6 +61,10 @@ export class WeaveStagePanningPlugin extends WeavePlugin {
       params?.config ?? {}
     );
 
+    this.initialize();
+  }
+
+  initialize(): void {
     this.pointers = new Map<number, { x: number; y: number }>();
     this.panning = false;
     this.isDragging = false;
@@ -72,6 +76,9 @@ export class WeaveStagePanningPlugin extends WeavePlugin {
     this.isCtrlOrMetaPressed = false;
     this.isSpaceKeyPressed = false;
     this.previousPointer = null;
+    this.currentPointer = null;
+    this.stageScrollInterval = undefined;
+    this.panEdgeTargets = {};
   }
 
   getName(): string {

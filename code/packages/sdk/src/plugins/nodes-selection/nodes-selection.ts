@@ -63,18 +63,18 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
   private trHover!: Konva.Transformer;
   private config!: WeaveNodesSelectionConfig;
   private selectionRectangle!: Konva.Rect;
-  private active: boolean;
-  private defaultEnabledAnchors: string[];
-  private selecting: boolean;
-  private didMove: boolean;
-  private initialized: boolean;
-  private isCtrlMetaPressed: boolean;
-  private isSpaceKeyPressed: boolean;
-  protected taps: number;
-  protected isDoubleTap: boolean;
-  protected previousTap: { x: number; y: number; time: number } | null;
-  protected tapStart: { x: number; y: number; time: number } | null;
-  protected tapTimeoutId: NodeJS.Timeout | null;
+  private active!: boolean;
+  private defaultEnabledAnchors!: string[];
+  private selecting!: boolean;
+  private didMove!: boolean;
+  private initialized!: boolean;
+  private isCtrlMetaPressed!: boolean;
+  private isSpaceKeyPressed!: boolean;
+  protected taps!: number;
+  protected isDoubleTap!: boolean;
+  protected previousTap!: { x: number; y: number; time: number } | null;
+  protected tapStart!: { x: number; y: number; time: number } | null;
+  protected tapTimeoutId!: NodeJS.Timeout | null;
   private x1!: number;
   private y1!: number;
   private x2!: number;
@@ -82,7 +82,7 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
   private selectionStart: { x: number; y: number } | null = null;
   private panSpeed = { x: 0, y: 0 };
   private readonly panDirection = { x: 0, y: 0 };
-  private pointers: Record<string, PointerEvent>;
+  private pointers!: Record<string, PointerEvent>;
   private panLoopId: number | null = null;
   private prevSelectedNodes: Konva.Node[] = [];
   private handledClickOrTap: boolean = false;
@@ -100,6 +100,10 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
       params?.config ?? {}
     );
 
+    this.initialize();
+  }
+
+  initialize(): void {
     this.defaultEnabledAnchors = this.config.selection?.enabledAnchors ?? [
       'top-left',
       'top-center',
@@ -1516,7 +1520,10 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
     }
 
     this.tr.nodes([...newSelectedNodes]);
-    this.tr.forceUpdate();
+
+    if (newSelectedNodes.length > 0) {
+      this.tr.forceUpdate();
+    }
 
     this.triggerSelectedNodesEvent();
   }

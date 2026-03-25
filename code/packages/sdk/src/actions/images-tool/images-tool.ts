@@ -52,16 +52,16 @@ export class WeaveImagesToolAction extends WeaveAction {
   private readonly config: WeaveImagesToolActionParams;
   protected initialized: boolean = false;
   protected initialCursor: string | null = null;
-  protected state: WeaveImagesToolActionState;
-  protected pointers: Map<number, Vector2d>;
-  protected tempPointerFeedbackNode: Konva.Group | null;
+  protected state!: WeaveImagesToolActionState;
+  protected pointers!: Map<number, Vector2d>;
+  protected tempPointerFeedbackNode!: Konva.Group | null;
   protected container: Konva.Layer | Konva.Group | undefined;
   protected nodesIds: string[] = [];
   private toAdd: number = 0;
   protected imagesFile: WeaveImagesFile[] = [];
   protected imagesURL: WeaveImagesURL[] = [];
-  protected preloadImgs: Record<string, HTMLImageElement>;
-  protected clickPoint: Vector2d | null;
+  protected preloadImgs!: Record<string, HTMLImageElement>;
+  protected clickPoint!: Vector2d | null;
   protected forceMainContainer: boolean = false;
   protected cancelAction!: () => void;
   private uploadImageFunction!: WeaveImagesToolActionUploadFunction;
@@ -79,6 +79,10 @@ export class WeaveImagesToolAction extends WeaveAction {
       params ?? {}
     );
 
+    this.initialize();
+  }
+
+  initialize(): void {
     this.pointers = new Map<number, Vector2d>();
     this.initialized = false;
     this.tempPointerFeedbackNode = null;

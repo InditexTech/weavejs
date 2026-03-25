@@ -31,13 +31,13 @@ import { WEAVE_STAGE_DEFAULT_MODE } from '../stage/constants';
 export class WeaveTextNode extends WeaveNode {
   private config: WeaveTextProperties;
   protected nodeType: string = WEAVE_TEXT_NODE_TYPE;
-  private editing: boolean = false;
-  private textAreaSuperContainer: HTMLDivElement | null = null;
-  private textAreaContainer: HTMLDivElement | null = null;
-  private textArea: HTMLTextAreaElement | null = null;
+  private editing!: boolean;
+  private textAreaSuperContainer!: HTMLDivElement | null;
+  private textAreaContainer!: HTMLDivElement | null;
+  private textArea!: HTMLTextAreaElement | null;
   private keyPressHandler: ((e: KeyboardEvent) => void) | undefined;
-  private eventsInitialized: boolean = false;
-  private isCtrlMetaPressed: boolean = false;
+  private eventsInitialized!: boolean;
+  private isCtrlMetaPressed!: boolean;
 
   constructor(params?: WeaveTextNodeParams) {
     super();
@@ -46,7 +46,16 @@ export class WeaveTextNode extends WeaveNode {
 
     this.config = merge({}, WEAVE_TEXT_NODE_DEFAULT_CONFIG, config);
 
+    this.initialize();
+  }
+
+  initialize(): void {
     this.keyPressHandler = undefined;
+    this.eventsInitialized = false;
+    this.isCtrlMetaPressed = false;
+    this.textAreaSuperContainer = null;
+    this.textAreaContainer = null;
+    this.textArea = null;
     this.editing = false;
     this.textArea = null;
   }

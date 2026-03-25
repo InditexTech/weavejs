@@ -274,6 +274,62 @@ export class Weave {
     store.connect();
   }
 
+  async switchRoom() {
+    this.moduleLogger.info(`Switching room`);
+
+    // this.emitter.clearListeners();
+
+    const nodeHandlers = this.registerManager.getNodesHandlers();
+    for (const nodeHandlerKey of Object.keys(nodeHandlers)) {
+      const nodeHandler = nodeHandlers[nodeHandlerKey];
+      nodeHandler?.onDestroyInstance();
+    }
+
+    // destroy the stage from memory
+    const stage = this.getStage();
+    if (stage) {
+      stage.destroy();
+    }
+
+    this.registerManager.reset();
+    this.asyncManager.reset();
+
+    this.moduleLogger.info('Switching room instance');
+
+    if (!this.isServerSide()) {
+      // Setup the instance on the weave global variable
+      if (!window.weave) {
+        window.weave = this;
+      }
+    }
+
+    this.emitEvent<WeaveStoreOnRoomLoadedEvent>('onRoomLoaded', false);
+
+    this.status = WEAVE_INSTANCE_STATUS.STARTING;
+    this.emitEvent<WeaveInstanceStatusEvent>('onInstanceStatus', this.status);
+
+    // Resets all the nodes, plugins and actions registered
+    this.registerManager.reset();
+
+    this.status = WEAVE_INSTANCE_STATUS.LOADING_FONTS;
+    this.emitEvent<WeaveInstanceStatusEvent>('onInstanceStatus', this.status);
+
+    // Start loading the fonts, this operation can be asynchronous
+    await this.fontsManager.loadFonts();
+    this.setupManager.setupLog();
+
+    // Setup stage
+    this.stageManager.initStage();
+
+    this.status = WEAVE_INSTANCE_STATUS.CONNECTING_TO_ROOM;
+    this.emitEvent<WeaveInstanceStatusEvent>('onInstanceStatus', this.status);
+
+    this.addEventListener(
+      'onStoreConnectionStatusChange',
+      this.handleStoreConnectionStatusChange.bind(this)
+    );
+  }
+
   destroy(): void {
     this.moduleLogger.info(`Destroying the instance`);
 
@@ -1138,6 +1194,17 @@ export class Weave {
       boundingNodes,
       options
     );
+  }
+
+  public async exportAreaServerSide(
+    area: { x: number; y: number; width: number; height: number },
+    options: WeaveExportNodesOptions
+  ): Promise<{
+    composites: { input: Buffer; left: number; top: number }[];
+    width: number;
+    height: number;
+  }> {
+    return await this.exportManager.exportAreaServerSide(area, options);
   }
 
   public async exportNodes(

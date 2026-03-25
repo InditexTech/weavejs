@@ -14,6 +14,10 @@ export class WeaveStageDropAreaPlugin extends WeavePlugin {
   constructor() {
     super();
 
+    this.initialize();
+  }
+
+  initialize(): void {
     this.enabled = true;
   }
 

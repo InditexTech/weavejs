@@ -18,12 +18,12 @@ import type { WeaveStarNode } from '@/nodes/star/star';
 
 export class WeaveStarToolAction extends WeaveAction {
   protected initialized: boolean = false;
-  protected state: WeaveStarToolActionState;
-  protected starId: string | null;
-  protected creating: boolean;
-  protected moved: boolean;
-  protected pointers: Map<number, Konva.Vector2d>;
-  protected clickPoint: Konva.Vector2d | null;
+  protected state!: WeaveStarToolActionState;
+  protected starId!: string | null;
+  protected creating!: boolean;
+  protected moved!: boolean;
+  protected pointers!: Map<number, Konva.Vector2d>;
+  protected clickPoint!: Konva.Vector2d | null;
   protected container!: Konva.Layer | Konva.Node | undefined;
   protected cancelAction!: () => void;
   onPropsChange = undefined;
@@ -32,6 +32,10 @@ export class WeaveStarToolAction extends WeaveAction {
   constructor() {
     super();
 
+    this.initialize();
+  }
+
+  initialize(): void {
     this.pointers = new Map<number, Konva.Vector2d>();
     this.initialized = false;
     this.state = STAR_TOOL_STATE.IDLE;

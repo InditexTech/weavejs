@@ -16,12 +16,12 @@ import type { WeaveRectangleNode } from '@/nodes/rectangle/rectangle';
 
 export class WeaveRectangleToolAction extends WeaveAction {
   protected initialized: boolean = false;
-  protected state: WeaveRectangleToolActionState;
-  protected rectId: string | null;
-  protected moved: boolean;
-  protected tempRectNode: Konva.Rect | null;
-  protected pointers: Map<number, Konva.Vector2d>;
-  protected clickPoint: Konva.Vector2d | null;
+  protected state!: WeaveRectangleToolActionState;
+  protected rectId!: string | null;
+  protected moved!: boolean;
+  protected tempRectNode!: Konva.Rect | null;
+  protected pointers!: Map<number, Konva.Vector2d>;
+  protected clickPoint!: Konva.Vector2d | null;
   protected container!: Konva.Layer | Konva.Node | undefined;
   protected measureContainer: Konva.Layer | Konva.Group | undefined;
   protected cancelAction!: () => void;
@@ -31,6 +31,10 @@ export class WeaveRectangleToolAction extends WeaveAction {
   constructor() {
     super();
 
+    this.initialize();
+  }
+
+  initialize(): void {
     this.pointers = new Map<number, Konva.Vector2d>();
     this.initialized = false;
     this.state = RECTANGLE_TOOL_STATE.IDLE;

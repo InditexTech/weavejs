@@ -25,18 +25,18 @@ export class WeaveLineToolAction extends WeaveAction {
   protected initialized: boolean = false;
   protected initialCursor: string | null = null;
   protected config: WeaveLineToolActionProperties;
-  protected state: WeaveLineToolActionState;
-  protected lineId: string | null;
-  protected tempLineId: string | null;
-  protected tempMainLineNode: Konva.Line | null;
-  protected tempLineNode: Konva.Line | null;
+  protected state!: WeaveLineToolActionState;
+  protected lineId!: string | null;
+  protected tempLineId!: string | null;
+  protected tempMainLineNode!: Konva.Line | null;
+  protected tempLineNode!: Konva.Line | null;
   protected container: Konva.Layer | Konva.Node | undefined;
   protected measureContainer: Konva.Layer | Konva.Group | undefined;
-  protected clickPoint: Konva.Vector2d | null;
-  protected pointers: Map<number, Konva.Vector2d>;
+  protected clickPoint!: Konva.Vector2d | null;
+  protected pointers!: Map<number, Konva.Vector2d>;
   protected cancelAction!: () => void;
   protected snappedAngle: number | null = null;
-  protected snapper: GreedySnapper;
+  protected snapper!: GreedySnapper;
   protected shiftPressed: boolean = false;
   onPropsChange = undefined;
   onInit = undefined;
@@ -49,6 +49,10 @@ export class WeaveLineToolAction extends WeaveAction {
       params?.config ?? {}
     );
 
+    this.initialize();
+  }
+
+  initialize(): void {
     this.pointers = new Map<number, Konva.Vector2d>();
     this.initialized = false;
     this.state = LINE_TOOL_STATE.IDLE;

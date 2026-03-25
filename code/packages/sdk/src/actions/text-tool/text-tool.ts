@@ -4,25 +4,21 @@
 
 import { v4 as uuidv4 } from 'uuid';
 import { WeaveAction } from '@/actions/action';
-import {
-  type WeaveTextToolActionOnAddingEvent,
-  type WeaveTextToolActionState,
-} from './types';
+import { type WeaveTextToolActionState } from './types';
 import { TEXT_TOOL_ACTION_NAME, TEXT_TOOL_STATE } from './constants';
 import Konva from 'konva';
 import { WeaveNodesSelectionPlugin } from '@/plugins/nodes-selection/nodes-selection';
 import type { WeaveTextNode } from '@/nodes/text/text';
 import { SELECTION_TOOL_ACTION_NAME } from '../selection-tool/constants';
-import type { WeaveArrowToolActionOnAddingEvent } from '../arrow-tool/types';
 import { TEXT_LAYOUT } from '@/nodes/text/constants';
 
 export class WeaveTextToolAction extends WeaveAction {
   protected initialized: boolean = false;
   protected initialCursor: string | null = null;
-  protected state: WeaveTextToolActionState;
-  protected textId: string | null;
+  protected state!: WeaveTextToolActionState;
+  protected textId!: string | null;
   protected container: Konva.Layer | Konva.Node | undefined;
-  protected clickPoint: Konva.Vector2d | null;
+  protected clickPoint!: Konva.Vector2d | null;
   protected cancelAction!: () => void;
   onPropsChange = undefined;
   onInit = undefined;
@@ -30,6 +26,10 @@ export class WeaveTextToolAction extends WeaveAction {
   constructor() {
     super();
 
+    this.initialize();
+  }
+
+  initialize(): void {
     this.initialized = false;
     this.state = TEXT_TOOL_STATE.IDLE;
     this.textId = null;
@@ -103,7 +103,7 @@ export class WeaveTextToolAction extends WeaveAction {
     this.setCursor();
     this.setFocusStage();
 
-    this.instance.emitEvent<WeaveTextToolActionOnAddingEvent>('onAddingText');
+    this.instance.emitEvent<undefined>('onAddingText');
 
     this.clickPoint = null;
     this.setState(TEXT_TOOL_STATE.ADDING);
@@ -128,9 +128,7 @@ export class WeaveTextToolAction extends WeaveAction {
       });
       this.instance.addNode(node, this.container?.getAttrs().id);
 
-      this.instance.emitEvent<WeaveArrowToolActionOnAddingEvent>(
-        'onAddedArrow'
-      );
+      this.instance.emitEvent<undefined>('onAddedArrow');
     }
 
     this.setState(TEXT_TOOL_STATE.FINISHED);

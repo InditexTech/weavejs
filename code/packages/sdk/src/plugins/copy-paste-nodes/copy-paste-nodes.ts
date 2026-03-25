@@ -41,15 +41,15 @@ import type Konva from 'konva';
 import type { Weave } from '@/weave';
 
 export class WeaveCopyPasteNodesPlugin extends WeavePlugin {
-  protected state: WeaveCopyPasteNodesPluginState;
+  protected state!: WeaveCopyPasteNodesPluginState;
   private readonly config: WeaveCopyPasteNodesPluginConfig;
   private readonly getImageBase64!: (
     instance: Weave,
     nodes: Konva.Node[]
   ) => Promise<string>;
-  private lastInternalPasteSnapshot: string;
-  private actualInternalPaddingX: number;
-  private actualInternalPaddingY: number;
+  private lastInternalPasteSnapshot!: string;
+  private actualInternalPaddingX!: number;
+  private actualInternalPaddingY!: number;
   private toPaste: WeavePasteModel | undefined;
   getLayerName: undefined;
   initLayer: undefined;
@@ -64,6 +64,10 @@ export class WeaveCopyPasteNodesPlugin extends WeavePlugin {
       params?.config
     );
 
+    this.initialize();
+  }
+
+  initialize(): void {
     this.actualInternalPaddingX = 0;
     this.actualInternalPaddingY = 0;
     this.lastInternalPasteSnapshot = '';

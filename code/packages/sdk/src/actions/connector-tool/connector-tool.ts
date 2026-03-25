@@ -25,12 +25,12 @@ export class WeaveConnectorToolAction extends WeaveAction {
   protected readonly config!: WeaveConnectorToolActionProperties;
   protected initialized: boolean = false;
   protected initialCursor: string | null = null;
-  protected tempLineNode: Konva.Line | null;
-  protected state: WeaveConnectorToolActionState;
+  protected tempLineNode!: Konva.Line | null;
+  protected state!: WeaveConnectorToolActionState;
   protected container: Konva.Layer | Konva.Node | undefined;
   protected measureContainer: Konva.Layer | Konva.Group | undefined;
-  protected clickPoint: Konva.Vector2d | null;
-  protected pointers: Map<number, Konva.Vector2d>;
+  protected clickPoint!: Konva.Vector2d | null;
+  protected pointers!: Map<number, Konva.Vector2d>;
   protected startPoint: Konva.Vector2d | undefined;
   protected startNodeId: string | undefined;
   protected startNodeAnchor: string | undefined;
@@ -54,6 +54,10 @@ export class WeaveConnectorToolAction extends WeaveAction {
       params?.config
     );
 
+    this.initialize();
+  }
+
+  initialize(): void {
     this.pointers = new Map<number, Konva.Vector2d>();
     this.initialized = false;
     this.tempLineNode = null;

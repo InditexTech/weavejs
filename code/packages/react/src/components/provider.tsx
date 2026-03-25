@@ -62,8 +62,8 @@ export const WeaveProvider = ({
   const setActualAction = useWeave((state) => state.setActualAction);
   const setConnectionStatus = useWeave((state) => state.setConnectionStatus);
   const setAsyncElements = useWeave((state) => state.setAsyncElements);
-  const setAsyncElementsAllLoaded = useWeave(
-    (state) => state.setAsyncElementsAllLoaded
+  const setAsyncElementsState = useWeave(
+    (state) => state.setAsyncElementsState
   );
 
   const onInstanceStatusHandler = React.useCallback(
@@ -116,8 +116,17 @@ export const WeaveProvider = ({
     [selectedNodes]
   );
 
+  const onAsyncElementsIdleHandler = React.useCallback(
+    () => {
+      setAsyncElementsState('idle');
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [selectedNodes]
+  );
+
   const onAsyncElementsLoadingHandler = React.useCallback(
     ({ loaded, total }: { loaded: number; total: number }) => {
+      setAsyncElementsState('loading');
       setAsyncElements(loaded, total);
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -126,7 +135,7 @@ export const WeaveProvider = ({
 
   const onAsyncElementsLoadedHandler = React.useCallback(
     () => {
-      setAsyncElementsAllLoaded(true);
+      setAsyncElementsState('loaded');
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [selectedNodes]
@@ -195,6 +204,11 @@ export const WeaveProvider = ({
         );
 
         weaveInstanceRef.current.addEventListener(
+          'onAsyncElementsIdle',
+          onAsyncElementsIdleHandler
+        );
+
+        weaveInstanceRef.current.addEventListener(
           'onAsyncElementsLoading',
           onAsyncElementsLoadingHandler
         );
@@ -214,6 +228,7 @@ export const WeaveProvider = ({
     initWeave();
 
     return () => {
+      console.log("unmounting weave provider, let's clean up");
       weaveInstanceRef.current?.removeEventListener(
         'onInstanceStatus',
         onInstanceStatusHandler
@@ -256,6 +271,7 @@ export const WeaveProvider = ({
 
       setStatus(WEAVE_INSTANCE_STATUS.IDLE);
       setRoomLoaded(false);
+      console.log('Destroying weave instance');
       weaveInstanceRef.current?.destroy();
       weaveInstanceRef.current = null;
     };

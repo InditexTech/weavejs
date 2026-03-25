@@ -24,15 +24,21 @@ export class WeaveStageMinimapPlugin extends WeavePlugin {
   private minimapLayer!: Konva.Layer;
   private minimapStageImage!: Konva.Image;
   private minimapViewportReference!: Konva.Rect;
-  private initialized: boolean;
+  private initialized!: boolean;
   private offscreenWorker: Worker | null = null;
 
   constructor(params: WeaveStageMinimapPluginParams) {
     super();
+
     this.config = mergeExceptArrays(
       STAGE_MINIMAP_DEFAULT_CONFIG,
       params.config
     );
+
+    this.initialize();
+  }
+
+  initialize(): void {
     this.initialized = false;
   }
 

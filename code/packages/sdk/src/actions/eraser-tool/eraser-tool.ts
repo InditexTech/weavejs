@@ -12,7 +12,7 @@ import type { WeaveElementInstance } from '@inditextech/weave-types';
 
 export class WeaveEraserToolAction extends WeaveAction {
   protected initialized: boolean = false;
-  protected state: WeaveEraserToolActionState;
+  protected state!: WeaveEraserToolActionState;
   protected erasing: boolean = false;
   protected cancelAction!: () => void;
   onPropsChange = undefined;
@@ -21,6 +21,10 @@ export class WeaveEraserToolAction extends WeaveAction {
   constructor() {
     super();
 
+    this.initialize();
+  }
+
+  initialize(): void {
     this.initialized = false;
     this.erasing = false;
     this.state = ERASER_TOOL_STATE.IDLE;

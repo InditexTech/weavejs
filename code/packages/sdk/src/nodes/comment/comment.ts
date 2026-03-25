@@ -33,15 +33,20 @@ import { mergeExceptArrays } from '@/utils/utils';
 export class WeaveCommentNode<T> extends WeaveNode {
   protected nodeType = WEAVE_COMMENT_NODE_TYPE;
   protected config: WeaveCommentNodeConfig<T>;
-  protected commentDomAction: WeaveCommentNodeAction | null;
-  protected commentDomVisibleId: string | null;
-  protected commentDomVisible: boolean;
-  protected showResolved: boolean;
+  protected commentDomAction!: WeaveCommentNodeAction | null;
+  protected commentDomVisibleId!: string | null;
+  protected commentDomVisible!: boolean;
+  protected showResolved!: boolean;
 
   constructor(params: WeaveCommentNodeParams<T>) {
     super();
 
     this.config = mergeExceptArrays(WEAVE_COMMENT_NODE_DEFAULTS, params.config);
+
+    this.initialize();
+  }
+
+  initialize(): void {
     this.commentDomVisibleId = null;
     this.commentDomVisible = false;
     this.commentDomAction = null;

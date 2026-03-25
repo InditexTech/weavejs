@@ -2,9 +2,9 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-export const ARROW_TOOL_ACTION_NAME = 'arrowTool';
+export const WEAVE_ARROW_TOOL_ACTION_NAME = 'arrowTool';
 
-export const ARROW_TOOL_STATE = {
+export const WEAVE_ARROW_TOOL_STATE = {
   ['IDLE']: 'idle',
   ['ADDING']: 'adding',
   ['DEFINING_SIZE']: 'definingSize',

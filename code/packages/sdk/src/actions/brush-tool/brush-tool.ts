@@ -28,11 +28,11 @@ import { mergeExceptArrays } from '@/utils/utils';
 export class WeaveBrushToolAction extends WeaveAction {
   protected config: WeaveBrushToolActionProperties;
   protected initialized: boolean = false;
-  protected state: WeaveBrushToolActionState;
-  protected clickPoint: Konva.Vector2d | null;
-  protected strokeId: string | null;
+  protected state!: WeaveBrushToolActionState;
+  protected clickPoint!: Konva.Vector2d | null;
+  protected strokeId!: string | null;
   protected isSpacePressed: boolean = false;
-  protected isEraser: boolean;
+  protected isEraser!: boolean;
   protected container: Konva.Layer | Konva.Node | undefined;
   protected measureContainer: Konva.Layer | Konva.Group | undefined;
   protected cancelAction!: () => void;
@@ -46,6 +46,11 @@ export class WeaveBrushToolAction extends WeaveAction {
       BRUSH_TOOL_DEFAULT_CONFIG,
       params?.config ?? {}
     );
+
+    this.initialize();
+  }
+
+  initialize(): void {
     this.initialized = false;
     this.state = BRUSH_TOOL_STATE.INACTIVE;
     this.strokeId = null;

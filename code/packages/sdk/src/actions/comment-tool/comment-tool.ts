@@ -30,10 +30,10 @@ import { extractCursorUrl } from '@/utils/cursors';
 export class WeaveCommentToolAction<T> extends WeaveAction {
   private readonly config!: WeaveCommentToolActionConfig<T>;
   protected initialized: boolean = false;
-  protected state: WeaveCommentToolActionState;
-  protected pointers: Map<number, Konva.Vector2d>;
-  protected commentId: string | null;
-  protected clickPoint: Konva.Vector2d | null;
+  protected state!: WeaveCommentToolActionState;
+  protected pointers!: Map<number, Konva.Vector2d>;
+  protected commentId!: string | null;
+  protected clickPoint!: Konva.Vector2d | null;
   protected cancelAction!: () => void;
   onPropsChange = undefined;
 
@@ -43,6 +43,11 @@ export class WeaveCommentToolAction<T> extends WeaveAction {
     const { config } = params ?? {};
 
     this.config = mergeExceptArrays(WEAVE_COMMENT_TOOL_DEFAULT_CONFIG, config);
+
+    this.initialize();
+  }
+
+  initialize(): void {
     this.pointers = new Map<number, Konva.Vector2d>();
     this.initialized = false;
     this.state = WEAVE_COMMENT_TOOL_STATE.IDLE;

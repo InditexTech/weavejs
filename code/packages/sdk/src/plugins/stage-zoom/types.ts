@@ -18,6 +18,13 @@ export type WeaveStageZoomChanged = {
   canZoomOut: boolean;
 };
 
+export type WeaveArea = {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+};
+
 export type WeaveStageZoomPluginOnZoomChangeEvent = WeaveStageZoomChanged;
 
 export type WeaveStageZoomPluginConfig = {

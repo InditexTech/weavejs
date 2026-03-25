@@ -5,6 +5,7 @@
 import { throttle } from 'lodash';
 import { WeavePlugin } from '@/plugins/plugin';
 import {
+  type WeaveArea,
   type WeaveStageZoomPluginConfig,
   type WeaveStageZoomPluginOnZoomChangeEvent,
   type WeaveStageZoomPluginParams,
@@ -28,19 +29,19 @@ import type { WeaveStageGridPlugin } from '../stage-grid/stage-grid';
 import { DEFAULT_THROTTLE_MS } from '@/constants';
 
 export class WeaveStageZoomPlugin extends WeavePlugin {
-  private isCtrlOrMetaPressed: boolean;
+  private isCtrlOrMetaPressed!: boolean;
   protected previousPointer!: string | null;
   getLayerName = undefined;
   initLayer = undefined;
   onRender: undefined;
   private config!: WeaveStageZoomPluginConfig;
-  private actualScale: number;
-  private actualStep: number;
-  private updatedMinimumZoom: boolean;
-  private pinching: boolean = false;
-  private zooming: boolean = false;
-  private isTrackpad: boolean = false;
-  private zoomVelocity: number = 0;
+  private actualScale!: number;
+  private actualStep!: number;
+  private updatedMinimumZoom!: boolean;
+  private pinching!: boolean;
+  private zooming!: boolean;
+  private isTrackpad!: boolean;
+  private zoomVelocity!: number;
   private zoomInertiaType: WeaveStageZoomType =
     WEAVE_STAGE_ZOOM_TYPE.MOUSE_WHEEL;
   defaultStep: number = 3;
@@ -58,8 +59,14 @@ export class WeaveStageZoomPlugin extends WeavePlugin {
       );
     }
 
+    this.initialize();
+  }
+
+  initialize(): void {
     this.pinching = false;
+    this.zooming = false;
     this.isTrackpad = false;
+    this.zoomVelocity = 0;
     this.isCtrlOrMetaPressed = false;
     this.updatedMinimumZoom = false;
     this.actualStep = this.config.zoomSteps.findIndex(
@@ -586,6 +593,32 @@ export class WeaveStageZoomPlugin extends WeavePlugin {
     }
 
     this.fitToElements(box, finalOptions);
+  }
+
+  fitToArea(
+    area: WeaveArea,
+    options?: {
+      smartZoom?: boolean;
+      overrideZoom?: boolean;
+    }
+  ): void {
+    const finalOptions = mergeExceptArrays(
+      {
+        smartZoom: false,
+        overrideZoom: true,
+      },
+      options
+    );
+
+    if (!this.enabled) {
+      return;
+    }
+
+    if (area.width === 0 || area.height === 0) {
+      return;
+    }
+
+    this.fitToElements(area, finalOptions);
   }
 
   enable(): void {

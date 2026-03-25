@@ -64,6 +64,11 @@ export class WeaveNodesDistanceSnappingPlugin extends WeavePlugin {
       GUIDE_DISTANCE_LINE_DEFAULT_CONFIG,
       config?.ui
     );
+
+    this.initialize();
+  }
+
+  initialize(): void {
     this.enabled = true;
   }
 

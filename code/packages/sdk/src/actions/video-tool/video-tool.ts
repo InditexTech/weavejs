@@ -23,13 +23,13 @@ import { getPositionRelativeToContainerOnPosition } from '@/utils/utils';
 export class WeaveVideoToolAction extends WeaveAction {
   protected initialized: boolean = false;
   protected initialCursor: string | null = null;
-  protected state: WeaveVideoToolActionState;
+  protected state!: WeaveVideoToolActionState;
   protected cursorPadding: number = 5;
-  protected videoId: string | null;
+  protected videoId!: string | null;
   protected container: Konva.Layer | Konva.Node | undefined;
-  protected pointers: Map<number, Konva.Vector2d>;
-  protected videoParams: WeaveVideoToolDragParams | null;
-  protected clickPoint: Konva.Vector2d | null;
+  protected pointers!: Map<number, Konva.Vector2d>;
+  protected videoParams!: WeaveVideoToolDragParams | null;
+  protected clickPoint!: Konva.Vector2d | null;
   protected forceMainContainer: boolean = false;
   protected cancelAction!: () => void;
   onPropsChange = undefined;
@@ -38,6 +38,10 @@ export class WeaveVideoToolAction extends WeaveAction {
   constructor() {
     super();
 
+    this.initialize();
+  }
+
+  initialize(): void {
     this.pointers = new Map<number, Konva.Vector2d>();
     this.initialized = false;
     this.state = VIDEO_TOOL_STATE.IDLE;

@@ -19,6 +19,7 @@ export class WeaveStageNode extends WeaveNode {
   protected wheelMousePressed: boolean = false;
   private isCmdCtrlPressed: boolean = false;
   protected globalEventsInitialized: boolean = false;
+  initialize = undefined;
 
   onRender(props: WeaveElementAttributes): WeaveElementInstance {
     const stage = new Konva.Stage({

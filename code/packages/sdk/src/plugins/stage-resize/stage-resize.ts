@@ -7,11 +7,13 @@ import { WEAVE_STAGE_RESIZE_KEY } from './constants';
 import { setupUpscaleStage } from '@/internal-utils/upscale';
 import { throttle } from 'lodash';
 import { DEFAULT_THROTTLE_MS } from '@/constants';
+import type { WeaveStageResizePluginOnStageResizeEvent } from './types';
 
 export class WeaveStageResizePlugin extends WeavePlugin {
   getLayerName = undefined;
   initLayer = undefined;
   onRender: undefined;
+  initialize = undefined;
 
   getName(): string {
     return WEAVE_STAGE_RESIZE_KEY;
@@ -41,6 +43,14 @@ export class WeaveStageResizePlugin extends WeavePlugin {
         const pluginInstance = plugins[pluginId];
         pluginInstance.onRender?.();
       }
+
+      this.instance.emitEvent<WeaveStageResizePluginOnStageResizeEvent>(
+        'onStageResize',
+        {
+          width: stage.width(),
+          height: stage.height(),
+        }
+      );
     }
   }
 

@@ -20,7 +20,7 @@ import { WeavePlugin } from '../plugin';
 
 export class WeaveCommentsRendererPlugin<T> extends WeavePlugin {
   private readonly config!: WeaveCommentsRendererPluginConfig<T>;
-  private comments: T[] = [];
+  private comments!: T[];
   getLayerName = undefined;
   initLayer: undefined;
   onRender: undefined;
@@ -32,6 +32,10 @@ export class WeaveCommentsRendererPlugin<T> extends WeavePlugin {
 
     this.config = config;
 
+    this.initialize();
+  }
+
+  initialize(): void {
     this.comments = [];
   }
 
