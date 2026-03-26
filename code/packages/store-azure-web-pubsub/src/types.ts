@@ -108,6 +108,7 @@ export type WeaveStoreAzureWebPubsubOnWebsocketCloseEvent = {
 export type WeaveStoreAzureWebPubsubOnWebsocketErrorEvent = {
   group: string;
   error: ErrorEvent;
+  reconnectionAttempt: number;
 };
 
 export type WeaveStoreAzureWebPubSubSyncHostClientConnectOptions = {

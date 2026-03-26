@@ -274,6 +274,7 @@ export class WeaveStoreAzureWebPubSubSyncHost {
           {
             group: `${group}.host`,
             error: error as unknown as ErrorEvent,
+            reconnectionAttempt: this._reconnectAttempts,
           }
         );
 
