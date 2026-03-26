@@ -6,7 +6,10 @@ import type { WebSocket } from 'ws';
 import type { TokenCredential } from '@azure/identity';
 import type { Doc } from 'yjs';
 import type { ConnectionContext } from './index.server';
-import type { WEAVE_STORE_AZURE_WEB_PUBSUB_CONNECTION_STATUS } from './constants';
+import type {
+  WEAVE_STORE_AZURE_WEB_PUBSUB_CONNECTION_STATUS,
+  WEAVE_STORE_AZURE_WEB_PUBSUB_DESTROY_ROOM_STATUS,
+} from './constants';
 import type { WeaveStoreAzureWebPubSubSyncClient } from './client';
 import type { Encoder } from 'lib0/encoding';
 import type { Decoder } from 'lib0/decoding';
@@ -154,3 +157,8 @@ export type MessageHandler = (
   emitSynced: boolean,
   messageType: number
 ) => void;
+
+export type WeaveStoreAzureWebPubsubSyncHandlerDestroyRoomStatusKeys =
+  keyof typeof WEAVE_STORE_AZURE_WEB_PUBSUB_DESTROY_ROOM_STATUS;
+export type WeaveStoreAzureWebPubsubSyncHandlerDestroyRoomStatus =
+  (typeof WEAVE_STORE_AZURE_WEB_PUBSUB_DESTROY_ROOM_STATUS)[WeaveStoreAzureWebPubsubSyncHandlerDestroyRoomStatusKeys];

@@ -18,11 +18,13 @@ import {
   type WeaveStoreAzureWebPubsubOnConnectedEvent,
   type WeaveStoreAzureWebPubsubOnConnectEvent,
   type WeaveStoreAzureWebPubsubOnDisconnectedEvent,
+  type WeaveStoreAzureWebPubsubSyncHandlerDestroyRoomStatus,
   type WeaveStoreAzureWebPubSubSyncHostClientConnectOptions,
 } from '@/types';
 import { WeaveStoreAzureWebPubSubSyncHost } from './azure-web-pubsub-host';
 import { WeaveAzureWebPubsubServer } from './azure-web-pubsub-server';
 import { getStateAsJson, hashJson } from './utils';
+import { WEAVE_STORE_AZURE_WEB_PUBSUB_DESTROY_ROOM_STATUS } from '@/constants';
 
 export default class WeaveAzureWebPubsubSyncHandler extends WebPubSubEventHandler {
   // eslint-disable-next-line @typescript-eslint/naming-convention
@@ -209,10 +211,15 @@ export default class WeaveAzureWebPubsubSyncHandler extends WebPubSubEventHandle
 
   async destroyRoomInstance(
     roomId: string
-  ): Promise<'not-connected' | 'destroyed'> {
+  ): Promise<WeaveStoreAzureWebPubsubSyncHandlerDestroyRoomStatus> {
     const syncHost = this._roomsSyncHost.get(roomId);
-    if (syncHost && !syncHost.isConnected()) {
-      return 'not-connected';
+
+    if (!syncHost) {
+      return WEAVE_STORE_AZURE_WEB_PUBSUB_DESTROY_ROOM_STATUS.NOT_FOUND;
+    }
+
+    if (!syncHost?.isConnected()) {
+      return WEAVE_STORE_AZURE_WEB_PUBSUB_DESTROY_ROOM_STATUS.NOT_CONNECTED;
     }
 
     if (this.isPersistingOnInterval()) {
@@ -230,14 +237,14 @@ export default class WeaveAzureWebPubsubSyncHandler extends WebPubSubEventHandle
     }
 
     // stop sync host
-    if (syncHost && syncHost.isConnected()) {
+    if (syncHost?.isConnected()) {
       await syncHost.stop();
       this._roomsSyncHost.delete(roomId);
     }
 
     this._rooms.delete(roomId);
 
-    return 'destroyed';
+    return WEAVE_STORE_AZURE_WEB_PUBSUB_DESTROY_ROOM_STATUS.DESTROYED;
   }
 
   private async getHostConnection(roomId: string) {
