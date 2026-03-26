@@ -7,6 +7,10 @@ import type Konva from 'konva';
 import { merge } from 'lodash';
 
 export const setupUpscaleStage = (instance: Weave, stage: Konva.Stage) => {
+  if (instance.isServerSide()) {
+    return;
+  }
+
   const config = instance.getConfiguration();
 
   const doUpscale = config.performance?.upscale?.enabled ?? false;

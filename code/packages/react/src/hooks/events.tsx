@@ -41,8 +41,7 @@ export const useWeaveEvents = (): void => {
   );
 
   const onRoomSwitchingStartHandler = React.useCallback(
-    ({ room }: WeaveStoreOnRoomSwitchingStartEvent) => {
-      console.log('Room switching started to room:', room);
+    () => {
       setRoomSwitching(true);
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -50,8 +49,7 @@ export const useWeaveEvents = (): void => {
   );
 
   const onRoomSwitchingEndHandler = React.useCallback(
-    ({ room }: WeaveStoreOnRoomSwitchingEndEvent) => {
-      console.log('Room switching ended to room:', room);
+    () => {
       setRoomSwitching(false);
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps

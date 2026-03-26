@@ -80,14 +80,18 @@ export class WeaveMeasureToolAction extends WeaveAction {
   private setupEvents() {
     const stage = this.instance.getStage();
 
-    window.addEventListener('keydown', (e) => {
-      if (
-        e.code === 'Escape' &&
-        this.instance.getActiveAction() === MEASURE_TOOL_ACTION_NAME
-      ) {
-        this.cancelAction();
-      }
-    });
+    window.addEventListener(
+      'keydown',
+      (e) => {
+        if (
+          e.code === 'Escape' &&
+          this.instance.getActiveAction() === MEASURE_TOOL_ACTION_NAME
+        ) {
+          this.cancelAction();
+        }
+      },
+      { signal: this.instance.getEventsController()?.signal }
+    );
 
     stage.on('pointermove', () => {
       if (this.state === MEASURE_TOOL_STATE.IDLE) return;

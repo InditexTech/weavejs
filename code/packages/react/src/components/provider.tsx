@@ -228,7 +228,6 @@ export const WeaveProvider = ({
     initWeave();
 
     return () => {
-      console.log("unmounting weave provider, let's clean up");
       weaveInstanceRef.current?.removeEventListener(
         'onInstanceStatus',
         onInstanceStatusHandler
@@ -271,7 +270,7 @@ export const WeaveProvider = ({
 
       setStatus(WEAVE_INSTANCE_STATUS.IDLE);
       setRoomLoaded(false);
-      console.log('Destroying weave instance');
+
       weaveInstanceRef.current?.destroy();
       weaveInstanceRef.current = null;
     };

@@ -105,37 +105,45 @@ export class WeaveStrokeToolAction extends WeaveAction {
   private setupEvents() {
     const stage = this.instance.getStage();
 
-    window.addEventListener('keydown', (e) => {
-      if (
-        e.code === 'Enter' &&
-        this.getNames().includes(this.instance.getActiveAction() ?? '')
-      ) {
-        this.cancelAction();
-        return;
-      }
-      if (
-        e.code === 'Escape' &&
-        this.getNames().includes(this.instance.getActiveAction() ?? '')
-      ) {
-        this.cancelAction();
-        return;
-      }
-      if (
-        e.key === 'Shift' &&
-        this.getNames().includes(this.instance.getActiveAction() ?? '')
-      ) {
-        this.shiftPressed = true;
-      }
-    });
+    window.addEventListener(
+      'keydown',
+      (e) => {
+        if (
+          e.code === 'Enter' &&
+          this.getNames().includes(this.instance.getActiveAction() ?? '')
+        ) {
+          this.cancelAction();
+          return;
+        }
+        if (
+          e.code === 'Escape' &&
+          this.getNames().includes(this.instance.getActiveAction() ?? '')
+        ) {
+          this.cancelAction();
+          return;
+        }
+        if (
+          e.key === 'Shift' &&
+          this.getNames().includes(this.instance.getActiveAction() ?? '')
+        ) {
+          this.shiftPressed = true;
+        }
+      },
+      { signal: this.instance.getEventsController()?.signal }
+    );
 
-    window.addEventListener('keyup', (e) => {
-      if (
-        e.key === 'Shift' &&
-        this.getNames().includes(this.instance.getActiveAction() ?? '')
-      ) {
-        this.shiftPressed = false;
-      }
-    });
+    window.addEventListener(
+      'keyup',
+      (e) => {
+        if (
+          e.key === 'Shift' &&
+          this.getNames().includes(this.instance.getActiveAction() ?? '')
+        ) {
+          this.shiftPressed = false;
+        }
+      },
+      { signal: this.instance.getEventsController()?.signal }
+    );
 
     stage.on('pointerdown', (e) => {
       this.setTapStart(e);

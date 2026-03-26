@@ -60,9 +60,13 @@ export class WeaveStageResizePlugin extends WeavePlugin {
     }, DEFAULT_THROTTLE_MS);
 
     // Resize when window is resized
-    window.addEventListener('resize', () => {
-      throttledResize();
-    });
+    window.addEventListener(
+      'resize',
+      () => {
+        throttledResize();
+      },
+      { signal: this.instance.getEventsController()?.signal }
+    );
 
     // Resize when stage container is resized
     const resizeObserver = new ResizeObserver(() => {

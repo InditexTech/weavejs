@@ -70,15 +70,19 @@ export class WeaveEraserToolAction extends WeaveAction {
       }
     });
 
-    window.addEventListener('keydown', (e) => {
-      if (
-        e.code === 'Escape' &&
-        this.instance.getActiveAction() === ERASER_TOOL_ACTION_NAME
-      ) {
-        this.cancelAction();
-        return;
-      }
-    });
+    window.addEventListener(
+      'keydown',
+      (e) => {
+        if (
+          e.code === 'Escape' &&
+          this.instance.getActiveAction() === ERASER_TOOL_ACTION_NAME
+        ) {
+          this.cancelAction();
+          return;
+        }
+      },
+      { signal: this.instance.getEventsController()?.signal }
+    );
 
     this.initialized = true;
   }

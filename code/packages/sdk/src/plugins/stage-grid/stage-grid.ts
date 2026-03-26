@@ -96,17 +96,25 @@ export class WeaveStageGridPlugin extends WeavePlugin {
   private initEvents() {
     const stage = this.instance.getStage();
 
-    window.addEventListener('keydown', (e) => {
-      if (e.code === 'Space') {
-        this.isSpaceKeyPressed = true;
-      }
-    });
+    window.addEventListener(
+      'keydown',
+      (e) => {
+        if (e.code === 'Space') {
+          this.isSpaceKeyPressed = true;
+        }
+      },
+      { signal: this.instance.getEventsController()?.signal }
+    );
 
-    window.addEventListener('keyup', (e) => {
-      if (e.code === 'Space') {
-        this.isSpaceKeyPressed = false;
-      }
-    });
+    window.addEventListener(
+      'keyup',
+      (e) => {
+        if (e.code === 'Space') {
+          this.isSpaceKeyPressed = false;
+        }
+      },
+      { signal: this.instance.getEventsController()?.signal }
+    );
 
     this.instance.addEventListener('onStageMove', () => {
       this.onRender();

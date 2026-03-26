@@ -65,22 +65,26 @@ export class WeaveRectangleToolAction extends WeaveAction {
   private setupEvents() {
     const stage = this.instance.getStage();
 
-    window.addEventListener('keydown', (e) => {
-      if (
-        e.code === 'Enter' &&
-        this.instance.getActiveAction() === RECTANGLE_TOOL_ACTION_NAME
-      ) {
-        this.cancelAction();
-        return;
-      }
-      if (
-        e.code === 'Escape' &&
-        this.instance.getActiveAction() === RECTANGLE_TOOL_ACTION_NAME
-      ) {
-        this.cancelAction();
-        return;
-      }
-    });
+    window.addEventListener(
+      'keydown',
+      (e) => {
+        if (
+          e.code === 'Enter' &&
+          this.instance.getActiveAction() === RECTANGLE_TOOL_ACTION_NAME
+        ) {
+          this.cancelAction();
+          return;
+        }
+        if (
+          e.code === 'Escape' &&
+          this.instance.getActiveAction() === RECTANGLE_TOOL_ACTION_NAME
+        ) {
+          this.cancelAction();
+          return;
+        }
+      },
+      { signal: this.instance.getEventsController()?.signal }
+    );
 
     stage.on('pointermove', () => {
       if (this.state === RECTANGLE_TOOL_STATE.IDLE) return;

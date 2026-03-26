@@ -32,26 +32,36 @@ export class WeaveStageDropAreaPlugin extends WeavePlugin {
   private initEvents() {
     const stage = this.instance.getStage();
 
-    stage.container().addEventListener('dragover', (e) => {
-      e.preventDefault();
-      e.stopPropagation();
-    });
+    stage.container().addEventListener(
+      'dragover',
+      (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+      },
+      { signal: this.instance.getEventsController()?.signal }
+    );
 
-    stage.container().addEventListener('drop', (e) => {
-      e.preventDefault();
-      e.stopPropagation();
+    stage.container().addEventListener(
+      'drop',
+      (e) => {
+        e.preventDefault();
+        e.stopPropagation();
 
-      this.instance.emitEvent<WeaveStageDropPluginOnStageDropEvent>(
-        'onStageDrop',
-        e
-      );
-    });
+        this.instance.emitEvent<WeaveStageDropPluginOnStageDropEvent>(
+          'onStageDrop',
+          e
+        );
+      },
+      { signal: this.instance.getEventsController()?.signal }
+    );
 
     // Safari: Prevent default page drop behavior
     window.addEventListener('dragover', (e) => e.preventDefault(), {
+      signal: this.instance.getEventsController()?.signal,
       passive: false,
     });
     window.addEventListener('drop', (e) => e.preventDefault(), {
+      signal: this.instance.getEventsController()?.signal,
       passive: false,
     });
   }

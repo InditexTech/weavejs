@@ -271,7 +271,9 @@ export class WeaveImageCrop {
 
     this.cropGroup.show();
 
-    window.addEventListener('keydown', this.handleHide);
+    window.addEventListener('keydown', this.handleHide, {
+      signal: this.instance.getEventsController()?.signal,
+    });
 
     if (options.cmdCtrl.triggered) {
       utilityLayer?.hide();

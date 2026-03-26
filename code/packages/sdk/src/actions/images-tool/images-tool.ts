@@ -145,14 +145,18 @@ export class WeaveImagesToolAction extends WeaveAction {
   private setupEvents() {
     const stage = this.instance.getStage();
 
-    stage.container().addEventListener('keydown', (e) => {
-      if (
-        e.key === 'Escape' &&
-        this.instance.getActiveAction() === WEAVE_IMAGES_TOOL_ACTION_NAME
-      ) {
-        this.cancelAction();
-      }
-    });
+    stage.container().addEventListener(
+      'keydown',
+      (e) => {
+        if (
+          e.key === 'Escape' &&
+          this.instance.getActiveAction() === WEAVE_IMAGES_TOOL_ACTION_NAME
+        ) {
+          this.cancelAction();
+        }
+      },
+      { signal: this.instance.getEventsController()?.signal }
+    );
 
     stage.on('pointerdown', (e) => {
       this.setTapStart(e);

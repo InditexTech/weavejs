@@ -366,7 +366,7 @@ export class WeaveExportManager {
     mainLayer.add(background);
     background.moveToBottom();
 
-    const backgroundRect = background.getClientRect();
+    const backgroundRect = background.getClientRect({ relativeTo: stage });
 
     const composites: { input: Buffer; left: number; top: number }[] = [];
 

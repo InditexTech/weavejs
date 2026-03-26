@@ -94,21 +94,25 @@ export class WeaveConnectorToolAction extends WeaveAction {
   private setupEvents() {
     const stage = this.instance.getStage();
 
-    window.addEventListener('keydown', (e) => {
-      if (
-        e.code === 'Enter' &&
-        this.instance.getActiveAction() === CONNECTOR_TOOL_ACTION_NAME
-      ) {
-        this.cancelAction();
-        return;
-      }
-      if (
-        e.code === 'Escape' &&
-        this.instance.getActiveAction() === CONNECTOR_TOOL_ACTION_NAME
-      ) {
-        this.cancelAction();
-      }
-    });
+    window.addEventListener(
+      'keydown',
+      (e) => {
+        if (
+          e.code === 'Enter' &&
+          this.instance.getActiveAction() === CONNECTOR_TOOL_ACTION_NAME
+        ) {
+          this.cancelAction();
+          return;
+        }
+        if (
+          e.code === 'Escape' &&
+          this.instance.getActiveAction() === CONNECTOR_TOOL_ACTION_NAME
+        ) {
+          this.cancelAction();
+        }
+      },
+      { signal: this.instance.getEventsController()?.signal }
+    );
 
     let nodeHovered: Konva.Node | undefined = undefined;
 

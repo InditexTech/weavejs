@@ -97,15 +97,19 @@ export class WeaveVideoToolAction extends WeaveAction {
   private setupEvents() {
     const stage = this.instance.getStage();
 
-    window.addEventListener('keydown', (e) => {
-      if (
-        e.code === 'Escape' &&
-        this.instance.getActiveAction() === VIDEO_TOOL_ACTION_NAME
-      ) {
-        this.cancelAction();
-        return;
-      }
-    });
+    window.addEventListener(
+      'keydown',
+      (e) => {
+        if (
+          e.code === 'Escape' &&
+          this.instance.getActiveAction() === VIDEO_TOOL_ACTION_NAME
+        ) {
+          this.cancelAction();
+          return;
+        }
+      },
+      { signal: this.instance.getEventsController()?.signal }
+    );
 
     stage.on('pointerdown', (e) => {
       this.setTapStart(e);

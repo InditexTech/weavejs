@@ -427,7 +427,7 @@ export class WeaveImageNode extends WeaveNode {
 
       this.updateImageCrop(image);
     } else {
-      this.updatePlaceholderSize(image, imagePlaceholder);
+      this.updatePlaceholderSize(image);
       this.loadImage(imageProps, image, true);
     }
 
@@ -1097,7 +1097,9 @@ export class WeaveImageNode extends WeaveNode {
 
             this.updateImageCrop(image);
 
-            this.resolveAsyncElement(id);
+            if (!useFallback) {
+              this.resolveAsyncElement(id);
+            }
 
             this.cacheNode(image);
           }
@@ -1183,19 +1185,11 @@ export class WeaveImageNode extends WeaveNode {
     );
   }
 
-  updatePlaceholderSize(
-    image: Konva.Group,
-    imagePlaceholder: Konva.Rect
-  ): void {
+  updatePlaceholderSize(image: Konva.Group): void {
     const imageAttrs = image.getAttrs();
 
     if (!this.imageState[imageAttrs.id ?? '']?.loaded) {
       return;
-    }
-
-    if (!imageAttrs.adding && !imageAttrs.cropInfo) {
-      imagePlaceholder.width(imageAttrs.uncroppedImage.width);
-      imagePlaceholder.height(imageAttrs.uncroppedImage.height);
     }
   }
 

@@ -62,17 +62,25 @@ export class WeaveTextNode extends WeaveNode {
 
   private initEvents() {
     if (!this.eventsInitialized && !globalThis._weave_isServerSide) {
-      window.addEventListener('keydown', (e) => {
-        if (e.ctrlKey || e.metaKey) {
-          this.isCtrlMetaPressed = true;
-        }
-      });
+      window.addEventListener(
+        'keydown',
+        (e) => {
+          if (e.ctrlKey || e.metaKey) {
+            this.isCtrlMetaPressed = true;
+          }
+        },
+        { signal: this.instance.getEventsController()?.signal }
+      );
 
-      window.addEventListener('keyup', (e) => {
-        if (!(e.ctrlKey || e.metaKey)) {
-          this.isCtrlMetaPressed = false;
-        }
-      });
+      window.addEventListener(
+        'keyup',
+        (e) => {
+          if (!(e.ctrlKey || e.metaKey)) {
+            this.isCtrlMetaPressed = false;
+          }
+        },
+        { signal: this.instance.getEventsController()?.signal }
+      );
 
       this.eventsInitialized = true;
     }
@@ -131,7 +139,9 @@ export class WeaveTextNode extends WeaveNode {
   onAdd(): void {
     if (!this.instance.isServerSide() && !this.keyPressHandler) {
       this.keyPressHandler = this.handleKeyPress.bind(this);
-      window.addEventListener('keypress', this.keyPressHandler);
+      window.addEventListener('keypress', this.keyPressHandler, {
+        signal: this.instance.getEventsController()?.signal,
+      });
     }
   }
 
@@ -389,7 +399,9 @@ export class WeaveTextNode extends WeaveNode {
 
     if (!this.instance.isServerSide() && !this.keyPressHandler) {
       this.keyPressHandler = this.handleKeyPress.bind(this);
-      window.addEventListener('keypress', this.keyPressHandler);
+      window.addEventListener('keypress', this.keyPressHandler, {
+        signal: this.instance.getEventsController()?.signal,
+      });
     }
 
     return text;
@@ -799,27 +811,39 @@ export class WeaveTextNode extends WeaveNode {
       throttledUpdateTextNode();
     };
     // lock internal scroll
-    this.textAreaSuperContainer.addEventListener('scroll', () => {
-      if (this.textAreaSuperContainer) {
-        this.textAreaSuperContainer.scrollTop = 0;
-        this.textAreaSuperContainer.scrollLeft = 0;
-      }
-    });
-    this.textAreaContainer.addEventListener('scroll', () => {
-      if (!this.textAreaContainer) {
-        return;
-      }
-      this.textAreaContainer.scrollTop = 0;
-      this.textAreaContainer.scrollLeft = 0;
-    });
-    this.textArea.addEventListener('scroll', () => {
-      if (!this.textArea) {
-        return;
-      }
+    this.textAreaSuperContainer.addEventListener(
+      'scroll',
+      () => {
+        if (this.textAreaSuperContainer) {
+          this.textAreaSuperContainer.scrollTop = 0;
+          this.textAreaSuperContainer.scrollLeft = 0;
+        }
+      },
+      { signal: this.instance.getEventsController()?.signal }
+    );
+    this.textAreaContainer.addEventListener(
+      'scroll',
+      () => {
+        if (!this.textAreaContainer) {
+          return;
+        }
+        this.textAreaContainer.scrollTop = 0;
+        this.textAreaContainer.scrollLeft = 0;
+      },
+      { signal: this.instance.getEventsController()?.signal }
+    );
+    this.textArea.addEventListener(
+      'scroll',
+      () => {
+        if (!this.textArea) {
+          return;
+        }
 
-      this.textArea.scrollTop = 0;
-      this.textArea.scrollLeft = 0;
-    });
+        this.textArea.scrollTop = 0;
+        this.textArea.scrollLeft = 0;
+      },
+      { signal: this.instance.getEventsController()?.signal }
+    );
 
     const rotation = textNode.getAbsoluteRotation();
     if (rotation) {
@@ -919,8 +943,12 @@ export class WeaveTextNode extends WeaveNode {
       }
     };
 
-    this.textArea.addEventListener('keydown', handleKeyDown);
-    this.textArea.addEventListener('keyup', handleKeyUp);
+    this.textArea.addEventListener('keydown', handleKeyDown, {
+      signal: this.instance.getEventsController()?.signal,
+    });
+    this.textArea.addEventListener('keyup', handleKeyUp, {
+      signal: this.instance.getEventsController()?.signal,
+    });
 
     this.textArea.tabIndex = 1;
     this.textArea.focus();
@@ -962,7 +990,9 @@ export class WeaveTextNode extends WeaveNode {
     };
 
     setTimeout(() => {
-      window.addEventListener('pointerup', handleOutsideClick);
+      window.addEventListener('pointerup', handleOutsideClick, {
+        signal: this.instance.getEventsController()?.signal,
+      });
     }, 0);
 
     this.instance.getStage().mode(WEAVE_STAGE_TEXT_EDITION_MODE);

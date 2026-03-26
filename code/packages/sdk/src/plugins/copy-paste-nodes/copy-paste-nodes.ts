@@ -210,56 +210,72 @@ export class WeaveCopyPasteNodesPlugin extends WeavePlugin {
 
     const catcher = this.getCatcherElement();
 
-    window.addEventListener('keydown', async (e) => {
-      if (stage.isFocused() && e.code === 'KeyC' && (e.ctrlKey || e.metaKey)) {
-        e.preventDefault();
+    window.addEventListener(
+      'keydown',
+      async (e) => {
+        if (
+          stage.isFocused() &&
+          e.code === 'KeyC' &&
+          (e.ctrlKey || e.metaKey)
+        ) {
+          e.preventDefault();
 
-        await this.handleCopy();
+          await this.handleCopy();
 
-        return;
-      }
-      if (stage.isFocused() && e.code === 'KeyV' && (e.ctrlKey || e.metaKey)) {
-        this.focusPasteCatcher();
-
-        if (!this.enabled) {
           return;
         }
-      }
-    });
+        if (
+          stage.isFocused() &&
+          e.code === 'KeyV' &&
+          (e.ctrlKey || e.metaKey)
+        ) {
+          this.focusPasteCatcher();
+
+          if (!this.enabled) {
+            return;
+          }
+        }
+      },
+      { signal: this.instance.getEventsController()?.signal }
+    );
 
     if (catcher) {
-      catcher.addEventListener('paste', async (e) => {
-        e.preventDefault();
+      catcher.addEventListener(
+        'paste',
+        async (e) => {
+          e.preventDefault();
 
-        let items: ClipboardItems | undefined = undefined;
+          let items: ClipboardItems | undefined = undefined;
 
-        let hasWeaveData = false;
+          let hasWeaveData = false;
 
-        if (!items) {
+          if (!items) {
+            if (this.isClipboardAPIAvailable()) {
+              items = await navigator.clipboard.read();
+            }
+          }
+
+          if (!items || items.length === 0) {
+            return;
+          }
+
           if (this.isClipboardAPIAvailable()) {
-            items = await navigator.clipboard.read();
+            const readText = await navigator.clipboard.readText();
+            const continueToPaste = this.isWeaveData(readText);
+            if (continueToPaste) {
+              hasWeaveData = true;
+            }
           }
-        }
 
-        if (!items || items.length === 0) {
-          return;
-        }
-
-        if (this.isClipboardAPIAvailable()) {
-          const readText = await navigator.clipboard.readText();
-          const continueToPaste = this.isWeaveData(readText);
-          if (continueToPaste) {
-            hasWeaveData = true;
+          if (hasWeaveData) {
+            this.handlePaste();
+            return;
           }
-        }
 
-        if (hasWeaveData) {
-          this.handlePaste();
-          return;
-        }
-
-        this.sendExternalPasteEvent(undefined, items);
-      });
+          this.sendExternalPasteEvent(undefined, items);
+        },
+        { signal: this.instance.getEventsController()?.signal }
+      );
     }
   }
 

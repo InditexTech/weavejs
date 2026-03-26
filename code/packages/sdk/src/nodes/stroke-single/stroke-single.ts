@@ -81,17 +81,25 @@ export class WeaveStrokeSingleNode extends WeaveNode {
       return;
     }
 
-    window.addEventListener('keydown', (e) => {
-      if (e.key === 'Shift') {
-        this.shiftPressed = true;
-      }
-    });
+    window.addEventListener(
+      'keydown',
+      (e) => {
+        if (e.key === 'Shift') {
+          this.shiftPressed = true;
+        }
+      },
+      { signal: this.instance.getEventsController()?.signal }
+    );
 
-    window.addEventListener('keyup', (e) => {
-      if (e.key === 'Shift') {
-        this.shiftPressed = false;
-      }
-    });
+    window.addEventListener(
+      'keyup',
+      (e) => {
+        if (e.key === 'Shift') {
+          this.shiftPressed = false;
+        }
+      },
+      { signal: this.instance.getEventsController()?.signal }
+    );
 
     this.eventsInitialized = true;
   }

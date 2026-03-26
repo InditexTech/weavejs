@@ -58,15 +58,19 @@ export class WeaveTextToolAction extends WeaveAction {
   private setupEvents() {
     const stage = this.instance.getStage();
 
-    window.addEventListener('keydown', (e) => {
-      if (
-        e.code === 'Escape' &&
-        this.instance.getActiveAction() === TEXT_TOOL_ACTION_NAME
-      ) {
-        this.cancelAction();
-        return;
-      }
-    });
+    window.addEventListener(
+      'keydown',
+      (e) => {
+        if (
+          e.code === 'Escape' &&
+          this.instance.getActiveAction() === TEXT_TOOL_ACTION_NAME
+        ) {
+          this.cancelAction();
+          return;
+        }
+      },
+      { signal: this.instance.getEventsController()?.signal }
+    );
 
     stage.on('pointermove', () => {
       if (this.state === TEXT_TOOL_STATE.IDLE) return;

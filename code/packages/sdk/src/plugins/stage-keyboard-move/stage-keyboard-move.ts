@@ -73,20 +73,24 @@ export class WeaveStageKeyboardMovePlugin extends WeavePlugin {
   }
 
   onInit(): void {
-    window.addEventListener('keydown', (e) => {
-      if (e.code === 'ArrowUp' && e.shiftKey) {
-        this.handleNodesMovement('up');
-      }
-      if (e.code === 'ArrowLeft' && e.shiftKey) {
-        this.handleNodesMovement('left');
-      }
-      if (e.code === 'ArrowRight' && e.shiftKey) {
-        this.handleNodesMovement('right');
-      }
-      if (e.code === 'ArrowDown' && e.shiftKey) {
-        this.handleNodesMovement('down');
-      }
-    });
+    window.addEventListener(
+      'keydown',
+      (e) => {
+        if (e.code === 'ArrowUp' && e.shiftKey) {
+          this.handleNodesMovement('up');
+        }
+        if (e.code === 'ArrowLeft' && e.shiftKey) {
+          this.handleNodesMovement('left');
+        }
+        if (e.code === 'ArrowRight' && e.shiftKey) {
+          this.handleNodesMovement('right');
+        }
+        if (e.code === 'ArrowDown' && e.shiftKey) {
+          this.handleNodesMovement('down');
+        }
+      },
+      { signal: this.instance.getEventsController()?.signal }
+    );
   }
 
   enable(): void {

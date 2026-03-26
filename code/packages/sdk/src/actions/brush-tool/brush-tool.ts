@@ -84,40 +84,48 @@ export class WeaveBrushToolAction extends WeaveAction {
   private setupEvents() {
     const stage = this.instance.getStage();
 
-    window.addEventListener('keyup', (e) => {
-      if (
-        e.code === 'Space' &&
-        this.instance.getActiveAction() === BRUSH_TOOL_ACTION_NAME
-      ) {
-        this.isSpacePressed = false;
-      }
-    });
+    window.addEventListener(
+      'keyup',
+      (e) => {
+        if (
+          e.code === 'Space' &&
+          this.instance.getActiveAction() === BRUSH_TOOL_ACTION_NAME
+        ) {
+          this.isSpacePressed = false;
+        }
+      },
+      { signal: this.instance.getEventsController()?.signal }
+    );
 
-    window.addEventListener('keydown', (e) => {
-      if (
-        e.code === 'Enter' &&
-        this.instance.getActiveAction() === BRUSH_TOOL_ACTION_NAME
-      ) {
-        e.stopPropagation();
-        this.cancelAction();
-        return;
-      }
-      if (
-        e.code === 'Space' &&
-        this.instance.getActiveAction() === BRUSH_TOOL_ACTION_NAME
-      ) {
-        e.stopPropagation();
-        this.isSpacePressed = true;
-        return;
-      }
-      if (
-        e.code === 'Escape' &&
-        this.instance.getActiveAction() === BRUSH_TOOL_ACTION_NAME
-      ) {
-        e.stopPropagation();
-        this.cancelAction();
-      }
-    });
+    window.addEventListener(
+      'keydown',
+      (e) => {
+        if (
+          e.code === 'Enter' &&
+          this.instance.getActiveAction() === BRUSH_TOOL_ACTION_NAME
+        ) {
+          e.stopPropagation();
+          this.cancelAction();
+          return;
+        }
+        if (
+          e.code === 'Space' &&
+          this.instance.getActiveAction() === BRUSH_TOOL_ACTION_NAME
+        ) {
+          e.stopPropagation();
+          this.isSpacePressed = true;
+          return;
+        }
+        if (
+          e.code === 'Escape' &&
+          this.instance.getActiveAction() === BRUSH_TOOL_ACTION_NAME
+        ) {
+          e.stopPropagation();
+          this.cancelAction();
+        }
+      },
+      { signal: this.instance.getEventsController()?.signal }
+    );
 
     const handlePointerDown = (e: Konva.KonvaEventObject<PointerEvent>) => {
       if (this.state === BRUSH_TOOL_STATE.INACTIVE) return;
@@ -144,7 +152,9 @@ export class WeaveBrushToolAction extends WeaveAction {
       e.evt.stopPropagation();
     };
 
-    stage.on('pointerdown', handlePointerDown);
+    stage.on('pointerdown', handlePointerDown, {
+      signal: this.instance.getEventsController()?.signal,
+    });
 
     const handlePointerMove = (e: Konva.KonvaEventObject<PointerEvent>) => {
       if (this.state === BRUSH_TOOL_STATE.INACTIVE) return;

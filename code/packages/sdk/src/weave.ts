@@ -107,6 +107,7 @@ export class Weave {
   private readonly asyncManager: WeaveAsyncManager;
   private readonly hooksManager: WeaveHooksManager;
   private readonly dragAndDropManager: WeaveDragAndDropManager;
+  private eventsController!: AbortController | undefined;
 
   constructor(
     weaveConfig: Pick<WeaveConfig, 'store' | 'renderer'> &
@@ -117,6 +118,8 @@ export class Weave {
     if (typeof window === 'undefined') {
       globalThis._weave_isServerSide = true;
     }
+
+    this.eventsController = undefined;
 
     this.emitter = new Emittery();
 
@@ -193,6 +196,8 @@ export class Weave {
 
       this.status = WEAVE_INSTANCE_STATUS.RUNNING;
       this.emitEvent<WeaveInstanceStatusEvent>('onInstanceStatus', this.status);
+
+      this.emitEvent<undefined>('onRender');
     });
   }
 
@@ -228,6 +233,7 @@ export class Weave {
     this.moduleLogger.info('Start instance');
 
     if (!this.isServerSide()) {
+      this.eventsController = new AbortController();
       // Setup the instance on the weave global variable
       if (!window.weave) {
         window.weave = this;
@@ -277,8 +283,6 @@ export class Weave {
   async switchRoom() {
     this.moduleLogger.info(`Switching room`);
 
-    // this.emitter.clearListeners();
-
     const nodeHandlers = this.registerManager.getNodesHandlers();
     for (const nodeHandlerKey of Object.keys(nodeHandlers)) {
       const nodeHandler = nodeHandlers[nodeHandlerKey];
@@ -289,6 +293,16 @@ export class Weave {
     const stage = this.getStage();
     if (stage) {
       stage.destroy();
+    }
+
+    // clear events listeners
+    if (this.eventsController) {
+      this.eventsController.abort();
+    }
+
+    // reset events controller
+    if (!this.isServerSide()) {
+      this.eventsController = new AbortController();
     }
 
     this.registerManager.reset();
@@ -332,6 +346,11 @@ export class Weave {
 
   destroy(): void {
     this.moduleLogger.info(`Destroying the instance`);
+
+    // clear events listeners
+    if (this.eventsController) {
+      this.eventsController.abort();
+    }
 
     // clear listeners
     this.emitter.clearListeners();
@@ -1526,5 +1545,11 @@ export class Weave {
 
   getDragProperties<T>(): T | null {
     return this.dragAndDropManager.getDragProperties();
+  }
+
+  // EVENTS CONTROLLER METHODS
+
+  getEventsController(): AbortController | undefined {
+    return this.eventsController;
   }
 }

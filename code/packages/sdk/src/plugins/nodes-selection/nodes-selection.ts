@@ -348,13 +348,17 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
       nodeHovered = undefined;
     });
 
-    window.addEventListener('mouseout', () => {
-      if (nodeHovered) {
-        nodeHovered.handleMouseout();
-        nodeHovered = undefined;
-      }
-      this.instance.getStage().handleMouseover?.();
-    });
+    window.addEventListener(
+      'mouseout',
+      () => {
+        if (nodeHovered) {
+          nodeHovered.handleMouseout();
+          nodeHovered = undefined;
+        }
+        this.instance.getStage().handleMouseover?.();
+      },
+      { signal: this.instance.getEventsController()?.signal }
+    );
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const handleTransform = (e: any) => {
@@ -1078,29 +1082,37 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
 
     const stage = this.instance.getStage();
 
-    stage.container().addEventListener('keydown', (e) => {
-      if (e.ctrlKey || e.metaKey) {
-        this.isCtrlMetaPressed = true;
-      }
-      if (e.code === 'Space') {
-        this.isSpaceKeyPressed = true;
-      }
-      if (e.code === 'Backspace' || e.code === 'Delete') {
-        Promise.resolve().then(() => {
-          this.removeSelectedNodes();
-        });
-        return;
-      }
-    });
+    stage.container().addEventListener(
+      'keydown',
+      (e) => {
+        if (e.ctrlKey || e.metaKey) {
+          this.isCtrlMetaPressed = true;
+        }
+        if (e.code === 'Space') {
+          this.isSpaceKeyPressed = true;
+        }
+        if (e.code === 'Backspace' || e.code === 'Delete') {
+          Promise.resolve().then(() => {
+            this.removeSelectedNodes();
+          });
+          return;
+        }
+      },
+      { signal: this.instance.getEventsController()?.signal }
+    );
 
-    stage.container().addEventListener('keyup', (e) => {
-      if (!(e.ctrlKey || e.metaKey)) {
-        this.isCtrlMetaPressed = false;
-      }
-      if (e.code === 'Space') {
-        this.isSpaceKeyPressed = false;
-      }
-    });
+    stage.container().addEventListener(
+      'keyup',
+      (e) => {
+        if (!(e.ctrlKey || e.metaKey)) {
+          this.isCtrlMetaPressed = false;
+        }
+        if (e.code === 'Space') {
+          this.isSpaceKeyPressed = false;
+        }
+      },
+      { signal: this.instance.getEventsController()?.signal }
+    );
 
     stage.on('pointerdown', (e: KonvaEventObject<PointerEvent, Stage>) => {
       this.setTapStart(e);

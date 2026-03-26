@@ -641,17 +641,25 @@ export class WeaveStageZoomPlugin extends WeavePlugin {
   }
 
   private initEvents() {
-    window.addEventListener('keydown', (e) => {
-      if (e.ctrlKey || e.metaKey) {
-        this.isCtrlOrMetaPressed = true;
-      }
-    });
+    window.addEventListener(
+      'keydown',
+      (e) => {
+        if (e.ctrlKey || e.metaKey) {
+          this.isCtrlOrMetaPressed = true;
+        }
+      },
+      { signal: this.instance.getEventsController()?.signal }
+    );
 
-    window.addEventListener('keyup', (e) => {
-      if (!(e.ctrlKey || e.metaKey)) {
-        this.isCtrlOrMetaPressed = false;
-      }
-    });
+    window.addEventListener(
+      'keyup',
+      (e) => {
+        if (!(e.ctrlKey || e.metaKey)) {
+          this.isCtrlOrMetaPressed = false;
+        }
+      },
+      { signal: this.instance.getEventsController()?.signal }
+    );
 
     const stage = this.instance.getStage();
 
@@ -687,7 +695,7 @@ export class WeaveStageZoomPlugin extends WeavePlugin {
           }
         }
       },
-      { passive: false }
+      { passive: false, signal: this.instance.getEventsController()?.signal }
     );
 
     stage.getContent().addEventListener(
@@ -753,7 +761,7 @@ export class WeaveStageZoomPlugin extends WeavePlugin {
           lastCenter = newCenter;
         }
       },
-      { passive: false }
+      { passive: false, signal: this.instance.getEventsController()?.signal }
     );
 
     stage.getContent().addEventListener(
@@ -763,7 +771,7 @@ export class WeaveStageZoomPlugin extends WeavePlugin {
         lastDist = 0;
         lastCenter = null;
       },
-      { passive: false }
+      { passive: false, signal: this.instance.getEventsController()?.signal }
     );
 
     let doZoom = false;
@@ -800,6 +808,7 @@ export class WeaveStageZoomPlugin extends WeavePlugin {
     };
 
     window.addEventListener('wheel', handleWheelImmediate, {
+      signal: this.instance.getEventsController()?.signal,
       passive: false,
     });
 
@@ -824,7 +833,10 @@ export class WeaveStageZoomPlugin extends WeavePlugin {
     // CAREFUL: previously was 30ms
     const throttledHandleWheel = throttle(handleWheel, DEFAULT_THROTTLE_MS);
 
-    window.addEventListener('wheel', throttledHandleWheel, { passive: true });
+    window.addEventListener('wheel', throttledHandleWheel, {
+      signal: this.instance.getEventsController()?.signal,
+      passive: true,
+    });
   }
 
   getInertiaScale() {
