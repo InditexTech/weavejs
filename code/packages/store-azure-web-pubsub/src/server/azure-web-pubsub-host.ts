@@ -263,18 +263,20 @@ export class WeaveStoreAzureWebPubSubSyncHost {
           return;
         } else {
           this._reconnectAttempts++;
-          const timeout = 1000 * Math.pow(1.5, this._reconnectAttempts - 1);
-          setTimeout(() => {
-            this.server.emitEvent<WeaveStoreAzureWebPubsubOnWebsocketReconnectEvent>(
-              'onWsReconnect',
-              {
-                group: `${group}.host`,
-                connectionAttempt: this._reconnectAttempts,
-              }
-            );
+          const timeoutMs = 1000 * Math.pow(1.5, this._reconnectAttempts - 1);
 
+          this.server.emitEvent<WeaveStoreAzureWebPubsubOnWebsocketReconnectEvent>(
+            'onWsReconnect',
+            {
+              group: `${group}.host`,
+              connectionAttempt: this._reconnectAttempts,
+              timeoutMs,
+            }
+          );
+
+          setTimeout(() => {
             this.createWebSocket(); // start fresh with a new token
-          }, timeout);
+          }, timeoutMs);
         }
       });
 
