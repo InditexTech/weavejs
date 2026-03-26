@@ -29,6 +29,7 @@ import {
   handleMessageBufferData,
   uint8ToBase64,
 } from './utils';
+import Y from './yjs';
 
 const messageSyncStep1 = 0;
 const messageAwareness = 1;
@@ -391,6 +392,22 @@ export class WeaveStoreAzureWebPubSubSyncClient extends Emittery {
       }
 
       const messageData = message.data;
+
+      if (messageData.type === 'resync') {
+        // Resync requested by sync host
+        const encoder = encoding.createEncoder();
+        encoding.writeVarUint(encoder, messageSyncStep1);
+        syncProtocol.writeUpdate(encoder, Y.encodeStateAsUpdate(this.doc));
+
+        sendToControlGroup(
+          this,
+          this.topic,
+          MessageDataType.Sync,
+          encoding.toUint8Array(encoder)
+        );
+        return;
+      }
+
       if (messageData.t !== undefined && messageData.t !== this._uuid) {
         // should ignore message for other clients.
         return;

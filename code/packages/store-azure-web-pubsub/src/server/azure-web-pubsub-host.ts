@@ -196,6 +196,17 @@ export class WeaveStoreAzureWebPubSubSyncHost {
             connectionAttempt,
           }
         );
+        // Send resync request to clients
+        ws.send(
+          JSON.stringify({
+            type: MessageType.SendToGroup,
+            group: group,
+            noEcho: true,
+            data: {
+              type: 'resync',
+            },
+          })
+        );
 
         this._reconnectAttempts = 0; // reset on successful connection
 

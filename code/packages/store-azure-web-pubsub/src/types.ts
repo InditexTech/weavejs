@@ -141,9 +141,10 @@ export enum MessageDataType {
 }
 
 export interface MessageData {
+  resync?: boolean;
   payloadId?: string;
   index?: number;
-  type?: 'chunk' | 'end';
+  type?: 'resync' | 'chunk' | 'end';
   totalChunks?: number;
   group: string;
   t: string; // type / target uuid
