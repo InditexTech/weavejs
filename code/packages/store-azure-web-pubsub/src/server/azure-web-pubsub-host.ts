@@ -174,11 +174,13 @@ export class WeaveStoreAzureWebPubSubSyncHost {
       const ws = new WebSocket(url, AzureWebPubSubJsonProtocol);
 
       ws.addEventListener('open', (event) => {
-        this._reconnectAttempts = 0; // reset on successful connection
-
         this.server.emitEvent<WeaveStoreAzureWebPubsubOnWebsocketOpenEvent>(
           'onWsOpen',
-          { group: `${group}.host`, event }
+          {
+            group: `${group}.host`,
+            event,
+            reconnectionAttempt: this._reconnectAttempts,
+          }
         );
         ws.send(
           JSON.stringify({
@@ -188,8 +190,13 @@ export class WeaveStoreAzureWebPubSubSyncHost {
         );
         this.server.emitEvent<WeaveStoreAzureWebPubsubOnWebsocketJoinGroupEvent>(
           'onWsJoinGroup',
-          { group: `${group}.host` }
+          {
+            group: `${group}.host`,
+            reconnectionAttempt: this._reconnectAttempts,
+          }
         );
+
+        this._reconnectAttempts = 0; // reset on successful connection
 
         this._conn = ws;
         resolve();
@@ -198,7 +205,10 @@ export class WeaveStoreAzureWebPubSubSyncHost {
       ws.addEventListener('message', (e) => {
         this.server.emitEvent<WeaveStoreAzureWebPubsubOnWebsocketMessageEvent>(
           'onWsMessage',
-          { group: `${group}.host`, event: e }
+          {
+            group: `${group}.host`,
+            event: e,
+          }
         );
 
         const event: Message = JSON.parse(e.data.toString());
@@ -244,6 +254,7 @@ export class WeaveStoreAzureWebPubSubSyncHost {
           {
             group: `${group}.host`,
             event: e as unknown as CloseEvent,
+            reconnectionAttempt: this._reconnectAttempts,
           }
         );
 
