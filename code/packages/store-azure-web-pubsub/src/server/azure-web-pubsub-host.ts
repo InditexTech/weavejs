@@ -24,7 +24,6 @@ import {
   type WeaveStoreAzureWebPubsubOnWebsocketErrorEvent,
   type WeaveStoreAzureWebPubsubOnWebsocketJoinGroupEvent,
   type WeaveStoreAzureWebPubsubOnWebsocketMessageEvent,
-  type WeaveStoreAzureWebPubsubOnWebsocketOnTokenRefreshEvent,
   type WeaveStoreAzureWebPubsubOnWebsocketOpenEvent,
 } from '@/types';
 import type WeaveAzureWebPubsubSyncHandler from './azure-web-pubsub-sync-handler';
@@ -269,17 +268,6 @@ export class WeaveStoreAzureWebPubSubSyncHost {
           ws.close(); // ensure cleanup
         }
       });
-
-      setTimeout(() => {
-        if (ws.readyState === WebSocket.OPEN) {
-          ws.close();
-          this.server.emitEvent<WeaveStoreAzureWebPubsubOnWebsocketOnTokenRefreshEvent>(
-            'onWsTokenRefresh',
-            { group: `${group}.host` }
-          );
-          this.createWebSocket(); // start fresh with a new token
-        }
-      }, expirationTimeInMinutes * 0.75 * 60 * 1000);
     });
   }
 
