@@ -174,6 +174,8 @@ export class WeaveStoreAzureWebPubSubSyncHost {
       const ws = new WebSocket(url, AzureWebPubSubJsonProtocol);
 
       ws.addEventListener('open', (event) => {
+        this._reconnectAttempts = 0; // reset on successful connection
+
         this.server.emitEvent<WeaveStoreAzureWebPubsubOnWebsocketOpenEvent>(
           'onWsOpen',
           { group: `${group}.host`, event }

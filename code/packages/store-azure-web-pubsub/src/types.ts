@@ -104,10 +104,6 @@ export type WeaveStoreAzureWebPubsubOnWebsocketErrorEvent = {
   error: ErrorEvent;
 };
 
-export type WeaveStoreAzureWebPubsubOnWebsocketOnTokenRefreshEvent = {
-  group: string;
-};
-
 export type WeaveStoreAzureWebPubSubSyncHostClientConnectOptions = {
   expirationTimeInMinutes?: number;
 };
