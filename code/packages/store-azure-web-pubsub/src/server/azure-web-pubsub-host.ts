@@ -30,6 +30,8 @@ import {
 import type WeaveAzureWebPubsubSyncHandler from './azure-web-pubsub-sync-handler';
 import { handleChunkedMessage } from '@/utils';
 
+const resyncAttempts = 12;
+const resyncInterval = 5000;
 const expirationTimeInMinutes = 60; // 1 hour
 const messageSync = 0;
 const messageAwareness = 1;
@@ -174,6 +176,9 @@ export class WeaveStoreAzureWebPubSubSyncHost {
 
       const connectionAttempt = this._reconnectAttempts;
 
+      let resyncAttempt: number = 0;
+      let resyncIntervalId: NodeJS.Timeout | null = null;
+
       ws.addEventListener('open', (event) => {
         this.server.emitEvent<WeaveStoreAzureWebPubsubOnWebsocketOpenEvent>(
           'onWsOpen',
@@ -196,17 +201,27 @@ export class WeaveStoreAzureWebPubSubSyncHost {
             connectionAttempt,
           }
         );
-        // Send resync request to clients
-        ws.send(
-          JSON.stringify({
-            type: MessageType.SendToGroup,
-            group: group,
-            noEcho: true,
-            data: {
-              type: 'resync',
-            },
-          })
-        );
+
+        const handleResync = () => {
+          ws.send(
+            JSON.stringify({
+              type: MessageType.SendToGroup,
+              group,
+              noEcho: true,
+              data: { type: 'resync' },
+            })
+          );
+          resyncAttempt++;
+          if (resyncAttempt >= resyncAttempts && resyncIntervalId) {
+            clearInterval(resyncIntervalId);
+          }
+        };
+
+        resyncIntervalId = setInterval(() => {
+          handleResync();
+        }, resyncInterval);
+
+        handleResync();
 
         this._reconnectAttempts = 0; // reset on successful connection
 
@@ -261,6 +276,10 @@ export class WeaveStoreAzureWebPubSubSyncHost {
       });
 
       ws.addEventListener('close', (e) => {
+        if (resyncIntervalId) {
+          clearInterval(resyncIntervalId);
+        }
+
         this.server.emitEvent<WeaveStoreAzureWebPubsubOnWebsocketCloseEvent>(
           'onWsClose',
           {
@@ -292,6 +311,10 @@ export class WeaveStoreAzureWebPubSubSyncHost {
       });
 
       ws.addEventListener('error', (error) => {
+        if (resyncIntervalId) {
+          clearInterval(resyncIntervalId);
+        }
+
         this.server.emitEvent<WeaveStoreAzureWebPubsubOnWebsocketErrorEvent>(
           'onWsError',
           {
