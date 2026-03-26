@@ -85,12 +85,12 @@ export type WeaveStoreAzureWebPubsubOnDisconnectedEvent = {
 export type WeaveStoreAzureWebPubsubOnWebsocketOpenEvent = {
   group: string;
   event: WebSocket.Event;
-  reconnectionAttempt: number;
+  connectionAttempt: number;
 };
 
 export type WeaveStoreAzureWebPubsubOnWebsocketJoinGroupEvent = {
   group: string;
-  reconnectionAttempt: number;
+  connectionAttempt: number;
 };
 
 export type WeaveStoreAzureWebPubsubOnWebsocketMessageEvent = {
@@ -102,13 +102,18 @@ export type WeaveStoreAzureWebPubsubOnWebsocketMessageEvent = {
 export type WeaveStoreAzureWebPubsubOnWebsocketCloseEvent = {
   group: string;
   event: CloseEvent;
-  reconnectionAttempt: number;
+  connectionAttempt: number;
+};
+
+export type WeaveStoreAzureWebPubsubOnWebsocketReconnectEvent = {
+  group: string;
+  connectionAttempt: number;
 };
 
 export type WeaveStoreAzureWebPubsubOnWebsocketErrorEvent = {
   group: string;
   error: ErrorEvent;
-  reconnectionAttempt: number;
+  connectionAttempt: number;
 };
 
 export type WeaveStoreAzureWebPubSubSyncHostClientConnectOptions = {

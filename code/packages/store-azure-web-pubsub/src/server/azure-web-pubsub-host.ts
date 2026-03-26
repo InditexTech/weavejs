@@ -25,6 +25,7 @@ import {
   type WeaveStoreAzureWebPubsubOnWebsocketJoinGroupEvent,
   type WeaveStoreAzureWebPubsubOnWebsocketMessageEvent,
   type WeaveStoreAzureWebPubsubOnWebsocketOpenEvent,
+  type WeaveStoreAzureWebPubsubOnWebsocketReconnectEvent,
 } from '@/types';
 import type WeaveAzureWebPubsubSyncHandler from './azure-web-pubsub-sync-handler';
 import { handleChunkedMessage } from '@/utils';
@@ -168,10 +169,10 @@ export class WeaveStoreAzureWebPubSubSyncHost {
 
     const { url } = await this.negotiate(this.topic);
 
-    this._reconnectAttempts++;
-
     return new Promise((resolve) => {
       const ws = new WebSocket(url, AzureWebPubSubJsonProtocol);
+
+      const connectionAttempt = this._reconnectAttempts;
 
       ws.addEventListener('open', (event) => {
         this.server.emitEvent<WeaveStoreAzureWebPubsubOnWebsocketOpenEvent>(
@@ -179,7 +180,7 @@ export class WeaveStoreAzureWebPubSubSyncHost {
           {
             group: `${group}.host`,
             event,
-            reconnectionAttempt: this._reconnectAttempts,
+            connectionAttempt,
           }
         );
         ws.send(
@@ -192,7 +193,7 @@ export class WeaveStoreAzureWebPubSubSyncHost {
           'onWsJoinGroup',
           {
             group: `${group}.host`,
-            reconnectionAttempt: this._reconnectAttempts,
+            connectionAttempt,
           }
         );
 
@@ -254,15 +255,24 @@ export class WeaveStoreAzureWebPubSubSyncHost {
           {
             group: `${group}.host`,
             event: e as unknown as CloseEvent,
-            reconnectionAttempt: this._reconnectAttempts,
+            connectionAttempt,
           }
         );
 
         if (this._forceClose) {
           return;
         } else {
-          const timeout = 1000 * Math.pow(1.5, this._reconnectAttempts);
+          this._reconnectAttempts++;
+          const timeout = 1000 * Math.pow(1.5, this._reconnectAttempts - 1);
           setTimeout(() => {
+            this.server.emitEvent<WeaveStoreAzureWebPubsubOnWebsocketReconnectEvent>(
+              'onWsReconnect',
+              {
+                group: `${group}.host`,
+                connectionAttempt: this._reconnectAttempts,
+              }
+            );
+
             this.createWebSocket(); // start fresh with a new token
           }, timeout);
         }
@@ -274,7 +284,7 @@ export class WeaveStoreAzureWebPubSubSyncHost {
           {
             group: `${group}.host`,
             error: error as unknown as ErrorEvent,
-            reconnectionAttempt: this._reconnectAttempts,
+            connectionAttempt,
           }
         );
 
