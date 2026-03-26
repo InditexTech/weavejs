@@ -277,6 +277,10 @@ export class WeaveStoreAzureWebPubSubSyncHost {
     await this.createWebSocket();
   }
 
+  public isConnected(): boolean {
+    return this._conn && this._conn.readyState === WebSocket.OPEN;
+  }
+
   async stop(): Promise<void> {
     this._forceClose = true;
     if (this._conn?.readyState === WebSocket.OPEN) {

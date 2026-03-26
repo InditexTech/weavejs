@@ -207,7 +207,14 @@ export default class WeaveAzureWebPubsubSyncHandler extends WebPubSubEventHandle
     }
   }
 
-  async destroyRoomInstance(roomId: string): Promise<void> {
+  async destroyRoomInstance(
+    roomId: string
+  ): Promise<'not-connected' | 'destroyed'> {
+    const syncHost = this._roomsSyncHost.get(roomId);
+    if (syncHost && !syncHost.isConnected()) {
+      return 'not-connected';
+    }
+
     if (this.isPersistingOnInterval()) {
       const intervalId = this._store_persistence.get(roomId);
       if (intervalId) {
@@ -223,13 +230,14 @@ export default class WeaveAzureWebPubsubSyncHandler extends WebPubSubEventHandle
     }
 
     // stop sync host
-    const syncHost = this._roomsSyncHost.get(roomId);
-    if (syncHost) {
+    if (syncHost && syncHost.isConnected()) {
       await syncHost.stop();
       this._roomsSyncHost.delete(roomId);
     }
 
     this._rooms.delete(roomId);
+
+    return 'destroyed';
   }
 
   private async getHostConnection(roomId: string) {
