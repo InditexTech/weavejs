@@ -551,9 +551,10 @@ export class WeaveStoreAzureWebPubSubSyncClient extends Emittery {
       const now = Date.now();
       if (now - this._lastHeartbeatTime > 10000 /* 10 seconds */) {
         console.warn(
-          'No heartbeat received for 10 seconds, assuming sync host is lost.'
+          'No heartbeat received for 10 seconds, assuming sync host is lost, start another connection on other server.'
         );
-        console.log('Start another connection on other server.');
+        this.disconnect();
+        this.createWebSocket();
       }
     }, heartbeatInterval);
   }
