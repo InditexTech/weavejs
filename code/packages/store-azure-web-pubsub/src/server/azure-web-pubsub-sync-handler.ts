@@ -20,11 +20,13 @@ import {
   type WeaveStoreAzureWebPubsubOnDisconnectedEvent,
   type WeaveStoreAzureWebPubsubSyncHandlerDestroyRoomStatus,
   type WeaveStoreAzureWebPubSubSyncHostClientConnectOptions,
+  type WeaveStoreAzureWebPubsubSyncHostOptions,
 } from '@/types';
 import { WeaveStoreAzureWebPubSubSyncHost } from './azure-web-pubsub-host';
 import { WeaveAzureWebPubsubServer } from './azure-web-pubsub-server';
 import { getStateAsJson, hashJson } from './utils';
 import { WEAVE_STORE_AZURE_WEB_PUBSUB_DESTROY_ROOM_STATUS } from '@/constants';
+import type { DeepPartial } from '@inditextech/weave-types';
 
 export default class WeaveAzureWebPubsubSyncHandler extends WebPubSubEventHandler {
   // eslint-disable-next-line @typescript-eslint/naming-convention
@@ -37,6 +39,9 @@ export default class WeaveAzureWebPubsubSyncHandler extends WebPubSubEventHandle
   > = new Map();
   // eslint-disable-next-line @typescript-eslint/naming-convention
   private _store_persistence: Map<string, NodeJS.Timeout> = new Map();
+  private readonly syncHostOptions?:
+    | DeepPartial<WeaveStoreAzureWebPubsubSyncHostOptions>
+    | undefined;
   private readonly syncOptions?: WeaveAzureWebPubsubSyncHandlerOptions;
   private initialState: FetchInitialState;
   private readonly server: WeaveAzureWebPubsubServer;
@@ -51,7 +56,8 @@ export default class WeaveAzureWebPubsubSyncHandler extends WebPubSubEventHandle
     client: WebPubSubServiceClient,
     initialState: FetchInitialState,
     syncHandlerOptions?: WeaveAzureWebPubsubSyncHandlerOptions,
-    eventHandlerOptions?: WebPubSubEventHandlerOptions
+    eventHandlerOptions?: WebPubSubEventHandlerOptions,
+    syncHostOptions?: DeepPartial<WeaveStoreAzureWebPubsubSyncHostOptions>
   ) {
     super(hub, {
       ...eventHandlerOptions,
@@ -90,6 +96,7 @@ export default class WeaveAzureWebPubsubSyncHandler extends WebPubSubEventHandle
       },
     });
 
+    this.syncHostOptions = syncHostOptions;
     this.syncOptions = syncHandlerOptions;
     this.server = server;
     this.initialState = initialState;

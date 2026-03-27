@@ -26,13 +26,14 @@ import {
   type WeaveStoreAzureWebPubsubOnWebsocketMessageEvent,
   type WeaveStoreAzureWebPubsubOnWebsocketOpenEvent,
   type WeaveStoreAzureWebPubsubOnWebsocketReconnectEvent,
+  type WeaveStoreAzureWebPubsubSyncHostOptions,
 } from '@/types';
 import type WeaveAzureWebPubsubSyncHandler from './azure-web-pubsub-sync-handler';
 import { handleChunkedMessage } from '@/utils';
+import type { DeepPartial } from '@inditextech/weave-types';
+import { mergeExceptArrays } from '@inditextech/weave-sdk';
+import { WEAVE_STORE_AZURE_WEB_PUBSUB_SYNC_HOST_DEFAULT_OPTIONS } from '@/constants';
 
-const resyncAttempts = 12;
-const resyncInterval = 5000;
-const heartbeatInterval = 2500;
 const expirationTimeInMinutes = 60; // 1 hour
 const messageSync = 0;
 const messageAwareness = 1;
@@ -62,6 +63,8 @@ export class WeaveStoreAzureWebPubSubSyncHost {
 
   private _chunkedMessages: Map<string, string[]>;
 
+  private readonly _syncHostOptions: WeaveStoreAzureWebPubsubSyncHostOptions;
+
   private _heartbeatIntervalId: NodeJS.Timeout | null;
 
   private _resyncAttempt: number = 0;
@@ -81,8 +84,13 @@ export class WeaveStoreAzureWebPubSubSyncHost {
     syncHandler: WeaveAzureWebPubsubSyncHandler,
     client: WebPubSubServiceClient,
     topic: string,
-    doc: Y.Doc
+    doc: Y.Doc,
+    syncHostOptions?: DeepPartial<WeaveStoreAzureWebPubsubSyncHostOptions>
   ) {
+    this._syncHostOptions = mergeExceptArrays(
+      WEAVE_STORE_AZURE_WEB_PUBSUB_SYNC_HOST_DEFAULT_OPTIONS,
+      syncHostOptions ?? {}
+    );
     this.server = server;
     this.syncHandler = syncHandler;
     this.doc = doc;
@@ -184,7 +192,7 @@ export class WeaveStoreAzureWebPubSubSyncHost {
           data: { type: 'heartbeat' },
         })
       );
-    }, heartbeatInterval);
+    }, this._syncHostOptions.heartbeat.sendIntervalMs);
   }
 
   async createWebSocket(): Promise<void> {
@@ -233,14 +241,17 @@ export class WeaveStoreAzureWebPubSubSyncHost {
             })
           );
           this._resyncAttempt++;
-          if (this._resyncAttempt >= resyncAttempts && this._resyncIntervalId) {
+          if (
+            this._resyncAttempt >= this._syncHostOptions.resync.attemptsLimit &&
+            this._resyncIntervalId
+          ) {
             clearInterval(this._resyncIntervalId);
           }
         };
 
         this._resyncIntervalId = setInterval(() => {
           handleResync();
-        }, resyncInterval);
+        }, this._syncHostOptions.resync.checkIntervalMs);
 
         handleResync();
 

@@ -42,6 +42,7 @@ export type WeaveStoreAzureWebPubsubOptions = {
   roomId: string;
   url: string;
   fetchClient?: FetchClient;
+  syncClientOptions?: DeepPartial<WeaveStoreAzureWebPubSubSyncClientOptions>;
 };
 
 export type WeaveStoreAzureWebPubsubOnStoreFetchConnectionUrlEvent = {
@@ -172,3 +173,20 @@ export type WeaveStoreAzureWebPubsubSyncHandlerDestroyRoomStatusKeys =
   keyof typeof WEAVE_STORE_AZURE_WEB_PUBSUB_DESTROY_ROOM_STATUS;
 export type WeaveStoreAzureWebPubsubSyncHandlerDestroyRoomStatus =
   (typeof WEAVE_STORE_AZURE_WEB_PUBSUB_DESTROY_ROOM_STATUS)[WeaveStoreAzureWebPubsubSyncHandlerDestroyRoomStatusKeys];
+
+export type WeaveStoreAzureWebPubSubSyncClientOptions = {
+  heartbeat: {
+    checkWindowTimeMs: number;
+    checkIntervalMs: number;
+  };
+};
+
+export type WeaveStoreAzureWebPubsubSyncHostOptions = {
+  heartbeat: {
+    sendIntervalMs: number;
+  };
+  resync: {
+    checkIntervalMs: number;
+    attemptsLimit: number;
+  };
+};

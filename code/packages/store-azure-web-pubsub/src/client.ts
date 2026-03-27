@@ -20,18 +20,24 @@ import {
   type MessageHandler,
   type WeaveStoreAzureWebPubsubOnStoreFetchConnectionUrlEvent,
   type WeaveStoreAzureWebPubSubSyncClientConnectionStatus,
+  type WeaveStoreAzureWebPubSubSyncClientOptions,
 } from './types';
 import type { WeaveStoreAzureWebPubsub } from './store-azure-web-pubsub';
-import { WEAVE_STORE_CONNECTION_STATUS } from '@inditextech/weave-types';
-import { WEAVE_STORE_AZURE_WEB_PUBSUB_CONNECTION_STATUS } from './constants';
+import {
+  WEAVE_STORE_CONNECTION_STATUS,
+  type DeepPartial,
+} from '@inditextech/weave-types';
+import {
+  WEAVE_STORE_AZURE_WEB_PUBSUB_CONNECTION_STATUS,
+  WEAVE_STORE_AZURE_WEB_PUBSUB_SYNC_CLIENT_DEFAULT_OPTIONS,
+} from './constants';
 import {
   handleChunkedMessage,
   handleMessageBufferData,
   uint8ToBase64,
 } from './utils';
 import Y from './yjs';
-
-const heartbeatInterval = 5000;
+import { mergeExceptArrays } from '@inditextech/weave-sdk';
 
 const messageSyncStep1 = 0;
 const messageAwareness = 1;
@@ -128,6 +134,8 @@ export class WeaveStoreAzureWebPubSubSyncClient extends Emittery {
   private _initialized: boolean;
   private _chunkedMessages: Map<string, string[]>;
 
+  private _synClientOptions: WeaveStoreAzureWebPubSubSyncClientOptions;
+
   private _checkHeartbeatId!: NodeJS.Timeout;
   private _lastHeartbeatTime!: number;
 
@@ -151,9 +159,15 @@ export class WeaveStoreAzureWebPubSubSyncClient extends Emittery {
     instance: WeaveStoreAzureWebPubsub,
     url: string,
     topic: string,
-    doc: Doc
+    doc: Doc,
+    options?: DeepPartial<WeaveStoreAzureWebPubSubSyncClientOptions>
   ) {
     super();
+
+    this._synClientOptions = mergeExceptArrays(
+      WEAVE_STORE_AZURE_WEB_PUBSUB_SYNC_CLIENT_DEFAULT_OPTIONS,
+      options ?? {}
+    );
 
     this.instance = instance;
 
@@ -549,14 +563,14 @@ export class WeaveStoreAzureWebPubSubSyncClient extends Emittery {
   private setupCheckHeartbeat() {
     this._checkHeartbeatId = setInterval(() => {
       const now = Date.now();
-      if (now - this._lastHeartbeatTime > 10000 /* 10 seconds */) {
-        console.warn(
-          'No heartbeat received for 10 seconds, assuming sync host is lost, start another connection on other server.'
-        );
+      if (
+        now - this._lastHeartbeatTime >
+        this._synClientOptions.heartbeat.noHeartbeatSpanTimeMs
+      ) {
         this.disconnect();
         this.createWebSocket();
       }
-    }, heartbeatInterval);
+    }, this._synClientOptions.heartbeat.checkIntervalMs);
   }
 
   async connect(
