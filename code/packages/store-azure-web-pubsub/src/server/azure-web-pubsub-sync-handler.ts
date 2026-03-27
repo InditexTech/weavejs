@@ -259,6 +259,13 @@ export default class WeaveAzureWebPubsubSyncHandler extends WebPubSubEventHandle
     if (!this._rooms.has(roomId)) {
       await this.setupRoomInstance(roomId);
     }
+    if (
+      this._rooms.has(roomId) &&
+      !this._roomsSyncHost.get(roomId)?.isConnected() &&
+      !this._roomsSyncHost.get(roomId)?.isReconnecting()
+    ) {
+      await this._roomsSyncHost.get(roomId)?.start();
+    }
   }
 
   getRoomsLoaded(): string[] {
@@ -294,5 +301,26 @@ export default class WeaveAzureWebPubsubSyncHandler extends WebPubSubEventHandle
     const finalURL = `${token.url}&group=${roomId}`;
 
     return finalURL;
+  }
+
+  async clientDisconnect(roomId: string): Promise<void> {
+    const roomSyncHost = this._roomsSyncHost.get(roomId);
+    if (roomSyncHost) {
+      await this.destroyRoomInstance(roomId);
+    }
+  }
+
+  async clientTransportConnect(roomId: string): Promise<void> {
+    const roomSyncHost = this._roomsSyncHost.get(roomId);
+    if (roomSyncHost) {
+      await roomSyncHost.start();
+    }
+  }
+
+  clientTransportDisconnect(roomId: string): void {
+    const roomSyncHost = this._roomsSyncHost.get(roomId);
+    if (roomSyncHost) {
+      roomSyncHost.stop();
+    }
   }
 }

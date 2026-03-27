@@ -331,7 +331,14 @@ export class WeaveStoreAzureWebPubSubSyncClient extends Emittery {
           connectionURL.searchParams.append(key, connectionUrlExtraParams[key]);
         }
       }
-      const res = await this._fetchClient(connectionURL.toString());
+
+      const controller = new AbortController();
+      const timeout = setTimeout(() => controller.abort(), 5000);
+
+      const res = await this._fetchClient(connectionURL.toString(), {
+        signal: controller.signal,
+      }).finally(() => clearTimeout(timeout));
+
       if (res.ok) {
         const data = (await res.json()) as { url: string };
         return data.url;
@@ -377,6 +384,8 @@ export class WeaveStoreAzureWebPubSubSyncClient extends Emittery {
         );
       }
 
+      console.log('🔌 [Azure Web PubSub] connecting', url);
+
       return url;
     }, AzureWebPubSubJsonProtocol);
 
@@ -387,7 +396,9 @@ export class WeaveStoreAzureWebPubSubSyncClient extends Emittery {
     this.synced = false;
 
     websocket.addEventListener('error', (e) => {
-      console.error('WebSocket error', e);
+      console.error('❌ client error', e);
+
+      this.destroyCheckHeartbeat();
 
       if (this._initialized && websocket.retryCount > 0) {
         this.setAndEmitStatusInfo(
@@ -470,10 +481,10 @@ export class WeaveStoreAzureWebPubSubSyncClient extends Emittery {
       }
     };
 
-    websocket.onclose = () => {
-      if (this._checkHeartbeatId) {
-        clearInterval(this._checkHeartbeatId);
-      }
+    websocket.onclose = (e) => {
+      console.log(`🚫 [Azure Web PubSub] closed, code: ${e.code}`);
+
+      this.destroyCheckHeartbeat();
 
       if ((this._ws?.retryCount ?? 0) > 0) {
         this.setAndEmitStatusInfo(
@@ -508,9 +519,15 @@ export class WeaveStoreAzureWebPubSubSyncClient extends Emittery {
 
       this._connectionRetries = this._connectionRetries++;
 
+      console.log('✅ [Azure Web PubSub] connected');
+
       this.setupCheckHeartbeat();
 
+      console.log(`🔌 [Azure Web PubSub] join room <${this.topic}>`);
+
       joinGroup(this, this.topic);
+
+      console.log(`✅ [Azure Web PubSub] room <${this.topic}> joined`);
 
       // always send sync step 1 when connected
       const encoder = encoding.createEncoder();
@@ -571,6 +588,14 @@ export class WeaveStoreAzureWebPubSubSyncClient extends Emittery {
         this.createWebSocket();
       }
     }, this._synClientOptions.heartbeat.checkIntervalMs);
+  }
+
+  private destroyCheckHeartbeat() {
+    this._lastHeartbeatTime = 0;
+
+    if (this._checkHeartbeatId) {
+      clearInterval(this._checkHeartbeatId);
+    }
   }
 
   async connect(

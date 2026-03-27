@@ -17,6 +17,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - [#993](https://github.com/InditexTech/weavejs/issues/993) Add Pages Support to enable multi-page canvas documents
 
+## [3.3.1] - 2026-03-27
+
 ### Fixed
 
 - [#995](https://github.com/InditexTech/weavejs/issues/995) Remove timeout to refresh token on Azure Web PubSub
@@ -1702,7 +1704,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - [#24](https://github.com/InditexTech/weavejs/issues/24) Bug when loading rooms with text or images
 - [#18](https://github.com/InditexTech/weavejs/issues/18) Fix awareness not working on store-azure-web-pubsub
 
-[Unreleased]: https://github.com/InditexTech/weavejs/compare/3.3.0...HEAD
+[Unreleased]: https://github.com/InditexTech/weavejs/compare/3.3.1...HEAD
+[3.3.1]: https://github.com/InditexTech/weavejs/compare/3.3.0...3.3.1
 [3.3.0]: https://github.com/InditexTech/weavejs/compare/3.2.5...3.3.0
 [3.2.5]: https://github.com/InditexTech/weavejs/compare/3.2.4...3.2.5
 [3.2.4]: https://github.com/InditexTech/weavejs/compare/3.2.3...3.2.4

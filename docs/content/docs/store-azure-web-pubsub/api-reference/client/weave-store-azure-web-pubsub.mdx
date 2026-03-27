@@ -48,20 +48,30 @@ const store = new WeaveStoreAzureWebPubsub(initialRoomData: Uint8Array | FetchIn
       description: "An object that defines the Undo-Redo manager options",
       type: "WeaveUndoManagerOptions",
     },
-    ["websocketOptions.roomId"]: {
+    ["azureWebPubsubOptions.roomId"]: {
       required: true,
       description: "Room id that we want to join",
       type: "string",
     },
-    ["websocketOptions.wsOptions"]: {
+    ["azureWebPubsubOptions.url"]: {
       required: true,
-      description: "WebSocket underlying client properties",
-      type: "{ serverUrl: string; }",
+      description: "Azure Web PubSub get connection URL",
+      type: "string",
     },
-    ["websocketOptions.callbacks"]: {
-      description: "Callbacks defined for the instance",
-      type: "WeaveStoreWebsocketsCallbacks",
-      default: "{}",
+    ["azureWebPubsubOptions.fetchClient"]: {
+      description: "Fetch client",
+      type: "FetchClient",
+      default: "fetch",
+    },
+    ["azureWebPubsubOptions.syncClientOptions.heartbeat.checkWindowTimeMs"]: {
+      description: "Check heartbeat for sync host window time, in miliseconds",
+      type: "number",
+      default: "10000",
+    },
+    ["azureWebPubsubOptions.syncClientOptions.heartbeat.checkIntervalMs"]: {
+      description: "Sync host heartbeat check interval time, in miliseconds",
+      type: "number",
+      default: "5000",
     },
   }}
 />
@@ -69,41 +79,181 @@ const store = new WeaveStoreAzureWebPubsub(initialRoomData: Uint8Array | FetchIn
 ## TypeScript types
 
 ```ts
-type WeaveStoreWebsocketsConnectionStatusKeys =
-  keyof typeof WEAVE_STORE_WEBSOCKETS_CONNECTION_STATUS;
-type WeaveStoreWebsocketsConnectionStatus =
-  (typeof WEAVE_STORE_WEBSOCKETS_CONNECTION_STATUS)[WeaveStoreWebsocketsConnectionStatusKeys];
-
-type WeaveStoreWebsocketsCallbacks = {
-  onConnectionStatusChange?: (
-    status: WeaveStoreWebsocketsConnectionStatus
-  ) => void;
-};
-
-type WeaveUser = {
-  name: string;
-  email: string;
-};
-
-type WeaveUndoManagerOptions = {
-  captureTimeout?: number;
-  trackedOrigins?: Set<any>;
-};
-
-type WeaveStoreOptions = {
-  getUser: () => WeaveUser;
-  undoManagerOptions?: WeaveUndoManagerOptions;
-};
-
-type WeaveStoreWebsocketsOptions = {
-  roomId: string;
-  wsOptions: {
-    serverUrl: string;
+type WeaveStoreAzureWebPubsubConfig = {
+  endpoint: string;
+  persistIntervalMs?: number;
+  hubName: string;
+  auth?: {
+    key?: string;
+    custom?: TokenCredential;
   };
-  callbacks?: WeaveStoreWebsocketsCallbacks;
+  connectionHandlers?: DeepPartial<WeaveAzureWebPubsubSyncHandlerOptions>;
 };
+
+type WeaveAzureWebPubsubSyncHandlerOptions = {
+  onConnect?: (
+    connectionId: string,
+    queries: Record<string, string[]> | undefined,
+  ) => Promise<void>;
+  onConnected?: (connectionId: string) => Promise<void>;
+  removeConnection?: (connectionId: string) => Promise<void>;
+  getConnectionRoom?: (connectionId: string) => Promise<string | null>;
+  getRoomConnections?: (roomId: string) => Promise<string[]>;
+  persistIntervalMs?: number;
+};
+
+type WeaveStoreAzureWebPubsubOptions = {
+  roomId: string;
+  url: string;
+  fetchClient?: FetchClient;
+  syncClientOptions?: DeepPartial<WeaveStoreAzureWebPubSubSyncClientOptions>;
+};
+
+type WeaveStoreAzureWebPubsubOnStoreFetchConnectionUrlEvent = {
+  loading: boolean;
+  error: Error | null;
+};
+
+type FetchClient = (
+  input: string | URL | globalThis.Request,
+  init?: RequestInit,
+) => Promise<Response>;
 
 type FetchInitialState = (doc: Doc) => void;
+type PersistRoom = (
+  roomId: string,
+  actualState: Uint8Array<ArrayBufferLike>,
+) => Promise<void>;
+type FetchRoom = (roomId: string) => Promise<Uint8Array | null>;
+
+type WeaveStoreAzureWebPubsubEvents = {
+  onConnect: WeaveStoreAzureWebPubsubOnConnectEvent;
+  onConnected: WeaveStoreAzureWebPubsubOnConnectedEvent;
+  onDisconnected: WeaveStoreAzureWebPubsubOnDisconnectedEvent;
+};
+
+type WeaveStoreAzureWebPubsubOnConnectEvent = {
+  context: ConnectionContext;
+  queries: Record<string, string[]> | undefined;
+};
+
+type WeaveStoreAzureWebPubsubOnConnectedEvent = {
+  context: ConnectionContext;
+  queries?: Record<string, string[]>;
+};
+
+type WeaveStoreAzureWebPubsubOnDisconnectedEvent = {
+  context: ConnectionContext;
+  queries?: Record<string, string[]>;
+};
+
+type WeaveStoreAzureWebPubsubOnWebsocketOpenEvent = {
+  group: string;
+  event: WebSocket.Event;
+  connectionAttempt: number;
+};
+
+type WeaveStoreAzureWebPubsubOnWebsocketJoinGroupEvent = {
+  group: string;
+  connectionAttempt: number;
+};
+
+type WeaveStoreAzureWebPubsubOnWebsocketMessageEvent = {
+  group: string;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  event: WebSocket.MessageEvent;
+};
+
+type WeaveStoreAzureWebPubsubOnWebsocketCloseEvent = {
+  group: string;
+  event: CloseEvent;
+  connectionAttempt: number;
+};
+
+type WeaveStoreAzureWebPubsubOnWebsocketReconnectEvent = {
+  group: string;
+  connectionAttempt: number;
+  timeoutMs: number;
+};
+
+type WeaveStoreAzureWebPubsubOnWebsocketErrorEvent = {
+  group: string;
+  error: ErrorEvent;
+  connectionAttempt: number;
+};
+
+type WeaveStoreAzureWebPubSubSyncHostClientConnectOptions = {
+  expirationTimeInMinutes?: number;
+};
+
+// Client types
+
+type WeaveStoreAzureWebPubSubSyncClientConnectionStatusKeys =
+  keyof typeof WEAVE_STORE_AZURE_WEB_PUBSUB_CONNECTION_STATUS;
+type WeaveStoreAzureWebPubSubSyncClientConnectionStatus =
+  (typeof WEAVE_STORE_AZURE_WEB_PUBSUB_CONNECTION_STATUS)[WeaveStoreAzureWebPubSubSyncClientConnectionStatusKeys];
+
+enum MessageType {
+  System = "system",
+  JoinGroup = "joinGroup",
+  SendToGroup = "sendToGroup",
+}
+
+enum MessageDataType {
+  Init = "init",
+  Sync = "sync",
+  Awareness = "awareness",
+}
+
+interface MessageData {
+  payloadId?: string;
+  index?: number;
+  type?: "heartbeat" | "resync" | "chunk" | "end";
+  totalChunks?: number;
+  group: string;
+  t: string; // type / target uuid
+  f: string; // origin uuid
+  c: string; // base64 encoded binary data
+}
+
+interface Message {
+  type: string;
+  fromUserId: string;
+  from: string;
+  group: string;
+  data: MessageData;
+}
+
+type MessageHandler = (
+  encoder: Encoder,
+  decoder: Decoder,
+  client: WeaveStoreAzureWebPubSubSyncClient,
+  clientId: string,
+  emitSynced: boolean,
+  messageType: number,
+) => void;
+
+type WeaveStoreAzureWebPubsubSyncHandlerDestroyRoomStatusKeys =
+  keyof typeof WEAVE_STORE_AZURE_WEB_PUBSUB_DESTROY_ROOM_STATUS;
+type WeaveStoreAzureWebPubsubSyncHandlerDestroyRoomStatus =
+  (typeof WEAVE_STORE_AZURE_WEB_PUBSUB_DESTROY_ROOM_STATUS)[WeaveStoreAzureWebPubsubSyncHandlerDestroyRoomStatusKeys];
+
+type WeaveStoreAzureWebPubSubSyncClientOptions = {
+  heartbeat: {
+    checkWindowTimeMs: number;
+    checkIntervalMs: number;
+  };
+};
+
+type WeaveStoreAzureWebPubsubSyncHostOptions = {
+  heartbeat: {
+    sendIntervalMs: number;
+  };
+  resync: {
+    checkIntervalMs: number;
+    attemptsLimit: number;
+  };
+};
 ```
 
 ## Events
