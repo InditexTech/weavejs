@@ -152,9 +152,7 @@ export class WeaveBrushToolAction extends WeaveAction {
       e.evt.stopPropagation();
     };
 
-    stage.on('pointerdown', handlePointerDown, {
-      signal: this.instance.getEventsController()?.signal,
-    });
+    stage.on('pointerdown', handlePointerDown);
 
     const handlePointerMove = (e: Konva.KonvaEventObject<PointerEvent>) => {
       if (this.state === BRUSH_TOOL_STATE.INACTIVE) return;
