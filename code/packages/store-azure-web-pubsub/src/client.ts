@@ -31,6 +31,8 @@ import {
 } from './utils';
 import Y from './yjs';
 
+const heartbeatInterval = 5000;
+
 const messageSyncStep1 = 0;
 const messageAwareness = 1;
 const messageQueryAwareness = 3;
@@ -126,6 +128,9 @@ export class WeaveStoreAzureWebPubSubSyncClient extends Emittery {
   private _initialized: boolean;
   private _chunkedMessages: Map<string, string[]>;
 
+  private _checkHeartbeatId!: NodeJS.Timeout;
+  private _lastHeartbeatTime!: number;
+
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   private _updateHandler: (update: any, origin: any) => void;
   private _awarenessUpdateHandler: (
@@ -158,6 +163,8 @@ export class WeaveStoreAzureWebPubSubSyncClient extends Emittery {
     this._fetchClient = fetch;
     this._url = url;
     this._uuid = uuidv4();
+
+    this._lastHeartbeatTime = 0;
 
     this._status = WEAVE_STORE_AZURE_WEB_PUBSUB_CONNECTION_STATUS.DISCONNECTED;
     this._wsConnected = false;
@@ -393,6 +400,11 @@ export class WeaveStoreAzureWebPubSubSyncClient extends Emittery {
 
       const messageData = message.data;
 
+      if (messageData.type === 'heartbeat') {
+        this._lastHeartbeatTime = Date.now();
+        return;
+      }
+
       if (messageData.type === 'resync') {
         // Resync requested by sync host
         const encoder = encoding.createEncoder();
@@ -445,6 +457,10 @@ export class WeaveStoreAzureWebPubSubSyncClient extends Emittery {
     };
 
     websocket.onclose = () => {
+      if (this._checkHeartbeatId) {
+        clearInterval(this._checkHeartbeatId);
+      }
+
       if ((this._ws?.retryCount ?? 0) > 0) {
         this.setAndEmitStatusInfo(
           WEAVE_STORE_AZURE_WEB_PUBSUB_CONNECTION_STATUS.CONNECTING
@@ -477,6 +493,8 @@ export class WeaveStoreAzureWebPubSubSyncClient extends Emittery {
       this._initialized = true;
 
       this._connectionRetries = this._connectionRetries++;
+
+      this.setupCheckHeartbeat();
 
       joinGroup(this, this.topic);
 
@@ -526,6 +544,18 @@ export class WeaveStoreAzureWebPubSubSyncClient extends Emittery {
   ): void {
     this._status = status;
     this.emit('status', this._status);
+  }
+
+  private setupCheckHeartbeat() {
+    this._checkHeartbeatId = setInterval(() => {
+      const now = Date.now();
+      if (now - this._lastHeartbeatTime > 10000 /* 10 seconds */) {
+        console.warn(
+          'No heartbeat received for 10 seconds, assuming sync host is lost.'
+        );
+        console.log('Start another connection on other server.');
+      }
+    }, heartbeatInterval);
   }
 
   async connect(

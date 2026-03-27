@@ -32,6 +32,7 @@ import { handleChunkedMessage } from '@/utils';
 
 const resyncAttempts = 12;
 const resyncInterval = 5000;
+const heartbeatInterval = 2500;
 const expirationTimeInMinutes = 60; // 1 hour
 const messageSync = 0;
 const messageAwareness = 1;
@@ -61,6 +62,11 @@ export class WeaveStoreAzureWebPubSubSyncHost {
 
   private _chunkedMessages: Map<string, string[]>;
 
+  private _heartbeatIntervalId: NodeJS.Timeout | null;
+
+  private _resyncAttempt: number = 0;
+  private _resyncIntervalId: NodeJS.Timeout | null = null;
+
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   private _updateHandler: (update: any, origin: any) => void;
   private _awarenessUpdateHandler: (
@@ -84,6 +90,8 @@ export class WeaveStoreAzureWebPubSubSyncHost {
     this.topicAwarenessChannel = `${topic}-awareness`;
     this._client = client;
     this._chunkedMessages = new Map();
+
+    this._heartbeatIntervalId = null;
 
     this._conn = null;
 
@@ -166,6 +174,19 @@ export class WeaveStoreAzureWebPubSubSyncHost {
     this.broadcast(this.topic, origin, u8);
   }
 
+  private setupHeartbeat() {
+    this._heartbeatIntervalId = setInterval(() => {
+      this._conn?.send?.(
+        JSON.stringify({
+          type: MessageType.SendToGroup,
+          group: this.topic,
+          noEcho: true,
+          data: { type: 'heartbeat' },
+        })
+      );
+    }, heartbeatInterval);
+  }
+
   async createWebSocket(): Promise<void> {
     const group = this.topic;
 
@@ -176,8 +197,8 @@ export class WeaveStoreAzureWebPubSubSyncHost {
 
       const connectionAttempt = this._reconnectAttempts;
 
-      let resyncAttempt: number = 0;
-      let resyncIntervalId: NodeJS.Timeout | null = null;
+      this._resyncAttempt = 0;
+      this._resyncIntervalId = null;
 
       ws.addEventListener('open', (event) => {
         this.server.emitEvent<WeaveStoreAzureWebPubsubOnWebsocketOpenEvent>(
@@ -211,17 +232,19 @@ export class WeaveStoreAzureWebPubSubSyncHost {
               data: { type: 'resync' },
             })
           );
-          resyncAttempt++;
-          if (resyncAttempt >= resyncAttempts && resyncIntervalId) {
-            clearInterval(resyncIntervalId);
+          this._resyncAttempt++;
+          if (this._resyncAttempt >= resyncAttempts && this._resyncIntervalId) {
+            clearInterval(this._resyncIntervalId);
           }
         };
 
-        resyncIntervalId = setInterval(() => {
+        this._resyncIntervalId = setInterval(() => {
           handleResync();
         }, resyncInterval);
 
         handleResync();
+
+        this.setupHeartbeat();
 
         this._reconnectAttempts = 0; // reset on successful connection
 
@@ -276,8 +299,12 @@ export class WeaveStoreAzureWebPubSubSyncHost {
       });
 
       ws.addEventListener('close', (e) => {
-        if (resyncIntervalId) {
-          clearInterval(resyncIntervalId);
+        if (this._heartbeatIntervalId) {
+          clearInterval(this._heartbeatIntervalId);
+        }
+
+        if (this._resyncIntervalId) {
+          clearInterval(this._resyncIntervalId);
         }
 
         this.server.emitEvent<WeaveStoreAzureWebPubsubOnWebsocketCloseEvent>(
@@ -311,8 +338,12 @@ export class WeaveStoreAzureWebPubSubSyncHost {
       });
 
       ws.addEventListener('error', (error) => {
-        if (resyncIntervalId) {
-          clearInterval(resyncIntervalId);
+        if (this._heartbeatIntervalId) {
+          clearInterval(this._heartbeatIntervalId);
+        }
+
+        if (this._resyncIntervalId) {
+          clearInterval(this._resyncIntervalId);
         }
 
         this.server.emitEvent<WeaveStoreAzureWebPubsubOnWebsocketErrorEvent>(
