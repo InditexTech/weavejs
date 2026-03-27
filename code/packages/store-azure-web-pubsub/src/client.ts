@@ -134,7 +134,7 @@ export class WeaveStoreAzureWebPubSubSyncClient extends Emittery {
   private _initialized: boolean;
   private _chunkedMessages: Map<string, string[]>;
 
-  private _synClientOptions: WeaveStoreAzureWebPubSubSyncClientOptions;
+  private readonly _synClientOptions: WeaveStoreAzureWebPubSubSyncClientOptions;
 
   private _checkHeartbeatId!: NodeJS.Timeout;
   private _lastHeartbeatTime!: number;
@@ -565,7 +565,7 @@ export class WeaveStoreAzureWebPubSubSyncClient extends Emittery {
       const now = Date.now();
       if (
         now - this._lastHeartbeatTime >
-        this._synClientOptions.heartbeat.noHeartbeatSpanTimeMs
+        this._synClientOptions.heartbeat.checkWindowTimeMs
       ) {
         this.disconnect();
         this.createWebSocket();

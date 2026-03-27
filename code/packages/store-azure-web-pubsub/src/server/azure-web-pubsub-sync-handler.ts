@@ -39,7 +39,7 @@ export default class WeaveAzureWebPubsubSyncHandler extends WebPubSubEventHandle
   > = new Map();
   // eslint-disable-next-line @typescript-eslint/naming-convention
   private _store_persistence: Map<string, NodeJS.Timeout> = new Map();
-  private readonly syncHostOptions?:
+  private readonly syncHostOptions:
     | DeepPartial<WeaveStoreAzureWebPubsubSyncHostOptions>
     | undefined;
   private readonly syncOptions?: WeaveAzureWebPubsubSyncHandlerOptions;
@@ -136,7 +136,8 @@ export default class WeaveAzureWebPubsubSyncHandler extends WebPubSubEventHandle
         this,
         this._client,
         roomId,
-        doc
+        doc,
+        this.syncHostOptions
       )
     );
 
