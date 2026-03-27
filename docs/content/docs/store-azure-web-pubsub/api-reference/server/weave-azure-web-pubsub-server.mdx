@@ -47,7 +47,6 @@ const azureWebPubSubServer = new WeaveAzureWebPubsubServer(params: WeaveAzureWeb
       type: "WeaveAzureWebPubsubConfig",
     },
     eventsHandlerConfig: {
-      required: true,
       description: "An object Azure Web PubSub Event Handler configuration",
       type: "WebPubSubEventHandlerOptions",
     },
@@ -65,17 +64,19 @@ const azureWebPubSubServer = new WeaveAzureWebPubsubServer(params: WeaveAzureWeb
       type: "initialState",
       default: "defaultInitialState",
     },
-    syncHostConfig.heartbeat.sendIntervalMs: {
-      description: "Interval to send sync room heartbeat to clients, in miliseconds",
+    ["syncHostConfig.heartbeat.sendIntervalMs"]: {
+      description:
+        "Interval to send sync room heartbeat to clients, in miliseconds",
       type: "number",
       default: "2500",
     },
-    syncHostConfig.resync.checkIntervalMs: {
-      description: "Sync host resync request check interval, used to request a resync event to clients when sync host disconnect / reconnect, in miliseconds",
+    ["syncHostConfig.resync.checkIntervalMs"]: {
+      description:
+        "Sync host resync request check interval, used to request a resync event to clients when sync host disconnect / reconnect, in miliseconds",
       type: "number",
       default: "5000",
     },
-    syncHostConfig.resync.attemptsLimit: {
+    ["syncHostConfig.resync.attemptsLimit"]: {
       description: "Maximum limit of resync attempts",
       type: "number",
       default: "12",
