@@ -5,11 +5,11 @@
 import { v4 as uuidv4 } from 'uuid';
 import Konva from 'konva';
 import { WeaveAction } from '@/actions/action';
+import { type WeaveArrowToolActionState } from './types';
 import {
-  type WeaveArrowToolActionOnAddingEvent,
-  type WeaveArrowToolActionState,
-} from './types';
-import { ARROW_TOOL_ACTION_NAME, ARROW_TOOL_STATE } from './constants';
+  WEAVE_ARROW_TOOL_ACTION_NAME,
+  WEAVE_ARROW_TOOL_STATE,
+} from './constants';
 import { WeaveNodesSelectionPlugin } from '@/plugins/nodes-selection/nodes-selection';
 import type { WeaveArrowNode } from '@/nodes/arrow/arrow';
 import { SELECTION_TOOL_ACTION_NAME } from '../selection-tool/constants';
@@ -17,15 +17,15 @@ import { SELECTION_TOOL_ACTION_NAME } from '../selection-tool/constants';
 export class WeaveArrowToolAction extends WeaveAction {
   protected initialized: boolean = false;
   protected initialCursor: string | null = null;
-  protected state: WeaveArrowToolActionState;
-  protected arrowId: string | null;
-  protected tempArrowId: string | null;
-  protected tempMainArrowNode: Konva.Line | null;
-  protected tempArrowNode: Konva.Arrow | null;
+  protected state!: WeaveArrowToolActionState;
+  protected arrowId!: string | null;
+  protected tempArrowId!: string | null;
+  protected tempMainArrowNode!: Konva.Line | null;
+  protected tempArrowNode!: Konva.Arrow | null;
   protected container: Konva.Layer | Konva.Node | undefined;
   protected measureContainer: Konva.Layer | Konva.Group | undefined;
-  protected clickPoint: Konva.Vector2d | null;
-  protected pointers: Map<number, Konva.Vector2d>;
+  protected clickPoint!: Konva.Vector2d | null;
+  protected pointers!: Map<number, Konva.Vector2d>;
   protected tempPoint: Konva.Circle | undefined;
   protected tempNextPoint: Konva.Circle | undefined;
   protected cancelAction!: () => void;
@@ -35,9 +35,13 @@ export class WeaveArrowToolAction extends WeaveAction {
   constructor() {
     super();
 
+    this.initialize();
+  }
+
+  initialize(): void {
     this.pointers = new Map<number, Konva.Vector2d>();
     this.initialized = false;
-    this.state = ARROW_TOOL_STATE.IDLE;
+    this.state = WEAVE_ARROW_TOOL_STATE.IDLE;
     this.arrowId = null;
     this.tempArrowId = null;
     this.tempMainArrowNode = null;
@@ -51,7 +55,7 @@ export class WeaveArrowToolAction extends WeaveAction {
   }
 
   getName(): string {
-    return ARROW_TOOL_ACTION_NAME;
+    return WEAVE_ARROW_TOOL_ACTION_NAME;
   }
 
   initProps() {
@@ -70,22 +74,25 @@ export class WeaveArrowToolAction extends WeaveAction {
   private setupEvents() {
     const stage = this.instance.getStage();
 
-    window.addEventListener('keydown', (e) => {
-      if (
-        e.code === 'Enter' &&
-        this.instance.getActiveAction() === ARROW_TOOL_ACTION_NAME
-      ) {
-        this.cancelAction();
-        return;
-      }
-      if (
-        e.code === 'Escape' &&
-        this.instance.getActiveAction() === ARROW_TOOL_ACTION_NAME
-      ) {
-        this.cancelAction();
-        return;
-      }
-    });
+    window.addEventListener(
+      'keydown',
+      (e) => {
+        if (
+          e.code === 'Enter' &&
+          this.instance.getActiveAction() === WEAVE_ARROW_TOOL_ACTION_NAME
+        ) {
+          this.cancelAction();
+          return;
+        }
+        if (
+          e.code === 'Escape' &&
+          this.instance.getActiveAction() === WEAVE_ARROW_TOOL_ACTION_NAME
+        ) {
+          this.cancelAction();
+        }
+      },
+      { signal: this.instance.getEventsController()?.signal }
+    );
 
     stage.on('pointerdown', (e) => {
       this.setTapStart(e);
@@ -97,35 +104,41 @@ export class WeaveArrowToolAction extends WeaveAction {
 
       if (
         this.pointers.size === 2 &&
-        this.instance.getActiveAction() === ARROW_TOOL_ACTION_NAME
+        this.instance.getActiveAction() === WEAVE_ARROW_TOOL_ACTION_NAME
       ) {
-        this.state = ARROW_TOOL_STATE.ADDING;
+        this.state = WEAVE_ARROW_TOOL_STATE.ADDING;
         return;
       }
 
-      if (!this.tempMainArrowNode && this.state === ARROW_TOOL_STATE.ADDING) {
+      if (
+        !this.tempMainArrowNode &&
+        this.state === WEAVE_ARROW_TOOL_STATE.ADDING
+      ) {
         this.handleAdding();
       }
 
-      if (this.tempMainArrowNode && this.state === ARROW_TOOL_STATE.ADDING) {
-        this.state = ARROW_TOOL_STATE.DEFINING_SIZE;
+      if (
+        this.tempMainArrowNode &&
+        this.state === WEAVE_ARROW_TOOL_STATE.ADDING
+      ) {
+        this.state = WEAVE_ARROW_TOOL_STATE.DEFINING_SIZE;
       }
     });
 
     stage.on('pointermove', () => {
-      if (this.state === ARROW_TOOL_STATE.IDLE) return;
+      if (this.state === WEAVE_ARROW_TOOL_STATE.IDLE) return;
 
       this.setCursor();
 
       if (
         this.pointers.size === 2 &&
-        this.instance.getActiveAction() === ARROW_TOOL_ACTION_NAME
+        this.instance.getActiveAction() === WEAVE_ARROW_TOOL_ACTION_NAME
       ) {
-        this.state = ARROW_TOOL_STATE.ADDING;
+        this.state = WEAVE_ARROW_TOOL_STATE.ADDING;
         return;
       }
 
-      if (this.state === ARROW_TOOL_STATE.DEFINING_SIZE) {
+      if (this.state === WEAVE_ARROW_TOOL_STATE.DEFINING_SIZE) {
         this.handleMovement();
       }
     });
@@ -133,7 +146,7 @@ export class WeaveArrowToolAction extends WeaveAction {
     stage.on('pointerup', (e) => {
       this.pointers.delete(e.evt.pointerId);
 
-      if (this.state === ARROW_TOOL_STATE.DEFINING_SIZE) {
+      if (this.state === WEAVE_ARROW_TOOL_STATE.DEFINING_SIZE) {
         this.handleSettingSize();
       }
     });
@@ -149,12 +162,12 @@ export class WeaveArrowToolAction extends WeaveAction {
     this.setCursor();
     this.setFocusStage();
 
-    this.instance.emitEvent<WeaveArrowToolActionOnAddingEvent>('onAddingArrow');
+    this.instance.emitEvent<undefined>('onAddingArrow');
 
     this.tempPoint = undefined;
     this.tempNextPoint = undefined;
     this.clickPoint = null;
-    this.setState(ARROW_TOOL_STATE.ADDING);
+    this.setState(WEAVE_ARROW_TOOL_STATE.ADDING);
   }
 
   private handleAdding() {
@@ -215,7 +228,7 @@ export class WeaveArrowToolAction extends WeaveAction {
       this.tempPoint.moveToTop();
       this.tempNextPoint.moveToTop();
 
-      this.setState(ARROW_TOOL_STATE.DEFINING_SIZE);
+      this.setState(WEAVE_ARROW_TOOL_STATE.DEFINING_SIZE);
     }
   }
 
@@ -257,12 +270,12 @@ export class WeaveArrowToolAction extends WeaveAction {
         points: [0, 0],
       });
 
-      this.setState(ARROW_TOOL_STATE.DEFINING_SIZE);
+      this.setState(WEAVE_ARROW_TOOL_STATE.DEFINING_SIZE);
     }
   }
 
   private handleMovement() {
-    if (this.state !== ARROW_TOOL_STATE.DEFINING_SIZE) {
+    if (this.state !== WEAVE_ARROW_TOOL_STATE.DEFINING_SIZE) {
       return;
     }
 
@@ -345,9 +358,7 @@ export class WeaveArrowToolAction extends WeaveAction {
         delete finalArrow.props.dragBoundFunc;
         this.instance.addNode(finalArrow, this.container?.getAttrs().id);
 
-        this.instance.emitEvent<WeaveArrowToolActionOnAddingEvent>(
-          'onAddedArrow'
-        );
+        this.instance.emitEvent<undefined>('onAddedArrow');
       }
 
       const selectionPlugin =
@@ -373,7 +384,7 @@ export class WeaveArrowToolAction extends WeaveAction {
     this.container = undefined;
     this.measureContainer = undefined;
     this.clickPoint = null;
-    this.setState(ARROW_TOOL_STATE.IDLE);
+    this.setState(WEAVE_ARROW_TOOL_STATE.IDLE);
   }
 
   private setCursor() {

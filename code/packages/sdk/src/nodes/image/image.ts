@@ -34,13 +34,13 @@ import { doPreloadCursors } from '@/utils/cursors';
 
 export class WeaveImageNode extends WeaveNode {
   protected config: WeaveImageProperties;
-  protected imageBitmapCache: Record<string, ImageBitmap> = {};
-  protected imageSource: Record<string, HTMLImageElement> = {};
-  protected imageFallback: Record<string, HTMLImageElement> = {};
-  protected imageState: Record<string, WeaveImageState> = {};
-  protected imageTryoutAttempts: Record<string, number> = {};
-  protected imageTryoutIds: Record<string, NodeJS.Timeout> = {};
-  protected tapStart: { x: number; y: number; time: number } | null;
+  protected imageBitmapCache!: Record<string, ImageBitmap>;
+  protected imageSource!: Record<string, HTMLImageElement>;
+  protected imageFallback!: Record<string, HTMLImageElement>;
+  protected imageState!: Record<string, WeaveImageState>;
+  protected imageTryoutAttempts!: Record<string, number>;
+  protected imageTryoutIds!: Record<string, NodeJS.Timeout>;
+  protected tapStart!: { x: number; y: number; time: number } | null;
   protected imageCrop!: WeaveImageCrop | null;
   protected nodeType: string = WEAVE_IMAGE_NODE_TYPE;
   private readonly cursorsFallback: WeaveImageCursors = {
@@ -53,9 +53,13 @@ export class WeaveImageNode extends WeaveNode {
 
     const { config } = params ?? {};
 
-    this.tapStart = { x: 0, y: 0, time: 0 };
     this.config = mergeExceptArrays(WEAVE_IMAGE_DEFAULT_CONFIG, config);
 
+    this.initialize();
+  }
+
+  initialize(): void {
+    this.tapStart = { x: 0, y: 0, time: 0 };
     this.imageCrop = null;
     this.imageBitmapCache = {};
     this.imageSource = {};
@@ -423,7 +427,7 @@ export class WeaveImageNode extends WeaveNode {
 
       this.updateImageCrop(image);
     } else {
-      this.updatePlaceholderSize(image, imagePlaceholder);
+      this.updatePlaceholderSize(image);
       this.loadImage(imageProps, image, true);
     }
 
@@ -1001,7 +1005,7 @@ export class WeaveImageNode extends WeaveNode {
       id,
       realImageURL ?? '',
       {
-        onLoad: () => {
+        onLoad: async () => {
           if (useFallback) {
             this.imageTryoutIds[id] = setTimeout(() => {
               const node = this.instance.getStage().findOne(`#${id}`);
@@ -1093,7 +1097,9 @@ export class WeaveImageNode extends WeaveNode {
 
             this.updateImageCrop(image);
 
-            this.resolveAsyncElement(id);
+            if (!useFallback) {
+              this.resolveAsyncElement(id);
+            }
 
             this.cacheNode(image);
           }
@@ -1179,19 +1185,11 @@ export class WeaveImageNode extends WeaveNode {
     );
   }
 
-  updatePlaceholderSize(
-    image: Konva.Group,
-    imagePlaceholder: Konva.Rect
-  ): void {
+  updatePlaceholderSize(image: Konva.Group): void {
     const imageAttrs = image.getAttrs();
 
     if (!this.imageState[imageAttrs.id ?? '']?.loaded) {
       return;
-    }
-
-    if (!imageAttrs.adding && !imageAttrs.cropInfo) {
-      imagePlaceholder.width(imageAttrs.uncroppedImage.width);
-      imagePlaceholder.height(imageAttrs.uncroppedImage.height);
     }
   }
 

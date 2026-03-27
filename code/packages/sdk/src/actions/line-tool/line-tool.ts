@@ -25,18 +25,18 @@ export class WeaveLineToolAction extends WeaveAction {
   protected initialized: boolean = false;
   protected initialCursor: string | null = null;
   protected config: WeaveLineToolActionProperties;
-  protected state: WeaveLineToolActionState;
-  protected lineId: string | null;
-  protected tempLineId: string | null;
-  protected tempMainLineNode: Konva.Line | null;
-  protected tempLineNode: Konva.Line | null;
+  protected state!: WeaveLineToolActionState;
+  protected lineId!: string | null;
+  protected tempLineId!: string | null;
+  protected tempMainLineNode!: Konva.Line | null;
+  protected tempLineNode!: Konva.Line | null;
   protected container: Konva.Layer | Konva.Node | undefined;
   protected measureContainer: Konva.Layer | Konva.Group | undefined;
-  protected clickPoint: Konva.Vector2d | null;
-  protected pointers: Map<number, Konva.Vector2d>;
+  protected clickPoint!: Konva.Vector2d | null;
+  protected pointers!: Map<number, Konva.Vector2d>;
   protected cancelAction!: () => void;
   protected snappedAngle: number | null = null;
-  protected snapper: GreedySnapper;
+  protected snapper!: GreedySnapper;
   protected shiftPressed: boolean = false;
   onPropsChange = undefined;
   onInit = undefined;
@@ -49,6 +49,10 @@ export class WeaveLineToolAction extends WeaveAction {
       params?.config ?? {}
     );
 
+    this.initialize();
+  }
+
+  initialize(): void {
     this.pointers = new Map<number, Konva.Vector2d>();
     this.initialized = false;
     this.state = LINE_TOOL_STATE.IDLE;
@@ -84,39 +88,47 @@ export class WeaveLineToolAction extends WeaveAction {
   private setupEvents() {
     const stage = this.instance.getStage();
 
-    window.addEventListener('keydown', (e) => {
-      if (
-        e.code === 'Enter' &&
-        this.instance.getActiveAction() === LINE_TOOL_ACTION_NAME
-      ) {
-        this.cancelAction();
-        return;
-      }
-      if (
-        e.code === 'Escape' &&
-        this.instance.getActiveAction() === LINE_TOOL_ACTION_NAME
-      ) {
-        this.cancelAction();
-        return;
-      }
-      if (
-        e.key === 'Shift' &&
-        this.instance.getActiveAction() === LINE_TOOL_ACTION_NAME
-      ) {
-        this.snappedAngle = null;
-        this.shiftPressed = true;
-      }
-    });
+    window.addEventListener(
+      'keydown',
+      (e) => {
+        if (
+          e.code === 'Enter' &&
+          this.instance.getActiveAction() === LINE_TOOL_ACTION_NAME
+        ) {
+          this.cancelAction();
+          return;
+        }
+        if (
+          e.code === 'Escape' &&
+          this.instance.getActiveAction() === LINE_TOOL_ACTION_NAME
+        ) {
+          this.cancelAction();
+          return;
+        }
+        if (
+          e.key === 'Shift' &&
+          this.instance.getActiveAction() === LINE_TOOL_ACTION_NAME
+        ) {
+          this.snappedAngle = null;
+          this.shiftPressed = true;
+        }
+      },
+      { signal: this.instance.getEventsController()?.signal }
+    );
 
-    window.addEventListener('keyup', (e) => {
-      if (
-        e.key === 'Shift' &&
-        this.instance.getActiveAction() === LINE_TOOL_ACTION_NAME
-      ) {
-        this.snappedAngle = null;
-        this.shiftPressed = false;
-      }
-    });
+    window.addEventListener(
+      'keyup',
+      (e) => {
+        if (
+          e.key === 'Shift' &&
+          this.instance.getActiveAction() === LINE_TOOL_ACTION_NAME
+        ) {
+          this.snappedAngle = null;
+          this.shiftPressed = false;
+        }
+      },
+      { signal: this.instance.getEventsController()?.signal }
+    );
 
     stage.on('pointerdown', (e) => {
       this.setTapStart(e);

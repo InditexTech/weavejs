@@ -9,7 +9,7 @@ import { WeaveNodesSelectionPlugin } from '@/plugins/nodes-selection/nodes-selec
 
 export class WeaveSelectionToolAction extends WeaveAction {
   protected initialized: boolean = false;
-  protected state: WeaveSelectionToolActionState;
+  protected state!: WeaveSelectionToolActionState;
   protected cancelAction!: () => void;
   onPropsChange = undefined;
   onInit = undefined;
@@ -17,6 +17,10 @@ export class WeaveSelectionToolAction extends WeaveAction {
   constructor() {
     super();
 
+    this.initialize();
+  }
+
+  initialize(): void {
     this.initialized = false;
     this.state = SELECTION_TOOL_STATE.IDLE;
   }

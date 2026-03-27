@@ -18,12 +18,12 @@ import type { WeaveEllipseNode } from '@/nodes/ellipse/ellipse';
 
 export class WeaveEllipseToolAction extends WeaveAction {
   protected initialized: boolean = false;
-  protected state: WeaveEllipseToolActionState;
-  protected ellipseId: string | null;
-  protected creating: boolean;
-  protected moved: boolean;
-  protected pointers: Map<number, Konva.Vector2d>;
-  protected clickPoint: Konva.Vector2d | null;
+  protected state!: WeaveEllipseToolActionState;
+  protected ellipseId!: string | null;
+  protected creating!: boolean;
+  protected moved!: boolean;
+  protected pointers!: Map<number, Konva.Vector2d>;
+  protected clickPoint!: Konva.Vector2d | null;
   protected container!: Konva.Layer | Konva.Node | undefined;
   protected cancelAction!: () => void;
   onPropsChange = undefined;
@@ -32,6 +32,10 @@ export class WeaveEllipseToolAction extends WeaveAction {
   constructor() {
     super();
 
+    this.initialize();
+  }
+
+  initialize(): void {
     this.pointers = new Map<number, Konva.Vector2d>();
     this.initialized = false;
     this.state = ELLIPSE_TOOL_STATE.IDLE;
@@ -62,22 +66,26 @@ export class WeaveEllipseToolAction extends WeaveAction {
   private setupEvents() {
     const stage = this.instance.getStage();
 
-    window.addEventListener('keydown', (e) => {
-      if (
-        e.code === 'Enter' &&
-        this.instance.getActiveAction() === ELLIPSE_TOOL_ACTION_NAME
-      ) {
-        this.cancelAction();
-        return;
-      }
-      if (
-        e.code === 'Escape' &&
-        this.instance.getActiveAction() === ELLIPSE_TOOL_ACTION_NAME
-      ) {
-        this.cancelAction();
-        return;
-      }
-    });
+    window.addEventListener(
+      'keydown',
+      (e) => {
+        if (
+          e.code === 'Enter' &&
+          this.instance.getActiveAction() === ELLIPSE_TOOL_ACTION_NAME
+        ) {
+          this.cancelAction();
+          return;
+        }
+        if (
+          e.code === 'Escape' &&
+          this.instance.getActiveAction() === ELLIPSE_TOOL_ACTION_NAME
+        ) {
+          this.cancelAction();
+          return;
+        }
+      },
+      { signal: this.instance.getEventsController()?.signal }
+    );
 
     stage.on('pointerdown', (e) => {
       this.setTapStart(e);

@@ -18,15 +18,15 @@ import { SELECTION_TOOL_ACTION_NAME } from '../selection-tool/constants';
 export class WeavePenToolAction extends WeaveAction {
   protected initialized: boolean = false;
   protected initialCursor: string | null = null;
-  protected state: WeavePenToolActionState;
-  protected lineId: string | null;
-  protected tempLineId: string | null;
-  protected tempMainLineNode: Konva.Line | null;
-  protected tempLineNode: Konva.Line | null;
+  protected state!: WeavePenToolActionState;
+  protected lineId!: string | null;
+  protected tempLineId!: string | null;
+  protected tempMainLineNode!: Konva.Line | null;
+  protected tempLineNode!: Konva.Line | null;
   protected container: Konva.Layer | Konva.Node | undefined;
   protected measureContainer: Konva.Layer | Konva.Group | undefined;
-  protected clickPoint: Konva.Vector2d | null;
-  protected pointers: Map<number, Konva.Vector2d>;
+  protected clickPoint!: Konva.Vector2d | null;
+  protected pointers!: Map<number, Konva.Vector2d>;
   protected tempPoint: Konva.Circle | undefined;
   protected tempNextPoint: Konva.Circle | undefined;
   protected cancelAction!: () => void;
@@ -36,6 +36,10 @@ export class WeavePenToolAction extends WeaveAction {
   constructor() {
     super();
 
+    this.initialize();
+  }
+
+  initialize(): void {
     this.pointers = new Map<number, Konva.Vector2d>();
     this.initialized = false;
     this.state = PEN_TOOL_STATE.IDLE;
@@ -66,22 +70,26 @@ export class WeavePenToolAction extends WeaveAction {
   private setupEvents() {
     const stage = this.instance.getStage();
 
-    window.addEventListener('keydown', (e) => {
-      if (
-        e.code === 'Enter' &&
-        this.instance.getActiveAction() === PEN_TOOL_ACTION_NAME
-      ) {
-        this.cancelAction();
-        return;
-      }
-      if (
-        e.code === 'Escape' &&
-        this.instance.getActiveAction() === PEN_TOOL_ACTION_NAME
-      ) {
-        this.cancelAction();
-        return;
-      }
-    });
+    window.addEventListener(
+      'keydown',
+      (e) => {
+        if (
+          e.code === 'Enter' &&
+          this.instance.getActiveAction() === PEN_TOOL_ACTION_NAME
+        ) {
+          this.cancelAction();
+          return;
+        }
+        if (
+          e.code === 'Escape' &&
+          this.instance.getActiveAction() === PEN_TOOL_ACTION_NAME
+        ) {
+          this.cancelAction();
+          return;
+        }
+      },
+      { signal: this.instance.getEventsController()?.signal }
+    );
 
     stage.on('pointerdown', (e) => {
       this.setTapStart(e);

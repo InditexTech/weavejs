@@ -2,11 +2,20 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-import { ARROW_TOOL_STATE } from './constants';
+import { WEAVE_ARROW_TOOL_STATE } from './constants';
 
-export type WeaveArrowToolActionStateKeys = keyof typeof ARROW_TOOL_STATE;
+export type WeaveArrowToolActionStateKeys = keyof typeof WEAVE_ARROW_TOOL_STATE;
 export type WeaveArrowToolActionState =
-  (typeof ARROW_TOOL_STATE)[WeaveArrowToolActionStateKeys];
+  (typeof WEAVE_ARROW_TOOL_STATE)[WeaveArrowToolActionStateKeys];
 
-export type WeaveArrowToolActionOnAddingEvent = undefined;
-export type WeaveArrowToolActionOnAddedEvent = undefined;
+export type WeaveArrowToolActionProperties = {
+  snapAngles: {
+    angles: number[]; // Angles for snapping in degrees
+    activateThreshold: number;
+    releaseThreshold: number;
+  };
+};
+
+export type WeaveArrowToolActionParams = {
+  config: Partial<WeaveArrowToolActionProperties>;
+};

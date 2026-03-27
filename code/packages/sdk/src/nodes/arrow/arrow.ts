@@ -15,6 +15,7 @@ import type { WeaveArrowNodeParams, WeaveArrowProperties } from './types';
 export class WeaveArrowNode extends WeaveNode {
   private config: WeaveArrowProperties;
   protected nodeType: string = WEAVE_ARROW_NODE_TYPE;
+  initialize = undefined;
 
   constructor(params?: WeaveArrowNodeParams) {
     super();

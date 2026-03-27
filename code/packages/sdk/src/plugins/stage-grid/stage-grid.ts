@@ -29,24 +29,21 @@ import { MOVE_TOOL_ACTION_NAME } from '@/actions/move-tool/constants';
 import { DEFAULT_THROTTLE_MS } from '@/constants';
 
 export class WeaveStageGridPlugin extends WeavePlugin {
-  private moveToolActive: boolean;
-  private isMouseMiddleButtonPressed: boolean;
-  private isSpaceKeyPressed: boolean;
-  private actStageZoomX: number = 1;
-  private actStageZoomY: number = 1;
-  private actStagePosX: number = 0;
-  private actStagePosY: number = 0;
-  private config!: WeaveStageGridPluginConfig;
-  private forceStageChange: boolean;
+  private moveToolActive!: boolean;
+  private isMouseMiddleButtonPressed!: boolean;
+  private isSpaceKeyPressed!: boolean;
+  private actStageZoomX!: number;
+  private actStageZoomY!: number;
+  private actStagePosX!: number;
+  private actStagePosY!: number;
+  private readonly config!: WeaveStageGridPluginConfig;
+  private forceStageChange!: boolean;
 
   constructor(params?: Partial<WeaveStageGridPluginParams>) {
     super();
 
     const { config } = params ?? {};
 
-    this.moveToolActive = false;
-    this.isMouseMiddleButtonPressed = false;
-    this.isSpaceKeyPressed = false;
     this.config = {
       type: WEAVE_GRID_DEFAULT_TYPE as WeaveStageGridType,
       gridColor: WEAVE_GRID_DEFAULT_COLOR,
@@ -55,7 +52,19 @@ export class WeaveStageGridPlugin extends WeavePlugin {
       gridDotMaxDotsPerAxis: WEAVE_GRID_DEFAULT_DOT_MAX_DOTS_PER_AXIS,
       ...config,
     };
+
+    this.initialize();
+  }
+
+  initialize(): void {
+    this.moveToolActive = false;
+    this.isMouseMiddleButtonPressed = false;
+    this.isSpaceKeyPressed = false;
     this.forceStageChange = false;
+    this.actStagePosX = 0;
+    this.actStagePosY = 0;
+    this.actStageZoomX = 1;
+    this.actStageZoomY = 1;
   }
 
   getName(): string {
@@ -87,17 +96,25 @@ export class WeaveStageGridPlugin extends WeavePlugin {
   private initEvents() {
     const stage = this.instance.getStage();
 
-    window.addEventListener('keydown', (e) => {
-      if (e.code === 'Space') {
-        this.isSpaceKeyPressed = true;
-      }
-    });
+    window.addEventListener(
+      'keydown',
+      (e) => {
+        if (e.code === 'Space') {
+          this.isSpaceKeyPressed = true;
+        }
+      },
+      { signal: this.instance.getEventsController()?.signal }
+    );
 
-    window.addEventListener('keyup', (e) => {
-      if (e.code === 'Space') {
-        this.isSpaceKeyPressed = false;
-      }
-    });
+    window.addEventListener(
+      'keyup',
+      (e) => {
+        if (e.code === 'Space') {
+          this.isSpaceKeyPressed = false;
+        }
+      },
+      { signal: this.instance.getEventsController()?.signal }
+    );
 
     this.instance.addEventListener('onStageMove', () => {
       this.onRender();

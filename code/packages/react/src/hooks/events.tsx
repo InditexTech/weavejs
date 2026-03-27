@@ -11,6 +11,9 @@ import type {
   WeaveNodesSelectionPluginOnSelectionStateEvent,
   WeaveStageZoomChanged,
   WeaveStageZoomPluginOnZoomChangeEvent,
+  WeaveStoreOnRoomChangedEvent,
+  WeaveStoreOnRoomSwitchingEndEvent,
+  WeaveStoreOnRoomSwitchingStartEvent,
 } from '@inditextech/weave-sdk';
 import type { WeaveSelection } from '@inditextech/weave-types';
 import React from 'react';
@@ -18,6 +21,8 @@ import React from 'react';
 export const useWeaveEvents = (): void => {
   const instance = useWeave((state) => state.instance);
   const node = useWeave((state) => state.selection.node);
+  const setRoomId = useWeave((state) => state.setRoomId);
+  const setRoomSwitching = useWeave((state) => state.setRoomSwitching);
   const setZoom = useWeave((state) => state.setZoom);
   const setCanZoomIn = useWeave((state) => state.setCanZoomIn);
   const setCanZoomOut = useWeave((state) => state.setCanZoomOut);
@@ -26,6 +31,30 @@ export const useWeaveEvents = (): void => {
   const setNode = useWeave((state) => state.setNode);
   const setUsers = useWeave((state) => state.setUsers);
   const setUsersLocks = useWeave((state) => state.setUsersLocks);
+
+  const onStoreRoomChangedHandler = React.useCallback(
+    ({ room }: WeaveStoreOnRoomChangedEvent) => {
+      setRoomId(room);
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    []
+  );
+
+  const onRoomSwitchingStartHandler = React.useCallback(
+    () => {
+      setRoomSwitching(true);
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    []
+  );
+
+  const onRoomSwitchingEndHandler = React.useCallback(
+    () => {
+      setRoomSwitching(false);
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    []
+  );
 
   const onSelectionStateHandler = React.useCallback((active: boolean) => {
     setSelectionActive(active);
@@ -87,6 +116,18 @@ export const useWeaveEvents = (): void => {
   React.useEffect(() => {
     if (!instance) return;
 
+    instance.addEventListener<WeaveStoreOnRoomChangedEvent>(
+      'onStoreRoomChanged',
+      onStoreRoomChangedHandler
+    );
+    instance.addEventListener<WeaveStoreOnRoomSwitchingStartEvent>(
+      'onRoomSwitchingStart',
+      onRoomSwitchingStartHandler
+    );
+    instance.addEventListener<WeaveStoreOnRoomSwitchingEndEvent>(
+      'onRoomSwitchingEnd',
+      onRoomSwitchingEndHandler
+    );
     instance.addEventListener<WeaveNodesSelectionPluginOnSelectionStateEvent>(
       'onSelectionState',
       onSelectionStateHandler
@@ -109,6 +150,18 @@ export const useWeaveEvents = (): void => {
     );
 
     return () => {
+      instance.removeEventListener<WeaveStoreOnRoomChangedEvent>(
+        'onStoreRoomChanged',
+        onStoreRoomChangedHandler
+      );
+      instance.removeEventListener<WeaveStoreOnRoomSwitchingStartEvent>(
+        'onRoomSwitchingStart',
+        onRoomSwitchingStartHandler
+      );
+      instance.removeEventListener<WeaveStoreOnRoomSwitchingEndEvent>(
+        'onRoomSwitchingEnd',
+        onRoomSwitchingEndHandler
+      );
       instance.removeEventListener<WeaveNodesSelectionPluginOnSelectionStateEvent>(
         'onSelectionState',
         onSelectionStateHandler

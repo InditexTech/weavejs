@@ -16,6 +16,7 @@ import type { WeaveEllipseNodeParams, WeaveEllipseProperties } from './types';
 export class WeaveEllipseNode extends WeaveNode {
   private config: WeaveEllipseProperties;
   protected nodeType: string = WEAVE_ELLIPSE_NODE_TYPE;
+  initialize = undefined;
 
   constructor(params?: WeaveEllipseNodeParams) {
     super();

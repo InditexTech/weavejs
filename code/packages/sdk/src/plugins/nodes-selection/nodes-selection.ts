@@ -63,18 +63,18 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
   private trHover!: Konva.Transformer;
   private config!: WeaveNodesSelectionConfig;
   private selectionRectangle!: Konva.Rect;
-  private active: boolean;
-  private defaultEnabledAnchors: string[];
-  private selecting: boolean;
-  private didMove: boolean;
-  private initialized: boolean;
-  private isCtrlMetaPressed: boolean;
-  private isSpaceKeyPressed: boolean;
-  protected taps: number;
-  protected isDoubleTap: boolean;
-  protected previousTap: { x: number; y: number; time: number } | null;
-  protected tapStart: { x: number; y: number; time: number } | null;
-  protected tapTimeoutId: NodeJS.Timeout | null;
+  private active!: boolean;
+  private defaultEnabledAnchors!: string[];
+  private selecting!: boolean;
+  private didMove!: boolean;
+  private initialized!: boolean;
+  private isCtrlMetaPressed!: boolean;
+  private isSpaceKeyPressed!: boolean;
+  protected taps!: number;
+  protected isDoubleTap!: boolean;
+  protected previousTap!: { x: number; y: number; time: number } | null;
+  protected tapStart!: { x: number; y: number; time: number } | null;
+  protected tapTimeoutId!: NodeJS.Timeout | null;
   private x1!: number;
   private y1!: number;
   private x2!: number;
@@ -82,7 +82,7 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
   private selectionStart: { x: number; y: number } | null = null;
   private panSpeed = { x: 0, y: 0 };
   private readonly panDirection = { x: 0, y: 0 };
-  private pointers: Record<string, PointerEvent>;
+  private pointers!: Record<string, PointerEvent>;
   private panLoopId: number | null = null;
   private prevSelectedNodes: Konva.Node[] = [];
   private handledClickOrTap: boolean = false;
@@ -100,6 +100,10 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
       params?.config ?? {}
     );
 
+    this.initialize();
+  }
+
+  initialize(): void {
     this.defaultEnabledAnchors = this.config.selection?.enabledAnchors ?? [
       'top-left',
       'top-center',
@@ -344,13 +348,17 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
       nodeHovered = undefined;
     });
 
-    window.addEventListener('mouseout', () => {
-      if (nodeHovered) {
-        nodeHovered.handleMouseout();
-        nodeHovered = undefined;
-      }
-      this.instance.getStage().handleMouseover?.();
-    });
+    window.addEventListener(
+      'mouseout',
+      () => {
+        if (nodeHovered) {
+          nodeHovered.handleMouseout();
+          nodeHovered = undefined;
+        }
+        this.instance.getStage().handleMouseover?.();
+      },
+      { signal: this.instance.getEventsController()?.signal }
+    );
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const handleTransform = (e: any) => {
@@ -1074,29 +1082,37 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
 
     const stage = this.instance.getStage();
 
-    stage.container().addEventListener('keydown', (e) => {
-      if (e.ctrlKey || e.metaKey) {
-        this.isCtrlMetaPressed = true;
-      }
-      if (e.code === 'Space') {
-        this.isSpaceKeyPressed = true;
-      }
-      if (e.code === 'Backspace' || e.code === 'Delete') {
-        Promise.resolve().then(() => {
-          this.removeSelectedNodes();
-        });
-        return;
-      }
-    });
+    stage.container().addEventListener(
+      'keydown',
+      (e) => {
+        if (e.ctrlKey || e.metaKey) {
+          this.isCtrlMetaPressed = true;
+        }
+        if (e.code === 'Space') {
+          this.isSpaceKeyPressed = true;
+        }
+        if (e.code === 'Backspace' || e.code === 'Delete') {
+          Promise.resolve().then(() => {
+            this.removeSelectedNodes();
+          });
+          return;
+        }
+      },
+      { signal: this.instance.getEventsController()?.signal }
+    );
 
-    stage.container().addEventListener('keyup', (e) => {
-      if (!(e.ctrlKey || e.metaKey)) {
-        this.isCtrlMetaPressed = false;
-      }
-      if (e.code === 'Space') {
-        this.isSpaceKeyPressed = false;
-      }
-    });
+    stage.container().addEventListener(
+      'keyup',
+      (e) => {
+        if (!(e.ctrlKey || e.metaKey)) {
+          this.isCtrlMetaPressed = false;
+        }
+        if (e.code === 'Space') {
+          this.isSpaceKeyPressed = false;
+        }
+      },
+      { signal: this.instance.getEventsController()?.signal }
+    );
 
     stage.on('pointerdown', (e: KonvaEventObject<PointerEvent, Stage>) => {
       this.setTapStart(e);
@@ -1516,7 +1532,10 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
     }
 
     this.tr.nodes([...newSelectedNodes]);
-    this.tr.forceUpdate();
+
+    if (newSelectedNodes.length > 0) {
+      this.tr.forceUpdate();
+    }
 
     this.triggerSelectedNodesEvent();
   }

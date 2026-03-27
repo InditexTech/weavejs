@@ -16,12 +16,12 @@ import type { WeaveRectangleNode } from '@/nodes/rectangle/rectangle';
 
 export class WeaveRectangleToolAction extends WeaveAction {
   protected initialized: boolean = false;
-  protected state: WeaveRectangleToolActionState;
-  protected rectId: string | null;
-  protected moved: boolean;
-  protected tempRectNode: Konva.Rect | null;
-  protected pointers: Map<number, Konva.Vector2d>;
-  protected clickPoint: Konva.Vector2d | null;
+  protected state!: WeaveRectangleToolActionState;
+  protected rectId!: string | null;
+  protected moved!: boolean;
+  protected tempRectNode!: Konva.Rect | null;
+  protected pointers!: Map<number, Konva.Vector2d>;
+  protected clickPoint!: Konva.Vector2d | null;
   protected container!: Konva.Layer | Konva.Node | undefined;
   protected measureContainer: Konva.Layer | Konva.Group | undefined;
   protected cancelAction!: () => void;
@@ -31,6 +31,10 @@ export class WeaveRectangleToolAction extends WeaveAction {
   constructor() {
     super();
 
+    this.initialize();
+  }
+
+  initialize(): void {
     this.pointers = new Map<number, Konva.Vector2d>();
     this.initialized = false;
     this.state = RECTANGLE_TOOL_STATE.IDLE;
@@ -61,22 +65,26 @@ export class WeaveRectangleToolAction extends WeaveAction {
   private setupEvents() {
     const stage = this.instance.getStage();
 
-    window.addEventListener('keydown', (e) => {
-      if (
-        e.code === 'Enter' &&
-        this.instance.getActiveAction() === RECTANGLE_TOOL_ACTION_NAME
-      ) {
-        this.cancelAction();
-        return;
-      }
-      if (
-        e.code === 'Escape' &&
-        this.instance.getActiveAction() === RECTANGLE_TOOL_ACTION_NAME
-      ) {
-        this.cancelAction();
-        return;
-      }
-    });
+    window.addEventListener(
+      'keydown',
+      (e) => {
+        if (
+          e.code === 'Enter' &&
+          this.instance.getActiveAction() === RECTANGLE_TOOL_ACTION_NAME
+        ) {
+          this.cancelAction();
+          return;
+        }
+        if (
+          e.code === 'Escape' &&
+          this.instance.getActiveAction() === RECTANGLE_TOOL_ACTION_NAME
+        ) {
+          this.cancelAction();
+          return;
+        }
+      },
+      { signal: this.instance.getEventsController()?.signal }
+    );
 
     stage.on('pointermove', () => {
       if (this.state === RECTANGLE_TOOL_STATE.IDLE) return;

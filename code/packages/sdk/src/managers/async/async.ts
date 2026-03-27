@@ -31,7 +31,14 @@ export class WeaveAsyncManager {
     }, new Map());
   }
 
+  reset(): void {
+    this.asyncElements.clear();
+    this.asyncElementsLoadedEventEmitted = false;
+  }
+
   checkForAsyncElements(elements?: WeaveState): void {
+    this.instance.emitEvent<undefined>('onAsyncElementsIdle');
+
     const amountAsyncResourcesExtracted = this.extractAsyncResources(elements);
     if (
       amountAsyncResourcesExtracted === 0 &&
@@ -129,13 +136,15 @@ export class WeaveAsyncManager {
 
     this.asyncElements.set(nodeId, element);
 
-    this.instance.emitEvent<WeaveAsyncElementsLoadingEvent>(
-      'onAsyncElementsLoading',
-      {
-        loaded: this.getAmountAsyncElementsLoaded(),
-        total: this.getAmountAsyncElements(),
-      }
-    );
+    if (!this.asyncElementsLoadedEventEmitted) {
+      this.instance.emitEvent<WeaveAsyncElementsLoadingEvent>(
+        'onAsyncElementsLoading',
+        {
+          loaded: this.getAmountAsyncElementsLoaded(),
+          total: this.getAmountAsyncElements(),
+        }
+      );
+    }
   }
 
   public resolveAsyncElement(nodeId: string, type: string): void {
@@ -148,15 +157,15 @@ export class WeaveAsyncManager {
 
     this.asyncElements.set(nodeId, element);
 
-    this.instance.emitEvent<WeaveAsyncElementsLoadingEvent>(
-      'onAsyncElementsLoading',
-      {
-        loaded: this.getAmountAsyncElementsLoaded(),
-        total: this.getAmountAsyncElements(),
-      }
-    );
-
     if (!this.asyncElementsLoadedEventEmitted) {
+      this.instance.emitEvent<WeaveAsyncElementsLoadingEvent>(
+        'onAsyncElementsLoading',
+        {
+          loaded: this.getAmountAsyncElementsLoaded(),
+          total: this.getAmountAsyncElements(),
+        }
+      );
+
       const allLoaded = this.asyncElementsLoaded();
       if (allLoaded) {
         this.instance.emitEvent('onAsyncElementsLoaded');

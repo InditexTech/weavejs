@@ -7,11 +7,13 @@ import { WEAVE_STAGE_RESIZE_KEY } from './constants';
 import { setupUpscaleStage } from '@/internal-utils/upscale';
 import { throttle } from 'lodash';
 import { DEFAULT_THROTTLE_MS } from '@/constants';
+import type { WeaveStageResizePluginOnStageResizeEvent } from './types';
 
 export class WeaveStageResizePlugin extends WeavePlugin {
   getLayerName = undefined;
   initLayer = undefined;
   onRender: undefined;
+  initialize = undefined;
 
   getName(): string {
     return WEAVE_STAGE_RESIZE_KEY;
@@ -41,6 +43,14 @@ export class WeaveStageResizePlugin extends WeavePlugin {
         const pluginInstance = plugins[pluginId];
         pluginInstance.onRender?.();
       }
+
+      this.instance.emitEvent<WeaveStageResizePluginOnStageResizeEvent>(
+        'onStageResize',
+        {
+          width: stage.width(),
+          height: stage.height(),
+        }
+      );
     }
   }
 
@@ -50,9 +60,13 @@ export class WeaveStageResizePlugin extends WeavePlugin {
     }, DEFAULT_THROTTLE_MS);
 
     // Resize when window is resized
-    window.addEventListener('resize', () => {
-      throttledResize();
-    });
+    window.addEventListener(
+      'resize',
+      () => {
+        throttledResize();
+      },
+      { signal: this.instance.getEventsController()?.signal }
+    );
 
     // Resize when stage container is resized
     const resizeObserver = new ResizeObserver(() => {

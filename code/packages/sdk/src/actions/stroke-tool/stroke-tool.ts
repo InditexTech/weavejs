@@ -29,17 +29,16 @@ export class WeaveStrokeToolAction extends WeaveAction {
   protected initialized: boolean = false;
   protected initialCursor: string | null = null;
   protected config: WeaveStrokeToolActionProperties;
-  protected state: WeaveStrokeToolActionState;
-  protected arrowId: string | null;
-  protected tempLineId: string | null;
-  protected tempLineNode: Konva.Group | null;
+  protected state!: WeaveStrokeToolActionState;
+  protected arrowId!: string | null;
+  protected tempLineId!: string | null;
+  protected tempLineNode!: Konva.Group | null;
   protected container: Konva.Layer | Konva.Node | undefined;
   protected measureContainer: Konva.Layer | Konva.Group | undefined;
-  protected clickPoint: Konva.Vector2d | null;
-  protected pointers: Map<number, Konva.Vector2d>;
+  protected clickPoint!: Konva.Vector2d | null;
+  protected pointers!: Map<number, Konva.Vector2d>;
   protected cancelAction!: () => void;
-  protected snappedAngle: number | null = null;
-  protected snapper: GreedySnapper;
+  protected snapper!: GreedySnapper;
   protected shiftPressed: boolean = false;
   onPropsChange = undefined;
   onInit = undefined;
@@ -52,6 +51,10 @@ export class WeaveStrokeToolAction extends WeaveAction {
       params?.config ?? {}
     );
 
+    this.initialize();
+  }
+
+  initialize(): void {
     this.pointers = new Map<number, Konva.Vector2d>();
     this.initialized = false;
     this.state = WEAVE_STROKE_TOOL_STATE.IDLE;
@@ -60,7 +63,6 @@ export class WeaveStrokeToolAction extends WeaveAction {
     this.tempLineId = null;
     this.tempLineNode = null;
     this.container = undefined;
-    this.snappedAngle = null;
     this.measureContainer = undefined;
     this.clickPoint = null;
     this.snapper = new GreedySnapper({
@@ -73,6 +75,13 @@ export class WeaveStrokeToolAction extends WeaveAction {
 
   getName(): string {
     return WEAVE_STROKE_TOOL_ACTION_NAME;
+  }
+
+  getNames(): string[] {
+    return [
+      WEAVE_STROKE_TOOL_ACTION_NAME,
+      ...WEAVE_STROKE_TOOL_ACTION_NAME_ALIASES,
+    ];
   }
 
   hasAliases(): boolean {
@@ -96,39 +105,45 @@ export class WeaveStrokeToolAction extends WeaveAction {
   private setupEvents() {
     const stage = this.instance.getStage();
 
-    window.addEventListener('keydown', (e) => {
-      if (
-        e.code === 'Enter' &&
-        this.instance.getActiveAction() === WEAVE_STROKE_TOOL_ACTION_NAME
-      ) {
-        this.cancelAction();
-        return;
-      }
-      if (
-        e.code === 'Escape' &&
-        this.instance.getActiveAction() === WEAVE_STROKE_TOOL_ACTION_NAME
-      ) {
-        this.cancelAction();
-        return;
-      }
-      if (
-        e.key === 'Shift' &&
-        this.instance.getActiveAction() === WEAVE_STROKE_TOOL_ACTION_NAME
-      ) {
-        this.snappedAngle = null;
-        this.shiftPressed = true;
-      }
-    });
+    window.addEventListener(
+      'keydown',
+      (e) => {
+        if (
+          e.code === 'Enter' &&
+          this.getNames().includes(this.instance.getActiveAction() ?? '')
+        ) {
+          this.cancelAction();
+          return;
+        }
+        if (
+          e.code === 'Escape' &&
+          this.getNames().includes(this.instance.getActiveAction() ?? '')
+        ) {
+          this.cancelAction();
+          return;
+        }
+        if (
+          e.key === 'Shift' &&
+          this.getNames().includes(this.instance.getActiveAction() ?? '')
+        ) {
+          this.shiftPressed = true;
+        }
+      },
+      { signal: this.instance.getEventsController()?.signal }
+    );
 
-    window.addEventListener('keyup', (e) => {
-      if (
-        e.key === 'Shift' &&
-        this.instance.getActiveAction() === WEAVE_STROKE_TOOL_ACTION_NAME
-      ) {
-        this.snappedAngle = null;
-        this.shiftPressed = false;
-      }
-    });
+    window.addEventListener(
+      'keyup',
+      (e) => {
+        if (
+          e.key === 'Shift' &&
+          this.getNames().includes(this.instance.getActiveAction() ?? '')
+        ) {
+          this.shiftPressed = false;
+        }
+      },
+      { signal: this.instance.getEventsController()?.signal }
+    );
 
     stage.on('pointerdown', (e) => {
       this.setTapStart(e);
@@ -140,7 +155,7 @@ export class WeaveStrokeToolAction extends WeaveAction {
 
       if (
         this.pointers.size === 2 &&
-        this.instance.getActiveAction() === WEAVE_STROKE_TOOL_ACTION_NAME
+        this.getNames().includes(this.instance.getActiveAction() ?? '')
       ) {
         this.state = WEAVE_STROKE_TOOL_STATE.ADDING;
         return;
@@ -164,7 +179,7 @@ export class WeaveStrokeToolAction extends WeaveAction {
 
       if (
         this.pointers.size === 2 &&
-        this.instance.getActiveAction() === WEAVE_STROKE_TOOL_ACTION_NAME
+        this.getNames().includes(this.instance.getActiveAction() ?? '')
       ) {
         this.state = WEAVE_STROKE_TOOL_STATE.ADDING;
         return;
@@ -197,8 +212,7 @@ export class WeaveStrokeToolAction extends WeaveAction {
     this.instance.emitEvent<WeaveStrokeToolActionOnAddingEvent>(
       'onAddingStroke',
       {
-        actionName:
-          this.instance.getActiveAction() ?? WEAVE_STROKE_TOOL_ACTION_NAME,
+        actionName: this.instance.getActiveAction() ?? 'not-defined',
       }
     );
 
@@ -358,8 +372,7 @@ export class WeaveStrokeToolAction extends WeaveAction {
         this.instance.emitEvent<WeaveStrokeToolActionOnAddedEvent>(
           'onAddedStroke',
           {
-            actionName:
-              this.instance.getActiveAction() ?? WEAVE_STROKE_TOOL_ACTION_NAME,
+            actionName: this.instance.getActiveAction() ?? 'not-defined',
           }
         );
 

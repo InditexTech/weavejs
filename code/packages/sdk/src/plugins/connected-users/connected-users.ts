@@ -17,7 +17,7 @@ import {
 
 export class WeaveConnectedUsersPlugin extends WeavePlugin {
   private config!: WeaveConnectedUsersPluginConfig;
-  private connectedUsers: Record<string, WeaveUser> = {};
+  private connectedUsers!: Record<string, WeaveUser>;
   getLayerName = undefined;
   initLayer: undefined;
   onRender: undefined;
@@ -29,6 +29,10 @@ export class WeaveConnectedUsersPlugin extends WeavePlugin {
 
     this.config = config;
 
+    this.initialize();
+  }
+
+  initialize(): void {
     this.connectedUsers = {};
   }
 

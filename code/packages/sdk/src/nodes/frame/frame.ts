@@ -28,6 +28,7 @@ import { GroupFrame } from './group-frame';
 export class WeaveFrameNode extends WeaveNode {
   private config: WeaveFrameProperties;
   protected nodeType: string = WEAVE_FRAME_NODE_TYPE;
+  initialize = undefined;
 
   constructor(params?: WeaveFrameNodeParams) {
     super();

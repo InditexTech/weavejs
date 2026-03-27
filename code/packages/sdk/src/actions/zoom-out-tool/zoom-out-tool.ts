@@ -11,6 +11,7 @@ export class WeaveZoomOutToolAction extends WeaveAction {
   protected previousAction!: string;
   protected cancelAction!: () => void;
   onPropsChange = undefined;
+  initialize = undefined;
 
   getName(): string {
     return ZOOM_OUT_TOOL_ACTION_NAME;

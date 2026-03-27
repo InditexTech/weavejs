@@ -26,6 +26,7 @@ import { mergeExceptArrays } from '@/utils/utils';
 export class WeaveStrokeNode extends WeaveNode {
   private readonly config: WeaveStrokeProperties;
   protected nodeType: string = WEAVE_STROKE_NODE_TYPE;
+  initialize = undefined;
 
   constructor(params?: WeaveStrokeNodeParams) {
     super();

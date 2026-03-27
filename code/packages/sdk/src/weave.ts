@@ -107,6 +107,7 @@ export class Weave {
   private readonly asyncManager: WeaveAsyncManager;
   private readonly hooksManager: WeaveHooksManager;
   private readonly dragAndDropManager: WeaveDragAndDropManager;
+  private eventsController!: AbortController | undefined;
 
   constructor(
     weaveConfig: Pick<WeaveConfig, 'store' | 'renderer'> &
@@ -117,6 +118,8 @@ export class Weave {
     if (typeof window === 'undefined') {
       globalThis._weave_isServerSide = true;
     }
+
+    this.eventsController = undefined;
 
     this.emitter = new Emittery();
 
@@ -193,6 +196,8 @@ export class Weave {
 
       this.status = WEAVE_INSTANCE_STATUS.RUNNING;
       this.emitEvent<WeaveInstanceStatusEvent>('onInstanceStatus', this.status);
+
+      this.emitEvent<undefined>('onRender');
     });
   }
 
@@ -228,6 +233,7 @@ export class Weave {
     this.moduleLogger.info('Start instance');
 
     if (!this.isServerSide()) {
+      this.eventsController = new AbortController();
       // Setup the instance on the weave global variable
       if (!window.weave) {
         window.weave = this;
@@ -274,8 +280,77 @@ export class Weave {
     store.connect();
   }
 
+  async switchRoom() {
+    this.moduleLogger.info(`Switching room`);
+
+    const nodeHandlers = this.registerManager.getNodesHandlers();
+    for (const nodeHandlerKey of Object.keys(nodeHandlers)) {
+      const nodeHandler = nodeHandlers[nodeHandlerKey];
+      nodeHandler?.onDestroyInstance();
+    }
+
+    // destroy the stage from memory
+    const stage = this.getStage();
+    if (stage) {
+      stage.destroy();
+    }
+
+    // clear events listeners
+    if (this.eventsController) {
+      this.eventsController.abort();
+    }
+
+    // reset events controller
+    if (!this.isServerSide()) {
+      this.eventsController = new AbortController();
+    }
+
+    this.registerManager.reset();
+    this.asyncManager.reset();
+
+    this.moduleLogger.info('Switching room instance');
+
+    if (!this.isServerSide()) {
+      // Setup the instance on the weave global variable
+      if (!window.weave) {
+        window.weave = this;
+      }
+    }
+
+    this.emitEvent<WeaveStoreOnRoomLoadedEvent>('onRoomLoaded', false);
+
+    this.status = WEAVE_INSTANCE_STATUS.STARTING;
+    this.emitEvent<WeaveInstanceStatusEvent>('onInstanceStatus', this.status);
+
+    // Resets all the nodes, plugins and actions registered
+    this.registerManager.reset();
+
+    this.status = WEAVE_INSTANCE_STATUS.LOADING_FONTS;
+    this.emitEvent<WeaveInstanceStatusEvent>('onInstanceStatus', this.status);
+
+    // Start loading the fonts, this operation can be asynchronous
+    await this.fontsManager.loadFonts();
+    this.setupManager.setupLog();
+
+    // Setup stage
+    this.stageManager.initStage();
+
+    this.status = WEAVE_INSTANCE_STATUS.CONNECTING_TO_ROOM;
+    this.emitEvent<WeaveInstanceStatusEvent>('onInstanceStatus', this.status);
+
+    this.addEventListener(
+      'onStoreConnectionStatusChange',
+      this.handleStoreConnectionStatusChange.bind(this)
+    );
+  }
+
   destroy(): void {
     this.moduleLogger.info(`Destroying the instance`);
+
+    // clear events listeners
+    if (this.eventsController) {
+      this.eventsController.abort();
+    }
 
     // clear listeners
     this.emitter.clearListeners();
@@ -1140,6 +1215,17 @@ export class Weave {
     );
   }
 
+  public async exportAreaServerSide(
+    area: { x: number; y: number; width: number; height: number },
+    options: WeaveExportNodesOptions
+  ): Promise<{
+    composites: { input: Buffer; left: number; top: number }[];
+    width: number;
+    height: number;
+  }> {
+    return await this.exportManager.exportAreaServerSide(area, options);
+  }
+
   public async exportNodes(
     nodes: WeaveElementInstance[],
     boundingNodes: (nodes: Konva.Node[]) => Konva.Node[],
@@ -1459,5 +1545,11 @@ export class Weave {
 
   getDragProperties<T>(): T | null {
     return this.dragAndDropManager.getDragProperties();
+  }
+
+  // EVENTS CONTROLLER METHODS
+
+  getEventsController(): AbortController | undefined {
+    return this.eventsController;
   }
 }

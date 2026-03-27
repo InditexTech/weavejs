@@ -28,11 +28,11 @@ import { mergeExceptArrays } from '@/utils/utils';
 export class WeaveBrushToolAction extends WeaveAction {
   protected config: WeaveBrushToolActionProperties;
   protected initialized: boolean = false;
-  protected state: WeaveBrushToolActionState;
-  protected clickPoint: Konva.Vector2d | null;
-  protected strokeId: string | null;
+  protected state!: WeaveBrushToolActionState;
+  protected clickPoint!: Konva.Vector2d | null;
+  protected strokeId!: string | null;
   protected isSpacePressed: boolean = false;
-  protected isEraser: boolean;
+  protected isEraser!: boolean;
   protected container: Konva.Layer | Konva.Node | undefined;
   protected measureContainer: Konva.Layer | Konva.Group | undefined;
   protected cancelAction!: () => void;
@@ -46,6 +46,11 @@ export class WeaveBrushToolAction extends WeaveAction {
       BRUSH_TOOL_DEFAULT_CONFIG,
       params?.config ?? {}
     );
+
+    this.initialize();
+  }
+
+  initialize(): void {
     this.initialized = false;
     this.state = BRUSH_TOOL_STATE.INACTIVE;
     this.strokeId = null;
@@ -79,40 +84,48 @@ export class WeaveBrushToolAction extends WeaveAction {
   private setupEvents() {
     const stage = this.instance.getStage();
 
-    window.addEventListener('keyup', (e) => {
-      if (
-        e.code === 'Space' &&
-        this.instance.getActiveAction() === BRUSH_TOOL_ACTION_NAME
-      ) {
-        this.isSpacePressed = false;
-      }
-    });
+    window.addEventListener(
+      'keyup',
+      (e) => {
+        if (
+          e.code === 'Space' &&
+          this.instance.getActiveAction() === BRUSH_TOOL_ACTION_NAME
+        ) {
+          this.isSpacePressed = false;
+        }
+      },
+      { signal: this.instance.getEventsController()?.signal }
+    );
 
-    window.addEventListener('keydown', (e) => {
-      if (
-        e.code === 'Enter' &&
-        this.instance.getActiveAction() === BRUSH_TOOL_ACTION_NAME
-      ) {
-        e.stopPropagation();
-        this.cancelAction();
-        return;
-      }
-      if (
-        e.code === 'Space' &&
-        this.instance.getActiveAction() === BRUSH_TOOL_ACTION_NAME
-      ) {
-        e.stopPropagation();
-        this.isSpacePressed = true;
-        return;
-      }
-      if (
-        e.code === 'Escape' &&
-        this.instance.getActiveAction() === BRUSH_TOOL_ACTION_NAME
-      ) {
-        e.stopPropagation();
-        this.cancelAction();
-      }
-    });
+    window.addEventListener(
+      'keydown',
+      (e) => {
+        if (
+          e.code === 'Enter' &&
+          this.instance.getActiveAction() === BRUSH_TOOL_ACTION_NAME
+        ) {
+          e.stopPropagation();
+          this.cancelAction();
+          return;
+        }
+        if (
+          e.code === 'Space' &&
+          this.instance.getActiveAction() === BRUSH_TOOL_ACTION_NAME
+        ) {
+          e.stopPropagation();
+          this.isSpacePressed = true;
+          return;
+        }
+        if (
+          e.code === 'Escape' &&
+          this.instance.getActiveAction() === BRUSH_TOOL_ACTION_NAME
+        ) {
+          e.stopPropagation();
+          this.cancelAction();
+        }
+      },
+      { signal: this.instance.getEventsController()?.signal }
+    );
 
     const handlePointerDown = (e: Konva.KonvaEventObject<PointerEvent>) => {
       if (this.state === BRUSH_TOOL_STATE.INACTIVE) return;

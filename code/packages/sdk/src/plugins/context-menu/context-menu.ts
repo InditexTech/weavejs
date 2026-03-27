@@ -28,13 +28,13 @@ import { getTargetedNode } from '@/utils/utils';
 import { SELECTION_TOOL_ACTION_NAME } from '@/actions/selection-tool/constants';
 
 export class WeaveContextMenuPlugin extends WeavePlugin {
-  private config: WeaveStageContextMenuPluginConfig;
-  private contextMenuVisible: boolean;
-  private tapHold: boolean;
-  private tapHoldTimeout: number;
-  private pointers: Record<string, PointerEvent>;
+  private readonly config: WeaveStageContextMenuPluginConfig;
+  private contextMenuVisible!: boolean;
+  private tapHold!: boolean;
+  private tapHoldTimeout!: number;
+  private pointers!: Record<string, PointerEvent>;
   private timer!: NodeJS.Timeout | null;
-  protected tapStart: { x: number; y: number; time: number } | null;
+  protected tapStart!: { x: number; y: number; time: number } | null;
   getLayerName = undefined;
   initLayer = undefined;
   onRender: undefined;
@@ -42,17 +42,22 @@ export class WeaveContextMenuPlugin extends WeavePlugin {
   constructor(params: WeaveStageContextMenuPluginParams) {
     super();
 
-    this.timer = null;
-    this.tapHold = false;
-    this.contextMenuVisible = false;
-    this.tapStart = { x: 0, y: 0, time: 0 };
-    this.tapHoldTimeout = WEAVE_CONTEXT_MENU_TAP_HOLD_TIMEOUT;
     const { config } = params ?? {};
     this.config = {
       xOffset: WEAVE_CONTEXT_MENU_X_OFFSET_DEFAULT,
       yOffset: WEAVE_CONTEXT_MENU_Y_OFFSET_DEFAULT,
       ...config,
     };
+
+    this.initialize();
+  }
+
+  initialize(): void {
+    this.timer = null;
+    this.tapHold = false;
+    this.contextMenuVisible = false;
+    this.tapStart = { x: 0, y: 0, time: 0 };
+    this.tapHoldTimeout = WEAVE_CONTEXT_MENU_TAP_HOLD_TIMEOUT;
     this.pointers = {};
   }
 

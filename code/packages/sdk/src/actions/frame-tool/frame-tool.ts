@@ -20,10 +20,10 @@ import { SELECTION_TOOL_ACTION_NAME } from '../selection-tool/constants';
 
 export class WeaveFrameToolAction extends WeaveAction {
   protected initialized: boolean = false;
-  protected state: WeaveFrameToolActionState;
-  protected frameId: string | null;
+  protected state!: WeaveFrameToolActionState;
+  protected frameId!: string | null;
   protected container: Konva.Layer | Konva.Node | undefined;
-  protected clickPoint: Konva.Vector2d | null;
+  protected clickPoint!: Konva.Vector2d | null;
   protected cancelAction!: () => void;
   protected templateId: string | null = null;
   onPropsChange = undefined;
@@ -32,6 +32,10 @@ export class WeaveFrameToolAction extends WeaveAction {
   constructor() {
     super();
 
+    this.initialize();
+  }
+
+  initialize(): void {
     this.initialized = false;
     this.state = FRAME_TOOL_STATE.IDLE;
     this.frameId = null;
@@ -59,15 +63,19 @@ export class WeaveFrameToolAction extends WeaveAction {
   private setupEvents() {
     const stage = this.instance.getStage();
 
-    window.addEventListener('keydown', (e) => {
-      if (
-        e.code === 'Escape' &&
-        this.instance.getActiveAction() === FRAME_TOOL_ACTION_NAME
-      ) {
-        this.cancelAction();
-        return;
-      }
-    });
+    window.addEventListener(
+      'keydown',
+      (e) => {
+        if (
+          e.code === 'Escape' &&
+          this.instance.getActiveAction() === FRAME_TOOL_ACTION_NAME
+        ) {
+          this.cancelAction();
+          return;
+        }
+      },
+      { signal: this.instance.getEventsController()?.signal }
+    );
 
     stage.on('pointermove', () => {
       if (this.state === FRAME_TOOL_STATE.IDLE) {

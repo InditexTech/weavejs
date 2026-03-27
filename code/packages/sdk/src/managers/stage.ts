@@ -108,6 +108,13 @@ export class WeaveStageManager {
       ...props,
     });
 
+    if (!this.instance.isServerSide()) {
+      const containerParent = stage.container().parentNode;
+
+      stage.width((containerParent as HTMLElement).clientWidth);
+      stage.height((containerParent as HTMLElement).clientHeight);
+    }
+
     const realContainer = stage.container();
     if (
       realContainer !== undefined &&

@@ -7,6 +7,10 @@ import type Konva from 'konva';
 import { merge } from 'lodash';
 
 export const setupUpscaleStage = (instance: Weave, stage: Konva.Stage) => {
+  if (instance.isServerSide()) {
+    return;
+  }
+
   const config = instance.getConfiguration();
 
   const doUpscale = config.performance?.upscale?.enabled ?? false;
@@ -62,6 +66,14 @@ export const setupUpscaleStage = (instance: Weave, stage: Konva.Stage) => {
       innerElement.style.transform = `scale(${scaleToCover})`;
     }
   } else {
+    const realContainer = stage.container();
+
+    const containerWidth = realContainer.offsetWidth;
+    const containerHeight = realContainer.offsetHeight;
+
+    stage.width(containerWidth);
+    stage.height(containerHeight);
+
     stage.setAttrs({ upscaleScale: 1 });
   }
 };

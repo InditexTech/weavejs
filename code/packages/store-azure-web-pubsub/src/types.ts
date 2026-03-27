@@ -62,6 +62,8 @@ export type PersistRoom = (
 ) => Promise<void>;
 export type FetchRoom = (roomId: string) => Promise<Uint8Array | null>;
 
+export type WeaveRoomData = Uint8Array | FetchInitialState;
+
 export type WeaveStoreAzureWebPubsubEvents = {
   onConnect: WeaveStoreAzureWebPubsubOnConnectEvent;
   onConnected: WeaveStoreAzureWebPubsubOnConnectedEvent;

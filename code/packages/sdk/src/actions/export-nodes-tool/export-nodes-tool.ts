@@ -27,6 +27,11 @@ export class WeaveExportNodesToolAction extends WeaveAction {
   private options!: WeaveExportNodesOptions;
   onPropsChange = undefined;
   onInit = undefined;
+  initialize = undefined;
+
+  constructor() {
+    super();
+  }
 
   getName(): string {
     return EXPORT_NODES_TOOL_ACTION_NAME;

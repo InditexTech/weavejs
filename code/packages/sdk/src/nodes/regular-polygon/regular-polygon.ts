@@ -19,6 +19,7 @@ import type {
 export class WeaveRegularPolygonNode extends WeaveNode {
   private config: WeaveRegularPolygonProperties;
   protected nodeType: string = WEAVE_REGULAR_POLYGON_NODE_TYPE;
+  initialize = undefined;
 
   constructor(params?: WeaveRegularPolygonNodeParams) {
     super();

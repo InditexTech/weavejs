@@ -20,12 +20,14 @@ interface WeaveRuntimeState {
     status: string;
   };
   room: {
+    id: string | null;
+    switching: boolean;
     loaded: boolean;
   };
   asyncElements: {
+    state: 'idle' | 'loading' | 'loaded';
     loaded: number;
     total: number;
-    allLoaded: boolean;
   };
   users: WeaveConnectedUsers;
   undoRedo: {
@@ -51,9 +53,11 @@ interface WeaveRuntimeState {
   setStatus: (newStatus: WeaveStatus) => void;
   setAppState: (newAppState: WeaveState) => void;
   setConnectionStatus: (newConnectionStatus: string) => void;
+  setRoomId: (newRoomId: string | null) => void;
+  setRoomSwitching: (newRoomSwitching: boolean) => void;
   setRoomLoaded: (newStatus: boolean) => void;
   setAsyncElements: (loaded: number, total: number) => void;
-  setAsyncElementsAllLoaded: (allLoaded: boolean) => void;
+  setAsyncElementsState: (newState: 'idle' | 'loading' | 'loaded') => void;
   setUsers: (newUsers: WeaveConnectedUsers) => void;
   setCanUndo: (newCanUndo: boolean) => void;
   setCanRedo: (newCanRedo: boolean) => void;
@@ -73,12 +77,14 @@ export const useWeave: UseBoundStore<StoreApi<WeaveRuntimeState>> =
     appState: { weave: {} },
     status: WEAVE_INSTANCE_STATUS.IDLE,
     room: {
+      id: null,
+      switching: false,
       loaded: false,
     },
     asyncElements: {
+      state: 'idle',
       loaded: 0,
       total: 0,
-      allLoaded: false,
     },
     connection: {
       status: 'disconnected',
@@ -118,6 +124,16 @@ export const useWeave: UseBoundStore<StoreApi<WeaveRuntimeState>> =
         ...state,
         connection: { ...state.connection, status: newConnectionStatus },
       })),
+    setRoomId: (newRoomId) =>
+      set((state) => ({
+        ...state,
+        room: { ...state.room, id: newRoomId },
+      })),
+    setRoomSwitching: (newRoomSwitching) =>
+      set((state) => ({
+        ...state,
+        room: { ...state.room, switching: newRoomSwitching },
+      })),
     setRoomLoaded: (newStatus) =>
       set((state) => ({
         ...state,
@@ -132,12 +148,12 @@ export const useWeave: UseBoundStore<StoreApi<WeaveRuntimeState>> =
           total,
         },
       })),
-    setAsyncElementsAllLoaded: (allLoaded) =>
+    setAsyncElementsState: (newState) =>
       set((state) => ({
         ...state,
         asyncElements: {
           ...state.asyncElements,
-          allLoaded,
+          state: newState,
         },
       })),
     setUsers: (newUsers) => set((state) => ({ ...state, users: newUsers })),

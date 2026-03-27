@@ -24,9 +24,9 @@ import { memoize, mergeExceptArrays } from '@/utils/utils';
 import { throttle } from 'lodash';
 
 export class WeaveUsersPointersPlugin extends WeavePlugin {
-  private usersPointers: Record<string, WeaveUserPointer>;
+  private usersPointers!: Record<string, WeaveUserPointer>;
   private config!: WeaveUsersPointersPluginConfig;
-  private usersOperations: Record<string, WeaveUserMutexLock<unknown>>;
+  private usersOperations!: Record<string, WeaveUserMutexLock<unknown>>;
 
   constructor(params: WeaveUsersPointersPluginParams) {
     super();
@@ -46,6 +46,10 @@ export class WeaveUsersPointersPlugin extends WeavePlugin {
       this.config.getUserForegroundColor
     );
 
+    this.initialize();
+  }
+
+  initialize(): void {
     this.usersPointers = {};
     this.usersOperations = {};
   }

@@ -13,6 +13,7 @@ import { WEAVE_LAYER_NODE_TYPE } from './constants';
 
 export class WeaveLayerNode extends WeaveNode {
   protected nodeType: string = WEAVE_LAYER_NODE_TYPE;
+  initialize = undefined;
 
   onRender(props: WeaveElementAttributes): WeaveElementInstance {
     const layer = new Konva.Layer({
