@@ -66,6 +66,7 @@ export class WeaveStoreAzureWebPubSubSyncHost {
   private readonly _syncHostOptions: WeaveStoreAzureWebPubsubSyncHostOptions;
 
   private _heartbeatIntervalId: NodeJS.Timeout | null;
+  private _reconnectionTimeoutId: NodeJS.Timeout | null;
 
   private _resyncAttempt: number = 0;
   private _resyncIntervalId: NodeJS.Timeout | null = null;
@@ -100,6 +101,7 @@ export class WeaveStoreAzureWebPubSubSyncHost {
     this._chunkedMessages = new Map();
 
     this._heartbeatIntervalId = null;
+    this._reconnectionTimeoutId = null;
 
     this._conn = null;
 
@@ -331,7 +333,9 @@ export class WeaveStoreAzureWebPubSubSyncHost {
           return;
         } else {
           this._reconnectAttempts++;
-          const timeoutMs = 1000 * Math.pow(1.5, this._reconnectAttempts - 1);
+          const timeoutMs = Math.round(
+            1000 * Math.pow(1.5, this._reconnectAttempts - 1)
+          );
 
           this.server.emitEvent<WeaveStoreAzureWebPubsubOnWebsocketReconnectEvent>(
             'onWsReconnect',
@@ -342,7 +346,7 @@ export class WeaveStoreAzureWebPubSubSyncHost {
             }
           );
 
-          setTimeout(() => {
+          this._reconnectionTimeoutId = setTimeout(() => {
             this.createWebSocket(); // start fresh with a new token
           }, timeoutMs);
         }
@@ -374,6 +378,13 @@ export class WeaveStoreAzureWebPubSubSyncHost {
   }
 
   async start(): Promise<void> {
+    this._forceClose = false;
+    this._reconnectAttempts = 0;
+
+    if (this._reconnectionTimeoutId) {
+      clearTimeout(this._reconnectionTimeoutId);
+    }
+
     await this.createWebSocket();
   }
 
@@ -381,7 +392,12 @@ export class WeaveStoreAzureWebPubSubSyncHost {
     return this._conn && this._conn.readyState === WebSocket.OPEN;
   }
 
+  public isReconnecting(): boolean {
+    return this._reconnectionTimeoutId !== null;
+  }
+
   async stop(): Promise<void> {
+    this._reconnectAttempts = 0;
     this._forceClose = true;
     if (this._conn?.readyState === WebSocket.OPEN) {
       this._conn?.close();

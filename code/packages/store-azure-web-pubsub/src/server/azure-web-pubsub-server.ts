@@ -120,4 +120,16 @@ export class WeaveAzureWebPubsubServer extends Emittery {
   ): Promise<string | null> {
     return await this.syncHandler.clientConnect(roomId, connectionOptions);
   }
+
+  async clientDisconnect(roomId: string): Promise<void> {
+    await this.syncHandler.clientDisconnect(roomId);
+  }
+
+  async clientTransportConnect(roomId: string): Promise<void> {
+    await this.syncHandler.clientTransportConnect(roomId);
+  }
+
+  clientTransportDisconnect(roomId: string): void {
+    this.syncHandler.clientTransportDisconnect(roomId);
+  }
 }

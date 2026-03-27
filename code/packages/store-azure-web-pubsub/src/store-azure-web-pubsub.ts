@@ -89,7 +89,7 @@ export class WeaveStoreAzureWebPubsub extends WeaveStore {
       this.handleConnectionStatusChange(
         WEAVE_STORE_CONNECTION_STATUS.DISCONNECTED
       );
-      this.disconnect();
+      // this.disconnect();
     });
 
     this.provider.on('status', (status) => {
