@@ -18,11 +18,15 @@ import {
   type WeaveStoreAzureWebPubsubOnConnectedEvent,
   type WeaveStoreAzureWebPubsubOnConnectEvent,
   type WeaveStoreAzureWebPubsubOnDisconnectedEvent,
+  type WeaveStoreAzureWebPubsubSyncHandlerDestroyRoomStatus,
   type WeaveStoreAzureWebPubSubSyncHostClientConnectOptions,
+  type WeaveStoreAzureWebPubsubSyncHostOptions,
 } from '@/types';
 import { WeaveStoreAzureWebPubSubSyncHost } from './azure-web-pubsub-host';
 import { WeaveAzureWebPubsubServer } from './azure-web-pubsub-server';
 import { getStateAsJson, hashJson } from './utils';
+import { WEAVE_STORE_AZURE_WEB_PUBSUB_DESTROY_ROOM_STATUS } from '@/constants';
+import type { DeepPartial } from '@inditextech/weave-types';
 
 export default class WeaveAzureWebPubsubSyncHandler extends WebPubSubEventHandler {
   // eslint-disable-next-line @typescript-eslint/naming-convention
@@ -35,6 +39,9 @@ export default class WeaveAzureWebPubsubSyncHandler extends WebPubSubEventHandle
   > = new Map();
   // eslint-disable-next-line @typescript-eslint/naming-convention
   private _store_persistence: Map<string, NodeJS.Timeout> = new Map();
+  private readonly syncHostOptions:
+    | DeepPartial<WeaveStoreAzureWebPubsubSyncHostOptions>
+    | undefined;
   private readonly syncOptions?: WeaveAzureWebPubsubSyncHandlerOptions;
   private initialState: FetchInitialState;
   private readonly server: WeaveAzureWebPubsubServer;
@@ -49,7 +56,8 @@ export default class WeaveAzureWebPubsubSyncHandler extends WebPubSubEventHandle
     client: WebPubSubServiceClient,
     initialState: FetchInitialState,
     syncHandlerOptions?: WeaveAzureWebPubsubSyncHandlerOptions,
-    eventHandlerOptions?: WebPubSubEventHandlerOptions
+    eventHandlerOptions?: WebPubSubEventHandlerOptions,
+    syncHostOptions?: DeepPartial<WeaveStoreAzureWebPubsubSyncHostOptions>
   ) {
     super(hub, {
       ...eventHandlerOptions,
@@ -88,6 +96,7 @@ export default class WeaveAzureWebPubsubSyncHandler extends WebPubSubEventHandle
       },
     });
 
+    this.syncHostOptions = syncHostOptions;
     this.syncOptions = syncHandlerOptions;
     this.server = server;
     this.initialState = initialState;
@@ -127,7 +136,8 @@ export default class WeaveAzureWebPubsubSyncHandler extends WebPubSubEventHandle
         this,
         this._client,
         roomId,
-        doc
+        doc,
+        this.syncHostOptions
       )
     );
 
@@ -207,7 +217,19 @@ export default class WeaveAzureWebPubsubSyncHandler extends WebPubSubEventHandle
     }
   }
 
-  async destroyRoomInstance(roomId: string): Promise<void> {
+  async destroyRoomInstance(
+    roomId: string
+  ): Promise<WeaveStoreAzureWebPubsubSyncHandlerDestroyRoomStatus> {
+    const syncHost = this._roomsSyncHost.get(roomId);
+
+    if (!syncHost) {
+      return WEAVE_STORE_AZURE_WEB_PUBSUB_DESTROY_ROOM_STATUS.NOT_FOUND;
+    }
+
+    if (!syncHost?.isConnected()) {
+      return WEAVE_STORE_AZURE_WEB_PUBSUB_DESTROY_ROOM_STATUS.NOT_CONNECTED;
+    }
+
     if (this.isPersistingOnInterval()) {
       const intervalId = this._store_persistence.get(roomId);
       if (intervalId) {
@@ -223,18 +245,26 @@ export default class WeaveAzureWebPubsubSyncHandler extends WebPubSubEventHandle
     }
 
     // stop sync host
-    const syncHost = this._roomsSyncHost.get(roomId);
-    if (syncHost) {
+    if (syncHost?.isConnected()) {
       await syncHost.stop();
       this._roomsSyncHost.delete(roomId);
     }
 
     this._rooms.delete(roomId);
+
+    return WEAVE_STORE_AZURE_WEB_PUBSUB_DESTROY_ROOM_STATUS.DESTROYED;
   }
 
   private async getHostConnection(roomId: string) {
     if (!this._rooms.has(roomId)) {
       await this.setupRoomInstance(roomId);
+    }
+    if (
+      this._rooms.has(roomId) &&
+      !this._roomsSyncHost.get(roomId)?.isConnected() &&
+      !this._roomsSyncHost.get(roomId)?.isReconnecting()
+    ) {
+      await this._roomsSyncHost.get(roomId)?.start();
     }
   }
 
@@ -271,5 +301,26 @@ export default class WeaveAzureWebPubsubSyncHandler extends WebPubSubEventHandle
     const finalURL = `${token.url}&group=${roomId}`;
 
     return finalURL;
+  }
+
+  async clientDisconnect(roomId: string): Promise<void> {
+    const roomSyncHost = this._roomsSyncHost.get(roomId);
+    if (roomSyncHost) {
+      await this.destroyRoomInstance(roomId);
+    }
+  }
+
+  async clientTransportConnect(roomId: string): Promise<void> {
+    const roomSyncHost = this._roomsSyncHost.get(roomId);
+    if (roomSyncHost) {
+      await roomSyncHost.start();
+    }
+  }
+
+  clientTransportDisconnect(roomId: string): void {
+    const roomSyncHost = this._roomsSyncHost.get(roomId);
+    if (roomSyncHost) {
+      roomSyncHost.stop();
+    }
   }
 }

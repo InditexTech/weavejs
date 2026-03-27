@@ -12,12 +12,14 @@ import {
   type FetchRoom,
   type WeaveStoreAzureWebPubsubConfig,
   type WeaveStoreAzureWebPubSubSyncHostClientConnectOptions,
+  type WeaveStoreAzureWebPubsubSyncHostOptions,
 } from '../types';
 import WeaveAzureWebPubsubSyncHandler from './azure-web-pubsub-sync-handler';
 import type { WebPubSubEventHandlerOptions } from './event-handler';
 import type { RequestHandler } from 'express';
 import { defaultInitialState } from '@inditextech/weave-sdk/server';
 import type Y from '@/yjs';
+import type { DeepPartial } from '@inditextech/weave-types';
 
 type WeaveAzureWebPubsubServerParams = {
   initialState?: FetchInitialState;
@@ -25,6 +27,7 @@ type WeaveAzureWebPubsubServerParams = {
   eventsHandlerConfig?: WebPubSubEventHandlerOptions;
   persistRoom?: PersistRoom;
   fetchRoom?: FetchRoom;
+  syncHostConfig?: DeepPartial<WeaveStoreAzureWebPubsubSyncHostOptions>;
 };
 
 export class WeaveAzureWebPubsubServer extends Emittery {
@@ -39,6 +42,7 @@ export class WeaveAzureWebPubsubServer extends Emittery {
     initialState = defaultInitialState,
     persistRoom,
     fetchRoom,
+    syncHostConfig,
   }: WeaveAzureWebPubsubServerParams) {
     super();
 
@@ -77,7 +81,8 @@ export class WeaveAzureWebPubsubServer extends Emittery {
         }),
         ...pubSubConfig.connectionHandlers,
       },
-      eventsHandlerConfig
+      eventsHandlerConfig,
+      syncHostConfig
     );
   }
 
@@ -114,5 +119,17 @@ export class WeaveAzureWebPubsubServer extends Emittery {
     connectionOptions?: WeaveStoreAzureWebPubSubSyncHostClientConnectOptions
   ): Promise<string | null> {
     return await this.syncHandler.clientConnect(roomId, connectionOptions);
+  }
+
+  async clientDisconnect(roomId: string): Promise<void> {
+    await this.syncHandler.clientDisconnect(roomId);
+  }
+
+  async clientTransportConnect(roomId: string): Promise<void> {
+    await this.syncHandler.clientTransportConnect(roomId);
+  }
+
+  clientTransportDisconnect(roomId: string): void {
+    this.syncHandler.clientTransportDisconnect(roomId);
   }
 }

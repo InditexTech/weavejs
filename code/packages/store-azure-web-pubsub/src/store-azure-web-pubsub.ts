@@ -72,7 +72,8 @@ export class WeaveStoreAzureWebPubsub extends WeaveStore {
       this,
       url,
       this.roomId,
-      this.getDocument()
+      this.getDocument(),
+      this.azureWebPubsubOptions.syncClientOptions
     );
 
     const awareness = this.provider.awareness;
@@ -88,7 +89,6 @@ export class WeaveStoreAzureWebPubsub extends WeaveStore {
       this.handleConnectionStatusChange(
         WEAVE_STORE_CONNECTION_STATUS.DISCONNECTED
       );
-      this.disconnect();
     });
 
     this.provider.on('status', (status) => {
