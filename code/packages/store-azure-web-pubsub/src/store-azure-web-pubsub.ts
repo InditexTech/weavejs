@@ -82,7 +82,8 @@ export class WeaveStoreAzureWebPubsub extends WeaveStore {
       this,
       patchedUrl,
       this.roomId,
-      this.getDocument()
+      this.getDocument(),
+      this.azureWebPubsubOptions.syncClientOptions
     );
 
     const awareness = this.provider.awareness;

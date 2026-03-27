@@ -6,7 +6,10 @@ import type { WebSocket } from 'ws';
 import type { TokenCredential } from '@azure/identity';
 import type { Doc } from 'yjs';
 import type { ConnectionContext } from './index.server';
-import type { WEAVE_STORE_AZURE_WEB_PUBSUB_CONNECTION_STATUS } from './constants';
+import type {
+  WEAVE_STORE_AZURE_WEB_PUBSUB_CONNECTION_STATUS,
+  WEAVE_STORE_AZURE_WEB_PUBSUB_DESTROY_ROOM_STATUS,
+} from './constants';
 import type { WeaveStoreAzureWebPubSubSyncClient } from './client';
 import type { Encoder } from 'lib0/encoding';
 import type { Decoder } from 'lib0/decoding';
@@ -39,6 +42,7 @@ export type WeaveStoreAzureWebPubsubOptions = {
   roomId: string;
   url: string;
   fetchClient?: FetchClient;
+  syncClientOptions?: DeepPartial<WeaveStoreAzureWebPubSubSyncClientOptions>;
 };
 
 export type WeaveStoreAzureWebPubsubOnStoreFetchConnectionUrlEvent = {
@@ -84,10 +88,12 @@ export type WeaveStoreAzureWebPubsubOnDisconnectedEvent = {
 export type WeaveStoreAzureWebPubsubOnWebsocketOpenEvent = {
   group: string;
   event: WebSocket.Event;
+  connectionAttempt: number;
 };
 
 export type WeaveStoreAzureWebPubsubOnWebsocketJoinGroupEvent = {
   group: string;
+  connectionAttempt: number;
 };
 
 export type WeaveStoreAzureWebPubsubOnWebsocketMessageEvent = {
@@ -99,15 +105,19 @@ export type WeaveStoreAzureWebPubsubOnWebsocketMessageEvent = {
 export type WeaveStoreAzureWebPubsubOnWebsocketCloseEvent = {
   group: string;
   event: CloseEvent;
+  connectionAttempt: number;
+};
+
+export type WeaveStoreAzureWebPubsubOnWebsocketReconnectEvent = {
+  group: string;
+  connectionAttempt: number;
+  timeoutMs: number;
 };
 
 export type WeaveStoreAzureWebPubsubOnWebsocketErrorEvent = {
   group: string;
   error: ErrorEvent;
-};
-
-export type WeaveStoreAzureWebPubsubOnWebsocketOnTokenRefreshEvent = {
-  group: string;
+  connectionAttempt: number;
 };
 
 export type WeaveStoreAzureWebPubSubSyncHostClientConnectOptions = {
@@ -136,7 +146,7 @@ export enum MessageDataType {
 export interface MessageData {
   payloadId?: string;
   index?: number;
-  type?: 'chunk' | 'end';
+  type?: 'heartbeat' | 'resync' | 'chunk' | 'end';
   totalChunks?: number;
   group: string;
   t: string; // type / target uuid
@@ -160,3 +170,25 @@ export type MessageHandler = (
   emitSynced: boolean,
   messageType: number
 ) => void;
+
+export type WeaveStoreAzureWebPubsubSyncHandlerDestroyRoomStatusKeys =
+  keyof typeof WEAVE_STORE_AZURE_WEB_PUBSUB_DESTROY_ROOM_STATUS;
+export type WeaveStoreAzureWebPubsubSyncHandlerDestroyRoomStatus =
+  (typeof WEAVE_STORE_AZURE_WEB_PUBSUB_DESTROY_ROOM_STATUS)[WeaveStoreAzureWebPubsubSyncHandlerDestroyRoomStatusKeys];
+
+export type WeaveStoreAzureWebPubSubSyncClientOptions = {
+  heartbeat: {
+    checkWindowTimeMs: number;
+    checkIntervalMs: number;
+  };
+};
+
+export type WeaveStoreAzureWebPubsubSyncHostOptions = {
+  heartbeat: {
+    sendIntervalMs: number;
+  };
+  resync: {
+    checkIntervalMs: number;
+    attemptsLimit: number;
+  };
+};

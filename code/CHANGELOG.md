@@ -17,6 +17,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - [#993](https://github.com/InditexTech/weavejs/issues/993) Add Pages Support to enable multi-page canvas documents
 
+### Fixed
+
+- [#995](https://github.com/InditexTech/weavejs/issues/995) Remove timeout to refresh token on Azure Web PubSub
+- [#996](https://github.com/InditexTech/weavejs/issues/996) Refresh reconnection attempts on Azure Web PubSub store once a connection is stablished
+
 ## [3.3.0] - 2026-03-18
 
 ### Added

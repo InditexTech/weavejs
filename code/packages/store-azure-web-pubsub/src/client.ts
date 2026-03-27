@@ -20,15 +20,24 @@ import {
   type MessageHandler,
   type WeaveStoreAzureWebPubsubOnStoreFetchConnectionUrlEvent,
   type WeaveStoreAzureWebPubSubSyncClientConnectionStatus,
+  type WeaveStoreAzureWebPubSubSyncClientOptions,
 } from './types';
 import type { WeaveStoreAzureWebPubsub } from './store-azure-web-pubsub';
-import { WEAVE_STORE_CONNECTION_STATUS } from '@inditextech/weave-types';
-import { WEAVE_STORE_AZURE_WEB_PUBSUB_CONNECTION_STATUS } from './constants';
+import {
+  WEAVE_STORE_CONNECTION_STATUS,
+  type DeepPartial,
+} from '@inditextech/weave-types';
+import {
+  WEAVE_STORE_AZURE_WEB_PUBSUB_CONNECTION_STATUS,
+  WEAVE_STORE_AZURE_WEB_PUBSUB_SYNC_CLIENT_DEFAULT_OPTIONS,
+} from './constants';
 import {
   handleChunkedMessage,
   handleMessageBufferData,
   uint8ToBase64,
 } from './utils';
+import Y from './yjs';
+import { mergeExceptArrays } from '@inditextech/weave-sdk';
 
 const messageSyncStep1 = 0;
 const messageAwareness = 1;
@@ -125,6 +134,11 @@ export class WeaveStoreAzureWebPubSubSyncClient extends Emittery {
   private _initialized: boolean;
   private _chunkedMessages: Map<string, string[]>;
 
+  private readonly _synClientOptions: WeaveStoreAzureWebPubSubSyncClientOptions;
+
+  private _checkHeartbeatId!: NodeJS.Timeout;
+  private _lastHeartbeatTime!: number;
+
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   private _updateHandler: (update: any, origin: any) => void;
   private _awarenessUpdateHandler: (
@@ -145,9 +159,15 @@ export class WeaveStoreAzureWebPubSubSyncClient extends Emittery {
     instance: WeaveStoreAzureWebPubsub,
     url: string,
     topic: string,
-    doc: Doc
+    doc: Doc,
+    options?: DeepPartial<WeaveStoreAzureWebPubSubSyncClientOptions>
   ) {
     super();
+
+    this._synClientOptions = mergeExceptArrays(
+      WEAVE_STORE_AZURE_WEB_PUBSUB_SYNC_CLIENT_DEFAULT_OPTIONS,
+      options ?? {}
+    );
 
     this.instance = instance;
 
@@ -157,6 +177,8 @@ export class WeaveStoreAzureWebPubSubSyncClient extends Emittery {
     this._fetchClient = fetch;
     this._url = url;
     this._uuid = uuidv4();
+
+    this._lastHeartbeatTime = 0;
 
     this._status = WEAVE_STORE_AZURE_WEB_PUBSUB_CONNECTION_STATUS.DISCONNECTED;
     this._wsConnected = false;
@@ -391,6 +413,27 @@ export class WeaveStoreAzureWebPubSubSyncClient extends Emittery {
       }
 
       const messageData = message.data;
+
+      if (messageData.type === 'heartbeat') {
+        this._lastHeartbeatTime = Date.now();
+        return;
+      }
+
+      if (messageData.type === 'resync') {
+        // Resync requested by sync host
+        const encoder = encoding.createEncoder();
+        encoding.writeVarUint(encoder, messageSyncStep1);
+        syncProtocol.writeUpdate(encoder, Y.encodeStateAsUpdate(this.doc));
+
+        sendToControlGroup(
+          this,
+          this.topic,
+          MessageDataType.Sync,
+          encoding.toUint8Array(encoder)
+        );
+        return;
+      }
+
       if (messageData.t !== undefined && messageData.t !== this._uuid) {
         // should ignore message for other clients.
         return;
@@ -428,6 +471,10 @@ export class WeaveStoreAzureWebPubSubSyncClient extends Emittery {
     };
 
     websocket.onclose = () => {
+      if (this._checkHeartbeatId) {
+        clearInterval(this._checkHeartbeatId);
+      }
+
       if ((this._ws?.retryCount ?? 0) > 0) {
         this.setAndEmitStatusInfo(
           WEAVE_STORE_AZURE_WEB_PUBSUB_CONNECTION_STATUS.CONNECTING
@@ -460,6 +507,8 @@ export class WeaveStoreAzureWebPubSubSyncClient extends Emittery {
       this._initialized = true;
 
       this._connectionRetries = this._connectionRetries++;
+
+      this.setupCheckHeartbeat();
 
       joinGroup(this, this.topic);
 
@@ -509,6 +558,19 @@ export class WeaveStoreAzureWebPubSubSyncClient extends Emittery {
   ): void {
     this._status = status;
     this.emit('status', this._status);
+  }
+
+  private setupCheckHeartbeat() {
+    this._checkHeartbeatId = setInterval(() => {
+      const now = Date.now();
+      if (
+        now - this._lastHeartbeatTime >
+        this._synClientOptions.heartbeat.checkWindowTimeMs
+      ) {
+        this.disconnect();
+        this.createWebSocket();
+      }
+    }, this._synClientOptions.heartbeat.checkIntervalMs);
   }
 
   async connect(
