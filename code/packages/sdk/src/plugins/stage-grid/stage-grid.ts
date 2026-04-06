@@ -228,19 +228,31 @@ export class WeaveStageGridPlugin extends WeavePlugin {
       const isHighlight = index % highlightEvery === 0;
       const isOrigin = Math.abs(x) < spacing / 2;
 
+      let stroke = this.config.gridColor;
+      if (isOrigin) {
+        stroke = this.config.gridOriginColor;
+      } else if (isHighlight) {
+        stroke = this.config.gridMajorColor;
+      }
+
+      let strokeWidth = invScale;
+      if (isHighlight || isOrigin) {
+        strokeWidth = invScale * this.config.gridMajorRatio;
+      }
+
+      let zIndex = 1;
+      if (isOrigin) {
+        zIndex = 3;
+      } else if (isHighlight) {
+        zIndex = 2;
+      }
+
       const line = new Konva.Line({
         points: [x, startY, x, endY],
-        stroke: isOrigin
-          ? this.config.gridOriginColor
-          : isHighlight
-          ? this.config.gridMajorColor
-          : this.config.gridColor,
-        strokeWidth:
-          !isHighlight && !isOrigin
-            ? invScale
-            : invScale * this.config.gridMajorRatio,
+        stroke,
+        strokeWidth,
         listening: false,
-        zIndex: isOrigin ? 3 : isHighlight ? 2 : 1,
+        zIndex,
       });
       gridLayer.add(line);
     }
@@ -250,19 +262,31 @@ export class WeaveStageGridPlugin extends WeavePlugin {
       const isHighlight = index % highlightEvery === 0;
       const isOrigin = Math.abs(y) < spacing / 2;
 
+      let stroke = this.config.gridColor;
+      if (isOrigin) {
+        stroke = this.config.gridOriginColor;
+      } else if (isHighlight) {
+        stroke = this.config.gridMajorColor;
+      }
+
+      let strokeWidth = invScale;
+      if (isHighlight || isOrigin) {
+        strokeWidth = invScale * this.config.gridMajorRatio;
+      }
+
+      let zIndex = 1;
+      if (isOrigin) {
+        zIndex = 3;
+      } else if (isHighlight) {
+        zIndex = 2;
+      }
+
       const line = new Konva.Line({
         points: [startX, y, endX, y],
-        stroke: isOrigin
-          ? this.config.gridOriginColor
-          : isHighlight
-          ? this.config.gridMajorColor
-          : this.config.gridColor,
-        strokeWidth:
-          !isHighlight && !isOrigin
-            ? invScale
-            : invScale * this.config.gridMajorRatio,
+        stroke,
+        strokeWidth,
         listening: false,
-        zIndex: isOrigin ? 3 : isHighlight ? 2 : 1,
+        zIndex,
       });
       gridLayer.add(line);
     }
@@ -326,11 +350,14 @@ export class WeaveStageGridPlugin extends WeavePlugin {
               const isOriginY = Math.abs(y) < spacing / 2;
               const isOrigin = isOriginX || isOriginY;
 
-              ctx.fillStyle = isOrigin
-                ? centerColor
-                : isHighlight
-                ? majorColor
-                : defaultColor;
+              let fillStyle = defaultColor;
+              if (isOrigin) {
+                fillStyle = centerColor;
+              } else if (isHighlight) {
+                fillStyle = majorColor;
+              }
+
+              ctx.fillStyle = fillStyle;
 
               ctx.beginPath();
               ctx.arc(
@@ -373,12 +400,16 @@ export class WeaveStageGridPlugin extends WeavePlugin {
               const isOriginY = Math.abs(sy) < spacing / 2;
               const isOrigin = isOriginX || isOriginY;
 
+              let fillStyle = defaultColor;
+              if (isOrigin) {
+                fillStyle = centerColor;
+              } else if (isHighlight) {
+                fillStyle = majorColor;
+              }
+
+              ctx.fillStyle = fillStyle;
+
               const size = (isHighlight ? majorSize : defaultSize) / scale;
-              ctx.fillStyle = isOrigin
-                ? centerColor
-                : isHighlight
-                ? majorColor
-                : defaultColor;
 
               ctx.fillRect(sx - size / 2, sy - size / 2, size, size);
             }
