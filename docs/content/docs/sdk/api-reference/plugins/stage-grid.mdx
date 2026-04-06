@@ -38,17 +38,27 @@ new WeaveStageGridPlugin(params?: Partial<WeaveStageGridPluginParams>);
 type WeaveStageGridPluginConfig = {
   type: WeaveStageGridType;
   gridColor: string;
+  gridMajorColor: string;
   gridOriginColor: string;
   gridSize: number;
-  gridMajorRatio?: number;
-  gridStroke?: number;
-  gridDotRadius?: number;
-  gridDotMaxDotsPerAxis: number;
+  gridMajorEvery: number;
+  gridMajorRatio: number;
+  gridStroke: number;
+  gridDotType: WeaveStageGridDotType;
+  gridDotRadius: number;
+  gridDotRectSize: number;
 };
 
 type WeaveStageGridPluginParams = {
-  config?: Partial<WeaveStageGridPluginConfig>;
+  config?: DeepPartial<WeaveStageGridPluginConfig>;
 };
+
+type WeaveStageGridDotTypeKeys = keyof typeof WEAVE_GRID_DOT_TYPES;
+type WeaveStageGridDotType =
+  (typeof WEAVE_GRID_DOT_TYPES)[WeaveStageGridDotTypeKeys];
+
+type WeaveStageGridTypeKeys = keyof typeof WEAVE_GRID_TYPES;
+type WeaveStageGridType = (typeof WEAVE_GRID_TYPES)[WeaveStageGridTypeKeys];
 ```
 
 ## Parameters
@@ -76,12 +86,17 @@ For `WeaveStageGridPluginConfig`:
     ["gridColor"]: {
       description: "Color of the grid (lines or dots)",
       type: "string",
-      default: "rgba(0,0,0,0.2)",
+      default: "#b3b3b3",
+    },
+    ["gridMajorColor"]: {
+      description: "Color of the grid (lines or dots) for the major separators",
+      type: "string",
+      default: "#b3b3b3",
     },
     ["gridOriginColor"]: {
-      description: "Color of the grid origin axis.",
+      description: "Color of the grid origin axis (both x and y).",
       type: "string",
-      default: "rgba(255,0,0,0.2)",
+      default: "#ff746c",
     },
     ["gridSize"]: {
       description:
@@ -99,25 +114,30 @@ For `WeaveStageGridPluginConfig`:
       description:
         "A number that defines the size (ratio) of the references, for the type lines its a multiple for the stroke and for the dots its a multiple for the dot radius",
       type: "number",
-      default: "type === 'lines' => 4, type === 'dots' => 2",
+      default: "2",
     },
     ["gridStroke"]: {
       description:
         "A number that defines the stroke base size of the grid lines when the type is lines",
       type: "number",
-      default: "0.5",
+      default: "1",
+    },
+    ["gridDotType"]: {
+      description: "The type of the dot grid, it can be square or circle",
+      type: "string",
+      default: "circle",
     },
     ["gridDotRadius"]: {
       description:
-        "A number that defines the dot radius base size of the grid when the type is dots",
+        "A number that defines the dot base size of the grid when the type is dots and circles (radius)",
       type: "number",
       default: "1",
     },
-    ["gridDotMaxDotsPerAxis"]: {
+    ["gridDotRectSize"]: {
       description:
-        "A number that defines the maximum dots per axis (for performance)",
+        "A number that defines the dot base size of the grid when the type is dots and square (square size)",
       type: "number",
-      default: "250",
+      default: "2",
     },
   }}
 />
@@ -139,6 +159,22 @@ setType(type: WeaveStageGridType): void
 ```
 
 This method set the type of the actual grid (line or dotted).
+
+### getDotsType
+
+```ts
+getDotsType(): WeaveStageGridDotType
+```
+
+This method return the kind of the actual grid dot (square or circle).
+
+### setDotsType
+
+```ts
+setDotsType(type: WeaveStageGridDotType): void
+```
+
+This method set the kind of the actual grid dot (square or circle).
 
 ### enable
 
