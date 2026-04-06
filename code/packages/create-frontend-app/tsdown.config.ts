@@ -1,10 +1,10 @@
 import { writeFileSync } from 'node:fs';
 import { defineConfig } from 'tsdown';
-import typesPkg from '../types/package.json';
-import sdkPkg from '../sdk/package.json';
-import storeWebsocketsPkg from '../store-websockets/package.json';
-import storeAzureWebPubsubPkg from '../store-azure-web-pubsub/package.json';
-import reactPkg from '../react/package.json';
+import typesPkg from '../types/package.json' with { type: 'json' };
+import sdkPkg from '../sdk/package.json' with { type: 'json' };
+import storeWebsocketsPkg from '../store-websockets/package.json' with { type: 'json' };
+import storeAzureWebPubsubPkg from '../store-azure-web-pubsub/package.json' with { type: 'json' };
+import reactPkg from '../react/package.json' with { type: 'json' };
 
 const versions = {
   '@inditextech/weave-react': reactPkg.version,

@@ -17,6 +17,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - [#1001](https://github.com/InditexTech/weavejs/issues/1001) Allow disabling Ctrl / Cmd key trigger for cropping on image nodes
 
+### Changed
+
+- [#1005](https://github.com/InditexTech/weavejs/issues/1005) Support node 24.x LTS
+
 ### Fixed
 
 - [#1002](https://github.com/InditexTech/weavejs/issues/1002) Fix image node selected wrapped area when ctrl zooming (crop rect)
