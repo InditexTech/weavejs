@@ -2,7 +2,7 @@ import path from 'node:path';
 import fs from 'node:fs/promises';
 import { tryGitInit } from '@/git';
 import { versions as localVersions } from '@/versions';
-import versionPkg from './../template/package.json';
+import versionPkg from './../template/package.json' with { type: 'json' };
 import type { PackageManager } from './auto-install';
 import { autoInstall } from './auto-install';
 import { cwd, sourceDir } from './constants';

@@ -1,6 +1,6 @@
 {
   "name": "@inditextech/weave",
-  "version": "3.4.0-SNAPSHOT",
+  "version": "3.6.0-SNAPSHOT",
   "description": "Weave.js framework",
   "packageManager": "npm@10.2.4",
   "workspaces": [
@@ -67,13 +67,13 @@
   "devDependencies": {
     "@commitlint/cli": "19.4.0",
     "@commitlint/config-conventional": "19.2.2",
-    "@nx/js": "19.8.5",
-    "@swc-node/register": "1.10.9",
-    "@swc/core": "1.13.3",
+    "@nx/js": "22.6.4",
+    "@swc-node/register": "1.11.1",
+    "@swc/core": "1.15.8",
     "@swc/helpers": "0.5.17",
     "husky": "9.1.4",
     "npkill": "0.12.2",
-    "nx": "19.5.7",
+    "nx": "22.6.4",
     "prettier": "2.8.8",
     "typescript": "5.7.3"
   },

@@ -61,5 +61,6 @@
       },
       "automaticFromRef": true
     }
-  }
+  },
+  "analytics": false
 }
