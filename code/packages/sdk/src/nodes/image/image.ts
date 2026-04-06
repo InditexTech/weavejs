@@ -571,6 +571,7 @@ export class WeaveImageNode extends WeaveNode {
       width: absoluteCorners[1].x - absoluteCorners[0].x,
       height: absoluteCorners[2].y - absoluteCorners[0].y,
       fill: 'transparent',
+      strokeScaleEnabled: false,
       strokeWidth: 2,
       stroke: '#1a1aff',
       draggable: false,
@@ -585,15 +586,6 @@ export class WeaveImageNode extends WeaveNode {
     rect.scale({
       x: 1 / stageScale,
       y: 1 / stageScale,
-    });
-
-    stage.on('scaleXChange scaleYChange', () => {
-      const scale = stage.scaleX();
-
-      rect.scale({
-        x: 1 / scale,
-        y: 1 / scale,
-      });
     });
   }
 
