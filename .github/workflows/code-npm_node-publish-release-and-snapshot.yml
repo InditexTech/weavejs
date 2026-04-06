@@ -205,6 +205,11 @@ jobs:
             PKG_NAME=$(node -p "require('./$pkg_dir/package.json').name")
             ENCODED_PKG_NAME=$(node -p "encodeURIComponent(process.argv[1])" "$PKG_NAME")
             HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" \
+              --connect-timeout 10 \
+              --max-time 30 \
+              --retry 3 \
+              --retry-delay 2 \
+              --retry-all-errors \
               "https://registry.npmjs.org/${ENCODED_PKG_NAME}")
             case "$HTTP_STATUS" in
               200)
@@ -486,6 +491,11 @@ jobs:
             PKG_NAME=$(node -p "require('./$pkg_dir/package.json').name")
             ENCODED_PKG_NAME=$(node -p "encodeURIComponent(process.argv[1])" "$PKG_NAME")
             HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" \
+              --connect-timeout 10 \
+              --max-time 30 \
+              --retry 3 \
+              --retry-delay 2 \
+              --retry-all-errors \
               "https://registry.npmjs.org/${ENCODED_PKG_NAME}")
             case "$HTTP_STATUS" in
               200)
