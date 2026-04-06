@@ -213,12 +213,22 @@ jobs:
               "https://registry.npmjs.org/${ENCODED_PKG_NAME}")
             case "$HTTP_STATUS" in
               200)
-                if node -e "const d=JSON.parse(require('fs').readFileSync(process.argv[1],'utf8')); process.exit(Object.keys(d.versions||{}).length > 0 ? 0 : 1)" "$RESPONSE_FILE"; then
-                  echo "✓ $PKG_NAME exists in registry with active versions"
-                else
-                  echo "✗ $PKG_NAME has no active versions (unpublished) — treating as new"
-                  MISSING+=("$PKG_NAME")
-                fi
+                node -e "try { const d=JSON.parse(require('fs').readFileSync(process.argv[1],'utf8')); process.exit(Object.keys(d.versions||{}).length > 0 ? 0 : 1); } catch(e) { console.error('JSON parse error:', e.message); process.exit(2); }" "$RESPONSE_FILE"
+                PARSE_STATUS=$?
+                case "$PARSE_STATUS" in
+                  0)
+                    echo "✓ $PKG_NAME exists in registry with active versions"
+                    ;;
+                  1)
+                    echo "✗ $PKG_NAME has no active versions (unpublished) — treating as new"
+                    MISSING+=("$PKG_NAME")
+                    ;;
+                  *)
+                    echo "::error::Failed to verify $PKG_NAME — npm registry returned invalid JSON (HTTP 200)"
+                    rm -f "$RESPONSE_FILE"
+                    exit 1
+                    ;;
+                esac
                 ;;
               404)
                 echo "✗ $PKG_NAME NOT found in registry"
@@ -259,7 +269,9 @@ jobs:
         working-directory: code
         run: |
           TEMP_NPMRC="$(mktemp)"
+          trap 'rm -f "$TEMP_NPMRC"' EXIT
           cp ~/.npmrc "$TEMP_NPMRC"
+          chmod 600 "$TEMP_NPMRC"
           echo "//registry.npmjs.org/:_authToken=${NPM_AUTH}" >> "$TEMP_NPMRC"
           export NPM_CONFIG_USERCONFIG="$TEMP_NPMRC"
           npm run publish:snapshot
@@ -508,12 +520,22 @@ jobs:
               "https://registry.npmjs.org/${ENCODED_PKG_NAME}")
             case "$HTTP_STATUS" in
               200)
-                if node -e "const d=JSON.parse(require('fs').readFileSync(process.argv[1],'utf8')); process.exit(Object.keys(d.versions||{}).length > 0 ? 0 : 1)" "$RESPONSE_FILE"; then
-                  echo "✓ $PKG_NAME exists in registry with active versions"
-                else
-                  echo "✗ $PKG_NAME has no active versions (unpublished) — treating as new"
-                  MISSING+=("$PKG_NAME")
-                fi
+                node -e "try { const d=JSON.parse(require('fs').readFileSync(process.argv[1],'utf8')); process.exit(Object.keys(d.versions||{}).length > 0 ? 0 : 1); } catch(e) { console.error('JSON parse error:', e.message); process.exit(2); }" "$RESPONSE_FILE"
+                PARSE_STATUS=$?
+                case "$PARSE_STATUS" in
+                  0)
+                    echo "✓ $PKG_NAME exists in registry with active versions"
+                    ;;
+                  1)
+                    echo "✗ $PKG_NAME has no active versions (unpublished) — treating as new"
+                    MISSING+=("$PKG_NAME")
+                    ;;
+                  *)
+                    echo "::error::Failed to verify $PKG_NAME — npm registry returned invalid JSON (HTTP 200)"
+                    rm -f "$RESPONSE_FILE"
+                    exit 1
+                    ;;
+                esac
                 ;;
               404)
                 echo "✗ $PKG_NAME NOT found in registry"
@@ -555,7 +577,9 @@ jobs:
         working-directory: code
         run: |
           TEMP_NPMRC="$(mktemp)"
+          trap 'rm -f "$TEMP_NPMRC"' EXIT
           cp ~/.npmrc "$TEMP_NPMRC"
+          chmod 600 "$TEMP_NPMRC"
           echo "//registry.npmjs.org/:_authToken=${NPM_AUTH}" >> "$TEMP_NPMRC"
           export NPM_CONFIG_USERCONFIG="$TEMP_NPMRC"
           set -o pipefail
