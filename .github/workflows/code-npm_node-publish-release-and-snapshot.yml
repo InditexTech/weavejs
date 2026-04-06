@@ -213,8 +213,8 @@ jobs:
               "https://registry.npmjs.org/${ENCODED_PKG_NAME}")
             case "$HTTP_STATUS" in
               200)
-                node -e "try { const d=JSON.parse(require('fs').readFileSync(process.argv[1],'utf8')); process.exit(Object.keys(d.versions||{}).length > 0 ? 0 : 1); } catch(e) { console.error('JSON parse error:', e.message); process.exit(2); }" "$RESPONSE_FILE"
-                PARSE_STATUS=$?
+                PARSE_STATUS=0
+                node -e "try { const d=JSON.parse(require('fs').readFileSync(process.argv[1],'utf8')); process.exit(Object.keys(d.versions||{}).length > 0 ? 0 : 1); } catch(e) { console.error('JSON parse error:', e.message); process.exit(2); }" "$RESPONSE_FILE" || PARSE_STATUS=$?
                 case "$PARSE_STATUS" in
                   0)
                     echo "✓ $PKG_NAME exists in registry with active versions"
@@ -524,8 +524,8 @@ jobs:
               "https://registry.npmjs.org/${ENCODED_PKG_NAME}")
             case "$HTTP_STATUS" in
               200)
-                node -e "try { const d=JSON.parse(require('fs').readFileSync(process.argv[1],'utf8')); process.exit(Object.keys(d.versions||{}).length > 0 ? 0 : 1); } catch(e) { console.error('JSON parse error:', e.message); process.exit(2); }" "$RESPONSE_FILE"
-                PARSE_STATUS=$?
+                PARSE_STATUS=0
+                node -e "try { const d=JSON.parse(require('fs').readFileSync(process.argv[1],'utf8')); process.exit(Object.keys(d.versions||{}).length > 0 ? 0 : 1); } catch(e) { console.error('JSON parse error:', e.message); process.exit(2); }" "$RESPONSE_FILE" || PARSE_STATUS=$?
                 case "$PARSE_STATUS" in
                   0)
                     echo "✓ $PKG_NAME exists in registry with active versions"
