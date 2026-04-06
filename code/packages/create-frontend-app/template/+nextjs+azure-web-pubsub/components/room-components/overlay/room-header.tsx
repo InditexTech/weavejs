@@ -45,9 +45,9 @@ import { Divider } from "./divider";
 import { ZoomToolbar } from "./zoom-toolbar";
 import { HelpDrawerTrigger } from "../help/help-drawer";
 import { DOCUMENTATION_URL, GITHUB_URL } from "@/lib/constants";
-import weavePackage from "../../../node_modules/@inditextech/weave-sdk/package.json";
-import weaveReactHelperPackage from "../../../node_modules/@inditextech/weave-react/package.json";
-import weaveStorePackage from "../../../node_modules/@inditextech/weave-store-azure-web-pubsub/package.json";
+import weavePackage from "../../../node_modules/@inditextech/weave-sdk/package.json" with { type: 'json' };
+import weaveReactHelperPackage from "../../../node_modules/@inditextech/weave-react/package.json" with { type: 'json' };
+import weaveStorePackage from "../../../node_modules/@inditextech/weave-store-azure-web-pubsub/package.json" with { type: 'json' };
 import { WEAVE_STORE_CONNECTION_STATUS } from "@inditextech/weave-types";
 
 export function RoomHeader() {
