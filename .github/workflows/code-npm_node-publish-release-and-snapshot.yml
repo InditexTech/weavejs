@@ -268,6 +268,10 @@ jobs:
           NPM_AUTH: ${{ secrets.NPM_TOKEN }}
         working-directory: code
         run: |
+          if [ -z "${NPM_AUTH:-}" ]; then
+            echo "::error::NPM_TOKEN secret is required for publishing new packages but is not set"
+            exit 1
+          fi
           TEMP_NPMRC="$(mktemp)"
           trap 'rm -f "$TEMP_NPMRC"' EXIT
           cp ~/.npmrc "$TEMP_NPMRC"
@@ -576,6 +580,10 @@ jobs:
           NPM_AUTH: ${{ secrets.NPM_TOKEN }}
         working-directory: code
         run: |
+          if [ -z "${NPM_AUTH:-}" ]; then
+            echo "::error::NPM_TOKEN secret is required for publishing new packages but is not set"
+            exit 1
+          fi
           TEMP_NPMRC="$(mktemp)"
           trap 'rm -f "$TEMP_NPMRC"' EXIT
           cp ~/.npmrc "$TEMP_NPMRC"
