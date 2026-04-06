@@ -204,13 +204,17 @@ jobs:
             PKG_NAME=$(node -p "require('./$pkg_dir/package.json').name")
             ENCODED_PKG_NAME=$(node -p "encodeURIComponent(process.argv[1])" "$PKG_NAME")
             RESPONSE_FILE=$(mktemp)
-            HTTP_STATUS=$(curl -s -o "$RESPONSE_FILE" -w "%{http_code}" \
+            if ! HTTP_STATUS=$(curl -sS -o "$RESPONSE_FILE" -w "%{http_code}" \
               --connect-timeout 10 \
               --max-time 30 \
               --retry 3 \
               --retry-delay 2 \
               --retry-all-errors \
-              "https://registry.npmjs.org/${ENCODED_PKG_NAME}")
+              "https://registry.npmjs.org/${ENCODED_PKG_NAME}"); then
+              echo "::error::Failed to verify $PKG_NAME due to npm registry connectivity error"
+              rm -f "$RESPONSE_FILE"
+              exit 1
+            fi
             case "$HTTP_STATUS" in
               200)
                 PARSE_STATUS=0
@@ -515,13 +519,17 @@ jobs:
             PKG_NAME=$(node -p "require('./$pkg_dir/package.json').name")
             ENCODED_PKG_NAME=$(node -p "encodeURIComponent(process.argv[1])" "$PKG_NAME")
             RESPONSE_FILE=$(mktemp)
-            HTTP_STATUS=$(curl -s -o "$RESPONSE_FILE" -w "%{http_code}" \
+            if ! HTTP_STATUS=$(curl -sS -o "$RESPONSE_FILE" -w "%{http_code}" \
               --connect-timeout 10 \
               --max-time 30 \
               --retry 3 \
               --retry-delay 2 \
               --retry-all-errors \
-              "https://registry.npmjs.org/${ENCODED_PKG_NAME}")
+              "https://registry.npmjs.org/${ENCODED_PKG_NAME}"); then
+              echo "::error::Failed to verify $PKG_NAME due to npm registry connectivity error"
+              rm -f "$RESPONSE_FILE"
+              exit 1
+            fi
             case "$HTTP_STATUS" in
               200)
                 PARSE_STATUS=0
