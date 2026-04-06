@@ -108,6 +108,10 @@ export class WeaveImageNode extends WeaveNode {
     imageNode: Konva.Group,
     options: WeaveImageTriggerCropOptions
   ): void {
+    if (!this.config.cropMode.enabled) {
+      return;
+    }
+
     const stage = this.instance.getStage();
 
     if (imageNode.getAttrs().cropping ?? false) {
@@ -168,6 +172,10 @@ export class WeaveImageNode extends WeaveNode {
   }
 
   closeCrop = (imageNode: Konva.Group, type: WeaveImageCropEndType): void => {
+    if (!this.config.cropMode.enabled) {
+      return;
+    }
+
     if (!this.imageCrop) {
       return;
     }
@@ -191,6 +199,10 @@ export class WeaveImageNode extends WeaveNode {
   };
 
   resetCrop = (imageNode: Konva.Group): void => {
+    if (!this.config.cropMode.enabled) {
+      return;
+    }
+
     const internalImage: Konva.Image | undefined = imageNode.findOne(
       `#${imageNode.getAttrs().id}-image`
     );
@@ -277,36 +289,38 @@ export class WeaveImageNode extends WeaveNode {
       }
     };
 
-    image.triggerCrop = () => {
-      this.triggerCrop(image, {
-        cmdCtrl: {
-          triggered: false,
-        },
-      });
-    };
+    if (this.config.cropMode.enabled) {
+      image.triggerCrop = () => {
+        this.triggerCrop(image, {
+          cmdCtrl: {
+            triggered: false,
+          },
+        });
+      };
 
-    image.closeCrop = (type: WeaveImageCropEndType) => {
-      this.closeCrop(image, type);
-    };
+      image.closeCrop = (type: WeaveImageCropEndType) => {
+        this.closeCrop(image, type);
+      };
 
-    image.resetCrop = () => {
-      const stage = this.instance.getStage();
-      const image = stage.findOne(`#${id}`) as Konva.Group | undefined;
+      image.resetCrop = () => {
+        const stage = this.instance.getStage();
+        const image = stage.findOne(`#${id}`) as Konva.Group | undefined;
 
-      if (!image) {
-        return;
-      }
+        if (!image) {
+          return;
+        }
 
-      const imageCrop = new WeaveImageCrop(
-        this.instance,
-        this,
-        image,
-        internalImage,
-        cropGroup
-      );
+        const imageCrop = new WeaveImageCrop(
+          this.instance,
+          this,
+          image,
+          internalImage,
+          cropGroup
+        );
 
-      imageCrop.unCrop();
-    };
+        imageCrop.unCrop();
+      };
+    }
 
     const defaultTransformerProperties = this.defaultGetTransformerProperties(
       this.config.transform
@@ -453,45 +467,47 @@ export class WeaveImageNode extends WeaveNode {
       }
     );
 
-    image.on('onCmdCtrlPressed', () => {
-      const transformer = this.getSelectionPlugin()?.getTransformer();
+    if (this.config.cropMode.enabled && this.config.cropMode.triggers.ctrlCmd) {
+      image.on('onCmdCtrlPressed', () => {
+        const transformer = this.getSelectionPlugin()?.getTransformer();
 
-      if (!transformer) {
-        return;
-      }
+        if (!transformer) {
+          return;
+        }
 
-      transformer.hide();
+        transformer.hide();
 
-      const utilityLayer = this.instance.getUtilityLayer();
+        const utilityLayer = this.instance.getUtilityLayer();
 
-      if (!utilityLayer) {
-        return;
-      }
+        if (!utilityLayer) {
+          return;
+        }
 
-      utilityLayer?.destroyChildren();
+        utilityLayer?.destroyChildren();
 
-      this.renderCropMode(utilityLayer, image);
+        this.renderCropMode(utilityLayer, image);
 
-      utilityLayer?.show();
-    });
+        utilityLayer?.show();
+      });
 
-    image.on('onCmdCtrlReleased', () => {
-      const transformer = this.getSelectionPlugin()?.getTransformer();
+      image.on('onCmdCtrlReleased', () => {
+        const transformer = this.getSelectionPlugin()?.getTransformer();
 
-      if (!transformer) {
-        return;
-      }
+        if (!transformer) {
+          return;
+        }
 
-      transformer.show();
+        transformer.show();
 
-      const utilityLayer = this.instance.getUtilityLayer();
+        const utilityLayer = this.instance.getUtilityLayer();
 
-      if (!utilityLayer) {
-        return;
-      }
+        if (!utilityLayer) {
+          return;
+        }
 
-      utilityLayer?.destroyChildren();
-    });
+        utilityLayer?.destroyChildren();
+      });
+    }
 
     image.on('onSelectionCleared', () => {
       const transformer = this.getSelectionPlugin()?.getTransformer();
@@ -559,6 +575,7 @@ export class WeaveImageNode extends WeaveNode {
       width: absoluteCorners[1].x - absoluteCorners[0].x,
       height: absoluteCorners[2].y - absoluteCorners[0].y,
       fill: 'transparent',
+      strokeScaleEnabled: false,
       strokeWidth: 2,
       stroke: '#1a1aff',
       draggable: false,
@@ -573,15 +590,6 @@ export class WeaveImageNode extends WeaveNode {
     rect.scale({
       x: 1 / stageScale,
       y: 1 / stageScale,
-    });
-
-    stage.on('scaleXChange scaleYChange', () => {
-      const scale = stage.scaleX();
-
-      rect.scale({
-        x: 1 / scale,
-        y: 1 / scale,
-      });
     });
   }
 

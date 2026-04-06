@@ -46,6 +46,10 @@ export const WEAVE_IMAGE_DEFAULT_CONFIG: WeaveImageProperties = {
   crossOrigin: 'anonymous',
   useFallbackImage: true,
   cropMode: {
+    enabled: true,
+    triggers: {
+      ctrlCmd: true,
+    },
     gridLines: {
       enabled: true,
     },

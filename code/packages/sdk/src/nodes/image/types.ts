@@ -66,6 +66,10 @@ export type WeaveImageProperties = {
   urlTransformer?: URLTransformerFunction;
   onDblClick?: (instance: WeaveImageNode, node: Konva.Group) => void;
   cropMode: {
+    enabled: boolean;
+    triggers: {
+      ctrlCmd: boolean;
+    };
     gridLines: {
       enabled: boolean;
     };
