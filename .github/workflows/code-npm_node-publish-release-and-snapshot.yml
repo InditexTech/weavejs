@@ -203,14 +203,26 @@ jobs:
           MISSING=()
           for pkg_dir in packages/*/; do
             PKG_NAME=$(node -p "require('./$pkg_dir/package.json').name")
+            ENCODED_PKG_NAME=$(node -p "encodeURIComponent(process.argv[1])" "$PKG_NAME")
             HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" \
-              "https://registry.npmjs.org/${PKG_NAME}")
-            if [[ "$HTTP_STATUS" == "200" ]]; then
-              echo "✓ $PKG_NAME exists in registry"
-            else
-              echo "✗ $PKG_NAME NOT found in registry (HTTP $HTTP_STATUS)"
-              MISSING+=("$PKG_NAME")
-            fi
+              "https://registry.npmjs.org/${ENCODED_PKG_NAME}")
+            case "$HTTP_STATUS" in
+              200)
+                echo "✓ $PKG_NAME exists in registry"
+                ;;
+              404)
+                echo "✗ $PKG_NAME NOT found in registry (HTTP $HTTP_STATUS)"
+                MISSING+=("$PKG_NAME")
+                ;;
+              429|5??)
+                echo "::error::Failed to verify $PKG_NAME due to transient npm registry error (HTTP $HTTP_STATUS)"
+                exit 1
+                ;;
+              *)
+                echo "::error::Failed to verify $PKG_NAME due to unexpected npm registry response (HTTP $HTTP_STATUS)"
+                exit 1
+                ;;
+            esac
           done
           if [[ ${#MISSING[@]} -gt 0 ]]; then
             echo "MISSING_PACKAGES=${MISSING[*]}" >> "$GITHUB_ENV"
@@ -472,14 +484,26 @@ jobs:
           MISSING=()
           for pkg_dir in packages/*/; do
             PKG_NAME=$(node -p "require('./$pkg_dir/package.json').name")
+            ENCODED_PKG_NAME=$(node -p "encodeURIComponent(process.argv[1])" "$PKG_NAME")
             HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" \
-              "https://registry.npmjs.org/${PKG_NAME}")
-            if [[ "$HTTP_STATUS" == "200" ]]; then
-              echo "✓ $PKG_NAME exists in registry"
-            else
-              echo "✗ $PKG_NAME NOT found in registry (HTTP $HTTP_STATUS)"
-              MISSING+=("$PKG_NAME")
-            fi
+              "https://registry.npmjs.org/${ENCODED_PKG_NAME}")
+            case "$HTTP_STATUS" in
+              200)
+                echo "✓ $PKG_NAME exists in registry"
+                ;;
+              404)
+                echo "✗ $PKG_NAME NOT found in registry (HTTP $HTTP_STATUS)"
+                MISSING+=("$PKG_NAME")
+                ;;
+              429|5??)
+                echo "::error::Failed to verify $PKG_NAME due to transient npm registry error (HTTP $HTTP_STATUS)"
+                exit 1
+                ;;
+              *)
+                echo "::error::Failed to verify $PKG_NAME due to unexpected npm registry response (HTTP $HTTP_STATUS)"
+                exit 1
+                ;;
+            esac
           done
           if [[ ${#MISSING[@]} -gt 0 ]]; then
             echo "MISSING_PACKAGES=${MISSING[*]}" >> "$GITHUB_ENV"
