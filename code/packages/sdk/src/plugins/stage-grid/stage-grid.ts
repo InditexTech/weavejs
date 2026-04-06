@@ -5,21 +5,14 @@
 import Konva from 'konva';
 import { WeavePlugin } from '@/plugins/plugin';
 import {
-  WEAVE_GRID_DEFAULT_COLOR,
-  WEAVE_GRID_DEFAULT_ORIGIN_COLOR,
-  WEAVE_GRID_DEFAULT_STROKE,
-  WEAVE_GRID_DEFAULT_RADIUS,
-  WEAVE_GRID_DEFAULT_SIZE,
-  WEAVE_GRID_DEFAULT_TYPE,
   WEAVE_GRID_LAYER_ID,
   WEAVE_GRID_TYPES,
-  WEAVE_GRID_DEFAULT_MAJOR_LINE_RATIO,
-  WEAVE_GRID_DEFAULT_MAJOR_DOT_RATIO,
-  WEAVE_GRID_DEFAULT_MAJOR_EVERY,
-  WEAVE_GRID_DEFAULT_DOT_MAX_DOTS_PER_AXIS,
   WEAVE_STAGE_GRID_PLUGIN_KEY,
+  WEAVE_GRID_DEFAULT_CONFIG,
+  WEAVE_GRID_DOT_TYPES,
 } from './constants';
 import {
+  type WeaveStageGridDotType,
   type WeaveStageGridPluginConfig,
   type WeaveStageGridPluginParams,
   type WeaveStageGridType,
@@ -27,6 +20,7 @@ import {
 import { throttle } from 'lodash';
 import { MOVE_TOOL_ACTION_NAME } from '@/actions/move-tool/constants';
 import { DEFAULT_THROTTLE_MS } from '@/constants';
+import { mergeExceptArrays } from '@/index.node';
 
 export class WeaveStageGridPlugin extends WeavePlugin {
   private moveToolActive!: boolean;
@@ -44,14 +38,12 @@ export class WeaveStageGridPlugin extends WeavePlugin {
 
     const { config } = params ?? {};
 
-    this.config = {
-      type: WEAVE_GRID_DEFAULT_TYPE as WeaveStageGridType,
-      gridColor: WEAVE_GRID_DEFAULT_COLOR,
-      gridOriginColor: WEAVE_GRID_DEFAULT_ORIGIN_COLOR,
-      gridSize: WEAVE_GRID_DEFAULT_SIZE,
-      gridDotMaxDotsPerAxis: WEAVE_GRID_DEFAULT_DOT_MAX_DOTS_PER_AXIS,
-      ...config,
-    };
+    this.moveToolActive = false;
+    this.isMouseMiddleButtonPressed = false;
+    this.isSpaceKeyPressed = false;
+    this.forceStageChange = false;
+
+    this.config = mergeExceptArrays(WEAVE_GRID_DEFAULT_CONFIG, config);
 
     this.initialize();
   }
@@ -176,11 +168,16 @@ export class WeaveStageGridPlugin extends WeavePlugin {
     return layer;
   }
 
+  getShapeAdaptiveSpacing(baseSpacing: number, scale: number): number {
+    const factor = Math.pow(2, Math.floor(Math.log2(1 / scale)));
+    return baseSpacing * factor;
+  }
+
   getAdaptiveSpacing(scale: number): number {
     const baseGridSpacing = this.config.gridSize;
 
-    const minPixelSpacing = 8;
-    const maxPixelSpacing = 100;
+    const minPixelSpacing = this.config.gridSize;
+    const maxPixelSpacing = this.config.gridSize * 2;
 
     let spacing = baseGridSpacing;
     let pixelSpacing = spacing * scale;
@@ -204,30 +201,6 @@ export class WeaveStageGridPlugin extends WeavePlugin {
     return snappedSpacing;
   }
 
-  private getAdjustedSpacing(
-    startX: number,
-    endX: number,
-    startY: number,
-    endY: number,
-    baseSpacing = 50
-  ) {
-    let spacing = baseSpacing;
-    let dotCountX = Math.ceil((endX - startX) / spacing);
-    let dotCountY = Math.ceil((endY - startY) / spacing);
-
-    while (
-      (dotCountX > this.config.gridDotMaxDotsPerAxis ||
-        dotCountY > this.config.gridDotMaxDotsPerAxis) &&
-      spacing < 1e6
-    ) {
-      spacing *= 2;
-      dotCountX = Math.ceil((endX - startX) / spacing);
-      dotCountY = Math.ceil((endY - startY) / spacing);
-    }
-
-    return spacing;
-  }
-
   private renderGridLines(): void {
     const stage = this.instance.getStage();
     const gridLayer = this.getLayer();
@@ -244,8 +217,7 @@ export class WeaveStageGridPlugin extends WeavePlugin {
 
     const scale = stage.scaleX();
     const spacing = this.getAdaptiveSpacing(scale);
-    const invScale =
-      (this.config.gridStroke ?? WEAVE_GRID_DEFAULT_STROKE) / scale;
+    const invScale = this.config.gridStroke / scale;
 
     const offsetX = -stage.x() / stage.scaleX();
     const offsetY = -stage.y() / stage.scaleY();
@@ -261,24 +233,38 @@ export class WeaveStageGridPlugin extends WeavePlugin {
     const endX = offsetX + (1 + margin) * worldWidth;
     const endY = offsetY + (1 + margin) * worldHeight;
 
-    const highlightEvery =
-      this.config.gridMajorEvery ?? WEAVE_GRID_DEFAULT_MAJOR_EVERY;
+    const highlightEvery = this.config.gridMajorEvery;
 
     for (let x = startX; x <= endX; x += spacing) {
       const index = Math.round(x / spacing);
       const isHighlight = index % highlightEvery === 0;
       const isOrigin = Math.abs(x) < spacing / 2;
 
+      let stroke = this.config.gridColor;
+      if (isOrigin) {
+        stroke = this.config.gridOriginColor;
+      } else if (isHighlight) {
+        stroke = this.config.gridMajorColor;
+      }
+
+      let strokeWidth = invScale;
+      if (isHighlight || isOrigin) {
+        strokeWidth = invScale * this.config.gridMajorRatio;
+      }
+
+      let zIndex = 1;
+      if (isOrigin) {
+        zIndex = 3;
+      } else if (isHighlight) {
+        zIndex = 2;
+      }
+
       const line = new Konva.Line({
         points: [x, startY, x, endY],
-        stroke: isOrigin ? this.config.gridOriginColor : this.config.gridColor,
-        strokeWidth:
-          !isHighlight && !isOrigin
-            ? invScale
-            : invScale *
-              (this.config.gridMajorRatio ??
-                WEAVE_GRID_DEFAULT_MAJOR_LINE_RATIO),
+        stroke,
+        strokeWidth,
         listening: false,
+        zIndex,
       });
       gridLayer.add(line);
     }
@@ -288,11 +274,31 @@ export class WeaveStageGridPlugin extends WeavePlugin {
       const isHighlight = index % highlightEvery === 0;
       const isOrigin = Math.abs(y) < spacing / 2;
 
+      let stroke = this.config.gridColor;
+      if (isOrigin) {
+        stroke = this.config.gridOriginColor;
+      } else if (isHighlight) {
+        stroke = this.config.gridMajorColor;
+      }
+
+      let strokeWidth = invScale;
+      if (isHighlight || isOrigin) {
+        strokeWidth = invScale * this.config.gridMajorRatio;
+      }
+
+      let zIndex = 1;
+      if (isOrigin) {
+        zIndex = 3;
+      } else if (isHighlight) {
+        zIndex = 2;
+      }
+
       const line = new Konva.Line({
         points: [startX, y, endX, y],
-        stroke: isOrigin ? this.config.gridOriginColor : this.config.gridColor,
-        strokeWidth: !isHighlight && !isOrigin ? invScale : invScale * 2,
+        stroke,
+        strokeWidth,
         listening: false,
+        zIndex,
       });
       gridLayer.add(line);
     }
@@ -312,109 +318,119 @@ export class WeaveStageGridPlugin extends WeavePlugin {
       return;
     }
 
-    const scale = stage.scaleX();
-    const spacing = this.getAdaptiveSpacing(scale);
-    const invScale =
-      (this.config.gridDotRadius ?? WEAVE_GRID_DEFAULT_RADIUS) / scale;
-    const position = stage.position();
+    const grid = new Konva.Shape({
+      // opacity: 0.5,
+      listening: false,
+      sceneFunc: (ctx) => {
+        const dotType = this.config.gridDotType;
 
-    const offsetX = -position.x * invScale;
-    const offsetY = -position.y * invScale;
+        const scale = stage.scaleX();
+        const pos = stage.position();
 
-    const margin = 2; // how many screen widths/heights to extend in each direction
-    const worldWidth = stage.width() * invScale;
-    const worldHeight = stage.height() * invScale;
+        const baseSpacing = this.config.gridSize;
+        const spacing = this.getShapeAdaptiveSpacing(baseSpacing, scale);
 
-    let startX =
-      Math.floor((offsetX - margin * worldWidth) / spacing) * spacing;
-    const endX = offsetX + (1 + margin) * worldWidth;
+        const highlightEvery = this.config.gridMajorEvery;
 
-    let startY =
-      Math.floor((offsetY - margin * worldHeight) / spacing) * spacing;
-    const endY = offsetY + (1 + margin) * worldHeight;
+        const defaultColor = this.config.gridColor;
+        const majorColor = this.config.gridMajorColor;
+        const centerColor = this.config.gridOriginColor;
 
-    let adjustedSpacing = spacing;
-    let dotCountX = Math.ceil((endX - startX) / adjustedSpacing);
-    let dotCountY = Math.ceil((endY - startY) / adjustedSpacing);
+        if (dotType === WEAVE_GRID_DOT_TYPES.CIRCLE) {
+          const scale = stage.scaleX();
+          const pos = stage.position();
+          // 👇 THIS is the key
+          const topLeftX = -pos.x / scale;
+          const topLeftY = -pos.y / scale;
+          const viewWidth = stage.width() / scale;
+          const viewHeight = stage.height() / scale;
+          const startX = Math.floor(topLeftX / spacing) * spacing;
+          const startY = Math.floor(topLeftY / spacing) * spacing;
 
-    while (
-      (dotCountX > this.config.gridDotMaxDotsPerAxis ||
-        dotCountY > this.config.gridDotMaxDotsPerAxis) &&
-      adjustedSpacing < 1e6
-    ) {
-      adjustedSpacing *= 2;
-      dotCountX = Math.ceil((endX - startX) / adjustedSpacing);
-      dotCountY = Math.ceil((endY - startY) / adjustedSpacing);
-    }
+          const dotRadius = this.config.gridDotRadius;
+          const dotMajorRadius = dotRadius * this.config.gridMajorRatio;
 
-    this.getAdjustedSpacing(startX, endX, startY, endY, spacing);
+          for (let x = startX; x < topLeftX + viewWidth; x += spacing) {
+            for (let y = startY; y < topLeftY + viewHeight; y += spacing) {
+              const indexX = Math.round(x / spacing);
+              const indexY = Math.round(y / spacing);
+              const isHighlightX = indexX % highlightEvery === 0;
+              const isHighlightY = indexY % highlightEvery === 0;
+              const isHighlight = isHighlightX || isHighlightY;
 
-    startX =
-      Math.floor((offsetX - margin * worldWidth) / adjustedSpacing) *
-      adjustedSpacing;
-    startY =
-      Math.floor((offsetY - margin * worldHeight) / adjustedSpacing) *
-      adjustedSpacing;
+              const isOriginX = Math.abs(x) < spacing / 2;
+              const isOriginY = Math.abs(y) < spacing / 2;
+              const isOrigin = isOriginX || isOriginY;
 
-    const highlightEvery =
-      this.config.gridMajorEvery ?? WEAVE_GRID_DEFAULT_MAJOR_EVERY;
+              let fillStyle = defaultColor;
+              if (isOrigin) {
+                fillStyle = centerColor;
+              } else if (isHighlight) {
+                fillStyle = majorColor;
+              }
 
-    const majorColor = this.config.gridColor;
-    const gridMajorRatio =
-      this.config.gridMajorRatio ?? WEAVE_GRID_DEFAULT_MAJOR_DOT_RATIO;
+              ctx.fillStyle = fillStyle;
 
-    const majorShape = new Konva.Shape({
-      sceneFunc: function (context) {
-        context.beginPath();
-
-        for (let x = startX; x <= endX; x += adjustedSpacing) {
-          for (let y = startY; y <= endY; y += adjustedSpacing) {
-            if (Math.abs(x) < spacing / 2 || Math.abs(y) < spacing / 2)
-              continue;
-
-            const indexX = Math.round(x / spacing);
-            const indexY = Math.round(y / spacing);
-            const isHighlightX = indexX % highlightEvery === 0;
-            const isHighlightY = indexY % highlightEvery === 0;
-
-            const radius = !(isHighlightX || isHighlightY)
-              ? invScale
-              : invScale * gridMajorRatio;
-
-            context.moveTo(x + radius, y);
-            context.arc(x, y, radius, 0, Math.PI * 2, false);
+              ctx.beginPath();
+              ctx.arc(
+                x,
+                y,
+                (isHighlight ? dotMajorRadius : dotRadius) / scale,
+                0,
+                Math.PI * 2
+              );
+              ctx.fill();
+            }
           }
         }
-        context.fillStyle = majorColor;
-        context.fill();
+
+        if (dotType === WEAVE_GRID_DOT_TYPES.SQUARE) {
+          const topLeftX = -pos.x / scale;
+          const topLeftY = -pos.y / scale;
+
+          const viewWidth = stage.width() / scale;
+          const viewHeight = stage.height() / scale;
+
+          const startX = Math.floor(topLeftX / spacing) * spacing;
+          const startY = Math.floor(topLeftY / spacing) * spacing;
+
+          const defaultSize = this.config.gridDotRectSize;
+          const majorSize = defaultSize * this.config.gridMajorRatio;
+
+          for (let x = startX; x < topLeftX + viewWidth; x += spacing) {
+            for (let y = startY; y < topLeftY + viewHeight; y += spacing) {
+              const sx = Math.round(x * scale) / scale;
+              const sy = Math.round(y * scale) / scale;
+
+              const indexX = Math.round(sx / spacing);
+              const indexY = Math.round(sy / spacing);
+              const isHighlightX = indexX % highlightEvery === 0;
+              const isHighlightY = indexY % highlightEvery === 0;
+              const isHighlight = isHighlightX || isHighlightY;
+
+              const isOriginX = Math.abs(sx) < spacing / 2;
+              const isOriginY = Math.abs(sy) < spacing / 2;
+              const isOrigin = isOriginX || isOriginY;
+
+              let fillStyle = defaultColor;
+              if (isOrigin) {
+                fillStyle = centerColor;
+              } else if (isHighlight) {
+                fillStyle = majorColor;
+              }
+
+              ctx.fillStyle = fillStyle;
+
+              const size = (isHighlight ? majorSize : defaultSize) / scale;
+
+              ctx.fillRect(sx - size / 2, sy - size / 2, size, size);
+            }
+          }
+        }
       },
     });
 
-    gridLayer.add(majorShape);
-
-    const originColor = this.config.gridOriginColor;
-
-    const originShape = new Konva.Shape({
-      sceneFunc: function (context) {
-        context.beginPath();
-        for (let x = startX; x <= endX; x += adjustedSpacing) {
-          const radius = invScale * gridMajorRatio;
-
-          context.moveTo(x + radius, 0);
-          context.arc(x, 0, radius, 0, Math.PI * 2);
-        }
-        for (let y = startY; y <= endY; y += adjustedSpacing) {
-          const radius = invScale * gridMajorRatio;
-          if (Math.abs(y) < spacing / 2) continue; // skip center dot (already added)
-          context.moveTo(0 + radius, y);
-          context.arc(0, y, radius, 0, Math.PI * 2);
-        }
-        context.fillStyle = originColor;
-        context.fill();
-      },
-    });
-
-    gridLayer.add(originShape);
+    gridLayer.add(grid);
   }
 
   private hasStageChanged(): boolean {
@@ -470,12 +486,14 @@ export class WeaveStageGridPlugin extends WeavePlugin {
   enable(): void {
     this.enabled = true;
     this.getLayer()?.show();
+    this.forceStageChange = true;
     this.onRender();
   }
 
   disable(): void {
     this.enabled = false;
     this.getLayer()?.hide();
+    this.forceStageChange = true;
     this.onRender();
   }
 
@@ -485,6 +503,16 @@ export class WeaveStageGridPlugin extends WeavePlugin {
 
   setType(type: WeaveStageGridType): void {
     this.config.type = type;
+    this.forceStageChange = true;
+    this.onRender();
+  }
+
+  getDotsType(): WeaveStageGridDotType {
+    return this.config.gridDotType;
+  }
+
+  setDotsType(type: WeaveStageGridDotType): void {
+    this.config.gridDotType = type;
     this.forceStageChange = true;
     this.onRender();
   }

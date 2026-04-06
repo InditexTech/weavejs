@@ -2,6 +2,8 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
+import type { WeaveStageGridPluginConfig } from './types';
+
 export const WEAVE_STAGE_GRID_PLUGIN_KEY = 'stageGrid';
 
 export const WEAVE_GRID_TYPES = {
@@ -9,15 +11,23 @@ export const WEAVE_GRID_TYPES = {
   ['DOTS']: 'dots',
 } as const;
 
-export const WEAVE_GRID_DEFAULT_SIZE = 50;
-export const WEAVE_GRID_DEFAULT_TYPE = WEAVE_GRID_TYPES.LINES as string;
-export const WEAVE_GRID_DEFAULT_COLOR = 'rgba(0,0,0,0.1)';
-export const WEAVE_GRID_DEFAULT_ORIGIN_COLOR = 'rgba(255,0,0,0.1)';
-export const WEAVE_GRID_DEFAULT_STROKE = 0.5;
-export const WEAVE_GRID_DEFAULT_MAJOR_LINE_RATIO = 4;
-export const WEAVE_GRID_DEFAULT_RADIUS = 1;
-export const WEAVE_GRID_DEFAULT_MAJOR_DOT_RATIO = 2;
-export const WEAVE_GRID_DEFAULT_MAJOR_EVERY = 10;
-export const WEAVE_GRID_DEFAULT_DOT_MAX_DOTS_PER_AXIS = 125;
+export const WEAVE_GRID_DOT_TYPES = {
+  ['SQUARE']: 'square',
+  ['CIRCLE']: 'circle',
+} as const;
+
+export const WEAVE_GRID_DEFAULT_CONFIG: WeaveStageGridPluginConfig = {
+  type: WEAVE_GRID_TYPES.LINES,
+  gridColor: '#b3b3b3',
+  gridMajorColor: '#b3b3b3',
+  gridOriginColor: '#ff746c',
+  gridSize: 20,
+  gridMajorEvery: 10,
+  gridMajorRatio: 2,
+  gridStroke: 1,
+  gridDotType: WEAVE_GRID_DOT_TYPES.CIRCLE,
+  gridDotRadius: 1,
+  gridDotRectSize: 2,
+};
 
 export const WEAVE_GRID_LAYER_ID = 'gridLayer';
