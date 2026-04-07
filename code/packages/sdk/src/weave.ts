@@ -1140,6 +1140,17 @@ export class Weave {
     );
   }
 
+  public async exportAreaServerSide(
+    area: { x: number; y: number; width: number; height: number },
+    options: WeaveExportNodesOptions
+  ): Promise<{
+    composites: { input: Buffer; left: number; top: number }[];
+    width: number;
+    height: number;
+  }> {
+    return await this.exportManager.exportAreaServerSide(area, options);
+  }
+
   public async exportNodes(
     nodes: WeaveElementInstance[],
     boundingNodes: (nodes: Konva.Node[]) => Konva.Node[],
@@ -1150,6 +1161,13 @@ export class Weave {
       boundingNodes,
       options
     );
+  }
+
+  public async exportArea(
+    area: { x: number; y: number; width: number; height: number },
+    options: WeaveExportNodesOptions
+  ): Promise<HTMLImageElement> {
+    return await this.exportManager.exportAreaAsImage(area, options);
   }
 
   public getExportBoundingBox(nodesIds: string[]): {

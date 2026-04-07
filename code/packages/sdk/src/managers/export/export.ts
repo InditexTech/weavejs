@@ -68,6 +68,14 @@ export class WeaveExportManager {
         backgroundColor = WEAVE_EXPORT_BACKGROUND_COLOR,
       } = options;
 
+      const nodesSelectionPluginPrev =
+        this.getNodesSelectionPlugin()?.isEnabled();
+      const nodesDistanceSnappingPluginPrev =
+        this.getNodesDistanceSnappingPlugin()?.isEnabled();
+      const nodesEdgeSnappingPluginPrev =
+        this.getNodesDistanceSnappingPlugin()?.isEnabled();
+      const nodesStageGridPluginPrev = this.getStageGridPlugin()?.isEnabled();
+
       this.getNodesSelectionPlugin()?.disable();
       this.getNodesDistanceSnappingPlugin()?.disable();
       this.getNodesEdgeSnappingPlugin()?.disable();
@@ -144,15 +152,110 @@ export class WeaveExportManager {
             stage.scale(originalScale);
             stage.batchDraw();
 
-            this.getNodesSelectionPlugin()?.enable();
-            this.getNodesDistanceSnappingPlugin()?.enable();
-            this.getNodesEdgeSnappingPlugin()?.enable();
-            this.getStageGridPlugin()?.enable();
+            if (nodesSelectionPluginPrev) {
+              this.getNodesSelectionPlugin()?.enable();
+            }
+            if (nodesDistanceSnappingPluginPrev) {
+              this.getNodesDistanceSnappingPlugin()?.enable();
+            }
+            if (nodesEdgeSnappingPluginPrev) {
+              this.getNodesEdgeSnappingPlugin()?.enable();
+            }
+            if (nodesStageGridPluginPrev) {
+              this.getStageGridPlugin()?.enable();
+            }
 
             resolve(img);
           },
         });
       }
+    });
+  }
+
+  exportAreaAsImage(
+    area: { x: number; y: number; width: number; height: number },
+    options: WeaveExportNodesOptions
+  ): Promise<HTMLImageElement> {
+    return new Promise((resolve) => {
+      const {
+        format = WEAVE_EXPORT_FORMATS.PNG,
+        padding = 0,
+        pixelRatio = 1,
+        backgroundColor = WEAVE_EXPORT_BACKGROUND_COLOR,
+      } = options;
+
+      const nodesSelectionPluginPrev =
+        this.getNodesSelectionPlugin()?.isEnabled();
+      const nodesDistanceSnappingPluginPrev =
+        this.getNodesDistanceSnappingPlugin()?.isEnabled();
+      const nodesEdgeSnappingPluginPrev =
+        this.getNodesDistanceSnappingPlugin()?.isEnabled();
+      const nodesStageGridPluginPrev = this.getStageGridPlugin()?.isEnabled();
+
+      this.getNodesSelectionPlugin()?.disable();
+      this.getNodesDistanceSnappingPlugin()?.disable();
+      this.getNodesEdgeSnappingPlugin()?.disable();
+      this.getStageGridPlugin()?.disable();
+
+      const stage = this.instance.getStage();
+      const mainLayer = this.instance.getMainLayer();
+
+      if (!mainLayer) {
+        throw new Error('Main layer not found');
+      }
+
+      const originalPosition = { x: stage.x(), y: stage.y() };
+      const originalScale = { x: stage.scaleX(), y: stage.scaleY() };
+
+      stage.scale({ x: 1, y: 1 });
+      stage.position({ x: 0, y: 0 });
+
+      const bounds = area;
+
+      const background = new Konva.Rect({
+        x: bounds.x - padding,
+        y: bounds.y - padding,
+        width: bounds.width + 2 * padding,
+        height: bounds.height + 2 * padding,
+        strokeWidth: 0,
+        fill: backgroundColor,
+      });
+
+      mainLayer.add(background);
+      background.moveToBottom();
+      stage.batchDraw();
+
+      stage.toImage({
+        x: area.x,
+        y: area.y,
+        width: area.width,
+        height: area.height,
+        mimeType: format,
+        pixelRatio,
+        quality: options.quality ?? 1,
+        callback: (img) => {
+          background.destroy();
+
+          stage.position(originalPosition);
+          stage.scale(originalScale);
+          stage.batchDraw();
+
+          if (nodesSelectionPluginPrev) {
+            this.getNodesSelectionPlugin()?.enable();
+          }
+          if (nodesDistanceSnappingPluginPrev) {
+            this.getNodesDistanceSnappingPlugin()?.enable();
+          }
+          if (nodesEdgeSnappingPluginPrev) {
+            this.getNodesEdgeSnappingPlugin()?.enable();
+          }
+          if (nodesStageGridPluginPrev) {
+            this.getStageGridPlugin()?.enable();
+          }
+
+          resolve(img);
+        },
+      });
     });
   }
 
@@ -293,6 +396,132 @@ export class WeaveExportManager {
     }
 
     exportGroup.destroy();
+
+    stage.position(originalPosition);
+    stage.scale(originalScale);
+    stage.batchDraw();
+
+    this.getNodesSelectionPlugin()?.enable();
+    this.getNodesDistanceSnappingPlugin()?.enable();
+    this.getNodesEdgeSnappingPlugin()?.enable();
+    this.getStageGridPlugin()?.enable();
+
+    return {
+      composites,
+      width: imageWidth * pixelRatio,
+      height: imageHeight * pixelRatio,
+    };
+  }
+
+  async exportAreaServerSide(
+    area: { x: number; y: number; width: number; height: number },
+    options: WeaveExportNodesOptions
+  ): Promise<{
+    composites: { input: Buffer; left: number; top: number }[];
+    width: number;
+    height: number;
+  }> {
+    const {
+      format = WEAVE_EXPORT_FORMATS.PNG,
+      padding = 0,
+      pixelRatio = 1,
+      backgroundColor = WEAVE_EXPORT_BACKGROUND_COLOR,
+    } = options;
+
+    this.getNodesSelectionPlugin()?.disable();
+    this.getNodesDistanceSnappingPlugin()?.disable();
+    this.getNodesEdgeSnappingPlugin()?.disable();
+    this.getStageGridPlugin()?.disable();
+
+    const stage = this.instance.getStage();
+    const mainLayer = this.instance.getMainLayer();
+
+    if (!mainLayer) {
+      throw new Error('Main layer not found');
+    }
+
+    const originalPosition = { x: stage.x(), y: stage.y() };
+    const originalScale = { x: stage.scaleX(), y: stage.scaleY() };
+
+    stage.scale({ x: 1, y: 1 });
+
+    const bounds = area;
+
+    const scaleX = stage.scaleX();
+    const scaleY = stage.scaleY();
+
+    const unscaledBounds = {
+      x: bounds.x / scaleX,
+      y: bounds.y / scaleY,
+      width: bounds.width / scaleX,
+      height: bounds.height / scaleY,
+    };
+
+    const background = new Konva.Rect({
+      x: unscaledBounds.x - padding,
+      y: unscaledBounds.y - padding,
+      width: unscaledBounds.width + 2 * padding,
+      height: unscaledBounds.height + 2 * padding,
+      strokeWidth: 0,
+      fill: backgroundColor,
+    });
+
+    mainLayer.add(background);
+    background.moveToBottom();
+
+    const backgroundRect = background.getClientRect({ relativeTo: stage });
+
+    const composites: { input: Buffer; left: number; top: number }[] = [];
+
+    const imageWidth = Math.round(backgroundRect.width);
+    const imageHeight = Math.round(backgroundRect.height);
+
+    const maxRenderSize = 1920; // safe max for Cairo
+    const cols = Math.ceil(imageWidth / maxRenderSize);
+    const rows = Math.ceil(imageHeight / maxRenderSize);
+
+    const tileWidth = Math.floor(imageWidth / cols);
+    const tileHeight = Math.floor(imageHeight / rows);
+
+    for (let y = 0; y < imageHeight; y += tileHeight) {
+      for (let x = 0; x < imageWidth; x += tileWidth) {
+        const width = Math.min(tileWidth, imageWidth - x);
+        const height = Math.min(tileHeight, imageHeight - y);
+
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const canvas: any = await mainLayer.toCanvas({
+          x: Math.round(backgroundRect.x) + x,
+          y: Math.round(backgroundRect.y) + y,
+          width: width,
+          height: height,
+          mimeType: format,
+          pixelRatio,
+          quality: options.quality ?? 1,
+        });
+
+        let buffer: Buffer | null = null;
+        if (
+          globalThis._weave_serverSideBackend === WEAVE_KONVA_BACKEND.CANVAS
+        ) {
+          buffer = canvas.toBuffer();
+        }
+        if (globalThis._weave_serverSideBackend === WEAVE_KONVA_BACKEND.SKIA) {
+          buffer = await canvas.toBuffer();
+        }
+
+        if (!buffer) {
+          throw new Error('Failed to generate image buffer');
+        }
+
+        composites.push({
+          top: y * pixelRatio,
+          left: x * pixelRatio,
+          input: buffer,
+        });
+      }
+    }
+
+    background.destroy();
 
     stage.position(originalPosition);
     stage.scale(originalScale);
