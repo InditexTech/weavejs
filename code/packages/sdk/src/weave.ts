@@ -1238,6 +1238,13 @@ export class Weave {
     );
   }
 
+  public async exportArea(
+    area: { x: number; y: number; width: number; height: number },
+    options: WeaveExportNodesOptions
+  ): Promise<HTMLImageElement> {
+    return await this.exportManager.exportAreaAsImage(area, options);
+  }
+
   public getExportBoundingBox(nodesIds: string[]): {
     x: number;
     y: number;

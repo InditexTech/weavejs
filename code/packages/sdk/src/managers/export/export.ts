@@ -68,6 +68,14 @@ export class WeaveExportManager {
         backgroundColor = WEAVE_EXPORT_BACKGROUND_COLOR,
       } = options;
 
+      const nodesSelectionPluginPrev =
+        this.getNodesSelectionPlugin()?.isEnabled();
+      const nodesDistanceSnappingPluginPrev =
+        this.getNodesDistanceSnappingPlugin()?.isEnabled();
+      const nodesEdgeSnappingPluginPrev =
+        this.getNodesDistanceSnappingPlugin()?.isEnabled();
+      const nodesStageGridPluginPrev = this.getStageGridPlugin()?.isEnabled();
+
       this.getNodesSelectionPlugin()?.disable();
       this.getNodesDistanceSnappingPlugin()?.disable();
       this.getNodesEdgeSnappingPlugin()?.disable();
@@ -144,15 +152,110 @@ export class WeaveExportManager {
             stage.scale(originalScale);
             stage.batchDraw();
 
-            this.getNodesSelectionPlugin()?.enable();
-            this.getNodesDistanceSnappingPlugin()?.enable();
-            this.getNodesEdgeSnappingPlugin()?.enable();
-            this.getStageGridPlugin()?.enable();
+            if (nodesSelectionPluginPrev) {
+              this.getNodesSelectionPlugin()?.enable();
+            }
+            if (nodesDistanceSnappingPluginPrev) {
+              this.getNodesDistanceSnappingPlugin()?.enable();
+            }
+            if (nodesEdgeSnappingPluginPrev) {
+              this.getNodesEdgeSnappingPlugin()?.enable();
+            }
+            if (nodesStageGridPluginPrev) {
+              this.getStageGridPlugin()?.enable();
+            }
 
             resolve(img);
           },
         });
       }
+    });
+  }
+
+  exportAreaAsImage(
+    area: { x: number; y: number; width: number; height: number },
+    options: WeaveExportNodesOptions
+  ): Promise<HTMLImageElement> {
+    return new Promise((resolve) => {
+      const {
+        format = WEAVE_EXPORT_FORMATS.PNG,
+        padding = 0,
+        pixelRatio = 1,
+        backgroundColor = WEAVE_EXPORT_BACKGROUND_COLOR,
+      } = options;
+
+      const nodesSelectionPluginPrev =
+        this.getNodesSelectionPlugin()?.isEnabled();
+      const nodesDistanceSnappingPluginPrev =
+        this.getNodesDistanceSnappingPlugin()?.isEnabled();
+      const nodesEdgeSnappingPluginPrev =
+        this.getNodesDistanceSnappingPlugin()?.isEnabled();
+      const nodesStageGridPluginPrev = this.getStageGridPlugin()?.isEnabled();
+
+      this.getNodesSelectionPlugin()?.disable();
+      this.getNodesDistanceSnappingPlugin()?.disable();
+      this.getNodesEdgeSnappingPlugin()?.disable();
+      this.getStageGridPlugin()?.disable();
+
+      const stage = this.instance.getStage();
+      const mainLayer = this.instance.getMainLayer();
+
+      if (!mainLayer) {
+        throw new Error('Main layer not found');
+      }
+
+      const originalPosition = { x: stage.x(), y: stage.y() };
+      const originalScale = { x: stage.scaleX(), y: stage.scaleY() };
+
+      stage.scale({ x: 1, y: 1 });
+      stage.position({ x: 0, y: 0 });
+
+      const bounds = area;
+
+      const background = new Konva.Rect({
+        x: bounds.x - padding,
+        y: bounds.y - padding,
+        width: bounds.width + 2 * padding,
+        height: bounds.height + 2 * padding,
+        strokeWidth: 0,
+        fill: backgroundColor,
+      });
+
+      mainLayer.add(background);
+      background.moveToBottom();
+      stage.batchDraw();
+
+      stage.toImage({
+        x: area.x,
+        y: area.y,
+        width: area.width,
+        height: area.height,
+        mimeType: format,
+        pixelRatio,
+        quality: options.quality ?? 1,
+        callback: (img) => {
+          background.destroy();
+
+          stage.position(originalPosition);
+          stage.scale(originalScale);
+          stage.batchDraw();
+
+          if (nodesSelectionPluginPrev) {
+            this.getNodesSelectionPlugin()?.enable();
+          }
+          if (nodesDistanceSnappingPluginPrev) {
+            this.getNodesDistanceSnappingPlugin()?.enable();
+          }
+          if (nodesEdgeSnappingPluginPrev) {
+            this.getNodesEdgeSnappingPlugin()?.enable();
+          }
+          if (nodesStageGridPluginPrev) {
+            this.getStageGridPlugin()?.enable();
+          }
+
+          resolve(img);
+        },
+      });
     });
   }
 
