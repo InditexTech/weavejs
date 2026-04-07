@@ -17,6 +17,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - [#993](https://github.com/InditexTech/weavejs/issues/993) Add Pages Support to enable multi-page canvas documents
 
+## [3.6.0] - 2026-04-07
+
+### Added
+
+- [#1011](https://github.com/InditexTech/weavejs/issues/1011) Support to export an area of the canvas
+
 ## [3.5.0] - 2026-04-06
 
 ### Changed
@@ -1724,7 +1730,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - [#24](https://github.com/InditexTech/weavejs/issues/24) Bug when loading rooms with text or images
 - [#18](https://github.com/InditexTech/weavejs/issues/18) Fix awareness not working on store-azure-web-pubsub
 
-[Unreleased]: https://github.com/InditexTech/weavejs/compare/3.5.0...HEAD
+[Unreleased]: https://github.com/InditexTech/weavejs/compare/3.6.0...HEAD
+[3.6.0]: https://github.com/InditexTech/weavejs/compare/3.5.0...3.6.0
 [3.5.0]: https://github.com/InditexTech/weavejs/compare/3.4.0...3.5.0
 [3.4.0]: https://github.com/InditexTech/weavejs/compare/3.3.1...3.4.0
 [3.3.1]: https://github.com/InditexTech/weavejs/compare/3.3.0...3.3.1

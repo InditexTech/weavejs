@@ -46,7 +46,7 @@ jobs:
     steps:
       - name: Validate admin permissions
         id: permission-check
-        uses: actions/github-script@v7
+        uses: actions/github-script@f28e40c7f34bde8b3046d885e986cb6290c5673b # v7
         with:
           script: |
             const { data } = await github.rest.repos.getCollaboratorPermissionLevel({
@@ -71,23 +71,23 @@ jobs:
           echo "RELEASE_LABELS=$RELEASE_LABELS" >> "$GITHUB_ENV"
 
       - name: Checkout PR branch
-        uses: actions/checkout@v4
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
         with:
           ref: refs/pull/${{ github.event.issue.number }}/head
           fetch-depth: 0
           persist-credentials: false
 
       - name: NPM / Setup Dependencies Cache
-        uses: actions/cache@v4
+        uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4
         with:
           path: ~/.npm
           key: ${{ runner.os }}-node-${{ hashFiles('code/package-lock.json') }}
           restore-keys: |
             ${{ runner.os }}-node-
 
-      - name: Setup asdf Cache
+      - name: Restore asdf Cache
         id: asdf-cache
-        uses: actions/cache@v4
+        uses: actions/cache/restore@0057852bfaa89a56745cba8c7296529d2fc39830 # v4
         continue-on-error: true
         with:
           path: ~/.asdf
@@ -108,20 +108,19 @@ jobs:
           tool_versions: ${{ env.TOOL_VERSIONS }}
           asdf_version: ${{ env.ASDF_BRANCH_VERSION }}
 
-      - name: NPM / Ensure minimum npm version for trusted publishing
+      - name: Save asdf Cache
+        if: steps.asdf-cache.outputs.cache-hit != 'true'
+        uses: actions/cache/save@0057852bfaa89a56745cba8c7296529d2fc39830 # v4
+        with:
+          path: ~/.asdf
+          key: ${{ runner.os }}-asdf-${{ env.ASDF_BRANCH_VERSION }}-${{ hashFiles('code/.tool-versions') }}
+
+      - name: Restore asdf shims to PATH
+        if: steps.asdf-cache.outputs.cache-hit == 'true'
         run: |
-          CURRENT_NPM=$(npm --version)
-          REQUIRED_NPM="11.5.1"
-          if printf '%s\n%s\n' "$REQUIRED_NPM" "$CURRENT_NPM" | sort -V -C; then
-            echo "npm $CURRENT_NPM already meets the minimum requirement ($REQUIRED_NPM). Skipping upgrade."
-          else
-            echo "npm $CURRENT_NPM is below the minimum requirement ($REQUIRED_NPM). Upgrading…"
-            sudo npm install -g npm@^11.5.1 --registry="https://registry.npmjs.org/"
-          fi
-          echo "node path: $(command -v node)"
-          echo "npm path: $(command -v npm)"
-          node --version
-          npm --version
+          echo "$HOME/.asdf/bin" >> "$GITHUB_PATH"
+          echo "$HOME/.asdf/shims" >> "$GITHUB_PATH"
+          cp code/.tool-versions "$HOME/.tool-versions"
 
       - name: NPM / Set npmrc registry
         env:
@@ -180,27 +179,128 @@ jobs:
           npm run version:release
           npm run release:prepare
 
-      - name: NPM / Publish Snapshot - Distribution Platform
+      - name: NPM / Ensure minimum npm version for trusted publishing
+        run: |
+          CURRENT_NPM=$(npm --version)
+          REQUIRED_NPM="11.5.1"
+          if printf '%s\n%s\n' "$REQUIRED_NPM" "$CURRENT_NPM" | sort -V -C; then
+            echo "npm $CURRENT_NPM already meets the minimum requirement ($REQUIRED_NPM). Skipping upgrade."
+          else
+            echo "npm $CURRENT_NPM is below the minimum requirement ($REQUIRED_NPM). Upgrading…"
+            npm install -g npm@^11.5.1 --registry="https://registry.npmjs.org/"
+            asdf reshim nodejs
+          fi
+          echo "node path: $(command -v node)"
+          echo "npm path: $(command -v npm)"
+          node --version
+          npm --version
+
+      - name: NPM / Verify packages exist in registry
+        id: verify-packages
+        working-directory: code
+        run: |
+          MISSING=()
+          for pkg_dir in packages/*/; do
+            PKG_NAME=$(node -p "require('./$pkg_dir/package.json').name")
+            ENCODED_PKG_NAME=$(node -p "encodeURIComponent(process.argv[1])" "$PKG_NAME")
+            RESPONSE_FILE=$(mktemp)
+            if ! HTTP_STATUS=$(curl -sS -o "$RESPONSE_FILE" -w "%{http_code}" \
+              --connect-timeout 10 \
+              --max-time 30 \
+              --retry 3 \
+              --retry-delay 2 \
+              --retry-all-errors \
+              "https://registry.npmjs.org/${ENCODED_PKG_NAME}"); then
+              echo "::error::Failed to verify $PKG_NAME due to npm registry connectivity error"
+              rm -f "$RESPONSE_FILE"
+              exit 1
+            fi
+            case "$HTTP_STATUS" in
+              200)
+                PARSE_STATUS=0
+                node -e "try { const d=JSON.parse(require('fs').readFileSync(process.argv[1],'utf8')); process.exit(Object.keys(d.versions||{}).length > 0 ? 0 : 1); } catch(e) { console.error('JSON parse error:', e.message); process.exit(2); }" "$RESPONSE_FILE" || PARSE_STATUS=$?
+                case "$PARSE_STATUS" in
+                  0)
+                    echo "✓ $PKG_NAME exists in registry with active versions"
+                    ;;
+                  1)
+                    echo "✗ $PKG_NAME has no active versions (unpublished) — treating as new"
+                    MISSING+=("$PKG_NAME")
+                    ;;
+                  *)
+                    echo "::error::Failed to verify $PKG_NAME — npm registry returned invalid JSON (HTTP 200)"
+                    rm -f "$RESPONSE_FILE"
+                    exit 1
+                    ;;
+                esac
+                ;;
+              404)
+                echo "✗ $PKG_NAME NOT found in registry"
+                MISSING+=("$PKG_NAME")
+                ;;
+              429|5??)
+                echo "::error::Failed to verify $PKG_NAME due to transient npm registry error (HTTP $HTTP_STATUS)"
+                exit 1
+                ;;
+              *)
+                echo "::error::Failed to verify $PKG_NAME due to unexpected npm registry response (HTTP $HTTP_STATUS)"
+                exit 1
+                ;;
+            esac
+            rm -f "$RESPONSE_FILE"
+          done
+          if [[ ${#MISSING[@]} -gt 0 ]]; then
+            echo "MISSING_PACKAGES=${MISSING[*]}" >> "$GITHUB_ENV"
+            echo "HAS_NEW_PACKAGES=true" >> "$GITHUB_ENV"
+            echo "::warning::New packages detected: ${MISSING[*]} — will use NPM_TOKEN instead of OIDC"
+          else
+            echo "HAS_NEW_PACKAGES=false" >> "$GITHUB_ENV"
+            echo "All packages verified in registry — OIDC publish is safe."
+          fi
+
+      - name: NPM / Publish Snapshot (OIDC + provenance)
+        if: env.HAS_NEW_PACKAGES == 'false'
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          NPM_CONFIG_PROVENANCE: "false"
+          NPM_CONFIG_PROVENANCE: "true"
         working-directory: code
         run: |
           npm run publish:snapshot
 
+      - name: NPM / Publish Snapshot (NPM_TOKEN for new packages)
+        if: env.HAS_NEW_PACKAGES == 'true'
+        env:
+          NPM_AUTH: ${{ secrets.NPM_TOKEN }}
+        working-directory: code
+        run: |
+          if [ -z "${NPM_AUTH:-}" ]; then
+            echo "::error::NPM_TOKEN secret is required for publishing new packages but is not set"
+            exit 1
+          fi
+          TEMP_NPMRC="$(mktemp)"
+          trap 'rm -f "$TEMP_NPMRC"' EXIT
+          cp ~/.npmrc "$TEMP_NPMRC"
+          chmod 600 "$TEMP_NPMRC"
+          echo "//registry.npmjs.org/:_authToken=${NPM_AUTH}" >> "$TEMP_NPMRC"
+          export NPM_CONFIG_USERCONFIG="$TEMP_NPMRC"
+          npm run publish:snapshot
+
       - name: Result / Comment on PR
         if: always()
-        uses: actions/github-script@v7
+        uses: actions/github-script@f28e40c7f34bde8b3046d885e986cb6290c5673b # v7
         with:
           script: |
             const status = '${{ job.status }}';
+            const authMethod = '${{ env.HAS_NEW_PACKAGES }}' === 'true'
+              ? 'NPM_TOKEN (new packages detected)'
+              : 'OIDC trusted publishing (provenance)';
 
             const body = status === 'success'
               ? [
                   "### :rocket: NPM snapshot published",
                   "",
                   `- Version: \`${process.env.SNAPSHOT_VERSION}\``,
-                  "- Tag: `next`"
+                  "- Tag: `next`",
+                  `- Auth: ${authMethod}`
                 ]
               : [
                   "### :x: NPM snapshot publication failed",
@@ -234,7 +334,7 @@ jobs:
     steps:
       - name: Validate admin permissions
         id: permission-check
-        uses: actions/github-script@v7
+        uses: actions/github-script@f28e40c7f34bde8b3046d885e986cb6290c5673b # v7
         with:
           script: |
             const { data } = await github.rest.repos.getCollaboratorPermissionLevel({
@@ -265,23 +365,23 @@ jobs:
           echo "BASELINE_BRANCH=${BASELINE_BRANCH#refs/heads/}" >> "$GITHUB_ENV"
 
       - name: Checkout merge commit
-        uses: actions/checkout@v4
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
         with:
           ref: ${{ env.BASELINE_BRANCH }}
           fetch-depth: 0
           persist-credentials: false
 
       - name: NPM / Setup Dependencies Cache
-        uses: actions/cache@v4
+        uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4
         with:
           path: ~/.npm
           key: ${{ runner.os }}-node-${{ hashFiles('code/package-lock.json') }}
           restore-keys: |
             ${{ runner.os }}-node-
 
-      - name: Setup asdf Cache
+      - name: Restore asdf Cache
         id: asdf-cache
-        uses: actions/cache@v4
+        uses: actions/cache/restore@0057852bfaa89a56745cba8c7296529d2fc39830 # v4
         continue-on-error: true
         with:
           path: ~/.asdf
@@ -302,20 +402,19 @@ jobs:
           tool_versions: ${{ env.TOOL_VERSIONS }}
           asdf_version: ${{ env.ASDF_BRANCH_VERSION }}
 
-      - name: NPM / Ensure minimum npm version for trusted publishing
+      - name: Save asdf Cache
+        if: steps.asdf-cache.outputs.cache-hit != 'true'
+        uses: actions/cache/save@0057852bfaa89a56745cba8c7296529d2fc39830 # v4
+        with:
+          path: ~/.asdf
+          key: ${{ runner.os }}-asdf-${{ env.ASDF_BRANCH_VERSION }}-${{ hashFiles('code/.tool-versions') }}
+
+      - name: Restore asdf shims to PATH
+        if: steps.asdf-cache.outputs.cache-hit == 'true'
         run: |
-          CURRENT_NPM=$(npm --version)
-          REQUIRED_NPM="11.5.1"
-          if printf '%s\n%s\n' "$REQUIRED_NPM" "$CURRENT_NPM" | sort -V -C; then
-            echo "npm $CURRENT_NPM already meets the minimum requirement ($REQUIRED_NPM). Skipping upgrade."
-          else
-            echo "npm $CURRENT_NPM is below the minimum requirement ($REQUIRED_NPM). Upgrading…"
-            sudo npm install -g npm@^11.5.1 --registry="https://registry.npmjs.org/"
-          fi
-          echo "node path: $(command -v node)"
-          echo "npm path: $(command -v npm)"
-          node --version
-          npm --version
+          echo "$HOME/.asdf/bin" >> "$GITHUB_PATH"
+          echo "$HOME/.asdf/shims" >> "$GITHUB_PATH"
+          cp code/.tool-versions "$HOME/.tool-versions"
 
       - name: NPM / Set npmrc registry
         env:
@@ -395,12 +494,110 @@ jobs:
           npm run version:release
           npm run release:prepare
 
-      - name: NPM / Release Perform - Distribution Platform
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          NPM_CONFIG_PROVENANCE: "false"
+      - name: NPM / Ensure minimum npm version for trusted publishing
+        run: |
+          CURRENT_NPM=$(npm --version)
+          REQUIRED_NPM="11.5.1"
+          if printf '%s\n%s\n' "$REQUIRED_NPM" "$CURRENT_NPM" | sort -V -C; then
+            echo "npm $CURRENT_NPM already meets the minimum requirement ($REQUIRED_NPM). Skipping upgrade."
+          else
+            echo "npm $CURRENT_NPM is below the minimum requirement ($REQUIRED_NPM). Upgrading…"
+            npm install -g npm@^11.5.1 --registry="https://registry.npmjs.org/"
+            asdf reshim nodejs
+          fi
+          echo "node path: $(command -v node)"
+          echo "npm path: $(command -v npm)"
+          node --version
+          npm --version
+
+      - name: NPM / Verify packages exist in registry
+        id: verify-packages
         working-directory: code
         run: |
+          MISSING=()
+          for pkg_dir in packages/*/; do
+            PKG_NAME=$(node -p "require('./$pkg_dir/package.json').name")
+            ENCODED_PKG_NAME=$(node -p "encodeURIComponent(process.argv[1])" "$PKG_NAME")
+            RESPONSE_FILE=$(mktemp)
+            if ! HTTP_STATUS=$(curl -sS -o "$RESPONSE_FILE" -w "%{http_code}" \
+              --connect-timeout 10 \
+              --max-time 30 \
+              --retry 3 \
+              --retry-delay 2 \
+              --retry-all-errors \
+              "https://registry.npmjs.org/${ENCODED_PKG_NAME}"); then
+              echo "::error::Failed to verify $PKG_NAME due to npm registry connectivity error"
+              rm -f "$RESPONSE_FILE"
+              exit 1
+            fi
+            case "$HTTP_STATUS" in
+              200)
+                PARSE_STATUS=0
+                node -e "try { const d=JSON.parse(require('fs').readFileSync(process.argv[1],'utf8')); process.exit(Object.keys(d.versions||{}).length > 0 ? 0 : 1); } catch(e) { console.error('JSON parse error:', e.message); process.exit(2); }" "$RESPONSE_FILE" || PARSE_STATUS=$?
+                case "$PARSE_STATUS" in
+                  0)
+                    echo "✓ $PKG_NAME exists in registry with active versions"
+                    ;;
+                  1)
+                    echo "✗ $PKG_NAME has no active versions (unpublished) — treating as new"
+                    MISSING+=("$PKG_NAME")
+                    ;;
+                  *)
+                    echo "::error::Failed to verify $PKG_NAME — npm registry returned invalid JSON (HTTP 200)"
+                    rm -f "$RESPONSE_FILE"
+                    exit 1
+                    ;;
+                esac
+                ;;
+              404)
+                echo "✗ $PKG_NAME NOT found in registry"
+                MISSING+=("$PKG_NAME")
+                ;;
+              429|5??)
+                echo "::error::Failed to verify $PKG_NAME due to transient npm registry error (HTTP $HTTP_STATUS)"
+                exit 1
+                ;;
+              *)
+                echo "::error::Failed to verify $PKG_NAME due to unexpected npm registry response (HTTP $HTTP_STATUS)"
+                exit 1
+                ;;
+            esac
+            rm -f "$RESPONSE_FILE"
+          done
+          if [[ ${#MISSING[@]} -gt 0 ]]; then
+            echo "MISSING_PACKAGES=${MISSING[*]}" >> "$GITHUB_ENV"
+            echo "HAS_NEW_PACKAGES=true" >> "$GITHUB_ENV"
+            echo "::warning::New packages detected: ${MISSING[*]} — will use NPM_TOKEN instead of OIDC"
+          else
+            echo "HAS_NEW_PACKAGES=false" >> "$GITHUB_ENV"
+            echo "All packages verified in registry — OIDC publish is safe."
+          fi
+
+      - name: NPM / Release Perform (OIDC + provenance)
+        if: env.HAS_NEW_PACKAGES == 'false'
+        env:
+          NPM_CONFIG_PROVENANCE: "true"
+        working-directory: code
+        run: |
+          set -o pipefail
+          npm run release:perform 2>&1 | tee /tmp/release-perform.log
+
+      - name: NPM / Release Perform (NPM_TOKEN for new packages)
+        if: env.HAS_NEW_PACKAGES == 'true'
+        env:
+          NPM_AUTH: ${{ secrets.NPM_TOKEN }}
+        working-directory: code
+        run: |
+          if [ -z "${NPM_AUTH:-}" ]; then
+            echo "::error::NPM_TOKEN secret is required for publishing new packages but is not set"
+            exit 1
+          fi
+          TEMP_NPMRC="$(mktemp)"
+          trap 'rm -f "$TEMP_NPMRC"' EXIT
+          cp ~/.npmrc "$TEMP_NPMRC"
+          chmod 600 "$TEMP_NPMRC"
+          echo "//registry.npmjs.org/:_authToken=${NPM_AUTH}" >> "$TEMP_NPMRC"
+          export NPM_CONFIG_USERCONFIG="$TEMP_NPMRC"
           set -o pipefail
           npm run release:perform 2>&1 | tee /tmp/release-perform.log
 
@@ -448,7 +645,7 @@ jobs:
           fi
 
       - name: GitHub Release / Create
-        uses: ncipollo/release-action@2c591bcc8ecdcd2db72b97d6147f871fcd833ba5
+        uses: ncipollo/release-action@2c591bcc8ecdcd2db72b97d6147f871fcd833ba5 # v1.14.0
         id: github-release
         continue-on-error: true
         with:
