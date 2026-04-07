@@ -68,6 +68,14 @@ export class WeaveExportManager {
         backgroundColor = WEAVE_EXPORT_BACKGROUND_COLOR,
       } = options;
 
+      const nodesSelectionPluginPrev =
+        this.getNodesSelectionPlugin()?.isEnabled();
+      const nodesDistanceSnappingPluginPrev =
+        this.getNodesDistanceSnappingPlugin()?.isEnabled();
+      const nodesEdgeSnappingPluginPrev =
+        this.getNodesDistanceSnappingPlugin()?.isEnabled();
+      const nodesStageGridPluginPrev = this.getStageGridPlugin()?.isEnabled();
+
       this.getNodesSelectionPlugin()?.disable();
       this.getNodesDistanceSnappingPlugin()?.disable();
       this.getNodesEdgeSnappingPlugin()?.disable();
@@ -144,10 +152,18 @@ export class WeaveExportManager {
             stage.scale(originalScale);
             stage.batchDraw();
 
-            this.getNodesSelectionPlugin()?.enable();
-            this.getNodesDistanceSnappingPlugin()?.enable();
-            this.getNodesEdgeSnappingPlugin()?.enable();
-            this.getStageGridPlugin()?.enable();
+            if (nodesSelectionPluginPrev) {
+              this.getNodesSelectionPlugin()?.enable();
+            }
+            if (nodesDistanceSnappingPluginPrev) {
+              this.getNodesDistanceSnappingPlugin()?.enable();
+            }
+            if (nodesEdgeSnappingPluginPrev) {
+              this.getNodesEdgeSnappingPlugin()?.enable();
+            }
+            if (nodesStageGridPluginPrev) {
+              this.getStageGridPlugin()?.enable();
+            }
 
             resolve(img);
           },
@@ -168,6 +184,14 @@ export class WeaveExportManager {
         backgroundColor = WEAVE_EXPORT_BACKGROUND_COLOR,
       } = options;
 
+      const nodesSelectionPluginPrev =
+        this.getNodesSelectionPlugin()?.isEnabled();
+      const nodesDistanceSnappingPluginPrev =
+        this.getNodesDistanceSnappingPlugin()?.isEnabled();
+      const nodesEdgeSnappingPluginPrev =
+        this.getNodesDistanceSnappingPlugin()?.isEnabled();
+      const nodesStageGridPluginPrev = this.getStageGridPlugin()?.isEnabled();
+
       this.getNodesSelectionPlugin()?.disable();
       this.getNodesDistanceSnappingPlugin()?.disable();
       this.getNodesEdgeSnappingPlugin()?.disable();
@@ -184,38 +208,28 @@ export class WeaveExportManager {
       const originalScale = { x: stage.scaleX(), y: stage.scaleY() };
 
       stage.scale({ x: 1, y: 1 });
+      stage.position({ x: 0, y: 0 });
 
       const bounds = area;
 
-      const scaleX = stage.scaleX();
-      const scaleY = stage.scaleY();
-
-      const unscaledBounds = {
-        x: bounds.x / scaleX,
-        y: bounds.y / scaleY,
-        width: bounds.width / scaleX,
-        height: bounds.height / scaleY,
-      };
-
       const background = new Konva.Rect({
-        x: unscaledBounds.x - padding,
-        y: unscaledBounds.y - padding,
-        width: unscaledBounds.width + 2 * padding,
-        height: unscaledBounds.height + 2 * padding,
+        x: bounds.x - padding,
+        y: bounds.y - padding,
+        width: bounds.width + 2 * padding,
+        height: bounds.height + 2 * padding,
         strokeWidth: 0,
         fill: backgroundColor,
       });
 
       mainLayer.add(background);
       background.moveToBottom();
+      stage.batchDraw();
 
-      const backgroundRect = background.getClientRect({ relativeTo: stage });
-
-      mainLayer.toImage({
-        x: Math.round(backgroundRect.x),
-        y: Math.round(backgroundRect.y),
-        width: Math.round(backgroundRect.width),
-        height: Math.round(backgroundRect.height),
+      stage.toImage({
+        x: area.x,
+        y: area.y,
+        width: area.width,
+        height: area.height,
         mimeType: format,
         pixelRatio,
         quality: options.quality ?? 1,
@@ -226,10 +240,18 @@ export class WeaveExportManager {
           stage.scale(originalScale);
           stage.batchDraw();
 
-          this.getNodesSelectionPlugin()?.enable();
-          this.getNodesDistanceSnappingPlugin()?.enable();
-          this.getNodesEdgeSnappingPlugin()?.enable();
-          this.getStageGridPlugin()?.enable();
+          if (nodesSelectionPluginPrev) {
+            this.getNodesSelectionPlugin()?.enable();
+          }
+          if (nodesDistanceSnappingPluginPrev) {
+            this.getNodesDistanceSnappingPlugin()?.enable();
+          }
+          if (nodesEdgeSnappingPluginPrev) {
+            this.getNodesEdgeSnappingPlugin()?.enable();
+          }
+          if (nodesStageGridPluginPrev) {
+            this.getStageGridPlugin()?.enable();
+          }
 
           resolve(img);
         },
