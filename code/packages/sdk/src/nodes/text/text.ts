@@ -63,6 +63,14 @@ export class WeaveTextNode extends WeaveNode {
   private initEvents() {
     if (!this.eventsInitialized && !globalThis._weave_isServerSide) {
       window.addEventListener(
+        'blur',
+        () => {
+          this.isCtrlMetaPressed = false;
+        },
+        { signal: this.instance.getEventsController()?.signal }
+      );
+
+      window.addEventListener(
         'keydown',
         (e) => {
           if (e.ctrlKey || e.metaKey) {

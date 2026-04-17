@@ -14,7 +14,6 @@ import * as awarenessProtocol from 'y-protocols/awareness';
 import {
   MessageDataType,
   MessageType,
-  // type WeaveStoreAzureWebPubSubSyncClientOptions,
   type FetchClient,
   type Message,
   type MessageHandler,

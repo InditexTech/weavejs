@@ -1082,6 +1082,15 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
 
     const stage = this.instance.getStage();
 
+    window.addEventListener(
+      'blur',
+      () => {
+        this.isCtrlMetaPressed = false;
+        this.isSpaceKeyPressed = false;
+      },
+      { signal: this.instance.getEventsController()?.signal }
+    );
+
     stage.container().addEventListener(
       'keydown',
       (e) => {
