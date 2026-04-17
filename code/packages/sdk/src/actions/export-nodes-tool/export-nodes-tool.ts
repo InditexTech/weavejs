@@ -7,6 +7,7 @@ import {
   type WeaveElementInstance,
   WEAVE_EXPORT_BACKGROUND_COLOR,
   WEAVE_EXPORT_FORMATS,
+  WEAVE_EXPORT_RETURN_FORMAT,
 } from '@inditextech/weave-types';
 import { type WeaveExportNodesActionParams } from './types';
 import { WeaveAction } from '../action';
@@ -44,10 +45,11 @@ export class WeaveExportNodesToolAction extends WeaveAction {
     const img = await this.instance.exportNodes(
       nodes,
       boundingNodes ?? ((nodes) => nodes),
-      this.options
+      this.options,
+      WEAVE_EXPORT_RETURN_FORMAT.IMAGE
     );
 
-    return img;
+    return img as HTMLImageElement;
   }
 
   async trigger(

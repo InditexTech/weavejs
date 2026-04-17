@@ -6,6 +6,7 @@ import {
   type WeaveExportNodesOptions,
   WEAVE_EXPORT_BACKGROUND_COLOR,
   WEAVE_EXPORT_FORMATS,
+  WEAVE_EXPORT_RETURN_FORMAT,
 } from '@inditextech/weave-types';
 import { WeaveAction } from '../action';
 import { EXPORT_STAGE_TOOL_ACTION_NAME } from './constants';
@@ -43,10 +44,11 @@ export class WeaveExportStageToolAction extends WeaveAction {
     const img = await this.instance.exportNodes(
       mainLayer?.getChildren() ?? [],
       boundingNodes,
-      this.options
+      this.options,
+      WEAVE_EXPORT_RETURN_FORMAT.IMAGE
     );
 
-    return img;
+    return img as HTMLImageElement;
   }
 
   async trigger(
