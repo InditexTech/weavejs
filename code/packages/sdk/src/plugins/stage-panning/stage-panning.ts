@@ -109,6 +109,14 @@ export class WeaveStagePanningPlugin extends WeavePlugin {
     const stage = this.instance.getStage();
 
     window.addEventListener(
+      'blur',
+      () => {
+        this.isCtrlOrMetaPressed = false;
+      },
+      { signal: this.instance.getEventsController()?.signal }
+    );
+
+    window.addEventListener(
       'keydown',
       (e) => {
         if (e.ctrlKey || e.metaKey) {

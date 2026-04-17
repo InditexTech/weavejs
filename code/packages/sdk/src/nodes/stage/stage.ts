@@ -181,6 +181,14 @@ export class WeaveStageNode extends WeaveNode {
     }
 
     window.addEventListener(
+      'blur',
+      () => {
+        this.isCmdCtrlPressed = false;
+      },
+      { signal: this.instance.getEventsController()?.signal }
+    );
+
+    window.addEventListener(
       'keydown',
       (e) => {
         if (this.isOnlyCtrlOrMeta(e)) {
