@@ -181,21 +181,16 @@ export class WeaveFrameNode extends WeaveNode {
       width: props.frameWidth - borderWidth * 2,
       height: props.frameHeight - borderWidth * 2,
       strokeScaleEnabled: true,
-      clipFunc: (ctx) => {
-        const width =
-          (frameInternal.width() + borderWidth) * frameInternal.scaleX();
-        const height =
-          (frameInternal.height() + borderWidth) * frameInternal.scaleY();
-        ctx.rect(
-          -(borderWidth / 2) * frameInternal.scaleX(),
-          -(borderWidth / 2) * frameInternal.scaleY(),
-          width,
-          height
-        );
-      },
       listening: true,
       draggable: false,
       isTargetable: false,
+    });
+
+    frameInternal.clip({
+      x: -(borderWidth / 2) * frameInternal.scaleX(),
+      y: -(borderWidth / 2) * frameInternal.scaleX(),
+      width: (frameInternal.width() + borderWidth) * frameInternal.scaleX(),
+      height: (frameInternal.height() + borderWidth) * frameInternal.scaleY(),
     });
 
     frame.add(frameInternal);
@@ -312,6 +307,13 @@ export class WeaveFrameNode extends WeaveNode {
     frame.getNodeAnchors = function () {
       return [];
     };
+
+    frame.clip({
+      x: 0,
+      y: text.y(),
+      width: frame.width(),
+      height: frame.height() + text.height(),
+    });
 
     return frame;
   }

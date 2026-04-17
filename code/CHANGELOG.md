@@ -17,6 +17,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - [#993](https://github.com/InditexTech/weavejs/issues/993) Add Pages Support to enable multi-page canvas documents
 
+### Fixed
+
+- [1015](https://github.com/InditexTech/weavejs/issues/1015) Frames occlude unrelated elements when rendering to image
+
 ## [3.6.0] - 2026-04-07
 
 ### Added
