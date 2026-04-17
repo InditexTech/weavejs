@@ -12,6 +12,11 @@ export class WeaveFitToSelectionToolAction extends WeaveAction {
   protected previousAction!: string;
   protected cancelAction!: () => void;
   onPropsChange = undefined;
+  initialize = undefined;
+
+  constructor() {
+    super();
+  }
 
   getName(): string {
     return FIT_TO_SELECTION_TOOL_ACTION_NAME;

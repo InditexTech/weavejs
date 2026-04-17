@@ -21,12 +21,12 @@ import type { WeaveRegularPolygonNode } from '@/nodes/regular-polygon/regular-po
 
 export class WeaveRegularPolygonToolAction extends WeaveAction {
   protected initialized: boolean = false;
-  protected state: WeaveRegularPolygonToolActionState;
-  protected regularPolygonId: string | null;
-  protected creating: boolean;
-  protected moved: boolean;
-  protected pointers: Map<number, Konva.Vector2d>;
-  protected clickPoint: Konva.Vector2d | null;
+  protected state!: WeaveRegularPolygonToolActionState;
+  protected regularPolygonId!: string | null;
+  protected creating!: boolean;
+  protected moved!: boolean;
+  protected pointers!: Map<number, Konva.Vector2d>;
+  protected clickPoint!: Konva.Vector2d | null;
   protected container!: Konva.Layer | Konva.Node | undefined;
   protected cancelAction!: () => void;
   onPropsChange = undefined;
@@ -35,6 +35,10 @@ export class WeaveRegularPolygonToolAction extends WeaveAction {
   constructor() {
     super();
 
+    this.initialize();
+  }
+
+  initialize(): void {
     this.pointers = new Map<number, Konva.Vector2d>();
     this.initialized = false;
     this.state = REGULAR_POLYGON_TOOL_STATE.IDLE;
@@ -64,22 +68,26 @@ export class WeaveRegularPolygonToolAction extends WeaveAction {
   private setupEvents() {
     const stage = this.instance.getStage();
 
-    window.addEventListener('keydown', (e) => {
-      if (
-        e.code === 'Enter' &&
-        this.instance.getActiveAction() === REGULAR_POLYGON_TOOL_ACTION_NAME
-      ) {
-        this.cancelAction();
-        return;
-      }
-      if (
-        e.code === 'Escape' &&
-        this.instance.getActiveAction() === REGULAR_POLYGON_TOOL_ACTION_NAME
-      ) {
-        this.cancelAction();
-        return;
-      }
-    });
+    window.addEventListener(
+      'keydown',
+      (e) => {
+        if (
+          e.code === 'Enter' &&
+          this.instance.getActiveAction() === REGULAR_POLYGON_TOOL_ACTION_NAME
+        ) {
+          this.cancelAction();
+          return;
+        }
+        if (
+          e.code === 'Escape' &&
+          this.instance.getActiveAction() === REGULAR_POLYGON_TOOL_ACTION_NAME
+        ) {
+          this.cancelAction();
+          return;
+        }
+      },
+      { signal: this.instance.getEventsController()?.signal }
+    );
 
     stage.on('pointerdown', (e) => {
       this.setTapStart(e);

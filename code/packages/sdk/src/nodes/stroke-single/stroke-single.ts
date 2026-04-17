@@ -33,10 +33,10 @@ import type { Circle } from 'konva/lib/shapes/Circle';
 
 export class WeaveStrokeSingleNode extends WeaveNode {
   private config: WeaveStrokeSingleProperties;
-  protected startHandle: Konva.Circle | null = null;
-  protected endHandle: Konva.Circle | null = null;
-  protected handleNodeChanges: ((nodes: WeaveSelection[]) => void) | null;
-  protected handleZoomChanges: (() => void) | null;
+  protected startHandle!: Konva.Circle | null;
+  protected endHandle!: Konva.Circle | null;
+  protected handleNodeChanges!: ((nodes: WeaveSelection[]) => void) | null;
+  protected handleZoomChanges!: (() => void) | null;
   protected nodeType: string = WEAVE_STROKE_SINGLE_NODE_TYPE;
   protected tipManagers: Record<string, WeaveBaseLineTipManager> = {
     [WEAVE_STROKE_SINGLE_NODE_TIP_TYPE.ARROW]: new WeaveArrowLineTipManager(),
@@ -56,16 +56,24 @@ export class WeaveStrokeSingleNode extends WeaveNode {
       params?.config ?? {}
     );
 
-    this.handleNodeChanges = null;
-    this.handleZoomChanges = null;
-
-    this.shiftPressed = false;
     this.snapper = new GreedySnapper({
       snapAngles: this.config.snapAngles.angles,
       activateThreshold: this.config.snapAngles.activateThreshold,
       releaseThreshold: this.config.snapAngles.releaseThreshold,
     });
+
+    this.initialize();
+  }
+
+  initialize(): void {
     this.eventsInitialized = false;
+    this.startHandle = null;
+    this.endHandle = null;
+
+    this.handleNodeChanges = null;
+    this.handleZoomChanges = null;
+
+    this.shiftPressed = false;
   }
 
   initEvents(): void {
@@ -73,17 +81,25 @@ export class WeaveStrokeSingleNode extends WeaveNode {
       return;
     }
 
-    window.addEventListener('keydown', (e) => {
-      if (e.key === 'Shift') {
-        this.shiftPressed = true;
-      }
-    });
+    window.addEventListener(
+      'keydown',
+      (e) => {
+        if (e.key === 'Shift') {
+          this.shiftPressed = true;
+        }
+      },
+      { signal: this.instance.getEventsController()?.signal }
+    );
 
-    window.addEventListener('keyup', (e) => {
-      if (e.key === 'Shift') {
-        this.shiftPressed = false;
-      }
-    });
+    window.addEventListener(
+      'keyup',
+      (e) => {
+        if (e.key === 'Shift') {
+          this.shiftPressed = false;
+        }
+      },
+      { signal: this.instance.getEventsController()?.signal }
+    );
 
     this.eventsInitialized = true;
   }

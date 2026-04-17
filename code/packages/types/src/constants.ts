@@ -82,6 +82,7 @@ export const WEAVE_DEFAULT_TRANSFORM_PROPERTIES: WeaveNodeTransformerProperties 
 export const WEAVE_STORE_CONNECTION_STATUS = {
   ['ERROR']: 'error',
   ['CONNECTING']: 'connecting',
+  ['SWITCHING_ROOM']: 'switching_room',
   ['CONNECTED']: 'connected',
   ['DISCONNECTED']: 'disconnected',
 } as const;

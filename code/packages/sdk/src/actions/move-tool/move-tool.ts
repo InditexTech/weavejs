@@ -13,7 +13,7 @@ import { SELECTION_TOOL_ACTION_NAME } from '../selection-tool/constants';
 
 export class WeaveMoveToolAction extends WeaveAction {
   protected initialized: boolean = false;
-  protected state: WeaveMoveToolActionState;
+  protected state!: WeaveMoveToolActionState;
   protected cancelAction!: () => void;
   protected triggerSelectionTool!: boolean;
   onPropsChange = undefined;
@@ -22,6 +22,10 @@ export class WeaveMoveToolAction extends WeaveAction {
   constructor() {
     super();
 
+    this.initialize();
+  }
+
+  initialize(): void {
     this.initialized = false;
     this.state = MOVE_TOOL_STATE.IDLE;
   }
@@ -33,15 +37,19 @@ export class WeaveMoveToolAction extends WeaveAction {
   private setupEvents() {
     const stage = this.instance.getStage();
 
-    window.addEventListener('keydown', (e) => {
-      if (
-        e.code === 'Escape' &&
-        this.instance.getActiveAction() === MOVE_TOOL_ACTION_NAME
-      ) {
-        this.cancelAction();
-        return;
-      }
-    });
+    window.addEventListener(
+      'keydown',
+      (e) => {
+        if (
+          e.code === 'Escape' &&
+          this.instance.getActiveAction() === MOVE_TOOL_ACTION_NAME
+        ) {
+          this.cancelAction();
+          return;
+        }
+      },
+      { signal: this.instance.getEventsController()?.signal }
+    );
 
     stage.on('pointerdown', () => {
       if (

@@ -10,6 +10,7 @@ import {
   type WeaveStoreOptions,
 } from '@inditextech/weave-types';
 import { WEAVE_STORE_STANDALONE } from './constants.js';
+import { Buffer } from 'buffer';
 import type { FetchInitialState, WeaveStoreStandaloneParams } from './types.js';
 
 export class WeaveStoreStandalone extends WeaveStore {

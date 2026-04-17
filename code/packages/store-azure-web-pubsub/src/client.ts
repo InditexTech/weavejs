@@ -426,9 +426,6 @@ export class WeaveStoreAzureWebPubSubSyncClient extends Emittery {
       const messageData = message.data;
 
       if (messageData.type === 'heartbeat') {
-        console.log(
-          '[Azure Web PubSub] received heartbeat, updating last heartbeat time.'
-        );
         this._lastHeartbeatTime = Date.now();
         return;
       }
@@ -587,9 +584,6 @@ export class WeaveStoreAzureWebPubSubSyncClient extends Emittery {
         now - this._lastHeartbeatTime >
         this._synClientOptions.heartbeat.checkWindowTimeMs
       ) {
-        console.log(
-          `[Azure Web PubSub] heartbeat not received in ${this._synClientOptions.heartbeat.checkWindowTimeMs}ms window, handling it...`
-        );
         this.disconnect();
         this.createWebSocket();
       }

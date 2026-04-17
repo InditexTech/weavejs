@@ -24,4 +24,9 @@ export const WEAVE_DEFAULT_CONFIG = {
   behaviors: {
     axisLockThreshold: 5,
   },
+  performance: {
+    upscale: {
+      enabled: false,
+    },
+  },
 };

@@ -21,7 +21,7 @@ import { SELECTION_TOOL_ACTION_NAME } from '../selection-tool/constants';
 
 export class WeaveAlignNodesToolAction extends WeaveAction {
   protected initialized: boolean = false;
-  protected state: WeaveAlignNodesToolActionState;
+  protected state!: WeaveAlignNodesToolActionState;
   protected triggerSelectionTool!: boolean;
   protected cancelAction!: () => void;
   onPropsChange = undefined;
@@ -30,6 +30,10 @@ export class WeaveAlignNodesToolAction extends WeaveAction {
   constructor() {
     super();
 
+    this.initialize();
+  }
+
+  initialize(): void {
     this.initialized = false;
     this.state = ALIGN_NODES_TOOL_STATE.IDLE;
   }

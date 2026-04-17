@@ -25,12 +25,12 @@ export class WeaveConnectorToolAction extends WeaveAction {
   protected readonly config!: WeaveConnectorToolActionProperties;
   protected initialized: boolean = false;
   protected initialCursor: string | null = null;
-  protected tempLineNode: Konva.Line | null;
-  protected state: WeaveConnectorToolActionState;
+  protected tempLineNode!: Konva.Line | null;
+  protected state!: WeaveConnectorToolActionState;
   protected container: Konva.Layer | Konva.Node | undefined;
   protected measureContainer: Konva.Layer | Konva.Group | undefined;
-  protected clickPoint: Konva.Vector2d | null;
-  protected pointers: Map<number, Konva.Vector2d>;
+  protected clickPoint!: Konva.Vector2d | null;
+  protected pointers!: Map<number, Konva.Vector2d>;
   protected startPoint: Konva.Vector2d | undefined;
   protected startNodeId: string | undefined;
   protected startNodeAnchor: string | undefined;
@@ -54,6 +54,10 @@ export class WeaveConnectorToolAction extends WeaveAction {
       params?.config
     );
 
+    this.initialize();
+  }
+
+  initialize(): void {
     this.pointers = new Map<number, Konva.Vector2d>();
     this.initialized = false;
     this.tempLineNode = null;
@@ -90,21 +94,25 @@ export class WeaveConnectorToolAction extends WeaveAction {
   private setupEvents() {
     const stage = this.instance.getStage();
 
-    window.addEventListener('keydown', (e) => {
-      if (
-        e.code === 'Enter' &&
-        this.instance.getActiveAction() === CONNECTOR_TOOL_ACTION_NAME
-      ) {
-        this.cancelAction();
-        return;
-      }
-      if (
-        e.code === 'Escape' &&
-        this.instance.getActiveAction() === CONNECTOR_TOOL_ACTION_NAME
-      ) {
-        this.cancelAction();
-      }
-    });
+    window.addEventListener(
+      'keydown',
+      (e) => {
+        if (
+          e.code === 'Enter' &&
+          this.instance.getActiveAction() === CONNECTOR_TOOL_ACTION_NAME
+        ) {
+          this.cancelAction();
+          return;
+        }
+        if (
+          e.code === 'Escape' &&
+          this.instance.getActiveAction() === CONNECTOR_TOOL_ACTION_NAME
+        ) {
+          this.cancelAction();
+        }
+      },
+      { signal: this.instance.getEventsController()?.signal }
+    );
 
     let nodeHovered: Konva.Node | undefined = undefined;
 

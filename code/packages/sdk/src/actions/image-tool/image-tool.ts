@@ -55,13 +55,13 @@ export class WeaveImageToolAction extends WeaveAction {
   protected readonly config: WeaveImageToolActionConfig;
   protected initialized: boolean = false;
   protected initialCursor: string | null = null;
-  protected state: WeaveImageToolActionState;
-  protected imageId: string | null;
-  protected pointers: Map<number, Konva.Vector2d>;
+  protected state!: WeaveImageToolActionState;
+  protected imageId!: string | null;
+  protected pointers!: Map<number, Konva.Vector2d>;
   protected imageAction: Record<string, ImageToolActionData> = {};
   protected cancelAction!: () => void;
-  protected tempImageId: string | null;
-  protected tempImageNode: Konva.Image | null;
+  protected tempImageId!: string | null;
+  protected tempImageNode!: Konva.Image | null;
   private ignoreKeyboardEvents: boolean = false;
   private ignorePointerEvents: boolean = false;
   onPropsChange = undefined;
@@ -75,6 +75,10 @@ export class WeaveImageToolAction extends WeaveAction {
       params?.config ?? {}
     );
 
+    this.initialize();
+  }
+
+  initialize(): void {
     this.pointers = new Map<number, Konva.Vector2d>();
     this.initialized = false;
     this.imageId = null;
@@ -133,16 +137,20 @@ export class WeaveImageToolAction extends WeaveAction {
   private setupEvents() {
     const stage = this.instance.getStage();
 
-    window.addEventListener('keydown', (e) => {
-      if (
-        e.code === 'Escape' &&
-        this.instance.getActiveAction() === WEAVE_IMAGE_TOOL_ACTION_NAME &&
-        !this.ignoreKeyboardEvents
-      ) {
-        this.cancelAction();
-        return;
-      }
-    });
+    window.addEventListener(
+      'keydown',
+      (e) => {
+        if (
+          e.code === 'Escape' &&
+          this.instance.getActiveAction() === WEAVE_IMAGE_TOOL_ACTION_NAME &&
+          !this.ignoreKeyboardEvents
+        ) {
+          this.cancelAction();
+          return;
+        }
+      },
+      { signal: this.instance.getEventsController()?.signal }
+    );
 
     stage.on('pointerdown', (e) => {
       this.setTapStart(e);

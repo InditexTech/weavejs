@@ -21,11 +21,11 @@ import type { Vector2d } from 'konva/lib/types';
 
 export class WeaveLineNode extends WeaveNode {
   private config: WeaveLineProperties;
-  protected snapper: GreedySnapper;
+  protected readonly snapper: GreedySnapper;
   protected startHandle: Konva.Circle | null = null;
   protected endHandle: Konva.Circle | null = null;
-  protected handleNodeChanges: ((nodes: WeaveSelection[]) => void) | null;
-  protected handleZoomChanges: (() => void) | null;
+  protected handleNodeChanges!: ((nodes: WeaveSelection[]) => void) | null;
+  protected handleZoomChanges!: (() => void) | null;
   protected nodeType: string = WEAVE_LINE_NODE_TYPE;
 
   constructor(params?: WeaveLineNodeParams) {
@@ -36,14 +36,18 @@ export class WeaveLineNode extends WeaveNode {
       params?.config ?? {}
     );
 
-    this.handleNodeChanges = null;
-    this.handleZoomChanges = null;
-
     this.snapper = new GreedySnapper({
       snapAngles: this.config.snapAngles.angles,
       activateThreshold: this.config.snapAngles.activateThreshold,
       releaseThreshold: this.config.snapAngles.releaseThreshold,
     });
+
+    this.initialize();
+  }
+
+  initialize(): void {
+    this.handleNodeChanges = null;
+    this.handleZoomChanges = null;
   }
 
   onRender(props: WeaveElementAttributes): WeaveElementInstance {

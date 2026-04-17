@@ -100,6 +100,16 @@ export abstract class WeaveStore implements WeaveStoreBase {
     return this.document;
   }
 
+  restartDocument(): void {
+    this.latestState = {
+      weave: {},
+    };
+    this.state = syncedStore<WeaveState>({
+      weave: {},
+    });
+    this.document = getYjsDoc(this.state);
+  }
+
   loadDocument(roomData: Uint8Array): void {
     Y.applyUpdate(this.document, roomData);
   }

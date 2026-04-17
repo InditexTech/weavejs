@@ -11,6 +11,11 @@ export class WeaveFitToScreenToolAction extends WeaveAction {
   protected previousAction!: string;
   protected cancelAction!: () => void;
   onPropsChange = undefined;
+  initialize = undefined;
+
+  constructor() {
+    super();
+  }
 
   getName(): string {
     return FIT_TO_SCREEN_TOOL_ACTION_NAME;

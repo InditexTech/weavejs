@@ -2,7 +2,12 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-import { WeaveStore } from '@inditextech/weave-sdk';
+import {
+  WeaveStore,
+  type WeaveStoreOnRoomChangedEvent,
+  type WeaveStoreOnRoomSwitchingEndEvent,
+  type WeaveStoreOnRoomSwitchingStartEvent,
+} from '@inditextech/weave-sdk';
 import merge from 'lodash/merge';
 import {
   WEAVE_STORE_CONNECTION_STATUS,
@@ -12,6 +17,7 @@ import { WeaveStoreAzureWebPubSubSyncClient } from './client';
 import { WEAVE_STORE_AZURE_WEB_PUBSUB } from './constants';
 import {
   type FetchInitialState,
+  type WeaveRoomData,
   type WeaveStoreAzureWebPubsubOptions,
 } from './types';
 
@@ -19,7 +25,8 @@ export class WeaveStoreAzureWebPubsub extends WeaveStore {
   private azureWebPubsubOptions: WeaveStoreAzureWebPubsubOptions;
   private roomId: string;
   private started: boolean;
-  private initialRoomData: Uint8Array | FetchInitialState | undefined;
+  private initialRoomData: WeaveRoomData | undefined;
+  private actualStatus!: (typeof WEAVE_STORE_CONNECTION_STATUS)[keyof typeof WEAVE_STORE_CONNECTION_STATUS];
   protected provider!: WeaveStoreAzureWebPubSubSyncClient;
   protected name: string = WEAVE_STORE_AZURE_WEB_PUBSUB;
   protected supportsUndoManager = true;
@@ -27,7 +34,7 @@ export class WeaveStoreAzureWebPubsub extends WeaveStore {
   protected awarenessCallback!: (changes: any) => void;
 
   constructor(
-    initialRoomData: Uint8Array | FetchInitialState | undefined,
+    initialRoomData: WeaveRoomData | undefined,
     storeOptions: WeaveStoreOptions,
     azureWebPubsubOptions: Pick<
       WeaveStoreAzureWebPubsubOptions,
@@ -43,6 +50,7 @@ export class WeaveStoreAzureWebPubsub extends WeaveStore {
     this.roomId = roomId;
     this.initialRoomData = initialRoomData;
     this.started = false;
+    this.actualStatus = WEAVE_STORE_CONNECTION_STATUS.DISCONNECTED;
 
     this.init();
   }
@@ -68,9 +76,11 @@ export class WeaveStoreAzureWebPubsub extends WeaveStore {
   private init() {
     const { url } = this.azureWebPubsubOptions;
 
+    const patchedUrl = url.replace('[roomId]', this.roomId);
+
     this.provider = new WeaveStoreAzureWebPubSubSyncClient(
       this,
-      url,
+      patchedUrl,
       this.roomId,
       this.getDocument(),
       this.azureWebPubsubOptions.syncClientOptions
@@ -92,7 +102,25 @@ export class WeaveStoreAzureWebPubsub extends WeaveStore {
     });
 
     this.provider.on('status', (status) => {
-      this.handleConnectionStatusChange(status);
+      if (
+        this.actualStatus !== WEAVE_STORE_CONNECTION_STATUS.SWITCHING_ROOM ||
+        (this.actualStatus === WEAVE_STORE_CONNECTION_STATUS.SWITCHING_ROOM &&
+          status === WEAVE_STORE_CONNECTION_STATUS.CONNECTED)
+      ) {
+        this.handleConnectionStatusChange(status);
+
+        if (
+          this.actualStatus === WEAVE_STORE_CONNECTION_STATUS.SWITCHING_ROOM &&
+          status === WEAVE_STORE_CONNECTION_STATUS.CONNECTED
+        ) {
+          this.instance.emitEvent<WeaveStoreOnRoomSwitchingEndEvent>(
+            'onRoomSwitchingEnd',
+            { room: this.roomId }
+          );
+        }
+
+        this.actualStatus = status;
+      }
 
       if (status === WEAVE_STORE_CONNECTION_STATUS.CONNECTED && !this.started) {
         this.loadRoomInitialData();
@@ -112,10 +140,42 @@ export class WeaveStoreAzureWebPubsub extends WeaveStore {
     return null;
   }
 
+  async switchToRoom(
+    roomId: string,
+    roomData: Uint8Array | FetchInitialState | undefined
+  ): Promise<void> {
+    this.instance.emitEvent<WeaveStoreOnRoomSwitchingStartEvent>(
+      'onRoomSwitchingStart',
+      { room: roomId }
+    );
+
+    this.actualStatus = WEAVE_STORE_CONNECTION_STATUS.SWITCHING_ROOM;
+
+    this.disconnect();
+
+    this.restartDocument();
+
+    await this.instance.switchRoom();
+
+    this.roomId = roomId;
+    this.initialRoomData = roomData;
+    this.started = false;
+
+    this.init();
+
+    this.setup();
+    this.connect();
+  }
+
   async connect(extraParams?: Record<string, string>): Promise<void> {
     const { fetchClient } = this.azureWebPubsubOptions;
 
     this.provider.setFetchClient(fetchClient ?? window.fetch);
+
+    this.instance.emitEvent<WeaveStoreOnRoomChangedEvent>(
+      'onStoreRoomChanged',
+      { room: this.roomId }
+    );
 
     await this.provider.connect(extraParams);
   }

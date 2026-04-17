@@ -11,6 +11,11 @@ export class WeaveZoomInToolAction extends WeaveAction {
   protected previousAction!: string;
   protected cancelAction!: () => void;
   onPropsChange = undefined;
+  initialize = undefined;
+
+  constructor() {
+    super();
+  }
 
   getName(): string {
     return ZOOM_IN_TOOL_ACTION_NAME;

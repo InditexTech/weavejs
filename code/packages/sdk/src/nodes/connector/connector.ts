@@ -64,6 +64,7 @@ export class WeaveConnectorNode extends WeaveNode {
     [WEAVE_CONNECTOR_NODE_DECORATOR_TYPE.DOT]: setupNodeDecoratorDot,
     [WEAVE_CONNECTOR_NODE_DECORATOR_TYPE.ARROW]: setupNodeDecoratorArrow,
   };
+  initialize = undefined;
 
   constructor(params?: WeaveConnectorNodeParams) {
     super();

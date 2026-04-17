@@ -28,13 +28,13 @@ export class WeaveMeasureToolAction extends WeaveAction {
   private readonly config!: WeaveMeasureToolProperties;
   protected initialized: boolean = false;
   protected initialCursor: string | null = null;
-  protected state: WeaveMeasureToolActionState;
-  protected measureId: string | null;
+  protected state!: WeaveMeasureToolActionState;
+  protected measureId!: string | null;
   protected container: Konva.Layer | Konva.Node | undefined;
-  protected clickPoint: Konva.Vector2d | null;
-  protected crosshairCursor: Konva.Group | null;
-  protected firstPoint: Konva.Circle | null;
-  protected measureLine: Konva.Line | null;
+  protected clickPoint!: Konva.Vector2d | null;
+  protected crosshairCursor!: Konva.Group | null;
+  protected firstPoint!: Konva.Circle | null;
+  protected measureLine!: Konva.Line | null;
   protected measureContainer: Konva.Layer | Konva.Group | undefined;
   protected cancelAction!: () => void;
   onPropsChange = undefined;
@@ -48,6 +48,10 @@ export class WeaveMeasureToolAction extends WeaveAction {
       params?.config ?? {}
     );
 
+    this.initialize();
+  }
+
+  initialize(): void {
     this.initialized = false;
     this.state = MEASURE_TOOL_STATE.IDLE;
     this.measureId = null;
@@ -76,14 +80,18 @@ export class WeaveMeasureToolAction extends WeaveAction {
   private setupEvents() {
     const stage = this.instance.getStage();
 
-    window.addEventListener('keydown', (e) => {
-      if (
-        e.code === 'Escape' &&
-        this.instance.getActiveAction() === MEASURE_TOOL_ACTION_NAME
-      ) {
-        this.cancelAction();
-      }
-    });
+    window.addEventListener(
+      'keydown',
+      (e) => {
+        if (
+          e.code === 'Escape' &&
+          this.instance.getActiveAction() === MEASURE_TOOL_ACTION_NAME
+        ) {
+          this.cancelAction();
+        }
+      },
+      { signal: this.instance.getEventsController()?.signal }
+    );
 
     stage.on('pointermove', () => {
       if (this.state === MEASURE_TOOL_STATE.IDLE) return;

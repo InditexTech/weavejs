@@ -35,19 +35,19 @@ import { DEFAULT_THROTTLE_MS } from '@/constants';
 
 export class WeaveStagePanningPlugin extends WeavePlugin {
   private readonly config!: WeaveStagePanningPluginConfig;
-  private moveToolActive: boolean;
-  private isMouseLeftButtonPressed: boolean;
-  private isMouseMiddleButtonPressed: boolean;
-  private isCtrlOrMetaPressed: boolean;
-  private isDragging: boolean;
-  private enableMove: boolean;
-  private isSpaceKeyPressed: boolean;
-  private pointers: Map<number, Konva.Vector2d>;
-  private panning: boolean = false;
+  private moveToolActive!: boolean;
+  private isMouseLeftButtonPressed!: boolean;
+  private isMouseMiddleButtonPressed!: boolean;
+  private isCtrlOrMetaPressed!: boolean;
+  private isDragging!: boolean;
+  private enableMove!: boolean;
+  private isSpaceKeyPressed!: boolean;
+  private pointers!: Map<number, Konva.Vector2d>;
+  private panning!: boolean;
   protected previousPointer!: string | null;
-  protected currentPointer: Konva.Vector2d | null = null;
-  protected stageScrollInterval: NodeJS.Timeout | undefined = undefined;
-  protected panEdgeTargets: Record<string, Konva.Node | undefined> = {};
+  protected currentPointer!: Konva.Vector2d | null;
+  protected stageScrollInterval: NodeJS.Timeout | undefined;
+  protected panEdgeTargets!: Record<string, Konva.Node | undefined>;
 
   getLayerName = undefined;
   initLayer = undefined;
@@ -61,6 +61,10 @@ export class WeaveStagePanningPlugin extends WeavePlugin {
       params?.config ?? {}
     );
 
+    this.initialize();
+  }
+
+  initialize(): void {
     this.pointers = new Map<number, { x: number; y: number }>();
     this.panning = false;
     this.isDragging = false;
@@ -72,6 +76,9 @@ export class WeaveStagePanningPlugin extends WeavePlugin {
     this.isCtrlOrMetaPressed = false;
     this.isSpaceKeyPressed = false;
     this.previousPointer = null;
+    this.currentPointer = null;
+    this.stageScrollInterval = undefined;
+    this.panEdgeTargets = {};
   }
 
   getName(): string {
@@ -101,35 +108,43 @@ export class WeaveStagePanningPlugin extends WeavePlugin {
   private initEvents() {
     const stage = this.instance.getStage();
 
-    window.addEventListener('keydown', (e) => {
-      if (e.ctrlKey || e.metaKey) {
-        this.isCtrlOrMetaPressed = true;
-      }
-      if (e.code === 'Space') {
-        this.getContextMenuPlugin()?.disable();
-        this.getNodesSelectionPlugin()?.disable();
-        this.getNodesEdgeSnappingPlugin()?.disable();
-        this.getNodesDistanceSnappingPlugin()?.disable();
+    window.addEventListener(
+      'keydown',
+      (e) => {
+        if (e.ctrlKey || e.metaKey) {
+          this.isCtrlOrMetaPressed = true;
+        }
+        if (e.code === 'Space') {
+          this.getContextMenuPlugin()?.disable();
+          this.getNodesSelectionPlugin()?.disable();
+          this.getNodesEdgeSnappingPlugin()?.disable();
+          this.getNodesDistanceSnappingPlugin()?.disable();
 
-        this.isSpaceKeyPressed = true;
-        this.setCursor();
-      }
-    });
+          this.isSpaceKeyPressed = true;
+          this.setCursor();
+        }
+      },
+      { signal: this.instance.getEventsController()?.signal }
+    );
 
-    window.addEventListener('keyup', (e) => {
-      if (e.key === 'Meta' || e.key === 'Control') {
-        this.isCtrlOrMetaPressed = false;
-      }
-      if (e.code === 'Space') {
-        this.getContextMenuPlugin()?.enable();
-        this.getNodesSelectionPlugin()?.enable();
-        this.getNodesEdgeSnappingPlugin()?.enable();
-        this.getNodesDistanceSnappingPlugin()?.enable();
+    window.addEventListener(
+      'keyup',
+      (e) => {
+        if (e.key === 'Meta' || e.key === 'Control') {
+          this.isCtrlOrMetaPressed = false;
+        }
+        if (e.code === 'Space') {
+          this.getContextMenuPlugin()?.enable();
+          this.getNodesSelectionPlugin()?.enable();
+          this.getNodesEdgeSnappingPlugin()?.enable();
+          this.getNodesDistanceSnappingPlugin()?.enable();
 
-        this.isSpaceKeyPressed = false;
-        this.disableMove();
-      }
-    });
+          this.isSpaceKeyPressed = false;
+          this.disableMove();
+        }
+      },
+      { signal: this.instance.getEventsController()?.signal }
+    );
 
     let lastPos: Konva.Vector2d | null = null;
 
@@ -279,7 +294,10 @@ export class WeaveStagePanningPlugin extends WeavePlugin {
       WEAVE_STAGE_PANNING_THROTTLE_MS
     );
 
-    window.addEventListener('wheel', handleWheelThrottled, { passive: true });
+    window.addEventListener('wheel', handleWheelThrottled, {
+      passive: true,
+      signal: this.instance.getEventsController()?.signal,
+    });
 
     stage.on('dragstart', (e) => {
       const duration = 1000 / 60;
@@ -382,7 +400,7 @@ export class WeaveStagePanningPlugin extends WeavePlugin {
       function (e) {
         e.preventDefault();
       },
-      { passive: false }
+      { passive: false, signal: this.instance.getEventsController()?.signal }
     );
   }
 

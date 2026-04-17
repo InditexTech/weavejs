@@ -18,6 +18,7 @@ import type {
 export class WeaveRectangleNode extends WeaveNode {
   private config: WeaveRectangleProperties;
   protected nodeType: string = WEAVE_RECTANGLE_NODE_TYPE;
+  initialize = undefined;
 
   constructor(params?: WeaveRectangleNodeParams) {
     super();

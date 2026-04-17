@@ -42,6 +42,11 @@ export class WeaveNodesEdgeSnappingPlugin extends WeavePlugin {
     this.transformSnappingThreshold =
       config?.transformSnappingThreshold ??
       GUIDE_LINE_TRANSFORM_SNAPPING_THRESHOLD;
+
+    this.initialize();
+  }
+
+  initialize(): void {
     this.enabled = true;
   }
 

@@ -26,6 +26,7 @@ export class WeaveMeasureNode extends WeaveNode {
   private readonly config: WeaveMeasureNodeProperties;
   protected nodeType: string = WEAVE_MEASURE_NODE_TYPE;
   protected handlePointCircleRadius: number = 6;
+  initialize = undefined;
 
   constructor(params?: Partial<WeaveMeasureNodeParams>) {
     super();

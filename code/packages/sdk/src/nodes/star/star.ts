@@ -16,6 +16,7 @@ import type { WeaveStarNodeParams, WeaveStarProperties } from './types';
 export class WeaveStarNode extends WeaveNode {
   private config: WeaveStarProperties;
   protected nodeType: string = WEAVE_STAR_NODE_TYPE;
+  initialize = undefined;
 
   constructor(params?: WeaveStarNodeParams) {
     super();

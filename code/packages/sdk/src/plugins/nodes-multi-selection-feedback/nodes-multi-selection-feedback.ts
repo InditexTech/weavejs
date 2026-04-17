@@ -17,7 +17,7 @@ import type {
 
 export class WeaveNodesMultiSelectionFeedbackPlugin extends WeavePlugin {
   private config!: WeaveNodesMultiSelectionFeedbackConfig;
-  protected selectedHalos: Record<string, Konva.Rect> = {};
+  protected selectedHalos!: Record<string, Konva.Rect>;
 
   onRender: undefined;
   onInit: undefined;
@@ -30,6 +30,10 @@ export class WeaveNodesMultiSelectionFeedbackPlugin extends WeavePlugin {
       params?.config ?? {}
     );
 
+    this.initialize();
+  }
+
+  initialize(): void {
     this.selectedHalos = {};
   }
 

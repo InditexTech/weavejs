@@ -19,6 +19,7 @@ export class WeaveStageNode extends WeaveNode {
   protected wheelMousePressed: boolean = false;
   private isCmdCtrlPressed: boolean = false;
   protected globalEventsInitialized: boolean = false;
+  initialize = undefined;
 
   onRender(props: WeaveElementAttributes): WeaveElementInstance {
     const stage = new Konva.Stage({
@@ -39,13 +40,21 @@ export class WeaveStageNode extends WeaveNode {
       const container = stage.container();
       container.setAttribute('tabindex', '0');
 
-      stage.container().addEventListener('focus', () => {
-        this.stageFocused = true;
-      });
+      stage.container().addEventListener(
+        'focus',
+        () => {
+          this.stageFocused = true;
+        },
+        { signal: this.instance.getEventsController()?.signal }
+      );
 
-      stage.container().addEventListener('blur', () => {
-        this.stageFocused = false;
-      });
+      stage.container().addEventListener(
+        'blur',
+        () => {
+          this.stageFocused = false;
+        },
+        { signal: this.instance.getEventsController()?.signal }
+      );
     }
 
     Konva.Stage.prototype.mode = function (mode?: string) {
@@ -171,53 +180,61 @@ export class WeaveStageNode extends WeaveNode {
       return;
     }
 
-    window.addEventListener('keydown', (e) => {
-      if (this.isOnlyCtrlOrMeta(e)) {
-        this.isCmdCtrlPressed = true;
+    window.addEventListener(
+      'keydown',
+      (e) => {
+        if (this.isOnlyCtrlOrMeta(e)) {
+          this.isCmdCtrlPressed = true;
 
-        this.instance.getStage().container().style.cursor = 'default';
+          this.instance.getStage().container().style.cursor = 'default';
 
-        const transformer = this.getSelectionPlugin()?.getTransformer();
+          const transformer = this.getSelectionPlugin()?.getTransformer();
 
-        if (!transformer) {
-          return;
+          if (!transformer) {
+            return;
+          }
+
+          if (
+            transformer.nodes().length === 0 ||
+            transformer.nodes().length > 1
+          ) {
+            return;
+          }
+
+          const selectedNode = transformer.nodes()[0];
+          selectedNode.fire('onCmdCtrlPressed');
         }
+      },
+      { signal: this.instance.getEventsController()?.signal }
+    );
 
-        if (
-          transformer.nodes().length === 0 ||
-          transformer.nodes().length > 1
-        ) {
-          return;
+    window.addEventListener(
+      'keyup',
+      (e) => {
+        if (!(e.ctrlKey || e.metaKey)) {
+          this.isCmdCtrlPressed = false;
+
+          this.instance.getStage().container().style.cursor = 'default';
+
+          const transformer = this.getSelectionPlugin()?.getTransformer();
+
+          if (!transformer) {
+            return;
+          }
+
+          if (
+            transformer.nodes().length === 0 ||
+            transformer.nodes().length > 1
+          ) {
+            return;
+          }
+
+          const selectedNode = transformer.nodes()[0];
+          selectedNode.fire('onCmdCtrlReleased');
         }
-
-        const selectedNode = transformer.nodes()[0];
-        selectedNode.fire('onCmdCtrlPressed');
-      }
-    });
-
-    window.addEventListener('keyup', (e) => {
-      if (!(e.ctrlKey || e.metaKey)) {
-        this.isCmdCtrlPressed = false;
-
-        this.instance.getStage().container().style.cursor = 'default';
-
-        const transformer = this.getSelectionPlugin()?.getTransformer();
-
-        if (!transformer) {
-          return;
-        }
-
-        if (
-          transformer.nodes().length === 0 ||
-          transformer.nodes().length > 1
-        ) {
-          return;
-        }
-
-        const selectedNode = transformer.nodes()[0];
-        selectedNode.fire('onCmdCtrlReleased');
-      }
-    });
+      },
+      { signal: this.instance.getEventsController()?.signal }
+    );
 
     this.globalEventsInitialized = true;
   }

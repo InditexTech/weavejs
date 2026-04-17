@@ -17,6 +17,7 @@ import { intersectArrays } from '@/utils/utils';
 export class WeaveGroupNode extends WeaveNode {
   private config: WeaveGroupProperties;
   protected nodeType: string = WEAVE_GROUP_NODE_TYPE;
+  initialize = undefined;
 
   constructor(params?: WeaveGroupNodeParams) {
     super();

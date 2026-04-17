@@ -21,7 +21,7 @@ import { memoize } from '@/utils/utils';
 
 export class WeaveUsersSelectionPlugin extends WeavePlugin {
   private padding = 1;
-  private usersSelection: Record<string, WeaveUserSelectionInfo>;
+  private usersSelection!: Record<string, WeaveUserSelectionInfo>;
   private config!: WeaveUsersSelectionPluginConfig;
 
   constructor(params: WeaveUsersSelectionPluginParams) {
@@ -33,6 +33,11 @@ export class WeaveUsersSelectionPlugin extends WeavePlugin {
 
     this.config.getUser = memoize(this.config.getUser);
     this.config.getUserColor = memoize(this.config.getUserColor);
+
+    this.initialize();
+  }
+
+  initialize(): void {
     this.usersSelection = {};
   }
 

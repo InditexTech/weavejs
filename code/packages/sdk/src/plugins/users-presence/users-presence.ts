@@ -19,7 +19,7 @@ import type { WeaveAwarenessChange } from '@inditextech/weave-types';
 
 export class WeaveUsersPresencePlugin extends WeavePlugin {
   private readonly config!: WeaveUsersPresencePluginConfig;
-  private userPresence: WeaveUserPresenceInformation;
+  private userPresence!: WeaveUserPresenceInformation;
   onRender = undefined;
 
   constructor(params: WeaveUsersPresencePluginParams) {
@@ -32,6 +32,10 @@ export class WeaveUsersPresencePlugin extends WeavePlugin {
       config
     );
 
+    this.initialize();
+  }
+
+  initialize(): void {
     this.userPresence = {};
   }
 

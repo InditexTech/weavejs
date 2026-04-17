@@ -16,3 +16,12 @@ export type WeaveStoreOnRoomLoadedEvent = boolean;
 export type WeaveInstanceStatusEvent = WeaveStatus;
 export type WeaveStoreOnUndoRedoChangeEvent = WeaveUndoRedoChange;
 export type WeaveStoreOnNodeChangeEvent = WeaveSelection;
+export type WeaveStoreOnRoomChangedEvent = {
+  room: string;
+};
+export type WeaveStoreOnRoomSwitchingStartEvent = {
+  room: string;
+};
+export type WeaveStoreOnRoomSwitchingEndEvent = {
+  room: string;
+};

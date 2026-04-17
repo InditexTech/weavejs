@@ -117,4 +117,31 @@ export class WeaveRegisterManager {
       }
     }
   }
+
+  resetNodesHandlers(): void {
+    for (const nodeHandlerId of Object.keys(this.nodesHandlers)) {
+      const nodeHandler = this.nodesHandlers[nodeHandlerId];
+      nodeHandler.initialize?.();
+    }
+  }
+
+  resetActionsHandlers(): void {
+    for (const actionHandlerId of Object.keys(this.actionsHandlers)) {
+      const actionHandler = this.actionsHandlers[actionHandlerId];
+      actionHandler.initialize?.();
+    }
+  }
+
+  resetPlugins(): void {
+    for (const pluginId of Object.keys(this.plugins)) {
+      const plugin = this.plugins[pluginId];
+      plugin.initialize?.();
+    }
+  }
+
+  reset(): void {
+    this.resetNodesHandlers();
+    this.resetActionsHandlers();
+    this.resetPlugins();
+  }
 }
