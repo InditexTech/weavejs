@@ -105,3 +105,10 @@ export const WEAVE_NODE_CHANGE_TYPE = {
 } as const;
 
 export const WEAVE_ROOT_NODE_TYPE = 'stage';
+
+export const WEAVE_EXPORT_RETURN_FORMAT = {
+  ['IMAGE']: 'image',
+  ['BLOB']: 'blob',
+  ['CANVAS']: 'canvas',
+  ['DATA_URL']: 'dataURL',
+} as const;

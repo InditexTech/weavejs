@@ -16,6 +16,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - [#993](https://github.com/InditexTech/weavejs/issues/993) Add Pages Support to enable multi-page canvas documents
+- [#1016](https://github.com/InditexTech/weavejs/issues/1016) Client-side rendering with multiple output formats (Image, Blob, Canvas, DataURL)
 
 ### Fixed
 
