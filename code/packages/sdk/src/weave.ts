@@ -30,6 +30,8 @@ import {
   WEAVE_NODE_CHANGE_TYPE,
   type WeaveUserChangeEvent,
   type DeepPartial,
+  type WeaveExportReturnFormat,
+  WEAVE_EXPORT_RETURN_FORMAT,
 } from '@inditextech/weave-types';
 import { WeaveStore } from './stores/store';
 import {
@@ -1229,20 +1231,68 @@ export class Weave {
   public async exportNodes(
     nodes: WeaveElementInstance[],
     boundingNodes: (nodes: Konva.Node[]) => Konva.Node[],
-    options: WeaveExportNodesOptions
-  ): Promise<HTMLImageElement> {
-    return await this.exportManager.exportNodesAsImage(
-      nodes,
-      boundingNodes,
-      options
-    );
+    options: WeaveExportNodesOptions,
+    returnFormat: WeaveExportReturnFormat = WEAVE_EXPORT_RETURN_FORMAT.IMAGE
+  ): Promise<HTMLImageElement | Blob | HTMLCanvasElement | string> {
+    switch (returnFormat) {
+      case WEAVE_EXPORT_RETURN_FORMAT.BLOB: {
+        return await this.exportManager.exportNodesAsBlob(
+          nodes,
+          boundingNodes,
+          options
+        );
+      }
+
+      case WEAVE_EXPORT_RETURN_FORMAT.CANVAS: {
+        return await this.exportManager.exportNodesAsCanvas(
+          nodes,
+          boundingNodes,
+          options
+        );
+      }
+
+      case WEAVE_EXPORT_RETURN_FORMAT.DATA_URL: {
+        const blob = await this.exportManager.exportNodesAsBlob(
+          nodes,
+          boundingNodes,
+          options
+        );
+        return await this.exportManager.blobToDataURL(blob);
+      }
+
+      case WEAVE_EXPORT_RETURN_FORMAT.IMAGE: {
+        return await this.exportManager.exportNodesAsImage(
+          nodes,
+          boundingNodes,
+          options
+        );
+      }
+    }
   }
 
   public async exportArea(
     area: { x: number; y: number; width: number; height: number },
-    options: WeaveExportNodesOptions
-  ): Promise<HTMLImageElement> {
-    return await this.exportManager.exportAreaAsImage(area, options);
+    options: WeaveExportNodesOptions,
+    returnFormat: WeaveExportReturnFormat = WEAVE_EXPORT_RETURN_FORMAT.IMAGE
+  ): Promise<HTMLImageElement | Blob | HTMLCanvasElement | string> {
+    switch (returnFormat) {
+      case WEAVE_EXPORT_RETURN_FORMAT.BLOB: {
+        return await this.exportManager.exportAreaAsBlob(area, options);
+      }
+
+      case WEAVE_EXPORT_RETURN_FORMAT.CANVAS: {
+        return await this.exportManager.exportAreaAsCanvas(area, options);
+      }
+
+      case WEAVE_EXPORT_RETURN_FORMAT.DATA_URL: {
+        const blob = await this.exportManager.exportAreaAsBlob(area, options);
+        return await this.exportManager.blobToDataURL(blob);
+      }
+
+      case WEAVE_EXPORT_RETURN_FORMAT.IMAGE: {
+        return await this.exportManager.exportAreaAsImage(area, options);
+      }
+    }
   }
 
   public getExportBoundingBox(nodesIds: string[]): {

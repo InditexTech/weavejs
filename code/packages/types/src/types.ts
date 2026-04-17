@@ -16,6 +16,7 @@ import {
   WEAVE_ASYNC_STATUS,
   WEAVE_LOG_LEVEL,
   WEAVE_NODE_CHANGE_TYPE,
+  WEAVE_EXPORT_RETURN_FORMAT,
 } from './constants';
 
 // Base types
@@ -149,6 +150,11 @@ export type WeaveExportNodesOptions = {
   backgroundColor?: string;
   quality?: number;
 };
+
+export type WeaveExportReturnFormatKeys =
+  keyof typeof WEAVE_EXPORT_RETURN_FORMAT;
+export type WeaveExportReturnFormat =
+  (typeof WEAVE_EXPORT_RETURN_FORMAT)[WeaveExportReturnFormatKeys];
 
 export type WeaveExportFormatKeys = keyof typeof WEAVE_EXPORT_FORMATS;
 export type WeaveExportFormat =
