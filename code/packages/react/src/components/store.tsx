@@ -49,6 +49,9 @@ interface WeaveRuntimeState {
     active: boolean;
     actual: string | undefined;
   };
+}
+
+interface WeaveRuntimeActions {
   setInstance: (newInstance: Weave | null) => void;
   setStatus: (newStatus: WeaveStatus) => void;
   setAppState: (newAppState: WeaveState) => void;
@@ -69,51 +72,53 @@ interface WeaveRuntimeState {
   setSelectedNodes: (newSelectedNodes: WeaveSelection[]) => void;
   setNode: (newNode: WeaveStateElement | undefined) => void;
   setActualAction: (newActualAction: string | undefined) => void;
+  reset: () => void;
 }
 
-export const useWeave: UseBoundStore<StoreApi<WeaveRuntimeState>> =
-  create<WeaveRuntimeState>()((set) => ({
-    instance: null,
-    appState: { weave: {} },
-    status: WEAVE_INSTANCE_STATUS.IDLE,
-    room: {
-      id: null,
-      switching: false,
-      loaded: false,
-    },
-    asyncElements: {
-      state: 'idle',
-      loaded: 0,
-      total: 0,
-    },
-    connection: {
-      status: 'disconnected',
-    },
-    users: {},
-    undoRedo: {
-      canUndo: false,
-      canRedo: false,
-    },
-    usersLocks: {},
-    zoom: {
-      value: 1,
-      canZoomIn: false,
-      canZoomOut: false,
-    },
-    contextMenu: {
-      show: false,
-      position: { x: 0, y: 0 },
-      options: [],
-    },
-    selection: {
-      active: false,
-      nodes: [],
-      node: undefined,
-    },
-    actions: {
-      active: false,
-      actual: undefined,
-    },
+interface WeaveStore extends WeaveRuntimeState, WeaveRuntimeActions {}
+
+const defaultAppState: WeaveRuntimeState = {
+  instance: null,
+  appState: { weave: {} },
+  status: WEAVE_INSTANCE_STATUS.IDLE,
+  room: {
+    id: null,
+    switching: false,
+    loaded: false,
+  },
+  asyncElements: {
+    state: 'idle',
+    loaded: 0,
+    total: 0,
+  },
+  connection: {
+    status: 'disconnected',
+  },
+  users: {},
+  undoRedo: {
+    canUndo: false,
+    canRedo: false,
+  },
+  usersLocks: {},
+  zoom: {
+    value: 1,
+    canZoomIn: false,
+    canZoomOut: false,
+  },
+  selection: {
+    active: false,
+    nodes: [],
+    node: undefined,
+  },
+  actions: {
+    active: false,
+    actual: undefined,
+  },
+};
+
+export const useWeave: UseBoundStore<StoreApi<WeaveStore>> =
+  create<WeaveStore>()((set) => ({
+    ...defaultAppState,
     setInstance: (newInstance) =>
       set((state) => ({ ...state, instance: newInstance })),
     setStatus: (newStatus) => set((state) => ({ ...state, status: newStatus })),
@@ -205,4 +210,5 @@ export const useWeave: UseBoundStore<StoreApi<WeaveRuntimeState>> =
           actual: newActualAction,
         },
       })),
+    reset: () => set(() => defaultAppState),
   }));
