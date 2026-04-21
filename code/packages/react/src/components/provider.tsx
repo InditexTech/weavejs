@@ -53,6 +53,7 @@ export const WeaveProvider = ({
   const weaveInstanceRef = React.useRef<Weave | null>(null);
   const selectedNodes = useWeave((state) => state.selection.nodes);
 
+  const reset = useWeave((state) => state.reset);
   const setInstance = useWeave((state) => state.setInstance);
   const setAppState = useWeave((state) => state.setAppState);
   const setStatus = useWeave((state) => state.setStatus);
@@ -270,6 +271,8 @@ export const WeaveProvider = ({
 
       setStatus(WEAVE_INSTANCE_STATUS.IDLE);
       setRoomLoaded(false);
+
+      reset();
 
       weaveInstanceRef.current?.destroy();
       weaveInstanceRef.current = null;
