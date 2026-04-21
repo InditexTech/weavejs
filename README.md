@@ -103,9 +103,6 @@ The following table provides a high-level overview of our approximate roadmap. F
 
 | Quarter | Focus Area                                               |
 | ------- | -------------------------------------------------------- |
-| Q3 2025 | Mobile gesture support improvements, Smart Guides Plugin |
-| Q4 2025 | Connector Tool, Sticky Notes Tool                        |
-| Q1 2026 | Awareness enhancement, Comment plugin, Minimap Plugin    |
 | Q2 2026 | Other cloud providers stores                             |
 | Q3 2026 | Koa server, Fastify server, NestJS server                |
 | Q4 2026 | Bindings kit for Vue, Bindings for Svelte                |
