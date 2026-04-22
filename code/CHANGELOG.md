@@ -16,6 +16,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 - [1024](https://github.com/InditexTech/weavejs/issues/1024) Text undo / redo doesnt' work correctly
+- [1025](https://github.com/InditexTech/weavejs/issues/1025) Image cropping utility layer for keyboard (ctrl + cmd over an image) not updated correctly on undo
 
 ## [3.7.1] - 2026-04-21
 
