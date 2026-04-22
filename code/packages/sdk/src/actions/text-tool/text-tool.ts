@@ -50,6 +50,7 @@ export class WeaveTextToolAction extends WeaveAction {
       fontFamily: 'Arial, sans-serif',
       fill: '#000000',
       align: 'left',
+      lineHeight: 1,
       verticalAlign: 'top',
       strokeEnabled: false,
     };
@@ -130,7 +131,8 @@ export class WeaveTextToolAction extends WeaveAction {
         y: this.clickPoint?.y ?? 0,
         draggable: true,
       });
-      this.instance.addNode(node, this.container?.getAttrs().id);
+      const renderedNode = nodeHandler.onRender(node.props);
+      (this.container as Konva.Container).add(renderedNode);
 
       this.instance.emitEvent<undefined>('onAddedArrow');
     }
@@ -177,7 +179,7 @@ export class WeaveTextToolAction extends WeaveAction {
 
     const node = stage.findOne(`#${this.textId}`) as Konva.Text | undefined;
     if (node) {
-      node.getAttr('triggerEditMode')(node);
+      node.getAttr('triggerEditMode')(node, true);
     }
 
     this.initialCursor = null;
