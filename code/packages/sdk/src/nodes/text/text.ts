@@ -24,8 +24,7 @@ import type {
   WeaveTextNodeParams,
   WeaveTextProperties,
 } from './types';
-import { merge, throttle } from 'lodash';
-import { DEFAULT_THROTTLE_MS } from '@/constants';
+import { merge } from 'lodash';
 import { WEAVE_STAGE_DEFAULT_MODE } from '../stage/constants';
 
 export class WeaveTextNode extends WeaveNode {
@@ -301,6 +300,7 @@ export class WeaveTextNode extends WeaveNode {
         ['middle-right', 'middle-left'].includes(actualAnchor ?? '')
       ) {
         text.wrap('word');
+        text.scaleY(1);
         text.height(undefined);
       }
 
@@ -342,7 +342,7 @@ export class WeaveTextNode extends WeaveNode {
       text.getLayer()?.batchDraw();
     };
 
-    text.on('transform', throttle(handleTextTransform, DEFAULT_THROTTLE_MS));
+    text.on('transform', handleTextTransform);
 
     const handleTransformEnd = () => {
       this.instance.emitEvent('onTransform', null);
@@ -388,6 +388,7 @@ export class WeaveTextNode extends WeaveNode {
         definedSmartWidth = true;
         text.width(Math.ceil(text.width() * text.scaleX()));
         text.scaleX(1);
+        text.scaleY(1);
         text.height(undefined);
         text.getLayer()?.batchDraw();
         text.height(Math.ceil(text.height()));
