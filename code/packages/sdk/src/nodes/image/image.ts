@@ -1375,6 +1375,9 @@ export class WeaveImageNode extends WeaveNode {
     const isMoveContainer = nodeInstance.getAttr('onMoveContainer');
     nodeInstance.setAttr('onMoveContainer', undefined);
 
+    const utilityLayer = this.instance.getUtilityLayer();
+    utilityLayer?.destroyChildren();
+
     if (this.imageTryoutIds[nodeId]) {
       clearTimeout(this.imageTryoutIds[nodeId]);
       delete this.imageTryoutIds[nodeId];
