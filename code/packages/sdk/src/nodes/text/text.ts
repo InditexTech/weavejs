@@ -31,6 +31,7 @@ import { WEAVE_STAGE_DEFAULT_MODE } from '../stage/constants';
 export class WeaveTextNode extends WeaveNode {
   private config: WeaveTextProperties;
   protected nodeType: string = WEAVE_TEXT_NODE_TYPE;
+  private createNode!: boolean;
   private editing!: boolean;
   private textAreaSuperContainer!: HTMLDivElement | null;
   private textAreaContainer!: HTMLDivElement | null;
@@ -102,7 +103,20 @@ export class WeaveTextNode extends WeaveNode {
       const clonedText = actNode.clone();
       clonedText.setAttr('triggerEditMode', undefined);
       clonedText.setAttr('cancelEditMode', undefined);
-      this.instance.updateNode(this.serialize(clonedText));
+      if (this.createNode && actNode.getAttrs().text !== '') {
+        // create node if text is not empty
+        const actualContainer = actNode.getParent();
+        actNode.destroy();
+        const serializedNode = this.serialize(clonedText);
+        this.instance.addNode(serializedNode, actualContainer?.getAttrs().id);
+      } else if (this.createNode && actNode.getAttrs().text === '') {
+        // don't node because text is empty
+        actNode.destroy();
+      } else {
+        // just update the node
+        this.instance.updateNode(this.serialize(clonedText));
+      }
+      this.createNode = false;
       clonedText.destroy();
     }
   }
@@ -399,7 +413,11 @@ export class WeaveTextNode extends WeaveNode {
     this.instance.addEventListener(
       'onNodeRenderedAdded',
       (node: Konva.Node) => {
-        if (node.id() === text.id() && node.getParent() !== text.getParent()) {
+        if (
+          node.id() === text.id() &&
+          node.getParent() !== text.getParent() &&
+          this.editing
+        ) {
           text.getAttr('cancelEditMode')?.();
         }
       }
@@ -419,25 +437,6 @@ export class WeaveTextNode extends WeaveNode {
     nodeInstance: WeaveElementInstance,
     nextProps: WeaveElementAttributes
   ): void {
-    const actualFontFamily = nodeInstance.getAttrs().fontFamily;
-    const actualFontSize = nodeInstance.getAttrs().fontSize;
-    const actualFontStyle = nodeInstance.getAttrs().fontStyle;
-    const actualFontVariant = nodeInstance.getAttrs().fontVariant;
-    const actualTextDecoration = nodeInstance.getAttrs().textDecoration;
-    const actualLineHeight = nodeInstance.getAttrs().lineHeight;
-
-    let updateNeeded = false;
-    if (
-      actualFontFamily !== nextProps.fontFamily ||
-      actualFontSize !== nextProps.fontSize ||
-      actualFontStyle !== nextProps.fontStyle ||
-      actualFontVariant !== nextProps.fontVariant ||
-      actualTextDecoration !== nextProps.textDecoration ||
-      actualLineHeight !== nextProps.lineHeight
-    ) {
-      updateNeeded = true;
-    }
-
     nodeInstance.setAttrs({
       ...nextProps,
       ...(!this.config.outline.enabled && {
@@ -456,15 +455,15 @@ export class WeaveTextNode extends WeaveNode {
     if (nextProps.layout === TEXT_LAYOUT.AUTO_ALL) {
       const { width: textAreaWidth, height: textAreaHeight } =
         this.textRenderedSize(nextProps.text, nodeInstance as Konva.Text);
-      width = textAreaWidth;
-      height = textAreaHeight;
+      width = (textAreaWidth + 2) * nodeInstance.getAbsoluteScale().x;
+      height = (textAreaHeight + 2) * nodeInstance.getAbsoluteScale().x;
     }
     if (nextProps.layout === TEXT_LAYOUT.SMART && !nextProps.smartFixedWidth) {
       const { width: textAreaWidth } = this.textRenderedSize(
         nextProps.text,
         nodeInstance as Konva.Text
       );
-      width = textAreaWidth;
+      width = textAreaWidth / this.instance.getStage().scaleX();
       height = undefined;
     }
     if (nextProps.layout === TEXT_LAYOUT.SMART && nextProps.smartFixedWidth) {
@@ -473,18 +472,11 @@ export class WeaveTextNode extends WeaveNode {
     if (nextProps.layout === TEXT_LAYOUT.AUTO_HEIGHT) {
       height = undefined;
     }
-    if (nextProps.layout === TEXT_LAYOUT.FIXED) {
-      updateNeeded = false;
-    }
 
     nodeInstance.setAttrs({
       width,
       height,
     });
-
-    if (updateNeeded) {
-      this.instance.updateNode(this.serialize(nodeInstance));
-    }
 
     if (this.editing) {
       this.updateTextAreaDOM(nodeInstance as Konva.Text);
@@ -560,8 +552,10 @@ export class WeaveTextNode extends WeaveNode {
         this.textArea.value,
         textNode
       );
-      this.textAreaContainer.style.width =
-        textAreaWidth * textNode.getAbsoluteScale().x + 1 + 'px';
+      const width =
+        ((textAreaWidth + 2) * textNode.getAbsoluteScale().x) /
+        this.instance.getStage().scaleX();
+      this.textAreaContainer.style.width = width + 'px';
     }
     if (
       !textNode.getAttrs().layout ||
@@ -570,13 +564,13 @@ export class WeaveTextNode extends WeaveNode {
       textNode.getAttrs().layout === TEXT_LAYOUT.SMART
     ) {
       this.textAreaContainer.style.height = 'auto';
-      this.textAreaContainer.style.height =
-        this.textArea.scrollHeight + textNode.getAbsoluteScale().y + 'px';
+      const height = this.textArea.scrollHeight + textNode.getAbsoluteScale().y;
+      this.textAreaContainer.style.height = height + 'px';
     }
 
     this.textArea.style.height = 'auto';
-    this.textArea.style.height =
-      this.textArea.scrollHeight + textNode.getAbsoluteScale().x + 'px';
+    const height = this.textArea.scrollHeight + textNode.getAbsoluteScale().y;
+    this.textArea.style.height = height + 'px';
     this.textArea.rows = this.textArea.value.split('\n').length;
   }
 
@@ -607,7 +601,11 @@ export class WeaveTextNode extends WeaveNode {
       }
       height = height + textSize.height * (textNode.lineHeight() ?? 1);
     }
-    return { width: width * 1.01, height };
+
+    return {
+      width: width * this.instance.getStage().scaleX() * 1.01,
+      height: height * this.instance.getStage().scaleX() * 1.01,
+    };
   }
 
   private mimicTextNode(textNode: Konva.Text) {
@@ -620,7 +618,7 @@ export class WeaveTextNode extends WeaveNode {
     this.textArea.rows = textNode.text().split('\n').length;
     this.textArea.style.letterSpacing = `${textNode.letterSpacing()}`;
     this.textArea.style.opacity = `${textNode.getAttrs().opacity}`;
-    this.textArea.style.lineHeight = `${textNode.lineHeight()}`;
+    this.textArea.style.lineHeight = `${textNode.lineHeight()}em`;
     this.textArea.style.fontFamily = textNode.fontFamily();
     let fontWeight = 'normal';
     let fontStyle = 'normal';
@@ -637,6 +635,12 @@ export class WeaveTextNode extends WeaveNode {
     this.textArea.style.textDecoration = textNode.textDecoration();
     this.textArea.style.textAlign = textNode.align();
     this.textArea.style.color = `${textNode.fill()}`;
+    if (this.config.outline.enabled) {
+      this.textArea.style.paintOrder = 'stroke fill';
+      this.textArea.style.webkitTextStroke = `${
+        this.config.outline.width * this.instance.getStage().scaleX()
+      }px ${this.config.outline.color}`;
+    }
   }
 
   private createTextAreaDOM(textNode: Konva.Text, position: Konva.Vector2d) {
@@ -701,10 +705,11 @@ export class WeaveTextNode extends WeaveNode {
       !textNode.getAttrs().smartFixedWidth
     ) {
       const rect = textNode.getClientRect({ relativeTo: stage });
+      // const width = rect.width - 2;
       this.textAreaContainer.style.width =
-        (rect.width + 2) * stage.scaleX() + 'px';
+        (rect.width + 2) * textNode.getAbsoluteScale().x + 'px';
       this.textAreaContainer.style.height =
-        (textNode.height() - textNode.padding() * 2 + 1) *
+        (textNode.height() - textNode.padding() * 2) *
           textNode.getAbsoluteScale().x +
         'px';
     }
@@ -714,9 +719,9 @@ export class WeaveTextNode extends WeaveNode {
     ) {
       const rect = textNode.getClientRect({ relativeTo: stage });
       this.textAreaContainer.style.width =
-        (rect.width + 2) * stage.scaleX() + 'px';
+        (rect.width + 2) * textNode.getAbsoluteScale().x + 'px';
       this.textAreaContainer.style.height =
-        (textNode.height() - textNode.padding() * 2 + 1) *
+        (textNode.height() - textNode.padding() * 2) *
           textNode.getAbsoluteScale().x +
         'px';
     }
@@ -727,17 +732,17 @@ export class WeaveTextNode extends WeaveNode {
     ) {
       const rect = textNode.getClientRect({ relativeTo: stage });
       this.textAreaContainer.style.width =
-        (rect.width + 10) * stage.scaleX() + 'px';
+        (rect.width + 10) * textNode.getAbsoluteScale().x + 'px';
 
       if (textNode.getAttrs().smartFixedWidth) {
         this.textAreaContainer.style.width =
-          (textNode.width() - textNode.padding() * 2 + 1) *
+          (textNode.width() - textNode.padding() * 2) *
             textNode.getAbsoluteScale().x +
           'px';
       }
 
       this.textAreaContainer.style.height =
-        (textNode.height() - textNode.padding() * 2 + 1) *
+        (textNode.height() - textNode.padding() * 2) *
           textNode.getAbsoluteScale().x +
         'px';
     }
@@ -756,6 +761,7 @@ export class WeaveTextNode extends WeaveNode {
     this.textArea.style.position = 'absolute';
     this.textArea.style.top = '0px';
     this.textArea.style.left = '0px';
+    this.textArea.style.lineHeight = '1em';
     this.textArea.style.overscrollBehavior = 'contains';
     this.textArea.style.scrollBehavior = 'auto';
     this.textArea.style.caretColor = 'black';
@@ -764,40 +770,47 @@ export class WeaveTextNode extends WeaveNode {
     this.textArea.style.margin = '0px';
     this.textArea.style.padding = '0px';
     this.textArea.style.paddingTop = '0px';
-    this.textArea.style.boxSizing = 'content-box';
+    this.textArea.style.boxSizing = 'border-box';
     this.textArea.style.overflow = 'hidden';
     this.textArea.style.background = 'transparent';
     this.textArea.style.border = 'none';
     this.textArea.style.outline = 'none';
     this.textArea.style.resize = 'none';
     this.textArea.style.overflow = 'hidden';
+    if (this.config.outline.enabled) {
+      this.textArea.style.paintOrder = 'stroke fill';
+      this.textArea.style.webkitTextStroke = `${
+        this.config.outline.width * this.instance.getStage().scaleX()
+      }px ${this.config.outline.color}`;
+    }
     this.textArea.style.backgroundColor = 'transparent';
     this.textAreaContainer.style.transformOrigin = 'left top';
     this.mimicTextNode(textNode);
 
-    const loadedFonts = this.instance.getFonts();
-    const fontFamily = this.textArea.style.fontFamily;
-    const actualFont = loadedFonts.find((f) => f.name === fontFamily);
+    this.textArea.style.left = `${-1}px`;
+    this.textArea.style.top = `${-1}px`;
 
-    const correctionX =
-      (actualFont === undefined ? 0 : actualFont.offsetX ?? 0) * stage.scaleX();
-    const correctionY =
-      (actualFont === undefined ? 0 : actualFont.offsetY ?? 0) * stage.scaleX();
-    this.textArea.style.left = `${correctionX - 1}px`;
-    this.textArea.style.top = `${correctionY}px`;
+    // console.log({
+    //   rect,
+    //   width,
+    //   height,
+    //   diffW,
+    //   diffH,
+    // });
 
-    const updateTextNode = () => {
-      if (!this.textArea) {
-        return;
-      }
+    // const updateTextNode = () => {
+    //   if (!this.textArea) {
+    //     return;
+    //   }
 
-      updateTextNodeSize();
-      textNode.text(this.textArea.value);
-      textNode.visible(true);
-      this.instance.updateNode(this.serialize(textNode));
-    };
+    //   updateTextNodeSize();
+    //   textNode.text(this.textArea.value);
+    //   textNode.visible(true);
 
-    const throttledUpdateTextNode = throttle(updateTextNode, 300);
+    //   this.instance.updateNodeNT(this.serialize(textNode));
+    // };
+
+    // const throttledUpdateTextNode = throttle(updateTextNode, 300);
 
     this.textArea.onfocus = () => {
       this.textAreaDomResize(textNode);
@@ -812,11 +825,11 @@ export class WeaveTextNode extends WeaveNode {
     };
     this.textArea.onpaste = () => {
       this.textAreaDomResize(textNode);
-      throttledUpdateTextNode();
+      // throttledUpdateTextNode();
     };
     this.textArea.oninput = () => {
       this.textAreaDomResize(textNode);
-      throttledUpdateTextNode();
+      // throttledUpdateTextNode();
     };
     // lock internal scroll
     this.textAreaSuperContainer.addEventListener(
@@ -875,7 +888,8 @@ export class WeaveTextNode extends WeaveNode {
           textNode
         );
 
-        textNode.width(textAreaWidth);
+        const width = textAreaWidth / this.instance.getStage().scaleX();
+        textNode.width(width);
       }
       if (
         !textNode.getAttrs().layout ||
@@ -1094,7 +1108,11 @@ export class WeaveTextNode extends WeaveNode {
     );
   }
 
-  private triggerEditMode(textNode: Konva.Text) {
+  private triggerEditMode(textNode: Konva.Text, create = false) {
+    if (create) {
+      this.createNode = true;
+    }
+
     const lockAcquired = this.instance.setMutexLock({
       nodeIds: [textNode.id()],
       operation: 'text-edit',
