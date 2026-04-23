@@ -5,5 +5,6 @@
 export const WEAVE_STAGE_KEYBOARD_MOVE_KEY = 'stageKeyboardMove';
 
 export const WEAVE_STAGE_KEYBOARD_MOVE_DEFAULT_CONFIG = {
-  movementDelta: 5,
+  movementDelta: 1,
+  shiftMovementDelta: 10,
 };
