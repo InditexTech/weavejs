@@ -36,28 +36,41 @@ export class WeaveStageKeyboardMovePlugin extends WeavePlugin {
     return WEAVE_STAGE_KEYBOARD_MOVE_KEY;
   }
 
-  handleNodesMovement(movementOrientation: WeaveMoveOrientation) {
+  handleNodesMovement(
+    movementOrientation: WeaveMoveOrientation,
+    { isShiftPressed }: { isShiftPressed: boolean }
+  ) {
     const nodesSelectionPlugin =
       this.instance.getPlugin<WeaveNodesSelectionPlugin>('nodesSelection');
 
     if (nodesSelectionPlugin) {
       const selectedNodes = nodesSelectionPlugin.getSelectedNodes();
 
+      const movementDelta = isShiftPressed
+        ? this.config.shiftMovementDelta
+        : this.config.movementDelta;
+
       for (const node of selectedNodes) {
         switch (movementOrientation) {
           case 'up':
-            node.y(node.y() - this.config.movementDelta);
+            node.y(node.y() - movementDelta);
             break;
           case 'down':
-            node.y(node.y() + this.config.movementDelta);
+            node.y(node.y() + movementDelta);
             break;
           case 'left':
-            node.x(node.x() - this.config.movementDelta);
+            node.x(node.x() - movementDelta);
             break;
           case 'right':
-            node.x(node.x() + this.config.movementDelta);
+            node.x(node.x() + movementDelta);
             break;
         }
+
+        this.instance.emitEvent('onNodeKeyboardMove', {
+          node,
+          orientation: movementOrientation,
+          delta: movementDelta,
+        });
 
         const nodeHandler = this.instance.getNodeHandler<WeaveNode>(
           node.getAttrs().nodeType
@@ -76,17 +89,21 @@ export class WeaveStageKeyboardMovePlugin extends WeavePlugin {
     window.addEventListener(
       'keydown',
       (e) => {
-        if (e.code === 'ArrowUp' && e.shiftKey) {
-          this.handleNodesMovement('up');
+        console.log('keydown', e.code);
+
+        const isShiftPressed = e.shiftKey || e.code === 'Shift';
+
+        if (e.code === 'ArrowUp') {
+          this.handleNodesMovement('up', { isShiftPressed });
         }
-        if (e.code === 'ArrowLeft' && e.shiftKey) {
-          this.handleNodesMovement('left');
+        if (e.code === 'ArrowLeft') {
+          this.handleNodesMovement('left', { isShiftPressed });
         }
-        if (e.code === 'ArrowRight' && e.shiftKey) {
-          this.handleNodesMovement('right');
+        if (e.code === 'ArrowRight') {
+          this.handleNodesMovement('right', { isShiftPressed });
         }
-        if (e.code === 'ArrowDown' && e.shiftKey) {
-          this.handleNodesMovement('down');
+        if (e.code === 'ArrowDown') {
+          this.handleNodesMovement('down', { isShiftPressed });
         }
       },
       { signal: this.instance.getEventsController()?.signal }
