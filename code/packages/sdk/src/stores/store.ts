@@ -38,6 +38,7 @@ export abstract class WeaveStore implements WeaveStoreBase {
   protected name!: string;
   protected supportsUndoManager!: boolean;
   protected config!: WeaveStoreOptions;
+  protected roomId!: string;
 
   private state!: MappedTypeDescription<WeaveState>;
   private latestState: WeaveState;
@@ -128,6 +129,10 @@ export abstract class WeaveStore implements WeaveStoreBase {
 
   getStateJson(): WeaveState {
     return JSON.parse(JSON.stringify(this.state, undefined, 2)) as WeaveState;
+  }
+
+  getRoomId(): string {
+    return this.roomId;
   }
 
   getStateSnapshot(): Uint8Array {

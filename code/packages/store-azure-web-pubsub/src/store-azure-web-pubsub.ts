@@ -23,10 +23,10 @@ import {
 
 export class WeaveStoreAzureWebPubsub extends WeaveStore {
   private azureWebPubsubOptions: WeaveStoreAzureWebPubsubOptions;
-  private roomId: string;
   private started: boolean;
   private initialRoomData: WeaveRoomData | undefined;
   private actualStatus!: (typeof WEAVE_STORE_CONNECTION_STATUS)[keyof typeof WEAVE_STORE_CONNECTION_STATUS];
+  protected roomId: string;
   protected provider!: WeaveStoreAzureWebPubSubSyncClient;
   protected name: string = WEAVE_STORE_AZURE_WEB_PUBSUB;
   protected supportsUndoManager = true;
