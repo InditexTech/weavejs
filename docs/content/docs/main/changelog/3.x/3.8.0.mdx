@@ -1,6 +1,6 @@
 ---
 title: v3.8.0
-description: Keyboard move plugin improvements, expose the room id on the store internal instance
+description: Keyboard move plugin improvements, expose the room id on the store internal instance, and avoid global listeners for keyboard, mouse, pointer modifiers
 ---
 
 ## Metadata
@@ -11,3 +11,7 @@ description: Keyboard move plugin improvements, expose the room id on the store 
 
 - [#1029](https://github.com/InditexTech/weavejs/issues/1029) Improve Stage keyboard move plugin to support movement without requiring Shift key
 - [#1030](https://github.com/InditexTech/weavejs/issues/1030) Expose roomId getter from internal store instance
+
+### Fixed
+
+- [#1028](https://github.com/InditexTech/weavejs/issues/1028) Inconsistent / missing modifier & focus signals (Cmd+Shift+5, Space key) make interaction state unreliable

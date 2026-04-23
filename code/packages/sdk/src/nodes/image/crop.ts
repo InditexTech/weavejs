@@ -510,7 +510,9 @@ export class WeaveImageCrop {
     const utilityLayer = this.instance.getUtilityLayer();
     utilityLayer?.destroyChildren();
 
-    if (stage.isCmdCtrlPressed() && utilityLayer) {
+    const isCtrlOrMetaPressed = e.ctrlKey || e.metaKey;
+
+    if (isCtrlOrMetaPressed && utilityLayer) {
       this.node.renderCropMode(utilityLayer, this.image);
       utilityLayer.show();
     }

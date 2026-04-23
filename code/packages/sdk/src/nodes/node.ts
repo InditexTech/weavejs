@@ -40,12 +40,6 @@ import type { WeaveUsersPresencePlugin } from '@/plugins/users-presence/users-pr
 import { WEAVE_USERS_PRESENCE_PLUGIN_KEY } from '@/plugins/users-presence/constants';
 import { DEFAULT_THROTTLE_MS } from '@/constants';
 
-export const augmentKonvaStageClass = (): void => {
-  Konva.Stage.prototype.isMouseWheelPressed = function () {
-    return false;
-  };
-};
-
 export const augmentKonvaNodeClass = (
   config?: WeaveNodeConfiguration
 ): void => {
@@ -522,6 +516,11 @@ export abstract class WeaveNode implements WeaveNodeBase {
       node.on('dragstart', (e) => {
         const nodeTarget = e.target;
 
+        let isWheelMousePressed = false;
+        if (e.evt.button === 1) {
+          isWheelMousePressed = true;
+        }
+
         e.cancelBubble = true;
 
         this.getNodesSelectionFeedbackPlugin()?.hideSelectionHalo(nodeTarget);
@@ -554,7 +553,7 @@ export abstract class WeaveNode implements WeaveNodeBase {
 
         this.instance.emitEvent('onDrag', nodeTarget);
 
-        if (stage.isMouseWheelPressed()) {
+        if (isWheelMousePressed) {
           e.cancelBubble = true;
           nodeTarget.stopDrag();
         }
@@ -586,6 +585,8 @@ export abstract class WeaveNode implements WeaveNodeBase {
             `#${originalContainer.getAttrs().nodeId}`
           );
         }
+
+        realNodeTarget.fire('nodeDragStart', { node: realNodeTarget });
 
         if (e.evt?.altKey) {
           nodeTarget.setAttrs({ isCloneOrigin: true });
@@ -630,6 +631,11 @@ export abstract class WeaveNode implements WeaveNodeBase {
       const handleDragMove = (e: KonvaEventObject<DragEvent, Konva.Node>) => {
         const nodeTarget = e.target;
 
+        let isWheelMousePressed = false;
+        if (e.evt.button === 1) {
+          isWheelMousePressed = true;
+        }
+
         e.cancelBubble = true;
 
         if (e.evt?.buttons === 0) {
@@ -639,8 +645,6 @@ export abstract class WeaveNode implements WeaveNodeBase {
 
         this.didMove = true;
 
-        const stage = this.instance.getStage();
-
         const isErasing = this.instance.getActiveAction() === 'eraseTool';
 
         if (isErasing) {
@@ -648,7 +652,7 @@ export abstract class WeaveNode implements WeaveNodeBase {
           return;
         }
 
-        if (stage.isMouseWheelPressed()) {
+        if (isWheelMousePressed) {
           e.cancelBubble = true;
           nodeTarget.stopDrag();
           return;
@@ -879,12 +883,12 @@ export abstract class WeaveNode implements WeaveNodeBase {
       });
 
       if (!node.getAttrs().overridesMouseControl) {
-        node.handleMouseover = () => {
-          this.handleMouseOver(node);
+        node.handleMouseover = (e) => {
+          this.handleMouseOver(e, node);
         };
 
-        node.handleMouseout = () => {
-          this.handleMouseout(node);
+        node.handleMouseout = (e) => {
+          this.handleMouseout(e, node);
         };
       }
 
@@ -933,9 +937,9 @@ export abstract class WeaveNode implements WeaveNodeBase {
 
       node.on('pointerover', (e) => {
         const realNodeTarget: Konva.Node = this.getRealSelectedNode(e.target);
-        realNodeTarget?.handleMouseover?.();
+        realNodeTarget?.handleMouseover?.(e);
 
-        const doCancelBubble = this.handleMouseOver(e.target);
+        const doCancelBubble = this.handleMouseOver(e, e.target);
         if (doCancelBubble) {
           e.cancelBubble = true;
         }
@@ -943,17 +947,22 @@ export abstract class WeaveNode implements WeaveNodeBase {
 
       node.on('pointerleave', (e) => {
         const realNodeTarget: Konva.Node = this.getRealSelectedNode(e.target);
-        realNodeTarget?.handleMouseout?.();
+        realNodeTarget?.handleMouseout?.(e);
 
-        this.handleMouseout(e.target);
+        this.handleMouseout(e, e.target);
       });
     }
   }
 
-  handleMouseOver(node: Konva.Node): boolean {
+  handleMouseOver(
+    e: KonvaEventObject<MouseEvent, any>,
+    node: Konva.Node
+  ): boolean {
     const stage = this.instance.getStage();
 
-    if (stage?.isCmdCtrlPressed?.()) {
+    const isCtrlOrMetaPressed = e.evt.ctrlKey || e.evt.metaKey;
+
+    if (isCtrlOrMetaPressed) {
       return false;
     }
 
@@ -1039,10 +1048,10 @@ export abstract class WeaveNode implements WeaveNodeBase {
     return cancelBubble;
   }
 
-  handleMouseout(node: Konva.Node) {
-    const stage = this.instance.getStage();
+  handleMouseout(e: KonvaEventObject<MouseEvent, any>, node: Konva.Node) {
+    const isCtrlOrMetaPressed = e.evt.ctrlKey || e.evt.metaKey;
 
-    if (stage?.isCmdCtrlPressed?.()) {
+    if (isCtrlOrMetaPressed) {
       return;
     }
 
