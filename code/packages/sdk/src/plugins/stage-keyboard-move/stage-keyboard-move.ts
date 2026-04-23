@@ -89,8 +89,6 @@ export class WeaveStageKeyboardMovePlugin extends WeavePlugin {
     window.addEventListener(
       'keydown',
       (e) => {
-        console.log('keydown', e.code);
-
         const isShiftPressed = e.shiftKey || e.code === 'Shift';
 
         if (e.code === 'ArrowUp') {

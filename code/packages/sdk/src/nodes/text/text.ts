@@ -941,8 +941,6 @@ export class WeaveTextNode extends WeaveNode {
     const handleOutsideClick = (e: PointerEvent) => {
       e.stopPropagation();
 
-      console.log('aqui text');
-
       if (!this.textArea) {
         return;
       }
