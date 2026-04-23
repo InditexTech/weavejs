@@ -16,9 +16,9 @@ import { WebsocketProvider } from 'y-websocket';
 
 export class WeaveStoreWebsockets extends WeaveStore {
   private websocketOptions: WeaveStoreWebsocketsOptions;
-  private roomId: string;
   private initialRoomData: Uint8Array | FetchInitialState | undefined;
   private started: boolean;
+  protected roomId: string;
   protected provider!: WebsocketProvider;
   protected name: string = WEAVE_STORE_WEBSOCKETS;
   protected supportsUndoManager = true;

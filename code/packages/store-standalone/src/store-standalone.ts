@@ -16,6 +16,7 @@ import type { FetchInitialState, WeaveStoreStandaloneParams } from './types.js';
 export class WeaveStoreStandalone extends WeaveStore {
   private readonly roomData: string | undefined;
   private initialState: FetchInitialState;
+  protected roomId: string;
   protected name: string = WEAVE_STORE_STANDALONE;
   protected supportsUndoManager = true;
 
@@ -25,6 +26,7 @@ export class WeaveStoreStandalone extends WeaveStore {
   ) {
     super(storeOptions);
 
+    this.roomId = 'standalone';
     this.roomData = roomData;
     this.initialState = initialState ?? defaultInitialState;
   }
