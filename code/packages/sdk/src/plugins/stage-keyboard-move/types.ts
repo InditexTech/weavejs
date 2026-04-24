@@ -3,8 +3,12 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import type { DeepPartial } from '@inditextech/weave-types';
+import type { WEAVE_STAGE_KEYBOARD_MOVE_ORIENTATION } from './constants';
 
-export type WeaveMoveOrientation = 'up' | 'down' | 'left' | 'right';
+export type WeaveMoveOrientationKeys =
+  keyof typeof WEAVE_STAGE_KEYBOARD_MOVE_ORIENTATION;
+export type WeaveMoveOrientation =
+  (typeof WEAVE_STAGE_KEYBOARD_MOVE_ORIENTATION)[WeaveMoveOrientationKeys];
 
 export type WeaveStageKeyboardMovePluginConfig = {
   movementDelta: number;
