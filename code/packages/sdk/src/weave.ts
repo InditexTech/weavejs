@@ -247,8 +247,8 @@ export class Weave {
     await this.registerManager.registerNodesHandlers();
     // Augment the Konva classes
     this.augmentKonvaNodeClass();
-    await this.registerManager.registerPlugins();
-    await this.registerManager.registerActionsHandlers();
+    this.registerManager.registerPlugins();
+    this.registerManager.registerActionsHandlers();
 
     // Register the store
     this.storeManager.registerStore(this.config.store as WeaveStore);
