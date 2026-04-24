@@ -29,7 +29,6 @@ import type { WeaveStageGridPlugin } from '../stage-grid/stage-grid';
 import { DEFAULT_THROTTLE_MS } from '@/constants';
 
 export class WeaveStageZoomPlugin extends WeavePlugin {
-  private isCtrlOrMetaPressed!: boolean;
   protected previousPointer!: string | null;
   getLayerName = undefined;
   initLayer = undefined;
@@ -67,7 +66,6 @@ export class WeaveStageZoomPlugin extends WeavePlugin {
     this.zooming = false;
     this.isTrackpad = false;
     this.zoomVelocity = 0;
-    this.isCtrlOrMetaPressed = false;
     this.updatedMinimumZoom = false;
     this.actualStep = this.config.zoomSteps.findIndex(
       (step) => step === this.config.defaultZoom
@@ -641,34 +639,6 @@ export class WeaveStageZoomPlugin extends WeavePlugin {
   }
 
   private initEvents() {
-    window.addEventListener(
-      'blur',
-      () => {
-        this.isCtrlOrMetaPressed = false;
-      },
-      { signal: this.instance.getEventsController()?.signal }
-    );
-
-    window.addEventListener(
-      'keydown',
-      (e) => {
-        if (e.ctrlKey || e.metaKey) {
-          this.isCtrlOrMetaPressed = true;
-        }
-      },
-      { signal: this.instance.getEventsController()?.signal }
-    );
-
-    window.addEventListener(
-      'keyup',
-      (e) => {
-        if (!(e.ctrlKey || e.metaKey)) {
-          this.isCtrlOrMetaPressed = false;
-        }
-      },
-      { signal: this.instance.getEventsController()?.signal }
-    );
-
     const stage = this.instance.getStage();
 
     let lastCenter: Konva.Vector2d | null = null;
@@ -785,9 +755,10 @@ export class WeaveStageZoomPlugin extends WeavePlugin {
     let doZoom = false;
 
     const handleWheelImmediate = (e: WheelEvent) => {
+      const isCtrlOrMetaPressed = e.ctrlKey || e.metaKey;
       const performZoom =
-        this.isCtrlOrMetaPressed ||
-        (!this.isCtrlOrMetaPressed && e.ctrlKey && e.deltaMode === 0);
+        isCtrlOrMetaPressed ||
+        (!isCtrlOrMetaPressed && e.ctrlKey && e.deltaMode === 0);
 
       const mouseX = e.clientX;
       const mouseY = e.clientY;

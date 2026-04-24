@@ -16,8 +16,6 @@ import { setupUpscaleStage } from '@/internal-utils/upscale';
 export class WeaveStageNode extends WeaveNode {
   protected nodeType: string = WEAVE_STAGE_NODE_TYPE;
   protected stageFocused: boolean = false;
-  protected wheelMousePressed: boolean = false;
-  private isCmdCtrlPressed: boolean = false;
   protected globalEventsInitialized: boolean = false;
   initialize = undefined;
 
@@ -29,10 +27,7 @@ export class WeaveStageNode extends WeaveNode {
 
     setupUpscaleStage(this.instance, stage);
 
-    this.wheelMousePressed = false;
-
     stage.isFocused = () => this.stageFocused;
-    stage.isMouseWheelPressed = () => this.wheelMousePressed;
 
     stage.position({ x: 0, y: 0 });
 
@@ -93,11 +88,7 @@ export class WeaveStageNode extends WeaveNode {
 
     stage.mode(WEAVE_STAGE_DEFAULT_MODE);
 
-    stage.on('pointerdown', (e) => {
-      if (e.evt.button === 1) {
-        this.wheelMousePressed = true;
-      }
-
+    stage.on('pointerdown', () => {
       if (
         !this.instance.isServerSide() &&
         [MOVE_TOOL_ACTION_NAME].includes(this.instance.getActiveAction() ?? '')
@@ -128,12 +119,8 @@ export class WeaveStageNode extends WeaveNode {
       }
     });
 
-    stage.on('pointerup', (e) => {
+    stage.on('pointerup', () => {
       const activeAction = this.instance.getActiveAction();
-
-      if (e.evt.button === 1) {
-        this.wheelMousePressed = false;
-      }
 
       if (
         !this.instance.isServerSide() &&
@@ -162,8 +149,6 @@ export class WeaveStageNode extends WeaveNode {
       }
     });
 
-    stage.isCmdCtrlPressed = () => this.isCmdCtrlPressed;
-
     this.setupEvents();
 
     return stage;
@@ -181,19 +166,9 @@ export class WeaveStageNode extends WeaveNode {
     }
 
     window.addEventListener(
-      'blur',
-      () => {
-        this.isCmdCtrlPressed = false;
-      },
-      { signal: this.instance.getEventsController()?.signal }
-    );
-
-    window.addEventListener(
       'keydown',
       (e) => {
         if (this.isOnlyCtrlOrMeta(e)) {
-          this.isCmdCtrlPressed = true;
-
           this.instance.getStage().container().style.cursor = 'default';
 
           const transformer = this.getSelectionPlugin()?.getTransformer();
@@ -220,8 +195,6 @@ export class WeaveStageNode extends WeaveNode {
       'keyup',
       (e) => {
         if (!(e.ctrlKey || e.metaKey)) {
-          this.isCmdCtrlPressed = false;
-
           this.instance.getStage().container().style.cursor = 'default';
 
           const transformer = this.getSelectionPlugin()?.getTransformer();

@@ -467,8 +467,39 @@ export class WeaveImageNode extends WeaveNode {
       }
     );
 
+    image.on('nodeDragStart', () => {
+      const utilityLayer = this.instance.getUtilityLayer();
+
+      if (!utilityLayer) {
+        return;
+      }
+
+      const nodes = utilityLayer?.find('.cropMode') ?? [];
+      nodes.forEach((n) => {
+        n.destroy();
+      });
+
+      const transformer = this.getSelectionPlugin()?.getTransformer();
+
+      if (!transformer) {
+        return;
+      }
+
+      transformer.show();
+    });
+
     if (this.config.cropMode.enabled && this.config.cropMode.triggers.ctrlCmd) {
       image.on('onCmdCtrlPressed', () => {
+        const utilityLayer = this.instance.getUtilityLayer();
+
+        if (!utilityLayer) {
+          return;
+        }
+
+        if (image.isDragging()) {
+          return;
+        }
+
         const transformer = this.getSelectionPlugin()?.getTransformer();
 
         if (!transformer) {
@@ -476,12 +507,6 @@ export class WeaveImageNode extends WeaveNode {
         }
 
         transformer.hide();
-
-        const utilityLayer = this.instance.getUtilityLayer();
-
-        if (!utilityLayer) {
-          return;
-        }
 
         utilityLayer?.destroyChildren();
 
@@ -491,6 +516,16 @@ export class WeaveImageNode extends WeaveNode {
       });
 
       image.on('onCmdCtrlReleased', () => {
+        const utilityLayer = this.instance.getUtilityLayer();
+
+        if (!utilityLayer) {
+          return;
+        }
+
+        if (image.isDragging()) {
+          return;
+        }
+
         const transformer = this.getSelectionPlugin()?.getTransformer();
 
         if (!transformer) {
@@ -498,12 +533,6 @@ export class WeaveImageNode extends WeaveNode {
         }
 
         transformer.show();
-
-        const utilityLayer = this.instance.getUtilityLayer();
-
-        if (!utilityLayer) {
-          return;
-        }
 
         utilityLayer?.destroyChildren();
       });
@@ -577,6 +606,7 @@ export class WeaveImageNode extends WeaveNode {
       fill: 'transparent',
       strokeScaleEnabled: false,
       strokeWidth: 2,
+      name: 'cropMode',
       stroke: '#1a1aff',
       draggable: false,
       listening: false,
@@ -630,6 +660,7 @@ export class WeaveImageNode extends WeaveNode {
 
     const anchor = new Konva.Rect({
       draggable: false,
+      name: 'cropMode',
       rotation: node.rotation(),
     });
 
@@ -1376,7 +1407,10 @@ export class WeaveImageNode extends WeaveNode {
     nodeInstance.setAttr('onMoveContainer', undefined);
 
     const utilityLayer = this.instance.getUtilityLayer();
-    utilityLayer?.destroyChildren();
+    const nodes = utilityLayer?.find('.cropMode') ?? [];
+    nodes.forEach((n) => {
+      n.destroy();
+    });
 
     if (this.imageTryoutIds[nodeId]) {
       clearTimeout(this.imageTryoutIds[nodeId]);

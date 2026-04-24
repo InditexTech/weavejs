@@ -38,7 +38,6 @@ export class WeaveStagePanningPlugin extends WeavePlugin {
   private moveToolActive!: boolean;
   private isMouseLeftButtonPressed!: boolean;
   private isMouseMiddleButtonPressed!: boolean;
-  private isCtrlOrMetaPressed!: boolean;
   private isDragging!: boolean;
   private enableMove!: boolean;
   private isSpaceKeyPressed!: boolean;
@@ -73,7 +72,6 @@ export class WeaveStagePanningPlugin extends WeavePlugin {
     this.moveToolActive = false;
     this.isMouseLeftButtonPressed = false;
     this.isMouseMiddleButtonPressed = false;
-    this.isCtrlOrMetaPressed = false;
     this.isSpaceKeyPressed = false;
     this.previousPointer = null;
     this.currentPointer = null;
@@ -109,19 +107,8 @@ export class WeaveStagePanningPlugin extends WeavePlugin {
     const stage = this.instance.getStage();
 
     window.addEventListener(
-      'blur',
-      () => {
-        this.isCtrlOrMetaPressed = false;
-      },
-      { signal: this.instance.getEventsController()?.signal }
-    );
-
-    window.addEventListener(
       'keydown',
       (e) => {
-        if (e.ctrlKey || e.metaKey) {
-          this.isCtrlOrMetaPressed = true;
-        }
         if (e.code === 'Space') {
           this.getContextMenuPlugin()?.disable();
           this.getNodesSelectionPlugin()?.disable();
@@ -138,9 +125,6 @@ export class WeaveStagePanningPlugin extends WeavePlugin {
     window.addEventListener(
       'keyup',
       (e) => {
-        if (e.key === 'Meta' || e.key === 'Control') {
-          this.isCtrlOrMetaPressed = false;
-        }
         if (e.code === 'Space') {
           this.getContextMenuPlugin()?.enable();
           this.getNodesSelectionPlugin()?.enable();
@@ -265,7 +249,8 @@ export class WeaveStagePanningPlugin extends WeavePlugin {
 
     // Pan with wheel mouse pressed
     const handleWheel = (e: WheelEvent) => {
-      const performPanning = !this.isCtrlOrMetaPressed && !e.ctrlKey;
+      const isCtrlOrMetaPressed = e.ctrlKey || e.metaKey;
+      const performPanning = !isCtrlOrMetaPressed && !e.ctrlKey;
 
       const mouseX = e.clientX;
       const mouseY = e.clientY;
@@ -280,7 +265,7 @@ export class WeaveStagePanningPlugin extends WeavePlugin {
 
       if (
         !this.enabled ||
-        this.isCtrlOrMetaPressed ||
+        isCtrlOrMetaPressed ||
         e.buttons === 4 ||
         !performPanning ||
         this.instance.getClosestParentWithWeaveId(elementUnderMouse) !==

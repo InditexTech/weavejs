@@ -545,8 +545,8 @@ export class WeaveVideoNode extends WeaveNode {
     }
 
     const defaultHandleMouseover = videoGroup.handleMouseover;
-    videoGroup.handleMouseover = () => {
-      defaultHandleMouseover.call(this);
+    videoGroup.handleMouseover = (e) => {
+      defaultHandleMouseover.call(this, e);
 
       if (this.config.style.track.onlyOnHover && this.videoState[id].loaded) {
         const videoProgress = videoGroup.findOne(`#${id}-video-progress`) as
@@ -558,8 +558,8 @@ export class WeaveVideoNode extends WeaveNode {
     };
 
     const defaultHandleMouseout = videoGroup.handleMouseout;
-    videoGroup.handleMouseout = () => {
-      defaultHandleMouseout.call(this);
+    videoGroup.handleMouseout = (e) => {
+      defaultHandleMouseout.call(e, this);
 
       if (
         this.config.style.track.onlyOnHover &&

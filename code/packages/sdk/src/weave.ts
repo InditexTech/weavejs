@@ -34,11 +34,7 @@ import {
   WEAVE_EXPORT_RETURN_FORMAT,
 } from '@inditextech/weave-types';
 import { WeaveStore } from './stores/store';
-import {
-  augmentKonvaNodeClass,
-  augmentKonvaStageClass,
-  WeaveNode,
-} from './nodes/node';
+import { augmentKonvaNodeClass, WeaveNode } from './nodes/node';
 import { WeaveAction } from './actions/action';
 import { WeavePlugin } from './plugins/plugin';
 import { WeaveRenderer } from './renderer/renderer';
@@ -250,7 +246,6 @@ export class Weave {
     // Register all the nodes, plugins and actions that come from the configuration
     await this.registerManager.registerNodesHandlers();
     // Augment the Konva classes
-    this.augmentKonvaStageClass();
     this.augmentKonvaNodeClass();
     this.registerManager.registerPlugins();
     this.registerManager.registerActionsHandlers();
@@ -392,10 +387,6 @@ export class Weave {
 
   getConfiguration(): WeaveConfig {
     return this.config;
-  }
-
-  augmentKonvaStageClass(): void {
-    augmentKonvaStageClass();
   }
 
   augmentKonvaNodeClass(config?: WeaveNodeConfiguration): void {

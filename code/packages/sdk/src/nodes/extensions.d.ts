@@ -49,8 +49,8 @@ declare module 'konva/lib/Node' {
     dblClick(): void;
     isSelectable(): boolean;
     movedToContainer(container: Konva.Layer | Konva.Group): void;
-    handleMouseover(): void;
-    handleMouseout(): void;
+    handleMouseover(e: KonvaEventObject): void;
+    handleMouseout(e: KonvaEventObject): void;
     handleSelectNode(): void;
     handleDeselectNode(): void;
     defineMousePointer(): string;
@@ -77,9 +77,7 @@ declare module 'konva/lib/Stage' {
     allowSelectNodes(nodeTypes?: string[]): string[];
     allowSelection(allowSelection?: boolean): boolean;
     isFocused(): boolean;
-    isMouseWheelPressed(): boolean;
-    handleMouseover(): void;
-    handleMouseout(): void;
-    isCmdCtrlPressed(): boolean;
+    handleMouseover(e: KonvaEventObject): void;
+    handleMouseout(e: KonvaEventObject): void;
   }
 }

@@ -68,7 +68,6 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
   private selecting!: boolean;
   private didMove!: boolean;
   private initialized!: boolean;
-  private isCtrlMetaPressed!: boolean;
   private isSpaceKeyPressed!: boolean;
   protected taps!: number;
   protected isDoubleTap!: boolean;
@@ -115,7 +114,6 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
       'bottom-right',
     ];
     this.taps = 0;
-    this.isCtrlMetaPressed = false;
     this.isSpaceKeyPressed = false;
     this.isDoubleTap = false;
     this.tapStart = null;
@@ -281,7 +279,7 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
       throttle(handlePointerMoveInit, DEFAULT_THROTTLE_MS)
     );
 
-    tr.on('transformstart', () => {
+    tr.on('transformstart', (e) => {
       this.transformInProcess = true;
 
       this.triggerSelectedNodesEvent();
@@ -289,7 +287,7 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
       const selectedNodes = tr.nodes();
 
       for (const node of selectedNodes) {
-        node.handleMouseout();
+        node.handleMouseout(e);
         if (node.getAttrs().strokeScaleEnabled !== false) {
           node.setAttr('strokeScaleEnabled', false);
           node.setAttr('_revertStrokeScaleEnabled', true);
@@ -306,7 +304,7 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
 
     let nodeHovered: Konva.Node | undefined = undefined;
 
-    tr.on('mousemove', () => {
+    tr.on('mousemove', (e) => {
       if (this.dragInProcess) {
         return;
       }
@@ -321,14 +319,14 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
       if (shape) {
         const targetNode = this.instance.getInstanceRecursive(shape);
         if (targetNode && targetNode !== nodeHovered) {
-          this.instance.getStage().handleMouseover();
-          nodeHovered?.handleMouseout?.();
-          targetNode?.handleMouseover?.();
+          this.instance.getStage().handleMouseover(e);
+          nodeHovered?.handleMouseout?.(e);
+          targetNode?.handleMouseover?.(e);
           nodeHovered = targetNode as Konva.Node | undefined;
         }
-        targetNode?.handleMouseover?.();
+        targetNode?.handleMouseover?.(e);
       } else {
-        nodeHovered?.handleMouseout?.();
+        nodeHovered?.handleMouseout?.(e);
       }
     });
 
@@ -343,19 +341,19 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
       }
     });
 
-    tr.on('mouseout', () => {
-      this.instance.getStage().handleMouseover?.();
+    tr.on('mouseout', (e) => {
+      this.instance.getStage().handleMouseover?.(e);
       nodeHovered = undefined;
     });
 
     window.addEventListener(
       'mouseout',
-      () => {
+      (e) => {
         if (nodeHovered) {
-          nodeHovered.handleMouseout();
+          nodeHovered.handleMouseout(e);
           nodeHovered = undefined;
         }
-        this.instance.getStage().handleMouseover?.();
+        this.instance.getStage().handleMouseover?.(e);
       },
       { signal: this.instance.getEventsController()?.signal }
     );
@@ -424,6 +422,11 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
     tr.on('dragstart', (e) => {
       this.dragInProcess = true;
 
+      let isWheelMousePressed = false;
+      if (e.evt.button === 1) {
+        isWheelMousePressed = true;
+      }
+
       const mainLayer = this.instance.getMainLayer();
 
       if (!mainLayer) {
@@ -444,7 +447,7 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
 
       selectedNodes = tr.nodes();
 
-      if (stage.isMouseWheelPressed()) {
+      if (isWheelMousePressed) {
         e.cancelBubble = true;
         e.target.stopDrag();
         return;
@@ -479,6 +482,11 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
     ) => {
       const actualPos = { x: e.target.x(), y: e.target.y() };
 
+      let isWheelMousePressed = false;
+      if (e.evt.button === 1) {
+        isWheelMousePressed = true;
+      }
+
       e.cancelBubble = true;
 
       if (initialPos) {
@@ -488,9 +496,7 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
         }
       }
 
-      const stage = this.instance.getStage();
-
-      if (stage.isMouseWheelPressed()) {
+      if (isWheelMousePressed) {
         e.cancelBubble = true;
         e.target.stopDrag();
         return;
@@ -715,22 +721,6 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
 
         this.setSelectedNodes(finalSelectedNodes);
         tr.forceUpdate();
-      }
-    });
-
-    this.instance.addEventListener('onRender', () => {
-      const point = stage.getPointerPosition();
-
-      if (point) {
-        const ele = this.instance
-          .getTargetingManager()
-          .pointIntersectsElement(point);
-
-        if (ele) {
-          const realEle = this.instance.getTargetingManager().resolveNode(ele);
-
-          realEle?.handleMouseover();
-        }
       }
     });
 
@@ -1082,21 +1072,9 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
 
     const stage = this.instance.getStage();
 
-    window.addEventListener(
-      'blur',
-      () => {
-        this.isCtrlMetaPressed = false;
-        this.isSpaceKeyPressed = false;
-      },
-      { signal: this.instance.getEventsController()?.signal }
-    );
-
     stage.container().addEventListener(
       'keydown',
       (e) => {
-        if (e.ctrlKey || e.metaKey) {
-          this.isCtrlMetaPressed = true;
-        }
         if (e.code === 'Space') {
           this.isSpaceKeyPressed = true;
         }
@@ -1113,9 +1091,6 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
     stage.container().addEventListener(
       'keyup',
       (e) => {
-        if (!(e.ctrlKey || e.metaKey)) {
-          this.isCtrlMetaPressed = false;
-        }
         if (e.code === 'Space') {
           this.isSpaceKeyPressed = false;
         }
@@ -1211,7 +1186,8 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
       this.selectionRectangle.height(0);
       this.selecting = true;
 
-      if (this.isCtrlMetaPressed) {
+      const isCtrlOrMetaPressed = e.evt.ctrlKey || e.evt.metaKey;
+      if (isCtrlOrMetaPressed) {
         const nodesSelected = this.tr.nodes();
         for (const node of nodesSelected) {
           node.fire('onSelectionCleared', { bubbles: true });
@@ -1673,7 +1649,8 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
       return;
     }
 
-    if (stage.isCmdCtrlPressed()) {
+    const isCtrlOrCmdPressed = e.evt.ctrlKey || e.evt.metaKey;
+    if (isCtrlOrCmdPressed) {
       return;
     }
 

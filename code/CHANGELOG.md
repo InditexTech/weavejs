@@ -18,6 +18,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - [#1029](https://github.com/InditexTech/weavejs/issues/1029) Improve Stage keyboard move plugin to support movement without requiring Shift key
 - [#1030](https://github.com/InditexTech/weavejs/issues/1030) Expose roomId getter from internal store instance
 
+### Fixed
+
+- [#1028](https://github.com/InditexTech/weavejs/issues/1028) Inconsistent / missing modifier & focus signals (Cmd+Shift+5, Space key) make interaction state unreliable
+
 ## [3.7.2] - 2026-04-22
 
 ### Fixed

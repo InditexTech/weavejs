@@ -36,8 +36,6 @@ export class WeaveTextNode extends WeaveNode {
   private textAreaContainer!: HTMLDivElement | null;
   private textArea!: HTMLTextAreaElement | null;
   private keyPressHandler: ((e: KeyboardEvent) => void) | undefined;
-  private eventsInitialized!: boolean;
-  private isCtrlMetaPressed!: boolean;
 
   constructor(params?: WeaveTextNodeParams) {
     super();
@@ -51,47 +49,11 @@ export class WeaveTextNode extends WeaveNode {
 
   initialize(): void {
     this.keyPressHandler = undefined;
-    this.eventsInitialized = false;
-    this.isCtrlMetaPressed = false;
     this.textAreaSuperContainer = null;
     this.textAreaContainer = null;
     this.textArea = null;
     this.editing = false;
     this.textArea = null;
-  }
-
-  private initEvents() {
-    if (!this.eventsInitialized && !globalThis._weave_isServerSide) {
-      window.addEventListener(
-        'blur',
-        () => {
-          this.isCtrlMetaPressed = false;
-        },
-        { signal: this.instance.getEventsController()?.signal }
-      );
-
-      window.addEventListener(
-        'keydown',
-        (e) => {
-          if (e.ctrlKey || e.metaKey) {
-            this.isCtrlMetaPressed = true;
-          }
-        },
-        { signal: this.instance.getEventsController()?.signal }
-      );
-
-      window.addEventListener(
-        'keyup',
-        (e) => {
-          if (!(e.ctrlKey || e.metaKey)) {
-            this.isCtrlMetaPressed = false;
-          }
-        },
-        { signal: this.instance.getEventsController()?.signal }
-      );
-
-      this.eventsInitialized = true;
-    }
   }
 
   private updateNode(nodeInstance: WeaveElementInstance) {
@@ -167,8 +129,6 @@ export class WeaveTextNode extends WeaveNode {
   }
 
   onRender(props: WeaveElementAttributes): WeaveElementInstance {
-    this.initEvents();
-
     const text = new Konva.Text({
       ...props,
       name: 'node',
@@ -275,6 +235,8 @@ export class WeaveTextNode extends WeaveNode {
     let actualAnchor: string | null | undefined = undefined;
 
     text.on('transformstart', (e) => {
+      const isCtrlOrMetaPressed = e.evt.ctrlKey || e.evt.metaKey;
+
       this.instance.emitEvent('onTransform', e.target);
 
       actualAnchor = this.getNodesSelectionPlugin()
@@ -286,7 +248,7 @@ export class WeaveTextNode extends WeaveNode {
           ['top-left', 'top-right', 'bottom-left', 'bottom-right'].includes(
             actualAnchor ?? ''
           )) ||
-        (text.getAttrs().layout === TEXT_LAYOUT.FIXED && this.isCtrlMetaPressed)
+        (text.getAttrs().layout === TEXT_LAYOUT.FIXED && isCtrlOrMetaPressed)
       ) {
         this.getNodesSelectionPlugin()?.getTransformer()?.keepRatio(true);
       } else {
