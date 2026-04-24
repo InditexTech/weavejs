@@ -6,6 +6,7 @@ import { WeavePlugin } from '@/plugins/plugin';
 import {
   WEAVE_STAGE_KEYBOARD_MOVE_DEFAULT_CONFIG,
   WEAVE_STAGE_KEYBOARD_MOVE_KEY,
+  WEAVE_STAGE_KEYBOARD_MOVE_ORIENTATION,
 } from './constants';
 import type { WeaveNodesSelectionPlugin } from '../nodes-selection/nodes-selection';
 import type {
@@ -52,16 +53,16 @@ export class WeaveStageKeyboardMovePlugin extends WeavePlugin {
 
       for (const node of selectedNodes) {
         switch (movementOrientation) {
-          case 'up':
+          case WEAVE_STAGE_KEYBOARD_MOVE_ORIENTATION.UP:
             node.y(node.y() - movementDelta);
             break;
-          case 'down':
+          case WEAVE_STAGE_KEYBOARD_MOVE_ORIENTATION.DOWN:
             node.y(node.y() + movementDelta);
             break;
-          case 'left':
+          case WEAVE_STAGE_KEYBOARD_MOVE_ORIENTATION.LEFT:
             node.x(node.x() - movementDelta);
             break;
-          case 'right':
+          case WEAVE_STAGE_KEYBOARD_MOVE_ORIENTATION.RIGHT:
             node.x(node.x() + movementDelta);
             break;
         }
@@ -92,16 +93,25 @@ export class WeaveStageKeyboardMovePlugin extends WeavePlugin {
         const isShiftPressed = e.shiftKey || e.code === 'Shift';
 
         if (e.code === 'ArrowUp') {
-          this.handleNodesMovement('up', { isShiftPressed });
+          this.handleNodesMovement(WEAVE_STAGE_KEYBOARD_MOVE_ORIENTATION.UP, {
+            isShiftPressed,
+          });
         }
         if (e.code === 'ArrowLeft') {
-          this.handleNodesMovement('left', { isShiftPressed });
+          this.handleNodesMovement(WEAVE_STAGE_KEYBOARD_MOVE_ORIENTATION.LEFT, {
+            isShiftPressed,
+          });
         }
         if (e.code === 'ArrowRight') {
-          this.handleNodesMovement('right', { isShiftPressed });
+          this.handleNodesMovement(
+            WEAVE_STAGE_KEYBOARD_MOVE_ORIENTATION.RIGHT,
+            { isShiftPressed }
+          );
         }
         if (e.code === 'ArrowDown') {
-          this.handleNodesMovement('down', { isShiftPressed });
+          this.handleNodesMovement(WEAVE_STAGE_KEYBOARD_MOVE_ORIENTATION.DOWN, {
+            isShiftPressed,
+          });
         }
       },
       { signal: this.instance.getEventsController()?.signal }
