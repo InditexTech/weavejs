@@ -369,8 +369,15 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
 
       if (this.getUsersPresencePlugin()) {
         for (const node of tr.nodes()) {
+          let parentId: string = node.getParent()?.id() ?? '';
+          const parent = node.getParent();
+          if (parent?.getAttrs().nodeId) {
+            parentId = parent.getAttrs().nodeId;
+          }
+
           this.getUsersPresencePlugin()?.setPresence(
             node.id(),
+            parentId,
             {
               x: node.x(),
               y: node.y(),
@@ -523,8 +530,15 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
 
         if (this.getUsersPresencePlugin() && this.dragInProcess) {
           for (const node of selectedNodes) {
+            let parentId: string = node.getParent()?.id() ?? '';
+            const parent = node.getParent();
+            if (parent?.getAttrs().nodeId) {
+              parentId = parent.getAttrs().nodeId;
+            }
+
             this.getUsersPresencePlugin()?.setPresence(
               node.id(),
+              parentId,
               {
                 x: node.x(),
                 y: node.y(),

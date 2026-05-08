@@ -21,6 +21,7 @@ export type WeaveUserPresenceInformation = Record<
 
 export type WeaveUserPresence<T> = {
   userId: string;
+  parentId: string;
   nodeId: string;
   attrs: T;
 };

@@ -10,7 +10,7 @@ import type {
   WeaveMousePointInfoSimple,
 } from '@inditextech/weave-types';
 import type { WeaveNodesSelectionPlugin } from '@/plugins/nodes-selection/nodes-selection';
-import { getBoundingBox } from '@/utils/utils';
+import { containerOverCursor, getBoundingBox } from '@/utils/utils';
 
 export class WeaveTargetingManager {
   private instance: Weave;
@@ -181,20 +181,23 @@ export class WeaveTargetingManager {
 
   getMousePointer(point?: Konva.Vector2d): WeaveMousePointInfo {
     this.logger.debug({ point }, 'getMousePointer');
-    const stage = this.instance.getStage();
     const mainLayer = this.instance.getMainLayer();
 
     let relativeMousePointer =
       typeof point !== 'undefined'
         ? point
         : mainLayer?.getRelativePointerPosition() ?? { x: 0, y: 0 };
-    let measureContainer: Konva.Layer | Konva.Group | undefined = mainLayer;
-    let container: Konva.Layer | Konva.Node | undefined = mainLayer;
 
     const utilityLayer = this.instance.getUtilityLayer();
     if (utilityLayer) {
       utilityLayer.visible(false);
     }
+
+    const containerAlt = containerOverCursor(
+      this.instance,
+      [],
+      relativeMousePointer
+    );
 
     const nodesSelection =
       this.instance.getPlugin<WeaveNodesSelectionPlugin>('nodesSelection');
@@ -203,42 +206,8 @@ export class WeaveTargetingManager {
       nodesSelection.getTransformer().visible(false);
     }
 
-    const dummyRect = new Konva.Rect({
-      width: 10,
-      height: 10,
-      x: relativeMousePointer.x,
-      y: relativeMousePointer.y,
-    });
-    mainLayer?.add(dummyRect);
-
-    const intersectedNode = this.nodeIntersectsContainerElement(dummyRect);
-    if (intersectedNode) {
-      const containerOfNode = stage.findOne(
-        `#${intersectedNode.getAttrs().containerId}`
-      ) as Konva.Group | undefined;
-      if (containerOfNode) {
-        container = intersectedNode;
-        measureContainer = containerOfNode;
-      }
-    }
-
-    if (
-      typeof point === 'undefined' &&
-      container?.getAttrs().nodeType !== 'layer'
-    ) {
-      relativeMousePointer =
-        measureContainer?.getRelativePointerPosition() ?? relativeMousePointer;
-    }
-
-    if (
-      typeof point === 'undefined' &&
-      container?.getAttrs().nodeType === 'layer'
-    ) {
-      relativeMousePointer = measureContainer?.getRelativePointerPosition() ?? {
-        x: 0,
-        y: 0,
-      };
-    }
+    relativeMousePointer =
+      containerAlt?.getRelativePointerPosition() ?? relativeMousePointer;
 
     if (utilityLayer) {
       utilityLayer.visible(true);
@@ -248,9 +217,11 @@ export class WeaveTargetingManager {
       nodesSelection.getTransformer().visible(true);
     }
 
-    dummyRect.destroy();
-
-    return { mousePoint: relativeMousePointer, container, measureContainer };
+    return {
+      mousePoint: relativeMousePointer,
+      container: containerAlt,
+      measureContainer: containerAlt,
+    };
   }
 
   getMousePointerRelativeToContainer(

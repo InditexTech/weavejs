@@ -43,6 +43,7 @@ export class WeaveImageNode extends WeaveNode {
   protected tapStart!: { x: number; y: number; time: number } | null;
   protected imageCrop!: WeaveImageCrop | null;
   protected nodeType: string = WEAVE_IMAGE_NODE_TYPE;
+  protected notUsedImagesCleanup!: NodeJS.Timeout | null;
   private readonly cursorsFallback: WeaveImageCursors = {
     loading: 'wait',
   };
@@ -67,6 +68,34 @@ export class WeaveImageNode extends WeaveNode {
     this.imageTryoutIds = {};
     this.imageTryoutAttempts = {};
     this.imageFallback = {};
+  }
+
+  private setupNotUsedImagesCleanup() {
+    const cleanupHandler = () => {
+      this.notUsedImagesCleanup = null;
+      const stage = this.instance.getStage();
+
+      const nodesIds = Object.keys(this.imageState);
+
+      for (const nodeId of nodesIds) {
+        const node = stage.findOne(`#${nodeId}`) as Konva.Node | undefined;
+
+        if (!node) {
+          delete this.imageSource[nodeId];
+          delete this.imageState[nodeId];
+          delete this.imageTryoutAttempts[nodeId];
+          delete this.imageFallback[nodeId];
+        }
+      }
+
+      this.setupNotUsedImagesCleanup();
+    };
+
+    const bindedCleanupHandler = cleanupHandler.bind(this);
+
+    if (!this.notUsedImagesCleanup) {
+      setTimeout(bindedCleanupHandler, this.config.cleanup.intervalMs);
+    }
   }
 
   preloadCursors() {
@@ -237,6 +266,8 @@ export class WeaveImageNode extends WeaveNode {
   onRender(props: WeaveElementAttributes): WeaveElementInstance {
     // this.initGlobalEvents();
 
+    this.setupNotUsedImagesCleanup();
+
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const imageProperties: any = props.imageProperties;
     const imageProps = props as ImageProps;
@@ -278,15 +309,6 @@ export class WeaveImageNode extends WeaveNode {
       }
 
       return 'pointer';
-    };
-
-    image.movedToContainer = () => {
-      const stage = this.instance.getStage();
-      const image = stage.findOne(`#${id}`) as Konva.Group | undefined;
-
-      if (!image) {
-        return;
-      }
     };
 
     if (this.config.cropMode.enabled) {
@@ -1403,9 +1425,6 @@ export class WeaveImageNode extends WeaveNode {
   onDestroy(nodeInstance: WeaveElementInstance) {
     const nodeId = nodeInstance.getAttrs().id ?? '';
 
-    const isMoveContainer = nodeInstance.getAttr('onMoveContainer');
-    nodeInstance.setAttr('onMoveContainer', undefined);
-
     const utilityLayer = this.instance.getUtilityLayer();
     const nodes = utilityLayer?.find('.cropMode') ?? [];
     nodes.forEach((n) => {
@@ -1415,13 +1434,6 @@ export class WeaveImageNode extends WeaveNode {
     if (this.imageTryoutIds[nodeId]) {
       clearTimeout(this.imageTryoutIds[nodeId]);
       delete this.imageTryoutIds[nodeId];
-    }
-
-    if (!isMoveContainer) {
-      delete this.imageSource[nodeId];
-      delete this.imageState[nodeId];
-      delete this.imageTryoutAttempts[nodeId];
-      delete this.imageFallback[nodeId];
     }
 
     nodeInstance.destroy();

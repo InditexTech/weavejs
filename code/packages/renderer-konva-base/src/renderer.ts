@@ -299,23 +299,23 @@ export class WeaveKonvaBaseRenderer extends WeaveRenderer {
 
     const stage = this.instance.getStage();
 
-    const parentInstance = stage.findOne(`#${instruction.parentKey}`) as
-      | Stage
-      | Layer
-      | Group;
-
-    const childInstance = stage.findOne(
+    const childInstances: WeaveElementInstance[] = stage.find(
       `#${instruction.key}`
-    ) as WeaveElementInstance;
+    );
 
-    if (!childInstance) {
-      console.warn(
-        `Trying to remove non existing node with key ${instruction.key}`
-      );
-      return;
+    for (const childInstance of childInstances) {
+      let parent = childInstance.getParent();
+      if (parent && parent.getAttrs().nodeId) {
+        parent = stage.findOne(`#${parent.getAttrs().nodeId}`) as
+          | Stage
+          | Layer
+          | Group;
+      }
+
+      if (parent?.id() === instruction.parentKey) {
+        this.reconciler.removeChild(this.instance, childInstance);
+      }
     }
-
-    this.reconciler.removeChild(this.instance, parentInstance, childInstance);
   }
 
   private updateProps(instruction: RendererInstruction) {
@@ -330,9 +330,6 @@ export class WeaveKonvaBaseRenderer extends WeaveRenderer {
     const node = stage.findOne(`#${instruction.key}`) as WeaveElementInstance;
 
     if (!node) {
-      console.warn(
-        `Trying to update non existing node with key ${instruction.key}`
-      );
       return;
     }
 
