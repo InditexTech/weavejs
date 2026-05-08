@@ -13,6 +13,7 @@ import {
   type MappedTypeDescription,
   type WeaveStoreConnectionStatus,
   type WeaveStoreOnStoreConnectionStatusChangeEvent,
+  type AllowedObject,
 } from '@inditextech/weave-types';
 import {
   observeDeep,
@@ -28,6 +29,7 @@ import type {
   WeaveStoreOnRedoChangeEvent,
   WeaveStoreOnRoomLoadedEvent,
   WeaveStoreOnStateChangeEvent,
+  WeaveStoreOnStateMetadataChangeEvent,
   WeaveStoreOnUndoChangeEvent,
   WeaveStoreOnUndoRedoChangeEvent,
 } from './types';
@@ -53,9 +55,11 @@ export abstract class WeaveStore implements WeaveStoreBase {
     this.isRoomLoaded = false;
     this.latestState = {
       weave: {},
+      weaveMetadata: {},
     };
     this.state = syncedStore<WeaveState>({
       weave: {},
+      weaveMetadata: {},
     });
     this.document = getYjsDoc(this.state);
   }
@@ -197,6 +201,17 @@ export abstract class WeaveStore implements WeaveStoreBase {
       }
     }
 
+    observeDeep(this.getState().weaveMetadata, () => {
+      const newMetadataState: AllowedObject = JSON.parse(
+        JSON.stringify(this.getState())
+      ).weaveMetadata;
+
+      this.instance.emitEvent<WeaveStoreOnStateMetadataChangeEvent>(
+        'onStateMetadataChange',
+        newMetadataState
+      );
+    });
+
     observeDeep(this.getState(), () => {
       const newState: WeaveState = JSON.parse(JSON.stringify(this.getState()));
 
@@ -276,7 +291,6 @@ export abstract class WeaveStore implements WeaveStoreBase {
     this.instance.emitEvent<WeaveStoreOnRedoChangeEvent>('onRedoChange');
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   handleConnectionStatusChange(status: WeaveStoreConnectionStatus): void {
     this.instance.emitEvent<WeaveStoreOnStoreConnectionStatusChangeEvent>(
       'onStoreConnectionStatusChange',

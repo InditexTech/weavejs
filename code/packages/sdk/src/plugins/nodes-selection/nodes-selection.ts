@@ -42,11 +42,7 @@ import type { Stage } from 'konva/lib/Stage';
 import { WEAVE_STAGE_DEFAULT_MODE } from '@/nodes/stage/constants';
 import type { TransformerConfig } from 'konva/lib/shapes/Transformer';
 import { SELECTION_TOOL_ACTION_NAME } from '@/actions/selection-tool/constants';
-import { WEAVE_NODES_EDGE_SNAPPING_PLUGIN_KEY } from '../nodes-edge-snapping/constants';
 import { WEAVE_CONTEXT_MENU_PLUGIN_KEY } from '../context-menu/constants';
-import type { WeaveNodesEdgeSnappingPlugin } from '../nodes-edge-snapping/nodes-edge-snapping';
-import type { WeaveNodesDistanceSnappingPlugin } from '../nodes-distance-snapping/nodes-distance-snapping';
-import { WEAVE_NODES_DISTANCE_SNAPPING_PLUGIN_KEY } from '../nodes-distance-snapping/constants';
 import { WEAVE_STAGE_GRID_PLUGIN_KEY } from '../stage-grid/constants';
 import type { WeaveStageGridPlugin } from '../stage-grid/stage-grid';
 import type { WeaveStagePanningPlugin } from '../stage-panning/stage-panning';
@@ -212,6 +208,7 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
     const trHover = new Konva.Transformer({
       id: 'hoverTransformer',
       ...this.config.hover,
+      ignoreStroke: true,
       rotateEnabled: false,
       resizeEnabled: false,
       enabledAnchors: [],
@@ -288,10 +285,10 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
 
       for (const node of selectedNodes) {
         node.handleMouseout(e);
-        if (node.getAttrs().strokeScaleEnabled !== false) {
-          node.setAttr('strokeScaleEnabled', false);
-          node.setAttr('_revertStrokeScaleEnabled', true);
-        }
+        // if (node.getAttrs().strokeScaleEnabled !== false) {
+        //   node.setAttr('strokeScaleEnabled', false);
+        //   node.setAttr('_revertStrokeScaleEnabled', true);
+        // }
       }
 
       if (this.getSelectedNodes().length > 1) {
@@ -300,6 +297,11 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
           operation: 'nodes-transform',
         });
       }
+
+      this.instance.getHooks().callHook('weave:onTransformerTransformStart', {
+        e,
+        nodes: selectedNodes,
+      });
     });
 
     let nodeHovered: Konva.Node | undefined = undefined;
@@ -335,7 +337,7 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
 
       if (nodesSelected.length === 1) {
         const node = nodesSelected[0];
-        stage.container().style.cursor = node.defineMousePointer() ?? 'grab';
+        stage.container().style.cursor = node.defineMousePointer?.() ?? 'grab';
       } else {
         stage.container().style.cursor = 'grab';
       }
@@ -350,7 +352,7 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
       'mouseout',
       (e) => {
         if (nodeHovered) {
-          nodeHovered.handleMouseout(e);
+          nodeHovered.handleMouseout?.(e);
           nodeHovered = undefined;
         }
         this.instance.getStage().handleMouseover?.(e);
@@ -358,14 +360,18 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
       { signal: this.instance.getEventsController()?.signal }
     );
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const handleTransform = (e: any) => {
+    const handleTransform = (e: KonvaEventObject<PointerEvent>) => {
       const moved = this.checkMoved(e);
       if (moved) {
         this.getContextMenuPlugin()?.cancelLongPressTimer();
       }
 
       this.triggerSelectedNodesEvent();
+
+      this.instance.getHooks().callHook('weave:onTransformerTransform', {
+        e,
+        nodes: selectedNodes,
+      });
 
       if (this.getUsersPresencePlugin()) {
         for (const node of tr.nodes()) {
@@ -389,8 +395,9 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
     };
 
     tr.on('transform', throttle(handleTransform, DEFAULT_THROTTLE_MS));
+    // tr.on('transform', handleTransform);
 
-    tr.on('transformend', () => {
+    tr.on('transformend', (e) => {
       this.transformInProcess = false;
 
       if (this.getSelectedNodes().length > 1) {
@@ -403,15 +410,20 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
         node.handleDeselectNode();
         node.handleSelectNode();
 
-        if (node.getAttrs()._revertStrokeScaleEnabled === true) {
-          node.setAttr('strokeScaleEnabled', true);
-        }
-        node.setAttr('_revertStrokeScaleEnabled', undefined);
+        // if (node.getAttrs()._revertStrokeScaleEnabled === true) {
+        //   node.setAttr('strokeScaleEnabled', true);
+        // }
+        // node.setAttr('_revertStrokeScaleEnabled', undefined);
       }
 
       tr.forceUpdate();
 
       this.triggerSelectedNodesEvent();
+
+      this.instance.getHooks().callHook('weave:onTransformerTransformEnd', {
+        e,
+        nodes: selectedNodes,
+      });
     });
 
     let initialPos: Konva.Vector2d | null = null;
@@ -467,6 +479,10 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
 
       e.cancelBubble = true;
 
+      this.instance
+        .getHooks()
+        .callHook('weave:onTransformerDragStart', { e, nodes: selectedNodes });
+
       tr.forceUpdate();
 
       if (selectedNodes.length > 1) {
@@ -488,6 +504,10 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
       }
 
       e.cancelBubble = true;
+
+      this.instance
+        .getHooks()
+        .callHook('weave:onTransformerDragMove', { e, nodes: selectedNodes });
 
       if (initialPos) {
         const moved = this.checkMovedDrag(initialPos, actualPos);
@@ -545,7 +565,7 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
       tr.forceUpdate();
     };
 
-    tr.on('dragmove', throttle(handleDragMove, DEFAULT_THROTTLE_MS));
+    tr.on('dragmove', handleDragMove);
 
     tr.on('dragend', (e) => {
       this.dragInProcess = false;
@@ -572,6 +592,10 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
       }
 
       e.cancelBubble = true;
+
+      this.instance
+        .getHooks()
+        .callHook('weave:onTransformerDragEnd', { e, nodes: selectedNodes });
 
       this.instance.getCloningManager().cleanupClones();
 
@@ -741,7 +765,7 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
       }
 
       if (currentSelectedNodes.length === 1) {
-        currentSelectedNodes[0].handleDeselectNode();
+        currentSelectedNodes[0]?.handleDeselectNode?.();
       }
 
       for (const node of unselectedNodes) {
@@ -1006,9 +1030,7 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
     return true;
   }
 
-  private checkMoved(
-    e: KonvaEventObject<PointerEvent | DragEvent, Stage | Konva.Transformer>
-  ): boolean {
+  private checkMoved(e: KonvaEventObject<PointerEvent | DragEvent>): boolean {
     if (!this.tapStart) {
       return false;
     }
@@ -1100,6 +1122,10 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
 
     stage.on('pointerdown', (e: KonvaEventObject<PointerEvent, Stage>) => {
       this.setTapStart(e);
+
+      if (e.target.getClassName().includes('custom-snap-guide')) {
+        return;
+      }
 
       this.handledClickOrTap = false;
 
@@ -1274,11 +1300,6 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
 
       if (stage.mode() !== WEAVE_STAGE_DEFAULT_MODE) {
         return;
-      }
-
-      if (stage.mode() === WEAVE_STAGE_DEFAULT_MODE) {
-        this.getNodesEdgeSnappingPlugin()?.cleanupGuidelines();
-        this.getNodesDistanceSnappingPlugin()?.cleanupGuidelines();
       }
 
       const contextMenuPlugin = this.getContextMenuPlugin();
@@ -1684,7 +1705,7 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
       stage.container().tabIndex = 1;
       stage.container().focus();
       stage.container().style.cursor =
-        nodeTargeted.defineMousePointer() ?? 'grab';
+        nodeTargeted.defineMousePointer?.() ?? 'grab';
     }
 
     this.triggerSelectedNodesEvent();
@@ -1733,12 +1754,12 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
         transformerAttrs,
         nodes[0].getTransformerProperties()
       );
-      transformerAttrs.enabledAnchors = nodes[0]?.allowedAnchors() ?? [];
+      transformerAttrs.enabledAnchors = nodes[0]?.allowedAnchors?.() ?? [];
     }
     if (nodesSelected > 1) {
       const anchorsArrays = [];
       for (const node of nodes) {
-        anchorsArrays.push(node?.allowedAnchors() ?? []);
+        anchorsArrays.push(node?.allowedAnchors?.() ?? []);
       }
 
       const enabledAnchors = intersectArrays(anchorsArrays);
@@ -1829,22 +1850,6 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
       WEAVE_STAGE_GRID_PLUGIN_KEY
     );
     return gridPlugin;
-  }
-
-  getNodesEdgeSnappingPlugin() {
-    const snappingPlugin =
-      this.instance.getPlugin<WeaveNodesEdgeSnappingPlugin>(
-        WEAVE_NODES_EDGE_SNAPPING_PLUGIN_KEY
-      );
-    return snappingPlugin;
-  }
-
-  getNodesDistanceSnappingPlugin() {
-    const snappingPlugin =
-      this.instance.getPlugin<WeaveNodesDistanceSnappingPlugin>(
-        WEAVE_NODES_DISTANCE_SNAPPING_PLUGIN_KEY
-      );
-    return snappingPlugin;
   }
 
   getStagePanningPlugin() {

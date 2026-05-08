@@ -24,15 +24,11 @@ import {
   mergeExceptArrays,
   moveNodeToContainerNT,
 } from '@/utils/utils';
-import type { WeaveNodesEdgeSnappingPlugin } from '@/plugins/nodes-edge-snapping/nodes-edge-snapping';
 import { throttle } from 'lodash';
 import type { KonvaEventObject } from 'konva/lib/Node';
 import { WEAVE_STAGE_DEFAULT_MODE } from './stage/constants';
 import { MOVE_TOOL_ACTION_NAME } from '@/actions/move-tool/constants';
 import { SELECTION_TOOL_ACTION_NAME } from '@/actions/selection-tool/constants';
-import { WEAVE_NODES_EDGE_SNAPPING_PLUGIN_KEY } from '@/plugins/nodes-edge-snapping/constants';
-import { WEAVE_NODES_DISTANCE_SNAPPING_PLUGIN_KEY } from '@/plugins/nodes-distance-snapping/constants';
-import type { WeaveNodesDistanceSnappingPlugin } from '@/plugins/nodes-distance-snapping/nodes-distance-snapping';
 import type { WeaveNodesMultiSelectionFeedbackPlugin } from '@/plugins/nodes-multi-selection-feedback/nodes-multi-selection-feedback';
 import { WEAVE_NODES_MULTI_SELECTION_FEEDBACK_PLUGIN_KEY } from '@/plugins/nodes-multi-selection-feedback/constants';
 import type { WeaveNodeChangedContainerEvent } from './types';
@@ -268,13 +264,20 @@ export abstract class WeaveNode implements WeaveNodeBase {
   }
 
   scaleReset(node: Konva.Node): void {
-    const scale = node.scale();
+    const absTransform = node.getAbsoluteTransform().copy();
 
-    node.width(Math.max(5, node.width() * scale.x));
-    node.height(Math.max(5, node.height() * scale.y));
+    node.width(node.width() * node.scaleX());
+    node.height(node.height() * node.scaleY());
+    node.scaleX(1);
+    node.scaleY(1);
 
-    // reset scale to 1
-    node.scale({ x: 1, y: 1 });
+    const newTransform = node.getAbsoluteTransform();
+
+    const dx = absTransform.m[4] - newTransform.m[4];
+    const dy = absTransform.m[5] - newTransform.m[5];
+
+    node.x(node.x() + dx);
+    node.y(node.y() + dy);
   }
 
   protected setHoverState(node: Konva.Node): void {
@@ -361,7 +364,7 @@ export abstract class WeaveNode implements WeaveNodeBase {
       node.off('pointerover');
       node.off('pointerleave');
     } else {
-      let transforming = false;
+      // let transforming = false;
 
       this.instance.addEventListener<WeaveNodesSelectionPluginOnNodesChangeEvent>(
         'onNodesChange',
@@ -370,12 +373,12 @@ export abstract class WeaveNode implements WeaveNodeBase {
 
       node.off('transformstart');
       node.on('transformstart', (e) => {
-        transforming = true;
+        // transforming = true;
 
-        if (e.target.getAttrs().strokeScaleEnabled !== false) {
-          e.target.setAttr('strokeScaleEnabled', false);
-          e.target.setAttr('_revertStrokeScaleEnabled', true);
-        }
+        // if (e.target.getAttrs().strokeScaleEnabled !== false) {
+        //   e.target.setAttr('strokeScaleEnabled', false);
+        //   e.target.setAttr('_revertStrokeScaleEnabled', true);
+        // }
 
         this.getNodesSelectionFeedbackPlugin()?.hideSelectionHalo(node);
 
@@ -395,23 +398,12 @@ export abstract class WeaveNode implements WeaveNodeBase {
         const nodesSelectionPlugin =
           this.instance.getPlugin<WeaveNodesSelectionPlugin>('nodesSelection');
 
-        const nodesEdgeSnappingPlugin = this.getNodesEdgeSnappingPlugin();
-
         if (
           nodesSelectionPlugin &&
           this.isSelecting() &&
           this.isNodeSelected(node)
         ) {
           nodesSelectionPlugin.getTransformer().forceUpdate();
-        }
-
-        if (
-          nodesEdgeSnappingPlugin &&
-          transforming &&
-          this.isSelecting() &&
-          this.isNodeSelected(node)
-        ) {
-          nodesEdgeSnappingPlugin.evaluateGuidelines(e);
         }
 
         this.getUsersPresencePlugin()?.setPresence(node.id(), {
@@ -428,6 +420,7 @@ export abstract class WeaveNode implements WeaveNodeBase {
 
       node.off('transform');
       node.on('transform', throttle(handleTransform, DEFAULT_THROTTLE_MS));
+      // node.on('transform', handleTransform);
 
       node.off('transformend');
       node.on('transformend', (e) => {
@@ -437,23 +430,17 @@ export abstract class WeaveNode implements WeaveNodeBase {
           this.instance.releaseMutexLock();
         }
 
-        if (e.target.getAttrs()._revertStrokeScaleEnabled === true) {
-          e.target.setAttr('strokeScaleEnabled', true);
-        }
-        e.target.setAttr('_revertStrokeScaleEnabled', undefined);
+        // if (e.target.getAttrs()._revertStrokeScaleEnabled === true) {
+        //   e.target.setAttr('strokeScaleEnabled', true);
+        // }
+        // e.target.setAttr('_revertStrokeScaleEnabled', undefined);
 
         this.instance.emitEvent('onTransform', null);
 
-        transforming = false;
+        // transforming = false;
 
         const nodesSelectionPlugin =
           this.instance.getPlugin<WeaveNodesSelectionPlugin>('nodesSelection');
-
-        const nodesSnappingPlugin = this.getNodesEdgeSnappingPlugin();
-
-        if (nodesSnappingPlugin) {
-          nodesSnappingPlugin.cleanupGuidelines();
-        }
 
         if (nodesSelectionPlugin) {
           nodesSelectionPlugin.getTransformer().forceUpdate();
@@ -522,6 +509,10 @@ export abstract class WeaveNode implements WeaveNodeBase {
         }
 
         e.cancelBubble = true;
+
+        this.instance
+          .getHooks()
+          .callHook('weave:onNodeDragStart', { e, node: nodeTarget });
 
         this.getNodesSelectionFeedbackPlugin()?.hideSelectionHalo(nodeTarget);
 
@@ -698,10 +689,14 @@ export abstract class WeaveNode implements WeaveNodeBase {
             });
           }
         }
+
+        this.instance
+          .getHooks()
+          .callHook('weave:onNodeDragMove', { e, node: realNodeTarget });
       };
 
       node.off('dragmove');
-      node.on('dragmove', throttle(handleDragMove, DEFAULT_THROTTLE_MS));
+      node.on('dragmove', handleDragMove);
 
       node.dragBoundFunc((pos) => {
         if (!startPosition) return pos;
@@ -758,6 +753,10 @@ export abstract class WeaveNode implements WeaveNodeBase {
           );
         }
 
+        this.instance
+          .getHooks()
+          .callHook('weave:onNodeDragEnd', { e, node: nodeTarget });
+
         e.cancelBubble = true;
 
         if (nodeTarget.getAttrs().isCloneOrigin && originalPosition) {
@@ -791,19 +790,6 @@ export abstract class WeaveNode implements WeaveNodeBase {
         ) {
           this.instance.stateTransactional(() => {
             clearContainerTargets(this.instance);
-
-            const nodesEdgeSnappingPlugin = this.getNodesEdgeSnappingPlugin();
-
-            const nodesDistanceSnappingPlugin =
-              this.getNodesDistanceSnappingPlugin();
-
-            if (nodesEdgeSnappingPlugin) {
-              nodesEdgeSnappingPlugin.cleanupGuidelines();
-            }
-
-            if (nodesDistanceSnappingPlugin) {
-              nodesDistanceSnappingPlugin.cleanupGuidelines();
-            }
 
             const layerToMove = containerOverCursor(this.instance, [
               realNodeTarget,
@@ -954,10 +940,7 @@ export abstract class WeaveNode implements WeaveNodeBase {
     }
   }
 
-  handleMouseOver(
-    e: KonvaEventObject<MouseEvent, any>,
-    node: Konva.Node
-  ): boolean {
+  handleMouseOver(e: KonvaEventObject<MouseEvent>, node: Konva.Node): boolean {
     const stage = this.instance.getStage();
 
     const isCtrlOrMetaPressed = e.evt.ctrlKey || e.evt.metaKey;
@@ -1010,7 +993,7 @@ export abstract class WeaveNode implements WeaveNodeBase {
     ) {
       showHover = true;
       stage.container().style.cursor =
-        realNode?.defineMousePointer() ?? 'pointer';
+        realNode?.defineMousePointer?.() ?? 'pointer';
       cancelBubble = true;
     }
 
@@ -1025,7 +1008,8 @@ export abstract class WeaveNode implements WeaveNodeBase {
       stage.mode() === WEAVE_STAGE_DEFAULT_MODE
     ) {
       showHover = true;
-      stage.container().style.cursor = realNode?.defineMousePointer() ?? 'grab';
+      stage.container().style.cursor =
+        realNode?.defineMousePointer?.() ?? 'grab';
       cancelBubble = true;
     }
 
@@ -1048,8 +1032,8 @@ export abstract class WeaveNode implements WeaveNodeBase {
     return cancelBubble;
   }
 
-  handleMouseout(e: KonvaEventObject<MouseEvent, any>, node: Konva.Node) {
-    const isCtrlOrMetaPressed = e.evt.ctrlKey || e.evt.metaKey;
+  handleMouseout(e: KonvaEventObject<MouseEvent>, node: Konva.Node) {
+    const isCtrlOrMetaPressed = e.evt?.ctrlKey || e.evt?.metaKey;
 
     if (isCtrlOrMetaPressed) {
       return;
@@ -1270,22 +1254,6 @@ export abstract class WeaveNode implements WeaveNodeBase {
       this.instance.getPlugin<WeaveNodesSelectionPlugin>('nodesSelection');
 
     return nodesSelectionPlugin;
-  }
-
-  protected getNodesEdgeSnappingPlugin() {
-    const snappingPlugin =
-      this.instance.getPlugin<WeaveNodesEdgeSnappingPlugin>(
-        WEAVE_NODES_EDGE_SNAPPING_PLUGIN_KEY
-      );
-    return snappingPlugin;
-  }
-
-  protected getNodesDistanceSnappingPlugin() {
-    const snappingPlugin =
-      this.instance.getPlugin<WeaveNodesDistanceSnappingPlugin>(
-        WEAVE_NODES_DISTANCE_SNAPPING_PLUGIN_KEY
-      );
-    return snappingPlugin;
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars

@@ -31,13 +31,50 @@ export class WeaveEllipseNode extends WeaveNode {
   }
 
   onRender(props: WeaveElementAttributes): WeaveElementInstance {
-    const ellipse = new Konva.Ellipse({
+    const ellipse = new Konva.Group({
       ...props,
       name: 'node',
-      radiusX: props.radiusX,
-      radiusY: props.radiusY,
-      strokeScaleEnabled: true,
     });
+
+    const baseRadiusX = ellipse.getAttr('radiusX') as number;
+    const baseRadiusY = ellipse.getAttr('radiusY') as number;
+
+    const internalEllipseBg = new Konva.Ellipse({
+      ...props,
+      name: undefined,
+      id: `${props.id}-bg`,
+      nodeId: props.id,
+      x: Math.max(1, baseRadiusX),
+      y: Math.max(1, baseRadiusY),
+      radiusX: Math.max(1, baseRadiusX),
+      radiusY: Math.max(1, baseRadiusY),
+      fill: props.fill || 'transparent',
+      strokeWidth: 0,
+      strokeScaleEnabled: true,
+      rotation: 0,
+    });
+
+    ellipse.add(internalEllipseBg);
+
+    const internalEllipseBorder = new Konva.Ellipse({
+      ...props,
+      name: undefined,
+      id: `${props.id}-border`,
+      x: Math.max(1, baseRadiusX),
+      y: Math.max(1, baseRadiusY),
+      radiusX: Math.max(1, baseRadiusX) - (props.strokeWidth || 0) / 2,
+      radiusY: Math.max(1, baseRadiusY) - (props.strokeWidth || 0) / 2,
+      fill: 'transparent',
+      strokeWidth: props.strokeWidth || 0,
+      strokeScaleEnabled: true,
+      rotation: 0,
+      listening: false,
+    });
+
+    ellipse.add(internalEllipseBorder);
+
+    internalEllipseBorder.moveToTop();
+    internalEllipseBg.moveToBottom();
 
     this.setupDefaultNodeAugmentation(ellipse);
 
@@ -96,22 +133,59 @@ export class WeaveEllipseNode extends WeaveNode {
       ...nextProps,
     });
 
+    const baseRadiusX = nodeInstance.getAttr('radiusX') as number;
+    const baseRadiusY = nodeInstance.getAttr('radiusY') as number;
+
+    const ellipse = nodeInstance as Konva.Group;
+    const internalEllipseBg = ellipse.findOne(
+      `#${nextProps.id}-bg`
+    ) as Konva.Ellipse;
+    const internalEllipseBorder = ellipse.findOne(
+      `#${nextProps.id}-border`
+    ) as Konva.Ellipse;
+
+    if (internalEllipseBg) {
+      internalEllipseBg.setAttrs({
+        ...nextProps,
+        name: undefined,
+        id: `${nextProps.id}-bg`,
+        nodeId: nextProps.id,
+        x: Math.max(1, baseRadiusX),
+        y: Math.max(1, baseRadiusY),
+        radiusX: Math.max(1, baseRadiusX),
+        radiusY: Math.max(1, baseRadiusY),
+        fill: nextProps.fill || 'transparent',
+        strokeWidth: 0,
+        strokeScaleEnabled: true,
+        rotation: 0,
+      });
+      internalEllipseBg.moveToBottom();
+    }
+
+    if (internalEllipseBorder) {
+      internalEllipseBorder.setAttrs({
+        ...nextProps,
+        name: undefined,
+        id: `${nextProps.id}-border`,
+        x: Math.max(1, baseRadiusX),
+        y: Math.max(1, baseRadiusY),
+        radiusX: Math.max(1, baseRadiusX) - (nextProps.strokeWidth || 0) / 2,
+        radiusY: Math.max(1, baseRadiusY) - (nextProps.strokeWidth || 0) / 2,
+        stroke: nextProps.stroke || 'transparent',
+        strokeWidth: nextProps.strokeWidth || 0,
+        strokeScaleEnabled: true,
+        listening: false,
+        rotation: 0,
+      });
+      internalEllipseBorder.moveToTop();
+    }
+
     const nodesSelectionPlugin =
       this.instance.getPlugin<WeaveNodesSelectionPlugin>('nodesSelection');
 
     if (nodesSelectionPlugin) {
-      const actualSelectedNodes = nodesSelectionPlugin.getSelectedNodes();
-      nodesSelectionPlugin.setSelectedNodes(actualSelectedNodes);
       nodesSelectionPlugin.getTransformer().forceUpdate();
     }
-  }
-
-  scaleReset(node: Konva.Ellipse): void {
-    node.radiusX(Math.max(5, node.radiusX() * node.scaleX()));
-    node.radiusY(Math.max(5, node.radiusY() * node.scaleY()));
-
-    // reset scale to 1
-    node.scale({ x: 1, y: 1 });
   }
 
   realOffset(element: WeaveStateElement): Konva.Vector2d {
@@ -119,5 +193,27 @@ export class WeaveEllipseNode extends WeaveNode {
       x: element.props.radiusX,
       y: element.props.radiusY,
     };
+  }
+
+  scaleReset(node: Konva.Node): void {
+    const absTransform = node.getAbsoluteTransform().copy();
+
+    const baseRadiusX = node.getAttr('radiusX') as number;
+    const baseRadiusY = node.getAttr('radiusY') as number;
+
+    node.setAttrs({
+      radiusX: baseRadiusX * node.scaleX(),
+      radiusY: baseRadiusY * node.scaleY(),
+    });
+    node.scaleX(1);
+    node.scaleY(1);
+
+    const newTransform = node.getAbsoluteTransform();
+
+    const dx = absTransform.m[4] - newTransform.m[4];
+    const dy = absTransform.m[5] - newTransform.m[5];
+
+    node.x(node.x() + dx);
+    node.y(node.y() + dy);
   }
 }

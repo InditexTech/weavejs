@@ -13,11 +13,7 @@ import type {
   WeaveImageTriggerCropOptions,
 } from './types';
 import { WEAVE_STAGE_DEFAULT_MODE } from '../stage/constants';
-import type { WeaveNodesEdgeSnappingPlugin } from '@/plugins/nodes-edge-snapping/nodes-edge-snapping';
-import { WEAVE_NODES_EDGE_SNAPPING_PLUGIN_KEY } from '@/plugins/nodes-edge-snapping/constants';
 import { WEAVE_NODES_SELECTION_KEY } from '@/plugins/nodes-selection/constants';
-import { WEAVE_NODES_DISTANCE_SNAPPING_PLUGIN_KEY } from '@/plugins/nodes-distance-snapping/constants';
-import type { WeaveNodesDistanceSnappingPlugin } from '@/plugins/nodes-distance-snapping/nodes-distance-snapping';
 import { WEAVE_IMAGE_CROP_ANCHOR_POSITION } from './constants';
 
 const SNAP = 8;
@@ -55,16 +51,6 @@ export class WeaveImageCrop {
 
   show(onClose: () => void, options: WeaveImageTriggerCropOptions): void {
     this.onClose = onClose;
-
-    const nodeEdgeSnappingPlugin = this.getNodesEdgeSnappingPlugin();
-    if (nodeEdgeSnappingPlugin) {
-      nodeEdgeSnappingPlugin.disable();
-    }
-
-    const nodeDistanceSnappingPlugin = this.getNodesDistanceSnappingPlugin();
-    if (nodeDistanceSnappingPlugin) {
-      nodeDistanceSnappingPlugin.disable();
-    }
 
     const nodesSelectionPlugin = this.getNodesSelectionPlugin();
     if (nodesSelectionPlugin) {
@@ -522,16 +508,6 @@ export class WeaveImageCrop {
     this.cropGroup.destroyChildren();
     this.cropGroup.hide();
 
-    const nodesEdgeSnappingPlugin = this.getNodesEdgeSnappingPlugin();
-    if (nodesEdgeSnappingPlugin) {
-      nodesEdgeSnappingPlugin.enable();
-    }
-
-    const nodesDistanceSnappingPlugin = this.getNodesDistanceSnappingPlugin();
-    if (nodesDistanceSnappingPlugin) {
-      nodesDistanceSnappingPlugin.enable();
-    }
-
     this.internalImage.show();
 
     const nodesSelectionPlugin = this.getNodesSelectionPlugin();
@@ -755,22 +731,6 @@ export class WeaveImageCrop {
       x: a.x + t * ab.x,
       y: a.y + t * ab.y,
     };
-  }
-
-  private getNodesEdgeSnappingPlugin() {
-    const snappingEdgesPlugin =
-      this.instance.getPlugin<WeaveNodesEdgeSnappingPlugin>(
-        WEAVE_NODES_EDGE_SNAPPING_PLUGIN_KEY
-      );
-    return snappingEdgesPlugin;
-  }
-
-  private getNodesDistanceSnappingPlugin() {
-    const snappingDistancePlugin =
-      this.instance.getPlugin<WeaveNodesDistanceSnappingPlugin>(
-        WEAVE_NODES_DISTANCE_SNAPPING_PLUGIN_KEY
-      );
-    return snappingDistancePlugin;
   }
 
   private getNodesSelectionPlugin() {

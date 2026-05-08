@@ -155,6 +155,7 @@ export class WeaveTextNode extends WeaveNode {
       if (actualAttrs.layout === TEXT_LAYOUT.SMART) {
         return {
           ...defaultTransformerProperties,
+          ignoreStroke: true,
           resizeEnabled: true,
           keepRatio: false,
           enabledAnchors: [] as string[],
@@ -163,6 +164,7 @@ export class WeaveTextNode extends WeaveNode {
       if (actualAttrs.layout === TEXT_LAYOUT.AUTO_ALL) {
         return {
           ...defaultTransformerProperties,
+          ignoreStroke: true,
           resizeEnabled: false,
           enabledAnchors: [] as string[],
         };
@@ -170,6 +172,7 @@ export class WeaveTextNode extends WeaveNode {
       if (actualAttrs.layout === TEXT_LAYOUT.AUTO_HEIGHT) {
         return {
           ...defaultTransformerProperties,
+          ignoreStroke: true,
           resizeEnabled: true,
           enabledAnchors: ['middle-right', 'middle-left'] as string[],
         };
@@ -866,8 +869,7 @@ export class WeaveTextNode extends WeaveNode {
       }
     };
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const handleKeyDown = (e: any) => {
+    const handleKeyDown = (e: KeyboardEvent) => {
       if (this.textArea && textNode && e.code === 'Escape') {
         e.stopPropagation();
 
@@ -905,7 +907,6 @@ export class WeaveTextNode extends WeaveNode {
 
     textNode.setAttr('cancelEditMode', cancelEditMode.bind(this));
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const handleKeyUp = () => {
       if (!this.textArea) {
         return;

@@ -7,6 +7,7 @@ import mergeWith from 'lodash/mergeWith';
 import {
   WEAVE_NODE_CHANGE_TYPE,
   WEAVE_NODE_CUSTOM_EVENTS,
+  type BoundingBox,
   type WeaveElementInstance,
 } from '@inditextech/weave-types';
 import type { KonvaEventObject } from 'konva/lib/Node';
@@ -225,12 +226,7 @@ export function moveNodeToContainerNT(
   return false;
 }
 
-export function getExportBoundingBox(nodes: Konva.Node[]): {
-  x: number;
-  y: number;
-  width: number;
-  height: number;
-} {
+export function getExportBoundingBox(nodes: Konva.Node[]): BoundingBox {
   if (nodes.length === 0) {
     return { x: 0, y: 0, width: 0, height: 0 };
   }
@@ -267,12 +263,7 @@ export function getBoundingBox(
         relativeTo?: Konva.Container;
       }
     | undefined
-): {
-  x: number;
-  y: number;
-  width: number;
-  height: number;
-} {
+): BoundingBox {
   if (nodes.length === 0) {
     return { x: 0, y: 0, width: 0, height: 0 };
   }

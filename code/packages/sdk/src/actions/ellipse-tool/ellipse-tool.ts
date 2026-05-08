@@ -183,11 +183,10 @@ export class WeaveEllipseToolAction extends WeaveAction {
     if (nodeHandler) {
       const node = nodeHandler.create(this.ellipseId, {
         ...this.props,
-        strokeScaleEnabled: true,
         x: this.clickPoint?.x ?? 0 + this.props.radiusX,
         y: this.clickPoint?.y ?? 0 + this.props.radiusY,
-        radiusX: 0,
-        radiusY: 0,
+        radiusX: 1,
+        radiusY: 1,
       });
 
       this.instance.addNode(node, this.container?.getAttrs().id);
@@ -222,10 +221,10 @@ export class WeaveEllipseToolAction extends WeaveAction {
 
       ellipse.setAttrs({
         ...this.props,
-        x: ellipsePos.x + ellipseRadiusX,
-        y: ellipsePos.y + ellipseRadiusY,
-        radiusX: ellipseRadiusX,
-        radiusY: ellipseRadiusY,
+        x: ellipsePos.x,
+        y: ellipsePos.y,
+        radiusX: ellipseRadiusX / 2,
+        radiusY: ellipseRadiusY / 2,
       });
 
       if (nodeHandler) {
@@ -266,12 +265,17 @@ export class WeaveEllipseToolAction extends WeaveAction {
         ellipsePos.y = Math.min(this.clickPoint.y, mousePoint.y);
       }
 
-      ellipse.setAttrs({
-        x: ellipsePos.x + deltaX,
-        y: ellipsePos.y + deltaY,
-        radiusX: deltaX,
-        radiusY: deltaY,
-      });
+      const nodeHandler =
+        this.instance.getNodeHandler<WeaveEllipseNode>('ellipse');
+
+      if (nodeHandler) {
+        nodeHandler.onUpdate(ellipse as WeaveElementInstance, {
+          ...this.props,
+          id: this.ellipseId,
+          radiusX: deltaX / 2,
+          radiusY: deltaY / 2,
+        });
+      }
     }
   }
 

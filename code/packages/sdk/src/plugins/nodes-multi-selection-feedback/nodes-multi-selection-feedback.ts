@@ -74,14 +74,12 @@ export class WeaveNodesMultiSelectionFeedbackPlugin extends WeavePlugin {
 
     const clone = node.clone();
 
-    const box = clone.getClientRect({
-      skipTransform: true,
-      skipStroke: true,
-      relativeTo: node.getParent() ?? this.instance.getMainLayer(),
-    });
+    // const box = clone.getClientRect({
+    //   skipTransform: true,
+    //   relativeTo: node.getParent() ?? this.instance.getMainLayer(),
+    // });
     const localBox = clone.getClientRect({
       skipTransform: true,
-      skipStroke: true,
     });
 
     const transform = clone.getAbsoluteTransform();
@@ -97,14 +95,17 @@ export class WeaveNodesMultiSelectionFeedbackPlugin extends WeavePlugin {
     return {
       x: corners[0].x,
       y: corners[0].y,
-      width: box.width * clone.scaleX(),
-      height: box.height * clone.scaleY(),
+      width: localBox.width * clone.scaleX(),
+      height: localBox.height * clone.scaleY(),
       rotation: clone.rotation(),
     };
   }
 
   private getNodeInfo(node: Konva.Node) {
     const info = this.getNodeRectInfo(node);
+
+    let containerCompensationX = 0;
+    let containerCompensationY = 0;
 
     if (info) {
       const parent = node.getParent();
@@ -116,6 +117,10 @@ export class WeaveNodesMultiSelectionFeedbackPlugin extends WeavePlugin {
         if (realParent) {
           info.x += realParent.x();
           info.y += realParent.y();
+          // containerCompensationX =
+          //   realParent.getAttrs().containerCompensationX ?? 0 / 4;
+          // containerCompensationY =
+          //   realParent.getAttrs().containerCompensationY ?? 0 / 4;
         }
       }
       // Its parent is a Container (frame)
@@ -126,11 +131,19 @@ export class WeaveNodesMultiSelectionFeedbackPlugin extends WeavePlugin {
         if (realParent) {
           info.x += realParent.x();
           info.y += realParent.y();
+          containerCompensationX =
+            realParent.getAttrs().containerCompensationX ?? 0;
+          containerCompensationY =
+            realParent.getAttrs().containerCompensationY ?? 0;
         }
       }
     }
 
-    return info;
+    return {
+      ...info,
+      x: info?.x + containerCompensationX,
+      y: info?.y + containerCompensationY,
+    };
   }
 
   createSelectionHalo(node: Konva.Node): void {
@@ -160,6 +173,7 @@ export class WeaveNodesMultiSelectionFeedbackPlugin extends WeavePlugin {
       });
 
       this.instance.getSelectionLayer()?.add(this.selectedHalos[nodeId]);
+      this.selectedHalos[nodeId].moveToBottom();
     }
   }
 

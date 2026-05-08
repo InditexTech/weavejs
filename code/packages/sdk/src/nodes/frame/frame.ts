@@ -93,6 +93,8 @@ export class WeaveFrameNode extends WeaveNode {
       measureContainerId: `${id}-selection-area`,
       containerOffsetX: 0,
       containerOffsetY: borderWidth,
+      containerCompensationX: borderWidth,
+      containerCompensationY: borderWidth,
       width: props.frameWidth,
       height: props.frameHeight,
       fill: 'transparent',
@@ -223,7 +225,7 @@ export class WeaveFrameNode extends WeaveNode {
       height: props.frameHeight,
       hitFunc: function (ctx, shape) {
         ctx.beginPath();
-        ctx.rect(0, 0, props.frameWidth, props.frameHeight);
+        ctx.rect(0, -textHeight, props.frameWidth, textHeight);
         ctx.fillStrokeShape(shape);
       },
       strokeWidth: 0,

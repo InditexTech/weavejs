@@ -3,6 +3,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import type {
+  AllowedObject,
   WeaveSelection,
   WeaveState,
   WeaveStatus,
@@ -12,6 +13,7 @@ import type {
 export type WeaveStoreOnUndoChangeEvent = undefined;
 export type WeaveStoreOnRedoChangeEvent = undefined;
 export type WeaveStoreOnStateChangeEvent = WeaveState;
+export type WeaveStoreOnStateMetadataChangeEvent = AllowedObject;
 export type WeaveStoreOnRoomLoadedEvent = boolean;
 export type WeaveInstanceStatusEvent = WeaveStatus;
 export type WeaveStoreOnUndoRedoChangeEvent = WeaveUndoRedoChange;

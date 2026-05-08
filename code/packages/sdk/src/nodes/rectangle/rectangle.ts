@@ -33,11 +33,48 @@ export class WeaveRectangleNode extends WeaveNode {
   }
 
   onRender(props: WeaveElementAttributes): WeaveElementInstance {
-    const rectangle = new Konva.Rect({
+    const rectangle = new Konva.Group({
       ...props,
       name: 'node',
-      strokeScaleEnabled: true,
     });
+
+    const internalRectBg = new Konva.Rect({
+      ...props,
+      name: undefined,
+      id: `${props.id}-bg`,
+      nodeId: props.id,
+      x: 0,
+      y: 0,
+      width: props.width,
+      height: props.height,
+      fill: props.fill || 'transparent',
+      strokeWidth: 0,
+      strokeScaleEnabled: true,
+      cornerRadius: (props.cornerRadius || 0) * 1.1,
+      rotation: 0,
+    });
+
+    rectangle.add(internalRectBg);
+
+    const internalRectBorder = new Konva.Rect({
+      ...props,
+      name: undefined,
+      id: `${props.id}-border`,
+      x: props.strokeWidth / 2,
+      y: props.strokeWidth / 2,
+      width: props.width - props.strokeWidth,
+      height: props.height - props.strokeWidth,
+      fill: 'transparent',
+      strokeWidth: props.strokeWidth || 0,
+      strokeScaleEnabled: true,
+      rotation: 0,
+      listening: false,
+    });
+
+    rectangle.add(internalRectBorder);
+
+    internalRectBorder.moveToTop();
+    internalRectBg.moveToBottom();
 
     this.setupDefaultNodeAugmentation(rectangle);
 
@@ -62,21 +99,56 @@ export class WeaveRectangleNode extends WeaveNode {
       ...nextProps,
     });
 
+    const rectangle = nodeInstance as Konva.Group;
+    const internalRectBg = rectangle.findOne(
+      `#${nextProps.id}-bg`
+    ) as Konva.Rect;
+    const internalRectBorder = rectangle.findOne(
+      `#${nextProps.id}-border`
+    ) as Konva.Rect;
+
+    if (internalRectBg) {
+      internalRectBg.setAttrs({
+        ...nextProps,
+        name: undefined,
+        id: `${nextProps.id}-bg`,
+        nodeId: nextProps.id,
+        x: 0,
+        y: 0,
+        cornerRadius: (nextProps.cornerRadius || 0) * 1.1,
+        width: nextProps.width,
+        height: nextProps.height,
+        fill: nextProps.fill || 'transparent',
+        strokeWidth: 0,
+        strokeScaleEnabled: true,
+        rotation: 0,
+      });
+      internalRectBg.moveToBottom();
+    }
+
+    if (internalRectBorder) {
+      internalRectBorder.setAttrs({
+        ...nextProps,
+        name: undefined,
+        id: `${nextProps.id}-border`,
+        x: nextProps.strokeWidth / 2,
+        y: nextProps.strokeWidth / 2,
+        width: nextProps.width - nextProps.strokeWidth,
+        height: nextProps.height - nextProps.strokeWidth,
+        stroke: nextProps.stroke || 'transparent',
+        strokeWidth: nextProps.strokeWidth || 0,
+        strokeScaleEnabled: true,
+        listening: false,
+        rotation: 0,
+      });
+      internalRectBorder.moveToTop();
+    }
+
     const nodesSelectionPlugin =
       this.instance.getPlugin<WeaveNodesSelectionPlugin>('nodesSelection');
 
     if (nodesSelectionPlugin) {
       nodesSelectionPlugin.getTransformer().forceUpdate();
     }
-  }
-
-  scaleReset(node: Konva.Rect): void {
-    const scale = node.scale();
-
-    node.width(Math.max(5, node.width() * scale.x));
-    node.height(Math.max(5, node.height() * scale.y));
-
-    // reset scale to 1
-    node.scale({ x: 1, y: 1 });
   }
 }

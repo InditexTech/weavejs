@@ -29,6 +29,7 @@ import type {
 } from '@inditextech/weave-types';
 import { WeaveNode } from '../node';
 import { mergeExceptArrays } from '@/utils/utils';
+import type { KonvaEventObject } from 'konva/lib/Node';
 
 export class WeaveCommentNode<T> extends WeaveNode {
   protected nodeType = WEAVE_COMMENT_NODE_TYPE;
@@ -339,9 +340,8 @@ export class WeaveCommentNode<T> extends WeaveNode {
       return [];
     };
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    commentNode.on('dragstart', (e: any) => {
-      this.contractNode(e.target);
+    commentNode.on('dragstart', (e: KonvaEventObject<DragEvent>) => {
+      this.contractNode(e.target as Konva.Group);
 
       e.target.setAttrs({
         isDragging: true,
@@ -350,8 +350,7 @@ export class WeaveCommentNode<T> extends WeaveNode {
       this.onUpdate(e.target, {});
     });
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    commentNode.on('dragend', (e: any) => {
+    commentNode.on('dragend', (e: KonvaEventObject<DragEvent>) => {
       e.target.setAttrs({
         isDragging: false,
       });

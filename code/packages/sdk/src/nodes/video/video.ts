@@ -80,6 +80,10 @@ export class WeaveVideoNode extends WeaveNode {
         video
       ) ?? videoProps.videoPlaceholderURL;
 
+    if (!this.videoPlaceholder) {
+      this.initialize();
+    }
+
     this.videoPlaceholder[id] = Konva.Util.createImageElement();
     this.videoPlaceholder[id].crossOrigin = this.config.crossOrigin;
     this.videoPlaceholder[id].src = realVideoPlaceholderURL;

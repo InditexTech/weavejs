@@ -74,6 +74,7 @@ export type WeaveState = {
         };
       }
     | Record<string, WeaveStateElement>;
+  weaveMetadata?: AllowedObject;
 };
 
 export type WeaveSelection = {
@@ -348,3 +349,10 @@ export type WeaveUserChangeEvent = {
   node: WeaveStateElement;
   parent: WeaveStateElement;
 };
+
+// Metadata
+
+export type AllowedValue = string | number | AllowedValue[] | AllowedObject;
+export interface AllowedObject {
+  [key: string]: AllowedValue;
+}
