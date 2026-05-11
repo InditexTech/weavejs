@@ -801,6 +801,12 @@ export class WeaveImageNode extends WeaveNode {
 
     nodeInstance.setAttrs({
       ...nextProps,
+      ...(nextProps.cropInfo
+        ? { cropInfo: node.getAttrs().cropInfo }
+        : { cropInfo: undefined }),
+      ...(nextProps.cropSize
+        ? { cropSize: node.getAttrs().cropSize }
+        : { cropSize: undefined }),
     });
 
     const imagePlaceholder = node.findOne(`#${id}-placeholder`) as
