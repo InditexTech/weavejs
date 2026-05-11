@@ -961,10 +961,7 @@ export abstract class WeaveNode implements WeaveNodeBase {
     }
   }
 
-  handleMouseOver(
-    e: KonvaEventObject<MouseEvent, any>,
-    node: Konva.Node
-  ): boolean {
+  handleMouseOver(e: KonvaEventObject<MouseEvent>, node: Konva.Node): boolean {
     const stage = this.instance.getStage();
 
     const isCtrlOrMetaPressed = e.evt.ctrlKey || e.evt.metaKey;
@@ -1055,7 +1052,7 @@ export abstract class WeaveNode implements WeaveNodeBase {
     return cancelBubble;
   }
 
-  handleMouseout(e: KonvaEventObject<MouseEvent, any>, node: Konva.Node) {
+  handleMouseout(e: KonvaEventObject<MouseEvent>, node: Konva.Node) {
     const isCtrlOrMetaPressed = e.evt.ctrlKey || e.evt.metaKey;
 
     if (isCtrlOrMetaPressed) {
