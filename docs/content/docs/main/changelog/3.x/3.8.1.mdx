@@ -1,6 +1,6 @@
 ---
 title: v3.8.1
-description: Important bugfixes related to base renderer / reconciler and minor fix for pan stage when dragging elements near border
+description: Important bugfixes related to base renderer / reconciler and minor fixes for pan stage when dragging elements near border and to avoid pasting a frame onto a frame
 ---
 
 ## Metadata
@@ -9,5 +9,6 @@ description: Important bugfixes related to base renderer / reconciler and minor 
 
 ### Fixed
 
+- [#1038](https://github.com/InditexTech/weavejs/issues/1038) Avoid to add a frame inside a frame by pasting with right mouse button
 - [#1043](https://github.com/InditexTech/weavejs/issues/1043) Canvas does not auto-scroll when dragging an element near the border
 - [#1044](https://github.com/InditexTech/weavejs/issues/1044) Nodes disappear when moving between frames
