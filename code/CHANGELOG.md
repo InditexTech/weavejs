@@ -17,6 +17,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - [#1041](https://github.com/InditexTech/weavejs/issues/1041) Custom guides support and refactor of snapping and distance guides plugins
 
+## [3.8.1] - 2026-05-11
+
+### Fixed
+
+- [#1036](https://github.com/InditexTech/weavejs/issues/1036) Corrupt Image nodes prevent frames to complete initial loading
+- [#1038](https://github.com/InditexTech/weavejs/issues/1038) Is possible to add a frame inside a frame by pasting with right mouse button
+- [#1043](https://github.com/InditexTech/weavejs/issues/1043) Canvas does not auto-scroll when dragging an element near the border
+- [#1044](https://github.com/InditexTech/weavejs/issues/1044) Nodes disappear when moving between frames
+
 ## [3.8.0] - 2026-04-24
 
 ### Added
@@ -1766,7 +1775,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - [#24](https://github.com/InditexTech/weavejs/issues/24) Bug when loading rooms with text or images
 - [#18](https://github.com/InditexTech/weavejs/issues/18) Fix awareness not working on store-azure-web-pubsub
 
-[Unreleased]: https://github.com/InditexTech/weavejs/compare/3.8.0...HEAD
+[Unreleased]: https://github.com/InditexTech/weavejs/compare/3.8.1...HEAD
+[3.8.1]: https://github.com/InditexTech/weavejs/compare/3.8.0...3.8.1
 [3.8.0]: https://github.com/InditexTech/weavejs/compare/3.7.2...3.8.0
 [3.7.2]: https://github.com/InditexTech/weavejs/compare/3.7.1...3.7.2
 [3.7.1]: https://github.com/InditexTech/weavejs/compare/3.7.0...3.7.1

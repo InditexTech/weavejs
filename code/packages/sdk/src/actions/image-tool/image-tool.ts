@@ -29,10 +29,7 @@ import { WeaveNodesSelectionPlugin } from '@/plugins/nodes-selection/nodes-selec
 import Konva from 'konva';
 import type { WeaveImageNode } from '@/nodes/image/image';
 import { SELECTION_TOOL_ACTION_NAME } from '../selection-tool/constants';
-import {
-  getPositionRelativeToContainerOnPosition,
-  mergeExceptArrays,
-} from '@/utils/utils';
+import { mergeExceptArrays } from '@/utils/utils';
 import type {
   WeaveElementAttributes,
   WeaveElementInstance,
@@ -109,8 +106,9 @@ export class WeaveImageToolAction extends WeaveAction {
       if (dragProperties && dragId === WEAVE_IMAGE_TOOL_ACTION_NAME) {
         this.instance.getStage().setPointersPositions(e);
 
-        const position: Konva.Vector2d | null | undefined =
-          getPositionRelativeToContainerOnPosition(this.instance);
+        const position: Konva.Vector2d | null | undefined = this.instance
+          .getStage()
+          .getRelativePointerPosition();
 
         if (!position) {
           return;

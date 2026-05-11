@@ -26,6 +26,9 @@ export const WEAVE_IMAGE_CROP_ANCHOR_POSITION = {
 } as const;
 
 export const WEAVE_IMAGE_DEFAULT_CONFIG: WeaveImageProperties = {
+  cleanup: {
+    intervalMs: 60 * 1000, // 1 minute
+  },
   performance: {
     cache: {
       enabled: false,
@@ -40,7 +43,7 @@ export const WEAVE_IMAGE_DEFAULT_CONFIG: WeaveImageProperties = {
     },
   },
   imageLoading: {
-    maxRetryAttempts: 15,
+    maxRetryAttempts: 3,
     retryDelayMs: 2000,
   },
   crossOrigin: 'anonymous',

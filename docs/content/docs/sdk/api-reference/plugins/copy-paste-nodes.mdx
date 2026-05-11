@@ -49,6 +49,15 @@ const WEAVE_COPY_PASTE_PASTE_MODES = {
 } as const;
 
 const WEAVE_COPY_PASTE_CONFIG_DEFAULT = {
+  canPasteOnto: (node: WeaveStateElement, atTarget: Konva.Container) => {
+    const targetType = atTarget.getAttrs().nodeType;
+
+    if (targetType === "frame" && node.type === "frame") {
+      return false;
+    }
+
+    return true;
+  },
   paddingOnPaste: {
     enabled: false,
     paddingX: 0,
@@ -90,7 +99,13 @@ type PaddingOnPaste = {
   paddingY: number;
 };
 
+export type WeaveCanPasteOntoFunction = (
+  node: WeaveStateElement,
+  atTarget: Konva.Container,
+) => boolean;
+
 type WeaveCopyPasteNodesPluginConfig = {
+  canPasteOnto: WeaveCanPasteOntoFunction;
   paddingOnPaste: PaddingOnPaste;
 };
 
@@ -122,6 +137,12 @@ For `WeaveCopyPasteNodesPluginConfig`:
 
 <TypeTable
   type={{
+    ["canPasteOnto"]: {
+      description:
+        "Function that returns when a node to be pasted can be pasted onto the specified target",
+      type: "WeaveCanPasteOntoFunction",
+      default: "WEAVE_COPY_PASTE_CONFIG_DEFAULT.canPasteOnto",
+    },
     ["paddingOnPaste"]: {
       description: "Allows to add a padding when pasting internally.",
       type: "PaddingOnPaste",

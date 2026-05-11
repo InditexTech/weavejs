@@ -47,6 +47,9 @@ export type WeaveImageCursors = {
 };
 
 export type WeaveImageProperties = {
+  cleanup: {
+    intervalMs: number;
+  };
   performance: {
     cache: WeaveImageCache;
   };

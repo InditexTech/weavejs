@@ -29,10 +29,7 @@ import {
   WEAVE_IMAGES_TOOL_UPLOAD_TYPE,
 } from './constants';
 import { WeaveAction } from '../action';
-import {
-  getPositionRelativeToContainerOnPosition,
-  mergeExceptArrays,
-} from '@/utils/utils';
+import { mergeExceptArrays } from '@/utils/utils';
 import type { WeaveImageToolAction } from '../image-tool/image-tool';
 import {
   WEAVE_IMAGE_TOOL_ACTION_NAME,
@@ -120,8 +117,9 @@ export class WeaveImagesToolAction extends WeaveAction {
 
       if (dragProperties && dragId === WEAVE_IMAGES_TOOL_ACTION_NAME) {
         this.instance.getStage().setPointersPositions(e);
-        const position: Konva.Vector2d | null | undefined =
-          getPositionRelativeToContainerOnPosition(this.instance);
+        const position: Konva.Vector2d | null | undefined = this.instance
+          .getStage()
+          .getRelativePointerPosition();
 
         if (!position) {
           return;

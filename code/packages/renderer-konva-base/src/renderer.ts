@@ -11,9 +11,6 @@ import {
 } from '@inditextech/weave-types';
 import Konva from 'konva';
 import { isEqual } from 'lodash';
-import type { Stage } from 'konva/lib/Stage';
-import type { Layer } from 'konva/lib/Layer';
-import type { Group } from 'konva/lib/Group';
 import type { RendererInstruction } from './types';
 import { SIMPLE_RECONCILER } from './reconciler';
 import { WeaveRenderer } from '@inditextech/weave-sdk';
@@ -299,23 +296,22 @@ export class WeaveKonvaBaseRenderer extends WeaveRenderer {
 
     const stage = this.instance.getStage();
 
-    const parentInstance = stage.findOne(`#${instruction.parentKey}`) as
-      | Stage
-      | Layer
-      | Group;
-
-    const childInstance = stage.findOne(
+    const childInstances: WeaveElementInstance[] = stage.find(
       `#${instruction.key}`
-    ) as WeaveElementInstance;
+    );
 
-    if (!childInstance) {
-      console.warn(
-        `Trying to remove non existing node with key ${instruction.key}`
-      );
-      return;
+    for (const childInstance of childInstances) {
+      let parent = childInstance.getParent();
+      if (parent?.getAttrs().nodeId) {
+        parent = stage.findOne(
+          `#${parent.getAttrs().nodeId}`
+        ) as Konva.Container;
+      }
+
+      if (parent?.id() === instruction.parentKey) {
+        this.reconciler.removeChild(this.instance, childInstance);
+      }
     }
-
-    this.reconciler.removeChild(this.instance, parentInstance, childInstance);
   }
 
   private updateProps(instruction: RendererInstruction) {
@@ -330,9 +326,6 @@ export class WeaveKonvaBaseRenderer extends WeaveRenderer {
     const node = stage.findOne(`#${instruction.key}`) as WeaveElementInstance;
 
     if (!node) {
-      console.warn(
-        `Trying to update non existing node with key ${instruction.key}`
-      );
       return;
     }
 

@@ -196,10 +196,11 @@ export function moveNodeToContainerNT(
     node.rotation(nodeRotation);
     node.x(node.x() - (layerToMoveAttrs.containerOffsetX ?? 0));
     node.y(node.y() - (layerToMoveAttrs.containerOffsetY ?? 0));
-    node.movedToContainer(layerToMove);
+    node.destroy();
 
+    const newNode: Konva.Node = node.clone();
     instance.emitEvent('onNodeMovedToContainer', {
-      node: node.clone(),
+      node: newNode,
       container: layerToMove,
       originalNode,
       originalContainer,
@@ -210,10 +211,14 @@ export function moveNodeToContainerNT(
     );
 
     if (nodeHandler) {
-      node.setAttrs({ onMoveContainer: true });
-      const actualNode = nodeHandler.serialize(node as WeaveElementInstance);
-      instance.removeNodeNT(actualNode, { emitUserChangeEvent: false });
-      instance.addNodeNT(actualNode, layerToMoveAttrs.id, {
+      const actualNodeState = nodeHandler.serialize(
+        node as WeaveElementInstance
+      );
+      const newNodeState = nodeHandler.serialize(
+        newNode as WeaveElementInstance
+      );
+      instance.removeNodeNT(actualNodeState, { emitUserChangeEvent: false });
+      instance.addNodeNT(newNodeState, layerToMoveAttrs.id, {
         // emitUserChangeEvent: true,
         emitUserChangeEvent: false,
         overrideUserChangeType: WEAVE_NODE_CHANGE_TYPE.UPDATE,
@@ -623,40 +628,6 @@ export function isIOS() {
 }
 
 export const isServer = () => typeof window === 'undefined';
-
-export const getPositionRelativeToContainerOnPosition = (
-  instance: Weave
-): Konva.Vector2d | null | undefined => {
-  let position: Konva.Vector2d | null | undefined = instance
-    .getStage()
-    .getRelativePointerPosition();
-
-  if (!position) {
-    return position;
-  }
-
-  const container = containerOverCursor(instance, [], position);
-
-  if (container) {
-    if (container.getAttrs().containerId) {
-      const containerNode = container.findOne(
-        `#${container.getAttrs().containerId}`
-      ) as Konva.Group;
-
-      if (containerNode) {
-        position = containerNode?.getRelativePointerPosition();
-      }
-    } else {
-      position = container?.getRelativePointerPosition();
-    }
-  }
-
-  if (!position) {
-    return position;
-  }
-
-  return position;
-};
 
 export const canComposite = (node: Konva.Node) => {
   const parent = node.getParent();

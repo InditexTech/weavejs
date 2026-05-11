@@ -423,6 +423,9 @@ export class WeaveCopyPasteNodesPlugin extends WeavePlugin {
 
       this.instance.addEventListener('onNodeRenderedAdded', handleOnNodeAdded);
 
+      const nodesToPaste: { node: WeaveStateElement; containerId: string }[] =
+        [];
+
       for (const element of Object.keys(this.toPaste.weave)) {
         const node = this.toPaste.weave[element].element;
         const posRelativeToSelection =
@@ -513,11 +516,31 @@ export class WeaveCopyPasteNodesPlugin extends WeavePlugin {
           containerNode = this.instance.getMainLayer();
         }
 
-        if (containerId) {
-          nodesToSelect.push(newNodeId);
-          this.instance.addNodeNT(node, containerId);
+        const canPasteNodeOntoTarget = this.config.canPasteOnto(
+          node,
+          containerNode as Konva.Container
+        );
+
+        if (!canPasteNodeOntoTarget) {
+          throw new Error(
+            `Cannot paste node ${node.key} onto target container: ${containerId}`,
+            {
+              cause: 'InvalidPasteTarget',
+            }
+          );
         }
 
+        if (containerId && canPasteNodeOntoTarget) {
+          nodesToSelect.push(newNodeId);
+          nodesToPaste.push({ node, containerId });
+        }
+
+        this.getStageGridPlugin()?.onRender();
+      }
+
+      for (const elementToPaste of nodesToPaste) {
+        const { node, containerId } = elementToPaste;
+        this.instance.addNodeNT(node, containerId);
         this.getStageGridPlugin()?.onRender();
       }
     });
@@ -665,6 +688,10 @@ export class WeaveCopyPasteNodesPlugin extends WeavePlugin {
         'onPaste',
         { error: ex as Error }
       );
+
+      if (ex instanceof Error && ex.cause === 'InvalidPasteTarget') {
+        return;
+      }
     }
 
     try {
