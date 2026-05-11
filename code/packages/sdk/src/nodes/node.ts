@@ -56,7 +56,6 @@ export const augmentKonvaNodeClass = (
   Konva.Node.prototype.getRealClientRect = function (config) {
     return this.getClientRect(config);
   };
-  Konva.Node.prototype.movedToContainer = function () {};
   Konva.Node.prototype.updatePosition = function () {};
   Konva.Node.prototype.triggerCrop = function () {};
   Konva.Node.prototype.closeCrop = function () {};
@@ -130,7 +129,6 @@ export abstract class WeaveNode implements WeaveNodeBase {
         'bottom-right',
       ];
     };
-    node.movedToContainer = function () {};
     node.updatePosition = function () {};
     node.resetCrop = function () {};
     node.handleMouseover = function () {};
@@ -414,7 +412,13 @@ export abstract class WeaveNode implements WeaveNodeBase {
           nodesEdgeSnappingPlugin.evaluateGuidelines(e);
         }
 
-        this.getUsersPresencePlugin()?.setPresence(node.id(), {
+        let parentId: string = node.getParent()?.id() ?? '';
+        const parent = node.getParent();
+        if (parent?.getAttrs().nodeId) {
+          parentId = parent.getAttrs().nodeId;
+        }
+
+        this.getUsersPresencePlugin()?.setPresence(node.id(), parentId, {
           x: node.x(),
           y: node.y(),
           width: node.width(),
@@ -522,11 +526,6 @@ export abstract class WeaveNode implements WeaveNodeBase {
         }
 
         this.getNodesSelectionFeedbackPlugin()?.hideSelectionHalo(nodeTarget);
-
-        this.getSelectionPlugin()?.saveDragSelectedNodes();
-        if (this.getSelectionPlugin()?.getDragSelectedNodes().length === 1) {
-          this.getSelectionPlugin()?.setNodesOpacityOnDrag();
-        }
 
         const canMove = nodeTarget?.canDrag() ?? false;
 
@@ -676,10 +675,20 @@ export abstract class WeaveNode implements WeaveNodeBase {
         ) {
           clearContainerTargets(this.instance);
 
-          this.getUsersPresencePlugin()?.setPresence(realNodeTarget.id(), {
-            x: realNodeTarget.x(),
-            y: realNodeTarget.y(),
-          });
+          let parentId: string = realNodeTarget.getParent()?.id() ?? '';
+          const parent = realNodeTarget.getParent();
+          if (parent?.getAttrs().nodeId) {
+            parentId = parent.getAttrs().nodeId;
+          }
+
+          this.getUsersPresencePlugin()?.setPresence(
+            realNodeTarget.id(),
+            parentId,
+            {
+              x: realNodeTarget.x(),
+              y: realNodeTarget.y(),
+            }
+          );
 
           const layerToMove = containerOverCursor(this.instance, [
             realNodeTarget,
@@ -744,9 +753,9 @@ export abstract class WeaveNode implements WeaveNodeBase {
         lockedAxis = null;
         isShiftPressed = false;
 
-        if (this.getSelectionPlugin()?.getDragSelectedNodes().length === 1) {
-          this.getSelectionPlugin()?.restoreNodesOpacityOnDrag();
-        }
+        // if (this.getSelectionPlugin()?.getDragSelectedNodes().length === 1) {
+        this.getSelectionPlugin()?.restoreNodesOpacityOnDrag();
+        // }
 
         if (this.getSelectionPlugin()?.getSelectedNodes().length === 1) {
           this.instance.releaseMutexLock();
@@ -1044,10 +1053,10 @@ export abstract class WeaveNode implements WeaveNodeBase {
   }
 
   handleMouseout(e: KonvaEventObject<MouseEvent>, node: Konva.Node) {
-    const isCtrlOrMetaPressed = e.evt.ctrlKey || e.evt.metaKey;
+    const isCtrlOrMetaPressed = e.evt?.ctrlKey || e.evt?.metaKey;
 
     if (isCtrlOrMetaPressed) {
-      return;
+      return false;
     }
 
     const realNode = this.instance.getInstanceRecursive(node);
@@ -1103,7 +1112,6 @@ export abstract class WeaveNode implements WeaveNodeBase {
     delete cleanedAttrs.mutexUserId;
     delete cleanedAttrs.draggable;
     delete cleanedAttrs.overridesMouseControl;
-    delete cleanedAttrs.onMoveContainer;
     delete cleanedAttrs.dragBoundFunc;
 
     return {

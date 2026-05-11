@@ -48,7 +48,6 @@ declare module 'konva/lib/Node' {
     updatePosition(position: Vector2d): void;
     dblClick(): void;
     isSelectable(): boolean;
-    movedToContainer(container: Konva.Layer | Konva.Group): void;
     handleMouseover(e: KonvaEventObject): void;
     handleMouseout(e: KonvaEventObject): void;
     handleSelectNode(): void;

@@ -1222,7 +1222,6 @@ export class WeaveConnectorNode extends WeaveNode {
     delete cleanedAttrs.startInfoLoaded;
     delete cleanedAttrs.endInfoLoaded;
     delete cleanedAttrs.overridesMouseControl;
-    delete cleanedAttrs.onMoveContainer;
     delete cleanedAttrs.dragBoundFunc;
 
     return {

@@ -114,11 +114,7 @@ export const SIMPLE_RECONCILER = {
       child.setZIndex(index);
     }
   },
-  removeChild(
-    instance: Weave,
-    parent: WeaveElementInstance | undefined,
-    child: WeaveElementInstance
-  ) {
+  removeChild(instance: Weave, child: WeaveElementInstance) {
     const type = child.getAttrs().nodeType;
 
     const handler = instance.getNodeHandler<WeaveNode>(type);

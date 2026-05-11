@@ -232,10 +232,7 @@ export class Weave {
 
     if (!this.isServerSide()) {
       this.eventsController = new AbortController();
-      // Setup the instance on the weave global variable
-      if (!window.weave) {
-        window.weave = this;
-      }
+      window.weave = this;
     }
 
     this.emitEvent<WeaveStoreOnRoomLoadedEvent>('onRoomLoaded', false);

@@ -75,7 +75,17 @@ export class WeaveUsersPresencePlugin extends WeavePlugin {
 
             const nodeInstance = stage.findOne(`#${presenceInfo.nodeId}`);
 
-            if (nodeInstance) {
+            if (!nodeInstance) {
+              continue;
+            }
+
+            let parentId: string = nodeInstance.getParent()?.id() ?? '';
+            const parent = nodeInstance.getParent();
+            if (parent?.getAttrs().nodeId) {
+              parentId = parent.getAttrs().nodeId;
+            }
+
+            if (nodeInstance && presenceInfo.parentId === parentId) {
               const newProps = {
                 ...nodeInstance.getAttrs(),
                 ...(presenceInfo.attrs as Record<string, unknown>),
@@ -93,11 +103,17 @@ export class WeaveUsersPresencePlugin extends WeavePlugin {
     store.setAwarenessInfo(WEAVE_USER_PRESENCE_KEY, this.userPresence);
   }
 
-  setPresence<T>(nodeId: string, attrs: T, forceUpdate = true) {
+  setPresence<T>(
+    nodeId: string,
+    parentId: string,
+    attrs: T,
+    forceUpdate = true
+  ) {
     const userInfo = this.config.getUser();
 
     this.userPresence[nodeId] = {
       userId: userInfo.id,
+      parentId,
       nodeId,
       attrs,
     };

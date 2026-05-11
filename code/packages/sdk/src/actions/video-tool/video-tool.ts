@@ -18,7 +18,6 @@ import { WeaveNodesSelectionPlugin } from '@/plugins/nodes-selection/nodes-selec
 import Konva from 'konva';
 import { SELECTION_TOOL_ACTION_NAME } from '../selection-tool/constants';
 import type { WeaveVideoNode } from '@/nodes/video/video';
-import { getPositionRelativeToContainerOnPosition } from '@/utils/utils';
 
 export class WeaveVideoToolAction extends WeaveAction {
   protected initialized: boolean = false;
@@ -82,8 +81,9 @@ export class WeaveVideoToolAction extends WeaveAction {
 
       if (dragProperties && dragId === VIDEO_TOOL_ACTION_NAME) {
         this.instance.getStage().setPointersPositions(e);
-        const position: Konva.Vector2d | null | undefined =
-          getPositionRelativeToContainerOnPosition(this.instance);
+        const position: Konva.Vector2d | null | undefined = this.instance
+          .getStage()
+          .getRelativePointerPosition();
 
         this.instance.triggerAction(VIDEO_TOOL_ACTION_NAME, {
           videoId: dragProperties.videoId,
