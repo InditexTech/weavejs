@@ -983,15 +983,21 @@ export class WeaveImageNode extends WeaveNode {
   ): void {
     const imageURLToLoad = imageURL ?? 'http://localhost/false-image';
 
+    if (imageURLToLoad === '') {
+      console.log('AQUI');
+      this.setErrorState(imageId, undefined);
+      return;
+    }
+
     this.imageSource[imageId] = Konva.Util.createImageElement();
     this.imageSource[imageId].crossOrigin = this.config.crossOrigin;
     this.imageSource[imageId].onerror = (error) => {
       if (!loadingTryout) {
-        this.imageState[imageId] = {
-          status: 'error',
-          loaded: false,
-          error: true,
-        };
+        const stage = this.instance.getStage();
+        const image = stage.findOne(`#${imageId}`) as Konva.Group | undefined;
+        if (image) {
+          this.setErrorState(imageId, image);
+        }
       }
 
       onError(error);
@@ -1074,6 +1080,7 @@ export class WeaveImageNode extends WeaveNode {
               if (node) {
                 this.imageTryoutAttempts[id] =
                   (this.imageTryoutAttempts[id] ?? 0) + 1;
+
                 this.loadImage(
                   node.getAttrs(),
                   node as Konva.Group,
@@ -1167,37 +1174,30 @@ export class WeaveImageNode extends WeaveNode {
         },
         onError: (error) => {
           if (!this.config.useFallbackImage) {
-            this.imageTryoutIds[id] = setTimeout(() => {
-              const node = this.instance.getStage().findOne(`#${id}`);
+            const tryoutAttempts = this.imageTryoutAttempts[id] ?? 0;
 
-              if (node) {
-                this.imageTryoutAttempts[id] =
-                  (this.imageTryoutAttempts[id] ?? 0) + 1;
-                this.loadImage(
-                  node.getAttrs(),
-                  node as Konva.Group,
-                  false,
-                  true
-                );
-              }
-            }, this.config.imageLoading.retryDelayMs);
+            if (
+              tryoutAttempts - 1 <
+              this.config.imageLoading.maxRetryAttempts
+            ) {
+              this.loadImageTryout(id);
+              return;
+            } else {
+              this.setErrorState(id, image);
+            }
           }
 
           if (loadTryout) {
             const tryoutAttempts = this.imageTryoutAttempts[id] ?? 0;
-            if (tryoutAttempts < this.config.imageLoading.maxRetryAttempts) {
-              this.imageTryoutIds[id] = setTimeout(() => {
-                const node = this.instance.getStage().findOne(`#${id}`);
-                if (node) {
-                  this.imageTryoutAttempts[id] = tryoutAttempts + 1;
-                  this.loadImage(
-                    node.getAttrs(),
-                    node as Konva.Group,
-                    false,
-                    true
-                  );
-                }
-              }, this.config.imageLoading.retryDelayMs);
+
+            if (
+              tryoutAttempts - 1 <
+              this.config.imageLoading.maxRetryAttempts
+            ) {
+              this.loadImageTryout(id);
+              return;
+            } else {
+              this.setErrorState(id, image);
             }
             return;
           }
@@ -1218,19 +1218,15 @@ export class WeaveImageNode extends WeaveNode {
             return;
           }
 
-          this.imageState[id] = {
-            status: 'error',
-            loaded: false,
-            error: true,
-          };
+          this.setErrorState(id, image);
 
           image.setAttrs({
             image: undefined,
           });
 
-          this.resolveAsyncElement(id);
+          console.error('Error loading image', error);
 
-          console.error('Error loading image', realImageURL, error);
+          this.resolveAsyncElement(id);
 
           imagePlaceholder?.setAttrs({
             visible: true,
@@ -1437,5 +1433,31 @@ export class WeaveImageNode extends WeaveNode {
     }
 
     nodeInstance.destroy();
+  }
+
+  private loadImageTryout(imageId: string): void {
+    this.imageTryoutIds[imageId] = setTimeout(() => {
+      const node = this.instance.getStage().findOne(`#${imageId}`);
+      if (node) {
+        const tryoutAttempts = this.imageTryoutAttempts[imageId] ?? 0;
+        this.imageTryoutAttempts[imageId] = tryoutAttempts + 1;
+
+        this.loadImage(node.getAttrs(), node as Konva.Group, false, true);
+      }
+    }, this.config.imageLoading.retryDelayMs);
+  }
+
+  private setErrorState(imageId: string, image?: Konva.Group): void {
+    this.imageState[imageId] = {
+      status: 'loaded',
+      loaded: true,
+      error: true,
+    };
+
+    this.resolveAsyncElement(imageId);
+
+    if (image) {
+      this.cacheNode(image);
+    }
   }
 }
