@@ -62,6 +62,7 @@ export type PaddingOnPaste = {
 };
 
 export type WeaveCopyPasteNodesPluginConfig = {
+  canPasteOnto: (node: WeaveStateElement, atTarget: Konva.Container) => boolean;
   paddingOnPaste: PaddingOnPaste;
 };
 

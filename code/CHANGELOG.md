@@ -15,6 +15,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- [#1038](https://github.com/InditexTech/weavejs/issues/1038) Is possible to add a frame inside a frame by pasting with right mouse button
 - [#1043](https://github.com/InditexTech/weavejs/issues/1043) Canvas does not auto-scroll when dragging an element near the border
 
 ## [3.8.0] - 2026-04-24
