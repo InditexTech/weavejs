@@ -984,7 +984,6 @@ export class WeaveImageNode extends WeaveNode {
     const imageURLToLoad = imageURL ?? 'http://localhost/false-image';
 
     if (imageURLToLoad === '') {
-      console.log('AQUI');
       this.setErrorState(imageId, undefined);
       return;
     }
