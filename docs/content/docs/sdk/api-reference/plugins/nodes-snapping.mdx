@@ -15,6 +15,11 @@ the canvas.
 Snapping provides users with subtle, intuitive assistance when organizing elements, making building
 clean and aligned interfaces much easier—especially in collaborative environments.
 
+Guides can be:
+
+- STATIC: are guides that can be pre-defined, but the user cannot move, for example the center of a frame or its edges.
+- CUSTOM: are guides that users can create, edit and delete.
+
 The class extends the [WeavePlugin](/docs/sdk/api-reference/plugins/plugin) class
 
 ## Name
@@ -36,24 +41,335 @@ new WeaveNodesSnappingPlugin(params?: WeaveNodesSnappingPluginParams);
 ## TypeScript types
 
 ```ts
-const GUIDE_LINE_DEFAULT_CONFIG: Required<
-  Pick<Konva.LineConfig, "stroke" | "strokeWidth" | "dash">
-> = {
-  stroke: "rgb(0, 161, 255)",
-  strokeWidth: 1,
-  dash: [4, 6],
-};
-const GUIDE_LINE_DRAG_SNAPPING_THRESHOLD = 10;
-const GUIDE_LINE_TRANSFORM_SNAPPING_THRESHOLD = 10;
+const GUIDE_STATE = {
+  DEFAULT: "default",
+  SELECTED: "selected",
+} as const;
 
-type WeaveNodesSnappingPluginConfig = {
-  guideLine: Konva.LineConfig;
-  dragSnappingThreshold: number;
-  transformSnappingThreshold: number;
+const GUIDE_KIND = {
+  STATIC: "static",
+  CUSTOM: "custom",
+  EQUAL_DISTANCE: "equal-distance",
+  CENTERED_HORIZONTAL: "centered-horizontal",
+  CENTERED_VERTICAL: "centered-vertical",
+} as const;
+
+const GUIDE_ORIENTATION = {
+  ["HORIZONTAL"]: "H",
+  ["VERTICAL"]: "V",
+} as const;
+
+const GUIDE_DISTANCE_ORIGIN = {
+  FROM: "from",
+  TO: "to",
+} as const;
+
+const MOVE_ORIENTATION = {
+  ["UP"]: "up",
+  ["DOWN"]: "down",
+  ["LEFT"]: "left",
+  ["RIGHT"]: "right",
+} as const;
+
+const DEFAULT_SNAPPING_MANAGER_CONFIG: WeaveNodesSnappingPluginConfig = {
+  snap: {
+    tolerance: 5,
+  },
+  persistence: {
+    enabled: false,
+  },
+  movement: {
+    delta: 0.5,
+    shiftDelta: 10,
+  },
+  style: {
+    [GUIDE_KIND.CUSTOM]: {
+      default: {
+        stroke: "#FF3B30",
+        strokeWidth: 0.5,
+        dash: [],
+        opacity: 1,
+      },
+      selected: {
+        stroke: "#0D99FF",
+        strokeWidth: 1,
+        dash: [],
+        opacity: 1,
+      },
+    },
+    [GUIDE_KIND.STATIC]: {
+      default: {
+        stroke: "#FF3B30",
+        strokeWidth: 0.5,
+        dash: [6, 6],
+        opacity: 1,
+      },
+      selected: {
+        stroke: "#0D99FF",
+        strokeWidth: 1,
+        dash: [6, 6],
+        opacity: 1,
+      },
+    },
+  },
+  targetDistanceStyle: {
+    target: {
+      stroke: "#FF3B30",
+      strokeWidth: 1,
+      dash: [],
+      opacity: 1,
+    },
+    distance: {
+      opacity: 1,
+      line: {
+        stroke: "#FF3B30",
+        strokeWidth: 1,
+        dash: [],
+        opacity: 1,
+      },
+      text: {
+        fill: "#ffffff",
+        fontSize: 10,
+        fontFamily: "monospace",
+        opacity: 1,
+      },
+      background: {
+        fill: "#FF3B30",
+        cornerRadius: 4,
+        stroke: "#FF3B30",
+        strokeWidth: 0,
+        opacity: 1,
+      },
+    },
+  },
+};
+
+type MoveOrientationKeys = keyof typeof MOVE_ORIENTATION;
+type MoveOrientation = (typeof MOVE_ORIENTATION)[MoveOrientationKeys];
+
+type GuideKindKeys = keyof typeof GUIDE_KIND;
+type GuideKind = (typeof GUIDE_KIND)[GuideKindKeys];
+
+type DistanceOriginKeys = keyof typeof GUIDE_DISTANCE_ORIGIN;
+type DistanceOrigin = (typeof GUIDE_DISTANCE_ORIGIN)[DistanceOriginKeys];
+
+type GuideOrientationKeys = keyof typeof GUIDE_ORIENTATION;
+type GuideOrientation = (typeof GUIDE_ORIENTATION)[GuideOrientationKeys];
+
+type Guide = {
+  orientation: GuideOrientation;
+  value: number;
+  renderValue?: number;
+  kind: GuideKind;
+  guideId: string;
+  containerId: string;
+  persist?: boolean;
+} & (
+  | {
+      kind: "static" | "custom";
+    }
+  | {
+      kind: "equal-distance";
+      distanceCombinationIndex: number;
+      distanceOrigin: DistanceOrigin;
+      distance: number;
+    }
+  | {
+      kind: "centered-horizontal" | "centered-vertical";
+      distance: number;
+      center: {
+        from: BoundingBoxWithId;
+        center: BoundingBoxWithId;
+        to: BoundingBoxWithId;
+      };
+    }
+);
+
+type SnapPoint = {
+  orientation: GuideOrientation;
+  guideId: string;
+  value: number;
+  offset: number;
+  kind: GuideKind;
+};
+
+type SnapMatch = {
+  orientation: GuideOrientation;
+  guideId: string;
+  containerId: string;
+  guide: number;
+  offset: number;
+  diff: number;
+} & (
+  | {
+      kind: "static" | "custom";
+    }
+  | {
+      kind: "equal-distance";
+      distanceCombinationIndex: number;
+      distanceOrigin: DistanceOrigin;
+      distance: number;
+    }
+  | {
+      kind: "centered-horizontal" | "centered-vertical";
+      distance: number;
+      center: {
+        from: BoundingBoxWithId;
+        center: BoundingBoxWithId;
+        to: BoundingBoxWithId;
+      };
+    }
+);
+
+type SnapResult = {
+  vertical?: SnapMatch;
+  horizontal?: SnapMatch;
+};
+
+type SnapOptions = {
+  tolerance: number;
+};
+
+type VisibleWorldRect = {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
 };
 
 type WeaveNodesSnappingPluginParams = {
-  config?: WeaveNodesSnappingPluginConfig;
+  config?: DeepPartial<WeaveNodesSnappingPluginConfig>;
+};
+
+type WeaveNodesSnappingPluginConfig = {
+  snap: SnapOptions;
+  persistence: SnappingManagerPersistenceConfig;
+  movement: SnappingManagerMovementConfig;
+  style: SnappingManagerStyle;
+  targetDistanceStyle: GuideDistanceToTargetInfoStyle;
+  getStaticGuides?: (params: {
+    instance: Weave;
+    containerId: string;
+  }) => Guide[];
+};
+
+type SnappingManagerKindStyle = {
+  default: {
+    stroke: string;
+    strokeWidth: number;
+    opacity: number;
+    dash?: number[];
+  };
+  selected: {
+    stroke: string;
+    strokeWidth: number;
+    opacity: number;
+    dash?: number[];
+  };
+};
+
+type GuideKindOnlyCustomOrStatic = Exclude<
+  GuideKind,
+  "centered-horizontal" | "centered-vertical" | "equal-distance"
+>;
+
+type SnappingManagerStyle = Record<
+  GuideKindOnlyCustomOrStatic,
+  SnappingManagerKindStyle
+>;
+
+type SnappingManagerPersistenceConfig = {
+  enabled: boolean;
+};
+
+type SnappingManagerMovementConfig = {
+  delta: number;
+  shiftDelta: number;
+};
+
+type WeaveGetStaticGuidesFunction = (params: {
+  instance: Weave;
+  containerId: string;
+}) => Guide[];
+
+type WeaveNodesSnappingCustomGuidesConfig = {
+  persistence: SnappingManagerPersistenceConfig;
+  movement: SnappingManagerMovementConfig;
+  style: SnappingManagerStyle;
+  targetDistanceStyle: GuideDistanceToTargetInfoStyle;
+  getStaticGuides?: WeaveGetStaticGuidesFunction;
+};
+
+type GuideDistanceToTargetInfoParams = {
+  config: GuideDistanceToTargetInfoConfig;
+};
+
+type GuideDistanceToTargetInfoConfig = {
+  style: GuideDistanceToTargetInfoStyle;
+};
+
+type GuideDistanceToTargetInfoStyle = {
+  target: {
+    stroke: string;
+    strokeWidth: number;
+    opacity: number;
+    dash?: number[];
+  };
+  distance: {
+    opacity: number;
+    line: {
+      stroke: string;
+      strokeWidth: number;
+      opacity: number;
+      dash?: number[];
+    };
+    text: {
+      fill: string;
+      fontSize: number;
+      fontFamily: string;
+      opacity: number;
+    };
+    background: {
+      fill: string;
+      cornerRadius: number;
+      stroke: string;
+      strokeWidth: number;
+      opacity: number;
+    };
+  };
+};
+
+type DistanceInfoH = {
+  from: { id: string; box: BoundingBox };
+  to: { id: string; box: BoundingBox };
+  midY: number;
+  distance: number;
+};
+
+type DistanceInfoV = {
+  from: { id: string; box: BoundingBox };
+  to: { id: string; box: BoundingBox };
+  midX: number;
+  distance: number;
+};
+
+type BoundingBoxWithId = {
+  id: string;
+  box: BoundingBox;
+};
+
+type HIntersection = {
+  combination: BoundingBoxWithId[];
+  targetIndex: number;
+  distances: DistanceInfoH[];
+  targetDistanceIndexes: number[];
+};
+
+type VIntersection = {
+  combination: BoundingBoxWithId[];
+  targetIndex: number;
+  distances: DistanceInfoV[];
+  targetDistanceIndexes: number[];
 };
 ```
 
@@ -74,25 +390,43 @@ For `WeaveNodesSnappingPluginConfig`:
 
 <TypeTable
   type={{
-    ["guideLine"]: {
-      description: "Guide lines configuration, extend from Konva.Line",
-      type: "Konva.LineConfig",
-      default: `{
-        stroke: "rgb(0, 161, 255)",
-        strokeWidth: 1,
-        dash: [4, 6]
-      }`,
-    },
-    ["dragSnappingThreshold"]: {
-      description: "Drag snapping threshold (in px) to the guides.",
+    ["snap.tolerance"]: {
+      description: "Tolerance in px to magnet-snap towards guides.",
       type: "number",
-      default: "10",
+      default: "5",
     },
-    ["transformSnappingThreshold"]: {
+    ["persistence.enabled"]: {
+      description: "Defines if the guides need to be persisted.",
+      type: "SnappingManagerPersistenceConfig",
+      default: "true",
+    },
+    ["movement.delta"]: {
       description:
-        "Transform (resize) snapping threshold (in px) to the guides.",
+        "Defines the delta in px when moving the guides via keyboard.",
+      type: "number",
+      default: "0.5",
+    },
+    ["movement.shiftDelta"]: {
+      description:
+        "Defines the delta in px when moving the guides via keyboard with shift pressed.",
       type: "number",
       default: "10",
+    },
+    ["style"]: {
+      description: "Defines the UI style of the guides.",
+      type: "SnappingManagerStyle",
+      default: "DEFAULT_SNAPPING_MANAGER_CONFIG.style",
+    },
+    ["targetDistanceStyle"]: {
+      description:
+        "Defines the UI style to show the distance from the selected target when creating / updating a custom guide.",
+      type: "GuideDistanceToTargetInfoStyle",
+      default: "DEFAULT_SNAPPING_MANAGER_CONFIG.targetDistanceStyle",
+    },
+    ["getStaticGuides"]: {
+      description: "Function that define the static guides to render.",
+      type: "WeaveGetStaticGuidesFunction",
+      default: "undefined",
     },
   }}
 />

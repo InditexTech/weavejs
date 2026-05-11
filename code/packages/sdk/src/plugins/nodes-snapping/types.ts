@@ -108,16 +108,18 @@ export type WeaveNodesSnappingPluginParams = {
   config?: DeepPartial<WeaveNodesSnappingPluginConfig>;
 };
 
+export type WeaveGetStaticGuidesFunction = (params: {
+  instance: Weave;
+  containerId: string;
+}) => Guide[];
+
 export type WeaveNodesSnappingPluginConfig = {
   snap: SnapOptions;
   persistence: SnappingManagerPersistenceConfig;
   movement: SnappingManagerMovementConfig;
   style: SnappingManagerStyle;
   targetDistanceStyle: GuideDistanceToTargetInfoStyle;
-  getStaticGuides?: (params: {
-    instance: Weave;
-    containerId: string;
-  }) => Guide[];
+  getStaticGuides?: WeaveGetStaticGuidesFunction;
 };
 
 export type SnappingManagerKindStyle = {

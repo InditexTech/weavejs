@@ -41,7 +41,7 @@ export const MOVE_ORIENTATION = {
 
 export const DEFAULT_SNAPPING_MANAGER_CONFIG: WeaveNodesSnappingPluginConfig = {
   snap: {
-    tolerance: 2,
+    tolerance: 5,
   },
   persistence: {
     enabled: false,

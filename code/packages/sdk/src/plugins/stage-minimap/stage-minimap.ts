@@ -53,6 +53,8 @@ export class WeaveStageMinimapPlugin extends WeavePlugin {
 
     if (!container) return;
 
+    console.log('setup minimap');
+
     let preview = document.getElementById(this.config.id);
 
     const windowAspectRatio = window.innerWidth / window.innerHeight;
@@ -77,10 +79,13 @@ export class WeaveStageMinimapPlugin extends WeavePlugin {
     const mainLayer = this.instance.getMainLayer();
 
     if (mainLayer) {
+      this.initialized = true;
+
       // Setup preview stage
       this.minimapLayer = new Konva.Layer();
       this.minimapStage.add(this.minimapLayer);
 
+      console.log('aqui?');
       this.minimapViewportReference = new Konva.Rect({
         ...this.config.style.viewportReference,
         id: 'minimapViewportReference',
@@ -96,11 +101,12 @@ export class WeaveStageMinimapPlugin extends WeavePlugin {
     stage.on(
       'dragmove wheel dragend scaleXChange scaleYChange xChange yChange',
       () => {
+        console.log('update minimap viewport');
         this.updateMinimapViewportReference();
       }
     );
 
-    this.initialized = true;
+    console.log('aqui initialized');
   }
 
   private async updateMinimapContent() {
@@ -145,13 +151,17 @@ export class WeaveStageMinimapPlugin extends WeavePlugin {
 
     if (box.width === 0 || box.height === 0) return;
 
-    const fitScale = Math.min(
-      this.minimapStage.width() / box.width,
-      this.minimapStage.height() / box.height
-    );
+    console.log('update minimap viewport reference', this.minimapStage);
+
+    const width = this.minimapStage?.width();
+    const height = this.minimapStage?.height();
+
+    console.log('update minimap viewport reference', width, height);
+
+    const fitScale = Math.min(width / box.width, height / box.height);
     const centerOffset = {
-      x: (this.minimapStage.width() - box.width * fitScale) / 2,
-      y: (this.minimapStage.height() - box.height * fitScale) / 2,
+      x: (width - box.width * fitScale) / 2,
+      y: (height - box.height * fitScale) / 2,
     };
 
     const sX = stage.scaleX() ?? 1;
@@ -171,7 +181,7 @@ export class WeaveStageMinimapPlugin extends WeavePlugin {
     const realWidth = visible.width * fitScale;
     const realHeight = visible.height * fitScale;
 
-    this.minimapViewportReference.setAttrs({
+    this.minimapViewportReference?.setAttrs({
       x: realX,
       y: realY,
       width: realWidth,
@@ -184,12 +194,16 @@ export class WeaveStageMinimapPlugin extends WeavePlugin {
   }
 
   onInit(): void {
+    console.log('init minimap');
     const throttledUpdateMinimap = throttle(async () => {
+      console.log('throttle update minimap');
       await this.updateMinimapContent();
       this.updateMinimapViewportReference();
     }, DEFAULT_THROTTLE_MS);
 
     this.instance.addEventListener('onStateChange', throttledUpdateMinimap);
+
+    this.instance.addEventListener('onRender', throttledUpdateMinimap);
 
     if (this.instance.isServerSide()) {
       return;
