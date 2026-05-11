@@ -193,11 +193,15 @@ export class WeaveTargetingManager {
       utilityLayer.visible(false);
     }
 
-    const containerAlt = containerOverCursor(
+    let containerAlt = containerOverCursor(
       this.instance,
       [],
       relativeMousePointer
     );
+
+    if (!containerAlt) {
+      containerAlt = this.instance.getMainLayer();
+    }
 
     const nodesSelection =
       this.instance.getPlugin<WeaveNodesSelectionPlugin>('nodesSelection');
