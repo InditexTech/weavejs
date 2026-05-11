@@ -984,7 +984,7 @@ export class WeaveImageNode extends WeaveNode {
     const imageURLToLoad = imageURL ?? 'http://localhost/false-image';
 
     if (imageURLToLoad === '') {
-      this.setErrorState(imageId, undefined);
+      this.setErrorState(imageId);
       return;
     }
 
@@ -993,9 +993,9 @@ export class WeaveImageNode extends WeaveNode {
     this.imageSource[imageId].onerror = (error) => {
       if (!loadingTryout) {
         const stage = this.instance.getStage();
-        const image = stage.findOne(`#${imageId}`) as Konva.Group | undefined;
+        const image = stage.findOne(`#${imageId}`);
         if (image) {
-          this.setErrorState(imageId, image);
+          this.setErrorState(imageId, image as Konva.Group);
         }
       }
 
