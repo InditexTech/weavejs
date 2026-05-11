@@ -447,10 +447,7 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
       const stage = this.instance.getStage();
 
       this.saveDragSelectedNodes();
-
-      if (this.getDragSelectedNodes().length > 1) {
-        this.setNodesOpacityOnDrag();
-      }
+      this.setNodesOpacityOnDrag();
 
       selectedNodes = tr.nodes();
 
@@ -572,10 +569,6 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
 
       this.instance.getSelectionLayer()?.hitGraphEnabled(true);
       this.instance.getMainLayer()?.hitGraphEnabled(true);
-
-      if (this.getDragSelectedNodes().length > 1) {
-        this.restoreNodesOpacityOnDrag();
-      }
 
       if (!this.didMove) {
         return;

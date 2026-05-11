@@ -527,11 +527,6 @@ export abstract class WeaveNode implements WeaveNodeBase {
 
         this.getNodesSelectionFeedbackPlugin()?.hideSelectionHalo(nodeTarget);
 
-        this.getSelectionPlugin()?.saveDragSelectedNodes();
-        if (this.getSelectionPlugin()?.getDragSelectedNodes().length === 1) {
-          this.getSelectionPlugin()?.setNodesOpacityOnDrag();
-        }
-
         const canMove = nodeTarget?.canDrag() ?? false;
 
         if (!canMove) {
@@ -758,9 +753,9 @@ export abstract class WeaveNode implements WeaveNodeBase {
         lockedAxis = null;
         isShiftPressed = false;
 
-        if (this.getSelectionPlugin()?.getDragSelectedNodes().length === 1) {
-          this.getSelectionPlugin()?.restoreNodesOpacityOnDrag();
-        }
+        // if (this.getSelectionPlugin()?.getDragSelectedNodes().length === 1) {
+        this.getSelectionPlugin()?.restoreNodesOpacityOnDrag();
+        // }
 
         if (this.getSelectionPlugin()?.getSelectedNodes().length === 1) {
           this.instance.releaseMutexLock();
