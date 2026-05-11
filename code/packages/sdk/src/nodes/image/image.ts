@@ -264,8 +264,6 @@ export class WeaveImageNode extends WeaveNode {
   }
 
   onRender(props: WeaveElementAttributes): WeaveElementInstance {
-    // this.initGlobalEvents();
-
     this.setupNotUsedImagesCleanup();
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -859,29 +857,12 @@ export class WeaveImageNode extends WeaveNode {
     }
     // Loaded but image is corrupted
     if (this.imageState[id ?? '']?.loaded && this.imageState[id ?? '']?.error) {
-      imagePlaceholder?.setAttrs({
-        ...internalImageProps,
-        ...(nodeAttrs.imageProperties ?? {}),
-        name: undefined,
-        id: `${id}-placeholder`,
-        nodeId: id,
-        x: 0,
-        y: 0,
-        scaleX: 1,
-        scaleY: 1,
-        rotation: 0,
-        visible: true,
-        fill: this.config.style.placeholder.fill,
-        strokeWidth: 0,
-        draggable: false,
-        zIndex: 0,
-      });
       internalImage?.setAttrs({
         ...internalImageProps,
         ...(nodeAttrs.imageProperties ?? {}),
         name: undefined,
         id: `${id}-image`,
-        image: undefined,
+        image: this.imageFallback[id ?? ''],
         nodeId: id,
         x: 0,
         y: 0,
@@ -892,6 +873,8 @@ export class WeaveImageNode extends WeaveNode {
         draggable: false,
         zIndex: 1,
       });
+      internalImage?.visible(true);
+      this.updateImageCrop(nodeInstance as Konva.Group);
     }
     // Loaded
     if (
