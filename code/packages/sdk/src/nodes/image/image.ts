@@ -78,7 +78,7 @@ export class WeaveImageNode extends WeaveNode {
       const nodesIds = Object.keys(this.imageState);
 
       for (const nodeId of nodesIds) {
-        const node = stage.findOne(`#${nodeId}`) as Konva.Node | undefined;
+        const node = stage.findOne(`#${nodeId}`);
 
         if (!node) {
           delete this.imageSource[nodeId];

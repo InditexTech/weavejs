@@ -11,9 +11,6 @@ import {
 } from '@inditextech/weave-types';
 import Konva from 'konva';
 import { isEqual } from 'lodash';
-import type { Stage } from 'konva/lib/Stage';
-import type { Layer } from 'konva/lib/Layer';
-import type { Group } from 'konva/lib/Group';
 import type { RendererInstruction } from './types';
 import { SIMPLE_RECONCILER } from './reconciler';
 import { WeaveRenderer } from '@inditextech/weave-sdk';
@@ -305,11 +302,10 @@ export class WeaveKonvaBaseRenderer extends WeaveRenderer {
 
     for (const childInstance of childInstances) {
       let parent = childInstance.getParent();
-      if (parent && parent.getAttrs().nodeId) {
-        parent = stage.findOne(`#${parent.getAttrs().nodeId}`) as
-          | Stage
-          | Layer
-          | Group;
+      if (parent?.getAttrs().nodeId) {
+        parent = stage.findOne(
+          `#${parent.getAttrs().nodeId}`
+        ) as Konva.Container;
       }
 
       if (parent?.id() === instruction.parentKey) {
