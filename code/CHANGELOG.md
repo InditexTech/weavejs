@@ -17,6 +17,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - [#1041](https://github.com/InditexTech/weavejs/issues/1041) Custom guides support and refactor of snapping and distance guides plugins
 
+## [3.8.2] - 2026-05-11
+
+### Fixed
+
+- [#1042](https://github.com/InditexTech/weavejs/issues/1042) Undo does not work correctly after cropping an image with Ctrl+drag corner
+
 ## [3.8.1] - 2026-05-11
 
 ### Fixed
@@ -1775,7 +1781,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - [#24](https://github.com/InditexTech/weavejs/issues/24) Bug when loading rooms with text or images
 - [#18](https://github.com/InditexTech/weavejs/issues/18) Fix awareness not working on store-azure-web-pubsub
 
-[Unreleased]: https://github.com/InditexTech/weavejs/compare/3.8.1...HEAD
+[Unreleased]: https://github.com/InditexTech/weavejs/compare/3.8.2...HEAD
+[3.8.2]: https://github.com/InditexTech/weavejs/compare/3.8.1...3.8.2
 [3.8.1]: https://github.com/InditexTech/weavejs/compare/3.8.0...3.8.1
 [3.8.0]: https://github.com/InditexTech/weavejs/compare/3.7.2...3.8.0
 [3.7.2]: https://github.com/InditexTech/weavejs/compare/3.7.1...3.7.2
