@@ -802,10 +802,10 @@ export class WeaveImageNode extends WeaveNode {
     nodeInstance.setAttrs({
       ...nextProps,
       ...(nextProps.cropInfo
-        ? { cropInfo: node.getAttrs().cropInfo }
+        ? { cropInfo: nextProps.cropInfo }
         : { cropInfo: undefined }),
       ...(nextProps.cropSize
-        ? { cropSize: node.getAttrs().cropSize }
+        ? { cropSize: nextProps.cropSize }
         : { cropSize: undefined }),
     });
 
