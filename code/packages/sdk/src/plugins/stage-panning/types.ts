@@ -7,8 +7,8 @@ export type WeaveStagePanningPluginParams = {
 };
 
 export type WeaveStagePanningPluginConfig = {
-  edgePanOffset: number;
-  edgePanMinSpeed: number;
-  edgePanSpeed: number;
-  edgePanMaxSpeed: number;
+  edgePan: {
+    offset: number;
+    speed: number;
+  };
 };

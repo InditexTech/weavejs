@@ -305,21 +305,15 @@ export class WeaveStagePanningPlugin extends WeavePlugin {
         return;
       }
 
+      const speed = this.config.edgePan.speed;
+
       this.stageScrollInterval = setInterval(() => {
         const pos = stage.getPointerPosition();
-        const offset = this.config.edgePanOffset;
+        const offset = this.config.edgePan.offset;
 
         if (!pos) return;
 
         const { width, height } = stage.size();
-        const scale = stage.scaleX();
-        const speed = Math.max(
-          this.config.edgePanMinSpeed,
-          Math.min(
-            this.config.edgePanMaxSpeed,
-            this.config.edgePanSpeed / scale
-          )
-        );
 
         let isNearLeft = false;
         let isNearRight = false;

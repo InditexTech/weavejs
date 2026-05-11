@@ -525,8 +525,6 @@ export abstract class WeaveNode implements WeaveNodeBase {
           isWheelMousePressed = true;
         }
 
-        e.cancelBubble = true;
-
         this.getNodesSelectionFeedbackPlugin()?.hideSelectionHalo(nodeTarget);
 
         this.getSelectionPlugin()?.saveDragSelectedNodes();

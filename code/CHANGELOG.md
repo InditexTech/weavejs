@@ -15,6 +15,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- [#1043](https://github.com/InditexTech/weavejs/issues/1043) Canvas does not auto-scroll when dragging an element near the border
 - [#1044](https://github.com/InditexTech/weavejs/issues/1044) Nodes disappear when moving between frames
 
 ## [3.8.0] - 2026-04-24
