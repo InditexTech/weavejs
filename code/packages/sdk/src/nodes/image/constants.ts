@@ -40,7 +40,7 @@ export const WEAVE_IMAGE_DEFAULT_CONFIG: WeaveImageProperties = {
     },
   },
   imageLoading: {
-    maxRetryAttempts: 15,
+    maxRetryAttempts: 3,
     retryDelayMs: 2000,
   },
   crossOrigin: 'anonymous',
