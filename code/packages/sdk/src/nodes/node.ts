@@ -1053,10 +1053,10 @@ export abstract class WeaveNode implements WeaveNodeBase {
   }
 
   handleMouseout(e: KonvaEventObject<MouseEvent>, node: Konva.Node) {
-    const isCtrlOrMetaPressed = e.evt.ctrlKey || e.evt.metaKey;
+    const isCtrlOrMetaPressed = e.evt?.ctrlKey || e.evt?.metaKey;
 
     if (isCtrlOrMetaPressed) {
-      return;
+      return false;
     }
 
     const realNode = this.instance.getInstanceRecursive(node);
