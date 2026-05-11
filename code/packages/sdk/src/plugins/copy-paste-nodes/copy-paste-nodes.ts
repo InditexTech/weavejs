@@ -534,7 +534,6 @@ export class WeaveCopyPasteNodesPlugin extends WeavePlugin {
         if (containerId && canPasteNodeOntoTarget) {
           nodesToSelect.push(newNodeId);
           nodesToPaste.push({ node, containerId });
-          // this.instance.addNodeNT(node, containerId);
         }
 
         this.getStageGridPlugin()?.onRender();
