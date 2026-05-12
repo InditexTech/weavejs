@@ -19,6 +19,7 @@ export type WeaveVideoToolDragParams = {
 export type WeaveVideoToolActionTriggerParams = {
   videoId?: string;
   videoParams?: WeaveVideoToolDragParams;
+  container?: Konva.Layer | Konva.Group;
   position?: Konva.Vector2d;
   forceMainContainer?: boolean;
 };

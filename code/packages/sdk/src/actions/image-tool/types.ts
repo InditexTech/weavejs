@@ -34,6 +34,7 @@ export type WeaveImageToolActionTriggerCommonParams = {
   imageId?: string;
   options?: ImageOptions;
   position?: Konva.Vector2d;
+  container?: Konva.Layer | Konva.Group;
   forceMainContainer?: boolean;
 };
 
