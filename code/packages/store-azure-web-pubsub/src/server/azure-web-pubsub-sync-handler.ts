@@ -174,6 +174,13 @@ export default class WeaveAzureWebPubsubSyncHandler extends WebPubSubEventHandle
 
       const actualState = Y.encodeStateAsUpdate(doc);
 
+      // do compact?
+      const update = Y.encodeStateAsUpdate(doc);
+      const newDoc = new Y.Doc();
+      Y.applyUpdate(newDoc, update);
+      this._rooms.set(roomId, newDoc);
+      doc.destroy();
+
       if (!this.isPersistingOnInterval()) {
         const savedRoomData = this.roomsLastState.get(roomId);
         if (savedRoomData) {
@@ -250,6 +257,7 @@ export default class WeaveAzureWebPubsubSyncHandler extends WebPubSubEventHandle
       this._roomsSyncHost.delete(roomId);
     }
 
+    this._rooms.get(roomId)?.destroy();
     this._rooms.delete(roomId);
 
     return WEAVE_STORE_AZURE_WEB_PUBSUB_DESTROY_ROOM_STATUS.DESTROYED;
