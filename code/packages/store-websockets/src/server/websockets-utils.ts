@@ -162,6 +162,15 @@ export class WSSharedDoc extends Y.Doc {
         });
     }
   }
+
+  destroy(): void {
+    this.conns.forEach((_, conn) => {
+      conn.close();
+    });
+    this.conns.clear();
+    this.awareness.destroy();
+    this.destroy();
+  }
 }
 
 export const getYDoc = (
@@ -387,3 +396,11 @@ async function setupRoomPersistence(roomId: string, doc: Y.Doc): Promise<void> {
     persistenceMap.set(roomId, intervalId);
   }
 }
+
+export const destroyWSConnection = (roomId: string): void => {
+  if (docs.has(roomId)) {
+    const doc = docs.get(roomId);
+    docs.delete(roomId);
+    doc.destroy();
+  }
+};
