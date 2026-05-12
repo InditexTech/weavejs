@@ -55,6 +55,7 @@ export class WeaveStoreStandalone extends WeaveStore {
   }
 
   disconnect(): void {
+    this.getDocument().destroy();
     this.handleConnectionStatusChange(
       WEAVE_STORE_CONNECTION_STATUS.DISCONNECTED
     );

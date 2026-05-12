@@ -17,6 +17,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - [#1041](https://github.com/InditexTech/weavejs/issues/1041) Custom guides support and refactor of snapping and distance guides plugins
 
+### Fixed
+
+- [#1053](https://github.com/InditexTech/weavejs/issues/1053) Avoid OOM by cleaning up documents using Yjs destroy API
+
 ## [3.8.2] - 2026-05-11
 
 ### Fixed
