@@ -1,6 +1,6 @@
 ---
 title: v3.8.3
-description: Fix images tool positioning as grid
+description: Fix images tool positioning as grid and OOM on server side, now we correctly cleanup the Yjs document
 ---
 
 ## Metadata
@@ -10,3 +10,4 @@ description: Fix images tool positioning as grid
 ### Fixed
 
 - [#1051](https://github.com/InditexTech/weavejs/issues/1051) When adding images with the Images tool, they are not positioned on a grid
+- [#1053](https://github.com/InditexTech/weavejs/issues/1053) Avoid OOM by cleaning up documents using Yjs destroy API

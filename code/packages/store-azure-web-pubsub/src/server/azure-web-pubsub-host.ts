@@ -49,7 +49,7 @@ export interface WebPubSubHostOptions {
 export class WeaveStoreAzureWebPubSubSyncHost {
   private readonly server: WeaveAzureWebPubsubServer;
   private readonly syncHandler: WeaveAzureWebPubsubSyncHandler;
-  public doc: Y.Doc;
+  public doc: Y.Doc | undefined;
   public topic: string;
   public topicAwarenessChannel: string;
 
@@ -59,7 +59,7 @@ export class WeaveStoreAzureWebPubSubSyncHost {
   private _reconnectAttempts: number = 0;
   private _forceClose: boolean = false;
 
-  private _awareness!: awarenessProtocol.Awareness;
+  private _awareness!: awarenessProtocol.Awareness | undefined;
 
   private _chunkedMessages: Map<string, string[]>;
 
@@ -125,6 +125,8 @@ export class WeaveStoreAzureWebPubSubSyncHost {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       origin: any
     ) => {
+      if (!this._awareness) return;
+
       try {
         const changedClients = added.concat(added, updated, removed);
         const encoder = encoding.createEncoder();
@@ -165,7 +167,7 @@ export class WeaveStoreAzureWebPubSubSyncHost {
     this.doc.on('update', this._updateHandler);
   }
 
-  get awareness(): awarenessProtocol.Awareness {
+  get awareness(): awarenessProtocol.Awareness | undefined {
     return this._awareness;
   }
 
@@ -397,6 +399,23 @@ export class WeaveStoreAzureWebPubSubSyncHost {
   }
 
   async stop(): Promise<void> {
+    if (this._heartbeatIntervalId) {
+      clearInterval(this._heartbeatIntervalId);
+    }
+
+    if (this._reconnectionTimeoutId) {
+      clearTimeout(this._reconnectionTimeoutId);
+    }
+
+    if (this._resyncIntervalId) {
+      clearInterval(this._resyncIntervalId);
+    }
+
+    this.doc?.destroy();
+    this._awareness?.destroy();
+    this.doc = undefined;
+    this._awareness = undefined;
+
     this._reconnectAttempts = 0;
     this._forceClose = true;
     if (this._conn?.readyState === WebSocket.OPEN) {
@@ -555,6 +574,8 @@ export class WeaveStoreAzureWebPubSubSyncHost {
   }
 
   private onClientInit(group: string, data: MessageData) {
+    if (!this.doc) return;
+
     const encoder = encoding.createEncoder();
     encoding.writeVarUint(encoder, syncProtocol.messageYjsSyncStep1);
     syncProtocol.writeSyncStep1(encoder, this.doc);
@@ -564,6 +585,8 @@ export class WeaveStoreAzureWebPubSubSyncHost {
 
   private onClientSync(group: string, from: string, data: string) {
     try {
+      if (!this.doc) return;
+
       const buf = Buffer.from(data, 'base64');
       const encoder = encoding.createEncoder();
       const decoder = decoding.createDecoder(buf);
