@@ -174,13 +174,6 @@ export default class WeaveAzureWebPubsubSyncHandler extends WebPubSubEventHandle
 
       const actualState = Y.encodeStateAsUpdate(doc);
 
-      // do compact?
-      const update = Y.encodeStateAsUpdate(doc);
-      const newDoc = new Y.Doc();
-      Y.applyUpdate(newDoc, update);
-      this._rooms.set(roomId, newDoc);
-      doc.destroy();
-
       if (!this.isPersistingOnInterval()) {
         const savedRoomData = this.roomsLastState.get(roomId);
         if (savedRoomData) {
