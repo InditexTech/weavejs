@@ -206,12 +206,12 @@ export class WeaveTargetingManager {
       nodesSelection.getTransformer().visible(false);
     }
 
-    if (containerAlt && typeof point === 'undefined') {
+    if (containerAlt && point === undefined) {
       relativeMousePointer =
         containerAlt.getRelativePointerPosition() ?? relativeMousePointer;
     }
 
-    if (!containerAlt && typeof point === 'undefined') {
+    if (!containerAlt && point === undefined) {
       containerAlt = this.instance.getMainLayer();
       relativeMousePointer = containerAlt?.getRelativePointerPosition() ?? {
         x: 0,
