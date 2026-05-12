@@ -106,11 +106,9 @@ export class WeaveImageToolAction extends WeaveAction {
       if (dragProperties && dragId === WEAVE_IMAGE_TOOL_ACTION_NAME) {
         this.instance.getStage().setPointersPositions(e);
 
-        const position: Konva.Vector2d | null | undefined = this.instance
-          .getStage()
-          .getRelativePointerPosition();
+        const { mousePoint, container } = this.instance.getMousePointer();
 
-        if (!position) {
+        if (!mousePoint) {
           return;
         }
 
@@ -126,7 +124,8 @@ export class WeaveImageToolAction extends WeaveAction {
           ...(dragProperties.forceMainContainer && {
             forceMainContainer: dragProperties.forceMainContainer,
           }),
-          position,
+          container: container as Konva.Layer | Konva.Group | undefined,
+          position: mousePoint,
         });
       }
     });
@@ -409,7 +408,8 @@ export class WeaveImageToolAction extends WeaveAction {
       const { mousePoint, container } = this.instance.getMousePointer(position);
 
       this.imageAction[nodeId].clickPoint = mousePoint;
-      this.imageAction[nodeId].container = container;
+      this.imageAction[nodeId].container =
+        this.imageAction[nodeId].container ?? container;
 
       const nodeHandler = this.instance.getNodeHandler<WeaveImageNode>('image');
 
@@ -530,9 +530,9 @@ export class WeaveImageToolAction extends WeaveAction {
       props: this.initProps(),
       imageId: nodeId,
       clickPoint: null,
-      container: undefined,
       imageFile: null,
       imageURL: null,
+      container: params?.container,
       forceMainContainer: params?.forceMainContainer ?? false,
       uploadType: null,
       uploadImageFunction: null,

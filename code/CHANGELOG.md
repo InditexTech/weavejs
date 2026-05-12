@@ -15,6 +15,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- [#1051](https://github.com/InditexTech/weavejs/issues/1051) When adding images with the Images tool, they are not positioned on a grid
 - [#1053](https://github.com/InditexTech/weavejs/issues/1053) Avoid OOM by cleaning up documents using Yjs destroy API
 
 ## [3.8.2] - 2026-05-11

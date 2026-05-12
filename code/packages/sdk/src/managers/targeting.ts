@@ -199,10 +199,6 @@ export class WeaveTargetingManager {
       relativeMousePointer
     );
 
-    if (!containerAlt) {
-      containerAlt = this.instance.getMainLayer();
-    }
-
     const nodesSelection =
       this.instance.getPlugin<WeaveNodesSelectionPlugin>('nodesSelection');
 
@@ -210,8 +206,18 @@ export class WeaveTargetingManager {
       nodesSelection.getTransformer().visible(false);
     }
 
-    relativeMousePointer =
-      containerAlt?.getRelativePointerPosition() ?? relativeMousePointer;
+    if (containerAlt && point === undefined) {
+      relativeMousePointer =
+        containerAlt.getRelativePointerPosition() ?? relativeMousePointer;
+    }
+
+    if (!containerAlt && point === undefined) {
+      containerAlt = this.instance.getMainLayer();
+      relativeMousePointer = containerAlt?.getRelativePointerPosition() ?? {
+        x: 0,
+        y: 0,
+      };
+    }
 
     if (utilityLayer) {
       utilityLayer.visible(true);
