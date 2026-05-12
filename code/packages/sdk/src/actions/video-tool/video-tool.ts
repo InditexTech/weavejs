@@ -81,14 +81,18 @@ export class WeaveVideoToolAction extends WeaveAction {
 
       if (dragProperties && dragId === VIDEO_TOOL_ACTION_NAME) {
         this.instance.getStage().setPointersPositions(e);
-        const position: Konva.Vector2d | null | undefined = this.instance
-          .getStage()
-          .getRelativePointerPosition();
+
+        const { mousePoint, container } = this.instance.getMousePointer();
+
+        if (!mousePoint) {
+          return;
+        }
 
         this.instance.triggerAction(VIDEO_TOOL_ACTION_NAME, {
           videoId: dragProperties.videoId,
           videoParams: dragProperties.videoParams,
-          position,
+          container: container as Konva.Layer | Konva.Group | undefined,
+          position: mousePoint,
         });
       }
     });
@@ -181,7 +185,7 @@ export class WeaveVideoToolAction extends WeaveAction {
       const { mousePoint, container } = this.instance.getMousePointer(position);
 
       this.clickPoint = mousePoint;
-      this.container = container;
+      this.container = this.container ?? container;
 
       const nodeHandler = this.instance.getNodeHandler<WeaveVideoNode>('video');
 
@@ -238,6 +242,7 @@ export class WeaveVideoToolAction extends WeaveAction {
       selectionPlugin.setSelectedNodes([]);
     }
 
+    this.container = params?.container;
     this.forceMainContainer = params?.forceMainContainer ?? false;
 
     if (params?.videoId) {

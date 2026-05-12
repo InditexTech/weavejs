@@ -58,6 +58,7 @@ export class WeaveImagesToolAction extends WeaveAction {
   protected imagesFile: WeaveImagesFile[] = [];
   protected imagesURL: WeaveImagesURL[] = [];
   protected preloadImgs!: Record<string, HTMLImageElement>;
+  protected stageClickPoint!: Vector2d | null;
   protected clickPoint!: Vector2d | null;
   protected forceMainContainer: boolean = false;
   protected cancelAction!: () => void;
@@ -117,11 +118,10 @@ export class WeaveImagesToolAction extends WeaveAction {
 
       if (dragProperties && dragId === WEAVE_IMAGES_TOOL_ACTION_NAME) {
         this.instance.getStage().setPointersPositions(e);
-        const position: Konva.Vector2d | null | undefined = this.instance
-          .getStage()
-          .getRelativePointerPosition();
 
-        if (!position) {
+        const { mousePoint, container } = this.instance.getMousePointer();
+
+        if (!mousePoint) {
           return;
         }
 
@@ -130,7 +130,8 @@ export class WeaveImagesToolAction extends WeaveAction {
           {
             type: WEAVE_IMAGES_TOOL_UPLOAD_TYPE.IMAGE_URL,
             images: dragProperties.imagesURL,
-            position,
+            container: container as Konva.Layer | Konva.Group | undefined,
+            position: mousePoint,
             ...(dragProperties.forceMainContainer && {
               forceMainContainer: dragProperties.forceMainContainer,
             }),
@@ -377,7 +378,10 @@ export class WeaveImagesToolAction extends WeaveAction {
     const { mousePoint, container } = this.instance.getMousePointer(position);
 
     this.clickPoint = mousePoint;
-    this.container = container as Konva.Layer | Konva.Group;
+    this.stageClickPoint = position
+      ? position
+      : stage.getRelativePointerPosition();
+    this.container = this.container ?? (container as Konva.Layer | Konva.Group);
 
     const originPoint = {
       x: this.clickPoint?.x ?? 0,
@@ -485,10 +489,8 @@ export class WeaveImagesToolAction extends WeaveAction {
               },
               uploadImageFunction: uploadImageFunctionInternal,
               ...(imageId && { imageId }),
-              position: {
-                x: position.x,
-                y: position.y,
-              },
+              position,
+              container: this.container,
               forceMainContainer: this.forceMainContainer,
               nodeId,
             },
@@ -543,10 +545,8 @@ export class WeaveImagesToolAction extends WeaveAction {
               },
               ...(imageId && { imageId }),
               ...(options && { options }),
-              position: {
-                x: position.x,
-                y: position.y,
-              },
+              position,
+              container: this.container,
               forceMainContainer: this.forceMainContainer,
               nodeId,
             },
@@ -604,6 +604,10 @@ export class WeaveImagesToolAction extends WeaveAction {
 
     if (params?.position) {
       this.setState(WEAVE_IMAGES_TOOL_STATE.SELECTED_POSITION);
+    }
+
+    if (params?.container) {
+      this.container = params.container;
     }
 
     this.nodesIds = [];
@@ -689,6 +693,7 @@ export class WeaveImagesToolAction extends WeaveAction {
     this.forceMainContainer = false;
     this.initialCursor = null;
     this.container = undefined;
+    this.stageClickPoint = null;
     this.clickPoint = null;
     this.nodesIds = [];
     this.toAdd = 0;

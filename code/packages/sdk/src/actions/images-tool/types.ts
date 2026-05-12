@@ -31,6 +31,7 @@ export type ImageInfo = {
 
 export type WeaveImagesToolActionTriggerCommonParams = {
   position?: Vector2d;
+  container?: Konva.Layer | Konva.Group;
   forceMainContainer?: boolean;
 };
 
