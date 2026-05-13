@@ -434,7 +434,7 @@ export class WeaveNodesSnappingDistance {
         y: containerOffset.y + midYLeft + separation,
       };
 
-      this.renderHorizontalDistanceGuide(
+      this.renderDistanceGuide(
         lineLeft,
         snap.orientation,
         `${snap.distance.toFixed(2) ?? '-'}px`,
@@ -460,7 +460,7 @@ export class WeaveNodesSnappingDistance {
         y: containerOffset.y + midYRight + separation,
       };
 
-      this.renderHorizontalDistanceGuide(
+      this.renderDistanceGuide(
         lineRight,
         snap.orientation,
         `${snap.distance.toFixed(2) ?? '-'}px`,
@@ -497,7 +497,7 @@ export class WeaveNodesSnappingDistance {
           snap.distance / 2,
       };
 
-      this.renderHorizontalDistanceGuide(
+      this.renderDistanceGuide(
         lineTop,
         snap.orientation,
         `${snap.distance.toFixed(2) ?? '-'}px`,
@@ -523,7 +523,7 @@ export class WeaveNodesSnappingDistance {
         y: containerOffset.y + snap.center.to.box.y - snap.distance / 2,
       };
 
-      this.renderHorizontalDistanceGuide(
+      this.renderDistanceGuide(
         lineBottom,
         snap.orientation,
         `${snap.distance.toFixed(2) ?? '-'}px`,
@@ -557,7 +557,7 @@ export class WeaveNodesSnappingDistance {
                 containerOffset.x + distanceH.to.box.x - distanceH.distance / 2,
               y: containerOffset.y + distanceH.midY + separation,
             };
-            this.renderHorizontalDistanceGuide(
+            this.renderDistanceGuide(
               points,
               snap.orientation,
               `${snap.distance.toFixed(2) ?? '-'}px`,
@@ -587,7 +587,7 @@ export class WeaveNodesSnappingDistance {
                 y: containerOffset.y + distanceH.midY + separation,
               };
 
-              this.renderHorizontalDistanceGuide(
+              this.renderDistanceGuide(
                 points,
                 snap.orientation,
                 `${snap.distance.toFixed(2) ?? '-'}px`,
@@ -622,7 +622,7 @@ export class WeaveNodesSnappingDistance {
                 y: containerOffset.y + distanceH.midY + separation,
               };
 
-              this.renderHorizontalDistanceGuide(
+              this.renderDistanceGuide(
                 points,
                 snap.orientation,
                 `${snap.distance.toFixed(2) ?? '-'}px`,
@@ -664,7 +664,7 @@ export class WeaveNodesSnappingDistance {
                 distanceV.distance / 2,
             };
 
-            this.renderVerticalDistanceGuide(
+            this.renderDistanceGuide(
               points,
               snap.orientation,
               `${snap.distance.toFixed(2) ?? '-'}px`,
@@ -694,7 +694,7 @@ export class WeaveNodesSnappingDistance {
                 y: containerOffset.y + toBox.y - snap.distance / 2,
               };
 
-              this.renderVerticalDistanceGuide(
+              this.renderDistanceGuide(
                 points,
                 snap.orientation,
                 `${snap.distance.toFixed(2) ?? '-'}px`,
@@ -729,7 +729,7 @@ export class WeaveNodesSnappingDistance {
                   snap.distance / 2,
               };
 
-              this.renderVerticalDistanceGuide(
+              this.renderDistanceGuide(
                 points,
                 snap.orientation,
                 `${snap.distance.toFixed(2) ?? '-'}px`,
@@ -958,32 +958,7 @@ export class WeaveNodesSnappingDistance {
     container.moveToTop();
   }
 
-  private renderHorizontalDistanceGuide(
-    points: number[],
-    orientation: GuideOrientation,
-    text: string,
-    mid: Konva.Vector2d
-  ): void {
-    const stage = this.instance.getStage();
-
-    const line = new Konva.Line({
-      name: GUIDE_DISTANCE_NAME,
-      points,
-      stroke: this.config.style.distance.line.stroke,
-      strokeWidth: this.config.style.distance.line.strokeWidth / stage.scaleX(), // keeps it thin on zoom
-      dash: this.config.style.distance.line.dash?.map(
-        (d) => d / stage.scaleX()
-      ),
-      opacity: this.config.style.distance.line.opacity,
-      listening: false,
-    });
-    this.layer.add(line);
-    line.moveToTop();
-
-    this.renderTextGuide(text, orientation, mid);
-  }
-
-  private renderVerticalDistanceGuide(
+  private renderDistanceGuide(
     points: number[],
     orientation: GuideOrientation,
     text: string,
