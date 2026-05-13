@@ -61,7 +61,7 @@
     "@syncedstore/core": "0.6.0",
     "buffer": "6.0.3",
     "reconnecting-websocket": "4.4.0",
-    "uuid": "11.1.0",
+    "uuid": "11.1.1",
     "ws": "8.18.1"
   },
   "devDependencies": {
@@ -90,8 +90,6 @@
     "tsdown": "^0.10.2",
     "tsx": "^4.19.3",
     "typescript-eslint": "8.22.0",
-    "vite-plugin-compression2": "1.0.0",
-    "vite-plugin-dts": "4.0.3",
     "vitest": "1.6.1",
     "vitest-sonar-reporter": "2.0.0"
   },
