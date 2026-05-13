@@ -17,6 +17,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - [#1041](https://github.com/InditexTech/weavejs/issues/1041) Custom guides support and refactor of snapping and distance guides plugins
 
+## [3.9.1] - 2026-05-13
+
+### Fixed
+
+- [#1061](https://github.com/InditexTech/weavejs/issues/1061) Remove unnecessary console.log on Azure Web PubSub store client
+
 ## [3.9.0] - 2026-05-13
 
 ### Added
@@ -1804,7 +1810,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - [#24](https://github.com/InditexTech/weavejs/issues/24) Bug when loading rooms with text or images
 - [#18](https://github.com/InditexTech/weavejs/issues/18) Fix awareness not working on store-azure-web-pubsub
 
-[Unreleased]: https://github.com/InditexTech/weavejs/compare/3.9.0...HEAD
+[Unreleased]: https://github.com/InditexTech/weavejs/compare/3.9.1...HEAD
+[3.9.1]: https://github.com/InditexTech/weavejs/compare/3.9.0...3.9.1
 [3.9.0]: https://github.com/InditexTech/weavejs/compare/3.8.4...3.9.0
 [3.8.4]: https://github.com/InditexTech/weavejs/compare/3.8.3...3.8.4
 [3.8.3]: https://github.com/InditexTech/weavejs/compare/3.8.2...3.8.3
