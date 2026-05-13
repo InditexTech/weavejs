@@ -93,7 +93,7 @@ export class WeaveNodesSnappingCustomGuides {
       const persistedGuides: Record<string, Guide[]> =
         this.extractGuidesFromMetadata(metadata);
 
-      this.customGuides = persistedGuides;
+      this.customGuides = persistedGuides ?? {};
 
       this.instance.emitEvent('snappingManager:onCustomGuidesChange', {
         guides: this.customGuides,
@@ -193,7 +193,7 @@ export class WeaveNodesSnappingCustomGuides {
       }
       return guides;
     }
-    return this.customGuides[containerId] || [];
+    return this.customGuides?.[containerId] ?? [];
   }
 
   private persistGuides(): void {
@@ -417,7 +417,7 @@ export class WeaveNodesSnappingCustomGuides {
 
     const stageVisible = this.getVisibleStageRect(stage);
 
-    const hasAnyGuides = Object.values(this.customGuides).some(
+    const hasAnyGuides = Object.values(this.customGuides ?? {}).some(
       (arr) => arr.length
     );
 
@@ -426,7 +426,7 @@ export class WeaveNodesSnappingCustomGuides {
     }
 
     const guidesForContainer = [
-      ...(this.customGuides[containerId] || []),
+      ...(this.customGuides?.[containerId] ?? []),
       ...staticGuides,
     ];
 
@@ -905,7 +905,10 @@ export class WeaveNodesSnappingCustomGuides {
       guideNode.destroy();
     }
 
-    if (this.selectedGuide?.guideId === guide.guideId) {
+    if (
+      this.selectedGuide?.guideId === guide.guideId &&
+      guide.kind === GUIDE_KIND.CUSTOM
+    ) {
       this.selectedGuide = null;
     }
 

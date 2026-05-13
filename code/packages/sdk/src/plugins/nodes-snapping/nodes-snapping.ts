@@ -281,43 +281,16 @@ export class WeaveNodesSnappingPlugin extends WeavePlugin {
       return;
     }
 
-    const stage = this.instance.getStage();
-    this.relativeToId = null;
-    this.relativeTo = null;
-
-    if (container === this.instance.getMainLayer()) {
-      this.relativeTo = stage;
-      this.relativeToId = this.instance.getMainLayer()?.id() ?? null;
-    }
-    if (
-      container !== this.instance.getMainLayer() &&
-      container.getAttrs().nodeId
-    ) {
-      const containerNode = stage.findOne(`#${container.getAttrs().nodeId}`) as
-        | Konva.Group
-        | undefined;
-      if (containerNode) {
-        this.relativeTo = containerNode;
-        this.relativeToId = containerNode.id();
-      }
-    }
+    const isCtrlOrCmdPressed = e ? e.evt.ctrlKey || e.evt.metaKey : false;
+    this.snappingPreCalculations(isCtrlOrCmdPressed, nodes, container);
 
     if (!this.relativeTo) {
       return;
     }
 
-    const allGuides = this.getAllGuides(
-      e,
-      nodes,
-      container.getChildren((item) => {
-        return item.name()?.includes('node');
-      }) as Konva.Node[],
-      this.relativeTo
-    );
-
     const transformedGuidesHorizontal: Guide[] = [];
     const transformedGuidesVertical: Guide[] = [];
-    for (const guide of allGuides) {
+    for (const guide of this.snappingGuides) {
       if (
         container === this.instance.getMainLayer() &&
         guide.orientation === GUIDE_ORIENTATION.VERTICAL
@@ -571,26 +544,11 @@ export class WeaveNodesSnappingPlugin extends WeavePlugin {
     this.snappingGuides = [];
   }
 
-  private dragStartHandler({
-    e,
-    nodes,
-  }: {
-    e: KonvaEventObject<DragEvent>;
-    nodes: Konva.Node[];
-  }) {
-    this.lockX = null;
-    this.lockY = null;
-    this.lockedAbsX = null;
-    this.lockedAbsY = null;
-
-    this.snappingGuides = [];
-
-    const container = this.extractContainer(nodes);
-
-    if (!container) {
-      return;
-    }
-
+  private snappingPreCalculations(
+    isCtrlOrCmdPressed: boolean,
+    nodes: Konva.Node[],
+    container: Konva.Container
+  ) {
     const stage = this.instance.getStage();
     this.relativeToId = null;
     this.relativeTo = null;
@@ -635,22 +593,29 @@ export class WeaveNodesSnappingPlugin extends WeavePlugin {
     });
 
     this.snappingGuides = this.getAllGuides(
-      e,
+      isCtrlOrCmdPressed,
       nodes,
       this.visibleNodes,
       this.relativeTo
     );
+  }
 
+  private calculateSelectionOffsets(
+    nodes: Konva.Node[],
+    container: Konva.Container,
+    relativeTo: Konva.Container
+  ): void {
+    const stage = this.instance.getStage();
     const nodesBox = getNodesRect(nodes, container);
     this.selectionOffsets = [];
     for (const node of nodes) {
       const nodeBox = getNodeRect(node, container ?? stage);
 
       let containerCompensation: Konva.Vector2d = { x: 0, y: 0 };
-      if (this.relativeTo !== this.instance.getMainLayer()) {
+      if (relativeTo !== this.instance.getMainLayer()) {
         containerCompensation = {
-          x: -1 * (this.relativeTo.getAttrs().containerCompensationX ?? 0),
-          y: -1 * (this.relativeTo.getAttrs().containerCompensationY ?? 0),
+          x: -1 * (relativeTo.getAttrs().containerCompensationX ?? 0),
+          y: -1 * (relativeTo.getAttrs().containerCompensationY ?? 0),
         };
       }
 
@@ -664,6 +629,36 @@ export class WeaveNodesSnappingPlugin extends WeavePlugin {
         y: nodeBox.y - nodesBox.y + diff.y + containerCompensation.y,
       });
     }
+  }
+
+  private dragStartHandler({
+    e,
+    nodes,
+  }: {
+    e: KonvaEventObject<DragEvent>;
+    nodes: Konva.Node[];
+  }) {
+    this.lockX = null;
+    this.lockY = null;
+    this.lockedAbsX = null;
+    this.lockedAbsY = null;
+
+    this.snappingGuides = [];
+
+    const container = this.extractContainer(nodes);
+
+    if (!container) {
+      return;
+    }
+
+    const isCtrlOrCmdPressed = e ? e.evt.ctrlKey || e.evt.metaKey : false;
+    this.snappingPreCalculations(isCtrlOrCmdPressed, nodes, container);
+
+    if (!this.relativeTo) {
+      return;
+    }
+
+    this.calculateSelectionOffsets(nodes, container, this.relativeTo);
   }
 
   private dragMoveHandler({
@@ -706,7 +701,22 @@ export class WeaveNodesSnappingPlugin extends WeavePlugin {
         'onNodeKeyboardMove',
         ({ node }: { node: Konva.Node }) => {
           const nodes = [node];
-          console.log('onNodeKeyboardMove', node);
+
+          const container = this.extractContainer(nodes);
+
+          if (!container) {
+            return;
+          }
+
+          const isCtrlOrCmdPressed = false;
+          this.snappingPreCalculations(isCtrlOrCmdPressed, nodes, container);
+
+          if (!this.relativeTo) {
+            return;
+          }
+
+          this.calculateSelectionOffsets(nodes, container, this.relativeTo);
+
           this.snappingManagerGuides.performSnapping(
             nodes,
             this.selectionOffsets,
@@ -852,16 +862,14 @@ export class WeaveNodesSnappingPlugin extends WeavePlugin {
   }
 
   private getAllGuides(
-    e: KonvaEventObject<MouseEvent | TouchEvent>,
+    isCtrlOrCmdPressed: boolean,
     nodes: Konva.Node[],
     visibleNodes: Konva.Node[],
     relativeTo: Konva.Container
   ) {
     let otherNodesGuides: Guide[] = [];
 
-    const isCtrlOrCmdPressed = e ? e.evt.ctrlKey || e.evt.metaKey : false;
-
-    if (e && !isCtrlOrCmdPressed) {
+    if (!isCtrlOrCmdPressed) {
       otherNodesGuides = this.snappingManagerGuides.getGuidesFromOtherNodes(
         nodes,
         visibleNodes,
