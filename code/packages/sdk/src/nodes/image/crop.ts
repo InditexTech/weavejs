@@ -782,7 +782,7 @@ export class WeaveImageCrop {
 
       group.rotate(originalRotation);
       group.getChildren().forEach((child) => {
-        child.moveTo(originalContainer!);
+        child.moveTo(originalContainer);
       });
       group.destroy();
 

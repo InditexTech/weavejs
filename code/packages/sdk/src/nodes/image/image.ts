@@ -1456,13 +1456,9 @@ export class WeaveImageNode extends WeaveNode {
   }
 
   cropImageWithReference(image: Konva.Group, reference: Konva.Node): void {
-    const internalImage = image?.findOne(`#${image.getAttrs().id}-image`) as
-      | Konva.Image
-      | undefined;
+    const internalImage = image?.findOne(`#${image.getAttrs().id}-image`);
 
-    const cropGroup = image?.findOne(`#${image.getAttrs().id}-cropGroup`) as
-      | Konva.Group
-      | undefined;
+    const cropGroup = image?.findOne(`#${image.getAttrs().id}-cropGroup`);
 
     if (!internalImage || !cropGroup) {
       throw new Error('Provided element is not a valid image node.', {
@@ -1474,8 +1470,8 @@ export class WeaveImageNode extends WeaveNode {
       this.instance,
       this,
       image,
-      internalImage,
-      cropGroup
+      internalImage as Konva.Image,
+      cropGroup as Konva.Group
     );
 
     this.instance.stateTransactional(() => {
