@@ -14,7 +14,7 @@ import {
   GUIDE_ORIENTATION,
   WEAVE_NODES_SNAPPING_PLUGIN_KEY,
 } from './constants';
-import { roundNumber } from './utils';
+import { getNodesRect, roundNumber } from './utils';
 import type { WeaveNodesSnappingPlugin } from './nodes-snapping';
 import type { Weave } from '@/weave';
 import type { WeaveNodesSelectionPlugin } from '../nodes-selection/nodes-selection';
@@ -56,7 +56,7 @@ export class WeaveNodesSnappingGuideDistanceToTargetInfo {
 
     const selectedNodes = this.getNodeSelectionPlugin()?.getSelectedNodes();
     if (selectedNodes && selectedNodes.length > 0) {
-      const nodesRect = this.getNodesRect(selectedNodes ?? [], stage);
+      const nodesRect = getNodesRect(selectedNodes ?? [], stage);
       this.targetRect = nodesRect;
     }
 
@@ -77,7 +77,7 @@ export class WeaveNodesSnappingGuideDistanceToTargetInfo {
       ) {
         const guideNode = stage.findOne(`#${selectedGuide?.guideId}`);
         if (guideNode) {
-          const nodesRect = this.getNodesRect([guideNode], stage);
+          const nodesRect = getNodesRect([guideNode], stage);
           this.targetRect = nodesRect;
         }
       }
@@ -466,30 +466,6 @@ export class WeaveNodesSnappingGuideDistanceToTargetInfo {
       y: -pos.y / scaleY,
       width: stage.width() / scaleX,
       height: stage.height() / scaleY,
-    };
-  }
-
-  private getNodesRect(
-    nodes: Konva.Node[],
-    relativeTo?: Konva.Layer | Konva.Group | null
-  ): BoundingBox {
-    const rects = nodes.map((n) =>
-      n.getClientRect({
-        relativeTo: relativeTo ?? undefined,
-        skipStroke: true,
-      })
-    );
-
-    const minX = Math.min(...rects.map((r) => r.x));
-    const minY = Math.min(...rects.map((r) => r.y));
-    const maxX = Math.max(...rects.map((r) => r.x + r.width));
-    const maxY = Math.max(...rects.map((r) => r.y + r.height));
-
-    return {
-      x: minX,
-      y: minY,
-      width: maxX - minX,
-      height: maxY - minY,
     };
   }
 

@@ -27,6 +27,7 @@ import type {
 } from './types';
 import Konva from 'konva';
 import type { Weave } from '@/weave';
+import { applySnap, getNodeRect, getNodesRect } from './utils';
 
 export class WeaveNodesSnappingDistance {
   config: { tolerance: number; style: GuideDistanceToTargetInfoStyle };
@@ -58,9 +59,9 @@ export class WeaveNodesSnappingDistance {
 
     let box: BoundingBox;
     if (nodes.length === 1) {
-      box = this.getNodeRect(nodes[0], relativeTo);
+      box = getNodeRect(nodes[0], relativeTo);
     } else {
-      box = this.getNodesRect(nodes, relativeTo);
+      box = getNodesRect(nodes, relativeTo);
     }
 
     let cachedBoxes: { id: string; box: BoundingBox }[] = Array.from(peerBoxes);
@@ -255,7 +256,7 @@ export class WeaveNodesSnappingDistance {
 
     const { snap } = this.findSnapMatches(snappingGuides, snapPoints);
 
-    this.applySnap(nodes, nodesOffsets, snap);
+    applySnap(nodes, nodesOffsets, snap);
 
     this.clearSnapDistanceGuides();
 
@@ -279,18 +280,6 @@ export class WeaveNodesSnappingDistance {
     }
   }
 
-  private getNodeRect(
-    node: Konva.Node,
-    relativeTo?: Konva.Container
-  ): BoundingBox {
-    return node.getClientRect({
-      ...(relativeTo && {
-        relativeTo: relativeTo as unknown as Konva.Container,
-      }),
-      skipStroke: true,
-    }) as BoundingBox;
-  }
-
   private getNodeSnapPointsDistance(
     nodes: Konva.Node[],
     relativeTo: Konva.Container | null
@@ -302,7 +291,7 @@ export class WeaveNodesSnappingDistance {
     if (nodes.length === 1) {
       const node = nodes[0];
 
-      const box = this.getNodeRect(node, relativeTo);
+      const box = getNodeRect(node, relativeTo);
 
       return [
         {
@@ -322,7 +311,7 @@ export class WeaveNodesSnappingDistance {
       ];
     }
 
-    const box = this.getNodesRect(nodes, relativeTo);
+    const box = getNodesRect(nodes, relativeTo);
 
     return [
       {
@@ -409,29 +398,6 @@ export class WeaveNodesSnappingDistance {
       vertical,
       horizontal,
     };
-  }
-
-  private applySnap(
-    nodes: Konva.Node[],
-    offsets: Konva.Vector2d[],
-    snap: SnapResult
-  ): void {
-    for (let i = 0; i < nodes.length; i++) {
-      const offset = offsets[i];
-      const node = nodes[i];
-      const pos = node.position();
-      const next = { ...pos };
-
-      if (snap.vertical) {
-        next.x = snap.vertical.guide + snap.vertical.offset + offset.x;
-      }
-
-      if (snap.horizontal) {
-        next.y = snap.horizontal.guide + snap.horizontal.offset + offset.y;
-      }
-
-      node.position(next);
-    }
   }
 
   private renderSnapDistanceGuides(
@@ -626,7 +592,7 @@ export class WeaveNodesSnappingDistance {
             const to = stage.findOne(`#${distanceH.to.id}`) as Konva.Node;
 
             if (to) {
-              const toBox = this.getNodeRect(to, relativeTo);
+              const toBox = getNodeRect(to, relativeTo);
 
               const points = [
                 containerOffset.x + toBox.x - snap.distance,
@@ -657,7 +623,7 @@ export class WeaveNodesSnappingDistance {
             const from = stage.findOne(`#${distanceH.from.id}`) as Konva.Node;
 
             if (from) {
-              const fromBox = this.getNodeRect(from, relativeTo);
+              const fromBox = getNodeRect(from, relativeTo);
 
               const points = [
                 containerOffset.x + fromBox.x + fromBox.width,
@@ -733,7 +699,7 @@ export class WeaveNodesSnappingDistance {
             const to = stage.findOne(`#${distanceV.to.id}`) as Konva.Node;
 
             if (to) {
-              const toBox = this.getNodeRect(to, relativeTo);
+              const toBox = getNodeRect(to, relativeTo);
 
               const points = [
                 distanceV.midX,
@@ -764,7 +730,7 @@ export class WeaveNodesSnappingDistance {
             const from = stage.findOne(`#${distanceV.from.id}`) as Konva.Node;
 
             if (from) {
-              const fromBox = this.getNodeRect(from, relativeTo);
+              const fromBox = getNodeRect(from, relativeTo);
 
               const points = [
                 containerOffset.x + distanceV.midX,
@@ -799,25 +765,6 @@ export class WeaveNodesSnappingDistance {
   clearSnapDistanceGuides(): void {
     this.layer.find(`.${GUIDE_DISTANCE_NAME}`).forEach((n) => n.destroy());
     this.layer.batchDraw();
-  }
-
-  private getNodesRect(
-    nodes: Konva.Node[],
-    relativeTo: Konva.Container
-  ): BoundingBox {
-    const rects = nodes.map((n) => this.getNodeRect(n, relativeTo));
-
-    const minX = Math.min(...rects.map((r) => r.x));
-    const minY = Math.min(...rects.map((r) => r.y));
-    const maxX = Math.max(...rects.map((r) => r.x + r.width));
-    const maxY = Math.max(...rects.map((r) => r.y + r.height));
-
-    return {
-      x: minX,
-      y: minY,
-      width: maxX - minX,
-      height: maxY - minY,
-    };
   }
 
   private getHorizontalIntersections(

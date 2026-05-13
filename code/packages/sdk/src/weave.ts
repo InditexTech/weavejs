@@ -1624,10 +1624,7 @@ export class Weave {
     const state = this.getStore().getState();
 
     this.stateTransactional(() => {
-      this.stateManager.deepSyncSyncedStoreGeneric<T>(
-        state.weaveMetadata,
-        metadata
-      );
+      this.stateManager.deepSyncSyncedStore<T>(state.weaveMetadata, metadata);
     });
   }
 }

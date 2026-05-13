@@ -79,7 +79,7 @@ interface WeaveStore extends WeaveRuntimeState, WeaveRuntimeActions {}
 
 const defaultAppState: WeaveRuntimeState = {
   instance: null,
-  appState: { weave: {} },
+  appState: { weave: {}, weaveMetadata: {} },
   status: WEAVE_INSTANCE_STATUS.IDLE,
   room: {
     id: null,

@@ -6,7 +6,6 @@ import { isEmpty } from 'lodash';
 import { Weave } from '@/weave';
 import { type Logger } from 'pino';
 import {
-  type WeaveElementAttributes,
   type WeaveNodeFound,
   type WeavePosition,
   type WeaveStateElement,
@@ -191,42 +190,7 @@ export class WeaveStateManager {
   }
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  deepSyncSyncedStore(target: any, source: WeaveElementAttributes) {
-    // Remove fields not in source
-    for (const key in target) {
-      if (!(key in source)) {
-        delete target[key];
-      }
-    }
-
-    // Update or add fields from source
-    for (const key in source) {
-      const srcVal = source[key];
-      const tgtVal = target[key];
-
-      const bothAreObjects = this.isObject(srcVal) && this.isObject(tgtVal);
-
-      if (bothAreObjects && !Array.isArray(srcVal)) {
-        // Recurse into nested object
-        this.deepSyncSyncedStore(tgtVal, srcVal);
-      } else if (Array.isArray(srcVal)) {
-        // Sync array by item position
-        this.syncArray(target, key, srcVal);
-      } else {
-        // Primitive or different type → replace
-        if (tgtVal !== srcVal) {
-          target[key] = srcVal;
-        }
-      }
-    }
-  }
-
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  deepSyncSyncedStoreGeneric<T extends Record<string, any>>(
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    target: any,
-    source: T
-  ) {
+  deepSyncSyncedStore<T extends Record<string, any>>(target: any, source: T) {
     // Remove fields not in source
     for (const key in target) {
       if (!(key in source)) {

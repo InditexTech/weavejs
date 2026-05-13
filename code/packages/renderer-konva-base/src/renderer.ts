@@ -27,6 +27,7 @@ export class WeaveKonvaBaseRenderer extends WeaveRenderer {
   init(): void {
     this.actualState = {
       weave: {},
+      weaveMetadata: {},
     };
   }
 

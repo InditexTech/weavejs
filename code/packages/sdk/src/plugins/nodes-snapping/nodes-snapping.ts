@@ -26,6 +26,7 @@ import { mergeExceptArrays } from '@/utils/utils';
 import type { Weave } from '@/weave';
 import type { WeaveNodesSelectionPlugin } from '../nodes-selection/nodes-selection';
 import { WEAVE_NODES_SELECTION_KEY } from '../nodes-selection/constants';
+import { getNodeRect, getNodesRect } from './utils';
 
 export class WeaveNodesSnappingPlugin extends WeavePlugin {
   config!: WeaveNodesSnappingPluginConfig;
@@ -661,7 +662,7 @@ export class WeaveNodesSnappingPlugin extends WeavePlugin {
     this.visibleNodes.forEach((n) => {
       this.cachedPeerBoxes?.add({
         id: n.getAttrs().id ?? '',
-        box: this.getNodeRect(n, this.relativeTo!),
+        box: getNodeRect(n, this.relativeTo!),
       });
     });
 
@@ -700,10 +701,10 @@ export class WeaveNodesSnappingPlugin extends WeavePlugin {
 
     this.snappingGuides = [...customGuides, ...otherNodesGuides];
 
-    const nodesBox = this.getNodesRect(nodes, container);
+    const nodesBox = getNodesRect(nodes, container);
     this.selectionOffsets = [];
     for (const node of nodes) {
-      const nodeBox = this.getNodeRect(node, container ?? stage);
+      const nodeBox = getNodeRect(node, container ?? stage);
 
       let containerCompensation: Konva.Vector2d = { x: 0, y: 0 };
       if (this.relativeTo !== this.instance.getMainLayer()) {
@@ -835,37 +836,6 @@ export class WeaveNodesSnappingPlugin extends WeavePlugin {
 
   disable(): void {
     this.enabled = false;
-  }
-
-  private getNodeRect(
-    node: Konva.Node,
-    relativeTo?: Konva.Container
-  ): BoundingBox {
-    return node.getClientRect({
-      ...(relativeTo && {
-        relativeTo: relativeTo as unknown as Konva.Container,
-      }),
-      skipStroke: true,
-    }) as BoundingBox;
-  }
-
-  private getNodesRect(
-    nodes: Konva.Node[],
-    relativeTo: Konva.Container
-  ): BoundingBox {
-    const rects = nodes.map((n) => this.getNodeRect(n, relativeTo));
-
-    const minX = Math.min(...rects.map((r) => r.x));
-    const minY = Math.min(...rects.map((r) => r.y));
-    const maxX = Math.max(...rects.map((r) => r.x + r.width));
-    const maxY = Math.max(...rects.map((r) => r.y + r.height));
-
-    return {
-      x: minX,
-      y: minY,
-      width: maxX - minX,
-      height: maxY - minY,
-    };
   }
 
   async copyContainerGuidesToClipboard(containerId: string) {

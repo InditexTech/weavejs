@@ -3,7 +3,6 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { nanoid } from 'nanoid';
-import type { BoundingBox } from '@inditextech/weave-types';
 import { GUIDE_KIND, GUIDE_NAME, GUIDE_ORIENTATION } from './constants';
 import type {
   Guide,
@@ -17,6 +16,7 @@ import type {
 import Konva from 'konva';
 import { WeaveNodesSnappingCustomGuides } from './nodes-snapping.custom-guides';
 import type { Weave } from '@/weave';
+import { applySnap, getNodeRect, getNodesRect } from './utils';
 
 export class WeaveNodesSnappingGuides {
   config: { tolerance: number; style: SnappingManagerStyle };
@@ -49,7 +49,7 @@ export class WeaveNodesSnappingGuides {
 
     const { snap } = this.findSnapMatches(snappingGuides, snapPoints);
 
-    this.applySnap(nodes, nodesOffsets, snap);
+    applySnap(nodes, nodesOffsets, snap);
 
     this.clearSnapGuides();
 
@@ -59,18 +59,6 @@ export class WeaveNodesSnappingGuides {
     if (snap.horizontal) {
       this.renderSnapGuides(relativeTo, snap.horizontal);
     }
-  }
-
-  private getNodeRect(
-    node: Konva.Node,
-    relativeTo?: Konva.Container
-  ): BoundingBox {
-    return node.getClientRect({
-      ...(relativeTo && {
-        relativeTo: relativeTo as unknown as Konva.Container,
-      }),
-      skipStroke: true,
-    }) as BoundingBox;
   }
 
   private getNodeSnapPoints(
@@ -84,7 +72,7 @@ export class WeaveNodesSnappingGuides {
     if (nodes.length === 1) {
       const node = nodes[0];
 
-      const box = this.getNodeRect(node, relativeTo);
+      const box = getNodeRect(node, relativeTo);
 
       return [
         {
@@ -132,7 +120,7 @@ export class WeaveNodesSnappingGuides {
       ];
     }
 
-    const box = this.getNodesRect(nodes, relativeTo);
+    const box = getNodesRect(nodes, relativeTo);
 
     return [
       {
@@ -224,29 +212,6 @@ export class WeaveNodesSnappingGuides {
       vertical,
       horizontal,
     };
-  }
-
-  private applySnap(
-    nodes: Konva.Node[],
-    offsets: Konva.Vector2d[],
-    snap: SnapResult
-  ): void {
-    for (let i = 0; i < nodes.length; i++) {
-      const offset = offsets[i];
-      const node = nodes[i];
-      const pos = node.position();
-      const next = { ...pos };
-
-      if (snap.vertical) {
-        next.x = snap.vertical.guide + snap.vertical.offset + offset.x;
-      }
-
-      if (snap.horizontal) {
-        next.y = snap.horizontal.guide + snap.horizontal.offset + offset.y;
-      }
-
-      node.position(next);
-    }
   }
 
   private getVisibleStageRect(container: Konva.Node): VisibleWorldRect {
@@ -354,25 +319,6 @@ export class WeaveNodesSnappingGuides {
     this.layer.batchDraw();
   }
 
-  private getNodesRect(
-    nodes: Konva.Node[],
-    relativeTo: Konva.Container
-  ): BoundingBox {
-    const rects = nodes.map((n) => this.getNodeRect(n, relativeTo));
-
-    const minX = Math.min(...rects.map((r) => r.x));
-    const minY = Math.min(...rects.map((r) => r.y));
-    const maxX = Math.max(...rects.map((r) => r.x + r.width));
-    const maxY = Math.max(...rects.map((r) => r.y + r.height));
-
-    return {
-      x: minX,
-      y: minY,
-      width: maxX - minX,
-      height: maxY - minY,
-    };
-  }
-
   async copyContainerGuidesToClipboard(containerId: string) {
     const allGuides = this.customGuidesManager.getAllCustomGuides();
 
@@ -450,7 +396,7 @@ export class WeaveNodesSnappingGuides {
       if (draggedNodes.includes(node)) continue;
       if (!node.isVisible()) continue;
 
-      const rect = this.getNodeRect(node, relativeTo);
+      const rect = getNodeRect(node, relativeTo);
       const id = node.id();
 
       guides.push(
