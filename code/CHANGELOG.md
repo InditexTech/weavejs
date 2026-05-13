@@ -16,7 +16,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - [#1041](https://github.com/InditexTech/weavejs/issues/1041) Custom guides support and refactor of snapping and distance guides plugins
-- 
+
+## [3.9.0] - 2026-05-13
+
+### Added
+
+- [#1057](https://github.com/InditexTech/weavejs/issues/1057) Provide an API to crop an image programmatically using an image and an element (bounding box)
+
+### Fixed
+
+- [#1059](https://github.com/InditexTech/weavejs/issues/1059) Wrong initialization of heartbeat on the Azure Web PubSub store
+
 ## [3.8.4] - 2026-05-12
 
 ### Fixed
@@ -1794,7 +1804,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - [#24](https://github.com/InditexTech/weavejs/issues/24) Bug when loading rooms with text or images
 - [#18](https://github.com/InditexTech/weavejs/issues/18) Fix awareness not working on store-azure-web-pubsub
 
-[Unreleased]: https://github.com/InditexTech/weavejs/compare/3.8.4...HEAD
+[Unreleased]: https://github.com/InditexTech/weavejs/compare/3.9.0...HEAD
+
+[3.9.0]: https://github.com/InditexTech/weavejs/compare/3.8.4...3.9.0
 
 [3.8.4]: https://github.com/InditexTech/weavejs/compare/3.8.3...3.8.4
 
