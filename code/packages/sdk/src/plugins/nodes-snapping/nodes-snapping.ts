@@ -281,8 +281,6 @@ export class WeaveNodesSnappingPlugin extends WeavePlugin {
       return;
     }
 
-    const isCtrlOrCmdPressed = e ? e.evt.ctrlKey || e.evt.metaKey : false;
-
     const stage = this.instance.getStage();
     this.relativeToId = null;
     this.relativeTo = null;
@@ -308,44 +306,15 @@ export class WeaveNodesSnappingPlugin extends WeavePlugin {
       return;
     }
 
-    let otherNodesGuides: Guide[] = [];
-    if (e && !isCtrlOrCmdPressed) {
-      otherNodesGuides = this.snappingManagerGuides.getGuidesFromOtherNodes(
-        nodes,
-        container.getChildren((item) => {
-          return item.name()?.includes('node');
-        }) as Konva.Node[],
-        this.relativeTo
-      );
-    }
+    const allGuides = this.getAllGuides(
+      e,
+      nodes,
+      container.getChildren((item) => {
+        return item.name()?.includes('node');
+      }) as Konva.Node[],
+      this.relativeTo
+    );
 
-    let customGuides: Guide[] = [];
-    if (
-      this.snappingManagerCustomGuides.isCustomGuidesVisible(
-        this.relativeToId ?? ''
-      )
-    ) {
-      const noStaticGuides = () => [];
-      const getStaticGuides = this.config.getStaticGuides
-        ? this.config.getStaticGuides
-        : noStaticGuides;
-
-      const staticGuides = getStaticGuides({
-        instance: this.instance,
-        containerId: this.relativeToId ?? '',
-      });
-
-      customGuides = [
-        ...this.snappingManagerCustomGuides.getCustomGuides(
-          this.relativeToId ?? ''
-        ),
-        ...staticGuides,
-      ];
-    }
-
-    const allGuides = [...customGuides, ...otherNodesGuides];
-
-    // const handle = tr.getActiveAnchor();
     const transformedGuidesHorizontal: Guide[] = [];
     const transformedGuidesVertical: Guide[] = [];
     for (const guide of allGuides) {
@@ -622,8 +591,6 @@ export class WeaveNodesSnappingPlugin extends WeavePlugin {
       return;
     }
 
-    const isCtrlOrCmdPressed = e ? e.evt.ctrlKey || e.evt.metaKey : false;
-
     const stage = this.instance.getStage();
     this.relativeToId = null;
     this.relativeTo = null;
@@ -667,40 +634,12 @@ export class WeaveNodesSnappingPlugin extends WeavePlugin {
       });
     });
 
-    let otherNodesGuides: Guide[] = [];
-    if (e && !isCtrlOrCmdPressed) {
-      otherNodesGuides = this.snappingManagerGuides.getGuidesFromOtherNodes(
-        nodes,
-        this.visibleNodes,
-        this.relativeTo
-      );
-    }
-
-    let customGuides: Guide[] = [];
-    if (
-      this.snappingManagerCustomGuides.isCustomGuidesVisible(
-        this.relativeToId ?? ''
-      )
-    ) {
-      const noStaticGuides = () => [];
-      const getStaticGuides = this.config.getStaticGuides
-        ? this.config.getStaticGuides
-        : noStaticGuides;
-
-      const staticGuides = getStaticGuides({
-        instance: this.instance,
-        containerId: this.relativeToId ?? '',
-      });
-
-      customGuides = [
-        ...this.snappingManagerCustomGuides.getCustomGuides(
-          this.relativeToId ?? ''
-        ),
-        ...staticGuides,
-      ];
-    }
-
-    this.snappingGuides = [...customGuides, ...otherNodesGuides];
+    this.snappingGuides = this.getAllGuides(
+      e,
+      nodes,
+      this.visibleNodes,
+      this.relativeTo
+    );
 
     const nodesBox = getNodesRect(nodes, container);
     this.selectionOffsets = [];
@@ -910,5 +849,50 @@ export class WeaveNodesSnappingPlugin extends WeavePlugin {
     if (angle === 270) return map270[anchor] ?? anchor;
 
     return anchor;
+  }
+
+  private getAllGuides(
+    e: KonvaEventObject<MouseEvent | TouchEvent>,
+    nodes: Konva.Node[],
+    visibleNodes: Konva.Node[],
+    relativeTo: Konva.Container
+  ) {
+    let otherNodesGuides: Guide[] = [];
+
+    const isCtrlOrCmdPressed = e ? e.evt.ctrlKey || e.evt.metaKey : false;
+
+    if (e && !isCtrlOrCmdPressed) {
+      otherNodesGuides = this.snappingManagerGuides.getGuidesFromOtherNodes(
+        nodes,
+        visibleNodes,
+        relativeTo
+      );
+    }
+
+    let customGuides: Guide[] = [];
+    if (
+      this.snappingManagerCustomGuides.isCustomGuidesVisible(
+        this.relativeToId ?? ''
+      )
+    ) {
+      const noStaticGuides = () => [];
+      const getStaticGuides = this.config.getStaticGuides
+        ? this.config.getStaticGuides
+        : noStaticGuides;
+
+      const staticGuides = getStaticGuides({
+        instance: this.instance,
+        containerId: this.relativeToId ?? '',
+      });
+
+      customGuides = [
+        ...this.snappingManagerCustomGuides.getCustomGuides(
+          this.relativeToId ?? ''
+        ),
+        ...staticGuides,
+      ];
+    }
+
+    return [...customGuides, ...otherNodesGuides];
   }
 }
