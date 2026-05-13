@@ -288,30 +288,12 @@ export class WeaveNodesSnappingDistance {
       return [];
     }
 
+    let box: BoundingBox | null = null;
     if (nodes.length === 1) {
-      const node = nodes[0];
-
-      const box = getNodeRect(node, relativeTo);
-
-      return [
-        {
-          guideId: `node-vertical-center`,
-          orientation: GUIDE_ORIENTATION.VERTICAL,
-          kind: GUIDE_KIND.STATIC,
-          value: box.x + box.width / 2,
-          offset: -box.width / 2,
-        },
-        {
-          guideId: `node-horizontal-center`,
-          orientation: GUIDE_ORIENTATION.HORIZONTAL,
-          kind: GUIDE_KIND.STATIC,
-          value: box.y + box.height / 2,
-          offset: -box.height / 2,
-        },
-      ];
+      box = getNodeRect(nodes[0], relativeTo);
+    } else {
+      box = getNodesRect(nodes, relativeTo);
     }
-
-    const box = getNodesRect(nodes, relativeTo);
 
     return [
       {
