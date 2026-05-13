@@ -262,20 +262,13 @@ export abstract class WeaveNode implements WeaveNodeBase {
   }
 
   scaleReset(node: Konva.Node): void {
-    const absTransform = node.getAbsoluteTransform().copy();
+    const scale = node.scale();
 
-    node.width(node.width() * node.scaleX());
-    node.height(node.height() * node.scaleY());
-    node.scaleX(1);
-    node.scaleY(1);
+    node.width(Math.max(5, node.width() * scale.x));
+    node.height(Math.max(5, node.height() * scale.y));
 
-    const newTransform = node.getAbsoluteTransform();
-
-    const dx = absTransform.m[4] - newTransform.m[4];
-    const dy = absTransform.m[5] - newTransform.m[5];
-
-    node.x(node.x() + dx);
-    node.y(node.y() + dy);
+    // reset scale to 1
+    node.scale({ x: 1, y: 1 });
   }
 
   protected setHoverState(node: Konva.Node): void {
@@ -362,8 +355,6 @@ export abstract class WeaveNode implements WeaveNodeBase {
       node.off('pointerover');
       node.off('pointerleave');
     } else {
-      // let transforming = false;
-
       this.instance.addEventListener<WeaveNodesSelectionPluginOnNodesChangeEvent>(
         'onNodesChange',
         handleNodesChange
@@ -371,12 +362,10 @@ export abstract class WeaveNode implements WeaveNodeBase {
 
       node.off('transformstart');
       node.on('transformstart', (e) => {
-        // transforming = true;
-
-        // if (e.target.getAttrs().strokeScaleEnabled !== false) {
-        //   e.target.setAttr('strokeScaleEnabled', false);
-        //   e.target.setAttr('_revertStrokeScaleEnabled', true);
-        // }
+        if (e.target.getAttrs().strokeScaleEnabled !== false) {
+          e.target.setAttr('strokeScaleEnabled', false);
+          e.target.setAttr('_revertStrokeScaleEnabled', true);
+        }
 
         this.getNodesSelectionFeedbackPlugin()?.hideSelectionHalo(node);
 
@@ -424,7 +413,6 @@ export abstract class WeaveNode implements WeaveNodeBase {
 
       node.off('transform');
       node.on('transform', throttle(handleTransform, DEFAULT_THROTTLE_MS));
-      // node.on('transform', handleTransform);
 
       node.off('transformend');
       node.on('transformend', (e) => {
@@ -434,14 +422,12 @@ export abstract class WeaveNode implements WeaveNodeBase {
           this.instance.releaseMutexLock();
         }
 
-        // if (e.target.getAttrs()._revertStrokeScaleEnabled === true) {
-        //   e.target.setAttr('strokeScaleEnabled', true);
-        // }
-        // e.target.setAttr('_revertStrokeScaleEnabled', undefined);
+        if (e.target.getAttrs()._revertStrokeScaleEnabled === true) {
+          e.target.setAttr('strokeScaleEnabled', true);
+        }
+        e.target.setAttr('_revertStrokeScaleEnabled', undefined);
 
         this.instance.emitEvent('onTransform', null);
-
-        // transforming = false;
 
         const nodesSelectionPlugin =
           this.instance.getPlugin<WeaveNodesSelectionPlugin>('nodesSelection');
@@ -692,14 +678,10 @@ export abstract class WeaveNode implements WeaveNodeBase {
             });
           }
         }
-
-        this.instance
-          .getHooks()
-          .callHook('weave:onNodeDragMove', { e, node: realNodeTarget });
       };
 
       node.off('dragmove');
-      node.on('dragmove', handleDragMove);
+      node.on('dragmove', throttle(handleDragMove, DEFAULT_THROTTLE_MS));
 
       node.dragBoundFunc((pos) => {
         if (!startPosition) return pos;
@@ -755,10 +737,6 @@ export abstract class WeaveNode implements WeaveNodeBase {
             nodeTarget
           );
         }
-
-        this.instance
-          .getHooks()
-          .callHook('weave:onNodeDragEnd', { e, node: nodeTarget });
 
         e.cancelBubble = true;
 
@@ -996,7 +974,7 @@ export abstract class WeaveNode implements WeaveNodeBase {
     ) {
       showHover = true;
       stage.container().style.cursor =
-        realNode?.defineMousePointer?.() ?? 'pointer';
+        realNode?.defineMousePointer() ?? 'pointer';
       cancelBubble = true;
     }
 
@@ -1011,8 +989,7 @@ export abstract class WeaveNode implements WeaveNodeBase {
       stage.mode() === WEAVE_STAGE_DEFAULT_MODE
     ) {
       showHover = true;
-      stage.container().style.cursor =
-        realNode?.defineMousePointer?.() ?? 'grab';
+      stage.container().style.cursor = realNode?.defineMousePointer() ?? 'grab';
       cancelBubble = true;
     }
 

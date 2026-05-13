@@ -38,11 +38,11 @@ export class WeaveNodesSnappingPlugin extends WeavePlugin {
   snappingGuidesVertical: Guide[] = [];
   clearTimeoutId: NodeJS.Timeout | null = null;
   handleTransformStart!: (params: {
-    e: KonvaEventObject<Event>;
+    e: KonvaEventObject<MouseEvent | TouchEvent>;
     nodes: Konva.Node[];
   }) => void;
   handleTransformEnd!: (params: {
-    e: KonvaEventObject<Event>;
+    e: KonvaEventObject<MouseEvent | TouchEvent>;
     nodes: Konva.Node[];
   }) => void;
   handleDragStart!: (params: {
@@ -257,7 +257,7 @@ export class WeaveNodesSnappingPlugin extends WeavePlugin {
     e,
     nodes,
   }: {
-    e: KonvaEventObject<Event>;
+    e: KonvaEventObject<MouseEvent | TouchEvent>;
     nodes: Konva.Node[];
   }) {
     this.lockX = null;
