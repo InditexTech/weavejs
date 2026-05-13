@@ -3,6 +3,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { defineConfig } from 'tsdown';
+import { visualizer } from 'rollup-plugin-visualizer';
 
 export default defineConfig([
   {
@@ -16,6 +17,14 @@ export default defineConfig([
     clean: true,
     dts: true,
     platform: 'browser',
+    plugins: [
+      visualizer({
+        open: false,
+        gzipSize: true,
+        brotliSize: true,
+        filename: 'dist/types.stats.html',
+      }) as any,
+    ],
   },
   {
     entry: {
@@ -28,6 +37,14 @@ export default defineConfig([
     clean: true,
     dts: false,
     platform: 'browser',
+    plugins: [
+      visualizer({
+        open: false,
+        gzipSize: true,
+        brotliSize: true,
+        filename: 'dist/renderer-konva-base.stats.html',
+      }) as any,
+    ],
   },
   {
     entry: {
@@ -40,5 +57,13 @@ export default defineConfig([
     clean: true,
     dts: false,
     platform: 'node',
+    plugins: [
+      visualizer({
+        open: false,
+        gzipSize: true,
+        brotliSize: true,
+        filename: 'dist/renderer-konva-base.node.stats.html',
+      }) as any,
+    ],
   },
 ]);
