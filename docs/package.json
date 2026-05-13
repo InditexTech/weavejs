@@ -17,7 +17,8 @@
     "version:release": "npm ci --force && npm version $RELEASE_VERSION"
   },
   "overrides": {
-    "fast-uri": "3.1.1"
+    "fast-uri": "3.1.2",
+    "postcss": "8.5.10"
   },
   "dependencies": {
     "@codesandbox/sandpack-react": "^2.20.0",
@@ -47,7 +48,7 @@
     "eslint": "^8",
     "eslint-config-next": "15.3.1",
     "npkill": "^0.12.2",
-    "postcss": "^8.5.10",
+    "postcss": "8.5.10",
     "tailwindcss": "^4.1.4",
     "typescript": "^5.8.3"
   }
