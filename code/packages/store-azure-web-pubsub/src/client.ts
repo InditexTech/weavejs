@@ -481,7 +481,6 @@ export class WeaveStoreAzureWebPubSubSyncClient extends Emittery {
     };
 
     websocket.onclose = (e) => {
-      console.log(e);
       console.log(`🚫 [Azure Web PubSub] closed, code: ${e.code}`);
 
       this.destroyCheckHeartbeat();
