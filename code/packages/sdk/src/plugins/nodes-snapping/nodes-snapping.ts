@@ -876,9 +876,7 @@ export class WeaveNodesSnappingPlugin extends WeavePlugin {
       )
     ) {
       const noStaticGuides = () => [];
-      const getStaticGuides = this.config.getStaticGuides
-        ? this.config.getStaticGuides
-        : noStaticGuides;
+      const getStaticGuides = this.config.getStaticGuides ?? noStaticGuides;
 
       const staticGuides = getStaticGuides({
         instance: this.instance,

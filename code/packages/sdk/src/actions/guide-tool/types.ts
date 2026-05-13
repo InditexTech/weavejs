@@ -13,9 +13,6 @@ export type GuideToolActionStateKeys = keyof typeof GUIDE_TOOL_STATE;
 export type GuideToolActionState =
   (typeof GUIDE_TOOL_STATE)[GuideToolActionStateKeys];
 
-export type GuideToolActionOnAddingEvent = undefined;
-export type GuideToolActionOnAddedEvent = undefined;
-
 export type GuideToolActionTriggerParams = {
   orientation: GuideOrientation;
 };

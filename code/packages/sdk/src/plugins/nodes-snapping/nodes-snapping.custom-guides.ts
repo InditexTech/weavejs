@@ -371,7 +371,7 @@ export class WeaveNodesSnappingCustomGuides {
     const guideState = isSelected ? GUIDE_STATE.SELECTED : GUIDE_STATE.DEFAULT;
 
     let createGuide = true;
-    const guideNode = stage.findOne(`#${guide.guideId}`) as Konva.Line | null;
+    const guideNode = stage.findOne(`#${guide.guideId}`);
     if (guideNode) {
       const guideKind = guide.kind as GuideKindOnlyCustomOrStatic;
 
@@ -408,9 +408,7 @@ export class WeaveNodesSnappingCustomGuides {
     const stage = this.instance.getStage();
 
     const noStaticGuides = () => [];
-    const getStaticGuides = this.config.getStaticGuides
-      ? this.config.getStaticGuides
-      : noStaticGuides;
+    const getStaticGuides = this.config.getStaticGuides ?? noStaticGuides;
 
     const staticGuides = getStaticGuides({
       instance: this.instance,
@@ -902,9 +900,7 @@ export class WeaveNodesSnappingCustomGuides {
       this.deleteCustomGuide(guide);
     }
 
-    const guideNode = this.guidesRenderLayer.findOne(
-      `#${guide.guideId}`
-    ) as Konva.Line | null;
+    const guideNode = this.guidesRenderLayer.findOne(`#${guide.guideId}`);
     if (guideNode) {
       guideNode.destroy();
     }

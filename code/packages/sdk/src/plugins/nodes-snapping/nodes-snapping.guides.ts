@@ -208,9 +208,7 @@ export class WeaveNodesSnappingGuides {
       let value = snap.guide;
 
       if (snap.containerId !== 'mainLayer') {
-        const containerNode = stage.findOne(`#${snap.containerId}`) as
-          | Konva.Group
-          | undefined;
+        const containerNode = stage.findOne(`#${snap.containerId}`);
         if (containerNode) {
           const containerPos = containerNode.getClientRect({
             relativeTo: stage as unknown as Konva.Container,
@@ -239,9 +237,7 @@ export class WeaveNodesSnappingGuides {
       let value = snap.guide;
 
       if (snap.containerId !== 'mainLayer') {
-        const containerNode = stage.findOne(`#${snap.containerId}`) as
-          | Konva.Group
-          | undefined;
+        const containerNode = stage.findOne(`#${snap.containerId}`);
         if (containerNode) {
           const containerPos = containerNode.getClientRect({
             relativeTo: stage as unknown as Konva.Container,

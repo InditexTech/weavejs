@@ -396,9 +396,7 @@ export class WeaveNodesSnappingDistance {
     let containerOffset: Konva.Vector2d = { x: 0, y: 0 };
 
     if (snap.containerId !== 'mainLayer') {
-      const containerNode = stage.findOne(`#${snap.containerId}`) as
-        | Konva.Group
-        | undefined;
+      const containerNode = stage.findOne(`#${snap.containerId}`);
       if (containerNode) {
         const containerPos = containerNode.getClientRect({
           relativeTo: stage as unknown as Konva.Container,
