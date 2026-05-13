@@ -138,6 +138,53 @@ export class WeaveNodesSnappingGuideDistanceToTargetInfo {
     };
   }
 
+  private getPointsFromTarget(
+    target: BoundingBox,
+    guide: Guide,
+    guidePosition: Konva.Vector2d
+  ) {
+    const stage = this.instance.getStage();
+
+    let distance: number = 0;
+    let points: number[] = [];
+    let visibleTargetRect = this.getVisibleRect(target, stage);
+
+    if (!visibleTargetRect) {
+      visibleTargetRect = target;
+    }
+
+    if (guide.orientation === GUIDE_ORIENTATION.HORIZONTAL) {
+      const { value, distance: d } = this.closestX(
+        guidePosition.y,
+        visibleTargetRect.y,
+        visibleTargetRect.y + visibleTargetRect.height
+      );
+      distance = d;
+      points = [
+        visibleTargetRect.x + visibleTargetRect.width / 2,
+        guidePosition.y,
+        visibleTargetRect.x + visibleTargetRect.width / 2,
+        roundNumber(value),
+      ];
+    }
+    if (guide.orientation === GUIDE_ORIENTATION.VERTICAL) {
+      const { value, distance: d } = this.closestX(
+        guidePosition.x,
+        visibleTargetRect.x,
+        visibleTargetRect.x + visibleTargetRect.width
+      );
+      distance = d;
+      points = [
+        guidePosition.x,
+        visibleTargetRect.y + visibleTargetRect.height / 2,
+        roundNumber(value),
+        visibleTargetRect.y + visibleTargetRect.height / 2,
+      ];
+    }
+
+    return { distance, points };
+  }
+
   handleDistanceLine(guide: Guide, isOptionAltPressed: boolean) {
     if (!this.targetRect) {
       return;
@@ -207,42 +254,11 @@ export class WeaveNodesSnappingGuideDistanceToTargetInfo {
     ) {
       const utilityLayer = this.instance.getUtilityLayer();
 
-      let distance: number = 0;
-      let points: number[] = [];
-      let visibleTargetRect = this.getVisibleRect(this.targetRect, stage);
-
-      if (!visibleTargetRect) {
-        visibleTargetRect = this.targetRect;
-      }
-
-      if (guide.orientation === GUIDE_ORIENTATION.HORIZONTAL) {
-        const { value, distance: d } = this.closestX(
-          guidePosition.y,
-          visibleTargetRect.y,
-          visibleTargetRect.y + visibleTargetRect.height
-        );
-        distance = d;
-        points = [
-          visibleTargetRect.x + visibleTargetRect.width / 2,
-          guidePosition.y,
-          visibleTargetRect.x + visibleTargetRect.width / 2,
-          roundNumber(value),
-        ];
-      }
-      if (guide.orientation === GUIDE_ORIENTATION.VERTICAL) {
-        const { value, distance: d } = this.closestX(
-          guidePosition.x,
-          visibleTargetRect.x,
-          visibleTargetRect.x + visibleTargetRect.width
-        );
-        distance = d;
-        points = [
-          guidePosition.x,
-          visibleTargetRect.y + visibleTargetRect.height / 2,
-          roundNumber(value),
-          visibleTargetRect.y + visibleTargetRect.height / 2,
-        ];
-      }
+      const { distance, points } = this.getPointsFromTarget(
+        this.targetRect,
+        guide,
+        guidePosition
+      );
 
       this.distanceLine = new Konva.Line({
         points,
@@ -327,42 +343,11 @@ export class WeaveNodesSnappingGuideDistanceToTargetInfo {
       this.targetRect &&
       targetParentRect
     ) {
-      let distance: number = 0;
-      let points: number[] = [];
-      let visibleTargetRect = this.getVisibleRect(this.targetRect, stage);
-
-      if (!visibleTargetRect) {
-        visibleTargetRect = this.targetRect;
-      }
-
-      if (guide.orientation === GUIDE_ORIENTATION.HORIZONTAL) {
-        const { value, distance: d } = this.closestX(
-          guidePosition.y,
-          visibleTargetRect.y,
-          visibleTargetRect.y + visibleTargetRect.height
-        );
-        distance = d;
-        points = [
-          visibleTargetRect.x + visibleTargetRect.width / 2,
-          guidePosition.y,
-          visibleTargetRect.x + visibleTargetRect.width / 2,
-          roundNumber(value),
-        ];
-      }
-      if (guide.orientation === GUIDE_ORIENTATION.VERTICAL) {
-        const { value, distance: d } = this.closestX(
-          guidePosition.x,
-          visibleTargetRect.x,
-          visibleTargetRect.x + visibleTargetRect.width
-        );
-        distance = d;
-        points = [
-          guidePosition.x,
-          visibleTargetRect.y + visibleTargetRect.height / 2,
-          roundNumber(value),
-          visibleTargetRect.y + visibleTargetRect.height / 2,
-        ];
-      }
+      const { distance, points } = this.getPointsFromTarget(
+        this.targetRect,
+        guide,
+        guidePosition
+      );
 
       if (this.distanceBox && this.distanceText && this.distanceBg) {
         const distanceLinePoints = this.distanceLine.points();
