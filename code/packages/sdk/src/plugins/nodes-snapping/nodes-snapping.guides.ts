@@ -17,6 +17,7 @@ import Konva from 'konva';
 import { WeaveNodesSnappingCustomGuides } from './nodes-snapping.custom-guides';
 import type { Weave } from '@/weave';
 import { applySnap, getNodeRect, getNodesRect } from './utils';
+import type { BoundingBox } from '@inditextech/weave-types';
 
 export class WeaveNodesSnappingGuides {
   config: { tolerance: number; style: SnappingManagerStyle };
@@ -69,58 +70,12 @@ export class WeaveNodesSnappingGuides {
       return [];
     }
 
+    let box: BoundingBox | null = null;
     if (nodes.length === 1) {
-      const node = nodes[0];
-
-      const box = getNodeRect(node, relativeTo);
-
-      return [
-        {
-          guideId: `node-vertical-start`,
-          orientation: GUIDE_ORIENTATION.VERTICAL,
-          kind: GUIDE_KIND.STATIC,
-          value: box.x,
-          offset: 0,
-        },
-        {
-          guideId: `node-vertical-center`,
-          orientation: GUIDE_ORIENTATION.VERTICAL,
-          kind: GUIDE_KIND.STATIC,
-          value: box.x + box.width / 2,
-          offset: -box.width / 2,
-        },
-        {
-          guideId: `node-vertical-end`,
-          orientation: GUIDE_ORIENTATION.VERTICAL,
-          kind: GUIDE_KIND.STATIC,
-          value: box.x + box.width,
-          offset: -box.width,
-        },
-        {
-          guideId: `node-horizontal-start`,
-          orientation: GUIDE_ORIENTATION.HORIZONTAL,
-          kind: GUIDE_KIND.STATIC,
-          value: box.y,
-          offset: 0,
-        },
-        {
-          guideId: `node-horizontal-center`,
-          orientation: GUIDE_ORIENTATION.HORIZONTAL,
-          kind: GUIDE_KIND.STATIC,
-          value: box.y + box.height / 2,
-          offset: -box.height / 2,
-        },
-        {
-          guideId: `node-horizontal-end`,
-          orientation: GUIDE_ORIENTATION.HORIZONTAL,
-          kind: GUIDE_KIND.STATIC,
-          value: box.y + box.height,
-          offset: -box.height,
-        },
-      ];
+      box = getNodeRect(nodes[0], relativeTo);
+    } else {
+      box = getNodesRect(nodes, relativeTo);
     }
-
-    const box = getNodesRect(nodes, relativeTo);
 
     return [
       {

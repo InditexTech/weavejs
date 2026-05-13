@@ -22,7 +22,7 @@ import type { Box } from 'konva/lib/shapes/Transformer';
 import { WeaveNodesSnappingDistance } from './nodes-snapping.distance';
 import { WeaveNodesSnappingGuides } from './nodes-snapping.guides';
 import { WeavePlugin } from '../plugin';
-import { mergeExceptArrays } from '@/utils/utils';
+import { getVisibleNodes, mergeExceptArrays } from '@/utils/utils';
 import type { Weave } from '@/weave';
 import type { WeaveNodesSelectionPlugin } from '../nodes-selection/nodes-selection';
 import { WEAVE_NODES_SELECTION_KEY } from '../nodes-selection/constants';
@@ -649,12 +649,13 @@ export class WeaveNodesSnappingPlugin extends WeavePlugin {
       return;
     }
 
-    this.visibleNodes = this.getVisibleNodes({
+    this.visibleNodes = getVisibleNodes({
+      instance: this.instance,
+      skipNodes: nodes.map((n) => n.getAttrs().id ?? ''),
       referenceLayer:
         this.relativeToId === this.instance.getMainLayer()?.id()
           ? (this.instance.getMainLayer() as Konva.Layer)
           : (this.relativeTo as Konva.Group),
-      skipNodes: nodes.map((n) => n.getAttrs().id ?? ''),
     });
 
     this.cachedPeerBoxes = new Set();
@@ -909,107 +910,5 @@ export class WeaveNodesSnappingPlugin extends WeavePlugin {
     if (angle === 270) return map270[anchor] ?? anchor;
 
     return anchor;
-  }
-
-  private getVisibleNodes({
-    referenceLayer,
-    skipNodes,
-  }: {
-    referenceLayer: Konva.Layer | Konva.Group;
-    skipNodes: string[];
-  }): Konva.Node[] {
-    const nodesSelection =
-      this.instance.getPlugin<WeaveNodesSelectionPlugin>('nodesSelection');
-
-    if (nodesSelection) {
-      nodesSelection.getTransformer().hide();
-    }
-
-    const nodes = this.getVisibleNodesInViewport(referenceLayer);
-
-    const finalVisibleNodes: Konva.Node[] = [];
-
-    // and we snap over edges and center of each object on the canvas
-    nodes.forEach((node) => {
-      const actualNodeParent = this.instance.getNodeContainer(node);
-
-      if (actualNodeParent?.getAttrs().id !== referenceLayer?.getAttrs().id) {
-        return;
-      }
-
-      if (node.getParent()?.getAttrs().nodeType === 'group') {
-        return;
-      }
-
-      if (skipNodes.includes(node.getParent()?.getAttrs().nodeId)) {
-        return;
-      }
-
-      if (skipNodes.includes(node.getAttrs().id ?? '')) {
-        return;
-      }
-
-      if (node.getAttrs().nodeType === 'connector') {
-        return;
-      }
-
-      if (
-        node.getParent() !== referenceLayer &&
-        !node.getParent()?.getAttrs().nodeId
-      ) {
-        return;
-      }
-
-      finalVisibleNodes.push(node);
-    });
-
-    if (nodesSelection) {
-      nodesSelection.getTransformer().show();
-    }
-
-    return finalVisibleNodes;
-  }
-
-  private getVisibleNodesInViewport(
-    referenceLayer: Konva.Layer | Konva.Group | undefined
-  ) {
-    const stage = this.instance.getStage();
-    const scale = stage.scaleX();
-    const stagePos = stage.position();
-    const stageSize = {
-      width: stage.width(),
-      height: stage.height(),
-    };
-
-    // Calculate viewport rect in world coordinates
-    const viewRect = {
-      x: -stagePos.x / scale,
-      y: -stagePos.y / scale,
-      width: stageSize.width / scale,
-      height: stageSize.height / scale,
-    };
-
-    const visibleNodes: Konva.Node[] = [];
-
-    referenceLayer?.find('.node').forEach((node) => {
-      if (!node.isVisible()) return;
-
-      const box = node.getClientRect({
-        relativeTo: stage,
-        skipStroke: true,
-        skipShadow: true,
-      });
-      const intersects =
-        box.x + box.width > viewRect.x &&
-        box.x < viewRect.x + viewRect.width &&
-        box.y + box.height > viewRect.y &&
-        box.y < viewRect.y + viewRect.height;
-
-      if (intersects) {
-        visibleNodes.push(node);
-      }
-    });
-
-    return visibleNodes;
   }
 }

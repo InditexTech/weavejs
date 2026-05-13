@@ -542,17 +542,15 @@ export function getTopmostShadowHost(el: DOMElement): ShadowRoot | null {
 
 export function getVisibleNodes({
   instance,
-  stage,
-  nodeParent,
   skipNodes,
   referenceLayer,
 }: {
   instance: Weave;
-  stage: Konva.Stage;
-  nodeParent: Konva.Node;
   skipNodes: string[];
   referenceLayer: Konva.Layer | Konva.Group;
 }): Konva.Node[] {
+  const stage = instance.getStage();
+
   const nodesSelection =
     instance.getPlugin<WeaveNodesSelectionPlugin>('nodesSelection');
 
@@ -568,7 +566,7 @@ export function getVisibleNodes({
   nodes.forEach((node) => {
     const actualNodeParent = instance.getNodeContainer(node);
 
-    if (actualNodeParent?.getAttrs().id !== nodeParent?.getAttrs().id) {
+    if (actualNodeParent?.getAttrs().id !== referenceLayer?.getAttrs().id) {
       return;
     }
 
