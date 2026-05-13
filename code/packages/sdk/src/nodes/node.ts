@@ -404,15 +404,6 @@ export abstract class WeaveNode implements WeaveNodeBase {
           nodesSelectionPlugin.getTransformer().forceUpdate();
         }
 
-        if (
-          nodesEdgeSnappingPlugin &&
-          transforming &&
-          this.isSelecting() &&
-          this.isNodeSelected(node)
-        ) {
-          nodesEdgeSnappingPlugin.evaluateGuidelines(e);
-        }
-
         let parentId: string = node.getParent()?.id() ?? '';
         const parent = node.getParent();
         if (parent?.getAttrs().nodeId) {

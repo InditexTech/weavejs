@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-import type { AllowedValue, WeaveSelection } from '@inditextech/weave-types';
+import type { AllowedObject, WeaveSelection } from '@inditextech/weave-types';
 import type {
   Guide,
   MoveOrientation,
@@ -76,26 +76,22 @@ export class WeaveNodesSnappingCustomGuides {
     }
   }
 
-  private serialize(guides: Record<string, Guide[]> | undefined) {
-    let data = undefined;
-    try {
-      data = JSON.stringify(guides);
-    } catch {
-      data = undefined;
+  private extractGuidesFromMetadata(metadata: AllowedObject) {
+    let guides: Record<string, Guide[]> = {};
+    if (typeof metadata.guides === 'string') {
+      guides = this.deserialize(metadata.guides) as Record<string, Guide[]>;
+    } else {
+      guides = metadata.guides as unknown as Record<string, Guide[]>;
     }
-    return data;
+    return guides;
   }
 
   async initialize(): Promise<void> {
     if (this.config.persistence.enabled) {
       const metadata = this.instance.getMetadata();
 
-      let data: string | undefined = undefined;
-      if (metadata.guides) {
-        data = metadata.guides as string;
-      }
-
-      const persistedGuides: Record<string, Guide[]> = this.deserialize(data);
+      const persistedGuides: Record<string, Guide[]> =
+        this.extractGuidesFromMetadata(metadata);
 
       this.customGuides = persistedGuides;
 
@@ -115,22 +111,14 @@ export class WeaveNodesSnappingCustomGuides {
       this.instance.addEventListener('onStateMetadataChange', () => {
         const metadata = this.instance.getMetadata();
 
-        const actualGuides = this.serialize(this.customGuides);
+        this.customGuides = this.extractGuidesFromMetadata(metadata);
 
-        if (metadata.guides && metadata.guides !== actualGuides) {
-          const guides: Record<string, Guide[]> = this.deserialize(
-            metadata.guides as string
-          );
+        this.instance.emitEvent('snappingManager:onCustomGuidesChange', {
+          guides: this.customGuides,
+        });
 
-          this.customGuides = guides;
-
-          this.instance.emitEvent('snappingManager:onCustomGuidesChange', {
-            guides: this.customGuides,
-          });
-
-          this.hideAllCustomGuides();
-          this.renderAllVisibleCustomGuides();
-        }
+        this.hideAllCustomGuides();
+        this.renderAllVisibleCustomGuides();
       });
     }
 
@@ -221,11 +209,11 @@ export class WeaveNodesSnappingCustomGuides {
         }
       }
 
-      const data = this.serialize(guidesToPersist);
+      // const data = this.serialize(guidesToPersist);
 
       const metadata = this.instance.getMetadata();
 
-      metadata.guides = data as AllowedValue;
+      metadata.guides = guidesToPersist as unknown as AllowedObject;
 
       this.instance.saveMetadata(metadata);
     }

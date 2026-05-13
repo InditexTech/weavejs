@@ -74,7 +74,7 @@ export type WeaveState = {
         };
       }
     | Record<string, WeaveStateElement>;
-  weaveMetadata?: AllowedObject;
+  weaveMetadata: AllowedObject;
 };
 
 export type WeaveSelection = {

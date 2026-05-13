@@ -108,9 +108,11 @@ export abstract class WeaveStore implements WeaveStoreBase {
   restartDocument(): void {
     this.latestState = {
       weave: {},
+      weaveMetadata: {},
     };
     this.state = syncedStore<WeaveState>({
       weave: {},
+      weaveMetadata: {},
     });
     this.document = getYjsDoc(this.state);
   }
@@ -202,13 +204,15 @@ export abstract class WeaveStore implements WeaveStoreBase {
     }
 
     observeDeep(this.getState().weaveMetadata, () => {
-      const newMetadataState: AllowedObject = JSON.parse(
+      const newState: AllowedObject = JSON.parse(
         JSON.stringify(this.getState())
-      ).weaveMetadata;
+      );
+
+      const metadata = newState.weaveMetadata as AllowedObject;
 
       this.instance.emitEvent<WeaveStoreOnStateMetadataChangeEvent>(
         'onStateMetadataChange',
-        newMetadataState
+        metadata
       );
     });
 
