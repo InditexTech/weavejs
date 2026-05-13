@@ -713,7 +713,7 @@ export class WeaveNodesSnappingCustomGuides {
       listening: true,
     });
 
-    guideNode.on('pointerover', () => {
+    const handleCursor = () => {
       const isEditable = guide.kind === GUIDE_KIND.CUSTOM;
 
       if (!isEditable) {
@@ -725,19 +725,13 @@ export class WeaveNodesSnappingCustomGuides {
       if (isEditable && guide.orientation === GUIDE_ORIENTATION.HORIZONTAL) {
         stage.container().style.cursor = 'ns-resize';
       }
+    };
+
+    guideNode.on('pointerover', () => {
+      handleCursor();
     });
     guideNode.on('pointerdown', () => {
-      const isEditable = guide.kind === GUIDE_KIND.CUSTOM;
-
-      if (!isEditable) {
-        stage.container().style.cursor = 'pointer';
-      }
-      if (isEditable && guide.orientation === GUIDE_ORIENTATION.VERTICAL) {
-        stage.container().style.cursor = 'ew-resize';
-      }
-      if (isEditable && guide.orientation === GUIDE_ORIENTATION.HORIZONTAL) {
-        stage.container().style.cursor = 'ns-resize';
-      }
+      handleCursor();
 
       this.deselectAllGuides();
 
