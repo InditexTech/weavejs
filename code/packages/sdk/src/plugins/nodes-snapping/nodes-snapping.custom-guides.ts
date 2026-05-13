@@ -81,7 +81,7 @@ export class WeaveNodesSnappingCustomGuides {
     if (typeof metadata.guides === 'string') {
       guides = this.deserialize(metadata.guides) as Record<string, Guide[]>;
     } else {
-      guides = metadata.guides as unknown as Record<string, Guide[]>;
+      guides = metadata.guides;
     }
     return guides;
   }
@@ -208,8 +208,6 @@ export class WeaveNodesSnappingCustomGuides {
           guidesToPersist[containerId] = guides;
         }
       }
-
-      // const data = this.serialize(guidesToPersist);
 
       const metadata = this.instance.getMetadata();
 

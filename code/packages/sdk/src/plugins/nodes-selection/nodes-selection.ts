@@ -285,10 +285,6 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
 
       for (const node of selectedNodes) {
         node.handleMouseout(e);
-        // if (node.getAttrs().strokeScaleEnabled !== false) {
-        //   node.setAttr('strokeScaleEnabled', false);
-        //   node.setAttr('_revertStrokeScaleEnabled', true);
-        // }
       }
 
       if (this.getSelectedNodes().length > 1) {
@@ -402,7 +398,6 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
     };
 
     tr.on('transform', throttle(handleTransform, DEFAULT_THROTTLE_MS));
-    // tr.on('transform', handleTransform);
 
     tr.on('transformend', (e) => {
       this.transformInProcess = false;
@@ -416,11 +411,6 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
       for (const node of selectedNodes) {
         node.handleDeselectNode();
         node.handleSelectNode();
-
-        // if (node.getAttrs()._revertStrokeScaleEnabled === true) {
-        //   node.setAttr('strokeScaleEnabled', true);
-        // }
-        // node.setAttr('_revertStrokeScaleEnabled', undefined);
       }
 
       tr.forceUpdate();

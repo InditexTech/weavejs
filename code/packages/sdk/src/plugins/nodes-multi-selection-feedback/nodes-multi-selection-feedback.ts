@@ -74,10 +74,6 @@ export class WeaveNodesMultiSelectionFeedbackPlugin extends WeavePlugin {
 
     const clone = node.clone();
 
-    // const box = clone.getClientRect({
-    //   skipTransform: true,
-    //   relativeTo: node.getParent() ?? this.instance.getMainLayer(),
-    // });
     const localBox = clone.getClientRect({
       skipTransform: true,
     });
@@ -117,10 +113,6 @@ export class WeaveNodesMultiSelectionFeedbackPlugin extends WeavePlugin {
         if (realParent) {
           info.x += realParent.x();
           info.y += realParent.y();
-          // containerCompensationX =
-          //   realParent.getAttrs().containerCompensationX ?? 0 / 4;
-          // containerCompensationY =
-          //   realParent.getAttrs().containerCompensationY ?? 0 / 4;
         }
       }
       // Its parent is a Container (frame)

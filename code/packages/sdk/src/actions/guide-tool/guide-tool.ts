@@ -5,8 +5,6 @@
 import { nanoid } from 'nanoid';
 import type {
   GuideToolActionConfig,
-  GuideToolActionOnAddedEvent,
-  GuideToolActionOnAddingEvent,
   GuideToolActionParams,
   GuideToolActionState,
   GuideToolActionTriggerParams,
@@ -122,9 +120,7 @@ export class WeaveGuideToolAction extends WeaveAction {
           e.stopPropagation();
           if (this.state === GUIDE_TOOL_STATE.ADDING) {
             this.setState(GUIDE_TOOL_STATE.ADDED);
-            this.instance.emitEvent<GuideToolActionOnAddedEvent>(
-              'onAddedGuide'
-            );
+            this.instance.emitEvent<undefined>('onAddedGuide');
             this.cancelAction();
           }
         }
@@ -143,7 +139,6 @@ export class WeaveGuideToolAction extends WeaveAction {
       ) {
         const isOptionAltPressed = e.evt.altKey;
         this.moveGuide(isOptionAltPressed);
-        return;
       }
     });
 
@@ -157,7 +152,7 @@ export class WeaveGuideToolAction extends WeaveAction {
         this.state === GUIDE_TOOL_STATE.ADDING
       ) {
         this.setState(GUIDE_TOOL_STATE.ADDED);
-        this.instance.emitEvent<GuideToolActionOnAddedEvent>('onAddedGuide');
+        this.instance.emitEvent<undefined>('onAddedGuide');
         this.cancelAction();
       }
     });
@@ -172,7 +167,7 @@ export class WeaveGuideToolAction extends WeaveAction {
   private addGuide(orientation: GuideOrientation) {
     this.setCursor();
 
-    this.instance.emitEvent<GuideToolActionOnAddingEvent>('onAddingGuide');
+    this.instance.emitEvent<undefined>('onAddingGuide');
 
     this.setState(GUIDE_TOOL_STATE.ADDING);
 
@@ -209,24 +204,20 @@ export class WeaveGuideToolAction extends WeaveAction {
 
     let addGuide = false;
     let lineSegments: number[] = [];
-    if (
-      mousePoint &&
-      this.guide &&
-      this.guide.orientation === GUIDE_ORIENTATION.VERTICAL
-    ) {
-      if (!containerRect) {
-        lineSegments = [
-          mousePoint.x,
-          visible.y,
-          mousePoint.x,
-          visible.y + visible.height,
-        ];
-      } else {
+    if (mousePoint && this.guide?.orientation === GUIDE_ORIENTATION.VERTICAL) {
+      if (containerRect) {
         lineSegments = [
           mousePoint.x,
           containerRect.y,
           mousePoint.x,
           containerRect.y + containerRect.height,
+        ];
+      } else {
+        lineSegments = [
+          mousePoint.x,
+          visible.y,
+          mousePoint.x,
+          visible.y + visible.height,
         ];
       }
 
@@ -235,21 +226,20 @@ export class WeaveGuideToolAction extends WeaveAction {
 
     if (
       mousePoint &&
-      this.guide &&
-      this.guide.orientation === GUIDE_ORIENTATION.HORIZONTAL
+      this.guide?.orientation === GUIDE_ORIENTATION.HORIZONTAL
     ) {
-      if (!containerRect) {
-        lineSegments = [
-          visible.x,
-          mousePoint.y,
-          visible.x + visible.width,
-          mousePoint.y,
-        ];
-      } else {
+      if (containerRect) {
         lineSegments = [
           containerRect.x,
           mousePoint.y,
           containerRect.x + containerRect.width,
+          mousePoint.y,
+        ];
+      } else {
+        lineSegments = [
+          visible.x,
+          mousePoint.y,
+          visible.x + visible.width,
           mousePoint.y,
         ];
       }
@@ -295,14 +285,7 @@ export class WeaveGuideToolAction extends WeaveAction {
       mousePoint &&
       this.guide.orientation === GUIDE_ORIENTATION.VERTICAL
     ) {
-      if (!containerRect) {
-        this.guideLine.points([
-          roundNumber(mousePoint.x),
-          visible.y,
-          roundNumber(mousePoint.x),
-          visible.y + visible.height,
-        ]);
-      } else {
+      if (containerRect) {
         const pointerPosition = stage.getRelativePointerPosition();
 
         if (!pointerPosition) return;
@@ -313,6 +296,13 @@ export class WeaveGuideToolAction extends WeaveAction {
           roundNumber(pointerPosition.x),
           containerRect.y + containerRect.height,
         ]);
+      } else {
+        this.guideLine.points([
+          roundNumber(mousePoint.x),
+          visible.y,
+          roundNumber(mousePoint.x),
+          visible.y + visible.height,
+        ]);
       }
     }
 
@@ -321,14 +311,7 @@ export class WeaveGuideToolAction extends WeaveAction {
       mousePoint &&
       this.guide.orientation === GUIDE_ORIENTATION.HORIZONTAL
     ) {
-      if (!containerRect) {
-        this.guideLine.points([
-          visible.x,
-          roundNumber(mousePoint.y),
-          visible.x + visible.width,
-          roundNumber(mousePoint.y),
-        ]);
-      } else {
+      if (containerRect) {
         const pointerPosition = stage.getRelativePointerPosition();
 
         if (!pointerPosition) return;
@@ -338,6 +321,13 @@ export class WeaveGuideToolAction extends WeaveAction {
           roundNumber(pointerPosition.y),
           containerRect.x + containerRect.width,
           roundNumber(pointerPosition.y),
+        ]);
+      } else {
+        this.guideLine.points([
+          visible.x,
+          roundNumber(mousePoint.y),
+          visible.x + visible.width,
+          roundNumber(mousePoint.y),
         ]);
       }
     }
