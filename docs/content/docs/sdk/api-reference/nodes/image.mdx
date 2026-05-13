@@ -352,6 +352,21 @@ Function that when is called closes the image cropping, depending on the `type`:
 
 ---
 
+### cropImageWithReference
+
+```ts
+cropImageWithReference(image: Konva.Group, reference: Konva.Node): void
+```
+
+Function that apply a crop to an image given a reference element bounding box.
+Both elements provided, image and reference must have the same rotation applied.
+When calling the method it can raise errors with the following causes:
+
+- `InvalidImageNode`: if the first argument of the method is not a valid Weave Image node.
+- `RotationNotAligned`: if the image element and the reference element doesn't have the same rotation angle.
+
+---
+
 ### resetCrop
 
 ```ts

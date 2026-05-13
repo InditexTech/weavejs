@@ -621,8 +621,14 @@ export class WeaveImageNode extends WeaveNode {
     );
 
     const rect = new Konva.Rect({
-      width: absoluteCorners[1].x - absoluteCorners[0].x,
-      height: absoluteCorners[2].y - absoluteCorners[0].y,
+      width: Math.hypot(
+        absoluteCorners[1].x - absoluteCorners[0].x,
+        absoluteCorners[1].y - absoluteCorners[0].y
+      ),
+      height: Math.hypot(
+        absoluteCorners[3].x - absoluteCorners[0].x,
+        absoluteCorners[3].y - absoluteCorners[0].y
+      ),
       fill: 'transparent',
       strokeScaleEnabled: false,
       strokeWidth: 2,
@@ -1447,5 +1453,47 @@ export class WeaveImageNode extends WeaveNode {
     if (image) {
       this.cacheNode(image);
     }
+  }
+
+  cropImageWithReference(image: Konva.Group, reference: Konva.Node): void {
+    const internalImage = image?.findOne(`#${image.getAttrs().id}-image`) as
+      | Konva.Image
+      | undefined;
+
+    const cropGroup = image?.findOne(`#${image.getAttrs().id}-cropGroup`) as
+      | Konva.Group
+      | undefined;
+
+    if (!internalImage || !cropGroup) {
+      throw new Error('Provided element is not a valid image node.', {
+        cause: 'InvalidImageNode',
+      });
+    }
+
+    this.imageCrop = new WeaveImageCrop(
+      this.instance,
+      this,
+      image,
+      internalImage,
+      cropGroup
+    );
+
+    this.instance.stateTransactional(() => {
+      this.imageCrop?.handleClipExternal(image, reference);
+
+      const nodeHandler: WeaveNode | undefined = this.instance.getNodeHandler(
+        reference.getAttrs().nodeType
+      );
+
+      if (nodeHandler) {
+        const rectangleState = nodeHandler.serialize(
+          reference as WeaveElementInstance
+        );
+        this.instance.removeNodeNT(rectangleState);
+      }
+    });
+
+    this.getNodesSelectionPlugin()?.setSelectedNodes([image]);
+    this.getNodesSelectionPlugin()?.getHoverTransformer().forceUpdate();
   }
 }
