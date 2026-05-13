@@ -1184,8 +1184,7 @@ export class WeaveNodesSnappingDistance {
 
     const bands: BoundingBoxWithId[][] = [];
 
-    for (let i = 0; i < leftmostNodes.length; i++) {
-      const start = leftmostNodes[i];
+    for (const start of leftmostNodes) {
       const result: BoundingBoxWithId[] = [start];
 
       let current = start;
@@ -1286,8 +1285,7 @@ export class WeaveNodesSnappingDistance {
 
     const bands: BoundingBoxWithId[][] = [];
 
-    for (let i = 0; i < topmostNodes.length; i++) {
-      const start = topmostNodes[i];
+    for (const start of topmostNodes) {
       const result: BoundingBoxWithId[] = [start];
 
       let current = start;

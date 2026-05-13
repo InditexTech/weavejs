@@ -82,7 +82,7 @@ import { WeaveDragAndDropManager } from './managers/drag-and-drop';
 export class Weave {
   private id: string;
   private emitter: Emittery;
-  private hooks: Hookable;
+  private readonly hooks: Hookable;
   private config: WeaveConfig;
   private logger: WeaveLogger;
   private moduleLogger: Logger;

@@ -62,8 +62,7 @@ export class WeaveNodesSnappingGuideDistanceToTargetInfo {
 
     const snappingManager = this.getSnappingManagerPlugin();
     if (
-      snappingManager &&
-      snappingManager.getGuidesManager().getSelectedGuide() &&
+      snappingManager?.getGuidesManager().getSelectedGuide() &&
       (selectedNodes ?? []).length === 0
     ) {
       const selectedGuide = snappingManager
@@ -71,9 +70,8 @@ export class WeaveNodesSnappingGuideDistanceToTargetInfo {
         .getSelectedGuide();
 
       if (
-        selectedGuide &&
-        selectedGuide.orientation === guide.orientation &&
-        selectedGuide.guideId !== guide.guideId
+        selectedGuide?.orientation === guide.orientation &&
+        selectedGuide?.guideId !== guide.guideId
       ) {
         const guideNode = stage.findOne(`#${selectedGuide?.guideId}`);
         if (guideNode) {
@@ -147,11 +145,7 @@ export class WeaveNodesSnappingGuideDistanceToTargetInfo {
 
     let distance: number = 0;
     let points: number[] = [];
-    let visibleTargetRect = this.getVisibleRect(target, stage);
-
-    if (!visibleTargetRect) {
-      visibleTargetRect = target;
-    }
+    const visibleTargetRect = this.getVisibleRect(target, stage) ?? target;
 
     if (guide.orientation === GUIDE_ORIENTATION.HORIZONTAL) {
       const { value, distance: d } = this.closestX(
