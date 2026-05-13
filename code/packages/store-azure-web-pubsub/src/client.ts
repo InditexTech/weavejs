@@ -481,6 +481,7 @@ export class WeaveStoreAzureWebPubSubSyncClient extends Emittery {
     };
 
     websocket.onclose = (e) => {
+      console.log(e);
       console.log(`🚫 [Azure Web PubSub] closed, code: ${e.code}`);
 
       this.destroyCheckHeartbeat();
@@ -509,6 +510,8 @@ export class WeaveStoreAzureWebPubSubSyncClient extends Emittery {
     };
 
     websocket.onopen = () => {
+      this._lastHeartbeatTime = Date.now();
+
       this.setAndEmitStatusInfo(
         WEAVE_STORE_AZURE_WEB_PUBSUB_CONNECTION_STATUS.CONNECTED
       );
@@ -579,6 +582,7 @@ export class WeaveStoreAzureWebPubSubSyncClient extends Emittery {
   private setupCheckHeartbeat() {
     this._checkHeartbeatId = setInterval(() => {
       const now = Date.now();
+
       if (
         now - this._lastHeartbeatTime >
         this._synClientOptions.heartbeat.checkWindowTimeMs

@@ -3,7 +3,10 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import Konva from 'konva';
-import { type WeaveElementInstance } from '@inditextech/weave-types';
+import {
+  type WeaveElementAttributes,
+  type WeaveElementInstance,
+} from '@inditextech/weave-types';
 import { WeaveNodesSelectionPlugin } from '@/plugins/nodes-selection/nodes-selection';
 import { Weave } from '@/weave';
 import { WeaveImageNode } from './image';
@@ -49,23 +52,7 @@ export class WeaveImageCrop {
     this.handleHide = this.hide.bind(this);
   }
 
-  show(onClose: () => void, options: WeaveImageTriggerCropOptions): void {
-    this.onClose = onClose;
-
-    const nodesSelectionPlugin = this.getNodesSelectionPlugin();
-    if (nodesSelectionPlugin) {
-      nodesSelectionPlugin.disable();
-    }
-
-    this.node.clearCache(this.image as WeaveElementInstance);
-
-    this.image.setAttrs({ cropping: true });
-    this.image.listening(false);
-
-    const imageAttrs = this.image.getAttrs();
-
-    this.internalImage.hide();
-
+  private setupCropImage(imageAttrs: WeaveElementAttributes, visible: boolean) {
     this.cropGroup.destroyChildren();
 
     const actualScale =
@@ -84,10 +71,32 @@ export class WeaveImageCrop {
       scaleY: 1,
       image: this.internalImage.image(),
       crop: undefined,
-      visible: true,
+      visible,
       listening: false,
       draggable: false,
     });
+
+    return { realScale };
+  }
+
+  show(onClose: () => void, options: WeaveImageTriggerCropOptions): void {
+    this.onClose = onClose;
+
+    const nodesSelectionPlugin = this.getNodesSelectionPlugin();
+    if (nodesSelectionPlugin) {
+      nodesSelectionPlugin.disable();
+    }
+
+    this.node.clearCache(this.image as WeaveElementInstance);
+
+    this.image.setAttrs({ cropping: true });
+    this.image.listening(false);
+
+    const imageAttrs = this.image.getAttrs();
+
+    this.internalImage.hide();
+
+    const { realScale } = this.setupCropImage(imageAttrs, true);
 
     this.imageOffsetX = imageAttrs.cropInfo
       ? imageAttrs.cropInfo.x * realScale
@@ -579,28 +588,7 @@ export class WeaveImageCrop {
   unCrop(): void {
     const imageAttrs = this.image.getAttrs();
 
-    this.cropGroup.destroyChildren();
-
-    const actualScale =
-      imageAttrs.uncroppedImage.width / imageAttrs.imageInfo.width;
-    const cropScale = imageAttrs.cropInfo
-      ? imageAttrs.cropInfo.scaleX
-      : actualScale;
-    const realScale = actualScale / cropScale;
-
-    this.cropImage = new Konva.Image({
-      x: imageAttrs.cropInfo ? -imageAttrs.cropInfo.x * realScale : 0,
-      y: imageAttrs.cropInfo ? -imageAttrs.cropInfo.y * realScale : 0,
-      width: imageAttrs.uncroppedImage.width,
-      height: imageAttrs.uncroppedImage.height,
-      scaleX: 1,
-      scaleY: 1,
-      image: this.internalImage.image(),
-      crop: undefined,
-      visible: false,
-      listening: false,
-      draggable: false,
-    });
+    this.setupCropImage(imageAttrs, false);
 
     this.cropGroup.add(this.cropImage);
 
@@ -682,16 +670,125 @@ export class WeaveImageCrop {
     }
   }
 
+  handleClipExternal(image: Konva.Group, reference: Konva.Node) {
+    const stage = this.instance.getStage();
+
+    const originalRotation = image.getAbsoluteRotation();
+
+    if (image.getAbsoluteRotation() !== reference.getAbsoluteRotation()) {
+      throw new Error('Image and reference must have the same rotation', {
+        cause: 'RotationNotAligned',
+      });
+    }
+
+    const originalContainer = image.getParent();
+    const group = new Konva.Group();
+    image.moveTo(group);
+    reference.moveTo(group);
+    originalContainer?.add(group);
+    group.rotate(-originalRotation);
+
+    const dImage = group.findOne('#' + image.getAttrs().id) as Konva.Group;
+    const dReference = group.findOne(
+      '#' + reference.getAttrs().id
+    ) as Konva.Node;
+
+    const intersectionRectAbs = this.getIntersectionRect(dImage, dReference);
+    const intersectionRect = this.getIntersectionRect(
+      dImage,
+      dReference,
+      stage
+    );
+
+    const imageRect = dImage.getClientRect({
+      relativeTo: stage,
+      skipStroke: true,
+    });
+
+    if (!intersectionRect || !intersectionRectAbs) {
+      return;
+    }
+
+    const imageAttrs = this.image.getAttrs();
+    const actualScale =
+      imageAttrs.uncroppedImage.width / imageAttrs.imageInfo.width;
+    const cropScale = imageAttrs.cropInfo
+      ? imageAttrs.cropInfo.scaleX
+      : actualScale;
+    const realScale = actualScale / cropScale;
+
+    const imageOffsetX = imageAttrs.cropInfo
+      ? imageAttrs.cropInfo.x * realScale
+      : 0;
+    const imageOffsetY = imageAttrs.cropInfo
+      ? imageAttrs.cropInfo.y * realScale
+      : 0;
+
+    const diffX = intersectionRect.x - imageRect.x;
+    const diffY = intersectionRect.y - imageRect.y;
+
+    const realClipRect = {
+      scaleX: actualScale,
+      scaleY: actualScale,
+      x: WeaveImageCrop.roundTo6Decimals(diffX + imageOffsetX),
+      y: WeaveImageCrop.roundTo6Decimals(diffY + imageOffsetY),
+      width: WeaveImageCrop.roundTo6Decimals(intersectionRect.width),
+      height: WeaveImageCrop.roundTo6Decimals(intersectionRect.height),
+    };
+
+    if (dImage) {
+      const cropSize = {
+        x: diffX,
+        y: diffY,
+        width: intersectionRect.width,
+        height: intersectionRect.height,
+      };
+
+      dImage.setAttrs({
+        width: intersectionRect.width,
+        height: intersectionRect.height,
+        cropInfo: realClipRect,
+        cropSize,
+        uncroppedImage: {
+          width: imageAttrs.uncroppedImage.width,
+          height: imageAttrs.uncroppedImage.height,
+        },
+      });
+      dImage.setAbsolutePosition(intersectionRectAbs);
+
+      group.rotate(originalRotation);
+      group.getChildren().forEach((child) => {
+        child.moveTo(originalContainer);
+      });
+      group.destroy();
+
+      const fImage = stage.findOne('#' + image.getAttrs().id) as Konva.Group;
+
+      if (fImage) {
+        this.instance.updateNodeNT(
+          this.node.serialize(fImage as WeaveElementInstance)
+        );
+      }
+    }
+  }
+
   static roundTo6Decimals(value: number): number {
     return parseFloat(value.toFixed(6));
   }
 
   private getIntersectionRect(
     a: Konva.Node,
-    b: Konva.Node
+    b: Konva.Node,
+    relativeTo?: Konva.Container
   ): { x: number; y: number; width: number; height: number } | null {
-    const rectA = a.getClientRect({ skipStroke: true });
-    const rectB = b.getClientRect({ skipStroke: true });
+    const rectA = a.getClientRect({
+      skipStroke: true,
+      relativeTo,
+    });
+    const rectB = b.getClientRect({
+      skipStroke: true,
+      relativeTo,
+    });
 
     const x1 = WeaveImageCrop.roundTo6Decimals(Math.max(rectA.x, rectB.x));
     const y1 = WeaveImageCrop.roundTo6Decimals(Math.max(rectA.y, rectB.y));

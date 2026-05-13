@@ -1,6 +1,6 @@
 {
   "name": "@inditextech/weave",
-  "version": "3.9.0-SNAPSHOT",
+  "version": "3.10.0-SNAPSHOT",
   "description": "Weave.js framework",
   "packageManager": "npm@10.2.4",
   "workspaces": [
@@ -73,7 +73,7 @@
     "@swc/helpers": "0.5.17",
     "husky": "9.1.4",
     "npkill": "0.12.2",
-    "nx": "22.6.4",
+    "nx": "22.7.1",
     "prettier": "2.8.8",
     "typescript": "5.7.3"
   },
@@ -82,8 +82,13 @@
     "npm": ">= 10.9.2"
   },
   "overrides": {
+    "@babel/preset-env": "7.29.5",
+    "axios": "1.16.0",
     "esbuild": "0.25.0",
+    "fast-uri": "3.1.2",
+    "follow-redirects": "1.16.0",
     "konva": "10.0.2",
+    "lodash": "4.18.1",
     "rimraf": "6.0.1",
     "yjs": "13.6.27"
   },

@@ -16,6 +16,10 @@
     "version:development": "export BUMP_DEVELOP_VERSION=$(npm version $(npm version minor)-prerelease)",
     "version:release": "npm ci --force && npm version $RELEASE_VERSION"
   },
+  "overrides": {
+    "fast-uri": "3.1.2",
+    "postcss": "8.5.10"
+  },
   "dependencies": {
     "@codesandbox/sandpack-react": "^2.20.0",
     "@codesandbox/sandpack-themes": "^2.0.21",
@@ -28,7 +32,7 @@
     "fumadocs-ui": "15.3.3",
     "lucide-react": "^0.511.0",
     "mermaid": "^11.10.0",
-    "next": "15.4.8",
+    "next": "15.5.18",
     "ogl": "^1.0.11",
     "raw-loader": "^4.0.2",
     "react": "^19.1.0",
@@ -44,7 +48,7 @@
     "eslint": "^8",
     "eslint-config-next": "15.3.1",
     "npkill": "^0.12.2",
-    "postcss": "^8.5.3",
+    "postcss": "8.5.10",
     "tailwindcss": "^4.1.4",
     "typescript": "^5.8.3"
   }

@@ -3,6 +3,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { defineConfig } from 'tsdown';
+import { visualizer } from 'rollup-plugin-visualizer';
 
 export default [
   defineConfig({
@@ -52,6 +53,14 @@ export default [
     clean: true,
     dts: true,
     platform: 'browser',
+    plugins: [
+      visualizer({
+        open: false,
+        gzipSize: true,
+        brotliSize: true,
+        filename: 'dist/client.stats.html',
+      }) as any,
+    ],
   }),
   defineConfig({
     entry: {
@@ -103,5 +112,13 @@ export default [
     dts: true,
     platform: 'node',
     report: true,
+    plugins: [
+      visualizer({
+        open: false,
+        gzipSize: true,
+        brotliSize: true,
+        filename: 'dist/server.stats.html',
+      }) as any,
+    ],
   }),
 ];
