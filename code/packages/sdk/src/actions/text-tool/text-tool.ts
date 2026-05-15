@@ -177,9 +177,11 @@ export class WeaveTextToolAction extends WeaveAction {
       this.instance.triggerAction(SELECTION_TOOL_ACTION_NAME);
     }
 
-    const node = stage.findOne(`#${this.textId}`) as Konva.Text | undefined;
-    if (node) {
-      node.getAttr('triggerEditMode')(node, true);
+    const textGroup = stage.findOne(`#${this.textId}`) as
+      | Konva.Group
+      | undefined;
+    if (textGroup) {
+      textGroup.getAttr('triggerEditMode')(textGroup, true);
     }
 
     this.initialCursor = null;

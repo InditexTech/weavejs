@@ -8,6 +8,7 @@
     "copy-paste-nodes",
     "nodes-selection",
     "nodes-multi-selection-feedback",
+    "nodes-snapping",
     "nodes-edge-snapping",
     "nodes-distance-snapping",
     "stage-drop-area",

@@ -180,7 +180,6 @@ export class WeaveCopyPasteNodesPlugin extends WeavePlugin {
     catcher?.focus();
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   private checkIfInternalElementsAreNew(newData: string) {
     if (!this.config.paddingOnPaste.enabled) {
       return false;

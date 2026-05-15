@@ -27,6 +27,7 @@ export class WeaveKonvaBaseRenderer extends WeaveRenderer {
   init(): void {
     this.actualState = {
       weave: {},
+      weaveMetadata: {},
     };
   }
 
@@ -236,7 +237,8 @@ export class WeaveKonvaBaseRenderer extends WeaveRenderer {
     );
 
     if (!nodeInstance) {
-      throw new Error(`No handler found for node type ${element.type}`);
+      console.warn(`No handler found for node type ${element.type}`);
+      return;
     }
 
     if (!parentInstance && nodeInstance) {

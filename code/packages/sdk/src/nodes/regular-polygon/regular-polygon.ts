@@ -32,13 +32,62 @@ export class WeaveRegularPolygonNode extends WeaveNode {
   }
 
   onRender(props: WeaveElementAttributes): WeaveElementInstance {
-    const regularPolygon = new Konva.RegularPolygon({
+    const regularPolygon = new Konva.Group({
       ...props,
       name: 'node',
-      sides: props.sides,
-      radius: props.radius,
-      strokeScaleEnabled: true,
     });
+
+    const sides = regularPolygon.getAttr('sides') as number;
+    const radius = regularPolygon.getAttr('radius') as number;
+
+    const internalRPBg = new Konva.RegularPolygon({
+      ...props,
+      name: undefined,
+      id: `${props.id}-bg`,
+      nodeId: props.id,
+      x: radius,
+      y: radius,
+      sides,
+      radius,
+      fill: props.fill || 'transparent',
+      strokeWidth: 0,
+      strokeScaleEnabled: true,
+      rotation: 0,
+    });
+
+    const internalRPBgBox = internalRPBg.getClientRect({
+      relativeTo: regularPolygon,
+    });
+    internalRPBg.x(internalRPBg.x() - internalRPBgBox.x);
+    internalRPBg.y(internalRPBg.y() - internalRPBgBox.y);
+
+    regularPolygon.add(internalRPBg);
+
+    const internalRPBorder = new Konva.RegularPolygon({
+      ...props,
+      name: undefined,
+      id: `${props.id}-border`,
+      x: radius,
+      y: radius,
+      sides,
+      radius: radius - (props.strokeWidth || 0) / 2,
+      fill: 'transparent',
+      strokeWidth: props.strokeWidth || 0,
+      strokeScaleEnabled: true,
+      rotation: 0,
+      listening: false,
+    });
+
+    const internalRPBorderBox = internalRPBorder.getClientRect({
+      relativeTo: regularPolygon,
+    });
+    internalRPBorder.x(internalRPBorder.x() - internalRPBorderBox.x);
+    internalRPBorder.y(internalRPBorder.y() - internalRPBorderBox.y);
+
+    regularPolygon.add(internalRPBorder);
+
+    internalRPBorder.moveToTop();
+    internalRPBg.moveToBottom();
 
     this.setupDefaultNodeAugmentation(regularPolygon);
 
@@ -74,8 +123,68 @@ export class WeaveRegularPolygonNode extends WeaveNode {
   ): void {
     nodeInstance.setAttrs({
       ...nextProps,
-      radius: nextProps.radius,
     });
+
+    const sides = nodeInstance.getAttr('sides') as number;
+    const radius = nodeInstance.getAttr('radius') as number;
+
+    const regularPolygon = nodeInstance as Konva.Group;
+    const internalRPBg = regularPolygon.findOne(
+      `#${nextProps.id}-bg`
+    ) as Konva.RegularPolygon;
+    const internalRPBorder = regularPolygon.findOne(
+      `#${nextProps.id}-border`
+    ) as Konva.RegularPolygon;
+
+    if (internalRPBg) {
+      internalRPBg.setAttrs({
+        ...nextProps,
+        name: undefined,
+        id: `${nextProps.id}-bg`,
+        nodeId: nextProps.id,
+        x: radius,
+        y: radius,
+        sides,
+        radius,
+        fill: nextProps.fill || 'transparent',
+        strokeWidth: 0,
+        strokeScaleEnabled: true,
+        rotation: 0,
+      });
+
+      const internalRPBgBox = internalRPBg.getClientRect({
+        relativeTo: regularPolygon,
+      });
+      internalRPBg.x(internalRPBg.x() - internalRPBgBox.x);
+      internalRPBg.y(internalRPBg.y() - internalRPBgBox.y);
+
+      internalRPBg.moveToBottom();
+    }
+
+    if (internalRPBorder) {
+      internalRPBorder.setAttrs({
+        ...nextProps,
+        name: undefined,
+        id: `${nextProps.id}-border`,
+        x: radius,
+        y: radius,
+        sides,
+        radius: radius - (nextProps.strokeWidth || 0) / 2,
+        stroke: nextProps.stroke || 'transparent',
+        strokeWidth: nextProps.strokeWidth || 0,
+        strokeScaleEnabled: true,
+        listening: false,
+        rotation: 0,
+      });
+
+      const internalRPBorderBox = internalRPBorder.getClientRect({
+        relativeTo: regularPolygon,
+      });
+      internalRPBorder.x(internalRPBorder.x() - internalRPBorderBox.x);
+      internalRPBorder.y(internalRPBorder.y() - internalRPBorderBox.y);
+
+      internalRPBorder.moveToTop();
+    }
 
     const nodesSelectionPlugin =
       this.instance.getPlugin<WeaveNodesSelectionPlugin>('nodesSelection');
@@ -87,11 +196,24 @@ export class WeaveRegularPolygonNode extends WeaveNode {
     }
   }
 
-  scaleReset(node: Konva.RegularPolygon): void {
-    node.radius(Math.max(5, node.radius() * node.scaleX()));
+  scaleReset(node: Konva.Node): void {
+    const absTransform = node.getAbsoluteTransform().copy();
 
-    // reset scale to 1
-    node.scale({ x: 1, y: 1 });
+    const radius = node.getAttr('radius') as number;
+
+    node.setAttrs({
+      radius: radius * node.scaleX(),
+    });
+    node.scaleX(1);
+    node.scaleY(1);
+
+    const newTransform = node.getAbsoluteTransform();
+
+    const dx = absTransform.m[4] - newTransform.m[4];
+    const dy = absTransform.m[5] - newTransform.m[5];
+
+    node.x(node.x() + dx);
+    node.y(node.y() + dy);
   }
 
   realOffset(element: WeaveStateElement): Konva.Vector2d {

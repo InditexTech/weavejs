@@ -31,14 +31,74 @@ export class WeaveStarNode extends WeaveNode {
   }
 
   onRender(props: WeaveElementAttributes): WeaveElementInstance {
-    const star = new Konva.Star({
+    const star = new Konva.Group({
       ...props,
       name: 'node',
-      numPoints: props.numPoints,
-      innerRadius: props.innerRadius,
-      outerRadius: props.outerRadius,
-      strokeScaleEnabled: true,
     });
+
+    const numPoints = star.getAttr('numPoints') as number;
+    const innerRadius = star.getAttr('innerRadius') as number;
+    const outerRadius = star.getAttr('outerRadius') as number;
+
+    const internalStarBg = new Konva.Star({
+      ...props,
+      name: undefined,
+      id: `${props.id}-bg`,
+      nodeId: props.id,
+      x: outerRadius,
+      y: outerRadius,
+      numPoints,
+      innerRadius,
+      outerRadius,
+      fill: props.fill || 'transparent',
+      strokeWidth: 0,
+      strokeScaleEnabled: true,
+      rotation: 0,
+    });
+
+    const internalStarBgBox = internalStarBg.getClientRect({
+      relativeTo: star,
+    });
+    internalStarBg.x(internalStarBg.x() - internalStarBgBox.x);
+    internalStarBg.y(internalStarBg.y() - internalStarBgBox.y);
+
+    star.add(internalStarBg);
+
+    const innerStarScale = (outerRadius - props.strokeWidth) / outerRadius;
+    const internalStarBorder = new Konva.Star({
+      ...props,
+      name: undefined,
+      id: `${props.id}-border`,
+      x: outerRadius,
+      y: outerRadius,
+      numPoints,
+      innerRadius: innerRadius * innerStarScale,
+      outerRadius: outerRadius * innerStarScale,
+      fill: 'transparent',
+      strokeWidth: props.strokeWidth || 0,
+      strokeScaleEnabled: true,
+      rotation: 0,
+      listening: false,
+    });
+
+    const internalStarBorderBox = internalStarBorder.getClientRect({
+      relativeTo: star,
+    });
+
+    const diffX = internalStarBgBox.width - internalStarBorderBox.width;
+    const diffY = internalStarBgBox.height - internalStarBorderBox.height;
+
+    internalStarBorder.x(
+      internalStarBorder.x() - internalStarBorderBox.x + diffX / 2
+    );
+    internalStarBorder.y(
+      internalStarBorder.y() - internalStarBorderBox.y + diffY / 2
+    );
+
+    star.add(internalStarBorder);
+
+    internalStarBorder.moveToTop();
+    internalStarBg.moveToBottom();
 
     this.setupDefaultNodeAugmentation(star);
 
@@ -47,41 +107,20 @@ export class WeaveStarNode extends WeaveNode {
     );
 
     star.getTransformerProperties = function () {
-      const actualAttrs = this.getAttrs();
-
-      if (actualAttrs.keepAspectRatio) {
-        return {
-          ...defaultTransformerProperties,
-          enabledAnchors: [
-            'top-left',
-            'top-right',
-            'bottom-left',
-            'bottom-right',
-          ],
-          keepRatio: true,
-        };
-      }
-
-      return defaultTransformerProperties;
+      return {
+        ...defaultTransformerProperties,
+        enabledAnchors: [
+          'top-left',
+          'top-right',
+          'bottom-left',
+          'bottom-right',
+        ],
+        keepRatio: true,
+      };
     };
 
     star.allowedAnchors = function () {
-      const actualAttrs = this.getAttrs();
-
-      if (actualAttrs.keepAspectRatio) {
-        return ['top-left', 'top-right', 'bottom-left', 'bottom-right'];
-      }
-
-      return [
-        'top-left',
-        'top-center',
-        'top-right',
-        'middle-right',
-        'middle-left',
-        'bottom-left',
-        'bottom-center',
-        'bottom-right',
-      ];
+      return ['top-left', 'top-right', 'bottom-left', 'bottom-right'];
     };
 
     this.setupDefaultNodeEvents(star);
@@ -97,6 +136,75 @@ export class WeaveStarNode extends WeaveNode {
       ...nextProps,
     });
 
+    const numPoints = nodeInstance.getAttr('numPoints') as number;
+    const innerRadius = nodeInstance.getAttr('innerRadius') as number;
+    const outerRadius = nodeInstance.getAttr('outerRadius') as number;
+
+    const star = nodeInstance as Konva.Group;
+    const internalStarBg = star.findOne(`#${nextProps.id}-bg`) as Konva.Star;
+    const internalStarBorder = star.findOne(
+      `#${nextProps.id}-border`
+    ) as Konva.Star;
+
+    if (internalStarBg && internalStarBorder) {
+      internalStarBg.setAttrs({
+        ...nextProps,
+        name: undefined,
+        id: `${nextProps.id}-bg`,
+        nodeId: nextProps.id,
+        x: outerRadius,
+        y: outerRadius,
+        numPoints,
+        innerRadius,
+        outerRadius,
+        fill: nextProps.fill || 'transparent',
+        strokeWidth: 0,
+        strokeScaleEnabled: true,
+        rotation: 0,
+      });
+
+      const internalStarBgBox = internalStarBg.getClientRect({
+        relativeTo: star,
+      });
+      internalStarBg.x(internalStarBg.x() - internalStarBgBox.x);
+      internalStarBg.y(internalStarBg.y() - internalStarBgBox.y);
+
+      internalStarBg.moveToBottom();
+
+      const innerStarScale =
+        (outerRadius - nextProps.strokeWidth) / outerRadius;
+
+      internalStarBorder.setAttrs({
+        ...nextProps,
+        name: undefined,
+        id: `${nextProps.id}-border`,
+        x: outerRadius,
+        y: outerRadius,
+        numPoints,
+        innerRadius: innerRadius * innerStarScale,
+        outerRadius: outerRadius * innerStarScale,
+        stroke: nextProps.stroke || 'transparent',
+        strokeWidth: nextProps.strokeWidth || 0,
+        strokeScaleEnabled: true,
+        listening: false,
+        rotation: 0,
+      });
+
+      const internalStarBorderBox = internalStarBorder.getClientRect({
+        relativeTo: star,
+      });
+
+      const diffX = internalStarBgBox.width - internalStarBorderBox.width;
+      const diffY = internalStarBgBox.height - internalStarBorderBox.height;
+
+      internalStarBorder.x(
+        internalStarBorder.x() - internalStarBorderBox.x + diffX / 2
+      );
+      internalStarBorder.y(
+        internalStarBorder.y() - internalStarBorderBox.y + diffY / 2
+      );
+    }
+
     const nodesSelectionPlugin =
       this.instance.getPlugin<WeaveNodesSelectionPlugin>('nodesSelection');
 
@@ -107,12 +215,26 @@ export class WeaveStarNode extends WeaveNode {
     }
   }
 
-  scaleReset(node: Konva.Star): void {
-    node.innerRadius(Math.max(5, node.innerRadius() * node.scaleX()));
-    node.outerRadius(Math.max(5, node.outerRadius() * node.scaleY()));
+  scaleReset(node: Konva.Node): void {
+    const absTransform = node.getAbsoluteTransform().copy();
 
-    // reset scale to
-    node.scale({ x: 1, y: 1 });
+    const outerRadius = node.getAttr('outerRadius') as number;
+    const innerRadius = node.getAttr('innerRadius') as number;
+
+    node.setAttrs({
+      outerRadius: outerRadius * node.scaleX(),
+      innerRadius: innerRadius * node.scaleX(),
+    });
+    node.scaleX(1);
+    node.scaleY(1);
+
+    const newTransform = node.getAbsoluteTransform();
+
+    const dx = absTransform.m[4] - newTransform.m[4];
+    const dy = absTransform.m[5] - newTransform.m[5];
+
+    node.x(node.x() + dx);
+    node.y(node.y() + dy);
   }
 
   realOffset(element: WeaveStateElement): Konva.Vector2d {

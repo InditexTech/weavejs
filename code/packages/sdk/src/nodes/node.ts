@@ -24,15 +24,11 @@ import {
   mergeExceptArrays,
   moveNodeToContainerNT,
 } from '@/utils/utils';
-import type { WeaveNodesEdgeSnappingPlugin } from '@/plugins/nodes-edge-snapping/nodes-edge-snapping';
 import { throttle } from 'lodash';
 import type { KonvaEventObject } from 'konva/lib/Node';
 import { WEAVE_STAGE_DEFAULT_MODE } from './stage/constants';
 import { MOVE_TOOL_ACTION_NAME } from '@/actions/move-tool/constants';
 import { SELECTION_TOOL_ACTION_NAME } from '@/actions/selection-tool/constants';
-import { WEAVE_NODES_EDGE_SNAPPING_PLUGIN_KEY } from '@/plugins/nodes-edge-snapping/constants';
-import { WEAVE_NODES_DISTANCE_SNAPPING_PLUGIN_KEY } from '@/plugins/nodes-distance-snapping/constants';
-import type { WeaveNodesDistanceSnappingPlugin } from '@/plugins/nodes-distance-snapping/nodes-distance-snapping';
 import type { WeaveNodesMultiSelectionFeedbackPlugin } from '@/plugins/nodes-multi-selection-feedback/nodes-multi-selection-feedback';
 import { WEAVE_NODES_MULTI_SELECTION_FEEDBACK_PLUGIN_KEY } from '@/plugins/nodes-multi-selection-feedback/constants';
 import type { WeaveNodeChangedContainerEvent } from './types';
@@ -359,8 +355,6 @@ export abstract class WeaveNode implements WeaveNodeBase {
       node.off('pointerover');
       node.off('pointerleave');
     } else {
-      let transforming = false;
-
       this.instance.addEventListener<WeaveNodesSelectionPluginOnNodesChangeEvent>(
         'onNodesChange',
         handleNodesChange
@@ -368,8 +362,6 @@ export abstract class WeaveNode implements WeaveNodeBase {
 
       node.off('transformstart');
       node.on('transformstart', (e) => {
-        transforming = true;
-
         if (e.target.getAttrs().strokeScaleEnabled !== false) {
           e.target.setAttr('strokeScaleEnabled', false);
           e.target.setAttr('_revertStrokeScaleEnabled', true);
@@ -393,23 +385,12 @@ export abstract class WeaveNode implements WeaveNodeBase {
         const nodesSelectionPlugin =
           this.instance.getPlugin<WeaveNodesSelectionPlugin>('nodesSelection');
 
-        const nodesEdgeSnappingPlugin = this.getNodesEdgeSnappingPlugin();
-
         if (
           nodesSelectionPlugin &&
           this.isSelecting() &&
           this.isNodeSelected(node)
         ) {
           nodesSelectionPlugin.getTransformer().forceUpdate();
-        }
-
-        if (
-          nodesEdgeSnappingPlugin &&
-          transforming &&
-          this.isSelecting() &&
-          this.isNodeSelected(node)
-        ) {
-          nodesEdgeSnappingPlugin.evaluateGuidelines(e);
         }
 
         let parentId: string = node.getParent()?.id() ?? '';
@@ -448,16 +429,8 @@ export abstract class WeaveNode implements WeaveNodeBase {
 
         this.instance.emitEvent('onTransform', null);
 
-        transforming = false;
-
         const nodesSelectionPlugin =
           this.instance.getPlugin<WeaveNodesSelectionPlugin>('nodesSelection');
-
-        const nodesSnappingPlugin = this.getNodesEdgeSnappingPlugin();
-
-        if (nodesSnappingPlugin) {
-          nodesSnappingPlugin.cleanupGuidelines();
-        }
 
         if (nodesSelectionPlugin) {
           nodesSelectionPlugin.getTransformer().forceUpdate();
@@ -798,19 +771,6 @@ export abstract class WeaveNode implements WeaveNodeBase {
         ) {
           this.instance.stateTransactional(() => {
             clearContainerTargets(this.instance);
-
-            const nodesEdgeSnappingPlugin = this.getNodesEdgeSnappingPlugin();
-
-            const nodesDistanceSnappingPlugin =
-              this.getNodesDistanceSnappingPlugin();
-
-            if (nodesEdgeSnappingPlugin) {
-              nodesEdgeSnappingPlugin.cleanupGuidelines();
-            }
-
-            if (nodesDistanceSnappingPlugin) {
-              nodesDistanceSnappingPlugin.cleanupGuidelines();
-            }
 
             const layerToMove = containerOverCursor(this.instance, [
               realNodeTarget,
@@ -1273,22 +1233,6 @@ export abstract class WeaveNode implements WeaveNodeBase {
       this.instance.getPlugin<WeaveNodesSelectionPlugin>('nodesSelection');
 
     return nodesSelectionPlugin;
-  }
-
-  protected getNodesEdgeSnappingPlugin() {
-    const snappingPlugin =
-      this.instance.getPlugin<WeaveNodesEdgeSnappingPlugin>(
-        WEAVE_NODES_EDGE_SNAPPING_PLUGIN_KEY
-      );
-    return snappingPlugin;
-  }
-
-  protected getNodesDistanceSnappingPlugin() {
-    const snappingPlugin =
-      this.instance.getPlugin<WeaveNodesDistanceSnappingPlugin>(
-        WEAVE_NODES_DISTANCE_SNAPPING_PLUGIN_KEY
-      );
-    return snappingPlugin;
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars

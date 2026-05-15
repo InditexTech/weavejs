@@ -58,6 +58,7 @@ export class WeaveImagesToolAction extends WeaveAction {
   protected imagesFile: WeaveImagesFile[] = [];
   protected imagesURL: WeaveImagesURL[] = [];
   protected preloadImgs!: Record<string, HTMLImageElement>;
+  protected stageClickPoint!: Vector2d | null;
   protected clickPoint!: Vector2d | null;
   protected forceMainContainer: boolean = false;
   protected cancelAction!: () => void;
@@ -689,6 +690,7 @@ export class WeaveImagesToolAction extends WeaveAction {
     this.forceMainContainer = false;
     this.initialCursor = null;
     this.container = undefined;
+    this.stageClickPoint = null;
     this.clickPoint = null;
     this.nodesIds = [];
     this.toAdd = 0;

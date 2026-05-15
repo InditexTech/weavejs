@@ -162,6 +162,9 @@ export * from './actions/measure-tool/types';
 export { WeaveConnectorToolAction } from './actions/connector-tool/connector-tool';
 export * from './actions/connector-tool/constants';
 export * from './actions/connector-tool/types';
+export { WeaveGuideToolAction } from './actions/guide-tool/guide-tool';
+export * from './actions/guide-tool/constants';
+export * from './actions/guide-tool/types';
 
 // Provided Plugins
 export { WeaveStageGridPlugin } from './plugins/stage-grid/stage-grid';
@@ -202,14 +205,11 @@ export * from './plugins/stage-drop-area/types';
 export { WeaveCopyPasteNodesPlugin } from './plugins/copy-paste-nodes/copy-paste-nodes';
 export * from './plugins/copy-paste-nodes/constants';
 export * from './plugins/copy-paste-nodes/types';
-export { WeaveNodesEdgeSnappingPlugin } from './plugins/nodes-edge-snapping/nodes-edge-snapping';
-export * from './plugins/nodes-edge-snapping/constants';
-export * from './plugins/nodes-edge-snapping/types';
-export { WeaveNodesDistanceSnappingPlugin } from './plugins/nodes-distance-snapping/nodes-distance-snapping';
-export * from './plugins/nodes-distance-snapping/constants';
-export * from './plugins/nodes-distance-snapping/types';
 export { WeaveCommentsRendererPlugin } from './plugins/comments-renderer/comments-renderer';
 export * from './plugins/comments-renderer/constants';
 export * from './plugins/comments-renderer/types';
 export { WeaveStageKeyboardMovePlugin } from './plugins/stage-keyboard-move/stage-keyboard-move';
 export * from './plugins/stage-keyboard-move/constants';
+export { WeaveNodesSnappingPlugin } from './plugins/nodes-snapping/nodes-snapping';
+export * from './plugins/nodes-snapping/constants';
+export * from './plugins/nodes-snapping/types';

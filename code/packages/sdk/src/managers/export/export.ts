@@ -18,10 +18,6 @@ import type { WeaveNodesSelectionPlugin } from '@/plugins/nodes-selection/nodes-
 import { WEAVE_NODES_SELECTION_KEY } from '@/plugins/nodes-selection/constants';
 import type { WeaveStageGridPlugin } from '@/plugins/stage-grid/stage-grid';
 import { WEAVE_STAGE_GRID_PLUGIN_KEY } from '@/plugins/stage-grid/constants';
-import type { WeaveNodesEdgeSnappingPlugin } from '@/plugins/nodes-edge-snapping/nodes-edge-snapping';
-import { WEAVE_NODES_EDGE_SNAPPING_PLUGIN_KEY } from '@/plugins/nodes-edge-snapping/constants';
-import type { WeaveNodesDistanceSnappingPlugin } from '@/plugins/nodes-distance-snapping/nodes-distance-snapping';
-import { WEAVE_NODES_DISTANCE_SNAPPING_PLUGIN_KEY } from '@/plugins/nodes-distance-snapping/constants';
 import { reject } from 'lodash';
 
 export class WeaveExportManager {
@@ -71,15 +67,9 @@ export class WeaveExportManager {
 
       const nodesSelectionPluginPrev =
         this.getNodesSelectionPlugin()?.isEnabled();
-      const nodesDistanceSnappingPluginPrev =
-        this.getNodesDistanceSnappingPlugin()?.isEnabled();
-      const nodesEdgeSnappingPluginPrev =
-        this.getNodesDistanceSnappingPlugin()?.isEnabled();
       const nodesStageGridPluginPrev = this.getStageGridPlugin()?.isEnabled();
 
       this.getNodesSelectionPlugin()?.disable();
-      this.getNodesDistanceSnappingPlugin()?.disable();
-      this.getNodesEdgeSnappingPlugin()?.disable();
       this.getStageGridPlugin()?.disable();
 
       const stage = this.instance.getStage();
@@ -156,12 +146,6 @@ export class WeaveExportManager {
             if (nodesSelectionPluginPrev) {
               this.getNodesSelectionPlugin()?.enable();
             }
-            if (nodesDistanceSnappingPluginPrev) {
-              this.getNodesDistanceSnappingPlugin()?.enable();
-            }
-            if (nodesEdgeSnappingPluginPrev) {
-              this.getNodesEdgeSnappingPlugin()?.enable();
-            }
             if (nodesStageGridPluginPrev) {
               this.getStageGridPlugin()?.enable();
             }
@@ -188,15 +172,9 @@ export class WeaveExportManager {
 
       const nodesSelectionPluginPrev =
         this.getNodesSelectionPlugin()?.isEnabled();
-      const nodesDistanceSnappingPluginPrev =
-        this.getNodesDistanceSnappingPlugin()?.isEnabled();
-      const nodesEdgeSnappingPluginPrev =
-        this.getNodesDistanceSnappingPlugin()?.isEnabled();
       const nodesStageGridPluginPrev = this.getStageGridPlugin()?.isEnabled();
 
       this.getNodesSelectionPlugin()?.disable();
-      this.getNodesDistanceSnappingPlugin()?.disable();
-      this.getNodesEdgeSnappingPlugin()?.disable();
       this.getStageGridPlugin()?.disable();
 
       const stage = this.instance.getStage();
@@ -273,12 +251,6 @@ export class WeaveExportManager {
             if (nodesSelectionPluginPrev) {
               this.getNodesSelectionPlugin()?.enable();
             }
-            if (nodesDistanceSnappingPluginPrev) {
-              this.getNodesDistanceSnappingPlugin()?.enable();
-            }
-            if (nodesEdgeSnappingPluginPrev) {
-              this.getNodesEdgeSnappingPlugin()?.enable();
-            }
             if (nodesStageGridPluginPrev) {
               this.getStageGridPlugin()?.enable();
             }
@@ -310,15 +282,9 @@ export class WeaveExportManager {
 
       const nodesSelectionPluginPrev =
         this.getNodesSelectionPlugin()?.isEnabled();
-      const nodesDistanceSnappingPluginPrev =
-        this.getNodesDistanceSnappingPlugin()?.isEnabled();
-      const nodesEdgeSnappingPluginPrev =
-        this.getNodesDistanceSnappingPlugin()?.isEnabled();
       const nodesStageGridPluginPrev = this.getStageGridPlugin()?.isEnabled();
 
       this.getNodesSelectionPlugin()?.disable();
-      this.getNodesDistanceSnappingPlugin()?.disable();
-      this.getNodesEdgeSnappingPlugin()?.disable();
       this.getStageGridPlugin()?.disable();
 
       const stage = this.instance.getStage();
@@ -395,12 +361,6 @@ export class WeaveExportManager {
             if (nodesSelectionPluginPrev) {
               this.getNodesSelectionPlugin()?.enable();
             }
-            if (nodesDistanceSnappingPluginPrev) {
-              this.getNodesDistanceSnappingPlugin()?.enable();
-            }
-            if (nodesEdgeSnappingPluginPrev) {
-              this.getNodesEdgeSnappingPlugin()?.enable();
-            }
             if (nodesStageGridPluginPrev) {
               this.getStageGridPlugin()?.enable();
             }
@@ -426,15 +386,9 @@ export class WeaveExportManager {
 
       const nodesSelectionPluginPrev =
         this.getNodesSelectionPlugin()?.isEnabled();
-      const nodesDistanceSnappingPluginPrev =
-        this.getNodesDistanceSnappingPlugin()?.isEnabled();
-      const nodesEdgeSnappingPluginPrev =
-        this.getNodesDistanceSnappingPlugin()?.isEnabled();
       const nodesStageGridPluginPrev = this.getStageGridPlugin()?.isEnabled();
 
       this.getNodesSelectionPlugin()?.disable();
-      this.getNodesDistanceSnappingPlugin()?.disable();
-      this.getNodesEdgeSnappingPlugin()?.disable();
       this.getStageGridPlugin()?.disable();
 
       const stage = this.instance.getStage();
@@ -483,12 +437,6 @@ export class WeaveExportManager {
           if (nodesSelectionPluginPrev) {
             this.getNodesSelectionPlugin()?.enable();
           }
-          if (nodesDistanceSnappingPluginPrev) {
-            this.getNodesDistanceSnappingPlugin()?.enable();
-          }
-          if (nodesEdgeSnappingPluginPrev) {
-            this.getNodesEdgeSnappingPlugin()?.enable();
-          }
           if (nodesStageGridPluginPrev) {
             this.getStageGridPlugin()?.enable();
           }
@@ -513,15 +461,9 @@ export class WeaveExportManager {
 
       const nodesSelectionPluginPrev =
         this.getNodesSelectionPlugin()?.isEnabled();
-      const nodesDistanceSnappingPluginPrev =
-        this.getNodesDistanceSnappingPlugin()?.isEnabled();
-      const nodesEdgeSnappingPluginPrev =
-        this.getNodesDistanceSnappingPlugin()?.isEnabled();
       const nodesStageGridPluginPrev = this.getStageGridPlugin()?.isEnabled();
 
       this.getNodesSelectionPlugin()?.disable();
-      this.getNodesDistanceSnappingPlugin()?.disable();
-      this.getNodesEdgeSnappingPlugin()?.disable();
       this.getStageGridPlugin()?.disable();
 
       const stage = this.instance.getStage();
@@ -570,12 +512,6 @@ export class WeaveExportManager {
           if (nodesSelectionPluginPrev) {
             this.getNodesSelectionPlugin()?.enable();
           }
-          if (nodesDistanceSnappingPluginPrev) {
-            this.getNodesDistanceSnappingPlugin()?.enable();
-          }
-          if (nodesEdgeSnappingPluginPrev) {
-            this.getNodesEdgeSnappingPlugin()?.enable();
-          }
           if (nodesStageGridPluginPrev) {
             this.getStageGridPlugin()?.enable();
           }
@@ -605,15 +541,9 @@ export class WeaveExportManager {
 
       const nodesSelectionPluginPrev =
         this.getNodesSelectionPlugin()?.isEnabled();
-      const nodesDistanceSnappingPluginPrev =
-        this.getNodesDistanceSnappingPlugin()?.isEnabled();
-      const nodesEdgeSnappingPluginPrev =
-        this.getNodesDistanceSnappingPlugin()?.isEnabled();
       const nodesStageGridPluginPrev = this.getStageGridPlugin()?.isEnabled();
 
       this.getNodesSelectionPlugin()?.disable();
-      this.getNodesDistanceSnappingPlugin()?.disable();
-      this.getNodesEdgeSnappingPlugin()?.disable();
       this.getStageGridPlugin()?.disable();
 
       const stage = this.instance.getStage();
@@ -662,12 +592,6 @@ export class WeaveExportManager {
           if (nodesSelectionPluginPrev) {
             this.getNodesSelectionPlugin()?.enable();
           }
-          if (nodesDistanceSnappingPluginPrev) {
-            this.getNodesDistanceSnappingPlugin()?.enable();
-          }
-          if (nodesEdgeSnappingPluginPrev) {
-            this.getNodesEdgeSnappingPlugin()?.enable();
-          }
           if (nodesStageGridPluginPrev) {
             this.getStageGridPlugin()?.enable();
           }
@@ -695,8 +619,6 @@ export class WeaveExportManager {
     } = options;
 
     this.getNodesSelectionPlugin()?.disable();
-    this.getNodesDistanceSnappingPlugin()?.disable();
-    this.getNodesEdgeSnappingPlugin()?.disable();
     this.getStageGridPlugin()?.disable();
 
     const stage = this.instance.getStage();
@@ -821,8 +743,6 @@ export class WeaveExportManager {
     stage.batchDraw();
 
     this.getNodesSelectionPlugin()?.enable();
-    this.getNodesDistanceSnappingPlugin()?.enable();
-    this.getNodesEdgeSnappingPlugin()?.enable();
     this.getStageGridPlugin()?.enable();
 
     return {
@@ -848,8 +768,6 @@ export class WeaveExportManager {
     } = options;
 
     this.getNodesSelectionPlugin()?.disable();
-    this.getNodesDistanceSnappingPlugin()?.disable();
-    this.getNodesEdgeSnappingPlugin()?.disable();
     this.getStageGridPlugin()?.disable();
 
     const stage = this.instance.getStage();
@@ -947,8 +865,6 @@ export class WeaveExportManager {
     stage.batchDraw();
 
     this.getNodesSelectionPlugin()?.enable();
-    this.getNodesDistanceSnappingPlugin()?.enable();
-    this.getNodesEdgeSnappingPlugin()?.enable();
     this.getStageGridPlugin()?.enable();
 
     return {
@@ -991,22 +907,6 @@ export class WeaveExportManager {
       WEAVE_STAGE_GRID_PLUGIN_KEY
     );
     return gridPlugin;
-  }
-
-  getNodesEdgeSnappingPlugin() {
-    const snappingPlugin =
-      this.instance.getPlugin<WeaveNodesEdgeSnappingPlugin>(
-        WEAVE_NODES_EDGE_SNAPPING_PLUGIN_KEY
-      );
-    return snappingPlugin;
-  }
-
-  getNodesDistanceSnappingPlugin() {
-    const snappingPlugin =
-      this.instance.getPlugin<WeaveNodesDistanceSnappingPlugin>(
-        WEAVE_NODES_DISTANCE_SNAPPING_PLUGIN_KEY
-      );
-    return snappingPlugin;
   }
 
   blobToDataURL(blob: Blob): Promise<string> {

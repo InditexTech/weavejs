@@ -5,7 +5,6 @@
 import { throttle } from 'lodash';
 import { WeavePlugin } from '@/plugins/plugin';
 import {
-  type WeaveArea,
   type WeaveStageZoomPluginConfig,
   type WeaveStageZoomPluginOnZoomChangeEvent,
   type WeaveStageZoomPluginParams,
@@ -27,6 +26,7 @@ import {
 import type { WeaveContextMenuPlugin } from '../context-menu/context-menu';
 import type { WeaveStageGridPlugin } from '../stage-grid/stage-grid';
 import { DEFAULT_THROTTLE_MS } from '@/constants';
+import type { BoundingBox } from '@inditextech/weave-types';
 
 export class WeaveStageZoomPlugin extends WeavePlugin {
   protected previousPointer!: string | null;
@@ -171,6 +171,7 @@ export class WeaveStageZoomPlugin extends WeavePlugin {
       };
 
       stage.fire('onZoomChange', {}, true);
+      stage.batchDraw();
 
       this.instance.emitEvent<WeaveStageZoomPluginOnZoomChangeEvent>(
         'onZoomChange',
@@ -594,7 +595,7 @@ export class WeaveStageZoomPlugin extends WeavePlugin {
   }
 
   fitToArea(
-    area: WeaveArea,
+    area: BoundingBox,
     options?: {
       smartZoom?: boolean;
       overrideZoom?: boolean;

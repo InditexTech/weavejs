@@ -37,8 +37,12 @@ export class WeaveStoreStandalone extends WeaveStore {
     Y.applyUpdate(tempDoc, roomDataSnapshot);
     const actualStateString = JSON.stringify(tempDoc.getMap('weave').toJSON());
     const actualStateJson = JSON.parse(actualStateString);
+    const actualMetadataStateString = JSON.stringify(
+      tempDoc.getMap('weaveMetadata').toJSON()
+    );
+    const actualMetadataStateJson = JSON.parse(actualMetadataStateString);
 
-    return { weave: actualStateJson };
+    return { weave: actualStateJson, weaveMetadata: actualMetadataStateJson };
   }
 
   async connect(): Promise<void> {

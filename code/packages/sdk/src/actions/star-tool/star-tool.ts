@@ -185,8 +185,8 @@ export class WeaveStarToolAction extends WeaveAction {
         x: this.clickPoint?.x ?? 0 + this.props.outerRadius,
         y: this.clickPoint?.y ?? 0 + this.props.outerRadius,
         numPoints: 5,
-        innerRadius: 0,
-        outerRadius: 0,
+        innerRadius: 1,
+        outerRadius: 1,
       });
       this.instance.addNode(node, this.container?.getAttrs().id);
     }
@@ -219,10 +219,10 @@ export class WeaveStarToolAction extends WeaveAction {
 
       star.setAttrs({
         ...this.props,
-        x: starPos.x + starOuterRadius,
-        y: starPos.y + starOuterRadius,
-        outerRadius: starOuterRadius,
-        innerRadius: starInnerRadius,
+        x: starPos.x,
+        y: starPos.y,
+        outerRadius: starOuterRadius / 2,
+        innerRadius: starInnerRadius / 2,
       });
 
       if (nodeHandler) {
@@ -261,12 +261,16 @@ export class WeaveStarToolAction extends WeaveAction {
         starPos.y = Math.min(this.clickPoint.y, mousePoint.y);
       }
 
-      star.setAttrs({
-        x: starPos.x + deltaX,
-        y: starPos.y + deltaX,
-        outerRadius: deltaX,
-        innerRadius: deltaY,
-      });
+      const nodeHandler = this.instance.getNodeHandler<WeaveStarNode>('star');
+
+      if (nodeHandler) {
+        nodeHandler.onUpdate(star as WeaveElementInstance, {
+          ...this.props,
+          id: this.starId,
+          outerRadius: deltaX / 2,
+          innerRadius: deltaY / 2,
+        });
+      }
     }
   }
 

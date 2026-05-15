@@ -6,7 +6,6 @@ import { isEmpty } from 'lodash';
 import { Weave } from '@/weave';
 import { type Logger } from 'pino';
 import {
-  type WeaveElementAttributes,
   type WeaveNodeFound,
   type WeavePosition,
   type WeaveStateElement,
@@ -191,7 +190,7 @@ export class WeaveStateManager {
   }
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  deepSyncSyncedStore(target: any, source: WeaveElementAttributes) {
+  deepSyncSyncedStore<T extends Record<string, any>>(target: any, source: T) {
     // Remove fields not in source
     for (const key in target) {
       if (!(key in source)) {

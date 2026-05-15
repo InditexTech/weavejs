@@ -3,6 +3,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import Emittery from 'emittery';
+import { Hookable } from 'hookable';
 import Konva from 'konva';
 import { v4 as uuidv4 } from 'uuid';
 import pino, { type Logger } from 'pino';
@@ -32,6 +33,7 @@ import {
   type DeepPartial,
   type WeaveExportReturnFormat,
   WEAVE_EXPORT_RETURN_FORMAT,
+  type AllowedObject,
 } from '@inditextech/weave-types';
 import { WeaveStore } from './stores/store';
 import { augmentKonvaNodeClass, WeaveNode } from './nodes/node';
@@ -80,6 +82,7 @@ import { WeaveDragAndDropManager } from './managers/drag-and-drop';
 export class Weave {
   private id: string;
   private emitter: Emittery;
+  private readonly hooks: Hookable;
   private config: WeaveConfig;
   private logger: WeaveLogger;
   private moduleLogger: Logger;
@@ -120,6 +123,7 @@ export class Weave {
     this.eventsController = undefined;
 
     this.emitter = new Emittery();
+    this.hooks = new Hookable();
 
     Konva.showWarnings = false;
 
@@ -889,6 +893,8 @@ export class Weave {
       parentId = this.getContainerByNodeId(node.key);
     }
 
+    const nodeInstance = this.getStage().findOne(`#${node.key}`);
+
     this.stateManager.removeNode(node);
 
     if (decoratedNode && emitUserChangeEvent) {
@@ -903,6 +909,10 @@ export class Weave {
       };
 
       this.addEventListener('onNodeRenderedRemoved', handleSendEvent);
+    }
+
+    if (nodeInstance) {
+      this.getHooks().callHook('weave:onRemoveNode', nodeInstance);
     }
 
     this.runPhaseHooks<{
@@ -1596,5 +1606,25 @@ export class Weave {
 
   getEventsController(): AbortController | undefined {
     return this.eventsController;
+  }
+
+  // HOOKS
+
+  getHooks(): Hookable {
+    return this.hooks;
+  }
+
+  // METADATA METHODS
+
+  getMetadata<T extends AllowedObject>(): T {
+    return this.getStore().getStateJson().weaveMetadata as T;
+  }
+
+  saveMetadata<T extends AllowedObject>(metadata: T): void {
+    const state = this.getStore().getState();
+
+    this.stateTransactional(() => {
+      this.stateManager.deepSyncSyncedStore<T>(state.weaveMetadata, metadata);
+    });
   }
 }

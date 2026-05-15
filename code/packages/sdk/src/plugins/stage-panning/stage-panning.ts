@@ -16,11 +16,7 @@ import {
   isInShadowDOM,
   mergeExceptArrays,
 } from '@/utils/utils';
-import type { WeaveNodesEdgeSnappingPlugin } from '../nodes-edge-snapping/nodes-edge-snapping';
-import type { WeaveNodesDistanceSnappingPlugin } from '../nodes-distance-snapping/nodes-distance-snapping';
 import type { WeaveNodesSelectionPlugin } from '../nodes-selection/nodes-selection';
-import { WEAVE_NODES_EDGE_SNAPPING_PLUGIN_KEY } from '../nodes-edge-snapping/constants';
-import { WEAVE_NODES_DISTANCE_SNAPPING_PLUGIN_KEY } from '../nodes-distance-snapping/constants';
 import { WEAVE_NODES_SELECTION_KEY } from '../nodes-selection/constants';
 import { WEAVE_CONTEXT_MENU_PLUGIN_KEY } from '../context-menu/constants';
 import type { WeaveStageGridPlugin } from '../stage-grid/stage-grid';
@@ -112,8 +108,6 @@ export class WeaveStagePanningPlugin extends WeavePlugin {
         if (e.code === 'Space') {
           this.getContextMenuPlugin()?.disable();
           this.getNodesSelectionPlugin()?.disable();
-          this.getNodesEdgeSnappingPlugin()?.disable();
-          this.getNodesDistanceSnappingPlugin()?.disable();
 
           this.isSpaceKeyPressed = true;
           this.setCursor();
@@ -128,8 +122,6 @@ export class WeaveStagePanningPlugin extends WeavePlugin {
         if (e.code === 'Space') {
           this.getContextMenuPlugin()?.enable();
           this.getNodesSelectionPlugin()?.enable();
-          this.getNodesEdgeSnappingPlugin()?.enable();
-          this.getNodesDistanceSnappingPlugin()?.enable();
 
           this.isSpaceKeyPressed = false;
           this.disableMove();
@@ -361,15 +353,6 @@ export class WeaveStagePanningPlugin extends WeavePlugin {
           stage.y(stage.y() + dy);
         }
 
-        if (isNearLeft || isNearRight || isNearTop || isNearBottom) {
-          this.getNodesEdgeSnappingPlugin()?.disable();
-          this.getNodesDistanceSnappingPlugin()?.disable();
-        }
-        if (!(isNearLeft || isNearRight || isNearTop || isNearBottom)) {
-          this.getNodesEdgeSnappingPlugin()?.enable();
-          this.getNodesDistanceSnappingPlugin()?.enable();
-        }
-
         this.getStageGridPlugin()?.renderGrid();
       }, duration);
     });
@@ -430,22 +413,6 @@ export class WeaveStagePanningPlugin extends WeavePlugin {
       WEAVE_NODES_SELECTION_KEY
     );
     return selectionPlugin;
-  }
-
-  getNodesEdgeSnappingPlugin() {
-    const snappingPlugin =
-      this.instance.getPlugin<WeaveNodesEdgeSnappingPlugin>(
-        WEAVE_NODES_EDGE_SNAPPING_PLUGIN_KEY
-      );
-    return snappingPlugin;
-  }
-
-  getNodesDistanceSnappingPlugin() {
-    const snappingPlugin =
-      this.instance.getPlugin<WeaveNodesDistanceSnappingPlugin>(
-        WEAVE_NODES_DISTANCE_SNAPPING_PLUGIN_KEY
-      );
-    return snappingPlugin;
   }
 
   getStageGridPlugin() {
