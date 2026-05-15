@@ -873,6 +873,12 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
     );
   }
 
+  removeElement(element: WeaveStateElement): void {
+    this.instance.removeNode(element);
+    this.selectNone();
+    this.triggerSelectedNodesEvent();
+  }
+
   removeSelectedNodes(): void {
     const selectedNodes = this.getSelectedNodes();
     const mappedSelectedNodes = selectedNodes

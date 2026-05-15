@@ -92,9 +92,10 @@ export class WeaveFrameNode extends WeaveNode {
       containerId: `${id}-group-internal`,
       measureContainerId: `${id}-selection-area`,
       containerOffsetX: 0,
-      containerOffsetY: borderWidth,
-      containerCompensationX: borderWidth,
-      containerCompensationY: borderWidth,
+      containerOffsetY: 0,
+      containerCompensationX: 0,
+      containerCompensationY: 0,
+      borderWidth: borderWidth,
       width: props.frameWidth,
       height: props.frameHeight,
       fill: 'transparent',
@@ -121,21 +122,39 @@ export class WeaveFrameNode extends WeaveNode {
     const background = new Konva.Rect({
       id: `${id}-bg`,
       nodeId: id,
-      x: 0,
-      y: 0,
+      x: -borderWidth,
+      y: -borderWidth,
       onTargetEnter: false,
-      width: props.frameWidth,
+      width: props.frameWidth + borderWidth * 2,
+      height: props.frameHeight + borderWidth * 2,
       stroke: borderColor,
-      strokeWidth: borderWidth,
+      strokeWidth: 0,
       strokeScaleEnabled: true,
       shadowForStrokeEnabled: false,
-      height: props.frameHeight,
       fill: frameParams.frameBackground ?? WEAVE_FRAME_DEFAULT_BACKGROUND_COLOR,
       listening: false,
       draggable: false,
     });
 
+    const backgroundBorder = new Konva.Rect({
+      id: `${id}-bg-border`,
+      nodeId: id,
+      x: -borderWidth / 2,
+      y: -borderWidth / 2,
+      onTargetEnter: false,
+      width: props.frameWidth + borderWidth,
+      height: props.frameHeight + borderWidth,
+      stroke: borderColor,
+      strokeWidth: borderWidth,
+      strokeScaleEnabled: true,
+      shadowForStrokeEnabled: false,
+      fill: 'transparent',
+      listening: false,
+      draggable: false,
+    });
+
     frameInternalGroup.add(background);
+    frameInternalGroup.add(backgroundBorder);
 
     const stage = this.instance.getStage();
 
@@ -178,10 +197,11 @@ export class WeaveFrameNode extends WeaveNode {
     const frameInternal = new Konva.Group({
       id: `${id}-group-internal`,
       nodeId: id,
-      x: borderWidth,
-      y: borderWidth,
-      width: props.frameWidth - borderWidth * 2,
-      height: props.frameHeight - borderWidth * 2,
+      x: 0,
+      y: 0,
+      width: props.frameWidth,
+      height: props.frameHeight,
+      strokeWidth: 0,
       strokeScaleEnabled: true,
       listening: true,
       draggable: false,
@@ -189,23 +209,28 @@ export class WeaveFrameNode extends WeaveNode {
     });
 
     frameInternal.clip({
-      x: -(borderWidth / 2) * frameInternal.scaleX(),
-      y: -(borderWidth / 2) * frameInternal.scaleX(),
-      width: (frameInternal.width() + borderWidth) * frameInternal.scaleX(),
-      height: (frameInternal.height() + borderWidth) * frameInternal.scaleY(),
+      x: 0 * frameInternal.scaleX(),
+      y: 0 * frameInternal.scaleX(),
+      width: frameInternal.width() * frameInternal.scaleX(),
+      height: frameInternal.height() * frameInternal.scaleY(),
     });
 
     frame.add(frameInternal);
 
     const selectionArea = new Konva.Rect({
       ...frameParams,
-      x: 0,
-      y: 0,
-      width: props.frameWidth,
-      height: props.frameHeight,
+      x: -borderWidth / 2,
+      y: -borderWidth / 2,
+      width: props.frameWidth + borderWidth,
+      height: props.frameHeight + borderWidth,
       hitFunc: function (ctx, shape) {
         ctx.beginPath();
-        ctx.rect(0, -textHeight, props.frameWidth, textHeight);
+        ctx.rect(
+          -borderWidth / 2,
+          -textHeight,
+          props.frameWidth + borderWidth,
+          textHeight
+        );
         ctx.fillStrokeShape(shape);
       },
       strokeWidth: 0,
@@ -219,13 +244,18 @@ export class WeaveFrameNode extends WeaveNode {
     });
 
     const containerArea = new Konva.Rect({
-      x: 0,
-      y: 0,
-      width: props.frameWidth,
-      height: props.frameHeight,
+      x: borderWidth,
+      y: borderWidth,
+      width: props.frameWidth + borderWidth,
+      height: props.frameHeight + borderWidth,
       hitFunc: function (ctx, shape) {
         ctx.beginPath();
-        ctx.rect(0, -textHeight, props.frameWidth, textHeight);
+        ctx.rect(
+          -borderWidth / 2,
+          -textHeight,
+          props.frameWidth + borderWidth,
+          textHeight
+        );
         ctx.fillStrokeShape(shape);
       },
       strokeWidth: 0,
@@ -276,7 +306,12 @@ export class WeaveFrameNode extends WeaveNode {
     this.instance.addEventListener('onZoomChange', () => {
       selectionArea.hitFunc(function (ctx, shape) {
         ctx.beginPath();
-        ctx.rect(0, -textHeight, props.frameWidth, textHeight);
+        ctx.rect(
+          -borderWidth / 2,
+          -textHeight,
+          props.frameWidth + borderWidth,
+          textHeight
+        );
         ctx.fillStrokeShape(shape);
       });
     });
@@ -287,7 +322,7 @@ export class WeaveFrameNode extends WeaveNode {
       background.setAttrs({
         onTargetEnter: false,
         stroke: borderColor,
-        strokeWidth: borderWidth,
+        // strokeWidth: borderWidth,
         fill:
           frameParams.frameBackground ?? WEAVE_FRAME_DEFAULT_BACKGROUND_COLOR,
       });
@@ -297,7 +332,7 @@ export class WeaveFrameNode extends WeaveNode {
       background.setAttrs({
         onTargetEnter: true,
         stroke: onTargetEnterBorderColor,
-        strokeWidth: borderWidth,
+        // strokeWidth: borderWidth,
         fill: onTargetEnterFill,
       });
     });
@@ -311,10 +346,10 @@ export class WeaveFrameNode extends WeaveNode {
     };
 
     frame.clip({
-      x: 0,
+      x: -borderWidth,
       y: text.y(),
-      width: frame.width(),
-      height: frame.height() + text.height(),
+      width: frame.width() + 2 * borderWidth,
+      height: frame.height() + 2 * borderWidth + text.height(),
     });
 
     return frame;
@@ -334,7 +369,7 @@ export class WeaveFrameNode extends WeaveNode {
       ...newProps,
       name: 'node containerCapable',
       containerOffsetX: 0,
-      containerOffsetY: borderWidth,
+      containerOffsetY: 0,
       clip: undefined,
     });
 
@@ -366,7 +401,12 @@ export class WeaveFrameNode extends WeaveNode {
 
       selectionArea.hitFunc(function (ctx, shape) {
         ctx.beginPath();
-        ctx.rect(0, -textHeight, nextProps.frameWidth, textHeight);
+        ctx.rect(
+          -borderWidth / 2,
+          -textHeight,
+          nextProps.frameWidth + borderWidth,
+          textHeight
+        );
         ctx.fillStrokeShape(shape);
       });
     }

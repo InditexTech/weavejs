@@ -20,6 +20,13 @@ export class GroupFrame extends Konva.Group {
     }
 
     const rect = containerArea.getClientRect(config);
-    return rect;
+    const attrs = this.getAttrs();
+
+    return {
+      x: rect.x - attrs.borderWidth,
+      y: rect.y - attrs.borderWidth,
+      width: rect.width + attrs.borderWidth,
+      height: rect.height + attrs.borderWidth,
+    };
   }
 }
