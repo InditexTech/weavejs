@@ -42,6 +42,10 @@ export async function downscaleImageFile(
 ): Promise<Blob> {
   const bitmap = await createImageBitmap(file);
 
+  if (bitmap.width === 0) {
+    throw new Error('Invalid image', { cause: 'InvalidImage' });
+  }
+
   const width = Math.round(bitmap.width * ratio);
   const height = Math.round(bitmap.height * ratio);
 
@@ -65,6 +69,11 @@ export function getImageSizeFromFile(
     const url = URL.createObjectURL(file);
 
     img.onload = () => {
+      if (img.naturalWidth === 0) {
+        reject(new Error('Invalid image', { cause: 'InvalidImage' }));
+        return;
+      }
+
       resolve({
         width: img.naturalWidth,
         height: img.naturalHeight,
@@ -72,7 +81,9 @@ export function getImageSizeFromFile(
       URL.revokeObjectURL(url);
     };
 
-    img.onerror = reject;
+    img.onerror = () => {
+      reject(new Error('Invalid image', { cause: 'InvalidImage' }));
+    };
     img.src = url;
   });
 }
@@ -117,6 +128,11 @@ export const downscaleImageFromURL = (
     img.crossOrigin = crossOrigin;
 
     img.onload = () => {
+      if (img.naturalWidth === 0) {
+        reject(new Error('Invalid image', { cause: 'InvalidImage' }));
+        return;
+      }
+
       const ratio = Math.min(maxWidth / img.width, maxHeight / img.height, 1);
 
       const width = Math.round(img.width * ratio);
@@ -132,7 +148,9 @@ export const downscaleImageFromURL = (
       resolve(canvas.toDataURL(type));
     };
 
-    img.onerror = reject;
+    img.onerror = () => {
+      reject(new Error('Invalid image', { cause: 'InvalidImage' }));
+    };
     img.src = url;
   });
 };
