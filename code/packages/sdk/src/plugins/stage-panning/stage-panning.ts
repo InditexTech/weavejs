@@ -142,8 +142,8 @@ export class WeaveStagePanningPlugin extends WeavePlugin {
 
     stage.on('pointerdown', (e) => {
       this.pointers.set(e.evt.pointerId, {
-        x: e.evt.clientX,
-        y: e.evt.clientY,
+        x: e?.evt?.clientX ?? 0,
+        y: e?.evt?.clientY ?? 0,
       });
 
       if (this.pointers.size > 1) {
@@ -158,15 +158,15 @@ export class WeaveStagePanningPlugin extends WeavePlugin {
         this.moveToolActive = true;
       }
 
-      if (e.evt.pointerType === 'mouse' && e.evt.buttons === 1) {
+      if (e.evt.pointerType === 'mouse' && e?.evt?.buttons === 1) {
         this.isMouseLeftButtonPressed = true;
       }
 
-      if (e.evt.pointerType === 'mouse' && e.evt.buttons === 4) {
+      if (e.evt.pointerType === 'mouse' && e?.evt?.buttons === 4) {
         this.isMouseMiddleButtonPressed = true;
       }
 
-      const isTouchOrPen = ['touch', 'pen'].includes(e.evt.pointerType);
+      const isTouchOrPen = ['touch', 'pen'].includes(e?.evt?.pointerType);
 
       if (
         this.enabled &&
@@ -186,7 +186,9 @@ export class WeaveStagePanningPlugin extends WeavePlugin {
     });
 
     stage.on('pointercancel', (e) => {
-      this.pointers.delete(e.evt.pointerId);
+      if (e?.evt?.pointerId) {
+        this.pointers.delete(e.evt.pointerId);
+      }
 
       lastPos = null;
     });
