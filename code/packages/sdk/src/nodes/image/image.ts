@@ -922,7 +922,7 @@ export class WeaveImageNode extends WeaveNode {
       onError,
     }: {
       onLoad: () => void;
-      onError: (error: string | Event) => void;
+      onError: (error: Error) => void;
       node?: Konva.Group;
     }
   ): void {
@@ -930,17 +930,36 @@ export class WeaveImageNode extends WeaveNode {
 
     this.imageFallback[imageId] = Konva.Util.createImageElement();
     this.imageFallback[imageId].crossOrigin = this.config.crossOrigin;
-    this.imageFallback[imageId].onerror = (error) => {
+    this.imageFallback[imageId].onerror = () => {
       this.imageState[imageId] = {
         status: 'error-fallback',
         loaded: false,
         error: true,
       };
 
-      onError(error);
+      onError(
+        new Error(`Failed to load fallback image from provided URL`, {
+          cause: 'ErrorLoadingFallbackImage',
+        })
+      );
     };
 
     this.imageFallback[imageId].onload = async () => {
+      if (this.imageFallback[imageId].width === 0) {
+        this.imageState[imageId] = {
+          status: 'error-fallback',
+          loaded: false,
+          error: true,
+        };
+
+        onError(
+          new Error(`Invalid fallback image provided`, {
+            cause: 'InvalidFallbackImage',
+          })
+        );
+        return;
+      }
+
       this.imageState[imageId] = {
         status: 'loading',
         loaded: true,
@@ -971,7 +990,7 @@ export class WeaveImageNode extends WeaveNode {
       onError,
     }: {
       onLoad: () => void;
-      onError: (error: string | Event) => void;
+      onError: (error: Error) => void;
       node?: Konva.Group;
     },
     loadingTryout = false
@@ -985,7 +1004,7 @@ export class WeaveImageNode extends WeaveNode {
 
     this.imageSource[imageId] = Konva.Util.createImageElement();
     this.imageSource[imageId].crossOrigin = this.config.crossOrigin;
-    this.imageSource[imageId].onerror = (error) => {
+    this.imageSource[imageId].onerror = () => {
       if (!loadingTryout) {
         const stage = this.instance.getStage();
         const image = stage.findOne(`#${imageId}`);
@@ -994,10 +1013,23 @@ export class WeaveImageNode extends WeaveNode {
         }
       }
 
-      onError(error);
+      onError(
+        new Error(`Failed to load image from provided URL`, {
+          cause: 'ErrorLoadingImage',
+        })
+      );
     };
 
     this.imageSource[imageId].onload = async () => {
+      if (this.imageSource[imageId].width === 0) {
+        onError(
+          new Error(`Invalid image provided`, {
+            cause: 'InvalidImage',
+          })
+        );
+        return;
+      }
+
       const stage = this.instance.getStage();
 
       if (!this.instance.isServerSide()) {
@@ -1167,7 +1199,12 @@ export class WeaveImageNode extends WeaveNode {
           }
         },
         onError: (error) => {
-          if (!this.config.useFallbackImage) {
+          let isInvalidImage = false;
+          if (error.cause === 'InvalidImage') {
+            isInvalidImage = true;
+          }
+
+          if (!this.config.useFallbackImage && !isInvalidImage) {
             const tryoutAttempts = this.imageTryoutAttempts[id] ?? 0;
 
             if (
@@ -1181,7 +1218,7 @@ export class WeaveImageNode extends WeaveNode {
             }
           }
 
-          if (loadTryout) {
+          if (loadTryout && !isInvalidImage) {
             const tryoutAttempts = this.imageTryoutAttempts[id] ?? 0;
 
             if (
@@ -1214,22 +1251,7 @@ export class WeaveImageNode extends WeaveNode {
 
           this.setErrorState(id, image);
 
-          image.setAttrs({
-            image: undefined,
-          });
-
-          console.error('Error loading image', error);
-
           this.resolveAsyncElement(id);
-
-          imagePlaceholder?.setAttrs({
-            visible: true,
-          });
-          internalImage?.setAttrs({
-            visible: false,
-          });
-
-          this.cacheNode(image);
         },
       },
       loadTryout
