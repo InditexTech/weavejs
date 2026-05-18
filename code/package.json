@@ -26,7 +26,7 @@
     "pack": "nx run-many -t pack",
     "prepare": "cd ../ && node code/.husky/install.mjs",
     "publish:snapshot": "nx run-many -t publish:snapshot -- --verbose --unsafe-perm",
-    "release:perform": "nx run-many -t release:perform -- --verbose --unsafe-perm --tag=v3",
+    "release:perform": "nx run-many -t release:perform -- --verbose --unsafe-perm --tag=v3-latest",
     "release:prepare": "nx run-many -t release:prepare",
     "release": "nx run-many -t release",
     "reset": "nx reset",
