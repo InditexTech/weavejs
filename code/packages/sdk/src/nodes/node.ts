@@ -615,8 +615,8 @@ export abstract class WeaveNode implements WeaveNodeBase {
             nodesSelectionPlugin?.setSelectedNodes(
               this.instance.getCloningManager().getClones()
             );
-            if (clone && clone.getStage()) {
-              clone?.startDrag(e.evt);
+            if (clone?.getStage()) {
+              clone.startDrag(e.evt);
             }
           });
         }
