@@ -142,7 +142,7 @@ export class WeaveBrushToolAction extends WeaveAction {
         return;
       }
 
-      if (e.evt.button !== 0) {
+      if (e?.evt?.button !== 0) {
         return;
       }
 

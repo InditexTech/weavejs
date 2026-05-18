@@ -493,8 +493,10 @@ export abstract class WeaveNode implements WeaveNodeBase {
       node.on('dragstart', (e) => {
         const nodeTarget = e.target;
 
+        if (!e.evt) return;
+
         let isWheelMousePressed = false;
-        if (e.evt.button === 1) {
+        if (e.evt?.button === 1) {
           isWheelMousePressed = true;
         }
 
@@ -602,7 +604,7 @@ export abstract class WeaveNode implements WeaveNodeBase {
         const nodeTarget = e.target;
 
         let isWheelMousePressed = false;
-        if (e.evt.button === 1) {
+        if (e.evt?.button === 1) {
           isWheelMousePressed = true;
         }
 

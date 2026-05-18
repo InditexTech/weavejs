@@ -431,8 +431,10 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
     tr.on('dragstart', (e) => {
       this.dragInProcess = true;
 
+      if (!e?.evt) return;
+
       let isWheelMousePressed = false;
-      if (e.evt.button === 1) {
+      if (e.evt?.button === 1) {
         isWheelMousePressed = true;
       }
 
@@ -493,7 +495,7 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
       const actualPos = { x: e.target.x(), y: e.target.y() };
 
       let isWheelMousePressed = false;
-      if (e.evt.button === 1) {
+      if (e.evt?.button === 1) {
         isWheelMousePressed = true;
       }
 
@@ -1141,11 +1143,11 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
         return;
       }
 
-      if (e.evt.pointerType === 'mouse' && e.evt.button !== 0) {
+      if (e.evt.pointerType === 'mouse' && e.evt?.button !== 0) {
         return;
       }
 
-      if (e.evt.pointerType === 'pen' && e.evt.pressure <= 0.05) {
+      if (e.evt.pointerType === 'pen' && e.evt?.pressure <= 0.05) {
         return;
       }
 
@@ -1236,9 +1238,11 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
     const handleMouseMove = (
       e: KonvaEventObject<PointerEvent, Konva.Stage>
     ) => {
+      if (!e?.evt) return;
+
       const moved = this.checkMoved(e);
 
-      if (e.evt.buttons === 0) {
+      if (e.evt?.buttons === 0) {
         return;
       }
 
@@ -1595,7 +1599,7 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
       return;
     }
 
-    if (e.evt.pointerType === 'mouse' && e.evt.button && e.evt.button !== 0) {
+    if (e.evt.pointerType === 'mouse' && e.evt?.button && e.evt?.button !== 0) {
       return;
     }
 
