@@ -57,6 +57,33 @@ export const augmentKonvaNodeClass = (
   Konva.Node.prototype.closeCrop = function () {};
   Konva.Node.prototype.resetCrop = function () {};
   Konva.Node.prototype.dblClick = function () {};
+  Konva.Node.prototype.allowedAnchors = function () {
+    return [];
+  };
+  Konva.Node.prototype.isSelectable = function () {
+    return true;
+  };
+  Konva.Node.prototype.handleMouseover = function () {};
+  Konva.Node.prototype.handleMouseout = function () {};
+  Konva.Node.prototype.handleSelectNode = function () {};
+  Konva.Node.prototype.handleDeselectNode = function () {};
+  Konva.Node.prototype.defineMousePointer = function () {
+    return 'default';
+  };
+  Konva.Node.prototype.canBeHovered = function () {
+    return false;
+  };
+  Konva.Node.prototype.canDrag = function () {
+    return false;
+  };
+  Konva.Node.prototype.canMoveToContainer = function () {
+    return false;
+  };
+  Konva.Node.prototype.getNodeAnchors = function () {
+    return [];
+  };
+  Konva.Node.prototype.lockMutex = function () {};
+  Konva.Node.prototype.releaseMutex = function () {};
 };
 
 export abstract class WeaveNode implements WeaveNodeBase {
@@ -502,7 +529,10 @@ export abstract class WeaveNode implements WeaveNodeBase {
 
         this.getNodesSelectionFeedbackPlugin()?.hideSelectionHalo(nodeTarget);
 
-        const canMove = nodeTarget?.canDrag() ?? false;
+        const canMove =
+          typeof nodeTarget?.canDrag === 'function'
+            ? nodeTarget.canDrag()
+            : false;
 
         if (!canMove) {
           nodeTarget.stopDrag();
