@@ -88,13 +88,7 @@ export class WeaveVideoNode extends WeaveNode {
     this.videoPlaceholder[id].crossOrigin = this.config.crossOrigin;
     this.videoPlaceholder[id].src = realVideoPlaceholderURL;
 
-    this.videoPlaceholder[id].onerror = (error) => {
-      console.error(
-        'Error loading video placeholder',
-        realVideoPlaceholderURL,
-        error
-      );
-
+    this.videoPlaceholder[id].onerror = () => {
       this.resolveAsyncElement(id);
     };
 

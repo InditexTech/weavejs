@@ -115,11 +115,11 @@ export class WeaveStageGridPlugin extends WeavePlugin {
     stage.on('pointerdown', (e) => {
       const activeAction = this.instance.getActiveAction();
 
-      if (e && e.evt.button === 0 && activeAction === MOVE_TOOL_ACTION_NAME) {
+      if (e && e?.evt?.button === 0 && activeAction === MOVE_TOOL_ACTION_NAME) {
         this.moveToolActive = true;
       }
 
-      if (e && (e.evt.button === 2 || e.evt.buttons === 4)) {
+      if (e && (e?.evt?.button === 2 || e?.evt?.buttons === 4)) {
         this.isMouseMiddleButtonPressed = true;
       }
     });
@@ -127,11 +127,11 @@ export class WeaveStageGridPlugin extends WeavePlugin {
     stage.on('pointerup', (e) => {
       const activeAction = this.instance.getActiveAction();
 
-      if (e && e.evt.button === 0 && activeAction === MOVE_TOOL_ACTION_NAME) {
+      if (e && e?.evt?.button === 0 && activeAction === MOVE_TOOL_ACTION_NAME) {
         this.moveToolActive = false;
       }
 
-      if (e && (e.evt.button === 1 || e.evt.buttons === 0)) {
+      if (e && (e?.evt?.button === 1 || e?.evt?.buttons === 0)) {
         this.isMouseMiddleButtonPressed = false;
       }
     });

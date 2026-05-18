@@ -57,6 +57,33 @@ export const augmentKonvaNodeClass = (
   Konva.Node.prototype.closeCrop = function () {};
   Konva.Node.prototype.resetCrop = function () {};
   Konva.Node.prototype.dblClick = function () {};
+  Konva.Node.prototype.allowedAnchors = function () {
+    return [];
+  };
+  Konva.Node.prototype.isSelectable = function () {
+    return true;
+  };
+  Konva.Node.prototype.handleMouseover = function () {};
+  Konva.Node.prototype.handleMouseout = function () {};
+  Konva.Node.prototype.handleSelectNode = function () {};
+  Konva.Node.prototype.handleDeselectNode = function () {};
+  Konva.Node.prototype.defineMousePointer = function () {
+    return 'default';
+  };
+  Konva.Node.prototype.canBeHovered = function () {
+    return false;
+  };
+  Konva.Node.prototype.canDrag = function () {
+    return false;
+  };
+  Konva.Node.prototype.canMoveToContainer = function () {
+    return false;
+  };
+  Konva.Node.prototype.getNodeAnchors = function () {
+    return [];
+  };
+  Konva.Node.prototype.lockMutex = function () {};
+  Konva.Node.prototype.releaseMutex = function () {};
 };
 
 export abstract class WeaveNode implements WeaveNodeBase {
@@ -493,14 +520,19 @@ export abstract class WeaveNode implements WeaveNodeBase {
       node.on('dragstart', (e) => {
         const nodeTarget = e.target;
 
+        if (!e.evt) return;
+
         let isWheelMousePressed = false;
-        if (e.evt.button === 1) {
+        if (e.evt?.button === 1) {
           isWheelMousePressed = true;
         }
 
         this.getNodesSelectionFeedbackPlugin()?.hideSelectionHalo(nodeTarget);
 
-        const canMove = nodeTarget?.canDrag() ?? false;
+        const canMove =
+          typeof nodeTarget?.canDrag === 'function'
+            ? nodeTarget.canDrag()
+            : false;
 
         if (!canMove) {
           nodeTarget.stopDrag();
@@ -586,7 +618,9 @@ export abstract class WeaveNode implements WeaveNodeBase {
             nodesSelectionPlugin?.setSelectedNodes(
               this.instance.getCloningManager().getClones()
             );
-            clone?.startDrag(e.evt);
+            if (clone?.getStage()) {
+              clone.startDrag(e.evt);
+            }
           });
         }
 
@@ -602,7 +636,7 @@ export abstract class WeaveNode implements WeaveNodeBase {
         const nodeTarget = e.target;
 
         let isWheelMousePressed = false;
-        if (e.evt.button === 1) {
+        if (e.evt?.button === 1) {
           isWheelMousePressed = true;
         }
 
@@ -974,7 +1008,9 @@ export abstract class WeaveNode implements WeaveNodeBase {
     ) {
       showHover = true;
       stage.container().style.cursor =
-        realNode?.defineMousePointer() ?? 'pointer';
+        (typeof node?.defineMousePointer === 'function'
+          ? node.defineMousePointer()
+          : null) ?? 'pointer';
       cancelBubble = true;
     }
 
@@ -989,7 +1025,10 @@ export abstract class WeaveNode implements WeaveNodeBase {
       stage.mode() === WEAVE_STAGE_DEFAULT_MODE
     ) {
       showHover = true;
-      stage.container().style.cursor = realNode?.defineMousePointer() ?? 'grab';
+      stage.container().style.cursor =
+        (typeof node?.defineMousePointer === 'function'
+          ? node.defineMousePointer()
+          : null) ?? 'grab';
       cancelBubble = true;
     }
 

@@ -17,7 +17,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - [#1064](https://github.com/InditexTech/weavejs/issues/1064) Fix unnecessary console.log type errors / undefined errors in SDK
 - [#1065](https://github.com/InditexTech/weavejs/issues/1065) Fix error cannot set properties of undefined (setting 'dragStatus'), avoid console.log imprint
-- [#1066](https://github.com/InditexTech/weavejs/issues/1066) Fix error failed to execute 'drawImage' on 'CanvasRenderingContext2D', when the image provided is in the 'broken' state
+- [#1066](https://github.com/InditexTech/weavejs/issues/1066) Failed to execute 'drawImage' on 'CanvasRenderingContext2D': The HTMLImageElement provided is in the 'broken' state
 - [#1067](https://github.com/InditexTech/weavejs/issues/1067) Avoid console.log error `Cannot read properties of undefined (reading 'previousAction')` in zoom / fit actions
 - [#1068](https://github.com/InditexTech/weavejs/issues/1068) Avoid console.log errors from: canDrag is not a function
 - [#1069](https://github.com/InditexTech/weavejs/issues/1069) Avoid console.log error `defineMousePointer is not a function`
