@@ -16,6 +16,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 - [#1064](https://github.com/InditexTech/weavejs/issues/1064) Fix unnecessary console.log type errors / undefined errors in SDK
+- [#1065](https://github.com/InditexTech/weavejs/issues/1065) Fix error cannot set properties of undefined (setting 'dragStatus'), avoid console.log imprint
+- [#1067](https://github.com/InditexTech/weavejs/issues/1067) Avoid console.log error `Cannot read properties of undefined (reading 'previousAction')` in zoom / fit actions
 
 ## [4.0.0] - 2026-05-15
 
