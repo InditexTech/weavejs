@@ -333,7 +333,10 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
 
       if (nodesSelected.length === 1) {
         const node = nodesSelected[0];
-        stage.container().style.cursor = node.defineMousePointer?.() ?? 'grab';
+        stage.container().style.cursor =
+          (typeof node?.defineMousePointer === 'function'
+            ? node.defineMousePointer()
+            : null) ?? 'grab';
       } else {
         stage.container().style.cursor = 'grab';
       }
@@ -1712,7 +1715,9 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
       stage.container().tabIndex = 1;
       stage.container().focus();
       stage.container().style.cursor =
-        nodeTargeted.defineMousePointer?.() ?? 'grab';
+        (typeof nodeTargeted?.defineMousePointer === 'function'
+          ? nodeTargeted.defineMousePointer()
+          : null) ?? 'grab';
     }
 
     this.triggerSelectedNodesEvent();

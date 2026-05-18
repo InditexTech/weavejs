@@ -19,6 +19,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - [#1065](https://github.com/InditexTech/weavejs/issues/1065) Fix error cannot set properties of undefined (setting 'dragStatus'), avoid console.log imprint
 - [#1067](https://github.com/InditexTech/weavejs/issues/1067) Avoid console.log error `Cannot read properties of undefined (reading 'previousAction')` in zoom / fit actions
 - [#1068](https://github.com/InditexTech/weavejs/issues/1068) Avoid console.log errors from: canDrag is not a function
+- [#1069](https://github.com/InditexTech/weavejs/issues/1069) Avoid console.log error `defineMousePointer is not a function`
 
 ## [4.0.0] - 2026-05-15
 

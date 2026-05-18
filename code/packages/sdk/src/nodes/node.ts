@@ -1006,7 +1006,9 @@ export abstract class WeaveNode implements WeaveNodeBase {
     ) {
       showHover = true;
       stage.container().style.cursor =
-        realNode?.defineMousePointer() ?? 'pointer';
+        (typeof node?.defineMousePointer === 'function'
+          ? node.defineMousePointer()
+          : null) ?? 'pointer';
       cancelBubble = true;
     }
 
@@ -1021,7 +1023,10 @@ export abstract class WeaveNode implements WeaveNodeBase {
       stage.mode() === WEAVE_STAGE_DEFAULT_MODE
     ) {
       showHover = true;
-      stage.container().style.cursor = realNode?.defineMousePointer() ?? 'grab';
+      stage.container().style.cursor =
+        (typeof node?.defineMousePointer === 'function'
+          ? node.defineMousePointer()
+          : null) ?? 'grab';
       cancelBubble = true;
     }
 
