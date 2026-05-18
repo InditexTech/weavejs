@@ -50,7 +50,7 @@ export class WeaveFitToScreenToolAction extends WeaveAction {
       });
     }
 
-    this.previousAction = params.previousAction;
+    this.previousAction = params?.previousAction;
     this.cancelAction = cancelAction;
 
     this.cancelAction();
@@ -59,7 +59,7 @@ export class WeaveFitToScreenToolAction extends WeaveAction {
   cleanup(): void {
     const stage = this.instance.getStage();
 
-    if (this.previousAction !== undefined) {
+    if (this.previousAction) {
       this.instance.triggerAction(this.previousAction);
     }
 

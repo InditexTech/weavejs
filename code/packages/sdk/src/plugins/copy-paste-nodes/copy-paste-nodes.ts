@@ -39,6 +39,9 @@ import {
 import type { WeaveStageGridPlugin } from '../stage-grid/stage-grid';
 import type Konva from 'konva';
 import type { Weave } from '@/weave';
+import { FIT_TO_SELECTION_TOOL_ACTION_NAME } from '@/actions/fit-to-selection-tool/constants';
+import { SELECTION_TOOL_ACTION_NAME } from '@/actions/selection-tool/constants';
+import type { WeaveFitToSelectionToolActionParams } from '@/actions/fit-to-selection-tool/types';
 
 export class WeaveCopyPasteNodesPlugin extends WeavePlugin {
   protected state!: WeaveCopyPasteNodesPluginState;
@@ -398,8 +401,11 @@ export class WeaveCopyPasteNodesPlugin extends WeavePlugin {
           const nodesSelectionPlugin = this.getNodesSelectionPlugin();
           nodesSelectionPlugin?.setSelectedNodes(realNodes);
 
-          this.instance?.triggerAction('fitToSelectionTool', {
-            previousAction: 'selectionTool',
+          this.instance?.triggerAction<
+            WeaveFitToSelectionToolActionParams,
+            void
+          >(FIT_TO_SELECTION_TOOL_ACTION_NAME, {
+            previousAction: SELECTION_TOOL_ACTION_NAME,
             smartZoom: true,
           });
 
