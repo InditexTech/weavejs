@@ -9,11 +9,6 @@ import 'konva/lib/Node';
 declare module 'konva/lib/Node' {
   interface Node {
     getTransformerProperties(): WeaveNodeTransformerProperties;
-    triggerCrop(): void;
-    closeCrop(type: WeaveImageCropEndType): void;
-    resetCrop(): void;
-    allowedAnchors(): string[];
-    realTopLeftOffset(): Vector2d;
     getExportClientRect(
       config?:
         | {
@@ -44,9 +39,12 @@ declare module 'konva/lib/Node' {
       width: number;
       height: number;
     };
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     updatePosition(position: Vector2d): void;
+    triggerCrop(): void;
+    closeCrop(type: WeaveImageCropEndType): void;
+    resetCrop(): void;
     dblClick(): void;
+    allowedAnchors(): string[];
     isSelectable(): boolean;
     handleMouseover(e: KonvaEventObject): void;
     handleMouseout(e: KonvaEventObject): void;
