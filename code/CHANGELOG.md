@@ -15,7 +15,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
-- [#1064](https://github.com/InditexTech/weavejs/issues/1064) Fix unnecessary console.log type errors / undefined errors
+- [#1064](https://github.com/InditexTech/weavejs/issues/1064) Fix unnecessary console.log type errors / undefined errors in SDK
+- [#1065](https://github.com/InditexTech/weavejs/issues/1065) Fix error cannot set properties of undefined (setting 'dragStatus'), avoid console.log imprint
 
 ## [3.9.1] - 2026-05-13
 
