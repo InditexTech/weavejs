@@ -117,8 +117,8 @@ export class WeaveStrokeNode extends WeaveNode {
       const nx = -dy / segLen;
       const ny = dx / segLen;
 
-      const w0 = (baseW * p0.pressure) / 2;
-      const w1 = (baseW * p1.pressure) / 2;
+      const w0 = Math.max((baseW * p0.pressure) / 2, 0.5);
+      const w1 = Math.max((baseW * p1.pressure) / 2, 0.5);
 
       let traveled = 0;
 
