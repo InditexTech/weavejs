@@ -22,7 +22,7 @@ export * from './utils/image';
 // Types
 export * from './types';
 
-// State low-level manipulation
+// Document state API for low-level manipulation
 export * from './state.manipulation';
 
 // Store
