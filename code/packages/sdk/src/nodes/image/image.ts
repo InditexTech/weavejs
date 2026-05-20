@@ -2,12 +2,13 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
+import { z } from 'zod';
 import Konva from 'konva';
 import {
   type WeaveElementAttributes,
   type WeaveElementInstance,
 } from '@inditextech/weave-types';
-import { WeaveNode } from '../node';
+import { getNodeBaseSchema, WeaveNode } from '../node';
 import {
   type ImageProps,
   type WeaveImageCropAnchorPosition,
@@ -1513,5 +1514,41 @@ export class WeaveImageNode extends WeaveNode {
 
     this.getNodesSelectionPlugin()?.setSelectedNodes([image]);
     this.getNodesSelectionPlugin()?.getHoverTransformer().forceUpdate();
+  }
+
+  static getSchema() {
+    const baseSchema = getNodeBaseSchema();
+
+    const imageNodeSchema = baseSchema.extend({
+      type: z.literal('image'),
+      props: z.object({
+        nodeType: z.literal('image'),
+
+        imageURL: z.string(),
+        imageFallback: z.string().optional(),
+
+        adding: z.boolean().default(false),
+
+        stroke: z.string().default('#000000ff'),
+        strokeWidth: z.number().default(0),
+        strokeScaleEnabled: z.boolean().default(true),
+
+        imageId: z.string().optional(),
+        imageWidth: z.number(),
+        imageHeight: z.number(),
+        imageInfo: z.object({
+          width: z.number(),
+          height: z.number(),
+        }),
+
+        uncroppedImage: z.object({
+          width: z.number(),
+          height: z.number(),
+        }),
+        cropping: z.boolean().default(false),
+      }),
+    });
+
+    return imageNodeSchema;
   }
 }

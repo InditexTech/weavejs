@@ -2,13 +2,14 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
+import { z } from 'zod';
 import Konva from 'konva';
 import {
   type WeaveElementAttributes,
   type WeaveElementInstance,
   type WeaveStateElement,
 } from '@inditextech/weave-types';
-import { WeaveNode } from '@/nodes/node';
+import { getNodeBaseSchema, WeaveNode } from '@/nodes/node';
 import { WeaveNodesSelectionPlugin } from '@/plugins/nodes-selection/nodes-selection';
 import { getTopmostShadowHost, isInShadowDOM, resetScale } from '@/utils/utils';
 import {
@@ -1129,5 +1130,39 @@ export class WeaveTextNode extends WeaveNode {
     textNode.width(textAreaWidth);
 
     this.instance.updateNode(this.serialize(textNode));
+  }
+
+  static getSchema() {
+    const baseSchema = getNodeBaseSchema();
+
+    const textNodeSchema = baseSchema.extend({
+      type: z.literal('text'),
+      props: z.object({
+        nodeType: z.literal('text'),
+
+        fontFamily: z.string().default('Arial'),
+        fontSize: z.number().default(16),
+        fontStyle: z.string().default('normal'),
+        fontVariant: z.string().default('normal'),
+        textDecoration: z.string().default('none'),
+        letterSpacing: z.number().default(0),
+        lineHeight: z.number().default(1),
+        align: z.string().default('left'),
+        verticalAlign: z.string().default('top'),
+
+        fill: z.string().default('#000000ff'),
+
+        text: z.string().default('text'),
+
+        stroke: z.string().optional().default('#d6d6d6'),
+        strokeWidth: z.number().optional().default(2),
+        strokeScaleEnabled: z.boolean().optional().default(true),
+        fillAfterStrokeEnabled: z.boolean().optional().default(true),
+
+        layout: z.enum(TEXT_LAYOUT).default(TEXT_LAYOUT.SMART),
+      }),
+    });
+
+    return textNodeSchema;
   }
 }

@@ -2,6 +2,7 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
+import { z } from 'zod';
 import { Weave } from '@/weave';
 import {
   type WeaveElementAttributes,
@@ -1306,3 +1307,31 @@ export abstract class WeaveNode implements WeaveNodeBase {
     return false;
   }
 }
+
+export const getNodeBaseSchema = () => {
+  const baseNodeSchema = z.object({
+    key: z.uuid(),
+    type: z.string(),
+    props: z.object({
+      id: z.uuid(),
+      name: z.string().default('node'),
+      nodeType: z.string(),
+
+      x: z.number(),
+      y: z.number(),
+      width: z.number(),
+      height: z.number(),
+      scaleX: z.number(),
+      scaleY: z.number(),
+      rotation: z.number().optional().default(0),
+      skewX: z.number().optional().default(0),
+      skewY: z.number().optional().default(0),
+
+      opacity: z.number().default(1),
+
+      children: z.array(z.any()).length(0),
+    }),
+  });
+
+  return baseNodeSchema;
+};

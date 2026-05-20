@@ -2,8 +2,9 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
+import { z } from 'zod';
 import Konva from 'konva';
-import { WeaveNode } from '../node';
+import { getNodeBaseSchema, WeaveNode } from '../node';
 import {
   type WeaveElementAttributes,
   type WeaveElementInstance,
@@ -236,6 +237,7 @@ export class WeaveFrameNode extends WeaveNode {
       strokeWidth: 0,
       fill: 'transparent',
       nodeId: id,
+      nodeType: undefined,
       id: `${id}-selection-area`,
       listening: true,
       draggable: true,
@@ -471,5 +473,33 @@ export class WeaveFrameNode extends WeaveNode {
 
   scaleReset(): void {
     // don't change anything
+  }
+
+  static getSchema() {
+    const baseSchema = getNodeBaseSchema();
+
+    const frameNodeSchema = baseSchema.extend({
+      type: z.literal('frame'),
+      props: z.object({
+        nodeType: z.literal('frame'),
+
+        width: z.number().optional(),
+        height: z.number().optional(),
+
+        borderColor: z.string().default('#000000ff'),
+        borderWidth: z.number().default(1),
+
+        title: z.string().default('Frame'),
+        frameWidth: z.number(),
+        frameHeight: z.number(),
+        frameBackground: z
+          .string()
+          .default(WEAVE_FRAME_DEFAULT_BACKGROUND_COLOR),
+
+        children: z.array(z.any()).default([]),
+      }),
+    });
+
+    return frameNodeSchema;
   }
 }
