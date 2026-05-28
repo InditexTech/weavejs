@@ -9,7 +9,7 @@ import {
   type WeaveElementInstance,
   type WeaveStateElement,
 } from '@inditextech/weave-types';
-import { getNodeBaseSchema, WeaveNode } from '@/nodes/node';
+import { WeaveNode } from '@/nodes/node';
 import { WeaveNodesSelectionPlugin } from '@/plugins/nodes-selection/nodes-selection';
 import { getTopmostShadowHost, isInShadowDOM, resetScale } from '@/utils/utils';
 import {
@@ -1132,8 +1132,49 @@ export class WeaveTextNode extends WeaveNode {
     this.instance.updateNode(this.serialize(textNode));
   }
 
+  static defaultState<WeaveTextProperties>(
+    nodeId: string,
+    params?: { config: WeaveTextProperties }
+  ): WeaveStateElement {
+    const config = merge(
+      {},
+      WEAVE_TEXT_NODE_DEFAULT_CONFIG,
+      params?.config ?? {}
+    );
+
+    return {
+      ...super.defaultState(nodeId),
+      type: WEAVE_TEXT_NODE_TYPE,
+      props: {
+        ...super.defaultState(nodeId).props,
+        nodeType: 'text',
+        fontFamily: 'Arial',
+        fontSize: 32,
+        fontStyle: 'normal',
+        fontVariant: 'normal',
+        textDecoration: 'none',
+        letterSpacing: 0,
+        lineHeight: 1,
+        align: 'left',
+        verticalAlign: 'top',
+        fill: '#000000ff',
+        text: 'This is a text node',
+        ...(!config.outline.enabled && {
+          strokeEnabled: false,
+        }),
+        ...(config.outline.enabled && {
+          strokeEnabled: true,
+          stroke: config.outline.color,
+          strokeWidth: config.outline.width,
+          fillAfterStrokeEnabled: true,
+        }),
+        layout: TEXT_LAYOUT.SMART,
+      },
+    };
+  }
+
   static getSchema() {
-    const baseSchema = getNodeBaseSchema();
+    const baseSchema = super.getSchema();
 
     const textNodeSchema = baseSchema.extend({
       type: z.literal('text'),

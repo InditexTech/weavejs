@@ -139,12 +139,18 @@ export class WeaveStageNode extends WeaveNode {
 
       if (e.target !== stage && !e.target.getAttrs().nodeId) return;
 
-      const parent = (e.target as Konva.Node).getParent();
+      let parent: Konva.Node | null | undefined = (
+        e.target as Konva.Node
+      ).getParent();
       if (parent && parent instanceof Konva.Transformer) return;
 
       this.hideHoverState();
 
-      if (!this.instance.isServerSide()) {
+      if (e.target.getAttrs().nodeId) {
+        parent = stage.findOne(`#${e.target.getAttrs().nodeId}`);
+      }
+
+      if (!this.instance.isServerSide() && !parent?.hasName('node')) {
         stage.container().style.cursor = 'default';
       }
     });

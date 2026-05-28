@@ -45,4 +45,8 @@ export class WeaveHooksManager {
   unregisterHook(hookName: string): void {
     this.registeredHooks.delete(hookName);
   }
+
+  reset(): void {
+    this.registeredHooks.clear();
+  }
 }

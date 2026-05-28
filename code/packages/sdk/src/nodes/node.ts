@@ -991,6 +991,7 @@ export abstract class WeaveNode implements WeaveNodeBase {
       this.isSelecting() &&
       !this.isNodeSelected(realNode) &&
       !this.isPasting() &&
+      node.hasName('node') &&
       (isLocked || isMutexLocked)
     ) {
       stage.container().style.cursor = 'default';
@@ -1004,6 +1005,7 @@ export abstract class WeaveNode implements WeaveNodeBase {
       !this.isNodeSelected(realNode) &&
       !this.isPasting() &&
       isTargetable &&
+      node.hasName('node') &&
       !(isLocked || isMutexLocked) &&
       stage.mode() === WEAVE_STAGE_DEFAULT_MODE
     ) {
@@ -1021,6 +1023,7 @@ export abstract class WeaveNode implements WeaveNodeBase {
       this.isSelecting() &&
       this.isNodeSelected(realNode) &&
       !this.isPasting() &&
+      node.hasName('node') &&
       isTargetable &&
       !(isLocked || isMutexLocked) &&
       stage.mode() === WEAVE_STAGE_DEFAULT_MODE
@@ -1306,32 +1309,79 @@ export abstract class WeaveNode implements WeaveNodeBase {
   getIsAsync(): boolean {
     return false;
   }
+
+  static defaultState(nodeId: string): WeaveStateElement {
+    return {
+      key: nodeId,
+      type: 'unknown',
+      props: {
+        id: nodeId,
+        nodeType: 'unknown',
+        x: 0,
+        y: 0,
+        width: 100,
+        height: 100,
+        rotation: 0,
+        scaleX: 1,
+        scaleY: 1,
+        opacity: 1,
+        zIndex: 1,
+        children: [],
+      },
+    };
+  }
+
+  static getSchema(): z.ZodObject<any> {
+    const baseNodeSchema = z.object({
+      key: z
+        .string()
+        .describe(
+          'Unique identifier (uuid) for the node, generate one it if not provided'
+        ),
+      type: z.string().describe('Type of the node, must be always provided'),
+      props: z.object({
+        id: z
+          .string()
+          .describe(
+            'Unique identifier (uuid) for the node instance, is the same as key'
+          ),
+        nodeType: z
+          .string()
+          .describe('Type of the node, must be always provided'),
+        x: z
+          .number()
+          .describe('X position of the node, relative to the parent container'),
+        y: z
+          .number()
+          .describe('Y position of the node, relative to the parent container'),
+        width: z.number().describe('Width of the node in pixels'),
+        height: z.number().describe('Height of the node in pixels'),
+        scaleX: z.number().describe('Scale factor on the X axis, default is 1'),
+        scaleY: z.number().describe('Scale factor on the Y axis, default is 1'),
+        rotation: z
+          .number()
+          .optional()
+          .describe('Rotation of the node in degrees, default is 0'),
+        skewX: z
+          .number()
+          .optional()
+          .describe('Skew on the X axis in degrees, default is 0'),
+        skewY: z
+          .number()
+          .optional()
+          .describe('Skew on the Y axis in degrees, default is 0'),
+
+        opacity: z
+          .number()
+          .describe('Opacity of the node, between 0 and 1, default is 1'),
+
+        children: z
+          .array(z.any())
+          .length(0)
+          .describe('Children nodes, always be an empty array for leaf nodes'),
+      }),
+    });
+
+    return baseNodeSchema;
+  }
 }
-
-export const getNodeBaseSchema = () => {
-  const baseNodeSchema = z.object({
-    key: z.uuid(),
-    type: z.string(),
-    props: z.object({
-      id: z.uuid(),
-      name: z.string().default('node'),
-      nodeType: z.string(),
-
-      x: z.number(),
-      y: z.number(),
-      width: z.number(),
-      height: z.number(),
-      scaleX: z.number(),
-      scaleY: z.number(),
-      rotation: z.number().optional().default(0),
-      skewX: z.number().optional().default(0),
-      skewY: z.number().optional().default(0),
-
-      opacity: z.number().default(1),
-
-      children: z.array(z.any()).length(0),
-    }),
-  });
-
-  return baseNodeSchema;
-};

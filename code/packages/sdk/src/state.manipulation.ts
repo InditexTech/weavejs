@@ -97,23 +97,24 @@ export class WeaveStateManipulation {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     layerYjsElement: Y.Map<any>,
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    yjsElements: Y.Map<any>[]
+    yjsElements: { nodeId: string; element: Y.Map<any> }[]
   ): void {
-    for (const yjsElement of yjsElements) {
-      const index = layerYjsElement
-        .get('props')
-        .get('children')
-        .findIndex(
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          (child: Y.Map<any>) => child.get('key') === yjsElement.get('key')
-        );
+    for (let i = 0; i < yjsElements.length; i++) {
+      const yjsElement = yjsElements[i];
+      const nodeId = yjsElement.nodeId;
+      const element = yjsElement.element;
+
+      const childrenArr = JSON.parse(
+        JSON.stringify(layerYjsElement.get('props').get('children'))
+      );
+
+      const index = childrenArr.findIndex(
+        (child: WeaveStateElement) => child['key'] === nodeId
+      );
 
       if (index !== -1) {
         layerYjsElement.get('props').get('children').delete(index);
-        layerYjsElement
-          .get('props')
-          .get('children')
-          .insert(index, [yjsElement]);
+        layerYjsElement.get('props').get('children').insert(index, [element]);
       }
     }
   }
@@ -121,17 +122,18 @@ export class WeaveStateManipulation {
   static deleteElements(
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     layerYjsElement: Y.Map<any>,
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    yjsElements: Y.Map<any>[]
+    yjsElementsIds: string[]
   ): void {
-    for (const yjsElement of yjsElements) {
-      const index = layerYjsElement
-        .get('props')
-        .get('children')
-        .findIndex(
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          (child: Y.Map<any>) => child.get('key') === yjsElement.get('key')
-        );
+    for (let i = 0; i < yjsElementsIds.length; i++) {
+      const yjsElementId = yjsElementsIds[i];
+
+      const childrenArr = JSON.parse(
+        JSON.stringify(layerYjsElement.get('props').get('children'))
+      );
+
+      const index = childrenArr.findIndex(
+        (child: WeaveStateElement) => child['key'] === yjsElementId
+      );
 
       if (index !== -1) {
         layerYjsElement.get('props').get('children').delete(index);

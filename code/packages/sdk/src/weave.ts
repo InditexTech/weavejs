@@ -287,9 +287,16 @@ export class Weave {
       nodeHandler?.onDestroyInstance();
     }
 
+    // destroy the main layer from memory
+    const mainLayer = this.stageManager.getMainLayer();
+    if (mainLayer) {
+      mainLayer.destroy();
+    }
+
     // destroy the stage from memory
     const stage = this.getStage();
     if (stage) {
+      console.log('remove stage');
       stage.destroy();
     }
 
@@ -305,6 +312,9 @@ export class Weave {
 
     this.registerManager.reset();
     this.asyncManager.reset();
+
+    // remove event listeners
+    // this.emitter.clearListeners();
 
     this.moduleLogger.info('Switching room instance');
 
@@ -322,6 +332,10 @@ export class Weave {
 
     // Resets all the nodes, plugins and actions registered
     this.registerManager.reset();
+
+    // Resets all hooks
+    this.hooks.removeAllHooks();
+    this.hooksManager.reset();
 
     this.status = WEAVE_INSTANCE_STATUS.LOADING_FONTS;
     this.emitEvent<WeaveInstanceStatusEvent>('onInstanceStatus', this.status);
@@ -359,6 +373,7 @@ export class Weave {
     // disconnect from the store
     const store = this.storeManager.getStore();
     store.disconnect();
+    store.getDocument()?.destroy();
 
     const nodeHandlers = this.registerManager.getNodesHandlers();
     for (const nodeHandlerKey of Object.keys(nodeHandlers)) {

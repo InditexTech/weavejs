@@ -4,7 +4,7 @@
 
 import { z } from 'zod';
 import Konva from 'konva';
-import { getNodeBaseSchema, WeaveNode } from '../node';
+import { WeaveNode } from '../node';
 import {
   type WeaveElementAttributes,
   type WeaveElementInstance,
@@ -475,12 +475,89 @@ export class WeaveFrameNode extends WeaveNode {
     // don't change anything
   }
 
+  static defaultState(nodeId: string): WeaveStateElement {
+    return {
+      ...super.defaultState(nodeId),
+      type: WEAVE_FRAME_NODE_TYPE,
+      props: {
+        ...super.defaultState(nodeId).props,
+        nodeType: WEAVE_FRAME_NODE_TYPE,
+        x: 0,
+        y: 0,
+        width: WEAVE_FRAME_NODE_DEFAULT_PROPS.frameWidth,
+        height: WEAVE_FRAME_NODE_DEFAULT_PROPS.frameHeight,
+        title: WEAVE_FRAME_NODE_DEFAULT_PROPS.title,
+        frameWidth: WEAVE_FRAME_NODE_DEFAULT_PROPS.frameWidth,
+        frameHeight: WEAVE_FRAME_NODE_DEFAULT_PROPS.frameHeight,
+        frameBackground: WEAVE_FRAME_NODE_DEFAULT_PROPS.frameBackground,
+        borderWidth: WEAVE_FRAME_NODE_DEFAULT_CONFIG.borderWidth,
+        borderColor: WEAVE_FRAME_NODE_DEFAULT_CONFIG.borderColor,
+        stroke: 'transparent',
+        strokeWidth: 0,
+        strokeScaleEnabled: true,
+        rotation: 0,
+        zIndex: 1,
+        children: [],
+      },
+    };
+  }
+
+  static addNodeState(
+    defaultNodeState: WeaveStateElement,
+    props: WeaveElementAttributes
+  ): WeaveStateElement {
+    return mergeExceptArrays(defaultNodeState, {
+      props: {
+        x: props.props.x,
+        y: props.props.y,
+        width: props.props.width,
+        height: props.props.height,
+        ...(props.props.title && { stroke: props.props.title }),
+        frameWidth: props.props.frameWidth,
+        frameHeight: props.props.frameHeight,
+        ...(props.props.frameBackground && {
+          stroke: props.props.frameBackground,
+        }),
+        rotation: props.props.rotation,
+        ...(props.props.borderColor && {
+          borderColor: props.props.borderColor,
+        }),
+        ...(props.props.borderWidth && {
+          borderWidth: props.props.borderWidth,
+        }),
+      },
+    });
+  }
+
+  static updateNodeState(
+    prevNodeState: WeaveStateElement,
+    nextProps: WeaveElementAttributes
+  ): WeaveStateElement {
+    return mergeExceptArrays(prevNodeState, {
+      props: {
+        x: nextProps.x,
+        y: nextProps.y,
+        width: nextProps.width,
+        height: nextProps.height,
+        rotation: nextProps.rotation,
+        title: nextProps.title,
+        ...(nextProps.frameBackground && {
+          frameBackground: nextProps.frameBackground,
+        }),
+        ...(nextProps.borderColor && { stroke: nextProps.borderColor }),
+        ...(nextProps.borderWidth && {
+          strokeWidth: nextProps.borderWidth,
+        }),
+      },
+    });
+  }
+
   static getSchema() {
-    const baseSchema = getNodeBaseSchema();
+    const baseSchema = super.getSchema();
 
     const frameNodeSchema = baseSchema.extend({
       type: z.literal('frame'),
-      props: z.object({
+      props: baseSchema.shape.props.extend({
         nodeType: z.literal('frame'),
 
         width: z.number().optional(),

@@ -77,6 +77,10 @@ export class WeaveStrokeSingleNode extends WeaveNode {
   }
 
   initEvents(): void {
+    if (this.instance.isServerSide()) {
+      return;
+    }
+
     if (this.eventsInitialized) {
       return;
     }

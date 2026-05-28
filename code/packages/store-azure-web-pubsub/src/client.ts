@@ -276,8 +276,6 @@ export class WeaveStoreAzureWebPubSubSyncClient extends Emittery {
   }
 
   disconnect(): void {
-    const stack = new Error().stack;
-    console.log('disconnect', { stack });
     if (this._ws !== null) {
       // broadcast message with local awareness state set to null (indicating disconnect)
       const encoder = encoding.createEncoder();

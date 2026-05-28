@@ -7,8 +7,9 @@ import Konva from 'konva';
 import {
   type WeaveElementAttributes,
   type WeaveElementInstance,
+  type WeaveStateElement,
 } from '@inditextech/weave-types';
-import { getNodeBaseSchema, WeaveNode } from '../node';
+import { WeaveNode } from '../node';
 import {
   type ImageProps,
   type WeaveImageCropAnchorPosition,
@@ -1516,36 +1517,169 @@ export class WeaveImageNode extends WeaveNode {
     this.getNodesSelectionPlugin()?.getHoverTransformer().forceUpdate();
   }
 
+  static defaultState(nodeId: string): WeaveStateElement {
+    return {
+      ...super.defaultState(nodeId),
+      props: {
+        ...super.defaultState(nodeId).props,
+        nodeType: WEAVE_IMAGE_NODE_TYPE,
+        width: 800,
+        height: 600,
+        imageURL: 'https://picsum.photos/id/10/800/600',
+        adding: false,
+        imageWidth: 800,
+        imageHeight: 600,
+        imageInfo: {
+          width: 800,
+          height: 600,
+        },
+        uncroppedImage: {
+          width: 800,
+          height: 600,
+        },
+        cropping: false,
+        stroke: '#000000',
+        fill: '#FFFFFF',
+        strokeWidth: 0,
+        strokeScaleEnabled: true,
+        children: [],
+      },
+    };
+  }
+
+  static addNodeState(
+    defaultNodeState: WeaveStateElement,
+    props: WeaveElementAttributes
+  ): WeaveStateElement {
+    return mergeExceptArrays(defaultNodeState, {
+      props: {
+        x: props.x,
+        y: props.y,
+        width: props.width,
+        height: props.height,
+        rotation: props.rotation,
+        imageURL: props.imageURL,
+        ...(props.imageFallback && {
+          imageFallback: props.imageFallback,
+        }),
+        ...(props.imageId && {
+          imageId: props.imageId,
+        }),
+        adding: props.adding,
+        imageWidth: props.imageWidth,
+        imageHeight: props.imageHeight,
+        imageInfo: {
+          width: props.imageInfo.width,
+          height: props.imageInfo.height,
+        },
+        uncroppedImage: {
+          width: props.uncroppedImage.width,
+          height: props.uncroppedImage.height,
+        },
+        cropping: props.cropping,
+      },
+    });
+  }
+
+  static updateNodeState(
+    prevNodeState: WeaveStateElement,
+    nextProps: WeaveElementAttributes
+  ): WeaveStateElement {
+    return mergeExceptArrays(prevNodeState, {
+      props: {
+        x: nextProps.x,
+        y: nextProps.y,
+        width: nextProps.width,
+        height: nextProps.height,
+        rotation: nextProps.rotation,
+        imageURL: nextProps.imageURL,
+        ...(nextProps.imageFallback && {
+          imageFallback: nextProps.imageFallback,
+        }),
+        ...(nextProps.imageId && {
+          imageId: nextProps.imageId,
+        }),
+        adding: nextProps.adding,
+        imageWidth: nextProps.imageWidth,
+        imageHeight: nextProps.imageHeight,
+        ...(nextProps.imageInfo && {
+          imageInfo: {
+            width: nextProps.imageInfo.width,
+            height: nextProps.imageInfo.height,
+          },
+        }),
+        ...(nextProps.uncroppedImage && {
+          uncroppedImage: {
+            width: nextProps.uncroppedImage?.width,
+            height: nextProps.uncroppedImage?.height,
+          },
+        }),
+        cropping: nextProps.cropping,
+      },
+    });
+  }
+
   static getSchema() {
-    const baseSchema = getNodeBaseSchema();
+    const baseSchema = super.getSchema();
 
     const imageNodeSchema = baseSchema.extend({
-      type: z.literal('image'),
-      props: z.object({
-        nodeType: z.literal('image'),
+      type: z
+        .literal('image')
+        .describe(
+          'Type of the node, for a image node it will always be "image"'
+        ),
+      props: baseSchema.shape.props.extend({
+        nodeType: z
+          .literal('image')
+          .describe(
+            'Type of the node, for a image node it will always be "image"'
+          ),
 
-        imageURL: z.string(),
-        imageFallback: z.string().optional(),
+        imageURL: z
+          .string()
+          .describe('The URL of the image to be rendered by the node'),
+        imageFallback: z
+          .string()
+          .optional()
+          .describe(
+            'The fallback image to display while the image to loads, it must be a base64 string with the format: data:image/{format};base64,{data}'
+          ),
 
         adding: z.boolean().default(false),
 
-        stroke: z.string().default('#000000ff'),
-        strokeWidth: z.number().default(0),
-        strokeScaleEnabled: z.boolean().default(true),
-
-        imageId: z.string().optional(),
-        imageWidth: z.number(),
-        imageHeight: z.number(),
+        imageId: z
+          .string()
+          .optional()
+          .describe(
+            'The id of the image, used for external management of the node.'
+          ),
+        imageWidth: z.number().describe('The width of the image in pixels'),
+        imageHeight: z.number().describe('The height of the image in pixels'),
         imageInfo: z.object({
-          width: z.number(),
-          height: z.number(),
+          width: z
+            .number()
+            .describe('The original width of the image in pixels'),
+          height: z
+            .number()
+            .describe('The original height of the image in pixels'),
         }),
 
         uncroppedImage: z.object({
-          width: z.number(),
-          height: z.number(),
+          width: z
+            .number()
+            .describe(
+              'The width of the image before cropping, used for cropping calculations'
+            ),
+          height: z
+            .number()
+            .describe(
+              'The height of the image before cropping, used for cropping calculations'
+            ),
         }),
-        cropping: z.boolean().default(false),
+        cropping: z
+          .boolean()
+          .default(false)
+          .describe('Whether the image is currently being cropped'),
       }),
     });
 
