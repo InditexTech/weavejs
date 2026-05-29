@@ -104,6 +104,7 @@ export class WeaveStageManager {
       id: 'stage',
       initialZIndex: undefined,
     };
+
     const stage = new Konva.Stage({
       ...props,
     });

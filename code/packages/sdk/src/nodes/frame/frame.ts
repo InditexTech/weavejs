@@ -206,7 +206,7 @@ export class WeaveFrameNode extends WeaveNode {
       strokeScaleEnabled: true,
       listening: true,
       draggable: false,
-      isTargetable: false,
+      canBeTargeted: false,
     });
 
     frameInternal.clip({

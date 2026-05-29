@@ -25,6 +25,8 @@ export const doPreloadCursors = async (
 
         const dataURL = canvas.toDataURL('image/png');
 
+        canvas.remove();
+
         const tokens = value.split(' ');
         tokens[0] = `url(${dataURL})`;
 

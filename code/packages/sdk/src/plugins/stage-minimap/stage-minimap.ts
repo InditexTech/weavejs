@@ -151,12 +151,8 @@ export class WeaveStageMinimapPlugin extends WeavePlugin {
 
     if (box.width === 0 || box.height === 0) return;
 
-    console.log('update minimap viewport reference', this.minimapStage);
-
     const width = this.minimapStage?.width();
     const height = this.minimapStage?.height();
-
-    console.log('update minimap viewport reference', width, height);
 
     const fitScale = Math.min(width / box.width, height / box.height);
     const centerOffset = {

@@ -93,7 +93,7 @@ export class WeaveCommentNode<T> extends WeaveNode {
     const commentNode = new Konva.Group({
       ...commentParams,
       name: 'comment',
-      isTargetable: false,
+      canBeTargeted: false,
       isExpanded: false,
       commentAction: null,
       listening: true,
@@ -106,7 +106,7 @@ export class WeaveCommentNode<T> extends WeaveNode {
       id: `${id}-bg`,
       x: 0,
       y: -heightContracted,
-      isTargetable: false,
+      canBeTargeted: false,
       fill: commentParams.userBackgroundColor ?? '#0000FF',
       stroke: this.config.style.stroke,
       strokeWidth: this.config.style.strokeWidth,
