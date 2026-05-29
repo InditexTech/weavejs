@@ -508,22 +508,22 @@ export class WeaveFrameNode extends WeaveNode {
   ): WeaveStateElement {
     return mergeExceptArrays(defaultNodeState, {
       props: {
-        x: props.props.x,
-        y: props.props.y,
-        width: props.props.width,
-        height: props.props.height,
-        ...(props.props.title && { stroke: props.props.title }),
-        frameWidth: props.props.frameWidth,
-        frameHeight: props.props.frameHeight,
-        ...(props.props.frameBackground && {
-          stroke: props.props.frameBackground,
+        x: props.x,
+        y: props.y,
+        width: props.width,
+        height: props.height,
+        ...(props.title && { stroke: props.title }),
+        frameWidth: props.frameWidth,
+        frameHeight: props.frameHeight,
+        ...(props.frameBackground && {
+          stroke: props.frameBackground,
         }),
-        rotation: props.props.rotation,
-        ...(props.props.borderColor && {
-          borderColor: props.props.borderColor,
+        rotation: props.rotation,
+        ...(props.borderColor && {
+          borderColor: props.borderColor,
         }),
-        ...(props.props.borderWidth && {
-          borderWidth: props.props.borderWidth,
+        ...(props.borderWidth && {
+          borderWidth: props.borderWidth,
         }),
       },
     });
@@ -555,28 +555,46 @@ export class WeaveFrameNode extends WeaveNode {
   static getSchema() {
     const baseSchema = super.getSchema();
 
-    const frameNodeSchema = baseSchema.extend({
-      type: z.literal('frame'),
+    const nodeSchema = baseSchema.extend({
+      type: z
+        .literal(WEAVE_FRAME_NODE_TYPE)
+        .describe(
+          `Type of the node, for a frame node it will always be "${WEAVE_FRAME_NODE_TYPE}"`
+        ),
       props: baseSchema.shape.props.extend({
-        nodeType: z.literal('frame'),
+        nodeType: z
+          .literal(WEAVE_FRAME_NODE_TYPE)
+          .describe(
+            `Type of the node, for a frame node it will always be "${WEAVE_FRAME_NODE_TYPE}"`
+          ),
 
-        width: z.number().optional(),
-        height: z.number().optional(),
+        borderColor: z
+          .string()
+          .default('#000000ff')
+          .describe(
+            'Border color of the frame in hex format with alpha channel (e.g. #RRGGBBAA)'
+          ),
+        borderWidth: z
+          .number()
+          .default(1)
+          .describe(
+            'Border width of the frame in hex format with alpha channel (e.g. #RRGGBBAA)'
+          ),
 
-        borderColor: z.string().default('#000000ff'),
-        borderWidth: z.number().default(1),
-
-        title: z.string().default('Frame'),
-        frameWidth: z.number(),
-        frameHeight: z.number(),
+        title: z.string().default('Frame').describe('Title of the frame'),
+        frameWidth: z.number().describe('Width of the frame in pixels'),
+        frameHeight: z.number().describe('Height of the frame in pixels'),
         frameBackground: z
           .string()
-          .default(WEAVE_FRAME_DEFAULT_BACKGROUND_COLOR),
+          .default(WEAVE_FRAME_DEFAULT_BACKGROUND_COLOR)
+          .describe(
+            'Background color of the frame in hex format with alpha channel (e.g. #RRGGBBAA)'
+          ),
 
         children: z.array(z.any()).default([]),
       }),
     });
 
-    return frameNodeSchema;
+    return nodeSchema;
   }
 }

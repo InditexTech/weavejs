@@ -16,6 +16,9 @@ export const WEAVE_TEXT_NODE_DEFAULT_CONFIG: WeaveTextProperties = {
   outline: {
     enabled: false,
   },
+  cursor: {
+    color: '#000000',
+  },
 };
 
 export const TEXT_LAYOUT = {

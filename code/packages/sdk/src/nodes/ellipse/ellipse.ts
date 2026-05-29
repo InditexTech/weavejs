@@ -2,6 +2,7 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
+import { z } from 'zod';
 import Konva from 'konva';
 import {
   type WeaveElementAttributes,
@@ -12,6 +13,7 @@ import { WeaveNode } from '../node';
 import { WEAVE_ELLIPSE_NODE_TYPE } from './constants';
 import type { WeaveNodesSelectionPlugin } from '@/plugins/nodes-selection/nodes-selection';
 import type { WeaveEllipseNodeParams, WeaveEllipseProperties } from './types';
+import { mergeExceptArrays } from '@/utils/utils';
 
 export class WeaveEllipseNode extends WeaveNode {
   private config: WeaveEllipseProperties;
@@ -215,5 +217,115 @@ export class WeaveEllipseNode extends WeaveNode {
 
     node.x(node.x() + dx);
     node.y(node.y() + dy);
+  }
+
+  static defaultState(nodeId: string): WeaveStateElement {
+    return {
+      ...super.defaultState(nodeId),
+      type: WEAVE_ELLIPSE_NODE_TYPE,
+      props: {
+        ...super.defaultState(nodeId).props,
+        nodeType: WEAVE_ELLIPSE_NODE_TYPE,
+        x: 0,
+        y: 0,
+        radiusX: 100,
+        radiusY: 100,
+        stroke: '#000000',
+        fill: '#FFFFFF',
+        strokeWidth: 1,
+        strokeScaleEnabled: true,
+        rotation: 0,
+        zIndex: 1,
+        children: [],
+      },
+    };
+  }
+
+  static addNodeState(
+    defaultNodeState: WeaveStateElement,
+    props: WeaveElementAttributes
+  ): WeaveStateElement {
+    return mergeExceptArrays(defaultNodeState, {
+      props: {
+        x: props.x,
+        y: props.y,
+        radiusX: props.radiusX,
+        radiusY: props.radiusY,
+        rotation: props.rotation,
+        fill: props.fill,
+        ...(props.stroke && { stroke: props.stroke }),
+        ...(props.strokeWidth && {
+          strokeWidth: props.strokeWidth,
+        }),
+      },
+    });
+  }
+
+  static updateNodeState(
+    prevNodeState: WeaveStateElement,
+    nextProps: WeaveElementAttributes
+  ): WeaveStateElement {
+    return mergeExceptArrays(prevNodeState, {
+      props: {
+        x: nextProps.x,
+        y: nextProps.y,
+        radiusX: nextProps.radiusX,
+        radiusY: nextProps.radiusY,
+        rotation: nextProps.rotation,
+        fill: nextProps.fill,
+        ...(nextProps.stroke && { stroke: nextProps.stroke }),
+        ...(nextProps.strokeWidth && {
+          strokeWidth: nextProps.strokeWidth,
+        }),
+      },
+    });
+  }
+
+  static getSchema() {
+    const baseSchema = super.getSchema();
+
+    const nodeSchema = baseSchema.extend({
+      type: z
+        .literal(WEAVE_ELLIPSE_NODE_TYPE)
+        .describe(
+          `Type of the node, for a ellipse node it will always be "${WEAVE_ELLIPSE_NODE_TYPE}"`
+        ),
+      props: baseSchema.shape.props.extend({
+        nodeType: z
+          .literal(WEAVE_ELLIPSE_NODE_TYPE)
+          .describe(
+            `Type of the node, for a ellipse node it will always be "${WEAVE_ELLIPSE_NODE_TYPE}"`
+          ),
+
+        radiusX: z
+          .number()
+          .describe('Radius on the X axis of the ellipse in pixels'),
+        radiusY: z
+          .number()
+          .describe('Radius on the Y axis of the ellipse in pixels'),
+
+        fill: z
+          .string()
+          .describe(
+            'Fill color of the ellipse in hex format with alpha channel (e.g. #RRGGBBAA)'
+          ),
+
+        stroke: z
+          .string()
+          .describe(
+            'Stroke color of the ellipse in hex format with alpha channel (e.g. #RRGGBBAA)'
+          ),
+        strokeWidth: z
+          .number()
+          .describe('Stroke width of the ellipse in pixels'),
+        strokeScaleEnabled: z
+          .boolean()
+          .describe(
+            'Whether the ellipse stroke width should scale when the node is scaled. Defaults to true.'
+          ),
+      }),
+    });
+
+    return nodeSchema;
   }
 }

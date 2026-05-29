@@ -11,7 +11,12 @@ import {
 } from '@inditextech/weave-types';
 import { WeaveNode } from '@/nodes/node';
 import { WeaveNodesSelectionPlugin } from '@/plugins/nodes-selection/nodes-selection';
-import { getTopmostShadowHost, isInShadowDOM, resetScale } from '@/utils/utils';
+import {
+  getTopmostShadowHost,
+  isInShadowDOM,
+  mergeExceptArrays,
+  resetScale,
+} from '@/utils/utils';
 import {
   TEXT_LAYOUT,
   WEAVE_STAGE_TEXT_EDITION_MODE,
@@ -579,6 +584,7 @@ export class WeaveTextNode extends WeaveNode {
       return;
     }
 
+    this.textArea.style.caretColor = this.config.cursor.color;
     this.textArea.style.fontSize =
       textNode.fontSize() * textNode.getAbsoluteScale().x + 'px';
     this.textArea.rows = textNode.text().split('\n').length;
@@ -586,10 +592,14 @@ export class WeaveTextNode extends WeaveNode {
     this.textArea.style.opacity = `${textNode.getAttrs().opacity}`;
     this.textArea.style.lineHeight = `${textNode.lineHeight()}em`;
     this.textArea.style.fontFamily = textNode.fontFamily();
-    let fontWeight = 'normal';
-    let fontStyle = 'normal';
+    let fontWeight: string = 'normal';
+    let fontStyle: string = 'normal';
+    const matchNumber = textNode.fontStyle().match(/\d+/);
     if ((textNode.fontStyle() ?? 'normal').indexOf('bold') !== -1) {
       fontWeight = 'bold';
+    }
+    if (matchNumber) {
+      fontWeight = matchNumber[0].toString();
     }
     if ((textNode.fontStyle() ?? 'normal').indexOf('italic') !== -1) {
       fontStyle = 'italic';
@@ -1159,6 +1169,7 @@ export class WeaveTextNode extends WeaveNode {
         verticalAlign: 'top',
         fill: '#000000ff',
         text: 'This is a text node',
+        layout: TEXT_LAYOUT.SMART,
         ...(!config.outline.enabled && {
           strokeEnabled: false,
         }),
@@ -1168,42 +1179,199 @@ export class WeaveTextNode extends WeaveNode {
           strokeWidth: config.outline.width,
           fillAfterStrokeEnabled: true,
         }),
-        layout: TEXT_LAYOUT.SMART,
       },
     };
+  }
+
+  static addNodeState(
+    defaultNodeState: WeaveStateElement,
+    props: WeaveElementAttributes
+  ): WeaveStateElement {
+    return mergeExceptArrays(defaultNodeState, {
+      props: {
+        x: props.x,
+        y: props.y,
+        width: props.width,
+        ...(props.height && { height: props.height }),
+        FontFamily: props.fontFamily,
+        fontSize: props.fontSize,
+        fontStyle: props.fontStyle,
+        fontVariant: props.fontVariant,
+        textDecoration: props.textDecoration,
+        letterSpacing: props.letterSpacing,
+        lineHeight: props.lineHeight,
+        align: props.align,
+        verticalAlign: props.verticalAlign,
+        rotation: props.rotation,
+        fill: props.fill,
+        text: props.text,
+        layout: props.layout,
+        ...(props.strokeEnabled && { strokeEnabled: props.strokeEnabled }),
+        ...(props.stroke && { stroke: props.stroke }),
+        ...(props.strokeWidth && { strokeWidth: props.strokeWidth }),
+        ...(props.fillAfterStrokeEnabled && {
+          fillAfterStrokeEnabled: props.fillAfterStrokeEnabled,
+        }),
+      },
+    });
+  }
+
+  static updateNodeState(
+    prevNodeState: WeaveStateElement,
+    nextProps: WeaveElementAttributes
+  ): WeaveStateElement {
+    return mergeExceptArrays(prevNodeState, {
+      props: {
+        x: nextProps.x,
+        y: nextProps.y,
+        width: nextProps.width,
+        ...(nextProps.height && { height: nextProps.height }),
+        FontFamily: nextProps.fontFamily,
+        fontSize: nextProps.fontSize,
+        fontStyle: nextProps.fontStyle,
+        fontVariant: nextProps.fontVariant,
+        textDecoration: nextProps.textDecoration,
+        letterSpacing: nextProps.letterSpacing,
+        lineHeight: nextProps.lineHeight,
+        align: nextProps.align,
+        verticalAlign: nextProps.verticalAlign,
+        rotation: nextProps.rotation,
+        fill: nextProps.fill,
+        text: nextProps.text,
+        layout: nextProps.layout,
+        ...(nextProps.strokeEnabled && {
+          strokeEnabled: nextProps.strokeEnabled,
+        }),
+        ...(nextProps.stroke && { stroke: nextProps.stroke }),
+        ...(nextProps.strokeWidth && { strokeWidth: nextProps.strokeWidth }),
+        ...(nextProps.fillAfterStrokeEnabled && {
+          fillAfterStrokeEnabled: nextProps.fillAfterStrokeEnabled,
+        }),
+      },
+    });
   }
 
   static getSchema() {
     const baseSchema = super.getSchema();
 
-    const textNodeSchema = baseSchema.extend({
-      type: z.literal('text'),
+    const nodeSchema = baseSchema.extend({
+      type: z
+        .literal(WEAVE_TEXT_NODE_TYPE)
+        .describe(
+          `Type of the node, for a text node it will always be "${WEAVE_TEXT_NODE_TYPE}"`
+        ),
       props: z.object({
-        nodeType: z.literal('text'),
+        nodeType: z
+          .literal(WEAVE_TEXT_NODE_TYPE)
+          .describe(
+            `Type of the node, for a text node it will always be "${WEAVE_TEXT_NODE_TYPE}"`
+          ),
 
-        fontFamily: z.string().default('Arial'),
-        fontSize: z.number().default(16),
-        fontStyle: z.string().default('normal'),
-        fontVariant: z.string().default('normal'),
-        textDecoration: z.string().default('none'),
-        letterSpacing: z.number().default(0),
-        lineHeight: z.number().default(1),
-        align: z.string().default('left'),
-        verticalAlign: z.string().default('top'),
+        width: z.number().describe('Width of the text in pixels'),
+        height: z
+          .number()
+          .optional()
+          .describe(
+            'Height of the text in pixels. Optional if layout is auto-height or smart.'
+          ),
 
-        fill: z.string().default('#000000ff'),
+        fontFamily: z
+          .string()
+          .default('Arial')
+          .describe('Font family of the text, e.g. Arial, Helvetica, etc.'),
+        fontSize: z
+          .number()
+          .default(16)
+          .describe('Font size of the text in pixels.'),
+        fontStyle: z
+          .string()
+          .regex(/^(?:normal|bold|\d+)(?: italic)?$/)
+          .default('normal')
+          .describe(
+            'Font style of the text, can be "normal", "bold", "400", "italic" or a combination like "bold italic" or "700 italic".'
+          ),
+        fontVariant: z
+          .enum(['normal', 'small-caps'])
+          .describe(
+            'Font variant of the text, can be "normal" or "small-caps".'
+          ),
+        textDecoration: z
+          .enum(['line-through', 'underline', ''])
+          .default('')
+          .describe(
+            'Text decoration can be "line-through", "underline" or empty string for none.'
+          ),
+        letterSpacing: z
+          .number()
+          .default(0)
+          .describe('Spacing between letters in pixels.'),
+        lineHeight: z
+          .number()
+          .default(1)
+          .describe('Line height of the text, as a multiplier of font size.'),
+        align: z
+          .enum(['left', 'center', 'right', 'justify'])
+          .default('left')
+          .describe(
+            'Text alignment, can be "left", "center", "right" or "justify".'
+          ),
+        verticalAlign: z
+          .enum(['top', 'middle', 'bottom'])
+          .default('top')
+          .describe(
+            "Vertical alignment of the text, can be 'top', 'middle' or 'bottom'."
+          ),
 
-        text: z.string().default('text'),
+        fill: z
+          .string()
+          .default('#000000ff')
+          .describe(
+            'Fill color of the text  in hex format with alpha channel (e.g. #RRGGBBAA).'
+          ),
 
-        stroke: z.string().optional().default('#d6d6d6'),
-        strokeWidth: z.number().optional().default(2),
-        strokeScaleEnabled: z.boolean().optional().default(true),
-        fillAfterStrokeEnabled: z.boolean().optional().default(true),
+        text: z
+          .string()
+          .default('text')
+          .describe('The actual text content of the node.'),
 
-        layout: z.enum(TEXT_LAYOUT).default(TEXT_LAYOUT.SMART),
+        strokeEnabled: z
+          .boolean()
+          .default(false)
+          .describe('Whether the text outline is enabled.'),
+        stroke: z
+          .string()
+          .optional()
+          .default('#d6d6d6')
+          .describe(
+            'Color of the text outline in hex format with alpha channel (e.g. #RRGGBBAA).'
+          ),
+        strokeWidth: z
+          .number()
+          .optional()
+          .default(2)
+          .describe('Width of the text outline in pixels.'),
+        strokeScaleEnabled: z
+          .boolean()
+          .default(true)
+          .describe(
+            'Whether the stroke width should scale when the node is scaled.'
+          ),
+        fillAfterStrokeEnabled: z
+          .boolean()
+          .default(true)
+          .describe(
+            'Whether the fill should be drawn after the stroke. If false, the stroke will be drawn on top of the fill.'
+          ),
+
+        layout: z
+          .enum(TEXT_LAYOUT)
+          .default(TEXT_LAYOUT.SMART)
+          .describe(
+            "Layout mode of the text node. Can be:\n- 'fixed': the text node will have fixed width and height, and the text will be scaled to fit the node.\n- 'auto-height': the width of the text node will be fixed, but the height will adjust to fit the text content.\n- 'auto-all': both width and height of the text node will adjust to fit the text content.\n- 'smart': the text node will try to adjust its size based on the content and layout, but it will not exceed the initial width and height set on the node."
+          ),
       }),
     });
 
-    return textNodeSchema;
+    return nodeSchema;
   }
 }

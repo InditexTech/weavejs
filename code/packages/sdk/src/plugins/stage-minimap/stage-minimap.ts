@@ -53,8 +53,6 @@ export class WeaveStageMinimapPlugin extends WeavePlugin {
 
     if (!container) return;
 
-    console.log('setup minimap');
-
     let preview = document.getElementById(this.config.id);
 
     const windowAspectRatio = window.innerWidth / window.innerHeight;
@@ -85,7 +83,6 @@ export class WeaveStageMinimapPlugin extends WeavePlugin {
       this.minimapLayer = new Konva.Layer();
       this.minimapStage.add(this.minimapLayer);
 
-      console.log('aqui?');
       this.minimapViewportReference = new Konva.Rect({
         ...this.config.style.viewportReference,
         id: 'minimapViewportReference',
@@ -101,12 +98,9 @@ export class WeaveStageMinimapPlugin extends WeavePlugin {
     stage.on(
       'dragmove wheel dragend scaleXChange scaleYChange xChange yChange',
       () => {
-        console.log('update minimap viewport');
         this.updateMinimapViewportReference();
       }
     );
-
-    console.log('aqui initialized');
   }
 
   private async updateMinimapContent() {
@@ -190,9 +184,7 @@ export class WeaveStageMinimapPlugin extends WeavePlugin {
   }
 
   onInit(): void {
-    console.log('init minimap');
     const throttledUpdateMinimap = throttle(async () => {
-      console.log('throttle update minimap');
       await this.updateMinimapContent();
       this.updateMinimapViewportReference();
     }, DEFAULT_THROTTLE_MS);

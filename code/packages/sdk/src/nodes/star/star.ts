@@ -2,6 +2,7 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
+import { z } from 'zod';
 import Konva from 'konva';
 import {
   type WeaveElementAttributes,
@@ -12,6 +13,7 @@ import { WeaveNode } from '../node';
 import { WEAVE_STAR_NODE_TYPE } from './constants';
 import type { WeaveNodesSelectionPlugin } from '@/plugins/nodes-selection/nodes-selection';
 import type { WeaveStarNodeParams, WeaveStarProperties } from './types';
+import { mergeExceptArrays } from '@/utils/utils';
 
 export class WeaveStarNode extends WeaveNode {
   private config: WeaveStarProperties;
@@ -242,5 +244,125 @@ export class WeaveStarNode extends WeaveNode {
       x: element.props.outerRadius,
       y: element.props.outerRadius,
     };
+  }
+
+  static defaultState(nodeId: string): WeaveStateElement {
+    return {
+      ...super.defaultState(nodeId),
+      type: WEAVE_STAR_NODE_TYPE,
+      props: {
+        ...super.defaultState(nodeId).props,
+        nodeType: WEAVE_STAR_NODE_TYPE,
+        x: 0,
+        y: 0,
+        numPoints: 5,
+        innerRadius: 50,
+        outerRadius: 100,
+        stroke: '#000000',
+        fill: '#FFFFFF',
+        strokeWidth: 1,
+        strokeScaleEnabled: true,
+        rotation: 0,
+        zIndex: 1,
+        children: [],
+      },
+    };
+  }
+
+  static addNodeState(
+    defaultNodeState: WeaveStateElement,
+    props: WeaveElementAttributes
+  ): WeaveStateElement {
+    return mergeExceptArrays(defaultNodeState, {
+      props: {
+        x: props.x,
+        y: props.y,
+        numPoints: props.numPoints,
+        innerRadius: props.innerRadius,
+        outerRadius: props.outerRadius,
+        rotation: props.rotation,
+        fill: props.fill,
+        ...(props.stroke && { stroke: props.stroke }),
+        ...(props.strokeWidth && {
+          strokeWidth: props.strokeWidth,
+        }),
+      },
+    });
+  }
+
+  static updateNodeState(
+    prevNodeState: WeaveStateElement,
+    nextProps: WeaveElementAttributes
+  ): WeaveStateElement {
+    return mergeExceptArrays(prevNodeState, {
+      props: {
+        x: nextProps.x,
+        y: nextProps.y,
+        numPoints: nextProps.numPoints,
+        innerRadius: nextProps.innerRadius,
+        outerRadius: nextProps.outerRadius,
+        rotation: nextProps.rotation,
+        fill: nextProps.fill,
+        ...(nextProps.stroke && { stroke: nextProps.stroke }),
+        ...(nextProps.strokeWidth && {
+          strokeWidth: nextProps.strokeWidth,
+        }),
+      },
+    });
+  }
+
+  static getSchema() {
+    const baseSchema = super.getSchema();
+
+    const nodeSchema = baseSchema.extend({
+      type: z
+        .literal(WEAVE_STAR_NODE_TYPE)
+        .describe(
+          `Type of the node, for a start node it will always be "${WEAVE_STAR_NODE_TYPE}"`
+        ),
+      props: baseSchema.shape.props.extend({
+        nodeType: z
+          .literal(WEAVE_STAR_NODE_TYPE)
+          .describe(
+            `Type of the node, for a rectangle node it will always be "${WEAVE_STAR_NODE_TYPE}"`
+          ),
+
+        numPoints: z
+          .number()
+          .describe(
+            'Number of points of the star, must be greater than or equal to 3'
+          ),
+        innerRadius: z
+          .number()
+          .describe(
+            'Inner radius of the star, must be greater than or equal to 0'
+          ),
+        outerRadius: z
+          .number()
+          .describe(
+            'Outer radius of the star, must be greater than or equal to 0'
+          ),
+
+        fill: z
+          .string()
+          .describe(
+            'Fill color of the star in hex format with alpha channel (e.g. #RRGGBBAA)'
+          ),
+
+        stroke: z
+          .string()
+          .describe(
+            'Stroke color of the star in hex format with alpha channel (e.g. #RRGGBBAA)'
+          ),
+        strokeWidth: z.number().describe('Stroke width of the star in pixels'),
+        strokeScaleEnabled: z
+          .boolean()
+          .describe(
+            'Whether the star stroke width should scale when the node is scaled. Defaults to true.'
+          ),
+      }),
+    });
+
+    return nodeSchema;
   }
 }

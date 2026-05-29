@@ -220,18 +220,21 @@ export class WeaveRectangleNode extends WeaveNode {
   static getSchema() {
     const baseSchema = super.getSchema();
 
-    const imageNodeSchema = baseSchema.extend({
+    const nodeSchema = baseSchema.extend({
       type: z
-        .literal('rectangle')
+        .literal(WEAVE_RECTANGLE_NODE_TYPE)
         .describe(
-          'Type of the node, for a rectangle node it will always be "rectangle"'
+          `Type of the node, for a rectangle node it will always be "${WEAVE_RECTANGLE_NODE_TYPE}"`
         ),
       props: baseSchema.shape.props.extend({
         nodeType: z
-          .literal('rectangle')
+          .literal(WEAVE_RECTANGLE_NODE_TYPE)
           .describe(
-            'Type of the node, for a rectangle node it will always be "rectangle"'
+            `Type of the node, for a rectangle node it will always be "${WEAVE_RECTANGLE_NODE_TYPE}"`
           ),
+
+        width: z.number().describe('Width of the rectangle in pixels'),
+        height: z.number().describe('Height of the rectangle in pixels'),
 
         fill: z
           .string()
@@ -255,6 +258,6 @@ export class WeaveRectangleNode extends WeaveNode {
       }),
     });
 
-    return imageNodeSchema;
+    return nodeSchema;
   }
 }

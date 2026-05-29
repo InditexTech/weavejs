@@ -1520,6 +1520,7 @@ export class WeaveImageNode extends WeaveNode {
   static defaultState(nodeId: string): WeaveStateElement {
     return {
       ...super.defaultState(nodeId),
+      type: WEAVE_IMAGE_NODE_TYPE,
       props: {
         ...super.defaultState(nodeId).props,
         nodeType: WEAVE_IMAGE_NODE_TYPE,
@@ -1622,18 +1623,21 @@ export class WeaveImageNode extends WeaveNode {
   static getSchema() {
     const baseSchema = super.getSchema();
 
-    const imageNodeSchema = baseSchema.extend({
+    const nodeSchema = baseSchema.extend({
       type: z
-        .literal('image')
+        .literal(WEAVE_IMAGE_NODE_TYPE)
         .describe(
-          'Type of the node, for a image node it will always be "image"'
+          `Type of the node, for a image node it will always be "${WEAVE_IMAGE_NODE_TYPE}"`
         ),
       props: baseSchema.shape.props.extend({
         nodeType: z
           .literal('image')
           .describe(
-            'Type of the node, for a image node it will always be "image"'
+            `Type of the node, for a image node it will always be "${WEAVE_IMAGE_NODE_TYPE}"`
           ),
+
+        width: z.number().describe('Width of the image in pixels'),
+        height: z.number().describe('Height of the image in pixels'),
 
         imageURL: z
           .string()
@@ -1683,6 +1687,6 @@ export class WeaveImageNode extends WeaveNode {
       }),
     });
 
-    return imageNodeSchema;
+    return nodeSchema;
   }
 }

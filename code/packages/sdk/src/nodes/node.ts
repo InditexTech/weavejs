@@ -1367,8 +1367,6 @@ export abstract class WeaveNode implements WeaveNodeBase {
         y: z
           .number()
           .describe('Y position of the node, relative to the parent container'),
-        width: z.number().describe('Width of the node in pixels'),
-        height: z.number().describe('Height of the node in pixels'),
         scaleX: z.number().describe('Scale factor on the X axis, default is 1'),
         scaleY: z.number().describe('Scale factor on the Y axis, default is 1'),
         rotation: z

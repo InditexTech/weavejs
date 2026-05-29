@@ -9,8 +9,6 @@ globalThis.onmessage = async (e: MessageEvent) => {
     return;
   }
 
-  console.log('aqui?');
-
   const canvas = new OffscreenCanvas(bitmap.width, bitmap.height);
   const ctx = canvas.getContext('2d')!;
   ctx.drawImage(bitmap, 0, 0);

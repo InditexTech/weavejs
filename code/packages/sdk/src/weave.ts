@@ -296,7 +296,6 @@ export class Weave {
     // destroy the stage from memory
     const stage = this.getStage();
     if (stage) {
-      console.log('remove stage');
       stage.destroy();
     }
 
