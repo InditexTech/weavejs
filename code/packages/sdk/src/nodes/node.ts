@@ -270,6 +270,13 @@ export abstract class WeaveNode implements WeaveNodeBase {
     node.releaseMutex = function () {
       this.setAttrs({ mutexLocked: false, mutexUserId: undefined });
     };
+
+    const isLocked = node.getAttrs().locked ?? false;
+    if (isLocked) {
+      node.listening(false);
+    } else {
+      node.listening(true);
+    }
   }
 
   isNodeSelected(ele: Konva.Node): boolean {
@@ -971,8 +978,8 @@ export abstract class WeaveNode implements WeaveNodeBase {
 
     const realNode = this.instance.getInstanceRecursive(node);
 
-    const isTargetable = node.getAttrs().isTargetable !== false;
-    const isLocked = node.getAttrs().locked ?? false;
+    const canBeTargeted = realNode.getAttrs().canBeTargeted !== false;
+    const isLocked = realNode.getAttrs().locked ?? false;
     const isMutexLocked =
       realNode.getAttrs().mutexLocked &&
       realNode.getAttrs().mutexUserId !== user.id;
@@ -990,6 +997,7 @@ export abstract class WeaveNode implements WeaveNodeBase {
       this.isSelecting() &&
       !this.isNodeSelected(realNode) &&
       !this.isPasting() &&
+      realNode.hasName('node') &&
       (isLocked || isMutexLocked)
     ) {
       stage.container().style.cursor = 'default';
@@ -1002,14 +1010,15 @@ export abstract class WeaveNode implements WeaveNodeBase {
       this.isSelecting() &&
       !this.isNodeSelected(realNode) &&
       !this.isPasting() &&
-      isTargetable &&
+      canBeTargeted &&
+      realNode.hasName('node') &&
       !(isLocked || isMutexLocked) &&
       stage.mode() === WEAVE_STAGE_DEFAULT_MODE
     ) {
       showHover = true;
       stage.container().style.cursor =
-        (typeof node?.defineMousePointer === 'function'
-          ? node.defineMousePointer()
+        (typeof realNode?.defineMousePointer === 'function'
+          ? realNode.defineMousePointer()
           : null) ?? 'pointer';
       cancelBubble = true;
     }
@@ -1020,19 +1029,20 @@ export abstract class WeaveNode implements WeaveNodeBase {
       this.isSelecting() &&
       this.isNodeSelected(realNode) &&
       !this.isPasting() &&
-      isTargetable &&
+      realNode.hasName('node') &&
+      canBeTargeted &&
       !(isLocked || isMutexLocked) &&
       stage.mode() === WEAVE_STAGE_DEFAULT_MODE
     ) {
       showHover = true;
       stage.container().style.cursor =
-        (typeof node?.defineMousePointer === 'function'
-          ? node.defineMousePointer()
+        (typeof realNode?.defineMousePointer === 'function'
+          ? realNode.defineMousePointer()
           : null) ?? 'grab';
       cancelBubble = true;
     }
 
-    if (!isTargetable) {
+    if (!canBeTargeted) {
       cancelBubble = true;
     }
 
@@ -1189,8 +1199,11 @@ export abstract class WeaveNode implements WeaveNodeBase {
       return;
     }
 
+    const isListening = instance.listening();
     instance.setAttrs({
       locked: true,
+      listening: false,
+      previousListening: isListening,
     });
 
     this.instance.updateNode(this.serialize(instance as WeaveElementInstance));
@@ -1227,8 +1240,11 @@ export abstract class WeaveNode implements WeaveNodeBase {
       return;
     }
 
+    const previousListening = realInstance.getAttrs().previousListening ?? true;
     realInstance.setAttrs({
       locked: false,
+      listening: previousListening,
+      previousListening: undefined,
     });
 
     this.instance.updateNode(

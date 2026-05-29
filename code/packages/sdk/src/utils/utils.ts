@@ -181,10 +181,15 @@ export function moveNodeToContainerNT(
     layerToMove = containerToMove;
   }
 
+  const nodeHandler = instance.getNodeHandler<WeaveNode>(
+    node.getAttrs().nodeType
+  );
+
   if (
     layerToMove &&
     actualContainerAttrs.id !== layerToMove.getAttrs().id &&
-    actualContainerAttrs.id !== layerToMove.getAttrs().containerId
+    actualContainerAttrs.id !== layerToMove.getAttrs().containerId &&
+    nodeHandler
   ) {
     const layerToMoveAttrs = layerToMove.getAttrs();
 
@@ -196,7 +201,6 @@ export function moveNodeToContainerNT(
     node.rotation(nodeRotation);
     node.x(node.x() - (layerToMoveAttrs.containerOffsetX ?? 0));
     node.y(node.y() - (layerToMoveAttrs.containerOffsetY ?? 0));
-    node.destroy();
 
     const newNode: Konva.Node = node.clone();
     instance.emitEvent('onNodeMovedToContainer', {
@@ -206,26 +210,19 @@ export function moveNodeToContainerNT(
       originalContainer,
     });
 
-    const nodeHandler = instance.getNodeHandler<WeaveNode>(
-      node.getAttrs().nodeType
-    );
+    const actualNodeState = nodeHandler.serialize(node as WeaveElementInstance);
+    const newNodeState = nodeHandler.serialize(newNode as WeaveElementInstance);
 
-    if (nodeHandler) {
-      const actualNodeState = nodeHandler.serialize(
-        node as WeaveElementInstance
-      );
-      const newNodeState = nodeHandler.serialize(
-        newNode as WeaveElementInstance
-      );
-      instance.removeNodeNT(actualNodeState, { emitUserChangeEvent: false });
-      instance.addNodeNT(newNodeState, layerToMoveAttrs.id, {
-        // emitUserChangeEvent: true,
-        emitUserChangeEvent: false,
-        overrideUserChangeType: WEAVE_NODE_CHANGE_TYPE.UPDATE,
-      });
+    node.destroy();
 
-      return true;
-    }
+    instance.removeNodeNT(actualNodeState, { emitUserChangeEvent: false });
+    instance.addNodeNT(newNodeState, layerToMoveAttrs.id, {
+      // emitUserChangeEvent: true,
+      emitUserChangeEvent: false,
+      overrideUserChangeType: WEAVE_NODE_CHANGE_TYPE.UPDATE,
+    });
+
+    return true;
   }
 
   return false;
