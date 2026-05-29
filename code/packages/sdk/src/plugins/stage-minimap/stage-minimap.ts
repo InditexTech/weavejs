@@ -145,10 +145,10 @@ export class WeaveStageMinimapPlugin extends WeavePlugin {
 
     if (box.width === 0 || box.height === 0) return;
 
-    const fitScale = Math.min(
-      this.minimapStage.width() / box.width,
-      this.minimapStage.height() / box.height
-    );
+    const width = this.minimapStage?.width();
+    const height = this.minimapStage?.height();
+
+    const fitScale = Math.min(width / box.width, height / box.height);
     const centerOffset = {
       x: (this.minimapStage.width() - box.width * fitScale) / 2,
       y: (this.minimapStage.height() - box.height * fitScale) / 2,

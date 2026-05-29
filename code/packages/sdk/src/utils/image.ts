@@ -58,6 +58,8 @@ export async function downscaleImageFile(
 
   return new Promise((resolve) => {
     canvas.toBlob((blob) => resolve(blob!), file.type, 0.9);
+
+    canvas.remove();
   });
 }
 
@@ -145,7 +147,11 @@ export const downscaleImageFromURL = (
       const ctx = canvas.getContext('2d')!;
       ctx.drawImage(img, 0, 0, width, height);
 
-      resolve(canvas.toDataURL(type));
+      const dataURL = canvas.toDataURL(type);
+
+      canvas.remove();
+
+      resolve(dataURL);
     };
 
     img.onerror = () => {
