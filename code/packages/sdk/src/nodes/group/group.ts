@@ -114,6 +114,7 @@ export class WeaveGroupNode extends WeaveNode {
     const children: WeaveElementInstance[] = [
       ...(instance as Konva.Group).getChildren(),
     ];
+
     for (const node of children) {
       const handler = this.instance.getNodeHandler<WeaveNode>(
         node.getAttr('nodeType')
