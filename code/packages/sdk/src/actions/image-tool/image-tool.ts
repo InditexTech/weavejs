@@ -8,16 +8,15 @@ import {
   type WeaveImageToolActionTriggerParams,
   type WeaveImageToolActionState,
   type WeaveImageToolActionOnAddedEvent,
-  type WeaveImageToolActionUploadType,
   type WeaveImageToolDragAndDropProperties,
   type WeaveImageToolActionParams,
   type WeaveImageToolActionConfig,
   type WeaveImageFile,
   type WeaveImageURL,
-  type WeaveImageToolActionUploadFunction,
   type WeaveImageToolActionOnImageUploadedEvent,
   type WeaveImageToolActionTriggerReturn,
   type WeaveImageToolActionOnImageUploadedErrorEvent,
+  type ImageToolActionData,
 } from './types';
 import {
   WEAVE_IMAGE_TOOL_ACTION_NAME,
@@ -30,23 +29,8 @@ import Konva from 'konva';
 import type { WeaveImageNode } from '@/nodes/image/image';
 import { SELECTION_TOOL_ACTION_NAME } from '../selection-tool/constants';
 import { mergeExceptArrays } from '@/utils/utils';
-import type {
-  WeaveElementAttributes,
-  WeaveElementInstance,
-} from '@inditextech/weave-types';
+import type { WeaveElementInstance } from '@inditextech/weave-types';
 import { downscaleImageFile, getImageSizeFromFile } from '@/utils/image';
-
-type ImageToolActionData = {
-  props: WeaveElementAttributes;
-  imageId: string | null;
-  container: Konva.Layer | Konva.Node | undefined;
-  imageFile: WeaveImageFile | null;
-  imageURL: WeaveImageURL | null;
-  forceMainContainer: boolean;
-  clickPoint: Konva.Vector2d | null;
-  uploadType: WeaveImageToolActionUploadType | null;
-  uploadImageFunction: WeaveImageToolActionUploadFunction | null;
-};
 
 export class WeaveImageToolAction extends WeaveAction {
   protected readonly config: WeaveImageToolActionConfig;
@@ -269,11 +253,30 @@ export class WeaveImageToolAction extends WeaveAction {
 
         this.imageAction[nodeId].props = {
           ...this.imageAction[nodeId].props,
-          imageFallback: dataURL,
+          ...(this.imageAction[nodeId].imageId && {
+            imageId: this.imageAction[nodeId].imageId,
+          }),
           imageURL: undefined,
+          imageFallbackURL: dataURL,
           width: realImageSize.width,
           height: realImageSize.height,
         };
+
+        const imageNodeHandler = this.getImageNodeHandler();
+
+        if (!imageNodeHandler) {
+          return;
+        }
+
+        imageNodeHandler.saveImageFallback(
+          this.imageAction[nodeId].props,
+          dataURL
+        );
+
+        imageNodeHandler.cacheImageFallbackURL(
+          this.imageAction[nodeId].props,
+          dataURL
+        );
 
         this.addImageNode(nodeId, params?.position);
       } catch {
@@ -315,18 +318,29 @@ export class WeaveImageToolAction extends WeaveAction {
     }
 
     if (this.imageAction[nodeId]) {
-      const { uploadType } = this.imageAction[nodeId];
-
       const mousePos = stage.getRelativePointerPosition();
 
       this.tempImageId = uuidv4();
 
       let imageSource = imageNodeHandler.getImageSource(nodeId);
-      if (uploadType === 'file') {
-        imageSource = imageNodeHandler.getFallbackImageSource(nodeId);
+      const imageFallbackId = imageNodeHandler.getImageFallbackId(
+        this.imageAction[nodeId].props
+      );
+      if (
+        this.imageAction[nodeId].props.imageFallbackURL &&
+        !imageNodeHandler.isImageFallbackEnabled()
+      ) {
         imageSource ??= await this.loadImageDataURL(
-          this.imageAction[nodeId].props.imageFallback
+          this.imageAction[nodeId].props.imageFallbackURL
         );
+      }
+      if (imageFallbackId && imageNodeHandler.isImageFallbackEnabled()) {
+        imageSource = imageNodeHandler.getFallbackImageSource(nodeId);
+        const imageFallbackURL =
+          imageNodeHandler.getFallbackImageSourceURL(imageFallbackId);
+        if (imageFallbackURL) {
+          imageSource ??= await this.loadImageDataURL(imageFallbackURL);
+        }
       }
 
       if (!imageSource) {
@@ -334,9 +348,14 @@ export class WeaveImageToolAction extends WeaveAction {
         return;
       }
 
-      const aspectRatio = imageSource.width / imageSource.height;
+      if (
+        !this.tempImageNode &&
+        this.tempImageId &&
+        !this.isTouchDevice() &&
+        imageSource
+      ) {
+        const aspectRatio = imageSource.width / imageSource.height;
 
-      if (!this.tempImageNode && this.tempImageId && !this.isTouchDevice()) {
         const cursorPadding = this.config.style.cursor.padding;
         const imageThumbnailWidth =
           this.config.style.cursor.imageThumbnail.width;
@@ -393,11 +412,24 @@ export class WeaveImageToolAction extends WeaveAction {
         this.imageAction[nodeId];
 
       let imageSource = imageNodeHandler.getImageSource(nodeId);
-      if (uploadType === WEAVE_IMAGE_TOOL_UPLOAD_TYPE.FILE) {
-        imageSource = imageNodeHandler.getFallbackImageSource(nodeId);
+      const imageFallbackId = imageNodeHandler.getImageFallbackId(
+        this.imageAction[nodeId].props
+      );
+      if (
+        this.imageAction[nodeId].props.imageFallbackURL &&
+        !imageNodeHandler.isImageFallbackEnabled()
+      ) {
         imageSource ??= await this.loadImageDataURL(
-          this.imageAction[nodeId].props.imageFallback
+          this.imageAction[nodeId].props.imageFallbackURL
         );
+      }
+      if (imageFallbackId && imageNodeHandler.isImageFallbackEnabled()) {
+        imageSource = imageNodeHandler.getFallbackImageSource(nodeId);
+        const imageFallbackURL =
+          imageNodeHandler.getFallbackImageSourceURL(imageFallbackId);
+        if (imageFallbackURL) {
+          imageSource ??= await this.loadImageDataURL(imageFallbackURL);
+        }
       }
 
       if (!imageSource && !position) {
@@ -426,6 +458,13 @@ export class WeaveImageToolAction extends WeaveAction {
       }
 
       if (nodeHandler) {
+        if (this.imageAction[nodeId].props.imageFallbackURL) {
+          this.imageAction[nodeId].props = {
+            ...this.imageAction[nodeId].props,
+            imageFallbackURL: undefined,
+          };
+        }
+
         const node = nodeHandler.create(nodeId, {
           ...this.imageAction[nodeId].props,
           x: this.imageAction[nodeId].clickPoint.x,
@@ -469,7 +508,10 @@ export class WeaveImageToolAction extends WeaveAction {
           ) => {
             const { uploadImageFunction, imageFile } = imageActionData;
             try {
-              const imageURL = await uploadImageFunction?.(imageFile!.file);
+              const imageURL = await uploadImageFunction?.(
+                imageFile!.file,
+                this.imageAction[nodeId].imageId!
+              );
 
               if (!imageURL) {
                 return;
@@ -532,6 +574,7 @@ export class WeaveImageToolAction extends WeaveAction {
       clickPoint: null,
       imageFile: null,
       imageURL: null,
+      imageFallbackURL: null,
       container: params?.container,
       forceMainContainer: params?.forceMainContainer ?? false,
       uploadType: null,
@@ -571,7 +614,6 @@ export class WeaveImageToolAction extends WeaveAction {
       this.imageAction[nodeId].imageURL = params.image;
       this.imageAction[nodeId].props = {
         ...this.imageAction[nodeId].props,
-        imageFallback: params.image.fallback,
         width: params.image.width,
         height: params.image.height,
       };
