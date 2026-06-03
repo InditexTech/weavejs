@@ -6,6 +6,7 @@ import { type Logger } from 'pino';
 import { Weave } from '@/weave';
 import { v4 as uuidv4 } from 'uuid';
 import {
+  type BoundingBox,
   type WeaveElementInstance,
   type WeaveExportNodesOptions,
   WEAVE_EXPORT_BACKGROUND_COLOR,
@@ -61,6 +62,7 @@ export class WeaveExportManager {
   private cloneStageForExport(): {
     stage: Konva.Stage;
     mainLayer: Konva.Layer;
+    originalScale: { scaleX: number; scaleY: number };
   } {
     const originalStage = this.instance.getStage();
     const stage = originalStage.clone();
@@ -78,7 +80,84 @@ export class WeaveExportManager {
     const gridLayer = stage.findOne(`#${WEAVE_GRID_LAYER_ID}`) as Konva.Layer;
     gridLayer?.destroy();
 
-    return { stage, mainLayer };
+    const scaleX = originalStage.scaleX();
+    const scaleY = originalStage.scaleY();
+
+    return { stage, mainLayer, originalScale: { scaleX, scaleY } };
+  }
+
+  private setupForExport({
+    bounds,
+    stage,
+    mainLayer,
+    scaleX,
+    scaleY,
+    options,
+  }: {
+    bounds: BoundingBox;
+    stage: Konva.Stage;
+    mainLayer: Konva.Layer;
+    scaleX: number;
+    scaleY: number;
+    options: WeaveExportNodesOptions;
+  }): {
+    exportGroup: Konva.Group;
+    pixelRatio: number;
+    backgroundRect: { x: number; y: number; width: number; height: number };
+  } {
+    const {
+      padding = 0,
+      pixelRatio = 1,
+      backgroundColor = WEAVE_EXPORT_BACKGROUND_COLOR,
+    } = options;
+
+    const unscaledBounds = {
+      x: bounds.x / scaleX,
+      y: bounds.y / scaleY,
+      width: bounds.width / scaleX,
+      height: bounds.height / scaleY,
+    };
+
+    const exportGroup = new Konva.Group();
+
+    const background = new Konva.Rect({
+      x: unscaledBounds.x - padding,
+      y: unscaledBounds.y - padding,
+      width: unscaledBounds.width + 2 * padding,
+      height: unscaledBounds.height + 2 * padding,
+      strokeWidth: 0,
+      fill: backgroundColor,
+    });
+
+    exportGroup.add(background);
+
+    for (const node of nodes) {
+      const clonedNode = node.clone({ id: uuidv4() });
+      const absPos = node.getAbsolutePosition();
+      clonedNode.absolutePosition({
+        x: absPos.x / scaleX,
+        y: absPos.y / scaleY,
+      });
+      exportGroup.add(clonedNode);
+    }
+
+    mainLayer.add(exportGroup);
+
+    const backgroundRect = background.getClientRect();
+
+    stage.batchDraw();
+
+    const { pixelRatio: finalPixelRatio } = this.fitKonvaPixelRatio(
+      Math.round(backgroundRect.width),
+      Math.round(backgroundRect.height),
+      pixelRatio
+    );
+
+    return {
+      exportGroup,
+      pixelRatio: finalPixelRatio,
+      backgroundRect,
+    };
   }
 
   exportNodesAsImage(
@@ -87,63 +166,27 @@ export class WeaveExportManager {
     options: WeaveExportNodesOptions
   ): Promise<HTMLImageElement> {
     return new Promise((resolve) => {
-      const {
-        format = WEAVE_EXPORT_FORMATS.PNG,
-        padding = 0,
-        pixelRatio = 1,
-        backgroundColor = WEAVE_EXPORT_BACKGROUND_COLOR,
-      } = options;
+      const { format = WEAVE_EXPORT_FORMATS.PNG } = options;
 
-      const originalStage = this.instance.getStage();
-      const { stage, mainLayer } = this.cloneStageForExport();
+      const {
+        stage,
+        mainLayer,
+        originalScale: { scaleX, scaleY },
+      } = this.cloneStageForExport();
 
       if (mainLayer) {
-        const bounds = getExportBoundingBox(boundingNodes(nodes));
-
-        const scaleX = originalStage.scaleX();
-        const scaleY = originalStage.scaleY();
-
-        const unscaledBounds = {
-          x: bounds.x / scaleX,
-          y: bounds.y / scaleY,
-          width: bounds.width / scaleX,
-          height: bounds.height / scaleY,
-        };
-
-        const exportGroup = new Konva.Group();
-
-        const background = new Konva.Rect({
-          x: unscaledBounds.x - padding,
-          y: unscaledBounds.y - padding,
-          width: unscaledBounds.width + 2 * padding,
-          height: unscaledBounds.height + 2 * padding,
-          strokeWidth: 0,
-          fill: backgroundColor,
+        const {
+          pixelRatio: finalPixelRatio,
+          backgroundRect,
+          exportGroup,
+        } = this.setupForExport({
+          bounds: getExportBoundingBox(boundingNodes(nodes)),
+          stage,
+          mainLayer,
+          scaleX,
+          scaleY,
+          options,
         });
-
-        exportGroup.add(background);
-
-        for (const node of nodes) {
-          const clonedNode = node.clone({ id: uuidv4() });
-          const absPos = node.getAbsolutePosition();
-          clonedNode.absolutePosition({
-            x: absPos.x / scaleX,
-            y: absPos.y / scaleY,
-          });
-          exportGroup.add(clonedNode);
-        }
-
-        mainLayer.add(exportGroup);
-
-        const backgroundRect = background.getClientRect();
-
-        stage.batchDraw();
-
-        const { pixelRatio: finalPixelRatio } = this.fitKonvaPixelRatio(
-          Math.round(backgroundRect.width),
-          Math.round(backgroundRect.height),
-          pixelRatio
-        );
 
         exportGroup.toImage({
           x: Math.round(backgroundRect.x),
@@ -171,63 +214,27 @@ export class WeaveExportManager {
     options: WeaveExportNodesOptions
   ): Promise<Blob> {
     return new Promise((resolve) => {
-      const {
-        format = WEAVE_EXPORT_FORMATS.PNG,
-        padding = 0,
-        pixelRatio = 1,
-        backgroundColor = WEAVE_EXPORT_BACKGROUND_COLOR,
-      } = options;
+      const { format = WEAVE_EXPORT_FORMATS.PNG } = options;
 
-      const originalStage = this.instance.getStage();
-      const { stage, mainLayer } = this.cloneStageForExport();
+      const {
+        stage,
+        mainLayer,
+        originalScale: { scaleX, scaleY },
+      } = this.cloneStageForExport();
 
       if (mainLayer) {
-        const bounds = getExportBoundingBox(boundingNodes(nodes));
-
-        const scaleX = originalStage.scaleX();
-        const scaleY = originalStage.scaleY();
-
-        const unscaledBounds = {
-          x: bounds.x / scaleX,
-          y: bounds.y / scaleY,
-          width: bounds.width / scaleX,
-          height: bounds.height / scaleY,
-        };
-
-        const exportGroup = new Konva.Group();
-
-        const background = new Konva.Rect({
-          x: unscaledBounds.x - padding,
-          y: unscaledBounds.y - padding,
-          width: unscaledBounds.width + 2 * padding,
-          height: unscaledBounds.height + 2 * padding,
-          strokeWidth: 0,
-          fill: backgroundColor,
+        const {
+          pixelRatio: finalPixelRatio,
+          backgroundRect,
+          exportGroup,
+        } = this.setupForExport({
+          bounds: getExportBoundingBox(boundingNodes(nodes)),
+          stage,
+          mainLayer,
+          scaleX,
+          scaleY,
+          options,
         });
-
-        exportGroup.add(background);
-
-        for (const node of nodes) {
-          const clonedNode = node.clone({ id: uuidv4() });
-          const absPos = node.getAbsolutePosition();
-          clonedNode.absolutePosition({
-            x: absPos.x / scaleX,
-            y: absPos.y / scaleY,
-          });
-          exportGroup.add(clonedNode);
-        }
-
-        mainLayer.add(exportGroup);
-
-        const backgroundRect = background.getClientRect();
-
-        stage.batchDraw();
-
-        const { pixelRatio: finalPixelRatio } = this.fitKonvaPixelRatio(
-          Math.round(backgroundRect.width),
-          Math.round(backgroundRect.height),
-          pixelRatio
-        );
 
         exportGroup.toBlob({
           x: Math.round(backgroundRect.x),
@@ -260,63 +267,27 @@ export class WeaveExportManager {
     options: WeaveExportNodesOptions
   ): Promise<HTMLCanvasElement> {
     return new Promise((resolve) => {
-      const {
-        format = WEAVE_EXPORT_FORMATS.PNG,
-        padding = 0,
-        pixelRatio = 1,
-        backgroundColor = WEAVE_EXPORT_BACKGROUND_COLOR,
-      } = options;
+      const { format = WEAVE_EXPORT_FORMATS.PNG } = options;
 
-      const originalStage = this.instance.getStage();
-      const { stage, mainLayer } = this.cloneStageForExport();
+      const {
+        stage,
+        mainLayer,
+        originalScale: { scaleX, scaleY },
+      } = this.cloneStageForExport();
 
       if (mainLayer) {
-        const bounds = getExportBoundingBox(boundingNodes(nodes));
-
-        const scaleX = originalStage.scaleX();
-        const scaleY = originalStage.scaleY();
-
-        const unscaledBounds = {
-          x: bounds.x / scaleX,
-          y: bounds.y / scaleY,
-          width: bounds.width / scaleX,
-          height: bounds.height / scaleY,
-        };
-
-        const exportGroup = new Konva.Group();
-
-        const background = new Konva.Rect({
-          x: unscaledBounds.x - padding,
-          y: unscaledBounds.y - padding,
-          width: unscaledBounds.width + 2 * padding,
-          height: unscaledBounds.height + 2 * padding,
-          strokeWidth: 0,
-          fill: backgroundColor,
+        const {
+          pixelRatio: finalPixelRatio,
+          backgroundRect,
+          exportGroup,
+        } = this.setupForExport({
+          bounds: getExportBoundingBox(boundingNodes(nodes)),
+          stage,
+          mainLayer,
+          scaleX,
+          scaleY,
+          options,
         });
-
-        exportGroup.add(background);
-
-        for (const node of nodes) {
-          const clonedNode = node.clone({ id: uuidv4() });
-          const absPos = node.getAbsolutePosition();
-          clonedNode.absolutePosition({
-            x: absPos.x / scaleX,
-            y: absPos.y / scaleY,
-          });
-          exportGroup.add(clonedNode);
-        }
-
-        mainLayer.add(exportGroup);
-
-        const backgroundRect = background.getClientRect();
-
-        stage.batchDraw();
-
-        const { pixelRatio: finalPixelRatio } = this.fitKonvaPixelRatio(
-          Math.round(backgroundRect.width),
-          Math.round(backgroundRect.height),
-          pixelRatio
-        );
 
         exportGroup.toCanvas({
           x: Math.round(backgroundRect.x),
@@ -343,73 +314,39 @@ export class WeaveExportManager {
     options: WeaveExportNodesOptions
   ): Promise<HTMLImageElement> {
     return new Promise((resolve) => {
+      const { format = WEAVE_EXPORT_FORMATS.PNG } = options;
+
       const {
-        format = WEAVE_EXPORT_FORMATS.PNG,
-        padding = 0,
-        pixelRatio = 1,
-        backgroundColor = WEAVE_EXPORT_BACKGROUND_COLOR,
-      } = options;
+        stage,
+        mainLayer,
+        originalScale: { scaleX, scaleY },
+      } = this.cloneStageForExport();
 
-      const nodesSelectionPluginPrev =
-        this.getNodesSelectionPlugin()?.isEnabled();
-      const nodesStageGridPluginPrev = this.getStageGridPlugin()?.isEnabled();
+      if (mainLayer) {
+        const { pixelRatio: finalPixelRatio } = this.setupForExport({
+          bounds: area,
+          stage,
+          mainLayer,
+          scaleX,
+          scaleY,
+          options,
+        });
 
-      this.getNodesSelectionPlugin()?.disable();
-      this.getStageGridPlugin()?.disable();
+        stage.toImage({
+          x: area.x,
+          y: area.y,
+          width: area.width,
+          height: area.height,
+          mimeType: format,
+          pixelRatio: finalPixelRatio,
+          quality: options.quality ?? 1,
+          callback: (img) => {
+            stage.destroy();
 
-      const stage = this.instance.getStage();
-      const mainLayer = this.instance.getMainLayer();
-
-      if (!mainLayer) {
-        throw new Error('Main layer not found');
+            resolve(img);
+          },
+        });
       }
-
-      const originalPosition = { x: stage.x(), y: stage.y() };
-      const originalScale = { x: stage.scaleX(), y: stage.scaleY() };
-
-      stage.scale({ x: 1, y: 1 });
-      stage.position({ x: 0, y: 0 });
-
-      const bounds = area;
-
-      const background = new Konva.Rect({
-        x: bounds.x - padding,
-        y: bounds.y - padding,
-        width: bounds.width + 2 * padding,
-        height: bounds.height + 2 * padding,
-        strokeWidth: 0,
-        fill: backgroundColor,
-      });
-
-      mainLayer.add(background);
-      background.moveToBottom();
-      stage.batchDraw();
-
-      stage.toImage({
-        x: area.x,
-        y: area.y,
-        width: area.width,
-        height: area.height,
-        mimeType: format,
-        pixelRatio,
-        quality: options.quality ?? 1,
-        callback: (img) => {
-          background.destroy();
-
-          stage.position(originalPosition);
-          stage.scale(originalScale);
-          stage.batchDraw();
-
-          if (nodesSelectionPluginPrev) {
-            this.getNodesSelectionPlugin()?.enable();
-          }
-          if (nodesStageGridPluginPrev) {
-            this.getStageGridPlugin()?.enable();
-          }
-
-          resolve(img);
-        },
-      });
     });
   }
 
@@ -418,78 +355,44 @@ export class WeaveExportManager {
     options: WeaveExportNodesOptions
   ): Promise<Blob> {
     return new Promise((resolve) => {
+      const { format = WEAVE_EXPORT_FORMATS.PNG } = options;
+
       const {
-        format = WEAVE_EXPORT_FORMATS.PNG,
-        padding = 0,
-        pixelRatio = 1,
-        backgroundColor = WEAVE_EXPORT_BACKGROUND_COLOR,
-      } = options;
+        stage,
+        mainLayer,
+        originalScale: { scaleX, scaleY },
+      } = this.cloneStageForExport();
 
-      const nodesSelectionPluginPrev =
-        this.getNodesSelectionPlugin()?.isEnabled();
-      const nodesStageGridPluginPrev = this.getStageGridPlugin()?.isEnabled();
+      if (mainLayer) {
+        const { pixelRatio: finalPixelRatio } = this.setupForExport({
+          bounds: area,
+          stage,
+          mainLayer,
+          scaleX,
+          scaleY,
+          options,
+        });
 
-      this.getNodesSelectionPlugin()?.disable();
-      this.getStageGridPlugin()?.disable();
+        stage.toBlob({
+          x: area.x,
+          y: area.y,
+          width: area.width,
+          height: area.height,
+          mimeType: format,
+          pixelRatio: finalPixelRatio,
+          quality: options.quality ?? 1,
+          callback: (blob: Blob | null) => {
+            stage.destroy();
 
-      const stage = this.instance.getStage();
-      const mainLayer = this.instance.getMainLayer();
+            if (!blob) {
+              reject(new Error('Failed to generate image blob'));
+              return;
+            }
 
-      if (!mainLayer) {
-        throw new Error('Main layer not found');
+            resolve(blob);
+          },
+        });
       }
-
-      const originalPosition = { x: stage.x(), y: stage.y() };
-      const originalScale = { x: stage.scaleX(), y: stage.scaleY() };
-
-      stage.scale({ x: 1, y: 1 });
-      stage.position({ x: 0, y: 0 });
-
-      const bounds = area;
-
-      const background = new Konva.Rect({
-        x: bounds.x - padding,
-        y: bounds.y - padding,
-        width: bounds.width + 2 * padding,
-        height: bounds.height + 2 * padding,
-        strokeWidth: 0,
-        fill: backgroundColor,
-      });
-
-      mainLayer.add(background);
-      background.moveToBottom();
-      stage.batchDraw();
-
-      stage.toBlob({
-        x: area.x,
-        y: area.y,
-        width: area.width,
-        height: area.height,
-        mimeType: format,
-        pixelRatio,
-        quality: options.quality ?? 1,
-        callback: (blob: Blob | null) => {
-          background.destroy();
-
-          stage.position(originalPosition);
-          stage.scale(originalScale);
-          stage.batchDraw();
-
-          if (nodesSelectionPluginPrev) {
-            this.getNodesSelectionPlugin()?.enable();
-          }
-          if (nodesStageGridPluginPrev) {
-            this.getStageGridPlugin()?.enable();
-          }
-
-          if (!blob) {
-            reject(new Error('Failed to generate image blob'));
-            return;
-          }
-
-          resolve(blob);
-        },
-      });
     });
   }
 
@@ -498,73 +401,39 @@ export class WeaveExportManager {
     options: WeaveExportNodesOptions
   ): Promise<HTMLCanvasElement> {
     return new Promise((resolve) => {
+      const { format = WEAVE_EXPORT_FORMATS.PNG } = options;
+
       const {
-        format = WEAVE_EXPORT_FORMATS.PNG,
-        padding = 0,
-        pixelRatio = 1,
-        backgroundColor = WEAVE_EXPORT_BACKGROUND_COLOR,
-      } = options;
+        stage,
+        mainLayer,
+        originalScale: { scaleX, scaleY },
+      } = this.cloneStageForExport();
 
-      const nodesSelectionPluginPrev =
-        this.getNodesSelectionPlugin()?.isEnabled();
-      const nodesStageGridPluginPrev = this.getStageGridPlugin()?.isEnabled();
+      if (mainLayer) {
+        const { pixelRatio: finalPixelRatio } = this.setupForExport({
+          bounds: area,
+          stage,
+          mainLayer,
+          scaleX,
+          scaleY,
+          options,
+        });
 
-      this.getNodesSelectionPlugin()?.disable();
-      this.getStageGridPlugin()?.disable();
+        stage.toCanvas({
+          x: area.x,
+          y: area.y,
+          width: area.width,
+          height: area.height,
+          mimeType: format,
+          pixelRatio: finalPixelRatio,
+          quality: options.quality ?? 1,
+          callback: (canvas: HTMLCanvasElement) => {
+            stage.destroy();
 
-      const stage = this.instance.getStage();
-      const mainLayer = this.instance.getMainLayer();
-
-      if (!mainLayer) {
-        throw new Error('Main layer not found');
+            resolve(canvas);
+          },
+        });
       }
-
-      const originalPosition = { x: stage.x(), y: stage.y() };
-      const originalScale = { x: stage.scaleX(), y: stage.scaleY() };
-
-      stage.scale({ x: 1, y: 1 });
-      stage.position({ x: 0, y: 0 });
-
-      const bounds = area;
-
-      const background = new Konva.Rect({
-        x: bounds.x - padding,
-        y: bounds.y - padding,
-        width: bounds.width + 2 * padding,
-        height: bounds.height + 2 * padding,
-        strokeWidth: 0,
-        fill: backgroundColor,
-      });
-
-      mainLayer.add(background);
-      background.moveToBottom();
-      stage.batchDraw();
-
-      stage.toCanvas({
-        x: area.x,
-        y: area.y,
-        width: area.width,
-        height: area.height,
-        mimeType: format,
-        pixelRatio,
-        quality: options.quality ?? 1,
-        callback: (canvas: HTMLCanvasElement) => {
-          background.destroy();
-
-          stage.position(originalPosition);
-          stage.scale(originalScale);
-          stage.batchDraw();
-
-          if (nodesSelectionPluginPrev) {
-            this.getNodesSelectionPlugin()?.enable();
-          }
-          if (nodesStageGridPluginPrev) {
-            this.getStageGridPlugin()?.enable();
-          }
-
-          resolve(canvas);
-        },
-      });
     });
   }
 
