@@ -22,6 +22,9 @@ export * from './utils/image';
 // Types
 export * from './types';
 
+// Document state API for low-level manipulation
+export * from './state.manipulation';
+
 // Store
 export { WeaveStore } from './stores/store';
 export { defaultInitialState } from './stores/default-initial-state';

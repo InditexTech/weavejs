@@ -2,6 +2,7 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
+import { z } from 'zod';
 import { Weave } from '@/weave';
 import {
   type WeaveElementAttributes,
@@ -1320,5 +1321,78 @@ export abstract class WeaveNode implements WeaveNodeBase {
 
   getIsAsync(): boolean {
     return false;
+  }
+
+  static defaultState(nodeId: string): WeaveStateElement {
+    return {
+      key: nodeId,
+      type: 'unknown',
+      props: {
+        id: nodeId,
+        nodeType: 'unknown',
+        x: 0,
+        y: 0,
+        width: 100,
+        height: 100,
+        rotation: 0,
+        scaleX: 1,
+        scaleY: 1,
+        opacity: 1,
+        zIndex: 1,
+        children: [],
+      },
+    };
+  }
+
+  static getSchema(): z.ZodObject<any> {
+    const baseNodeSchema = z.object({
+      key: z
+        .string()
+        .describe(
+          'Unique identifier (uuid) for the node, generate one it if not provided'
+        ),
+      type: z.string().describe('Type of the node, must be always provided'),
+      props: z.object({
+        id: z
+          .string()
+          .describe(
+            'Unique identifier (uuid) for the node instance, is the same as key'
+          ),
+        nodeType: z
+          .string()
+          .describe('Type of the node, must be always provided'),
+        x: z
+          .number()
+          .describe('X position of the node, relative to the parent container'),
+        y: z
+          .number()
+          .describe('Y position of the node, relative to the parent container'),
+        scaleX: z.number().describe('Scale factor on the X axis, default is 1'),
+        scaleY: z.number().describe('Scale factor on the Y axis, default is 1'),
+        rotation: z
+          .number()
+          .optional()
+          .describe('Rotation of the node in degrees, default is 0'),
+        skewX: z
+          .number()
+          .optional()
+          .describe('Skew on the X axis in degrees, default is 0'),
+        skewY: z
+          .number()
+          .optional()
+          .describe('Skew on the Y axis in degrees, default is 0'),
+
+        opacity: z
+          .number()
+          .describe('Opacity of the node, between 0 and 1, default is 1'),
+
+        children: z
+          .array(z.any())
+          .length(0)
+          .describe('Children nodes, always be an empty array for leaf nodes'),
+      }),
+    });
+
+    return baseNodeSchema;
   }
 }

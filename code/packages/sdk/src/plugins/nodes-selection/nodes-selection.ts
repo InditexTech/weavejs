@@ -331,13 +331,7 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
     tr.on('mouseover', () => {
       const nodesSelected = tr.nodes();
 
-      if (nodesSelected.length === 1) {
-        const node = nodesSelected[0];
-        stage.container().style.cursor =
-          (typeof node?.defineMousePointer === 'function'
-            ? node.defineMousePointer()
-            : null) ?? 'grab';
-      } else {
+      if (nodesSelected.length > 1) {
         stage.container().style.cursor = 'grab';
       }
     });

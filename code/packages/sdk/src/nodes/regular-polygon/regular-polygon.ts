@@ -2,6 +2,7 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
+import { z } from 'zod';
 import Konva from 'konva';
 import {
   type WeaveElementAttributes,
@@ -15,6 +16,7 @@ import type {
   WeaveRegularPolygonNodeParams,
   WeaveRegularPolygonProperties,
 } from './types';
+import { mergeExceptArrays } from '@/utils/utils';
 
 export class WeaveRegularPolygonNode extends WeaveNode {
   private config: WeaveRegularPolygonProperties;
@@ -221,5 +223,119 @@ export class WeaveRegularPolygonNode extends WeaveNode {
       x: element.props.radius,
       y: element.props.radius,
     };
+  }
+
+  static defaultState(nodeId: string): WeaveStateElement {
+    return {
+      ...super.defaultState(nodeId),
+      type: WEAVE_REGULAR_POLYGON_NODE_TYPE,
+      props: {
+        ...super.defaultState(nodeId).props,
+        nodeType: WEAVE_REGULAR_POLYGON_NODE_TYPE,
+        x: 0,
+        y: 0,
+        sides: 5,
+        radius: 100,
+        stroke: '#000000',
+        fill: '#FFFFFF',
+        strokeWidth: 1,
+        strokeScaleEnabled: true,
+        rotation: 0,
+        zIndex: 1,
+        children: [],
+      },
+    };
+  }
+
+  static addNodeState(
+    defaultNodeState: WeaveStateElement,
+    props: WeaveElementAttributes
+  ): WeaveStateElement {
+    return mergeExceptArrays(defaultNodeState, {
+      props: {
+        x: props.x,
+        y: props.y,
+        sides: props.sides,
+        radius: props.radius,
+        rotation: props.rotation,
+        fill: props.fill,
+        ...(props.stroke && { stroke: props.stroke }),
+        ...(props.strokeWidth && {
+          strokeWidth: props.strokeWidth,
+        }),
+      },
+    });
+  }
+
+  static updateNodeState(
+    prevNodeState: WeaveStateElement,
+    nextProps: WeaveElementAttributes
+  ): WeaveStateElement {
+    return mergeExceptArrays(prevNodeState, {
+      props: {
+        x: nextProps.x,
+        y: nextProps.y,
+        sides: nextProps.sides,
+        radius: nextProps.radius,
+        rotation: nextProps.rotation,
+        fill: nextProps.fill,
+        ...(nextProps.stroke && { stroke: nextProps.stroke }),
+        ...(nextProps.strokeWidth && {
+          strokeWidth: nextProps.strokeWidth,
+        }),
+      },
+    });
+  }
+
+  static getSchema() {
+    const baseSchema = super.getSchema();
+
+    const nodeSchema = baseSchema.extend({
+      type: z
+        .literal(WEAVE_REGULAR_POLYGON_NODE_TYPE)
+        .describe(
+          `Type of the node, for a regular polygon node it will always be "${WEAVE_REGULAR_POLYGON_NODE_TYPE}"`
+        ),
+      props: baseSchema.shape.props.extend({
+        nodeType: z
+          .literal(WEAVE_REGULAR_POLYGON_NODE_TYPE)
+          .describe(
+            `Type of the node, for a regular polygon node it will always be "${WEAVE_REGULAR_POLYGON_NODE_TYPE}"`
+          ),
+
+        sides: z
+          .number()
+          .describe(
+            'Number of sides of the regular polygon, must be 3 or more'
+          ),
+        radius: z
+          .number()
+          .describe(
+            'Radius of the regular polygon in pixels, distance from the center to any vertex'
+          ),
+
+        fill: z
+          .string()
+          .describe(
+            'Fill color of the regular polygon in hex format with alpha channel (e.g. #RRGGBBAA)'
+          ),
+
+        stroke: z
+          .string()
+          .describe(
+            'Stroke color of the regular polygon in hex format with alpha channel (e.g. #RRGGBBAA)'
+          ),
+        strokeWidth: z
+          .number()
+          .describe('Stroke width of the regular polygon in pixels'),
+        strokeScaleEnabled: z
+          .boolean()
+          .describe(
+            'Whether the regular polygon stroke width should scale when the node is scaled. Defaults to true.'
+          ),
+      }),
+    });
+
+    return nodeSchema;
   }
 }

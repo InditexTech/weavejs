@@ -2,6 +2,7 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
+import { z } from 'zod';
 import Konva from 'konva';
 import { WeaveNode } from '../node';
 import {
@@ -236,6 +237,7 @@ export class WeaveFrameNode extends WeaveNode {
       strokeWidth: 0,
       fill: 'transparent',
       nodeId: id,
+      nodeType: undefined,
       id: `${id}-selection-area`,
       listening: true,
       draggable: true,
@@ -471,5 +473,128 @@ export class WeaveFrameNode extends WeaveNode {
 
   scaleReset(): void {
     // don't change anything
+  }
+
+  static defaultState(nodeId: string): WeaveStateElement {
+    return {
+      ...super.defaultState(nodeId),
+      type: WEAVE_FRAME_NODE_TYPE,
+      props: {
+        ...super.defaultState(nodeId).props,
+        nodeType: WEAVE_FRAME_NODE_TYPE,
+        x: 0,
+        y: 0,
+        width: WEAVE_FRAME_NODE_DEFAULT_PROPS.frameWidth,
+        height: WEAVE_FRAME_NODE_DEFAULT_PROPS.frameHeight,
+        title: WEAVE_FRAME_NODE_DEFAULT_PROPS.title,
+        frameWidth: WEAVE_FRAME_NODE_DEFAULT_PROPS.frameWidth,
+        frameHeight: WEAVE_FRAME_NODE_DEFAULT_PROPS.frameHeight,
+        frameBackground: WEAVE_FRAME_NODE_DEFAULT_PROPS.frameBackground,
+        borderWidth: WEAVE_FRAME_NODE_DEFAULT_CONFIG.borderWidth,
+        borderColor: WEAVE_FRAME_NODE_DEFAULT_CONFIG.borderColor,
+        stroke: 'transparent',
+        strokeWidth: 0,
+        strokeScaleEnabled: true,
+        rotation: 0,
+        zIndex: 1,
+        children: [],
+      },
+    };
+  }
+
+  static addNodeState(
+    defaultNodeState: WeaveStateElement,
+    props: WeaveElementAttributes
+  ): WeaveStateElement {
+    return mergeExceptArrays(defaultNodeState, {
+      props: {
+        x: props.x,
+        y: props.y,
+        width: props.width,
+        height: props.height,
+        ...(props.title && { stroke: props.title }),
+        frameWidth: props.frameWidth,
+        frameHeight: props.frameHeight,
+        ...(props.frameBackground && {
+          stroke: props.frameBackground,
+        }),
+        rotation: props.rotation,
+        ...(props.borderColor && {
+          borderColor: props.borderColor,
+        }),
+        ...(props.borderWidth && {
+          borderWidth: props.borderWidth,
+        }),
+      },
+    });
+  }
+
+  static updateNodeState(
+    prevNodeState: WeaveStateElement,
+    nextProps: WeaveElementAttributes
+  ): WeaveStateElement {
+    return mergeExceptArrays(prevNodeState, {
+      props: {
+        x: nextProps.x,
+        y: nextProps.y,
+        width: nextProps.width,
+        height: nextProps.height,
+        rotation: nextProps.rotation,
+        title: nextProps.title,
+        ...(nextProps.frameBackground && {
+          frameBackground: nextProps.frameBackground,
+        }),
+        ...(nextProps.borderColor && { stroke: nextProps.borderColor }),
+        ...(nextProps.borderWidth && {
+          strokeWidth: nextProps.borderWidth,
+        }),
+      },
+    });
+  }
+
+  static getSchema() {
+    const baseSchema = super.getSchema();
+
+    const nodeSchema = baseSchema.extend({
+      type: z
+        .literal(WEAVE_FRAME_NODE_TYPE)
+        .describe(
+          `Type of the node, for a frame node it will always be "${WEAVE_FRAME_NODE_TYPE}"`
+        ),
+      props: baseSchema.shape.props.extend({
+        nodeType: z
+          .literal(WEAVE_FRAME_NODE_TYPE)
+          .describe(
+            `Type of the node, for a frame node it will always be "${WEAVE_FRAME_NODE_TYPE}"`
+          ),
+
+        borderColor: z
+          .string()
+          .default('#000000ff')
+          .describe(
+            'Border color of the frame in hex format with alpha channel (e.g. #RRGGBBAA)'
+          ),
+        borderWidth: z
+          .number()
+          .default(1)
+          .describe(
+            'Border width of the frame in hex format with alpha channel (e.g. #RRGGBBAA)'
+          ),
+
+        title: z.string().default('Frame').describe('Title of the frame'),
+        frameWidth: z.number().describe('Width of the frame in pixels'),
+        frameHeight: z.number().describe('Height of the frame in pixels'),
+        frameBackground: z
+          .string()
+          .default(WEAVE_FRAME_DEFAULT_BACKGROUND_COLOR)
+          .describe(
+            'Background color of the frame in hex format with alpha channel (e.g. #RRGGBBAA)'
+          ),
+
+        children: z.array(z.any()).default([]),
+      }),
+    });
+
+    return nodeSchema;
   }
 }

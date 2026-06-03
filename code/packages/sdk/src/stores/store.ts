@@ -106,6 +106,7 @@ export abstract class WeaveStore implements WeaveStoreBase {
   }
 
   restartDocument(): void {
+    this.document?.destroy();
     this.latestState = {
       weave: {},
       weaveMetadata: {},

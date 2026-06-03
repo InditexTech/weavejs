@@ -16,6 +16,10 @@ export type TextSerializable = Konva.TextConfig &
     id: string;
   };
 
+export type WeaveTextCursorProperties = {
+  color: string;
+};
+
 export type WeaveTextOutlineProperties =
   | {
       enabled: true;
@@ -29,7 +33,9 @@ export type WeaveTextOutlineProperties =
 export type WeaveTextProperties = {
   transform: WeaveNodeTransformerProperties;
   outline: WeaveTextOutlineProperties;
+  cursor: WeaveTextCursorProperties;
 };
+
 export type WeaveTextNodeParams = {
   config: DeepPartial<WeaveTextProperties>;
 };

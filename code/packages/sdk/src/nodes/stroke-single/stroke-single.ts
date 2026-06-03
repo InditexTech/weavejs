@@ -2,11 +2,13 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
+import { z } from 'zod';
 import Konva from 'konva';
 import {
   type WeaveElementAttributes,
   type WeaveElementInstance,
   type WeaveSelection,
+  type WeaveStateElement,
 } from '@inditextech/weave-types';
 import { WeaveNode } from '../node';
 import {
@@ -77,6 +79,10 @@ export class WeaveStrokeSingleNode extends WeaveNode {
   }
 
   initEvents(): void {
+    if (this.instance.isServerSide()) {
+      return;
+    }
+
     if (this.eventsInitialized) {
       return;
     }
@@ -681,5 +687,122 @@ export class WeaveStrokeSingleNode extends WeaveNode {
     }
 
     return pos;
+  }
+
+  static defaultState(nodeId: string): WeaveStateElement {
+    return {
+      ...super.defaultState(nodeId),
+      type: WEAVE_STROKE_SINGLE_NODE_TYPE,
+      props: {
+        ...super.defaultState(nodeId).props,
+        nodeType: WEAVE_STROKE_SINGLE_NODE_TYPE,
+        x: 0,
+        y: 0,
+        strokeElements: [0, 0, 100, 100],
+        stroke: '#000000',
+        fill: '#FFFFFF',
+        strokeWidth: 1,
+        strokeScaleEnabled: true,
+        rotation: 0,
+        zIndex: 1,
+        children: [],
+      },
+    };
+  }
+
+  static addNodeState(
+    defaultNodeState: WeaveStateElement,
+    props: WeaveElementAttributes
+  ): WeaveStateElement {
+    return mergeExceptArrays(defaultNodeState, {
+      props: {
+        x: props.x,
+        y: props.y,
+        strokeElements: props.strokeElements,
+        rotation: props.rotation,
+        fill: props.fill,
+        ...(props.stroke && { stroke: props.stroke }),
+        ...(props.strokeWidth && {
+          strokeWidth: props.strokeWidth,
+        }),
+      },
+    });
+  }
+
+  static updateNodeState(
+    prevNodeState: WeaveStateElement,
+    nextProps: WeaveElementAttributes
+  ): WeaveStateElement {
+    return mergeExceptArrays(prevNodeState, {
+      props: {
+        x: nextProps.x,
+        y: nextProps.y,
+        strokeElements: nextProps.strokeElements,
+        rotation: nextProps.rotation,
+        fill: nextProps.fill,
+        ...(nextProps.stroke && { stroke: nextProps.stroke }),
+        ...(nextProps.strokeWidth && {
+          strokeWidth: nextProps.strokeWidth,
+        }),
+      },
+    });
+  }
+
+  static getSchema() {
+    const baseSchema = super.getSchema();
+
+    const nodeSchema = baseSchema.extend({
+      type: z
+        .literal(WEAVE_STROKE_SINGLE_NODE_TYPE)
+        .describe(
+          `Type of the node, for a stroke node it will always be "${WEAVE_STROKE_SINGLE_NODE_TYPE}"`
+        ),
+      props: baseSchema.shape.props.extend({
+        nodeType: z
+          .literal(WEAVE_STROKE_SINGLE_NODE_TYPE)
+          .describe(
+            `Type of the node, for a stroke node it will always be "${WEAVE_STROKE_SINGLE_NODE_TYPE}"`
+          ),
+
+        strokeElements: z
+          .array(z.number())
+          .length(4)
+          .describe(
+            'Array of 4 numbers representing the start and end points of the stroke in the format [startX, startY, endX, endY]'
+          ),
+        tipStartStyle: z
+          .string()
+          .describe(
+            `Style of the line tip at the start of the stroke. Can be "none", "arrow", "circle" or "square". Defaults to "none".`
+          ),
+        tipEndStyle: z
+          .string()
+          .describe(
+            `Style of the line tip at the end of the stroke. Can be "none", "arrow", "circle" or "square". Defaults to "none".`
+          ),
+
+        fill: z
+          .string()
+          .describe(
+            'Fill color of the rectangle in hex format with alpha channel (e.g. #RRGGBBAA)'
+          ),
+
+        stroke: z
+          .string()
+          .describe(
+            'Stroke color of the rectangle in hex format with alpha channel (e.g. #RRGGBBAA)'
+          ),
+        strokeWidth: z
+          .number()
+          .describe('Stroke width of the rectangle in pixels'),
+        strokeScaleEnabled: z
+          .boolean()
+          .describe(
+            'Whether the rectangle stroke width should scale when the node is scaled. Defaults to true.'
+          ),
+      }),
+    });
+
+    return nodeSchema;
   }
 }
