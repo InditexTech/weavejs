@@ -15,9 +15,15 @@ import {
 import Konva from 'konva';
 import { getExportBoundingBox } from '@/utils/utils';
 import type { WeaveNodesSelectionPlugin } from '@/plugins/nodes-selection/nodes-selection';
-import { WEAVE_NODES_SELECTION_KEY } from '@/plugins/nodes-selection/constants';
+import {
+  WEAVE_NODES_SELECTION_KEY,
+  WEAVE_NODES_SELECTION_LAYER_ID,
+} from '@/plugins/nodes-selection/constants';
 import type { WeaveStageGridPlugin } from '@/plugins/stage-grid/stage-grid';
-import { WEAVE_STAGE_GRID_PLUGIN_KEY } from '@/plugins/stage-grid/constants';
+import {
+  WEAVE_GRID_LAYER_ID,
+  WEAVE_STAGE_GRID_PLUGIN_KEY,
+} from '@/plugins/stage-grid/constants';
 import reject from 'lodash/reject';
 
 export class WeaveExportManager {
@@ -65,26 +71,29 @@ export class WeaveExportManager {
         backgroundColor = WEAVE_EXPORT_BACKGROUND_COLOR,
       } = options;
 
-      const nodesSelectionPluginPrev =
-        this.getNodesSelectionPlugin()?.isEnabled();
-      const nodesStageGridPluginPrev = this.getStageGridPlugin()?.isEnabled();
+      const originalStage = this.instance.getStage();
+      const stage = originalStage.clone();
+      const mainLayer = stage.findOne('#mainLayer') as Konva.Layer;
 
-      this.getNodesSelectionPlugin()?.disable();
-      this.getStageGridPlugin()?.disable();
+      if (!mainLayer) {
+        throw new Error('Main layer not found');
+      }
 
-      const stage = this.instance.getStage();
-      const mainLayer = this.instance.getMainLayer();
+      const selectionLayer = stage.findOne(
+        `#${WEAVE_NODES_SELECTION_LAYER_ID}`
+      ) as Konva.Layer;
+      selectionLayer?.destroy();
 
-      const originalPosition = { x: stage.x(), y: stage.y() };
-      const originalScale = { x: stage.scaleX(), y: stage.scaleY() };
+      const gridLayer = stage.findOne(`#${WEAVE_GRID_LAYER_ID}`) as Konva.Layer;
+      gridLayer?.destroy();
 
       stage.scale({ x: 1, y: 1 });
 
       if (mainLayer) {
         const bounds = getExportBoundingBox(boundingNodes(nodes));
 
-        const scaleX = stage.scaleX();
-        const scaleY = stage.scaleY();
+        const scaleX = originalStage.scaleX();
+        const scaleY = originalStage.scaleY();
 
         const unscaledBounds = {
           x: bounds.x / scaleX,
@@ -139,16 +148,7 @@ export class WeaveExportManager {
           callback: (img: HTMLImageElement) => {
             exportGroup.destroy();
 
-            stage.position(originalPosition);
-            stage.scale(originalScale);
-            stage.batchDraw();
-
-            if (nodesSelectionPluginPrev) {
-              this.getNodesSelectionPlugin()?.enable();
-            }
-            if (nodesStageGridPluginPrev) {
-              this.getStageGridPlugin()?.enable();
-            }
+            stage.destroy();
 
             resolve(img);
           },
@@ -170,26 +170,27 @@ export class WeaveExportManager {
         backgroundColor = WEAVE_EXPORT_BACKGROUND_COLOR,
       } = options;
 
-      const nodesSelectionPluginPrev =
-        this.getNodesSelectionPlugin()?.isEnabled();
-      const nodesStageGridPluginPrev = this.getStageGridPlugin()?.isEnabled();
+      const originalStage = this.instance.getStage();
+      const stage = originalStage.clone();
+      const mainLayer = stage.findOne('#mainLayer') as Konva.Layer;
 
-      this.getNodesSelectionPlugin()?.disable();
-      this.getStageGridPlugin()?.disable();
+      if (!mainLayer) {
+        throw new Error('Main layer not found');
+      }
 
-      const stage = this.instance.getStage();
-      const mainLayer = this.instance.getMainLayer();
+      const selectionLayer = stage.findOne(
+        `#${WEAVE_NODES_SELECTION_LAYER_ID}`
+      ) as Konva.Layer;
+      selectionLayer?.destroy();
 
-      const originalPosition = { x: stage.x(), y: stage.y() };
-      const originalScale = { x: stage.scaleX(), y: stage.scaleY() };
-
-      stage.scale({ x: 1, y: 1 });
+      const gridLayer = stage.findOne(`#${WEAVE_GRID_LAYER_ID}`) as Konva.Layer;
+      gridLayer?.destroy();
 
       if (mainLayer) {
         const bounds = getExportBoundingBox(boundingNodes(nodes));
 
-        const scaleX = stage.scaleX();
-        const scaleY = stage.scaleY();
+        const scaleX = originalStage.scaleX();
+        const scaleY = originalStage.scaleY();
 
         const unscaledBounds = {
           x: bounds.x / scaleX,
@@ -244,16 +245,7 @@ export class WeaveExportManager {
           callback: (blob: Blob | null) => {
             exportGroup.destroy();
 
-            stage.position(originalPosition);
-            stage.scale(originalScale);
-            stage.batchDraw();
-
-            if (nodesSelectionPluginPrev) {
-              this.getNodesSelectionPlugin()?.enable();
-            }
-            if (nodesStageGridPluginPrev) {
-              this.getStageGridPlugin()?.enable();
-            }
+            stage.destroy();
 
             if (!blob) {
               reject(new Error('Failed to generate image blob'));
@@ -280,26 +272,29 @@ export class WeaveExportManager {
         backgroundColor = WEAVE_EXPORT_BACKGROUND_COLOR,
       } = options;
 
-      const nodesSelectionPluginPrev =
-        this.getNodesSelectionPlugin()?.isEnabled();
-      const nodesStageGridPluginPrev = this.getStageGridPlugin()?.isEnabled();
+      const originalStage = this.instance.getStage();
+      const stage = originalStage.clone();
+      const mainLayer = stage.findOne('#mainLayer') as Konva.Layer;
 
-      this.getNodesSelectionPlugin()?.disable();
-      this.getStageGridPlugin()?.disable();
+      if (!mainLayer) {
+        throw new Error('Main layer not found');
+      }
 
-      const stage = this.instance.getStage();
-      const mainLayer = this.instance.getMainLayer();
+      const selectionLayer = stage.findOne(
+        `#${WEAVE_NODES_SELECTION_LAYER_ID}`
+      ) as Konva.Layer;
+      selectionLayer?.destroy();
 
-      const originalPosition = { x: stage.x(), y: stage.y() };
-      const originalScale = { x: stage.scaleX(), y: stage.scaleY() };
+      const gridLayer = stage.findOne(`#${WEAVE_GRID_LAYER_ID}`) as Konva.Layer;
+      gridLayer?.destroy();
 
       stage.scale({ x: 1, y: 1 });
 
       if (mainLayer) {
         const bounds = getExportBoundingBox(boundingNodes(nodes));
 
-        const scaleX = stage.scaleX();
-        const scaleY = stage.scaleY();
+        const scaleX = originalStage.scaleX();
+        const scaleY = originalStage.scaleY();
 
         const unscaledBounds = {
           x: bounds.x / scaleX,
@@ -354,16 +349,7 @@ export class WeaveExportManager {
           callback: (canvas: HTMLCanvasElement) => {
             exportGroup.destroy();
 
-            stage.position(originalPosition);
-            stage.scale(originalScale);
-            stage.batchDraw();
-
-            if (nodesSelectionPluginPrev) {
-              this.getNodesSelectionPlugin()?.enable();
-            }
-            if (nodesStageGridPluginPrev) {
-              this.getStageGridPlugin()?.enable();
-            }
+            stage.destroy();
 
             resolve(canvas);
           },
