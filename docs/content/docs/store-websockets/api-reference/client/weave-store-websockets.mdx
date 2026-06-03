@@ -75,7 +75,7 @@ type WeaveStoreWebsocketsConnectionStatus =
 
 type WeaveStoreWebsocketsCallbacks = {
   onConnectionStatusChange?: (
-    status: WeaveStoreWebsocketsConnectionStatus
+    status: WeaveStoreWebsocketsConnectionStatus,
   ) => void;
 };
 
@@ -144,7 +144,7 @@ The `onNodeChange` event is called when there is a single node selected and the 
 #### connect
 
 ```ts
-connect(): void
+connect(): Promise<void>
 ```
 
 The `connect` method is called when an user tries to join a room.
@@ -152,7 +152,7 @@ The `connect` method is called when an user tries to join a room.
 #### disconnect
 
 ```ts
-disconnect(): void
+disconnect(): Promise<void>
 ```
 
 The `disconnect` method is called when an user leaves a room.
