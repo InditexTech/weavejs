@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-import { isEqual } from 'lodash';
+import isEqual from 'lodash/isEqual';
 import pino, { type Logger } from 'pino';
 import {
   WEAVE_LOG_LEVEL,

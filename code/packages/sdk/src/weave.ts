@@ -275,7 +275,7 @@ export class Weave {
     );
 
     store.setup();
-    store.connect();
+    await store.connect();
   }
 
   async switchRoom() {
@@ -355,7 +355,7 @@ export class Weave {
     );
   }
 
-  destroy(): void {
+  async destroy(): Promise<void> {
     this.moduleLogger.info(`Destroying the instance`);
 
     // clear events listeners
@@ -371,7 +371,7 @@ export class Weave {
 
     // disconnect from the store
     const store = this.storeManager.getStore();
-    store.disconnect();
+    await store.disconnect();
     store.getDocument()?.destroy();
 
     const nodeHandlers = this.registerManager.getNodesHandlers();

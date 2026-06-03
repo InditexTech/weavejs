@@ -151,7 +151,7 @@ export class WeaveStoreAzureWebPubsub extends WeaveStore {
 
     this.actualStatus = WEAVE_STORE_CONNECTION_STATUS.SWITCHING_ROOM;
 
-    this.disconnect();
+    await this.disconnect();
 
     this.restartDocument();
 
@@ -180,8 +180,8 @@ export class WeaveStoreAzureWebPubsub extends WeaveStore {
     await this.provider.connect(extraParams);
   }
 
-  disconnect(): void {
-    this.provider.disconnect();
+  async disconnect(): Promise<void> {
+    await this.provider.disconnect();
   }
 
   simulateWebsocketError(): void {

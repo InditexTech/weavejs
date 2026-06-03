@@ -5,7 +5,7 @@
 import { WeavePlugin } from '@/plugins/plugin';
 import { WEAVE_STAGE_RESIZE_KEY } from './constants';
 import { setupUpscaleStage } from '@/internal-utils/upscale';
-import { throttle } from 'lodash';
+import throttle from 'lodash/throttle';
 import { DEFAULT_THROTTLE_MS } from '@/constants';
 import type { WeaveStageResizePluginOnStageResizeEvent } from './types';
 

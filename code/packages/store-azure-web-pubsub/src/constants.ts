@@ -29,19 +29,22 @@ export const WEAVE_STORE_AZURE_WEB_PUBSUB_DESTROY_ROOM_STATUS = {
 
 export const WEAVE_STORE_AZURE_WEB_PUBSUB_SYNC_CLIENT_DEFAULT_OPTIONS: WeaveStoreAzureWebPubSubSyncClientOptions =
   {
+    clientConnection: {
+      timeoutMs: 60000,
+    },
     heartbeat: {
-      checkWindowTimeMs: 10000,
-      checkIntervalMs: 5000,
+      checkWindowTimeMs: 60000,
+      checkIntervalMs: 15000,
     },
   };
 
 export const WEAVE_STORE_AZURE_WEB_PUBSUB_SYNC_HOST_DEFAULT_OPTIONS: WeaveStoreAzureWebPubsubSyncHostOptions =
   {
     heartbeat: {
-      sendIntervalMs: 2500,
+      sendIntervalMs: 5000,
     },
     resync: {
-      checkIntervalMs: 5000,
+      checkIntervalMs: 60000,
       attemptsLimit: 12,
     },
   };

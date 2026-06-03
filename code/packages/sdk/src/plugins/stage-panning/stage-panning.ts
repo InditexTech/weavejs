@@ -21,7 +21,7 @@ import { WEAVE_NODES_SELECTION_KEY } from '../nodes-selection/constants';
 import { WEAVE_CONTEXT_MENU_PLUGIN_KEY } from '../context-menu/constants';
 import type { WeaveStageGridPlugin } from '../stage-grid/stage-grid';
 import Konva from 'konva';
-import { throttle } from 'lodash';
+import throttle from 'lodash/throttle';
 import type {
   WeaveStagePanningPluginConfig,
   WeaveStagePanningPluginParams,

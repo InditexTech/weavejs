@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-import { isEqual } from 'lodash';
+import isEqual from 'lodash/isEqual';
 import Konva from 'konva';
 import {
   type WeaveElementInstance,

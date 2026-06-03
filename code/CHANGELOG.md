@@ -15,7 +15,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- [#1080](https://github.com/InditexTech/weavejs/issues/1080) API to manipulate document state natively on server-side
+- [#1080](https://github.com/InditexTech/weavejs/issues/1080) [alpha] API to manipulate document state natively on server-side
+
+### Changed
+
+- [#1091](https://github.com/InditexTech/weavejs/issues/1091) Make Store Connection Lifecycle Asynchronous and Increase Azure Web PubSub Frame Size to 512 KB
 
 ## [4.1.1] - 2026-05-29
 

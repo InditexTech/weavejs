@@ -1,4 +1,4 @@
-import _ from "lodash";
+import debounce from "lodash/debounce";
 import React from "react";
 import Image from "next/image";
 import Konva from "konva";
@@ -49,7 +49,7 @@ export const FrameImage = ({ node }: Readonly<FrameImageProps>) => {
     };
 
     loadImage();
-    const debouncedLoadImage = _.debounce(loadImage, 250);
+    const debouncedLoadImage = debounce(loadImage, 250);
 
     const eventHandler = () => {
       debouncedLoadImage();

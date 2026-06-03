@@ -58,7 +58,7 @@ export class WeaveStoreStandalone extends WeaveStore {
     this.handleConnectionStatusChange(WEAVE_STORE_CONNECTION_STATUS.CONNECTED);
   }
 
-  disconnect(): void {
+  async disconnect(): Promise<void> {
     this.getDocument().destroy();
     this.handleConnectionStatusChange(
       WEAVE_STORE_CONNECTION_STATUS.DISCONNECTED

@@ -177,6 +177,9 @@ export type WeaveStoreAzureWebPubsubSyncHandlerDestroyRoomStatus =
   (typeof WEAVE_STORE_AZURE_WEB_PUBSUB_DESTROY_ROOM_STATUS)[WeaveStoreAzureWebPubsubSyncHandlerDestroyRoomStatusKeys];
 
 export type WeaveStoreAzureWebPubSubSyncClientOptions = {
+  clientConnection: {
+    timeoutMs: number;
+  };
   heartbeat: {
     checkWindowTimeMs: number;
     checkIntervalMs: number;

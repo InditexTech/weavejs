@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-import { orderBy } from 'lodash';
+import orderBy from 'lodash/orderBy';
 import Konva from 'konva';
 import { v4 as uuidv4 } from 'uuid';
 import { Weave } from '@/weave';

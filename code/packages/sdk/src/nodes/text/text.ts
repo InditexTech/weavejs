@@ -30,7 +30,7 @@ import type {
   WeaveTextNodeParams,
   WeaveTextProperties,
 } from './types';
-import { merge } from 'lodash';
+import merge from 'lodash/merge';
 import { WEAVE_STAGE_DEFAULT_MODE } from '../stage/constants';
 
 export class WeaveTextNode extends WeaveNode {

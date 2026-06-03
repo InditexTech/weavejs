@@ -9,29 +9,46 @@ import {
 } from '@inditextech/weave-types';
 
 export class WeaveStateManipulation {
+  /**
+   * Converts any JS value to the appropriate Yjs type:
+   * - null / undefined / primitive → returned as-is
+   * - Array → Y.Array (elements mapped recursively)
+   * - plain object → Y.Map (values mapped recursively)
+   */
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  static mapValueToYjs(value: any): any {
+    if (value === null || value === undefined) {
+      return value;
+    }
+
+    if (Array.isArray(value)) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const arr = new Y.Array<any>();
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      arr.push(value.map((item: any) => WeaveStateManipulation.mapValueToYjs(item)));
+      return arr;
+    }
+
+    if (typeof value === 'object') {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const map = new Y.Map<any>();
+      for (const [k, v] of Object.entries(value)) {
+        map.set(k, WeaveStateManipulation.mapValueToYjs(v));
+      }
+      return map;
+    }
+
+    // primitive (string, number, boolean)
+    return value;
+  }
+
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   static mapPropsToYjs(props: Record<string, any>): Y.Map<any> {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const propsMap = new Y.Map<any>();
 
-    for (const propKey of Object.keys(props)) {
-      const propValue = props[propKey];
-      if (Array.isArray(propValue)) {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const childrenArray = new Y.Array<any>();
-        propValue.forEach((child) => {
-          const childMap = WeaveStateManipulation.mapPropsToYjs(child);
-          childrenArray.push([childMap]);
-        });
-      } else if (
-        typeof propValue === 'object' &&
-        propValue !== null &&
-        !Array.isArray(propValue)
-      ) {
-        propsMap.set(propKey, WeaveStateManipulation.mapPropsToYjs(propValue));
-      } else {
-        propsMap.set(propKey, propValue);
-      }
+    for (const [propKey, propValue] of Object.entries(props)) {
+      propsMap.set(propKey, WeaveStateManipulation.mapValueToYjs(propValue));
     }
 
     return propsMap;
@@ -51,33 +68,17 @@ export class WeaveStateManipulation {
     element.set('type', node.type);
     element.set('props', elementProps);
 
-    for (const propKey of Object.keys(node.props)) {
-      const propValue = node.props[propKey];
-      if (Array.isArray(propValue) && propKey === 'children') {
+    for (const [propKey, propValue] of Object.entries(node.props)) {
+      if (propKey === 'children' && Array.isArray(propValue)) {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const childrenArray = new Y.Array<any>();
-        propValue.forEach((child) => {
-          const childMap = WeaveStateManipulation.mapNodeToYjs(child);
-          childrenArray.push([childMap.element]);
+        propValue.forEach((child: WeaveStateElement) => {
+          const { element: childElement } = WeaveStateManipulation.mapNodeToYjs(child);
+          childrenArray.push([childElement]);
         });
         elementProps.set(propKey, childrenArray);
-      } else if (Array.isArray(propValue) && propKey !== 'children') {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const childrenArray = new Y.Array<any>();
-        propValue.forEach((child) => {
-          const childMap = WeaveStateManipulation.mapPropsToYjs(child);
-          childrenArray.push([childMap]);
-        });
-        elementProps.set(propKey, childrenArray);
-      } else if (
-        typeof propValue === 'object' &&
-        propValue !== null &&
-        !Array.isArray(propValue)
-      ) {
-        const childrenMap = WeaveStateManipulation.mapPropsToYjs(propValue);
-        elementProps.set(propKey, childrenMap);
       } else {
-        elementProps.set(propKey, propValue);
+        elementProps.set(propKey, WeaveStateManipulation.mapValueToYjs(propValue));
       }
     }
 

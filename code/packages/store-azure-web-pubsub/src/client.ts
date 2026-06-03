@@ -275,7 +275,7 @@ export class WeaveStoreAzureWebPubSubSyncClient extends Emittery {
     }
   }
 
-  disconnect(): void {
+  async disconnect(): Promise<void> {
     if (this._ws !== null) {
       // broadcast message with local awareness state set to null (indicating disconnect)
       const encoder = encoding.createEncoder();
@@ -332,7 +332,10 @@ export class WeaveStoreAzureWebPubSubSyncClient extends Emittery {
       }
 
       const controller = new AbortController();
-      const timeout = setTimeout(() => controller.abort(), 5000);
+      const timeout = setTimeout(
+        () => controller.abort(),
+        this._synClientOptions.clientConnection.timeoutMs
+      );
 
       const res = await this._fetchClient(connectionURL.toString(), {
         signal: controller.signal,
@@ -367,6 +370,7 @@ export class WeaveStoreAzureWebPubSubSyncClient extends Emittery {
         );
         url = await this.fetchConnectionUrl(connectionUrlExtraParams);
       } catch (ex) {
+        console.error(ex);
         error = ex as Error;
       } finally {
         if (error) {
@@ -411,7 +415,7 @@ export class WeaveStoreAzureWebPubSubSyncClient extends Emittery {
       );
     });
 
-    websocket.onmessage = (event) => {
+    websocket.onmessage = async (event) => {
       if (event.data === null) {
         return;
       }
@@ -425,7 +429,8 @@ export class WeaveStoreAzureWebPubSubSyncClient extends Emittery {
       const messageData = message.data;
 
       if (messageData.type === 'heartbeat') {
-        this._lastHeartbeatTime = Date.now();
+        const actualDate = Date.now();
+        this._lastHeartbeatTime = actualDate;
         return;
       }
 
@@ -433,7 +438,15 @@ export class WeaveStoreAzureWebPubSubSyncClient extends Emittery {
         // Resync requested by sync host
         const encoder = encoding.createEncoder();
         encoding.writeVarUint(encoder, messageSyncStep1);
-        syncProtocol.writeUpdate(encoder, Y.encodeStateAsUpdate(this.doc));
+        const stateVector = Y.encodeStateVector(this.doc);
+        syncProtocol.writeUpdate(
+          encoder,
+          Y.encodeStateAsUpdate(this.doc, stateVector)
+        );
+
+        console.log(
+          'Resync request received, sending sync step 1 with current state vector'
+        );
 
         sendToControlGroup(
           this,
@@ -508,7 +521,7 @@ export class WeaveStoreAzureWebPubSubSyncClient extends Emittery {
       }
     };
 
-    websocket.onopen = () => {
+    websocket.onopen = async () => {
       this._lastHeartbeatTime = Date.now();
 
       this.setAndEmitStatusInfo(
@@ -521,8 +534,6 @@ export class WeaveStoreAzureWebPubSubSyncClient extends Emittery {
       this._connectionRetries = this._connectionRetries++;
 
       console.log('✅ [Azure Web PubSub] connected');
-
-      this.setupCheckHeartbeat();
 
       console.log(`🔌 [Azure Web PubSub] join room <${this.topic}>`);
 
@@ -562,6 +573,8 @@ export class WeaveStoreAzureWebPubSubSyncClient extends Emittery {
 
         sendToControlGroup(this, this.topic, MessageDataType.Awareness, u82);
       }
+
+      this.setupCheckHeartbeat();
     };
 
     this.setAndEmitStatusInfo(
@@ -579,14 +592,18 @@ export class WeaveStoreAzureWebPubSubSyncClient extends Emittery {
   }
 
   private setupCheckHeartbeat() {
-    this._checkHeartbeatId = setInterval(() => {
+    this._checkHeartbeatId = setInterval(async () => {
       const now = Date.now();
 
       if (
         now - this._lastHeartbeatTime >
         this._synClientOptions.heartbeat.checkWindowTimeMs
       ) {
-        this.disconnect();
+        if (this._checkHeartbeatId) {
+          clearInterval(this._checkHeartbeatId);
+        }
+
+        await this.disconnect();
         this.createWebSocket();
       }
     }, this._synClientOptions.heartbeat.checkIntervalMs);
@@ -612,7 +629,7 @@ export class WeaveStoreAzureWebPubSubSyncClient extends Emittery {
 }
 
 function safeSend(data: string) {
-  const MAX_BYTES = 64 * 1024; // 64 KB
+  const MAX_BYTES = 512 * 1024; // 512 KB
 
   const bytes = new TextEncoder().encode(data);
 
@@ -677,7 +694,7 @@ function sendToControlGroupChunked(
 ) {
   const base64Data = uint8ToBase64(u8);
 
-  const CHUNK_SIZE = 60 * 1024; // 60 KB
+  const CHUNK_SIZE = 512 * 1024; // 512 KB
   const chunks = chunkString(base64Data, CHUNK_SIZE);
   const payloadId = uuidv4();
 

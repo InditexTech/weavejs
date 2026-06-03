@@ -267,7 +267,7 @@ export class WeaveStoreAzureWebPubSubSyncHost {
         resolve();
       });
 
-      ws.addEventListener('message', (e) => {
+      ws.addEventListener('message', async (e) => {
         this.server.emitEvent<WeaveStoreAzureWebPubsubOnWebsocketMessageEvent>(
           'onWsMessage',
           {
@@ -431,7 +431,7 @@ export class WeaveStoreAzureWebPubSubSyncHost {
   }
 
   private safeSend(data: string) {
-    const MAX_BYTES = 64 * 1024; // 64 KB
+    const MAX_BYTES = 512 * 1024; // 512 KB
 
     const bytes = new TextEncoder().encode(data);
 
@@ -452,7 +452,7 @@ export class WeaveStoreAzureWebPubSubSyncHost {
   private chunkedBroadcast(group: string, from: string, u8: Uint8Array) {
     const base64Data = Buffer.from(u8).toString('base64');
 
-    const CHUNK_SIZE = 60 * 1024; // 60 KB
+    const CHUNK_SIZE = 512 * 1024; // 60 KB
     const chunks = this.chunkString(base64Data, CHUNK_SIZE);
     const payloadId = crypto.randomUUID();
 
@@ -470,7 +470,6 @@ export class WeaveStoreAzureWebPubSubSyncHost {
           c: chunks[i],
         },
       });
-
       this._conn?.send?.(payload);
     }
 
@@ -514,7 +513,7 @@ export class WeaveStoreAzureWebPubSubSyncHost {
   private chunkedSend(group: string, to: string, u8: Uint8Array) {
     const base64Data = Buffer.from(u8).toString('base64');
 
-    const CHUNK_SIZE = 60 * 1024; // 60 KB
+    const CHUNK_SIZE = 512 * 1024; // 60 KB
     const chunks = this.chunkString(base64Data, CHUNK_SIZE);
     const payloadId = crypto.randomUUID();
 
@@ -532,7 +531,6 @@ export class WeaveStoreAzureWebPubSubSyncHost {
           c: chunks[i],
         },
       });
-
       this._conn?.send?.(payload);
     }
 
@@ -573,7 +571,7 @@ export class WeaveStoreAzureWebPubSubSyncHost {
     }
   }
 
-  private onClientInit(group: string, data: MessageData) {
+  private async onClientInit(group: string, data: MessageData) {
     if (!this.doc) return;
 
     const encoder = encoding.createEncoder();
