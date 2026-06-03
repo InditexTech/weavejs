@@ -298,6 +298,37 @@ export class WeaveImageToolAction extends WeaveAction {
     return window.matchMedia('(pointer: coarse)').matches;
   }
 
+  private async getImageSource(nodeId: string) {
+    const imageNodeHandler = this.getImageNodeHandler();
+
+    if (!imageNodeHandler) {
+      return undefined;
+    }
+
+    let imageSource = imageNodeHandler.getImageSource(nodeId);
+    const imageFallbackId = imageNodeHandler.getImageFallbackId(
+      this.imageAction[nodeId].props
+    );
+    if (
+      this.imageAction[nodeId].props.imageFallbackURL &&
+      !imageNodeHandler.isImageFallbackEnabled()
+    ) {
+      imageSource ??= await this.loadImageDataURL(
+        this.imageAction[nodeId].props.imageFallbackURL
+      );
+    }
+    if (imageFallbackId && imageNodeHandler.isImageFallbackEnabled()) {
+      imageSource = imageNodeHandler.getFallbackImageSource(nodeId);
+      const imageFallbackURL =
+        imageNodeHandler.getFallbackImageSourceURL(imageFallbackId);
+      if (imageFallbackURL) {
+        imageSource ??= await this.loadImageDataURL(imageFallbackURL);
+      }
+    }
+
+    return imageSource;
+  }
+
   private async addImageNode(nodeId: string, position?: Konva.Vector2d) {
     const stage = this.instance.getStage();
 
@@ -322,26 +353,7 @@ export class WeaveImageToolAction extends WeaveAction {
 
       this.tempImageId = uuidv4();
 
-      let imageSource = imageNodeHandler.getImageSource(nodeId);
-      const imageFallbackId = imageNodeHandler.getImageFallbackId(
-        this.imageAction[nodeId].props
-      );
-      if (
-        this.imageAction[nodeId].props.imageFallbackURL &&
-        !imageNodeHandler.isImageFallbackEnabled()
-      ) {
-        imageSource ??= await this.loadImageDataURL(
-          this.imageAction[nodeId].props.imageFallbackURL
-        );
-      }
-      if (imageFallbackId && imageNodeHandler.isImageFallbackEnabled()) {
-        imageSource = imageNodeHandler.getFallbackImageSource(nodeId);
-        const imageFallbackURL =
-          imageNodeHandler.getFallbackImageSourceURL(imageFallbackId);
-        if (imageFallbackURL) {
-          imageSource ??= await this.loadImageDataURL(imageFallbackURL);
-        }
-      }
+      const imageSource = await this.getImageSource(nodeId);
 
       if (!imageSource) {
         this.cancelAction();
@@ -411,26 +423,7 @@ export class WeaveImageToolAction extends WeaveAction {
       const { uploadType, imageURL, forceMainContainer } =
         this.imageAction[nodeId];
 
-      let imageSource = imageNodeHandler.getImageSource(nodeId);
-      const imageFallbackId = imageNodeHandler.getImageFallbackId(
-        this.imageAction[nodeId].props
-      );
-      if (
-        this.imageAction[nodeId].props.imageFallbackURL &&
-        !imageNodeHandler.isImageFallbackEnabled()
-      ) {
-        imageSource ??= await this.loadImageDataURL(
-          this.imageAction[nodeId].props.imageFallbackURL
-        );
-      }
-      if (imageFallbackId && imageNodeHandler.isImageFallbackEnabled()) {
-        imageSource = imageNodeHandler.getFallbackImageSource(nodeId);
-        const imageFallbackURL =
-          imageNodeHandler.getFallbackImageSourceURL(imageFallbackId);
-        if (imageFallbackURL) {
-          imageSource ??= await this.loadImageDataURL(imageFallbackURL);
-        }
-      }
+      const imageSource = await this.getImageSource(nodeId);
 
       if (!imageSource && !position) {
         this.cancelAction();

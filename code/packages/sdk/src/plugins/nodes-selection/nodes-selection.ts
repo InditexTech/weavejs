@@ -84,6 +84,7 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
   private dragInProcess: boolean = false;
   private dragSelectedNodes: Konva.Node[] = [];
   private transformInProcess: boolean = false;
+  private serializedSelectedNodes: WeaveSelection[] = [];
 
   onRender: undefined;
 
@@ -848,6 +849,12 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
   }
 
   triggerSelectedNodesEvent(): void {
+    this.serializeSelectedNodes();
+    this.triggerSelectionAwarenessEvent();
+    this.triggerOnNodesChangeEvent();
+  }
+
+  serializeSelectedNodes() {
     const selectedNodes: WeaveSelection[] = this.tr.getNodes().map((node) => {
       const nodeType = node.getAttr('nodeType');
       const nodeHandler = this.instance.getNodeHandler<WeaveNode>(nodeType);
@@ -856,22 +863,23 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
         node: nodeHandler?.serialize(node as Konva.Shape | Konva.Group),
       };
     });
+    this.serializedSelectedNodes = selectedNodes;
+  }
 
-    const usersSelectionPlugin =
-      this.instance.getPlugin<WeaveUsersSelectionPlugin>(
-        WEAVE_USERS_SELECTION_KEY
-      );
-
-    if (usersSelectionPlugin) {
-      requestAnimationFrame(() => {
-        usersSelectionPlugin.sendSelectionAwarenessInfo(this.tr);
-      });
-    }
-
+  triggerSelectionAwarenessEvent(): void {
     requestAnimationFrame(() => {
       this.instance.emitEvent<WeaveNodesSelectionPluginOnNodesChangeEvent>(
         'onNodesChange',
-        selectedNodes
+        this.serializedSelectedNodes
+      );
+    });
+  }
+
+  triggerOnNodesChangeEvent(): void {
+    requestAnimationFrame(() => {
+      this.instance.emitEvent<WeaveNodesSelectionPluginOnNodesChangeEvent>(
+        'onNodesChange',
+        this.serializedSelectedNodes
       );
     });
   }
@@ -1194,6 +1202,12 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
         this.hideSelectorArea();
         this.handleClickOrTap(e);
         return;
+      }
+
+      if (isStage || isContainerEmptyArea) {
+        this.setSelectedNodes([]);
+        this.serializeSelectedNodes();
+        this.triggerOnNodesChangeEvent();
       }
 
       this.panDirection.x = 0;
