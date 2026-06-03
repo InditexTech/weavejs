@@ -213,7 +213,7 @@ export class WeaveStoreAzureWebPubSubSyncClient extends Emittery {
     this.doc.on('update', this._updateHandler);
 
     // register awareness update handler
-    this._awarenessUpdateHandler = async ({ added, updated, removed }) => {
+    this._awarenessUpdateHandler = ({ added, updated, removed }) => {
       const changedClients = added.concat(updated).concat(removed);
       const encoder = encoding.createEncoder();
       encoding.writeVarUint(encoder, messageAwareness);
