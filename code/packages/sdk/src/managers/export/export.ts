@@ -87,19 +87,23 @@ export class WeaveExportManager {
   }
 
   private setupForExport({
+    nodes,
     bounds,
     stage,
     mainLayer,
     scaleX,
     scaleY,
     options,
+    exportArea,
   }: {
+    nodes: WeaveElementInstance[];
     bounds: BoundingBox;
     stage: Konva.Stage;
     mainLayer: Konva.Layer;
     scaleX: number;
     scaleY: number;
     options: WeaveExportNodesOptions;
+    exportArea: boolean;
   }): {
     exportGroup: Konva.Group;
     pixelRatio: number;
@@ -118,8 +122,6 @@ export class WeaveExportManager {
       height: bounds.height / scaleY,
     };
 
-    const exportGroup = new Konva.Group();
-
     const background = new Konva.Rect({
       x: unscaledBounds.x - padding,
       y: unscaledBounds.y - padding,
@@ -129,19 +131,25 @@ export class WeaveExportManager {
       fill: backgroundColor,
     });
 
-    exportGroup.add(background);
+    const exportGroup = new Konva.Group();
 
-    for (const node of nodes) {
-      const clonedNode = node.clone({ id: uuidv4() });
-      const absPos = node.getAbsolutePosition();
-      clonedNode.absolutePosition({
-        x: absPos.x / scaleX,
-        y: absPos.y / scaleY,
-      });
-      exportGroup.add(clonedNode);
+    if (!exportArea) {
+      exportGroup.add(background);
+
+      for (const node of nodes) {
+        const clonedNode = node.clone({ id: uuidv4() });
+        const absPos = node.getAbsolutePosition();
+        clonedNode.absolutePosition({
+          x: absPos.x / scaleX,
+          y: absPos.y / scaleY,
+        });
+        exportGroup.add(clonedNode);
+      }
+
+      mainLayer.add(exportGroup);
+    } else {
+      mainLayer.add(background);
     }
-
-    mainLayer.add(exportGroup);
 
     const backgroundRect = background.getClientRect();
 
@@ -180,12 +188,14 @@ export class WeaveExportManager {
           backgroundRect,
           exportGroup,
         } = this.setupForExport({
+          nodes,
           bounds: getExportBoundingBox(boundingNodes(nodes)),
           stage,
           mainLayer,
           scaleX,
           scaleY,
           options,
+          exportArea: false,
         });
 
         exportGroup.toImage({
@@ -228,12 +238,14 @@ export class WeaveExportManager {
           backgroundRect,
           exportGroup,
         } = this.setupForExport({
+          nodes,
           bounds: getExportBoundingBox(boundingNodes(nodes)),
           stage,
           mainLayer,
           scaleX,
           scaleY,
           options,
+          exportArea: false,
         });
 
         exportGroup.toBlob({
@@ -281,12 +293,14 @@ export class WeaveExportManager {
           backgroundRect,
           exportGroup,
         } = this.setupForExport({
+          nodes,
           bounds: getExportBoundingBox(boundingNodes(nodes)),
           stage,
           mainLayer,
           scaleX,
           scaleY,
           options,
+          exportArea: false,
         });
 
         exportGroup.toCanvas({
@@ -324,12 +338,14 @@ export class WeaveExportManager {
 
       if (mainLayer) {
         const { pixelRatio: finalPixelRatio } = this.setupForExport({
+          nodes: [],
           bounds: area,
           stage,
           mainLayer,
           scaleX,
           scaleY,
           options,
+          exportArea: true,
         });
 
         stage.toImage({
@@ -365,12 +381,14 @@ export class WeaveExportManager {
 
       if (mainLayer) {
         const { pixelRatio: finalPixelRatio } = this.setupForExport({
+          nodes: [],
           bounds: area,
           stage,
           mainLayer,
           scaleX,
           scaleY,
           options,
+          exportArea: true,
         });
 
         stage.toBlob({
@@ -411,12 +429,14 @@ export class WeaveExportManager {
 
       if (mainLayer) {
         const { pixelRatio: finalPixelRatio } = this.setupForExport({
+          nodes: [],
           bounds: area,
           stage,
           mainLayer,
           scaleX,
           scaleY,
           options,
+          exportArea: true,
         });
 
         stage.toCanvas({
