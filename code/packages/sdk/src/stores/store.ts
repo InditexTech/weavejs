@@ -304,9 +304,9 @@ export abstract class WeaveStore implements WeaveStoreBase {
   }
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  abstract connect(extraParams?: any): void;
+  abstract connect(extraParams?: any): Promise<void>;
 
-  abstract disconnect(): void;
+  abstract disconnect(): Promise<void>;
 
   abstract handleAwarenessChange(emit: boolean): void;
 
