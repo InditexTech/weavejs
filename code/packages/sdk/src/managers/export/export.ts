@@ -58,6 +58,29 @@ export class WeaveExportManager {
     return { pixelRatio: pr, outW, outH };
   }
 
+  private cloneStageForExport(): {
+    stage: Konva.Stage;
+    mainLayer: Konva.Layer;
+  } {
+    const originalStage = this.instance.getStage();
+    const stage = originalStage.clone();
+    const mainLayer = stage.findOne('#mainLayer') as Konva.Layer;
+
+    if (!mainLayer) {
+      throw new Error('Main layer not found');
+    }
+
+    const selectionLayer = stage.findOne(
+      `#${WEAVE_NODES_SELECTION_LAYER_ID}`
+    ) as Konva.Layer;
+    selectionLayer?.destroy();
+
+    const gridLayer = stage.findOne(`#${WEAVE_GRID_LAYER_ID}`) as Konva.Layer;
+    gridLayer?.destroy();
+
+    return { stage, mainLayer };
+  }
+
   exportNodesAsImage(
     nodes: WeaveElementInstance[],
     boundingNodes: (nodes: Konva.Node[]) => Konva.Node[],
@@ -72,22 +95,7 @@ export class WeaveExportManager {
       } = options;
 
       const originalStage = this.instance.getStage();
-      const stage = originalStage.clone();
-      const mainLayer = stage.findOne('#mainLayer') as Konva.Layer;
-
-      if (!mainLayer) {
-        throw new Error('Main layer not found');
-      }
-
-      const selectionLayer = stage.findOne(
-        `#${WEAVE_NODES_SELECTION_LAYER_ID}`
-      ) as Konva.Layer;
-      selectionLayer?.destroy();
-
-      const gridLayer = stage.findOne(`#${WEAVE_GRID_LAYER_ID}`) as Konva.Layer;
-      gridLayer?.destroy();
-
-      stage.scale({ x: 1, y: 1 });
+      const { stage, mainLayer } = this.cloneStageForExport();
 
       if (mainLayer) {
         const bounds = getExportBoundingBox(boundingNodes(nodes));
@@ -171,20 +179,7 @@ export class WeaveExportManager {
       } = options;
 
       const originalStage = this.instance.getStage();
-      const stage = originalStage.clone();
-      const mainLayer = stage.findOne('#mainLayer') as Konva.Layer;
-
-      if (!mainLayer) {
-        throw new Error('Main layer not found');
-      }
-
-      const selectionLayer = stage.findOne(
-        `#${WEAVE_NODES_SELECTION_LAYER_ID}`
-      ) as Konva.Layer;
-      selectionLayer?.destroy();
-
-      const gridLayer = stage.findOne(`#${WEAVE_GRID_LAYER_ID}`) as Konva.Layer;
-      gridLayer?.destroy();
+      const { stage, mainLayer } = this.cloneStageForExport();
 
       if (mainLayer) {
         const bounds = getExportBoundingBox(boundingNodes(nodes));
@@ -273,22 +268,7 @@ export class WeaveExportManager {
       } = options;
 
       const originalStage = this.instance.getStage();
-      const stage = originalStage.clone();
-      const mainLayer = stage.findOne('#mainLayer') as Konva.Layer;
-
-      if (!mainLayer) {
-        throw new Error('Main layer not found');
-      }
-
-      const selectionLayer = stage.findOne(
-        `#${WEAVE_NODES_SELECTION_LAYER_ID}`
-      ) as Konva.Layer;
-      selectionLayer?.destroy();
-
-      const gridLayer = stage.findOne(`#${WEAVE_GRID_LAYER_ID}`) as Konva.Layer;
-      gridLayer?.destroy();
-
-      stage.scale({ x: 1, y: 1 });
+      const { stage, mainLayer } = this.cloneStageForExport();
 
       if (mainLayer) {
         const bounds = getExportBoundingBox(boundingNodes(nodes));
