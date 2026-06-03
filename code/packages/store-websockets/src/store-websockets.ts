@@ -105,21 +105,21 @@ export class WeaveStoreWebsockets extends WeaveStore {
     });
   }
 
-  connect(): void {
+  async connect(): Promise<void> {
     const awareness = this.provider.awareness;
     awareness.on('update', this.handleAwarenessChange.bind(this));
     awareness.on('change', this.handleAwarenessChange.bind(this));
 
-    this.provider.connect();
+    await this.provider.connect();
   }
 
-  disconnect(): void {
+  async disconnect(): Promise<void> {
     const awareness = this.provider.awareness;
     awareness.destroy();
     awareness.off('update', this.handleAwarenessChange.bind(this));
     awareness.off('change', this.handleAwarenessChange.bind(this));
 
-    this.provider.disconnect();
+    await this.provider.disconnect();
   }
 
   handleAwarenessChange(emit: boolean = true): void {

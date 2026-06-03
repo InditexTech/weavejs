@@ -37,6 +37,7 @@ import {
 } from './utils';
 import Y from './yjs';
 import { mergeExceptArrays } from '@inditextech/weave-sdk';
+import { sleep } from './utils';
 
 const messageSyncStep1 = 0;
 const messageAwareness = 1;
@@ -195,13 +196,13 @@ export class WeaveStoreAzureWebPubSubSyncClient extends Emittery {
 
     // register text update handler
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    this._updateHandler = (update: Uint8Array, origin: any) => {
+    this._updateHandler = async (update: Uint8Array, origin: any) => {
       if (origin !== this) {
         const encoder = encoding.createEncoder();
         encoding.writeVarUint(encoder, messageSyncStep1);
         syncProtocol.writeUpdate(encoder, update);
 
-        sendToControlGroup(
+        await sendToControlGroup(
           this,
           topic,
           MessageDataType.Sync,
@@ -213,7 +214,7 @@ export class WeaveStoreAzureWebPubSubSyncClient extends Emittery {
     this.doc.on('update', this._updateHandler);
 
     // register awareness update handler
-    this._awarenessUpdateHandler = ({ added, updated, removed }) => {
+    this._awarenessUpdateHandler = async ({ added, updated, removed }) => {
       const changedClients = added.concat(updated).concat(removed);
       const encoder = encoding.createEncoder();
       encoding.writeVarUint(encoder, messageAwareness);
@@ -222,7 +223,7 @@ export class WeaveStoreAzureWebPubSubSyncClient extends Emittery {
         awarenessProtocol.encodeAwarenessUpdate(this.awareness, changedClients)
       );
 
-      sendToControlGroup(
+      await sendToControlGroup(
         this,
         topic,
         MessageDataType.Awareness,
@@ -275,7 +276,7 @@ export class WeaveStoreAzureWebPubSubSyncClient extends Emittery {
     }
   }
 
-  disconnect(): void {
+  async disconnect(): Promise<void> {
     if (this._ws !== null) {
       // broadcast message with local awareness state set to null (indicating disconnect)
       const encoder = encoding.createEncoder();
@@ -289,7 +290,7 @@ export class WeaveStoreAzureWebPubSubSyncClient extends Emittery {
         )
       );
       const u8 = encoding.toUint8Array(encoder);
-      sendToControlGroup(this, this.topic, MessageDataType.Awareness, u8);
+      await sendToControlGroup(this, this.topic, MessageDataType.Awareness, u8);
 
       // update awareness (all users except local left)
       awarenessProtocol.removeAwarenessStates(
@@ -332,7 +333,10 @@ export class WeaveStoreAzureWebPubSubSyncClient extends Emittery {
       }
 
       const controller = new AbortController();
-      const timeout = setTimeout(() => controller.abort(), 5000);
+      const timeout = setTimeout(
+        () => controller.abort(),
+        this._synClientOptions.clientConnection.timeoutMs
+      );
 
       const res = await this._fetchClient(connectionURL.toString(), {
         signal: controller.signal,
@@ -367,6 +371,7 @@ export class WeaveStoreAzureWebPubSubSyncClient extends Emittery {
         );
         url = await this.fetchConnectionUrl(connectionUrlExtraParams);
       } catch (ex) {
+        console.error(ex);
         error = ex as Error;
       } finally {
         if (error) {
@@ -411,7 +416,7 @@ export class WeaveStoreAzureWebPubSubSyncClient extends Emittery {
       );
     });
 
-    websocket.onmessage = (event) => {
+    websocket.onmessage = async (event) => {
       if (event.data === null) {
         return;
       }
@@ -425,7 +430,8 @@ export class WeaveStoreAzureWebPubSubSyncClient extends Emittery {
       const messageData = message.data;
 
       if (messageData.type === 'heartbeat') {
-        this._lastHeartbeatTime = Date.now();
+        const actualDate = Date.now();
+        this._lastHeartbeatTime = actualDate;
         return;
       }
 
@@ -433,9 +439,17 @@ export class WeaveStoreAzureWebPubSubSyncClient extends Emittery {
         // Resync requested by sync host
         const encoder = encoding.createEncoder();
         encoding.writeVarUint(encoder, messageSyncStep1);
-        syncProtocol.writeUpdate(encoder, Y.encodeStateAsUpdate(this.doc));
+        const stateVector = Y.encodeStateVector(this.doc);
+        syncProtocol.writeUpdate(
+          encoder,
+          Y.encodeStateAsUpdate(this.doc, stateVector)
+        );
 
-        sendToControlGroup(
+        console.log(
+          'Resync request received, sending sync step 1 with current state vector'
+        );
+
+        await sendToControlGroup(
           this,
           this.topic,
           MessageDataType.Sync,
@@ -471,7 +485,7 @@ export class WeaveStoreAzureWebPubSubSyncClient extends Emittery {
 
       const encoder = readMessage(this, buffer, true, messageData.f);
       if (encoding.length(encoder) > 1) {
-        sendToControlGroup(
+        await sendToControlGroup(
           this,
           this.topic,
           MessageDataType.Sync,
@@ -508,7 +522,7 @@ export class WeaveStoreAzureWebPubSubSyncClient extends Emittery {
       }
     };
 
-    websocket.onopen = () => {
+    websocket.onopen = async () => {
       this._lastHeartbeatTime = Date.now();
 
       this.setAndEmitStatusInfo(
@@ -522,8 +536,6 @@ export class WeaveStoreAzureWebPubSubSyncClient extends Emittery {
 
       console.log('✅ [Azure Web PubSub] connected');
 
-      this.setupCheckHeartbeat();
-
       console.log(`🔌 [Azure Web PubSub] join room <${this.topic}>`);
 
       joinGroup(this, this.topic);
@@ -535,18 +547,18 @@ export class WeaveStoreAzureWebPubSubSyncClient extends Emittery {
       encoding.writeVarUint(encoder, messageSyncStep1);
       syncProtocol.writeSyncStep1(encoder, this.doc);
       const u8 = encoding.toUint8Array(encoder);
-      sendToControlGroup(this, this.topic, MessageDataType.Init, u8);
+      await sendToControlGroup(this, this.topic, MessageDataType.Init, u8);
 
       // broadcast local state
       const encoderState = encoding.createEncoder();
       encoding.writeVarUint(encoderState, messageSyncStep1);
       syncProtocol.writeSyncStep2(encoderState, this.doc);
-      sendToControlGroup(this, this.topic, MessageDataType.Init, u8);
+      await sendToControlGroup(this, this.topic, MessageDataType.Init, u8);
 
       // write queryAwareness
       const encoderAwarenessQuery = encoding.createEncoder();
       encoding.writeVarUint(encoderAwarenessQuery, messageQueryAwareness);
-      sendToControlGroup(this, this.topic, MessageDataType.Init, u8);
+      await sendToControlGroup(this, this.topic, MessageDataType.Init, u8);
 
       // broadcast awareness state
       if (this.awareness.getLocalState() !== null) {
@@ -560,8 +572,15 @@ export class WeaveStoreAzureWebPubSubSyncClient extends Emittery {
         );
         const u82 = encoding.toUint8Array(encoder);
 
-        sendToControlGroup(this, this.topic, MessageDataType.Awareness, u82);
+        await sendToControlGroup(
+          this,
+          this.topic,
+          MessageDataType.Awareness,
+          u82
+        );
       }
+
+      this.setupCheckHeartbeat();
     };
 
     this.setAndEmitStatusInfo(
@@ -579,14 +598,18 @@ export class WeaveStoreAzureWebPubSubSyncClient extends Emittery {
   }
 
   private setupCheckHeartbeat() {
-    this._checkHeartbeatId = setInterval(() => {
+    this._checkHeartbeatId = setInterval(async () => {
       const now = Date.now();
 
       if (
         now - this._lastHeartbeatTime >
         this._synClientOptions.heartbeat.checkWindowTimeMs
       ) {
-        this.disconnect();
+        if (this._checkHeartbeatId) {
+          clearInterval(this._checkHeartbeatId);
+        }
+
+        await this.disconnect();
         this.createWebSocket();
       }
     }, this._synClientOptions.heartbeat.checkIntervalMs);
@@ -612,7 +635,7 @@ export class WeaveStoreAzureWebPubSubSyncClient extends Emittery {
 }
 
 function safeSend(data: string) {
-  const MAX_BYTES = 64 * 1024; // 64 KB
+  const MAX_BYTES = 512 * 1024; // 512 KB
 
   const bytes = new TextEncoder().encode(data);
 
@@ -636,7 +659,7 @@ function joinGroup(client: WeaveStoreAzureWebPubSubSyncClient, group: string) {
   client.ws?.send(payload);
 }
 
-function sendToControlGroup(
+async function sendToControlGroup(
   client: WeaveStoreAzureWebPubSubSyncClient,
   group: string,
   type: string,
@@ -654,7 +677,7 @@ function sendToControlGroup(
   });
 
   if (!safeSend(payload)) {
-    sendToControlGroupChunked(client, group, type, u8);
+    await sendToControlGroupChunked(client, group, type, u8);
     return;
   }
 
@@ -669,7 +692,7 @@ function chunkString(str: string, size: number) {
   return chunks;
 }
 
-function sendToControlGroupChunked(
+async function sendToControlGroupChunked(
   client: WeaveStoreAzureWebPubSubSyncClient,
   group: string,
   type: string,
@@ -677,7 +700,8 @@ function sendToControlGroupChunked(
 ) {
   const base64Data = uint8ToBase64(u8);
 
-  const CHUNK_SIZE = 60 * 1024; // 60 KB
+  // const CHUNK_SIZE = 60 * 1024; // 60 KB
+  const CHUNK_SIZE = 512 * 1024; // 512 KB
   const chunks = chunkString(base64Data, CHUNK_SIZE);
   const payloadId = uuidv4();
 
@@ -696,6 +720,10 @@ function sendToControlGroupChunked(
         c: chunks[i],
       },
     });
+
+    if (i % 5 === 0) {
+      await sleep(10);
+    }
 
     client.ws?.send(payload);
   }

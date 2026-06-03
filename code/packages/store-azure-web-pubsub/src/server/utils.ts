@@ -19,3 +19,7 @@ export function hashJson(obj: any): string {
   const jsonString = JSON.stringify(obj);
   return crypto.createHash('sha256').update(jsonString).digest('hex');
 }
+
+export function sleep(ms: number): Promise<void> {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}

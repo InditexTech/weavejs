@@ -17,7 +17,7 @@ import {
   type WeaveStageGridPluginParams,
   type WeaveStageGridType,
 } from './types';
-import { throttle } from 'lodash';
+import throttle from 'lodash/throttle';
 import { MOVE_TOOL_ACTION_NAME } from '@/actions/move-tool/constants';
 import { DEFAULT_THROTTLE_MS } from '@/constants';
 import { mergeExceptArrays } from '@/index.node';

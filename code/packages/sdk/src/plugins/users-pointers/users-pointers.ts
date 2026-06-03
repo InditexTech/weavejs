@@ -21,7 +21,7 @@ import {
 import { WeavePlugin } from '@/plugins/plugin';
 import Konva from 'konva';
 import { memoize, mergeExceptArrays } from '@/utils/utils';
-import { throttle } from 'lodash';
+import throttle from 'lodash/throttle';
 
 export class WeaveUsersPointersPlugin extends WeavePlugin {
   private usersPointers!: Record<string, WeaveUserPointer>;

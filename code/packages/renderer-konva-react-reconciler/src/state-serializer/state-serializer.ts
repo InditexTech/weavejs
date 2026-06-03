@@ -4,7 +4,7 @@
 
 import React from 'react';
 import { type WeaveStateElement } from '@inditextech/weave-types';
-import { isEmpty } from 'lodash';
+import isEmpty from 'lodash/isEmpty';
 
 export class WeaveStateSerializer {
   serialize(element: React.ReactNode): string {

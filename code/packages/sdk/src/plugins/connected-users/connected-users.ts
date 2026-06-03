@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-import { isEqual } from 'lodash';
+import isEqual from 'lodash/isEqual';
 import { WeavePlugin } from '@/plugins/plugin';
 import { type WeaveUser } from '@inditextech/weave-types';
 import {

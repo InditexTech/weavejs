@@ -4,7 +4,7 @@
 
 import type { Weave } from '@/weave';
 import type Konva from 'konva';
-import { merge } from 'lodash';
+import merge from 'lodash/merge';
 
 export const setupUpscaleStage = (instance: Weave, stage: Konva.Stage) => {
   if (instance.isServerSide()) {

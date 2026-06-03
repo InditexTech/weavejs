@@ -2,7 +2,8 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-import { isEmpty, orderBy } from 'lodash';
+import orderBy from 'lodash/orderBy';
+import isEmpty from 'lodash/isEmpty';
 import { v4 as uuidv4 } from 'uuid';
 import Konva from 'konva';
 import {

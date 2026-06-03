@@ -10,7 +10,7 @@ import {
   type WeaveStateElement,
 } from '@inditextech/weave-types';
 import Konva from 'konva';
-import { isEqual } from 'lodash';
+import isEqual from 'lodash/isEqual';
 import type { RendererInstruction } from './types';
 import { SIMPLE_RECONCILER } from './reconciler';
 import { WeaveRenderer } from '@inditextech/weave-sdk';

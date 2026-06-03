@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-import { throttle } from 'lodash';
+import throttle from 'lodash/throttle';
 import { WeavePlugin } from '@/plugins/plugin';
 import {
   type WeaveStageZoomPluginConfig,

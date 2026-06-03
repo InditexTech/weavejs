@@ -8,7 +8,7 @@ import type {
   WeaveElementInstance,
 } from '@inditextech/weave-types';
 import Konva from 'konva';
-import { isEqual } from 'lodash';
+import isEqual from 'lodash/isEqual';
 
 export const SIMPLE_RECONCILER = {
   createInstance(

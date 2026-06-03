@@ -76,3 +76,7 @@ export function uint8ToBase64(u8: Uint8Array<ArrayBufferLike>): string {
 
   return btoa(binary);
 }
+
+export function sleep(ms: number): Promise<void> {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}

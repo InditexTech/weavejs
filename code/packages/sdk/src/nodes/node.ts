@@ -25,7 +25,7 @@ import {
   mergeExceptArrays,
   moveNodeToContainerNT,
 } from '@/utils/utils';
-import { throttle } from 'lodash';
+import throttle from 'lodash/throttle';
 import type { KonvaEventObject } from 'konva/lib/Node';
 import { WEAVE_STAGE_DEFAULT_MODE } from './stage/constants';
 import { MOVE_TOOL_ACTION_NAME } from '@/actions/move-tool/constants';

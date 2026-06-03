@@ -863,17 +863,22 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
       );
 
     if (usersSelectionPlugin) {
-      usersSelectionPlugin.sendSelectionAwarenessInfo(this.tr);
+      requestAnimationFrame(() => {
+        usersSelectionPlugin.sendSelectionAwarenessInfo(this.tr);
+      });
     }
 
-    this.instance.emitEvent<WeaveNodesSelectionPluginOnNodesChangeEvent>(
-      'onNodesChange',
-      selectedNodes
-    );
+    requestAnimationFrame(() => {
+      this.instance.emitEvent<WeaveNodesSelectionPluginOnNodesChangeEvent>(
+        'onNodesChange',
+        selectedNodes
+      );
+    });
   }
 
   removeElement(element: WeaveStateElement): void {
     this.instance.removeNode(element);
+    this.instance.getHooks().callHook('weave:onNodesRemoved', [element]);
     this.selectNone();
     this.triggerSelectedNodesEvent();
   }
@@ -889,7 +894,12 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
         return handler?.serialize(node);
       })
       .filter((node) => typeof node !== 'undefined');
-    this.instance.removeNodes(mappedSelectedNodes);
+    this.instance.removeNodes(mappedSelectedNodes, {
+      updateSelection: false,
+    });
+    this.instance
+      .getHooks()
+      .callHook('weave:onNodesRemoved', mappedSelectedNodes);
     this.selectNone();
     this.triggerSelectedNodesEvent();
   }
@@ -1501,11 +1511,15 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
     });
 
     this.instance.addEventListener('onStateChange', () => {
-      this.syncSelection();
+      requestAnimationFrame(() => {
+        this.syncSelection();
+      });
     });
 
     this.instance.addEventListener('onUndoManagerStatusChange', () => {
-      this.syncSelection();
+      requestAnimationFrame(() => {
+        this.syncSelection();
+      });
     });
   }
 
@@ -1790,7 +1804,22 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
 
     this.handleBehaviors();
 
-    this.triggerSelectedNodesEvent();
+    if (nodes.length === 0) {
+      this.getNodesSelectionFeedbackPlugin()?.cleanupSelectedHalos();
+    }
+
+    const usersSelectionPlugin =
+      this.instance.getPlugin<WeaveUsersSelectionPlugin>(
+        WEAVE_USERS_SELECTION_KEY
+      );
+
+    if (usersSelectionPlugin) {
+      requestAnimationFrame(() => {
+        usersSelectionPlugin.sendSelectionAwarenessInfo(this.tr);
+      });
+    }
+
+    // this.triggerSelectedNodesEvent();
   }
 
   getSelectedNodes() {

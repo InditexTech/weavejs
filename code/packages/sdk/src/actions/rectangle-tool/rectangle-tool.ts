@@ -5,6 +5,7 @@
 import { v4 as uuidv4 } from 'uuid';
 import Konva from 'konva';
 import { WeaveAction } from '@/actions/action';
+import type { WeaveElementInstance } from '@inditextech/weave-types';
 import {
   type WeaveRectangleToolActionOnAddingEvent,
   type WeaveRectangleToolActionState,
@@ -181,7 +182,7 @@ export class WeaveRectangleToolAction extends WeaveAction {
     if (!this.tempRectNode) {
       this.tempRectNode = new Konva.Rect({
         ...this.props,
-        id: this.rectId,
+        id: `${this.rectId}-preview`,
         strokeScaleEnabled: true,
         x: this.clickPoint?.x ?? 0,
         y: this.clickPoint?.y ?? 0,
@@ -226,12 +227,27 @@ export class WeaveRectangleToolAction extends WeaveAction {
 
       if (nodeHandler) {
         const clonedRectNode = this.tempRectNode.clone();
-        this.tempRectNode.destroy();
+
+        const rectIdToWatch = this.rectId;
+        const tempRectToDestroy = this.tempRectNode;
+        this.tempRectNode = null;
 
         const node = nodeHandler.create(this.rectId, {
           ...this.props,
           ...clonedRectNode.getAttrs(),
         });
+
+        // Destroy the preview rect only after the real node is rendered to avoid a blank frame
+        const destroyOnRender = (addedNode: WeaveElementInstance) => {
+          if (addedNode.getAttrs().id === rectIdToWatch) {
+            tempRectToDestroy.destroy();
+            this.instance.removeEventListener(
+              'onNodeRenderedAdded',
+              destroyOnRender
+            );
+          }
+        };
+        this.instance.addEventListener('onNodeRenderedAdded', destroyOnRender);
 
         this.instance.addNode(node, this.container?.getAttrs().id);
       }
