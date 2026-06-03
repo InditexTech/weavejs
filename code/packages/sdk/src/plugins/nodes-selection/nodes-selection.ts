@@ -894,9 +894,7 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
         return handler?.serialize(node);
       })
       .filter((node) => typeof node !== 'undefined');
-    this.instance.removeNodes(mappedSelectedNodes, {
-      updateSelection: false,
-    });
+    this.instance.removeNodes(mappedSelectedNodes);
     this.instance
       .getHooks()
       .callHook('weave:onNodesRemoved', mappedSelectedNodes);
