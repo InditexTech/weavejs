@@ -1344,6 +1344,7 @@ export abstract class WeaveNode implements WeaveNodeBase {
     };
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   static getSchema(): z.ZodObject<any> {
     const baseNodeSchema = z.object({
       key: z
