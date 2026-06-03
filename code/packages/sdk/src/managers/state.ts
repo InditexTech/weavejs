@@ -81,18 +81,15 @@ export class WeaveStateManager {
       if (Array.isArray(value)) {
         yjsMap.set(key, WeaveStateManipulation.mapValueToYjs(value));
       } else if (typeof value === 'object' && value !== null) {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        let nested = yjsMap.get(key) as Y.Map<any> | undefined;
+        let nested = yjsMap.get(key);
         if (!(nested instanceof Y.Map)) {
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
           nested = new Y.Map<any>();
           yjsMap.set(key, nested);
         }
         this.updateYjsMapFromObject(nested, value);
-      } else {
-        if (yjsMap.get(key) !== value) {
-          yjsMap.set(key, value);
-        }
+      } else if (yjsMap.get(key) !== value) {
+        yjsMap.set(key, value);
       }
     }
   }
