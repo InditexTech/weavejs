@@ -1,0 +1,284 @@
+---
+title: Low-level State Manipulation
+description: API reference for the WeaveStateManipulation class
+---
+
+import { TypeTable } from "fumadocs-ui/components/type-table";
+
+## Overview
+
+The [WeaveStateManipulation](https://github.com/InditexTech/weavejs/blob/main/code/packages/sdk/src/state.manipulation.ts)
+class is a collection of **static helpers** for reading and writing the Yjs document that backs
+the collaborative canvas state.
+
+All canvas state in Weave.js is stored as two `Y.Map` roots inside a `Y.Doc`:
+
+- `weave` — the node tree (stage → layers → nodes)
+- `weaveMetadata` — metadata not directly rendered
+
+`WeaveStateManipulation` gives you direct access to that tree, letting you build,
+insert, update, delete, and query nodes at the Yjs level without going through the
+higher-level `Weave` instance methods.
+
+<Callout title="Low-level API" type="warn">
+  Prefer the `Weave` instance methods (`addNode`, `updateNode`, `removeNode`,
+  etc.) for everyday node management. Use `WeaveStateManipulation` only when you
+  need precise, transactional control over the Yjs document — for example when
+  writing a custom store, seeding initial state, or implementing a bulk-import
+  operation.
+</Callout>
+
+## Import
+
+```ts
+import { WeaveStateManipulation } from "@inditextech/weave-sdk";
+```
+
+## Static Methods
+
+### mapValueToYjs
+
+```ts
+static mapValueToYjs(value: unknown): unknown
+```
+
+Converts any JavaScript value to its Yjs-compatible equivalent, recursively:
+
+| Input type                       | Output type                             |
+| -------------------------------- | --------------------------------------- |
+| `null` / `undefined` / primitive | returned as-is                          |
+| `Array`                          | `Y.Array` (elements mapped recursively) |
+| plain `object`                   | `Y.Map` (values mapped recursively)     |
+
+#### Parameters
+
+<TypeTable
+  type={{
+    value: {
+      required: true,
+      description: "The JavaScript value to convert",
+      type: "unknown",
+    },
+  }}
+/>
+
+#### Returns
+
+The Yjs-compatible representation of `value`.
+
+---
+
+### mapPropsToYjs
+
+```ts
+static mapPropsToYjs(props: Record<string, unknown>): Y.Map<unknown>
+```
+
+Converts a flat or nested props object into a `Y.Map`, mapping each value through
+[`mapValueToYjs`](#mapvaluetoyjs).
+
+#### Parameters
+
+<TypeTable
+  type={{
+    props: {
+      required: true,
+      description: "A record of node properties to convert",
+      type: "Record<string, unknown>",
+    },
+  }}
+/>
+
+#### Returns
+
+`Y.Map<unknown>` — a Yjs map with all props converted to Yjs types.
+
+---
+
+### mapNodeToYjs
+
+```ts
+static mapNodeToYjs(node: WeaveStateElement): {
+  nodeId: string;
+  element: Y.Map<WeaveStateElement>;
+}
+```
+
+Converts a `WeaveStateElement` JSON model into a Yjs `Y.Map` structure ready to be
+inserted into the document. Children are handled recursively as `Y.Array` elements.
+
+#### Parameters
+
+<TypeTable
+  type={{
+    node: {
+      required: true,
+      description: "The node JSON model to convert",
+      type: "WeaveStateElement",
+    },
+  }}
+/>
+
+#### Returns
+
+An object with:
+
+- `nodeId` — the `key` of the input node
+- `element` — the `Y.Map` representing the node, with `key`, `type`, and `props` fields
+
+---
+
+### addElements
+
+```ts
+static addElements(
+  layerYjsElement: Y.Map<unknown>,
+  yjsElements: Y.Map<unknown>[]
+): void
+```
+
+Appends one or more Yjs element maps to the `children` array of the given layer element.
+
+#### Parameters
+
+<TypeTable
+  type={{
+    layerYjsElement: {
+      required: true,
+      description:
+        "The Y.Map representing the layer (or container) that will receive the new children",
+      type: "Y.Map<unknown>",
+    },
+    yjsElements: {
+      required: true,
+      description: "An array of Y.Map elements to append as children",
+      type: "Y.Map<unknown>[]",
+    },
+  }}
+/>
+
+---
+
+### updateElements
+
+```ts
+static updateElements(
+  layerYjsElement: Y.Map<unknown>,
+  yjsElements: { nodeId: string; element: Y.Map<unknown> }[]
+): void
+```
+
+Replaces existing child elements inside a layer by matching on `nodeId`. For each
+entry, the old element at that position is deleted and the new one is inserted at
+the same index.
+
+#### Parameters
+
+<TypeTable
+  type={{
+    layerYjsElement: {
+      required: true,
+      description:
+        "The Y.Map representing the layer whose children will be updated",
+      type: "Y.Map<unknown>",
+    },
+    yjsElements: {
+      required: true,
+      description:
+        "An array of objects with the target nodeId and the replacement Y.Map element",
+      type: "{ nodeId: string; element: Y.Map<unknown> }[]",
+    },
+  }}
+/>
+
+---
+
+### deleteElements
+
+```ts
+static deleteElements(
+  layerYjsElement: Y.Map<unknown>,
+  yjsElementsIds: string[]
+): void
+```
+
+Removes child elements from a layer by their node ids.
+
+#### Parameters
+
+<TypeTable
+  type={{
+    layerYjsElement: {
+      required: true,
+      description:
+        "The Y.Map representing the layer whose children will be modified",
+      type: "Y.Map<unknown>",
+    },
+    yjsElementsIds: {
+      required: true,
+      description: "An array of node ids to remove from the layer's children",
+      type: "string[]",
+    },
+  }}
+/>
+
+---
+
+### getYjsElement
+
+```ts
+static getYjsElement(doc: Y.Doc, nodeId: string): Y.Map<unknown> | null
+```
+
+Searches the `weave` root of the document for a node by its `id` prop. Looks in
+both direct children of the stage and one level deeper (grandchildren / container
+children).
+
+#### Parameters
+
+<TypeTable
+  type={{
+    doc: {
+      required: true,
+      description: "The Yjs document to search in",
+      type: "Y.Doc",
+    },
+    nodeId: {
+      required: true,
+      description: "The id of the node to find (matches `props.id`)",
+      type: "string",
+    },
+  }}
+/>
+
+#### Returns
+
+The `Y.Map` for the matching node, or `null` if not found.
+
+---
+
+### getNodesBoundingBox
+
+```ts
+static getNodesBoundingBox(nodes: WeaveStateElement[]): BoundingBox
+```
+
+Computes the axis-aligned bounding box that contains all the provided nodes,
+based on their `x`, `y`, `width`, and `height` props.
+
+#### Parameters
+
+<TypeTable
+  type={{
+    nodes: {
+      required: true,
+      description:
+        "An array of WeaveStateElement nodes to compute the bounding box for",
+      type: "WeaveStateElement[]",
+    },
+  }}
+/>
+
+#### Returns
+
+`BoundingBox` — `{ x, y, width, height }` of the combined bounding box.
