@@ -867,12 +867,16 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
   }
 
   triggerSelectionAwarenessEvent(): void {
-    requestAnimationFrame(() => {
-      this.instance.emitEvent<WeaveNodesSelectionPluginOnNodesChangeEvent>(
-        'onNodesChange',
-        this.serializedSelectedNodes
+    const usersSelectionPlugin =
+      this.instance.getPlugin<WeaveUsersSelectionPlugin>(
+        WEAVE_USERS_SELECTION_KEY
       );
-    });
+
+    if (usersSelectionPlugin) {
+      requestAnimationFrame(() => {
+        usersSelectionPlugin.sendSelectionAwarenessInfo(this.tr);
+      });
+    }
   }
 
   triggerOnNodesChangeEvent(): void {
