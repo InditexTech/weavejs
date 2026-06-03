@@ -1816,8 +1816,6 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
         usersSelectionPlugin.sendSelectionAwarenessInfo(this.tr);
       });
     }
-
-    // this.triggerSelectedNodesEvent();
   }
 
   getSelectedNodes() {
