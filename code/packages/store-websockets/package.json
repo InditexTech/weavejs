@@ -57,7 +57,6 @@
   "dependencies": {
     "@inditextech/weave-sdk": "4.2.0-SNAPSHOT",
     "@inditextech/weave-types": "4.2.0-SNAPSHOT",
-    "@syncedstore/core": "0.6.0",
     "ws": "8.18.1",
     "y-websocket": "3.0.0"
   },

@@ -312,9 +312,6 @@ export class Weave {
     this.registerManager.reset();
     this.asyncManager.reset();
 
-    // remove event listeners
-    // this.emitter.clearListeners();
-
     this.moduleLogger.info('Switching room instance');
 
     if (!this.isServerSide()) {
@@ -884,6 +881,12 @@ export class Weave {
 
     this.stateTransactional(() => {
       this.removeNodeNT(node, restOptions);
+
+      const selectionPlugin =
+        this.getPlugin<WeaveNodesSelectionPlugin>('nodesSelection');
+      if (selectionPlugin) {
+        selectionPlugin.setSelectedNodes([]);
+      }
     }, origin);
   }
 
@@ -932,19 +935,12 @@ export class Weave {
     this.runPhaseHooks<{
       node: Konva.Node;
     }>('onRemoveNode', (hook) => {
-      const nodeInstance = this.getStage().findOne(`#${node.key}`);
       if (nodeInstance) {
         hook({
           node: nodeInstance,
         });
       }
     });
-
-    const selectionPlugin =
-      this.getPlugin<WeaveNodesSelectionPlugin>('nodesSelection');
-    if (selectionPlugin) {
-      selectionPlugin.setSelectedNodes([]);
-    }
   }
 
   removeNodes(
@@ -958,6 +954,12 @@ export class Weave {
 
     this.stateTransactional(() => {
       this.removeNodesNT(nodes, restOptions);
+
+      const selectionPlugin =
+        this.getPlugin<WeaveNodesSelectionPlugin>('nodesSelection');
+      if (selectionPlugin) {
+        selectionPlugin.setSelectedNodes([]);
+      }
     }, origin);
   }
 
@@ -967,14 +969,10 @@ export class Weave {
       emitUserChangeEvent?: boolean;
     } = DEFAULT_REMOVE_NODE_OPTIONS
   ): void {
-    for (const node of nodes) {
-      this.removeNodeNT(node, options);
-    }
+    const { ...nodeOptions } = options;
 
-    const selectionPlugin =
-      this.getPlugin<WeaveNodesSelectionPlugin>('nodesSelection');
-    if (selectionPlugin) {
-      selectionPlugin.setSelectedNodes([]);
+    for (const node of nodes) {
+      this.removeNodeNT(node, { ...nodeOptions });
     }
   }
 
@@ -1631,14 +1629,12 @@ export class Weave {
   // METADATA METHODS
 
   getMetadata<T extends AllowedObject>(): T {
-    return this.getStore().getStateJson().weaveMetadata as T;
+    return this.getStore().getDocument().getMap('weaveMetadata').toJSON() as T;
   }
 
   saveMetadata<T extends AllowedObject>(metadata: T): void {
-    const state = this.getStore().getState();
-
     this.stateTransactional(() => {
-      this.stateManager.deepSyncSyncedStore<T>(state.weaveMetadata, metadata);
+      this.stateManager.syncMetadata(metadata);
     });
   }
 }

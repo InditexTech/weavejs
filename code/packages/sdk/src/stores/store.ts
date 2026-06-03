@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-import { isEmpty } from 'lodash';
+import isEmpty from 'lodash/isEmpty';
 import { Weave } from '@/weave';
 import {
   type WeaveState,
@@ -10,17 +10,9 @@ import {
   type WeaveUndoRedoChange,
   type WeaveStoreOptions,
   type WeaveUser,
-  type MappedTypeDescription,
   type WeaveStoreConnectionStatus,
   type WeaveStoreOnStoreConnectionStatusChangeEvent,
-  type AllowedObject,
 } from '@inditextech/weave-types';
-import {
-  observeDeep,
-  syncedStore,
-  getYjsDoc,
-  getYjsValue,
-} from '@syncedstore/core';
 import Y from './../yjs';
 import { type Logger } from 'pino';
 import type { WeaveNodesSelectionPlugin } from '@/plugins/nodes-selection/nodes-selection';
@@ -42,13 +34,14 @@ export abstract class WeaveStore implements WeaveStoreBase {
   protected config!: WeaveStoreOptions;
   protected roomId!: string;
 
-  private state!: MappedTypeDescription<WeaveState>;
+  private state!: WeaveState;
   private latestState: WeaveState;
   private document: Y.Doc;
 
   private logger!: Logger;
   private undoManager!: Y.UndoManager;
   private isRoomLoaded: boolean;
+  private _pendingRaf: ReturnType<typeof requestAnimationFrame> | null = null;
 
   constructor(config: WeaveStoreOptions) {
     this.config = config;
@@ -57,11 +50,14 @@ export abstract class WeaveStore implements WeaveStoreBase {
       weave: {},
       weaveMetadata: {},
     };
-    this.state = syncedStore<WeaveState>({
+    this.state = {
       weave: {},
       weaveMetadata: {},
-    });
-    this.document = getYjsDoc(this.state);
+    };
+    const document = new Y.Doc();
+    document.getMap('weave');
+    document.getMap('weaveMetadata');
+    this.document = document;
   }
 
   getName(): string {
@@ -111,11 +107,14 @@ export abstract class WeaveStore implements WeaveStoreBase {
       weave: {},
       weaveMetadata: {},
     };
-    this.state = syncedStore<WeaveState>({
+    this.state = {
       weave: {},
       weaveMetadata: {},
-    });
-    this.document = getYjsDoc(this.state);
+    };
+    const document = new Y.Doc();
+    document.getMap('weave');
+    document.getMap('weaveMetadata');
+    this.document = document;
   }
 
   loadDocument(roomData: Uint8Array): void {
@@ -130,12 +129,8 @@ export abstract class WeaveStore implements WeaveStoreBase {
     }
   }
 
-  getState(): MappedTypeDescription<WeaveState> {
+  getState(): WeaveState {
     return this.state;
-  }
-
-  getStateJson(): WeaveState {
-    return JSON.parse(JSON.stringify(this.state, undefined, 2)) as WeaveState;
   }
 
   getRoomId(): string {
@@ -160,10 +155,7 @@ export abstract class WeaveStore implements WeaveStoreBase {
     this.emitOnRoomLoadedEvent();
 
     if (this.supportsUndoManager) {
-      const weaveStateValues = getYjsValue(
-        this.getState().weave
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      ) as Y.AbstractType<any>;
+      const weaveStateValues = this.document.getMap('weave');
 
       if (weaveStateValues) {
         this.undoManager = new Y.UndoManager([weaveStateValues], {
@@ -204,47 +196,16 @@ export abstract class WeaveStore implements WeaveStoreBase {
       }
     }
 
-    observeDeep(this.getState().weaveMetadata, () => {
-      const newState: AllowedObject = JSON.parse(
-        JSON.stringify(this.getState())
-      );
+    this.document.on('afterTransaction', () => {
+      const newState: WeaveState = {
+        weave: this.document.getMap('weave').toJSON(),
+        weaveMetadata: this.document.getMap('weaveMetadata').toJSON(),
+      };
 
-      const metadata = newState.weaveMetadata as AllowedObject;
+      this.state = newState;
 
-      this.instance.emitEvent<WeaveStoreOnStateMetadataChangeEvent>(
-        'onStateMetadataChange',
-        metadata
-      );
-    });
-
-    observeDeep(this.getState(), () => {
-      const newState: WeaveState = JSON.parse(JSON.stringify(this.getState()));
-
-      this.instance.emitEvent<WeaveStoreOnStateChangeEvent>(
-        'onStateChange',
-        newState
-      );
-
-      const nodesSelectionPlugin =
-        this.instance.getPlugin<WeaveNodesSelectionPlugin>('nodesSelection');
-
-      if (
-        this.isRoomLoaded &&
-        nodesSelectionPlugin?.getSelectedNodes().length === 1
-      ) {
-        const selectedNode = nodesSelectionPlugin.getSelectedNodes()[0];
-        const nodeInfo = this.instance.getNode(
-          selectedNode.getAttrs().id ?? ''
-        );
-
-        if (nodeInfo && nodeInfo.node) {
-          this.instance.emitEvent<WeaveStoreOnNodeChangeEvent>('onNodeChange', {
-            instance: selectedNode,
-            node: JSON.parse(JSON.stringify(nodeInfo.node)),
-          });
-        }
-      }
-
+      // First-load must run synchronously so the renderer initialises before
+      // any deferred callbacks fire.
       if (!this.isRoomLoaded && !isEmpty(this.state.weave)) {
         this.instance.checkForAsyncElements();
         this.instance.setupRenderer();
@@ -254,8 +215,56 @@ export abstract class WeaveStore implements WeaveStoreBase {
 
         return;
       }
-      if (this.isRoomLoaded && !isEmpty(this.state.weave)) {
-        this.instance.render();
+
+      // Subsequent updates: coalesce all event emissions and the Konva render
+      // into a single requestAnimationFrame so that multiple Yjs transactions
+      // arriving within the same frame (e.g. stroke drawing, multi-node drag)
+      // produce only one React state update and one canvas repaint.
+      if (this._pendingRaf === null) {
+        this._pendingRaf = requestAnimationFrame(() => {
+          this._pendingRaf = null;
+
+          const latestState = this.state;
+
+          this.instance.emitEvent<WeaveStoreOnStateMetadataChangeEvent>(
+            'onStateMetadataChange',
+            latestState.weaveMetadata
+          );
+
+          this.instance.emitEvent<WeaveStoreOnStateChangeEvent>(
+            'onStateChange',
+            latestState
+          );
+
+          const nodesSelectionPlugin =
+            this.instance.getPlugin<WeaveNodesSelectionPlugin>(
+              'nodesSelection'
+            );
+
+          if (
+            this.isRoomLoaded &&
+            nodesSelectionPlugin?.getSelectedNodes().length === 1
+          ) {
+            const selectedNode = nodesSelectionPlugin.getSelectedNodes()[0];
+            const nodeInfo = this.instance.getNode(
+              selectedNode.getAttrs().id ?? ''
+            );
+
+            if (nodeInfo && nodeInfo.node) {
+              this.instance.emitEvent<WeaveStoreOnNodeChangeEvent>(
+                'onNodeChange',
+                {
+                  instance: selectedNode,
+                  node: JSON.parse(JSON.stringify(nodeInfo.node)),
+                }
+              );
+            }
+          }
+
+          if (this.isRoomLoaded && !isEmpty(latestState.weave)) {
+            this.instance.render();
+          }
+        });
       }
     });
   }

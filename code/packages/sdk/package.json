@@ -57,7 +57,6 @@
   },
   "dependencies": {
     "@inditextech/weave-types": "4.2.0-SNAPSHOT",
-    "@syncedstore/core": "0.6.0",
     "pino": "9.6.0",
     "pino-pretty": "13.0.0",
     "simplify-js": "^1.2.4",

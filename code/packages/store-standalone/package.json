@@ -53,8 +53,7 @@
   },
   "dependencies": {
     "@inditextech/weave-sdk": "4.2.0-SNAPSHOT",
-    "@inditextech/weave-types": "4.2.0-SNAPSHOT",
-    "@syncedstore/core": "0.6.0"
+    "@inditextech/weave-types": "4.2.0-SNAPSHOT"
   },
   "devDependencies": {
     "@types/lodash.debounce": "^4.0.9",
