@@ -2,7 +2,6 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-import { isEmpty } from 'lodash';
 import { Weave } from '@/weave';
 import { type Logger } from 'pino';
 import {
@@ -12,7 +11,8 @@ import {
   WEAVE_NODE_POSITION,
 } from '@inditextech/weave-types';
 import Konva from 'konva';
-import { getYjsDoc } from '@syncedstore/core';
+import * as Y from 'yjs';
+import { WeaveStateManipulation } from '@/state.manipulation';
 
 export class WeaveStateManager {
   private instance: Weave;
@@ -22,6 +22,84 @@ export class WeaveStateManager {
     this.instance = instance;
     this.logger = this.instance.getChildLogger('state-manager');
     this.logger.debug('State manager created');
+  }
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  private findYjsNodeById(
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    node: Y.Map<any>,
+    key: string,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    parentArray: Y.Array<any> | null = null,
+    index: number = -1
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  ): {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    node: Y.Map<any> | null;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    parentArray: Y.Array<any> | null;
+    index: number;
+  } {
+    if (node.get('key') === key) {
+      return { node, parentArray, index };
+    }
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const children: Y.Array<any> | undefined = node
+      .get('props')
+      ?.get('children');
+    if (children) {
+      for (let i = 0; i < children.length; i++) {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const child = children.get(i) as Y.Map<any>;
+        const result = this.findYjsNodeById(child, key, children, i);
+        if (result.node) return result;
+      }
+    }
+
+    return { node: null, parentArray: null, index: -1 };
+  }
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  private updateYjsMapFromObject(
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    yjsMap: Y.Map<any>,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    obj: Record<string, any>
+  ): void {
+    // Remove keys not present in obj
+    for (const key of Array.from(yjsMap.keys())) {
+      if (!(key in obj)) {
+        yjsMap.delete(key);
+      }
+    }
+
+    // Update or add keys from obj
+    for (const [key, value] of Object.entries(obj)) {
+      if (key === 'children') continue; // children are managed by addNode / removeNode
+
+      if (Array.isArray(value)) {
+        yjsMap.set(key, WeaveStateManipulation.mapValueToYjs(value));
+      } else if (typeof value === 'object' && value !== null) {
+        let nested = yjsMap.get(key);
+        if (!(nested instanceof Y.Map)) {
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          nested = new Y.Map<any>();
+          yjsMap.set(key, nested);
+        }
+        this.updateYjsMapFromObject(nested, value);
+      } else if (yjsMap.get(key) !== value) {
+        yjsMap.set(key, value);
+      }
+    }
+  }
+
+  syncMetadata<T extends Record<string, unknown>>(metadata: T): void {
+    const yjsMetadata = this.instance
+      .getStore()
+      .getDocument()
+      .getMap('weaveMetadata');
+    this.updateYjsMapFromObject(yjsMetadata, metadata);
   }
 
   getInstanceRecursive(
@@ -119,13 +197,15 @@ export class WeaveStateManager {
   }
 
   getNode(nodeKey: string): WeaveNodeFound {
-    const state = this.instance.getStore().getState().weave;
+    const doc = this.instance.getStore().getDocument();
+    const root = doc.getMap('weave');
 
-    if (isEmpty(state)) {
+    if (root.size === 0) {
       return { node: null, parent: null, index: -1 };
     }
 
-    return this.findNodeById(state as WeaveStateElement, nodeKey);
+    const state = root.toJSON() as WeaveStateElement;
+    return this.findNodeById(state, nodeKey);
   }
 
   addNode(
@@ -133,129 +213,86 @@ export class WeaveStateManager {
     parentId = 'mainLayer',
     index: number | undefined = undefined
   ): void {
-    const state = this.instance.getStore().getState();
+    const doc = this.instance.getStore().getDocument();
+    const root = doc.getMap('weave');
 
-    if (isEmpty(state.weave)) {
+    if (root.size === 0) {
       const msg = `State is empty, cannot add the node`;
       this.logger.warn({ node, parentId }, msg);
       return;
     }
 
-    const { node: nodeState } = this.findNodeById(
-      state.weave as WeaveStateElement,
-      node.key
-    );
-    if (nodeState) {
+    const { node: existing } = this.findYjsNodeById(root, node.key);
+    if (existing) {
       const msg = `Node with key [${node.key}] already exists, cannot add it`;
       this.logger.warn({ node, parentId }, msg);
       return;
     }
 
-    const { node: parent } = this.findNodeById(
-      state.weave as WeaveStateElement,
-      parentId
-    );
-    if (!parent) {
-      const msg = `Parent container with key [${node.key}] doesn't exists, cannot add it`;
+    const { node: parentNode } = this.findYjsNodeById(root, parentId);
+    if (!parentNode) {
+      const msg = `Parent container with key [${parentId}] doesn't exists, cannot add it`;
       this.logger.warn({ node, parentId }, msg);
       return;
     }
 
-    if (!parent.props.children) {
-      parent.props.children = [];
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const parentChildren: Y.Array<any> | undefined = parentNode
+      .get('props')
+      ?.get('children');
+    if (!parentChildren) {
+      const msg = `Parent container with key [${parentId}] has no children array`;
+      this.logger.warn({ node, parentId }, msg);
+      return;
     }
 
-    if (index) {
-      parent.props.children.splice(index, 0, node);
-      for (let i = 0; i < parent.props.children.length; i++) {
-        parent.props.children[i].props.zIndex = i;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { element } = WeaveStateManipulation.mapNodeToYjs(node);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const elementMap = element as unknown as Y.Map<any>;
+
+    if (index !== undefined) {
+      // Insert into the document first so elementMap.get() works correctly.
+      parentChildren.insert(index, [elementMap]);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      (elementMap.get('props') as Y.Map<any>)?.set('zIndex', index);
+      for (let i = 0; i < parentChildren.length; i++) {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const child = parentChildren.get(i) as Y.Map<any>;
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        (child.get('props') as Y.Map<any>)?.set('zIndex', i);
       }
-    }
-
-    if (!index) {
-      const childrenAmount = parent.props.children.length;
-
-      const nodeToAdd = {
-        ...node,
-        props: {
-          ...node.props,
-          zIndex: childrenAmount,
-        },
-      };
-
-      parent.props.children.push(nodeToAdd);
+    } else {
+      const zIndex = parentChildren.length;
+      // Insert into the document first so elementMap.get() works correctly.
+      parentChildren.push([elementMap]);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      (elementMap.get('props') as Y.Map<any>)?.set('zIndex', zIndex);
     }
 
     this.instance.emitEvent('onNodeAdded', node);
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  deepSyncSyncedStore<T extends Record<string, any>>(target: any, source: T) {
-    // Remove fields not in source
-    for (const key in target) {
-      if (!(key in source)) {
-        delete target[key];
-      }
-    }
-
-    // Update or add fields from source
-    for (const key in source) {
-      const srcVal = source[key];
-      const tgtVal = target[key];
-
-      const bothAreObjects = this.isObject(srcVal) && this.isObject(tgtVal);
-
-      if (bothAreObjects && !Array.isArray(srcVal)) {
-        // Recurse into nested object
-        this.deepSyncSyncedStore(tgtVal, srcVal);
-      } else if (Array.isArray(srcVal)) {
-        // Sync array by item position
-        this.syncArray(target, key, srcVal);
-      } else {
-        // Primitive or different type → replace
-        if (tgtVal !== srcVal) {
-          target[key] = srcVal;
-        }
-      }
-    }
-  }
-
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  syncArray(target: any, key: string, sourceArr: any[]) {
-    const tgtArr = target[key];
-    if (!Array.isArray(tgtArr)) {
-      target[key] = [...sourceArr]; // replace if not already an array
-      return;
-    }
-
-    target[key] = [...sourceArr]; // copy existing array to avoid mutation
-  }
-
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  isObject(val: any) {
-    return typeof val === 'object' && val !== null;
-  }
-
   updateNode(node: WeaveStateElement): void {
-    const state = this.instance.getStore().getState();
+    const doc = this.instance.getStore().getDocument();
+    const root = doc.getMap('weave');
 
-    if (isEmpty(state.weave)) {
+    if (root.size === 0) {
       const msg = `State is empty, cannot update the node`;
       this.logger.warn({ node }, msg);
       return;
     }
 
-    const { node: nodeState } = this.findNodeById(
-      state.weave as WeaveStateElement,
-      node.key
-    );
-    if (!nodeState) {
+    const { node: yjsNode } = this.findYjsNodeById(root, node.key);
+    if (!yjsNode) {
       const msg = `Node with key [${node.key}] doesn't exists, cannot update it`;
       this.logger.warn({ node }, msg);
       return;
     }
 
-    this.deepSyncSyncedStore(nodeState.props, node.props);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const yjsProps = yjsNode.get('props') as Y.Map<any>;
+    this.updateYjsMapFromObject(yjsProps, node.props);
 
     this.instance.emitEvent('onNodeUpdated', node);
   }
@@ -267,9 +304,7 @@ export class WeaveStateManager {
   }
 
   stateTransactional(callback: () => void, origin?: string): void {
-    const state = this.instance.getStore().getState();
-
-    const doc = getYjsDoc(state);
+    const doc = this.instance.getStore().getDocument();
     const transactionOrigin = origin ?? this.instance.getStore().getUser().id;
 
     doc.transact(() => {
@@ -278,138 +313,121 @@ export class WeaveStateManager {
   }
 
   removeNode(node: WeaveStateElement): void {
-    const state = this.instance.getStore().getState();
+    const doc = this.instance.getStore().getDocument();
+    const root = doc.getMap('weave');
 
-    if (isEmpty(state.weave)) {
-      const msg = `State is empty, cannot update the node`;
+    if (root.size === 0) {
+      const msg = `State is empty, cannot remove the node`;
       this.logger.warn({ node }, msg);
       return;
     }
 
-    const { node: nodeState, parent } = this.findNodeById(
-      state.weave as WeaveStateElement,
-      node.key
-    );
+    const {
+      node: yjsNode,
+      parentArray,
+      index,
+    } = this.findYjsNodeById(root, node.key);
 
-    if (!nodeState) {
+    if (!yjsNode) {
       const msg = `Node with key [${node.key}] doesn't exists, cannot remove it`;
       this.logger.warn({ node }, msg);
       return;
     }
 
-    if (!parent) {
+    if (!parentArray) {
       const msg = `Parent doesn't exists, cannot remove it`;
       this.logger.warn({ node }, msg);
       return;
     }
 
-    if (parent.props.children) {
-      for (let i = parent.props.children.length - 1; i >= 0; i--) {
-        if (parent.props.children[i].key === node.key) {
-          parent.props.children.splice(i, 1);
-          break;
-        }
-      }
+    parentArray.delete(index, 1);
 
-      for (let i = 0; i < parent.props.children.length; i++) {
-        parent.props.children[i].props.zIndex = i;
-      }
-
-      this.instance.emitEvent('onNodeRemoved', node);
+    for (let i = 0; i < parentArray.length; i++) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const child = parentArray.get(i) as Y.Map<any>;
+      child.get('props')?.set('zIndex', i);
     }
+
+    this.instance.emitEvent('onNodeRemoved', node);
   }
 
   zMoveNode(node: WeaveStateElement, position: WeavePosition): void {
-    const state = this.instance.getStore().getState();
+    const doc = this.instance.getStore().getDocument();
+    const root = doc.getMap('weave');
 
-    if (isEmpty(state.weave)) {
-      const msg = `State is empty, cannot update the node`;
+    if (root.size === 0) {
+      const msg = `State is empty, cannot move the node`;
       this.logger.warn({ node }, msg);
       return;
     }
 
-    const { node: nodeState, parent } = this.findNodeById(
-      state.weave as WeaveStateElement,
-      node.key
-    );
-    if (!nodeState) {
+    const {
+      node: yjsNode,
+      parentArray,
+      index: nodeIndex,
+    } = this.findYjsNodeById(root, node.key);
+
+    if (!yjsNode) {
       const msg = `Node with key [${node.key}] doesn't exists, cannot update it`;
       this.logger.warn({ node }, msg);
       return;
     }
 
-    if (!parent) {
+    if (!parentArray) {
       const msg = `Parent doesn't exists, cannot move it`;
       this.logger.warn({ node }, msg);
       return;
     }
 
-    if (parent.props.children) {
-      const childrenAmount = parent.props.children.length;
+    if (nodeIndex === -1) {
+      const msg = `Element doesn't exists on parent, cannot move it`;
+      this.logger.warn({ node }, msg);
+      return;
+    }
 
-      const nodeIndex = parent.props.children.findIndex(
-        (child: WeaveStateElement) => child.key === node.key
-      );
+    const childrenAmount = parentArray.length;
+    const itemJson = yjsNode.toJSON() as WeaveStateElement;
+    parentArray.delete(nodeIndex, 1);
 
-      if (nodeIndex === -1) {
-        const msg = `Element doesn't exists on parent, cannot move it`;
-        this.logger.warn({ node }, msg);
-        return;
-      }
+    const { element: newElement } =
+      WeaveStateManipulation.mapNodeToYjs(itemJson);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const newElementMap = newElement as unknown as Y.Map<any>;
 
-      if (parent.props.children) {
-        const item = JSON.parse(
-          JSON.stringify(parent.props.children[nodeIndex])
-        );
-        parent.props.children.splice(nodeIndex, 1);
+    if (position === WEAVE_NODE_POSITION.UP && nodeIndex + 1 < childrenAmount) {
+      parentArray.insert(nodeIndex + 1, [newElementMap]);
+    }
+    if (
+      position === WEAVE_NODE_POSITION.UP &&
+      nodeIndex + 1 >= childrenAmount
+    ) {
+      parentArray.insert(childrenAmount - 1, [newElementMap]);
+    }
+    if (position === WEAVE_NODE_POSITION.DOWN && nodeIndex - 1 >= 0) {
+      parentArray.insert(nodeIndex - 1, [newElementMap]);
+    }
+    if (position === WEAVE_NODE_POSITION.DOWN && nodeIndex - 1 < 0) {
+      parentArray.insert(0, [newElementMap]);
+    }
+    if (position === WEAVE_NODE_POSITION.FRONT) {
+      parentArray.insert(childrenAmount - 1, [newElementMap]);
+    }
+    if (position === WEAVE_NODE_POSITION.BACK) {
+      parentArray.insert(0, [newElementMap]);
+    }
 
-        if (
-          item &&
-          position === WEAVE_NODE_POSITION.UP &&
-          nodeIndex + 1 < childrenAmount
-        ) {
-          parent.props.children.splice(nodeIndex + 1, 0, item);
-        }
-        if (
-          item &&
-          position === WEAVE_NODE_POSITION.UP &&
-          nodeIndex + 1 >= childrenAmount
-        ) {
-          parent.props.children.splice(childrenAmount - 1, 0, item);
-        }
-        if (
-          item &&
-          position === WEAVE_NODE_POSITION.DOWN &&
-          nodeIndex - 1 >= 0
-        ) {
-          parent.props.children.splice(nodeIndex - 1, 0, item);
-        }
-        if (
-          item &&
-          position === WEAVE_NODE_POSITION.DOWN &&
-          nodeIndex - 1 < 0
-        ) {
-          parent.props.children.splice(0, 0, item);
-        }
-        if (item && position === WEAVE_NODE_POSITION.FRONT) {
-          parent.props.children.splice(childrenAmount - 1, 0, item);
-        }
-        if (item && position === WEAVE_NODE_POSITION.BACK) {
-          parent.props.children.splice(0, 0, item);
-        }
-
-        for (let i = 0; i < parent.props.children.length; i++) {
-          parent.props.children[i].props.zIndex = i;
-        }
-      }
+    for (let i = 0; i < parentArray.length; i++) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const child = parentArray.get(i) as Y.Map<any>;
+      child.get('props')?.set('zIndex', i);
     }
   }
 
   getElementsTree(): WeaveStateElement[] {
-    const state = this.instance.getStore().getState().weave;
-    const jsonState = JSON.parse(JSON.stringify(state, null, 2));
+    const doc = this.instance.getStore().getDocument();
+    const jsonState = doc.getMap('weave').toJSON();
 
-    const mainLayer = jsonState.props?.children.find(
+    const mainLayer = jsonState.props?.children?.find(
       (node: WeaveStateElement) => node.key === 'mainLayer'
     );
 

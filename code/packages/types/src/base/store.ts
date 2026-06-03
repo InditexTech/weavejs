@@ -14,9 +14,9 @@ export type WeaveStoreOptions = {
 };
 
 export interface WeaveStoreBase {
-  connect(): void;
+  connect(): Promise<void>;
 
-  disconnect(): void;
+  disconnect(): Promise<void>;
 
   handleAwarenessChange(emit: boolean): void;
 
