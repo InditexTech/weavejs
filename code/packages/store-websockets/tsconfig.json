@@ -25,5 +25,6 @@
     "verbatimModuleSyntax": true,
     "skipLibCheck": true
   },
-  "include": ["src/**/*", "src/**/*.json", "tests"]
+  "include": ["src/**/*", "src/**/*.json", "tests"],
+  "exclude": ["src/**/__tests__/**/*.ts", "src/**/*.test.ts"]
 }
