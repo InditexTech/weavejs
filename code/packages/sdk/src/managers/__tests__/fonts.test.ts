@@ -26,13 +26,13 @@ describe('WeaveFontsManager', () => {
   describe('constructor', () => {
     it('calls getChildLogger with "fonts-manager"', () => {
       const { weave } = makeMockWeave();
-      new WeaveFontsManager(weave);
+      const _mgr = new WeaveFontsManager(weave);
       expect(weave.getChildLogger).toHaveBeenCalledWith('fonts-manager');
     });
 
     it('logs debug on creation', () => {
       const { weave, logger } = makeMockWeave();
-      new WeaveFontsManager(weave);
+      const _mgr = new WeaveFontsManager(weave);
       expect(logger.debug).toHaveBeenCalledWith('Fonts manager created');
     });
   });

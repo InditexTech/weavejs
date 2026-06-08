@@ -62,13 +62,13 @@ describe('WeaveRegisterManager', () => {
   describe('constructor', () => {
     it('calls getChildLogger with "register-manager"', () => {
       const { weave } = makeMockWeave();
-      new WeaveRegisterManager(weave);
+      const _mgr = new WeaveRegisterManager(weave);
       expect(weave.getChildLogger).toHaveBeenCalledWith('register-manager');
     });
 
     it('logs debug on creation', () => {
       const { weave, logger } = makeMockWeave();
-      new WeaveRegisterManager(weave);
+      const _mgr = new WeaveRegisterManager(weave);
       expect(logger.debug).toHaveBeenCalledWith('Register manager created');
     });
   });

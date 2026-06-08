@@ -68,13 +68,13 @@ describe('WeaveCloningManager', () => {
   describe('constructor', () => {
     it('calls getChildLogger with "cloning-manager"', () => {
       const { weave } = makeMockWeave();
-      new WeaveCloningManager(weave);
+      const _mgr = new WeaveCloningManager(weave);
       expect(weave.getChildLogger).toHaveBeenCalledWith('cloning-manager');
     });
 
     it('logs debug on creation', () => {
       const { weave, logger } = makeMockWeave();
-      new WeaveCloningManager(weave);
+      const _mgr = new WeaveCloningManager(weave);
       expect(logger.debug).toHaveBeenCalledWith('Cloning manager created');
     });
   });

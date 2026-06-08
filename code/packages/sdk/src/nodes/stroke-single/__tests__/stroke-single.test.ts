@@ -15,6 +15,7 @@ import {
 import { augmentKonvaNodeClass } from '../../node';
 import type { WeaveElementAttributes } from '@inditextech/weave-types';
 import { makeTipGroup } from './helpers';
+import { createMockInstance } from '../../__tests__/shared/node.test-helpers';
 
 // Break the node.ts ↔ weave.ts circular dependency so that WeaveNode is
 // fully evaluated before any barrel re-export tries to extend it.
@@ -24,44 +25,6 @@ vi.mock('@/weave', () => ({ Weave: class MockWeave {} }));
 // Helpers — stroke-single node tests
 // ---------------------------------------------------------------------------
 
-function createMockInstance(pluginOverride?: unknown) {
-  return {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    getPlugin: vi.fn().mockReturnValue(pluginOverride ?? undefined) as any,
-    getStage: vi.fn().mockReturnValue({
-      findOne: vi.fn().mockReturnValue(null),
-      find: vi.fn().mockReturnValue([]),
-      container: vi.fn().mockReturnValue({ style: { cursor: '' } }),
-      scaleX: vi.fn().mockReturnValue(1),
-      scaleY: vi.fn().mockReturnValue(1),
-      getAbsoluteTransform: vi.fn().mockReturnValue({
-        copy: vi.fn().mockReturnThis(),
-        invert: vi.fn().mockReturnThis(),
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        point: vi.fn().mockImplementation((p: any) => p), // identity: returns the input point
-      }),
-    }),
-    getSelectionLayer: vi.fn().mockReturnValue({ add: vi.fn() }),
-    getEventsController: vi.fn().mockReturnValue(null),
-    addEventListener: vi.fn(),
-    removeEventListener: vi.fn(),
-    emitEvent: vi.fn(),
-    getActiveAction: vi.fn().mockReturnValue(undefined),
-    setMutexLock: vi.fn(),
-    releaseMutexLock: vi.fn(),
-    getRealSelectedNode: vi.fn().mockReturnValue(undefined),
-    updateNode: vi.fn(),
-    isServerSide: vi.fn().mockReturnValue(false),
-    getChildLogger: vi.fn().mockReturnValue({
-      debug: vi.fn(),
-      info: vi.fn(),
-      warn: vi.fn(),
-      error: vi.fn(),
-      trace: vi.fn(),
-    }),
-    getMainLayer: vi.fn().mockReturnValue(undefined),
-  };
-}
 
 function makeNode(config?: object): {
   node: WeaveStrokeSingleNode;

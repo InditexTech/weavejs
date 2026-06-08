@@ -39,13 +39,13 @@ describe('WeaveActionsManager', () => {
   describe('constructor', () => {
     it('calls getChildLogger with "actions-manager"', () => {
       const { weave } = makeMockWeave();
-      new WeaveActionsManager(weave);
+      const _mgr = new WeaveActionsManager(weave);
       expect(weave.getChildLogger).toHaveBeenCalledWith('actions-manager');
     });
 
     it('logs debug on creation', () => {
       const { weave, logger } = makeMockWeave();
-      new WeaveActionsManager(weave);
+      const _mgr = new WeaveActionsManager(weave);
       expect(logger.debug).toHaveBeenCalledWith('Actions manager created');
     });
   });

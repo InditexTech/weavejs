@@ -36,10 +36,11 @@ function makeLayerDoc(): { doc: Y.Doc; layer: Y.Map<unknown> } {
 }
 
 /** Creates a WeaveStateElement-shaped object for test input */
+const DEFAULT_MAKE_NODE_PROPS: Record<string, unknown> = { x: 0, y: 0, width: 100, height: 100 };
 function makeNode(
   key: string,
   type: string,
-  props: Record<string, unknown> = { x: 0, y: 0, width: 100, height: 100 }
+  props: Record<string, unknown> = DEFAULT_MAKE_NODE_PROPS
 ) {
   return { key, type, props };
 }

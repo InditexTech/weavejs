@@ -64,13 +64,13 @@ describe('WeaveSetupManager', () => {
   describe('constructor', () => {
     it('calls getChildLogger with "setup-manager"', () => {
       const { weave } = makeMockWeave();
-      new WeaveSetupManager(weave);
+      const _mgr = new WeaveSetupManager(weave);
       expect(weave.getChildLogger).toHaveBeenCalledWith('setup-manager');
     });
 
     it('logs debug on creation', () => {
       const { weave, logger } = makeMockWeave();
-      new WeaveSetupManager(weave);
+      const _mgr = new WeaveSetupManager(weave);
       expect(logger.debug).toHaveBeenCalledWith('Setup manager created');
     });
   });

@@ -297,7 +297,9 @@ describe('20 — getSelectedNodesMetadata', () => {
 // ---------------------------------------------------------------------------
 
 describe('21 — getVisibleNodesInViewport', () => {
-  function makeMockStageWithViewport(scale = 1, pos = { x: 0, y: 0 }, size = { w: 800, h: 600 }) {
+const DEFAULT_VIEWPORT_POS = { x: 0, y: 0 };
+const DEFAULT_VIEWPORT_SIZE = { w: 800, h: 600 };
+  function makeMockStageWithViewport(scale = 1, pos = DEFAULT_VIEWPORT_POS, size = DEFAULT_VIEWPORT_SIZE) {
     const stage = makeMockStage();
     stage.scaleX.mockReturnValue(scale);
     stage.position.mockReturnValue(pos);

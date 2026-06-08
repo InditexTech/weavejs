@@ -29,13 +29,13 @@ describe('WeavePluginsManager', () => {
   describe('constructor', () => {
     it('calls getChildLogger with "plugins-manager"', () => {
       const { weave } = makeMockWeave();
-      new WeavePluginsManager(weave);
+      const _mgr = new WeavePluginsManager(weave);
       expect(weave.getChildLogger).toHaveBeenCalledWith('plugins-manager');
     });
 
     it('logs debug on creation', () => {
       const { weave, logger } = makeMockWeave();
-      new WeavePluginsManager(weave);
+      const _mgr = new WeavePluginsManager(weave);
       expect(logger.debug).toHaveBeenCalledWith('Plugins manager created');
     });
   });

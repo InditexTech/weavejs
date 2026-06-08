@@ -357,7 +357,6 @@ describe('WeaveBrushToolAction', () => {
     });
 
     it('4.9 floor: returns at least 0.15 even when smoothed value would be lower', () => {
-      (action as unknown as R)['lastSmoothedPressure'] = 0.0;
       // raw=0 (pen, pressure=0 → raw=0.5 via || fallback), so this won't go below 0.15 easily
       // Force by setting lastSmoothedPressure to deeply negative (unreachable normally)
       (action as unknown as R)['lastSmoothedPressure'] = -1.0;

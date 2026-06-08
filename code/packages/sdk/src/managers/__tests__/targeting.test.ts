@@ -57,7 +57,9 @@ function makeMockWeave() {
 
 type MockRect = { x: number; y: number; width: number; height: number };
 
-function makeNode(attrs: Record<string, unknown> = {}, rect: MockRect = { x: 0, y: 0, width: 10, height: 10 }) {
+const DEFAULT_MAKE_NODE_ATTRS: Record<string, unknown> = {};
+const DEFAULT_MAKE_NODE_RECT: MockRect = { x: 0, y: 0, width: 10, height: 10 };
+function makeNode(attrs: Record<string, unknown> = DEFAULT_MAKE_NODE_ATTRS, rect: MockRect = DEFAULT_MAKE_NODE_RECT) {
   return {
     getAttrs: vi.fn().mockReturnValue(attrs),
     getClientRect: vi.fn().mockReturnValue(rect),

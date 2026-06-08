@@ -11,6 +11,7 @@ import {
 } from '../constants';
 import { augmentKonvaNodeClass } from '../../node';
 import type { WeaveElementAttributes } from '@inditextech/weave-types';
+import { createMockInstance } from '../../__tests__/shared/node.test-helpers';
 
 vi.mock('@/weave', () => ({ Weave: class MockWeave {} }));
 
@@ -18,37 +19,6 @@ vi.mock('@/weave', () => ({ Weave: class MockWeave {} }));
 // Helpers
 // ---------------------------------------------------------------------------
 
-function createMockInstance(pluginOverride?: unknown) {
-  return {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    getPlugin: vi.fn().mockReturnValue(pluginOverride ?? undefined) as any,
-    getStage: vi.fn().mockReturnValue({
-      findOne: vi.fn().mockReturnValue(null),
-      find: vi.fn().mockReturnValue([]),
-      container: vi.fn().mockReturnValue({ style: { cursor: '' } }),
-      scaleX: vi.fn().mockReturnValue(1),
-      scaleY: vi.fn().mockReturnValue(1),
-    }),
-    getSelectionLayer: vi.fn().mockReturnValue({ add: vi.fn() }),
-    addEventListener: vi.fn(),
-    removeEventListener: vi.fn(),
-    emitEvent: vi.fn(),
-    getActiveAction: vi.fn().mockReturnValue(undefined),
-    setMutexLock: vi.fn(),
-    releaseMutexLock: vi.fn(),
-    getRealSelectedNode: vi.fn().mockReturnValue(undefined),
-    updateNode: vi.fn(),
-    isServerSide: vi.fn().mockReturnValue(false),
-    getChildLogger: vi.fn().mockReturnValue({
-      debug: vi.fn(),
-      info: vi.fn(),
-      warn: vi.fn(),
-      error: vi.fn(),
-      trace: vi.fn(),
-    }),
-    getMainLayer: vi.fn().mockReturnValue(undefined),
-  };
-}
 
 function makeNode(config?: object): {
   node: WeaveLineNode;

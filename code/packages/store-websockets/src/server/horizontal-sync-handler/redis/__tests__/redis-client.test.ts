@@ -64,14 +64,14 @@ describe('1 — Constructor without config', () => {
 
   it('1.2 initPubClient and initSubClient are called', () => {
     const server = makeMockServer();
-    new WeaveHorizontalSyncHandlerRedis(server as never);
+    const _handler = new WeaveHorizontalSyncHandlerRedis(server as never);
     // Two Redis instances created: one for pub, one for sub
     expect(mockRedisInstances).toHaveLength(2);
   });
 
   it('1.3 emits onPubClientStatusChange and onSubClientStatusChange with connecting', () => {
     const server = makeMockServer();
-    new WeaveHorizontalSyncHandlerRedis(server as never);
+    const _handler = new WeaveHorizontalSyncHandlerRedis(server as never);
     const calls = server.emitEvent.mock.calls.map((c) => c[0]);
     expect(calls).toContain('onPubClientStatusChange');
     expect(calls).toContain('onSubClientStatusChange');
@@ -134,7 +134,7 @@ describe('3 — isEnabledPubSub()', () => {
 describe('4 — initPubClient() Redis event handlers', () => {
   it('4.1 emits onPubClientStatusChange { status: "connecting" } on construction', () => {
     const server = makeMockServer();
-    new WeaveHorizontalSyncHandlerRedis(server as never);
+    const _handler = new WeaveHorizontalSyncHandlerRedis(server as never);
     expect(server.emitEvent).toHaveBeenCalledWith(
       'onPubClientStatusChange',
       { status: 'connecting' }
@@ -143,7 +143,7 @@ describe('4 — initPubClient() Redis event handlers', () => {
 
   it('4.2 Redis error event → emits { status: "error", error }', () => {
     const server = makeMockServer();
-    new WeaveHorizontalSyncHandlerRedis(server as never);
+    const _handler = new WeaveHorizontalSyncHandlerRedis(server as never);
     const pubClient = mockRedisInstances[0];
     const err = new Error('connection refused');
     server.emitEvent.mockClear();
@@ -156,7 +156,7 @@ describe('4 — initPubClient() Redis event handlers', () => {
 
   it('4.3 Redis end event → emits { status: "end" }', () => {
     const server = makeMockServer();
-    new WeaveHorizontalSyncHandlerRedis(server as never);
+    const _handler = new WeaveHorizontalSyncHandlerRedis(server as never);
     const pubClient = mockRedisInstances[0];
     server.emitEvent.mockClear();
     pubClient.emit('end');
@@ -168,7 +168,7 @@ describe('4 — initPubClient() Redis event handlers', () => {
 
   it('4.4 Redis reconnecting event → emits { status: "reconnecting", delay }', () => {
     const server = makeMockServer();
-    new WeaveHorizontalSyncHandlerRedis(server as never);
+    const _handler = new WeaveHorizontalSyncHandlerRedis(server as never);
     const pubClient = mockRedisInstances[0];
     server.emitEvent.mockClear();
     pubClient.emit('reconnecting', 1000);
@@ -180,7 +180,7 @@ describe('4 — initPubClient() Redis event handlers', () => {
 
   it('4.5 Redis connect event → emits { status: "connect" }', () => {
     const server = makeMockServer();
-    new WeaveHorizontalSyncHandlerRedis(server as never);
+    const _handler = new WeaveHorizontalSyncHandlerRedis(server as never);
     const pubClient = mockRedisInstances[0];
     server.emitEvent.mockClear();
     pubClient.emit('connect');
@@ -192,7 +192,7 @@ describe('4 — initPubClient() Redis event handlers', () => {
 
   it('4.6 Redis ready event → emits { status: "ready" }', () => {
     const server = makeMockServer();
-    new WeaveHorizontalSyncHandlerRedis(server as never);
+    const _handler = new WeaveHorizontalSyncHandlerRedis(server as never);
     const pubClient = mockRedisInstances[0];
     server.emitEvent.mockClear();
     pubClient.emit('ready');
@@ -210,7 +210,7 @@ describe('4 — initPubClient() Redis event handlers', () => {
 describe('5 — initSubClient() Redis event handlers', () => {
   it('5.1 emits onSubClientStatusChange { status: "connecting" } on construction', () => {
     const server = makeMockServer();
-    new WeaveHorizontalSyncHandlerRedis(server as never);
+    const _handler = new WeaveHorizontalSyncHandlerRedis(server as never);
     expect(server.emitEvent).toHaveBeenCalledWith(
       'onSubClientStatusChange',
       { status: 'connecting' }
@@ -219,7 +219,7 @@ describe('5 — initSubClient() Redis event handlers', () => {
 
   it('5.2 Redis error event → emits { status: "error", error }', () => {
     const server = makeMockServer();
-    new WeaveHorizontalSyncHandlerRedis(server as never);
+    const _handler = new WeaveHorizontalSyncHandlerRedis(server as never);
     const subClient = mockRedisInstances[1];
     const err = new Error('sub error');
     server.emitEvent.mockClear();
@@ -232,7 +232,7 @@ describe('5 — initSubClient() Redis event handlers', () => {
 
   it('5.3 Redis end event → emits { status: "end" }', () => {
     const server = makeMockServer();
-    new WeaveHorizontalSyncHandlerRedis(server as never);
+    const _handler = new WeaveHorizontalSyncHandlerRedis(server as never);
     const subClient = mockRedisInstances[1];
     server.emitEvent.mockClear();
     subClient.emit('end');
@@ -244,7 +244,7 @@ describe('5 — initSubClient() Redis event handlers', () => {
 
   it('5.4 Redis reconnecting event → emits { status: "reconnecting", delay }', () => {
     const server = makeMockServer();
-    new WeaveHorizontalSyncHandlerRedis(server as never);
+    const _handler = new WeaveHorizontalSyncHandlerRedis(server as never);
     const subClient = mockRedisInstances[1];
     server.emitEvent.mockClear();
     subClient.emit('reconnecting', 500);
@@ -256,7 +256,7 @@ describe('5 — initSubClient() Redis event handlers', () => {
 
   it('5.5 Redis connect event → emits { status: "connect" }', () => {
     const server = makeMockServer();
-    new WeaveHorizontalSyncHandlerRedis(server as never);
+    const _handler = new WeaveHorizontalSyncHandlerRedis(server as never);
     const subClient = mockRedisInstances[1];
     server.emitEvent.mockClear();
     subClient.emit('connect');
@@ -268,7 +268,7 @@ describe('5 — initSubClient() Redis event handlers', () => {
 
   it('5.6 Redis ready event → emits { status: "ready" }', () => {
     const server = makeMockServer();
-    new WeaveHorizontalSyncHandlerRedis(server as never);
+    const _handler = new WeaveHorizontalSyncHandlerRedis(server as never);
     const subClient = mockRedisInstances[1];
     server.emitEvent.mockClear();
     subClient.emit('ready');

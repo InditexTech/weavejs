@@ -213,7 +213,7 @@ describe('2 — WSSharedDoc constructor (PubSub disabled)', () => {
 
   it('2.5 PubSub disabled → subscribe NOT called', () => {
     const handler = makeHandler(false);
-    new WSSharedDoc('room-nosub', handler as never);
+    const _doc = new WSSharedDoc('room-nosub', handler as never);
     expect(handler.getSubClient().subscribe).not.toHaveBeenCalled();
   });
 });
@@ -225,7 +225,7 @@ describe('2 — WSSharedDoc constructor (PubSub disabled)', () => {
 describe('3 — WSSharedDoc constructor (PubSub enabled)', () => {
   it('3.1 subscribe called for topic and awareness channel', () => {
     const handler = makeHandler(true);
-    new WSSharedDoc('pub-room', handler as never);
+    const _doc = new WSSharedDoc('pub-room', handler as never);
     const sub = handler.getSubClient();
     expect(sub.subscribe).toHaveBeenCalledWith('pub-room');
     expect(sub.subscribe).toHaveBeenCalledWith('pub-room-awareness');

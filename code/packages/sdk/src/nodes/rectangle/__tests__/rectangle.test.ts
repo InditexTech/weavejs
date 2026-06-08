@@ -8,6 +8,7 @@ import { WeaveRectangleNode } from '../rectangle';
 import { WEAVE_RECTANGLE_NODE_TYPE } from '../constants';
 import { augmentKonvaNodeClass } from '../../node';
 import type { WeaveElementAttributes } from '@inditextech/weave-types';
+import { createMockInstance } from '../../__tests__/shared/node.test-helpers';
 
 // Break the node.ts ↔ weave.ts circular dependency so that WeaveNode is
 // fully evaluated before any barrel re-export (e.g. WeaveStageNode) tries
@@ -18,33 +19,6 @@ vi.mock('@/weave', () => ({ Weave: class MockWeave {} }));
 // Helpers
 // ---------------------------------------------------------------------------
 
-function createMockInstance(pluginOverride?: unknown) {
-  return {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    getPlugin: vi.fn().mockReturnValue(pluginOverride ?? undefined) as any,
-    getStage: vi.fn().mockReturnValue({
-      findOne: vi.fn().mockReturnValue(null),
-      container: vi.fn().mockReturnValue({ style: {} }),
-    }),
-    getMainLayer: vi.fn().mockReturnValue(undefined),
-    getChildLogger: vi.fn().mockReturnValue({
-      debug: vi.fn(),
-      info: vi.fn(),
-      warn: vi.fn(),
-      error: vi.fn(),
-      trace: vi.fn(),
-    }),
-    addEventListener: vi.fn(),
-    removeEventListener: vi.fn(),
-    emitEvent: vi.fn(),
-    getActiveAction: vi.fn().mockReturnValue(undefined),
-    setMutexLock: vi.fn(),
-    releaseMutexLock: vi.fn(),
-    getRealSelectedNode: vi.fn().mockReturnValue(undefined),
-    updateNode: vi.fn(),
-    isServerSide: vi.fn().mockReturnValue(false),
-  };
-}
 
 function makeNode(transformConfig?: object): {
   node: WeaveRectangleNode;

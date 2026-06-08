@@ -48,9 +48,11 @@ function makeConfig(userId = 'user-1'): WeaveStoreOptions {
  * Builds a base64-encoded Yjs state update from a plain-object payload.
  * Both `weave` and `weaveMetadata` maps are populated with the provided data.
  */
+const DEFAULT_WEAVE_DATA: Record<string, unknown> = { node1: 'value1' };
+const DEFAULT_META_DATA: Record<string, unknown> = { meta1: 'metaValue1' };
 function makeBase64RoomData(
-  weaveData: Record<string, unknown> = { node1: 'value1' },
-  metaData: Record<string, unknown> = { meta1: 'metaValue1' }
+  weaveData: Record<string, unknown> = DEFAULT_WEAVE_DATA,
+  metaData: Record<string, unknown> = DEFAULT_META_DATA
 ): string {
   const doc = new Y.Doc();
   doc.transact(() => {

@@ -8,6 +8,7 @@ import { WeaveRegularPolygonNode } from '../regular-polygon';
 import { WEAVE_REGULAR_POLYGON_NODE_TYPE } from '../constants';
 import { augmentKonvaNodeClass } from '../../node';
 import type { WeaveElementAttributes } from '@inditextech/weave-types';
+import { createMockInstance, makePluginMock } from '../../__tests__/shared/node.test-helpers';
 
 // Break the node.ts ↔ weave.ts circular dependency so that WeaveNode is
 // fully evaluated before any barrel re-export tries to extend it.
@@ -17,33 +18,6 @@ vi.mock('@/weave', () => ({ Weave: class MockWeave {} }));
 // Helpers
 // ---------------------------------------------------------------------------
 
-function createMockInstance(pluginOverride?: unknown) {
-  return {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    getPlugin: vi.fn().mockReturnValue(pluginOverride ?? undefined) as any,
-    getStage: vi.fn().mockReturnValue({
-      findOne: vi.fn().mockReturnValue(null),
-      container: vi.fn().mockReturnValue({ style: {} }),
-    }),
-    getMainLayer: vi.fn().mockReturnValue(undefined),
-    getChildLogger: vi.fn().mockReturnValue({
-      debug: vi.fn(),
-      info: vi.fn(),
-      warn: vi.fn(),
-      error: vi.fn(),
-      trace: vi.fn(),
-    }),
-    addEventListener: vi.fn(),
-    removeEventListener: vi.fn(),
-    emitEvent: vi.fn(),
-    getActiveAction: vi.fn().mockReturnValue(undefined),
-    setMutexLock: vi.fn(),
-    releaseMutexLock: vi.fn(),
-    getRealSelectedNode: vi.fn().mockReturnValue(undefined),
-    updateNode: vi.fn(),
-    isServerSide: vi.fn().mockReturnValue(false),
-  };
-}
 
 function makeNode(transformConfig?: object): {
   node: WeaveRegularPolygonNode;
@@ -82,18 +56,6 @@ function defaultProps(
 }
 
 // Plugin mock satisfying setupDefaultNodeEvents and onUpdate requirements.
-function makePluginMock(transformerOverride?: Konva.Transformer) {
-  const transformer = transformerOverride ?? new Konva.Transformer();
-  return {
-    getTransformer: vi.fn().mockReturnValue(transformer),
-    getHoverTransformer: vi.fn().mockReturnValue({ nodes: vi.fn() }),
-    isDragging: vi.fn().mockReturnValue(false),
-    isTransforming: vi.fn().mockReturnValue(false),
-    getSelectedNodes: vi.fn().mockReturnValue([]),
-    setSelectedNodes: vi.fn(),
-    getSelectorConfig: vi.fn().mockReturnValue({}),
-  };
-}
 
 // ---------------------------------------------------------------------------
 // Global setup: install Konva.Node prototype augmentations once

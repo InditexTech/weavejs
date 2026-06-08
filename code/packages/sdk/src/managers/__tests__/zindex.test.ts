@@ -31,7 +31,8 @@ function makeInstance(id: string, nodeType: string, zIndexVal = 0) {
   } as unknown as WeaveElementInstance;
 }
 
-function makeHandler(serialized: object = { key: 'node1' }) {
+const DEFAULT_SERIALIZED = { key: 'node1' };
+function makeHandler(serialized: object = DEFAULT_SERIALIZED) {
   return { serialize: vi.fn().mockReturnValue(serialized) };
 }
 

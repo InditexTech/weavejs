@@ -20,13 +20,13 @@ describe('WeaveDragAndDropManager', () => {
   describe('constructor', () => {
     it('calls getChildLogger with "drag-and-drop-manager"', () => {
       const { weave } = makeMockWeave();
-      new WeaveDragAndDropManager(weave);
+      const _mgr = new WeaveDragAndDropManager(weave);
       expect(weave.getChildLogger).toHaveBeenCalledWith('drag-and-drop-manager');
     });
 
     it('logs debug on creation', () => {
       const { weave, logger } = makeMockWeave();
-      new WeaveDragAndDropManager(weave);
+      const _mgr = new WeaveDragAndDropManager(weave);
       expect(logger.debug).toHaveBeenCalledWith('Drag and drop manager created');
     });
 

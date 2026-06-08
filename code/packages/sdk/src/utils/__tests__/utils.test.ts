@@ -33,7 +33,7 @@ describe('1 — isNumber', () => {
   });
 
   it('1.2 NaN returns false', () => {
-    expect(isNumber(NaN)).toBe(false);
+    expect(isNumber(Number.NaN)).toBe(false);
   });
 
   it('1.3 a string returns false', () => {

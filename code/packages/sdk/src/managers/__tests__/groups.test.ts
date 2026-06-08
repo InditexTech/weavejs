@@ -119,13 +119,13 @@ describe('WeaveGroupsManager', () => {
   describe('constructor', () => {
     it('calls getChildLogger with "groups-manager"', () => {
       const { weave } = makeMockWeave();
-      new WeaveGroupsManager(weave);
+      const _mgr = new WeaveGroupsManager(weave);
       expect(weave.getChildLogger).toHaveBeenCalledWith('groups-manager');
     });
 
     it('logs debug on creation', () => {
       const { weave, logger } = makeMockWeave();
-      new WeaveGroupsManager(weave);
+      const _mgr = new WeaveGroupsManager(weave);
       expect(logger.debug).toHaveBeenCalledWith('Groups manager created');
     });
   });
