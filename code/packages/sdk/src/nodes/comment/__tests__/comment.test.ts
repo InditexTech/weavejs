@@ -1241,7 +1241,7 @@ describe('WeaveCommentNode', () => {
       expect(tweenInstance.play).toHaveBeenCalled();
 
       TweenSpy.mockRestore();
-      void group; // suppress unused warning
+      expect(group).toBeDefined();
     });
 
     it('13.3 node found + commentDomVisible + target changes → closes DOM before tween', () => {

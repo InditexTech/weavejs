@@ -17,8 +17,8 @@ class TestRenderer extends WeaveRenderer {
     this.name = name;
   }
 
-  init(): void {}
-  render(_callback?: () => void): void {}
+  init(): void { /* intentionally empty */ }
+  render(_callback?: () => void): void { /* intentionally empty */ }
 }
 
 // ---------------------------------------------------------------------------

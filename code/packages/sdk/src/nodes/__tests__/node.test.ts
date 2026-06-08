@@ -123,7 +123,7 @@ type TestNodePrivate = {
 class TestNode extends WeaveNode {
   protected nodeType = 'test';
 
-  initialize() {}
+  initialize() { /* intentionally empty */ }
 
   onRender(props: WeaveElementAttributes): WeaveElementInstance {
     return new Konva.Group({

@@ -23,8 +23,8 @@ class TestStore extends WeaveStore {
 
   connect(): Promise<void> { return Promise.resolve(); }
   disconnect(): Promise<void> { return Promise.resolve(); }
-  handleAwarenessChange(): void {}
-  setAwarenessInfo(): void {}
+  handleAwarenessChange(): void { /* intentionally empty */ }
+  setAwarenessInfo(): void { /* intentionally empty */ }
 }
 
 // ---------------------------------------------------------------------------

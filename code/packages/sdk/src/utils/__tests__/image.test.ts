@@ -100,7 +100,7 @@ describe('2 — loadImageSource', () => {
   beforeEach(() => {
     vi.stubGlobal('FileReader', function (this: typeof capturedReader) {
       // eslint-disable-next-line @typescript-eslint/no-this-alias
-      capturedReader = this;
+      capturedReader = this; // NOSONAR
       this.result = 'data:image/png;base64,FAKE';
       this.onloadend = null;
       this.onerror = null;
@@ -281,7 +281,7 @@ describe('4 — getImageSizeFromFile', () => {
 
     vi.stubGlobal('Image', function (this: typeof capturedImg) {
       // eslint-disable-next-line @typescript-eslint/no-this-alias
-      capturedImg = this;
+      capturedImg = this; // NOSONAR
       this.naturalWidth = 800;
       this.naturalHeight = 600;
       this.src = '';
@@ -367,7 +367,7 @@ describe('5 — downscaleImageFromURL', () => {
 
     vi.stubGlobal('Image', function (this: typeof capturedImg) {
       // eslint-disable-next-line @typescript-eslint/no-this-alias
-      capturedImg = this;
+      capturedImg = this; // NOSONAR
       this.naturalWidth = 800;
       this.naturalHeight = 600;
       this.width = 800;
