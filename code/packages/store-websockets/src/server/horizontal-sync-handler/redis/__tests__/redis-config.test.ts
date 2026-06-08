@@ -12,6 +12,7 @@ describe('1 — Default values', () => {
   beforeEach(() => {
     vi.resetModules();
     vi.unstubAllEnvs();
+    vi.stubEnv('WEAVE_REDIS_ENABLED', undefined); // ensure absent regardless of real process env
   });
 
   afterEach(() => {
