@@ -30,7 +30,7 @@
     "release:prepare": "nx run-many -t release:prepare --no-tui",
     "release": "nx run-many -t release --no-tui",
     "reset": "nx reset",
-    "test": "nx run-many -t test --no-tui",
+    "test": "nx run-many -t test --no-tui && shx mkdir -p coverage && npx lcov-result-merger 'packages/**/reports/vite-coverage/**/lcov.info' coverage/lcov.info",
     "unpublish": "nx run-many --skip-nx-cache -t unpublish --no-tui",
     "verdaccio:setup": "node ./verdaccio.setup.js",
     "verify": "npm ci && nx run-many -t verify --no-tui",
@@ -72,9 +72,11 @@
     "@swc/core": "1.15.8",
     "@swc/helpers": "0.5.17",
     "husky": "9.1.4",
+    "lcov-result-merger": "^6.0.0",
     "npkill": "0.12.2",
     "nx": "22.7.1",
     "prettier": "2.8.8",
+    "shx": "^0.4.0",
     "typescript": "5.7.3"
   },
   "engines": {
