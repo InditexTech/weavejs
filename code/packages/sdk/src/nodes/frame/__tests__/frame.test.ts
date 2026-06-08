@@ -916,7 +916,6 @@ describe('WeaveFrameNode', () => {
 
     it('15.5 borderColor, borderWidth, title, frameBackground have schema defaults', () => {
       const schema = WeaveFrameNode.getSchema();
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const result = schema.parse({
         key: 'k6', type: WEAVE_FRAME_NODE_TYPE,
         props: {
@@ -925,7 +924,7 @@ describe('WeaveFrameNode', () => {
           rotation: 0, zIndex: 1,
           frameWidth: 1920, frameHeight: 1080,
         },
-      }) as any;
+      }) as unknown as { props: Record<string, unknown> };
       expect(result.props.borderColor).toBe('#000000ff');
       expect(result.props.borderWidth).toBe(1);
       expect(result.props.title).toBe('Frame');
@@ -933,7 +932,6 @@ describe('WeaveFrameNode', () => {
 
     it('15.6 children defaults to []', () => {
       const schema = WeaveFrameNode.getSchema();
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const result = schema.parse({
         key: 'k7', type: WEAVE_FRAME_NODE_TYPE,
         props: {
@@ -942,7 +940,7 @@ describe('WeaveFrameNode', () => {
           rotation: 0, zIndex: 1,
           frameWidth: 1920, frameHeight: 1080,
         },
-      }) as any;
+      }) as unknown as { props: Record<string, unknown> };
       expect(result.props.children).toEqual([]);
     });
   });

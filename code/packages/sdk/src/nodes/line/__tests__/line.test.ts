@@ -542,6 +542,7 @@ describe('WeaveLineNode', () => {
       const { node } = makeNode();
       node.onRender(defaultProps());
       const line = makeLine([0, 0, 100, 100]);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       expect(() => (node as any).showHandles(line)).not.toThrow();
     });
   });

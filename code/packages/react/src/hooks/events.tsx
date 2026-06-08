@@ -98,8 +98,6 @@ export const useWeaveEvents = (): void => {
 
   const onMutexLockChangeHandler = React.useCallback(
     ({ locks }: { locks: string[] }) => {
-      if (!instance) return;
-
       const actUsersLocks: Record<string, unknown> = {};
       for (const lockKey of locks) {
         const mutexInfo = instance?.getLockDetails(lockKey);
@@ -173,10 +171,6 @@ export const useWeaveEvents = (): void => {
       instance.removeEventListener<WeaveNodesSelectionPluginOnNodesChangeEvent>(
         'onNodesChange',
         onNodesChangeHandler
-      );
-      instance.removeEventListener<WeaveConnectedUsersChangeEvent>(
-        'onConnectedUsersChange',
-        onConnectedUsersChangedHandler
       );
       instance.removeEventListener<WeaveConnectedUsersChangeEvent>(
         'onConnectedUsersChange',

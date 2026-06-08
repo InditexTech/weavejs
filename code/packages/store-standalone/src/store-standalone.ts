@@ -65,7 +65,7 @@ export class WeaveStoreStandalone extends WeaveStore {
     );
   }
 
-  handleAwarenessChange(): void {}
+  handleAwarenessChange(_emit: boolean): void {}
 
-  setAwarenessInfo(): void {}
+  setAwarenessInfo(_field: string, _value: unknown): void {}
 }

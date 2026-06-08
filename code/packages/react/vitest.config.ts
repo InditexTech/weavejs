@@ -19,7 +19,7 @@ export default defineConfig({
 
     setupFiles: path.resolve(__dirname, 'vitest.setup.ts'),
 
-    include: ['**/*.test.ts'],
+    include: ['**/*.test.ts', '**/*.test.tsx'],
     exclude: ['**/node_modules/**'],
 
     reporters: ['default', 'json'],

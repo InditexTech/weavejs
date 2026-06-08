@@ -797,6 +797,7 @@ describe('stroke-single / WeaveStrokeSingleNode', () => {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       (node as any).startHandle = null;
       const group = makeTipGroup({ id: 'show-null' });
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       expect(() => (node as any).showHandles(group)).not.toThrow();
       // endHandle remains null since we returned early without creating handles
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -809,19 +810,23 @@ describe('stroke-single / WeaveStrokeSingleNode', () => {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       (node as any).endHandle = null;
       const group = makeTipGroup({ id: 'show-null-end' });
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       expect(() => (node as any).showHandles(group)).not.toThrow();
     });
 
     it('21.3 positionHandle returns early when internalLine is not found', () => {
       const { node } = makeNode();
       node.onRender(defaultProps());
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const handleNodeChanges = (node as any).handleNodeChanges as (...args: unknown[]) => unknown;
       const strokeGroup = makeTipGroup({ id: 'pos-handle-test' });
       handleNodeChanges([{ node: { type: WEAVE_STROKE_SINGLE_NODE_TYPE }, instance: strokeGroup }]);
 
       // Group with linePoints but NO internal line child
       const noLineGroup = new Konva.Group({ id: 'no-line', linePoints: [0, 0, 100, 0] });
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       expect(() => (node as any).positionHandle(noLineGroup, 'start')).not.toThrow();
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       expect(() => (node as any).positionHandle(noLineGroup, 'end')).not.toThrow();
     });
 
@@ -838,6 +843,7 @@ describe('stroke-single / WeaveStrokeSingleNode', () => {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       (mock.getStage() as any).find.mockReturnValueOnce([strokeGroup]);
 
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       (node as any).teardownSelection();
 
       expect(strokeGroup.find('.hoverClone').length).toBe(0);
@@ -850,6 +856,7 @@ describe('stroke-single / WeaveStrokeSingleNode', () => {
 
       const strokeGroup = makeTipGroup({ id: 'drag-test' });
       strokeGroup.setAttr('linePoints', [0, 0, 100, 0]);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const handleNodeChanges = (node as any).handleNodeChanges as (...args: unknown[]) => unknown;
       handleNodeChanges([{ node: { type: WEAVE_STROKE_SINGLE_NODE_TYPE }, instance: strokeGroup }]);
 
@@ -871,6 +878,7 @@ describe('stroke-single / WeaveStrokeSingleNode', () => {
       node.onRender(defaultProps());
 
       const strokeGroup = makeTipGroup({ id: 'drag-nf' });
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const handleNodeChanges = (node as any).handleNodeChanges as (...args: unknown[]) => unknown;
       handleNodeChanges([{ node: { type: WEAVE_STROKE_SINGLE_NODE_TYPE }, instance: strokeGroup }]);
 
@@ -889,6 +897,7 @@ describe('stroke-single / WeaveStrokeSingleNode', () => {
 
       const strokeGroup = makeTipGroup({ id: 'dragmove-test' });
       strokeGroup.setAttr('linePoints', [0, 0, 100, 0]);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const handleNodeChanges = (node as any).handleNodeChanges as (...args: unknown[]) => unknown;
       handleNodeChanges([{ node: { type: WEAVE_STROKE_SINGLE_NODE_TYPE }, instance: strokeGroup }]);
 
@@ -915,6 +924,7 @@ describe('stroke-single / WeaveStrokeSingleNode', () => {
 
       const strokeGroup = makeTipGroup({ id: 'dragend-test' });
       strokeGroup.setAttr('linePoints', [0, 0, 100, 0]);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const handleNodeChanges = (node as any).handleNodeChanges as (...args: unknown[]) => unknown;
       handleNodeChanges([{ node: { type: WEAVE_STROKE_SINGLE_NODE_TYPE }, instance: strokeGroup }]);
 
@@ -942,6 +952,7 @@ describe('stroke-single / WeaveStrokeSingleNode', () => {
       const strokeGroup = makeTipGroup({ id: 'snap-test' });
       strokeGroup.setAttr('linePoints', [0, 0, 100, 0]);
       // Drag start from (10, 10) with fixed point at end (100, 0)
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const result = (node as any).getDragPoint(strokeGroup, { x: 10, y: 10 }, 'start');
       // Should be snapped to a 45-degree-aligned position
       expect(typeof result.x).toBe('number');
@@ -957,6 +968,7 @@ describe('stroke-single / WeaveStrokeSingleNode', () => {
 
       const strokeGroup = makeTipGroup({ id: 'tr-hide-test' });
       strokeGroup.setAttr('linePoints', [0, 0, 100, 0]);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const handleNodeChanges = (node as any).handleNodeChanges as (...args: unknown[]) => unknown;
       handleNodeChanges([{ node: { type: WEAVE_STROKE_SINGLE_NODE_TYPE }, instance: strokeGroup }]);
 
@@ -974,11 +986,13 @@ describe('stroke-single / WeaveStrokeSingleNode', () => {
     it('21.11 pointerover / pointerout on handle changes stage cursor', () => {
       const { node, mock } = makeNode();
       node.onRender(defaultProps());
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const handleNodeChanges = (node as any).handleNodeChanges as (...args: unknown[]) => unknown;
       const strokeGroup = makeTipGroup({ id: 'cursor-test' });
       handleNodeChanges([{ node: { type: WEAVE_STROKE_SINGLE_NODE_TYPE }, instance: strokeGroup }]);
 
       const container = mock.getStage().container();
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const startHandle = (node as any).startHandle as Konva.Circle;
 
       startHandle.fire('pointerover');
@@ -993,9 +1007,11 @@ describe('stroke-single / WeaveStrokeSingleNode', () => {
       node.onRender(defaultProps());
 
       const strokeGroup = makeTipGroup({ id: 'dragend-null' });
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const handleNodeChanges = (node as any).handleNodeChanges as (...args: unknown[]) => unknown;
       handleNodeChanges([{ node: { type: WEAVE_STROKE_SINGLE_NODE_TYPE }, instance: strokeGroup }]);
 
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const startHandle = (node as any).startHandle as Konva.Circle;
       startHandle.setAttr('strokeId', 'not-found');
       // findOne returns null → both handleDragPosition and handleDragEnd outer guard triggered
@@ -1012,11 +1028,13 @@ describe('stroke-single / WeaveStrokeSingleNode', () => {
 
       // Stroke group WITHOUT a line child (just linePoints, no -line child)
       const noLineStroke = new Konva.Group({ id: 'no-line-stroke', linePoints: [0, 0, 100, 0] });
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const handleNodeChanges = (node as any).handleNodeChanges as (...args: unknown[]) => unknown;
       // Need to use a group with a line to create handles, then test dragmove with no-line group
       const setupGroup = makeTipGroup({ id: 'setup-grp' });
       handleNodeChanges([{ node: { type: WEAVE_STROKE_SINGLE_NODE_TYPE }, instance: setupGroup }]);
 
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const startHandle = (node as any).startHandle as Konva.Circle;
       startHandle.setAttr('strokeId', 'no-line-stroke');
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -1033,10 +1051,12 @@ describe('stroke-single / WeaveStrokeSingleNode', () => {
 
       const badPointsGroup = makeTipGroup({ id: 'bad-pts' });
       badPointsGroup.setAttr('linePoints', [0, 0]); // only 2 points
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const handleNodeChanges = (node as any).handleNodeChanges as (...args: unknown[]) => unknown;
       const setupGroup = makeTipGroup({ id: 'setup-grp2' });
       handleNodeChanges([{ node: { type: WEAVE_STROKE_SINGLE_NODE_TYPE }, instance: setupGroup }]);
 
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const startHandle = (node as any).startHandle as Konva.Circle;
       startHandle.setAttr('strokeId', 'bad-pts');
       // eslint-disable-next-line @typescript-eslint/no-explicit-any

@@ -18,7 +18,6 @@ import type { WeaveNodesSelectionPlugin } from '@/plugins/nodes-selection/nodes-
 import { WEAVE_NODES_SELECTION_KEY } from '@/plugins/nodes-selection/constants';
 import type { WeaveStageGridPlugin } from '@/plugins/stage-grid/stage-grid';
 import { WEAVE_STAGE_GRID_PLUGIN_KEY } from '@/plugins/stage-grid/constants';
-import reject from 'lodash/reject';
 
 export class WeaveExportManager {
   private instance: Weave;
@@ -162,7 +161,7 @@ export class WeaveExportManager {
     boundingNodes: (nodes: Konva.Node[]) => Konva.Node[],
     options: WeaveExportNodesOptions
   ): Promise<Blob> {
-    return new Promise((resolve) => {
+    return new Promise((resolve, reject) => {
       const {
         format = WEAVE_EXPORT_FORMATS.PNG,
         padding = 0,
@@ -451,7 +450,7 @@ export class WeaveExportManager {
     area: { x: number; y: number; width: number; height: number },
     options: WeaveExportNodesOptions
   ): Promise<Blob> {
-    return new Promise((resolve) => {
+    return new Promise((resolve, reject) => {
       const {
         format = WEAVE_EXPORT_FORMATS.PNG,
         padding = 0,
