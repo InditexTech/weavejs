@@ -305,7 +305,7 @@ describe('WeaveCopyPasteNodesPlugin - catcher DOM helpers', () => {
   });
 
   it('3.2 createPasteCatcher is idempotent — second onInit() does not add a second catcher', () => {
-    const { plugin, weave, stage } = setup();
+    const { weave } = setup();
     // Build a second plugin that shares the same stage container
     const plugin2 = new WeaveCopyPasteNodesPlugin({ getImageBase64: vi.fn() });
     // @ts-expect-error — registering with same weave mock
@@ -315,7 +315,6 @@ describe('WeaveCopyPasteNodesPlugin - catcher DOM helpers', () => {
       `#${WEAVE_COPY_PASTE_PASTE_CATCHER_ID}`
     );
     expect(catchers.length).toBe(1);
-    void plugin; void stage;
   });
 
   it('3.3 getCatcherElement returns null when in shadow DOM, no shadow host, catcher not in main doc', () => {
@@ -451,13 +450,12 @@ describe('WeaveCopyPasteNodesPlugin - keydown handler', () => {
   });
 
   it('6.3 Ctrl+V when focused + enabled → focusPasteCatcher called, no early return', async () => {
-    const { plugin, handler } = captureKeydownHandler();
+    const { handler } = captureKeydownHandler();
     const e = { code: 'KeyV', ctrlKey: true, metaKey: false, preventDefault: vi.fn() };
     await handler(e);
     // focusPasteCatcher called — catcher.focus() should have been invoked
     const catcher = document.getElementById(WEAVE_COPY_PASTE_PASTE_CATCHER_ID);
     expect(catcher).not.toBeNull();
-    void plugin;
   });
 
   it('6.4 Ctrl+V when focused + disabled → focusCatcher then early return', async () => {
@@ -615,8 +613,7 @@ describe('WeaveCopyPasteNodesPlugin - handleCopyAsWeaveData branches', () => {
 
   it('9.1 no nodeHandler → node skipped; clipboard.write still called (empty weave)', async () => {
     const node = makeKonvaNode();
-    const { plugin, weave } = setup({ selectedNodes: [node], nodeHandler: null });
-    void weave;
+    const { plugin } = setup({ selectedNodes: [node], nodeHandler: null });
     const p = plugin.copy();
     await vi.runAllTimersAsync();
     await p;
