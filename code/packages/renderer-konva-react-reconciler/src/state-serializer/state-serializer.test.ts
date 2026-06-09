@@ -203,4 +203,23 @@ describe('state-serializer', () => {
       'Deserialization error: element type must be string received [10]'
     );
   });
+
+  test('deserialize an element whose props has no children key (else branch)', () => {
+    const stateSerializer = new WeaveStateSerializer();
+
+    // props has NO children key — exercises the else branch at lines 72-73
+    const element = {
+      key: 'elementKey1',
+      type: 'elementtype1',
+      props: {
+        attr: 'elementAttr1',
+      },
+    };
+
+    const deserialized = stateSerializer.deserialize(element);
+
+    expect(deserialized.key).toBe('elementKey1');
+    expect(deserialized.type).toBe('elementtype1');
+    expect(deserialized.props).toMatchObject({ attr: 'elementAttr1' });
+  });
 });

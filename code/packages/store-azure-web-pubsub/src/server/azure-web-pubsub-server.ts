@@ -4,7 +4,7 @@
 
 import { WebPubSubServiceClient, AzureKeyCredential } from '@azure/web-pubsub';
 import { DefaultAzureCredential, type TokenCredential } from '@azure/identity';
-import koa from 'koa';
+import type koa from 'koa';
 import Emittery from 'emittery';
 import {
   type FetchInitialState,

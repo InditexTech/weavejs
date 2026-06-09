@@ -18,7 +18,6 @@ import type { WeaveNodesSelectionPlugin } from '@/plugins/nodes-selection/nodes-
 import { WEAVE_NODES_SELECTION_KEY } from '@/plugins/nodes-selection/constants';
 import type { WeaveStageGridPlugin } from '@/plugins/stage-grid/stage-grid';
 import { WEAVE_STAGE_GRID_PLUGIN_KEY } from '@/plugins/stage-grid/constants';
-import reject from 'lodash/reject';
 
 export class WeaveExportManager {
   private instance: Weave;
@@ -28,6 +27,212 @@ export class WeaveExportManager {
     this.instance = instance;
     this.logger = this.instance.getChildLogger('export-manager');
     this.logger.debug('Export manager created');
+  }
+
+  // ---------------------------------------------------------------------------
+  // Private helpers
+  // ---------------------------------------------------------------------------
+
+  private parseExportOptions(options: WeaveExportNodesOptions) {
+    return {
+      format: options.format ?? WEAVE_EXPORT_FORMATS.PNG,
+      padding: options.padding ?? 0,
+      pixelRatio: options.pixelRatio ?? 1,
+      backgroundColor: options.backgroundColor ?? WEAVE_EXPORT_BACKGROUND_COLOR,
+    };
+  }
+
+  private saveAndDisablePlugins() {
+    const nodesSelectionPluginPrev =
+      this.getNodesSelectionPlugin()?.isEnabled();
+    const nodesStageGridPluginPrev = this.getStageGridPlugin()?.isEnabled();
+    this.getNodesSelectionPlugin()?.disable();
+    this.getStageGridPlugin()?.disable();
+    return { nodesSelectionPluginPrev, nodesStageGridPluginPrev };
+  }
+
+  private restorePlugins(
+    nodesSelectionPluginPrev: boolean | undefined,
+    nodesStageGridPluginPrev: boolean | undefined
+  ) {
+    if (nodesSelectionPluginPrev) {
+      this.getNodesSelectionPlugin()?.enable();
+    }
+    if (nodesStageGridPluginPrev) {
+      this.getStageGridPlugin()?.enable();
+    }
+  }
+
+  private saveAndResetStage(resetPosition = false) {
+    const stage = this.instance.getStage();
+    const originalPosition = { x: stage.x(), y: stage.y() };
+    const originalScale = { x: stage.scaleX(), y: stage.scaleY() };
+    stage.scale({ x: 1, y: 1 });
+    if (resetPosition) {
+      stage.position({ x: 0, y: 0 });
+    }
+    return { stage, originalPosition, originalScale };
+  }
+
+  private restoreStage(
+    stage: Konva.Stage,
+    originalPosition: { x: number; y: number },
+    originalScale: { x: number; y: number }
+  ) {
+    stage.position(originalPosition);
+    stage.scale(originalScale);
+    stage.batchDraw();
+  }
+
+  private buildNodesExportGroup(
+    nodes: Konva.Node[],
+    boundingNodes: (nodes: Konva.Node[]) => Konva.Node[],
+    stage: Konva.Stage,
+    mainLayer: Konva.Layer,
+    padding: number,
+    backgroundColor: string
+  ) {
+    const bounds = getExportBoundingBox(boundingNodes(nodes));
+
+    const scaleX = stage.scaleX();
+    const scaleY = stage.scaleY();
+
+    const unscaledBounds = {
+      x: bounds.x / scaleX,
+      y: bounds.y / scaleY,
+      width: bounds.width / scaleX,
+      height: bounds.height / scaleY,
+    };
+
+    const exportGroup = new Konva.Group();
+
+    const background = new Konva.Rect({
+      x: unscaledBounds.x - padding,
+      y: unscaledBounds.y - padding,
+      width: unscaledBounds.width + 2 * padding,
+      height: unscaledBounds.height + 2 * padding,
+      strokeWidth: 0,
+      fill: backgroundColor,
+    });
+
+    exportGroup.add(background);
+
+    for (const node of nodes) {
+      const clonedNode = node.clone({ id: uuidv4() });
+      const absPos = node.getAbsolutePosition();
+      clonedNode.absolutePosition({
+        x: absPos.x / scaleX,
+        y: absPos.y / scaleY,
+      });
+      exportGroup.add(clonedNode);
+    }
+
+    mainLayer.add(exportGroup);
+
+    const backgroundRect = background.getClientRect();
+    stage.batchDraw();
+
+    return { exportGroup, background, backgroundRect };
+  }
+
+  private buildAreaBackground(
+    area: { x: number; y: number; width: number; height: number },
+    stage: Konva.Stage,
+    mainLayer: Konva.Layer,
+    padding: number,
+    backgroundColor: string,
+    relativeToStage = false
+  ) {
+    const bounds = area;
+    const scaleX = stage.scaleX();
+    const scaleY = stage.scaleY();
+
+    const unscaledBounds = {
+      x: bounds.x / scaleX,
+      y: bounds.y / scaleY,
+      width: bounds.width / scaleX,
+      height: bounds.height / scaleY,
+    };
+
+    const background = new Konva.Rect({
+      x: unscaledBounds.x - padding,
+      y: unscaledBounds.y - padding,
+      width: unscaledBounds.width + 2 * padding,
+      height: unscaledBounds.height + 2 * padding,
+      strokeWidth: 0,
+      fill: backgroundColor,
+    });
+
+    mainLayer.add(background);
+    background.moveToBottom();
+    stage.batchDraw();
+
+    const backgroundRect = relativeToStage
+      ? background.getClientRect({ relativeTo: stage })
+      : background.getClientRect();
+
+    return { background, backgroundRect };
+  }
+
+  private async renderTiles(
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    source: any,
+    backgroundRect: { x: number; y: number; width: number; height: number },
+    format: string,
+    pixelRatio: number,
+    quality: number
+  ): Promise<{ composites: { input: Buffer; left: number; top: number }[] }> {
+    const composites: { input: Buffer; left: number; top: number }[] = [];
+
+    const imageWidth = Math.round(backgroundRect.width);
+    const imageHeight = Math.round(backgroundRect.height);
+
+    const maxRenderSize = 1920; // safe max for Cairo
+    const cols = Math.ceil(imageWidth / maxRenderSize);
+    const rows = Math.ceil(imageHeight / maxRenderSize);
+
+    const tileWidth = Math.floor(imageWidth / cols);
+    const tileHeight = Math.floor(imageHeight / rows);
+
+    for (let y = 0; y < imageHeight; y += tileHeight) {
+      for (let x = 0; x < imageWidth; x += tileWidth) {
+        const width = Math.min(tileWidth, imageWidth - x);
+        const height = Math.min(tileHeight, imageHeight - y);
+
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const canvas: any = await source.toCanvas({
+          x: Math.round(backgroundRect.x) + x,
+          y: Math.round(backgroundRect.y) + y,
+          width,
+          height,
+          mimeType: format,
+          pixelRatio,
+          quality,
+        });
+
+        let buffer: Buffer | null = null;
+        if (
+          globalThis._weave_serverSideBackend === WEAVE_KONVA_BACKEND.CANVAS
+        ) {
+          buffer = canvas.toBuffer();
+        }
+        if (globalThis._weave_serverSideBackend === WEAVE_KONVA_BACKEND.SKIA) {
+          buffer = await canvas.toBuffer();
+        }
+
+        if (!buffer) {
+          throw new Error('Failed to generate image buffer');
+        }
+
+        composites.push({
+          top: y * pixelRatio,
+          left: x * pixelRatio,
+          input: buffer,
+        });
+      }
+    }
+
+    return { composites };
   }
 
   private fitKonvaPixelRatio(
@@ -58,69 +263,23 @@ export class WeaveExportManager {
     options: WeaveExportNodesOptions
   ): Promise<HTMLImageElement> {
     return new Promise((resolve) => {
-      const {
-        format = WEAVE_EXPORT_FORMATS.PNG,
-        padding = 0,
-        pixelRatio = 1,
-        backgroundColor = WEAVE_EXPORT_BACKGROUND_COLOR,
-      } = options;
-
-      const nodesSelectionPluginPrev =
-        this.getNodesSelectionPlugin()?.isEnabled();
-      const nodesStageGridPluginPrev = this.getStageGridPlugin()?.isEnabled();
-
-      this.getNodesSelectionPlugin()?.disable();
-      this.getStageGridPlugin()?.disable();
-
-      const stage = this.instance.getStage();
+      const { format, padding, pixelRatio, backgroundColor } =
+        this.parseExportOptions(options);
+      const { nodesSelectionPluginPrev, nodesStageGridPluginPrev } =
+        this.saveAndDisablePlugins();
+      const { stage, originalPosition, originalScale } =
+        this.saveAndResetStage();
       const mainLayer = this.instance.getMainLayer();
 
-      const originalPosition = { x: stage.x(), y: stage.y() };
-      const originalScale = { x: stage.scaleX(), y: stage.scaleY() };
-
-      stage.scale({ x: 1, y: 1 });
-
       if (mainLayer) {
-        const bounds = getExportBoundingBox(boundingNodes(nodes));
-
-        const scaleX = stage.scaleX();
-        const scaleY = stage.scaleY();
-
-        const unscaledBounds = {
-          x: bounds.x / scaleX,
-          y: bounds.y / scaleY,
-          width: bounds.width / scaleX,
-          height: bounds.height / scaleY,
-        };
-
-        const exportGroup = new Konva.Group();
-
-        const background = new Konva.Rect({
-          x: unscaledBounds.x - padding,
-          y: unscaledBounds.y - padding,
-          width: unscaledBounds.width + 2 * padding,
-          height: unscaledBounds.height + 2 * padding,
-          strokeWidth: 0,
-          fill: backgroundColor,
-        });
-
-        exportGroup.add(background);
-
-        for (const node of nodes) {
-          const clonedNode = node.clone({ id: uuidv4() });
-          const absPos = node.getAbsolutePosition();
-          clonedNode.absolutePosition({
-            x: absPos.x / scaleX,
-            y: absPos.y / scaleY,
-          });
-          exportGroup.add(clonedNode);
-        }
-
-        mainLayer.add(exportGroup);
-
-        const backgroundRect = background.getClientRect();
-
-        stage.batchDraw();
+        const { exportGroup, backgroundRect } = this.buildNodesExportGroup(
+          nodes,
+          boundingNodes,
+          stage,
+          mainLayer,
+          padding,
+          backgroundColor
+        );
 
         const { pixelRatio: finalPixelRatio } = this.fitKonvaPixelRatio(
           Math.round(backgroundRect.width),
@@ -138,18 +297,11 @@ export class WeaveExportManager {
           quality: options.quality ?? 1,
           callback: (img: HTMLImageElement) => {
             exportGroup.destroy();
-
-            stage.position(originalPosition);
-            stage.scale(originalScale);
-            stage.batchDraw();
-
-            if (nodesSelectionPluginPrev) {
-              this.getNodesSelectionPlugin()?.enable();
-            }
-            if (nodesStageGridPluginPrev) {
-              this.getStageGridPlugin()?.enable();
-            }
-
+            this.restoreStage(stage, originalPosition, originalScale);
+            this.restorePlugins(
+              nodesSelectionPluginPrev,
+              nodesStageGridPluginPrev
+            );
             resolve(img);
           },
         });
@@ -162,70 +314,24 @@ export class WeaveExportManager {
     boundingNodes: (nodes: Konva.Node[]) => Konva.Node[],
     options: WeaveExportNodesOptions
   ): Promise<Blob> {
-    return new Promise((resolve) => {
-      const {
-        format = WEAVE_EXPORT_FORMATS.PNG,
-        padding = 0,
-        pixelRatio = 1,
-        backgroundColor = WEAVE_EXPORT_BACKGROUND_COLOR,
-      } = options;
-
-      const nodesSelectionPluginPrev =
-        this.getNodesSelectionPlugin()?.isEnabled();
-      const nodesStageGridPluginPrev = this.getStageGridPlugin()?.isEnabled();
-
-      this.getNodesSelectionPlugin()?.disable();
-      this.getStageGridPlugin()?.disable();
-
-      const stage = this.instance.getStage();
+    return new Promise((resolve, reject) => {
+      const { format, padding, pixelRatio, backgroundColor } =
+        this.parseExportOptions(options);
+      const { nodesSelectionPluginPrev, nodesStageGridPluginPrev } =
+        this.saveAndDisablePlugins();
+      const { stage, originalPosition, originalScale } =
+        this.saveAndResetStage();
       const mainLayer = this.instance.getMainLayer();
 
-      const originalPosition = { x: stage.x(), y: stage.y() };
-      const originalScale = { x: stage.scaleX(), y: stage.scaleY() };
-
-      stage.scale({ x: 1, y: 1 });
-
       if (mainLayer) {
-        const bounds = getExportBoundingBox(boundingNodes(nodes));
-
-        const scaleX = stage.scaleX();
-        const scaleY = stage.scaleY();
-
-        const unscaledBounds = {
-          x: bounds.x / scaleX,
-          y: bounds.y / scaleY,
-          width: bounds.width / scaleX,
-          height: bounds.height / scaleY,
-        };
-
-        const exportGroup = new Konva.Group();
-
-        const background = new Konva.Rect({
-          x: unscaledBounds.x - padding,
-          y: unscaledBounds.y - padding,
-          width: unscaledBounds.width + 2 * padding,
-          height: unscaledBounds.height + 2 * padding,
-          strokeWidth: 0,
-          fill: backgroundColor,
-        });
-
-        exportGroup.add(background);
-
-        for (const node of nodes) {
-          const clonedNode = node.clone({ id: uuidv4() });
-          const absPos = node.getAbsolutePosition();
-          clonedNode.absolutePosition({
-            x: absPos.x / scaleX,
-            y: absPos.y / scaleY,
-          });
-          exportGroup.add(clonedNode);
-        }
-
-        mainLayer.add(exportGroup);
-
-        const backgroundRect = background.getClientRect();
-
-        stage.batchDraw();
+        const { exportGroup, backgroundRect } = this.buildNodesExportGroup(
+          nodes,
+          boundingNodes,
+          stage,
+          mainLayer,
+          padding,
+          backgroundColor
+        );
 
         const { pixelRatio: finalPixelRatio } = this.fitKonvaPixelRatio(
           Math.round(backgroundRect.width),
@@ -243,23 +349,15 @@ export class WeaveExportManager {
           quality: options.quality ?? 1,
           callback: (blob: Blob | null) => {
             exportGroup.destroy();
-
-            stage.position(originalPosition);
-            stage.scale(originalScale);
-            stage.batchDraw();
-
-            if (nodesSelectionPluginPrev) {
-              this.getNodesSelectionPlugin()?.enable();
-            }
-            if (nodesStageGridPluginPrev) {
-              this.getStageGridPlugin()?.enable();
-            }
-
+            this.restoreStage(stage, originalPosition, originalScale);
+            this.restorePlugins(
+              nodesSelectionPluginPrev,
+              nodesStageGridPluginPrev
+            );
             if (!blob) {
               reject(new Error('Failed to generate image blob'));
               return;
             }
-
             resolve(blob);
           },
         });
@@ -273,69 +371,23 @@ export class WeaveExportManager {
     options: WeaveExportNodesOptions
   ): Promise<HTMLCanvasElement> {
     return new Promise((resolve) => {
-      const {
-        format = WEAVE_EXPORT_FORMATS.PNG,
-        padding = 0,
-        pixelRatio = 1,
-        backgroundColor = WEAVE_EXPORT_BACKGROUND_COLOR,
-      } = options;
-
-      const nodesSelectionPluginPrev =
-        this.getNodesSelectionPlugin()?.isEnabled();
-      const nodesStageGridPluginPrev = this.getStageGridPlugin()?.isEnabled();
-
-      this.getNodesSelectionPlugin()?.disable();
-      this.getStageGridPlugin()?.disable();
-
-      const stage = this.instance.getStage();
+      const { format, padding, pixelRatio, backgroundColor } =
+        this.parseExportOptions(options);
+      const { nodesSelectionPluginPrev, nodesStageGridPluginPrev } =
+        this.saveAndDisablePlugins();
+      const { stage, originalPosition, originalScale } =
+        this.saveAndResetStage();
       const mainLayer = this.instance.getMainLayer();
 
-      const originalPosition = { x: stage.x(), y: stage.y() };
-      const originalScale = { x: stage.scaleX(), y: stage.scaleY() };
-
-      stage.scale({ x: 1, y: 1 });
-
       if (mainLayer) {
-        const bounds = getExportBoundingBox(boundingNodes(nodes));
-
-        const scaleX = stage.scaleX();
-        const scaleY = stage.scaleY();
-
-        const unscaledBounds = {
-          x: bounds.x / scaleX,
-          y: bounds.y / scaleY,
-          width: bounds.width / scaleX,
-          height: bounds.height / scaleY,
-        };
-
-        const exportGroup = new Konva.Group();
-
-        const background = new Konva.Rect({
-          x: unscaledBounds.x - padding,
-          y: unscaledBounds.y - padding,
-          width: unscaledBounds.width + 2 * padding,
-          height: unscaledBounds.height + 2 * padding,
-          strokeWidth: 0,
-          fill: backgroundColor,
-        });
-
-        exportGroup.add(background);
-
-        for (const node of nodes) {
-          const clonedNode = node.clone({ id: uuidv4() });
-          const absPos = node.getAbsolutePosition();
-          clonedNode.absolutePosition({
-            x: absPos.x / scaleX,
-            y: absPos.y / scaleY,
-          });
-          exportGroup.add(clonedNode);
-        }
-
-        mainLayer.add(exportGroup);
-
-        const backgroundRect = background.getClientRect();
-
-        stage.batchDraw();
+        const { exportGroup, backgroundRect } = this.buildNodesExportGroup(
+          nodes,
+          boundingNodes,
+          stage,
+          mainLayer,
+          padding,
+          backgroundColor
+        );
 
         const { pixelRatio: finalPixelRatio } = this.fitKonvaPixelRatio(
           Math.round(backgroundRect.width),
@@ -353,18 +405,11 @@ export class WeaveExportManager {
           quality: options.quality ?? 1,
           callback: (canvas: HTMLCanvasElement) => {
             exportGroup.destroy();
-
-            stage.position(originalPosition);
-            stage.scale(originalScale);
-            stage.batchDraw();
-
-            if (nodesSelectionPluginPrev) {
-              this.getNodesSelectionPlugin()?.enable();
-            }
-            if (nodesStageGridPluginPrev) {
-              this.getStageGridPlugin()?.enable();
-            }
-
+            this.restoreStage(stage, originalPosition, originalScale);
+            this.restorePlugins(
+              nodesSelectionPluginPrev,
+              nodesStageGridPluginPrev
+            );
             resolve(canvas);
           },
         });
@@ -377,47 +422,25 @@ export class WeaveExportManager {
     options: WeaveExportNodesOptions
   ): Promise<HTMLImageElement> {
     return new Promise((resolve) => {
-      const {
-        format = WEAVE_EXPORT_FORMATS.PNG,
-        padding = 0,
-        pixelRatio = 1,
-        backgroundColor = WEAVE_EXPORT_BACKGROUND_COLOR,
-      } = options;
-
-      const nodesSelectionPluginPrev =
-        this.getNodesSelectionPlugin()?.isEnabled();
-      const nodesStageGridPluginPrev = this.getStageGridPlugin()?.isEnabled();
-
-      this.getNodesSelectionPlugin()?.disable();
-      this.getStageGridPlugin()?.disable();
-
-      const stage = this.instance.getStage();
+      const { format, padding, pixelRatio, backgroundColor } =
+        this.parseExportOptions(options);
+      const { nodesSelectionPluginPrev, nodesStageGridPluginPrev } =
+        this.saveAndDisablePlugins();
+      const { stage, originalPosition, originalScale } =
+        this.saveAndResetStage(true);
       const mainLayer = this.instance.getMainLayer();
 
       if (!mainLayer) {
         throw new Error('Main layer not found');
       }
 
-      const originalPosition = { x: stage.x(), y: stage.y() };
-      const originalScale = { x: stage.scaleX(), y: stage.scaleY() };
-
-      stage.scale({ x: 1, y: 1 });
-      stage.position({ x: 0, y: 0 });
-
-      const bounds = area;
-
-      const background = new Konva.Rect({
-        x: bounds.x - padding,
-        y: bounds.y - padding,
-        width: bounds.width + 2 * padding,
-        height: bounds.height + 2 * padding,
-        strokeWidth: 0,
-        fill: backgroundColor,
-      });
-
-      mainLayer.add(background);
-      background.moveToBottom();
-      stage.batchDraw();
+      const { background } = this.buildAreaBackground(
+        area,
+        stage,
+        mainLayer,
+        padding,
+        backgroundColor
+      );
 
       stage.toImage({
         x: area.x,
@@ -429,18 +452,11 @@ export class WeaveExportManager {
         quality: options.quality ?? 1,
         callback: (img) => {
           background.destroy();
-
-          stage.position(originalPosition);
-          stage.scale(originalScale);
-          stage.batchDraw();
-
-          if (nodesSelectionPluginPrev) {
-            this.getNodesSelectionPlugin()?.enable();
-          }
-          if (nodesStageGridPluginPrev) {
-            this.getStageGridPlugin()?.enable();
-          }
-
+          this.restoreStage(stage, originalPosition, originalScale);
+          this.restorePlugins(
+            nodesSelectionPluginPrev,
+            nodesStageGridPluginPrev
+          );
           resolve(img);
         },
       });
@@ -451,48 +467,26 @@ export class WeaveExportManager {
     area: { x: number; y: number; width: number; height: number },
     options: WeaveExportNodesOptions
   ): Promise<Blob> {
-    return new Promise((resolve) => {
-      const {
-        format = WEAVE_EXPORT_FORMATS.PNG,
-        padding = 0,
-        pixelRatio = 1,
-        backgroundColor = WEAVE_EXPORT_BACKGROUND_COLOR,
-      } = options;
-
-      const nodesSelectionPluginPrev =
-        this.getNodesSelectionPlugin()?.isEnabled();
-      const nodesStageGridPluginPrev = this.getStageGridPlugin()?.isEnabled();
-
-      this.getNodesSelectionPlugin()?.disable();
-      this.getStageGridPlugin()?.disable();
-
-      const stage = this.instance.getStage();
+    return new Promise((resolve, reject) => {
+      const { format, padding, pixelRatio, backgroundColor } =
+        this.parseExportOptions(options);
+      const { nodesSelectionPluginPrev, nodesStageGridPluginPrev } =
+        this.saveAndDisablePlugins();
+      const { stage, originalPosition, originalScale } =
+        this.saveAndResetStage(true);
       const mainLayer = this.instance.getMainLayer();
 
       if (!mainLayer) {
         throw new Error('Main layer not found');
       }
 
-      const originalPosition = { x: stage.x(), y: stage.y() };
-      const originalScale = { x: stage.scaleX(), y: stage.scaleY() };
-
-      stage.scale({ x: 1, y: 1 });
-      stage.position({ x: 0, y: 0 });
-
-      const bounds = area;
-
-      const background = new Konva.Rect({
-        x: bounds.x - padding,
-        y: bounds.y - padding,
-        width: bounds.width + 2 * padding,
-        height: bounds.height + 2 * padding,
-        strokeWidth: 0,
-        fill: backgroundColor,
-      });
-
-      mainLayer.add(background);
-      background.moveToBottom();
-      stage.batchDraw();
+      const { background } = this.buildAreaBackground(
+        area,
+        stage,
+        mainLayer,
+        padding,
+        backgroundColor
+      );
 
       stage.toBlob({
         x: area.x,
@@ -504,23 +498,15 @@ export class WeaveExportManager {
         quality: options.quality ?? 1,
         callback: (blob: Blob | null) => {
           background.destroy();
-
-          stage.position(originalPosition);
-          stage.scale(originalScale);
-          stage.batchDraw();
-
-          if (nodesSelectionPluginPrev) {
-            this.getNodesSelectionPlugin()?.enable();
-          }
-          if (nodesStageGridPluginPrev) {
-            this.getStageGridPlugin()?.enable();
-          }
-
+          this.restoreStage(stage, originalPosition, originalScale);
+          this.restorePlugins(
+            nodesSelectionPluginPrev,
+            nodesStageGridPluginPrev
+          );
           if (!blob) {
             reject(new Error('Failed to generate image blob'));
             return;
           }
-
           resolve(blob);
         },
       });
@@ -532,47 +518,25 @@ export class WeaveExportManager {
     options: WeaveExportNodesOptions
   ): Promise<HTMLCanvasElement> {
     return new Promise((resolve) => {
-      const {
-        format = WEAVE_EXPORT_FORMATS.PNG,
-        padding = 0,
-        pixelRatio = 1,
-        backgroundColor = WEAVE_EXPORT_BACKGROUND_COLOR,
-      } = options;
-
-      const nodesSelectionPluginPrev =
-        this.getNodesSelectionPlugin()?.isEnabled();
-      const nodesStageGridPluginPrev = this.getStageGridPlugin()?.isEnabled();
-
-      this.getNodesSelectionPlugin()?.disable();
-      this.getStageGridPlugin()?.disable();
-
-      const stage = this.instance.getStage();
+      const { format, padding, pixelRatio, backgroundColor } =
+        this.parseExportOptions(options);
+      const { nodesSelectionPluginPrev, nodesStageGridPluginPrev } =
+        this.saveAndDisablePlugins();
+      const { stage, originalPosition, originalScale } =
+        this.saveAndResetStage(true);
       const mainLayer = this.instance.getMainLayer();
 
       if (!mainLayer) {
         throw new Error('Main layer not found');
       }
 
-      const originalPosition = { x: stage.x(), y: stage.y() };
-      const originalScale = { x: stage.scaleX(), y: stage.scaleY() };
-
-      stage.scale({ x: 1, y: 1 });
-      stage.position({ x: 0, y: 0 });
-
-      const bounds = area;
-
-      const background = new Konva.Rect({
-        x: bounds.x - padding,
-        y: bounds.y - padding,
-        width: bounds.width + 2 * padding,
-        height: bounds.height + 2 * padding,
-        strokeWidth: 0,
-        fill: backgroundColor,
-      });
-
-      mainLayer.add(background);
-      background.moveToBottom();
-      stage.batchDraw();
+      const { background } = this.buildAreaBackground(
+        area,
+        stage,
+        mainLayer,
+        padding,
+        backgroundColor
+      );
 
       stage.toCanvas({
         x: area.x,
@@ -584,18 +548,11 @@ export class WeaveExportManager {
         quality: options.quality ?? 1,
         callback: (canvas: HTMLCanvasElement) => {
           background.destroy();
-
-          stage.position(originalPosition);
-          stage.scale(originalScale);
-          stage.batchDraw();
-
-          if (nodesSelectionPluginPrev) {
-            this.getNodesSelectionPlugin()?.enable();
-          }
-          if (nodesStageGridPluginPrev) {
-            this.getStageGridPlugin()?.enable();
-          }
-
+          this.restoreStage(stage, originalPosition, originalScale);
+          this.restorePlugins(
+            nodesSelectionPluginPrev,
+            nodesStageGridPluginPrev
+          );
           resolve(canvas);
         },
       });
@@ -611,27 +568,17 @@ export class WeaveExportManager {
     width: number;
     height: number;
   }> {
-    const {
-      format = WEAVE_EXPORT_FORMATS.PNG,
-      padding = 0,
-      pixelRatio = 1,
-      backgroundColor = WEAVE_EXPORT_BACKGROUND_COLOR,
-    } = options;
-
-    this.getNodesSelectionPlugin()?.disable();
-    this.getStageGridPlugin()?.disable();
-
-    const stage = this.instance.getStage();
+    const { format, padding, pixelRatio, backgroundColor } =
+      this.parseExportOptions(options);
+    const { nodesSelectionPluginPrev, nodesStageGridPluginPrev } =
+      this.saveAndDisablePlugins();
+    const { stage, originalPosition, originalScale } =
+      this.saveAndResetStage();
     const mainLayer = this.instance.getMainLayer();
 
     if (!mainLayer) {
       throw new Error('Main layer not found');
     }
-
-    const originalPosition = { x: stage.x(), y: stage.y() };
-    const originalScale = { x: stage.scaleX(), y: stage.scaleY() };
-
-    stage.scale({ x: 1, y: 1 });
 
     let realNodes = [...nodes];
     if (nodes.length === 0) {
@@ -647,103 +594,29 @@ export class WeaveExportManager {
       }
     }
 
-    const bounds = getExportBoundingBox(boundingNodes(konvaNodes));
+    const { exportGroup, backgroundRect } = this.buildNodesExportGroup(
+      konvaNodes,
+      boundingNodes,
+      stage,
+      mainLayer,
+      padding,
+      backgroundColor
+    );
 
-    const scaleX = stage.scaleX();
-    const scaleY = stage.scaleY();
-
-    const unscaledBounds = {
-      x: bounds.x / scaleX,
-      y: bounds.y / scaleY,
-      width: bounds.width / scaleX,
-      height: bounds.height / scaleY,
-    };
-
-    const exportGroup = new Konva.Group();
-
-    const background = new Konva.Rect({
-      x: unscaledBounds.x - padding,
-      y: unscaledBounds.y - padding,
-      width: unscaledBounds.width + 2 * padding,
-      height: unscaledBounds.height + 2 * padding,
-      strokeWidth: 0,
-      fill: backgroundColor,
-    });
-
-    exportGroup.add(background);
-
-    for (const node of konvaNodes) {
-      const clonedNode = node.clone({ id: uuidv4() });
-      const absPos = node.getAbsolutePosition();
-      clonedNode.absolutePosition({
-        x: absPos.x / scaleX,
-        y: absPos.y / scaleY,
-      });
-      exportGroup.add(clonedNode);
-    }
-
-    mainLayer.add(exportGroup);
-
-    const backgroundRect = background.getClientRect();
-
-    const composites: { input: Buffer; left: number; top: number }[] = [];
+    const { composites } = await this.renderTiles(
+      exportGroup,
+      backgroundRect,
+      format,
+      pixelRatio,
+      options.quality ?? 1
+    );
 
     const imageWidth = Math.round(backgroundRect.width);
     const imageHeight = Math.round(backgroundRect.height);
 
-    const maxRenderSize = 1920; // safe max for Cairo
-    const cols = Math.ceil(imageWidth / maxRenderSize);
-    const rows = Math.ceil(imageHeight / maxRenderSize);
-
-    const tileWidth = Math.floor(imageWidth / cols);
-    const tileHeight = Math.floor(imageHeight / rows);
-
-    for (let y = 0; y < imageHeight; y += tileHeight) {
-      for (let x = 0; x < imageWidth; x += tileWidth) {
-        const width = Math.min(tileWidth, imageWidth - x);
-        const height = Math.min(tileHeight, imageHeight - y);
-
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const canvas: any = await exportGroup.toCanvas({
-          x: Math.round(backgroundRect.x) + x,
-          y: Math.round(backgroundRect.y) + y,
-          width: width,
-          height: height,
-          mimeType: format,
-          pixelRatio,
-          quality: options.quality ?? 1,
-        });
-
-        let buffer: Buffer | null = null;
-        if (
-          globalThis._weave_serverSideBackend === WEAVE_KONVA_BACKEND.CANVAS
-        ) {
-          buffer = canvas.toBuffer();
-        }
-        if (globalThis._weave_serverSideBackend === WEAVE_KONVA_BACKEND.SKIA) {
-          buffer = await canvas.toBuffer();
-        }
-
-        if (!buffer) {
-          throw new Error('Failed to generate image buffer');
-        }
-
-        composites.push({
-          top: y * pixelRatio,
-          left: x * pixelRatio,
-          input: buffer,
-        });
-      }
-    }
-
     exportGroup.destroy();
-
-    stage.position(originalPosition);
-    stage.scale(originalScale);
-    stage.batchDraw();
-
-    this.getNodesSelectionPlugin()?.enable();
-    this.getStageGridPlugin()?.enable();
+    this.restoreStage(stage, originalPosition, originalScale);
+    this.restorePlugins(nodesSelectionPluginPrev, nodesStageGridPluginPrev);
 
     return {
       composites,
@@ -760,112 +633,41 @@ export class WeaveExportManager {
     width: number;
     height: number;
   }> {
-    const {
-      format = WEAVE_EXPORT_FORMATS.PNG,
-      padding = 0,
-      pixelRatio = 1,
-      backgroundColor = WEAVE_EXPORT_BACKGROUND_COLOR,
-    } = options;
-
-    this.getNodesSelectionPlugin()?.disable();
-    this.getStageGridPlugin()?.disable();
-
-    const stage = this.instance.getStage();
+    const { format, padding, pixelRatio, backgroundColor } =
+      this.parseExportOptions(options);
+    const { nodesSelectionPluginPrev, nodesStageGridPluginPrev } =
+      this.saveAndDisablePlugins();
+    const { stage, originalPosition, originalScale } =
+      this.saveAndResetStage();
     const mainLayer = this.instance.getMainLayer();
 
     if (!mainLayer) {
       throw new Error('Main layer not found');
     }
 
-    const originalPosition = { x: stage.x(), y: stage.y() };
-    const originalScale = { x: stage.scaleX(), y: stage.scaleY() };
+    const { background, backgroundRect } = this.buildAreaBackground(
+      area,
+      stage,
+      mainLayer,
+      padding,
+      backgroundColor,
+      true
+    );
 
-    stage.scale({ x: 1, y: 1 });
-
-    const bounds = area;
-
-    const scaleX = stage.scaleX();
-    const scaleY = stage.scaleY();
-
-    const unscaledBounds = {
-      x: bounds.x / scaleX,
-      y: bounds.y / scaleY,
-      width: bounds.width / scaleX,
-      height: bounds.height / scaleY,
-    };
-
-    const background = new Konva.Rect({
-      x: unscaledBounds.x - padding,
-      y: unscaledBounds.y - padding,
-      width: unscaledBounds.width + 2 * padding,
-      height: unscaledBounds.height + 2 * padding,
-      strokeWidth: 0,
-      fill: backgroundColor,
-    });
-
-    mainLayer.add(background);
-    background.moveToBottom();
-
-    const backgroundRect = background.getClientRect({ relativeTo: stage });
-
-    const composites: { input: Buffer; left: number; top: number }[] = [];
+    const { composites } = await this.renderTiles(
+      mainLayer,
+      backgroundRect,
+      format,
+      pixelRatio,
+      options.quality ?? 1
+    );
 
     const imageWidth = Math.round(backgroundRect.width);
     const imageHeight = Math.round(backgroundRect.height);
 
-    const maxRenderSize = 1920; // safe max for Cairo
-    const cols = Math.ceil(imageWidth / maxRenderSize);
-    const rows = Math.ceil(imageHeight / maxRenderSize);
-
-    const tileWidth = Math.floor(imageWidth / cols);
-    const tileHeight = Math.floor(imageHeight / rows);
-
-    for (let y = 0; y < imageHeight; y += tileHeight) {
-      for (let x = 0; x < imageWidth; x += tileWidth) {
-        const width = Math.min(tileWidth, imageWidth - x);
-        const height = Math.min(tileHeight, imageHeight - y);
-
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const canvas: any = await mainLayer.toCanvas({
-          x: Math.round(backgroundRect.x) + x,
-          y: Math.round(backgroundRect.y) + y,
-          width: width,
-          height: height,
-          mimeType: format,
-          pixelRatio,
-          quality: options.quality ?? 1,
-        });
-
-        let buffer: Buffer | null = null;
-        if (
-          globalThis._weave_serverSideBackend === WEAVE_KONVA_BACKEND.CANVAS
-        ) {
-          buffer = canvas.toBuffer();
-        }
-        if (globalThis._weave_serverSideBackend === WEAVE_KONVA_BACKEND.SKIA) {
-          buffer = await canvas.toBuffer();
-        }
-
-        if (!buffer) {
-          throw new Error('Failed to generate image buffer');
-        }
-
-        composites.push({
-          top: y * pixelRatio,
-          left: x * pixelRatio,
-          input: buffer,
-        });
-      }
-    }
-
     background.destroy();
-
-    stage.position(originalPosition);
-    stage.scale(originalScale);
-    stage.batchDraw();
-
-    this.getNodesSelectionPlugin()?.enable();
-    this.getStageGridPlugin()?.enable();
+    this.restoreStage(stage, originalPosition, originalScale);
+    this.restorePlugins(nodesSelectionPluginPrev, nodesStageGridPluginPrev);
 
     return {
       composites,

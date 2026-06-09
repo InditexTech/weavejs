@@ -44,7 +44,7 @@ export class WeaveStageNode extends WeaveNode {
         () => {
           this.stageFocused = true;
         },
-        { signal: this.instance.getEventsController()?.signal }
+        { signal: this.instance.getEventsController().signal }
       );
 
       stage.container().addEventListener(
@@ -52,7 +52,7 @@ export class WeaveStageNode extends WeaveNode {
         () => {
           this.stageFocused = false;
         },
-        { signal: this.instance.getEventsController()?.signal }
+        { signal: this.instance.getEventsController().signal }
       );
     }
 
@@ -198,7 +198,7 @@ export class WeaveStageNode extends WeaveNode {
           selectedNode.fire('onCmdCtrlPressed');
         }
       },
-      { signal: this.instance.getEventsController()?.signal }
+      { signal: this.instance.getEventsController().signal }
     );
 
     window.addEventListener(
@@ -224,7 +224,7 @@ export class WeaveStageNode extends WeaveNode {
           selectedNode.fire('onCmdCtrlReleased');
         }
       },
-      { signal: this.instance.getEventsController()?.signal }
+      { signal: this.instance.getEventsController().signal }
     );
 
     this.globalEventsInitialized = true;
