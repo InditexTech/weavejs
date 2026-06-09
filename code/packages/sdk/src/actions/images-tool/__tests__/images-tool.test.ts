@@ -51,6 +51,7 @@ if (typeof (globalThis as Record<string, unknown>)['window'] === 'undefined') {
   (globalThis as Record<string, unknown>)['window'] = globalThis;
 }
 
+import { makePointerEvent, type R } from '../../__tests__/shared/action.test-helpers';
 import { WeaveImagesToolAction } from '../images-tool';
 import {
   WEAVE_IMAGES_TOOL_ACTION_NAME,
@@ -59,8 +60,6 @@ import {
 } from '../constants';
 import { SELECTION_TOOL_ACTION_NAME } from '../../selection-tool/constants';
 import { WEAVE_IMAGE_TOOL_ACTION_NAME } from '../../image-tool/constants';
-
-type R = Record<string, unknown>;
 
 const mockImagesURL = [
   { url: 'https://example.com/a.png', fallback: 'data:a', width: 400, height: 300 },
@@ -163,18 +162,6 @@ function makeMockWeave() {
   };
 }
 
-function makePointerEvent(
-  overrides: Partial<{
-    pointerId: number;
-    clientX: number;
-    clientY: number;
-    pointerType: string;
-  }> = {}
-) {
-  return {
-    evt: { pointerId: 1, clientX: 50, clientY: 75, pointerType: 'mouse', ...overrides },
-  };
-}
 
 describe('WeaveImagesToolAction', () => {
   let action: WeaveImagesToolAction;

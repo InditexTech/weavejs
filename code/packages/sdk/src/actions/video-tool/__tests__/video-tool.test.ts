@@ -17,12 +17,11 @@ if (typeof (globalThis as Record<string, unknown>)['window'] === 'undefined') {
   (globalThis as Record<string, unknown>)['window'] = globalThis;
 }
 
+import { makePointerEvent, type R } from '../../__tests__/shared/action.test-helpers';
 import { WeaveVideoToolAction } from '../video-tool';
 import { VIDEO_TOOL_ACTION_NAME, VIDEO_TOOL_STATE } from '../constants';
 import { SELECTION_TOOL_ACTION_NAME } from '../../selection-tool/constants';
 import type { WeaveVideoToolDragParams } from '../types';
-
-type R = Record<string, unknown>;
 
 const mockVideoParams: WeaveVideoToolDragParams = {
   placeholderUrl: 'https://example.com/thumb.jpg',
@@ -115,10 +114,6 @@ function makeMockWeave() {
     _mockContainer: mockContainer,
     _mockVideoEl: mockVideoEl,
   };
-}
-
-function makePointerEvent(overrides: Partial<{ pointerId: number; clientX: number; clientY: number }> = {}) {
-  return { evt: { pointerId: 1, clientX: 50, clientY: 75, ...overrides } };
 }
 
 describe('WeaveVideoToolAction', () => {

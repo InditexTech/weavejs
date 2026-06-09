@@ -22,6 +22,7 @@ if (typeof (globalThis as Record<string, unknown>)['window'] === 'undefined') {
   (globalThis as Record<string, unknown>)['window'] = globalThis;
 }
 
+import { makeContainer, makeMeasureContainer, makePointerEvent, type R } from '../../__tests__/shared/action.test-helpers';
 import { WeaveStrokeToolAction } from '../stroke-tool';
 import {
   WEAVE_STROKE_TOOL_ACTION_NAME,
@@ -30,8 +31,6 @@ import {
   WEAVE_STROKE_TOOL_STATE,
 } from '../constants';
 import { SELECTION_TOOL_ACTION_NAME } from '../../selection-tool/constants';
-
-type R = Record<string, unknown>;
 
 function makeTempLineNode(linePoints = [0, 0, 1, 1]) {
   const cloneAttrs = { linePoints: [...linePoints] };
@@ -45,14 +44,6 @@ function makeTempLineNode(linePoints = [0, 0, 1, 1]) {
       getAttrs: vi.fn().mockReturnValue(cloneAttrs),
     }),
   };
-}
-
-function makeContainer(id = 'layer-id') {
-  return { getAttrs: vi.fn().mockReturnValue({ id }) };
-}
-
-function makeMeasureContainer() {
-  return { add: vi.fn() };
 }
 
 function makeNodeHandler(tempNode = makeTempLineNode()) {
@@ -114,13 +105,6 @@ function makeMockWeave() {
   };
 }
 
-function makePointerEvent(
-  overrides: Partial<{ pointerId: number; clientX: number; clientY: number }> = {}
-) {
-  return {
-    evt: { pointerId: 1, clientX: 50, clientY: 75, ...overrides },
-  };
-}
 
 describe('WeaveStrokeToolAction', () => {
   let action: WeaveStrokeToolAction;

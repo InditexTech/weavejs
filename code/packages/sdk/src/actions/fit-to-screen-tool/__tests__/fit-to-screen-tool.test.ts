@@ -16,12 +16,11 @@ vi.mock('@/plugins/stage-zoom/stage-zoom', () => ({
 }));
 vi.mock('konva', () => ({ default: {} }));
 
+import { type R } from '../../__tests__/shared/action.test-helpers';
 import { WeaveFitToScreenToolAction } from '../fit-to-screen-tool';
 import { FIT_TO_SCREEN_TOOL_ACTION_NAME } from '../constants';
 
 // ─── helpers ──────────────────────────────────────────────────────────────────
-
-type R = Record<string, unknown>;
 
 function makeMockZoomPlugin() {
   return { fitToScreen: vi.fn() };

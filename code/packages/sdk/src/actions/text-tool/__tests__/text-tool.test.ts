@@ -22,14 +22,13 @@ if (typeof (globalThis as Record<string, unknown>)['window'] === 'undefined') {
   (globalThis as Record<string, unknown>)['window'] = globalThis;
 }
 
+import { type R } from '../../__tests__/shared/action.test-helpers';
 import { WeaveTextToolAction } from '../text-tool';
 import { TEXT_TOOL_ACTION_NAME, TEXT_TOOL_STATE } from '../constants';
 import { SELECTION_TOOL_ACTION_NAME } from '../../selection-tool/constants';
 import { TEXT_LAYOUT } from '@/nodes/text/constants';
 
 // ─── helpers ──────────────────────────────────────────────────────────────────
-
-type R = Record<string, unknown>;
 
 function makeContainer() {
   return {

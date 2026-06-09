@@ -16,12 +16,11 @@ vi.mock('@/plugins/stage-zoom/stage-zoom', () => ({
 }));
 vi.mock('konva', () => ({ default: {} }));
 
+import { type R } from '../../__tests__/shared/action.test-helpers';
 import { WeaveFitToSelectionToolAction } from '../fit-to-selection-tool';
 import { FIT_TO_SELECTION_TOOL_ACTION_NAME } from '../constants';
 
 // ─── helpers ──────────────────────────────────────────────────────────────────
-
-type R = Record<string, unknown>;
 
 function makeMockZoomPlugin() {
   return { fitToSelection: vi.fn() };

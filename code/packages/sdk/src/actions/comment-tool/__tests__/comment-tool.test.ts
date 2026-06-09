@@ -41,6 +41,7 @@ if (typeof (globalThis as Record<string, unknown>)['window'] === 'undefined') {
   (globalThis as Record<string, unknown>)['window'] = globalThis;
 }
 
+import { type R } from '../../__tests__/shared/action.test-helpers';
 import { WeaveCommentToolAction } from '../comment-tool';
 import {
   WEAVE_COMMENT_TOOL_ACTION_NAME,
@@ -50,8 +51,6 @@ import {
 import { mergeExceptArrays } from '@/utils/utils';
 import { extractCursorUrl } from '@/utils/cursors';
 import Konva from 'konva';
-
-type R = Record<string, unknown>;
 
 const mockParams = {
   config: {

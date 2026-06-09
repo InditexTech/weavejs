@@ -16,11 +16,10 @@ if (typeof (globalThis as Record<string, unknown>)['window'] === 'undefined') {
   (globalThis as Record<string, unknown>)['window'] = globalThis;
 }
 
+import { type R } from '../../__tests__/shared/action.test-helpers';
 import { WeaveMoveToolAction } from '../move-tool';
 import { MOVE_TOOL_ACTION_NAME, MOVE_TOOL_STATE } from '../constants';
 import { SELECTION_TOOL_ACTION_NAME } from '../../selection-tool/constants';
-
-type R = Record<string, unknown>;
 
 function makeTransformer() {
   return {

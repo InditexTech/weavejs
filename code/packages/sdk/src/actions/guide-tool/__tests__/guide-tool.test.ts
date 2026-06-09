@@ -44,6 +44,7 @@ if (typeof (globalThis as Record<string, unknown>)['window'] === 'undefined') {
   (globalThis as Record<string, unknown>)['window'] = globalThis;
 }
 
+import { type R } from '../../__tests__/shared/action.test-helpers';
 import { WeaveGuideToolAction } from '../guide-tool';
 import {
   DEFAULT_GUIDE_TOOL_ACTION_CONFIG,
@@ -58,8 +59,6 @@ import {
 import { WEAVE_NODES_SELECTION_KEY } from '@/plugins/nodes-selection/constants';
 
 // ─── helpers ──────────────────────────────────────────────────────────────────
-
-type R = Record<string, unknown>;
 
 function makeNonMainContainer(
   id = 'c1',

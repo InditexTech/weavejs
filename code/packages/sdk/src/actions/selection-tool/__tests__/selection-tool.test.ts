@@ -12,13 +12,12 @@ vi.mock('@/plugins/nodes-selection/nodes-selection', () => ({
 }));
 vi.mock('konva', () => ({ default: {} }));
 
+import { type R } from '../../__tests__/shared/action.test-helpers';
 import { WeaveSelectionToolAction } from '../selection-tool';
 import {
   SELECTION_TOOL_ACTION_NAME,
   SELECTION_TOOL_STATE,
 } from '../constants';
-
-type R = Record<string, unknown>;
 
 function makeTransformer() {
   return { show: vi.fn(), hide: vi.fn() };

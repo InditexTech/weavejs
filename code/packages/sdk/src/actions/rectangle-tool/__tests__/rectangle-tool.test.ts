@@ -51,13 +51,12 @@ if (typeof (globalThis as Record<string, unknown>)['window'] === 'undefined') {
   (globalThis as Record<string, unknown>)['window'] = globalThis;
 }
 
+import { makePointerEvent, type R } from '../../__tests__/shared/action.test-helpers';
 import { WeaveRectangleToolAction } from '../rectangle-tool';
 import { RECTANGLE_TOOL_ACTION_NAME, RECTANGLE_TOOL_STATE } from '../constants';
 import { SELECTION_TOOL_ACTION_NAME } from '../../selection-tool/constants';
 
 // ─── helpers ──────────────────────────────────────────────────────────────────
-
-type R = Record<string, unknown>;
 
 function makeContainer(id = 'layer-id') {
   return {
@@ -135,25 +134,6 @@ function makeNodeHandler() {
   return {
     create: vi.fn().mockReturnValue(mockNode),
     _mockNode: mockNode,
-  };
-}
-
-function makePointerEvent(overrides: Partial<{
-  pointerId: number;
-  clientX: number;
-  clientY: number;
-  buttons: number;
-  pointerType: string;
-}> = {}) {
-  return {
-    evt: {
-      pointerId: 1,
-      clientX: 50,
-      clientY: 75,
-      buttons: 1,
-      pointerType: 'mouse',
-      ...overrides,
-    },
   };
 }
 
@@ -275,7 +255,6 @@ describe('WeaveRectangleToolAction', () => {
       triggerAction();
       expect(mockWeave._selectionPlugin.setSelectedNodes).not.toHaveBeenCalled();
     });
-
 
     it('4.8 after trigger → state=ADDING, clickPoint=null', () => {
       triggerAction();

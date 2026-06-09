@@ -56,6 +56,7 @@ if (typeof (globalThis as Record<string, unknown>)['window'] === 'undefined') {
   (globalThis as Record<string, unknown>)['window'] = globalThis;
 }
 
+import { type R } from '../../__tests__/shared/action.test-helpers';
 import { WeaveBrushToolAction } from '../brush-tool';
 import {
   BRUSH_TOOL_ACTION_NAME,
@@ -66,8 +67,6 @@ import { SELECTION_TOOL_ACTION_NAME } from '../../selection-tool/constants';
 import simplify from 'simplify-js';
 
 // ─── helpers ──────────────────────────────────────────────────────────────────
-
-type R = Record<string, unknown>;
 
 function makeMockMeasureContainer() {
   return {

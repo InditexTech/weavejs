@@ -44,6 +44,7 @@ if (typeof (globalThis as Record<string, unknown>)['window'] === 'undefined') {
   (globalThis as Record<string, unknown>)['window'] = globalThis;
 }
 
+import { makeContainer, makeMeasureContainer, makePointerEvent, type R } from '../../__tests__/shared/action.test-helpers';
 import { WeaveLineToolAction } from '../line-tool';
 import {
   LINE_TOOL_ACTION_NAME,
@@ -51,16 +52,6 @@ import {
   LINE_TOOL_STATE,
 } from '../constants';
 import { SELECTION_TOOL_ACTION_NAME } from '../../selection-tool/constants';
-
-type R = Record<string, unknown>;
-
-function makeContainer(id = 'layer-id') {
-  return { getAttrs: vi.fn().mockReturnValue({ id }) };
-}
-
-function makeMeasureContainer() {
-  return { add: vi.fn() };
-}
 
 function makeNodeHandler() {
   const mockNode = { getAttrs: vi.fn().mockReturnValue({ id: 'test-uuid' }) };
@@ -121,13 +112,6 @@ function makeMockWeave() {
   };
 }
 
-function makePointerEvent(
-  overrides: Partial<{ pointerId: number; clientX: number; clientY: number }> = {}
-) {
-  return {
-    evt: { pointerId: 1, clientX: 50, clientY: 75, ...overrides },
-  };
-}
 
 describe('WeaveLineToolAction', () => {
   let action: WeaveLineToolAction;

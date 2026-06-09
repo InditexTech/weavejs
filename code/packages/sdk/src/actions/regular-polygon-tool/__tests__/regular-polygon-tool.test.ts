@@ -19,6 +19,7 @@ if (typeof (globalThis as Record<string, unknown>)['window'] === 'undefined') {
   (globalThis as Record<string, unknown>)['window'] = globalThis;
 }
 
+import { makeContainer, makePointerEvent, type R } from '../../__tests__/shared/action.test-helpers';
 import { WeaveRegularPolygonToolAction } from '../regular-polygon-tool';
 import {
   REGULAR_POLYGON_TOOL_ACTION_NAME,
@@ -27,12 +28,6 @@ import {
 import { SELECTION_TOOL_ACTION_NAME } from '../../selection-tool/constants';
 
 // ─── helpers ──────────────────────────────────────────────────────────────────
-
-type R = Record<string, unknown>;
-
-function makeContainer(id = 'layer-id') {
-  return { getAttrs: vi.fn().mockReturnValue({ id }) };
-}
 
 function makeMockPolygon() {
   return {
@@ -97,25 +92,6 @@ function makeMockWeave() {
     _selectionPlugin: selectionPlugin,
     _defaultContainer: defaultContainer,
     _mockPolygon: mockPolygon,
-  };
-}
-
-function makePointerEvent(overrides: Partial<{
-  pointerId: number;
-  clientX: number;
-  clientY: number;
-  buttons: number;
-  pointerType: string;
-}> = {}) {
-  return {
-    evt: {
-      pointerId: 1,
-      clientX: 50,
-      clientY: 75,
-      buttons: 1,
-      pointerType: 'mouse',
-      ...overrides,
-    },
   };
 }
 
@@ -236,7 +212,6 @@ describe('WeaveRegularPolygonToolAction', () => {
       triggerAction();
       expect(mockWeave._selectionPlugin.setSelectedNodes).not.toHaveBeenCalled();
     });
-
 
     it('4.8 after trigger → state=ADDING, clickPoint=null', () => {
       triggerAction();

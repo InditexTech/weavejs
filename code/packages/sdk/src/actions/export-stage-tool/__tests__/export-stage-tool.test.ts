@@ -13,6 +13,7 @@ vi.mock('@/plugins/nodes-selection/nodes-selection', () => ({
 }));
 vi.mock('konva', () => ({ default: {} }));
 
+import { type R } from '../../__tests__/shared/action.test-helpers';
 import { WeaveExportStageToolAction } from '../export-stage-tool';
 import { EXPORT_STAGE_TOOL_ACTION_NAME } from '../constants';
 import { SELECTION_TOOL_ACTION_NAME } from '../../selection-tool/constants';
@@ -23,8 +24,6 @@ import {
 } from '@inditextech/weave-types';
 
 // ─── helpers ──────────────────────────────────────────────────────────────────
-
-type R = Record<string, unknown>;
 
 const MOCK_IMG = { src: 'data:image/png;base64,abc' } as HTMLImageElement;
 const MOCK_CHILDREN = [{ id: 'node-1' }, { id: 'node-2' }];

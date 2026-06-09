@@ -8,9 +8,8 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 
 vi.mock('@/weave', () => ({ Weave: class Weave {} }));
 
+import { type R } from './shared/action.test-helpers';
 import { WeaveAction } from '../action';
-
-type R = Record<string, unknown>;
 
 // Minimal concrete subclass for testing the abstract base class
 class TestAction extends WeaveAction {
