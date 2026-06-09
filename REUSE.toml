@@ -42,6 +42,8 @@ path = [
     "code/lerna.json",
     "code/nx.json",
     "code/tsconfig.base.json",
+    "code/.agents/**",
+    "code/skills-lock.json"
 
     # docs/ directory licensing
     "docs/**",
