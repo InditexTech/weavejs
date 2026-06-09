@@ -55,7 +55,7 @@ function makeWeave(stage: ReturnType<typeof makeStage>, plugins: Record<string, 
     getStage: vi.fn().mockReturnValue(stage),
     getPlugins: vi.fn().mockReturnValue(plugins),
     emitEvent: vi.fn(),
-    getEventsController: vi.fn().mockReturnValue(undefined),
+    getEventsController: vi.fn().mockReturnValue(new AbortController()),
     getChildLogger: vi.fn().mockReturnValue({
       debug: vi.fn(),
       info: vi.fn(),

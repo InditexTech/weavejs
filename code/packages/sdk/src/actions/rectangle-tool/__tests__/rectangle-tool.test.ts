@@ -276,10 +276,6 @@ describe('WeaveRectangleToolAction', () => {
       expect(mockWeave._selectionPlugin.setSelectedNodes).not.toHaveBeenCalled();
     });
 
-    it('4.7 getEventsController returns null → no throw', () => {
-      mockWeave.getEventsController.mockReturnValue(null);
-      expect(() => triggerAction()).not.toThrow();
-    });
 
     it('4.8 after trigger → state=ADDING, clickPoint=null', () => {
       triggerAction();

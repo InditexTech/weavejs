@@ -125,7 +125,7 @@ export class WeaveBrushToolAction extends WeaveAction {
           this.isSpacePressed = false;
         }
       },
-      { signal: this.instance.getEventsController()?.signal }
+      { signal: this.instance.getEventsController().signal }
     );
 
     window.addEventListener(
@@ -155,7 +155,7 @@ export class WeaveBrushToolAction extends WeaveAction {
           this.cancelAction();
         }
       },
-      { signal: this.instance.getEventsController()?.signal }
+      { signal: this.instance.getEventsController().signal }
     );
 
     const handlePointerDown = (e: Konva.KonvaEventObject<PointerEvent>) => {

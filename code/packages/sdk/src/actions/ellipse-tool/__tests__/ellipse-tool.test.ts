@@ -304,15 +304,6 @@ describe('WeaveEllipseToolAction', () => {
       expect(pointers.get(42)).toEqual({ x: 5, y: 7 });
     });
 
-    it('5.5 getEventsController() returns null → setupEvents does not throw', () => {
-      // Create a fresh action with getEventsController returning null
-      const freshAction = new WeaveEllipseToolAction();
-      const freshMock = makeMockWeave();
-      freshMock.getEventsController.mockReturnValue(null);
-      (freshAction as unknown as R)['instance'] = freshMock;
-      (freshAction as unknown as R)['cancelAction'] = vi.fn();
-      expect(() => freshAction.trigger(vi.fn())).not.toThrow();
-    });
   });
 
   // ── Suite 6: setupEvents – pointermove ────────────────────────────────────

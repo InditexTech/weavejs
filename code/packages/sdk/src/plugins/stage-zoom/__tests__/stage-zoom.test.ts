@@ -92,7 +92,7 @@ function makeMockWeave(stage = makeMockStage(), mainLayer: ReturnType<typeof mak
     getPlugin: vi.fn().mockReturnValue(undefined),
     getPlugins: vi.fn().mockReturnValue({}),
     emitEvent: vi.fn(),
-    getEventsController: vi.fn().mockReturnValue(undefined),
+    getEventsController: vi.fn().mockReturnValue(new AbortController()),
     getClosestParentWithWeaveId: vi.fn().mockReturnValue(stage._container),
     getChildLogger: vi.fn().mockReturnValue({
       debug: vi.fn(), info: vi.fn(), warn: vi.fn(), error: vi.fn(),

@@ -188,7 +188,7 @@ export class WeaveCommentToolAction<T> extends WeaveAction {
           this.setState(WEAVE_COMMENT_TOOL_STATE.ADDING);
         }
       },
-      { signal: this.instance.getEventsController()?.signal }
+      { signal: this.instance.getEventsController().signal }
     );
 
     stage.on('pointermove', (e) => {

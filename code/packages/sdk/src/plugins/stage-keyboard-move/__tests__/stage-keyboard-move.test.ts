@@ -35,7 +35,7 @@ function makeWeave(opts: { nodes?: ReturnType<typeof makeNode>[]; nodeHandler?: 
     getNodeHandler: vi.fn().mockReturnValue(opts.nodeHandler ?? undefined),
     updateNode: vi.fn(),
     emitEvent: vi.fn(),
-    getEventsController: vi.fn().mockReturnValue(undefined),
+    getEventsController: vi.fn().mockReturnValue(new AbortController()),
     getStage: vi.fn().mockReturnValue({ container: vi.fn().mockReturnValue({ style: {} }) }),
     getChildLogger: vi.fn().mockReturnValue({
       debug: vi.fn(),

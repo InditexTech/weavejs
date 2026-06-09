@@ -111,7 +111,7 @@ export class WeaveConnectorToolAction extends WeaveAction {
           this.cancelAction();
         }
       },
-      { signal: this.instance.getEventsController()?.signal }
+      { signal: this.instance.getEventsController().signal }
     );
 
     let nodeHovered: Konva.Node | undefined = undefined;

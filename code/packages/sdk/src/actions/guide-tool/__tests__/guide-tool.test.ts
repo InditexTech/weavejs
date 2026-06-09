@@ -298,13 +298,6 @@ describe('WeaveGuideToolAction', () => {
       expect(mockWeave._stage.on).toHaveBeenCalledTimes(2);
     });
 
-    it('5.6 getEventsController returns null → no throw', () => {
-      mockWeave.getEventsController.mockReturnValue(null);
-      action.onInit();
-      expect(() =>
-        action.trigger(vi.fn(), { orientation: GUIDE_ORIENTATION.VERTICAL })
-      ).not.toThrow();
-    });
   });
 
   // ── Suite 6: keyup window listener ────────────────────────────────────────

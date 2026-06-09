@@ -94,7 +94,7 @@ export class WeaveStrokeSingleNode extends WeaveNode {
           this.shiftPressed = true;
         }
       },
-      { signal: this.instance.getEventsController()?.signal }
+      { signal: this.instance.getEventsController().signal }
     );
 
     window.addEventListener(
@@ -104,7 +104,7 @@ export class WeaveStrokeSingleNode extends WeaveNode {
           this.shiftPressed = false;
         }
       },
-      { signal: this.instance.getEventsController()?.signal }
+      { signal: this.instance.getEventsController().signal }
     );
 
     this.eventsInitialized = true;

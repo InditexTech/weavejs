@@ -24,7 +24,7 @@ function makeWeave() {
   };
   const weave = {
     getStage: vi.fn().mockReturnValue({ container: vi.fn().mockReturnValue(container) }),
-    getEventsController: vi.fn().mockReturnValue(undefined),
+    getEventsController: vi.fn().mockReturnValue(new AbortController()),
     emitEvent: vi.fn(),
     getChildLogger: vi.fn().mockReturnValue({
       debug: vi.fn(), info: vi.fn(), warn: vi.fn(), error: vi.fn(),

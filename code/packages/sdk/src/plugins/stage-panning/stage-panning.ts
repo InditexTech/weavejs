@@ -113,7 +113,7 @@ export class WeaveStagePanningPlugin extends WeavePlugin {
           this.setCursor();
         }
       },
-      { signal: this.instance.getEventsController()?.signal }
+      { signal: this.instance.getEventsController().signal }
     );
 
     window.addEventListener(
@@ -127,7 +127,7 @@ export class WeaveStagePanningPlugin extends WeavePlugin {
           this.disableMove();
         }
       },
-      { signal: this.instance.getEventsController()?.signal }
+      { signal: this.instance.getEventsController().signal }
     );
 
     let lastPos: Konva.Vector2d | null = null;
@@ -283,7 +283,7 @@ export class WeaveStagePanningPlugin extends WeavePlugin {
 
     window.addEventListener('wheel', handleWheelThrottled, {
       passive: true,
-      signal: this.instance.getEventsController()?.signal,
+      signal: this.instance.getEventsController().signal,
     });
 
     stage.on('dragstart', (e) => {
@@ -372,7 +372,7 @@ export class WeaveStagePanningPlugin extends WeavePlugin {
       function (e) {
         e.preventDefault();
       },
-      { passive: false, signal: this.instance.getEventsController()?.signal }
+      { passive: false, signal: this.instance.getEventsController().signal }
     );
   }
 

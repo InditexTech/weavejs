@@ -118,6 +118,7 @@ function createMockInstance() {
     getUtilityLayer: vi.fn().mockReturnValue(mockUtilityLayer),
     getPlugin: vi.fn().mockReturnValue(null),
     getEventsController: vi.fn().mockReturnValue({ signal: undefined }),
+    isServerSide: vi.fn().mockReturnValue(false),
     addEventListener: vi.fn(),
     removeEventListener: vi.fn(),
     emitEvent: vi.fn(),

@@ -129,7 +129,7 @@ export class WeaveStrokeToolAction extends WeaveAction {
           this.shiftPressed = true;
         }
       },
-      { signal: this.instance.getEventsController()?.signal }
+      { signal: this.instance.getEventsController().signal }
     );
 
     window.addEventListener(
@@ -142,7 +142,7 @@ export class WeaveStrokeToolAction extends WeaveAction {
           this.shiftPressed = false;
         }
       },
-      { signal: this.instance.getEventsController()?.signal }
+      { signal: this.instance.getEventsController().signal }
     );
 
     stage.on('pointerdown', (e) => {

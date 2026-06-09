@@ -260,14 +260,6 @@ describe('WeaveEraserToolAction', () => {
       expect(cancelAction).not.toHaveBeenCalled();
     });
 
-    it('5.4 getEventsController() returns null → setupEvents does not throw', () => {
-      const freshAction = new WeaveEraserToolAction();
-      const freshMock = makeMockWeave();
-      freshMock.getEventsController.mockReturnValue(null);
-      (freshAction as unknown as R)['instance'] = freshMock;
-      (freshAction as unknown as R)['cancelAction'] = vi.fn();
-      expect(() => freshAction.trigger(vi.fn())).not.toThrow();
-    });
   });
 
   // ── Suite 6: trigger ──────────────────────────────────────────────────────

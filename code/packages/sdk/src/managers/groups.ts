@@ -115,11 +115,7 @@ export class WeaveGroupsManager {
         selectionPlugin.setSelectedNodes([]);
       }
 
-      let parentNodeId = parentId ?? WEAVE_NODE_LAYER_ID;
-      if (typeof parentNodeId === 'undefined') {
-        parentNodeId = WEAVE_NODE_LAYER_ID;
-      }
-
+      const parentNodeId = parentId ?? WEAVE_NODE_LAYER_ID;
       const parentLayer = stage.findOne(`#${parentNodeId}`) as
         | Konva.Layer
         | Konva.Group

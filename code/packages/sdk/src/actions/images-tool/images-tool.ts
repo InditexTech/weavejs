@@ -154,7 +154,7 @@ export class WeaveImagesToolAction extends WeaveAction {
           this.cancelAction();
         }
       },
-      { signal: this.instance.getEventsController()?.signal }
+      { signal: this.instance.getEventsController().signal }
     );
 
     stage.on('pointerdown', (e) => {
