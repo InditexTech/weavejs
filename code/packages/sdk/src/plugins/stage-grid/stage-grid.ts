@@ -95,7 +95,7 @@ export class WeaveStageGridPlugin extends WeavePlugin {
           this.isSpaceKeyPressed = true;
         }
       },
-      { signal: this.instance.getEventsController()?.signal }
+      { signal: this.instance.getEventsController().signal }
     );
 
     window.addEventListener(
@@ -105,7 +105,7 @@ export class WeaveStageGridPlugin extends WeavePlugin {
           this.isSpaceKeyPressed = false;
         }
       },
-      { signal: this.instance.getEventsController()?.signal }
+      { signal: this.instance.getEventsController().signal }
     );
 
     this.instance.addEventListener('onStageMove', () => {

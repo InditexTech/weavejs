@@ -90,7 +90,7 @@ export class WeaveMeasureToolAction extends WeaveAction {
           this.cancelAction();
         }
       },
-      { signal: this.instance.getEventsController()?.signal }
+      { signal: this.instance.getEventsController().signal }
     );
 
     stage.on('pointermove', () => {

@@ -90,7 +90,7 @@ export class WeaveGuideToolAction extends WeaveAction {
         }
       },
       {
-        signal: this.instance.getEventsController()?.signal,
+        signal: this.instance.getEventsController().signal,
       }
     );
 
@@ -125,7 +125,7 @@ export class WeaveGuideToolAction extends WeaveAction {
           }
         }
       },
-      { signal: this.instance.getEventsController()?.signal }
+      { signal: this.instance.getEventsController().signal }
     );
 
     stage.on('pointermove', (e) => {

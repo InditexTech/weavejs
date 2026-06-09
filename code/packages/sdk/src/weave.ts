@@ -1616,7 +1616,11 @@ export class Weave {
 
   // EVENTS CONTROLLER METHODS
 
-  getEventsController(): AbortController | undefined {
+  getEventsController(): AbortController {
+    if (!this.eventsController) {
+      throw new Error('Events controller not initialized');
+    }
+
     return this.eventsController;
   }
 

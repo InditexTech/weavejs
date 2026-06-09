@@ -48,7 +48,12 @@ path = [
     "docs-old/**",
 
     # code/patches/ directory licensing
-    "code/patches/**"
+    "code/patches/**",
+
+    # agents files
+    "AGENTS.md",
+    "code/.agents/**",
+    "code/skills-lock.json"
 ]
 SPDX-FileCopyrightText = "2025 INDUSTRIA DE DISEÑO TEXTIL S.A. (INDITEX S.A.)"
 SPDX-License-Identifier = "Apache-2.0"

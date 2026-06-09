@@ -130,7 +130,7 @@ export class WeaveImageToolAction extends WeaveAction {
           return;
         }
       },
-      { signal: this.instance.getEventsController()?.signal }
+      { signal: this.instance.getEventsController().signal }
     );
 
     stage.on('pointerdown', (e) => {

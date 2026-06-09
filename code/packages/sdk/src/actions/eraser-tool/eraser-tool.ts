@@ -81,7 +81,7 @@ export class WeaveEraserToolAction extends WeaveAction {
           return;
         }
       },
-      { signal: this.instance.getEventsController()?.signal }
+      { signal: this.instance.getEventsController().signal }
     );
 
     this.initialized = true;

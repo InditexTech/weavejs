@@ -65,7 +65,7 @@ export class WeaveStageResizePlugin extends WeavePlugin {
       () => {
         throttledResize();
       },
-      { signal: this.instance.getEventsController()?.signal }
+      { signal: this.instance.getEventsController().signal }
     );
 
     // Resize when stage container is resized

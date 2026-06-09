@@ -5,8 +5,6 @@
 import {
   type WeaveSelection,
   type NodeSerializable,
-  WEAVE_NODE_CUSTOM_EVENTS,
-  type WeaveElementInstance,
   type WeaveStateElement,
 } from '@inditextech/weave-types';
 import Konva from 'konva';
@@ -19,69 +17,54 @@ import {
 import {
   type WeaveNodesSelectionConfig,
   type WeaveNodesSelectionPluginOnNodesChangeEvent,
-  type WeaveNodesSelectionPluginOnSelectionStateEvent,
   type WeaveNodesSelectionPluginParams,
 } from './types';
-import { WeaveContextMenuPlugin } from '../context-menu/context-menu';
 import { type WeaveNode } from '@/nodes/node';
 import type { WeaveCopyPasteNodesPlugin } from '../copy-paste-nodes/copy-paste-nodes';
-import {
-  clearContainerTargets,
-  containerOverCursor,
-  getTargetedNode,
-  hasFrames,
-  intersectArrays,
-  mergeExceptArrays,
-  moveNodeToContainerNT,
-} from '@/utils/utils';
+import { mergeExceptArrays, intersectArrays } from '@/utils/utils';
 import { WEAVE_USERS_SELECTION_KEY } from '../users-selection/constants';
 import type { WeaveUsersSelectionPlugin } from '../users-selection/users-selection';
-import type { KonvaEventObject } from 'konva/lib/Node';
 import throttle from 'lodash/throttle';
 import type { Stage } from 'konva/lib/Stage';
 import { WEAVE_STAGE_DEFAULT_MODE } from '@/nodes/stage/constants';
 import type { TransformerConfig } from 'konva/lib/shapes/Transformer';
 import { SELECTION_TOOL_ACTION_NAME } from '@/actions/selection-tool/constants';
-import { WEAVE_CONTEXT_MENU_PLUGIN_KEY } from '../context-menu/constants';
-import { WEAVE_STAGE_GRID_PLUGIN_KEY } from '../stage-grid/constants';
-import type { WeaveStageGridPlugin } from '../stage-grid/stage-grid';
-import type { WeaveStagePanningPlugin } from '../stage-panning/stage-panning';
-import { WEAVE_STAGE_PANNING_KEY } from '../stage-panning/constants';
-import type { WeaveNodesMultiSelectionFeedbackPlugin } from '../nodes-multi-selection-feedback/nodes-multi-selection-feedback';
-import { WEAVE_NODES_MULTI_SELECTION_FEEDBACK_PLUGIN_KEY } from '../nodes-multi-selection-feedback/constants';
-import type { WeaveNodeChangedContainerEvent } from '@/nodes/types';
-import type { WeaveUsersPresencePlugin } from '../users-presence/users-presence';
-import { WEAVE_USERS_PRESENCE_PLUGIN_KEY } from '../users-presence/constants';
 import { DEFAULT_THROTTLE_MS } from '@/constants';
 
-export class WeaveNodesSelectionPlugin extends WeavePlugin {
-  private tr!: Konva.Transformer;
-  private trHover!: Konva.Transformer;
+import { GestureDetector } from './gesture-detector';
+import { EdgePanning } from './edge-panning';
+import { AreaSelector } from './area-selection';
+import { TransformerController } from './transformer-controller';
+import type { TransformerCallbacks } from './transformer-controller';
+import {
+  getContextMenuPlugin,
+  getStageGridPlugin,
+  getStagePanningPlugin,
+  getNodesSelectionFeedbackPlugin,
+  getUsersPresencePlugin,
+} from './plugin-accessors';
+import type { SelectionContext } from './selection-context';
+import {
+  registerKeyboardHandlers,
+  handlePointerDown,
+  handlePointerMove,
+  handlePointerUp,
+} from './events';
+
+export class WeaveNodesSelectionPlugin extends WeavePlugin implements SelectionContext {
+  readonly gesture = new GestureDetector();
+  private edgePanning!: EdgePanning;
+  private areaSelector!: AreaSelector;
+  private transformerCtrl!: TransformerController;
+
   private config!: WeaveNodesSelectionConfig;
-  private selectionRectangle!: Konva.Rect;
   private active!: boolean;
-  private defaultEnabledAnchors!: string[];
+  private _defaultEnabledAnchors!: string[];
   private selecting!: boolean;
-  private didMove!: boolean;
   private initialized!: boolean;
-  private isSpaceKeyPressed!: boolean;
-  protected taps!: number;
-  protected isDoubleTap!: boolean;
-  protected previousTap!: { x: number; y: number; time: number } | null;
-  protected tapStart!: { x: number; y: number; time: number } | null;
-  protected tapTimeoutId!: NodeJS.Timeout | null;
-  private x1!: number;
-  private y1!: number;
-  private x2!: number;
-  private y2!: number;
-  private selectionStart: { x: number; y: number } | null = null;
-  private panSpeed = { x: 0, y: 0 };
-  private readonly panDirection = { x: 0, y: 0 };
-  private pointers!: Record<string, PointerEvent>;
-  private panLoopId: number | null = null;
-  private prevSelectedNodes: Konva.Node[] = [];
-  private handledClickOrTap: boolean = false;
-  private dragInProcess: boolean = false;
+  private _isSpaceKeyPressed!: boolean;
+  private pointers!: Record<number, PointerEvent>;
+  private _handledClickOrTap: boolean = false;
   private dragSelectedNodes: Konva.Node[] = [];
   private transformInProcess: boolean = false;
   private serializedSelectedNodes: WeaveSelection[] = [];
@@ -100,7 +83,7 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
   }
 
   initialize(): void {
-    this.defaultEnabledAnchors = this.config.selection?.enabledAnchors ?? [
+    this._defaultEnabledAnchors = this.config.selection?.enabledAnchors ?? [
       'top-left',
       'top-center',
       'top-right',
@@ -110,19 +93,13 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
       'bottom-center',
       'bottom-right',
     ];
-    this.taps = 0;
-    this.isSpaceKeyPressed = false;
-    this.isDoubleTap = false;
-    this.tapStart = null;
-    this.previousTap = null;
+    this.gesture.reset();
+    this._isSpaceKeyPressed = false;
     this.active = false;
-    this.didMove = false;
     this.selecting = false;
     this.initialized = false;
     this.enabled = false;
     this.pointers = {};
-    this.panLoopId = null;
-    this.tapTimeoutId = null;
     this.dragSelectedNodes = [];
     this.dragInProcess = false;
   }
@@ -1258,273 +1235,263 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
       this.panLoopId = requestAnimationFrame(() => this.panLoop());
     });
 
-    const handleMouseMove = (
-      e: KonvaEventObject<PointerEvent, Konva.Stage>
-    ) => {
-      if (!e?.evt) return;
+  getName(): string {
+    return WEAVE_NODES_SELECTION_KEY;
+  }
 
-      const moved = this.checkMoved(e);
+  getLayerName(): string {
+    return WEAVE_NODES_SELECTION_LAYER_ID;
+  }
 
-      if (e.evt?.buttons === 0) {
-        return;
-      }
+  getConfiguration(): WeaveNodesSelectionConfig {
+    return this.config;
+  }
 
-      if (
-        e.evt.pointerType === 'touch' &&
-        Object.keys(this.pointers).length > 1
-      ) {
-        return;
-      }
+  // ── SelectionContext accessors ──────────────────────────────────────────────
 
-      if (!this.initialized) {
-        return;
-      }
+  getWeaveInstance() {
+    return this.instance;
+  }
 
-      if (!this.active) {
-        return;
-      }
+  getGesture(): GestureDetector {
+    return this.gesture;
+  }
 
-      const contextMenuPlugin = this.getContextMenuPlugin();
-      if (moved) {
-        contextMenuPlugin?.cancelLongPressTimer();
-      } else {
-        this.hideSelectorArea();
-      }
+  getAreaSelector(): AreaSelector {
+    return this.areaSelector;
+  }
 
-      if (contextMenuPlugin?.isContextMenuVisible()) {
-        this.stopPanLoop();
-      }
+  getEdgePanning(): EdgePanning {
+    return this.edgePanning;
+  }
 
-      if (this.isSpaceKeyPressed) {
-        return;
-      }
+  getTransformerController(): TransformerController {
+    return this.transformerCtrl;
+  }
 
-      // do nothing if we didn't start selection
-      if (!this.selecting) {
-        return;
-      }
+  getDefaultEnabledAnchors(): string[] {
+    return this._defaultEnabledAnchors;
+  }
 
-      this.updateSelectionRect();
-      this.updatePanDirection();
+  isInitialized(): boolean {
+    return this.initialized;
+  }
+
+  isActive(): boolean {
+    return this.active;
+  }
+
+  getSpaceKeyPressedState(): boolean {
+    return this._isSpaceKeyPressed;
+  }
+
+  setSpaceKeyPressed(val: boolean): void {
+    this._isSpaceKeyPressed = val;
+  }
+
+  getPointerCount(): number {
+    return Object.keys(this.pointers).length;
+  }
+
+  registerPointer(id: number, evt: PointerEvent): void {
+    this.pointers[id] = evt;
+  }
+
+  unregisterPointer(id: number): void {
+    delete this.pointers[id];
+  }
+
+  wasClickOrTapHandled(): boolean {
+    return this._handledClickOrTap;
+  }
+
+  setClickOrTapHandled(val: boolean): void {
+    this._handledClickOrTap = val;
+  }
+
+  setAreaSelecting(val: boolean): void {
+    this.selecting = val;
+  }
+
+  // ────────────────────────────────────────────────────────────────────────────
+
+  initLayer(): void {
+    const stage = this.instance.getStage();
+    const layer = new Konva.Layer({ id: this.getLayerName() });
+    stage.add(layer);
+  }
+
+  isPasting(): boolean {
+    const copyPastePlugin =
+      this.instance.getPlugin<WeaveCopyPasteNodesPlugin>('copyPasteNodes');
+    if (!copyPastePlugin) return false;
+    return copyPastePlugin.isPasting();
+  }
+
+  isAreaSelecting(): boolean {
+    return this.selecting;
+  }
+
+  isSelecting(): boolean {
+    return this.instance.getActiveAction() === SELECTION_TOOL_ACTION_NAME;
+  }
+
+  isNodeSelected(ele: Konva.Node): boolean {
+    return (
+      this.getSelectedNodes().length === 1 &&
+      this.getSelectedNodes()[0].getAttrs().id === ele.getAttrs().id
+    );
+  }
+
+  onInit(): void {
+    const stage = this.instance.getStage();
+    const selectionLayer = this.getLayer()!;
+
+    stage.container().tabIndex = 1;
+    stage.container().focus();
+
+    // AreaSelector — manages the visual selection rectangle
+    this.areaSelector = new AreaSelector();
+    this.areaSelector.init(selectionLayer, this.config.selectionArea, stage.scaleX());
+
+    // EdgePanning — handles auto-scroll when pointer reaches canvas edge during selection
+    this.edgePanning = new EdgePanning(this.config.panningWhenSelection, {
+      getStage: () => this.instance.getStage() as unknown as Stage,
+      isSelecting: () => this.isAreaSelecting(),
+      onTick: (dx, dy) => {
+        if (this.areaSelector.selectionStart) {
+          this.areaSelector.selectionStart.x += dx;
+          this.areaSelector.selectionStart.y += dy;
+        }
+        this.getStageGridPlugin()?.onRender();
+        this.areaSelector.update(
+          this.instance.getStage() as unknown as Stage,
+          () => this.selectNone()
+        );
+      },
+    });
+
+    // TransformerController — creates transformers and registers all transformer events
+    const callbacks: TransformerCallbacks = {
+      isSelecting: () => this.isSelecting(),
+      setSelectedNodes: (nodes) => this.setSelectedNodes(nodes),
+      triggerSelectedNodesEvent: () => this.triggerSelectedNodesEvent(),
+      saveDragSelectedNodes: () => this.saveDragSelectedNodes(),
+      setNodesOpacityOnDrag: () => this.setNodesOpacityOnDrag(),
+      disablePlugin: () => this.disable(),
+      enablePlugin: () => this.enable(),
+      getContextMenuPlugin: () => this.getContextMenuPlugin(),
+      getUsersPresencePlugin: () => this.getUsersPresencePlugin(),
+      getStagePanningPlugin: () => this.getStagePanningPlugin(),
+      getNodesSelectionFeedbackPlugin: () => this.getNodesSelectionFeedbackPlugin(),
     };
+    this.transformerCtrl = new TransformerController(
+      this.instance,
+      this.config,
+      this.gesture,
+      callbacks
+    );
+    this.transformerCtrl.setup(selectionLayer);
 
-    stage.on('pointermove', throttle(handleMouseMove, DEFAULT_THROTTLE_MS));
-    this.panLoop();
+    this.initEvents();
+    this.initialized = true;
 
-    stage.on('pointerup', (e) => {
-      const store = this.instance.getStore();
-      const actUser = store.getUser();
-
-      this.tr.setAttrs({
-        listening: true,
-      });
-
-      this.selecting = false;
-      this.stopPanLoop();
-
-      const moved = this.checkMoved(e);
-      this.checkDoubleTap(e);
-      delete this.pointers[e.evt.pointerId];
-
-      this.previousTap = this.tapStart;
-
-      if (stage.mode() !== WEAVE_STAGE_DEFAULT_MODE) {
-        return;
+    this.instance.addEventListener(
+      'onActiveActionChange',
+      (activeAction: string | undefined) => {
+        if (
+          typeof activeAction !== 'undefined' &&
+          activeAction !== SELECTION_TOOL_ACTION_NAME
+        ) {
+          this.active = false;
+          return;
+        }
+        this.active = true;
       }
+    );
 
-      const contextMenuPlugin = this.getContextMenuPlugin();
-
-      if (!this.initialized) {
-        this.hideSelectorArea();
-        return;
-      }
-
-      if (!this.active) {
-        this.hideSelectorArea();
-        return;
-      }
-
-      this.instance.emitEvent<WeaveNodesSelectionPluginOnSelectionStateEvent>(
-        'onSelectionState',
-        false
-      );
-
-      if (this.isDoubleTap) {
-        this.hideSelectorArea();
-        this.handleClickOrTap(e);
-        return;
-      }
-
-      const isStage = e.target instanceof Konva.Stage;
-      const isContainerEmptyArea =
-        e.target.getAttrs().isContainerPrincipal !== undefined &&
-        !e.target.getAttrs().isContainerPrincipal;
-
-      if ((isStage || isContainerEmptyArea) && !moved) {
-        this.selecting = false;
-        this.stopPanLoop();
-        this.hideSelectorArea();
-        this.getSelectionPlugin()?.setSelectedNodes([]);
-        return;
-      }
-
-      if (
-        e.evt.pointerType === 'touch' &&
-        Object.keys(this.pointers).length + 1 > 1
-      ) {
-        this.hideSelectorArea();
-        return;
-      }
-
-      if (contextMenuPlugin?.isContextMenuVisible()) {
-        this.stopPanLoop();
-      }
-
-      const selectedGroup = getTargetedNode(this.instance);
-
-      if (
-        !moved &&
-        selectedGroup?.getParent() instanceof Konva.Transformer &&
-        !this.handledClickOrTap
-      ) {
-        this.selecting = false;
-        this.stopPanLoop();
-        this.hideSelectorArea();
-        this.handleClickOrTap(e);
-        return;
-      }
-
-      if (!this.selectionRectangle.visible()) {
-        this.hideSelectorArea();
-        return;
-      }
-
-      const shapes = stage.find((node: Konva.Node) => {
-        return (
-          ['Shape', 'Group'].includes(node.getType()) &&
-          typeof node.getAttrs().id !== 'undefined'
+    this.instance.addEventListener(
+      'onNodeRemoved',
+      (node: NodeSerializable) => {
+        const selectedNodes = this.getSelectedNodes();
+        const newSelectedNodes = selectedNodes.filter(
+          (actNode) => actNode.getAttrs().id !== node.id
         );
-      });
-      const box = this.selectionRectangle.getClientRect();
-      this.selectionRectangle.visible(false);
-      const selected = shapes.filter((shape) => {
-        // Check if mutex lock exists and if exist don't let it select the shape
-        const shapeMutex = this.instance.getNodeMutexLock(shape.id());
-        if (shapeMutex && shapeMutex.user.id !== actUser.id) {
-          return false;
-        }
-
-        let parent = this.instance.getInstanceRecursive(
-          shape.getParent() as Konva.Node
-        );
-
-        if (parent.getAttrs().nodeId) {
-          parent = this.instance
-            .getStage()
-            .findOne(`#${parent.getAttrs().nodeId}`) as Konva.Node;
-        }
-
-        if (
-          shape.getAttrs().nodeType &&
-          shape.getAttrs().nodeType === 'frame'
-        ) {
-          const frameBox = shape.getClientRect();
-          const isContained =
-            frameBox.x >= box.x &&
-            frameBox.y >= box.y &&
-            frameBox.x + frameBox.width <= box.x + box.width &&
-            frameBox.y + frameBox.height <= box.y + box.height;
-          return isContained;
-        }
-        if (
-          shape.getAttrs().nodeType &&
-          shape?.getAttrs().nodeType === 'group' &&
-          ['layer', 'frame'].includes(parent?.getAttrs().nodeType)
-        ) {
-          return (
-            shape.getAttrs().nodeType &&
-            Konva.Util.haveIntersection(box, shape.getClientRect())
-          );
-        }
-        if (
-          shape.getAttrs().nodeType &&
-          shape.getAttrs().nodeType !== 'group' &&
-          ['layer', 'frame'].includes(parent?.getAttrs().nodeType)
-        ) {
-          return (
-            shape.getAttrs().nodeType &&
-            Konva.Util.haveIntersection(box, shape.getClientRect())
-          );
-        }
-        return false;
-      });
-
-      const selectedNodes = new Set<Konva.Node>();
-      const uniqueContainerNodesIds = new Set();
-      const containerNodesIds: string[] = [];
-      const containerNodes: Konva.Node[] = [];
-      const otherNodes: Konva.Node[] = [];
-
-      for (const node of selected) {
-        let realNode = node;
-        if (node.getAttrs().nodeId) {
-          realNode = stage.findOne(`#${node.getAttrs().nodeId}`) as Konva.Node;
-        }
-
-        if (!realNode) continue;
-
-        const isContainer =
-          typeof realNode.getAttrs().isContainerPrincipal !== 'undefined' &&
-          realNode.getAttrs().isContainerPrincipal;
-
-        if (isContainer) {
-          containerNodes.push(realNode);
-          containerNodesIds.push(realNode.getAttrs().id ?? '');
-          uniqueContainerNodesIds.add(realNode.getAttrs().id ?? '');
-
-          if (!realNode.getAttrs().locked) {
-            selectedNodes.add(realNode);
-          }
-        } else {
-          otherNodes.push(realNode);
-        }
-      }
-
-      for (const node of otherNodes) {
-        let parent = this.instance.getInstanceRecursive(
-          node.getParent() as Konva.Node
-        );
-
-        if (parent?.getAttrs().nodeId) {
-          parent = this.instance
-            .getStage()
-            .findOne(`#${parent.getAttrs().nodeId}`) as Konva.Node;
-        }
-
-        if (
-          parent &&
-          !containerNodesIds.includes(parent?.getAttrs().id ?? '') &&
-          !node.getAttrs().locked
-        ) {
-          selectedNodes.add(node);
-        }
-      }
-
-      this.selecting = false;
-      this.stopPanLoop();
-
-      this.tr.nodes([...selectedNodes]);
-
-      this.handleMultipleSelectionBehavior();
-      this.handleBehaviors();
-
-      if (this.tr.nodes().length > 0) {
+        this.setSelectedNodes(newSelectedNodes);
         stage.container().tabIndex = 1;
         stage.container().focus();
+        stage.container().style.cursor = 'default';
       }
+    );
+  }
 
-      this.triggerSelectedNodesEvent();
+  private getLayer() {
+    const stage = this.instance.getStage();
+    return stage.findOne(`#${this.getLayerName()}`) as Konva.Layer | undefined;
+  }
+
+  triggerSelectedNodesEvent(): void {
+    const tr = this.transformerCtrl.getTransformer();
+    const selectedNodes: WeaveSelection[] = tr.getNodes().map((node) => {
+      const nodeType = node.getAttr('nodeType');
+      const nodeHandler = this.instance.getNodeHandler<WeaveNode>(nodeType);
+      return {
+        instance: node as Konva.Shape | Konva.Group,
+        node: nodeHandler?.serialize(node as Konva.Shape | Konva.Group),
+      };
     });
+
+    const usersSelectionPlugin =
+      this.instance.getPlugin<WeaveUsersSelectionPlugin>(WEAVE_USERS_SELECTION_KEY);
+
+    if (usersSelectionPlugin) {
+      requestAnimationFrame(() => {
+        usersSelectionPlugin.sendSelectionAwarenessInfo(tr);
+      });
+    }
+
+    requestAnimationFrame(() => {
+      this.instance.emitEvent<WeaveNodesSelectionPluginOnNodesChangeEvent>(
+        'onNodesChange',
+        selectedNodes
+      );
+    });
+  }
+
+  removeElement(element: WeaveStateElement): void {
+    this.instance.removeNode(element);
+    this.instance.getHooks().callHook('weave:onNodesRemoved', [element]);
+    this.selectNone();
+    this.triggerSelectedNodesEvent();
+  }
+
+  removeSelectedNodes(): void {
+    const selectedNodes = this.getSelectedNodes();
+    const mappedSelectedNodes = selectedNodes
+      .map((node) => {
+        const handler = this.instance.getNodeHandler<WeaveNode>(
+          node.getAttrs().nodeType
+        );
+        return handler?.serialize(node);
+      })
+      .filter((node) => typeof node !== 'undefined');
+    this.instance.removeNodes(mappedSelectedNodes);
+    this.instance.getHooks().callHook('weave:onNodesRemoved', mappedSelectedNodes);
+    this.selectNone();
+    this.triggerSelectedNodesEvent();
+  }
+
+  private initEvents() {
+    this.selecting = false;
+    const stage = this.instance.getStage();
+
+    registerKeyboardHandlers(this);
+
+    stage.on('pointerdown', (e) => handlePointerDown(this, e));
+
+    stage.on('pointermove', throttle((e) => handlePointerMove(this, e), DEFAULT_THROTTLE_MS));
+
+    stage.on('pointerup', (e) => handlePointerUp(this, e));
 
     this.instance.addEventListener('onStateChange', () => {
       requestAnimationFrame(() => {
@@ -1539,29 +1506,23 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
     });
   }
 
-  private handleMultipleSelectionBehavior() {
-    if (
-      this.tr.nodes().length > 1 &&
-      this.config.behaviors?.onMultipleSelection
-    ) {
-      const selectionBehavior = this.config.behaviors?.onMultipleSelection?.(
-        this.tr.nodes()
-      );
-      this.tr.setAttrs(selectionBehavior);
-      this.tr.forceUpdate();
+  handleMultipleSelectionBehavior(): void {
+    const tr = this.transformerCtrl.getTransformer();
+    if (tr.nodes().length > 1 && this.config.behaviors?.onMultipleSelection) {
+      const selectionBehavior = this.config.behaviors.onMultipleSelection(tr.nodes());
+      tr.setAttrs(selectionBehavior);
+      tr.forceUpdate();
     }
   }
 
-  protected syncSelection(): void {
+  syncSelection(): void {
     const stageMode = this.instance.getStage().mode();
+    if (![WEAVE_STAGE_DEFAULT_MODE].includes(stageMode)) return;
 
-    if (![WEAVE_STAGE_DEFAULT_MODE].includes(stageMode)) {
-      return;
-    }
-
+    const tr = this.transformerCtrl.getTransformer();
     const newSelectedNodes = [];
+    const actualSelectedNodes = tr.nodes();
 
-    const actualSelectedNodes = this.tr.nodes();
     for (const node of actualSelectedNodes) {
       const existNode = this.instance
         .getStage()
@@ -1571,191 +1532,34 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
       }
     }
 
-    this.tr.nodes([...newSelectedNodes]);
-
+    tr.nodes([...newSelectedNodes]);
     if (newSelectedNodes.length > 0) {
-      this.tr.forceUpdate();
+      tr.forceUpdate();
     }
 
     this.triggerSelectedNodesEvent();
   }
 
   protected getSelectionPlugin(): WeaveNodesSelectionPlugin | undefined {
-    const selectionPlugin =
-      this.instance.getPlugin<WeaveNodesSelectionPlugin>('nodesSelection');
-
-    return selectionPlugin;
+    return this.instance.getPlugin<WeaveNodesSelectionPlugin>('nodesSelection');
   }
 
-  protected hideHoverState(): void {
+  hideHoverState(): void {
     const selectionPlugin = this.getSelectionPlugin();
-
-    if (!selectionPlugin) {
-      return;
-    }
-
+    if (!selectionPlugin) return;
     selectionPlugin.getHoverTransformer().nodes([]);
   }
 
-  handleClickOrTap(e: KonvaEventObject<PointerEvent, Stage>): void {
-    const stage = this.instance.getStage();
-
-    this.handledClickOrTap = true;
-
-    e.cancelBubble = true;
-
-    if (!this.enabled) {
-      return;
-    }
-
-    if (this.instance.getActiveAction() !== SELECTION_TOOL_ACTION_NAME) {
-      return;
-    }
-
-    const contextMenuPlugin = this.getContextMenuPlugin();
-
-    if (contextMenuPlugin?.isContextMenuVisible()) {
-      this.stopPanLoop();
-    }
-
-    this.hideHoverState();
-
-    const selectedGroup = getTargetedNode(this.instance);
-
-    if (!this.initialized) {
-      return;
-    }
-
-    if (e.evt.pointerType === 'mouse' && e.evt?.button && e.evt?.button !== 0) {
-      return;
-    }
-
-    let areNodesSelected = false;
-
-    let nodeTargeted =
-      selectedGroup && !(selectedGroup.getAttrs().active ?? false)
-        ? selectedGroup
-        : e.target;
-
-    if (e.target === this.instance.getStage()) {
-      this.isDoubleTap = false;
-      this.getNodesSelectionFeedbackPlugin()?.cleanupSelectedHalos();
-      return;
-    }
-
-    nodeTargeted = this.instance.getRealSelectedNode(nodeTargeted);
-
-    if (!nodeTargeted.getAttrs().nodeType) {
-      this.isDoubleTap = false;
-      return;
-    }
-
-    // do we pressed shift or ctrl?
-    const metaPressed = e.evt.shiftKey || e.evt.ctrlKey || e.evt.metaKey;
-    const nodeSelectedIndex = this.tr.nodes().findIndex((node) => {
-      return node.getAttrs().id === nodeTargeted.getAttrs().id;
-    });
-    const isSelected = nodeSelectedIndex !== -1;
-
-    const user = this.instance.getStore().getUser();
-    const isLocked = nodeTargeted.getAttrs().locked ?? false;
-    const isMutexLocked =
-      nodeTargeted.getAttrs().mutexLocked &&
-      nodeTargeted.getAttrs().mutexUserId !== user.id;
-
-    if (isLocked || isMutexLocked) {
-      // check if clicked on empty area of container
-      const parent = this.instance.getInstanceRecursive(
-        nodeTargeted.getParent() as Konva.Node
-      );
-
-      const mainLayer = this.instance.getMainLayer();
-      const isStage = parent instanceof Konva.Stage;
-      const isMainLayer = parent === mainLayer;
-      const isContainerEmptyArea =
-        e.target.getAttrs().isContainerPrincipal !== undefined &&
-        !e.target.getAttrs().isContainerPrincipal;
-
-      if (isStage || isMainLayer || isContainerEmptyArea) {
-        this.getSelectionPlugin()?.setSelectedNodes([]);
-      }
-
-      return;
-    }
-
-    if (nodeTargeted.getAttrs().nodeId) {
-      const realNode = stage.findOne(`#${nodeTargeted.getAttrs().nodeId}`);
-
-      if (realNode) {
-        nodeTargeted = realNode;
-      }
-    }
-
-    if (
-      typeof nodeTargeted.getAttrs().isContainerPrincipal !== 'undefined' &&
-      !nodeTargeted.getAttrs().isContainerPrincipal
-    ) {
-      return;
-    }
-
-    if (this.isDoubleTap && !metaPressed) {
-      this.isDoubleTap = false;
-      nodeTargeted.dblClick();
-      return;
-    }
-
-    const isCtrlOrCmdPressed = e.evt.ctrlKey || e.evt.metaKey;
-    if (isCtrlOrCmdPressed) {
-      return;
-    }
-
-    if (!metaPressed) {
-      // if no key pressed and the node is not selected
-      // select just one
-      this.tr.nodes([nodeTargeted]);
-      this.tr.show();
-      areNodesSelected = true;
-    }
-    if (metaPressed && isSelected) {
-      // if we pressed keys and node was selected
-      // we need to remove it from selection:
-      const nodes = this.tr.nodes().slice(); // use slice to have new copy of array
-      // remove node from array
-      nodes.splice(nodes.indexOf(nodeTargeted), 1);
-      this.tr.nodes(nodes);
-      areNodesSelected = true;
-    }
-    if (metaPressed && !isSelected) {
-      // add the node into selection
-      const nodes = this.tr.nodes().concat([nodeTargeted]);
-      this.tr.nodes(nodes);
-      areNodesSelected = true;
-    }
-
-    this.handleMultipleSelectionBehavior();
-    this.handleBehaviors();
-
-    if (areNodesSelected) {
-      stage.container().tabIndex = 1;
-      stage.container().focus();
-      stage.container().style.cursor =
-        (typeof nodeTargeted?.defineMousePointer === 'function'
-          ? nodeTargeted.defineMousePointer()
-          : null) ?? 'grab';
-    }
-
-    this.triggerSelectedNodesEvent();
-  }
-
   getTransformer(): Konva.Transformer {
-    return this.tr;
+    return this.transformerCtrl.getTransformer();
   }
 
   getHoverTransformer(): Konva.Transformer {
-    return this.trHover;
+    return this.transformerCtrl.getHoverTransformer();
   }
 
   handleBehaviors(): void {
+    const tr = this.transformerCtrl.getTransformer();
     const nodes = this.getSelectedNodes();
     const nodesSelected = nodes.length;
 
@@ -1763,24 +1567,24 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
       (nodesSelected > 1 && !this.config.behaviors.multipleSelection.enabled) ||
       (nodesSelected === 1 && !this.config.behaviors.singleSelection.enabled)
     ) {
-      this.tr.enabledAnchors([]);
+      tr.enabledAnchors([]);
     }
     if (
       (nodesSelected > 1 && this.config.behaviors.multipleSelection.enabled) ||
       (nodesSelected === 1 && this.config.behaviors.singleSelection.enabled)
     ) {
-      this.tr.enabledAnchors(this.defaultEnabledAnchors);
+      tr.enabledAnchors(this._defaultEnabledAnchors);
     }
 
     let transformerAttrs: TransformerConfig = { ...this.config.selection };
 
-    if (this.tr && this.tr.nodes().length > 0) {
-      const currentAttrs = this.tr.getAttrs();
+    if (tr && tr.nodes().length > 0) {
+      const currentAttrs = tr.getAttrs();
       Object.keys(currentAttrs).forEach((key) => {
         if (['rotationSnaps', 'enabledAnchors'].includes(key)) {
-          this.tr.setAttr(key, []);
+          tr.setAttr(key, []);
         } else {
-          this.tr.setAttr(key, undefined);
+          tr.setAttr(key, undefined);
         }
       });
     }
@@ -1797,27 +1601,22 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
       for (const node of nodes) {
         anchorsArrays.push(node?.allowedAnchors?.() ?? []);
       }
-
-      const enabledAnchors = intersectArrays(anchorsArrays);
-
-      transformerAttrs.enabledAnchors = enabledAnchors;
+      transformerAttrs.enabledAnchors = intersectArrays(anchorsArrays);
     }
 
-    if (this.tr && this.tr.nodes().length > 0) {
+    if (tr && tr.nodes().length > 0) {
       if (transformerAttrs.enabledAnchors?.length === 0) {
         transformerAttrs.resizeEnabled = false;
       }
-
-      this.tr.setAttrs(transformerAttrs);
-      this.tr.forceUpdate();
-
-      this.tr.getLayer()?.batchDraw();
+      tr.setAttrs(transformerAttrs);
+      tr.forceUpdate();
+      tr.getLayer()?.batchDraw();
     }
   }
 
   setSelectedNodes(nodes: Konva.Node[]): void {
-    this.tr.setNodes(nodes);
-
+    const tr = this.transformerCtrl.getTransformer();
+    tr.setNodes(nodes);
     this.handleBehaviors();
 
     if (nodes.length === 0) {
@@ -1825,27 +1624,23 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
     }
 
     const usersSelectionPlugin =
-      this.instance.getPlugin<WeaveUsersSelectionPlugin>(
-        WEAVE_USERS_SELECTION_KEY
-      );
+      this.instance.getPlugin<WeaveUsersSelectionPlugin>(WEAVE_USERS_SELECTION_KEY);
 
     if (usersSelectionPlugin) {
       requestAnimationFrame(() => {
-        usersSelectionPlugin.sendSelectionAwarenessInfo(this.tr);
+        usersSelectionPlugin.sendSelectionAwarenessInfo(tr);
       });
     }
   }
 
   getSelectedNodes() {
-    if (!this.tr) {
-      return [];
-    }
-
-    return this.tr.nodes() as (Konva.Group | Konva.Shape)[];
+    if (!this.transformerCtrl) return [];
+    return this.transformerCtrl.getTransformer().nodes() as (Konva.Group | Konva.Shape)[];
   }
 
   getSelectedNodesExtended(): WeaveSelection[] {
-    const selectedNodes: WeaveSelection[] = this.tr.getNodes().map((node) => {
+    const tr = this.transformerCtrl.getTransformer();
+    return tr.getNodes().map((node) => {
       const nodeType = node.getAttr('nodeType');
       const nodeHandler = this.instance.getNodeHandler<WeaveNode>(nodeType);
       return {
@@ -1853,20 +1648,17 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
         node: nodeHandler?.serialize(node as Konva.Shape | Konva.Group),
       };
     });
-
-    return selectedNodes;
   }
 
   selectAll(): void {
     const mainLayer = this.instance.getMainLayer();
     if (mainLayer) {
-      const nodes = mainLayer.getChildren();
-      this.tr.nodes(nodes);
+      this.transformerCtrl.getTransformer().nodes(mainLayer.getChildren());
     }
   }
 
   selectNone(): void {
-    this.tr.nodes([]);
+    this.transformerCtrl.getTransformer().nodes([]);
   }
 
   enable(): void {
@@ -1880,48 +1672,31 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
   }
 
   getNodesSelectionFeedbackPlugin() {
-    const selectionFeedbackPlugin =
-      this.instance.getPlugin<WeaveNodesMultiSelectionFeedbackPlugin>(
-        WEAVE_NODES_MULTI_SELECTION_FEEDBACK_PLUGIN_KEY
-      );
-    return selectionFeedbackPlugin;
+    return getNodesSelectionFeedbackPlugin(this.instance);
   }
 
   getContextMenuPlugin() {
-    const contextMenuPlugin = this.instance.getPlugin<WeaveContextMenuPlugin>(
-      WEAVE_CONTEXT_MENU_PLUGIN_KEY
-    );
-    return contextMenuPlugin;
+    return getContextMenuPlugin(this.instance);
   }
 
   getStageGridPlugin() {
-    const gridPlugin = this.instance.getPlugin<WeaveStageGridPlugin>(
-      WEAVE_STAGE_GRID_PLUGIN_KEY
-    );
-    return gridPlugin;
+    return getStageGridPlugin(this.instance);
   }
 
   getStagePanningPlugin() {
-    const stagePanning = this.instance.getPlugin<WeaveStagePanningPlugin>(
-      WEAVE_STAGE_PANNING_KEY
-    );
-    return stagePanning;
+    return getStagePanningPlugin(this.instance);
   }
 
   getUsersPresencePlugin() {
-    const usersPresencePlugin =
-      this.instance.getPlugin<WeaveUsersPresencePlugin>(
-        WEAVE_USERS_PRESENCE_PLUGIN_KEY
-      );
-    return usersPresencePlugin;
+    return getUsersPresencePlugin(this.instance);
   }
 
   isTransforming(): boolean {
-    return this.transformInProcess;
+    return this.transformerCtrl.isTransforming();
   }
 
   isDragging(): boolean {
-    return this.dragInProcess;
+    return this.transformerCtrl.isDragging();
   }
 
   getSelectorConfig(): TransformerConfig {
@@ -1929,7 +1704,7 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin {
   }
 
   saveDragSelectedNodes(): void {
-    this.dragSelectedNodes = this.tr.nodes();
+    this.dragSelectedNodes = this.transformerCtrl.getTransformer().nodes();
   }
 
   getDragSelectedNodes(): Konva.Node[] {

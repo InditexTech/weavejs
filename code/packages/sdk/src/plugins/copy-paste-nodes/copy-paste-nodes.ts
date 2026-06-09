@@ -238,7 +238,7 @@ export class WeaveCopyPasteNodesPlugin extends WeavePlugin {
           }
         }
       },
-      { signal: this.instance.getEventsController()?.signal }
+      { signal: this.instance.getEventsController().signal }
     );
 
     if (catcher) {
@@ -276,7 +276,7 @@ export class WeaveCopyPasteNodesPlugin extends WeavePlugin {
 
           this.sendExternalPasteEvent(undefined, items);
         },
-        { signal: this.instance.getEventsController()?.signal }
+        { signal: this.instance.getEventsController().signal }
       );
     }
   }

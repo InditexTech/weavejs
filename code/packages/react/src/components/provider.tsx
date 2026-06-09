@@ -226,7 +226,9 @@ export const WeaveProvider = ({
 
     setStatus(WEAVE_INSTANCE_STATUS.IDLE);
     setRoomLoaded(false);
-    initWeave();
+    initWeave().catch((error: unknown) => {
+      console.error('WeaveProvider failed to initialize:', error);
+    });
 
     return () => {
       weaveInstanceRef.current?.removeEventListener(
@@ -257,6 +259,11 @@ export const WeaveProvider = ({
       weaveInstanceRef.current?.removeEventListener(
         'onActiveActionChange',
         onActiveActionChangeHandler
+      );
+
+      weaveInstanceRef.current?.removeEventListener(
+        'onAsyncElementsIdle',
+        onAsyncElementsIdleHandler
       );
 
       weaveInstanceRef.current?.removeEventListener(

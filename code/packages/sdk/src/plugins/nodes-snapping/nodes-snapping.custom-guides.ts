@@ -141,7 +141,7 @@ export class WeaveNodesSnappingCustomGuides {
         }
       },
       {
-        signal: this.instance.getEventsController()?.signal,
+        signal: this.instance.getEventsController().signal,
       }
     );
 
@@ -155,7 +155,7 @@ export class WeaveNodesSnappingCustomGuides {
         }
       },
       {
-        signal: this.instance.getEventsController()?.signal,
+        signal: this.instance.getEventsController().signal,
       }
     );
 
@@ -169,7 +169,7 @@ export class WeaveNodesSnappingCustomGuides {
           this.handleDistanceGuide(isOptionAltPressed);
         }
       },
-      { signal: this.instance.getEventsController()?.signal }
+      { signal: this.instance.getEventsController().signal }
     );
   }
 
@@ -528,7 +528,7 @@ export class WeaveNodesSnappingCustomGuides {
     }
     if (!this.noGuidesVisible() && !this.setupEvents) {
       stage.container().addEventListener('keydown', this.handleArrowKeys, {
-        signal: this.instance.getEventsController()?.signal,
+        signal: this.instance.getEventsController().signal,
       });
       stage.on('pointerclick', this.handlePointerClick);
       this.instance.addEventListener(

@@ -83,6 +83,7 @@ export class WSSharedDoc extends Y.Doc {
     horizontalSyncHandler: WeaveHorizontalSyncHandlerRedis
   ) {
     super({ gc: gcEnabled });
+    this.name = name;
     this.topic = name;
     this.topicAwarenessChannel = `${name}-awareness`;
     this.conns = new Map();
@@ -169,7 +170,7 @@ export class WSSharedDoc extends Y.Doc {
     });
     this.conns.clear();
     this.awareness.destroy();
-    this.destroy();
+    super.destroy();
   }
 }
 

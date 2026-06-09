@@ -129,7 +129,7 @@ export class WeaveTextNode extends WeaveNode {
     if (!this.instance.isServerSide() && !this.keyPressHandler) {
       this.keyPressHandler = this.handleKeyPress.bind(this);
       window.addEventListener('keypress', this.keyPressHandler, {
-        signal: this.instance.getEventsController()?.signal,
+        signal: this.instance.getEventsController().signal,
       });
     }
   }
@@ -398,7 +398,7 @@ export class WeaveTextNode extends WeaveNode {
     if (!this.instance.isServerSide() && !this.keyPressHandler) {
       this.keyPressHandler = this.handleKeyPress.bind(this);
       window.addEventListener('keypress', this.keyPressHandler, {
-        signal: this.instance.getEventsController()?.signal,
+        signal: this.instance.getEventsController().signal,
       });
     }
 
@@ -816,7 +816,7 @@ export class WeaveTextNode extends WeaveNode {
           this.textAreaSuperContainer.scrollLeft = 0;
         }
       },
-      { signal: this.instance.getEventsController()?.signal }
+      { signal: this.instance.getEventsController().signal }
     );
     this.textAreaContainer.addEventListener(
       'scroll',
@@ -827,7 +827,7 @@ export class WeaveTextNode extends WeaveNode {
         this.textAreaContainer.scrollTop = 0;
         this.textAreaContainer.scrollLeft = 0;
       },
-      { signal: this.instance.getEventsController()?.signal }
+      { signal: this.instance.getEventsController().signal }
     );
     this.textArea.addEventListener(
       'scroll',
@@ -839,7 +839,7 @@ export class WeaveTextNode extends WeaveNode {
         this.textArea.scrollTop = 0;
         this.textArea.scrollLeft = 0;
       },
-      { signal: this.instance.getEventsController()?.signal }
+      { signal: this.instance.getEventsController().signal }
     );
 
     const rotation = textNode.getAbsoluteRotation();
@@ -940,10 +940,10 @@ export class WeaveTextNode extends WeaveNode {
     };
 
     this.textArea.addEventListener('keydown', handleKeyDown, {
-      signal: this.instance.getEventsController()?.signal,
+      signal: this.instance.getEventsController().signal,
     });
     this.textArea.addEventListener('keyup', handleKeyUp, {
-      signal: this.instance.getEventsController()?.signal,
+      signal: this.instance.getEventsController().signal,
     });
 
     this.textArea.tabIndex = 1;
@@ -987,7 +987,7 @@ export class WeaveTextNode extends WeaveNode {
 
     setTimeout(() => {
       window.addEventListener('pointerup', handleOutsideClick, {
-        signal: this.instance.getEventsController()?.signal,
+        signal: this.instance.getEventsController().signal,
       });
     }, 0);
 

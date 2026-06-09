@@ -3,8 +3,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { beforeEach, vi } from 'vitest';
-// import "@testing-library/jest-dom/vitest";
-// import "@testing-library/user-event";
+import "@testing-library/jest-dom/vitest";
 
 beforeEach(() => {
   vi.spyOn(console, 'log').mockImplementation(() => {});

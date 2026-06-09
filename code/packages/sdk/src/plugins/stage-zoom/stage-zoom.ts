@@ -674,7 +674,7 @@ export class WeaveStageZoomPlugin extends WeavePlugin {
           }
         }
       },
-      { passive: false, signal: this.instance.getEventsController()?.signal }
+      { passive: false, signal: this.instance.getEventsController().signal }
     );
 
     stage.getContent().addEventListener(
@@ -740,7 +740,7 @@ export class WeaveStageZoomPlugin extends WeavePlugin {
           lastCenter = newCenter;
         }
       },
-      { passive: false, signal: this.instance.getEventsController()?.signal }
+      { passive: false, signal: this.instance.getEventsController().signal }
     );
 
     stage.getContent().addEventListener(
@@ -750,7 +750,7 @@ export class WeaveStageZoomPlugin extends WeavePlugin {
         lastDist = 0;
         lastCenter = null;
       },
-      { passive: false, signal: this.instance.getEventsController()?.signal }
+      { passive: false, signal: this.instance.getEventsController().signal }
     );
 
     let doZoom = false;
@@ -788,7 +788,7 @@ export class WeaveStageZoomPlugin extends WeavePlugin {
     };
 
     window.addEventListener('wheel', handleWheelImmediate, {
-      signal: this.instance.getEventsController()?.signal,
+      signal: this.instance.getEventsController().signal,
       passive: false,
     });
 
@@ -814,7 +814,7 @@ export class WeaveStageZoomPlugin extends WeavePlugin {
     const throttledHandleWheel = throttle(handleWheel, DEFAULT_THROTTLE_MS);
 
     window.addEventListener('wheel', throttledHandleWheel, {
-      signal: this.instance.getEventsController()?.signal,
+      signal: this.instance.getEventsController().signal,
       passive: true,
     });
   }

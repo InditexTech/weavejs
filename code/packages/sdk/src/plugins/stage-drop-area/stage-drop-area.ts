@@ -38,7 +38,7 @@ export class WeaveStageDropAreaPlugin extends WeavePlugin {
         e.preventDefault();
         e.stopPropagation();
       },
-      { signal: this.instance.getEventsController()?.signal }
+      { signal: this.instance.getEventsController().signal }
     );
 
     stage.container().addEventListener(
@@ -52,16 +52,16 @@ export class WeaveStageDropAreaPlugin extends WeavePlugin {
           e
         );
       },
-      { signal: this.instance.getEventsController()?.signal }
+      { signal: this.instance.getEventsController().signal }
     );
 
     // Safari: Prevent default page drop behavior
     window.addEventListener('dragover', (e) => e.preventDefault(), {
-      signal: this.instance.getEventsController()?.signal,
+      signal: this.instance.getEventsController().signal,
       passive: false,
     });
     window.addEventListener('drop', (e) => e.preventDefault(), {
-      signal: this.instance.getEventsController()?.signal,
+      signal: this.instance.getEventsController().signal,
       passive: false,
     });
   }

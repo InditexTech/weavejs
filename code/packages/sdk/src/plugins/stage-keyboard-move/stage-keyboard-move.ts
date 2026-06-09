@@ -114,7 +114,7 @@ export class WeaveStageKeyboardMovePlugin extends WeavePlugin {
           });
         }
       },
-      { signal: this.instance.getEventsController()?.signal }
+      { signal: this.instance.getEventsController().signal }
     );
   }
 
