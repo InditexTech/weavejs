@@ -1045,14 +1045,26 @@ describe('WeaveBrushToolAction', () => {
       expect(() => callHandleEndStroke(action)).not.toThrow();
     });
 
-    it('13.10 strokeElements.length >= 3 → addNode() called', () => {
-      setupEndStroke(3, 0); // 3 elements → >= 3 → addNode
+    it('13.10 strokeElements.length >= 1 → addNode() called', () => {
+      setupEndStroke(1, 0); // 1 element → >= 1 → addNode
       callHandleEndStroke(action);
       expect(mockWeave.addNode).toHaveBeenCalled();
     });
 
-    it('13.11 strokeElements.length < 3 → addNode() NOT called', () => {
-      setupEndStroke(2, 0); // 2 elements < 3 → skip addNode
+    it('13.10b tap (1 element) → addNode() called', () => {
+      setupEndStroke(1, 0); // single tap → should be saved as dot
+      callHandleEndStroke(action);
+      expect(mockWeave.addNode).toHaveBeenCalled();
+    });
+
+    it('13.10c short stroke (2 elements) → addNode() called', () => {
+      setupEndStroke(2, 0); // short line → should now be saved
+      callHandleEndStroke(action);
+      expect(mockWeave.addNode).toHaveBeenCalled();
+    });
+
+    it('13.11 strokeElements.length = 0 → addNode() NOT called', () => {
+      setupEndStroke(0, 0); // 0 elements → skip addNode
       callHandleEndStroke(action);
       expect(mockWeave.addNode).not.toHaveBeenCalled();
     });
@@ -1071,6 +1083,30 @@ describe('WeaveBrushToolAction', () => {
       (action as unknown as R)['container'] = undefined;
       callHandleEndStroke(action);
       expect(mockWeave.addNode).toHaveBeenCalledWith(expect.anything(), undefined);
+    });
+
+    it('13.13b tap (1 point, box width/height = 0) → setAttrs called with width ≥ strokeWidth', () => {
+      // Single point at (5, 5) → box.width = 0, box.height = 0
+      mockTempStroke = makeMockTempStroke('stroke-1', [{ x: 5, y: 5, pressure: 0.5 }]);
+      // Set strokeWidth on the mock stroke so the minimum bounding box uses it
+      mockTempStroke.getAttrs = vi.fn(() => ({
+        id: 'stroke-1',
+        strokeElements: [{ x: 5, y: 5, pressure: 0.5 }],
+        strokeWidth: 4,
+      }));
+      (action as unknown as R)['strokeId'] = 'stroke-1';
+      nodeHandler = makeMockNodeHandler();
+      mockWeave.getNodeHandler.mockReturnValue(nodeHandler);
+      const realNode = { destroy: vi.fn() };
+      mockWeave._stage.findOne
+        .mockReturnValueOnce(mockTempStroke)
+        .mockReturnValueOnce(realNode);
+
+      callHandleEndStroke(action);
+
+      const call = (mockTempStroke.setAttrs as ReturnType<typeof vi.fn>).mock.calls[0]?.[0];
+      expect(call?.['width']).toBeGreaterThanOrEqual(4);
+      expect(call?.['height']).toBeGreaterThanOrEqual(4);
     });
 
     it('13.14 clickPoint set to null after processing', () => {

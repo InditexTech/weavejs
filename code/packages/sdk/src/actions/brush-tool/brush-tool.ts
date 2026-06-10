@@ -399,6 +399,59 @@ export class WeaveBrushToolAction extends WeaveAction {
     }
   }
 
+  private finalizeStroke(
+    tempStroke: Konva.Line,
+    nodeHandler: WeaveStrokeNode
+  ): void {
+    const box = this.getBoundingBox(tempStroke.getAttrs().strokeElements);
+
+    let newStrokeElements = [...tempStroke.getAttrs().strokeElements];
+
+    if (this.predictedCount > 0) {
+      newStrokeElements = newStrokeElements.slice(
+        0,
+        -1 * this.predictedCount
+      );
+      this.predictedCount = 0;
+    }
+
+    newStrokeElements = newStrokeElements.map((point) => ({
+      ...point,
+      x: point.x - box.x,
+      y: point.y - box.y,
+    }));
+
+    const compressedPoints = simplify(newStrokeElements, 1, true);
+
+    const sw = tempStroke.getAttrs().strokeWidth ?? 1;
+    const finalWidth = Math.max(box.width, sw);
+    const finalHeight = Math.max(box.height, sw);
+    const finalX = box.width === 0 ? box.x - sw / 2 : box.x;
+    const finalY = box.height === 0 ? box.y - sw / 2 : box.y;
+
+    tempStroke.setAttrs({
+      width: finalWidth,
+      height: finalHeight,
+      x: finalX,
+      y: finalY,
+      strokeElements: compressedPoints,
+    });
+
+    const realNode = this.instance
+      .getStage()
+      .findOne(`#${tempStroke.getAttrs().id}`);
+    if (realNode) {
+      realNode.destroy();
+    }
+
+    if (tempStroke.getAttrs().strokeElements.length >= 1) {
+      this.instance.addNode(
+        nodeHandler.serialize(tempStroke as WeaveElementInstance),
+        this.container?.getAttrs().id
+      );
+    }
+  }
+
   private handleEndStroke() {
     const tempStroke = this.instance.getStage().findOne(`#${this.strokeId}`) as
       | Konva.Line
@@ -409,47 +462,7 @@ export class WeaveBrushToolAction extends WeaveAction {
         this.instance.getNodeHandler<WeaveStrokeNode>('stroke');
 
       if (nodeHandler) {
-        const box = this.getBoundingBox(tempStroke.getAttrs().strokeElements);
-
-        let newStrokeElements = [...tempStroke.getAttrs().strokeElements];
-
-        if (this.predictedCount > 0) {
-          newStrokeElements = newStrokeElements.slice(
-            0,
-            -1 * this.predictedCount
-          );
-          this.predictedCount = 0;
-        }
-
-        newStrokeElements = newStrokeElements.map((point) => ({
-          ...point,
-          x: point.x - box.x,
-          y: point.y - box.y,
-        }));
-
-        const compressedPoints = simplify(newStrokeElements, 1, true);
-
-        tempStroke.setAttrs({
-          width: box.width,
-          height: box.height,
-          x: box.x,
-          y: box.y,
-          strokeElements: compressedPoints,
-        });
-
-        const realNode = this.instance
-          .getStage()
-          .findOne(`#${tempStroke.getAttrs().id}`);
-        if (realNode) {
-          realNode.destroy();
-        }
-
-        if (tempStroke.getAttrs().strokeElements.length >= 3) {
-          this.instance.addNode(
-            nodeHandler.serialize(tempStroke as WeaveElementInstance),
-            this.container?.getAttrs().id
-          );
-        }
+        this.finalizeStroke(tempStroke, nodeHandler);
       }
 
       this.clickPoint = null;
