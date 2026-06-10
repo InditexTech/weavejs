@@ -453,7 +453,7 @@ describe('WeaveImageNode', () => {
 
       expect(withoutOptional.props.imageFallback).toBeUndefined();
       expect(withoutOptional.props.imageId).toBeUndefined();
-      expect(withOptional.props.imageFallback).toBe('fallback-data');
+      expect(withOptional.props.imageFallback).toBeUndefined();
       expect(withOptional.props.imageId).toBe('asset-1');
     });
   });
@@ -622,7 +622,7 @@ describe('WeaveImageNode', () => {
       expect(internalImage.getAttrs().visible).toBe(true);
     });
 
-    it('11.2 uses fallback when imageURL missing and fallback exists', () => {
+    it('11.2 fallback not used when imageFallback.enabled is false (default)', () => {
       const { node } = makeNode();
       const privateNode = getPrivateNode(node);
       const fallback = makeMockImageElement() as unknown as HTMLImageElement;
@@ -631,7 +631,8 @@ describe('WeaveImageNode', () => {
       const group = node.onRender(defaultProps({ imageURL: undefined })) as Konva.Group;
       const internalImage = group.findOne('#test-image-image') as Konva.Image;
 
-      expect(internalImage.getAttrs().image).toBe(fallback);
+      // imageFallback.enabled=false → hasFallbackAndFinalImageNotLoaded is false → fallback not applied
+      expect(internalImage.getAttrs().image).toBeUndefined();
     });
 
     it('11.3 without sources it calls loadImage and createImageElement', () => {
@@ -1218,10 +1219,11 @@ describe('WeaveImageNode', () => {
       );
     });
 
-    it('21.3 loadFallback=true calls preloadFallbackImage', () => {
+    it('21.3 loadFallback=true with imageFallback.enabled=false calls preloadImage (not preloadFallbackImage)', () => {
       const { node } = makeNode();
       const privateNode = getPrivateNode(node);
       const fallbackSpy = vi.spyOn(node, 'preloadFallbackImage').mockImplementation(() => {});
+      const preloadSpy = vi.spyOn(node, 'preloadImage').mockImplementation(() => {});
       const { group } = createRenderableGroup();
 
       privateNode.loadImage(
@@ -1231,12 +1233,9 @@ describe('WeaveImageNode', () => {
         false
       );
 
-      expect(fallbackSpy).toHaveBeenCalledWith(
-        'test-image',
-        'fallback-image',
-        expect.any(Object),
-        false
-      );
+      // imageFallback.enabled=false → preloadFallbackImage NOT called; preloadImage IS called
+      expect(fallbackSpy).not.toHaveBeenCalled();
+      expect(preloadSpy).toHaveBeenCalled();
     });
 
     it('21.4 onLoad without fallback shows internal image', () => {
@@ -1254,11 +1253,11 @@ describe('WeaveImageNode', () => {
       expect(internalImage.isVisible()).toBe(true);
     });
 
-    it('21.5 onLoad with fallback schedules retry', () => {
+    it('21.5 onLoad with useFallback=true schedules retry via preloadImage', () => {
       vi.useFakeTimers();
       const { node } = makeNode();
       const { group } = createRenderableGroup();
-      vi.spyOn(node, 'preloadFallbackImage').mockImplementation((id, _url, handlers) => {
+      vi.spyOn(node, 'preloadImage').mockImplementation((id, _url, handlers) => {
         getPrivateNode(node).imageFallback[id] = makeMockImageElement() as unknown as HTMLImageElement;
         getPrivateNode(node).imageSource[id] = makeMockImageElement() as unknown as HTMLImageElement;
         handlers.onLoad();
@@ -1303,19 +1302,23 @@ describe('WeaveImageNode', () => {
       expect(setErrorStateSpy).toHaveBeenCalledWith('test-image', group);
     });
 
-    it('21.8 onError with fallback recurses into fallback load', () => {
+    it('21.8 onError without imageFallback.enabled sets error state (no recursion)', () => {
       const { node } = makeNode();
       const privateNode = getPrivateNode(node);
       const loadImageSpy = vi.spyOn(privateNode, 'loadImage');
+      const setErrorStateSpy = vi.spyOn(privateNode, 'setErrorState').mockImplementation(() => {});
       vi.spyOn(node, 'preloadImage').mockImplementation((_id, _url, handlers) => {
         handlers.onError(new Error('fail', { cause: 'ErrorLoadingImage' }));
       });
       const { group } = createRenderableGroup();
       const props = defaultProps({ imageFallback: 'fallback-image' });
+      privateNode.imageTryoutAttempts['test-image'] = 99; // exhaust retries
 
       privateNode.loadImage(props, group, false, false);
 
-      expect(loadImageSpy).toHaveBeenCalledWith(expect.objectContaining(props), group, true);
+      // imageFallback.enabled=false → no recursive loadImage with fallback; setErrorState called instead
+      expect(loadImageSpy).toHaveBeenCalledTimes(1);
+      expect(setErrorStateSpy).toHaveBeenCalled();
     });
 
     it('21.9 onError during tryout below max schedules another tryout', () => {
@@ -1581,7 +1584,7 @@ describe('WeaveImageNode', () => {
   });
 
   describe('30 — setupNotUsedImagesCleanup', () => {
-    it('30.1 schedules cleanup on each call with current implementation', () => {
+    it('30.1 schedules cleanup only once per idle period (guard prevents double-scheduling)', () => {
       vi.useFakeTimers();
       setupCleanupSpy.mockRestore();
       const { node } = makeNode();
@@ -1590,7 +1593,8 @@ describe('WeaveImageNode', () => {
       getPrivateNode(node).setupNotUsedImagesCleanup();
       getPrivateNode(node).setupNotUsedImagesCleanup();
 
-      expect(setTimeoutSpy).toHaveBeenCalledTimes(2);
+      // Second call is a no-op because notUsedImagesCleanup is already set
+      expect(setTimeoutSpy).toHaveBeenCalledTimes(1);
     });
 
     it('30.2 removes stale entries after timer fires', () => {

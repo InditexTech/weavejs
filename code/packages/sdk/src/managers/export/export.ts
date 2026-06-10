@@ -25,7 +25,6 @@ import {
   WEAVE_GRID_LAYER_ID,
   WEAVE_STAGE_GRID_PLUGIN_KEY,
 } from '@/plugins/stage-grid/constants';
-import reject from 'lodash/reject';
 
 export class WeaveExportManager {
   private instance: Weave;
@@ -429,7 +428,7 @@ export class WeaveExportManager {
     boundingNodes: (nodes: Konva.Node[]) => Konva.Node[],
     options: WeaveExportNodesOptions
   ): Promise<Blob> {
-    return new Promise((resolve) => {
+    return new Promise((resolve, reject) => {
       const { format = WEAVE_EXPORT_FORMATS.PNG } = options;
 
       const {
@@ -575,7 +574,7 @@ export class WeaveExportManager {
     area: { x: number; y: number; width: number; height: number },
     options: WeaveExportNodesOptions
   ): Promise<Blob> {
-    return new Promise((resolve) => {
+    return new Promise((resolve, reject) => {
       const { format = WEAVE_EXPORT_FORMATS.PNG } = options;
 
       const {
@@ -675,8 +674,7 @@ export class WeaveExportManager {
       this.parseExportOptions(options);
     const { nodesSelectionPluginPrev, nodesStageGridPluginPrev } =
       this.saveAndDisablePlugins();
-    const { stage, originalPosition, originalScale } =
-      this.saveAndResetStage();
+    const { stage, originalPosition, originalScale } = this.saveAndResetStage();
     const mainLayer = this.instance.getMainLayer();
 
     if (!mainLayer) {
@@ -740,8 +738,7 @@ export class WeaveExportManager {
       this.parseExportOptions(options);
     const { nodesSelectionPluginPrev, nodesStageGridPluginPrev } =
       this.saveAndDisablePlugins();
-    const { stage, originalPosition, originalScale } =
-      this.saveAndResetStage();
+    const { stage, originalPosition, originalScale } = this.saveAndResetStage();
     const mainLayer = this.instance.getMainLayer();
 
     if (!mainLayer) {
