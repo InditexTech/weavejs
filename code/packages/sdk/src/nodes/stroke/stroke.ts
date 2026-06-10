@@ -115,8 +115,8 @@ export class WeaveStrokeNode extends WeaveNode {
   ): void {
     const capStartL = leftSide[0];
     const capStartR = rightSide[0];
-    const capEndL = leftSide[leftSide.length - 1];
-    const capEndR = rightSide[rightSide.length - 1];
+    const capEndL = leftSide.at(-1);
+    const capEndR = rightSide.at(-1);
 
     const smoothLeft = this.getSplinePoints(leftSide, 4);
     const smoothRight = this.getSplinePoints(rightSide.reverse(), 4);
@@ -130,7 +130,7 @@ export class WeaveStrokeNode extends WeaveNode {
     ctx.fill();
 
     this.drawRoundCap(ctx, capStartL, capStartR, color);
-    this.drawRoundCap(ctx, capEndL, capEndR, color);
+    this.drawRoundCap(ctx, capEndL!, capEndR!, color);
   }
 
   private drawRibbonWithDash(

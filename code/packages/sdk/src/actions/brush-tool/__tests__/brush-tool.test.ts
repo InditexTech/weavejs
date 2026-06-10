@@ -1104,9 +1104,9 @@ describe('WeaveBrushToolAction', () => {
 
       callHandleEndStroke(action);
 
-      const call = (mockTempStroke.setAttrs as ReturnType<typeof vi.fn>).mock.calls[0]?.[0] as R;
-      expect((call?.['width'] as number)).toBeGreaterThanOrEqual(4);
-      expect((call?.['height'] as number)).toBeGreaterThanOrEqual(4);
+      const call = (mockTempStroke.setAttrs as ReturnType<typeof vi.fn>).mock.calls[0]?.[0];
+      expect(call?.['width']).toBeGreaterThanOrEqual(4);
+      expect(call?.['height']).toBeGreaterThanOrEqual(4);
     });
 
     it('13.14 clickPoint set to null after processing', () => {
