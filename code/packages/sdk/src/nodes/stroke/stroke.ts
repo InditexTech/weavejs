@@ -102,6 +102,37 @@ export class WeaveStrokeNode extends WeaveNode {
     ctx.fill();
   }
 
+  /**
+   * Draws a filled polygon from the accumulated left/right outline points of a
+   * dash segment and adds round caps at both ends.
+   * NOTE: mutates `rightSide` via Array.reverse() — callers must not reuse it after this call.
+   */
+  private drawDashPolygon(
+    ctx: Konva.Context,
+    leftSide: WeaveStrokePoint[],
+    rightSide: WeaveStrokePoint[],
+    color: string | CanvasGradient
+  ): void {
+    const capStartL = leftSide[0];
+    const capStartR = rightSide[0];
+    const capEndL = leftSide[leftSide.length - 1];
+    const capEndR = rightSide[rightSide.length - 1];
+
+    const smoothLeft = this.getSplinePoints(leftSide, 4);
+    const smoothRight = this.getSplinePoints(rightSide.reverse(), 4);
+
+    ctx.beginPath();
+    ctx.fillStyle = color;
+    ctx.moveTo(smoothLeft[0].x, smoothLeft[0].y);
+    for (const p of smoothLeft) ctx.lineTo(p.x, p.y);
+    for (const p of smoothRight) ctx.lineTo(p.x, p.y);
+    ctx.closePath();
+    ctx.fill();
+
+    this.drawRoundCap(ctx, capStartL, capStartR, color);
+    this.drawRoundCap(ctx, capEndL, capEndR, color);
+  }
+
   private drawRibbonWithDash(
     ctx: Konva.Context,
     pts: WeaveStrokePoint[],
@@ -171,26 +202,7 @@ export class WeaveStrokeNode extends WeaveNode {
         if (dashRemaining <= 0) {
           // Fill current dash polygon if it exists
           if (dashOn && leftSide.length && rightSide.length) {
-            // Capture cap reference points before rightSide.reverse() mutates the array
-            const capStartL = leftSide[0];
-            const capStartR = rightSide[0];
-            const capEndL = leftSide[leftSide.length - 1];
-            const capEndR = rightSide[rightSide.length - 1];
-
-            const smoothLeft = this.getSplinePoints(leftSide, 4);
-            const smoothRight = this.getSplinePoints(rightSide.reverse(), 4);
-
-            ctx.beginPath();
-            ctx.fillStyle = color;
-            ctx.moveTo(smoothLeft[0].x, smoothLeft[0].y);
-            for (const p of smoothLeft) ctx.lineTo(p.x, p.y);
-            for (const p of smoothRight) ctx.lineTo(p.x, p.y);
-            ctx.closePath();
-            ctx.fill();
-
-            // Round caps at both ends of the dash segment
-            this.drawRoundCap(ctx, capStartL, capStartR, color);
-            this.drawRoundCap(ctx, capEndL, capEndR, color);
+            this.drawDashPolygon(ctx, leftSide, rightSide, color);
           }
 
           // Reset for next dash segment
@@ -208,26 +220,7 @@ export class WeaveStrokeNode extends WeaveNode {
 
     // Fill the last dash polygon if needed
     if (dashOn && leftSide.length && rightSide.length) {
-      // Capture cap reference points before rightSide.reverse() mutates the array
-      const capStartL = leftSide[0];
-      const capStartR = rightSide[0];
-      const capEndL = leftSide[leftSide.length - 1];
-      const capEndR = rightSide[rightSide.length - 1];
-
-      const smoothLeft = this.getSplinePoints(leftSide, 4);
-      const smoothRight = this.getSplinePoints(rightSide.reverse(), 4);
-
-      ctx.beginPath();
-      ctx.fillStyle = color;
-      ctx.moveTo(smoothLeft[0].x, smoothLeft[0].y);
-      for (const p of smoothLeft) ctx.lineTo(p.x, p.y);
-      for (const p of smoothRight) ctx.lineTo(p.x, p.y);
-      ctx.closePath();
-      ctx.fill();
-
-      // Round caps at both ends of the stroke
-      this.drawRoundCap(ctx, capStartL, capStartR, color);
-      this.drawRoundCap(ctx, capEndL, capEndR, color);
+      this.drawDashPolygon(ctx, leftSide, rightSide, color);
     }
   }
 
