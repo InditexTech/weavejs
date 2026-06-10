@@ -22,6 +22,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - [#1090](https://github.com/InditexTech/weavejs/issues/1090) Remove usage of @syncedstore/core
 - [#1091](https://github.com/InditexTech/weavejs/issues/1091) Make Store Connection Lifecycle Asynchronous and Increase Azure Web PubSub Frame Size to 512 KB
 
+### Fixed
+
+- [#1098](https://github.com/InditexTech/weavejs/issues/1098) WeaveTextNode: textarea edit overlay misaligns due to hardcoded border offset and scrollHeight approximation
+
 ## [4.1.1] - 2026-05-29
 
 ### Fixed

@@ -444,10 +444,6 @@ export class WeaveStoreAzureWebPubSubSyncClient extends Emittery {
           Y.encodeStateAsUpdate(this.doc, stateVector)
         );
 
-        console.log(
-          'Resync request received, sending sync step 1 with current state vector'
-        );
-
         sendToControlGroup(
           this,
           this.topic,
