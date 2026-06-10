@@ -2,6 +2,8 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
+// @vitest-environment jsdom
+
 import { describe, it, expect, vi, beforeAll, beforeEach } from 'vitest';
 import Konva from 'konva';
 import { WeaveEllipseNode } from '../ellipse';
@@ -9,6 +11,7 @@ import { WEAVE_ELLIPSE_NODE_TYPE } from '../constants';
 import { augmentKonvaNodeClass } from '../../node';
 import type { WeaveElementAttributes } from '@inditextech/weave-types';
 import { createMockInstance, makePluginMock } from '../../__tests__/shared/node.test-helpers';
+import { WEAVE_SHAPE_LABEL_DEFAULTS, labelId } from '../../shared/shape-label.constants';
 
 // Break the node.ts ↔ weave.ts circular dependency so that WeaveNode is
 // fully evaluated before any barrel re-export tries to extend it.
@@ -116,8 +119,8 @@ describe('WeaveEllipseNode', () => {
       expect(group.name()).toBe('node');
     });
 
-    it('2.3 group has exactly two children', () => {
-      expect(group.getChildren().length).toBe(2);
+    it('2.3 group has exactly three children (bg, border, label)', () => {
+      expect(group.getChildren().length).toBe(3);
     });
 
     it('2.4 group id matches props.id', () => {
@@ -743,6 +746,103 @@ describe('WeaveEllipseNode', () => {
       expect(() =>
         schema.parse({ ...validNode, props: propsWithout })
       ).toThrow();
+    });
+  });
+
+  // -------------------------------------------------------------------------
+  // Suite 14 — Label integration
+  // -------------------------------------------------------------------------
+
+  describe('label', () => {
+    function makeNode() {
+      const node = new WeaveEllipseNode();
+      node.instance = createMockInstance() as never;
+      return node;
+    }
+
+    it('14.1 defaultState includes all label props with defaults', () => {
+      const state = WeaveEllipseNode.defaultState('lbl-test');
+      expect(state.props.labelText).toBe(WEAVE_SHAPE_LABEL_DEFAULTS.labelText);
+      expect(state.props.labelFontFamily).toBe(WEAVE_SHAPE_LABEL_DEFAULTS.labelFontFamily);
+      expect(state.props.labelFontSize).toBe(WEAVE_SHAPE_LABEL_DEFAULTS.labelFontSize);
+      expect(state.props.labelFill).toBe(WEAVE_SHAPE_LABEL_DEFAULTS.labelFill);
+      expect(state.props.labelAlign).toBe(WEAVE_SHAPE_LABEL_DEFAULTS.labelAlign);
+      expect(state.props.labelVerticalAlign).toBe(WEAVE_SHAPE_LABEL_DEFAULTS.labelVerticalAlign);
+      expect(state.props.labelPaddingX).toBe(WEAVE_SHAPE_LABEL_DEFAULTS.labelPaddingX);
+      expect(state.props.labelPaddingY).toBe(WEAVE_SHAPE_LABEL_DEFAULTS.labelPaddingY);
+    });
+
+    it('14.2 onRender creates a Konva.Text child with the label id', () => {
+      const node = makeNode();
+      const group = node.onRender(defaultProps({ labelText: 'test label' })) as Konva.Group;
+      const label = group.findOne<Konva.Text>(`#${labelId('ellipse-id')}`);
+      expect(label).toBeTruthy();
+    });
+
+    it('14.3 label is hidden when labelText is empty', () => {
+      const node = makeNode();
+      const group = node.onRender(defaultProps({ labelText: '' })) as Konva.Group;
+      const label = group.findOne<Konva.Text>(`#${labelId('ellipse-id')}`) as Konva.Text;
+      expect(label.visible()).toBe(false);
+    });
+
+    it('14.4 label is visible when labelText is non-empty', () => {
+      const node = makeNode();
+      const group = node.onRender(defaultProps({ labelText: 'seam' })) as Konva.Group;
+      const label = group.findOne<Konva.Text>(`#${labelId('ellipse-id')}`) as Konva.Text;
+      expect(label.visible()).toBe(true);
+    });
+
+    it('14.5 label text matches labelText prop on render', () => {
+      const node = makeNode();
+      const group = node.onRender(defaultProps({ labelText: 'collar' })) as Konva.Group;
+      const label = group.findOne<Konva.Text>(`#${labelId('ellipse-id')}`) as Konva.Text;
+      expect(label.text()).toBe('collar');
+    });
+
+    it('14.6 onUpdate changes label text', () => {
+      const node = makeNode();
+      const group = node.onRender(defaultProps({ labelText: 'before' })) as Konva.Group;
+      node.onUpdate(group, defaultProps({ labelText: 'after' }));
+      const label = group.findOne<Konva.Text>(`#${labelId('ellipse-id')}`) as Konva.Text;
+      expect(label.text()).toBe('after');
+    });
+
+    it('14.7 label textBounds use inscribed rectangle formula', () => {
+      const node = makeNode();
+      const radiusX = 100;
+      const radiusY = 80;
+      const paddingX = WEAVE_SHAPE_LABEL_DEFAULTS.labelPaddingX;
+      const paddingY = WEAVE_SHAPE_LABEL_DEFAULTS.labelPaddingY;
+      const expectedX = radiusX - (radiusX * Math.SQRT2) / 2 + paddingX;
+      const expectedY = radiusY - (radiusY * Math.SQRT2) / 2 + paddingY;
+      const expectedWidth = radiusX * Math.SQRT2 - 2 * paddingX;
+      const group = node.onRender(
+        defaultProps({ radiusX, radiusY, labelText: 'inset' })
+      ) as Konva.Group;
+      const label = group.findOne<Konva.Text>(`#${labelId('ellipse-id')}`) as Konva.Text;
+      expect(label.x()).toBeCloseTo(expectedX, 5);
+      expect(label.y()).toBeCloseTo(expectedY, 5);
+      expect(label.width()).toBeCloseTo(expectedWidth, 5);
+    });
+
+    it('14.8 schema accepts all label props', () => {
+      const schema = WeaveEllipseNode.getSchema();
+      const validSchemaNode = {
+        key: 'e1',
+        type: WEAVE_ELLIPSE_NODE_TYPE,
+        props: {
+          id: 'e1',
+          nodeType: WEAVE_ELLIPSE_NODE_TYPE,
+          x: 0, y: 0, scaleX: 1, scaleY: 1, opacity: 1,
+          radiusX: 100, radiusY: 80,
+          fill: '#fff', stroke: '#000', strokeWidth: 1,
+          strokeScaleEnabled: true,
+          children: [],
+          ...WEAVE_SHAPE_LABEL_DEFAULTS,
+        },
+      };
+      expect(() => schema.parse(validSchemaNode)).not.toThrow();
     });
   });
 });

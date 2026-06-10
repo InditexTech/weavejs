@@ -89,6 +89,10 @@ export { WeaveConnectorNode } from './nodes/connector/connector';
 export * from './nodes/connector/constants';
 export * from './nodes/connector/types';
 
+// Shared shape label utilities
+export * from './nodes/shared/shape-label.types';
+export * from './nodes/shared/shape-label.constants';
+
 // Provided Actions
 export { WeaveZoomOutToolAction } from './actions/zoom-out-tool/zoom-out-tool';
 export * from './actions/zoom-out-tool/types';

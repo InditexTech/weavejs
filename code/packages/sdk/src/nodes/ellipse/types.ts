@@ -3,6 +3,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { type WeaveNodeTransformerProperties } from '@inditextech/weave-types';
+import type { WeaveShapeLabelProps } from '@/nodes/shared/shape-label.types';
 
 export type WeaveEllipseProperties = {
   transform: WeaveNodeTransformerProperties;
@@ -11,3 +12,5 @@ export type WeaveEllipseProperties = {
 export type WeaveEllipseNodeParams = {
   config: Partial<WeaveEllipseProperties>;
 };
+
+export type { WeaveShapeLabelProps };
