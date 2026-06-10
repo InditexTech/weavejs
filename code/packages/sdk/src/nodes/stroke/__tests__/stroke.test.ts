@@ -79,6 +79,7 @@ function makeMockCtx() {
     closePath: vi.fn(),
     fill: vi.fn(),
     rect: vi.fn(),
+    arc: vi.fn(),
     fillStrokeShape: vi.fn(),
     fillStyle: '' as string | CanvasGradient,
   };
@@ -169,18 +170,6 @@ describe('WeaveStrokeNode', () => {
       const { node } = makeNode();
       const shape = node.onRender(defaultProps()) as Konva.Shape;
       expect(shape.name()).toBe('node');
-    });
-
-    it('2.3 shape lineCap is "round"', () => {
-      const { node } = makeNode();
-      const shape = node.onRender(defaultProps()) as Konva.Shape;
-      expect(shape.lineCap()).toBe('round');
-    });
-
-    it('2.4 shape lineJoin is "round"', () => {
-      const { node } = makeNode();
-      const shape = node.onRender(defaultProps()) as Konva.Shape;
-      expect(shape.lineJoin()).toBe('round');
     });
 
     it('2.5 shape dashEnabled is false', () => {
@@ -556,15 +545,16 @@ describe('WeaveStrokeNode', () => {
   // -------------------------------------------------------------------------
 
   describe('drawRibbonWithDash — solid stroke (no dash array)', () => {
-    it('10.1 1 strokeElement → pts.length < 2 → early return, no fill()', () => {
+    it('10.1 1 strokeElement → draws a dot circle (ctx.arc + ctx.fill called once)', () => {
       const { node } = makeNode();
       const shape = node.onRender(defaultProps()) as Konva.Shape;
-      shape.setAttr('strokeElements', [{ x: 5, y: 5, pressure: 1 }]);
+      shape.setAttrs({ strokeElements: [{ x: 5, y: 5, pressure: 1 }], strokeWidth: 4 });
       const ctx = makeMockCtx();
 
       (shape.getAttr('sceneFunc') as (...args: unknown[]) => unknown)(ctx, shape);
 
-      expect(ctx.fill).not.toHaveBeenCalled();
+      expect(ctx.arc).toHaveBeenCalledOnce();
+      expect(ctx.fill).toHaveBeenCalledOnce();
     });
 
     it('10.2 2+ points, no dash → Infinity dashRemaining → always dashOn → fill() called', () => {
@@ -578,7 +568,7 @@ describe('WeaveStrokeNode', () => {
       expect(ctx.fill).toHaveBeenCalled();
     });
 
-    it('10.3 solid stroke: all segments merged — final polygon flushed exactly once', () => {
+    it('10.3 solid stroke: all segments merged — final polygon flushed once, plus 2 round caps', () => {
       const { node } = makeNode();
       const shape = node.onRender(defaultProps()) as Konva.Shape;
       shape.setAttrs({ strokeElements: makeLine(10), dash: [] });
@@ -587,8 +577,9 @@ describe('WeaveStrokeNode', () => {
       (shape.getAttr('sceneFunc') as (...args: unknown[]) => unknown)(ctx, shape);
 
       // With Infinity dashRemaining, the polygon is never flushed mid-loop;
-      // the final `if (dashOn && leftSide.length && rightSide.length)` fires once.
-      expect(ctx.fill).toHaveBeenCalledTimes(1);
+      // the final `if (dashOn && leftSide.length && rightSide.length)` fires once
+      // (1 polygon fill + 2 cap fills = 3 total).
+      expect(ctx.fill).toHaveBeenCalledTimes(3);
     });
   });
 
@@ -742,6 +733,70 @@ describe('WeaveStrokeNode', () => {
       expect(() =>
         (shape.getAttr('sceneFunc') as (...args: unknown[]) => unknown)(makeMockCtx(), shape)
       ).not.toThrow();
+    });
+  });
+
+  // -------------------------------------------------------------------------
+  // Suite 15 — rounded caps: ctx.arc calls
+  // -------------------------------------------------------------------------
+
+  describe('drawRibbonWithDash — rounded caps via ctx.arc', () => {
+    it('15.1 solid stroke draws 2 round caps (start + end) via ctx.arc', () => {
+      const { node } = makeNode();
+      const shape = node.onRender(defaultProps()) as Konva.Shape;
+      shape.setAttrs({ strokeElements: makeLine(10), dash: [], strokeWidth: 4 });
+      const ctx = makeMockCtx();
+
+      (shape.getAttr('sceneFunc') as (...args: unknown[]) => unknown)(ctx, shape);
+
+      // drawRoundCap calls ctx.arc once per cap; solid stroke has start + end = 2
+      expect(ctx.arc).toHaveBeenCalledTimes(2);
+    });
+
+    it('15.2 each arc call uses full circle (0 to 2π)', () => {
+      const { node } = makeNode();
+      const shape = node.onRender(defaultProps()) as Konva.Shape;
+      shape.setAttrs({ strokeElements: makeLine(10), dash: [], strokeWidth: 4 });
+      const ctx = makeMockCtx();
+
+      (shape.getAttr('sceneFunc') as (...args: unknown[]) => unknown)(ctx, shape);
+
+      for (const call of ctx.arc.mock.calls) {
+        const [, , , startAngle, endAngle] = call as number[];
+        expect(startAngle).toBe(0);
+        expect(endAngle).toBeCloseTo(Math.PI * 2);
+      }
+    });
+
+    it('15.3 dashed stroke draws ctx.arc for each "on" dash segment (start + end per segment)', () => {
+      const { node } = makeNode();
+      const shape = node.onRender(defaultProps()) as Konva.Shape;
+      // Short path with 1 dash segment (dash larger than path length)
+      shape.setAttrs({
+        strokeElements: makeLine(5, 5), // 4 segments × 5px = 20px path
+        dash: [100, 100],               // first "on" segment covers entire 20px → 1 dash polygon
+        strokeWidth: 4,
+      });
+      const ctx = makeMockCtx();
+
+      (shape.getAttr('sceneFunc') as (...args: unknown[]) => unknown)(ctx, shape);
+
+      // One dash polygon → 2 caps
+      expect(ctx.arc).toHaveBeenCalledTimes(2);
+    });
+
+    it('15.4 drawRoundCap always calls arc, even for coincident points (r=0)', () => {
+      const { node } = makeNode();
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const mockCtx = makeMockCtx() as any;
+
+      // Call drawRoundCap directly with coincident points (radius = 0)
+      // The guard was removed so arc is always called regardless of radius.
+      const coincident = { x: 5, y: 5, pressure: 1 };
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      (node as any).drawRoundCap(mockCtx, coincident, coincident, 'red');
+
+      expect(mockCtx.arc).toHaveBeenCalledOnce();
     });
   });
 });

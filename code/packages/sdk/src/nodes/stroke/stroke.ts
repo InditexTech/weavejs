@@ -87,6 +87,52 @@ export class WeaveStrokeNode extends WeaveNode {
     return result;
   }
 
+  private drawRoundCap(
+    ctx: Konva.Context,
+    a: WeaveStrokePoint,
+    b: WeaveStrokePoint,
+    color: string | CanvasGradient
+  ) {
+    const cx = (a.x + b.x) / 2;
+    const cy = (a.y + b.y) / 2;
+    const r = Math.hypot(a.x - b.x, a.y - b.y) / 2;
+    ctx.beginPath();
+    ctx.fillStyle = color;
+    ctx.arc(cx, cy, r, 0, Math.PI * 2);
+    ctx.fill();
+  }
+
+  /**
+   * Draws a filled polygon from the accumulated left/right outline points of a
+   * dash segment and adds round caps at both ends.
+   * NOTE: mutates `rightSide` via Array.reverse() — callers must not reuse it after this call.
+   */
+  private drawDashPolygon(
+    ctx: Konva.Context,
+    leftSide: WeaveStrokePoint[],
+    rightSide: WeaveStrokePoint[],
+    color: string | CanvasGradient
+  ): void {
+    const capStartL = leftSide[0];
+    const capStartR = rightSide[0];
+    const capEndL = leftSide.at(-1);
+    const capEndR = rightSide.at(-1);
+
+    const smoothLeft = this.getSplinePoints(leftSide, 4);
+    const smoothRight = this.getSplinePoints(rightSide.reverse(), 4);
+
+    ctx.beginPath();
+    ctx.fillStyle = color;
+    ctx.moveTo(smoothLeft[0].x, smoothLeft[0].y);
+    for (const p of smoothLeft) ctx.lineTo(p.x, p.y);
+    for (const p of smoothRight) ctx.lineTo(p.x, p.y);
+    ctx.closePath();
+    ctx.fill();
+
+    this.drawRoundCap(ctx, capStartL, capStartR, color);
+    this.drawRoundCap(ctx, capEndL!, capEndR!, color);
+  }
+
   private drawRibbonWithDash(
     ctx: Konva.Context,
     pts: WeaveStrokePoint[],
@@ -96,7 +142,15 @@ export class WeaveStrokeNode extends WeaveNode {
   ) {
     if (!pts) return;
 
-    if (pts.length < 2) return;
+    if (pts.length < 2) {
+      const pt = pts[0];
+      const r = Math.max((baseW * pt.pressure) / 2, 0.5);
+      ctx.beginPath();
+      ctx.fillStyle = color;
+      ctx.arc(pt.x, pt.y, r, 0, Math.PI * 2);
+      ctx.fill();
+      return;
+    }
 
     const filtered = this.resamplePoints(pts, 2);
     const centerline = this.getSplinePoints(filtered, 8);
@@ -148,16 +202,7 @@ export class WeaveStrokeNode extends WeaveNode {
         if (dashRemaining <= 0) {
           // Fill current dash polygon if it exists
           if (dashOn && leftSide.length && rightSide.length) {
-            const smoothLeft = this.getSplinePoints(leftSide, 4);
-            const smoothRight = this.getSplinePoints(rightSide.reverse(), 4);
-
-            ctx.beginPath();
-            ctx.fillStyle = color;
-            ctx.moveTo(smoothLeft[0].x, smoothLeft[0].y);
-            for (const p of smoothLeft) ctx.lineTo(p.x, p.y);
-            for (const p of smoothRight) ctx.lineTo(p.x, p.y);
-            ctx.closePath();
-            ctx.fill();
+            this.drawDashPolygon(ctx, leftSide, rightSide, color);
           }
 
           // Reset for next dash segment
@@ -175,16 +220,7 @@ export class WeaveStrokeNode extends WeaveNode {
 
     // Fill the last dash polygon if needed
     if (dashOn && leftSide.length && rightSide.length) {
-      const smoothLeft = this.getSplinePoints(leftSide, 4);
-      const smoothRight = this.getSplinePoints(rightSide.reverse(), 4);
-
-      ctx.beginPath();
-      ctx.fillStyle = color;
-      ctx.moveTo(smoothLeft[0].x, smoothLeft[0].y);
-      for (const p of smoothLeft) ctx.lineTo(p.x, p.y);
-      for (const p of smoothRight) ctx.lineTo(p.x, p.y);
-      ctx.closePath();
-      ctx.fill();
+      this.drawDashPolygon(ctx, leftSide, rightSide, color);
     }
   }
 
@@ -209,8 +245,6 @@ export class WeaveStrokeNode extends WeaveNode {
       sceneFunc: (ctx, shape) => {
         this.drawShape(ctx, shape);
       },
-      lineCap: 'round',
-      lineJoin: 'round',
       dashEnabled: false,
       hitFunc: (context, shape) => {
         context.beginPath();
