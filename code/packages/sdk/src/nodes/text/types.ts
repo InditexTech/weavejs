@@ -20,6 +20,10 @@ export type WeaveTextCursorProperties = {
   color: string;
 };
 
+export type WeaveTextEditionProperties = {
+  borderSize: number;
+};
+
 export type WeaveTextOutlineProperties =
   | {
       enabled: true;
@@ -33,6 +37,7 @@ export type WeaveTextOutlineProperties =
 export type WeaveTextProperties = {
   transform: WeaveNodeTransformerProperties;
   outline: WeaveTextOutlineProperties;
+  edition: WeaveTextEditionProperties;
   cursor: WeaveTextCursorProperties;
 };
 

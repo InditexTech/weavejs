@@ -523,8 +523,9 @@ export class WeaveTextNode extends WeaveNode {
         this.textArea.value,
         textNode
       );
+      const borderSize = this.config.edition.borderSize;
       const width =
-        ((textAreaWidth + 2) * textNode.getAbsoluteScale().x) /
+        ((textAreaWidth + borderSize * 2) * textNode.getAbsoluteScale().x) /
         this.instance.getStage().scaleX();
       this.textAreaContainer.style.width = width + 'px';
     }
@@ -680,10 +681,10 @@ export class WeaveTextNode extends WeaveNode {
       textNode.getAttrs().layout === TEXT_LAYOUT.SMART &&
       !textNode.getAttrs().smartFixedWidth
     ) {
+      const borderSize = this.config.edition.borderSize;
       const rect = textNode.getClientRect({ relativeTo: stage });
-      // const width = rect.width - 2;
       this.textAreaContainer.style.width =
-        (rect.width + 2) * textNode.getAbsoluteScale().x + 'px';
+        (rect.width + borderSize * 2) * textNode.getAbsoluteScale().x + 'px';
       this.textAreaContainer.style.height =
         (textNode.height() - textNode.padding() * 2) *
           textNode.getAbsoluteScale().x +
@@ -693,9 +694,10 @@ export class WeaveTextNode extends WeaveNode {
       !textNode.getAttrs().layout ||
       textNode.getAttrs().layout === TEXT_LAYOUT.AUTO_ALL
     ) {
+      const borderSize = this.config.edition.borderSize;
       const rect = textNode.getClientRect({ relativeTo: stage });
       this.textAreaContainer.style.width =
-        (rect.width + 2) * textNode.getAbsoluteScale().x + 'px';
+        (rect.width + borderSize * 2) * textNode.getAbsoluteScale().x + 'px';
       this.textAreaContainer.style.height =
         (textNode.height() - textNode.padding() * 2) *
           textNode.getAbsoluteScale().x +
@@ -733,7 +735,10 @@ export class WeaveTextNode extends WeaveNode {
         'px';
     }
 
-    this.textAreaContainer.style.border = 'solid 1px #1e40af';
+    const size = this.textRenderedSize(textNode.text(), textNode);
+
+    const borderSize = this.config.edition.borderSize;
+    this.textAreaContainer.style.border = `solid ${borderSize}px #1e40af`;
     this.textArea.style.position = 'absolute';
     this.textArea.style.top = '0px';
     this.textArea.style.left = '0px';
@@ -742,11 +747,12 @@ export class WeaveTextNode extends WeaveNode {
     this.textArea.style.scrollBehavior = 'auto';
     this.textArea.style.caretColor = 'black';
     this.textArea.style.width = '100%';
+    this.textArea.style.height = `${size.height}px`;
     this.textArea.style.minHeight = 'auto';
     this.textArea.style.margin = '0px';
     this.textArea.style.padding = '0px';
     this.textArea.style.paddingTop = '0px';
-    this.textArea.style.boxSizing = 'border-box';
+    this.textArea.style.boxSizing = 'content-box';
     this.textArea.style.overflow = 'hidden';
     this.textArea.style.background = 'transparent';
     this.textArea.style.border = 'none';
@@ -763,30 +769,10 @@ export class WeaveTextNode extends WeaveNode {
     this.textAreaContainer.style.transformOrigin = 'left top';
     this.mimicTextNode(textNode);
 
-    this.textArea.style.left = `${-1}px`;
-    this.textArea.style.top = `${-1}px`;
-
-    // console.log({
-    //   rect,
-    //   width,
-    //   height,
-    //   diffW,
-    //   diffH,
-    // });
-
-    // const updateTextNode = () => {
-    //   if (!this.textArea) {
-    //     return;
-    //   }
-
-    //   updateTextNodeSize();
-    //   textNode.text(this.textArea.value);
-    //   textNode.visible(true);
-
-    //   this.instance.updateNodeNT(this.serialize(textNode));
-    // };
-
-    // const throttledUpdateTextNode = throttle(updateTextNode, 300);
+    this.textArea.style.left = `${-borderSize}px`;
+    this.textArea.style.top = `${
+      -borderSize + (size.height - this.textArea.offsetHeight)
+    }px`;
 
     this.textArea.onfocus = () => {
       this.textAreaDomResize(textNode);
@@ -873,9 +859,8 @@ export class WeaveTextNode extends WeaveNode {
         textNode.getAttrs().layout === TEXT_LAYOUT.AUTO_ALL ||
         textNode.getAttrs().layout === TEXT_LAYOUT.SMART
       ) {
-        textNode.height(
-          this.textArea.scrollHeight * (1 / textNode.getAbsoluteScale().x)
-        );
+        const size = this.textRenderedSize(this.textArea.value, textNode);
+        textNode.height(size.height * (1 / textNode.getAbsoluteScale().x));
       }
     };
 

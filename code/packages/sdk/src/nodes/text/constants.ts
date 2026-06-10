@@ -19,6 +19,9 @@ export const WEAVE_TEXT_NODE_DEFAULT_CONFIG: WeaveTextProperties = {
   cursor: {
     color: '#000000',
   },
+  edition: {
+    borderSize: 2,
+  },
 };
 
 export const TEXT_LAYOUT = {
