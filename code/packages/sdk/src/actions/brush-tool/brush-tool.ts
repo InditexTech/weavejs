@@ -429,11 +429,17 @@ export class WeaveBrushToolAction extends WeaveAction {
 
         const compressedPoints = simplify(newStrokeElements, 1, true);
 
+        const sw = tempStroke.getAttrs().strokeWidth ?? 1;
+        const finalWidth = Math.max(box.width, sw);
+        const finalHeight = Math.max(box.height, sw);
+        const finalX = box.width === 0 ? box.x - sw / 2 : box.x;
+        const finalY = box.height === 0 ? box.y - sw / 2 : box.y;
+
         tempStroke.setAttrs({
-          width: box.width,
-          height: box.height,
-          x: box.x,
-          y: box.y,
+          width: finalWidth,
+          height: finalHeight,
+          x: finalX,
+          y: finalY,
           strokeElements: compressedPoints,
         });
 
@@ -444,7 +450,7 @@ export class WeaveBrushToolAction extends WeaveAction {
           realNode.destroy();
         }
 
-        if (tempStroke.getAttrs().strokeElements.length >= 3) {
+        if (tempStroke.getAttrs().strokeElements.length >= 1) {
           this.instance.addNode(
             nodeHandler.serialize(tempStroke as WeaveElementInstance),
             this.container?.getAttrs().id
