@@ -37,7 +37,8 @@ export type WeaveImagesToolActionTriggerCommonParams = {
 
 export type WeaveImagesToolActionInternalUploadFunction = () => Promise<void>;
 export type WeaveImagesToolActionUploadFunction = (
-  file: File
+  file: File,
+  imageId: string
 ) => Promise<string>;
 export type WeaveImagesToolActionOnStartUploadingFunction =
   () => void | Promise<void>;
@@ -54,7 +55,6 @@ export type WeaveImagesFile = {
 
 export type WeaveImagesURL = {
   url: string;
-  fallback: string;
   width: number;
   height: number;
   options?: ImageOptions;

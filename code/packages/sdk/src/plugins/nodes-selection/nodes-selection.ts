@@ -99,8 +99,8 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin implements SelectionC
     this.enabled = false;
     this.pointers = {};
     this.dragSelectedNodes = [];
-    this._handledClickOrTap = false;
   }
+
 
   getName(): string {
     return WEAVE_NODES_SELECTION_KEY;

@@ -55,6 +55,7 @@ type ImageProps = WeaveElementAttributes & {
 };
 
 type WeaveImageState = {
+  status: "loaded" | "loading" | "error-fallback" | "error" | "idle";
   loaded: boolean;
   error: boolean;
 };
@@ -68,12 +69,14 @@ type WeaveImageCache =
       pixelRatio: number;
     };
 
-type WeaveImageURLTransformerFunction = (
-  url: string,
-  node?: Konva.Node,
-) => string;
+type WeaveImageCursors = {
+  loading: string;
+};
 
 type WeaveImageProperties = {
+  cleanup: {
+    intervalMs: number;
+  };
   performance: {
     cache: WeaveImageCache;
   };
@@ -81,14 +84,36 @@ type WeaveImageProperties = {
     placeholder: {
       fill: string;
     };
+    cursor: WeaveImageCursors;
+  };
+  imageLoading: {
+    maxRetryAttempts: number;
+    retryDelayMs: number;
   };
   crossOrigin: ImageCrossOrigin;
   transform?: WeaveNodeTransformerProperties;
-  urlTransformer?: WeaveImageURLTransformerFunction;
+  urlTransformer?: URLTransformerFunction;
+  imageFallback:
+    | {
+        enabled: true;
+        getId: (params: WeaveElementAttributes) => string;
+        getDataURL: (imageFallbackId: string) => string;
+        onPersist: (params: WeaveElementAttributes, dataURL: string) => void;
+      }
+    | {
+        enabled: false;
+      };
   onDblClick?: (instance: WeaveImageNode, node: Konva.Group) => void;
   cropMode: {
-    grid: {
+    enabled: boolean;
+    triggers: {
+      ctrlCmd: boolean;
+    };
+    gridLines: {
       enabled: boolean;
+    };
+    overlay: {
+      fill: string;
     };
     selection: {
       enabledAnchors: WeaveImageCropAnchorPosition[];
@@ -186,6 +211,26 @@ For `WeaveImageProperties`:
       description:
         "Function that receives the actual image node URL, and returns an URL. Useful for transformations of the URL.",
       type: "(url: string) => string",
+    },
+    ["imageFallback.enabled"]: {
+      description:
+        "Defines if we use the image fallback mechanism to provide an image fallback to the node while the real image is loading.",
+      type: "boolean",
+    },
+    ["imageFallback.getId"]: {
+      description:
+        "Function that provided a specific node parameters, returns the resource id used by that node.",
+      type: "(params: WeaveElementAttributes) => string",
+    },
+    ["imageFallback.getDataURL"]: {
+      description:
+        "Function that provided a resource id, returns de image fallback in data URL format for that resource.",
+      type: "boolean",
+    },
+    ["imageFallback.onPersist"]: {
+      description:
+        "Function that provided a specific node parameters and a data URL as the image fallback for that node, allows developers to persist the mapping (id, data URL) to an external service, in order to later on use it on imageFallback.getDataURL",
+      type: "(params: WeaveElementAttributes, dataURL: string) => void",
     },
     ["onDblClick"]: {
       description:

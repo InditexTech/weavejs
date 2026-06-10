@@ -47,7 +47,9 @@ export const WEAVE_IMAGE_DEFAULT_CONFIG: WeaveImageProperties = {
     retryDelayMs: 2000,
   },
   crossOrigin: 'anonymous',
-  useFallbackImage: true,
+  imageFallback: {
+    enabled: false,
+  },
   cropMode: {
     enabled: true,
     triggers: {

@@ -469,7 +469,10 @@ export class WeaveImagesToolAction extends WeaveAction {
           const { imageId } = imageFile;
 
           const uploadImageFunctionInternal = async () => {
-            const imageURL = await this.uploadImageFunction(imageFile.file);
+            const imageURL = await this.uploadImageFunction(
+              imageFile.file,
+              imageId ?? ''
+            );
             return imageURL;
           };
 
@@ -536,7 +539,6 @@ export class WeaveImagesToolAction extends WeaveAction {
               type: WEAVE_IMAGE_TOOL_UPLOAD_TYPE.IMAGE_URL,
               image: {
                 url: imageURL.url,
-                fallback: imageURL.fallback,
                 width: imageURL.width,
                 height: imageURL.height,
               },

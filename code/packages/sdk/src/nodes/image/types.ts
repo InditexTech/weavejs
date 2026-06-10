@@ -65,8 +65,17 @@ export type WeaveImageProperties = {
   };
   crossOrigin: ImageCrossOrigin;
   transform?: WeaveNodeTransformerProperties;
-  useFallbackImage?: boolean;
   urlTransformer?: URLTransformerFunction;
+  imageFallback:
+    | {
+        enabled: true;
+        getId: (params: WeaveElementAttributes) => string;
+        getDataURL: (imageFallbackId: string) => string;
+        onPersist: (params: WeaveElementAttributes, dataURL: string) => void;
+      }
+    | {
+        enabled: false;
+      };
   onDblClick?: (instance: WeaveImageNode, node: Konva.Group) => void;
   cropMode: {
     enabled: boolean;
