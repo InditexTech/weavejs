@@ -107,54 +107,52 @@ jobs:
             echo "coverage-exists=false" >> "$GITHUB_OUTPUT"
           fi
 
-       - name: SonarCloud / Run analysis with release event
-         env:
-           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-         if: ${{ github.event_name == 'release' }}
-         working-directory: code
-         run: |
-           COVERAGE_OPTIONS=""
-           if [ "${{ steps.coverage-check.outputs.coverage-exists }}" = "true" ]; then
-             COVERAGE_OPTIONS="-Dsonar.javascript.lcov.reportPaths=coverage/lcov.info"
-           fi
-           
-           npx sonar-scanner \
-             -Dsonar.projectKey=InditexTech_"${{ steps.version.outputs.github-repository }}" \
-             -Dsonar.projectName="${{ steps.version.outputs.github-repository }}" \
-             -Dsonar.projectVersion="${{ github.event.release.tag_name }}" \
-             -Dsonar.sources=packages \
-             -Dsonar.exclusions="**/node_modules/**,**/*.test.js,**/*.spec.js,**/dist/**,**/coverage/**" \
-             -Dsonar.tests=packages \
-             -Dsonar.test.inclusions="**/*.test.js,**/*.spec.js" \
-             -Dsonar.branch.name="release/${{ github.event.release.tag_name }}" \
-             -Dsonar.host.url="https://sonarcloud.io/" \
-             -Dsonar.organization=inditextech \
-             $COVERAGE_OPTIONS
+      - name: SonarCloud / Run analysis with release event
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        if: ${{ github.event_name == 'release' }}
+        working-directory: code
+        run: |
+          COVERAGE_OPTIONS=""
+          if [ "${{ steps.coverage-check.outputs.coverage-exists }}" = "true" ]; then
+            COVERAGE_OPTIONS="-Dsonar.javascript.lcov.reportPaths=coverage/lcov.info"
+          fi
 
-       - name: SonarCloud / Run analysis
-         env:
-           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-         if: ${{ github.event_name != 'release' }}
-         working-directory: code
-         run: |
-           COVERAGE_OPTIONS=""
-           if [ "${{ steps.coverage-check.outputs.coverage-exists }}" = "true" ]; then
-             COVERAGE_OPTIONS="-Dsonar.javascript.lcov.reportPaths=coverage/lcov.info"
-           fi
-           
-           npx sonar-scanner \
-             -Dsonar.projectKey=InditexTech_"${{ steps.version.outputs.github-repository }}" \
-             -Dsonar.projectName="${{ steps.version.outputs.github-repository }}" \
-             -Dsonar.projectVersion="${{ steps.version.outputs.app-version }}" \
-             -Dsonar.sources=packages \
-             -Dsonar.exclusions="**/node_modules/**,**/*.test.js,**/*.spec.js,**/dist/**,**/coverage/**" \
-             -Dsonar.tests=packages \
-             -Dsonar.test.inclusions="**/*.test.js,**/*.spec.js" \
-             -Dsonar.branch.name="${{ github.base_ref || github.ref_name }}" \
-             -Dsonar.host.url="https://sonarcloud.io/" \
-             -Dsonar.organization=inditextech \
-             $COVERAGE_OPTIONS
+          npx sonar-scanner \
+            -Dsonar.projectKey=InditexTech_"${{ steps.version.outputs.github-repository }}" \
+            -Dsonar.projectName="${{ steps.version.outputs.github-repository }}" \
+            -Dsonar.projectVersion="${{ github.event.release.tag_name }}" \
+            -Dsonar.sources=packages \
+            -Dsonar.exclusions="**/node_modules/**,**/*.test.js,**/*.spec.js,**/dist/**,**/coverage/**" \
+            -Dsonar.tests=packages \
+            -Dsonar.test.inclusions="**/*.test.js,**/*.spec.js" \
+            -Dsonar.branch.name="release/${{ github.event.release.tag_name }}" \
+            -Dsonar.host.url="https://sonarcloud.io/" \
+            -Dsonar.organization=inditextech \
+            $COVERAGE_OPTIONS
 
+      - name: SonarCloud / Run analysis
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        if: ${{ github.event_name != 'release' }}
+        working-directory: code
+        run: |
+          COVERAGE_OPTIONS=""
+          if [ "${{ steps.coverage-check.outputs.coverage-exists }}" = "true" ]; then
+            COVERAGE_OPTIONS="-Dsonar.javascript.lcov.reportPaths=coverage/lcov.info"
+          fi
 
+          npx sonar-scanner \
+            -Dsonar.projectKey=InditexTech_"${{ steps.version.outputs.github-repository }}" \
+            -Dsonar.projectName="${{ steps.version.outputs.github-repository }}" \
+            -Dsonar.projectVersion="${{ steps.version.outputs.app-version }}" \
+            -Dsonar.sources=packages \
+            -Dsonar.exclusions="**/node_modules/**,**/*.test.js,**/*.spec.js,**/dist/**,**/coverage/**" \
+            -Dsonar.tests=packages \
+            -Dsonar.test.inclusions="**/*.test.js,**/*.spec.js" \
+            -Dsonar.branch.name="${{ github.base_ref || github.ref_name }}" \
+            -Dsonar.host.url="https://sonarcloud.io/" \
+            -Dsonar.organization=inditextech \
+            $COVERAGE_OPTIONS
