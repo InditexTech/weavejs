@@ -135,25 +135,9 @@ jobs:
         if: ${{ github.event_name == 'release' }}
         working-directory: code
         run: |
-          COVERAGE_OPTIONS=""
-          if [ "${{ steps.coverage-check.outputs.coverage-exists }}" = "true" ]; then
-            COVERAGE_OPTIONS="-Dsonar.javascript.lcov.reportPaths=coverage/lcov.info"
-          fi
-
           npx sonar-scanner \
-            -Dsonar.projectKey=InditexTech_"${{ steps.version.outputs.github-repository }}" \
-            -Dsonar.projectName="${{ steps.version.outputs.github-repository }}" \
             -Dsonar.projectVersion="${{ github.event.release.tag_name }}" \
-            -Dsonar.sources=packages \
-            -Dsonar.tests=packages \
-            -Dsonar.test.inclusions="**/*.test.ts,**/*.test.tsx" \
-            -Dsonar.exclusions="**/node_modules/**,**/dist/**,**/coverage/**,**/reports/**,**/*.test-d.ts" \
-            -Dsonar.coverage.exclusions="**/__tests__/**,**/*.config.ts,**/vitest.setup.ts,packages/create-backend-app/**,packages/create-frontend-app/**" \
-            -Dsonar.cpd.exclusions="packages/create-backend-app/**/*,packages/create-frontend-app/**/*,**/tsdown.config.ts,**/vitest.config.ts,**/vitest.setup.ts,**/__tests__/**,**/*.test.ts" \
-            -Dsonar.branch.name="release/${{ github.event.release.tag_name }}" \
-            -Dsonar.host.url="https://sonarcloud.io/" \
-            -Dsonar.organization=inditextech \
-            $COVERAGE_OPTIONS
+            -Dsonar.branch.name="release/${{ github.event.release.tag_name }}"
 
       - name: SonarCloud / Run analysis
         env:
@@ -162,11 +146,6 @@ jobs:
         if: ${{ github.event_name != 'release' }}
         working-directory: code
         run: |
-          COVERAGE_OPTIONS=""
-          if [ "${{ steps.coverage-check.outputs.coverage-exists }}" = "true" ]; then
-            COVERAGE_OPTIONS="-Dsonar.javascript.lcov.reportPaths=coverage/lcov.info"
-          fi
-
           if [ "${{ github.event_name }}" = "pull_request" ]; then
             SCOPE_OPTIONS="-Dsonar.pullrequest.key=${{ github.event.pull_request.number }} -Dsonar.pullrequest.branch=${{ github.head_ref }} -Dsonar.pullrequest.base=${{ github.base_ref }}"
           else
@@ -174,16 +153,5 @@ jobs:
           fi
 
           npx sonar-scanner \
-            -Dsonar.projectKey=InditexTech_"${{ steps.version.outputs.github-repository }}" \
-            -Dsonar.projectName="${{ steps.version.outputs.github-repository }}" \
             -Dsonar.projectVersion="${{ steps.version.outputs.app-version }}" \
-            -Dsonar.sources=packages \
-            -Dsonar.tests=packages \
-            -Dsonar.test.inclusions="**/*.test.ts,**/*.test.tsx" \
-            -Dsonar.exclusions="**/node_modules/**,**/dist/**,**/coverage/**,**/reports/**,**/*.test-d.ts" \
-            -Dsonar.coverage.exclusions="**/__tests__/**,**/*.config.ts,**/vitest.setup.ts,packages/create-backend-app/**,packages/create-frontend-app/**" \
-            -Dsonar.cpd.exclusions="packages/create-backend-app/**/*,packages/create-frontend-app/**/*,**/tsdown.config.ts,**/vitest.config.ts,**/vitest.setup.ts,**/__tests__/**,**/*.test.ts" \
-            -Dsonar.host.url="https://sonarcloud.io/" \
-            -Dsonar.organization=inditextech \
-            $SCOPE_OPTIONS \
-            $COVERAGE_OPTIONS
+            $SCOPE_OPTIONS
