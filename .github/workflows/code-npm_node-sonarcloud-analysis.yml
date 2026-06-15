@@ -120,8 +120,8 @@ jobs:
            fi
            
            npx sonar-scanner \
-             -Dsonar.projectKey=InditexTech_weavejs \
-             -Dsonar.projectName=weavejs \
+             -Dsonar.projectKey=InditexTech_"${{ steps.version.outputs.github-repository }}" \
+             -Dsonar.projectName="${{ steps.version.outputs.github-repository }}" \
              -Dsonar.projectVersion="${{ github.event.release.tag_name }}" \
              -Dsonar.sources=packages \
              -Dsonar.exclusions="**/node_modules/**,**/*.test.js,**/*.spec.js,**/dist/**,**/coverage/**" \
@@ -145,8 +145,8 @@ jobs:
            fi
            
            npx sonar-scanner \
-             -Dsonar.projectKey=InditexTech_weavejs \
-             -Dsonar.projectName=weavejs \
+             -Dsonar.projectKey=InditexTech_"${{ steps.version.outputs.github-repository }}" \
+             -Dsonar.projectName="${{ steps.version.outputs.github-repository }}" \
              -Dsonar.projectVersion="${{ steps.version.outputs.app-version }}" \
              -Dsonar.sources=packages \
              -Dsonar.exclusions="**/node_modules/**,**/*.test.js,**/*.spec.js,**/dist/**,**/coverage/**" \
