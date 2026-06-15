@@ -88,7 +88,14 @@ jobs:
         working-directory: code
         continue-on-error: true
         run: |
-          npm run test -- --coverage --silent || true
+          npx nx run-many -t test --no-tui || true
+
+      - name: NPM / Merge coverage reports
+        if: always()
+        working-directory: code
+        continue-on-error: true
+        run: |
+          npm run test:merge-coverage || true
 
       - name: Store project information
         id: version
@@ -101,9 +108,13 @@ jobs:
         id: coverage-check
         working-directory: code
         run: |
+          echo "Per-package lcov reports found:"
+          find packages -path '*reports/vite-coverage/lcov.info' || true
           if [ -f "coverage/lcov.info" ]; then
+            echo "Merged coverage lines: $(grep -c '^SF:' coverage/lcov.info || echo 0)"
             echo "coverage-exists=true" >> "$GITHUB_OUTPUT"
           else
+            echo "::warning::coverage/lcov.info not found"
             echo "coverage-exists=false" >> "$GITHUB_OUTPUT"
           fi
 
