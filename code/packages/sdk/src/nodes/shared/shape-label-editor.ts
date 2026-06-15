@@ -445,9 +445,15 @@ export class WeaveShapeLabelEditor {
     this.textArea.style.textDecoration =
       props.labelTextDecoration ??
       WEAVE_SHAPE_LABEL_DEFAULTS.labelTextDecoration;
-    this.textArea.style.fontWeight = fontStyle.includes('bold')
-      ? 'bold'
-      : 'normal';
+    let fontWeight = 'normal';
+    const matchNumber = fontStyle.match(/\d+/);
+    if (fontStyle.includes('bold')) {
+      fontWeight = 'bold';
+    }
+    if (matchNumber) {
+      fontWeight = matchNumber[0];
+    }
+    this.textArea.style.fontWeight = fontWeight;
     this.textArea.style.fontVariant =
       props.labelFontVariant ?? WEAVE_SHAPE_LABEL_DEFAULTS.labelFontVariant;
     this.textArea.style.color =

@@ -409,6 +409,73 @@ describe('WeaveShapeLabelEditor', () => {
   });
 
   // -------------------------------------------------------------------------
+  // 6b — textarea font styles (fontStyle / fontWeight mapping)
+  // -------------------------------------------------------------------------
+
+  describe('textarea font styles', () => {
+    function makeEditorForFontStyle(labelFontStyle: string) {
+      const mockInstance = createMockInstance();
+      const editor = new WeaveShapeLabelEditor(mockInstance as never);
+      const group = makeGroup('fs-node');
+      group.setAttr('labelFontStyle', labelFontStyle);
+      group.setAttr('getAbsoluteTransform', () => ({
+        point: (p: { x: number; y: number }) => p,
+      }));
+      editor.renderLabel(
+        group,
+        { id: 'fs-node', labelText: 'hello', labelFontStyle },
+        defaultTextBounds()
+      );
+      editor.triggerEditMode(group, defaultTextBounds(), vi.fn());
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const ta = (editor as any).textArea as HTMLTextAreaElement;
+      return ta;
+    }
+
+    it('6b.1 labelFontStyle "normal" — fontWeight=normal, fontStyle=normal', () => {
+      const ta = makeEditorForFontStyle('normal');
+      expect(ta.style.fontWeight).toBe('normal');
+      expect(ta.style.fontStyle).toBe('normal');
+    });
+
+    it('6b.2 labelFontStyle "bold" — fontWeight=bold, fontStyle=normal', () => {
+      const ta = makeEditorForFontStyle('bold');
+      expect(ta.style.fontWeight).toBe('bold');
+      expect(ta.style.fontStyle).toBe('normal');
+    });
+
+    it('6b.3 labelFontStyle "italic" — fontWeight=normal, fontStyle=italic', () => {
+      const ta = makeEditorForFontStyle('italic');
+      expect(ta.style.fontWeight).toBe('normal');
+      expect(ta.style.fontStyle).toBe('italic');
+    });
+
+    it('6b.4 labelFontStyle "bold italic" — fontWeight=bold, fontStyle=italic', () => {
+      const ta = makeEditorForFontStyle('bold italic');
+      expect(ta.style.fontWeight).toBe('bold');
+      expect(ta.style.fontStyle).toBe('italic');
+    });
+
+    it('6b.5 labelFontStyle "700" — fontWeight=700, fontStyle=normal', () => {
+      const ta = makeEditorForFontStyle('700');
+      expect(ta.style.fontWeight).toBe('700');
+      expect(ta.style.fontStyle).toBe('normal');
+    });
+
+    it('6b.6 labelFontStyle "300" — fontWeight=300, fontStyle=normal', () => {
+      const ta = makeEditorForFontStyle('300');
+      expect(ta.style.fontWeight).toBe('300');
+      expect(ta.style.fontStyle).toBe('normal');
+    });
+
+    it('6b.7 labelFontStyle "700 italic" — fontWeight=700, fontStyle=italic', () => {
+      const ta = makeEditorForFontStyle('700 italic');
+      expect(ta.style.fontWeight).toBe('700');
+      expect(ta.style.fontStyle).toBe('italic');
+    });
+  });
+
+  // -------------------------------------------------------------------------
   // 7 — exitEditMode
   // -------------------------------------------------------------------------
 
