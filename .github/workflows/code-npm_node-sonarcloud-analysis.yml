@@ -84,6 +84,11 @@ jobs:
         run: |
           mkdir -p "$HOME"/.npm
 
+      - name: NPM / Install dependencies
+        working-directory: code
+        run: |
+          npm ci
+
       - name: NPM / Run unit tests with coverage
         working-directory: code
         continue-on-error: true
