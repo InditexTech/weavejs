@@ -136,6 +136,7 @@ jobs:
         working-directory: code
         run: |
           npx sonar-scanner \
+            -Dproject.settings=sonar-project.properties \
             -Dsonar.projectVersion="${{ github.event.release.tag_name }}" \
             -Dsonar.branch.name="release/${{ github.event.release.tag_name }}"
 
@@ -153,5 +154,6 @@ jobs:
           fi
 
           npx sonar-scanner \
+            -Dproject.settings=sonar-project.properties \
             -Dsonar.projectVersion="${{ steps.version.outputs.app-version }}" \
             $SCOPE_OPTIONS
