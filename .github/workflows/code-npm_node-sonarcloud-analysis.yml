@@ -125,6 +125,7 @@ jobs:
             -Dsonar.projectVersion="${{ github.event.release.tag_name }}" \
             -Dsonar.sources=packages \
             -Dsonar.exclusions="**/node_modules/**,**/*.test.js,**/*.spec.js,**/dist/**,**/coverage/**" \
+            -Dsonar.cpd.exclusions="packages/create-backend-app/**/*,packages/create-frontend-app/**/*,**/tsdown.config.ts,**/vitest.config.ts,**/vitest.setup.ts,**/__tests__/**,**/*.test.ts" \
             -Dsonar.tests=packages \
             -Dsonar.test.inclusions="**/*.test.js,**/*.spec.js" \
             -Dsonar.branch.name="release/${{ github.event.release.tag_name }}" \
@@ -150,6 +151,7 @@ jobs:
             -Dsonar.projectVersion="${{ steps.version.outputs.app-version }}" \
             -Dsonar.sources=packages \
             -Dsonar.exclusions="**/node_modules/**,**/*.test.js,**/*.spec.js,**/dist/**,**/coverage/**" \
+            -Dsonar.cpd.exclusions="packages/create-backend-app/**/*,packages/create-frontend-app/**/*,**/tsdown.config.ts,**/vitest.config.ts,**/vitest.setup.ts,**/__tests__/**,**/*.test.ts" \
             -Dsonar.tests=packages \
             -Dsonar.test.inclusions="**/*.test.js,**/*.spec.js" \
             -Dsonar.branch.name="${{ github.base_ref || github.ref_name }}" \
