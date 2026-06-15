@@ -1,0 +1,19 @@
+code/package.json
+  s_6c1a6cd8d9ad78::t_67042db6d87073 34
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.7",
+  "base_commit_sha": "0ebabd27d168db90b81b56c3e7fe1b38368dd19f",
+  "prompts": {},
+  "sessions": {
+    "s_6c1a6cd8d9ad78": {
+      "agent_id": {
+        "tool": "github-copilot-jetbrains",
+        "id": "1781506596099",
+        "model": "unknown"
+      },
+      "human_author": "Adria Berge Aguilar <adriaba@ext.inditex.com>"
+    }
+  }
+}
