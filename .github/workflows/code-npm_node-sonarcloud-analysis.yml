@@ -89,11 +89,16 @@ jobs:
         run: |
           npm ci
 
+      - name: NPM / Build packages
+        working-directory: code
+        run: |
+          npx nx run-many -t build --no-tui
+
       - name: NPM / Run unit tests with coverage
         working-directory: code
         continue-on-error: true
         run: |
-          npx nx run-many -t test --no-tui || true
+          npx nx run-many -t test --no-tui --nx-bail=false || true
 
       - name: NPM / Merge coverage reports
         if: always()
