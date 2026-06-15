@@ -41,6 +41,7 @@ function createMockInstance() {
     disablePlugin: vi.fn(),
     enablePlugin: vi.fn(),
     getEventsController: vi.fn().mockReturnValue(new AbortController()),
+    getFonts: vi.fn().mockReturnValue([]),
   };
 }
 

@@ -880,7 +880,9 @@ describe('WeaveRectangleNode', () => {
     });
 
     it('8.15 growCallback does NOT call updateNode while transform is in progress', () => {
-      const { node, mock } = makeNode();
+      const node = makeNode();
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const mock = (node as any).instance;
       const group = node.onRender(defaultProps({ width: 200, height: 50, labelText: 'hi' })) as Konva.Group;
 
       const label = group.findOne<Konva.Text>(`#${labelId('rect-id')}`) as Konva.Text;
@@ -892,9 +894,9 @@ describe('WeaveRectangleNode', () => {
 
       mock.updateNode.mockClear();
 
-      // Simulate transform in progress by firing the transform event
-      group.fire('transform');
-      // updateNode must NOT be called during transform — deferred to transformend
+      // Simulate transform in progress by firing the transformstart event
+      group.fire('transformstart');
+      // growCallback must NOT call updateNode during transform — deferred to transformend
       expect(mock.updateNode).not.toHaveBeenCalled();
 
       // After transformend the flag is cleared; a direct onUpdate call persists again

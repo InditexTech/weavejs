@@ -92,7 +92,8 @@ export function handleClickOrTap(
   }
 
   if (
-    nodeTargeted.getAttrs().name?.indexOf('node') === -1 &&
+    (!nodeTargeted.getAttrs().name ||
+      nodeTargeted.getAttrs().name.indexOf('node') === -1) &&
     nodeTargeted.getAttrs().nodeId
   ) {
     const realNode = stage.findOne(`#${nodeTargeted.getAttrs().nodeId}`);

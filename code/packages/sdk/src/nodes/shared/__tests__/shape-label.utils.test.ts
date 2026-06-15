@@ -19,6 +19,8 @@ import {
 // Helpers
 // ---------------------------------------------------------------------------
 
+const mockStage = { scaleX: () => 1, scaleY: () => 1 } as unknown as Konva.Stage;
+
 function makeLabelNode(
   groupId: string,
   text: string,
@@ -96,21 +98,21 @@ function makeEllipseGroup(
 describe('computeRectangleLabelMinSize', () => {
   it('returns { 0, 0 } when labelText is empty', () => {
     const group = makeRectGroup('r-empty', 200, 100, '');
-    const result = computeRectangleLabelMinSize(group);
-    expect(result).toEqual({ minWidth: 0, minHeight: 0 });
+    const result = computeRectangleLabelMinSize(mockStage, group);
+    expect(result).toEqual({ width: 0, height: 0 });
   });
 
   it('returns { 0, 0 } when labelText attr is absent', () => {
     const group = new Konva.Group({ id: 'r-no-text', width: 200, height: 100 });
     // no label child at all
-    const result = computeRectangleLabelMinSize(group);
-    expect(result).toEqual({ minWidth: 0, minHeight: 0 });
+    const result = computeRectangleLabelMinSize(mockStage, group);
+    expect(result).toEqual({ width: 0, height: 0 });
   });
 
   it('returns minHeight > 0 for non-empty text', () => {
     const group = makeRectGroup('r-1', 200, 100, 'Some text');
-    const { minHeight } = computeRectangleLabelMinSize(group);
-    expect(minHeight).toBeGreaterThan(0);
+    const { height } = computeRectangleLabelMinSize(mockStage, group);
+    expect(height).toBeGreaterThan(0);
   });
 
   it('minHeight includes paddingY on both sides', () => {
@@ -122,16 +124,16 @@ describe('computeRectangleLabelMinSize', () => {
     label!.setAttr('height', undefined);
     const naturalH = label!.height();
 
-    const { minHeight } = computeRectangleLabelMinSize(group);
-    expect(minHeight).toBe(naturalH + paddingY * 2);
+    const { height } = computeRectangleLabelMinSize(mockStage, group);
+    expect(height).toBe(naturalH + paddingY * 2);
   });
 
   it('minWidth is at least paddingX*2 + fontSize', () => {
     const paddingX = WEAVE_SHAPE_LABEL_DEFAULTS.labelPaddingX;
     const fontSize = WEAVE_SHAPE_LABEL_DEFAULTS.labelFontSize;
     const group = makeRectGroup('r-3', 200, 100, 'Hi');
-    const { minWidth } = computeRectangleLabelMinSize(group);
-    expect(minWidth).toBeGreaterThanOrEqual(paddingX * 2 + fontSize);
+    const { width } = computeRectangleLabelMinSize(mockStage, group);
+    expect(width).toBeGreaterThanOrEqual(paddingX * 2 + fontSize);
   });
 
   it('does not mutate the label node height permanently', () => {
@@ -139,7 +141,7 @@ describe('computeRectangleLabelMinSize', () => {
     const label = group.findOne<Konva.Text>(`#${labelId('r-4')}`);
     const heightBefore = label!.height();
 
-    computeRectangleLabelMinSize(group);
+    computeRectangleLabelMinSize(mockStage, group);
 
     expect(label!.height()).toBe(heightBefore);
   });
@@ -148,20 +150,20 @@ describe('computeRectangleLabelMinSize', () => {
 describe('computeEllipseLabelMinSize', () => {
   it('returns { 0, 0 } when labelText is empty', () => {
     const group = makeEllipseGroup('e-empty', 100, 60, '');
-    const result = computeEllipseLabelMinSize(group);
-    expect(result).toEqual({ minWidth: 0, minHeight: 0 });
+    const result = computeEllipseLabelMinSize(mockStage, group);
+    expect(result).toEqual({ width: 0, height: 0 });
   });
 
   it('returns { 0, 0 } when labelText attr is absent', () => {
     const group = new Konva.Group({ id: 'e-no-text', radiusX: 100, radiusY: 60 });
-    const result = computeEllipseLabelMinSize(group);
-    expect(result).toEqual({ minWidth: 0, minHeight: 0 });
+    const result = computeEllipseLabelMinSize(mockStage, group);
+    expect(result).toEqual({ width: 0, height: 0 });
   });
 
   it('returns minHeight > 0 for non-empty text', () => {
     const group = makeEllipseGroup('e-1', 100, 60, 'Some text');
-    const { minHeight } = computeEllipseLabelMinSize(group);
-    expect(minHeight).toBeGreaterThan(0);
+    const { height } = computeEllipseLabelMinSize(mockStage, group);
+    expect(height).toBeGreaterThan(0);
   });
 
   it('minHeight is radiusY * 2 (bounding box diameter)', () => {
@@ -176,8 +178,8 @@ describe('computeEllipseLabelMinSize', () => {
     const expectedMinRadiusY = Math.ceil(
       (naturalH + paddingY * 2) / Math.SQRT2
     );
-    const { minHeight } = computeEllipseLabelMinSize(group);
-    expect(minHeight).toBe(expectedMinRadiusY * 2);
+    const { height } = computeEllipseLabelMinSize(mockStage, group);
+    expect(height).toBe(expectedMinRadiusY * 2);
   });
 
   it('does not mutate the label node height permanently', () => {
@@ -185,7 +187,7 @@ describe('computeEllipseLabelMinSize', () => {
     const label = group.findOne<Konva.Text>(`#${labelId('e-3')}`);
     const heightBefore = label!.height();
 
-    computeEllipseLabelMinSize(group);
+    computeEllipseLabelMinSize(mockStage, group);
 
     expect(label!.height()).toBe(heightBefore);
   });

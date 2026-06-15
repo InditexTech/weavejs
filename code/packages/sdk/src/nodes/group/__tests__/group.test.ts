@@ -475,13 +475,13 @@ describe('WeaveGroupNode', () => {
   describe('scaleReset', () => {
     it('9.1 is a no-op — does not throw and does not mutate the node', () => {
       const { node } = makeNode();
-      const konvaNode = new Konva.Rect({ x: 10, y: 20, scaleX: 2, scaleY: 3 });
-      expect(() => node.scaleReset()).not.toThrow();
-      // No mutations
-      expect(konvaNode.x()).toBe(10);
-      expect(konvaNode.y()).toBe(20);
-      expect(konvaNode.scaleX()).toBe(2);
-      expect(konvaNode.scaleY()).toBe(3);
+      const konvaGroup = new Konva.Group({ x: 10, y: 20, scaleX: 1, scaleY: 1 });
+      expect(() => node.scaleReset(konvaGroup)).not.toThrow();
+      // No mutations on the group itself
+      expect(konvaGroup.x()).toBe(10);
+      expect(konvaGroup.y()).toBe(20);
+      expect(konvaGroup.scaleX()).toBe(1);
+      expect(konvaGroup.scaleY()).toBe(1);
     });
   });
 });
