@@ -327,6 +327,10 @@ export class WeaveRectangleToolAction extends WeaveAction {
       this.instance.triggerAction(SELECTION_TOOL_ACTION_NAME);
     }
 
+    if (this.tempRectNode) {
+      this.tempRectNode.destroy();
+    }
+
     this.rectId = null;
     this.tempRectNode = null;
     this.moved = false;

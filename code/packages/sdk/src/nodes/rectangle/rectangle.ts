@@ -22,12 +22,14 @@ import {
   labelId,
   WEAVE_SHAPE_LABEL_DEFAULTS,
 } from '@/nodes/shared/shape-label.constants';
+import { computeRectangleLabelMinSize } from '@/nodes/shared/shape-label.utils';
 
 export class WeaveRectangleNode extends WeaveNode {
   private config: WeaveRectangleProperties;
   protected nodeType: string = WEAVE_RECTANGLE_NODE_TYPE;
   initialize = undefined;
   private _shapeLabelEditor: WeaveShapeLabelEditor | undefined;
+  private _transforming = false;
 
   private get shapeLabelEditor(): WeaveShapeLabelEditor {
     if (!this._shapeLabelEditor) {
@@ -51,14 +53,16 @@ export class WeaveRectangleNode extends WeaveNode {
   onRender(props: WeaveElementAttributes): WeaveElementInstance {
     const rectangle = new Konva.Group({
       ...props,
+      id: `${props.id}`,
       name: 'node',
     });
 
     const internalRectBg = new Konva.Rect({
       ...props,
       name: undefined,
-      id: `${props.id}-bg`,
+      nodeType: undefined,
       nodeId: props.id,
+      id: `${props.id}-bg`,
       x: 0,
       y: 0,
       width: props.width,
@@ -75,6 +79,7 @@ export class WeaveRectangleNode extends WeaveNode {
     const internalRectBorder = new Konva.Rect({
       ...props,
       name: undefined,
+      nodeType: undefined,
       id: `${props.id}-border`,
       x: props.strokeWidth / 2,
       y: props.strokeWidth / 2,
@@ -85,9 +90,28 @@ export class WeaveRectangleNode extends WeaveNode {
       strokeScaleEnabled: true,
       rotation: 0,
       listening: false,
+      draggable: false,
     });
 
     rectangle.add(internalRectBorder);
+
+    // const targetRect = new Konva.Rect({
+    //   ...props,
+    //   id: `${props.id}-target`,
+    //   nodeId: props.id,
+    //   name: 'node',
+    //   x: 0,
+    //   y: 0,
+    //   width: props.width,
+    //   height: props.height,
+    //   fill: 'transparent',
+    //   strokeWidth: 0,
+    //   strokeScaleEnabled: true,
+    //   cornerRadius: (props.cornerRadius || 0) * 1.1,
+    //   rotation: 0,
+    // });
+
+    // rectangle.add(targetRect);
 
     const paddingX =
       props.labelPaddingX ?? WEAVE_SHAPE_LABEL_DEFAULTS.labelPaddingX;
@@ -117,6 +141,19 @@ export class WeaveRectangleNode extends WeaveNode {
 
     this.setupDefaultNodeEvents(rectangle);
 
+    rectangle.on('transformstart', () => {
+      this._transforming = true;
+    });
+
+    rectangle.on('transform', () => {
+      this.scaleReset(rectangle);
+      this.onUpdate(rectangle, rectangle.getAttrs());
+    });
+
+    rectangle.on('transformend', () => {
+      this._transforming = false;
+    });
+
     rectangle.dblClick = () => {
       if (this.shapeLabelEditor.isEditing()) {
         return;
@@ -138,11 +175,45 @@ export class WeaveRectangleNode extends WeaveNode {
         this.instance.updateNode(serialized);
       };
 
+      // Re-derive bounds from live attrs so a resized rectangle uses the
+      // correct dimensions when the edit overlay is shown.
+      const currentAttrs = rectangle.getAttrs();
+      const curPaddingX =
+        currentAttrs.labelPaddingX ?? WEAVE_SHAPE_LABEL_DEFAULTS.labelPaddingX;
+      const curPaddingY =
+        currentAttrs.labelPaddingY ?? WEAVE_SHAPE_LABEL_DEFAULTS.labelPaddingY;
+      const currentLabelTextBounds = {
+        x: curPaddingX,
+        y: curPaddingY,
+        width: Math.max(1, (currentAttrs.width ?? 0) - curPaddingX * 2),
+        height: Math.max(1, (currentAttrs.height ?? 0) - curPaddingY * 2),
+      };
+      // Capture original height so the callback can restore to it when text shrinks
+      const originalHeight = (currentAttrs.height as number) ?? 0;
+
       this.shapeLabelEditor.triggerEditMode(
         rectangle,
-        labelTextBounds,
-        onCommit
+        currentLabelTextBounds,
+        onCommit,
+        (neededShapeHeight) => {
+          // Never shrink below original — Math.max handles both grow and restore
+          const finalHeight = Math.max(neededShapeHeight, originalHeight);
+          const liveAttrs = rectangle.getAttrs() as WeaveElementAttributes;
+          const strokeW = (liveAttrs.strokeWidth as number) || 0;
+          const bg = rectangle.findOne<Konva.Rect>(`#${liveAttrs.id}-bg`);
+          const border = rectangle.findOne<Konva.Rect>(
+            `#${liveAttrs.id}-border`
+          );
+          rectangle.setAttrs({ height: finalHeight });
+          bg?.setAttrs({ height: finalHeight });
+          border?.setAttrs({ height: Math.max(0, finalHeight - strokeW) });
+          rectangle.getLayer()?.batchDraw();
+        }
       );
+    };
+
+    rectangle.getNodeMinSize = () => {
+      return computeRectangleLabelMinSize(this.instance.getStage(), rectangle);
     };
 
     return rectangle;
@@ -157,6 +228,7 @@ export class WeaveRectangleNode extends WeaveNode {
     });
 
     const rectangle = nodeInstance as Konva.Group;
+
     const internalRectBg = rectangle.findOne(
       `#${nextProps.id}-bg`
     ) as Konva.Rect;
@@ -187,6 +259,7 @@ export class WeaveRectangleNode extends WeaveNode {
       internalRectBorder.setAttrs({
         ...nextProps,
         name: undefined,
+        fill: 'transparent',
         id: `${nextProps.id}-border`,
         x: nextProps.strokeWidth / 2,
         y: nextProps.strokeWidth / 2,
@@ -222,13 +295,21 @@ export class WeaveRectangleNode extends WeaveNode {
         internalRectBorder?.setAttrs({
           height: neededShapeHeight - nextProps.strokeWidth,
         });
+        // Persist the grown height to Yjs — skip during transform since
+        // the transformend handler in node.ts will persist the final state.
+        if (!this._transforming) {
+          this.instance.updateNode(
+            this.serialize(nodeInstance as WeaveElementInstance)
+          );
+        }
       }
     );
 
     // Move label below the border so border renders on top
-    const labelNode = rectangle.findOne(`#${labelId(nextProps.id as string)}`);
+    const labelNode = rectangle.findOne(`#${labelId(nextProps.id ?? '')}`);
     if (labelNode) {
       labelNode.moveToTop();
+      internalRectBg?.moveToBottom();
       internalRectBorder?.moveToTop();
     }
 
@@ -280,17 +361,35 @@ export class WeaveRectangleNode extends WeaveNode {
           strokeWidth: props.strokeWidth,
         }),
         ...(props.labelText !== undefined && { labelText: props.labelText }),
-        ...(props.labelFontFamily !== undefined && { labelFontFamily: props.labelFontFamily }),
-        ...(props.labelFontSize !== undefined && { labelFontSize: props.labelFontSize }),
-        ...(props.labelFontStyle !== undefined && { labelFontStyle: props.labelFontStyle }),
-        ...(props.labelFontVariant !== undefined && { labelFontVariant: props.labelFontVariant }),
+        ...(props.labelFontFamily !== undefined && {
+          labelFontFamily: props.labelFontFamily,
+        }),
+        ...(props.labelFontSize !== undefined && {
+          labelFontSize: props.labelFontSize,
+        }),
+        ...(props.labelFontStyle !== undefined && {
+          labelFontStyle: props.labelFontStyle,
+        }),
+        ...(props.labelFontVariant !== undefined && {
+          labelFontVariant: props.labelFontVariant,
+        }),
         ...(props.labelFill !== undefined && { labelFill: props.labelFill }),
         ...(props.labelAlign !== undefined && { labelAlign: props.labelAlign }),
-        ...(props.labelVerticalAlign !== undefined && { labelVerticalAlign: props.labelVerticalAlign }),
-        ...(props.labelLetterSpacing !== undefined && { labelLetterSpacing: props.labelLetterSpacing }),
-        ...(props.labelLineHeight !== undefined && { labelLineHeight: props.labelLineHeight }),
-        ...(props.labelPaddingX !== undefined && { labelPaddingX: props.labelPaddingX }),
-        ...(props.labelPaddingY !== undefined && { labelPaddingY: props.labelPaddingY }),
+        ...(props.labelVerticalAlign !== undefined && {
+          labelVerticalAlign: props.labelVerticalAlign,
+        }),
+        ...(props.labelLetterSpacing !== undefined && {
+          labelLetterSpacing: props.labelLetterSpacing,
+        }),
+        ...(props.labelLineHeight !== undefined && {
+          labelLineHeight: props.labelLineHeight,
+        }),
+        ...(props.labelPaddingX !== undefined && {
+          labelPaddingX: props.labelPaddingX,
+        }),
+        ...(props.labelPaddingY !== undefined && {
+          labelPaddingY: props.labelPaddingY,
+        }),
       },
     });
   }
@@ -311,18 +410,42 @@ export class WeaveRectangleNode extends WeaveNode {
         ...(nextProps.strokeWidth && {
           strokeWidth: nextProps.strokeWidth,
         }),
-        ...(nextProps.labelText !== undefined && { labelText: nextProps.labelText }),
-        ...(nextProps.labelFontFamily !== undefined && { labelFontFamily: nextProps.labelFontFamily }),
-        ...(nextProps.labelFontSize !== undefined && { labelFontSize: nextProps.labelFontSize }),
-        ...(nextProps.labelFontStyle !== undefined && { labelFontStyle: nextProps.labelFontStyle }),
-        ...(nextProps.labelFontVariant !== undefined && { labelFontVariant: nextProps.labelFontVariant }),
-        ...(nextProps.labelFill !== undefined && { labelFill: nextProps.labelFill }),
-        ...(nextProps.labelAlign !== undefined && { labelAlign: nextProps.labelAlign }),
-        ...(nextProps.labelVerticalAlign !== undefined && { labelVerticalAlign: nextProps.labelVerticalAlign }),
-        ...(nextProps.labelLetterSpacing !== undefined && { labelLetterSpacing: nextProps.labelLetterSpacing }),
-        ...(nextProps.labelLineHeight !== undefined && { labelLineHeight: nextProps.labelLineHeight }),
-        ...(nextProps.labelPaddingX !== undefined && { labelPaddingX: nextProps.labelPaddingX }),
-        ...(nextProps.labelPaddingY !== undefined && { labelPaddingY: nextProps.labelPaddingY }),
+        ...(nextProps.labelText !== undefined && {
+          labelText: nextProps.labelText,
+        }),
+        ...(nextProps.labelFontFamily !== undefined && {
+          labelFontFamily: nextProps.labelFontFamily,
+        }),
+        ...(nextProps.labelFontSize !== undefined && {
+          labelFontSize: nextProps.labelFontSize,
+        }),
+        ...(nextProps.labelFontStyle !== undefined && {
+          labelFontStyle: nextProps.labelFontStyle,
+        }),
+        ...(nextProps.labelFontVariant !== undefined && {
+          labelFontVariant: nextProps.labelFontVariant,
+        }),
+        ...(nextProps.labelFill !== undefined && {
+          labelFill: nextProps.labelFill,
+        }),
+        ...(nextProps.labelAlign !== undefined && {
+          labelAlign: nextProps.labelAlign,
+        }),
+        ...(nextProps.labelVerticalAlign !== undefined && {
+          labelVerticalAlign: nextProps.labelVerticalAlign,
+        }),
+        ...(nextProps.labelLetterSpacing !== undefined && {
+          labelLetterSpacing: nextProps.labelLetterSpacing,
+        }),
+        ...(nextProps.labelLineHeight !== undefined && {
+          labelLineHeight: nextProps.labelLineHeight,
+        }),
+        ...(nextProps.labelPaddingX !== undefined && {
+          labelPaddingX: nextProps.labelPaddingX,
+        }),
+        ...(nextProps.labelPaddingY !== undefined && {
+          labelPaddingY: nextProps.labelPaddingY,
+        }),
       },
     });
   }
@@ -387,7 +510,9 @@ export class WeaveRectangleNode extends WeaveNode {
         labelFontVariant: z
           .string()
           .optional()
-          .describe('Font variant for the label text (e.g. "normal", "small-caps")'),
+          .describe(
+            'Font variant for the label text (e.g. "normal", "small-caps")'
+          ),
         labelFill: z
           .string()
           .optional()
@@ -395,11 +520,15 @@ export class WeaveRectangleNode extends WeaveNode {
         labelAlign: z
           .string()
           .optional()
-          .describe('Horizontal alignment of the label text ("left", "center", "right")'),
+          .describe(
+            'Horizontal alignment of the label text ("left", "center", "right")'
+          ),
         labelVerticalAlign: z
           .string()
           .optional()
-          .describe('Vertical alignment of the label text ("top", "middle", "bottom")'),
+          .describe(
+            'Vertical alignment of the label text ("top", "middle", "bottom")'
+          ),
         labelLetterSpacing: z
           .number()
           .optional()
@@ -411,11 +540,15 @@ export class WeaveRectangleNode extends WeaveNode {
         labelPaddingX: z
           .number()
           .optional()
-          .describe('Horizontal inset (padding) in pixels applied on each side of the label'),
+          .describe(
+            'Horizontal inset (padding) in pixels applied on each side of the label'
+          ),
         labelPaddingY: z
           .number()
           .optional()
-          .describe('Vertical inset (padding) in pixels applied on top and bottom of the label'),
+          .describe(
+            'Vertical inset (padding) in pixels applied on top and bottom of the label'
+          ),
       }),
     });
 

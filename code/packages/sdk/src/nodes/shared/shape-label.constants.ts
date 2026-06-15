@@ -8,10 +8,11 @@ export const WEAVE_STAGE_SHAPE_LABEL_EDITION_MODE = 'shape-label-edition';
 
 export const WEAVE_SHAPE_LABEL_DEFAULTS: Required<WeaveShapeLabelProps> = {
   labelText: '',
-  labelFontFamily: 'Arial',
+  labelFontFamily: 'Arial, sans-serif',
   labelFontSize: 14,
   labelFontStyle: 'normal',
   labelFontVariant: 'normal',
+  labelTextDecoration: '',
   labelFill: '#000000',
   labelAlign: 'center',
   labelVerticalAlign: 'middle',

@@ -8,6 +8,7 @@ export type WeaveShapeLabelProps = {
   labelFontSize?: number;
   labelFontStyle?: string;
   labelFontVariant?: string;
+  labelTextDecoration?: string;
   labelFill?: string;
   labelAlign?: string;
   labelVerticalAlign?: string;

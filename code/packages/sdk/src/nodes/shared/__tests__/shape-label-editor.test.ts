@@ -32,6 +32,9 @@ function createMockInstance() {
         return undefined;
       }),
       mode: vi.fn(),
+      findOne: vi.fn().mockReturnValue(undefined),
+      on: vi.fn(),
+      off: vi.fn(),
     }),
     setMutexLock: vi.fn().mockReturnValue(true),
     releaseMutexLock: vi.fn(),
@@ -82,8 +85,8 @@ describe('WeaveShapeLabelEditor', () => {
     it('2.1 labelText defaults to empty string', () => {
       expect(WEAVE_SHAPE_LABEL_DEFAULTS.labelText).toBe('');
     });
-    it('2.2 labelFontFamily defaults to Arial', () => {
-      expect(WEAVE_SHAPE_LABEL_DEFAULTS.labelFontFamily).toBe('Arial');
+    it('2.2 labelFontFamily defaults to Arial, sans-serif', () => {
+      expect(WEAVE_SHAPE_LABEL_DEFAULTS.labelFontFamily).toBe('Arial, sans-serif');
     });
     it('2.3 labelFontSize defaults to 14', () => {
       expect(WEAVE_SHAPE_LABEL_DEFAULTS.labelFontSize).toBe(14);
@@ -270,14 +273,36 @@ describe('WeaveShapeLabelEditor', () => {
       const bounds = { x: 8, y: 8, width: 184, height: 30 };
       editor.updateLabel(group, { id: 'node-2', labelText: 'overflow text' }, bounds);
 
-      // Simulate what Konva would return in a real (non-jsdom) env:
-      // patch getSelfRect on the label node so it reports a height > bounds.height
+      // In jsdom, Konva cannot measure real text. Spy on label.height() to simulate
+      // overflow: the new detection clears attrs.height (setAttr('height', undefined))
+      // then reads labelNode.height() as the natural text height.
       const label = group.findOne<Konva.Text>(`#node-2-label`) as Konva.Text;
-      vi.spyOn(label, 'getSelfRect').mockReturnValue({ x: 0, y: 0, width: 184, height: 60 });
+      const origHeight = label.height.bind(label);
+      vi.spyOn(label, 'height').mockImplementation((...args: unknown[]) => {
+        // When called as getter (no args after clearing height), return overflow height
+        if (args.length === 0) return 60;
+        // When called as setter, pass through to the real Konva implementation
+        return origHeight(args[0] as number);
+      });
 
-      // Now update again — the spy makes it look like text overflows
+      // Update again with the spy active — label.height() returns 60 > bounds.height 30
       editor.updateLabel(group, { id: 'node-2', labelText: 'overflow text' }, bounds, growCallback);
       expect(growCallback).toHaveBeenCalled();
+    });
+
+    it('4.10 restores label height to max(textBounds.height, measuredHeight) after measurement', () => {
+      const bounds = { x: 8, y: 8, width: 184, height: 30 };
+      const label = group.findOne<Konva.Text>(`#node-2-label`) as Konva.Text;
+      const origHeight = label.height.bind(label);
+      vi.spyOn(label, 'height').mockImplementation((...args: unknown[]) => {
+        if (args.length === 0) return 60; // simulate natural overflow height
+        return origHeight(args[0] as number); // pass through setter
+      });
+
+      editor.updateLabel(group, { id: 'node-2', labelText: 'overflow text' }, bounds);
+
+      // The setter height(max(30, 60) = 60) was called; verify via getAttr
+      expect(label.getAttr('height')).toBe(60);
     });
 
     it('4.7 does not call growCallback when text fits within bounds', () => {
@@ -413,6 +438,191 @@ describe('WeaveShapeLabelEditor', () => {
       editor.triggerEditMode(group, defaultTextBounds(), vi.fn());
       editor.exitEditMode();
       expect(mockInstance.releaseMutexLock).toHaveBeenCalled();
+    });
+    it('7.4 restores label visibility via live group lookup on exitEditMode', () => {
+      const group = makeGroup('node-6');
+      editor.renderLabel(group, { id: 'node-6', labelText: 'hi' }, defaultTextBounds());
+      // Make findOne return the actual group so the label can be found
+      mockInstance.getStage().findOne = vi.fn().mockReturnValue(group);
+      editor.triggerEditMode(group, defaultTextBounds(), vi.fn());
+      // Label should be hidden during editing
+      const label = group.findOne<Konva.Text>(`#node-6-label`) as Konva.Text;
+      expect(label.visible()).toBe(false);
+      editor.exitEditMode();
+      // Label should be restored to visible after exitEditMode
+      expect(label.visible()).toBe(true);
+    });
+
+    it('7.5 gracefully handles missing live group in exitEditMode', () => {
+      const group = makeGroup('node-7');
+      editor.renderLabel(group, { id: 'node-7', labelText: 'hi' }, defaultTextBounds());
+      // findOne returns null (node was destroyed)
+      mockInstance.getStage().findOne = vi.fn().mockReturnValue(null);
+      editor.triggerEditMode(group, defaultTextBounds(), vi.fn());
+      expect(() => editor.exitEditMode()).not.toThrow();
+    });
+  });
+
+  // ---------------------------------------------------------------------------
+  // 8 — triggerEditMode onLiveResize callback
+  // ---------------------------------------------------------------------------
+
+  describe('onLiveResize', () => {
+    let editor: WeaveShapeLabelEditor;
+    let mockInstance: ReturnType<typeof createMockInstance>;
+    let group: Konva.Group;
+    const bounds = { x: 8, y: 8, width: 184, height: 50 };
+
+    beforeEach(() => {
+      mockInstance = createMockInstance();
+      editor = new WeaveShapeLabelEditor(mockInstance as never);
+      group = makeGroup('node-lr');
+      group.setAttrs({ height: 100, labelPaddingY: 8 });
+      editor.renderLabel(group, { id: 'node-lr', labelText: 'hi' }, bounds);
+    });
+
+    it('8.1 onLiveResize callback is stored when triggerEditMode is called', () => {
+      const cb = vi.fn();
+      editor.triggerEditMode(group, bounds, vi.fn(), cb);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      expect((editor as any).onLiveResize).toBe(cb);
+    });
+
+    it('8.2 clears onLiveResize after exitEditMode', () => {
+      const cb = vi.fn();
+      editor.triggerEditMode(group, bounds, vi.fn(), cb);
+      editor.exitEditMode();
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      expect((editor as any).onLiveResize).toBeNull();
+    });
+
+  });
+
+  // ---------------------------------------------------------------------------
+  // 9 — computeVerticalOffset (private helper)
+  // ---------------------------------------------------------------------------
+
+  describe('computeVerticalOffset', () => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    let computeVerticalOffset: (v: string, b: number, c: number) => number;
+
+    beforeEach(() => {
+      const editor = new WeaveShapeLabelEditor(createMockInstance() as never);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      computeVerticalOffset = (editor as any).computeVerticalOffset.bind(editor);
+    });
+
+    it('9.1 returns 0 for "top" regardless of heights', () => {
+      expect(computeVerticalOffset('top', 200, 40)).toBe(0);
+      expect(computeVerticalOffset('top', 200, 200)).toBe(0);
+      expect(computeVerticalOffset('top', 200, 0)).toBe(0);
+    });
+
+    it('9.2 returns half the remainder for "middle"', () => {
+      expect(computeVerticalOffset('middle', 200, 40)).toBe(80);
+    });
+
+    it('9.3 returns 0 for "middle" when content equals bounds', () => {
+      expect(computeVerticalOffset('middle', 100, 100)).toBe(0);
+    });
+
+    it('9.4 returns 0 (not negative) for "middle" when content overflows', () => {
+      expect(computeVerticalOffset('middle', 50, 100)).toBe(0);
+    });
+
+    it('9.5 returns full remainder for "bottom"', () => {
+      expect(computeVerticalOffset('bottom', 200, 40)).toBe(160);
+    });
+
+    it('9.6 returns 0 for "bottom" when content equals bounds', () => {
+      expect(computeVerticalOffset('bottom', 100, 100)).toBe(0);
+    });
+
+    it('9.7 returns 0 (not negative) for "bottom" when content overflows', () => {
+      expect(computeVerticalOffset('bottom', 50, 100)).toBe(0);
+    });
+
+    it('9.8 treats unknown value same as "middle"', () => {
+      expect(computeVerticalOffset('unknown', 200, 40)).toBe(80);
+    });
+  });
+
+  // ---------------------------------------------------------------------------
+  // 10 — repositionTextArea vertical offset respects labelVerticalAlign
+  // ---------------------------------------------------------------------------
+
+  describe('repositionTextArea vertical alignment', () => {
+    function makeEditorWithTextarea(
+      verticalAlign: string,
+      boundsHeight = 100,
+      contentScrollHeight = 20
+    ) {
+      const mockInstance = createMockInstance();
+      const editor = new WeaveShapeLabelEditor(mockInstance as never);
+      const group = makeGroup('ta-node');
+      group.setAttrs({ labelVerticalAlign: verticalAlign });
+
+      // Fake the absolute transform so coords pass through unchanged
+      group.getAbsoluteTransform = () =>
+        ({ point: (p: { x: number; y: number }) => p }) as never;
+      // Fake scale so absScale.x/y = 1
+      group.getAbsoluteScale = () => ({ x: 1, y: 1 });
+
+      // Set up a textarea manually (bypasses requestAnimationFrame in createTextAreaDOM)
+      const ta = document.createElement('textarea');
+      ta.style.height = `${boundsHeight}px`;
+      Object.defineProperty(ta, 'scrollHeight', {
+        get: () => contentScrollHeight,
+        configurable: true,
+      });
+
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const e = editor as any;
+      e.editing = true;
+      e.textArea = ta;
+      e.editingTextBounds = { x: 8, y: 8, width: 184, height: boundsHeight };
+
+      return { editor, group, ta };
+    }
+
+    const textBounds = { x: 8, y: 8, width: 184, height: 100 };
+
+    it('10.1 "top" alignment positions textarea at textBounds top (offsetY=0)', () => {
+      const { editor, group, ta } = makeEditorWithTextarea('top', 100, 20);
+      editor.repositionTextArea(group, textBounds);
+      // top = textBounds.y * upscaleScale + 0 = 8
+      expect(ta.style.top).toBe('8px');
+    });
+
+    it('10.2 "middle" alignment centers textarea vertically', () => {
+      const { editor, group, ta } = makeEditorWithTextarea('middle', 100, 20);
+      editor.repositionTextArea(group, textBounds);
+      // offsetY = (100 - 20) / 2 = 40; top = 8 + 40 = 48
+      expect(ta.style.top).toBe('48px');
+    });
+
+    it('10.3 "bottom" alignment positions textarea at textBounds bottom', () => {
+      const { editor, group, ta } = makeEditorWithTextarea('bottom', 100, 20);
+      editor.repositionTextArea(group, textBounds);
+      // offsetY = 100 - 20 = 80; top = 8 + 80 = 88
+      expect(ta.style.top).toBe('88px');
+    });
+
+    it('10.4 when content equals bounds height, all alignments produce the same top', () => {
+      for (const align of ['top', 'middle', 'bottom']) {
+        const { editor, group, ta } = makeEditorWithTextarea(align, 100, 100);
+        editor.repositionTextArea(group, textBounds);
+        expect(ta.style.top).toBe('8px');
+      }
+    });
+
+    it('10.5 when content overflows, all alignments snap to textBounds top', () => {
+      for (const align of ['top', 'middle', 'bottom']) {
+        const { editor, group, ta } = makeEditorWithTextarea(align, 100, 150);
+        editor.repositionTextArea(group, textBounds);
+        // offsetY clamped to 0; top = textBounds.y = 8
+        expect(ta.style.top).toBe('8px');
+      }
     });
   });
 });

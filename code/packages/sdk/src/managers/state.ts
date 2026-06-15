@@ -294,6 +294,15 @@ export class WeaveStateManager {
     const yjsProps = yjsNode.get('props') as Y.Map<any>;
     this.updateYjsMapFromObject(yjsProps, node.props);
 
+    // Recursively propagate prop updates for already-present children.
+    // Group and frame nodes serialize their Konva children into props.children,
+    // so we must walk the tree to ensure those updates reach the Yjs state.
+    if (Array.isArray(node.props.children) && node.props.children.length > 0) {
+      for (const child of node.props.children as WeaveStateElement[]) {
+        this.updateNode(child);
+      }
+    }
+
     this.instance.emitEvent('onNodeUpdated', node);
   }
 

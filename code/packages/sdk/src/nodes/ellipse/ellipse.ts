@@ -19,12 +19,14 @@ import {
   labelId,
   WEAVE_SHAPE_LABEL_DEFAULTS,
 } from '@/nodes/shared/shape-label.constants';
+import { computeEllipseLabelMinSize } from '@/index.node';
 
 export class WeaveEllipseNode extends WeaveNode {
   private config: WeaveEllipseProperties;
   protected nodeType: string = WEAVE_ELLIPSE_NODE_TYPE;
   initialize = undefined;
   private _shapeLabelEditor: WeaveShapeLabelEditor | undefined;
+  private _transforming = false;
 
   private get shapeLabelEditor(): WeaveShapeLabelEditor {
     if (!this._shapeLabelEditor) {
@@ -167,6 +169,19 @@ export class WeaveEllipseNode extends WeaveNode {
 
     this.setupDefaultNodeEvents(ellipse);
 
+    ellipse.on('transformstart', () => {
+      this._transforming = true;
+    });
+
+    ellipse.on('transform', () => {
+      this.scaleReset(ellipse);
+      this.onUpdate(ellipse, ellipse.getAttrs());
+    });
+
+    ellipse.on('transformend', () => {
+      this._transforming = false;
+    });
+
     ellipse.dblClick = () => {
       if (this.shapeLabelEditor.isEditing()) {
         return;
@@ -188,7 +203,67 @@ export class WeaveEllipseNode extends WeaveNode {
         this.instance.updateNode(serialized);
       };
 
-      this.shapeLabelEditor.triggerEditMode(ellipse, labelTextBounds, onCommit);
+      // Re-derive bounds from live attrs so a resized ellipse uses the
+      // correct dimensions when the edit overlay is shown.
+      const currentAttrs = ellipse.getAttrs() as WeaveElementAttributes;
+      const curPaddingX =
+        currentAttrs.labelPaddingX ?? WEAVE_SHAPE_LABEL_DEFAULTS.labelPaddingX;
+      const curPaddingY =
+        currentAttrs.labelPaddingY ?? WEAVE_SHAPE_LABEL_DEFAULTS.labelPaddingY;
+      const currentRadiusX = Math.max(1, currentAttrs.radiusX as number);
+      const currentRadiusY = Math.max(1, currentAttrs.radiusY as number);
+      const currentLabelTextBounds = this.getLabelTextBounds(
+        currentRadiusX,
+        currentRadiusY,
+        curPaddingX,
+        curPaddingY
+      );
+      // Capture original size and threshold for grow/restore decisions.
+      // originalNeededHeight = currentRadiusY * √2 (the current inscribed height)
+      const originalRadiusY = currentRadiusY;
+      const originalNeededHeight =
+        currentLabelTextBounds.height + curPaddingY * 2;
+
+      this.shapeLabelEditor.triggerEditMode(
+        ellipse,
+        currentLabelTextBounds,
+        onCommit,
+        (neededShapeHeight) => {
+          // neededShapeHeight = contentHeight + paddingY*2 = the needed inscribed height
+          // radiusY = inscribedH / √2  →  newRadiusY = ceil(neededShapeHeight / √2)
+          const newRadiusY =
+            neededShapeHeight <= originalNeededHeight
+              ? originalRadiusY
+              : Math.ceil(neededShapeHeight / Math.SQRT2);
+          const liveAttrs = ellipse.getAttrs() as WeaveElementAttributes;
+          const strokeW = (liveAttrs.strokeWidth as number) || 0;
+          const bg = ellipse.findOne<Konva.Ellipse>(`#${liveAttrs.id}-bg`);
+          const border = ellipse.findOne<Konva.Ellipse>(
+            `#${liveAttrs.id}-border`
+          );
+          ellipse.setAttrs({ radiusY: newRadiusY });
+          bg?.setAttrs({
+            radiusY: Math.max(1, newRadiusY),
+            y: Math.max(1, newRadiusY),
+          });
+          border?.setAttrs({
+            radiusY: Math.max(1, newRadiusY) - strokeW / 2,
+            y: Math.max(1, newRadiusY),
+          });
+          // Reposition textarea to follow the ellipse's vertical growth/restore
+          const newLabelTextBounds = this.getLabelTextBounds(
+            currentRadiusX,
+            newRadiusY,
+            curPaddingX,
+            curPaddingY
+          );
+          this.shapeLabelEditor.repositionTextArea(ellipse, newLabelTextBounds);
+        }
+      );
+    };
+
+    ellipse.getNodeMinSize = () => {
+      return computeEllipseLabelMinSize(this.instance.getStage(), ellipse);
     };
 
     return ellipse;
@@ -242,6 +317,7 @@ export class WeaveEllipseNode extends WeaveNode {
         radiusY: Math.max(1, baseRadiusY) - (nextProps.strokeWidth || 0) / 2,
         stroke: nextProps.stroke || 'transparent',
         strokeWidth: nextProps.strokeWidth || 0,
+        fill: 'transparent',
         strokeScaleEnabled: true,
         listening: false,
         rotation: 0,
@@ -265,14 +341,25 @@ export class WeaveEllipseNode extends WeaveNode {
       nextProps,
       labelTextBounds,
       (neededHeight) => {
-        // Grow radiusY so the inscribed rectangle can accommodate the text
-        const inscribedH = neededHeight + paddingY * 2;
-        const newRadiusY = Math.ceil(inscribedH / Math.SQRT2 / 2) + paddingY;
+        // neededHeight = measuredTextHeight + paddingY*2 = needed inscribed height
+        // radiusY = inscribedH / √2  →  newRadiusY = ceil(neededHeight / √2)
+        const newRadiusY = Math.ceil(neededHeight / Math.SQRT2);
         nodeInstance.setAttrs({ radiusY: newRadiusY });
-        internalEllipseBg?.setAttrs({ radiusY: Math.max(1, newRadiusY) });
+        internalEllipseBg?.setAttrs({
+          radiusY: Math.max(1, newRadiusY),
+          y: Math.max(1, newRadiusY),
+        });
         internalEllipseBorder?.setAttrs({
           radiusY: Math.max(1, newRadiusY) - (nextProps.strokeWidth || 0) / 2,
+          y: Math.max(1, newRadiusY),
         });
+        // Persist the grown radiusY to Yjs — skip during transform since
+        // the transformend handler in node.ts will persist the final state.
+        if (!this._transforming) {
+          this.instance.updateNode(
+            this.serialize(nodeInstance as WeaveElementInstance)
+          );
+        }
       }
     );
 
@@ -360,17 +447,35 @@ export class WeaveEllipseNode extends WeaveNode {
           strokeWidth: props.strokeWidth,
         }),
         ...(props.labelText !== undefined && { labelText: props.labelText }),
-        ...(props.labelFontFamily !== undefined && { labelFontFamily: props.labelFontFamily }),
-        ...(props.labelFontSize !== undefined && { labelFontSize: props.labelFontSize }),
-        ...(props.labelFontStyle !== undefined && { labelFontStyle: props.labelFontStyle }),
-        ...(props.labelFontVariant !== undefined && { labelFontVariant: props.labelFontVariant }),
+        ...(props.labelFontFamily !== undefined && {
+          labelFontFamily: props.labelFontFamily,
+        }),
+        ...(props.labelFontSize !== undefined && {
+          labelFontSize: props.labelFontSize,
+        }),
+        ...(props.labelFontStyle !== undefined && {
+          labelFontStyle: props.labelFontStyle,
+        }),
+        ...(props.labelFontVariant !== undefined && {
+          labelFontVariant: props.labelFontVariant,
+        }),
         ...(props.labelFill !== undefined && { labelFill: props.labelFill }),
         ...(props.labelAlign !== undefined && { labelAlign: props.labelAlign }),
-        ...(props.labelVerticalAlign !== undefined && { labelVerticalAlign: props.labelVerticalAlign }),
-        ...(props.labelLetterSpacing !== undefined && { labelLetterSpacing: props.labelLetterSpacing }),
-        ...(props.labelLineHeight !== undefined && { labelLineHeight: props.labelLineHeight }),
-        ...(props.labelPaddingX !== undefined && { labelPaddingX: props.labelPaddingX }),
-        ...(props.labelPaddingY !== undefined && { labelPaddingY: props.labelPaddingY }),
+        ...(props.labelVerticalAlign !== undefined && {
+          labelVerticalAlign: props.labelVerticalAlign,
+        }),
+        ...(props.labelLetterSpacing !== undefined && {
+          labelLetterSpacing: props.labelLetterSpacing,
+        }),
+        ...(props.labelLineHeight !== undefined && {
+          labelLineHeight: props.labelLineHeight,
+        }),
+        ...(props.labelPaddingX !== undefined && {
+          labelPaddingX: props.labelPaddingX,
+        }),
+        ...(props.labelPaddingY !== undefined && {
+          labelPaddingY: props.labelPaddingY,
+        }),
       },
     });
   }
@@ -391,18 +496,42 @@ export class WeaveEllipseNode extends WeaveNode {
         ...(nextProps.strokeWidth && {
           strokeWidth: nextProps.strokeWidth,
         }),
-        ...(nextProps.labelText !== undefined && { labelText: nextProps.labelText }),
-        ...(nextProps.labelFontFamily !== undefined && { labelFontFamily: nextProps.labelFontFamily }),
-        ...(nextProps.labelFontSize !== undefined && { labelFontSize: nextProps.labelFontSize }),
-        ...(nextProps.labelFontStyle !== undefined && { labelFontStyle: nextProps.labelFontStyle }),
-        ...(nextProps.labelFontVariant !== undefined && { labelFontVariant: nextProps.labelFontVariant }),
-        ...(nextProps.labelFill !== undefined && { labelFill: nextProps.labelFill }),
-        ...(nextProps.labelAlign !== undefined && { labelAlign: nextProps.labelAlign }),
-        ...(nextProps.labelVerticalAlign !== undefined && { labelVerticalAlign: nextProps.labelVerticalAlign }),
-        ...(nextProps.labelLetterSpacing !== undefined && { labelLetterSpacing: nextProps.labelLetterSpacing }),
-        ...(nextProps.labelLineHeight !== undefined && { labelLineHeight: nextProps.labelLineHeight }),
-        ...(nextProps.labelPaddingX !== undefined && { labelPaddingX: nextProps.labelPaddingX }),
-        ...(nextProps.labelPaddingY !== undefined && { labelPaddingY: nextProps.labelPaddingY }),
+        ...(nextProps.labelText !== undefined && {
+          labelText: nextProps.labelText,
+        }),
+        ...(nextProps.labelFontFamily !== undefined && {
+          labelFontFamily: nextProps.labelFontFamily,
+        }),
+        ...(nextProps.labelFontSize !== undefined && {
+          labelFontSize: nextProps.labelFontSize,
+        }),
+        ...(nextProps.labelFontStyle !== undefined && {
+          labelFontStyle: nextProps.labelFontStyle,
+        }),
+        ...(nextProps.labelFontVariant !== undefined && {
+          labelFontVariant: nextProps.labelFontVariant,
+        }),
+        ...(nextProps.labelFill !== undefined && {
+          labelFill: nextProps.labelFill,
+        }),
+        ...(nextProps.labelAlign !== undefined && {
+          labelAlign: nextProps.labelAlign,
+        }),
+        ...(nextProps.labelVerticalAlign !== undefined && {
+          labelVerticalAlign: nextProps.labelVerticalAlign,
+        }),
+        ...(nextProps.labelLetterSpacing !== undefined && {
+          labelLetterSpacing: nextProps.labelLetterSpacing,
+        }),
+        ...(nextProps.labelLineHeight !== undefined && {
+          labelLineHeight: nextProps.labelLineHeight,
+        }),
+        ...(nextProps.labelPaddingX !== undefined && {
+          labelPaddingX: nextProps.labelPaddingX,
+        }),
+        ...(nextProps.labelPaddingY !== undefined && {
+          labelPaddingY: nextProps.labelPaddingY,
+        }),
       },
     });
   }
@@ -471,7 +600,9 @@ export class WeaveEllipseNode extends WeaveNode {
         labelFontVariant: z
           .string()
           .optional()
-          .describe('Font variant for the label text (e.g. "normal", "small-caps")'),
+          .describe(
+            'Font variant for the label text (e.g. "normal", "small-caps")'
+          ),
         labelFill: z
           .string()
           .optional()
@@ -479,11 +610,15 @@ export class WeaveEllipseNode extends WeaveNode {
         labelAlign: z
           .string()
           .optional()
-          .describe('Horizontal alignment of the label text ("left", "center", "right")'),
+          .describe(
+            'Horizontal alignment of the label text ("left", "center", "right")'
+          ),
         labelVerticalAlign: z
           .string()
           .optional()
-          .describe('Vertical alignment of the label text ("top", "middle", "bottom")'),
+          .describe(
+            'Vertical alignment of the label text ("top", "middle", "bottom")'
+          ),
         labelLetterSpacing: z
           .number()
           .optional()
@@ -495,11 +630,15 @@ export class WeaveEllipseNode extends WeaveNode {
         labelPaddingX: z
           .number()
           .optional()
-          .describe('Horizontal inset (padding) in pixels applied on each side of the label'),
+          .describe(
+            'Horizontal inset (padding) in pixels applied on each side of the label'
+          ),
         labelPaddingY: z
           .number()
           .optional()
-          .describe('Vertical inset (padding) in pixels applied on top and bottom of the label'),
+          .describe(
+            'Vertical inset (padding) in pixels applied on top and bottom of the label'
+          ),
       }),
     });
 

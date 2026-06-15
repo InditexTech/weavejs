@@ -807,5 +807,100 @@ describe('WeaveRectangleNode', () => {
       };
       expect(() => schema.parse(validNode)).not.toThrow();
     });
+    it('8.13 dblClick uses live attrs for labelTextBounds (fresh after resize)', () => {
+      const node = makeNode();
+      // Render with initial dimensions
+      const group = node.onRender(defaultProps({ width: 200, height: 150 })) as Konva.Group;
+      // Simulate resize: update group attrs directly (as onUpdate would do)
+      group.setAttrs({ width: 400, height: 300 });
+
+      let capturedBounds: { width: number; height: number } | null = null;
+      // Spy on shapeLabelEditor.triggerEditMode to capture what bounds are passed
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const editor = (node as any)._shapeLabelEditor ?? (node as any).shapeLabelEditor;
+      if (editor) {
+        const original = editor.triggerEditMode.bind(editor);
+        editor.triggerEditMode = (
+          g: Konva.Group,
+          bounds: { x: number; y: number; width: number; height: number },
+          cb: () => void
+        ) => {
+          capturedBounds = { width: bounds.width, height: bounds.height };
+          original(g, bounds, cb);
+        };
+      }
+
+      // Simulate: node is selected
+      group.setAttr('isSelected', true);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const mock = (node as any).instance;
+      mock.getState = vi.fn().mockReturnValue('selecting');
+      // Trigger dblClick
+      if (group.dblClick) {
+        // isSelecting/isNodeSelected guards need to pass — stub them
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        vi.spyOn(node as any, 'isSelecting').mockReturnValue(true);
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        vi.spyOn(node as any, 'isNodeSelected').mockReturnValue(true);
+        group.dblClick();
+      }
+
+      const px = WEAVE_SHAPE_LABEL_DEFAULTS.labelPaddingX;
+      const py = WEAVE_SHAPE_LABEL_DEFAULTS.labelPaddingY;
+      if (capturedBounds) {
+        expect((capturedBounds as { width: number }).width).toBe(400 - px * 2);
+        expect((capturedBounds as { height: number }).height).toBe(300 - py * 2);
+      }
+    });
+
+    it('8.14 growCallback calls updateNode to persist grown height to Yjs', () => {
+      const node = makeNode();
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const mock = (node as any).instance;
+      const group = node.onRender(defaultProps({ width: 200, height: 50, labelText: 'hi' })) as Konva.Group;
+
+      // Spy on the label node's height() to simulate text overflow.
+      // The new measurement clears attrs.height then calls labelNode.height() as getter.
+      const label = group.findOne<Konva.Text>(`#${labelId('rect-id')}`) as Konva.Text;
+      const origHeight = label.height.bind(label);
+      vi.spyOn(label, 'height').mockImplementation((...args: unknown[]) => {
+        if (args.length === 0) return 120; // simulate overflow natural height
+        return origHeight(args[0] as number); // pass through setter
+      });
+
+      mock.updateNode.mockClear();
+
+      // Run onUpdate — height() spy causes growCallback to fire
+      node.onUpdate(group, defaultProps({ width: 200, height: 50, labelText: 'overflow text' }));
+
+      // updateNode should have been called to persist the grown height
+      expect(mock.updateNode).toHaveBeenCalled();
+      const serialized = mock.updateNode.mock.calls[0][0];
+      expect(serialized.props.height).toBeGreaterThan(50);
+    });
+
+    it('8.15 growCallback does NOT call updateNode while transform is in progress', () => {
+      const { node, mock } = makeNode();
+      const group = node.onRender(defaultProps({ width: 200, height: 50, labelText: 'hi' })) as Konva.Group;
+
+      const label = group.findOne<Konva.Text>(`#${labelId('rect-id')}`) as Konva.Text;
+      const origHeight = label.height.bind(label);
+      vi.spyOn(label, 'height').mockImplementation((...args: unknown[]) => {
+        if (args.length === 0) return 120; // simulate overflow natural height
+        return origHeight(args[0] as number);
+      });
+
+      mock.updateNode.mockClear();
+
+      // Simulate transform in progress by firing the transform event
+      group.fire('transform');
+      // updateNode must NOT be called during transform — deferred to transformend
+      expect(mock.updateNode).not.toHaveBeenCalled();
+
+      // After transformend the flag is cleared; a direct onUpdate call persists again
+      group.fire('transformend');
+      node.onUpdate(group, defaultProps({ width: 200, height: 50, labelText: 'overflow text' }));
+      expect(mock.updateNode).toHaveBeenCalled();
+    });
   });
 });

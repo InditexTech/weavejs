@@ -85,6 +85,9 @@ export const augmentKonvaNodeClass = (
   };
   Konva.Node.prototype.lockMutex = function () {};
   Konva.Node.prototype.releaseMutex = function () {};
+  Konva.Node.prototype.getNodeMinSize = function () {
+    return { width: 0, height: 0 };
+  };
 };
 
 export abstract class WeaveNode implements WeaveNodeBase {
@@ -296,8 +299,8 @@ export abstract class WeaveNode implements WeaveNodeBase {
     return false;
   }
 
-  scaleReset(node: Konva.Node): void {
-    const scale = node.scale();
+  scaleReset(node: Konva.Node, scaleCustom?: { x: number; y: number }): void {
+    const scale = scaleCustom ?? node.scale();
 
     node.width(Math.max(5, node.width() * scale.x));
     node.height(Math.max(5, node.height() * scale.y));
@@ -464,13 +467,6 @@ export abstract class WeaveNode implements WeaveNodeBase {
 
         this.instance.emitEvent('onTransform', null);
 
-        const nodesSelectionPlugin =
-          this.instance.getPlugin<WeaveNodesSelectionPlugin>('nodesSelection');
-
-        if (nodesSelectionPlugin) {
-          nodesSelectionPlugin.getTransformer().forceUpdate();
-        }
-
         if (performScaleReset) {
           this.scaleReset(node);
         }
@@ -488,10 +484,18 @@ export abstract class WeaveNode implements WeaveNodeBase {
             node.getAttrs().shouldUpdateOnTransform ?? true;
 
           if (shouldUpdateOnTransform) {
-            this.instance.updateNode(
-              nodeHandler.serialize(node as WeaveElementInstance)
+            const serializedNode = nodeHandler.serialize(
+              node as WeaveElementInstance
             );
+            this.instance.updateNode(serializedNode);
           }
+        }
+
+        const nodesSelectionPlugin =
+          this.instance.getPlugin<WeaveNodesSelectionPlugin>('nodesSelection');
+
+        if (nodesSelectionPlugin) {
+          nodesSelectionPlugin.getTransformer().forceUpdate();
         }
 
         this.getNodesSelectionPlugin()?.getHoverTransformer().forceUpdate();

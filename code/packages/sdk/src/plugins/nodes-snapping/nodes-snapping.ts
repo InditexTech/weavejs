@@ -530,16 +530,25 @@ export class WeaveNodesSnappingPlugin extends WeavePlugin {
       return updatedBox;
     };
 
-    const bindedBoundingBoxFunc = boundingBoxFunc.bind(this);
+    const snapBoundingBoxFunc = boundingBoxFunc.bind(this);
 
-    tr.boundBoxFunc(bindedBoundingBoxFunc);
+    const newBoundFunc = (oldBox: Box, newBox: Box) => {
+      const mainBoundBoxFunc = nodesSelectionPlugin.getBoundBoxFunc();
+      const actualBox = mainBoundBoxFunc(oldBox, newBox);
+      if (actualBox === oldBox) {
+        return actualBox;
+      }
+      return snapBoundingBoxFunc(oldBox, newBox);
+    };
+
+    tr.boundBoxFunc(newBoundFunc);
   }
 
   private transformEndHandler() {
     const nodesSelectionPlugin = this.getNodesSelectionPlugin();
     if (nodesSelectionPlugin) {
       const tr = nodesSelectionPlugin.getTransformer();
-      tr.boundBoxFunc(undefined);
+      tr.boundBoxFunc(nodesSelectionPlugin.getBoundBoxFunc());
     }
     this.snappingGuides = [];
   }

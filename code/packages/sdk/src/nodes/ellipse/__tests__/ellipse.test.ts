@@ -844,5 +844,51 @@ describe('WeaveEllipseNode', () => {
       };
       expect(() => schema.parse(validSchemaNode)).not.toThrow();
     });
+
+    it('14.9 growCallback calls updateNode to persist grown radiusY to Yjs', () => {
+      const node = makeNode();
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const mock = (node as any).instance;
+      const group = node.onRender(defaultProps({ radiusX: 100, radiusY: 40, labelText: 'hi' })) as Konva.Group;
+
+      const label = group.findOne<Konva.Text>(`#${labelId('ellipse-id')}`) as Konva.Text;
+      const origHeight = label.height.bind(label);
+      vi.spyOn(label, 'height').mockImplementation((...args: unknown[]) => {
+        if (args.length === 0) return 120; // simulate overflow natural height
+        return origHeight(args[0] as number);
+      });
+
+      mock.updateNode.mockClear();
+
+      node.onUpdate(group, defaultProps({ radiusX: 100, radiusY: 40, labelText: 'overflow text' }));
+
+      expect(mock.updateNode).toHaveBeenCalled();
+      const serialized = mock.updateNode.mock.calls[0][0];
+      expect(serialized.props.radiusY).toBeGreaterThan(40);
+    });
+
+    it('14.10 growCallback does NOT call updateNode while transform is in progress', () => {
+      const { node, mock } = makeNode();
+      const group = node.onRender(defaultProps({ radiusX: 100, radiusY: 40, labelText: 'hi' })) as Konva.Group;
+
+      const label = group.findOne<Konva.Text>(`#${labelId('ellipse-id')}`) as Konva.Text;
+      const origHeight = label.height.bind(label);
+      vi.spyOn(label, 'height').mockImplementation((...args: unknown[]) => {
+        if (args.length === 0) return 120; // simulate overflow natural height
+        return origHeight(args[0] as number);
+      });
+
+      mock.updateNode.mockClear();
+
+      // Simulate transform in progress by firing the transform event
+      group.fire('transform');
+      // updateNode must NOT be called during transform — deferred to transformend
+      expect(mock.updateNode).not.toHaveBeenCalled();
+
+      // After transformend the flag is cleared; a direct onUpdate call persists again
+      group.fire('transformend');
+      node.onUpdate(group, defaultProps({ radiusX: 100, radiusY: 40, labelText: 'overflow text' }));
+      expect(mock.updateNode).toHaveBeenCalled();
+    });
   });
 });

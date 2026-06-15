@@ -1416,6 +1416,11 @@ export class WeaveImageNode extends WeaveNode {
 
     // reset scale to 1
     node.scale({ x: 1, y: 1 });
+
+    // Synchronously update the internal image dimensions after baking the scale
+    // into width/height to prevent a flicker frame where the group is already at
+    // the new size but the internalImage still holds the old (pre-transform) dimensions.
+    this.updateImageCrop(node);
   }
 
   getIsAsync(): boolean {
