@@ -1,6 +1,6 @@
 ---
 name: code-npm-sonarcloud-analysis
-run-name: Sonarcloud analysis on ${{ github.base_ref || github.ref_name }} branch
+run-name: Sonarcloud analysis on ${{ github.head_ref || github.ref_name }} branch
 
 concurrency:
   group: sonarcloud-${{ github.ref }}
@@ -167,6 +167,12 @@ jobs:
             COVERAGE_OPTIONS="-Dsonar.javascript.lcov.reportPaths=coverage/lcov.info"
           fi
 
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            SCOPE_OPTIONS="-Dsonar.pullrequest.key=${{ github.event.pull_request.number }} -Dsonar.pullrequest.branch=${{ github.head_ref }} -Dsonar.pullrequest.base=${{ github.base_ref }}"
+          else
+            SCOPE_OPTIONS="-Dsonar.branch.name=${{ github.ref_name }}"
+          fi
+
           npx sonar-scanner \
             -Dsonar.projectKey=InditexTech_"${{ steps.version.outputs.github-repository }}" \
             -Dsonar.projectName="${{ steps.version.outputs.github-repository }}" \
@@ -177,7 +183,7 @@ jobs:
             -Dsonar.exclusions="**/node_modules/**,**/dist/**,**/coverage/**,**/reports/**,**/*.test-d.ts" \
             -Dsonar.coverage.exclusions="**/__tests__/**,**/*.config.ts,**/vitest.setup.ts,packages/create-backend-app/**,packages/create-frontend-app/**" \
             -Dsonar.cpd.exclusions="packages/create-backend-app/**/*,packages/create-frontend-app/**/*,**/tsdown.config.ts,**/vitest.config.ts,**/vitest.setup.ts,**/__tests__/**,**/*.test.ts" \
-            -Dsonar.branch.name="${{ github.base_ref || github.ref_name }}" \
             -Dsonar.host.url="https://sonarcloud.io/" \
             -Dsonar.organization=inditextech \
+            $SCOPE_OPTIONS \
             $COVERAGE_OPTIONS
