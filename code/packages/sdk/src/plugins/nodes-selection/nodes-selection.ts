@@ -51,7 +51,10 @@ import {
   handlePointerUp,
 } from './events';
 
-export class WeaveNodesSelectionPlugin extends WeavePlugin implements SelectionContext {
+export class WeaveNodesSelectionPlugin
+  extends WeavePlugin
+  implements SelectionContext
+{
   readonly gesture = new GestureDetector();
   private edgePanning!: EdgePanning;
   private areaSelector!: AreaSelector;
@@ -219,7 +222,11 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin implements SelectionC
 
     // AreaSelector — manages the visual selection rectangle
     this.areaSelector = new AreaSelector();
-    this.areaSelector.init(selectionLayer, this.config.selectionArea, stage.scaleX());
+    this.areaSelector.init(
+      selectionLayer,
+      this.config.selectionArea,
+      stage.scaleX()
+    );
 
     // EdgePanning — handles auto-scroll when pointer reaches canvas edge during selection
     this.edgePanning = new EdgePanning(this.config.panningWhenSelection, {
@@ -250,7 +257,8 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin implements SelectionC
       getContextMenuPlugin: () => this.getContextMenuPlugin(),
       getUsersPresencePlugin: () => this.getUsersPresencePlugin(),
       getStagePanningPlugin: () => this.getStagePanningPlugin(),
-      getNodesSelectionFeedbackPlugin: () => this.getNodesSelectionFeedbackPlugin(),
+      getNodesSelectionFeedbackPlugin: () =>
+        this.getNodesSelectionFeedbackPlugin(),
     };
     this.transformerCtrl = new TransformerController(
       this.instance,
@@ -309,7 +317,9 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin implements SelectionC
     });
 
     const usersSelectionPlugin =
-      this.instance.getPlugin<WeaveUsersSelectionPlugin>(WEAVE_USERS_SELECTION_KEY);
+      this.instance.getPlugin<WeaveUsersSelectionPlugin>(
+        WEAVE_USERS_SELECTION_KEY
+      );
 
     if (usersSelectionPlugin) {
       requestAnimationFrame(() => {
@@ -343,7 +353,9 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin implements SelectionC
       })
       .filter((node) => typeof node !== 'undefined');
     this.instance.removeNodes(mappedSelectedNodes);
-    this.instance.getHooks().callHook('weave:onNodesRemoved', mappedSelectedNodes);
+    this.instance
+      .getHooks()
+      .callHook('weave:onNodesRemoved', mappedSelectedNodes);
     this.selectNone();
     this.triggerSelectedNodesEvent();
   }
@@ -356,7 +368,10 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin implements SelectionC
 
     stage.on('pointerdown', (e) => handlePointerDown(this, e));
 
-    stage.on('pointermove', throttle((e) => handlePointerMove(this, e), DEFAULT_THROTTLE_MS));
+    stage.on(
+      'pointermove',
+      throttle((e) => handlePointerMove(this, e), DEFAULT_THROTTLE_MS)
+    );
 
     stage.on('pointerup', (e) => handlePointerUp(this, e));
 
@@ -376,7 +391,9 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin implements SelectionC
   handleMultipleSelectionBehavior(): void {
     const tr = this.transformerCtrl.getTransformer();
     if (tr.nodes().length > 1 && this.config.behaviors?.onMultipleSelection) {
-      const selectionBehavior = this.config.behaviors.onMultipleSelection(tr.nodes());
+      const selectionBehavior = this.config.behaviors.onMultipleSelection(
+        tr.nodes()
+      );
       tr.setAttrs(selectionBehavior);
       tr.forceUpdate();
     }
@@ -491,7 +508,9 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin implements SelectionC
     }
 
     const usersSelectionPlugin =
-      this.instance.getPlugin<WeaveUsersSelectionPlugin>(WEAVE_USERS_SELECTION_KEY);
+      this.instance.getPlugin<WeaveUsersSelectionPlugin>(
+        WEAVE_USERS_SELECTION_KEY
+      );
 
     if (usersSelectionPlugin) {
       requestAnimationFrame(() => {
@@ -502,7 +521,10 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin implements SelectionC
 
   getSelectedNodes() {
     if (!this.transformerCtrl) return [];
-    return this.transformerCtrl.getTransformer().nodes() as (Konva.Group | Konva.Shape)[];
+    return this.transformerCtrl.getTransformer().nodes() as (
+      | Konva.Group
+      | Konva.Shape
+    )[];
   }
 
   getSelectedNodesExtended(): WeaveSelection[] {
@@ -564,6 +586,10 @@ export class WeaveNodesSelectionPlugin extends WeavePlugin implements SelectionC
 
   isDragging(): boolean {
     return this.transformerCtrl.isDragging();
+  }
+
+  getBoundBoxFunc() {
+    return this.transformerCtrl.getBoundBoxFunc();
   }
 
   getSelectorConfig(): TransformerConfig {

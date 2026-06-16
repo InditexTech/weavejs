@@ -459,6 +459,68 @@ describe('WeaveStateManager', () => {
       manager.updateNode(updated);
       expect(mockWeave.emitEvent).toHaveBeenCalledWith('onNodeUpdated', updated);
     });
+
+    it('propagates child prop updates when parent is updated with children (regression: group/frame serialize)', () => {
+      buildYjsRoot(doc);
+      addChildToRoot(doc, { key: 'mainLayer', type: 'layer', props: { children: [] } });
+      // Add parent group with one child
+      manager.addNode({
+        key: 'group1',
+        type: 'group',
+        props: {
+          x: 0,
+          y: 0,
+          children: [{ key: 'child1', type: 'rect', props: { x: 0, y: 0, width: 10 } }],
+        },
+      });
+      manager.addNode({ key: 'child1', type: 'rect', props: { x: 0, y: 0, width: 10 } }, 'group1');
+
+      // Update parent serialised with updated child — simulates group.serialize() output
+      manager.updateNode({
+        key: 'group1',
+        type: 'group',
+        props: {
+          x: 5,
+          y: 5,
+          children: [{ key: 'child1', type: 'rect', props: { x: 42, y: 7, width: 10 } }],
+        },
+      });
+
+      expect(manager.getNode('group1').node?.props.x).toBe(5);
+      expect(manager.getNode('child1').node?.props.x).toBe(42);
+      expect(manager.getNode('child1').node?.props.y).toBe(7);
+    });
+
+    it('propagates grandchild prop updates via recursive updateNode', () => {
+      buildYjsRoot(doc);
+      addChildToRoot(doc, { key: 'mainLayer', type: 'layer', props: { children: [] } });
+      // frame → group → rect hierarchy
+      manager.addNode({ key: 'frame1', type: 'frame', props: { x: 0, children: [] } });
+      manager.addNode({ key: 'group1', type: 'group', props: { x: 0, children: [] } }, 'frame1');
+      manager.addNode({ key: 'rect1', type: 'rect', props: { x: 0 } }, 'group1');
+
+      manager.updateNode({
+        key: 'frame1',
+        type: 'frame',
+        props: {
+          x: 1,
+          children: [
+            {
+              key: 'group1',
+              type: 'group',
+              props: {
+                x: 2,
+                children: [{ key: 'rect1', type: 'rect', props: { x: 99 } }],
+              },
+            },
+          ],
+        },
+      });
+
+      expect(manager.getNode('frame1').node?.props.x).toBe(1);
+      expect(manager.getNode('group1').node?.props.x).toBe(2);
+      expect(manager.getNode('rect1').node?.props.x).toBe(99);
+    });
   });
 
   // ─── Suite 10: updateNodes ───────────────────────────────────────────────

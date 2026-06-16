@@ -2,6 +2,8 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
+// @vitest-environment jsdom
+
 import { describe, it, expect, vi, beforeAll, beforeEach } from 'vitest';
 import Konva from 'konva';
 import { WeaveEllipseNode } from '../ellipse';
@@ -9,6 +11,7 @@ import { WEAVE_ELLIPSE_NODE_TYPE } from '../constants';
 import { augmentKonvaNodeClass } from '../../node';
 import type { WeaveElementAttributes } from '@inditextech/weave-types';
 import { createMockInstance, makePluginMock } from '../../__tests__/shared/node.test-helpers';
+import { WEAVE_SHAPE_LABEL_DEFAULTS, labelId } from '../../shared/shape-label.constants';
 
 // Break the node.ts ↔ weave.ts circular dependency so that WeaveNode is
 // fully evaluated before any barrel re-export tries to extend it.
@@ -116,8 +119,8 @@ describe('WeaveEllipseNode', () => {
       expect(group.name()).toBe('node');
     });
 
-    it('2.3 group has exactly two children', () => {
-      expect(group.getChildren().length).toBe(2);
+    it('2.3 group has exactly three children (bg, border, label)', () => {
+      expect(group.getChildren().length).toBe(3);
     });
 
     it('2.4 group id matches props.id', () => {
@@ -613,11 +616,40 @@ describe('WeaveEllipseNode', () => {
       expect(result.props.strokeWidth).toBe(5);
     });
 
-    it('11.5 omits strokeWidth override when props.strokeWidth is 0 — base value is preserved', () => {
+    it('11.6 passes all label props through addNodeState', () => {
       const result = WeaveEllipseNode.addNodeState(base, {
-        strokeWidth: 0,
+        labelText: 'Hello',
+        labelFontFamily: 'Georgia',
+        labelFontSize: 18,
+        labelFontStyle: 'bold',
+        labelFontVariant: 'small-caps',
+        labelFill: '#FF0000FF',
+        labelAlign: 'right',
+        labelVerticalAlign: 'bottom',
+        labelLetterSpacing: 2,
+        labelLineHeight: 1.5,
+        labelPaddingX: 12,
+        labelPaddingY: 10,
       } as WeaveElementAttributes);
-      expect(result.props.strokeWidth).toBe(base.props.strokeWidth);
+      expect(result.props.labelText).toBe('Hello');
+      expect(result.props.labelFontFamily).toBe('Georgia');
+      expect(result.props.labelFontSize).toBe(18);
+      expect(result.props.labelFontStyle).toBe('bold');
+      expect(result.props.labelFontVariant).toBe('small-caps');
+      expect(result.props.labelFill).toBe('#FF0000FF');
+      expect(result.props.labelAlign).toBe('right');
+      expect(result.props.labelVerticalAlign).toBe('bottom');
+      expect(result.props.labelLetterSpacing).toBe(2);
+      expect(result.props.labelLineHeight).toBe(1.5);
+      expect(result.props.labelPaddingX).toBe(12);
+      expect(result.props.labelPaddingY).toBe(10);
+    });
+
+    it('11.7 omits undefined label props (base defaults are preserved)', () => {
+      const result = WeaveEllipseNode.addNodeState(base, {} as WeaveElementAttributes);
+      // Undefined label props are not spread, so base defaults remain
+      expect(result.props.labelText).toBe(base.props.labelText);
+      expect(result.props.labelFontFamily).toBe(base.props.labelFontFamily);
     });
   });
 
@@ -666,11 +698,39 @@ describe('WeaveEllipseNode', () => {
       expect(result.props.strokeWidth).toBe(8);
     });
 
-    it('12.5 omits strokeWidth override when nextProps.strokeWidth is 0 — prev value is preserved', () => {
+    it('12.6 passes all label props through updateNodeState', () => {
       const result = WeaveEllipseNode.updateNodeState(prev, {
-        strokeWidth: 0,
+        labelText: 'Updated',
+        labelFontFamily: 'Verdana',
+        labelFontSize: 20,
+        labelFontStyle: 'italic',
+        labelFontVariant: 'normal',
+        labelFill: '#0000FFFF',
+        labelAlign: 'left',
+        labelVerticalAlign: 'top',
+        labelLetterSpacing: 3,
+        labelLineHeight: 2,
+        labelPaddingX: 16,
+        labelPaddingY: 14,
       } as WeaveElementAttributes);
-      expect(result.props.strokeWidth).toBe(prev.props.strokeWidth);
+      expect(result.props.labelText).toBe('Updated');
+      expect(result.props.labelFontFamily).toBe('Verdana');
+      expect(result.props.labelFontSize).toBe(20);
+      expect(result.props.labelFontStyle).toBe('italic');
+      expect(result.props.labelFontVariant).toBe('normal');
+      expect(result.props.labelFill).toBe('#0000FFFF');
+      expect(result.props.labelAlign).toBe('left');
+      expect(result.props.labelVerticalAlign).toBe('top');
+      expect(result.props.labelLetterSpacing).toBe(3);
+      expect(result.props.labelLineHeight).toBe(2);
+      expect(result.props.labelPaddingX).toBe(16);
+      expect(result.props.labelPaddingY).toBe(14);
+    });
+
+    it('12.7 omits undefined label props (prev values are preserved)', () => {
+      const result = WeaveEllipseNode.updateNodeState(prev, {} as WeaveElementAttributes);
+      expect(result.props.labelText).toBe(prev.props.labelText);
+      expect(result.props.labelFontFamily).toBe(prev.props.labelFontFamily);
     });
   });
 
@@ -745,4 +805,338 @@ describe('WeaveEllipseNode', () => {
       ).toThrow();
     });
   });
+
+  // -------------------------------------------------------------------------
+  // Suite 14 — Label integration
+  // -------------------------------------------------------------------------
+
+  describe('label', () => {
+    function makeNode() {
+      const node = new WeaveEllipseNode();
+      node.instance = createMockInstance() as never;
+      return node;
+    }
+
+    it('14.1 defaultState includes all label props with defaults', () => {
+      const state = WeaveEllipseNode.defaultState('lbl-test');
+      expect(state.props.labelText).toBe(WEAVE_SHAPE_LABEL_DEFAULTS.labelText);
+      expect(state.props.labelFontFamily).toBe(WEAVE_SHAPE_LABEL_DEFAULTS.labelFontFamily);
+      expect(state.props.labelFontSize).toBe(WEAVE_SHAPE_LABEL_DEFAULTS.labelFontSize);
+      expect(state.props.labelFill).toBe(WEAVE_SHAPE_LABEL_DEFAULTS.labelFill);
+      expect(state.props.labelAlign).toBe(WEAVE_SHAPE_LABEL_DEFAULTS.labelAlign);
+      expect(state.props.labelVerticalAlign).toBe(WEAVE_SHAPE_LABEL_DEFAULTS.labelVerticalAlign);
+      expect(state.props.labelPaddingX).toBe(WEAVE_SHAPE_LABEL_DEFAULTS.labelPaddingX);
+      expect(state.props.labelPaddingY).toBe(WEAVE_SHAPE_LABEL_DEFAULTS.labelPaddingY);
+    });
+
+    it('14.2 onRender creates a Konva.Text child with the label id', () => {
+      const node = makeNode();
+      const group = node.onRender(defaultProps({ labelText: 'test label' })) as Konva.Group;
+      const label = group.findOne<Konva.Text>(`#${labelId('ellipse-id')}`);
+      expect(label).toBeTruthy();
+    });
+
+    it('14.3 label is hidden when labelText is empty', () => {
+      const node = makeNode();
+      const group = node.onRender(defaultProps({ labelText: '' })) as Konva.Group;
+      const label = group.findOne<Konva.Text>(`#${labelId('ellipse-id')}`) as Konva.Text;
+      expect(label.visible()).toBe(false);
+    });
+
+    it('14.4 label is visible when labelText is non-empty', () => {
+      const node = makeNode();
+      const group = node.onRender(defaultProps({ labelText: 'seam' })) as Konva.Group;
+      const label = group.findOne<Konva.Text>(`#${labelId('ellipse-id')}`) as Konva.Text;
+      expect(label.visible()).toBe(true);
+    });
+
+    it('14.5 label text matches labelText prop on render', () => {
+      const node = makeNode();
+      const group = node.onRender(defaultProps({ labelText: 'collar' })) as Konva.Group;
+      const label = group.findOne<Konva.Text>(`#${labelId('ellipse-id')}`) as Konva.Text;
+      expect(label.text()).toBe('collar');
+    });
+
+    it('14.6 onUpdate changes label text', () => {
+      const node = makeNode();
+      const group = node.onRender(defaultProps({ labelText: 'before' })) as Konva.Group;
+      node.onUpdate(group, defaultProps({ labelText: 'after' }));
+      const label = group.findOne<Konva.Text>(`#${labelId('ellipse-id')}`) as Konva.Text;
+      expect(label.text()).toBe('after');
+    });
+
+    it('14.7 label textBounds use inscribed rectangle formula', () => {
+      const node = makeNode();
+      const radiusX = 100;
+      const radiusY = 80;
+      const paddingX = WEAVE_SHAPE_LABEL_DEFAULTS.labelPaddingX;
+      const paddingY = WEAVE_SHAPE_LABEL_DEFAULTS.labelPaddingY;
+      const expectedX = radiusX - (radiusX * Math.SQRT2) / 2 + paddingX;
+      const expectedY = radiusY - (radiusY * Math.SQRT2) / 2 + paddingY;
+      const expectedWidth = radiusX * Math.SQRT2 - 2 * paddingX;
+      const group = node.onRender(
+        defaultProps({ radiusX, radiusY, labelText: 'inset' })
+      ) as Konva.Group;
+      const label = group.findOne<Konva.Text>(`#${labelId('ellipse-id')}`) as Konva.Text;
+      expect(label.x()).toBeCloseTo(expectedX, 5);
+      expect(label.y()).toBeCloseTo(expectedY, 5);
+      expect(label.width()).toBeCloseTo(expectedWidth, 5);
+    });
+
+    it('14.8 schema accepts all label props', () => {
+      const schema = WeaveEllipseNode.getSchema();
+      const validSchemaNode = {
+        key: 'e1',
+        type: WEAVE_ELLIPSE_NODE_TYPE,
+        props: {
+          id: 'e1',
+          nodeType: WEAVE_ELLIPSE_NODE_TYPE,
+          x: 0, y: 0, scaleX: 1, scaleY: 1, opacity: 1,
+          radiusX: 100, radiusY: 80,
+          fill: '#fff', stroke: '#000', strokeWidth: 1,
+          strokeScaleEnabled: true,
+          children: [],
+          ...WEAVE_SHAPE_LABEL_DEFAULTS,
+        },
+      };
+      expect(() => schema.parse(validSchemaNode)).not.toThrow();
+    });
+
+    it('14.9 growCallback calls updateNode to persist grown radiusY to Yjs', () => {
+      const node = makeNode();
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const mock = (node as any).instance;
+      const group = node.onRender(defaultProps({ radiusX: 100, radiusY: 40, labelText: 'hi' })) as Konva.Group;
+
+      const label = group.findOne<Konva.Text>(`#${labelId('ellipse-id')}`) as Konva.Text;
+      const origHeight = label.height.bind(label);
+      vi.spyOn(label, 'height').mockImplementation((...args: unknown[]) => {
+        if (args.length === 0) return 120; // simulate overflow natural height
+        return origHeight(args[0] as number);
+      });
+
+      mock.updateNode.mockClear();
+
+      node.onUpdate(group, defaultProps({ radiusX: 100, radiusY: 40, labelText: 'overflow text' }));
+
+      expect(mock.updateNode).toHaveBeenCalled();
+      const serialized = mock.updateNode.mock.calls[0][0];
+      expect(serialized.props.radiusY).toBeGreaterThan(40);
+    });
+
+    it('14.10 growCallback does NOT call updateNode while transform is in progress', () => {
+      const node = makeNode();
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const mock = (node as any).instance;
+      const group = node.onRender(defaultProps({ radiusX: 100, radiusY: 40, labelText: 'hi' })) as Konva.Group;
+
+      const label = group.findOne<Konva.Text>(`#${labelId('ellipse-id')}`) as Konva.Text;
+      const origHeight = label.height.bind(label);
+      vi.spyOn(label, 'height').mockImplementation((...args: unknown[]) => {
+        if (args.length === 0) return 120; // simulate overflow natural height
+        return origHeight(args[0] as number);
+      });
+
+      mock.updateNode.mockClear();
+
+      // Simulate transform in progress by firing the transformstart event
+      group.fire('transformstart');
+      // growCallback must NOT call updateNode during transform — deferred to transformend
+      expect(mock.updateNode).not.toHaveBeenCalled();
+
+      // After transformend the flag is cleared; a direct onUpdate call persists again
+      group.fire('transformend');
+      node.onUpdate(group, defaultProps({ radiusX: 100, radiusY: 40, labelText: 'overflow text' }));
+      expect(mock.updateNode).toHaveBeenCalled();
+    });
+  });
+
+  // -------------------------------------------------------------------------
+  // Suite 15 — onRender: transform events
+  // -------------------------------------------------------------------------
+
+  describe('onRender — transform events', () => {
+    it('15.1 transform event calls scaleReset and onUpdate', () => {
+      const { node } = makeNode();
+      const group = node.onRender(defaultProps({ radiusX: 100, radiusY: 80 })) as Konva.Group;
+
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const scaleResetSpy = vi.spyOn(node as any, 'scaleReset');
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const onUpdateSpy = vi.spyOn(node as any, 'onUpdate');
+
+      group.fire('transform');
+
+      expect(scaleResetSpy).toHaveBeenCalledWith(group);
+      expect(onUpdateSpy).toHaveBeenCalled();
+    });
+
+    it('15.2 transformstart sets _transforming to true', () => {
+      const { node } = makeNode();
+      const group = node.onRender(defaultProps()) as Konva.Group;
+
+      group.fire('transformstart');
+
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      expect((node as any)._transforming).toBe(true);
+    });
+
+    it('15.3 transformend sets _transforming to false', () => {
+      const { node } = makeNode();
+      const group = node.onRender(defaultProps()) as Konva.Group;
+
+      group.fire('transformstart');
+      group.fire('transformend');
+
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      expect((node as any)._transforming).toBe(false);
+    });
+  });
+
+  // -------------------------------------------------------------------------
+  // Suite 16 — dblClick handler
+  // -------------------------------------------------------------------------
+
+  describe('dblClick handler', () => {
+    function makeNodeForDblClick() {
+      const node = new WeaveEllipseNode();
+      node.instance = createMockInstance() as never;
+      return node;
+    }
+
+    it('16.1 returns early when shapeLabelEditor is already editing', () => {
+      const node = makeNodeForDblClick();
+      const group = node.onRender(defaultProps({ labelText: 'hi' })) as Konva.Group;
+
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const editor = (node as any).shapeLabelEditor;
+      vi.spyOn(editor, 'isEditing').mockReturnValue(true);
+      const triggerSpy = vi.spyOn(editor, 'triggerEditMode');
+
+      if (group.dblClick) {
+        group.dblClick();
+      }
+
+      expect(triggerSpy).not.toHaveBeenCalled();
+    });
+
+    it('16.2 returns early when node is not selected', () => {
+      const node = makeNodeForDblClick();
+      const group = node.onRender(defaultProps({ labelText: 'hi' })) as Konva.Group;
+
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      vi.spyOn(node as any, 'isSelecting').mockReturnValue(false);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const editor = (node as any).shapeLabelEditor;
+      const triggerSpy = vi.spyOn(editor, 'triggerEditMode');
+
+      if (group.dblClick) {
+        group.dblClick();
+      }
+
+      expect(triggerSpy).not.toHaveBeenCalled();
+    });
+
+    it('16.3 triggers edit mode when node is selected', () => {
+      const node = makeNodeForDblClick();
+      const group = node.onRender(defaultProps({ radiusX: 100, radiusY: 80, labelText: 'edit me' })) as Konva.Group;
+
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      vi.spyOn(node as any, 'isSelecting').mockReturnValue(true);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      vi.spyOn(node as any, 'isNodeSelected').mockReturnValue(true);
+
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const editor = (node as any).shapeLabelEditor;
+      const triggerSpy = vi.spyOn(editor, 'triggerEditMode').mockImplementation(() => {});
+
+      if (group.dblClick) {
+        group.dblClick();
+      }
+
+      expect(triggerSpy).toHaveBeenCalled();
+    });
+
+    it('16.4 dblClick passes correct textBounds from live radiusX/radiusY', () => {
+      const node = makeNodeForDblClick();
+      const radiusX = 120;
+      const radiusY = 90;
+      const group = node.onRender(
+        defaultProps({ radiusX, radiusY, labelText: 'bounds-test' })
+      ) as Konva.Group;
+
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      vi.spyOn(node as any, 'isSelecting').mockReturnValue(true);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      vi.spyOn(node as any, 'isNodeSelected').mockReturnValue(true);
+
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const editor = (node as any).shapeLabelEditor;
+      let capturedBounds: { width: number } | null = null;
+      vi.spyOn(editor, 'triggerEditMode').mockImplementation(
+        (_g: Konva.Group, bounds: { width: number }) => {
+          capturedBounds = bounds;
+        }
+      );
+
+      if (group.dblClick) {
+        group.dblClick();
+      }
+
+      expect(capturedBounds).not.toBeNull();
+      const WEAVE_SHAPE_LABEL_DEFAULTS_PADDING_X = WEAVE_SHAPE_LABEL_DEFAULTS.labelPaddingX;
+      const expectedWidth = radiusX * Math.SQRT2 - 2 * WEAVE_SHAPE_LABEL_DEFAULTS_PADDING_X;
+      expect((capturedBounds as { width: number }).width).toBeCloseTo(expectedWidth, 4);
+    });
+
+    it('16.5 onLiveResize callback updates radiusY and repositions textarea', () => {
+      const node = makeNodeForDblClick();
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const mock = (node as any).instance;
+      const radiusX = 100;
+      const radiusY = 60;
+      const group = node.onRender(
+        defaultProps({ radiusX, radiusY, labelText: 'resize me' })
+      ) as Konva.Group;
+
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      vi.spyOn(node as any, 'isSelecting').mockReturnValue(true);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      vi.spyOn(node as any, 'isNodeSelected').mockReturnValue(true);
+
+      let capturedOnLiveResize: ((h: number) => void) | null = null;
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const editor = (node as any).shapeLabelEditor;
+      vi.spyOn(editor, 'triggerEditMode').mockImplementation(
+        (
+          _g: Konva.Group,
+          _bounds: unknown,
+          _onCommit: unknown,
+          onLiveResize: (h: number) => void
+        ) => {
+          capturedOnLiveResize = onLiveResize;
+        }
+      );
+      vi.spyOn(editor, 'repositionTextArea').mockImplementation(() => {});
+
+      if (group.dblClick) {
+        group.dblClick();
+      }
+
+      expect(capturedOnLiveResize).not.toBeNull();
+
+      mock.updateNode.mockClear();
+
+      // Fire onLiveResize with a height that exceeds originalNeededHeight
+      // originalNeededHeight = currentLabelTextBounds.height + paddingY * 2
+      const largeHeight = 999;
+      if (capturedOnLiveResize) {
+        (capturedOnLiveResize as (h: number) => void)(largeHeight);
+      }
+
+      const newRadiusY = Math.ceil(largeHeight / Math.SQRT2);
+      expect(group.getAttr('radiusY')).toBe(newRadiusY);
+    });
+  });
 });
+

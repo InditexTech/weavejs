@@ -68,6 +68,10 @@ export * from './nodes/arrow/types';
 export { WeaveRegularPolygonNode } from './nodes/regular-polygon/regular-polygon';
 export * from './nodes/regular-polygon/constants';
 export * from './nodes/regular-polygon/types';
+export { WeavePolygonNode } from './nodes/polygon/polygon';
+export * from './nodes/polygon/constants';
+export * from './nodes/polygon/types';
+export * from './nodes/polygon/presets';
 export { WeaveFrameNode } from './nodes/frame/frame';
 export * from './nodes/frame/constants';
 export * from './nodes/frame/types';
@@ -88,6 +92,11 @@ export * from './nodes/measure/constants';
 export { WeaveConnectorNode } from './nodes/connector/connector';
 export * from './nodes/connector/constants';
 export * from './nodes/connector/types';
+
+// Shared shape label utilities
+export * from './nodes/shared/shape-label.types';
+export * from './nodes/shared/shape-label.constants';
+export * from './nodes/shared/shape-label.utils';
 
 // Provided Actions
 export { WeaveZoomOutToolAction } from './actions/zoom-out-tool/zoom-out-tool';
@@ -143,6 +152,9 @@ export * from './actions/stroke-tool/types';
 export { WeaveRegularPolygonToolAction } from './actions/regular-polygon-tool/regular-polygon-tool';
 export * from './actions/regular-polygon-tool/constants';
 export * from './actions/regular-polygon-tool/types';
+export { WeavePolygonToolAction } from './actions/polygon-tool/polygon-tool';
+export * from './actions/polygon-tool/constants';
+export * from './actions/polygon-tool/types';
 export { WeaveFrameToolAction } from './actions/frame-tool/frame-tool';
 export * from './actions/frame-tool/constants';
 export * from './actions/frame-tool/types';

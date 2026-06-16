@@ -11,3 +11,5 @@ export type WeaveRegularPolygonProperties = {
 export type WeaveRegularPolygonNodeParams = {
   config: Partial<WeaveRegularPolygonProperties>;
 };
+
+export type { WeaveShapeLabelProps } from '@/nodes/shared/shape-label.types';

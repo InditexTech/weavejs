@@ -13,6 +13,11 @@ class represents a basic ellipse shape within the Weave.js canvas.
 Built on top of Konva’s [Ellipse](https://konvajs.org/api/Konva.Ellipse.html) class shape under the hood, the WeaveEllipseNode
 offers a simple yet powerful primitive that supports full interaction, styling, and real-time synchronization.
 
+Ellipse nodes support an optional **text label** that is displayed centred inside the shape.
+The label can be edited interactively by double-clicking the ellipse while it is selected.
+All label appearance properties (font, colour, alignment, padding, …) are configurable via the
+`label*` props described below.
+
 The class extends the [WeaveNode](/docs/sdk/api-reference/nodes/node) class
 
 ## Type
@@ -43,6 +48,22 @@ type WeaveEllipseProperties = {
 type WeaveEllipseNodeParams = {
   config: Partial<WeaveEllipseProperties>;
 };
+
+type WeaveShapeLabelProps = {
+  labelText?: string;
+  labelFontFamily?: string;
+  labelFontSize?: number;
+  labelFontStyle?: string;
+  labelFontVariant?: string;
+  labelTextDecoration?: string;
+  labelFill?: string;
+  labelAlign?: string;
+  labelVerticalAlign?: string;
+  labelLetterSpacing?: number;
+  labelLineHeight?: number;
+  labelPaddingX?: number;
+  labelPaddingY?: number;
+};
 ```
 
 ## Parameters
@@ -72,6 +93,84 @@ For `WeaveEllipseProperties`:
   }}
 />
 
+## Label properties
+
+The following props control the optional text label rendered inside the ellipse.
+They map directly to `WeaveShapeLabelProps` and are all optional — omit them to use the defaults.
+
+<TypeTable
+  type={{
+    ["labelText"]: {
+      description: "Text content of the label. Set to an empty string to hide the label.",
+      type: "string",
+      default: '""',
+    },
+    ["labelFontFamily"]: {
+      description: "CSS font-family string for the label text.",
+      type: "string",
+      default: '"Arial, sans-serif"',
+    },
+    ["labelFontSize"]: {
+      description: "Font size of the label text in pixels.",
+      type: "number",
+      default: "14",
+    },
+    ["labelFontStyle"]: {
+      description:
+        'Font style for the label. Accepts CSS font-style/weight keywords or a numeric weight (e.g. "normal", "bold", "italic", "bold italic", "700").',
+      type: "string",
+      default: '"normal"',
+    },
+    ["labelFontVariant"]: {
+      description: 'CSS font-variant for the label (e.g. "normal", "small-caps").',
+      type: "string",
+      default: '"normal"',
+    },
+    ["labelTextDecoration"]: {
+      description: 'CSS text-decoration for the label (e.g. "underline", "line-through").',
+      type: "string",
+      default: '""',
+    },
+    ["labelFill"]: {
+      description: "Colour of the label text in hex format (e.g. #RRGGBBAA).",
+      type: "string",
+      default: '"#000000"',
+    },
+    ["labelAlign"]: {
+      description: 'Horizontal alignment of the label text ("left", "center", "right").',
+      type: "string",
+      default: '"center"',
+    },
+    ["labelVerticalAlign"]: {
+      description: 'Vertical alignment of the label text ("top", "middle", "bottom").',
+      type: "string",
+      default: '"middle"',
+    },
+    ["labelLetterSpacing"]: {
+      description: "Letter spacing for the label text in pixels.",
+      type: "number",
+      default: "0",
+    },
+    ["labelLineHeight"]: {
+      description: "Line-height multiplier for the label text.",
+      type: "number",
+      default: "1",
+    },
+    ["labelPaddingX"]: {
+      description:
+        "Horizontal inset (padding) in pixels applied on each side of the label area.",
+      type: "number",
+      default: "8",
+    },
+    ["labelPaddingY"]: {
+      description:
+        "Vertical inset (padding) in pixels applied on the top and bottom of the label area.",
+      type: "number",
+      default: "8",
+    },
+  }}
+/>
+
 ## Default values
 
 ```ts
@@ -96,5 +195,21 @@ const WEAVE_DEFAULT_TRANSFORM_PROPERTIES: WeaveNodeTransformerProperties = {
   enabledAnchors: WEAVE_DEFAULT_ENABLED_ANCHORS,
   borderStrokeWidth: 3,
   padding: 0,
+};
+
+const WEAVE_SHAPE_LABEL_DEFAULTS: WeaveShapeLabelProps = {
+  labelText: "",
+  labelFontFamily: "Arial, sans-serif",
+  labelFontSize: 14,
+  labelFontStyle: "normal",
+  labelFontVariant: "normal",
+  labelTextDecoration: "",
+  labelFill: "#000000",
+  labelAlign: "center",
+  labelVerticalAlign: "middle",
+  labelLetterSpacing: 0,
+  labelLineHeight: 1,
+  labelPaddingX: 8,
+  labelPaddingY: 8,
 };
 ```

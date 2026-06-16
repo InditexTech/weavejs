@@ -65,7 +65,9 @@ export function handlePointerDown(
 
   const relPos = stage.getRelativePointerPosition() ?? { x: 0, y: 0 };
   ctx.getAreaSelector().setStart(relPos.x, relPos.y);
-  ctx.getAreaSelector().resetForScale(stage.scaleX(), ctx.getConfiguration().selectionArea);
+  ctx
+    .getAreaSelector()
+    .resetForScale(stage.scaleX(), ctx.getConfiguration().selectionArea);
   ctx.setAreaSelecting(true);
 
   const isCtrlOrMetaPressed = e.evt.ctrlKey || e.evt.metaKey;
@@ -78,11 +80,14 @@ export function handlePointerDown(
   }
 
   ctx.selectNone();
+  ctx.triggerSelectedNodesEvent();
 
-  ctx.getWeaveInstance().emitEvent<WeaveNodesSelectionPluginOnSelectionStateEvent>(
-    'onSelectionState',
-    true
-  );
+  ctx
+    .getWeaveInstance()
+    .emitEvent<WeaveNodesSelectionPluginOnSelectionStateEvent>(
+      'onSelectionState',
+      true
+    );
 
   ctx.getEdgePanning().start();
 }

@@ -34,6 +34,7 @@ vi.mock('konva', () => {
     getChildren = vi.fn().mockReturnValue([]);
     on = vi.fn();
     fire = vi.fn();
+    boundBoxFunc = vi.fn();
   }
   class Stage {
     container = vi.fn().mockReturnValue({ style: { cursor: '' } });

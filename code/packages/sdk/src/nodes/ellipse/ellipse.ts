@@ -14,11 +14,23 @@ import { WEAVE_ELLIPSE_NODE_TYPE } from './constants';
 import type { WeaveNodesSelectionPlugin } from '@/plugins/nodes-selection/nodes-selection';
 import type { WeaveEllipseNodeParams, WeaveEllipseProperties } from './types';
 import { mergeExceptArrays } from '@/utils/utils';
+import { WeaveShapeLabelEditor } from '@/nodes/shared/shape-label-editor';
+import {
+  labelId,
+  WEAVE_SHAPE_LABEL_DEFAULTS,
+} from '@/nodes/shared/shape-label.constants';
+import { computeEllipseLabelMinSize, spreadLabelProps, getShapeLabelSchemaFields } from '@/nodes/shared/shape-label.utils';
 
 export class WeaveEllipseNode extends WeaveNode {
   private config: WeaveEllipseProperties;
   protected nodeType: string = WEAVE_ELLIPSE_NODE_TYPE;
   initialize = undefined;
+  private _shapeLabelEditor: WeaveShapeLabelEditor | undefined;
+  private _transforming = false;
+
+  private get shapeLabelEditor(): WeaveShapeLabelEditor {
+    return (this._shapeLabelEditor ??= new WeaveShapeLabelEditor(this.instance));
+  }
 
   constructor(params?: WeaveEllipseNodeParams) {
     super();
@@ -29,6 +41,23 @@ export class WeaveEllipseNode extends WeaveNode {
       transform: {
         ...config?.transform,
       },
+    };
+  }
+
+  private getLabelTextBounds(
+    radiusX: number,
+    radiusY: number,
+    paddingX: number,
+    paddingY: number
+  ) {
+    // Inscribed rectangle inside the ellipse: width = radiusX*√2, height = radiusY*√2
+    const inscribedW = radiusX * Math.SQRT2;
+    const inscribedH = radiusY * Math.SQRT2;
+    return {
+      x: radiusX - inscribedW / 2 + paddingX,
+      y: radiusY - inscribedH / 2 + paddingY,
+      width: Math.max(1, inscribedW - paddingX * 2),
+      height: Math.max(1, inscribedH - paddingY * 2),
     };
   }
 
@@ -74,6 +103,19 @@ export class WeaveEllipseNode extends WeaveNode {
     });
 
     ellipse.add(internalEllipseBorder);
+
+    const paddingX =
+      props.labelPaddingX ?? WEAVE_SHAPE_LABEL_DEFAULTS.labelPaddingX;
+    const paddingY =
+      props.labelPaddingY ?? WEAVE_SHAPE_LABEL_DEFAULTS.labelPaddingY;
+    const labelTextBounds = this.getLabelTextBounds(
+      Math.max(1, baseRadiusX),
+      Math.max(1, baseRadiusY),
+      paddingX,
+      paddingY
+    );
+
+    this.shapeLabelEditor.renderLabel(ellipse, props, labelTextBounds);
 
     internalEllipseBorder.moveToTop();
     internalEllipseBg.moveToBottom();
@@ -123,6 +165,103 @@ export class WeaveEllipseNode extends WeaveNode {
     };
 
     this.setupDefaultNodeEvents(ellipse);
+
+    ellipse.on('transformstart', () => {
+      this._transforming = true;
+    });
+
+    ellipse.on('transform', () => {
+      this.scaleReset(ellipse);
+      this.onUpdate(ellipse, ellipse.getAttrs());
+    });
+
+    ellipse.on('transformend', () => {
+      this._transforming = false;
+    });
+
+    ellipse.dblClick = () => {
+      if (this.shapeLabelEditor.isEditing()) {
+        return;
+      }
+
+      if (!(this.isSelecting() && this.isNodeSelected(ellipse))) {
+        return;
+      }
+
+      const onCommit = (labelText: string) => {
+        const updatedGroup = this.instance
+          .getStage()
+          .findOne<Konva.Group>(`#${props.id}`);
+        if (!updatedGroup) {
+          return;
+        }
+        const serialized = this.serialize(updatedGroup);
+        serialized.props.labelText = labelText;
+        this.instance.updateNode(serialized);
+      };
+
+      // Re-derive bounds from live attrs so a resized ellipse uses the
+      // correct dimensions when the edit overlay is shown.
+      const currentAttrs = ellipse.getAttrs() as WeaveElementAttributes;
+      const curPaddingX =
+        currentAttrs.labelPaddingX ?? WEAVE_SHAPE_LABEL_DEFAULTS.labelPaddingX;
+      const curPaddingY =
+        currentAttrs.labelPaddingY ?? WEAVE_SHAPE_LABEL_DEFAULTS.labelPaddingY;
+      const currentRadiusX = Math.max(1, currentAttrs.radiusX as number);
+      const currentRadiusY = Math.max(1, currentAttrs.radiusY as number);
+      const currentLabelTextBounds = this.getLabelTextBounds(
+        currentRadiusX,
+        currentRadiusY,
+        curPaddingX,
+        curPaddingY
+      );
+      // Capture original size and threshold for grow/restore decisions.
+      // originalNeededHeight = currentRadiusY * √2 (the current inscribed height)
+      const originalRadiusY = currentRadiusY;
+      const originalNeededHeight =
+        currentLabelTextBounds.height + curPaddingY * 2;
+
+      this.shapeLabelEditor.triggerEditMode(
+        ellipse,
+        currentLabelTextBounds,
+        onCommit,
+        (neededShapeHeight) => {
+          // neededShapeHeight = contentHeight + paddingY*2 = the needed inscribed height
+          // radiusY = inscribedH / √2  →  newRadiusY = ceil(neededShapeHeight / √2)
+          const newRadiusY =
+            neededShapeHeight <= originalNeededHeight
+              ? originalRadiusY
+              : Math.ceil(neededShapeHeight / Math.SQRT2);
+          const liveAttrs = ellipse.getAttrs() as WeaveElementAttributes;
+          const strokeW = (liveAttrs.strokeWidth as number) || 0;
+          const bg = ellipse.findOne<Konva.Ellipse>(`#${liveAttrs.id}-bg`);
+          const border = ellipse.findOne<Konva.Ellipse>(
+            `#${liveAttrs.id}-border`
+          );
+          ellipse.setAttrs({ radiusY: newRadiusY });
+          bg?.setAttrs({
+            radiusY: Math.max(1, newRadiusY),
+            y: Math.max(1, newRadiusY),
+          });
+          border?.setAttrs({
+            radiusY: Math.max(1, newRadiusY) - strokeW / 2,
+            y: Math.max(1, newRadiusY),
+          });
+          // Reposition textarea to follow the ellipse's vertical growth/restore
+          const newLabelTextBounds = this.getLabelTextBounds(
+            currentRadiusX,
+            newRadiusY,
+            curPaddingX,
+            curPaddingY
+          );
+          this.shapeLabelEditor.repositionTextArea(ellipse, newLabelTextBounds);
+        }
+      );
+    };
+
+    ellipse.getNodeMinSize = () => {
+      return computeEllipseLabelMinSize(this.instance.getStage(), ellipse);
+    };
 
     return ellipse;
   }
@@ -175,11 +314,57 @@ export class WeaveEllipseNode extends WeaveNode {
         radiusY: Math.max(1, baseRadiusY) - (nextProps.strokeWidth || 0) / 2,
         stroke: nextProps.stroke || 'transparent',
         strokeWidth: nextProps.strokeWidth || 0,
+        fill: 'transparent',
         strokeScaleEnabled: true,
         listening: false,
         rotation: 0,
       });
       internalEllipseBorder.moveToTop();
+    }
+
+    const paddingX =
+      nextProps.labelPaddingX ?? WEAVE_SHAPE_LABEL_DEFAULTS.labelPaddingX;
+    const paddingY =
+      nextProps.labelPaddingY ?? WEAVE_SHAPE_LABEL_DEFAULTS.labelPaddingY;
+    const labelTextBounds = this.getLabelTextBounds(
+      Math.max(1, baseRadiusX),
+      Math.max(1, baseRadiusY),
+      paddingX,
+      paddingY
+    );
+
+    this.shapeLabelEditor.updateLabel(
+      ellipse,
+      nextProps,
+      labelTextBounds,
+      (neededHeight) => {
+        // neededHeight = measuredTextHeight + paddingY*2 = needed inscribed height
+        // radiusY = inscribedH / √2  →  newRadiusY = ceil(neededHeight / √2)
+        const newRadiusY = Math.ceil(neededHeight / Math.SQRT2);
+        nodeInstance.setAttrs({ radiusY: newRadiusY });
+        internalEllipseBg?.setAttrs({
+          radiusY: Math.max(1, newRadiusY),
+          y: Math.max(1, newRadiusY),
+        });
+        internalEllipseBorder?.setAttrs({
+          radiusY: Math.max(1, newRadiusY) - (nextProps.strokeWidth || 0) / 2,
+          y: Math.max(1, newRadiusY),
+        });
+        // Persist the grown radiusY to Yjs — skip during transform since
+        // the transformend handler in node.ts will persist the final state.
+        if (!this._transforming) {
+          this.instance.updateNode(
+            this.serialize(nodeInstance)
+          );
+        }
+      }
+    );
+
+    // Keep label above bg, below border
+    const labelNode = ellipse.findOne(`#${labelId(nextProps.id as string)}`);
+    if (labelNode) {
+      labelNode.moveToTop();
+      internalEllipseBorder?.moveToTop();
     }
 
     const nodesSelectionPlugin =
@@ -237,6 +422,7 @@ export class WeaveEllipseNode extends WeaveNode {
         rotation: 0,
         zIndex: 1,
         children: [],
+        ...WEAVE_SHAPE_LABEL_DEFAULTS,
       },
     };
   }
@@ -257,6 +443,7 @@ export class WeaveEllipseNode extends WeaveNode {
         ...(props.strokeWidth && {
           strokeWidth: props.strokeWidth,
         }),
+        ...spreadLabelProps(props),
       },
     });
   }
@@ -277,6 +464,7 @@ export class WeaveEllipseNode extends WeaveNode {
         ...(nextProps.strokeWidth && {
           strokeWidth: nextProps.strokeWidth,
         }),
+        ...spreadLabelProps(nextProps),
       },
     });
   }
@@ -323,6 +511,8 @@ export class WeaveEllipseNode extends WeaveNode {
           .describe(
             'Whether the ellipse stroke width should scale when the node is scaled. Defaults to true.'
           ),
+
+        ...getShapeLabelSchemaFields(),
       }),
     });
 

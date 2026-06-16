@@ -175,6 +175,7 @@ export class WeaveRegularPolygonNode extends WeaveNode {
         stroke: nextProps.stroke || 'transparent',
         strokeWidth: nextProps.strokeWidth || 0,
         strokeScaleEnabled: true,
+        fill: 'transparent',
         listening: false,
         rotation: 0,
       });

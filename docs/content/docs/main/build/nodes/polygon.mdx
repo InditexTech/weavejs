@@ -1,0 +1,76 @@
+---
+title: Polygon
+description: Draw a polygon on the canvas using a preset shape
+---
+
+The Polygon node is a versatile primitive shape used to render polygon elements on the canvas.
+Unlike the [Regular Polygon](/docs/main/build/nodes/regular-polygon) node, it is based on a
+set of explicit vertex points and an inner bounding rectangle, enabling arbitrary convex
+polygons to be rendered with a consistent, inside-stroke border.
+
+It supports customizable properties such as position, fill color, stroke, and an optional
+inline text label.
+
+They can also respond to interactions like dragging, resizing, or selection.
+
+## Presets
+
+The polygon node ships with six built-in presets, each defining the normalized vertex positions
+and the largest inscribed axis-aligned rectangle (used for label placement):
+
+| Preset ID | Label | Sides |
+|-----------|-------|-------|
+| `triangle` | Triangle | 3 |
+| `diamond` | Diamond | 4 |
+| `pentagon` | Pentagon | 5 |
+| `hexagon` | Hexagon | 6 |
+| `octagon` | Octagon | 8 |
+| `decagon` | Decagon | 10 |
+
+## Usage
+
+<div className="fd-steps">
+
+<div className="[&_h3]:fd-step">
+
+### Import the Node
+
+Start by importing the node:
+
+```ts
+import { WeavePolygonNode } from "@inditextech/weave-sdk";
+```
+
+</div>
+
+<div className='[&_h3]:fd-step'>
+
+### Register the Node
+
+Then register the node on the [Weave](/docs/sdk/api-reference/weave) class instance.
+
+```ts
+const instance = new Weave({
+  ...
+  nodes: [
+    ...,
+    new WeavePolygonNode(), // [!code ++]
+  ]
+})
+```
+
+</div>
+
+<div className='[&_h3]:fd-step'>
+
+### Use the node
+
+Once the node is registered you can use it on [Actions](/docs/main/build/actions) or
+[Plugins](/docs/main/build/plugins) or even other [Nodes](/docs/main/build/nodes).
+
+We provide an action named [Polygon Tool](/docs/main/build/actions/polygon-tool) that
+allows users to add Polygon nodes to the application.
+
+</div>
+
+</div>

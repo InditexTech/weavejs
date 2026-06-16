@@ -2,6 +2,8 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
+// @vitest-environment jsdom
+
 import { describe, it, expect, vi, beforeAll, beforeEach } from 'vitest';
 import Konva from 'konva';
 import { WeaveRectangleNode } from '../rectangle';
@@ -9,6 +11,7 @@ import { WEAVE_RECTANGLE_NODE_TYPE } from '../constants';
 import { augmentKonvaNodeClass } from '../../node';
 import type { WeaveElementAttributes } from '@inditextech/weave-types';
 import { createMockInstance } from '../../__tests__/shared/node.test-helpers';
+import { WEAVE_SHAPE_LABEL_DEFAULTS, labelId } from '../../shared/shape-label.constants';
 
 // Break the node.ts ↔ weave.ts circular dependency so that WeaveNode is
 // fully evaluated before any barrel re-export (e.g. WeaveStageNode) tries
@@ -122,8 +125,8 @@ describe('WeaveRectangleNode', () => {
       expect(group.name()).toBe('node');
     });
 
-    it('2.3 group has exactly two children', () => {
-      expect(group.getChildren().length).toBe(2);
+    it('2.3 group has exactly three children (bg, border, label)', () => {
+      expect(group.getChildren().length).toBe(3);
     });
 
     it('2.4 group id matches props.id', () => {
@@ -231,8 +234,8 @@ describe('WeaveRectangleNode', () => {
       expect(bgRect.zIndex()).toBe(0);
     });
 
-    it('2.24 border rect is at zIndex 1 (top)', () => {
-      expect(borderRect.zIndex()).toBe(1);
+    it('2.24 border rect is at zIndex 2 (top)', () => {
+      expect(borderRect.zIndex()).toBe(2);
     });
 
     // 2e — Transformer augmentation
@@ -375,10 +378,10 @@ describe('WeaveRectangleNode', () => {
       expect(border.rotation()).toBe(0);
     });
 
-    it('3.16 border rect is at zIndex 1 (top) after update', () => {
+    it('3.16 border rect is at zIndex 2 (top) after update', () => {
       node.onUpdate(group, nextProps);
       const border = group.findOne(`#${nextProps.id}-border`) as Konva.Rect;
-      expect(border.zIndex()).toBe(1);
+      expect(border.zIndex()).toBe(2);
     });
 
     // 3d — Plugin interaction
@@ -684,6 +687,222 @@ describe('WeaveRectangleNode', () => {
         props: { ...validNode.props, width: 'not-a-number' },
       };
       expect(() => schema.parse(invalid)).toThrow();
+    });
+  });
+
+  // -------------------------------------------------------------------------
+  // Suite 8 — Label integration
+  // -------------------------------------------------------------------------
+
+  describe('label', () => {
+    function makeNode() {
+      const node = new WeaveRectangleNode();
+      node.instance = createMockInstance() as never;
+      return node;
+    }
+
+    it('8.1 defaultState includes all label props with defaults', () => {
+      const state = WeaveRectangleNode.defaultState('lbl-test');
+      expect(state.props.labelText).toBe(WEAVE_SHAPE_LABEL_DEFAULTS.labelText);
+      expect(state.props.labelFontFamily).toBe(WEAVE_SHAPE_LABEL_DEFAULTS.labelFontFamily);
+      expect(state.props.labelFontSize).toBe(WEAVE_SHAPE_LABEL_DEFAULTS.labelFontSize);
+      expect(state.props.labelFill).toBe(WEAVE_SHAPE_LABEL_DEFAULTS.labelFill);
+      expect(state.props.labelAlign).toBe(WEAVE_SHAPE_LABEL_DEFAULTS.labelAlign);
+      expect(state.props.labelVerticalAlign).toBe(WEAVE_SHAPE_LABEL_DEFAULTS.labelVerticalAlign);
+      expect(state.props.labelPaddingX).toBe(WEAVE_SHAPE_LABEL_DEFAULTS.labelPaddingX);
+      expect(state.props.labelPaddingY).toBe(WEAVE_SHAPE_LABEL_DEFAULTS.labelPaddingY);
+    });
+
+    it('8.2 onRender creates a Konva.Text child with the label id', () => {
+      const node = makeNode();
+      const group = node.onRender(defaultProps({ labelText: 'test label' })) as Konva.Group;
+      const label = group.findOne<Konva.Text>(`#${labelId('rect-id')}`);
+      expect(label).toBeTruthy();
+    });
+
+    it('8.3 label is hidden when labelText is empty', () => {
+      const node = makeNode();
+      const group = node.onRender(defaultProps({ labelText: '' })) as Konva.Group;
+      const label = group.findOne<Konva.Text>(`#${labelId('rect-id')}`) as Konva.Text;
+      expect(label.visible()).toBe(false);
+    });
+
+    it('8.4 label is visible when labelText is non-empty', () => {
+      const node = makeNode();
+      const group = node.onRender(defaultProps({ labelText: 'hello' })) as Konva.Group;
+      const label = group.findOne<Konva.Text>(`#${labelId('rect-id')}`) as Konva.Text;
+      expect(label.visible()).toBe(true);
+    });
+
+    it('8.5 label text matches labelText prop on render', () => {
+      const node = makeNode();
+      const group = node.onRender(defaultProps({ labelText: 'sleeve' })) as Konva.Group;
+      const label = group.findOne<Konva.Text>(`#${labelId('rect-id')}`) as Konva.Text;
+      expect(label.text()).toBe('sleeve');
+    });
+
+    it('8.6 onUpdate changes label text', () => {
+      const node = makeNode();
+      const group = node.onRender(defaultProps({ labelText: 'before' })) as Konva.Group;
+      node.onUpdate(group, defaultProps({ labelText: 'after' }));
+      const label = group.findOne<Konva.Text>(`#${labelId('rect-id')}`) as Konva.Text;
+      expect(label.text()).toBe('after');
+    });
+
+    it('8.7 onUpdate hides label when labelText is set to empty', () => {
+      const node = makeNode();
+      const group = node.onRender(defaultProps({ labelText: 'visible' })) as Konva.Group;
+      node.onUpdate(group, defaultProps({ labelText: '' }));
+      const label = group.findOne<Konva.Text>(`#${labelId('rect-id')}`) as Konva.Text;
+      expect(label.visible()).toBe(false);
+    });
+
+    it('8.8 onUpdate changes label fontFamily', () => {
+      const node = makeNode();
+      const group = node.onRender(
+        defaultProps({ labelText: 'hi', labelFontFamily: 'Arial' })
+      ) as Konva.Group;
+      node.onUpdate(group, defaultProps({ labelText: 'hi', labelFontFamily: 'Georgia' }));
+      const label = group.findOne<Konva.Text>(`#${labelId('rect-id')}`) as Konva.Text;
+      expect(label.fontFamily()).toBe('Georgia');
+    });
+
+    it('8.9 label textBounds are derived from shape width/height and padding', () => {
+      const node = makeNode();
+      const props = defaultProps({ width: 200, height: 150, labelPaddingX: 10, labelPaddingY: 12, labelText: 'x' });
+      const group = node.onRender(props) as Konva.Group;
+      const label = group.findOne<Konva.Text>(`#${labelId('rect-id')}`) as Konva.Text;
+      expect(label.x()).toBe(10);
+      expect(label.y()).toBe(12);
+      expect(label.width()).toBe(200 - 2 * 10);
+    });
+
+    it('8.10 addNodeState passes labelText through', () => {
+      const base = WeaveRectangleNode.defaultState('n1');
+      const result = WeaveRectangleNode.addNodeState(base, { ...defaultProps(), labelText: 'front' });
+      expect(result.props.labelText).toBe('front');
+    });
+
+    it('8.11 updateNodeState passes labelText through', () => {
+      const prev = WeaveRectangleNode.defaultState('n2');
+      const result = WeaveRectangleNode.updateNodeState(prev, { ...defaultProps(), labelText: 'updated' });
+      expect(result.props.labelText).toBe('updated');
+    });
+
+    it('8.12 schema accepts all label props', () => {
+      const schema = WeaveRectangleNode.getSchema();
+      const validNode = {
+        key: 'r1',
+        type: WEAVE_RECTANGLE_NODE_TYPE,
+        props: {
+          id: 'r1',
+          nodeType: WEAVE_RECTANGLE_NODE_TYPE,
+          x: 0, y: 0, scaleX: 1, scaleY: 1, opacity: 1,
+          width: 100, height: 80,
+          fill: '#000', stroke: '#fff', strokeWidth: 1,
+          strokeScaleEnabled: true,
+          children: [],
+          ...WEAVE_SHAPE_LABEL_DEFAULTS,
+        },
+      };
+      expect(() => schema.parse(validNode)).not.toThrow();
+    });
+    it('8.13 dblClick uses live attrs for labelTextBounds (fresh after resize)', () => {
+      const node = makeNode();
+      // Render with initial dimensions
+      const group = node.onRender(defaultProps({ width: 200, height: 150 })) as Konva.Group;
+      // Simulate resize: update group attrs directly (as onUpdate would do)
+      group.setAttrs({ width: 400, height: 300 });
+
+      let capturedBounds: { width: number; height: number } | null = null;
+      // Spy on shapeLabelEditor.triggerEditMode to capture what bounds are passed
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const editor = (node as any)._shapeLabelEditor ?? (node as any).shapeLabelEditor;
+      if (editor) {
+        const original = editor.triggerEditMode.bind(editor);
+        editor.triggerEditMode = (
+          g: Konva.Group,
+          bounds: { x: number; y: number; width: number; height: number },
+          cb: () => void
+        ) => {
+          capturedBounds = { width: bounds.width, height: bounds.height };
+          original(g, bounds, cb);
+        };
+      }
+
+      // Simulate: node is selected
+      group.setAttr('isSelected', true);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const mock = (node as any).instance;
+      mock.getState = vi.fn().mockReturnValue('selecting');
+      // Trigger dblClick
+      if (group.dblClick) {
+        // isSelecting/isNodeSelected guards need to pass — stub them
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        vi.spyOn(node as any, 'isSelecting').mockReturnValue(true);
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        vi.spyOn(node as any, 'isNodeSelected').mockReturnValue(true);
+        group.dblClick();
+      }
+
+      const px = WEAVE_SHAPE_LABEL_DEFAULTS.labelPaddingX;
+      const py = WEAVE_SHAPE_LABEL_DEFAULTS.labelPaddingY;
+      if (capturedBounds) {
+        expect((capturedBounds as { width: number }).width).toBe(400 - px * 2);
+        expect((capturedBounds as { height: number }).height).toBe(300 - py * 2);
+      }
+    });
+
+    it('8.14 growCallback calls updateNode to persist grown height to Yjs', () => {
+      const node = makeNode();
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const mock = (node as any).instance;
+      const group = node.onRender(defaultProps({ width: 200, height: 50, labelText: 'hi' })) as Konva.Group;
+
+      // Spy on the label node's height() to simulate text overflow.
+      // The new measurement clears attrs.height then calls labelNode.height() as getter.
+      const label = group.findOne<Konva.Text>(`#${labelId('rect-id')}`) as Konva.Text;
+      const origHeight = label.height.bind(label);
+      vi.spyOn(label, 'height').mockImplementation((...args: unknown[]) => {
+        if (args.length === 0) return 120; // simulate overflow natural height
+        return origHeight(args[0] as number); // pass through setter
+      });
+
+      mock.updateNode.mockClear();
+
+      // Run onUpdate — height() spy causes growCallback to fire
+      node.onUpdate(group, defaultProps({ width: 200, height: 50, labelText: 'overflow text' }));
+
+      // updateNode should have been called to persist the grown height
+      expect(mock.updateNode).toHaveBeenCalled();
+      const serialized = mock.updateNode.mock.calls[0][0];
+      expect(serialized.props.height).toBeGreaterThan(50);
+    });
+
+    it('8.15 growCallback does NOT call updateNode while transform is in progress', () => {
+      const node = makeNode();
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const mock = (node as any).instance;
+      const group = node.onRender(defaultProps({ width: 200, height: 50, labelText: 'hi' })) as Konva.Group;
+
+      const label = group.findOne<Konva.Text>(`#${labelId('rect-id')}`) as Konva.Text;
+      const origHeight = label.height.bind(label);
+      vi.spyOn(label, 'height').mockImplementation((...args: unknown[]) => {
+        if (args.length === 0) return 120; // simulate overflow natural height
+        return origHeight(args[0] as number);
+      });
+
+      mock.updateNode.mockClear();
+
+      // Simulate transform in progress by firing the transformstart event
+      group.fire('transformstart');
+      // growCallback must NOT call updateNode during transform — deferred to transformend
+      expect(mock.updateNode).not.toHaveBeenCalled();
+
+      // After transformend the flag is cleared; a direct onUpdate call persists again
+      group.fire('transformend');
+      node.onUpdate(group, defaultProps({ width: 200, height: 50, labelText: 'overflow text' }));
+      expect(mock.updateNode).toHaveBeenCalled();
     });
   });
 });

@@ -39,7 +39,8 @@ export function handleClickOrTap(
   const selectedGroup = getTargetedNode(weave);
   if (!ctx.isInitialized()) return;
 
-  if (e.evt.pointerType === 'mouse' && e.evt?.button && e.evt?.button !== 0) return;
+  if (e.evt.pointerType === 'mouse' && e.evt?.button && e.evt?.button !== 0)
+    return;
 
   let areNodesSelected = false;
 
@@ -74,7 +75,9 @@ export function handleClickOrTap(
     nodeTargeted.getAttrs().mutexUserId !== user.id;
 
   if (isLocked || isMutexLocked) {
-    const parent = weave.getInstanceRecursive(nodeTargeted.getParent() as Konva.Node);
+    const parent = weave.getInstanceRecursive(
+      nodeTargeted.getParent() as Konva.Node
+    );
     const mainLayer = weave.getMainLayer();
     const isStage = parent instanceof Konva.Stage;
     const isMainLayer = parent === mainLayer;
@@ -85,10 +88,16 @@ export function handleClickOrTap(
     if (isStage || isMainLayer || isContainerEmptyArea) {
       ctx.setSelectedNodes([]);
     }
+
+    ctx.triggerSelectedNodesEvent();
+
     return;
   }
 
-  if (nodeTargeted.getAttrs().nodeId) {
+  if (
+    !nodeTargeted.getAttrs().name?.includes('node') &&
+    nodeTargeted.getAttrs().nodeId
+  ) {
     const realNode = stage.findOne(`#${nodeTargeted.getAttrs().nodeId}`);
     if (realNode) nodeTargeted = realNode;
   }

@@ -11,3 +11,5 @@ export type WeaveEllipseProperties = {
 export type WeaveEllipseNodeParams = {
   config: Partial<WeaveEllipseProperties>;
 };
+
+export type { WeaveShapeLabelProps } from '@/nodes/shared/shape-label.types';

@@ -221,6 +221,8 @@ export class WeaveGroupsManager {
       const groupNode = stage.findOne(`#${groupId}`);
 
       if (groupHandler && groupNode) {
+        groupNode.x(0);
+        groupNode.y(0);
         this.instance.updateNodeNT(
           groupHandler.serialize(groupNode as WeaveElementInstance)
         );
@@ -317,6 +319,13 @@ export class WeaveGroupsManager {
           y: absScale.y / stage.scaleY(),
         });
         child.rotation(absRotation);
+
+        const nodeHandler = this.instance.getNodeHandler<WeaveNode>(
+          child.getAttrs().nodeType
+        );
+        if (nodeHandler) {
+          nodeHandler.scaleReset(child);
+        }
 
         child.zIndex(newLayerChildrenAmount - 1 + child.zIndex());
         child.setAttr('draggable', true);

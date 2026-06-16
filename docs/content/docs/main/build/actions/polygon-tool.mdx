@@ -1,0 +1,115 @@
+---
+title: Polygon Tool
+description: Add a polygon to the canvas using a preset shape
+---
+
+## Introduction
+
+This action enables users to create new polygon nodes on the canvas by clicking or touching it.
+The shape drawn is determined by a **preset** — one of the six built-in polygon shapes.
+
+## Dependencies
+
+This action needs registered on the Weave instance the following element:
+
+- [Polygon](/docs/main/build/nodes/polygon) node
+
+## Usage
+
+<div className="fd-steps">
+
+<div className="[&_h3]:fd-step">
+
+### Import the Action
+
+Start by importing the action:
+
+```ts
+import { WeavePolygonToolAction } from "@inditextech/weave-sdk";
+```
+
+</div>
+
+<div className='[&_h3]:fd-step'>
+
+### Register the Action
+
+Then register the action on the [Weave](/docs/sdk/api-reference/weave) class instance.
+
+```ts
+const instance = new Weave({
+  ...
+  actions: [
+    ...,
+    new WeavePolygonToolAction(), // [!code ++]
+  ]
+})
+```
+
+You can pass an optional preset ID to the constructor to set the default preset:
+
+```ts
+new WeavePolygonToolAction("hexagon")
+```
+
+Available preset IDs: `triangle`, `diamond`, `pentagon` (default), `hexagon`, `octagon`, `decagon`.
+
+</div>
+
+<div className='[&_h3]:fd-step'>
+
+### Setup the action trigger
+
+Setup on a button or any element on the UI the user can interact with on the action event:
+
+```ts
+instance.triggerAction("polygonTool");
+```
+
+You can also pass a `presetId` at trigger time to override the constructor default:
+
+```ts
+instance.triggerAction("polygonTool", { presetId: "hexagon" });
+```
+
+---
+
+For example on a button on React:
+
+```tsx
+import React from "react";
+import { useWeave } from "@inditextech/weave-react";
+
+const MyPolygonToolTriggerComponent = () => {
+  const instance = useWeave((state) => state.instance);
+
+  const triggerTool = React.useCallback(() => {
+    instance.triggerAction("polygonTool", { presetId: "hexagon" });
+  }, [instance]);
+
+  return <button onClick={triggerTool}>Polygon Tool</button>;
+};
+```
+
+</div>
+
+<div className='[&_h3]:fd-step'>
+
+### Trigger the action
+
+Finally a user triggers the UI element that launches the action.
+
+---
+
+When active the user can:
+
+- **Click** on the canvas, it will place the selected preset polygon at the cursor position with its default size.
+- **Touch** on the canvas, it will place the selected preset polygon at the touch position with its default size.
+
+Once placed, the polygon is added to the canvas as a fully functional node. This action integrates
+seamlessly with Weave.js's real-time state system, ensuring the new element appears instantly for
+all connected users.
+
+</div>
+
+</div>
