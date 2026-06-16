@@ -333,6 +333,25 @@ export abstract class WeaveNode implements WeaveNodeBase {
       return;
     }
 
+    // Don't show hover border on the active group or any of its ancestors
+    // while in group-edit context (e.g. group inside a frame — suppress frame hover too)
+    const activeGroupId = selectionPlugin.getActiveGroupContext();
+    if (activeGroupId !== null) {
+      const stage = this.instance.getStage();
+      const activeGroupNode = stage.findOne(`#${activeGroupId}`);
+      if (activeGroupNode) {
+        const hoveredId = node.getAttrs().id ?? '';
+        let current: Konva.Node | null = activeGroupNode;
+        while (current) {
+          if ((current.getAttrs().id ?? '') === hoveredId) {
+            this.hideHoverState();
+            return;
+          }
+          current = current.getParent();
+        }
+      }
+    }
+
     if (node?.canBeHovered?.()) {
       selectionPlugin.getHoverTransformer().nodes([node]);
     } else {
@@ -807,7 +826,13 @@ export abstract class WeaveNode implements WeaveNodeBase {
 
         const realNodeTarget: Konva.Node = this.getRealSelectedNode(nodeTarget);
 
+        // While in group-edit context, keep the node inside its parent group.
+        // Skip the container-move logic entirely and fall through to updateNodeNT.
+        const isInGroupContext =
+          (this.getSelectionPlugin()?.getActiveGroupContext() ?? null) !== null;
+
         if (
+          !isInGroupContext &&
           this.isSelecting() &&
           this.getSelectionPlugin()?.getSelectedNodes().length === 1 &&
           (realNodeTarget.getAttrs().lockToContainer === undefined ||
@@ -979,7 +1004,27 @@ export abstract class WeaveNode implements WeaveNodeBase {
 
     const isNodeSelectionEnabled = this.getSelectionPlugin()?.isEnabled();
 
-    const realNode = this.instance.getInstanceRecursive(node);
+    const activeGroupCtx =
+      this.getSelectionPlugin()?.getActiveGroupContext() ?? undefined;
+    let realNode: Konva.Node;
+    if (activeGroupCtx) {
+      // Build the full ancestor ID set: active group + all ancestor groups up to
+      // the root. Passing this as stopAtGroupId makes getInstanceRecursive stop at
+      // the direct child of whichever ancestor group directly contains the hovered
+      // node — not just the active group itself.
+      const stage = this.instance.getStage();
+      const stopIds: string[] = [];
+      let cur: Konva.Node | null =
+        (stage.findOne(`#${activeGroupCtx}`) as Konva.Node | null) ?? null;
+      while (cur) {
+        const id = cur.getAttrs().id;
+        if (id) stopIds.push(id);
+        cur = cur.getParent();
+      }
+      realNode = this.instance.getInstanceRecursive(node, [], stopIds);
+    } else {
+      realNode = this.instance.getInstanceRecursive(node);
+    }
 
     const canBeTargeted = realNode.getAttrs().canBeTargeted !== false;
     const isLocked = realNode.getAttrs().locked ?? false;

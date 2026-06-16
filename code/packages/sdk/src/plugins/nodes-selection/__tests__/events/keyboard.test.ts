@@ -67,6 +67,9 @@ function makeCtx(): { ctx: SelectionContext; container: HTMLDivElement; listener
     getStagePanningPlugin: vi.fn().mockReturnValue(undefined),
     getStageGridPlugin: vi.fn().mockReturnValue(undefined),
     getNodesSelectionFeedbackPlugin: vi.fn().mockReturnValue(undefined),
+    getActiveGroupContext: vi.fn().mockReturnValue(null),
+    enterGroupContext: vi.fn(),
+    exitGroupContext: vi.fn(),
   } as unknown as SelectionContext;
 
   return { ctx, container, listeners };

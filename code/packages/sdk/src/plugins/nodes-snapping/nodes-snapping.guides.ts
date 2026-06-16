@@ -173,28 +173,48 @@ export class WeaveNodesSnappingGuides {
     const stage = this.instance.getStage();
     const scaleX = stage.scaleX();
     const scaleY = stage.scaleY();
-    let finalContainer = container;
-    if (container !== stage) {
-      finalContainer = container.getParent() as unknown as Konva.Container;
+    const mainLayer = this.instance.getMainLayer();
+
+    // For the main layer, guide lines extend across the visible viewport.
+    if (container === stage || container === mainLayer) {
+      const pos = stage.position();
+      return {
+        x: -pos.x / scaleX,
+        y: -pos.y / scaleY,
+        width: stage.width() / scaleX,
+        height: stage.height() / scaleY,
+      };
     }
-    const pos = finalContainer.position();
 
-    const rect = finalContainer.getClientRect({
-      relativeTo: stage as unknown as Konva.Container,
-    });
+    // For any other container (frame, group):
+    //   • if the container itself is a frame, clip to the frame's bounds.
+    //   • if the container is a group, walk up to find the nearest frame ancestor.
+    //     – frame found  → clip to the frame's bounds.
+    //     – no frame     → use the stage viewport (group on main layer).
+    let frameNode: Konva.Node | null = null;
+    let cur: Konva.Node | null = container;
+    while (cur && cur !== mainLayer && cur !== stage) {
+      if (cur.getAttrs().nodeType === 'frame') {
+        frameNode = cur;
+        break;
+      }
+      cur = cur.getParent();
+    }
 
-    const x = finalContainer === stage ? -pos.x / scaleX : rect.x;
-    const y = finalContainer === stage ? -pos.y / scaleX : rect.y;
-    const width =
-      finalContainer === stage ? stage.width() / scaleX : rect.width;
-    const height =
-      finalContainer === stage ? stage.height() / scaleY : rect.height;
+    if (frameNode) {
+      const rect = frameNode.getClientRect({
+        relativeTo: stage as unknown as Konva.Container,
+      });
+      return { x: rect.x, y: rect.y, width: rect.width, height: rect.height };
+    }
 
+    // No frame ancestor — use the stage viewport.
+    const pos = stage.position();
     return {
-      x,
-      y,
-      width,
-      height,
+      x: -pos.x / scaleX,
+      y: -pos.y / scaleY,
+      width: stage.width() / scaleX,
+      height: stage.height() / scaleY,
     };
   }
 
@@ -210,10 +230,28 @@ export class WeaveNodesSnappingGuides {
       if (snap.containerId !== 'mainLayer') {
         const containerNode = stage.findOne(`#${snap.containerId}`);
         if (containerNode) {
-          const containerPos = containerNode.getClientRect({
-            relativeTo: stage as unknown as Konva.Container,
-          });
-          value = containerPos.x + snap.guide;
+          // snap.guide is in the container's local coordinate space.
+          // To draw it on the snapping layer we need the equivalent scene
+          // coordinate (before the stage pan/zoom transform).
+          //
+          // Step 1 — container-local → canvas pixels:
+          //   containerNode.getAbsoluteTransform() includes all ancestor
+          //   transforms up to and including the stage's pan/zoom.
+          // Step 2 — canvas pixels → scene:
+          //   Undo the stage transform so the result is in the same space as
+          //   the Konva layer (scene / mainLayer space).
+          //
+          // getClientRect({ relativeTo: stage }) would give scene coords but
+          // also includes the bbox min-child offset, which is wrong for groups
+          // that have no background rect at their local (0,0).
+          const canvasPt = containerNode
+            .getAbsoluteTransform()
+            .point({ x: snap.guide, y: 0 });
+          value = stage
+            .getAbsoluteTransform()
+            .copy()
+            .invert()
+            .point(canvasPt).x;
         }
       }
 
@@ -239,10 +277,14 @@ export class WeaveNodesSnappingGuides {
       if (snap.containerId !== 'mainLayer') {
         const containerNode = stage.findOne(`#${snap.containerId}`);
         if (containerNode) {
-          const containerPos = containerNode.getClientRect({
-            relativeTo: stage as unknown as Konva.Container,
-          });
-          value = containerPos.y + snap.guide;
+          const canvasPt = containerNode
+            .getAbsoluteTransform()
+            .point({ x: 0, y: snap.guide });
+          value = stage
+            .getAbsoluteTransform()
+            .copy()
+            .invert()
+            .point(canvasPt).y;
         }
       }
 

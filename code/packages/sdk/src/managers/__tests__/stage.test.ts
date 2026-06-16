@@ -184,6 +184,36 @@ describe('WeaveStageManager', () => {
       const result = manager.getInstanceRecursive(child);
       expect(result).toBe(parent);
     });
+
+    it('stopAtGroupId: returns node immediately when its parent id equals stopAtGroupId', () => {
+      // Represents a child node inside a group. Normally recursion would return
+      // the group, but with stopAtGroupId it should stop at the child.
+      const group = makeNode('group-ctx', 'group');
+      const child = makeNode('child-in-group', 'rect', group as unknown as object);
+      // Without stopAtGroupId → returns group (recursion)
+      const withoutStop = manager.getInstanceRecursive(child);
+      expect(withoutStop).toBe(group);
+      // With stopAtGroupId = 'group-ctx' → stops at child (direct child of active group)
+      const withStop = manager.getInstanceRecursive(child, [], 'group-ctx');
+      expect(withStop).toBe(child);
+    });
+
+    it('stopAtGroupId: does not affect nodes outside the active group', () => {
+      // A sibling group that is NOT the active group — should still recurse normally
+      const grandparent = makeNode('root');
+      const otherGroup = makeNode('other-group', 'group', grandparent as unknown as object);
+      const child = makeNode('child-other', 'rect', otherGroup as unknown as object);
+      // Even with stopAtGroupId set to a different id, recursion behaves normally
+      const result = manager.getInstanceRecursive(child, [], 'group-ctx');
+      expect(result).toBe(otherGroup);
+    });
+
+    it('stopAtGroupId: undefined (default) leaves existing behaviour unchanged', () => {
+      const group = makeNode('group1', 'group');
+      const child = makeNode('child5', 'rect', group as unknown as object);
+      const result = manager.getInstanceRecursive(child, [], undefined);
+      expect(result).toBe(group);
+    });
   });
 
   // ─── Suite 5: initStage ─────────────────────────────────────────────────────

@@ -67,6 +67,7 @@ type SelectionPluginMock = {
   getHoverTransformer: ReturnType<typeof vi.fn>;
   setSelectedNodes: ReturnType<typeof vi.fn>;
   getSelectorConfig: ReturnType<typeof vi.fn>;
+  getActiveGroupContext: ReturnType<typeof vi.fn>;
 };
 
 type MockStage = {
@@ -169,6 +170,7 @@ function createMockInstance() {
     getHoverTransformer: vi.fn().mockReturnValue(mockHoverTransformer),
     setSelectedNodes: vi.fn(),
     getSelectorConfig: vi.fn().mockReturnValue({}),
+    getActiveGroupContext: vi.fn().mockReturnValue(null),
   };
   const logger: MockLogger = {
     info: vi.fn(),

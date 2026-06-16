@@ -8,6 +8,9 @@ import type Konva from 'konva';
 export type WeaveNodesSelectionPluginOnSelectionStateEvent = boolean;
 export type WeaveNodesSelectionPluginOnNodesChangeEvent = WeaveSelection[];
 export type WeaveNodesSelectionPluginOnStageSelectionEvent = undefined;
+export type WeaveNodesSelectionPluginOnGroupContextChangeEvent =
+  | string
+  | null;
 
 export type WeaveNodesSelectionOnSelectionParams = {
   resizeEnabled: boolean;

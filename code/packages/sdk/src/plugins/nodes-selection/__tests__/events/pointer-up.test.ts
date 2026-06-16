@@ -166,6 +166,9 @@ function makeCtx(overrides: Partial<SelectionContext> = {}): SelectionContext {
     getStagePanningPlugin: vi.fn().mockReturnValue(undefined),
     getStageGridPlugin: vi.fn().mockReturnValue(undefined),
     getNodesSelectionFeedbackPlugin: vi.fn().mockReturnValue(undefined),
+    getActiveGroupContext: vi.fn().mockReturnValue(null),
+    exitGroupContext: vi.fn(),
+    enterGroupContext: vi.fn(),
     ...overrides,
   } as unknown as SelectionContext;
 }

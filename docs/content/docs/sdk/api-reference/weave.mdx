@@ -214,12 +214,17 @@ This method returns the `mainLayer` Layer of the Konva internals for the actual 
 ```ts
 getInstanceRecursive(
   instance: Konva.Node,
-  filterInstanceType: string[] = []
+  filterInstanceType: string[] = [],
+  stopAtGroupId?: string | string[]
 ): Konva.Node
 ```
 
 This method transverse the internal Konva instance nodes tree from the specified node instance,
 giving the ability to filter by an specific node. The found node is returned.
+
+When `stopAtGroupId` is provided (a single group ID or an array of IDs), the traversal stops
+at the direct child of any matching group — useful when a group edit context is active and
+you need to resolve a hit node relative to the group boundary rather than the root.
 
 #### getContainerNodes
 

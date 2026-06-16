@@ -66,3 +66,38 @@ Once the node is registered you can use it on [Actions](/docs/main/build/actions
 </div>
 
 </div>
+
+## Group Edit Mode
+
+When the [Nodes Selection](/docs/main/build/plugins/nodes-selection) plugin is registered, users
+can enter **Group Edit Mode** to select and manipulate individual child nodes inside a group
+without ungrouping it first.
+
+### Entering edit mode
+
+**Double-click** a group on the canvas. The group enters edit context: its direct children become
+individually selectable and draggable, and any selection outside the group is cleared.
+
+### Interacting with children
+
+While in edit mode:
+
+- **Click** a child node to select it. Standard single/multi-selection and transformer handles work
+  as usual, scoped to the group.
+- **Drag** a child node to reposition it within the group. Snapping guides respect the group boundary.
+- Actions like delete, copy, or move are applied only to the selected child(ren).
+
+### Exiting edit mode
+
+Exit the group context using any of the following:
+
+- **Click** anywhere outside the group on the canvas.
+- Press the **Escape** key.
+- The context is also exited automatically if the group node is removed.
+
+### Programmatic access
+
+The active group context is managed by `WeaveNodesSelectionPlugin`. See the
+[plugin API reference](/docs/sdk/api-reference/plugins/nodes-selection#group-context) for the
+`enterGroupContext`, `exitGroupContext`, and `getActiveGroupContext` methods, as well as the
+`onGroupContextChange` event.
