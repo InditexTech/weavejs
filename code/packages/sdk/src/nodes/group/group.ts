@@ -88,6 +88,25 @@ export class WeaveGroupNode extends WeaveNode {
 
     this.setupDefaultNodeEvents(group);
 
+    group.on('transform', () => {
+      const sx = group.scaleX();
+      const sy = group.scaleY();
+      group.getChildren().forEach((child) => {
+        child.scaleX(child.scaleX() * sx);
+        child.scaleY(child.scaleY() * sy);
+        child.x(child.x() * sx);
+        child.y(child.y() * sy);
+        const nodeHandler = this.instance.getNodeHandler<WeaveNode>(
+          child.getAttrs().nodeType
+        );
+        if (nodeHandler) {
+          nodeHandler.scaleReset(child);
+          nodeHandler.onUpdate(child, child.getAttrs());
+        }
+      });
+      group.scale({ x: 1, y: 1 });
+    });
+
     return group;
   }
 
@@ -97,6 +116,11 @@ export class WeaveGroupNode extends WeaveNode {
   ): void {
     nodeInstance.setAttrs({
       ...nextProps,
+      x: nextProps.x ?? 0,
+      y: nextProps.y ?? 0,
+      scaleX: nextProps.scaleX ?? 1,
+      scaleY: nextProps.scaleY ?? 1,
+      rotation: nextProps.rotation ?? 0,
     });
 
     const nodesSelectionPlugin =
@@ -151,7 +175,22 @@ export class WeaveGroupNode extends WeaveNode {
     };
   }
 
-  scaleReset(): void {
-    // don't change anything
+  scaleReset(node: Konva.Group): void {
+    const sx = node.scaleX();
+    const sy = node.scaleY();
+    node.getChildren().forEach((child) => {
+      child.scaleX(child.scaleX() * sx);
+      child.scaleY(child.scaleY() * sy);
+      child.x(child.x() * sx);
+      child.y(child.y() * sy);
+      const nodeHandler = this.instance.getNodeHandler<WeaveNode>(
+        child.getAttrs().nodeType
+      );
+      if (nodeHandler) {
+        nodeHandler.scaleReset(child);
+        nodeHandler.onUpdate(child, child.getAttrs());
+      }
+    });
+    node.scale({ x: 1, y: 1 });
   }
 }

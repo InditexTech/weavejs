@@ -6,6 +6,7 @@ import Konva from 'konva';
 import type { Stage } from 'konva/lib/Stage';
 import type { KonvaEventObject } from 'konva/lib/Node';
 import throttle from 'lodash/throttle';
+import type { Box } from 'konva/lib/shapes/Transformer';
 import {
   type WeaveStateElement,
   WEAVE_NODE_CUSTOM_EVENTS,
@@ -93,6 +94,8 @@ export class TransformerController {
       listening: true,
       shouldOverdrawWholeArea: true,
     });
+    this.tr.boundBoxFunc(this.getBoundBoxFunc());
+
     layer.add(this.tr);
 
     this.trHover = new Konva.Transformer({
@@ -109,6 +112,41 @@ export class TransformerController {
     this.registerStagePointerMove();
     this.registerTransformerEvents();
     this.registerInstanceEvents();
+  }
+
+  getBoundBoxFunc(): (oldBox: Box, newBox: Box) => Box {
+    return (oldBox: Box, newBox: Box): Box => {
+      const sx = newBox.width / oldBox.width;
+      const sy = newBox.height / oldBox.height;
+
+      const violatesConstraint = this.tr.nodes().some((node) => {
+        const rect = node.getClientRect({
+          skipStroke: true,
+        });
+
+        const { width: minWidth, height: minHeight } = node.getNodeMinSize();
+
+        if (
+          ['middle-right', 'middle-left'].includes(
+            this.tr.getActiveAnchor() ?? ''
+          )
+        ) {
+          return rect.width * sx < minWidth;
+        }
+
+        if (
+          ['top-center', 'bottom-center'].includes(
+            this.tr.getActiveAnchor() ?? ''
+          )
+        ) {
+          return rect.height * sy < minHeight;
+        }
+
+        return rect.width * sx < minWidth || rect.height * sy < minHeight;
+      });
+
+      return violatesConstraint ? oldBox : newBox;
+    };
   }
 
   getTransformer(): Konva.Transformer {

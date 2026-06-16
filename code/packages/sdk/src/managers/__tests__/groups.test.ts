@@ -49,7 +49,7 @@ function makeGroupHandler(groupNode?: WeaveStateElement) {
 
 function makeNodeHandler(stateNode?: WeaveStateElement) {
   const node = stateNode ?? fakeNode('nid');
-  return { serialize: vi.fn().mockReturnValue(node) };
+  return { serialize: vi.fn().mockReturnValue(node), scaleReset: vi.fn() };
 }
 
 interface MockWeaveOptions {

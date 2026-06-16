@@ -2,6 +2,8 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
+// @vitest-environment jsdom
+
 import { describe, it, expect, vi, beforeAll, beforeEach } from 'vitest';
 import Konva from 'konva';
 import { WeaveRegularPolygonNode } from '../regular-polygon';
@@ -116,7 +118,7 @@ describe('WeaveRegularPolygonNode', () => {
       expect(group.name()).toBe('node');
     });
 
-    it('2.3 group has exactly two children', () => {
+    it('2.3 group has exactly two children (bg, border)', () => {
       expect(group.getChildren().length).toBe(2);
     });
 

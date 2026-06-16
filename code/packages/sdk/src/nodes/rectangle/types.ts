@@ -11,3 +11,5 @@ export type WeaveRectangleProperties = {
 export type WeaveRectangleNodeParams = {
   config: Partial<WeaveRectangleProperties>;
 };
+
+export type { WeaveShapeLabelProps } from '@/nodes/shared/shape-label.types';

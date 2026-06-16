@@ -16,6 +16,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - [#1080](https://github.com/InditexTech/weavejs/issues/1080) [alpha] API to manipulate document state natively on server-side
+- [#1101](https://github.com/InditexTech/weavejs/issues/1101) Add inline text labels to shape nodes (Rectangle and Ellipse)
 
 ### Changed
 
