@@ -10,8 +10,8 @@
     "node",
     "layer",
     "measure",
+    "polygon",
     "rectangle",
-    "regular-polygon",
     "stage",
     "star",
     "stroke",
@@ -19,6 +19,7 @@
     "text",
     "video",
     "arrow",
-    "line"
+    "line",
+    "regular-polygon"
   ]
 }
