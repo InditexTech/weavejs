@@ -1,0 +1,23 @@
+.github/workflows/code-npm_node-sonarcloud-analysis.yml
+  s_b2fdb4898690e2::t_6c886fc603feb6 162-165
+  s_b2fdb4898690e2::t_b58a5a5d15c8e9 140-143
+code/sonar-project.properties
+  s_b2fdb4898690e2::t_58e77838bae2a7 31
+  s_b2fdb4898690e2::t_120da4ae170b46 3-11
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.7",
+  "base_commit_sha": "c93c03a14545e954cb6edd85b8b390eaca57812b",
+  "prompts": {},
+  "sessions": {
+    "s_b2fdb4898690e2": {
+      "agent_id": {
+        "tool": "github-copilot-jetbrains",
+        "id": "1781592281064",
+        "model": "unknown"
+      },
+      "human_author": "Adria Berge Aguilar <adriaba@ext.inditex.com>"
+    }
+  }
+}
