@@ -137,6 +137,10 @@ jobs:
         run: |
           npx sonar-scanner \
             -Dproject.settings=sonar-project.properties \
+            -Dsonar.host.url="https://sonarcloud.io/" \
+            -Dsonar.organization=inditextech \
+            -Dsonar.projectKey=InditexTech_"${{ steps.version.outputs.github-repository }}" \
+            -Dsonar.projectName="${{ steps.version.outputs.github-repository }}" \
             -Dsonar.projectVersion="${{ github.event.release.tag_name }}" \
             -Dsonar.branch.name="release/${{ github.event.release.tag_name }}"
 
@@ -155,5 +159,9 @@ jobs:
 
           npx sonar-scanner \
             -Dproject.settings=sonar-project.properties \
+            -Dsonar.host.url="https://sonarcloud.io/" \
+            -Dsonar.organization=inditextech \
+            -Dsonar.projectKey=InditexTech_"${{ steps.version.outputs.github-repository }}" \
+            -Dsonar.projectName="${{ steps.version.outputs.github-repository }}" \
             -Dsonar.projectVersion="${{ steps.version.outputs.app-version }}" \
             $SCOPE_OPTIONS
