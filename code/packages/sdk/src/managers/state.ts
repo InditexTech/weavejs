@@ -298,7 +298,7 @@ export class WeaveStateManager {
     // Group and frame nodes serialize their Konva children into props.children,
     // so we must walk the tree to ensure those updates reach the Yjs state.
     if (Array.isArray(node.props.children) && node.props.children.length > 0) {
-      for (const child of node.props.children as WeaveStateElement[]) {
+      for (const child of node.props.children) {
         this.updateNode(child);
       }
     }

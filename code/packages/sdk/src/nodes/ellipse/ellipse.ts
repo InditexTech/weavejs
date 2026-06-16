@@ -29,10 +29,7 @@ export class WeaveEllipseNode extends WeaveNode {
   private _transforming = false;
 
   private get shapeLabelEditor(): WeaveShapeLabelEditor {
-    if (!this._shapeLabelEditor) {
-      this._shapeLabelEditor = new WeaveShapeLabelEditor(this.instance);
-    }
-    return this._shapeLabelEditor;
+    return (this._shapeLabelEditor ??= new WeaveShapeLabelEditor(this.instance));
   }
 
   constructor(params?: WeaveEllipseNodeParams) {
@@ -357,7 +354,7 @@ export class WeaveEllipseNode extends WeaveNode {
         // the transformend handler in node.ts will persist the final state.
         if (!this._transforming) {
           this.instance.updateNode(
-            this.serialize(nodeInstance as WeaveElementInstance)
+            this.serialize(nodeInstance)
           );
         }
       }

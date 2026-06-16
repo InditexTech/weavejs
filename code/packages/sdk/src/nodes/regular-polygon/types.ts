@@ -3,7 +3,6 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { type WeaveNodeTransformerProperties } from '@inditextech/weave-types';
-import type { WeaveShapeLabelProps } from '@/nodes/shared/shape-label.types';
 
 export type WeaveRegularPolygonProperties = {
   transform: WeaveNodeTransformerProperties;
@@ -13,4 +12,4 @@ export type WeaveRegularPolygonNodeParams = {
   config: Partial<WeaveRegularPolygonProperties>;
 };
 
-export type { WeaveShapeLabelProps };
+export type { WeaveShapeLabelProps } from '@/nodes/shared/shape-label.types';

@@ -32,10 +32,7 @@ export class WeaveRectangleNode extends WeaveNode {
   private _transforming = false;
 
   private get shapeLabelEditor(): WeaveShapeLabelEditor {
-    if (!this._shapeLabelEditor) {
-      this._shapeLabelEditor = new WeaveShapeLabelEditor(this.instance);
-    }
-    return this._shapeLabelEditor;
+    return (this._shapeLabelEditor ??= new WeaveShapeLabelEditor(this.instance));
   }
 
   constructor(params?: WeaveRectangleNodeParams) {
@@ -94,24 +91,6 @@ export class WeaveRectangleNode extends WeaveNode {
     });
 
     rectangle.add(internalRectBorder);
-
-    // const targetRect = new Konva.Rect({
-    //   ...props,
-    //   id: `${props.id}-target`,
-    //   nodeId: props.id,
-    //   name: 'node',
-    //   x: 0,
-    //   y: 0,
-    //   width: props.width,
-    //   height: props.height,
-    //   fill: 'transparent',
-    //   strokeWidth: 0,
-    //   strokeScaleEnabled: true,
-    //   cornerRadius: (props.cornerRadius || 0) * 1.1,
-    //   rotation: 0,
-    // });
-
-    // rectangle.add(targetRect);
 
     const paddingX =
       props.labelPaddingX ?? WEAVE_SHAPE_LABEL_DEFAULTS.labelPaddingX;
@@ -299,7 +278,7 @@ export class WeaveRectangleNode extends WeaveNode {
         // the transformend handler in node.ts will persist the final state.
         if (!this._transforming) {
           this.instance.updateNode(
-            this.serialize(nodeInstance as WeaveElementInstance)
+            this.serialize(nodeInstance)
           );
         }
       }

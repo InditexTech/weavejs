@@ -484,9 +484,7 @@ export abstract class WeaveNode implements WeaveNodeBase {
             node.getAttrs().shouldUpdateOnTransform ?? true;
 
           if (shouldUpdateOnTransform) {
-            const serializedNode = nodeHandler.serialize(
-              node as WeaveElementInstance
-            );
+            const serializedNode = nodeHandler.serialize(node);
             this.instance.updateNode(serializedNode);
           }
         }

@@ -16,7 +16,7 @@ import {
 import type { WeaveShapeLabelTextBounds } from './shape-label.types';
 
 export class WeaveShapeLabelEditor {
-  private instance: Weave;
+  private readonly instance: Weave;
   private editing: boolean = false;
   private editingGroup: Konva.Group | null = null;
   private editingTextBounds: WeaveShapeLabelTextBounds | null = null;
@@ -119,11 +119,8 @@ export class WeaveShapeLabelEditor {
       lineHeight:
         nextProps.labelLineHeight ?? WEAVE_SHAPE_LABEL_DEFAULTS.labelLineHeight,
       wrap: 'word',
-      visible: labelText !== '',
+      visible: !this.editing && labelText !== '',
     });
-
-    // Auto-grow: measure the natural text height by temporarily setting height to
-    // undefined (auto mode). Konva.Text.getHeight() returns the fixed attr value
     // when height is any explicit number — including 0 — so height(0) does NOT
     // enable auto-height. Only `attrs.height === undefined` triggers the auto
     // computation: `fontSize * lineCount * lineHeight + padding*2`.
@@ -361,6 +358,59 @@ export class WeaveShapeLabelEditor {
     this.textArea.style.top = `${topLeft.y * upscaleScale + offsetY}px`;
   }
 
+  /**
+   * Convergence loop: onLiveResize may change the textarea width (e.g. a
+   * growing polygon becomes wider), which changes line-wrapping, which may
+   * require a different shape height. Iterates until scrollHeight is stable
+   * or a safety limit is reached (5 passes cover any practical input).
+   *
+   * Oscillation prevention: if the sequence alternates (narrow→grow→wide→
+   * restore→narrow→…) the loop exits with the polygon under-sized.
+   * We track `lastUsedPx` — the height last passed to onLiveResize — and
+   * fire a final corrective grow whenever `prevHeightPx > lastUsedPx`
+   * (content at the current width still overflows what was last asked for).
+   */
+  private runLiveResizeLoop(
+    onLiveResize: (neededShapeHeight: number) => void,
+    contentHeightPx: number,
+    effectiveScale: number,
+    upscaleScale: number,
+    paddingY: number
+  ): void {
+    const MAX_PASSES = 5;
+    let maxNeededPx = contentHeightPx;
+    let prevHeightPx = contentHeightPx;
+    let lastUsedPx = 0;
+
+    for (let pass = 0; pass < MAX_PASSES; pass++) {
+      lastUsedPx = prevHeightPx;
+      const neededInCanvas = prevHeightPx / (effectiveScale * upscaleScale);
+      onLiveResize(neededInCanvas + paddingY * 2);
+
+      if (!this.textArea) break;
+      this.textArea.style.height = 'auto';
+      const measuredPx = this.textArea.scrollHeight;
+      this.textArea.style.height = `${measuredPx}px`;
+
+      if (measuredPx > maxNeededPx) {
+        maxNeededPx = measuredPx;
+      }
+      if (measuredPx === prevHeightPx) break; // stable
+      prevHeightPx = measuredPx;
+    }
+
+    // Final guarantee: if the last measured content height exceeds what we
+    // passed to onLiveResize in the final iteration (polygon under-sized due
+    // to oscillation), grow one last time to the maximum observed height.
+    if (this.textArea && prevHeightPx > lastUsedPx) {
+      const finalInCanvas = maxNeededPx / (effectiveScale * upscaleScale);
+      onLiveResize(finalInCanvas + paddingY * 2);
+      this.textArea.style.height = 'auto';
+      const finalPx = this.textArea.scrollHeight;
+      this.textArea.style.height = `${finalPx}px`;
+    }
+  }
+
   private createTextAreaDOM(
     group: Konva.Group,
     textBounds: WeaveShapeLabelTextBounds,
@@ -512,49 +562,15 @@ export class WeaveShapeLabelEditor {
         this.textArea.style.top = `${liveTL.y * upscaleScale}px`;
       }
 
-      // Convergence loop: onLiveResize may change the textarea width (e.g. a
-      // growing polygon becomes wider), which changes line-wrapping, which may
-      // require a different shape height. Iterate until scrollHeight is stable
-      // or we hit the safety limit (5 passes cover any practical input).
-      //
-      // Oscillation prevention: if the sequence alternates (narrow→grow→wide→
-      // restore→narrow→…) the loop exits with the polygon under-sized.
-      // We track `lastUsedPx` — the height last passed to onLiveResize — and
-      // fire a final corrective grow whenever `prevHeightPx > lastUsedPx`
-      // (content at the current width still overflows what was last asked for).
+      // Convergence loop: see runLiveResizeLoop for full explanation.
       if (onLiveResize) {
-        const MAX_PASSES = 5;
-        let maxNeededPx = contentHeightPx;
-        let prevHeightPx = contentHeightPx;
-        let lastUsedPx = 0;
-
-        for (let pass = 0; pass < MAX_PASSES; pass++) {
-          lastUsedPx = prevHeightPx;
-          const neededInCanvas = prevHeightPx / (effectiveScale * upscaleScale);
-          onLiveResize(neededInCanvas + paddingY * 2);
-
-          if (!this.textArea) break;
-          this.textArea.style.height = 'auto';
-          const measuredPx = this.textArea.scrollHeight;
-          this.textArea.style.height = `${measuredPx}px`;
-
-          if (measuredPx > maxNeededPx) {
-            maxNeededPx = measuredPx;
-          }
-          if (measuredPx === prevHeightPx) break; // stable
-          prevHeightPx = measuredPx;
-        }
-
-        // Final guarantee: if the last measured content height exceeds what we
-        // passed to onLiveResize in the final iteration (polygon under-sized due
-        // to oscillation), grow one last time to the maximum observed height.
-        if (this.textArea && prevHeightPx > lastUsedPx) {
-          const finalInCanvas = maxNeededPx / (effectiveScale * upscaleScale);
-          onLiveResize(finalInCanvas + paddingY * 2);
-          this.textArea.style.height = 'auto';
-          const finalPx = this.textArea.scrollHeight;
-          this.textArea.style.height = `${finalPx}px`;
-        }
+        this.runLiveResizeLoop(
+          onLiveResize,
+          contentHeightPx,
+          effectiveScale,
+          upscaleScale,
+          paddingY
+        );
       }
 
       // Reveal the textarea now that top/height are correctly set.
