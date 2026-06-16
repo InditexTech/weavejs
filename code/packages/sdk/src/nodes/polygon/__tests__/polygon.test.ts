@@ -10,6 +10,7 @@ import { WeavePolygonNode } from '../polygon';
 import { WEAVE_POLYGON_NODE_TYPE } from '../constants';
 import { augmentKonvaNodeClass } from '../../node';
 import type { WeaveElementAttributes } from '@inditextech/weave-types';
+import type { WeavePolygonPoint, WeavePolygonInnerRect } from '../types';
 import {
   createMockInstance,
   makePluginMock,
@@ -382,6 +383,490 @@ describe('WeavePolygonNode', () => {
       const { node } = makeNode();
       const group = node.onRender(defaultProps()) as Konva.Group;
       expect(() => node.scaleReset(group)).not.toThrow();
+    });
+  });
+
+  // -------------------------------------------------------------------------
+  // Suite 10 — polygonSelfRect (getSelfRect helper)
+  // -------------------------------------------------------------------------
+
+  describe('polygonSelfRect (getSelfRect)', () => {
+    it('10.1 returns min/max bounds from polygon points', () => {
+      const { node } = makeNode();
+      const group = node.onRender(defaultProps()) as Konva.Group;
+      const bgShape = group.findOne('#poly-id-bg') as Konva.Shape;
+      const rect = bgShape.getSelfRect();
+      expect(rect.x).toBeTypeOf('number');
+      expect(rect.y).toBeTypeOf('number');
+      expect(rect.width).toBeGreaterThan(0);
+      expect(rect.height).toBeGreaterThan(0);
+    });
+
+    it('10.2 returns zero bounds for empty points', () => {
+      const { node } = makeNode();
+      const group = node.onRender(defaultProps()) as Konva.Group;
+      const bgShape = group.findOne('#poly-id-bg') as Konva.Shape;
+      bgShape.setAttr('points', []);
+      const rect = bgShape.getSelfRect();
+      expect(rect).toEqual({ x: 0, y: 0, width: 0, height: 0 });
+    });
+
+    it('10.3 border shape getSelfRect also uses polygonSelfRect', () => {
+      const { node } = makeNode();
+      const group = node.onRender(defaultProps()) as Konva.Group;
+      const borderShape = group.findOne('#poly-id-border') as Konva.Shape;
+      const rect = borderShape.getSelfRect();
+      expect(rect.width).toBeGreaterThan(0);
+    });
+  });
+
+  // -------------------------------------------------------------------------
+  // Suite 11 — scaleReset with non-unit scale
+  // -------------------------------------------------------------------------
+
+  describe('scaleReset — non-unit scale', () => {
+    it('11.1 rescales points proportionally and resets scaleX/scaleY to 1', () => {
+      const { node } = makeNode();
+      const group = node.onRender(defaultProps()) as Konva.Group;
+      const pointsBefore = (group.getAttr('points') as WeavePolygonPoint[]).map(
+        (p) => ({ ...p })
+      );
+
+      group.scaleX(2);
+      group.scaleY(3);
+      node.scaleReset(group);
+
+      expect(group.scaleX()).toBe(1);
+      expect(group.scaleY()).toBe(1);
+
+      const pointsAfter = group.getAttr('points') as WeavePolygonPoint[];
+      expect(pointsAfter[1].x).toBeCloseTo(pointsBefore[1].x * 2);
+      expect(pointsAfter[1].y).toBeCloseTo(pointsBefore[1].y * 3);
+    });
+
+    it('11.2 rescales innerRect when present', () => {
+      const { node } = makeNode();
+      const group = node.onRender(defaultProps()) as Konva.Group;
+      const innerBefore = group.getAttr('innerRect') as WeavePolygonInnerRect;
+
+      group.scaleX(2);
+      group.scaleY(2);
+      node.scaleReset(group);
+
+      const innerAfter = group.getAttr('innerRect') as WeavePolygonInnerRect;
+      expect(innerAfter.tl.x).toBeCloseTo(innerBefore.tl.x * 2);
+      expect(innerAfter.tl.y).toBeCloseTo(innerBefore.tl.y * 2);
+      expect(innerAfter.br.x).toBeCloseTo(innerBefore.br.x * 2);
+      expect(innerAfter.br.y).toBeCloseTo(innerBefore.br.y * 2);
+    });
+
+    it('11.3 handles missing innerRect without throwing', () => {
+      const { node } = makeNode();
+      const group = node.onRender(defaultProps()) as Konva.Group;
+      group.setAttr('innerRect', undefined);
+
+      group.scaleX(2);
+      group.scaleY(2);
+      expect(() => node.scaleReset(group)).not.toThrow();
+      expect(group.scaleX()).toBe(1);
+    });
+
+    it('11.4 updates width/height attrs after rescale', () => {
+      const { node } = makeNode();
+      const group = node.onRender(defaultProps()) as Konva.Group;
+      const pointsBefore = (group.getAttr('points') as WeavePolygonPoint[]).map(
+        (p) => ({ ...p })
+      );
+      const maxXBefore = Math.max(...pointsBefore.map((p) => p.x));
+
+      group.scaleX(2);
+      group.scaleY(1);
+      node.scaleReset(group);
+
+      expect(group.getAttr('width')).toBeCloseTo(maxXBefore * 2);
+    });
+  });
+
+  // -------------------------------------------------------------------------
+  // Suite 12 — onUpdate: scalePolygonByDimensions
+  // -------------------------------------------------------------------------
+
+  describe('onUpdate — scalePolygonByDimensions', () => {
+    it('12.1 rescales points when width/height differ significantly from current bounds', () => {
+      const pluginMock = makePluginMock();
+      const { node, mock } = makeNode();
+      mock.getPlugin.mockReturnValue(pluginMock);
+      const group = node.onRender(defaultProps()) as Konva.Group;
+      const pointsBefore = (group.getAttr('points') as WeavePolygonPoint[]).map(
+        (p) => ({ ...p })
+      );
+      const maxX = Math.max(...pointsBefore.map((p) => p.x));
+      const maxY = Math.max(...pointsBefore.map((p) => p.y));
+
+      node.onUpdate(group, defaultProps({ width: maxX * 2, height: maxY * 2 }));
+
+      const pointsAfter = group.getAttr('points') as WeavePolygonPoint[];
+      expect(pointsAfter[1].x).toBeCloseTo(pointsBefore[1].x * 2, 0);
+    });
+
+    it('12.2 skips rescaling when scale delta <= 0.001', () => {
+      const pluginMock = makePluginMock();
+      const { node, mock } = makeNode();
+      mock.getPlugin.mockReturnValue(pluginMock);
+      const group = node.onRender(defaultProps()) as Konva.Group;
+      const pointsBefore = (group.getAttr('points') as WeavePolygonPoint[]).map(
+        (p) => ({ ...p })
+      );
+      const maxX = Math.max(...pointsBefore.map((p) => p.x));
+      const maxY = Math.max(...pointsBefore.map((p) => p.y));
+
+      node.onUpdate(group, defaultProps({ width: maxX, height: maxY }));
+
+      const pointsAfter = group.getAttr('points') as WeavePolygonPoint[];
+      expect(pointsAfter[0].x).toBeCloseTo(pointsBefore[0].x);
+    });
+
+    it('12.3 scales innerRect proportionally during dimension rescale', () => {
+      const pluginMock = makePluginMock();
+      const { node, mock } = makeNode();
+      mock.getPlugin.mockReturnValue(pluginMock);
+      const group = node.onRender(defaultProps()) as Konva.Group;
+      const innerBefore = group.getAttr('innerRect') as WeavePolygonInnerRect;
+      const pointsBefore = (group.getAttr('points') as WeavePolygonPoint[]).map(
+        (p) => ({ ...p })
+      );
+      const maxX = Math.max(...pointsBefore.map((p) => p.x));
+      const maxY = Math.max(...pointsBefore.map((p) => p.y));
+
+      node.onUpdate(group, defaultProps({ width: maxX * 2, height: maxY * 2 }));
+
+      const innerAfter = group.getAttr('innerRect') as WeavePolygonInnerRect;
+      expect(innerAfter.tl.x).toBeCloseTo(innerBefore.tl.x * 2, 0);
+      expect(innerAfter.tl.y).toBeCloseTo(innerBefore.tl.y * 2, 0);
+    });
+
+    it('12.4 skips innerRect scaling when innerRect is absent', () => {
+      const pluginMock = makePluginMock();
+      const { node, mock } = makeNode();
+      mock.getPlugin.mockReturnValue(pluginMock);
+      const group = node.onRender(defaultProps()) as Konva.Group;
+      group.setAttr('innerRect', undefined);
+
+      const pointsBefore = (group.getAttr('points') as WeavePolygonPoint[]).map(
+        (p) => ({ ...p })
+      );
+      const maxX = Math.max(...pointsBefore.map((p) => p.x));
+      const maxY = Math.max(...pointsBefore.map((p) => p.y));
+
+      expect(() =>
+        node.onUpdate(group, defaultProps({ width: maxX * 2, height: maxY * 2 }))
+      ).not.toThrow();
+    });
+  });
+
+  // -------------------------------------------------------------------------
+  // Suite 13 — addNodeState: optional label properties
+  // -------------------------------------------------------------------------
+
+  describe('addNodeState — label properties', () => {
+    it('13.1 passes through all optional label and style fields', () => {
+      const base = WeavePolygonNode.defaultState('test-id');
+      const preset = WEAVE_POLYGON_PRESETS.pentagon;
+      const { points, innerRect } = instantiatePreset(
+        preset,
+        preset.defaultWidth,
+        preset.defaultHeight
+      );
+
+      const result = WeavePolygonNode.addNodeState(base, {
+        x: 0,
+        y: 0,
+        sides: 5,
+        points,
+        innerRect,
+        fill: '#FF0000',
+        stroke: '#000000',
+        strokeWidth: 3,
+        labelText: 'Hello',
+        labelFontFamily: 'Arial',
+        labelFontSize: 16,
+        labelFontStyle: 'bold',
+        labelFontVariant: 'small-caps',
+        labelFill: '#FFFFFF',
+        labelAlign: 'center',
+        labelVerticalAlign: 'middle',
+        labelLetterSpacing: 2,
+        labelLineHeight: 1.5,
+        labelPaddingX: 12,
+        labelPaddingY: 8,
+      });
+
+      expect(result.props.stroke).toBe('#000000');
+      expect(result.props.strokeWidth).toBe(3);
+      expect(result.props.labelText).toBe('Hello');
+      expect(result.props.labelFontFamily).toBe('Arial');
+      expect(result.props.labelFontSize).toBe(16);
+      expect(result.props.labelFontStyle).toBe('bold');
+      expect(result.props.labelFontVariant).toBe('small-caps');
+      expect(result.props.labelFill).toBe('#FFFFFF');
+      expect(result.props.labelAlign).toBe('center');
+      expect(result.props.labelVerticalAlign).toBe('middle');
+      expect(result.props.labelLetterSpacing).toBe(2);
+      expect(result.props.labelLineHeight).toBe(1.5);
+      expect(result.props.labelPaddingX).toBe(12);
+      expect(result.props.labelPaddingY).toBe(8);
+    });
+
+    it('13.2 omits conditional label fields when not provided', () => {
+      const base = WeavePolygonNode.defaultState('test-id');
+      const preset = WEAVE_POLYGON_PRESETS.pentagon;
+      const { points, innerRect } = instantiatePreset(
+        preset,
+        preset.defaultWidth,
+        preset.defaultHeight
+      );
+
+      const result = WeavePolygonNode.addNodeState(base, {
+        x: 0,
+        y: 0,
+        sides: 5,
+        points,
+        innerRect,
+        fill: '#FF0000',
+      });
+
+      // When optional fields are absent the base defaultState values are preserved
+      expect(result.props.strokeWidth).toBe(1);
+      expect(result.props.labelFontFamily).toBe('Arial, sans-serif');
+      expect(result.props.labelFontSize).toBe(14);
+      expect(result.props.labelFontStyle).toBe('normal');
+    });
+
+    it('13.3 does not set stroke when not provided or falsy', () => {
+      const base = WeavePolygonNode.defaultState('test-id');
+      const preset = WEAVE_POLYGON_PRESETS.pentagon;
+      const { points, innerRect } = instantiatePreset(
+        preset,
+        preset.defaultWidth,
+        preset.defaultHeight
+      );
+
+      const result = WeavePolygonNode.addNodeState(base, {
+        x: 0,
+        y: 0,
+        sides: 5,
+        points,
+        innerRect,
+        fill: '#FF0000',
+        stroke: '',
+      });
+
+      expect(result.props.stroke).toBe('#000000');
+    });
+  });
+
+  // -------------------------------------------------------------------------
+  // Suite 14 — updateNodeState: optional label properties
+  // -------------------------------------------------------------------------
+
+  describe('updateNodeState — label properties', () => {
+    it('14.1 passes through all optional label and style fields', () => {
+      const base = WeavePolygonNode.defaultState('test-id');
+      const preset = WEAVE_POLYGON_PRESETS.pentagon;
+      const { points, innerRect } = instantiatePreset(
+        preset,
+        preset.defaultWidth,
+        preset.defaultHeight
+      );
+
+      const result = WeavePolygonNode.updateNodeState(base, {
+        ...base.props,
+        x: 10,
+        y: 20,
+        sides: 5,
+        points,
+        innerRect,
+        fill: '#00FF00',
+        stroke: '#FF0000',
+        strokeWidth: 5,
+        labelText: 'Updated',
+        labelFontFamily: 'Verdana',
+        labelFontSize: 18,
+        labelFontStyle: 'italic',
+        labelFontVariant: 'normal',
+        labelFill: '#123456',
+        labelAlign: 'left',
+        labelVerticalAlign: 'top',
+        labelLetterSpacing: 1,
+        labelLineHeight: 1.2,
+        labelPaddingX: 6,
+        labelPaddingY: 4,
+      });
+
+      expect(result.props.x).toBe(10);
+      expect(result.props.stroke).toBe('#FF0000');
+      expect(result.props.strokeWidth).toBe(5);
+      expect(result.props.labelText).toBe('Updated');
+      expect(result.props.labelFontFamily).toBe('Verdana');
+      expect(result.props.labelFontSize).toBe(18);
+      expect(result.props.labelFontStyle).toBe('italic');
+      expect(result.props.labelFontVariant).toBe('normal');
+      expect(result.props.labelFill).toBe('#123456');
+      expect(result.props.labelAlign).toBe('left');
+      expect(result.props.labelVerticalAlign).toBe('top');
+      expect(result.props.labelLetterSpacing).toBe(1);
+      expect(result.props.labelLineHeight).toBe(1.2);
+      expect(result.props.labelPaddingX).toBe(6);
+      expect(result.props.labelPaddingY).toBe(4);
+    });
+
+    it('14.2 omits conditional fields when not provided', () => {
+      const base = WeavePolygonNode.defaultState('test-id');
+      const preset = WEAVE_POLYGON_PRESETS.pentagon;
+      const { points, innerRect } = instantiatePreset(
+        preset,
+        preset.defaultWidth,
+        preset.defaultHeight
+      );
+
+      const result = WeavePolygonNode.updateNodeState(base, {
+        x: 0,
+        y: 0,
+        sides: 5,
+        points,
+        innerRect,
+        fill: '#FF0000',
+      });
+
+      // When optional fields are absent the base defaultState values are preserved
+      expect(result.props.strokeWidth).toBe(1);
+      expect(result.props.labelFontFamily).toBe('Arial, sans-serif');
+    });
+  });
+
+  // -------------------------------------------------------------------------
+  // Suite 15 — onUpdate: full bg/border setAttrs path
+  // -------------------------------------------------------------------------
+
+  describe('onUpdate — full bg/border update path', () => {
+    it('15.1 updates bg shape fill and border stroke in a single call', () => {
+      const pluginMock = makePluginMock();
+      const { node, mock } = makeNode();
+      mock.getPlugin.mockReturnValue(pluginMock);
+      const group = node.onRender(defaultProps()) as Konva.Group;
+
+      node.onUpdate(
+        group,
+        defaultProps({ fill: '#ABCDEF', stroke: '#111111', strokeWidth: 6 })
+      );
+
+      const bgShape = group.findOne('#poly-id-bg') as Konva.Shape;
+      const borderShape = group.findOne('#poly-id-border') as Konva.Shape;
+
+      expect(bgShape.fill()).toBe('#ABCDEF');
+      expect(borderShape.stroke()).toBe('#111111');
+      expect(borderShape.getAttr('innerStrokeWidth')).toBe(6);
+    });
+
+    it('15.2 falls back to "transparent" when fill/stroke are absent', () => {
+      const pluginMock = makePluginMock();
+      const { node, mock } = makeNode();
+      mock.getPlugin.mockReturnValue(pluginMock);
+      const group = node.onRender(defaultProps()) as Konva.Group;
+
+      node.onUpdate(group, defaultProps({ fill: undefined, stroke: undefined }));
+
+      const bgShape = group.findOne('#poly-id-bg') as Konva.Shape;
+      const borderShape = group.findOne('#poly-id-border') as Konva.Shape;
+
+      expect(bgShape.fill()).toBe('transparent');
+      expect(borderShape.stroke()).toBe('transparent');
+    });
+  });
+
+  // -------------------------------------------------------------------------
+  // Suite 16 — allowedAnchors
+  // -------------------------------------------------------------------------
+
+  describe('allowedAnchors', () => {
+    it('16.1 returns all 8 anchor names', () => {
+      const { node } = makeNode();
+      const group = node.onRender(defaultProps()) as Konva.Group;
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const anchors = (group as any).allowedAnchors();
+      expect(anchors).toContain('top-left');
+      expect(anchors).toContain('top-center');
+      expect(anchors).toContain('top-right');
+      expect(anchors).toContain('middle-right');
+      expect(anchors).toContain('middle-left');
+      expect(anchors).toContain('bottom-left');
+      expect(anchors).toContain('bottom-center');
+      expect(anchors).toContain('bottom-right');
+      expect(anchors).toHaveLength(8);
+    });
+  });
+
+  // -------------------------------------------------------------------------
+  // Suite 17 — transform events and dblClick
+  // -------------------------------------------------------------------------
+
+  describe('transform events', () => {
+    it('17.1 transformstart sets _transforming to true', () => {
+      const { node } = makeNode();
+      const group = node.onRender(defaultProps()) as Konva.Group;
+      group.fire('transformstart');
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      expect((node as any)._transforming).toBe(true);
+    });
+
+    it('17.2 transformend sets _transforming to false', () => {
+      const { node } = makeNode();
+      const group = node.onRender(defaultProps()) as Konva.Group;
+      group.fire('transformstart');
+      group.fire('transformend');
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      expect((node as any)._transforming).toBe(false);
+    });
+
+    it('17.3 transform event calls scaleReset and onUpdate without throwing', () => {
+      const pluginMock = makePluginMock();
+      const { node, mock } = makeNode();
+      mock.getPlugin.mockImplementation((key: string) => {
+        if (key === 'nodesSelection') return pluginMock;
+        return undefined;
+      });
+      const group = node.onRender(defaultProps()) as Konva.Group;
+      expect(() => group.fire('transform')).not.toThrow();
+    });
+
+    it('17.4 dblClick does nothing when not selecting', () => {
+      const { node, mock } = makeNode();
+      mock.getRealSelectedNode.mockReturnValue(undefined);
+      const group = node.onRender(defaultProps()) as Konva.Group;
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      expect(() => (group as any).dblClick()).not.toThrow();
+    });
+
+    it('17.5 getNodeMinSize returns an object with width and height', () => {
+      const { node, mock } = makeNode();
+      mock.getStage.mockReturnValue({
+        findOne: vi.fn().mockReturnValue(null),
+        find: vi.fn().mockReturnValue([]),
+        container: vi.fn().mockReturnValue({ style: { cursor: '' } }),
+        scaleX: vi.fn().mockReturnValue(1),
+        scaleY: vi.fn().mockReturnValue(1),
+        getAbsoluteTransform: vi.fn().mockReturnValue({
+          copy: vi.fn().mockReturnThis(),
+          invert: vi.fn().mockReturnThis(),
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          point: vi.fn().mockImplementation((p: any) => p),
+        }),
+      });
+      const group = node.onRender(defaultProps()) as Konva.Group;
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const minSize = (group as any).getNodeMinSize();
+      expect(minSize).toHaveProperty('width');
+      expect(minSize).toHaveProperty('height');
     });
   });
 });
