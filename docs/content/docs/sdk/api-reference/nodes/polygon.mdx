@@ -1,0 +1,128 @@
+---
+title: WeavePolygonNode
+description: Polygon node API Reference
+---
+
+import { TypeTable } from "fumadocs-ui/components/type-table";
+
+## Overview
+
+The [WeavePolygonNode](https://github.com/InditexTech/weavejs/blob/main/code/packages/sdk/src/nodes/polygon/polygon.ts)
+class represents a polygon shape within the Weave.js canvas.
+
+Unlike the `WeaveRegularPolygonNode`, which uses Konva's built-in `RegularPolygon` primitive,
+`WeavePolygonNode` is drawn via explicit vertex points (`points: WeavePolygonPoint[]`). This enables
+arbitrary convex polygon shapes and precise inside-stroke rendering that never exceeds the shape boundary.
+
+The node also supports an inline text label whose bounding box is derived from the polygon's
+`innerRect` — the largest axis-aligned rectangle that fits inside the shape.
+
+The class extends the [WeaveNode](/docs/sdk/api-reference/nodes/node) class.
+
+## Type
+
+This node `nodeType` property value is `polygon`.
+
+## Import
+
+```shell
+import { WeavePolygonNode } from "@inditextech/weave-sdk";
+```
+
+## Instantiation
+
+```ts
+new WeavePolygonNode(params?: WeavePolygonNodeParams);
+```
+
+## TypeScript types
+
+```ts
+type WeavePolygonPoint = { x: number; y: number };
+
+type WeavePolygonInnerRect = {
+  tl: WeavePolygonPoint;
+  tr: WeavePolygonPoint;
+  bl: WeavePolygonPoint;
+  br: WeavePolygonPoint;
+};
+
+type WeaveNodeTransformerProperties = Konva.TransformerConfig;
+
+type WeavePolygonProperties = {
+  transform: WeaveNodeTransformerProperties;
+};
+
+type WeavePolygonNodeParams = {
+  config: Partial<WeavePolygonProperties>;
+};
+```
+
+## Parameters
+
+For `WeavePolygonNodeParams`:
+
+<TypeTable
+  type={{
+    ["config"]: {
+      required: false,
+      description: "Config parameters for the node.",
+      type: "Partial<WeavePolygonProperties>",
+    },
+  }}
+/>
+
+For `WeavePolygonProperties`:
+
+<TypeTable
+  type={{
+    ["transform"]: {
+      description:
+        "Setup the transform properties for the polygon (if it can be resized, rotated, which anchors are available, etc.).",
+      type: "object",
+      default: "check default values",
+    },
+  }}
+/>
+
+## Presets
+
+The polygon node ships with six built-in presets available via the exported constant
+`WEAVE_POLYGON_PRESETS`. Each preset defines normalized vertex positions and an inner
+bounding rectangle used for label placement.
+
+| Preset ID | Label | Sides |
+|-----------|-------|-------|
+| `triangle` | Triangle | 3 |
+| `diamond` | Diamond | 4 |
+| `pentagon` | Pentagon | 5 |
+| `hexagon` | Hexagon | 6 |
+| `octagon` | Octagon | 8 |
+| `decagon` | Decagon | 10 |
+
+## Default values
+
+```ts
+const WEAVE_TRANSFORMER_ANCHORS = {
+  ["TOP_LEFT"]: "top-left",
+  ["TOP_CENTER"]: "top-center",
+  ["TOP_RIGHT"]: "top-right",
+  ["MIDDLE_RIGHT"]: "middle-right",
+  ["MIDDLE_LEFT"]: "middle-left",
+  ["BOTTOM_LEFT"]: "bottom-left",
+  ["BOTTOM_CENTER"]: "bottom-center",
+  ["BOTTOM_RIGHT"]: "bottom-right",
+};
+
+const WEAVE_DEFAULT_ENABLED_ANCHORS: string[] = Object.values(
+  WEAVE_TRANSFORMER_ANCHORS
+);
+
+const WEAVE_DEFAULT_TRANSFORM_PROPERTIES: WeaveNodeTransformerProperties = {
+  rotateEnabled: true,
+  resizeEnabled: true,
+  enabledAnchors: WEAVE_DEFAULT_ENABLED_ANCHORS,
+  borderStrokeWidth: 3,
+  padding: 0,
+};
+```

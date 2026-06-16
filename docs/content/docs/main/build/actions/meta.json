@@ -15,8 +15,8 @@
     "images-tool",
     "measure-tool",
     "move-tool",
+    "polygon-tool",
     "rectangle-tool",
-    "regular-polygon-tool",
     "selection-tool",
     "star-tool",
     "stroke-tool",
@@ -26,7 +26,8 @@
     "zoom-out-tool",
     "arrow-tool",
     "line-tool",
-    "pen-tool"
+    "pen-tool",
+    "regular-polygon-tool"
   ],
   "title": "Actions"
 }
