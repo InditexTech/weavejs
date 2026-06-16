@@ -3,11 +3,9 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { v4 as uuidv4 } from 'uuid';
-import { type WeaveElementInstance } from '@inditextech/weave-types';
+
 import { WeaveAction } from '@/actions/action';
 import {
-  type WeavePolygonToolActionOnAddedEvent,
-  type WeavePolygonToolActionOnAddingEvent,
   type WeavePolygonToolActionState,
   type WeavePolygonToolActionTriggerParams,
 } from './types';
@@ -110,7 +108,7 @@ export class WeavePolygonToolAction extends WeaveAction {
     this.setCursor();
     this.setFocusStage();
 
-    this.instance.emitEvent<WeavePolygonToolActionOnAddingEvent>(
+    this.instance.emitEvent<undefined>(
       'onAddingPolygon'
     );
 
@@ -148,7 +146,7 @@ export class WeavePolygonToolAction extends WeaveAction {
       this.instance.addNode(node, container?.getAttrs().id);
     }
 
-    this.instance.emitEvent<WeavePolygonToolActionOnAddedEvent>(
+    this.instance.emitEvent<undefined>(
       'onAddedPolygon'
     );
 
@@ -194,7 +192,7 @@ export class WeavePolygonToolAction extends WeaveAction {
     if (selectionPlugin) {
       const node = stage.findOne(`#${this.polygonId}`);
       if (node) {
-        selectionPlugin.setSelectedNodes([node as WeaveElementInstance]);
+        selectionPlugin.setSelectedNodes([node]);
       }
       this.instance.triggerAction(SELECTION_TOOL_ACTION_NAME);
     }

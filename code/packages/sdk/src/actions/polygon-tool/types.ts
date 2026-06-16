@@ -8,8 +8,6 @@ export type WeavePolygonToolActionStateKeys = keyof typeof POLYGON_TOOL_STATE;
 export type WeavePolygonToolActionState =
   (typeof POLYGON_TOOL_STATE)[WeavePolygonToolActionStateKeys];
 
-export type WeavePolygonToolActionOnAddingEvent = undefined;
-export type WeavePolygonToolActionOnAddedEvent = undefined;
 
 export type WeavePolygonToolActionTriggerParams = {
   presetId?: string;

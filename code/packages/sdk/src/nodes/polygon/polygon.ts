@@ -12,7 +12,7 @@ import {
 import { WeaveNode } from '../node';
 import { WEAVE_POLYGON_NODE_TYPE } from './constants';
 import type { WeaveNodesSelectionPlugin } from '@/plugins/nodes-selection/nodes-selection';
-import type { WeavePolygonNodeParams, WeavePolygonProperties } from './types';
+import type { WeavePolygonNodeParams, WeavePolygonProperties, WeavePolygonPoint, WeavePolygonInnerRect } from './types';
 import { mergeExceptArrays } from '@/utils/utils';
 import { WeaveShapeLabelEditor } from '@/nodes/shared/shape-label-editor';
 import {
@@ -21,7 +21,6 @@ import {
 } from '@/nodes/shared/shape-label.constants';
 import { computePolygonLabelMinSize } from '@/index.node';
 import { WEAVE_POLYGON_PRESETS, instantiatePreset } from './presets';
-import type { WeavePolygonPoint, WeavePolygonInnerRect } from './types';
 
 // ---------------------------------------------------------------------------
 // Geometry helpers
@@ -121,16 +120,14 @@ function borderSceneFunc(context: Konva.Context, shape: Konva.Shape) {
 // ---------------------------------------------------------------------------
 
 export class WeavePolygonNode extends WeaveNode {
-  private config: WeavePolygonProperties;
+  private readonly config: WeavePolygonProperties;
   protected nodeType: string = WEAVE_POLYGON_NODE_TYPE;
   initialize = undefined;
   private _shapeLabelEditor: WeaveShapeLabelEditor | undefined;
   private _transforming = false;
 
   private get shapeLabelEditor(): WeaveShapeLabelEditor {
-    if (!this._shapeLabelEditor) {
-      this._shapeLabelEditor = new WeaveShapeLabelEditor(this.instance);
-    }
+    this._shapeLabelEditor ??= new WeaveShapeLabelEditor(this.instance);
     return this._shapeLabelEditor;
   }
 
@@ -159,6 +156,152 @@ export class WeavePolygonNode extends WeaveNode {
     }
 
     return getPolygonLabelTextBounds(innerRect, paddingX, paddingY);
+  }
+
+  private scalePolygonByDimensions(
+    polygon: Konva.Group,
+    nextProps: WeaveElementAttributes,
+    nodeInstance: WeaveElementInstance
+  ): WeavePolygonPoint[] {
+    let points = polygon.getAttr('points') as WeavePolygonPoint[];
+    const propsMaxX = points.length ? Math.max(...points.map((p) => p.x)) : 0;
+    const propsMaxY = points.length ? Math.max(...points.map((p) => p.y)) : 0;
+    const wantWidth = nextProps.width as number | undefined;
+    const wantHeight = nextProps.height as number | undefined;
+
+    if (wantWidth === undefined || wantHeight === undefined) return points;
+
+    const sX = propsMaxX > 0 ? wantWidth / propsMaxX : 1;
+    const sY = propsMaxY > 0 ? wantHeight / propsMaxY : 1;
+    if (Math.abs(sX - 1) <= 0.001 && Math.abs(sY - 1) <= 0.001) return points;
+
+    const scaledPoints: WeavePolygonPoint[] = points.map((p) => ({
+      x: p.x * sX,
+      y: p.y * sY,
+    }));
+    const prevInnerRect = polygon.getAttr('innerRect') as
+      | WeavePolygonInnerRect
+      | undefined;
+    if (prevInnerRect) {
+      const scaledInnerRect: WeavePolygonInnerRect = {
+        tl: { x: prevInnerRect.tl.x * sX, y: prevInnerRect.tl.y * sY },
+        tr: { x: prevInnerRect.tr.x * sX, y: prevInnerRect.tr.y * sY },
+        bl: { x: prevInnerRect.bl.x * sX, y: prevInnerRect.bl.y * sY },
+        br: { x: prevInnerRect.br.x * sX, y: prevInnerRect.br.y * sY },
+      };
+      polygon.setAttr('innerRect', scaledInnerRect);
+    }
+    polygon.setAttr('points', scaledPoints);
+    points = scaledPoints;
+
+    if (!this._transforming) {
+      this.instance.updateNode(this.serialize(nodeInstance));
+    }
+    return points;
+  }
+
+  private onLabelGrow(
+    polygon: Konva.Group,
+    bgShape: Konva.Shape | undefined,
+    borderShape: Konva.Shape | undefined,
+    nodeInstance: WeaveElementInstance,
+    neededHeight: number
+  ): void {
+    const livePoints = polygon.getAttr('points') as WeavePolygonPoint[];
+    const liveInnerRect = polygon.getAttr('innerRect') as
+      | WeavePolygonInnerRect
+      | undefined;
+    if (!liveInnerRect) return;
+
+    const currentBoundsHeight = liveInnerRect.bl.y - liveInnerRect.tl.y;
+    if (neededHeight <= currentBoundsHeight) return;
+
+    const oldHeight = Math.max(...livePoints.map((p) => p.y));
+    const scale =
+      currentBoundsHeight > 0 ? neededHeight / currentBoundsHeight : 1;
+    const newHeight = oldHeight * scale;
+
+    const newPoints: WeavePolygonPoint[] = livePoints.map((p) => ({
+      ...p,
+      y: p.y * scale,
+    }));
+    const newInnerRect: WeavePolygonInnerRect = {
+      tl: { ...liveInnerRect.tl, y: liveInnerRect.tl.y * scale },
+      tr: { ...liveInnerRect.tr, y: liveInnerRect.tr.y * scale },
+      bl: { ...liveInnerRect.bl, y: liveInnerRect.bl.y * scale },
+      br: { ...liveInnerRect.br, y: liveInnerRect.br.y * scale },
+    };
+
+    polygon.setAttr('points', newPoints);
+    polygon.setAttr('innerRect', newInnerRect);
+    polygon.setAttr('height', newHeight);
+
+    bgShape?.setAttr('points', newPoints);
+    borderShape?.setAttr('points', newPoints);
+
+    if (!this._transforming) {
+      this.instance.updateNode(this.serialize(nodeInstance));
+    }
+  }
+
+  private triggerPolygonLabelEdit(
+    polygon: Konva.Group,
+    props: WeaveElementAttributes
+  ): void {
+    const onCommit = (labelText: string) => {
+      const updatedGroup = this.instance
+        .getStage()
+        .findOne<Konva.Group>(`#${props.id}`);
+      if (!updatedGroup) return;
+      const serialized = this.serialize(updatedGroup);
+      serialized.props.labelText = labelText;
+      this.instance.updateNode(serialized);
+    };
+
+    const currentLabelTextBounds = this.getLabelTextBounds(polygon);
+
+    this.shapeLabelEditor.triggerEditMode(
+      polygon,
+      currentLabelTextBounds,
+      onCommit,
+      (neededShapeHeight) => {
+        const liveAttrs = polygon.getAttrs() as WeaveElementAttributes;
+        const livePoints = liveAttrs.points as WeavePolygonPoint[];
+        const liveInnerRect = liveAttrs.innerRect as WeavePolygonInnerRect;
+        const liveInnerRectHeight = liveInnerRect.bl.y - liveInnerRect.tl.y;
+
+        if (neededShapeHeight <= liveInnerRectHeight) return;
+
+        const oldHeight = Math.max(...livePoints.map((p) => p.y));
+        const scale =
+          liveInnerRectHeight > 0
+            ? neededShapeHeight / liveInnerRectHeight
+            : 1;
+        const newHeight = oldHeight * scale;
+
+        const newPoints: WeavePolygonPoint[] = livePoints.map((p) => ({
+          ...p,
+          y: p.y * scale,
+        }));
+
+        const newInnerRect: WeavePolygonInnerRect = {
+          tl: { ...liveInnerRect.tl, y: liveInnerRect.tl.y * scale },
+          tr: { ...liveInnerRect.tr, y: liveInnerRect.tr.y * scale },
+          bl: { ...liveInnerRect.bl, y: liveInnerRect.bl.y * scale },
+          br: { ...liveInnerRect.br, y: liveInnerRect.br.y * scale },
+        };
+
+        polygon.setAttrs({
+          points: newPoints,
+          innerRect: newInnerRect,
+          height: newHeight,
+        });
+        this.onUpdate(polygon, polygon.getAttrs());
+
+        const newLabelTextBounds = this.getLabelTextBounds(polygon);
+        this.shapeLabelEditor.repositionTextArea(polygon, newLabelTextBounds);
+      }
+    );
   }
 
   scaleReset(group: Konva.Group): void {
@@ -315,68 +458,9 @@ export class WeavePolygonNode extends WeaveNode {
     });
 
     polygon.dblClick = () => {
-      if (this.shapeLabelEditor.isEditing()) {
-        return;
-      }
-
-      if (!(this.isSelecting() && this.isNodeSelected(polygon))) {
-        return;
-      }
-
-      const onCommit = (labelText: string) => {
-        const updatedGroup = this.instance
-          .getStage()
-          .findOne<Konva.Group>(`#${props.id}`);
-        if (!updatedGroup) return;
-        const serialized = this.serialize(updatedGroup);
-        serialized.props.labelText = labelText;
-        this.instance.updateNode(serialized);
-      };
-
-      const currentLabelTextBounds = this.getLabelTextBounds(polygon);
-
-      this.shapeLabelEditor.triggerEditMode(
-        polygon,
-        currentLabelTextBounds,
-        onCommit,
-        (neededShapeHeight) => {
-          const liveAttrs = polygon.getAttrs() as WeaveElementAttributes;
-          const livePoints = liveAttrs.points as WeavePolygonPoint[];
-          const liveInnerRect = liveAttrs.innerRect as WeavePolygonInnerRect;
-          const liveInnerRectHeight = liveInnerRect.bl.y - liveInnerRect.tl.y;
-
-          if (neededShapeHeight <= liveInnerRectHeight) return;
-
-          const oldHeight = Math.max(...livePoints.map((p) => p.y));
-          const scale =
-            liveInnerRectHeight > 0
-              ? neededShapeHeight / liveInnerRectHeight
-              : 1;
-          const newHeight = oldHeight * scale;
-
-          const newPoints: WeavePolygonPoint[] = livePoints.map((p) => ({
-            ...p,
-            y: p.y * scale,
-          }));
-
-          const newInnerRect: WeavePolygonInnerRect = {
-            tl: { ...liveInnerRect.tl, y: liveInnerRect.tl.y * scale },
-            tr: { ...liveInnerRect.tr, y: liveInnerRect.tr.y * scale },
-            bl: { ...liveInnerRect.bl, y: liveInnerRect.bl.y * scale },
-            br: { ...liveInnerRect.br, y: liveInnerRect.br.y * scale },
-          };
-
-          polygon.setAttrs({
-            points: newPoints,
-            innerRect: newInnerRect,
-            height: newHeight,
-          });
-          this.onUpdate(polygon, polygon.getAttrs());
-
-          const newLabelTextBounds = this.getLabelTextBounds(polygon);
-          this.shapeLabelEditor.repositionTextArea(polygon, newLabelTextBounds);
-        }
-      );
+      if (this.shapeLabelEditor.isEditing()) return;
+      if (!(this.isSelecting() && this.isNodeSelected(polygon))) return;
+      this.triggerPolygonLabelEdit(polygon, props);
     };
 
     polygon.getNodeMinSize = () => {
@@ -393,7 +477,6 @@ export class WeavePolygonNode extends WeaveNode {
     nodeInstance.setAttrs({ ...nextProps });
 
     const polygon = nodeInstance as Konva.Group;
-    let points = polygon.getAttr('points') as WeavePolygonPoint[];
     const strokeWidth = (nextProps.strokeWidth as number) || 0;
 
     // ── Resize-by-dimensions ─────────────────────────────────────────────────
@@ -401,40 +484,7 @@ export class WeavePolygonNode extends WeaveNode {
     // current vertex set, rescale all vertices (and innerRect) to match.
     // This allows external callers (properties panels, automation) to resize
     // the polygon by simply setting width/height on the node props.
-    const propsMaxX = points.length ? Math.max(...points.map((p) => p.x)) : 0;
-    const propsMaxY = points.length ? Math.max(...points.map((p) => p.y)) : 0;
-    const wantWidth = nextProps.width as number | undefined;
-    const wantHeight = nextProps.height as number | undefined;
-    if (wantWidth !== undefined && wantHeight !== undefined) {
-      const sX = propsMaxX > 0 ? wantWidth / propsMaxX : 1;
-      const sY = propsMaxY > 0 ? wantHeight / propsMaxY : 1;
-      if (Math.abs(sX - 1) > 0.001 || Math.abs(sY - 1) > 0.001) {
-        const scaledPoints: WeavePolygonPoint[] = points.map((p) => ({
-          x: p.x * sX,
-          y: p.y * sY,
-        }));
-        const prevInnerRect = polygon.getAttr('innerRect') as
-          | WeavePolygonInnerRect
-          | undefined;
-        if (prevInnerRect) {
-          const scaledInnerRect: WeavePolygonInnerRect = {
-            tl: { x: prevInnerRect.tl.x * sX, y: prevInnerRect.tl.y * sY },
-            tr: { x: prevInnerRect.tr.x * sX, y: prevInnerRect.tr.y * sY },
-            bl: { x: prevInnerRect.bl.x * sX, y: prevInnerRect.bl.y * sY },
-            br: { x: prevInnerRect.br.x * sX, y: prevInnerRect.br.y * sY },
-          };
-          polygon.setAttr('innerRect', scaledInnerRect);
-        }
-        polygon.setAttr('points', scaledPoints);
-        points = scaledPoints;
-
-        if (!this._transforming) {
-          this.instance.updateNode(
-            this.serialize(nodeInstance as WeaveElementInstance)
-          );
-        }
-      }
-    }
+    const points = this.scalePolygonByDimensions(polygon, nextProps, nodeInstance);
     // ─────────────────────────────────────────────────────────────────────────
 
     const bgShape = polygon.findOne<Konva.Shape>(`#${nextProps.id}-bg`);
@@ -479,45 +529,8 @@ export class WeavePolygonNode extends WeaveNode {
       polygon,
       nextProps,
       labelTextBounds,
-      (neededHeight) => {
-        const livePoints = polygon.getAttr('points') as WeavePolygonPoint[];
-        const liveInnerRect = polygon.getAttr('innerRect') as
-          | WeavePolygonInnerRect
-          | undefined;
-        if (!liveInnerRect) return;
-
-        const currentBoundsHeight = liveInnerRect.bl.y - liveInnerRect.tl.y;
-        if (neededHeight <= currentBoundsHeight) return;
-
-        const oldHeight = Math.max(...livePoints.map((p) => p.y));
-        const scale =
-          currentBoundsHeight > 0 ? neededHeight / currentBoundsHeight : 1;
-        const newHeight = oldHeight * scale;
-
-        const newPoints: WeavePolygonPoint[] = livePoints.map((p) => ({
-          ...p,
-          y: p.y * scale,
-        }));
-        const newInnerRect: WeavePolygonInnerRect = {
-          tl: { ...liveInnerRect.tl, y: liveInnerRect.tl.y * scale },
-          tr: { ...liveInnerRect.tr, y: liveInnerRect.tr.y * scale },
-          bl: { ...liveInnerRect.bl, y: liveInnerRect.bl.y * scale },
-          br: { ...liveInnerRect.br, y: liveInnerRect.br.y * scale },
-        };
-
-        polygon.setAttr('points', newPoints);
-        polygon.setAttr('innerRect', newInnerRect);
-        polygon.setAttr('height', newHeight);
-
-        bgShape?.setAttr('points', newPoints);
-        borderShape?.setAttr('points', newPoints);
-
-        if (!this._transforming) {
-          this.instance.updateNode(
-            this.serialize(nodeInstance as WeaveElementInstance)
-          );
-        }
-      }
+      (neededHeight) =>
+        this.onLabelGrow(polygon, bgShape, borderShape, nodeInstance, neededHeight)
     );
 
     const labelNode = polygon.findOne(`#${labelId(nextProps.id as string)}`);
