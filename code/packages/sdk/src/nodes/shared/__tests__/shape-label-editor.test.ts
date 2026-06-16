@@ -13,6 +13,7 @@ import {
   labelId,
 } from '../shape-label.constants';
 import { augmentKonvaNodeClass } from '../../node';
+import { makePluginMock } from '../../__tests__/shared/node.test-helpers';
 
 vi.mock('@/weave', () => ({ Weave: class MockWeave {} }));
 
@@ -406,6 +407,25 @@ describe('WeaveShapeLabelEditor', () => {
       editor.triggerEditMode(group, textBounds, vi.fn());
       expect(mockInstance.setMutexLock.mock.calls.length).toBe(firstCallCount);
     });
+
+    it('6.7 disables nodesSelection plugin and hides transformer when present', () => {
+      const transformer = new Konva.Transformer();
+      const hideSpy = vi.spyOn(transformer, 'hide');
+      const pluginMock = makePluginMock(transformer);
+
+      // Create a mock instance where getPlugin('nodesSelection') returns the plugin
+      const instanceWithPlugin = createMockInstance();
+      instanceWithPlugin.getPlugin.mockReturnValue(pluginMock);
+
+      const editorWithPlugin = new WeaveShapeLabelEditor(instanceWithPlugin as never);
+      const g = makeGroup('sel-node');
+
+      editorWithPlugin.renderLabel(g, { id: 'sel-node', labelText: 'hi' }, defaultTextBounds());
+      editorWithPlugin.triggerEditMode(g, defaultTextBounds(), vi.fn());
+
+      expect(instanceWithPlugin.disablePlugin).toHaveBeenCalledWith('nodesSelection');
+      expect(hideSpy).toHaveBeenCalled();
+    });
   });
 
   // -------------------------------------------------------------------------
@@ -567,8 +587,128 @@ describe('WeaveShapeLabelEditor', () => {
   });
 
   // ---------------------------------------------------------------------------
-  // 9 — computeVerticalOffset (private helper)
+  // 11 — updateTextAreaPosition (called during stage pan/zoom)
   // ---------------------------------------------------------------------------
+
+  describe('updateTextAreaPosition', () => {
+    function makeEditorInEditMode(
+      verticalAlign = 'middle',
+      boundsHeight = 100,
+      contentScrollHeight = 20
+    ) {
+      const mockInstance = createMockInstance();
+      // Add getAttr for upscaleScale
+      (mockInstance.getStage() as ReturnType<typeof createMockInstance>['getStage'] & {
+        getAttr: ReturnType<typeof vi.fn>;
+        mode: ReturnType<typeof vi.fn>;
+        off: ReturnType<typeof vi.fn>;
+      }).getAttr = vi.fn().mockReturnValue(undefined);
+      (mockInstance.getStage() as ReturnType<typeof createMockInstance>['getStage'] & {
+        mode: ReturnType<typeof vi.fn>;
+        off: ReturnType<typeof vi.fn>;
+      }).mode = vi.fn();
+      (mockInstance.getStage() as ReturnType<typeof createMockInstance>['getStage'] & {
+        off: ReturnType<typeof vi.fn>;
+      }).off = vi.fn();
+
+      const editor = new WeaveShapeLabelEditor(mockInstance as never);
+      const group = makeGroup('utp-node');
+      group.setAttrs({ labelVerticalAlign: verticalAlign, labelFontSize: 14 });
+
+      group.getAbsoluteTransform = () =>
+        ({ point: (p: { x: number; y: number }) => p }) as never;
+      group.getAbsoluteScale = () => ({ x: 1, y: 1 });
+
+      const ta = document.createElement('textarea');
+      ta.style.height = `${boundsHeight}px`;
+      Object.defineProperty(ta, 'scrollHeight', {
+        get: () => contentScrollHeight,
+        configurable: true,
+      });
+
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const e = editor as any;
+      e.editing = true;
+      e.textArea = ta;
+      e.editingTextBounds = { x: 0, y: 0, width: 180, height: boundsHeight };
+      e.onLiveResize = null;
+
+      return { editor, group, ta, mockInstance };
+    }
+
+    const textBounds = { x: 0, y: 0, width: 180, height: 100 };
+
+    it('11.1 returns early when not editing', () => {
+      const { editor, group } = makeEditorInEditMode();
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      (editor as any).editing = false;
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      (editor as any).textArea = null;
+
+      // Should not throw
+      expect(() => editor.updateTextAreaPosition(group, textBounds)).not.toThrow();
+    });
+
+    it('11.2 returns early when textArea is null', () => {
+      const { editor, group } = makeEditorInEditMode();
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      (editor as any).textArea = null;
+
+      expect(() => editor.updateTextAreaPosition(group, textBounds)).not.toThrow();
+    });
+
+    it('11.3 sets textarea left based on topLeft.x', () => {
+      const { editor, group, ta } = makeEditorInEditMode();
+      editor.updateTextAreaPosition(group, textBounds);
+      // topLeft.x = textBounds.x = 0; upscaleScale = 1 (undefined → 1)
+      expect(ta.style.left).toBe('0px');
+    });
+
+    it('11.4 when content fits — sets height and top with vertical offset', () => {
+      // boundsHeight=100, contentScrollHeight=20, align=middle → offsetY=(100-20)/2=40, top=0+40=40
+      const { editor, group, ta } = makeEditorInEditMode('middle', 100, 20);
+      editor.updateTextAreaPosition(group, textBounds);
+      expect(ta.style.height).toBe('20px');
+      expect(ta.style.top).toBe('40px');
+    });
+
+    it('11.5 when content overflows — sets height to content and top to topLeft.y', () => {
+      // boundsHeight=50, contentScrollHeight=120 → overflow
+      const { editor, group, ta } = makeEditorInEditMode('middle', 50, 120);
+      // Update textArea scrollHeight for this case
+      Object.defineProperty(ta, 'scrollHeight', {
+        get: () => 120,
+        configurable: true,
+      });
+      editor.updateTextAreaPosition(group, { ...textBounds, height: 50 });
+      expect(ta.style.height).toBe('120px');
+      expect(ta.style.top).toBe('0px');
+    });
+
+    it('11.6 calls onLiveResize with content height in canvas units when set', () => {
+      const { editor, group } = makeEditorInEditMode('middle', 50, 120);
+      const onLiveResize = vi.fn();
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      (editor as any).onLiveResize = onLiveResize;
+
+      editor.updateTextAreaPosition(group, { ...textBounds, height: 50 });
+
+      expect(onLiveResize).toHaveBeenCalled();
+      const arg = onLiveResize.mock.calls[0][0];
+      expect(typeof arg).toBe('number');
+      expect(arg).toBeGreaterThan(0);
+    });
+
+    it('11.7 fontSize is scaled by absScale.x', () => {
+      const { editor, group, ta } = makeEditorInEditMode();
+      group.setAttrs({ labelFontSize: 16 });
+      // absScale.x = 1, upscaleScale = 1 → fontSize = 16 * 1 = 16
+      editor.updateTextAreaPosition(group, textBounds);
+      expect(ta.style.fontSize).toBe('16px');
+    });
+  });
+
+
 
   describe('computeVerticalOffset', () => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any

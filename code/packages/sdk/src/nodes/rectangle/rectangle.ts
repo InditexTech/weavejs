@@ -22,7 +22,7 @@ import {
   labelId,
   WEAVE_SHAPE_LABEL_DEFAULTS,
 } from '@/nodes/shared/shape-label.constants';
-import { computeRectangleLabelMinSize } from '@/nodes/shared/shape-label.utils';
+import { computeRectangleLabelMinSize, spreadLabelProps, getShapeLabelSchemaFields } from '@/nodes/shared/shape-label.utils';
 
 export class WeaveRectangleNode extends WeaveNode {
   private config: WeaveRectangleProperties;
@@ -360,36 +360,7 @@ export class WeaveRectangleNode extends WeaveNode {
         ...(props.strokeWidth && {
           strokeWidth: props.strokeWidth,
         }),
-        ...(props.labelText !== undefined && { labelText: props.labelText }),
-        ...(props.labelFontFamily !== undefined && {
-          labelFontFamily: props.labelFontFamily,
-        }),
-        ...(props.labelFontSize !== undefined && {
-          labelFontSize: props.labelFontSize,
-        }),
-        ...(props.labelFontStyle !== undefined && {
-          labelFontStyle: props.labelFontStyle,
-        }),
-        ...(props.labelFontVariant !== undefined && {
-          labelFontVariant: props.labelFontVariant,
-        }),
-        ...(props.labelFill !== undefined && { labelFill: props.labelFill }),
-        ...(props.labelAlign !== undefined && { labelAlign: props.labelAlign }),
-        ...(props.labelVerticalAlign !== undefined && {
-          labelVerticalAlign: props.labelVerticalAlign,
-        }),
-        ...(props.labelLetterSpacing !== undefined && {
-          labelLetterSpacing: props.labelLetterSpacing,
-        }),
-        ...(props.labelLineHeight !== undefined && {
-          labelLineHeight: props.labelLineHeight,
-        }),
-        ...(props.labelPaddingX !== undefined && {
-          labelPaddingX: props.labelPaddingX,
-        }),
-        ...(props.labelPaddingY !== undefined && {
-          labelPaddingY: props.labelPaddingY,
-        }),
+        ...spreadLabelProps(props),
       },
     });
   }
@@ -410,42 +381,7 @@ export class WeaveRectangleNode extends WeaveNode {
         ...(nextProps.strokeWidth && {
           strokeWidth: nextProps.strokeWidth,
         }),
-        ...(nextProps.labelText !== undefined && {
-          labelText: nextProps.labelText,
-        }),
-        ...(nextProps.labelFontFamily !== undefined && {
-          labelFontFamily: nextProps.labelFontFamily,
-        }),
-        ...(nextProps.labelFontSize !== undefined && {
-          labelFontSize: nextProps.labelFontSize,
-        }),
-        ...(nextProps.labelFontStyle !== undefined && {
-          labelFontStyle: nextProps.labelFontStyle,
-        }),
-        ...(nextProps.labelFontVariant !== undefined && {
-          labelFontVariant: nextProps.labelFontVariant,
-        }),
-        ...(nextProps.labelFill !== undefined && {
-          labelFill: nextProps.labelFill,
-        }),
-        ...(nextProps.labelAlign !== undefined && {
-          labelAlign: nextProps.labelAlign,
-        }),
-        ...(nextProps.labelVerticalAlign !== undefined && {
-          labelVerticalAlign: nextProps.labelVerticalAlign,
-        }),
-        ...(nextProps.labelLetterSpacing !== undefined && {
-          labelLetterSpacing: nextProps.labelLetterSpacing,
-        }),
-        ...(nextProps.labelLineHeight !== undefined && {
-          labelLineHeight: nextProps.labelLineHeight,
-        }),
-        ...(nextProps.labelPaddingX !== undefined && {
-          labelPaddingX: nextProps.labelPaddingX,
-        }),
-        ...(nextProps.labelPaddingY !== undefined && {
-          labelPaddingY: nextProps.labelPaddingY,
-        }),
+        ...spreadLabelProps(nextProps),
       },
     });
   }
@@ -489,66 +425,7 @@ export class WeaveRectangleNode extends WeaveNode {
             'Whether the rectangle stroke width should scale when the node is scaled. Defaults to true.'
           ),
 
-        labelText: z
-          .string()
-          .optional()
-          .describe('Text label displayed inside the rectangle'),
-        labelFontFamily: z
-          .string()
-          .optional()
-          .describe('Font family for the label text'),
-        labelFontSize: z
-          .number()
-          .optional()
-          .describe('Font size for the label text in pixels'),
-        labelFontStyle: z
-          .string()
-          .optional()
-          .describe(
-            'Font style for the label text (e.g. "normal", "bold", "italic", "bold italic")'
-          ),
-        labelFontVariant: z
-          .string()
-          .optional()
-          .describe(
-            'Font variant for the label text (e.g. "normal", "small-caps")'
-          ),
-        labelFill: z
-          .string()
-          .optional()
-          .describe('Color of the label text in hex format (e.g. #RRGGBBAA)'),
-        labelAlign: z
-          .string()
-          .optional()
-          .describe(
-            'Horizontal alignment of the label text ("left", "center", "right")'
-          ),
-        labelVerticalAlign: z
-          .string()
-          .optional()
-          .describe(
-            'Vertical alignment of the label text ("top", "middle", "bottom")'
-          ),
-        labelLetterSpacing: z
-          .number()
-          .optional()
-          .describe('Letter spacing for the label text in pixels'),
-        labelLineHeight: z
-          .number()
-          .optional()
-          .describe('Line height multiplier for the label text'),
-        labelPaddingX: z
-          .number()
-          .optional()
-          .describe(
-            'Horizontal inset (padding) in pixels applied on each side of the label'
-          ),
-        labelPaddingY: z
-          .number()
-          .optional()
-          .describe(
-            'Vertical inset (padding) in pixels applied on top and bottom of the label'
-          ),
+        ...getShapeLabelSchemaFields(),
       }),
     });
 
