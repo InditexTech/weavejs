@@ -88,6 +88,9 @@ export function handleClickOrTap(
     if (isStage || isMainLayer || isContainerEmptyArea) {
       ctx.setSelectedNodes([]);
     }
+
+    ctx.triggerSelectedNodesEvent();
+
     return;
   }
 
