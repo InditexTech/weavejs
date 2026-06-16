@@ -1,0 +1,167 @@
+---
+name: code-npm-sonarcloud-analysis
+run-name: Sonarcloud analysis on ${{ github.head_ref || github.ref_name }} branch
+
+concurrency:
+  group: sonarcloud-${{ github.ref }}
+  cancel-in-progress: true
+
+on:
+  workflow_dispatch:
+  pull_request:
+    types: [opened, synchronize, reopened]
+    branches: ['develop', 'develop-*', 'main', 'main-*']
+    paths: ['code/**', '.github/workflows/code-*-sonarcloud-analysis.yml']
+  release:
+    types:
+      - published
+
+env:
+  ASDF_BRANCH_VERSION: 0.18.0
+
+jobs:
+  unit-tests:
+    name: SonarCloud / Unit Tests
+    permissions:
+      contents: read
+    timeout-minutes: 30
+    if: ${{ (github.event_name == 'pull_request' ||
+        github.event_name == 'workflow_dispatch' ||
+        github.event_name == 'release') &&
+        vars.IS_INDITEXTECH_REPO == 'true' }}
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: NPM / Setup Dependencies Cache
+        uses: actions/cache@v4
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-node-${{ hashFiles('code/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-
+
+      - name: asdf / Setup Dependencies Cache
+        uses: actions/cache@v4
+        id: asdf-cache
+        with:
+          path: ~/.asdf
+          key: ${{ runner.os }}-asdf-${{ env.ASDF_BRANCH_VERSION }}-${{ hashFiles('code/.tool-versions') }}
+
+      - name: Validate tool-versions content
+        run: |
+          if grep -Evq '^[a-zA-Z0-9_-]+ [a-zA-Z0-9._+-]+$' code/.tool-versions; then
+            echo "::error::Invalid .tool-versions content detected"
+            exit 1
+          fi
+
+      - name: Save tool-versions content
+        run: |
+          {
+            echo "TOOL_VERSIONS<<EOF"
+            cat code/.tool-versions
+            echo "EOF"
+          } >> "$GITHUB_ENV"
+
+      - name: NPM / Setup asdf environment
+        uses: asdf-vm/actions/install@1902764435ca0dd2f3388eea723a4f92a4eb8302 # v4.0.0
+        if: steps.asdf-cache.outputs.cache-hit != 'true'
+        with:
+          tool_versions: ${{ env.TOOL_VERSIONS }}
+          asdf_version: ${{ env.ASDF_BRANCH_VERSION }}
+
+      - name: Restore asdf shims to PATH
+        if: steps.asdf-cache.outputs.cache-hit == 'true'
+        run: |
+          echo "$HOME/.asdf/bin" >> "$GITHUB_PATH"
+          echo "$HOME/.asdf/shims" >> "$GITHUB_PATH"
+          cp code/.tool-versions "$HOME/.tool-versions"
+
+      - name: NPM / Create Cache Folders
+        run: |
+          mkdir -p "$HOME"/.npm
+
+      - name: NPM / Install dependencies
+        working-directory: code
+        run: |
+          npm ci
+
+      - name: NPM / Build packages
+        working-directory: code
+        run: |
+          npx nx run-many -t build --no-tui
+
+      - name: NPM / Run unit tests with coverage
+        working-directory: code
+        continue-on-error: true
+        run: |
+          npx nx run-many -t test --no-tui --nx-bail=false || true
+
+      - name: NPM / Merge coverage reports
+        if: always()
+        working-directory: code
+        continue-on-error: true
+        run: |
+          npm run test:merge-coverage || true
+
+      - name: Store project information
+        id: version
+        run: |
+          echo "app-version=$(jq -r '.version' code/package.json)" >> "$GITHUB_OUTPUT"
+          echo "app-name=$(jq -r '.name' code/package.json)" >> "$GITHUB_OUTPUT"
+          echo "github-repository=$(echo $GITHUB_REPOSITORY | cut -d'/' -f2)" >> "$GITHUB_OUTPUT"
+
+      - name: SonarCloud / Check coverage file
+        id: coverage-check
+        working-directory: code
+        run: |
+          echo "Per-package lcov reports found:"
+          find packages -path '*reports/vite-coverage/lcov.info' || true
+          if [ -f "coverage/lcov.info" ]; then
+            echo "Merged coverage lines: $(grep -c '^SF:' coverage/lcov.info || echo 0)"
+            echo "coverage-exists=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "::warning::coverage/lcov.info not found"
+            echo "coverage-exists=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: SonarCloud / Run analysis with release event
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        if: ${{ github.event_name == 'release' }}
+        working-directory: code
+        run: |
+          npx sonar-scanner \
+            -Dproject.settings=sonar-project.properties \
+            -Dsonar.host.url="https://sonarcloud.io/" \
+            -Dsonar.organization=inditextech \
+            -Dsonar.projectKey=InditexTech_"${{ steps.version.outputs.github-repository }}" \
+            -Dsonar.projectName="${{ steps.version.outputs.github-repository }}" \
+            -Dsonar.projectVersion="${{ github.event.release.tag_name }}" \
+            -Dsonar.branch.name="release/${{ github.event.release.tag_name }}"
+
+      - name: SonarCloud / Run analysis
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        if: ${{ github.event_name != 'release' }}
+        working-directory: code
+        run: |
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            SCOPE_OPTIONS="-Dsonar.pullrequest.key=${{ github.event.pull_request.number }} -Dsonar.pullrequest.branch=${{ github.head_ref }} -Dsonar.pullrequest.base=${{ github.base_ref }}"
+          else
+            SCOPE_OPTIONS="-Dsonar.branch.name=${{ github.ref_name }}"
+          fi
+
+          npx sonar-scanner \
+            -Dproject.settings=sonar-project.properties \
+            -Dsonar.host.url="https://sonarcloud.io/" \
+            -Dsonar.organization=inditextech \
+            -Dsonar.projectKey=InditexTech_"${{ steps.version.outputs.github-repository }}" \
+            -Dsonar.projectName="${{ steps.version.outputs.github-repository }}" \
+            -Dsonar.projectVersion="${{ steps.version.outputs.app-version }}" \
+            $SCOPE_OPTIONS
