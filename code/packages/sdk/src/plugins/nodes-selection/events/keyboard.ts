@@ -19,6 +19,13 @@ export function registerKeyboardHandlers(ctx: SelectionContext): void {
       if (e.code === 'Space') {
         ctx.setSpaceKeyPressed(true);
       }
+      if (e.code === 'Escape') {
+        if (ctx.getActiveGroupContext() !== null) {
+          ctx.exitGroupContext();
+          e.stopPropagation();
+          return;
+        }
+      }
       if (e.code === 'Backspace' || e.code === 'Delete') {
         Promise.resolve().then(() => {
           ctx.removeSelectedNodes();

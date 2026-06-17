@@ -46,6 +46,11 @@ export interface SelectionContext {
   unregisterPointer(id: number): void;
   setClickOrTapHandled(val: boolean): void;
 
+  // ── Group context ────────────────────────────────────────────────────────────
+  getActiveGroupContext(): string | null;
+  enterGroupContext(groupId: string): void;
+  exitGroupContext(): void;
+
   // ── Selection operations ─────────────────────────────────────────────────────
   selectNone(): void;
   setSelectedNodes(nodes: Konva.Node[]): void;

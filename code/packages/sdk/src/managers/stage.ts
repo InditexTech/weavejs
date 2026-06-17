@@ -67,9 +67,20 @@ export class WeaveStageManager {
 
   getInstanceRecursive(
     instance: Konva.Node,
-    filterInstanceType: string[] = []
+    filterInstanceType: string[] = [],
+    stopAtGroupId?: string | string[]
   ): Konva.Node {
     const attributes = instance.getAttrs();
+
+    // When in group-edit context, stop walking at the first direct child of any
+    // group in the ancestor chain (active group or its ancestors).
+    if (stopAtGroupId) {
+      const parentId = instance.getParent()?.getAttrs().id ?? '';
+      const matches = Array.isArray(stopAtGroupId)
+        ? stopAtGroupId.includes(parentId)
+        : parentId === stopAtGroupId;
+      if (matches) return instance;
+    }
 
     if (
       instance.getParent() &&
@@ -78,7 +89,11 @@ export class WeaveStageManager {
         instance.getParent()?.getAttrs().nodeType
       )
     ) {
-      return this.getInstanceRecursive(instance.getParent() as Konva.Node);
+      return this.getInstanceRecursive(
+        instance.getParent() as Konva.Node,
+        filterInstanceType,
+        stopAtGroupId
+      );
     }
 
     if (attributes.id === 'mainLayer') {

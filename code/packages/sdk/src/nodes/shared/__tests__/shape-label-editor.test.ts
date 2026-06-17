@@ -549,6 +549,46 @@ describe('WeaveShapeLabelEditor', () => {
       editor.triggerEditMode(group, defaultTextBounds(), vi.fn());
       expect(() => editor.exitEditMode()).not.toThrow();
     });
+
+    it('7.6 re-selects the edited node via nodesSelection plugin on exit', async () => {
+      const group = makeGroup('node-resel');
+      const pluginMock = makePluginMock();
+
+      const instanceWithPlugin = createMockInstance();
+      instanceWithPlugin.getPlugin = vi.fn().mockReturnValue(pluginMock);
+      instanceWithPlugin.getStage().findOne = vi.fn().mockImplementation(
+        (selector: string) => (selector === `#node-resel` ? group : null)
+      );
+
+      const editorWithPlugin = new WeaveShapeLabelEditor(instanceWithPlugin as never);
+      editorWithPlugin.renderLabel(group, { id: 'node-resel', labelText: 'hi' }, defaultTextBounds());
+      editorWithPlugin.triggerEditMode(group, defaultTextBounds(), vi.fn());
+      editorWithPlugin.exitEditMode();
+
+      // requestAnimationFrame is polyfilled as setTimeout(fn, 0) in jsdom
+      await new Promise((resolve) => setTimeout(resolve, 0));
+
+      expect(pluginMock.setSelectedNodes).toHaveBeenCalledWith([group]);
+    });
+
+    it('7.7 does not throw when live group is missing at re-selection time', async () => {
+      const group = makeGroup('node-gone');
+      const pluginMock = makePluginMock();
+
+      const instanceWithPlugin = createMockInstance();
+      instanceWithPlugin.getPlugin = vi.fn().mockReturnValue(pluginMock);
+      // findOne always returns null (node destroyed before rAF fires)
+      instanceWithPlugin.getStage().findOne = vi.fn().mockReturnValue(null);
+
+      const editorWithPlugin = new WeaveShapeLabelEditor(instanceWithPlugin as never);
+      editorWithPlugin.renderLabel(group, { id: 'node-gone', labelText: 'hi' }, defaultTextBounds());
+      editorWithPlugin.triggerEditMode(group, defaultTextBounds(), vi.fn());
+      editorWithPlugin.exitEditMode();
+
+      await new Promise((resolve) => setTimeout(resolve, 0));
+
+      expect(pluginMock.setSelectedNodes).not.toHaveBeenCalled();
+    });
   });
 
   // ---------------------------------------------------------------------------

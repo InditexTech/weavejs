@@ -150,6 +150,9 @@ function makeCtx(overrides: Partial<SelectionContext> = {}): SelectionContext {
     getStagePanningPlugin: vi.fn().mockReturnValue(undefined),
     getStageGridPlugin: vi.fn().mockReturnValue(undefined),
     getNodesSelectionFeedbackPlugin: vi.fn().mockReturnValue(feedbackPlugin),
+    getActiveGroupContext: vi.fn().mockReturnValue(null),
+    enterGroupContext: vi.fn(),
+    exitGroupContext: vi.fn(),
     ...overrides,
   } as unknown as SelectionContext;
 }
@@ -456,5 +459,183 @@ describe('handleClickOrTap', () => {
     handleClickOrTap(ctx, e);
     const container = ctx.getWeaveInstance().getStage().container();
     expect(container.style.cursor).toBe('grab');
+  });
+
+  // ─── group context ───────────────────────────────────────────────────────────
+
+  it('exits group context when clicking on empty canvas while in group context', () => {
+    const ctx = makeCtx({
+      getActiveGroupContext: vi.fn().mockReturnValue('group-1'),
+    });
+    const stageInst = ctx.getWeaveInstance().getStage();
+    const e = makeEvent({}, stageInst);
+    handleClickOrTap(ctx, e);
+    expect(ctx.exitGroupContext).toHaveBeenCalled();
+    expect(ctx.getGesture().resetDoubleTap).toHaveBeenCalled();
+  });
+
+  it('does not call exitGroupContext when clicking on empty canvas with no group context', () => {
+    const ctx = makeCtx({ getActiveGroupContext: vi.fn().mockReturnValue(null) });
+    const stageInst = ctx.getWeaveInstance().getStage();
+    const e = makeEvent({}, stageInst);
+    handleClickOrTap(ctx, e);
+    expect(ctx.exitGroupContext).not.toHaveBeenCalled();
+  });
+
+  it('selects inner node when clicking inside the active group context (same parent)', () => {
+    const groupNode = makeNode({ id: 'group-1', nodeType: 'group' });
+    const innerNode = makeNode({ id: 'inner-1', nodeType: 'rect' });
+    innerNode.getParent = vi.fn().mockReturnValue({ getAttrs: vi.fn().mockReturnValue({ id: 'group-1' }) });
+
+    const stage = makeStage();
+    // stage.findOne returns the group so isNodeInsideGroup can traverse ancestry
+    (stage.findOne as ReturnType<typeof vi.fn>).mockImplementation((selector: string) => {
+      if (selector === '#group-1') return groupNode;
+      return undefined;
+    });
+    // groupNode.getParent returns null (it's top-level in stage)
+    groupNode.getParent = vi.fn().mockReturnValue(null);
+
+    const ctx = makeCtx({
+      getActiveGroupContext: vi.fn().mockReturnValue('group-1'),
+      getWeaveInstance: vi.fn().mockReturnValue({
+        getStage: vi.fn().mockReturnValue(stage),
+        getActiveAction: vi.fn().mockReturnValue('selectionTool'),
+        getStore: vi.fn().mockReturnValue({ getUser: vi.fn().mockReturnValue({ id: 'user-1' }) }),
+        getInstanceRecursive: vi.fn((n: unknown) => n),
+        getRealSelectedNode: vi.fn().mockReturnValue(innerNode),
+        getMainLayer: vi.fn().mockReturnValue({ getType: () => 'Layer' }),
+        emitEvent: vi.fn(),
+      }),
+    });
+    const trMock = makeTransformer();
+    ctx.getTransformerController().getTransformer = vi.fn().mockReturnValue(trMock);
+    const e = makeEvent({}, innerNode);
+
+    handleClickOrTap(ctx, e);
+
+    // Should NOT exit context (node is inside group)
+    expect(ctx.exitGroupContext).not.toHaveBeenCalled();
+    expect(trMock.nodes).toHaveBeenCalledWith([innerNode]);
+  });
+
+  it('enters deeper group context when clicking nested group child (parent !== activeContext)', () => {
+    const outerGroup = makeNode({ id: 'outer-group', nodeType: 'group' });
+    const innerNode = makeNode({ id: 'inner-node', nodeType: 'rect' });
+
+    // innerNode lives inside inner-group, which lives inside outer-group
+    // All parent proxy objects must have getParent() for isNodeInsideGroup traversal
+    const outerGroupProxy = {
+      getAttrs: vi.fn().mockReturnValue({ id: 'outer-group', nodeType: 'group' }),
+      getParent: vi.fn().mockReturnValue(null),
+    };
+    const innerGroupProxy = {
+      getAttrs: vi.fn().mockReturnValue({ id: 'inner-group', nodeType: 'group' }),
+      getParent: vi.fn().mockReturnValue(outerGroupProxy),
+    };
+    innerNode.getParent = vi.fn().mockReturnValue(innerGroupProxy);
+    outerGroup.getParent = vi.fn().mockReturnValue(null);
+
+    const stage = makeStage();
+    (stage.findOne as ReturnType<typeof vi.fn>).mockImplementation((selector: string) => {
+      if (selector === '#outer-group') return outerGroup;
+      return undefined;
+    });
+
+    const ctx = makeCtx({
+      getActiveGroupContext: vi.fn().mockReturnValue('outer-group'),
+      getWeaveInstance: vi.fn().mockReturnValue({
+        getStage: vi.fn().mockReturnValue(stage),
+        getActiveAction: vi.fn().mockReturnValue('selectionTool'),
+        getStore: vi.fn().mockReturnValue({ getUser: vi.fn().mockReturnValue({ id: 'user-1' }) }),
+        getInstanceRecursive: vi.fn((n: unknown) => n),
+        getRealSelectedNode: vi.fn().mockReturnValue(innerNode),
+        getMainLayer: vi.fn().mockReturnValue({ getType: () => 'Layer' }),
+        emitEvent: vi.fn(),
+      }),
+    });
+    const trMock = makeTransformer();
+    ctx.getTransformerController().getTransformer = vi.fn().mockReturnValue(trMock);
+    const e = makeEvent({}, innerNode);
+
+    handleClickOrTap(ctx, e);
+
+    // parentId (inner-group) !== activeGroupContext (outer-group) → enter inner-group context
+    expect(ctx.enterGroupContext).toHaveBeenCalledWith('inner-group');
+    expect(ctx.exitGroupContext).not.toHaveBeenCalled();
+  });
+
+  it('exits group context and re-resolves target when clicking outside the active group', () => {
+    const outsideNode = makeNode({ id: 'outside-node', nodeType: 'rect' });
+    outsideNode.getParent = vi.fn().mockReturnValue(null);
+
+    const stage = makeStage();
+    // findOne returns undefined → group not found → isNodeInsideGroup returns false
+    (stage.findOne as ReturnType<typeof vi.fn>).mockReturnValue(undefined);
+
+    const weaveInst = {
+      getStage: vi.fn().mockReturnValue(stage),
+      getActiveAction: vi.fn().mockReturnValue('selectionTool'),
+      getStore: vi.fn().mockReturnValue({ getUser: vi.fn().mockReturnValue({ id: 'user-1' }) }),
+      getInstanceRecursive: vi.fn((n: unknown) => n),
+      getRealSelectedNode: vi.fn().mockReturnValue(outsideNode),
+      getMainLayer: vi.fn().mockReturnValue({ getType: () => 'Layer' }),
+      emitEvent: vi.fn(),
+    };
+
+    const ctx = makeCtx({
+      getActiveGroupContext: vi.fn().mockReturnValue('group-1'),
+      getWeaveInstance: vi.fn().mockReturnValue(weaveInst),
+    });
+    const trMock = makeTransformer();
+    ctx.getTransformerController().getTransformer = vi.fn().mockReturnValue(trMock);
+    const e = makeEvent({}, outsideNode);
+
+    handleClickOrTap(ctx, e);
+
+    expect(ctx.exitGroupContext).toHaveBeenCalled();
+    // getInstanceRecursive called to re-resolve the target
+    expect(weaveInst.getInstanceRecursive).toHaveBeenCalledWith(outsideNode);
+  });
+
+  it('walks up to the topmost non-context group when no active group context', () => {
+    const topGroup = makeNode({ id: 'top-group', nodeType: 'group' });
+    const bottomGroup = makeNode({ id: 'bottom-group', nodeType: 'group' });
+    const leaf = makeNode({ id: 'leaf', nodeType: 'rect' });
+
+    // leaf → bottomGroup → topGroup → null
+    leaf.getParent = vi.fn().mockReturnValue({ getAttrs: vi.fn().mockReturnValue({ id: 'bottom-group', nodeType: 'group' }) });
+    const bottomGroupParent = { getAttrs: vi.fn().mockReturnValue({ id: 'top-group', nodeType: 'group' }), getParent: vi.fn().mockReturnValue(null) };
+    const leafParent = { getAttrs: vi.fn().mockReturnValue({ id: 'bottom-group', nodeType: 'group' }), getParent: vi.fn().mockReturnValue(bottomGroupParent) };
+    leaf.getParent = vi.fn().mockReturnValue(leafParent);
+    topGroup.getParent = vi.fn().mockReturnValue(null);
+    bottomGroup.getParent = vi.fn().mockReturnValue(topGroup);
+
+    const stage = makeStage();
+    (stage.findOne as ReturnType<typeof vi.fn>).mockReturnValue(undefined);
+
+    const ctx = makeCtx({
+      getActiveGroupContext: vi.fn().mockReturnValue(null),
+      getWeaveInstance: vi.fn().mockReturnValue({
+        getStage: vi.fn().mockReturnValue(stage),
+        getActiveAction: vi.fn().mockReturnValue('selectionTool'),
+        getStore: vi.fn().mockReturnValue({ getUser: vi.fn().mockReturnValue({ id: 'user-1' }) }),
+        getInstanceRecursive: vi.fn((n: unknown) => n),
+        getRealSelectedNode: vi.fn().mockReturnValue(leaf),
+        getMainLayer: vi.fn().mockReturnValue({ getType: () => 'Layer' }),
+        emitEvent: vi.fn(),
+      }),
+    });
+    const trMock = makeTransformer();
+    ctx.getTransformerController().getTransformer = vi.fn().mockReturnValue(trMock);
+    const e = makeEvent({}, leaf);
+
+    handleClickOrTap(ctx, e);
+
+    // Should have selected the top-level group (bottom-group's parent = top-group, top-group parent = null → stop)
+    // The while loop walks: leaf → leafParent (bottom-group) → bottomGroupParent (top-group) → null
+    // Result: nodeTargeted = bottomGroupParent (top-group)
+    const lastNodesCall = (trMock.nodes as ReturnType<typeof vi.fn>).mock.calls.slice(-1)[0]?.[0];
+    expect(lastNodesCall).toBeDefined();
   });
 });

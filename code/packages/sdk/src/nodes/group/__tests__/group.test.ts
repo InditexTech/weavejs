@@ -484,4 +484,83 @@ describe('WeaveGroupNode', () => {
       expect(konvaGroup.scaleY()).toBe(1);
     });
   });
+
+  // -------------------------------------------------------------------------
+  // Suite 10 — dblClick: enters group context via selection plugin
+  // -------------------------------------------------------------------------
+
+  describe('dblClick — group context', () => {
+    it('10.1 dblClick is a function on the rendered group', () => {
+      const { node } = makeNode();
+      const group = node.onRender(defaultProps()) as Konva.Group;
+      expect(typeof group.dblClick).toBe('function');
+    });
+
+    it('10.2 dblClick calls enterGroupContext with the group id when selection plugin is present', () => {
+      const { node, mock } = makeNode();
+      const group = node.onRender(defaultProps()) as Konva.Group;
+
+      const enterGroupContext = vi.fn();
+      const getPointerPosition = vi.fn().mockReturnValue(null);
+      const getLayerName = vi.fn().mockReturnValue('nodesSelection-layer');
+
+      mock.getPlugin.mockReturnValue({
+        enterGroupContext,
+        getLayerName,
+      });
+      mock.getStage.mockReturnValue({
+        getPointerPosition,
+        findOne: vi.fn().mockReturnValue(null),
+      });
+
+      group.dblClick();
+
+      // context is entered, then we return early because mousePos is null
+      expect(enterGroupContext).toHaveBeenCalledWith('group-id');
+    });
+
+    it('10.3 dblClick does nothing when selection plugin is absent', () => {
+      const { node, mock } = makeNode();
+      const group = node.onRender(defaultProps()) as Konva.Group;
+
+      mock.getPlugin.mockReturnValue(null);
+
+      expect(() => group.dblClick()).not.toThrow();
+    });
+
+    it('10.4 dblClick enters context first then selects the direct child under cursor via getInstanceRecursive', () => {
+      const { node, mock } = makeNode();
+      const group = node.onRender(defaultProps({ id: 'g1' })) as Konva.Group;
+
+      // Add a child that is a direct child of the group
+      const childRect = new Konva.Rect({ id: 'child-1', nodeType: 'rectangle' });
+      group.add(childRect);
+
+      const enterGroupContext = vi.fn();
+      const setSelectedNodes = vi.fn();
+      const triggerSelectedNodesEvent = vi.fn();
+      const getLayerName = vi.fn().mockReturnValue('selection-layer');
+      const selectionLayerMock = { listening: vi.fn() };
+
+      mock.getPlugin.mockReturnValue({
+        enterGroupContext,
+        setSelectedNodes,
+        triggerSelectedNodesEvent,
+        getLayerName,
+      });
+      mock.getStage.mockReturnValue({
+        getPointerPosition: vi.fn().mockReturnValue({ x: 50, y: 50 }),
+        getIntersection: vi.fn().mockReturnValue(childRect),
+        findOne: vi.fn().mockReturnValue(selectionLayerMock),
+      });
+      // getInstanceRecursive returns the direct child
+      (mock as Record<string, unknown>).getInstanceRecursive = vi.fn().mockReturnValue(childRect);
+
+      group.dblClick();
+
+      expect(enterGroupContext).toHaveBeenCalledWith('g1');
+      expect(setSelectedNodes).toHaveBeenCalledWith([childRect]);
+      expect(triggerSelectedNodesEvent).toHaveBeenCalled();
+    });
+  });
 });

@@ -107,6 +107,45 @@ export class WeaveGroupNode extends WeaveNode {
       group.scale({ x: 1, y: 1 });
     });
 
+    group.dblClick = () => {
+      const selectionPlugin =
+        this.instance.getPlugin<WeaveNodesSelectionPlugin>('nodesSelection');
+      if (!selectionPlugin) return;
+
+      const groupId = group.getAttrs().id ?? '';
+
+      // Enter context first so getInstanceRecursive respects the group boundary
+      selectionPlugin.enterGroupContext(groupId);
+
+      // Find the direct child under the cursor using the context-aware machinery
+      const stage = this.instance.getStage();
+      const mousePos = stage.getPointerPosition();
+      if (!mousePos) return;
+
+      // Disable selection layer so it doesn't intercept the hit test
+      const selectionLayer = stage.findOne(
+        '#' + selectionPlugin.getLayerName()
+      );
+      selectionLayer?.listening(false);
+      const intersected = stage.getIntersection(mousePos);
+      selectionLayer?.listening(true);
+
+      if (!intersected) return;
+
+      // getInstanceRecursive with stopAtGroupId stops at the direct child
+      // of the group, correctly handling any Konva inner shapes without nodeType
+      const directChild = this.instance.getInstanceRecursive(
+        intersected,
+        [],
+        groupId
+      );
+
+      if (directChild.getParent()?.getAttrs().id === groupId) {
+        selectionPlugin.setSelectedNodes([directChild]);
+        selectionPlugin.triggerSelectedNodesEvent();
+      }
+    };
+
     return group;
   }
 

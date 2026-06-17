@@ -77,6 +77,7 @@ import {
   WEAVE_NODES_SNAPPING_PLUGIN_KEY,
   DEFAULT_SNAPPING_MANAGER_CONFIG,
 } from '../constants';
+import { getNodeRect, getNodesRect } from '../utils';
 
 // ─── helpers ──────────────────────────────────────────────────────────────────
 
@@ -549,6 +550,93 @@ describe('WeaveNodesSnappingPlugin mapAnchor', () => {
     const { plugin } = setup();
     // @ts-expect-error accessing private for testing
     expect(plugin.mapAnchor('top-left', 270)).toBe('bottom-left');
+  });
+});
+
+// ─── calculateSelectionOffsets (private) ─────────────────────────────────────
+// These tests verify the fix for groups that "jump" when near a snap guide.
+// A Weave group lives at (0, 0) in its parent layer but its children (the
+// grouped shapes) keep their original canvas coordinates as relative positions
+// inside the group.  The snap offset must therefore be *signed* so that
+// `next.x = guide + snap.offset + selectionOffset.x` positions the group with
+// its bounding-box left edge exactly on the guide.
+
+describe('WeaveNodesSnappingPlugin calculateSelectionOffsets', () => {
+  it('computes zero offset for a regular node whose origin matches its bounding box', () => {
+    const { plugin, weave, mainLayer } = setup();
+    plugin.instance = weave as never;
+    plugin.onInit();
+
+    const node = {
+      x: vi.fn().mockReturnValue(50),
+      y: vi.fn().mockReturnValue(50),
+      getAttrs: vi.fn().mockReturnValue({}),
+    };
+
+    vi.mocked(getNodesRect).mockReturnValueOnce({ x: 50, y: 50, width: 100, height: 50 });
+    vi.mocked(getNodeRect).mockReturnValueOnce({ x: 50, y: 50, width: 100, height: 50 });
+
+    // @ts-expect-error accessing private method for testing
+    plugin.calculateSelectionOffsets([node], mainLayer, mainLayer);
+
+    expect(plugin.selectionOffsets[0]).toEqual({ x: 0, y: 0 });
+  });
+
+  it('computes a negative offset for a group whose bounding box extends beyond its origin', () => {
+    // Group placed at (0, 0) but its children's bounding box starts at (100, 80).
+    // Without the fix (Math.abs) the offset would be +100 and the group would
+    // snap to guide + 200 instead of guide.
+    const { plugin, weave, mainLayer } = setup();
+    plugin.instance = weave as never;
+    plugin.onInit();
+
+    const group = {
+      x: vi.fn().mockReturnValue(0),
+      y: vi.fn().mockReturnValue(0),
+      getAttrs: vi.fn().mockReturnValue({}),
+    };
+
+    vi.mocked(getNodesRect).mockReturnValueOnce({ x: 100, y: 80, width: 200, height: 150 });
+    vi.mocked(getNodeRect).mockReturnValueOnce({ x: 100, y: 80, width: 200, height: 150 });
+
+    // @ts-expect-error accessing private method for testing
+    plugin.calculateSelectionOffsets([group], mainLayer, mainLayer);
+
+    // signed diff: x = 0 - 100 = -100, y = 0 - 80 = -80
+    expect(plugin.selectionOffsets[0]).toEqual({ x: -100, y: -80 });
+  });
+
+  it('maintains correct relative spacing between a group and a regular node in multi-selection', () => {
+    // Group at (0, 0), children bounding box at x=100.
+    // Rect at (300, 0), bounding box also at x=300.
+    // Combined bounding box starts at x=100.
+    const { plugin, weave, mainLayer } = setup();
+    plugin.instance = weave as never;
+    plugin.onInit();
+
+    const group = {
+      x: vi.fn().mockReturnValue(0),
+      y: vi.fn().mockReturnValue(0),
+      getAttrs: vi.fn().mockReturnValue({}),
+    };
+    const rect = {
+      x: vi.fn().mockReturnValue(300),
+      y: vi.fn().mockReturnValue(0),
+      getAttrs: vi.fn().mockReturnValue({}),
+    };
+
+    vi.mocked(getNodesRect).mockReturnValueOnce({ x: 100, y: 0, width: 300, height: 100 });
+    vi.mocked(getNodeRect)
+      .mockReturnValueOnce({ x: 100, y: 0, width: 100, height: 100 })  // group bbox
+      .mockReturnValueOnce({ x: 300, y: 0, width: 100, height: 100 }); // rect bbox
+
+    // @ts-expect-error accessing private method for testing
+    plugin.calculateSelectionOffsets([group, rect], mainLayer, mainLayer);
+
+    // group: (100 - 100) + (0 - 100) = -100
+    expect(plugin.selectionOffsets[0].x).toBe(-100);
+    // rect: (300 - 100) + (300 - 300) = 200
+    expect(plugin.selectionOffsets[1].x).toBe(200);
   });
 });
 

@@ -248,7 +248,8 @@ describe('19 — getTargetedNode', () => {
 
     const result = getTargetedNode(instance as never);
     expect(result).toBe(shape);
-    expect(instance.getInstanceRecursive).toHaveBeenCalledWith(shape);
+    // getTargetedNode forwards the active group context (null → undefined) as third arg
+    expect(instance.getInstanceRecursive).toHaveBeenCalledWith(shape, [], undefined);
   });
 });
 
