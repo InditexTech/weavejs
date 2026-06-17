@@ -72,6 +72,14 @@ function makeLayer() {
 }
 
 function makeStage(opts: { scaleX?: number; findOne?: unknown } = {}) {
+  const stageAbsTransformMock = {
+    copy: vi.fn().mockReturnValue({
+      invert: vi.fn().mockReturnValue({
+        // Identity stage transform: canvas pixels == scene coords
+        point: vi.fn().mockImplementation(({ x, y }: { x: number; y: number }) => ({ x, y })),
+      }),
+    }),
+  };
   return {
     scaleX: vi.fn().mockReturnValue(opts.scaleX ?? 1),
     scaleY: vi.fn().mockReturnValue(1),
@@ -90,6 +98,7 @@ function makeStage(opts: { scaleX?: number; findOne?: unknown } = {}) {
           }
     ),
     getParent: vi.fn().mockReturnValue(null),
+    getAbsoluteTransform: vi.fn().mockReturnValue(stageAbsTransformMock),
   };
 }
 
@@ -333,7 +342,10 @@ describe('WeaveNodesSnappingGuides.renderSnapGuides', () => {
 
   it('adjusts guide value by containerNode position when containerId !== mainLayer', () => {
     const containerNode = {
-      getClientRect: vi.fn().mockReturnValue({ x: 50, y: 0, width: 300, height: 300 }),
+      // Step 1: container-local → canvas pixels (translate by 50 on x)
+      getAbsoluteTransform: vi.fn().mockReturnValue({
+        point: vi.fn().mockImplementation(({ x }: { x: number }) => ({ x: 50 + x, y: 0 })),
+      }),
     };
     const { guidesManager, stage, layer } = setup({
       findOne: containerNode,
@@ -348,17 +360,22 @@ describe('WeaveNodesSnappingGuides.renderSnapGuides', () => {
       diff: 1,
       kind: 'static' as const,
     };
-    // Container is a frame node (not stage); its parent is the stage
+    // Container is a frame node (not stage or mainLayer).
+    // getVisibleStageRect walks up to find the nearest frame ancestor; the
+    // container itself has nodeType 'frame' so it is used directly.
     const container = {
       id: vi.fn().mockReturnValue('frame1'),
       getParent: vi.fn().mockReturnValue(stage),
       position: vi.fn().mockReturnValue({ x: 0, y: 0 }),
       getClientRect: vi.fn().mockReturnValue({ x: 50, y: 0, width: 300, height: 300 }),
+      getAttrs: vi.fn().mockReturnValue({ nodeType: 'frame' }),
     };
 
     guidesManager.renderSnapGuides(container as never, snap);
 
-    // The line should be added — value = containerPos.x + snap.guide = 50 + 10 = 60
+    // Step 1: containerNode.getAbsoluteTransform().point({x: 10}) → {x: 60}
+    // Step 2: stage.getAbsoluteTransform().copy().invert().point({x: 60}) → {x: 60} (identity)
+    // → value = 60; line is added to layer
     expect(layer.add).toHaveBeenCalled();
   });
 });

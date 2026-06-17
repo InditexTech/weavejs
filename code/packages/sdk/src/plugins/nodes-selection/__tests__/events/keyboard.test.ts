@@ -67,6 +67,9 @@ function makeCtx(): { ctx: SelectionContext; container: HTMLDivElement; listener
     getStagePanningPlugin: vi.fn().mockReturnValue(undefined),
     getStageGridPlugin: vi.fn().mockReturnValue(undefined),
     getNodesSelectionFeedbackPlugin: vi.fn().mockReturnValue(undefined),
+    getActiveGroupContext: vi.fn().mockReturnValue(null),
+    enterGroupContext: vi.fn(),
+    exitGroupContext: vi.fn(),
   } as unknown as SelectionContext;
 
   return { ctx, container, listeners };
@@ -115,6 +118,22 @@ describe('registerKeyboardHandlers', () => {
       expect(ctx.setSpaceKeyPressed).not.toHaveBeenCalled();
       expect(ctx.removeSelectedNodes).not.toHaveBeenCalled();
     });
+    it('calls exitGroupContext() and stops propagation when Escape is pressed in group context', () => {
+      (ctx.getActiveGroupContext as ReturnType<typeof vi.fn>).mockReturnValue('group-1');
+      const event = new KeyboardEvent('keydown', { code: 'Escape', bubbles: true });
+      const stopPropagation = vi.spyOn(event, 'stopPropagation');
+      const handler = listeners['keydown'];
+      handler?.(event);
+      expect(ctx.exitGroupContext).toHaveBeenCalled();
+      expect(stopPropagation).toHaveBeenCalled();
+    });
+
+    it('does not call exitGroupContext() when Escape is pressed with no group context', () => {
+      (ctx.getActiveGroupContext as ReturnType<typeof vi.fn>).mockReturnValue(null);
+      fireKey(listeners, 'keydown', 'Escape');
+      expect(ctx.exitGroupContext).not.toHaveBeenCalled();
+    });
+
   });
 
   describe('keyup', () => {

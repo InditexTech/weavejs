@@ -79,6 +79,11 @@ export function handlePointerDown(
     }
   }
 
+  const activeGroupContext = ctx.getActiveGroupContext();
+  if (activeGroupContext !== null) {
+    ctx.exitGroupContext();
+  }
+
   ctx.selectNone();
   ctx.triggerSelectedNodesEvent();
 

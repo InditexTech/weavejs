@@ -292,6 +292,26 @@ export function getBoundingBox(
   };
 }
 
+/**
+ * Builds an array of Weave node IDs from `groupId` up to the root,
+ * including only nodes that have a `nodeType` attribute (actual Weave nodes,
+ * not Konva stage/layer). Used as the multi-stop set for `getInstanceRecursive`
+ * and group-context ancestor checks.
+ */
+export function buildAncestorGroupIds(
+  groupId: string,
+  stage: Konva.Stage
+): string[] {
+  const ids: string[] = [];
+  let cur: Konva.Node | null = (stage.findOne(`#${groupId}`) as Konva.Node | null) ?? null;
+  while (cur) {
+    const id = cur.getAttrs().id;
+    if (id && cur.getAttrs().nodeType) ids.push(id);
+    cur = cur.getParent();
+  }
+  return ids;
+}
+
 export function getTargetedNode(instance: Weave): Konva.Node | undefined {
   const stage = instance.getStage();
   let selectedGroup: Konva.Node | undefined = undefined;
@@ -299,7 +319,15 @@ export function getTargetedNode(instance: Weave): Konva.Node | undefined {
   if (mousePos) {
     const inter = stage.getIntersection(mousePos);
     if (inter) {
-      selectedGroup = instance.getInstanceRecursive(inter);
+      const selectionPlugin =
+        instance.getPlugin<WeaveNodesSelectionPlugin>('nodesSelection');
+      const activeGroupContext = selectionPlugin?.getActiveGroupContext() ?? undefined;
+      // When in group context, pass the full ancestor ID set so nodes in
+      // ancestor groups resolve to themselves (not their containing group)
+      const stopIds: string | string[] | undefined = activeGroupContext
+        ? buildAncestorGroupIds(activeGroupContext, stage)
+        : undefined;
+      selectedGroup = instance.getInstanceRecursive(inter, [], stopIds);
     }
   }
   return selectedGroup;
@@ -567,7 +595,10 @@ export function getVisibleNodes({
       return;
     }
 
-    if (node.getParent()?.getAttrs().nodeType === 'group') {
+    if (
+      node.getParent()?.getAttrs().nodeType === 'group' &&
+      node.getParent()?.getAttrs().id !== referenceLayer?.getAttrs().id
+    ) {
       return;
     }
 

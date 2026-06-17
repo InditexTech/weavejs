@@ -579,6 +579,17 @@ export class WeaveNodesSnappingPlugin extends WeavePlugin {
       }
     }
 
+    // When inside a group context the dragged nodes' direct parent IS the group
+    // node itself (no intermediate container with nodeId like frames have).
+    if (
+      container !== this.instance.getMainLayer() &&
+      !container.getAttrs().nodeId &&
+      container.getAttrs().nodeType === 'group'
+    ) {
+      this.relativeTo = container;
+      this.relativeToId = container.id();
+    }
+
     if (!this.relativeTo) {
       return;
     }
@@ -629,8 +640,8 @@ export class WeaveNodesSnappingPlugin extends WeavePlugin {
       }
 
       const diff: Konva.Vector2d = {
-        x: Math.abs(nodeBox.x - node.x()),
-        y: Math.abs(nodeBox.y - node.y()),
+        x: node.x() - nodeBox.x,
+        y: node.y() - nodeBox.y,
       };
 
       this.selectionOffsets.push({

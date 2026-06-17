@@ -144,8 +144,8 @@ describe('Weave — stage proxy methods', () => {
     const node = {} as any;
     const result = {} as any;
     (weave as any).stageManager.getInstanceRecursive.mockReturnValue(result);
-    expect(weave.getInstanceRecursive(node, ['Group'])).toBe(result);
-    expect((weave as any).stageManager.getInstanceRecursive).toHaveBeenCalledWith(node, ['Group']);
+    expect(weave.getInstanceRecursive(node, ['Group'], 'group-123')).toBe(result);
+    expect((weave as any).stageManager.getInstanceRecursive).toHaveBeenCalledWith(node, ['Group'], 'group-123');
   });
 
   it('getContainerNodes() delegates to stageManager.getContainerNodes()', () => {

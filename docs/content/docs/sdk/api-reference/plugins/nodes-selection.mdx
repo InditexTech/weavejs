@@ -58,6 +58,7 @@ type WeaveSelection = {
 type WeaveNodesSelectionPluginOnSelectionStateEvent = boolean;
 type WeaveNodesSelectionPluginOnNodesChangeEvent = WeaveSelection[];
 type WeaveNodesSelectionPluginOnStageSelectionEvent = undefined;
+type WeaveNodesSelectionPluginOnGroupContextChangeEvent = string | null;
 
 type WeaveNodesSelectionOnSelectionParams = {
   resizeEnabled: boolean;
@@ -241,6 +242,37 @@ removeSelectedNodes(): void
 
 This method removes the selected nodes of the underlying Transformer of the plugin.
 
+## Group context
+
+### getActiveGroupContext
+
+```ts
+getActiveGroupContext(): string | null
+```
+
+This method returns the ID of the group currently in edit context, or `null` if no group context
+is active.
+
+### enterGroupContext
+
+```ts
+enterGroupContext(groupId: string): void
+```
+
+This method enters edit context for the group with the given ID. Direct children of the group
+become individually draggable and the current selection is cleared. An `onGroupContextChange`
+event is emitted with the `groupId`.
+
+### exitGroupContext
+
+```ts
+exitGroupContext(): void
+```
+
+This method exits the active group edit context, restoring children to their default
+non-draggable state and clearing the selection. An `onGroupContextChange` event is emitted
+with `null`.
+
 ## Events
 
 ### onSelectionState
@@ -268,3 +300,13 @@ onStageSelection: WeaveNodesSelectionPluginOnStageSelectionEvent;
 
 The `onStageSelection` event is called when an user selected the stage,
 meaning there is no nodes selected.
+
+### onGroupContextChange
+
+```ts
+onGroupContextChange: WeaveNodesSelectionPluginOnGroupContextChangeEvent;
+```
+
+The `onGroupContextChange` event is called when the active group edit context changes.
+The payload is the `groupId` of the group that was entered, or `null` when the context
+was exited.

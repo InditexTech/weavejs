@@ -17,6 +17,7 @@ import {
 import {
   type WeaveNodesSelectionConfig,
   type WeaveNodesSelectionPluginOnNodesChangeEvent,
+  type WeaveNodesSelectionPluginOnGroupContextChangeEvent,
   type WeaveNodesSelectionPluginParams,
 } from './types';
 import { type WeaveNode } from '@/nodes/node';
@@ -69,8 +70,9 @@ export class WeaveNodesSelectionPlugin
   private pointers!: Record<number, PointerEvent>;
   private _handledClickOrTap: boolean = false;
   private dragSelectedNodes: Konva.Node[] = [];
+  private _activeGroupContext: string | null = null;
 
-  onRender: undefined;
+  onRender = undefined;
 
   constructor(params?: WeaveNodesSelectionPluginParams) {
     super();
@@ -102,6 +104,8 @@ export class WeaveNodesSelectionPlugin
     this.enabled = false;
     this.pointers = {};
     this.dragSelectedNodes = [];
+    this._handledClickOrTap = false;
+    this._activeGroupContext = null;
   }
 
 
@@ -288,6 +292,10 @@ export class WeaveNodesSelectionPlugin
     this.instance.addEventListener(
       'onNodeRemoved',
       (node: NodeSerializable) => {
+        // If the removed node is the active group context, exit immediately
+        if (this._activeGroupContext === node.id) {
+          this.exitGroupContext();
+        }
         const selectedNodes = this.getSelectedNodes();
         const newSelectedNodes = selectedNodes.filter(
           (actNode) => actNode.getAttrs().id !== node.id
@@ -300,7 +308,59 @@ export class WeaveNodesSelectionPlugin
     );
   }
 
-  private getLayer() {
+  // ── Group context ───────────────────────────────────────────────────────────
+
+  getActiveGroupContext(): string | null {
+    return this._activeGroupContext;
+  }
+
+  enterGroupContext(groupId: string): void {
+    const stage = this.instance.getStage();
+    const groupNode = stage.findOne(`#${groupId}`) as Konva.Group | undefined;
+    if (!groupNode) return;
+
+    this._activeGroupContext = groupId;
+
+    // Make direct children draggable so they can be moved individually
+    groupNode.getChildren().forEach((child) => {
+      child.setAttr('draggable', true);
+    });
+
+    this.selectNone();
+
+    this.instance.emitEvent<WeaveNodesSelectionPluginOnGroupContextChangeEvent>(
+      'onGroupContextChange',
+      groupId
+    );
+  }
+
+  exitGroupContext(): void {
+    if (this._activeGroupContext === null) return;
+
+    const stage = this.instance.getStage();
+    const groupNode = stage.findOne(`#${this._activeGroupContext}`) as
+      | Konva.Group
+      | undefined;
+
+    if (groupNode) {
+      // Restore children to non-draggable
+      groupNode.getChildren().forEach((child) => {
+        child.setAttr('draggable', false);
+      });
+    }
+
+    this._activeGroupContext = null;
+    this.selectNone();
+
+    this.instance.emitEvent<WeaveNodesSelectionPluginOnGroupContextChangeEvent>(
+      'onGroupContextChange',
+      null
+    );
+  }
+
+  // ── Overlay ─────────────────────────────────────────────────────────────────
+
+  private getLayer(): Konva.Layer | undefined {
     const stage = this.instance.getStage();
     return stage.findOne(`#${this.getLayerName()}`) as Konva.Layer | undefined;
   }

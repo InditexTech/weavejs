@@ -551,9 +551,14 @@ export class Weave {
 
   getInstanceRecursive(
     instance: Konva.Node,
-    filterInstanceType: string[] = []
+    filterInstanceType: string[] = [],
+    stopAtGroupId?: string | string[]
   ): Konva.Node {
-    return this.stageManager.getInstanceRecursive(instance, filterInstanceType);
+    return this.stageManager.getInstanceRecursive(
+      instance,
+      filterInstanceType,
+      stopAtGroupId
+    );
   }
 
   getContainerNodes(): WeaveElementInstance[] {

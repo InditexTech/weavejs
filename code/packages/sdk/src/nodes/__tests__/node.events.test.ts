@@ -122,6 +122,7 @@ function createMockInstance() {
     getHoverTransformer: vi.fn().mockReturnValue(mockHoverTransformer),
     setSelectedNodes: vi.fn(),
     restoreNodesOpacityOnDrag: vi.fn(),
+    getActiveGroupContext: vi.fn().mockReturnValue(null),
   };
   const mockFeedbackPlugin = {
     hideSelectionHalo: vi.fn(),

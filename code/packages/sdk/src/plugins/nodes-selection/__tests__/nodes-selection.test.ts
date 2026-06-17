@@ -902,6 +902,114 @@ describe('WeaveNodesSelectionPlugin', () => {
       const cfg = plugin.getSelectorConfig();
       expect(cfg).toBeDefined();
     });
+
+    it('getBoundBoxFunc() delegates to transformerCtrl', () => {
+      const { plugin } = makePlugin();
+      plugin.onInit!();
+      const result = plugin.getBoundBoxFunc();
+      // Returns a function or undefined — just verify it doesn't throw
+      expect(result === undefined || typeof result === 'function').toBe(true);
+    });
+  });
+
+  describe('group context', () => {
+    it('getActiveGroupContext() returns null initially', () => {
+      const { plugin } = makePlugin();
+      expect(plugin.getActiveGroupContext()).toBeNull();
+    });
+
+    it('enterGroupContext() sets active context, makes children draggable, and emits event', () => {
+      const { plugin, weave } = makePlugin();
+      plugin.onInit!();
+      const child1 = { setAttr: vi.fn() };
+      const mockGroupNode = { getChildren: vi.fn().mockReturnValue([child1]) };
+      (weave.getStage().findOne as ReturnType<typeof vi.fn>).mockReturnValue(mockGroupNode);
+
+      plugin.enterGroupContext('group-1');
+
+      expect(plugin.getActiveGroupContext()).toBe('group-1');
+      expect(child1.setAttr).toHaveBeenCalledWith('draggable', true);
+      expect(weave.emitEvent).toHaveBeenCalledWith('onGroupContextChange', 'group-1');
+    });
+
+    it('enterGroupContext() returns early when group node is not found', () => {
+      const { plugin, weave } = makePlugin();
+      plugin.onInit!();
+      (weave.getStage().findOne as ReturnType<typeof vi.fn>).mockReturnValue(undefined);
+
+      plugin.enterGroupContext('missing-group');
+
+      expect(plugin.getActiveGroupContext()).toBeNull();
+      expect(weave.emitEvent).not.toHaveBeenCalledWith('onGroupContextChange', expect.anything());
+    });
+
+    it('exitGroupContext() restores children to non-draggable, clears context, and emits event', () => {
+      const { plugin, weave } = makePlugin();
+      plugin.onInit!();
+      const child1 = { setAttr: vi.fn() };
+      const mockGroupNode = { getChildren: vi.fn().mockReturnValue([child1]) };
+      (weave.getStage().findOne as ReturnType<typeof vi.fn>).mockReturnValue(mockGroupNode);
+      plugin.enterGroupContext('group-1');
+
+      plugin.exitGroupContext();
+
+      expect(plugin.getActiveGroupContext()).toBeNull();
+      expect(child1.setAttr).toHaveBeenCalledWith('draggable', false);
+      expect(weave.emitEvent).toHaveBeenCalledWith('onGroupContextChange', null);
+    });
+
+    it('exitGroupContext() is a no-op when no group context is active', () => {
+      const { plugin, weave } = makePlugin();
+      plugin.onInit!();
+      const callCountBefore = (weave.emitEvent as ReturnType<typeof vi.fn>).mock.calls.length;
+
+      plugin.exitGroupContext();
+
+      expect((weave.emitEvent as ReturnType<typeof vi.fn>).mock.calls.length).toBe(callCountBefore);
+      expect(plugin.getActiveGroupContext()).toBeNull();
+    });
+
+    it('exitGroupContext() works even when the group node is no longer on the stage', () => {
+      const { plugin, weave } = makePlugin();
+      plugin.onInit!();
+      const child1 = { setAttr: vi.fn() };
+      const mockGroupNode = { getChildren: vi.fn().mockReturnValue([child1]) };
+      (weave.getStage().findOne as ReturnType<typeof vi.fn>).mockReturnValue(mockGroupNode);
+      plugin.enterGroupContext('group-1');
+      // Group node gone from stage
+      (weave.getStage().findOne as ReturnType<typeof vi.fn>).mockReturnValue(undefined);
+
+      plugin.exitGroupContext();
+
+      expect(plugin.getActiveGroupContext()).toBeNull();
+      expect(weave.emitEvent).toHaveBeenCalledWith('onGroupContextChange', null);
+    });
+
+    it('onNodeRemoved exits group context when the removed node is the active group', () => {
+      const { plugin, weave } = makePlugin();
+      plugin.onInit!();
+      const child1 = { setAttr: vi.fn() };
+      const mockGroupNode = { getChildren: vi.fn().mockReturnValue([child1]) };
+      (weave.getStage().findOne as ReturnType<typeof vi.fn>).mockReturnValue(mockGroupNode);
+      plugin.enterGroupContext('group-to-remove');
+
+      weave._trigger('onNodeRemoved', { id: 'group-to-remove' });
+
+      expect(plugin.getActiveGroupContext()).toBeNull();
+    });
+
+    it('onNodeRemoved does NOT exit context when a different node is removed', () => {
+      const { plugin, weave } = makePlugin();
+      plugin.onInit!();
+      const child1 = { setAttr: vi.fn() };
+      const mockGroupNode = { getChildren: vi.fn().mockReturnValue([child1]) };
+      (weave.getStage().findOne as ReturnType<typeof vi.fn>).mockReturnValue(mockGroupNode);
+      plugin.enterGroupContext('group-1');
+
+      weave._trigger('onNodeRemoved', { id: 'some-other-node' });
+
+      expect(plugin.getActiveGroupContext()).toBe('group-1');
+    });
   });
 
   describe('initLayer()', () => {
