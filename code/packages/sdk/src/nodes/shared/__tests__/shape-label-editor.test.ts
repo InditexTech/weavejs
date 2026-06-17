@@ -565,7 +565,9 @@ describe('WeaveShapeLabelEditor', () => {
       editorWithPlugin.triggerEditMode(group, defaultTextBounds(), vi.fn());
       editorWithPlugin.exitEditMode();
 
-      // requestAnimationFrame is polyfilled as setTimeout(fn, 0) in jsdom
+      // requestAnimationFrame is polyfilled as setTimeout(fn, 0) in jsdom;
+      // two ticks are needed because rAF fires after the first macrotask flush.
+      await new Promise((resolve) => setTimeout(resolve, 0));
       await new Promise((resolve) => setTimeout(resolve, 0));
 
       expect(pluginMock.setSelectedNodes).toHaveBeenCalledWith([group]);
