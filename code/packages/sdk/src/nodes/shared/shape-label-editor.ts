@@ -218,6 +218,9 @@ export class WeaveShapeLabelEditor {
     this.instance.getStage().mode(WEAVE_STAGE_DEFAULT_MODE);
     this.editing = false;
 
+    // Capture the id before nulling so we can re-select after re-enabling.
+    const editedGroupId = this.editingGroup?.id() ?? null;
+
     // Restore label visibility on the live node (onUpdate will set the
     // authoritative value once the committed text arrives via Yjs).
     if (this.editingGroup) {
@@ -248,6 +251,18 @@ export class WeaveShapeLabelEditor {
       this.instance.getPlugin<WeaveNodesSelectionPlugin>('nodesSelection');
     if (selectionPlugin) {
       this.instance.enablePlugin('nodesSelection');
+      // Re-select the shape that was being edited so the user does not have to
+      // click again after finishing label input.
+      if (editedGroupId) {
+        requestAnimationFrame(() => {
+          const liveGroup = this.instance
+            .getStage()
+            .findOne<Konva.Group>(`#${editedGroupId}`);
+          if (liveGroup) {
+            selectionPlugin.setSelectedNodes([liveGroup]);
+          }
+        });
+      }
     }
   }
 
