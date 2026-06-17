@@ -88,7 +88,7 @@ export function handleClickOrTap(
       // so the outer node (group or top-level node) is selected normally
       nodeTargeted = weave.getInstanceRecursive(
         nodeTargeted
-      ) as typeof nodeTargeted;
+      );
     }
   }
 
@@ -153,7 +153,7 @@ export function handleClickOrTap(
     cur = p;
     p = cur.getParent();
   }
-  nodeTargeted = cur as typeof nodeTargeted;
+  nodeTargeted = cur;
 
   if (ctx.getGesture().isDoubleTap && !metaPressed) {
     ctx.getGesture().resetDoubleTap();

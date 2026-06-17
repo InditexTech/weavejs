@@ -335,21 +335,9 @@ export abstract class WeaveNode implements WeaveNodeBase {
 
     // Don't show hover border on the active group or any of its ancestors
     // while in group-edit context (e.g. group inside a frame — suppress frame hover too)
-    const activeGroupId = selectionPlugin.getActiveGroupContext();
-    if (activeGroupId !== null) {
-      const stage = this.instance.getStage();
-      const activeGroupNode = stage.findOne(`#${activeGroupId}`);
-      if (activeGroupNode) {
-        const hoveredId = node.getAttrs().id ?? '';
-        let current: Konva.Node | null = activeGroupNode;
-        while (current) {
-          if ((current.getAttrs().id ?? '') === hoveredId) {
-            this.hideHoverState();
-            return;
-          }
-          current = current.getParent();
-        }
-      }
+    if (this.isHoverSuppressedByGroupContext(node, selectionPlugin)) {
+      this.hideHoverState();
+      return;
     }
 
     if (node?.canBeHovered?.()) {
@@ -359,6 +347,23 @@ export abstract class WeaveNode implements WeaveNodeBase {
     }
 
     selectionPlugin.getHoverTransformer().moveToTop();
+  }
+
+  private isHoverSuppressedByGroupContext(
+    node: Konva.Node,
+    selectionPlugin: WeaveNodesSelectionPlugin
+  ): boolean {
+    const activeGroupId = selectionPlugin.getActiveGroupContext();
+    if (activeGroupId === null) return false;
+    const activeGroupNode = this.instance.getStage().findOne(`#${activeGroupId}`);
+    if (!activeGroupNode) return false;
+    const hoveredId = node.getAttrs().id ?? '';
+    let current: Konva.Node | null = activeGroupNode;
+    while (current) {
+      if ((current.getAttrs().id ?? '') === hoveredId) return true;
+      current = current.getParent();
+    }
+    return false;
   }
 
   protected hideHoverState(): void {

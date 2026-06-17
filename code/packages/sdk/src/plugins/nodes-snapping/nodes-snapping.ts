@@ -586,7 +586,7 @@ export class WeaveNodesSnappingPlugin extends WeavePlugin {
       !container.getAttrs().nodeId &&
       container.getAttrs().nodeType === 'group'
     ) {
-      this.relativeTo = container as Konva.Group;
+      this.relativeTo = container;
       this.relativeToId = container.id();
     }
 

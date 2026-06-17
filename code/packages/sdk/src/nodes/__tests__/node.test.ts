@@ -878,6 +878,72 @@ describe('WeaveNode', () => {
         []
       );
     });
+
+    it('8.11 group context suppresses hover on the active group node itself', () => {
+      const { node, mock } = makeNode();
+      const group = createRenderableGroup();
+      const hoveredId = group.getAttrs().id ?? 'test-id';
+      const mockGroupNode = {
+        getAttrs: vi.fn().mockReturnValue({ id: hoveredId }),
+        getParent: vi.fn().mockReturnValue(null),
+      };
+      mock._selectionPlugin.getActiveGroupContext.mockReturnValue(hoveredId);
+      mock._stage.findOne = vi.fn().mockReturnValue(mockGroupNode);
+
+      getPrivateNode(node).setHoverState(group);
+
+      expect(mock._hoverTransformer.nodes).toHaveBeenCalledWith([]);
+    });
+
+    it('8.12 group context suppresses hover on ancestors of the active group', () => {
+      const { node, mock } = makeNode();
+      const ancestor = createRenderableGroup({ id: 'ancestor-id' });
+      const ancestorId = ancestor.getAttrs().id ?? 'ancestor-id';
+      // activeGroupNode's parent is the ancestor being hovered
+      const mockGroupNode = {
+        getAttrs: vi.fn().mockReturnValue({ id: 'active-group' }),
+        getParent: vi.fn().mockReturnValue({
+          getAttrs: vi.fn().mockReturnValue({ id: ancestorId }),
+          getParent: vi.fn().mockReturnValue(null),
+        }),
+      };
+      mock._selectionPlugin.getActiveGroupContext.mockReturnValue('active-group');
+      mock._stage.findOne = vi.fn().mockReturnValue(mockGroupNode);
+
+      getPrivateNode(node).setHoverState(ancestor);
+
+      expect(mock._hoverTransformer.nodes).toHaveBeenCalledWith([]);
+    });
+
+    it('8.13 group context does NOT suppress hover for nodes outside the active group tree', () => {
+      const { node, mock } = makeNode();
+      const outsideNode = createRenderableGroup({ id: 'outside-id' });
+      node.setupDefaultNodeAugmentation(outsideNode);
+      const mockGroupNode = {
+        getAttrs: vi.fn().mockReturnValue({ id: 'active-group' }),
+        getParent: vi.fn().mockReturnValue(null),
+      };
+      mock._selectionPlugin.getActiveGroupContext.mockReturnValue('active-group');
+      mock._stage.findOne = vi.fn().mockReturnValue(mockGroupNode);
+
+      getPrivateNode(node).setHoverState(outsideNode);
+
+      // Hover should NOT be suppressed — outsideNode is not in the group's ancestor chain
+      expect(mock._hoverTransformer.nodes).toHaveBeenCalledWith([outsideNode]);
+    });
+
+    it('8.14 group context active but activeGroupNode not found → hover shown normally', () => {
+      const { node, mock } = makeNode();
+      const group = createRenderableGroup();
+      node.setupDefaultNodeAugmentation(group);
+      mock._selectionPlugin.getActiveGroupContext.mockReturnValue('ghost-group');
+      mock._stage.findOne = vi.fn().mockReturnValue(null);
+
+      getPrivateNode(node).setHoverState(group);
+
+      // activeGroupNode is null → isHoverSuppressedByGroupContext returns false
+      expect(mock._hoverTransformer.nodes).toHaveBeenCalledWith([group]);
+    });
   });
 
   describe('9 — handleMouseOver', () => {
