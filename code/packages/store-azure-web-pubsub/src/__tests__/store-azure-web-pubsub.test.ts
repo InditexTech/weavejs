@@ -226,6 +226,7 @@ describe('WeaveStoreAzureWebPubsub', () => {
     mockState.WeaveStoreAzureWebPubSubSyncClient.mockClear();
     mockState.IndexeddbPersistence.mockClear();
     mockState.mockIndexedDbPersistence.destroy.mockClear();
+    vi.spyOn(WeaveStoreAzureWebPubsub, 'roomHasIndexedDbData').mockResolvedValue(false);
   });
 
   describe('constructor', () => {
@@ -273,7 +274,7 @@ describe('WeaveStoreAzureWebPubsub', () => {
   });
 
   describe('loadRoomInitialData', () => {
-    it('loads Uint8Array room data on first connected status', () => {
+    it('loads Uint8Array room data on first connected status', async () => {
       const sourceDoc = new Y.Doc();
       sourceDoc.getMap('weave').set('key', 'value');
       const initialRoomData = Y.encodeStateAsUpdate(sourceDoc);
@@ -282,7 +283,7 @@ describe('WeaveStoreAzureWebPubsub', () => {
       const provider = getLatestProvider();
       const onStatusHandler = getProviderHandler(provider, 'status');
 
-      onStatusHandler(WEAVE_STORE_CONNECTION_STATUS.CONNECTED);
+      await onStatusHandler(WEAVE_STORE_CONNECTION_STATUS.CONNECTED);
 
       expect(testStore._loadDocumentData).toBe(initialRoomData);
       expect(store.getDocument().getMap('weave').get('key')).toBe('value');
@@ -290,7 +291,7 @@ describe('WeaveStoreAzureWebPubsub', () => {
       expect(testStore.started).toBe(true);
     });
 
-    it('loads function room data on first connected status', () => {
+    it('loads function room data on first connected status', async () => {
       const initialRoomData = vi.fn((doc: Y.Doc) => {
         doc.getMap('weave').set('from-fn', true);
       });
@@ -299,7 +300,7 @@ describe('WeaveStoreAzureWebPubsub', () => {
       const provider = getLatestProvider();
       const onStatusHandler = getProviderHandler(provider, 'status');
 
-      onStatusHandler(WEAVE_STORE_CONNECTION_STATUS.CONNECTED);
+      await onStatusHandler(WEAVE_STORE_CONNECTION_STATUS.CONNECTED);
 
       expect(testStore._loadDefaultDocumentFn).toBe(initialRoomData);
       expect(initialRoomData).toHaveBeenCalledWith(store.getDocument());
@@ -308,13 +309,13 @@ describe('WeaveStoreAzureWebPubsub', () => {
       expect(testStore.started).toBe(true);
     });
 
-    it('loads the default document when initial room data is undefined', () => {
+    it('loads the default document when initial room data is undefined', async () => {
       const { store } = makeStore(undefined);
       const testStore = asTestStore(store);
       const provider = getLatestProvider();
       const onStatusHandler = getProviderHandler(provider, 'status');
 
-      onStatusHandler(WEAVE_STORE_CONNECTION_STATUS.CONNECTED);
+      await onStatusHandler(WEAVE_STORE_CONNECTION_STATUS.CONNECTED);
 
       expect(testStore._loadDefaultDocumentFn).toBeUndefined();
       expect(store.getDocument().getMap('weave').get('default')).toBe(true);
@@ -344,7 +345,7 @@ describe('WeaveStoreAzureWebPubsub', () => {
       );
     });
 
-    it('handles connected status when not switching rooms', () => {
+    it('handles connected status when not switching rooms', async () => {
       const { store } = makeStore();
       const testStore = asTestStore(store);
       const provider = getLatestProvider();
@@ -355,7 +356,7 @@ describe('WeaveStoreAzureWebPubsub', () => {
       const loadRoomInitialDataSpy = vi.spyOn(testStore, 'loadRoomInitialData');
       const onStatusHandler = getProviderHandler(provider, 'status');
 
-      onStatusHandler(WEAVE_STORE_CONNECTION_STATUS.CONNECTED);
+      await onStatusHandler(WEAVE_STORE_CONNECTION_STATUS.CONNECTED);
 
       expect(handleConnectionStatusChangeSpy).toHaveBeenCalledWith(
         WEAVE_STORE_CONNECTION_STATUS.CONNECTED
@@ -365,20 +366,20 @@ describe('WeaveStoreAzureWebPubsub', () => {
       expect(testStore.started).toBe(true);
     });
 
-    it('does not load initial room data again after the first connected status', () => {
+    it('does not load initial room data again after the first connected status', async () => {
       const { store } = makeStore();
       const testStore = asTestStore(store);
       const provider = getLatestProvider();
       const loadRoomInitialDataSpy = vi.spyOn(testStore, 'loadRoomInitialData');
       const onStatusHandler = getProviderHandler(provider, 'status');
 
-      onStatusHandler(WEAVE_STORE_CONNECTION_STATUS.CONNECTED);
-      onStatusHandler(WEAVE_STORE_CONNECTION_STATUS.CONNECTED);
+      await onStatusHandler(WEAVE_STORE_CONNECTION_STATUS.CONNECTED);
+      await onStatusHandler(WEAVE_STORE_CONNECTION_STATUS.CONNECTED);
 
       expect(loadRoomInitialDataSpy).toHaveBeenCalledTimes(1);
     });
 
-    it('ignores non-connected statuses while switching rooms', () => {
+    it('ignores non-connected statuses while switching rooms', async () => {
       const { store } = makeStore();
       const testStore = asTestStore(store);
       const provider = getLatestProvider();
@@ -390,7 +391,7 @@ describe('WeaveStoreAzureWebPubsub', () => {
 
       testStore.actualStatus = WEAVE_STORE_CONNECTION_STATUS.SWITCHING_ROOM;
 
-      onStatusHandler(WEAVE_STORE_CONNECTION_STATUS.DISCONNECTED);
+      await onStatusHandler(WEAVE_STORE_CONNECTION_STATUS.DISCONNECTED);
 
       expect(handleConnectionStatusChangeSpy).not.toHaveBeenCalled();
       expect(testStore.actualStatus).toBe(
@@ -398,7 +399,7 @@ describe('WeaveStoreAzureWebPubsub', () => {
       );
     });
 
-    it('ends room switching when connected status arrives during switching', () => {
+    it('ends room switching when connected status arrives during switching', async () => {
       const { store, mockInstance } = makeStore();
       const testStore = asTestStore(store);
       const provider = getLatestProvider();
@@ -410,7 +411,7 @@ describe('WeaveStoreAzureWebPubsub', () => {
 
       testStore.actualStatus = WEAVE_STORE_CONNECTION_STATUS.SWITCHING_ROOM;
 
-      onStatusHandler(WEAVE_STORE_CONNECTION_STATUS.CONNECTED);
+      await onStatusHandler(WEAVE_STORE_CONNECTION_STATUS.CONNECTED);
 
       expect(handleConnectionStatusChangeSpy).toHaveBeenCalledWith(
         WEAVE_STORE_CONNECTION_STATUS.CONNECTED
@@ -635,11 +636,15 @@ describe('WeaveStoreAzureWebPubsub', () => {
       expect(testStore.indexedDbPersistence).toBeNull();
     });
 
-    it('creates IndexeddbPersistence with the roomId as db name when indexedDb.enabled is true', () => {
+    it('creates IndexeddbPersistence with the roomId as db name when indexedDb.enabled is true', async () => {
       const { store } = makeStore(undefined, {
         indexedDb: { enabled: true },
       });
       const testStore = asTestStore(store);
+      const provider = getLatestProvider();
+      const onStatusHandler = getProviderHandler(provider, 'status');
+
+      await onStatusHandler(WEAVE_STORE_CONNECTION_STATUS.CONNECTED);
 
       expect(mockState.IndexeddbPersistence).toHaveBeenCalledWith(
         'room-1',
@@ -648,10 +653,14 @@ describe('WeaveStoreAzureWebPubsub', () => {
       expect(testStore.indexedDbPersistence).not.toBeNull();
     });
 
-    it('creates IndexeddbPersistence with the custom dbName when provided', () => {
+    it('creates IndexeddbPersistence with the custom dbName when provided', async () => {
       makeStore(undefined, {
         indexedDb: { enabled: true, dbName: 'custom-db' },
       });
+      const provider = getLatestProvider();
+      const onStatusHandler = getProviderHandler(provider, 'status');
+
+      await onStatusHandler(WEAVE_STORE_CONNECTION_STATUS.CONNECTED);
 
       expect(mockState.IndexeddbPersistence).toHaveBeenCalledWith(
         'custom-db',
@@ -659,7 +668,9 @@ describe('WeaveStoreAzureWebPubsub', () => {
       );
     });
 
-    it('skips loadRoomInitialData when IndexedDB is active and doc already has content', () => {
+    it('skips loadRoomInitialData when IndexedDB is active and doc already has content', async () => {
+      vi.spyOn(WeaveStoreAzureWebPubsub, 'roomHasIndexedDbData').mockResolvedValue(true);
+
       const { store } = makeStore(undefined, {
         indexedDb: { enabled: true },
       });
@@ -667,10 +678,7 @@ describe('WeaveStoreAzureWebPubsub', () => {
       const provider = getLatestProvider();
       const onStatusHandler = getProviderHandler(provider, 'status');
 
-      // Simulate IndexedDB having pre-loaded content into the doc
-      store.getDocument().getMap('weave').set('cached-key', 'cached-value');
-
-      onStatusHandler(WEAVE_STORE_CONNECTION_STATUS.CONNECTED);
+      await onStatusHandler(WEAVE_STORE_CONNECTION_STATUS.CONNECTED);
 
       // loadDefaultDocument and loadDocument should NOT have been called
       expect(testStore._loadDocumentData).toBeUndefined();
@@ -680,7 +688,7 @@ describe('WeaveStoreAzureWebPubsub', () => {
       expect(testStore.started).toBe(true);
     });
 
-    it('runs loadRoomInitialData normally when IndexedDB is active but doc is empty (first visit)', () => {
+    it('runs loadRoomInitialData normally when IndexedDB is active but doc is empty (first visit)', async () => {
       const { store } = makeStore(undefined, {
         indexedDb: { enabled: true },
       });
@@ -689,7 +697,7 @@ describe('WeaveStoreAzureWebPubsub', () => {
       const onStatusHandler = getProviderHandler(provider, 'status');
 
       // Doc is empty — IndexedDB had nothing for this room
-      onStatusHandler(WEAVE_STORE_CONNECTION_STATUS.CONNECTED);
+      await onStatusHandler(WEAVE_STORE_CONNECTION_STATUS.CONNECTED);
 
       expect(store.getDocument().getMap('weave').get('default')).toBe(true);
       expect(testStore.started).toBe(true);
@@ -700,6 +708,10 @@ describe('WeaveStoreAzureWebPubsub', () => {
         indexedDb: { enabled: true },
       });
       const testStore = asTestStore(store);
+      const firstProvider = getLatestProvider();
+      const firstOnStatusHandler = getProviderHandler(firstProvider, 'status');
+
+      await firstOnStatusHandler(WEAVE_STORE_CONNECTION_STATUS.CONNECTED);
 
       expect(mockState.IndexeddbPersistence).toHaveBeenCalledTimes(1);
       expect(testStore.indexedDbPersistence).not.toBeNull();
@@ -707,7 +719,12 @@ describe('WeaveStoreAzureWebPubsub', () => {
       await store.switchToRoom('room-2', undefined);
 
       expect(mockState.mockIndexedDbPersistence.destroy).toHaveBeenCalledTimes(1);
-      // A new IndexeddbPersistence should be created for room-2
+
+      // Connect the new provider so initIndexedDb runs for room-2
+      const secondProvider = getLatestProvider();
+      const secondOnStatusHandler = getProviderHandler(secondProvider, 'status');
+      await secondOnStatusHandler(WEAVE_STORE_CONNECTION_STATUS.CONNECTED);
+
       expect(mockState.IndexeddbPersistence).toHaveBeenCalledTimes(2);
       expect(mockState.IndexeddbPersistence).toHaveBeenLastCalledWith(
         'room-2',
@@ -719,14 +736,58 @@ describe('WeaveStoreAzureWebPubsub', () => {
       const { store } = makeStore(undefined, {
         indexedDb: { enabled: true },
       });
+      const provider = getLatestProvider();
+      const onStatusHandler = getProviderHandler(provider, 'status');
+
+      await onStatusHandler(WEAVE_STORE_CONNECTION_STATUS.CONNECTED);
 
       store.destroy();
 
-      // Allow the async destroy to execute
-      await vi.runAllTimersAsync?.().catch(() => undefined);
+      // Allow the void async destroy to settle
+      await Promise.resolve();
       await Promise.resolve();
 
       expect(mockState.mockIndexedDbPersistence.destroy).toHaveBeenCalledTimes(1);
+    });
+  });
+
+  describe('roomHasIndexedDbData', () => {
+    beforeEach(() => {
+      // Restore only the roomHasIndexedDbData spy so the real implementation runs
+      vi.mocked(WeaveStoreAzureWebPubsub.roomHasIndexedDbData).mockRestore();
+    });
+
+    it('resolves false when the IndexedDB doc is empty', async () => {
+      mockState.IndexeddbPersistence.mockImplementationOnce(
+        (_: string, _doc: Y.Doc) => ({
+          on: (event: string, cb: () => void) => {
+            if (event === 'synced') cb();
+          },
+          destroy: vi.fn(),
+        })
+      );
+
+      const result = await WeaveStoreAzureWebPubsub.roomHasIndexedDbData('empty-db');
+
+      expect(result).toBe(false);
+    });
+
+    it('resolves true when the IndexedDB doc has content', async () => {
+      mockState.IndexeddbPersistence.mockImplementationOnce(
+        (_: string, doc: Y.Doc) => ({
+          on: (event: string, cb: () => void) => {
+            if (event === 'synced') {
+              doc.getMap('weave').set('cached', true);
+              cb();
+            }
+          },
+          destroy: vi.fn(),
+        })
+      );
+
+      const result = await WeaveStoreAzureWebPubsub.roomHasIndexedDbData('non-empty-db');
+
+      expect(result).toBe(true);
     });
   });
 });

@@ -97,17 +97,8 @@ export class WeaveStoreAzureWebPubsub extends WeaveStore {
     }
     if (
       !loadedData &&
-      !this.azureWebPubsubOptions.indexedDb?.enabled &&
-      !this.initialRoomData
-    ) {
-      this.loadDefaultDocument();
-      loadedData = true;
-    }
-    if (
-      !loadedData &&
-      this.initialRoomData &&
-      this.azureWebPubsubOptions.indexedDb &&
-      !hasIndexedDbData
+      !this.initialRoomData &&
+      (!this.azureWebPubsubOptions.indexedDb?.enabled || !hasIndexedDbData)
     ) {
       this.loadDefaultDocument();
       loadedData = true;
