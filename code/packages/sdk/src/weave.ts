@@ -60,6 +60,7 @@ import type { StageConfig } from 'konva/lib/Stage';
 import type {
   WeaveInstanceStatusEvent,
   WeaveStoreOnRoomLoadedEvent,
+  WeaveStoreOnUndoRedoChangeEvent,
 } from './stores/types';
 import type { DOMElement, WeaveConfig } from './types';
 import {
@@ -345,6 +346,11 @@ export class Weave {
 
     this.status = WEAVE_INSTANCE_STATUS.CONNECTING_TO_ROOM;
     this.emitEvent<WeaveInstanceStatusEvent>('onInstanceStatus', this.status);
+
+    this.emitEvent<WeaveStoreOnUndoRedoChangeEvent>(
+      'onUndoManagerStatusChange',
+      { canUndo: false, canRedo: false, redoStackLength: 0, undoStackLength: 0 }
+    );
 
     this.addEventListener(
       'onStoreConnectionStatusChange',

@@ -61,7 +61,8 @@
     "buffer": "6.0.3",
     "reconnecting-websocket": "4.4.0",
     "uuid": "11.1.1",
-    "ws": "8.18.1"
+    "ws": "8.18.1",
+    "y-indexeddb": "^9.0.12"
   },
   "devDependencies": {
     "@koa/cors": "^5.0.0",
@@ -74,8 +75,8 @@
     "@types/ws": "^8.18.0",
     "@typescript-eslint/eslint-plugin": "8.26.0",
     "@typescript-eslint/parser": "8.26.0",
-    "@vitest/coverage-v8": "1.6.1",
-    "@vitest/ui": "1.6.1",
+    "@vitest/coverage-v8": "^3.2.6",
+    "@vitest/ui": "^3.2.6",
     "cors": "^2.8.5",
     "emittery": "^1.1.0",
     "eslint": "8.57.1",
@@ -89,8 +90,8 @@
     "tsdown": "^0.10.2",
     "tsx": "^4.19.3",
     "typescript-eslint": "8.22.0",
-    "vitest": "1.6.1",
-    "vitest-sonar-reporter": "2.0.0"
+    "vitest": "^3.2.6",
+    "vitest-sonar-reporter": "^3.0.0"
   },
   "peerDependencies": {
     "ioredis": ">= 5.6.1",

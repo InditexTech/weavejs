@@ -19,6 +19,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - [#1080](https://github.com/InditexTech/weavejs/issues/1080) [alpha] API to manipulate document state natively on server-side
 - [#1101](https://github.com/InditexTech/weavejs/issues/1101) Add inline text labels to shape nodes (Rectangle and Ellipse)
 - [#1104](https://github.com/InditexTech/weavejs/issues/1104) Add Polygon Node and Polygon Drawing Tool with Label Support
+- [#1106](https://github.com/InditexTech/weavejs/issues/1106) Add y-indexeddb client-side persistence to WeaveStoreAzureWebPubsub for optimistic initial render
 
 ### Changed
 

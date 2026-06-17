@@ -129,7 +129,7 @@ The `onRoomLoaded` event is called when the room shared-state is loaded.
 onUndoManagerStatusChange: WeaveStoreOnUndoRedoChangeEvent;
 ```
 
-The `onUndoManagerStatusChange` event is called when the undo/redo manager changes.
+The `onUndoManagerStatusChange` event is called when the undo/redo manager changes. It is also emitted when a room connection begins (on every `connect()` call), resetting all stack counts to `0` and both `canUndo` and `canRedo` to `false`.
 
 ### onNodeChange
 

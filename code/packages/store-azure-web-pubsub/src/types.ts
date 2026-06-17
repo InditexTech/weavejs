@@ -38,11 +38,23 @@ export type WeaveAzureWebPubsubSyncHandlerOptions = {
   persistIntervalMs?: number;
 };
 
+export type IndexedDbOptions = {
+  /** Enable IndexedDB offline persistence for faster initial load. Default: false. */
+  enabled: boolean;
+  /**
+   * IndexedDB database name. Defaults to the roomId when omitted.
+   * Override to namespace databases in multi-tenant applications.
+   */
+  dbName?: string;
+};
+
 export type WeaveStoreAzureWebPubsubOptions = {
   roomId: string;
   url: string;
   fetchClient?: FetchClient;
   syncClientOptions?: DeepPartial<WeaveStoreAzureWebPubSubSyncClientOptions>;
+  /** Optional IndexedDB persistence to pre-populate the Yjs doc before the WebSocket connects. */
+  indexedDb?: IndexedDbOptions;
 };
 
 export type WeaveStoreAzureWebPubsubOnStoreFetchConnectionUrlEvent = {
