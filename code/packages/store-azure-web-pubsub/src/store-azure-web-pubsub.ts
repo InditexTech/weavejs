@@ -13,6 +13,7 @@ import {
   WEAVE_STORE_CONNECTION_STATUS,
   type WeaveStoreOptions,
 } from '@inditextech/weave-types';
+import { IndexeddbPersistence } from 'y-indexeddb';
 import { WeaveStoreAzureWebPubSubSyncClient } from './client';
 import { WEAVE_STORE_AZURE_WEB_PUBSUB } from './constants';
 import {
@@ -20,12 +21,14 @@ import {
   type WeaveRoomData,
   type WeaveStoreAzureWebPubsubOptions,
 } from './types';
+import Y from './yjs';
 
 export class WeaveStoreAzureWebPubsub extends WeaveStore {
   private azureWebPubsubOptions: WeaveStoreAzureWebPubsubOptions;
   private started: boolean;
   private initialRoomData: WeaveRoomData | undefined;
   private actualStatus!: (typeof WEAVE_STORE_CONNECTION_STATUS)[keyof typeof WEAVE_STORE_CONNECTION_STATUS];
+  private indexedDbPersistence: IndexeddbPersistence | null = null;
   protected roomId: string;
   protected provider!: WeaveStoreAzureWebPubSubSyncClient;
   protected name: string = WEAVE_STORE_AZURE_WEB_PUBSUB;
@@ -59,18 +62,74 @@ export class WeaveStoreAzureWebPubsub extends WeaveStore {
     super.setup();
   }
 
-  private loadRoomInitialData() {
-    if (this.initialRoomData && this.initialRoomData instanceof Uint8Array) {
+  static roomHasIndexedDbData(dbName: string): Promise<boolean> {
+    return new Promise((resolve) => {
+      const doc = new Y.Doc();
+      const providerTest = new IndexeddbPersistence(dbName, doc);
+
+      providerTest.on('synced', () => {
+        const docHasContent = doc.getMap('weave').size > 0;
+        doc.destroy();
+        providerTest.destroy();
+        resolve(docHasContent);
+      });
+    });
+  }
+
+  private loadRoomInitialData(hasIndexedDbData: boolean): void {
+    let loadedData = false;
+
+    if (
+      !loadedData &&
+      this.initialRoomData &&
+      this.initialRoomData instanceof Uint8Array
+    ) {
       this.loadDocument(this.initialRoomData);
+      loadedData = true;
     }
-    if (this.initialRoomData && typeof this.initialRoomData === 'function') {
+    if (
+      !loadedData &&
+      this.initialRoomData &&
+      typeof this.initialRoomData === 'function'
+    ) {
       this.loadDefaultDocument(this.initialRoomData);
+      loadedData = true;
     }
-    if (!this.initialRoomData) {
+    if (
+      !loadedData &&
+      !this.azureWebPubsubOptions.indexedDb?.enabled &&
+      !this.initialRoomData
+    ) {
       this.loadDefaultDocument();
+      loadedData = true;
+    }
+    if (
+      !loadedData &&
+      this.initialRoomData &&
+      this.azureWebPubsubOptions.indexedDb &&
+      !hasIndexedDbData
+    ) {
+      this.loadDefaultDocument();
+      loadedData = true;
     }
 
     this.initialRoomData = undefined;
+  }
+
+  private initIndexedDb() {
+    if (!this.azureWebPubsubOptions.indexedDb?.enabled) return;
+    const dbName = this.azureWebPubsubOptions.indexedDb.dbName ?? this.roomId;
+    this.indexedDbPersistence = new IndexeddbPersistence(
+      dbName,
+      this.getDocument()
+    );
+  }
+
+  private async destroyIndexedDb(): Promise<void> {
+    if (this.indexedDbPersistence) {
+      await this.indexedDbPersistence.destroy();
+      this.indexedDbPersistence = null;
+    }
   }
 
   private init() {
@@ -101,7 +160,7 @@ export class WeaveStoreAzureWebPubsub extends WeaveStore {
       );
     });
 
-    this.provider.on('status', (status) => {
+    this.provider.on('status', async (status) => {
       if (
         this.actualStatus !== WEAVE_STORE_CONNECTION_STATUS.SWITCHING_ROOM ||
         (this.actualStatus === WEAVE_STORE_CONNECTION_STATUS.SWITCHING_ROOM &&
@@ -122,9 +181,14 @@ export class WeaveStoreAzureWebPubsub extends WeaveStore {
         this.actualStatus = status;
       }
 
+      const hasIndexedDbData =
+        await WeaveStoreAzureWebPubsub.roomHasIndexedDbData(this.roomId);
+
       if (status === WEAVE_STORE_CONNECTION_STATUS.CONNECTED && !this.started) {
-        this.loadRoomInitialData();
+        this.loadRoomInitialData(hasIndexedDbData);
         this.started = true;
+
+        this.initIndexedDb();
       }
     });
   }
@@ -152,6 +216,8 @@ export class WeaveStoreAzureWebPubsub extends WeaveStore {
     this.actualStatus = WEAVE_STORE_CONNECTION_STATUS.SWITCHING_ROOM;
 
     await this.disconnect();
+
+    await this.destroyIndexedDb();
 
     this.restartDocument();
 
@@ -188,7 +254,9 @@ export class WeaveStoreAzureWebPubsub extends WeaveStore {
     this.provider.simulateWebsocketError();
   }
 
-  destroy(): void {}
+  destroy(): void {
+    void this.destroyIndexedDb();
+  }
 
   handleAwarenessChange(emit: boolean = true): void {
     if (!this.instance) {

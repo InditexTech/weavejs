@@ -61,7 +61,8 @@
     "buffer": "6.0.3",
     "reconnecting-websocket": "4.4.0",
     "uuid": "11.1.1",
-    "ws": "8.18.1"
+    "ws": "8.18.1",
+    "y-indexeddb": "^9.0.12"
   },
   "devDependencies": {
     "@koa/cors": "^5.0.0",

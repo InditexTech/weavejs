@@ -73,6 +73,15 @@ const store = new WeaveStoreAzureWebPubsub(initialRoomData: Uint8Array | FetchIn
       type: "number",
       default: "5000",
     },
+    ["azureWebPubsubOptions.indexedDb.enabled"]: {
+      description: "Enable IndexedDB offline persistence for faster initial load. When true, the Yjs document is pre-populated from a local IndexedDB cache before the WebSocket connects.",
+      type: "boolean",
+      default: "false",
+    },
+    ["azureWebPubsubOptions.indexedDb.dbName"]: {
+      description: "IndexedDB database name. Defaults to the roomId when omitted. Override to namespace databases in multi-tenant applications.",
+      type: "string",
+    },
   }}
 />
 
@@ -107,6 +116,18 @@ type WeaveStoreAzureWebPubsubOptions = {
   url: string;
   fetchClient?: FetchClient;
   syncClientOptions?: DeepPartial<WeaveStoreAzureWebPubSubSyncClientOptions>;
+  /** Optional IndexedDB persistence to pre-populate the Yjs doc before the WebSocket connects. */
+  indexedDb?: IndexedDbOptions;
+};
+
+type IndexedDbOptions = {
+  /** Enable IndexedDB offline persistence for faster initial load. Default: false. */
+  enabled: boolean;
+  /**
+   * IndexedDB database name. Defaults to the roomId when omitted.
+   * Override to namespace databases in multi-tenant applications.
+   */
+  dbName?: string;
 };
 
 type WeaveStoreAzureWebPubsubOnStoreFetchConnectionUrlEvent = {
@@ -280,7 +301,7 @@ The `onRoomLoaded` event is called when the room shared-state is loaded.
 onUndoManagerStatusChange: WeaveStoreOnUndoRedoChangeEvent;
 ```
 
-The `onUndoManagerStatusChange` event is called when the undo/redo manager changes.
+The `onUndoManagerStatusChange` event is called when the undo/redo manager changes. It is also emitted when a room connection begins (on every `connect()` call), resetting all stack counts to `0` and both `canUndo` and `canRedo` to `false`.
 
 ### onNodeChange
 
@@ -317,3 +338,20 @@ setAwarenessInfo(field: string, value: unknown): void
 This method set awareness information, for example if you want to inform the metadata of
 an user that connected to the room, or to send the pointer information of that user to the
 other peers.
+
+## Static Methods
+
+#### roomHasIndexedDbData
+
+```ts
+static roomHasIndexedDbData(dbName: string): Promise<boolean>
+```
+
+Checks whether an IndexedDB database with the given name already contains Weave document data.
+Useful to decide whether to skip setting `initialRoomData` when local cached state exists.
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `dbName` | `string` | The IndexedDB database name to inspect. Typically the `roomId` or the value of `indexedDb.dbName`. |
+
+Returns `true` if the database exists and the Weave map has at least one entry, `false` otherwise.

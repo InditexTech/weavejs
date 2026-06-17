@@ -43,6 +43,7 @@ type TestStore = {
   _loadDefaultDocumentFn?: ((doc: Y.Doc) => void) | undefined;
   _setupCalls: number;
   loadRoomInitialData: () => void;
+  indexedDbPersistence: { destroy: ReturnType<typeof vi.fn> } | null;
 };
 
 const mockState = vi.hoisted(() => {
@@ -73,15 +74,29 @@ const mockState = vi.hoisted(() => {
       return provider;
     });
 
+  const mockIndexedDbPersistence = {
+    destroy: vi.fn().mockResolvedValue(undefined),
+  };
+
+  const IndexeddbPersistence = vi
+    .fn()
+    .mockImplementation(() => mockIndexedDbPersistence);
+
   return {
     providers,
     WeaveStoreAzureWebPubSubSyncClient,
+    IndexeddbPersistence,
+    mockIndexedDbPersistence,
   };
 });
 
 vi.mock('../client', () => ({
   WeaveStoreAzureWebPubSubSyncClient:
     mockState.WeaveStoreAzureWebPubSubSyncClient,
+}));
+
+vi.mock('y-indexeddb', () => ({
+  IndexeddbPersistence: mockState.IndexeddbPersistence,
 }));
 
 vi.mock('@inditextech/weave-sdk', async () => {
@@ -209,6 +224,8 @@ describe('WeaveStoreAzureWebPubsub', () => {
     vi.stubGlobal('fetch', vi.fn());
     mockState.providers.length = 0;
     mockState.WeaveStoreAzureWebPubSubSyncClient.mockClear();
+    mockState.IndexeddbPersistence.mockClear();
+    mockState.mockIndexedDbPersistence.destroy.mockClear();
   });
 
   describe('constructor', () => {
@@ -596,6 +613,120 @@ describe('WeaveStoreAzureWebPubsub', () => {
       );
       expect(setupSpy).toHaveBeenCalledTimes(1);
       expect(connectSpy).toHaveBeenCalledTimes(1);
+    });
+  });
+
+  describe('indexedDb persistence', () => {
+    it('does not create IndexeddbPersistence when indexedDb option is absent', () => {
+      const { store } = makeStore();
+      const testStore = asTestStore(store);
+
+      expect(mockState.IndexeddbPersistence).not.toHaveBeenCalled();
+      expect(testStore.indexedDbPersistence).toBeNull();
+    });
+
+    it('does not create IndexeddbPersistence when indexedDb.enabled is false', () => {
+      const { store } = makeStore(undefined, {
+        indexedDb: { enabled: false },
+      });
+      const testStore = asTestStore(store);
+
+      expect(mockState.IndexeddbPersistence).not.toHaveBeenCalled();
+      expect(testStore.indexedDbPersistence).toBeNull();
+    });
+
+    it('creates IndexeddbPersistence with the roomId as db name when indexedDb.enabled is true', () => {
+      const { store } = makeStore(undefined, {
+        indexedDb: { enabled: true },
+      });
+      const testStore = asTestStore(store);
+
+      expect(mockState.IndexeddbPersistence).toHaveBeenCalledWith(
+        'room-1',
+        store.getDocument()
+      );
+      expect(testStore.indexedDbPersistence).not.toBeNull();
+    });
+
+    it('creates IndexeddbPersistence with the custom dbName when provided', () => {
+      makeStore(undefined, {
+        indexedDb: { enabled: true, dbName: 'custom-db' },
+      });
+
+      expect(mockState.IndexeddbPersistence).toHaveBeenCalledWith(
+        'custom-db',
+        expect.anything()
+      );
+    });
+
+    it('skips loadRoomInitialData when IndexedDB is active and doc already has content', () => {
+      const { store } = makeStore(undefined, {
+        indexedDb: { enabled: true },
+      });
+      const testStore = asTestStore(store);
+      const provider = getLatestProvider();
+      const onStatusHandler = getProviderHandler(provider, 'status');
+
+      // Simulate IndexedDB having pre-loaded content into the doc
+      store.getDocument().getMap('weave').set('cached-key', 'cached-value');
+
+      onStatusHandler(WEAVE_STORE_CONNECTION_STATUS.CONNECTED);
+
+      // loadDefaultDocument and loadDocument should NOT have been called
+      expect(testStore._loadDocumentData).toBeUndefined();
+      expect(testStore._loadDefaultDocumentFn).toBeUndefined();
+      expect(store.getDocument().getMap('weave').get('default')).toBeUndefined();
+      expect(testStore.initialRoomData).toBeUndefined();
+      expect(testStore.started).toBe(true);
+    });
+
+    it('runs loadRoomInitialData normally when IndexedDB is active but doc is empty (first visit)', () => {
+      const { store } = makeStore(undefined, {
+        indexedDb: { enabled: true },
+      });
+      const testStore = asTestStore(store);
+      const provider = getLatestProvider();
+      const onStatusHandler = getProviderHandler(provider, 'status');
+
+      // Doc is empty — IndexedDB had nothing for this room
+      onStatusHandler(WEAVE_STORE_CONNECTION_STATUS.CONNECTED);
+
+      expect(store.getDocument().getMap('weave').get('default')).toBe(true);
+      expect(testStore.started).toBe(true);
+    });
+
+    it('destroys the IndexedDB provider and creates a new one on switchToRoom', async () => {
+      const { store } = makeStore(undefined, {
+        indexedDb: { enabled: true },
+      });
+      const testStore = asTestStore(store);
+
+      expect(mockState.IndexeddbPersistence).toHaveBeenCalledTimes(1);
+      expect(testStore.indexedDbPersistence).not.toBeNull();
+
+      await store.switchToRoom('room-2', undefined);
+
+      expect(mockState.mockIndexedDbPersistence.destroy).toHaveBeenCalledTimes(1);
+      // A new IndexeddbPersistence should be created for room-2
+      expect(mockState.IndexeddbPersistence).toHaveBeenCalledTimes(2);
+      expect(mockState.IndexeddbPersistence).toHaveBeenLastCalledWith(
+        'room-2',
+        store.getDocument()
+      );
+    });
+
+    it('destroy cleans up the IndexedDB provider', async () => {
+      const { store } = makeStore(undefined, {
+        indexedDb: { enabled: true },
+      });
+
+      store.destroy();
+
+      // Allow the async destroy to execute
+      await vi.runAllTimersAsync?.().catch(() => undefined);
+      await Promise.resolve();
+
+      expect(mockState.mockIndexedDbPersistence.destroy).toHaveBeenCalledTimes(1);
     });
   });
 });
