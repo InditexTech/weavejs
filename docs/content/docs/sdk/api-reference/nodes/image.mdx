@@ -358,6 +358,17 @@ resetCrop(imageNode: Konva.Group): void
 
 Function that when is called reset the image cropping to its original size.
 
+### forceLoadFallbackImage
+
+```ts
+forceLoadFallbackImage(nodeInstance: WeaveElementInstance, dataURL: string): void
+```
+
+Forces a fallback image to load on the given node instance using the provided data URL.
+Cancels any pending retry timers for that node and immediately caches and loads the fallback image.
+Useful when you want to programmatically supply a local data URL as a replacement for an image that
+failed to load from its remote URL.
+
 ## Konva.Node Augmentation
 
 This Node extends the `Konva.Node` class to define several functions:

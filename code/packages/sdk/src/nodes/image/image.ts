@@ -1502,6 +1502,24 @@ export class WeaveImageNode extends WeaveNode {
     }
   }
 
+  forceLoadFallbackImage(
+    nodeInstance: WeaveElementInstance,
+    dataURL: string
+  ): void {
+    const nodeId = nodeInstance.getAttrs().id ?? '';
+    const node = this.instance.getStage().findOne(`#${nodeId}`);
+
+    if (this.imageTryoutIds[nodeId]) {
+      clearTimeout(this.imageTryoutIds[nodeId]);
+      delete this.imageTryoutIds[nodeId];
+    }
+
+    if (node) {
+      this.cacheImageFallbackURL(node.getAttrs(), dataURL);
+      this.loadImage(node.getAttrs(), node as Konva.Group, true);
+    }
+  }
+
   onDestroy(nodeInstance: WeaveElementInstance) {
     const nodeId = nodeInstance.getAttrs().id ?? '';
 

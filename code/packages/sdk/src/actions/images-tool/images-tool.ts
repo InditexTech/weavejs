@@ -47,6 +47,7 @@ import { loadImageSource } from '@/utils/image';
 
 export class WeaveImagesToolAction extends WeaveAction {
   private readonly config: WeaveImagesToolActionParams;
+  protected initInitialized: boolean = false;
   protected initialized: boolean = false;
   protected initialCursor: string | null = null;
   protected state!: WeaveImagesToolActionState;
@@ -111,7 +112,9 @@ export class WeaveImagesToolAction extends WeaveAction {
   }
 
   onInit(): void {
-    this.instance.addEventListener('onStageDrop', (e: DragEvent) => {
+    if (!this.initInitialized) return;
+
+    const handleImagesOnStageDrop = (e: DragEvent) => {
       const dragId = this.instance.getDragStartedId();
       const dragProperties =
         this.instance.getDragProperties<WeaveImagesToolDragAndDropProperties>();
@@ -138,7 +141,11 @@ export class WeaveImagesToolAction extends WeaveAction {
           }
         );
       }
-    });
+    };
+
+    this.instance.addEventListener('onStageDrop', handleImagesOnStageDrop);
+
+    this.initInitialized = true;
   }
 
   private setupEvents() {

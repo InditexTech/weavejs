@@ -2,7 +2,11 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-import type { WeaveFont, WeaveLoggerConfig } from '@inditextech/weave-types';
+import type {
+  WeaveFont,
+  WeaveFontStyle,
+  WeaveLoggerConfig,
+} from '@inditextech/weave-types';
 import type { WeaveAction } from './actions/action';
 import type { WeaveNode } from './nodes/node';
 import type { WeavePlugin } from './plugins/plugin';
@@ -13,7 +17,20 @@ import type { WeaveStore } from './stores/store';
 
 export type DOMElement = HTMLElement | Element | null;
 
-export type WeaveFontsPreloadFunction = () => Promise<WeaveFont[]>;
+export type WeaveFontFace = FontFaceDescriptors & {
+  source: string | BufferSource;
+};
+
+export type WeaveFontFamily = {
+  family: string;
+  fontFaces: WeaveFontFace[];
+  offset: { x: number; y: number };
+  supportedStyles: WeaveFontStyle[];
+};
+
+export type WeaveFontsPreloadFunction = (
+  loadFontsFamilies: (fontFamilies: WeaveFontFamily[]) => Promise<WeaveFont[]>
+) => Promise<WeaveFont[]>;
 
 export type WeaveUpscaleConfig = {
   enabled?: boolean;
