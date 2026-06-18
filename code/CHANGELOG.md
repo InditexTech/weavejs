@@ -13,10 +13,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-### Changed
-
-- Improve NPM release workflow with GitHub App Token authentication and GPG-signed commits with Signed-off-by trailers for better security and compliance
-
 ## [5.0.0] - 2026-06-18
 
 ### Added
