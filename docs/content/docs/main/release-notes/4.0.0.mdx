@@ -1,0 +1,111 @@
+---
+title: v4.0.0
+description: Focus on unified snapping architecture and custom canvas guides.
+---
+
+## 🧲 Unified snapping and custom guides.
+
+**Release date:** May 15, 2026
+
+This release focuses on **architectural unification of the snapping system** and the introduction of **custom canvas guides**.
+
+The two separate snapping plugins from previous versions have been merged into a single, coherent plugin that handles edge snapping, distance indicators, and custom guide lines from one place. This reduces configuration overhead and makes snapping behaviour easier to reason about and extend.
+
+---
+
+## Changes
+
+### Unified Snapping Plugin
+
+The `WeaveNodesEdgeSnappingPlugin` and `WeaveNodesDistanceSnappingPlugin` have been **merged into a single `WeaveNodesSnappingPlugin`**.
+
+- One plugin replaces two, simplifying registration and configuration
+- Edge snapping and distance guide rendering now share the same internal state and coordinate system
+- Consistent snapping behaviour across all node types
+- Reduced risk of the two plugins disagreeing about snapping targets
+
+[https://github.com/InditexTech/weavejs/issues/1041](https://github.com/InditexTech/weavejs/issues/1041)
+
+---
+
+### Custom Guides Support
+
+A new `WeaveGuideToolAction` lets users draw **persistent ruler guides** directly on the canvas — horizontal or vertical lines that act as snapping targets for other nodes.
+
+- Place guides precisely anywhere on the canvas
+- Guides participate in the unified snapping system
+- Guides are stored in the shared Yjs document and synced to all collaborators in real time
+
+[https://github.com/InditexTech/weavejs/issues/1041](https://github.com/InditexTech/weavejs/issues/1041)
+
+---
+
+## Breaking Changes
+
+### `WeaveNodesEdgeSnappingPlugin` and `WeaveNodesDistanceSnappingPlugin` removed
+
+Both plugins have been removed and replaced by the new `WeaveNodesSnappingPlugin`.
+
+#### Before (v3.x)
+
+```ts
+import {
+  WeaveNodesEdgeSnappingPlugin,
+  WeaveNodesDistanceSnappingPlugin,
+} from "@inditextech/weave-sdk";
+
+const instance = new Weave({
+  // ...
+  plugins: [
+    new WeaveNodesEdgeSnappingPlugin(),
+    new WeaveNodesDistanceSnappingPlugin(),
+  ],
+});
+```
+
+#### After (v4.0.0)
+
+```ts
+import { WeaveNodesSnappingPlugin } from "@inditextech/weave-sdk";
+
+const instance = new Weave({
+  // ...
+  plugins: [new WeaveNodesSnappingPlugin()],
+});
+```
+
+---
+
+### Snapping metadata stored as plain objects
+
+Snapping guide metadata is now stored in the Yjs document as plain objects instead of serialized JSON strings. If your application reads snapping metadata directly from the Yjs document (e.g. to render custom overlays), update your reading logic accordingly.
+
+---
+
+### `WeaveGuideToolAction` must be registered to use guides
+
+If your application does not register `WeaveGuideToolAction`, users will not be able to create custom guides. Register it alongside your other action handlers:
+
+```ts
+import {
+  WeaveGuideToolAction,
+  WeaveNodesSnappingPlugin,
+} from "@inditextech/weave-sdk";
+
+const instance = new Weave({
+  // ...
+  actions: [
+    // ... other actions
+    new WeaveGuideToolAction(),
+  ],
+  plugins: [new WeaveNodesSnappingPlugin()],
+});
+```
+
+---
+
+## Migration Steps
+
+1. **Replace both snapping plugin imports** — remove `WeaveNodesEdgeSnappingPlugin` and `WeaveNodesDistanceSnappingPlugin` from your imports and plugin list. Add `WeaveNodesSnappingPlugin` in their place.
+2. **Register `WeaveGuideToolAction`** — if you want users to be able to create custom ruler guides, register the new action.
+3. **Update any direct Yjs snapping metadata reads** — if your code reads raw snapping/guide metadata from the Yjs document, update it to handle plain objects instead of JSON strings.
