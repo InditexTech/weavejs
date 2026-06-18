@@ -355,7 +355,9 @@ export abstract class WeaveNode implements WeaveNodeBase {
   ): boolean {
     const activeGroupId = selectionPlugin.getActiveGroupContext();
     if (activeGroupId === null) return false;
-    const activeGroupNode = this.instance.getStage().findOne(`#${activeGroupId}`);
+    const activeGroupNode = this.instance
+      .getStage()
+      .findOne(`#${activeGroupId}`);
     if (!activeGroupNode) return false;
     const hoveredId = node.getAttrs().id ?? '';
     let current: Konva.Node | null = activeGroupNode;
@@ -836,13 +838,23 @@ export abstract class WeaveNode implements WeaveNodeBase {
         const isInGroupContext =
           (this.getSelectionPlugin()?.getActiveGroupContext() ?? null) !== null;
 
-        if (
-          !isInGroupContext &&
+        const shouldUpdateMove =
           this.isSelecting() &&
           this.getSelectionPlugin()?.getSelectedNodes().length === 1 &&
           (realNodeTarget.getAttrs().lockToContainer === undefined ||
-            !realNodeTarget.getAttrs().lockToContainer)
-        ) {
+            !realNodeTarget.getAttrs().lockToContainer);
+
+        if (isInGroupContext && shouldUpdateMove) {
+          if (realNodeTarget.getAttrs().isCloned) {
+            this.instance.getCloningManager().removeClone(realNodeTarget);
+          }
+
+          this.instance.updateNodeNT(
+            this.serialize(realNodeTarget as WeaveElementInstance)
+          );
+        }
+
+        if (!isInGroupContext && shouldUpdateMove) {
           this.instance.stateTransactional(() => {
             clearContainerTargets(this.instance);
 

@@ -1,0 +1,231 @@
+---
+title: v5.0.0
+description: Focus on **diagramming capabilities, optimistic persistence, and a cleaner store architecture**.
+---
+
+## 🔷 Richer diagramming, faster initial load, and a cleaner store architecture.
+
+**Release date:** June 18, 2026
+
+This release delivers significant new **diagramming capabilities** — editable groups, inline shape labels, and a full polygon node — alongside an **alpha server-side document API**. On the infrastructure side, store connections are now fully asynchronous, image fallback data is decoupled from the shared document state, and the `@syncedstore/core` dependency has been removed in favour of direct Yjs APIs. The Azure Web PubSub store now uses IndexedDB to render the canvas optimistically before the server connection is established.
+
+---
+
+## Changes
+
+### Edit Elements Inside a Group Without Ungrouping
+
+Users can now **double-click into a group** to edit its individual child elements in place, without having to ungroup and re-group them.
+
+- Select and transform individual nodes within a group
+- Full support for nested groups
+- Grouping is preserved — no accidental destructuring of complex compositions
+
+[https://github.com/InditexTech/weavejs/issues/1039](https://github.com/InditexTech/weavejs/issues/1039)
+
+---
+
+### Inline Text Labels on Shape Nodes
+
+`WeaveRectangleNode` and `WeaveEllipseNode` now support **inline text labels** rendered directly on the shape.
+
+- Add a label to any rectangle or ellipse without placing a separate text node
+- Labels scale and move with the shape
+- Configurable font, size, colour, and alignment
+
+[https://github.com/InditexTech/weavejs/issues/1101](https://github.com/InditexTech/weavejs/issues/1101)
+
+---
+
+### Polygon Node and Drawing Tool
+
+A new `WeavePolygonNode` and `WeavePolygonToolAction` enable users to draw **arbitrary closed polygons** on the canvas.
+
+- Click to place vertices; close the shape to finish
+- Full label support (same API as the new shape label system)
+- Preset shapes available out of the box
+- Participates in the standard selection, transform, and snapping pipeline
+
+[https://github.com/InditexTech/weavejs/issues/1104](https://github.com/InditexTech/weavejs/issues/1104)
+
+---
+
+### IndexedDB Persistence for Optimistic Render (Azure Web PubSub)
+
+`WeaveStoreAzureWebPubsub` now uses **`y-indexeddb`** to persist the Yjs document locally in the browser. On subsequent visits, the canvas renders immediately from local storage while the WebSocket connection is established in the background.
+
+- Near-instant canvas load for returning users
+- Eliminates the blank canvas flash on reconnect
+- State is automatically reconciled once the server connection completes
+
+[https://github.com/InditexTech/weavejs/issues/1106](https://github.com/InditexTech/weavejs/issues/1106)
+
+---
+
+### [Alpha] Server-Side Document Manipulation API
+
+A new low-level API allows **Node.js server code to read and write Weave document state** natively, without a browser or WebSocket connection.
+
+- Create, update, and delete nodes programmatically on the server
+- Useful for seeding rooms, running migrations, or generating documents from external data sources
+- Exported from the `./server` entry point of `@inditextech/weave-sdk`
+
+> **This API is in alpha.** Interfaces may change in a future minor or patch release.
+
+[https://github.com/InditexTech/weavejs/issues/1080](https://github.com/InditexTech/weavejs/issues/1080)
+
+---
+
+### Bug Fixes
+
+- **Brush tool** — it was no longer possible to draw a dot or very small stroke on the canvas. This is now fixed. ([#1088](https://github.com/InditexTech/weavejs/issues/1088))
+- **WeaveTextNode** — the textarea edit overlay was misaligned due to a hardcoded border offset and an inaccurate `scrollHeight` approximation. The overlay now tracks the text node position correctly. ([#1098](https://github.com/InditexTech/weavejs/issues/1098))
+
+---
+
+## Breaking Changes
+
+### `WeaveStore.connect()` and `disconnect()` are now async
+
+The abstract methods `connect()` and `disconnect()` on `WeaveStore` now return `Promise<void>` instead of `void`. Any **custom store implementations** must be updated to be `async`.
+
+#### Before (v4.x)
+
+```ts
+class MyStore extends WeaveStore {
+  connect(extraParams?: unknown): void {
+    // synchronous setup
+  }
+
+  disconnect(): void {
+    // synchronous teardown
+  }
+}
+```
+
+#### After (v5.0.0)
+
+```ts
+class MyStore extends WeaveStore {
+  async connect(extraParams?: unknown): Promise<void> {
+    // async setup — await any async operations
+  }
+
+  async disconnect(): Promise<void> {
+    // async teardown
+  }
+}
+```
+
+Also in this change: the Azure Web PubSub store's **maximum WebSocket frame size** has been increased from 64 KB to **512 KB**.
+
+[https://github.com/InditexTech/weavejs/issues/1091](https://github.com/InditexTech/weavejs/issues/1091)
+
+---
+
+### Image fallback data no longer saved in shared document state
+
+The `WeaveImageNode` no longer writes image fallback data (base64 data URLs) into the shared Yjs document. This reduces document size and avoids flooding collaborators with binary data. Applications that relied on the old behaviour must adopt the new `imageFallback` configuration API to persist and retrieve fallback images from their own storage.
+
+#### Before (v4.x)
+
+Image fallback data was automatically stored in the room state and broadcast to all collaborators.
+
+#### After (v5.0.0)
+
+Configure the `imageFallback` option on `WeaveImageNode` to hook into your own persistence layer:
+
+```ts
+import { WeaveImageNode } from '@inditextech/weave-sdk';
+
+const imageNode = new WeaveImageNode({
+  // ... other config
+  imageFallback: {
+    enabled: true,
+    getId: (params) => params.id as string,
+    getDataURL: (id) => myStorage.get(id) ?? '',
+    onPersist: (params, dataURL) => {
+      myStorage.set(params.id as string, dataURL);
+    },
+  },
+});
+```
+
+[https://github.com/InditexTech/weavejs/issues/1089](https://github.com/InditexTech/weavejs/issues/1089)
+
+---
+
+### Font loading API: `fontsConfig` function now receives a helper argument
+
+If you use a **function** to configure fonts (as opposed to a static array), its signature has changed. The function now receives a `loadFontsFamilies` helper as its first argument, which handles `FontFace` loading and registration for you.
+
+#### Before (v4.x)
+
+```ts
+const instance = new Weave({
+  // ...
+  fonts: async () => {
+    // manually load and register FontFace objects
+    return [
+      { id: 'MyFont', name: 'MyFont, sans-serif', offsetY: 0, supportedStyles: [] },
+    ];
+  },
+});
+```
+
+#### After (v5.0.0)
+
+```ts
+const instance = new Weave({
+  // ...
+  fonts: async (loadFontsFamilies) => {
+    return loadFontsFamilies([
+      {
+        family: 'MyFont',
+        offset: { y: 0 },
+        supportedStyles: [],
+        fontFaces: [
+          { source: 'url(/fonts/MyFont-Regular.woff2)', weight: '400' },
+          { source: 'url(/fonts/MyFont-Bold.woff2)', weight: '700' },
+        ],
+      },
+    ]);
+  },
+});
+```
+
+Passing a static array of `WeaveFont` objects is unaffected by this change.
+
+---
+
+### `@syncedstore/core` removed
+
+The `@syncedstore/core` package is no longer a dependency of `@inditextech/weave-react`. If your application imported anything from `@syncedstore/core` directly (e.g. to observe Yjs state), migrate to the equivalent **Yjs** APIs.
+
+#### Before (v4.x)
+
+```ts
+import { getYjsValue } from '@syncedstore/core';
+
+const yjsMap = getYjsValue(store.state);
+```
+
+#### After (v5.0.0)
+
+```ts
+// Use the Yjs doc directly — available from the store
+const yjsDoc = store.getDoc();
+const yjsMap = yjsDoc.getMap('weave');
+```
+
+[https://github.com/InditexTech/weavejs/issues/1090](https://github.com/InditexTech/weavejs/issues/1090)
+
+---
+
+## Migration Steps
+
+1. **Update custom store implementations** — add `async` and return `Promise<void>` from `connect()` and `disconnect()`.
+2. **Adopt the `imageFallback` API** — if you rely on image fallback data being stored in the Yjs document, configure the new `imageFallback` option on `WeaveImageNode` to persist fallback images in your own storage.
+3. **Update font loading functions** — if you use a `fontsConfig` function, update its signature to accept and use the `loadFontsFamilies` helper.
+4. **Remove `@syncedstore/core`** — replace any direct usage with Yjs APIs accessed via `store.getDoc()`.
+5. **Register new nodes and actions** (optional) — add `WeavePolygonNode` and `WeavePolygonToolAction` to unlock polygon drawing; no action needed if you do not want the feature.

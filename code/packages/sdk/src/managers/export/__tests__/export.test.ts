@@ -46,6 +46,8 @@ function makeStage() {
     toImage: vi.fn(),
     toBlob: vi.fn(),
     toCanvas: vi.fn(),
+    clone: vi.fn(),
+    destroy: vi.fn(),
   };
 }
 
@@ -77,6 +79,7 @@ describe('WeaveExportManager', () => {
   let layer: ReturnType<typeof makeLayer>;
   let mockInst: ReturnType<typeof makeInstance>;
   let manager: WeaveExportManager;
+  let clonedStage: ReturnType<typeof makeStage>;
 
   beforeEach(() => {
     vi.mocked(getExportBoundingBox).mockReturnValue(MOCK_BOUNDS);
@@ -91,6 +94,14 @@ describe('WeaveExportManager', () => {
 
     stage = makeStage();
     layer = makeLayer();
+
+    // Set up cloned stage (returned by stage.clone() — used by all export methods)
+    clonedStage = makeStage();
+    clonedStage.findOne.mockImplementation((sel: string) =>
+      sel === '#mainLayer' ? layer : undefined
+    );
+    stage.clone.mockReturnValue(clonedStage);
+
     mockInst = makeInstance(stage, layer);
     manager = new WeaveExportManager(mockInst.instance as never);
 
@@ -113,14 +124,14 @@ describe('WeaveExportManager', () => {
       return Promise.resolve({ toBuffer: vi.fn().mockReturnValue(MOCK_BUFFER) });
     });
 
-    // Default stage callback mocks (for exportArea* methods)
-    stage.toImage.mockImplementation((options: Record<string, unknown>) =>
+    // Default stage callback mocks (for exportArea* methods — called on clonedStage)
+    clonedStage.toImage.mockImplementation((options: Record<string, unknown>) =>
       (options?.callback as (img: typeof MOCK_IMG) => void)?.(MOCK_IMG)
     );
-    stage.toBlob.mockImplementation((options: Record<string, unknown>) =>
+    clonedStage.toBlob.mockImplementation((options: Record<string, unknown>) =>
       (options?.callback as (blob: Blob) => void)?.(MOCK_BLOB)
     );
-    stage.toCanvas.mockImplementation((options: Record<string, unknown>) => {
+    clonedStage.toCanvas.mockImplementation((options: Record<string, unknown>) => {
       if (options?.callback) {
         (options.callback as (canvas: typeof MOCK_CANVAS_ELEMENT) => void)(MOCK_CANVAS_ELEMENT);
         return;
@@ -222,43 +233,33 @@ describe('WeaveExportManager', () => {
       expect(img).toBe(MOCK_IMG);
     });
 
-    it('disables plugins and re-enables if they were enabled', async () => {
+    it('client-side export does not call disable/enable on plugins (uses clone)', async () => {
       const sel = makePlugin(true);
       const grid = makePlugin(true);
       vi.mocked(manager.getNodesSelectionPlugin).mockReturnValue(sel as never);
       vi.mocked(manager.getStageGridPlugin).mockReturnValue(grid as never);
       await manager.exportNodesAsImage([], bound as never, {});
-      expect(sel.disable).toHaveBeenCalled();
-      expect(sel.enable).toHaveBeenCalled();
-      expect(grid.disable).toHaveBeenCalled();
-      expect(grid.enable).toHaveBeenCalled();
+      expect(sel.disable).not.toHaveBeenCalled();
+      expect(grid.disable).not.toHaveBeenCalled();
     });
 
     it('does NOT re-enable a plugin that was already disabled', async () => {
       const sel = makePlugin(false);
       vi.mocked(manager.getNodesSelectionPlugin).mockReturnValue(sel as never);
       await manager.exportNodesAsImage([], bound as never, {});
-      expect(sel.disable).toHaveBeenCalled();
+      expect(sel.disable).not.toHaveBeenCalled();
       expect(sel.enable).not.toHaveBeenCalled();
     });
 
-    it('restores original stage position and scale after export', async () => {
-      stage.x.mockReturnValue(50);
-      stage.y.mockReturnValue(60);
-      stage.scaleX.mockReturnValue(2);
-      stage.scaleY.mockReturnValue(3);
+    it('original stage is not modified after export', async () => {
       await manager.exportNodesAsImage([], bound as never, {});
-      expect(stage.position).toHaveBeenCalledWith({ x: 50, y: 60 });
-      expect(stage.scale).toHaveBeenCalledWith({ x: 2, y: 3 });
+      expect(stage.position).not.toHaveBeenCalled();
+      expect(stage.scale).not.toHaveBeenCalled();
     });
 
-    it('returns a pending Promise when mainLayer is null', async () => {
-      (mockInst.instance as { getMainLayer: ReturnType<typeof vi.fn> }).getMainLayer.mockReturnValue(null);
-      const result = await Promise.race([
-        manager.exportNodesAsImage([], bound as never, {}),
-        Promise.resolve('timeout'),
-      ]);
-      expect(result).toBe('timeout');
+    it('rejects when mainLayer is null', async () => {
+      clonedStage.findOne.mockReturnValue(null);
+      await expect(manager.exportNodesAsImage([], bound as never, {})).rejects.toThrow('Main layer not found');
     });
   });
 
@@ -282,28 +283,22 @@ describe('WeaveExportManager', () => {
       );
     });
 
-    it('disables/re-enables plugins', async () => {
+    it('client-side export does not call disable/enable on plugins (uses clone)', async () => {
       const sel = makePlugin(true);
       vi.mocked(manager.getNodesSelectionPlugin).mockReturnValue(sel as never);
       await manager.exportNodesAsBlob([], bound as never, {});
-      expect(sel.disable).toHaveBeenCalled();
-      expect(sel.enable).toHaveBeenCalled();
+      expect(sel.disable).not.toHaveBeenCalled();
+      expect(sel.enable).not.toHaveBeenCalled();
     });
 
-    it('restores stage position and scale', async () => {
-      stage.x.mockReturnValue(10);
-      stage.y.mockReturnValue(20);
+    it('original stage is not modified after export', async () => {
       await manager.exportNodesAsBlob([], bound as never, {});
-      expect(stage.position).toHaveBeenCalledWith({ x: 10, y: 20 });
+      expect(stage.position).not.toHaveBeenCalled();
     });
 
-    it('returns a pending Promise when mainLayer is null', async () => {
-      (mockInst.instance as { getMainLayer: ReturnType<typeof vi.fn> }).getMainLayer.mockReturnValue(null);
-      const result = await Promise.race([
-        manager.exportNodesAsBlob([], bound as never, {}),
-        Promise.resolve('timeout'),
-      ]);
-      expect(result).toBe('timeout');
+    it('rejects when mainLayer is null', async () => {
+      clonedStage.findOne.mockReturnValue(null);
+      await expect(manager.exportNodesAsBlob([], bound as never, {})).rejects.toThrow('Main layer not found');
     });
   });
 
@@ -317,28 +312,23 @@ describe('WeaveExportManager', () => {
       expect(canvas).toBe(MOCK_CANVAS_ELEMENT);
     });
 
-    it('disables/re-enables plugins', async () => {
+    it('client-side export does not call disable/enable on plugins (uses clone)', async () => {
       const grid = makePlugin(true);
       vi.mocked(manager.getStageGridPlugin).mockReturnValue(grid as never);
       await manager.exportNodesAsCanvas([], bound as never, {});
-      expect(grid.disable).toHaveBeenCalled();
-      expect(grid.enable).toHaveBeenCalled();
+      expect(grid.disable).not.toHaveBeenCalled();
+      expect(grid.enable).not.toHaveBeenCalled();
     });
 
-    it('restores stage position and scale', async () => {
-      stage.x.mockReturnValue(5);
-      stage.y.mockReturnValue(7);
+    it('original stage is not modified after export', async () => {
       await manager.exportNodesAsCanvas([], bound as never, {});
-      expect(stage.position).toHaveBeenCalledWith({ x: 5, y: 7 });
+      expect(stage.position).not.toHaveBeenCalled();
+      expect(stage.scale).not.toHaveBeenCalled();
     });
 
-    it('returns a pending Promise when mainLayer is null', async () => {
-      (mockInst.instance as { getMainLayer: ReturnType<typeof vi.fn> }).getMainLayer.mockReturnValue(null);
-      const result = await Promise.race([
-        manager.exportNodesAsCanvas([], bound as never, {}),
-        Promise.resolve('timeout'),
-      ]);
-      expect(result).toBe('timeout');
+    it('rejects when mainLayer is null', async () => {
+      clonedStage.findOne.mockReturnValue(null);
+      await expect(manager.exportNodesAsCanvas([], bound as never, {})).rejects.toThrow('Main layer not found');
     });
   });
 
@@ -348,7 +338,7 @@ describe('WeaveExportManager', () => {
     const area = { x: 10, y: 20, width: 100, height: 200 };
 
     it('rejects when mainLayer is null', async () => {
-      (mockInst.instance as { getMainLayer: ReturnType<typeof vi.fn> }).getMainLayer.mockReturnValue(null);
+      clonedStage.findOne.mockReturnValue(null);
       await expect(manager.exportAreaAsImage(area, {})).rejects.toThrow('Main layer not found');
     });
 
@@ -363,10 +353,9 @@ describe('WeaveExportManager', () => {
       vi.mocked(manager.getNodesSelectionPlugin).mockReturnValue(sel as never);
       vi.mocked(manager.getStageGridPlugin).mockReturnValue(grid as never);
       await manager.exportAreaAsImage(area, {});
-      expect(sel.disable).toHaveBeenCalled();
-      expect(sel.enable).toHaveBeenCalled();
-      expect(grid.disable).toHaveBeenCalled();
-      expect(grid.enable).toHaveBeenCalled();
+      // client-side export uses clone; no plugin disable/enable
+      expect(sel.disable).not.toHaveBeenCalled();
+      expect(grid.disable).not.toHaveBeenCalled();
     });
 
     it('does NOT re-enable a plugin that was already disabled', async () => {
@@ -376,11 +365,9 @@ describe('WeaveExportManager', () => {
       expect(sel.enable).not.toHaveBeenCalled();
     });
 
-    it('restores stage position and scale', async () => {
-      stage.x.mockReturnValue(3);
-      stage.y.mockReturnValue(4);
+    it('original stage is not modified after export', async () => {
       await manager.exportAreaAsImage(area, {});
-      expect(stage.position).toHaveBeenCalledWith({ x: 3, y: 4 });
+      expect(stage.position).not.toHaveBeenCalled();
     });
   });
 
@@ -390,7 +377,7 @@ describe('WeaveExportManager', () => {
     const area = { x: 10, y: 20, width: 100, height: 200 };
 
     it('rejects when mainLayer is null', async () => {
-      (mockInst.instance as { getMainLayer: ReturnType<typeof vi.fn> }).getMainLayer.mockReturnValue(null);
+      clonedStage.findOne.mockReturnValue(null);
       await expect(manager.exportAreaAsBlob(area, {})).rejects.toThrow('Main layer not found');
     });
 
@@ -400,23 +387,24 @@ describe('WeaveExportManager', () => {
     });
 
     it('rejects when blob is null', async () => {
-      stage.toBlob.mockImplementation((options: Record<string, unknown>) =>
+      clonedStage.toBlob.mockImplementation((options: Record<string, unknown>) =>
         (options?.callback as (b: null) => void)?.(null)
       );
       await expect(manager.exportAreaAsBlob(area, {})).rejects.toThrow('Failed to generate image blob');
     });
 
-    it('restores stage position and scale', async () => {
+    it('original stage is not modified after export', async () => {
       await manager.exportAreaAsBlob(area, {});
-      expect(stage.position).toHaveBeenCalled();
-      expect(stage.scale).toHaveBeenCalled();
+      expect(stage.position).not.toHaveBeenCalled();
+      expect(stage.scale).not.toHaveBeenCalled();
     });
 
     it('disables plugins before export', async () => {
       const sel = makePlugin(true);
       vi.mocked(manager.getNodesSelectionPlugin).mockReturnValue(sel as never);
       await manager.exportAreaAsBlob(area, {});
-      expect(sel.disable).toHaveBeenCalled();
+      // client-side export uses clone; no plugin disable/enable
+      expect(sel.disable).not.toHaveBeenCalled();
     });
   });
 
@@ -426,7 +414,7 @@ describe('WeaveExportManager', () => {
     const area = { x: 10, y: 20, width: 100, height: 200 };
 
     it('rejects when mainLayer is null', async () => {
-      (mockInst.instance as { getMainLayer: ReturnType<typeof vi.fn> }).getMainLayer.mockReturnValue(null);
+      clonedStage.findOne.mockReturnValue(null);
       await expect(manager.exportAreaAsCanvas(area, {})).rejects.toThrow('Main layer not found');
     });
 
@@ -439,14 +427,15 @@ describe('WeaveExportManager', () => {
       const grid = makePlugin(true);
       vi.mocked(manager.getStageGridPlugin).mockReturnValue(grid as never);
       await manager.exportAreaAsCanvas(area, {});
-      expect(grid.disable).toHaveBeenCalled();
-      expect(grid.enable).toHaveBeenCalled();
+      // client-side export uses clone; no plugin disable/enable
+      expect(grid.disable).not.toHaveBeenCalled();
+      expect(grid.enable).not.toHaveBeenCalled();
     });
 
-    it('restores stage position and scale', async () => {
+    it('original stage is not modified after export', async () => {
       await manager.exportAreaAsCanvas(area, {});
-      expect(stage.position).toHaveBeenCalled();
-      expect(stage.scale).toHaveBeenCalled();
+      expect(stage.position).not.toHaveBeenCalled();
+      expect(stage.scale).not.toHaveBeenCalled();
     });
   });
 

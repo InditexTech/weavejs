@@ -73,8 +73,8 @@ const instance = new Weave(weaveConfig: WeaveConfig, stageConfig: Konva.StageCon
     },
     ["weaveConfig.fonts"]: {
       description:
-        "An array that defines the Fonts to be registered and used on the instance",
-      type: "WeaveFont[]",
+        "An array of fonts to be registered and used on the instance, or a preload function that dynamically loads font families and returns the resolved fonts",
+      type: "WeaveFont[] | WeaveFontsPreloadFunction",
     },
     ["weaveConfig.logger"]: {
       description: "Weave logger configuration",
@@ -887,7 +887,24 @@ the room.
 export type WeaveFont = {
   id: string;
   name: string;
+  offsetY?: number;
+  supportedStyles?: WeaveFontStyle[];
 };
+
+export type WeaveFontFace = FontFaceDescriptors & {
+  source: string | BufferSource;
+};
+
+export type WeaveFontFamily = {
+  family: string;
+  fontFaces: WeaveFontFace[];
+  offset: { x: number; y: number };
+  supportedStyles: WeaveFontStyle[];
+};
+
+export type WeaveFontsPreloadFunction = (
+  loadFontsFamilies: (fontFamilies: WeaveFontFamily[]) => Promise<WeaveFont[]>
+) => Promise<WeaveFont[]>;
 
 export type WeaveElementInstance = Konva.Layer | Konva.Group | Konva.Shape;
 
@@ -974,7 +991,7 @@ export declare type WeaveConfig = {
   nodes?: WeaveNodeBase[];
   actions?: WeaveActionBase[];
   plugins?: WeavePluginBase[];
-  fonts?: WeaveFont[];
+  fonts?: WeaveFont[] | WeaveFontsPreloadFunction;
   callbacks?: WeaveCallbacks;
   logger?: WeaveLoggerConfig;
 };

@@ -222,6 +222,10 @@ export class WeaveNodesSnappingCustomGuides {
   saveCustomGuide(guide: Guide): void {
     const containerId = guide.containerId;
 
+    if (!this.customGuides) {
+      this.customGuides = {};
+    }
+
     if (!this.customGuides[containerId]) {
       this.customGuides[containerId] = [];
     }

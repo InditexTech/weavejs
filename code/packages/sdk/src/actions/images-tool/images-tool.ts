@@ -47,6 +47,7 @@ import { loadImageSource } from '@/utils/image';
 
 export class WeaveImagesToolAction extends WeaveAction {
   private readonly config: WeaveImagesToolActionParams;
+  protected initInitialized: boolean = false;
   protected initialized: boolean = false;
   protected initialCursor: string | null = null;
   protected state!: WeaveImagesToolActionState;
@@ -111,7 +112,9 @@ export class WeaveImagesToolAction extends WeaveAction {
   }
 
   onInit(): void {
-    this.instance.addEventListener('onStageDrop', (e: DragEvent) => {
+    if (this.initInitialized) return;
+
+    const handleImagesOnStageDrop = (e: DragEvent) => {
       const dragId = this.instance.getDragStartedId();
       const dragProperties =
         this.instance.getDragProperties<WeaveImagesToolDragAndDropProperties>();
@@ -138,7 +141,11 @@ export class WeaveImagesToolAction extends WeaveAction {
           }
         );
       }
-    });
+    };
+
+    this.instance.addEventListener('onStageDrop', handleImagesOnStageDrop);
+
+    this.initInitialized = true;
   }
 
   private setupEvents() {
@@ -469,7 +476,10 @@ export class WeaveImagesToolAction extends WeaveAction {
           const { imageId } = imageFile;
 
           const uploadImageFunctionInternal = async () => {
-            const imageURL = await this.uploadImageFunction(imageFile.file);
+            const imageURL = await this.uploadImageFunction(
+              imageFile.file,
+              imageId ?? ''
+            );
             return imageURL;
           };
 
@@ -536,7 +546,6 @@ export class WeaveImagesToolAction extends WeaveAction {
               type: WEAVE_IMAGE_TOOL_UPLOAD_TYPE.IMAGE_URL,
               image: {
                 url: imageURL.url,
-                fallback: imageURL.fallback,
                 width: imageURL.width,
                 height: imageURL.height,
               },

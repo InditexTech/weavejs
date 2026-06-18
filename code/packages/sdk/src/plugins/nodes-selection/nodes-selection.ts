@@ -108,6 +108,7 @@ export class WeaveNodesSelectionPlugin
     this._activeGroupContext = null;
   }
 
+
   getName(): string {
     return WEAVE_NODES_SELECTION_KEY;
   }

@@ -7,7 +7,11 @@ import {
   WEAVE_IMAGE_TOOL_UPLOAD_TYPE,
   WEAVE_IMAGE_TOOL_STATE,
 } from './constants';
-import type { DeepPartial, ImageCrossOrigin } from '@inditextech/weave-types';
+import type {
+  DeepPartial,
+  ImageCrossOrigin,
+  WeaveElementAttributes,
+} from '@inditextech/weave-types';
 
 export type WeaveImageToolActionUploadTypeKeys =
   keyof typeof WEAVE_IMAGE_TOOL_UPLOAD_TYPE;
@@ -45,13 +49,13 @@ export type WeaveImageFile = {
 
 export type WeaveImageURL = {
   url: string;
-  fallback: string;
   width: number;
   height: number;
 };
 
 export type WeaveImageToolActionUploadFunction = (
-  file: File
+  file: File,
+  imageId: string
 ) => Promise<string>;
 
 export type WeaveImageToolActionTriggerParams = (
@@ -97,4 +101,17 @@ export type WeaveImageToolActionConfig = {
 
 export type WeaveImageToolActionParams = {
   config: DeepPartial<WeaveImageToolActionConfig>;
+};
+
+export type ImageToolActionData = {
+  props: WeaveElementAttributes;
+  imageId: string | null;
+  container: Konva.Layer | Konva.Node | undefined;
+  imageFile: WeaveImageFile | null;
+  imageURL: WeaveImageURL | null;
+  imageFallbackURL: string | null;
+  forceMainContainer: boolean;
+  clickPoint: Konva.Vector2d | null;
+  uploadType: WeaveImageToolActionUploadType | null;
+  uploadImageFunction: WeaveImageToolActionUploadFunction | null;
 };

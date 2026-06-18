@@ -68,6 +68,7 @@ type WeaveImageToolActionTriggerCommonParams = {
   imageId?: string;
   options?: ImageOptions;
   position?: Konva.Vector2d;
+  container?: Konva.Layer | Konva.Group;
   forceMainContainer?: boolean;
 };
 
@@ -78,12 +79,14 @@ type WeaveImageFile = {
 
 type WeaveImageURL = {
   url: string;
-  fallback: string;
   width: number;
   height: number;
 };
 
-type WeaveImageToolActionUploadFunction = (file: File) => Promise<string>;
+type WeaveImageToolActionUploadFunction = (
+  file: File,
+  imageId: string,
+) => Promise<string>;
 
 type WeaveImageToolActionTriggerParams = (
   | {
@@ -128,6 +131,19 @@ type WeaveImageToolActionConfig = {
 
 type WeaveImageToolActionParams = {
   config: DeepPartial<WeaveImageToolActionConfig>;
+};
+
+type ImageToolActionData = {
+  props: WeaveElementAttributes;
+  imageId: string | null;
+  container: Konva.Layer | Konva.Node | undefined;
+  imageFile: WeaveImageFile | null;
+  imageURL: WeaveImageURL | null;
+  imageFallbackURL: string | null;
+  forceMainContainer: boolean;
+  clickPoint: Konva.Vector2d | null;
+  uploadType: WeaveImageToolActionUploadType | null;
+  uploadImageFunction: WeaveImageToolActionUploadFunction | null;
 };
 ```
 
@@ -188,7 +204,7 @@ on the `onDragStart` event you must call the `setDragAndDropProperties` method o
 properties:
 
 - `imageURL`: the image `WeaveImageURL` metadata of the image to add.
-- `imageId`: (optional) the image id (external resource id) associated to the image.
+- `imageId`: (optional) the image id (external resource id) associated to the image. Used for the image fallback maps normally.
 - `forceMainContainer`: (optional) defines if we should force to add the images on the main stage instead for example A
   frame.
 

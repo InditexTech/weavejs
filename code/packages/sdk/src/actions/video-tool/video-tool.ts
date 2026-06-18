@@ -20,6 +20,7 @@ import { SELECTION_TOOL_ACTION_NAME } from '../selection-tool/constants';
 import type { WeaveVideoNode } from '@/nodes/video/video';
 
 export class WeaveVideoToolAction extends WeaveAction {
+  protected initInitialized: boolean = false;
   protected initialized: boolean = false;
   protected initialCursor: string | null = null;
   protected state!: WeaveVideoToolActionState;
@@ -74,7 +75,9 @@ export class WeaveVideoToolAction extends WeaveAction {
   }
 
   onInit(): void {
-    this.instance.addEventListener('onStageDrop', (e: DragEvent) => {
+    if (this.initInitialized) return;
+
+    const handleVideoOnStageDrop = (e: DragEvent) => {
       const dragId = this.instance.getDragStartedId();
       const dragProperties =
         this.instance.getDragProperties<WeaveVideoToolDragAndDropProperties>();
@@ -95,7 +98,11 @@ export class WeaveVideoToolAction extends WeaveAction {
           position: mousePoint,
         });
       }
-    });
+    };
+
+    this.instance.addEventListener('onStageDrop', handleVideoOnStageDrop);
+
+    this.initInitialized = true;
   }
 
   private setupEvents() {

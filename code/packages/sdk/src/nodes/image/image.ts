@@ -46,6 +46,7 @@ export class WeaveImageNode extends WeaveNode {
   protected imageCrop!: WeaveImageCrop | null;
   protected nodeType: string = WEAVE_IMAGE_NODE_TYPE;
   protected notUsedImagesCleanup!: NodeJS.Timeout | null;
+  protected imageFallbackURL!: Record<string, string>;
   private readonly cursorsFallback: WeaveImageCursors = {
     loading: 'wait',
   };
@@ -70,6 +71,33 @@ export class WeaveImageNode extends WeaveNode {
     this.imageTryoutIds = {};
     this.imageTryoutAttempts = {};
     this.imageFallback = {};
+    this.imageFallbackURL = {};
+  }
+
+  getImageFallbackId(params: WeaveElementAttributes): string | undefined {
+    if (this.config.imageFallback.enabled) {
+      return this.config.imageFallback.getId(params);
+    }
+    return undefined;
+  }
+
+  saveImageFallback(params: WeaveElementAttributes, dataURL: string): void {
+    if (this.config.imageFallback.enabled) {
+      this.config.imageFallback.onPersist(params, dataURL);
+    }
+  }
+
+  cacheImageFallbackURL(params: WeaveElementAttributes, dataURL?: string) {
+    if (this.config.imageFallback.enabled) {
+      const imageFallbackId = this.config.imageFallback.getId(params);
+      let finalDataURL: string = '';
+      if (dataURL) {
+        finalDataURL = dataURL;
+      } else {
+        finalDataURL = this.config.imageFallback.getDataURL(imageFallbackId);
+      }
+      this.imageFallbackURL[imageFallbackId] = finalDataURL;
+    }
   }
 
   private setupNotUsedImagesCleanup() {
@@ -95,9 +123,10 @@ export class WeaveImageNode extends WeaveNode {
 
     const bindedCleanupHandler = cleanupHandler.bind(this);
 
-    if (!this.notUsedImagesCleanup) {
-      setTimeout(bindedCleanupHandler, this.config.cleanup.intervalMs);
-    }
+    this.notUsedImagesCleanup ??= setTimeout(
+      bindedCleanupHandler,
+      this.config.cleanup.intervalMs
+    );
   }
 
   preloadCursors() {
@@ -417,8 +446,8 @@ export class WeaveImageNode extends WeaveNode {
     const hasFinalImageLoaded = this.imageSource[id] && imageProps.imageURL;
     const hasFallbackAndFinalImageNotLoaded =
       !imageProps.imageURL &&
-      this.imageFallback[id] &&
-      this.config.useFallbackImage;
+      this.imageFallback[id] !== undefined &&
+      this.config.imageFallback.enabled;
 
     if (hasFinalImageLoaded || hasFallbackAndFinalImageNotLoaded) {
       imagePlaceholder?.destroy();
@@ -464,7 +493,7 @@ export class WeaveImageNode extends WeaveNode {
       this.updateImageCrop(image);
     } else {
       this.updatePlaceholderSize(image);
-      this.loadImage(imageProps, image, true);
+      this.loadImage(imageProps, image, this.config.imageFallback.enabled);
     }
 
     if (this.config.performance.cache.enabled) {
@@ -807,6 +836,9 @@ export class WeaveImageNode extends WeaveNode {
     const id = nodeInstance.getAttrs().id;
     const node = nodeInstance as Konva.Group;
 
+    const actualImageURL = `${nodeInstance.getAttrs().imageURL ?? ''}`;
+    const nextImageURL = `${nextProps.imageURL ?? ''}`;
+
     nodeInstance.setAttrs({
       ...nextProps,
       ...(nextProps.cropInfo
@@ -834,7 +866,15 @@ export class WeaveImageNode extends WeaveNode {
     delete internalImageProps.imageURL;
     delete internalImageProps.zIndex;
 
-    // Loading image
+    if (actualImageURL === '' && nextImageURL !== '') {
+      nodeInstance.setAttrs({
+        ...nodeInstance.getAttrs(),
+        imageURL: nextProps.imageURL,
+      });
+      this.forceLoadImage(nodeInstance);
+    }
+
+    // Not loaded image
     if (!this.imageState[id ?? '']?.loaded) {
       imagePlaceholder?.setAttrs({
         ...internalImageProps,
@@ -1086,12 +1126,23 @@ export class WeaveImageNode extends WeaveNode {
 
     let preloadFunction = this.preloadImage.bind(this);
 
-    const loadFallback =
-      useFallback && imageProps.imageFallback && this.config.useFallbackImage;
+    const loadFallback = useFallback;
 
-    if (loadFallback) {
+    let fallbackImage = undefined;
+    if (loadFallback && this.config.imageFallback.enabled) {
       preloadFunction = this.preloadFallbackImage.bind(this);
-      realImageURL = imageProps.imageFallback;
+      const imageFallbackId = this.config.imageFallback.getId(imageProps);
+      if (!this.imageFallbackURL[imageFallbackId]) {
+        const dataURL = this.config.imageFallback.getDataURL(imageFallbackId);
+        this.cacheImageFallbackURL(imageProps, dataURL);
+      }
+      if (this.imageFallbackURL[imageFallbackId]) {
+        fallbackImage = this.imageFallbackURL[imageFallbackId];
+      }
+    }
+
+    if (fallbackImage) {
+      realImageURL = fallbackImage;
     }
 
     this.loadAsyncElement(id);
@@ -1206,7 +1257,7 @@ export class WeaveImageNode extends WeaveNode {
             isInvalidImage = true;
           }
 
-          if (!this.config.useFallbackImage && !isInvalidImage) {
+          if (!this.config.imageFallback.enabled && !isInvalidImage) {
             const tryoutAttempts = this.imageTryoutAttempts[id] ?? 0;
 
             if (
@@ -1236,7 +1287,7 @@ export class WeaveImageNode extends WeaveNode {
           }
 
           if (
-            this.config.useFallbackImage &&
+            this.config.imageFallback.enabled &&
             !useFallback &&
             !loadTryout &&
             imageProps.imageFallback
@@ -1352,8 +1403,16 @@ export class WeaveImageNode extends WeaveNode {
     }
   }
 
+  isImageFallbackEnabled(): boolean {
+    return this.config.imageFallback.enabled;
+  }
+
   getFallbackImageSource(imageId: string): HTMLImageElement | undefined {
     return this.imageFallback[imageId];
+  }
+
+  getFallbackImageSourceURL(imageId: string): string | undefined {
+    return this.imageFallbackURL[imageId];
   }
 
   getImageSource(imageId: string): HTMLImageElement | undefined {
@@ -1438,6 +1497,24 @@ export class WeaveImageNode extends WeaveNode {
 
     if (node) {
       this.loadImage(node.getAttrs(), node as Konva.Group, false, false);
+    }
+  }
+
+  forceLoadFallbackImage(
+    nodeInstance: WeaveElementInstance,
+    dataURL: string
+  ): void {
+    const nodeId = nodeInstance.getAttrs().id ?? '';
+    const node = this.instance.getStage().findOne(`#${nodeId}`);
+
+    if (this.imageTryoutIds[nodeId]) {
+      clearTimeout(this.imageTryoutIds[nodeId]);
+      delete this.imageTryoutIds[nodeId];
+    }
+
+    if (node) {
+      this.cacheImageFallbackURL(node.getAttrs(), dataURL);
+      this.loadImage(node.getAttrs(), node as Konva.Group, true);
     }
   }
 
@@ -1565,9 +1642,6 @@ export class WeaveImageNode extends WeaveNode {
         height: props.height,
         rotation: props.rotation,
         imageURL: props.imageURL,
-        ...(props.imageFallback && {
-          imageFallback: props.imageFallback,
-        }),
         ...(props.imageId && {
           imageId: props.imageId,
         }),
@@ -1599,9 +1673,6 @@ export class WeaveImageNode extends WeaveNode {
         height: nextProps.height,
         rotation: nextProps.rotation,
         imageURL: nextProps.imageURL,
-        ...(nextProps.imageFallback && {
-          imageFallback: nextProps.imageFallback,
-        }),
         ...(nextProps.imageId && {
           imageId: nextProps.imageId,
         }),
@@ -1647,12 +1718,6 @@ export class WeaveImageNode extends WeaveNode {
         imageURL: z
           .string()
           .describe('The URL of the image to be rendered by the node'),
-        imageFallback: z
-          .string()
-          .optional()
-          .describe(
-            'The fallback image to display while the image to loads, it must be a base64 string with the format: data:image/{format};base64,{data}'
-          ),
 
         adding: z.boolean().default(false),
 

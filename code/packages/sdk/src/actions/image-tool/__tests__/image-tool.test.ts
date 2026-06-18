@@ -68,6 +68,9 @@ function makeImageNodeHandler() {
   return {
     getImageSource: vi.fn().mockReturnValue({ width: 400, height: 300 }),
     getFallbackImageSource: vi.fn().mockReturnValue(null),
+    getImageFallbackId: vi.fn().mockReturnValue(undefined),
+    isImageFallbackEnabled: vi.fn().mockReturnValue(false),
+    getFallbackImageSourceURL: vi.fn().mockReturnValue(undefined),
     create: vi.fn().mockReturnValue({
       getAttrs: vi.fn().mockReturnValue({ id: 'test-uuid' }),
     }),
@@ -441,11 +444,11 @@ describe('WeaveImageToolAction', () => {
       expect(entry['uploadType']).toBeNull();
     });
 
-    it('6.3 props.imageFallback/width/height set from image', () => {
+    it('6.3 props.width/height set from image (imageFallback not propagated to props)', () => {
       triggerImageURL();
       const entry = ((action as unknown as R)['imageAction'] as R)['test-uuid'] as R;
       const props = entry['props'] as R;
-      expect(props['imageFallback']).toBe(mockImageURL.fallback);
+      expect(props['imageFallback']).toBeUndefined();
       expect(props['width']).toBe(mockImageURL.width);
       expect(props['height']).toBe(mockImageURL.height);
     });
@@ -778,7 +781,7 @@ describe('WeaveImageToolAction', () => {
       expect(imageNodeHandler.getImageSource).toHaveBeenCalled();
     });
 
-    it('13.4 uploadType=file → getFallbackImageSource, then loadImageDataURL if null', async () => {
+    it('13.4 uploadType=file + imageFallbackURL → loadImageDataURL called if imageSource null', async () => {
       const imageNodeHandler = makeImageNodeHandler();
       imageNodeHandler.getImageSource.mockReturnValue(null);
       imageNodeHandler.getFallbackImageSource.mockReturnValue(null);
@@ -789,7 +792,7 @@ describe('WeaveImageToolAction', () => {
       (action as unknown as R)['imageAction'] = {
         'test-uuid': makeImageActionEntry({
           uploadType: WEAVE_IMAGE_TOOL_UPLOAD_TYPE.FILE,
-          props: { imageFallback: 'data:image/png;base64,abc', width: 400, height: 300 },
+          props: { imageFallbackURL: 'data:image/png;base64,abc', width: 400, height: 300 },
         }),
       };
       await (action as unknown as R)['addImageNode']('test-uuid');
@@ -905,7 +908,7 @@ describe('WeaveImageToolAction', () => {
       expect((action as unknown as R)['cancelAction']).toHaveBeenCalled();
     });
 
-    it('14.2 uploadType=FILE → getFallbackImageSource, loadImageDataURL if null', async () => {
+    it('14.2 uploadType=FILE + imageFallbackURL → loadImageDataURL called if imageSource null', async () => {
       const handler = makeImageNodeHandler();
       handler.getImageSource.mockReturnValue(null);
       handler.getFallbackImageSource.mockReturnValue(null);
@@ -916,7 +919,7 @@ describe('WeaveImageToolAction', () => {
       (action as unknown as R)['imageAction'] = {
         'test-uuid': makeImageActionEntry({
           uploadType: WEAVE_IMAGE_TOOL_UPLOAD_TYPE.FILE,
-          props: { imageFallback: 'data:image/png;base64,abc', width: 0, height: 0 },
+          props: { imageFallbackURL: 'data:image/png;base64,abc', width: 0, height: 0 },
         }),
       };
       await (action as unknown as R)['handleAdding']('test-uuid');

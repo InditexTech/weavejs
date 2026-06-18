@@ -311,6 +311,7 @@ export class Weave {
     }
 
     this.registerManager.reset();
+
     this.asyncManager.reset();
 
     this.moduleLogger.info('Switching room instance');
@@ -339,6 +340,7 @@ export class Weave {
 
     // Start loading the fonts, this operation can be asynchronous
     await this.fontsManager.loadFonts();
+
     this.setupManager.setupLog();
 
     // Setup stage
