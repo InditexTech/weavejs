@@ -13,6 +13,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- [#1112](https://github.com/InditexTech/weavejs/issues/1112) Preserve Node IDs When Grouping Nodes
+
 ## [5.0.0] - 2026-06-18
 
 ### Added

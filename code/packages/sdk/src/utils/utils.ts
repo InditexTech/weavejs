@@ -303,7 +303,8 @@ export function buildAncestorGroupIds(
   stage: Konva.Stage
 ): string[] {
   const ids: string[] = [];
-  let cur: Konva.Node | null = (stage.findOne(`#${groupId}`) as Konva.Node | null) ?? null;
+  let cur: Konva.Node | null =
+    (stage.findOne(`#${groupId}`) as Konva.Node | null) ?? null;
   while (cur) {
     const id = cur.getAttrs().id;
     if (id && cur.getAttrs().nodeType) ids.push(id);
@@ -321,7 +322,8 @@ export function getTargetedNode(instance: Weave): Konva.Node | undefined {
     if (inter) {
       const selectionPlugin =
         instance.getPlugin<WeaveNodesSelectionPlugin>('nodesSelection');
-      const activeGroupContext = selectionPlugin?.getActiveGroupContext() ?? undefined;
+      const activeGroupContext =
+        selectionPlugin?.getActiveGroupContext() ?? undefined;
       // When in group context, pass the full ancestor ID set so nodes in
       // ancestor groups resolve to themselves (not their containing group)
       const stopIds: string | string[] | undefined = activeGroupContext
@@ -698,4 +700,8 @@ export function getStageClickPoint(
 
 export function isNumber(value: unknown): value is number {
   return typeof value === 'number' && !Number.isNaN(value);
+}
+
+export function sleep(ms: number): Promise<void> {
+  return new Promise((resolve) => setTimeout(resolve, ms));
 }
