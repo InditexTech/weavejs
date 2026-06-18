@@ -66,8 +66,6 @@ export class WeaveFontsManager {
   async loadFonts(): Promise<void> {
     this.logger.info('Loading fonts');
 
-    this.loadedFonts = [];
-
     const fontsConfig = this.instance.getConfiguration().fonts;
 
     if (!fontsConfig) {

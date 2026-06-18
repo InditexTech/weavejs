@@ -112,7 +112,7 @@ export class WeaveImagesToolAction extends WeaveAction {
   }
 
   onInit(): void {
-    if (!this.initInitialized) return;
+    if (this.initInitialized) return;
 
     const handleImagesOnStageDrop = (e: DragEvent) => {
       const dragId = this.instance.getDragStartedId();
