@@ -364,6 +364,12 @@ jobs:
           BASELINE_BRANCH=${{ github.event.inputs.BASELINE || github.ref }}
           echo "BASELINE_BRANCH=${BASELINE_BRANCH#refs/heads/}" >> "$GITHUB_ENV"
 
+      - uses: actions/create-github-app-token@v3
+        id: app-token
+        with:
+          client-id: ${{ vars.APP_CLIENT_ID }}
+          private-key: ${{ secrets.APP_PRIVATE_KEY }}
+
       - name: Checkout merge commit
         uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
         with:
@@ -447,7 +453,7 @@ jobs:
 
       - name: Prepare committer information
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ steps.app-token.outputs.token }}
           GPG_PRIVATE_KEY: ${{ secrets.CI_GPG_SECRET_KEY }}
           GPG_PASSPHRASE: ${{ secrets.CI_GPG_SECRET_KEY_PASSWORD }}
         run: |
@@ -603,11 +609,11 @@ jobs:
 
       - name: Release / Commit and Tag
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ steps.app-token.outputs.token }}
         working-directory: code
         run: |
-          git commit -i CHANGELOG.md -m "chore: Update CHANGELOG with ${{ steps.update-changelog.outputs.version }} version" --no-verify
-          git commit -i package.json package-lock.json packages/*/package.json -m "[npm-scripts] Release ${{ steps.update-changelog.outputs.version }}" --no-verify
+          git commit -S -i CHANGELOG.md -m "chore: Update CHANGELOG with ${{ steps.update-changelog.outputs.version }} version Signed-off-by: srvcosoitxtech <oso@inditex.com>" --no-verify
+          git commit -S -i package.json package-lock.json packages/*/package.json -m "[npm-scripts] Release ${{ steps.update-changelog.outputs.version }} Signed-off-by: srvcosoitxtech <oso@inditex.com>" --no-verify
           git tag -a -m "Release ${{ steps.update-changelog.outputs.version }}" ${{ steps.update-changelog.outputs.version }}
           git push --atomic --no-verify origin HEAD ${{ steps.update-changelog.outputs.version }}
 
@@ -618,10 +624,10 @@ jobs:
 
       - name: Next Development Iteration / Commit Changes
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ steps.app-token.outputs.token }}
         working-directory: code
         run: |
-          git commit -i package.json package-lock.json packages/*/package.json -m "[npm-scripts] prepare for next development iteration" --no-verify
+          git commit -S -i package.json package-lock.json packages/*/package.json -m "[npm-scripts] prepare for next development iteration Signed-off-by: srvcosoitxtech <oso@inditex.com>" --no-verify
           git push --no-verify origin HEAD
 
       - name: Next Development Iteration / Create Sync Branch PR into Develop
@@ -629,7 +635,7 @@ jobs:
         continue-on-error: true
         if: ${{ vars.DEVELOPMENT_FLOW != 'trunk-based-development' }}
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ steps.app-token.outputs.token }}
         run: |
           DEVELOP=${BASELINE_BRANCH/main/develop}
           echo "DEVELOP=$DEVELOP" >> "$GITHUB_OUTPUT"
@@ -651,14 +657,14 @@ jobs:
         with:
           name: ${{ steps.update-changelog.outputs.version }}
           tag: ${{ steps.update-changelog.outputs.version }}
-          token: ${{ secrets.GITHUB_TOKEN }}
+          token: ${{ steps.app-token.outputs.token }}
           body: |
             Check out the [changelog](code/CHANGELOG.md) for version ${{ steps.update-changelog.outputs.version }}
 
       - name: Comment in PR / Sync PR creation failed
         if: ${{ vars.DEVELOPMENT_FLOW != 'trunk-based-development' }}
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ steps.app-token.outputs.token }}
         run: |
           DEVELOP=${BASELINE_BRANCH/main/develop}
           git remote set-url origin "https://x-access-token:$GITHUB_TOKEN@github.com/$GITHUB_REPOSITORY"
@@ -671,7 +677,7 @@ jobs:
       - name: Comment in PR / Release creation failed
         if: ${{ steps.github-release.outcome == 'failure' }}
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ steps.app-token.outputs.token }}
         run: >
           gh pr comment ${{ github.event.number }} --body "An error occurred creating the GitHub Release.
           Don't panic! Your artifacts were successfully uploaded to the InditexTech npmjs registry and the new release tag was created.
