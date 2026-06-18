@@ -283,6 +283,13 @@ describe('saveCustomGuide', () => {
     expect(manager.getAllCustomGuides()['newContainer']).toHaveLength(1);
   });
 
+  it('initializes customGuides map when it is null before saving', () => {
+    const { manager } = setup();
+    (manager as unknown as { customGuides: null }).customGuides = null as never;
+    manager.saveCustomGuide(makeGuide('g1', 'V', 'c1'));
+    expect(manager.getAllCustomGuides()).toHaveProperty('c1');
+  });
+
   it('appends to existing container array', () => {
     const { manager } = setup();
     manager.saveCustomGuide(makeGuide('g1', 'V', 'c1'));

@@ -91,10 +91,10 @@ export class WeaveImageNode extends WeaveNode {
     if (this.config.imageFallback.enabled) {
       const imageFallbackId = this.config.imageFallback.getId(params);
       let finalDataURL: string = '';
-      if (!dataURL) {
-        finalDataURL = this.config.imageFallback.getDataURL(imageFallbackId);
-      } else {
+      if (dataURL) {
         finalDataURL = dataURL;
+      } else {
+        finalDataURL = this.config.imageFallback.getDataURL(imageFallbackId);
       }
       this.imageFallbackURL[imageFallbackId] = finalDataURL;
     }
@@ -123,12 +123,10 @@ export class WeaveImageNode extends WeaveNode {
 
     const bindedCleanupHandler = cleanupHandler.bind(this);
 
-    if (!this.notUsedImagesCleanup) {
-      this.notUsedImagesCleanup = setTimeout(
-        bindedCleanupHandler,
-        this.config.cleanup.intervalMs
-      );
-    }
+    this.notUsedImagesCleanup ??= setTimeout(
+      bindedCleanupHandler,
+      this.config.cleanup.intervalMs
+    );
   }
 
   preloadCursors() {
@@ -873,7 +871,7 @@ export class WeaveImageNode extends WeaveNode {
         ...nodeInstance.getAttrs(),
         imageURL: nextProps.imageURL,
       });
-      this.forceLoadImage(nodeInstance as Konva.Group);
+      this.forceLoadImage(nodeInstance);
     }
 
     // Not loaded image

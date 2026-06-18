@@ -338,7 +338,9 @@ export class WeaveExportManager {
 
     const exportGroup = new Konva.Group();
 
-    if (!exportArea) {
+    if (exportArea) {
+      mainLayer.add(background);
+    } else {
       exportGroup.add(background);
 
       for (const node of nodes) {
@@ -352,8 +354,6 @@ export class WeaveExportManager {
       }
 
       mainLayer.add(exportGroup);
-    } else {
-      mainLayer.add(background);
     }
 
     const backgroundRect = background.getClientRect();
