@@ -45,6 +45,7 @@ vi.mock('@/utils/utils', () => ({
   mergeExceptArrays: vi.fn(
     (a: Record<string, unknown>, b: Record<string, unknown>) => ({ ...a, ...b })
   ),
+  sleep: vi.fn().mockResolvedValue(undefined),
 }));
 
 if (typeof (globalThis as Record<string, unknown>)['window'] === 'undefined') {
@@ -395,8 +396,8 @@ describe('WeaveImagesToolAction', () => {
       expect((action as unknown as R)['uploadImageFunction']).toBe(uploadFn);
     });
 
-    it('5.2 nodesIds reset to [] inside FILE block', () => {
-      (action as unknown as R)['nodesIds'] = ['old-id'];
+    it('5.2 nodesIds reset to new Set() inside FILE block', () => {
+      (action as unknown as R)['nodesIds'] = new Set(['old-id']);
       action.trigger(vi.fn(), {
         type: WEAVE_IMAGES_TOOL_UPLOAD_TYPE.FILE,
         images: [makeImageFile()],
@@ -404,9 +405,8 @@ describe('WeaveImagesToolAction', () => {
         onStartUploading: onStart,
         onFinishedUploading: onFinish,
       });
-      // nodesIds is reset in FILE block then populated by addImages
-      // immediately after trigger, addImages is called but async; nodesIds may be []
-      expect(Array.isArray((action as unknown as R)['nodesIds'])).toBe(true);
+      // nodesIds is reset to a new Set in FILE block then populated by addImages
+      expect((action as unknown as R)['nodesIds']).toBeInstanceOf(Set);
     });
 
     it('5.3 addImages called → state transitions toward DEFINING_POSITION', async () => {
@@ -897,8 +897,8 @@ describe('WeaveImagesToolAction', () => {
 
     it('13.1 nodeId in nodesIds → handleImageAdded called', async () => {
       const checkAdded = await setupHandleAdding();
-      const nodesIds = (action as unknown as R)['nodesIds'] as string[];
-      const nodeId = nodesIds[0];
+      const nodesIds = (action as unknown as R)['nodesIds'] as Set<string>;
+      const nodeId = Array.from(nodesIds)[0];
       (action as unknown as R)['toAdd'] = 5; // keep > 0 so cleanup doesn't happen
       const handleImageAddedSpy = vi.spyOn(action, 'handleImageAdded');
       checkAdded?.({ nodeId });
@@ -915,14 +915,14 @@ describe('WeaveImagesToolAction', () => {
 
     it('13.3 getImagesAdded()<=0 → setState(FINISHED) + cancelAction + removeEventListener + emitEvent', async () => {
       const checkAdded = await setupHandleAdding();
-      const nodesIds = (action as unknown as R)['nodesIds'] as string[];
+      const nodesIds = (action as unknown as R)['nodesIds'] as Set<string>;
       (action as unknown as R)['toAdd'] = 1; // will become 0 after handleImageAdded
       const cancelFn = (action as unknown as R)['cancelAction'] as ReturnType<typeof vi.fn>;
-      checkAdded?.({ nodeId: nodesIds[0] });
+      checkAdded?.({ nodeId: Array.from(nodesIds)[0] });
       expect((action as unknown as R)['state']).toBe(WEAVE_IMAGES_TOOL_STATE.FINISHED);
       expect(cancelFn).toHaveBeenCalled();
       expect(mockWeave.removeEventListener).toHaveBeenCalledWith('onAddedImage', expect.any(Function));
-      expect(mockWeave.emitEvent).toHaveBeenCalledWith('onAddedImages', { nodesIds });
+      expect(mockWeave.emitEvent).toHaveBeenCalledWith('onAddedImages', { nodesIds: Array.from(nodesIds) });
     });
 
     it('13.4 getImagesAdded()>0 → no setState/cancelAction', async () => {
@@ -1010,7 +1010,7 @@ describe('WeaveImagesToolAction', () => {
   describe('Suite 16: cleanup', () => {
     beforeEach(() => {
       setupAction();
-      (action as unknown as R)['nodesIds'] = ['node-1', 'node-2'];
+      (action as unknown as R)['nodesIds'] = new Set(['node-1', 'node-2']);
     });
 
     it('16.1 tempPointerFeedbackNode present → destroy + null', () => {
@@ -1078,7 +1078,7 @@ describe('WeaveImagesToolAction', () => {
       expect((action as unknown as R)['initialCursor']).toBeNull();
       expect((action as unknown as R)['container']).toBeUndefined();
       expect((action as unknown as R)['clickPoint']).toBeNull();
-      expect((action as unknown as R)['nodesIds']).toEqual([]);
+      expect((action as unknown as R)['nodesIds']).toEqual(new Set());
       expect((action as unknown as R)['toAdd']).toBe(0);
       expect((action as unknown as R)['state']).toBe(WEAVE_IMAGES_TOOL_STATE.IDLE);
     });

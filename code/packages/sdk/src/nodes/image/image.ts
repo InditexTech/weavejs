@@ -465,6 +465,8 @@ export class WeaveImageNode extends WeaveNode {
       this.config.imageFallback.enabled;
 
     if (hasFinalImageLoaded || hasFallbackAndFinalImageNotLoaded) {
+      imagePlaceholder?.destroy();
+
       const imageSource: HTMLImageElement | ImageBitmap =
         hasFallbackAndFinalImageNotLoaded
           ? this.imageFallback[id]

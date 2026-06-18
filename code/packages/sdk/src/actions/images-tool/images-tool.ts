@@ -29,7 +29,7 @@ import {
   WEAVE_IMAGES_TOOL_UPLOAD_TYPE,
 } from './constants';
 import { WeaveAction } from '../action';
-import { mergeExceptArrays, sleep } from '@/utils/utils';
+import { mergeExceptArrays } from '@/utils/utils';
 import type { WeaveImageToolAction } from '../image-tool/image-tool';
 import {
   WEAVE_IMAGE_TOOL_ACTION_NAME,
@@ -665,41 +665,26 @@ export class WeaveImagesToolAction extends WeaveAction {
     }
   }
 
-  async waitForImagesToBeAdded() {
+  async waitForImagesToBeAdded(nodesIds: Set<string>) {
     const stage = this.instance.getStage();
 
     const selectionPlugin =
       this.instance.getPlugin<WeaveNodesSelectionPlugin>('nodesSelection');
 
     if (selectionPlugin) {
-      let allFound = false;
+      const addedNodes = [];
 
-      while (!allFound) {
-        const addedNodes = [];
+      for (const nodeId of Array.from(nodesIds)) {
+        const node = stage.findOne(`#${nodeId}`);
 
-        let foundImages = 0;
-        for (const nodeId of Array.from(this.nodesIds)) {
-          const node = stage.findOne(`#${nodeId}`);
-
-          if (node) {
-            addedNodes.push(node);
-            foundImages++;
-          }
+        if (node) {
+          addedNodes.push(node);
         }
-
-        if (foundImages === this.nodesIds.size) {
-          allFound = true;
-
-          selectionPlugin.setSelectedNodes(addedNodes);
-          this.instance.triggerAction(SELECTION_TOOL_ACTION_NAME);
-        }
-
-        await sleep(50);
       }
-    }
 
-    this.nodesIds = new Set();
-    this.toAdd = 0;
+      selectionPlugin.setSelectedNodes(addedNodes);
+      this.instance.triggerAction(SELECTION_TOOL_ACTION_NAME);
+    }
   }
 
   cleanup(): void {
@@ -709,7 +694,10 @@ export class WeaveImagesToolAction extends WeaveAction {
     this.tempPointerFeedbackNode = null;
     this.instance.getUtilityLayer()?.batchDraw();
 
-    this.waitForImagesToBeAdded();
+    const nodesIds = this.nodesIds;
+    this.nodesIds = new Set();
+    this.toAdd = 0;
+    this.waitForImagesToBeAdded(nodesIds);
 
     this.instance.emitEvent<undefined>('onFinishedImages');
 
