@@ -1810,5 +1810,355 @@ describe('WeaveImageNode', () => {
       expect(mock.stateTransactional).toHaveBeenCalledTimes(1);
       expect(mock.emitEvent).not.toHaveBeenCalled();
     });
+
+    it('34.3 calls removeNodeNT when nodeHandler is found', () => {
+      const { node, mock } = makeNode();
+      const imageNode = new Konva.Group({ id: 'test-image' });
+      imageNode.add(new Konva.Image({ id: 'test-image-image' } as Konva.ImageConfig));
+      imageNode.add(new Konva.Group({ id: 'test-image-cropGroup' }));
+      const reference = new Konva.Rect({ id: 'ref-1', nodeType: 'rect' });
+      const fakeState = { id: 'ref-1' };
+      mock.getNodeHandler.mockReturnValue({ serialize: vi.fn().mockReturnValue(fakeState) });
+      vi.spyOn(WeaveImageCrop.prototype, 'handleClipExternal').mockImplementation(() => {});
+
+      node.cropImageWithReference(imageNode, reference);
+
+      expect(mock.removeNodeNT).toHaveBeenCalledWith(fakeState);
+    });
+  });
+
+  describe('35 — imageFallback methods', () => {
+    function makeFallbackNode() {
+      return makeNode({
+        imageFallback: {
+          enabled: true,
+          getId: vi.fn().mockImplementation((params: Record<string, unknown>) => `fallback-${params['id'] ?? 'x'}`),
+          getDataURL: vi.fn().mockReturnValue('data:image/png;base64,fetched'),
+          onPersist: vi.fn(),
+        } as WeaveImageProperties['imageFallback'],
+      });
+    }
+
+    it('35.1 getImageFallbackId returns id when enabled', () => {
+      const { node } = makeFallbackNode();
+      const result = node.getImageFallbackId({ id: 'img-1' });
+      expect(result).toBe('fallback-img-1');
+    });
+
+    it('35.2 getImageFallbackId returns undefined when disabled', () => {
+      const { node } = makeNode();
+      const result = node.getImageFallbackId({ id: 'img-1' });
+      expect(result).toBeUndefined();
+    });
+
+    it('35.3 saveImageFallback calls onPersist when enabled', () => {
+      const { node } = makeFallbackNode();
+      const priv = getPrivateNode(node);
+      node.saveImageFallback({ id: 'img-1' }, 'data:image/png;base64,abc');
+      expect(priv.config.imageFallback.onPersist).toHaveBeenCalledWith(
+        { id: 'img-1' },
+        'data:image/png;base64,abc'
+      );
+    });
+
+    it('35.4 saveImageFallback does nothing when disabled', () => {
+      const { node } = makeNode();
+      expect(() => node.saveImageFallback({ id: 'img-1' }, 'data:abc')).not.toThrow();
+    });
+
+    it('35.5 cacheImageFallbackURL stores provided dataURL', () => {
+      const { node } = makeFallbackNode();
+      node.cacheImageFallbackURL({ id: 'img-1' }, 'data:image/png;base64,provided');
+      const priv = getPrivateNode(node) as unknown as { imageFallbackURL: Record<string, string> };
+      expect(priv.imageFallbackURL['fallback-img-1']).toBe('data:image/png;base64,provided');
+    });
+
+    it('35.6 cacheImageFallbackURL fetches via getDataURL when no dataURL given', () => {
+      const { node } = makeFallbackNode();
+      node.cacheImageFallbackURL({ id: 'img-1' });
+      const priv = getPrivateNode(node) as unknown as { imageFallbackURL: Record<string, string> };
+      expect(priv.imageFallbackURL['fallback-img-1']).toBe('data:image/png;base64,fetched');
+    });
+
+    it('35.7 cacheImageFallbackURL does nothing when disabled', () => {
+      const { node } = makeNode();
+      expect(() => node.cacheImageFallbackURL({ id: 'img-1' }, 'data:abc')).not.toThrow();
+    });
+  });
+
+  describe('36 — getter helpers', () => {
+    it('36.1 isImageFallbackEnabled returns false by default', () => {
+      const { node } = makeNode();
+      expect(node.isImageFallbackEnabled()).toBe(false);
+    });
+
+    it('36.2 isImageFallbackEnabled returns true when configured', () => {
+      const { node } = makeNode({
+        imageFallback: {
+          enabled: true,
+          getId: vi.fn(),
+          getDataURL: vi.fn(),
+          onPersist: vi.fn(),
+        } as WeaveImageProperties['imageFallback'],
+      });
+      expect(node.isImageFallbackEnabled()).toBe(true);
+    });
+
+    it('36.3 getFallbackImageSource returns stored fallback element', () => {
+      const { node } = makeNode();
+      const priv = getPrivateNode(node);
+      const img = makeMockImageElement() as unknown as HTMLImageElement;
+      priv.imageFallback['abc'] = img;
+      expect(node.getFallbackImageSource('abc')).toBe(img);
+    });
+
+    it('36.4 getFallbackImageSourceURL returns stored fallback URL', () => {
+      const { node } = makeNode();
+      const priv = getPrivateNode(node) as unknown as { imageFallbackURL: Record<string, string> };
+      priv.imageFallbackURL['abc'] = 'data:image/png;base64,xyz';
+      expect(node.getFallbackImageSourceURL('abc')).toBe('data:image/png;base64,xyz');
+    });
+
+    it('36.5 getImageSource returns stored image element', () => {
+      const { node } = makeNode();
+      const priv = getPrivateNode(node);
+      const img = makeMockImageElement() as unknown as HTMLImageElement;
+      priv.imageSource['abc'] = img;
+      expect(node.getImageSource('abc')).toBe(img);
+    });
+  });
+
+  describe('37 — forceLoadFallbackImage', () => {
+    it('37.1 calls loadImage with useFallback=true when node found', () => {
+      const { node, mock } = makeNode();
+      const priv = getPrivateNode(node);
+      const imageNode = new Konva.Group({ id: 'test-image' });
+      mock.getStage().findOne.mockReturnValue(imageNode);
+      const loadSpy = vi.spyOn(priv, 'loadImage').mockImplementation(() => {});
+
+      node.forceLoadFallbackImage(imageNode, 'data:image/png;base64,fallback');
+
+      expect(loadSpy).toHaveBeenCalledWith(
+        expect.anything(),
+        imageNode,
+        true
+      );
+    });
+
+    it('37.2 does not call loadImage when node not found', () => {
+      const { node, mock } = makeNode();
+      const priv = getPrivateNode(node);
+      mock.getStage().findOne.mockReturnValue(null);
+      const loadSpy = vi.spyOn(priv, 'loadImage').mockImplementation(() => {});
+      const nodeInstance = new Konva.Group({ id: 'missing-node' });
+
+      node.forceLoadFallbackImage(nodeInstance, 'data:image/png;base64,x');
+
+      expect(loadSpy).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('38 — onRender: group crop callbacks', () => {
+    it('38.1 group.triggerCrop() calls node.triggerCrop', () => {
+      const { node, mock } = makeNode();
+      mock.getActiveAction.mockReturnValue(SELECTION_TOOL_ACTION_NAME);
+      const group = node.onRender(defaultProps()) as Konva.Group;
+      getSelectionPlugin(mock).getSelectedNodes.mockReturnValue([group]);
+      const triggerCropSpy = vi.spyOn(node, 'triggerCrop').mockImplementation(() => {});
+
+      group.triggerCrop?.();
+
+      expect(triggerCropSpy).toHaveBeenCalledWith(group, { cmdCtrl: { triggered: false } });
+    });
+
+    it('38.2 group.closeCrop() calls node.closeCrop', () => {
+      const { node } = makeNode();
+      const group = node.onRender(defaultProps()) as Konva.Group;
+      const closeCropSpy = vi.spyOn(node, 'closeCrop').mockImplementation(() => {});
+
+      group.closeCrop?.(WEAVE_IMAGE_CROP_END_TYPE.CANCEL);
+
+      expect(closeCropSpy).toHaveBeenCalledWith(group, WEAVE_IMAGE_CROP_END_TYPE.CANCEL);
+    });
+
+    it('38.3 group.resetCrop() returns early when stage.findOne returns null', () => {
+      const { node, mock } = makeNode();
+      mock.getStage().findOne.mockReturnValue(null);
+      const group = node.onRender(defaultProps()) as Konva.Group;
+
+      expect(() => group.resetCrop?.()).not.toThrow();
+    });
+
+    it('38.4 group.resetCrop() calls imageCrop.unCrop when image found', () => {
+      const { node, mock } = makeNode();
+      const { group: imageGroup, internalImage, cropGroup } = createRenderableGroup();
+      mock.getStage().findOne.mockReturnValue(imageGroup);
+      const unCropSpy = vi.spyOn(WeaveImageCrop.prototype, 'unCrop').mockImplementation(() => {});
+      const renderedGroup = node.onRender(defaultProps()) as Konva.Group;
+
+      renderedGroup.resetCrop?.();
+
+      void internalImage;
+      void cropGroup;
+      expect(unCropSpy).toHaveBeenCalled();
+    });
+  });
+
+  describe('39 — onRender: nodeDragStart and cmdCtrl early returns', () => {
+    it('39.1 nodeDragStart returns early when utilityLayer is null', () => {
+      const { node, mock } = makeNode();
+      mock.getUtilityLayer.mockReturnValue(null);
+      const group = node.onRender(defaultProps()) as Konva.Group;
+
+      expect(() => fireKonvaEvent(group, 'nodeDragStart')).not.toThrow();
+    });
+
+    it('39.2 nodeDragStart returns early when transformer is null', () => {
+      const { node, mock } = makeNode();
+      getSelectionPlugin(mock).getTransformer.mockReturnValue(null);
+      const group = node.onRender(defaultProps()) as Konva.Group;
+
+      expect(() => fireKonvaEvent(group, 'nodeDragStart')).not.toThrow();
+    });
+
+    it('39.3 onCmdCtrlPressed returns early when utilityLayer is null', () => {
+      const { node, mock } = makeNode();
+      mock.getUtilityLayer.mockReturnValue(null);
+      const group = node.onRender(defaultProps()) as Konva.Group;
+      vi.spyOn(group, 'isDragging').mockReturnValue(false);
+
+      expect(() => fireKonvaEvent(group, 'onCmdCtrlPressed')).not.toThrow();
+    });
+
+    it('39.4 onCmdCtrlPressed returns early when isDragging', () => {
+      const { node, mock } = makeNode();
+      const transformer = { hide: vi.fn(), show: vi.fn() };
+      getSelectionPlugin(mock).getTransformer.mockReturnValue(transformer);
+      const group = node.onRender(defaultProps()) as Konva.Group;
+      vi.spyOn(group, 'isDragging').mockReturnValue(true);
+
+      fireKonvaEvent(group, 'onCmdCtrlPressed');
+
+      expect(transformer.hide).not.toHaveBeenCalled();
+    });
+
+    it('39.5 onCmdCtrlPressed returns early when transformer is null', () => {
+      const { node, mock } = makeNode();
+      getSelectionPlugin(mock).getTransformer.mockReturnValue(null);
+      const group = node.onRender(defaultProps()) as Konva.Group;
+      vi.spyOn(group, 'isDragging').mockReturnValue(false);
+
+      expect(() => fireKonvaEvent(group, 'onCmdCtrlPressed')).not.toThrow();
+    });
+
+    it('39.6 onCmdCtrlReleased returns early when utilityLayer is null', () => {
+      const { node, mock } = makeNode();
+      mock.getUtilityLayer.mockReturnValue(null);
+      const group = node.onRender(defaultProps()) as Konva.Group;
+      vi.spyOn(group, 'isDragging').mockReturnValue(false);
+
+      expect(() => fireKonvaEvent(group, 'onCmdCtrlReleased')).not.toThrow();
+    });
+
+    it('39.7 onCmdCtrlReleased returns early when isDragging', () => {
+      const { node, mock } = makeNode();
+      const transformer = { hide: vi.fn(), show: vi.fn() };
+      getSelectionPlugin(mock).getTransformer.mockReturnValue(transformer);
+      const group = node.onRender(defaultProps()) as Konva.Group;
+      vi.spyOn(group, 'isDragging').mockReturnValue(true);
+
+      fireKonvaEvent(group, 'onCmdCtrlReleased');
+
+      expect(transformer.show).not.toHaveBeenCalled();
+    });
+
+    it('39.8 onCmdCtrlReleased returns early when transformer is null', () => {
+      const { node, mock } = makeNode();
+      getSelectionPlugin(mock).getTransformer.mockReturnValue(null);
+      const group = node.onRender(defaultProps()) as Konva.Group;
+      vi.spyOn(group, 'isDragging').mockReturnValue(false);
+
+      expect(() => fireKonvaEvent(group, 'onCmdCtrlReleased')).not.toThrow();
+    });
+  });
+
+  describe('40 — onUpdate: cropInfo / cropSize / empty imageURL', () => {
+    it('40.1 cropInfo truthy branch is applied', () => {
+      const { node } = makeNode();
+      const group = node.onRender(defaultProps()) as Konva.Group;
+      const cropInfo = { x: 0, y: 0, width: 50, height: 50, scaleX: 1 };
+
+      node.onUpdate(group, defaultProps({ cropInfo }));
+
+      expect(group.getAttrs().cropInfo).toEqual(cropInfo);
+    });
+
+    it('40.2 cropSize truthy branch is applied', () => {
+      const { node } = makeNode();
+      const group = node.onRender(defaultProps()) as Konva.Group;
+      const cropSize = { width: 50, height: 50 };
+
+      node.onUpdate(group, defaultProps({ cropSize }));
+
+      expect(group.getAttrs().cropSize).toEqual(cropSize);
+    });
+
+    it('40.3 empty actualImageURL triggers forceLoadImage', () => {
+      const { node, mock } = makeNode();
+      const group = node.onRender(defaultProps({ imageURL: '' })) as Konva.Group;
+      group.setAttr('imageURL', '');
+      const imageNode = new Konva.Group({ id: 'test-image' });
+      mock.getStage().findOne.mockReturnValue(imageNode);
+      const priv = getPrivateNode(node);
+      const loadSpy = vi.spyOn(priv, 'loadImage').mockImplementation(() => {});
+
+      node.onUpdate(group, defaultProps({ imageURL: 'http://example.com/new.jpg' }));
+
+      expect(loadSpy).toHaveBeenCalled();
+    });
+  });
+
+  describe('41 — triggerCrop: missing image early return and show callback', () => {
+    it('41.1 returns early when stage.findOne returns null for image', () => {
+      const { node, mock } = makeNode();
+      mock.getActiveAction.mockReturnValue(SELECTION_TOOL_ACTION_NAME);
+      const imageNode = new Konva.Group({ id: 'test-image', cropping: false });
+      getSelectionPlugin(mock).getSelectedNodes.mockReturnValue([imageNode]);
+      mock.getStage().findOne.mockReturnValue(null);
+
+      expect(() => node.triggerCrop(imageNode, { cmdCtrl: { triggered: false } })).not.toThrow();
+      expect(mock.getStage().mode).toHaveBeenCalledWith(WEAVE_STAGE_IMAGE_CROPPING_MODE);
+    });
+
+    it('41.2 show callback covers crop-end branch', () => {
+      const { node, mock } = makeNode();
+      mock.getActiveAction.mockReturnValue(SELECTION_TOOL_ACTION_NAME);
+      const imageNode = new Konva.Group({ id: 'test-image', cropping: false });
+      const internalImage = new Konva.Image({ id: 'test-image-image' } as Konva.ImageConfig);
+      const cropGroup = new Konva.Group({ id: 'test-image-cropGroup' });
+      imageNode.add(internalImage);
+      imageNode.add(cropGroup);
+      getSelectionPlugin(mock).getSelectedNodes.mockReturnValue([imageNode]);
+      mock.getStage().findOne.mockReturnValue(imageNode);
+      vi.spyOn(WeaveImageCrop.prototype, 'show').mockImplementation((cb: () => void) => { cb(); });
+
+      node.triggerCrop(imageNode, { cmdCtrl: { triggered: false } });
+
+      expect(mock.emitEvent).toHaveBeenCalledWith('onImageCropEnd', expect.objectContaining({ instance: imageNode }));
+    });
+  });
+
+  describe('42 — updateNodeState with imageId', () => {
+    it('42.1 imageId is included when provided', () => {
+      const base = WeaveImageNode.defaultState('test-image');
+      const result = WeaveImageNode.updateNodeState(base, defaultProps({ imageId: 'asset-42' }));
+      expect((result.props as Record<string, unknown>)['imageId']).toBe('asset-42');
+    });
+
+    it('42.2 imageId is omitted when not provided', () => {
+      const base = WeaveImageNode.defaultState('test-image');
+      const result = WeaveImageNode.updateNodeState(base, defaultProps());
+      expect((result.props as Record<string, unknown>)['imageId']).toBeUndefined();
+    });
   });
 });
