@@ -29,7 +29,19 @@ export const setupStore = () => {
   azureWebPubsubServer = new WeaveAzureWebPubsubServer({
     pubSubConfig: {
       endpoint,
-      hubName
+      hubName,
+      // Forward the access key so the server uses key-based auth instead of
+      // falling through to DefaultAzureCredential. Remove auth.key and set
+      // auth.custom to a managed-identity credential for keyless deployments.
+      auth: { key },
+    },
+    eventsHandlerConfig: {
+      // Restrict incoming CloudEvents POSTs to the configured service endpoint.
+      allowedEndpoints: [endpoint],
+      // Verify the HMAC-SHA256 signature on every inbound event using the
+      // primary access key. Requests with a missing or invalid ce-signature
+      // header are rejected with HTTP 401.
+      accessKey: key,
     },
     fetchRoom: async (docName: string) => {
       try {
