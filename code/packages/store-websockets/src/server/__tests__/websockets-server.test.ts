@@ -228,20 +228,47 @@ describe('6 — handleUpgrade()', () => {
     httpServer.removeAllListeners();
   });
 
-  it('6.2 performUpgrade returns false → wss.handleUpgrade NOT called', async () => {
+  it('6.2 performUpgrade returns false → wss.handleUpgrade NOT called and socket is destroyed', async () => {
     mockHandleUpgrade.mockClear();
     const server = makeServer({ performUpgrade: vi.fn().mockResolvedValue(false) });
     const httpServer = new http.Server();
     server.handleUpgrade(httpServer);
 
     const req = { headers: {}, url: '/room-1' };
-    const socket = { destroy: vi.fn() };
+    const socket = { destroy: vi.fn(), write: vi.fn() };
     const head = Buffer.alloc(0);
     httpServer.emit('upgrade', req, socket, head);
 
     await new Promise((r) => setTimeout(r, 10));
 
     expect(mockHandleUpgrade).not.toHaveBeenCalled();
+    expect(socket.destroy).toHaveBeenCalled();
+    httpServer.removeAllListeners();
+  });
+
+  it('6.3 performUpgrade returns false → HTTP 401 error is written to socket before destroy', async () => {
+    mockHandleUpgrade.mockClear();
+    const server = makeServer({ performUpgrade: vi.fn().mockResolvedValue(false) });
+    const httpServer = new http.Server();
+    server.handleUpgrade(httpServer);
+
+    const req = { headers: {}, url: '/room-1' };
+    const socket = { destroy: vi.fn(), write: vi.fn() };
+    const head = Buffer.alloc(0);
+    httpServer.emit('upgrade', req, socket, head);
+
+    await new Promise((r) => setTimeout(r, 10));
+
+    expect(socket.write).toHaveBeenCalledWith(
+      expect.stringContaining('401')
+    );
+    expect(socket.write).toHaveBeenCalledWith(
+      expect.stringContaining('Connection: close')
+    );
+    // write must precede destroy
+    const writeOrder = socket.write.mock.invocationCallOrder[0];
+    const destroyOrder = socket.destroy.mock.invocationCallOrder[0];
+    expect(writeOrder).toBeLessThan(destroyOrder);
     httpServer.removeAllListeners();
   });
 });

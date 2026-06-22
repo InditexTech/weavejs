@@ -40,7 +40,7 @@ const websocketsServer = new WeaveWebsocketsServer(params: WeaveWebsocketsServer
     performUpgrade: {
       required: true,
       description:
-        "A function that receives as parameter the request and must return a boolean indicating if the request allows to perform the HTTP/1.1 protocol upgrade mechanism",
+        "A function that receives as parameter the request and must return a boolean indicating if the request allows to perform the HTTP/1.1 protocol upgrade mechanism. When it returns false, the server replies with HTTP 401 Unauthorized and immediately destroys the socket.",
       type: "PerformUpgrade",
     },
     extractRoomId: {
@@ -86,8 +86,11 @@ const websocketsServer = new WeaveWebsocketsServer(params: WeaveWebsocketsServer
 handleUpgrade(server: http.Server | https.Server)
 ```
 
-This method needs the underlying server where request are made and need to apply the
-HTTP/1.1 protocol upgrade mechanism to switch from HTTP protocol to the WebSockets one.
+This method attaches the upgrade handler to the underlying HTTP/HTTPS server. It applies
+the HTTP/1.1 protocol upgrade mechanism to switch from HTTP to WebSocket protocol.
+
+If `performUpgrade` returns `false`, the server writes an HTTP 401 Unauthorized response
+and destroys the socket so denied connections do not remain open.
 
 ## TypeScript types
 

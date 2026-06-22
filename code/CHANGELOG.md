@@ -17,6 +17,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - [#1114](https://github.com/InditexTech/weavejs/issues/1114) Security: verify Azure Web PubSub `ce-signature` HMAC-SHA256 and enforce `allowedEndpoints` on incoming CloudEvents POST requests (`store-azure-web-pubsub`)
 - [#1116](https://github.com/InditexTech/weavejs/issues/1116) A single WebSocket close can disable room persistence
+- [#1118](https://github.com/InditexTech/weavejs/issues/1118) Denied WebSocket upgrades return without closing sockets
 
 ## [5.1.0] - 2026-06-22
 
