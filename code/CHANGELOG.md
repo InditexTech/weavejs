@@ -13,6 +13,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [5.1.1] - 2026-06-22
+
+### Fixed
+
+- [#1116](https://github.com/InditexTech/weavejs/issues/1116) A single WebSocket close can disable room persistence
+
 ## [5.1.0] - 2026-06-22
 
 ### Changed
