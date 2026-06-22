@@ -2,6 +2,7 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
+import { createHmac } from 'node:crypto';
 import { Readable } from 'node:stream';
 import type { IncomingMessage, ServerResponse } from 'node:http';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
@@ -734,6 +735,200 @@ describe('CloudEventsDispatcher', () => {
       expect(handleUserEvent).not.toHaveBeenCalled();
       expect(loggerMocks.warning).toHaveBeenCalledWith(
         'Unsupported content type application/xml'
+      );
+    });
+  });
+
+  // ─── Issue [4] fixes ────────────────────────────────────────────────────────
+
+  describe('handleRequest — origin validation', () => {
+    it('accepts a POST from a matching allowed origin', async () => {
+      const dispatcher = new CloudEventsDispatcher('myhub', {
+        allowedEndpoints: ['https://service.example.com'],
+      });
+      const req = makeRequest(
+        makeHeaders({ 'webhook-request-origin': 'service.example.com' }),
+        makeConnectBody()
+      );
+      const res = makeResponse();
+
+      // No handleConnect configured → no-handler short-circuit returns true with 200
+      await expect(dispatcher.handleRequest(req, res)).resolves.toBe(true);
+      expect(res.statusCode).not.toBe(403);
+    });
+
+    it('rejects with 403 when the request origin is not in allowedEndpoints', async () => {
+      const dispatcher = new CloudEventsDispatcher('myhub', {
+        allowedEndpoints: ['https://service.example.com'],
+      });
+      const req = makeRequest(
+        makeHeaders({ 'webhook-request-origin': 'evil.example.com' }),
+        makeConnectBody()
+      );
+      const res = makeResponse();
+
+      await expect(dispatcher.handleRequest(req, res)).resolves.toBe(true);
+      expect(res.statusCode).toBe(403);
+      expect(res.end).toHaveBeenCalledWith();
+    });
+
+    it('does not check origin when allowedEndpoints is not configured', async () => {
+      const dispatcher = new CloudEventsDispatcher('myhub');
+      const req = makeRequest(
+        makeHeaders({ 'webhook-request-origin': 'any-origin.example.com' }),
+        makeConnectBody()
+      );
+      const res = makeResponse();
+
+      // No allowedEndpoints → _allowAll true → origin not validated; proceeds normally
+      await expect(dispatcher.handleRequest(req, res)).resolves.toBe(true);
+      expect(res.statusCode).not.toBe(403);
+    });
+
+    it('rejects with 400 when the origin header cannot be parsed as a hostname', async () => {
+      const dispatcher = new CloudEventsDispatcher('myhub', {
+        allowedEndpoints: ['https://service.example.com'],
+      });
+      // A value that makes `new URL('https://<origin>')` throw
+      const req = makeRequest(
+        makeHeaders({ 'webhook-request-origin': 'not a valid://hostname here' }),
+        makeConnectBody()
+      );
+      const res = makeResponse();
+
+      await expect(dispatcher.handleRequest(req, res)).resolves.toBe(true);
+      expect(res.statusCode).toBe(400);
+      expect(res.end).toHaveBeenCalledWith();
+    });
+  });
+
+  describe('handleRequest — signature verification', () => {
+    const TEST_KEY_PRIMARY = 'testprimarykey123';
+    const TEST_KEY_SECONDARY = 'testsecondarykey456';
+    const TEST_CONNECTION_ID = 'conn123'; // matches makeHeaders() default
+
+    /** Compute the expected ce-signature value for a given key and connection ID. */
+    function computeSig(key: string, connectionId = TEST_CONNECTION_ID): string {
+      return 'sha256=' + createHmac('sha256', key).update(connectionId).digest('hex');
+    }
+
+    it('accepts a request whose ce-signature matches the primary access key', async () => {
+      const dispatcher = new CloudEventsDispatcher('myhub', {
+        accessKey: TEST_KEY_PRIMARY,
+      });
+      const req = makeRequest(
+        makeHeaders({ 'ce-signature': computeSig(TEST_KEY_PRIMARY) }),
+        makeConnectBody()
+      );
+      const res = makeResponse();
+
+      await expect(dispatcher.handleRequest(req, res)).resolves.toBe(true);
+      expect(res.statusCode).not.toBe(401);
+    });
+
+    it('accepts a request when only the secondary key signature is present (key rotation)', async () => {
+      // Both keys configured; request carries only the secondary signature
+      const dispatcher = new CloudEventsDispatcher('myhub', {
+        accessKey: [TEST_KEY_PRIMARY, TEST_KEY_SECONDARY],
+      });
+      const req = makeRequest(
+        makeHeaders({ 'ce-signature': computeSig(TEST_KEY_SECONDARY) }),
+        makeConnectBody()
+      );
+      const res = makeResponse();
+
+      await expect(dispatcher.handleRequest(req, res)).resolves.toBe(true);
+      expect(res.statusCode).not.toBe(401);
+    });
+
+    it('accepts a request with comma-separated primary and secondary signatures (Azure format)', async () => {
+      const dispatcher = new CloudEventsDispatcher('myhub', {
+        accessKey: [TEST_KEY_PRIMARY, TEST_KEY_SECONDARY],
+      });
+      // Azure sends: sha256=<primary>,sha256=<secondary>
+      const headerVal = `${computeSig(TEST_KEY_PRIMARY)},${computeSig(TEST_KEY_SECONDARY)}`;
+      const req = makeRequest(
+        makeHeaders({ 'ce-signature': headerVal }),
+        makeConnectBody()
+      );
+      const res = makeResponse();
+
+      await expect(dispatcher.handleRequest(req, res)).resolves.toBe(true);
+      expect(res.statusCode).not.toBe(401);
+    });
+
+    it('rejects with 401 when the ce-signature HMAC value is wrong', async () => {
+      const dispatcher = new CloudEventsDispatcher('myhub', {
+        accessKey: TEST_KEY_PRIMARY,
+      });
+      const req = makeRequest(
+        makeHeaders({
+          'ce-signature':
+            'sha256=deadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeef',
+        }),
+        makeConnectBody()
+      );
+      const res = makeResponse();
+
+      await expect(dispatcher.handleRequest(req, res)).resolves.toBe(true);
+      expect(res.statusCode).toBe(401);
+      expect(res.end).toHaveBeenCalledWith();
+    });
+
+    it('rejects with 401 when the ce-signature header is absent', async () => {
+      const dispatcher = new CloudEventsDispatcher('myhub', {
+        accessKey: TEST_KEY_PRIMARY,
+      });
+      const headers = makeHeaders();
+      delete headers['ce-signature'];
+      const req = makeRequest(headers, makeConnectBody());
+      const res = makeResponse();
+
+      await expect(dispatcher.handleRequest(req, res)).resolves.toBe(true);
+      expect(res.statusCode).toBe(401);
+      expect(res.end).toHaveBeenCalledWith();
+    });
+
+    it('rejects with 401 when the ce-connectionid header is absent', async () => {
+      const dispatcher = new CloudEventsDispatcher('myhub', {
+        accessKey: TEST_KEY_PRIMARY,
+      });
+      const headers = makeHeaders({ 'ce-signature': computeSig(TEST_KEY_PRIMARY) });
+      delete headers['ce-connectionid'];
+      const req = makeRequest(headers, makeConnectBody());
+      const res = makeResponse();
+
+      await expect(dispatcher.handleRequest(req, res)).resolves.toBe(true);
+      expect(res.statusCode).toBe(401);
+      expect(res.end).toHaveBeenCalledWith();
+    });
+
+    it('rejects with 401 when the signature has a different length (padding attack)', async () => {
+      const dispatcher = new CloudEventsDispatcher('myhub', {
+        accessKey: TEST_KEY_PRIMARY,
+      });
+      // Same correct prefix but extra character changes length — timingSafeEqual is length-gated
+      const correctSig = computeSig(TEST_KEY_PRIMARY);
+      const req = makeRequest(
+        makeHeaders({ 'ce-signature': correctSig + 'x' }),
+        makeConnectBody()
+      );
+      const res = makeResponse();
+
+      await expect(dispatcher.handleRequest(req, res)).resolves.toBe(true);
+      expect(res.statusCode).toBe(401);
+    });
+
+    it('logs a warning and does not reject when no accessKey is configured', async () => {
+      const dispatcher = new CloudEventsDispatcher('myhub');
+      // Fake signature — accepted because no key is configured
+      const req = makeRequest(makeHeaders({ 'ce-signature': 'sha256=abc' }), makeConnectBody());
+      const res = makeResponse();
+
+      await expect(dispatcher.handleRequest(req, res)).resolves.toBe(true);
+      expect(res.statusCode).not.toBe(401);
+      expect(loggerMocks.warning).toHaveBeenCalledWith(
+        expect.stringContaining('no accessKey configured')
       );
     });
   });

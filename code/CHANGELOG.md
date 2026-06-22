@@ -13,6 +13,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- [#1114](https://github.com/InditexTech/weavejs/issues/1114) Security: verify Azure Web PubSub `ce-signature` HMAC-SHA256 and enforce `allowedEndpoints` on incoming CloudEvents POST requests (`store-azure-web-pubsub`)
+
 ## [5.1.0] - 2026-06-22
 
 ### Changed
