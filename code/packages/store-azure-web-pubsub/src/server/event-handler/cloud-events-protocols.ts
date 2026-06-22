@@ -456,4 +456,21 @@ export interface WebPubSubEventHandlerOptions {
    * If not specified, by default allow all the endpoints, otherwise only allow specified endpoints
    */
   allowedEndpoints?: string[];
+
+  /**
+   * The Azure Web PubSub access key (or an array of [primary, secondary] keys to support key
+   * rotation) used to verify the HMAC-SHA256 signature on every incoming CloudEvents POST.
+   *
+   * The Azure service signs each event as:
+   *   `sha256=Hex(HMAC-SHA256(accessKey, connectionId))`
+   * and includes both the primary and secondary signatures in the `ce-signature` header.
+   *
+   * When set, requests whose `ce-signature` does not match are rejected with HTTP 401.
+   * When omitted, signature verification is skipped and a warning is logged — use this only
+   * when combined with network-level ingress restriction to Azure Web PubSub IP ranges.
+   *
+   * For managed identity / DefaultAzureCredential deployments that have no static key,
+   * provide the service access key separately (e.g. from `WEAVE_AZURE_WEB_PUBSUB_KEY`).
+   */
+  accessKey?: string | string[];
 }

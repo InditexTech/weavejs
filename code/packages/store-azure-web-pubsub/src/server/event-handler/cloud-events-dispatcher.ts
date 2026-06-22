@@ -5,6 +5,7 @@
 import * as utils from './utils';
 import type { IncomingMessage, ServerResponse } from 'node:http';
 import { URL } from 'node:url';
+import { createHmac, timingSafeEqual } from 'node:crypto';
 import { logger } from './logger';
 
 import type {
@@ -367,6 +368,8 @@ async function readSystemEventRequest<T extends { context: ConnectionContext }>(
 export class CloudEventsDispatcher {
   private readonly _allowAll: boolean = true;
   private readonly _allowedOrigins: Array<string> = [];
+  private readonly _accessKeys: string[] = [];
+
   constructor(
     private hub: string,
     private eventHandler?: WebPubSubEventHandlerOptions | undefined
@@ -380,6 +383,38 @@ export class CloudEventsDispatcher {
       );
       this._allowAll = false;
     }
+    if (eventHandler?.accessKey !== undefined) {
+      this._accessKeys = Array.isArray(eventHandler.accessKey)
+        ? eventHandler.accessKey
+        : [eventHandler.accessKey];
+    }
+  }
+
+  /**
+   * Verify the `ce-signature` header against the configured access keys.
+   *
+   * The Azure Web PubSub service computes the signature as:
+   *   sha256=Hex(HMAC-SHA256(accessKey, connectionId))
+   * and sends one value per key (primary, secondary) comma-separated.
+   *
+   * Returns `true` when at least one key produces a matching signature.
+   */
+  private verifySignature(connectionId: string, signatureHeader: string): boolean {
+    const provided = signatureHeader.split(',').map((s) => s.trim());
+    for (const key of this._accessKeys) {
+      const expected =
+        'sha256=' + createHmac('sha256', key).update(connectionId).digest('hex');
+      const expectedBuf = Buffer.from(expected);
+      if (
+        provided.some((sig) => {
+          if (sig.length !== expected.length) return false;
+          return timingSafeEqual(Buffer.from(sig), expectedBuf);
+        })
+      ) {
+        return true;
+      }
+    }
+    return false;
   }
 
   public handlePreflight(req: IncomingMessage, res: ServerResponse): boolean {
@@ -416,6 +451,24 @@ export class CloudEventsDispatcher {
       return false;
     }
 
+    // Validate the request origin against the configured allowed endpoints.
+    // This mirrors the preflight check so that POST requests are not accepted
+    // from origins that were never allowed during the WebHook handshake.
+    if (!this._allowAll) {
+      try {
+        const incomingHost = new URL(`https://${origin}`).host.toLowerCase();
+        if (!this._allowedOrigins.includes(incomingHost)) {
+          response.statusCode = 403;
+          response.end();
+          return true;
+        }
+      } catch {
+        response.statusCode = 400;
+        response.end();
+        return true;
+      }
+    }
+
     const eventType = tryGetWebPubSubEvent(request);
     if (eventType === undefined) {
       return false;
@@ -425,6 +478,30 @@ export class CloudEventsDispatcher {
     const hub = utils.getHttpHeader(request, 'ce-hub');
     if (hub?.toUpperCase() !== this.hub.toUpperCase()) {
       return false;
+    }
+
+    // Verify the Azure Web PubSub HMAC-SHA256 signature.
+    // The service signs every event as: sha256=Hex(HMAC-SHA256(accessKey, connectionId))
+    // When an accessKey is configured we fail closed: missing or wrong signature → 401.
+    // Without a key, signature verification is skipped and a warning is emitted once so
+    // that operators know they must restrict ingress via network policy instead.
+    const sigHeader = utils.getHttpHeader(request, 'ce-signature');
+    const connectionId = utils.getHttpHeader(request, 'ce-connectionid');
+    if (this._accessKeys.length > 0) {
+      if (
+        !sigHeader ||
+        !connectionId ||
+        !this.verifySignature(connectionId, sigHeader)
+      ) {
+        response.statusCode = 401;
+        response.end();
+        return true;
+      }
+    } else {
+      logger.warning(
+        'CloudEventsDispatcher: no accessKey configured — ce-signature is not verified. ' +
+          'Restrict ingress to Azure Web PubSub IP ranges or provide an accessKey.'
+      );
     }
 
     const isMqtt = isMqttRequest(request);
