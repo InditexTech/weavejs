@@ -777,7 +777,7 @@ describe('9 — send', () => {
     expect(doc.conns.has(throwingConn)).toBe(false);
   });
 
-  it('9.4 closeConn clears persistence interval when one exists', async () => {
+  it('9.4 closeConn removes conn from doc.conns (persistence interval is NOT cleared)', async () => {
     const roomId = nextRoomId();
     const mockServer = makeMockServer();
     mockServer.persistRoom = vi.fn().mockResolvedValue(undefined);
@@ -821,5 +821,138 @@ describe('10 — destroyWSConnection', () => {
 
   it('10.2 roomId NOT in docs → no error', () => {
     expect(() => destroyWSConnection('nonexistent-room')).not.toThrow();
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Suite 11 — persistence lifecycle (regression for issue [6])
+// ---------------------------------------------------------------------------
+
+describe('11 — persistence lifecycle', () => {
+  it('11.1 persistence interval survives when one of two connections closes', async () => {
+    vi.useFakeTimers();
+
+    const roomId = nextRoomId();
+    const mockServer = makeMockServer();
+    const persistRoom = vi.fn().mockResolvedValue(undefined);
+    mockServer.persistRoom = persistRoom;
+    setServer(mockServer as never);
+
+    const myHandler = makeHandler(false);
+    const preDoc = await getYDoc(roomId, vi.fn(), myHandler as never);
+    docs.set(roomId, preDoc);
+
+    // Connect two clients
+    const connA = makeConn();
+    const connB = makeConn();
+    const handler = setupWSConnection(() => roomId, vi.fn(), myHandler as never);
+    await handler(connA, {} as never);
+    await handler(connB, {} as never);
+
+    // Close only connA
+    connA._handlers['close']?.[0]?.();
+    expect(preDoc!.conns.has(connA)).toBe(false);
+    expect(preDoc!.conns.has(connB)).toBe(true);
+
+    // Advance timer — interval must still fire for connB's room
+    persistRoom.mockClear();
+    await vi.advanceTimersByTimeAsync(
+      parseInt(process.env.WEAVE_WEBSOCKETS_STATE_SYNC_FREQUENCY_SEG ?? '10') * 1000 + 100
+    );
+
+    expect(persistRoom).toHaveBeenCalledWith(roomId, expect.any(Uint8Array));
+
+    vi.useRealTimers();
+  });
+
+  it('11.2 destroyWSConnection clears the interval and removes the persistenceMap entry', async () => {
+    vi.useFakeTimers();
+
+    const roomId = nextRoomId();
+    const mockServer = makeMockServer();
+    const persistRoom = vi.fn().mockResolvedValue(undefined);
+    mockServer.persistRoom = persistRoom;
+    setServer(mockServer as never);
+
+    const preDoc = await getYDoc(roomId, vi.fn(), makeHandler(false) as never);
+    docs.set(roomId, preDoc); // explicitly place actual doc (pattern used across this suite)
+
+    const clearIntervalSpy = vi.spyOn(globalThis, 'clearInterval');
+
+    destroyWSConnection(roomId);
+
+    // clearInterval must have been called for the persistence interval
+    expect(clearIntervalSpy).toHaveBeenCalled();
+
+    // Drain the fire-and-forget flush microtask (flush + .catch = 2 ticks minimum)
+    await Promise.resolve();
+    await Promise.resolve();
+    persistRoom.mockClear();
+
+    // Advance 3× past the interval — no further ticks must fire (interval was cleared)
+    await vi.advanceTimersByTimeAsync(
+      parseInt(process.env.WEAVE_WEBSOCKETS_STATE_SYNC_FREQUENCY_SEG ?? '10') * 1000 * 3 + 100
+    );
+
+    expect(persistRoom).not.toHaveBeenCalled();
+
+    vi.useRealTimers();
+  });
+
+  it('11.3 destroyWSConnection flushes the final document state before destroying', async () => {
+    const roomId = nextRoomId();
+    const mockServer = makeMockServer();
+    const persistRoom = vi.fn().mockResolvedValue(undefined);
+    mockServer.persistRoom = persistRoom;
+    setServer(mockServer as never);
+
+    const preDoc = await getYDoc(roomId, vi.fn(), makeHandler(false) as never);
+    docs.set(roomId, preDoc);
+
+    // Give the fire-and-forget initial persist a tick
+    await new Promise((r) => setTimeout(r, 10));
+    persistRoom.mockClear();
+
+    destroyWSConnection(roomId);
+
+    // Final flush is fire-and-forget async; give it a tick
+    await new Promise((r) => setTimeout(r, 10));
+
+    expect(persistRoom).toHaveBeenCalledWith(roomId, expect.any(Uint8Array));
+  });
+
+  it('11.4 new connection to the same roomId gets a fresh persistence interval after destroyWSConnection', async () => {
+    const roomId = nextRoomId();
+    const mockServer = makeMockServer();
+    const persistRoom = vi.fn().mockResolvedValue(undefined);
+    mockServer.persistRoom = persistRoom;
+    setServer(mockServer as never);
+
+    // First lifecycle — real timers so destroyWSConnection's clearInterval works on a real timer
+    const preDoc = await getYDoc(roomId, vi.fn(), makeHandler(false) as never);
+    docs.set(roomId, preDoc);
+    destroyWSConnection(roomId);
+
+    // Switch to fake timers BEFORE the second lifecycle so its setInterval is captured as a fake timer
+    vi.useFakeTimers();
+
+    // Second lifecycle — setInterval is registered as a fake timer
+    const myHandler = makeHandler(false);
+    const preDoc2 = await getYDoc(roomId, vi.fn(), myHandler as never);
+    docs.set(roomId, preDoc2);
+
+    // Drain the immediate persistHandler() fire-and-forget from setupRoomPersistence (2 microtask ticks)
+    await Promise.resolve();
+    await Promise.resolve();
+    persistRoom.mockClear();
+
+    // Advance past the interval — fake timer fires
+    await vi.advanceTimersByTimeAsync(
+      parseInt(process.env.WEAVE_WEBSOCKETS_STATE_SYNC_FREQUENCY_SEG ?? '10') * 1000 + 100
+    );
+
+    expect(persistRoom).toHaveBeenCalledWith(roomId, expect.any(Uint8Array));
+
+    vi.useRealTimers();
   });
 });

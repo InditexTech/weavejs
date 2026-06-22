@@ -410,15 +410,34 @@ describe('WeaveAzureWebPubsubSyncHandler', () => {
       );
     });
 
-    it('returns NOT_CONNECTED when the room host is not connected', async () => {
-      const { handler } = makeSyncHandler();
+    it('cleans up all room state and returns DESTROYED when the room host is not connected', async () => {
+      vi.useFakeTimers();
+
+      const clearIntervalSpy = vi.spyOn(globalThis, 'clearInterval');
+      const { handler, server } = makeSyncHandler({ persistIntervalMs: 1000 });
 
       await handler.getRoomDocument('room-1');
+      server.persistRoom.mockClear();
       mockedState.mockHostInstance.isConnected.mockReturnValue(false);
 
       await expect(handler.destroyRoomInstance('room-1')).resolves.toBe(
-        WEAVE_STORE_AZURE_WEB_PUBSUB_DESTROY_ROOM_STATUS.NOT_CONNECTED
+        WEAVE_STORE_AZURE_WEB_PUBSUB_DESTROY_ROOM_STATUS.DESTROYED
       );
+
+      // Persistence interval cleared and map entry removed
+      expect(clearIntervalSpy).toHaveBeenCalled();
+      expect(
+        (handler as never as { _store_persistence: Map<string, NodeJS.Timeout> })._store_persistence.has('room-1')
+      ).toBe(false);
+
+      // Room and host entries cleaned up
+      expect(handler.getRoomsLoaded()).toEqual([]);
+      expect(handler.getRoomSyncHost('room-1')).toBeUndefined();
+
+      // Transport stop NOT called since already disconnected
+      expect(mockedState.mockHostInstance.stop).not.toHaveBeenCalled();
+
+      vi.useRealTimers();
     });
 
     it('clears interval, persists, stops and removes the room when connected', async () => {
@@ -469,6 +488,46 @@ describe('WeaveAzureWebPubsubSyncHandler', () => {
       expect(
         (handler as never as { _store_persistence: Map<string, NodeJS.Timeout> })._store_persistence.size
       ).toBe(0);
+    });
+
+    it('clears persistence interval even when transport was already stopped (analog of issue [6])', async () => {
+      vi.useFakeTimers();
+
+      const clearIntervalSpy = vi.spyOn(globalThis, 'clearInterval');
+      const { handler, server } = makeSyncHandler({ persistIntervalMs: 500 });
+
+      await handler.getRoomDocument('room-1');
+      server.persistRoom.mockClear();
+
+      // Simulate transport being stopped before destroyRoomInstance is called
+      mockedState.mockHostInstance.isConnected.mockReturnValue(false);
+
+      await handler.destroyRoomInstance('room-1');
+
+      // Interval must be cleared — this was the bug: it was skipped via NOT_CONNECTED early exit
+      expect(clearIntervalSpy).toHaveBeenCalled();
+      expect(
+        (handler as never as { _store_persistence: Map<string, NodeJS.Timeout> })._store_persistence.has('room-1')
+      ).toBe(false);
+
+      // No more ticks after destroy
+      server.persistRoom.mockClear();
+      await vi.advanceTimersByTimeAsync(2000);
+      expect(server.persistRoom).not.toHaveBeenCalled();
+
+      vi.useRealTimers();
+    });
+
+    it('_rooms and _roomsSyncHost are always cleaned up even when transport is not connected', async () => {
+      const { handler } = makeSyncHandler();
+
+      await handler.getRoomDocument('room-1');
+      mockedState.mockHostInstance.isConnected.mockReturnValue(false);
+
+      await handler.destroyRoomInstance('room-1');
+
+      expect(handler.getRoomsLoaded()).toEqual([]);
+      expect(handler.getRoomSyncHost('room-1')).toBeUndefined();
     });
   });
 
