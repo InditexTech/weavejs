@@ -112,6 +112,8 @@ export class WeaveWebsocketsServer extends Emittery {
       const continueToUpgrade = await this.performUpgrade(request);
 
       if (!continueToUpgrade) {
+        socket.write('HTTP/1.1 401 Unauthorized\r\nConnection: close\r\n\r\n');
+        socket.destroy();
         return;
       }
 

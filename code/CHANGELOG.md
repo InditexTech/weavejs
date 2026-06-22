@@ -13,6 +13,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- [#1118](https://github.com/InditexTech/weavejs/issues/1118) Denied WebSocket upgrades return without closing sockets
+
 ## [5.1.0] - 2026-06-22
 
 ### Changed
