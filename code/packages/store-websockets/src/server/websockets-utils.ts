@@ -250,9 +250,6 @@ const closeConn = (doc: WSSharedDoc, conn: any) => {
      */
     const controlledIds = doc.conns.get(conn);
     doc.conns.delete(conn);
-    if (persistenceMap.has(doc.name)) {
-      clearInterval(persistenceMap.get(doc.name));
-    }
     awarenessProtocol.removeAwarenessStates(
       doc.awareness,
       Array.from(controlledIds),
@@ -399,9 +396,19 @@ async function setupRoomPersistence(roomId: string, doc: Y.Doc): Promise<void> {
 }
 
 export const destroyWSConnection = (roomId: string): void => {
+  if (persistenceMap.has(roomId)) {
+    clearInterval(persistenceMap.get(roomId));
+    persistenceMap.delete(roomId);
+  }
   if (docs.has(roomId)) {
     const doc = docs.get(roomId);
     docs.delete(roomId);
+    if (actualServer?.persistRoom) {
+      const finalState = Y.encodeStateAsUpdate(doc);
+      actualServer.persistRoom(roomId, finalState).catch((ex: Error) => {
+        console.error(ex);
+      });
+    }
     doc.destroy();
   }
 };

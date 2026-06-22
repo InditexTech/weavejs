@@ -47,7 +47,8 @@ const azureWebPubSubServer = new WeaveAzureWebPubsubServer(params: WeaveAzureWeb
       type: "WeaveAzureWebPubsubConfig",
     },
     eventsHandlerConfig: {
-      description: "An object Azure Web PubSub Event Handler configuration",
+      description:
+        "Azure Web PubSub event handler configuration. Use allowedEndpoints to restrict the CloudEvents origin and accessKey to verify the HMAC-SHA256 signature on every inbound event.",
       type: "WebPubSubEventHandlerOptions",
     },
     persistRoom: {
@@ -84,6 +85,38 @@ const azureWebPubSubServer = new WeaveAzureWebPubsubServer(params: WeaveAzureWeb
   }}
 />
 
+## Webhook authentication
+
+The `eventsHandlerConfig` object accepts two fields that together protect the CloudEvents
+endpoint from spoofed requests.
+
+| Field | HTTP response on failure | Purpose |
+|---|---|---|
+| `allowedEndpoints` | `403 Forbidden` | Restricts incoming POST requests to the Azure Web PubSub service hostname. Requests from any other origin are rejected. |
+| `accessKey` | `401 Unauthorized` | Verifies the `ce-signature` HMAC-SHA256 header (`sha256=Hex(HMAC-SHA256(accessKey, connectionId))`) on every event. Accepts a single key string or `[primary, secondary]` for zero-downtime key rotation. |
+
+```ts
+new WeaveAzureWebPubsubServer({
+  pubSubConfig: {
+    endpoint: process.env.WEAVE_AZURE_WEB_PUBSUB_ENDPOINT,
+    hubName: process.env.WEAVE_AZURE_WEB_PUBSUB_HUB_NAME,
+    auth: { key: process.env.WEAVE_AZURE_WEB_PUBSUB_KEY },
+  },
+  eventsHandlerConfig: {
+    // Reject POSTs from origins other than the configured service endpoint
+    allowedEndpoints: [process.env.WEAVE_AZURE_WEB_PUBSUB_ENDPOINT],
+    // Verify the HMAC-SHA256 signature on every inbound CloudEvent
+    accessKey: process.env.WEAVE_AZURE_WEB_PUBSUB_KEY,
+  },
+});
+```
+
+> **Managed identity / `DefaultAzureCredential`**: when no static access key is available,
+> omit `accessKey`. A warning is logged on every request. Protect the endpoint at the
+> network level by restricting ingress to
+> [Azure Web PubSub IP ranges](https://learn.microsoft.com/en-us/azure/azure-web-pubsub/concept-service-internals)
+> via NSG or firewall rules.
+
 ## Methods
 
 ### getMiddleware
@@ -107,6 +140,33 @@ Web PubSub infrastructure.
 Used
 
 ## TypeScript types
+
+```ts
+type WebPubSubEventHandlerOptions = {
+  /** Custom serving path for the CloudEvents handler endpoint. */
+  path?: string;
+  /** Handle 'connect' — service waits for the response before proceeding. */
+  handleConnect?: (connectRequest: ConnectRequest, connectResponse: ConnectResponseHandler) => void;
+  /** Handle user events — service waits for the response before proceeding. */
+  handleUserEvent?: (userEventRequest: UserEventRequest, userEventResponse: UserEventResponseHandler) => void;
+  /** Fire-and-forget 'connected' event. */
+  onConnected?: (connectedRequest: ConnectedRequest) => void;
+  /** Fire-and-forget 'disconnected' event. */
+  onDisconnected?: (disconnectedRequest: DisconnectedRequest) => void;
+  /**
+   * Restrict incoming CloudEvents POST requests to these Azure Web PubSub service
+   * endpoint URLs. Requests from any other origin are rejected with HTTP 403.
+   * When omitted, all origins are allowed.
+   */
+  allowedEndpoints?: string[];
+  /**
+   * Access key(s) used to verify the HMAC-SHA256 `ce-signature` header on every
+   * inbound CloudEvent. Provide `[primary, secondary]` to support key rotation.
+   * When omitted, signature verification is skipped and a warning is logged.
+   */
+  accessKey?: string | string[];
+};
+```
 
 ```ts
 type WeaveStoreAzureWebPubsubConfig = {

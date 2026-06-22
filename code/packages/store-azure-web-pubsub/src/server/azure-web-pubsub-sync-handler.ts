@@ -226,10 +226,7 @@ export default class WeaveAzureWebPubsubSyncHandler extends WebPubSubEventHandle
       return WEAVE_STORE_AZURE_WEB_PUBSUB_DESTROY_ROOM_STATUS.NOT_FOUND;
     }
 
-    if (!syncHost?.isConnected()) {
-      return WEAVE_STORE_AZURE_WEB_PUBSUB_DESTROY_ROOM_STATUS.NOT_CONNECTED;
-    }
-
+    // Always clean up persistence regardless of transport state
     if (this.isPersistingOnInterval()) {
       const intervalId = this._store_persistence.get(roomId);
       if (intervalId) {
@@ -238,17 +235,18 @@ export default class WeaveAzureWebPubsubSyncHandler extends WebPubSubEventHandle
       this._store_persistence.delete(roomId);
     }
 
-    // flush document to storage
+    // Best-effort flush: doc may already be destroyed if transport was stopped first
     await this.persistRoomTask(roomId);
     if (!this.isPersistingOnInterval()) {
       this.roomsLastState.delete(roomId);
     }
 
-    // stop sync host
+    // Only stop the transport if it is still live
     if (syncHost?.isConnected()) {
       await syncHost.stop();
-      this._roomsSyncHost.delete(roomId);
     }
+    // Always remove the host and room entries
+    this._roomsSyncHost.delete(roomId);
 
     this._rooms.get(roomId)?.destroy();
     this._rooms.delete(roomId);
