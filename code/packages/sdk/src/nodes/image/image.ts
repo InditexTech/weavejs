@@ -305,6 +305,7 @@ export class WeaveImageNode extends WeaveNode {
     const groupImageProps = {
       ...imageProps,
     };
+    delete groupImageProps.name;
     delete groupImageProps.children;
     delete groupImageProps.imageProperties;
     delete groupImageProps.zIndex;
@@ -443,9 +444,23 @@ export class WeaveImageNode extends WeaveNode {
       }
     };
 
-    const hasFinalImageLoaded = this.imageSource[id] && imageProps.imageURL;
+    // An image is considered fully loaded only when its state explicitly reflects
+    // a successful load. imageSource[id] being set is not sufficient because
+    // the HTMLImageElement is created at the start of loading (before onload fires).
+    const isImageFullyLoaded =
+      this.imageState[id]?.status === 'loaded' &&
+      this.imageState[id]?.loaded === true &&
+      !this.imageState[id]?.error;
+
+    const hasFinalImageLoaded =
+      this.imageSource[id] && imageProps.imageURL && isImageFullyLoaded;
+
+    // Show fallback whenever the final image is not yet fully loaded and a
+    // fallback is available. This covers two cases:
+    //   1. imageURL not yet set (upload in progress, thumbnail available).
+    //   2. imageURL is set but the image is still downloading with a thumbnail.
     const hasFallbackAndFinalImageNotLoaded =
-      !imageProps.imageURL &&
+      !isImageFullyLoaded &&
       this.imageFallback[id] !== undefined &&
       this.config.imageFallback.enabled;
 
@@ -489,6 +504,18 @@ export class WeaveImageNode extends WeaveNode {
         loaded: true,
         error: false,
       };
+
+      // When the fallback is showing but a real URL is available (e.g. the node
+      // was re-rendered during grouping while the real image was still loading),
+      // the previous loadImage closure held references to the now-destroyed Konva
+      // node. Restart loading on this new node so the final image still appears.
+      if (hasFallbackAndFinalImageNotLoaded && imageProps.imageURL) {
+        this.loadImage(imageProps, image, false);
+      }
+
+      if (hasFallbackAndFinalImageNotLoaded && !imageProps.imageURL) {
+        this.loadImage(imageProps, image, this.config.imageFallback.enabled);
+      }
 
       this.updateImageCrop(image);
     } else {

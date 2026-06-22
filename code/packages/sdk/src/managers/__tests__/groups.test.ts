@@ -388,11 +388,11 @@ describe('WeaveGroupsManager', () => {
     beforeEach(() => { vi.useFakeTimers(); });
     afterEach(() => { vi.useRealTimers(); });
 
-    it('empty nodes: group() does not crash and calls removeNodes with []', () => {
+    it('empty nodes: group() does not crash and does not call removeNodeNT', () => {
       const { weave } = makeMockWeave();
       const mgr = new WeaveGroupsManager(weave);
       mgr.group([]);
-      expect(weave.removeNodes).toHaveBeenCalledWith([]);
+      expect(weave.removeNodeNT).not.toHaveBeenCalled();
     });
 
     it('no frames: realNodes = nodes, all nodes are processed', () => {
@@ -448,27 +448,35 @@ describe('WeaveGroupsManager', () => {
       });
       const mgr = new WeaveGroupsManager(weave);
       mgr.group([frameEl, childEl, otherEl]);
-      // childEl should be excluded; removeNodes should not contain childEl
-      expect(weave.removeNodes).toHaveBeenCalledWith(
-        expect.not.arrayContaining([childEl])
-      );
+      // childEl should be excluded from realNodes; removeNodeNT should not be called with it
+      expect(weave.removeNodeNT).not.toHaveBeenCalledWith(childEl, expect.anything());
     });
 
     it('frame child NOT excluded when parent has no nodeId in framesIds', () => {
       const mainLayer = new Konva.Layer();
       const frameKonva = new Konva.Group({ nodeType: 'frame' });
-      // Child whose parent has nodeId NOT in framesIds → should be included
+      // Child whose parent has nodeId NOT in framesIds → should be included.
+      // Give childKonva an explicit id so mainLayer.findOne('#child-key') resolves
+      // correctly (Konva assigns empty-string ids in jsdom without an explicit id).
+      // The stage mock proxy simulates childKonva having parentWithOtherNodeId
+      // as its parent, which is what allNodesInSameParent uses for filtering.
       const parentWithOtherNodeId = new Konva.Group({ nodeId: 'other-id' });
-      const childKonva = new Konva.Rect({ nodeType: 'rect' });
-      parentWithOtherNodeId.add(childKonva);
+      const childKonva = new Konva.Rect({ id: 'child-key', nodeType: 'rect' });
       mainLayer.add(frameKonva);
+      mainLayer.add(childKonva);
 
       const frameEl = { key: 'frame-key', type: 'node', props: { id: 'frame-key', nodeType: 'frame' } } as unknown as WeaveStateElement;
-      const childEl = { key: childKonva.id(), type: 'node', props: { id: childKonva.id(), nodeType: 'rect' } } as unknown as WeaveStateElement;
+      const childEl = { key: 'child-key', type: 'node', props: { id: 'child-key', nodeType: 'rect' } } as unknown as WeaveStateElement;
 
-      const stageMap: Record<string, Konva.Node> = {
+      // Proxy for childKonva in the stage mock: simulates being a child of
+      // parentWithOtherNodeId (nodeId='other-id', which is NOT in framesIds)
+      const childKonvaProxy = {
+        getAttrs: () => ({ nodeType: 'rect' }),
+        getParent: () => parentWithOtherNodeId,
+      };
+      const stageMap: Record<string, Konva.Node | object> = {
         'frame-key': frameKonva,
-        [childKonva.id()]: childKonva,
+        'child-key': childKonvaProxy as unknown as Konva.Node,
       };
       const groupHandler = makeGroupHandler();
       const nodeHandler = makeNodeHandler();
@@ -480,9 +488,7 @@ describe('WeaveGroupsManager', () => {
       const mgr = new WeaveGroupsManager(weave);
       mgr.group([frameEl, childEl]);
       // childEl should be included (parent.nodeId = 'other-id' not in framesIds)
-      expect(weave.removeNodes).toHaveBeenCalledWith(
-        expect.arrayContaining([childEl])
-      );
+      expect(weave.removeNodeNT).toHaveBeenCalledWith(childEl, expect.anything());
     });
 
     it('single parent with nodeId → parentId = nodeId used in addNodeNT', () => {

@@ -10,6 +10,7 @@ import type {
   WeaveRenderer,
   WeaveStore,
   WeavePerformanceConfig,
+  WeaveFontsPreloadFunction,
 } from '@inditextech/weave-sdk';
 import { Weave } from '@inditextech/weave-sdk';
 import {
@@ -25,7 +26,7 @@ import { useWeave } from './store';
 
 type WeaveProviderType = {
   getContainer: () => HTMLElement;
-  fonts?: WeaveFont[] | (() => Promise<WeaveFont[]>);
+  fonts?: WeaveFont[] | WeaveFontsPreloadFunction;
   store: WeaveStore;
   renderer: WeaveRenderer;
   nodes?: WeaveNode[];

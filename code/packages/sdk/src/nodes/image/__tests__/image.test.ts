@@ -608,11 +608,15 @@ describe('WeaveImageNode', () => {
   });
 
   describe('11 — onRender: image state branches', () => {
-    it('11.1 preloaded image removes placeholder and shows image', () => {
+    it('11.1 fully-loaded image (status=loaded) removes placeholder and shows image', () => {
       const { node } = makeNode();
       const privateNode = getPrivateNode(node);
       privateNode.imageSource = {
         'test-image': makeMockImageElement() as unknown as HTMLImageElement,
+      };
+      // Must also have status='loaded' for the image to be shown
+      privateNode.imageState = {
+        'test-image': { status: 'loaded', loaded: true, error: false },
       };
 
       const group = node.onRender(defaultProps()) as Konva.Group;
@@ -620,6 +624,78 @@ describe('WeaveImageNode', () => {
 
       expect(group.findOne('#test-image-placeholder')).toBeFalsy();
       expect(internalImage.getAttrs().visible).toBe(true);
+    });
+
+    it('11.1b imageSource set but not yet loaded (status=loading) — keeps placeholder visible, does NOT show the unloaded image', () => {
+      // Regression: grouping images while they are downloading caused onRender to
+      // treat a still-loading HTMLImageElement as a fully loaded image, destroying the
+      // placeholder and rendering a transparent/blank node.
+      const { node } = makeNode();
+      const privateNode = getPrivateNode(node);
+      const loadSpy = vi.spyOn(privateNode, 'loadImage');
+
+      // imageSource is set (loading started) but onload has not fired yet
+      privateNode.imageSource = {
+        'test-image': makeMockImageElement() as unknown as HTMLImageElement,
+      };
+      privateNode.imageState = {
+        'test-image': { status: 'loading', loaded: false, error: false },
+      };
+
+      const group = node.onRender(defaultProps()) as Konva.Group;
+      const placeholder = group.findOne('#test-image-placeholder');
+      const internalImage = group.findOne('#test-image-image') as Konva.Image;
+
+      // Placeholder must still be present (image not done loading)
+      expect(placeholder).toBeTruthy();
+      // internalImage must NOT be visible
+      expect(internalImage.getAttrs().visible).toBeFalsy();
+      // imageState must not be overwritten to 'loaded'
+      expect(privateNode.imageState['test-image']?.status).not.toBe('loaded');
+      // loadImage should be called to restart loading on the new node
+      expect(loadSpy).toHaveBeenCalled();
+    });
+
+    it('11.1c fallback showing + imageURL set + status=loading (e.g. after grouping mid-download) — shows fallback and restarts load', () => {
+      // Regression: when images with a thumbnail were grouped while still downloading
+      // the real image, the fallback/thumbnail disappeared and the image went transparent.
+      const fallback = makeMockImageElement() as unknown as HTMLImageElement;
+      const { node } = makeNode({
+        imageFallback: {
+          enabled: true,
+          getId: () => 'test-image',
+          getDataURL: () => '',
+          onPersist: () => {},
+        },
+      });
+      const privateNode = getPrivateNode(node);
+      const loadSpy = vi.spyOn(privateNode, 'loadImage');
+
+      privateNode.imageFallback = { 'test-image': fallback };
+      privateNode.imageSource = {
+        'test-image': makeMockImageElement() as unknown as HTMLImageElement,
+      };
+      // URL is set but image is in loading-with-fallback state
+      privateNode.imageState = {
+        'test-image': { status: 'loading', loaded: true, error: false },
+      };
+
+      const group = node.onRender(defaultProps()) as Konva.Group;
+      const internalImage = group.findOne('#test-image-image') as Konva.Image;
+
+      // Placeholder should be gone — fallback is shown instead
+      expect(group.findOne('#test-image-placeholder')).toBeFalsy();
+      // Fallback image must be the visible source
+      expect(internalImage.getAttrs().image).toBe(fallback);
+      expect(internalImage.getAttrs().visible).toBe(true);
+      // imageState must remain 'loading' (not prematurely promoted to 'loaded')
+      expect(privateNode.imageState['test-image']?.status).toBe('loading');
+      // loadImage should be restarted on the new node so the real image eventually loads
+      expect(loadSpy).toHaveBeenCalledWith(
+        expect.objectContaining({ imageURL: 'http://example.com/image.jpg' }),
+        group,
+        false
+      );
     });
 
     it('11.2 fallback not used when imageFallback.enabled is false (default)', () => {

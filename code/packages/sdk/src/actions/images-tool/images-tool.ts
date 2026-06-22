@@ -54,7 +54,7 @@ export class WeaveImagesToolAction extends WeaveAction {
   protected pointers!: Map<number, Vector2d>;
   protected tempPointerFeedbackNode!: Konva.Group | null;
   protected container: Konva.Layer | Konva.Group | undefined;
-  protected nodesIds: string[] = [];
+  protected nodesIds: Set<string> = new Set();
   private toAdd: number = 0;
   protected imagesFile: WeaveImagesFile[] = [];
   protected imagesURL: WeaveImagesURL[] = [];
@@ -412,11 +412,11 @@ export class WeaveImagesToolAction extends WeaveAction {
     let imagePositionY = originPoint.y;
     let maxHeight = 0;
 
-    this.nodesIds = [];
+    this.nodesIds = new Set();
     const images: Promise<void>[] = [];
 
     const checkAddedImages = ({ nodeId }: { nodeId: string }) => {
-      if (this.nodesIds.includes(nodeId)) {
+      if (this.nodesIds.has(nodeId)) {
         this.handleImageAdded();
       }
 
@@ -429,7 +429,7 @@ export class WeaveImagesToolAction extends WeaveAction {
 
         this.instance.emitEvent<WeaveImagesToolActionOnAddedEvent>(
           'onAddedImages',
-          { nodesIds: this.nodesIds }
+          { nodesIds: Array.from(this.nodesIds) }
         );
       }
     };
@@ -509,7 +509,7 @@ export class WeaveImagesToolAction extends WeaveAction {
           handleImage(nodeId, image, { x: imagePositionX, y: imagePositionY })
         );
 
-        this.nodesIds.push(nodeId);
+        this.nodesIds.add(nodeId);
 
         maxHeight = Math.max(maxHeight, height);
 
@@ -564,7 +564,7 @@ export class WeaveImagesToolAction extends WeaveAction {
           handleImage(nodeId, image, { x: imagePositionX, y: imagePositionY })
         );
 
-        this.nodesIds.push(nodeId);
+        this.nodesIds.add(nodeId);
 
         maxHeight = Math.max(maxHeight, image.height);
 
@@ -577,8 +577,8 @@ export class WeaveImagesToolAction extends WeaveAction {
       }
     }
 
-    if (this.nodesIds.length > 0) {
-      this.toAdd = this.nodesIds.length;
+    if (this.nodesIds.size > 0) {
+      this.toAdd = this.nodesIds.size;
 
       await Promise.allSettled(images);
     } else {
@@ -616,7 +616,7 @@ export class WeaveImagesToolAction extends WeaveAction {
       this.container = params.container;
     }
 
-    this.nodesIds = [];
+    this.nodesIds = new Set();
     this.forceMainContainer = params.forceMainContainer ?? false;
 
     if (params.type === WEAVE_IMAGES_TOOL_UPLOAD_TYPE.FILE) {
@@ -624,13 +624,13 @@ export class WeaveImagesToolAction extends WeaveAction {
       this.onStartUploading = params.onStartUploading;
       this.onFinishedUploading = params.onFinishedUploading;
       this.uploadImageFunction = params.uploadImageFunction;
-      this.nodesIds = [];
+      this.nodesIds = new Set();
       this.imagesFile = params.images;
     }
 
     if (params.type === WEAVE_IMAGES_TOOL_UPLOAD_TYPE.IMAGE_URL) {
       this.uploadType = WEAVE_IMAGES_TOOL_UPLOAD_TYPE.IMAGE_URL;
-      this.nodesIds = [];
+      this.nodesIds = new Set();
       this.imagesURL = params.images;
     }
 
@@ -665,19 +665,16 @@ export class WeaveImagesToolAction extends WeaveAction {
     }
   }
 
-  cleanup(): void {
+  async waitForImagesToBeAdded(nodesIds: Set<string>) {
     const stage = this.instance.getStage();
-
-    this.tempPointerFeedbackNode?.destroy();
-    this.tempPointerFeedbackNode = null;
-    this.instance.getUtilityLayer()?.batchDraw();
 
     const selectionPlugin =
       this.instance.getPlugin<WeaveNodesSelectionPlugin>('nodesSelection');
+
     if (selectionPlugin) {
       const addedNodes = [];
 
-      for (const nodeId of this.nodesIds) {
+      for (const nodeId of Array.from(nodesIds)) {
         const node = stage.findOne(`#${nodeId}`);
 
         if (node) {
@@ -688,6 +685,19 @@ export class WeaveImagesToolAction extends WeaveAction {
       selectionPlugin.setSelectedNodes(addedNodes);
       this.instance.triggerAction(SELECTION_TOOL_ACTION_NAME);
     }
+  }
+
+  cleanup(): void {
+    const stage = this.instance.getStage();
+
+    this.tempPointerFeedbackNode?.destroy();
+    this.tempPointerFeedbackNode = null;
+    this.instance.getUtilityLayer()?.batchDraw();
+
+    const nodesIds = this.nodesIds;
+    this.nodesIds = new Set();
+    this.toAdd = 0;
+    this.waitForImagesToBeAdded(nodesIds);
 
     this.instance.emitEvent<undefined>('onFinishedImages');
 
@@ -701,8 +711,6 @@ export class WeaveImagesToolAction extends WeaveAction {
     this.container = undefined;
     this.stageClickPoint = null;
     this.clickPoint = null;
-    this.nodesIds = [];
-    this.toAdd = 0;
     this.setState(WEAVE_IMAGES_TOOL_STATE.IDLE);
   }
 

@@ -16,10 +16,8 @@ import { type Logger } from 'pino';
 import { WeaveNodesSelectionPlugin } from '@/plugins/nodes-selection/nodes-selection';
 import type { WeaveNode } from '@/nodes/node';
 import type { WeaveGroupNode } from '@/nodes/group/group';
-import {
-  WEAVE_NODES_MULTI_SELECTION_FEEDBACK_PLUGIN_KEY,
-  WeaveNodesMultiSelectionFeedbackPlugin,
-} from '@/index.node';
+import type { WeaveNodesMultiSelectionFeedbackPlugin } from '@/plugins/nodes-multi-selection-feedback/nodes-multi-selection-feedback';
+import { WEAVE_NODES_MULTI_SELECTION_FEEDBACK_PLUGIN_KEY } from '@/plugins/nodes-multi-selection-feedback/constants';
 
 export class WeaveGroupsManager {
   private instance: Weave;
@@ -167,17 +165,22 @@ export class WeaveGroupsManager {
             const nodePos = konvaGroup.getAbsolutePosition();
             const nodeRotation = konvaGroup.getAbsoluteRotation();
 
+            const newId = uuidv4();
             konvaGroup.moveTo(groupInstance);
             konvaGroup.setAbsolutePosition(nodePos);
             konvaGroup.rotation(nodeRotation);
             konvaGroup.zIndex(index);
-            konvaGroup.setAttr('id', uuidv4());
+            konvaGroup.setAttr('id', newId);
             konvaGroup.setAttr('draggable', false);
 
             const handler =
               this.instance.getNodeHandler<WeaveGroupNode>('group');
 
             if (handler) {
+              this.instance.removeNodeNT(groupChild, {
+                emitUserChangeEvent: false,
+              });
+              konvaGroup.setAttr('id', groupChild.key);
               const stateNode = handler.serialize(konvaGroup);
               this.instance.addNodeNT(stateNode, groupId, {
                 emitUserChangeEvent: false,
@@ -194,11 +197,12 @@ export class WeaveGroupsManager {
           const nodePos = konvaNode.getAbsolutePosition();
           const nodeRotation = konvaNode.getAbsoluteRotation();
 
+          const newId = uuidv4();
           konvaNode.moveTo(groupInstance);
           konvaNode.setAbsolutePosition(nodePos);
           konvaNode.rotation(nodeRotation);
           konvaNode.zIndex(index);
-          konvaNode.setAttr('id', uuidv4());
+          konvaNode.setAttr('id', newId);
           konvaNode.setAttr('draggable', false);
 
           const handler = this.instance.getNodeHandler<WeaveNode>(
@@ -206,6 +210,10 @@ export class WeaveGroupsManager {
           );
 
           if (handler) {
+            this.instance.removeNodeNT(node, {
+              emitUserChangeEvent: false,
+            });
+            konvaNode.setAttr('id', node.key);
             const stateNode = handler.serialize(konvaNode);
             this.instance.addNodeNT(stateNode, groupId, {
               emitUserChangeEvent: false,
@@ -213,8 +221,6 @@ export class WeaveGroupsManager {
           }
         }
       }
-
-      this.instance.removeNodes(sortedNodesByZIndex);
 
       groupInstance.destroy();
 
@@ -243,7 +249,7 @@ export class WeaveGroupsManager {
           tr.show();
           tr.forceUpdate();
         }
-      }, 0);
+      }, 10);
     });
   }
 
@@ -397,7 +403,7 @@ export class WeaveGroupsManager {
     };
   }
 
-  getNodesMultiSelectionFeedbackPlugin() {
+  getNodesMultiSelectionFeedbackPlugin(): WeaveNodesMultiSelectionFeedbackPlugin | undefined {
     return this.instance.getPlugin<WeaveNodesMultiSelectionFeedbackPlugin>(
       WEAVE_NODES_MULTI_SELECTION_FEEDBACK_PLUGIN_KEY
     );
