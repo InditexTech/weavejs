@@ -25,6 +25,7 @@ export function handlePointerDown(
 
   ctx.setClickOrTapHandled(false);
   ctx.registerPointer(e.evt.pointerId, e.evt);
+  ctx.clearArmedDrag();
 
   if (e.evt.pointerType === 'touch' && ctx.getPointerCount() > 1) return;
   if (e.evt.pointerType === 'mouse' && e.evt?.button !== 0) return;

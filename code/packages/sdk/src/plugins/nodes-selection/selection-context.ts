@@ -46,6 +46,12 @@ export interface SelectionContext {
   unregisterPointer(id: number): void;
   setClickOrTapHandled(val: boolean): void;
 
+  // ── Single-gesture drag arming ───────────────────────────────────────────────
+  armDrag(node: Konva.Node, pointerId: number): void;
+  getArmedDragNode(): Konva.Node | null;
+  getArmedDragPointerId(): number | null;
+  clearArmedDrag(): void;
+
   // ── Group context ────────────────────────────────────────────────────────────
   getActiveGroupContext(): string | null;
   enterGroupContext(groupId: string): void;
