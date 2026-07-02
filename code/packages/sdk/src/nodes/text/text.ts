@@ -38,6 +38,8 @@ export class WeaveTextNode extends WeaveNode {
   protected nodeType: string = WEAVE_TEXT_NODE_TYPE;
   private createNode!: boolean;
   private editing!: boolean;
+  private editingNodeId!: string | null;
+  private nodeRenderedAddedRegistered!: boolean;
   private textAreaSuperContainer!: HTMLDivElement | null;
   private textAreaContainer!: HTMLDivElement | null;
   private textArea!: HTMLTextAreaElement | null;
@@ -59,6 +61,8 @@ export class WeaveTextNode extends WeaveNode {
     this.textAreaContainer = null;
     this.textArea = null;
     this.editing = false;
+    this.editingNodeId = null;
+    this.nodeRenderedAddedRegistered = false;
     this.textArea = null;
   }
 
@@ -83,9 +87,12 @@ export class WeaveTextNode extends WeaveNode {
         // just update the node
         this.instance.updateNode(this.serialize(clonedText));
       }
-      this.createNode = false;
       clonedText.destroy();
     }
+    // Always reset the create flag: it is shared across all text nodes (single
+    // handler instance) and must never leak into the next edit session, even
+    // when the node could not be found above.
+    this.createNode = false;
   }
 
   private readonly handleKeyPress = (e: KeyboardEvent) => {
@@ -382,18 +389,23 @@ export class WeaveTextNode extends WeaveNode {
       handleTransformEnd();
     });
 
-    this.instance.addEventListener(
-      'onNodeRenderedAdded',
-      (node: Konva.Node) => {
-        if (
-          node.id() === text.id() &&
-          node.getParent() !== text.getParent() &&
-          this.editing
-        ) {
-          text.getAttr('cancelEditMode')?.();
+    if (!this.nodeRenderedAddedRegistered) {
+      this.instance.addEventListener(
+        'onNodeRenderedAdded',
+        (node: Konva.Node) => {
+          if (
+            this.editing &&
+            this.editingNodeId !== null &&
+            node.id() === this.editingNodeId &&
+            node.getAttr('cancelEditMode')
+          ) {
+            node.getAttr('cancelEditMode')?.();
+          }
         }
-      }
-    );
+      );
+
+      this.nodeRenderedAddedRegistered = true;
+    }
 
     if (!this.instance.isServerSide() && !this.keyPressHandler) {
       this.keyPressHandler = this.handleKeyPress.bind(this);
@@ -450,7 +462,11 @@ export class WeaveTextNode extends WeaveNode {
       height,
     });
 
-    if (this.editing) {
+    // Only drive the edit overlay from updates that belong to the node actually
+    // being edited. The handler is shared across every text node, so an update
+    // for a *different* text node (e.g. a previously-selected one) must never
+    // hijack the textarea or toggle that node's visibility.
+    if (this.editing && this.editingNodeId === nodeInstance.id()) {
       this.updateTextAreaDOM(nodeInstance as Konva.Text);
     }
 
@@ -1027,7 +1043,11 @@ export class WeaveTextNode extends WeaveNode {
       tr.hide();
     }
 
-    if (this.editing) {
+    // Guard the hide against the shared handler: only the node under edit may be
+    // hidden behind the textarea overlay. Without the id check a stray call for
+    // another text node would hide it locally with no way to restore it (the
+    // shared state stays visible, so it only reappears after a reload).
+    if (this.editing && this.editingNodeId === textNode.id()) {
       textNode.visible(false);
     } else {
       textNode.visible(true);
@@ -1040,6 +1060,7 @@ export class WeaveTextNode extends WeaveNode {
     this.instance.getStage().mode(WEAVE_STAGE_DEFAULT_MODE);
 
     this.editing = false;
+    this.editingNodeId = null;
     const stage = this.instance.getStage();
 
     if (this.textAreaSuperContainer) {
@@ -1049,11 +1070,16 @@ export class WeaveTextNode extends WeaveNode {
     textNode.visible(true);
     this.updateNode(textNode);
 
+    // For a freshly-created node, updateNode() destroys `textNode` and re-adds
+    // it through addNode(), producing a brand-new Konva instance. Re-resolve the
+    // live node by id so the transformer never attaches to a destroyed node.
+    const liveNode = stage.findOne<Konva.Text>(`#${textNode.id()}`) ?? textNode;
+
     const selectionPlugin =
       this.instance.getPlugin<WeaveNodesSelectionPlugin>('nodesSelection');
     if (selectionPlugin) {
       this.instance.enablePlugin('nodesSelection');
-      selectionPlugin.setSelectedNodes([textNode]);
+      selectionPlugin.setSelectedNodes([liveNode]);
       this.instance.triggerAction(SELECTION_TOOL_ACTION_NAME);
     }
 
@@ -1063,7 +1089,7 @@ export class WeaveTextNode extends WeaveNode {
 
     this.instance.emitEvent<WeaveTextNodeOnExitTextNodeEditMode>(
       'onExitTextNodeEditMode',
-      { node: textNode }
+      { node: liveNode }
     );
   }
 
@@ -1082,6 +1108,7 @@ export class WeaveTextNode extends WeaveNode {
     }
 
     this.editing = true;
+    this.editingNodeId = textNode.id();
 
     textNode.visible(false);
 

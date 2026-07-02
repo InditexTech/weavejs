@@ -639,20 +639,19 @@ describe('WeaveTextNode', () => {
   // ---------------------------------------------------------------------------
 
   describe('onRender() — onNodeRenderedAdded listener', () => {
-    it('10.1 same id, different parent, editing=true — cancelEditMode called', () => {
+    it('10.1 incoming id matches editingNodeId, editing=true — cancelEditMode called on incoming node', () => {
       const { node, mock } = makeNode();
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       (node as any).editing = true;
-      const text = node.onRender(defaultProps()) as Konva.Text;
-      const cancelMock = vi.fn();
-      text.setAttr('cancelEditMode', cancelMock);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      (node as any).editingNodeId = 'text-1';
+      node.onRender(defaultProps());
 
-      // Give text a real parent so getParent() !== null
-      const layer = new Konva.Layer();
-      layer.add(text);
-
-      // Simulate onNodeRenderedAdded callback with matching id but no parent (different)
+      // The re-rendered node carrying the cancelEditMode attr is the incoming one
       const incomingNode = new Konva.Text({ id: 'text-1' });
+      const cancelMock = vi.fn();
+      incomingNode.setAttr('cancelEditMode', cancelMock);
+
       const cb = mock.addEventListener.mock.calls.find(
         ([evt]: [string]) => evt === 'onNodeRenderedAdded'
       )?.[1];
@@ -664,23 +663,30 @@ describe('WeaveTextNode', () => {
       const { node, mock } = makeNode();
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       (node as any).editing = true;
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      (node as any).editingNodeId = 'text-1';
       node.onRender(defaultProps());
       const cb = mock.addEventListener.mock.calls.find(
         ([evt]: [string]) => evt === 'onNodeRenderedAdded'
       )?.[1];
       const otherNode = new Konva.Text({ id: 'other-id' });
+      const cancelMock = vi.fn();
+      otherNode.setAttr('cancelEditMode', cancelMock);
       expect(() => cb?.(otherNode)).not.toThrow();
+      expect(cancelMock).not.toHaveBeenCalled();
     });
 
     it('10.3 editing=false — cancelEditMode not called', () => {
       const { node, mock } = makeNode();
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       (node as any).editing = false;
-      const text = node.onRender(defaultProps()) as Konva.Text;
-      const cancelMock = vi.fn();
-      text.setAttr('cancelEditMode', cancelMock);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      (node as any).editingNodeId = 'text-1';
+      node.onRender(defaultProps());
 
       const incomingNode = new Konva.Text({ id: 'text-1' });
+      const cancelMock = vi.fn();
+      incomingNode.setAttr('cancelEditMode', cancelMock);
       const cb = mock.addEventListener.mock.calls.find(
         ([evt]: [string]) => evt === 'onNodeRenderedAdded'
       )?.[1];
@@ -873,10 +879,12 @@ describe('WeaveTextNode', () => {
       expect(lastCall.height).toBeUndefined();
     });
 
-    it('12.7 editing=true — calls updateTextAreaDOM', () => {
+    it('12.7 editing=true + update for the edited node — calls updateTextAreaDOM', () => {
       const { node, mock: _mock } = makeNode();
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       (node as any).editing = true;
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      (node as any).editingNodeId = 'text-1';
 
       // Setup a fake textAreaContainer and textArea so updateTextAreaDOM doesn't bail early
       const container = document.createElement('div');
@@ -894,6 +902,38 @@ describe('WeaveTextNode', () => {
       // updateTextAreaDOM updates the container style
       expect(container.style.top).toBe('10px');
       expect(container.style.left).toBe('5px');
+    });
+
+    it('12.10 editing=true but update is for a DIFFERENT node — does not hijack the overlay or hide it', () => {
+      const { node, mock: _mock } = makeNode();
+      // Editing node "text-1" while an update arrives for the previously
+      // selected node "text-2". The shared handler must ignore it — otherwise
+      // "text-2" gets hidden locally with no way to restore it (GH-1123).
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      (node as any).editing = true;
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      (node as any).editingNodeId = 'text-1';
+
+      const container = document.createElement('div');
+      const textarea = document.createElement('textarea');
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      (node as any).textAreaContainer = container;
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      (node as any).textArea = textarea;
+
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const updateOverlaySpy = vi.spyOn(node as any, 'updateTextAreaDOM');
+      const otherNode = new Konva.Text({ id: 'text-2' });
+      const visibleSpy = vi.spyOn(otherNode, 'visible');
+
+      // The incoming update carries the other node's own props (id "text-2").
+      node.onUpdate(otherNode, defaultProps({ id: 'text-2' }));
+
+      // the edit overlay must NOT be driven by the non-edited node
+      expect(updateOverlaySpy).not.toHaveBeenCalled();
+      expect(container.style.top).toBe('');
+      // and the non-edited node must never be hidden
+      expect(visibleSpy).not.toHaveBeenCalledWith(false);
     });
 
     it('12.8 editing=false + plugin present — refreshes selected nodes', () => {
@@ -2061,6 +2101,8 @@ describe('WeaveTextNode', () => {
       (node as any).textArea = textarea;
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       (node as any).editing = true;
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      (node as any).editingNodeId = 'upd-2';
 
       const visibleSpy = vi.spyOn(textNode, 'visible');
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -2091,6 +2133,33 @@ describe('WeaveTextNode', () => {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       (node as any).updateTextAreaDOM(textNode);
       expect(visibleSpy).toHaveBeenCalledWith(true);
+    });
+
+    it('32.4 editing=true but for a different node id — does not hide it (visible(true))', () => {
+      const { node } = makeNode();
+      const textNode = new Konva.Text({ id: 'upd-other', text: 'x' });
+      vi.spyOn(textNode, 'absolutePosition').mockReturnValue({ x: 0, y: 0 });
+      vi.spyOn(textNode, 'getAbsoluteRotation').mockReturnValue(0);
+      vi.spyOn(textNode, 'getAbsoluteScale').mockReturnValue({ x: 1, y: 1 });
+      vi.spyOn(textNode, 'measureSize').mockReturnValue({ width: 10, height: 10 });
+      vi.spyOn(textNode, 'lineHeight').mockReturnValue(1);
+
+      const container = document.createElement('div');
+      const textarea = document.createElement('textarea');
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      (node as any).textAreaContainer = container;
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      (node as any).textArea = textarea;
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      (node as any).editing = true;
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      (node as any).editingNodeId = 'upd-under-edit';
+
+      const visibleSpy = vi.spyOn(textNode, 'visible');
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      (node as any).updateTextAreaDOM(textNode);
+      expect(visibleSpy).toHaveBeenCalledWith(true);
+      expect(visibleSpy).not.toHaveBeenCalledWith(false);
     });
   });
 });

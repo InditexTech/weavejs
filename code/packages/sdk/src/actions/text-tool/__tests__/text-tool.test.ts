@@ -127,6 +127,14 @@ describe('WeaveTextToolAction', () => {
     return { cancelFn, handlers: mockWeave._stageHandlers };
   }
 
+  // Drive the action through a placement click so state becomes FINISHED and
+  // textId is set — the precondition for cleanup()'s auto-edit-mode block.
+  function advanceToFinished(cancelFn = vi.fn()) {
+    action.trigger(cancelFn);
+    mockWeave._stageHandlers['pointerclick']?.();
+    return { cancelFn, handlers: mockWeave._stageHandlers };
+  }
+
   // ── Suite 1: constructor / initialize() ────────────────────────────────────
 
   describe('constructor / initialize()', () => {
@@ -408,7 +416,7 @@ describe('WeaveTextToolAction', () => {
       // Node needs getAttr so the textGroup branch in cleanup() doesn't throw
       const node = { id: 'found-node', getAttr: vi.fn().mockReturnValue(vi.fn()) };
       mockWeave._stage.findOne.mockReturnValue(node);
-      action.trigger(vi.fn());
+      advanceToFinished();
       action.cleanup();
       expect(plugin.setSelectedNodes).toHaveBeenCalledWith([node]);
     });
@@ -417,7 +425,7 @@ describe('WeaveTextToolAction', () => {
       const plugin = makeSelectionPlugin();
       mockWeave.getPlugin.mockReturnValue(plugin);
       mockWeave._stage.findOne.mockReturnValue(undefined);
-      action.trigger(vi.fn());
+      advanceToFinished();
       // setSelectedNodes([]) is called in trigger, clear before cleanup
       plugin.setSelectedNodes.mockClear();
       action.cleanup();
@@ -427,14 +435,14 @@ describe('WeaveTextToolAction', () => {
     it('10.4 selectionPlugin present → triggerAction(selectionTool) called', () => {
       const plugin = makeSelectionPlugin();
       mockWeave.getPlugin.mockReturnValue(plugin);
-      action.trigger(vi.fn());
+      advanceToFinished();
       action.cleanup();
       expect(mockWeave.triggerAction).toHaveBeenCalledWith(SELECTION_TOOL_ACTION_NAME);
     });
 
     it('10.5 selectionPlugin absent → no error', () => {
       mockWeave.getPlugin.mockReturnValue(undefined);
-      action.trigger(vi.fn());
+      advanceToFinished();
       expect(() => action.cleanup()).not.toThrow();
     });
 
@@ -446,7 +454,7 @@ describe('WeaveTextToolAction', () => {
       // findOne returns textGroup for both calls in cleanup
       mockWeave._stage.findOne.mockReturnValue(textGroup);
       mockWeave.getPlugin.mockReturnValue(undefined);
-      action.trigger(vi.fn());
+      advanceToFinished();
       action.cleanup();
       expect(triggerEditMode).toHaveBeenCalledWith(textGroup, true);
     });
@@ -454,7 +462,7 @@ describe('WeaveTextToolAction', () => {
     it('10.7 textGroup NOT found → no error', () => {
       mockWeave._stage.findOne.mockReturnValue(undefined);
       mockWeave.getPlugin.mockReturnValue(undefined);
-      action.trigger(vi.fn());
+      advanceToFinished();
       expect(() => action.cleanup()).not.toThrow();
     });
 
@@ -468,6 +476,30 @@ describe('WeaveTextToolAction', () => {
       expect(a['container']).toBeUndefined();
       expect(a['clickPoint']).toBeNull();
       expect(a['initialCursor']).toBeNull();
+    });
+
+    it('10.9 plain cancel (state≠FINISHED) → triggerEditMode NOT triggered', () => {
+      const triggerEditMode = vi.fn();
+      const textGroup = {
+        getAttr: vi.fn().mockReturnValue(triggerEditMode),
+      };
+      mockWeave._stage.findOne.mockReturnValue(textGroup);
+      mockWeave.getPlugin.mockReturnValue(undefined);
+      // trigger() leaves state=ADDING (no placement) → cleanup must not auto-edit
+      action.trigger(vi.fn());
+      action.cleanup();
+      expect(triggerEditMode).not.toHaveBeenCalled();
+    });
+
+    it('10.10 plain cancel (state≠FINISHED) → triggerAction(selectionTool) NOT called', () => {
+      const plugin = makeSelectionPlugin();
+      mockWeave.getPlugin.mockReturnValue(plugin);
+      action.trigger(vi.fn());
+      mockWeave.triggerAction.mockClear();
+      action.cleanup();
+      expect(mockWeave.triggerAction).not.toHaveBeenCalledWith(
+        SELECTION_TOOL_ACTION_NAME
+      );
     });
   });
 });
