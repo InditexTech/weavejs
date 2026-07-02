@@ -137,6 +137,10 @@ function makeCtx(overrides: Partial<SelectionContext> = {}): SelectionContext {
     registerPointer: vi.fn(),
     unregisterPointer: vi.fn(),
     setClickOrTapHandled: vi.fn(),
+    armDrag: vi.fn(),
+    getArmedDragNode: vi.fn().mockReturnValue(null),
+    getArmedDragPointerId: vi.fn().mockReturnValue(null),
+    clearArmedDrag: vi.fn(),
     selectNone: vi.fn(),
     setSelectedNodes: vi.fn(),
     getSelectedNodes: vi.fn().mockReturnValue([]),
@@ -303,6 +307,21 @@ describe('handleClickOrTap', () => {
     handleClickOrTap(ctx, e);
     // Should continue to selection logic
     expect(ctx.triggerSelectedNodesEvent).toHaveBeenCalled();
+  });
+
+  it('arms a single-gesture drag for a freshly selected draggable node', () => {
+    const ctx = makeCtx();
+    const node = {
+      ...makeNode(),
+      canDrag: vi.fn().mockReturnValue(true),
+      draggable: vi.fn(),
+    };
+    (getTargetedNode as ReturnType<typeof vi.fn>).mockReturnValue(node);
+    ctx.getWeaveInstance().getRealSelectedNode = vi.fn().mockReturnValue(node);
+    const e = makeEvent({ pointerId: 1 }, node);
+    handleClickOrTap(ctx, e);
+    expect(node.draggable).toHaveBeenCalledWith(true);
+    expect(ctx.armDrag).toHaveBeenCalledWith(node, 1);
   });
 
   it('returns early when isContainerPrincipal is explicitly false', () => {

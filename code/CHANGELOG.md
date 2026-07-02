@@ -15,6 +15,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- [#1122](https://github.com/InditexTech/weavejs/issues/1122) Avoid double interaction to drag
 - [#1123](https://github.com/InditexTech/weavejs/issues/1123) Fix text editing trigger inconsistencies when creating consecutive text nodes
 
 ## [5.1.1] - 2026-06-22

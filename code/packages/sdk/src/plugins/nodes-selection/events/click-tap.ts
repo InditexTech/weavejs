@@ -168,6 +168,17 @@ export function handleClickOrTap(
     tr.nodes([nodeTargeted]);
     tr.show();
     areNodesSelected = true;
+
+    // Single-gesture select+drag: make the freshly selected node draggable now
+    // (public API, synchronous) and arm it. The actual drag only begins once the
+    // pointer passes the move threshold (see handleArmedDrag), so a plain click
+    // still just selects.
+    const canMove =
+      typeof nodeTargeted.canDrag === 'function' ? nodeTargeted.canDrag() : false;
+    if (canMove && e.evt) {
+      nodeTargeted.draggable(true);
+      ctx.armDrag(nodeTargeted, e.evt.pointerId);
+    }
   }
   if (metaPressed && isSelected) {
     const nodes = tr.nodes().slice();

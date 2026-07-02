@@ -1213,4 +1213,28 @@ describe('WeaveNodesSelectionPlugin', () => {
       expect(anchor.height).not.toHaveBeenCalled();
     });
   });
+
+  describe('single-gesture drag arming', () => {
+    it('getArmedDragNode/getArmedDragPointerId return null initially', () => {
+      const { plugin } = makePlugin();
+      expect(plugin.getArmedDragNode()).toBeNull();
+      expect(plugin.getArmedDragPointerId()).toBeNull();
+    });
+
+    it('armDrag stores the node and pointer id', () => {
+      const { plugin } = makePlugin();
+      const node = makeKonvaNode() as unknown as Konva.Node;
+      plugin.armDrag(node, 7);
+      expect(plugin.getArmedDragNode()).toBe(node);
+      expect(plugin.getArmedDragPointerId()).toBe(7);
+    });
+
+    it('clearArmedDrag resets the armed node and pointer id', () => {
+      const { plugin } = makePlugin();
+      plugin.armDrag(makeKonvaNode() as unknown as Konva.Node, 7);
+      plugin.clearArmedDrag();
+      expect(plugin.getArmedDragNode()).toBeNull();
+      expect(plugin.getArmedDragPointerId()).toBeNull();
+    });
+  });
 });

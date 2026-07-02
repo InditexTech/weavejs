@@ -36,6 +36,9 @@ export function handlePointerUp(
   ctx.unregisterPointer(e.evt.pointerId);
   ctx.getGesture().commitTap();
 
+  // A plain click (no movement) leaves the node selected but must not drag.
+  ctx.clearArmedDrag();
+
   if (stage.mode() !== WEAVE_STAGE_DEFAULT_MODE) return;
 
   const contextMenuPlugin = ctx.getContextMenuPlugin();

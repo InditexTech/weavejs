@@ -50,6 +50,7 @@ import {
   handlePointerDown,
   handlePointerMove,
   handlePointerUp,
+  handleArmedDrag,
 } from './events';
 
 export class WeaveNodesSelectionPlugin
@@ -71,6 +72,8 @@ export class WeaveNodesSelectionPlugin
   private _handledClickOrTap: boolean = false;
   private dragSelectedNodes: Konva.Node[] = [];
   private _activeGroupContext: string | null = null;
+  private _armedDragNode: Konva.Node | null = null;
+  private _armedDragPointerId: number | null = null;
 
   onRender = undefined;
 
@@ -106,6 +109,8 @@ export class WeaveNodesSelectionPlugin
     this.dragSelectedNodes = [];
     this._handledClickOrTap = false;
     this._activeGroupContext = null;
+    this._armedDragNode = null;
+    this._armedDragPointerId = null;
   }
 
 
@@ -185,6 +190,26 @@ export class WeaveNodesSelectionPlugin
 
   setAreaSelecting(val: boolean): void {
     this.selecting = val;
+  }
+
+  // ── Single-gesture drag arming ──────────────────────────────────────────────
+
+  armDrag(node: Konva.Node, pointerId: number): void {
+    this._armedDragNode = node;
+    this._armedDragPointerId = pointerId;
+  }
+
+  getArmedDragNode(): Konva.Node | null {
+    return this._armedDragNode;
+  }
+
+  getArmedDragPointerId(): number | null {
+    return this._armedDragPointerId;
+  }
+
+  clearArmedDrag(): void {
+    this._armedDragNode = null;
+    this._armedDragPointerId = null;
   }
 
   // ────────────────────────────────────────────────────────────────────────────
@@ -432,6 +457,9 @@ export class WeaveNodesSelectionPlugin
       'pointermove',
       throttle((e) => handlePointerMove(this, e), DEFAULT_THROTTLE_MS)
     );
+
+    // Un-throttled so single-gesture drag initiation stays responsive.
+    stage.on('pointermove', (e) => handleArmedDrag(this, e));
 
     stage.on('pointerup', (e) => handlePointerUp(this, e));
 
