@@ -167,21 +167,29 @@ export class WeaveTextToolAction extends WeaveAction {
 
     stage.container().style.cursor = 'default';
 
-    const selectionPlugin =
-      this.instance.getPlugin<WeaveNodesSelectionPlugin>('nodesSelection');
-    if (selectionPlugin) {
-      const node = stage.findOne(`#${this.textId}`);
-      if (node) {
-        selectionPlugin.setSelectedNodes([node]);
-      }
-      this.instance.triggerAction(SELECTION_TOOL_ACTION_NAME);
-    }
+    // Only auto-enter edit mode when a node was actually just placed by this
+    // tool. cleanup() also runs on plain cancels (Escape / tool switch), and in
+    // those cases we must never re-open an editor on a previously-added node.
+    const placedId = this.textId;
+    const justAdded = this.state === TEXT_TOOL_STATE.FINISHED && !!placedId;
 
-    const textGroup = stage.findOne(`#${this.textId}`) as
-      | Konva.Group
-      | undefined;
-    if (textGroup) {
-      textGroup.getAttr('triggerEditMode')(textGroup, true);
+    if (justAdded) {
+      const selectionPlugin =
+        this.instance.getPlugin<WeaveNodesSelectionPlugin>('nodesSelection');
+      if (selectionPlugin) {
+        const node = stage.findOne(`#${placedId}`);
+        if (node) {
+          selectionPlugin.setSelectedNodes([node]);
+        }
+        this.instance.triggerAction(SELECTION_TOOL_ACTION_NAME);
+      }
+
+      const textGroup = stage.findOne(`#${placedId}`) as
+        | Konva.Group
+        | undefined;
+      if (textGroup) {
+        textGroup.getAttr('triggerEditMode')?.(textGroup, true);
+      }
     }
 
     this.initialCursor = null;
