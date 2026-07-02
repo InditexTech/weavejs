@@ -7,3 +7,4 @@ export { registerKeyboardHandlers } from './keyboard';
 export { handlePointerDown } from './pointer-down';
 export { handlePointerMove } from './pointer-move';
 export { handlePointerUp } from './pointer-up';
+export { handleArmedDrag } from './armed-drag';
