@@ -1,6 +1,6 @@
 {
   "name": "@inditextech/weave-store-standalone",
-  "version": "5.1.2",
+  "version": "5.2.0-SNAPSHOT",
   "type": "module",
   "license": "Apache-2.0",
   "author": "Jesus Manuel Piñeiro Cid <jesusmpc@inditex.com>",
@@ -52,8 +52,8 @@
     "version:release": "npm version $RELEASE_VERSION -m \"[npm-scripts] prepare release $RELEASE_VERSION\" --tag-version-prefix \"\""
   },
   "dependencies": {
-    "@inditextech/weave-sdk": "5.1.2",
-    "@inditextech/weave-types": "5.1.2"
+    "@inditextech/weave-sdk": "5.2.0-SNAPSHOT",
+    "@inditextech/weave-types": "5.2.0-SNAPSHOT"
   },
   "devDependencies": {
     "@types/lodash.debounce": "^4.0.9",
