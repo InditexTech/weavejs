@@ -779,6 +779,25 @@ describe('WeaveNode setupDefaultNodeEvents', () => {
 
       expect(handler).toHaveBeenCalled();
     });
+
+    it('5.11 stops dragging when a non-selection tool is active', () => {
+      const { node, mock } = makeNode();
+      const group = createGroup();
+      group.canDrag = () => true;
+      group.stopDrag = vi.fn();
+      // A drawing tool (e.g. rectangleTool) is active while a node remains
+      // selectable/draggable. Drawing on top of it must not drag the node.
+      mock.getActiveAction.mockReturnValue('rectangleTool');
+
+      node.setupDefaultNodeEvents(group);
+      fireKonvaEvent(group, 'dragstart', {
+        target: group,
+        evt: { button: 0, buttons: 1, shiftKey: false, altKey: false },
+      });
+
+      expect(group.stopDrag).toHaveBeenCalled();
+      expect(mock.emitEvent).not.toHaveBeenCalledWith('onDrag', group);
+    });
   });
 
   describe('6 — dragmove', () => {

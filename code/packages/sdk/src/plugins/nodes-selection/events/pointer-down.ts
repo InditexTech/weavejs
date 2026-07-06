@@ -42,6 +42,44 @@ export function handlePointerDown(
     ctx.setAreaSelecting(false);
     ctx.getEdgePanning().stop();
     ctx.getAreaSelector().hide();
+
+    // The pointer landed on the selection transformer's overdraw area (its
+    // `back` shape spans the whole bounding box). Re-resolve the real node
+    // underneath: if a *different*, targetable node sits on top of the current
+    // selection, the drag must move that node — not proxy-drag the selection.
+    const weave = ctx.getWeaveInstance();
+    const realNode = weave.getRealSelectedNode(selectedGroup);
+    const tr = ctx.getTransformerController().getTransformer();
+
+    const selectedIds = new Set(tr.nodes().map((node) => node.getAttrs().id));
+    let isWithinSelection = false;
+    for (let cur: Konva.Node | null = realNode; cur; cur = cur.getParent()) {
+      if (typeof cur.getAttrs !== 'function') break;
+      if (selectedIds.has(cur.getAttrs().id)) {
+        isWithinSelection = true;
+        break;
+      }
+    }
+
+    if (!isWithinSelection && realNode.getAttrs().nodeType) {
+      // Because the previous selection's nodes are draggable, the transformer's
+      // `back` overdraw shape is draggable too, so Konva armed a `ready` drag
+      // element for it on this pointerdown. Left in place it would compete with
+      // (or hijack) the drag of the node we are about to re-target. Drop any
+      // not-yet-started (`ready`) drag elements so only the re-targeted node's
+      // armed drag proceeds.
+      Konva.DD._dragElements.forEach((elem, key) => {
+        if (elem.dragStatus === 'ready') {
+          Konva.DD._dragElements.delete(key);
+        }
+      });
+
+      // Stop the transformer from proxy-dragging the old selection for this
+      // gesture (restored on pointerup). handleClickOrTap re-resolves the node
+      // under the overlay, selects it, and arms its drag.
+      tr.setAttrs({ listening: false });
+      handleClickOrTap(ctx, e);
+    }
     return;
   }
 

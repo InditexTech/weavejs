@@ -822,6 +822,33 @@ describe('WeaveNodesSelectionPlugin', () => {
       expect(tr.setNodes).toHaveBeenCalledWith([node]);
     });
 
+    it('resets draggable on deselected nodes but not on retained ones', () => {
+      const { plugin } = makePlugin();
+      plugin.onInit!();
+      const tr = plugin.getTransformer();
+
+      const removedNode = {
+        draggable: vi.fn(),
+      } as unknown as import('konva').Node;
+      const retainedNode = {
+        draggable: vi.fn(),
+      } as unknown as import('konva').Node;
+
+      (tr.getNodes as ReturnType<typeof vi.fn>).mockReturnValue([
+        removedNode,
+        retainedNode,
+      ]);
+
+      plugin.setSelectedNodes([retainedNode]);
+
+      expect(removedNode.draggable as ReturnType<typeof vi.fn>).toHaveBeenCalledWith(
+        false
+      );
+      expect(
+        retainedNode.draggable as ReturnType<typeof vi.fn>
+      ).not.toHaveBeenCalled();
+    });
+
     it('cleans halos when empty array passed', () => {
       const { plugin, weave } = makePlugin();
       plugin.onInit!();

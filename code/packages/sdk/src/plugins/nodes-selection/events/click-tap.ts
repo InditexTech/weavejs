@@ -86,9 +86,7 @@ export function handleClickOrTap(
       ctx.exitGroupContext();
       // After exiting, re-resolve the target without group context constraint
       // so the outer node (group or top-level node) is selected normally
-      nodeTargeted = weave.getInstanceRecursive(
-        nodeTargeted
-      );
+      nodeTargeted = weave.getInstanceRecursive(nodeTargeted);
     }
   }
 
@@ -174,10 +172,13 @@ export function handleClickOrTap(
     // pointer passes the move threshold (see handleArmedDrag), so a plain click
     // still just selects.
     const canMove =
-      typeof nodeTargeted.canDrag === 'function' ? nodeTargeted.canDrag() : false;
+      typeof nodeTargeted.canDrag === 'function'
+        ? nodeTargeted.canDrag()
+        : false;
     if (canMove && e.evt) {
       nodeTargeted.draggable(true);
       ctx.armDrag(nodeTargeted, e.evt.pointerId);
+      return;
     }
   }
   if (metaPressed && isSelected) {
