@@ -15,14 +15,22 @@ vi.mock('@/utils/utils', async (importOriginal) => {
 
 // Use vi.hoisted so that KonvaStage / KonvaTransformer are the SAME class reference
 // in both this test file and inside the SUT (pointer-down.ts), making instanceof work.
-const { KonvaStageClass, KonvaTransformerClass } = vi.hoisted(() => {
+const { KonvaStageClass, KonvaTransformerClass, dragElements } = vi.hoisted(() => {
   class KonvaStageClass {}
   class KonvaTransformerClass {}
-  return { KonvaStageClass, KonvaTransformerClass };
+  const dragElements = new Map<
+    number,
+    { node: unknown; dragStatus: 'ready' | 'dragging' | 'stopped' }
+  >();
+  return { KonvaStageClass, KonvaTransformerClass, dragElements };
 });
 
 vi.mock('konva', () => ({
-  default: { Stage: KonvaStageClass, Transformer: KonvaTransformerClass },
+  default: {
+    Stage: KonvaStageClass,
+    Transformer: KonvaTransformerClass,
+    DD: { _dragElements: dragElements },
+  },
 }));
 
 import { getTargetedNode } from '@/utils/utils';
@@ -183,6 +191,7 @@ function makeEvent(
 describe('handlePointerDown', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    dragElements.clear();
     (getTargetedNode as ReturnType<typeof vi.fn>).mockReturnValue(undefined);
   });
 
@@ -255,6 +264,116 @@ describe('handlePointerDown', () => {
     expect(ctx.setAreaSelecting).toHaveBeenCalledWith(false);
     expect(ctx.getEdgePanning().stop).toHaveBeenCalled();
     expect(ctx.getAreaSelector().hide).toHaveBeenCalled();
+  });
+
+  it('reselects and suppresses proxy-drag when a different node sits on top of the selection', () => {
+    // Selection holds node "A"; the real node under the pointer is "B".
+    const tr = makeTransformer([{ getAttrs: () => ({ id: 'A' }) }]);
+    const transformerCtrl = { getTransformer: vi.fn().mockReturnValue(tr) };
+    const ctx = makeCtx({
+      getTransformerController: vi.fn().mockReturnValue(transformerCtrl),
+    });
+    const realNodeB = {
+      getAttrs: () => ({ id: 'B', nodeType: 'rectangle' }),
+      getParent: () => null,
+    };
+    ctx.getWeaveInstance().getRealSelectedNode = vi
+      .fn()
+      .mockReturnValue(realNodeB);
+
+    const transformer = new KonvaTransformerClass();
+    const overlay = { getAttrs: () => ({}), getParent: () => transformer };
+    (getTargetedNode as ReturnType<typeof vi.fn>).mockReturnValue(overlay);
+
+    const e = makeEvent();
+    handlePointerDown(ctx, e);
+
+    // Transformer proxy-drag is suppressed for this gesture...
+    expect(tr.setAttrs).toHaveBeenCalledWith({ listening: false });
+    // ...and the click/tap path runs to reselect + arm the top node.
+    expect(ctx.setClickOrTapHandled).toHaveBeenCalledWith(true);
+  });
+
+  it('purges stale "ready" drag elements when re-targeting a node on top of the selection', () => {
+    // The transformer's draggable `back` shape armed a Konva `ready` drag on
+    // this pointerdown; a separate node is mid-drag. Only the `ready` one must
+    // be dropped so it cannot hijack the re-targeted node's drag.
+    dragElements.set(1, { node: {}, dragStatus: 'ready' });
+    dragElements.set(2, { node: {}, dragStatus: 'dragging' });
+
+    const tr = makeTransformer([{ getAttrs: () => ({ id: 'A' }) }]);
+    const transformerCtrl = { getTransformer: vi.fn().mockReturnValue(tr) };
+    const ctx = makeCtx({
+      getTransformerController: vi.fn().mockReturnValue(transformerCtrl),
+    });
+    const realNodeB = {
+      getAttrs: () => ({ id: 'B', nodeType: 'rectangle' }),
+      getParent: () => null,
+    };
+    ctx.getWeaveInstance().getRealSelectedNode = vi
+      .fn()
+      .mockReturnValue(realNodeB);
+
+    const transformer = new KonvaTransformerClass();
+    const overlay = { getAttrs: () => ({}), getParent: () => transformer };
+    (getTargetedNode as ReturnType<typeof vi.fn>).mockReturnValue(overlay);
+
+    handlePointerDown(ctx, makeEvent());
+
+    expect(dragElements.has(1)).toBe(false); // ready → purged
+    expect(dragElements.has(2)).toBe(true); // dragging → untouched
+  });
+
+  it('does NOT purge drag elements when the real node is within the current selection', () => {
+    dragElements.set(1, { node: {}, dragStatus: 'ready' });
+
+    const tr = makeTransformer([{ getAttrs: () => ({ id: 'A' }) }]);
+    const transformerCtrl = { getTransformer: vi.fn().mockReturnValue(tr) };
+    const ctx = makeCtx({
+      getTransformerController: vi.fn().mockReturnValue(transformerCtrl),
+    });
+    const realNodeA = {
+      getAttrs: () => ({ id: 'A', nodeType: 'rectangle' }),
+      getParent: () => null,
+    };
+    ctx.getWeaveInstance().getRealSelectedNode = vi
+      .fn()
+      .mockReturnValue(realNodeA);
+
+    const transformer = new KonvaTransformerClass();
+    const overlay = { getAttrs: () => ({}), getParent: () => transformer };
+    (getTargetedNode as ReturnType<typeof vi.fn>).mockReturnValue(overlay);
+
+    handlePointerDown(ctx, makeEvent());
+
+    expect(dragElements.has(1)).toBe(true);
+  });
+
+  it('does NOT reselect when the real node is within the current selection', () => {
+    // Real node under the pointer is the already-selected node "A".
+    const tr = makeTransformer([{ getAttrs: () => ({ id: 'A' }) }]);
+    const transformerCtrl = { getTransformer: vi.fn().mockReturnValue(tr) };
+    const ctx = makeCtx({
+      getTransformerController: vi.fn().mockReturnValue(transformerCtrl),
+    });
+    const realNodeA = {
+      getAttrs: () => ({ id: 'A', nodeType: 'rectangle' }),
+      getParent: () => null,
+    };
+    ctx.getWeaveInstance().getRealSelectedNode = vi
+      .fn()
+      .mockReturnValue(realNodeA);
+
+    const transformer = new KonvaTransformerClass();
+    const overlay = { getAttrs: () => ({}), getParent: () => transformer };
+    (getTargetedNode as ReturnType<typeof vi.fn>).mockReturnValue(overlay);
+
+    const e = makeEvent();
+    handlePointerDown(ctx, e);
+
+    // Left to the native transformer drag: no suppression, no reselect.
+    expect(tr.setAttrs).not.toHaveBeenCalledWith({ listening: false });
+    expect(ctx.setClickOrTapHandled).not.toHaveBeenCalledWith(true);
   });
 
   it('returns early when target is a Transformer itself', () => {

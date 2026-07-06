@@ -25,6 +25,7 @@ export function handleArmedDrag(
   e: KonvaEventObject<PointerEvent, Stage>
 ): void {
   const node: Konva.Node | null = ctx.getArmedDragNode();
+
   if (!node || !e?.evt) return;
 
   // Button released without crossing the threshold: cancel arming (plain click).
@@ -38,5 +39,17 @@ export function handleArmedDrag(
   if (node.isDragging()) return;
 
   ctx.clearArmedDrag();
-  node.startDrag(e.evt);
+
+  // Wrap the raw DOM `PointerEvent` as a Konva-style event object. Konva fires
+  // `dragstart` with `evt: evt && evt.evt`, so the node's own dragstart handler
+  // needs `.evt` present or it bails on `!e.evt` before any Weave drag setup.
+  //
+  // We deliberately do NOT forward `pointerId`. Konva drives the per-frame drag
+  // position from native `mousemove`/`touchmove` (see DragAndDrop `_drag`), and
+  // a mouse `mousemove` has no `pointerId` so Konva stamps the drag position
+  // with id `999` (`Util._getFirstPointerId`). If we seed the drag element with
+  // the PointerEvent's real `pointerId` (e.g. `1`), it can never match `999`,
+  // so `_drag` finds no matching pointer and the node stays frozen. Leaving it
+  // `undefined` lets `_drag` self-assign the id from the driving event.
+  node.startDrag({ evt: e.evt });
 }

@@ -588,6 +588,21 @@ export class WeaveNodesSelectionPlugin
 
   setSelectedNodes(nodes: Konva.Node[]): void {
     const tr = this.transformerCtrl.getTransformer();
+
+    // Reset draggable state on nodes that are being deselected. setSelectedNodes
+    // does not emit onNodesChange, so handleNodesChange never runs to restore
+    // draggable(false) on removed nodes, which could otherwise leave them
+    // draggable while a non-selection tool is active.
+    const previousNodes = tr.getNodes();
+    for (const previousNode of previousNodes) {
+      if (
+        !nodes.includes(previousNode) &&
+        typeof previousNode.draggable === 'function'
+      ) {
+        previousNode.draggable(false);
+      }
+    }
+
     tr.setNodes(nodes);
     this.handleBehaviors();
 

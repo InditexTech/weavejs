@@ -570,7 +570,7 @@ export abstract class WeaveNode implements WeaveNodeBase {
             ? nodeTarget.canDrag()
             : false;
 
-        if (!canMove) {
+        if (!canMove || !this.isSelecting()) {
           nodeTarget.stopDrag();
           return;
         }

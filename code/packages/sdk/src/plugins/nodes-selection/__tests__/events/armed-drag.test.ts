@@ -112,6 +112,20 @@ describe('handleArmedDrag', () => {
     const e = makeEvent();
     handleArmedDrag(ctx, e);
     expect(ctx.clearArmedDrag).toHaveBeenCalled();
-    expect(node.startDrag).toHaveBeenCalledWith(e.evt);
+    expect(node.startDrag).toHaveBeenCalledOnce();
+  });
+
+  it('wraps the pointer event so the node dragstart receives a defined evt, without forcing a pointerId', () => {
+    const node = makeNode();
+    const { ctx } = makeCtx({ getArmedDragNode: vi.fn().mockReturnValue(node) });
+    const e = makeEvent();
+    handleArmedDrag(ctx, e);
+
+    // Konva fires `dragstart` with `evt.evt` (the DOM event the node handler
+    // needs), so `.evt` must be present or the node's dragstart bails on
+    // `!e.evt`. We must NOT forward `pointerId`: Konva drives the drag from
+    // native `mousemove` (id `999`), and seeding the drag element with the
+    // PointerEvent's real id would never match, freezing the node in place.
+    expect(node.startDrag).toHaveBeenCalledWith({ evt: e.evt });
   });
 });
