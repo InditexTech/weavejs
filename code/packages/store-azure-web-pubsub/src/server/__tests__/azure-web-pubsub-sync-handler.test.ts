@@ -230,6 +230,20 @@ describe('WeaveAzureWebPubsubSyncHandler', () => {
       expect(initialState).toHaveBeenCalledWith(doc);
     });
 
+    it('does not register the room when fetchRoom rejects', async () => {
+      const { handler, server, initialState } = makeSyncHandler();
+
+      server.fetchRoom.mockRejectedValue(new Error('boom'));
+
+      await expect(handler.getRoomDocument('room-1')).rejects.toThrow('boom');
+
+      expect(server.fetchRoom).toHaveBeenCalledWith('room-1');
+      expect(handler.getRoomsLoaded()).toEqual([]);
+      expect(handler.getRoomSyncHost('room-1')).toBeUndefined();
+      expect(initialState).not.toHaveBeenCalled();
+      expect(WeaveStoreAzureWebPubSubSyncHost).not.toHaveBeenCalled();
+    });
+
     it('creates a sync host and starts it', async () => {
       const { handler, server } = makeSyncHandler();
 

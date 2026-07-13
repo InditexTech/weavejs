@@ -114,14 +114,12 @@ export default class WeaveAzureWebPubsubSyncHandler extends WebPubSubEventHandle
   }
 
   private async setupRoomInstance(roomId: string): Promise<void> {
-    this._rooms.set(roomId, this.getNewYDoc());
-
-    const doc = this._rooms.get(roomId)!;
-
     let documentData = undefined;
     if (this.server?.fetchRoom) {
       documentData = await this.server.fetchRoom(roomId);
     }
+
+    const doc = this.getNewYDoc();
 
     if (documentData) {
       Y.applyUpdate(doc, documentData);
@@ -148,6 +146,8 @@ export default class WeaveAzureWebPubsubSyncHandler extends WebPubSubEventHandle
     if (this.isPersistingOnInterval()) {
       this.setupRoomInstancePersistence(roomId);
     }
+
+    this._rooms.set(roomId, doc);
   }
 
   isPersistingOnInterval(): boolean {
