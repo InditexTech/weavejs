@@ -22,6 +22,7 @@ export class WeaveShapeLabelEditor {
   private editingTextBounds: WeaveShapeLabelTextBounds | null = null;
   private textArea: HTMLTextAreaElement | null = null;
   private onLiveResize: ((neededShapeHeight: number) => void) | null = null;
+  private restoreUserSelect: (() => void) | null = null;
 
   constructor(instance: Weave) {
     this.instance = instance;
@@ -29,6 +30,49 @@ export class WeaveShapeLabelEditor {
 
   isEditing(): boolean {
     return this.editing;
+  }
+
+  // Konva applies `user-select: none` to its content div (`.konvajs-content`)
+  // to stop the canvas being selected while dragging. That rule also cancels
+  // the browser's native text-selection extension the moment the pointer leaves
+  // the overlay textarea and moves over the canvas, so click-dragging to select
+  // multiline label text "breaks" as soon as the cursor exits the textarea.
+  // While editing, allow text selection on the stage content and restore the
+  // original value on teardown.
+  private enableStageTextSelection(): void {
+    const stage = this.instance.getStage();
+    const targets: HTMLElement[] = [];
+    const content = (stage as unknown as { content?: HTMLElement }).content;
+    if (content) {
+      targets.push(content);
+    }
+    const container = stage.container();
+    if (container && container !== content) {
+      targets.push(container);
+    }
+
+    const previous = targets.map((el) => ({
+      el,
+      userSelect: el.style.userSelect,
+      webkitUserSelect: el.style.getPropertyValue('-webkit-user-select'),
+    }));
+
+    for (const el of targets) {
+      el.style.userSelect = 'text';
+      el.style.setProperty('-webkit-user-select', 'text');
+    }
+
+    this.restoreUserSelect = () => {
+      for (const { el, userSelect, webkitUserSelect } of previous) {
+        el.style.userSelect = userSelect;
+        if (webkitUserSelect) {
+          el.style.setProperty('-webkit-user-select', webkitUserSelect);
+        } else {
+          el.style.removeProperty('-webkit-user-select');
+        }
+      }
+      this.restoreUserSelect = null;
+    };
   }
 
   renderLabel(
@@ -217,6 +261,8 @@ export class WeaveShapeLabelEditor {
     this.instance.releaseMutexLock();
     this.instance.getStage().mode(WEAVE_STAGE_DEFAULT_MODE);
     this.editing = false;
+
+    this.restoreUserSelect?.();
 
     // Capture the id before nulling so we can re-select after re-enabling.
     const editedGroupId = this.editingGroup?.id() ?? null;
@@ -439,6 +485,8 @@ export class WeaveShapeLabelEditor {
     const absScale = group.getAbsoluteScale();
     const effectiveScale = absScale.x;
 
+    this.enableStageTextSelection();
+
     this.textArea = document.createElement('textarea');
     this.textArea.id = `${group.id()}_label_textarea`;
     // Override the HTML default of rows=2 so the textarea starts as a single
@@ -598,6 +646,7 @@ export class WeaveShapeLabelEditor {
 
     const commit = (text: string) => {
       window.removeEventListener('pointerup', handleOutsideClick);
+      window.removeEventListener('pointerdown', handlePointerDown);
       this.exitEditMode();
       // exitEditMode already shows the label; apply the precise visibility
       // based on the committed text, using the live group in case the node
@@ -647,9 +696,25 @@ export class WeaveShapeLabelEditor {
       { signal: this.instance.getEventsController().signal }
     );
 
+    // Track where the pointer gesture started. A text-selection drag begins
+    // inside the textarea but may release outside it; that must NOT be treated
+    // as an outside click, otherwise the editor is torn down mid-selection.
+    let pointerDownInsideTextArea = false;
+    const handlePointerDown = (e: PointerEvent) => {
+      pointerDownInsideTextArea =
+        !!this.textArea && this.textArea.contains(e.target as Node | null);
+    };
+
     const handleOutsideClick = (e: PointerEvent) => {
       e.stopPropagation();
       if (!this.textArea) {
+        return;
+      }
+
+      // Gesture started inside the textarea (e.g. dragging to select text and
+      // releasing outside its bounds): keep the editor open and reset origin.
+      if (pointerDownInsideTextArea) {
+        pointerDownInsideTextArea = false;
         return;
       }
 
@@ -671,6 +736,9 @@ export class WeaveShapeLabelEditor {
     };
 
     setTimeout(() => {
+      window.addEventListener('pointerdown', handlePointerDown, {
+        signal: this.instance.getEventsController().signal,
+      });
       window.addEventListener('pointerup', handleOutsideClick, {
         signal: this.instance.getEventsController().signal,
       });

@@ -43,6 +43,7 @@ export class WeaveTextNode extends WeaveNode {
   private textAreaSuperContainer!: HTMLDivElement | null;
   private textAreaContainer!: HTMLDivElement | null;
   private textArea!: HTMLTextAreaElement | null;
+  private restoreUserSelect: (() => void) | null = null;
   private keyPressHandler: ((e: KeyboardEvent) => void) | undefined;
 
   constructor(params?: WeaveTextNodeParams) {
@@ -636,9 +637,53 @@ export class WeaveTextNode extends WeaveNode {
     }
   }
 
+  // Konva applies `user-select: none` to its content div (`.konvajs-content`)
+  // to stop the canvas being selected while dragging. That rule also cancels
+  // the browser's native text-selection extension the moment the pointer leaves
+  // the overlay textarea and moves over the canvas, so click-dragging to select
+  // multiline text "breaks" as soon as the cursor exits the textarea. While
+  // editing, allow text selection on the stage content and restore the original
+  // value on teardown.
+  private enableStageTextSelection() {
+    const stage = this.instance.getStage();
+    const targets: HTMLElement[] = [];
+    const content = (stage as unknown as { content?: HTMLElement }).content;
+    if (content) {
+      targets.push(content);
+    }
+    const container = stage.container();
+    if (container && container !== content) {
+      targets.push(container);
+    }
+
+    const previous = targets.map((el) => ({
+      el,
+      userSelect: el.style.userSelect,
+      webkitUserSelect: el.style.getPropertyValue('-webkit-user-select'),
+    }));
+
+    for (const el of targets) {
+      el.style.userSelect = 'text';
+      el.style.setProperty('-webkit-user-select', 'text');
+    }
+
+    this.restoreUserSelect = () => {
+      for (const { el, userSelect, webkitUserSelect } of previous) {
+        el.style.userSelect = userSelect;
+        if (webkitUserSelect) {
+          el.style.setProperty('-webkit-user-select', webkitUserSelect);
+        } else {
+          el.style.removeProperty('-webkit-user-select');
+        }
+      }
+      this.restoreUserSelect = null;
+    };
+  }
+
   private createTextAreaDOM(textNode: Konva.Text, position: Konva.Vector2d) {
     const stage = this.instance.getStage();
 
+    this.enableStageTextSelection();
     // create textarea and style it
     this.textAreaSuperContainer = document.createElement('div');
     this.textAreaSuperContainer.id = `${textNode.id()}_supercontainer`;
@@ -896,7 +941,7 @@ export class WeaveTextNode extends WeaveNode {
           this.onStageMoveHandler(textNode).bind(this)
         );
         window.removeEventListener('pointerup', handleOutsideClick);
-        window.removeEventListener('pointerdown', handleOutsideClick);
+        window.removeEventListener('pointerdown', handlePointerDown);
         return;
       }
     };
@@ -914,7 +959,7 @@ export class WeaveTextNode extends WeaveNode {
         this.onStageMoveHandler(textNode).bind(this)
       );
       window.removeEventListener('pointerup', handleOutsideClick);
-      window.removeEventListener('pointerdown', handleOutsideClick);
+      window.removeEventListener('pointerdown', handlePointerDown);
     };
 
     textNode.setAttr('cancelEditMode', cancelEditMode.bind(this));
@@ -951,10 +996,26 @@ export class WeaveTextNode extends WeaveNode {
     this.textArea.tabIndex = 1;
     this.textArea.focus();
 
+    // Track where the pointer gesture started. A text-selection drag begins
+    // inside the textarea but may release outside it; that must NOT be treated
+    // as an outside click, otherwise the editor is torn down mid-selection.
+    let pointerDownInsideTextArea = false;
+    const handlePointerDown = (e: PointerEvent) => {
+      pointerDownInsideTextArea =
+        !!this.textArea && this.textArea.contains(e.target as Node | null);
+    };
+
     const handleOutsideClick = (e: PointerEvent) => {
       e.stopPropagation();
 
       if (!this.textArea) {
+        return;
+      }
+
+      // Gesture started inside the textarea (e.g. dragging to select text and
+      // releasing outside its bounds): keep the editor open and reset origin.
+      if (pointerDownInsideTextArea) {
+        pointerDownInsideTextArea = false;
         return;
       }
 
@@ -982,12 +1043,16 @@ export class WeaveTextNode extends WeaveNode {
         this.textArea.removeEventListener('keydown', handleKeyDown);
         this.textArea.removeEventListener('keyup', handleKeyUp);
         window.removeEventListener('pointerup', handleOutsideClick);
+        window.removeEventListener('pointerdown', handlePointerDown);
 
         return;
       }
     };
 
     setTimeout(() => {
+      window.addEventListener('pointerdown', handlePointerDown, {
+        signal: this.instance.getEventsController().signal,
+      });
       window.addEventListener('pointerup', handleOutsideClick, {
         signal: this.instance.getEventsController().signal,
       });
@@ -1056,6 +1121,8 @@ export class WeaveTextNode extends WeaveNode {
   }
 
   private removeTextAreaDOM(textNode: Konva.Text) {
+    this.restoreUserSelect?.();
+
     this.instance.releaseMutexLock();
 
     this.instance.getStage().mode(WEAVE_STAGE_DEFAULT_MODE);

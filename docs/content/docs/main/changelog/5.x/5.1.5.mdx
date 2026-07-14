@@ -1,6 +1,6 @@
 ---
 title: v5.1.5
-description: Fixed regression issue related to trigger onNodesChange event when a node is selected (without click-drag)
+description: Text node edition selection now works OK, fixed regression issue related to trigger onNodesChange event when a node is selected (without click-drag)
 ---
 
 ## Metadata
@@ -9,4 +9,5 @@ description: Fixed regression issue related to trigger onNodesChange event when 
 
 ### Fixed
 
+- [#1130](https://github.com/InditexTech/weavejs/issues/1130) Text selection: cursor must be inside the text box to select from the first character — improve to match PowerPoint/Illustrator behavior
 - [#1131](https://github.com/InditexTech/weavejs/issues/1131) onNodesChange not emitted on single-click selection of a draggable node (regression)
