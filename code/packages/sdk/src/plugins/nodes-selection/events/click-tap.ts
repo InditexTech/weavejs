@@ -178,6 +178,19 @@ export function handleClickOrTap(
     if (canMove && e.evt) {
       nodeTargeted.draggable(true);
       ctx.armDrag(nodeTargeted, e.evt.pointerId);
+
+      // Emit selection event and update cursor/focus so consumers hear about
+      // the selection immediately, even though handleBehaviors() is skipped
+      // (its transformer `listening` state must remain untouched for the
+      // stacked-node drag path added in #1127).
+      stage.container().tabIndex = 1;
+      stage.container().focus();
+      stage.container().style.cursor =
+        (typeof nodeTargeted?.defineMousePointer === 'function'
+          ? nodeTargeted.defineMousePointer()
+          : null) ?? 'grab';
+      ctx.triggerSelectedNodesEvent();
+
       return;
     }
   }
