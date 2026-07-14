@@ -15,6 +15,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- [#1130](https://github.com/InditexTech/weavejs/issues/1130) Text selection: cursor must be inside the text box to select from the first character — improve to match PowerPoint/Illustrator behavior
 - [#1131](https://github.com/InditexTech/weavejs/issues/1131) onNodesChange not emitted on single-click selection of a draggable node (regression)
 
 ## [5.1.4] - 2026-07-13
