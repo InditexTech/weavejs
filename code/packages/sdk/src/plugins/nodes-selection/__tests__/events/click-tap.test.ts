@@ -322,6 +322,8 @@ describe('handleClickOrTap', () => {
     handleClickOrTap(ctx, e);
     expect(node.draggable).toHaveBeenCalledWith(true);
     expect(ctx.armDrag).toHaveBeenCalledWith(node, 1);
+    // A plain click that arms a drag must still emit onNodesChange immediately.
+    expect(ctx.triggerSelectedNodesEvent).toHaveBeenCalled();
   });
 
   it('returns early when isContainerPrincipal is explicitly false', () => {
