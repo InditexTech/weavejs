@@ -903,6 +903,7 @@ export class WeaveTextNode extends WeaveNode {
 
     const cancelEditMode = () => {
       textNode.setAttr('cancelEditMode', undefined);
+      // this.instance.getStage().listening(true);
       this.removeTextAreaDOM(textNode);
       this.instance.removeEventListener(
         'onZoomChange',
@@ -1106,6 +1107,8 @@ export class WeaveTextNode extends WeaveNode {
     if (!lockAcquired) {
       return;
     }
+
+    // this.instance.getStage().listening(false);
 
     this.editing = true;
     this.editingNodeId = textNode.id();

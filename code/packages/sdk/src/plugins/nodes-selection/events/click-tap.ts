@@ -178,6 +178,19 @@ export function handleClickOrTap(
     if (canMove && e.evt) {
       nodeTargeted.draggable(true);
       ctx.armDrag(nodeTargeted, e.evt.pointerId);
+
+      // A plain click still just selects, so emit onNodesChange now instead of
+      // waiting for a drag to start. We intentionally skip handleBehaviors here
+      // to avoid clearing the transformer's `listening` state during the
+      // stacked-node drag gesture (see pointer-down.ts / #1127).
+      stage.container().tabIndex = 1;
+      stage.container().focus();
+      stage.container().style.cursor =
+        (typeof nodeTargeted?.defineMousePointer === 'function'
+          ? nodeTargeted.defineMousePointer()
+          : null) ?? 'grab';
+
+      ctx.triggerSelectedNodesEvent();
       return;
     }
   }
