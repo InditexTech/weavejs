@@ -1,0 +1,19 @@
+code/packages/sdk/src/plugins/nodes-selection/events/click-tap.ts
+  s_6b09670de8be49::t_4fd5d1f900677b 181-193
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "1d8bf68cfd29fe33b8c2c9cb2ad776eeaf2b813f",
+  "prompts": {},
+  "sessions": {
+    "s_6b09670de8be49": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "ses_0a0bbfce7ffeR2z9744tO3KAhY",
+        "model": "claude-opus-4.8"
+      },
+      "human_author": "Jesus Manuel Piñeiro Cid <jesusmpc@inditex.com>"
+    }
+  }
+}
