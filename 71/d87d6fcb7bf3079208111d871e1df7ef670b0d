@@ -1,0 +1,41 @@
+openspec/changes/establish-consumer-test-strategy/.openspec.yaml
+  s_5c71634aa63350::t_3cd13b099f9957 1-2
+openspec/changes/establish-consumer-test-strategy/design.md
+  s_3f8f841f529a21::t_b648d2ba8cd5b9 1-85
+openspec/changes/establish-consumer-test-strategy/proposal.md
+  s_3f8f841f529a21::t_3896df7cd027e0 1-34
+openspec/changes/establish-consumer-test-strategy/specs/distribution-test-automation/spec.md
+  s_3f8f841f529a21::t_c61c71f2ea9ec0 1-45
+openspec/changes/establish-consumer-test-strategy/specs/generated-starter-validation/spec.md
+  s_3f8f841f529a21::t_b0319df11b181b 1-34
+openspec/changes/establish-consumer-test-strategy/specs/package-tarball-validation/spec.md
+  s_5c71634aa63350::t_91386e9deac8e7 1-30
+openspec/changes/establish-consumer-test-strategy/specs/reference-consumer-integration/spec.md
+  s_3f8f841f529a21::t_ea05e6fe72170a 1-67
+openspec/changes/establish-consumer-test-strategy/tasks.md
+  s_3f8f841f529a21::t_20b82296d9f25c 1-47
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.14",
+  "base_commit_sha": "71d87d6fcb7bf3079208111d871e1df7ef670b0d",
+  "prompts": {},
+  "sessions": {
+    "s_3f8f841f529a21": {
+      "agent_id": {
+        "tool": "github-copilot-cli",
+        "id": "92d25c32-7f48-4c56-8faf-471010b8e6c8",
+        "model": "unknown"
+      },
+      "human_author": "Alejandro Montes <alejandromogarcia@ext.inditex.com>"
+    },
+    "s_5c71634aa63350": {
+      "agent_id": {
+        "tool": "github-copilot-cli",
+        "id": "a832b97c-285d-4591-9e6f-a39a62ce2860",
+        "model": "gpt-5.6-terra"
+      },
+      "human_author": "Alejandro Montes <alejandromogarcia@ext.inditex.com>"
+    }
+  }
+}
