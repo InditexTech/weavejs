@@ -114,6 +114,12 @@ jobs:
           echo "app-name=$(jq -r '.name' code/package.json)" >> "$GITHUB_OUTPUT"
           echo "github-repository=$(echo $GITHUB_REPOSITORY | cut -d'/' -f2)" >> "$GITHUB_OUTPUT"
 
+      - name: SonarCloud / Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+
       - name: SonarCloud / Check coverage file
         id: coverage-check
         working-directory: code
