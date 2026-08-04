@@ -622,6 +622,11 @@ jobs:
         run: |
           npm run version:development
 
+      - name: NPM / Verify regenerated lockfile is consistent
+        working-directory: code
+        run: |
+          npm ci --dry-run
+
       - name: Next Development Iteration / Commit Changes
         env:
           GITHUB_TOKEN: ${{ steps.app-token.outputs.token }}
