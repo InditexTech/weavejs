@@ -1,0 +1,19 @@
+docs/superpowers/specs/2026-08-04-image-crop-cursor-design.md
+  s_5934d3e85f12a4::t_9d81e274f49ca7 1-48
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.14",
+  "base_commit_sha": "38696555ec46425349e95210009acb5560e85306",
+  "prompts": {},
+  "sessions": {
+    "s_5934d3e85f12a4": {
+      "agent_id": {
+        "tool": "github-copilot-cli",
+        "id": "89e4e063-e5fd-4bce-b451-23cdee8c3bed",
+        "model": "unknown"
+      },
+      "human_author": "Alejandro Montes <alejandromogarcia@ext.inditex.com>"
+    }
+  }
+}
