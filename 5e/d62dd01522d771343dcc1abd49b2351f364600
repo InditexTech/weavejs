@@ -1,0 +1,19 @@
+code/package-lock.json
+  s_65034509f2806b::t_6f662028ecad31 4166-4188
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.14",
+  "base_commit_sha": "5ed62dd01522d771343dcc1abd49b2351f364600",
+  "prompts": {},
+  "sessions": {
+    "s_65034509f2806b": {
+      "agent_id": {
+        "tool": "github-copilot-cli",
+        "id": "f1d1f343-7153-4e4a-ab7c-33779726dce9",
+        "model": "unknown"
+      },
+      "human_author": "Alejandro Montes <alejandromogarcia@ext.inditex.com>"
+    }
+  }
+}
