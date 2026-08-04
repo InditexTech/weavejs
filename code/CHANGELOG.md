@@ -13,6 +13,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+- [#1137](https://github.com/InditexTech/weavejs/issues/1137) Rectangle resize handle not working when placed on top of an image — drag moves the image instead of resizing the rectangle
+
 ## [5.2.0] - 2026-08-04
 
 ## [5.1.5] - 2026-07-14
