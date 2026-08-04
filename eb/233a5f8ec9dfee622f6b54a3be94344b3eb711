@@ -1,0 +1,19 @@
+code/packages/sdk/src/plugins/nodes-selection/__tests__/events/pointer-down.test.ts
+  s_65034509f2806b::t_4fb324b03ac569 260,329,362,388,412
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.14",
+  "base_commit_sha": "eb233a5f8ec9dfee622f6b54a3be94344b3eb711",
+  "prompts": {},
+  "sessions": {
+    "s_65034509f2806b": {
+      "agent_id": {
+        "tool": "github-copilot-cli",
+        "id": "f1d1f343-7153-4e4a-ab7c-33779726dce9",
+        "model": "claude-sonnet-5"
+      },
+      "human_author": "Alejandro Montes <alejandromogarcia@ext.inditex.com>"
+    }
+  }
+}
