@@ -1,0 +1,19 @@
+CONTRIBUTING.md
+  s_959b57fa94d03e::t_5d68a5ffb0dcce 184-196
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.14",
+  "base_commit_sha": "9059188fd67f7ae650d5bd23787d9a35d02d2c86",
+  "prompts": {},
+  "sessions": {
+    "s_959b57fa94d03e": {
+      "agent_id": {
+        "tool": "github-copilot-cli",
+        "id": "7432c1bc-c409-49ad-a32e-56e31be1d32d",
+        "model": "unknown"
+      },
+      "human_author": "Alejandro Montes <alejandromogarcia@ext.inditex.com>"
+    }
+  }
+}
