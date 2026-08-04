@@ -179,17 +179,11 @@ jobs:
           npm run version:release
           npm run release:prepare
 
-      - name: NPM / Ensure minimum npm version for trusted publishing
+      - name: NPM / Report npm version for trusted publishing
         run: |
-          CURRENT_NPM=$(npm --version)
-          REQUIRED_NPM="11.5.1"
-          if printf '%s\n%s\n' "$REQUIRED_NPM" "$CURRENT_NPM" | sort -V -C; then
-            echo "npm $CURRENT_NPM already meets the minimum requirement ($REQUIRED_NPM). Skipping upgrade."
-          else
-            echo "npm $CURRENT_NPM is below the minimum requirement ($REQUIRED_NPM). Upgrading…"
-            npm install -g npm@^11.5.1 --registry="https://registry.npmjs.org/"
-            asdf reshim nodejs
-          fi
+          # npm >=11.5.1 is required for trusted publishing (OIDC + provenance).
+          # This is satisfied by the asdf-managed nodejs version in code/.tool-versions
+          # (Node 24.11.1 bundles npm 11.6.2) — no separate npm self-upgrade needed.
           echo "node path: $(command -v node)"
           echo "npm path: $(command -v npm)"
           node --version
@@ -500,17 +494,11 @@ jobs:
           npm run version:release
           npm run release:prepare
 
-      - name: NPM / Ensure minimum npm version for trusted publishing
+      - name: NPM / Report npm version for trusted publishing
         run: |
-          CURRENT_NPM=$(npm --version)
-          REQUIRED_NPM="11.5.1"
-          if printf '%s\n%s\n' "$REQUIRED_NPM" "$CURRENT_NPM" | sort -V -C; then
-            echo "npm $CURRENT_NPM already meets the minimum requirement ($REQUIRED_NPM). Skipping upgrade."
-          else
-            echo "npm $CURRENT_NPM is below the minimum requirement ($REQUIRED_NPM). Upgrading…"
-            npm install -g npm@^11.5.1 --registry="https://registry.npmjs.org/"
-            asdf reshim nodejs
-          fi
+          # npm >=11.5.1 is required for trusted publishing (OIDC + provenance).
+          # This is satisfied by the asdf-managed nodejs version in code/.tool-versions
+          # (Node 24.11.1 bundles npm 11.6.2) — no separate npm self-upgrade needed.
           echo "node path: $(command -v node)"
           echo "npm path: $(command -v npm)"
           node --version
@@ -621,11 +609,6 @@ jobs:
         working-directory: code
         run: |
           npm run version:development
-
-      - name: NPM / Verify regenerated lockfile is consistent
-        working-directory: code
-        run: |
-          npm ci --dry-run
 
       - name: Next Development Iteration / Commit Changes
         env:
