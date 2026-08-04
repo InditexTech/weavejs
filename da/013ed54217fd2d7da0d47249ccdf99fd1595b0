@@ -1,0 +1,19 @@
+code/package.json
+  s_65034509f2806b::t_a820f6f5cd19e1 38-39
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.14",
+  "base_commit_sha": "da013ed54217fd2d7da0d47249ccdf99fd1595b0",
+  "prompts": {},
+  "sessions": {
+    "s_65034509f2806b": {
+      "agent_id": {
+        "tool": "github-copilot-cli",
+        "id": "f1d1f343-7153-4e4a-ab7c-33779726dce9",
+        "model": "unknown"
+      },
+      "human_author": "Alejandro Montes <alejandromogarcia@ext.inditex.com>"
+    }
+  }
+}
