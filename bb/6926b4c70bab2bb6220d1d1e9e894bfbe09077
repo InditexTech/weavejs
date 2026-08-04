@@ -1,0 +1,19 @@
+.github/workflows/code-npm_node-publish-release-and-snapshot.yml
+  s_65034509f2806b::t_77a0a7e7db0432 182,184-186,497,499-501
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.14",
+  "base_commit_sha": "bb6926b4c70bab2bb6220d1d1e9e894bfbe09077",
+  "prompts": {},
+  "sessions": {
+    "s_65034509f2806b": {
+      "agent_id": {
+        "tool": "github-copilot-cli",
+        "id": "f1d1f343-7153-4e4a-ab7c-33779726dce9",
+        "model": "unknown"
+      },
+      "human_author": "Alejandro Montes <alejandromogarcia@ext.inditex.com>"
+    }
+  }
+}
