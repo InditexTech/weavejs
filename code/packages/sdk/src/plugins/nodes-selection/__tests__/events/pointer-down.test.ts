@@ -257,7 +257,7 @@ describe('handlePointerDown', () => {
   it('stops area selection when targeted node is the Transformer\'s `back` shape', () => {
     const ctx = makeCtx();
     const transformer = new KonvaTransformerClass();
-    const child = { getAttrs: () => ({}), getParent: () => transformer, hasName: () => true };
+    const child = { getAttrs: () => ({}), getParent: () => transformer, hasName: (name: string) => name === 'back' };
     (getTargetedNode as ReturnType<typeof vi.fn>).mockReturnValue(child);
     const e = makeEvent();
     handlePointerDown(ctx, e);
@@ -326,7 +326,7 @@ describe('handlePointerDown', () => {
       .mockReturnValue(realNodeB);
 
     const transformer = new KonvaTransformerClass();
-    const overlay = { getAttrs: () => ({}), getParent: () => transformer, hasName: () => true };
+    const overlay = { getAttrs: () => ({}), getParent: () => transformer, hasName: (name: string) => name === 'back' };
     (getTargetedNode as ReturnType<typeof vi.fn>).mockReturnValue(overlay);
 
     const e = makeEvent();
@@ -359,7 +359,7 @@ describe('handlePointerDown', () => {
       .mockReturnValue(realNodeB);
 
     const transformer = new KonvaTransformerClass();
-    const overlay = { getAttrs: () => ({}), getParent: () => transformer, hasName: () => true };
+    const overlay = { getAttrs: () => ({}), getParent: () => transformer, hasName: (name: string) => name === 'back' };
     (getTargetedNode as ReturnType<typeof vi.fn>).mockReturnValue(overlay);
 
     handlePointerDown(ctx, makeEvent());
@@ -385,7 +385,7 @@ describe('handlePointerDown', () => {
       .mockReturnValue(realNodeA);
 
     const transformer = new KonvaTransformerClass();
-    const overlay = { getAttrs: () => ({}), getParent: () => transformer, hasName: () => true };
+    const overlay = { getAttrs: () => ({}), getParent: () => transformer, hasName: (name: string) => name === 'back' };
     (getTargetedNode as ReturnType<typeof vi.fn>).mockReturnValue(overlay);
 
     handlePointerDown(ctx, makeEvent());
@@ -409,7 +409,7 @@ describe('handlePointerDown', () => {
       .mockReturnValue(realNodeA);
 
     const transformer = new KonvaTransformerClass();
-    const overlay = { getAttrs: () => ({}), getParent: () => transformer, hasName: () => true };
+    const overlay = { getAttrs: () => ({}), getParent: () => transformer, hasName: (name: string) => name === 'back' };
     (getTargetedNode as ReturnType<typeof vi.fn>).mockReturnValue(overlay);
 
     const e = makeEvent();
