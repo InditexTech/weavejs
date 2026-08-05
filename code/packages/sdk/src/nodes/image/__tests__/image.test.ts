@@ -73,6 +73,7 @@ type UtilityLayerMock = {
   add: ReturnType<typeof vi.fn>;
   find: ReturnType<typeof vi.fn>;
   destroyChildren: ReturnType<typeof vi.fn>;
+  draw: ReturnType<typeof vi.fn>;
   show: ReturnType<typeof vi.fn>;
   hide: ReturnType<typeof vi.fn>;
 };
@@ -85,6 +86,8 @@ type MockStage = {
   scaleY: ReturnType<typeof vi.fn>;
   on: ReturnType<typeof vi.fn>;
   off: ReturnType<typeof vi.fn>;
+  getPointerPosition: ReturnType<typeof vi.fn>;
+  getIntersection: ReturnType<typeof vi.fn>;
 };
 
 type MockInstance = ReturnType<typeof createMockInstance>;
@@ -152,11 +155,14 @@ function createMockInstance() {
     scaleY: vi.fn().mockReturnValue(1),
     on: vi.fn(),
     off: vi.fn(),
+    getPointerPosition: vi.fn().mockReturnValue(null),
+    getIntersection: vi.fn().mockReturnValue(null),
   };
   const utilityLayer: UtilityLayerMock = {
     add: vi.fn(),
     find: vi.fn().mockReturnValue([]),
     destroyChildren: vi.fn(),
+    draw: vi.fn(),
     show: vi.fn(),
     hide: vi.fn(),
   };
@@ -857,19 +863,73 @@ describe('WeaveImageNode', () => {
       expect(transformer.show).toHaveBeenCalled();
     });
 
-    it('15.2 onCmdCtrlPressed hides transformer, clears utility layer and renders crop mode', () => {
+    it('15.2 onCmdCtrlPressed hides transformer, clears utility layer, renders crop mode and synchronously draws', () => {
       const { node, mock } = makeNode();
       const renderCropModeSpy = vi.spyOn(node, 'renderCropMode').mockImplementation(() => {});
       const transformer = { show: vi.fn(), hide: vi.fn() };
       getSelectionPlugin(mock).getTransformer.mockReturnValue(transformer);
+      const utilityLayer = mock.getUtilityLayer();
       const group = node.onRender(defaultProps()) as Konva.Group;
       vi.spyOn(group, 'isDragging').mockReturnValue(false);
 
       fireKonvaEvent(group, 'onCmdCtrlPressed');
 
       expect(transformer.hide).toHaveBeenCalled();
-      expect(mock.getUtilityLayer().destroyChildren).toHaveBeenCalled();
+      expect(utilityLayer.destroyChildren).toHaveBeenCalled();
       expect(renderCropModeSpy).toHaveBeenCalled();
+      expect(utilityLayer.show).toHaveBeenCalled();
+      expect(utilityLayer.draw).toHaveBeenCalled();
+      // The hit graph must contain the newly rendered anchors before the
+      // layer is shown, and the draw must be synchronous (not batched via
+      // requestAnimationFrame) so it is already visible when drawn.
+      expect(renderCropModeSpy.mock.invocationCallOrder[0]).toBeLessThan(
+        utilityLayer.show.mock.invocationCallOrder[0],
+      );
+      expect(utilityLayer.show.mock.invocationCallOrder[0]).toBeLessThan(
+        utilityLayer.draw.mock.invocationCallOrder[0],
+      );
+    });
+
+    it('15.2b onCmdCtrlPressed sets the resize cursor when the pointer already rests on a crop anchor', () => {
+      const { node, mock } = makeNode();
+      const transformer = { show: vi.fn(), hide: vi.fn() };
+      getSelectionPlugin(mock).getTransformer.mockReturnValue(transformer);
+      const utilityLayer = mock.getUtilityLayer();
+      const stage = mock.getStage();
+      const group = node.onRender(defaultProps()) as Konva.Group;
+      vi.spyOn(group, 'isDragging').mockReturnValue(false);
+
+      // Simulate a stationary pointer already resting on the top-left crop
+      // anchor: pointerover never fires for it because the anchor did not
+      // exist yet at the time the browser last dispatched a pointer move.
+      const stationaryAnchor = {
+        getAttr: vi.fn().mockReturnValue('top-left'),
+      };
+      stage.getPointerPosition.mockReturnValue({ x: 5, y: 5 });
+      stage.getIntersection.mockReturnValue(stationaryAnchor);
+
+      fireKonvaEvent(group, 'onCmdCtrlPressed');
+
+      expect(utilityLayer.draw).toHaveBeenCalled();
+      expect(stage.getIntersection).toHaveBeenCalledWith({ x: 5, y: 5 });
+      expect(stationaryAnchor.getAttr).toHaveBeenCalledWith('cropAnchorPosition');
+      expect(stage.container().style.cursor).toBe('nwse-resize');
+    });
+
+    it('15.2c onCmdCtrlPressed leaves the cursor untouched when there is no current pointer position', () => {
+      const { node, mock } = makeNode();
+      const transformer = { show: vi.fn(), hide: vi.fn() };
+      getSelectionPlugin(mock).getTransformer.mockReturnValue(transformer);
+      const stage = mock.getStage();
+      const group = node.onRender(defaultProps()) as Konva.Group;
+      vi.spyOn(group, 'isDragging').mockReturnValue(false);
+
+      stage.getPointerPosition.mockReturnValue(null);
+
+      fireKonvaEvent(group, 'onCmdCtrlPressed');
+
+      expect(stage.getIntersection).not.toHaveBeenCalled();
+      expect(stage.container().style.cursor).toBe('');
     });
 
     it('15.3 onCmdCtrlReleased shows transformer', () => {

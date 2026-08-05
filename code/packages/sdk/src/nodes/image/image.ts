@@ -590,7 +590,10 @@ export class WeaveImageNode extends WeaveNode {
 
         this.renderCropMode(utilityLayer, image);
 
-        utilityLayer?.show();
+        utilityLayer.show();
+        utilityLayer.draw();
+
+        this.updateCropCursorForCurrentPointer();
       });
 
       image.on('onCmdCtrlReleased', () => {
@@ -707,6 +710,71 @@ export class WeaveImageNode extends WeaveNode {
     });
   }
 
+  private getCropAnchorCursor(
+    position: WeaveImageCropAnchorPosition
+  ): string | undefined {
+    if (
+      position === WEAVE_IMAGE_CROP_ANCHOR_POSITION.BOTTOM_LEFT ||
+      position === WEAVE_IMAGE_CROP_ANCHOR_POSITION.TOP_RIGHT
+    ) {
+      return 'nesw-resize';
+    }
+    if (
+      position === WEAVE_IMAGE_CROP_ANCHOR_POSITION.TOP_LEFT ||
+      position === WEAVE_IMAGE_CROP_ANCHOR_POSITION.BOTTOM_RIGHT
+    ) {
+      return 'nwse-resize';
+    }
+    if (
+      position === WEAVE_IMAGE_CROP_ANCHOR_POSITION.MIDDLE_RIGHT ||
+      position === WEAVE_IMAGE_CROP_ANCHOR_POSITION.MIDDLE_LEFT
+    ) {
+      return 'ew-resize';
+    }
+    if (
+      position === WEAVE_IMAGE_CROP_ANCHOR_POSITION.TOP_CENTER ||
+      position === WEAVE_IMAGE_CROP_ANCHOR_POSITION.BOTTOM_CENTER
+    ) {
+      return 'ns-resize';
+    }
+    return undefined;
+  }
+
+  // When Ctrl/Cmd is pressed while the pointer is already resting on a crop
+  // anchor, the anchor did not exist yet when the browser last computed
+  // pointerover, so Konva never fires it for the newly created node. Re-check
+  // the current pointer position against the freshly drawn hit graph and
+  // apply the matching resize cursor directly.
+  private updateCropCursorForCurrentPointer(): void {
+    const stage = this.instance.getStage();
+
+    const pointerPosition = stage.getPointerPosition?.();
+
+    if (!pointerPosition) {
+      return;
+    }
+
+    const intersection = stage.getIntersection?.(pointerPosition);
+
+    if (!intersection) {
+      return;
+    }
+
+    const position = intersection.getAttr('cropAnchorPosition') as
+      | WeaveImageCropAnchorPosition
+      | undefined;
+
+    if (!position) {
+      return;
+    }
+
+    const cursor = this.getCropAnchorCursor(position);
+
+    if (cursor) {
+      stage.container().style.cursor = cursor;
+    }
+  }
+
   private renderCropAnchor(
     position: WeaveImageCropAnchorPosition,
     node: Konva.Group,
@@ -747,6 +815,8 @@ export class WeaveImageNode extends WeaveNode {
       name: 'cropMode',
       rotation: node.rotation(),
     });
+
+    anchor.setAttr('cropAnchorPosition', position);
 
     this.config.cropMode.selection.anchorStyleFunc(anchor, position);
 
@@ -792,29 +862,10 @@ export class WeaveImageNode extends WeaveNode {
     }
 
     anchor.on('pointerover', () => {
-      if (
-        position === WEAVE_IMAGE_CROP_ANCHOR_POSITION.BOTTOM_LEFT ||
-        position === WEAVE_IMAGE_CROP_ANCHOR_POSITION.TOP_RIGHT
-      ) {
-        this.instance.getStage().container().style.cursor = 'nesw-resize';
-      }
-      if (
-        position === WEAVE_IMAGE_CROP_ANCHOR_POSITION.TOP_LEFT ||
-        position === WEAVE_IMAGE_CROP_ANCHOR_POSITION.BOTTOM_RIGHT
-      ) {
-        this.instance.getStage().container().style.cursor = 'nwse-resize';
-      }
-      if (
-        position === WEAVE_IMAGE_CROP_ANCHOR_POSITION.MIDDLE_RIGHT ||
-        position === WEAVE_IMAGE_CROP_ANCHOR_POSITION.MIDDLE_LEFT
-      ) {
-        this.instance.getStage().container().style.cursor = 'ew-resize';
-      }
-      if (
-        position === WEAVE_IMAGE_CROP_ANCHOR_POSITION.TOP_CENTER ||
-        position === WEAVE_IMAGE_CROP_ANCHOR_POSITION.BOTTOM_CENTER
-      ) {
-        this.instance.getStage().container().style.cursor = 'ns-resize';
+      const cursor = this.getCropAnchorCursor(position);
+
+      if (cursor) {
+        this.instance.getStage().container().style.cursor = cursor;
       }
     });
 
