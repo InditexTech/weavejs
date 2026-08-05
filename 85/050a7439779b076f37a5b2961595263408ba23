@@ -1,0 +1,21 @@
+code/packages/sdk/src/nodes/image/__tests__/image.test.ts
+  s_5934d3e85f12a4::t_38e1ac3538b647 76,89-90,158-159,165,866,871,878,880-932
+code/packages/sdk/src/nodes/image/image.ts
+  s_5934d3e85f12a4::t_ed84c05b9b2c7f 593-596,713-777,819-820,865-868
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.14",
+  "base_commit_sha": "85050a7439779b076f37a5b2961595263408ba23",
+  "prompts": {},
+  "sessions": {
+    "s_5934d3e85f12a4": {
+      "agent_id": {
+        "tool": "github-copilot-cli",
+        "id": "89e4e063-e5fd-4bce-b451-23cdee8c3bed",
+        "model": "unknown"
+      },
+      "human_author": "Alejandro Montes <alejandromogarcia@ext.inditex.com>"
+    }
+  }
+}
