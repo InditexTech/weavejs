@@ -1,0 +1,41 @@
+docs/superpowers/plans/2026-08-04-image-crop-cursor-fix.md
+  s_5934d3e85f12a4::t_3865f2d08fe6d8 1-172
+docs/superpowers/plans/2026-08-05-ungroup-transformer-reset.md
+  s_4a8c55c318cd20::t_93785c9c9b873d 1-122
+docs/superpowers/specs/2026-08-04-image-crop-cursor-design.md
+  s_5934d3e85f12a4::t_190a85a2e68709 1-86
+code/packages/sdk/src/managers/__tests__/groups.test.ts
+  s_5934d3e85f12a4::t_bd66020a89eb9e 100-102,761,774,788-790,794-800,802-809
+code/packages/sdk/src/managers/groups.ts
+  s_5934d3e85f12a4::t_c4ac73151ebe57 93-117,262,388-390
+code/packages/sdk/src/plugins/context-menu/__tests__/context-menu.test.ts
+  s_5934d3e85f12a4::t_3f6caf38a81645 351-376
+code/packages/sdk/src/plugins/context-menu/context-menu.ts
+  s_5934d3e85f12a4::t_981ab5f66f566d 91,122-141,175-177
+docs/content/docs/main/changelog/5.x/5.2.1.mdx
+  s_5934d3e85f12a4::t_a0762104187f84 8
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.14",
+  "base_commit_sha": "28e76e38e2f70f4d0cec315997bf3acf8cdb37cb",
+  "prompts": {},
+  "sessions": {
+    "s_4a8c55c318cd20": {
+      "agent_id": {
+        "tool": "github-copilot-cli",
+        "id": "0a3bf29e-4fdc-47b9-84a8-fc32b543a21a",
+        "model": "unknown"
+      },
+      "human_author": "Alejandro Montes <alejandromogarcia@ext.inditex.com>"
+    },
+    "s_5934d3e85f12a4": {
+      "agent_id": {
+        "tool": "github-copilot-cli",
+        "id": "89e4e063-e5fd-4bce-b451-23cdee8c3bed",
+        "model": "unknown"
+      },
+      "human_author": "Alejandro Montes <alejandromogarcia@ext.inditex.com>"
+    }
+  }
+}
