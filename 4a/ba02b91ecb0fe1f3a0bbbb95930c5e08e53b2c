@@ -1,0 +1,19 @@
+code/packages/sdk/src/managers/__tests__/groups.test.ts
+  s_4a8c55c318cd20::t_952cc2d7d75700 757,791
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.14",
+  "base_commit_sha": "4aba02b91ecb0fe1f3a0bbbb95930c5e08e53b2c",
+  "prompts": {},
+  "sessions": {
+    "s_4a8c55c318cd20": {
+      "agent_id": {
+        "tool": "github-copilot-cli",
+        "id": "0a3bf29e-4fdc-47b9-84a8-fc32b543a21a",
+        "model": "unknown"
+      },
+      "human_author": "Alejandro Montes <alejandromogarcia@ext.inditex.com>"
+    }
+  }
+}
