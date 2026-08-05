@@ -1,0 +1,21 @@
+code/packages/sdk/src/plugins/nodes-selection/__tests__/transformer-controller.test.ts
+  s_65034509f2806b::t_71956c901bb045 35,295,298,303-323,334-335,338,343-344,357,360,367-368,381-404
+code/packages/sdk/src/plugins/nodes-selection/transformer-controller.ts
+  s_65034509f2806b::t_70b0aa0655fdb5 177-178,194-204,207-216,218
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.14",
+  "base_commit_sha": "48837e4beb1f2006b9442b8eff0bf5043862e0b1",
+  "prompts": {},
+  "sessions": {
+    "s_65034509f2806b": {
+      "agent_id": {
+        "tool": "github-copilot-cli",
+        "id": "f1d1f343-7153-4e4a-ab7c-33779726dce9",
+        "model": "unknown"
+      },
+      "human_author": "Alejandro Montes <alejandromogarcia@ext.inditex.com>"
+    }
+  }
+}
