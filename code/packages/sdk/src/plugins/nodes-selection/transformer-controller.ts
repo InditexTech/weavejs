@@ -174,7 +174,8 @@ export class TransformerController {
   }
 
   // ---------------------------------------------------------------------------
-  // Stage-level pointermove (manages transformer listening for container nodes)
+  // Stage-level pointermove (manages the transformer's `back` shape listening
+  // for container nodes)
   // ---------------------------------------------------------------------------
 
   private registerStagePointerMove(): void {
@@ -190,35 +191,31 @@ export class TransformerController {
         const pos = stage.getPointerPosition();
         if (!pos) return;
 
+        // Only the `back` shape's own listening state is toggled here. `back`
+        // is a sibling of the resize anchors and rotater (not their parent),
+        // so this can never make anchors/rotater non-listening — unlike
+        // toggling `this.tr.listening`, which (because Konva's isListening()
+        // climbs the parent chain) disables every child of the transformer,
+        // including anchors, and can get permanently stuck if the pointer
+        // then resolves to an unrelated shape that isn't covered by any of
+        // the re-enabling cases below.
+        const back = this.tr.findOne<Konva.Shape>('.back');
+        if (!back) return;
+
         const shapeUnder = stage.getIntersection(pos);
 
-        if (!shapeUnder) {
-          this.tr.setAttrs({ listening: true });
-          this.tr.forceUpdate();
+        if (shapeUnder === back) {
+          // Pointer is over empty space within the bounding box: make `back`
+          // transparent to hit-testing so the next check (and any click/drag)
+          // falls through to whatever is actually underneath it.
+          back.listening(false);
+        } else {
+          // Pointer is over an anchor, the rotater, a real group member, an
+          // unrelated shape, or nothing at all: restore `back` so it's ready
+          // to intercept the next hover over genuinely empty space.
+          back.listening(true);
         }
-        if (
-          shapeUnder &&
-          this.tr.getChildren().includes(shapeUnder) &&
-          shapeUnder.name() === 'back'
-        ) {
-          this.tr.setAttrs({ listening: false });
-          this.tr.forceUpdate();
-        }
-        if (
-          shapeUnder &&
-          (this.tr.nodes()[0] as Konva.Group).getChildren().includes(shapeUnder)
-        ) {
-          this.tr.setAttrs({ listening: false });
-          this.tr.forceUpdate();
-        }
-        if (
-          shapeUnder &&
-          !this.tr.getChildren().includes(shapeUnder) &&
-          (this.tr.nodes()[0] as Konva.Group).getChildren().includes(shapeUnder)
-        ) {
-          this.tr.setAttrs({ listening: true });
-          this.tr.forceUpdate();
-        }
+        this.tr.forceUpdate();
       }
     };
 
