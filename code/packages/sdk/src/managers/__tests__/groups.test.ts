@@ -31,6 +31,7 @@ function makeSelectionPlugin() {
   const plugin = {
     getTransformer: vi.fn().mockReturnValue(tr),
     setSelectedNodes: vi.fn(),
+    triggerSelectedNodesEvent: vi.fn(),
   };
   return { plugin, tr };
 }
@@ -95,6 +96,9 @@ function makeMockWeave(options: MockWeaveOptions = {}) {
     }),
     getNodeHandler: vi.fn().mockImplementation(
       (type: string) => nodeHandlerMap[type]
+    ),
+    addOnceEventListener: vi.fn().mockImplementation(
+      (_event: string, callback: () => void) => callback()
     ),
     stateTransactional: vi.fn().mockImplementation((fn: () => void) => fn()),
     addNodeNT: vi.fn(),
@@ -754,7 +758,7 @@ describe('WeaveGroupsManager', () => {
       expect(weave.removeNodeNT).toHaveBeenCalled();
     });
 
-    it('setTimeout: calls cleanupSelectedHalos and setSelectedNodes when firstElement found', () => {
+    it('reselects the replacement node by generated ID after state rendering', () => {
       const mainLayer = new Konva.Layer();
       const child = new Konva.Rect({ id: 'child-1', nodeType: 'rect' });
       const konvaGroup = new Konva.Group({ id: 'grp' });
@@ -762,31 +766,54 @@ describe('WeaveGroupsManager', () => {
       mainLayer.add(konvaGroup);
 
       const multiSelectionPlugin = makeMultiSelectionPlugin();
-      const { plugin } = makeSelectionPlugin();
+      const { plugin, tr } = makeSelectionPlugin();
       const nodeHandler = makeNodeHandler(
         { key: 'child-1', type: 'node', props: { id: 'child-1', nodeType: 'rect' } } as unknown as WeaveStateElement
       );
       const groupHandler = makeGroupHandler();
-      const { weave } = makeMockWeave({
+      const { weave, mockStage } = makeMockWeave({
         mainLayer,
         stageMap: { grp: konvaGroup },
         nodeHandlerMap: { group: groupHandler, rect: nodeHandler },
         selectionPlugin: plugin,
         multiSelectionPlugin,
       });
+
+      const generatedNodes: Konva.Rect[] = [];
+      (weave.addNodeNT as ReturnType<typeof vi.fn>).mockImplementation((node) => {
+        const rendered = new Konva.Rect({ id: node.key });
+        generatedNodes.push(rendered);
+        mainLayer.add(rendered);
+      });
+      mockStage.findOne.mockImplementation((selector: string) =>
+        mainLayer.findOne(selector)
+      );
+
       const mgr = new WeaveGroupsManager(weave);
       const groupEl = { key: 'grp', type: 'group', props: { id: 'grp' } } as unknown as WeaveStateElement;
+      let onStateChange: (() => void) | undefined;
+      (
+        weave.addOnceEventListener as ReturnType<typeof vi.fn>
+      ).mockImplementation((_event: string, callback: () => void) => {
+        onStateChange = callback;
+      });
+
       mgr.unGroup(groupEl);
 
-      // Re-add a fake node to newLayer with the newChildId so firstElement is found
-      // newChildId = child.getAttrs().id = 'child-1' (set before node.key is changed)
-      // child is destroyed, so we add a fresh node with id 'child-1'
-      const fakeFirstElement = new Konva.Rect({ id: 'child-1' });
-      mainLayer.add(fakeFirstElement);
+      expect(plugin.setSelectedNodes).not.toHaveBeenCalled();
+      expect(weave.addOnceEventListener).toHaveBeenCalledWith(
+        'onStateChange',
+        expect.any(Function)
+      );
 
-      vi.runAllTimers();
-      expect(multiSelectionPlugin.cleanupSelectedHalos).toHaveBeenCalled();
-      expect(plugin.setSelectedNodes).toHaveBeenCalledWith([fakeFirstElement]);
+      onStateChange?.();
+
+      expect(tr.hide).toHaveBeenCalled();
+      expect(plugin.setSelectedNodes).not.toHaveBeenCalledWith([]);
+      expect(plugin.setSelectedNodes).toHaveBeenLastCalledWith([generatedNodes[0]]);
+      expect(tr.show).toHaveBeenCalled();
+      expect(tr.forceUpdate).toHaveBeenCalled();
+      expect(plugin.triggerSelectedNodesEvent).toHaveBeenCalled();
     });
 
     it('setTimeout: does not throw when firstElement or selectionPlugin absent', () => {

@@ -90,6 +90,31 @@ export class WeaveGroupsManager {
     return { realNodes, parentId };
   }
 
+  private selectRenderedNode(
+    nodeId: string,
+    triggerSelectionEvent = false
+  ): void {
+    this.instance.addOnceEventListener('onStateChange', () => {
+      this.getNodesMultiSelectionFeedbackPlugin()?.cleanupSelectedHalos();
+
+      const node = this.instance.getStage().findOne(`#${nodeId}`) as
+        | Konva.Node
+        | undefined;
+      const selectionPlugin =
+        this.instance.getPlugin<WeaveNodesSelectionPlugin>('nodesSelection');
+      if (node && selectionPlugin) {
+        const tr = selectionPlugin.getTransformer();
+        selectionPlugin.setSelectedNodes([node]);
+        tr.show();
+        tr.forceUpdate();
+
+        if (triggerSelectionEvent) {
+          selectionPlugin.triggerSelectedNodesEvent();
+        }
+      }
+    });
+  }
+
   group(nodes: WeaveStateElement[]): void {
     this.instance.stateTransactional(() => {
       this.logger.debug({ nodes }, 'Grouping nodes');
@@ -234,22 +259,7 @@ export class WeaveGroupsManager {
         );
       }
 
-      setTimeout(() => {
-        this.getNodesMultiSelectionFeedbackPlugin()?.cleanupSelectedHalos();
-
-        const groupNode = stage.findOne(`#${groupId}`) as
-          | Konva.Layer
-          | Konva.Group
-          | undefined;
-        const selectionPlugin =
-          this.instance.getPlugin<WeaveNodesSelectionPlugin>('nodesSelection');
-        if (groupNode && selectionPlugin) {
-          const tr = selectionPlugin.getTransformer();
-          selectionPlugin.setSelectedNodes([groupNode]);
-          tr.show();
-          tr.forceUpdate();
-        }
-      }, 10);
+      this.selectRenderedNode(groupId);
     });
   }
 
@@ -268,6 +278,13 @@ export class WeaveGroupsManager {
           "Group instance doesn't exists, cannot un-group"
         );
         return;
+      }
+
+      const selectionPlugin =
+        this.instance.getPlugin<WeaveNodesSelectionPlugin>('nodesSelection');
+      if (selectionPlugin) {
+        const tr = selectionPlugin.getTransformer();
+        tr.hide();
       }
 
       let nodeId: string | undefined = undefined;
@@ -354,6 +371,8 @@ export class WeaveGroupsManager {
             }
           }
 
+          newChildId = newNodeId;
+
           this.instance.addNodeNT(node, nodeId ?? newLayer.getAttrs().id);
         }
 
@@ -366,18 +385,9 @@ export class WeaveGroupsManager {
         this.instance.removeNodeNT(groupNode, { emitUserChangeEvent: false });
       }
 
-      setTimeout(() => {
-        this.getNodesMultiSelectionFeedbackPlugin()?.cleanupSelectedHalos();
-
-        const firstElement = newLayer.findOne(`#${newChildId}`) as
-          | Konva.Node
-          | undefined;
-        const selectionPlugin =
-          this.instance.getPlugin<WeaveNodesSelectionPlugin>('nodesSelection');
-        if (firstElement && selectionPlugin) {
-          selectionPlugin.setSelectedNodes([firstElement]);
-        }
-      }, 0);
+      if (newChildId) {
+        this.selectRenderedNode(newChildId, true);
+      }
     });
   }
 
