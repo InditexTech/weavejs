@@ -254,16 +254,60 @@ describe('handlePointerDown', () => {
     expect(ctx.setAreaSelecting).not.toHaveBeenCalled();
   });
 
-  it('stops area selection when targeted node is child of a Transformer', () => {
+  it('stops area selection when targeted node is the Transformer\'s `back` shape', () => {
     const ctx = makeCtx();
     const transformer = new KonvaTransformerClass();
-    const child = { getAttrs: () => ({}), getParent: () => transformer };
+    const child = { getAttrs: () => ({}), getParent: () => transformer, hasName: (name: string) => name === 'back' };
     (getTargetedNode as ReturnType<typeof vi.fn>).mockReturnValue(child);
     const e = makeEvent();
     handlePointerDown(ctx, e);
     expect(ctx.setAreaSelecting).toHaveBeenCalledWith(false);
     expect(ctx.getEdgePanning().stop).toHaveBeenCalled();
     expect(ctx.getAreaSelector().hide).toHaveBeenCalled();
+  });
+
+  it('does NOT run the back-overdraw re-targeting logic for a resize anchor (only for the `back` shape)', () => {
+    // Regression test for https://github.com/InditexTech/weavejs/issues/1137:
+    // a resize anchor's hit area extends past the selected node's own shape
+    // (e.g. centered on a corner). Re-resolving "what's really under the
+    // pointer" for anchors — like the `back` overdraw shape does — could hit
+    // a different node underneath (e.g. an image below a rectangle's corner)
+    // and hijack the drag instead of letting Konva's native transformer
+    // resize the selected node.
+    const tr = makeTransformer([{ getAttrs: () => ({ id: 'A' }) }]);
+    const transformerCtrl = { getTransformer: vi.fn().mockReturnValue(tr) };
+    const ctx = makeCtx({
+      getTransformerController: vi.fn().mockReturnValue(transformerCtrl),
+    });
+    const realNodeImage = {
+      getAttrs: () => ({ id: 'image-1', nodeType: 'image' }),
+      getParent: () => null,
+    };
+    ctx.getWeaveInstance().getRealSelectedNode = vi
+      .fn()
+      .mockReturnValue(realNodeImage);
+
+    const transformer = new KonvaTransformerClass();
+    const anchor = {
+      getAttrs: () => ({}),
+      getParent: () => transformer,
+      hasName: () => false,
+    };
+    (getTargetedNode as ReturnType<typeof vi.fn>).mockReturnValue(anchor);
+
+    const target = {
+      getClassName: () => 'Rect',
+      getAttrs: vi.fn().mockReturnValue({}),
+      getParent: vi.fn().mockReturnValue(transformer),
+    };
+    const e = makeEvent({}, target);
+    handlePointerDown(ctx, e);
+
+    // The re-targeting logic must not run: no proxy-drag suppression, no
+    // reselect of the node underneath — Konva's native anchor drag proceeds.
+    expect(tr.setAttrs).not.toHaveBeenCalledWith({ listening: false });
+    expect(ctx.setClickOrTapHandled).not.toHaveBeenCalledWith(true);
+    expect(ctx.getWeaveInstance().getRealSelectedNode).not.toHaveBeenCalled();
   });
 
   it('reselects and suppresses proxy-drag when a different node sits on top of the selection', () => {
@@ -282,7 +326,7 @@ describe('handlePointerDown', () => {
       .mockReturnValue(realNodeB);
 
     const transformer = new KonvaTransformerClass();
-    const overlay = { getAttrs: () => ({}), getParent: () => transformer };
+    const overlay = { getAttrs: () => ({}), getParent: () => transformer, hasName: (name: string) => name === 'back' };
     (getTargetedNode as ReturnType<typeof vi.fn>).mockReturnValue(overlay);
 
     const e = makeEvent();
@@ -315,7 +359,7 @@ describe('handlePointerDown', () => {
       .mockReturnValue(realNodeB);
 
     const transformer = new KonvaTransformerClass();
-    const overlay = { getAttrs: () => ({}), getParent: () => transformer };
+    const overlay = { getAttrs: () => ({}), getParent: () => transformer, hasName: (name: string) => name === 'back' };
     (getTargetedNode as ReturnType<typeof vi.fn>).mockReturnValue(overlay);
 
     handlePointerDown(ctx, makeEvent());
@@ -341,7 +385,7 @@ describe('handlePointerDown', () => {
       .mockReturnValue(realNodeA);
 
     const transformer = new KonvaTransformerClass();
-    const overlay = { getAttrs: () => ({}), getParent: () => transformer };
+    const overlay = { getAttrs: () => ({}), getParent: () => transformer, hasName: (name: string) => name === 'back' };
     (getTargetedNode as ReturnType<typeof vi.fn>).mockReturnValue(overlay);
 
     handlePointerDown(ctx, makeEvent());
@@ -365,7 +409,7 @@ describe('handlePointerDown', () => {
       .mockReturnValue(realNodeA);
 
     const transformer = new KonvaTransformerClass();
-    const overlay = { getAttrs: () => ({}), getParent: () => transformer };
+    const overlay = { getAttrs: () => ({}), getParent: () => transformer, hasName: (name: string) => name === 'back' };
     (getTargetedNode as ReturnType<typeof vi.fn>).mockReturnValue(overlay);
 
     const e = makeEvent();

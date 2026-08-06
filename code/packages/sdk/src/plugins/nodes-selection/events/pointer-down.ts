@@ -38,7 +38,18 @@ export function handlePointerDown(
 
   const selectedGroup = getTargetedNode(ctx.getWeaveInstance());
 
-  if (selectedGroup?.getParent() instanceof Konva.Transformer) {
+  // Only the transformer's `back` shape (the whole-bounding-box overdraw used
+  // to proxy-drag the selection) needs the re-targeting logic below. Resize
+  // anchors and the rotater are also children of the Transformer, but their
+  // hit area intentionally extends past the selected node's own shape (e.g. a
+  // corner anchor centered on the node's corner) — re-resolving "what's
+  // really under the pointer" for them would wrongly hit whatever node sits
+  // beneath that overdrawn area (like an image below a rectangle's corner)
+  // and hijack the drag instead of resizing/rotating.
+  if (
+    selectedGroup?.getParent() instanceof Konva.Transformer &&
+    selectedGroup?.hasName('back')
+  ) {
     ctx.setAreaSelecting(false);
     ctx.getEdgePanning().stop();
     ctx.getAreaSelector().hide();

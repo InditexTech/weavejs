@@ -32,6 +32,7 @@ vi.mock('konva', () => {
     getAttrs = vi.fn().mockReturnValue({});
     forceUpdate = vi.fn();
     getChildren = vi.fn().mockReturnValue([]);
+    findOne = vi.fn().mockReturnValue(undefined);
     on = vi.fn();
     fire = vi.fn();
     boundBoxFunc = vi.fn();
@@ -291,14 +292,35 @@ describe('TransformerController', () => {
         'pointermove'
       );
       handler();
-      expect(tr.setAttrs).not.toHaveBeenCalled();
+      expect(tr.forceUpdate).not.toHaveBeenCalled();
     });
 
-    it('sets listening=true when no shape under pointer', () => {
+    it('returns early when the transformer has no "back" shape', () => {
       const { ctrl, stage } = makeController();
       const tr = ctrl.getTransformer();
       const node = makeKonvaNode({ isContainerPrincipal: true });
       (tr.nodes as ReturnType<typeof vi.fn>).mockReturnValue([node]);
+      (tr.findOne as ReturnType<typeof vi.fn>).mockReturnValue(undefined);
+      (stage.getPointerPosition as ReturnType<typeof vi.fn>).mockReturnValue({
+        x: 10,
+        y: 10,
+      });
+      const handler = getHandler(
+        stage.on as ReturnType<typeof vi.fn>,
+        'pointermove'
+      );
+      handler();
+      expect(stage.getIntersection).not.toHaveBeenCalled();
+      expect(tr.forceUpdate).not.toHaveBeenCalled();
+    });
+
+    it('sets back.listening(true) when no shape under pointer', () => {
+      const { ctrl, stage } = makeController();
+      const tr = ctrl.getTransformer();
+      const node = makeKonvaNode({ isContainerPrincipal: true });
+      (tr.nodes as ReturnType<typeof vi.fn>).mockReturnValue([node]);
+      const backShape = { listening: vi.fn() };
+      (tr.findOne as ReturnType<typeof vi.fn>).mockReturnValue(backShape);
       (stage.getPointerPosition as ReturnType<typeof vi.fn>).mockReturnValue({
         x: 10,
         y: 10,
@@ -309,16 +331,17 @@ describe('TransformerController', () => {
         'pointermove'
       );
       handler();
-      expect(tr.setAttrs).toHaveBeenCalledWith({ listening: true });
+      expect(backShape.listening).toHaveBeenCalledWith(true);
+      expect(tr.forceUpdate).toHaveBeenCalled();
     });
 
-    it('sets listening=false when shape is transformer child named "back"', () => {
+    it('sets back.listening(false) when the pointer is over the "back" shape itself', () => {
       const { ctrl, stage } = makeController();
       const tr = ctrl.getTransformer();
       const node = makeKonvaNode({ isContainerPrincipal: true });
       (tr.nodes as ReturnType<typeof vi.fn>).mockReturnValue([node]);
-      const backShape = { name: vi.fn().mockReturnValue('back') };
-      (tr.getChildren as ReturnType<typeof vi.fn>).mockReturnValue([backShape]);
+      const backShape = { listening: vi.fn() };
+      (tr.findOne as ReturnType<typeof vi.fn>).mockReturnValue(backShape);
       (stage.getPointerPosition as ReturnType<typeof vi.fn>).mockReturnValue({
         x: 10,
         y: 10,
@@ -331,17 +354,18 @@ describe('TransformerController', () => {
         'pointermove'
       );
       handler();
-      expect(tr.setAttrs).toHaveBeenCalledWith({ listening: false });
+      expect(backShape.listening).toHaveBeenCalledWith(false);
     });
 
-    it('sets listening=false when shape is a child of the selected node', () => {
+    it('sets back.listening(true) when shape under pointer is a child of the selected node (not "back")', () => {
       const { ctrl, stage } = makeController();
       const tr = ctrl.getTransformer();
       const child = { name: vi.fn().mockReturnValue('rect') };
       const node = makeKonvaNode({ isContainerPrincipal: true });
       (node.getChildren as ReturnType<typeof vi.fn>).mockReturnValue([child]);
       (tr.nodes as ReturnType<typeof vi.fn>).mockReturnValue([node]);
-      (tr.getChildren as ReturnType<typeof vi.fn>).mockReturnValue([]);
+      const backShape = { listening: vi.fn() };
+      (tr.findOne as ReturnType<typeof vi.fn>).mockReturnValue(backShape);
       (stage.getPointerPosition as ReturnType<typeof vi.fn>).mockReturnValue({
         x: 10,
         y: 10,
@@ -354,7 +378,30 @@ describe('TransformerController', () => {
         'pointermove'
       );
       handler();
-      expect(tr.setAttrs).toHaveBeenCalledWith({ listening: false });
+      expect(backShape.listening).toHaveBeenCalledWith(true);
+    });
+
+    it('sets back.listening(true) when shape under pointer is an unrelated sibling shape (e.g. a resize anchor overlapping a non-group node)', () => {
+      const { ctrl, stage } = makeController();
+      const tr = ctrl.getTransformer();
+      const node = makeKonvaNode({ isContainerPrincipal: true });
+      (tr.nodes as ReturnType<typeof vi.fn>).mockReturnValue([node]);
+      const backShape = { listening: vi.fn() };
+      (tr.findOne as ReturnType<typeof vi.fn>).mockReturnValue(backShape);
+      const unrelatedShape = { name: vi.fn().mockReturnValue('rect') };
+      (stage.getPointerPosition as ReturnType<typeof vi.fn>).mockReturnValue({
+        x: 10,
+        y: 10,
+      });
+      (stage.getIntersection as ReturnType<typeof vi.fn>).mockReturnValue(
+        unrelatedShape
+      );
+      const handler = getHandler(
+        stage.on as ReturnType<typeof vi.fn>,
+        'pointermove'
+      );
+      handler();
+      expect(backShape.listening).toHaveBeenCalledWith(true);
     });
   });
 

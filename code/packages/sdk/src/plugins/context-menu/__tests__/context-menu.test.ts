@@ -348,6 +348,32 @@ describe('WeaveContextMenuPlugin - triggerContextMenu()', () => {
     expect(weave.getNodeHandler).toHaveBeenCalled();
   });
 
+  it('6.4b preserves the current multi-selection when a selected node is targeted', () => {
+    const nodeHandler = makeNodeHandler();
+    const selectedNode = makeEventTarget({ id: 'node-1' });
+    const otherSelectedNode = makeEventTarget({ id: 'node-2' });
+    const selectionPlugin = makeSelectionPlugin();
+    selectionPlugin.getSelectedNodes.mockReturnValue([
+      selectedNode,
+      otherSelectedNode,
+    ]);
+    const { plugin, weave } = setup({ selectionPlugin, nodeHandler });
+
+    // @ts-expect-error — passing mock Konva nodes for test
+    plugin.triggerContextMenu(selectedNode, selectedNode);
+
+    expect(selectionPlugin.setSelectedNodes).not.toHaveBeenCalled();
+    expect(weave.emitEvent).toHaveBeenCalledWith(
+      'onNodeContextMenu',
+      expect.objectContaining({
+        selection: [
+          expect.objectContaining({ instance: selectedNode }),
+          expect.objectContaining({ instance: otherSelectedNode }),
+        ],
+      })
+    );
+  });
+
   it('6.5 contextMenuVisible=true → closeContextMenu emits visible=false first', () => {
     const { plugin, weave } = setup();
     // @ts-expect-error — setting private contextMenuVisible for test

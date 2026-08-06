@@ -181,6 +181,19 @@ To make a change and test it:
 
 As you can see to test you can repeat steps 1-2 as many times as you want.
 
+### Documentation Release Checklist
+
+Complete this checklist for every release, not for every individual change. You may still update it incrementally as changes are made to keep track of what is pending for the next release.
+
+1. Identify the upcoming version: the one after the latest released version, matching the `release-type/*` label of the PR.
+2. Update `code/CHANGELOG.md` with the changes included in the release.
+3. If the release includes public API changes, document them in the relevant API reference file under `docs`.
+4. Create or update the release page at `docs/content/docs/main/changelog/<major>.x/<version>.mdx`:
+   - If the page is new, add its title, description, release date, and change sections.
+   - If the page already exists, add the release changes under the corresponding sections.
+5. Add the version to the `pages` array in `docs/content/docs/main/changelog/<major>.x/meta.json`, keeping versions newest first.
+6. Add a link to the version at the top of the corresponding section in `docs/content/docs/main/changelog/index.mdx`.
+
 ### Before Submitting
 
 - Set the version to release of the docs on the `.release` file located on the `/docs` folder.

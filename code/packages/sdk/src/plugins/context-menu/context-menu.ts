@@ -88,6 +88,7 @@ export class WeaveContextMenuPlugin extends WeavePlugin {
     const stage = this.instance.getStage();
 
     const selectionPlugin = this.getSelectionPlugin();
+    const selectedNodes = selectionPlugin?.getSelectedNodes() ?? [];
 
     let nodes: WeaveSelection[] = [];
 
@@ -107,6 +108,26 @@ export class WeaveContextMenuPlugin extends WeavePlugin {
     const eventTargetParent = eventTarget.getParent();
     if (eventTargetParent instanceof Konva.Transformer) {
       nodes = eventTargetParent.nodes().map((node) => {
+        const nodeHandler = this.instance.getNodeHandler<WeaveNode>(
+          node.getAttrs().nodeType
+        );
+
+        return {
+          instance: node as WeaveElementInstance,
+          node: nodeHandler?.serialize(node as WeaveElementInstance),
+        };
+      });
+    }
+
+    const targetIsPartOfMultiSelection =
+      target !== undefined &&
+      selectedNodes.length > 1 &&
+      selectedNodes.some(
+        (selectedNode) =>
+          selectedNode.getAttrs().id === target.getAttrs().id
+      );
+    if (targetIsPartOfMultiSelection) {
+      nodes = selectedNodes.map((node) => {
         const nodeHandler = this.instance.getNodeHandler<WeaveNode>(
           node.getAttrs().nodeType
         );
@@ -151,8 +172,9 @@ export class WeaveContextMenuPlugin extends WeavePlugin {
       selectionPlugin &&
       !(
         eventTarget.getParent() instanceof Konva.Transformer &&
-        selectionPlugin.getSelectedNodes().length > 0
-      )
+        selectedNodes.length > 0
+      ) &&
+      !targetIsPartOfMultiSelection
     ) {
       selectionPlugin.setSelectedNodes([...nodes.map((node) => node.instance)]);
       selectionPlugin.getHoverTransformer().nodes([]);
