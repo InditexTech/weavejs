@@ -65,6 +65,7 @@
     "eslint": "8.57.1",
     "globals": "15.14.0",
     "rollup-plugin-visualizer": "^7.0.1",
+    "tsdown": "0.22.14",
     "typescript-eslint": "8.22.0",
     "vitest": "^3.2.6",
     "vitest-sonar-reporter": "^3.0.0"

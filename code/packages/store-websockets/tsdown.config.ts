@@ -41,6 +41,7 @@ export default [
     clean: true,
     dts: true,
     platform: 'node',
+    fixedExtension: false,
     plugins: [
       visualizer({
         open: false,

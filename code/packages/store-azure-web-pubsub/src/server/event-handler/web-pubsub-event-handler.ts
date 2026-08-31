@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-import type express from 'express-serve-static-core';
+import type * as express from 'express-serve-static-core';
 import type koa from 'koa';
 import { CloudEventsDispatcher } from './cloud-events-dispatcher';
 import type { WebPubSubEventHandlerOptions } from './cloud-events-protocols';
@@ -17,7 +17,7 @@ export class WebPubSubEventHandler {
    */
   public readonly path: string;
 
-  private _cloudEventsHandler: CloudEventsDispatcher;
+  private readonly _cloudEventsHandler: CloudEventsDispatcher;
 
   /**
    * Creates an instance of a WebPubSubEventHandler for handling incoming CloudEvents messages.
