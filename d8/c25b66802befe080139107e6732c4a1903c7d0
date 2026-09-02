@@ -1,0 +1,18 @@
+docs/package-lock.json
+  h_c93d154c7c7074 12-16,324-326,333,344-346,358-360,375-377,388-390
+docs/package.json
+  h_c93d154c7c7074 19-23
+docs/src/antora.yml
+  h_c93d154c7c7074 150-153
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.22",
+  "base_commit_sha": "d8c25b66802befe080139107e6732c4a1903c7d0",
+  "prompts": {},
+  "humans": {
+    "h_c93d154c7c7074": {
+      "author": "Jesus Manuel Piñeiro Cid <jesusmpc@inditex.com>"
+    }
+  }
+}
