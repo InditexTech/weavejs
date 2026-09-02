@@ -13,6 +13,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- [#1147](https://github.com/InditexTech/weavejs/issues/1147) Upgrade vulnerable direct dependencies (npm audit: 0 vulnerabilities)
+
 ## [5.2.1] - 2026-08-06
 
 ### Fixed

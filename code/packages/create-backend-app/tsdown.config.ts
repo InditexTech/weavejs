@@ -28,5 +28,6 @@ export default defineConfig({
   format: 'esm',
   target: 'node18',
   platform: 'node',
+  fixedExtension: false,
   dts: true,
 });

@@ -111,6 +111,7 @@ export default [
     clean: true,
     dts: true,
     platform: 'node',
+    fixedExtension: false,
     report: true,
     plugins: [
       visualizer({

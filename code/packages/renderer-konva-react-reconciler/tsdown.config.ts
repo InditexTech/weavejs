@@ -57,6 +57,7 @@ export default defineConfig([
     clean: true,
     dts: false,
     platform: 'node',
+    fixedExtension: false,
     plugins: [
       visualizer({
         open: false,
