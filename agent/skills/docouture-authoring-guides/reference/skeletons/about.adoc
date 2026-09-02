@@ -1,0 +1,32 @@
+= About _PRODUCT_NAME_
+:description: What _PRODUCT_NAME_ is, who it is for, and why it exists.
+
+// SIZING RULE: Start small. If this section has little content, write
+// everything on this page as level-2 sections (== Architecture, == Glossary)
+// and delete the separate page files + their nav entries.
+// Split a section into its own page only when it exceeds ~2 screens
+// or needs to be linked/found directly.
+
+_PRODUCT_NAME_ is a <category> that <what it does> for <who it serves>.
+
+// 2nd paragraph: how it works, roughly — the reader must be able to
+// picture the product in action without reading anything else.
+
+// 3rd paragraph: the problem it solves and why it is necessary.
+
+== Key features
+
+* *<Feature>* — <one line>, see xref:<page>.adoc[<page title>].
+* *<Feature>* — <one line>.
+
+== Benefits
+
+* *<Benefit>:* <how and why — the value proposition vs. the alternative>.
+
+== What _PRODUCT_NAME_ is not
+
+* _PRODUCT_NAME_ does not <out-of-scope use case>. For that, use <alternative>.
+
+== Status and roadmap
+
+_PRODUCT_NAME_ is <maturity>. // what exists today, direction ahead — no dates

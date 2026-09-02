@@ -1,0 +1,86 @@
+= Home
+:page-layout: home
+// or :page-layout: home-single for the single-column sibling — same
+// authoring surface below either way.
+:page-nav-module: <module>
+:description: <Couple-lines value proposition.>
+:page-tags: <tag-one>, <tag-two>
+:page-action: <Primary action — quickstart, or the product itself when it is an app>
+:page-action-url: <module:page.adoc or URL>
+:page-action-secondary: <Secondary action — the quickstart when the product is an app>
+:page-action-secondary-url: <module:page.adoc>
+:page-hero-video: <hero.mp4 — a short video or gif of the product in motion>
+:page-hero-video-poster: <hero.png — the still shown before it plays>
+// No motion visual? Use :page-hero-image: + :page-hero-image-alt: instead.
+// Either media form can add :page-hero-image-bordered: (no value) for a
+// framed panel instead of the default bare media slot.
+// The hero title is the site title (the product name) from antora-playbook.yml.
+
+<Engaging paragraphs: who the product is for and what it lets them do.>
+
+== Get started
+
+[cards,type=image-square,columns="1 s:2 m:4",width=container]
+====
+[card,subheader="Start here"]
+.xref:<module>:quickstart.adoc[Quickstart]
+--
+image::<card-image>.png["<Alt text>"]
+
+<From zero to a first working result.>
+--
+
+[card,subheader="<Category>"]
+.xref:<module>:<page>.adoc[<Entry point>]
+--
+image::<card-image>.png["<Alt text>"]
+
+<Short description.>
+--
+====
+
+== Key capabilities
+
+[feature-tabs]
+====
+[feature,label="<What it lets you do — not the technical component>"]
+--
+image::<feature-one>.gif[<Alt text>]
+
+<Prose describing this capability.>
+
+[.cta]
+xref:<module>:<page>.adoc[Learn more]
+--
+
+[feature,label="<What it lets you do>"]
+--
+image::<feature-two>.png[<Alt text>]
+
+<Prose describing this capability.>
+--
+====
+
+== Free & open source
+
+[cta]
+====
+<Prose making the case for the action.>
+
+[.primary]
+link:<repo>/fork[Create a fork]
+====
+
+== Frequently asked questions
+
+Have more questions? Check the xref:<module>:additional-information/faq.adoc[FAQ]
+or contact us — we'll respond as quickly as possible.
+
+[accordion,aria-label="Frequently asked questions"]
+--
+.<Pre-adoption question?>
+[%collapsible]
+====
+<Self-contained answer, with a link to the docs page that expands on it.>
+====
+--

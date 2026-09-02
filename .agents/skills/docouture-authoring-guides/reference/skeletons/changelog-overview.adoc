@@ -1,0 +1,14 @@
+= Changelog
+:description: Complete record of changes in every _PRODUCT_NAME_ version.
+
+This changelog records every change in each version. For the curated
+highlights, see the xref:../release-notes/overview.adoc[release notes].
+
+[cols="1,1,1",options="header"]
+|===
+| Version | Date (YYYY/MM/DD) | Changelog
+
+| xref:vX-Y-Z.adoc[Version X.Y.Z]
+| <YYYY/MM/DD>
+| xref:vX-Y-Z.adoc[Changelog]
+|===

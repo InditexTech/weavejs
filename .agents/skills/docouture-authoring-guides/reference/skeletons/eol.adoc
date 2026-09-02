@@ -1,0 +1,23 @@
+= End of life
+:description: _PRODUCT_NAME_ support policy and supported versions.
+
+_PRODUCT_NAME_ releases a major version every <cadence>. Each major
+version receives <support policy>. Always read the documentation for
+the latest supported version.
+
+== Supported versions
+
+[cols="1,1,1,1",options="header"]
+|===
+| Version | GA | End of full support | End of life
+
+| vX.Y
+| YYYY-MM-DD
+| YYYY-MM-DD
+| YYYY-MM-DD (estimated)
+
+| vX.Y label:red[Discontinued]
+| YYYY-MM-DD
+| YYYY-MM-DD
+| YYYY-MM-DD
+|===

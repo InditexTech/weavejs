@@ -1,0 +1,36 @@
+= <Task title, bare infinitive>
+:description: <The goal this guide accomplishes>.
+
+// REPEATABLE PATTERN: clone this file for each task worth documenting.
+// One guide, one goal. Derive tasks from real capabilities of the repo.
+
+<What the reader accomplishes and the minimum context to follow the guide.
+Link concepts to the Overview section instead of re-explaining them.>
+
+== Prerequisites
+
+* xref:../getting-started/prerequisites.adoc[Install _PRODUCT_NAME_].
+* <Other completed guide, tool, permission, or product state.>
+
+== Steps
+
+. <First action.>
++
+[source,<lang>]
+----
+<real, copy-pasteable code>
+----
++
+<The observable result of this step.>
+
+. <Second action.>
+
+== Verify
+
+<The command or check that proves the goal was reached, with its
+expected output.>
+
+== Next steps
+
+* xref:<related-task>.adoc[<Related guide>] — <when to follow it>.
+* xref:../reference/<page>.adoc[<Reference page>] — all the options used here.

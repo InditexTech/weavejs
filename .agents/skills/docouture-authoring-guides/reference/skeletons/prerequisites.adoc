@@ -1,0 +1,46 @@
+= Prerequisites
+:description: What you need before you start using _PRODUCT_NAME_.
+
+// SIZING RULE: Start small. If this section has little content, write
+// everything on this page as level-2 sections (== Requirements, == Quickstart)
+// and delete the separate page files + their nav entries.
+// Split a section into its own page only when it exceeds ~2 screens
+// or needs to be linked/found directly.
+
+This page lists what you need before using _PRODUCT_NAME_. After meeting
+these requirements, follow the xref:quickstart.adoc[quickstart].
+
+== Requirements
+
+* <Tool> <exact minimum version>
+* <Account / permission>, see <where to get it>
+
+== Installation
+
+[tabs]
+--
+[tab,label="<manager 1>"]
+****
+[source,bash]
+----
+<install command>
+----
+****
+
+[tab,label="<manager 2>"]
+****
+[source,bash]
+----
+<install command>
+----
+****
+--
+
+== Verify the installation
+
+[source,bash]
+----
+<verification command>
+----
+
+The command prints `<expected output>`.

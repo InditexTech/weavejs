@@ -1,0 +1,32 @@
+= Quickstart
+:description: <The scenario> with _PRODUCT_NAME_ in <N> minutes.
+
+// PAGE OR SECTION: use standalone, or merge into the section entry page
+// demoting headings one level (= → ==). See the sizing rule there.
+
+In this quickstart, you <build/do the scenario> with _PRODUCT_NAME_. Before you begin, make sure you meet the
+xref:prerequisites.adoc[prerequisites].
+
+== Step by step
+
+=== 1. <First step>
+
+[source,bash]
+----
+<command>
+----
+
+// What the reader should see after running it, and why this step matters.
+
+=== 2. <Second step>
+
+// Keep steps small: one action, one observable result.
+
+== See it working
+
+// The unambiguous proof of success: exact output, screenshot, or URL.
+
+== Next steps
+
+* xref:guides/<page>.adoc[<Guide title>] — <what it deepens>.
+* xref:guides/<page>.adoc[<Guide title>] — <what it deepens>.

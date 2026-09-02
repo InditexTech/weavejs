@@ -1,0 +1,11 @@
+= Release notes
+:description: Highlights of every _PRODUCT_NAME_ release.
+
+_PRODUCT_NAME_ publishes a release every <cadence>. For the complete
+list of changes, see the xref:../changelog/overview.adoc[changelog].
+
+- xref:vX-Y-Z.adoc[vX.Y.Z — <release title>]
+- xref:vX-Y-Z.adoc[vX.Y.Z — <release title>]
+- xref:vX-Y-Z.adoc[vX.Y.Z — <release title>]
+
+// Repeated, newest first. Not versioned? Use YYYY-MM-DD — <title>.

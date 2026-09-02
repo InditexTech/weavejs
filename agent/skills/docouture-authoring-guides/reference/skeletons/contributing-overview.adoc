@@ -1,0 +1,26 @@
+= Contributing
+:description: How to contribute to _PRODUCT_NAME_.
+
+// SIZING RULE: this section is usually a single page. Add sub-pages only
+// if the project has contributor docs that exceed ~2 screens and do not
+// belong in CONTRIBUTING.md.
+
+We welcome contributions to _PRODUCT_NAME_ — from bug reports and typo
+fixes to new features. This page shows you where to start.
+
+== Ways to contribute
+
+* *Report a bug* — open an issue in our link:<repo>/issues[issue tracker].
+* *Suggest a feature* — open an issue explaining your idea. We'll refine & decide next steps from there.
+* *Improve the docs* — open an issue
+* *Contribute code* — read the contribution guide below and pick a
+  link:<repo>/labels/good%20first%20issue[good first issue].
+
+== Before you start
+
+* link:<repo>/blob/main/CONTRIBUTING.md[Contribution guide] — the process:
+  how to set up, branch, and submit a pull request.
+* link:<repo>/blob/main/CODE_OF_CONDUCT.md[Code of conduct] — the behavior
+  we expect in all project spaces.
+* link:<repo>/blob/main/LICENSE[License] — what you agree to when you
+  contribute.

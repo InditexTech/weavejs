@@ -1,0 +1,22 @@
+= Development
+:description: Set up a development environment and work on _PRODUCT_NAME_.
+
+// PAGE OR SECTION: use standalone, or merge into the section entry page
+// demoting headings one level (= → ==). See the sizing rule there.
+
+This page explains how to set up a development environment for
+_PRODUCT_NAME_ and the workflow to build, run, and test it locally. For
+the contribution process (issues, pull requests, conventions), see
+xref:../contributing/overview.adoc[Contributing].
+
+== Environment setup
+
+// Tools + exact versions, then the clone/install/build commands.
+
+== Development process
+
+// Run locally, watch mode, useful scripts, where things live.
+
+== Testing
+
+// Run all tests, run one test, expectations before submitting.

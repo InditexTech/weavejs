@@ -1,0 +1,24 @@
+= Reference
+:description: Reference material for _PRODUCT_NAME_: configuration, APIs, and commands.
+
+// SIZING RULE: Start small. If this section has little content, write
+// everything on this page as level-2 sections and delete the separate
+// page files + their nav entries. Split a section into its own page only
+// when it exceeds ~2 screens or needs to be linked/found directly.
+
+This section is the lookup material for _PRODUCT_NAME_: every option,
+command, and API, described exhaustively.
+
+[cards,columns="1 s:2 m:3"]
+====
+[card]
+.xref:configuration.adoc[Configuration]
+<Short description, only when the title alone is not enough.>
+
+[card]
+.xref:<surface>.adoc[<Surface>]
+====
+
+// When the catalog grows, group by type of reference (configuration,
+// APIs, catalogs...): one == <Type> heading with its own [cards] block
+// per group.
