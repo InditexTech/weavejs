@@ -1,8 +1,12 @@
-# The component name is the site's first URL segment: pages live at
-# /weavejs/<module>/<page>, and this component's ROOT pages — the landing —
-# directly at /weavejs/. It has nothing to do with the `docs/` directory this
-# file sits in, which Antora never puts in a URL.
-name: weavejs
+# Antora's own reserved component name. A component named ROOT gets no
+# `/<component-name>/` URL segment of its own — pages live at
+# /<version>/<module>/<page>, and this component's ROOT pages — the landing —
+# directly at /. (Previously named `weavejs`, which duplicated the
+# `/weavejs/` GitHub Pages already prepends for this project page, producing
+# `/weavejs/weavejs/<version>/...` once published — see git history/issue for
+# the full diagnosis.) Has nothing to do with the `docs/` directory this file
+# sits in, which Antora never puts in a URL.
+name: ROOT
 title: Weave.js
 # Mode 2 (Stable + Prerelease) — GH-80. `main` is permanently the prerelease
 # channel: this file never toggles back and forth, only the rolling `stable`
