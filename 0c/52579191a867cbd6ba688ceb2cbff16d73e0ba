@@ -1,0 +1,25 @@
+docs/content/docs/main/changelog/5.x/5.2.2.mdx
+  s_6b7efafc61e920::t_71b1e40564270d 1-11
+docs/content/docs/main/changelog/5.x/meta.json
+  s_6b7efafc61e920::t_65a4dc09c8716e 4
+docs/content/docs/main/changelog/index.mdx
+  s_6b7efafc61e920::t_a266a1d5e0bff2 8
+code/CHANGELOG.md
+  s_6b7efafc61e920::t_eb2846782b3aa2 16-18
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.22",
+  "base_commit_sha": "0c52579191a867cbd6ba688ceb2cbff16d73e0ba",
+  "prompts": {},
+  "sessions": {
+    "s_6b7efafc61e920": {
+      "agent_id": {
+        "tool": "github-copilot-cli",
+        "id": "c6d238f3-f984-4a48-abfc-c29b87907b15",
+        "model": "unknown"
+      },
+      "human_author": "Alejandro Montes <alejandromogarcia@ext.inditex.com>"
+    }
+  }
+}

@@ -1,0 +1,19 @@
+code/packages/store-azure-web-pubsub/src/server/event-handler/web-pubsub-event-handler.ts
+  s_6b7efafc61e920::t_7fab24db776c8b 49-52
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.22",
+  "base_commit_sha": "a6357ed73f9b8abbcd800999b856327bf5075a07",
+  "prompts": {},
+  "sessions": {
+    "s_6b7efafc61e920": {
+      "agent_id": {
+        "tool": "github-copilot-cli",
+        "id": "c6d238f3-f984-4a48-abfc-c29b87907b15",
+        "model": "unknown"
+      },
+      "human_author": "Alejandro Montes <alejandromogarcia@ext.inditex.com>"
+    }
+  }
+}
