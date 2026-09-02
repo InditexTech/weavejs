@@ -1,0 +1,1430 @@
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+
+
+<meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <script>
+      /*
+       * Theme bootstrap. Runs before first paint so the page never flashes the
+       * wrong theme. Keep it inline, keep it tiny, and keep it in sync with
+       * src/js/08-theme.ts, which owns the same storage key and class names.
+       *
+       * IDS switches theme with a class on <html>, not a data attribute, so an
+       * attribute here would style nothing.
+       */
+      (function () {
+        var stored
+        try { stored = localStorage.getItem('dt-theme') } catch (e) {}
+        var theme = stored === 'light' || stored === 'dark'
+          ? stored
+          : window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
+        var root = document.documentElement
+        root.classList.add('dt-theme-' + theme, 'dt-scale-medium')
+        root.style.colorScheme = theme
+      })()
+    </script>
+    <script>
+      /*
+       * Side-menu collapse bootstrap (GH-8). Runs before first paint so the
+       * 320px column never flashes in and reflows the article on navigation.
+       * Keep it inline, keep it tiny, and keep it in sync with
+       * src/js/01-nav.ts, which owns the same storage key and class name.
+       *
+       * A stored choice always wins; absent one, the menu starts collapsed
+       * on the home/landing page (matching Figma's "State=Home" toolbar
+       * variant, which is the only one that shows the toggle) and open
+       * everywhere else. With JavaScript disabled this script never runs, so
+       * the class is never added and the menu stays open unconditionally —
+       * the toggle that would reopen it is also never unhidden.
+       */
+      (function () {
+        var stored
+        try { stored = localStorage.getItem('docouture-side-menu') } catch (e) {}
+        var collapsed = stored === 'collapsed' || stored === 'open'
+          ? stored === 'collapsed'
+          : document.documentElement.hasAttribute('data-page-home')
+        if (collapsed) document.documentElement.classList.add('is-side-menu-collapsed')
+      })()
+    </script>
+    <script>
+      /*
+       * ToC collapse bootstrap (GH-10). Runs before first paint so a closed
+       * choice never flashes open for an instant. Keep it in sync with
+       * src/js/02-on-this-page.ts, which owns the same storage key and class
+       * name.
+       *
+       * Deliberately does NOT add `has-toc` — only 02-on-this-page.ts knows
+       * whether this page actually has a usable ToC (headings found, page
+       * not `-toc`), and every effect of the class added here is itself
+       * gated behind `has-toc` in toc.css, so there is nothing to flash
+       * either way before that script runs. This one exists only so a
+       * *closed* choice is already in place the moment it does.
+       */
+      (function () {
+        var stored
+        try { stored = localStorage.getItem('docouture-toc') } catch (e) {}
+        if (stored === 'closed') document.documentElement.classList.add('is-toc-closed')
+      })()
+    </script>
+
+<title>Home | Weave.js</title>
+
+    <link rel="canonical" href="https://inditextech.github.io/weavejs/weavejs/5.2.1/">
+    <link rel="next" href="main/">
+    <meta name="description" content="Weave.js — the framework for building visual collaborative applications.">
+    <meta name="generator" content="Antora 3.2.0">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&family=Noto+Sans+Mono:wght@100..900&display=swap">
+    <link rel="stylesheet" href="../../_/css/site.css">
+    <style>:root { --home-background-image: url("/weavejs/_/home-background.jpg") }</style>
+
+
+
+    <link rel="icon" href="../../_/favicon.ico">
+  </head>
+  <body class="home-page">
+
+
+
+<header class="header-toolbar">
+  <div class="dt-grid-layout dt-grid-layout--with-margin header-toolbar__grid">
+    <div class="dt-grid-layout__item dt-grid-layout__item--span-6 dt-grid-layout__item--span-xs-3 header-toolbar__left">
+      <button class="dt-button dt-button--ghost dt-button--icon-only side-menu-toggle" type="button" aria-controls="side-menu" hidden>
+        <span class="dt-button__content">
+          <span class="dt-button__icon dt-button__icon-icon"><svg class="dt-icon" aria-hidden="true" focusable="false"><use href="../../_/img/icons.svg#icon-menu"></use></svg></span>
+        </span>
+      </button>
+      <a class="header-toolbar__brand" href="../5.2.1/">
+        <img class="header-toolbar__logo" src="../../_/product-logo.png" width="24" height="24" alt="">
+        <span class="header-toolbar__product-name dt-text dt-text--label-l-high">Weave.js</span>
+      </a>
+    </div>
+    <div class="dt-grid-layout__item dt-grid-layout__item--span-6 dt-grid-layout__item--span-xs-3 header-toolbar__actions">
+      <button type="button" class="dt-button dt-button--ghost header-toolbar__search-trigger">
+        <span class="dt-button__content">
+          <span class="dt-button__icon dt-button__icon-icon"><svg class="dt-icon" aria-hidden="true" focusable="false"><use href="../../_/img/icons.svg#icon-search"></use></svg></span>
+          <span class="dt-text dt-text--label-l header-toolbar__search-label">Search</span>
+          <kbd class="header-toolbar__search-shortcut" aria-hidden="true">⌘K</kbd>
+        </span>
+      </button>
+
+<div class="page-versions">
+  <button type="button" class="dt-tag dt-tag--solid dt-tag--selected header-toolbar__version header-toolbar__version--prerelease version-menu-toggle" title="Show other versions of page" aria-expanded="false">
+    <span class="dt-tag__label">prerelease</span>
+    <span class="dt-tag__icon"><svg class="dt-icon" aria-hidden="true" focusable="false"><use href="../../_/img/icons.svg#icon-chevron-down"></use></svg></span>
+  </button>
+  <div class="version-menu">
+    <span class="version is-current" aria-current="page">
+      <span class="version__label">prerelease</span>
+      <span class="dt-label dt-label--orange"><span class="dt-label__content">Prerelease</span></span>
+    </span>
+    <a class="version" href="../5.2.1/">
+      <span class="version__label">5.2.1</span>
+      <span class="dt-label dt-label--green"><span class="dt-label__content">Latest</span></span>
+          </a>
+  </div>
+</div>
+
+<a class="dt-button dt-button--ghost dt-button--icon-only header-toolbar__repo" href="https://github.com/InditexTech/weavejs" target="_blank" rel="noopener" aria-label="Repository">
+  <span class="dt-button__content">
+    <span class="dt-button__icon dt-button__icon-icon header-toolbar__repo-icon" aria-hidden="true"></span>
+  </span>
+</a>
+
+<button class="dt-button dt-button--ghost dt-button--icon-only theme-toggle" type="button" hidden>
+  <span class="dt-button__content">
+    <span class="dt-button__icon dt-button__icon-icon theme-toggle-icon theme-toggle-icon--light" aria-hidden="true"><svg class="dt-icon" aria-hidden="true" focusable="false"><use href="../../_/img/icons.svg#icon-sun"></use></svg></span>
+    <span class="dt-button__icon dt-button__icon-icon theme-toggle-icon theme-toggle-icon--dark" aria-hidden="true"><svg class="dt-icon" aria-hidden="true" focusable="false"><use href="../../_/img/icons.svg#icon-moon"></use></svg></span>
+  </span>
+</button>
+    </div>
+  </div>
+</header>
+
+<dialog id="search-dialog" class="search-dialog" aria-label="Search" data-search-index="weavejs-prerelease.json">
+  <div class="dt-overlay dt-overlay--visible search-dialog__overlay">
+    <div class="dt-overlay__content"></div>
+    <div class="dt-modal dt-modal--small search-dialog__panel">
+      <div class="dt-modal__container search-dialog__container">
+        <div class="dt-search-field-minimal dt-search-field-minimal--full-width search-dialog__field">
+          <span class="dt-search-field-minimal__icon-start" aria-hidden="true"><svg class="dt-icon" aria-hidden="true" focusable="false"><use href="../../_/img/icons.svg#icon-search"></use></svg></span>
+          <div class="dt-search-field-minimal__input-wrapper">
+            <div class="dt-search-field-minimal__input-container">
+              <input type="search" class="dt-search-field-minimal__input" placeholder="Search the docs" aria-label="Search the docs"
+                role="combobox" aria-expanded="false" aria-haspopup="listbox" aria-autocomplete="list"
+                aria-controls="search-dialog-listbox" disabled>
+            </div>
+          </div>
+          <button type="button" class="dt-button dt-button--ghost dt-button--icon-only search-dialog__close" aria-label="Close search" disabled>
+            <span class="dt-button__content">
+              <span class="dt-button__icon dt-button__icon-icon"><svg class="dt-icon" aria-hidden="true" focusable="false"><use href="../../_/img/icons.svg#icon-x"></use></svg></span>
+            </span>
+          </button>
+        </div>
+        <div class="search-dialog__chips" role="group" aria-label="Filter results by module">
+          <button type="button" class="dt-tag dt-tag--solid dt-tag--selected search-dialog__chip" data-category="" aria-pressed="true">
+            <span class="dt-tag__label">All</span>
+          </button>
+          <button type="button" class="dt-tag dt-tag--solid search-dialog__chip" data-category="Framework" aria-pressed="false">
+            <span class="dt-tag__label">Framework</span>
+          </button>
+          <button type="button" class="dt-tag dt-tag--solid search-dialog__chip" data-category="SDK" aria-pressed="false">
+            <span class="dt-tag__label">SDK</span>
+          </button>
+          <button type="button" class="dt-tag dt-tag--solid search-dialog__chip" data-category="React Helper" aria-pressed="false">
+            <span class="dt-tag__label">React Helper</span>
+          </button>
+          <button type="button" class="dt-tag dt-tag--solid search-dialog__chip" data-category="Websockets Store" aria-pressed="false">
+            <span class="dt-tag__label">Websockets Store</span>
+          </button>
+          <button type="button" class="dt-tag dt-tag--solid search-dialog__chip" data-category="Azure Web Pubsub Store" aria-pressed="false">
+            <span class="dt-tag__label">Azure Web Pubsub Store</span>
+          </button>
+          <button type="button" class="dt-tag dt-tag--solid search-dialog__chip" data-category="Standalone Store" aria-pressed="false">
+            <span class="dt-tag__label">Standalone Store</span>
+          </button>
+          <button type="button" class="dt-tag dt-tag--solid search-dialog__chip" data-category="TypeScript Types" aria-pressed="false">
+            <span class="dt-tag__label">TypeScript Types</span>
+          </button>
+        </div>
+        <div id="search-dialog-listbox" class="dt-modal__content dt-modal__content--scrollable search-dialog__results" role="listbox" aria-label="Search results"></div>
+        <div class="search-dialog__status" aria-live="polite"></div>
+        <div class="dt-modal__footer dt-modal__footer--horizontal search-dialog__footer">
+          <span class="dt-modal__footer-left dt-text dt-text--detail-m search-dialog__hints">
+            <kbd>&uarr;&darr;</kbd> navigate &middot; <kbd>&crarr;</kbd> select &middot; <kbd>esc</kbd> close
+          </span>
+        </div>
+      </div>
+    </div>
+  </div>
+</dialog>
+<div class="dt-floating-button-wrapper dt-floating-button-wrapper--viewport dt-floating-button-wrapper--end search-fab">
+  <button type="button" class="dt-button dt-button--ghost dt-button--icon-only dt-floating-button search-fab__trigger" aria-label="Search" aria-haspopup="dialog" aria-controls="search-dialog">
+    <span class="dt-button__content">
+      <span class="dt-button__icon dt-button__icon-icon"><svg class="dt-icon" aria-hidden="true" focusable="false"><use href="../../_/img/icons.svg#icon-search"></use></svg></span>
+    </span>
+  </button>
+</div>
+
+<dialog id="image-zoom-dialog" class="image-zoom-dialog" aria-label="Zoomed image">
+  <div class="dt-overlay dt-overlay--visible image-zoom-dialog__overlay">
+    <div class="dt-overlay__content"></div>
+    <div class="dt-modal dt-modal--fullscreen image-zoom-dialog__panel">
+      <div class="dt-modal__container image-zoom-dialog__container">
+        <button type="button" class="dt-button dt-button--ghost dt-button--icon-only image-zoom-dialog__close" aria-label="Close zoomed image">
+          <span class="dt-button__content">
+            <span class="dt-button__icon dt-button__icon-icon"><svg class="dt-icon" aria-hidden="true" focusable="false"><use href="../../_/img/icons.svg#icon-x"></use></svg></span>
+          </span>
+        </button>
+        <div class="image-zoom-dialog__content"></div>
+      </div>
+    </div>
+  </div>
+</dialog>
+    <div class="body">
+
+<div id="side-menu" class="side-menu" data-component="weavejs" data-version="prerelease" data-module="ROOT">
+  <div class="side-menu__header">
+    <div class="side-menu__header-start">
+      <img class="side-menu__header-logo" src="../../_/product-logo.png" width="24" height="24" alt="">
+      <span class="side-menu__header-title dt-text dt-text--title-s">Weave.js</span>
+    </div>
+    <button class="side-menu__close" type="button" aria-label="Close navigation"><svg class="dt-icon" aria-hidden="true" focusable="false"><use href="../../_/img/icons.svg#icon-x"></use></svg></button>
+  </div>
+
+<div class="side-menu__brand">
+  <a class="side-menu__brand-link" href="../5.2.1/">
+    <img class="side-menu__brand-logo" src="../../_/product-logo.png" width="40" height="40" alt="">
+    <span class="side-menu__brand-title dt-text dt-text--title-m">Weave.js</span>
+  </a>
+</div>
+
+<div class="nav-switcher">
+  <button class="nav-switcher__toggle" type="button" aria-expanded="false" aria-haspopup="true" aria-label="Switch module, currently Framework">
+    <span class="nav-switcher__icon"><svg class="dt-icon" aria-hidden="true" focusable="false"><use href="../../_/img/icons.svg#icon-grid-3x3"></use></svg></span>
+    <span class="nav-switcher__label">
+      <span class="nav-switcher__title dt-text dt-text--body-m-high">Framework</span>
+      <span class="nav-switcher__description dt-text dt-text--detail-m">The visual collaborative apps framework</span>
+    </span>
+    <span class="nav-switcher__chevron"><svg class="dt-icon" aria-hidden="true" focusable="false"><use href="../../_/img/icons.svg#icon-chevron-down"></use></svg></span>
+  </button>
+  <div class="nav-switcher__menu" hidden>
+    <ul class="dt-list nav-switcher__list">
+      <li class="nav-switcher__item">
+        <a class="nav-switcher__option" href="main/" aria-current="true">
+          <span class="nav-switcher__icon"><svg class="dt-icon" aria-hidden="true" focusable="false"><use href="../../_/img/icons.svg#icon-grid-3x3"></use></svg></span>
+          <span class="nav-switcher__label">
+            <span class="nav-switcher__title dt-text dt-text--body-m-high">Framework</span>
+            <span class="nav-switcher__description dt-text dt-text--detail-m">The visual collaborative apps framework</span>
+          </span>
+        </a>
+      </li>
+      <li class="nav-switcher__item">
+        <a class="nav-switcher__option" href="sdk/">
+          <span class="nav-switcher__icon"><svg class="dt-icon" aria-hidden="true" focusable="false"><use href="../../_/img/icons.svg#icon-code"></use></svg></span>
+          <span class="nav-switcher__label">
+            <span class="nav-switcher__title dt-text dt-text--body-m-high">SDK</span>
+            <span class="nav-switcher__description dt-text dt-text--detail-m">The visual collaborative tool headless library</span>
+          </span>
+        </a>
+      </li>
+      <li class="nav-switcher__item">
+        <a class="nav-switcher__option" href="react/">
+          <span class="nav-switcher__icon"><svg class="dt-icon" aria-hidden="true" focusable="false"><use href="../../_/img/icons.svg#icon-wrench"></use></svg></span>
+          <span class="nav-switcher__label">
+            <span class="nav-switcher__title dt-text dt-text--body-m-high">React Helper</span>
+            <span class="nav-switcher__description dt-text dt-text--detail-m">Set of React components to help you integrate Weave.js</span>
+          </span>
+        </a>
+      </li>
+      <li class="nav-switcher__item">
+        <a class="nav-switcher__option" href="store-websockets/">
+          <span class="nav-switcher__icon"><svg class="dt-icon" aria-hidden="true" focusable="false"><use href="../../_/img/icons.svg#icon-wifi"></use></svg></span>
+          <span class="nav-switcher__label">
+            <span class="nav-switcher__title dt-text dt-text--body-m-high">Websockets Store</span>
+            <span class="nav-switcher__description dt-text dt-text--detail-m">Store implementation using WebSockets as transport</span>
+          </span>
+        </a>
+      </li>
+      <li class="nav-switcher__item">
+        <a class="nav-switcher__option" href="store-azure-web-pubsub/">
+          <span class="nav-switcher__icon"><svg class="dt-icon" aria-hidden="true" focusable="false"><use href="../../_/img/icons.svg#icon-cloud"></use></svg></span>
+          <span class="nav-switcher__label">
+            <span class="nav-switcher__title dt-text dt-text--body-m-high">Azure Web Pubsub Store</span>
+            <span class="nav-switcher__description dt-text dt-text--detail-m">Store implementation using Azure Web Pubsub as transport</span>
+          </span>
+        </a>
+      </li>
+      <li class="nav-switcher__item">
+        <a class="nav-switcher__option" href="store-standalone/">
+          <span class="nav-switcher__icon"><svg class="dt-icon" aria-hidden="true" focusable="false"><use href="../../_/img/icons.svg#icon-server"></use></svg></span>
+          <span class="nav-switcher__label">
+            <span class="nav-switcher__title dt-text dt-text--body-m-high">Standalone Store</span>
+            <span class="nav-switcher__description dt-text dt-text--detail-m">Store implementation to render a Weave.js canvas in a direct way, just pass a room data.</span>
+          </span>
+        </a>
+      </li>
+      <li class="nav-switcher__item">
+        <a class="nav-switcher__option" href="types/">
+          <span class="nav-switcher__icon"><svg class="dt-icon" aria-hidden="true" focusable="false"><use href="../../_/img/icons.svg#icon-file"></use></svg></span>
+          <span class="nav-switcher__label">
+            <span class="nav-switcher__title dt-text dt-text--body-m-high">TypeScript Types</span>
+            <span class="nav-switcher__description dt-text dt-text--detail-m">Package that contains the TypeScript types definitions</span>
+          </span>
+        </a>
+      </li>
+    </ul>
+  </div>
+</div>
+  <nav class="side-menu__nav" aria-label="Site navigation">
+
+
+<ul class="dt-list side-menu__list" data-depth="0">
+  <li class="side-menu__item side-menu__item--label">
+    <div class="side-menu__row">
+      <span class="dt-list-item side-menu__link--label dt-list-item--tree--level-0">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Overview</span></span>
+      </span>
+    </div>
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-0"
+        href="main/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">About Weave.js</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-0"
+        href="main/architecture/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Architecture overview</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-0"
+        href="main/application-structure/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Application structure</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-0"
+        href="main/glossary/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Glossary</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item side-menu__item--label">
+    <div class="side-menu__row">
+      <span class="dt-list-item side-menu__link--label dt-list-item--tree--level-0">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Getting started</span></span>
+      </span>
+    </div>
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-0"
+        href="main/requirements/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Requirements</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-0"
+        href="main/quickstart/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Quickstart</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item side-menu__item--branch">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-0"
+        href="main/manual-installation/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Manual Installation</span></span>
+      </a>
+      <button class="side-menu__toggle" type="button" aria-expanded="true" aria-label="Toggle Manual Installation">
+        <svg class="dt-icon" aria-hidden="true" focusable="false"><use href="../../_/img/icons.svg#icon-chevron-down"></use></svg>
+      </button>
+    </div>
+
+<ul class="dt-list side-menu__list" data-depth="1">
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="main/manual-installation/backend/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Set up the backend</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item side-menu__item--branch">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="main/manual-installation/frontend/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Frontend</span></span>
+      </a>
+      <button class="side-menu__toggle" type="button" aria-expanded="true" aria-label="Toggle Frontend">
+        <svg class="dt-icon" aria-hidden="true" focusable="false"><use href="../../_/img/icons.svg#icon-chevron-down"></use></svg>
+      </button>
+    </div>
+
+<ul class="dt-list side-menu__list" data-depth="2">
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-2"
+        href="main/manual-installation/frontend/enter-room-page/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Enter Room page</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-2"
+        href="main/manual-installation/frontend/room-page/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Room page</span></span>
+      </a>
+    </div>
+
+  </li>
+</ul>
+  </li>
+</ul>
+  </li>
+  <li class="side-menu__item side-menu__item--label">
+    <div class="side-menu__row">
+      <span class="dt-list-item side-menu__link--label dt-list-item--tree--level-0">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Build</span></span>
+      </span>
+    </div>
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-0"
+        href="main/build/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Overview</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item side-menu__item--branch">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-0"
+        href="main/build/nodes/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Nodes</span></span>
+      </a>
+      <button class="side-menu__toggle" type="button" aria-expanded="true" aria-label="Toggle Nodes">
+        <svg class="dt-icon" aria-hidden="true" focusable="false"><use href="../../_/img/icons.svg#icon-chevron-down"></use></svg>
+      </button>
+    </div>
+
+<ul class="dt-list side-menu__list" data-depth="1">
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="main/build/nodes/connector/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Connector</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="main/build/nodes/comment/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Comment</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="main/build/nodes/ellipse/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Ellipse</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="main/build/nodes/frame/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Frame</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="main/build/nodes/group/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Group</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="main/build/nodes/image/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Image</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="main/build/nodes/layer/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Layer</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="main/build/nodes/measure/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Measure</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="main/build/nodes/polygon/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Polygon</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="main/build/nodes/rectangle/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Rectangle</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="main/build/nodes/stage/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Stage</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="main/build/nodes/star/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Star</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="main/build/nodes/stroke/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Stroke</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="main/build/nodes/stroke-single/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Stroke Single</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="main/build/nodes/text/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Text</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="main/build/nodes/video/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Video</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="main/build/nodes/arrow/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Arrow (deprecated)</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="main/build/nodes/line/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Line (deprecated)</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="main/build/nodes/regular-polygon/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Regular Polygon (deprecated)</span></span>
+      </a>
+    </div>
+
+  </li>
+</ul>
+  </li>
+  <li class="side-menu__item side-menu__item--branch">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-0"
+        href="main/build/plugins/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Plugins</span></span>
+      </a>
+      <button class="side-menu__toggle" type="button" aria-expanded="true" aria-label="Toggle Plugins">
+        <svg class="dt-icon" aria-hidden="true" focusable="false"><use href="../../_/img/icons.svg#icon-chevron-down"></use></svg>
+      </button>
+    </div>
+
+<ul class="dt-list side-menu__list" data-depth="1">
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="main/build/plugins/comments-renderer/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Comments Renderer</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="main/build/plugins/connected-users/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Connected Users</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="main/build/plugins/context-menu/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Context Menu</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="main/build/plugins/copy-paste-nodes/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Copy &amp; Paste Nodes</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="main/build/plugins/nodes-selection/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Nodes Selection</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="main/build/plugins/nodes-multi-selection-feedback/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Nodes Multi-selection Feedback</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="main/build/plugins/nodes-snapping/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Nodes Snapping</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="main/build/plugins/stage-drop-area/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Stage Drop Area</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="main/build/plugins/stage-grid/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Stage Grid</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="main/build/plugins/stage-keyboard-move/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Stage Keyboard Move</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="main/build/plugins/stage-panning/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Stage Panning</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="main/build/plugins/stage-resize/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Stage Resize</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="main/build/plugins/stage-zoom/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Stage Zoom</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="main/build/plugins/users-pointers/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Users Pointers</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="main/build/plugins/users-presence/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Users Presence</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="main/build/plugins/users-selector/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Users Selector</span></span>
+      </a>
+    </div>
+
+  </li>
+</ul>
+  </li>
+  <li class="side-menu__item side-menu__item--branch">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-0"
+        href="main/build/actions/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Actions</span></span>
+      </a>
+      <button class="side-menu__toggle" type="button" aria-expanded="true" aria-label="Toggle Actions">
+        <svg class="dt-icon" aria-hidden="true" focusable="false"><use href="../../_/img/icons.svg#icon-chevron-down"></use></svg>
+      </button>
+    </div>
+
+<ul class="dt-list side-menu__list" data-depth="1">
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="main/build/actions/align-nodes-tool/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Align Nodes Tool</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="main/build/actions/brush-tool/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Brush Tool</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="main/build/actions/connector-tool/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Connector Tool</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="main/build/actions/comment-tool/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Comment Tool</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="main/build/actions/ellipse-tool/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Ellipse Tool</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="main/build/actions/eraser-tool/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Eraser Tool</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="main/build/actions/export-node-tool/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Export Node Tool</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="main/build/actions/export-stage-tool/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Export Stage Tool</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="main/build/actions/fit-to-screen-tool/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Fit to Screen Tool</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="main/build/actions/fit-to-selection-tool/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Fit to Selection Tool</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="main/build/actions/frame-tool/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Frame Tool</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="main/build/actions/image-tool/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Image Tool</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="main/build/actions/images-tool/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Images Tool</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="main/build/actions/measure-tool/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Measure Tool</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="main/build/actions/move-tool/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Move Tool</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="main/build/actions/polygon-tool/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Polygon Tool</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="main/build/actions/rectangle-tool/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Rectangle Tool</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="main/build/actions/selection-tool/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Selection Tool</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="main/build/actions/star-tool/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Star Tool</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="main/build/actions/stroke-tool/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Stroke Tool</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="main/build/actions/text-tool/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Text Tool</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="main/build/actions/video-tool/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Video Tool</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="main/build/actions/zoom-in-tool/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Zoom In Tool</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="main/build/actions/zoom-out-tool/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Zoom Out Tool</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="main/build/actions/arrow-tool/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Arrow Tool (deprecated)</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="main/build/actions/line-tool/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Line Tool (deprecated)</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="main/build/actions/pen-tool/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Pen Tool (deprecated)</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="main/build/actions/regular-polygon-tool/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Regular Polygon Tool (deprecated)</span></span>
+      </a>
+    </div>
+
+  </li>
+</ul>
+  </li>
+  <li class="side-menu__item side-menu__item--branch">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-0"
+        href="main/build/stores/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Stores</span></span>
+      </a>
+      <button class="side-menu__toggle" type="button" aria-expanded="true" aria-label="Toggle Stores">
+        <svg class="dt-icon" aria-hidden="true" focusable="false"><use href="../../_/img/icons.svg#icon-chevron-down"></use></svg>
+      </button>
+    </div>
+
+<ul class="dt-list side-menu__list" data-depth="1">
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="main/build/stores/websockets-store/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">WebSockets</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="main/build/stores/azure-web-pubsub-store/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Azure Web PubSub</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="main/build/stores/standalone-store/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Standalone</span></span>
+      </a>
+    </div>
+
+  </li>
+</ul>
+  </li>
+  <li class="side-menu__item side-menu__item--label">
+    <div class="side-menu__row">
+      <span class="dt-list-item side-menu__link--label dt-list-item--tree--level-0">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Additional information</span></span>
+      </span>
+    </div>
+  </li>
+  <li class="side-menu__item side-menu__item--branch">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-0"
+        href="main/release-notes/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Release notes</span></span>
+      </a>
+      <button class="side-menu__toggle" type="button" aria-expanded="true" aria-label="Toggle Release notes">
+        <svg class="dt-icon" aria-hidden="true" focusable="false"><use href="../../_/img/icons.svg#icon-chevron-down"></use></svg>
+      </button>
+    </div>
+
+<ul class="dt-list side-menu__list" data-depth="1">
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="main/release-notes/5.0.0/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">v5.0.0</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="main/release-notes/4.0.0/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">v4.0.0</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="main/release-notes/3.0.0/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">v3.0.0</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="main/release-notes/2.0.0/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">v2.0.0</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="main/release-notes/1.0.0/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">v1.0.0</span></span>
+      </a>
+    </div>
+
+  </li>
+</ul>
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-0"
+        href="main/changelog/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Changelog</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-0"
+        href="main/roadmap/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Roadmap</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-0"
+        href="main/contributing/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Contributing</span></span>
+      </a>
+    </div>
+
+  </li>
+</ul>
+  </nav>
+  <div class="side-menu__version">
+
+<div class="page-versions">
+  <button type="button" class="dt-tag dt-tag--solid dt-tag--selected header-toolbar__version header-toolbar__version--prerelease version-menu-toggle" title="Show other versions of page" aria-expanded="false">
+    <span class="dt-tag__label">prerelease</span>
+    <span class="dt-tag__icon"><svg class="dt-icon" aria-hidden="true" focusable="false"><use href="../../_/img/icons.svg#icon-chevron-down"></use></svg></span>
+  </button>
+  <div class="version-menu">
+    <span class="version is-current" aria-current="page">
+      <span class="version__label">prerelease</span>
+      <span class="dt-label dt-label--orange"><span class="dt-label__content">Prerelease</span></span>
+    </span>
+    <a class="version" href="../5.2.1/">
+      <span class="version__label">5.2.1</span>
+      <span class="dt-label dt-label--green"><span class="dt-label__content">Latest</span></span>
+          </a>
+  </div>
+</div>
+  </div>
+</div>
+<div class="side-menu-scrim"></div>
+      <main class="home home--single dt-grid-layout dt-grid-layout--with-margin">
+        <aside class="home__hero">
+<div class="home-hero">
+  <div class="home-hero__intro">
+    <img class="home-hero__logo" src="../../_/product-logo.png" width="40" height="40" alt="">
+    <h1 class="home-hero__title">Weave.js</h1>
+    <div class="home-hero__labels">
+      <div class="dt-label dt-label--grey">
+        <span class="dt-label__content">collaborative</span>
+      </div>
+      <div class="dt-label dt-label--grey">
+        <span class="dt-label__content">canvas</span>
+      </div>
+      <div class="dt-label dt-label--grey">
+        <span class="dt-label__content">real-time</span>
+      </div>
+    </div>
+    <div class="home-hero__actions">
+      <a class="dt-button dt-button--primary dt-button--icon-and-label dt-button--icon-action" href="https://weavejs.cloud.inditex.com">
+        <span class="dt-button__content">Open the showcase<span class="dt-button__icon dt-button__icon-action"><svg class="dt-icon" aria-hidden="true" focusable="false"><use href="../../_/img/icons.svg#icon-external-link"></use></svg></span></span>
+      </a>
+      <a class="dt-button dt-button--secondary" href="main/quickstart/">
+        <span class="dt-button__content">Quickstart</span>
+      </a>
+    </div>
+  </div>
+  <img class="home-hero__media" src="_images/home-hero.png" alt="A Weave.js room with a text node selected on the canvas.">
+</div>
+</aside>
+        <div class="home__main doc"><div id="preamble">
+<div class="sectionbody">
+<div class="paragraph">
+<p>Created for developers, Weave.js is an open-source library that provides all the building blocks, plugins, and APIs to develop visual collaborative tools at the speed of light.</p>
+</div>
+<div class="paragraph">
+<p>Weave.js abstracts the complexity of building real-time, collaborative apps from scratch by handling the three core pillars of any collaborative visual tool:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>Shared state model that allows collaboration</strong>. A structured data layer to model your applications' needs.</p>
+</li>
+<li>
+<p><strong>Real-time shared state synchronization</strong>. Built-in mechanisms for syncing shared-state across clients using atomic diffs and pluggable transport layers.</p>
+</li>
+<li>
+<p><strong>Rendering and interactions (User Interface)</strong>. A decoupled rendering and interaction layer with a simple API to handle shared state changes, user interactions, and custom behaviors. A headless solution (in terms of UI).</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="get-started"><a class="anchor" href="#get-started"></a>Get started</h2>
+<div class="sectionbody">
+<div class="docouture-card-grid docouture-card-grid--cols-1 docouture-card-grid--cols-s-2 docouture-card-grid--cols-m-4 docouture-card-grid--width-container"><div class="dt-card dt-card--vertical docouture-card docouture-card--square"><div class="dt-card__image docouture-card__image"><img src="_images/card-quickstart-flat.png" alt="A room is created, a canvas node is added and a second collaborator connects"></div><div class="dt-card__content"><div class="docouture-card__header"><span class="docouture-card__subheader">Start here</span></div><div class="docouture-card__main"><div class="docouture-card__title"><a href="main/quickstart/" class="xref page">Quickstart</a></div><p>Set up a room, render a canvas and invite a second participant.</p></div></div></div><div class="dt-card dt-card--vertical docouture-card docouture-card--square"><div class="dt-card__image docouture-card__image"><img src="_images/card-sdk-flat.png" alt="The shared state model connects nodes, actions, plugins and canvas rendering primitives"></div><div class="dt-card__content"><div class="docouture-card__header"><span class="docouture-card__subheader">Reference</span></div><div class="docouture-card__main"><div class="docouture-card__title"><a href="sdk/" class="xref page">SDK</a></div><p>The headless library the canvas is built on.</p></div></div></div><div class="dt-card dt-card--vertical docouture-card docouture-card--square"><div class="dt-card__image docouture-card__image"><img src="_images/card-react-flat.png" alt="React components connect into a Weave.js collaborative canvas"></div><div class="dt-card__content"><div class="docouture-card__header"><span class="docouture-card__subheader">Integration</span></div><div class="docouture-card__main"><div class="docouture-card__title"><a href="react/" class="xref page">React Helper</a></div><p>Components for integrating Weave.js into a React application.</p></div></div></div><div class="dt-card dt-card--vertical docouture-card docouture-card--square"><div class="dt-card__image docouture-card__image"><img src="_images/card-stores-flat.png" alt="Two clients synchronize the same room state through a central store transport"></div><div class="dt-card__content"><div class="docouture-card__header"><span class="docouture-card__subheader">Transport</span></div><div class="docouture-card__main"><div class="docouture-card__title"><a href="main/build/stores/" class="xref page">Stores</a></div><p>How a room&#8217;s state reaches every participant, and which transport to pick.</p></div></div></div></div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="build-collaborative-whiteboard-applications"><a class="anchor" href="#build-collaborative-whiteboard-applications"></a>Build collaborative whiteboard applications</h2>
+<div class="sectionbody">
+<div class="docouture-feature-tabs" data-feature-tabs><ul class="docouture-feature-tabs__list"><li class="docouture-feature-tabs__item"><a class="dt-tabs-item docouture-feature-tabs__tab dt-tabs-item--selected" id="feature-tabs-tab-1" href="#feature-tabs-panel-1">UI-agnostic</a></li><li class="docouture-feature-tabs__item"><a class="dt-tabs-item docouture-feature-tabs__tab" id="feature-tabs-tab-2" href="#feature-tabs-panel-2">Powerful abstractions</a></li><li class="docouture-feature-tabs__item"><a class="dt-tabs-item docouture-feature-tabs__tab" id="feature-tabs-tab-3" href="#feature-tabs-panel-3">React Helper library</a></li><li class="docouture-feature-tabs__item"><a class="dt-tabs-item docouture-feature-tabs__tab" id="feature-tabs-tab-4" href="#feature-tabs-panel-4">Light &amp; well-built</a></li></ul><div class="docouture-feature-tabs__panels"><section class="docouture-feature-tabs__panel is-selected" id="feature-tabs-panel-1" aria-label="UI-agnostic"><div class="docouture-feature-tabs__media"><img class="docouture-feature-tabs__image docouture-feature-tabs__image--light" src="_images/feature-1.png" alt="A Weave.js canvas rendered through several UI frameworks"><img class="docouture-feature-tabs__image docouture-feature-tabs__image--dark" src="_images/feature-1-dark.png" alt="feature 1 dark"></div><div class="docouture-feature-tabs__body"><div class="paragraph">
+<p>Change the UI using our included primitives or build a new one. With Weave.js,
+you get a unified system that includes a high-performance, fully customizable
+whiteboard so you can focus on building the product.</p>
+</div></div><a class="dt-button dt-button--ghost docouture-feature-tabs__cta" href="main/architecture/"><span class="dt-button__content">Learn more</span></a></section><section class="docouture-feature-tabs__panel" id="feature-tabs-panel-2" aria-label="Powerful abstractions"><div class="docouture-feature-tabs__media"><img class="docouture-feature-tabs__image docouture-feature-tabs__image--light" src="_images/feature-2.png" alt="The store" width="node" height="plugin and action layers of a Weave.js room"><img class="docouture-feature-tabs__image docouture-feature-tabs__image--dark" src="_images/feature-2-dark.png" alt="feature 2 dark"></div><div class="docouture-feature-tabs__body"><div class="paragraph">
+<p>Keep what you need, discard the rest, and build your own. Stores handle the
+real-time sync complexity while nodes, plugins, and actions allow for
+selection, drawing, erasing, creating geometric shapes, and perfect freehand
+drawing to smooth development.</p>
+</div></div><a class="dt-button dt-button--ghost docouture-feature-tabs__cta" href="main/build/"><span class="dt-button__content">Learn more</span></a></section><section class="docouture-feature-tabs__panel" id="feature-tabs-panel-3" aria-label="React Helper library"><div class="docouture-feature-tabs__media"><img class="docouture-feature-tabs__image docouture-feature-tabs__image--light" src="_images/feature-3.png" alt="Weave.js components rendered inside a React application"><img class="docouture-feature-tabs__image docouture-feature-tabs__image--dark" src="_images/feature-3-dark.png" alt="feature 3 dark"></div><div class="docouture-feature-tabs__body"><div class="paragraph">
+<p>Our React Helper library provides all the necessary components to easily
+integrate Weave.js on top of React projects.</p>
+</div></div><a class="dt-button dt-button--ghost docouture-feature-tabs__cta" href="react/"><span class="dt-button__content">Learn more</span></a></section><section class="docouture-feature-tabs__panel" id="feature-tabs-panel-4" aria-label="Light &amp; well-built"><div class="docouture-feature-tabs__media"><img class="docouture-feature-tabs__image docouture-feature-tabs__image--light" src="_images/feature-4.png" alt="Atomic diffs travelling between two clients of a room"><img class="docouture-feature-tabs__image docouture-feature-tabs__image--dark" src="_images/feature-4-dark.png" alt="feature 4 dark"></div><div class="docouture-feature-tabs__body"><div class="paragraph">
+<p>Weave.js only syncs minimal state changes — not the full tree. It uses a custom
+React Reconciler under the hood to detect and transmit mutations with maximum
+efficiency. Lower overhead, higher performance for live collaboration.</p>
+</div></div><a class="dt-button dt-button--ghost docouture-feature-tabs__cta" href="react/"><span class="dt-button__content">Learn more</span></a></section></div></div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="open-source"><a class="anchor" href="#open-source"></a>Open source</h2>
+<div class="sectionbody">
+<div class="docouture-cta docouture-cta--center"><div class="docouture-cta__body"><p class="docouture-cta__lead dt-text--body-l">Weave.js is actively maintained and open for contributions.</p><p class="docouture-cta__lead dt-text--body-l">It comes with best-in-class documentation and developer experience.</p></div><div class="docouture-cta__actions"><a class="dt-button dt-button--primary docouture-cta__action dt-button--icon-and-label dt-button--icon-icon" href="https://github.com/InditexTech/weavejs-frontend/fork"><span class="dt-button__content"><span class="dt-button__icon dt-button__icon-icon docouture-cta__action-icon docouture-cta__action-icon--github" aria-hidden="true"></span>Create a fork</span></a></div></div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="frequently-asked-questions"><a class="anchor" href="#frequently-asked-questions"></a>Frequently asked questions</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Have more questions? Contact us and we&#8217;ll respond as quickly as possible.</p>
+</div>
+<div class="docouture-accordion-group" role="group" aria-label="Frequently asked questions"><details>
+<summary class="title">What type of applications can I create with Weave.js?</summary>
+<div class="content">
+<div class="paragraph">
+<p>Weave.js is aimed at developers. It provides a framework with all the
+components, plugins, and tools to build custom whiteboards, canvas, and
+collaborative visual tools for your applications. It provides a set of
+nodes, actions, and plugins you can choose from and extend to your needs,
+so you can easily build the perfect whiteboard solution.</p>
+</div>
+<div class="paragraph">
+<p>Although we provide a default UI, you can customize it so the visual
+collaborative tool you build has the look &amp; feel of your liking or matches
+your corporate identity.</p>
+</div>
+</div>
+</details><details>
+<summary class="title">Can I use Weave.js in frontend frameworks other than React?</summary>
+<div class="content">
+<div class="paragraph">
+<p>Yes, you can use Weave.js with any UI framework, but we recommend using it
+with React.</p>
+</div>
+<div class="paragraph">
+<p>Weave.js is framework-agnostic at its core, meaning the rendering and
+collaboration logic can be integrated into different environments. However,
+we provide and maintain a React utility to make the integration with React
+more seamless.</p>
+</div>
+<div class="paragraph">
+<p>If you&#8217;re using another framework (like Vue or Svelte), integration is
+possible, but may require additional setup or custom wrappers not provided
+by Weave.js documentation.</p>
+</div>
+</div>
+</details><details>
+<summary class="title">Is Weave.js free to use and open source?</summary>
+<div class="content">
+<div class="paragraph">
+<p>Yes, Weave.js is free to use and open source. It is distributed under the
+Apache 2.0 License, which means you can use, modify, and distribute the
+software. When using Weave.js, remember to comply with the license: simply
+provide a copy of the License, include the required notices, and indicate
+any modifications you make to the Weave.js code.</p>
+</div>
+</div>
+</details><details>
+<summary class="title">Can I use Weave.js in a commercial application?</summary>
+<div class="content">
+<div class="paragraph">
+<p>Yes, you can use Weave.js in a commercial application. The Apache 2.0
+License is a permissive license that allows its use in all types of
+applications.</p>
+</div>
+</div>
+</details><details>
+<summary class="title">How do I request a feature for Weave.js?</summary>
+<div class="content">
+<div class="paragraph">
+<p>You can find us on <a href="https://github.com/InditexTech/weavejs-frontend">GitHub</a>,
+where you can request new features, contribute with your own, find support,
+and open discussions that will help us improve our product further.</p>
+</div>
+<div class="paragraph">
+<p>If you like it, don&#8217;t forget to give us a star ;-)</p>
+</div>
+</div>
+</details></div>
+</div>
+</div></div>
+      </main>
+    </div>
+
+<footer class="site-footer">
+  <div class="dt-grid-layout dt-grid-layout--with-margin site-footer__grid">
+    <div class="dt-grid-layout__item site-footer__col site-footer__brand">
+      <a class="site-footer__brand-link" href="../5.2.1/">
+        <img class="site-footer__logo" src="../../_/product-logo.png" width="24" height="24" alt="">
+        <span class="dt-text dt-text--label-l-high">Weave.js</span>
+      </a>
+      <span class="dt-text dt-text--detail-m site-footer__legal">&#169; 2026 InditexTech</span>
+    </div>
+    <div class="dt-grid-layout__item site-footer__col site-footer__links">
+      <span class="dt-text dt-text--label-l site-footer__heading">Resources</span>
+      <a class="dt-text dt-text--body-l site-footer__link" href="main/quickstart/">Quickstart</a>
+      <a class="dt-text dt-text--body-l site-footer__link" href="sdk/">SDK</a>
+      <a class="dt-text dt-text--body-l site-footer__link" href="react/">React Helper</a>
+      <a class="dt-text dt-text--body-l site-footer__link" href="main/build/stores/">Stores</a>
+      <a class="dt-text dt-text--body-l site-footer__link" href="https://github.com/InditexTech/weavejs">Repository</a>
+    </div>
+    <div class="dt-grid-layout__item site-footer__col site-footer__links">
+      <span class="dt-text dt-text--label-l site-footer__heading">Modules</span>
+      <a class="dt-text dt-text--body-l site-footer__link" href="main/">Framework</a>
+      <a class="dt-text dt-text--body-l site-footer__link" href="sdk/">SDK</a>
+      <a class="dt-text dt-text--body-l site-footer__link" href="react/">React Helper</a>
+      <a class="dt-text dt-text--body-l site-footer__link" href="store-websockets/">Websockets Store</a>
+      <a class="dt-text dt-text--body-l site-footer__link" href="store-azure-web-pubsub/">Azure Web Pubsub Store</a>
+      <a class="dt-text dt-text--body-l site-footer__link" href="store-standalone/">Standalone Store</a>
+      <a class="dt-text dt-text--body-l site-footer__link" href="types/">TypeScript Types</a>
+    </div>
+  </div>
+</footer>
+
+<script id="site-script" src="../../_/js/site.js" data-ui-root-path="../../_"></script>
+  </body>
+</html>

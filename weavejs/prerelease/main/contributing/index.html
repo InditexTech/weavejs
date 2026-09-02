@@ -1,0 +1,1480 @@
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+
+
+<meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <script>
+      /*
+       * Theme bootstrap. Runs before first paint so the page never flashes the
+       * wrong theme. Keep it inline, keep it tiny, and keep it in sync with
+       * src/js/08-theme.ts, which owns the same storage key and class names.
+       *
+       * IDS switches theme with a class on <html>, not a data attribute, so an
+       * attribute here would style nothing.
+       */
+      (function () {
+        var stored
+        try { stored = localStorage.getItem('dt-theme') } catch (e) {}
+        var theme = stored === 'light' || stored === 'dark'
+          ? stored
+          : window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
+        var root = document.documentElement
+        root.classList.add('dt-theme-' + theme, 'dt-scale-medium')
+        root.style.colorScheme = theme
+      })()
+    </script>
+    <script>
+      /*
+       * Side-menu collapse bootstrap (GH-8). Runs before first paint so the
+       * 320px column never flashes in and reflows the article on navigation.
+       * Keep it inline, keep it tiny, and keep it in sync with
+       * src/js/01-nav.ts, which owns the same storage key and class name.
+       *
+       * A stored choice always wins; absent one, the menu starts collapsed
+       * on the home/landing page (matching Figma's "State=Home" toolbar
+       * variant, which is the only one that shows the toggle) and open
+       * everywhere else. With JavaScript disabled this script never runs, so
+       * the class is never added and the menu stays open unconditionally —
+       * the toggle that would reopen it is also never unhidden.
+       */
+      (function () {
+        var stored
+        try { stored = localStorage.getItem('docouture-side-menu') } catch (e) {}
+        var collapsed = stored === 'collapsed' || stored === 'open'
+          ? stored === 'collapsed'
+          : document.documentElement.hasAttribute('data-page-home')
+        if (collapsed) document.documentElement.classList.add('is-side-menu-collapsed')
+      })()
+    </script>
+    <script>
+      /*
+       * ToC collapse bootstrap (GH-10). Runs before first paint so a closed
+       * choice never flashes open for an instant. Keep it in sync with
+       * src/js/02-on-this-page.ts, which owns the same storage key and class
+       * name.
+       *
+       * Deliberately does NOT add `has-toc` — only 02-on-this-page.ts knows
+       * whether this page actually has a usable ToC (headings found, page
+       * not `-toc`), and every effect of the class added here is itself
+       * gated behind `has-toc` in toc.css, so there is nothing to flash
+       * either way before that script runs. This one exists only so a
+       * *closed* choice is already in place the moment it does.
+       */
+      (function () {
+        var stored
+        try { stored = localStorage.getItem('docouture-toc') } catch (e) {}
+        if (stored === 'closed') document.documentElement.classList.add('is-toc-closed')
+      })()
+    </script>
+
+<title>Contributing | Weave.js</title>
+
+    <link rel="canonical" href="https://inditextech.github.io/weavejs/weavejs/5.2.1/main/contributing/">
+    <link rel="prev" href="../roadmap/">
+    <link rel="next" href="../../sdk/">
+    <meta name="description" content="Want to collaborate? Learn how.">
+    <meta name="generator" content="Antora 3.2.0">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&family=Noto+Sans+Mono:wght@100..900&display=swap">
+    <link rel="stylesheet" href="../../../../_/css/site.css">
+    <style>:root { --home-background-image: url("/weavejs/_/home-background.jpg") }</style>
+
+
+
+    <link rel="icon" href="../../../../_/favicon.ico">
+  </head>
+  <body class="article">
+
+
+
+<header class="header-toolbar">
+  <div class="dt-grid-layout dt-grid-layout--with-margin header-toolbar__grid">
+    <div class="dt-grid-layout__item dt-grid-layout__item--span-6 dt-grid-layout__item--span-xs-3 header-toolbar__left">
+      <button class="dt-button dt-button--ghost dt-button--icon-only side-menu-toggle" type="button" aria-controls="side-menu" hidden>
+        <span class="dt-button__content">
+          <span class="dt-button__icon dt-button__icon-icon"><svg class="dt-icon" aria-hidden="true" focusable="false"><use href="../../../../_/img/icons.svg#icon-menu"></use></svg></span>
+        </span>
+      </button>
+      <a class="header-toolbar__brand" href="../../../5.2.1/">
+        <img class="header-toolbar__logo" src="../../../../_/product-logo.png" width="24" height="24" alt="">
+        <span class="header-toolbar__product-name dt-text dt-text--label-l-high">Weave.js</span>
+      </a>
+    </div>
+    <div class="dt-grid-layout__item dt-grid-layout__item--span-6 dt-grid-layout__item--span-xs-3 header-toolbar__actions">
+      <button type="button" class="dt-button dt-button--ghost header-toolbar__search-trigger">
+        <span class="dt-button__content">
+          <span class="dt-button__icon dt-button__icon-icon"><svg class="dt-icon" aria-hidden="true" focusable="false"><use href="../../../../_/img/icons.svg#icon-search"></use></svg></span>
+          <span class="dt-text dt-text--label-l header-toolbar__search-label">Search</span>
+          <kbd class="header-toolbar__search-shortcut" aria-hidden="true">⌘K</kbd>
+        </span>
+      </button>
+
+<div class="page-versions">
+  <button type="button" class="dt-tag dt-tag--solid dt-tag--selected header-toolbar__version header-toolbar__version--prerelease version-menu-toggle" title="Show other versions of page" aria-expanded="false">
+    <span class="dt-tag__label">prerelease</span>
+    <span class="dt-tag__icon"><svg class="dt-icon" aria-hidden="true" focusable="false"><use href="../../../../_/img/icons.svg#icon-chevron-down"></use></svg></span>
+  </button>
+  <div class="version-menu">
+    <span class="version is-current" aria-current="page">
+      <span class="version__label">prerelease</span>
+      <span class="dt-label dt-label--orange"><span class="dt-label__content">Prerelease</span></span>
+    </span>
+    <a class="version" href="../../../5.2.1/main/contributing/">
+      <span class="version__label">5.2.1</span>
+      <span class="dt-label dt-label--green"><span class="dt-label__content">Latest</span></span>
+          </a>
+  </div>
+</div>
+
+<a class="dt-button dt-button--ghost dt-button--icon-only header-toolbar__repo" href="https://github.com/InditexTech/weavejs" target="_blank" rel="noopener" aria-label="Repository">
+  <span class="dt-button__content">
+    <span class="dt-button__icon dt-button__icon-icon header-toolbar__repo-icon" aria-hidden="true"></span>
+  </span>
+</a>
+
+<button class="dt-button dt-button--ghost dt-button--icon-only theme-toggle" type="button" hidden>
+  <span class="dt-button__content">
+    <span class="dt-button__icon dt-button__icon-icon theme-toggle-icon theme-toggle-icon--light" aria-hidden="true"><svg class="dt-icon" aria-hidden="true" focusable="false"><use href="../../../../_/img/icons.svg#icon-sun"></use></svg></span>
+    <span class="dt-button__icon dt-button__icon-icon theme-toggle-icon theme-toggle-icon--dark" aria-hidden="true"><svg class="dt-icon" aria-hidden="true" focusable="false"><use href="../../../../_/img/icons.svg#icon-moon"></use></svg></span>
+  </span>
+</button>
+    </div>
+  </div>
+</header>
+
+<dialog id="search-dialog" class="search-dialog" aria-label="Search" data-search-index="weavejs-prerelease.json">
+  <div class="dt-overlay dt-overlay--visible search-dialog__overlay">
+    <div class="dt-overlay__content"></div>
+    <div class="dt-modal dt-modal--small search-dialog__panel">
+      <div class="dt-modal__container search-dialog__container">
+        <div class="dt-search-field-minimal dt-search-field-minimal--full-width search-dialog__field">
+          <span class="dt-search-field-minimal__icon-start" aria-hidden="true"><svg class="dt-icon" aria-hidden="true" focusable="false"><use href="../../../../_/img/icons.svg#icon-search"></use></svg></span>
+          <div class="dt-search-field-minimal__input-wrapper">
+            <div class="dt-search-field-minimal__input-container">
+              <input type="search" class="dt-search-field-minimal__input" placeholder="Search the docs" aria-label="Search the docs"
+                role="combobox" aria-expanded="false" aria-haspopup="listbox" aria-autocomplete="list"
+                aria-controls="search-dialog-listbox" disabled>
+            </div>
+          </div>
+          <button type="button" class="dt-button dt-button--ghost dt-button--icon-only search-dialog__close" aria-label="Close search" disabled>
+            <span class="dt-button__content">
+              <span class="dt-button__icon dt-button__icon-icon"><svg class="dt-icon" aria-hidden="true" focusable="false"><use href="../../../../_/img/icons.svg#icon-x"></use></svg></span>
+            </span>
+          </button>
+        </div>
+        <div class="search-dialog__chips" role="group" aria-label="Filter results by module">
+          <button type="button" class="dt-tag dt-tag--solid dt-tag--selected search-dialog__chip" data-category="" aria-pressed="true">
+            <span class="dt-tag__label">All</span>
+          </button>
+          <button type="button" class="dt-tag dt-tag--solid search-dialog__chip" data-category="Framework" aria-pressed="false">
+            <span class="dt-tag__label">Framework</span>
+          </button>
+          <button type="button" class="dt-tag dt-tag--solid search-dialog__chip" data-category="SDK" aria-pressed="false">
+            <span class="dt-tag__label">SDK</span>
+          </button>
+          <button type="button" class="dt-tag dt-tag--solid search-dialog__chip" data-category="React Helper" aria-pressed="false">
+            <span class="dt-tag__label">React Helper</span>
+          </button>
+          <button type="button" class="dt-tag dt-tag--solid search-dialog__chip" data-category="Websockets Store" aria-pressed="false">
+            <span class="dt-tag__label">Websockets Store</span>
+          </button>
+          <button type="button" class="dt-tag dt-tag--solid search-dialog__chip" data-category="Azure Web Pubsub Store" aria-pressed="false">
+            <span class="dt-tag__label">Azure Web Pubsub Store</span>
+          </button>
+          <button type="button" class="dt-tag dt-tag--solid search-dialog__chip" data-category="Standalone Store" aria-pressed="false">
+            <span class="dt-tag__label">Standalone Store</span>
+          </button>
+          <button type="button" class="dt-tag dt-tag--solid search-dialog__chip" data-category="TypeScript Types" aria-pressed="false">
+            <span class="dt-tag__label">TypeScript Types</span>
+          </button>
+        </div>
+        <div id="search-dialog-listbox" class="dt-modal__content dt-modal__content--scrollable search-dialog__results" role="listbox" aria-label="Search results"></div>
+        <div class="search-dialog__status" aria-live="polite"></div>
+        <div class="dt-modal__footer dt-modal__footer--horizontal search-dialog__footer">
+          <span class="dt-modal__footer-left dt-text dt-text--detail-m search-dialog__hints">
+            <kbd>&uarr;&darr;</kbd> navigate &middot; <kbd>&crarr;</kbd> select &middot; <kbd>esc</kbd> close
+          </span>
+        </div>
+      </div>
+    </div>
+  </div>
+</dialog>
+<div class="dt-floating-button-wrapper dt-floating-button-wrapper--viewport dt-floating-button-wrapper--end search-fab">
+  <button type="button" class="dt-button dt-button--ghost dt-button--icon-only dt-floating-button search-fab__trigger" aria-label="Search" aria-haspopup="dialog" aria-controls="search-dialog">
+    <span class="dt-button__content">
+      <span class="dt-button__icon dt-button__icon-icon"><svg class="dt-icon" aria-hidden="true" focusable="false"><use href="../../../../_/img/icons.svg#icon-search"></use></svg></span>
+    </span>
+  </button>
+</div>
+
+<dialog id="image-zoom-dialog" class="image-zoom-dialog" aria-label="Zoomed image">
+  <div class="dt-overlay dt-overlay--visible image-zoom-dialog__overlay">
+    <div class="dt-overlay__content"></div>
+    <div class="dt-modal dt-modal--fullscreen image-zoom-dialog__panel">
+      <div class="dt-modal__container image-zoom-dialog__container">
+        <button type="button" class="dt-button dt-button--ghost dt-button--icon-only image-zoom-dialog__close" aria-label="Close zoomed image">
+          <span class="dt-button__content">
+            <span class="dt-button__icon dt-button__icon-icon"><svg class="dt-icon" aria-hidden="true" focusable="false"><use href="../../../../_/img/icons.svg#icon-x"></use></svg></span>
+          </span>
+        </button>
+        <div class="image-zoom-dialog__content"></div>
+      </div>
+    </div>
+  </div>
+</dialog>
+
+<div class="body">
+
+<div id="side-menu" class="side-menu" data-component="weavejs" data-version="prerelease" data-module="main">
+  <div class="side-menu__header">
+    <div class="side-menu__header-start">
+      <img class="side-menu__header-logo" src="../../../../_/product-logo.png" width="24" height="24" alt="">
+      <span class="side-menu__header-title dt-text dt-text--title-s">Weave.js</span>
+    </div>
+    <button class="side-menu__close" type="button" aria-label="Close navigation"><svg class="dt-icon" aria-hidden="true" focusable="false"><use href="../../../../_/img/icons.svg#icon-x"></use></svg></button>
+  </div>
+
+<div class="side-menu__brand">
+  <a class="side-menu__brand-link" href="../../../5.2.1/">
+    <img class="side-menu__brand-logo" src="../../../../_/product-logo.png" width="40" height="40" alt="">
+    <span class="side-menu__brand-title dt-text dt-text--title-m">Weave.js</span>
+  </a>
+</div>
+
+<div class="nav-switcher">
+  <button class="nav-switcher__toggle" type="button" aria-expanded="false" aria-haspopup="true" aria-label="Switch module, currently Framework">
+    <span class="nav-switcher__icon"><svg class="dt-icon" aria-hidden="true" focusable="false"><use href="../../../../_/img/icons.svg#icon-grid-3x3"></use></svg></span>
+    <span class="nav-switcher__label">
+      <span class="nav-switcher__title dt-text dt-text--body-m-high">Framework</span>
+      <span class="nav-switcher__description dt-text dt-text--detail-m">The visual collaborative apps framework</span>
+    </span>
+    <span class="nav-switcher__chevron"><svg class="dt-icon" aria-hidden="true" focusable="false"><use href="../../../../_/img/icons.svg#icon-chevron-down"></use></svg></span>
+  </button>
+  <div class="nav-switcher__menu" hidden>
+    <ul class="dt-list nav-switcher__list">
+      <li class="nav-switcher__item">
+        <a class="nav-switcher__option" href="../" aria-current="true">
+          <span class="nav-switcher__icon"><svg class="dt-icon" aria-hidden="true" focusable="false"><use href="../../../../_/img/icons.svg#icon-grid-3x3"></use></svg></span>
+          <span class="nav-switcher__label">
+            <span class="nav-switcher__title dt-text dt-text--body-m-high">Framework</span>
+            <span class="nav-switcher__description dt-text dt-text--detail-m">The visual collaborative apps framework</span>
+          </span>
+        </a>
+      </li>
+      <li class="nav-switcher__item">
+        <a class="nav-switcher__option" href="../../sdk/">
+          <span class="nav-switcher__icon"><svg class="dt-icon" aria-hidden="true" focusable="false"><use href="../../../../_/img/icons.svg#icon-code"></use></svg></span>
+          <span class="nav-switcher__label">
+            <span class="nav-switcher__title dt-text dt-text--body-m-high">SDK</span>
+            <span class="nav-switcher__description dt-text dt-text--detail-m">The visual collaborative tool headless library</span>
+          </span>
+        </a>
+      </li>
+      <li class="nav-switcher__item">
+        <a class="nav-switcher__option" href="../../react/">
+          <span class="nav-switcher__icon"><svg class="dt-icon" aria-hidden="true" focusable="false"><use href="../../../../_/img/icons.svg#icon-wrench"></use></svg></span>
+          <span class="nav-switcher__label">
+            <span class="nav-switcher__title dt-text dt-text--body-m-high">React Helper</span>
+            <span class="nav-switcher__description dt-text dt-text--detail-m">Set of React components to help you integrate Weave.js</span>
+          </span>
+        </a>
+      </li>
+      <li class="nav-switcher__item">
+        <a class="nav-switcher__option" href="../../store-websockets/">
+          <span class="nav-switcher__icon"><svg class="dt-icon" aria-hidden="true" focusable="false"><use href="../../../../_/img/icons.svg#icon-wifi"></use></svg></span>
+          <span class="nav-switcher__label">
+            <span class="nav-switcher__title dt-text dt-text--body-m-high">Websockets Store</span>
+            <span class="nav-switcher__description dt-text dt-text--detail-m">Store implementation using WebSockets as transport</span>
+          </span>
+        </a>
+      </li>
+      <li class="nav-switcher__item">
+        <a class="nav-switcher__option" href="../../store-azure-web-pubsub/">
+          <span class="nav-switcher__icon"><svg class="dt-icon" aria-hidden="true" focusable="false"><use href="../../../../_/img/icons.svg#icon-cloud"></use></svg></span>
+          <span class="nav-switcher__label">
+            <span class="nav-switcher__title dt-text dt-text--body-m-high">Azure Web Pubsub Store</span>
+            <span class="nav-switcher__description dt-text dt-text--detail-m">Store implementation using Azure Web Pubsub as transport</span>
+          </span>
+        </a>
+      </li>
+      <li class="nav-switcher__item">
+        <a class="nav-switcher__option" href="../../store-standalone/">
+          <span class="nav-switcher__icon"><svg class="dt-icon" aria-hidden="true" focusable="false"><use href="../../../../_/img/icons.svg#icon-server"></use></svg></span>
+          <span class="nav-switcher__label">
+            <span class="nav-switcher__title dt-text dt-text--body-m-high">Standalone Store</span>
+            <span class="nav-switcher__description dt-text dt-text--detail-m">Store implementation to render a Weave.js canvas in a direct way, just pass a room data.</span>
+          </span>
+        </a>
+      </li>
+      <li class="nav-switcher__item">
+        <a class="nav-switcher__option" href="../../types/">
+          <span class="nav-switcher__icon"><svg class="dt-icon" aria-hidden="true" focusable="false"><use href="../../../../_/img/icons.svg#icon-file"></use></svg></span>
+          <span class="nav-switcher__label">
+            <span class="nav-switcher__title dt-text dt-text--body-m-high">TypeScript Types</span>
+            <span class="nav-switcher__description dt-text dt-text--detail-m">Package that contains the TypeScript types definitions</span>
+          </span>
+        </a>
+      </li>
+    </ul>
+  </div>
+</div>
+  <nav class="side-menu__nav" aria-label="Site navigation">
+
+
+<ul class="dt-list side-menu__list" data-depth="0">
+  <li class="side-menu__item side-menu__item--label">
+    <div class="side-menu__row">
+      <span class="dt-list-item side-menu__link--label dt-list-item--tree--level-0">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Overview</span></span>
+      </span>
+    </div>
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-0"
+        href="../">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">About Weave.js</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-0"
+        href="../architecture/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Architecture overview</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-0"
+        href="../application-structure/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Application structure</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-0"
+        href="../glossary/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Glossary</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item side-menu__item--label">
+    <div class="side-menu__row">
+      <span class="dt-list-item side-menu__link--label dt-list-item--tree--level-0">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Getting started</span></span>
+      </span>
+    </div>
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-0"
+        href="../requirements/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Requirements</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-0"
+        href="../quickstart/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Quickstart</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item side-menu__item--branch">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-0"
+        href="../manual-installation/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Manual Installation</span></span>
+      </a>
+      <button class="side-menu__toggle" type="button" aria-expanded="true" aria-label="Toggle Manual Installation">
+        <svg class="dt-icon" aria-hidden="true" focusable="false"><use href="../../../../_/img/icons.svg#icon-chevron-down"></use></svg>
+      </button>
+    </div>
+
+<ul class="dt-list side-menu__list" data-depth="1">
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="../manual-installation/backend/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Set up the backend</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item side-menu__item--branch">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="../manual-installation/frontend/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Frontend</span></span>
+      </a>
+      <button class="side-menu__toggle" type="button" aria-expanded="true" aria-label="Toggle Frontend">
+        <svg class="dt-icon" aria-hidden="true" focusable="false"><use href="../../../../_/img/icons.svg#icon-chevron-down"></use></svg>
+      </button>
+    </div>
+
+<ul class="dt-list side-menu__list" data-depth="2">
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-2"
+        href="../manual-installation/frontend/enter-room-page/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Enter Room page</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-2"
+        href="../manual-installation/frontend/room-page/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Room page</span></span>
+      </a>
+    </div>
+
+  </li>
+</ul>
+  </li>
+</ul>
+  </li>
+  <li class="side-menu__item side-menu__item--label">
+    <div class="side-menu__row">
+      <span class="dt-list-item side-menu__link--label dt-list-item--tree--level-0">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Build</span></span>
+      </span>
+    </div>
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-0"
+        href="../build/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Overview</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item side-menu__item--branch">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-0"
+        href="../build/nodes/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Nodes</span></span>
+      </a>
+      <button class="side-menu__toggle" type="button" aria-expanded="true" aria-label="Toggle Nodes">
+        <svg class="dt-icon" aria-hidden="true" focusable="false"><use href="../../../../_/img/icons.svg#icon-chevron-down"></use></svg>
+      </button>
+    </div>
+
+<ul class="dt-list side-menu__list" data-depth="1">
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="../build/nodes/connector/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Connector</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="../build/nodes/comment/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Comment</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="../build/nodes/ellipse/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Ellipse</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="../build/nodes/frame/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Frame</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="../build/nodes/group/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Group</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="../build/nodes/image/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Image</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="../build/nodes/layer/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Layer</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="../build/nodes/measure/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Measure</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="../build/nodes/polygon/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Polygon</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="../build/nodes/rectangle/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Rectangle</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="../build/nodes/stage/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Stage</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="../build/nodes/star/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Star</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="../build/nodes/stroke/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Stroke</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="../build/nodes/stroke-single/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Stroke Single</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="../build/nodes/text/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Text</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="../build/nodes/video/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Video</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="../build/nodes/arrow/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Arrow (deprecated)</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="../build/nodes/line/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Line (deprecated)</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="../build/nodes/regular-polygon/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Regular Polygon (deprecated)</span></span>
+      </a>
+    </div>
+
+  </li>
+</ul>
+  </li>
+  <li class="side-menu__item side-menu__item--branch">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-0"
+        href="../build/plugins/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Plugins</span></span>
+      </a>
+      <button class="side-menu__toggle" type="button" aria-expanded="true" aria-label="Toggle Plugins">
+        <svg class="dt-icon" aria-hidden="true" focusable="false"><use href="../../../../_/img/icons.svg#icon-chevron-down"></use></svg>
+      </button>
+    </div>
+
+<ul class="dt-list side-menu__list" data-depth="1">
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="../build/plugins/comments-renderer/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Comments Renderer</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="../build/plugins/connected-users/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Connected Users</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="../build/plugins/context-menu/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Context Menu</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="../build/plugins/copy-paste-nodes/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Copy &amp; Paste Nodes</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="../build/plugins/nodes-selection/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Nodes Selection</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="../build/plugins/nodes-multi-selection-feedback/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Nodes Multi-selection Feedback</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="../build/plugins/nodes-snapping/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Nodes Snapping</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="../build/plugins/stage-drop-area/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Stage Drop Area</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="../build/plugins/stage-grid/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Stage Grid</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="../build/plugins/stage-keyboard-move/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Stage Keyboard Move</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="../build/plugins/stage-panning/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Stage Panning</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="../build/plugins/stage-resize/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Stage Resize</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="../build/plugins/stage-zoom/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Stage Zoom</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="../build/plugins/users-pointers/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Users Pointers</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="../build/plugins/users-presence/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Users Presence</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="../build/plugins/users-selector/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Users Selector</span></span>
+      </a>
+    </div>
+
+  </li>
+</ul>
+  </li>
+  <li class="side-menu__item side-menu__item--branch">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-0"
+        href="../build/actions/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Actions</span></span>
+      </a>
+      <button class="side-menu__toggle" type="button" aria-expanded="true" aria-label="Toggle Actions">
+        <svg class="dt-icon" aria-hidden="true" focusable="false"><use href="../../../../_/img/icons.svg#icon-chevron-down"></use></svg>
+      </button>
+    </div>
+
+<ul class="dt-list side-menu__list" data-depth="1">
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="../build/actions/align-nodes-tool/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Align Nodes Tool</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="../build/actions/brush-tool/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Brush Tool</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="../build/actions/connector-tool/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Connector Tool</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="../build/actions/comment-tool/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Comment Tool</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="../build/actions/ellipse-tool/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Ellipse Tool</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="../build/actions/eraser-tool/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Eraser Tool</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="../build/actions/export-node-tool/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Export Node Tool</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="../build/actions/export-stage-tool/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Export Stage Tool</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="../build/actions/fit-to-screen-tool/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Fit to Screen Tool</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="../build/actions/fit-to-selection-tool/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Fit to Selection Tool</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="../build/actions/frame-tool/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Frame Tool</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="../build/actions/image-tool/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Image Tool</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="../build/actions/images-tool/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Images Tool</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="../build/actions/measure-tool/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Measure Tool</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="../build/actions/move-tool/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Move Tool</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="../build/actions/polygon-tool/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Polygon Tool</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="../build/actions/rectangle-tool/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Rectangle Tool</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="../build/actions/selection-tool/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Selection Tool</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="../build/actions/star-tool/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Star Tool</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="../build/actions/stroke-tool/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Stroke Tool</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="../build/actions/text-tool/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Text Tool</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="../build/actions/video-tool/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Video Tool</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="../build/actions/zoom-in-tool/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Zoom In Tool</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="../build/actions/zoom-out-tool/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Zoom Out Tool</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="../build/actions/arrow-tool/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Arrow Tool (deprecated)</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="../build/actions/line-tool/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Line Tool (deprecated)</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="../build/actions/pen-tool/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Pen Tool (deprecated)</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="../build/actions/regular-polygon-tool/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Regular Polygon Tool (deprecated)</span></span>
+      </a>
+    </div>
+
+  </li>
+</ul>
+  </li>
+  <li class="side-menu__item side-menu__item--branch">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-0"
+        href="../build/stores/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Stores</span></span>
+      </a>
+      <button class="side-menu__toggle" type="button" aria-expanded="true" aria-label="Toggle Stores">
+        <svg class="dt-icon" aria-hidden="true" focusable="false"><use href="../../../../_/img/icons.svg#icon-chevron-down"></use></svg>
+      </button>
+    </div>
+
+<ul class="dt-list side-menu__list" data-depth="1">
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="../build/stores/websockets-store/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">WebSockets</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="../build/stores/azure-web-pubsub-store/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Azure Web PubSub</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="../build/stores/standalone-store/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Standalone</span></span>
+      </a>
+    </div>
+
+  </li>
+</ul>
+  </li>
+  <li class="side-menu__item side-menu__item--label">
+    <div class="side-menu__row">
+      <span class="dt-list-item side-menu__link--label dt-list-item--tree--level-0">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Additional information</span></span>
+      </span>
+    </div>
+  </li>
+  <li class="side-menu__item side-menu__item--branch">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-0"
+        href="../release-notes/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Release notes</span></span>
+      </a>
+      <button class="side-menu__toggle" type="button" aria-expanded="true" aria-label="Toggle Release notes">
+        <svg class="dt-icon" aria-hidden="true" focusable="false"><use href="../../../../_/img/icons.svg#icon-chevron-down"></use></svg>
+      </button>
+    </div>
+
+<ul class="dt-list side-menu__list" data-depth="1">
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="../release-notes/5.0.0/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">v5.0.0</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="../release-notes/4.0.0/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">v4.0.0</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="../release-notes/3.0.0/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">v3.0.0</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="../release-notes/2.0.0/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">v2.0.0</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="../release-notes/1.0.0/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">v1.0.0</span></span>
+      </a>
+    </div>
+
+  </li>
+</ul>
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-0"
+        href="../changelog/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Changelog</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-0"
+        href="../roadmap/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Roadmap</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-0"
+        href="./" aria-current="page">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Contributing</span></span>
+      </a>
+    </div>
+
+  </li>
+</ul>
+  </nav>
+  <div class="side-menu__version">
+
+<div class="page-versions">
+  <button type="button" class="dt-tag dt-tag--solid dt-tag--selected header-toolbar__version header-toolbar__version--prerelease version-menu-toggle" title="Show other versions of page" aria-expanded="false">
+    <span class="dt-tag__label">prerelease</span>
+    <span class="dt-tag__icon"><svg class="dt-icon" aria-hidden="true" focusable="false"><use href="../../../../_/img/icons.svg#icon-chevron-down"></use></svg></span>
+  </button>
+  <div class="version-menu">
+    <span class="version is-current" aria-current="page">
+      <span class="version__label">prerelease</span>
+      <span class="dt-label dt-label--orange"><span class="dt-label__content">Prerelease</span></span>
+    </span>
+    <a class="version" href="../../../5.2.1/main/contributing/">
+      <span class="version__label">5.2.1</span>
+      <span class="dt-label dt-label--green"><span class="dt-label__content">Latest</span></span>
+          </a>
+  </div>
+</div>
+  </div>
+</div>
+<div class="side-menu-scrim"></div>
+
+<main class="article">
+
+<div class="hero">
+  <div class="dt-grid-layout dt-grid-layout--with-margin hero__grid">
+    <div class="dt-grid-layout__item dt-grid-layout__item--span-full hero__row">
+      <div class="hero__main">
+
+<nav class="dt-breadcrumbs" aria-label="Breadcrumb">
+  <a class="dt-breadcrumb-item dt-breadcrumb-item--link" href="../../"><span class="dt-breadcrumb-item__content">Weave.js</span></a>
+  <div class="dt-breadcrumb-item dt-breadcrumb-item--active" aria-current="page"><span class="dt-breadcrumb-item__content">Contributing</span></div>
+</nav>
+        <h1 class="hero__title dt-text dt-text--title-xl">Contributing</h1>
+        <p class="hero__excerpt dt-text dt-text--body-l">Want to collaborate? Learn how.</p>
+      </div>
+      <div class="hero__aside">
+        <button class="dt-button dt-button--ghost dt-button--icon-only toc-toggle" type="button" aria-controls="on-this-page" aria-expanded="true" hidden>
+          <span class="dt-button__content">
+            <span class="dt-button__icon dt-button__icon-icon"><svg class="dt-icon" aria-hidden="true" focusable="false"><use href="../../../../_/img/icons.svg#icon-panel-left"></use></svg></span>
+          </span>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+  <div class="content dt-grid-layout dt-grid-layout--with-margin">
+
+<aside id="on-this-page" class="toc" data-title="On this page" data-levels="4">
+  <div class="toc-menu"></div>
+</aside>
+
+<article class="doc">
+<div id="preamble">
+<div class="sectionbody">
+<div class="paragraph">
+<p><strong>Weave.js</strong> is an open-sourced and growing project, and we welcome contributions
+from developers, designers, technical writers, and the broader community!</p>
+</div>
+<div class="paragraph">
+<p>Your ideas, improvements, bug fixes, and new features help make Weave.js better,
+stronger, and more useful for all the community.</p>
+</div>
+<div class="paragraph">
+<p>This section explains how external collaborators can get involved, collaborate
+with the project, and make an impact.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="ways-to-collaborate"><a class="anchor" href="#ways-to-collaborate"></a>Ways to Collaborate</h2>
+<div class="sectionbody">
+<div class="tableblock-wrap"><div class="tablecontainer"><table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Area</th>
+<th class="tableblock halign-left valign-top">How You Can Contribute</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>Code Contributions</strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Fix bugs, improve performance, build new features, or extend plugin and store support.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>Documentation</strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Help us improve or expand the docs: quickstarts, tutorials, architecture deep-dives, or translations.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>Testing and QA</strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Try new releases, report issues, suggest improvements for usability, performance, or developer experience.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>Ideas and Proposals</strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Suggest new tools, plugins, integrations, or use cases by opening discussions.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>Community Engagement</strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Answer questions, write blog posts or tutorials about Weave.js, help other developers get started.</p></td>
+</tr>
+</tbody>
+</table></div></div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="how-to-start-contributing"><a class="anchor" href="#how-to-start-contributing"></a>How to start contributing</h2>
+<div class="sectionbody">
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p><strong>Check the open issues</strong>: browse the <a href="https://github.com/InditexTech/weavejs/issues">GitHub Issues</a>
+to find open bugs, enhancement requests, or tasks labeled "candidate".</p>
+</li>
+<li>
+<p><strong>Fork the repository</strong>: fork the <a href="https://github.com/InditexTech/weavejs">Weave.js GitHub repository</a>
+and create a new branch for your contribution.</p>
+</li>
+<li>
+<p><strong>Follow the development guidelines</strong>: please read the <a href="https://github.com/InditexTech/weavejs/blob/main/CONTRIBUTING.md">CONTRIBUTING.md</a>
+file for coding standards, commit style, and pull request best practices.</p>
+</li>
+<li>
+<p><strong>Submit a pull request</strong>: open a <a href="https://github.com/InditexTech/weavejs/pulls">pull request</a>
+(PR) with a clear description of what you changed or added. The core team will
+review it, suggest feedback if necessary, and merge when ready.</p>
+</li>
+</ol>
+</div>
+<div class="paragraph">
+<p>If you&#8217;re more visual, here&#8217;s a flowchart for the collaboration process:</p>
+</div>
+<div class="docouture-diagram zoom-in" data-diagram-type="mermaid"><div class="docouture-diagram__content"><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAjwAAAObCAYAAABXYVt4AAAQAElEQVR4nOzdBZhVVdvG8YdGUFBQMVCwEcXuQLEDA7u7sAMsRMHEQlEUbEHB1lcxMLEVG0RBsBBFQURp6W/d67jmOzNMnIl9Yu//77rWNcyZMyeH2fc861lr1zYAAICYq20AAAAxR+ABAACxR+ABAACxR+ABAACxR+ABAACxR+ABAACxV9eA/NDDABSqr914xoA8VsuA3NPP4aKrrrrKABSWUaNG2bBhw16aOnVqRwPyGIEH+cAHnsWLFxuAwvL444/bWWedReBB3qOHBwAAxB6BBwAAxB6BBwAAxB6BBwAAxB6BBwAAxB6BBwAAxB6BBwAAxB6BBwAAxB6BBwAAxB6BBwAAxB6BBwAAxB6BBwAAxB6BBwAAxB6BBwAAxB6BBwAAxB6BBwAAxB6BB0AkvvjiC3vggQds/vz5lhTPP/+8vfLKKwYg/xB4gAj98ssvdvLJJ9uoUaMsabp06WKnnHKKffrpp5YEixYtsoMOOsj22WcfA5B/CDyAs9pqq1mtWrWKjbXXXtuqS4HnwQcftH/++Sej6+++++7WsWPHYpd17drVP5633nqr2OUtWrSwm266yfJVjx49rHfv3rbllltaVYwZM6bY+9G6dWs74IAD7PPPP7d8VLt2bRs4cKANHjy42OW//vqrTZkyxQDkVl0D4CloXHTRRUWfL7PMMpZtG220kT333HPFLvvyyy/9Rx3od9llF//vSZMm2eTJk23jjTe2fNW+fXs/quvyyy+33Xbbzb799lt78cUXbauttrKhQ4f6cJhvjj766GKff//997bOOuvY448/bocffrgByB0CD/AfVUx23nlnyyUFHlVFZs2aZY0bN/bTJJ988ontsMMORcFHwhRZPgeemrLuuutahw4d/DjjjDNs/fXX95WtfAw8APIXU1pABRYvXmy33HKL7bjjjta0aVPbdNNN7Yknnih2nffff99Pu4wdO9ZOPPFEH1ZK69vR1JYO4Kom6XZLUuCRESNG+I/fffedzZkzx0466ST77LPPiq6n215hhRVspZVW8p8vXLjQrrjiCtt8881tueWWs/32289XgIKvv/7ajj32WF8dadKkiW2//fb29NNPF32vbueYY44p9ljee+89/5xeeOGFjO6jpKuuusqWXXbZos/nzp1rxx9/vH/+egzbbLON3XzzzT7UZapOnTo+8IwbN67oskweV/369X2Q3H///W355Ze3NdZYw3r27LnE7eu57rvvvtasWTP/OLt161bs8el+1aOz6qqr2oorruhDlxqVg7333tsPUThTdUeOOOII/1q+/vrr/vNMfqZuuOEGPx2owLvHHnv49+jOO+/0t/Pbb78Vu26nTp1s6623NgBlI/AAFdCB6bLLLvMhQT0aW2yxhT+AvfTSS0tc96ijjrJGjRrZ/fffb23atCn2NR3kQqh49NFH/YGrpA022MDq1q1ro0eP9p9rGqtdu3b+vnWw/fPPP/3l33zzjQ8vgQ7eOkButtlmds899/gpr7322qsoVOkArcd98cUX26BBg/z9aPrlp59+8iFCB8xXX33Vh4dA00aa1tPtZHIfFbn99tvt2Weftc6dO/s+F013DRkyxBYsWGCVoVC58sorZ/zcg+7du/tQoKmxSy65xPcYPfPMM0Vf//DDD+3ggw/2YVWryxQQb7vtNv/eBxdccIHvy7rmmmvs7rvvtlVWWaUoxJSk6+q1Ft3XsGHDbNttt/WfZ/ozNXHiRP8+KfDoMR1yyCH+8hBCRUHytdde80EPQNmY0gLKoYPJjTfeaGeeeab16tXLX6bG2fHjx9u1117rqwHpWrZsaXfddVfR5yHU6ON1113nD3offfRRscpHOlUiNtlkE39QFgUeHchVbVD40IonVRgUeHbaaSd/HVWA+vTp48PWfffd5y9T5UBNvjoQ7rnnnr5icd555xXdj3qBdN0333zTr6Q68MADrX///r5SFW5XAUiVKD2mTO6jIl999ZUPCAoCUrI5OxMKGWpmvuOOOzJ+7oGqZKrYiKov/fr1swEDBviQI3p/FQSffPJJ/7lCoN43hSkFxebNm/v3Q1Ui3ZaEAFKa9dZbz4dJUfgN06WV+ZlS4FE4Su8tU2jTe6PgKKrEzZ492z8uAGWjwgP8R39Bp68K+vjjj2348OH2119/FYWAQNUJfV29NumOO+64Um9bwUJTPPfee2/RtFVZVNEJFR7tZaPAI6oOhBVK6ufR9USPY/r06cV6WlQBWWuttfzjD1RV0sFSwWnppZf2l+n7RE3Bmg4Ke8hoyiQc3CtzH+VRwFF1RmHhjTfeyHgq64QTTih6T1QVufrqq+3ss8+u9ONS2Eqn1y/0RamypYqW+oTSKTwpTGhaSRRMVJ1SxWbkyJFWFZX9mdIUaTpVchTm5s2b5z9X+NHUWUU/V0DSEXiA/+iArApMGG3btrW///7bf019FulChUZLjtOpr6M0OmjqAJ/Jyi81IivwhIZl9aaIPioAaWpLlY3QsBxCi/pj0gObbiM8PlWdNEWjao4qJCU3A1QlQlUeHfRFUytLLbVU0Z4ymdxHRVSFefjhh23atGm+MqKqR+gjKo9Waen9UPhYc801/eehcladx6X3VBUUmTFjhn9N1FuUTiFQwm2p2qL7/+CDD/z7oYCU3kyeicr8TNWrV89X59Ip8Oj9V4gWhR8FMQDlY0oL+E9pq7TU+yIl99EJn6txOBM6SKlqcuqpp/pKTXnfp7/Uf/75Z18JUH9LqPDoo6ZgNJ2lMBJ6hMJj1PRIycbV0Oty6623+qkS3b+U1jejTfMeeugh/zhVNVDVJASATO6jIgoiCiYaM2fO9PsLaam2GrDViFwWTefpfdE00HbbbWd9+/Ytmp6rzuOaOnWqtWrVyv9bYUMBRGEsXQgnms4SVcZUZdJQL4/6a/S6/fDDD34fnkxU92dKPx+q6Og9UpVKlSa9JgDKR4UHKIeqPDoA6S/6dO+++64/wJb867s86jXRX+yh/6MsWrEjqoaoiqDvEf1bFQkd6BR+wgFWj1GVJfWGKBikD/WRqHlXIUYrk4LSqhJqjFUFSlUXTW2lVw0qug9RWNC+M5lQcFAfjapYYUVaRRQUjzzySN+kHDbyy+RxBelVLU1h6T1Mb/zW0n/1w6TT5w0bNix1u4LVV1/dDjvsMB9O1ShdmvDepTeD18TPlPqL1Lj88ssv+9VbeuwAykeFByiHVlypYVXTGKqq6ICkA41W5mgTvIqElUL6qAOZVm9p2bI+anqpNKo2qAflqaee8gf4QIFFVSgtX9aKnvTHqGqJelvUNK1pH4UIrf5RONIybD1urYjStJ3Cgqoluh9VkRQ6FJ7UnKxpLX1NUybpTbCZ3IeWUGu6LTRal3wdVGFS1UXTQKpyqCqhKaOwcikT119/vd+YUe+JdrDO5HEFuj/dv6ojeg8VHs8999yir6uhWX00em31uut2VDnSdfTeaYWcmr31PLS6SmFGPVl63mVVk/Q8FUj0s6IeIr3Wuo3q/EyJwqj2IlKjeWiuBlA+Ag9QAZ0TSgdsVVx0kNFBWg3OJVdoZULLpdXYrNtURUVVgtKEHZdDtSdQlUd/1YeG5fTHqIOpekzUA6LpLjX7hikpBQBdRwdyHZx1wNWB+Morr/TNr6piiELOI4884puY08NCJvehzzVNpOAhmjZr0KCB/7cOyAp5qnJpPxyFjV133dXeeeedommlTGj11VlnneWn6LRKSWGjoscV6Lkr9Klqo9dATdyaIgsUvPTaKvio30gVIa2kUsgSVWU05ael77pvLV/Xz4CCS1m0xYCanPUYFfT0nivwVPdnSo9V758qdVoiD6Bi/FmAfKCfw0WZ7ueCwqBgpwbpsMIpl1S90lRY+p46hU7hUdU4LWcPU2e5oNNmuBD6kgu7ld9nAMgiengA1Dj1tWiaRpUi1LwJEyb4ipaqXbkMO0AhIfAAqFGaCtJUk6ZdypvuQdVoak4N2eo3ilPFCogaPTwAapQqDtoRWv02+UINwfn0eKpDfT6nn356zk90CxQaAg+AGpdv4aLkrsaFrORJXgFkhiktAAAQewQeAAAQewQeAAAQewQeAAAQewQeAAAQewQeAAAQewQeAAAQewQeAAAQewQeAAAQewQeAAAQewQeAAAQewQeAAAQewQeAAAQewQeAAAQewQeAAAQewQeAAAQe3UNyBM9e/Y0AIVl1KhRBhSCWgbkhx6GuGrhRic3+hvi6ms3njEgjxF4AERtYzcGuLGJAUCO0MMDAABij8ADAABij6ZlAFFb6MYkA4AcIvAAiJp6BRsaAOQQgQdA1DR13tQAIIcIPACittiNBQYAOUTgARA1TWnxuwZATrFKCwAAxB5/dQGImlZpfWcAkEMEHgBRq+PGegYAOUTgARC1RW7MNgDIIQIPgKipV7CRAUAO0bQMAABijwoPgKipaXmsAUAOEXgARE1Ny+saAOQQU1oAACD2qPAAiJpOK/GNAUAOEXgARE2/ZzYwAMghprQAAEDsUeEBEDVNaX1rAJBDBB4AUdPvmbYGADnElBYAAIg9KjwAosbGgwByjsADIGpsPAgg55jSAgAAsUeFB0DUNKU1yQAghwg8AKKmKa0WBgA5ROABELVFbkwzAMghAg+AqKlXsKkBQA7RtAwAAGKPCg+AqHG2dAA5R+ABEDXOlg4g5wg8AKKmpuV5BgA5ROABEDX1CtY3AMghmpYBAEDsUeEBEDXttDzeACCHCDwAoqadllsZAOQQgQdA1FTh+dkAIIcIPACipgpPawOAHCLwAIjaYkttPggAOVPLAKDmjXajTTlf53cPgKxiWTqAKPS0ss+QPs4AIMsIPACi8Lgb35ZyuRqYBxgAZFkdA4BozHBjTzcapF32gxsnG6eaAJBlVHgAROVJK36W9PluDLRUEAKArKLCAyBKCjd7uNHQjbFGdQdAjlDhARAlVXnGWKq686AbMw0AcoB9eBAHB7mxkSFfTbDUEvVl3ehhyFeDjBV0iDH2wkDBa968+Qs77bTTfu3atTMAlffwww/PHT9+/MHuny8ZEFNUeBALBx10kB199NEGoPLeeeedf13gMSDO6OEBAACxR+ABAACxR+ABAACxR+ABAACxR+ABAACxR+ABAACxR+ABAACxR+ABAACxR+ABAACxR+ABAACxR+ABAACxR+ABAACxR+ABAACxR+ABAACxR+ABAACxR+ABAACxR+ABAACxR+ABgCz63//+Zx9++KEByC4CD1ADpk6dapdddpm1bdvWmjRpYtttt5317t3bsmHatGk2fvx4y4V7773XatWqZVtttVWxy//44w9/+TPPPGPZMmbMGH+fGg0aNPDvxRFHHGFvvfWW5ZPDDjvM3nnnHQOQXQQeoJomTpxo22yzjQ0aNMjOOecc/7Fdu3bWq1cv++uvvyxqm266qd18882WK/Xq1bNPP/3U3n//fcsHl19+ub388st23HHH2W+//Wa77767I10rQQAAEABJREFUvf766wYg2eoagGq5+uqrbcKECfbFF1/Y+uuv7y/bb7/9fOBZbrnlLM5UTVlnnXVs0aJF1rdvX9thhx0s19Zdd13bdddd/ejSpYutvfbaNmDAAB98ACQXFR6gGubMmWODBw+2gw8+uCjsBOlhp379+vb000/bVVddZSuvvLLdfffd/vKPPvrIOnXqZM2aNfNTMPfcc0+x21Bo2muvvaxFixa2+uqr22mnnWZ//vmn/5oqSQocP/30k911113+3927dy/63kceecR22WUXP8WmClRFfSPPPfecHXTQQbbeeuv5x7P//vvbl19+aRXRdJ4qW5q++vHHH8u9blmPacqUKf7xP/jgg0XXPemkk/xleo2CjTbayC655BLLVN26da127do2e/bsostuuOEG23LLLe2TTz6xPfbYw1ZaaSV/eXmvdaD3UeHpmGOO8dfTe6ZpvXSLFy/2t6VpzaZNm9rOO+/s3/uSLr744qLbKPm+A6h5BB6gGjSVM2PGDH9Qq4gOgjrAK5yo2qCDqULFN998Y7fccosPPmeffbZvag022GAD3/OhoHDllVfaG2+8URRqdtttNxs2bJgPUAoq+vfpp5/uv6YpHE3p6GB///33W+vWrf3B/Ndffy3z8ek6CgC33Xabf4wKCUcffbSv3pRHYeWEE06wZZZZxn9fWcp7TMsvv7wPjCNHjiy6/ueff+5D41dffeU/nzVrln399dc+rGTq+uuv9/1NCk/pNA2p56bn+8ADD/jLynut0+k9Wm211eyzzz7zQVevuap7wU033eS/T9WugQMHWps2bWz48OHFbkP3uWDBAv9Rj+GMM84odhsAah5TWkA1TJ482X9U6KjI77//7ptVGzdu7D+/7rrrfFhQ74uqKqKQoWbnAw880H+uqbF033//vT3++OP+36oOaDRs2NDff3roUoDSQVkHbTn00ENtiy22sH79+vn7LY16gTQCVSf23Xdff5+aJiqLDtyqfJx66qnWv39/69GjR6nXq+gxqfF5xIgR/muqnCn8KFyEwBM+VhR4FL40RI/r2muvtY4dOxa7jgKPHs9FF11UdFl5r3W6Y4891leJ5MILL/S3r0rYZpttZvPnz7dbb73VhyAFHznggAOWuA1Vt0JT+7bbbmt9+vQpug0A0aDCA2SJqgch7Mjbb7/t+0tC2BEFAE3h6MApCkk6eK+xxhp+eufGG2+0f/75p9z7UQDRyqQ999yz6DJ9b5jGKcvcuXP9lNuGG27oG5EVdmT69Ollfo+mb2ThwoV21lln2cyZM33VQvdX2cekwBOqHKqIqOKy4447Fk2rKfAo2LVq1crKo6ZlVbueeuopX9m54oorfKWnpBNPPLHY55m+1gptwVJLLeU/qvokeu9UuWvfvr2VR88tCD8T4TYARIPAA1TDiiuu6D9OmjQp4+sGWk6uKkJYSq2h3hCFAx18w1SZbvuhhx6yefPm+amWiih06DY0bZR+2+oTUXN1WVS5UD/SNddc41eXhUpMJhR81PeiUKfm5Tp16lT6MSnwKFyNHTvWTxeFipMCjwKgqj+qhlRE1Si9bocccoivHp177rnWrVs3/5oGCnTqUwqq+lqX9Pfff/uP6bcNID8wpQVUw+abb26NGjXyFYWSfSIVWXXVVf3UzZ133rnE1zRVpaZkHfwffvjhjA70wbLLLuunozSNc8oppxT7WqhIlKTgpYqI+ozUS1RVmoJS70rJZeCZPKaNN97YT89pKkuVHgUgrQDT66uwowpPVR6btgiQn3/+ucypRz33qrzWJa2yyir+Y0VVOADZR+ABqkHTEepFeeKJJ+z888/3AShQBUcH+bKoj0PTWprGWnrppZf4eqgarbnmmkWXlbZqStUKTSmlU+hQn0omzdTp96XpnCD0zFTG9ttv7wODKjdqYq7MY9Lz0MomhRtVeNTIKwo+mvbSc1cgq6wwTZY+dVhSpq91RTRVpUree++95ytMAPIHU1pANWkKSEub1W+iJlj1qqiRVdWJ0aNHl/l9Z555pg862g1YFaKhQ4f6f+v2JIQnNde+9tprfk8ZHUg1/ZK+okdLtXW5bkNLy0VTOGqQ1u7PClVqvg0BqzRaSaSl4uq/0e1otVVoqq3saRBU5dF9//vvv8Uuz+QxqadHr9+4ceOKmpM32WQTX+3SlJjCYUVUqdFtampK1SQ9lwsuuKDcaaZMX+uKqBrVtWtXv+3ApZdeas8//7xv5lZzM4DcIvAA1aQmVlUgFGBeeeUVv+GdDnjaL6bk3jzpVAHRQVX9IqoSad8X9cKEVT1arqxVT7pNBSFNO40aNco326afLkHBRI28agjWgVUrx1RlefXVV30fjlYf9ezZ04cL7flSmubNm/uDs1aJaYXYo48+akOGDPEB4OOPP7bKUB9Py5Ytixqvg0wek0KOApamt9KnunSZgp1CWUXUoNyhQwffvKzgpLCklVPlyfS1zoTCkkKrthdQX5Sm0rT9AIDcqmVAgXMH6xf69Omzn/ZVAVB5LiBOc1Ux/Qd6yYCYosIDAABij8ADAABij8ADAABij8ADAABij8ADAABij8ADAABij8ADAABij8ADAABij8ADAABij8ADAABij8ADAABij8ADAABij8ADAABij8ADAABij8ADAABij8ADAABij8ADAABij8ADAABij8ADAABij8ADAABir64BMfDss8/a999/bwAq76effmpgQMzVMqDwHeTGRoZ81cKNTm70N+SzQW6MMyCmCDwAoraxGwPc2MQAIEfo4QEAALFH4AEAALFH0zKAqC10Y5IBQA4ReABETb2CDQ0AcojAAyBqmjpvagCQQwQeAFFb7MYCA4AcIvAAiJqmtPhdAyCnWKUFAABij7+6AERNq7S+MwDIIQIPgKjVcWM9A4AcIvAAiNoiN2YbAOQQgQdA1NQr2MgAIIdoWgYAALFHhQdA1NS0PNYAIIcIPACipqbldQ0AcogpLQAAEHtUeABETaeV+MYAIIcIPACipt8zGxgA5BBTWgAAIPao8ACImqa0vjUAyCECD4Co6fdMWwOAHGJKCwAAxB4VHgBRY+NBADlH4AEQNTYeBJBzTGkBAIDYo8IDIGqa0ppkAJBDBB4AUdOUVgsDgBwi8ACI2iI3phkA5BCBB0DU1CvY1AAgh2haBgAAsUeFB0DUOFs6gJwj8ACIGmdLB5BzBB4AUVPT8jwDgBwi8ACImnoF6xsA5BBNywAAIPao8ACImnZaHm8AkEMEHgBR007LrQwAcojAAyBqqvD8bACQQwQeAFFThae1AUAOEXgARG2xpTYfBICcqWUAUPNGu9GmnK/zuwdAVrEsHUAUelrZZ0gfZwCQZQQeAFF43I1vS7lcDcwDDACyrI4BQDRmuLGnGw3SLvvBjZONU00AyDIqPACi8qQVP0v6fDcGWioIAUBWUeEBECWFmz3caOjGWKO6AyBHqPAAiJKqPGMsVd150I2ZBgA5wD48KEQHu9HOUCgmWGqJ+rJu9DAUisGWqsoBscBeGCg4zZo1e7FDhw77brjhhgag5g0YMGDuzz//fKj75xADYoIKDwrSwQcfbEceeaQBqHnvvffevy7wGBAn9PAAAIDYI/AAAIDYI/AAAIDYI/AAAIDYI/AAAIDYI/AAAIDYI/AAAIDYI/AAAIDYI/AAAIDYI/AAAIDYI/AAAIDYI/AAAIDYI/AAAIDYI/AAAIDYI/AAAIDYI/AAAIDYI/AAAIDYI/AAeeCtt96yo446yrLto48+smeeecYQnVtvvdVuueWWos///fdfO+uss+zll182ANlD4AEq6eGHH7ZatWrZpptuusTXVl99df+1p59+2ipj+PDhlf6eTCxcuND69+9v2223nS2zzDK20UYb2ZlnnmmzZ8/2X7/66qvt/vvvt7g69thjbd1117VceuKJJ2zEiBFFnyvw3H333fbrr78agOwh8ACVNHXqVKtXr5599dVX9scffxRd/v3339uECRP813SdXFu8eLEdcMABdu6559o+++zjD7yHHnqoPfLII/bpp58aACQJgQeopL/++su22WYbq1+/vr355ptFl7/zzju29tpr22qrreavk2uDBw+2l156yVd4rrjiCh96unfvbr/88ovttNNOlg9mzpzpp3w+//xzA4AoEXiASlL1Ztlll/WhYdiwYUWXK/Dsuuuu1rBhw2KB5+uvv/ZTK1tttZU1adLEtt9++wqnrxQAllpqKevdu3fRZarM7LLLLv42FLg+/PDDcm9DU28tW7a0E044odjlyy233BLXVThq06aNrbDCCnb++efb3LlzK/X4b7jhBttiiy3sueee8x+bNm1qBx10kK94pRswYIB/DqqCaepPr9fQoUOLrqeeok6dOlmzZs2sbdu2ds899xT7fvW97Ljjjv45rLnmmnbIIYf4x1dVo0aN8r1TCqmrrrqqHXnkkfb3338Xu44qZb169fLTgnpeO++8c9Hzr8p7W9Jhhx3mn0s6TUXqvbjxxhsNQM0g8ACVpDCz9NJL22677Wavvvpq0eVvv/22dejQwR/40qe0dCBVCLj44ott0KBBtsEGG9jRRx9tP/30U5m3r6knVWQuvPBCf9nrr79uxx13nNWuXdv33LRu3dr22muvMvtAdMBUANPj0feU55tvvvHTXQotPXv29P0l/fr1q/Tj1+306NHDh4P33nvPf67wFOjgfdppp9npp59uP//8s11wwQU2f/58H7YOPPBA+/PPP23//ff336cmXwWfs88+2/73v//5758xY4adcsopPmw+8MADdumll9q0adNs5MiRVhXTp0+3vffe28aNG+cf85VXXmkffPCBf90VcoKbbrrJV8Z22GEHGzhwoA+G6rmqzGtTno4dO/rr63kHCrNTpkzx4RBAzahrACpFgUSNsLvvvrtdcsklNmbMGH+AVJVizz339FWM9AqPqhXnnXde0ec6iN13331+OkwH8EAVj0WLFvkqg6o7up1AAUBViDfeeMN/rkCkA62CyXXXXbfEY1TgUphYeeWVrSKqtijwqDIlChNffvllpR//vHnz7JVXXrFVVlnFf77vvvv6ik+gqTU97sMPP9x/roBx22232WOPPeb7jO69915/kH///fdtvfXW89dRc7WqXApE48ePt99//91/v6pHogBVVaoeTZ482T755JOi10lhRhUcTQUqiOg11JSbQpqCj6gvqrKvTXn03PQeqNKlwCQKuCuttJJtueWWBqBmUOEBKklhRlUcrdLSwV3TWqpo6OCk6kPz5s2X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cMMN/v5k0KBB/jZUlbjrrrv8vzW1VJo5c+bY6aef7u+radOmPmhcc801tmjRoiUekz7usssu/nqqKOm1SvfXX3/5qR9N+7Rt29b69+9vVbHMMsvYTjvt5J+zPP/88/7+03uB7rjjDn/ZzJkz/edz5861448/3gcnvWbbbLONr26lPw/59ttv/df0HA466CCbMGFCmY8j05+FQNWpFi1a+Od+zz33FPtar169bK+99vJfX3311e20006zP//8s9h19P4NGDDAjjnmmKLbuffee4td57fffrMzzzzTT6/p+a+44or+vf3iiy+KrqOfOb1P4XUoOT2ox6Lqn17nDTfc0M4++2zCPPAfAg8S44MPPvAfVWkoiwLK3nvvbePGjfMHjyuvvNJ/3z777GOLFy8udl0dLHUQ1gGpVatW/qCoXhIFFvWBPPvss/42StLB+IwzzvBNyH/88Yc/CD733HP2zDPP2GWXXWY9evQos6dot91285URBQ/djv6tUFOapZZayh/81PCsPpfjjjvOrr76anvssceWuO4hhxziH8fXX3/tA5w+nzdvXtHXFTiGDBlil1xyib+Nl19+2T/2qqhTp84Sr2V5FAb1Wnbu3NkGDx5s7du3949lwYIFRdcJFRuFDQUJhdby+noy+VkIHnjgAX9f+rjHHnv49y49hChIqtdHYUQ/L2+88UapIVThQyH6s88+s4MPPti/b+F2FCjVo6Upv08++cTfhkKLrvf000/767z++uv+PVQoU8O4qlMKWr/++qv/un6e9POjgPv444/790zPc8qUKQaAKS0kyOTJk/3Hli1blnkd/fWu6+mgo1Ahbdq08QeRl156yTp27Fh0XQUETc2IDnjqCVGw0AFZ1B8ycuTIJe5DDchHHHGE/7f+Wn/ttdd8hUVVobXWWsu6dOliI0aM8AezklQd0GjYsKF/fHpc5dHBOdhzzz3thRdesFdffdVXptLddtttvpIlJ510kg8UaopW5UohSM9dQULhSfbdd1//OCpLQUevyRZbbJHx96gapKrHBRdc4D9Pfw8CVXvuvPNO/16JqmhaYVWWTH4WAlVSevfu7f+tUNKnTx+/VcBmm23mL1Mjdrrvv//eB46SVPFTtU7Uk3XttdcW3Y4eqypSem/0mDQUdvTzpWCkio96ixSYFIZE0296Hfv162fXXXedv61w27qe3qOu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HgBRW2ypzQcBIGdqGQDUvNFutCnn6/zuAZBVLEsHEIWeVvYZ0scZAGQZgQdAFB5349tSLlcD8wADgCyrYwAQjRlu7OlGg7TLfnDjZONUEwCyjAoPgKg8acXPkj7fjYGWCkIAkFVUeABESeFmDzcaujHWqO4AyBEqPACipCrPGEtVdx50Y6YBQA6wDw/iooMbOxny0QRLLVFf1o0ehnzU140pBsQYe2EgFmrXrn3tTjvt1K19+/YGIHO9e/eeO2PGjE0ttXcSEFtUeBAbHTp0sO7duxuAzD344IMKPAbEHT08AAAg9gg8AAAg9gg8AAAg9gg8AAAg9gg8AAAg9gg8AAAg9gg8AAAg9gg8AAAg9gg8AAAg9gg8AAAg9gg8AAAg9gg8AAAg9gg8AAAg9gg8AAAg9gg8AAAg9gg8AAAg9gg8AAAg9gg8ALJmyJAhdtpppxW77NZbb7VbbrnFACBKBB6ghixatMjuvvtu23777a1p06a2zTbbWO/evW3evHlW6I499lirVauWH8sss4xtttlmdtVVV9mcOXMqdTtvv/22vfLKK8Uue+KJJ2zEiBFW2fu/9tpr7d9//7VCNXfuXBszZowByA4CD1BDzjnnHLvooousY8eO9thjj9mRRx5p119/ve22227+4FboWrZsacOGDbNBgwbZtttu65/bgQceaNkS7l+v7R577GF9+/a1/fbbzxYuXGiF6PTTT7fDDjvMAGRHXQNQbYMHD/bVnUcffdSOPvroosvbtWtnu+66q91111124YUXWiFbaqmlbOedd/b/3n///W3ttdf2z+mNN97woS6b969Que6669rJJ59s7777rnXo0MEAoDxUeIAacP/99/sAoKpOul122cU22WQTX5UIbrjhBttiiy38dJc+aoqmffv29v333xf73smTJ/sD+qqrrmqrr766nX322bZgwYKir7///vt+ikcfdT+aRtthhx3svffeK/exPvfcc3bQQQfZeuutZ82aNfPh5csvv7TK2mefffzHr7/+2n/caqut/NRTuhVWWMEuueQSi8KGG27oP/7www9Flz3yyCP+tWjSpImfUvzwww+LfY+mHbt3724bbbSRrbLKKv6x9ejRw7bbbrui6zz//PP+dU2fbrrjjjv8ZTNnziy6TJWlK664wjbffHNbbrnlfLVJ71mgqt7xxx/vg1l4PDfffLNN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669vp512mq9YAagZdQ1ARhYvXuwP0q+99ppdeeWVdsUVV/gD9k033WSHH3647bTTTpYtderUsWHDhhV9roNqu3bt7OKLL/afN2vWzPLR5Zdfbrvttpt9++239uKLL9pWW21lQ4cOtd13391qwmqrrWbdu3e3fNOyZUt75JFHbPr06fbqq6/a9ddfbx9//LH/d7rHH3/cv3f6uXrsscds8803t08//dRWXXVVA1A9BB4gQ4MHD7aXXnrJHnjgATvppJP8Zfvss4+dffbZttxyy1k2qRKw8847F32+1FJL2Yorrljssny07rrrWocOHfw444wzfCVDgbGmAk++0vsT3pv999/f1l57bbvwwgvtjTfe8AEw2HrrrX31S6/HoYce6q+nnzcFbADVw5QWkKGHH37Y/6WuaZN06WFHVaBbbrnFdtxxR2vatKltuumm9sQTTxS7/g033GBbbrmlffLJJ7bHHnvYSiut5C/XdJmqRvqrXre533772eTJk606VFXYZZddrEmTJrbNNtvYhx9+WPQ1Tamcfvrp/kCsx7rBBhvYNddcY4sWLSq6zvvvv+/DlaoRup5uR4/vq6++sttvv93WW289//h79uxplaUqlQLPuHHjii4r7zVQM7Iey+jRo4vdzl577eWDQvrj1cdMbnPKlCn++g8++GDR9RVmddlHH31UdJmmLi+55BL/75dfftm/v7qtNddc0w455BD7+uuvrTIUlKW871trrbWsUaNG9v333xuA6iPwABlQCHjnnXd8ZaJ27bL/2yjsXHbZZbb99tvbwIEDbYsttrAjjjjCV4bSTZw40Y4++mgfePQXvCg0KAypx+Oee+7xK410MFeIqorXX3/djjvuOP941cSryoFu79dff/VfV9VBgezUU0+1J5980l9X/S+aSinpoIMO8hUZhYA//vjDjjnmGHvuuefsmWee8c+3R48efmqqssaOHWsrr7xy0eflvQYKFvLKK68UXV+9U2+99ZafaixLebe5/PLL+9A1cuTIoutrOklhRqFOZs2a5YOJQuqMGTPslFNOsWWXXda/b5deeqlNmzat2PdnQmFPFKzKovdJzy8EYgDVw5QWkIGpU6fa/Pnzix2cS5o7d67deOONvom5V69e/jIdiMePH2/XXnut7bvvvkXXVeBROLrooov856q29OnTx4466ii77777/GWqIiik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pdPUlS7X1/WcP/zww2JfV/ALYUc0vTVu3Dg/vRUVKj1AQfnNjfmGRCDwZEG2wo5CwiuvvGI777yzrb/++uYOuqVOaz344IM2Y8YMe+ONN+ypp56yN9980y699NIlrqcqUefOne2HH36wbbfd1g477DD77bffil3n3XffNfe8fDVJ1xUFKIWgE0880e69914fPBR6Jk6caHXq1LFOnTrZq6++6h9voMepYBUCSs+ePe2GG26wzTbbzO655x6bNGmS/9rixYv91/X4dTsTJkywvn37+j6dO++8s8zX5uWXX/aPQXr06GFRIvQABWNlNxoYEoHAE7FsrsbSVM2UKVNsl1128Z/vtttu9uKLLy5xvfXWW89P9ayxxhq26667+iCjz+fNm1fser1797YjjjjC9wNdffXVvgo0ePDgYtf5/PPP7fHHH/chp3379r7qonBx991323nnnWeHHnqofwwKKrfffrv/ngMPPNA/TlWSAgWgjh07Wv369W3OnDm+4Vq3ed999/nH9/zzz9s333xjr732mr/+gAED7Pfff/erso4++mhfsbrrrrtKfV0UtPQ49Dz0/RtvvLFFjdADAPmFwBOhbC89V5VE/Trbbbed/1yVHoWCTz/9tNj1NKWkSkug6ai//vrLfvyx+N5b6VM/+p5VV121aGoqUAVmyy23LPpcVSPRSrGgcePGttVWWxVNOSmIaRpK1ShR1UjBSU3F8vHHH9v06dNt9913L7qNlVde2U/BhRVYCktafq7wFmh6rjQKXOplev31122dddaxbCH0AED+IPBEZ1tXUdghm/vsKPAoTNStm+pFD9NDFa3Watq0qf+oqkt5FFJKXkdVk3RaJSbLLrvsEt/7yy+/+H8rbKnKEx7XSy+9ZEsttZTts88+/nOFHdEScvX1hDF69Gg1A/uv/fPPP0vcR1kU5hQEW7RoYdmm0OPuW0luQwMA5AyBJzofuarFvs2bN59uWaAqyZdffumbfkNAUFVGQiWlLCGkhOuXRWGnotCgKpD8/fffxS7X5yussELR5wcddJCNGDHCP25NZ6ma06RJk2K30atXLxs2bFixcdFFF/mvKWiFYFSRyy67rMb33smUC3L/jh07VtvXjzIAQM6wLD1a412Y2MiFnpGuytDEIhRWUD333HPFKh/quVEfzB9//FEUaBYsWFDsezXVFDbmS6dVXoGq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fT5t2jR7+OGHbcKECRalt956y4466ijLF/fff7+NGTPGsCQCDwDkuTfeeMNq1aplK6ywgjYJtaiMHTvWBgwYYLNnz7aquvfee/1jLTkeeughi9LgwYPtsssuK/r866+/thNPPNHGjx9vURo+fLg9/XT+nH6we/fukb/WharCfXgAALn1yiuv2IorrmiTJ0+2Dz74wHbYYQfLd48//ri1aNGi6PN27doZkEsEHgDIcy+//LKddNJJ9uCDD9rQoUMLIvBsvfXW1rp1awPyBVNaAJDHNM2knoxddtnFdt99d1/tSff+++/7KaPHHnvMdtppJ1tmmWV8NUU9Len23ntvO/vss+20006ztdZay5o1a+Z7T/79998y7/uwww6zNddcs9hlCxcu9FNrVT3l0EcffWSdOnXy99+2bVu75557lrjOI4884p9vkyZNbJtttrEPP/yw2NcXLVrkp2422mgjW2WVVezCCy8s83moh0evm25riy228FNQ6Xr16mV77bWXr0atvvrq/vX5888/i11nxIgRdvjhh/uzDqy99tp26qmn2t9//13q/X3++ee21FJLWe/evUv9+pw5c+z000+3nXfe2Zo2bWobbLCBXXPNNf45BeE91Ue9DrqeQu577xU//d1ff/3lp+1WXnll/1r279/fUDYCDwDkMVV36tevb+3bt/cHyS+++MJ+++23Ja7XtWtX69y5s/3www+27bbb+rBS8nqqEM2YMcP3BD311FP25ptv2qWXXlrmfXfs2NF++ukn++abb4ouU/iYMmWK7bffflZZChL777+/v71bbrnFBx+FsP/9739F13n99dftuOOOs9q1a/sGXFWJFEh+/fXXouvcfPPNdu2119qee+5ZdJBPv410F1xwgX+seu4KFXpOamgOFDj0WilkXXnllf61UZgKdN199tnHv6633XabXXTRRTZy5EibPn36EvelAHLooYf66yuElUZhaNNNN/Wh6cknn/TP9eqrr/aBtaRDDjnEjjnmGN+PpICoz+fNm1f09eOPP94H20suucTfhn5W/vjjD0PpmNICgDymio6CToMGDaxDhw7+Mh3kzjjjjGLXU0VBB27Rwe++++7zjbwKQsF6661njz76qNWpU8fWWGMNf319ftNNN/lQVdKBBx5o9erV89NoCgaiQKJKhwJYZamhWWFJlQs9FlGDtB677ksU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" alt=""></div></div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="general-guidelines"><a class="anchor" href="#general-guidelines"></a>General Guidelines</h2>
+<div class="sectionbody">
+<div class="ulist">
+<ul>
+<li>
+<p>Keep changes small and focused whenever possible.</p>
+</li>
+<li>
+<p>Always write clear commit messages and link related issues in PRs.</p>
+</li>
+<li>
+<p>Prefer discussion first for larger features or architectural changes.</p>
+</li>
+<li>
+<p>Be respectful, inclusive, and patient — we&#8217;re all building something great
+together!</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="why-collaborate-with-weave-js"><a class="anchor" href="#why-collaborate-with-weave-js"></a>Why Collaborate with Weave.js?</h2>
+<div class="sectionbody">
+<div class="ulist">
+<ul>
+<li>
+<p>Work on a cutting-edge real-time collaboration framework.</p>
+</li>
+<li>
+<p>Learn or improve skills around CRDTs, WebSockets, React, Canvas APIs, and scalable
+architectures.</p>
+</li>
+<li>
+<p>Grow your open-source contribution profile.</p>
+</li>
+<li>
+<p>Help shape the future of collaborative and visual tools on the web.</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="weave-js-is-a-community-effort"><a class="anchor" href="#weave-js-is-a-community-effort"></a>Weave.js is a community effort.</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>We believe that the best tools are built together — and we would love for you to be
+part of this journey. No contribution is too small — even a typo fix matters!</p>
+</div>
+</div>
+</div>
+</article>
+  </div>
+</main>
+</div>
+
+
+<footer class="page-footer">
+  <div class="page-footer__nav">
+
+<div class="dt-grid-layout dt-grid-layout--with-margin pagination">
+  <div class="dt-grid-layout__item dt-grid-layout__item--span-full pagination__row">
+    <div class="pagination__buttons">
+    <a class="dt-button dt-button--ghost dt-button--icon-and-label dt-button--icon-icon pagination__prev" href="../roadmap/">
+      <span class="dt-button__content">
+        <span class="dt-button__icon dt-button__icon-icon"><svg class="dt-icon" aria-hidden="true" focusable="false"><use href="../../../../_/img/icons.svg#icon-arrow-left"></use></svg></span>
+        <span class="pagination__label-full">Roadmap</span>
+        <span class="pagination__label-short">Prev</span>
+      </span>
+    </a>
+    </div>
+  </div>
+</div>
+  </div>
+  <div class="dt-grid-layout dt-grid-layout--with-margin page-footer__feedback">
+    <div class="dt-grid-layout__item dt-grid-layout__item--span-full page-footer__contribute">
+      <div class="page-footer__contribute-copy">
+        <p class="dt-text dt-text--title-s">Help us make these docs great!</p>
+        <p class="dt-text dt-text--body-m">See something that is wrong or unclear? Collaborate with us! Submit a pull request</p>
+      </div>
+      <div class="page-footer__contribute-buttons">
+
+<a class="dt-button dt-button--ghost dt-button--icon-and-label dt-button--icon-action page-footer__propose-change" href="https://github.com/InditexTech/weavejs/edit/main/docs/src/modules/main/pages/contributing.adoc">
+  <span class="dt-button__content">
+    Propose a change
+    <span class="dt-button__icon dt-button__icon-action"><svg class="dt-icon" aria-hidden="true" focusable="false"><use href="../../../../_/img/icons.svg#icon-external-link"></use></svg></span>
+  </span>
+</a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+
+<script id="site-script" src="../../../../_/js/site.js" data-ui-root-path="../../../../_"></script>
+
+<footer class="site-footer">
+  <div class="dt-grid-layout dt-grid-layout--with-margin site-footer__grid">
+    <div class="dt-grid-layout__item site-footer__col site-footer__brand">
+      <a class="site-footer__brand-link" href="../../../5.2.1/">
+        <img class="site-footer__logo" src="../../../../_/product-logo.png" width="24" height="24" alt="">
+        <span class="dt-text dt-text--label-l-high">Weave.js</span>
+      </a>
+      <span class="dt-text dt-text--detail-m site-footer__legal">&#169; 2026 InditexTech</span>
+    </div>
+    <div class="dt-grid-layout__item site-footer__col site-footer__links">
+      <span class="dt-text dt-text--label-l site-footer__heading">Resources</span>
+      <a class="dt-text dt-text--body-l site-footer__link" href="../quickstart/">Quickstart</a>
+      <a class="dt-text dt-text--body-l site-footer__link" href="../../sdk/">SDK</a>
+      <a class="dt-text dt-text--body-l site-footer__link" href="../../react/">React Helper</a>
+      <a class="dt-text dt-text--body-l site-footer__link" href="../build/stores/">Stores</a>
+      <a class="dt-text dt-text--body-l site-footer__link" href="https://github.com/InditexTech/weavejs">Repository</a>
+    </div>
+    <div class="dt-grid-layout__item site-footer__col site-footer__links">
+      <span class="dt-text dt-text--label-l site-footer__heading">Modules</span>
+      <a class="dt-text dt-text--body-l site-footer__link" href="../">Framework</a>
+      <a class="dt-text dt-text--body-l site-footer__link" href="../../sdk/">SDK</a>
+      <a class="dt-text dt-text--body-l site-footer__link" href="../../react/">React Helper</a>
+      <a class="dt-text dt-text--body-l site-footer__link" href="../../store-websockets/">Websockets Store</a>
+      <a class="dt-text dt-text--body-l site-footer__link" href="../../store-azure-web-pubsub/">Azure Web Pubsub Store</a>
+      <a class="dt-text dt-text--body-l site-footer__link" href="../../store-standalone/">Standalone Store</a>
+      <a class="dt-text dt-text--body-l site-footer__link" href="../../types/">TypeScript Types</a>
+    </div>
+  </div>
+</footer>
+  </body>
+</html>
