@@ -1,0 +1,117 @@
+= WeaveLineNode (deprecated)
+:description: Line node API Reference
+
+== Overview
+
+The https://github.com/InditexTech/weavejs/blob/main/code/packages/sdk/src/nodes/line/line.ts[WeaveLineNode]
+class represents a multi-point line or path on the Weave.js canvas. It is a versatile and essential node type for
+building connectors, freehand drawings, flow diagrams, annotations, and visual paths in collaborative environments.
+
+Built on top of Konva’s https://konvajs.org/api/Konva.Line.html[Line] class shape under the hood, the WeaveLineNode
+offers full control over the line’s geometry, style, and behavior—all synchronized in real time across users.
+
+Lines are ideal for:
+
+* Drawing connectors between nodes (e.g., in flowcharts, mind maps, and diagrams).
+* Allowing freehand sketching or pen/brush tools.
+* Building visual relationships or paths between visual elements.
+* Enabling annotation layers in collaborative tools.
+
+The class extends the xref:sdk:api-reference/nodes/node.adoc[WeaveNode] class
+
+== Type
+
+This node `nodeType` property value is `line`.
+
+== Import
+
+[source,shell]
+----
+import { WeaveLineNode } from "@inditextech/weave-sdk";
+----
+
+== Instantiation
+
+[source,ts]
+----
+new WeaveLineNode(params?: WeaveLineNodeParams);
+----
+
+== TypeScript types
+
+[source,ts]
+----
+type WeaveNodeTransformerProperties = Konva.TransformerConfig;
+
+type WeaveLineProperties = {
+  transform?: WeaveNodeTransformerProperties;
+  snapAngles: {
+    angles: number[]; // Angles for snapping in degrees
+    activateThreshold: number;
+    releaseThreshold: number;
+  };
+};
+
+type WeaveLineNodeParams = {
+  config: Partial<WeaveLineProperties>;
+};
+----
+
+== Parameters
+
+For `WeaveLineNodeParams`:
+
+[cols="4*"]
+|===
+| Property | Type | Required | Description
+
+| mono:[config] | mono:[Partial<WeaveLineProperties>] | label:green[Required] | Config parameters for the node.
+|===
+
+For `WeaveLineProperties`:
+
+[cols="5*"]
+|===
+| Property | Type | Required | Default | Description
+
+| mono:[transform] | mono:[object] |  | mono:[check default values] | Setup the transform properties for the line (if can be resized, rotated, anchors, etc.).
+| mono:[snapAngles.angles] | mono:[number] |  | mono:[10] | Array of angles (in degrees) to snap the line to when shift is pressed.
+| mono:[snapAngles.activateThreshold] | mono:[number] |  | mono:[5] | Activation threshold for the angle snapping utility.
+| mono:[snapAngles.releaseThreshold] | mono:[number] |  | mono:[10] | Release threshold for the angle snapping utility.
+|===
+
+== Default values
+
+[source,ts]
+----
+const WEAVE_TRANSFORMER_ANCHORS = {
+  ["TOP_LEFT"]: "top-left",
+  ["TOP_CENTER"]: "top-center",
+  ["TOP_RIGHT"]: "top-right",
+  ["MIDDLE_RIGHT"]: "middle-right",
+  ["MIDDLE_LEFT"]: "middle-left",
+  ["BOTTOM_LEFT"]: "bottom-left",
+  ["BOTTOM_CENTER"]: "bottom-center",
+  ["BOTTOM_RIGHT"]: "bottom-right",
+};
+
+const WEAVE_DEFAULT_ENABLED_ANCHORS: string[] = Object.values(
+  WEAVE_TRANSFORMER_ANCHORS,
+);
+
+const WEAVE_DEFAULT_TRANSFORM_PROPERTIES: WeaveNodeTransformerProperties = {
+  rotateEnabled: true,
+  resizeEnabled: true,
+  enabledAnchors: WEAVE_DEFAULT_ENABLED_ANCHORS,
+  borderStrokeWidth: 3,
+  padding: 0,
+};
+
+const WEAVE_LINE_NODE_DEFAULT_CONFIG = {
+  snapAngles: {
+    angles: [0, 45, 90, 135, 180, 225, 270, 315],
+    activateThreshold: 5,
+    releaseThreshold: 10,
+  },
+};
+----

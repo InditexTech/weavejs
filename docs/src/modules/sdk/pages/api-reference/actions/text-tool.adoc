@@ -1,0 +1,32 @@
+= WeaveTextToolAction
+:description: Add text to the canvas
+
+== Overview
+
+The https://github.com/InditexTech/weavejs/blob/main/code/packages/sdk/src/actions/text-tool/text-tool.ts[WeaveTextToolAction]
+class that allows users to insert text nodes onto the canvas by clicking. It
+provides a fast and intuitive way to add labels, notes, annotations, or any textual
+content within a collaborative visual environment.
+
+Each interaction results in the creation of a xref:sdk:api-reference/nodes/text.adoc[WeaveTextNode],
+ready for direct editing and synchronized in real time with all connected users.
+
+The class extends the xref:sdk:api-reference/actions/action.adoc[WeaveAction] class.
+
+== Name
+
+This action `name` property value is `textTool`.
+
+== Import
+
+[source,shell]
+----
+import { WeaveTextToolAction } from "@inditextech/weave-sdk";
+----
+
+== Instantiation
+
+[source,ts]
+----
+new WeaveTextToolAction();
+----

@@ -45,7 +45,6 @@ path = [
 
     # docs/ directory licensing
     "docs/**",
-    "docs-old/**",
 
     # code/patches/ directory licensing
     "code/patches/**",

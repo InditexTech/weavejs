@@ -1,0 +1,138 @@
+= Actions
+:description: Actions API Reference
+
+== Introduction
+
+Actions are the core mechanism for handling user-driven changes in Weave.js. Whether
+you're adding a node, moving elements, updating properties, or triggering a custom behavior,
+Actions provide a structured, trackable way to apply changes to the shared state.
+
+Actions help keep your application logic clean and consistent, and collaborative. In Weave.js,
+if something meaningful happens—it’s probably through an Action.
+
+Weave.js includes a set of built-in Actions, but you can also create your own to tailor
+functionality to your specific application needs.
+
+== Available actions
+
+Weave.js team maintain a set of *actions*, think of them as how the users interact with
+the canvas to build visual collaborative applications. This are the actions:
+
+[cards,columns="1 s:2 m:4",width=container]
+====
+[card,subheader="Base"]
+.xref:sdk:api-reference/actions/action.adoc[WeaveAction]
+The WeaveAction node is the abstract class that defines the blueprint of a action in Weave.js.
+
+[card,subheader="Collaboration"]
+.xref:sdk:api-reference/actions/comment-tool.adoc[WeaveCommentToolAction]
+Enables users to directly comment and give feedback on the stage.
+
+[card,subheader="UX"]
+.xref:sdk:api-reference/actions/eraser-tool.adoc[WeaveEraserToolAction]
+Allows users to erase (delete) elements of the canvas. When enabled the user can click on an element and it will be erased.
+
+[card,subheader="UX"]
+.xref:sdk:api-reference/actions/move-tool.adoc[WeaveMoveToolAction]
+Allows users to enable/disable the panning of canvas. When enabled the user can pan the canvas at its will.
+
+[card,subheader="UX"]
+.xref:sdk:api-reference/actions/selection-tool.adoc[WeaveSelectionToolAction]
+Allows users to enable/disable the selection mode of the canvas. When enabled the users can select nodes, move then, resize them, etc.
+
+[card,subheader="Layout"]
+.xref:sdk:api-reference/actions/align-nodes-tool.adoc[WeaveAlignNodesToolAction]
+Allows users to align selected nodes.
+
+[card,subheader="Nodes"]
+.xref:sdk:api-reference/actions/brush-tool.adoc[WeaveBrushToolAction]
+Enables users to paint freeform strokes on the canvas, similar to a digital brush.
+
+[card,subheader="Nodes"]
+.xref:sdk:api-reference/actions/connector-tool.adoc[WeaveConnectorToolAction]
+Enables users to add new connector nodes to the canvas by clicking or touching on nodes pre-defined anchors.
+
+[card,subheader="Nodes"]
+.xref:sdk:api-reference/actions/ellipse-tool.adoc[WeaveEllipseToolAction]
+Enables users to create new ellipses nodes on the canvas.
+
+[card,subheader="Nodes"]
+.xref:sdk:api-reference/actions/image-tool.adoc[WeaveImageToolAction]
+Enables users to add and image to the canvas by selecting a file, drag & drop from your application, drag & drop external file or when copying from an external source.
+
+[card,subheader="Nodes"]
+.xref:sdk:api-reference/actions/images-tool.adoc[WeaveImagesToolAction]
+Enables users to add multiple images to the canvas by selecting files, drag & drop files from your application, or drag & drop external files.
+
+[card,subheader="Nodes"]
+.xref:sdk:api-reference/actions/rectangle-tool.adoc[WeaveRectangleToolAction]
+Enables users to create new rectangle nodes on the canvas.
+
+[card,subheader="Nodes"]
+.xref:sdk:api-reference/actions/polygon-tool.adoc[WeavePolygonToolAction]
+Enables users to place a polygon node on the canvas using a preset shape (triangle, diamond, pentagon, hexagon, octagon or decagon).
+
+[card,subheader="Nodes"]
+.xref:sdk:api-reference/actions/star-tool.adoc[WeaveStarToolAction]
+Enables users to add new star nodes to the canvas by clicking or touching on it.
+
+[card,subheader="Nodes"]
+.xref:sdk:api-reference/actions/stroke-tool.adoc[WeaveStrokeToolAction]
+Enables users to create a single-stroke line on the canvas.
+
+[card,subheader="Nodes"]
+.xref:sdk:api-reference/actions/text-tool.adoc[WeaveTextToolAction]
+Enables users to add new text nodes to the canvas by clicking or touching on it.
+
+[card,subheader="Nodes"]
+.xref:sdk:api-reference/actions/video-tool.adoc[WeaveVideoToolAction]
+Enables users to add videos to the canvas by selecting a file.
+
+[card,subheader="Nodes",labels="deprecated"]
+.xref:sdk:api-reference/actions/arrow-tool.adoc[WeaveArrowToolAction (deprecated)]
+Enables users to add new arrow nodes to the canvas by clicking or touching on it.
+
+[card,subheader="Nodes",labels="deprecated"]
+.xref:sdk:api-reference/actions/line-tool.adoc[WeaveLineToolAction (deprecated)]
+Enables users to create a single-stroke line on the canvas.
+
+[card,subheader="Nodes",labels="deprecated"]
+.xref:sdk:api-reference/actions/pen-tool.adoc[WeavePenToolAction (deprecated)]
+Enables users to create continuos lines on the canvas with N segments on the canvas.
+
+[card,subheader="Nodes",labels="deprecated"]
+.xref:sdk:api-reference/actions/regular-polygon-tool.adoc[WeaveRegularPolygonToolAction (deprecated)]
+Enables users to create new regular polygons nodes on the canvas.
+
+[card,subheader="Support"]
+.xref:sdk:api-reference/actions/measure-tool.adoc[WeaveMeasureToolAction]
+Enables users to add new measure nodes to the canvas by clicking or touching on it.
+
+[card,subheader="Grouping"]
+.xref:sdk:api-reference/actions/frame-tool.adoc[WeaveFrameToolAction]
+Enables users to create frame nodes by clicking on the canvas.
+
+[card,subheader="Zooming"]
+.xref:sdk:api-reference/actions/fit-to-screen-tool.adoc[WeaveFitToScreenToolAction]
+Automatically adjusts the zoom and position of the canvas to ensure all visible nodes fit neatly within the viewport.
+
+[card,subheader="Zooming"]
+.xref:sdk:api-reference/actions/fit-to-selection-tool.adoc[WeaveFitToSelectionToolAction]
+Automatically adjusts the zoom and position of the canvas to ensure all selected nodes fit neatly within the viewport.
+
+[card,subheader="Zooming"]
+.xref:sdk:api-reference/actions/zoom-in-tool.adoc[WeaveZoomInToolAction]
+Enables users to incrementally zoom into the canvas, providing a more detailed view of content.
+
+[card,subheader="Zooming"]
+.xref:sdk:api-reference/actions/zoom-out-tool.adoc[WeaveZoomOutToolAction]
+Enables users to incrementally zoom out the canvas, providing a more general view of content.
+
+[card,subheader="Export"]
+.xref:sdk:api-reference/actions/export-nodes-tool.adoc[WeaveExportNodeToolAction]
+Automatically adjusts the zoom and position of the canvas to ensure all selected nodes fit neatly within the viewport, and then proceeds to export the viewport as an image.
+
+[card,subheader="Export"]
+.xref:sdk:api-reference/actions/export-stage-tool.adoc[WeaveExportStageToolAction]
+Automatically adjusts the zoom and position of the canvas to ensure all visible nodes fit neatly within the viewport, and then proceeds to export the viewport as an image.
+====

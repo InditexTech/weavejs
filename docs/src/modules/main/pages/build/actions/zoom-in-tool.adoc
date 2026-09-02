@@ -1,0 +1,74 @@
+= Zoom In Tool
+:description: Increases one step the stage zoom level
+
+image::actions/zoom-in-tool.gif[Zoom In Tool action on use on the Weave.js showcase,role="zoom-in"]
+
+== Introduction
+
+This action allows users to incrementally zoom into the canvas, providing a more detailed
+view of the content. It adjusts the Stage’s scale smoothly and centers the zoom
+on the current viewport or a specific focal point.
+
+== Dependencies
+
+This action needs registered on the Weave instance the following element:
+
+* xref:main:build/plugins/stage-zoom.adoc[Stage zoom] plugin
+
+== Usage
+
+=== Import the Action
+Start by importing the action:
+
+[source,ts]
+----
+import { WeaveZoomInToolAction } from "@inditextech/weave-sdk";
+----
+
+=== Register the Action
+Then register the action on the xref:sdk:api-reference/weave/index.adoc[Weave] class instance.
+
+[source,ts]
+----
+const instance = new Weave({
+  ...
+  actions: [
+    ...,
+    new WeaveZoomInToolAction(), // <.>
+  ]
+})
+----
+<.> Added in this step.
+
+=== Setup the action trigger
+Setup on a button or any element on the UI the user can interact with on the action event:
+
+[source,ts]
+----
+instance.triggerAction("zoomInTool");
+----
+
+
+For example on a button on React:
+
+[source,tsx]
+----
+import React from "react";
+import { useWeave } from "@inditextech/weave-react";
+
+const MyZoomInToolTriggerComponent = () => {
+  const instance = useWeave((state) => state.instance);
+
+  const triggerTool = React.useCallback(() => {
+    instance.triggerAction("zoomInTool");
+  }, [instance]);
+
+  return <button onClick={triggerTool}>Zoom In Tool</button>;
+};
+----
+
+=== Trigger the action
+Finally a final user trigger the UI element that launches the action.
+
+
+When triggered increases the zoom level of the canvas by one step.

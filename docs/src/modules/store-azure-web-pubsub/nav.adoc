@@ -1,0 +1,8 @@
+* Introduction
+* xref:store-azure-web-pubsub:index.adoc[Overview]
+* xref:store-azure-web-pubsub:setup.adoc[Setup]
+* API Reference
+* Server
+** xref:store-azure-web-pubsub:api-reference/server/weave-azure-web-pubsub-server.adoc[WeaveAzureWebPubsubServer]
+* Client
+** xref:store-azure-web-pubsub:api-reference/client/weave-store-azure-web-pubsub.adoc[WeaveStoreAzureWebPubsub]

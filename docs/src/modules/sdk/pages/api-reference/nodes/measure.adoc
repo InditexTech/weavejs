@@ -1,0 +1,141 @@
+= WeaveMeasureNode
+:description: Measure node API Reference
+
+== Overview
+
+The https://github.com/InditexTech/weavejs/blob/main/code/packages/sdk/src/nodes/measure/measure.ts[WeaveMeasureNode]
+class represents visually the distance (scaled) between two points on a Weave.js canvas.
+
+In order to render a scaled distance from pixels to real distance on the real world, it needs:
+
+* A measure unit, e.g. meters, centimeters, milimeters, or inches.
+* A reference measure. A distance you previously know based on the measure unit.
+* A reference distance. The distance between two points on the canvas that represent the reference
+
+The class extends the xref:sdk:api-reference/nodes/node.adoc[WeaveNode] class
+
+== Type
+
+This node `nodeType` property value is `measure`.
+
+== Import
+
+[source,shell]
+----
+import { WeaveMeasureNode } from "@inditextech/weave-sdk";
+----
+
+== Instantiation
+
+[source,ts]
+----
+new WeaveMeasureNode(params?: WeaveMeasureNodeParams);
+----
+
+== TypeScript types
+
+[source,ts]
+----
+type WeaveMeasureNodeProperties = {
+  style: {
+    separationLine: {
+      padding: number;
+      strokeWidth: number;
+      dash: number[];
+      stroke: string;
+    };
+    text: {
+      padding: number;
+      fontSize: number;
+      fontFamily: string;
+      fill: string;
+    };
+    intersectionCircle: {
+      radius: number;
+      fill: string;
+    };
+    measureLine: {
+      stroke: string;
+      dash: number[];
+      strokeWidth: number;
+    };
+    handler: {
+      noSpaceSeparationMultiplier: number;
+      spaceSeparationMultiplier: number;
+    };
+  };
+};
+
+type WeaveMeasureNodeParams = {
+  config: DeepPartial<WeaveMeasureNodeProperties>;
+};
+----
+
+== Parameters
+
+For `WeaveMeasureNodeParams`:
+
+[cols="4*"]
+|===
+| Property | Type | Required | Description
+
+| mono:[config] | mono:[Partial<WeaveMeasureProperties>] | label:green[Required] | Config parameters for the node.
+|===
+
+For `WeaveMeasureProperties`:
+
+[cols="5*"]
+|===
+| Property | Type | Required | Default | Description
+
+| mono:[style.separationLine.padding] | mono:[number] |  | mono:[0] | Defines the padding (in px) from the separator end to put the measure line
+| mono:[style.separationLine.strokeWidth] | mono:[number] |  | mono:[1] | Width of the separation line
+| mono:[style.separationLine.dash] | mono:[number[\]] |  | mono:[[\]] | Defines the dashing properties of the separation line as Konva does
+| mono:[style.separationLine.stroke] | mono:[string] |  | mono:[#FF3366] | Defines the line color
+| mono:[style.text.padding] | mono:[number] |  | mono:[10] | Defines the padding from the measure line to the measure text
+| mono:[style.text.frontSize] | mono:[number] |  | mono:[14] | Defines the measure text font size
+| mono:[style.text.frontFamily] | mono:[string] |  | mono:[monospace] | Defines the measure text font family
+| mono:[style.text.fill] | mono:[string] |  | mono:[#FF3366] | Defines the measure text color
+| mono:[style.intersectionCircle.radius] | mono:[number] |  | mono:[3] | Defines the intersection circle between the separator line and the measure line radius
+| mono:[style.intersectionCircle.fill] | mono:[string] |  | mono:[#FF3366] | Defines the intersection circle between the separator line and the measure line color
+| mono:[style.measureLine.stroke] | mono:[string] |  | mono:[#FF3366] | Defines the measure line color
+| mono:[style.measureLine.dash] | mono:[string] |  | mono:[#FF3366] | Defines the dashing properties of the measure line as Konva does
+| mono:[style.measureLine.strokeWidth] | mono:[number] |  | mono:[1] | Width of the measure line
+| mono:[style.handler.noSpaceSeparationMultiplier] | mono:[number] |  | mono:[2.5] | Multiplier of separation for the separation handler when the text doesn't fit on the measure line space
+| mono:[style.handler.spaceSeparationMultiplier] | mono:[number] |  | mono:[1.5] | Multiplier of separation for the separation handler when the text fit on the measure line space
+|===
+
+== Default values
+
+[source,ts]
+----
+const WEAVE_MEASURE_NODE_DEFAULT_CONFIG: WeaveMeasureNodeProperties = {
+  style: {
+    separationLine: {
+      padding: 0,
+      strokeWidth: 1,
+      dash: [],
+      stroke: "#FF3366",
+    },
+    text: {
+      padding: 10,
+      fontSize: 14,
+      fontFamily: "monospace",
+      fill: "#FF3366",
+    },
+    intersectionCircle: {
+      radius: 3,
+      fill: "#FF3366",
+    },
+    measureLine: {
+      stroke: "#FF3366",
+      dash: [4, 4],
+      strokeWidth: 1,
+    },
+    handler: {
+      noSpaceSeparationMultiplier: 2.5,
+      spaceSeparationMultiplier: 1.5,
+    },
+  },
+};
+----

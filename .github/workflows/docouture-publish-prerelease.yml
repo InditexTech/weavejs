@@ -1,0 +1,127 @@
+name: docouture-publish-prerelease
+
+# Rebuilds and republishes the prerelease (prerelease-branch) docs
+# automatically on every ordinary push to the prerelease branch that
+# actually touches content — no docs/release label needed, unlike
+# docouture-release.yml. This exists specifically so ordinary content merges
+# show up without anyone having to fall back to docouture-publish.yml's own
+# workflow_dispatch every time.
+#
+# A plain `on: push: branches: [<prerelease branch>*]` used to live directly
+# on docouture-publish.yml and was removed for two reasons — see that
+# file's own header comment. Both are avoided here by construction rather
+# than by reintroducing the same trigger in the same place:
+#
+#   1. An unrelated commit shouldn't kick off a rebuild with nothing new to
+#      publish. `check-changes-in-paths` (below) gates on real content paths
+#      only. In particular this deliberately excludes docs/.release-version:
+#      that file is the ONLY thing docouture-release.yml's own "Bump release
+#      descriptor" step pushes straight to the release branch directly (see
+#      that workflow's own comment on that step) — a bot commit that is not
+#      new docs content, and (trunk-based only, where prerelease and release
+#      are the same branch) would otherwise fire this workflow for nothing.
+#
+#   2. Firing twice for one release — once from a docs/release-labeled
+#      merge's own content, and again from docouture-release.yml's chained
+#      docouture-publish.yml call once the tag is actually cut — is not a race
+#      (the two are sequential, not simultaneous: this workflow's own push
+#      event fires at merge time, before docouture-release.yml's job even
+#      starts), just a redundant rebuild. `check-release-label` (below)
+#      closes that gap directly: if the commit that triggered this push came
+#      from a merged pull request carrying the docs/release label,
+#      docouture-release.yml is already about to publish the definitive
+#      post-release build itself, so this workflow skips rather than
+#      duplicate it. (Only reachable at all in a trunk-based site, where the
+#      prerelease and release branches are the same one — under git-flow
+#      they're different branches, so a docs/release-labeled PR never
+#      targets the prerelease branch this workflow watches.)
+on:
+  push:
+    branches: ['main*']
+
+permissions:
+  contents: read
+  pull-requests: read
+
+concurrency:
+  group: docouture-publish-prerelease
+  cancel-in-progress: true
+
+jobs:
+  check-changes-in-paths:
+    name: Check for changes in corresponding paths
+    runs-on: ubuntu-latest
+    outputs:
+      detected: ${{ steps.changes.outputs.paths }}
+    steps:
+      # dorny/paths-filter diffs github.event.before -> github.sha via local
+      # git history on a push trigger (unlike a pull_request trigger, where
+      # it can resolve the base from the GitHub API alone) — needs an actual
+      # checkout first, or there is no .git to diff against at all
+      # (`git` exits 128, "not a git repository"/"bad revision"). fetch-depth
+      # 0 rather than a shallow default: a batched push can carry more
+      # commits than a shallow clone's history would contain, and `before`
+      # must be reachable locally for the diff to succeed.
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Check for changed files in specific paths
+        id: changes
+        uses: dorny/paths-filter@ebc4d7e9ebcb0b1eb21480bb8f43113e996ac77a # v3
+        with:
+          filters: |
+            paths:
+              - 'docs/src/**'
+              - 'docs/antora-playbook*.yml'
+              - 'docs/supplemental-ui/**'
+              # docs/.release-version is deliberately NOT listed — see this
+              # file's own header comment, point 1.
+
+  check-release-label:
+    name: Check for docs/release label on the triggering pull request
+    needs: check-changes-in-paths
+    if: needs.check-changes-in-paths.outputs.detected == 'true'
+    runs-on: ubuntu-latest
+    outputs:
+      skip: ${{ steps.check.outputs.skip }}
+    env:
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    steps:
+      # Resolves the merged pull request (if any) that produced this push's
+      # HEAD commit, regardless of merge strategy (merge commit, squash, or
+      # rebase) — GitHub tracks this association itself rather than this
+      # step having to guess from the SHA, see
+      # https://docs.github.com/en/rest/commits/commits#list-pull-requests-associated-with-a-commit.
+      # A direct push to the prerelease branch with no associated pull
+      # request (e.g. an admin pushing straight to it) simply resolves no
+      # labels and is never skipped here.
+      - name: Check for docs/release label
+        id: check
+        run: |
+          labels=$(gh api "repos/${{ github.repository }}/commits/${{ github.sha }}/pulls" \
+            --jq '.[0].labels[].name' 2>/dev/null || echo "")
+
+          if echo "$labels" | grep -qx 'docs/release'; then
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+            echo "This push came from a docs/release-labeled merge — docouture-release.yml will publish the definitive build itself, skipping here."
+          else
+            echo "skip=false" >> "$GITHUB_OUTPUT"
+          fi
+
+  publish:
+    name: Publish
+    needs: [check-changes-in-paths, check-release-label]
+    if: needs.check-changes-in-paths.outputs.detected == 'true' && needs.check-release-label.outputs.skip != 'true'
+    # docouture-publish.yml's own `publish` job requests `contents: write` (only
+    # ever used by @inditextech/docouture-publish-gh-pages, pushing to the
+    # `gh-pages` branch) — a reusable workflow can never be granted more than
+    # its caller job holds, so without this the call is rejected outright as
+    # a permissions escalation rather than merely losing write access at
+    # runtime. The two gate jobs above stay read-only; only this job, which
+    # actually calls through, needs the elevated grant.
+    permissions:
+      contents: write
+    uses: ./.github/workflows/docouture-publish.yml
+    secrets: inherit

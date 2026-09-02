@@ -1,0 +1,97 @@
+= WeaveUsersPointersPlugin
+:description: Showcase the position of the users mouse pointer on the canvas
+
+== Overview
+
+The https://github.com/InditexTech/weavejs/blob/main/code/packages/sdk/src/plugins/users-pointers/users-pointers.ts[WeaveUsersPointersPlugin]
+class that enables real-time cursor sharing across all connected users on the collaborative canvas. It displays live
+pointer positions, often tagged with user metadata like name or color, allowing participants to see each other’s
+activity and collaborate more intuitively.
+
+This plugin helps create a shared sense of presence, making collaborative tools feel dynamic, interactive, and
+truly multi-user.
+
+The class extends the xref:sdk:api-reference/plugins/plugin.adoc[WeavePlugin] class
+
+== Name
+
+This plugin `name` property value is `usersPointers`.
+
+== Import
+
+[source,shell]
+----
+import { WeaveUsersPointersPlugin } from "@inditextech/weave-sdk";
+----
+
+== Instantiation
+
+[source,ts]
+----
+new WeaveUsersPointersPlugin(params: WeaveUsersPointersPluginParams);
+----
+
+== TypeScript types
+
+[source,ts]
+----
+type WeaveUser = {
+  [key: string]: any;
+  name: string;
+  email: string;
+};
+
+type WeaveUsersPointersPluginConfig = {
+  getUser: () => WeaveUser;
+  getUserBackgroundColor: (
+    user: WeaveUser
+  ) => string | CanvasGradient | undefined;
+  getUserForegroundColor: (
+    user: WeaveUser
+  ) => string | CanvasGradient | undefined;
+  ui?: WeaveUserPointersUIProperties;
+};
+
+type WeaveUserPointersUIProperties = {
+  separation: number;
+  pointer: {
+    circleRadius: number;
+    circleStrokeWidth: number;
+  };
+  name: {
+    fontFamily: string;
+    fontSize: number;
+    backgroundCornerRadius: number;
+    backgroundPaddingX: number;
+    backgroundPaddingY: number;
+  };
+};
+
+type WeaveUsersPointersPluginParams = {
+  config: WeaveUsersPointersPluginConfig;
+  ui?: WeaveUserPointersUIProperties;
+};
+----
+
+== Parameters
+
+For `WeaveUsersPointersPluginParams`:
+
+[cols="4*"]
+|===
+| Property | Type | Required | Description
+
+| mono:[config] | mono:[WeaveUsersPointersPluginConfig] |  | Config parameters for the plugin.
+|===
+
+For `WeaveUsersPointersPluginConfig`:
+
+[cols="4*"]
+|===
+| Property | Type | Required | Description
+
+| mono:[getUser] | mono:[() => WeaveUser] |  | A function that returns the actual instance user metadata.
+| mono:[getUserBackgroundColor] | mono:[(user: WeaveUser) => string \| CanvasGradient \| undefined] |  | A function that returns the color (#RGB or #RGBA) to use to set the pointer background color.
+| mono:[getUserForegroundColor] | mono:[(user: WeaveUser) => string \| CanvasGradient \| undefined] |  | A function that returns the color (#RGB or #RGBA) to use to set the pointer foreground color.
+| mono:[ui] | mono:[WeaveUserPointersUIProperties] |  | An object that defined the cursor properties (UI)
+|===

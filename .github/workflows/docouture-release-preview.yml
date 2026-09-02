@@ -1,0 +1,202 @@
+name: docouture-release-preview
+
+# Comments on a pull request labeled `docs/release`, previewing what
+# docouture-release.yml (this workflow's sibling) will do when the PR merges —
+# same 3-job shape as this monorepo's own .github/workflows/code-release_preview.yml
+# (check-changes-in-paths / release-preview / release-preview-no-*-changes /
+# release-preview-no-release-label), adapted to docs-release's own signal
+# (the `docs/release` label + versioning-mode detection) instead of
+# code-release's (`release-type/*` labels + a CHANGELOG.md diff).
+#
+# Read-only: this workflow never touches git, tags, or docs/antora.yml — it
+# only reports what docouture-release.yml would do, so a reviewer can catch a
+# missing docs/.release-version (versioned mode) or an about-to-be-overwritten
+# tag before merging, not after.
+#
+# Reuses docouture-release.yml's own "Detect mode" (grep antora-playbook.yml's
+# content.sources[] tags) and "Resolve version" (stable, or
+# docs/.release-version's contents) logic verbatim — see that workflow's own
+# comments, and the docs-site-package skill's reference/versioning-modes.md,
+# for the full mechanism.
+on:
+  pull_request:
+    types: [labeled, synchronize, ready_for_review, opened]
+    branches: ["main*"]
+
+concurrency:
+  group: docouture-release-preview-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  check-changes-in-paths:
+    name: Check for changes in corresponding paths
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: read
+    if: ${{ github.event.pull_request.draft == false || contains(github.event.pull_request.labels.*.name, 'docs/release') }}
+    outputs:
+      detected: ${{ steps.changes.outputs.paths }}
+    steps:
+      - name: Check for changed files in specific paths
+        id: changes
+        uses: dorny/paths-filter@ebc4d7e9ebcb0b1eb21480bb8f43113e996ac77a # v3
+        with:
+          filters: |
+            paths:
+              - 'docs/**'
+              - '.github/workflows/docouture-release*.yml'
+
+  release-preview:
+    name: Release Preview
+    needs: check-changes-in-paths
+    if: ${{ contains(github.event.pull_request.labels.*.name, 'docs/release') && needs.check-changes-in-paths.outputs.detected == 'true' }}
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+    # `docouture new` scaffolds this site's antora-playbook.yml, docs/antora.yml
+    # etc. under docs/ (not the repository root) — same layout
+    # docouture-release.yml itself runs against. Every step below runs from
+    # there; only .github/workflows itself has to live at the true repo
+    # root.
+    defaults:
+      run:
+        working-directory: docs
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # Same signal docouture-release.yml's own "Detect mode" step reads:
+      # antora-playbook.yml's content.sources[] tags, not docs/antora.yml
+      # (identical on the release branch for both modes, so it carries no
+      # mode signal).
+      - name: Detect mode
+        id: detect
+        run: |
+          line=$(grep -E "tags:" antora-playbook.yml | head -1)
+
+          case "$line" in
+            *"v*"*) mode=versioned ;;
+            *stable*) mode=standalone ;;
+            *)
+              echo "::error::antora-playbook.yml's content.sources[] has tags: '${line}' — expected something matching 'docs/v*' (versioned) or 'docs/stable' (standalone)."
+              exit 1
+              ;;
+          esac
+
+          echo "mode=${mode}" >> "$GITHUB_OUTPUT"
+          echo "Detected ${mode} (antora-playbook.yml: ${line})"
+
+      # Standalone always targets 'stable'; versioned reads the plain-text
+      # docs/.release-version this PR is expected to have committed — same
+      # source docouture-release.yml's pull_request trigger reads (there is no
+      # workflow_dispatch input to fall back to here, since this workflow
+      # only ever runs on pull_request).
+      - name: Resolve version
+        id: resolve
+        env:
+          MODE: ${{ steps.detect.outputs.mode }}
+        run: |
+          if [ "$MODE" = "versioned" ]; then
+            if [ -f .release-version ]; then
+              version=$(tr -d '[:space:]' < .release-version)
+            else
+              version=""
+            fi
+            tag="docs/v${version}"
+          else
+            version="stable"
+            tag="docs/stable"
+          fi
+
+          echo "version=${version}" >> "$GITHUB_OUTPUT"
+          echo "tag=${tag}" >> "$GITHUB_OUTPUT"
+
+      # Query the remote directly — no local tag fetch needed. A hit here
+      # means docouture-release.yml's "Push release tag" step will force-move an
+      # existing tag (a republish) rather than create a new one.
+      - name: Check for existing tag
+        id: check
+        env:
+          MODE: ${{ steps.detect.outputs.mode }}
+          TAG: ${{ steps.resolve.outputs.tag }}
+        run: |
+          if [ "$MODE" = "versioned" ] && [ -z "${{ steps.resolve.outputs.version }}" ]; then
+            echo "existed=unknown" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          if git ls-remote --exit-code --tags origin "refs/tags/${TAG}" >/dev/null 2>&1; then
+            echo "existed=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "existed=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Comment on PR
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          MODE: ${{ steps.detect.outputs.mode }}
+          VERSION: ${{ steps.resolve.outputs.version }}
+          TAG: ${{ steps.resolve.outputs.tag }}
+          EXISTED: ${{ steps.check.outputs.existed }}
+        run: |
+          if [ "$MODE" = "versioned" ] && [ -z "$VERSION" ]; then
+            gh pr comment ${{ github.event.number }} --body "
+          ### :x: docs/release: no target version
+          This site is on Versioned (Full History) mode, but no \`docs/.release-version\` file was found in this PR — add one with the target version (e.g. \`1.2.0\`) before merging with the \`docs/release\` label, or the release workflow will fail on merge."
+            exit 0
+          fi
+
+          MESSAGE="
+          ### :rocket: Docs Release Preview
+          Merging this Pull Request will release the docs site as **\`${TAG}\`**."
+
+          if [ "$EXISTED" = "true" ]; then
+            MESSAGE="${MESSAGE}
+
+          ### :warning: Tag already exists
+          \`${TAG}\` already exists and will be **force-overwritten** on merge."
+          fi
+
+          gh pr comment ${{ github.event.number }} --body "$(echo -e "$MESSAGE")"
+
+  release-preview-no-docs-changes:
+    name: Add PR comment with configuration management information
+    needs: check-changes-in-paths
+    if: ${{ contains(github.event.pull_request.labels.*.name, 'docs/release') && needs.check-changes-in-paths.outputs.detected == 'false' }}
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+    env:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Add PR comment with release preview
+        run: |
+          gh pr comment ${{ github.event.number }} --body "
+          ### :exclamation: This Pull Request will not trigger a meaningful release
+          The \`docs/release\` label is set, but this Pull Request has no changes under \`docs/**\` — merging it will still cut a release, just with nothing new in it."
+
+  release-preview-no-release-label:
+    name: Add PR comment with release information
+    needs: check-changes-in-paths
+    if: ${{ !contains(github.event.pull_request.labels.*.name, 'docs/release') && needs.check-changes-in-paths.outputs.detected == 'true' && github.event.pull_request.draft == false }}
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+    env:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Add PR comment with release preview
+        run: |
+          gh pr comment ${{ github.event.number }} --body "
+          ### :exclamation: This Pull Request will not trigger a docs release
+          A Pull Request with no \`docs/release\` label will not trigger a docs site release — label it \`docs/release\` if you want this merge to release the docs site."

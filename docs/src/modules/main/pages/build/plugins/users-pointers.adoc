@@ -1,0 +1,84 @@
+= Users Pointers
+:description: Showcase the position of the users mouse pointer on the canvas
+
+image::plugins/users-pointers.gif[Users pointers plugin on use on the Weave.js showcase,role="zoom-in"]
+
+== Introduction
+
+This plugin displays real-time cursors or pointers for all connected users on the
+canvas. Each pointer is typically labeled with the user's name or avatar, allowing
+collaborators to see where others are pointing, clicking, or working in real time.
+
+This plugin enhances awareness and coordination in multi-user sessions, making
+collaboration feel more intuitive and dynamic. It integrates with Weave.js's
+presence system and updates instantly as users move their mouse or interact with
+the canvas.
+
+== Usage
+
+=== Import the Plugin
+Start by importing the plugin:
+
+[source,ts]
+----
+import { WeaveUsersPointersPlugin } from "@inditextech/weave-sdk";
+----
+
+=== Register the Plugin
+Then register the plugin on the xref:sdk:api-reference/weave/index.adoc[Weave] class instance.
+
+[source,ts]
+----
+const getUser = () => { // <.>
+  id: 'user-id', // <.>
+  email: 'useremail@corp.com', // <.>
+  name: 'User' // <.>
+} // <.>
+
+const getUserBackgroundColor = (user: WeaveUser) => // <.>
+  getUserBackgroundColor(user?.name ?? "#000000") // <.>
+
+const getUserForegroundColor = (user: WeaveUser) => { // <.>
+  const bgColor = getUserBackgroundColor(user?.name ?? "#000000"); // <.>
+  return getContrastColor(bgColor); // <.>
+} // <.>
+
+const instance = new Weave({
+  ...
+  plugins: [
+    ...,
+    new WeaveUsersPointersPlugin({ // <.>
+      config: { // <.>
+        getUser, // <.>
+        getUserBackgroundColor, // <.>
+        getUserForegroundColor, // <.>
+      }, // <.>
+    }), // <.>
+  ]
+})
+----
+<.> Added in this step.
+<.> Added in this step.
+<.> Added in this step.
+<.> Added in this step.
+<.> Added in this step.
+<.> Added in this step.
+<.> Added in this step.
+<.> Added in this step.
+<.> Added in this step.
+<.> Added in this step.
+<.> Added in this step.
+<.> Added in this step.
+<.> Added in this step.
+<.> Added in this step.
+<.> Added in this step.
+<.> Added in this step.
+<.> Added in this step.
+<.> Added in this step.
+
+You can also customize the pointer visual style and font style. For more information check the
+xref:sdk:api-reference/plugins/users-pointers.adoc[WeaveUsersPointersPlugin] plugin API.
+
+=== Use the plugin
+Once the plugin is registered if more than one users are connected to the xref:main:glossary.adoc#room[room],
+the instance user will be able to see the other users pointers, and the others users can see theirs.

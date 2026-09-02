@@ -1,0 +1,126 @@
+= WeaveNodesDistanceSnappingPlugin
+:description: Allow to snap nodes to distance guides among peers nodes of a target node
+
+== Overview
+
+The https://github.com/InditexTech/weavejs/blob/main/code/packages/sdk/src/plugins/nodes-distance-snapping/nodes-distance-snapping.ts[WeaveNodesDistanceSnappingPlugin]
+class that enables smart snapping behavior when users move a target node, distance is relative to the peer nodes
+located (vertically or horizontally) to the target node. It helps align nodes with
+each other, improving layout precision and visual consistency across
+the canvas.
+
+The class extends the xref:sdk:api-reference/plugins/plugin.adoc[WeavePlugin] class
+
+== Name
+
+This plugin `name` property value is `nodesDistanceSnapping`.
+
+== Import
+
+[source,shell]
+----
+import { WeaveNodesDistanceSnappingPlugin } from "@inditextech/weave-sdk";
+----
+
+== Instantiation
+
+[source,ts]
+----
+new import { WeaveNodesDistanceSnappingPlugin } from "@inditextech/weave-sdk";
+(params?: WeaveNodesDistanceSnappingPluginParams);
+----
+
+== TypeScript types
+
+[source,ts]
+----
+const GUIDE_DISTANCE_LINE_DEFAULT_CONFIG: WeaveNodesDistanceSnappingUIConfig = {
+  line: {
+    stroke: "#E12D3C",
+    strokeWidth: 1,
+  },
+  label: {
+    linePadding: 10,
+    height: 20,
+    cornerRadius: 0,
+    fill: "#E12D3C",
+    fontStyle: "normal",
+    fontSize: 14,
+    fontFamily: "Arial",
+    paddingX: 4,
+  },
+};
+const GUIDE_ENTER_SNAPPING_TOLERANCE = 3;
+const GUIDE_EXIT_SNAPPING_TOLERANCE = 5;
+
+type NodeSnapHorizontalKeys = keyof typeof NODE_SNAP_HORIZONTAL;
+type NodeSnapHorizontal = (typeof NODE_SNAP_HORIZONTAL)[NodeSnapHorizontalKeys];
+
+type NodeSnapVerticalKeys = keyof typeof NODE_SNAP_VERTICAL;
+type NodeSnapVertical = (typeof NODE_SNAP_VERTICAL)[NodeSnapVerticalKeys];
+
+type WeaveNodesDistanceSnappingPluginConfig = {
+  enterSnappingTolerance: number;
+  exitSnappingTolerance: number;
+  ui: WeaveNodesDistanceSnappingUIConfig;
+};
+
+type WeaveNodesDistanceSnappingPluginParams = {
+  config?: DeepPartial<WeaveNodesDistanceSnappingPluginConfig>;
+};
+
+type DistanceInfoH = {
+  index: number;
+  from: Konva.Node;
+  to: Konva.Node;
+  midY: number;
+  distance: number;
+};
+
+type DistanceInfoV = {
+  index: number;
+  from: Konva.Node;
+  to: Konva.Node;
+  midX: number;
+  distance: number;
+};
+
+type WeaveNodesDistanceSnappingUIConfig = {
+  line: {
+    stroke: string;
+    strokeWidth: number;
+  };
+  label: {
+    height: number;
+    cornerRadius: number;
+    fill: string;
+    fontSize: number;
+    fontFamily: string;
+    fontStyle: string;
+    linePadding: number;
+    paddingX: number;
+  };
+};
+----
+
+== Parameters
+
+For `WeaveNodesDistanceSnappingPluginParams`:
+
+[cols="4*"]
+|===
+| Property | Type | Required | Description
+
+| mono:[config] | mono:[WeaveNodesDistanceSnappingPluginConfig] |  | Config parameters for the plugin.
+|===
+
+For `WeaveNodesDistanceSnappingPluginConfig`:
+
+[cols="5*"]
+|===
+| Property | Type | Required | Default | Description
+
+| mono:[enterSnappingTolerance] | mono:[number] |  | mono:[3] | Drag snapping threshold (in px) to the guides (when entering snap).
+| mono:[exitSnappingTolerance] | mono:[number] |  | mono:[3] | Drag snapping threshold (in px) to the guides (when exiting snap).
+| mono:[ui] | mono:[WeaveNodesDistanceSnappingUIConfig] |  | mono:[GUIDE_DISTANCE_LINE_DEFAULT_CONFIG] | Distance lines and labels UI configuration.
+|===

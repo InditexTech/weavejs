@@ -1,0 +1,63 @@
+= Users Presence
+:description: Showcase what the users are doing on the canvas
+
+image::plugins/users-presence.gif[Users showcase plugin on use on the Weave.js showcase,role="zoom-in"]
+
+== Introduction
+
+This plugin displays in real-time what connected users are doing on the canvas. For example
+when an user drags/moves an element, the dragging movement will be displayed, and not just the
+final result of the user operation.
+
+As today we support:
+
+* Dragging of nodes
+* Transforming of nodes
+
+== Usage
+
+=== Import the Plugin
+Start by importing the plugin:
+
+[source,ts]
+----
+import { WeaveUsersPresencePlugin } from "@inditextech/weave-sdk";
+----
+
+=== Register the Plugin
+Then register the plugin on the xref:sdk:api-reference/weave/index.adoc[Weave] class instance.
+
+[source,ts]
+----
+const getUser = () => { // <.>
+  id: 'user-id', // <.>
+  email: 'useremail@corp.com', // <.>
+  name: 'User' // <.>
+}
+
+const instance = new Weave({
+  ...
+  plugins: [
+    ...,
+    new WeaveUsersPresencePlugin({ // <.>
+      config: { // <.>
+        getUser, // <.>
+      }, // <.>
+    }), // <.>
+  ]
+})
+----
+<.> Added in this step.
+<.> Added in this step.
+<.> Added in this step.
+<.> Added in this step.
+<.> Added in this step.
+<.> Added in this step.
+<.> Added in this step.
+<.> Added in this step.
+<.> Added in this step.
+
+=== Use the plugin
+Once the plugin is registered if more than one users are connected to the xref:main:glossary.adoc#room[room],
+instance, users will be able to see the other users operations in real-time, and the others users can see
+theirs.

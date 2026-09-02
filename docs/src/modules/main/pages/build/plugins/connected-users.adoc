@@ -1,0 +1,84 @@
+= Connected Users
+:description: Get an structure with information about the connected users
+
+image::plugins/connected-users.gif[Connected Users plugin on use on the Weave.js showcase,role="zoom-in"]
+
+== Introduction
+
+This plugin returns the list of users currently active in a collaborative session.
+It can provide the user name and email, helping participants stay aware of who’s
+online and interacting with the canvas.
+
+.UI Agnostic
+[NOTE]
+====
+This plugin only returns an structure of the connected users to a
+xref:main:glossary.adoc#room[room], it doesn't provide an UI.
+====
+
+== Usage
+
+=== Import the Plugin
+Start by importing the plugin:
+
+[source,ts]
+----
+import { WeaveConnectedUsersPlugin } from "@inditextech/weave-sdk";
+----
+
+=== Register the Plugin
+Then register the plugin on the xref:sdk:api-reference/weave/index.adoc[Weave] class instance.
+
+[source,ts]
+----
+const getUser = () => { // <.>
+  id: 'user-id', // <.>
+  email: 'useremail@corp.com', // <.>
+  name: 'User' // <.>
+} // <.>
+
+const instance = new Weave({
+  ...
+  plugins: [
+    ...,
+    new WeaveConnectedUsersPlugin({ // <.>
+      config: { // <.>
+        getUser, // <.>
+      }, // <.>
+    }), // <.>
+  ]
+})
+----
+<.> Added in this step.
+<.> Added in this step.
+<.> Added in this step.
+<.> Added in this step.
+<.> Added in this step.
+<.> Added in this step.
+<.> Added in this step.
+<.> Added in this step.
+<.> Added in this step.
+<.> Added in this step.
+
+=== Use the plugin
+Once the plugin is registered you can add a listener with the xref:sdk:api-reference/weave/index.adoc[Weave]
+instance xref:sdk:api-reference/weave/index.adoc#events[Events API] that listen to the event named `onConnectedUsersChange`.
+
+[source,ts]
+----
+// Import types
+import type {
+  WeaveConnectedUsers,
+  WeaveConnectedUsersChangeEvent,
+} from "@inditextech/weave-sdk";
+
+instance.addEventListener<WeaveConnectedUsersChangeEvent>(
+  "onConnectedUsersChange",
+  (users: WeaveConnectedUsers) => {
+    console.log(users);
+  }
+);
+----
+
+With this callback you can save this information on the UI state and render accordingly, whenever it
+changes your UI will remain updated.

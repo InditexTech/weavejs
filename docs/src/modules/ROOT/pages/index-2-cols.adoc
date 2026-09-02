@@ -1,0 +1,190 @@
+= Home (two columns)
+:page-layout: home
+:page-nav-module: main
+:description: Weave.js — the framework for building visual collaborative applications.
+:page-tags: collaborative, canvas, real-time
+:page-action: Open the showcase
+:page-action-url: https://weavejs.cloud.inditex.com
+:page-action-secondary: Quickstart
+:page-action-secondary-url: main:quickstart.adoc
+:page-hero-image: home-hero.png
+:page-hero-image-alt: A Weave.js room with a text node selected on the canvas.
+
+Created for developers, Weave.js is an open-source library that provides all the building blocks, plugins, and APIs to develop visual collaborative tools at the speed of light.
+
+Weave.js abstracts the complexity of building real-time, collaborative apps from scratch by handling the three core pillars of any collaborative visual tool:
+
+- *Shared state model that allows collaboration*. A structured data layer to model your applications' needs.
+- *Real-time shared state synchronization*. Built-in mechanisms for syncing shared-state across clients using atomic diffs and pluggable transport layers.
+- *Rendering and interactions (User Interface)*. A decoupled rendering and interaction layer with a simple API to handle shared state changes, user interactions, and custom behaviors. A headless solution (in terms of UI).
+
+== Get started
+
+[cards,type=image-square,columns="1 s:2 m:4",width=container]
+====
+[card,subheader="Start here"]
+.xref:main:quickstart.adoc[Quickstart]
+--
+image::card-quickstart-flat.png["A room is created, a canvas node is added and a second collaborator connects"]
+
+Set up a room, render a canvas and invite a second participant.
+--
+
+[card,subheader="Reference"]
+.xref:sdk:index.adoc[SDK]
+--
+image::card-sdk-flat.png["The shared state model connects nodes, actions, plugins and canvas rendering primitives"]
+
+The headless library the canvas is built on.
+--
+
+[card,subheader="Integration"]
+.xref:react:index.adoc[React Helper]
+--
+image::card-react-flat.png["React components connect into a Weave.js collaborative canvas"]
+
+Components for integrating Weave.js into a React application.
+--
+
+[card,subheader="Transport"]
+.xref:main:build/stores/index.adoc[Stores]
+--
+image::card-stores-flat.png["Two clients synchronize the same room state through a central store transport"]
+
+How a room's state reaches every participant, and which transport to pick.
+--
+====
+
+== Build collaborative whiteboard applications
+
+[feature-tabs]
+====
+[feature,label="UI-agnostic"]
+--
+image::feature-1.png[A Weave.js canvas rendered through several UI frameworks]
+image::feature-1-dark.png[role=dark]
+
+Change the UI using our included primitives or build a new one. With Weave.js,
+you get a unified system that includes a high-performance, fully customizable
+whiteboard so you can focus on building the product.
+
+[.cta]
+xref:main:architecture.adoc[Learn more]
+--
+
+[feature,label="Powerful abstractions"]
+--
+image::feature-2.png[The store, node, plugin and action layers of a Weave.js room]
+image::feature-2-dark.png[role=dark]
+
+Keep what you need, discard the rest, and build your own. Stores handle the
+real-time sync complexity while nodes, plugins, and actions allow for
+selection, drawing, erasing, creating geometric shapes, and perfect freehand
+drawing to smooth development.
+
+[.cta]
+xref:main:build/index.adoc[Learn more]
+--
+
+[feature,label="React Helper library"]
+--
+image::feature-3.png[Weave.js components rendered inside a React application]
+image::feature-3-dark.png[role=dark]
+
+Our React Helper library provides all the necessary components to easily
+integrate Weave.js on top of React projects.
+
+[.cta]
+xref:react:index.adoc[Learn more]
+--
+
+[feature,label="Light & well-built"]
+--
+image::feature-4.png[Atomic diffs travelling between two clients of a room]
+image::feature-4-dark.png[role=dark]
+
+Weave.js only syncs minimal state changes — not the full tree. It uses a custom
+React Reconciler under the hood to detect and transmit mutations with maximum
+efficiency. Lower overhead, higher performance for live collaboration.
+
+[.cta]
+xref:react:index.adoc[Learn more]
+--
+====
+
+== Free & open source
+
+[cta]
+====
+Weave.js is actively maintained and open for contributions.
+
+It comes with best-in-class documentation and developer experience.
+
+[.primary]
+https://github.com/InditexTech/weavejs-frontend/fork[Create a fork]
+====
+
+== Frequently asked questions
+
+Have more questions? Contact us and we'll respond as quickly as possible.
+
+[accordion,aria-label="Frequently asked questions"]
+--
+.What type of applications can I create with Weave.js?
+[%collapsible]
+====
+Weave.js is aimed at developers. It provides a framework with all the
+components, plugins, and tools to build custom whiteboards, canvas, and
+collaborative visual tools for your applications. It provides a set of
+nodes, actions, and plugins you can choose from and extend to your needs,
+so you can easily build the perfect whiteboard solution.
+
+Although we provide a default UI, you can customize it so the visual
+collaborative tool you build has the look & feel of your liking or matches
+your corporate identity.
+====
+
+.Can I use Weave.js in frontend frameworks other than React?
+[%collapsible]
+====
+Yes, you can use Weave.js with any UI framework, but we recommend using it
+with React.
+
+Weave.js is framework-agnostic at its core, meaning the rendering and
+collaboration logic can be integrated into different environments. However,
+we provide and maintain a React utility to make the integration with React
+more seamless.
+
+If you're using another framework (like Vue or Svelte), integration is
+possible, but may require additional setup or custom wrappers not provided
+by Weave.js documentation.
+====
+
+.Is Weave.js free to use and open source?
+[%collapsible]
+====
+Yes, Weave.js is free to use and open source. It is distributed under the
+Apache 2.0 License, which means you can use, modify, and distribute the
+software. When using Weave.js, remember to comply with the license: simply
+provide a copy of the License, include the required notices, and indicate
+any modifications you make to the Weave.js code.
+====
+
+.Can I use Weave.js in a commercial application?
+[%collapsible]
+====
+Yes, you can use Weave.js in a commercial application. The Apache 2.0
+License is a permissive license that allows its use in all types of
+applications.
+====
+
+.How do I request a feature for Weave.js?
+[%collapsible]
+====
+You can find us on https://github.com/InditexTech/weavejs-frontend[GitHub],
+where you can request new features, contribute with your own, find support,
+and open discussions that will help us improve our product further.
+
+If you like it, don't forget to give us a star ;-)
+====
+--

@@ -1,0 +1,137 @@
+= Copy & Paste Nodes
+:description: Activate support to copy & paste the nodes
+
+image::plugins/copy-paste.gif[Copy & Paste plugin on use on the Weave.js showcase,role="zoom-in"]
+
+== Introduction
+
+This plugin enables users to copy & paste selected nodes.
+
+Using familiar keyboard shortcuts like kbd:[Ctrl] / kbd:[Cmd] + kbd:[C]
+and kbd:[Ctrl] / kbd:[Cmd] + kbd:[V], or
+through options in a context-menu. It preserves node structure, styles, and
+metadata, allowing for quick reuse and layout iteration.
+
+Supports multi-node copy & copy & paste between tabs. It integrates
+seamlessly with the selection and action systems, making it a natural part of the
+collaborative editing workflow.
+
+== Usage
+
+=== Import the Plugin
+Start by importing the plugin:
+
+[source,ts]
+----
+import { WeaveCopyPasteNodesPlugin } from "@inditextech/weave-sdk";
+----
+
+=== Register the Plugin
+Then register the plugin on the xref:sdk:api-reference/weave/index.adoc[Weave] class instance.
+
+[source,ts]
+----
+const instance = new Weave({
+  ...
+  plugins: [
+    ...,
+    new WeaveCopyPasteNodesPlugin(), // <.>
+  ]
+})
+----
+<.> Added in this step.
+
+=== Use the plugin
+Once the plugin is registered final users can now copy & paste nodes freely, but the copy & paste
+mus be triggered using the API provided by the plugin.
+
+
+==== Public API
+
+* To copy just select a node (or nodes), and trigger the `copy()` function:
++
+[source,ts]
+----
+const copyPastePlugin =
+  this.instance.getPlugin<WeaveCopyPasteNodesPlugin>("copyPasteNodes");
+if (copyPastePlugin) {
+  await copyPastePlugin.copy();
+}
+----
+* To paste, after copy something to the clipboard just trigger the `paste()` function:
++
+[source,ts]
+----
+const copyPastePlugin =
+  this.instance.getPlugin<WeaveCopyPasteNodesPlugin>("copyPasteNodes");
+if (copyPastePlugin) {
+  copyPastePlugin.paste();
+}
+----
+
+To learn more check the xref:sdk:api-reference/plugins/copy-paste-nodes.adoc[WeaveCopyPasteNodesPlugin]
+plugin.
+
+
+==== Events
+
+You can also add some listeners with the xref:sdk:api-reference/weave/index.adoc[Weave]
+instance xref:sdk:api-reference/weave/index.adoc#events[Events API] that listen to the following
+provided events:
+
+* `onCopy`: triggers when an user copy something onto the clipboard.
++
+[source,ts]
+----
+// Import types
+import type {
+  WeaveCopyPasteNodesPlugin,
+  WeaveCopyPasteNodesPluginOnCopyEvent,
+} from "@inditextech/weave-sdk";
+
+instance.addEventListener<WeaveCopyPasteNodesPluginOnCopyEvent>(
+  "onCopy",
+  () => {
+    console.log("copy operation performed");
+  }
+);
+----
+* `onPaste`: triggers when an user paste something from the clipboard onto the stage.
++
+[source,ts]
+----
+// Import types
+import type {
+  WeaveCopyPasteNodesPlugin,
+  WeaveCopyPasteNodesPluginOnPasteEvent,
+} from "@inditextech/weave-sdk";
+
+instance.addEventListener<WeaveCopyPasteNodesPluginOnPasteEvent>(
+  "onPaste",
+  () => {
+    console.log("paste operation performed");
+  }
+);
+----
+* `onPasteExternal`: triggers when an user paste something from external sources (not from the same application).
++
+You receive an object as parameter with:
+** `position`: a `Vector2d` element, that represents the position on the stage that user pasted.
+** `item`: a `ClipboardItem` structure with the elements on the clipboard.
++
+[source,ts]
+----
+// Import types
+import type {
+  WeaveCopyPasteNodesPlugin,
+  WeaveCopyPasteNodesPluginOnPasteExternalEvent,
+} from "@inditextech/weave-sdk";
+
+instance.addEventListener<WeaveCopyPasteNodesPluginOnPasteExternalEvent>(
+  "onPasteExternal",
+  ({ position, item }) => {
+    console.log("external paste operation performed");
+    console.log("you're responsible to add something external to the app.");
+  }
+);
+----

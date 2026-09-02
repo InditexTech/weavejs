@@ -1,0 +1,286 @@
+= WeaveNodesSelectionPlugin
+:description: Activate support to select nodes on the canvas
+
+== Overview
+
+The https://github.com/InditexTech/weavejs/blob/main/code/packages/sdk/src/plugins/nodes-selection/nodes-selection.ts[WeaveNodesSelectionPlugin]
+class that provides node selection capabilities on the canvas. It allows users to click to
+select individual nodes, multi-select with modifier keys, or drag-select multiple elements at once
+using a selection rectangle (marquee).
+
+Selection is a critical foundation for enabling further interactions like moving, grouping, deleting,
+copying, or applying bulk actions on nodes.
+
+The class extends the xref:sdk:api-reference/plugins/plugin.adoc[WeavePlugin] class
+
+== Name
+
+This plugin `name` property value is `nodesSelection`.
+
+== Import
+
+[source,shell]
+----
+import { WeaveNodesSelectionPlugin } from "@inditextech/weave-sdk";
+----
+
+== Instantiation
+
+[source,ts]
+----
+new WeaveNodesSelectionPlugin(params: WeaveNodesSelectionPluginParams);
+----
+
+== TypeScript types
+
+[source,ts]
+----
+type WeaveElementAttributes = {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  [key: string]: any;
+  id?: string;
+  nodeType?: string;
+  children?: WeaveStateElement[];
+};
+
+type WeaveStateElement = {
+  key: string;
+  type: string;
+  props: WeaveElementAttributes;
+};
+
+type WeaveSelection = {
+  instance: Konva.Shape | Konva.Group;
+  node: WeaveStateElement;
+};
+
+type WeaveNodesSelectionPluginOnSelectionStateEvent = boolean;
+type WeaveNodesSelectionPluginOnNodesChangeEvent = WeaveSelection[];
+type WeaveNodesSelectionPluginOnStageSelectionEvent = undefined;
+type WeaveNodesSelectionPluginOnGroupContextChangeEvent = string | null;
+
+type WeaveNodesSelectionOnSelectionParams = {
+  resizeEnabled: boolean;
+  rotateEnabled: boolean;
+  enabledAnchors: string[];
+};
+
+type WeaveNodesSelectionBehaviorsConfig = {
+  singleSelection: {
+    enabled: boolean;
+  };
+  multipleSelection: {
+    enabled: boolean;
+  };
+  onMultipleSelection?: (
+    selectedNodes: Konva.Node[]
+  ) => Partial<WeaveNodesSelectionOnSelectionParams>;
+};
+
+type WeaveNodesSelectionPanningOnSelectionConfig = {
+  edgeThreshold: number;
+  minScrollSpeed: number;
+  maxScrollSpeed: number;
+};
+
+type WeaveNodesSelectionConfig = {
+  selection: Konva.TransformerConfig;
+  hover: Konva.TransformerConfig;
+  selectionArea: Konva.RectConfig;
+  panningWhenSelection: WeaveNodesSelectionPanningOnSelectionConfig;
+  behaviors: WeaveNodesSelectionBehaviorsConfig;
+};
+
+type WeaveNodesSelectionPluginConfig = Partial<WeaveNodesSelectionConfig>;
+
+type WeaveNodesSelectionPluginParams = {
+  config?: WeaveNodesSelectionPluginConfig;
+};
+----
+
+== Parameters
+
+For `WeaveNodesSelectionPluginParams`:
+
+[cols="4*"]
+|===
+| Property | Type | Required | Description
+
+| mono:[config] | mono:[WeaveNodesSelectionPluginConfig] |  | Config parameters for the plugin.
+|===
+
+For `WeaveNodesSelectionPluginConfig`:
+
+[cols="4*"]
+|===
+| Property | Type | Required | Description
+
+| mono:[selection] | mono:[Konva.TransformerConfig] |  | Selector config (Konva Transformer configuration).
+| mono:[hover] | mono:[Konva.TransformerConfig] |  | Hover config (Konva Transformer configuration).
+| mono:[selectionArea] | mono:[Konva.RectConfig] |  | Selection Area style (Konva Rect configuration).
+| mono:[panningWhenSelection] | mono:[WeaveNodesSelectionPanningOnSelectionConfig] |  | Panning when selecting by are configuration.
+| mono:[behaviors] | mono:[WeaveNodesSelectionBehaviorsConfig] |  | Selection anchors behaviors configuration.
+|===
+
+For `WeaveNodesSelectionPanningOnSelectionConfig`:
+
+[cols="5*"]
+|===
+| Property | Type | Required | Default | Description
+
+| mono:[edgeThreshold] | mono:[number] |  | mono:[50] | Stage edge threshold when to start panning when selecting by area.
+| mono:[minScrollSpeed] | mono:[number] |  | mono:[1] | Panning minimum speed when scrolling on selecting by area.
+| mono:[maxScrollSpeed] | mono:[number] |  | mono:[15] | Panning maximum speed when scrolling on selecting by area.
+|===
+
+For `WeaveNodesSelectionBehaviorsConfig`:
+
+[cols="5*"]
+|===
+| Property | Type | Required | Default | Description
+
+| mono:[singleSelection.enabled] | mono:[boolean] |  | mono:[true] | Enables transformer anchor handles on single selection.
+| mono:[multipleSelection.enabled] | mono:[boolean] |  | mono:[false] | Enables transformer anchor handles on multiple selection.
+| mono:[onMultipleSelection] | mono:[(selectedNodes: Konva.Node[\]) => Partial<WeaveNodesSelectionOnSelectionParams>] |  |  | Function that allows to define the transformer behavior when multi-selecting nodes
+|===
+
+== Methods
+
+=== getTransformer
+
+[source,ts]
+----
+getTransformer(): Konva.Transformer
+----
+
+This method returns the underlying Transformer of the plugin.
+
+=== setSelectedNodes
+
+[source,ts]
+----
+setSelectedNodes(nodes: Konva.Node[]): void
+----
+
+This method set the specified nodes as selected on the underlying Transformer of the plugin.
+
+=== getSelectedNodes
+
+[source,ts]
+----
+getSelectedNodes(): (Konva.Group | Konva.Shape)[]
+----
+
+This method returns the selected nodes from the underlying Transformer of the plugin.
+
+=== getSelectedNodesExtended
+
+[source,ts]
+----
+getSelectedNodesExtended(): WeaveSelection[]
+----
+
+This method returns the selected nodes but using the WeaveSelection format from the underlying Transformer of the plugin.
+
+=== selectAll
+
+[source,ts]
+----
+selectAll(): void
+----
+
+This method selects all nodes using the underlying Transformer of the plugin.
+
+=== selectNone
+
+[source,ts]
+----
+selectNone(): void
+----
+
+This method selects no nodes (0) using the underlying Transformer of the plugin.
+
+=== removeSelectedNodes
+
+[source,ts]
+----
+removeSelectedNodes(): void
+----
+
+This method removes the selected nodes of the underlying Transformer of the plugin.
+
+== Group context
+
+=== getActiveGroupContext
+
+[source,ts]
+----
+getActiveGroupContext(): string | null
+----
+
+This method returns the ID of the group currently in edit context, or `null` if no group context
+is active.
+
+=== enterGroupContext
+
+[source,ts]
+----
+enterGroupContext(groupId: string): void
+----
+
+This method enters edit context for the group with the given ID. Direct children of the group
+become individually draggable and the current selection is cleared. An `onGroupContextChange`
+event is emitted with the `groupId`.
+
+=== exitGroupContext
+
+[source,ts]
+----
+exitGroupContext(): void
+----
+
+This method exits the active group edit context, restoring children to their default
+non-draggable state and clearing the selection. An `onGroupContextChange` event is emitted
+with `null`.
+
+== Events
+
+=== onSelectionState
+
+[source,ts]
+----
+onSelectionState: WeaveNodesSelectionPluginOnSelectionStateEvent;
+----
+
+The `onSelectionState` event is called when the user is selecting (true) or not selecting
+(false).
+
+=== onNodesChange
+
+[source,ts]
+----
+onNodesChange: WeaveNodesSelectionPluginOnNodesChangeEvent;
+----
+
+The `onNodesChange` event is called when the selected nodes changed.
+
+=== onStageSelection
+
+[source,ts]
+----
+onStageSelection: WeaveNodesSelectionPluginOnStageSelectionEvent;
+----
+
+The `onStageSelection` event is called when an user selected the stage,
+meaning there is no nodes selected.
+
+=== onGroupContextChange
+
+[source,ts]
+----
+onGroupContextChange: WeaveNodesSelectionPluginOnGroupContextChangeEvent;
+----
+
+The `onGroupContextChange` event is called when the active group edit context changes.
+The payload is the `groupId` of the group that was entered, or `null` when the context
+was exited.

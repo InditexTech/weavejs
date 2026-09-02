@@ -1,0 +1,68 @@
+= WeaveFrameToolAction
+:description: Allows to add a canvas in canvas area
+
+== Overview
+
+The https://github.com/InditexTech/weavejs/blob/main/code/packages/sdk/src/actions/frame-tool/frame-tool.ts[WeaveFrameToolAction]
+class that allows users to create a new Frame node by clicking and dragging on the canvas. A frame acts
+as a visual container for organizing other nodes and structuring the workspace—similar to sections, groups,
+or modules in visual editors.
+
+This action enables an intuitive, drag-to-create experience for defining new framed areas, which are immediately
+editable and collaborative.
+
+Each interaction results in the creation of a xref:sdk:api-reference/nodes/frame.adoc[WeaveFrameNode],
+which can be moved and synchronized across all connected users.
+
+The class extends the xref:sdk:api-reference/actions/action.adoc[WeaveAction] class.
+
+== Name
+
+This action `name` property value is `frameTool`.
+
+== Import
+
+[source,shell]
+----
+import { WeaveFrameToolAction } from "@inditextech/weave-sdk";
+----
+
+== Instantiation
+
+[source,ts]
+----
+new WeaveFrameToolAction();
+----
+
+== TypeScript types
+
+[source,ts]
+----
+type WeaveFrameToolActionTriggerParams = {
+  title?: string;
+  frameWidth?: number;
+  frameHeight?: number;
+  frameOrientation?: string;
+  frameType?: string;
+};
+----
+
+== Trigger function params
+
+[source,ts]
+----
+trigger(cancelAction: () => void, params?: WeaveFrameToolActionTriggerParams): void;
+----
+
+For `WeaveFrameToolActionTriggerParams`:
+
+[cols="5*"]
+|===
+| Property | Type | Required | Default | Description
+
+| mono:[title] | mono:[string] |  | mono:[Frame XXX] | The title of the Frame.
+| mono:[frameWidth] | mono:[number] |  | mono:[1485] | The frame format width (px) for the Frame.
+| mono:[frameHeight] | mono:[number] |  | mono:[1050] | The frame format height (px) for the Frame.
+| mono:[frameOrientation] | mono:[string] |  | mono:[landscape] | The frame format orientation (landscape or portrait) for the Frame.
+| mono:[frameType] | mono:[string] |  | mono:[A4] | The frame format type (A1, A2, A3, A4 or custom) for the Frame.
+|===

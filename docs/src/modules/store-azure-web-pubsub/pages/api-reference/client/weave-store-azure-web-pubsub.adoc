@@ -1,0 +1,328 @@
+= WeaveStoreAzureWebPubsub
+:description: API reference for WeaveStoreAzureWebPubsub class
+
+== Overview
+
+The WeaveStoreAzureWebPubsub class is a client-side store in the Weave.js Azure Web PubSub store
+that enables real-time collaboration via Azure Web PubSub. It connects to a backend powered by
+xref:store-azure-web-pubsub:index.adoc[WeaveAzureWebPubsubServer], using Yjs under the hood to handle
+conflict-free data syncing and user awareness.
+
+This store allows your Weave.js-based frontend application to join a collaborative session, share
+state with other users, and reflect live updates instantly—all while leveraging the scalability and
+reliability of Azure’s managed infrastructure.
+
+== Import
+
+[source,shell]
+----
+import { WeaveStoreAzureWebPubsub } from "@inditextech/weave-store-azure-web-pubsub/client";
+----
+
+== Instantiation
+
+[source,ts]
+----
+const store = new WeaveStoreAzureWebPubsub(initialRoomData: Uint8Array | FetchInitialState | undefined, storeOptions: WeaveStoreOptions, azureWebPubsubOptions: WeaveStoreAzureWebPubsubOptions);
+----
+
+== Parameters
+
+[cols="5*"]
+|===
+| Property | Type | Required | Default | Description
+
+| mono:[initialRoomData] | mono:[Uint8Array \| FetchInitialState \| undefined] | label:green[Required] |  | If the room is not new, the actual data (snapshot) of the room in binary form.
+| mono:[storeOptions.getUser] | mono:[() => WeaveUser] | label:green[Required] |  | A function that returns a WeaveUser as definition of the metadata of the user that connects to a room
+| mono:[storeOptions.undoManagerOptions] | mono:[WeaveUndoManagerOptions] |  |  | An object that defines the Undo-Redo manager options
+| mono:[azureWebPubsubOptions.roomId] | mono:[string] | label:green[Required] |  | Room id that we want to join
+| mono:[azureWebPubsubOptions.url] | mono:[string] | label:green[Required] |  | Azure Web PubSub get connection URL
+| mono:[azureWebPubsubOptions.fetchClient] | mono:[FetchClient] |  | mono:[fetch] | Fetch client
+| mono:[azureWebPubsubOptions.syncClientOptions.heartbeat.checkWindowTimeMs] | mono:[number] |  | mono:[10000] | Check heartbeat for sync host window time, in miliseconds
+| mono:[azureWebPubsubOptions.syncClientOptions.heartbeat.checkIntervalMs] | mono:[number] |  | mono:[5000] | Sync host heartbeat check interval time, in miliseconds
+| mono:[azureWebPubsubOptions.indexedDb.enabled] | mono:[boolean] |  | mono:[false] | Enable IndexedDB offline persistence for faster initial load. When true, the Yjs document is pre-populated from a local IndexedDB cache before the WebSocket connects.
+| mono:[azureWebPubsubOptions.indexedDb.dbName] | mono:[string] |  |  | IndexedDB database name. Defaults to the roomId when omitted. Override to namespace databases in multi-tenant applications.
+|===
+
+== TypeScript types
+
+[source,ts]
+----
+type WeaveStoreAzureWebPubsubConfig = {
+  endpoint: string;
+  persistIntervalMs?: number;
+  hubName: string;
+  auth?: {
+    key?: string;
+    custom?: TokenCredential;
+  };
+  connectionHandlers?: DeepPartial<WeaveAzureWebPubsubSyncHandlerOptions>;
+};
+
+type WeaveAzureWebPubsubSyncHandlerOptions = {
+  onConnect?: (
+    connectionId: string,
+    queries: Record<string, string[]> | undefined,
+  ) => Promise<void>;
+  onConnected?: (connectionId: string) => Promise<void>;
+  removeConnection?: (connectionId: string) => Promise<void>;
+  getConnectionRoom?: (connectionId: string) => Promise<string | null>;
+  getRoomConnections?: (roomId: string) => Promise<string[]>;
+  persistIntervalMs?: number;
+};
+
+type WeaveStoreAzureWebPubsubOptions = {
+  roomId: string;
+  url: string;
+  fetchClient?: FetchClient;
+  syncClientOptions?: DeepPartial<WeaveStoreAzureWebPubSubSyncClientOptions>;
+  /** Optional IndexedDB persistence to pre-populate the Yjs doc before the WebSocket connects. */
+  indexedDb?: IndexedDbOptions;
+};
+
+type IndexedDbOptions = {
+  /** Enable IndexedDB offline persistence for faster initial load. Default: false. */
+  enabled: boolean;
+  /**
+   * IndexedDB database name. Defaults to the roomId when omitted.
+   * Override to namespace databases in multi-tenant applications.
+   */
+  dbName?: string;
+};
+
+type WeaveStoreAzureWebPubsubOnStoreFetchConnectionUrlEvent = {
+  loading: boolean;
+  error: Error | null;
+};
+
+type FetchClient = (
+  input: string | URL | globalThis.Request,
+  init?: RequestInit,
+) => Promise<Response>;
+
+type FetchInitialState = (doc: Doc) => void;
+type PersistRoom = (
+  roomId: string,
+  actualState: Uint8Array<ArrayBufferLike>,
+) => Promise<void>;
+type FetchRoom = (roomId: string) => Promise<Uint8Array | null>;
+
+type WeaveStoreAzureWebPubsubEvents = {
+  onConnect: WeaveStoreAzureWebPubsubOnConnectEvent;
+  onConnected: WeaveStoreAzureWebPubsubOnConnectedEvent;
+  onDisconnected: WeaveStoreAzureWebPubsubOnDisconnectedEvent;
+};
+
+type WeaveStoreAzureWebPubsubOnConnectEvent = {
+  context: ConnectionContext;
+  queries: Record<string, string[]> | undefined;
+};
+
+type WeaveStoreAzureWebPubsubOnConnectedEvent = {
+  context: ConnectionContext;
+  queries?: Record<string, string[]>;
+};
+
+type WeaveStoreAzureWebPubsubOnDisconnectedEvent = {
+  context: ConnectionContext;
+  queries?: Record<string, string[]>;
+};
+
+type WeaveStoreAzureWebPubsubOnWebsocketOpenEvent = {
+  group: string;
+  event: WebSocket.Event;
+  connectionAttempt: number;
+};
+
+type WeaveStoreAzureWebPubsubOnWebsocketJoinGroupEvent = {
+  group: string;
+  connectionAttempt: number;
+};
+
+type WeaveStoreAzureWebPubsubOnWebsocketMessageEvent = {
+  group: string;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  event: WebSocket.MessageEvent;
+};
+
+type WeaveStoreAzureWebPubsubOnWebsocketCloseEvent = {
+  group: string;
+  event: CloseEvent;
+  connectionAttempt: number;
+};
+
+type WeaveStoreAzureWebPubsubOnWebsocketReconnectEvent = {
+  group: string;
+  connectionAttempt: number;
+  timeoutMs: number;
+};
+
+type WeaveStoreAzureWebPubsubOnWebsocketErrorEvent = {
+  group: string;
+  error: ErrorEvent;
+  connectionAttempt: number;
+};
+
+type WeaveStoreAzureWebPubSubSyncHostClientConnectOptions = {
+  expirationTimeInMinutes?: number;
+};
+
+// Client types
+
+type WeaveStoreAzureWebPubSubSyncClientConnectionStatusKeys =
+  keyof typeof WEAVE_STORE_AZURE_WEB_PUBSUB_CONNECTION_STATUS;
+type WeaveStoreAzureWebPubSubSyncClientConnectionStatus =
+  (typeof WEAVE_STORE_AZURE_WEB_PUBSUB_CONNECTION_STATUS)[WeaveStoreAzureWebPubSubSyncClientConnectionStatusKeys];
+
+enum MessageType {
+  System = "system",
+  JoinGroup = "joinGroup",
+  SendToGroup = "sendToGroup",
+}
+
+enum MessageDataType {
+  Init = "init",
+  Sync = "sync",
+  Awareness = "awareness",
+}
+
+interface MessageData {
+  payloadId?: string;
+  index?: number;
+  type?: "heartbeat" | "resync" | "chunk" | "end";
+  totalChunks?: number;
+  group: string;
+  t: string; // type / target uuid
+  f: string; // origin uuid
+  c: string; // base64 encoded binary data
+}
+
+interface Message {
+  type: string;
+  fromUserId: string;
+  from: string;
+  group: string;
+  data: MessageData;
+}
+
+type MessageHandler = (
+  encoder: Encoder,
+  decoder: Decoder,
+  client: WeaveStoreAzureWebPubSubSyncClient,
+  clientId: string,
+  emitSynced: boolean,
+  messageType: number,
+) => void;
+
+type WeaveStoreAzureWebPubsubSyncHandlerDestroyRoomStatusKeys =
+  keyof typeof WEAVE_STORE_AZURE_WEB_PUBSUB_DESTROY_ROOM_STATUS;
+type WeaveStoreAzureWebPubsubSyncHandlerDestroyRoomStatus =
+  (typeof WEAVE_STORE_AZURE_WEB_PUBSUB_DESTROY_ROOM_STATUS)[WeaveStoreAzureWebPubsubSyncHandlerDestroyRoomStatusKeys];
+
+type WeaveStoreAzureWebPubSubSyncClientOptions = {
+  heartbeat: {
+    checkWindowTimeMs: number;
+    checkIntervalMs: number;
+  };
+};
+
+type WeaveStoreAzureWebPubsubSyncHostOptions = {
+  heartbeat: {
+    sendIntervalMs: number;
+  };
+  resync: {
+    checkIntervalMs: number;
+    attemptsLimit: number;
+  };
+};
+----
+
+== Events
+
+=== onStateChange
+
+[source,ts]
+----
+onStateChange: WeaveStoreOnStateChangeEvent;
+----
+
+The `onStateChange` event is called when the shared-state changes.
+
+=== onRoomLoaded
+
+[source,ts]
+----
+onRoomLoaded: WeaveStoreOnRoomLoadedEvent;
+----
+
+The `onRoomLoaded` event is called when the room shared-state is loaded.
+
+=== onUndoManagerStatusChange
+
+[source,ts]
+----
+onUndoManagerStatusChange: WeaveStoreOnUndoRedoChangeEvent;
+----
+
+The `onUndoManagerStatusChange` event is called when the undo/redo manager changes. It is also emitted when a room connection begins (on every `connect()` call), resetting all stack counts to `0` and both `canUndo` and `canRedo` to `false`.
+
+=== onNodeChange
+
+[source,ts]
+----
+onNodeChange: WeaveStoreOnNodeChangeEvent;
+----
+
+The `onNodeChange` event is called when there is a single node selected and the node changes.
+
+== Methods
+
+=== connect
+
+[source,ts]
+----
+connect(): Promise<void>
+----
+
+The `connect` method is called when an user tries to join a room.
+
+=== disconnect
+
+[source,ts]
+----
+disconnect(): Promise<void>
+----
+
+The `disconnect` method is called when an user leaves a room.
+
+=== setAwarenessInfo
+
+[source,ts]
+----
+setAwarenessInfo(field: string, value: unknown): void
+----
+
+This method set awareness information, for example if you want to inform the metadata of
+an user that connected to the room, or to send the pointer information of that user to the
+other peers.
+
+== Static Methods
+
+=== roomHasIndexedDbData
+
+[source,ts]
+----
+static roomHasIndexedDbData(dbName: string): Promise<boolean>
+----
+
+Checks whether an IndexedDB database with the given name already contains Weave document data.
+Useful to decide whether to skip setting `initialRoomData` when local cached state exists.
+
+[cols="3*"]
+|===
+| Parameter | Type | Description
+
+| `dbName` | `string` | The IndexedDB database name to inspect. Typically the `roomId` or the value of `indexedDb.dbName`.
+|===
+
+Returns `true` if the database exists and the Weave map has at least one entry, `false` otherwise.

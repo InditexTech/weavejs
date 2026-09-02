@@ -1,0 +1,66 @@
+= Eraser Tool
+:description: Activate the deletion of nodes from the canvas
+
+image::actions/eraser-tool.gif[Eraser Tool action on use on the Weave.js showcase,role="zoom-in"]
+
+== Introduction
+
+This action allows users to erase (delete) elements from the Stage canvas.
+
+== Usage
+
+=== Import the Action
+Start by importing the action:
+
+[source,ts]
+----
+import { WeaveEraserToolAction } from "@inditextech/weave-sdk";
+----
+
+=== Register the Action
+Then register the action on the xref:sdk:api-reference/weave/index.adoc[Weave] class instance.
+
+[source,ts]
+----
+const instance = new Weave({
+  ...
+  actions: [
+    ...,
+    new WeaveEraserToolAction(), // <.>
+  ]
+})
+----
+<.> Added in this step.
+
+=== Setup the action trigger
+Setup on a button or any element on the UI the user can interact with on the action event:
+
+[source,ts]
+----
+instance.triggerAction("eraserTool");
+----
+
+
+For example on a button on React:
+
+[source,tsx]
+----
+import React from "react";
+import { useWeave } from "@inditextech/weave-react";
+
+const MyEraserToolTriggerComponent = () => {
+  const instance = useWeave((state) => state.instance);
+
+  const triggerTool = React.useCallback(() => {
+    instance.triggerAction("eraserTool");
+  }, [instance]);
+
+  return <button onClick={triggerTool}>Eraser Tool</button>;
+};
+----
+
+=== Trigger the action
+Finally a final user trigger the UI element that launches the action.
+
+
+When enabled the user can click / touch on an element and it will deleted.

@@ -1,0 +1,85 @@
+= Brush Tool
+:description: Paint freeform strokes on the canvas
+
+image::actions/brush-tool.gif[Brush Tool action on use on the Weave.js showcase,role="zoom-in"]
+
+== Introduction
+
+This action enables users to paint freeform strokes on the canvas, similar to a
+digital brush. Unlike the xref:main:build/actions/pen-tool.adoc[Pen Tool] action,
+which focuses on clean vector lines, the *WeaveBrushToolAction* emphasizes style,
+thickness, and expressive drawing, creating xref:main:build/nodes/line.adoc[Line] nodes
+with a more natural, hand-drawn feel.
+
+It’s ideal for sketching, highlighting, or adding visual flair to collaborative
+sessions.
+
+== Dependencies
+
+This action needs registered on the Weave instance the following elements:
+
+* xref:main:build/nodes/line.adoc[Line] node
+
+== Usage
+
+=== Import the Action
+Start by importing the action:
+
+[source,ts]
+----
+import { WeaveBrushToolAction } from "@inditextech/weave-sdk";
+----
+
+=== Register the Action
+Then register the action on the xref:sdk:api-reference/weave/index.adoc[Weave] class instance.
+
+[source,ts]
+----
+const instance = new Weave({
+  ...
+  actions: [
+    ...,
+    new WeaveBrushToolAction(), // <.>
+  ]
+})
+----
+<.> Added in this step.
+
+=== Setup the action trigger
+Setup on a button or any element on the UI the user can interact with on the action event:
+
+[source,ts]
+----
+instance.triggerAction("brushTool");
+----
+
+
+For example on a button on React:
+
+[source,tsx]
+----
+import React from "react";
+import { useWeave } from "@inditextech/weave-react";
+
+const MyBrushToolTriggerComponent = () => {
+  const instance = useWeave((state) => state.instance);
+
+  const triggerTool = React.useCallback(() => {
+    instance.triggerAction("brushTool");
+  }, [instance]);
+
+  return <button onClick={triggerTool}>Brush Tool</button>;
+};
+----
+
+=== Trigger the action
+Finally a final user trigger the UI element that launches the action.
+
+
+When active the user:
+
+* *Click-press* or *Touch-press* on the canvas, to define a brush line.
+
+Then the freeform line is added to the canvas as a fully functional node—ready.
+This action integrates seamlessly with Weave.js's real-time state system,
+ensuring the new element appears instantly for all connected users.

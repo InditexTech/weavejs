@@ -1,0 +1,81 @@
+= Ellipse Tool
+:description: Add an ellipse to the canvas
+
+image::actions/ellipse-tool.gif[Ellipse Tool action on use on the Weave.js showcase,role="zoom-in"]
+
+== Introduction
+
+This action enables users to create new ellipses nodes on the canvas.
+
+== Dependencies
+
+This action needs registered on the Weave instance the following elements:
+
+* xref:main:build/nodes/ellipse.adoc[Ellipse] node
+
+== Usage
+
+=== Import the Action
+Start by importing the action:
+
+[source,ts]
+----
+import { WeaveEllipseToolAction } from "@inditextech/weave-sdk";
+----
+
+=== Register the Action
+Then register the action on the xref:sdk:api-reference/weave/index.adoc[Weave] class instance.
+
+[source,ts]
+----
+const instance = new Weave({
+  ...
+  actions: [
+    ...,
+    new WeaveEllipseToolAction(), // <.>
+  ]
+})
+----
+<.> Added in this step.
+
+=== Setup the action trigger
+Setup on a button or any element on the UI the user can interact with on the action event:
+
+[source,ts]
+----
+instance.triggerAction("ellipseTool");
+----
+
+
+For example on a button on React:
+
+[source,tsx]
+----
+import React from "react";
+import { useWeave } from "@inditextech/weave-react";
+
+const MyEllipseToolTriggerComponent = () => {
+  const instance = useWeave((state) => state.instance);
+
+  const triggerTool = React.useCallback(() => {
+    instance.triggerAction("ellipseTool");
+  }, [instance]);
+
+  return <button onClick={triggerTool}>Ellipse Tool</button>;
+};
+----
+
+=== Trigger the action
+Finally a final user trigger the UI element that launches the action.
+
+
+When active the user can:
+
+* *Click* on the canvas, it will create a ellipse with a default size.
+* *Touch* on the canvas, it will create a ellipse with a default size.
+* *Click & drag* to create a ellipse and define its radius on both axis (X axis control
+the x-radius and y axis controls the y-radius, if both radius are the same you have a circle).
+
+Once clicked or click-drag finishes, the ellipse is added to the canvas as a fully functional
+node—ready. This action integrates seamlessly with Weave.js's real-time state system,
+ensuring the new element appears instantly for all connected users.

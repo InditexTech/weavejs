@@ -1,0 +1,386 @@
+= WeaveImageNode
+:description: Image node API Reference
+
+== Overview
+
+The https://github.com/InditexTech/weavejs/blob/main/code/packages/sdk/src/nodes/image/image.ts[WeaveImageNode]
+class represents an image element on the Weave.js collaborative canvas. It allows users to upload, display, and
+manipulate images within a real-time shared environment, making it a key building block for visual storytelling,
+design workspaces, and multimedia collaboration.
+
+Built on top of Konva’s https://konvajs.org/api/Konva.Image.html[Image] class shape under the hood, the WeaveImageNode
+handles image loading (via callbacks), scaling, positioning, and real-time synchronization, ensuring a smooth
+collaborative experience even when working with dynamic media content.
+
+Images are ideal for:
+
+* Allowing users to import visual references, mockups, icons, or photos into a collaborative canvas.
+* Building rich multimedia design spaces or creative whiteboards.
+* Enhancing collaborative diagrams with visual context and assets.
+
+The class extends the xref:sdk:api-reference/nodes/node.adoc[WeaveNode] class
+
+== Type
+
+This node `nodeType` property value is `image`.
+
+== Import
+
+[source,shell]
+----
+import { WeaveImageNode } from "@inditextech/weave-sdk";
+----
+
+== Instantiation
+
+[source,ts]
+----
+new WeaveImageNode(params?: WeaveImageNodeParams);
+----
+
+== TypeScript types
+
+[source,ts]
+----
+type ImageProps = WeaveElementAttributes & {
+  id: string;
+  width?: number;
+  height?: number;
+  imageURL?: string;
+  imageInfo?: {
+    width: number;
+    height: number;
+  };
+};
+
+type WeaveImageState = {
+  status: "loaded" | "loading" | "error-fallback" | "error" | "idle";
+  loaded: boolean;
+  error: boolean;
+};
+
+type WeaveImageCache =
+  | {
+      enabled: false;
+    }
+  | {
+      enabled: true;
+      pixelRatio: number;
+    };
+
+type WeaveImageCursors = {
+  loading: string;
+};
+
+type WeaveImageProperties = {
+  cleanup: {
+    intervalMs: number;
+  };
+  performance: {
+    cache: WeaveImageCache;
+  };
+  style: {
+    placeholder: {
+      fill: string;
+    };
+    cursor: WeaveImageCursors;
+  };
+  imageLoading: {
+    maxRetryAttempts: number;
+    retryDelayMs: number;
+  };
+  crossOrigin: ImageCrossOrigin;
+  transform?: WeaveNodeTransformerProperties;
+  urlTransformer?: URLTransformerFunction;
+  imageFallback:
+    | {
+        enabled: true;
+        getId: (params: WeaveElementAttributes) => string;
+        getDataURL: (imageFallbackId: string) => string;
+        onPersist: (params: WeaveElementAttributes, dataURL: string) => void;
+      }
+    | {
+        enabled: false;
+      };
+  onDblClick?: (instance: WeaveImageNode, node: Konva.Group) => void;
+  cropMode: {
+    enabled: boolean;
+    triggers: {
+      ctrlCmd: boolean;
+    };
+    gridLines: {
+      enabled: boolean;
+    };
+    overlay: {
+      fill: string;
+    };
+    selection: {
+      enabledAnchors: WeaveImageCropAnchorPosition[];
+      borderStroke: string;
+      borderStrokeWidth: number;
+      anchorStyleFunc: (
+        node: Konva.Rect,
+        position: WeaveImageCropAnchorPosition,
+      ) => void;
+    };
+  };
+};
+
+type WeaveImageNodeParams = {
+  config: DeepPartial<WeaveImageProperties>;
+};
+
+type WeaveImageCropEndTypeKeys = keyof typeof WEAVE_IMAGE_CROP_END_TYPE;
+type WeaveImageCropEndType =
+  (typeof WEAVE_IMAGE_CROP_END_TYPE)[WeaveImageCropEndTypeKeys];
+
+type WeaveImageOnCropStartEvent = {
+  instance: Konva.Group;
+  cmdCtrlTriggered: boolean;
+};
+
+type WeaveImageOnCropEndEvent = {
+  instance: Konva.Group;
+};
+
+type WeaveImageCropAnchorPositionKeys =
+  keyof typeof WEAVE_IMAGE_CROP_ANCHOR_POSITION;
+type WeaveImageCropAnchorPosition =
+  (typeof WEAVE_IMAGE_CROP_ANCHOR_POSITION)[WeaveImageCropAnchorPositionKeys];
+
+type WeaveImageTriggerCropOptions = {
+  cmdCtrl:
+    | {
+        triggered: true;
+        corner: WeaveImageCropAnchorPosition;
+      }
+    | {
+        triggered: false;
+      };
+};
+----
+
+== Parameters
+
+For `WeaveImageNodeParams`:
+
+[cols="4*"]
+|===
+| Property | Type | Required | Description
+
+| mono:[config] | mono:[Partial<WeaveImageProperties>] | label:green[Required] | Config parameters for the node.
+|===
+
+For `WeaveImageProperties`:
+
+[cols="5*"]
+|===
+| Property | Type | Required | Default | Description
+
+| mono:[performance.cache.enabled] | mono:[boolean] |  | mono:[false] | Boolean that enables image nodes caching, increasing the performance of the canvas.
+| mono:[performance.cache.pixelRatio] | mono:[number] |  |  | Pixel ratio of the generated cache image, recommended value is 2.
+| mono:[style.placeholder.fill] | mono:[string] |  | mono:[#aaaaaa] | Fill color of the placeholder rectangle to paint while the image is loaded.
+| mono:[crossOrigin] | mono:[ImageCrossOrigin] |  | mono:[anonymous] | Value of the property crossOrigin for the HTMLImageElement DOM element. Useful for CORS support.
+| mono:[transform] | mono:[object] |  |  | Setup the transform properties for the image (if can be resized, rotated, anchors, etc.).
+| mono:[urlTransformer] | mono:[(url: string) => string] |  |  | Function that receives the actual image node URL, and returns an URL. Useful for transformations of the URL.
+| mono:[imageFallback.enabled] | mono:[boolean] |  |  | Defines if we use the image fallback mechanism to provide an image fallback to the node while the real image is loading.
+| mono:[imageFallback.getId] | mono:[(params: WeaveElementAttributes) => string] |  |  | Function that provided a specific node parameters, returns the resource id used by that node.
+| mono:[imageFallback.getDataURL] | mono:[boolean] |  |  | Function that provided a resource id, returns de image fallback in data URL format for that resource.
+| mono:[imageFallback.onPersist] | mono:[(params: WeaveElementAttributes, dataURL: string) => void] |  |  | Function that provided a specific node parameters and a data URL as the image fallback for that node, allows developers to persist the mapping (id, data URL) to an external service, in order to later on use it on imageFallback.getDataURL
+| mono:[onDblClick] | mono:[(instance: WeaveImageNode, node: Konva.Group) => void] |  |  | Setup an callback that is called when an user double-click (or double tap) on the node
+| mono:[cropMode.gridLines.enabled] | mono:[boolean] |  | mono:[true] | Enables / disables the rendering of the internal grid lines when cropping mode is activated
+| mono:[cropMode.selection.enabledAnchors] | mono:[WeaveImageCropAnchorPosition[\]] |  | mono:[['top-left','top-center','top-right','middle-right','middle-left','bottom-left','bottom-center','bottom-right'\]] | List of active anchors for cropping
+| mono:[cropMode.selection.borderStroke] | mono:[string] |  | mono:[#1a1aff] | Crop anchor stroke color
+| mono:[cropMode.selection.borderStrokeWidth] | mono:[number] |  | mono:[2] | Crop anchor stroke width (px)
+| mono:[cropMode.selection.anchorStyleFunc] | mono:[(anchor: Konva.Rect, position: ) => void] |  |  | Function that allows to fully customize an anchor, it receives the anchor to customize and it's position
+|===
+
+== Default values
+
+[source,ts]
+----
+const WEAVE_IMAGE_NODE_TYPE = "image";
+
+const WEAVE_IMAGE_CROP_END_TYPE = {
+  ["ACCEPT"]: "accept",
+  ["CANCEL"]: "cancel",
+};
+
+const WEAVE_IMAGE_CROP_ANCHOR_POSITION = {
+  ["TOP_LEFT"]: "top-left",
+  ["TOP_RIGHT"]: "top-right",
+  ["BOTTOM_LEFT"]: "bottom-left",
+  ["BOTTOM_RIGHT"]: "bottom-right",
+  ["TOP_CENTER"]: "top-center",
+  ["MIDDLE_LEFT"]: "middle-left",
+  ["MIDDLE_RIGHT"]: "middle-right",
+  ["BOTTOM_CENTER"]: "bottom-center",
+} as const;
+
+const WEAVE_IMAGE_DEFAULT_CONFIG: WeaveImageProperties = {
+  performance: {
+    cache: {
+      enabled: false,
+    },
+  },
+  style: {
+    placeholder: {
+      fill: "#aaaaaa",
+    },
+  },
+  crossOrigin: "anonymous",
+  cropMode: {
+    gridLines: {
+      enabled: true,
+    },
+    selection: {
+      enabledAnchors: [
+        "top-left",
+        "top-center",
+        "top-right",
+        "middle-right",
+        "middle-left",
+        "bottom-left",
+        "bottom-center",
+        "bottom-right",
+      ],
+      borderStroke: "#1a1aff",
+      borderStrokeWidth: 2,
+      anchorStyleFunc: (anchor: Konva.Rect) => {
+        anchor.width(12);
+        anchor.height(12);
+        anchor.offsetX(6);
+        anchor.offsetY(6);
+        anchor.fill("white");
+        anchor.stroke("black");
+        anchor.strokeWidth(1);
+        anchor.cornerRadius(0);
+      },
+    },
+  },
+};
+----
+
+== Methods
+
+=== triggerCrop
+
+[source,ts]
+----
+triggerCrop(imageNode: Konva.Group, options: WeaveImageTriggerCropOptions): void
+----
+
+Function that when is called triggers the image cropping on the specified node.
+
+=== closeCrop
+
+[source,ts]
+----
+closeCrop(imageNode: Konva.Group, type: WeaveImageCropEndType): void
+----
+
+Function that when is called closes (accepted or canceled) the image cropping.
+
+=== resetCrop
+
+[source,ts]
+----
+resetCrop(imageNode: Konva.Group): void
+----
+
+Function that when is called reset the image cropping to its original size.
+
+=== forceLoadFallbackImage
+
+[source,ts]
+----
+forceLoadFallbackImage(nodeInstance: WeaveElementInstance, dataURL: string): void
+----
+
+Forces a fallback image to load on the given node instance using the provided data URL.
+Cancels any pending retry timers for that node and immediately caches and loads the fallback image.
+Useful when you want to programmatically supply a local data URL as a replacement for an image that
+failed to load from its remote URL.
+
+== Konva.Node Augmentation
+
+This Node extends the `Konva.Node` class to define several functions:
+
+
+=== triggerCrop
+
+[source,ts]
+----
+triggerCrop(): void
+----
+
+Function that when is called triggers the image cropping.
+
+
+=== dblClick
+
+[source,ts]
+----
+dblClick(): void
+----
+
+Function that when double click (or tap) is triggered triggers the image cropping.
+
+
+=== closeCrop
+
+[source,ts]
+----
+closeCrop(type: WeaveImageCropEndType): void
+----
+
+Function that when is called closes the image cropping, depending on the `type`:
+
+* `accept`: accepts the cropping configuration and crops the image.
+* `cancel`: cancel the cropping configuration without changes to the image.
+
+
+=== cropImageWithReference
+
+[source,ts]
+----
+cropImageWithReference(image: Konva.Group, reference: Konva.Node): void
+----
+
+Function that apply a crop to an image given a reference element bounding box.
+Both elements provided, image and reference must have the same rotation applied.
+When calling the method it can raise errors with the following causes:
+
+* `InvalidImageNode`: if the first argument of the method is not a valid Weave Image node.
+* `RotationNotAligned`: if the image element and the reference element doesn't have the same rotation angle.
+
+
+=== resetCrop
+
+[source,ts]
+----
+resetCrop(): void
+----
+
+Function that when is called resets the cropping properties of an image.
+
+== Events
+
+=== onImageCropStart
+
+[source,ts]
+----
+onImageCropStart: WeaveImageOnCropStartEvent;
+----
+
+The `onImageCropStart` event is called when an image enters on the cropping edition mode.
+
+
+=== onImageCropEnd
+
+[source,ts]
+----
+onImageCropEnd: WeaveImageOnCropEndEvent;
+----
+
+The `onImageCropEnd` event is called when an image closes the cropping edition mode.

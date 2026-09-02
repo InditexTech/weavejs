@@ -1,0 +1,121 @@
+= WeaveCommentToolAction
+:description: Let users add comments to a (x,y) position of the stage.
+
+== Overview
+
+The https://github.com/InditexTech/weavejs/blob/main/code/packages/sdk/src/actions/comment-tool/comment-tool.ts[WeaveCommentToolAction]
+class that allows users to create comments on a particular position (x,y) of the stage.
+
+The class extends the xref:sdk:api-reference/actions/action.adoc[WeaveAction] class.
+
+== Name
+
+This action `name` property value is `commentTool`.
+
+== Import
+
+[source,shell]
+----
+import { WeaveCommentToolAction } from "@inditextech/weave-sdk";
+----
+
+== Instantiation
+
+[source,ts]
+----
+new WeaveCommentToolAction<T>(params: WeaveCommentToolActionParams<T>);
+----
+
+== TypeScript types
+
+[source,ts]
+----
+type WeaveCommentToolActionStateKeys = keyof typeof WEAVE_COMMENT_TOOL_STATE;
+type WeaveCommentToolActionState =
+  (typeof WEAVE_COMMENT_TOOL_STATE)[WeaveCommentToolActionStateKeys];
+
+type WeaveCommentToolStyle = {
+  cursor: {
+    add: string;
+    block: string;
+  };
+};
+
+type WeaveCommentToolModel<T> = {
+  getCreateModel: () => DeepPartial<T>;
+};
+
+type WeaveCommentToolActionConfig<T> = {
+  style: WeaveCommentToolStyle;
+  getUser: () => WeaveUser;
+  getUserBackgroundColor: (
+    user: WeaveUser
+  ) => string | CanvasGradient | undefined;
+  getUserForegroundColor: (
+    user: WeaveUser
+  ) => string | CanvasGradient | undefined;
+  model: WeaveCommentToolModel<T>;
+};
+
+type WeaveCommentToolActionParams<T> = {
+  config: Pick<
+    WeaveCommentToolActionConfig<T>,
+    "model" | "getUser" | "getUserBackgroundColor" | "getUserForegroundColor"
+  > &
+    DeepPartial<Pick<WeaveCommentToolActionConfig<T>, "style">>;
+};
+----
+
+== Constants
+
+[source,ts]
+----
+const WEAVE_COMMENT_TOOL_ACTION_NAME = "commentTool";
+const WEAVE_COMMENT_TOOL_LAYER_NAME = "commentsLayer";
+
+const WEAVE_COMMENT_TOOL_STATE = {
+  ["IDLE"]: "idle",
+  ["ADDING"]: "adding",
+  ["SELECTED_POSITION"]: "selectedPosition",
+  ["CREATING_COMMENT"]: "creatingComment",
+  ["ADDED"]: "added",
+} as const;
+----
+
+== Parameters
+
+For `WeaveBrushToolActionParams`:
+
+[cols="4*"]
+|===
+| Property | Type | Required | Description
+
+| mono:[config] | mono:[Pick<WeaveCommentToolActionConfig<T>, 'model' \| 'getUser' \| 'getUserBackgroundColor' \| 'getUserForegroundColor'> & DeepPartial<Pick<WeaveCommentToolActionConfig<T>, 'style'>>] | label:green[Required] | Config parameters for the tool.
+|===
+
+For `Pick<WeaveCommentToolActionConfig<T>, 'model' | 'getUser' | 'getUserBackgroundColor' | 'getUserForegroundColor'> & DeepPartial<Pick<WeaveCommentToolActionConfig<T>, 'style'>>`:
+
+[cols="5*"]
+|===
+| Property | Type | Required | Default | Description
+
+| mono:[style] | mono:[WeaveCommentToolStyle] |  | mono:[check default values] | Defines the tool style properties.
+| mono:[model] | mono:[WeaveCommentToolModel<T>] | label:green[Required] |  | Setup the Entity model 
+| mono:[getUser] | mono:[() => WeaveUser] | label:green[Required] |  | A function that return the actual user model
+| mono:[getUserBackgroundColor] | mono:[(user: WeaveUser) => string \| CanvasGradient \| undefined] | label:green[Required] |  | A function that is called to define a user background color base on its model.
+| mono:[getUserForegroundColor] | mono:[(user: WeaveUser) => string \| CanvasGradient \| undefined] | label:green[Required] |  | A function that is called to define a user foreground color base on its model.
+|===
+
+== Default values
+
+[source,ts]
+----
+const WEAVE_COMMENT_TOOL_DEFAULT_CONFIG = {
+  style: {
+    cursor: {
+      add: "crosshair",
+      block: "not-allowed",
+    },
+  },
+};
+----

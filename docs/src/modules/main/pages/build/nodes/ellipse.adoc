@@ -1,0 +1,43 @@
+= Ellipse
+:description: Draw an ellipse (or circle) on the canvas
+
+image::nodes/ellipse.png[Ellipse on Weave.js showcase,role="zoom-in"]
+
+The Ellipse node is a simple, versatile primitive shape used to render ellipse
+elements on the canvas. Built on top of Konva’s https://konvajs.org/api/Konva.Ellipse.html[Ellipse],
+it supports customizable properties such as position, axis radius, fill color, stroke, radius (on both axis),
+and more.
+
+They can also respond to interactions like dragging, resizing, or selection.
+
+== Usage
+
+=== Import the Node
+Start by importing the node:
+
+[source,ts]
+----
+import { WeaveEllipseNode } from "@inditextech/weave-sdk";
+----
+
+=== Register the Node
+Then register the node on the xref:sdk:api-reference/weave/index.adoc[Weave] class instance.
+
+[source,ts]
+----
+const instance = new Weave({
+  ...
+  nodes: [
+    ...,
+    new WeaveEllipseNode(), // <.>
+  ]
+})
+----
+<.> Added in this step.
+
+=== Use the node
+Once the node is registered you can use it on xref:main:build/actions/index.adoc[Actions] or
+xref:main:build/plugins/index.adoc[Plugins] or even other xref:main:build/nodes/index.adoc[Nodes].
+
+We provide an action named xref:main:build/actions/ellipse-tool.adoc[Ellipse Tool] that
+allows users to add Ellipse nodes to the application.

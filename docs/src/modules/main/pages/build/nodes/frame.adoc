@@ -1,0 +1,44 @@
+= Frame
+:description: Canvas-in-canvas element
+
+image::nodes/frame.png[Frame on Weave.js showcase,role="zoom-in"]
+
+The Frame node is a container-like visual element used to group and organize other
+nodes within a pre-defined boundary. It functions as a structured layout region, often
+used to represent panels, sections, or modular components on the canvas.
+
+Built using a combination of primitive shapes, the Frame node can include a title,
+background, border, and optional interactive handles. It supports nesting of child
+Nodes, making it ideal for modular UIs, flow sections, or structured diagrams.
+
+== Usage
+
+=== Import the Node
+Start by importing the node:
+
+[source,ts]
+----
+import { WeaveFrameNode } from "@inditextech/weave-sdk";
+----
+
+=== Register the Node
+Then register the node on the xref:sdk:api-reference/weave/index.adoc[Weave] class instance.
+
+[source,ts]
+----
+const instance = new Weave({
+  ...
+  nodes: [
+    ...,
+    new WeaveFrameNode(), // <.>
+  ]
+})
+----
+<.> Added in this step.
+
+=== Use the node
+Once the node is registered you can use it on xref:main:build/actions/index.adoc[Actions] or
+xref:main:build/plugins/index.adoc[Plugins] or even other xref:main:build/nodes/index.adoc[Nodes].
+
+We provide an action named xref:main:build/actions/ellipse-tool.adoc[Frame Tool] that
+allows users to add Frame nodes to the application.

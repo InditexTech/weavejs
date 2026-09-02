@@ -1,0 +1,147 @@
+= WeaveStageGridPlugin
+:description: Renders a reference grid behind the nodes layer
+
+== Overview
+
+The https://github.com/InditexTech/weavejs/blob/main/code/packages/sdk/src/plugins/stage-grid/stage-grid.ts[WeaveStageGridPlugin]
+class that renders a background grid on the canvas Stage. It provides visual guides that help users align, arrange,
+and position nodes more precisely, improving layout consistency and the overall user experience.
+
+The plugin can render grids as lines or dots, and it is highly configurable to match the needs of different visual
+collaborative tools, from whiteboards to complex design editors.
+
+The class extends the xref:sdk:api-reference/plugins/plugin.adoc[WeavePlugin] class
+
+== Name
+
+This plugin `name` property value is `stageGrid`.
+
+== Import
+
+[source,shell]
+----
+import { WeaveStageGridPlugin } from "@inditextech/weave-sdk";
+----
+
+== Instantiation
+
+[source,ts]
+----
+new WeaveStageGridPlugin(params?: Partial<WeaveStageGridPluginParams>);
+----
+
+== TypeScript types
+
+[source,ts]
+----
+type WeaveStageGridPluginConfig = {
+  type: WeaveStageGridType;
+  gridColor: string;
+  gridMajorColor: string;
+  gridOriginColor: string;
+  gridSize: number;
+  gridMajorEvery: number;
+  gridMajorRatio: number;
+  gridStroke: number;
+  gridDotType: WeaveStageGridDotType;
+  gridDotRadius: number;
+  gridDotRectSize: number;
+};
+
+type WeaveStageGridPluginParams = {
+  config?: DeepPartial<WeaveStageGridPluginConfig>;
+};
+
+type WeaveStageGridDotTypeKeys = keyof typeof WEAVE_GRID_DOT_TYPES;
+type WeaveStageGridDotType =
+  (typeof WEAVE_GRID_DOT_TYPES)[WeaveStageGridDotTypeKeys];
+
+type WeaveStageGridTypeKeys = keyof typeof WEAVE_GRID_TYPES;
+type WeaveStageGridType = (typeof WEAVE_GRID_TYPES)[WeaveStageGridTypeKeys];
+----
+
+== Parameters
+
+For `WeaveStageGridPluginParams`:
+
+[cols="4*"]
+|===
+| Property | Type | Required | Description
+
+| mono:[config] | mono:[Partial<WeaveStageGridPluginConfig>] |  | Config parameters for the plugin.
+|===
+
+For `WeaveStageGridPluginConfig`:
+
+[cols="5*"]
+|===
+| Property | Type | Required | Default | Description
+
+| mono:[type] | mono:[WeaveStageGridType] |  | mono:[lines] | Type of the grid to use by default.
+| mono:[gridColor] | mono:[string] |  | mono:[#b3b3b3] | Color of the grid (lines or dots)
+| mono:[gridMajorColor] | mono:[string] |  | mono:[#b3b3b3] | Color of the grid (lines or dots) for the major separators
+| mono:[gridOriginColor] | mono:[string] |  | mono:[#ff746c] | Color of the grid origin axis (both x and y).
+| mono:[gridSize] | mono:[number] |  | mono:[50] | A number in pixels that define the size of the grid separation.
+| mono:[gridMajorEvery] | mono:[number] |  | mono:[10] | A number that defines when to render the major lines, every N gridSize
+| mono:[gridMajorRatio] | mono:[number] |  | mono:[2] | A number that defines the size (ratio) of the references, for the type lines its a multiple for the stroke and for the dots its a multiple for the dot radius
+| mono:[gridStroke] | mono:[number] |  | mono:[1] | A number that defines the stroke base size of the grid lines when the type is lines
+| mono:[gridDotType] | mono:[string] |  | mono:[circle] | The type of the dot grid, it can be square or circle
+| mono:[gridDotRadius] | mono:[number] |  | mono:[1] | A number that defines the dot base size of the grid when the type is dots and circles (radius)
+| mono:[gridDotRectSize] | mono:[number] |  | mono:[2] | A number that defines the dot base size of the grid when the type is dots and square (square size)
+|===
+
+== Methods
+
+=== getType
+
+[source,ts]
+----
+getType(): WeaveStageGridType
+----
+
+This method return the type of the actual grid (line or dotted).
+
+=== setType
+
+[source,ts]
+----
+setType(type: WeaveStageGridType): void
+----
+
+This method set the type of the actual grid (line or dotted).
+
+=== getDotsType
+
+[source,ts]
+----
+getDotsType(): WeaveStageGridDotType
+----
+
+This method return the kind of the actual grid dot (square or circle).
+
+=== setDotsType
+
+[source,ts]
+----
+setDotsType(type: WeaveStageGridDotType): void
+----
+
+This method set the kind of the actual grid dot (square or circle).
+
+=== enable
+
+[source,ts]
+----
+enable(): void
+----
+
+This method enables the grid.
+
+=== disable
+
+[source,ts]
+----
+disable(): void
+----
+
+This method disables the grid.

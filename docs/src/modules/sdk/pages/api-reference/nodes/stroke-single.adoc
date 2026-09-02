@@ -1,0 +1,91 @@
+= WeaveStrokeSingleNode
+:description: Stroke V2 node API Reference
+
+== Overview
+
+The https://github.com/InditexTech/weavejs/blob/main/code/packages/sdk/src/nodes/stroke-single/stroke-single.ts[WeaveStrokeSingleNode]
+class represents a single stroke line on the Weave.js canvas. It is a versatile and essential node type for
+building tools like freehand drawing. It supports also define tips for both stroke ends as:
+
+* Arrow
+* Circle
+* Square
+
+The class extends the xref:sdk:api-reference/nodes/node.adoc[WeaveNode] class
+
+== Type
+
+This node `nodeType` property value is `stroke-single`.
+
+== Import
+
+[source,shell]
+----
+import { WeaveStrokeSingleNode } from "@inditextech/weave-sdk";
+----
+
+== Instantiation
+
+[source,ts]
+----
+new WeaveStrokeSingleNode(params?: WeaveStrokeSingleNodeParams);
+----
+
+== TypeScript types
+
+[source,ts]
+----
+type WeaveStrokeSingleProperties = {
+  transform?: WeaveNodeTransformerProperties;
+  snapAngles: {
+    angles: number[]; // Angles for snapping in degrees
+    activateThreshold: number;
+    releaseThreshold: number;
+  };
+};
+
+type WeaveStrokeSingleNodeParams = {
+  config: Partial<WeaveStrokeSingleProperties>;
+};
+
+type WeaveStrokeSingleNodeTipSideKeys =
+  keyof typeof WEAVE_STROKE_SINGLE_NODE_TIP_SIDE;
+type WeaveStrokeSingleNodeTipSide =
+  (typeof WEAVE_STROKE_SINGLE_NODE_TIP_SIDE)[WeaveStrokeSingleNodeTipSideKeys];
+----
+
+== Parameters
+
+For `WeaveStrokeSingleNodeParams`:
+
+[cols="4*"]
+|===
+| Property | Type | Required | Description
+
+| mono:[config] | mono:[Partial<WeaveStrokeSingleProperties>] | label:green[Required] | Config parameters for the node.
+|===
+
+For `WeaveStrokeSingleProperties`:
+
+[cols="5*"]
+|===
+| Property | Type | Required | Default | Description
+
+| mono:[snapAngles.angles] | mono:[number] |  | mono:[10] | Array of angles (in degrees) to snap the line to when shift is pressed.
+| mono:[snapAngles.activateThreshold] | mono:[number] |  | mono:[5] | Activation threshold for the angle snapping utility.
+| mono:[snapAngles.releaseThreshold] | mono:[number] |  | mono:[10] | Release threshold for the angle snapping utility.
+| mono:[transform] | mono:[object] |  | mono:[check default values] | Setup the transform properties for the line (if can be resized, rotated, anchors, etc.).
+|===
+
+== Default values
+
+[source,ts]
+----
+const WEAVE_STROKE_SINGLE_NODE_DEFAULT_CONFIG = {
+  snapAngles: {
+    angles: [0, 45, 90, 135, 180, 225, 270, 315],
+    activateThreshold: 5,
+    releaseThreshold: 10,
+  },
+};
+----

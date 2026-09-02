@@ -1,0 +1,39 @@
+= Connector
+:description: Draw a connected line between nodes
+
+image::nodes/connector.png[Connector on the Weave.js showcase,role="zoom-in"]
+
+The Connector node is a complex node used to render a line between two elements anchors, if the elements move
+the line also does automatically.
+
+== Usage
+
+=== Import the Node
+Start by importing the node:
+
+[source,ts]
+----
+import { WeaveConnectorNode } from "@inditextech/weave-sdk";
+----
+
+=== Register the Node
+Then register the node on the xref:sdk:api-reference/weave/index.adoc[Weave] class instance.
+
+[source,ts]
+----
+const instance = new Weave({
+  ...
+  nodes: [
+    ...,
+    new WeaveConnectorNode(), // <.>
+  ]
+})
+----
+<.> Added in this step.
+
+=== Use the node
+Once the node is registered you can use it on xref:main:build/actions/index.adoc[Actions] or
+xref:main:build/plugins/index.adoc[Plugins] or even other xref:main:build/nodes/index.adoc[Nodes].
+
+We provide an action named xref:main:build/actions/connector-tool.adoc[Connector Tool] that
+allows users to add Connector nodes to the application in a simple and intuitive way.

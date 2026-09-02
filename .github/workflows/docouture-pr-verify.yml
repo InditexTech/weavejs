@@ -1,0 +1,127 @@
+name: docouture-pr-verify
+
+# Validates that the docs still build on a pull request. Deliberately builds
+# only the PR's own HEAD — not whichever refs this site's versioning mode
+# (see the docs-site-package skill's versioning-modes.md) publishes from:
+#
+#   - Versioned (Full History): not the prerelease branch, not any `v*`
+#     release tag.
+#   - Standalone (Stable + Prerelease): not the prerelease branch, not the
+#     rolling `stable` tag.
+#
+# A PR checkout is on a detached HEAD or a feature branch — neither of those
+# refs — so building the real `antora-playbook.yml` here would either fail
+# (the refs it names are not reachable from a shallow, single-ref checkout)
+# or silently validate the wrong content. `antora-playbook.local.yml` (see
+# that file's own header) exists for exactly this: one content source,
+# `branches: HEAD`, so this always validates whatever the PR actually
+# changed — no `fetch-depth: 0` needed, since no other ref is ever read.
+on:
+  pull_request: {}
+
+# Least-privilege default: this job only checks out the PR's own HEAD,
+# builds it, and checks links — it never writes to the repository, comments
+# on the PR, or otherwise uses GITHUB_TOKEN, so it never needs more than
+# read access. Declared explicitly rather than left to inherit whatever the
+# repository/organization's default token permissions happen to be.
+permissions:
+  contents: read
+
+concurrency:
+  group: docouture-pr-verify-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  verify:
+    name: Verify
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    # `docouture new` scaffolds this site's package.json, antora-playbook.yml
+    # etc. under docs/ (not the repository root) — see the docs-site-package
+    # skill's reference/versioning-modes.md. Every step below runs from
+    # there; only .github/workflows itself has to live at the true repo
+    # root, since that is the one path GitHub Actions requires.
+    defaults:
+      run:
+        working-directory: docs
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          # Reads engines.node from docs/package.json — no separate version
+          # file to keep in sync.
+          node-version-file: docs/package.json
+          cache: npm
+          # `defaults.run.working-directory: docs` above only applies to
+          # `run:` steps, not to this action's own inputs — without this,
+          # setup-node looks for a lockfile from the repo root and fails.
+          cache-dependency-path: docs/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      # This build's antora-playbook.local.yml (the file Build actually reads
+      # below) may or may not have `kroki-enabled: true` — a site can turn it
+      # off (see that attribute's own comment). When it's off, the Build
+      # step's implicit Kroki startup never runs, so priming a Docker image
+      # store for it would just waste time on every single PR run; this step
+      # checks that up front and gates the three Kroki steps below on it.
+      - name: Kroki / Detect enabled
+        id: kroki-check
+        run: |
+          if grep -qE "^\s*kroki-enabled:\s*['\"]?true['\"]?\s*(#.*)?$" antora-playbook.local.yml; then
+            echo "enabled=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "enabled=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      # When enabled: the Build step below renders real diagrams through a
+      # local Kroki service that `@inditextech/docouture-antora-extensions`'
+      # `kroki-prewarm.js` starts itself (docker compose) the moment it finds
+      # nothing listening yet — no explicit setup needed for that. These two
+      # steps only prime the runner's Docker image store first, so that
+      # implicit startup finds everything already pulled instead of doing it
+      # cold on every run. Cache key is the compose file's own hash (images
+      # are pinned by digest, not `:latest` — see that file's own header), so
+      # it only invalidates when the actual pinned images change.
+      - name: Kroki / Docker image cache
+        id: kroki-cache
+        if: steps.kroki-check.outputs.enabled == 'true'
+        uses: actions/cache@v4
+        with:
+          path: /tmp/kroki-images.tar
+          key: ${{ runner.os }}-kroki-images-${{ hashFiles('**/kroki-compose.yml') }}
+
+      - name: Kroki / Load cached images
+        if: steps.kroki-check.outputs.enabled == 'true' && steps.kroki-cache.outputs.cache-hit == 'true'
+        run: docker load -i /tmp/kroki-images.tar
+
+      - name: Kroki / Pull and save images
+        if: steps.kroki-check.outputs.enabled == 'true' && steps.kroki-cache.outputs.cache-hit != 'true'
+        run: |
+          # docs/kroki-compose.yml if this site has ejected it (see that
+          # file's own header), else the bundled default under node_modules.
+          compose_file="$(find . -name kroki-compose.yml 2>/dev/null | head -1)"
+          docker compose -f "$compose_file" pull
+          docker save -o /tmp/kroki-images.tar $(docker compose -f "$compose_file" config --images)
+
+      - name: Build
+        run: npx antora --fetch antora-playbook.local.yml
+
+      # Antora's own `runtime.log.failure_level: warn` (see
+      # antora-playbook.yml's own comment) already fails the Build step above
+      # on a broken cross-reference — but that only covers refs Antora
+      # itself resolves. Raw http(s) links in content are invisible to it, so
+      # `check-links` (package.json's own script, see scripts/check-links.mjs)
+      # crawls the built HTML separately to catch those before they reach a
+      # PR reviewer. It only fails on a broken EXTERNAL link — a broken local
+      # one is printed as a warning, never a failure, since this job builds
+      # with antora-playbook.local.yml (a single, HEAD-only source) and
+      # content generated from config (the module switcher, the footer) can
+      # legitimately point at another version/component this reduced build
+      # doesn't have. See that script's own header comment.
+      - name: Check links
+        run: npm run check-links

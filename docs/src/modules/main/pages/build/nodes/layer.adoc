@@ -1,0 +1,54 @@
+= Layer
+:description: Segment and order the Stage in layers
+
+The Layer node is a logical container within the Stage. Based on Konva’s
+https://konvajs.org/api/Konva.Layer.html[Layer], it allows you to separate visual
+elements—for example, background grids, interactive elements, or UI overlays—into
+distinct rendering layers.
+
+Layers improve rendering control, enabling selective updates, independent z-index
+management, and cleaner composition of complex scenes. Nodes rendered within a Layer
+share the same coordinate space but can be managed and updated independently.
+
+== Usage
+
+=== Import the Node
+Start by importing the node:
+
+[source,ts]
+----
+import { WeaveLayerNode } from "@inditextech/weave-sdk";
+----
+
+=== Register the Node
+Then register the node on the xref:sdk:api-reference/weave/index.adoc[Weave] class instance.
+
+[source,ts]
+----
+const instance = new Weave({
+  ...
+  nodes: [
+    ...,
+    new WeaveLayerNode(), // <.>
+  ]
+})
+----
+<.> Added in this step.
+
+=== Use the node
+[WARNING]
+====
+Don't use this node directly.
+
+[WARNING]
+====
+The Layer node is a layering node, it doesn't render anything visual per-se to the end user.
+====
+
+To define your application structure: Stage and Layers,
+use the stores `initialState` configuration property on server-side. You can find more information
+on this links:
+
+* xref:store-websockets:api-reference/server/weave-websockets-server.adoc#shared-state-initial-value[Websockets Store]
+* xref:store-azure-web-pubsub:api-reference/server/weave-azure-web-pubsub-server.adoc#shared-state-initial-value[Azure Web PubSub Store]
+====

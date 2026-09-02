@@ -1,0 +1,75 @@
+= Selection Tool
+:description: Activate the selection of canvas nodes
+
+image::actions/selection-tool.gif[Selection Tool action on use on the Weave.js showcase,role="zoom-in"]
+
+== Introduction
+
+This action toggles the selection of nodes within the canvas on or off.
+
+== Dependencies
+
+This action needs registered on the Weave instance the following element:
+
+* xref:main:build/plugins/nodes-selection.adoc[Nodes selection] plugin
+
+== Usage
+
+=== Import the Action
+Start by importing the action:
+
+[source,ts]
+----
+import { WeaveSelectionToolAction } from "@inditextech/weave-sdk";
+----
+
+=== Register the Action
+Then register the action on the xref:sdk:api-reference/weave/index.adoc[Weave] class instance.
+
+[source,ts]
+----
+const instance = new Weave({
+  ...
+  actions: [
+    ...,
+    new WeaveSelectionToolAction(), // <.>
+  ]
+})
+----
+<.> Added in this step.
+
+=== Setup the action trigger
+Setup on a button or any element on the UI the user can interact with on the action event:
+
+[source,ts]
+----
+instance.triggerAction("selectionTool");
+----
+
+
+For example on a button on React:
+
+[source,tsx]
+----
+import React from "react";
+import { useWeave } from "@inditextech/weave-react";
+
+const MySelectionToolTriggerComponent = () => {
+  const instance = useWeave((state) => state.instance);
+
+  const triggerTool = React.useCallback(() => {
+    instance.triggerAction("selectionTool");
+  }, [instance]);
+
+  return <button onClick={triggerTool}>Selection Tool</button>;
+};
+----
+
+=== Trigger the action
+Finally a final user trigger the UI element that launches the action.
+
+
+When enabled, it allows users to interactively select nodes using the
+xref:main:build/plugins/nodes-selection.adoc[Nodes Selection] plugin. This action
+doesn’t handle selection logic itself—instead, it simply activates or deactivates
+selection capabilities in the UI.

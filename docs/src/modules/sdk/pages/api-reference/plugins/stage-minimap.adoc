@@ -1,0 +1,78 @@
+= WeaveStageMinimapPlugin
+:description: Provides a scaled-down preview of the stage content
+
+== Overview
+
+The https://github.com/InditexTech/weavejs/blob/main/code/packages/sdk/src/plugins/stage-minimap/stage-minimap.ts[WeaveStageMinimapPlugin]
+class represents a plugin that renders a scaled-down preview of the stage content on a specified DOM node, useful for quick navigation and
+orientation. It renders the entire stage (including padding) into a miniature view and overlays a viewport rectangle that indicates the currently
+visible region.
+
+The class extends the xref:sdk:api-reference/plugins/plugin.adoc[WeavePlugin] class
+
+== Name
+
+This plugin `name` property value is `stageMinimap`.
+
+== Import
+
+[source,shell]
+----
+import { WeaveStageMinimapPlugin } from "@inditextech/weave-sdk";
+----
+
+== Instantiation
+
+[source,ts]
+----
+new WeaveStageMinimapPlugin(params: WeaveStageMinimapPluginParams);
+----
+
+== TypeScript types
+
+[source,ts]
+----
+type WeaveStageMinimapPluginStyle = {
+  viewportReference: Konva.RectConfig;
+};
+
+type WeaveStageMinimapPluginConfig = {
+  getContainer: () => HTMLElement;
+  id: string;
+  width: number;
+  fitToContentPadding: number;
+  style: WeaveStageMinimapPluginStyle;
+};
+
+type WeaveStageMinimapPluginParams = {
+  config: Pick<
+    WeaveStageMinimapPluginConfig,
+    "getContainer" | "id" | "width" | "fitToContentPadding"
+  > &
+    DeepPartial<Pick<WeaveStageMinimapPluginConfig, "style">>;
+};
+----
+
+== Parameters
+
+For `WeaveStageMinimapPluginParams`:
+
+[cols="4*"]
+|===
+| Property | Type | Required | Description
+
+| mono:[config] | mono:[WeaveStageMinimapPluginConfig] | label:green[Required] | Config parameters for the plugin.
+|===
+
+For `WeaveStageMinimapPluginConfig`:
+
+[cols="4*"]
+|===
+| Property | Type | Required | Description
+
+| mono:[getContainer] | mono:[() => HTMLElement] | label:green[Required] | A function that determines the DOM node where to render the minimap.
+| mono:[id] | mono:[string] | label:green[Required] | The id of the Konva stage container for the minimap.
+| mono:[width] | mono:[number] | label:green[Required] | The width of the minimap, by default, the height is calculated based on the aspect ratio of the window.
+| mono:[fitToContentPadding] | mono:[number] | label:green[Required] | Padding to apply to the stage generated image in order to make a 1:1 if you fit to content when zooming.
+| mono:[style] | mono:[WeaveStageMinimapPluginStyle] |  | Style configuration for the minimap
+|===

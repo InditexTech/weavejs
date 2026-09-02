@@ -1,0 +1,77 @@
+= WeaveMeasureToolAction
+:description: Add measure nodes to the canvas
+
+== Overview
+
+The https://github.com/InditexTech/weavejs/blob/main/code/packages/sdk/src/actions/measure-tool/measure-tool.ts[WeaveMeasureToolAction]
+class that allows users to add measure to the canvas by click-and-click to define the measure points.
+
+The class extends the xref:sdk:api-reference/actions/action.adoc[WeaveAction] class.
+
+== Name
+
+This action `name` property value is `measureTool`.
+
+== Import
+
+[source,shell]
+----
+import { WeaveMeasureToolAction } from "@inditextech/weave-sdk";
+----
+
+== Instantiation
+
+[source,ts]
+----
+new WeaveMeasureToolAction(params?: WeaveMeasureToolActionParams);
+----
+
+== TypeScript types
+
+[source,ts]
+----
+type WeaveMeasureToolActionStateKeys = keyof typeof MEASURE_TOOL_STATE;
+type WeaveMeasureToolActionState =
+  (typeof MEASURE_TOOL_STATE)[WeaveMeasureToolActionStateKeys];
+
+type WeaveMeasureToolProperties = {
+  style: {
+    stroke: string;
+  };
+};
+
+type WeaveMeasureToolParams = {
+  config: DeepPartial<WeaveMeasureToolProperties>;
+};
+----
+
+== Parameters
+
+For `WeaveMeasureToolActionParams`:
+
+[cols="4*"]
+|===
+| Property | Type | Required | Description
+
+| mono:[config] | mono:[Partial<WeaveMeasureToolActionProperties>] | label:green[Required] | Config parameters for the tool.
+|===
+
+For `WeaveMeasureToolActionProperties`:
+
+[cols="5*"]
+|===
+| Property | Type | Required | Default | Description
+
+| mono:[style.stroke] | mono:[string] |  | mono:[#FF3366] | Color for the crosshair cursor
+|===
+
+== Default values
+
+[source,ts]
+----
+const WEAVE_MEASURE_TOOL_DEFAULT_CONFIG: WeaveMeasureToolProperties = {
+  style: {
+    stroke: "#FF3366",
+  },
+};
+----

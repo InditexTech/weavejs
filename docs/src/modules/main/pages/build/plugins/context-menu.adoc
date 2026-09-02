@@ -1,0 +1,79 @@
+= Context Menu
+:description: Trigger a contextual menu on the canvas
+
+image::plugins/context-menu.gif[Context Menu plugin on use on the Weave.js showcase,role="zoom-in"]
+
+== Introduction
+
+This plugin adds custom right-click menus to the canvas, enabling users to access
+context-specific actions—like deleting nodes, duplicating elements, or triggering
+custom workflows. It enhances usability by offering quick access to relevant tools
+based on the current selection or interaction.
+
+Fully customizable and extensible, making it easy to tailor the experience to your
+application's needs.
+
+.UI Agnostic
+[NOTE]
+====
+This plugin only returns metadata that allows developers to render a context
+menu on the xref:main:glossary.adoc#room[room], it doesn't provide an UI.
+====
+
+== Usage
+
+=== Import the Plugin
+Start by importing the plugin:
+
+[source,ts]
+----
+import { WeaveContextMenuPlugin } from "@inditextech/weave-sdk";
+----
+
+=== Register the Plugin
+Then register the plugin on the xref:sdk:api-reference/weave/index.adoc[Weave] class instance.
+
+[source,ts]
+----
+const instance = new Weave({
+  ...
+  plugins: [
+    ...,
+    new WeaveContextMenuPlugin(), // <.>
+  ]
+})
+----
+<.> Added in this step.
+
+=== Use the plugin
+Once the plugin is registered you can add a listener with the xref:sdk:api-reference/weave/index.adoc[Weave]
+instance xref:sdk:api-reference/weave/index.adoc#events[Events API] that listen to the event named `onNodeContextMenu`.
+
+[source,ts]
+----
+// Import types
+import type {
+  WeaveContextMenuPlugin,
+  WeaveStageContextMenuPluginOnNodeContextMenuEvent,
+} from "@inditextech/weave-sdk";
+
+instance.addEventListener<WeaveConnectedUsersChangeEvent>(
+  "onNodeContextMenu",
+  ({
+    selection,
+    point,
+    visible,
+  }: WeaveStageContextMenuPluginOnNodeContextMenuEvent) => {
+    // Returns what is selected, the point where the user press the mouse button or
+    // touched and if is visible or not, useful when for example the user touches
+    // the stage to close the contextual menu.
+    console.log({
+      selection,
+      point,
+      visible,
+    });
+  }
+);
+----
+
+With this callback you can trigger your own Context Menu UI.

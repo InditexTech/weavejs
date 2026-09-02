@@ -1,0 +1,83 @@
+= WeaveExportStageToolAction
+:description: Tool to export the stage as an image
+
+== Overview
+
+The https://github.com/InditexTech/weavejs/blob/main/code/packages/sdk/src/actions/export-stage-tool/export-stage-tool.ts[WeaveExportStageToolAction]
+class that enables users to export the entire canvas (Stage) as an image file—typically in PNG format. This action captures everything visible on the canvas,
+including all nodes, layers, and plugin-rendered visuals, and converts it into a high-fidelity static image.
+
+It’s particularly useful for sharing snapshots, archiving work, or generating thumbnails from collaborative visual tools.
+
+The class extends the xref:sdk:api-reference/actions/action.adoc[WeaveAction] class.
+
+== Name
+
+This action `name` property value is `exportStageTool`.
+
+== Import
+
+[source,shell]
+----
+import { WeaveExportStageToolAction } from "@inditextech/weave-sdk";
+----
+
+== Instantiation
+
+[source,ts]
+----
+new WeaveExportStageToolAction();
+----
+
+== TypeScript types
+
+[source,ts]
+----
+const WEAVE_EXPORT_FORMATS: {
+  readonly PNG: "image/png";
+  readonly JPEG: "image/jpeg";
+};
+
+type WeaveExportNodeOptions = {
+  format?: typeof WEAVE_EXPORT_FORMATS.PNG;
+  padding?: number;
+  pixelRatio?: number;
+  backgroundColor?: string;
+  quality?: number;
+};
+
+type WeaveExportStageActionParams = {
+  boundingNodes?: (nodes: Konva.Node[]) => Konva.Node[];
+  options?: WeaveExportNodesOptions;
+};
+----
+
+== Trigger function params
+
+[source,ts]
+----
+trigger(cancelAction: () => void, params?: WeaveExportStageActionParams): Promise<void>;
+----
+
+For `WeaveExportStageActionParams`:
+
+[cols="4*"]
+|===
+| Property | Type | Required | Description
+
+| mono:[boundingNodes] | mono:[(nodes: Konva.Node[\]) => Konva.Node[\]] |  | A function that defines the bounding node
+| mono:[options] | mono:[WeaveExportNodeOptions] |  | The exported image options.
+|===
+
+For `WeaveExportNodeOptions`:
+
+[cols="5*"]
+|===
+| Property | Type | Required | Default | Description
+
+| mono:[format] | mono:[WeaveExportFormat] | label:green[Required] | mono:[WEAVE_EXPORT_FORMATS.PNG] | The format of the image to export.
+| mono:[padding] | mono:[number] |  | mono:[0] | The padding to add to the image to export. In pixels.
+| mono:[pixelRatio] | mono:[number] |  | mono:[1] | The pixel ratio to use on the image to export. For example 2 on a image of 400x400 generates a image of 800x800 pixels.
+| mono:[backgroundColor] | mono:[string] |  | mono:[#FFFFFF] | The background color to use on the image to export. Is a CCS color value.
+| mono:[quality] | mono:[number] |  | mono:[1] | The quality of the image to export. From 0 to 1.
+|===

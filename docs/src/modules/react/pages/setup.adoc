@@ -1,0 +1,16 @@
+= Setup
+:description: React Helper library API setup
+
+== Dependencies
+
+This package is dependant on:
+
+* xref:sdk:index.adoc[Weave.js SDK] package
+* xref:types:index.adoc[Weave.js types] package
+
+== Installation
+
+[source,shell]
+----
+npm install @inditextech/weave-react;
+----

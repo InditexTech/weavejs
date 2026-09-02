@@ -1,0 +1,89 @@
+= Pen Tool (deprecated)
+:description: Add line segments to the canvas
+
+image::actions/pen-tool.gif[Pen Tool action on use on the Weave.js showcase,role="zoom-in"]
+
+== Introduction
+
+This action allows users to draw continuos lines on the canvas with N segments, by
+clicking N times to define the N segments. This tool is ideal for sketching, annotating,
+or creating custom shapes.
+
+Each line is captured as a Line Node with configurable styling, and is instantly
+synchronized across all connected users.
+
+== Dependencies
+
+This action needs registered on the Weave instance the following elements:
+
+* xref:main:build/nodes/line.adoc[Line] node
+
+== Usage
+
+=== Import the Action
+Start by importing the action:
+
+[source,ts]
+----
+import { WeavePenToolAction } from "@inditextech/weave-sdk";
+----
+
+=== Register the Action
+Then register the action on the xref:sdk:api-reference/weave/index.adoc[Weave] class instance.
+
+[source,ts]
+----
+const instance = new Weave({
+  ...
+  actions: [
+    ...,
+    new WeavePenToolAction(), // <.>
+  ]
+})
+----
+<.> Added in this step.
+
+=== Setup the action trigger
+Setup on a button or any element on the UI the user can interact with on the action event:
+
+[source,ts]
+----
+instance.triggerAction("penTool");
+----
+
+
+For example on a button on React:
+
+[source,tsx]
+----
+import React from "react";
+import { useWeave } from "@inditextech/weave-react";
+
+const MyPenToolTriggerComponent = () => {
+  const instance = useWeave((state) => state.instance);
+
+  const triggerTool = React.useCallback(() => {
+    instance.triggerAction("penTool");
+  }, [instance]);
+
+  return <button onClick={triggerTool}>Pen Tool</button>;
+};
+----
+
+=== Trigger the action
+Finally a final user trigger the UI element that launches the action.
+
+
+When active the user will iterate on the following steps:
+
+* *Click* or *Touch* on the canvas, to define a line segment start point.
+* *Click* or *Touch* again on the canvas, to define the line final segment point.
+
+When the user is satisfied with the line segments:
+
+* On non-touch devices, press the kbd:[Enter] or kbd:[Esc] keys.
+* On touch devices, trigger the xref:main:build/actions/selection-tool.adoc[Selection Tool].
+
+Then the line with the N defined segments is added to the canvas as a fully functional
+node—ready. This action integrates seamlessly with Weave.js's real-time state system,
+ensuring the new element appears instantly for all connected users.

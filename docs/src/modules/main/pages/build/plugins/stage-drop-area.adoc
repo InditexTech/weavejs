@@ -1,0 +1,63 @@
+= Stage Drop Area
+:description: Activate support to drop elements on the canvas
+
+image::plugins/stage-drop-area.gif[Stage Drop Area on use on the Weave.js showcase,role="zoom-in"]
+
+== Introduction
+
+This plugin enables drag-and-drop support on the canvas, allowing users to drop
+elements—such as shapes, files, or custom components—directly onto the Stage. It
+captures drop events, calculates drop positions, and can trigger custom Actions or
+workflows based on the dropped content.
+
+This plugin is ideal for building intuitive drag-to-create interfaces, asset import
+features, or external integrations (e.g., dropping images or nodes from a sidebar).
+It integrates smoothly with Weave.js's action system for precise and flexible drop
+handling.
+
+== Usage
+
+=== Import the Plugin
+Start by importing the plugin:
+
+[source,ts]
+----
+import { WeaveStageDropAreaPlugin } from "@inditextech/weave-sdk";
+----
+
+=== Register the Plugin
+Then register the plugin on the xref:sdk:api-reference/weave/index.adoc[Weave] class instance.
+
+[source,ts]
+----
+const instance = new Weave({
+  ...
+  plugins: [
+    ...,
+    new WeaveStageDropAreaPlugin(), // <.>
+  ]
+})
+----
+<.> Added in this step.
+
+=== Use the plugin
+Once the plugin is registered you can add a listener with the xref:sdk:api-reference/weave/index.adoc[Weave]
+instance xref:sdk:api-reference/weave/index.adoc#events[Events API] that listen to the event named `onStageDrop`.
+
+[source,ts]
+----
+// Import types
+import type { WeaveStageDropPluginOnStageDropEvent } from "@inditextech/weave-sdk";
+
+instance.addEventListener<WeaveStageDropPluginOnStageDropEvent>(
+  "onStageDrop",
+  () => {
+    console.log("user dropped something");
+  }
+);
+----
+
+With this callback you can know when the users drops something to the stage, now to specifically know
+what the user dropped, you can for example, on the `onDragStart` https://developer.mozilla.org/es/docs/Web/API/HTMLElement/dragstart_event[event]
+define on the `window` object (being global) a property with metadata of the element that started
+dragging and retrieve / perform and action / clean it on the callback.

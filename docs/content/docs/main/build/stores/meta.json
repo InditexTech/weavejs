@@ -1,4 +1,0 @@
-{
-  "title": "Stores",
-  "pages": ["websockets-store", "azure-web-pubsub-store", "standalone-store"]
-}

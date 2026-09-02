@@ -1,0 +1,101 @@
+= WeaveGroupNode
+:description: Group node API Reference
+
+== Overview
+
+The https://github.com/InditexTech/weavejs/blob/main/code/packages/sdk/src/nodes/group/group.ts[WeaveGroupNode]
+class represents a container node in Weave.js that groups multiple child nodes together into a single, manageable entity.
+Built on top of Konva’s https://konvajs.org/api/Konva.Group.html[Group] class, it allows developers and users to
+treat a collection of nodes as a single object—moving, scaling, rotating, or interacting with them as one.
+
+Groups are useful for:
+
+* Organizing multiple child nodes under one parent, allowing bulk transformations like dragging, resizing, scaling,
+and rotating.
+* Ensures that transformations applied to the group (like moving or rotating) cascade properly to the children,
+maintaining relative positions and sizes.
+* Allows nesting other groups or individual nodes, making it flexible for complex scene structures (e.g., a diagram
+block containing text, shapes, and connectors).
+
+The class extends the xref:sdk:api-reference/nodes/node.adoc[WeaveNode] class
+
+== Type
+
+This node `nodeType` property value is `group`.
+
+== Import
+
+[source,shell]
+----
+import { WeaveGroupNode } from "@inditextech/weave-sdk";
+----
+
+== Instantiation
+
+[source,ts]
+----
+new WeaveGroupNode(params?: WeaveGroupNodeParams);
+----
+
+== TypeScript types
+
+[source,ts]
+----
+type WeaveNodeTransformerProperties = Konva.TransformerConfig;
+
+type WeaveGroupProperties = {
+  transform: WeaveNodeTransformerProperties;
+};
+
+type WeaveGroupNodeParams = {
+  config: Partial<WeaveGroupProperties>;
+};
+----
+
+== Parameters
+
+For `WeaveGroupNodeParams`:
+
+[cols="4*"]
+|===
+| Property | Type | Required | Description
+
+| mono:[config] | mono:[Partial<WeaveGroupProperties>] | label:green[Required] | Config parameters for the node.
+|===
+
+For `WeaveGroupProperties`:
+
+[cols="5*"]
+|===
+| Property | Type | Required | Default | Description
+
+| mono:[transform] | mono:[object] |  | mono:[check default values] | Setup the transform properties for the group (if can be resized, rotated, anchors, etc.).
+|===
+
+== Default values
+
+[source,ts]
+----
+const WEAVE_TRANSFORMER_ANCHORS = {
+  ["TOP_LEFT"]: "top-left",
+  ["TOP_CENTER"]: "top-center",
+  ["TOP_RIGHT"]: "top-right",
+  ["MIDDLE_RIGHT"]: "middle-right",
+  ["MIDDLE_LEFT"]: "middle-left",
+  ["BOTTOM_LEFT"]: "bottom-left",
+  ["BOTTOM_CENTER"]: "bottom-center",
+  ["BOTTOM_RIGHT"]: "bottom-right",
+};
+
+const WEAVE_DEFAULT_ENABLED_ANCHORS: string[] = Object.values(
+  WEAVE_TRANSFORMER_ANCHORS
+);
+
+const WEAVE_DEFAULT_TRANSFORM_PROPERTIES: WeaveNodeTransformerProperties = {
+  rotateEnabled: true,
+  resizeEnabled: true,
+  enabledAnchors: WEAVE_DEFAULT_ENABLED_ANCHORS,
+  borderStrokeWidth: 3,
+  padding: 0,
+};
+----

@@ -1,0 +1,53 @@
+= About Weave.js
+:description: Build collaborative canvas applications
+
+Weave.js is a powerful headless framework for building end-to-end *collaborative whiteboard applications*.
+
+Aimed at developers, it provides all the building blocks and plugins to develop visual collaborative xref:main:glossary.adoc#canvas[canvas], while handling user interactions to enable real-time collaboration among multiple users.
+
+.Want to learn more?
+[NOTE]
+====
+For a deep dive, refer to xref:main:architecture.adoc[Architecture overview].
+====
+
+== Key features
+
+* *Canvas-first rendering* via xref:main:architecture.adoc#konvajs[Konva.js] & xref:main:architecture.adoc#react-reconciler[React Reconciler]
+* *Real-time collaboration* powered by xref:main:architecture.adoc#yjs[Yjs] & xref:main:architecture.adoc#syncedstore[SyncedStore]
+* *Works with any UI framework* (React helpers included)
+
+== Live showcase
+
+image::showcase.png[Enter room page of the Weave.js showcase,role="zoom-in"]
+
+Explore our live whiteboard application:
+
+👉 https://weavejs.cloud.inditex.com[weavejs.cloud.inditex.com]
+
+Built using:
+
+* *Frontend:* https://tanstack.com/[TanStack Start]
+* *Backend:* https://expressjs.com/[Express] & https://nodejs.org/es[Node.js]
+
+== FAQ
+
+Here are some common questions developers often ask.
+
+.Can I use Weave.js with any UI framework?
+[%collapsible]
+====
+Yes, Weave.js is framework-agnostic by design.
+
+While we provide helper utilities for React to streamline integration, you can also use Weave.js with other frameworks like Vue or Svelte.
+For those, additional setup or custom wrappers may be required and are not currently covered in this documentation.
+====
+
+.Can I deploy the frontend and backend on a single artifact?
+[%collapsible]
+====
+Yes, you can bundle the frontend and backend together.
+
+This is a common approach when using full-stack frameworks like TanStack Start, Next.js, Express, or Vite with a Node.js server.
+However, for production deployments, we recommend separating the frontend and backend into distinct artifacts.
+====

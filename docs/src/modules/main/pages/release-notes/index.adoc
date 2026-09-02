@@ -1,0 +1,10 @@
+= Release notes
+:description: Discover what's new in Weave.js
+
+== Release versions
+
+* xref:main:release-notes/5.0.0.adoc[*5.0.0*]
+* xref:main:release-notes/4.0.0.adoc[*4.0.0*]
+* xref:main:release-notes/3.0.0.adoc[*3.0.0*]
+* xref:main:release-notes/2.0.0.adoc[*2.0.0*]
+* xref:main:release-notes/1.0.0.adoc[*1.0.0*]

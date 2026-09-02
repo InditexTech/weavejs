@@ -1,0 +1,454 @@
+name: docouture-release
+
+# Handles BOTH versioning modes — see the docouture docs-site-package skill's
+# versioning-modes.md for the full mechanism. Which mode a site is on is
+# detected, not asked: `docs/antora-playbook.yml`'s own content.sources[]
+# tags permanently say `tags: ['docs/v*']` under versioned (Full History) or
+# `tags: ['docs/stable']` under standalone (Stable + Prerelease) from the moment a
+# site opts into either — see the `Detect mode` step below. `docs/antora.yml`
+# on the release branch is identical for both modes (`version: prerelease`,
+# `prerelease: true`) and is never read for this. Adopting a mode in the
+# first place (setting antora-playbook.yml's content.sources[] tags/branches)
+# is still a manual, one-time edit; this workflow only handles cutting
+# releases afterwards.
+#
+# Prerequisite, done once, not by this workflow: this site's own
+# antora-playbook.yml content.sources[] must already match
+# `branches: [main]` + `tags: ['docs/v*']` (versioned) or
+# `branches: [main]` + `tags: ['docs/stable']` (standalone) —
+# see the guides-branching-model guide for what the prerelease/release
+# branch roles mean (trunk-based: both the same branch; git-flow: two
+# independently-named branches, e.g. `develop`/`main`).
+#
+# Two ways to run this, both deliberate acts rather than a side effect of an
+# ordinary push:
+#
+#   1. workflow_dispatch — a person runs it by hand and supplies `version`
+#      (versioned) or leaves it as the default (standalone).
+#   2. Automatically, when a pull request carrying the `docs/release` label
+#      is merged into a branch matching the release branch (see the
+#      guides-branching-model guide). This path has no input to
+#      type a version into: standalone doesn't need one (always `docs/stable`);
+#      versioned reads it from `docs/.release-version`, a plain-text file
+#      the PR itself commits with the target version — reviewed as part of
+#      that PR's diff, like any other change.
+#
+# Republishing (versioned only): a fix that needs to land on an
+# already-released version overwrites that version's tag — this workflow
+# always force-recreates a tag that already exists, both modes, no separate
+# flag or label needed. `docs/.release-version` itself is never cleared by
+# hand: after every successful versioned release that is NOT a republish,
+# this workflow bumps it forward to the next patch version on the release
+# branch (see "Bump release descriptor" below), so the file always holds a
+# sane next target rather than going stale. A republish (the target tag
+# already existed) skips that bump, since `docs/.release-version` already
+# holds whatever was planned to come after it.
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: >-
+          Target version for a versioned release, e.g. 1.2.0 (becomes tag
+          docs/v1.2.0). Leave as 'stable' for a standalone site — that mode's
+          target is always the 'docs/stable' tag, this input is ignored there.
+        required: true
+        type: string
+        default: 'stable'
+  pull_request:
+    types: [closed]
+    branches: ['main*']
+
+permissions:
+  contents: write
+
+concurrency:
+  group: docouture-release
+  cancel-in-progress: false
+
+jobs:
+  release:
+    name: Cut release
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    # `docouture new` scaffolds this site's package.json, antora-playbook.yml,
+    # docs/antora.yml etc. under docs/ (not the repository root) — see the
+    # docs-site-package skill's reference/versioning-modes.md. Every step
+    # below — including the git ones, so `docs/antora.yml` below really
+    # means the descriptor at docs/src/antora.yml relative to the repo
+    # root — runs from there; only .github/workflows itself has to live at
+    # the true repo root, since that is the one path GitHub Actions
+    # requires.
+    defaults:
+      run:
+        working-directory: docs
+    # workflow_dispatch always proceeds (it's already an explicit, deliberate
+    # act). The pull_request trigger fires on every close of a PR targeting
+    # the release branch — including ones that were closed unmerged, or
+    # merged without the label — so it only proceeds when both are true:
+    # actually merged, and carrying `docs/release`. Anything else is a
+    # no-op run, not an error.
+    if: >-
+      github.event_name == 'workflow_dispatch' ||
+      (github.event.pull_request.merged == true &&
+        contains(github.event.pull_request.labels.*.name, 'docs/release'))
+    steps:
+      - name: Require release branch
+        # Only meaningful for a manual dispatch: someone could run this
+        # workflow with a different branch selected in the "Run workflow"
+        # UI. The pull_request trigger can't have this problem — the
+        # `branches:` filter above already restricted it to the release
+        # branch before the job started, and by the time a `closed`+`merged`
+        # event fires, that branch already reflects the merge.
+        if: github.event_name == 'workflow_dispatch' && github.ref != 'refs/heads/main'
+        run: |
+          echo "::error::docouture-release must run against main (got ${{ github.ref }})"
+          exit 1
+
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          # Standalone moves an existing `docs/stable` tag, which has to already
+          # be reachable in history to be force-moved. Versioned only ever
+          # creates a brand-new tag on a brand-new commit and doesn't
+          # strictly need this, but the detect step below needs the release
+          # branch's tip either way, and full history is harmless for that
+          # case.
+          fetch-depth: 0
+          ref: main
+          # Don't persist the ambient GITHUB_TOKEN's credentials — it isn't
+          # on this repo's branch-ruleset bypass list, and a local credential
+          # from actions/checkout would otherwise win over the app token's
+          # own credentials (set up below) when the git-push steps run.
+          persist-credentials: false
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          # Reads engines.node from docs/package.json — no separate version
+          # file to keep in sync.
+          node-version-file: docs/package.json
+          cache: npm
+          # `defaults.run.working-directory: docs` above only applies to
+          # `run:` steps, not to this action's own inputs — without this,
+          # setup-node looks for a lockfile from the repo root and fails.
+          cache-dependency-path: docs/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      # See docouture-pr-verify.yml's own comment: this build reads
+      # antora-playbook.local.yml (Build docs below), not the real
+      # antora-playbook.yml — same reason as that step's own "Detect mode"
+      # doesn't apply here (the tag this run is about to cut doesn't exist
+      # yet, per Build docs' own comment), so the enabled check has to look
+      # at the same file Build docs actually builds.
+      - name: Kroki / Detect enabled
+        id: kroki-check
+        run: |
+          if grep -qE "^\s*kroki-enabled:\s*['\"]?true['\"]?\s*(#.*)?$" antora-playbook.local.yml; then
+            echo "enabled=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "enabled=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      # See docouture-pr-verify.yml's own comment: primes the runner's Docker
+      # image store before the Build step's implicit Kroki startup.
+      - name: Kroki / Docker image cache
+        id: kroki-cache
+        if: steps.kroki-check.outputs.enabled == 'true'
+        uses: actions/cache@v4
+        with:
+          path: /tmp/kroki-images.tar
+          key: ${{ runner.os }}-kroki-images-${{ hashFiles('**/kroki-compose.yml') }}
+
+      - name: Kroki / Load cached images
+        if: steps.kroki-check.outputs.enabled == 'true' && steps.kroki-cache.outputs.cache-hit == 'true'
+        run: docker load -i /tmp/kroki-images.tar
+
+      - name: Kroki / Pull and save images
+        if: steps.kroki-check.outputs.enabled == 'true' && steps.kroki-cache.outputs.cache-hit != 'true'
+        run: |
+          compose_file="$(find . -name kroki-compose.yml 2>/dev/null | head -1)"
+          docker compose -f "$compose_file" pull
+          docker save -o /tmp/kroki-images.tar $(docker compose -f "$compose_file" config --images)
+
+      # Nothing before this point has actually built the docs — unlike
+      # docouture-pr-verify.yml and docouture-publish.yml, this workflow previously
+      # went straight from install to cutting a release tag. That let a
+      # broken site get tagged and released, only to be caught later, when
+      # the tag push triggers docouture-publish.yml downstream. Building here
+      # too, before any git mutation below, catches it before a tag or
+      # GitHub Release ever exists for it.
+      #
+      # `antora-playbook.local.yml` (branches: HEAD), not the real
+      # antora-playbook.yml: the tag this run is about to cut doesn't exist
+      # yet, so the real playbook's tag-based content source can't see it —
+      # it would just rebuild whatever was already released, not what's
+      # about to ship. The local playbook validates exactly the content on
+      # the release branch right now, which is what the new version will
+      # actually be.
+      - name: Build docs
+        run: npx antora --fetch antora-playbook.local.yml
+
+      # See docouture-pr-verify.yml's own comment: catches raw http(s) links
+      # Antora's own strict mode (runtime.log.failure_level: warn, already
+      # exercised by Build above) can't see. Only a broken EXTERNAL link
+      # fails this step — a broken local one is a warning only, since this
+      # job also builds with antora-playbook.local.yml (see that comment for
+      # why a local link can legitimately look broken here).
+      - name: Check links
+        run: npm run check-links
+
+      - name: git identity
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+      # Mints an installation token for a GitHub App that's on this repo's
+      # branch-ruleset bypass list, if the release branch/`gh-pages` are
+      # protected by one (branch rulesets requiring PRs / status checks) —
+      # see issue #157 in InditexTech/docouture. `Push release tag` and
+      # `Bump release descriptor` below both push straight to a branch/ref,
+      # and the plain GITHUB_TOKEN identity is never on a ruleset's own
+      # bypass list, so those pushes are rejected (GH013) on a protected
+      # repo without this.
+      # `APP_CLIENT_ID` (a variable) and `APP_PRIVATE_KEY` (a secret) are
+      # organization-level in InditexTech — set both at the org or repo
+      # level for whichever GitHub App is bypass-listed on this site's rules.
+      - name: Git app token
+        id: app-token
+        uses: actions/create-github-app-token@v3
+        with:
+          client-id: ${{ vars.APP_CLIENT_ID }}
+          private-key: ${{ secrets.APP_PRIVATE_KEY }}
+
+      - name: Git app credentials
+        env:
+          APP_TOKEN: ${{ steps.app-token.outputs.token }}
+        run: |
+          git config --global credential.helper store
+          echo "https://x-access-token:${APP_TOKEN}@github.com" >> ~/.git-credentials
+
+      # The one signal this workflow trusts: docs/antora-playbook.yml's own
+      # content.sources[] tags permanently say `tags: ['docs/v*']` (versioned) or
+      # `tags: ['docs/stable']` (standalone) from the moment a site opts into that
+      # mode — see this file's header and versioning-modes.md. Anything else
+      # there is treated as misconfiguration, not a third mode. Unlike
+      # docs/antora.yml elsewhere in this job — which really means
+      # docs/src/antora.yml relative to the repo root, per this job's own
+      # working-directory comment above — antora-playbook.yml sits directly
+      # under docs/ (one level, not nested), so it's read here bare, without
+      # a docs/ prefix.
+      - name: Detect mode
+        id: detect
+        run: |
+          line=$(grep -E "tags:" antora-playbook.yml | head -1)
+
+          case "$line" in
+            *"v*"*) mode=versioned ;;
+            *stable*) mode=standalone ;;
+            *)
+              echo "::error::antora-playbook.yml's content.sources[] has tags: '${line}' — expected something matching 'docs/v*' (versioned) or 'docs/stable' (standalone). See versioning-modes.md's 'Prerequisite' note."
+              exit 1
+              ;;
+          esac
+
+          echo "mode=${mode}" >> "$GITHUB_OUTPUT"
+          echo "Detected ${mode} (antora-playbook.yml: ${line})"
+
+      # Where the target version comes from depends on how this run started:
+      # a person typed it (workflow_dispatch) or the merged PR committed it
+      # (docs/.release-version). Standalone ignores whatever this resolves to
+      # either way — it always targets `stable` — but it's still resolved
+      # uniformly here so later steps don't need to know which trigger fired.
+      - name: Resolve version
+        id: resolve
+        env:
+          EVENT: ${{ github.event_name }}
+          DISPATCH_VERSION: ${{ inputs.version }}
+        run: |
+          if [ "$EVENT" = "workflow_dispatch" ]; then
+            version="$DISPATCH_VERSION"
+            source="workflow_dispatch input"
+          elif [ -f .release-version ]; then
+            version=$(tr -d '[:space:]' < .release-version)
+            source="docs/.release-version"
+          else
+            version=""
+            source="docs/.release-version (missing)"
+          fi
+
+          echo "version=${version}" >> "$GITHUB_OUTPUT"
+          echo "Resolved version '${version}' from ${source}"
+
+      - name: Validate version
+        env:
+          MODE: ${{ steps.detect.outputs.mode }}
+          EVENT: ${{ github.event_name }}
+          VERSION: ${{ steps.resolve.outputs.version }}
+        run: |
+          if [ "$MODE" = "versioned" ] && [ -z "$VERSION" ]; then
+            if [ "$EVENT" = "workflow_dispatch" ]; then
+              echo "::error::Versioned mode requires a real target version — re-run with a 'version' input other than the default 'stable', e.g. 1.2.0."
+            else
+              echo "::error::Versioned mode requires a real target version, and this PR carried no docs/.release-version — add that file with the target version (e.g. 1.2.0) before merging with the docs/release label, or run docouture-release manually via workflow_dispatch instead."
+            fi
+            exit 1
+          fi
+
+          if [ "$MODE" = "versioned" ] && [ "$VERSION" = "stable" ]; then
+            echo "::error::'stable' is standalone's target name, not a valid versioned-mode version — use a real version, e.g. 1.2.0."
+            exit 1
+          fi
+
+          if [ "$MODE" = "standalone" ] && [ -n "$VERSION" ] && [ "$VERSION" != "stable" ]; then
+            echo "::warning::Standalone mode always releases to the 'stable' tag — ignoring provided version '${VERSION}'."
+          fi
+
+      # The release branch's own docs/antora.yml is never touched here — it
+      # permanently says version: prerelease (both modes, trunk-based only
+      # — see the guides-branching-model guide for why this steady-state
+      # value stops being meaningful once the release branch is a distinct,
+      # git-flow branch: nothing reads it back in that case either way).
+      # This step patches a COMMIT, not the release branch itself:
+      # `docouture version <value>` edits the working tree, that edit is
+      # committed on top of the release branch's current tip, and then the
+      # release branch is reset back to that same tip immediately after —
+      # so the commit's only route into the repository's reachable history
+      # is whichever tag points at it next (pushed in the following step).
+      # It is deliberately never pushed as part of the release branch.
+      - name: Cut release
+        id: cut
+        env:
+          MODE: ${{ steps.detect.outputs.mode }}
+          VERSION: ${{ steps.resolve.outputs.version }}
+        run: |
+          if [ "$MODE" = "versioned" ]; then
+            value="$VERSION"
+            tag="docs/v${value}"
+          else
+            value="stable"
+            tag="docs/stable"
+          fi
+
+          base=$(git rev-parse HEAD)
+
+          npx docouture version "$value"
+          git add src/antora.yml
+          git commit -m "chore: docs release ${tag}"
+          sha=$(git rev-parse HEAD)
+
+          # Detach the release branch back to its real tip. The commit just
+          # made keeps existing (git doesn't garbage-collect same-run
+          # objects), it's just no longer what any local branch points at.
+          git reset --hard "$base"
+
+          echo "sha=${sha}" >> "$GITHUB_OUTPUT"
+          echo "tag=${tag}" >> "$GITHUB_OUTPUT"
+
+      # Versioned only: whether this exact version was released before
+      # decides whether "Bump release descriptor" below runs — a republish
+      # (the tag already existed) must NOT bump docs/.release-version
+      # forward, since that file already holds whatever was planned to come
+      # after this republished version. Standalone has no equivalent need —
+      # `docs/stable` is a rolling pointer, always overwritten, and there's no
+      # release-version file to protect.
+      - name: Check for existing release
+        if: steps.detect.outputs.mode == 'versioned'
+        id: check
+        env:
+          TAG: ${{ steps.cut.outputs.tag }}
+        run: |
+          if git ls-remote --exit-code --tags origin "refs/tags/${TAG}" >/dev/null 2>&1; then
+            echo "existed=true" >> "$GITHUB_OUTPUT"
+            echo "${TAG} already exists — republishing (force)."
+          else
+            echo "existed=false" >> "$GITHUB_OUTPUT"
+            echo "${TAG} is new."
+          fi
+
+      # Every release tag is force-recreated if it already exists — both
+      # modes, unconditionally. Standalone's `docs/stable` is a rolling pointer by
+      # design; versioned's docs/vX.Y.Z tags are meant to be immutable once
+      # released, but a republish (fixing a released version) is a
+      # deliberate, ordinary act here, not something gated behind a separate
+      # flag or label.
+      - name: Push release tag
+        env:
+          TAG: ${{ steps.cut.outputs.tag }}
+          SHA: ${{ steps.cut.outputs.sha }}
+        run: |
+          git tag -f "$TAG" "$SHA"
+          git push origin "refs/tags/${TAG}" --force
+
+      # Neither mode creates a GitHub Release object — `Push release tag` above
+      # is the last step of this dance for both. Versioned mode used to
+      # (`gh release create --generate-notes` here, deleting-then-recreating
+      # on a republish), but that Release was functionally inert: nothing
+      # reads it back — no workflow, no Antora extension, no CLI command; the
+      # version dropdown and `duplicate_latest_version` are driven purely by
+      # the tag itself plus Antora's own ref aggregation (see
+      # versioning-modes.md) — and it polluted the same Releases page/RSS/
+      # watch feed as this repo's real npm semver releases
+      # (code-npm_node-publish-release-and-snapshot.yml), which #166's `docs/`
+      # tag prefix alone didn't fully solve: a Release object still shows in
+      # that list regardless of what its tag is named. `--generate-notes`'s
+      # auto PR-list was dropped outright rather than relocated when this was
+      # removed — its value is already covered by the hand-authored
+      # `release-notes/<version>.adoc` page and the auto-generated
+      # `changelog/index.adoc` (built from CHANGELOG.md at build time). See
+      # GH #172.
+
+      # Versioned only, and only on a genuine forward release (not a
+      # republish of an already-released version — see "Check for existing
+      # release" above): docs/.release-version needs a sane value again
+      # immediately or the next docs/release merge has nothing to read (see
+      # "Validate version" above). Rather than clearing it, bump it forward
+      # one patch version — the same idiom `just bump` uses for this
+      # workspace's own npm packages: let `npm version` do the semver
+      # arithmetic against a throwaway package.json instead of hand-rolling
+      # it, then read the result back out. This is a real commit directly on
+      # the release branch (unlike "Cut release" above, which deliberately
+      # never advances it) — it's just bookkeeping, not a release. Skipped
+      # on a republish: that run's target version was already superseded by
+      # whatever docs/.release-version currently holds, so bumping forward
+      # from it would clobber that already-planned next target instead of
+      # protecting it.
+      - name: Bump release descriptor
+        if: steps.detect.outputs.mode == 'versioned' && steps.check.outputs.existed != 'true'
+        env:
+          VERSION: ${{ steps.resolve.outputs.version }}
+        run: |
+          dir=$(mktemp -d)
+          echo '{"name":"docs-release-version","version":"'"${VERSION}"'"}' > "${dir}/package.json"
+          npm --prefix "${dir}" version patch --no-git-tag-version --loglevel error >/dev/null
+          next=$(node -p "require('${dir}/package.json').version")
+
+          echo "${next}" > .release-version
+          git add .release-version
+          git commit -m "chore: bump docs/.release-version to ${next}"
+          git push origin main
+
+          echo "docs/.release-version: ${VERSION} → ${next}"
+
+      # Rebuild/deploy: called directly here, as a reusable job, rather than
+      # relying on docouture-publish.yml's own trigger reacting to the pushes
+      # above — a plain `on: push` there previously had two problems: (1) it
+      # matched both the tag push above AND the release branch's ordinary
+      # pushes, so an unrelated commit to it (or this job's own
+      # release-version bump commit, previously pushed to it directly)
+      # could kick off a publish with nothing to do with a release, and (2)
+      # both this job's tag push and its release-branch push could each
+      # independently match, firing publish twice for one release with no
+      # ordering guarantee between them. A direct `needs:` job dependency
+      # below has neither problem: publish only ever runs once, only after
+      # this job finishes, and only when it actually cut something
+      # (`needs.release.result == 'success'` is already false for a no-op
+      # run — see this job's own `if:` above, which makes a run that
+      # doesn't match skip rather than succeed).
+  publish:
+    name: Publish
+    needs: release
+    if: needs.release.result == 'success'
+    uses: ./.github/workflows/docouture-publish.yml
+    secrets: inherit

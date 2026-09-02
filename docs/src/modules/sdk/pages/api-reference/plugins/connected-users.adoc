@@ -1,0 +1,89 @@
+= WeaveConnectedUsersPlugin
+:description: Get an structure with information about the connected users
+
+== Overview
+
+The https://github.com/InditexTech/weavejs/blob/main/code/packages/sdk/src/plugins/connected-users/connected-users.ts[WeaveConnectedUsersPlugin]
+class represents a plugin that manages and returns information about users connected to a collaborative
+session. It tracks user presence through the shared store and provides metadata such as active users,
+their IDs, names, and statuses, enabling applications to build user lists, indicators, and collaborative
+awareness features.
+
+It enhances the multi-user experience by letting participants know who is connected, online, or active on
+the canvas in real time.
+
+The class extends the xref:sdk:api-reference/plugins/plugin.adoc[WeavePlugin] class
+
+== Name
+
+This plugin `name` property value is `connectedUsers`.
+
+== Import
+
+[source,shell]
+----
+import { WeaveConnectedUsersPlugin } from "@inditextech/weave-sdk";
+----
+
+== Instantiation
+
+[source,ts]
+----
+new WeaveConnectedUsersPlugin(params: WeaveConnectedUsersPluginParams);
+----
+
+== TypeScript types
+
+[source,ts]
+----
+type WeaveUser = {
+  [key: string]: any;
+  name: string;
+  email: string;
+};
+
+type WeaveConnectedUsers = {
+  [userName: string]: WeaveUser;
+};
+
+type WeaveConnectedUsersPluginConfig = {
+  getUser: () => WeaveUser;
+};
+
+type WeaveConnectedUsersPluginParams = {
+  config: WeaveConnectedUsersPluginConfig;
+};
+
+type WeaveConnectedUsersChangeEvent = WeaveConnectedUsers;
+----
+
+== Parameters
+
+For `WeaveConnectedUsersPluginParams`:
+
+[cols="4*"]
+|===
+| Property | Type | Required | Description
+
+| mono:[config] | mono:[WeaveConnectedUsersPluginConfig] | label:green[Required] | Config parameters for the plugin.
+|===
+
+For `WeaveConnectedUsersPluginConfig`:
+
+[cols="4*"]
+|===
+| Property | Type | Required | Description
+
+| mono:[getUser] | mono:[() => WeaveUser] | label:green[Required] | A function that returns the instance user metadata, used to inform the actual connected user to other peers.
+|===
+
+== Events
+
+=== onConnectedUsersChange
+
+[source,ts]
+----
+onConnectedUsersChange: WeaveConnectedUsersChangeEvent;
+----
+
+The `onConnectedUsersChange` event is called every time a user connect / disconnect from a room.

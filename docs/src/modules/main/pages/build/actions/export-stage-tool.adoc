@@ -1,0 +1,85 @@
+= Export Stage Tool
+:description: Export the entire stage (all nodes) node as an image
+
+image::actions/export-stage-tool.gif[Export Stage Tool action on use on the Weave.js showcase,role="zoom-in"]
+
+== Introduction
+
+This action allows users to capture and download the current canvas Stage view as an
+image file (jpeg, png or gif). It takes a snapshot of the entire Stage where are nodes
+are visible, preserving the visual state of nodes, styling, and layout.
+
+== Dependencies
+
+This action needs also registered on the Weave instance the following:
+
+* xref:main:build/plugins/nodes-selection.adoc[Nodes selection] plugin
+
+== Usage
+
+=== Import the Action
+Start by importing the action:
+
+[source,ts]
+----
+import { WeaveExportStageToolAction } from "@inditextech/weave-sdk";
+----
+
+=== Register the Action
+Then register the action on the xref:sdk:api-reference/weave/index.adoc[Weave] class instance.
+
+[source,ts]
+----
+const instance = new Weave({
+  ...
+  actions: [
+    ...,
+    new WeaveExportStageToolAction(), // <.>
+  ]
+})
+----
+<.> Added in this step.
+
+=== Setup the action trigger
+Setup on a button or any element on the UI the user can interact with on the action event:
+
+[source,ts]
+----
+instance.triggerAction("exportStageTool", {
+  options: {
+    padding: 20, // the exported stage image should have a 20px padding
+    pixelRatio: 2, // the exported stage image should have 2x resolution
+  },
+});
+----
+
+
+For example on a button on React:
+
+[source,tsx]
+----
+import React from "react";
+import { useWeave } from "@inditextech/weave-react";
+
+const MyExportStageToolTriggerComponent = () => {
+  const instance = useWeave((state) => state.instance);
+
+  const triggerTool = React.useCallback(() => {
+    instance.triggerAction("exportStageTool", {
+      options: {
+        padding: 20,
+        pixelRatio: 2,
+      },
+    });
+  }, [instance]);
+
+  return <button onClick={triggerTool}>Export Node Tool</button>;
+};
+----
+
+=== Trigger the action
+Finally a final user trigger the UI element that launches the action.
+
+
+When triggered fit all the nodes of the canvas in the viewport, center on its and then
+proceed to generate an image from it. Allowing to download it.

@@ -1,0 +1,409 @@
+= WeaveCommentNode
+:description: Comment node API Reference
+
+== Overview
+
+The https://github.com/InditexTech/weavejs/blob/main/code/packages/sdk/src/nodes/comment/comment.ts[WeaveCommentNode]
+class represents a way to provide feedback to users and let them know where comments have been
+created on the Weave.js canvas.
+
+It also provides a headless mechanism to render DOM nodes to create or view / manage the comment model.
+
+The class extends the xref:sdk:api-reference/nodes/node.adoc[WeaveNode] class
+
+.Not shareable thought the room state
+[WARNING]
+====
+This node is intended and designed to be used standalone, it doesn't support
+to be shared via the room state mechanism.
+====
+
+== Type
+
+This node `nodeType` property value is `arrow`.
+
+== Import
+
+[source,shell]
+----
+import { WeaveCommentNode } from "@inditextech/weave-sdk";
+----
+
+== Instantiation
+
+[source,ts]
+----
+new WeaveCommentNode<T>(params: WeaveCommentNodeParams<T>);
+----
+
+== TypeScript types
+
+[source,ts]
+----
+type WeaveCommentNodeCreateActionKeys =
+  keyof typeof WEAVE_COMMENT_CREATE_ACTION;
+type WeaveCommentNodeCreateAction =
+  (typeof WEAVE_COMMENT_CREATE_ACTION)[WeaveCommentNodeCreateActionKeys];
+
+type WeaveCommentNodeViewActionKeys = keyof typeof WEAVE_COMMENT_VIEW_ACTION;
+type WeaveCommentNodeViewAction =
+  (typeof WEAVE_COMMENT_VIEW_ACTION)[WeaveCommentNodeViewActionKeys];
+
+type WeaveCommentNodeActionKeys = keyof typeof WEAVE_COMMENT_NODE_ACTION;
+type WeaveCommentNodeAction =
+  (typeof WEAVE_COMMENT_NODE_ACTION)[WeaveCommentNodeActionKeys];
+
+type WeaveCommentStatusKeys = keyof typeof WEAVE_COMMENT_STATUS;
+type WeaveCommentStatus = (typeof WEAVE_COMMENT_STATUS)[WeaveCommentStatusKeys];
+
+type WeaveCommentNodeStyle = {
+  stroke: string;
+  strokeWidth: number;
+  shadowColor: string;
+  shadowBlur: number;
+  shadowOffsetX: number;
+  shadowOffsetY: number;
+  shadowOpacity: number;
+  contracted: {
+    width: number;
+    height: number;
+    circlePadding: number;
+    userName: {
+      fontFamily: string;
+      fontSize: number;
+      fontStyle: string;
+    };
+  };
+  expanded: {
+    width: number;
+    userNameLeftMargin: number;
+    dateLeftMargin: number;
+    contentTopMargin: number;
+    contentBottomMargin: number;
+    userName: {
+      fontFamily: string;
+      fontSize: number;
+      fontStyle: string;
+      color: string;
+    };
+    date: {
+      fontFamily: string;
+      fontSize: number;
+      fontStyle: string;
+      color: string;
+    };
+    content: {
+      maxLines: number;
+      fontFamily: string;
+      fontSize: number;
+      fontStyle: string;
+      color: string;
+    };
+  };
+  creating: {
+    paddingX: number;
+    paddingY: number;
+    stroke: string;
+    strokeWidth: number;
+  };
+  viewing: {
+    paddingX: number;
+    paddingY: number;
+    stroke: string;
+    strokeWidth: number;
+  };
+};
+
+type WeaveCommentNodeModel<T> = {
+  getDate: (comment: T) => string;
+  getId: (comment: T) => string;
+  getUserId: (comment: T) => string;
+  getStatus: (comment: T) => WeaveCommentStatus;
+  getUserShortName: (comment: T) => string;
+  getUserFullName: (comment: T) => string;
+  canUserDrag: (comment: T) => boolean;
+  getContent: (comment: T) => string;
+  setMarkResolved: (comment: T) => T;
+  setContent: (comment: T, content: string) => T;
+};
+
+type WeaveCommentNodeConfig<T> = {
+  style: WeaveCommentNodeStyle;
+  model: WeaveCommentNodeModel<T>;
+  formatDate: (date: string) => string;
+  createComment: (
+    ele: HTMLDivElement,
+    node: WeaveElementInstance,
+    finish: (
+      node: WeaveElementInstance,
+      content: string,
+      action: WeaveCommentNodeCreateAction
+    ) => void
+  ) => Promise<void>;
+  viewComment: (
+    ele: HTMLDivElement,
+    node: WeaveElementInstance,
+    finish: (
+      node: WeaveElementInstance,
+      content: string,
+      action: WeaveCommentNodeViewAction
+    ) => void
+  ) => Promise<void>;
+};
+
+type WeaveCommentNodeParams<T> = {
+  config: Pick<
+    WeaveCommentNodeConfig<T>,
+    "model" | "formatDate" | "createComment" | "viewComment"
+  > &
+    DeepPartial<Pick<WeaveCommentNodeConfig<T>, "style">>;
+};
+
+type WeaveCommentNodeOnFinishCreateEvent = {
+  node: WeaveElementInstance;
+  action: WeaveCommentNodeCreateAction;
+};
+
+type WeaveCommentNodeOnCreateCommentEvent = {
+  node: WeaveElementInstance;
+  position: Konva.Vector2d;
+  content: string;
+};
+
+type WeaveCommentNodeOnViewEvent = {
+  node: WeaveElementInstance;
+};
+
+type WeaveCommentNodeOnDragStartEvent = {
+  node: WeaveElementInstance;
+};
+
+type WeaveCommentNodeOnDragEndEvent = {
+  node: WeaveElementInstance;
+};
+----
+
+== Parameters
+
+For `WeaveCommentNodeParams<T>`:
+
+[cols="4*"]
+|===
+| Property | Type | Required | Description
+
+| mono:[config] | mono:[Pick<WeaveCommentNodeConfig<T>, 'model' \| 'formatDate' \| 'createComment' \| 'viewComment'> & DeepPartial<Pick<WeaveCommentNodeConfig<T>, 'style'>>] | label:green[Required] | Config parameters for the node.
+|===
+
+For `Pick<WeaveCommentNodeConfig<T>, 'model' | 'formatDate' | 'createComment' | 'viewComment'> & DeepPartial<Pick<WeaveCommentNodeConfig<T>, 'style'>>`:
+
+[cols="5*"]
+|===
+| Property | Type | Required | Default | Description
+
+| mono:[style] | mono:[WeaveCommentNodeStyle] |  | mono:[check default values] | Defines the node canvas UI style.
+| mono:[model] | mono:[WeaveCommentNodeModel<T>] | label:green[Required] |  | Setup the Entity model 
+| mono:[formatDate] | mono:[(date: string) => string] | label:green[Required] |  | A function that formats the date when used on the canvas UI.
+| mono:[createComment] | mono:[(ele: HTMLDivElement, node: WeaveElementInstance, finish: (node: WeaveElementInstance, content: string, action: WeaveCommentNodeCreateAction) => void) => Promise<void>] | label:green[Required] |  | A callback that is called when the create comment overlay UI is needed to be render.
+| mono:[viewComment] | mono:[(ele: HTMLDivElement, node: WeaveElementInstance, finish: (node: WeaveElementInstance, content: string, action: WeaveCommentNodeViewAction) => void) => Promise<void>] | label:green[Required] |  | A callback that is called when the view / manage comment overlay UI is needed to be render.
+|===
+
+== Default values
+
+[source,ts]
+----
+const WEAVE_COMMENT_STATUS = {
+  PENDING: "pending",
+  RESOLVED: "resolved",
+} as const;
+
+const WEAVE_COMMENT_CREATE_ACTION = {
+  CREATE: "create",
+  CLOSE: "close",
+} as const;
+
+const WEAVE_COMMENT_VIEW_ACTION = {
+  REPLY: "reply",
+  MARK_RESOLVED: "markResolved",
+  EDIT: "edit",
+  DELETE: "delete",
+  CLOSE: "close",
+} as const;
+
+const WEAVE_COMMENT_NODE_ACTION = {
+  IDLE: "idle",
+  CREATING: "creating",
+  VIEWING: "viewing",
+} as const;
+
+const WEAVE_COMMENT_NODE_TYPE = "comment";
+
+const WEAVE_COMMENT_NODE_DEFAULTS = {
+  style: {
+    stroke: "#000000",
+    strokeWidth: 0,
+    shadowColor: "rgba(0,0,0,0.25)",
+    shadowBlur: 4,
+    shadowOffsetX: 0,
+    shadowOffsetY: 0,
+    shadowOpacity: 0.8,
+    contracted: {
+      width: 40,
+      height: 40,
+      circlePadding: 2,
+      userName: {
+        fontFamily: "arial, sans-serif",
+        fontSize: 14,
+        fontStyle: "normal",
+      },
+    },
+    expanded: {
+      width: 250,
+      userNameLeftMargin: 8,
+      dateLeftMargin: 8,
+      contentTopMargin: 8,
+      contentBottomMargin: 12,
+      userName: {
+        fontFamily: "arial, sans-serif",
+        fontSize: 12,
+        fontStyle: "bold",
+        color: "#000000",
+      },
+      date: {
+        fontFamily: "arial, sans-serif",
+        fontSize: 12,
+        fontStyle: "normal",
+        color: "#757575",
+      },
+      content: {
+        fontFamily: "arial, sans-serif",
+        fontSize: 12,
+        maxLines: 3,
+        fontStyle: "normal",
+        color: "#000000",
+      },
+    },
+    creating: {
+      paddingX: 8,
+      paddingY: -4,
+      stroke: "#1a1aff",
+      strokeWidth: 2,
+    },
+    viewing: {
+      paddingX: 8,
+      paddingY: -18,
+      stroke: "#1a1aff",
+      strokeWidth: 2,
+    },
+  },
+  formatDate: (date: string) => date,
+};
+----
+
+== Methods
+
+=== setCommentModel
+
+[source,ts]
+----
+setCommentModel(commentNode: WeaveElementInstance, comment: T): void
+----
+
+This method associates to a node instance it respective model instance, useful after creating, to associate
+the newly created module to the created instance.
+
+=== focusOn
+
+[source,ts]
+----
+focusOn(nodeId: string, duration = 0.5): void
+----
+
+This method focus the stage on the node with a nice animation. The animation duration can be tuned.
+
+=== setCommentViewing
+
+[source,ts]
+----
+setCommentViewing(commentId: string | null): void
+----
+
+This method sets if a comment is actually on the `viewing` internal state for the DOM, passing the comment Id from
+the model that is visible. If null is passed the internal state is `idle`.
+
+=== setCommentViewing
+
+[source,ts]
+----
+isCommentViewing(): boolean
+----
+
+This method returns true if the internal state of the DOM is `viewing'.
+
+=== isCommentCreating
+
+[source,ts]
+----
+isCommentCreating(): boolean
+----
+
+This method returns true if the internal state of the DOM is `creating'.
+
+=== getCommentId
+
+[source,ts]
+----
+getCommentId(node: WeaveElementInstance): string
+----
+
+Gets the comment Id from the node using the defined model functions.
+
+=== setShowResolved
+
+[source,ts]
+----
+setShowResolved(show: boolean): void
+----
+
+If true, allow to render nodes that are on the `resolved` status.
+
+== Events
+
+=== onCommentFinishCreate
+
+[source,ts]
+----
+onCommentFinishCreate: WeaveCommentNodeOnFinishCreateEvent;
+----
+
+The `onCommentFinishCreate` event is called when the create loop is finished.
+
+=== onCommentCreate
+
+[source,ts]
+----
+onCommentCreate: WeaveCommentNodeOnCreateCommentEvent;
+----
+
+The `onCommentCreate` event is called when a comment is created. Useful to initiate sync
+state with other peers.
+
+=== onCommentView
+
+[source,ts]
+----
+onCommentView: WeaveCommentNodeOnViewEvent;
+----
+
+The `onCommentView` event is called when a comment overlay DOM is rendered on the UI.
+Used internally on the xref:main:build/actions/comment-tool.adoc[Comment tool] to handle it
+internal state machine.
+
+=== onCommentDragEnd
+
+[source,ts]
+----
+onCommentDragEnd: WeaveCommentNodeOnDragEndEvent;
+----
+
+The `onCommentDragEnd` event is called when a comment finished a drag to change it's position.
+Useful to update the model with the new (x,y) coordinates for the new position.

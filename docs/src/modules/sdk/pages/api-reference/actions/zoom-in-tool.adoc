@@ -1,0 +1,58 @@
+= WeaveZoomInToolAction
+:description: Increases one step the stage zoom level
+
+== Overview
+
+The https://github.com/InditexTech/weavejs/blob/main/code/packages/sdk/src/actions/zoom-in-tool/zoom-in-tool.ts[WeaveZoomInToolAction]
+class that allows users to incrementally zoom in on the canvas Stage. It provides
+a simple, user-friendly way to enlarge the view, helping users focus on fine
+details within a complex visual environment.
+
+This action works in coordination with the xref:sdk:api-reference/plugins/stage-zoom.adoc[WeaveStageZoomPlugin]
+plugin and ensures a smooth zooming experience without disrupting the
+layout or collaboration session.
+
+The class extends the xref:sdk:api-reference/actions/action.adoc[WeaveAction] class.
+
+== Name
+
+This action `name` property value is `zoomInTool`.
+
+== Import
+
+[source,shell]
+----
+import { WeaveZoomInToolAction } from "@inditextech/weave-sdk";
+----
+
+== Instantiation
+
+[source,ts]
+----
+new WeaveZoomInToolAction();
+----
+
+== TypeScript types
+
+[source,ts]
+----
+type WeaveZoomInToolActionParams = {
+  previousAction: string;
+};
+----
+
+== Trigger function params
+
+[source,ts]
+----
+trigger(cancelAction: () => void, params?: WeaveZoomInToolActionParams): void;
+----
+
+For `WeaveZoomInToolActionParams`:
+
+[cols="4*"]
+|===
+| Property | Type | Required | Description
+
+| mono:[previousAction] | mono:[string] | label:green[Required] | The action to trigger after the zoom-in action is completed.
+|===

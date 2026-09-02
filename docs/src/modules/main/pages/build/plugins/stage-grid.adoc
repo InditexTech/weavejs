@@ -1,0 +1,55 @@
+= Stage Grid
+:description: Renders a reference grid behind the nodes layer
+
+== Introduction
+
+This plugin adds a visual background grid to the canvas stage, helping users align
+and position elements more precisely. The grid can be rendered as lines or dots, and
+supports customizable spacing, color, and style.
+
+Is especially useful for diagramming tools, design interfaces, or any
+application where spatial structure improves usability. It integrates seamlessly
+with zoom and pan behaviors to ensure the grid remains consistent and responsive
+during interactions.
+
+== Usage
+
+=== Import the Plugin
+Start by importing the plugin:
+
+[source,ts]
+----
+import { WeaveStageGridPlugin } from "@inditextech/weave-sdk";
+----
+
+=== Register the Plugin
+Then register the plugin on the xref:sdk:api-reference/weave/index.adoc[Weave] class instance.
+
+[source,ts]
+----
+const instance = new Weave({
+  ...
+  plugins: [
+    ...,
+    new WeaveStageGridPlugin(), // <.>
+  ]
+})
+----
+<.> Added in this step.
+
+You can also define:
+
+* The type of the grid (by default is a line grid, but it also can be a dot grid).
+* The style of the grid (visual colors and appearance).
+* The separation of the grid cells.
+
+For more information check the xref:sdk:api-reference/plugins/stage-grid.adoc[WeaveStageGridPlugin]
+plugin API.
+
+=== Use the plugin
+Once the plugin is registered the final user should be able to see the reference grid.
+
+The plugin also provides a public API to:
+
+* Enable / disable the grid.
+* Change the grid type.

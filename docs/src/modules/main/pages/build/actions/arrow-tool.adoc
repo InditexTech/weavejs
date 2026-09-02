@@ -1,0 +1,85 @@
+= Arrow Tool (deprecated)
+:description: Add an arrow to the canvas
+
+image::actions/arrow-tool.gif[Arrow Tool action on use on the Weave.js showcase,role="zoom-in"]
+
+== Introduction
+
+This action enables users to create new arrow nodes on the canvas.
+
+== Dependencies
+
+This action needs registered on the Weave instance the following elements:
+
+* xref:main:build/nodes/arrow.adoc[Arrow] node
+* xref:main:build/nodes/line.adoc[Line] node
+
+== Usage
+
+=== Import the Action
+Start by importing the action:
+
+[source,ts]
+----
+import { WeaveArrowToolAction } from "@inditextech/weave-sdk";
+----
+
+=== Register the Action
+Then register the action on the xref:sdk:api-reference/weave/index.adoc[Weave] class instance.
+
+[source,ts]
+----
+const instance = new Weave({
+  ...
+  actions: [
+    ...,
+    new WeaveArrowToolAction(), // <.>
+  ]
+})
+----
+<.> Added in this step.
+
+=== Setup the action trigger
+Setup on a button or any element on the UI the user can interact with on the action event:
+
+[source,ts]
+----
+instance.triggerAction("arrowTool");
+----
+
+
+For example on a button on React:
+
+[source,tsx]
+----
+import React from "react";
+import { useWeave } from "@inditextech/weave-react";
+
+const MyArrowToolTriggerComponent = () => {
+  const instance = useWeave((state) => state.instance);
+
+  const triggerTool = React.useCallback(() => {
+    instance.triggerAction("arrowTool");
+  }, [instance]);
+
+  return <button onClick={triggerTool}>Arrow Tool</button>;
+};
+----
+
+=== Trigger the action
+Finally a final user trigger the UI element that launches the action.
+
+
+When the tool is active the user can:
+
+* *Click* or *Touch* on the canvas, to define an arrow segment start point.
+* *Click* or *Touch* again on the canvas, to define the arrow final segment point.
+
+When the user is satisfied with the arrow segments:
+
+* On non-touch devices, press the kbd:[Enter] or kbd:[Esc] keys.
+* On touch devices, trigger the xref:main:build/actions/selection-tool.adoc[Selection Tool].
+
+Then the arrow with the N defined segments is added to the canvas as a fully functional
+node—ready. This action integrates seamlessly with Weave.js's real-time state system,
+ensuring the new element appears instantly for all connected users.

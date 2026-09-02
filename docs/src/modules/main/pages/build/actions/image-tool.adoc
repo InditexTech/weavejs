@@ -1,0 +1,154 @@
+= Image Tool
+:description: Add an image to the canvas
+
+image::actions/image-tool.gif[Image Tool action on use on the Weave.js showcase,role="zoom-in"]
+
+== Introduction
+
+This action allows users to add images to the canvas by:
+
+* Selecting a file and add it to the canvas on a position of its choice.
+* Drag & Drop an Image from the same application to the canvas and add it to the canvas on a position of its choice.
+* Drag & Drop an external Image to the canvas and add it to the canvas on a position of its choice.
+* Copy / pasting an external Image to the canvas.
+
+Once added, the image is rendered as an Image Node, ready for positioning, resizing,
+and collaboration.
+
+This action supports various image formats: jpeg, gif & png. Ideal for visual
+references, diagrams, or creative content.
+
+== Dependencies
+
+This action needs also registered on the Weave instance the following:
+
+* xref:main:build/nodes/image.adoc[Image] node
+
+== Usage
+
+=== Import the Action
+Start by importing the action:
+
+[source,ts]
+----
+import { WeaveImageToolAction } from "@inditextech/weave-sdk";
+----
+
+=== Register the Action
+Then register the action on the xref:sdk:api-reference/weave/index.adoc[Weave] class instance.
+
+[source,ts]
+----
+const instance = new Weave({
+  ...
+  actions: [
+    ...,
+    new WeaveImageToolAction(), // <.>
+  ]
+})
+----
+<.> Added in this step.
+
+=== Setup the action trigger
+Setup on a button or any element on the UI the user can interact with on the action event:
+
+[source,ts]
+----
+const { nodeId } = instance.triggerAction("imageTool");
+----
+
+Then select the image to upload (by showcasing a file select to the end user), and when the user
+selects an image, the user can select where to put the image on the canvas, and when added, the image
+is uploaded asynchronously using the defined `uploadImageFunction` that has the following signature:
+`(file: File) => Promise<string>`.
+
+
+For example on a button on React:
+
+[source,tsx]
+----
+import React from "react";
+import { useWeave } from "@inditextech/weave-react";
+import {
+  WEAVE_IMAGE_TOOL_UPLOAD_TYPE,
+  WeaveImageToolActionTriggerParams,
+  WeaveImageToolActionTriggerReturn,
+} from "@inditextech/weave-sdk";
+
+const MyImageToolTriggerComponent = () => {
+  const inputFileRef = React.useRef<any>(null);
+  const instance = useWeave((state) => state.instance);
+  const [showSelectFile, setShowSelectFile] = React.useState<boolean>(false);
+
+  React.useEffect(() => {
+    if (showSelectFile && inputFileRef.current) {
+      inputFileRef.current.click();
+      setShowSelectFile(false);
+    }
+  }, [instance, showSelectFile]);
+
+  const handleUploadFile = React.useCallback(
+    async (file: File) => {
+      const uploadImageFunction = async (file: File) => {
+        const imageURL = await uploadImage(file);
+        return imageURL;
+      };
+
+      instance.triggerAction<
+        WeaveImageToolActionTriggerParams,
+        WeaveImageToolActionTriggerReturn
+      >("imageTool", {
+        type: WEAVE_IMAGE_TOOL_UPLOAD_TYPE.FILE,
+        image: {
+          file,
+          downscaleRatio,
+        },
+        uploadImageFunction,
+      });
+    },
+    [instance],
+  );
+
+  return (
+    <>
+      <input
+        type="file"
+        accept="image/png,image/gif,image/jpeg"
+        name="image"
+        style={{ display: "none" }}
+        ref={inputFileRef}
+        onClick={() => {
+          inputFileRef.current.value = null;
+        }}
+        onChange={(e) => {
+          const file = e.target.files?.[0];
+          if (file) {
+            handleUploadFile(file);
+          }
+        }}
+      />
+      <button
+        onClick={() => {
+          setShowSelectFile(true);
+        }}
+      >
+        Image Tool
+      </button>
+    </>
+  );
+};
+----
+
+=== Trigger the action
+Finally a final user trigger the UI element that launches the action.
+
+
+When active the user:
+
+* Select the image to upload.
+* Image is uploaded with the API the developer choses or has available.
+* Once the image is uploaded, the user can click or touch on the canvas to place it where it wants.
+
+Then the image is added to the canvas as a fully functional node—ready.
+This action integrates seamlessly with Weave.js's real-time state system,
+ensuring the new element appears instantly for all connected users.

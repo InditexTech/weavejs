@@ -1,0 +1,76 @@
+= WeaveBrushToolAction
+:description: Paint freeform strokes on the canvas
+
+== Overview
+
+The https://github.com/InditexTech/weavejs/blob/main/code/packages/sdk/src/actions/brush-tool/brush-tool.ts[WeaveBrushToolAction]
+class that enables users to draw freeform strokes on the canvas using a brush tool. It lets users click and drag across the canvas
+to create a smooth, continuous path—perfect for sketching, annotating, or freehand drawing within a collaborative environment.
+
+Each stroke is recorded as a xref:sdk:api-reference/nodes/line.adoc[WeaveLineNode], synchronized across all connected users in real time.
+
+The class extends the xref:sdk:api-reference/actions/action.adoc[WeaveAction] class.
+
+== Name
+
+This action `name` property value is `brushTool`.
+
+== Type
+
+This node `nodeType` property value is `stroke`.
+
+== Import
+
+[source,shell]
+----
+import { WeaveBrushToolAction } from "@inditextech/weave-sdk";
+----
+
+== Instantiation
+
+[source,ts]
+----
+new WeaveBrushToolAction(params?: WeaveBrushToolActionParams);
+----
+
+== TypeScript types
+
+[source,ts]
+----
+type WeaveBrushToolActionProperties = {
+  interpolationSteps: number; // Number of steps for interpolation
+};
+
+type WeaveBrushToolActionParams = {
+  config: Partial<WeaveBrushToolActionProperties>;
+};
+----
+
+== Parameters
+
+For `WeaveBrushToolActionParams`:
+
+[cols="4*"]
+|===
+| Property | Type | Required | Description
+
+| mono:[config] | mono:[Partial<WeaveBrushToolActionParams>] | label:green[Required] | Config parameters for the tool.
+|===
+
+For `WeaveBrushToolActionParams`:
+
+[cols="5*"]
+|===
+| Property | Type | Required | Default | Description
+
+| mono:[interpolationSteps] | mono:[number] |  | mono:[10] | Number of interpolation steps for smooth curve on touch devices.
+|===
+
+== Default values
+
+[source,ts]
+----
+const BRUSH_TOOL_DEFAULT_CONFIG = {
+  interpolationSteps: 10,
+};
+----

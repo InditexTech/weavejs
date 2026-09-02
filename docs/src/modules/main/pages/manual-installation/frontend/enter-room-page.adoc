@@ -1,0 +1,100 @@
+= Enter Room page
+:description: Learn how to set up the Enter Room page on Next.js
+
+In this guide, you will build the *Enter Room page*:
+
+image::enter-room-manual.png[Enter room page,role="zoom-in"]
+
+This page allows users to define the room they wish to join and set their username.
+
+== Prerequisites
+
+Before you begin, ensure that you have completed the xref:main:manual-installation/frontend/enter-room-page.adoc[frontend installation] guide, up to the _"Set up the Enter Room page"_ step.
+
+== Step by step
+
+To set up the *Enter Room* page in your Next.js project, follow these steps:
+
+=== 1. Install the UI building block components
+
+Set up the necessary https://ui.shadcn.com/docs[Shadcn/UI] components for the *Enter Room* page.
+
+Use the https://ui.shadcn.com/docs/cli[Shadcn/UI CLI] and accept all the default options.
+
+From the project root folder, follow these steps:
+
+* Install the https://ui.shadcn.com/docs/components/form[Form] component:
++
+[source,shell]
+----
+npx shadcn@latest add form
+----
+* Install the https://ui.shadcn.com/docs/components/input[Input] component:
++
+[source,shell]
+----
+npx shadcn@latest add input
+----
+
+=== 2. Define the base styles
+
+Adjust the styling of the *Enter Room* page.
+
+Replace the contents of `app/globals.css` with:
+
+.app/globals.css
+[source,css]
+----
+include::example$manual-installation/app/globals.css[]
+----
+
+=== 3. Set up the page React component
+
+Create a `home` folder in the `components` folder.
+
+==== Home component
+
+In the `components/home` folder, create a file named `home.tsx` with:
+
+.components/home/home.tsx
+[source,tsx]
+----
+include::example$manual-installation/components/home/home.tsx[]
+----
+
+==== LoginForm component
+
+In the `components/home` folder, create a file named `login-form.tsx` with:
+
+.components/home/login-form.tsx
+[source,tsx]
+----
+include::example$manual-installation/components/home/login-form.tsx[]
+----
+
+=== 4. Define the page component
+
+Replace the contents of the file `app/page.tsx` with:
+
+.app/page.tsx
+[source,tsx]
+----
+include::example$manual-installation/app/page.tsx[]
+----
+
+.Run the project
+Once the *Enter Room* page setup is complete, run the project by executing the following command:
+
+[source,shell]
+----
+npm run dev
+----
+
+Navigate to `http://localhost:3000` in a browser.
+You should see the following:
+
+image::enter-room-manual.png[Enter room page,role="zoom-in"]
+
+== Next steps
+
+Set up the xref:main:manual-installation/frontend/room-page.adoc[Room page] of the Next.js application.

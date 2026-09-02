@@ -1,0 +1,204 @@
+= Manual installation
+:description: Integrate Weave.js into a new or existing Next.js project
+
+In this guide, you will manually integrate Weave.js into a https://nextjs.org/docs[Next.js] application.
+You can reference the https://github.com/InditexTech/weavejs/tree/main/docs/manual-installation[complete sample project] in the Weave.js repository as you follow along.
+
+.Why Next.js?
+[NOTE]
+====
+Next.js is used in this quickstart to simplify the process by combining the frontend and backend into a single artifact.
+It's a widely adopted framework built on React.
+
+For instructions on setting up Weave.js with separate artifacts, refer to our showcase implementations:
+
+* https://github.com/InditexTech/weavejs-backend[Backend]
+* https://github.com/InditexTech/weavejs-frontend[Frontend]
+====
+
+== Prerequisites
+
+Before you begin, ensure that you meet the xref:main:requirements.adoc[requirements].
+
+.Next.js version used
+[NOTE]
+====
+Weave.js is not compatible with React 19, which is included in Next.js 15. For
+this reason, this guide uses *Next.js 14*.
+====
+
+== Step by step
+
+=== Set up your project
+
+To have a Weave.js project running, follow these steps:
+
+==== 1. Install Next.js
+
+If you don't have a Next.js 14 project already, start by creating a new one.
+Run the following command, and when prompted, accept all the default values:
+
+[source,shell]
+----
+npx create-next-app@next-14
+----
+
+When finished, navigate to the app folder and:
+
+* Delete the `node_modules` folder.
+* Delete the `package-lock.json` file.
+
+Update add the following on the the `package.json` file:
+
+* Add the `type` property and set it to `module`:
+
+[source,json]
+----
+{
+  ...
+  "type": "module",
+  ...
+}
+----
+
+* Add the `overrides` section to the `package.json` file in order to
+force the use of React `18.2.0` version:
+
+[source,json]
+----
+{
+  ...
+  "devDependencies": {
+    ...
+  },
+  "overrides": {
+    "react": "18.2.0",
+    "react-dom": "18.2.0"
+  }
+}
+----
+
+* Set strict dependencies for `react` and `react-dom` to version `18.2.0`, and
+version `18.3.7` for`@types/react` and `@types/react-dom` as follows:
+
+[source,json]
+----
+{
+  ...
+  "dependencies": {
+    ...
+    "react": "18.2.0",
+    "react-dom": "18.2.0",
+    ...
+  },
+  "devDependencies": {
+    ...
+    "@types/react": "18.3.7",
+    "@types/react-dom": "18.3.7",
+    ...
+  },
+  ...
+}
+``
+
+Now execute a new install of the dependencies:
+
+```shell
+npm install
+----
+
+Set `"baseUrl": "."` in `tsconfig.json` to simplify module imports:
+
+[source,json]
+----
+{
+  "compilerOptions": {
+    "baseUrl": ".",
+    // ...
+}
+----
+
+Navigate to the project folder and start the development server by running the following command:
+
+[source,shell]
+----
+npm run dev
+----
+
+Open `http://localhost:3000` in your browser to see the Next.js base app.
+
+.Failed to load images
+[WARNING]
+====
+Some images in the default Next.js template may not load correctly. You can
+safely ignore this issue since it is specific to the template and does not
+impact the functionality of Weave.js.
+====
+
+=== 2. Set up the backend
+
+Follow the steps to xref:main:manual-installation/backend.adoc[set up the backend] of the application.
+
+=== 3. Set up the frontend
+
+Follow the steps to xref:main:manual-installation/frontend/index.adoc[set up the frontend] of the application.
+
+=== 4. Run the project
+
+If you have completed all the previous steps, you should have a working project.
+
+To run the project, use the following command:
+
+[source,shell]
+----
+npm run dev
+----
+
+In a browser, navigate to `http://localhost:3000`.
+
+You will see the *Enter Room* page:
+
+image::enter-room-manual.png[Enter room page,role="zoom-in"]
+
+On it, enter a _room name_ and your _username_, then click on the *ENTER THE ROOM* button.
+
+Once the *Room* loads, you can:
+
+image::room.png[Room page,role="zoom-in"]
+
+* View the collaborative canvas.
+* Zoom and pan the canvas.
+* Create a simple node, such as a xref:main:build/nodes/rectangle.adoc[Rectangle].
+
+Next, try opening another tab.
+Use a different username and the same room name and make some changes.
+In the first tab, you should see the changes made by this new user.
+
+Congratulations! You have a working Weave.js application.
+
+== Next steps
+
+Now that you've completed the quickstart, you're ready to dive deeper into Weave.js and unlock its full potential. Here are some of our recommended next steps:
+
+====
+
+[discrete]
+=== Explore the building blocks
+
+To learn how to build modular and interactive tools, explore how Weave.js is structured under the hood and get familiar with core concepts like:
+
+* xref:main:build/nodes/index.adoc[Nodes]
+* xref:main:build/plugins/index.adoc[Plugins]
+* xref:main:build/actions/index.adoc[Actions]
+
+====
+
+=====
+
+[discrete]
+=== Review the API Reference
+
+Dive into xref:sdk:index.adoc[API reference] to explore all available methods, utilities, and configuration options.
+This is your go-to resource as you start building more advanced features.
+
+=====

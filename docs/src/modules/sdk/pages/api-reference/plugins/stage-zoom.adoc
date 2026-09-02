@@ -1,0 +1,183 @@
+= WeaveStageZoomPlugin
+:description: Activates support for zoom on the stage
+
+== Overview
+
+The https://github.com/InditexTech/weavejs/blob/main/code/packages/sdk/src/plugins/stage-zoom/stage-zoom.ts[WeaveStageZoomPlugin]
+class that adds zooming capabilities to the canvas Stage. It allows users to zoom in and out using gestures like
+the mouse wheel, trackpad, or programmatic controls, enabling smooth navigation across large or detailed workspaces.
+
+Zooming makes it easier for users to focus on fine details or get a high-level overview of complex visual layouts
+during collaboration.
+
+The class extends the xref:sdk:api-reference/plugins/plugin.adoc[WeavePlugin] class
+
+== Name
+
+This plugin `name` property value is `stageZoom`.
+
+== Import
+
+[source,shell]
+----
+import { WeaveStageZoomPlugin } from "@inditextech/weave-sdk";
+----
+
+== Instantiation
+
+[source,ts]
+----
+new WeaveStageZoomPlugin(params?: WeaveStageZoomPluginConfig);
+----
+
+== TypeScript types
+
+[source,ts]
+----
+type WeaveStageZoomChanged = {
+  scale: number;
+  zoomSteps: number[];
+  actualStep: number;
+  onDefaultStep: boolean;
+  canZoomIn: boolean;
+  canZoomOut: boolean;
+};
+
+type WeaveStageZoomPluginOnZoomChangeEvent = WeaveStageZoomChanged;
+
+type WeaveStageZoomPluginConfig = {
+  zoomSteps: number[];
+  defaultZoom: number;
+  fitToScreen: {
+    padding: number;
+  };
+  fitToSelection: {
+    padding: number;
+  };
+  zoomInertia: {
+    friction: number;
+    mouseWheelStep: number;
+    trackpadStep: number;
+  };
+};
+
+type DeepPartial<T> = {
+  [P in keyof T]?: T[P] extends object
+    ? T[P] extends Function
+      ? T[P]
+      : DeepPartial<T[P]>
+    : T[P];
+};
+
+type WeaveStageZoomPluginParams = {
+  config?: DeepPartial<WeaveStageZoomPluginConfig>;
+};
+----
+
+== Parameters
+
+For `WeaveStageZoomPluginConfig`:
+
+[cols="4*"]
+|===
+| Property | Type | Required | Description
+
+| mono:[config] | mono:[Partial<WeaveStageZoomPluginConfig>] |  | Config parameters for the plugin.
+|===
+
+For `WeaveStageZoomPluginConfig`:
+
+[cols="5*"]
+|===
+| Property | Type | Required | Default | Description
+
+| mono:[zoomSteps] | mono:[number[\]] |  | mono:[[ 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1, 1.25, 1.5, 1.75, 2, 3, 4, 6, 8, 10\]] | An array that defines the zooming steps of the plugin.
+| mono:[defaultZoom] | mono:[number] |  | mono:[1] | The default zoom when loading the stage (canvas).
+| mono:[fitToScreen.padding] | mono:[number] |  | mono:[40] | The default padding zoom when fitting elements to screen (in px).
+| mono:[fitToSelection.padding] | mono:[number] |  | mono:[40] | The default padding zoom when fitting elements to selection (in px).
+| mono:[zoomInertia.friction] | mono:[number] |  | mono:[0.9] | The friction applied to the zoom inertia feature. This smooths the stop of the zoom.
+| mono:[zoomInertia.mouseWheelStep] | mono:[number] |  | mono:[0.01] | The step (zooming) applied to the zoom inertia feature when using the mouse wheel (via the wheel event).
+| mono:[zoomInertia.trackpadStep] | mono:[number] |  | mono:[0.005] | The step (zooming) applied to the zoom inertia feature when using a trackpad (via the wheel event).
+|===
+
+== Methods
+
+=== canZoomOut
+
+[source,ts]
+----
+canZoomOut(): boolean
+----
+
+Returns true if zoom-out is possible with the defined steps and actual step, return false otherwise.
+
+=== canZoomIn
+
+[source,ts]
+----
+canZoomIn(): boolean
+----
+
+Returns true if zoom-in is possible with the defined steps and actual step, return false otherwise.
+
+=== zoomToStep
+
+[source,ts]
+----
+zoomToStep(index: number): void
+----
+
+This method set the defined step index as zoom.
+
+=== setZoom
+
+[source,ts]
+----
+setZoom(scale: number, centered: boolean = true, pointer?: Konva.Vector2d): void
+----
+
+This method set the defined zoom as scale, the zoom by default is centered on screen and if a pointer is provided
+will use that pointer as zoom center.
+
+=== fitToScreen
+
+[source,ts]
+----
+fitToScreen(options?: { overrideZoom: boolean }): void
+----
+
+This method fits the zoom so all elements on the canvas are visible on the user screen or viewport. By default it
+overrides zoom steps, pass `overrideZoom` to `false` to clamp to zoom steps minimum and maximum values.
+
+=== fitToNodes
+
+[source,ts]
+----
+fitToNodes(nodes: string[], options?: { smartZoom?: boolean; overrideZoom?: boolean }): void
+----
+
+This method fits the zoom so all elements Id defined on the `nodes` parameter are visible on the user screen or
+viewport. If `smartZoom` is true, no scaling is done, only panning to the center of the defined elements. By default
+it overrides zoom steps, pass `overrideZoom` to `false` to clamp to zoom steps minimum and maximum values.
+
+=== fitToSelection
+
+[source,ts]
+----
+fitToSelection(smartZoom?: boolean, overrideZoom?: boolean;): void
+----
+
+This method fits the zoom so all selected elements (uses the WeaveNodesSelectionPlugin) are visible on the user
+screen or viewport. If `smartZoom` is true, no scaling is done, only panning to the center of the defined elements.
+By default it overrides zoom steps, pass `overrideZoom` to `false` to clamp to zoom steps minimum and maximum values.
+
+== Events
+
+=== onZoomChange
+
+[source,ts]
+----
+onZoomChange: WeaveStageZoomPluginOnZoomChangeEvent;
+----
+
+The `onZoomChange` event is called when the the zoom of the stage is changed.

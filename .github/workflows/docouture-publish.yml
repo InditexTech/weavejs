@@ -1,0 +1,154 @@
+name: docouture-publish
+
+# Builds this site, then publishes it with `docouture publish <target>` — see
+# that command's own usage (`docouture --help`) and
+# @inditextech/docouture-cli's publish.ts for the mechanism: `<target>` resolves
+# by convention to the npm package `@inditextech/docouture-publish-<target>`
+# (e.g. `gh-pages` → `@inditextech/docouture-publish-gh-pages`), which this site
+# must add to its own devDependencies to opt in, alongside a
+# `"docouture": { "publish": { "<target>": { ... } } }` block in this site's own
+# package.json for that driver's options. There is no publish-target Antora
+# extension and no `antora.extensions` involvement at all — publishing is a
+# CLI concern, decoupled from `antora build`, which is why Build and Publish
+# are two separate steps below: re-publishing an already-built site never
+# needs a rebuild.
+#
+# Replace `gh-pages` in the Publish step with whatever target this site's
+# own devDependencies declare a driver for, or drop the step entirely for a
+# site that only wants a build artifact for now — this file makes no
+# platform assumption.
+#
+# `permissions: contents: write` and `GITHUB_TOKEN` below are only ever used
+# by @inditextech/docouture-publish-gh-pages specifically (pushing to a
+# `gh-pages` branch needs both); harmless to leave granted for any other
+# driver, which simply never reads them.
+#
+# Not triggered by push — docouture-release.yml calls this workflow directly
+# (as a reusable job, via `uses:` + `needs:`) as its last step, once a
+# release has actually been cut, so ordering is a real dependency rather
+# than a coincidence of two workflows independently reacting to the same
+# git push. `workflow_call` is what makes that direct call possible.
+# `workflow_dispatch` is kept alongside it for a manual rebuild+republish
+# of whatever is currently checked out, without cutting a new release.
+on:
+  workflow_call: {}
+  workflow_dispatch: {}
+
+concurrency:
+  group: docouture-publish
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    name: Build and publish
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    # Needed only by @inditextech/docouture-publish-gh-pages, if this site uses
+    # it — pushing to a `gh-pages` branch needs write access to repository
+    # contents. Harmless to leave granted for any other publish target.
+    permissions:
+      contents: write
+    # `docouture new` scaffolds this site's package.json, antora-playbook.yml
+    # etc. under docs/ (not the repository root) — see the docs-site-package
+    # skill's reference/versioning-modes.md. Every step below runs from
+    # there; only .github/workflows itself has to live at the true repo
+    # root, since that is the one path GitHub Actions requires.
+    defaults:
+      run:
+        working-directory: docs
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          # Antora aggregates every ref content.sources[] matches into one
+          # build, not just whichever ref triggered this run — a shallow,
+          # single-branch checkout would leave the others unreachable.
+          fetch-depth: 0
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          # Reads engines.node from docs/package.json — no separate version
+          # file to keep in sync.
+          node-version-file: docs/package.json
+          cache: npm
+          # `defaults.run.working-directory: docs` above only applies to
+          # `run:` steps, not to this action's own inputs — without this,
+          # setup-node looks for a lockfile from the repo root and fails.
+          cache-dependency-path: docs/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      # See docouture-pr-verify.yml's own comment: this build reads the real
+      # antora-playbook.yml (Build below), unlike pr-verify/release which
+      # build antora-playbook.local.yml — so the enabled check looks at the
+      # same file this job actually builds.
+      - name: Kroki / Detect enabled
+        id: kroki-check
+        run: |
+          if grep -qE "^\s*kroki-enabled:\s*['\"]?true['\"]?\s*(#.*)?$" antora-playbook.yml; then
+            echo "enabled=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "enabled=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      # See docouture-pr-verify.yml's own comment: primes the runner's Docker
+      # image store before Build's implicit Kroki startup, so a fresh runner
+      # doesn't pull all 4 images from scratch on every publish.
+      - name: Kroki / Docker image cache
+        id: kroki-cache
+        if: steps.kroki-check.outputs.enabled == 'true'
+        uses: actions/cache@v4
+        with:
+          path: /tmp/kroki-images.tar
+          key: ${{ runner.os }}-kroki-images-${{ hashFiles('**/kroki-compose.yml') }}
+
+      - name: Kroki / Load cached images
+        if: steps.kroki-check.outputs.enabled == 'true' && steps.kroki-cache.outputs.cache-hit == 'true'
+        run: docker load -i /tmp/kroki-images.tar
+
+      - name: Kroki / Pull and save images
+        if: steps.kroki-check.outputs.enabled == 'true' && steps.kroki-cache.outputs.cache-hit != 'true'
+        run: |
+          compose_file="$(find . -name kroki-compose.yml 2>/dev/null | head -1)"
+          docker compose -f "$compose_file" pull
+          docker save -o /tmp/kroki-images.tar $(docker compose -f "$compose_file" config --images)
+
+      - name: Build
+        run: npm run build
+
+      # See docouture-pr-verify.yml's own comment: Antora's strict mode already
+      # catches broken cross-references during Build above; check-links
+      # (package.json's own script, see scripts/check-links.mjs) covers what
+      # it can't — raw http(s) links in content — before this site actually
+      # gets published. Only a broken EXTERNAL link fails this step; a
+      # broken local one is a warning only.
+      - name: Check links
+        run: npm run check-links
+
+      # `GITHUB_TOKEN` is read by @inditextech/docouture-publish-gh-pages
+      # specifically (unused, and unnecessary to set, for any other publish
+      # target). See this file's own header comment for the `<target>`
+      # naming convention and where its options come from.
+
+      # Mints an installation token for a GitHub App that's on this repo's
+      # branch-ruleset bypass list, if `gh-pages` is protected by one
+      # (branch rulesets requiring PRs / status checks) — see issue #157 in
+      # InditexTech/docouture. The plain GITHUB_TOKEN identity is never on a
+      # ruleset's own bypass list, so pushing `gh-pages` below is otherwise
+      # rejected (GH013) on a protected repo without this. `APP_CLIENT_ID`
+      # (a variable) and `APP_PRIVATE_KEY` (a secret) are organization-level
+      # in InditexTech — set both at the org or repo level for whichever
+      # GitHub App is bypass-listed on this site's rules.
+      - name: Git app token
+        id: app-token
+        uses: actions/create-github-app-token@v3
+        with:
+          client-id: ${{ vars.APP_CLIENT_ID }}
+          private-key: ${{ secrets.APP_PRIVATE_KEY }}
+
+      - name: Publish
+        run: npx docouture publish gh-pages
+        env:
+          GITHUB_TOKEN: ${{ steps.app-token.outputs.token }}
