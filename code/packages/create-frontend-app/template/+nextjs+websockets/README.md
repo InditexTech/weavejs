@@ -16,7 +16,7 @@ yarn install
 ```
 
 This App uses the Weave.js
-[Azure Web Pubsub store](https://inditextech.github.io/weavejs/docs/main/build/stores/azure-web-pubsub-store). So before start the development server please setup on the `.env` file the configuration for your Azure Web Pubsub instance.
+[Azure Web Pubsub store](https://inditextech.github.io/weavejs/latest/main/build/stores/azure-web-pubsub-store/). So before start the development server please setup on the `.env` file the configuration for your Azure Web Pubsub instance.
 
 After configures, lets run the development server:
 
