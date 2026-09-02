@@ -1,0 +1,92 @@
+code/CHANGELOG.md
+  s_6b7efafc61e920::t_eb2846782b3aa2 16-18
+  s_ee0cb651aef0fa::t_80586febc71ecd 16-18
+docs/content/docs/main/changelog/5.x/5.2.2.mdx
+  s_6b7efafc61e920::t_71b1e40564270d 1-7,9-11
+  s_ee0cb651aef0fa::t_58aacc0b400b5f 1-2,4-7,9-11
+  h_9876611f59032e 8
+docs/content/docs/main/changelog/5.x/meta.json
+  s_6b7efafc61e920::t_65a4dc09c8716e 4
+  s_ee0cb651aef0fa::t_0d8dd389c9e7d1 4
+docs/content/docs/main/changelog/index.mdx
+  s_6b7efafc61e920::t_a266a1d5e0bff2 8
+  s_9ae179a895172d::t_5b473351e026d0 8
+code/packages/store-azure-web-pubsub/src/server/event-handler/web-pubsub-event-handler.ts
+  s_6b7efafc61e920::t_7fab24db776c8b 49-52
+code/package-lock.json
+  s_ee0cb651aef0fa::t_5073116d5fc018 18109,18149,18195,18253,18310,18375,18449,18500,18559,18604
+  s_ee0cb651aef0fa::t_22e21b181eee39 3898-3922,5337-5339,8141-8143
+code/packages/create-backend-app/package.json
+  s_ee0cb651aef0fa::t_b37fddb21277f4 54
+code/packages/create-frontend-app/package.json
+  s_ee0cb651aef0fa::t_c4d05ffed79683 52
+code/packages/react/package.json
+  s_ee0cb651aef0fa::t_cc714eae0ffb84 67
+code/packages/renderer-konva-base/package.json
+  s_ee0cb651aef0fa::t_46ca794678b9ef 74
+code/packages/renderer-konva-react-reconciler/package.json
+  s_ee0cb651aef0fa::t_d4cea58c74f695 76
+code/packages/sdk/package.json
+  s_ee0cb651aef0fa::t_da8e39038882ea 82
+code/packages/store-azure-web-pubsub/package.json
+  s_ee0cb651aef0fa::t_043301508a398a 90
+code/packages/store-standalone/package.json
+  s_ee0cb651aef0fa::t_a02be3664bf134 68
+code/packages/store-websockets/package.json
+  s_ee0cb651aef0fa::t_f644f8d8b57eb3 81
+code/packages/types/package.json
+  s_ee0cb651aef0fa::t_44304606c81ff0 60
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.22",
+  "base_commit_sha": "ca6f528b456c51cf9e17183886ed9af167a7a3b0",
+  "prompts": {},
+  "humans": {
+    "h_9876611f59032e": {
+      "author": "Alejandro Montes <alejandromogarcia@ext.inditex.com>"
+    }
+  },
+  "sessions": {
+    "s_4a8c55c318cd20": {
+      "agent_id": {
+        "tool": "github-copilot-cli",
+        "id": "0a3bf29e-4fdc-47b9-84a8-fc32b543a21a",
+        "model": "unknown"
+      },
+      "human_author": "Alejandro Montes <alejandromogarcia@ext.inditex.com>"
+    },
+    "s_5934d3e85f12a4": {
+      "agent_id": {
+        "tool": "github-copilot-cli",
+        "id": "89e4e063-e5fd-4bce-b451-23cdee8c3bed",
+        "model": "unknown"
+      },
+      "human_author": "Alejandro Montes <alejandromogarcia@ext.inditex.com>"
+    },
+    "s_6b7efafc61e920": {
+      "agent_id": {
+        "tool": "github-copilot-cli",
+        "id": "c6d238f3-f984-4a48-abfc-c29b87907b15",
+        "model": "claude-sonnet-5"
+      },
+      "human_author": "Alejandro Montes <alejandromogarcia@ext.inditex.com>"
+    },
+    "s_9ae179a895172d": {
+      "agent_id": {
+        "tool": "github-copilot-cli",
+        "id": "1a6648fc-5a3d-4eb2-af7d-e35c9a591f58",
+        "model": "unknown"
+      },
+      "human_author": "Alejandro Montes <alejandromogarcia@ext.inditex.com>"
+    },
+    "s_ee0cb651aef0fa": {
+      "agent_id": {
+        "tool": "github-copilot-cli",
+        "id": "7d3c336c-66ea-4b51-8ae2-2b19af461be5",
+        "model": "unknown"
+      },
+      "human_author": "Alejandro Montes <alejandromogarcia@ext.inditex.com>"
+    }
+  }
+}
