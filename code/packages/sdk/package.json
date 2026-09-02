@@ -4,7 +4,7 @@
   "type": "module",
   "license": "Apache-2.0",
   "author": "Jesus Manuel Piñeiro Cid <jesusmpc@inditex.com>",
-  "homepage": "https://inditextech.github.io/weavejs",
+  "homepage": "https://inditextech.github.io/weavejs/latest/sdk/",
   "repository": {
     "url": "git+https://github.com/InditexTech/weavejs.git"
   },

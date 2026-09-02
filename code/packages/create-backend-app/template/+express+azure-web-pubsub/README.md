@@ -3,7 +3,7 @@
 This is an Express.js application that was generated with **Create Weave.js Backend**
 
 This server setup the Weave.js
-[Azure Web Pubsub store](https://inditextech.github.io/weavejs/docs/main/build/stores/azure-web-pubsub-store) store. So before perform the quickstart please setup on the `.env` file the configuration for your Azure Web Pubsub instance.
+[Azure Web Pubsub store](https://inditextech.github.io/weavejs/latest/main/build/stores/azure-web-pubsub-store/) store. So before perform the quickstart please setup on the `.env` file the configuration for your Azure Web Pubsub instance.
 
 ## Quickstart
 

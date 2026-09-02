@@ -3,7 +3,7 @@
 This is an Express.js application that was generated with **Create Weave.js Backend**
 
 This server setup the Weave.js
-[Azure WebSockets](https://inditextech.github.io/weavejs/docs/main/build/stores/websockets-store) store. No extra setup needed.
+[Azure WebSockets](https://inditextech.github.io/weavejs/latest/main/build/stores/websockets-store/) store. No extra setup needed.
 
 ## Quickstart
 

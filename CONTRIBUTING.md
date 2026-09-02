@@ -208,4 +208,4 @@ Complete this checklist for every release, not for every individual change. You 
 
 Thank you for your time and contribution! Your work helps to grow and improve this project. If you have any questions, feel free to reach out to us.
 
-[docs-quick-start-url]: https://inditextech.github.io/weavejs/docs/main/quickstart
+[docs-quick-start-url]: https://inditextech.github.io/weavejs/latest/main/quickstart/

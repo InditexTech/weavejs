@@ -25,7 +25,7 @@ SPDX-License-Identifier: Apache-2.0
   <p align="center">
     Free, open source library to build real-time collaboration applications like whiteboards, <br /> diagram editors, etc. on HTML5 Canvas with your own UI!
     <br />
-    <a href="https://inditextech.github.io/weavejs/docs/main"><strong>Explore the docs »</strong></a>
+    <a href="https://inditextech.github.io/weavejs/latest/main/"><strong>Explore the docs »</strong></a>
     <br />
     <br />
     <a href="https://weavejs.cloud.inditex.com/">View Demo</a>
@@ -58,7 +58,7 @@ It provides robust synchronization of a shared-state based on [Yjs][Yjs-url] and
 - **Package Manager:** `pnpm` is used in the examples below. `npm` or `yarn` can also be used.
 - **React:** `18.2.0` (or `<19.0.0`) is required as a peer dependency.
 
-For a complete understanding of the requirements and detailed setup instructions, please visit the [official documentation](https://inditextech.github.io/weavejs/docs/main/requirements).
+For a complete understanding of the requirements and detailed setup instructions, please visit the [official documentation](https://inditextech.github.io/weavejs/latest/main/requirements/).
 
 ## Quickstart
 
@@ -138,9 +138,9 @@ This project is licensed under the terms of the [Apache-2.0](LICENSE) license.
 [stars-url]: https://github.com/InditexTech/weavejs/stargazers
 [issues-shield]: https://img.shields.io/github/issues/InditexTech/weavejs.svg?style=for-the-badge
 [docs-url]: https://inditextech.github.io/weavejs
-[docs-architecture]: https://inditextech.github.io/weavejs/docs/main/architecture
-[docs-quick-start-url]: https://inditextech.github.io/weavejs/docs/main/quickstart
-[docs-roadmap-url]: https://inditextech.github.io/weavejs/docs/main/roadmap
+[docs-architecture]: https://inditextech.github.io/weavejs/latest/main/architecture/
+[docs-quick-start-url]: https://inditextech.github.io/weavejs/latest/main/quickstart/
+[docs-roadmap-url]: https://inditextech.github.io/weavejs/latest/main/roadmap/
 [issues-url]: https://github.com/InditexTech/weavejs/issues
 [license-shield]: https://img.shields.io/github/license/InditexTech/weavejs.svg?style=for-the-badge
 [license-url]: https://github.com/InditexTech/weavejs/blob/master/LICENSE.txt
