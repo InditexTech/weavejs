@@ -1,0 +1,26 @@
+= Guides
+:description: Step-by-step guides to accomplish specific tasks with _PRODUCT_NAME_.
+
+// SIZING RULE: Start small. If this section has little content, write
+// everything on this page as level-2 sections and delete the separate
+// page files + their nav entries. Split a section into its own page only
+// when it exceeds ~2 screens or needs to be linked/found directly.
+
+These guides show how to accomplish specific tasks with _PRODUCT_NAME_.
+Each guide states its goal, the prerequisites, and the steps to follow.
+
+[cards,columns="1 s:2 m:3"]
+====
+[card]
+.xref:<task-name>.adoc[<Task title, bare infinitive>]
+<Short description, only when the title alone is not enough.>
+
+[card]
+.xref:<task-name>.adoc[<Task title, bare infinitive>]
+====
+
+// When the catalog grows, group by set of actions (management,
+// observability, authentication...): one == <Action set> heading with
+// its own [cards] block per group.
+// For visual tools, use image cards (type=image-landscape + image:: in
+// an open block): a screenshot of the task, or the component itself.

@@ -1,0 +1,32 @@
+= CLI reference
+:description: Every _PRODUCT_NAME_ command: what it does and how to use it.
+
+// A CLI is documented as a list of commands: one == section per command,
+// in plain text — what it does, usage, options as a list, an example.
+
+The _PRODUCT_NAME_ CLI is invoked as `<binary> <command> [options]`.
+
+== <command>
+
+<What it does, one or two sentences.>
+
+[source,bash]
+----
+<binary> <command> [options] <args>
+----
+
+Options:
+
+* `--<option>` — <what it controls and its default>.
+* `--<option>` — <what it controls and its default>.
+
+.Example
+[source,bash]
+----
+<real command>
+----
+
+[source]
+----
+<expected output>
+----

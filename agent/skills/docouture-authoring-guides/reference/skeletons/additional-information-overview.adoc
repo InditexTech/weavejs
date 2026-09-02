@@ -1,0 +1,38 @@
+= Additional information
+:description: _PRODUCT_NAME_ changes, versions, support, and contact information.
+
+// SIZING RULE: Start small. If this section has little content, write
+// each topic on this page as its own level-2 section (== Changelog,
+// == End of life...) and delete the separate page files + nav entries.
+// Split a topic into its own page only when it exceeds ~2 screens
+// or needs to be linked/found directly.
+
+Here you can find the most up-to-date information about _PRODUCT_NAME_:
+what has changed and how, version support deadlines, and how to reach us.
+
+== Contact and support
+
+* <Channel + link> — <preferred use: incidents, questions, ideas…>.
+
+=== Security
+
+To report a security vulnerability, follow the process in our
+link:<repo>/blob/main/SECURITY.md[security policy]. Report privately —
+do not open a public issue.
+
+== Sections
+
+[cards,columns="1 s:2 m:3"]
+====
+[card]
+.xref:release-notes/overview.adoc[Release notes]
+<Highlights and major changes of each release.>
+
+[card]
+.xref:changelog/overview.adoc[Changelog]
+<The complete list of additions, changes, fixes, and deprecations.>
+
+[card]
+.xref:faq.adoc[FAQ]
+<Common questions and known issues.>
+====

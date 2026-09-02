@@ -1,0 +1,41 @@
+= FAQ and troubleshooting
+:description: Common questions and known issues of _PRODUCT_NAME_.
+
+// PAGE OR SECTION: use standalone, or merge into the section entry page
+// demoting headings one level (= → ==). See the sizing rule there.
+// If either half outgrows the page, split troubleshooting into its own
+// page nested under this one.
+
+Here you can find _PRODUCT_NAME_'s frequent questions and known issues.
+If your question is not here, reach us through the
+xref:overview.adoc#_contact_and_support[contact channels].
+
+== FAQ
+
+[accordion,aria-label="Frequently asked questions"]
+--
+.<Question, verbatim as users ask it?>
+[%collapsible]
+====
+<Answer, linking to the relevant docs page.>
+====
+--
+
+== Troubleshooting
+
+// One === per known issue. Always include the exact error message as
+// text so search engines and Ctrl+F can find it.
+
+=== <Issue title>
+
+*Description:* <the situation and when it occurs>.
+
+[source]
+----
+<exact error message>
+----
+
+*Steps to fix:*
+
+. <Step.>
+. <Step.>

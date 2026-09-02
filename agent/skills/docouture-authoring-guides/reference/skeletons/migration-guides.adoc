@@ -1,0 +1,21 @@
+= Migration guides
+:description: How to upgrade between _PRODUCT_NAME_ versions.
+
+== Migrate to vX
+
+=== Prerequisites
+
+* <What must be true before starting (version, backup...).>
+
+=== Steps to update
+
+. <Step.>
+. <Step.>
+
+=== Considerations
+
+* <Behavior changes to be aware of after migrating.>
+
+== Migrate to vX-1
+
+No changes are needed to upgrade from v_X-2_ to v_X-1_.

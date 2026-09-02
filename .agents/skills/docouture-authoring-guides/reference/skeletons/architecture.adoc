@@ -1,0 +1,22 @@
+= _PRODUCT_NAME_ architecture
+:description: How _PRODUCT_NAME_ is built: components, flow, and design decisions.
+
+// PAGE OR SECTION: use standalone, or merge into the section entry page
+// demoting headings one level (= → ==). See the sizing rule there.
+
+This page describes the architecture of _PRODUCT_NAME_: its components,
+how they communicate, and the decisions behind them.
+
+== Overview
+
+image::architecture-diagram.png[_PRODUCT_NAME_ architecture diagram]
+
+// Walk through the diagram: each component, each arrow. Then the key
+// technical decisions and why they were the right call given the
+// determinants. Do NOT just paste the diagram.
+
+== Project structure
+
+// The artifacts that make up the product and the purpose of each one.
+
+== <Other concern> // UI, lifecycle, plugins, data flow… one per section

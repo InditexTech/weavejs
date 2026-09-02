@@ -1,0 +1,29 @@
+= vX.Y.Z release notes — <brief title>
+:description: Highlights of _PRODUCT_NAME_ v_X.Y_.
+
+label:[Released YYYY-MM-DD]
+
+In these release notes, where we introduce <main theme>.
+
+== New & improved
+
+=== <Feature 1 title>
+
+// Most important first. What it is, how it works, why it was built.
+// Include visuals when helpful; link to the docs pages covering it.
+
+=== <Feature 2 title>
+
+== Fixed & Removed
+
+=== <Item 1 title>
+
+// Most important first.
+
+== Migration
+
+To upgrade from v_X.Y-1_, see xref:../migration-guides.adoc[Migration guides].
+
+== Changelog
+
+For the complete list of changes, see the xref:../changelog/vX-Y-Z.adoc[v_X.Y.Z_ changelog].

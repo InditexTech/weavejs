@@ -1,0 +1,21 @@
+= Glossary
+:description: Terms and abbreviations used across the _PRODUCT_NAME_ documentation.
+
+// PAGE OR SECTION: use standalone, or merge into the section entry page
+// demoting headings one level (= → ==). See the sizing rule there.
+
+This glossary lists the terms, abbreviations, and phrases used across the
+_PRODUCT_NAME_ documentation, together with their definitions. Use this
+terminology for clarity and consistency when discussing _PRODUCT_NAME_.
+
+// Terms in alphabetical order, one == section per term.
+// Each definition lives in its own partial (partials/glossary/<term>.adoc)
+// so other pages can reuse it.
+
+== <Term>
+
+include::partial$glossary/<term>.adoc[]
+
+=== <Sub-concept> // only if the term has genuine sub-concepts
+
+include::partial$glossary/<sub-concept>.adoc[]

@@ -1,0 +1,28 @@
+= vX.Y.Z changelog
+:description: Complete list of changes in _PRODUCT_NAME_ vX.Y.Z.
+
+label:[Released YYYY-MM-DD]
+
+== Added
+
+* <Change, one factual line.>
+
+== Changed
+
+* label:red[Breaking] <Change.>
+** *Impact:* <who/what is affected>.
+** *Reasoning:* <why the change was made>.
+** *Actions required:* <what the user must do>.
+
+== Fixed
+
+* <Fix, with issue link when public.>
+
+== Removed
+
+* <Removal or deprecation.>
+
+== Contributors
+
+Thank you to all the contributors of this release:
+link:https://github.com/<user>[@<user>], link:https://github.com/<user>[@<user>].

@@ -1,0 +1,36 @@
+= Configuration
+:description: Every _PRODUCT_NAME_ configuration property: type, default, and effect.
+
+// PAGE OR SECTION: use standalone, or merge into the section entry page
+// demoting headings one level (= → ==). See the sizing rule there.
+
+_PRODUCT_NAME_ reads its configuration from <source>. <Precedence order
+when several sources exist. How to apply changes.>
+
+== Full example
+
+// Readers reach for examples before tables — lead with the maximal
+// example: a complete, commented configuration file showing the options
+// in use together. Minimal snippets live in the guides.
+
+[source,yaml]
+----
+<complete configuration file, commented>
+----
+
+== <Namespace or functional area>
+
+[cols="20%,20%,20%,40%"]
+|===
+| Key | Type | Default value | Description
+
+| `<property>`
+| String
+| `<default>`
+| #Required# <What it does and its effect.>
+
+| `<property>`
+| Boolean
+| `false`
+| <What it does and its effect.>
+|===
