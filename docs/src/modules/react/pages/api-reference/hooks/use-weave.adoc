@@ -19,7 +19,7 @@ import { useWeave } from "@inditextech/weave-react";
 
 == Store schema
 
-The store is based on https://zustand.docs.pmnd.rs/getting-started/introduction[Zustand] state
+The store is based on https://zustand.docs.pmnd.rs/learn/getting-started/introduction[Zustand] state
 state management solution.
 
 Its schema or structure is the following:
@@ -82,7 +82,7 @@ interface WeaveRuntimeState {
 
 == Usage
 
-Being the store based on https://zustand.docs.pmnd.rs/getting-started/introduction[Zustand],
+Being the store based on https://zustand.docs.pmnd.rs/learn/getting-started/introduction[Zustand],
 usage is pretty straight-forward, we just instantiate the hook and we pass a function as parameter,
 that receives the state as parameter and from there we can reduce to the part of the state we need,
 like this:

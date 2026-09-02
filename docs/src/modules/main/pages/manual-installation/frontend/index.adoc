@@ -55,9 +55,9 @@ These packages provide auxiliary functionality such as:
 Create a global state store to handle the UI state.
 This store manages the current user, room ID, and UI visibility state across the application.
 Use
-https://zustand.docs.pmnd.rs/getting-started/introduction[Zustand] for this.
+https://zustand.docs.pmnd.rs/learn/getting-started/introduction[Zustand] for this.
 
-* Install the https://zustand.docs.pmnd.rs/getting-started/introduction[Zustand] dependency:
+* Install the https://zustand.docs.pmnd.rs/learn/getting-started/introduction[Zustand] dependency:
 +
 [source,shell]
 ----

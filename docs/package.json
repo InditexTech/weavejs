@@ -12,7 +12,8 @@
     "build": "antora --fetch antora-playbook.yml",
     "dev": "docouture dev",
     "clean": "node -e \"require('fs').rmSync('build', { recursive: true, force: true })\"",
-    "check-links": "node scripts/check-links.mjs"
+    "check-links": "node scripts/check-links.mjs",
+    "git:pre-push": "antora --fetch antora-playbook.local.yml && npm run check-links"
   },
   "devDependencies": {
     "@inditextech/docouture-cli": "0.1.0-SNAPSHOT.90.1",
