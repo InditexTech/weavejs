@@ -1,5 +1,0 @@
-{
-  "title": "API Reference",
-  "description": "The SDK api reference",
-  "pages": ["weave", "nodes", "plugins", "actions", "state-api"]
-}
