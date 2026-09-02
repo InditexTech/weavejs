@@ -18,11 +18,15 @@ site:
   # GitHub Pages project page, always published under
   # https://<org>.github.io/<repo>/.
   url: https://inditextech.github.io/weavejs
-  # docs/antora.yml's component name is `weavejs` (this site opted into the
-  # extra /<component-name>/ URL segment via `docouture new`), so the start
-  # page has to name it explicitly — `ROOT:...` only works for a site whose
-  # component is Antora's own reserved `ROOT`.
-  start_page: weavejs:ROOT:index.adoc
+  # docs/antora.yml's component name is Antora's own reserved `ROOT`, which
+  # gets no extra `/<component-name>/` URL segment — GitHub Pages already
+  # serves this project page under `/weavejs/`; an Antora component also
+  # named `weavejs` used to duplicate that segment
+  # (`/weavejs/weavejs/<version>/...`). Needs the full `component:module:page`
+  # form here (unlike an in-page `xref:`, this is a global site key with no
+  # component to infer) — `ROOT:index.adoc` alone (the 2-part `module:page`
+  # shorthand) logs "Missing component name in start page for site".
+  start_page: ROOT:ROOT:index.adoc
   # Side-menu brand mark (nav-brand.hbs), browser tab icon (head-icons.hbs)
   # and the landing page's decorative background (home.css) — real artwork
   # under supplemental-ui/, wired via ui.supplemental_files below.

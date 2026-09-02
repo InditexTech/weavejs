@@ -40,7 +40,7 @@ site:
   url: http://localhost:5000
   # Same component-name reasoning as the real antora-playbook.yml — see its
   # own comment.
-  start_page: weavejs:ROOT:index.adoc
+  start_page: ROOT:ROOT:index.adoc
   # Same logo/background/favicon as the real antora-playbook.yml — see its
   # own comment.
   keys:
