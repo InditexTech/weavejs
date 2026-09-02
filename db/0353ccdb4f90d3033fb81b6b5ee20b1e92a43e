@@ -1,0 +1,39 @@
+code/package-lock.json
+  s_ee0cb651aef0fa::t_5073116d5fc018 18084,18124,18170,18228,18285,18350,18424,18475,18534,18579
+code/packages/create-backend-app/package.json
+  s_ee0cb651aef0fa::t_b37fddb21277f4 54
+code/packages/create-frontend-app/package.json
+  s_ee0cb651aef0fa::t_c4d05ffed79683 52
+code/packages/react/package.json
+  s_ee0cb651aef0fa::t_cc714eae0ffb84 67
+code/packages/renderer-konva-base/package.json
+  s_ee0cb651aef0fa::t_46ca794678b9ef 74
+code/packages/renderer-konva-react-reconciler/package.json
+  s_ee0cb651aef0fa::t_d4cea58c74f695 76
+code/packages/sdk/package.json
+  s_ee0cb651aef0fa::t_da8e39038882ea 82
+code/packages/store-azure-web-pubsub/package.json
+  s_ee0cb651aef0fa::t_043301508a398a 90
+code/packages/store-standalone/package.json
+  s_ee0cb651aef0fa::t_a02be3664bf134 68
+code/packages/store-websockets/package.json
+  s_ee0cb651aef0fa::t_f644f8d8b57eb3 81
+code/packages/types/package.json
+  s_ee0cb651aef0fa::t_44304606c81ff0 60
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.22",
+  "base_commit_sha": "db0353ccdb4f90d3033fb81b6b5ee20b1e92a43e",
+  "prompts": {},
+  "sessions": {
+    "s_ee0cb651aef0fa": {
+      "agent_id": {
+        "tool": "github-copilot-cli",
+        "id": "7d3c336c-66ea-4b51-8ae2-2b19af461be5",
+        "model": "claude-sonnet-5"
+      },
+      "human_author": "Alejandro Montes <alejandromogarcia@ext.inditex.com>"
+    }
+  }
+}
