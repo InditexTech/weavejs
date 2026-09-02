@@ -452,23 +452,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [2.12.0] - 2025-12-19
 
-\### Added
+### Added
 
 - [#725](https://github.com/InditexTech/weavejs/issues/725) Connector node and action
 
-\### Changed
+### Changed
 
 - [#857](https://github.com/InditexTech/weavejs/issues/857) Homogenize styles on line, arrow and pen tools
 
 ## [2.11.1] - 2025-12-16
 
-\### Changed
+### Changed
 
 - [#855](https://github.com/InditexTech/weavejs/issues/855) Measure node style customization
 
 ## [2.11.0] - 2025-12-15
 
-\### Added
+### Added
 
 - [#847](https://github.com/InditexTech/weavejs/issues/847) Measure node & action
 
@@ -478,7 +478,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [2.10.0] - 2025-12-11
 
-\### Added
+### Added
 
 - [#848](https://github.com/InditexTech/weavejs/issues/848) Support to upscale via CSS transforms to improve performance
 
@@ -514,7 +514,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [2.9.0] - 2025-12-03
 
-\### Added
+### Added
 
 - [#830](https://github.com/InditexTech/weavejs/issues/830) Expose a function to zoom to an specific scale when using the WeaveStageZoomPlugin
 - [#831](https://github.com/InditexTech/weavejs/issues/831) Add an API to convert from JSON to Yjs binary and viceversa
@@ -570,13 +570,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [2.5.0] - 2025-11-19
 
-\### Added
+### Added
 
 - [#798](https://github.com/InditexTech/weavejs/issues/798) Copy / Paste images to/from external applications
 
 ## [2.4.0] - 2025-11-19
 
-\### Added
+### Added
 
 - [#789](https://github.com/InditexTech/weavejs/issues/789) Support a simpler line drawing tool
 
@@ -700,7 +700,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [1.1.0] - 2025-10-21
 
-###  Changed
+###  Changed
 
 - [#738](https://github.com/InditexTech/weavejs/issues/738) Improve packaging
 
@@ -791,13 +791,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [0.76.0] - 2025-10-14
 
-\### Changed
+### Changed
 
 - [#712](https://github.com/InditexTech/weavejs/issues/712) Improve node selection over nodes that are selected
 
 ## [0.75.0] - 2025-10-13
 
-\### Changed
+### Changed
 
 - [#691](https://github.com/InditexTech/weavejs/issues/691) Make Minimap plugin stage rendering non-blocking
 
@@ -1074,7 +1074,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - [#578](https://github.com/InditexTech/weavejs/issues/578) Allow to define user color in WeaveConnectedUsersPlugin & WeaveUsersSelectionPlugin
 
-\### Fixed
+### Fixed
 
 - [#580](https://github.com/InditexTech/weavejs/issues/580) Brush tool draws unintended strokes during pinch zoom
 
@@ -1200,7 +1200,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [0.43.0] - 2025-07-24
 
-\### Added
+### Added
 
 - [#526](https://github.com/InditexTech/weavejs/issues/526) Remaining tools movement on touch devices
 - [#508](https://github.com/InditexTech/weavejs/issues/508) Check tools to avoid multiple pointers, also determine if tool allows to zoom and pan
@@ -1310,7 +1310,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [0.34.0] - 2025-07-03
 
-\### Added
+### Added
 
 - [#168](https://github.com/InditexTech/weavejs/issues/168) Tool to align nodes in the middle, top or bottom both vertically or horizontally
 - [#472](https://github.com/InditexTech/weavejs/issues/472) Expose whether the content is empty
@@ -1318,14 +1318,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [0.33.0] - 2025-07-02
 
-\### Added
+### Added
 
 - [#468](https://github.com/InditexTech/weavejs/issues/468) Migrate to pointer events
 - [#470](https://github.com/InditexTech/weavejs/issues/470) Support pinch-to-zoom gesture on trackpads and touch devices
 
 ## [0.32.0] - 2025-06-30
 
-\### Added
+### Added
 
 - [#466](https://github.com/InditexTech/weavejs/issues/466) Allow to filter image bounds on Export Nodes plugin
 
@@ -1352,14 +1352,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [0.30.1] - 2025-06-20
 
-\### Fixed
+### Fixed
 
 - [#430](https://github.com/InditexTech/weavejs/issues/430) The fontStyle property is not applied to the textarea while writing a text node
 - [#431](https://github.com/InditexTech/weavejs/issues/431) Editing a rotated text looks broken
 
 ## [0.30.0] - 2025-06-19
 
-\### Added
+### Added
 
 - [#435](https://github.com/InditexTech/weavejs/issues/435) Generate base64 image on Export Nodes Action
 - [#437](https://github.com/InditexTech/weavejs/issues/437) Add support to ShadowDOM
@@ -1368,7 +1368,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - [#426](https://github.com/InditexTech/weavejs/issues/426) Don't set default plugins on React Helper
 
-\### Fixed
+### Fixed
 
 - [#427](https://github.com/InditexTech/weavejs/issues/427) Fix activating area selector when context menu is activated and then cancelled
 
@@ -1380,7 +1380,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [0.29.0] - 2025-06-18
 
-\### Added
+### Added
 
 - [#306](https://github.com/InditexTech/weavejs/issues/306) Improve touch devices support
 
@@ -1388,13 +1388,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - [#419](https://github.com/InditexTech/weavejs/issues/419) Nodes, fill white and stroke black by default
 
-\### Fixed
+### Fixed
 
 - [#420](https://github.com/InditexTech/weavejs/issues/420) Nodes export to image is wrong
 
 ## [0.28.0] - 2025-06-18
 
-\### Added
+### Added
 
 - [#332](https://github.com/InditexTech/weavejs/issues/332) Presence feedback when moving
 
@@ -1432,7 +1432,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [0.27.0] - 2025-06-16
 
-\### Added
+### Added
 
 - [#400](https://github.com/InditexTech/weavejs/issues/400) Allow styles customizations on Frame title
 
@@ -1454,7 +1454,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [0.26.0] - 2025-06-12
 
-\### Added
+### Added
 
 - [#388](https://github.com/InditexTech/weavejs/issues/388) Allow the image tool to receive a specific event to trigger the crop mode
 
@@ -1541,7 +1541,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - [#330](https://github.com/InditexTech/weavejs/issues/330) Performance improvements
 - [#333](https://github.com/InditexTech/weavejs/issues/333) Update create-app frontend
 
-\### Fixed
+### Fixed
 
 - [#329](https://github.com/InditexTech/weavejs/issues/329) Fix initial state of images when cropping
 - [#334](https://github.com/InditexTech/weavejs/issues/334) Don't include d.ts as ts files on bundle

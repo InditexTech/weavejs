@@ -78,6 +78,15 @@ jobs:
         run: |
           mkdir -p "$HOME"/.npm
 
+      # Catches invisible Unicode whitespace (e.g. a pasted-in NBSP) before
+      # it reaches CHANGELOG.md's [Unreleased] section — that whitespace
+      # breaks release-flow/keep-a-changelog-action's markdown parsing of
+      # the heading it sits in, which then gets corrupted with a stray
+      # backslash escape on every future release. See
+      # .github/scripts/sanitize-changelog.mjs for the full story.
+      - name: Verify CHANGELOG.md has no invisible whitespace
+        run: node .github/scripts/sanitize-changelog.mjs code/CHANGELOG.md --check
+
       - name: NPM / Verify
         working-directory: code
         run: |
