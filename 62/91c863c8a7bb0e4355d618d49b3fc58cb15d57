@@ -1,0 +1,19 @@
+docs/src/antora.yml
+  s_aade97a62200f6::t_4eff1fd8b6ee4c 1-9
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.22",
+  "base_commit_sha": "6291c863c8a7bb0e4355d618d49b3fc58cb15d57",
+  "prompts": {},
+  "sessions": {
+    "s_aade97a62200f6": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "ses_f9e294b1bffeOX8EDRUs8uDf6Z",
+        "model": "claude-sonnet-5"
+      },
+      "human_author": "Jesus Manuel Piñeiro Cid <jesusmpc@inditex.com>"
+    }
+  }
+}
