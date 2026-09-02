@@ -1,0 +1,103 @@
+code/packages/renderer-konva-react-reconciler/tsdown.config.ts
+  s_ee0cb651aef0fa::t_b240f315aaaf35 60
+code/packages/store-websockets/package.json
+  s_ee0cb651aef0fa::t_1be45b87e03b5b 60
+  s_ee0cb651aef0fa::t_f644f8d8b57eb3 81
+code/package.json
+  s_ee0cb651aef0fa::t_3725bdf9a20ff8 71,78,90,92
+code/packages/store-websockets/tsdown.config.ts
+  s_ee0cb651aef0fa::t_9ebc02fdb44c67 44
+code/packages/store-azure-web-pubsub/tsdown.config.ts
+  s_ee0cb651aef0fa::t_04e577e38e00d2 114
+code/packages/store-azure-web-pubsub/package.json
+  s_ee0cb651aef0fa::t_a8d68761741875 57,64
+  s_ee0cb651aef0fa::t_043301508a398a 90
+code/packages/create-frontend-app/package.json
+  s_ee0cb651aef0fa::t_36bf2f48a7a8c7 51
+  s_ee0cb651aef0fa::t_c4d05ffed79683 52
+code/packages/store-azure-web-pubsub/src/server/event-handler/web-pubsub-event-handler.ts
+  s_ee0cb651aef0fa::t_60cd8c1ad33150 5
+  s_ee0cb651aef0fa::t_59b573bdfbe00e 20
+  s_6b7efafc61e920::t_7fab24db776c8b 49-52
+code/packages/sdk/tsdown.config.ts
+  s_ee0cb651aef0fa::t_6e0e83097b2422 78
+code/packages/renderer-konva-base/tsdown.config.ts
+  s_ee0cb651aef0fa::t_de529916409e88 60
+code/package-lock.json
+  s_ee0cb651aef0fa::t_d573c295e6ec60 21,28,137-145,191-193,199,204-205,210,227-229,232,239-241,248-250,253-254,257,260-263,265-266,3077-3086,3301-3303,3399-3401,3405,3407,3413,3417-3419,3423,3426-3428,3433-3434,3441-3442,3444,3454,3458-3460,3484-3486,3498-3500,3512-3514,3526-3528,3540-3542,3554-3556,3568-3570,3582-3584,3596-3598,3610-3612,3624-3626,3630,3634,3911-3914,3918,3920,3924-3950,3965-3966,4008-4011,4016,4019-4022,4026-4029,4032-4052,4063,4066,4069,4080,4083,4086,4097,4100,4103,4108,4114,4117,4120,4125,4131,4134,4137,4148,4150-4152,4154,4159,4166-4169,4185,4188,4193,4200-4203,4217-4227,4230-4232,4244-4246,4258-4260,4272-4274,4286-4288,4300-4302,4314-4316,4328-4330,4342-4344,4356-4358,4370-4372,4384-4386,4398-4400,4412-4414,4426-4428,4440-4442,4454-4456,4468-4470,4482-4484,4496-4498,4510-4512,4524-4526,4538-4540,4552-4554,4566-4568,4646-4655,4912,4924,4955-4957,5408-5417,5652-5654,5805-6120,6122-6128,6131-6134,6136-6142,6145-6148,6150-6156,6158-6162,6164-6170,6172-6176,6178-6184,6187-6190,6192-6195,6197,6278-6280,6284,6367-6369,6633-6635,6640-6641,6796-6798,6845-6847,6885-6887,6906-6910,6995-6997,7001,7065-7067,7448-7450,7454-7457,7747-7749,7763-7765,7806-7808,7811-7814,7910-7912,7915-7921,7923,7989-7991,7995,8000-8001,8003-8006,8048-8050,8057,8095-8097,8693-8702,8854-8855,8857-8858,9002-9011,9344-9346,9403-9405,9420-9422,9629-9631,9638-9639,9868-9870,10115-10117,10134-10136,10339-10341,10386-10398,10652-10654,10660,11064-11066,11069-11072,11074-11075,11215-11217,11366-11368,11662-11664,11754,11757,11760-11763,11765-11770,11772,11775,11778-11781,11783-11788,11790,11793,11796-11799,11801-11808,11810-11811,11814-11817,11819,11821,11824-11827,11829-11832,11834-11835,11838-11850,11852,11855-11856,12258-12260,12264,12325-12327,12357-12359,12362-12364,12366-12384,12395-12397,12458-12460,12525-12527,12532-12534,12548,12554,12558,12560,12570-12572,12574,12591-12592,12602-12603,12607,12609,12612-12613,12615,12622,12624,12628-12629,12637,12639,12648,12653,12657,12666-12675,12717-12726,12744-12746,12763-12778,12924-12937,13004-13006,13010,13042-13044,13048,13053-13054,13107,13472-13474,13492,13501-13503,13567-13569,13573-13575,13578,13622-13628,13674-13676,13822-13824,14150-14162,14171-14173,14177,14183-14191,14341,14346-14347,14349,14368-14370,14374-14379,14382,14388-14392,14395-14400,14403-14405,14409-14424,14446-14448,14464-14488,14493-14495,14500-14502,14524-14526,14582-14585,14588-14591,14593,14607-14609,14613,14617-14618,14627-14630,14632,14634-14637,14773-14775,15518-15520,15524,15548-15557,15709-15711,15715-15716,15718,15720-15721,15725,15727,16066-16068,16366-16368,16496-16516,16519,16522,16528-16536,16539-16550,16554-16559,16562-16564,16568-16580,16598-16600,16671-16673,17038-17047,17182-17184,17273-17285,17385-17394,17470-17472,17762-17764,17908-17910,17918-17920,17993-18051,18053-18055,18144,18405,18412,18543
+  s_ee0cb651aef0fa::t_5073116d5fc018 18109,18145,18187,18241,18294,18355,18438,18509,18564,18605
+  s_ee0cb651aef0fa::t_22e21b181eee39 3911-3935,5265-5267,8061-8063
+code/packages/create-backend-app/tsdown.config.ts
+  s_ee0cb651aef0fa::t_d7aed3e92b400a 31
+code/packages/create-frontend-app/tsdown.config.ts
+  s_ee0cb651aef0fa::t_c00574a571e0cc 29
+code/packages/store-standalone/tsdown.config.ts
+  s_ee0cb651aef0fa::t_33eae729b1a179 44
+code/packages/create-backend-app/package.json
+  s_ee0cb651aef0fa::t_b37fddb21277f4 54
+code/packages/react/package.json
+  s_ee0cb651aef0fa::t_cc714eae0ffb84 67
+code/packages/renderer-konva-base/package.json
+  s_ee0cb651aef0fa::t_46ca794678b9ef 74
+code/packages/renderer-konva-react-reconciler/package.json
+  s_ee0cb651aef0fa::t_d4cea58c74f695 76
+code/packages/sdk/package.json
+  s_ee0cb651aef0fa::t_da8e39038882ea 82
+code/packages/store-standalone/package.json
+  s_ee0cb651aef0fa::t_a02be3664bf134 68
+code/packages/types/package.json
+  s_ee0cb651aef0fa::t_44304606c81ff0 60
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.22",
+  "base_commit_sha": "1cfc9a4514e24dae6a8acdaa938cca238c8dacb3",
+  "prompts": {},
+  "humans": {
+    "h_9876611f59032e": {
+      "author": "Alejandro Montes <alejandromogarcia@ext.inditex.com>"
+    }
+  },
+  "sessions": {
+    "s_4a8c55c318cd20": {
+      "agent_id": {
+        "tool": "github-copilot-cli",
+        "id": "0a3bf29e-4fdc-47b9-84a8-fc32b543a21a",
+        "model": "unknown"
+      },
+      "human_author": "Alejandro Montes <alejandromogarcia@ext.inditex.com>"
+    },
+    "s_5934d3e85f12a4": {
+      "agent_id": {
+        "tool": "github-copilot-cli",
+        "id": "89e4e063-e5fd-4bce-b451-23cdee8c3bed",
+        "model": "unknown"
+      },
+      "human_author": "Alejandro Montes <alejandromogarcia@ext.inditex.com>"
+    },
+    "s_6b7efafc61e920": {
+      "agent_id": {
+        "tool": "github-copilot-cli",
+        "id": "c6d238f3-f984-4a48-abfc-c29b87907b15",
+        "model": "unknown"
+      },
+      "human_author": "Alejandro Montes <alejandromogarcia@ext.inditex.com>"
+    },
+    "s_9ae179a895172d": {
+      "agent_id": {
+        "tool": "github-copilot-cli",
+        "id": "1a6648fc-5a3d-4eb2-af7d-e35c9a591f58",
+        "model": "unknown"
+      },
+      "human_author": "Alejandro Montes <alejandromogarcia@ext.inditex.com>"
+    },
+    "s_ee0cb651aef0fa": {
+      "agent_id": {
+        "tool": "github-copilot-cli",
+        "id": "7d3c336c-66ea-4b51-8ae2-2b19af461be5",
+        "model": "claude-sonnet-5"
+      },
+      "human_author": "Alejandro Montes <alejandromogarcia@ext.inditex.com>"
+    }
+  }
+}
