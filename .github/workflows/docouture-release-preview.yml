@@ -21,10 +21,10 @@ name: docouture-release-preview
 on:
   pull_request:
     types: [labeled, synchronize, ready_for_review, opened]
-    branches: ['main*']
+    branches: ["main*"]
 
 concurrency:
-  group: release-preview
+  group: docouture-release-preview-${{ github.event.pull_request.number }}
   cancel-in-progress: true
 
 jobs:
