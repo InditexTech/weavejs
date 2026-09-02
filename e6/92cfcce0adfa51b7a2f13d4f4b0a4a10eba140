@@ -1,0 +1,14 @@
+docs/.release-version
+  h_c93d154c7c7074 1
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.22",
+  "base_commit_sha": "e692cfcce0adfa51b7a2f13d4f4b0a4a10eba140",
+  "prompts": {},
+  "humans": {
+    "h_c93d154c7c7074": {
+      "author": "Jesus Manuel Piñeiro Cid <jesusmpc@inditex.com>"
+    }
+  }
+}

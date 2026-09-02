@@ -1,0 +1,36 @@
+CONTRIBUTING.md
+  h_c93d154c7c7074 211
+README.md
+  h_c93d154c7c7074 28,61,141-143
+code/packages/create-backend-app/template/+express+azure-web-pubsub/README.md
+  h_c93d154c7c7074 6
+code/packages/create-backend-app/template/+express+websockets/README.md
+  h_c93d154c7c7074 6
+code/packages/create-frontend-app/template/+nextjs+websockets/README.md
+  h_c93d154c7c7074 19
+code/packages/react/package.json
+  h_c93d154c7c7074 7
+code/packages/sdk/package.json
+  h_c93d154c7c7074 7
+code/packages/store-azure-web-pubsub/package.json
+  h_c93d154c7c7074 7
+code/packages/store-standalone/package.json
+  h_c93d154c7c7074 7
+code/packages/store-websockets/package.json
+  h_c93d154c7c7074 7
+code/packages/types/package.json
+  h_c93d154c7c7074 7
+docs/.release-version
+  h_c93d154c7c7074 1
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.22",
+  "base_commit_sha": "d529f70f71dd82f3893405ad693647e2530e282e",
+  "prompts": {},
+  "humans": {
+    "h_c93d154c7c7074": {
+      "author": "Jesus Manuel Piñeiro Cid <jesusmpc@inditex.com>"
+    }
+  }
+}
