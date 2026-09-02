@@ -1,0 +1,21 @@
+docs/src/modules/main/pages/manual-installation/frontend/index.adoc
+  s_4f05750fdd678c::t_d13a10926679da 58,60
+docs/src/modules/react/pages/api-reference/hooks/use-weave.adoc
+  s_4f05750fdd678c::t_524005870c9986 22,85
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.22",
+  "base_commit_sha": "ababea4477323dc84814ac79db184efb6d91fa56",
+  "prompts": {},
+  "sessions": {
+    "s_4f05750fdd678c": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "ses_f9ec364f9ffeCler6pK49PONrH",
+        "model": "claude-sonnet-5"
+      },
+      "human_author": "Jesus Manuel Piñeiro Cid <jesusmpc@inditex.com>"
+    }
+  }
+}
