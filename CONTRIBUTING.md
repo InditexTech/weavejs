@@ -142,9 +142,9 @@ As you can see to test you can repeat steps 1-3 as many times as you want.
 
 ## Documentation
 
-This project documentation is handled by [Fumadocs](https://fumadocs.dev/) and [NPM](https://docs.npmjs.com/about-npm). All code is located on the `/docs` folder.
+This project documentation is built with [Antora](https://antora.org/) via [docouture](https://github.com/InditexTech/docouture) and [NPM](https://docs.npmjs.com/about-npm). All code is located on the `/docs` folder.
 
-Documentation is based on MDX and the content files are located on `/docs/content/docs`.
+Documentation is based on AsciiDoc and the content files are located on `/docs/src/modules/<module>/pages`, one page per file. Every page must have a corresponding `xref:` entry in that module's `nav.adoc`, or it builds but stays unreachable from the navigation.
 
 ### Installation
 
@@ -158,8 +158,11 @@ npm install
 
 Once you have a backend and frontend to test locally the changes on the different packages, you can perform several operations on top of the different packages:
 
-- `dev`: start the documentation site locally.
-- `build`: builds the documentation site.
+- `dev`: build the site and serve it locally with live reload, rebuilding on every change.
+- `build`: builds the documentation site once.
+- `clean`: removes the local build output.
+- `check-links`: checks the built site for broken links.
+- `git:pre-push`: builds the site and runs `check-links`, used as this repo's pre-push hook.
 
 All this operations can be performed launching the following command on the `/docs` folder:
 
@@ -172,11 +175,11 @@ npm run <operation>
 For start:
 
 1. Install the documentation dependencies.
-2. Start the documentation site locally.
+2. Start the documentation site locally (`npm run dev`).
 
 To make a change and test it:
 
-1. Make a change on a MDK file and save it.
+1. Make a change on an AsciiDoc file and save it.
 2. Check the changes on the live local site.
 
 As you can see to test you can repeat steps 1-2 as many times as you want.
@@ -188,15 +191,15 @@ Complete this checklist for every release, not for every individual change. You 
 1. Identify the upcoming version: the one after the latest released version, matching the `release-type/*` label of the PR.
 2. Update `code/CHANGELOG.md` with the changes included in the release.
 3. If the release includes public API changes, document them in the relevant API reference file under `docs`.
-4. Create or update the release page at `docs/content/docs/main/changelog/<major>.x/<version>.mdx`:
+4. Create or update the release notes page at `docs/src/modules/main/pages/release-notes/<version>.adoc`:
    - If the page is new, add its title, description, release date, and change sections.
    - If the page already exists, add the release changes under the corresponding sections.
-5. Add the version to the `pages` array in `docs/content/docs/main/changelog/<major>.x/meta.json`, keeping versions newest first.
-6. Add a link to the version at the top of the corresponding section in `docs/content/docs/main/changelog/index.mdx`.
+5. Add the new page to the release notes tree in `docs/src/modules/main/nav.adoc`, keeping versions newest first.
+6. Add an entry for the release at the top of `docs/src/modules/main/pages/changelog/index.adoc`.
 
 ### Before Submitting
 
-- Set the version to release of the docs on the `.release` file located on the `/docs` folder.
+- Set the version to release of the docs on the `docs/.release-version` file.
 
 ## Helpful Resources
 
