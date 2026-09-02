@@ -1,0 +1,14 @@
+code/CHANGELOG.md
+  h_9876611f59032e 16-19
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.22",
+  "base_commit_sha": "3d74fa5d33a72866923d91ff2ffb4593529bf071",
+  "prompts": {},
+  "humans": {
+    "h_9876611f59032e": {
+      "author": "Alejandro Montes <alejandromogarcia@ext.inditex.com>"
+    }
+  }
+}
