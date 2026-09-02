@@ -147,7 +147,7 @@ footer:
       links:
         - text: Repository
           url: https://github.com/InditexTech/weavejs
-    - title: InditexTech
-      links:
-        - text: Portal
-          url: https://opensource.inditex.com
+    # - title: INDITEXTECH
+    #   links:
+    #     - text: OSO Portal
+    #       url: https://opensource.inditex.com
