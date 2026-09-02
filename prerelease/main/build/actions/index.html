@@ -1,0 +1,1545 @@
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+
+
+<meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <script>
+      /*
+       * Theme bootstrap. Runs before first paint so the page never flashes the
+       * wrong theme. Keep it inline, keep it tiny, and keep it in sync with
+       * src/js/08-theme.ts, which owns the same storage key and class names.
+       *
+       * IDS switches theme with a class on <html>, not a data attribute, so an
+       * attribute here would style nothing.
+       */
+      (function () {
+        var stored
+        try { stored = localStorage.getItem('dt-theme') } catch (e) {}
+        var theme = stored === 'light' || stored === 'dark'
+          ? stored
+          : window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
+        var root = document.documentElement
+        root.classList.add('dt-theme-' + theme, 'dt-scale-medium')
+        root.style.colorScheme = theme
+      })()
+    </script>
+    <script>
+      /*
+       * Side-menu collapse bootstrap (GH-8). Runs before first paint so the
+       * 320px column never flashes in and reflows the article on navigation.
+       * Keep it inline, keep it tiny, and keep it in sync with
+       * src/js/01-nav.ts, which owns the same storage key and class name.
+       *
+       * A stored choice always wins; absent one, the menu starts collapsed
+       * on the home/landing page (matching Figma's "State=Home" toolbar
+       * variant, which is the only one that shows the toggle) and open
+       * everywhere else. With JavaScript disabled this script never runs, so
+       * the class is never added and the menu stays open unconditionally —
+       * the toggle that would reopen it is also never unhidden.
+       */
+      (function () {
+        var stored
+        try { stored = localStorage.getItem('docouture-side-menu') } catch (e) {}
+        var collapsed = stored === 'collapsed' || stored === 'open'
+          ? stored === 'collapsed'
+          : document.documentElement.hasAttribute('data-page-home')
+        if (collapsed) document.documentElement.classList.add('is-side-menu-collapsed')
+      })()
+    </script>
+    <script>
+      /*
+       * ToC collapse bootstrap (GH-10). Runs before first paint so a closed
+       * choice never flashes open for an instant. Keep it in sync with
+       * src/js/02-on-this-page.ts, which owns the same storage key and class
+       * name.
+       *
+       * Deliberately does NOT add `has-toc` — only 02-on-this-page.ts knows
+       * whether this page actually has a usable ToC (headings found, page
+       * not `-toc`), and every effect of the class added here is itself
+       * gated behind `has-toc` in toc.css, so there is nothing to flash
+       * either way before that script runs. This one exists only so a
+       * *closed* choice is already in place the moment it does.
+       */
+      (function () {
+        var stored
+        try { stored = localStorage.getItem('docouture-toc') } catch (e) {}
+        if (stored === 'closed') document.documentElement.classList.add('is-toc-closed')
+      })()
+    </script>
+
+<title>Actions | Weave.js</title>
+
+    <link rel="canonical" href="https://inditextech.github.io/weavejs/5.2.1/main/build/actions/">
+    <link rel="prev" href="../plugins/users-selector/">
+    <link rel="next" href="align-nodes-tool/">
+    <meta name="description" content="Actions maintained by Weave.js team">
+    <meta name="generator" content="Antora 3.2.0">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&family=Noto+Sans+Mono:wght@100..900&display=swap">
+    <link rel="stylesheet" href="../../../../_/css/site.css">
+    <style>:root { --home-background-image: url("/weavejs/_/home-background.jpg") }</style>
+
+
+
+    <link rel="icon" href="../../../../_/favicon.ico">
+  </head>
+  <body class="article">
+
+
+
+<header class="header-toolbar">
+  <div class="dt-grid-layout dt-grid-layout--with-margin header-toolbar__grid">
+    <div class="dt-grid-layout__item dt-grid-layout__item--span-6 dt-grid-layout__item--span-xs-3 header-toolbar__left">
+      <button class="dt-button dt-button--ghost dt-button--icon-only side-menu-toggle" type="button" aria-controls="side-menu" hidden>
+        <span class="dt-button__content">
+          <span class="dt-button__icon dt-button__icon-icon"><svg class="dt-icon" aria-hidden="true" focusable="false"><use href="../../../../_/img/icons.svg#icon-menu"></use></svg></span>
+        </span>
+      </button>
+      <a class="header-toolbar__brand" href="../../../../5.2.1/">
+        <img class="header-toolbar__logo" src="../../../../_/product-logo.png" width="24" height="24" alt="">
+        <span class="header-toolbar__product-name dt-text dt-text--label-l-high">Weave.js</span>
+      </a>
+    </div>
+    <div class="dt-grid-layout__item dt-grid-layout__item--span-6 dt-grid-layout__item--span-xs-3 header-toolbar__actions">
+      <button type="button" class="dt-button dt-button--ghost header-toolbar__search-trigger">
+        <span class="dt-button__content">
+          <span class="dt-button__icon dt-button__icon-icon"><svg class="dt-icon" aria-hidden="true" focusable="false"><use href="../../../../_/img/icons.svg#icon-search"></use></svg></span>
+          <span class="dt-text dt-text--label-l header-toolbar__search-label">Search</span>
+          <kbd class="header-toolbar__search-shortcut" aria-hidden="true">⌘K</kbd>
+        </span>
+      </button>
+
+<div class="page-versions">
+  <button type="button" class="dt-tag dt-tag--solid dt-tag--selected header-toolbar__version header-toolbar__version--prerelease version-menu-toggle" title="Show other versions of page" aria-expanded="false">
+    <span class="dt-tag__label">prerelease</span>
+    <span class="dt-tag__icon"><svg class="dt-icon" aria-hidden="true" focusable="false"><use href="../../../../_/img/icons.svg#icon-chevron-down"></use></svg></span>
+  </button>
+  <div class="version-menu">
+    <span class="version is-current" aria-current="page">
+      <span class="version__label">prerelease</span>
+      <span class="dt-label dt-label--orange"><span class="dt-label__content">Prerelease</span></span>
+    </span>
+    <a class="version" href="../../../../5.2.1/main/build/actions/">
+      <span class="version__label">5.2.1</span>
+      <span class="dt-label dt-label--green"><span class="dt-label__content">Latest</span></span>
+          </a>
+  </div>
+</div>
+
+<a class="dt-button dt-button--ghost dt-button--icon-only header-toolbar__repo" href="https://github.com/InditexTech/weavejs" target="_blank" rel="noopener" aria-label="Repository">
+  <span class="dt-button__content">
+    <span class="dt-button__icon dt-button__icon-icon header-toolbar__repo-icon" aria-hidden="true"></span>
+  </span>
+</a>
+
+<button class="dt-button dt-button--ghost dt-button--icon-only theme-toggle" type="button" hidden>
+  <span class="dt-button__content">
+    <span class="dt-button__icon dt-button__icon-icon theme-toggle-icon theme-toggle-icon--light" aria-hidden="true"><svg class="dt-icon" aria-hidden="true" focusable="false"><use href="../../../../_/img/icons.svg#icon-sun"></use></svg></span>
+    <span class="dt-button__icon dt-button__icon-icon theme-toggle-icon theme-toggle-icon--dark" aria-hidden="true"><svg class="dt-icon" aria-hidden="true" focusable="false"><use href="../../../../_/img/icons.svg#icon-moon"></use></svg></span>
+  </span>
+</button>
+    </div>
+  </div>
+</header>
+
+<dialog id="search-dialog" class="search-dialog" aria-label="Search" data-search-index="ROOT-prerelease.json">
+  <div class="dt-overlay dt-overlay--visible search-dialog__overlay">
+    <div class="dt-overlay__content"></div>
+    <div class="dt-modal dt-modal--small search-dialog__panel">
+      <div class="dt-modal__container search-dialog__container">
+        <div class="dt-search-field-minimal dt-search-field-minimal--full-width search-dialog__field">
+          <span class="dt-search-field-minimal__icon-start" aria-hidden="true"><svg class="dt-icon" aria-hidden="true" focusable="false"><use href="../../../../_/img/icons.svg#icon-search"></use></svg></span>
+          <div class="dt-search-field-minimal__input-wrapper">
+            <div class="dt-search-field-minimal__input-container">
+              <input type="search" class="dt-search-field-minimal__input" placeholder="Search the docs" aria-label="Search the docs"
+                role="combobox" aria-expanded="false" aria-haspopup="listbox" aria-autocomplete="list"
+                aria-controls="search-dialog-listbox" disabled>
+            </div>
+          </div>
+          <button type="button" class="dt-button dt-button--ghost dt-button--icon-only search-dialog__close" aria-label="Close search" disabled>
+            <span class="dt-button__content">
+              <span class="dt-button__icon dt-button__icon-icon"><svg class="dt-icon" aria-hidden="true" focusable="false"><use href="../../../../_/img/icons.svg#icon-x"></use></svg></span>
+            </span>
+          </button>
+        </div>
+        <div class="search-dialog__chips" role="group" aria-label="Filter results by module">
+          <button type="button" class="dt-tag dt-tag--solid dt-tag--selected search-dialog__chip" data-category="" aria-pressed="true">
+            <span class="dt-tag__label">All</span>
+          </button>
+          <button type="button" class="dt-tag dt-tag--solid search-dialog__chip" data-category="Framework" aria-pressed="false">
+            <span class="dt-tag__label">Framework</span>
+          </button>
+          <button type="button" class="dt-tag dt-tag--solid search-dialog__chip" data-category="SDK" aria-pressed="false">
+            <span class="dt-tag__label">SDK</span>
+          </button>
+          <button type="button" class="dt-tag dt-tag--solid search-dialog__chip" data-category="React Helper" aria-pressed="false">
+            <span class="dt-tag__label">React Helper</span>
+          </button>
+          <button type="button" class="dt-tag dt-tag--solid search-dialog__chip" data-category="Websockets Store" aria-pressed="false">
+            <span class="dt-tag__label">Websockets Store</span>
+          </button>
+          <button type="button" class="dt-tag dt-tag--solid search-dialog__chip" data-category="Azure Web Pubsub Store" aria-pressed="false">
+            <span class="dt-tag__label">Azure Web Pubsub Store</span>
+          </button>
+          <button type="button" class="dt-tag dt-tag--solid search-dialog__chip" data-category="Standalone Store" aria-pressed="false">
+            <span class="dt-tag__label">Standalone Store</span>
+          </button>
+          <button type="button" class="dt-tag dt-tag--solid search-dialog__chip" data-category="TypeScript Types" aria-pressed="false">
+            <span class="dt-tag__label">TypeScript Types</span>
+          </button>
+        </div>
+        <div id="search-dialog-listbox" class="dt-modal__content dt-modal__content--scrollable search-dialog__results" role="listbox" aria-label="Search results"></div>
+        <div class="search-dialog__status" aria-live="polite"></div>
+        <div class="dt-modal__footer dt-modal__footer--horizontal search-dialog__footer">
+          <span class="dt-modal__footer-left dt-text dt-text--detail-m search-dialog__hints">
+            <kbd>&uarr;&darr;</kbd> navigate &middot; <kbd>&crarr;</kbd> select &middot; <kbd>esc</kbd> close
+          </span>
+        </div>
+      </div>
+    </div>
+  </div>
+</dialog>
+<div class="dt-floating-button-wrapper dt-floating-button-wrapper--viewport dt-floating-button-wrapper--end search-fab">
+  <button type="button" class="dt-button dt-button--ghost dt-button--icon-only dt-floating-button search-fab__trigger" aria-label="Search" aria-haspopup="dialog" aria-controls="search-dialog">
+    <span class="dt-button__content">
+      <span class="dt-button__icon dt-button__icon-icon"><svg class="dt-icon" aria-hidden="true" focusable="false"><use href="../../../../_/img/icons.svg#icon-search"></use></svg></span>
+    </span>
+  </button>
+</div>
+
+<dialog id="image-zoom-dialog" class="image-zoom-dialog" aria-label="Zoomed image">
+  <div class="dt-overlay dt-overlay--visible image-zoom-dialog__overlay">
+    <div class="dt-overlay__content"></div>
+    <div class="dt-modal dt-modal--fullscreen image-zoom-dialog__panel">
+      <div class="dt-modal__container image-zoom-dialog__container">
+        <button type="button" class="dt-button dt-button--ghost dt-button--icon-only image-zoom-dialog__close" aria-label="Close zoomed image">
+          <span class="dt-button__content">
+            <span class="dt-button__icon dt-button__icon-icon"><svg class="dt-icon" aria-hidden="true" focusable="false"><use href="../../../../_/img/icons.svg#icon-x"></use></svg></span>
+          </span>
+        </button>
+        <div class="image-zoom-dialog__content"></div>
+      </div>
+    </div>
+  </div>
+</dialog>
+
+<div class="body">
+
+<div id="side-menu" class="side-menu" data-component="ROOT" data-version="prerelease" data-module="main">
+  <div class="side-menu__header">
+    <div class="side-menu__header-start">
+      <img class="side-menu__header-logo" src="../../../../_/product-logo.png" width="24" height="24" alt="">
+      <span class="side-menu__header-title dt-text dt-text--title-s">Weave.js</span>
+    </div>
+    <button class="side-menu__close" type="button" aria-label="Close navigation"><svg class="dt-icon" aria-hidden="true" focusable="false"><use href="../../../../_/img/icons.svg#icon-x"></use></svg></button>
+  </div>
+
+<div class="side-menu__brand">
+  <a class="side-menu__brand-link" href="../../../../5.2.1/">
+    <img class="side-menu__brand-logo" src="../../../../_/product-logo.png" width="40" height="40" alt="">
+    <span class="side-menu__brand-title dt-text dt-text--title-m">Weave.js</span>
+  </a>
+</div>
+
+<div class="nav-switcher">
+  <button class="nav-switcher__toggle" type="button" aria-expanded="false" aria-haspopup="true" aria-label="Switch module, currently Framework">
+    <span class="nav-switcher__icon"><svg class="dt-icon" aria-hidden="true" focusable="false"><use href="../../../../_/img/icons.svg#icon-grid-3x3"></use></svg></span>
+    <span class="nav-switcher__label">
+      <span class="nav-switcher__title dt-text dt-text--body-m-high">Framework</span>
+      <span class="nav-switcher__description dt-text dt-text--detail-m">The visual collaborative apps framework</span>
+    </span>
+    <span class="nav-switcher__chevron"><svg class="dt-icon" aria-hidden="true" focusable="false"><use href="../../../../_/img/icons.svg#icon-chevron-down"></use></svg></span>
+  </button>
+  <div class="nav-switcher__menu" hidden>
+    <ul class="dt-list nav-switcher__list">
+      <li class="nav-switcher__item">
+        <a class="nav-switcher__option" href="../../" aria-current="true">
+          <span class="nav-switcher__icon"><svg class="dt-icon" aria-hidden="true" focusable="false"><use href="../../../../_/img/icons.svg#icon-grid-3x3"></use></svg></span>
+          <span class="nav-switcher__label">
+            <span class="nav-switcher__title dt-text dt-text--body-m-high">Framework</span>
+            <span class="nav-switcher__description dt-text dt-text--detail-m">The visual collaborative apps framework</span>
+          </span>
+        </a>
+      </li>
+      <li class="nav-switcher__item">
+        <a class="nav-switcher__option" href="../../../sdk/">
+          <span class="nav-switcher__icon"><svg class="dt-icon" aria-hidden="true" focusable="false"><use href="../../../../_/img/icons.svg#icon-code"></use></svg></span>
+          <span class="nav-switcher__label">
+            <span class="nav-switcher__title dt-text dt-text--body-m-high">SDK</span>
+            <span class="nav-switcher__description dt-text dt-text--detail-m">The visual collaborative tool headless library</span>
+          </span>
+        </a>
+      </li>
+      <li class="nav-switcher__item">
+        <a class="nav-switcher__option" href="../../../react/">
+          <span class="nav-switcher__icon"><svg class="dt-icon" aria-hidden="true" focusable="false"><use href="../../../../_/img/icons.svg#icon-wrench"></use></svg></span>
+          <span class="nav-switcher__label">
+            <span class="nav-switcher__title dt-text dt-text--body-m-high">React Helper</span>
+            <span class="nav-switcher__description dt-text dt-text--detail-m">Set of React components to help you integrate Weave.js</span>
+          </span>
+        </a>
+      </li>
+      <li class="nav-switcher__item">
+        <a class="nav-switcher__option" href="../../../store-websockets/">
+          <span class="nav-switcher__icon"><svg class="dt-icon" aria-hidden="true" focusable="false"><use href="../../../../_/img/icons.svg#icon-wifi"></use></svg></span>
+          <span class="nav-switcher__label">
+            <span class="nav-switcher__title dt-text dt-text--body-m-high">Websockets Store</span>
+            <span class="nav-switcher__description dt-text dt-text--detail-m">Store implementation using WebSockets as transport</span>
+          </span>
+        </a>
+      </li>
+      <li class="nav-switcher__item">
+        <a class="nav-switcher__option" href="../../../store-azure-web-pubsub/">
+          <span class="nav-switcher__icon"><svg class="dt-icon" aria-hidden="true" focusable="false"><use href="../../../../_/img/icons.svg#icon-cloud"></use></svg></span>
+          <span class="nav-switcher__label">
+            <span class="nav-switcher__title dt-text dt-text--body-m-high">Azure Web Pubsub Store</span>
+            <span class="nav-switcher__description dt-text dt-text--detail-m">Store implementation using Azure Web Pubsub as transport</span>
+          </span>
+        </a>
+      </li>
+      <li class="nav-switcher__item">
+        <a class="nav-switcher__option" href="../../../store-standalone/">
+          <span class="nav-switcher__icon"><svg class="dt-icon" aria-hidden="true" focusable="false"><use href="../../../../_/img/icons.svg#icon-server"></use></svg></span>
+          <span class="nav-switcher__label">
+            <span class="nav-switcher__title dt-text dt-text--body-m-high">Standalone Store</span>
+            <span class="nav-switcher__description dt-text dt-text--detail-m">Store implementation to render a Weave.js canvas in a direct way, just pass a room data.</span>
+          </span>
+        </a>
+      </li>
+      <li class="nav-switcher__item">
+        <a class="nav-switcher__option" href="../../../types/">
+          <span class="nav-switcher__icon"><svg class="dt-icon" aria-hidden="true" focusable="false"><use href="../../../../_/img/icons.svg#icon-file"></use></svg></span>
+          <span class="nav-switcher__label">
+            <span class="nav-switcher__title dt-text dt-text--body-m-high">TypeScript Types</span>
+            <span class="nav-switcher__description dt-text dt-text--detail-m">Package that contains the TypeScript types definitions</span>
+          </span>
+        </a>
+      </li>
+    </ul>
+  </div>
+</div>
+  <nav class="side-menu__nav" aria-label="Site navigation">
+
+
+<ul class="dt-list side-menu__list" data-depth="0">
+  <li class="side-menu__item side-menu__item--label">
+    <div class="side-menu__row">
+      <span class="dt-list-item side-menu__link--label dt-list-item--tree--level-0">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Overview</span></span>
+      </span>
+    </div>
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-0"
+        href="../../">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">About Weave.js</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-0"
+        href="../../architecture/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Architecture overview</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-0"
+        href="../../application-structure/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Application structure</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-0"
+        href="../../glossary/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Glossary</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item side-menu__item--label">
+    <div class="side-menu__row">
+      <span class="dt-list-item side-menu__link--label dt-list-item--tree--level-0">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Getting started</span></span>
+      </span>
+    </div>
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-0"
+        href="../../requirements/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Requirements</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-0"
+        href="../../quickstart/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Quickstart</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item side-menu__item--branch">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-0"
+        href="../../manual-installation/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Manual Installation</span></span>
+      </a>
+      <button class="side-menu__toggle" type="button" aria-expanded="true" aria-label="Toggle Manual Installation">
+        <svg class="dt-icon" aria-hidden="true" focusable="false"><use href="../../../../_/img/icons.svg#icon-chevron-down"></use></svg>
+      </button>
+    </div>
+
+<ul class="dt-list side-menu__list" data-depth="1">
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="../../manual-installation/backend/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Set up the backend</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item side-menu__item--branch">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="../../manual-installation/frontend/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Frontend</span></span>
+      </a>
+      <button class="side-menu__toggle" type="button" aria-expanded="true" aria-label="Toggle Frontend">
+        <svg class="dt-icon" aria-hidden="true" focusable="false"><use href="../../../../_/img/icons.svg#icon-chevron-down"></use></svg>
+      </button>
+    </div>
+
+<ul class="dt-list side-menu__list" data-depth="2">
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-2"
+        href="../../manual-installation/frontend/enter-room-page/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Enter Room page</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-2"
+        href="../../manual-installation/frontend/room-page/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Room page</span></span>
+      </a>
+    </div>
+
+  </li>
+</ul>
+  </li>
+</ul>
+  </li>
+  <li class="side-menu__item side-menu__item--label">
+    <div class="side-menu__row">
+      <span class="dt-list-item side-menu__link--label dt-list-item--tree--level-0">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Build</span></span>
+      </span>
+    </div>
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-0"
+        href="../">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Overview</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item side-menu__item--branch">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-0"
+        href="../nodes/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Nodes</span></span>
+      </a>
+      <button class="side-menu__toggle" type="button" aria-expanded="true" aria-label="Toggle Nodes">
+        <svg class="dt-icon" aria-hidden="true" focusable="false"><use href="../../../../_/img/icons.svg#icon-chevron-down"></use></svg>
+      </button>
+    </div>
+
+<ul class="dt-list side-menu__list" data-depth="1">
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="../nodes/connector/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Connector</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="../nodes/comment/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Comment</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="../nodes/ellipse/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Ellipse</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="../nodes/frame/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Frame</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="../nodes/group/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Group</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="../nodes/image/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Image</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="../nodes/layer/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Layer</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="../nodes/measure/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Measure</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="../nodes/polygon/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Polygon</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="../nodes/rectangle/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Rectangle</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="../nodes/stage/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Stage</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="../nodes/star/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Star</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="../nodes/stroke/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Stroke</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="../nodes/stroke-single/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Stroke Single</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="../nodes/text/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Text</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="../nodes/video/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Video</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="../nodes/arrow/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Arrow (deprecated)</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="../nodes/line/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Line (deprecated)</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="../nodes/regular-polygon/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Regular Polygon (deprecated)</span></span>
+      </a>
+    </div>
+
+  </li>
+</ul>
+  </li>
+  <li class="side-menu__item side-menu__item--branch">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-0"
+        href="../plugins/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Plugins</span></span>
+      </a>
+      <button class="side-menu__toggle" type="button" aria-expanded="true" aria-label="Toggle Plugins">
+        <svg class="dt-icon" aria-hidden="true" focusable="false"><use href="../../../../_/img/icons.svg#icon-chevron-down"></use></svg>
+      </button>
+    </div>
+
+<ul class="dt-list side-menu__list" data-depth="1">
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="../plugins/comments-renderer/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Comments Renderer</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="../plugins/connected-users/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Connected Users</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="../plugins/context-menu/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Context Menu</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="../plugins/copy-paste-nodes/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Copy &amp; Paste Nodes</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="../plugins/nodes-selection/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Nodes Selection</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="../plugins/nodes-multi-selection-feedback/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Nodes Multi-selection Feedback</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="../plugins/nodes-snapping/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Nodes Snapping</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="../plugins/stage-drop-area/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Stage Drop Area</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="../plugins/stage-grid/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Stage Grid</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="../plugins/stage-keyboard-move/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Stage Keyboard Move</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="../plugins/stage-panning/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Stage Panning</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="../plugins/stage-resize/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Stage Resize</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="../plugins/stage-zoom/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Stage Zoom</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="../plugins/users-pointers/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Users Pointers</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="../plugins/users-presence/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Users Presence</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="../plugins/users-selector/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Users Selector</span></span>
+      </a>
+    </div>
+
+  </li>
+</ul>
+  </li>
+  <li class="side-menu__item side-menu__item--branch">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-0"
+        href="./" aria-current="page">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Actions</span></span>
+      </a>
+      <button class="side-menu__toggle" type="button" aria-expanded="true" aria-label="Toggle Actions">
+        <svg class="dt-icon" aria-hidden="true" focusable="false"><use href="../../../../_/img/icons.svg#icon-chevron-down"></use></svg>
+      </button>
+    </div>
+
+<ul class="dt-list side-menu__list" data-depth="1">
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="align-nodes-tool/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Align Nodes Tool</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="brush-tool/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Brush Tool</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="connector-tool/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Connector Tool</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="comment-tool/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Comment Tool</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="ellipse-tool/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Ellipse Tool</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="eraser-tool/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Eraser Tool</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="export-node-tool/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Export Node Tool</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="export-stage-tool/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Export Stage Tool</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="fit-to-screen-tool/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Fit to Screen Tool</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="fit-to-selection-tool/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Fit to Selection Tool</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="frame-tool/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Frame Tool</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="image-tool/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Image Tool</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="images-tool/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Images Tool</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="measure-tool/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Measure Tool</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="move-tool/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Move Tool</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="polygon-tool/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Polygon Tool</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="rectangle-tool/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Rectangle Tool</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="selection-tool/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Selection Tool</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="star-tool/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Star Tool</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="stroke-tool/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Stroke Tool</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="text-tool/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Text Tool</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="video-tool/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Video Tool</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="zoom-in-tool/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Zoom In Tool</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="zoom-out-tool/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Zoom Out Tool</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="arrow-tool/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Arrow Tool (deprecated)</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="line-tool/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Line Tool (deprecated)</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="pen-tool/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Pen Tool (deprecated)</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="regular-polygon-tool/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Regular Polygon Tool (deprecated)</span></span>
+      </a>
+    </div>
+
+  </li>
+</ul>
+  </li>
+  <li class="side-menu__item side-menu__item--branch">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-0"
+        href="../stores/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Stores</span></span>
+      </a>
+      <button class="side-menu__toggle" type="button" aria-expanded="true" aria-label="Toggle Stores">
+        <svg class="dt-icon" aria-hidden="true" focusable="false"><use href="../../../../_/img/icons.svg#icon-chevron-down"></use></svg>
+      </button>
+    </div>
+
+<ul class="dt-list side-menu__list" data-depth="1">
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="../stores/websockets-store/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">WebSockets</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="../stores/azure-web-pubsub-store/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Azure Web PubSub</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="../stores/standalone-store/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Standalone</span></span>
+      </a>
+    </div>
+
+  </li>
+</ul>
+  </li>
+  <li class="side-menu__item side-menu__item--label">
+    <div class="side-menu__row">
+      <span class="dt-list-item side-menu__link--label dt-list-item--tree--level-0">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Additional information</span></span>
+      </span>
+    </div>
+  </li>
+  <li class="side-menu__item side-menu__item--branch">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-0"
+        href="../../release-notes/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Release notes</span></span>
+      </a>
+      <button class="side-menu__toggle" type="button" aria-expanded="true" aria-label="Toggle Release notes">
+        <svg class="dt-icon" aria-hidden="true" focusable="false"><use href="../../../../_/img/icons.svg#icon-chevron-down"></use></svg>
+      </button>
+    </div>
+
+<ul class="dt-list side-menu__list" data-depth="1">
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="../../release-notes/5.0.0/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">v5.0.0</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="../../release-notes/4.0.0/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">v4.0.0</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="../../release-notes/3.0.0/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">v3.0.0</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="../../release-notes/2.0.0/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">v2.0.0</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="../../release-notes/1.0.0/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">v1.0.0</span></span>
+      </a>
+    </div>
+
+  </li>
+</ul>
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-0"
+        href="../../changelog/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Changelog</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-0"
+        href="../../roadmap/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Roadmap</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-0"
+        href="../../contributing/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Contributing</span></span>
+      </a>
+    </div>
+
+  </li>
+</ul>
+  </nav>
+  <div class="side-menu__version">
+
+<div class="page-versions">
+  <button type="button" class="dt-tag dt-tag--solid dt-tag--selected header-toolbar__version header-toolbar__version--prerelease version-menu-toggle" title="Show other versions of page" aria-expanded="false">
+    <span class="dt-tag__label">prerelease</span>
+    <span class="dt-tag__icon"><svg class="dt-icon" aria-hidden="true" focusable="false"><use href="../../../../_/img/icons.svg#icon-chevron-down"></use></svg></span>
+  </button>
+  <div class="version-menu">
+    <span class="version is-current" aria-current="page">
+      <span class="version__label">prerelease</span>
+      <span class="dt-label dt-label--orange"><span class="dt-label__content">Prerelease</span></span>
+    </span>
+    <a class="version" href="../../../../5.2.1/main/build/actions/">
+      <span class="version__label">5.2.1</span>
+      <span class="dt-label dt-label--green"><span class="dt-label__content">Latest</span></span>
+          </a>
+  </div>
+</div>
+  </div>
+</div>
+<div class="side-menu-scrim"></div>
+
+<main class="article">
+
+<div class="hero">
+  <div class="dt-grid-layout dt-grid-layout--with-margin hero__grid">
+    <div class="dt-grid-layout__item dt-grid-layout__item--span-full hero__row">
+      <div class="hero__main">
+
+<nav class="dt-breadcrumbs" aria-label="Breadcrumb">
+  <a class="dt-breadcrumb-item dt-breadcrumb-item--link" href="../../../"><span class="dt-breadcrumb-item__content">Weave.js</span></a>
+  <div class="dt-breadcrumb-item dt-breadcrumb-item--active" aria-current="page"><span class="dt-breadcrumb-item__content">Actions</span></div>
+</nav>
+        <h1 class="hero__title dt-text dt-text--title-xl">Actions</h1>
+        <p class="hero__excerpt dt-text dt-text--body-l">Actions maintained by Weave.js team</p>
+      </div>
+      <div class="hero__aside">
+        <button class="dt-button dt-button--ghost dt-button--icon-only toc-toggle" type="button" aria-controls="on-this-page" aria-expanded="true" hidden>
+          <span class="dt-button__content">
+            <span class="dt-button__icon dt-button__icon-icon"><svg class="dt-icon" aria-hidden="true" focusable="false"><use href="../../../../_/img/icons.svg#icon-panel-left"></use></svg></span>
+          </span>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+  <div class="content dt-grid-layout dt-grid-layout--with-margin">
+
+<aside id="on-this-page" class="toc" data-title="On this page" data-levels="4">
+  <div class="toc-menu"></div>
+</aside>
+
+<article class="doc">
+<div class="sect1">
+<h2 id="introduction"><a class="anchor" href="#introduction"></a>Introduction</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Actions are the core mechanism for handling user-driven changes in Weave.js. Whether
+you&#8217;re adding a node, moving elements, updating properties, or triggering a custom behavior,
+Actions provide a structured, trackable way to apply changes to the shared state.</p>
+</div>
+<div class="paragraph">
+<p>Actions help keep your application logic clean and consistent, and collaborative. In Weave.js,
+if something meaningful happens—it’s probably through an Action.</p>
+</div>
+<div class="paragraph">
+<p>Weave.js includes a set of built-in Actions, but you can also create your own to tailor
+functionality to your specific application needs.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="action-lifecycle"><a class="anchor" href="#action-lifecycle"></a>Action lifecycle</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Weave.js action lifecycle is pretty simple:</p>
+</div>
+<div class="docouture-diagram zoom-in" data-diagram-type="mermaid"><div class="docouture-diagram__content"><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAS4AAANXCAYAAACL8rJjAAAQAElEQVR4nOzdCZxV8//H8U+lXYsQWbMlKT+ErC0oRGhRSalkSRJSdir7Vn5pIYlEZN8qKUvJkl0pu5+llELaRPv/vr8z5/7vTDNz78y93/RtXs/H49TMvefeudt5n+/38/3ec0oaAASmpAFAYAguAMEhuAAEh+ACEByCC0BwCC4AwdnKgMyqHFvqxJYDs3//LLbMiS3LDcgQgguZdHVsuSC2VI0tZbIvWx1b/owtI2LL7QZkQAkDMuPj2FIrtmydz/V/WVbLq4EBaSK4kAkfxZb6hVj3UAPSUMqA9FwTW1ra/3cNk6kSW9bFlncMKCJaXEiHCvGfxJa9rHD+F1vqxZaVBhQB0yGQDo0eVrXC023qGlBEBBfSoSkPqXYRE+k2BxlQREyHQLqK8hmitoq00OJCOjS5dJUVnuZ2fWJAERFcSIfmZS2zwtNtZhtQRAQX0qGv8Yy2wrW6tO7I2PK3AUXEdAhkQmEmoL4fWw43IA0EFzLlw9iyX2ypmM/1+srPrNhypAFpYnQHmaLu31rL+r6idogbsn9Xl3BhbLkztnQzIANocSHTKljW5NLrLOvzdaNlFeKpaSFjmMeFTNPXeD6wrKNFKLg+NCDDGFUEEByCC0Bw6CrCF9W0qKHCC4ILvmjEmuCCFwQXfNERIAgueEGNC0BwCC4AwSG4AASHGhd8WWLUuOAJwQVfdFx5ggte0FUEEByCC76st6wjRAAZR1cRvminSFcRXhBc8IWv/MAbggu+lDeCC55Q4wIQHFpc8EXHmGfHCC8ILviik2bQVYQX7BEBBIcWF3z5x9gxwhOCC76UM7qK8IQ9IoDgEFwAgkNwAQgOwQUgOAQXgOAwqghfVhmjivCE4IIvZY3ggid0FQEEhxYXfFlptLjgCcEFXyoYwQVP6CoCCA4tLviiQzezY4QXBBd84dDN8Ibggi/rjBYXPCG44Espo8UFT9gjAggOwYVM2D6Py5ZkL6msCxQKwYV01Y8tC2JLk1yXV81eEjXJXre+AWkguJCuj2PLuNgyPrb0Trh8fWzZkPB77+x1xmXfBigyiqfIFIXUUssKp46xpZ9lfb76x5bHYsspsaWK8ZlDBtDiQqZcZFkjia1jy6cJl3+SfVmp7HWAtLH3QyZ9G1v2tqw5XGuzLyttWTvI72LLPgZkAC0uZFJ7y+ouqnVVNnspmX1ZewMyhOBCJqnorhrX2oTL1mZfRkEeGUNXET5syPU7nzNkFC0u+KAi/OrshYI8Mm5L+q5im9hS17C5iFpd1S1rSgT+fbNjyzO2BdhimvDVqlWb0KRJk+Z165JdQG5z5syxN954Y+LixYtPti3AFnV0iDZt2lj79gxeAbk9+eSTCi7bUlDjAhAcggtAcAguAMEhuAAEh+ACEByCC0BwCC4AwSG4AASH4AIQHIIrYC+++KK98sorVpx9+umn9uCDD9qaNWsMxQcnhA3U+vXrrVWrVu7/DRs2WHF1xRVX2GuvvWa1atWyhg0bWnGj0D766KOtdu3aVpwUqxZX06ZN7ZRTTslxWd++fa1EiRIbfY9rhx12sDvvvNM2VyVLlrQxY8bY448/bpmkIPz6669t9erVFoJ+/frZwIED7YgjjjAfVq1aZV999ZVl0rx58+z333+3TLj++uvt4YcftuKmWAXXAQccYF988UWOy9TVkI8//v8DdC5cuNAWLVpk//nPf2xzdtZZZ9mZZ55pmTR69Gi39168eLGFQK2N3r17W+nSpc2HCy64wNq2bWuZ8t1339muu+5qr7/+uqHoil1w/fDDD/bXX3+539W6+OCDD9yHPwowmT17tvt/cw8uoLgqdsElM2fOdP+rS/T333/bOeecYx999FF8PQXX9ttvbzvuuGP8skcffdSOPfZYq1y5sh1++OH27rvvxq/TfWjP3LhxY6tSpYrtv//+dtNNN7lglHbt2tlOO+2U47GoK6Z1+/Tp435ft26dXXfddVa/fn3bZpttrEWLFq7VV5CTTjrJLZG3337bdXv1vx6r7l+hPH369Pg66vp07tzZ1YSi53LXXXe5x1qnTh3r1q2bW69GjRruvv755x/3++23324nnnii60Lvtttudv7559tvv/2W4/GUKVPGHnnkEevYsaNbT/f3wAMP5FhH9Tjd15FHHuken16zZ555JqXXOS+33Xab+7upPL+8fPvtt9a8eXPbeeedrXr16q6coEEPdef0/PV8Pv/8c/ezHqske78T34tvvvnGunbtahUrVnQtt332yTrRkQ6/pOunTJnifk/l/f/jjz/cfem90Wt7//33W3FVrIJLH7CtttrKvvzyS/e7uof16tWzo446yn2Aow1RB1077LDD4rfTh+vs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1pbUqFHDdTf/+ecf9/tJJ53klkSzZ8+2Dh062K677mo777yznXnmme5+EumxPPLII9axY0fbYYcd3N944IEHcqwzceJEO+aYY2ybbbaxPffc03VxP//88zyf399//+1aHpq3V6VKFdt///3tpptucqEQefvtt91j/+abb6xr165WsWJF91jl0UcftWOPPdYqV65shx9+uL377rtWkNtuu80OPfRQ++CDD6xZs2bxVui6devsuuuus/r167vH3aJFC9eNSqT71nPR39Lj2W+//WzkyJH2/fff5/mafvvtt9a8eXP3Wuq9a9q0qSvgz5s3z91er6NeF/2cONn6vffes5YtW1q1atXc6ztixIiMPQd1CXW5rtd7lOz1Qk4EV4oUXEcffbTbWE844QR74YUXcly/dOlSt3Fo47nnnnvs8ssvd10Ptc4efvhhu/LKK916zz33nE2fPt3KlSuX59/R+trotLHdfvvtrq72zjvvuPvOXWzu2bOnC7ePPvrIWrduHe/yyPLly+3cc8+1qlWr2qhRo+yqq65yjzG/7lD58uXtoIMOcmGr1svZZ59tN954oz3xxBMbratQrVChgj344INWu3Zt13XW+qov6bKaNWvaiSee6IKhIPPnz3fdOm30eoyiyYcKhIMPPtgFxcKFC919Rc/9rbfecuGyzz772P/+9z8XOn/88YcLWb1Webnsssvs559/dusMHz7cdtppJ/eYt99+e3vzzTfd673XXnu5n4cOHepu89tvv7lC+Zw5c+zuu+92AabXO/f7XpTnoPdG9zd37lz39zp16mRDhgwxpI4aVwpUz1JwXXvtte53bThqYXzxxRduTyxq7fz6669u76s9u1x44YXu/913391tAHLEEUfkqHHlpg+69s66H7XOROGgvzlhwgQ75ZRT4uvqA68NRHr37m0333yzffrpp26D+emnn1w9TS1AjbLJ+eefbwVRazKicH7ppZfs1Vdf3ahmtMsuu9iwYcPiv2vDVoC+9tpr7vczzjjDDjnkELvvvvvslltuyffvaaPXbRXyolbf4MGDXTCqBSVqjSgIJ0+e7B6TwkEtTD3XUqVKucDU3xk4cKA9/fTTef6djz/+2IXQOeec435PHFzR66r6o0I2sbWl9/P33393rcx9993XXbZy5UobNGiQnX766Wk9B4Wt3hsFZXTfeo8bNWpkSA0t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lStXtsMPP9zeffddd/m8efPcbdRd+fzzz93PjRs3znH/ut0uu+ziulT50W07depkhx12mPsbRx11lD3zzDM51rntttvskEMOsZdeesnq1atnVatWdaGoGsw555xjO+ywg9WtW3ejoFm3bp1dd911Vr9+fdtmm22sRYsWrhsU0XOpUaOG7bbbbhs9Lt1G169fvz7Px63HVKZMmfjv6jJ37tzZatWqFX+t7rrrrnxvLzNnzrR27drZjjvuaHvvvbdr6f3555/uuttvv91OPPFE99z0+FS7+u2336ywkr0Goi6hLtf1xxxzTPw9Tmb27NnWoUMHVxbYeeed7cwzz4w//oheI31GOnbs6J5LnTp17IEHHjCkhuDK5Y8//nD1mf/973/2wQcf2GuvvWaVKlWy1q1bx4NDLZKzzz7bSpYs6UbQatas6TYmhZZqQW+++aaddNJJttdee7mfc3cLV6xY4YJxzJgxG20sEX3gFUoqdo8dO9b2339/O+uss+yHH37Isd6cOXNcXUndNy2q5Sgot9pqK/f4VTfTxrF48eL4bXTQOAWMrhsxYoQtXLjQPf4NGza467Xh7bvvvnk+rj322MPVvlJtLf73v/+15557zi688EJ7/PHHrWHDhq5Yvnbt2jzXV1dU4fv999/bPffcY5dffrnNmjXLtQBFr4O64Npx3HDDDe790U6lsJK9BsuXL7eWLVva3Llz3funnciQIUOS3q8ep977b7/91oWsHuM777zjnlN03xHVDxVuH330kft8qbyQuHNE/oI6Auqm8MILL7gP66uvvupaRVr0oVI46IOlFtTdd9/tPnDaaOSMM85wIXPffffZLbfc4oJj9OjRLshyt7ZErZBLLrnEbr75Zncb3Xdu1apVc+tE1EpTML3++ut27rnnxi/XUStV6FfrUK0ZBZ4eszZGPVa1drSRf/311y6QFTqDBw92LYKoVqXWhMJ38uTJbvqDQk7PLy96XJJqK+ezzz5zj+2yyy5zv59yyikFrq9Wx6+//upCV89FFHoRtYASfffddzZu3DgrjFReA7WGFixY4HY8UYjXrl3bdZULotddOyM9frVao9vpc6D3KfH5KwwVnqK6oD4Pmk6yOQ3SbK5oceWiLoSolRWpUqWKa+rrOrUU3njjjfj8JlFAHHrooe7Dmoz2urofBYA+uPqgK8h0H7k99thj1qBB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96RixYo2e/Zsd12ZMmXstttui6+rnw855BB7/vnn3f9VqlSxVq1a2dy5c3P8zUceecQ9v9KlS7v7Pu6442zSpEkbrZfoueeesxNPPNGqVq3q7lth/+mnn7rbjx49Ose6gwYNco/tjz/+cL8vXbrUevXqZXXr1nWv1WmnnWafffZZvn9LNcDrrrvO6tev7167Fi1auNcpGb3+eo222247977kVYdK9t7+8ssv1qNHD9tpp53cc6tevbprYX3yySfu+uj90P+RVD4PEydOtGOOOcY9nz333NN9Hj7//HNDTgRXir777jv3v1piMmXKFDv77LOtZMmS7oNfs2ZNt8Gqa5lI16mF8uKLL9oDDzxgw4cPt/vuuy9+/TvvvONaddtuu609/PDDduihh7oWXm76ACsUFFhXXXWVPfPMM3bFFVdstF6HDh2sQoUK7u/Wrl3b8jNnzhw3sfj222+36dOnu9+1EUXuuOMOVwy/4IILXFhrg1uzZo2r9Z1++ul53qeeyxlnnGGVKlVyoafg0YZbr149t6FOnjw5x/r6Xa1aPXc588wz3aDEueee614nbdA///xzvs9B3XaF8MEHH2wjRoxwI3h6DzZs2GAFUatRofHQQw/ZAQccYOedd16Ouley91ZBq9rh//73P/vggw/stddec8+5devW7n0pSEGfh+XLl7vnrtAfNWqUe58V5owIb4waVwo++ugj1yrSRqnWiajgrTqGPrSi69TC0Ifwlltuid92r732smeffda22morq1Onjv3nP/9xLZDIvffe6zYMfeBLlSrlLlNLSi2JyFtvveXCRR90bWSy4447WufOnV3RPXpMsssuu9iwYcOSPSXX5VWxWy0GOfnkk10LLKLw1HNq166d+/2GG26we+65x5544gnXKsqLwk4t06eeesq1NhRcEf2sx69Wkp7nypUr7Y033nCtLtGAhB7PuHHj4n9Tfz8/GrgYPHiwC2pN9xC1VPRaKhBPOOGEfG+rULrzzjvdz6plqmWj59uoUSN3WbL3ViOTanW++uqr7vXWotDSe6Gg13PPT0Gfh59++slNo9DzVwtYMjGSuiWixZUP7fGikcUGDRq4Vka0gShYtNElbhxaT60l7YET1ahRw31II+XLl3cbbUR7+qOPPjoeWqJuQqLo6w/NmjWLX3bYYYe5mlPUNYloo0yF/l4UWtHj0v1F9By33nrr+O/qeqpbpxZAXhRI6kZq489rw1U3btmyZS6A5fXXX3ctOG3wEoVEqt+LVT1J99e0adP4ZXqtFQwKwYIoaCJqVan1FL1vqby30TQVtbIi2nn8+eefSaewFPR5UJAp+NUS1hywvEoGyEJw5UN74jfffNMuuugi1/W66aab4i0bbeD6gKvZH4WbFnVXCqr/5EXdm8QWU16isFBrIvpbahFI7q6pai2ZoOkYahlEXWS1DNVK0+uSF3VzFES5Qzei1pBaiWqliFpF2iFoQ5bFixe7/6tVq2apUGiJWp2J78GXX3650WuSjB6zun2SynvbvHlzdxu1zOS3336Ld40TQ6mwFKKar6b7UT1Q77ee3++//27Iia5iPqJRRdVP1I3r06dPvH6hGoTCRhuxahKJtActjN133z2+EeZHBXlRV6pcuXI5rttvv/3MB9W+VChWbUr0vNQKPeigg/JcX6+JWiD5tci08Z966qkuuFSX0n1rsCEStf6WLFni6k/JRK+JHqcCMFEUhqnS34z+firvrVpsCvJOnTq57qo0adLEtZLStccee7ganKhmqNpm7969bcyYMYb/R3AloVEl1S40gqQuhEaaRN07NeXTPeSPuiC5R41yjzoeddRR7n/NydpUhxiaMGGCa0koiPQapEIjowVN7lRwqc6l11EtHP0e0espur021mTUrVLrUq9VYV+TxCktal3pb+qxJz6WZO/tkCFDXL3rmmuuMV/0vqulmlgTRRa6iilQgVS1B3Ub1R2Sa6+91n3gr776aleDUlFZw+bJDseR24UXXuiG/DW6pIKzajcqgidSi0IbudYdP36868JqUqnqRr5ow9XomUYR9ZyimlJB9JoohFVc1qiZAl81qOg1O/74412LRq1XtRQ17SH3c9SoqVoxTz/9tKszqbsqCil1mdTF1Kihuu/6GpO6axod1GPU7TQ1IlnXSqO3Ksa/9NJL1rJlS/dc9XcTn0ey91bdUa2jup4u//bbb910mXTo/jTKqUEOjWxqQEg7kMTaJrIQXClQIVsTC7/66qt4XUMFXXV7VFRWgGhoXh9utQQKQy04bUQKK22M2ovnNYlRo3naA6vlp4L2zJkzvY44KXz0HBWW6gbpZ9V1FBL50Tra0NSa0hQPdW31FZuo7qMWo6YVqAWRV+gqJBVWeo31PDVNQl110f1p3pWuj1og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MDYPOjoENi8E12ZGh09JPFFEqHRoEuGQSPCBriKA4BBcAIJDcAEIDsEFIDgU5+GFzu6zYcMGA3wguODFljAyis0XXUUAwaHFBS+qVKniznEI+EBwwYulS5ca4AtdRQDBocUFL9RVBHwhuOAFXUX4RFcRQHAILgDBoasIL0qXLs3MeXhDcMGLNWvWGOALXUUAwSG4AASH4IIXpUqV4rj58IYaF7xYt26dAb7Q4gIQHIILQHDoKsILjoAKnwgueMERUOETXUUAwSG4AASHriK8qFSpEjUueENwwYvly5cb4AtdRQDBIbgABIfgAhAcalzwguI8fCK44AXFefhEVxFAcAguAMEh4kfjTAAAEABJREFUuAAEh+ACEByCC0BwCC4AwSG4AASHeVzwonLlykxAhTcEF7xYtmyZAb7QVQQQHIILQHAILgDBocYFLzg9GXwiuOAFpyeDT3QVAQSH4AIQHLqK8IIjoMInggtecARU+ERXEUBwCC4AwaGrCC9KlixJjQveEFzwYv369Qb4QlcRQHAILgDBoasIL8qUKUN3Ed4QXPBi9erVBvhCVxFAcAguAMGhqwgvqlatSo0L3hBc8GLJkiUG+EJXEWmZPn26tWrVKuX1ta5uA6SD4EJajjnmGBdEhx56aI7Lq1Sp4g5tk0jraF3dBkgHwYW0PfLII/bTTz/ZjjvuaL/99pu7bOnSpfFD2+gyXad1tC6QLoILaWvevLkdeOCB7jjz++23n02dOjV+3bRp09xluk7raF0gXQQXMmLMmDFWvnx5++eff+yss86yTz/91C0dOnRwl+k6rQNkAsGFjFBXsHv37la2bFnXTXzjjTfcop91ma7TOkAmEFzImJtuusmFlKxatcotost0HZApBBcy6sEHH8wxmqifdRmQSQQXMkrF93r16sV/188U5JFpBBcyTkX4rbbayi0U5OFDMF/5ufXWW92CsOy9996GMFxzzTVuCUFQ31Xs16+f9e/f3wBk1oABA4I6hhpdRQDBIbgABIfgAhAcggtAcAguAMEhuAAEh+ACEByCC0BwCC4AwSG4AASH4PoXLFiwwIYOHWoLFy5Maf0PP/zQTjjhBPfz888/bxdddFHS2+joozqczJo1awzY0hBc/wIFysUXX5zScaoUPAqq6NAwRx99tD3xxBP21ltvFXi7K664ws477zx777337N/w5ZdfWpcuXeznn3+OX/byyy/b+eefb+latGiRPfTQQ/b777/blur777+34cOHG/JGcKVh5MiRVqJECXf2msLQBn3jjTda165d45fpaKFfffXVRuveeeed9vfff1vPnj3d79tvv737snm3bt3csdzzo3UGDhxoRxxxhP0bvvnmG3dGn5UrV8Yv00k0XnnlFUuXgkvP//3337ct1VNPPWWXXnqpIW8E179g1113teuvv9522mmn+GUXXHCBtW3bNsd6y5Ytc8GlD3CpUqXil6slpWO5Kzjzo5ZZ7969rXTp0gZsaQiuzdiUKVNceDVt2jTH5RUqVLBGjRrZiy++aEBxVCyDa/bs2e60WWr57LzzznbmmWfan3/+mWOdk046yS677DLXpdtnn31cF00tn+gEEPlJ5XZvv/2262Lq/3nz5rmf1a36/PPP3c+NGzd267377rtWo0YN22233Tb6O/Xr13fXr1+/Ps/Hcdttt1mZMmXiv+vvd+7c2WrVqmWVK1e2ww8/3O666658by8zZ860du3aubPz6ICAaulFr9Ptt99uJ554ou2www7u8al2FZ0MtjCibp/eB92PusRr167NsY66hC1atLBtttnGnQVbzzsVqbzPeo302nfs2NE9lzp16tgDDzyQ9L4fffRRO/bYY+OvZe7HlMrro1Zzr169rG7duu5zctppp9lnn32WY50vvvjC3b/ODN6qVSubO3euoRgGl1owCpdvv/3WfbhuuOEGe+edd1zxe8OGDTnWVfH8448/di0bfZhVLL3vvvuS/o3C3E4f2DfffNM9pr322sv9rBFH0Ya377775nm7PfbYw9W+8qqL5eW///2vPffcc3bhhRfa448/bg0bNnTF8twhEdFGpddEReJ77rnHLr/8cps1a5Z7/WT//fd3XVttwHoNX3vtNdf9Law2bdq4x6XAuuqqq+yZZ55xAwsRnQ27ZcuWboPV69KpUycbMmRI0vstzPusv61w++ijj6x169au2/7JJ5/ke99qCZ999tlWsmRJ917XrFnThZR2QpFUXh8F6ZNPPmnnnnuu+4xo55I4mLFu3Tq75JJLXOjpc6TPA3WvLEEdATUTRowY4fbyH3zwgWvNSO3atV0rZ8KECXbKKafE11WQPPvss+7Y6doT/+c//3HTDJIpzO106i797dGjR7sPftTaksWLF7sNKi/VqlVz/6fa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" alt=""></div></div>
+<div class="sect2">
+<h3 id="weave-instance-is-started"><a class="anchor" href="#weave-instance-is-started"></a>Weave instance is started</h3>
+
+</div>
+<div class="sect2">
+<h3 id="actions-are-registered"><a class="anchor" href="#actions-are-registered"></a>Actions are registered</h3>
+<div class="paragraph">
+<p>The <code>getName</code> method is used to identify the action.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="rendering-cycle"><a class="anchor" href="#rendering-cycle"></a>Rendering cycle</h3>
+<div class="paragraph">
+<p>After the first render, the <code>init</code> method of every action is called.</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<div class="title">Decoupled from the lifecycle</div>
+<div class="paragraph">
+<p>The following methods are called outside the lifecycle:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>When an user want to trigger an action, the <code>trigger</code> function is called.</p>
+</li>
+<li>
+<p>When the action finishes or the user cancel the action, the <code>cleanup</code> function is called.</p>
+</li>
+</ul>
+</div>
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="available-actions"><a class="anchor" href="#available-actions"></a>Available actions</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Weave.js team maintain a set of <strong>actions</strong>, think of them as how the users interact with
+the canvas to build visual collaborative applications. This are the actions:</p>
+</div>
+<div class="docouture-card-grid docouture-card-grid--cols-1 docouture-card-grid--cols-s-2 docouture-card-grid--cols-m-4 docouture-card-grid--width-container"><div class="dt-card dt-card--vertical docouture-card"><div class="dt-card__content"><div class="docouture-card__header"><span class="docouture-card__subheader">UX</span></div><div class="docouture-card__main"><div class="docouture-card__title"><a href="eraser-tool/" class="xref page">Eraser Tool</a></div><p>Allows users to erase (delete) elements of the canvas. When enabled the user can click on an element and it will be erased.</p></div></div></div><div class="dt-card dt-card--vertical docouture-card"><div class="dt-card__content"><div class="docouture-card__header"><span class="docouture-card__subheader">UX</span></div><div class="docouture-card__main"><div class="docouture-card__title"><a href="move-tool/" class="xref page">Move Tool</a></div><p>Allows users to enable/disable the panning of canvas. When enabled the user can pan the canvas at its will.</p></div></div></div><div class="dt-card dt-card--vertical docouture-card"><div class="dt-card__content"><div class="docouture-card__header"><span class="docouture-card__subheader">UX</span></div><div class="docouture-card__main"><div class="docouture-card__title"><a href="selection-tool/" class="xref page">Selection Tool</a></div><p>Allows users to enable/disable the selection mode of the canvas. When enabled the users can select nodes, move then, resize them, etc.</p></div></div></div><div class="dt-card dt-card--vertical docouture-card"><div class="dt-card__content"><div class="docouture-card__header"><span class="docouture-card__subheader">Collaboration</span></div><div class="docouture-card__main"><div class="docouture-card__title"><a href="comment-tool/" class="xref page">Comment Tool</a></div><p>Enables users to add comments on top of the stage, helpful to make collaborative work seamless.</p></div></div></div><div class="dt-card dt-card--vertical docouture-card"><div class="dt-card__content"><div class="docouture-card__header"><span class="docouture-card__subheader">Nodes</span></div><div class="docouture-card__main"><div class="docouture-card__title"><a href="brush-tool/" class="xref page">Brush Tool</a></div><p>Enables users to paint freeform strokes on the canvas, similar to a digital brush.</p></div></div></div><div class="dt-card dt-card--vertical docouture-card"><div class="dt-card__content"><div class="docouture-card__header"><span class="docouture-card__subheader">Nodes</span></div><div class="docouture-card__main"><div class="docouture-card__title"><a href="connector-tool/" class="xref page">Connector Tool</a></div><p>Enables users to add new connector nodes to the canvas by clicking between two nodes anchor points.</p></div></div></div><div class="dt-card dt-card--vertical docouture-card"><div class="dt-card__content"><div class="docouture-card__header"><span class="docouture-card__subheader">Nodes</span></div><div class="docouture-card__main"><div class="docouture-card__title"><a href="ellipse-tool/" class="xref page">Ellipse Tool</a></div><p>Enables users to create new ellipse nodes on the canvas.</p></div></div></div><div class="dt-card dt-card--vertical docouture-card"><div class="dt-card__content"><div class="docouture-card__header"><span class="docouture-card__subheader">Nodes</span></div><div class="docouture-card__main"><div class="docouture-card__title"><a href="image-tool/" class="xref page">Image Tool</a></div><p>Enables users to add and image to the canvas by selecting a file, drag &amp; drop from your application, drag &amp; drop external file or when copying from an external source.</p></div></div></div><div class="dt-card dt-card--vertical docouture-card"><div class="dt-card__content"><div class="docouture-card__header"><span class="docouture-card__subheader">Nodes</span></div><div class="docouture-card__main"><div class="docouture-card__title"><a href="images-tool/" class="xref page">Images Tool</a></div><p>Enables users to add multiple images to the canvas by selecting files, drag &amp; drop files from your application, or drag &amp; drop external files.</p></div></div></div><div class="dt-card dt-card--vertical docouture-card"><div class="dt-card__content"><div class="docouture-card__header"><span class="docouture-card__subheader">Nodes</span></div><div class="docouture-card__main"><div class="docouture-card__title"><a href="measure-tool/" class="xref page">Measure Tool</a></div><p>Enables users to add new measure nodes to the canvas by clicking or touching on it.</p></div></div></div><div class="dt-card dt-card--vertical docouture-card"><div class="dt-card__content"><div class="docouture-card__header"><span class="docouture-card__subheader">Nodes</span></div><div class="docouture-card__main"><div class="docouture-card__title"><a href="rectangle-tool/" class="xref page">Rectangle Tool</a></div><p>Enables users to create new rectangle nodes on the canvas.</p></div></div></div><div class="dt-card dt-card--vertical docouture-card"><div class="dt-card__content"><div class="docouture-card__header"><span class="docouture-card__subheader">Nodes</span></div><div class="docouture-card__main"><div class="docouture-card__title"><a href="polygon-tool/" class="xref page">Polygon Tool</a></div><p>Enables users to place a polygon node on the canvas using a preset shape (triangle, diamond, pentagon, hexagon, octagon or decagon).</p></div></div></div><div class="dt-card dt-card--vertical docouture-card"><div class="dt-card__content"><div class="docouture-card__header"><span class="docouture-card__subheader">Nodes</span></div><div class="docouture-card__main"><div class="docouture-card__title"><a href="star-tool/" class="xref page">Star Tool</a></div><p>Enables users to add new star nodes to the canvas by clicking or touching on it.</p></div></div></div><div class="dt-card dt-card--vertical docouture-card"><div class="dt-card__content"><div class="docouture-card__header"><span class="docouture-card__subheader">Nodes</span></div><div class="docouture-card__main"><div class="docouture-card__title"><a href="stroke-tool/" class="xref page">Stroke Tool</a></div><p>Enables users to create a single-stroke line on the canvas. With the possibility to define the stoke tips format.</p></div></div></div><div class="dt-card dt-card--vertical docouture-card"><div class="dt-card__content"><div class="docouture-card__header"><span class="docouture-card__subheader">Nodes</span></div><div class="docouture-card__main"><div class="docouture-card__title"><a href="text-tool/" class="xref page">Text Tool</a></div><p>Enables users to add new text nodes to the canvas by clicking or touching on it.</p></div></div></div><div class="dt-card dt-card--vertical docouture-card"><div class="dt-card__content"><div class="docouture-card__header"><span class="docouture-card__subheader">Nodes</span></div><div class="docouture-card__main"><div class="docouture-card__title"><a href="video-tool/" class="xref page">Video Tool</a></div><p>Enables users to add videos to the canvas by selecting a file.</p></div></div></div><div class="dt-card dt-card--vertical docouture-card"><div class="dt-card__content"><div class="docouture-card__header"><span class="docouture-card__subheader">Nodes</span></div><div class="docouture-card__main"><div class="docouture-card__title"><a href="arrow-tool/" class="xref page">Arrow Tool (deprecated)</a></div><p>Enables users to add new arrow nodes to the canvas by clicking or touching on it.</p></div><div class="docouture-card__meta"><span class="dt-label dt-label--grey"><span class="dt-label__content">deprecated</span></span></div></div></div><div class="dt-card dt-card--vertical docouture-card"><div class="dt-card__content"><div class="docouture-card__header"><span class="docouture-card__subheader">Nodes</span></div><div class="docouture-card__main"><div class="docouture-card__title"><a href="line-tool/" class="xref page">Line Tool (deprecated)</a></div><p>Enables users to create a simple line on the canvas.</p></div><div class="docouture-card__meta"><span class="dt-label dt-label--grey"><span class="dt-label__content">deprecated</span></span></div></div></div><div class="dt-card dt-card--vertical docouture-card"><div class="dt-card__content"><div class="docouture-card__header"><span class="docouture-card__subheader">Nodes</span></div><div class="docouture-card__main"><div class="docouture-card__title"><a href="pen-tool/" class="xref page">Pen Tool (deprecated)</a></div><p>Enables users to create continuos lines on the canvas with N segments on the canvas.</p></div><div class="docouture-card__meta"><span class="dt-label dt-label--grey"><span class="dt-label__content">deprecated</span></span></div></div></div><div class="dt-card dt-card--vertical docouture-card"><div class="dt-card__content"><div class="docouture-card__header"><span class="docouture-card__subheader">Nodes</span></div><div class="docouture-card__main"><div class="docouture-card__title"><a href="regular-polygon-tool/" class="xref page">Regular Polygon Tool (deprecated)</a></div><p>Enables users to create new regular polygons nodes on the canvas.</p></div><div class="docouture-card__meta"><span class="dt-label dt-label--grey"><span class="dt-label__content">deprecated</span></span></div></div></div><div class="dt-card dt-card--vertical docouture-card"><div class="dt-card__content"><div class="docouture-card__header"><span class="docouture-card__subheader">Grouping</span></div><div class="docouture-card__main"><div class="docouture-card__title"><a href="frame-tool/" class="xref page">Frame Tool</a></div><p>Enables users to create frame nodes by clicking on the canvas.</p></div></div></div><div class="dt-card dt-card--vertical docouture-card"><div class="dt-card__content"><div class="docouture-card__header"><span class="docouture-card__subheader">Alignment</span></div><div class="docouture-card__main"><div class="docouture-card__title"><a href="align-nodes-tool/" class="xref page">Align Nodes Tool</a></div><p>Allows users to users to align selected nodes vertically or horizontally.</p></div></div></div><div class="dt-card dt-card--vertical docouture-card"><div class="dt-card__content"><div class="docouture-card__header"><span class="docouture-card__subheader">Zooming</span></div><div class="docouture-card__main"><div class="docouture-card__title"><a href="fit-to-screen-tool/" class="xref page">Fit to Screen Tool</a></div><p>Automatically adjusts the zoom and position of the canvas to ensure all visible nodes fit neatly within the viewport.</p></div></div></div><div class="dt-card dt-card--vertical docouture-card"><div class="dt-card__content"><div class="docouture-card__header"><span class="docouture-card__subheader">Zooming</span></div><div class="docouture-card__main"><div class="docouture-card__title"><a href="fit-to-selection-tool/" class="xref page">Fit to Selection Tool</a></div><p>Automatically adjusts the zoom and position of the canvas to ensure all selected nodes fit neatly within the viewport.</p></div></div></div><div class="dt-card dt-card--vertical docouture-card"><div class="dt-card__content"><div class="docouture-card__header"><span class="docouture-card__subheader">Zooming</span></div><div class="docouture-card__main"><div class="docouture-card__title"><a href="zoom-in-tool/" class="xref page">Zoom In Tool</a></div><p>Enables users to incrementally zoom into the canvas, providing a more detailed view of content.</p></div></div></div><div class="dt-card dt-card--vertical docouture-card"><div class="dt-card__content"><div class="docouture-card__header"><span class="docouture-card__subheader">Zooming</span></div><div class="docouture-card__main"><div class="docouture-card__title"><a href="zoom-out-tool/" class="xref page">Zoom Out Tool</a></div><p>Enables users to incrementally zoom out the canvas, providing a more general view of content.</p></div></div></div><div class="dt-card dt-card--vertical docouture-card"><div class="dt-card__content"><div class="docouture-card__header"><span class="docouture-card__subheader">Export</span></div><div class="docouture-card__main"><div class="docouture-card__title"><a href="export-node-tool/" class="xref page">Export Node Tool</a></div><p>Automatically adjusts the zoom and position of the canvas to ensure all selected nodes fit neatly within the viewport, and then proceeds to export the viewport as an image.</p></div></div></div><div class="dt-card dt-card--vertical docouture-card"><div class="dt-card__content"><div class="docouture-card__header"><span class="docouture-card__subheader">Export</span></div><div class="docouture-card__main"><div class="docouture-card__title"><a href="export-stage-tool/" class="xref page">Export Stage Tool</a></div><p>Automatically adjusts the zoom and position of the canvas to ensure all visible nodes fit neatly within the viewport, and then proceeds to export the viewport as an image.</p></div></div></div></div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="custom-actions"><a class="anchor" href="#custom-actions"></a>Custom Actions</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Developers can also build their own <strong>actions</strong>, empowering this way their applications
+with new interactions closer to the needs of their applications.</p>
+</div>
+<div class="paragraph">
+<p>For this we provide an extension mechanism that allows to define your own actions and use them
+on your application.</p>
+</div>
+<div class="sect2">
+<h3 id="weaveaction-class"><a class="anchor" href="#weaveaction-class"></a>WeaveAction class</h3>
+<div class="paragraph">
+<p>In Weave.js a Action is a class that extends the
+<a href="https://github.com/InditexTech/weavejs/blob/main/code/packages/sdk/src/actions/action.ts">WeaveAction</a>
+abstract class, and implements a set of methods that define the Action behavior.</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<div class="title">Access the Weave instance</div>
+<div class="paragraph">
+<p>You can access Weave.js main instance via <code>this.instance</code>.</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>To build an action, create a class that extends the <a href="https://github.com/InditexTech/weavejs/blob/main/code/packages/sdk/src/actions/action.ts">WeaveAction</a>
+abstract class, and implement the following methods:</p>
+</div>
+<div class="sect3">
+<h4 id="getname"><a class="anchor" href="#getname"></a>getName</h4>
+<div class="listingblock">
+<div class="content">
+<pre class="shiki highlight"><code data-lang="ts"><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4;--shiki-light-bg:#1E1E1E;--shiki-dark-bg:#1E1E1E"><span class="line"><span style="--shiki-light:#DCDCAA;--shiki-dark:#DCDCAA">getName</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">(): </span><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">string</span></span></span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The <code>getName</code> method returns the name of the action, used as an identifier
+on the Weave instance. The name of the action must be unique among other actions.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="oninit"><a class="anchor" href="#oninit"></a>onInit</h4>
+<div class="listingblock">
+<div class="content">
+<pre class="shiki highlight"><code data-lang="ts"><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4;--shiki-light-bg:#1E1E1E;--shiki-dark-bg:#1E1E1E"><span class="line"><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">onInit</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">?(): </span><span style="--shiki-light:#4EC9B0;--shiki-dark:#4EC9B0">void</span></span></span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The <code>onInit</code> method is optional, and is called after the first render of the
+Weave instance. It&#8217;s a good place to initialize the action state, events, etc.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="trigger"><a class="anchor" href="#trigger"></a>trigger</h4>
+<div class="listingblock">
+<div class="content">
+<pre class="shiki highlight"><code data-lang="ts"><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4;--shiki-light-bg:#1E1E1E;--shiki-dark-bg:#1E1E1E"><span class="line"><span style="--shiki-light:#DCDCAA;--shiki-dark:#DCDCAA">trigger</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">(</span><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">cancelAction</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">: () </span><span style="--shiki-light:#569CD6;--shiki-dark:#569CD6">=></span><span style="--shiki-light:#569CD6;--shiki-dark:#569CD6"> void</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">, </span><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">params</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">?: </span><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">unknown</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">): </span><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">unknown</span></span></span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>When a user wants to call an action, the <code>trigger</code> method is called, it receives
+the following parameters:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>cancelAction: () &#8658; void</code>: a callback that we call when then user wants to cancel
+the action, or if the action itself finishes.</p>
+</li>
+<li>
+<p><code>params?: unknown</code>: an optional parameter that the user can pass to the action, dependencies
+on the action implementation.</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect3">
+<h4 id="internalupdate"><a class="anchor" href="#internalupdate"></a>internalUpdate</h4>
+<div class="listingblock">
+<div class="content">
+<pre class="shiki highlight"><code data-lang="ts"><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4;--shiki-light-bg:#1E1E1E;--shiki-dark-bg:#1E1E1E"><span class="line"><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">internalUpdate</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">?(): </span><span style="--shiki-light:#4EC9B0;--shiki-dark:#4EC9B0">void</span></span></span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>An action instance is wrapped with the
+<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Proxy">Proxy</a>
+object, which enables us to intercept the <code>get</code> and <code>set</code> operations on the action instance.</p>
+</div>
+<div class="paragraph">
+<p>The <code>internalUpdate</code> method is called when the for example the <code>props</code> property of the instance
+is updated (via get/set), allowing us to dynamically pass parameters to an action after this is
+triggered.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="cleanup"><a class="anchor" href="#cleanup"></a>cleanup</h4>
+<div class="listingblock">
+<div class="content">
+<pre class="shiki highlight"><code data-lang="ts"><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4;--shiki-light-bg:#1E1E1E;--shiki-dark-bg:#1E1E1E"><span class="line"><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">cleanup</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">?(): </span><span style="--shiki-light:#4EC9B0;--shiki-dark:#4EC9B0">void</span></span></span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The <code>cleanup</code> method is called when the action finishes or the user cancel the action. It&#8217;s a
+good place to clean up the action state, events, etc.</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+</article>
+  </div>
+</main>
+</div>
+
+
+<footer class="page-footer">
+  <div class="page-footer__nav">
+
+<div class="dt-grid-layout dt-grid-layout--with-margin pagination">
+  <div class="dt-grid-layout__item dt-grid-layout__item--span-full pagination__row">
+    <div class="pagination__buttons">
+    <a class="dt-button dt-button--ghost dt-button--icon-and-label dt-button--icon-icon pagination__prev" href="../plugins/users-selector/">
+      <span class="dt-button__content">
+        <span class="dt-button__icon dt-button__icon-icon"><svg class="dt-icon" aria-hidden="true" focusable="false"><use href="../../../../_/img/icons.svg#icon-arrow-left"></use></svg></span>
+        <span class="pagination__label-full">Users Selector</span>
+        <span class="pagination__label-short">Prev</span>
+      </span>
+    </a>
+    <a class="dt-button dt-button--ghost dt-button--icon-and-label dt-button--icon-action pagination__next" href="align-nodes-tool/">
+      <span class="dt-button__content">
+        <span class="pagination__label-full">Align Nodes Tool</span>
+        <span class="pagination__label-short">Next</span>
+        <span class="dt-button__icon dt-button__icon-action"><svg class="dt-icon" aria-hidden="true" focusable="false"><use href="../../../../_/img/icons.svg#icon-arrow-right"></use></svg></span>
+      </span>
+    </a>
+    </div>
+  </div>
+</div>
+  </div>
+  <div class="dt-grid-layout dt-grid-layout--with-margin page-footer__feedback">
+    <div class="dt-grid-layout__item dt-grid-layout__item--span-full page-footer__contribute">
+      <div class="page-footer__contribute-copy">
+        <p class="dt-text dt-text--title-s">Help us make these docs great!</p>
+        <p class="dt-text dt-text--body-m">See something that is wrong or unclear? Collaborate with us! Submit a pull request</p>
+      </div>
+      <div class="page-footer__contribute-buttons">
+
+<a class="dt-button dt-button--ghost dt-button--icon-and-label dt-button--icon-action page-footer__propose-change" href="https://github.com/InditexTech/weavejs/edit/main/docs/src/modules/main/pages/build/actions/index.adoc">
+  <span class="dt-button__content">
+    Propose a change
+    <span class="dt-button__icon dt-button__icon-action"><svg class="dt-icon" aria-hidden="true" focusable="false"><use href="../../../../_/img/icons.svg#icon-external-link"></use></svg></span>
+  </span>
+</a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+
+<script id="site-script" src="../../../../_/js/site.js" data-ui-root-path="../../../../_"></script>
+
+<footer class="site-footer">
+  <div class="dt-grid-layout dt-grid-layout--with-margin site-footer__grid">
+    <div class="dt-grid-layout__item site-footer__col site-footer__brand">
+      <a class="site-footer__brand-link" href="../../../../5.2.1/">
+        <img class="site-footer__logo" src="../../../../_/product-logo.png" width="24" height="24" alt="">
+        <span class="dt-text dt-text--label-l-high">Weave.js</span>
+      </a>
+      <span class="dt-text dt-text--detail-m site-footer__legal">&#169; 2026 InditexTech</span>
+    </div>
+    <div class="dt-grid-layout__item site-footer__col site-footer__links">
+      <span class="dt-text dt-text--label-l site-footer__heading">Resources</span>
+      <a class="dt-text dt-text--body-l site-footer__link" href="../../quickstart/">Quickstart</a>
+      <a class="dt-text dt-text--body-l site-footer__link" href="../../../sdk/">SDK</a>
+      <a class="dt-text dt-text--body-l site-footer__link" href="../../../react/">React Helper</a>
+      <a class="dt-text dt-text--body-l site-footer__link" href="../stores/">Stores</a>
+      <a class="dt-text dt-text--body-l site-footer__link" href="https://github.com/InditexTech/weavejs">Repository</a>
+    </div>
+    <div class="dt-grid-layout__item site-footer__col site-footer__links">
+      <span class="dt-text dt-text--label-l site-footer__heading">Modules</span>
+      <a class="dt-text dt-text--body-l site-footer__link" href="../../">Framework</a>
+      <a class="dt-text dt-text--body-l site-footer__link" href="../../../sdk/">SDK</a>
+      <a class="dt-text dt-text--body-l site-footer__link" href="../../../react/">React Helper</a>
+      <a class="dt-text dt-text--body-l site-footer__link" href="../../../store-websockets/">Websockets Store</a>
+      <a class="dt-text dt-text--body-l site-footer__link" href="../../../store-azure-web-pubsub/">Azure Web Pubsub Store</a>
+      <a class="dt-text dt-text--body-l site-footer__link" href="../../../store-standalone/">Standalone Store</a>
+      <a class="dt-text dt-text--body-l site-footer__link" href="../../../types/">TypeScript Types</a>
+    </div>
+  </div>
+</footer>
+  </body>
+</html>

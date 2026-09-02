@@ -1,0 +1,1013 @@
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+
+
+<meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <script>
+      /*
+       * Theme bootstrap. Runs before first paint so the page never flashes the
+       * wrong theme. Keep it inline, keep it tiny, and keep it in sync with
+       * src/js/08-theme.ts, which owns the same storage key and class names.
+       *
+       * IDS switches theme with a class on <html>, not a data attribute, so an
+       * attribute here would style nothing.
+       */
+      (function () {
+        var stored
+        try { stored = localStorage.getItem('dt-theme') } catch (e) {}
+        var theme = stored === 'light' || stored === 'dark'
+          ? stored
+          : window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
+        var root = document.documentElement
+        root.classList.add('dt-theme-' + theme, 'dt-scale-medium')
+        root.style.colorScheme = theme
+      })()
+    </script>
+    <script>
+      /*
+       * Side-menu collapse bootstrap (GH-8). Runs before first paint so the
+       * 320px column never flashes in and reflows the article on navigation.
+       * Keep it inline, keep it tiny, and keep it in sync with
+       * src/js/01-nav.ts, which owns the same storage key and class name.
+       *
+       * A stored choice always wins; absent one, the menu starts collapsed
+       * on the home/landing page (matching Figma's "State=Home" toolbar
+       * variant, which is the only one that shows the toggle) and open
+       * everywhere else. With JavaScript disabled this script never runs, so
+       * the class is never added and the menu stays open unconditionally —
+       * the toggle that would reopen it is also never unhidden.
+       */
+      (function () {
+        var stored
+        try { stored = localStorage.getItem('docouture-side-menu') } catch (e) {}
+        var collapsed = stored === 'collapsed' || stored === 'open'
+          ? stored === 'collapsed'
+          : document.documentElement.hasAttribute('data-page-home')
+        if (collapsed) document.documentElement.classList.add('is-side-menu-collapsed')
+      })()
+    </script>
+    <script>
+      /*
+       * ToC collapse bootstrap (GH-10). Runs before first paint so a closed
+       * choice never flashes open for an instant. Keep it in sync with
+       * src/js/02-on-this-page.ts, which owns the same storage key and class
+       * name.
+       *
+       * Deliberately does NOT add `has-toc` — only 02-on-this-page.ts knows
+       * whether this page actually has a usable ToC (headings found, page
+       * not `-toc`), and every effect of the class added here is itself
+       * gated behind `has-toc` in toc.css, so there is nothing to flash
+       * either way before that script runs. This one exists only so a
+       * *closed* choice is already in place the moment it does.
+       */
+      (function () {
+        var stored
+        try { stored = localStorage.getItem('docouture-toc') } catch (e) {}
+        if (stored === 'closed') document.documentElement.classList.add('is-toc-closed')
+      })()
+    </script>
+
+<title>WeaveAzureWebPubsubServer | Weave.js</title>
+
+    <link rel="canonical" href="https://inditextech.github.io/weavejs/5.2.1/store-azure-web-pubsub/api-reference/server/weave-azure-web-pubsub-server/">
+    <link rel="prev" href="../../../setup/">
+    <link rel="next" href="../../client/weave-store-azure-web-pubsub/">
+    <meta name="description" content="API reference for the WeaveAzureWebPubsubServer class">
+    <meta name="generator" content="Antora 3.2.0">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&family=Noto+Sans+Mono:wght@100..900&display=swap">
+    <link rel="stylesheet" href="../../../../../_/css/site.css">
+    <style>:root { --home-background-image: url("/weavejs/_/home-background.jpg") }</style>
+
+
+
+    <link rel="icon" href="../../../../../_/favicon.ico">
+  </head>
+  <body class="article">
+
+
+
+<header class="header-toolbar">
+  <div class="dt-grid-layout dt-grid-layout--with-margin header-toolbar__grid">
+    <div class="dt-grid-layout__item dt-grid-layout__item--span-6 dt-grid-layout__item--span-xs-3 header-toolbar__left">
+      <button class="dt-button dt-button--ghost dt-button--icon-only side-menu-toggle" type="button" aria-controls="side-menu" hidden>
+        <span class="dt-button__content">
+          <span class="dt-button__icon dt-button__icon-icon"><svg class="dt-icon" aria-hidden="true" focusable="false"><use href="../../../../../_/img/icons.svg#icon-menu"></use></svg></span>
+        </span>
+      </button>
+      <a class="header-toolbar__brand" href="../../../../../5.2.1/">
+        <img class="header-toolbar__logo" src="../../../../../_/product-logo.png" width="24" height="24" alt="">
+        <span class="header-toolbar__product-name dt-text dt-text--label-l-high">Weave.js</span>
+      </a>
+    </div>
+    <div class="dt-grid-layout__item dt-grid-layout__item--span-6 dt-grid-layout__item--span-xs-3 header-toolbar__actions">
+      <button type="button" class="dt-button dt-button--ghost header-toolbar__search-trigger">
+        <span class="dt-button__content">
+          <span class="dt-button__icon dt-button__icon-icon"><svg class="dt-icon" aria-hidden="true" focusable="false"><use href="../../../../../_/img/icons.svg#icon-search"></use></svg></span>
+          <span class="dt-text dt-text--label-l header-toolbar__search-label">Search</span>
+          <kbd class="header-toolbar__search-shortcut" aria-hidden="true">⌘K</kbd>
+        </span>
+      </button>
+
+<div class="page-versions">
+  <button type="button" class="dt-tag dt-tag--solid dt-tag--selected header-toolbar__version header-toolbar__version--prerelease version-menu-toggle" title="Show other versions of page" aria-expanded="false">
+    <span class="dt-tag__label">prerelease</span>
+    <span class="dt-tag__icon"><svg class="dt-icon" aria-hidden="true" focusable="false"><use href="../../../../../_/img/icons.svg#icon-chevron-down"></use></svg></span>
+  </button>
+  <div class="version-menu">
+    <span class="version is-current" aria-current="page">
+      <span class="version__label">prerelease</span>
+      <span class="dt-label dt-label--orange"><span class="dt-label__content">Prerelease</span></span>
+    </span>
+    <a class="version" href="../../../../../5.2.1/store-azure-web-pubsub/api-reference/server/weave-azure-web-pubsub-server/">
+      <span class="version__label">5.2.1</span>
+      <span class="dt-label dt-label--green"><span class="dt-label__content">Latest</span></span>
+          </a>
+  </div>
+</div>
+
+<a class="dt-button dt-button--ghost dt-button--icon-only header-toolbar__repo" href="https://github.com/InditexTech/weavejs" target="_blank" rel="noopener" aria-label="Repository">
+  <span class="dt-button__content">
+    <span class="dt-button__icon dt-button__icon-icon header-toolbar__repo-icon" aria-hidden="true"></span>
+  </span>
+</a>
+
+<button class="dt-button dt-button--ghost dt-button--icon-only theme-toggle" type="button" hidden>
+  <span class="dt-button__content">
+    <span class="dt-button__icon dt-button__icon-icon theme-toggle-icon theme-toggle-icon--light" aria-hidden="true"><svg class="dt-icon" aria-hidden="true" focusable="false"><use href="../../../../../_/img/icons.svg#icon-sun"></use></svg></span>
+    <span class="dt-button__icon dt-button__icon-icon theme-toggle-icon theme-toggle-icon--dark" aria-hidden="true"><svg class="dt-icon" aria-hidden="true" focusable="false"><use href="../../../../../_/img/icons.svg#icon-moon"></use></svg></span>
+  </span>
+</button>
+    </div>
+  </div>
+</header>
+
+<dialog id="search-dialog" class="search-dialog" aria-label="Search" data-search-index="ROOT-prerelease.json">
+  <div class="dt-overlay dt-overlay--visible search-dialog__overlay">
+    <div class="dt-overlay__content"></div>
+    <div class="dt-modal dt-modal--small search-dialog__panel">
+      <div class="dt-modal__container search-dialog__container">
+        <div class="dt-search-field-minimal dt-search-field-minimal--full-width search-dialog__field">
+          <span class="dt-search-field-minimal__icon-start" aria-hidden="true"><svg class="dt-icon" aria-hidden="true" focusable="false"><use href="../../../../../_/img/icons.svg#icon-search"></use></svg></span>
+          <div class="dt-search-field-minimal__input-wrapper">
+            <div class="dt-search-field-minimal__input-container">
+              <input type="search" class="dt-search-field-minimal__input" placeholder="Search the docs" aria-label="Search the docs"
+                role="combobox" aria-expanded="false" aria-haspopup="listbox" aria-autocomplete="list"
+                aria-controls="search-dialog-listbox" disabled>
+            </div>
+          </div>
+          <button type="button" class="dt-button dt-button--ghost dt-button--icon-only search-dialog__close" aria-label="Close search" disabled>
+            <span class="dt-button__content">
+              <span class="dt-button__icon dt-button__icon-icon"><svg class="dt-icon" aria-hidden="true" focusable="false"><use href="../../../../../_/img/icons.svg#icon-x"></use></svg></span>
+            </span>
+          </button>
+        </div>
+        <div class="search-dialog__chips" role="group" aria-label="Filter results by module">
+          <button type="button" class="dt-tag dt-tag--solid dt-tag--selected search-dialog__chip" data-category="" aria-pressed="true">
+            <span class="dt-tag__label">All</span>
+          </button>
+          <button type="button" class="dt-tag dt-tag--solid search-dialog__chip" data-category="Framework" aria-pressed="false">
+            <span class="dt-tag__label">Framework</span>
+          </button>
+          <button type="button" class="dt-tag dt-tag--solid search-dialog__chip" data-category="SDK" aria-pressed="false">
+            <span class="dt-tag__label">SDK</span>
+          </button>
+          <button type="button" class="dt-tag dt-tag--solid search-dialog__chip" data-category="React Helper" aria-pressed="false">
+            <span class="dt-tag__label">React Helper</span>
+          </button>
+          <button type="button" class="dt-tag dt-tag--solid search-dialog__chip" data-category="Websockets Store" aria-pressed="false">
+            <span class="dt-tag__label">Websockets Store</span>
+          </button>
+          <button type="button" class="dt-tag dt-tag--solid search-dialog__chip" data-category="Azure Web Pubsub Store" aria-pressed="false">
+            <span class="dt-tag__label">Azure Web Pubsub Store</span>
+          </button>
+          <button type="button" class="dt-tag dt-tag--solid search-dialog__chip" data-category="Standalone Store" aria-pressed="false">
+            <span class="dt-tag__label">Standalone Store</span>
+          </button>
+          <button type="button" class="dt-tag dt-tag--solid search-dialog__chip" data-category="TypeScript Types" aria-pressed="false">
+            <span class="dt-tag__label">TypeScript Types</span>
+          </button>
+        </div>
+        <div id="search-dialog-listbox" class="dt-modal__content dt-modal__content--scrollable search-dialog__results" role="listbox" aria-label="Search results"></div>
+        <div class="search-dialog__status" aria-live="polite"></div>
+        <div class="dt-modal__footer dt-modal__footer--horizontal search-dialog__footer">
+          <span class="dt-modal__footer-left dt-text dt-text--detail-m search-dialog__hints">
+            <kbd>&uarr;&darr;</kbd> navigate &middot; <kbd>&crarr;</kbd> select &middot; <kbd>esc</kbd> close
+          </span>
+        </div>
+      </div>
+    </div>
+  </div>
+</dialog>
+<div class="dt-floating-button-wrapper dt-floating-button-wrapper--viewport dt-floating-button-wrapper--end search-fab">
+  <button type="button" class="dt-button dt-button--ghost dt-button--icon-only dt-floating-button search-fab__trigger" aria-label="Search" aria-haspopup="dialog" aria-controls="search-dialog">
+    <span class="dt-button__content">
+      <span class="dt-button__icon dt-button__icon-icon"><svg class="dt-icon" aria-hidden="true" focusable="false"><use href="../../../../../_/img/icons.svg#icon-search"></use></svg></span>
+    </span>
+  </button>
+</div>
+
+<dialog id="image-zoom-dialog" class="image-zoom-dialog" aria-label="Zoomed image">
+  <div class="dt-overlay dt-overlay--visible image-zoom-dialog__overlay">
+    <div class="dt-overlay__content"></div>
+    <div class="dt-modal dt-modal--fullscreen image-zoom-dialog__panel">
+      <div class="dt-modal__container image-zoom-dialog__container">
+        <button type="button" class="dt-button dt-button--ghost dt-button--icon-only image-zoom-dialog__close" aria-label="Close zoomed image">
+          <span class="dt-button__content">
+            <span class="dt-button__icon dt-button__icon-icon"><svg class="dt-icon" aria-hidden="true" focusable="false"><use href="../../../../../_/img/icons.svg#icon-x"></use></svg></span>
+          </span>
+        </button>
+        <div class="image-zoom-dialog__content"></div>
+      </div>
+    </div>
+  </div>
+</dialog>
+
+<div class="body">
+
+<div id="side-menu" class="side-menu" data-component="ROOT" data-version="prerelease" data-module="store-azure-web-pubsub">
+  <div class="side-menu__header">
+    <div class="side-menu__header-start">
+      <img class="side-menu__header-logo" src="../../../../../_/product-logo.png" width="24" height="24" alt="">
+      <span class="side-menu__header-title dt-text dt-text--title-s">Weave.js</span>
+    </div>
+    <button class="side-menu__close" type="button" aria-label="Close navigation"><svg class="dt-icon" aria-hidden="true" focusable="false"><use href="../../../../../_/img/icons.svg#icon-x"></use></svg></button>
+  </div>
+
+<div class="side-menu__brand">
+  <a class="side-menu__brand-link" href="../../../../../5.2.1/">
+    <img class="side-menu__brand-logo" src="../../../../../_/product-logo.png" width="40" height="40" alt="">
+    <span class="side-menu__brand-title dt-text dt-text--title-m">Weave.js</span>
+  </a>
+</div>
+
+<div class="nav-switcher">
+  <button class="nav-switcher__toggle" type="button" aria-expanded="false" aria-haspopup="true" aria-label="Switch module, currently Azure Web Pubsub Store">
+    <span class="nav-switcher__icon"><svg class="dt-icon" aria-hidden="true" focusable="false"><use href="../../../../../_/img/icons.svg#icon-cloud"></use></svg></span>
+    <span class="nav-switcher__label">
+      <span class="nav-switcher__title dt-text dt-text--body-m-high">Azure Web Pubsub Store</span>
+      <span class="nav-switcher__description dt-text dt-text--detail-m">Store implementation using Azure Web Pubsub as transport</span>
+    </span>
+    <span class="nav-switcher__chevron"><svg class="dt-icon" aria-hidden="true" focusable="false"><use href="../../../../../_/img/icons.svg#icon-chevron-down"></use></svg></span>
+  </button>
+  <div class="nav-switcher__menu" hidden>
+    <ul class="dt-list nav-switcher__list">
+      <li class="nav-switcher__item">
+        <a class="nav-switcher__option" href="../../../../main/">
+          <span class="nav-switcher__icon"><svg class="dt-icon" aria-hidden="true" focusable="false"><use href="../../../../../_/img/icons.svg#icon-grid-3x3"></use></svg></span>
+          <span class="nav-switcher__label">
+            <span class="nav-switcher__title dt-text dt-text--body-m-high">Framework</span>
+            <span class="nav-switcher__description dt-text dt-text--detail-m">The visual collaborative apps framework</span>
+          </span>
+        </a>
+      </li>
+      <li class="nav-switcher__item">
+        <a class="nav-switcher__option" href="../../../../sdk/">
+          <span class="nav-switcher__icon"><svg class="dt-icon" aria-hidden="true" focusable="false"><use href="../../../../../_/img/icons.svg#icon-code"></use></svg></span>
+          <span class="nav-switcher__label">
+            <span class="nav-switcher__title dt-text dt-text--body-m-high">SDK</span>
+            <span class="nav-switcher__description dt-text dt-text--detail-m">The visual collaborative tool headless library</span>
+          </span>
+        </a>
+      </li>
+      <li class="nav-switcher__item">
+        <a class="nav-switcher__option" href="../../../../react/">
+          <span class="nav-switcher__icon"><svg class="dt-icon" aria-hidden="true" focusable="false"><use href="../../../../../_/img/icons.svg#icon-wrench"></use></svg></span>
+          <span class="nav-switcher__label">
+            <span class="nav-switcher__title dt-text dt-text--body-m-high">React Helper</span>
+            <span class="nav-switcher__description dt-text dt-text--detail-m">Set of React components to help you integrate Weave.js</span>
+          </span>
+        </a>
+      </li>
+      <li class="nav-switcher__item">
+        <a class="nav-switcher__option" href="../../../../store-websockets/">
+          <span class="nav-switcher__icon"><svg class="dt-icon" aria-hidden="true" focusable="false"><use href="../../../../../_/img/icons.svg#icon-wifi"></use></svg></span>
+          <span class="nav-switcher__label">
+            <span class="nav-switcher__title dt-text dt-text--body-m-high">Websockets Store</span>
+            <span class="nav-switcher__description dt-text dt-text--detail-m">Store implementation using WebSockets as transport</span>
+          </span>
+        </a>
+      </li>
+      <li class="nav-switcher__item">
+        <a class="nav-switcher__option" href="../../../" aria-current="true">
+          <span class="nav-switcher__icon"><svg class="dt-icon" aria-hidden="true" focusable="false"><use href="../../../../../_/img/icons.svg#icon-cloud"></use></svg></span>
+          <span class="nav-switcher__label">
+            <span class="nav-switcher__title dt-text dt-text--body-m-high">Azure Web Pubsub Store</span>
+            <span class="nav-switcher__description dt-text dt-text--detail-m">Store implementation using Azure Web Pubsub as transport</span>
+          </span>
+        </a>
+      </li>
+      <li class="nav-switcher__item">
+        <a class="nav-switcher__option" href="../../../../store-standalone/">
+          <span class="nav-switcher__icon"><svg class="dt-icon" aria-hidden="true" focusable="false"><use href="../../../../../_/img/icons.svg#icon-server"></use></svg></span>
+          <span class="nav-switcher__label">
+            <span class="nav-switcher__title dt-text dt-text--body-m-high">Standalone Store</span>
+            <span class="nav-switcher__description dt-text dt-text--detail-m">Store implementation to render a Weave.js canvas in a direct way, just pass a room data.</span>
+          </span>
+        </a>
+      </li>
+      <li class="nav-switcher__item">
+        <a class="nav-switcher__option" href="../../../../types/">
+          <span class="nav-switcher__icon"><svg class="dt-icon" aria-hidden="true" focusable="false"><use href="../../../../../_/img/icons.svg#icon-file"></use></svg></span>
+          <span class="nav-switcher__label">
+            <span class="nav-switcher__title dt-text dt-text--body-m-high">TypeScript Types</span>
+            <span class="nav-switcher__description dt-text dt-text--detail-m">Package that contains the TypeScript types definitions</span>
+          </span>
+        </a>
+      </li>
+    </ul>
+  </div>
+</div>
+  <nav class="side-menu__nav" aria-label="Site navigation">
+
+
+<ul class="dt-list side-menu__list" data-depth="0">
+  <li class="side-menu__item side-menu__item--label">
+    <div class="side-menu__row">
+      <span class="dt-list-item side-menu__link--label dt-list-item--tree--level-0">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Introduction</span></span>
+      </span>
+    </div>
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-0"
+        href="../../../">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Overview</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-0"
+        href="../../../setup/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Setup</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item side-menu__item--label">
+    <div class="side-menu__row">
+      <span class="dt-list-item side-menu__link--label dt-list-item--tree--level-0">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">API Reference</span></span>
+      </span>
+    </div>
+  </li>
+  <li class="side-menu__item side-menu__item--group">
+
+<ul class="dt-list side-menu__list" data-depth="1">
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="./" aria-current="page">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">WeaveAzureWebPubsubServer</span></span>
+      </a>
+    </div>
+
+  </li>
+</ul>
+  </li>
+  <li class="side-menu__item side-menu__item--group">
+
+<ul class="dt-list side-menu__list" data-depth="1">
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="../../client/weave-store-azure-web-pubsub/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">WeaveStoreAzureWebPubsub</span></span>
+      </a>
+    </div>
+
+  </li>
+</ul>
+  </li>
+</ul>
+  </nav>
+  <div class="side-menu__version">
+
+<div class="page-versions">
+  <button type="button" class="dt-tag dt-tag--solid dt-tag--selected header-toolbar__version header-toolbar__version--prerelease version-menu-toggle" title="Show other versions of page" aria-expanded="false">
+    <span class="dt-tag__label">prerelease</span>
+    <span class="dt-tag__icon"><svg class="dt-icon" aria-hidden="true" focusable="false"><use href="../../../../../_/img/icons.svg#icon-chevron-down"></use></svg></span>
+  </button>
+  <div class="version-menu">
+    <span class="version is-current" aria-current="page">
+      <span class="version__label">prerelease</span>
+      <span class="dt-label dt-label--orange"><span class="dt-label__content">Prerelease</span></span>
+    </span>
+    <a class="version" href="../../../../../5.2.1/store-azure-web-pubsub/api-reference/server/weave-azure-web-pubsub-server/">
+      <span class="version__label">5.2.1</span>
+      <span class="dt-label dt-label--green"><span class="dt-label__content">Latest</span></span>
+          </a>
+  </div>
+</div>
+  </div>
+</div>
+<div class="side-menu-scrim"></div>
+
+<main class="article">
+
+<div class="hero">
+  <div class="dt-grid-layout dt-grid-layout--with-margin hero__grid">
+    <div class="dt-grid-layout__item dt-grid-layout__item--span-full hero__row">
+      <div class="hero__main">
+
+<nav class="dt-breadcrumbs" aria-label="Breadcrumb">
+  <a class="dt-breadcrumb-item dt-breadcrumb-item--link" href="../../../../"><span class="dt-breadcrumb-item__content">Weave.js</span></a>
+  <div class="dt-breadcrumb-item"><span class="dt-breadcrumb-item__content">Server</span></div>
+    <div class="dt-breadcrumb-item dt-breadcrumb-item--active" aria-current="page"><span class="dt-breadcrumb-item__content">WeaveAzureWebPubsubServer</span></div>
+</nav>
+        <h1 class="hero__title dt-text dt-text--title-xl">WeaveAzureWebPubsubServer</h1>
+        <p class="hero__excerpt dt-text dt-text--body-l">API reference for the WeaveAzureWebPubsubServer class</p>
+      </div>
+      <div class="hero__aside">
+        <button class="dt-button dt-button--ghost dt-button--icon-only toc-toggle" type="button" aria-controls="on-this-page" aria-expanded="true" hidden>
+          <span class="dt-button__content">
+            <span class="dt-button__icon dt-button__icon-icon"><svg class="dt-icon" aria-hidden="true" focusable="false"><use href="../../../../../_/img/icons.svg#icon-panel-left"></use></svg></span>
+          </span>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+  <div class="content dt-grid-layout dt-grid-layout--with-margin">
+
+<aside id="on-this-page" class="toc" data-title="On this page" data-levels="4">
+  <div class="toc-menu"></div>
+</aside>
+
+<article class="doc">
+<div class="sect1">
+<h2 id="overview"><a class="anchor" href="#overview"></a>Overview</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>The WeaveAzureWebPubsubServer is a server-side class in the Weave.js Azure Web PubSub store
+that enables real-time collaboration using Azure Web PubSub as the transport layer. It serves
+as a store provider, handling the synchronization of shared document state across all clients
+connected to a specific room.</p>
+</div>
+<div class="paragraph">
+<p>Built on top of Yjs, this class leverages Azure&#8217;s managed Web PubSub infrastructure to offer scalable,
+low-latency communication, with support for CRDT-based document syncing, user presence (awareness),
+and optional persistence of shared state.</p>
+</div>
+<div class="paragraph">
+<p>This class enables seamless collaboration by handling server-side:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Connection management via WebSocket clients</p>
+</li>
+<li>
+<p>Document synchronization using CRDTs (through Yjs)</p>
+</li>
+<li>
+<p>Broadcasting updates between users in real time</p>
+</li>
+<li>
+<p>Support for awareness events</p>
+</li>
+<li>
+<p>Support for persistence of the shared-state</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="import"><a class="anchor" href="#import"></a>Import</h2>
+<div class="sectionbody">
+<div class="listingblock">
+<div class="content">
+<pre class="shiki highlight"><code data-lang="shell"><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4;--shiki-light-bg:#1E1E1E;--shiki-dark-bg:#1E1E1E"><span class="line"><span style="--shiki-light:#DCDCAA;--shiki-dark:#DCDCAA">import</span><span style="--shiki-light:#CE9178;--shiki-dark:#CE9178"> {</span><span style="--shiki-light:#CE9178;--shiki-dark:#CE9178"> WeaveAzureWebPubsubServer</span><span style="--shiki-light:#CE9178;--shiki-dark:#CE9178"> }</span><span style="--shiki-light:#CE9178;--shiki-dark:#CE9178"> from</span><span style="--shiki-light:#CE9178;--shiki-dark:#CE9178"> "@inditextech/weave-store-azure-web-pubsub/server"</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">;</span></span></span></code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="instantiation"><a class="anchor" href="#instantiation"></a>Instantiation</h2>
+<div class="sectionbody">
+<div class="listingblock">
+<div class="content">
+<pre class="shiki highlight"><code data-lang="ts"><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4;--shiki-light-bg:#1E1E1E;--shiki-dark-bg:#1E1E1E"><span class="line"><span style="--shiki-light:#569CD6;--shiki-dark:#569CD6">const</span><span style="--shiki-light:#4FC1FF;--shiki-dark:#4FC1FF"> azureWebPubSubServer</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4"> = </span><span style="--shiki-light:#569CD6;--shiki-dark:#569CD6">new</span><span style="--shiki-light:#DCDCAA;--shiki-dark:#DCDCAA"> WeaveAzureWebPubsubServer</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">(</span><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">params</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">: </span><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">WeaveAzureWebPubsubServerParams</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">);</span></span></span></code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="parameters"><a class="anchor" href="#parameters"></a>Parameters</h2>
+<div class="sectionbody">
+<div class="tableblock-wrap"><div class="tablecontainer"><table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 20%;">
+<col style="width: 20%;">
+<col style="width: 20%;">
+<col style="width: 20%;">
+<col style="width: 20%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Property</th>
+<th class="tableblock halign-left valign-top">Type</th>
+<th class="tableblock halign-left valign-top">Required</th>
+<th class="tableblock halign-left valign-top">Default</th>
+<th class="tableblock halign-left valign-top">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code class="dt-mono">pubsubConfig</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code class="dt-mono">WeaveAzureWebPubsubConfig</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="dt-label dt-label--green"><span class="dt-label__content">Required</span></span></p></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">An object defining the Azure Web PubSub params: endpoint, custom auth (token flow or key) and hub name. By default we promote the use of DefaultAzureCredential from the @azure/identity dependency.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code class="dt-mono">eventsHandlerConfig</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code class="dt-mono">WebPubSubEventHandlerOptions</code></p></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Azure Web PubSub event handler configuration. Use allowedEndpoints to restrict the CloudEvents origin and accessKey to verify the HMAC-SHA256 signature on every inbound event.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code class="dt-mono">persistRoom</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code class="dt-mono">PersistRoom</code></p></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Weave.js Store to use to handle the real-time communication</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code class="dt-mono">fetchRoom</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code class="dt-mono">FetchRoom</code></p></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Child nodes to render</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code class="dt-mono">initialState</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code class="dt-mono">initialState</code></p></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code class="dt-mono">defaultInitialState</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Array of nodes to register and use by the instance</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code class="dt-mono">syncHostConfig.heartbeat.sendIntervalMs</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code class="dt-mono">number</code></p></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code class="dt-mono">2500</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Interval to send sync room heartbeat to clients, in miliseconds</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code class="dt-mono">syncHostConfig.resync.checkIntervalMs</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code class="dt-mono">number</code></p></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code class="dt-mono">5000</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Sync host resync request check interval, used to request a resync event to clients when sync host disconnect / reconnect, in miliseconds</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code class="dt-mono">syncHostConfig.resync.attemptsLimit</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code class="dt-mono">number</code></p></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code class="dt-mono">12</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Maximum limit of resync attempts</p></td>
+</tr>
+</tbody>
+</table></div></div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="webhook-authentication"><a class="anchor" href="#webhook-authentication"></a>Webhook authentication</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>The <code>eventsHandlerConfig</code> object accepts two fields that together protect the CloudEvents
+endpoint from spoofed requests.</p>
+</div>
+<div class="tableblock-wrap"><div class="tablecontainer"><table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 33.3333%;">
+<col style="width: 33.3333%;">
+<col style="width: 33.3334%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Field</th>
+<th class="tableblock halign-left valign-top">HTTP response on failure</th>
+<th class="tableblock halign-left valign-top">Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>allowedEndpoints</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>403 Forbidden</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Restricts incoming POST requests to the Azure Web PubSub service hostname. Requests from any other origin are rejected.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>accessKey</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>401 Unauthorized</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Verifies the <code>ce-signature</code> HMAC-SHA256 header (<code>sha256=Hex(HMAC-SHA256(accessKey, connectionId))</code>) on every event. Accepts a single key string or <code>[primary, secondary]</code> for zero-downtime key rotation.</p></td>
+</tr>
+</tbody>
+</table></div></div>
+<div class="listingblock">
+<div class="content">
+<pre class="shiki highlight"><code data-lang="ts"><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4;--shiki-light-bg:#1E1E1E;--shiki-dark-bg:#1E1E1E"><span class="line"><span style="--shiki-light:#569CD6;--shiki-dark:#569CD6">new</span><span style="--shiki-light:#DCDCAA;--shiki-dark:#DCDCAA"> WeaveAzureWebPubsubServer</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">({</span></span>
+<span class="line"><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">  pubSubConfig:</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4"> {</span></span>
+<span class="line"><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">    endpoint:</span><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE"> process</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">.</span><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">env</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">.</span><span style="--shiki-light:#4FC1FF;--shiki-dark:#4FC1FF">WEAVE_AZURE_WEB_PUBSUB_ENDPOINT</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">,</span></span>
+<span class="line"><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">    hubName:</span><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE"> process</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">.</span><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">env</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">.</span><span style="--shiki-light:#4FC1FF;--shiki-dark:#4FC1FF">WEAVE_AZURE_WEB_PUBSUB_HUB_NAME</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">,</span></span>
+<span class="line"><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">    auth:</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4"> { </span><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">key:</span><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE"> process</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">.</span><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">env</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">.</span><span style="--shiki-light:#4FC1FF;--shiki-dark:#4FC1FF">WEAVE_AZURE_WEB_PUBSUB_KEY</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4"> },</span></span>
+<span class="line"><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">  },</span></span>
+<span class="line"><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">  eventsHandlerConfig:</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4"> {</span></span>
+<span class="line"><span style="--shiki-light:#6A9955;--shiki-dark:#6A9955">    // Reject POSTs from origins other than the configured service endpoint</span></span>
+<span class="line"><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">    allowedEndpoints:</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4"> [</span><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">process</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">.</span><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">env</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">.</span><span style="--shiki-light:#4FC1FF;--shiki-dark:#4FC1FF">WEAVE_AZURE_WEB_PUBSUB_ENDPOINT</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">],</span></span>
+<span class="line"><span style="--shiki-light:#6A9955;--shiki-dark:#6A9955">    // Verify the HMAC-SHA256 signature on every inbound CloudEvent</span></span>
+<span class="line"><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">    accessKey:</span><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE"> process</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">.</span><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">env</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">.</span><span style="--shiki-light:#4FC1FF;--shiki-dark:#4FC1FF">WEAVE_AZURE_WEB_PUBSUB_KEY</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">,</span></span>
+<span class="line"><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">  },</span></span>
+<span class="line"><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">});</span></span></span></code></pre>
+</div>
+</div>
+<div class="quoteblock">
+<blockquote>
+<div class="paragraph">
+<p><strong>Managed identity / <code>DefaultAzureCredential</code></strong>: when no static access key is available,
+omit <code>accessKey</code>. A warning is logged on every request. Protect the endpoint at the
+network level by restricting ingress to
+<a href="https://learn.microsoft.com/en-us/azure/azure-web-pubsub/concept-service-internals">Azure Web PubSub IP ranges</a>
+via NSG or firewall rules.</p>
+</div>
+</blockquote>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="methods"><a class="anchor" href="#methods"></a>Methods</h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="getmiddleware"><a class="anchor" href="#getmiddleware"></a>getMiddleware</h3>
+<div class="listingblock">
+<div class="content">
+<pre class="shiki highlight"><code data-lang="ts"><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4;--shiki-light-bg:#1E1E1E;--shiki-dark-bg:#1E1E1E"><span class="line"><span style="--shiki-light:#DCDCAA;--shiki-dark:#DCDCAA">getMiddleware</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">();</span></span></span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>This method return the necessary middlewares that you need to attach to your Express
+server in order to manage the Azure Web PubSub connectivity.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="clientconnect"><a class="anchor" href="#clientconnect"></a>clientConnect</h3>
+<div class="listingblock">
+<div class="content">
+<pre class="shiki highlight"><code data-lang="ts"><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4;--shiki-light-bg:#1E1E1E;--shiki-dark-bg:#1E1E1E"><span class="line"><span style="--shiki-light:#DCDCAA;--shiki-dark:#DCDCAA">clientConnect</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">(</span><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">roomId</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">: </span><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">string</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">): </span><span style="--shiki-light:#4EC9B0;--shiki-dark:#4EC9B0">Promise</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">&#x3C;</span><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">string</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">></span></span></span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>This method return a secure connection URL to use client-side to connect to the Azure
+Web PubSub infrastructure.</p>
+</div>
+<div class="paragraph">
+<p>Used</p>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="typescript-types"><a class="anchor" href="#typescript-types"></a>TypeScript types</h2>
+<div class="sectionbody">
+<div class="listingblock">
+<div class="content">
+<pre class="shiki highlight"><code data-lang="ts"><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4;--shiki-light-bg:#1E1E1E;--shiki-dark-bg:#1E1E1E"><span class="line"><span style="--shiki-light:#569CD6;--shiki-dark:#569CD6">type</span><span style="--shiki-light:#4EC9B0;--shiki-dark:#4EC9B0"> WebPubSubEventHandlerOptions</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4"> = {</span></span>
+<span class="line"><span style="--shiki-light:#6A9955;--shiki-dark:#6A9955">  /** Custom serving path for the CloudEvents handler endpoint. */</span></span>
+<span class="line"><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">  path</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">?: </span><span style="--shiki-light:#4EC9B0;--shiki-dark:#4EC9B0">string</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">;</span></span>
+<span class="line"><span style="--shiki-light:#6A9955;--shiki-dark:#6A9955">  /** Handle 'connect' — service waits for the response before proceeding. */</span></span>
+<span class="line"><span style="--shiki-light:#DCDCAA;--shiki-dark:#DCDCAA">  handleConnect</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">?: (</span><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">connectRequest</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">: </span><span style="--shiki-light:#4EC9B0;--shiki-dark:#4EC9B0">ConnectRequest</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">, </span><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">connectResponse</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">: </span><span style="--shiki-light:#4EC9B0;--shiki-dark:#4EC9B0">ConnectResponseHandler</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">) </span><span style="--shiki-light:#569CD6;--shiki-dark:#569CD6">=></span><span style="--shiki-light:#4EC9B0;--shiki-dark:#4EC9B0"> void</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">;</span></span>
+<span class="line"><span style="--shiki-light:#6A9955;--shiki-dark:#6A9955">  /** Handle user events — service waits for the response before proceeding. */</span></span>
+<span class="line"><span style="--shiki-light:#DCDCAA;--shiki-dark:#DCDCAA">  handleUserEvent</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">?: (</span><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">userEventRequest</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">: </span><span style="--shiki-light:#4EC9B0;--shiki-dark:#4EC9B0">UserEventRequest</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">, </span><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">userEventResponse</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">: </span><span style="--shiki-light:#4EC9B0;--shiki-dark:#4EC9B0">UserEventResponseHandler</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">) </span><span style="--shiki-light:#569CD6;--shiki-dark:#569CD6">=></span><span style="--shiki-light:#4EC9B0;--shiki-dark:#4EC9B0"> void</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">;</span></span>
+<span class="line"><span style="--shiki-light:#6A9955;--shiki-dark:#6A9955">  /** Fire-and-forget 'connected' event. */</span></span>
+<span class="line"><span style="--shiki-light:#DCDCAA;--shiki-dark:#DCDCAA">  onConnected</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">?: (</span><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">connectedRequest</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">: </span><span style="--shiki-light:#4EC9B0;--shiki-dark:#4EC9B0">ConnectedRequest</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">) </span><span style="--shiki-light:#569CD6;--shiki-dark:#569CD6">=></span><span style="--shiki-light:#4EC9B0;--shiki-dark:#4EC9B0"> void</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">;</span></span>
+<span class="line"><span style="--shiki-light:#6A9955;--shiki-dark:#6A9955">  /** Fire-and-forget 'disconnected' event. */</span></span>
+<span class="line"><span style="--shiki-light:#DCDCAA;--shiki-dark:#DCDCAA">  onDisconnected</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">?: (</span><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">disconnectedRequest</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">: </span><span style="--shiki-light:#4EC9B0;--shiki-dark:#4EC9B0">DisconnectedRequest</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">) </span><span style="--shiki-light:#569CD6;--shiki-dark:#569CD6">=></span><span style="--shiki-light:#4EC9B0;--shiki-dark:#4EC9B0"> void</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">;</span></span>
+<span class="line"><span style="--shiki-light:#6A9955;--shiki-dark:#6A9955">  /**</span></span>
+<span class="line"><span style="--shiki-light:#6A9955;--shiki-dark:#6A9955">   * Restrict incoming CloudEvents POST requests to these Azure Web PubSub service</span></span>
+<span class="line"><span style="--shiki-light:#6A9955;--shiki-dark:#6A9955">   * endpoint URLs. Requests from any other origin are rejected with HTTP 403.</span></span>
+<span class="line"><span style="--shiki-light:#6A9955;--shiki-dark:#6A9955">   * When omitted, all origins are allowed.</span></span>
+<span class="line"><span style="--shiki-light:#6A9955;--shiki-dark:#6A9955">   */</span></span>
+<span class="line"><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">  allowedEndpoints</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">?: </span><span style="--shiki-light:#4EC9B0;--shiki-dark:#4EC9B0">string</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">[];</span></span>
+<span class="line"><span style="--shiki-light:#6A9955;--shiki-dark:#6A9955">  /**</span></span>
+<span class="line"><span style="--shiki-light:#6A9955;--shiki-dark:#6A9955">   * Access key(s) used to verify the HMAC-SHA256 `ce-signature` header on every</span></span>
+<span class="line"><span style="--shiki-light:#6A9955;--shiki-dark:#6A9955">   * inbound CloudEvent. Provide `[primary, secondary]` to support key rotation.</span></span>
+<span class="line"><span style="--shiki-light:#6A9955;--shiki-dark:#6A9955">   * When omitted, signature verification is skipped and a warning is logged.</span></span>
+<span class="line"><span style="--shiki-light:#6A9955;--shiki-dark:#6A9955">   */</span></span>
+<span class="line"><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">  accessKey</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">?: </span><span style="--shiki-light:#4EC9B0;--shiki-dark:#4EC9B0">string</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4"> | </span><span style="--shiki-light:#4EC9B0;--shiki-dark:#4EC9B0">string</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">[];</span></span>
+<span class="line"><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">};</span></span></span></code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="shiki highlight"><code data-lang="ts"><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4;--shiki-light-bg:#1E1E1E;--shiki-dark-bg:#1E1E1E"><span class="line"><span style="--shiki-light:#569CD6;--shiki-dark:#569CD6">type</span><span style="--shiki-light:#4EC9B0;--shiki-dark:#4EC9B0"> WeaveStoreAzureWebPubsubConfig</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4"> = {</span></span>
+<span class="line"><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">  endpoint</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">: </span><span style="--shiki-light:#4EC9B0;--shiki-dark:#4EC9B0">string</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">;</span></span>
+<span class="line"><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">  persistIntervalMs</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">?: </span><span style="--shiki-light:#4EC9B0;--shiki-dark:#4EC9B0">number</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">;</span></span>
+<span class="line"><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">  hubName</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">: </span><span style="--shiki-light:#4EC9B0;--shiki-dark:#4EC9B0">string</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">;</span></span>
+<span class="line"><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">  auth</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">?: {</span></span>
+<span class="line"><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">    key</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">?: </span><span style="--shiki-light:#4EC9B0;--shiki-dark:#4EC9B0">string</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">;</span></span>
+<span class="line"><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">    custom</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">?: </span><span style="--shiki-light:#4EC9B0;--shiki-dark:#4EC9B0">TokenCredential</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">;</span></span>
+<span class="line"><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">  };</span></span>
+<span class="line"><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">  connectionHandlers</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">?: </span><span style="--shiki-light:#4EC9B0;--shiki-dark:#4EC9B0">DeepPartial</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">&#x3C;</span><span style="--shiki-light:#4EC9B0;--shiki-dark:#4EC9B0">WeaveAzureWebPubsubSyncHandlerOptions</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">>;</span></span>
+<span class="line"><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">};</span></span>
+<span class="line"></span>
+<span class="line"><span style="--shiki-light:#569CD6;--shiki-dark:#569CD6">type</span><span style="--shiki-light:#4EC9B0;--shiki-dark:#4EC9B0"> WeaveAzureWebPubsubSyncHandlerOptions</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4"> = {</span></span>
+<span class="line"><span style="--shiki-light:#DCDCAA;--shiki-dark:#DCDCAA">  onConnect</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">?: (</span></span>
+<span class="line"><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">    connectionId</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">: </span><span style="--shiki-light:#4EC9B0;--shiki-dark:#4EC9B0">string</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">,</span></span>
+<span class="line"><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">    queries</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">: </span><span style="--shiki-light:#4EC9B0;--shiki-dark:#4EC9B0">Record</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">&#x3C;</span><span style="--shiki-light:#4EC9B0;--shiki-dark:#4EC9B0">string</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">, </span><span style="--shiki-light:#4EC9B0;--shiki-dark:#4EC9B0">string</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">[]> | </span><span style="--shiki-light:#4EC9B0;--shiki-dark:#4EC9B0">undefined</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">,</span></span>
+<span class="line"><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">  ) </span><span style="--shiki-light:#569CD6;--shiki-dark:#569CD6">=></span><span style="--shiki-light:#4EC9B0;--shiki-dark:#4EC9B0"> Promise</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">&#x3C;</span><span style="--shiki-light:#4EC9B0;--shiki-dark:#4EC9B0">void</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">>;</span></span>
+<span class="line"><span style="--shiki-light:#DCDCAA;--shiki-dark:#DCDCAA">  onConnected</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">?: (</span><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">connectionId</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">: </span><span style="--shiki-light:#4EC9B0;--shiki-dark:#4EC9B0">string</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">) </span><span style="--shiki-light:#569CD6;--shiki-dark:#569CD6">=></span><span style="--shiki-light:#4EC9B0;--shiki-dark:#4EC9B0"> Promise</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">&#x3C;</span><span style="--shiki-light:#4EC9B0;--shiki-dark:#4EC9B0">void</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">>;</span></span>
+<span class="line"><span style="--shiki-light:#DCDCAA;--shiki-dark:#DCDCAA">  removeConnection</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">?: (</span><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">connectionId</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">: </span><span style="--shiki-light:#4EC9B0;--shiki-dark:#4EC9B0">string</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">) </span><span style="--shiki-light:#569CD6;--shiki-dark:#569CD6">=></span><span style="--shiki-light:#4EC9B0;--shiki-dark:#4EC9B0"> Promise</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">&#x3C;</span><span style="--shiki-light:#4EC9B0;--shiki-dark:#4EC9B0">void</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">>;</span></span>
+<span class="line"><span style="--shiki-light:#DCDCAA;--shiki-dark:#DCDCAA">  getConnectionRoom</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">?: (</span><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">connectionId</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">: </span><span style="--shiki-light:#4EC9B0;--shiki-dark:#4EC9B0">string</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">) </span><span style="--shiki-light:#569CD6;--shiki-dark:#569CD6">=></span><span style="--shiki-light:#4EC9B0;--shiki-dark:#4EC9B0"> Promise</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">&#x3C;</span><span style="--shiki-light:#4EC9B0;--shiki-dark:#4EC9B0">string</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4"> | </span><span style="--shiki-light:#4EC9B0;--shiki-dark:#4EC9B0">null</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">>;</span></span>
+<span class="line"><span style="--shiki-light:#DCDCAA;--shiki-dark:#DCDCAA">  getRoomConnections</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">?: (</span><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">roomId</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">: </span><span style="--shiki-light:#4EC9B0;--shiki-dark:#4EC9B0">string</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">) </span><span style="--shiki-light:#569CD6;--shiki-dark:#569CD6">=></span><span style="--shiki-light:#4EC9B0;--shiki-dark:#4EC9B0"> Promise</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">&#x3C;</span><span style="--shiki-light:#4EC9B0;--shiki-dark:#4EC9B0">string</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">[]>;</span></span>
+<span class="line"><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">  persistIntervalMs</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">?: </span><span style="--shiki-light:#4EC9B0;--shiki-dark:#4EC9B0">number</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">;</span></span>
+<span class="line"><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">};</span></span>
+<span class="line"></span>
+<span class="line"><span style="--shiki-light:#569CD6;--shiki-dark:#569CD6">type</span><span style="--shiki-light:#4EC9B0;--shiki-dark:#4EC9B0"> WeaveStoreAzureWebPubsubOptions</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4"> = {</span></span>
+<span class="line"><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">  roomId</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">: </span><span style="--shiki-light:#4EC9B0;--shiki-dark:#4EC9B0">string</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">;</span></span>
+<span class="line"><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">  url</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">: </span><span style="--shiki-light:#4EC9B0;--shiki-dark:#4EC9B0">string</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">;</span></span>
+<span class="line"><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">  fetchClient</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">?: </span><span style="--shiki-light:#4EC9B0;--shiki-dark:#4EC9B0">FetchClient</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">;</span></span>
+<span class="line"><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">  syncClientOptions</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">?: </span><span style="--shiki-light:#4EC9B0;--shiki-dark:#4EC9B0">DeepPartial</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">&#x3C;</span><span style="--shiki-light:#4EC9B0;--shiki-dark:#4EC9B0">WeaveStoreAzureWebPubSubSyncClientOptions</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">>;</span></span>
+<span class="line"><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">};</span></span>
+<span class="line"></span>
+<span class="line"><span style="--shiki-light:#569CD6;--shiki-dark:#569CD6">type</span><span style="--shiki-light:#4EC9B0;--shiki-dark:#4EC9B0"> WeaveStoreAzureWebPubsubOnStoreFetchConnectionUrlEvent</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4"> = {</span></span>
+<span class="line"><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">  loading</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">: </span><span style="--shiki-light:#4EC9B0;--shiki-dark:#4EC9B0">boolean</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">;</span></span>
+<span class="line"><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">  error</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">: </span><span style="--shiki-light:#4EC9B0;--shiki-dark:#4EC9B0">Error</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4"> | </span><span style="--shiki-light:#4EC9B0;--shiki-dark:#4EC9B0">null</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">;</span></span>
+<span class="line"><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">};</span></span>
+<span class="line"></span>
+<span class="line"><span style="--shiki-light:#569CD6;--shiki-dark:#569CD6">type</span><span style="--shiki-light:#4EC9B0;--shiki-dark:#4EC9B0"> FetchClient</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4"> = (</span></span>
+<span class="line"><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">  input</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">: </span><span style="--shiki-light:#4EC9B0;--shiki-dark:#4EC9B0">string</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4"> | </span><span style="--shiki-light:#4EC9B0;--shiki-dark:#4EC9B0">URL</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4"> | </span><span style="--shiki-light:#4EC9B0;--shiki-dark:#4EC9B0">globalThis</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">.</span><span style="--shiki-light:#4EC9B0;--shiki-dark:#4EC9B0">Request</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">,</span></span>
+<span class="line"><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">  init</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">?: </span><span style="--shiki-light:#4EC9B0;--shiki-dark:#4EC9B0">RequestInit</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">,</span></span>
+<span class="line"><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">) </span><span style="--shiki-light:#569CD6;--shiki-dark:#569CD6">=></span><span style="--shiki-light:#4EC9B0;--shiki-dark:#4EC9B0"> Promise</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">&#x3C;</span><span style="--shiki-light:#4EC9B0;--shiki-dark:#4EC9B0">Response</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">>;</span></span>
+<span class="line"></span>
+<span class="line"><span style="--shiki-light:#569CD6;--shiki-dark:#569CD6">type</span><span style="--shiki-light:#4EC9B0;--shiki-dark:#4EC9B0"> FetchInitialState</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4"> = (</span><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">doc</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">: </span><span style="--shiki-light:#4EC9B0;--shiki-dark:#4EC9B0">Doc</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">) </span><span style="--shiki-light:#569CD6;--shiki-dark:#569CD6">=></span><span style="--shiki-light:#4EC9B0;--shiki-dark:#4EC9B0"> void</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">;</span></span>
+<span class="line"><span style="--shiki-light:#569CD6;--shiki-dark:#569CD6">type</span><span style="--shiki-light:#4EC9B0;--shiki-dark:#4EC9B0"> PersistRoom</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4"> = (</span></span>
+<span class="line"><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">  roomId</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">: </span><span style="--shiki-light:#4EC9B0;--shiki-dark:#4EC9B0">string</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">,</span></span>
+<span class="line"><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">  actualState</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">: </span><span style="--shiki-light:#4EC9B0;--shiki-dark:#4EC9B0">Uint8Array</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">&#x3C;</span><span style="--shiki-light:#4EC9B0;--shiki-dark:#4EC9B0">ArrayBufferLike</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">>,</span></span>
+<span class="line"><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">) </span><span style="--shiki-light:#569CD6;--shiki-dark:#569CD6">=></span><span style="--shiki-light:#4EC9B0;--shiki-dark:#4EC9B0"> Promise</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">&#x3C;</span><span style="--shiki-light:#4EC9B0;--shiki-dark:#4EC9B0">void</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">>;</span></span>
+<span class="line"><span style="--shiki-light:#569CD6;--shiki-dark:#569CD6">type</span><span style="--shiki-light:#4EC9B0;--shiki-dark:#4EC9B0"> FetchRoom</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4"> = (</span><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">roomId</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">: </span><span style="--shiki-light:#4EC9B0;--shiki-dark:#4EC9B0">string</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">) </span><span style="--shiki-light:#569CD6;--shiki-dark:#569CD6">=></span><span style="--shiki-light:#4EC9B0;--shiki-dark:#4EC9B0"> Promise</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">&#x3C;</span><span style="--shiki-light:#4EC9B0;--shiki-dark:#4EC9B0">Uint8Array</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4"> | </span><span style="--shiki-light:#4EC9B0;--shiki-dark:#4EC9B0">null</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">>;</span></span>
+<span class="line"></span>
+<span class="line"><span style="--shiki-light:#569CD6;--shiki-dark:#569CD6">type</span><span style="--shiki-light:#4EC9B0;--shiki-dark:#4EC9B0"> WeaveStoreAzureWebPubsubEvents</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4"> = {</span></span>
+<span class="line"><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">  onConnect</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">: </span><span style="--shiki-light:#4EC9B0;--shiki-dark:#4EC9B0">WeaveStoreAzureWebPubsubOnConnectEvent</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">;</span></span>
+<span class="line"><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">  onConnected</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">: </span><span style="--shiki-light:#4EC9B0;--shiki-dark:#4EC9B0">WeaveStoreAzureWebPubsubOnConnectedEvent</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">;</span></span>
+<span class="line"><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">  onDisconnected</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">: </span><span style="--shiki-light:#4EC9B0;--shiki-dark:#4EC9B0">WeaveStoreAzureWebPubsubOnDisconnectedEvent</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">;</span></span>
+<span class="line"><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">};</span></span>
+<span class="line"></span>
+<span class="line"><span style="--shiki-light:#569CD6;--shiki-dark:#569CD6">type</span><span style="--shiki-light:#4EC9B0;--shiki-dark:#4EC9B0"> WeaveStoreAzureWebPubsubOnConnectEvent</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4"> = {</span></span>
+<span class="line"><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">  context</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">: </span><span style="--shiki-light:#4EC9B0;--shiki-dark:#4EC9B0">ConnectionContext</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">;</span></span>
+<span class="line"><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">  queries</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">: </span><span style="--shiki-light:#4EC9B0;--shiki-dark:#4EC9B0">Record</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">&#x3C;</span><span style="--shiki-light:#4EC9B0;--shiki-dark:#4EC9B0">string</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">, </span><span style="--shiki-light:#4EC9B0;--shiki-dark:#4EC9B0">string</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">[]> | </span><span style="--shiki-light:#4EC9B0;--shiki-dark:#4EC9B0">undefined</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">;</span></span>
+<span class="line"><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">};</span></span>
+<span class="line"></span>
+<span class="line"><span style="--shiki-light:#569CD6;--shiki-dark:#569CD6">type</span><span style="--shiki-light:#4EC9B0;--shiki-dark:#4EC9B0"> WeaveStoreAzureWebPubsubOnConnectedEvent</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4"> = {</span></span>
+<span class="line"><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">  context</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">: </span><span style="--shiki-light:#4EC9B0;--shiki-dark:#4EC9B0">ConnectionContext</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">;</span></span>
+<span class="line"><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">  queries</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">?: </span><span style="--shiki-light:#4EC9B0;--shiki-dark:#4EC9B0">Record</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">&#x3C;</span><span style="--shiki-light:#4EC9B0;--shiki-dark:#4EC9B0">string</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">, </span><span style="--shiki-light:#4EC9B0;--shiki-dark:#4EC9B0">string</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">[]>;</span></span>
+<span class="line"><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">};</span></span>
+<span class="line"></span>
+<span class="line"><span style="--shiki-light:#569CD6;--shiki-dark:#569CD6">type</span><span style="--shiki-light:#4EC9B0;--shiki-dark:#4EC9B0"> WeaveStoreAzureWebPubsubOnDisconnectedEvent</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4"> = {</span></span>
+<span class="line"><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">  context</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">: </span><span style="--shiki-light:#4EC9B0;--shiki-dark:#4EC9B0">ConnectionContext</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">;</span></span>
+<span class="line"><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">  queries</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">?: </span><span style="--shiki-light:#4EC9B0;--shiki-dark:#4EC9B0">Record</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">&#x3C;</span><span style="--shiki-light:#4EC9B0;--shiki-dark:#4EC9B0">string</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">, </span><span style="--shiki-light:#4EC9B0;--shiki-dark:#4EC9B0">string</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">[]>;</span></span>
+<span class="line"><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">};</span></span>
+<span class="line"></span>
+<span class="line"><span style="--shiki-light:#569CD6;--shiki-dark:#569CD6">type</span><span style="--shiki-light:#4EC9B0;--shiki-dark:#4EC9B0"> WeaveStoreAzureWebPubsubOnWebsocketOpenEvent</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4"> = {</span></span>
+<span class="line"><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">  group</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">: </span><span style="--shiki-light:#4EC9B0;--shiki-dark:#4EC9B0">string</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">;</span></span>
+<span class="line"><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">  event</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">: </span><span style="--shiki-light:#4EC9B0;--shiki-dark:#4EC9B0">WebSocket</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">.</span><span style="--shiki-light:#4EC9B0;--shiki-dark:#4EC9B0">Event</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">;</span></span>
+<span class="line"><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">  connectionAttempt</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">: </span><span style="--shiki-light:#4EC9B0;--shiki-dark:#4EC9B0">number</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">;</span></span>
+<span class="line"><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">};</span></span>
+<span class="line"></span>
+<span class="line"><span style="--shiki-light:#569CD6;--shiki-dark:#569CD6">type</span><span style="--shiki-light:#4EC9B0;--shiki-dark:#4EC9B0"> WeaveStoreAzureWebPubsubOnWebsocketJoinGroupEvent</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4"> = {</span></span>
+<span class="line"><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">  group</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">: </span><span style="--shiki-light:#4EC9B0;--shiki-dark:#4EC9B0">string</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">;</span></span>
+<span class="line"><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">  connectionAttempt</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">: </span><span style="--shiki-light:#4EC9B0;--shiki-dark:#4EC9B0">number</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">;</span></span>
+<span class="line"><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">};</span></span>
+<span class="line"></span>
+<span class="line"><span style="--shiki-light:#569CD6;--shiki-dark:#569CD6">type</span><span style="--shiki-light:#4EC9B0;--shiki-dark:#4EC9B0"> WeaveStoreAzureWebPubsubOnWebsocketMessageEvent</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4"> = {</span></span>
+<span class="line"><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">  group</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">: </span><span style="--shiki-light:#4EC9B0;--shiki-dark:#4EC9B0">string</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">;</span></span>
+<span class="line"><span style="--shiki-light:#6A9955;--shiki-dark:#6A9955">  // eslint-disable-next-line @typescript-eslint/no-explicit-any</span></span>
+<span class="line"><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">  event</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">: </span><span style="--shiki-light:#4EC9B0;--shiki-dark:#4EC9B0">WebSocket</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">.</span><span style="--shiki-light:#4EC9B0;--shiki-dark:#4EC9B0">MessageEvent</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">;</span></span>
+<span class="line"><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">};</span></span>
+<span class="line"></span>
+<span class="line"><span style="--shiki-light:#569CD6;--shiki-dark:#569CD6">type</span><span style="--shiki-light:#4EC9B0;--shiki-dark:#4EC9B0"> WeaveStoreAzureWebPubsubOnWebsocketCloseEvent</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4"> = {</span></span>
+<span class="line"><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">  group</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">: </span><span style="--shiki-light:#4EC9B0;--shiki-dark:#4EC9B0">string</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">;</span></span>
+<span class="line"><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">  event</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">: </span><span style="--shiki-light:#4EC9B0;--shiki-dark:#4EC9B0">CloseEvent</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">;</span></span>
+<span class="line"><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">  connectionAttempt</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">: </span><span style="--shiki-light:#4EC9B0;--shiki-dark:#4EC9B0">number</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">;</span></span>
+<span class="line"><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">};</span></span>
+<span class="line"></span>
+<span class="line"><span style="--shiki-light:#569CD6;--shiki-dark:#569CD6">type</span><span style="--shiki-light:#4EC9B0;--shiki-dark:#4EC9B0"> WeaveStoreAzureWebPubsubOnWebsocketReconnectEvent</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4"> = {</span></span>
+<span class="line"><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">  group</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">: </span><span style="--shiki-light:#4EC9B0;--shiki-dark:#4EC9B0">string</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">;</span></span>
+<span class="line"><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">  connectionAttempt</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">: </span><span style="--shiki-light:#4EC9B0;--shiki-dark:#4EC9B0">number</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">;</span></span>
+<span class="line"><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">  timeoutMs</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">: </span><span style="--shiki-light:#4EC9B0;--shiki-dark:#4EC9B0">number</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">;</span></span>
+<span class="line"><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">};</span></span>
+<span class="line"></span>
+<span class="line"><span style="--shiki-light:#569CD6;--shiki-dark:#569CD6">type</span><span style="--shiki-light:#4EC9B0;--shiki-dark:#4EC9B0"> WeaveStoreAzureWebPubsubOnWebsocketErrorEvent</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4"> = {</span></span>
+<span class="line"><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">  group</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">: </span><span style="--shiki-light:#4EC9B0;--shiki-dark:#4EC9B0">string</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">;</span></span>
+<span class="line"><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">  error</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">: </span><span style="--shiki-light:#4EC9B0;--shiki-dark:#4EC9B0">ErrorEvent</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">;</span></span>
+<span class="line"><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">  connectionAttempt</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">: </span><span style="--shiki-light:#4EC9B0;--shiki-dark:#4EC9B0">number</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">;</span></span>
+<span class="line"><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">};</span></span>
+<span class="line"></span>
+<span class="line"><span style="--shiki-light:#569CD6;--shiki-dark:#569CD6">type</span><span style="--shiki-light:#4EC9B0;--shiki-dark:#4EC9B0"> WeaveStoreAzureWebPubSubSyncHostClientConnectOptions</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4"> = {</span></span>
+<span class="line"><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">  expirationTimeInMinutes</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">?: </span><span style="--shiki-light:#4EC9B0;--shiki-dark:#4EC9B0">number</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">;</span></span>
+<span class="line"><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">};</span></span>
+<span class="line"></span>
+<span class="line"><span style="--shiki-light:#6A9955;--shiki-dark:#6A9955">// Client types</span></span>
+<span class="line"></span>
+<span class="line"><span style="--shiki-light:#569CD6;--shiki-dark:#569CD6">type</span><span style="--shiki-light:#4EC9B0;--shiki-dark:#4EC9B0"> WeaveStoreAzureWebPubSubSyncClientConnectionStatusKeys</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4"> =</span></span>
+<span class="line"><span style="--shiki-light:#569CD6;--shiki-dark:#569CD6">  keyof</span><span style="--shiki-light:#569CD6;--shiki-dark:#569CD6"> typeof</span><span style="--shiki-light:#4FC1FF;--shiki-dark:#4FC1FF"> WEAVE_STORE_AZURE_WEB_PUBSUB_CONNECTION_STATUS</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">;</span></span>
+<span class="line"><span style="--shiki-light:#569CD6;--shiki-dark:#569CD6">type</span><span style="--shiki-light:#4EC9B0;--shiki-dark:#4EC9B0"> WeaveStoreAzureWebPubSubSyncClientConnectionStatus</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4"> =</span></span>
+<span class="line"><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">  (</span><span style="--shiki-light:#569CD6;--shiki-dark:#569CD6">typeof</span><span style="--shiki-light:#4FC1FF;--shiki-dark:#4FC1FF"> WEAVE_STORE_AZURE_WEB_PUBSUB_CONNECTION_STATUS</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">)[</span><span style="--shiki-light:#4EC9B0;--shiki-dark:#4EC9B0">WeaveStoreAzureWebPubSubSyncClientConnectionStatusKeys</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">];</span></span>
+<span class="line"></span>
+<span class="line"><span style="--shiki-light:#569CD6;--shiki-dark:#569CD6">enum</span><span style="--shiki-light:#4EC9B0;--shiki-dark:#4EC9B0"> MessageType</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4"> {</span></span>
+<span class="line"><span style="--shiki-light:#4FC1FF;--shiki-dark:#4FC1FF">  System</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4"> = </span><span style="--shiki-light:#CE9178;--shiki-dark:#CE9178">"system"</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">,</span></span>
+<span class="line"><span style="--shiki-light:#4FC1FF;--shiki-dark:#4FC1FF">  JoinGroup</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4"> = </span><span style="--shiki-light:#CE9178;--shiki-dark:#CE9178">"joinGroup"</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">,</span></span>
+<span class="line"><span style="--shiki-light:#4FC1FF;--shiki-dark:#4FC1FF">  SendToGroup</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4"> = </span><span style="--shiki-light:#CE9178;--shiki-dark:#CE9178">"sendToGroup"</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">,</span></span>
+<span class="line"><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">}</span></span>
+<span class="line"></span>
+<span class="line"><span style="--shiki-light:#569CD6;--shiki-dark:#569CD6">enum</span><span style="--shiki-light:#4EC9B0;--shiki-dark:#4EC9B0"> MessageDataType</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4"> {</span></span>
+<span class="line"><span style="--shiki-light:#4FC1FF;--shiki-dark:#4FC1FF">  Init</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4"> = </span><span style="--shiki-light:#CE9178;--shiki-dark:#CE9178">"init"</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">,</span></span>
+<span class="line"><span style="--shiki-light:#4FC1FF;--shiki-dark:#4FC1FF">  Sync</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4"> = </span><span style="--shiki-light:#CE9178;--shiki-dark:#CE9178">"sync"</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">,</span></span>
+<span class="line"><span style="--shiki-light:#4FC1FF;--shiki-dark:#4FC1FF">  Awareness</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4"> = </span><span style="--shiki-light:#CE9178;--shiki-dark:#CE9178">"awareness"</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">,</span></span>
+<span class="line"><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">}</span></span>
+<span class="line"></span>
+<span class="line"><span style="--shiki-light:#569CD6;--shiki-dark:#569CD6">interface</span><span style="--shiki-light:#4EC9B0;--shiki-dark:#4EC9B0"> MessageData</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4"> {</span></span>
+<span class="line"><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">  payloadId</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">?: </span><span style="--shiki-light:#4EC9B0;--shiki-dark:#4EC9B0">string</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">;</span></span>
+<span class="line"><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">  index</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">?: </span><span style="--shiki-light:#4EC9B0;--shiki-dark:#4EC9B0">number</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">;</span></span>
+<span class="line"><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">  type</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">?: </span><span style="--shiki-light:#CE9178;--shiki-dark:#CE9178">"heartbeat"</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4"> | </span><span style="--shiki-light:#CE9178;--shiki-dark:#CE9178">"resync"</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4"> | </span><span style="--shiki-light:#CE9178;--shiki-dark:#CE9178">"chunk"</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4"> | </span><span style="--shiki-light:#CE9178;--shiki-dark:#CE9178">"end"</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">;</span></span>
+<span class="line"><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">  totalChunks</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">?: </span><span style="--shiki-light:#4EC9B0;--shiki-dark:#4EC9B0">number</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">;</span></span>
+<span class="line"><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">  group</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">: </span><span style="--shiki-light:#4EC9B0;--shiki-dark:#4EC9B0">string</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">;</span></span>
+<span class="line"><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">  t</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">: </span><span style="--shiki-light:#4EC9B0;--shiki-dark:#4EC9B0">string</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">; </span><span style="--shiki-light:#6A9955;--shiki-dark:#6A9955">// type / target uuid</span></span>
+<span class="line"><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">  f</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">: </span><span style="--shiki-light:#4EC9B0;--shiki-dark:#4EC9B0">string</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">; </span><span style="--shiki-light:#6A9955;--shiki-dark:#6A9955">// origin uuid</span></span>
+<span class="line"><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">  c</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">: </span><span style="--shiki-light:#4EC9B0;--shiki-dark:#4EC9B0">string</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">; </span><span style="--shiki-light:#6A9955;--shiki-dark:#6A9955">// base64 encoded binary data</span></span>
+<span class="line"><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">}</span></span>
+<span class="line"></span>
+<span class="line"><span style="--shiki-light:#569CD6;--shiki-dark:#569CD6">interface</span><span style="--shiki-light:#4EC9B0;--shiki-dark:#4EC9B0"> Message</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4"> {</span></span>
+<span class="line"><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">  type</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">: </span><span style="--shiki-light:#4EC9B0;--shiki-dark:#4EC9B0">string</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">;</span></span>
+<span class="line"><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">  fromUserId</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">: </span><span style="--shiki-light:#4EC9B0;--shiki-dark:#4EC9B0">string</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">;</span></span>
+<span class="line"><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">  from</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">: </span><span style="--shiki-light:#4EC9B0;--shiki-dark:#4EC9B0">string</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">;</span></span>
+<span class="line"><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">  group</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">: </span><span style="--shiki-light:#4EC9B0;--shiki-dark:#4EC9B0">string</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">;</span></span>
+<span class="line"><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">  data</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">: </span><span style="--shiki-light:#4EC9B0;--shiki-dark:#4EC9B0">MessageData</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">;</span></span>
+<span class="line"><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">}</span></span>
+<span class="line"></span>
+<span class="line"><span style="--shiki-light:#569CD6;--shiki-dark:#569CD6">type</span><span style="--shiki-light:#4EC9B0;--shiki-dark:#4EC9B0"> MessageHandler</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4"> = (</span></span>
+<span class="line"><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">  encoder</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">: </span><span style="--shiki-light:#4EC9B0;--shiki-dark:#4EC9B0">Encoder</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">,</span></span>
+<span class="line"><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">  decoder</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">: </span><span style="--shiki-light:#4EC9B0;--shiki-dark:#4EC9B0">Decoder</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">,</span></span>
+<span class="line"><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">  client</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">: </span><span style="--shiki-light:#4EC9B0;--shiki-dark:#4EC9B0">WeaveStoreAzureWebPubSubSyncClient</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">,</span></span>
+<span class="line"><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">  clientId</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">: </span><span style="--shiki-light:#4EC9B0;--shiki-dark:#4EC9B0">string</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">,</span></span>
+<span class="line"><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">  emitSynced</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">: </span><span style="--shiki-light:#4EC9B0;--shiki-dark:#4EC9B0">boolean</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">,</span></span>
+<span class="line"><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">  messageType</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">: </span><span style="--shiki-light:#4EC9B0;--shiki-dark:#4EC9B0">number</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">,</span></span>
+<span class="line"><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">) </span><span style="--shiki-light:#569CD6;--shiki-dark:#569CD6">=></span><span style="--shiki-light:#4EC9B0;--shiki-dark:#4EC9B0"> void</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="--shiki-light:#569CD6;--shiki-dark:#569CD6">type</span><span style="--shiki-light:#4EC9B0;--shiki-dark:#4EC9B0"> WeaveStoreAzureWebPubsubSyncHandlerDestroyRoomStatusKeys</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4"> =</span></span>
+<span class="line"><span style="--shiki-light:#569CD6;--shiki-dark:#569CD6">  keyof</span><span style="--shiki-light:#569CD6;--shiki-dark:#569CD6"> typeof</span><span style="--shiki-light:#4FC1FF;--shiki-dark:#4FC1FF"> WEAVE_STORE_AZURE_WEB_PUBSUB_DESTROY_ROOM_STATUS</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">;</span></span>
+<span class="line"><span style="--shiki-light:#569CD6;--shiki-dark:#569CD6">type</span><span style="--shiki-light:#4EC9B0;--shiki-dark:#4EC9B0"> WeaveStoreAzureWebPubsubSyncHandlerDestroyRoomStatus</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4"> =</span></span>
+<span class="line"><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">  (</span><span style="--shiki-light:#569CD6;--shiki-dark:#569CD6">typeof</span><span style="--shiki-light:#4FC1FF;--shiki-dark:#4FC1FF"> WEAVE_STORE_AZURE_WEB_PUBSUB_DESTROY_ROOM_STATUS</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">)[</span><span style="--shiki-light:#4EC9B0;--shiki-dark:#4EC9B0">WeaveStoreAzureWebPubsubSyncHandlerDestroyRoomStatusKeys</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">];</span></span>
+<span class="line"></span>
+<span class="line"><span style="--shiki-light:#569CD6;--shiki-dark:#569CD6">type</span><span style="--shiki-light:#4EC9B0;--shiki-dark:#4EC9B0"> WeaveStoreAzureWebPubSubSyncClientOptions</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4"> = {</span></span>
+<span class="line"><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">  heartbeat</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">: {</span></span>
+<span class="line"><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">    checkWindowTimeMs</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">: </span><span style="--shiki-light:#4EC9B0;--shiki-dark:#4EC9B0">number</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">;</span></span>
+<span class="line"><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">    checkIntervalMs</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">: </span><span style="--shiki-light:#4EC9B0;--shiki-dark:#4EC9B0">number</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">;</span></span>
+<span class="line"><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">  };</span></span>
+<span class="line"><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">};</span></span>
+<span class="line"></span>
+<span class="line"><span style="--shiki-light:#569CD6;--shiki-dark:#569CD6">type</span><span style="--shiki-light:#4EC9B0;--shiki-dark:#4EC9B0"> WeaveStoreAzureWebPubsubSyncHostOptions</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4"> = {</span></span>
+<span class="line"><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">  heartbeat</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">: {</span></span>
+<span class="line"><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">    sendIntervalMs</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">: </span><span style="--shiki-light:#4EC9B0;--shiki-dark:#4EC9B0">number</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">;</span></span>
+<span class="line"><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">  };</span></span>
+<span class="line"><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">  resync</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">: {</span></span>
+<span class="line"><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">    checkIntervalMs</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">: </span><span style="--shiki-light:#4EC9B0;--shiki-dark:#4EC9B0">number</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">;</span></span>
+<span class="line"><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">    attemptsLimit</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">: </span><span style="--shiki-light:#4EC9B0;--shiki-dark:#4EC9B0">number</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">;</span></span>
+<span class="line"><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">  };</span></span>
+<span class="line"><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">};</span></span></span></code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="shared-state-initial-value"><a class="anchor" href="#shared-state-initial-value"></a>Shared-state initial value</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>If not defined the <code>defaultInitialState</code> is used, which is nothing more than:</p>
+</div>
+<div class="docouture-diagram zoom-in" data-diagram-type="mermaid"><div class="docouture-diagram__content"><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAA9cAAACuCAYAAAA8sv69AAAQAElEQVR4nOzdB5hU5dnG8RsbGA0ialRERcWCvXcFu2JXoibG3ktiSaKkKX4qlhgxtiS2qLFGJRoLUVFBRMWGWCmiqFhBRCyrgPKd+7xz2LPDzOzszpYp/991PdfszO7OLssp7/OW551PAAAAAACgJPMJAAAAAACUhOQaAAAAAIASkVwDAAAAAFAikmsAAAAAAEpEcg0AAAAAQIlIrgEAAAAAKNECAgCgdP2j6CSUi8lRXCcAANBmOggAgBJ17Nix7tRTT+0UEdrXBx98oMGDB4+dNm1aLwEAgDZDcg0AKJmT648//rhTly5dhPY1atQo9e3bl+QaAIA2xpprAAAAAABKRHINAAAAAECJSK4BAAAAACgRyTUAAAAAACUiuQYAAAAAoEQk1wAAAAAAlIjkGgAAAACAEpFcAwAAAABQIpJrAAAAAABKRHINAAAAAECJSK4BAAAAACgRyTUAAAAAACUiuQYAAAAAoEQk1wAAAAAAlIjkGgAAAACAEpFcAwAAAABQIpJrAAAAAABKRHINAAAAAECJSK4BABVv7NixOvLII9WtWzd1795dO+20k0aOHNngayZPnqypU6cKAACgNZBcAwAq2iuvvKLNN99c48eP13nnnaeBAwdq2WWX1UEHHaSvv/46/pq33npLyy+/vB577DEBAAC0hgUEAEAFu/HGGzVz5kwNHTpUnTp1il879NBDNX36dC2yyCJqaT/88IPuvvtuzZo1SwcffLAAAACMkWsAQEVzsjv//PPru+++a/B6ly5d4sfjjz9eq666avyxR7M7dOigRx99NH7+n//8R/vtt59WX311de3aVXvttZdGjx7d4H2efvpp9evXT507d46/t1evXrr22ms1ceLE+POffvqpjjrqKC233HJaYYUVdPLJJ2v27NkCAAC1heQaAFDR9t57b3311VfaY4899OSTT+r7779v8PnTTjtNt956a/zxgAED9MQTT2iLLbaIn/fo0UM777yzBg0apKuuukrffPNNPBrthN38fn369ImT87fffls33XSTPvvsM5177rk666yz4q9x4j148OA4qe7fv388qn3GGWcIAADUlg4CAKBEHTt2rPv44487JaPFbc0j0cccc4zeffddLbHEEjrwwAN10UUXadFFF40/7zXXTpDvuOOO+HP5PPTQQ9p99901btw4rbbaajrssMP0+OOPa9KkSfHouDkxd9G0u+66K06+e/furWuuuSb++eZE29/nAmqLLbaY2tqoUaPUt2/fsdOmTeslAADQZhi5BgBUPFcHd0J85ZVXaq211tLVV1+t7bbbLl53XYinkp999tlae+21teCCC8aJtc2YMSN+9Ai2120nibV5enjyvsOGDYsfPfqd2HTTTeOR9JdeekkAAKB2kFwDAKpCNHquk046ScOHD9d1112nF154QbfffnvB7znkkEN02223xdO8Pd3bRdHSDjjggDhpv+eee+Lnzz77bPw1e+65Z/z8iy++iB89vdzrsR2uSm4euQYAALWDauEAgKrjwmVHH310PJ07H08V99TuCy+8UPvuu2/Or3ESfeyxx8brqhNeW+0k3lzEzIYMGTK3UnnChc8AAEDtILkGAFQ0rzFeY401GqxvTkaNV1lllfjRU74tXezsk08+iR9XWmmlua+9/PLLDd576tSpuvnmm+O11dtss808P3urrbaKHz1q7sJnAACgdpFcAwAq2oknnqgvv/wyrt7tQmNeL+2q3R45Tvah9gjzMsssowceeEDdunWL11Kvt9568frp66+/XksttZTeeOMNXXrppfHXe/utjTfeON5m69tvv41HuL2vtZN0J+x+D9tss83i7btOOOEEXXLJJfH6bP+M8ePH6/777xcAAKgdrLkGAFQ0V/Pecsstdf7558fTuAcOHDh3Wy4nu7bAAgvEa6u9ftqFzlxJ3FXF77vvvnj7rX322Ue33HJLnBA7SfbaanOC7uT9iiuu0A477KBtt902TtSPOOIIzZkzJ/4ar+v2CLa/bv/999eYMWPiqeQAAKC2sBUXAKBk7b0VV1txFXAn006e77333niP7XLjafK77rrrZ9OnT/9P9PT9KN7LevxWAACgxTFyDQBoqo5RrBmFS2afEsXlUcyvKlNXVxdv8fX888/Pfc37ZifFz6ZMmaJy1aFDhy+jh1EK/y+9o/hdFA9G8XkUn0bxYhROvv1/95sovPn3FlF0FwAAaBbWXAMAclkiilUysXLqY8eSUUzMxNtRTIjiB1WZhRdeON6ey9PMTznllPg1F0S74YYb4uJp5VzALEquPTp9XZ5PLxWF9wtbIfW4ceq5S6DnGvFOP04TAABogOQaAGrXisqd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" alt=""></div></div>
+<div class="paragraph">
+<p>A <a href="../../../../main/build/nodes/stage/" class="xref page">Stage</a> node with 5 children <a href="../../../../main/build/nodes/layer/" class="xref page">Layer</a>
+nodes, in the specified order (bottom-to-top):</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>gridLayer</strong>: is the layer used by <a href="../../../../main/build/plugins/stage-grid/" class="xref page">WeaveStageGridPlugin</a>
+to render the reference grid elements.</p>
+</li>
+<li>
+<p><strong>mainLayer</strong>: is the main layer where all the nodes added by the users live.</p>
+</li>
+<li>
+<p><strong>selectionLayer</strong>: is the layer used by <a href="../../../../main/build/plugins/nodes-selection/" class="xref page">WeaveNodesSelectionPlugin</a>
+to render the selection overlay elements.</p>
+</li>
+<li>
+<p><strong>usersPointersLayer</strong>: is the layer used by <a href="../../../../main/build/plugins/users-pointers/" class="xref page">WeaveUsersPointersPlugin</a>
+to render the users pointers overlay elements.</p>
+</li>
+<li>
+<p><strong>utilityLayer</strong>: is a wildcard layer defined that can be used by any plugin.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>Check out here the <a href="https://github.com/InditexTech/weavejs/blob/main/code/packages/store-azure-web-pubsub/src/server/default-initial-state.ts">code</a>
+hat defines the <code>defaultInitialState</code> function.</p>
+</div>
+</div>
+</div>
+</article>
+  </div>
+</main>
+</div>
+
+
+<footer class="page-footer">
+  <div class="page-footer__nav">
+
+<div class="dt-grid-layout dt-grid-layout--with-margin pagination">
+  <div class="dt-grid-layout__item dt-grid-layout__item--span-full pagination__row">
+    <div class="pagination__buttons">
+    <a class="dt-button dt-button--ghost dt-button--icon-and-label dt-button--icon-icon pagination__prev" href="../../../setup/">
+      <span class="dt-button__content">
+        <span class="dt-button__icon dt-button__icon-icon"><svg class="dt-icon" aria-hidden="true" focusable="false"><use href="../../../../../_/img/icons.svg#icon-arrow-left"></use></svg></span>
+        <span class="pagination__label-full">Setup</span>
+        <span class="pagination__label-short">Prev</span>
+      </span>
+    </a>
+    <a class="dt-button dt-button--ghost dt-button--icon-and-label dt-button--icon-action pagination__next" href="../../client/weave-store-azure-web-pubsub/">
+      <span class="dt-button__content">
+        <span class="pagination__label-full">WeaveStoreAzureWebPubsub</span>
+        <span class="pagination__label-short">Next</span>
+        <span class="dt-button__icon dt-button__icon-action"><svg class="dt-icon" aria-hidden="true" focusable="false"><use href="../../../../../_/img/icons.svg#icon-arrow-right"></use></svg></span>
+      </span>
+    </a>
+    </div>
+  </div>
+</div>
+  </div>
+  <div class="dt-grid-layout dt-grid-layout--with-margin page-footer__feedback">
+    <div class="dt-grid-layout__item dt-grid-layout__item--span-full page-footer__contribute">
+      <div class="page-footer__contribute-copy">
+        <p class="dt-text dt-text--title-s">Help us make these docs great!</p>
+        <p class="dt-text dt-text--body-m">See something that is wrong or unclear? Collaborate with us! Submit a pull request</p>
+      </div>
+      <div class="page-footer__contribute-buttons">
+
+<a class="dt-button dt-button--ghost dt-button--icon-and-label dt-button--icon-action page-footer__propose-change" href="https://github.com/InditexTech/weavejs/edit/main/docs/src/modules/store-azure-web-pubsub/pages/api-reference/server/weave-azure-web-pubsub-server.adoc">
+  <span class="dt-button__content">
+    Propose a change
+    <span class="dt-button__icon dt-button__icon-action"><svg class="dt-icon" aria-hidden="true" focusable="false"><use href="../../../../../_/img/icons.svg#icon-external-link"></use></svg></span>
+  </span>
+</a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+
+<script id="site-script" src="../../../../../_/js/site.js" data-ui-root-path="../../../../../_"></script>
+
+<footer class="site-footer">
+  <div class="dt-grid-layout dt-grid-layout--with-margin site-footer__grid">
+    <div class="dt-grid-layout__item site-footer__col site-footer__brand">
+      <a class="site-footer__brand-link" href="../../../../../5.2.1/">
+        <img class="site-footer__logo" src="../../../../../_/product-logo.png" width="24" height="24" alt="">
+        <span class="dt-text dt-text--label-l-high">Weave.js</span>
+      </a>
+      <span class="dt-text dt-text--detail-m site-footer__legal">&#169; 2026 InditexTech</span>
+    </div>
+    <div class="dt-grid-layout__item site-footer__col site-footer__links">
+      <span class="dt-text dt-text--label-l site-footer__heading">Resources</span>
+      <a class="dt-text dt-text--body-l site-footer__link" href="../../../../main/quickstart/">Quickstart</a>
+      <a class="dt-text dt-text--body-l site-footer__link" href="../../../../sdk/">SDK</a>
+      <a class="dt-text dt-text--body-l site-footer__link" href="../../../../react/">React Helper</a>
+      <a class="dt-text dt-text--body-l site-footer__link" href="../../../../main/build/stores/">Stores</a>
+      <a class="dt-text dt-text--body-l site-footer__link" href="https://github.com/InditexTech/weavejs">Repository</a>
+    </div>
+    <div class="dt-grid-layout__item site-footer__col site-footer__links">
+      <span class="dt-text dt-text--label-l site-footer__heading">Modules</span>
+      <a class="dt-text dt-text--body-l site-footer__link" href="../../../../main/">Framework</a>
+      <a class="dt-text dt-text--body-l site-footer__link" href="../../../../sdk/">SDK</a>
+      <a class="dt-text dt-text--body-l site-footer__link" href="../../../../react/">React Helper</a>
+      <a class="dt-text dt-text--body-l site-footer__link" href="../../../../store-websockets/">Websockets Store</a>
+      <a class="dt-text dt-text--body-l site-footer__link" href="../../../">Azure Web Pubsub Store</a>
+      <a class="dt-text dt-text--body-l site-footer__link" href="../../../../store-standalone/">Standalone Store</a>
+      <a class="dt-text dt-text--body-l site-footer__link" href="../../../../types/">TypeScript Types</a>
+    </div>
+  </div>
+</footer>
+  </body>
+</html>

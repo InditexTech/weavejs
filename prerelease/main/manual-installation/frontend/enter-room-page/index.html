@@ -1,0 +1,1759 @@
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+
+
+<meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <script>
+      /*
+       * Theme bootstrap. Runs before first paint so the page never flashes the
+       * wrong theme. Keep it inline, keep it tiny, and keep it in sync with
+       * src/js/08-theme.ts, which owns the same storage key and class names.
+       *
+       * IDS switches theme with a class on <html>, not a data attribute, so an
+       * attribute here would style nothing.
+       */
+      (function () {
+        var stored
+        try { stored = localStorage.getItem('dt-theme') } catch (e) {}
+        var theme = stored === 'light' || stored === 'dark'
+          ? stored
+          : window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
+        var root = document.documentElement
+        root.classList.add('dt-theme-' + theme, 'dt-scale-medium')
+        root.style.colorScheme = theme
+      })()
+    </script>
+    <script>
+      /*
+       * Side-menu collapse bootstrap (GH-8). Runs before first paint so the
+       * 320px column never flashes in and reflows the article on navigation.
+       * Keep it inline, keep it tiny, and keep it in sync with
+       * src/js/01-nav.ts, which owns the same storage key and class name.
+       *
+       * A stored choice always wins; absent one, the menu starts collapsed
+       * on the home/landing page (matching Figma's "State=Home" toolbar
+       * variant, which is the only one that shows the toggle) and open
+       * everywhere else. With JavaScript disabled this script never runs, so
+       * the class is never added and the menu stays open unconditionally —
+       * the toggle that would reopen it is also never unhidden.
+       */
+      (function () {
+        var stored
+        try { stored = localStorage.getItem('docouture-side-menu') } catch (e) {}
+        var collapsed = stored === 'collapsed' || stored === 'open'
+          ? stored === 'collapsed'
+          : document.documentElement.hasAttribute('data-page-home')
+        if (collapsed) document.documentElement.classList.add('is-side-menu-collapsed')
+      })()
+    </script>
+    <script>
+      /*
+       * ToC collapse bootstrap (GH-10). Runs before first paint so a closed
+       * choice never flashes open for an instant. Keep it in sync with
+       * src/js/02-on-this-page.ts, which owns the same storage key and class
+       * name.
+       *
+       * Deliberately does NOT add `has-toc` — only 02-on-this-page.ts knows
+       * whether this page actually has a usable ToC (headings found, page
+       * not `-toc`), and every effect of the class added here is itself
+       * gated behind `has-toc` in toc.css, so there is nothing to flash
+       * either way before that script runs. This one exists only so a
+       * *closed* choice is already in place the moment it does.
+       */
+      (function () {
+        var stored
+        try { stored = localStorage.getItem('docouture-toc') } catch (e) {}
+        if (stored === 'closed') document.documentElement.classList.add('is-toc-closed')
+      })()
+    </script>
+
+<title>Enter Room page | Weave.js</title>
+
+    <link rel="canonical" href="https://inditextech.github.io/weavejs/5.2.1/main/manual-installation/frontend/enter-room-page/">
+    <link rel="prev" href="../">
+    <link rel="next" href="../room-page/">
+    <meta name="description" content="Learn how to set up the Enter Room page on Next.js">
+    <meta name="generator" content="Antora 3.2.0">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&family=Noto+Sans+Mono:wght@100..900&display=swap">
+    <link rel="stylesheet" href="../../../../../_/css/site.css">
+    <style>:root { --home-background-image: url("/weavejs/_/home-background.jpg") }</style>
+
+
+
+    <link rel="icon" href="../../../../../_/favicon.ico">
+  </head>
+  <body class="article">
+
+
+
+<header class="header-toolbar">
+  <div class="dt-grid-layout dt-grid-layout--with-margin header-toolbar__grid">
+    <div class="dt-grid-layout__item dt-grid-layout__item--span-6 dt-grid-layout__item--span-xs-3 header-toolbar__left">
+      <button class="dt-button dt-button--ghost dt-button--icon-only side-menu-toggle" type="button" aria-controls="side-menu" hidden>
+        <span class="dt-button__content">
+          <span class="dt-button__icon dt-button__icon-icon"><svg class="dt-icon" aria-hidden="true" focusable="false"><use href="../../../../../_/img/icons.svg#icon-menu"></use></svg></span>
+        </span>
+      </button>
+      <a class="header-toolbar__brand" href="../../../../../5.2.1/">
+        <img class="header-toolbar__logo" src="../../../../../_/product-logo.png" width="24" height="24" alt="">
+        <span class="header-toolbar__product-name dt-text dt-text--label-l-high">Weave.js</span>
+      </a>
+    </div>
+    <div class="dt-grid-layout__item dt-grid-layout__item--span-6 dt-grid-layout__item--span-xs-3 header-toolbar__actions">
+      <button type="button" class="dt-button dt-button--ghost header-toolbar__search-trigger">
+        <span class="dt-button__content">
+          <span class="dt-button__icon dt-button__icon-icon"><svg class="dt-icon" aria-hidden="true" focusable="false"><use href="../../../../../_/img/icons.svg#icon-search"></use></svg></span>
+          <span class="dt-text dt-text--label-l header-toolbar__search-label">Search</span>
+          <kbd class="header-toolbar__search-shortcut" aria-hidden="true">⌘K</kbd>
+        </span>
+      </button>
+
+<div class="page-versions">
+  <button type="button" class="dt-tag dt-tag--solid dt-tag--selected header-toolbar__version header-toolbar__version--prerelease version-menu-toggle" title="Show other versions of page" aria-expanded="false">
+    <span class="dt-tag__label">prerelease</span>
+    <span class="dt-tag__icon"><svg class="dt-icon" aria-hidden="true" focusable="false"><use href="../../../../../_/img/icons.svg#icon-chevron-down"></use></svg></span>
+  </button>
+  <div class="version-menu">
+    <span class="version is-current" aria-current="page">
+      <span class="version__label">prerelease</span>
+      <span class="dt-label dt-label--orange"><span class="dt-label__content">Prerelease</span></span>
+    </span>
+    <a class="version" href="../../../../../5.2.1/main/manual-installation/frontend/enter-room-page/">
+      <span class="version__label">5.2.1</span>
+      <span class="dt-label dt-label--green"><span class="dt-label__content">Latest</span></span>
+          </a>
+  </div>
+</div>
+
+<a class="dt-button dt-button--ghost dt-button--icon-only header-toolbar__repo" href="https://github.com/InditexTech/weavejs" target="_blank" rel="noopener" aria-label="Repository">
+  <span class="dt-button__content">
+    <span class="dt-button__icon dt-button__icon-icon header-toolbar__repo-icon" aria-hidden="true"></span>
+  </span>
+</a>
+
+<button class="dt-button dt-button--ghost dt-button--icon-only theme-toggle" type="button" hidden>
+  <span class="dt-button__content">
+    <span class="dt-button__icon dt-button__icon-icon theme-toggle-icon theme-toggle-icon--light" aria-hidden="true"><svg class="dt-icon" aria-hidden="true" focusable="false"><use href="../../../../../_/img/icons.svg#icon-sun"></use></svg></span>
+    <span class="dt-button__icon dt-button__icon-icon theme-toggle-icon theme-toggle-icon--dark" aria-hidden="true"><svg class="dt-icon" aria-hidden="true" focusable="false"><use href="../../../../../_/img/icons.svg#icon-moon"></use></svg></span>
+  </span>
+</button>
+    </div>
+  </div>
+</header>
+
+<dialog id="search-dialog" class="search-dialog" aria-label="Search" data-search-index="ROOT-prerelease.json">
+  <div class="dt-overlay dt-overlay--visible search-dialog__overlay">
+    <div class="dt-overlay__content"></div>
+    <div class="dt-modal dt-modal--small search-dialog__panel">
+      <div class="dt-modal__container search-dialog__container">
+        <div class="dt-search-field-minimal dt-search-field-minimal--full-width search-dialog__field">
+          <span class="dt-search-field-minimal__icon-start" aria-hidden="true"><svg class="dt-icon" aria-hidden="true" focusable="false"><use href="../../../../../_/img/icons.svg#icon-search"></use></svg></span>
+          <div class="dt-search-field-minimal__input-wrapper">
+            <div class="dt-search-field-minimal__input-container">
+              <input type="search" class="dt-search-field-minimal__input" placeholder="Search the docs" aria-label="Search the docs"
+                role="combobox" aria-expanded="false" aria-haspopup="listbox" aria-autocomplete="list"
+                aria-controls="search-dialog-listbox" disabled>
+            </div>
+          </div>
+          <button type="button" class="dt-button dt-button--ghost dt-button--icon-only search-dialog__close" aria-label="Close search" disabled>
+            <span class="dt-button__content">
+              <span class="dt-button__icon dt-button__icon-icon"><svg class="dt-icon" aria-hidden="true" focusable="false"><use href="../../../../../_/img/icons.svg#icon-x"></use></svg></span>
+            </span>
+          </button>
+        </div>
+        <div class="search-dialog__chips" role="group" aria-label="Filter results by module">
+          <button type="button" class="dt-tag dt-tag--solid dt-tag--selected search-dialog__chip" data-category="" aria-pressed="true">
+            <span class="dt-tag__label">All</span>
+          </button>
+          <button type="button" class="dt-tag dt-tag--solid search-dialog__chip" data-category="Framework" aria-pressed="false">
+            <span class="dt-tag__label">Framework</span>
+          </button>
+          <button type="button" class="dt-tag dt-tag--solid search-dialog__chip" data-category="SDK" aria-pressed="false">
+            <span class="dt-tag__label">SDK</span>
+          </button>
+          <button type="button" class="dt-tag dt-tag--solid search-dialog__chip" data-category="React Helper" aria-pressed="false">
+            <span class="dt-tag__label">React Helper</span>
+          </button>
+          <button type="button" class="dt-tag dt-tag--solid search-dialog__chip" data-category="Websockets Store" aria-pressed="false">
+            <span class="dt-tag__label">Websockets Store</span>
+          </button>
+          <button type="button" class="dt-tag dt-tag--solid search-dialog__chip" data-category="Azure Web Pubsub Store" aria-pressed="false">
+            <span class="dt-tag__label">Azure Web Pubsub Store</span>
+          </button>
+          <button type="button" class="dt-tag dt-tag--solid search-dialog__chip" data-category="Standalone Store" aria-pressed="false">
+            <span class="dt-tag__label">Standalone Store</span>
+          </button>
+          <button type="button" class="dt-tag dt-tag--solid search-dialog__chip" data-category="TypeScript Types" aria-pressed="false">
+            <span class="dt-tag__label">TypeScript Types</span>
+          </button>
+        </div>
+        <div id="search-dialog-listbox" class="dt-modal__content dt-modal__content--scrollable search-dialog__results" role="listbox" aria-label="Search results"></div>
+        <div class="search-dialog__status" aria-live="polite"></div>
+        <div class="dt-modal__footer dt-modal__footer--horizontal search-dialog__footer">
+          <span class="dt-modal__footer-left dt-text dt-text--detail-m search-dialog__hints">
+            <kbd>&uarr;&darr;</kbd> navigate &middot; <kbd>&crarr;</kbd> select &middot; <kbd>esc</kbd> close
+          </span>
+        </div>
+      </div>
+    </div>
+  </div>
+</dialog>
+<div class="dt-floating-button-wrapper dt-floating-button-wrapper--viewport dt-floating-button-wrapper--end search-fab">
+  <button type="button" class="dt-button dt-button--ghost dt-button--icon-only dt-floating-button search-fab__trigger" aria-label="Search" aria-haspopup="dialog" aria-controls="search-dialog">
+    <span class="dt-button__content">
+      <span class="dt-button__icon dt-button__icon-icon"><svg class="dt-icon" aria-hidden="true" focusable="false"><use href="../../../../../_/img/icons.svg#icon-search"></use></svg></span>
+    </span>
+  </button>
+</div>
+
+<dialog id="image-zoom-dialog" class="image-zoom-dialog" aria-label="Zoomed image">
+  <div class="dt-overlay dt-overlay--visible image-zoom-dialog__overlay">
+    <div class="dt-overlay__content"></div>
+    <div class="dt-modal dt-modal--fullscreen image-zoom-dialog__panel">
+      <div class="dt-modal__container image-zoom-dialog__container">
+        <button type="button" class="dt-button dt-button--ghost dt-button--icon-only image-zoom-dialog__close" aria-label="Close zoomed image">
+          <span class="dt-button__content">
+            <span class="dt-button__icon dt-button__icon-icon"><svg class="dt-icon" aria-hidden="true" focusable="false"><use href="../../../../../_/img/icons.svg#icon-x"></use></svg></span>
+          </span>
+        </button>
+        <div class="image-zoom-dialog__content"></div>
+      </div>
+    </div>
+  </div>
+</dialog>
+
+<div class="body">
+
+<div id="side-menu" class="side-menu" data-component="ROOT" data-version="prerelease" data-module="main">
+  <div class="side-menu__header">
+    <div class="side-menu__header-start">
+      <img class="side-menu__header-logo" src="../../../../../_/product-logo.png" width="24" height="24" alt="">
+      <span class="side-menu__header-title dt-text dt-text--title-s">Weave.js</span>
+    </div>
+    <button class="side-menu__close" type="button" aria-label="Close navigation"><svg class="dt-icon" aria-hidden="true" focusable="false"><use href="../../../../../_/img/icons.svg#icon-x"></use></svg></button>
+  </div>
+
+<div class="side-menu__brand">
+  <a class="side-menu__brand-link" href="../../../../../5.2.1/">
+    <img class="side-menu__brand-logo" src="../../../../../_/product-logo.png" width="40" height="40" alt="">
+    <span class="side-menu__brand-title dt-text dt-text--title-m">Weave.js</span>
+  </a>
+</div>
+
+<div class="nav-switcher">
+  <button class="nav-switcher__toggle" type="button" aria-expanded="false" aria-haspopup="true" aria-label="Switch module, currently Framework">
+    <span class="nav-switcher__icon"><svg class="dt-icon" aria-hidden="true" focusable="false"><use href="../../../../../_/img/icons.svg#icon-grid-3x3"></use></svg></span>
+    <span class="nav-switcher__label">
+      <span class="nav-switcher__title dt-text dt-text--body-m-high">Framework</span>
+      <span class="nav-switcher__description dt-text dt-text--detail-m">The visual collaborative apps framework</span>
+    </span>
+    <span class="nav-switcher__chevron"><svg class="dt-icon" aria-hidden="true" focusable="false"><use href="../../../../../_/img/icons.svg#icon-chevron-down"></use></svg></span>
+  </button>
+  <div class="nav-switcher__menu" hidden>
+    <ul class="dt-list nav-switcher__list">
+      <li class="nav-switcher__item">
+        <a class="nav-switcher__option" href="../../../" aria-current="true">
+          <span class="nav-switcher__icon"><svg class="dt-icon" aria-hidden="true" focusable="false"><use href="../../../../../_/img/icons.svg#icon-grid-3x3"></use></svg></span>
+          <span class="nav-switcher__label">
+            <span class="nav-switcher__title dt-text dt-text--body-m-high">Framework</span>
+            <span class="nav-switcher__description dt-text dt-text--detail-m">The visual collaborative apps framework</span>
+          </span>
+        </a>
+      </li>
+      <li class="nav-switcher__item">
+        <a class="nav-switcher__option" href="../../../../sdk/">
+          <span class="nav-switcher__icon"><svg class="dt-icon" aria-hidden="true" focusable="false"><use href="../../../../../_/img/icons.svg#icon-code"></use></svg></span>
+          <span class="nav-switcher__label">
+            <span class="nav-switcher__title dt-text dt-text--body-m-high">SDK</span>
+            <span class="nav-switcher__description dt-text dt-text--detail-m">The visual collaborative tool headless library</span>
+          </span>
+        </a>
+      </li>
+      <li class="nav-switcher__item">
+        <a class="nav-switcher__option" href="../../../../react/">
+          <span class="nav-switcher__icon"><svg class="dt-icon" aria-hidden="true" focusable="false"><use href="../../../../../_/img/icons.svg#icon-wrench"></use></svg></span>
+          <span class="nav-switcher__label">
+            <span class="nav-switcher__title dt-text dt-text--body-m-high">React Helper</span>
+            <span class="nav-switcher__description dt-text dt-text--detail-m">Set of React components to help you integrate Weave.js</span>
+          </span>
+        </a>
+      </li>
+      <li class="nav-switcher__item">
+        <a class="nav-switcher__option" href="../../../../store-websockets/">
+          <span class="nav-switcher__icon"><svg class="dt-icon" aria-hidden="true" focusable="false"><use href="../../../../../_/img/icons.svg#icon-wifi"></use></svg></span>
+          <span class="nav-switcher__label">
+            <span class="nav-switcher__title dt-text dt-text--body-m-high">Websockets Store</span>
+            <span class="nav-switcher__description dt-text dt-text--detail-m">Store implementation using WebSockets as transport</span>
+          </span>
+        </a>
+      </li>
+      <li class="nav-switcher__item">
+        <a class="nav-switcher__option" href="../../../../store-azure-web-pubsub/">
+          <span class="nav-switcher__icon"><svg class="dt-icon" aria-hidden="true" focusable="false"><use href="../../../../../_/img/icons.svg#icon-cloud"></use></svg></span>
+          <span class="nav-switcher__label">
+            <span class="nav-switcher__title dt-text dt-text--body-m-high">Azure Web Pubsub Store</span>
+            <span class="nav-switcher__description dt-text dt-text--detail-m">Store implementation using Azure Web Pubsub as transport</span>
+          </span>
+        </a>
+      </li>
+      <li class="nav-switcher__item">
+        <a class="nav-switcher__option" href="../../../../store-standalone/">
+          <span class="nav-switcher__icon"><svg class="dt-icon" aria-hidden="true" focusable="false"><use href="../../../../../_/img/icons.svg#icon-server"></use></svg></span>
+          <span class="nav-switcher__label">
+            <span class="nav-switcher__title dt-text dt-text--body-m-high">Standalone Store</span>
+            <span class="nav-switcher__description dt-text dt-text--detail-m">Store implementation to render a Weave.js canvas in a direct way, just pass a room data.</span>
+          </span>
+        </a>
+      </li>
+      <li class="nav-switcher__item">
+        <a class="nav-switcher__option" href="../../../../types/">
+          <span class="nav-switcher__icon"><svg class="dt-icon" aria-hidden="true" focusable="false"><use href="../../../../../_/img/icons.svg#icon-file"></use></svg></span>
+          <span class="nav-switcher__label">
+            <span class="nav-switcher__title dt-text dt-text--body-m-high">TypeScript Types</span>
+            <span class="nav-switcher__description dt-text dt-text--detail-m">Package that contains the TypeScript types definitions</span>
+          </span>
+        </a>
+      </li>
+    </ul>
+  </div>
+</div>
+  <nav class="side-menu__nav" aria-label="Site navigation">
+
+
+<ul class="dt-list side-menu__list" data-depth="0">
+  <li class="side-menu__item side-menu__item--label">
+    <div class="side-menu__row">
+      <span class="dt-list-item side-menu__link--label dt-list-item--tree--level-0">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Overview</span></span>
+      </span>
+    </div>
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-0"
+        href="../../../">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">About Weave.js</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-0"
+        href="../../../architecture/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Architecture overview</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-0"
+        href="../../../application-structure/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Application structure</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-0"
+        href="../../../glossary/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Glossary</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item side-menu__item--label">
+    <div class="side-menu__row">
+      <span class="dt-list-item side-menu__link--label dt-list-item--tree--level-0">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Getting started</span></span>
+      </span>
+    </div>
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-0"
+        href="../../../requirements/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Requirements</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-0"
+        href="../../../quickstart/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Quickstart</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item side-menu__item--branch">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-0"
+        href="../../">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Manual Installation</span></span>
+      </a>
+      <button class="side-menu__toggle" type="button" aria-expanded="true" aria-label="Toggle Manual Installation">
+        <svg class="dt-icon" aria-hidden="true" focusable="false"><use href="../../../../../_/img/icons.svg#icon-chevron-down"></use></svg>
+      </button>
+    </div>
+
+<ul class="dt-list side-menu__list" data-depth="1">
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="../../backend/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Set up the backend</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item side-menu__item--branch">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="../">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Frontend</span></span>
+      </a>
+      <button class="side-menu__toggle" type="button" aria-expanded="true" aria-label="Toggle Frontend">
+        <svg class="dt-icon" aria-hidden="true" focusable="false"><use href="../../../../../_/img/icons.svg#icon-chevron-down"></use></svg>
+      </button>
+    </div>
+
+<ul class="dt-list side-menu__list" data-depth="2">
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-2"
+        href="./" aria-current="page">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Enter Room page</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-2"
+        href="../room-page/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Room page</span></span>
+      </a>
+    </div>
+
+  </li>
+</ul>
+  </li>
+</ul>
+  </li>
+  <li class="side-menu__item side-menu__item--label">
+    <div class="side-menu__row">
+      <span class="dt-list-item side-menu__link--label dt-list-item--tree--level-0">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Build</span></span>
+      </span>
+    </div>
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-0"
+        href="../../../build/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Overview</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item side-menu__item--branch">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-0"
+        href="../../../build/nodes/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Nodes</span></span>
+      </a>
+      <button class="side-menu__toggle" type="button" aria-expanded="true" aria-label="Toggle Nodes">
+        <svg class="dt-icon" aria-hidden="true" focusable="false"><use href="../../../../../_/img/icons.svg#icon-chevron-down"></use></svg>
+      </button>
+    </div>
+
+<ul class="dt-list side-menu__list" data-depth="1">
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="../../../build/nodes/connector/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Connector</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="../../../build/nodes/comment/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Comment</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="../../../build/nodes/ellipse/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Ellipse</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="../../../build/nodes/frame/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Frame</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="../../../build/nodes/group/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Group</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="../../../build/nodes/image/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Image</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="../../../build/nodes/layer/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Layer</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="../../../build/nodes/measure/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Measure</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="../../../build/nodes/polygon/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Polygon</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="../../../build/nodes/rectangle/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Rectangle</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="../../../build/nodes/stage/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Stage</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="../../../build/nodes/star/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Star</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="../../../build/nodes/stroke/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Stroke</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="../../../build/nodes/stroke-single/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Stroke Single</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="../../../build/nodes/text/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Text</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="../../../build/nodes/video/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Video</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="../../../build/nodes/arrow/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Arrow (deprecated)</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="../../../build/nodes/line/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Line (deprecated)</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="../../../build/nodes/regular-polygon/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Regular Polygon (deprecated)</span></span>
+      </a>
+    </div>
+
+  </li>
+</ul>
+  </li>
+  <li class="side-menu__item side-menu__item--branch">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-0"
+        href="../../../build/plugins/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Plugins</span></span>
+      </a>
+      <button class="side-menu__toggle" type="button" aria-expanded="true" aria-label="Toggle Plugins">
+        <svg class="dt-icon" aria-hidden="true" focusable="false"><use href="../../../../../_/img/icons.svg#icon-chevron-down"></use></svg>
+      </button>
+    </div>
+
+<ul class="dt-list side-menu__list" data-depth="1">
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="../../../build/plugins/comments-renderer/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Comments Renderer</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="../../../build/plugins/connected-users/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Connected Users</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="../../../build/plugins/context-menu/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Context Menu</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="../../../build/plugins/copy-paste-nodes/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Copy &amp; Paste Nodes</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="../../../build/plugins/nodes-selection/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Nodes Selection</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="../../../build/plugins/nodes-multi-selection-feedback/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Nodes Multi-selection Feedback</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="../../../build/plugins/nodes-snapping/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Nodes Snapping</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="../../../build/plugins/stage-drop-area/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Stage Drop Area</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="../../../build/plugins/stage-grid/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Stage Grid</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="../../../build/plugins/stage-keyboard-move/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Stage Keyboard Move</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="../../../build/plugins/stage-panning/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Stage Panning</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="../../../build/plugins/stage-resize/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Stage Resize</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="../../../build/plugins/stage-zoom/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Stage Zoom</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="../../../build/plugins/users-pointers/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Users Pointers</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="../../../build/plugins/users-presence/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Users Presence</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="../../../build/plugins/users-selector/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Users Selector</span></span>
+      </a>
+    </div>
+
+  </li>
+</ul>
+  </li>
+  <li class="side-menu__item side-menu__item--branch">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-0"
+        href="../../../build/actions/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Actions</span></span>
+      </a>
+      <button class="side-menu__toggle" type="button" aria-expanded="true" aria-label="Toggle Actions">
+        <svg class="dt-icon" aria-hidden="true" focusable="false"><use href="../../../../../_/img/icons.svg#icon-chevron-down"></use></svg>
+      </button>
+    </div>
+
+<ul class="dt-list side-menu__list" data-depth="1">
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="../../../build/actions/align-nodes-tool/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Align Nodes Tool</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="../../../build/actions/brush-tool/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Brush Tool</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="../../../build/actions/connector-tool/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Connector Tool</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="../../../build/actions/comment-tool/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Comment Tool</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="../../../build/actions/ellipse-tool/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Ellipse Tool</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="../../../build/actions/eraser-tool/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Eraser Tool</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="../../../build/actions/export-node-tool/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Export Node Tool</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="../../../build/actions/export-stage-tool/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Export Stage Tool</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="../../../build/actions/fit-to-screen-tool/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Fit to Screen Tool</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="../../../build/actions/fit-to-selection-tool/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Fit to Selection Tool</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="../../../build/actions/frame-tool/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Frame Tool</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="../../../build/actions/image-tool/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Image Tool</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="../../../build/actions/images-tool/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Images Tool</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="../../../build/actions/measure-tool/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Measure Tool</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="../../../build/actions/move-tool/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Move Tool</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="../../../build/actions/polygon-tool/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Polygon Tool</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="../../../build/actions/rectangle-tool/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Rectangle Tool</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="../../../build/actions/selection-tool/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Selection Tool</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="../../../build/actions/star-tool/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Star Tool</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="../../../build/actions/stroke-tool/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Stroke Tool</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="../../../build/actions/text-tool/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Text Tool</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="../../../build/actions/video-tool/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Video Tool</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="../../../build/actions/zoom-in-tool/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Zoom In Tool</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="../../../build/actions/zoom-out-tool/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Zoom Out Tool</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="../../../build/actions/arrow-tool/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Arrow Tool (deprecated)</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="../../../build/actions/line-tool/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Line Tool (deprecated)</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="../../../build/actions/pen-tool/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Pen Tool (deprecated)</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="../../../build/actions/regular-polygon-tool/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Regular Polygon Tool (deprecated)</span></span>
+      </a>
+    </div>
+
+  </li>
+</ul>
+  </li>
+  <li class="side-menu__item side-menu__item--branch">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-0"
+        href="../../../build/stores/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Stores</span></span>
+      </a>
+      <button class="side-menu__toggle" type="button" aria-expanded="true" aria-label="Toggle Stores">
+        <svg class="dt-icon" aria-hidden="true" focusable="false"><use href="../../../../../_/img/icons.svg#icon-chevron-down"></use></svg>
+      </button>
+    </div>
+
+<ul class="dt-list side-menu__list" data-depth="1">
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="../../../build/stores/websockets-store/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">WebSockets</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="../../../build/stores/azure-web-pubsub-store/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Azure Web PubSub</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="../../../build/stores/standalone-store/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Standalone</span></span>
+      </a>
+    </div>
+
+  </li>
+</ul>
+  </li>
+  <li class="side-menu__item side-menu__item--label">
+    <div class="side-menu__row">
+      <span class="dt-list-item side-menu__link--label dt-list-item--tree--level-0">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Additional information</span></span>
+      </span>
+    </div>
+  </li>
+  <li class="side-menu__item side-menu__item--branch">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-0"
+        href="../../../release-notes/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Release notes</span></span>
+      </a>
+      <button class="side-menu__toggle" type="button" aria-expanded="true" aria-label="Toggle Release notes">
+        <svg class="dt-icon" aria-hidden="true" focusable="false"><use href="../../../../../_/img/icons.svg#icon-chevron-down"></use></svg>
+      </button>
+    </div>
+
+<ul class="dt-list side-menu__list" data-depth="1">
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="../../../release-notes/5.0.0/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">v5.0.0</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="../../../release-notes/4.0.0/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">v4.0.0</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="../../../release-notes/3.0.0/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">v3.0.0</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="../../../release-notes/2.0.0/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">v2.0.0</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-1"
+        href="../../../release-notes/1.0.0/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">v1.0.0</span></span>
+      </a>
+    </div>
+
+  </li>
+</ul>
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-0"
+        href="../../../changelog/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Changelog</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-0"
+        href="../../../roadmap/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Roadmap</span></span>
+      </a>
+    </div>
+
+  </li>
+  <li class="side-menu__item">
+    <div class="side-menu__row">
+      <a class="dt-list-item side-menu__link dt-list-item--tree--level-0"
+        href="../../../contributing/">
+        <span class="dt-list-item__text"><span class="dt-list-item__label">Contributing</span></span>
+      </a>
+    </div>
+
+  </li>
+</ul>
+  </nav>
+  <div class="side-menu__version">
+
+<div class="page-versions">
+  <button type="button" class="dt-tag dt-tag--solid dt-tag--selected header-toolbar__version header-toolbar__version--prerelease version-menu-toggle" title="Show other versions of page" aria-expanded="false">
+    <span class="dt-tag__label">prerelease</span>
+    <span class="dt-tag__icon"><svg class="dt-icon" aria-hidden="true" focusable="false"><use href="../../../../../_/img/icons.svg#icon-chevron-down"></use></svg></span>
+  </button>
+  <div class="version-menu">
+    <span class="version is-current" aria-current="page">
+      <span class="version__label">prerelease</span>
+      <span class="dt-label dt-label--orange"><span class="dt-label__content">Prerelease</span></span>
+    </span>
+    <a class="version" href="../../../../../5.2.1/main/manual-installation/frontend/enter-room-page/">
+      <span class="version__label">5.2.1</span>
+      <span class="dt-label dt-label--green"><span class="dt-label__content">Latest</span></span>
+          </a>
+  </div>
+</div>
+  </div>
+</div>
+<div class="side-menu-scrim"></div>
+
+<main class="article">
+
+<div class="hero">
+  <div class="dt-grid-layout dt-grid-layout--with-margin hero__grid">
+    <div class="dt-grid-layout__item dt-grid-layout__item--span-full hero__row">
+      <div class="hero__main">
+
+<nav class="dt-breadcrumbs" aria-label="Breadcrumb">
+  <a class="dt-breadcrumb-item dt-breadcrumb-item--link" href="../../../../"><span class="dt-breadcrumb-item__content">Weave.js</span></a>
+  <a class="dt-breadcrumb-item dt-breadcrumb-item--link" href="../../"><span class="dt-breadcrumb-item__content">Manual Installation</span></a>
+  <a class="dt-breadcrumb-item dt-breadcrumb-item--link" href="../"><span class="dt-breadcrumb-item__content">Frontend</span></a>
+  <div class="dt-breadcrumb-item dt-breadcrumb-item--active" aria-current="page"><span class="dt-breadcrumb-item__content">Enter Room page</span></div>
+</nav>
+        <h1 class="hero__title dt-text dt-text--title-xl">Enter Room page</h1>
+        <p class="hero__excerpt dt-text dt-text--body-l">Learn how to set up the Enter Room page on Next.js</p>
+      </div>
+      <div class="hero__aside">
+        <button class="dt-button dt-button--ghost dt-button--icon-only toc-toggle" type="button" aria-controls="on-this-page" aria-expanded="true" hidden>
+          <span class="dt-button__content">
+            <span class="dt-button__icon dt-button__icon-icon"><svg class="dt-icon" aria-hidden="true" focusable="false"><use href="../../../../../_/img/icons.svg#icon-panel-left"></use></svg></span>
+          </span>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+  <div class="content dt-grid-layout dt-grid-layout--with-margin">
+
+<aside id="on-this-page" class="toc" data-title="On this page" data-levels="4">
+  <div class="toc-menu"></div>
+</aside>
+
+<article class="doc">
+<div id="preamble">
+<div class="sectionbody">
+<div class="paragraph">
+<p>In this guide, you will build the <strong>Enter Room page</strong>:</p>
+</div>
+<div class="imageblock zoom-in">
+<div class="content">
+<img src="../../../_images/enter-room-manual.png" alt="Enter room page">
+</div>
+</div>
+<div class="paragraph">
+<p>This page allows users to define the room they wish to join and set their username.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="prerequisites"><a class="anchor" href="#prerequisites"></a>Prerequisites</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Before you begin, ensure that you have completed the <a href="./" class="xref page">frontend installation</a> guide, up to the <em>"Set up the Enter Room page"</em> step.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="step-by-step"><a class="anchor" href="#step-by-step"></a>Step by step</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>To set up the <strong>Enter Room</strong> page in your Next.js project, follow these steps:</p>
+</div>
+<div class="sect2">
+<h3 id="1-install-the-ui-building-block-components"><a class="anchor" href="#1-install-the-ui-building-block-components"></a>1. Install the UI building block components</h3>
+<div class="paragraph">
+<p>Set up the necessary <a href="https://ui.shadcn.com/docs">Shadcn/UI</a> components for the <strong>Enter Room</strong> page.</p>
+</div>
+<div class="paragraph">
+<p>Use the <a href="https://ui.shadcn.com/docs/cli">Shadcn/UI CLI</a> and accept all the default options.</p>
+</div>
+<div class="paragraph">
+<p>From the project root folder, follow these steps:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Install the <a href="https://ui.shadcn.com/docs/components/form">Form</a> component:</p>
+<div class="listingblock">
+<div class="content">
+<pre class="shiki highlight"><code data-lang="shell"><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4;--shiki-light-bg:#1E1E1E;--shiki-dark-bg:#1E1E1E"><span class="line"><span style="--shiki-light:#DCDCAA;--shiki-dark:#DCDCAA">npx</span><span style="--shiki-light:#CE9178;--shiki-dark:#CE9178"> shadcn@latest</span><span style="--shiki-light:#CE9178;--shiki-dark:#CE9178"> add</span><span style="--shiki-light:#CE9178;--shiki-dark:#CE9178"> form</span></span></span></code></pre>
+</div>
+</div>
+</li>
+<li>
+<p>Install the <a href="https://ui.shadcn.com/docs/components/input">Input</a> component:</p>
+<div class="listingblock">
+<div class="content">
+<pre class="shiki highlight"><code data-lang="shell"><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4;--shiki-light-bg:#1E1E1E;--shiki-dark-bg:#1E1E1E"><span class="line"><span style="--shiki-light:#DCDCAA;--shiki-dark:#DCDCAA">npx</span><span style="--shiki-light:#CE9178;--shiki-dark:#CE9178"> shadcn@latest</span><span style="--shiki-light:#CE9178;--shiki-dark:#CE9178"> add</span><span style="--shiki-light:#CE9178;--shiki-dark:#CE9178"> input</span></span></span></code></pre>
+</div>
+</div>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect2">
+<h3 id="2-define-the-base-styles"><a class="anchor" href="#2-define-the-base-styles"></a>2. Define the base styles</h3>
+<div class="paragraph">
+<p>Adjust the styling of the <strong>Enter Room</strong> page.</p>
+</div>
+<div class="paragraph">
+<p>Replace the contents of <code>app/globals.css</code> with:</p>
+</div>
+<div class="listingblock">
+<div class="title">app/globals.css</div>
+<div class="content">
+<pre class="shiki highlight"><code data-lang="css"><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4;--shiki-light-bg:#1E1E1E;--shiki-dark-bg:#1E1E1E"><span class="line"><span style="--shiki-light:#6A9955;--shiki-dark:#6A9955">/*</span></span>
+<span class="line"><span style="--shiki-light:#6A9955;--shiki-dark:#6A9955"> * SPDX-FileCopyrightText: 2026 INDUSTRIA DE DISEÑO TEXTIL S.A. (INDITEX S.A.)</span></span>
+<span class="line"><span style="--shiki-light:#6A9955;--shiki-dark:#6A9955"> *</span></span>
+<span class="line"><span style="--shiki-light:#6A9955;--shiki-dark:#6A9955"> * SPDX-License-Identifier: Apache-2.0</span></span>
+<span class="line"><span style="--shiki-light:#6A9955;--shiki-dark:#6A9955"> */</span></span>
+<span class="line"></span>
+<span class="line"><span style="--shiki-light:#C586C0;--shiki-dark:#C586C0">@tailwind</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4"> base;</span></span>
+<span class="line"><span style="--shiki-light:#C586C0;--shiki-dark:#C586C0">@tailwind</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4"> components;</span></span>
+<span class="line"><span style="--shiki-light:#C586C0;--shiki-dark:#C586C0">@tailwind</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4"> utilities;</span></span>
+<span class="line"></span>
+<span class="line"><span style="--shiki-light:#C586C0;--shiki-dark:#C586C0">@layer</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4"> base {</span></span>
+<span class="line"><span style="--shiki-light:#569CD6;--shiki-dark:#569CD6">  *</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4"> {</span></span>
+<span class="line"><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">    @apply border-border outline-ring/50;</span></span>
+<span class="line"><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">  }</span></span>
+<span class="line"><span style="--shiki-light:#D7BA7D;--shiki-dark:#D7BA7D">  html</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4"> {</span></span>
+<span class="line"><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">    @apply w-full h-full outline-transparent;</span></span>
+<span class="line"><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">  }</span></span>
+<span class="line"><span style="--shiki-light:#D7BA7D;--shiki-dark:#D7BA7D">  body</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4"> {</span></span>
+<span class="line"><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">    @apply w-full h-full outline-transparent bg-background text-foreground;</span></span>
+<span class="line"><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">  }</span></span>
+<span class="line"><span style="--shiki-light:#D7BA7D;--shiki-dark:#D7BA7D">  :root</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4"> {</span></span>
+<span class="line"><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">    --background</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">: </span><span style="--shiki-light:#B5CEA8;--shiki-dark:#B5CEA8">0</span><span style="--shiki-light:#B5CEA8;--shiki-dark:#B5CEA8"> 0%</span><span style="--shiki-light:#B5CEA8;--shiki-dark:#B5CEA8"> 100%</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">    --foreground</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">: </span><span style="--shiki-light:#B5CEA8;--shiki-dark:#B5CEA8">0</span><span style="--shiki-light:#B5CEA8;--shiki-dark:#B5CEA8"> 0%</span><span style="--shiki-light:#B5CEA8;--shiki-dark:#B5CEA8"> 3.9%</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">    --card</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">: </span><span style="--shiki-light:#B5CEA8;--shiki-dark:#B5CEA8">0</span><span style="--shiki-light:#B5CEA8;--shiki-dark:#B5CEA8"> 0%</span><span style="--shiki-light:#B5CEA8;--shiki-dark:#B5CEA8"> 100%</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">    --card-foreground</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">: </span><span style="--shiki-light:#B5CEA8;--shiki-dark:#B5CEA8">0</span><span style="--shiki-light:#B5CEA8;--shiki-dark:#B5CEA8"> 0%</span><span style="--shiki-light:#B5CEA8;--shiki-dark:#B5CEA8"> 3.9%</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">    --popover</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">: </span><span style="--shiki-light:#B5CEA8;--shiki-dark:#B5CEA8">0</span><span style="--shiki-light:#B5CEA8;--shiki-dark:#B5CEA8"> 0%</span><span style="--shiki-light:#B5CEA8;--shiki-dark:#B5CEA8"> 100%</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">    --popover-foreground</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">: </span><span style="--shiki-light:#B5CEA8;--shiki-dark:#B5CEA8">0</span><span style="--shiki-light:#B5CEA8;--shiki-dark:#B5CEA8"> 0%</span><span style="--shiki-light:#B5CEA8;--shiki-dark:#B5CEA8"> 3.9%</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">    --primary</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">: </span><span style="--shiki-light:#B5CEA8;--shiki-dark:#B5CEA8">0</span><span style="--shiki-light:#B5CEA8;--shiki-dark:#B5CEA8"> 0%</span><span style="--shiki-light:#B5CEA8;--shiki-dark:#B5CEA8"> 9%</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">    --primary-foreground</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">: </span><span style="--shiki-light:#B5CEA8;--shiki-dark:#B5CEA8">0</span><span style="--shiki-light:#B5CEA8;--shiki-dark:#B5CEA8"> 0%</span><span style="--shiki-light:#B5CEA8;--shiki-dark:#B5CEA8"> 98%</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">    --secondary</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">: </span><span style="--shiki-light:#B5CEA8;--shiki-dark:#B5CEA8">0</span><span style="--shiki-light:#B5CEA8;--shiki-dark:#B5CEA8"> 0%</span><span style="--shiki-light:#B5CEA8;--shiki-dark:#B5CEA8"> 96.1%</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">    --secondary-foreground</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">: </span><span style="--shiki-light:#B5CEA8;--shiki-dark:#B5CEA8">0</span><span style="--shiki-light:#B5CEA8;--shiki-dark:#B5CEA8"> 0%</span><span style="--shiki-light:#B5CEA8;--shiki-dark:#B5CEA8"> 9%</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">    --muted</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">: </span><span style="--shiki-light:#B5CEA8;--shiki-dark:#B5CEA8">0</span><span style="--shiki-light:#B5CEA8;--shiki-dark:#B5CEA8"> 0%</span><span style="--shiki-light:#B5CEA8;--shiki-dark:#B5CEA8"> 96.1%</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">    --muted-foreground</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">: </span><span style="--shiki-light:#B5CEA8;--shiki-dark:#B5CEA8">0</span><span style="--shiki-light:#B5CEA8;--shiki-dark:#B5CEA8"> 0%</span><span style="--shiki-light:#B5CEA8;--shiki-dark:#B5CEA8"> 45.1%</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">    --accent</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">: </span><span style="--shiki-light:#B5CEA8;--shiki-dark:#B5CEA8">0</span><span style="--shiki-light:#B5CEA8;--shiki-dark:#B5CEA8"> 0%</span><span style="--shiki-light:#B5CEA8;--shiki-dark:#B5CEA8"> 96.1%</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">    --accent-foreground</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">: </span><span style="--shiki-light:#B5CEA8;--shiki-dark:#B5CEA8">0</span><span style="--shiki-light:#B5CEA8;--shiki-dark:#B5CEA8"> 0%</span><span style="--shiki-light:#B5CEA8;--shiki-dark:#B5CEA8"> 9%</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">    --destructive</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">: </span><span style="--shiki-light:#B5CEA8;--shiki-dark:#B5CEA8">0</span><span style="--shiki-light:#B5CEA8;--shiki-dark:#B5CEA8"> 84.2%</span><span style="--shiki-light:#B5CEA8;--shiki-dark:#B5CEA8"> 60.2%</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">    --destructive-foreground</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">: </span><span style="--shiki-light:#B5CEA8;--shiki-dark:#B5CEA8">0</span><span style="--shiki-light:#B5CEA8;--shiki-dark:#B5CEA8"> 0%</span><span style="--shiki-light:#B5CEA8;--shiki-dark:#B5CEA8"> 98%</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">    --border</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">: </span><span style="--shiki-light:#B5CEA8;--shiki-dark:#B5CEA8">0</span><span style="--shiki-light:#B5CEA8;--shiki-dark:#B5CEA8"> 0%</span><span style="--shiki-light:#B5CEA8;--shiki-dark:#B5CEA8"> 89.8%</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">    --input</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">: </span><span style="--shiki-light:#B5CEA8;--shiki-dark:#B5CEA8">0</span><span style="--shiki-light:#B5CEA8;--shiki-dark:#B5CEA8"> 0%</span><span style="--shiki-light:#B5CEA8;--shiki-dark:#B5CEA8"> 89.8%</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">    --ring</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">: </span><span style="--shiki-light:#B5CEA8;--shiki-dark:#B5CEA8">0</span><span style="--shiki-light:#B5CEA8;--shiki-dark:#B5CEA8"> 0%</span><span style="--shiki-light:#B5CEA8;--shiki-dark:#B5CEA8"> 3.9%</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">    --chart-1</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">: </span><span style="--shiki-light:#B5CEA8;--shiki-dark:#B5CEA8">12</span><span style="--shiki-light:#B5CEA8;--shiki-dark:#B5CEA8"> 76%</span><span style="--shiki-light:#B5CEA8;--shiki-dark:#B5CEA8"> 61%</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">    --chart-2</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">: </span><span style="--shiki-light:#B5CEA8;--shiki-dark:#B5CEA8">173</span><span style="--shiki-light:#B5CEA8;--shiki-dark:#B5CEA8"> 58%</span><span style="--shiki-light:#B5CEA8;--shiki-dark:#B5CEA8"> 39%</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">    --chart-3</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">: </span><span style="--shiki-light:#B5CEA8;--shiki-dark:#B5CEA8">197</span><span style="--shiki-light:#B5CEA8;--shiki-dark:#B5CEA8"> 37%</span><span style="--shiki-light:#B5CEA8;--shiki-dark:#B5CEA8"> 24%</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">    --chart-4</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">: </span><span style="--shiki-light:#B5CEA8;--shiki-dark:#B5CEA8">43</span><span style="--shiki-light:#B5CEA8;--shiki-dark:#B5CEA8"> 74%</span><span style="--shiki-light:#B5CEA8;--shiki-dark:#B5CEA8"> 66%</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">    --chart-5</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">: </span><span style="--shiki-light:#B5CEA8;--shiki-dark:#B5CEA8">27</span><span style="--shiki-light:#B5CEA8;--shiki-dark:#B5CEA8"> 87%</span><span style="--shiki-light:#B5CEA8;--shiki-dark:#B5CEA8"> 67%</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">    --radius</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">: </span><span style="--shiki-light:#B5CEA8;--shiki-dark:#B5CEA8">0.5rem</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">;</span></span>
+<span class="line"><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">  }</span></span>
+<span class="line"><span style="--shiki-light:#D7BA7D;--shiki-dark:#D7BA7D">  .dark</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4"> {</span></span>
+<span class="line"><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">    --background</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">: </span><span style="--shiki-light:#B5CEA8;--shiki-dark:#B5CEA8">0</span><span style="--shiki-light:#B5CEA8;--shiki-dark:#B5CEA8"> 0%</span><span style="--shiki-light:#B5CEA8;--shiki-dark:#B5CEA8"> 3.9%</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">    --foreground</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">: </span><span style="--shiki-light:#B5CEA8;--shiki-dark:#B5CEA8">0</span><span style="--shiki-light:#B5CEA8;--shiki-dark:#B5CEA8"> 0%</span><span style="--shiki-light:#B5CEA8;--shiki-dark:#B5CEA8"> 98%</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">    --card</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">: </span><span style="--shiki-light:#B5CEA8;--shiki-dark:#B5CEA8">0</span><span style="--shiki-light:#B5CEA8;--shiki-dark:#B5CEA8"> 0%</span><span style="--shiki-light:#B5CEA8;--shiki-dark:#B5CEA8"> 3.9%</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">    --card-foreground</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">: </span><span style="--shiki-light:#B5CEA8;--shiki-dark:#B5CEA8">0</span><span style="--shiki-light:#B5CEA8;--shiki-dark:#B5CEA8"> 0%</span><span style="--shiki-light:#B5CEA8;--shiki-dark:#B5CEA8"> 98%</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">    --popover</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">: </span><span style="--shiki-light:#B5CEA8;--shiki-dark:#B5CEA8">0</span><span style="--shiki-light:#B5CEA8;--shiki-dark:#B5CEA8"> 0%</span><span style="--shiki-light:#B5CEA8;--shiki-dark:#B5CEA8"> 3.9%</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">    --popover-foreground</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">: </span><span style="--shiki-light:#B5CEA8;--shiki-dark:#B5CEA8">0</span><span style="--shiki-light:#B5CEA8;--shiki-dark:#B5CEA8"> 0%</span><span style="--shiki-light:#B5CEA8;--shiki-dark:#B5CEA8"> 98%</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">    --primary</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">: </span><span style="--shiki-light:#B5CEA8;--shiki-dark:#B5CEA8">0</span><span style="--shiki-light:#B5CEA8;--shiki-dark:#B5CEA8"> 0%</span><span style="--shiki-light:#B5CEA8;--shiki-dark:#B5CEA8"> 98%</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">    --primary-foreground</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">: </span><span style="--shiki-light:#B5CEA8;--shiki-dark:#B5CEA8">0</span><span style="--shiki-light:#B5CEA8;--shiki-dark:#B5CEA8"> 0%</span><span style="--shiki-light:#B5CEA8;--shiki-dark:#B5CEA8"> 9%</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">    --secondary</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">: </span><span style="--shiki-light:#B5CEA8;--shiki-dark:#B5CEA8">0</span><span style="--shiki-light:#B5CEA8;--shiki-dark:#B5CEA8"> 0%</span><span style="--shiki-light:#B5CEA8;--shiki-dark:#B5CEA8"> 14.9%</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">    --secondary-foreground</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">: </span><span style="--shiki-light:#B5CEA8;--shiki-dark:#B5CEA8">0</span><span style="--shiki-light:#B5CEA8;--shiki-dark:#B5CEA8"> 0%</span><span style="--shiki-light:#B5CEA8;--shiki-dark:#B5CEA8"> 98%</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">    --muted</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">: </span><span style="--shiki-light:#B5CEA8;--shiki-dark:#B5CEA8">0</span><span style="--shiki-light:#B5CEA8;--shiki-dark:#B5CEA8"> 0%</span><span style="--shiki-light:#B5CEA8;--shiki-dark:#B5CEA8"> 14.9%</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">    --muted-foreground</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">: </span><span style="--shiki-light:#B5CEA8;--shiki-dark:#B5CEA8">0</span><span style="--shiki-light:#B5CEA8;--shiki-dark:#B5CEA8"> 0%</span><span style="--shiki-light:#B5CEA8;--shiki-dark:#B5CEA8"> 63.9%</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">    --accent</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">: </span><span style="--shiki-light:#B5CEA8;--shiki-dark:#B5CEA8">0</span><span style="--shiki-light:#B5CEA8;--shiki-dark:#B5CEA8"> 0%</span><span style="--shiki-light:#B5CEA8;--shiki-dark:#B5CEA8"> 14.9%</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">    --accent-foreground</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">: </span><span style="--shiki-light:#B5CEA8;--shiki-dark:#B5CEA8">0</span><span style="--shiki-light:#B5CEA8;--shiki-dark:#B5CEA8"> 0%</span><span style="--shiki-light:#B5CEA8;--shiki-dark:#B5CEA8"> 98%</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">    --destructive</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">: </span><span style="--shiki-light:#B5CEA8;--shiki-dark:#B5CEA8">0</span><span style="--shiki-light:#B5CEA8;--shiki-dark:#B5CEA8"> 62.8%</span><span style="--shiki-light:#B5CEA8;--shiki-dark:#B5CEA8"> 30.6%</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">    --destructive-foreground</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">: </span><span style="--shiki-light:#B5CEA8;--shiki-dark:#B5CEA8">0</span><span style="--shiki-light:#B5CEA8;--shiki-dark:#B5CEA8"> 0%</span><span style="--shiki-light:#B5CEA8;--shiki-dark:#B5CEA8"> 98%</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">    --border</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">: </span><span style="--shiki-light:#B5CEA8;--shiki-dark:#B5CEA8">0</span><span style="--shiki-light:#B5CEA8;--shiki-dark:#B5CEA8"> 0%</span><span style="--shiki-light:#B5CEA8;--shiki-dark:#B5CEA8"> 14.9%</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">    --input</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">: </span><span style="--shiki-light:#B5CEA8;--shiki-dark:#B5CEA8">0</span><span style="--shiki-light:#B5CEA8;--shiki-dark:#B5CEA8"> 0%</span><span style="--shiki-light:#B5CEA8;--shiki-dark:#B5CEA8"> 14.9%</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">    --ring</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">: </span><span style="--shiki-light:#B5CEA8;--shiki-dark:#B5CEA8">0</span><span style="--shiki-light:#B5CEA8;--shiki-dark:#B5CEA8"> 0%</span><span style="--shiki-light:#B5CEA8;--shiki-dark:#B5CEA8"> 83.1%</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">    --chart-1</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">: </span><span style="--shiki-light:#B5CEA8;--shiki-dark:#B5CEA8">220</span><span style="--shiki-light:#B5CEA8;--shiki-dark:#B5CEA8"> 70%</span><span style="--shiki-light:#B5CEA8;--shiki-dark:#B5CEA8"> 50%</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">    --chart-2</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">: </span><span style="--shiki-light:#B5CEA8;--shiki-dark:#B5CEA8">160</span><span style="--shiki-light:#B5CEA8;--shiki-dark:#B5CEA8"> 60%</span><span style="--shiki-light:#B5CEA8;--shiki-dark:#B5CEA8"> 45%</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">    --chart-3</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">: </span><span style="--shiki-light:#B5CEA8;--shiki-dark:#B5CEA8">30</span><span style="--shiki-light:#B5CEA8;--shiki-dark:#B5CEA8"> 80%</span><span style="--shiki-light:#B5CEA8;--shiki-dark:#B5CEA8"> 55%</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">    --chart-4</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">: </span><span style="--shiki-light:#B5CEA8;--shiki-dark:#B5CEA8">280</span><span style="--shiki-light:#B5CEA8;--shiki-dark:#B5CEA8"> 65%</span><span style="--shiki-light:#B5CEA8;--shiki-dark:#B5CEA8"> 60%</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">    --chart-5</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">: </span><span style="--shiki-light:#B5CEA8;--shiki-dark:#B5CEA8">340</span><span style="--shiki-light:#B5CEA8;--shiki-dark:#B5CEA8"> 75%</span><span style="--shiki-light:#B5CEA8;--shiki-dark:#B5CEA8"> 55%</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">;</span></span>
+<span class="line"><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">  }</span></span>
+<span class="line"><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">}</span></span>
+<span class="line"></span>
+<span class="line"><span style="--shiki-light:#C586C0;--shiki-dark:#C586C0">@layer</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4"> base {</span></span>
+<span class="line"><span style="--shiki-light:#569CD6;--shiki-dark:#569CD6">  *</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4"> {</span></span>
+<span class="line"><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">    @apply border-border;</span></span>
+<span class="line"><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">  }</span></span>
+<span class="line"><span style="--shiki-light:#D7BA7D;--shiki-dark:#D7BA7D">  body</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4"> {</span></span>
+<span class="line"><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">    @apply bg-background text-foreground;</span></span>
+<span class="line"><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">  }</span></span>
+<span class="line"><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">}</span></span></span></code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="3-set-up-the-page-react-component"><a class="anchor" href="#3-set-up-the-page-react-component"></a>3. Set up the page React component</h3>
+<div class="paragraph">
+<p>Create a <code>home</code> folder in the <code>components</code> folder.</p>
+</div>
+<div class="sect3">
+<h4 id="home-component"><a class="anchor" href="#home-component"></a>Home component</h4>
+<div class="paragraph">
+<p>In the <code>components/home</code> folder, create a file named <code>home.tsx</code> with:</p>
+</div>
+<div class="listingblock">
+<div class="title">components/home/home.tsx</div>
+<div class="content">
+<pre class="shiki highlight"><code data-lang="tsx"><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4;--shiki-light-bg:#1E1E1E;--shiki-dark-bg:#1E1E1E"><span class="line"><span style="--shiki-light:#6A9955;--shiki-dark:#6A9955">// SPDX-FileCopyrightText: 2026 INDUSTRIA DE DISEÑO TEXTIL S.A. (INDITEX S.A.)</span></span>
+<span class="line"><span style="--shiki-light:#6A9955;--shiki-dark:#6A9955">//</span></span>
+<span class="line"><span style="--shiki-light:#6A9955;--shiki-dark:#6A9955">// SPDX-License-Identifier: Apache-2.0</span></span>
+<span class="line"></span>
+<span class="line"><span style="--shiki-light:#CE9178;--shiki-dark:#CE9178">'use client'</span></span>
+<span class="line"></span>
+<span class="line"><span style="--shiki-light:#C586C0;--shiki-dark:#C586C0">import</span><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE"> React</span><span style="--shiki-light:#C586C0;--shiki-dark:#C586C0"> from</span><span style="--shiki-light:#CE9178;--shiki-dark:#CE9178"> 'react'</span></span>
+<span class="line"><span style="--shiki-light:#C586C0;--shiki-dark:#C586C0">import</span><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE"> LoginForm</span><span style="--shiki-light:#C586C0;--shiki-dark:#C586C0"> from</span><span style="--shiki-light:#CE9178;--shiki-dark:#CE9178"> './login-form'</span></span>
+<span class="line"></span>
+<span class="line"><span style="--shiki-light:#C586C0;--shiki-dark:#C586C0">export</span><span style="--shiki-light:#569CD6;--shiki-dark:#569CD6"> const</span><span style="--shiki-light:#DCDCAA;--shiki-dark:#DCDCAA"> Home</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4"> = () </span><span style="--shiki-light:#569CD6;--shiki-dark:#569CD6">=></span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4"> {</span></span>
+<span class="line"><span style="--shiki-light:#C586C0;--shiki-dark:#C586C0">  return</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4"> (</span></span>
+<span class="line"><span style="--shiki-light:#808080;--shiki-dark:#808080">    &#x3C;></span></span>
+<span class="line"><span style="--shiki-light:#808080;--shiki-dark:#808080">      &#x3C;</span><span style="--shiki-light:#569CD6;--shiki-dark:#569CD6">main</span><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE"> className</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">=</span><span style="--shiki-light:#CE9178;--shiki-dark:#CE9178">"w-full h-full"</span><span style="--shiki-light:#808080;--shiki-dark:#808080">></span></span>
+<span class="line"><span style="--shiki-light:#808080;--shiki-dark:#808080">        &#x3C;</span><span style="--shiki-light:#569CD6;--shiki-dark:#569CD6">section</span><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE"> className</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">=</span><span style="--shiki-light:#CE9178;--shiki-dark:#CE9178">"relative flex h-full w-full flex-col items-center justify-center p-6"</span><span style="--shiki-light:#808080;--shiki-dark:#808080">></span></span>
+<span class="line"><span style="--shiki-light:#808080;--shiki-dark:#808080">          &#x3C;</span><span style="--shiki-light:#569CD6;--shiki-dark:#569CD6">h3</span><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE"> className</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">=</span><span style="--shiki-light:#CE9178;--shiki-dark:#CE9178">"text-2xl font-noto-sans-mono font-extralight text-muted-foreground uppercase mb-8"</span><span style="--shiki-light:#808080;--shiki-dark:#808080">></span></span>
+<span class="line"><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">            Join a Room</span></span>
+<span class="line"><span style="--shiki-light:#808080;--shiki-dark:#808080">          &#x3C;/</span><span style="--shiki-light:#569CD6;--shiki-dark:#569CD6">h3</span><span style="--shiki-light:#808080;--shiki-dark:#808080">></span></span>
+<span class="line"><span style="--shiki-light:#808080;--shiki-dark:#808080">          &#x3C;</span><span style="--shiki-light:#4EC9B0;--shiki-dark:#4EC9B0">LoginForm</span><span style="--shiki-light:#808080;--shiki-dark:#808080"> /></span></span>
+<span class="line"><span style="--shiki-light:#808080;--shiki-dark:#808080">        &#x3C;/</span><span style="--shiki-light:#569CD6;--shiki-dark:#569CD6">section</span><span style="--shiki-light:#808080;--shiki-dark:#808080">></span></span>
+<span class="line"><span style="--shiki-light:#808080;--shiki-dark:#808080">      &#x3C;/</span><span style="--shiki-light:#569CD6;--shiki-dark:#569CD6">main</span><span style="--shiki-light:#808080;--shiki-dark:#808080">></span></span>
+<span class="line"><span style="--shiki-light:#808080;--shiki-dark:#808080">    &#x3C;/></span></span>
+<span class="line"><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">  )</span></span>
+<span class="line"><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">}</span></span></span></code></pre>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="loginform-component"><a class="anchor" href="#loginform-component"></a>LoginForm component</h4>
+<div class="paragraph">
+<p>In the <code>components/home</code> folder, create a file named <code>login-form.tsx</code> with:</p>
+</div>
+<div class="listingblock">
+<div class="title">components/home/login-form.tsx</div>
+<div class="content">
+<pre class="shiki highlight"><code data-lang="tsx"><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4;--shiki-light-bg:#1E1E1E;--shiki-dark-bg:#1E1E1E"><span class="line"><span style="--shiki-light:#6A9955;--shiki-dark:#6A9955">// SPDX-FileCopyrightText: 2026 INDUSTRIA DE DISEÑO TEXTIL S.A. (INDITEX S.A.)</span></span>
+<span class="line"><span style="--shiki-light:#6A9955;--shiki-dark:#6A9955">//</span></span>
+<span class="line"><span style="--shiki-light:#6A9955;--shiki-dark:#6A9955">// SPDX-License-Identifier: Apache-2.0</span></span>
+<span class="line"></span>
+<span class="line"><span style="--shiki-light:#CE9178;--shiki-dark:#CE9178">'use client'</span></span>
+<span class="line"></span>
+<span class="line"><span style="--shiki-light:#C586C0;--shiki-dark:#C586C0">import</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4"> { </span><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">v4</span><span style="--shiki-light:#C586C0;--shiki-dark:#C586C0"> as</span><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE"> uuidv4</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4"> } </span><span style="--shiki-light:#C586C0;--shiki-dark:#C586C0">from</span><span style="--shiki-light:#CE9178;--shiki-dark:#CE9178"> 'uuid'</span></span>
+<span class="line"><span style="--shiki-light:#C586C0;--shiki-dark:#C586C0">import</span><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE"> React</span><span style="--shiki-light:#C586C0;--shiki-dark:#C586C0"> from</span><span style="--shiki-light:#CE9178;--shiki-dark:#CE9178"> 'react'</span></span>
+<span class="line"><span style="--shiki-light:#C586C0;--shiki-dark:#C586C0">import</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4"> { </span><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">useRouter</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4"> } </span><span style="--shiki-light:#C586C0;--shiki-dark:#C586C0">from</span><span style="--shiki-light:#CE9178;--shiki-dark:#CE9178"> 'next/navigation'</span></span>
+<span class="line"><span style="--shiki-light:#C586C0;--shiki-dark:#C586C0">import</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4"> { </span><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">z</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4"> } </span><span style="--shiki-light:#C586C0;--shiki-dark:#C586C0">from</span><span style="--shiki-light:#CE9178;--shiki-dark:#CE9178"> 'zod'</span></span>
+<span class="line"><span style="--shiki-light:#C586C0;--shiki-dark:#C586C0">import</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4"> { </span><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">zodResolver</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4"> } </span><span style="--shiki-light:#C586C0;--shiki-dark:#C586C0">from</span><span style="--shiki-light:#CE9178;--shiki-dark:#CE9178"> '@hookform/resolvers/zod'</span></span>
+<span class="line"><span style="--shiki-light:#C586C0;--shiki-dark:#C586C0">import</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4"> { </span><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">useForm</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4"> } </span><span style="--shiki-light:#C586C0;--shiki-dark:#C586C0">from</span><span style="--shiki-light:#CE9178;--shiki-dark:#CE9178"> 'react-hook-form'</span></span>
+<span class="line"><span style="--shiki-light:#C586C0;--shiki-dark:#C586C0">import</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4"> { </span><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">Form</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">, </span><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">FormControl</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">, </span><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">FormField</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">, </span><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">FormItem</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">, </span><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">FormLabel</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">, </span><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">FormMessage</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4"> } </span><span style="--shiki-light:#C586C0;--shiki-dark:#C586C0">from</span><span style="--shiki-light:#CE9178;--shiki-dark:#CE9178"> '@/components/ui/form'</span></span>
+<span class="line"><span style="--shiki-light:#C586C0;--shiki-dark:#C586C0">import</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4"> { </span><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">Input</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4"> } </span><span style="--shiki-light:#C586C0;--shiki-dark:#C586C0">from</span><span style="--shiki-light:#CE9178;--shiki-dark:#CE9178"> '@/components/ui/input'</span></span>
+<span class="line"><span style="--shiki-light:#C586C0;--shiki-dark:#C586C0">import</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4"> { </span><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">Button</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4"> } </span><span style="--shiki-light:#C586C0;--shiki-dark:#C586C0">from</span><span style="--shiki-light:#CE9178;--shiki-dark:#CE9178"> '@/components/ui/button'</span></span>
+<span class="line"><span style="--shiki-light:#C586C0;--shiki-dark:#C586C0">import</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4"> { </span><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">useCollaborationRoom</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4"> } </span><span style="--shiki-light:#C586C0;--shiki-dark:#C586C0">from</span><span style="--shiki-light:#CE9178;--shiki-dark:#CE9178"> '@/store/store'</span></span>
+<span class="line"></span>
+<span class="line"><span style="--shiki-light:#569CD6;--shiki-dark:#569CD6">const</span><span style="--shiki-light:#4FC1FF;--shiki-dark:#4FC1FF"> formSchema</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4"> = </span><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">z</span></span>
+<span class="line"><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">  .</span><span style="--shiki-light:#DCDCAA;--shiki-dark:#DCDCAA">object</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">({</span></span>
+<span class="line"><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">    username:</span><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE"> z</span></span>
+<span class="line"><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">      .</span><span style="--shiki-light:#DCDCAA;--shiki-dark:#DCDCAA">string</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">()</span></span>
+<span class="line"><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">      .</span><span style="--shiki-light:#DCDCAA;--shiki-dark:#DCDCAA">trim</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">()</span></span>
+<span class="line"><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">      .</span><span style="--shiki-light:#DCDCAA;--shiki-dark:#DCDCAA">min</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">(</span><span style="--shiki-light:#B5CEA8;--shiki-dark:#B5CEA8">1</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">, { </span><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">message:</span><span style="--shiki-light:#CE9178;--shiki-dark:#CE9178"> 'The username is required'</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4"> })</span></span>
+<span class="line"><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">      .</span><span style="--shiki-light:#DCDCAA;--shiki-dark:#DCDCAA">max</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">(</span><span style="--shiki-light:#B5CEA8;--shiki-dark:#B5CEA8">50</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">, { </span><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">message:</span><span style="--shiki-light:#CE9178;--shiki-dark:#CE9178"> 'The username must be maximum 50 characters long'</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4"> }),</span></span>
+<span class="line"><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">    roomId:</span><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE"> z</span></span>
+<span class="line"><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">      .</span><span style="--shiki-light:#DCDCAA;--shiki-dark:#DCDCAA">string</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">()</span></span>
+<span class="line"><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">      .</span><span style="--shiki-light:#DCDCAA;--shiki-dark:#DCDCAA">trim</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">()</span></span>
+<span class="line"><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">      .</span><span style="--shiki-light:#DCDCAA;--shiki-dark:#DCDCAA">min</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">(</span><span style="--shiki-light:#B5CEA8;--shiki-dark:#B5CEA8">1</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">, { </span><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">message:</span><span style="--shiki-light:#CE9178;--shiki-dark:#CE9178"> 'The room name is required'</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4"> })</span></span>
+<span class="line"><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">      .</span><span style="--shiki-light:#DCDCAA;--shiki-dark:#DCDCAA">max</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">(</span><span style="--shiki-light:#B5CEA8;--shiki-dark:#B5CEA8">50</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">, { </span><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">message:</span><span style="--shiki-light:#CE9178;--shiki-dark:#CE9178"> 'The room name must be maximum 50 characters long'</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4"> }),</span></span>
+<span class="line"><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">  })</span></span>
+<span class="line"><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">  .</span><span style="--shiki-light:#DCDCAA;--shiki-dark:#DCDCAA">required</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">()</span></span>
+<span class="line"></span>
+<span class="line"><span style="--shiki-light:#569CD6;--shiki-dark:#569CD6">function</span><span style="--shiki-light:#DCDCAA;--shiki-dark:#DCDCAA"> LoginForm</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">() {</span></span>
+<span class="line"><span style="--shiki-light:#569CD6;--shiki-dark:#569CD6">  const</span><span style="--shiki-light:#4FC1FF;--shiki-dark:#4FC1FF"> router</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4"> = </span><span style="--shiki-light:#DCDCAA;--shiki-dark:#DCDCAA">useRouter</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">()</span></span>
+<span class="line"></span>
+<span class="line"><span style="--shiki-light:#569CD6;--shiki-dark:#569CD6">  const</span><span style="--shiki-light:#4FC1FF;--shiki-dark:#4FC1FF"> setRoom</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4"> = </span><span style="--shiki-light:#DCDCAA;--shiki-dark:#DCDCAA">useCollaborationRoom</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">((</span><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">state</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">) </span><span style="--shiki-light:#569CD6;--shiki-dark:#569CD6">=></span><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE"> state</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">.</span><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">setRoom</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">)</span></span>
+<span class="line"><span style="--shiki-light:#569CD6;--shiki-dark:#569CD6">  const</span><span style="--shiki-light:#4FC1FF;--shiki-dark:#4FC1FF"> setUser</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4"> = </span><span style="--shiki-light:#DCDCAA;--shiki-dark:#DCDCAA">useCollaborationRoom</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">((</span><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">state</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">) </span><span style="--shiki-light:#569CD6;--shiki-dark:#569CD6">=></span><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE"> state</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">.</span><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">setUser</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">)</span></span>
+<span class="line"></span>
+<span class="line"><span style="--shiki-light:#569CD6;--shiki-dark:#569CD6">  const</span><span style="--shiki-light:#4FC1FF;--shiki-dark:#4FC1FF"> form</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4"> = </span><span style="--shiki-light:#DCDCAA;--shiki-dark:#DCDCAA">useForm</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">&#x3C;</span><span style="--shiki-light:#4EC9B0;--shiki-dark:#4EC9B0">z</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">.</span><span style="--shiki-light:#4EC9B0;--shiki-dark:#4EC9B0">infer</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">&#x3C;</span><span style="--shiki-light:#569CD6;--shiki-dark:#569CD6">typeof</span><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE"> formSchema</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">>>({</span></span>
+<span class="line"><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">    resolver:</span><span style="--shiki-light:#DCDCAA;--shiki-dark:#DCDCAA"> zodResolver</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">(</span><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">formSchema</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">),</span></span>
+<span class="line"><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">    defaultValues:</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4"> {</span></span>
+<span class="line"><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">      username:</span><span style="--shiki-light:#CE9178;--shiki-dark:#CE9178"> ''</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">,</span></span>
+<span class="line"><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">      roomId:</span><span style="--shiki-light:#CE9178;--shiki-dark:#CE9178"> ''</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">,</span></span>
+<span class="line"><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">    },</span></span>
+<span class="line"><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">  })</span></span>
+<span class="line"></span>
+<span class="line"><span style="--shiki-light:#569CD6;--shiki-dark:#569CD6">  function</span><span style="--shiki-light:#DCDCAA;--shiki-dark:#DCDCAA"> onSubmit</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">(</span><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">values</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">: </span><span style="--shiki-light:#4EC9B0;--shiki-dark:#4EC9B0">z</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">.</span><span style="--shiki-light:#4EC9B0;--shiki-dark:#4EC9B0">infer</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">&#x3C;</span><span style="--shiki-light:#569CD6;--shiki-dark:#569CD6">typeof</span><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE"> formSchema</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">>) {</span></span>
+<span class="line"><span style="--shiki-light:#DCDCAA;--shiki-dark:#DCDCAA">    setRoom</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">(</span><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">values</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">.</span><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">roomId</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">)</span></span>
+<span class="line"><span style="--shiki-light:#DCDCAA;--shiki-dark:#DCDCAA">    setUser</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">({</span></span>
+<span class="line"><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">      id:</span><span style="--shiki-light:#CE9178;--shiki-dark:#CE9178"> `</span><span style="--shiki-light:#569CD6;--shiki-dark:#569CD6">${</span><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">values</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">.</span><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">username</span><span style="--shiki-light:#569CD6;--shiki-dark:#569CD6">}</span><span style="--shiki-light:#CE9178;--shiki-dark:#CE9178">-</span><span style="--shiki-light:#569CD6;--shiki-dark:#569CD6">${</span><span style="--shiki-light:#DCDCAA;--shiki-dark:#DCDCAA">uuidv4</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">()</span><span style="--shiki-light:#569CD6;--shiki-dark:#569CD6">}</span><span style="--shiki-light:#CE9178;--shiki-dark:#CE9178">`</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">,</span></span>
+<span class="line"><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">      name:</span><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE"> values</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">.</span><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">username</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">,</span></span>
+<span class="line"><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">      email:</span><span style="--shiki-light:#CE9178;--shiki-dark:#CE9178"> `</span><span style="--shiki-light:#569CD6;--shiki-dark:#569CD6">${</span><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">values</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">.</span><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">username</span><span style="--shiki-light:#569CD6;--shiki-dark:#569CD6">}</span><span style="--shiki-light:#CE9178;--shiki-dark:#CE9178">@weavejs.com`</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">,</span></span>
+<span class="line"><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">    })</span></span>
+<span class="line"><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">    router</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">.</span><span style="--shiki-light:#DCDCAA;--shiki-dark:#DCDCAA">push</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">(</span><span style="--shiki-light:#CE9178;--shiki-dark:#CE9178">`/rooms/</span><span style="--shiki-light:#569CD6;--shiki-dark:#569CD6">${</span><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">values</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">.</span><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">roomId</span><span style="--shiki-light:#569CD6;--shiki-dark:#569CD6">}</span><span style="--shiki-light:#CE9178;--shiki-dark:#CE9178">?userName=</span><span style="--shiki-light:#569CD6;--shiki-dark:#569CD6">${</span><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">values</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">.</span><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">username</span><span style="--shiki-light:#569CD6;--shiki-dark:#569CD6">}</span><span style="--shiki-light:#CE9178;--shiki-dark:#CE9178">`</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">)</span></span>
+<span class="line"><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">  }</span></span>
+<span class="line"></span>
+<span class="line"><span style="--shiki-light:#C586C0;--shiki-dark:#C586C0">  return</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4"> (</span></span>
+<span class="line"><span style="--shiki-light:#808080;--shiki-dark:#808080">    &#x3C;</span><span style="--shiki-light:#569CD6;--shiki-dark:#569CD6">div</span><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE"> className</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">=</span><span style="--shiki-light:#CE9178;--shiki-dark:#CE9178">"w-full max-w-md"</span><span style="--shiki-light:#808080;--shiki-dark:#808080">></span></span>
+<span class="line"><span style="--shiki-light:#808080;--shiki-dark:#808080">      &#x3C;</span><span style="--shiki-light:#4EC9B0;--shiki-dark:#4EC9B0">Form</span><span style="--shiki-light:#569CD6;--shiki-dark:#569CD6"> {</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">...</span><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">form</span><span style="--shiki-light:#569CD6;--shiki-dark:#569CD6">}</span><span style="--shiki-light:#808080;--shiki-dark:#808080">></span></span>
+<span class="line"><span style="--shiki-light:#808080;--shiki-dark:#808080">        &#x3C;</span><span style="--shiki-light:#569CD6;--shiki-dark:#569CD6">form</span><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE"> onSubmit</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">=</span><span style="--shiki-light:#569CD6;--shiki-dark:#569CD6">{</span><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">form</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">.</span><span style="--shiki-light:#DCDCAA;--shiki-dark:#DCDCAA">handleSubmit</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">(</span><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">onSubmit</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">)</span><span style="--shiki-light:#569CD6;--shiki-dark:#569CD6">}</span><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE"> className</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">=</span><span style="--shiki-light:#CE9178;--shiki-dark:#CE9178">"w-full space-y-5"</span><span style="--shiki-light:#808080;--shiki-dark:#808080">></span></span>
+<span class="line"><span style="--shiki-light:#808080;--shiki-dark:#808080">          &#x3C;</span><span style="--shiki-light:#4EC9B0;--shiki-dark:#4EC9B0">FormField</span></span>
+<span class="line"><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">            control</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">=</span><span style="--shiki-light:#569CD6;--shiki-dark:#569CD6">{</span><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">form</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">.</span><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">control</span><span style="--shiki-light:#569CD6;--shiki-dark:#569CD6">}</span></span>
+<span class="line"><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">            name</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">=</span><span style="--shiki-light:#CE9178;--shiki-dark:#CE9178">"roomId"</span></span>
+<span class="line"><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">            render</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">=</span><span style="--shiki-light:#569CD6;--shiki-dark:#569CD6">{</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">({ </span><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">field</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4"> }) </span><span style="--shiki-light:#569CD6;--shiki-dark:#569CD6">=></span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4"> (</span></span>
+<span class="line"><span style="--shiki-light:#808080;--shiki-dark:#808080">              &#x3C;</span><span style="--shiki-light:#4EC9B0;--shiki-dark:#4EC9B0">FormItem</span><span style="--shiki-light:#808080;--shiki-dark:#808080">></span></span>
+<span class="line"><span style="--shiki-light:#808080;--shiki-dark:#808080">                &#x3C;</span><span style="--shiki-light:#4EC9B0;--shiki-dark:#4EC9B0">FormLabel</span><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE"> className</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">=</span><span style="--shiki-light:#CE9178;--shiki-dark:#CE9178">"font-noto-sans-mono"</span><span style="--shiki-light:#808080;--shiki-dark:#808080">></span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">ROOM</span><span style="--shiki-light:#808080;--shiki-dark:#808080">&#x3C;/</span><span style="--shiki-light:#4EC9B0;--shiki-dark:#4EC9B0">FormLabel</span><span style="--shiki-light:#808080;--shiki-dark:#808080">></span></span>
+<span class="line"><span style="--shiki-light:#808080;--shiki-dark:#808080">                &#x3C;</span><span style="--shiki-light:#4EC9B0;--shiki-dark:#4EC9B0">FormControl</span><span style="--shiki-light:#808080;--shiki-dark:#808080">></span></span>
+<span class="line"><span style="--shiki-light:#808080;--shiki-dark:#808080">                  &#x3C;</span><span style="--shiki-light:#4EC9B0;--shiki-dark:#4EC9B0">Input</span></span>
+<span class="line"><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">                    placeholder</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">=</span><span style="--shiki-light:#CE9178;--shiki-dark:#CE9178">"the room name to join"</span></span>
+<span class="line"><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">                    className</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">=</span><span style="--shiki-light:#CE9178;--shiki-dark:#CE9178">"font-noto-sans-mono rounded-none shadow-none"</span></span>
+<span class="line"><span style="--shiki-light:#569CD6;--shiki-dark:#569CD6">                    {</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">...</span><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">field</span><span style="--shiki-light:#569CD6;--shiki-dark:#569CD6">}</span></span>
+<span class="line"><span style="--shiki-light:#808080;--shiki-dark:#808080">                  /></span></span>
+<span class="line"><span style="--shiki-light:#808080;--shiki-dark:#808080">                &#x3C;/</span><span style="--shiki-light:#4EC9B0;--shiki-dark:#4EC9B0">FormControl</span><span style="--shiki-light:#808080;--shiki-dark:#808080">></span></span>
+<span class="line"><span style="--shiki-light:#808080;--shiki-dark:#808080">                &#x3C;</span><span style="--shiki-light:#4EC9B0;--shiki-dark:#4EC9B0">FormMessage</span><span style="--shiki-light:#808080;--shiki-dark:#808080"> /></span></span>
+<span class="line"><span style="--shiki-light:#808080;--shiki-dark:#808080">              &#x3C;/</span><span style="--shiki-light:#4EC9B0;--shiki-dark:#4EC9B0">FormItem</span><span style="--shiki-light:#808080;--shiki-dark:#808080">></span></span>
+<span class="line"><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">            )</span><span style="--shiki-light:#569CD6;--shiki-dark:#569CD6">}</span></span>
+<span class="line"><span style="--shiki-light:#808080;--shiki-dark:#808080">          /></span></span>
+<span class="line"><span style="--shiki-light:#808080;--shiki-dark:#808080">          &#x3C;</span><span style="--shiki-light:#4EC9B0;--shiki-dark:#4EC9B0">FormField</span></span>
+<span class="line"><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">            control</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">=</span><span style="--shiki-light:#569CD6;--shiki-dark:#569CD6">{</span><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">form</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">.</span><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">control</span><span style="--shiki-light:#569CD6;--shiki-dark:#569CD6">}</span></span>
+<span class="line"><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">            name</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">=</span><span style="--shiki-light:#CE9178;--shiki-dark:#CE9178">"username"</span></span>
+<span class="line"><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">            render</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">=</span><span style="--shiki-light:#569CD6;--shiki-dark:#569CD6">{</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">({ </span><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">field</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4"> }) </span><span style="--shiki-light:#569CD6;--shiki-dark:#569CD6">=></span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4"> (</span></span>
+<span class="line"><span style="--shiki-light:#808080;--shiki-dark:#808080">              &#x3C;</span><span style="--shiki-light:#4EC9B0;--shiki-dark:#4EC9B0">FormItem</span><span style="--shiki-light:#808080;--shiki-dark:#808080">></span></span>
+<span class="line"><span style="--shiki-light:#808080;--shiki-dark:#808080">                &#x3C;</span><span style="--shiki-light:#4EC9B0;--shiki-dark:#4EC9B0">FormLabel</span><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE"> className</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">=</span><span style="--shiki-light:#CE9178;--shiki-dark:#CE9178">"font-noto-sans-mono"</span><span style="--shiki-light:#808080;--shiki-dark:#808080">></span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">USERNAME</span><span style="--shiki-light:#808080;--shiki-dark:#808080">&#x3C;/</span><span style="--shiki-light:#4EC9B0;--shiki-dark:#4EC9B0">FormLabel</span><span style="--shiki-light:#808080;--shiki-dark:#808080">></span></span>
+<span class="line"><span style="--shiki-light:#808080;--shiki-dark:#808080">                &#x3C;</span><span style="--shiki-light:#4EC9B0;--shiki-dark:#4EC9B0">FormControl</span><span style="--shiki-light:#808080;--shiki-dark:#808080">></span></span>
+<span class="line"><span style="--shiki-light:#808080;--shiki-dark:#808080">                  &#x3C;</span><span style="--shiki-light:#4EC9B0;--shiki-dark:#4EC9B0">Input</span></span>
+<span class="line"><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">                    placeholder</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">=</span><span style="--shiki-light:#CE9178;--shiki-dark:#CE9178">"your username"</span></span>
+<span class="line"><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">                    className</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">=</span><span style="--shiki-light:#CE9178;--shiki-dark:#CE9178">"font-noto-sans-mono rounded-none shadow-none"</span></span>
+<span class="line"><span style="--shiki-light:#569CD6;--shiki-dark:#569CD6">                    {</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">...</span><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">field</span><span style="--shiki-light:#569CD6;--shiki-dark:#569CD6">}</span></span>
+<span class="line"><span style="--shiki-light:#808080;--shiki-dark:#808080">                  /></span></span>
+<span class="line"><span style="--shiki-light:#808080;--shiki-dark:#808080">                &#x3C;/</span><span style="--shiki-light:#4EC9B0;--shiki-dark:#4EC9B0">FormControl</span><span style="--shiki-light:#808080;--shiki-dark:#808080">></span></span>
+<span class="line"><span style="--shiki-light:#808080;--shiki-dark:#808080">                &#x3C;</span><span style="--shiki-light:#4EC9B0;--shiki-dark:#4EC9B0">FormMessage</span><span style="--shiki-light:#808080;--shiki-dark:#808080"> /></span></span>
+<span class="line"><span style="--shiki-light:#808080;--shiki-dark:#808080">              &#x3C;/</span><span style="--shiki-light:#4EC9B0;--shiki-dark:#4EC9B0">FormItem</span><span style="--shiki-light:#808080;--shiki-dark:#808080">></span></span>
+<span class="line"><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">            )</span><span style="--shiki-light:#569CD6;--shiki-dark:#569CD6">}</span></span>
+<span class="line"><span style="--shiki-light:#808080;--shiki-dark:#808080">          /></span></span>
+<span class="line"><span style="--shiki-light:#808080;--shiki-dark:#808080">          &#x3C;</span><span style="--shiki-light:#4EC9B0;--shiki-dark:#4EC9B0">Button</span><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE"> type</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">=</span><span style="--shiki-light:#CE9178;--shiki-dark:#CE9178">"submit"</span><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE"> className</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">=</span><span style="--shiki-light:#CE9178;--shiki-dark:#CE9178">"w-full cursor-pointer font-mono rounded-none"</span><span style="--shiki-light:#808080;--shiki-dark:#808080">></span></span>
+<span class="line"><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">            ENTER THE ROOM</span></span>
+<span class="line"><span style="--shiki-light:#808080;--shiki-dark:#808080">          &#x3C;/</span><span style="--shiki-light:#4EC9B0;--shiki-dark:#4EC9B0">Button</span><span style="--shiki-light:#808080;--shiki-dark:#808080">></span></span>
+<span class="line"><span style="--shiki-light:#808080;--shiki-dark:#808080">        &#x3C;/</span><span style="--shiki-light:#569CD6;--shiki-dark:#569CD6">form</span><span style="--shiki-light:#808080;--shiki-dark:#808080">></span></span>
+<span class="line"><span style="--shiki-light:#808080;--shiki-dark:#808080">      &#x3C;/</span><span style="--shiki-light:#4EC9B0;--shiki-dark:#4EC9B0">Form</span><span style="--shiki-light:#808080;--shiki-dark:#808080">></span></span>
+<span class="line"><span style="--shiki-light:#808080;--shiki-dark:#808080">    &#x3C;/</span><span style="--shiki-light:#569CD6;--shiki-dark:#569CD6">div</span><span style="--shiki-light:#808080;--shiki-dark:#808080">></span></span>
+<span class="line"><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">  )</span></span>
+<span class="line"><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">}</span></span>
+<span class="line"></span>
+<span class="line"><span style="--shiki-light:#C586C0;--shiki-dark:#C586C0">export</span><span style="--shiki-light:#C586C0;--shiki-dark:#C586C0"> default</span><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE"> LoginForm</span></span></span></code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="4-define-the-page-component"><a class="anchor" href="#4-define-the-page-component"></a>4. Define the page component</h3>
+<div class="paragraph">
+<p>Replace the contents of the file <code>app/page.tsx</code> with:</p>
+</div>
+<div class="listingblock">
+<div class="title">app/page.tsx</div>
+<div class="content">
+<pre class="shiki highlight"><code data-lang="tsx"><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4;--shiki-light-bg:#1E1E1E;--shiki-dark-bg:#1E1E1E"><span class="line"><span style="--shiki-light:#6A9955;--shiki-dark:#6A9955">// SPDX-FileCopyrightText: 2026 INDUSTRIA DE DISEÑO TEXTIL S.A. (INDITEX S.A.)</span></span>
+<span class="line"><span style="--shiki-light:#6A9955;--shiki-dark:#6A9955">//</span></span>
+<span class="line"><span style="--shiki-light:#6A9955;--shiki-dark:#6A9955">// SPDX-License-Identifier: Apache-2.0</span></span>
+<span class="line"></span>
+<span class="line"><span style="--shiki-light:#C586C0;--shiki-dark:#C586C0">import</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4"> { </span><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">Home</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4"> } </span><span style="--shiki-light:#C586C0;--shiki-dark:#C586C0">from</span><span style="--shiki-light:#CE9178;--shiki-dark:#CE9178"> '@/components/home/home'</span></span>
+<span class="line"></span>
+<span class="line"><span style="--shiki-light:#C586C0;--shiki-dark:#C586C0">export</span><span style="--shiki-light:#C586C0;--shiki-dark:#C586C0"> default</span><span style="--shiki-light:#569CD6;--shiki-dark:#569CD6"> function</span><span style="--shiki-light:#DCDCAA;--shiki-dark:#DCDCAA"> HomePage</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">() {</span></span>
+<span class="line"><span style="--shiki-light:#C586C0;--shiki-dark:#C586C0">  return</span><span style="--shiki-light:#808080;--shiki-dark:#808080"> &#x3C;</span><span style="--shiki-light:#4EC9B0;--shiki-dark:#4EC9B0">Home</span><span style="--shiki-light:#808080;--shiki-dark:#808080"> /></span></span>
+<span class="line"><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">}</span></span></span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<div class="title">Run the project</div>
+<p>Once the <strong>Enter Room</strong> page setup is complete, run the project by executing the following command:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="shiki highlight"><code data-lang="shell"><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4;--shiki-light-bg:#1E1E1E;--shiki-dark-bg:#1E1E1E"><span class="line"><span style="--shiki-light:#DCDCAA;--shiki-dark:#DCDCAA">npm</span><span style="--shiki-light:#CE9178;--shiki-dark:#CE9178"> run</span><span style="--shiki-light:#CE9178;--shiki-dark:#CE9178"> dev</span></span></span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Navigate to <code><a href="http://localhost:3000" class="bare">http://localhost:3000</a></code> in a browser.
+You should see the following:</p>
+</div>
+<div class="imageblock zoom-in">
+<div class="content">
+<img src="../../../_images/enter-room-manual.png" alt="Enter room page">
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="next-steps"><a class="anchor" href="#next-steps"></a>Next steps</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Set up the <a href="../room-page/" class="xref page">Room page</a> of the Next.js application.</p>
+</div>
+</div>
+</div>
+</article>
+  </div>
+</main>
+</div>
+
+
+<footer class="page-footer">
+  <div class="page-footer__nav">
+
+<div class="dt-grid-layout dt-grid-layout--with-margin pagination">
+  <div class="dt-grid-layout__item dt-grid-layout__item--span-full pagination__row">
+    <div class="pagination__buttons">
+    <a class="dt-button dt-button--ghost dt-button--icon-and-label dt-button--icon-icon pagination__prev" href="../">
+      <span class="dt-button__content">
+        <span class="dt-button__icon dt-button__icon-icon"><svg class="dt-icon" aria-hidden="true" focusable="false"><use href="../../../../../_/img/icons.svg#icon-arrow-left"></use></svg></span>
+        <span class="pagination__label-full">Frontend</span>
+        <span class="pagination__label-short">Prev</span>
+      </span>
+    </a>
+    <a class="dt-button dt-button--ghost dt-button--icon-and-label dt-button--icon-action pagination__next" href="../room-page/">
+      <span class="dt-button__content">
+        <span class="pagination__label-full">Room page</span>
+        <span class="pagination__label-short">Next</span>
+        <span class="dt-button__icon dt-button__icon-action"><svg class="dt-icon" aria-hidden="true" focusable="false"><use href="../../../../../_/img/icons.svg#icon-arrow-right"></use></svg></span>
+      </span>
+    </a>
+    </div>
+  </div>
+</div>
+  </div>
+  <div class="dt-grid-layout dt-grid-layout--with-margin page-footer__feedback">
+    <div class="dt-grid-layout__item dt-grid-layout__item--span-full page-footer__contribute">
+      <div class="page-footer__contribute-copy">
+        <p class="dt-text dt-text--title-s">Help us make these docs great!</p>
+        <p class="dt-text dt-text--body-m">See something that is wrong or unclear? Collaborate with us! Submit a pull request</p>
+      </div>
+      <div class="page-footer__contribute-buttons">
+
+<a class="dt-button dt-button--ghost dt-button--icon-and-label dt-button--icon-action page-footer__propose-change" href="https://github.com/InditexTech/weavejs/edit/main/docs/src/modules/main/pages/manual-installation/frontend/enter-room-page.adoc">
+  <span class="dt-button__content">
+    Propose a change
+    <span class="dt-button__icon dt-button__icon-action"><svg class="dt-icon" aria-hidden="true" focusable="false"><use href="../../../../../_/img/icons.svg#icon-external-link"></use></svg></span>
+  </span>
+</a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+
+<script id="site-script" src="../../../../../_/js/site.js" data-ui-root-path="../../../../../_"></script>
+
+<footer class="site-footer">
+  <div class="dt-grid-layout dt-grid-layout--with-margin site-footer__grid">
+    <div class="dt-grid-layout__item site-footer__col site-footer__brand">
+      <a class="site-footer__brand-link" href="../../../../../5.2.1/">
+        <img class="site-footer__logo" src="../../../../../_/product-logo.png" width="24" height="24" alt="">
+        <span class="dt-text dt-text--label-l-high">Weave.js</span>
+      </a>
+      <span class="dt-text dt-text--detail-m site-footer__legal">&#169; 2026 InditexTech</span>
+    </div>
+    <div class="dt-grid-layout__item site-footer__col site-footer__links">
+      <span class="dt-text dt-text--label-l site-footer__heading">Resources</span>
+      <a class="dt-text dt-text--body-l site-footer__link" href="../../../quickstart/">Quickstart</a>
+      <a class="dt-text dt-text--body-l site-footer__link" href="../../../../sdk/">SDK</a>
+      <a class="dt-text dt-text--body-l site-footer__link" href="../../../../react/">React Helper</a>
+      <a class="dt-text dt-text--body-l site-footer__link" href="../../../build/stores/">Stores</a>
+      <a class="dt-text dt-text--body-l site-footer__link" href="https://github.com/InditexTech/weavejs">Repository</a>
+    </div>
+    <div class="dt-grid-layout__item site-footer__col site-footer__links">
+      <span class="dt-text dt-text--label-l site-footer__heading">Modules</span>
+      <a class="dt-text dt-text--body-l site-footer__link" href="../../../">Framework</a>
+      <a class="dt-text dt-text--body-l site-footer__link" href="../../../../sdk/">SDK</a>
+      <a class="dt-text dt-text--body-l site-footer__link" href="../../../../react/">React Helper</a>
+      <a class="dt-text dt-text--body-l site-footer__link" href="../../../../store-websockets/">Websockets Store</a>
+      <a class="dt-text dt-text--body-l site-footer__link" href="../../../../store-azure-web-pubsub/">Azure Web Pubsub Store</a>
+      <a class="dt-text dt-text--body-l site-footer__link" href="../../../../store-standalone/">Standalone Store</a>
+      <a class="dt-text dt-text--body-l site-footer__link" href="../../../../types/">TypeScript Types</a>
+    </div>
+  </div>
+</footer>
+  </body>
+</html>

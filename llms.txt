@@ -4,408 +4,408 @@
 
 ## Weave.js
 
-- [Home](/weavejs/prerelease/): Weave.js — the framework for building visual collaborative applications.
-- [Home](/weavejs/5.2.1/): Weave.js — the framework for building visual collaborative applications.
+- [Home](/prerelease/): Weave.js — the framework for building visual collaborative applications.
+- [Home](/5.2.1/): Weave.js — the framework for building visual collaborative applications.
 
 ## Framework
 
-- [Application structure](/weavejs/prerelease/main/application-structure/): Overview of frontend and backend artifacts and their responsibilities
-- [Architecture overview](/weavejs/prerelease/main/architecture/): Deep dive into Weave.js architecture and design principles
-- [Contributing](/weavejs/prerelease/main/contributing/): Want to collaborate? Learn how.
-- [Glossary](/weavejs/prerelease/main/glossary/): Key terms and concepts used throughout the Weave.js documentation
-- [About Weave.js](/weavejs/prerelease/main/): Build collaborative canvas applications
-- [Quickstart](/weavejs/prerelease/main/quickstart/): Build a real-time collaborative canvas application in minutes
-- [Requirements](/weavejs/prerelease/main/requirements/): Required system dependencies and versions
-- [Roadmap](/weavejs/prerelease/main/roadmap/): Future development plans and upcoming features for Weave.js
-- [Overview](/weavejs/prerelease/main/build/): Build your visual collaborative tool with Weave.js
-- [Weave instance](/weavejs/prerelease/main/build/weave/): Build your visual collaborative tool with Weave.js
-- [Changelog](/weavejs/prerelease/main/changelog/): Check out the latest changes to Weave.js.
-- [Set up the backend](/weavejs/prerelease/main/manual-installation/backend/): Learn how to set up the backend of a Weave.js app on Next.js
-- [Manual installation](/weavejs/prerelease/main/manual-installation/): Integrate Weave.js into a new or existing Next.js project
-- [v1.0.0](/weavejs/prerelease/main/release-notes/1.0.0/): Initial stable release of Weave.js
-- [v2.0.0](/weavejs/prerelease/main/release-notes/2.0.0/): Improved scalability when using the Azure Web PubSub store
-- [v3.0.0](/weavejs/prerelease/main/release-notes/3.0.0/): Focus on **performance, architecture flexibility, and cleaner integration APIs**.
-- [v4.0.0](/weavejs/prerelease/main/release-notes/4.0.0/): Focus on unified snapping architecture and custom canvas guides.
-- [v5.0.0](/weavejs/prerelease/main/release-notes/5.0.0/): Focus on **diagramming capabilities, optimistic persistence, and a cleaner store architecture**.
-- [Release notes](/weavejs/prerelease/main/release-notes/): Discover what's new in Weave.js
-- [Align Nodes Tool](/weavejs/prerelease/main/build/actions/align-nodes-tool/): Select nodes and align among them
-- [Arrow Tool (deprecated)](/weavejs/prerelease/main/build/actions/arrow-tool/): Add an arrow to the canvas
-- [Brush Tool](/weavejs/prerelease/main/build/actions/brush-tool/): Paint freeform strokes on the canvas
-- [Comment Tool](/weavejs/prerelease/main/build/actions/comment-tool/): Allow users to comment on top of the stage content.
-- [Connector Tool](/weavejs/prerelease/main/build/actions/connector-tool/): Add connectors to the canvas
-- [Ellipse Tool](/weavejs/prerelease/main/build/actions/ellipse-tool/): Add an ellipse to the canvas
-- [Eraser Tool](/weavejs/prerelease/main/build/actions/eraser-tool/): Activate the deletion of nodes from the canvas
-- [Export Node Tool](/weavejs/prerelease/main/build/actions/export-node-tool/): Export the selected node as an image
-- [Export Stage Tool](/weavejs/prerelease/main/build/actions/export-stage-tool/): Export the entire stage (all nodes) node as an image
-- [Fit to Screen Tool](/weavejs/prerelease/main/build/actions/fit-to-screen-tool/): Set the zoom level so all the nodes on the stage are entirely visible on the screen
-- [Fit to Selection Tool](/weavejs/prerelease/main/build/actions/fit-to-selection-tool/): Set the zoom level so all the selected nodes are entirely visible on the screen
-- [Frame Tool](/weavejs/prerelease/main/build/actions/frame-tool/): Allows to add a canvas in canvas area
-- [Image Tool](/weavejs/prerelease/main/build/actions/image-tool/): Add an image to the canvas
-- [Images Tool](/weavejs/prerelease/main/build/actions/images-tool/): Add multiple images to the canvas
-- [Actions](/weavejs/prerelease/main/build/actions/): Actions maintained by Weave.js team
-- [Line Tool (deprecated)](/weavejs/prerelease/main/build/actions/line-tool/): Add a simple line to the canvas
-- [Measure Tool](/weavejs/prerelease/main/build/actions/measure-tool/): Add measures to the canvas
-- [Move Tool](/weavejs/prerelease/main/build/actions/move-tool/): Activate the panning or movement of the canvas
-- [Pen Tool (deprecated)](/weavejs/prerelease/main/build/actions/pen-tool/): Add line segments to the canvas
-- [Polygon Tool](/weavejs/prerelease/main/build/actions/polygon-tool/): Add a polygon to the canvas using a preset shape
-- [Rectangle Tool](/weavejs/prerelease/main/build/actions/rectangle-tool/): Add a rectangle to the canvas
-- [Regular Polygon Tool (deprecated)](/weavejs/prerelease/main/build/actions/regular-polygon-tool/): Add a regular polygon to the canvas
-- [Selection Tool](/weavejs/prerelease/main/build/actions/selection-tool/): Activate the selection of canvas nodes
-- [Star Tool](/weavejs/prerelease/main/build/actions/star-tool/): Add a star to the canvas
-- [Stroke Tool](/weavejs/prerelease/main/build/actions/stroke-tool/): Add a simple line to the canvas
-- [Text Tool](/weavejs/prerelease/main/build/actions/text-tool/): Add text to the canvas
-- [Video Tool](/weavejs/prerelease/main/build/actions/video-tool/): Add a video to the canvas
-- [Zoom In Tool](/weavejs/prerelease/main/build/actions/zoom-in-tool/): Increases one step the stage zoom level
-- [Zoom Out Tool](/weavejs/prerelease/main/build/actions/zoom-out-tool/): Decreases one step the stage zoom level
-- [Arrow (deprecated)](/weavejs/prerelease/main/build/nodes/arrow/): Draw an arrow on the canvas
-- [Comment](/weavejs/prerelease/main/build/nodes/comment/): Give feedback and collaborate with other users.
-- [Connector](/weavejs/prerelease/main/build/nodes/connector/): Draw a connected line between nodes
-- [Ellipse](/weavejs/prerelease/main/build/nodes/ellipse/): Draw an ellipse (or circle) on the canvas
-- [Frame](/weavejs/prerelease/main/build/nodes/frame/): Canvas-in-canvas element
-- [Group](/weavejs/prerelease/main/build/nodes/group/): Group nodes and manipulate them
-- [Image](/weavejs/prerelease/main/build/nodes/image/): Render images on the canvas
-- [Nodes](/weavejs/prerelease/main/build/nodes/): Nodes maintained by Weave.js team
-- [Layer](/weavejs/prerelease/main/build/nodes/layer/): Segment and order the Stage in layers
-- [Line (deprecated)](/weavejs/prerelease/main/build/nodes/line/): Draw a line on the canvas
-- [Measure](/weavejs/prerelease/main/build/nodes/measure/): Draw measure reference distance on the canvas
-- [Polygon](/weavejs/prerelease/main/build/nodes/polygon/): Draw a polygon on the canvas using a preset shape
-- [Rectangle](/weavejs/prerelease/main/build/nodes/rectangle/): Draw a rectangle on the canvas
-- [Regular Polygon (deprecated)](/weavejs/prerelease/main/build/nodes/regular-polygon/): Draw a regular polygon on the canvas
-- [Stage](/weavejs/prerelease/main/build/nodes/stage/): Main node to structure the canvas elements
-- [Star](/weavejs/prerelease/main/build/nodes/star/): Draw a star on the canvas
-- [Stroke Single](/weavejs/prerelease/main/build/nodes/stroke-single/): Draw a single-stroke line on the canvas
-- [Stroke](/weavejs/prerelease/main/build/nodes/stroke/): Draw a free-line on the canvas
-- [Text](/weavejs/prerelease/main/build/nodes/text/): Draw &amp; edit text on the canvas
-- [Video](/weavejs/prerelease/main/build/nodes/video/): Render a video on the canvas
-- [Comments Renderer](/weavejs/prerelease/main/build/plugins/comments-renderer/): Render the comments of a room in a special layer
-- [Connected Users](/weavejs/prerelease/main/build/plugins/connected-users/): Get an structure with information about the connected users
-- [Context Menu](/weavejs/prerelease/main/build/plugins/context-menu/): Trigger a contextual menu on the canvas
-- [Copy &amp; Paste Nodes](/weavejs/prerelease/main/build/plugins/copy-paste-nodes/): Activate support to copy &amp; paste the nodes
-- [Plugins](/weavejs/prerelease/main/build/plugins/): Plugins maintained by Weave.js team
-- [Nodes Multi-selection Feedback](/weavejs/prerelease/main/build/plugins/nodes-multi-selection-feedback/): Activate support to provide more feedback to the user when multi-selecting nodes
-- [Nodes Selection](/weavejs/prerelease/main/build/plugins/nodes-selection/): Activate support to select nodes on the canvas
-- [Nodes Snapping](/weavejs/prerelease/main/build/plugins/nodes-snapping/): Allow to snap nodes to guides and to themselves
-- [Stage Drop Area](/weavejs/prerelease/main/build/plugins/stage-drop-area/): Activate support to drop elements on the canvas
-- [Stage Grid](/weavejs/prerelease/main/build/plugins/stage-grid/): Renders a reference grid behind the nodes layer
-- [Stage Keyboard Move](/weavejs/prerelease/main/build/plugins/stage-keyboard-move/): Activates moving elements with shift + keyboard arrows
-- [Stage minimap](/weavejs/prerelease/main/build/plugins/stage-minimap/): Renders a minimap from the main stage
-- [Stage Panning](/weavejs/prerelease/main/build/plugins/stage-panning/): Activates the panning (move) of the stage
-- [Stage Resize](/weavejs/prerelease/main/build/plugins/stage-resize/): Activates the stage resizing (responsive support)
-- [Stage Zoom](/weavejs/prerelease/main/build/plugins/stage-zoom/): Activates support for zoom on the stage
-- [Users Pointers](/weavejs/prerelease/main/build/plugins/users-pointers/): Showcase the position of the users mouse pointer on the canvas
-- [Users Presence](/weavejs/prerelease/main/build/plugins/users-presence/): Showcase what the users are doing on the canvas
-- [Users Selector](/weavejs/prerelease/main/build/plugins/users-selector/): Showcase the selection of the users on the canvas
-- [Azure Web PubSub](/weavejs/prerelease/main/build/stores/azure-web-pubsub-store/): Store that uses Azure Web PubSub infrastructure as the transport layer
-- [Stores](/weavejs/prerelease/main/build/stores/): Stores maintained by Weave.js team
-- [Standalone](/weavejs/prerelease/main/build/stores/standalone-store/): Store that just renders a Weave.js room, useful for server-side image exporting
-- [WebSockets](/weavejs/prerelease/main/build/stores/websockets-store/): Store that uses the WebSockets API as the transport layer
-- [Enter Room page](/weavejs/prerelease/main/manual-installation/frontend/enter-room-page/): Learn how to set up the Enter Room page on Next.js
-- [Set up the frontend](/weavejs/prerelease/main/manual-installation/frontend/): Learn how to set up the frontend of a Weave.js app on Next.js
-- [Room page](/weavejs/prerelease/main/manual-installation/frontend/room-page/): Learn how to set up the Room page on Next.js
-- [Application structure](/weavejs/5.2.1/main/application-structure/): Overview of frontend and backend artifacts and their responsibilities
-- [Architecture overview](/weavejs/5.2.1/main/architecture/): Deep dive into Weave.js architecture and design principles
-- [Contributing](/weavejs/5.2.1/main/contributing/): Want to collaborate? Learn how.
-- [Glossary](/weavejs/5.2.1/main/glossary/): Key terms and concepts used throughout the Weave.js documentation
-- [About Weave.js](/weavejs/5.2.1/main/): Build collaborative canvas applications
-- [Quickstart](/weavejs/5.2.1/main/quickstart/): Build a real-time collaborative canvas application in minutes
-- [Requirements](/weavejs/5.2.1/main/requirements/): Required system dependencies and versions
-- [Roadmap](/weavejs/5.2.1/main/roadmap/): Future development plans and upcoming features for Weave.js
-- [Overview](/weavejs/5.2.1/main/build/): Build your visual collaborative tool with Weave.js
-- [Weave instance](/weavejs/5.2.1/main/build/weave/): Build your visual collaborative tool with Weave.js
-- [Changelog](/weavejs/5.2.1/main/changelog/): Check out the latest changes to Weave.js.
-- [Set up the backend](/weavejs/5.2.1/main/manual-installation/backend/): Learn how to set up the backend of a Weave.js app on Next.js
-- [Manual installation](/weavejs/5.2.1/main/manual-installation/): Integrate Weave.js into a new or existing Next.js project
-- [v1.0.0](/weavejs/5.2.1/main/release-notes/1.0.0/): Initial stable release of Weave.js
-- [v2.0.0](/weavejs/5.2.1/main/release-notes/2.0.0/): Improved scalability when using the Azure Web PubSub store
-- [v3.0.0](/weavejs/5.2.1/main/release-notes/3.0.0/): Focus on **performance, architecture flexibility, and cleaner integration APIs**.
-- [v4.0.0](/weavejs/5.2.1/main/release-notes/4.0.0/): Focus on unified snapping architecture and custom canvas guides.
-- [v5.0.0](/weavejs/5.2.1/main/release-notes/5.0.0/): Focus on **diagramming capabilities, optimistic persistence, and a cleaner store architecture**.
-- [Release notes](/weavejs/5.2.1/main/release-notes/): Discover what's new in Weave.js
-- [Arrow Tool (deprecated)](/weavejs/5.2.1/main/build/actions/arrow-tool/): Add an arrow to the canvas
-- [Comment Tool](/weavejs/5.2.1/main/build/actions/comment-tool/): Allow users to comment on top of the stage content.
-- [Fit to Screen Tool](/weavejs/5.2.1/main/build/actions/fit-to-screen-tool/): Set the zoom level so all the nodes on the stage are entirely visible on the screen
-- [Image Tool](/weavejs/5.2.1/main/build/actions/image-tool/): Add an image to the canvas
-- [Images Tool](/weavejs/5.2.1/main/build/actions/images-tool/): Add multiple images to the canvas
-- [Actions](/weavejs/5.2.1/main/build/actions/): Actions maintained by Weave.js team
-- [Pen Tool (deprecated)](/weavejs/5.2.1/main/build/actions/pen-tool/): Add line segments to the canvas
-- [Video Tool](/weavejs/5.2.1/main/build/actions/video-tool/): Add a video to the canvas
-- [Comment](/weavejs/5.2.1/main/build/nodes/comment/): Give feedback and collaborate with other users.
-- [Arrow (deprecated)](/weavejs/5.2.1/main/build/nodes/arrow/): Draw an arrow on the canvas
-- [Connector](/weavejs/5.2.1/main/build/nodes/connector/): Draw a connected line between nodes
-- [Frame](/weavejs/5.2.1/main/build/nodes/frame/): Canvas-in-canvas element
-- [Group](/weavejs/5.2.1/main/build/nodes/group/): Group nodes and manipulate them
-- [Nodes](/weavejs/5.2.1/main/build/nodes/): Nodes maintained by Weave.js team
-- [Layer](/weavejs/5.2.1/main/build/nodes/layer/): Segment and order the Stage in layers
-- [Line (deprecated)](/weavejs/5.2.1/main/build/nodes/line/): Draw a line on the canvas
-- [Measure](/weavejs/5.2.1/main/build/nodes/measure/): Draw measure reference distance on the canvas
-- [Polygon](/weavejs/5.2.1/main/build/nodes/polygon/): Draw a polygon on the canvas using a preset shape
-- [Stage](/weavejs/5.2.1/main/build/nodes/stage/): Main node to structure the canvas elements
-- [Star](/weavejs/5.2.1/main/build/nodes/star/): Draw a star on the canvas
-- [Text](/weavejs/5.2.1/main/build/nodes/text/): Draw &amp; edit text on the canvas
-- [Video](/weavejs/5.2.1/main/build/nodes/video/): Render a video on the canvas
-- [Comments Renderer](/weavejs/5.2.1/main/build/plugins/comments-renderer/): Render the comments of a room in a special layer
-- [Connected Users](/weavejs/5.2.1/main/build/plugins/connected-users/): Get an structure with information about the connected users
-- [Context Menu](/weavejs/5.2.1/main/build/plugins/context-menu/): Trigger a contextual menu on the canvas
-- [Copy &amp; Paste Nodes](/weavejs/5.2.1/main/build/plugins/copy-paste-nodes/): Activate support to copy &amp; paste the nodes
-- [Plugins](/weavejs/5.2.1/main/build/plugins/): Plugins maintained by Weave.js team
-- [Nodes Multi-selection Feedback](/weavejs/5.2.1/main/build/plugins/nodes-multi-selection-feedback/): Activate support to provide more feedback to the user when multi-selecting nodes
-- [Nodes Selection](/weavejs/5.2.1/main/build/plugins/nodes-selection/): Activate support to select nodes on the canvas
-- [Nodes Snapping](/weavejs/5.2.1/main/build/plugins/nodes-snapping/): Allow to snap nodes to guides and to themselves
-- [Stage Drop Area](/weavejs/5.2.1/main/build/plugins/stage-drop-area/): Activate support to drop elements on the canvas
-- [Stage Grid](/weavejs/5.2.1/main/build/plugins/stage-grid/): Renders a reference grid behind the nodes layer
-- [Stage Keyboard Move](/weavejs/5.2.1/main/build/plugins/stage-keyboard-move/): Activates moving elements with shift + keyboard arrows
-- [Stage minimap](/weavejs/5.2.1/main/build/plugins/stage-minimap/): Renders a minimap from the main stage
-- [Stage Panning](/weavejs/5.2.1/main/build/plugins/stage-panning/): Activates the panning (move) of the stage
-- [Stage Zoom](/weavejs/5.2.1/main/build/plugins/stage-zoom/): Activates support for zoom on the stage
-- [Users Pointers](/weavejs/5.2.1/main/build/plugins/users-pointers/): Showcase the position of the users mouse pointer on the canvas
-- [Stage Resize](/weavejs/5.2.1/main/build/plugins/stage-resize/): Activates the stage resizing (responsive support)
-- [Users Presence](/weavejs/5.2.1/main/build/plugins/users-presence/): Showcase what the users are doing on the canvas
-- [Azure Web PubSub](/weavejs/5.2.1/main/build/stores/azure-web-pubsub-store/): Store that uses Azure Web PubSub infrastructure as the transport layer
-- [Stores](/weavejs/5.2.1/main/build/stores/): Stores maintained by Weave.js team
-- [Standalone](/weavejs/5.2.1/main/build/stores/standalone-store/): Store that just renders a Weave.js room, useful for server-side image exporting
-- [WebSockets](/weavejs/5.2.1/main/build/stores/websockets-store/): Store that uses the WebSockets API as the transport layer
-- [Set up the frontend](/weavejs/5.2.1/main/manual-installation/frontend/): Learn how to set up the frontend of a Weave.js app on Next.js
-- [Room page](/weavejs/5.2.1/main/manual-installation/frontend/room-page/): Learn how to set up the Room page on Next.js
-- [Align Nodes Tool](/weavejs/5.2.1/main/build/actions/align-nodes-tool/): Select nodes and align among them
-- [Brush Tool](/weavejs/5.2.1/main/build/actions/brush-tool/): Paint freeform strokes on the canvas
-- [Connector Tool](/weavejs/5.2.1/main/build/actions/connector-tool/): Add connectors to the canvas
-- [Export Stage Tool](/weavejs/5.2.1/main/build/actions/export-stage-tool/): Export the entire stage (all nodes) node as an image
-- [Frame Tool](/weavejs/5.2.1/main/build/actions/frame-tool/): Allows to add a canvas in canvas area
-- [Line Tool (deprecated)](/weavejs/5.2.1/main/build/actions/line-tool/): Add a simple line to the canvas
-- [Measure Tool](/weavejs/5.2.1/main/build/actions/measure-tool/): Add measures to the canvas
-- [Text Tool](/weavejs/5.2.1/main/build/actions/text-tool/): Add text to the canvas
-- [Zoom In Tool](/weavejs/5.2.1/main/build/actions/zoom-in-tool/): Increases one step the stage zoom level
-- [Ellipse](/weavejs/5.2.1/main/build/nodes/ellipse/): Draw an ellipse (or circle) on the canvas
-- [Image](/weavejs/5.2.1/main/build/nodes/image/): Render images on the canvas
-- [Rectangle](/weavejs/5.2.1/main/build/nodes/rectangle/): Draw a rectangle on the canvas
-- [Regular Polygon (deprecated)](/weavejs/5.2.1/main/build/nodes/regular-polygon/): Draw a regular polygon on the canvas
-- [Stroke](/weavejs/5.2.1/main/build/nodes/stroke/): Draw a free-line on the canvas
-- [Users Selector](/weavejs/5.2.1/main/build/plugins/users-selector/): Showcase the selection of the users on the canvas
-- [Enter Room page](/weavejs/5.2.1/main/manual-installation/frontend/enter-room-page/): Learn how to set up the Enter Room page on Next.js
-- [Ellipse Tool](/weavejs/5.2.1/main/build/actions/ellipse-tool/): Add an ellipse to the canvas
-- [Eraser Tool](/weavejs/5.2.1/main/build/actions/eraser-tool/): Activate the deletion of nodes from the canvas
-- [Export Node Tool](/weavejs/5.2.1/main/build/actions/export-node-tool/): Export the selected node as an image
-- [Move Tool](/weavejs/5.2.1/main/build/actions/move-tool/): Activate the panning or movement of the canvas
-- [Star Tool](/weavejs/5.2.1/main/build/actions/star-tool/): Add a star to the canvas
-- [Stroke Tool](/weavejs/5.2.1/main/build/actions/stroke-tool/): Add a simple line to the canvas
-- [Zoom Out Tool](/weavejs/5.2.1/main/build/actions/zoom-out-tool/): Decreases one step the stage zoom level
-- [Stroke Single](/weavejs/5.2.1/main/build/nodes/stroke-single/): Draw a single-stroke line on the canvas
-- [Fit to Selection Tool](/weavejs/5.2.1/main/build/actions/fit-to-selection-tool/): Set the zoom level so all the selected nodes are entirely visible on the screen
-- [Polygon Tool](/weavejs/5.2.1/main/build/actions/polygon-tool/): Add a polygon to the canvas using a preset shape
-- [Regular Polygon Tool (deprecated)](/weavejs/5.2.1/main/build/actions/regular-polygon-tool/): Add a regular polygon to the canvas
-- [Rectangle Tool](/weavejs/5.2.1/main/build/actions/rectangle-tool/): Add a rectangle to the canvas
-- [Selection Tool](/weavejs/5.2.1/main/build/actions/selection-tool/): Activate the selection of canvas nodes
+- [Application structure](/prerelease/main/application-structure/): Overview of frontend and backend artifacts and their responsibilities
+- [Architecture overview](/prerelease/main/architecture/): Deep dive into Weave.js architecture and design principles
+- [Contributing](/prerelease/main/contributing/): Want to collaborate? Learn how.
+- [Glossary](/prerelease/main/glossary/): Key terms and concepts used throughout the Weave.js documentation
+- [About Weave.js](/prerelease/main/): Build collaborative canvas applications
+- [Quickstart](/prerelease/main/quickstart/): Build a real-time collaborative canvas application in minutes
+- [Requirements](/prerelease/main/requirements/): Required system dependencies and versions
+- [Roadmap](/prerelease/main/roadmap/): Future development plans and upcoming features for Weave.js
+- [Overview](/prerelease/main/build/): Build your visual collaborative tool with Weave.js
+- [Weave instance](/prerelease/main/build/weave/): Build your visual collaborative tool with Weave.js
+- [Changelog](/prerelease/main/changelog/): Check out the latest changes to Weave.js.
+- [Set up the backend](/prerelease/main/manual-installation/backend/): Learn how to set up the backend of a Weave.js app on Next.js
+- [Manual installation](/prerelease/main/manual-installation/): Integrate Weave.js into a new or existing Next.js project
+- [v1.0.0](/prerelease/main/release-notes/1.0.0/): Initial stable release of Weave.js
+- [v2.0.0](/prerelease/main/release-notes/2.0.0/): Improved scalability when using the Azure Web PubSub store
+- [v3.0.0](/prerelease/main/release-notes/3.0.0/): Focus on **performance, architecture flexibility, and cleaner integration APIs**.
+- [v4.0.0](/prerelease/main/release-notes/4.0.0/): Focus on unified snapping architecture and custom canvas guides.
+- [v5.0.0](/prerelease/main/release-notes/5.0.0/): Focus on **diagramming capabilities, optimistic persistence, and a cleaner store architecture**.
+- [Release notes](/prerelease/main/release-notes/): Discover what's new in Weave.js
+- [Align Nodes Tool](/prerelease/main/build/actions/align-nodes-tool/): Select nodes and align among them
+- [Arrow Tool (deprecated)](/prerelease/main/build/actions/arrow-tool/): Add an arrow to the canvas
+- [Brush Tool](/prerelease/main/build/actions/brush-tool/): Paint freeform strokes on the canvas
+- [Comment Tool](/prerelease/main/build/actions/comment-tool/): Allow users to comment on top of the stage content.
+- [Connector Tool](/prerelease/main/build/actions/connector-tool/): Add connectors to the canvas
+- [Ellipse Tool](/prerelease/main/build/actions/ellipse-tool/): Add an ellipse to the canvas
+- [Eraser Tool](/prerelease/main/build/actions/eraser-tool/): Activate the deletion of nodes from the canvas
+- [Export Node Tool](/prerelease/main/build/actions/export-node-tool/): Export the selected node as an image
+- [Export Stage Tool](/prerelease/main/build/actions/export-stage-tool/): Export the entire stage (all nodes) node as an image
+- [Fit to Screen Tool](/prerelease/main/build/actions/fit-to-screen-tool/): Set the zoom level so all the nodes on the stage are entirely visible on the screen
+- [Fit to Selection Tool](/prerelease/main/build/actions/fit-to-selection-tool/): Set the zoom level so all the selected nodes are entirely visible on the screen
+- [Frame Tool](/prerelease/main/build/actions/frame-tool/): Allows to add a canvas in canvas area
+- [Image Tool](/prerelease/main/build/actions/image-tool/): Add an image to the canvas
+- [Images Tool](/prerelease/main/build/actions/images-tool/): Add multiple images to the canvas
+- [Actions](/prerelease/main/build/actions/): Actions maintained by Weave.js team
+- [Line Tool (deprecated)](/prerelease/main/build/actions/line-tool/): Add a simple line to the canvas
+- [Measure Tool](/prerelease/main/build/actions/measure-tool/): Add measures to the canvas
+- [Move Tool](/prerelease/main/build/actions/move-tool/): Activate the panning or movement of the canvas
+- [Pen Tool (deprecated)](/prerelease/main/build/actions/pen-tool/): Add line segments to the canvas
+- [Polygon Tool](/prerelease/main/build/actions/polygon-tool/): Add a polygon to the canvas using a preset shape
+- [Rectangle Tool](/prerelease/main/build/actions/rectangle-tool/): Add a rectangle to the canvas
+- [Regular Polygon Tool (deprecated)](/prerelease/main/build/actions/regular-polygon-tool/): Add a regular polygon to the canvas
+- [Selection Tool](/prerelease/main/build/actions/selection-tool/): Activate the selection of canvas nodes
+- [Star Tool](/prerelease/main/build/actions/star-tool/): Add a star to the canvas
+- [Stroke Tool](/prerelease/main/build/actions/stroke-tool/): Add a simple line to the canvas
+- [Text Tool](/prerelease/main/build/actions/text-tool/): Add text to the canvas
+- [Video Tool](/prerelease/main/build/actions/video-tool/): Add a video to the canvas
+- [Zoom In Tool](/prerelease/main/build/actions/zoom-in-tool/): Increases one step the stage zoom level
+- [Zoom Out Tool](/prerelease/main/build/actions/zoom-out-tool/): Decreases one step the stage zoom level
+- [Arrow (deprecated)](/prerelease/main/build/nodes/arrow/): Draw an arrow on the canvas
+- [Comment](/prerelease/main/build/nodes/comment/): Give feedback and collaborate with other users.
+- [Connector](/prerelease/main/build/nodes/connector/): Draw a connected line between nodes
+- [Ellipse](/prerelease/main/build/nodes/ellipse/): Draw an ellipse (or circle) on the canvas
+- [Frame](/prerelease/main/build/nodes/frame/): Canvas-in-canvas element
+- [Group](/prerelease/main/build/nodes/group/): Group nodes and manipulate them
+- [Image](/prerelease/main/build/nodes/image/): Render images on the canvas
+- [Nodes](/prerelease/main/build/nodes/): Nodes maintained by Weave.js team
+- [Layer](/prerelease/main/build/nodes/layer/): Segment and order the Stage in layers
+- [Line (deprecated)](/prerelease/main/build/nodes/line/): Draw a line on the canvas
+- [Measure](/prerelease/main/build/nodes/measure/): Draw measure reference distance on the canvas
+- [Polygon](/prerelease/main/build/nodes/polygon/): Draw a polygon on the canvas using a preset shape
+- [Rectangle](/prerelease/main/build/nodes/rectangle/): Draw a rectangle on the canvas
+- [Regular Polygon (deprecated)](/prerelease/main/build/nodes/regular-polygon/): Draw a regular polygon on the canvas
+- [Stage](/prerelease/main/build/nodes/stage/): Main node to structure the canvas elements
+- [Star](/prerelease/main/build/nodes/star/): Draw a star on the canvas
+- [Stroke Single](/prerelease/main/build/nodes/stroke-single/): Draw a single-stroke line on the canvas
+- [Stroke](/prerelease/main/build/nodes/stroke/): Draw a free-line on the canvas
+- [Text](/prerelease/main/build/nodes/text/): Draw &amp; edit text on the canvas
+- [Video](/prerelease/main/build/nodes/video/): Render a video on the canvas
+- [Comments Renderer](/prerelease/main/build/plugins/comments-renderer/): Render the comments of a room in a special layer
+- [Connected Users](/prerelease/main/build/plugins/connected-users/): Get an structure with information about the connected users
+- [Context Menu](/prerelease/main/build/plugins/context-menu/): Trigger a contextual menu on the canvas
+- [Copy &amp; Paste Nodes](/prerelease/main/build/plugins/copy-paste-nodes/): Activate support to copy &amp; paste the nodes
+- [Plugins](/prerelease/main/build/plugins/): Plugins maintained by Weave.js team
+- [Nodes Multi-selection Feedback](/prerelease/main/build/plugins/nodes-multi-selection-feedback/): Activate support to provide more feedback to the user when multi-selecting nodes
+- [Nodes Selection](/prerelease/main/build/plugins/nodes-selection/): Activate support to select nodes on the canvas
+- [Nodes Snapping](/prerelease/main/build/plugins/nodes-snapping/): Allow to snap nodes to guides and to themselves
+- [Stage Drop Area](/prerelease/main/build/plugins/stage-drop-area/): Activate support to drop elements on the canvas
+- [Stage Grid](/prerelease/main/build/plugins/stage-grid/): Renders a reference grid behind the nodes layer
+- [Stage Keyboard Move](/prerelease/main/build/plugins/stage-keyboard-move/): Activates moving elements with shift + keyboard arrows
+- [Stage minimap](/prerelease/main/build/plugins/stage-minimap/): Renders a minimap from the main stage
+- [Stage Panning](/prerelease/main/build/plugins/stage-panning/): Activates the panning (move) of the stage
+- [Stage Resize](/prerelease/main/build/plugins/stage-resize/): Activates the stage resizing (responsive support)
+- [Stage Zoom](/prerelease/main/build/plugins/stage-zoom/): Activates support for zoom on the stage
+- [Users Pointers](/prerelease/main/build/plugins/users-pointers/): Showcase the position of the users mouse pointer on the canvas
+- [Users Presence](/prerelease/main/build/plugins/users-presence/): Showcase what the users are doing on the canvas
+- [Users Selector](/prerelease/main/build/plugins/users-selector/): Showcase the selection of the users on the canvas
+- [Azure Web PubSub](/prerelease/main/build/stores/azure-web-pubsub-store/): Store that uses Azure Web PubSub infrastructure as the transport layer
+- [Stores](/prerelease/main/build/stores/): Stores maintained by Weave.js team
+- [Standalone](/prerelease/main/build/stores/standalone-store/): Store that just renders a Weave.js room, useful for server-side image exporting
+- [WebSockets](/prerelease/main/build/stores/websockets-store/): Store that uses the WebSockets API as the transport layer
+- [Enter Room page](/prerelease/main/manual-installation/frontend/enter-room-page/): Learn how to set up the Enter Room page on Next.js
+- [Set up the frontend](/prerelease/main/manual-installation/frontend/): Learn how to set up the frontend of a Weave.js app on Next.js
+- [Room page](/prerelease/main/manual-installation/frontend/room-page/): Learn how to set up the Room page on Next.js
+- [Application structure](/5.2.1/main/application-structure/): Overview of frontend and backend artifacts and their responsibilities
+- [Architecture overview](/5.2.1/main/architecture/): Deep dive into Weave.js architecture and design principles
+- [Contributing](/5.2.1/main/contributing/): Want to collaborate? Learn how.
+- [Glossary](/5.2.1/main/glossary/): Key terms and concepts used throughout the Weave.js documentation
+- [About Weave.js](/5.2.1/main/): Build collaborative canvas applications
+- [Quickstart](/5.2.1/main/quickstart/): Build a real-time collaborative canvas application in minutes
+- [Requirements](/5.2.1/main/requirements/): Required system dependencies and versions
+- [Roadmap](/5.2.1/main/roadmap/): Future development plans and upcoming features for Weave.js
+- [Overview](/5.2.1/main/build/): Build your visual collaborative tool with Weave.js
+- [Weave instance](/5.2.1/main/build/weave/): Build your visual collaborative tool with Weave.js
+- [Changelog](/5.2.1/main/changelog/): Check out the latest changes to Weave.js.
+- [Set up the backend](/5.2.1/main/manual-installation/backend/): Learn how to set up the backend of a Weave.js app on Next.js
+- [Manual installation](/5.2.1/main/manual-installation/): Integrate Weave.js into a new or existing Next.js project
+- [v1.0.0](/5.2.1/main/release-notes/1.0.0/): Initial stable release of Weave.js
+- [v2.0.0](/5.2.1/main/release-notes/2.0.0/): Improved scalability when using the Azure Web PubSub store
+- [v3.0.0](/5.2.1/main/release-notes/3.0.0/): Focus on **performance, architecture flexibility, and cleaner integration APIs**.
+- [v5.0.0](/5.2.1/main/release-notes/5.0.0/): Focus on **diagramming capabilities, optimistic persistence, and a cleaner store architecture**.
+- [Release notes](/5.2.1/main/release-notes/): Discover what's new in Weave.js
+- [v4.0.0](/5.2.1/main/release-notes/4.0.0/): Focus on unified snapping architecture and custom canvas guides.
+- [Arrow Tool (deprecated)](/5.2.1/main/build/actions/arrow-tool/): Add an arrow to the canvas
+- [Comment Tool](/5.2.1/main/build/actions/comment-tool/): Allow users to comment on top of the stage content.
+- [Fit to Screen Tool](/5.2.1/main/build/actions/fit-to-screen-tool/): Set the zoom level so all the nodes on the stage are entirely visible on the screen
+- [Image Tool](/5.2.1/main/build/actions/image-tool/): Add an image to the canvas
+- [Images Tool](/5.2.1/main/build/actions/images-tool/): Add multiple images to the canvas
+- [Actions](/5.2.1/main/build/actions/): Actions maintained by Weave.js team
+- [Pen Tool (deprecated)](/5.2.1/main/build/actions/pen-tool/): Add line segments to the canvas
+- [Video Tool](/5.2.1/main/build/actions/video-tool/): Add a video to the canvas
+- [Arrow (deprecated)](/5.2.1/main/build/nodes/arrow/): Draw an arrow on the canvas
+- [Comment](/5.2.1/main/build/nodes/comment/): Give feedback and collaborate with other users.
+- [Connector](/5.2.1/main/build/nodes/connector/): Draw a connected line between nodes
+- [Frame](/5.2.1/main/build/nodes/frame/): Canvas-in-canvas element
+- [Group](/5.2.1/main/build/nodes/group/): Group nodes and manipulate them
+- [Nodes](/5.2.1/main/build/nodes/): Nodes maintained by Weave.js team
+- [Layer](/5.2.1/main/build/nodes/layer/): Segment and order the Stage in layers
+- [Line (deprecated)](/5.2.1/main/build/nodes/line/): Draw a line on the canvas
+- [Measure](/5.2.1/main/build/nodes/measure/): Draw measure reference distance on the canvas
+- [Polygon](/5.2.1/main/build/nodes/polygon/): Draw a polygon on the canvas using a preset shape
+- [Stage](/5.2.1/main/build/nodes/stage/): Main node to structure the canvas elements
+- [Star](/5.2.1/main/build/nodes/star/): Draw a star on the canvas
+- [Text](/5.2.1/main/build/nodes/text/): Draw &amp; edit text on the canvas
+- [Video](/5.2.1/main/build/nodes/video/): Render a video on the canvas
+- [Comments Renderer](/5.2.1/main/build/plugins/comments-renderer/): Render the comments of a room in a special layer
+- [Connected Users](/5.2.1/main/build/plugins/connected-users/): Get an structure with information about the connected users
+- [Context Menu](/5.2.1/main/build/plugins/context-menu/): Trigger a contextual menu on the canvas
+- [Copy &amp; Paste Nodes](/5.2.1/main/build/plugins/copy-paste-nodes/): Activate support to copy &amp; paste the nodes
+- [Plugins](/5.2.1/main/build/plugins/): Plugins maintained by Weave.js team
+- [Nodes Multi-selection Feedback](/5.2.1/main/build/plugins/nodes-multi-selection-feedback/): Activate support to provide more feedback to the user when multi-selecting nodes
+- [Nodes Selection](/5.2.1/main/build/plugins/nodes-selection/): Activate support to select nodes on the canvas
+- [Nodes Snapping](/5.2.1/main/build/plugins/nodes-snapping/): Allow to snap nodes to guides and to themselves
+- [Stage Drop Area](/5.2.1/main/build/plugins/stage-drop-area/): Activate support to drop elements on the canvas
+- [Stage Grid](/5.2.1/main/build/plugins/stage-grid/): Renders a reference grid behind the nodes layer
+- [Stage Keyboard Move](/5.2.1/main/build/plugins/stage-keyboard-move/): Activates moving elements with shift + keyboard arrows
+- [Stage minimap](/5.2.1/main/build/plugins/stage-minimap/): Renders a minimap from the main stage
+- [Stage Panning](/5.2.1/main/build/plugins/stage-panning/): Activates the panning (move) of the stage
+- [Stage Resize](/5.2.1/main/build/plugins/stage-resize/): Activates the stage resizing (responsive support)
+- [Stage Zoom](/5.2.1/main/build/plugins/stage-zoom/): Activates support for zoom on the stage
+- [Users Pointers](/5.2.1/main/build/plugins/users-pointers/): Showcase the position of the users mouse pointer on the canvas
+- [Users Presence](/5.2.1/main/build/plugins/users-presence/): Showcase what the users are doing on the canvas
+- [Stores](/5.2.1/main/build/stores/): Stores maintained by Weave.js team
+- [WebSockets](/5.2.1/main/build/stores/websockets-store/): Store that uses the WebSockets API as the transport layer
+- [Standalone](/5.2.1/main/build/stores/standalone-store/): Store that just renders a Weave.js room, useful for server-side image exporting
+- [Set up the frontend](/5.2.1/main/manual-installation/frontend/): Learn how to set up the frontend of a Weave.js app on Next.js
+- [Room page](/5.2.1/main/manual-installation/frontend/room-page/): Learn how to set up the Room page on Next.js
+- [Align Nodes Tool](/5.2.1/main/build/actions/align-nodes-tool/): Select nodes and align among them
+- [Brush Tool](/5.2.1/main/build/actions/brush-tool/): Paint freeform strokes on the canvas
+- [Connector Tool](/5.2.1/main/build/actions/connector-tool/): Add connectors to the canvas
+- [Export Stage Tool](/5.2.1/main/build/actions/export-stage-tool/): Export the entire stage (all nodes) node as an image
+- [Frame Tool](/5.2.1/main/build/actions/frame-tool/): Allows to add a canvas in canvas area
+- [Line Tool (deprecated)](/5.2.1/main/build/actions/line-tool/): Add a simple line to the canvas
+- [Measure Tool](/5.2.1/main/build/actions/measure-tool/): Add measures to the canvas
+- [Text Tool](/5.2.1/main/build/actions/text-tool/): Add text to the canvas
+- [Zoom In Tool](/5.2.1/main/build/actions/zoom-in-tool/): Increases one step the stage zoom level
+- [Ellipse](/5.2.1/main/build/nodes/ellipse/): Draw an ellipse (or circle) on the canvas
+- [Image](/5.2.1/main/build/nodes/image/): Render images on the canvas
+- [Rectangle](/5.2.1/main/build/nodes/rectangle/): Draw a rectangle on the canvas
+- [Regular Polygon (deprecated)](/5.2.1/main/build/nodes/regular-polygon/): Draw a regular polygon on the canvas
+- [Stroke](/5.2.1/main/build/nodes/stroke/): Draw a free-line on the canvas
+- [Users Selector](/5.2.1/main/build/plugins/users-selector/): Showcase the selection of the users on the canvas
+- [Enter Room page](/5.2.1/main/manual-installation/frontend/enter-room-page/): Learn how to set up the Enter Room page on Next.js
+- [Ellipse Tool](/5.2.1/main/build/actions/ellipse-tool/): Add an ellipse to the canvas
+- [Eraser Tool](/5.2.1/main/build/actions/eraser-tool/): Activate the deletion of nodes from the canvas
+- [Export Node Tool](/5.2.1/main/build/actions/export-node-tool/): Export the selected node as an image
+- [Move Tool](/5.2.1/main/build/actions/move-tool/): Activate the panning or movement of the canvas
+- [Star Tool](/5.2.1/main/build/actions/star-tool/): Add a star to the canvas
+- [Stroke Tool](/5.2.1/main/build/actions/stroke-tool/): Add a simple line to the canvas
+- [Zoom Out Tool](/5.2.1/main/build/actions/zoom-out-tool/): Decreases one step the stage zoom level
+- [Stroke Single](/5.2.1/main/build/nodes/stroke-single/): Draw a single-stroke line on the canvas
+- [Fit to Selection Tool](/5.2.1/main/build/actions/fit-to-selection-tool/): Set the zoom level so all the selected nodes are entirely visible on the screen
+- [Polygon Tool](/5.2.1/main/build/actions/polygon-tool/): Add a polygon to the canvas using a preset shape
+- [Rectangle Tool](/5.2.1/main/build/actions/rectangle-tool/): Add a rectangle to the canvas
+- [Regular Polygon Tool (deprecated)](/5.2.1/main/build/actions/regular-polygon-tool/): Add a regular polygon to the canvas
+- [Selection Tool](/5.2.1/main/build/actions/selection-tool/): Activate the selection of canvas nodes
+- [Azure Web PubSub](/5.2.1/main/build/stores/azure-web-pubsub-store/): Store that uses Azure Web PubSub infrastructure as the transport layer
 
 ## React Helper
 
-- [Overview](/weavejs/prerelease/react/): Getting started with Weave.js React Helper library API
-- [Setup](/weavejs/prerelease/react/setup/): React Helper library API setup
-- [useWeaveEvents](/weavejs/prerelease/react/api-reference/hooks/use-weave-events/): API reference for the useWeaveEvents hook
-- [useWeave](/weavejs/prerelease/react/api-reference/hooks/use-weave/): API reference for the useWeave hook
-- [WeaveProvider](/weavejs/prerelease/react/api-reference/providers/weave-provider/): API reference for WeaveProvider component
-- [Overview](/weavejs/5.2.1/react/): Getting started with Weave.js React Helper library API
-- [Setup](/weavejs/5.2.1/react/setup/): React Helper library API setup
-- [useWeave](/weavejs/5.2.1/react/api-reference/hooks/use-weave/): API reference for the useWeave hook
-- [useWeaveEvents](/weavejs/5.2.1/react/api-reference/hooks/use-weave-events/): API reference for the useWeaveEvents hook
-- [WeaveProvider](/weavejs/5.2.1/react/api-reference/providers/weave-provider/): API reference for WeaveProvider component
+- [Overview](/prerelease/react/): Getting started with Weave.js React Helper library API
+- [Setup](/prerelease/react/setup/): React Helper library API setup
+- [useWeaveEvents](/prerelease/react/api-reference/hooks/use-weave-events/): API reference for the useWeaveEvents hook
+- [useWeave](/prerelease/react/api-reference/hooks/use-weave/): API reference for the useWeave hook
+- [WeaveProvider](/prerelease/react/api-reference/providers/weave-provider/): API reference for WeaveProvider component
+- [Overview](/5.2.1/react/): Getting started with Weave.js React Helper library API
+- [Setup](/5.2.1/react/setup/): React Helper library API setup
+- [useWeaveEvents](/5.2.1/react/api-reference/hooks/use-weave-events/): API reference for the useWeaveEvents hook
+- [useWeave](/5.2.1/react/api-reference/hooks/use-weave/): API reference for the useWeave hook
+- [WeaveProvider](/5.2.1/react/api-reference/providers/weave-provider/): API reference for WeaveProvider component
 
 ## SDK
 
-- [Overview](/weavejs/prerelease/sdk/): Getting started with Weave.js SDK API
-- [Setup](/weavejs/prerelease/sdk/setup/): Weave.js SDK API setup
-- [Events](/weavejs/prerelease/sdk/api-reference/events/): API reference for Weave emitted events
-- [WeaveAction](/weavejs/prerelease/sdk/api-reference/actions/action/): Blueprint for the Action API
-- [WeaveAlignNodesToolAction](/weavejs/prerelease/sdk/api-reference/actions/align-nodes-tool/): Align selected nodes tool
-- [WeaveArrowToolAction (deprecated)](/weavejs/prerelease/sdk/api-reference/actions/arrow-tool/): Add line segments to the canvas
-- [WeaveBrushToolAction](/weavejs/prerelease/sdk/api-reference/actions/brush-tool/): Paint freeform strokes on the canvas
-- [WeaveCommentToolAction](/weavejs/prerelease/sdk/api-reference/actions/comment-tool/): Let users add comments to a (x,y) position of the stage.
-- [WeaveConnectorToolAction](/weavejs/prerelease/sdk/api-reference/actions/connector-tool/): Add connector nodes to the canvas
-- [WeaveEllipseToolAction](/weavejs/prerelease/sdk/api-reference/actions/ellipse-tool/): Add an ellipse to the canvas
-- [WeaveEraserToolAction](/weavejs/prerelease/sdk/api-reference/actions/eraser-tool/): Activate the deletion of nodes from the canvas
-- [WeaveExportNodesToolAction](/weavejs/prerelease/sdk/api-reference/actions/export-nodes-tool/): Export the selected nodes as an image
-- [WeaveExportStageToolAction](/weavejs/prerelease/sdk/api-reference/actions/export-stage-tool/): Tool to export the stage as an image
-- [WeaveFitToScreenToolAction](/weavejs/prerelease/sdk/api-reference/actions/fit-to-screen-tool/): Set the zoom level so all the nodes on the stage are entirely visible on the screen
-- [WeaveFitToSelectionToolAction](/weavejs/prerelease/sdk/api-reference/actions/fit-to-selection-tool/): Set the zoom level so all the selected nodes are entirely visible on the screen
-- [WeaveFrameToolAction](/weavejs/prerelease/sdk/api-reference/actions/frame-tool/): Allows to add a canvas in canvas area
-- [WeaveImageToolAction](/weavejs/prerelease/sdk/api-reference/actions/image-tool/): Add an image to the canvas
-- [WeaveImagesToolAction](/weavejs/prerelease/sdk/api-reference/actions/images-tool/): Add multiple image to the canvas
-- [Actions](/weavejs/prerelease/sdk/api-reference/actions/): Actions API Reference
-- [WeaveLineToolAction (deprecated)](/weavejs/prerelease/sdk/api-reference/actions/line-tool/): Add a simple line to the canvas
-- [WeaveMeasureToolAction](/weavejs/prerelease/sdk/api-reference/actions/measure-tool/): Add measure nodes to the canvas
-- [WeaveMoveToolAction](/weavejs/prerelease/sdk/api-reference/actions/move-tool/): Activate the panning or movement of the canvas
-- [WeavePenToolAction (deprecated)](/weavejs/prerelease/sdk/api-reference/actions/pen-tool/): Add line segments to the canvas
-- [WeavePolygonToolAction](/weavejs/prerelease/sdk/api-reference/actions/polygon-tool/): Add a polygon to the canvas using a preset shape
-- [WeaveRectangleToolAction](/weavejs/prerelease/sdk/api-reference/actions/rectangle-tool/): Add a rectangle to the canvas
-- [WeaveRegularPolygonToolAction (deprecated)](/weavejs/prerelease/sdk/api-reference/actions/regular-polygon-tool/): Add a regular polygon to the canvas
-- [WeaveSelectionToolAction](/weavejs/prerelease/sdk/api-reference/actions/selection-tool/): Activate the selection of canvas nodes
-- [WeaveStarToolAction](/weavejs/prerelease/sdk/api-reference/actions/star-tool/): Add a star to the canvas
-- [WeaveStrokeToolAction](/weavejs/prerelease/sdk/api-reference/actions/stroke-tool/): Add a single segment stroke to the canvas
-- [WeaveTextToolAction](/weavejs/prerelease/sdk/api-reference/actions/text-tool/): Add text to the canvas
-- [WeaveVideoToolAction](/weavejs/prerelease/sdk/api-reference/actions/video-tool/): Add a video to the canvas
-- [WeaveZoomInToolAction](/weavejs/prerelease/sdk/api-reference/actions/zoom-in-tool/): Increases one step the stage zoom level
-- [WeaveZoomOutToolAction](/weavejs/prerelease/sdk/api-reference/actions/zoom-out-tool/): Tool to export the stage as an image
-- [WeaveArrowNode (deprecated)](/weavejs/prerelease/sdk/api-reference/nodes/arrow/): Ellipse node API Reference
-- [WeaveCommentNode](/weavejs/prerelease/sdk/api-reference/nodes/comment/): Comment node API Reference
-- [WeaveConnectorNode](/weavejs/prerelease/sdk/api-reference/nodes/connector/): Connector node API Reference
-- [WeaveEllipseNode](/weavejs/prerelease/sdk/api-reference/nodes/ellipse/): Ellipse node API Reference
-- [WeaveFrameNode](/weavejs/prerelease/sdk/api-reference/nodes/frame/): Frame node API Reference
-- [WeaveGroupNode](/weavejs/prerelease/sdk/api-reference/nodes/group/): Group node API Reference
-- [WeaveImageNode](/weavejs/prerelease/sdk/api-reference/nodes/image/): Image node API Reference
-- [Nodes](/weavejs/prerelease/sdk/api-reference/nodes/): Nodes API Reference
-- [WeaveLayerNode](/weavejs/prerelease/sdk/api-reference/nodes/layer/): Layer node API Reference
-- [WeaveLineNode (deprecated)](/weavejs/prerelease/sdk/api-reference/nodes/line/): Line node API Reference
-- [WeaveMeasureNode](/weavejs/prerelease/sdk/api-reference/nodes/measure/): Measure node API Reference
-- [WeaveNode](/weavejs/prerelease/sdk/api-reference/nodes/node/): Blueprint for the Node API
-- [WeavePolygonNode](/weavejs/prerelease/sdk/api-reference/nodes/polygon/): Polygon node API Reference
-- [WeaveRectangleNode](/weavejs/prerelease/sdk/api-reference/nodes/rectangle/): Rectangle node API Reference
-- [WeaveRegularPolygonNode (deprecated)](/weavejs/prerelease/sdk/api-reference/nodes/regular-polygon/): Ellipse node API Reference
-- [WeaveStageNode](/weavejs/prerelease/sdk/api-reference/nodes/stage/): Stage node API Reference
-- [WeaveStarNode](/weavejs/prerelease/sdk/api-reference/nodes/star/): Ellipse node API Reference
-- [WeaveStrokeSingleNode](/weavejs/prerelease/sdk/api-reference/nodes/stroke-single/): Stroke V2 node API Reference
-- [WeaveStrokeNode](/weavejs/prerelease/sdk/api-reference/nodes/stroke/): Stroke node API Reference
-- [WeaveTextNode](/weavejs/prerelease/sdk/api-reference/nodes/text/): Text node API Reference
-- [WeaveVideoNode](/weavejs/prerelease/sdk/api-reference/nodes/video/): Video node API Reference
-- [WeaveCommentsRendererPlugin](/weavejs/prerelease/sdk/api-reference/plugins/comments-renderer/): Render comment nodes on a special layer to manage and interact with them
-- [WeaveConnectedUsersPlugin](/weavejs/prerelease/sdk/api-reference/plugins/connected-users/): Get an structure with information about the connected users
-- [WeaveContextMenuPlugin](/weavejs/prerelease/sdk/api-reference/plugins/context-menu/): Trigger a contextual menu on the canvas
-- [WeaveCopyPasteNodesPlugin](/weavejs/prerelease/sdk/api-reference/plugins/copy-paste-nodes/): Activate support to copy &amp; paste the nodes
-- [Plugins](/weavejs/prerelease/sdk/api-reference/plugins/): Plugins API Reference
-- [WeaveNodesDistanceSnappingPlugin](/weavejs/prerelease/sdk/api-reference/plugins/nodes-distance-snapping/): Allow to snap nodes to distance guides among peers nodes of a target node
-- [WeaveNodesEdgeSnappingPlugin](/weavejs/prerelease/sdk/api-reference/plugins/nodes-edge-snapping/): Allow to snap nodes to guides and to themselves
-- [WeaveNodesMultiSelectionFeedbackPlugin](/weavejs/prerelease/sdk/api-reference/plugins/nodes-multi-selection-feedback/): Activate support to provide more feedback when multi-selecting nodes on the canvas
-- [WeaveNodesSelectionPlugin](/weavejs/prerelease/sdk/api-reference/plugins/nodes-selection/): Activate support to select nodes on the canvas
-- [WeaveNodesSnappingPlugin](/weavejs/prerelease/sdk/api-reference/plugins/nodes-snapping/): Allow to snap nodes to guides and to themselves
-- [WeavePlugin](/weavejs/prerelease/sdk/api-reference/plugins/plugin/): Blueprint for the Plugin API
-- [WeaveStageDropAreaPlugin](/weavejs/prerelease/sdk/api-reference/plugins/stage-drop-area/): Activate support to drop elements on the canvas
-- [WeaveStageGridPlugin](/weavejs/prerelease/sdk/api-reference/plugins/stage-grid/): Renders a reference grid behind the nodes layer
-- [WeaveStageKeyboardMovePlugin](/weavejs/prerelease/sdk/api-reference/plugins/stage-keyboard-move/): Activates the movement by a delta of stage nodes using shift + keyboard arrow keys
-- [WeaveStageMinimapPlugin](/weavejs/prerelease/sdk/api-reference/plugins/stage-minimap/): Provides a scaled-down preview of the stage content
-- [WeaveStagePanningPlugin](/weavejs/prerelease/sdk/api-reference/plugins/stage-panning/): Activates the panning (move) of the stage
-- [WeaveStageResizePlugin](/weavejs/prerelease/sdk/api-reference/plugins/stage-resize/): Activates the stage resizing (responsive support)
-- [WeaveStageZoomPlugin](/weavejs/prerelease/sdk/api-reference/plugins/stage-zoom/): Activates support for zoom on the stage
-- [WeaveUsersPointersPlugin](/weavejs/prerelease/sdk/api-reference/plugins/users-pointers/): Showcase the position of the users mouse pointer on the canvas
-- [WeaveUsersPresencePlugin](/weavejs/prerelease/sdk/api-reference/plugins/users-presence/): Showcase what users are doing in real-time on the canvas
-- [WeaveUsersSelectionPlugin](/weavejs/prerelease/sdk/api-reference/plugins/users-selector/): Showcase what the users are selecting on the canvas
-- [Low-level State Manipulation](/weavejs/prerelease/sdk/api-reference/state-api/): API reference for the WeaveStateManipulation class
-- [Events](/weavejs/prerelease/sdk/api-reference/weave/events/): Weave instance emitted events
-- [Weave](/weavejs/prerelease/sdk/api-reference/weave/): API reference for Weave class
-- [Overview](/weavejs/5.2.1/sdk/): Getting started with Weave.js SDK API
-- [Setup](/weavejs/5.2.1/sdk/setup/): Weave.js SDK API setup
-- [Events](/weavejs/5.2.1/sdk/api-reference/events/): API reference for Weave emitted events
-- [WeaveAction](/weavejs/5.2.1/sdk/api-reference/actions/action/): Blueprint for the Action API
-- [WeaveAlignNodesToolAction](/weavejs/5.2.1/sdk/api-reference/actions/align-nodes-tool/): Align selected nodes tool
-- [WeaveArrowToolAction (deprecated)](/weavejs/5.2.1/sdk/api-reference/actions/arrow-tool/): Add line segments to the canvas
-- [WeaveBrushToolAction](/weavejs/5.2.1/sdk/api-reference/actions/brush-tool/): Paint freeform strokes on the canvas
-- [WeaveCommentToolAction](/weavejs/5.2.1/sdk/api-reference/actions/comment-tool/): Let users add comments to a (x,y) position of the stage.
-- [WeaveConnectorToolAction](/weavejs/5.2.1/sdk/api-reference/actions/connector-tool/): Add connector nodes to the canvas
-- [WeaveEllipseToolAction](/weavejs/5.2.1/sdk/api-reference/actions/ellipse-tool/): Add an ellipse to the canvas
-- [WeaveExportNodesToolAction](/weavejs/5.2.1/sdk/api-reference/actions/export-nodes-tool/): Export the selected nodes as an image
-- [WeaveExportStageToolAction](/weavejs/5.2.1/sdk/api-reference/actions/export-stage-tool/): Tool to export the stage as an image
-- [WeaveFitToScreenToolAction](/weavejs/5.2.1/sdk/api-reference/actions/fit-to-screen-tool/): Set the zoom level so all the nodes on the stage are entirely visible on the screen
-- [WeaveFitToSelectionToolAction](/weavejs/5.2.1/sdk/api-reference/actions/fit-to-selection-tool/): Set the zoom level so all the selected nodes are entirely visible on the screen
-- [WeaveFrameToolAction](/weavejs/5.2.1/sdk/api-reference/actions/frame-tool/): Allows to add a canvas in canvas area
-- [WeaveImageToolAction](/weavejs/5.2.1/sdk/api-reference/actions/image-tool/): Add an image to the canvas
-- [WeaveImagesToolAction](/weavejs/5.2.1/sdk/api-reference/actions/images-tool/): Add multiple image to the canvas
-- [WeaveLineToolAction (deprecated)](/weavejs/5.2.1/sdk/api-reference/actions/line-tool/): Add a simple line to the canvas
-- [WeaveMoveToolAction](/weavejs/5.2.1/sdk/api-reference/actions/move-tool/): Activate the panning or movement of the canvas
-- [WeavePenToolAction (deprecated)](/weavejs/5.2.1/sdk/api-reference/actions/pen-tool/): Add line segments to the canvas
-- [WeavePolygonToolAction](/weavejs/5.2.1/sdk/api-reference/actions/polygon-tool/): Add a polygon to the canvas using a preset shape
-- [WeaveSelectionToolAction](/weavejs/5.2.1/sdk/api-reference/actions/selection-tool/): Activate the selection of canvas nodes
-- [WeaveTextToolAction](/weavejs/5.2.1/sdk/api-reference/actions/text-tool/): Add text to the canvas
-- [WeaveVideoToolAction](/weavejs/5.2.1/sdk/api-reference/actions/video-tool/): Add a video to the canvas
-- [WeaveZoomOutToolAction](/weavejs/5.2.1/sdk/api-reference/actions/zoom-out-tool/): Tool to export the stage as an image
-- [WeaveArrowNode (deprecated)](/weavejs/5.2.1/sdk/api-reference/nodes/arrow/): Ellipse node API Reference
-- [WeaveCommentNode](/weavejs/5.2.1/sdk/api-reference/nodes/comment/): Comment node API Reference
-- [WeaveConnectorNode](/weavejs/5.2.1/sdk/api-reference/nodes/connector/): Connector node API Reference
-- [WeaveEllipseNode](/weavejs/5.2.1/sdk/api-reference/nodes/ellipse/): Ellipse node API Reference
-- [WeaveFrameNode](/weavejs/5.2.1/sdk/api-reference/nodes/frame/): Frame node API Reference
-- [WeaveImageNode](/weavejs/5.2.1/sdk/api-reference/nodes/image/): Image node API Reference
-- [WeaveGroupNode](/weavejs/5.2.1/sdk/api-reference/nodes/group/): Group node API Reference
-- [WeaveLayerNode](/weavejs/5.2.1/sdk/api-reference/nodes/layer/): Layer node API Reference
-- [WeaveMeasureNode](/weavejs/5.2.1/sdk/api-reference/nodes/measure/): Measure node API Reference
-- [WeaveNode](/weavejs/5.2.1/sdk/api-reference/nodes/node/): Blueprint for the Node API
-- [WeaveStageNode](/weavejs/5.2.1/sdk/api-reference/nodes/stage/): Stage node API Reference
-- [WeaveStarNode](/weavejs/5.2.1/sdk/api-reference/nodes/star/): Ellipse node API Reference
-- [WeaveVideoNode](/weavejs/5.2.1/sdk/api-reference/nodes/video/): Video node API Reference
-- [WeaveCommentsRendererPlugin](/weavejs/5.2.1/sdk/api-reference/plugins/comments-renderer/): Render comment nodes on a special layer to manage and interact with them
-- [WeaveConnectedUsersPlugin](/weavejs/5.2.1/sdk/api-reference/plugins/connected-users/): Get an structure with information about the connected users
-- [WeaveContextMenuPlugin](/weavejs/5.2.1/sdk/api-reference/plugins/context-menu/): Trigger a contextual menu on the canvas
-- [WeaveCopyPasteNodesPlugin](/weavejs/5.2.1/sdk/api-reference/plugins/copy-paste-nodes/): Activate support to copy &amp; paste the nodes
-- [WeaveNodesDistanceSnappingPlugin](/weavejs/5.2.1/sdk/api-reference/plugins/nodes-distance-snapping/): Allow to snap nodes to distance guides among peers nodes of a target node
-- [WeaveNodesMultiSelectionFeedbackPlugin](/weavejs/5.2.1/sdk/api-reference/plugins/nodes-multi-selection-feedback/): Activate support to provide more feedback when multi-selecting nodes on the canvas
-- [WeaveNodesSelectionPlugin](/weavejs/5.2.1/sdk/api-reference/plugins/nodes-selection/): Activate support to select nodes on the canvas
-- [WeaveNodesSnappingPlugin](/weavejs/5.2.1/sdk/api-reference/plugins/nodes-snapping/): Allow to snap nodes to guides and to themselves
-- [WeavePlugin](/weavejs/5.2.1/sdk/api-reference/plugins/plugin/): Blueprint for the Plugin API
-- [WeaveStageDropAreaPlugin](/weavejs/5.2.1/sdk/api-reference/plugins/stage-drop-area/): Activate support to drop elements on the canvas
-- [WeaveStageGridPlugin](/weavejs/5.2.1/sdk/api-reference/plugins/stage-grid/): Renders a reference grid behind the nodes layer
-- [WeaveStageKeyboardMovePlugin](/weavejs/5.2.1/sdk/api-reference/plugins/stage-keyboard-move/): Activates the movement by a delta of stage nodes using shift + keyboard arrow keys
-- [WeaveStageMinimapPlugin](/weavejs/5.2.1/sdk/api-reference/plugins/stage-minimap/): Provides a scaled-down preview of the stage content
-- [WeaveStagePanningPlugin](/weavejs/5.2.1/sdk/api-reference/plugins/stage-panning/): Activates the panning (move) of the stage
-- [WeaveStageResizePlugin](/weavejs/5.2.1/sdk/api-reference/plugins/stage-resize/): Activates the stage resizing (responsive support)
-- [WeaveStageZoomPlugin](/weavejs/5.2.1/sdk/api-reference/plugins/stage-zoom/): Activates support for zoom on the stage
-- [WeaveUsersPointersPlugin](/weavejs/5.2.1/sdk/api-reference/plugins/users-pointers/): Showcase the position of the users mouse pointer on the canvas
-- [WeaveUsersPresencePlugin](/weavejs/5.2.1/sdk/api-reference/plugins/users-presence/): Showcase what users are doing in real-time on the canvas
-- [Low-level State Manipulation](/weavejs/5.2.1/sdk/api-reference/state-api/): API reference for the WeaveStateManipulation class
-- [Events](/weavejs/5.2.1/sdk/api-reference/weave/events/): Weave instance emitted events
-- [WeaveEraserToolAction](/weavejs/5.2.1/sdk/api-reference/actions/eraser-tool/): Activate the deletion of nodes from the canvas
-- [Actions](/weavejs/5.2.1/sdk/api-reference/actions/): Actions API Reference
-- [WeaveMeasureToolAction](/weavejs/5.2.1/sdk/api-reference/actions/measure-tool/): Add measure nodes to the canvas
-- [WeaveRectangleToolAction](/weavejs/5.2.1/sdk/api-reference/actions/rectangle-tool/): Add a rectangle to the canvas
-- [WeaveStarToolAction](/weavejs/5.2.1/sdk/api-reference/actions/star-tool/): Add a star to the canvas
-- [WeaveStrokeToolAction](/weavejs/5.2.1/sdk/api-reference/actions/stroke-tool/): Add a single segment stroke to the canvas
-- [WeaveZoomInToolAction](/weavejs/5.2.1/sdk/api-reference/actions/zoom-in-tool/): Increases one step the stage zoom level
-- [Nodes](/weavejs/5.2.1/sdk/api-reference/nodes/): Nodes API Reference
-- [WeaveLineNode (deprecated)](/weavejs/5.2.1/sdk/api-reference/nodes/line/): Line node API Reference
-- [WeavePolygonNode](/weavejs/5.2.1/sdk/api-reference/nodes/polygon/): Polygon node API Reference
-- [WeaveRectangleNode](/weavejs/5.2.1/sdk/api-reference/nodes/rectangle/): Rectangle node API Reference
-- [WeaveRegularPolygonNode (deprecated)](/weavejs/5.2.1/sdk/api-reference/nodes/regular-polygon/): Ellipse node API Reference
-- [WeaveTextNode](/weavejs/5.2.1/sdk/api-reference/nodes/text/): Text node API Reference
-- [Plugins](/weavejs/5.2.1/sdk/api-reference/plugins/): Plugins API Reference
-- [WeaveNodesEdgeSnappingPlugin](/weavejs/5.2.1/sdk/api-reference/plugins/nodes-edge-snapping/): Allow to snap nodes to guides and to themselves
-- [WeaveUsersSelectionPlugin](/weavejs/5.2.1/sdk/api-reference/plugins/users-selector/): Showcase what the users are selecting on the canvas
-- [Weave](/weavejs/5.2.1/sdk/api-reference/weave/): API reference for Weave class
-- [WeaveRegularPolygonToolAction (deprecated)](/weavejs/5.2.1/sdk/api-reference/actions/regular-polygon-tool/): Add a regular polygon to the canvas
-- [WeaveStrokeSingleNode](/weavejs/5.2.1/sdk/api-reference/nodes/stroke-single/): Stroke V2 node API Reference
-- [WeaveStrokeNode](/weavejs/5.2.1/sdk/api-reference/nodes/stroke/): Stroke node API Reference
+- [Overview](/prerelease/sdk/): Getting started with Weave.js SDK API
+- [Setup](/prerelease/sdk/setup/): Weave.js SDK API setup
+- [Events](/prerelease/sdk/api-reference/events/): API reference for Weave emitted events
+- [WeaveAction](/prerelease/sdk/api-reference/actions/action/): Blueprint for the Action API
+- [WeaveAlignNodesToolAction](/prerelease/sdk/api-reference/actions/align-nodes-tool/): Align selected nodes tool
+- [WeaveArrowToolAction (deprecated)](/prerelease/sdk/api-reference/actions/arrow-tool/): Add line segments to the canvas
+- [WeaveBrushToolAction](/prerelease/sdk/api-reference/actions/brush-tool/): Paint freeform strokes on the canvas
+- [WeaveCommentToolAction](/prerelease/sdk/api-reference/actions/comment-tool/): Let users add comments to a (x,y) position of the stage.
+- [WeaveConnectorToolAction](/prerelease/sdk/api-reference/actions/connector-tool/): Add connector nodes to the canvas
+- [WeaveEllipseToolAction](/prerelease/sdk/api-reference/actions/ellipse-tool/): Add an ellipse to the canvas
+- [WeaveEraserToolAction](/prerelease/sdk/api-reference/actions/eraser-tool/): Activate the deletion of nodes from the canvas
+- [WeaveExportNodesToolAction](/prerelease/sdk/api-reference/actions/export-nodes-tool/): Export the selected nodes as an image
+- [WeaveExportStageToolAction](/prerelease/sdk/api-reference/actions/export-stage-tool/): Tool to export the stage as an image
+- [WeaveFitToScreenToolAction](/prerelease/sdk/api-reference/actions/fit-to-screen-tool/): Set the zoom level so all the nodes on the stage are entirely visible on the screen
+- [WeaveFitToSelectionToolAction](/prerelease/sdk/api-reference/actions/fit-to-selection-tool/): Set the zoom level so all the selected nodes are entirely visible on the screen
+- [WeaveFrameToolAction](/prerelease/sdk/api-reference/actions/frame-tool/): Allows to add a canvas in canvas area
+- [WeaveImageToolAction](/prerelease/sdk/api-reference/actions/image-tool/): Add an image to the canvas
+- [WeaveImagesToolAction](/prerelease/sdk/api-reference/actions/images-tool/): Add multiple image to the canvas
+- [Actions](/prerelease/sdk/api-reference/actions/): Actions API Reference
+- [WeaveLineToolAction (deprecated)](/prerelease/sdk/api-reference/actions/line-tool/): Add a simple line to the canvas
+- [WeaveMeasureToolAction](/prerelease/sdk/api-reference/actions/measure-tool/): Add measure nodes to the canvas
+- [WeaveMoveToolAction](/prerelease/sdk/api-reference/actions/move-tool/): Activate the panning or movement of the canvas
+- [WeavePenToolAction (deprecated)](/prerelease/sdk/api-reference/actions/pen-tool/): Add line segments to the canvas
+- [WeavePolygonToolAction](/prerelease/sdk/api-reference/actions/polygon-tool/): Add a polygon to the canvas using a preset shape
+- [WeaveRectangleToolAction](/prerelease/sdk/api-reference/actions/rectangle-tool/): Add a rectangle to the canvas
+- [WeaveRegularPolygonToolAction (deprecated)](/prerelease/sdk/api-reference/actions/regular-polygon-tool/): Add a regular polygon to the canvas
+- [WeaveSelectionToolAction](/prerelease/sdk/api-reference/actions/selection-tool/): Activate the selection of canvas nodes
+- [WeaveStarToolAction](/prerelease/sdk/api-reference/actions/star-tool/): Add a star to the canvas
+- [WeaveStrokeToolAction](/prerelease/sdk/api-reference/actions/stroke-tool/): Add a single segment stroke to the canvas
+- [WeaveTextToolAction](/prerelease/sdk/api-reference/actions/text-tool/): Add text to the canvas
+- [WeaveVideoToolAction](/prerelease/sdk/api-reference/actions/video-tool/): Add a video to the canvas
+- [WeaveZoomInToolAction](/prerelease/sdk/api-reference/actions/zoom-in-tool/): Increases one step the stage zoom level
+- [WeaveZoomOutToolAction](/prerelease/sdk/api-reference/actions/zoom-out-tool/): Tool to export the stage as an image
+- [WeaveArrowNode (deprecated)](/prerelease/sdk/api-reference/nodes/arrow/): Ellipse node API Reference
+- [WeaveCommentNode](/prerelease/sdk/api-reference/nodes/comment/): Comment node API Reference
+- [WeaveConnectorNode](/prerelease/sdk/api-reference/nodes/connector/): Connector node API Reference
+- [WeaveEllipseNode](/prerelease/sdk/api-reference/nodes/ellipse/): Ellipse node API Reference
+- [WeaveFrameNode](/prerelease/sdk/api-reference/nodes/frame/): Frame node API Reference
+- [WeaveGroupNode](/prerelease/sdk/api-reference/nodes/group/): Group node API Reference
+- [WeaveImageNode](/prerelease/sdk/api-reference/nodes/image/): Image node API Reference
+- [Nodes](/prerelease/sdk/api-reference/nodes/): Nodes API Reference
+- [WeaveLayerNode](/prerelease/sdk/api-reference/nodes/layer/): Layer node API Reference
+- [WeaveLineNode (deprecated)](/prerelease/sdk/api-reference/nodes/line/): Line node API Reference
+- [WeaveMeasureNode](/prerelease/sdk/api-reference/nodes/measure/): Measure node API Reference
+- [WeaveNode](/prerelease/sdk/api-reference/nodes/node/): Blueprint for the Node API
+- [WeavePolygonNode](/prerelease/sdk/api-reference/nodes/polygon/): Polygon node API Reference
+- [WeaveRectangleNode](/prerelease/sdk/api-reference/nodes/rectangle/): Rectangle node API Reference
+- [WeaveRegularPolygonNode (deprecated)](/prerelease/sdk/api-reference/nodes/regular-polygon/): Ellipse node API Reference
+- [WeaveStageNode](/prerelease/sdk/api-reference/nodes/stage/): Stage node API Reference
+- [WeaveStarNode](/prerelease/sdk/api-reference/nodes/star/): Ellipse node API Reference
+- [WeaveStrokeSingleNode](/prerelease/sdk/api-reference/nodes/stroke-single/): Stroke V2 node API Reference
+- [WeaveStrokeNode](/prerelease/sdk/api-reference/nodes/stroke/): Stroke node API Reference
+- [WeaveTextNode](/prerelease/sdk/api-reference/nodes/text/): Text node API Reference
+- [WeaveVideoNode](/prerelease/sdk/api-reference/nodes/video/): Video node API Reference
+- [WeaveCommentsRendererPlugin](/prerelease/sdk/api-reference/plugins/comments-renderer/): Render comment nodes on a special layer to manage and interact with them
+- [WeaveConnectedUsersPlugin](/prerelease/sdk/api-reference/plugins/connected-users/): Get an structure with information about the connected users
+- [WeaveContextMenuPlugin](/prerelease/sdk/api-reference/plugins/context-menu/): Trigger a contextual menu on the canvas
+- [WeaveCopyPasteNodesPlugin](/prerelease/sdk/api-reference/plugins/copy-paste-nodes/): Activate support to copy &amp; paste the nodes
+- [Plugins](/prerelease/sdk/api-reference/plugins/): Plugins API Reference
+- [WeaveNodesDistanceSnappingPlugin](/prerelease/sdk/api-reference/plugins/nodes-distance-snapping/): Allow to snap nodes to distance guides among peers nodes of a target node
+- [WeaveNodesEdgeSnappingPlugin](/prerelease/sdk/api-reference/plugins/nodes-edge-snapping/): Allow to snap nodes to guides and to themselves
+- [WeaveNodesMultiSelectionFeedbackPlugin](/prerelease/sdk/api-reference/plugins/nodes-multi-selection-feedback/): Activate support to provide more feedback when multi-selecting nodes on the canvas
+- [WeaveNodesSelectionPlugin](/prerelease/sdk/api-reference/plugins/nodes-selection/): Activate support to select nodes on the canvas
+- [WeaveNodesSnappingPlugin](/prerelease/sdk/api-reference/plugins/nodes-snapping/): Allow to snap nodes to guides and to themselves
+- [WeavePlugin](/prerelease/sdk/api-reference/plugins/plugin/): Blueprint for the Plugin API
+- [WeaveStageDropAreaPlugin](/prerelease/sdk/api-reference/plugins/stage-drop-area/): Activate support to drop elements on the canvas
+- [WeaveStageGridPlugin](/prerelease/sdk/api-reference/plugins/stage-grid/): Renders a reference grid behind the nodes layer
+- [WeaveStageKeyboardMovePlugin](/prerelease/sdk/api-reference/plugins/stage-keyboard-move/): Activates the movement by a delta of stage nodes using shift + keyboard arrow keys
+- [WeaveStageMinimapPlugin](/prerelease/sdk/api-reference/plugins/stage-minimap/): Provides a scaled-down preview of the stage content
+- [WeaveStagePanningPlugin](/prerelease/sdk/api-reference/plugins/stage-panning/): Activates the panning (move) of the stage
+- [WeaveStageResizePlugin](/prerelease/sdk/api-reference/plugins/stage-resize/): Activates the stage resizing (responsive support)
+- [WeaveStageZoomPlugin](/prerelease/sdk/api-reference/plugins/stage-zoom/): Activates support for zoom on the stage
+- [WeaveUsersPointersPlugin](/prerelease/sdk/api-reference/plugins/users-pointers/): Showcase the position of the users mouse pointer on the canvas
+- [WeaveUsersPresencePlugin](/prerelease/sdk/api-reference/plugins/users-presence/): Showcase what users are doing in real-time on the canvas
+- [WeaveUsersSelectionPlugin](/prerelease/sdk/api-reference/plugins/users-selector/): Showcase what the users are selecting on the canvas
+- [Low-level State Manipulation](/prerelease/sdk/api-reference/state-api/): API reference for the WeaveStateManipulation class
+- [Events](/prerelease/sdk/api-reference/weave/events/): Weave instance emitted events
+- [Weave](/prerelease/sdk/api-reference/weave/): API reference for Weave class
+- [Overview](/5.2.1/sdk/): Getting started with Weave.js SDK API
+- [Setup](/5.2.1/sdk/setup/): Weave.js SDK API setup
+- [Events](/5.2.1/sdk/api-reference/events/): API reference for Weave emitted events
+- [WeaveAction](/5.2.1/sdk/api-reference/actions/action/): Blueprint for the Action API
+- [WeaveAlignNodesToolAction](/5.2.1/sdk/api-reference/actions/align-nodes-tool/): Align selected nodes tool
+- [WeaveArrowToolAction (deprecated)](/5.2.1/sdk/api-reference/actions/arrow-tool/): Add line segments to the canvas
+- [WeaveBrushToolAction](/5.2.1/sdk/api-reference/actions/brush-tool/): Paint freeform strokes on the canvas
+- [WeaveCommentToolAction](/5.2.1/sdk/api-reference/actions/comment-tool/): Let users add comments to a (x,y) position of the stage.
+- [WeaveConnectorToolAction](/5.2.1/sdk/api-reference/actions/connector-tool/): Add connector nodes to the canvas
+- [WeaveEllipseToolAction](/5.2.1/sdk/api-reference/actions/ellipse-tool/): Add an ellipse to the canvas
+- [WeaveExportNodesToolAction](/5.2.1/sdk/api-reference/actions/export-nodes-tool/): Export the selected nodes as an image
+- [WeaveExportStageToolAction](/5.2.1/sdk/api-reference/actions/export-stage-tool/): Tool to export the stage as an image
+- [WeaveFitToScreenToolAction](/5.2.1/sdk/api-reference/actions/fit-to-screen-tool/): Set the zoom level so all the nodes on the stage are entirely visible on the screen
+- [WeaveFitToSelectionToolAction](/5.2.1/sdk/api-reference/actions/fit-to-selection-tool/): Set the zoom level so all the selected nodes are entirely visible on the screen
+- [WeaveFrameToolAction](/5.2.1/sdk/api-reference/actions/frame-tool/): Allows to add a canvas in canvas area
+- [WeaveImageToolAction](/5.2.1/sdk/api-reference/actions/image-tool/): Add an image to the canvas
+- [WeaveImagesToolAction](/5.2.1/sdk/api-reference/actions/images-tool/): Add multiple image to the canvas
+- [WeaveLineToolAction (deprecated)](/5.2.1/sdk/api-reference/actions/line-tool/): Add a simple line to the canvas
+- [WeavePenToolAction (deprecated)](/5.2.1/sdk/api-reference/actions/pen-tool/): Add line segments to the canvas
+- [WeaveMoveToolAction](/5.2.1/sdk/api-reference/actions/move-tool/): Activate the panning or movement of the canvas
+- [WeavePolygonToolAction](/5.2.1/sdk/api-reference/actions/polygon-tool/): Add a polygon to the canvas using a preset shape
+- [WeaveSelectionToolAction](/5.2.1/sdk/api-reference/actions/selection-tool/): Activate the selection of canvas nodes
+- [WeaveTextToolAction](/5.2.1/sdk/api-reference/actions/text-tool/): Add text to the canvas
+- [WeaveVideoToolAction](/5.2.1/sdk/api-reference/actions/video-tool/): Add a video to the canvas
+- [WeaveZoomOutToolAction](/5.2.1/sdk/api-reference/actions/zoom-out-tool/): Tool to export the stage as an image
+- [WeaveArrowNode (deprecated)](/5.2.1/sdk/api-reference/nodes/arrow/): Ellipse node API Reference
+- [WeaveCommentNode](/5.2.1/sdk/api-reference/nodes/comment/): Comment node API Reference
+- [WeaveConnectorNode](/5.2.1/sdk/api-reference/nodes/connector/): Connector node API Reference
+- [WeaveEllipseNode](/5.2.1/sdk/api-reference/nodes/ellipse/): Ellipse node API Reference
+- [WeaveFrameNode](/5.2.1/sdk/api-reference/nodes/frame/): Frame node API Reference
+- [WeaveGroupNode](/5.2.1/sdk/api-reference/nodes/group/): Group node API Reference
+- [WeaveImageNode](/5.2.1/sdk/api-reference/nodes/image/): Image node API Reference
+- [WeaveLayerNode](/5.2.1/sdk/api-reference/nodes/layer/): Layer node API Reference
+- [WeaveNode](/5.2.1/sdk/api-reference/nodes/node/): Blueprint for the Node API
+- [WeaveMeasureNode](/5.2.1/sdk/api-reference/nodes/measure/): Measure node API Reference
+- [WeaveStageNode](/5.2.1/sdk/api-reference/nodes/stage/): Stage node API Reference
+- [WeaveStarNode](/5.2.1/sdk/api-reference/nodes/star/): Ellipse node API Reference
+- [WeaveCommentsRendererPlugin](/5.2.1/sdk/api-reference/plugins/comments-renderer/): Render comment nodes on a special layer to manage and interact with them
+- [WeaveConnectedUsersPlugin](/5.2.1/sdk/api-reference/plugins/connected-users/): Get an structure with information about the connected users
+- [WeaveContextMenuPlugin](/5.2.1/sdk/api-reference/plugins/context-menu/): Trigger a contextual menu on the canvas
+- [WeaveCopyPasteNodesPlugin](/5.2.1/sdk/api-reference/plugins/copy-paste-nodes/): Activate support to copy &amp; paste the nodes
+- [WeaveNodesDistanceSnappingPlugin](/5.2.1/sdk/api-reference/plugins/nodes-distance-snapping/): Allow to snap nodes to distance guides among peers nodes of a target node
+- [WeaveNodesMultiSelectionFeedbackPlugin](/5.2.1/sdk/api-reference/plugins/nodes-multi-selection-feedback/): Activate support to provide more feedback when multi-selecting nodes on the canvas
+- [WeaveNodesSelectionPlugin](/5.2.1/sdk/api-reference/plugins/nodes-selection/): Activate support to select nodes on the canvas
+- [WeaveNodesSnappingPlugin](/5.2.1/sdk/api-reference/plugins/nodes-snapping/): Allow to snap nodes to guides and to themselves
+- [WeavePlugin](/5.2.1/sdk/api-reference/plugins/plugin/): Blueprint for the Plugin API
+- [WeaveStageDropAreaPlugin](/5.2.1/sdk/api-reference/plugins/stage-drop-area/): Activate support to drop elements on the canvas
+- [WeaveStageGridPlugin](/5.2.1/sdk/api-reference/plugins/stage-grid/): Renders a reference grid behind the nodes layer
+- [WeaveStageKeyboardMovePlugin](/5.2.1/sdk/api-reference/plugins/stage-keyboard-move/): Activates the movement by a delta of stage nodes using shift + keyboard arrow keys
+- [WeaveStageMinimapPlugin](/5.2.1/sdk/api-reference/plugins/stage-minimap/): Provides a scaled-down preview of the stage content
+- [WeaveStagePanningPlugin](/5.2.1/sdk/api-reference/plugins/stage-panning/): Activates the panning (move) of the stage
+- [WeaveStageResizePlugin](/5.2.1/sdk/api-reference/plugins/stage-resize/): Activates the stage resizing (responsive support)
+- [WeaveStageZoomPlugin](/5.2.1/sdk/api-reference/plugins/stage-zoom/): Activates support for zoom on the stage
+- [WeaveUsersPointersPlugin](/5.2.1/sdk/api-reference/plugins/users-pointers/): Showcase the position of the users mouse pointer on the canvas
+- [WeaveUsersPresencePlugin](/5.2.1/sdk/api-reference/plugins/users-presence/): Showcase what users are doing in real-time on the canvas
+- [Low-level State Manipulation](/5.2.1/sdk/api-reference/state-api/): API reference for the WeaveStateManipulation class
+- [Events](/5.2.1/sdk/api-reference/weave/events/): Weave instance emitted events
+- [WeaveEraserToolAction](/5.2.1/sdk/api-reference/actions/eraser-tool/): Activate the deletion of nodes from the canvas
+- [Actions](/5.2.1/sdk/api-reference/actions/): Actions API Reference
+- [WeaveMeasureToolAction](/5.2.1/sdk/api-reference/actions/measure-tool/): Add measure nodes to the canvas
+- [WeaveRectangleToolAction](/5.2.1/sdk/api-reference/actions/rectangle-tool/): Add a rectangle to the canvas
+- [WeaveStarToolAction](/5.2.1/sdk/api-reference/actions/star-tool/): Add a star to the canvas
+- [WeaveStrokeToolAction](/5.2.1/sdk/api-reference/actions/stroke-tool/): Add a single segment stroke to the canvas
+- [WeaveZoomInToolAction](/5.2.1/sdk/api-reference/actions/zoom-in-tool/): Increases one step the stage zoom level
+- [Nodes](/5.2.1/sdk/api-reference/nodes/): Nodes API Reference
+- [WeaveLineNode (deprecated)](/5.2.1/sdk/api-reference/nodes/line/): Line node API Reference
+- [WeavePolygonNode](/5.2.1/sdk/api-reference/nodes/polygon/): Polygon node API Reference
+- [WeaveRectangleNode](/5.2.1/sdk/api-reference/nodes/rectangle/): Rectangle node API Reference
+- [WeaveRegularPolygonNode (deprecated)](/5.2.1/sdk/api-reference/nodes/regular-polygon/): Ellipse node API Reference
+- [WeaveTextNode](/5.2.1/sdk/api-reference/nodes/text/): Text node API Reference
+- [Plugins](/5.2.1/sdk/api-reference/plugins/): Plugins API Reference
+- [WeaveNodesEdgeSnappingPlugin](/5.2.1/sdk/api-reference/plugins/nodes-edge-snapping/): Allow to snap nodes to guides and to themselves
+- [WeaveUsersSelectionPlugin](/5.2.1/sdk/api-reference/plugins/users-selector/): Showcase what the users are selecting on the canvas
+- [Weave](/5.2.1/sdk/api-reference/weave/): API reference for Weave class
+- [WeaveRegularPolygonToolAction (deprecated)](/5.2.1/sdk/api-reference/actions/regular-polygon-tool/): Add a regular polygon to the canvas
+- [WeaveStrokeSingleNode](/5.2.1/sdk/api-reference/nodes/stroke-single/): Stroke V2 node API Reference
+- [WeaveStrokeNode](/5.2.1/sdk/api-reference/nodes/stroke/): Stroke node API Reference
+- [WeaveVideoNode](/5.2.1/sdk/api-reference/nodes/video/): Video node API Reference
 
 ## Azure Web Pubsub Store
 
-- [Overview](/weavejs/prerelease/store-azure-web-pubsub/): Getting started with Weave.js Azure Web PubSub store
-- [Setup](/weavejs/prerelease/store-azure-web-pubsub/setup/): Azure Web PubSub Store API setup
-- [WeaveStoreAzureWebPubsub](/weavejs/prerelease/store-azure-web-pubsub/api-reference/client/weave-store-azure-web-pubsub/): API reference for WeaveStoreAzureWebPubsub class
-- [WeaveAzureWebPubsubServer](/weavejs/prerelease/store-azure-web-pubsub/api-reference/server/weave-azure-web-pubsub-server/): API reference for the WeaveAzureWebPubsubServer class
-- [Setup](/weavejs/5.2.1/store-azure-web-pubsub/setup/): Azure Web PubSub Store API setup
-- [Overview](/weavejs/5.2.1/store-azure-web-pubsub/): Getting started with Weave.js Azure Web PubSub store
-- [WeaveStoreAzureWebPubsub](/weavejs/5.2.1/store-azure-web-pubsub/api-reference/client/weave-store-azure-web-pubsub/): API reference for WeaveStoreAzureWebPubsub class
-- [WeaveAzureWebPubsubServer](/weavejs/5.2.1/store-azure-web-pubsub/api-reference/server/weave-azure-web-pubsub-server/): API reference for the WeaveAzureWebPubsubServer class
+- [Overview](/prerelease/store-azure-web-pubsub/): Getting started with Weave.js Azure Web PubSub store
+- [Setup](/prerelease/store-azure-web-pubsub/setup/): Azure Web PubSub Store API setup
+- [WeaveStoreAzureWebPubsub](/prerelease/store-azure-web-pubsub/api-reference/client/weave-store-azure-web-pubsub/): API reference for WeaveStoreAzureWebPubsub class
+- [WeaveAzureWebPubsubServer](/prerelease/store-azure-web-pubsub/api-reference/server/weave-azure-web-pubsub-server/): API reference for the WeaveAzureWebPubsubServer class
+- [Setup](/5.2.1/store-azure-web-pubsub/setup/): Azure Web PubSub Store API setup
+- [Overview](/5.2.1/store-azure-web-pubsub/): Getting started with Weave.js Azure Web PubSub store
+- [WeaveStoreAzureWebPubsub](/5.2.1/store-azure-web-pubsub/api-reference/client/weave-store-azure-web-pubsub/): API reference for WeaveStoreAzureWebPubsub class
+- [WeaveAzureWebPubsubServer](/5.2.1/store-azure-web-pubsub/api-reference/server/weave-azure-web-pubsub-server/): API reference for the WeaveAzureWebPubsubServer class
 
 ## Standalone Store
 
-- [Overview](/weavejs/prerelease/store-standalone/): Getting started with Weave.js Standalone store
-- [Setup](/weavejs/prerelease/store-standalone/setup/): Standalone Store API setup
-- [WeaveStoreStandalone](/weavejs/prerelease/store-standalone/api-reference/): API reference for the WeaveStoreStandalone class
-- [Overview](/weavejs/5.2.1/store-standalone/): Getting started with Weave.js Standalone store
-- [Setup](/weavejs/5.2.1/store-standalone/setup/): Standalone Store API setup
-- [WeaveStoreStandalone](/weavejs/5.2.1/store-standalone/api-reference/): API reference for the WeaveStoreStandalone class
+- [Overview](/prerelease/store-standalone/): Getting started with Weave.js Standalone store
+- [Setup](/prerelease/store-standalone/setup/): Standalone Store API setup
+- [WeaveStoreStandalone](/prerelease/store-standalone/api-reference/): API reference for the WeaveStoreStandalone class
+- [Overview](/5.2.1/store-standalone/): Getting started with Weave.js Standalone store
+- [Setup](/5.2.1/store-standalone/setup/): Standalone Store API setup
+- [WeaveStoreStandalone](/5.2.1/store-standalone/api-reference/): API reference for the WeaveStoreStandalone class
 
 ## Websockets Store
 
-- [Overview](/weavejs/prerelease/store-websockets/): Getting started with Weave.js Websockets store
-- [Setup](/weavejs/prerelease/store-websockets/setup/): WebSockets Store API setup
-- [WeaveStoreWebsockets](/weavejs/prerelease/store-websockets/api-reference/client/weave-store-websockets/): API reference for WeaveStoreWebsockets class
-- [WeaveWebsocketsServer](/weavejs/prerelease/store-websockets/api-reference/server/weave-websockets-server/): API reference for the WeaveWebsocketsServer class
-- [Overview](/weavejs/5.2.1/store-websockets/): Getting started with Weave.js Websockets store
-- [Setup](/weavejs/5.2.1/store-websockets/setup/): WebSockets Store API setup
-- [WeaveStoreWebsockets](/weavejs/5.2.1/store-websockets/api-reference/client/weave-store-websockets/): API reference for WeaveStoreWebsockets class
-- [WeaveWebsocketsServer](/weavejs/5.2.1/store-websockets/api-reference/server/weave-websockets-server/): API reference for the WeaveWebsocketsServer class
+- [Overview](/prerelease/store-websockets/): Getting started with Weave.js Websockets store
+- [Setup](/prerelease/store-websockets/setup/): WebSockets Store API setup
+- [WeaveStoreWebsockets](/prerelease/store-websockets/api-reference/client/weave-store-websockets/): API reference for WeaveStoreWebsockets class
+- [WeaveWebsocketsServer](/prerelease/store-websockets/api-reference/server/weave-websockets-server/): API reference for the WeaveWebsocketsServer class
+- [Overview](/5.2.1/store-websockets/): Getting started with Weave.js Websockets store
+- [Setup](/5.2.1/store-websockets/setup/): WebSockets Store API setup
+- [WeaveStoreWebsockets](/5.2.1/store-websockets/api-reference/client/weave-store-websockets/): API reference for WeaveStoreWebsockets class
+- [WeaveWebsocketsServer](/5.2.1/store-websockets/api-reference/server/weave-websockets-server/): API reference for the WeaveWebsocketsServer class
 
 ## TypeScript Types
 
-- [Overview](/weavejs/prerelease/types/): Getting started with Weave.js TypeScript types
-- [Setup](/weavejs/prerelease/types/setup/): Weave.js TypeScript types definitions setup
-- [Constants](/weavejs/prerelease/types/api-reference/constants/): Constants definitions for Weave.js
-- [Types](/weavejs/prerelease/types/api-reference/types/): TypeScript types definitions for Weave.js
-- [Overview](/weavejs/5.2.1/types/): Getting started with Weave.js TypeScript types
-- [Setup](/weavejs/5.2.1/types/setup/): Weave.js TypeScript types definitions setup
-- [Constants](/weavejs/5.2.1/types/api-reference/constants/): Constants definitions for Weave.js
-- [Types](/weavejs/5.2.1/types/api-reference/types/): TypeScript types definitions for Weave.js
+- [Overview](/prerelease/types/): Getting started with Weave.js TypeScript types
+- [Setup](/prerelease/types/setup/): Weave.js TypeScript types definitions setup
+- [Constants](/prerelease/types/api-reference/constants/): Constants definitions for Weave.js
+- [Types](/prerelease/types/api-reference/types/): TypeScript types definitions for Weave.js
+- [Overview](/5.2.1/types/): Getting started with Weave.js TypeScript types
+- [Setup](/5.2.1/types/setup/): Weave.js TypeScript types definitions setup
+- [Constants](/5.2.1/types/api-reference/constants/): Constants definitions for Weave.js
+- [Types](/5.2.1/types/api-reference/types/): TypeScript types definitions for Weave.js
