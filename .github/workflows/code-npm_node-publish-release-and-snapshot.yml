@@ -162,6 +162,19 @@ jobs:
           keep-unreleased-section: true
           tag-prefix: ""
 
+      # release-flow/keep-a-changelog-action parses the *entire* CHANGELOG.md
+      # into a markdown AST and re-serializes the whole file on every bump,
+      # not just the section it's updating. If invisible Unicode whitespace
+      # (most commonly a pasted-in NBSP) has ever broken an unrelated,
+      # historical heading elsewhere in the file, the action's serializer
+      # defensively backslash-escapes it on the way back out (`### Added` ->
+      # `\### Added`) — corrupting content the action never meant to touch.
+      # This fails on purpose rather than silently continuing: the defect
+      # needs fixing at its source (the PR that introduced the bad
+      # whitespace), or it will keep re-triggering on every future release.
+      - name: Sanitize CHANGELOG.md
+        run: node .github/scripts/sanitize-changelog.mjs code/CHANGELOG.md
+
       - name: Define snapshot version
         working-directory: code
         env:
@@ -491,6 +504,19 @@ jobs:
           fail-on-empty-release-notes: false
           keep-unreleased-section: true
           tag-prefix: ""
+
+      # release-flow/keep-a-changelog-action parses the *entire* CHANGELOG.md
+      # into a markdown AST and re-serializes the whole file on every bump,
+      # not just the section it's updating. If invisible Unicode whitespace
+      # (most commonly a pasted-in NBSP) has ever broken an unrelated,
+      # historical heading elsewhere in the file, the action's serializer
+      # defensively backslash-escapes it on the way back out (`### Added` ->
+      # `\### Added`) — corrupting content the action never meant to touch.
+      # This fails on purpose rather than silently continuing: the defect
+      # needs fixing at its source (the PR that introduced the bad
+      # whitespace), or it will keep re-triggering on every future release.
+      - name: Sanitize CHANGELOG.md
+        run: node .github/scripts/sanitize-changelog.mjs code/CHANGELOG.md
 
       - name: NPM / Prepare release
         working-directory: code
