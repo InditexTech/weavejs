@@ -1,0 +1,72 @@
+= WeaveUsersSelectionPlugin
+:description: Showcase what the users are selecting on the canvas
+
+== Overview
+
+The https://github.com/InditexTech/weavejs/blob/main/code/packages/sdk/src/plugins/users-selector/users-selector.ts[WeaveUsersSelectionPlugin]
+class that enables real-time user selection sharing across all connected users on the collaborative canvas. It displays live
+what each user is selecting, allowing participants to see each other’s activity and collaborate more intuitively.
+
+This plugin helps create a shared sense of presence, making collaborative tools feel dynamic, interactive, and
+truly multi-user.
+
+The class extends the xref:sdk:api-reference/plugins/plugin.adoc[WeavePlugin] class
+
+== Name
+
+This plugin `name` property value is `usersSelection`.
+
+== Import
+
+[source,shell]
+----
+import { WeaveUsersSelectionPlugin } from "@inditextech/weave-sdk";
+----
+
+== Instantiation
+
+[source,ts]
+----
+new WeaveUsersSelectionPlugin(params: WeaveUsersSelectionPluginParams);
+----
+
+== TypeScript types
+
+[source,ts]
+----
+type WeaveUser = {
+  [key: string]: any;
+  name: string;
+  email: string;
+};
+
+type WeaveUsersSelectionPluginConfig = {
+  getUser: () => WeaveUser;
+  getUserColor: (user: WeaveUser) => string | CanvasGradient | undefined;
+};
+
+type WeaveUsersSelectionPluginParams = {
+  config: WeaveUsersSelectionPluginConfig;
+};
+----
+
+== Parameters
+
+For `WeaveUsersSelectionPluginParams`:
+
+[cols="4*"]
+|===
+| Property | Type | Required | Description
+
+| mono:[config] | mono:[WeaveUsersSelectionPluginConfig] |  | Config parameters for the plugin.
+|===
+
+For `WeaveUsersSelectionPluginConfig`:
+
+[cols="4*"]
+|===
+| Property | Type | Required | Description
+
+| mono:[getUser] | mono:[() => WeaveUser] |  | A function that returns the actual instance user metadata.
+| mono:[getUserColor] | mono:[(user: WeaveUser) => string \| CanvasGradient \| undefined] |  | A function that returns the color (#RGB or #RGBA) to use to set the selector for the user.
+|===

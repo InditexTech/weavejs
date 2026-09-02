@@ -1,0 +1,80 @@
+= Move Tool
+:description: Activate the panning or movement of the canvas
+
+image::actions/move-tool.gif[Move Tool action on use on the Weave.js showcase,role="zoom-in"]
+
+== Introduction
+
+This action allows users enable/disable the panning of Stage canvas.
+
+== Dependencies
+
+This action needs registered on the Weave instance the following element:
+
+* xref:main:build/plugins/stage-panning.adoc[Stage panning] plugin
+
+== Usage
+
+=== Import the Action
+Start by importing the action:
+
+[source,ts]
+----
+import { WeaveMoveToolAction } from "@inditextech/weave-sdk";
+----
+
+=== Register the Action
+Then register the action on the xref:sdk:api-reference/weave/index.adoc[Weave] class instance.
+
+[source,ts]
+----
+const instance = new Weave({
+  ...
+  actions: [
+    ...,
+    new WeaveMoveToolAction(), // <.>
+  ]
+})
+----
+<.> Added in this step.
+
+=== Setup the action trigger
+Setup on a button or any element on the UI the user can interact with on the action event:
+
+[source,ts]
+----
+instance.triggerAction("moveTool");
+----
+
+
+For example on a button on React:
+
+[source,tsx]
+----
+import React from "react";
+import { useWeave } from "@inditextech/weave-react";
+
+const MyMoveToolTriggerComponent = () => {
+  const instance = useWeave((state) => state.instance);
+
+  const triggerTool = React.useCallback(() => {
+    instance.triggerAction("moveTool");
+  }, [instance]);
+
+  return <button onClick={triggerTool}>Move Tool</button>;
+};
+----
+
+=== Trigger the action
+Finally a final user trigger the UI element that launches the action.
+
+
+When enabled the user can:
+
+* Via the *mouse*, pan while maintain pressed the main button and moving the mouse.
+* Via *touch*, on touch-support devices, pan while touch-drag.
+* Via the *mouse* + *keyboard*, by maintaining the kbd:[Space] key pressed and moving
+the mouse.
+
+If the user device, posses a *touchpad* device (i.e. Mac laptops), use the two-finger swipe
+gesture to pan without the need to enable the action.

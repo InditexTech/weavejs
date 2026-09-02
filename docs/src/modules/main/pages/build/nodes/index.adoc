@@ -1,0 +1,254 @@
+= Nodes
+:description: Nodes maintained by Weave.js team
+
+== Introduction
+
+Nodes are the core visual elements in Weave.js, they represent everything you see and
+interact with on the canvas. From simple shapes like rectangles and lines, to text, images,
+and complex containers like frames, Nodes are the building blocks of your collaborative
+interface.
+
+Each Node is based on Konva.js primitives and enhanced with interactive behavior, styling,
+and real-time sync capabilities. Nodes can be selected, moved, edited, grouped, and extended,
+making them flexible enough to power everything from diagram tools to whiteboards and custom UIs.
+
+In short, if it shows up on the canvas in Weave.js, it's probably a Node.
+
+== Available nodes
+
+Weave.js team maintain a set of *base nodes*, think of them as the minimal nodes to
+build visual collaborative applications. This are the nodes:
+
+[cards,columns="1 s:2 m:4",width=container]
+====
+[card,subheader="Structure"]
+.xref:main:build/nodes/layer.adoc[Layer]
+The Layer node is a logical container within the Stage. It allows you to separate visual elements, for example: background grids, interactive elements, or UI overlays, into distinct rendering layers.
+
+[card,subheader="Structure"]
+.xref:main:build/nodes/stage.adoc[Stage]
+The Stage node is the root canvas container in Weave.js. It serves as the entry point for rendering all other visual or layout Nodes and manages the overall coordinate system.
+
+[card,subheader="Collaboration"]
+.xref:main:build/nodes/comment.adoc[Comment]
+The Comment node provides a way to provide feedback and let know users where on the stage a comment has been added to the room. Also provides a mechanism to render an overlay to manage the comment and the comment replies or actions.
+
+[card,subheader="Grouping"]
+.xref:main:build/nodes/frame.adoc[Frame]
+The Frame node is a container-like visual element used to group and organize other nodes within a pre-defined boundary. It functions as a structured layout region, often used to represent panels, sections, or modular components on the canvas.
+
+[card,subheader="Grouping"]
+.xref:main:build/nodes/group.adoc[Group]
+The Group node is a container for organizing multiple nodes into a single, movable and transformable unit. It allows you to nest shapes or other groups together, enabling you to apply transformations like positioning, scaling, rotation,or selection as one unified object.
+
+[card,subheader="Drawing"]
+.xref:main:build/nodes/connector.adoc[Connector]
+The Connector node is complex node that draw a line between two nodes anchor points, when the any one of the nodes move, the line is updated, mainly being always sticked to the node anchor point.
+
+[card,subheader="Drawing"]
+.xref:main:build/nodes/ellipse.adoc[Ellipse]
+The Ellipse node is a simple, versatile primitive shape used to render ellipses (or circles) elements on the canvas. It supports customizable properties such as position, axis radius, fill color, stroke and more.
+
+[card,subheader="Drawing"]
+.xref:main:build/nodes/image.adoc[Image]
+The Image Node allows you to render images directly onto the canvas. It supports properties like position, scale, opacity, and filters.
+
+[card,subheader="Drawing"]
+.xref:main:build/nodes/rectangle.adoc[Rectangle]
+The Rectangle node is a simple, versatile primitive shape used to render rectangular elements on the canvas. It supports customizable properties such as position, size, fill color, stroke, corner radius and more.
+
+[card,subheader="Drawing"]
+.xref:main:build/nodes/polygon.adoc[Polygon]
+The Polygon node is a versatile primitive shape used to render polygon elements on the canvas using a preset shape. It supports customizable properties such as position, fill color, stroke, and an optional inline text label.
+
+[card,subheader="Drawing"]
+.xref:main:build/nodes/stroke.adoc[Stroke]
+The Stroke node represents a customizable free line on the canvas. It supports features like stroke color, width and dash patterns.
+
+[card,subheader="Drawing"]
+.xref:main:build/nodes/stroke-single.adoc[Stroke Single]
+The Stroke node represents a customizable single-segment line on the canvas. It supports features like stroke color, width, dash patterns, and the possibility to define the line tips format: arrow, circle and square.
+
+[card,subheader="Drawing"]
+.xref:main:build/nodes/text.adoc[Text]
+The Text node is used to display editable or static text on the canvas. It supports rich styling options including font size, family, color, alignment, and line height.
+
+[card,subheader="Drawing"]
+.xref:main:build/nodes/star.adoc[Star]
+The Star node is a simple, versatile primitive shape used to render star elements on the canvas. It supports customizable properties such as position, inner and outer radius, fill color, stroke and more.
+
+[card,subheader="Drawing"]
+.xref:main:build/nodes/video.adoc[Video]
+The Video Node allows you to render and play videos directly onto the canvas.
+
+[card,subheader="Drawing",labels="deprecated"]
+.xref:main:build/nodes/star.adoc[Arrow]
+The Arrow node is a simple, versatile primitive shape used to render arrow elements on the canvas. It supports customizable properties such as position, several segments, fill color, stroke and more.
+
+[card,subheader="Drawing",labels="deprecated"]
+.xref:main:build/nodes/line.adoc[Line]
+The Line node represents a customizable straight or curved line on the canvas. It supports features like multiple points, stroke color, width, dash patterns, and smoothing options.
+
+[card,subheader="Drawing",labels="deprecated"]
+.xref:main:build/nodes/regular-polygon.adoc[Regular Polygon]
+The Regular Polygon node is a simple, versatile primitive shape used to render regular polygons elements on the canvas. It supports customizable properties such as position, radius, sides, fill color, stroke and more.
+
+[card,subheader="Support"]
+.xref:main:build/nodes/measure.adoc[Measure]
+The Measure node is complex node that display the distance between two points in the canvas. It needs a reference measure, a measure unit, and a reference distance from the canvas to calculate the scale and set the measures correctly.
+====
+
+== Custom Nodes
+
+Developers can also build their own *custom nodes*, empowering this way their applications
+with new visual nodes with behavior closer to the needs of their applications.
+
+For this we provide an extension mechanism that allows to define your own nodes and use them
+on your application.
+
+=== WeaveNode class
+
+In Weave.js a Node is a class that extends the https://github.com/InditexTech/weavejs/blob/main/code/packages/sdk/src/nodes/node.ts[WeaveNode]
+abstract class, and implements a set of methods that define the Node behavior.
+
+.Access the Weave instance
+[NOTE]
+====
+You can access Weave.js main instance via `this.instance`.
+====
+
+To create a custom node, create a class that extends the https://github.com/InditexTech/weavejs/blob/main/code/packages/sdk/src/nodes/node.ts[WeaveNode]
+abstract class, and implement the following attributes and methods:
+
+
+==== nodeType
+
+All nodes must define a property:
+
+[source,ts]
+----
+nodeType: string;
+----
+
+Which defines the node identity. The `nodeType` attribute must be unique among other nodes.
+
+
+==== create
+
+[source,ts]
+----
+create(key: string, props: WeaveElementAttributes): WeaveStateElement
+----
+
+The `create` method receives:
+
+* `key`: is the identifier of the node on the rendering tree - and is unique.
+* `props`: the properties of the node.
+
+It should return a JSON representation of the node.
+
+.Check the base implementation
+[NOTE]
+====
+Most times this method is not needed to extend as the implementation on the base class, covers most
+use cases.
+====
+
+
+==== onRender
+
+[source,ts]
+----
+onRender(props: WeaveElementAttributes): WeaveElementInstance
+----
+
+The `onRender` method is the one responsible for rendering the node on the canvas, It's a good place
+to initialize the nodes, events, etc.
+
+
+==== onUpdate
+
+[source,ts]
+----
+onUpdate(
+  instance: WeaveElementInstance,
+  nextProps: WeaveElementAttributes
+): void
+----
+
+The `onUpdate` method is called anytime that the nodes needs to update on the canvas, it receives the
+actual canvas instance (Konva element) of the node and the new props.
+
+
+==== onDestroy
+
+[source,ts]
+----
+onDestroy(nodeInstance: WeaveElementInstance): void
+----
+
+The `onDestroy` method is called when the canvas instance needs to be disposed.
+
+
+==== serialize
+
+[source,ts]
+----
+serialize(instance: WeaveElementInstance): WeaveStateElement
+----
+
+The `serialize` method transform a canvas instance (Konva element) into its JSON representation so it
+can be sent over the wire for sync with other peers or to persist the model server-side.
+
+=== Konva.Node Augmentation
+
+Our xref:sdk:api-reference/nodes/node.adoc[WeaveNode] base class extend the `Konva.Node` class to define several functions:
+
+
+==== getTransformerProperties
+
+[source,ts]
+----
+getTransformerProperties(): WeaveNodeTransformerProperties
+----
+
+This function allows you to override how when node is selected it can: rotate, resize and if is
+resizable which anchors for resizing will be available.
+
+By default, all nodes can rotate, resize and the default anchors are:
+
+[source,ts]
+----
+const DEFAULT_ANCHORS_ENABLED: string[] = [
+  "top-left",
+  "top-center",
+  "top-right",
+  "middle-right",
+  "middle-left",
+  "bottom-left",
+  "bottom-center",
+  "bottom-right",
+];
+----
+
+
+==== movedToContainer
+
+[source,ts]
+----
+movedToContainer(): void
+----
+
+Function that is called when the node changes from one container to another.
+
+
+==== updatePosition
+
+[source,ts]
+----
+updatePosition(): void
+----
+
+Function that is called when a node updates its position, its useful when trying to move Nodes
+my its children and not its parents, check how the https://github.com/InditexTech/weavejs/blob/main/code/packages/sdk/src/nodes/frame/frame.ts[Frame]
+node is coded and look for how it uses the `updatePosition` callback.

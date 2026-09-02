@@ -1,0 +1,92 @@
+= WeaveStageNode
+:description: Stage node API Reference
+
+== Overview
+
+The https://github.com/InditexTech/weavejs/blob/main/code/packages/sdk/src/nodes/stage/stage.ts[WeaveStageNode]
+class represents the root container of the canvas in Weave.js applications. Built on top of Konva’s
+https://konvajs.org/api/Konva.Stage.html[Stage] class, the WeaveStageNode manages the overall canvas
+environment where all other nodes (such as Layers, Groups, and Shapes) are rendered.
+
+As the top-level visual node, it is responsible for setting up the base coordinate system,
+initializing the layers, and serving as the anchor point for user interactions like panning, zooming,
+and resizing.
+
+The class extends the xref:sdk:api-reference/nodes/node.adoc[WeaveNode] class
+
+== Type
+
+This node `nodeType` property value is `stage`.
+
+== Import
+
+[source,shell]
+----
+import { WeaveStageNode } from "@inditextech/weave-sdk";
+----
+
+== Instantiation
+
+.Don't directly use
+[NOTE]
+====
+We don't recommend to use this node directly. To define the application Stage,
+use the stores `initialState` configuration property on server-side.
+====
+
+[source,ts]
+----
+new WeaveStageNode();
+----
+
+== Konva.Node Augmentation
+
+This Node extends the `Konva.Stage` class to define several functions:
+
+
+=== isFocused
+
+[source,ts]
+----
+isFocused(): boolean
+----
+
+Function that indicates if the stage is focused or not.
+
+
+=== isMouseWheelPressed
+
+[source,ts]
+----
+isMouseWheelPressed(): boolean
+----
+
+Function that indicates if the mouse wheel is being pressed or not.
+
+=== allowSelection
+
+[source,ts]
+----
+allowSelection(allowSelection?: boolean): boolean
+----
+
+Function that set is selection is allowed (when SelectionTool is disabled), useful to build
+tools over the utilityLayer.
+
+=== allowSelectNodes
+
+[source,ts]
+----
+allowSelectNodes(nodeTypes?: string[]): string[]
+----
+
+Function that set the nodes to listen for pointer when `allowSelection()` is active.
+
+=== allowActions
+
+[source,ts]
+----
+allowActions(actions?: string[]): string[]
+----
+
+Function that set the actions to listen for pointer when `allowSelection()` is active.

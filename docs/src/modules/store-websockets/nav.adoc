@@ -1,0 +1,8 @@
+* Introduction
+* xref:store-websockets:index.adoc[Overview]
+* xref:store-websockets:setup.adoc[Setup]
+* API Reference
+* Server
+** xref:store-websockets:api-reference/server/weave-websockets-server.adoc[WeaveWebsocketsServer]
+* Client
+** xref:store-websockets:api-reference/client/weave-store-websockets.adoc[WeaveStoreWebsockets]

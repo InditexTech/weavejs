@@ -1,0 +1,54 @@
+= Text
+:description: Draw & edit text on the canvas
+
+image::nodes/text.png[Text on Weave.js showcase,role="zoom-in"]
+
+The Text node is used to display editable or static text on the canvas. Based on
+Konva’s https://konvajs.org/api/Konva.Text.html[Text] shape, it supports rich styling
+options including font size, family, color, alignment, and line height.
+
+Text Nodes are essential for labels, annotations, or any UI elements that require
+readable content. They can be fully interactive—allowing selection, dragging, and
+inline editing.
+
+== Usage
+
+=== Import the Node
+Start by importing the node:
+
+[source,ts]
+----
+import { WeaveTextNode } from "@inditextech/weave-sdk";
+----
+
+=== Register the Node
+Then register the node on the xref:sdk:api-reference/weave/index.adoc[Weave] class instance.
+
+[source,ts]
+----
+const instance = new Weave({
+  ...
+  nodes: [
+    ...,
+    new WeaveTextNode(), // <.>
+  ]
+})
+----
+<.> Added in this step.
+
+=== Use the node
+Once the node is registered you can use it on xref:main:build/actions/index.adoc[Actions] or
+xref:main:build/plugins/index.adoc[Plugins] or even other xref:main:build/nodes/index.adoc[Nodes].
+
+We provide the action named xref:main:build/actions/text-tool.adoc[Text Tool] that allows
+users to add Text nodes to the application.
+
+
+When the Text node is added to the stage it can behave by three different ways defined by the
+property `layout`:
+
+* `auto-all`: makes the node auto-adjust its size (width & height) accordingly to the text
+that it contains.
+* `auto-height`: makes the node auto-adjust its height accordingly to the text that it contains.
+The width is fixed and defined by the end user.
+* `fixed`: makes the node fixed on both its width & height.

@@ -1,0 +1,242 @@
+= Low-level State Manipulation
+:description: API reference for the WeaveStateManipulation class
+
+== Overview
+
+The https://github.com/InditexTech/weavejs/blob/main/code/packages/sdk/src/state.manipulation.ts[WeaveStateManipulation]
+class is a collection of *static helpers* for reading and writing the Yjs document that backs
+the collaborative canvas state.
+
+All canvas state in Weave.js is stored as two `Y.Map` roots inside a `Y.Doc`:
+
+* `weave` — the node tree (stage → layers → nodes)
+* `weaveMetadata` — metadata not directly rendered
+
+`WeaveStateManipulation` gives you direct access to that tree, letting you build,
+insert, update, delete, and query nodes at the Yjs level without going through the
+higher-level `Weave` instance methods.
+
+.Low-level API
+[WARNING]
+====
+Prefer the `Weave` instance methods (`addNode`, `updateNode`, `removeNode`,
+etc.) for everyday node management. Use `WeaveStateManipulation` only when you
+need precise, transactional control over the Yjs document — for example when
+writing a custom store, seeding initial state, or implementing a bulk-import
+operation.
+====
+
+== Import
+
+[source,ts]
+----
+import { WeaveStateManipulation } from "@inditextech/weave-sdk";
+----
+
+== Static Methods
+
+=== mapValueToYjs
+
+[source,ts]
+----
+static mapValueToYjs(value: unknown): unknown
+----
+
+Converts any JavaScript value to its Yjs-compatible equivalent, recursively:
+
+[cols="2*"]
+|===
+| Input type | Output type
+
+| `null` / `undefined` / primitive | returned as-is
+| `Array` | `Y.Array` (elements mapped recursively)
+| plain `object` | `Y.Map` (values mapped recursively)
+|===
+
+==== Parameters
+
+[cols="4*"]
+|===
+| Property | Type | Required | Description
+
+| mono:[value] | mono:[unknown] | label:green[Required] | The JavaScript value to convert
+|===
+
+==== Returns
+
+The Yjs-compatible representation of `value`.
+
+
+=== mapPropsToYjs
+
+[source,ts]
+----
+static mapPropsToYjs(props: Record<string, unknown>): Y.Map<unknown>
+----
+
+Converts a flat or nested props object into a `Y.Map`, mapping each value through
+xref:#mapvaluetoyjs[`mapValueToYjs`].
+
+==== Parameters
+
+[cols="4*"]
+|===
+| Property | Type | Required | Description
+
+| mono:[props] | mono:[Record<string, unknown>] | label:green[Required] | A record of node properties to convert
+|===
+
+==== Returns
+
+`Y.Map<unknown>` — a Yjs map with all props converted to Yjs types.
+
+
+=== mapNodeToYjs
+
+[source,ts]
+----
+static mapNodeToYjs(node: WeaveStateElement): {
+  nodeId: string;
+  element: Y.Map<WeaveStateElement>;
+}
+----
+
+Converts a `WeaveStateElement` JSON model into a Yjs `Y.Map` structure ready to be
+inserted into the document. Children are handled recursively as `Y.Array` elements.
+
+==== Parameters
+
+[cols="4*"]
+|===
+| Property | Type | Required | Description
+
+| mono:[node] | mono:[WeaveStateElement] | label:green[Required] | The node JSON model to convert
+|===
+
+==== Returns
+
+An object with:
+
+* `nodeId` — the `key` of the input node
+* `element` — the `Y.Map` representing the node, with `key`, `type`, and `props` fields
+
+
+=== addElements
+
+[source,ts]
+----
+static addElements(
+  layerYjsElement: Y.Map<unknown>,
+  yjsElements: Y.Map<unknown>[]
+): void
+----
+
+Appends one or more Yjs element maps to the `children` array of the given layer element.
+
+==== Parameters
+
+[cols="4*"]
+|===
+| Property | Type | Required | Description
+
+| mono:[layerYjsElement] | mono:[Y.Map<unknown>] | label:green[Required] | The Y.Map representing the layer (or container) that will receive the new children
+| mono:[yjsElements] | mono:[Y.Map<unknown>[\]] | label:green[Required] | An array of Y.Map elements to append as children
+|===
+
+
+=== updateElements
+
+[source,ts]
+----
+static updateElements(
+  layerYjsElement: Y.Map<unknown>,
+  yjsElements: { nodeId: string; element: Y.Map<unknown> }[]
+): void
+----
+
+Replaces existing child elements inside a layer by matching on `nodeId`. For each
+entry, the old element at that position is deleted and the new one is inserted at
+the same index.
+
+==== Parameters
+
+[cols="4*"]
+|===
+| Property | Type | Required | Description
+
+| mono:[layerYjsElement] | mono:[Y.Map<unknown>] | label:green[Required] | The Y.Map representing the layer whose children will be updated
+| mono:[yjsElements] | mono:[{ nodeId: string; element: Y.Map<unknown> }[\]] | label:green[Required] | An array of objects with the target nodeId and the replacement Y.Map element
+|===
+
+
+=== deleteElements
+
+[source,ts]
+----
+static deleteElements(
+  layerYjsElement: Y.Map<unknown>,
+  yjsElementsIds: string[]
+): void
+----
+
+Removes child elements from a layer by their node ids.
+
+==== Parameters
+
+[cols="4*"]
+|===
+| Property | Type | Required | Description
+
+| mono:[layerYjsElement] | mono:[Y.Map<unknown>] | label:green[Required] | The Y.Map representing the layer whose children will be modified
+| mono:[yjsElementsIds] | mono:[string[\]] | label:green[Required] | An array of node ids to remove from the layer's children
+|===
+
+
+=== getYjsElement
+
+[source,ts]
+----
+static getYjsElement(doc: Y.Doc, nodeId: string): Y.Map<unknown> | null
+----
+
+Searches the `weave` root of the document for a node by its `id` prop. Looks in
+both direct children of the stage and one level deeper (grandchildren / container
+children).
+
+==== Parameters
+
+[cols="4*"]
+|===
+| Property | Type | Required | Description
+
+| mono:[doc] | mono:[Y.Doc] | label:green[Required] | The Yjs document to search in
+| mono:[nodeId] | mono:[string] | label:green[Required] | The id of the node to find (matches `props.id`)
+|===
+
+==== Returns
+
+The `Y.Map` for the matching node, or `null` if not found.
+
+
+=== getNodesBoundingBox
+
+[source,ts]
+----
+static getNodesBoundingBox(nodes: WeaveStateElement[]): BoundingBox
+----
+
+Computes the axis-aligned bounding box that contains all the provided nodes,
+based on their `x`, `y`, `width`, and `height` props.
+
+==== Parameters
+
+[cols="4*"]
+|===
+| Property | Type | Required | Description
+
+| mono:[nodes] | mono:[WeaveStateElement[\]] | label:green[Required] | An array of WeaveStateElement nodes to compute the bounding box for
+|===
+
+==== Returns
+
+`BoundingBox` — `{ x, y, width, height }` of the combined bounding box.

@@ -1,0 +1,81 @@
+= Star Tool
+:description: Add a star to the canvas
+
+image::actions/star-tool.gif[Star Tool action on use on the Weave.js showcase,role="zoom-in"]
+
+== Introduction
+
+This action enables users to create new star nodes on the canvas.
+
+== Dependencies
+
+This action needs registered on the Weave instance the following element:
+
+* xref:main:build/nodes/star.adoc[Star] node
+
+== Usage
+
+=== Import the Action
+Start by importing the action:
+
+[source,ts]
+----
+import { WeaveStarToolAction } from "@inditextech/weave-sdk";
+----
+
+=== Register the Action
+Then register the action on the xref:sdk:api-reference/weave/index.adoc[Weave] class instance.
+
+[source,ts]
+----
+const instance = new Weave({
+  ...
+  actions: [
+    ...,
+    new WeaveStarToolAction(), // <.>
+  ]
+})
+----
+<.> Added in this step.
+
+=== Setup the action trigger
+Setup on a button or any element on the UI the user can interact with on the action event:
+
+[source,ts]
+----
+instance.triggerAction("starTool");
+----
+
+
+For example on a button on React:
+
+[source,tsx]
+----
+import React from "react";
+import { useWeave } from "@inditextech/weave-react";
+
+const MyStarToolTriggerComponent = () => {
+  const instance = useWeave((state) => state.instance);
+
+  const triggerTool = React.useCallback(() => {
+    instance.triggerAction("starTool");
+  }, [instance]);
+
+  return <button onClick={triggerTool}>Star Tool</button>;
+};
+----
+
+=== Trigger the action
+Finally a final user trigger the UI element that launches the action.
+
+
+When active the user can:
+
+* *Click* on the canvas, it will create a star with a default size.
+* *Touch* on the canvas, it will create a star with a default size.
+* *Click & drag* to create a star and define its radius on both axis (X axis control
+the outer-radius and y axis controls the inner-radius).
+
+Once clicked or click-drag finishes, the star is added to the canvas as a fully functional
+node—ready. This action integrates seamlessly with Weave.js's real-time state system,
+ensuring the new element appears instantly for all connected users.

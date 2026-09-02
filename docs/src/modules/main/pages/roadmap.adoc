@@ -1,0 +1,58 @@
+= Roadmap
+:description: Future development plans and upcoming features for Weave.js
+
+This roadmap focuses on broadening:
+
+. Server frameworks compatibility,
+. Expanding store options,
+. Introducing new creative and collaborative tools, and
+. Enhancing functionality through new plugins.
+
+All while maintaining Weave.js’s core principles: Simple, Composable, and Extendable.
+
+== Focus areas
+
+=== 1. Server-side integrations
+
+*Goal*: Broaden backend server frameworks integration options for Weave.js users.
+
+* *Koa Support*: Implement a https://koajs.com/[Koa.js] compatible server integration for our stores.
+* *Fastify Support*: Implement a https://fastify.dev/[Fastify] compatible server integration for our stores.
+* *NestJS Support*: Implement a https://nestjs.com/[NestJS] compatible server integration for our stores.
+
+=== 2. Frontend integrations
+
+*Goal*: Broaden frontend frameworks integration options for Weave.js users.
+
+* *Vue.js bindings*: starter kit or bindings for https://vuejs.org/[Vue.js].
+* *Svelte bindings*: starter kit or bindings for https://svelte.dev/[Svelte].
+
+=== 3. Stores
+
+*Goal*: Offer more stores options with transports for other cloud providers.
+
+* *AWS SNS store*: Implement store that uses as transport AWS SNS.
+* *Google Cloud Pub/Sub store*: Implement store that uses as transport Google Cloud Pub/Sub.
+
+=== 4. Documentation
+
+*Goal*: Lower entry barriers and speed up adoption.
+
+* *Quickstart*: new server-side and frontend quickstart (Koa, Fastify, NestJS, Vue.js & Svelte).
+* *Advanced tutorials*: custom node creation or building a custom tool or plugin.
+* *Architecture deep-dives*: Detailed docs about lifecycle, rendering and
+synchronization.
+* *AI Support*: support for AI-driven development.
+
+== Timeline proposal
+
+Based on the current team size and velocity, we propose the following timeline:
+
+[cols="2*"]
+|===
+| Quarter | Focus Area
+
+| Q2 2026 | Other cloud providers stores
+| Q3 2026 | Koa server, Fastify server, NestJS server
+| Q4 2026 | Bindings kit for Vue, Bindings for Svelte
+|===

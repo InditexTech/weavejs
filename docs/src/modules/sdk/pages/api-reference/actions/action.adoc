@@ -1,0 +1,202 @@
+= WeaveAction
+:description: Blueprint for the Action API
+
+== Overview
+
+The abstract https://github.com/InditexTech/weavejs/blob/main/code/packages/sdk/src/actions/action.ts[WeaveAction]
+class represents represents a user-driven operation or system-triggered change within the canvas. Actions provide a
+structured and trackable way to mutate the shared state, ensuring that all modifications are intentional, synchronized,
+and potentially reversible.
+
+Every meaningful change in a Weave.js application — such as creating a node, moving an element, zooming the stage, or
+grouping nodes — is typically triggered through an Action.
+
+WeaveAction class uses internally a link:[Proxy], that allows us to intercept operations of the class, for example
+when the properties changes, and redefine that operation. This enable a developer to change Action parameters when
+triggered allowing to give the end-user more control over the action.
+
+Plugins are ideal for:
+
+* Maintaining a consistent and scalable workflow for all user interactions.
+* Enabling real-time, collaborative state mutations that stay predictable and traceable.
+
+All actions must extend this class.
+
+.Don't directly use
+[WARNING]
+====
+Don't instantiate this WeaveAction class directly.
+====
+
+== Lifecycle
+
+Weave.js action lifecycle is pretty simple:
+
+[mermaid,format=png,role=zoom-in]
+....
+stateDiagram-v2
+A: Weave instance is started
+B: Actions are registered
+C: getName() is called on each action
+D: Rendering cycle begins
+E: First render
+F: init() is called on each action
+[*] --> A
+A --> B
+state B {
+  C --> [*]
+}
+B --> D
+state D {
+  E --> F
+  F --> [*]
+}
+D --> [*]
+....
+
+.Decoupled from the lifecycle
+[NOTE]
+====
+The following methods are called outside the lifecycle:
+
+* When an user want to trigger an action, the `trigger` function is called.
+* When the action finishes or the user cancel the action, the `cleanup` function is called.
+====
+
+== Import
+
+[source,shell]
+----
+import { WeaveAction } from "@inditextech/weave-sdk";
+----
+
+== Name
+
+All actions must define a property:
+
+[source,ts]
+----
+name: string;
+----
+
+Which defines the action identity, for example the action that allow users to draw free-lines
+it's `name` is `brushTool`. The `name` must be unique among other actions.
+
+== Instantiation
+
+[source,ts]
+----
+new WeaveAction(callbacks: WeaveActionCallbacks)
+----
+
+A WeaveAction receives as parameter the type `WeaveActionCallbacks`.
+
+== TypeScript types
+
+[source,ts]
+----
+type WeaveElementAttributes = {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  [key: string]: any;
+  id?: string;
+  nodeType?: string;
+  children?: WeaveStateElement[];
+};
+
+type WeaveStateElement = {
+  key: string;
+  type: string;
+  props: WeaveElementAttributes;
+};
+
+type WeaveActionPropsChangeCallback = (props: WeaveElementAttributes) => void;
+
+type WeaveActionCallbacks = {
+  onPropsChange?: WeaveActionPropsChangeCallback;
+};
+----
+
+== Parameters
+
+For `WeaveActionCallbacks`:
+
+[cols="4*"]
+|===
+| Property | Type | Required | Description
+
+| mono:[onPropsChange] | mono:[WeaveActionPropsChangeCallback] |  | A callback that is called when action properties changed.
+|===
+
+== Methods
+
+=== getName
+
+[source,ts]
+----
+getName(): string
+----
+
+This method returns the `name` property of the node.
+
+=== updateProps
+
+[source,ts]
+----
+updateProps(props: WeaveElementAttributes): void
+----
+
+This method update the props of the action allowing to customize internals while the
+action is triggered.
+
+=== getProps
+
+[source,ts]
+----
+getProps(): WeaveElementAttributes
+----
+
+This method return the action props, normally propagating from the underlying main node.
+
+== Abstract Methods
+
+=== init
+
+[source,ts]
+----
+init?(): void
+----
+
+This method initializes the action, ideal to initialize all necessary Konva elements needed
+and their events.
+
+=== trigger
+
+[source,ts]
+----
+trigger(cancelAction: () => void, params?: unknown): unknown
+----
+
+This method triggers the action, as parameters receives:
+
+* *cancelAction*: a callback that allows to cancel the action.
+* *params*: are the params provided by the user when the action is triggered.
+
+=== onPropsChange
+
+[source,ts]
+----
+onPropsChange?(): void
+----
+
+This method, if defined is called when a property of the class is changed (via set).
+Useful to change the actions parameters when the action is active.
+
+=== cleanup
+
+[source,ts]
+----
+cleanup?(): void
+----
+
+This method is called when the action finishes or is cancelled, allowing developers to
+cleanup events o reseting the action internals for next uses.

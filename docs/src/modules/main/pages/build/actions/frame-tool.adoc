@@ -1,0 +1,90 @@
+= Frame Tool
+:description: Allows to add a canvas in canvas area
+
+image::actions/frame-tool.gif[Frame Tool action on use on the Weave.js showcase,role="zoom-in"]
+
+== Introduction
+
+This action allows users to create frame nodes by clicking and position the frame on
+the canvas. A frame acts as a visual container for organizing other nodes, often used
+to group related content, define sections, or build modular layouts.
+
+== Dependencies
+
+This action needs registered on the Weave instance the following elements:
+
+* xref:main:build/nodes/frame.adoc[Frame] node
+
+== Usage
+
+=== Import the Action
+Start by importing the action:
+
+[source,ts]
+----
+import { WeaveFrameToolAction } from "@inditextech/weave-sdk";
+----
+
+=== Register the Action
+Then register the action on the xref:sdk:api-reference/weave/index.adoc[Weave] class instance.
+
+[source,ts]
+----
+const instance = new Weave({
+  ...
+  actions: [
+    ...,
+    new WeaveFrameToolAction(), // <.>
+  ]
+})
+----
+<.> Added in this step.
+
+=== Setup the action trigger
+Setup on a button or any element on the UI the user can interact with on the action event:
+
+[source,ts]
+----
+instance.triggerAction("frameTool");
+----
+
+You can also optionally pass information to the tool as:
+
+* Frame title.
+* Frame width and height (this disable the creation of a frame by click-and-drag).
+* Frame orientation (portrait or landscape).
+
+To lean more check the xref:sdk:api-reference/actions/frame-tool.adoc[WeaveFrameToolAction]
+plugin API.
+
+
+For example on a button on React:
+
+[source,tsx]
+----
+import React from "react";
+import { useWeave } from "@inditextech/weave-react";
+
+const MyFrameToolTriggerComponent = () => {
+  const instance = useWeave((state) => state.instance);
+
+  const triggerTool = React.useCallback(() => {
+    instance.triggerAction("frameTool");
+  }, [instance]);
+
+  return <button onClick={triggerTool}>Frame Tool</button>;
+};
+----
+
+=== Trigger the action
+Finally a final user trigger the UI element that launches the action.
+
+
+When active the user:
+
+* Click on an empty stage space to add a frame.
+* Click-and-drag to create a frame with custom size (if enabled).
+
+Then the frame is added to the canvas as a fully functional node—ready.
+This action integrates seamlessly with Weave.js's real-time state system,
+ensuring the new element appears instantly for all connected users.

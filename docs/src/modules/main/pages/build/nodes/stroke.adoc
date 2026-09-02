@@ -1,0 +1,40 @@
+= Stroke
+:description: Draw a free-line on the canvas
+
+image::nodes/stroke.png[Stroke on Weave.js showcase,role="zoom-in"]
+
+The Stroke node represents a customizable free-line on the canvas.
+It supports features like stroke color, width, dash patterns.
+
+== Usage
+
+=== Import the Node
+Start by importing the node:
+
+[source,ts]
+----
+import { WeaveStrokeNode } from "@inditextech/weave-sdk";
+----
+
+=== Register the Node
+Then register the node on the xref:sdk:api-reference/weave/index.adoc[Weave] class instance.
+
+[source,ts]
+----
+const instance = new Weave({
+  ...
+  nodes: [
+    ...,
+    new WeaveStrokeNode(), // <.>
+  ]
+})
+----
+<.> Added in this step.
+
+=== Use the node
+Once the node is registered you can use it on xref:main:build/actions/index.adoc[Actions] or
+xref:main:build/plugins/index.adoc[Plugins] or even other xref:main:build/nodes/index.adoc[Nodes].
+
+We provide a single action:
+
+* xref:main:build/actions/brush-tool.adoc[Brush Tool] that allows users to add free-line nodes.

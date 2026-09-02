@@ -1,0 +1,100 @@
+= Plugins
+:description: Plugins API Reference
+
+== Introduction
+
+Plugins are the modular pieces that extend and enhance the functionality of Weave.js.
+They allow you to add behavior to the canvas: like selection, zooming, snapping, panning,
+keyboard shortcuts, and more, without modifying the core system.
+
+Plugins are designed to be lightweight, composable, and easy to integrate, making it simple
+to build rich, interactive experiences. Whether you're enabling multi-selection, managing
+drag-and-drop, or integrating custom logic, Plugins are how you supercharge your canvas with
+reusable, context-aware features.
+
+Weave.js includes a set of built-in plugins, but you can also create your own to tailor
+functionality to your specific application needs.
+
+== Available plugins
+
+Weave.js team maintain a set of *plugins*, think of them as added functionality to
+build visual collaborative applications. This are the plugins:
+
+[cards,columns="1 s:2 m:4",width=container]
+====
+[card,subheader="Base"]
+.xref:sdk:api-reference/plugins/plugin.adoc[WeavePlugin]
+The WeavePlugin node is the abstract class that defines the blueprint of a plugin in Weave.js.
+
+[card,subheader="Awareness"]
+.xref:sdk:api-reference/plugins/connected-users.adoc[WeaveConnectedUsersPlugin]
+Gives the list of users currently active in a collaborative session. Ideal as source information to paint the user list on the UI.
+
+[card,subheader="Awareness"]
+.xref:sdk:api-reference/plugins/users-pointers.adoc[WeaveUsersPointersPlugin]
+Displays real-time cursors or pointers for all connected users on the canvas.
+
+[card,subheader="Awareness"]
+.xref:sdk:api-reference/plugins/users-presence.adoc[WeaveUsersPresencePlugin]
+Displays what users are doing real-time for all connected users on the canvas. For example when an element is dragged or transformed.
+
+[card,subheader="Collaboration"]
+.xref:sdk:api-reference/plugins/comments-renderer.adoc[WeaveCommentsRendererPlugin]
+Renders the provider comments on a special layer in order to manage them.
+
+[card,subheader="UX"]
+.xref:sdk:api-reference/plugins/context-menu.adoc[WeaveContextMenuPlugin]
+Adds custom right-click menus to the canvas, enabling users to access context-specific actions
+
+[card,subheader="UX"]
+.xref:sdk:api-reference/plugins/copy-paste-nodes.adoc[WeaveCopyPasteNodesPlugin]
+Enables users to copy & paste selected nodes using familiar keyboard shortcuts like Ctrl/Cmd + C and Ctrl/Cmd + V or through actions on the context menu.
+
+[card,subheader="UX"]
+.xref:sdk:api-reference/plugins/nodes-selection.adoc[WeaveNodesSelectionPlugin]
+Enables users to select one or multiple nodes on the canvas through clicks, shift-clicks, or drag-selection (marquee).
+
+[card,subheader="UX"]
+.xref:sdk:api-reference/plugins/nodes-multi-selection-feedback.adoc[WeaveNodesMultiSelectionFeedbackPlugin]
+Enables more feedback to end users when multi-selecting nodes.
+
+[card,subheader="UX"]
+.xref:sdk:api-reference/plugins/nodes-snapping.adoc[WeaveNodesSnappingPlugin]
+Adds smart alignment assistance by enabling nodes to snap to guides or other nodes as they are moved or resized. Also allows the support to create custom horizontal and vertical guides onto containers.
+
+[card,subheader="UX",subheader="UX"]
+.xref:sdk:api-reference/plugins/nodes-edge-snapping.adoc[WeaveNodesEdgeSnappingPlugin]
+Adds smart alignment assistance by enabling nodes to snap to guides or other nodes as they are moved or resized.
+
+[card,subheader="UX",subheader="UX"]
+.xref:sdk:api-reference/plugins/nodes-distance-snapping.adoc[WeaveNodesDistanceSnappingPlugin]
+Adds smart alignment assistance by enabling nodes to snap to distance guides for peers nodes of the target dragged node (vertically and horizontally).
+
+[card,subheader="Stage"]
+.xref:sdk:api-reference/plugins/stage-drop-area.adoc[WeaveStageDropAreaPlugin]
+Enables drag-and-drop support on the canvas, allowing users to drop elements—such as shapes, files, or custom components—directly onto the canvas.
+
+[card,subheader="Stage"]
+.xref:sdk:api-reference/plugins/stage-grid.adoc[WeaveStageGridPlugin]
+Adds a visual background grid to the canvas stage, helping users align and position elements more precisely.
+
+[card,subheader="Stage"]
+.xref:sdk:api-reference/plugins/stage-keyboard-move.adoc[WeaveStageKeyboardMovePlugin]
+Enables to move selected nodes by a delta when pressing shift + keyboard arrows.
+
+[card,subheader="Stage"]
+.xref:sdk:api-reference/plugins/stage-panning.adoc[WeaveStagePanningPlugin]
+Enables users to navigate the canvas by dragging to move around the Stage.
+
+[card,subheader="Stage"]
+.xref:sdk:api-reference/plugins/stage-resize.adoc[WeaveStageResizePlugin]
+Automatically adjusts the canvas size to fit its container or the browser window, ensuring a responsive and adaptive user experience.
+
+[card,subheader="Stage"]
+.xref:sdk:api-reference/plugins/stage-zoom.adoc[WeaveStageZoomPlugin]
+Enables smooth zooming in and out of the canvas, allowing users to focus on details or get an overview of the entire workspace.
+
+[card,subheader="Experimental"]
+.xref:sdk:api-reference/plugins/stage-minimap.adoc[WeaveStageMinimapPlugin]
+Provides a scaled-down preview of the stage content, useful for quick navigation and orientation. It renders the entire stage (including padding) into a miniature view and overlays a viewport rectangle that indicates the currently visible region.
+====

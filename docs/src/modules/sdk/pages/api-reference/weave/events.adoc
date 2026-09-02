@@ -1,0 +1,100 @@
+= Events
+:description: Weave instance emitted events
+
+== Instance events
+
+=== onRender
+
+[source,ts]
+----
+instance.addEventListener('onRender', () => void);
+----
+
+The `onRender` event is triggered each time the room is rendered, this means each time the nodes reconciler detects a
+change, being a change made by the actual instance user or a remote user of the room.
+
+=== onInstanceStatus
+
+[source,ts]
+----
+const WEAVE_INSTANCE_STATUS = {
+  ['IDLE']: 'idle',
+  ['STARTING']: 'starting',
+  ['LOADING_FONTS']: 'loadingFonts',
+  ['CONNECTING_TO_ROOM']: 'connectingToRoom',
+  ['CONNECTING_ERROR']: 'connectingError',
+  ['LOADING_ROOM']: 'loadingRoom',
+  ['RUNNING']: 'running',
+} as const;
+
+type WeaveStatusKeys = keyof typeof WEAVE_INSTANCE_STATUS;
+type WeaveStatus = (typeof WEAVE_INSTANCE_STATUS)[WeaveStatusKeys];
+
+instance.addEventListener('onInstanceStatus', (status: WeaveStatus) => void);
+----
+
+The `onInstanceStatus` event is triggered each time the Weave.js instance change it's internal status.
+
+=== onRoomLoaded
+
+[source,ts]
+----
+type WeaveStoreOnRoomLoadedEvent = boolean;
+
+instance.addEventListener('onRoomLoaded', (roomLoaded: WeaveStoreOnRoomLoadedEvent) => void);
+----
+
+The `onRoomLoaded` event is triggered internally by Weave.js providing information about the room is loaded or not.
+
+=== onUserChange
+
+[source,ts]
+----
+const WEAVE_NODE_CHANGE_TYPE = {
+  ['CREATE']: 'create',
+  ['UPDATE']: 'update',
+  ['DELETE']: 'delete',
+} as const;
+
+type WeaveNodeChangeTypeKeys = keyof typeof WEAVE_NODE_CHANGE_TYPE;
+type WeaveNodeChangeType = (typeof WEAVE_NODE_CHANGE_TYPE)[WeaveNodeChangeTypeKeys];
+
+type WeaveUserChangeEvent = {
+  user: WeaveUser;
+  changeType: WeaveNodeChangeType;
+  node: WeaveStateElement;
+  parent: WeaveStateElement;
+}
+
+instance.addEventListener('onUserChange', (e: WeaveUserChangeEvent) => void);
+----
+
+The `onUserChange` event is triggered each time the user of the Weave.js instance adds, modifies or removes a node from
+the room.
+
+== Async Elements management
+
+=== onAsyncElementsLoading
+
+[source,ts]
+----
+type WeaveAsyncElementsLoadingEvent = {
+  loaded: number;
+  total: number;
+};
+
+instance.addEventListener('onAsyncElementsLoading', ({ loaded: number; total: number; }) => void);
+----
+
+The `onAsyncElementsLoading` event is triggered internally by Weave.js providing information about the the async elements
+loading progress. An Async element are resources that are loaded asynchronously like images or videos for example.
+
+=== onAsyncElementsLoaded
+
+[source,ts]
+----
+instance.addEventListener('onAsyncElementsLoaded', () => void);
+----
+
+The `onAsyncElementsLoaded` event is triggered internally by Weave.js that is emitted only one time after a room is loaded
+and all its async elements are fully loaded.

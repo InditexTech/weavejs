@@ -1,0 +1,67 @@
+= WeaveProvider
+:description: API reference for WeaveProvider component
+
+== Overview
+
+The WeaveProvider is a core component from the React Helper library that initializes and
+provides Weave.js context to your React application. It sets up the needed elements for real-time
+collaboration and canvas rendering:
+
+* Store
+* Nodes
+* Plugins
+* Actions
+* Fonts
+
+By wrapping your app (or part of it) with WeaveProvider, you can make use of the xref:react:api-reference/hooks/use-weave.adoc[useWeave]
+hook to access the API of the Weave instance.
+
+.Nodes, Actions and Plugins by default?
+[WARNING]
+====
+By default this helper doesn't include any nodes, actions or plugins. You must
+add your own.
+====
+
+== Import
+
+[source,shell]
+----
+import { WeaveProvider } from "@inditextech/weave-react";
+----
+
+== types
+
+[source,ts]
+----
+export type WeavePerformanceConfig = {
+  upscale?: Partial<WeaveUpscaleConfig>;
+};
+
+export type WeaveUpscaleConfig = {
+  enabled?: boolean;
+  multiplier?: number;
+  baseWidth?: number;
+  baseHeight?: number;
+};
+----
+
+== Props
+
+[cols="5*"]
+|===
+| Property | Type | Required | Default | Description
+
+| mono:[getContainer] | mono:[() => HTMLDivElement] | label:green[Required] |  | A function that returns an HTMLDivElement where Weave.js will setup
+| mono:[store] | mono:[WeaveStore] | label:green[Required] |  | Weave.js Store to use to handle the real-time communication
+| mono:[renderer] | mono:[WeaveRenderer] | label:green[Required] |  | Weave.js Renderer to use to handle the real-time reconciliation of the shared state
+| mono:[children] | mono:[ReactNode] | label:green[Required] |  | Child nodes to render
+| mono:[nodes] | mono:[WeaveNode[\]] |  | mono:[[\]] | Array of nodes to register and use by the instance
+| mono:[plugins] | mono:[WeavePlugin[\]] |  | mono:[[\]] | Array of plugins to register and use by the instance
+| mono:[actions] | mono:[WeaveAction[\]] |  | mono:[[\]] | Array of actions to register and use by the instance
+| mono:[customPlugins] | mono:[WeavePlugin[\]] |  | mono:[[\]] | Array of custom plugins to register and use by the instance
+| mono:[fonts] | mono:[WeaveFont[\]] |  | mono:[[\]] | Array that define the fonts to use on the canvas
+| mono:[logLevel] | mono:[WeaveLogLevel] |  | mono:[info] | Global log level of Weave.js instance
+| mono:[logModules] | mono:[WeaveChildLoggerLevel[\]] |  | mono:[[\]] | Define a custom log level Weave.js internal modules, nodes, actions and plugins. When defining a custom level, the format is 'moduleName:level'
+| mono:[performance] | mono:[WeavePerformanceConfig] |  |  | Options to fine-tune performance of Weave.js instance
+|===

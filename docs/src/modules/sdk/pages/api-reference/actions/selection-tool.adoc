@@ -1,0 +1,33 @@
+= WeaveSelectionToolAction
+:description: Activate the selection of canvas nodes
+
+== Overview
+
+The https://github.com/InditexTech/weavejs/blob/main/code/packages/sdk/src/actions/selection-tool/selection-tool.ts[WeaveSelectionToolAction]
+class that allows users to enter or exit selection mode. While it does not handle
+the selection logic itself, it activates the selection behavior managed by the
+xref:sdk:api-reference/plugins/nodes-selection.adoc[WeaveNodesSelectionPlugin],
+enabling users to click or drag to select nodes on the canvas.
+
+This tool acts as a toggle for interaction context, letting users switch between
+selection and other editing tools (e.g., draw, pan, or create).
+
+The class extends the xref:sdk:api-reference/actions/action.adoc[WeaveAction] class.
+
+== Name
+
+This action `name` property value is `selectionTool`.
+
+== Import
+
+[source,shell]
+----
+import { WeaveSelectionToolAction } from "@inditextech/weave-sdk";
+----
+
+== Instantiation
+
+[source,ts]
+----
+new WeaveSelectionToolAction();
+----

@@ -1,0 +1,25 @@
+= Setup
+:description: WebSockets Store API setup
+
+== Dependencies
+
+=== Backend-side dependencies
+
+* https://www.npmjs.com/package/canvas[canvas] package
+* https://www.npmjs.com/package/ws[ws] package
+* https://www.npmjs.com/package/y-protocols[y-protocols] package
+* https://www.npmjs.com/package/yjs[yjs] package
+
+=== Frontend-side dependencies
+
+This package is dependant on:
+
+* xref:types:index.adoc[Weave.js types] package
+* xref:sdk:index.adoc[Weave.js SDK] package
+
+== Installation
+
+[source,shell]
+----
+npm install @inditextech/weave-store-websockets
+----

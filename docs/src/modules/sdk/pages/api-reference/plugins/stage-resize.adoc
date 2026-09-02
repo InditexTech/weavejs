@@ -1,0 +1,32 @@
+= WeaveStageResizePlugin
+:description: Activates the stage resizing (responsive support)
+
+== Overview
+
+The https://github.com/InditexTech/weavejs/blob/main/code/packages/sdk/src/plugins/stage-resize/stage-resize.ts[WeaveStageResizePlugin]
+class that enables the automatic resizing of the canvas Stage based on the size of its container
+or the browser window. It ensures that the canvas remains responsive, properly scaled, and fully
+usable across different screen sizes, layouts, or device types.
+
+This plugin is critical for maintaining a fluid and adaptive collaborative workspace, especially
+in dynamic web applications.
+
+The class extends the xref:sdk:api-reference/plugins/plugin.adoc[WeavePlugin] class
+
+== Name
+
+This plugin `name` property value is `stageResize`.
+
+== Import
+
+[source,shell]
+----
+import { WeaveStageResizePlugin } from "@inditextech/weave-sdk";
+----
+
+== Instantiation
+
+[source,ts]
+----
+new WeaveStageResizePlugin();
+----

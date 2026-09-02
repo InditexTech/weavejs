@@ -1,0 +1,7 @@
+= Setup
+:description: Weave.js TypeScript types definitions setup
+
+[source,ts]
+----
+npm install @inditextech/weave-types;
+----

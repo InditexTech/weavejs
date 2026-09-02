@@ -1,0 +1,48 @@
+= Nodes Snapping
+:description: Allow to snap nodes to guides and to themselves
+
+image::plugins/nodes-snapping.gif[Nodes Snapping plugin on use on the Weave.js showcase,role="zoom-in"]
+
+== Introduction
+
+This plugin adds smart alignment assistance by enabling nodes to snap to guides or
+other nodes as they are moved or resized. It helps users place elements with
+precision, improving layout consistency and visual structure.
+
+It’s especially useful in design tools, diagram editors, and any interface where
+visual alignment matters.
+
+== Dependencies
+
+This plugin needs also registered on the Weave instance the following:
+
+* xref:main:build/plugins/nodes-selection.adoc[Nodes selection] plugin.
+
+== Usage
+
+=== Import the Plugin
+Start by importing the plugin:
+
+[source,ts]
+----
+import { WeaveNodesSnappingPlugin } from "@inditextech/weave-sdk";
+----
+
+=== Register the Plugin
+Then register the plugin on the xref:sdk:api-reference/weave/index.adoc[Weave] class instance.
+
+[source,ts]
+----
+const instance = new Weave({
+  ...
+  plugins: [
+    ...,
+    new WeaveNodesSnappingPlugin(), // <.>
+  ]
+})
+----
+<.> Added in this step.
+
+=== Use the plugin
+Once the plugin is registered the final user now can snap the nodes when moved or resized
+relative to other nodes or some guides like the center of the relative canvas.

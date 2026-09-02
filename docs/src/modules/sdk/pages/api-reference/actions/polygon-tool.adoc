@@ -1,0 +1,102 @@
+= WeavePolygonToolAction
+:description: Add a polygon to the canvas using a preset shape
+
+== Overview
+
+The https://github.com/InditexTech/weavejs/blob/main/code/packages/sdk/src/actions/polygon-tool/polygon-tool.ts[WeavePolygonToolAction]
+class allows users to place a polygon node on the canvas by clicking or touching it.
+
+The shape is selected via a *preset* — one of the six built-in polygon definitions shipped
+with the SDK. The preset can be set at construction time, changed programmatically, or
+overridden per-trigger via the `presetId` trigger parameter.
+
+Each interaction results in the creation of a xref:sdk:api-reference/nodes/polygon.adoc[WeavePolygonNode],
+added to the shared state and synchronized across all users.
+
+The class extends the xref:sdk:api-reference/actions/action.adoc[WeaveAction] class.
+
+== Name
+
+This action `name` property value is `polygonTool`.
+
+== Import
+
+[source,shell]
+----
+import { WeavePolygonToolAction } from "@inditextech/weave-sdk";
+----
+
+== Instantiation
+
+[source,ts]
+----
+new WeavePolygonToolAction(preset?: string);
+----
+
+=== Parameters
+
+[cols="5*"]
+|===
+| Property | Type | Required | Default | Description
+
+| mono:[preset] | mono:[string] |  | mono:['pentagon'] | The default preset ID to use when the action is triggered. Defaults to `'pentagon'`.
+|===
+
+== Trigger parameters
+
+[source,ts]
+----
+type WeavePolygonToolActionTriggerParams = {
+  presetId?: string;
+};
+----
+
+[cols="4*"]
+|===
+| Property | Type | Required | Description
+
+| mono:[presetId] | mono:[string] |  | Override the active preset ID for this trigger invocation.
+|===
+
+== Events
+
+[cols="3*"]
+|===
+| Event | Payload | Description
+
+| `onAddingPolygon` | `undefined` | Fired when the action enters the adding state (user is about to place the polygon).
+| `onAddedPolygon` | `undefined` | Fired after the polygon node has been placed on the canvas.
+|===
+
+== Methods
+
+=== getPolygonsPresets
+
+[source,ts]
+----
+getPolygonsPresets(): Record<string, WeavePolygonPresetDef>
+----
+
+Returns all available polygon presets. The built-in presets are:
+`triangle`, `diamond`, `pentagon`, `hexagon`, `octagon`, `decagon`.
+
+
+=== getPolygonPreset
+
+[source,ts]
+----
+getPolygonPreset(): string
+----
+
+Returns the currently active preset ID.
+
+
+=== setPolygonPreset
+
+[source,ts]
+----
+setPolygonPreset(preset: string): void
+----
+
+Sets the active preset ID. Takes effect on the next `trigger` call (unless `presetId` is
+supplied via trigger params, which takes precedence).

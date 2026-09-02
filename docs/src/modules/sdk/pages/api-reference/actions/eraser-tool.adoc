@@ -1,0 +1,28 @@
+= WeaveEraserToolAction
+:description: Activate the deletion of nodes from the canvas
+
+== Overview
+
+The https://github.com/InditexTech/weavejs/blob/main/code/packages/sdk/src/actions/eraser-tool/eraser-tool.ts[WeaveEraserToolAction]
+class that enables users to erase (delete or hide) elements (e.g. shapes, paths, annotations)
+the collaborative canvas.
+
+The class extends the xref:sdk:api-reference/actions/action.adoc[WeaveAction] class.
+
+== Name
+
+This action `name` property value is `eraserTool`.
+
+== Import
+
+[source,shell]
+----
+import { WeaveEraserToolAction } from "@inditextech/weave-sdk";
+----
+
+== Instantiation
+
+[source,ts]
+----
+new WeaveEraserToolAction();
+----

@@ -1,0 +1,43 @@
+= Nodes Multi-selection Feedback
+:description: Activate support to provide more feedback to the user when multi-selecting nodes
+
+image::plugins/nodes-multi-selection-feedback.gif[Nodes multi-selection plugin on use on the Weave.js showcase,role="zoom-in"]
+
+== Introduction
+
+This plugin enables more feedback to users when selecting multiple nodes on the canvas.
+
+== Usage
+
+=== Import the Plugin
+Start by importing the plugin:
+
+[source,ts]
+----
+import { WeaveNodesMultiSelectionFeedbackPlugin } from "@inditextech/weave-sdk";
+----
+
+=== Register the Plugin
+Then register the plugin on the xref:sdk:api-reference/weave/index.adoc[Weave] class instance.
+
+[source,ts]
+----
+const instance = new Weave({
+  ...
+  plugins: [
+    ...,
+    new WeaveNodesMultiSelectionFeedbackPlugin(), // <.>
+  ]
+})
+----
+<.> Added in this step.
+
+You can also:
+
+* Customize the transformer style.
+
+For more information check the xref:sdk:api-reference/plugins/nodes-multi-selection-feedback.adoc[WeaveNodesMultiSelectionFeedbackPlugin]
+plugin API.
+
+=== Use the plugin
+Once the plugin is registered when multi-selection, more feedback is provided to the end user.

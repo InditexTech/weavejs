@@ -1,0 +1,106 @@
+= Comment Tool
+:description: Allow users to comment on top of the stage content.
+
+image::actions/comment-tool.png[Comment Tool action on the Weave.js showcase,role="zoom-in"]
+
+== Introduction
+
+This action enables users to attach inline feedback on top of the stage content, useful to communicate
+and work collaborative with other peers..
+
+This tool is headless, this means that only provides the handling of Weave internals, in order
+to make it fully work you need to provide:
+
+* The UI / UX for the app you're building
+* A backend to store / retrieve / manage the Comments
+* Comments replication among peers
+
+.Showcase implementation example
+[NOTE]
+====
+On the showcase we use Next.js (React) as UI, we provide some API's (CRUD) to
+operate and query the comments, that are are stored on a database. We also
+share changes with other peers via SSE.
+====
+
+== Dependencies
+
+This action needs registered on the Weave instance the following elements:
+
+* xref:main:build/nodes/comment.adoc[Comment] node
+* xref:main:build/plugins/comments-renderer.adoc[Comments renderer] plugin
+
+== Usage
+
+=== Import the Action
+Start by importing the action:
+
+[source,ts]
+----
+import { WeaveCommentToolAction } from "@inditextech/weave-sdk";
+----
+
+=== Register the Action
+Then register the action on the xref:sdk:api-reference/weave/index.adoc[Weave] class instance.
+
+[source,ts]
+----
+const instance = new Weave({
+  ...
+  actions: [
+    ...,
+    new WeaveCommentToolAction({ // <.>
+      config: { // <.>
+        model, // here you define some utils to work with your Entity model // <.>
+        getUser, // we need the current user model when creating // <.>
+        getUserBackgroundColor, // define the background color associated to an user // <.>
+        getUserForegroundColor, // define the foreground color associated to an user // <.>
+      } // <.>
+    }), // <.>
+  ]
+})
+----
+<.> Added in this step.
+<.> Added in this step.
+<.> Added in this step.
+<.> Added in this step.
+<.> Added in this step.
+<.> Added in this step.
+<.> Added in this step.
+<.> Added in this step.
+
+=== Setup the action trigger
+Setup on a button or any element on the UI the user can interact with on the action event:
+
+[source,ts]
+----
+instance.triggerAction("commentTool");
+----
+
+
+For example on a button on React:
+
+[source,tsx]
+----
+import React from "react";
+import { useWeave } from "@inditextech/weave-react";
+
+const MyCommentToolTriggerComponent = () => {
+  const instance = useWeave((state) => state.instance);
+
+  const commentTool = React.useCallback(() => {
+    instance.triggerAction("commentTool");
+  }, [instance]);
+
+  return <button onClick={commentTool}>Comment</button>;
+};
+----
+
+=== Trigger the action
+When an user triggers the action:
+
+* The mouse pointer is changed, indicating that it can now add comments.
+* When click or tap on the stage (if not a comment), then a callback function
+is called so you can render your _create comment UI_.
+* After setting the comment, you can retrieve the comments and render them with the
+xref:main:build/plugins/comments-renderer.adoc[Comments renderer] plugin.

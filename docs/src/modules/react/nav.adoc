@@ -1,0 +1,9 @@
+* Introduction
+* xref:react:index.adoc[Overview]
+* xref:react:setup.adoc[Setup]
+* API Reference
+* Providers
+** xref:react:api-reference/providers/weave-provider.adoc[WeaveProvider]
+* Hooks
+** xref:react:api-reference/hooks/use-weave-events.adoc[useWeaveEvents]
+** xref:react:api-reference/hooks/use-weave.adoc[useWeave]

@@ -1,0 +1,102 @@
+= Set up the frontend
+:description: Learn how to set up the frontend of a Weave.js app on Next.js
+
+In this guide, you will learn how to set up the frontend of a collaborative application using Weave.js and Next.js.
+
+To build the collaborative canvas interface, you will create two pages:
+
+* *Enter room page:* Let users indicate the room name or ID and a username to join a collaboration room.
+* *Room page:* Handles the UI for the collaboration room after a user joins.
+
+.Opinionated tools
+[NOTE]
+====
+This guide uses some opinionated tools and libraries (like shadcn/ui for UI components) to demonstrate the integration.
+Adapt or replace these tools to match your project's needs and preferences.
+====
+
+== Prerequisites
+
+Before you begin, ensure that you have completed the xref:main:manual-installation/backend.adoc[backend installation] guide.
+
+== Step by step
+
+To set up Weave.js frontend over our Next.js project (on a single artifact), follow these steps:
+
+=== 1. Install the Weave.js frontend dependencies
+
+From the project root folder, install the *Weave.js* frontend dependencies:
+
+[source,shell]
+----
+npm install @inditextech/weave-react
+----
+
+This example uses the Weave.js React wrapper.
+
+=== 2. Install the additional frontend dependencies
+
+From the project root, install supporting frontend libraries:
+
+[source,shell]
+----
+npm install boring-avatars class-variance-authority clsx @hookform/resolvers lucide-react react-hook-form tailwindcss-animate tailwind-merge @tanstack/react-query zod
+----
+
+These packages provide auxiliary functionality such as:
+
+* *Form handling:* `react-hook-form`, `@hookform/resolvers`, `zod`
+* *UI utilities:* `clsx`, `class-variance-authority`, `tailwind-merge`, `tailwindcss-animate`
+* *Icons and avatars:* `lucide-react`, `boring-avatars`
+* *State management:* `@tanstack/react-query`
+
+=== 3. Set up a global state store for the UI
+
+Create a global state store to handle the UI state.
+This store manages the current user, room ID, and UI visibility state across the application.
+Use
+https://zustand.docs.pmnd.rs/getting-started/introduction[Zustand] for this.
+
+* Install the https://zustand.docs.pmnd.rs/getting-started/introduction[Zustand] dependency:
++
+[source,shell]
+----
+npm install zustand
+----
+* Create a `store/store.ts` file in the project root folder and set its content to:
++
+.store/store.ts
+[source,ts]
+----
+include::example$manual-installation/store/store.ts[]
+----
+
+=== 4. Configure utility functions
+
+Create a `lib/utils.ts` file in the project root folder to provide utility functions used throughout the UI components.
+
+Create the file with the following content:
+
+.lib/utils.ts
+[source,ts]
+----
+include::example$manual-installation/lib/utils.ts[]
+----
+
+This file includes:
+
+* *`cn` function:* Merges Tailwind CSS class names with proper conflict resolution using `clsx` and `tailwind-merge`. This ensures that when you combine multiple class strings, conflicting Tailwind utilities are resolved correctly (e.g., `p-4` and `p-2` will result in `p-2`).
+* *`getContrastTextColor` function:* Determines whether white or black text provides better contrast against a given hex color background. It calculates the relative luminance of the color using the W3C standard formula and returns the appropriate text color for readability.
+* *`stringToColor` function:* Generates a consistent hex color from any string input using a hash function. This is useful for creating deterministic color assignments (like avatar backgrounds) based on user names or other identifiers.
+
+=== 5. Set up the Enter Room page
+
+With the global state store in place, create the xref:main:manual-installation/frontend/enter-room-page.adoc[Enter Room page].
+
+=== 6. Set up the Room page
+
+Now that the Enter Room page is set up, create the xref:main:manual-installation/frontend/room-page.adoc[Room page].
+
+== Next steps
+
+Finally, xref:main:manual-installation/index.adoc#run-the-project[run the project].

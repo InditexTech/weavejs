@@ -1,0 +1,105 @@
+= Stores
+:description: Stores maintained by Weave.js team
+
+== Introduction
+
+A Store in Weave.js is a shared, real-time data layer that keeps all users in sync. It manages
+the state of the canvas, including nodes, user presence, and collaboration history—powered
+by Yjs under the hood.
+
+Stores ensure that changes made by one user are instantly reflected for everyone else, and can
+be connected to different backends for persistence and network transport. They make building
+multiplayer experiences feel as seamless as building a single-user app.
+
+Weave.js includes a set of built-in Stores, but you can also create your own to tailor
+functionality to your specific application needs. Specially if you want to use a particular transport.
+
+== Available stores
+
+Weave.js team maintain a set of *stores*, think of them as the core that:
+
+* On the backend, manages the shared-state persistence, replication to other peers and
+handle the awareness events.
+* On the frontend, provides a client so, users can connect to the backend and provide
+all the real-time sync needed to support a collaborative application.
+
+This are the stores:
+
+[cards,columns="1 s:2 m:4",width=container]
+====
+[card]
+.xref:main:build/stores/websockets-store.adoc[WebSockets Store]
+An store that uses WebSockets as its transport layer.
+
+[card]
+.xref:main:build/stores/azure-web-pubsub-store.adoc[Azure Web PubSub Store]
+An store that uses Azure Web PubSub as its transport layer.
+
+[card]
+.xref:main:build/stores/standalone-store.adoc[Standalone Store]
+An store that directly render a room, useful when trying to render a room server-side to export as image.
+====
+
+== Custom Store
+
+Developers can also build their own *store*, for example to use a custom transport to communicate
+the peers of their applications.
+
+For this we provide an extension mechanism that allows to define your own store and use them
+on your application.
+
+An store has two sides:
+
+=== Backend server
+
+We don't take an opinion on how to build the server-side of an store, mainly because they are too much
+dependant on the transport used.
+
+You can take a look at the code for our provided stores, so you can learn by example how they work:
+
+* https://github.com/InditexTech/weavejs/tree/main/code/packages/store-websockets/src/server[WebSockets store] server code
+* https://github.com/InditexTech/weavejs/tree/main/code/packages/store-azure-web-pubsub/src/server[Azure Web PubSub store] server code
+
+=== Frontend client
+
+In Weave.js a client for a Store is a class that extends the
+https://github.com/InditexTech/weavejs/blob/main/code/packages/sdk/src/stores/store.ts[WeaveStore]
+abstract class, and implements a set of methods that define the Store behavior.
+
+.Access the Weave instance
+[NOTE]
+====
+You can access Weave.js main instance via `this.instance`.
+====
+
+To build an store client, create a class that extends the https://github.com/InditexTech/weavejs/blob/main/code/packages/sdk/src/stores/store.ts[WeaveAcWeaveStoretion]
+abstract class, and implement the following methods:
+
+==== connect
+
+[source,ts]
+----
+connect(): void
+----
+
+The `connect` method is called when an user tries to join a room.
+
+==== disconnect
+
+[source,ts]
+----
+disconnect(): void
+----
+
+The `disconnect` method is called when an user leaves a room.
+
+==== setAwarenessInfo
+
+[source,ts]
+----
+setAwarenessInfo(field: string, value: unknown): void
+----
+
+This method set awareness information, for example if you want to inform the metadata of
+an user that connected to the room, or to send the pointer information of that user to the
+other peers.

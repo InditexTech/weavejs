@@ -1,0 +1,38 @@
+= WeaveRegularPolygonToolAction (deprecated)
+:description: Add a regular polygon to the canvas
+
+.Deprecated
+[WARNING]
+====
+This action is deprecated. Use the xref:sdk:api-reference/actions/polygon-tool.adoc[WeavePolygonToolAction] instead.
+====
+
+== Overview
+
+The https://github.com/InditexTech/weavejs/blob/main/code/packages/sdk/src/actions/regular-polygon-tool/regular-polygon-tool.ts[WeaveRegularPolygonToolAction]
+class that allows users to create regular polygons shapes on the canvas by clicking
+and dragging. It provides a smooth, intuitive way to add structured, resizable
+star elements .
+
+Each interaction results in the creation of a xref:sdk:api-reference/nodes/star.adoc[WeaveRegularPolygonNode],
+added to the shared state and synchronized across all users.
+
+The class extends the xref:sdk:api-reference/actions/action.adoc[WeaveAction] class.
+
+== Name
+
+This action `name` property value is `regularPolygonTool`.
+
+== Import
+
+[source,shell]
+----
+import { WeaveRegularPolygonToolAction } from "@inditextech/weave-sdk";
+----
+
+== Instantiation
+
+[source,ts]
+----
+new WeaveRegularPolygonToolAction();
+----

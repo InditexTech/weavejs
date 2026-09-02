@@ -1,0 +1,352 @@
+= WeaveAzureWebPubsubServer
+:description: API reference for the WeaveAzureWebPubsubServer class
+
+== Overview
+
+The WeaveAzureWebPubsubServer is a server-side class in the Weave.js Azure Web PubSub store
+that enables real-time collaboration using Azure Web PubSub as the transport layer. It serves
+as a store provider, handling the synchronization of shared document state across all clients
+connected to a specific room.
+
+Built on top of Yjs, this class leverages Azure's managed Web PubSub infrastructure to offer scalable,
+low-latency communication, with support for CRDT-based document syncing, user presence (awareness),
+and optional persistence of shared state.
+
+This class enables seamless collaboration by handling server-side:
+
+* Connection management via WebSocket clients
+* Document synchronization using CRDTs (through Yjs)
+* Broadcasting updates between users in real time
+* Support for awareness events
+* Support for persistence of the shared-state
+
+== Import
+
+[source,shell]
+----
+import { WeaveAzureWebPubsubServer } from "@inditextech/weave-store-azure-web-pubsub/server";
+----
+
+== Instantiation
+
+[source,ts]
+----
+const azureWebPubSubServer = new WeaveAzureWebPubsubServer(params: WeaveAzureWebPubsubServerParams);
+----
+
+== Parameters
+
+[cols="5*"]
+|===
+| Property | Type | Required | Default | Description
+
+| mono:[pubsubConfig] | mono:[WeaveAzureWebPubsubConfig] | label:green[Required] |  | An object defining the Azure Web PubSub params: endpoint, custom auth (token flow or key) and hub name. By default we promote the use of DefaultAzureCredential from the @azure/identity dependency.
+| mono:[eventsHandlerConfig] | mono:[WebPubSubEventHandlerOptions] |  |  | Azure Web PubSub event handler configuration. Use allowedEndpoints to restrict the CloudEvents origin and accessKey to verify the HMAC-SHA256 signature on every inbound event.
+| mono:[persistRoom] | mono:[PersistRoom] |  |  | Weave.js Store to use to handle the real-time communication
+| mono:[fetchRoom] | mono:[FetchRoom] |  |  | Child nodes to render
+| mono:[initialState] | mono:[initialState] |  | mono:[defaultInitialState] | Array of nodes to register and use by the instance
+| mono:[syncHostConfig.heartbeat.sendIntervalMs] | mono:[number] |  | mono:[2500] | Interval to send sync room heartbeat to clients, in miliseconds
+| mono:[syncHostConfig.resync.checkIntervalMs] | mono:[number] |  | mono:[5000] | Sync host resync request check interval, used to request a resync event to clients when sync host disconnect / reconnect, in miliseconds
+| mono:[syncHostConfig.resync.attemptsLimit] | mono:[number] |  | mono:[12] | Maximum limit of resync attempts
+|===
+
+== Webhook authentication
+
+The `eventsHandlerConfig` object accepts two fields that together protect the CloudEvents
+endpoint from spoofed requests.
+
+[cols="3*"]
+|===
+| Field | HTTP response on failure | Purpose
+
+| `allowedEndpoints` | `403 Forbidden` | Restricts incoming POST requests to the Azure Web PubSub service hostname. Requests from any other origin are rejected.
+| `accessKey` | `401 Unauthorized` | Verifies the `ce-signature` HMAC-SHA256 header (`sha256=Hex(HMAC-SHA256(accessKey, connectionId))`) on every event. Accepts a single key string or `[primary, secondary]` for zero-downtime key rotation.
+|===
+
+[source,ts]
+----
+new WeaveAzureWebPubsubServer({
+  pubSubConfig: {
+    endpoint: process.env.WEAVE_AZURE_WEB_PUBSUB_ENDPOINT,
+    hubName: process.env.WEAVE_AZURE_WEB_PUBSUB_HUB_NAME,
+    auth: { key: process.env.WEAVE_AZURE_WEB_PUBSUB_KEY },
+  },
+  eventsHandlerConfig: {
+    // Reject POSTs from origins other than the configured service endpoint
+    allowedEndpoints: [process.env.WEAVE_AZURE_WEB_PUBSUB_ENDPOINT],
+    // Verify the HMAC-SHA256 signature on every inbound CloudEvent
+    accessKey: process.env.WEAVE_AZURE_WEB_PUBSUB_KEY,
+  },
+});
+----
+
+[quote]
+____
+*Managed identity / `DefaultAzureCredential`*: when no static access key is available,
+omit `accessKey`. A warning is logged on every request. Protect the endpoint at the
+network level by restricting ingress to
+https://learn.microsoft.com/en-us/azure/azure-web-pubsub/concept-service-internals[Azure Web PubSub IP ranges]
+via NSG or firewall rules.
+____
+
+== Methods
+
+=== getMiddleware
+
+[source,ts]
+----
+getMiddleware();
+----
+
+This method return the necessary middlewares that you need to attach to your Express
+server in order to manage the Azure Web PubSub connectivity.
+
+=== clientConnect
+
+[source,ts]
+----
+clientConnect(roomId: string): Promise<string>
+----
+
+This method return a secure connection URL to use client-side to connect to the Azure
+Web PubSub infrastructure.
+
+Used
+
+== TypeScript types
+
+[source,ts]
+----
+type WebPubSubEventHandlerOptions = {
+  /** Custom serving path for the CloudEvents handler endpoint. */
+  path?: string;
+  /** Handle 'connect' — service waits for the response before proceeding. */
+  handleConnect?: (connectRequest: ConnectRequest, connectResponse: ConnectResponseHandler) => void;
+  /** Handle user events — service waits for the response before proceeding. */
+  handleUserEvent?: (userEventRequest: UserEventRequest, userEventResponse: UserEventResponseHandler) => void;
+  /** Fire-and-forget 'connected' event. */
+  onConnected?: (connectedRequest: ConnectedRequest) => void;
+  /** Fire-and-forget 'disconnected' event. */
+  onDisconnected?: (disconnectedRequest: DisconnectedRequest) => void;
+  /**
+   * Restrict incoming CloudEvents POST requests to these Azure Web PubSub service
+   * endpoint URLs. Requests from any other origin are rejected with HTTP 403.
+   * When omitted, all origins are allowed.
+   */
+  allowedEndpoints?: string[];
+  /**
+   * Access key(s) used to verify the HMAC-SHA256 `ce-signature` header on every
+   * inbound CloudEvent. Provide `[primary, secondary]` to support key rotation.
+   * When omitted, signature verification is skipped and a warning is logged.
+   */
+  accessKey?: string | string[];
+};
+----
+
+[source,ts]
+----
+type WeaveStoreAzureWebPubsubConfig = {
+  endpoint: string;
+  persistIntervalMs?: number;
+  hubName: string;
+  auth?: {
+    key?: string;
+    custom?: TokenCredential;
+  };
+  connectionHandlers?: DeepPartial<WeaveAzureWebPubsubSyncHandlerOptions>;
+};
+
+type WeaveAzureWebPubsubSyncHandlerOptions = {
+  onConnect?: (
+    connectionId: string,
+    queries: Record<string, string[]> | undefined,
+  ) => Promise<void>;
+  onConnected?: (connectionId: string) => Promise<void>;
+  removeConnection?: (connectionId: string) => Promise<void>;
+  getConnectionRoom?: (connectionId: string) => Promise<string | null>;
+  getRoomConnections?: (roomId: string) => Promise<string[]>;
+  persistIntervalMs?: number;
+};
+
+type WeaveStoreAzureWebPubsubOptions = {
+  roomId: string;
+  url: string;
+  fetchClient?: FetchClient;
+  syncClientOptions?: DeepPartial<WeaveStoreAzureWebPubSubSyncClientOptions>;
+};
+
+type WeaveStoreAzureWebPubsubOnStoreFetchConnectionUrlEvent = {
+  loading: boolean;
+  error: Error | null;
+};
+
+type FetchClient = (
+  input: string | URL | globalThis.Request,
+  init?: RequestInit,
+) => Promise<Response>;
+
+type FetchInitialState = (doc: Doc) => void;
+type PersistRoom = (
+  roomId: string,
+  actualState: Uint8Array<ArrayBufferLike>,
+) => Promise<void>;
+type FetchRoom = (roomId: string) => Promise<Uint8Array | null>;
+
+type WeaveStoreAzureWebPubsubEvents = {
+  onConnect: WeaveStoreAzureWebPubsubOnConnectEvent;
+  onConnected: WeaveStoreAzureWebPubsubOnConnectedEvent;
+  onDisconnected: WeaveStoreAzureWebPubsubOnDisconnectedEvent;
+};
+
+type WeaveStoreAzureWebPubsubOnConnectEvent = {
+  context: ConnectionContext;
+  queries: Record<string, string[]> | undefined;
+};
+
+type WeaveStoreAzureWebPubsubOnConnectedEvent = {
+  context: ConnectionContext;
+  queries?: Record<string, string[]>;
+};
+
+type WeaveStoreAzureWebPubsubOnDisconnectedEvent = {
+  context: ConnectionContext;
+  queries?: Record<string, string[]>;
+};
+
+type WeaveStoreAzureWebPubsubOnWebsocketOpenEvent = {
+  group: string;
+  event: WebSocket.Event;
+  connectionAttempt: number;
+};
+
+type WeaveStoreAzureWebPubsubOnWebsocketJoinGroupEvent = {
+  group: string;
+  connectionAttempt: number;
+};
+
+type WeaveStoreAzureWebPubsubOnWebsocketMessageEvent = {
+  group: string;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  event: WebSocket.MessageEvent;
+};
+
+type WeaveStoreAzureWebPubsubOnWebsocketCloseEvent = {
+  group: string;
+  event: CloseEvent;
+  connectionAttempt: number;
+};
+
+type WeaveStoreAzureWebPubsubOnWebsocketReconnectEvent = {
+  group: string;
+  connectionAttempt: number;
+  timeoutMs: number;
+};
+
+type WeaveStoreAzureWebPubsubOnWebsocketErrorEvent = {
+  group: string;
+  error: ErrorEvent;
+  connectionAttempt: number;
+};
+
+type WeaveStoreAzureWebPubSubSyncHostClientConnectOptions = {
+  expirationTimeInMinutes?: number;
+};
+
+// Client types
+
+type WeaveStoreAzureWebPubSubSyncClientConnectionStatusKeys =
+  keyof typeof WEAVE_STORE_AZURE_WEB_PUBSUB_CONNECTION_STATUS;
+type WeaveStoreAzureWebPubSubSyncClientConnectionStatus =
+  (typeof WEAVE_STORE_AZURE_WEB_PUBSUB_CONNECTION_STATUS)[WeaveStoreAzureWebPubSubSyncClientConnectionStatusKeys];
+
+enum MessageType {
+  System = "system",
+  JoinGroup = "joinGroup",
+  SendToGroup = "sendToGroup",
+}
+
+enum MessageDataType {
+  Init = "init",
+  Sync = "sync",
+  Awareness = "awareness",
+}
+
+interface MessageData {
+  payloadId?: string;
+  index?: number;
+  type?: "heartbeat" | "resync" | "chunk" | "end";
+  totalChunks?: number;
+  group: string;
+  t: string; // type / target uuid
+  f: string; // origin uuid
+  c: string; // base64 encoded binary data
+}
+
+interface Message {
+  type: string;
+  fromUserId: string;
+  from: string;
+  group: string;
+  data: MessageData;
+}
+
+type MessageHandler = (
+  encoder: Encoder,
+  decoder: Decoder,
+  client: WeaveStoreAzureWebPubSubSyncClient,
+  clientId: string,
+  emitSynced: boolean,
+  messageType: number,
+) => void;
+
+type WeaveStoreAzureWebPubsubSyncHandlerDestroyRoomStatusKeys =
+  keyof typeof WEAVE_STORE_AZURE_WEB_PUBSUB_DESTROY_ROOM_STATUS;
+type WeaveStoreAzureWebPubsubSyncHandlerDestroyRoomStatus =
+  (typeof WEAVE_STORE_AZURE_WEB_PUBSUB_DESTROY_ROOM_STATUS)[WeaveStoreAzureWebPubsubSyncHandlerDestroyRoomStatusKeys];
+
+type WeaveStoreAzureWebPubSubSyncClientOptions = {
+  heartbeat: {
+    checkWindowTimeMs: number;
+    checkIntervalMs: number;
+  };
+};
+
+type WeaveStoreAzureWebPubsubSyncHostOptions = {
+  heartbeat: {
+    sendIntervalMs: number;
+  };
+  resync: {
+    checkIntervalMs: number;
+    attemptsLimit: number;
+  };
+};
+----
+
+== Shared-state initial value
+
+If not defined the `defaultInitialState` is used, which is nothing more than:
+
+[mermaid,format=png,role=zoom-in]
+....
+flowchart TD;
+Stage --> gridLayer;
+Stage --> mainLayer;
+Stage --> selectionLayer;
+Stage --> usersPointersLayer;
+Stage --> utilityLayer;
+....
+
+A xref:main:build/nodes/stage.adoc[Stage] node with 5 children xref:main:build/nodes/layer.adoc[Layer]
+nodes, in the specified order (bottom-to-top):
+
+* *gridLayer*: is the layer used by xref:main:build/plugins/stage-grid.adoc[WeaveStageGridPlugin]
+to render the reference grid elements.
+* *mainLayer*: is the main layer where all the nodes added by the users live.
+* *selectionLayer*: is the layer used by xref:main:build/plugins/nodes-selection.adoc[WeaveNodesSelectionPlugin]
+to render the selection overlay elements.
+* *usersPointersLayer*: is the layer used by xref:main:build/plugins/users-pointers.adoc[WeaveUsersPointersPlugin]
+to render the users pointers overlay elements.
+* *utilityLayer*: is a wildcard layer defined that can be used by any plugin.
+
+Check out here the https://github.com/InditexTech/weavejs/blob/main/code/packages/store-azure-web-pubsub/src/server/default-initial-state.ts[code]
+hat defines the `defaultInitialState` function.

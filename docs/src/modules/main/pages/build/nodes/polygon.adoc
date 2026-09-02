@@ -1,0 +1,61 @@
+= Polygon
+:description: Draw a polygon on the canvas using a preset shape
+
+The Polygon node is a versatile primitive shape used to render polygon elements on the canvas.
+Unlike the xref:main:build/nodes/regular-polygon.adoc[Regular Polygon] node, it is based on a
+set of explicit vertex points and an inner bounding rectangle, enabling arbitrary convex
+polygons to be rendered with a consistent, inside-stroke border.
+
+It supports customizable properties such as position, fill color, stroke, and an optional
+inline text label.
+
+They can also respond to interactions like dragging, resizing, or selection.
+
+== Presets
+
+The polygon node ships with six built-in presets, each defining the normalized vertex positions
+and the largest inscribed axis-aligned rectangle (used for label placement):
+
+[cols="3*"]
+|===
+| Preset ID | Label | Sides
+
+| `triangle` | Triangle | 3
+| `diamond` | Diamond | 4
+| `pentagon` | Pentagon | 5
+| `hexagon` | Hexagon | 6
+| `octagon` | Octagon | 8
+| `decagon` | Decagon | 10
+|===
+
+== Usage
+
+=== Import the Node
+Start by importing the node:
+
+[source,ts]
+----
+import { WeavePolygonNode } from "@inditextech/weave-sdk";
+----
+
+=== Register the Node
+Then register the node on the xref:sdk:api-reference/weave/index.adoc[Weave] class instance.
+
+[source,ts]
+----
+const instance = new Weave({
+  ...
+  nodes: [
+    ...,
+    new WeavePolygonNode(), // <.>
+  ]
+})
+----
+<.> Added in this step.
+
+=== Use the node
+Once the node is registered you can use it on xref:main:build/actions/index.adoc[Actions] or
+xref:main:build/plugins/index.adoc[Plugins] or even other xref:main:build/nodes/index.adoc[Nodes].
+
+We provide an action named xref:main:build/actions/polygon-tool.adoc[Polygon Tool] that
+allows users to add Polygon nodes to the application.

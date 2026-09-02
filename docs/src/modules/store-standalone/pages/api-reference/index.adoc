@@ -1,0 +1,73 @@
+= WeaveStoreStandalone
+:description: API reference for the WeaveStoreStandalone class
+
+== Overview
+
+The WeaveStoreStandalone is a client/server-side class in Weave.js Standalone store that
+provides a way to directly render a Room without any of the overhead of the collaboration,
+useful for example when server-side rendering a room for exporting it to an image.
+
+== Import
+
+[source,shell]
+----
+import { WeaveStoreStandalone } from "@inditextech/weave-store-standalone/server";
+----
+
+== Instantiation
+
+[source,ts]
+----
+const store = new WeaveStoreStandalone(params: WeaveStoreStandaloneParams);
+----
+
+== Parameters
+
+[cols="5*"]
+|===
+| Property | Type | Required | Default | Description
+
+| mono:[roomData] | mono:[string] | label:green[Required] |  | The room to load
+| mono:[initialState] | mono:[initialState] |  | mono:[FetchInitialState] | Array of nodes to register and use by the instance
+|===
+
+== TypeScript types
+
+[source,ts]
+----
+type FetchInitialState = (doc: Y.Doc) => void;
+
+type WeaveStoreStandaloneParams = {
+  roomData: string;
+  initialState?: FetchInitialState;
+};
+----
+
+== Shared-state initial value
+
+If not defined the `defaultInitialState` is used, which is nothing more than:
+
+[mermaid,format=png,role=zoom-in]
+....
+flowchart TD;
+Stage --> gridLayer;
+Stage --> mainLayer;
+Stage --> selectionLayer;
+Stage --> usersPointersLayer;
+Stage --> utilityLayer;
+....
+
+A xref:main:build/nodes/stage.adoc[Stage] node with 5 children xref:main:build/nodes/layer.adoc[Layer]
+nodes, in the specified order (bottom-to-top):
+
+* *gridLayer*: is the layer used by xref:main:build/plugins/stage-grid.adoc[WeaveStageGridPlugin]
+to render the reference grid elements.
+* *mainLayer*: is the main layer where all the nodes added by the users live.
+* *selectionLayer*: is the layer used by xref:main:build/plugins/nodes-selection.adoc[WeaveNodesSelectionPlugin]
+to render the selection overlay elements.
+* *usersPointersLayer*: is the layer used by xref:main:build/plugins/users-pointers.adoc[WeaveUsersPointersPlugin]
+to render the users pointers overlay elements.
+* *utilityLayer*: is a wildcard layer defined that can be used by any plugin.
+
+Check out here the https://github.com/InditexTech/weavejs/blob/main/code/packages/store-websockets/src/server/default-initial-state.ts[code]
+hat defines the `defaultInitialState` function.

@@ -1,0 +1,62 @@
+= Stage Zoom
+:description: Activates support for zoom on the stage
+
+image::plugins/stage-panning.gif[Stage zoom on use on the Weave.js showcase,role="zoom-in"]
+
+== Introduction
+
+This plugin enables smooth zooming in and out of the canvas, allowing users to
+focus on details or get an overview of the entire workspace. It supports mouse wheel,
+trackpad gestures, and programmatic control, with customizable zoom levels.
+
+This plugin enhances navigation and usability in complex visual tools like
+whiteboards, diagrams, or design interfaces. It integrates seamlessly with the
+panning and resize plugins to provide a fully scalable and interactive canvas
+experience.
+
+== Dependencies
+
+This plugin needs also registered on the Weave instance the following:
+
+* xref:main:build/plugins/nodes-selection.adoc[Nodes selection] plugin.
+
+== Usage
+
+=== Import the Plugin
+Start by importing the plugin:
+
+[source,ts]
+----
+import { WeaveStageZoomPlugin } from "@inditextech/weave-sdk";
+----
+
+=== Register the Plugin
+Then register the plugin on the xref:sdk:api-reference/weave/index.adoc[Weave] class instance.
+
+[source,ts]
+----
+const instance = new Weave({
+  ...
+  plugins: [
+    ...,
+    new WeaveStageZoomPlugin(), // <.>
+  ]
+})
+----
+<.> Added in this step.
+
+You can also define:
+
+* The steps of the zoom.
+* The default step of the zoom.
+
+For more information check the xref:sdk:api-reference/plugins/stage-zoom.adoc[WeaveStageZoomPlugin]
+plugin API.
+
+=== Use the plugin
+Once the plugin is registered the final user can change the zoom through the following actions:
+
+* link:[Fit-to-screen Tool]: allows to set a zoom that makes visible the entire stage.
+* link:[Fit-to-selection Tool]: allows to set a zoom that makes visible the actual selection.
+* link:[Zoom-in Tool]: allows to interact and zoom-in the stage one zoom step.
+* link:[Zoom-out Tool]: allows to interact and zoom-out the stage one zoom step.

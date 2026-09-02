@@ -1,0 +1,62 @@
+= WeaveStageKeyboardMovePlugin
+:description: Activates the movement by a delta of stage nodes using shift + keyboard arrow keys
+
+== Overview
+
+The https://github.com/InditexTech/weavejs/blob/main/code/packages/sdk/src/plugins/stage-keyboard-move/stage-keyboard-move.ts[WeaveStageKeyboardMovePlugin]
+class that enables the movement of nodes by a delta (by default 5) when pressing shift + keyboard arrow keys.
+
+The class extends the xref:sdk:api-reference/plugins/plugin.adoc[WeavePlugin] class
+
+== Name
+
+This plugin `name` property value is `stageKeyboardMove`.
+
+== Import
+
+[source,shell]
+----
+import { WeaveStageKeyboardMovePlugin } from "@inditextech/weave-sdk";
+----
+
+== Instantiation
+
+[source,ts]
+----
+new WeaveStageKeyboardMovePlugin(params?: WeaveStageKeyboardMovePluginParams);
+----
+
+== TypeScript types
+
+[source,ts]
+----
+type WeaveMoveOrientation = "up" | "down" | "left" | "right";
+
+type WeaveStageKeyboardMovePluginConfig = {
+  movementDelta: number;
+};
+
+type WeaveStageKeyboardMovePluginParams = {
+  config?: WeaveStageKeyboardMovePluginConfig;
+};
+----
+
+== Parameters
+
+For `WeaveStageKeyboardMovePluginParams`:
+
+[cols="4*"]
+|===
+| Property | Type | Required | Description
+
+| mono:[config] | mono:[WeaveStageKeyboardMovePluginConfig] |  | Config parameters for the plugin.
+|===
+
+For `WeaveStageKeyboardMovePluginConfig`:
+
+[cols="5*"]
+|===
+| Property | Type | Required | Default | Description
+
+| mono:[movementDelta] | mono:[number] |  | mono:[5] | Delta to move the selected nodes.
+|===

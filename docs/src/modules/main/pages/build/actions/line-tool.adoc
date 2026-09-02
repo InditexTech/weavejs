@@ -1,0 +1,84 @@
+= Line Tool (deprecated)
+:description: Add a simple line to the canvas
+
+image::actions/line-tool.gif[Pen Tool action on use on the Weave.js showcase,role="zoom-in"]
+
+== Introduction
+
+This action allows users to draw a simple line on the canvas by click-and-drag. Also when the
+user press shift, the line is snapped to a defined set of angles.
+
+Each line is captured as a Line Node with configurable styling, and is instantly
+synchronized across all connected users.
+
+== Dependencies
+
+This action needs registered on the Weave instance the following elements:
+
+* xref:main:build/nodes/line.adoc[Line] node
+
+== Usage
+
+=== Import the Action
+Start by importing the action:
+
+[source,ts]
+----
+import { WeaveLineToolAction } from "@inditextech/weave-sdk";
+----
+
+=== Register the Action
+Then register the action on the xref:sdk:api-reference/weave/index.adoc[Weave] class instance.
+
+[source,ts]
+----
+const instance = new Weave({
+  ...
+  actions: [
+    ...,
+    new WeaveLineToolAction(), // <.>
+  ]
+})
+----
+<.> Added in this step.
+
+=== Setup the action trigger
+Setup on a button or any element on the UI the user can interact with on the action event:
+
+[source,ts]
+----
+instance.triggerAction("lineTool");
+----
+
+
+For example on a button on React:
+
+[source,tsx]
+----
+import React from "react";
+import { useWeave } from "@inditextech/weave-react";
+
+const MyLineToolTriggerComponent = () => {
+  const instance = useWeave((state) => state.instance);
+
+  const triggerTool = React.useCallback(() => {
+    instance.triggerAction("lineTool");
+  }, [instance]);
+
+  return <button onClick={triggerTool}>Line Tool</button>;
+};
+----
+
+=== Trigger the action
+Finally a final user trigger the UI element that launches the action.
+
+
+When active the user will follow this steps:
+
+* *Click* or *Touch* on the canvas and drag to define the line.
+* Release *Click* or *Touch* to add the defined line to the canvas.
+
+You can also press *Shift* to snap the line to a set of predefined angles.
+
+This action integrates seamlessly with Weave.js's real-time state system,
+ensuring the new element appears instantly for all connected users.

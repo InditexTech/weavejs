@@ -1,0 +1,144 @@
+= WeaveFrameNode
+:description: Frame node API Reference
+
+== Overview
+
+The https://github.com/InditexTech/weavejs/blob/main/code/packages/sdk/src/nodes/frame/frame.ts[WeaveFrameNode]
+class represents a specialized container node in Weave.js designed to act like a framed section or visual panel inside
+the canvas. A WeaveFrameNode is used to group and organize nodes visually and logically within a bounded, styled
+area—similar to a "frame" or "workspace" within the larger canvas.
+
+Built on top of the xref:sdk:api-reference/nodes/group.adoc[WeaveGroupNode] and extended with additional visual and
+interactive features, it provides a structured layout area perfect for modular designs, diagram sections, flowchart stages,
+or collaborative workspaces.
+
+Frames are useful for:
+
+* Renders a rectangular frame with optional size, background color, border and title area (depending on design requirements).
+* Acts as a container where users can add child nodes that logically belong inside a specific framed area.
+* Allows dragging and interacting with the frame itself while maintaining the internal layout of its child nodes.
+* Can carry additional metadata (e.g., frame labels, section types, or workflow states) useful for collaborative tooling and
+visual organization.
+
+The class extends the xref:sdk:api-reference/nodes/node.adoc[WeaveNode] class
+
+== Type
+
+This node `nodeType` property value is `frame`.
+
+== Import
+
+[source,shell]
+----
+import { WeaveFrameNode } from "@inditextech/weave-sdk";
+----
+
+== Instantiation
+
+[source,ts]
+----
+new WeaveFrameNode(params?: WeaveFrameNodeParams);
+----
+
+== TypeScript types
+
+[source,ts]
+----
+type WeaveNodeTransformerProperties = Konva.TransformerConfig;
+
+type WeaveFrameProperties = {
+  fontFamily: string;
+  fontStyle: string;
+  fontSize: number;
+  fontColor: string;
+  titleMargin: number;
+  borderWidth: number;
+  borderColor: string;
+  onTargetLeave: {
+    borderColor: string;
+    fill: string;
+  };
+  onTargetEnter: {
+    borderColor: string;
+    fill: string;
+  };
+  transform: WeaveNodeTransformerProperties;
+};
+
+type WeaveFrameAttributes = WeaveElementAttributes & {
+  title: string;
+  frameWidth: number;
+  frameHeight: number;
+};
+
+type WeaveFrameNodeParams = {
+  config: Partial<WeaveFrameProperties>;
+};
+----
+
+== Parameters
+
+For `WeaveFrameNodeParams`:
+
+[cols="4*"]
+|===
+| Property | Type | Required | Description
+
+| mono:[config] | mono:[Partial<WeaveFrameProperties>] | label:green[Required] | Config parameters for the node.
+|===
+
+For `WeaveFrameProperties`:
+
+[cols="5*"]
+|===
+| Property | Type | Required | Default | Description
+
+| mono:[fontFamily] | mono:[string] |  | mono:[check default values] | The font family to use on the frame title.
+| mono:[fontStyle] | mono:[string] |  | mono:[check default values] | The font style to use on the frame title.
+| mono:[fontSize] | mono:[string] |  | mono:[check default values] | The font size to use on the frame title.
+| mono:[fontColor] | mono:[string] |  | mono:[check default values] | The font color to use on the frame title.
+| mono:[titleMargin] | mono:[number] |  | mono:[check default values] | The margin of the title (px) with the frame contents.
+| mono:[borderWidth] | mono:[number] |  | mono:[check default values] | The border width (px) of the frame.
+| mono:[borderColor] | mono:[string] |  | mono:[#000check default values0ff] | The border color (HEX with alpha) of the frame.
+| mono:[onTargetLeave.borderColor] | mono:[string] |  | mono:[check default values] | The border color (HEX with alpha) of the frame when no target is added.
+| mono:[onTargetLeave.fill] | mono:[string] |  | mono:[check default values] | The frame background color (HEX with alpha) of the frame when no target is added.
+| mono:[onTargetEnter.borderColor] | mono:[string] |  | mono:[check default values] | The border color (HEX with alpha) of the frame when a target is going to be added.
+| mono:[onTargetEnter.fill] | mono:[string] |  | mono:[check default values] | The frame background color (HEX with alpha) of the frame when a target going to be added.
+| mono:[transform] | mono:[object] |  | mono:[check default values] | Setup the transform properties for the frame (if can be resized, rotated, anchors, etc.).
+|===
+
+== Default values
+
+[source,ts]
+----
+const WEAVE_FRAME_NODE_DEFAULT_CONFIG = {
+  fontFamily: "Arial",
+  fontStyle: "normal",
+  fontSize: 20,
+  fontColor: "#000000ff",
+  titleMargin: 20,
+  borderColor: "#000000ff",
+  borderWidth: 1,
+  onTargetLeave: {
+    borderColor: "#000000ff",
+    fill: "#ffffffff",
+  },
+  onTargetEnter: {
+    borderColor: "#ff6863ff",
+    fill: "#ffffffff",
+  },
+  transform: {
+    rotateEnabled: false,
+    resizeEnabled: false,
+    enabledAnchors: [] as string[],
+    borderStrokeWidth: 3,
+    padding: 0,
+  },
+};
+
+const WEAVE_FRAME_NODE_DEFAULT_PROPS = {
+  title: "Frame XXX",
+  frameWidth: 1920,
+  frameHeight: 1080,
+};
+----

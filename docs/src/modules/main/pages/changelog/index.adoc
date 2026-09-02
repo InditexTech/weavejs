@@ -1,0 +1,20 @@
+= Changelog
+:description: Check out the latest changes to Weave.js.
+
+Weave.js's own changelog is `code/CHANGELOG.md` in the
+https://github.com/InditexTech/weavejs[source repository] — the unabridged,
+https://keepachangelog.com/en/1.1.0/[Keep a Changelog]-format record, grouped into
+Added/Changed/Fixed/Removed sections under an `## [Unreleased]` heading until a
+version is actually cut.
+
+In contrast, xref:main:release-notes/index.adoc[Release notes] summarizes what
+matters to *users* of a given release, not every commit-level entry.
+
+== Convention
+
+Every entry is `- [#ISSUE_ID](ISSUE_URL) DESCRIPTION`, linking the tracking issue the
+change closes.
+
+TIP: `[Unreleased]` — what's landed but not yet cut into a release — is never mirrored
+here; see `code/CHANGELOG.md` directly for that. Every *cut* version below, though, is
+generated straight from that same file at build time, so it can't drift from it.

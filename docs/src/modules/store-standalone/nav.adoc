@@ -1,0 +1,5 @@
+* Introduction
+* xref:store-standalone:index.adoc[Overview]
+* xref:store-standalone:setup.adoc[Setup]
+* API Reference
+* xref:store-standalone:api-reference/index.adoc[WeaveStoreStandalone]

@@ -1,0 +1,53 @@
+= WeaveLayerNode
+:description: Layer node API Reference
+
+== Overview
+
+The https://github.com/InditexTech/weavejs/blob/main/code/packages/sdk/src/nodes/layer/layer.ts[WeaveLayerNode]
+class represents a logical and visual container within the Weave.js canvas, built directly on top of Konva’s
+https://konvajs.org/api/Konva.Layer.html[Layer] class. It serves as an organizational unit for grouping nodes
+together, improving rendering performance, and structuring complex scenes in a manageable way.
+
+Layers are useful for:
+
+* Improving performance by isolating redraws, only the layers with changes are re-rendered, minimizing canvas work.
+* Helps managing the visual stacking order also known as z-index (in terms of layers).
+* Specific layers can be used by plugins, for example, a grid plugin uses a grid layer to render the grid isolated
+from the main layer where the user add the nodes of their application.
+
+.Amount of layers
+[WARNING]
+====
+As specified on https://konvajs.org/docs/performance/Layer_Management.html[Konva.js
+documentation], in
+terms of performance, we should take into account the amount of layers we
+create (this mainly because each layer is a separate instance of a canvas),
+the maximum amount of layers shouldn't exceed 5.
+====
+
+The class extends the xref:sdk:api-reference/nodes/node.adoc[WeaveNode] class
+
+== Type
+
+This node `nodeType` property value is `layer`.
+
+== Import
+
+[source,shell]
+----
+import { WeaveLayerNode } from "@inditextech/weave-sdk";
+----
+
+== Instantiation
+
+.Don't directly use
+[NOTE]
+====
+We don't recommend to use this node directly. To define the application Stage,
+use the stores `initialState` configuration property on server-side.
+====
+
+[source,ts]
+----
+new WeaveLayerNode();
+----

@@ -1,0 +1,255 @@
+= Room page
+:description: Learn how to set up the Room page on Next.js
+
+In this guide, you will build the *Room page*:
+
+image::room.png[Room page,role="zoom-in"]
+
+This page renders the collaborative canvas once a user joins the room.
+
+== Prerequisites
+
+Before you begin, ensure that you have completed xref:main:manual-installation/frontend/enter-room-page.adoc[Set up the Enter Room page].
+
+== Step by step
+
+To set up the Room page in your Next.js project, follow these steps:
+
+=== 1. Install the UI building block components
+
+Set up the necessary https://ui.shadcn.com/docs[Shadcn/UI] components for the `Room` page.
+
+Use the https://ui.shadcn.com/docs/cli[Shadcn/UI CLI] and accept the default options.
+
+From the project root folder, follow these steps:
+
+* Install the https://ui.shadcn.com/docs/components/tooltip[Tooltip] component:
++
+[source,shell]
+----
+npx shadcn@latest add tooltip
+----
+* Install the https://ui.shadcn.com/docs/components/dropdown-menu[Dropdown Menu] component:
++
+[source,shell]
+----
+npx shadcn@latest add dropdown-menu
+----
+* Install the https://ui.shadcn.com/docs/components/avatar[Avatar] component:
++
+[source,shell]
+----
+npx shadcn@latest add avatar
+----
+
+=== 2. Define Weave.js Nodes, Actions & Plugins to use
+
+Define a set of constants for the *Weave.js* Nodes, Plugins, and Actions.
+
+Follow these steps:
+
+* In the `components` folder, create a folder named `utils`.
+* In the `components/utils` folder, create a file named `constants.ts` with:
++
+.components/utils/constants.ts
+[source,ts]
+----
+include::example$manual-installation/components/utils/constants.ts[]
+----
++
+File explanation:
+** *`(1)`*: Import the *Weave.js SDK* dependency.
+** *`(2)`*: Set up the fonts available on *Weave.js*.
+** *`(3)`*: Define the nodes used in this example.
+** *`(4)`*: Define the actions used in this example.
+** *`(5)`*: Define the custom plugins used in this example. By default, the xref:react:api-reference/providers/weave-provider.adoc[WeaveProvider]
+predefines a set of plugins. In this case, which can be overridden or extended here.
+
+=== 3. Define the page React hooks
+
+Define the hooks with the logic for the *Room* page.
+This separates component logic from UI logic.
+
+To start, create a `hooks` folder in the root directory.
+
+==== useHandleRouteParams hook
+
+In the `hooks` folder, create a file named `use-handle-route-params.ts` with:
+
+.hooks/use-handle-route-params.ts
+[source,tsx]
+----
+include::example$manual-installation/hooks/use-handle-route-params.ts[]
+----
+
+This hook handles route parameters in Next.js to extract the `roomId` for the connection.
+
+==== useGetWebsocketsStore hook
+
+Create a hook to manage the store instance. Its main responsibilities are:
+
+* Fetch the initial data for the room to connect
+* Instantiate Weave.js store
+
+In the `hooks` folder, create a file named `use-get-websockets-store.ts` with:
+
+.hooks/use-get-websockets-store.ts
+[source,tsx]
+----
+include::example$manual-installation/hooks/use-get-websockets-store.ts[]
+----
+
+This hook is a helper to set up the Websocket Store of Weave.js.
+
+Next, create a function to call the API.
+Create an `api` folder in the project root.
+Create inside it a file named `get-room.ts` with:
+
+.api/get-room.ts
+[source,ts]
+----
+include::example$manual-installation/api/get-room.ts[]
+----
+
+Finally, implement the API to fetch the persisted room (in this case, on the local file system).
+Create the folders `/api/rooms/[roomId]` inside the `app` directory.
+Inside the `[roomId]` folder, add a `route.ts` file with:
+
+.app/api/rooms/[roomId]/route.ts
+[source,ts]
+----
+include::example$manual-installation/app/api/rooms/roomId/route.ts[]
+----
+
+=== 4. Define the page React components
+Set up the following directories to organize our components:
+
+* In the `components` folder, create a `room` folder.
+* In the `components` folder, create an `overlays` folder.
+
+==== Room
+
+In the `components/room` folder, create a file named `room.tsx` with:
+
+.components/room/room.tsx
+[source,tsx]
+----
+include::example$manual-installation/components/room/room.tsx[]
+----
+
+==== RoomLayout
+
+In the `components/room` folder, create a file named `room.layout.tsx` with:
+
+.components/room/room.layout.tsx
+[source,tsx]
+----
+include::example$manual-installation/components/room/room.layout.tsx[]
+----
+
+==== RoomLoader
+
+In the `components/room` folder, create a file named `room.loader.tsx` with:
+
+.components/room/room.loader.tsx
+[source,tsx]
+----
+include::example$manual-installation/components/room/room.loader.tsx[]
+----
+
+==== ConnectedUsers
+
+In the `components/overlays` folder, create a file named `connected-users.tsx` with:
+
+.components/overlays/connected-users.tsx
+[source,tsx]
+----
+include::example$manual-installation/components/overlays/connected-users.tsx[]
+----
+
+==== ConnectionStatus
+
+In the `components/overlays` folder, create a file named `connection-status.tsx` with:
+
+.components/overlays/connection-status.tsx
+[source,tsx]
+----
+include::example$manual-installation/components/overlays/connection-status.tsx[]
+----
+
+==== RoomInformationOverlay
+
+In the `components/overlays` folder, create a file named `room-information-overlay.tsx` with:
+
+.components/overlays/room-information-overlay.tsx
+[source,tsx]
+----
+include::example$manual-installation/components/overlays/room-information-overlay.tsx[]
+----
+
+==== RoomUsersOverlay
+
+In the `components/overlays` folder, create a file named `room-users-overlay.tsx` with:
+
+.components/overlays/room-users-overlay.tsx
+[source,tsx]
+----
+include::example$manual-installation/components/overlays/room-users-overlay.tsx[]
+----
+
+==== ToolbarButton
+
+In the `components/overlays` folder, create a file named `toolbar-button.tsx` with:
+
+.components/overlays/toolbar-button.tsx
+[source,tsx]
+----
+include::example$manual-installation/components/overlays/toolbar-button.tsx[]
+----
+
+==== Toolbar
+
+In the `components/overlays` folder, create a file named `toolbar.tsx` with:
+
+.components/overlays/toolbar.tsx
+[source,tsx]
+----
+include::example$manual-installation/components/overlays/toolbar.tsx[]
+----
+
+==== ToolsOverlay
+
+In the `components/overlays` folder, create a file named `tools-overlay.tsx` with:
+
+.components/overlays/tools-overlay.tsx
+[source,tsx]
+----
+include::example$manual-installation/components/overlays/tools-overlay.tsx[]
+----
+
+==== ZoomHandlerOverlay
+
+In the `components/overlays` folder, create a file named `zoom-handler-overlay.tsx` with:
+
+.components/overlays/zoom-handler-overlay.tsx
+[source,tsx]
+----
+include::example$manual-installation/components/overlays/zoom-handler-overlay.tsx[]
+----
+
+.Define the page component
+To set up the *Room* page component, follow these steps:
+
+* In the `app` folder, create a folder named `rooms`.
+* In the `app/rooms` folder, create a folder named `[roomId]`.
+* In the `app/rooms/[roomId]` folder, create a file named `page.tsx` with:
++
+.app/rooms/[roomId]/page.tsx
+[source,tsx]
+----
+include::example$manual-installation/app/rooms/roomId/page.tsx[]
+----
+
+== Next steps
+
+Finally, xref:main:manual-installation/index.adoc#4-run-the-project[run the project].

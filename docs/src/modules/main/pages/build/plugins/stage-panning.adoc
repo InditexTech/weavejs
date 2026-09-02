@@ -1,0 +1,52 @@
+= Stage Panning
+:description: Activates the panning (move) of the stage
+
+image::plugins/stage-panning.gif[Stage panning on use on the Weave.js showcase,role="zoom-in"]
+
+== Introduction
+
+This plugin enables users to navigate the canvas by dragging to move around the
+Stage. It enhances the user experience by allowing intuitive exploration
+of large or zoomed-in workspaces, especially in collaborative or diagram-heavy
+environments.
+
+This plugin handles input events like mouse drag or touch gestures, and smoothly
+updates the Stage’s position. It integrates seamlessly with other plugins like
+zoom, grid, and selection—ensuring fluid and natural canvas navigation.
+
+== Dependencies
+
+This plugin needs also registered on the Weave instance the following:
+
+* xref:main:build/actions/move-tool.adoc[Move tool] action.
+
+== Usage
+
+=== Import the Plugin
+Start by importing the plugin:
+
+[source,ts]
+----
+import { WeaveStagePanningPlugin } from "@inditextech/weave-sdk";
+----
+
+=== Register the Plugin
+Then register the plugin on the xref:sdk:api-reference/weave/index.adoc[Weave] class instance.
+
+[source,ts]
+----
+const instance = new Weave({
+  ...
+  plugins: [
+    ...,
+    new WeaveStagePanningPlugin(), // <.>
+  ]
+})
+----
+<.> Added in this step.
+
+=== Use the plugin
+Once the plugin is registered you can pan the stage by:
+
+* Pressing the `Space` key and using the mouse to move.
+* Toggling on/off the `Move Tool` action, when enabled you can freely move the canvas.

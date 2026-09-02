@@ -1,0 +1,161 @@
+= WeaveRectangleNode
+:description: Rectangle node API Reference
+
+== Overview
+
+The https://github.com/InditexTech/weavejs/blob/main/code/packages/sdk/src/nodes/rectangle/rectangle.ts[WeaveRectangleNode]
+class represents a basic rectangular shape within the Weave.js canvas. It is one of the fundamental visual building blocks for
+creating collaborative tools, diagrams, design layouts, and interactive content.
+
+Built on top of Konva’s https://konvajs.org/api/Konva.Rect.html[Rect] class shape under the hood, the WeaveRectangleNode
+offers a simple yet powerful primitive that supports full interaction, styling, and real-time synchronization.
+
+Rectangles are ideal for:
+
+* Building interactive visual elements (e.g., cards, sections, containers).
+* Forming basic layout structures for more complex visual tools.
+* Acting as a foundational primitive in diagrams, whiteboards, or flow-based applications.
+
+Rectangle nodes support an optional *text label* that is displayed centred inside the shape.
+The label can be edited interactively by double-clicking the rectangle while it is selected.
+All label appearance properties (font, colour, alignment, padding, …) are configurable via the
+`label*` props described below.
+
+The class extends the xref:sdk:api-reference/nodes/node.adoc[WeaveNode] class
+
+== Type
+
+This node `nodeType` property value is `rectangle`.
+
+== Import
+
+[source,shell]
+----
+import { WeaveRectangleNode } from "@inditextech/weave-sdk";
+----
+
+== Instantiation
+
+[source,ts]
+----
+new WeaveRectangleNode(params?: WeaveRectangleNodeParams);
+----
+
+== TypeScript types
+
+[source,ts]
+----
+type WeaveNodeTransformerProperties = Konva.TransformerConfig;
+
+type WeaveRectangleProperties = {
+  transform: WeaveNodeTransformerProperties;
+};
+
+type WeaveRectangleNodeParams = {
+  config: Partial<WeaveRectangleProperties>;
+};
+
+type WeaveShapeLabelProps = {
+  labelText?: string;
+  labelFontFamily?: string;
+  labelFontSize?: number;
+  labelFontStyle?: string;
+  labelFontVariant?: string;
+  labelTextDecoration?: string;
+  labelFill?: string;
+  labelAlign?: string;
+  labelVerticalAlign?: string;
+  labelLetterSpacing?: number;
+  labelLineHeight?: number;
+  labelPaddingX?: number;
+  labelPaddingY?: number;
+};
+----
+
+== Parameters
+
+For `WeaveRectangleNodeParams`:
+
+[cols="4*"]
+|===
+| Property | Type | Required | Description
+
+| mono:[config] | mono:[Partial<WeaveRectangleProperties>] | label:green[Required] | Config parameters for the node.
+|===
+
+For `WeaveRectangleProperties`:
+
+[cols="5*"]
+|===
+| Property | Type | Required | Default | Description
+
+| mono:[transform] | mono:[object] |  | mono:[check default values] | Setup the transform properties for the rectangle (if can be resized, rotated, anchors, etc.).
+|===
+
+== Label properties
+
+The following props control the optional text label rendered inside the rectangle.
+They map directly to `WeaveShapeLabelProps` and are all optional — omit them to use the defaults.
+
+[cols="5*"]
+|===
+| Property | Type | Required | Default | Description
+
+| mono:[labelText] | mono:[string] |  | mono:[""] | Text content of the label. Set to an empty string to hide the label.
+| mono:[labelFontFamily] | mono:[string] |  | mono:["Arial, sans-serif"] | CSS font-family string for the label text.
+| mono:[labelFontSize] | mono:[number] |  | mono:[14] | Font size of the label text in pixels.
+| mono:[labelFontStyle] | mono:[string] |  | mono:["normal"] | Font style for the label. Accepts CSS font-style/weight keywords or a numeric weight (e.g. "normal", "bold", "italic", "bold italic", "700").
+| mono:[labelFontVariant] | mono:[string] |  | mono:["normal"] | CSS font-variant for the label (e.g. "normal", "small-caps").
+| mono:[labelTextDecoration] | mono:[string] |  | mono:[""] | CSS text-decoration for the label (e.g. "underline", "line-through").
+| mono:[labelFill] | mono:[string] |  | mono:["#000000"] | Colour of the label text in hex format (e.g. #RRGGBBAA).
+| mono:[labelAlign] | mono:[string] |  | mono:["center"] | Horizontal alignment of the label text ("left", "center", "right").
+| mono:[labelVerticalAlign] | mono:[string] |  | mono:["middle"] | Vertical alignment of the label text ("top", "middle", "bottom").
+| mono:[labelLetterSpacing] | mono:[number] |  | mono:[0] | Letter spacing for the label text in pixels.
+| mono:[labelLineHeight] | mono:[number] |  | mono:[1] | Line-height multiplier for the label text.
+| mono:[labelPaddingX] | mono:[number] |  | mono:[8] | Horizontal inset (padding) in pixels applied on each side of the label area.
+| mono:[labelPaddingY] | mono:[number] |  | mono:[8] | Vertical inset (padding) in pixels applied on the top and bottom of the label area.
+|===
+
+== Default values
+
+[source,ts]
+----
+const WEAVE_TRANSFORMER_ANCHORS = {
+  ["TOP_LEFT"]: "top-left",
+  ["TOP_CENTER"]: "top-center",
+  ["TOP_RIGHT"]: "top-right",
+  ["MIDDLE_RIGHT"]: "middle-right",
+  ["MIDDLE_LEFT"]: "middle-left",
+  ["BOTTOM_LEFT"]: "bottom-left",
+  ["BOTTOM_CENTER"]: "bottom-center",
+  ["BOTTOM_RIGHT"]: "bottom-right",
+};
+
+const WEAVE_DEFAULT_ENABLED_ANCHORS: string[] = Object.values(
+  WEAVE_TRANSFORMER_ANCHORS
+);
+
+const WEAVE_DEFAULT_TRANSFORM_PROPERTIES: WeaveNodeTransformerProperties = {
+  rotateEnabled: true,
+  resizeEnabled: true,
+  enabledAnchors: WEAVE_DEFAULT_ENABLED_ANCHORS,
+  borderStrokeWidth: 3,
+  padding: 0,
+};
+
+const WEAVE_SHAPE_LABEL_DEFAULTS: WeaveShapeLabelProps = {
+  labelText: "",
+  labelFontFamily: "Arial, sans-serif",
+  labelFontSize: 14,
+  labelFontStyle: "normal",
+  labelFontVariant: "normal",
+  labelTextDecoration: "",
+  labelFill: "#000000",
+  labelAlign: "center",
+  labelVerticalAlign: "middle",
+  labelLetterSpacing: 0,
+  labelLineHeight: 1,
+  labelPaddingX: 8,
+  labelPaddingY: 8,
+};
+----

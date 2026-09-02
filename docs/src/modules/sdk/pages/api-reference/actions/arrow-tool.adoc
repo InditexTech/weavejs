@@ -1,0 +1,32 @@
+= WeaveArrowToolAction (deprecated)
+:description: Add line segments to the canvas
+
+== Overview
+
+The https://github.com/InditexTech/weavejs/blob/main/code/packages/sdk/src/actions/arrow-tool/arrow-tool.ts[WeaveArrowToolAction]
+class that allows users to draw precise, vector-based arrows by clicking to place
+points, the pen tool emphasizes structured arrow creation, making it ideal for diagrams, connectors,
+wireframes, and flow-based interactions.
+
+Each completed arrow becomes a xref:sdk:api-reference/nodes/arrow.adoc[WeaveArrowNode],
+synced in real time across all collaborators.
+
+The class extends the xref:sdk:api-reference/actions/action.adoc[WeaveAction] class.
+
+== Name
+
+This action `name` property value is `arrowTool`.
+
+== Import
+
+[source,shell]
+----
+import { WeaveArrowToolAction } from "@inditextech/weave-sdk";
+----
+
+== Instantiation
+
+[source,ts]
+----
+new WeaveArrowToolAction();
+----

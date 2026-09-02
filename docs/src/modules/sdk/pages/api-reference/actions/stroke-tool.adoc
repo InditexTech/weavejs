@@ -1,0 +1,93 @@
+= WeaveStrokeToolAction
+:description: Add a single segment stroke to the canvas
+
+== Overview
+
+The https://github.com/InditexTech/weavejs/blob/main/code/packages/sdk/src/actions/stroke-tool/stroke-tool.ts[WeaveStrokeToolAction]
+class that allows users to draw a precise, vector-based line by click-and-drag to define the line.
+
+The line becomes a xref:sdk:api-reference/nodes/stroke-single.adoc[WeaveStrokeSingleNode],
+synced in real time across all collaborators.
+
+The class extends the xref:sdk:api-reference/actions/action.adoc[WeaveAction] class.
+
+== Name
+
+This action `name` property value is `strokeTool`.
+
+== Aliases
+
+This action `name` property value is `arrowTool`.
+
+== Import
+
+[source,shell]
+----
+import { WeaveStrokeToolAction } from "@inditextech/weave-sdk";
+----
+
+== Instantiation
+
+[source,ts]
+----
+new WeaveStrokeToolAction(params?: WeaveStrokeToolActionParams);
+----
+
+== TypeScript types
+
+[source,ts]
+----
+type WeaveStrokeToolActionStateKeys = keyof typeof WEAVE_STROKE_TOOL_STATE;
+type WeaveStrokeToolActionState =
+  (typeof WEAVE_STROKE_TOOL_STATE)[WeaveStrokeToolActionStateKeys];
+
+type WeaveStrokeToolActionProperties = {
+  snapAngles: {
+    angles: number[]; // Angles for snapping in degrees
+    activateThreshold: number;
+    releaseThreshold: number;
+  };
+};
+
+type WeaveStrokeToolActionParams = {
+  config: Partial<WeaveStrokeToolActionProperties>;
+};
+
+type WeaveStrokeToolActionOnAddingEvent = { actionName: string };
+type WeaveStrokeToolActionOnAddedEvent = { actionName: string };
+----
+
+== Parameters
+
+For `WeaveStrokeToolActionParams`:
+
+[cols="4*"]
+|===
+| Property | Type | Required | Description
+
+| mono:[config] | mono:[Partial<WeaveStrokeToolActionProperties>] | label:green[Required] | Config parameters for the tool.
+|===
+
+For `WeaveStrokeToolActionProperties`:
+
+[cols="5*"]
+|===
+| Property | Type | Required | Default | Description
+
+| mono:[snapAngles.angles] | mono:[number] |  | mono:[10] | Array of angles (in degrees) to snap the line to when shift is pressed.
+| mono:[snapAngles.activateThreshold] | mono:[number] |  | mono:[5] | Activation threshold for the angle snapping utility.
+| mono:[snapAngles.releaseThreshold] | mono:[number] |  | mono:[10] | Release threshold for the angle snapping utility.
+|===
+
+== Default values
+
+[source,ts]
+----
+const WEAVE_STROKE_TOOL_DEFAULT_CONFIG = {
+  snapAngles: {
+    angles: [0, 45, 90, 135, 180, 225, 270, 315],
+    activateThreshold: 5,
+    releaseThreshold: 10,
+  },
+};
+----

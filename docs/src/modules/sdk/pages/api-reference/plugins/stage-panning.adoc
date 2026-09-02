@@ -1,0 +1,71 @@
+= WeaveStagePanningPlugin
+:description: Activates the panning (move) of the stage
+
+== Overview
+
+The https://github.com/InditexTech/weavejs/blob/main/code/packages/sdk/src/plugins/stage-panning/stage-panning.ts[WeaveStagePanningPlugin]
+class that enables panning the Stage by dragging the canvas background. It allows users
+to move across large workspaces easily, improving navigation and usability, especially
+in collaborative and zoomable environments.
+
+This plugin provides a smooth, intuitive drag-to-move experience, essential for exploring
+detailed or expansive canvases.
+
+The class extends the xref:sdk:api-reference/plugins/plugin.adoc[WeavePlugin] class
+
+== Name
+
+This plugin `name` property value is `stagePanning`.
+
+== Import
+
+[source,shell]
+----
+import { WeaveStagePanningPlugin } from "@inditextech/weave-sdk";
+----
+
+== Instantiation
+
+[source,ts]
+----
+new WeaveStagePanningPlugin(params?: WeaveStagePanningPluginParams);
+----
+
+== TypeScript types
+
+[source,ts]
+----
+type WeaveStagePanningPluginParams = {
+  config?: Partial<WeaveStagePanningPluginConfig>;
+};
+
+type WeaveStagePanningPluginConfig = {
+  edgePanOffset: number;
+  edgePanMinSpeed: number;
+  edgePanSpeed: number;
+  edgePanMaxSpeed: number;
+};
+----
+
+== Parameters
+
+For `WeaveStagePanningPluginParams`:
+
+[cols="4*"]
+|===
+| Property | Type | Required | Description
+
+| mono:[config] | mono:[WeaveStagePanningPluginConfig] | label:green[Required] | Config parameters for the plugin.
+|===
+
+For `WeaveStagePanningPluginConfig`:
+
+[cols="5*"]
+|===
+| Property | Type | Required | Default | Description
+
+| mono:[edgePanOffset] | mono:[number] |  | mono:[25] | The offset from stage borders where auto-panning happens when dragging nodes. In pixels.
+| mono:[edgePanMinSpeed] | mono:[number] |  | mono:[2] | The minimum speed of the auto-panning. In pixels.
+| mono:[edgePanSpeed] | mono:[number] |  | mono:[10] | The base speed of the auto-panning. In pixels.
+| mono:[edgePanMaxSpeed] | mono:[number] |  | mono:[30] | The maximum speed of the auto-panning. In pixels.
+|===

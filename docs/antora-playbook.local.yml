@@ -1,0 +1,105 @@
+#
+# Antora playbook for local development and PR verification.
+#
+# Reference: https://docs.antora.org/antora/latest/playbook/
+#
+# Build with:  npx antora --fetch antora-playbook.local.yml
+# Output:      build/site
+#
+# Why this exists:
+# Once this site adopts one of the two documented versioning modes (see the
+# docouture docs-site-package skill's reference/versioning-modes.md), the real
+# `antora-playbook.yml` aggregates content from more than just whatever is
+# checked out right now — versioned matches `branches: [<prerelease branch>]` +
+# `tags: ['docs/v*']`, standalone matches `branches: [<prerelease branch>]` +
+# `tags: ['docs/stable']` (see the guides-branching-model guide for what
+# "prerelease branch" means — `main` for a trunk-based site, `develop` for a
+# git-flow one). A PR build (or a local build on a feature branch) is on a
+# detached HEAD or a branch that is neither of those, so the prerelease
+# branch and the version tag(s) are not resolved in that checkout — the real
+# playbook either fails or silently builds fewer versions than it should.
+#
+# This playbook points content aggregation at HEAD (the current worktree)
+# instead, so `docouture dev` (see src/lib/dev-server.ts) and
+# `docouture-pr-verify.yml` (see .github/workflows/) validate the current docs
+# content without needing the prerelease branch or any release ref. It
+# intentionally never changes shape when a site switches versioning mode or
+# branching model, or adds a release: there is always exactly one thing to
+# validate, whatever is currently checked out.
+#
+# Publishing (`docouture-publish.yml`) uses the real `antora-playbook.yml`.
+#
+
+site:
+  title: Weave.js
+  # Set to the dev server's own origin so Antora also generates 404.html
+  # (@antora/page-composer only does this when site.url is set) — docouture dev
+  # (src/lib/dev-server.ts) then has a real 404 page to serve instead of a
+  # plain-text fallback. Harmless here: this playbook is dev/PR-verify only,
+  # never used for a real publish (see the file header above).
+  url: http://localhost:5000
+  # Same component-name reasoning as the real antora-playbook.yml — see its
+  # own comment.
+  start_page: weavejs:ROOT:index.adoc
+  # Same logo/background/favicon as the real antora-playbook.yml — see its
+  # own comment.
+  keys:
+    product_logo: /_/product-logo.png
+    home_background: /_/home-background.jpg
+    favicon: /_/favicon.ico
+
+content:
+  sources:
+    # See antora-playbook.yml's comment on `url`/`start_path` — same reasoning
+    # applies here: this playbook lives at <repo-root>/docs/ too.
+    - url: ..
+      start_path: docs/src
+      branches: HEAD
+
+ui:
+  bundle:
+    # Same docouture UI bundle as the real antora-playbook.yml — see its comment.
+    # Resolved from node_modules too, so `npm install` must have run first.
+    url: ./node_modules/@inditextech/docouture-ui-bundle/build/ui-bundle.zip
+    snapshot: false
+  supplemental_files: ./supplemental-ui
+
+output:
+  dir: build/site
+  # See antora-playbook.yml's own comment on this key.
+  clean: true
+
+urls:
+  html_extension_style: indexify
+
+runtime:
+  log:
+    failure_level: warn
+    # See antora-playbook.yml's own comment on this key: Antora's own
+    # default is 'warn', which would otherwise silently drop
+    # @inditextech/docouture-antora-extensions' docouture-version-report and
+    # docouture-search-index diagnostics — both logged at 'info'.
+    level: info
+
+asciidoc:
+  attributes:
+    experimental: ''
+    icons: font
+    sectanchors: ''
+    idprefix: ''
+    idseparator: '-'
+    source-highlighter: shiki
+    page-pagination: '@'
+    # Same as the real antora-playbook.yml — see its own comment.
+    kroki-enabled: true
+    kroki-diagram-types: mermaid,plantuml,bpmn,excalidraw
+  extensions:
+    # Same as the real antora-playbook.yml — see its own comment and the
+    # writing-docs-pages skill's reference/docouture-blocks.md.
+    - '@inditextech/docouture-asciidoc-extensions'
+
+antora:
+  extensions:
+    # Same as the real antora-playbook.yml — see its own comment and the
+    # docs-internals skill's reference/antora-extensions.md.
+    - '@inditextech/docouture-antora-extensions'

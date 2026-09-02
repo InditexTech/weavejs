@@ -1,0 +1,136 @@
+= WeaveWebsocketsServer
+:description: API reference for the WeaveWebsocketsServer class
+
+== Overview
+
+The WeaveWebsocketsServer is a server-side class in Weave.js WebSockets store that
+provides a real-time backend for collaborative applications using WebSockets as the transport
+layer and and Express as the server framework. Built on top of the Yjs ecosystem,
+it acts as a store provider that manages the shared-document state and synchronizes
+it across all connected clients.
+
+This class enables seamless collaboration by handling server-side:
+
+* Connection management via WebSocket clients
+* Document synchronization using CRDTs (through Yjs)
+* Broadcasting updates between users in real time
+* Support for awareness events
+* Support for persistence of the shared-state
+
+== Import
+
+[source,shell]
+----
+import { WeaveWebsocketsServer } from "@inditextech/weave-store-websockets/server";
+----
+
+== Instantiation
+
+[source,ts]
+----
+const websocketsServer = new WeaveWebsocketsServer(params: WeaveWebsocketsServerParams);
+----
+
+== Parameters
+
+[cols="5*"]
+|===
+| Property | Type | Required | Default | Description
+
+| mono:[performUpgrade] | mono:[PerformUpgrade] | label:green[Required] |  | A function that receives as parameter the request and must return a boolean indicating if the request allows to perform the HTTP/1.1 protocol upgrade mechanism. When it returns false, the server replies with HTTP 401 Unauthorized and immediately destroys the socket.
+| mono:[extractRoomId] | mono:[ExtractRoomId] | label:green[Required] |  | A function that receives as parameter the request and must return the room id to connect to
+| mono:[persistRoom] | mono:[PersistRoom] |  |  | Weave.js Store to use to handle the real-time communication
+| mono:[fetchRoom] | mono:[FetchRoom] |  |  | Child nodes to render
+| mono:[horizontalSyncHandlerConfig] | mono:[WeaveStoreHorizontalSyncConfig] |  |  | The configuration for a Redis instance that syncs horizontally several instances of the server. A must-be when scaling horizontally. If not defined no horizontal sync is performed.
+| mono:[initialState] | mono:[initialState] |  | mono:[defaultInitialState] | Array of nodes to register and use by the instance
+|===
+
+.In production...
+[WARNING]
+====
+For production, we recommend deploying using the `horizontalSyncHandlerConfig`
+setup.
+====
+
+== Methods
+
+=== handleUpgrade
+
+[source,ts]
+----
+handleUpgrade(server: http.Server | https.Server)
+----
+
+This method attaches the upgrade handler to the underlying HTTP/HTTPS server. It applies
+the HTTP/1.1 protocol upgrade mechanism to switch from HTTP to WebSocket protocol.
+
+If `performUpgrade` returns `false`, the server writes an HTTP 401 Unauthorized response
+and destroys the socket so denied connections do not remain open.
+
+== TypeScript types
+
+[source,ts]
+----
+type PerformUpgrade = (req: IncomingMessage) => Promise<boolean>;
+
+type ExtractRoomId = (req: IncomingMessage) => string | undefined;
+
+type FetchInitialState = (doc: Y.Doc) => void;
+
+type PersistRoom = (
+  roomId: string,
+  actualState: Uint8Array<ArrayBufferLike>
+) => Promise<void>;
+
+type FetchRoom = (roomId: string) => Promise<Uint8Array | null>;
+
+type WeaveStoreHorizontalSyncRedisConfig = {
+  host: string;
+  port: number;
+  keyPrefix: string;
+  password?: string;
+};
+
+type WeaveStoreHorizontalSyncConfig = {
+  type: "redis";
+  config: WeaveStoreHorizontalSyncRedisConfig;
+};
+
+type WeaveWebsocketsServerParams = {
+  initialState?: FetchInitialState;
+  horizontalSyncHandlerConfig?: WeaveStoreHorizontalSyncConfig;
+  performUpgrade: PerformUpgrade;
+  extractRoomId: ExtractRoomId;
+  persistRoom?: PersistRoom;
+  fetchRoom?: FetchRoom;
+};
+----
+
+== Shared-state initial value
+
+If not defined the `defaultInitialState` is used, which is nothing more than:
+
+[mermaid,format=png,role=zoom-in]
+....
+flowchart TD;
+Stage --> gridLayer;
+Stage --> mainLayer;
+Stage --> selectionLayer;
+Stage --> usersPointersLayer;
+Stage --> utilityLayer;
+....
+
+A xref:main:build/nodes/stage.adoc[Stage] node with 5 children xref:main:build/nodes/layer.adoc[Layer]
+nodes, in the specified order (bottom-to-top):
+
+* *gridLayer*: is the layer used by xref:main:build/plugins/stage-grid.adoc[WeaveStageGridPlugin]
+to render the reference grid elements.
+* *mainLayer*: is the main layer where all the nodes added by the users live.
+* *selectionLayer*: is the layer used by xref:main:build/plugins/nodes-selection.adoc[WeaveNodesSelectionPlugin]
+to render the selection overlay elements.
+* *usersPointersLayer*: is the layer used by xref:main:build/plugins/users-pointers.adoc[WeaveUsersPointersPlugin]
+to render the users pointers overlay elements.
+* *utilityLayer*: is a wildcard layer defined that can be used by any plugin.
+
+Check out here the https://github.com/InditexTech/weavejs/blob/main/code/packages/store-websockets/src/server/default-initial-state.ts[code]
+hat defines the `defaultInitialState` function.

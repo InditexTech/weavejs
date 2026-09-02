@@ -1,0 +1,123 @@
+name: docouture-kroki-cache-warm
+
+# GitHub Actions' cache is scoped to the branch/ref a run executes under, not
+# just the key string — and a `pull_request`-triggered run (docouture-release.yml's
+# release-branch trigger) is ALWAYS scoped to that PR's own ephemeral merge
+# ref (`refs/pull/<N>/merge`), by design, even when it targets the release
+# branch and even after it merges. See GitHub's own docs ("Restrictions for
+# accessing a cache"): "Caches created by a pull_request run are already
+# scoped to the merge ref ... and cannot be written to the default branch's
+# scope." That means every release PR gets its own throwaway cache scope —
+# release #12's warm Kroki image cache is invisible to release #13, #14,
+# etc., even though the cache KEY (kroki-compose.yml's own hash) never
+# changes between them.
+#
+# The one sanctioned way around this (same docs, "Cache access for low-trust
+# workflow triggers"): "ensure there is a trusted workflow that keeps the
+# cache updated, for example a CI build triggered by a push to the default
+# branch." `push` is on GitHub's trusted-trigger allowlist, so a run
+# triggered this way writes into the DEFAULT BRANCH's cache scope — and any
+# other run in this repo (any PR, any ref, `pull_request: closed` included)
+# automatically falls back to that scope on its own cache lookup, no
+# `restore-keys` needed, since the key string is already identical
+# everywhere. That's this workflow's only job: keep that default-branch-scoped
+# entry warm, so docouture-pr-verify.yml/docouture-release.yml/docouture-publish.yml's own
+# (unmodified) cache steps get a real hit instead of a cold pull on every run.
+#
+# Triggers on push to BOTH the prerelease and release branches,
+# unconditionally (a trunk-based site collapses this to one entry — see
+# TemplateValues.cacheWarmBranchesYaml in copy-template.ts) — this workflow
+# has no reliable way to know at scaffold time which of the two a git-flow
+# repo actually has configured as its GitHub default branch (the one whose
+# cache scope this whole mechanism depends on), so it warms both rather than
+# guessing wrong and silently losing the optimization. Whichever one really
+# is the configured default gets its cache entry written either way; the
+# other branch's push still produces a normal base-branch-scoped cache,
+# benefiting PRs targeting it specifically, so nothing is wasted.
+#
+# Gated on `kroki-enabled` the same way those three are — no point warming a
+# cache for images a disabled site's build will never touch.
+on:
+  push:
+    branches: ['main*']
+
+# Least-privilege default: this job only checks out the release/prerelease
+# branch it happened to run against, warms the Docker/Kroki image cache and
+# writes it via actions/cache (a separate, token-independent cache API, not
+# repository contents) — it never uses GITHUB_TOKEN itself, so it never
+# needs more than read access. Declared explicitly rather than left to
+# inherit whatever the repository/organization's default token permissions
+# happen to be.
+permissions:
+  contents: read
+
+concurrency:
+  group: docouture-kroki-cache-warm
+  cancel-in-progress: true
+
+jobs:
+  warm:
+    name: Warm Kroki image cache
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    # `docouture new` scaffolds this site's package.json, antora-playbook.yml
+    # etc. under docs/ (not the repository root) — see the docs-site-package
+    # skill's reference/versioning-modes.md. Every step below runs from
+    # there; only .github/workflows itself has to live at the true repo
+    # root, since that is the one path GitHub Actions requires.
+    defaults:
+      run:
+        working-directory: docs
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          # Reads engines.node from docs/package.json — no separate version
+          # file to keep in sync.
+          node-version-file: docs/package.json
+          cache: npm
+          # `defaults.run.working-directory: docs` above only applies to
+          # `run:` steps, not to this action's own inputs — without this,
+          # setup-node looks for a lockfile from the repo root and fails.
+          cache-dependency-path: docs/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      # This is whichever branch triggered this run's own real
+      # antora-playbook.yml (this workflow only ever runs on a push to the
+      # prerelease or release branch, so there's no local/tag ambiguity to
+      # worry about the way docouture-release.yml's build step has) — see
+      # docouture-pr-verify.yml's own comment on the `kroki-enabled` attribute.
+      - name: Kroki / Detect enabled
+        id: kroki-check
+        run: |
+          if grep -qE "^\s*kroki-enabled:\s*['\"]?true['\"]?\s*(#.*)?$" antora-playbook.yml; then
+            echo "enabled=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "enabled=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      # Same cache key as docouture-pr-verify.yml/docouture-release.yml/
+      # docouture-publish.yml — the point of this job is only WHERE it's written
+      # from (a trusted `push` trigger, landing in the default branch's cache
+      # scope), never a different key. No load/consume step below: nothing
+      # else in this job needs the images locally, it only needs the cache
+      # entry to exist for those other workflows to fall back to.
+      - name: Kroki / Docker image cache
+        id: kroki-cache
+        if: steps.kroki-check.outputs.enabled == 'true'
+        uses: actions/cache@v4
+        with:
+          path: /tmp/kroki-images.tar
+          key: ${{ runner.os }}-kroki-images-${{ hashFiles('**/kroki-compose.yml') }}
+
+      - name: Kroki / Pull and save images
+        if: steps.kroki-check.outputs.enabled == 'true' && steps.kroki-cache.outputs.cache-hit != 'true'
+        run: |
+          compose_file="$(find . -name kroki-compose.yml 2>/dev/null | head -1)"
+          docker compose -f "$compose_file" pull
+          docker save -o /tmp/kroki-images.tar $(docker compose -f "$compose_file" config --images)

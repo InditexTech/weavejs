@@ -1,0 +1,83 @@
+= Comment
+:description: Give feedback and collaborate with other users.
+
+image::nodes/comment.png[Comment on Weave.js showcase,role="zoom-in"]
+
+The Comment node is a simple, versatile shape used to point to where an user added a
+comment to share with other peers, this node renders a shape that resembles an arrow
+pointing to some content on the stage.
+
+When clicked, a function is called in order to render an overlay with the comment
+information over a DOM node, on it anyone can deploy an UI / UX to:
+
+* Edit the comment content.
+* Render the comment replies.
+* Create a new reply.
+* Edit a reply.
+* Mark the comment as resolved.
+* Delete the comment
+
+.Not shareable thought the room state
+[WARNING]
+====
+This node is intended and designed to be used standalone, it doesn't support
+to be shared via the room state mechanism.
+====
+
+== Usage
+
+=== Import the Node
+Start by importing the node:
+
+[source,ts]
+----
+import { WeaveCommentNode } from "@inditextech/weave-sdk";
+----
+
+=== Register the Node
+Then register the node on the xref:sdk:api-reference/weave/index.adoc[Weave] class instance.
+
+[source,ts]
+----
+const instance = new Weave({
+  ...
+  nodes: [
+    ...,
+    new WeaveCommentNode({ // <.>
+      config: { // <.>
+        model, // here you define some utils to work with your Entity model // <.>
+        formatDate, // define how to format the dates rendered by Weave.js // <.>
+        createComment, // a callback that is called when you need to render the create comment UI // <.>
+        viewComment, // a callback that is called when you need to render the view comment UI // <.>
+      } // <.>
+    }), // <.>
+  ]
+})
+----
+<.> Added in this step.
+<.> Added in this step.
+<.> Added in this step.
+<.> Added in this step.
+<.> Added in this step.
+<.> Added in this step.
+<.> Added in this step.
+<.> Added in this step.
+
+=== UI configuration
+[NOTE]
+====
+Check the xref:sdk:api-reference/nodes/comment.adoc[Comment Node] API to know
+how it can be customized.
+
+.Use the node
+Once the node is registered you can use
+
+* The xref:main:build/actions/comment-tool.adoc[Comment tool] action to manage the comments of a room.
+* The xref:main:build/plugins/comments-renderer.adoc[Comments Renderer plugin] to render the comments
+on a special layer that is not shared using the room state mechanism.
+
+While the Comment nodes are rendered with the xref:main:build/plugins/comments-renderer.adoc[Comments Renderer plugin],
+interaction with the node is handled here, so if you want to for example view the comment
+details, when the Comment node is clicked a callback function is called, so you can render your
+Comment UI in order to handle that comment.
+====

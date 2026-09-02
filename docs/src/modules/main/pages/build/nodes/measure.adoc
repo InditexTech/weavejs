@@ -1,0 +1,44 @@
+= Measure
+:description: Draw measure reference distance on the canvas
+
+image::nodes/measure.png[Measure on the Weave.js showcase,role="zoom-in"]
+
+The Measure node is a complex node used to render a representation of the the distance between
+two points on the canvas. It needs:
+
+* A measure unit, e.g. meters, centimeters, milimeters, or inches.
+* A reference measure. A distance you previously know based on the measure unit.
+* A reference distance. The distance between two points on the canvas that represent the reference
+measure.
+
+== Usage
+
+=== Import the Node
+Start by importing the node:
+
+[source,ts]
+----
+import { WeaveMeasureNode } from "@inditextech/weave-sdk";
+----
+
+=== Register the Node
+Then register the node on the xref:sdk:api-reference/weave/index.adoc[Weave] class instance.
+
+[source,ts]
+----
+const instance = new Weave({
+  ...
+  nodes: [
+    ...,
+    new WeaveMeasureNode(), // <.>
+  ]
+})
+----
+<.> Added in this step.
+
+=== Use the node
+Once the node is registered you can use it on xref:main:build/actions/index.adoc[Actions] or
+xref:main:build/plugins/index.adoc[Plugins] or even other xref:main:build/nodes/index.adoc[Nodes].
+
+We provide an action named xref:main:build/actions/measure-tool.adoc[Measure Tool] that
+allows users to add Measure nodes to the application in a simple way.

@@ -1,0 +1,55 @@
+= Application structure
+:description: Overview of frontend and backend artifacts and their responsibilities
+
+A standard *Weave.js* project follows a frontend-backend architecture designed to support real-time collaboration, efficient state synchronization, and persistent data storage.
+
+.In production...
+[WARNING]
+====
+For production, we recommend deploying the frontend and backend separately.
+However, they can also run together in a single project, as shown in the
+xref:main:manual-installation/index.adoc[Manual installation] guide using Next.js.
+====
+
+== Frontend artifact
+
+The frontend is usually built with a modern web framework like React or Vue.
+Weave.js provides an SDK and optional integration libraries, like our React helper library, to facilitate the creation of collaborative visual interfaces.
+
+.Example
+[NOTE]
+====
+See the https://github.com/InditexTech/weavejs-frontend[weavejs-frontend]
+repository for a reference implementation.
+====
+
+On the frontend, Weave.js handles:
+
+* *Canvas rendering:* Handles all the canvas rendering and life-cycle via Konva.js elements and the React Reconciler.
+* *Real-time state synchronization:* Provides clients to connect to the backend, allowing them to manage the real-time collaboration, via Yjs and SyncedStore.
+* *User interaction:* Enables custom drawing nodes, actions, or plugins for the UI logic via our plugin system.
+
+Weave.js exposes a set of core abstractions to simplify and standardize development:
+
+* xref:main:build/nodes/index.adoc[Nodes]: Core building blocks of the collaborative interface: lines, rectangles, text, images, frames... Use the provided ones or build your own.
+* xref:main:build/plugins/index.adoc[Plugins]: Extend and enhance the functionality of Weave.js.
+* xref:main:build/actions/index.adoc[Actions]: Handle user interactions and user-driven changes.
+
+== Backend artifact
+
+The backend is usually built using Node.js on top of a server framework like Express, Koa, etc.
+Weave.js provides the xref:main:build/stores/index.adoc[Stores] abstraction to manage the shared application state and enable collaborative editing.
+
+.Example
+[NOTE]
+====
+See the https://github.com/InditexTech/weavejs-backend[weavejs-backend]
+repository for a reference implementation.
+====
+
+On the backend, Weave.js handles:
+
+* *State persistence and retrieval:* xref:main:build/stores/index.adoc[Stores] exposes an API for loading and saving shared state, enabling custom storage backends such as a file system, blob storage, or a cloud service.
+In the reference implementation, shared state binary files are persisted and retrieved using https://azure.microsoft.com/en-us/products/storage/blobs[Azure Blob Storage].
+* *Real-time state transport*: Stores also handle real-time synchronization of the shared state across clients. Weave.js includes built-in support for WebSockets and Azure Web PubSub, and also lets you implement custom stores with your own transport layer (e.g. AWS AppSync).
+* *Awareness events (optional)*: Weave.js supports optional awareness events—such as user join/leave events or cursor position—using Yjs's https://docs.yjs.dev/getting-started/adding-awareness[awareness] mechanism. This ephemeral data is shared only between active clients (not persisted) and is supported out of the box by all built-in stores. Awareness can enhance collaboration but should be used thoughtfully to avoid distractions.

@@ -1,0 +1,82 @@
+= Text Tool
+:description: Add text to the canvas
+
+image::actions/text-tool.gif[Text Tool action on use on the Weave.js showcase,role="zoom-in"]
+
+== Introduction
+
+This action allows users to add new text nodes to the canvas by clicking or touching
+on it. Once placed, the node becomes immediately editable, enabling users to type
+inline and customize the content.
+
+This action is perfect for adding labels, annotations, or descriptions in collaborative
+environments. Created text nodes are fully interactive, styleable, and synchronized
+across all connected users in real time.
+
+== Dependencies
+
+This action needs registered on the Weave instance the following element:
+
+* xref:main:build/nodes/text.adoc[Text] node
+
+== Usage
+
+=== Import the Action
+Start by importing the action:
+
+[source,ts]
+----
+import { WeaveTextToolAction } from "@inditextech/weave-sdk";
+----
+
+=== Register the Action
+Then register the action on the xref:sdk:api-reference/weave/index.adoc[Weave] class instance.
+
+[source,ts]
+----
+const instance = new Weave({
+  ...
+  actions: [
+    ...,
+    new WeaveTextToolAction(), // <.>
+  ]
+})
+----
+<.> Added in this step.
+
+=== Setup the action trigger
+Setup on a button or any element on the UI the user can interact with on the action event:
+
+[source,ts]
+----
+instance.triggerAction("textTool");
+----
+
+
+For example on a button on React:
+
+[source,tsx]
+----
+import React from "react";
+import { useWeave } from "@inditextech/weave-react";
+
+const MyTextToolTriggerComponent = () => {
+  const instance = useWeave((state) => state.instance);
+
+  const triggerTool = React.useCallback(() => {
+    instance.triggerAction("textTool");
+  }, [instance]);
+
+  return <button onClick={triggerTool}>Text Tool</button>;
+};
+----
+
+=== Trigger the action
+Finally a final user trigger the UI element that launches the action.
+
+
+When active the user can:
+
+* *Click* on the canvas, it will create a new text node.
+
+After the node is added it can be edited by *double-click* or *double-touch* on it.

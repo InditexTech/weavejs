@@ -1,0 +1,75 @@
+= Fit to Selection Tool
+:description: Set the zoom level so all the selected nodes are entirely visible on the screen
+
+image::actions/fit-to-selection-tool.gif[Fit to Selection Tool action on use on the Weave.js showcase,role="zoom-in"]
+
+== Introduction
+
+This action automatically adjusts the zoom and position of the Stage to ensure all
+selected nodes fit neatly within the viewport. It's perfect for focus the view on a
+selection.
+
+== Dependencies
+
+This action needs registered on the Weave instance the following elements:
+
+* xref:main:build/plugins/stage-zoom.adoc[Stage zoom] plugin
+
+== Usage
+
+=== Import the Action
+Start by importing the action:
+
+[source,ts]
+----
+import { WeaveFitToSelectionToolAction } from "@inditextech/weave-sdk";
+----
+
+=== Register the Action
+Then register the action on the xref:sdk:api-reference/weave/index.adoc[Weave] class instance.
+
+[source,ts]
+----
+const instance = new Weave({
+  ...
+  actions: [
+    ...,
+    new WeaveFitToSelectionToolAction(), // <.>
+  ]
+})
+----
+<.> Added in this step.
+
+=== Setup the action trigger
+Setup on a button or any element on the UI the user can interact with on the action event:
+
+[source,ts]
+----
+instance.triggerAction("fitToSelectionTool");
+----
+
+
+For example on a button on React:
+
+[source,tsx]
+----
+import React from "react";
+import { useWeave } from "@inditextech/weave-react";
+
+const MyFitToSelectionToolTriggerComponent = () => {
+  const instance = useWeave((state) => state.instance);
+
+  const triggerTool = React.useCallback(() => {
+    instance.triggerAction("fitToSelectionTool");
+  }, [instance]);
+
+  return <button onClick={triggerTool}>Fit to Selection Tool</button>;
+};
+----
+
+=== Trigger the action
+Finally a final user trigger the UI element that launches the action.
+
+
+When triggered finds the zoom level necessary to fit all the nodes of the canvas in the
+viewport and center on them, so they can be entirely visible.

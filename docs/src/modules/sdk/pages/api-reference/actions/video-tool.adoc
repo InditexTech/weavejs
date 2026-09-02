@@ -1,0 +1,130 @@
+= WeaveVideoToolAction
+:description: Add a video to the canvas
+
+== Overview
+
+The https://github.com/InditexTech/weavejs/blob/main/code/packages/sdk/src/actions/video-tool/video-tool.ts[WeaveVideoToolAction]
+class that enables users to insert video nodes into the canvas. It provides
+an intuitive way to add visual content—either by selecting a video file, dragging
+and dropping, or integrating with an video picker—allowing users to enhance their
+collaborative workspace with rich media.
+
+Each interaction results in the creation of a xref:sdk:api-reference/nodes/video.adoc[WeaveVideoNode],
+which can be resized, moved, and synchronized across all connected users.
+
+The class extends the xref:sdk:api-reference/actions/action.adoc[WeaveAction] class.
+
+== Name
+
+This action `name` property value is `videoTool`.
+
+== Import
+
+[source,shell]
+----
+import { WeaveVideoToolAction } from "@inditextech/weave-sdk";
+----
+
+== Instantiation
+
+[source,ts]
+----
+new WeaveVideoToolAction();
+----
+
+== TypeScript types
+
+[source,ts]
+----
+type WeaveVideoToolActionStateKeys = keyof typeof VIDEO_TOOL_STATE;
+type WeaveVideoToolActionState =
+  (typeof VIDEO_TOOL_STATE)[WeaveVideoToolActionStateKeys];
+
+type WeaveVideoToolDragParams = {
+  placeholderUrl: string;
+  url: string;
+  width: number;
+  height: number;
+};
+
+type WeaveVideoToolActionTriggerParams = {
+  videoId?: string;
+  videoParams?: WeaveVideoToolDragParams;
+  position?: Vector2d;
+  forceMainContainer?: boolean;
+};
+
+type WeaveVideoToolActionTriggerReturn =
+  | {
+      finishUploadCallback: (
+        videoParams: WeaveVideoToolDragParams,
+        position?: Vector2d,
+      ) => void;
+    }
+  | undefined;
+
+type WeaveVideoToolActionOnAddingEvent = { videoURL: string };
+type WeaveVideoToolActionOnAddedEvent = {
+  videoURL: string;
+  nodeId: string;
+};
+----
+
+== Trigger function params
+
+[source,ts]
+----
+trigger(cancelAction: () => void, params?: WeaveVideoToolActionTriggerParams): WeaveVideoToolActionTriggerReturn
+----
+
+For `WeaveVideoToolActionTriggerParams`:
+
+[cols="4*"]
+|===
+| Property | Type | Required | Description
+
+| mono:[videoId] | mono:[string] |  | An id to relate the video outside Weave.js
+| mono:[videoParams] | mono:[WeaveVideoToolDragParams] |  | Parameters for the video, for a video to be inserted, you need to define the video URL, video placeholder URL and its default width and height.
+| mono:[position] | mono:[Vector2d] |  | Position the image in this coordinates provided by the vector.
+| mono:[forceMainContainer] | mono:[boolean] |  | Force the image to be added in the main container and not on the container identified by the pointer.
+|===
+
+=== Drag & Drop from the same application
+
+When you implement drag & drop of a video loaded on a HTMLVideoElement that is located on the same application,
+on the `onDragStart` event you must call the `setDragAndDropProperties` method of the tool and define the following
+properties:
+
+* `videoId`: the video id (external resource id) associated to the image.
+* `videoParams`: the video parameters: video placeholder URL, video URL, video width and video height
+
+== Events
+
+=== onAddingVideo
+
+[source,ts]
+----
+onAddingVideo: WeaveNodesSelectionPluginOnNodesChangeEvent;
+----
+
+The `onAddingVideo` event is called when the tool is ready to add a video.
+
+=== onAddedVideo
+
+[source,ts]
+----
+onAddedVideo: WeaveVideoToolActionOnAddedEvent;
+----
+
+The `onAddedVideo` event is called when the video has been added to the canvas.
+
+== Methods
+
+=== setDragAndDropProperties
+
+[source,ts]
+----
+setDragAndDropProperties(properties: WeaveVideoToolDragAndDropProperties): void
+----
+
+The `setDragAndDropProperties` method set the necessary properties when drag & drop videos that are inside the application.

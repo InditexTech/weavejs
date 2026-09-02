@@ -1,0 +1,86 @@
+= Regular Polygon Tool (deprecated)
+:description: Add a regular polygon to the canvas
+
+.Deprecated
+[WARNING]
+====
+This action is deprecated. Use the xref:main:build/actions/polygon-tool.adoc[Polygon Tool] action instead.
+====
+
+image::actions/regular-polygon-tool.gif[Regular Polygon Tool action on use on the Weave.js showcase,role="zoom-in"]
+
+== Introduction
+
+This action enables users to create new regular polygons nodes on the canvas.
+
+== Dependencies
+
+This action needs registered on the Weave instance the following element:
+
+* xref:main:build/nodes/regular-polygon.adoc[Regular Polygon] node
+
+== Usage
+
+=== Import the Action
+Start by importing the action:
+
+[source,ts]
+----
+import { WeaveRegularPolygonToolAction } from "@inditextech/weave-sdk";
+----
+
+=== Register the Action
+Then register the action on the xref:sdk:api-reference/weave/index.adoc[Weave] class instance.
+
+[source,ts]
+----
+const instance = new Weave({
+  ...
+  actions: [
+    ...,
+    new WeaveRegularPolygonToolAction(), // <.>
+  ]
+})
+----
+<.> Added in this step.
+
+=== Setup the action trigger
+Setup on a button or any element on the UI the user can interact with on the action event:
+
+[source,ts]
+----
+instance.triggerAction("regularPolygonTool");
+----
+
+
+For example on a button on React:
+
+[source,tsx]
+----
+import React from "react";
+import { useWeave } from "@inditextech/weave-react";
+
+const MyRegularPolygonToolTriggerComponent = () => {
+  const instance = useWeave((state) => state.instance);
+
+  const triggerTool = React.useCallback(() => {
+    instance.triggerAction("regularPolygonTool");
+  }, [instance]);
+
+  return <button onClick={triggerTool}>Regular Polygon Tool</button>;
+};
+----
+
+=== Trigger the action
+Finally a final user trigger the UI element that launches the action.
+
+
+When active the user can:
+
+* *Click* on the canvas, it will create a regular polygon with a default size.
+* *Touch* on the canvas, it will create a regular polygon with a default size.
+* *Click & drag* to create a regular polygon and define its radius.
+
+Once clicked or click-drag finishes, the regular polygon is added to the canvas as a fully functional
+node—ready. This action integrates seamlessly with Weave.js's real-time state system,
+ensuring the new element appears instantly for all connected users.

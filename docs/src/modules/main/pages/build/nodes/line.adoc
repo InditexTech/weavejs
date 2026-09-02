@@ -1,0 +1,50 @@
+= Line (deprecated)
+:description: Draw a line on the canvas
+
+image::nodes/line.png[Line on Weave.js showcase,role="zoom-in"]
+
+The Line node represents a customizable straight or curved line on the canvas.
+Built on top of Konva’s https://konvajs.org/api/Konva.Line.html[Line], it supports
+features like multiple points, stroke color, width, dash patterns, and smoothing
+options.
+
+Line Nodes are ideal for drawing connectors, paths, or annotations between elements.
+They can be static or interactive, and are often used in diagramming tools,
+flow editors, and visual programming interfaces.
+
+== Usage
+
+=== Import the Node
+Start by importing the node:
+
+[source,ts]
+----
+import { WeaveLineNode } from "@inditextech/weave-sdk";
+----
+
+=== Register the Node
+Then register the node on the xref:sdk:api-reference/weave/index.adoc[Weave] class instance.
+
+[source,ts]
+----
+const instance = new Weave({
+  ...
+  nodes: [
+    ...,
+    new WeaveLineNode(), // <.>
+  ]
+})
+----
+<.> Added in this step.
+
+=== Use the node
+Once the node is registered you can use it on xref:main:build/actions/index.adoc[Actions] or
+xref:main:build/plugins/index.adoc[Plugins] or even other xref:main:build/nodes/index.adoc[Nodes].
+
+We provide two actions:
+
+* xref:main:build/actions/pen-tool.adoc[Pen Tool] that allows users to add Line nodes,
+to the application by specifying all segments one-by-one (a line is a collection of points,
+and lines are rendered among them).
+* xref:main:build/actions/brush-tool.adoc[Brush Tool] that allows users to add Line nodes,
+to the application by free-hand (mouse or digital pencil).

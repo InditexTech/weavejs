@@ -1,0 +1,67 @@
+= Users Selector
+:description: Showcase the selection of the users on the canvas
+
+image::plugins/users-selector.gif[Users selector plugin on use on the Weave.js showcase,role="zoom-in"]
+
+== Introduction
+
+This plugin displays real-time the user selection for all connected users on the
+canvas. Each selector is typically painted with the user related color, allowing
+collaborators to see where others are selecting in real time.
+
+This plugin enhances awareness and coordination in multi-user sessions, making
+collaboration feel more intuitive and dynamic. It integrates with Weave.js's
+presence system and updates instantly as users move their mouse or interact with
+the canvas.
+
+== Usage
+
+=== Import the Plugin
+Start by importing the plugin:
+
+[source,ts]
+----
+import { WeaveUsersSelectionPlugin } from "@inditextech/weave-sdk";
+----
+
+=== Register the Plugin
+Then register the plugin on the xref:sdk:api-reference/weave/index.adoc[Weave] class instance.
+
+[source,ts]
+----
+const getUser = () => { // <.>
+  id: 'user-id', // <.>
+  email: 'useremail@corp.com', // <.>
+  name: 'User' // <.>
+}
+
+const getUserColor = (user: WeaveUser) => getUserBackgroundColor(user?.name ?? "#000000") // <.>
+
+const instance = new Weave({
+  ...
+  plugins: [
+    ...,
+    new WeaveUsersSelectionPlugin({ // <.>
+      config: { // <.>
+        getUser, // <.>
+        getUserColor, // <.>
+      }, // <.>
+    }), // <.>
+  ]
+})
+----
+<.> Added in this step.
+<.> Added in this step.
+<.> Added in this step.
+<.> Added in this step.
+<.> Added in this step.
+<.> Added in this step.
+<.> Added in this step.
+<.> Added in this step.
+<.> Added in this step.
+<.> Added in this step.
+<.> Added in this step.
+
+=== Use the plugin
+Once the plugin is registered if more than one users are connected to the xref:main:glossary.adoc#room[room],
+the instance user will be able to see what the other users are selecting, and the others users can see theirs.

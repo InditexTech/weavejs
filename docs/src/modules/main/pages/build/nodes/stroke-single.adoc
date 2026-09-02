@@ -1,0 +1,42 @@
+= Stroke Single
+:description: Draw a single-stroke line on the canvas
+
+image::nodes/stroke-single.png[Single stroke on Weave.js showcase,role="zoom-in"]
+
+The Single Stroke node represents a customizable straight single-segment line on the canvas.
+It supports features like stroke color, width, dash patterns, and the possibility to define the line
+tips as: arrow, circle or square.
+
+== Usage
+
+=== Import the Node
+Start by importing the node:
+
+[source,ts]
+----
+import { WeaveStrokeSingleNode } from "@inditextech/weave-sdk";
+----
+
+=== Register the Node
+Then register the node on the xref:sdk:api-reference/weave/index.adoc[Weave] class instance.
+
+[source,ts]
+----
+const instance = new Weave({
+  ...
+  nodes: [
+    ...,
+    new WeaveStrokeSingleNode(), // <.>
+  ]
+})
+----
+<.> Added in this step.
+
+=== Use the node
+Once the node is registered you can use it on xref:main:build/actions/index.adoc[Actions] or
+xref:main:build/plugins/index.adoc[Plugins] or even other xref:main:build/nodes/index.adoc[Nodes].
+
+We provide a single action:
+
+* xref:main:build/actions/stroke-tool.adoc[Stroke Tool] that allows users to add single-stroke nodes,
+to the application by click-and-drag.

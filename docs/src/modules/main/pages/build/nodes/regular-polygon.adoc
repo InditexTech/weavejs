@@ -1,0 +1,50 @@
+= Regular Polygon (deprecated)
+:description: Draw a regular polygon on the canvas
+
+.Deprecated
+[WARNING]
+====
+This node is deprecated. Use the xref:main:build/nodes/polygon.adoc[Polygon] node instead.
+====
+
+image::nodes/regular-polygon.png[Regular Polygon on Weave.js showcase,role="zoom-in"]
+
+The Regular Polygon node is a simple, versatile primitive shape used to render star
+elements on the canvas. Built on top of Konva’s https://konvajs.org/api/Konva.RegularPolygon.html[RegularPolygon],
+it supports customizable properties such as amount of sides, position, radius, fill color, stroke, radius (on both axis),
+and more.
+
+They can also respond to interactions like dragging, resizing,
+or selection.
+
+== Usage
+
+=== Import the Node
+Start by importing the node:
+
+[source,ts]
+----
+import { WeaveRegularPolygonNode } from "@inditextech/weave-sdk";
+----
+
+=== Register the Node
+Then register the node on the xref:sdk:api-reference/weave/index.adoc[Weave] class instance.
+
+[source,ts]
+----
+const instance = new Weave({
+  ...
+  nodes: [
+    ...,
+    new WeaveRegularPolygonNode(), // <.>
+  ]
+})
+----
+<.> Added in this step.
+
+=== Use the node
+Once the node is registered you can use it on xref:main:build/actions/index.adoc[Actions] or
+xref:main:build/plugins/index.adoc[Plugins] or even other xref:main:build/nodes/index.adoc[Nodes].
+
+We provide an action named xref:main:build/actions/regular-polygon-tool.adoc[Regular Polygon Tool] that
+allows users to add Regular Polygon nodes to the application.

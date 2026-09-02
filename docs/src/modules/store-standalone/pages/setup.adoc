@@ -1,0 +1,23 @@
+= Setup
+:description: Standalone Store API setup
+
+== Dependencies
+
+=== External dependencies
+
+* https://www.npmjs.com/package/canvas[canvas] package
+* https://www.npmjs.com/package/yjs[yjs] package
+
+=== Package dependencies
+
+This package is dependant on:
+
+* xref:types:index.adoc[Weave.js types] package
+* xref:sdk:index.adoc[Weave.js SDK] package
+
+== Installation
+
+[source,shell]
+----
+npm install @inditextech/weave-store-standalone
+----

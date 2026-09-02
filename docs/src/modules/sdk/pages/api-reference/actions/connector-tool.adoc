@@ -1,0 +1,118 @@
+= WeaveConnectorToolAction
+:description: Add connector nodes to the canvas
+
+== Overview
+
+The https://github.com/InditexTech/weavejs/blob/main/code/packages/sdk/src/actions/connector-tool/connector-tool.ts[WeaveConnectorToolAction]
+class allows users to add connector to the canvas by click-and-click onto pre-defined anchors on the canvas elements.
+
+The class extends the xref:sdk:api-reference/actions/action.adoc[WeaveAction] class.
+
+== Name
+
+This action `name` property value is `connectorTool`.
+
+== Import
+
+[source,shell]
+----
+import { WeaveConnectorToolAction } from "@inditextech/weave-sdk";
+----
+
+== Instantiation
+
+[source,ts]
+----
+new WeaveConnectorToolAction(params?: WeaveConnectorToolActionParams);
+----
+
+== TypeScript types
+
+[source,ts]
+----
+type WeaveConnectorToolActionStateKeys = keyof typeof CONNECTOR_TOOL_STATE;
+type WeaveConnectorToolActionState =
+  (typeof CONNECTOR_TOOL_STATE)[WeaveConnectorToolActionStateKeys];
+
+type WeaveConnectorToolActionProperties = {
+  style: {
+    anchor: {
+      radius: number;
+      stroke: string;
+      strokeWidth: number;
+      fill: string;
+      selectedFill: string;
+      hoveredFill: string;
+    };
+    line: {
+      stroke: string;
+      strokeWidth: number;
+      dash: number[];
+    };
+  };
+};
+
+type WeaveConnectorToolActionParams = {
+  config: DeepPartial<WeaveConnectorToolActionProperties>;
+};
+----
+
+== Parameters
+
+For `WeaveConnectorToolActionParams`:
+
+[cols="4*"]
+|===
+| Property | Type | Required | Description
+
+| mono:[config] | mono:[Partial<WeaveConnectorToolActionProperties>] | label:green[Required] | Config parameters for the tool.
+|===
+
+For `WeaveConnectorToolActionProperties`:
+
+[cols="5*"]
+|===
+| Property | Type | Required | Default | Description
+
+| mono:[style.anchor.radius] | mono:[number] |  | mono:[7] | The anchor radius
+| mono:[style.anchor.stroke] | mono:[string] |  | mono:[#000000] | The anchor border color
+| mono:[style.anchor.strokeWidth] | mono:[string] |  | mono:[1] | The anchor border size (px)
+| mono:[style.anchor.fill] | mono:[string] |  | mono:[#FFFFFF] | The anchor fill color
+| mono:[style.anchor.selectedFill] | mono:[string] |  | mono:[#1a1aff] | The anchor fill color when selected
+| mono:[style.anchor.hoveredFill] | mono:[string] |  | mono:[#ff2c2c] | The anchor fill color when hovered
+| mono:[style.line.stroke] | mono:[string] |  | mono:[#000000] | The temporary connecting line when selecting the end anchor, this defines the border color
+| mono:[style.line.strokeWidth] | mono:[string] |  | mono:[1] | The temporary connecting line border size
+| mono:[style.line.dash] | mono:[string] |  | mono:[[\]] | The temporary connecting line dash pattern
+|===
+
+== Default values
+
+[source,ts]
+----
+const CONNECTOR_TOOL_ACTION_NAME = "connectorTool";
+
+const CONNECTOR_TOOL_STATE = {
+  ["IDLE"]: "idle",
+  ["SELECTING_INITIAL"]: "selecting_initial",
+  ["SELECTING_FINAL"]: "selecting_final",
+  ["ADDED"]: "added",
+} as const;
+
+const CONNECTOR_TOOL_DEFAULT_CONFIG: WeaveConnectorToolActionProperties = {
+  style: {
+    anchor: {
+      radius: 7,
+      stroke: "#000000",
+      strokeWidth: 1,
+      fill: "#FFFFFF",
+      selectedFill: "#1a1aff",
+      hoveredFill: "#ff2c2c",
+    },
+    line: {
+      stroke: "#000000",
+      strokeWidth: 1,
+      dash: [],
+    },
+  },
+};
+----

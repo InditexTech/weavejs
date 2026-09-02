@@ -1,0 +1,34 @@
+= WeavePenToolAction (deprecated)
+:description: Add line segments to the canvas
+
+== Overview
+
+The https://github.com/InditexTech/weavejs/blob/main/code/packages/sdk/src/actions/pen-tool/pen-tool.ts[WeavePenToolAction]
+class that allows users to draw precise, vector-based paths by clicking to place
+points and optionally closing or smoothing the resulting shape. Unlike the brush
+tool (which captures freehand strokes), the pen tool emphasizes structured line
+creation, making it ideal for diagrams, connectors, wireframes, and flow-based
+interactions.
+
+Each completed path becomes a xref:sdk:api-reference/nodes/line.adoc[WeaveLineNode],
+synced in real time across all collaborators.
+
+The class extends the xref:sdk:api-reference/actions/action.adoc[WeaveAction] class.
+
+== Name
+
+This action `name` property value is `penTool`.
+
+== Import
+
+[source,shell]
+----
+import { WeavePenToolAction } from "@inditextech/weave-sdk";
+----
+
+== Instantiation
+
+[source,ts]
+----
+new WeavePenToolAction();
+----
