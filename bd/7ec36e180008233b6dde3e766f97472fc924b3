@@ -1,0 +1,211 @@
+.agents/skills/docouture-authoring-guides/SKILL.md
+  s_ebd8c86a5c0803::t_d743d66145c242 1-170
+.agents/skills/docouture-authoring-guides/reference/additional-information.md
+  s_ebd8c86a5c0803::t_f8ca0e1807b1d9 1-507
+.agents/skills/docouture-authoring-guides/reference/contributing.md
+  s_ebd8c86a5c0803::t_c70782da6a31b5 1-93
+.agents/skills/docouture-authoring-guides/reference/getting-started.md
+  s_ebd8c86a5c0803::t_4e7f374f14a707 1-190
+.agents/skills/docouture-authoring-guides/reference/guides.md
+  s_ebd8c86a5c0803::t_7d155905e9f5ef 1-273
+.agents/skills/docouture-authoring-guides/reference/home.md
+  s_ebd8c86a5c0803::t_ae56accb9b8aad 1-198
+.agents/skills/docouture-authoring-guides/reference/overview.md
+  s_ebd8c86a5c0803::t_e48d884936f7f5 1-222
+.agents/skills/docouture-authoring-guides/reference/reference.md
+  s_ebd8c86a5c0803::t_1535d72f3f536e 1-310
+.agents/skills/docouture-authoring-guides/reference/skeletons/about.adoc
+  s_ebd8c86a5c0803::t_c7976be5e1d70c 1-32
+.agents/skills/docouture-authoring-guides/reference/skeletons/additional-information-overview.adoc
+  s_ebd8c86a5c0803::t_73113dfb36d33b 1-38
+.agents/skills/docouture-authoring-guides/reference/skeletons/architecture.adoc
+  s_ebd8c86a5c0803::t_ff97fc71afca75 1-22
+.agents/skills/docouture-authoring-guides/reference/skeletons/changelog-overview.adoc
+  s_ebd8c86a5c0803::t_131bb6f04ffb8c 1-14
+.agents/skills/docouture-authoring-guides/reference/skeletons/changelog-version.adoc
+  s_ebd8c86a5c0803::t_864faefc8deb47 1-28
+.agents/skills/docouture-authoring-guides/reference/skeletons/configuration.adoc
+  s_ebd8c86a5c0803::t_c364bf5f4046cb 1-36
+.agents/skills/docouture-authoring-guides/reference/skeletons/contributing-overview.adoc
+  s_ebd8c86a5c0803::t_82c6d8a9ed3b1d 1-26
+.agents/skills/docouture-authoring-guides/reference/skeletons/development.adoc
+  s_ebd8c86a5c0803::t_ddd6d12edf8c40 1-22
+.agents/skills/docouture-authoring-guides/reference/skeletons/eol.adoc
+  s_ebd8c86a5c0803::t_df5dfa850a6a7e 1-23
+.agents/skills/docouture-authoring-guides/reference/skeletons/faq.adoc
+  s_ebd8c86a5c0803::t_c75617399a6f31 1-41
+.agents/skills/docouture-authoring-guides/reference/skeletons/glossary-term-partial.adoc
+  s_ebd8c86a5c0803::t_d7adce5d610580 1
+.agents/skills/docouture-authoring-guides/reference/skeletons/glossary.adoc
+  s_ebd8c86a5c0803::t_a3abe448771b5e 1-21
+.agents/skills/docouture-authoring-guides/reference/skeletons/guides-overview.adoc
+  s_ebd8c86a5c0803::t_7ba0440a57196e 1-26
+.agents/skills/docouture-authoring-guides/reference/skeletons/home.adoc
+  s_ebd8c86a5c0803::t_000ef23b8bcb5a 1-86
+.agents/skills/docouture-authoring-guides/reference/skeletons/how-to-guide.adoc
+  s_ebd8c86a5c0803::t_f91dd78c453231 1-36
+.agents/skills/docouture-authoring-guides/reference/skeletons/migration-guides.adoc
+  s_ebd8c86a5c0803::t_5e308ecc22ced4 1-21
+.agents/skills/docouture-authoring-guides/reference/skeletons/prerequisites.adoc
+  s_ebd8c86a5c0803::t_f71770bef9cb7d 1-46
+.agents/skills/docouture-authoring-guides/reference/skeletons/quickstart.adoc
+  s_ebd8c86a5c0803::t_173a5bf59f766b 1-32
+.agents/skills/docouture-authoring-guides/reference/skeletons/reference-overview.adoc
+  s_ebd8c86a5c0803::t_701d362a57ba11 1-24
+.agents/skills/docouture-authoring-guides/reference/skeletons/release-notes-overview.adoc
+  s_ebd8c86a5c0803::t_00ea78ff1f3112 1-11
+.agents/skills/docouture-authoring-guides/reference/skeletons/release-notes-version.adoc
+  s_ebd8c86a5c0803::t_8cb2143c00e60f 1-29
+.agents/skills/docouture-authoring-guides/reference/skeletons/surface-api.adoc
+  s_ebd8c86a5c0803::t_d2d0bcfb722876 1-51
+.agents/skills/docouture-authoring-guides/reference/skeletons/surface-cli.adoc
+  s_ebd8c86a5c0803::t_1fee0dc219874b 1-32
+.agents/skills/docouture-docs-internals/SKILL.md
+  s_ebd8c86a5c0803::t_d7de3bd503a404 1-61
+.agents/skills/docouture-docs-internals/reference/antora-extensions.md
+  s_ebd8c86a5c0803::t_a1d53cce32cba0 1-54
+.agents/skills/docouture-docs-internals/reference/naming.md
+  s_ebd8c86a5c0803::t_bf64cc684e7b15 1-41
+.agents/skills/docouture-docs-internals/reference/page-patterns.md
+  s_ebd8c86a5c0803::t_1fc441e40914cf 1-285
+.agents/skills/docouture-docs-versioning/SKILL.md
+  s_ebd8c86a5c0803::t_0d7f55b243b4e9 1-37
+.agents/skills/docouture-docs-versioning/reference/releasing.md
+  s_ebd8c86a5c0803::t_b5c84697a8b20f 1-106
+.agents/skills/docouture-documenting-changes/SKILL.md
+  s_ebd8c86a5c0803::t_d28ae67e960b37 1-79
+.agents/skills/docouture-documenting-changes/reference/maintenance-loop.md
+  s_ebd8c86a5c0803::t_2d51247a959e9e 1-75
+.agents/skills/docouture-getting-started/SKILL.md
+  s_ebd8c86a5c0803::t_807a81232b5ae0 1-72
+.agents/skills/docouture-getting-started/reference/content-sourcing.md
+  s_ebd8c86a5c0803::t_33ce2ad288cd54 1-56
+.agents/skills/docouture-getting-started/reference/structure-planning.md
+  s_ebd8c86a5c0803::t_ce927d47108c48 1-152
+.agents/skills/docouture-writing-docs-pages/SKILL.md
+  s_ebd8c86a5c0803::t_e5a4735f815e3b 1-164
+.agents/skills/docouture-writing-docs-pages/reference/docouture-blocks.md
+  s_ebd8c86a5c0803::t_be9bea357f6b8d 1-170
+.agents/skills/docouture-writing-docs-pages/reference/language-basics.md
+  s_ebd8c86a5c0803::t_4e5d8b198592d0 1-402
+.claude/skills/docouture-authoring-guides
+  s_ebd8c86a5c0803::t_ad30e755fa4902 1
+.claude/skills/docouture-docs-internals
+  s_ebd8c86a5c0803::t_18839d8fbdd244 1
+.claude/skills/docouture-docs-versioning
+  s_ebd8c86a5c0803::t_ffb75993388673 1
+.claude/skills/docouture-documenting-changes
+  s_ebd8c86a5c0803::t_0f93b871ad6b5c 1
+.claude/skills/docouture-getting-started
+  s_ebd8c86a5c0803::t_950a27fc279271 1
+.claude/skills/docouture-writing-docs-pages
+  s_ebd8c86a5c0803::t_8d6799e8498d80 1
+agent/skills/docouture-authoring-guides/SKILL.md
+  s_ebd8c86a5c0803::t_d1a3e3ecc99cf0 1-168
+agent/skills/docouture-authoring-guides/reference/additional-information.md
+  s_ebd8c86a5c0803::t_587e388ea30ca7 1-507
+agent/skills/docouture-authoring-guides/reference/contributing.md
+  s_ebd8c86a5c0803::t_1412868c0210e2 1-93
+agent/skills/docouture-authoring-guides/reference/getting-started.md
+  s_ebd8c86a5c0803::t_85d72a7204cdfc 1-190
+agent/skills/docouture-authoring-guides/reference/guides.md
+  s_ebd8c86a5c0803::t_186e23728051bc 1-273
+agent/skills/docouture-authoring-guides/reference/home.md
+  s_ebd8c86a5c0803::t_73e9159462cf55 1-198
+agent/skills/docouture-authoring-guides/reference/overview.md
+  s_ebd8c86a5c0803::t_c3f15995f1ca4a 1-222
+agent/skills/docouture-authoring-guides/reference/reference.md
+  s_ebd8c86a5c0803::t_7e1149c8a4be71 1-310
+agent/skills/docouture-authoring-guides/reference/skeletons/about.adoc
+  s_ebd8c86a5c0803::t_04aaf08759e6f4 1-32
+agent/skills/docouture-authoring-guides/reference/skeletons/additional-information-overview.adoc
+  s_ebd8c86a5c0803::t_dece15bd203a7d 1-38
+agent/skills/docouture-authoring-guides/reference/skeletons/architecture.adoc
+  s_ebd8c86a5c0803::t_8b99ad968a078c 1-22
+agent/skills/docouture-authoring-guides/reference/skeletons/changelog-overview.adoc
+  s_ebd8c86a5c0803::t_01e95a28c772bd 1-14
+agent/skills/docouture-authoring-guides/reference/skeletons/changelog-version.adoc
+  s_ebd8c86a5c0803::t_710cfa5e8f2f3d 1-28
+agent/skills/docouture-authoring-guides/reference/skeletons/configuration.adoc
+  s_ebd8c86a5c0803::t_492bbbeb048127 1-36
+agent/skills/docouture-authoring-guides/reference/skeletons/contributing-overview.adoc
+  s_ebd8c86a5c0803::t_7264a606157700 1-26
+agent/skills/docouture-authoring-guides/reference/skeletons/development.adoc
+  s_ebd8c86a5c0803::t_6b20e8da73fc8c 1-22
+agent/skills/docouture-authoring-guides/reference/skeletons/eol.adoc
+  s_ebd8c86a5c0803::t_5ed12c5acf1fa2 1-23
+agent/skills/docouture-authoring-guides/reference/skeletons/faq.adoc
+  s_ebd8c86a5c0803::t_3cdccbe3e770a3 1-41
+agent/skills/docouture-authoring-guides/reference/skeletons/glossary-term-partial.adoc
+  s_ebd8c86a5c0803::t_dd73b3f76cb53e 1
+agent/skills/docouture-authoring-guides/reference/skeletons/glossary.adoc
+  s_ebd8c86a5c0803::t_0edc128a04e041 1-21
+agent/skills/docouture-authoring-guides/reference/skeletons/guides-overview.adoc
+  s_ebd8c86a5c0803::t_5318e3382cae0f 1-26
+agent/skills/docouture-authoring-guides/reference/skeletons/home.adoc
+  s_ebd8c86a5c0803::t_61dd16660351a4 1-86
+agent/skills/docouture-authoring-guides/reference/skeletons/how-to-guide.adoc
+  s_ebd8c86a5c0803::t_1bc0ddfec5dd93 1-36
+agent/skills/docouture-authoring-guides/reference/skeletons/migration-guides.adoc
+  s_ebd8c86a5c0803::t_8f4156010d2e88 1-21
+agent/skills/docouture-authoring-guides/reference/skeletons/prerequisites.adoc
+  s_ebd8c86a5c0803::t_973d20b5d6b6e8 1-46
+agent/skills/docouture-authoring-guides/reference/skeletons/quickstart.adoc
+  s_ebd8c86a5c0803::t_976f0739d0cb7f 1-32
+agent/skills/docouture-authoring-guides/reference/skeletons/reference-overview.adoc
+  s_ebd8c86a5c0803::t_f286b86f053f70 1-24
+agent/skills/docouture-authoring-guides/reference/skeletons/release-notes-overview.adoc
+  s_ebd8c86a5c0803::t_1eb77cff9c4990 1-11
+agent/skills/docouture-authoring-guides/reference/skeletons/release-notes-version.adoc
+  s_ebd8c86a5c0803::t_bf25da5d344a4b 1-29
+agent/skills/docouture-authoring-guides/reference/skeletons/surface-api.adoc
+  s_ebd8c86a5c0803::t_26a5c0d9886eb1 1-51
+agent/skills/docouture-authoring-guides/reference/skeletons/surface-cli.adoc
+  s_ebd8c86a5c0803::t_554508a970b442 1-32
+agent/skills/docouture-docs-internals/SKILL.md
+  s_ebd8c86a5c0803::t_a4714950ac3bc7 1-59
+agent/skills/docouture-docs-internals/reference/antora-extensions.md
+  s_ebd8c86a5c0803::t_487f47de99fe6d 1-54
+agent/skills/docouture-docs-internals/reference/naming.md
+  s_ebd8c86a5c0803::t_cc5f833d6ea03d 1-41
+agent/skills/docouture-docs-internals/reference/page-patterns.md
+  s_ebd8c86a5c0803::t_faf03c8fb23bc1 1-285
+agent/skills/docouture-docs-versioning/SKILL.md
+  s_ebd8c86a5c0803::t_0af66f432ad614 1-35
+agent/skills/docouture-docs-versioning/reference/releasing.md
+  s_ebd8c86a5c0803::t_14622739eabb8f 1-106
+agent/skills/docouture-documenting-changes/SKILL.md
+  s_ebd8c86a5c0803::t_d1e8de2e6a8326 1-77
+agent/skills/docouture-documenting-changes/reference/maintenance-loop.md
+  s_ebd8c86a5c0803::t_7d06fd0d1fce7c 1-75
+agent/skills/docouture-getting-started/SKILL.md
+  s_ebd8c86a5c0803::t_979d43f349f25f 1-70
+agent/skills/docouture-getting-started/reference/content-sourcing.md
+  s_ebd8c86a5c0803::t_40ee485b824c78 1-56
+agent/skills/docouture-getting-started/reference/structure-planning.md
+  s_ebd8c86a5c0803::t_42fd881d51acc3 1-152
+agent/skills/docouture-writing-docs-pages/SKILL.md
+  s_ebd8c86a5c0803::t_c62aa328f8ef7c 1-162
+agent/skills/docouture-writing-docs-pages/reference/docouture-blocks.md
+  s_ebd8c86a5c0803::t_c6dea2e97d30bf 1-170
+agent/skills/docouture-writing-docs-pages/reference/language-basics.md
+  s_ebd8c86a5c0803::t_a61136c3a40e82 1-402
+skills-lock.json
+  s_ebd8c86a5c0803::t_bcae2b5b460de3 22-57
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.22",
+  "base_commit_sha": "bd7ec36e180008233b6dde3e766f97472fc924b3",
+  "prompts": {},
+  "sessions": {
+    "s_ebd8c86a5c0803": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "ses_f9d43e410ffeW6Fm1Oz72GVxS0",
+        "model": "claude-sonnet-5"
+      },
+      "human_author": "Jesus Manuel Piñeiro Cid <jesusmpc@inditex.com>"
+    }
+  }
+}
