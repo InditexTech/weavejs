@@ -1,0 +1,28 @@
+.github/workflows/docouture-kroki-cache-warm.yml
+  h_c93d154c7c7074 40-44,48-50
+.github/workflows/docouture-pr-verify.yml
+  h_c93d154c7c7074 19-26,28-31
+.github/workflows/docouture-release-preview.yml
+  h_c93d154c7c7074 24,27-30,155-168
+.github/workflows/docouture-release.yml
+  h_c93d154c7c7074 23,35-56,82-83,108-117,120,122-124,335-353
+docs/.release-version
+  h_c93d154c7c7074 1
+docs/package-lock.json
+  h_c93d154c7c7074 12-16,324-326,333,344-346,358-360,375-377,388-390,2996-2998
+docs/package.json
+  h_c93d154c7c7074 19-23
+docs/scripts/check-links.mjs
+  h_c93d154c7c7074 66-67,143-164
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.22",
+  "base_commit_sha": "2c78149a0d619a1131bbad5cf8d4b5721bc917d3",
+  "prompts": {},
+  "humans": {
+    "h_c93d154c7c7074": {
+      "author": "Jesus Manuel Piñeiro Cid <jesusmpc@inditex.com>"
+    }
+  }
+}
