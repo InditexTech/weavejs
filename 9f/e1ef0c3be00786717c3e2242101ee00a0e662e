@@ -1,0 +1,19 @@
+code/packages/create-frontend-app/template/package.json
+  s_75a9b26c6ba864::t_16fe467a761c5b 38,50,73
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.22",
+  "base_commit_sha": "9fe1ef0c3be00786717c3e2242101ee00a0e662e",
+  "prompts": {},
+  "sessions": {
+    "s_75a9b26c6ba864": {
+      "agent_id": {
+        "tool": "github-copilot-cli",
+        "id": "1d16b3df-8757-400f-abd8-f99b1f180b1f",
+        "model": "claude-sonnet-5"
+      },
+      "human_author": "Alejandro Montes <alejandromogarcia@ext.inditex.com>"
+    }
+  }
+}
