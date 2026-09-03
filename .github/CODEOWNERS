@@ -1,0 +1,16 @@
+# These owners will be the default owners for everything in
+# the repo. Unless a later match takes precedence,
+# all users in this group will be requested
+# for review when someone opens a pull request.
+
+# Default reviewers
+* @InditexTech/weavejs-admins
+
+# Monorepo packages (sdk, react, renderer-konva-*, stores, create-*-app, types)
+/code/packages/ @InditexTech/weavejs-admins
+
+# Docs site (docouture/Antora)
+/docs/ @InditexTech/weavejs-admins
+
+# CI / GitHub configuration
+/.github/ @InditexTech/weavejs-admins
