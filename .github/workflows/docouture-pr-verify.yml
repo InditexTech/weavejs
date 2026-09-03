@@ -16,8 +16,19 @@ name: docouture-pr-verify
 # that file's own header) exists for exactly this: one content source,
 # `branches: HEAD`, so this always validates whatever the PR actually
 # changed — no `fetch-depth: 0` needed, since no other ref is ever read.
+#
+# Path-filtered so it doesn't run at all on a PR that touches neither `docs/`
+# content nor this file — nothing else in this job's build can be affected by
+# changes elsewhere in the repo. If this job (`Verify`, this workflow) is a
+# required status check in your own branch protection, confirm that's set up
+# to tolerate a skipped run (e.g. GitHub's "Do not require status checks on
+# creation" / rulesets' own equivalent) rather than blocking merges on a
+# check that now never reports for docs-untouched PRs.
 on:
-  pull_request: {}
+  pull_request:
+    paths:
+      - 'docs/**'
+      - '.github/workflows/docouture-pr-verify.yml'
 
 # Least-privilege default: this job only checks out the PR's own HEAD,
 # builds it, and checks links — it never writes to the repository, comments

@@ -63,8 +63,8 @@ const isExternal = (url) => /^https?:\/\//.test(url)
 // every other regex metacharacter so the rest of the string is matched
 // verbatim.
 function globToRegExp(glob) {
-  const escaped = glob.replace(/[.+^${}()|[\]\\]/g, '\\$&')
-  return new RegExp(escaped.replace(/\*/g, '.*').replace(/\?/g, '.'))
+  const escaped = glob.replace(/[.+^${}()|[\]\\]/g, String.raw`\$&`)
+  return new RegExp(escaped.replaceAll('*', '.*').replaceAll('?', '.'))
 }
 
 // `package.json`'s own "docouture" config block (see the scaffolded stub, next
@@ -140,6 +140,28 @@ const result = await check({
   path: 'build/site',
   recurse: true,
   linksToSkip: SKIP,
+  // linkinator's own default is 0 — NO application-level timeout at all
+  // (see its own README: "requests made by linkinator do not time out, or
+  // follow the settings of the OS"), which means `request.js`'s
+  // `AbortSignal.timeout(options.timeout)` is never even constructed. A
+  // real multi-page site can easily produce a few hundred *distinct*
+  // (not duplicate — linkinator already dedupes identical URLs, so this
+  // isn't a dedup gap) links to the same external host: think a
+  // CHANGELOG page with one github.com/…/pull/NNN link per entry, not
+  // just this template's own repo-link/edit-link. A burst that size can
+  // trip a host's own anonymous-crawler rate limiting (GitHub's included),
+  // and — unconfirmed upstream, but plausible and cheap to guard against
+  // either way — if that limiting responds slowly rather than rejecting
+  // fast, an unbounded request ties up one of `concurrency`'s 100 slots
+  // for however long the OS's own idle/keepalive timeout happens to be
+  // (which can be minutes), not a few seconds. 10s is generous for any
+  // real external page load; it only ever kicks in to cut a stalled
+  // socket loose instead of quietly inflating the whole crawl's wall-clock
+  // time. NOT a fix for "too many links to github.com" in general — those
+  // are real, individually-distinct links an author is vouching for, and
+  // correctly stay off `docouture.checkLinks.ignore` (see ignorePatterns()
+  // above) so a genuinely broken one still fails the build.
+  timeout: 10_000,
   // A plain 403/429 from a real external host (most commonly GitHub's own
   // bot/rate-limit protection kicking in on repo links, hit repeatedly
   // across every page of a freshly built site) can't be told apart from a
