@@ -1,0 +1,14 @@
+.github/CODEOWNERS
+  h_c93d154c7c7074 1-16
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.22",
+  "base_commit_sha": "e6aa5482d34c015d5b005010d627975fba689fb9",
+  "prompts": {},
+  "humans": {
+    "h_c93d154c7c7074": {
+      "author": "Jesus Manuel Piñeiro Cid <jesusmpc@inditex.com>"
+    }
+  }
+}
