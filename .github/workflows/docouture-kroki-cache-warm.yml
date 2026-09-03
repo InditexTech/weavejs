@@ -37,9 +37,17 @@ name: docouture-kroki-cache-warm
 #
 # Gated on `kroki-enabled` the same way those three are — no point warming a
 # cache for images a disabled site's build will never touch.
+#
+# Path-filtered for the same reason docouture-pr-verify.yml is: a push that
+# touches neither `docs/` nor this file has nothing for this job to usefully
+# warm a cache for. Nothing else in this repo depends on this job running,
+# so skipping it entirely (rather than a no-op run) is safe by construction.
 on:
   push:
     branches: ['main*']
+    paths:
+      - 'docs/**'
+      - '.github/workflows/docouture-kroki-cache-warm.yml'
 
 # Least-privilege default: this job only checks out the release/prerelease
 # branch it happened to run against, warms the Docker/Kroki image cache and

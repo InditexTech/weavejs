@@ -20,7 +20,7 @@ name: docouture-release
 # branch roles mean (trunk-based: both the same branch; git-flow: two
 # independently-named branches, e.g. `develop`/`main`).
 #
-# Two ways to run this, both deliberate acts rather than a side effect of an
+# Three ways to run this, all deliberate acts rather than a side effect of an
 # ordinary push:
 #
 #   1. workflow_dispatch — a person runs it by hand and supplies `version`
@@ -32,6 +32,28 @@ name: docouture-release
 #      versioned reads it from `docs/.release-version`, a plain-text file
 #      the PR itself commits with the target version — reviewed as part of
 #      that PR's diff, like any other change.
+#   3. Automatically, whenever a GitHub Release is published on this repo.
+#      Irrelevant unless this repo ALSO cuts its own code releases some other
+#      way, labelling the merged PR `release-type/*` (optionally
+#      `skip-release`) the way docouture's own repo does — nothing scaffolds
+#      that convention here, so on a fresh `docouture new` site this trigger
+#      simply never fires and the job below always takes path #2 instead.
+#      Kept anyway, disabled by omission rather than left out, so adopting
+#      that convention later is a label/workflow change only, not a rewrite
+#      of this file too.
+#
+#      Where it does apply: this overlaps with #2 — a single merged PR can
+#      carry BOTH `docs/release` and a `release-type/*` label (releasing
+#      code and docs together). If it did, and #2 fired unconditionally,
+#      this workflow would run twice for the one merge — once immediately
+#      (the `pull_request` close) and again once that other release job
+#      finishes and publishes its Release (the trigger added here). The
+#      job's own `if:` below avoids that: the `pull_request` branch only
+#      fires when a code release is NOT also about to happen for the same
+#      merge (no `release-type/*` label, or `skip-release` overrides it) —
+#      otherwise it backs off and leaves the job to trigger #3 instead, once
+#      that other workflow actually finishes. Either way this runs exactly
+#      once per merge, just not always at the same moment.
 #
 # Republishing (versioned only): a fix that needs to land on an
 # already-released version overwrites that version's tag — this workflow
@@ -57,6 +79,8 @@ on:
   pull_request:
     types: [closed]
     branches: ['main*']
+  release:
+    types: [published]
 
 permissions:
   contents: write
@@ -81,16 +105,23 @@ jobs:
     defaults:
       run:
         working-directory: docs
-    # workflow_dispatch always proceeds (it's already an explicit, deliberate
-    # act). The pull_request trigger fires on every close of a PR targeting
-    # the release branch — including ones that were closed unmerged, or
-    # merged without the label — so it only proceeds when both are true:
-    # actually merged, and carrying `docs/release`. Anything else is a
-    # no-op run, not an error.
+    # workflow_dispatch and a published Release both always proceed (already
+    # explicit, deliberate acts). The pull_request trigger fires on every
+    # close of a PR targeting the release branch — including ones that were
+    # closed unmerged, or merged without the label — so it only proceeds
+    # when merged, carrying `docs/release`, AND a same-merge code release is
+    # NOT also about to fire under the `release-type`/`skip-release`
+    # convention (see this file's own header comment on trigger #2/#3 — a
+    # no-op on a site that doesn't use that convention, since
+    # `release-type`/`skip-release` labels then never exist to contain).
+    # Anything else is a no-op run, not an error.
     if: >-
       github.event_name == 'workflow_dispatch' ||
+      github.event_name == 'release' ||
       (github.event.pull_request.merged == true &&
-        contains(github.event.pull_request.labels.*.name, 'docs/release'))
+        contains(github.event.pull_request.labels.*.name, 'docs/release') &&
+        (contains(github.event.pull_request.labels.*.name, 'skip-release') ||
+          !contains(join(github.event.pull_request.labels.*.name, ', '), 'release-type')))
     steps:
       - name: Require release branch
         # Only meaningful for a manual dispatch: someone could run this
@@ -298,6 +329,25 @@ jobs:
 
           if [ "$MODE" = "versioned" ] && [ "$VERSION" = "stable" ]; then
             echo "::error::'stable' is standalone's target name, not a valid versioned-mode version — use a real version, e.g. 1.2.0."
+            exit 1
+          fi
+
+          # Full SemVer 2.0.0 grammar (semver.org's own regex, rewritten with
+          # plain groups instead of `(?:...)` — bash's [[ =~ ]] runs glibc
+          # POSIX ERE, not PCRE, and doesn't understand non-capturing
+          # groups). Catches a hand-edited docs/.release-version (or a typo'd
+          # workflow_dispatch input) BEFORE any tag is pushed below — without
+          # this, a malformed value sails through here, tags and pushes fine
+          # in "Cut release"/"Push release tag", and only fails later inside
+          # "Bump release descriptor" (npm's `version patch` rejects
+          # non-semver input) — by which point the tag already exists but the
+          # job as a whole reads as failed, so the `publish` job below never
+          # runs. Prerelease/build-metadata suffixes (1.2.0-beta.1,
+          # 1.2.0+build) are valid SemVer and accepted; a leading 'v' or a
+          # bare '1.2' are not.
+          SEMVER_RE='^(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)(-(0|[1-9][0-9]*|[0-9]*[a-zA-Z-][0-9a-zA-Z-]*)(\.(0|[1-9][0-9]*|[0-9]*[a-zA-Z-][0-9a-zA-Z-]*))*)?(\+[0-9a-zA-Z-]+(\.[0-9a-zA-Z-]+)*)?$'
+          if [ "$MODE" = "versioned" ] && [ -n "$VERSION" ] && ! [[ "$VERSION" =~ $SEMVER_RE ]]; then
+            echo "::error::docs/.release-version (or the 'version' input) must be a valid SemVer version like 1.2.0 — got '${VERSION}'. See https://semver.org — prerelease/build metadata (1.2.0-beta.1, 1.2.0+build) is fine, a leading 'v' or a two-part '1.2' is not."
             exit 1
           fi
 

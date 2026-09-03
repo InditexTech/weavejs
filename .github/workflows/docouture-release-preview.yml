@@ -21,9 +21,13 @@ name: docouture-release-preview
 on:
   pull_request:
     types: [labeled, synchronize, ready_for_review, opened]
-    branches: ["main*"]
+    branches: ['main*']
 
 concurrency:
+  # Scoped per-PR, not just per-workflow: a bare 'release-preview' group name
+  # collides with this monorepo's own code-release_preview.yml, so a label
+  # change firing both workflows at once could have one cancel the other
+  # mid-run even though they preview unrelated releases.
   group: docouture-release-preview-${{ github.event.pull_request.number }}
   cancel-in-progress: true
 
@@ -145,6 +149,20 @@ jobs:
             gh pr comment ${{ github.event.number }} --body "
           ### :x: docs/release: no target version
           This site is on Versioned (Full History) mode, but no \`docs/.release-version\` file was found in this PR — add one with the target version (e.g. \`1.2.0\`) before merging with the \`docs/release\` label, or the release workflow will fail on merge."
+            exit 0
+          fi
+
+          # Same full SemVer 2.0.0 grammar docouture-release.yml's own
+          # "Validate version" step checks — see that step's own comment for
+          # why plain groups instead of `(?:...)` (bash's [[ =~ ]] runs glibc
+          # POSIX ERE, not PCRE). Catching this here, before merge, is the
+          # whole point of a preview: docouture-release.yml checks the same
+          # thing, but only finds out after the PR has already merged.
+          SEMVER_RE='^(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)(-(0|[1-9][0-9]*|[0-9]*[a-zA-Z-][0-9a-zA-Z-]*)(\.(0|[1-9][0-9]*|[0-9]*[a-zA-Z-][0-9a-zA-Z-]*))*)?(\+[0-9a-zA-Z-]+(\.[0-9a-zA-Z-]+)*)?$'
+          if [ "$MODE" = "versioned" ] && ! [[ "$VERSION" =~ $SEMVER_RE ]]; then
+            gh pr comment ${{ github.event.number }} --body "
+          ### :x: docs/release: invalid target version
+          \`docs/.release-version\` contains \`${VERSION}\`, which is not a valid SemVer version — use something like \`1.2.0\` (see https://semver.org). A leading \`v\` or a two-part \`1.2\` are not valid; the release workflow will fail on merge otherwise."
             exit 0
           fi
 
