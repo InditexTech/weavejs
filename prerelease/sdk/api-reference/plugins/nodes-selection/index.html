@@ -72,7 +72,7 @@
 
 <title>WeaveNodesSelectionPlugin | Weave.js</title>
 
-    <link rel="canonical" href="https://inditextech.github.io/weavejs/5.2.2/sdk/api-reference/plugins/nodes-selection/">
+    <link rel="canonical" href="https://inditextech.github.io/weavejs/5.3.0/sdk/api-reference/plugins/nodes-selection/">
     <link rel="prev" href="../copy-paste-nodes/">
     <link rel="next" href="../nodes-multi-selection-feedback/">
     <meta name="description" content="Activate support to select nodes on the canvas">
@@ -100,7 +100,7 @@
           <span class="dt-button__icon dt-button__icon-icon"><svg class="dt-icon" aria-hidden="true" focusable="false"><use href="../../../../../_/img/icons.svg#icon-menu"></use></svg></span>
         </span>
       </button>
-      <a class="header-toolbar__brand" href="../../../../../5.2.2/">
+      <a class="header-toolbar__brand" href="../../../../../5.3.0/">
         <img class="header-toolbar__logo" src="../../../../../_/product-logo.png" width="24" height="24" alt="">
         <span class="header-toolbar__product-name dt-text dt-text--label-l-high">Weave.js</span>
       </a>
@@ -124,10 +124,13 @@
       <span class="version__label">prerelease</span>
       <span class="dt-label dt-label--orange"><span class="dt-label__content">Prerelease</span></span>
     </span>
-    <a class="version" href="../../../../../5.2.2/sdk/api-reference/plugins/nodes-selection/">
-      <span class="version__label">5.2.2</span>
+    <a class="version" href="../../../../../5.3.0/sdk/api-reference/plugins/nodes-selection/">
+      <span class="version__label">5.3.0</span>
       <span class="dt-label dt-label--green"><span class="dt-label__content">Latest</span></span>
           </a>
+    <a class="version" href="../../../../../5.2.2/sdk/api-reference/plugins/nodes-selection/">
+      <span class="version__label">5.2.2</span>
+    </a>
     <a class="version" href="../../../../../5.2.1/sdk/api-reference/plugins/nodes-selection/">
       <span class="version__label">5.2.1</span>
     </a>
@@ -243,7 +246,7 @@
   </div>
 
 <div class="side-menu__brand">
-  <a class="side-menu__brand-link" href="../../../../../5.2.2/">
+  <a class="side-menu__brand-link" href="../../../../../5.3.0/">
     <img class="side-menu__brand-logo" src="../../../../../_/product-logo.png" width="40" height="40" alt="">
     <span class="side-menu__brand-title dt-text dt-text--title-m">Weave.js</span>
   </a>
@@ -1071,10 +1074,13 @@
       <span class="version__label">prerelease</span>
       <span class="dt-label dt-label--orange"><span class="dt-label__content">Prerelease</span></span>
     </span>
-    <a class="version" href="../../../../../5.2.2/sdk/api-reference/plugins/nodes-selection/">
-      <span class="version__label">5.2.2</span>
+    <a class="version" href="../../../../../5.3.0/sdk/api-reference/plugins/nodes-selection/">
+      <span class="version__label">5.3.0</span>
       <span class="dt-label dt-label--green"><span class="dt-label__content">Latest</span></span>
           </a>
+    <a class="version" href="../../../../../5.2.2/sdk/api-reference/plugins/nodes-selection/">
+      <span class="version__label">5.2.2</span>
+    </a>
     <a class="version" href="../../../../../5.2.1/sdk/api-reference/plugins/nodes-selection/">
       <span class="version__label">5.2.1</span>
     </a>
@@ -1215,12 +1221,15 @@ copying, or applying bulk actions on nodes.</p>
 <span class="line"><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">  maxScrollSpeed</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">: </span><span style="--shiki-light:#4EC9B0;--shiki-dark:#4EC9B0">number</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">;</span></span>
 <span class="line"><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">};</span></span>
 <span class="line"></span>
+<span class="line"><span style="--shiki-light:#569CD6;--shiki-dark:#569CD6">type</span><span style="--shiki-light:#4EC9B0;--shiki-dark:#4EC9B0"> WeaveNodesSelectionMode</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4"> = </span><span style="--shiki-light:#CE9178;--shiki-dark:#CE9178">'intersects'</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4"> | </span><span style="--shiki-light:#CE9178;--shiki-dark:#CE9178">'contains'</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">;</span></span>
+<span class="line"></span>
 <span class="line"><span style="--shiki-light:#569CD6;--shiki-dark:#569CD6">type</span><span style="--shiki-light:#4EC9B0;--shiki-dark:#4EC9B0"> WeaveNodesSelectionConfig</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4"> = {</span></span>
 <span class="line"><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">  selection</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">: </span><span style="--shiki-light:#4EC9B0;--shiki-dark:#4EC9B0">Konva</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">.</span><span style="--shiki-light:#4EC9B0;--shiki-dark:#4EC9B0">TransformerConfig</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">;</span></span>
 <span class="line"><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">  hover</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">: </span><span style="--shiki-light:#4EC9B0;--shiki-dark:#4EC9B0">Konva</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">.</span><span style="--shiki-light:#4EC9B0;--shiki-dark:#4EC9B0">TransformerConfig</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">;</span></span>
 <span class="line"><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">  selectionArea</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">: </span><span style="--shiki-light:#4EC9B0;--shiki-dark:#4EC9B0">Konva</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">.</span><span style="--shiki-light:#4EC9B0;--shiki-dark:#4EC9B0">RectConfig</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">;</span></span>
 <span class="line"><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">  panningWhenSelection</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">: </span><span style="--shiki-light:#4EC9B0;--shiki-dark:#4EC9B0">WeaveNodesSelectionPanningOnSelectionConfig</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">;</span></span>
 <span class="line"><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">  behaviors</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">: </span><span style="--shiki-light:#4EC9B0;--shiki-dark:#4EC9B0">WeaveNodesSelectionBehaviorsConfig</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">;</span></span>
+<span class="line"><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">  selectionMode</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">: </span><span style="--shiki-light:#4EC9B0;--shiki-dark:#4EC9B0">WeaveNodesSelectionMode</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">;</span></span>
 <span class="line"><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">};</span></span>
 <span class="line"></span>
 <span class="line"><span style="--shiki-light:#569CD6;--shiki-dark:#569CD6">type</span><span style="--shiki-light:#4EC9B0;--shiki-dark:#4EC9B0"> WeaveNodesSelectionPluginConfig</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4"> = </span><span style="--shiki-light:#4EC9B0;--shiki-dark:#4EC9B0">Partial</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">&#x3C;</span><span style="--shiki-light:#4EC9B0;--shiki-dark:#4EC9B0">WeaveNodesSelectionConfig</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">>;</span></span>
@@ -1267,16 +1276,18 @@ copying, or applying bulk actions on nodes.</p>
 </div>
 <div class="tableblock-wrap"><div class="tablecontainer"><table class="tableblock frame-all grid-all stretch">
 <colgroup>
-<col style="width: 25%;">
-<col style="width: 25%;">
-<col style="width: 25%;">
-<col style="width: 25%;">
+<col style="width: 20%;">
+<col style="width: 20%;">
+<col style="width: 20%;">
+<col style="width: 20%;">
+<col style="width: 20%;">
 </colgroup>
 <thead>
 <tr>
 <th class="tableblock halign-left valign-top">Property</th>
 <th class="tableblock halign-left valign-top">Type</th>
 <th class="tableblock halign-left valign-top">Required</th>
+<th class="tableblock halign-left valign-top">Default</th>
 <th class="tableblock halign-left valign-top">Description</th>
 </tr>
 </thead>
@@ -1285,11 +1296,13 @@ copying, or applying bulk actions on nodes.</p>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code class="dt-mono">selection</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code class="dt-mono">Konva.TransformerConfig</code></p></td>
 <td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Selector config (Konva Transformer configuration).</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code class="dt-mono">hover</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code class="dt-mono">Konva.TransformerConfig</code></p></td>
+<td class="tableblock halign-left valign-top"></td>
 <td class="tableblock halign-left valign-top"></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Hover config (Konva Transformer configuration).</p></td>
 </tr>
@@ -1297,11 +1310,13 @@ copying, or applying bulk actions on nodes.</p>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code class="dt-mono">selectionArea</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code class="dt-mono">Konva.RectConfig</code></p></td>
 <td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Selection Area style (Konva Rect configuration).</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code class="dt-mono">panningWhenSelection</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code class="dt-mono">WeaveNodesSelectionPanningOnSelectionConfig</code></p></td>
+<td class="tableblock halign-left valign-top"></td>
 <td class="tableblock halign-left valign-top"></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Panning when selecting by are configuration.</p></td>
 </tr>
@@ -1309,7 +1324,15 @@ copying, or applying bulk actions on nodes.</p>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code class="dt-mono">behaviors</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code class="dt-mono">WeaveNodesSelectionBehaviorsConfig</code></p></td>
 <td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Selection anchors behaviors configuration.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code class="dt-mono">selectionMode</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code class="dt-mono">WeaveNodesSelectionMode</code></p></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code class="dt-mono">intersects</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Drag-selection (marquee) hit-test mode. <code>'intersects'</code> selects any node whose bounding box overlaps the selection rectangle (default, matches prior behavior). <code>'contains'</code> selects a node only if its bounding box is fully enclosed by the selection rectangle; for a group node, containment is checked against the group&#8217;s own outer bounding box, not per child. Frame nodes are always selected by containment regardless of this setting.</p></td>
 </tr>
 </tbody>
 </table></div></div>
@@ -1636,7 +1659,7 @@ was exited.</p>
 <footer class="site-footer">
   <div class="dt-grid-layout dt-grid-layout--with-margin site-footer__grid">
     <div class="dt-grid-layout__item site-footer__col site-footer__brand">
-      <a class="site-footer__brand-link" href="../../../../../5.2.2/">
+      <a class="site-footer__brand-link" href="../../../../../5.3.0/">
         <img class="site-footer__logo" src="../../../../../_/product-logo.png" width="24" height="24" alt="">
         <span class="dt-text dt-text--label-l-high">Weave.js</span>
       </a>
