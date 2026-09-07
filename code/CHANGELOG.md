@@ -13,6 +13,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [5.3.0] - 2026-09-07
+
 ### Added
 
 - [#1158](https://github.com/InditexTech/weavejs/issues/1158) Opt-in "fully enclosed" (contains) mode for drag-selection
@@ -704,7 +706,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [1.1.0] - 2025-10-21
 
-###  Changed
+### Changed
 
 - [#738](https://github.com/InditexTech/weavejs/issues/738) Improve packaging
 
@@ -1920,7 +1922,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - [#24](https://github.com/InditexTech/weavejs/issues/24) Bug when loading rooms with text or images
 - [#18](https://github.com/InditexTech/weavejs/issues/18) Fix awareness not working on store-azure-web-pubsub
 
-[Unreleased]: https://github.com/InditexTech/weavejs/compare/5.2.2...HEAD
+[Unreleased]: https://github.com/InditexTech/weavejs/compare/5.3.0...HEAD
+
+[5.3.0]: https://github.com/InditexTech/weavejs/compare/5.2.2...5.3.0
 
 [5.2.2]: https://github.com/InditexTech/weavejs/compare/5.2.1...5.2.2
 
