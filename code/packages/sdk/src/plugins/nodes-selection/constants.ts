@@ -84,4 +84,5 @@ export const WEAVE_NODES_SELECTION_DEFAULT_CONFIG = {
   style: {
     dragOpacity: 0.75,
   },
+  selectionMode: 'intersects',
 };

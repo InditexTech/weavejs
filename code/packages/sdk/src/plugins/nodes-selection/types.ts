@@ -36,6 +36,8 @@ export type WeaveNodesSelectionPanningOnSelectionConfig = {
   maxScrollSpeed: number;
 };
 
+export type WeaveNodesSelectionMode = 'intersects' | 'contains';
+
 export type WeaveNodesSelectionConfig = {
   selection: Konva.TransformerConfig;
   hover: Konva.TransformerConfig;
@@ -43,6 +45,18 @@ export type WeaveNodesSelectionConfig = {
   panningWhenSelection: WeaveNodesSelectionPanningOnSelectionConfig;
   behaviors: WeaveNodesSelectionBehaviorsConfig;
   style: WeaveNodesSelectionStyleConfig;
+  /**
+   * Controls how a drag-selection rectangle picks up nodes:
+   * - 'intersects' (default): a node is selected if its bounding box merely
+   *   overlaps the drag rectangle.
+   * - 'contains': a node is selected only if its bounding box is fully
+   *   enclosed by the drag rectangle. For group nodes, containment is
+   *   checked against the group's own outer bounding box, not per child.
+   *
+   * Frame nodes are always selected using containment, regardless of this
+   * setting — that behavior predates this option and is unaffected by it.
+   */
+  selectionMode: WeaveNodesSelectionMode;
 };
 
 export type WeaveNodesSelectionStyleConfig = {

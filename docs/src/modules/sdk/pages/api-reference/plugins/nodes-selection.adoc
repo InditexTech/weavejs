@@ -83,12 +83,15 @@ type WeaveNodesSelectionPanningOnSelectionConfig = {
   maxScrollSpeed: number;
 };
 
+type WeaveNodesSelectionMode = 'intersects' | 'contains';
+
 type WeaveNodesSelectionConfig = {
   selection: Konva.TransformerConfig;
   hover: Konva.TransformerConfig;
   selectionArea: Konva.RectConfig;
   panningWhenSelection: WeaveNodesSelectionPanningOnSelectionConfig;
   behaviors: WeaveNodesSelectionBehaviorsConfig;
+  selectionMode: WeaveNodesSelectionMode;
 };
 
 type WeaveNodesSelectionPluginConfig = Partial<WeaveNodesSelectionConfig>;
@@ -111,15 +114,16 @@ For `WeaveNodesSelectionPluginParams`:
 
 For `WeaveNodesSelectionPluginConfig`:
 
-[cols="4*"]
+[cols="5*"]
 |===
-| Property | Type | Required | Description
+| Property | Type | Required | Default | Description
 
-| mono:[selection] | mono:[Konva.TransformerConfig] |  | Selector config (Konva Transformer configuration).
-| mono:[hover] | mono:[Konva.TransformerConfig] |  | Hover config (Konva Transformer configuration).
-| mono:[selectionArea] | mono:[Konva.RectConfig] |  | Selection Area style (Konva Rect configuration).
-| mono:[panningWhenSelection] | mono:[WeaveNodesSelectionPanningOnSelectionConfig] |  | Panning when selecting by are configuration.
-| mono:[behaviors] | mono:[WeaveNodesSelectionBehaviorsConfig] |  | Selection anchors behaviors configuration.
+| mono:[selection] | mono:[Konva.TransformerConfig] | | | Selector config (Konva Transformer configuration).
+| mono:[hover] | mono:[Konva.TransformerConfig] | | | Hover config (Konva Transformer configuration).
+| mono:[selectionArea] | mono:[Konva.RectConfig] | | | Selection Area style (Konva Rect configuration).
+| mono:[panningWhenSelection] | mono:[WeaveNodesSelectionPanningOnSelectionConfig] | | | Panning when selecting by are configuration.
+| mono:[behaviors] | mono:[WeaveNodesSelectionBehaviorsConfig] | | | Selection anchors behaviors configuration.
+| mono:[selectionMode] | mono:[WeaveNodesSelectionMode] | | mono:['intersects'] | Drag-selection (marquee) hit-test mode. `'intersects'` selects any node whose bounding box overlaps the selection rectangle (default, matches prior behavior). `'contains'` selects a node only if its bounding box is fully enclosed by the selection rectangle; for a group node, containment is checked against the group's own outer bounding box, not per child. Frame nodes are always selected by containment regardless of this setting.
 |===
 
 For `WeaveNodesSelectionPanningOnSelectionConfig`:
