@@ -1,0 +1,26 @@
+code/CHANGELOG.md
+  h_c93d154c7c7074 16-19
+code/packages/sdk/src/plugins/nodes-selection/__tests__/events/pointer-up.test.ts
+  h_c93d154c7c7074 497-652
+code/packages/sdk/src/plugins/nodes-selection/constants.ts
+  h_c93d154c7c7074 87
+code/packages/sdk/src/plugins/nodes-selection/events/pointer-up.ts
+  h_c93d154c7c7074 14-29,133-134,145-146,148,154-157
+code/packages/sdk/src/plugins/nodes-selection/types.ts
+  h_c93d154c7c7074 39-40,48-59
+docs/src/modules/main/pages/build/plugins/nodes-selection.adoc
+  h_c93d154c7c7074 46-47
+docs/src/modules/sdk/pages/api-reference/plugins/nodes-selection.adoc
+  h_c93d154c7c7074 86-87,94,117,119,121-126
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.22",
+  "base_commit_sha": "7c95a57fbbe42ea035b66c969dc808768b9b9199",
+  "prompts": {},
+  "humans": {
+    "h_c93d154c7c7074": {
+      "author": "Jesus Manuel Piñeiro Cid <jesusmpc@inditex.com>"
+    }
+  }
+}
