@@ -13,6 +13,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- [#1158](https://github.com/InditexTech/weavejs/issues/1158) Opt-in "fully enclosed" (contains) mode for drag-selection
+
 ## [5.2.2] - 2026-09-02
 
 ### Fixed

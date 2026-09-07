@@ -43,6 +43,8 @@ You can also:
 
 * Customize the transformer style.
 * Define if the user can multiple select or not.
+* Switch drag-selection (marquee) to only select nodes that are fully enclosed
+  by the selection rectangle, instead of the default overlap behavior.
 
 For more information check the xref:sdk:api-reference/plugins/nodes-selection.adoc[WeaveNodesSelectionPlugin]
 plugin API.

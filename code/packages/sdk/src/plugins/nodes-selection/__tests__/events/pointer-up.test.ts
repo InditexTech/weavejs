@@ -494,6 +494,162 @@ describe('handlePointerUp', () => {
     expect(setCall?.[0] ?? []).not.toContain(rectNode);
   });
 
+  it('commits area selection: selectionMode "contains" includes a rect fully inside the box', () => {
+    const ctx = makeCtx({
+      getConfiguration: vi.fn().mockReturnValue({
+        selectionArea: { strokeWidth: 1, dash: [4, 2] },
+        behaviors: { singleSelection: { enabled: true }, multipleSelection: { enabled: false } },
+        selectionMode: 'contains',
+      }),
+    });
+    const areaSelector = makeAreaSelector(true);
+    areaSelector.getBox.mockReturnValue({ x: 0, y: 0, width: 500, height: 500 });
+    (ctx.getAreaSelector as ReturnType<typeof vi.fn>).mockReturnValue(areaSelector);
+
+    const rectNode = makeNode({ nodeType: 'rect', id: 'r1' });
+    (rectNode.getClientRect as ReturnType<typeof vi.fn>).mockReturnValue({ x: 10, y: 10, width: 100, height: 100 });
+    (rectNode.getParent as ReturnType<typeof vi.fn>).mockReturnValue({ getAttrs: () => ({ nodeType: 'layer' }), getType: () => 'Layer' });
+
+    const weave = ctx.getWeaveInstance();
+    (weave.getInstanceRecursive as ReturnType<typeof vi.fn>).mockReturnValue({ getAttrs: () => ({ nodeType: 'layer' }) });
+
+    const stage = ctx.getWeaveInstance().getStage() as ReturnType<typeof makeStage>;
+    (stage.find as ReturnType<typeof vi.fn>).mockImplementation((fn: (n: unknown) => boolean) => {
+      return [rectNode].filter(fn);
+    });
+
+    handlePointerUp(ctx, makeEvent());
+    const tr = ctx.getTransformerController().getTransformer();
+    const setCall = (tr.nodes as ReturnType<typeof vi.fn>).mock.calls.find(
+      (call) => Array.isArray(call[0])
+    );
+    expect(setCall?.[0]).toContain(rectNode);
+  });
+
+  it('commits area selection: selectionMode "contains" excludes a rect only partially overlapping the box', () => {
+    const ctx = makeCtx({
+      getConfiguration: vi.fn().mockReturnValue({
+        selectionArea: { strokeWidth: 1, dash: [4, 2] },
+        behaviors: { singleSelection: { enabled: true }, multipleSelection: { enabled: false } },
+        selectionMode: 'contains',
+      }),
+    });
+    const areaSelector = makeAreaSelector(true);
+    areaSelector.getBox.mockReturnValue({ x: 0, y: 0, width: 150, height: 150 });
+    (ctx.getAreaSelector as ReturnType<typeof vi.fn>).mockReturnValue(areaSelector);
+
+    // Extends past the box (x/y + width/height > 150) → only partially overlapping.
+    const rectNode = makeNode({ nodeType: 'rect', id: 'r2' });
+    (rectNode.getClientRect as ReturnType<typeof vi.fn>).mockReturnValue({ x: 100, y: 100, width: 100, height: 100 });
+    (rectNode.getParent as ReturnType<typeof vi.fn>).mockReturnValue({ getAttrs: () => ({ nodeType: 'layer' }), getType: () => 'Layer' });
+
+    const weave = ctx.getWeaveInstance();
+    (weave.getInstanceRecursive as ReturnType<typeof vi.fn>).mockReturnValue({ getAttrs: () => ({ nodeType: 'layer' }) });
+
+    const stage = ctx.getWeaveInstance().getStage() as ReturnType<typeof makeStage>;
+    (stage.find as ReturnType<typeof vi.fn>).mockImplementation((fn: (n: unknown) => boolean) => {
+      return [rectNode].filter(fn);
+    });
+
+    handlePointerUp(ctx, makeEvent());
+    const tr = ctx.getTransformerController().getTransformer();
+    const setCall = (tr.nodes as ReturnType<typeof vi.fn>).mock.calls.find(
+      (call) => Array.isArray(call[0])
+    );
+    // Even though Konva.Util.haveIntersection is globally mocked to return true,
+    // 'contains' mode must not rely on it — the node must still be excluded.
+    expect(setCall?.[0] ?? []).not.toContain(rectNode);
+  });
+
+  it('commits area selection: selectionMode "contains" checks a group\'s own outer bounding box (fully inside → included)', () => {
+    const ctx = makeCtx({
+      getConfiguration: vi.fn().mockReturnValue({
+        selectionArea: { strokeWidth: 1, dash: [4, 2] },
+        behaviors: { singleSelection: { enabled: true }, multipleSelection: { enabled: false } },
+        selectionMode: 'contains',
+      }),
+    });
+    const areaSelector = makeAreaSelector(true);
+    areaSelector.getBox.mockReturnValue({ x: 0, y: 0, width: 500, height: 500 });
+    (ctx.getAreaSelector as ReturnType<typeof vi.fn>).mockReturnValue(areaSelector);
+
+    const groupNode = makeNode({ nodeType: 'group', id: 'g1' });
+    (groupNode.getClientRect as ReturnType<typeof vi.fn>).mockReturnValue({ x: 10, y: 10, width: 100, height: 100 });
+    (groupNode.getParent as ReturnType<typeof vi.fn>).mockReturnValue({ getAttrs: () => ({ nodeType: 'layer' }), getType: () => 'Layer' });
+
+    const weave = ctx.getWeaveInstance();
+    (weave.getInstanceRecursive as ReturnType<typeof vi.fn>).mockReturnValue({ getAttrs: () => ({ nodeType: 'layer' }) });
+
+    const stage = ctx.getWeaveInstance().getStage() as ReturnType<typeof makeStage>;
+    (stage.find as ReturnType<typeof vi.fn>).mockImplementation((fn: (n: unknown) => boolean) => {
+      return [groupNode].filter(fn);
+    });
+
+    handlePointerUp(ctx, makeEvent());
+    const tr = ctx.getTransformerController().getTransformer();
+    const setCall = (tr.nodes as ReturnType<typeof vi.fn>).mock.calls.find(
+      (call) => Array.isArray(call[0])
+    );
+    expect(setCall?.[0]).toContain(groupNode);
+  });
+
+  it('commits area selection: frame containment is unaffected by selectionMode "contains" (default frame behavior preserved)', () => {
+    const ctx = makeCtx({
+      getConfiguration: vi.fn().mockReturnValue({
+        selectionArea: { strokeWidth: 1, dash: [4, 2] },
+        behaviors: { singleSelection: { enabled: true }, multipleSelection: { enabled: false } },
+        selectionMode: 'contains',
+      }),
+    });
+    const areaSelector = makeAreaSelector(true);
+    areaSelector.getBox.mockReturnValue({ x: 0, y: 0, width: 500, height: 500 });
+    (ctx.getAreaSelector as ReturnType<typeof vi.fn>).mockReturnValue(areaSelector);
+
+    const frameNode = makeNode({ nodeType: 'frame', id: 'f1' });
+    (frameNode.getClientRect as ReturnType<typeof vi.fn>).mockReturnValue({ x: 10, y: 10, width: 100, height: 100 });
+    (frameNode.getParent as ReturnType<typeof vi.fn>).mockReturnValue({ getAttrs: () => ({ nodeType: 'layer' }) });
+
+    const stage = ctx.getWeaveInstance().getStage() as ReturnType<typeof makeStage>;
+    (stage.find as ReturnType<typeof vi.fn>).mockImplementation((fn: (n: unknown) => boolean) => {
+      return [frameNode].filter(fn);
+    });
+
+    handlePointerUp(ctx, makeEvent());
+    const tr = ctx.getTransformerController().getTransformer();
+    const setCall = (tr.nodes as ReturnType<typeof vi.fn>).mock.calls.find(
+      (call) => Array.isArray(call[0])
+    );
+    expect(setCall?.[0]).toContain(frameNode);
+  });
+
+  it('commits area selection: default selectionMode (unset) keeps today\'s intersects behavior for rect nodes', () => {
+    const ctx = makeCtx(); // getConfiguration has no selectionMode key, as in production defaults pre-feature
+    const areaSelector = makeAreaSelector(true);
+    // Box only partially overlaps the node's rect — under 'contains' this would be excluded,
+    // but haveIntersection is mocked to return true, so default 'intersects' must include it.
+    areaSelector.getBox.mockReturnValue({ x: 0, y: 0, width: 50, height: 50 });
+    (ctx.getAreaSelector as ReturnType<typeof vi.fn>).mockReturnValue(areaSelector);
+
+    const rectNode = makeNode({ nodeType: 'rect', id: 'r3' });
+    (rectNode.getClientRect as ReturnType<typeof vi.fn>).mockReturnValue({ x: 40, y: 40, width: 100, height: 100 });
+    (rectNode.getParent as ReturnType<typeof vi.fn>).mockReturnValue({ getAttrs: () => ({ nodeType: 'layer' }), getType: () => 'Layer' });
+
+    const weave = ctx.getWeaveInstance();
+    (weave.getInstanceRecursive as ReturnType<typeof vi.fn>).mockReturnValue({ getAttrs: () => ({ nodeType: 'layer' }) });
+
+    const stage = ctx.getWeaveInstance().getStage() as ReturnType<typeof makeStage>;
+    (stage.find as ReturnType<typeof vi.fn>).mockImplementation((fn: (n: unknown) => boolean) => {
+      return [rectNode].filter(fn);
+    });
+
+    handlePointerUp(ctx, makeEvent());
+    const tr = ctx.getTransformerController().getTransformer();
+    const setCall = (tr.nodes as ReturnType<typeof vi.fn>).mock.calls.find(
+      (call) => Array.isArray(call[0])
+    );
+    expect(setCall?.[0]).toContain(rectNode);
+  });
+
   it('resolves nodeId on a selected node via stage.findOne (lines 163-164)', () => {
     const ctx = makeCtx();
     const areaSelector = makeAreaSelector(true);

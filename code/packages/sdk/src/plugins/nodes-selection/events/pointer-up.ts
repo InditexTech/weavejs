@@ -12,6 +12,22 @@ import type { SelectionContext } from '../selection-context';
 import { handleClickOrTap } from './click-tap';
 
 /**
+ * Returns true when `inner` is fully enclosed within `outer` (an AABB
+ * containment test, as opposed to mere overlap/intersection).
+ */
+function isBoxContained(
+  outer: { x: number; y: number; width: number; height: number },
+  inner: { x: number; y: number; width: number; height: number }
+): boolean {
+  return (
+    inner.x >= outer.x &&
+    inner.y >= outer.y &&
+    inner.x + inner.width <= outer.x + outer.width &&
+    inner.y + inner.height <= outer.y + outer.height
+  );
+}
+
+/**
  * Handles the stage `pointerup` event: ends any in-progress area-selection
  * (including the node-filtering/commit step), or delegates to the click/tap
  * handler for point interactions.
@@ -114,6 +130,8 @@ export function handlePointerUp(
   const box = ctx.getAreaSelector().getBox();
   ctx.getAreaSelector().getRect().visible(false);
 
+  const selectionMode = ctx.getConfiguration().selectionMode ?? 'intersects';
+
   const selected = shapes.filter((shape) => {
     const shapeMutex = weave.getNodeMutexLock(shape.id());
     if (shapeMutex && shapeMutex.user.id !== actUser.id) return false;
@@ -124,34 +142,19 @@ export function handlePointerUp(
       parent = stage.findOne(`#${parent.getAttrs().nodeId}`) as Konva.Node;
     }
 
+    // Frames are always selected via containment — this predates
+    // `selectionMode` and is unaffected by it.
     if (shape.getAttrs().nodeType && shape.getAttrs().nodeType === 'frame') {
-      const frameBox = shape.getClientRect();
-      return (
-        frameBox.x >= box.x &&
-        frameBox.y >= box.y &&
-        frameBox.x + frameBox.width <= box.x + box.width &&
-        frameBox.y + frameBox.height <= box.y + box.height
-      );
+      return isBoxContained(box, shape.getClientRect());
     }
     if (
       shape.getAttrs().nodeType &&
-      shape?.getAttrs().nodeType === 'group' &&
       ['layer', 'frame'].includes(parent?.getAttrs().nodeType)
     ) {
-      return (
-        shape.getAttrs().nodeType &&
-        Konva.Util.haveIntersection(box, shape.getClientRect())
-      );
-    }
-    if (
-      shape.getAttrs().nodeType &&
-      shape.getAttrs().nodeType !== 'group' &&
-      ['layer', 'frame'].includes(parent?.getAttrs().nodeType)
-    ) {
-      return (
-        shape.getAttrs().nodeType &&
-        Konva.Util.haveIntersection(box, shape.getClientRect())
-      );
+      const shapeBox = shape.getClientRect();
+      return selectionMode === 'contains'
+        ? isBoxContained(box, shapeBox)
+        : Konva.Util.haveIntersection(box, shapeBox);
     }
     return false;
   });
