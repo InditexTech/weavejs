@@ -43,8 +43,29 @@ new WeaveTextNode(params?: WeaveTextNodeParams);
 ----
 type WeaveNodeTransformerProperties = Konva.TransformerConfig;
 
+type WeaveTextOutlineProperties =
+  | { enabled: true; color: string; width: number }
+  | { enabled: false };
+
+type WeaveTextEditionProperties = {
+  borderSize: number;
+};
+
+type WeaveTextCursorProperties = {
+  color: string;
+};
+
+type WeaveTextLinkProperties = {
+  defaultColor: string;
+  hoverColor: string;
+};
+
 type WeaveTextProperties = {
   transform: WeaveNodeTransformerProperties;
+  outline: WeaveTextOutlineProperties;
+  edition: WeaveTextEditionProperties;
+  cursor: WeaveTextCursorProperties;
+  link: WeaveTextLinkProperties;
 };
 
 type WeaveTextNodeParams = {
@@ -70,6 +91,10 @@ For `WeaveTextProperties`:
 | Property | Type | Required | Default | Description
 
 | mono:[transform] | mono:[object] |  | mono:[check default values] | Setup the transform properties for the text (if can be resized, rotated, anchors, etc.).
+| mono:[outline] | mono:[object] |  | mono:[{ enabled: false }] | Setup an outline (stroke) around the text glyphs.
+| mono:[edition] | mono:[object] |  | mono:[{ borderSize: 2 }] | Border size, in pixels, of the overlay shown while editing the text in-place.
+| mono:[cursor] | mono:[object] |  | mono:[{ color: "#000000" }] | Caret colour used by the in-place text editor.
+| mono:[link] | mono:[object] |  | mono:[check default values] | Default and hover colours applied to a text node once it has a `link` set — see the "Hyperlinks" section below.
 |===
 
 == Default values
@@ -98,4 +123,79 @@ const WEAVE_DEFAULT_TRANSFORM_PROPERTIES: WeaveNodeTransformerProperties = {
   borderStrokeWidth: 3,
   padding: 0,
 };
+
+const WEAVE_TEXT_NODE_DEFAULT_CONFIG: WeaveTextProperties = {
+  transform: WEAVE_DEFAULT_TRANSFORM_PROPERTIES,
+  outline: {
+    enabled: false,
+  },
+  cursor: {
+    color: "#000000",
+  },
+  edition: {
+    borderSize: 2,
+  },
+  link: {
+    defaultColor: "#1155ccff",
+    hoverColor: "#3d7be0ff",
+  },
+};
 ----
+
+== Hyperlinks
+
+A text node can link its whole text to an external URL by setting its `link` attribute (a
+plain string, part of the node's props like `fill` or `text`) to an absolute `http://` or
+`https://` URL — any other scheme (e.g. `javascript:`, `data:`) is rejected, both by the node's
+zod schema and again defensively before the link is opened, since the value is user-authored
+content that other collaborators will click on.
+
+Behaviour while `link` is set (per-node, does not affect nodes without a link):
+
+* The text is always rendered underlined and coloured with mono:[link.defaultColor], regardless
+  of the node's own `fill`/`textDecoration`. The real values are captured once, the first time a
+  link is applied, into two internal bookkeeping props — `linkPreviousFill` and
+  `linkPreviousTextDecoration` — and restored from there whenever the link is removed or the node
+  is re-serialized (e.g. after a resize, a drag, or exiting text-edit mode) while still linked, so
+  they're never lost to the forced link styling. These two props are managed automatically; don't
+  set them directly.
+* Hovering the text swaps its colour to mono:[link.hoverColor] and the cursor to a pointer.
+* Clicking opens the URL in a new tab (mono:[window.open(url, "_blank", "noopener,noreferrer")]).
+  Because a plain click on any node already means "select/drag it", opening the link uses two
+  gestures layered on top of that, both working identically on mouse and touch:
+** Clicking/tapping a text node that is *already selected* opens its link (a first click on an
+   unselected node still only selects it, same as any other node).
+** On desktop, holding kbd:[Ctrl] (or kbd:[Cmd] on macOS) while clicking opens the link
+   immediately, whether or not the node was already selected.
+* Rich/partial-text linking is out of scope — the link always applies to the node's entire text.
+
+=== Methods
+
+==== getLink
+
+[source,ts]
+----
+getLink(nodeInstance: WeaveElementInstance): string | undefined
+----
+
+Returns the URL currently set on the given text node instance, or mono:[undefined] if it has no link.
+
+==== setLink
+
+[source,ts]
+----
+setLink(nodeInstance: WeaveElementInstance, url: string): void
+----
+
+Sets (or replaces) the URL a text node links to. mono:[url] must be an absolute `http://` or
+`https://` URL; any other value is a no-op.
+
+==== removeLink
+
+[source,ts]
+----
+removeLink(nodeInstance: WeaveElementInstance): void
+----
+
+Removes the link from a text node. The node's original `fill`/`textDecoration` reappear
+immediately, since they were never altered while the link was set.

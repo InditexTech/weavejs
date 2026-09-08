@@ -58,6 +58,7 @@ export const augmentKonvaNodeClass = (
   Konva.Node.prototype.closeCrop = function () {};
   Konva.Node.prototype.resetCrop = function () {};
   Konva.Node.prototype.dblClick = function () {};
+  Konva.Node.prototype.click = function () {};
   Konva.Node.prototype.allowedAnchors = function () {
     return [];
   };

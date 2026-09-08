@@ -6,7 +6,7 @@
 
 import { describe, it, expect, vi, beforeAll, beforeEach, afterEach } from 'vitest';
 import Konva from 'konva';
-import { WeaveTextNode } from '../text';
+import { WeaveTextNode, isValidTextLink } from '../text';
 import {
   TEXT_LAYOUT,
   WEAVE_STAGE_TEXT_EDITION_MODE,
@@ -303,6 +303,50 @@ describe('WeaveTextNode', () => {
       const { node } = makeNode();
       const text = node.onRender(defaultProps()) as Konva.Text;
       expect(typeof text.getAttr('measureMultilineText')).toBe('function');
+    });
+
+    it('3.6 link set — forces underline + link default colour, ignoring stored fill/textDecoration', () => {
+      const { node } = makeNode({
+        link: { defaultColor: '#1155ccff', hoverColor: '#3d7be0ff' },
+      });
+      const text = node.onRender(
+        defaultProps({ link: 'https://example.com', fill: '#ff0000', textDecoration: 'line-through' })
+      ) as Konva.Text;
+      expect(text.textDecoration()).toBe('underline');
+      expect(text.fill()).toBe('#1155ccff');
+    });
+
+    it('3.7 no link — fill/textDecoration come straight from props', () => {
+      const { node } = makeNode();
+      const text = node.onRender(
+        defaultProps({ fill: '#ff0000', textDecoration: 'line-through' })
+      ) as Konva.Text;
+      expect(text.textDecoration()).toBe('line-through');
+      expect(text.fill()).toBe('#ff0000');
+    });
+
+    it('3.8 link set for the first time — captures linkPreviousFill/linkPreviousTextDecoration from props', () => {
+      const { node } = makeNode();
+      const text = node.onRender(
+        defaultProps({ link: 'https://example.com', fill: '#ff0000', textDecoration: 'line-through' })
+      ) as Konva.Text;
+      expect(text.getAttr('linkPreviousFill')).toBe('#ff0000');
+      expect(text.getAttr('linkPreviousTextDecoration')).toBe('line-through');
+    });
+
+    it('3.9 link set, capture already present in props (e.g. loaded from persisted state) — keeps it, does not recapture the (already overridden) fill', () => {
+      const { node } = makeNode();
+      const text = node.onRender(
+        defaultProps({
+          link: 'https://example.com',
+          fill: '#1155ccff', // already the link's forced colour
+          textDecoration: 'underline',
+          linkPreviousFill: '#ff0000', // the real original, captured earlier
+          linkPreviousTextDecoration: 'line-through',
+        })
+      ) as Konva.Text;
+      expect(text.getAttr('linkPreviousFill')).toBe('#ff0000');
+      expect(text.getAttr('linkPreviousTextDecoration')).toBe('line-through');
     });
   });
 
@@ -832,6 +876,101 @@ describe('WeaveTextNode', () => {
       }));
     });
 
+    it('12.2b link present — forces underline + link default colour', () => {
+      const { node } = makeNode({
+        link: { defaultColor: '#1155ccff', hoverColor: '#3d7be0ff' },
+      });
+      const nodeInstance = new Konva.Text({ id: 'text-1' });
+      const setAttrsSpy = vi.spyOn(nodeInstance, 'setAttrs');
+      node.onUpdate(nodeInstance, defaultProps({ link: 'https://example.com', fill: '#ff0000' }));
+      expect(setAttrsSpy).toHaveBeenCalledWith(expect.objectContaining({
+        textDecoration: 'underline',
+        fill: '#1155ccff',
+      }));
+    });
+
+    it('12.2c link removed — original fill/textDecoration from props applied again', () => {
+      const { node } = makeNode();
+      const nodeInstance = new Konva.Text({ id: 'text-1' });
+      const setAttrsSpy = vi.spyOn(nodeInstance, 'setAttrs');
+      node.onUpdate(nodeInstance, defaultProps({ fill: '#ff0000', textDecoration: 'line-through' }));
+      expect(setAttrsSpy).toHaveBeenCalledWith(expect.objectContaining({
+        textDecoration: 'line-through',
+        fill: '#ff0000',
+      }));
+    });
+
+    it('12.2d link set for the first time — captures linkPreviousFill/linkPreviousTextDecoration from nextProps', () => {
+      const { node } = makeNode();
+      const nodeInstance = new Konva.Text({ id: 'text-1' });
+      const setAttrsSpy = vi.spyOn(nodeInstance, 'setAttrs');
+      node.onUpdate(
+        nodeInstance,
+        defaultProps({ link: 'https://example.com', fill: '#ff0000', textDecoration: 'line-through' })
+      );
+      expect(setAttrsSpy).toHaveBeenCalledWith(expect.objectContaining({
+        linkPreviousFill: '#ff0000',
+        linkPreviousTextDecoration: 'line-through',
+      }));
+    });
+
+    it('12.2e link already had a capture — keeps it, does not recapture the (already overridden) live fill', () => {
+      const { node } = makeNode();
+      const nodeInstance = new Konva.Text({ id: 'text-1', fill: '#1155ccff', textDecoration: 'underline' });
+      const setAttrsSpy = vi.spyOn(nodeInstance, 'setAttrs');
+      node.onUpdate(
+        nodeInstance,
+        defaultProps({
+          link: 'https://example.com',
+          fill: '#1155ccff',
+          textDecoration: 'underline',
+          linkPreviousFill: '#ff0000',
+          linkPreviousTextDecoration: 'line-through',
+        })
+      );
+      expect(setAttrsSpy).toHaveBeenCalledWith(expect.objectContaining({
+        linkPreviousFill: '#ff0000',
+        linkPreviousTextDecoration: 'line-through',
+      }));
+    });
+
+    it('12.2f full lifecycle — set link, re-serialize mid-way (simulating a resize/drag), then remove: true original survives throughout', () => {
+      const { node } = makeNode({
+        link: { defaultColor: '#1155ccff', hoverColor: '#3d7be0ff' },
+      });
+      const nodeInstance = new Konva.Text({ id: 'text-1', fill: '#ff0000', textDecoration: 'line-through' });
+
+      // 1. Link gets set (e.g. via setLink()/a direct updateNode()) — state
+      //    now carries the link plus the true original fill/textDecoration.
+      let state = defaultProps({
+        link: 'https://example.com',
+        fill: '#ff0000',
+        textDecoration: 'line-through',
+      });
+      node.onUpdate(nodeInstance, state);
+      expect(nodeInstance.getAttr('linkPreviousFill')).toBe('#ff0000');
+
+      // 2. Something re-serializes the node while linked (a resize/drag/
+      //    edit-exit all do this) — must NOT persist the live override.
+      const midway = node.serialize(nodeInstance);
+      expect(midway.props.fill).toBe('#ff0000');
+      expect(midway.props.textDecoration).toBe('line-through');
+      expect(midway.props.link).toBe('https://example.com');
+
+      // 3. State round-trips back through onUpdate (as it would after the
+      //    updateNode() call above reaches this same client).
+      state = midway.props;
+      node.onUpdate(nodeInstance, state);
+
+      // 4. Link finally gets removed.
+      const afterRemove = node.serialize(nodeInstance);
+      delete afterRemove.props.link;
+      delete afterRemove.props.linkPreviousFill;
+      delete afterRemove.props.linkPreviousTextDecoration;
+      expect(afterRemove.props.fill).toBe('#ff0000');
+      expect(afterRemove.props.textDecoration).toBe('line-through');
+    });
+
     it('12.3 layout=AUTO_ALL — computes width/height from textRenderedSize', () => {
       const { node, mock } = makeNode();
       mock._stage.scaleX.mockReturnValue(1);
@@ -1009,6 +1148,65 @@ describe('WeaveTextNode', () => {
       const result = node.serialize(instance);
       expect(result.props.isCloned).toBeUndefined();
       expect(result.props.isCloneOrigin).toBeUndefined();
+    });
+
+    // Regression coverage: onRender()/onUpdate() apply the link's forced
+    // fill/textDecoration directly onto the live Konva node's own attrs (the
+    // same attrs getAttrs()/serialize() read) — so without this restoration,
+    // ANY serialize() call on a linked node (a resize, a drag, exiting text
+    // edit mode, ...) would read back the override and persist it as if it
+    // were the real value, permanently losing the user's original style the
+    // very first time any such interaction happened while linked.
+    it('13.6 link present with linkPreviousFill/linkPreviousTextDecoration captured — restores the true values, not the live (overridden) ones', () => {
+      const { node } = makeNode();
+      const instance = new Konva.Text({
+        id: 'text-abc',
+        nodeType: 'text',
+        link: 'https://example.com',
+        // What the live node currently looks like — i.e. what onRender()/
+        // onUpdate() forced while the link is active.
+        fill: '#1155ccff',
+        textDecoration: 'underline',
+        // What onRender()/onUpdate() captured as the true original.
+        linkPreviousFill: '#ff0000',
+        linkPreviousTextDecoration: 'line-through',
+      });
+      const result = node.serialize(instance);
+      expect(result.props.fill).toBe('#ff0000');
+      expect(result.props.textDecoration).toBe('line-through');
+      // The bookkeeping itself is preserved (not stripped) so it keeps
+      // surviving further serialize() calls until removeLink() clears it.
+      expect(result.props.linkPreviousFill).toBe('#ff0000');
+      expect(result.props.linkPreviousTextDecoration).toBe('line-through');
+    });
+
+    it('13.7 no link — fill/textDecoration passed through untouched even if stale linkPrevious* attrs linger', () => {
+      const { node } = makeNode();
+      const instance = new Konva.Text({
+        id: 'text-abc',
+        nodeType: 'text',
+        fill: '#00ff00',
+        textDecoration: '',
+        linkPreviousFill: '#ff0000',
+        linkPreviousTextDecoration: 'line-through',
+      });
+      const result = node.serialize(instance);
+      expect(result.props.fill).toBe('#00ff00');
+      expect(result.props.textDecoration).toBe('');
+    });
+
+    it('13.8 link present but no capture yet — fill/textDecoration pass through as-is (nothing to restore from)', () => {
+      const { node } = makeNode();
+      const instance = new Konva.Text({
+        id: 'text-abc',
+        nodeType: 'text',
+        link: 'https://example.com',
+        fill: '#1155ccff',
+        textDecoration: 'underline',
+      });
+      const result = node.serialize(instance);
+      expect(result.props.fill).toBe('#1155ccff');
+      expect(result.props.textDecoration).toBe('underline');
     });
   });
 
@@ -1747,6 +1945,15 @@ describe('WeaveTextNode', () => {
       expect(withStroke.props.stroke).toBe('#abc');
       expect(withStroke.props.strokeWidth).toBe(3);
     });
+
+    it('25.4 link included only when provided', () => {
+      const base = WeaveTextNode.defaultState('n-1');
+      const withLink = WeaveTextNode.addNodeState(base, defaultProps({ link: 'https://example.com' }));
+      expect(withLink.props.link).toBe('https://example.com');
+
+      const withoutLink = WeaveTextNode.addNodeState(base, defaultProps());
+      expect(withoutLink.props.link).toBeUndefined();
+    });
   });
 
   // ---------------------------------------------------------------------------
@@ -1765,6 +1972,12 @@ describe('WeaveTextNode', () => {
       const base = WeaveTextNode.defaultState('n-1');
       const withHeight = WeaveTextNode.updateNodeState(base, defaultProps({ height: 200 }));
       expect(withHeight.props.height).toBe(200);
+    });
+
+    it('26.3 link included only when provided', () => {
+      const base = WeaveTextNode.defaultState('n-1');
+      const withLink = WeaveTextNode.updateNodeState(base, defaultProps({ link: 'https://example.com' }));
+      expect(withLink.props.link).toBe('https://example.com');
     });
   });
 
@@ -1848,6 +2061,36 @@ describe('WeaveTextNode', () => {
       const schema = WeaveTextNode.getSchema();
       const result = schema.safeParse(validPayload({ fontStyle: '700' }));
       expect(result.success).toBe(true);
+    });
+
+    it('27.9 link omitted — passes (plain text node)', () => {
+      const schema = WeaveTextNode.getSchema();
+      const result = schema.safeParse(validPayload());
+      expect(result.success).toBe(true);
+    });
+
+    it('27.10 valid https link — passes', () => {
+      const schema = WeaveTextNode.getSchema();
+      const result = schema.safeParse(validPayload({ link: 'https://example.com/page' }));
+      expect(result.success).toBe(true);
+    });
+
+    it('27.11 valid http link — passes', () => {
+      const schema = WeaveTextNode.getSchema();
+      const result = schema.safeParse(validPayload({ link: 'http://example.com' }));
+      expect(result.success).toBe(true);
+    });
+
+    it('27.12 javascript: scheme — rejected', () => {
+      const schema = WeaveTextNode.getSchema();
+      const result = schema.safeParse(validPayload({ link: 'javascript:alert(1)' }));
+      expect(result.success).toBe(false);
+    });
+
+    it('27.13 not a URL at all — rejected', () => {
+      const schema = WeaveTextNode.getSchema();
+      const result = schema.safeParse(validPayload({ link: 'not a url' }));
+      expect(result.success).toBe(false);
     });
   });
 
@@ -2160,6 +2403,307 @@ describe('WeaveTextNode', () => {
       (node as any).updateTextAreaDOM(textNode);
       expect(visibleSpy).toHaveBeenCalledWith(true);
       expect(visibleSpy).not.toHaveBeenCalledWith(false);
+    });
+  });
+
+  // ---------------------------------------------------------------------------
+  // Suite 33 — link hover colour + cursor
+  // ---------------------------------------------------------------------------
+
+  describe('setupLinkBehavior() — hover colour + cursor', () => {
+    it('33.1 handleMouseover — link set — swaps fill to hoverColor', () => {
+      const { node } = makeNode({
+        link: { defaultColor: '#1155ccff', hoverColor: '#3d7be0ff' },
+      });
+      const text = node.onRender(defaultProps({ link: 'https://example.com' })) as Konva.Text;
+      text.handleMouseover?.({} as never);
+      expect(text.fill()).toBe('#3d7be0ff');
+    });
+
+    it('33.2 handleMouseover — no link — fill untouched', () => {
+      const { node } = makeNode({
+        link: { defaultColor: '#1155ccff', hoverColor: '#3d7be0ff' },
+      });
+      const text = node.onRender(defaultProps({ fill: '#ff0000' })) as Konva.Text;
+      text.handleMouseover?.({} as never);
+      expect(text.fill()).toBe('#ff0000');
+    });
+
+    it('33.3 handleMouseout — link set — reverts fill to link defaultColor', () => {
+      const { node } = makeNode({
+        link: { defaultColor: '#1155ccff', hoverColor: '#3d7be0ff' },
+      });
+      const text = node.onRender(defaultProps({ link: 'https://example.com' })) as Konva.Text;
+      text.fill('#3d7be0ff');
+      text.handleMouseout?.({} as never);
+      expect(text.fill()).toBe('#1155ccff');
+    });
+
+    it('33.4 defineMousePointer — pointer when link set, default otherwise', () => {
+      const { node } = makeNode();
+      const linked = node.onRender(defaultProps({ link: 'https://example.com' })) as Konva.Text;
+      const plain = node.onRender(defaultProps({ id: 'text-2' })) as Konva.Text;
+      expect(linked.defineMousePointer?.()).toBe('pointer');
+      expect(plain.defineMousePointer?.()).toBe('default');
+    });
+  });
+
+  // ---------------------------------------------------------------------------
+  // Suite 34 — click-to-open (text.click() property hook)
+  // ---------------------------------------------------------------------------
+
+  // Regression coverage for: once a node is selected, its hit area is covered
+  // by the Transformer's own overdraw shape (used to drag-move the whole
+  // selection), so a `text.on('pointerclick', ...)` Konva event listener
+  // registered directly on the node would silently stop firing the moment
+  // the node becomes selected — i.e. exactly the "click on an already
+  // selected linked text node" case this feature depends on. That's why
+  // click-to-open is wired through the `click()`/`dblClick()` property hooks
+  // (invoked directly by click-tap.ts on the resolved real node, the same
+  // way double-click-to-edit already works regardless of selection state)
+  // instead of a raw Konva event — these tests call those hooks directly,
+  // the same way click-tap.ts does, rather than simulating Konva events.
+  describe('setupLinkBehavior() — click to open link', () => {
+    it('34.1 no link — click() is a no-op even with Ctrl held', () => {
+      const { node } = makeNode();
+      const text = node.onRender(defaultProps()) as Konva.Text;
+      const openSpy = vi.spyOn(window, 'open').mockImplementation(() => null);
+      text.click({ wasSelected: false, ctrlOrMetaPressed: true });
+      expect(openSpy).not.toHaveBeenCalled();
+      openSpy.mockRestore();
+    });
+
+    it('34.2 Ctrl/Cmd+Click — opens immediately, no prior selection required', () => {
+      const { node } = makeNode();
+      const text = node.onRender(defaultProps({ link: 'https://example.com' })) as Konva.Text;
+      const openSpy = vi.spyOn(window, 'open').mockImplementation(() => null);
+      text.click({ wasSelected: false, ctrlOrMetaPressed: true });
+      expect(openSpy).toHaveBeenCalledWith('https://example.com', '_blank', 'noopener,noreferrer');
+      openSpy.mockRestore();
+    });
+
+    it('34.3 plain click, node not selected before the gesture — does not open', () => {
+      const { node } = makeNode();
+      const text = node.onRender(defaultProps({ link: 'https://example.com' })) as Konva.Text;
+      const openSpy = vi.spyOn(window, 'open').mockImplementation(() => null);
+      text.click({ wasSelected: false, ctrlOrMetaPressed: false });
+      expect(openSpy).not.toHaveBeenCalled();
+      openSpy.mockRestore();
+    });
+
+    it('34.4 plain click, node already selected before the gesture — opens after the double-click guard window', async () => {
+      const { node } = makeNode();
+      const text = node.onRender(defaultProps({ link: 'https://example.com' })) as Konva.Text;
+      const openSpy = vi.spyOn(window, 'open').mockImplementation(() => null);
+      text.click({ wasSelected: true, ctrlOrMetaPressed: false });
+      expect(openSpy).not.toHaveBeenCalled(); // not yet — debounced
+      await new Promise((resolve) => setTimeout(resolve, Konva.dblClickWindow + 30));
+      expect(openSpy).toHaveBeenCalledWith('https://example.com', '_blank', 'noopener,noreferrer');
+      openSpy.mockRestore();
+    });
+
+    it('34.5 a dblClick() within the guard window cancels the pending open', async () => {
+      const { node } = makeNode();
+      const text = node.onRender(defaultProps({ link: 'https://example.com' })) as Konva.Text;
+      const openSpy = vi.spyOn(window, 'open').mockImplementation(() => null);
+      text.click({ wasSelected: true, ctrlOrMetaPressed: false });
+      text.dblClick();
+      await new Promise((resolve) => setTimeout(resolve, Konva.dblClickWindow + 30));
+      expect(openSpy).not.toHaveBeenCalled();
+      openSpy.mockRestore();
+    });
+
+    it('34.6 dblClick() still triggers edit mode as before (wrapping preserves the original behaviour)', () => {
+      const textNode = new Konva.Text({ id: 'text-1', nodeType: WEAVE_TEXT_NODE_TYPE });
+      const plugin = makePluginMock([textNode]);
+      const { node, mock } = makeNode();
+      mock.getPlugin.mockImplementation((name: string) => {
+        if (name === 'nodesMultiSelectionFeedback') return mock._feedbackPlugin;
+        if (name === 'nodesSelection') return mock._selectionPlugin;
+        if (name === 'usersPresence') return mock._presencePlugin;
+        return plugin;
+      });
+      mock.getActiveAction.mockReturnValue('selectionTool');
+      const stageContainer = document.createElement('div');
+      document.body.appendChild(stageContainer);
+      mock._stage.container.mockReturnValue(stageContainer);
+      const text = node.onRender(defaultProps({ link: 'https://example.com' })) as Konva.Text;
+      text.setAttr('id', 'text-1');
+      mock._selectionPlugin.getSelectedNodes.mockReturnValue([text]);
+      text.dblClick();
+      expect(mock.setMutexLock).toHaveBeenCalled();
+    });
+
+    it('34.7 server-side — never calls window.open', () => {
+      const { node, mock } = makeNode();
+      mock.isServerSide.mockReturnValue(true);
+      const text = node.onRender(defaultProps({ link: 'https://example.com' })) as Konva.Text;
+      const openSpy = vi.spyOn(window, 'open').mockImplementation(() => null);
+      text.click({ wasSelected: false, ctrlOrMetaPressed: true });
+      expect(openSpy).not.toHaveBeenCalled();
+      openSpy.mockRestore();
+    });
+
+    it('34.8 non-http(s) link stored on the node — defensively rejected at click-time', () => {
+      const { node } = makeNode();
+      const text = node.onRender(defaultProps()) as Konva.Text;
+      text.setAttr('link', 'javascript:alert(1)');
+      const openSpy = vi.spyOn(window, 'open').mockImplementation(() => null);
+      text.click({ wasSelected: false, ctrlOrMetaPressed: true });
+      expect(openSpy).not.toHaveBeenCalled();
+      openSpy.mockRestore();
+    });
+  });
+
+  // ---------------------------------------------------------------------------
+  // Suite 35 — public API: getLink / setLink / removeLink
+  // ---------------------------------------------------------------------------
+
+  describe('getLink() / setLink() / removeLink()', () => {
+    it('35.1 getLink — undefined when no link set', () => {
+      const { node } = makeNode();
+      const text = new Konva.Text({ id: 'text-1', nodeType: WEAVE_TEXT_NODE_TYPE });
+      expect(node.getLink(text)).toBeUndefined();
+    });
+
+    it('35.2 getLink — returns the stored URL', () => {
+      const { node } = makeNode();
+      const text = new Konva.Text({ id: 'text-1', nodeType: WEAVE_TEXT_NODE_TYPE, link: 'https://example.com' });
+      expect(node.getLink(text)).toBe('https://example.com');
+    });
+
+    it('35.3 setLink — valid URL — updateNode called with link in props, rest of attrs preserved', () => {
+      const { node, mock } = makeNode();
+      const text = new Konva.Text({ id: 'text-1', nodeType: WEAVE_TEXT_NODE_TYPE, fill: '#ff0000' });
+      node.setLink(text, 'https://example.com');
+      expect(mock.updateNode).toHaveBeenCalledWith(
+        expect.objectContaining({
+          key: 'text-1',
+          props: expect.objectContaining({ link: 'https://example.com', fill: '#ff0000' }),
+        })
+      );
+    });
+
+    it('35.4 setLink — invalid URL — updateNode not called', () => {
+      const { node, mock } = makeNode();
+      const text = new Konva.Text({ id: 'text-1', nodeType: WEAVE_TEXT_NODE_TYPE });
+      node.setLink(text, 'javascript:alert(1)');
+      expect(mock.updateNode).not.toHaveBeenCalled();
+    });
+
+    it('35.5 removeLink — updateNode called with link key omitted', () => {
+      const { node, mock } = makeNode();
+      const text = new Konva.Text({ id: 'text-1', nodeType: WEAVE_TEXT_NODE_TYPE, link: 'https://example.com' });
+      node.removeLink(text);
+      const call = mock.updateNode.mock.calls[0][0];
+      expect('link' in call.props).toBe(false);
+    });
+
+    it('35.6 setLink — captures linkPreviousFill/linkPreviousTextDecoration in the same updateNode call', () => {
+      const { node, mock } = makeNode();
+      const text = new Konva.Text({
+        id: 'text-1',
+        nodeType: WEAVE_TEXT_NODE_TYPE,
+        fill: '#ff0000',
+        textDecoration: 'line-through',
+      });
+      node.setLink(text, 'https://example.com');
+      expect(mock.updateNode).toHaveBeenCalledWith(
+        expect.objectContaining({
+          props: expect.objectContaining({
+            linkPreviousFill: '#ff0000',
+            linkPreviousTextDecoration: 'line-through',
+          }),
+        })
+      );
+    });
+
+    it('35.7 removeLink — also omits linkPreviousFill/linkPreviousTextDecoration (cleanup) and restores the true fill', () => {
+      const { node, mock } = makeNode();
+      // Simulates a node that has been linked (and possibly re-serialized
+      // meanwhile) and now carries both the live override and the captured
+      // originals — exactly what onRender()/onUpdate() would have produced.
+      const text = new Konva.Text({
+        id: 'text-1',
+        nodeType: WEAVE_TEXT_NODE_TYPE,
+        link: 'https://example.com',
+        fill: '#1155ccff',
+        textDecoration: 'underline',
+        linkPreviousFill: '#ff0000',
+        linkPreviousTextDecoration: 'line-through',
+      });
+      node.removeLink(text);
+      const call = mock.updateNode.mock.calls[0][0];
+      expect('link' in call.props).toBe(false);
+      expect('linkPreviousFill' in call.props).toBe(false);
+      expect('linkPreviousTextDecoration' in call.props).toBe(false);
+      expect(call.props.fill).toBe('#ff0000');
+      expect(call.props.textDecoration).toBe('line-through');
+    });
+
+    it('35.8 full lifecycle via the public API — setLink, simulate a re-render while linked, then removeLink: the true original fill/textDecoration survive', () => {
+      const { node, mock } = makeNode({
+        link: { defaultColor: '#1155ccff', hoverColor: '#3d7be0ff' },
+      });
+      const text = new Konva.Text({
+        id: 'text-1',
+        nodeType: WEAVE_TEXT_NODE_TYPE,
+        fill: '#ff0000',
+        textDecoration: 'line-through',
+      });
+
+      // 1. setLink() — captures the true original alongside the new link.
+      node.setLink(text, 'https://example.com');
+      const afterSetLink = mock.updateNode.mock.calls[0][0];
+      expect(afterSetLink.props.linkPreviousFill).toBe('#ff0000');
+
+      // 2. The resulting state update reaches onUpdate(), which forces the
+      //    link styling onto the *live* node — exactly what would happen for
+      //    every collaborator's rendered copy of this node.
+      node.onUpdate(text, afterSetLink.props);
+      expect(text.fill()).toBe('#1155ccff'); // now visually overridden
+      expect(text.getAttr('linkPreviousFill')).toBe('#ff0000'); // but remembered
+
+      // 3. Some unrelated interaction re-serializes the node while still
+      //    linked (a resize/drag/edit-exit) and pushes that through
+      //    updateNode()/onUpdate() again, same as production code paths do.
+      const midway = node.serialize(text);
+      expect(midway.props.fill).toBe('#ff0000'); // NOT the live override
+      node.onUpdate(text, midway.props);
+
+      // 4. removeLink() — the true original must come back, not the link
+      //    colour that was sitting on the live node a moment ago.
+      node.removeLink(text);
+      const afterRemove = mock.updateNode.mock.calls[mock.updateNode.mock.calls.length - 1][0];
+      expect(afterRemove.props.fill).toBe('#ff0000');
+      expect(afterRemove.props.textDecoration).toBe('line-through');
+      expect('link' in afterRemove.props).toBe(false);
+    });
+  });
+
+  // ---------------------------------------------------------------------------
+  // Suite 36 — isValidTextLink() helper
+  // ---------------------------------------------------------------------------
+
+  describe('isValidTextLink()', () => {
+    it('36.1 https URL — valid', () => {
+      expect(isValidTextLink('https://example.com')).toBe(true);
+    });
+
+    it('36.2 http URL — valid', () => {
+      expect(isValidTextLink('http://example.com/page?x=1')).toBe(true);
+    });
+
+    it('36.3 javascript: scheme — invalid', () => {
+      expect(isValidTextLink('javascript:alert(1)')).toBe(false);
+    });
+
+    it('36.4 malformed string — invalid', () => {
+      expect(isValidTextLink('not a url')).toBe(false);
+    });
+
+    it('36.5 ftp: scheme — invalid (not in the http(s) allowlist)', () => {
+      expect(isValidTextLink('ftp://example.com/file')).toBe(false);
     });
   });
 });

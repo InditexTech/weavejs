@@ -44,6 +44,7 @@ declare module 'konva/lib/Node' {
     closeCrop(type: WeaveImageCropEndType): void;
     resetCrop(): void;
     dblClick(): void;
+    click(payload: { wasSelected: boolean; ctrlOrMetaPressed: boolean }): void;
     allowedAnchors(): string[];
     isSelectable(): boolean;
     handleMouseover(e: KonvaEventObject): void;

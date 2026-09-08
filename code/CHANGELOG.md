@@ -13,6 +13,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- [#1167](https://github.com/InditexTech/weavejs/issues/1167) Support hyperlinks on text nodes: make the whole text clickable to a defined URL
+
 ## [5.3.0] - 2026-09-07
 
 ### Added

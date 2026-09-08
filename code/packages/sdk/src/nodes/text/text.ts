@@ -20,6 +20,7 @@ import {
 import {
   TEXT_LAYOUT,
   WEAVE_STAGE_TEXT_EDITION_MODE,
+  WEAVE_TEXT_LINK_ALLOWED_PROTOCOLS,
   WEAVE_TEXT_NODE_DEFAULT_CONFIG,
   WEAVE_TEXT_NODE_TYPE,
 } from './constants';
@@ -32,6 +33,24 @@ import type {
 } from './types';
 import merge from 'lodash/merge';
 import { WEAVE_STAGE_DEFAULT_MODE } from '../stage/constants';
+
+/**
+ * Validates that a link is an absolute http(s) URL. Used both by the zod
+ * schema (getSchema()) and defensively again at click-time (setLink() and
+ * the pointerclick handler), since the value is user-authored content
+ * rendered and clicked on by other collaborators — schemes like
+ * `javascript:` or `data:` must never reach `window.open`.
+ */
+export function isValidTextLink(value: string): boolean {
+  try {
+    const url = new URL(value);
+    return (WEAVE_TEXT_LINK_ALLOWED_PROTOCOLS as string[]).includes(
+      url.protocol
+    );
+  } catch {
+    return false;
+  }
+}
 
 export class WeaveTextNode extends WeaveNode {
   private config: WeaveTextProperties;
@@ -143,6 +162,25 @@ export class WeaveTextNode extends WeaveNode {
   }
 
   onRender(props: WeaveElementAttributes): WeaveElementInstance {
+    // A link forces the whole text underlined + the link colour. The *true*
+    // fill/textDecoration must survive that override so removing the link
+    // restores them — but they can't just be left alone in `props`: once
+    // applied below they become the live Konva node's own `fill`/
+    // `textDecoration` attrs, which is exactly what serialize() reads via
+    // getAttrs() on every resize/drag/edit-exit. Without capturing them
+    // separately, the *first* such interaction while linked would
+    // read back the override and persist it as if it were the real value,
+    // permanently clobbering the user's original style. Capture once (the
+    // first render/update where `link` is truthy and no capture exists yet)
+    // into `linkPreviousFill`/`linkPreviousTextDecoration`; serialize()
+    // restores from those instead of trusting the live (overridden) attrs.
+    const linkPreviousFill = props.link
+      ? (props.linkPreviousFill ?? props.fill)
+      : props.linkPreviousFill;
+    const linkPreviousTextDecoration = props.link
+      ? (props.linkPreviousTextDecoration ?? props.textDecoration)
+      : props.linkPreviousTextDecoration;
+
     const text = new Konva.Text({
       ...props,
       name: 'node',
@@ -154,6 +192,12 @@ export class WeaveTextNode extends WeaveNode {
         stroke: this.config.outline.color,
         strokeWidth: this.config.outline.width,
         fillAfterStrokeEnabled: true,
+      }),
+      ...(props.link && {
+        textDecoration: 'underline',
+        fill: this.config.link.defaultColor,
+        linkPreviousFill,
+        linkPreviousTextDecoration,
       }),
     });
 
@@ -248,6 +292,8 @@ export class WeaveTextNode extends WeaveNode {
     };
 
     text.setAttr('triggerEditMode', this.triggerEditMode.bind(this));
+
+    this.setupLinkBehavior(text);
 
     let actualAnchor: string | null | undefined = undefined;
 
@@ -422,6 +468,17 @@ export class WeaveTextNode extends WeaveNode {
     nodeInstance: WeaveElementInstance,
     nextProps: WeaveElementAttributes
   ): void {
+    // See onRender() for why linkPreviousFill/linkPreviousTextDecoration
+    // exist: they capture the true fill/textDecoration once, so serialize()
+    // can restore them instead of persisting the live (link-overridden) attrs.
+    const isLinked = Boolean(nextProps.link);
+    const linkPreviousFill = nextProps.link
+      ? (nextProps.linkPreviousFill ?? nextProps.fill)
+      : nextProps.linkPreviousFill;
+    const linkPreviousTextDecoration = nextProps.link
+      ? (nextProps.linkPreviousTextDecoration ?? nextProps.textDecoration)
+      : nextProps.linkPreviousTextDecoration;
+
     nodeInstance.setAttrs({
       ...nextProps,
       ...(!this.config.outline.enabled && {
@@ -432,6 +489,27 @@ export class WeaveTextNode extends WeaveNode {
         stroke: this.config.outline.color,
         strokeWidth: this.config.outline.width,
         fillAfterStrokeEnabled: true,
+      }),
+      // Konva's setAttrs() only ever touches keys actually present on the
+      // object passed to it (see Konva.Node.setAttrs/_setAttr) — a key
+      // that's simply absent from `nextProps` (e.g. `link` right after
+      // removeLink() deletes it from state) is left completely untouched
+      // on the *live* node. Spreading `...nextProps` alone is therefore not
+      // enough to ever clear these three once they've been set: they must
+      // always be included explicitly (falling back to `undefined`, which
+      // Konva's _setAttr treats as "delete this attr") so removing a link
+      // actually clears the live node's `link`/linkPrevious* attrs instead
+      // of leaving them stuck — which otherwise keeps hover/click behaving
+      // as if the (removed) link were still active, and corrupts the next
+      // serialize() call for this node.
+      link: nextProps.link,
+      linkPreviousFill: isLinked ? linkPreviousFill : undefined,
+      linkPreviousTextDecoration: isLinked
+        ? linkPreviousTextDecoration
+        : undefined,
+      ...(isLinked && {
+        textDecoration: 'underline',
+        fill: this.config.link.defaultColor,
       }),
     });
 
@@ -494,6 +572,20 @@ export class WeaveTextNode extends WeaveNode {
     delete cleanedAttrs.overridesMouseControl;
     delete cleanedAttrs.shouldUpdateOnTransform;
     delete cleanedAttrs.dragBoundFunc;
+
+    // The live node's own fill/textDecoration are the link's forced styling
+    // (see onRender()/onUpdate()) whenever a link is set, not the user's
+    // real values — restore the real ones captured there instead, so a
+    // resize/drag/edit-exit (anything that re-serializes this node) never
+    // persists the override in place of the true fill/textDecoration.
+    if (cleanedAttrs.link) {
+      if (typeof cleanedAttrs.linkPreviousFill === 'string') {
+        cleanedAttrs.fill = cleanedAttrs.linkPreviousFill;
+      }
+      if (typeof cleanedAttrs.linkPreviousTextDecoration === 'string') {
+        cleanedAttrs.textDecoration = cleanedAttrs.linkPreviousTextDecoration;
+      }
+    }
 
     return {
       key: attrs.id ?? '',
@@ -1205,6 +1297,154 @@ export class WeaveTextNode extends WeaveNode {
     );
   }
 
+  /**
+   * Wires the hover colour swap, link cursor and click-to-open behaviour for
+   * a rendered text node. Runs on top of (not instead of) the generic
+   * selection-hover-halo handling in setupDefaultNodeEvents()/node.ts, the
+   * same way connector.ts layers its own handleMouseover/handleMouseout.
+   */
+  private setupLinkBehavior(text: Konva.Text): void {
+    text.handleMouseover = () => {
+      if (!text.getAttrs().link) {
+        return;
+      }
+      text.fill(this.config.link.hoverColor);
+      text.getLayer()?.batchDraw();
+    };
+
+    text.handleMouseout = () => {
+      if (!text.getAttrs().link) {
+        return;
+      }
+      text.fill(this.config.link.defaultColor);
+      text.getLayer()?.batchDraw();
+    };
+
+    text.defineMousePointer = () => {
+      return text.getAttrs().link ? 'pointer' : 'default';
+    };
+
+    // Distinguishes "already selected when this click started" from "just
+    // got selected by this very click" — computed and passed in by
+    // click-tap.ts's `nodeTargeted.click({...})` call, not by listening for
+    // a raw Konva 'pointerclick' here: once a node is selected, its hit area
+    // is covered by the Transformer's own overdraw shape (used to drag-move
+    // the whole selection), so `text.on('pointerclick', ...)` would stop
+    // firing the moment the node becomes selected — exactly the case we
+    // need (open the link on a click on an *already selected* node). See
+    // click-tap.ts for how `nodeTargeted` is resolved through that overlay.
+    let linkClickTimeout: ReturnType<typeof setTimeout> | undefined;
+    const clearLinkClickTimeout = () => {
+      if (linkClickTimeout) {
+        clearTimeout(linkClickTimeout);
+        linkClickTimeout = undefined;
+      }
+    };
+
+    // A genuine double-click (which enters edit mode, see dblClick below)
+    // still goes through a "plain click" pass first — click-tap.ts's own
+    // gesture detector only confirms it's a double-tap on the second tap's
+    // pointerup, after that same tap's pointerdown already ran the single-click
+    // path once. Clear any pending link-open whenever a real double-click
+    // fires, so it's never misread as two link-opens or one premature one.
+    const previousDblClick = text.dblClick.bind(text);
+    text.dblClick = () => {
+      clearLinkClickTimeout();
+      previousDblClick();
+    };
+
+    text.click = ({ wasSelected, ctrlOrMetaPressed }) => {
+      if (!text.getAttrs().link) {
+        return;
+      }
+
+      // Desktop shortcut: open immediately, no prior selection required.
+      // Ctrl/Cmd+Click is otherwise a no-op on nodes (see click-tap.ts), so
+      // this adds behaviour without changing any existing gesture.
+      if (ctrlOrMetaPressed) {
+        clearLinkClickTimeout();
+        this.openTextLink(text);
+        return;
+      }
+
+      // Universal (mouse + touch, no modifier needed): a click/tap on a
+      // node that was *already* selected opens the link. A first click on
+      // an unselected node still only selects it, same as every other
+      // node type. Debounced by Konva's own double-click window so a real
+      // double-click can cancel it (see dblClick above) instead of it firing
+      // mid-gesture.
+      if (wasSelected) {
+        clearLinkClickTimeout();
+        linkClickTimeout = setTimeout(() => {
+          linkClickTimeout = undefined;
+          if (!this.editing) {
+            this.openTextLink(text);
+          }
+        }, Konva.dblClickWindow);
+      }
+    };
+  }
+
+  private openTextLink(textNode: Konva.Text): void {
+    if (this.instance.isServerSide()) {
+      return;
+    }
+
+    const link = textNode.getAttrs().link;
+    if (typeof link !== 'string' || !isValidTextLink(link)) {
+      return;
+    }
+
+    window.open(link, '_blank', 'noopener,noreferrer');
+  }
+
+  /**
+   * Public API to read/set/remove the URL a text node links to. Setting an
+   * invalid or non-http(s) URL is a no-op (see isValidTextLink()).
+   *
+   * The node's real fill/textDecoration are captured once into
+   * `linkPreviousFill`/`linkPreviousTextDecoration` the first time a link is
+   * rendered (see onRender()/onUpdate()) and restored by serialize()
+   * whenever the node is re-serialized while linked — so they survive any
+   * number of resizes/drags/edits while the link is active. removeLink()
+   * relies on that: it omits `link` *and* those two bookkeeping props from
+   * the serialized props entirely, so all three are deleted from shared
+   * state (see updateYjsMapFromObject in managers/state.ts) rather than
+   * persisted as `undefined`, and the node's original fill/text decoration
+   * reappear immediately.
+   */
+  getLink(nodeInstance: WeaveElementInstance): string | undefined {
+    const link = nodeInstance.getAttrs().link;
+    return typeof link === 'string' ? link : undefined;
+  }
+
+  setLink(nodeInstance: WeaveElementInstance, url: string): void {
+    if (!isValidTextLink(url)) {
+      return;
+    }
+
+    // serialize() already restores props.fill/props.textDecoration to the
+    // true pre-link values when a link is already set (see serialize()), so
+    // this captures the right originals whether this call is adding a link
+    // for the first time or just changing an existing link's URL.
+    const serialized = this.serialize(nodeInstance);
+    serialized.props.linkPreviousFill = serialized.props.fill;
+    serialized.props.linkPreviousTextDecoration = serialized.props.textDecoration;
+    serialized.props.link = url;
+    this.instance.updateNode(serialized);
+  }
+
+  removeLink(nodeInstance: WeaveElementInstance): void {
+    // serialize() already restored props.fill/props.textDecoration to the
+    // true pre-link values (see serialize()) — just drop the link and the
+    // bookkeeping props used to remember them.
+    const serialized = this.serialize(nodeInstance);
+    delete serialized.props.link;
+    delete serialized.props.linkPreviousFill;
+    delete serialized.props.linkPreviousTextDecoration;
+    this.instance.updateNode(serialized);
+  }
+
   onDestroyInstance(): void {
     super.onDestroyInstance();
     if (!this.instance.isServerSide() && this.keyPressHandler) {
@@ -1294,6 +1534,7 @@ export class WeaveTextNode extends WeaveNode {
         ...(props.fillAfterStrokeEnabled && {
           fillAfterStrokeEnabled: props.fillAfterStrokeEnabled,
         }),
+        ...(props.link && { link: props.link }),
       },
     });
   }
@@ -1329,6 +1570,7 @@ export class WeaveTextNode extends WeaveNode {
         ...(nextProps.fillAfterStrokeEnabled && {
           fillAfterStrokeEnabled: nextProps.fillAfterStrokeEnabled,
         }),
+        ...(nextProps.link && { link: nextProps.link }),
       },
     });
   }
@@ -1415,6 +1657,39 @@ export class WeaveTextNode extends WeaveNode {
           .string()
           .default('text')
           .describe('The actual text content of the node.'),
+
+        link: z
+          .string()
+          .url()
+          .refine((value) => isValidTextLink(value), {
+            message: 'Link must be an absolute http:// or https:// URL.',
+          })
+          .optional()
+          .describe(
+            'External URL the whole text of the node links to. When set, the ' +
+              'text is forced underlined and coloured with the configured link ' +
+              'colours regardless of fill/textDecoration, is clickable, and ' +
+              'opens the URL in a new tab. Only http(s) URLs are accepted. ' +
+              'Omit/remove to make the node plain text again.'
+          ),
+        linkPreviousFill: z
+          .string()
+          .optional()
+          .describe(
+            'Internal bookkeeping: the fill colour the node had right ' +
+              'before a link was set, captured automatically so it can be ' +
+              'restored when the link is removed. Managed automatically — ' +
+              'do not set directly.'
+          ),
+        linkPreviousTextDecoration: z
+          .string()
+          .optional()
+          .describe(
+            'Internal bookkeeping: the textDecoration the node had right ' +
+              'before a link was set, captured automatically so it can be ' +
+              'restored when the link is removed. Managed automatically — ' +
+              'do not set directly.'
+          ),
 
         strokeEnabled: z
           .boolean()

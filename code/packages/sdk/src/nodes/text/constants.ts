@@ -22,7 +22,17 @@ export const WEAVE_TEXT_NODE_DEFAULT_CONFIG: WeaveTextProperties = {
   edition: {
     borderSize: 2,
   },
+  link: {
+    defaultColor: '#1155ccff',
+    hoverColor: '#3d7be0ff',
+  },
 };
+
+// Schemes allowed for the `link` attribute of a text node. Anything else
+// (javascript:, data:, vbscript:, etc.) is rejected both at the schema
+// level and again defensively at click-time, since the URL is untrusted
+// user-authored content that another collaborator will click on.
+export const WEAVE_TEXT_LINK_ALLOWED_PROTOCOLS = ['http:', 'https:'];
 
 export const TEXT_LAYOUT = {
   ['SMART']: 'smart',
