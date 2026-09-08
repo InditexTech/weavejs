@@ -1,0 +1,29 @@
+code/packages/sdk/src/plugins/nodes-selection/__tests__/events/pointer-down.test.ts
+  s_0be64137531d37::t_c2875a01dae4ea 164-165,325,359
+code/packages/sdk/src/plugins/nodes-selection/events/click-tap.ts
+  s_dec1d28260fdc1::t_a675329255cd02 163-185
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.22",
+  "base_commit_sha": "3bb1d2b3dcba5f5785d2ecbcdaa0764b3ed4f505",
+  "prompts": {},
+  "sessions": {
+    "s_0be64137531d37": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "ses_f83951ec4ffe41r1xSM4Ws5UZH",
+        "model": "claude-sonnet-5"
+      },
+      "human_author": "Jesus Manuel Piñeiro Cid <jesusmpc@inditex.com>"
+    },
+    "s_dec1d28260fdc1": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "ses_f8379ce3effevDJuDtncVJqiNO",
+        "model": "claude-sonnet-5"
+      },
+      "human_author": "Jesus Manuel Piñeiro Cid <jesusmpc@inditex.com>"
+    }
+  }
+}
