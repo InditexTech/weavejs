@@ -192,7 +192,14 @@ for (const link of nonRepresentative) {
 
 if (external.length > 0) {
   for (const link of external) {
-    console.log(`::error::broken external link: ${link.url} (parent: ${link.parent ?? 'unknown'})`)
+    // link.status is 0 when the request itself failed (timeout, DNS,
+    // connection reset — no response ever came back) rather than the
+    // server returning a real HTTP status. Distinguishing the two matters:
+    // a real 4xx/5xx is the site actually gone, while 0 usually means this
+    // crawl's own burst of concurrent requests got rate-limited or timed
+    // out against the host, not that the link is dead.
+    const status = link.status ? link.status : 'no response (timeout/network error)'
+    console.log(`::error::broken external link: ${link.url} (status: ${status}, parent: ${link.parent ?? 'unknown'})`)
   }
   console.error(`\n${external.length} broken external link(s) found.`)
   // process.exitCode (not process.exit()) — process.exit() terminates the
