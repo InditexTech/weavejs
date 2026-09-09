@@ -195,7 +195,14 @@ if (external.length > 0) {
     console.log(`::error::broken external link: ${link.url} (parent: ${link.parent ?? 'unknown'})`)
   }
   console.error(`\n${external.length} broken external link(s) found.`)
-  process.exit(1)
+  // process.exitCode (not process.exit()) — process.exit() terminates the
+  // process immediately, and when stdout is a pipe (as in CI) Node's writes
+  // to it are asynchronous, so a burst of console.log calls immediately
+  // followed by process.exit() can be truncated before the OS drains the
+  // write queue. Setting exitCode and letting the module finish lets Node's
+  // own event loop flush pending output first, so every broken link above
+  // actually reaches the log instead of being silently dropped.
+  process.exitCode = 1
 }
 
 const ignored = local.length + nonRepresentative.length
