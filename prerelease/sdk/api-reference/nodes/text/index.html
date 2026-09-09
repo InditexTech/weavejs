@@ -72,7 +72,7 @@
 
 <title>WeaveTextNode | Weave.js</title>
 
-    <link rel="canonical" href="https://inditextech.github.io/weavejs/5.3.0/sdk/api-reference/nodes/text/">
+    <link rel="canonical" href="https://inditextech.github.io/weavejs/5.4.1/sdk/api-reference/nodes/text/">
     <link rel="prev" href="../stroke-single/">
     <link rel="next" href="../video/">
     <meta name="description" content="Text node API Reference">
@@ -100,7 +100,7 @@
           <span class="dt-button__icon dt-button__icon-icon"><svg class="dt-icon" aria-hidden="true" focusable="false"><use href="../../../../../_/img/icons.svg#icon-menu"></use></svg></span>
         </span>
       </button>
-      <a class="header-toolbar__brand" href="../../../../../5.3.0/">
+      <a class="header-toolbar__brand" href="../../../../../5.4.1/">
         <img class="header-toolbar__logo" src="../../../../../_/product-logo.png" width="24" height="24" alt="">
         <span class="header-toolbar__product-name dt-text dt-text--label-l-high">Weave.js</span>
       </a>
@@ -124,10 +124,16 @@
       <span class="version__label">prerelease</span>
       <span class="dt-label dt-label--orange"><span class="dt-label__content">Prerelease</span></span>
     </span>
-    <a class="version" href="../../../../../5.3.0/sdk/api-reference/nodes/text/">
-      <span class="version__label">5.3.0</span>
+    <a class="version" href="../../../../../5.4.1/sdk/api-reference/nodes/text/">
+      <span class="version__label">5.4.1</span>
       <span class="dt-label dt-label--green"><span class="dt-label__content">Latest</span></span>
           </a>
+    <a class="version" href="../../../../../5.4.0/sdk/api-reference/nodes/text/">
+      <span class="version__label">5.4.0</span>
+    </a>
+    <a class="version" href="../../../../../5.3.0/sdk/api-reference/nodes/text/">
+      <span class="version__label">5.3.0</span>
+    </a>
     <a class="version" href="../../../../../5.2.2/sdk/api-reference/nodes/text/">
       <span class="version__label">5.2.2</span>
     </a>
@@ -246,7 +252,7 @@
   </div>
 
 <div class="side-menu__brand">
-  <a class="side-menu__brand-link" href="../../../../../5.3.0/">
+  <a class="side-menu__brand-link" href="../../../../../5.4.1/">
     <img class="side-menu__brand-logo" src="../../../../../_/product-logo.png" width="40" height="40" alt="">
     <span class="side-menu__brand-title dt-text dt-text--title-m">Weave.js</span>
   </a>
@@ -1074,10 +1080,16 @@
       <span class="version__label">prerelease</span>
       <span class="dt-label dt-label--orange"><span class="dt-label__content">Prerelease</span></span>
     </span>
-    <a class="version" href="../../../../../5.3.0/sdk/api-reference/nodes/text/">
-      <span class="version__label">5.3.0</span>
+    <a class="version" href="../../../../../5.4.1/sdk/api-reference/nodes/text/">
+      <span class="version__label">5.4.1</span>
       <span class="dt-label dt-label--green"><span class="dt-label__content">Latest</span></span>
           </a>
+    <a class="version" href="../../../../../5.4.0/sdk/api-reference/nodes/text/">
+      <span class="version__label">5.4.0</span>
+    </a>
+    <a class="version" href="../../../../../5.3.0/sdk/api-reference/nodes/text/">
+      <span class="version__label">5.3.0</span>
+    </a>
     <a class="version" href="../../../../../5.2.2/sdk/api-reference/nodes/text/">
       <span class="version__label">5.2.2</span>
     </a>
@@ -1191,8 +1203,29 @@ provides rich text customization, interaction handling, and real-time synchroniz
 <div class="content">
 <pre class="shiki highlight"><code data-lang="ts"><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4;--shiki-light-bg:#1E1E1E;--shiki-dark-bg:#1E1E1E"><span class="line"><span style="--shiki-light:#569CD6;--shiki-dark:#569CD6">type</span><span style="--shiki-light:#4EC9B0;--shiki-dark:#4EC9B0"> WeaveNodeTransformerProperties</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4"> = </span><span style="--shiki-light:#4EC9B0;--shiki-dark:#4EC9B0">Konva</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">.</span><span style="--shiki-light:#4EC9B0;--shiki-dark:#4EC9B0">TransformerConfig</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">;</span></span>
 <span class="line"></span>
+<span class="line"><span style="--shiki-light:#569CD6;--shiki-dark:#569CD6">type</span><span style="--shiki-light:#4EC9B0;--shiki-dark:#4EC9B0"> WeaveTextOutlineProperties</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4"> =</span></span>
+<span class="line"><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">  | { </span><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">enabled</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">: </span><span style="--shiki-light:#4EC9B0;--shiki-dark:#4EC9B0">true</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">; </span><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">color</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">: </span><span style="--shiki-light:#4EC9B0;--shiki-dark:#4EC9B0">string</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">; </span><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">width</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">: </span><span style="--shiki-light:#4EC9B0;--shiki-dark:#4EC9B0">number</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4"> }</span></span>
+<span class="line"><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">  | { </span><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">enabled</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">: </span><span style="--shiki-light:#4EC9B0;--shiki-dark:#4EC9B0">false</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4"> };</span></span>
+<span class="line"></span>
+<span class="line"><span style="--shiki-light:#569CD6;--shiki-dark:#569CD6">type</span><span style="--shiki-light:#4EC9B0;--shiki-dark:#4EC9B0"> WeaveTextEditionProperties</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4"> = {</span></span>
+<span class="line"><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">  borderSize</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">: </span><span style="--shiki-light:#4EC9B0;--shiki-dark:#4EC9B0">number</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">;</span></span>
+<span class="line"><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">};</span></span>
+<span class="line"></span>
+<span class="line"><span style="--shiki-light:#569CD6;--shiki-dark:#569CD6">type</span><span style="--shiki-light:#4EC9B0;--shiki-dark:#4EC9B0"> WeaveTextCursorProperties</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4"> = {</span></span>
+<span class="line"><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">  color</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">: </span><span style="--shiki-light:#4EC9B0;--shiki-dark:#4EC9B0">string</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">;</span></span>
+<span class="line"><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">};</span></span>
+<span class="line"></span>
+<span class="line"><span style="--shiki-light:#569CD6;--shiki-dark:#569CD6">type</span><span style="--shiki-light:#4EC9B0;--shiki-dark:#4EC9B0"> WeaveTextLinkProperties</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4"> = {</span></span>
+<span class="line"><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">  defaultColor</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">: </span><span style="--shiki-light:#4EC9B0;--shiki-dark:#4EC9B0">string</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">;</span></span>
+<span class="line"><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">  hoverColor</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">: </span><span style="--shiki-light:#4EC9B0;--shiki-dark:#4EC9B0">string</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">;</span></span>
+<span class="line"><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">};</span></span>
+<span class="line"></span>
 <span class="line"><span style="--shiki-light:#569CD6;--shiki-dark:#569CD6">type</span><span style="--shiki-light:#4EC9B0;--shiki-dark:#4EC9B0"> WeaveTextProperties</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4"> = {</span></span>
 <span class="line"><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">  transform</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">: </span><span style="--shiki-light:#4EC9B0;--shiki-dark:#4EC9B0">WeaveNodeTransformerProperties</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">;</span></span>
+<span class="line"><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">  outline</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">: </span><span style="--shiki-light:#4EC9B0;--shiki-dark:#4EC9B0">WeaveTextOutlineProperties</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">;</span></span>
+<span class="line"><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">  edition</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">: </span><span style="--shiki-light:#4EC9B0;--shiki-dark:#4EC9B0">WeaveTextEditionProperties</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">;</span></span>
+<span class="line"><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">  cursor</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">: </span><span style="--shiki-light:#4EC9B0;--shiki-dark:#4EC9B0">WeaveTextCursorProperties</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">;</span></span>
+<span class="line"><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">  link</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">: </span><span style="--shiki-light:#4EC9B0;--shiki-dark:#4EC9B0">WeaveTextLinkProperties</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">;</span></span>
 <span class="line"><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">};</span></span>
 <span class="line"></span>
 <span class="line"><span style="--shiki-light:#569CD6;--shiki-dark:#569CD6">type</span><span style="--shiki-light:#4EC9B0;--shiki-dark:#4EC9B0"> WeaveTextNodeParams</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4"> = {</span></span>
@@ -1260,6 +1293,34 @@ provides rich text customization, interaction handling, and real-time synchroniz
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code class="dt-mono">check default values</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Setup the transform properties for the text (if can be resized, rotated, anchors, etc.).</p></td>
 </tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code class="dt-mono">outline</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code class="dt-mono">object</code></p></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code class="dt-mono">{ enabled: false }</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Setup an outline (stroke) around the text glyphs.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code class="dt-mono">edition</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code class="dt-mono">object</code></p></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code class="dt-mono">{ borderSize: 2 }</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Border size, in pixels, of the overlay shown while editing the text in-place.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code class="dt-mono">cursor</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code class="dt-mono">object</code></p></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code class="dt-mono">{ color: "#000000" }</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Caret colour used by the in-place text editor.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code class="dt-mono">link</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code class="dt-mono">object</code></p></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code class="dt-mono">check default values</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Default and hover colours applied to a text node once it has a <code>link</code> set — see the "Hyperlinks" section below.</p></td>
+</tr>
 </tbody>
 </table></div></div>
 </div>
@@ -1290,7 +1351,113 @@ provides rich text customization, interaction handling, and real-time synchroniz
 <span class="line"><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">  enabledAnchors:</span><span style="--shiki-light:#4FC1FF;--shiki-dark:#4FC1FF"> WEAVE_DEFAULT_ENABLED_ANCHORS</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">,</span></span>
 <span class="line"><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">  borderStrokeWidth:</span><span style="--shiki-light:#B5CEA8;--shiki-dark:#B5CEA8"> 3</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">,</span></span>
 <span class="line"><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">  padding:</span><span style="--shiki-light:#B5CEA8;--shiki-dark:#B5CEA8"> 0</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">,</span></span>
+<span class="line"><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">};</span></span>
+<span class="line"></span>
+<span class="line"><span style="--shiki-light:#569CD6;--shiki-dark:#569CD6">const</span><span style="--shiki-light:#4FC1FF;--shiki-dark:#4FC1FF"> WEAVE_TEXT_NODE_DEFAULT_CONFIG</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">: </span><span style="--shiki-light:#4EC9B0;--shiki-dark:#4EC9B0">WeaveTextProperties</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4"> = {</span></span>
+<span class="line"><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">  transform:</span><span style="--shiki-light:#4FC1FF;--shiki-dark:#4FC1FF"> WEAVE_DEFAULT_TRANSFORM_PROPERTIES</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">,</span></span>
+<span class="line"><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">  outline:</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4"> {</span></span>
+<span class="line"><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">    enabled:</span><span style="--shiki-light:#569CD6;--shiki-dark:#569CD6"> false</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">,</span></span>
+<span class="line"><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">  },</span></span>
+<span class="line"><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">  cursor:</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4"> {</span></span>
+<span class="line"><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">    color:</span><span style="--shiki-light:#CE9178;--shiki-dark:#CE9178"> "#000000"</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">,</span></span>
+<span class="line"><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">  },</span></span>
+<span class="line"><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">  edition:</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4"> {</span></span>
+<span class="line"><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">    borderSize:</span><span style="--shiki-light:#B5CEA8;--shiki-dark:#B5CEA8"> 2</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">,</span></span>
+<span class="line"><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">  },</span></span>
+<span class="line"><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">  link:</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4"> {</span></span>
+<span class="line"><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">    defaultColor:</span><span style="--shiki-light:#CE9178;--shiki-dark:#CE9178"> "#1155ccff"</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">,</span></span>
+<span class="line"><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">    hoverColor:</span><span style="--shiki-light:#CE9178;--shiki-dark:#CE9178"> "#3d7be0ff"</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">,</span></span>
+<span class="line"><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">  },</span></span>
 <span class="line"><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">};</span></span></span></code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="hyperlinks"><a class="anchor" href="#hyperlinks"></a>Hyperlinks</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>A text node can link its whole text to an external URL by setting its <code>link</code> attribute (a
+plain string, part of the node&#8217;s props like <code>fill</code> or <code>text</code>) to an absolute <code>http://</code> or
+<code>https://</code> URL — any other scheme (e.g. <code>javascript:</code>, <code>data:</code>) is rejected, both by the node&#8217;s
+zod schema and again defensively before the link is opened, since the value is user-authored
+content that other collaborators will click on.</p>
+</div>
+<div class="paragraph">
+<p>Behaviour while <code>link</code> is set (per-node, does not affect nodes without a link):</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>The text is always rendered underlined and coloured with <code class="dt-mono">link.defaultColor</code>, regardless
+of the node&#8217;s own <code>fill</code>/<code>textDecoration</code>. The real values are captured once, the first time a
+link is applied, into two internal bookkeeping props — <code>linkPreviousFill</code> and
+<code>linkPreviousTextDecoration</code> — and restored from there whenever the link is removed or the node
+is re-serialized (e.g. after a resize, a drag, or exiting text-edit mode) while still linked, so
+they&#8217;re never lost to the forced link styling. These two props are managed automatically; don&#8217;t
+set them directly.</p>
+</li>
+<li>
+<p>Hovering the text swaps its colour to <code class="dt-mono">link.hoverColor</code> and the cursor to a pointer.</p>
+</li>
+<li>
+<p>Clicking opens the URL in a new tab (<code class="dt-mono">window.open(url</code>).
+Because a plain click on any node already means "select/drag it", opening the link uses two
+gestures layered on top of that, both working identically on mouse and touch:</p>
+<div class="ulist">
+<ul>
+<li>
+<p>Clicking/tapping a text node that is <strong>already selected</strong> opens its link (a first click on an
+unselected node still only selects it, same as any other node).</p>
+</li>
+<li>
+<p>On desktop, holding <kbd>Ctrl</kbd> (or <kbd>Cmd</kbd> on macOS) while clicking opens the link
+immediately, whether or not the node was already selected.</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p>Rich/partial-text linking is out of scope — the link always applies to the node&#8217;s entire text.</p>
+</li>
+</ul>
+</div>
+<div class="sect2">
+<h3 id="methods"><a class="anchor" href="#methods"></a>Methods</h3>
+<div class="sect3">
+<h4 id="getlink"><a class="anchor" href="#getlink"></a>getLink</h4>
+<div class="listingblock">
+<div class="content">
+<pre class="shiki highlight"><code data-lang="ts"><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4;--shiki-light-bg:#1E1E1E;--shiki-dark-bg:#1E1E1E"><span class="line"><span style="--shiki-light:#DCDCAA;--shiki-dark:#DCDCAA">getLink</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">(</span><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">nodeInstance</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">: </span><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">WeaveElementInstance</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">): </span><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">string</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4"> | </span><span style="--shiki-light:#569CD6;--shiki-dark:#569CD6">undefined</span></span></span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Returns the URL currently set on the given text node instance, or <code class="dt-mono">undefined</code> if it has no link.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="setlink"><a class="anchor" href="#setlink"></a>setLink</h4>
+<div class="listingblock">
+<div class="content">
+<pre class="shiki highlight"><code data-lang="ts"><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4;--shiki-light-bg:#1E1E1E;--shiki-dark-bg:#1E1E1E"><span class="line"><span style="--shiki-light:#DCDCAA;--shiki-dark:#DCDCAA">setLink</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">(</span><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">nodeInstance</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">: </span><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">WeaveElementInstance</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">, </span><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">url</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">: </span><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">string</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">): </span><span style="--shiki-light:#569CD6;--shiki-dark:#569CD6">void</span></span></span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Sets (or replaces) the URL a text node links to. <code class="dt-mono">url</code> must be an absolute <code>http://</code> or
+<code>https://</code> URL; any other value is a no-op.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="removelink"><a class="anchor" href="#removelink"></a>removeLink</h4>
+<div class="listingblock">
+<div class="content">
+<pre class="shiki highlight"><code data-lang="ts"><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4;--shiki-light-bg:#1E1E1E;--shiki-dark-bg:#1E1E1E"><span class="line"><span style="--shiki-light:#DCDCAA;--shiki-dark:#DCDCAA">removeLink</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">(</span><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">nodeInstance</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">: </span><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">WeaveElementInstance</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">): </span><span style="--shiki-light:#569CD6;--shiki-dark:#569CD6">void</span></span></span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Removes the link from a text node. The node&#8217;s original <code>fill</code>/<code>textDecoration</code> reappear
+immediately, since they were never altered while the link was set.</p>
+</div>
 </div>
 </div>
 </div>
@@ -1350,7 +1517,7 @@ provides rich text customization, interaction handling, and real-time synchroniz
 <footer class="site-footer">
   <div class="dt-grid-layout dt-grid-layout--with-margin site-footer__grid">
     <div class="dt-grid-layout__item site-footer__col site-footer__brand">
-      <a class="site-footer__brand-link" href="../../../../../5.3.0/">
+      <a class="site-footer__brand-link" href="../../../../../5.4.1/">
         <img class="site-footer__logo" src="../../../../../_/product-logo.png" width="24" height="24" alt="">
         <span class="dt-text dt-text--label-l-high">Weave.js</span>
       </a>
