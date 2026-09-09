@@ -173,6 +173,30 @@ const result = await check({
     403: 'warn',
     429: 'warn',
   },
+  // Live evidence this matters, not a hypothetical: the same 3 external
+  // links (azure.microsoft.com/…/web-pubsub, azure.microsoft.com/…/blobs,
+  // developer.mozilla.org/…/Clipboard_API) were reported BROKEN on one CI
+  // run, only 1 of the 3 on the next, and 0 of them on the run after that
+  // — same content, same build, no HTTP client anywhere else (including a
+  // plain curl from an unrelated network) ever sees anything but 200.
+  // That's the fingerprint of a transient failure (rate limit, timeout,
+  // reset), not a dead link, and linkinator already has a built-in answer
+  // for exactly this rather than the crawl just accepting the first
+  // failure as final:
+  //   - `retry`: honours a 429 response's own `retry-after` header before
+  //     trying again, instead of treating "the host asked us to slow
+  //     down" as "the link is gone".
+  //   - `retryErrors`: retries a 5xx or `status: 0` (linkinator's own
+  //     stand-in for "no HTTP response at all" — timeout, DNS failure,
+  //     connection reset) response too, which is exactly what an
+  //     unrelated rate limiter or a stalled socket looks like from here.
+  // `retryErrorsCount`/`retryErrorsJitter` are linkinator's own defaults
+  // (see its README), kept explicit so a future reader doesn't have to
+  // check upstream to know a real retry budget exists at all.
+  retry: true,
+  retryErrors: true,
+  retryErrorsCount: 3,
+  retryErrorsJitter: 5,
 })
 
 const broken = result.links.filter((link) => link.state === 'BROKEN')
