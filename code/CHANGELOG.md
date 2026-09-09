@@ -13,6 +13,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [5.4.0] - 2026-09-09
+
 ### Added
 
 - [#1167](https://github.com/InditexTech/weavejs/issues/1167) Support hyperlinks on text nodes: make the whole text clickable to a defined URL
@@ -1926,7 +1928,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - [#24](https://github.com/InditexTech/weavejs/issues/24) Bug when loading rooms with text or images
 - [#18](https://github.com/InditexTech/weavejs/issues/18) Fix awareness not working on store-azure-web-pubsub
 
-[Unreleased]: https://github.com/InditexTech/weavejs/compare/5.3.0...HEAD
+[Unreleased]: https://github.com/InditexTech/weavejs/compare/5.4.0...HEAD
+
+[5.4.0]: https://github.com/InditexTech/weavejs/compare/5.3.0...5.4.0
 
 [5.3.0]: https://github.com/InditexTech/weavejs/compare/5.2.2...5.3.0
 
