@@ -1,0 +1,14 @@
+docs/scripts/check-links.mjs
+  h_c93d154c7c7074 195-202
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.22",
+  "base_commit_sha": "8e9c99e8f86a4ff21816f6a5b1cbe5c1606d61be",
+  "prompts": {},
+  "humans": {
+    "h_c93d154c7c7074": {
+      "author": "Jesus Manuel Piñeiro Cid <jesusmpc@inditex.com>"
+    }
+  }
+}
