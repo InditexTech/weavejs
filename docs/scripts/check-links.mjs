@@ -39,9 +39,15 @@
 // is never fetched, so it can neither be validated NOR recursed into) — it
 // cannot express "fetch and recurse through this page, just don't fail the
 // whole job over IT specifically". Classifying results after the fact, via
-// the API, is the only way to get both: a full recursive crawl of every
-// generated page (so a raw external link buried three pages deep still gets
-// found), and a pass/fail decision that only external links get to make.
+// the API, is what makes that possible for links worth actually checking: a
+// full recursive crawl of every generated page (so a raw external link
+// buried three pages deep still gets found), and a pass/fail decision that
+// only external links get to make. `linksToSkip` below is still used
+// directly — via the SAME `docouture.checkLinks.ignore` config, see
+// ignorePatterns()'s own comment — for entries that don't need that
+// treatment: nothing is lost recursing into a github.com PR link or a
+// same-page footer link, so there's no reason to pay for fetching them at
+// all.
 import { readFile } from 'node:fs/promises'
 import { check } from 'linkinator'
 
@@ -70,10 +76,27 @@ function globToRegExp(glob) {
 // `package.json`'s own "docouture" config block (see the scaffolded stub, next
 // to "docouture.publish") is this project's existing place for a local,
 // site-specific override — `docouture.checkLinks.ignore` is a list of globs
-// (see globToRegExp above), tested the same way linkinator's own
-// `--skip`/`linksToSkip` are, but warned rather than silently dropped so an
-// ignored link that starts failing for a REAL reason still shows up
-// somewhere. Scaffolded with these default entries already in it (see
+// (see globToRegExp above). These patterns feed BOTH `linksToSkip` (below,
+// where `IGNORE_PATTERNS` is spread into the crawl's own skip list) AND the
+// post-hoc `isNonRepresentative` classification. That's a deliberate change
+// from "classify only" (see this project's own history, GH-1170/1171): live
+// CI showed a single CHANGELOG page rendering 257 distinct
+// github.com/InditexTech/weavejs/pull/NNN links (one per release entry),
+// every one of them already matching the `https://github.com/…weavejs*`
+// entry below and therefore GUARANTEED to never fail the build regardless of
+// what status they return. Fetching all 257 anyway — plus the `*/edit/HEAD/*`
+// footer link repeated across every page — was enough concurrent same-host
+// traffic to trip GitHub's own rate limiting, and once that fix's own
+// retry/retryErrors kicked in on top of that burst (see their own comments
+// below), the whole crawl's wall-clock time blew past this job's 15-minute
+// budget with zero output. Skipping a link outright does mean linkinator
+// can no longer recurse into it — fine for every entry below today, since
+// they're all external leaves or a self-referential local link with nothing
+// further to check, but worth remembering if a future ignore-list entry is a
+// path that legitimately has its own onward links worth crawling: that entry
+// would need to stay classify-only (added to `isNonRepresentative`'s matching
+// but left out of `linksToSkip`) rather than joining this list. Scaffolded
+// with these default entries already in it (see
 // package.json's own comment... it's JSON, so there isn't one — this is
 // that comment):
 //
@@ -139,28 +162,44 @@ const isNonRepresentative = (url) =>
 const result = await check({
   path: 'build/site',
   recurse: true,
-  linksToSkip: SKIP,
+  // SKIP (mailto:/tel:, never real HTTP links) plus IGNORE_PATTERNS (see
+  // ignorePatterns()'s own comment above) — anything already guaranteed to
+  // never fail the build doesn't need to be fetched at all, and for the
+  // CHANGELOG's own 257 github.com/…/pull/NNN links specifically, NOT
+  // fetching them is what keeps the crawl from tripping GitHub's rate
+  // limiting in the first place.
+  linksToSkip: [...SKIP, ...IGNORE_PATTERNS.map((pattern) => pattern.source)],
+  // linkinator's own default is 100. Even with the CHANGELOG's own links now
+  // skipped above, a real content page can still legitimately reference many
+  // distinct links to the same third-party host (docs, changelog entries,
+  // release notes elsewhere) — capping how many of THOSE can be in flight at
+  // once bounds the burst any single host sees, independent of whichever
+  // hosts happen to be on `docouture.checkLinks.ignore` today.
+  concurrency: 25,
   // linkinator's own default is 0 — NO application-level timeout at all
   // (see its own README: "requests made by linkinator do not time out, or
   // follow the settings of the OS"), which means `request.js`'s
   // `AbortSignal.timeout(options.timeout)` is never even constructed. A
-  // real multi-page site can easily produce a few hundred *distinct*
+  // real multi-page site can easily produce a few dozen *distinct*
   // (not duplicate — linkinator already dedupes identical URLs, so this
-  // isn't a dedup gap) links to the same external host: think a
-  // CHANGELOG page with one github.com/…/pull/NNN link per entry, not
-  // just this template's own repo-link/edit-link. A burst that size can
-  // trip a host's own anonymous-crawler rate limiting (GitHub's included),
-  // and — unconfirmed upstream, but plausible and cheap to guard against
-  // either way — if that limiting responds slowly rather than rejecting
-  // fast, an unbounded request ties up one of `concurrency`'s 100 slots
-  // for however long the OS's own idle/keepalive timeout happens to be
-  // (which can be minutes), not a few seconds. 10s is generous for any
-  // real external page load; it only ever kicks in to cut a stalled
-  // socket loose instead of quietly inflating the whole crawl's wall-clock
-  // time. NOT a fix for "too many links to github.com" in general — those
-  // are real, individually-distinct links an author is vouching for, and
-  // correctly stay off `docouture.checkLinks.ignore` (see ignorePatterns()
-  // above) so a genuinely broken one still fails the build.
+  // isn't a dedup gap) links to the same external host — release notes,
+  // docs, an author citing the same third-party page from several
+  // pages — and a burst that size can trip a host's own anonymous-crawler
+  // rate limiting (GitHub's included), even with `concurrency` capped
+  // above. If that limiting responds slowly rather than rejecting fast, an
+  // unbounded request ties up one of `concurrency`'s slots for however long
+  // the OS's own idle/keepalive timeout happens to be (which can be
+  // minutes), not a few seconds. 10s is generous for any real external page
+  // load; it only ever kicks in to cut a stalled socket loose instead of
+  // quietly inflating the whole crawl's wall-clock time. NOT a fix for "too
+  // many links to the same host" in general — a page's own,
+  // individually-distinct references to real external content are links an
+  // author is vouching for, correctly stay off `docouture.checkLinks.ignore`
+  // (see ignorePatterns() above), and so are still fetched, retried and able
+  // to fail the build like any other external link. The CHANGELOG's 257
+  // self-repo PR links were a different case entirely — see `linksToSkip`
+  // above — skipped because every one of them is already guaranteed to
+  // never affect the outcome, not merely because they're numerous.
   timeout: 10_000,
   // A plain 403/429 from a real external host (most commonly GitHub's own
   // bot/rate-limit protection kicking in on repo links, hit repeatedly
