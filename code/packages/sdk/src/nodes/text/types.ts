@@ -34,11 +34,17 @@ export type WeaveTextOutlineProperties =
       enabled: false;
     };
 
+export type WeaveTextLinkProperties = {
+  defaultColor: string;
+  hoverColor: string;
+};
+
 export type WeaveTextProperties = {
   transform: WeaveNodeTransformerProperties;
   outline: WeaveTextOutlineProperties;
   edition: WeaveTextEditionProperties;
   cursor: WeaveTextCursorProperties;
+  link: WeaveTextLinkProperties;
 };
 
 export type WeaveTextNodeParams = {

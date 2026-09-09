@@ -160,6 +160,29 @@ export function handleClickOrTap(
   }
 
   const isCtrlOrCmdPressed = e.evt.ctrlKey || e.evt.metaKey;
+
+  // Generic per-node click hook (e.g. text-node hyperlinks), invoked here
+  // rather than as a raw Konva event on the node itself: once a node is
+  // selected its hit area is covered by the Transformer's own overdraw
+  // shape (see Transformer's `back` proxy, used to drag-move the whole
+  // selection), so a `node.on('pointerclick', ...)` listener registered
+  // directly on the node would stop firing for any click while it's
+  // selected. `nodeTargeted` here is already correctly re-resolved through
+  // that overlay (same as `dblClick()` above), so it stays reliable
+  // regardless of selection state. Skipped on shift-click, which is a
+  // multi-select gesture, not a per-node interaction.
+  if (!e.evt.shiftKey) {
+    const wasSelectedBeforeThisClick =
+      tr
+        .nodes()
+        .findIndex((node) => node.getAttrs().id === nodeTargeted.getAttrs().id) !==
+      -1;
+    nodeTargeted.click({
+      wasSelected: wasSelectedBeforeThisClick,
+      ctrlOrMetaPressed: isCtrlOrCmdPressed,
+    });
+  }
+
   if (isCtrlOrCmdPressed) return;
 
   if (!metaPressed) {

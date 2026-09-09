@@ -130,6 +130,10 @@ As you can see to test you can repeat steps 1-3 as many times as you want.
 - Lint your code with `npm run lint`.
 - Format your code with `npm run format`.
 - Update the CHANGELOG.md to reflect the changes you made, we follow [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/).
+  - Add your entry under `## [Unreleased]`, in the `### Added` / `### Changed` / `### Fixed` section that matches your change (create the section if it isn't there yet).
+  - Format: `- [#ISSUE_ID](https://github.com/InditexTech/weavejs/issues/ISSUE_ID) ISSUE_NAME`, where `ISSUE_NAME` is the **verbatim title of the GitHub issue** (drop a generic prefix like `Feature request:`/`Bug:` if the issue has one, but otherwise don't paraphrase or summarize it).
+  - Example: `- [#1158](https://github.com/InditexTech/weavejs/issues/1158) Opt-in "fully enclosed" (contains) mode for drag-selection`
+
 - On the PR, depending on your change add one of the following labels:
 
   - `skip-release`: when this PR is merged no release will be performed.

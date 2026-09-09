@@ -66,6 +66,7 @@ function makeNode(attrs: Record<string, unknown> = {}) {
       .mockReturnValue({ nodeType: 'rect', id: 'node-1', ...attrs }),
     getParent: vi.fn().mockReturnValue(null),
     dblClick: vi.fn(),
+    click: vi.fn(),
     handleSelectNode: vi.fn(),
     handleDeselectNode: vi.fn(),
     defineMousePointer: undefined as (() => string) | undefined,
@@ -360,6 +361,72 @@ describe('handleClickOrTap', () => {
     expect(ctx.triggerSelectedNodesEvent).not.toHaveBeenCalled();
   });
 
+  // Regression coverage for the text-node hyperlink feature: `click()` must
+  // be invoked on the resolved node itself (not left to a raw Konva event on
+  // the node), because once a node is selected its hit area is covered by
+  // the Transformer's own overdraw shape — a `node.on('pointerclick', ...)`
+  // listener would stop firing the moment the node becomes selected, which
+  // is exactly the case a click-to-open-link feature depends on.
+  it('calls click({wasSelected, ctrlOrMetaPressed}) on plain click, not yet selected', () => {
+    const ctx = makeCtx();
+    const node = makeNode();
+    ctx.getWeaveInstance().getRealSelectedNode = vi.fn().mockReturnValue(node);
+    const e = makeEvent({}, node);
+    handleClickOrTap(ctx, e);
+    expect(node.click).toHaveBeenCalledWith({
+      wasSelected: false,
+      ctrlOrMetaPressed: false,
+    });
+  });
+
+  it('calls click({wasSelected: true, ...}) on plain click when the node was already selected', () => {
+    const ctx = makeCtx();
+    const node = makeNode({ id: 'node-1' });
+    ctx.getWeaveInstance().getRealSelectedNode = vi.fn().mockReturnValue(node);
+    ctx.getTransformerController().getTransformer = vi
+      .fn()
+      .mockReturnValue(makeTransformer([node]));
+    const e = makeEvent({}, node);
+    handleClickOrTap(ctx, e);
+    expect(node.click).toHaveBeenCalledWith({
+      wasSelected: true,
+      ctrlOrMetaPressed: false,
+    });
+  });
+
+  it('calls click({ctrlOrMetaPressed: true, ...}) on Ctrl/Cmd+Click, even though selection itself is a no-op', () => {
+    const ctx = makeCtx();
+    const node = makeNode();
+    ctx.getWeaveInstance().getRealSelectedNode = vi.fn().mockReturnValue(node);
+    const e = makeEvent({ ctrlKey: true }, node);
+    handleClickOrTap(ctx, e);
+    expect(node.click).toHaveBeenCalledWith({
+      wasSelected: false,
+      ctrlOrMetaPressed: true,
+    });
+    expect(ctx.triggerSelectedNodesEvent).not.toHaveBeenCalled();
+  });
+
+  it('does not call click() on shift+click (multi-select gesture, not a per-node interaction)', () => {
+    const ctx = makeCtx();
+    const node = makeNode({ id: 'node-1' });
+    ctx.getWeaveInstance().getRealSelectedNode = vi.fn().mockReturnValue(node);
+    const e = makeEvent({ shiftKey: true }, node);
+    handleClickOrTap(ctx, e);
+    expect(node.click).not.toHaveBeenCalled();
+  });
+
+  it('does not call click() on a double-tap (dblClick() handles it and returns early instead)', () => {
+    const ctx = makeCtx();
+    const node = makeNode();
+    (ctx.getGesture() as unknown as { isDoubleTap: boolean }).isDoubleTap =
+      true;
+    ctx.getWeaveInstance().getRealSelectedNode = vi.fn().mockReturnValue(node);
+    const e = makeEvent({}, node);
+    handleClickOrTap(ctx, e);
+    expect(node.click).not.toHaveBeenCalled();
+  });
+
   it('single-selects the node when no meta key is held', () => {
     const ctx = makeCtx();
     const node = makeNode();
@@ -549,10 +616,12 @@ describe('handleClickOrTap', () => {
     const outerGroupProxy = {
       getAttrs: vi.fn().mockReturnValue({ id: 'outer-group', nodeType: 'group' }),
       getParent: vi.fn().mockReturnValue(null),
+      click: vi.fn(),
     };
     const innerGroupProxy = {
       getAttrs: vi.fn().mockReturnValue({ id: 'inner-group', nodeType: 'group' }),
       getParent: vi.fn().mockReturnValue(outerGroupProxy),
+      click: vi.fn(),
     };
     innerNode.getParent = vi.fn().mockReturnValue(innerGroupProxy);
     outerGroup.getParent = vi.fn().mockReturnValue(null);
@@ -626,8 +695,8 @@ describe('handleClickOrTap', () => {
 
     // leaf → bottomGroup → topGroup → null
     leaf.getParent = vi.fn().mockReturnValue({ getAttrs: vi.fn().mockReturnValue({ id: 'bottom-group', nodeType: 'group' }) });
-    const bottomGroupParent = { getAttrs: vi.fn().mockReturnValue({ id: 'top-group', nodeType: 'group' }), getParent: vi.fn().mockReturnValue(null) };
-    const leafParent = { getAttrs: vi.fn().mockReturnValue({ id: 'bottom-group', nodeType: 'group' }), getParent: vi.fn().mockReturnValue(bottomGroupParent) };
+    const bottomGroupParent = { getAttrs: vi.fn().mockReturnValue({ id: 'top-group', nodeType: 'group' }), getParent: vi.fn().mockReturnValue(null), click: vi.fn() };
+    const leafParent = { getAttrs: vi.fn().mockReturnValue({ id: 'bottom-group', nodeType: 'group' }), getParent: vi.fn().mockReturnValue(bottomGroupParent), click: vi.fn() };
     leaf.getParent = vi.fn().mockReturnValue(leafParent);
     topGroup.getParent = vi.fn().mockReturnValue(null);
     bottomGroup.getParent = vi.fn().mockReturnValue(topGroup);

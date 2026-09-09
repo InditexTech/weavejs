@@ -161,6 +161,8 @@ function makeTarget(attrs: Record<string, unknown> = {}, parent: unknown = {}) {
     getClassName: () => 'Rect',
     getAttrs: vi.fn().mockReturnValue(attrs),
     getParent: vi.fn().mockReturnValue(parent),
+    dblClick: vi.fn(),
+    click: vi.fn(),
   };
 }
 
@@ -320,6 +322,7 @@ describe('handlePointerDown', () => {
     const realNodeB = {
       getAttrs: () => ({ id: 'B', nodeType: 'rectangle' }),
       getParent: () => null,
+      click: vi.fn(),
     };
     ctx.getWeaveInstance().getRealSelectedNode = vi
       .fn()
@@ -353,6 +356,7 @@ describe('handlePointerDown', () => {
     const realNodeB = {
       getAttrs: () => ({ id: 'B', nodeType: 'rectangle' }),
       getParent: () => null,
+      click: vi.fn(),
     };
     ctx.getWeaveInstance().getRealSelectedNode = vi
       .fn()
