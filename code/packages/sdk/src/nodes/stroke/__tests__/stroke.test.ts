@@ -153,6 +153,43 @@ describe('WeaveStrokeNode', () => {
       );
       expect(cfg.isEraser).toBe(true);
     });
+
+    it('1.6 splineTargetEdge / splineMaxSteps default and override', () => {
+      const { node: def } = makeNode();
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const defCfg = (def as any).config;
+      expect(defCfg.splineTargetEdge).toBe(
+        WEAVE_STROKE_NODE_DEFAULT_CONFIG.splineTargetEdge
+      );
+      expect(defCfg.splineMaxSteps).toBe(
+        WEAVE_STROKE_NODE_DEFAULT_CONFIG.splineMaxSteps
+      );
+
+      const { node: custom } = makeNode({
+        splineTargetEdge: 2,
+        splineMaxSteps: 12,
+      });
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const customCfg = (custom as any).config;
+      expect(customCfg.splineTargetEdge).toBe(2);
+      expect(customCfg.splineMaxSteps).toBe(12);
+    });
+
+    it('1.7 a coarser splineTargetEdge actually produces fewer rendered vertices', () => {
+      const curved: WeaveStrokePoint[] = [
+        { x: 0, y: 0, pressure: 1 },
+        { x: 40, y: 30, pressure: 1 },
+        { x: 80, y: -30, pressure: 1 },
+        { x: 120, y: 0, pressure: 1 },
+      ];
+      const { node: fine } = makeNode({ splineTargetEdge: 0.5 });
+      const { node: coarse } = makeNode({ splineTargetEdge: 6 });
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const fineOut = (fine as any).getSplinePoints(curved);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const coarseOut = (coarse as any).getSplinePoints(curved);
+      expect(fineOut.length).toBeGreaterThan(coarseOut.length);
+    });
   });
 
   // -------------------------------------------------------------------------
@@ -684,17 +721,89 @@ describe('WeaveStrokeNode', () => {
   // -------------------------------------------------------------------------
 
   describe('getSplinePoints (private — via direct cast)', () => {
-    it('13.1 two input points → produces resolution intermediate steps + last point appended', () => {
+    it('13.1 a straight span is emitted as a single edge (subdividing it changes no pixel)', () => {
       const { node } = makeNode();
       const pts: WeaveStrokePoint[] = [
         { x: 0, y: 0, pressure: 1 },
         { x: 10, y: 0, pressure: 1 },
       ];
-      // resolution=4 → 4 t-steps for 1 segment + 1 last point = 5 total
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const result = (node as any).getSplinePoints(pts, 4);
-      expect(result.length).toBe(5);
+      expect(result.length).toBe(2);
       expect(result[result.length - 1]).toEqual(pts[pts.length - 1]);
+    });
+
+    it('13.1b a curved span is subdivided at least `resolution` times', () => {
+      const { node } = makeNode();
+      const pts: WeaveStrokePoint[] = [
+        { x: 0, y: 0, pressure: 1 },
+        { x: 4, y: 6, pressure: 1 },
+        { x: 8, y: -6, pressure: 1 },
+        { x: 12, y: 0, pressure: 1 },
+      ];
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const result = (node as any).getSplinePoints(pts, 8);
+      expect(result.length).toBeGreaterThan(8);
+      expect(result[result.length - 1]).toEqual(pts[pts.length - 1]);
+    });
+
+    it('13.1c long curved spans subdivide by arc length, not by a fixed count (anti-faceting)', () => {
+      const { node } = makeNode();
+      const shortSpan: WeaveStrokePoint[] = [
+        { x: 0, y: 0, pressure: 1 },
+        { x: 3, y: 2, pressure: 1 },
+        { x: 6, y: -2, pressure: 1 },
+        { x: 9, y: 0, pressure: 1 },
+      ];
+      // Same shape, 10x larger: a fixed subdivision count would render this
+      // with 10x longer (visibly faceted) edges.
+      const longSpan: WeaveStrokePoint[] = shortSpan.map((p) => ({
+        ...p,
+        x: p.x * 10,
+        y: p.y * 10,
+      }));
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const shortOut = (node as any).getSplinePoints(shortSpan, 8);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const longOut = (node as any).getSplinePoints(longSpan, 8);
+      expect(longOut.length).toBeGreaterThan(shortOut.length);
+    });
+
+    it('13.1d rendered edge length stays bounded regardless of control-point spacing', () => {
+      const { node } = makeNode();
+      // Widely-spaced control points, as Douglas-Peucker leaves after a
+      // stroke is finalized — this is the case that used to look jagged.
+      const sparse: WeaveStrokePoint[] = [
+        { x: 0, y: 0, pressure: 1 },
+        { x: 40, y: 30, pressure: 1 },
+        { x: 80, y: -30, pressure: 1 },
+        { x: 120, y: 0, pressure: 1 },
+      ];
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const out = (node as any).getSplinePoints(sparse, 8) as WeaveStrokePoint[];
+      let maxEdge = 0;
+      for (let i = 1; i < out.length; i++) {
+        maxEdge = Math.max(
+          maxEdge,
+          Math.hypot(out[i].x - out[i - 1].x, out[i].y - out[i - 1].y)
+        );
+      }
+      // Well under the ~15px edges the old fixed-count sampling produced.
+      expect(maxEdge).toBeLessThan(4);
+    });
+
+    it('13.1e splineMaxSteps caps subdivision of a pathologically long span', () => {
+      const { node } = makeNode({ splineMaxSteps: 6 });
+      const huge: WeaveStrokePoint[] = [
+        { x: 0, y: 0, pressure: 1 },
+        { x: 500, y: 400, pressure: 1 },
+        { x: 1000, y: -400, pressure: 1 },
+        { x: 1500, y: 0, pressure: 1 },
+      ];
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const out = (node as any).getSplinePoints(huge, 2);
+      // 3 spans x max 6 steps + final point
+      expect(out.length).toBeLessThanOrEqual(3 * 6 + 1);
     });
 
     it('13.2 start/end boundary clamping (p0 = pts[max(i,0)], p3 = pts[min(i+3,len-1)]) does not throw', () => {
@@ -797,6 +906,63 @@ describe('WeaveStrokeNode', () => {
       (node as any).drawRoundCap(mockCtx, coincident, coincident, 'red');
 
       expect(mockCtx.arc).toHaveBeenCalledOnce();
+    });
+  });
+
+  // -------------------------------------------------------------------------
+  // Suite 16 — outline vertex efficiency
+  // -------------------------------------------------------------------------
+
+  describe('drawRibbonWithDash — outline vertex efficiency', () => {
+    /** Collects the points passed to ctx.lineTo during a scene render. */
+    function renderAndCollectLineTo(
+      node: WeaveStrokeNode,
+      pts: WeaveStrokePoint[]
+    ) {
+      const shape = node.onRender(defaultProps()) as Konva.Shape;
+      shape.setAttrs({ strokeElements: pts, dash: [], strokeWidth: 8 });
+      const ctx = makeMockCtx();
+      (shape.getAttr('sceneFunc') as (...args: unknown[]) => unknown)(ctx, shape);
+      return (ctx.lineTo.mock.calls as unknown as number[][]).map(([x, y]) => ({
+        x,
+        y,
+      }));
+    }
+
+    const curvedStroke: WeaveStrokePoint[] = Array.from(
+      { length: 24 },
+      (_, i) => ({ x: i * 6, y: Math.sin(i / 3) * 24, pressure: 0.6 })
+    );
+
+    it('16.1 the filled outline contains no consecutive duplicate vertices', () => {
+      const { node } = makeNode();
+      const drawn = renderAndCollectLineTo(node, curvedStroke);
+
+      let duplicatePairs = 0;
+      for (let i = 1; i < drawn.length; i++) {
+        const d = Math.hypot(
+          drawn[i].x - drawn[i - 1].x,
+          drawn[i].y - drawn[i - 1].y
+        );
+        if (d < 1e-9) duplicatePairs++;
+      }
+      expect(drawn.length).toBeGreaterThan(0);
+      expect(duplicatePairs).toBe(0);
+    });
+
+    it('16.2 outline vertex count stays proportional to the centerline (no 2x joint duplication)', () => {
+      const { node } = makeNode();
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const nodeAny = node as any;
+      const centerline = nodeAny.getSplinePoints(
+        nodeAny.resamplePoints(curvedStroke),
+        WEAVE_STROKE_NODE_DEFAULT_CONFIG.splineResolution
+      );
+      const drawn = renderAndCollectLineTo(node, curvedStroke);
+
+      // Two sides, ~one vertex per centerline point each. Previously each
+      // side emitted two vertices per centerline segment, i.e. ~4x.
+      expect(drawn.length).toBeLessThan(centerline.length * 3);
     });
   });
 });

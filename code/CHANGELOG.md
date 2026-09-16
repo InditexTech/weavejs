@@ -13,6 +13,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- [#1174](https://github.com/InditexTech/weavejs/issues/1174) Brush tool: fix stroke pressure smoothing, finished-stroke rendering accuracy, and drawing performance
+
 ## [5.4.0] - 2026-09-09
 
 ### Added

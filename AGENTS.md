@@ -101,3 +101,5 @@ npx skills@latest add InditexTech/docouture --all
 | doc page          | derived from          | status |
 | ----------------- | --------------------- | ------ |
 | index.adoc (home) | manual (hand-written) | —      |
+| sdk:api-reference/nodes/stroke.adoc | `code/packages/sdk/src/nodes/stroke/{types,constants}.ts` | updated for unreleased changes |
+| sdk:api-reference/actions/brush-tool.adoc | `code/packages/sdk/src/actions/brush-tool/{types,constants}.ts` | updated for unreleased changes |

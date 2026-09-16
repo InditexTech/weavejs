@@ -13,6 +13,7 @@ export type WeaveBrushToolActionOnAddedEvent = undefined;
 
 export type WeaveBrushToolActionProperties = {
   interpolationSteps: number; // Number of steps for interpolation
+  simplifyTolerance: number; // Douglas-Peucker tolerance applied on stroke finalize
 };
 
 export type WeaveBrushToolActionParams = {

@@ -39,6 +39,7 @@ new WeaveBrushToolAction(params?: WeaveBrushToolActionParams);
 ----
 type WeaveBrushToolActionProperties = {
   interpolationSteps: number; // Number of steps for interpolation
+  simplifyTolerance: number; // Douglas-Peucker tolerance applied on stroke finalize
 };
 
 type WeaveBrushToolActionParams = {
@@ -54,16 +55,17 @@ For `WeaveBrushToolActionParams`:
 |===
 | Property | Type | Required | Description
 
-| mono:[config] | mono:[Partial<WeaveBrushToolActionParams>] | label:green[Required] | Config parameters for the tool.
+| mono:[config] | mono:[Partial<WeaveBrushToolActionProperties>] | label:green[Required] | Config parameters for the tool.
 |===
 
-For `WeaveBrushToolActionParams`:
+For `WeaveBrushToolActionProperties`:
 
 [cols="5*"]
 |===
 | Property | Type | Required | Default | Description
 
 | mono:[interpolationSteps] | mono:[number] |  | mono:[10] | Number of interpolation steps for smooth curve on touch devices.
+| mono:[simplifyTolerance] | mono:[number] |  | mono:[0.5] | Tolerance, in canvas units, of the Douglas-Peucker simplification applied once when a stroke is finalized. While a stroke is being drawn every recorded sample is rendered; on release the point list is simplified before being persisted, so this value governs how much fidelity a finished stroke gives up. Lower values keep a finished stroke closer to the path drawn, at the cost of more points stored per stroke.
 |===
 
 == Default values
@@ -72,5 +74,6 @@ For `WeaveBrushToolActionParams`:
 ----
 const BRUSH_TOOL_DEFAULT_CONFIG = {
   interpolationSteps: 10,
+  simplifyTolerance: 0.5,
 };
 ----
