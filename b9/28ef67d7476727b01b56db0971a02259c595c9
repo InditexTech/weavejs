@@ -1,0 +1,21 @@
+code/packages/sdk/src/actions/brush-tool/__tests__/brush-tool.test.ts
+  s_b327efd7c5d05b::t_4e923ee6264f7f 65,91-100,315-319,321,361-363,371-382,394-484,693-701,710-713,734-738,748-750,777,787-819,1070-1075,1107-1109,1111,1302,1364-1394,1477,1517-1697
+openspec/changes/archive/2026-09-16-stabilize-brush-stroke-spline/.openspec.yaml
+  s_b327efd7c5d05b::t_a053b93090f5fb 1-2
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "b928ef67d7476727b01b56db0971a02259c595c9",
+  "prompts": {},
+  "sessions": {
+    "s_b327efd7c5d05b": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "ses_f56586303ffeKKF8qnmmd28ObE",
+        "model": "claude-sonnet-5"
+      },
+      "human_author": "Jesus Manuel Piñeiro Cid <jesusmpc@inditex.com>"
+    }
+  }
+}
