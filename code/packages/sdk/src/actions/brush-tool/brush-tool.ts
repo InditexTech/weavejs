@@ -109,6 +109,24 @@ export class WeaveBrushToolAction extends WeaveAction {
     return Math.max(this.lastSmoothedPressure, 0.15); // floor prevents invisible strokes
   }
 
+  /**
+   * Resets the pressure-smoothing state (smoothed pressure, last known pointer
+   * position/time, and predicted-point bookkeeping) to a neutral baseline.
+   *
+   * This state is scoped to a single stroke: it must be reset before the
+   * first pressure sample of a new stroke is computed (in `handlePointerDown`,
+   * ahead of the `getEventPressure` call for point 0), not only afterwards -
+   * otherwise that first sample can inherit smoothing state left behind by
+   * the previous stroke (its ending pressure, pointer position and time),
+   * inflating the very first point's pressure.
+   */
+  private resetPressureSmoothingState() {
+    this.lastSmoothedPressure = 0.5;
+    this.lastPointerPos = null;
+    this.lastPointerTime = 0;
+    this.predictedCount = 0;
+  }
+
   private setupEvents() {
     const stage = this.instance.getStage();
 
@@ -180,6 +198,11 @@ export class WeaveBrushToolAction extends WeaveAction {
       if (e.evt.pointerType === 'touch' && this.penActive) return;
 
       if (e.evt.pointerType === 'pen') this.penActive = true;
+
+      // Reset smoothing state BEFORE computing the new stroke's first
+      // pressure sample, so it can never inherit the previous stroke's
+      // ending pressure/pointer position (see resetPressureSmoothingState).
+      this.resetPressureSmoothingState();
 
       const pointPressure = this.getEventPressure(e);
       this.handleStartStroke(pointPressure);
@@ -290,10 +313,7 @@ export class WeaveBrushToolAction extends WeaveAction {
   }
 
   private handleStartStroke(pressure: number) {
-    this.lastSmoothedPressure = 0.5;
-    this.lastPointerPos = null;
-    this.lastPointerTime = 0;
-    this.predictedCount = 0;
+    this.resetPressureSmoothingState();
 
     const { mousePoint, container, measureContainer } =
       this.instance.getMousePointer();
@@ -369,6 +389,23 @@ export class WeaveBrushToolAction extends WeaveAction {
           -1 * this.predictedCount
         );
         this.predictedCount = 0;
+      }
+
+      // The stroke's very first (pointerdown) sample is frequently an
+      // unreliable "contact spike" - many stylus/OS stacks report a
+      // momentary peak pressure on initial touch that doesn't represent the
+      // sustained drawing pressure. It's rendered standalone as a filled dot
+      // and, via spline smoothing, doubly influences the start of the
+      // rendered ribbon (see stroke.ts's getSplinePoints phantom endpoint).
+      // Once a real second sample exists, trust it over that initial
+      // contact reading for point 0 too, so neither artifact persists.
+      // Only real (non-predicted) samples correct it, since predicted
+      // points are speculative and may be rolled back.
+      if (!isPredicted && newStrokeElements.length === 1) {
+        newStrokeElements[0] = {
+          ...newStrokeElements[0],
+          pressure: currentPoint.pressure,
+        };
       }
 
       newStrokeElements.push(currentPoint);

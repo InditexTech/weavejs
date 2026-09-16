@@ -827,6 +827,149 @@ describe('WeaveBrushToolAction', () => {
       callHandleStartStroke(action, 0.5);
       expect((action as unknown as R)['state']).toBe(BRUSH_TOOL_STATE.DEFINE_STROKE);
     });
+
+    it('11.10 resetPressureSmoothingState() resets the same 4 fields as the old inline block', () => {
+      (action as unknown as R)['lastSmoothedPressure'] = 0.9;
+      (action as unknown as R)['lastPointerPos'] = { x: 1, y: 1 };
+      (action as unknown as R)['lastPointerTime'] = 9999;
+      (action as unknown as R)['predictedCount'] = 5;
+      (action as unknown as R)['resetPressureSmoothingState']();
+      expect((action as unknown as R)['lastSmoothedPressure']).toBe(0.5);
+      expect((action as unknown as R)['lastPointerPos']).toBeNull();
+      expect((action as unknown as R)['lastPointerTime']).toBe(0);
+      expect((action as unknown as R)['predictedCount']).toBe(0);
+    });
+  });
+
+  // ── Suite 11b: cross-stroke pressure-state isolation (regression) ─────────
+  // These tests exercise the real pointerdown/pointermove/pointerup handlers
+  // (not the private methods directly) so they genuinely cover the ordering
+  // fixed in handlePointerDown - see openspec change
+  // fix-brush-stroke-start-pressure-leak.
+
+  describe('pressure-smoothing state isolation across strokes (regression)', () => {
+    let handlers: Record<string, (e?: unknown) => void>;
+    let nodeHandler: ReturnType<typeof makeMockNodeHandler>;
+
+    beforeEach(() => {
+      const result = triggerAndCapture();
+      handlers = result.handlers;
+      nodeHandler = makeMockNodeHandler();
+      mockWeave.getNodeHandler.mockReturnValue(nodeHandler);
+      // A single shared temp-stroke stub is enough here: these tests only
+      // assert on the pressure passed into nodeHandler.create() for each
+      // stroke's first point, not on per-stroke strokeElements content.
+      const tempStroke = makeMockTempStroke('shared', [{ x: 0, y: 0, pressure: 0.5 }]);
+      mockWeave._stage.findOne.mockReturnValue(tempStroke);
+    });
+
+    function firstPointPressureOfCreateCall(callIndex: number): number {
+      const propsArg = nodeHandler.create.mock.calls[callIndex]?.[1] as R;
+      const strokeElements = propsArg['strokeElements'] as R[];
+      return strokeElements[0]['pressure'] as number;
+    }
+
+    it("11.11 a new stroke's first-point pressure ignores a previous stroke's elevated ending pressure and stale pointer position", () => {
+      const nowSpy = vi.spyOn(performance, 'now');
+
+      // ── Stroke 1: pointerdown, then two pen moves engineered to push the
+      // ── smoothed pressure high and leave a far-away, recent pointer position.
+      nowSpy.mockReturnValueOnce(1000); // pointerdown1 → getEventPressure call #1
+      handlers['pointerdown']?.(
+        makePointerEvent({ pointerType: 'pen', pressure: 1.0, clientX: 0, clientY: 0 })
+      );
+
+      nowSpy.mockReturnValueOnce(1001); // pointermove1a → call #2 (lastPointerPos was
+      // reset to null by handleStartStroke, so velocity=0, alpha=0.15 here)
+      handlers['pointermove']?.(
+        makePointerEvent({ pointerType: 'pen', pressure: 1.0, clientX: 900, clientY: 900 })
+      );
+
+      nowSpy.mockReturnValueOnce(1002); // pointermove1b → call #3, 1ms after 1a,
+      // dx=0, dy=-900 → huge velocity → alpha clamped to its ceiling 0.6
+      handlers['pointermove']?.(
+        makePointerEvent({ pointerType: 'pen', pressure: 1.0, clientX: 900, clientY: 0 })
+      );
+      // lastSmoothedPressure is now ≈ 0.6*1.0 + 0.4*0.575 = 0.83 (elevated),
+      // lastPointerPos ≈ (900, 0), lastPointerTime = 1002.
+
+      handlers['pointerup']?.(makePointerEvent());
+
+      // ── Stroke 2: starts moments later, far from stroke 1's last position -
+      // exactly the shape that maximises the leaked "velocity" in the buggy
+      // pre-fix ordering.
+      nowSpy.mockReturnValueOnce(1003); // pointerdown2 → getEventPressure call #4
+      handlers['pointerdown']?.(
+        makePointerEvent({ pointerType: 'pen', pressure: 0.8, clientX: 0, clientY: 900 })
+      );
+
+      // With the fix, resetPressureSmoothingState() runs before this call's
+      // own getEventPressure, so lastPointerPos is null (velocity=0, alpha
+      // floored at 0.15) and lastSmoothedPressure starts from 0.5 - matching
+      // test 4.3's known result, independent of stroke 1 entirely.
+      expect(firstPointPressureOfCreateCall(1)).toBeCloseTo(0.15 * 0.8 + 0.85 * 0.5); // 0.545
+
+      nowSpy.mockRestore();
+    });
+
+    it('11.12 rapid successive strokes: no stroke\'s first-sample pressure is pulled toward a neighboring stroke\'s ending pressure', () => {
+      const nowSpy = vi.spyOn(performance, 'now');
+      let t = 1000;
+      const tick = () => nowSpy.mockReturnValueOnce((t += 1));
+
+      // Three strokes, back-to-back, each starting immediately (1ms) after the
+      // previous one's pointerup, each at a very different position, each
+      // with a different own raw pen pressure.
+      const rawPressures = [1.0, 0.2, 0.9];
+      const positions = [
+        { x: 0, y: 0 },
+        { x: 1000, y: 1000 },
+        { x: 0, y: 1000 },
+      ];
+
+      rawPressures.forEach((raw, i) => {
+        tick();
+        handlers['pointerdown']?.(
+          makePointerEvent({ pointerType: 'pen', pressure: raw, clientX: positions[i].x, clientY: positions[i].y })
+        );
+        tick();
+        handlers['pointermove']?.(
+          makePointerEvent({ pointerType: 'pen', pressure: raw, clientX: positions[i].x + 50, clientY: positions[i].y + 50 })
+        );
+        handlers['pointerup']?.(makePointerEvent());
+      });
+
+      // Every stroke's first-point pressure must match the clean-baseline
+      // formula for its OWN raw pressure - never blended with a neighbor's.
+      rawPressures.forEach((raw, i) => {
+        expect(firstPointPressureOfCreateCall(i)).toBeCloseTo(0.15 * raw + 0.85 * 0.5);
+      });
+
+      nowSpy.mockRestore();
+    });
+
+    it('11.13 end-to-end: a contact-spike pointerdown pressure is corrected as soon as the first real movement lands', () => {
+      // Simulate the tempStroke findOne would return right after a pointerdown
+      // whose pressure was an inflated hardware "contact spike" (0.575, as
+      // getEventPressure would produce for a raw=1.0 first sample - see test 4.3-style math).
+      const tempStroke = makeMockTempStroke('shared', [{ x: 10, y: 20, pressure: 0.575 }]);
+      mockWeave._stage.findOne.mockReturnValue(tempStroke);
+      (action as unknown as R)['state'] = BRUSH_TOOL_STATE.DEFINE_STROKE;
+      (action as unknown as R)['strokeId'] = 'shared';
+      (action as unknown as R)['measureContainer'] = mockWeave._measureContainer;
+
+      handlers['pointermove']?.(
+        makePointerEvent({ pointerType: 'pen', pressure: 0.4, clientX: 12, clientY: 22 })
+      );
+
+      const lastOnUpdateCall = nodeHandler.onUpdate.mock.calls.at(-1);
+      const updatedAttrs = lastOnUpdateCall?.[1] as R;
+      const elements = updatedAttrs['strokeElements'] as R[];
+      // Point 0 no longer holds the contact-spike value - it now matches
+      // the first real movement sample's own (settled) pressure.
+      expect(elements[0]['pressure']).toBeCloseTo(elements[1]['pressure'] as number);
+      expect(elements[0]['pressure']).not.toBeCloseTo(0.575);
+    });
   });
 
   // ── Suite 12: handleMovement ───────────────────────────────────────────────
@@ -929,6 +1072,43 @@ describe('WeaveBrushToolAction', () => {
     it('12.12 nodeHandler absent → skips onUpdate without throw', () => {
       mockWeave.getNodeHandler.mockReturnValue(undefined);
       expect(() => callHandleMovement(action, 0.5, undefined, false)).not.toThrow();
+    });
+
+    // ── contact-spike backfill (see openspec change
+    // fix-brush-stroke-start-pressure-leak, tasks 4.x) ──────────────────────
+
+    it('12.13 first real movement backfills point 0\'s pressure with its own (contact-spike correction)', () => {
+      // Point 0 carries an inflated "contact spike" pressure from pointerdown.
+      mockTempStroke = makeMockTempStroke('stroke-1', [{ x: 5, y: 5, pressure: 0.95 }]);
+      mockWeave._stage.findOne.mockReturnValue(mockTempStroke);
+      callHandleMovement(action, 0.4, undefined, false);
+      const call = mockTempStroke.setAttrs.mock.calls[0]?.[0] as R;
+      const elements = call?.['strokeElements'] as R[];
+      expect(elements[0]).toMatchObject({ pressure: 0.4 });
+      expect(elements[1]).toMatchObject({ pressure: 0.4 });
+    });
+
+    it('12.14 a predicted (speculative) sample does NOT backfill point 0', () => {
+      mockTempStroke = makeMockTempStroke('stroke-1', [{ x: 5, y: 5, pressure: 0.95 }]);
+      mockWeave._stage.findOne.mockReturnValue(mockTempStroke);
+      callHandleMovement(action, 0.4, undefined, true);
+      const call = mockTempStroke.setAttrs.mock.calls[0]?.[0] as R;
+      const elements = call?.['strokeElements'] as R[];
+      expect(elements[0]).toMatchObject({ pressure: 0.95 });
+    });
+
+    it('12.15 once the stroke already has 2+ points, later movements do not touch point 0 again', () => {
+      mockTempStroke = makeMockTempStroke('stroke-1', [
+        { x: 0, y: 0, pressure: 0.95 }, // already-corrected point 0
+        { x: 1, y: 1, pressure: 0.4 },
+      ]);
+      mockWeave._stage.findOne.mockReturnValue(mockTempStroke);
+      callHandleMovement(action, 0.6, undefined, false);
+      const call = mockTempStroke.setAttrs.mock.calls[0]?.[0] as R;
+      const elements = call?.['strokeElements'] as R[];
+      expect(elements[0]).toMatchObject({ pressure: 0.95 }); // untouched
+      expect(elements[1]).toMatchObject({ pressure: 0.4 }); // untouched
+      expect(elements[2]).toMatchObject({ pressure: 0.6 }); // newly appended
     });
   });
 
