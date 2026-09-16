@@ -13,6 +13,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [5.4.1] - 2026-09-16
+
 ### Fixed
 
 - [#1174](https://github.com/InditexTech/weavejs/issues/1174) Brush tool: fix stroke pressure smoothing, finished-stroke rendering accuracy, and drawing performance
@@ -1932,7 +1934,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - [#24](https://github.com/InditexTech/weavejs/issues/24) Bug when loading rooms with text or images
 - [#18](https://github.com/InditexTech/weavejs/issues/18) Fix awareness not working on store-azure-web-pubsub
 
-[Unreleased]: https://github.com/InditexTech/weavejs/compare/5.4.0...HEAD
+[Unreleased]: https://github.com/InditexTech/weavejs/compare/5.4.1...HEAD
+
+[5.4.1]: https://github.com/InditexTech/weavejs/compare/5.4.0...5.4.1
 
 [5.4.0]: https://github.com/InditexTech/weavejs/compare/5.3.0...5.4.0
 
