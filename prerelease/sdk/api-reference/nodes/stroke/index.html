@@ -72,7 +72,7 @@
 
 <title>WeaveStrokeNode | Weave.js</title>
 
-    <link rel="canonical" href="https://inditextech.github.io/weavejs/5.4.0/sdk/api-reference/nodes/stroke/">
+    <link rel="canonical" href="https://inditextech.github.io/weavejs/5.4.1/sdk/api-reference/nodes/stroke/">
     <link rel="prev" href="../star/">
     <link rel="next" href="../stroke-single/">
     <meta name="description" content="Stroke node API Reference">
@@ -100,7 +100,7 @@
           <span class="dt-button__icon dt-button__icon-icon"><svg class="dt-icon" aria-hidden="true" focusable="false"><use href="../../../../../_/img/icons.svg#icon-menu"></use></svg></span>
         </span>
       </button>
-      <a class="header-toolbar__brand" href="../../../../../5.4.0/">
+      <a class="header-toolbar__brand" href="../../../../../5.4.1/">
         <img class="header-toolbar__logo" src="../../../../../_/product-logo.png" width="24" height="24" alt="">
         <span class="header-toolbar__product-name dt-text dt-text--label-l-high">Weave.js</span>
       </a>
@@ -124,10 +124,13 @@
       <span class="version__label">prerelease</span>
       <span class="dt-label dt-label--orange"><span class="dt-label__content">Prerelease</span></span>
     </span>
-    <a class="version" href="../../../../../5.4.0/sdk/api-reference/nodes/stroke/">
-      <span class="version__label">5.4.0</span>
+    <a class="version" href="../../../../../5.4.1/sdk/api-reference/nodes/stroke/">
+      <span class="version__label">5.4.1</span>
       <span class="dt-label dt-label--green"><span class="dt-label__content">Latest</span></span>
           </a>
+    <a class="version" href="../../../../../5.4.0/sdk/api-reference/nodes/stroke/">
+      <span class="version__label">5.4.0</span>
+    </a>
     <a class="version" href="../../../../../5.3.0/sdk/api-reference/nodes/stroke/">
       <span class="version__label">5.3.0</span>
     </a>
@@ -249,7 +252,7 @@
   </div>
 
 <div class="side-menu__brand">
-  <a class="side-menu__brand-link" href="../../../../../5.4.0/">
+  <a class="side-menu__brand-link" href="../../../../../5.4.1/">
     <img class="side-menu__brand-logo" src="../../../../../_/product-logo.png" width="40" height="40" alt="">
     <span class="side-menu__brand-title dt-text dt-text--title-m">Weave.js</span>
   </a>
@@ -1077,10 +1080,13 @@
       <span class="version__label">prerelease</span>
       <span class="dt-label dt-label--orange"><span class="dt-label__content">Prerelease</span></span>
     </span>
-    <a class="version" href="../../../../../5.4.0/sdk/api-reference/nodes/stroke/">
-      <span class="version__label">5.4.0</span>
+    <a class="version" href="../../../../../5.4.1/sdk/api-reference/nodes/stroke/">
+      <span class="version__label">5.4.1</span>
       <span class="dt-label dt-label--green"><span class="dt-label__content">Latest</span></span>
           </a>
+    <a class="version" href="../../../../../5.4.0/sdk/api-reference/nodes/stroke/">
+      <span class="version__label">5.4.0</span>
+    </a>
     <a class="version" href="../../../../../5.3.0/sdk/api-reference/nodes/stroke/">
       <span class="version__label">5.3.0</span>
     </a>
@@ -1181,8 +1187,11 @@ offers full control over the line’s geometry, style, and behavior—all synchr
 <pre class="shiki highlight"><code data-lang="ts"><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4;--shiki-light-bg:#1E1E1E;--shiki-dark-bg:#1E1E1E"><span class="line"><span style="--shiki-light:#569CD6;--shiki-dark:#569CD6">type</span><span style="--shiki-light:#4EC9B0;--shiki-dark:#4EC9B0"> WeaveNodeTransformerProperties</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4"> = </span><span style="--shiki-light:#4EC9B0;--shiki-dark:#4EC9B0">Konva</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">.</span><span style="--shiki-light:#4EC9B0;--shiki-dark:#4EC9B0">TransformerConfig</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">;</span></span>
 <span class="line"></span>
 <span class="line"><span style="--shiki-light:#569CD6;--shiki-dark:#569CD6">type</span><span style="--shiki-light:#4EC9B0;--shiki-dark:#4EC9B0"> WeaveStrokeProperties</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4"> = {</span></span>
-<span class="line"><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">  splineResolution</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">: </span><span style="--shiki-light:#4EC9B0;--shiki-dark:#4EC9B0">number</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">; </span><span style="--shiki-light:#6A9955;--shiki-dark:#6A9955">// Spline resolution</span></span>
+<span class="line"><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">  splineResolution</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">: </span><span style="--shiki-light:#4EC9B0;--shiki-dark:#4EC9B0">number</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">; </span><span style="--shiki-light:#6A9955;--shiki-dark:#6A9955">// Minimum subdivisions per curved spline span</span></span>
+<span class="line"><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">  splineTargetEdge</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">: </span><span style="--shiki-light:#4EC9B0;--shiki-dark:#4EC9B0">number</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">; </span><span style="--shiki-light:#6A9955;--shiki-dark:#6A9955">// Target rendered edge length, in canvas units</span></span>
+<span class="line"><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">  splineMaxSteps</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">: </span><span style="--shiki-light:#4EC9B0;--shiki-dark:#4EC9B0">number</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">; </span><span style="--shiki-light:#6A9955;--shiki-dark:#6A9955">// Upper bound on subdivisions for a single span</span></span>
 <span class="line"><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">  resamplingSpacing</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">: </span><span style="--shiki-light:#4EC9B0;--shiki-dark:#4EC9B0">number</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">; </span><span style="--shiki-light:#6A9955;--shiki-dark:#6A9955">// Spacing for resampling points</span></span>
+<span class="line"><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">  isEraser</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">?: </span><span style="--shiki-light:#4EC9B0;--shiki-dark:#4EC9B0">boolean</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">; </span><span style="--shiki-light:#6A9955;--shiki-dark:#6A9955">// Whether the stroke is an eraser</span></span>
 <span class="line"><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">  transform</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">?: </span><span style="--shiki-light:#4EC9B0;--shiki-dark:#4EC9B0">WeaveNodeTransformerProperties</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">;</span></span>
 <span class="line"><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">};</span></span>
 <span class="line"></span>
@@ -1223,14 +1232,14 @@ offers full control over the line’s geometry, style, and behavior—all synchr
 <tbody>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code class="dt-mono">config</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code class="dt-mono">Partial&lt;WeaveStrokeNodeParams&gt;</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code class="dt-mono">Partial&lt;WeaveStrokeProperties&gt;</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="dt-label dt-label--green"><span class="dt-label__content">Required</span></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Config parameters for the node.</p></td>
 </tr>
 </tbody>
 </table></div></div>
 <div class="paragraph">
-<p>For <code>WeaveStrokeNodeParams</code>:</p>
+<p>For <code>WeaveStrokeProperties</code>:</p>
 </div>
 <div class="tableblock-wrap"><div class="tablecontainer"><table class="tableblock frame-all grid-all stretch">
 <colgroup>
@@ -1255,10 +1264,55 @@ offers full control over the line’s geometry, style, and behavior—all synchr
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code class="dt-mono">number</code></p></td>
 <td class="tableblock halign-left valign-top"></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code class="dt-mono">8</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Resolution of the interpolated spline to smooth the curve</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Minimum number of subdivisions used for a curved span of the smoothed curve. Longer spans are subdivided further, by arc length, so that rendered smoothness does not depend on how far apart the recorded points happen to be.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code class="dt-mono">splineTargetEdge</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code class="dt-mono">number</code></p></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code class="dt-mono">1</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Target length, in canvas units, of a single rendered edge. Lower values produce a smoother silhouette at the cost of proportionally more rendered vertices.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code class="dt-mono">splineMaxSteps</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code class="dt-mono">number</code></p></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code class="dt-mono">48</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Upper bound on the subdivisions used for one span, so an unusually long span cannot inflate the vertex count without limit.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code class="dt-mono">resamplingSpacing</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code class="dt-mono">number</code></p></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code class="dt-mono">2</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Minimum spacing between the control points fed to the spline. Applied after simplification, so it mainly guards against duplicate and near-duplicate samples.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code class="dt-mono">isEraser</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code class="dt-mono">boolean</code></p></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code class="dt-mono">false</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Whether the stroke behaves as an eraser.</p></td>
 </tr>
 </tbody>
 </table></div></div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p><code>splineResolution</code> and <code>resamplingSpacing</code> were previously accepted but
+ignored — the renderer used hardcoded values regardless. They now take
+effect, so a node that passed non-default values will render differently
+than it did before.</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
 </div>
 </div>
 <div class="sect1">
@@ -1268,7 +1322,10 @@ offers full control over the line’s geometry, style, and behavior—all synchr
 <div class="content">
 <pre class="shiki highlight"><code data-lang="ts"><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4;--shiki-light-bg:#1E1E1E;--shiki-dark-bg:#1E1E1E"><span class="line"><span style="--shiki-light:#569CD6;--shiki-dark:#569CD6">const</span><span style="--shiki-light:#4FC1FF;--shiki-dark:#4FC1FF"> WEAVE_STROKE_NODE_DEFAULT_CONFIG</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4"> = {</span></span>
 <span class="line"><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">  splineResolution:</span><span style="--shiki-light:#B5CEA8;--shiki-dark:#B5CEA8"> 8</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">,</span></span>
+<span class="line"><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">  splineTargetEdge:</span><span style="--shiki-light:#B5CEA8;--shiki-dark:#B5CEA8"> 1</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">,</span></span>
+<span class="line"><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">  splineMaxSteps:</span><span style="--shiki-light:#B5CEA8;--shiki-dark:#B5CEA8"> 48</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">,</span></span>
 <span class="line"><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">  resamplingSpacing:</span><span style="--shiki-light:#B5CEA8;--shiki-dark:#B5CEA8"> 2</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">,</span></span>
+<span class="line"><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">  isEraser:</span><span style="--shiki-light:#569CD6;--shiki-dark:#569CD6"> false</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">,</span></span>
 <span class="line"><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">};</span></span></span></code></pre>
 </div>
 </div>
@@ -1329,7 +1386,7 @@ offers full control over the line’s geometry, style, and behavior—all synchr
 <footer class="site-footer">
   <div class="dt-grid-layout dt-grid-layout--with-margin site-footer__grid">
     <div class="dt-grid-layout__item site-footer__col site-footer__brand">
-      <a class="site-footer__brand-link" href="../../../../../5.4.0/">
+      <a class="site-footer__brand-link" href="../../../../../5.4.1/">
         <img class="site-footer__logo" src="../../../../../_/product-logo.png" width="24" height="24" alt="">
         <span class="dt-text dt-text--label-l-high">Weave.js</span>
       </a>
