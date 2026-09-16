@@ -5,7 +5,9 @@
 import type { WeaveNodeTransformerProperties } from '@inditextech/weave-types';
 
 export type WeaveStrokeProperties = {
-  splineResolution: number; // Spline resolution
+  splineResolution: number; // Minimum subdivisions per curved spline span
+  splineTargetEdge: number; // Target rendered edge length, in canvas units
+  splineMaxSteps: number; // Upper bound on subdivisions for a single span
   resamplingSpacing: number; // Spacing for resampling points
   isEraser?: boolean; // Whether the stroke is an eraser
   transform?: WeaveNodeTransformerProperties;
