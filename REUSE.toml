@@ -53,7 +53,12 @@ path = [
     "AGENTS.md",
     ".agents/**",
     "agent/**",
-    "skills-lock.json"
+    "skills-lock.json",
+    ".claude/commands/**",
+    ".claude/skills/**",
+    ".opencode/commands/**",
+    ".opencode/skills/**",
+    "openspec/**"
 ]
 SPDX-FileCopyrightText = "2025 INDUSTRIA DE DISEÑO TEXTIL S.A. (INDITEX S.A.)"
 SPDX-License-Identifier = "Apache-2.0"

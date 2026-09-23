@@ -37,8 +37,11 @@ new WeaveStrokeNode(params?: WeaveStrokeNodeParams);
 type WeaveNodeTransformerProperties = Konva.TransformerConfig;
 
 type WeaveStrokeProperties = {
-  splineResolution: number; // Spline resolution
+  splineResolution: number; // Minimum subdivisions per curved spline span
+  splineTargetEdge: number; // Target rendered edge length, in canvas units
+  splineMaxSteps: number; // Upper bound on subdivisions for a single span
   resamplingSpacing: number; // Spacing for resampling points
+  isEraser?: boolean; // Whether the stroke is an eraser
   transform?: WeaveNodeTransformerProperties;
 };
 
@@ -61,17 +64,29 @@ For `WeaveStrokeNodeParams`:
 |===
 | Property | Type | Required | Description
 
-| mono:[config] | mono:[Partial<WeaveStrokeNodeParams>] | label:green[Required] | Config parameters for the node.
+| mono:[config] | mono:[Partial<WeaveStrokeProperties>] | label:green[Required] | Config parameters for the node.
 |===
 
-For `WeaveStrokeNodeParams`:
+For `WeaveStrokeProperties`:
 
 [cols="5*"]
 |===
 | Property | Type | Required | Default | Description
 
-| mono:[splineResolution] | mono:[number] |  | mono:[8] | Resolution of the interpolated spline to smooth the curve
+| mono:[splineResolution] | mono:[number] |  | mono:[8] | Minimum number of subdivisions used for a curved span of the smoothed curve. Longer spans are subdivided further, by arc length, so that rendered smoothness does not depend on how far apart the recorded points happen to be.
+| mono:[splineTargetEdge] | mono:[number] |  | mono:[1] | Target length, in canvas units, of a single rendered edge. Lower values produce a smoother silhouette at the cost of proportionally more rendered vertices.
+| mono:[splineMaxSteps] | mono:[number] |  | mono:[48] | Upper bound on the subdivisions used for one span, so an unusually long span cannot inflate the vertex count without limit.
+| mono:[resamplingSpacing] | mono:[number] |  | mono:[2] | Minimum spacing between the control points fed to the spline. Applied after simplification, so it mainly guards against duplicate and near-duplicate samples.
+| mono:[isEraser] | mono:[boolean] |  | mono:[false] | Whether the stroke behaves as an eraser.
 |===
+
+[NOTE]
+====
+`splineResolution` and `resamplingSpacing` were previously accepted but
+ignored — the renderer used hardcoded values regardless. They now take
+effect, so a node that passed non-default values will render differently
+than it did before.
+====
 
 == Default values
 
@@ -79,6 +94,9 @@ For `WeaveStrokeNodeParams`:
 ----
 const WEAVE_STROKE_NODE_DEFAULT_CONFIG = {
   splineResolution: 8,
+  splineTargetEdge: 1,
+  splineMaxSteps: 48,
   resamplingSpacing: 2,
+  isEraser: false,
 };
 ----
