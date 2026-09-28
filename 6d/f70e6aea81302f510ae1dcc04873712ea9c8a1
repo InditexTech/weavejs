@@ -1,0 +1,19 @@
+repolinter.json
+  s_4bdaa412259e96::t_6a723ee5a9b4a8 157-162,198
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "6df70e6aea81302f510ae1dcc04873712ea9c8a1",
+  "prompts": {},
+  "sessions": {
+    "s_4bdaa412259e96": {
+      "agent_id": {
+        "tool": "github-copilot",
+        "id": "s_4bdaa412259e96",
+        "model": "unknown"
+      },
+      "human_author": "ivanasabi <ivanasabi@ext.inditex.com>"
+    }
+  }
+}
