@@ -1,0 +1,19 @@
+code/package.json
+  s_eb7f1a8df8d424::t_8706a224abc192 39-40
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "54fede591462775f94eb820054bd70b7a408a76d",
+  "prompts": {},
+  "sessions": {
+    "s_eb7f1a8df8d424": {
+      "agent_id": {
+        "tool": "github-copilot",
+        "id": "s_eb7f1a8df8d424",
+        "model": "unknown"
+      },
+      "human_author": "ivanasabi <ivanasabi@ext.inditex.com>"
+    }
+  }
+}
