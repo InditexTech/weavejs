@@ -1,0 +1,21 @@
+code/packages/create-backend-app/src/create-app.ts
+  s_af499726ec7a36::t_a8e0e73dcfefc5 45-46,49,95-96,98-119
+code/packages/create-frontend-app/src/create-app.ts
+  s_af499726ec7a36::t_1f335374d83a4a 45-46,49,79-80,82-103
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "b460fe6fd9dc01b8a6990d9c133da1c371e0d182",
+  "prompts": {},
+  "sessions": {
+    "s_af499726ec7a36": {
+      "agent_id": {
+        "tool": "github-copilot",
+        "id": "s_af499726ec7a36",
+        "model": "unknown"
+      },
+      "human_author": "ivanasabi <ivanasabi@ext.inditex.com>"
+    }
+  }
+}

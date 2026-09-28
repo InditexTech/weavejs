@@ -1,0 +1,21 @@
+code/packages/create-backend-app/src/create-app.ts
+  s_3cdab802283fda::t_bb42f7dd2bb426 33-36
+code/packages/create-frontend-app/src/create-app.ts
+  s_3cdab802283fda::t_c7741d5432c616 33-36
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "f1f213c875bccaeca7ac60d663f546d6c9977cfa",
+  "prompts": {},
+  "sessions": {
+    "s_3cdab802283fda": {
+      "agent_id": {
+        "tool": "github-copilot",
+        "id": "s_3cdab802283fda",
+        "model": "unknown"
+      },
+      "human_author": "ivanasabi <ivanasabi@ext.inditex.com>"
+    }
+  }
+}

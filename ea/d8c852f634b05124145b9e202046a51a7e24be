@@ -1,0 +1,21 @@
+NOTICE
+  s_aa2840970ec973::t_5b18851f15a529 1-7
+REUSE.toml
+  s_aa2840970ec973::t_76a7b03fcbfe21 13
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "ead8c852f634b05124145b9e202046a51a7e24be",
+  "prompts": {},
+  "sessions": {
+    "s_aa2840970ec973": {
+      "agent_id": {
+        "tool": "github-copilot",
+        "id": "s_aa2840970ec973",
+        "model": "unknown"
+      },
+      "human_author": "ivanasabi <ivanasabi@ext.inditex.com>"
+    }
+  }
+}
