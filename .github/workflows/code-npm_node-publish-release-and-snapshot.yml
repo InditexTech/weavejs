@@ -1,711 +1,902 @@
----
-name: code-npm-publish-release-and-snapshot
-run-name: "Publish workflow: ${{ github.event_name }}"
+# SPDX-FileCopyrightText: 2026 INDUSTRIA DE DISEÑO TEXTIL S.A. (INDITEX S.A.)
+# SPDX-License-Identifier: Apache-2.0
+
+name: code-npm-node-publish-release-and-snapshot
+run-name: Publish npm (release or snapshot) from ${{ github.event_name }}
 
 on:
-  issue_comment:
-    types: [created]
-  pull_request:
-    types: [closed]
-    branches: ["main", "main-*"]
-    paths: ["code/**", ".github/workflows/code**"]
   workflow_dispatch:
     inputs:
-      BASELINE:
-        description: "Baseline branch"
+      release_type:
+        description: Release type to use
         required: true
-        default: "main"
-      RELEASE_TYPE:
-        description: "Release type to use"
-        required: true
-        default: "release-type/minor"
+        default: release-type/minor
         type: choice
         options:
-          - "release-type/hotfix"
-          - "release-type/multi-hotfix"
-          - "release-type/major"
-          - "release-type/minor"
-          - "release-type/patch"
+          - release-type/hotfix
+          - release-type/multi-hotfix
+          - release-type/major
+          - release-type/minor
+          - release-type/patch
+  pull_request:
+    types: [closed]
+    branches: [main, main-*]
+  push:
+    branches: [main, main-*, develop, develop-*]
+  issue_comment:
+    types: [created]
+
+# actionlint cache-call-unrestricted: this workflow is reachable from the
+# low-trust issue_comment trigger (release re-run gated to OWNER, MEMBER and
+# COLLABORATOR); cap its cache access explicitly. Declared at workflow level --
+# the job-level `cache-mode` key is not part of the workflow-call job schema.
+cache-mode: none
+
+permissions:
+  contents: read
+
+concurrency:
+  group: >-
+    ${{ format('code-npm-node-publish-{0}-{1}', github.repository,
+    (github.event_name == 'push' || github.event_name == 'issue_comment')
+    && format('snapshot-{0}', github.event.issue.number || github.ref)
+    || format('release-{0}', github.event.pull_request.base.ref || github.ref_name)) }}
+  cancel-in-progress: ${{ github.event_name == 'push' || github.event_name == 'issue_comment' }}
+
+env:
+  PROJECT_TYPE: ${{ vars.PROJECT_TYPE }}
+  WORKING_DIRECTORY: ${{ vars.WORKING_DIRECTORY }}
+  PACKAGE_MANAGER: ${{ vars.PACKAGE_MANAGER }}
+  ASDF_BRANCH_VERSION: '0.18.0'
+  SNAPSHOT_ARTIFACT: npm-snapshot-dist
 
 jobs:
-  publish-snapshot:
-    name: Publish Snapshot
-    concurrency: code-publish-snapshot-${{ github.ref }}
-    permissions:
-      id-token: write
-      contents: read
-      issues: write
-      pull-requests: write
-    if: >
+  authorize:
+    name: Authorize snapshot command
+    if: >-
       github.event_name == 'issue_comment' &&
-      github.event.issue.pull_request != null &&
-      github.event.comment.body == '/publish-snapshot'
+      github.event.issue.pull_request &&
+      startsWith(github.event.comment.body, '/publish-snapshot') &&
+      contains(fromJSON('["OWNER", "MEMBER", "COLLABORATOR"]'), github.event.comment.author_association)
     runs-on: ubuntu-24.04
-    env:
-      ASDF_BRANCH_VERSION: 0.18.0
+    timeout-minutes: 5
+    permissions:
+      contents: read
+      pull-requests: read
+    outputs:
+      head_sha: ${{ steps.resolve.outputs.head_sha }}
     steps:
-      - name: Validate admin permissions
-        id: permission-check
-        uses: actions/github-script@f28e40c7f34bde8b3046d885e986cb6290c5673b # v7
-        with:
-          script: |
-            const { data } = await github.rest.repos.getCollaboratorPermissionLevel({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              username: context.actor
-            });
-
-            const permission = data.permission;
-            core.info(`User permission level: ${permission}`);
-
-            if (permission !== 'admin') {
-              core.setFailed(`User @${context.actor} is not a repository admin.`);
-            }
-
-      - name: Get input parameters
-        run: |
-          RELEASE_LABELS="${{ join(github.event.issue.labels.*.name, ', ') }}"
-          if [[ $RELEASE_LABELS != *release-type/* ]]; then
-            RELEASE_LABELS="$RELEASE_LABELS, release-type/minor"
-          fi
-          echo "RELEASE_LABELS=$RELEASE_LABELS" >> "$GITHUB_ENV"
-
-      - name: Checkout PR branch
-        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
-        with:
-          ref: refs/pull/${{ github.event.issue.number }}/head
-          fetch-depth: 0
-          persist-credentials: false
-
-      - name: NPM / Setup Dependencies Cache
-        uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4
-        with:
-          path: ~/.npm
-          key: ${{ runner.os }}-node-${{ hashFiles('code/package-lock.json') }}
-          restore-keys: |
-            ${{ runner.os }}-node-
-
-      - name: Restore asdf Cache
-        id: asdf-cache
-        uses: actions/cache/restore@0057852bfaa89a56745cba8c7296529d2fc39830 # v4
-        continue-on-error: true
-        with:
-          path: ~/.asdf
-          key: ${{ runner.os }}-asdf-${{ env.ASDF_BRANCH_VERSION }}-${{ hashFiles('code/.tool-versions') }}
-
-      - name: Save tool-versions content
-        run: |
-          {
-            echo "TOOL_VERSIONS<<EOF"
-            cat code/.tool-versions
-            echo "EOF"
-          } >> "$GITHUB_ENV"
-
-      - name: Setup asdf environment
-        uses: asdf-vm/actions/install@1902764435ca0dd2f3388eea723a4f92a4eb8302 # v4.0.0
-        if: steps.asdf-cache.outputs.cache-hit != 'true'
-        with:
-          tool_versions: ${{ env.TOOL_VERSIONS }}
-          asdf_version: ${{ env.ASDF_BRANCH_VERSION }}
-
-      - name: Save asdf Cache
-        if: steps.asdf-cache.outputs.cache-hit != 'true'
-        uses: actions/cache/save@0057852bfaa89a56745cba8c7296529d2fc39830 # v4
-        with:
-          path: ~/.asdf
-          key: ${{ runner.os }}-asdf-${{ env.ASDF_BRANCH_VERSION }}-${{ hashFiles('code/.tool-versions') }}
-
-      - name: Restore asdf shims to PATH
-        if: steps.asdf-cache.outputs.cache-hit == 'true'
-        run: |
-          echo "$HOME/.asdf/bin" >> "$GITHUB_PATH"
-          echo "$HOME/.asdf/shims" >> "$GITHUB_PATH"
-          cp code/.tool-versions "$HOME/.tool-versions"
-
-      - name: NPM / Set npmrc registry
+      - name: Resolve pull request head
+        id: resolve
         env:
-          NPM_REGISTRY: "https://registry.npmjs.org/"
+          GH_TOKEN: ${{ github.token }}
+          PR_NUMBER: ${{ github.event.issue.number }}
+        shell: bash
         run: |
-          echo "registry=${NPM_REGISTRY}" >> /home/runner/.npmrc
-          echo "@inditextech:registry=${NPM_REGISTRY}" >> /home/runner/.npmrc
-
-      - name: NPM / Create Cache Folders
-        run: |
-          mkdir -p "$HOME"/.npm
-
-      - name: Setup patch release type version
-        if: contains(env.RELEASE_LABELS, 'release-type/hotfix')
-          || contains(env.RELEASE_LABELS, 'release-type/multi-hotfix')
-          || contains(env.RELEASE_LABELS, 'release-type/patch')
-        run: echo "RELEASE_VERSION=patch" >> "$GITHUB_ENV"
-
-      - name: Setup minor release type version
-        if: contains(env.RELEASE_LABELS, 'release-type/minor')
-        run: echo "RELEASE_VERSION=minor" >> "$GITHUB_ENV"
-
-      - name: Setup minor release type version when no label set and TBD
-        if: ${{ !contains(env.RELEASE_LABELS, 'release-type') && vars.DEVELOPMENT_FLOW == 'trunk-based-development' }}
-        run: echo "RELEASE_VERSION=minor" >> "$GITHUB_ENV"
-
-      - name: Setup major release type version
-        if: contains(env.RELEASE_LABELS, 'release-type/major')
-        run: echo "RELEASE_VERSION=major" >> "$GITHUB_ENV"
-
-      - name: Update CHANGELOG.md
-        id: update-changelog
-        uses: release-flow/keep-a-changelog-action@74931dec7ecdbfc8e38ac9ae7e8dd84c08db2f32 # v3.0.0
-        with:
-          command: bump
-          version: ${{ env.RELEASE_VERSION }}
-          changelog: code/CHANGELOG.md
-          fail-on-empty-release-notes: false
-          keep-unreleased-section: true
-          tag-prefix: ""
-
-      # release-flow/keep-a-changelog-action parses the *entire* CHANGELOG.md
-      # into a markdown AST and re-serializes the whole file on every bump,
-      # not just the section it's updating. If invisible Unicode whitespace
-      # (most commonly a pasted-in NBSP) has ever broken an unrelated,
-      # historical heading elsewhere in the file, the action's serializer
-      # defensively backslash-escapes it on the way back out (`### Added` ->
-      # `\### Added`) — corrupting content the action never meant to touch.
-      # This fails on purpose rather than silently continuing: the defect
-      # needs fixing at its source (the PR that introduced the bad
-      # whitespace), or it will keep re-triggering on every future release.
-      - name: Sanitize CHANGELOG.md
-        run: node .github/scripts/sanitize-changelog.mjs code/CHANGELOG.md
-
-      - name: Define snapshot version
-        working-directory: code
-        env:
-          RELEASE_VERSION: ${{ steps.update-changelog.outputs.version }}
-        run: |
-          CLEAN_VERSION=$(echo "$RELEASE_VERSION" | sed -E 's/-.*$//')
-          PRE_RELEASE_VERSION="${CLEAN_VERSION}-SNAPSHOT.${{ github.run_number }}.${{ github.run_attempt }}"
-          echo "SNAPSHOT_VERSION=$PRE_RELEASE_VERSION" >> "$GITHUB_ENV"
-
-      - name: NPM / Prepare snapshot
-        working-directory: code
-        env:
-          RELEASE_VERSION: ${{ env.SNAPSHOT_VERSION }}
-        run: |
-          npm run version:release
-          npm run release:prepare
-
-      - name: NPM / Ensure minimum npm version for trusted publishing
-        run: |
-          CURRENT_NPM=$(npm --version)
-          REQUIRED_NPM="11.5.1"
-          if printf '%s\n%s\n' "$REQUIRED_NPM" "$CURRENT_NPM" | sort -V -C; then
-            echo "npm $CURRENT_NPM already meets the minimum requirement ($REQUIRED_NPM). Skipping upgrade."
-          else
-            echo "npm $CURRENT_NPM is below the minimum requirement ($REQUIRED_NPM). Upgrading…"
-            npm install -g npm@^11.5.1 --registry="https://registry.npmjs.org/"
-            asdf reshim nodejs
-          fi
-          echo "node path: $(command -v node)"
-          echo "npm path: $(command -v npm)"
-          node --version
-          npm --version
-
-      - name: NPM / Verify packages exist in registry
-        id: verify-packages
-        working-directory: code
-        run: |
-          MISSING=()
-          for pkg_dir in packages/*/; do
-            PKG_NAME=$(node -p "require('./$pkg_dir/package.json').name")
-            ENCODED_PKG_NAME=$(node -p "encodeURIComponent(process.argv[1])" "$PKG_NAME")
-            RESPONSE_FILE=$(mktemp)
-            if ! HTTP_STATUS=$(curl -sS -o "$RESPONSE_FILE" -w "%{http_code}" \
-              --connect-timeout 10 \
-              --max-time 30 \
-              --retry 3 \
-              --retry-delay 2 \
-              --retry-all-errors \
-              "https://registry.npmjs.org/${ENCODED_PKG_NAME}"); then
-              echo "::error::Failed to verify $PKG_NAME due to npm registry connectivity error"
-              rm -f "$RESPONSE_FILE"
-              exit 1
-            fi
-            case "$HTTP_STATUS" in
-              200)
-                PARSE_STATUS=0
-                node -e "try { const d=JSON.parse(require('fs').readFileSync(process.argv[1],'utf8')); process.exit(Object.keys(d.versions||{}).length > 0 ? 0 : 1); } catch(e) { console.error('JSON parse error:', e.message); process.exit(2); }" "$RESPONSE_FILE" || PARSE_STATUS=$?
-                case "$PARSE_STATUS" in
-                  0)
-                    echo "✓ $PKG_NAME exists in registry with active versions"
-                    ;;
-                  1)
-                    echo "✗ $PKG_NAME has no active versions (unpublished) — treating as new"
-                    MISSING+=("$PKG_NAME")
-                    ;;
-                  *)
-                    echo "::error::Failed to verify $PKG_NAME — npm registry returned invalid JSON (HTTP 200)"
-                    rm -f "$RESPONSE_FILE"
-                    exit 1
-                    ;;
-                esac
-                ;;
-              404)
-                echo "✗ $PKG_NAME NOT found in registry"
-                MISSING+=("$PKG_NAME")
-                ;;
-              429|5??)
-                echo "::error::Failed to verify $PKG_NAME due to transient npm registry error (HTTP $HTTP_STATUS)"
-                exit 1
-                ;;
-              *)
-                echo "::error::Failed to verify $PKG_NAME due to unexpected npm registry response (HTTP $HTTP_STATUS)"
-                exit 1
-                ;;
-            esac
-            rm -f "$RESPONSE_FILE"
-          done
-          if [[ ${#MISSING[@]} -gt 0 ]]; then
-            echo "MISSING_PACKAGES=${MISSING[*]}" >> "$GITHUB_ENV"
-            echo "HAS_NEW_PACKAGES=true" >> "$GITHUB_ENV"
-            echo "::warning::New packages detected: ${MISSING[*]} — will use NPM_TOKEN instead of OIDC"
-          else
-            echo "HAS_NEW_PACKAGES=false" >> "$GITHUB_ENV"
-            echo "All packages verified in registry — OIDC publish is safe."
-          fi
-
-      - name: NPM / Publish Snapshot (OIDC + provenance)
-        if: env.HAS_NEW_PACKAGES == 'false'
-        env:
-          NPM_CONFIG_PROVENANCE: "true"
-        working-directory: code
-        run: |
-          npm run publish:snapshot
-
-      - name: NPM / Publish Snapshot (NPM_TOKEN for new packages)
-        if: env.HAS_NEW_PACKAGES == 'true'
-        env:
-          NPM_AUTH: ${{ secrets.NPM_TOKEN }}
-        working-directory: code
-        run: |
-          if [ -z "${NPM_AUTH:-}" ]; then
-            echo "::error::NPM_TOKEN secret is required for publishing new packages but is not set"
+          set -euo pipefail
+          head="$(gh api "repos/${GITHUB_REPOSITORY}/pulls/${PR_NUMBER}" --jq '[.head.sha, .head.repo.full_name] | @tsv')"
+          head_sha="$(printf '%s' "$head" | cut -f1)"
+          head_repo="$(printf '%s' "$head" | cut -f2)"
+          if [[ -z "$head_sha" || "$head_sha" == "null" ]]; then
+            echo "::error title=Unresolved head::Could not resolve the pull request head commit." >&2
             exit 1
           fi
-          TEMP_NPMRC="$(mktemp)"
-          trap 'rm -f "$TEMP_NPMRC"' EXIT
-          cp ~/.npmrc "$TEMP_NPMRC"
-          chmod 600 "$TEMP_NPMRC"
-          echo "//registry.npmjs.org/:_authToken=${NPM_AUTH}" >> "$TEMP_NPMRC"
-          export NPM_CONFIG_USERCONFIG="$TEMP_NPMRC"
-          npm run publish:snapshot
-
-      - name: Result / Comment on PR
-        if: always()
-        uses: actions/github-script@f28e40c7f34bde8b3046d885e986cb6290c5673b # v7
-        with:
-          script: |
-            const status = '${{ job.status }}';
-            const authMethod = '${{ env.HAS_NEW_PACKAGES }}' === 'true'
-              ? 'NPM_TOKEN (new packages detected)'
-              : 'OIDC trusted publishing (provenance)';
-
-            const body = status === 'success'
-              ? [
-                  "### :rocket: NPM snapshot published",
-                  "",
-                  `- Version: \`${process.env.SNAPSHOT_VERSION}\``,
-                  "- Tag: `next`",
-                  `- Auth: ${authMethod}`
-                ]
-              : [
-                  "### :x: NPM snapshot publication failed",
-                  "",
-                  "Please check the workflow logs for details."
-                ]
-
-            await github.rest.issues.createComment({
-              issue_number: context.issue.number,
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              body: body.join("\n")
-            });
-
-  release:
-    name: Release
-    concurrency: code-release-${{ github.ref }}
-    permissions:
-      id-token: write
-      contents: write
-      issues: write
-      pull-requests: write
-    if: github.event_name == 'workflow_dispatch'
-      || (github.event_name == 'pull_request' && github.event.pull_request.merged == true
-      && !contains(join(github.event.pull_request.labels.*.name, ', '), 'skip-release')
-      && (contains(join(github.event.pull_request.labels.*.name, ', '), 'release-type')
-      || vars.DEVELOPMENT_FLOW == 'trunk-based-development' ))
-    runs-on: ubuntu-24.04
-    env:
-      ASDF_BRANCH_VERSION: 0.18.0
-    steps:
-      - name: Validate admin permissions
-        id: permission-check
-        uses: actions/github-script@f28e40c7f34bde8b3046d885e986cb6290c5673b # v7
-        with:
-          script: |
-            const { data } = await github.rest.repos.getCollaboratorPermissionLevel({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              username: context.actor
-            });
-
-            const permission = data.permission;
-            core.info(`User permission level: ${permission}`);
-
-            if (permission !== 'admin') {
-              core.setFailed(`User @${context.actor} is not a repository admin.`);
-            }
-
-      - name: Get input parameters
-        run: |
-          if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
-            RELEASE_LABELS="${{ github.event.inputs.RELEASE_TYPE }}"
-          else
-            RELEASE_LABELS="${{ join(github.event.pull_request.labels.*.name, ', ') }}"
-            if [[ $RELEASE_LABELS != *release-type/* ]]; then
-              RELEASE_LABELS="$RELEASE_LABELS, release-type/minor"
-            fi
+          if [[ "$head_repo" != "$GITHUB_REPOSITORY" ]]; then
+            echo "::error title=Fork head rejected::Snapshot publishing only accepts branches of ${GITHUB_REPOSITORY}; refusing head from ${head_repo}." >&2
+            exit 1
           fi
-          echo "RELEASE_LABELS=$RELEASE_LABELS" >> "$GITHUB_ENV"
-          BASELINE_BRANCH=${{ github.event.inputs.BASELINE || github.ref }}
-          echo "BASELINE_BRANCH=${BASELINE_BRANCH#refs/heads/}" >> "$GITHUB_ENV"
+          echo "head_sha=${head_sha}" >> "$GITHUB_OUTPUT"
 
-      - uses: actions/create-github-app-token@v3
+  build:
+    name: Build snapshot
+    needs: [authorize]
+    if: >-
+      !cancelled() &&
+      (
+        (
+          github.event_name == 'push' &&
+          (
+            (vars.DEVELOPMENT_FLOW == 'trunk-based-development' && (github.ref_name == 'main' || startsWith(github.ref_name, 'main-'))) ||
+            (vars.DEVELOPMENT_FLOW == 'git-flow' && (github.ref_name == 'develop' || startsWith(github.ref_name, 'develop-')))
+          )
+        ) ||
+        (github.event_name == 'issue_comment' && needs.authorize.result == 'success')
+      )
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    permissions:
+      contents: read
+    outputs:
+      artifact_name: ${{ steps.pack.outputs.artifact_name }}
+      should_publish: ${{ steps.plan.outputs.should_publish }}
+    steps:
+      - name: Check out snapshot candidate
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+          ref: >-
+            ${{
+              (github.event_name == 'issue_comment' && needs.authorize.outputs.head_sha) ||
+              github.sha
+            }}
+
+      - name: Betrayal check for comment-authorized snapshot
+        if: github.event_name == 'issue_comment'
+        shell: bash
+        run: |
+          set -euo pipefail
+          authorized="${{ needs.authorize.outputs.head_sha }}"
+          checked="$(git rev-parse HEAD)"
+          if [[ "$checked" != "$authorized" ]]; then
+            echo "::error title=Snapshot head race::The pull request advanced since the /publish-snapshot authorization (authorized $authorized, workspace $checked). Aborting before any build or publish."
+            exit 1
+          fi
+          echo "::notice title=Snapshot head verified::Checked-out commit matches the authorized snapshot head."
+
+      - name: Plan snapshot
+        id: plan
+        env:
+          PUBLISH_SNAPSHOT: ${{ vars.PUBLISH_SNAPSHOT }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [[ "${PUBLISH_SNAPSHOT:-false}" != "true" ]]; then
+            echo "::notice title=Snapshot disabled::publish_snapshot opt-in is off; no snapshot is published."
+            echo "should_publish=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          head_committer_email="$(git show -s --format=%ce HEAD)"
+          if [[ "$GITHUB_EVENT_NAME" == "push" && "$head_committer_email" == *"[bot]@users.noreply.github.com" ]]; then
+            echo "::notice title=Snapshot skipped::Next-dev commit does not need a snapshot."
+            echo "should_publish=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          echo "should_publish=true" >> "$GITHUB_OUTPUT"
+
+      - name: Read governed tool versions
+        id: tool-versions
+        if: steps.plan.outputs.should_publish == 'true'
+        working-directory: ${{ env.WORKING_DIRECTORY }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          if grep -Evq '^[a-zA-Z0-9_-]+ [a-zA-Z0-9._+-]+$' .tool-versions; then
+            echo "::error title=Invalid tool-versions::${WORKING_DIRECTORY}/.tool-versions is malformed."
+            exit 1
+          fi
+          {
+            echo "tool_versions<<EOF"
+            cat .tool-versions
+            echo
+            echo "EOF"
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Set up asdf-managed Node
+        if: steps.plan.outputs.should_publish == 'true'
+        uses: asdf-vm/actions/install@b7bcd026f18772e44fe1026d729e1611cc435d47 # v4.0.1
+        with:
+          tool_versions: ${{ steps.tool-versions.outputs.tool_versions }}
+          asdf_version: ${{ env.ASDF_BRANCH_VERSION }}
+
+      - name: Build and pack snapshot
+        id: pack
+        if: steps.plan.outputs.should_publish == 'true'
+        working-directory: ${{ env.WORKING_DIRECTORY }}
+        env:
+          PR_NUMBER: ${{ github.event.issue.number }}
+          DIST_DIR: ${{ runner.temp }}/snapshot-dist
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          strip_snapshot() { printf '%s' "${1%-SNAPSHOT}"; }
+          compute_snapshot() {
+            if [[ "$GITHUB_EVENT_NAME" == "issue_comment" ]]; then
+              printf '%s-PR%s-SNAPSHOT.%s' "$1" "$PR_NUMBER" "$GITHUB_RUN_NUMBER"
+            else
+              printf '%s-SNAPSHOT.%s.%s' "$1" "$GITHUB_RUN_NUMBER" "$GITHUB_RUN_ATTEMPT"
+            fi
+          }
+          member_dir() {
+            printf '%s' "${1##*/}" | tr '[:upper:]' '[:lower:]' | sed -E 's/[^a-z0-9]+/-/g; s/^-+//; s/-+$//'
+          }
+
+          mkdir -p "$DIST_DIR"
+
+          case "${PACKAGE_MANAGER:-npm}" in
+            npm)
+              npm ci
+              npm run build
+              case "$PROJECT_TYPE" in
+                single)
+                  base="$(strip_snapshot "$(jq -r '.version' package.json)")"
+                  npm pkg set "version=$(compute_snapshot "$base")"
+                  npm pack --pack-destination "$DIST_DIR"
+                  ;;
+                workspaces)
+                  descriptor="$GITHUB_WORKSPACE/.github/inditextech-ci-node.json"
+                  while IFS= read -r package; do
+                    member="$(member_dir "$package")"
+                    base="$(strip_snapshot "$(jq -r '.version' "packages/$member/package.json")")"
+                    npm pkg set "version=$(compute_snapshot "$base")" --workspace "packages/$member"
+                  done < <(jq -er '.release.packages[]' "$descriptor")
+                  npm pack --workspaces --pack-destination "$DIST_DIR"
+                  ;;
+                *)
+                  echo "::error title=Invalid project type::PROJECT_TYPE must be single or workspaces."
+                  exit 1
+                  ;;
+              esac
+              ;;
+            pnpm)
+              corepack enable
+              pnpm install --frozen-lockfile
+              pnpm run build
+              case "$PROJECT_TYPE" in
+                single)
+                  base="$(strip_snapshot "$(jq -r '.version' package.json)")"
+                  npm pkg set "version=$(compute_snapshot "$base")"
+                  pnpm pack --pack-destination "$DIST_DIR"
+                  ;;
+                workspaces)
+                  descriptor="$GITHUB_WORKSPACE/.github/inditextech-ci-node.json"
+                  while IFS= read -r package; do
+                    member="$(member_dir "$package")"
+                    base="$(strip_snapshot "$(jq -r '.version' "packages/$member/package.json")")"
+                    ( cd "packages/$member" && npm pkg set "version=$(compute_snapshot "$base")" )
+                    ( cd "packages/$member" && pnpm pack --pack-destination "$DIST_DIR" )
+                  done < <(jq -er '.release.packages[]' "$descriptor")
+                  ;;
+                *)
+                  echo "::error title=Invalid project type::PROJECT_TYPE must be single or workspaces."
+                  exit 1
+                  ;;
+              esac
+              ;;
+            *)
+              echo "::error title=Invalid package manager::PACKAGE_MANAGER must be npm or pnpm."
+              exit 1
+              ;;
+          esac
+
+          echo "artifact_name=${SNAPSHOT_ARTIFACT}" >> "$GITHUB_OUTPUT"
+
+      - name: Upload snapshot artifact
+        if: steps.plan.outputs.should_publish == 'true'
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: ${{ env.SNAPSHOT_ARTIFACT }}
+          path: ${{ runner.temp }}/snapshot-dist/*.tgz
+          if-no-files-found: error
+          retention-days: 5
+
+  publish:
+    name: Publish snapshot
+    needs: [build]
+    if: >-
+      !cancelled() &&
+      needs.build.outputs.should_publish == 'true' &&
+      vars.PUBLISH_SNAPSHOT == 'true'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    environment: npm-snapshot
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - name: Check out trusted publish ref
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Download pre-built snapshot artifact
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          name: ${{ needs.build.outputs.artifact_name }}
+          path: ${{ runner.temp }}/publish-dist
+
+      - name: Publish via npm trusted publishing
+        uses: InditexTech/gh-actions/npm@8a719baa6e8d514ccdfe87cff2baae9007a8b168 # v1.1.5
+        env:
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+        with:
+          working-directory: ${{ vars.WORKING_DIRECTORY }}
+          project-type: ${{ vars.PROJECT_TYPE }}
+          dist-tag: next
+          artifact-directory: ${{ runner.temp }}/publish-dist
+
+  release-core:
+    name: Prepare and Build Release
+    if: >-
+      (github.event_name == 'workflow_dispatch' || github.event_name == 'pull_request') &&
+      (
+        github.event_name != 'issue_comment' ||
+        contains(
+          fromJSON('["OWNER", "MEMBER", "COLLABORATOR"]'),
+          github.event.comment.author_association
+        )
+      )
+    uses: ./.github/workflows/code-npm_node-release-core.yml
+    with:
+      release_type: ${{ inputs.release_type }}
+    secrets:
+      APP_PRIVATE_KEY: ${{ secrets.APP_PRIVATE_KEY }}
+
+  publish-npm:
+    name: Publish ${{ matrix.release.tag }} to npm
+    needs: release-core
+    if: vars.RELEASE_LIFECYCLE != 'delegated'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    environment: npm-registry
+    permissions:
+      contents: read
+      id-token: write
+    strategy:
+      fail-fast: false
+      matrix:
+        release: ${{ fromJSON(needs.release-core.outputs.releases) }}
+    steps:
+      - name: Check out trusted publish ref
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Download pre-built release artifact
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          name: npm-distributions-${{ matrix.release.tag }}
+          path: ${{ runner.temp }}/publish-dist
+
+      - name: Publish via npm trusted publishing
+        uses: InditexTech/gh-actions/npm@8a719baa6e8d514ccdfe87cff2baae9007a8b168 # v1.1.5
+        env:
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+        with:
+          working-directory: ${{ vars.WORKING_DIRECTORY }}
+          project-type: ${{ vars.PROJECT_TYPE }}
+          dist-tag: latest
+          artifact-directory: ${{ runner.temp }}/publish-dist
+
+  publish-npm-delegated:
+    name: Promote and publish delegated release to npm
+    needs: release-core
+    if: >-
+      vars.RELEASE_LIFECYCLE == 'delegated' &&
+      needs.release-core.result == 'success' &&
+      (github.event_name == 'workflow_dispatch' || github.event_name == 'pull_request')
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    environment: npm-registry
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - name: Download immutable delegated release handoff
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          name: node-delegated-release-handoff
+          path: ${{ runner.temp }}/node-delegated-release-handoff
+
+      - name: Verify delegated release handoff
+        id: handoff
+        env:
+          HANDOFF_DIR: ${{ runner.temp }}/node-delegated-release-handoff
+        shell: bash
+        run: |
+          set -euo pipefail
+          metadata="$HANDOFF_DIR/release-handoff.json"
+          source_bundle="$HANDOFF_DIR/release-source.bundle"
+          publish_dist="${RUNNER_TEMP}/publish-dist"
+          if [[ ! -f "$metadata" || ! -f "$source_bundle" || ! -d "$HANDOFF_DIR/tarballs" ]]; then
+            echo "::error title=Incomplete release handoff::The immutable source, metadata, and tarball directory are all required."
+            exit 1
+          fi
+          if [[ "$(sha256sum "$metadata" | awk '{print $1}')" != "${{ needs.release-core.outputs.handoff_digest }}" ]]; then
+            echo "::error title=Tampered release handoff::The run-bound release metadata digest does not match preparation."
+            exit 1
+          fi
+          jq -e \
+            --arg repository "$GITHUB_REPOSITORY" \
+            --arg run_id "$GITHUB_RUN_ID" \
+            --arg run_attempt "$GITHUB_RUN_ATTEMPT" \
+            '
+              .schema_version == 1 and
+              .repository == $repository and
+              .run_id == $run_id and
+              .run_attempt == $run_attempt and
+              (.expected_ref | test("^refs/heads/[A-Za-z0-9._/-]+$")) and
+              (.source_commit | test("^[0-9a-f]{40}$")) and
+              (.release_commit | test("^[0-9a-f]{40}$")) and
+              (.source_bundle.file == "release-source.bundle") and
+              (.source_bundle.sha256 | test("^[0-9a-f]{64}$")) and
+              (.releases | type == "array" and length > 0) and
+              (.tags | type == "array" and length > 0) and
+              (.tarballs | type == "array" and length > 0)
+            ' "$metadata" > /dev/null
+          if [[ "$(sha256sum "$source_bundle" | awk '{print $1}')" != "$(jq -r '.source_bundle.sha256' "$metadata")" ]]; then
+            echo "::error title=Tampered release handoff::The release source bundle digest does not match metadata."
+            exit 1
+          fi
+          jq -e '
+            (.tags | all(.[]; (.name | type == "string" and length > 0) and (.target | type == "string" and test("^[0-9a-f]{40}$")))) and
+            (.releases | all(.[]; (.tag | type == "string" and length > 0) and (.version | type == "string" and length > 0))) and
+            (([.tags[].name] | sort) == ([.releases[].tag] | sort)) and
+            (.tarballs | all(.[]; (.file | type == "string" and test("^[A-Za-z0-9][A-Za-z0-9._-]*\\.tgz$")) and (.package | type == "string" and length > 0) and (.release_tag | type == "string" and length > 0) and (.version | type == "string" and length > 0) and (.sha256 | type == "string" and test("^[0-9a-f]{64}$"))))
+          ' "$metadata" > /dev/null
+
+          release_tag_for() {
+            local package_name="$1"
+            local package_version="$2"
+            local member record release_tag release_version
+            local -a exact_matches=()
+            local -a version_matches=()
+            member="$(printf '%s' "${package_name##*/}" | tr '[:upper:]' '[:lower:]' | sed -E 's/[^a-z0-9]+/-/g; s/^-+//; s/-+$//')"
+            while IFS= read -r record; do
+              release_tag="$(jq -r '.tag' <<< "$record")"
+              release_version="$(jq -r '.version' <<< "$record")"
+              [[ "$release_version" == "$package_version" ]] || continue
+              version_matches+=("$release_tag")
+              if [[ "$release_tag" == "$package_version" || "$release_tag" == "${member}-${package_version}" || "$release_tag" == "${package_name}-${package_version}" ]]; then
+                exact_matches+=("$release_tag")
+              fi
+            done < <(jq -c '.releases[]' "$metadata")
+            if [[ ${#exact_matches[@]} -eq 1 ]]; then
+              printf '%s' "${exact_matches[0]}"
+            elif [[ ${#exact_matches[@]} -eq 0 && ${#version_matches[@]} -eq 1 ]]; then
+              printf '%s' "${version_matches[0]}"
+            else
+              echo "::error title=Ambiguous package release::Package '$package_name@$package_version' does not resolve to exactly one prepared release tag." >&2
+              exit 1
+            fi
+          }
+
+          rm -rf "$HANDOFF_DIR/source" "$publish_dist"
+          git clone --quiet --no-checkout "$source_bundle" "$HANDOFF_DIR/source"
+          source_commit="$(jq -r '.source_commit' "$metadata")"
+          release_commit="$(jq -r '.release_commit' "$metadata")"
+          git -C "$HANDOFF_DIR/source" rev-parse --verify --quiet "${source_commit}^{commit}" > /dev/null
+          git -C "$HANDOFF_DIR/source" rev-parse --verify --quiet "${release_commit}^{commit}" > /dev/null
+          if ! git -C "$HANDOFF_DIR/source" merge-base --is-ancestor "$source_commit" "$release_commit"; then
+            echo "::error title=Invalid release provenance::The prepared release is not descended from the verified source commit."
+            exit 1
+          fi
+
+          tag_count="$(jq -r '.tags | length' "$metadata")"
+          unique_tag_count="$(jq -r '[.tags[].name] | unique | length' "$metadata")"
+          if [[ "$unique_tag_count" -ne "$tag_count" ]]; then
+            echo "::error title=Invalid release tags::The handoff repeats a release tag."
+            exit 1
+          fi
+          while IFS= read -r tag; do
+            git check-ref-format --allow-onelevel "refs/tags/$tag"
+            target="$(jq -er --arg tag "$tag" '.tags[] | select(.name == $tag) | .target | select(test("^[0-9a-f]{40}$"))' "$metadata")"
+            if [[ "$(git -C "$HANDOFF_DIR/source" rev-parse "${tag}^{commit}")" != "$target" ]]; then
+              echo "::error title=Invalid release tag::Prepared tag '$tag' does not resolve to its recorded commit."
+              exit 1
+            fi
+            if ! git -C "$HANDOFF_DIR/source" merge-base --is-ancestor "$source_commit" "$target" \
+              || ! git -C "$HANDOFF_DIR/source" merge-base --is-ancestor "$target" "$release_commit"; then
+              echo "::error title=Invalid release tag provenance::Prepared tag '$tag' must satisfy source <= tag <= release."
+              exit 1
+            fi
+          done < <(jq -r '.tags[].name' "$metadata")
+
+          mkdir -p "$publish_dist"
+          tarball_count="$(jq -r '.tarballs | length' "$metadata")"
+          unique_tarball_count="$(jq -r '[.tarballs[].file] | unique | length' "$metadata")"
+          if [[ "$unique_tarball_count" -ne "$tarball_count" ]]; then
+            echo "::error title=Invalid package artifacts::The handoff repeats a tarball filename."
+            exit 1
+          fi
+          while IFS= read -r tarball_file; do
+            tarball="$HANDOFF_DIR/tarballs/$tarball_file"
+            expected_sha="$(jq -er --arg file "$tarball_file" '.tarballs[] | select(.file == $file) | .sha256' "$metadata")"
+            expected_package="$(jq -er --arg file "$tarball_file" '.tarballs[] | select(.file == $file) | .package' "$metadata")"
+            expected_release_tag="$(jq -er --arg file "$tarball_file" '.tarballs[] | select(.file == $file) | .release_tag' "$metadata")"
+            expected_version="$(jq -er --arg file "$tarball_file" '.tarballs[] | select(.file == $file) | .version' "$metadata")"
+            if [[ ! -f "$tarball" ]] || [[ "$(sha256sum "$tarball" | awk '{print $1}')" != "$expected_sha" ]]; then
+              echo "::error title=Tampered package artifact::Tarball '$tarball_file' is missing or does not match the prepared digest."
+              exit 1
+            fi
+            tar -tzf "$tarball" | grep -qx 'package/package.json'
+            if [[ "$(tar -xzOf "$tarball" package/package.json | jq -r '.name')" != "$expected_package" ]] \
+              || [[ "$(tar -xzOf "$tarball" package/package.json | jq -r '.version')" != "$expected_version" ]]; then
+              echo "::error title=Tampered package artifact::Tarball '$tarball_file' package identity does not match the prepared metadata."
+              exit 1
+            fi
+            mapped_release_tag="$(release_tag_for "$expected_package" "$expected_version")"
+            if [[ "$mapped_release_tag" != "$expected_release_tag" ]] \
+              || [[ "$(jq -r --arg tag "$expected_release_tag" --arg version "$expected_version" '[.releases[] | select(.tag == $tag and .version == $version)] | length' "$metadata")" -ne 1 ]]; then
+              echo "::error title=Invalid package release::Tarball '$expected_package@$expected_version' is not bound to exactly one prepared release tag."
+              exit 1
+            fi
+            cp "$tarball" "$publish_dist/$tarball_file"
+          done < <(jq -r '.tarballs[].file' "$metadata")
+          if [[ "$(find "$publish_dist" -maxdepth 1 -type f -name '*.tgz' | wc -l | tr -d ' ')" -ne "$tarball_count" ]]; then
+            echo "::error title=Incomplete package artifacts::The protected publish directory does not contain the complete verified tarball set."
+            exit 1
+          fi
+
+          {
+            echo "expected_ref=$(jq -r '.expected_ref' "$metadata")"
+            echo "release_commit=$release_commit"
+            echo "source_commit=$source_commit"
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Create GitHub App token
         id: app-token
+        uses: actions/create-github-app-token@bcd2ba49218906704ab6c1aa796996da409d3eb1 # v3.2.0
         with:
           client-id: ${{ vars.APP_CLIENT_ID }}
           private-key: ${{ secrets.APP_PRIVATE_KEY }}
+          permission-contents: write
 
-      - name: Checkout merge commit
-        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+      - name: Check out trusted release baseline
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
-          ref: ${{ env.BASELINE_BRANCH }}
           fetch-depth: 0
           persist-credentials: false
+          ref: ${{ github.event.pull_request.base.ref || github.ref_name }}
+          token: ${{ steps.app-token.outputs.token }}
 
-      - name: NPM / Setup Dependencies Cache
-        uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4
-        with:
-          path: ~/.npm
-          key: ${{ runner.os }}-node-${{ hashFiles('code/package-lock.json') }}
-          restore-keys: |
-            ${{ runner.os }}-node-
-
-      - name: Restore asdf Cache
-        id: asdf-cache
-        uses: actions/cache/restore@0057852bfaa89a56745cba8c7296529d2fc39830 # v4
-        continue-on-error: true
-        with:
-          path: ~/.asdf
-          key: ${{ runner.os }}-asdf-${{ env.ASDF_BRANCH_VERSION }}-${{ hashFiles('code/.tool-versions') }}
-
-      - name: Save tool-versions content
-        run: |
-          {
-            echo "TOOL_VERSIONS<<EOF"
-            cat code/.tool-versions
-            echo "EOF"
-          } >> "$GITHUB_ENV"
-
-      - name: Setup asdf environment
-        uses: asdf-vm/actions/install@1902764435ca0dd2f3388eea723a4f92a4eb8302 # v4.0.0
-        if: steps.asdf-cache.outputs.cache-hit != 'true'
-        with:
-          tool_versions: ${{ env.TOOL_VERSIONS }}
-          asdf_version: ${{ env.ASDF_BRANCH_VERSION }}
-
-      - name: Save asdf Cache
-        if: steps.asdf-cache.outputs.cache-hit != 'true'
-        uses: actions/cache/save@0057852bfaa89a56745cba8c7296529d2fc39830 # v4
-        with:
-          path: ~/.asdf
-          key: ${{ runner.os }}-asdf-${{ env.ASDF_BRANCH_VERSION }}-${{ hashFiles('code/.tool-versions') }}
-
-      - name: Restore asdf shims to PATH
-        if: steps.asdf-cache.outputs.cache-hit == 'true'
-        run: |
-          echo "$HOME/.asdf/bin" >> "$GITHUB_PATH"
-          echo "$HOME/.asdf/shims" >> "$GITHUB_PATH"
-          cp code/.tool-versions "$HOME/.tool-versions"
-
-      - name: NPM / Set npmrc registry
+      - name: Promote verified delegated release refs
         env:
-          NPM_REGISTRY: "https://registry.npmjs.org/"
+          EXPECTED_REF: ${{ steps.handoff.outputs.expected_ref }}
+          HANDOFF_DIR: ${{ runner.temp }}/node-delegated-release-handoff
+          GH_TOKEN: ${{ steps.app-token.outputs.token }}
+          RELEASE_COMMIT: ${{ steps.handoff.outputs.release_commit }}
+          SOURCE_COMMIT: ${{ steps.handoff.outputs.source_commit }}
+        shell: bash
         run: |
-          echo "registry=${NPM_REGISTRY}" >> /home/runner/.npmrc
-          echo "@inditextech:registry=${NPM_REGISTRY}" >> /home/runner/.npmrc
-
-      - name: NPM / Create Cache Folders
-        run: |
-          mkdir -p "$HOME"/.npm
-
-      - name: Setup patch release type version
-        if: contains(env.RELEASE_LABELS, 'release-type/hotfix')
-          || contains(env.RELEASE_LABELS, 'release-type/multi-hotfix')
-          || contains(env.RELEASE_LABELS, 'release-type/patch')
-        run: echo "RELEASE_VERSION=patch" >> "$GITHUB_ENV"
-
-      - name: Setup minor release type version
-        if: contains(env.RELEASE_LABELS, 'release-type/minor')
-        run: echo "RELEASE_VERSION=minor" >> "$GITHUB_ENV"
-
-      - name: Setup minor release type version when no label set and TBD
-        if: ${{ !contains(env.RELEASE_LABELS, 'release-type') && vars.DEVELOPMENT_FLOW == 'trunk-based-development' }}
-        run: echo "RELEASE_VERSION=minor" >> "$GITHUB_ENV"
-
-      - name: Setup major release type version
-        if: contains(env.RELEASE_LABELS, 'release-type/major')
-        run: echo "RELEASE_VERSION=major" >> "$GITHUB_ENV"
-
-      - name: Prepare committer information
-        env:
-          GITHUB_TOKEN: ${{ steps.app-token.outputs.token }}
-          GPG_PRIVATE_KEY: ${{ secrets.CI_GPG_SECRET_KEY }}
-          GPG_PASSPHRASE: ${{ secrets.CI_GPG_SECRET_KEY_PASSWORD }}
-        run: |
-          git config --global credential.helper store
-          cat <<EOT >> ~/.git-credentials
-          https://ci-user:$GITHUB_TOKEN@github.com
-          EOT
-
-          # GPG: non-interactive signing setup
-          mkdir -p ~/.gnupg && chmod 700 ~/.gnupg
-          printf 'allow-loopback-pinentry\nallow-preset-passphrase\n' > ~/.gnupg/gpg-agent.conf
-          printf 'use-agent\npinentry-mode loopback\n' > ~/.gnupg/gpg.conf
-          gpgconf --kill gpg-agent || true
-          echo "$GPG_PRIVATE_KEY" | gpg --batch --import
-          KEY_DATA=$(gpg --list-secret-keys --with-colons)
-          echo "$KEY_DATA" | awk -F: '/^grp:/ {print $10}' | while read -r GRIP; do
-            /usr/lib/gnupg/gpg-preset-passphrase --preset "$GRIP" <<< "$GPG_PASSPHRASE"
-          done
-
-          # Git: identity and signing
-          FPR=$(echo "$KEY_DATA" | awk -F: '/^fpr:/ {print $10; exit}')
-          git config user.name "srvcosoitxtech"
-          git config user.email "oso@inditex.com"
-          git config user.signingkey "$FPR"
-          git config commit.gpgsign true
-          git config tag.gpgsign true
-
-      - name: Update CHANGELOG.md
-        id: update-changelog
-        uses: release-flow/keep-a-changelog-action@74931dec7ecdbfc8e38ac9ae7e8dd84c08db2f32 # v3.0.0
-        with:
-          command: bump
-          version: ${{ env.RELEASE_VERSION }}
-          changelog: code/CHANGELOG.md
-          fail-on-empty-release-notes: false
-          keep-unreleased-section: true
-          tag-prefix: ""
-
-      # release-flow/keep-a-changelog-action parses the *entire* CHANGELOG.md
-      # into a markdown AST and re-serializes the whole file on every bump,
-      # not just the section it's updating. If invisible Unicode whitespace
-      # (most commonly a pasted-in NBSP) has ever broken an unrelated,
-      # historical heading elsewhere in the file, the action's serializer
-      # defensively backslash-escapes it on the way back out (`### Added` ->
-      # `\### Added`) — corrupting content the action never meant to touch.
-      # This fails on purpose rather than silently continuing: the defect
-      # needs fixing at its source (the PR that introduced the bad
-      # whitespace), or it will keep re-triggering on every future release.
-      - name: Sanitize CHANGELOG.md
-        run: node .github/scripts/sanitize-changelog.mjs code/CHANGELOG.md
-
-      - name: NPM / Prepare release
-        working-directory: code
-        env:
-          RELEASE_VERSION: ${{ steps.update-changelog.outputs.version }}
-        run: |
-          npm run version:release
-          npm run release:prepare
-
-      - name: NPM / Ensure minimum npm version for trusted publishing
-        run: |
-          CURRENT_NPM=$(npm --version)
-          REQUIRED_NPM="11.5.1"
-          if printf '%s\n%s\n' "$REQUIRED_NPM" "$CURRENT_NPM" | sort -V -C; then
-            echo "npm $CURRENT_NPM already meets the minimum requirement ($REQUIRED_NPM). Skipping upgrade."
-          else
-            echo "npm $CURRENT_NPM is below the minimum requirement ($REQUIRED_NPM). Upgrading…"
-            npm install -g npm@^11.5.1 --registry="https://registry.npmjs.org/"
-            asdf reshim nodejs
-          fi
-          echo "node path: $(command -v node)"
-          echo "npm path: $(command -v npm)"
-          node --version
-          npm --version
-
-      - name: NPM / Verify packages exist in registry
-        id: verify-packages
-        working-directory: code
-        run: |
-          MISSING=()
-          for pkg_dir in packages/*/; do
-            PKG_NAME=$(node -p "require('./$pkg_dir/package.json').name")
-            ENCODED_PKG_NAME=$(node -p "encodeURIComponent(process.argv[1])" "$PKG_NAME")
-            RESPONSE_FILE=$(mktemp)
-            if ! HTTP_STATUS=$(curl -sS -o "$RESPONSE_FILE" -w "%{http_code}" \
-              --connect-timeout 10 \
-              --max-time 30 \
-              --retry 3 \
-              --retry-delay 2 \
-              --retry-all-errors \
-              "https://registry.npmjs.org/${ENCODED_PKG_NAME}"); then
-              echo "::error::Failed to verify $PKG_NAME due to npm registry connectivity error"
-              rm -f "$RESPONSE_FILE"
-              exit 1
-            fi
-            case "$HTTP_STATUS" in
-              200)
-                PARSE_STATUS=0
-                node -e "try { const d=JSON.parse(require('fs').readFileSync(process.argv[1],'utf8')); process.exit(Object.keys(d.versions||{}).length > 0 ? 0 : 1); } catch(e) { console.error('JSON parse error:', e.message); process.exit(2); }" "$RESPONSE_FILE" || PARSE_STATUS=$?
-                case "$PARSE_STATUS" in
-                  0)
-                    echo "✓ $PKG_NAME exists in registry with active versions"
-                    ;;
-                  1)
-                    echo "✗ $PKG_NAME has no active versions (unpublished) — treating as new"
-                    MISSING+=("$PKG_NAME")
-                    ;;
-                  *)
-                    echo "::error::Failed to verify $PKG_NAME — npm registry returned invalid JSON (HTTP 200)"
-                    rm -f "$RESPONSE_FILE"
-                    exit 1
-                    ;;
-                esac
-                ;;
-              404)
-                echo "✗ $PKG_NAME NOT found in registry"
-                MISSING+=("$PKG_NAME")
-                ;;
-              429|5??)
-                echo "::error::Failed to verify $PKG_NAME due to transient npm registry error (HTTP $HTTP_STATUS)"
-                exit 1
-                ;;
-              *)
-                echo "::error::Failed to verify $PKG_NAME due to unexpected npm registry response (HTTP $HTTP_STATUS)"
-                exit 1
-                ;;
-            esac
-            rm -f "$RESPONSE_FILE"
-          done
-          if [[ ${#MISSING[@]} -gt 0 ]]; then
-            echo "MISSING_PACKAGES=${MISSING[*]}" >> "$GITHUB_ENV"
-            echo "HAS_NEW_PACKAGES=true" >> "$GITHUB_ENV"
-            echo "::warning::New packages detected: ${MISSING[*]} — will use NPM_TOKEN instead of OIDC"
-          else
-            echo "HAS_NEW_PACKAGES=false" >> "$GITHUB_ENV"
-            echo "All packages verified in registry — OIDC publish is safe."
-          fi
-
-      - name: NPM / Release Perform (OIDC + provenance)
-        if: env.HAS_NEW_PACKAGES == 'false'
-        env:
-          NPM_CONFIG_PROVENANCE: "true"
-        working-directory: code
-        run: |
-          set -o pipefail
-          npm run release:perform 2>&1 | tee /tmp/release-perform.log
-
-      - name: NPM / Release Perform (NPM_TOKEN for new packages)
-        if: env.HAS_NEW_PACKAGES == 'true'
-        env:
-          NPM_AUTH: ${{ secrets.NPM_TOKEN }}
-        working-directory: code
-        run: |
-          if [ -z "${NPM_AUTH:-}" ]; then
-            echo "::error::NPM_TOKEN secret is required for publishing new packages but is not set"
+          set -euo pipefail
+          gh auth setup-git
+          source="$HANDOFF_DIR/source"
+          git -C "$source" remote set-url origin "$GITHUB_SERVER_URL/$GITHUB_REPOSITORY.git"
+          if [[ "$(git ls-remote origin "$EXPECTED_REF" | cut -f1)" != "$SOURCE_COMMIT" ]]; then
+            echo "::error title=Release baseline moved::The protected release branch no longer points to the verified source commit."
             exit 1
           fi
-          TEMP_NPMRC="$(mktemp)"
-          trap 'rm -f "$TEMP_NPMRC"' EXIT
-          cp ~/.npmrc "$TEMP_NPMRC"
-          chmod 600 "$TEMP_NPMRC"
-          echo "//registry.npmjs.org/:_authToken=${NPM_AUTH}" >> "$TEMP_NPMRC"
-          export NPM_CONFIG_USERCONFIG="$TEMP_NPMRC"
-          set -o pipefail
-          npm run release:perform 2>&1 | tee /tmp/release-perform.log
+          tag_refs=()
+          while IFS= read -r tag; do
+            if git ls-remote --exit-code --tags origin "refs/tags/$tag" > /dev/null 2>&1; then
+              echo "::error title=Tag conflict::Release tag '$tag' already exists on the remote."
+              exit 1
+            fi
+            tag_refs+=("refs/tags/$tag")
+          done < <(jq -r '.tags[].name' "$HANDOFF_DIR/release-handoff.json")
+          git -C "$source" push --atomic origin "$RELEASE_COMMIT:$EXPECTED_REF" "${tag_refs[@]}"
 
-      - name: Release / Commit and Tag
+      - name: Publish verified delegated tarballs via npm trusted publishing
+        uses: InditexTech/gh-actions/npm@8a719baa6e8d514ccdfe87cff2baae9007a8b168 # v1.1.5
         env:
-          GITHUB_TOKEN: ${{ steps.app-token.outputs.token }}
-        working-directory: code
-        run: |
-          git commit -S -i CHANGELOG.md -m "chore: Update CHANGELOG with ${{ steps.update-changelog.outputs.version }} version Signed-off-by: srvcosoitxtech <oso@inditex.com>" --no-verify
-          git commit -S -i package.json package-lock.json packages/*/package.json -m "[npm-scripts] Release ${{ steps.update-changelog.outputs.version }} Signed-off-by: srvcosoitxtech <oso@inditex.com>" --no-verify
-          git tag -a -m "Release ${{ steps.update-changelog.outputs.version }}" ${{ steps.update-changelog.outputs.version }}
-          git push --atomic --no-verify origin HEAD ${{ steps.update-changelog.outputs.version }}
-
-      - name: NPM / Set next development version
-        working-directory: code
-        run: |
-          npm run version:development
-
-      - name: Next Development Iteration / Commit Changes
-        env:
-          GITHUB_TOKEN: ${{ steps.app-token.outputs.token }}
-        working-directory: code
-        run: |
-          git commit -S -i package.json package-lock.json packages/*/package.json -m "[npm-scripts] prepare for next development iteration Signed-off-by: srvcosoitxtech <oso@inditex.com>" --no-verify
-          git push --no-verify origin HEAD
-
-      - name: Next Development Iteration / Create Sync Branch PR into Develop
-        id: sync-branch-pr
-        continue-on-error: true
-        if: ${{ vars.DEVELOPMENT_FLOW != 'trunk-based-development' }}
-        env:
-          GITHUB_TOKEN: ${{ steps.app-token.outputs.token }}
-        run: |
-          DEVELOP=${BASELINE_BRANCH/main/develop}
-          echo "DEVELOP=$DEVELOP" >> "$GITHUB_OUTPUT"
-          # Avoid creating sync PR if the corresponding development branch does not exist
-          if [[ -z $(git ls-remote --heads origin "$DEVELOP") ]]; then
-            echo "The '$DEVELOP' branch does not exist in remote. Skipping the creation of sync PR"
-          else
-            git checkout -b "automated/sync-release-${{ steps.update-changelog.outputs.version }}-to-$DEVELOP"
-            git push --no-verify -u origin HEAD
-            gh pr create --base "$DEVELOP" \
-              --title "Sync release ${{ steps.update-changelog.outputs.version }} to $DEVELOP" \
-              --body "**Automated Pull Request**"
-          fi
-
-      - name: GitHub Release / Create
-        uses: ncipollo/release-action@2c591bcc8ecdcd2db72b97d6147f871fcd833ba5 # v1.14.0
-        id: github-release
-        continue-on-error: true
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
         with:
-          name: ${{ steps.update-changelog.outputs.version }}
-          tag: ${{ steps.update-changelog.outputs.version }}
-          token: ${{ steps.app-token.outputs.token }}
-          body: |
-            Check out the [changelog](code/CHANGELOG.md) for version ${{ steps.update-changelog.outputs.version }}
+          working-directory: ${{ vars.WORKING_DIRECTORY }}
+          project-type: ${{ vars.PROJECT_TYPE }}
+          dist-tag: latest
+          artifact-directory: ${{ runner.temp }}/publish-dist
 
-      - name: Comment in PR / Sync PR creation failed
-        if: ${{ vars.DEVELOPMENT_FLOW != 'trunk-based-development' }}
+  prepare-delegated-next-development:
+    name: Prepare delegated next-development source
+    needs: [release-core, publish-npm-delegated]
+    if: >-
+      vars.RELEASE_LIFECYCLE == 'delegated' &&
+      needs.release-core.result == 'success' &&
+      needs.publish-npm-delegated.result == 'success'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    permissions:
+      contents: read
+    outputs:
+      handoff_digest: ${{ steps.next-development.outputs.handoff_digest }}
+    steps:
+      - name: Download immutable delegated release handoff
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          name: node-delegated-release-handoff
+          path: ${{ runner.temp }}/node-delegated-release-handoff
+
+      - name: Restore verified release source
+        id: source
         env:
-          GITHUB_TOKEN: ${{ steps.app-token.outputs.token }}
+          HANDOFF_DIGEST: ${{ needs.release-core.outputs.handoff_digest }}
+          HANDOFF_DIR: ${{ runner.temp }}/node-delegated-release-handoff
+        shell: bash
         run: |
-          DEVELOP=${BASELINE_BRANCH/main/develop}
-          git remote set-url origin "https://x-access-token:$GITHUB_TOKEN@github.com/$GITHUB_REPOSITORY"
-          # shellcheck disable=SC2140
-          if ! git ls-remote --exit-code --heads origin automated/sync-release-"${{ steps.update-changelog.outputs.version }}"-to-"$DEVELOP"; then
-            gh pr comment "${{ github.event.number }}" --body "An error occurred creating the \`sync\` branch that synchronizes the \`$BASELINE_BRANCH\` and \`$DEVELOP\` branches.
-            Please create a branch from \`$BASELINE_BRANCH\` (e.g. \`internal/sync-$BASELINE_BRANCH-with-$DEVELOP\`) and then create a pull request against \`$DEVELOP\` to finish the release process."
+          set -euo pipefail
+          metadata="$HANDOFF_DIR/release-handoff.json"
+          source_bundle="$HANDOFF_DIR/release-source.bundle"
+          if [[ ! -f "$metadata" || ! -f "$source_bundle" ]] \
+            || [[ "$(sha256sum "$metadata" | awk '{print $1}')" != "$HANDOFF_DIGEST" ]] \
+            || [[ "$(sha256sum "$source_bundle" | awk '{print $1}')" != "$(jq -r '.source_bundle.sha256' "$metadata")" ]]; then
+            echo "::error title=Tampered release handoff::Next-development preparation requires the original verified release handoff."
+            exit 1
+          fi
+          jq -e \
+            --arg repository "$GITHUB_REPOSITORY" \
+            --arg run_id "$GITHUB_RUN_ID" \
+            --arg run_attempt "$GITHUB_RUN_ATTEMPT" \
+            '.schema_version == 1 and .repository == $repository and .run_id == $run_id and .run_attempt == $run_attempt and (.release_commit | test("^[0-9a-f]{40}$"))' \
+            "$metadata" > /dev/null
+          rm -rf "$HANDOFF_DIR/source"
+          git clone --quiet --no-checkout "$source_bundle" "$HANDOFF_DIR/source"
+          release_commit="$(jq -r '.release_commit' "$metadata")"
+          git -C "$HANDOFF_DIR/source" checkout --quiet --detach "$release_commit"
+          echo "release_commit=$release_commit" >> "$GITHUB_OUTPUT"
+          echo "source_root=$HANDOFF_DIR/source" >> "$GITHUB_OUTPUT"
+
+      - name: Read governed tool versions
+        id: tool-versions
+        working-directory: ${{ steps.source.outputs.source_root }}/${{ env.WORKING_DIRECTORY }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          if grep -Evq '^[a-zA-Z0-9_-]+ [a-zA-Z0-9._+-]+$' .tool-versions; then
+            echo "::error title=Invalid tool-versions::${WORKING_DIRECTORY}/.tool-versions is malformed."
+            exit 1
+          fi
+          {
+            echo "tool_versions<<EOF"
+            cat .tool-versions
+            echo
+            echo "EOF"
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Set up asdf-managed Node
+        uses: asdf-vm/actions/install@b7bcd026f18772e44fe1026d729e1611cc435d47 # v4.0.1
+        with:
+          tool_versions: ${{ steps.tool-versions.outputs.tool_versions }}
+          asdf_version: ${{ env.ASDF_BRANCH_VERSION }}
+
+      - name: Prepare next development source
+        env:
+          RELEASES: ${{ needs.release-core.outputs.releases }}
+          SOURCE_ROOT: ${{ steps.source.outputs.source_root }}
+        working-directory: ${{ steps.source.outputs.source_root }}/${{ env.WORKING_DIRECTORY }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          git -C "$SOURCE_ROOT" config user.name "github-actions[bot]"
+          git -C "$SOURCE_ROOT" config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          release_bump="$(jq -er '.[0].release_bump | select(type == "string" and length > 0)' <<< "$RELEASES")"
+          case "${PACKAGE_MANAGER:-npm}" in
+            npm)  RELEASE_BUMP="$release_bump" npm run version:development ;;
+            pnpm) corepack enable; RELEASE_BUMP="$release_bump" pnpm run version:development ;;
+            *)    echo "::error title=Invalid package manager::PACKAGE_MANAGER must be npm or pnpm."; exit 1 ;;
+          esac
+          git -C "$SOURCE_ROOT" add --update -- "$WORKING_DIRECTORY"
+          if git -C "$SOURCE_ROOT" diff --cached --quiet; then
+            echo "::error title=Missing next-development update::version:development did not produce a source change."
+            exit 1
+          fi
+          git -C "$SOURCE_ROOT" commit -m "[node-release] prepare for next development iteration"
+
+      - name: Create next-development handoff
+        id: next-development
+        env:
+          HANDOFF_DIGEST: ${{ needs.release-core.outputs.handoff_digest }}
+          HANDOFF_DIR: ${{ runner.temp }}/node-delegated-release-handoff
+          RELEASE_COMMIT: ${{ steps.source.outputs.release_commit }}
+          SOURCE_ROOT: ${{ steps.source.outputs.source_root }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          next_development_commit="$(git -C "$SOURCE_ROOT" rev-parse HEAD)"
+          if ! git -C "$SOURCE_ROOT" merge-base --is-ancestor "$RELEASE_COMMIT" "$next_development_commit"; then
+            echo "::error title=Invalid next-development provenance::The next-development commit is not descended from the published release."
+            exit 1
+          fi
+          git -C "$SOURCE_ROOT" bundle create "$HANDOFF_DIR/next-development.bundle" "$next_development_commit"
+          bundle_sha256="$(sha256sum "$HANDOFF_DIR/next-development.bundle" | awk '{print $1}')"
+          jq -n \
+            --arg bundle_sha256 "$bundle_sha256" \
+            --arg handoff_digest "$HANDOFF_DIGEST" \
+            --arg next_development_commit "$next_development_commit" \
+            --arg release_commit "$RELEASE_COMMIT" \
+            --arg repository "$GITHUB_REPOSITORY" \
+            --arg run_attempt "$GITHUB_RUN_ATTEMPT" \
+            --arg run_id "$GITHUB_RUN_ID" \
+            '{
+              schema_version: 1,
+              repository: $repository,
+              run_id: $run_id,
+              run_attempt: $run_attempt,
+              release_handoff_digest: $handoff_digest,
+              release_commit: $release_commit,
+              next_development_commit: $next_development_commit,
+              source_bundle: {file: "next-development.bundle", sha256: $bundle_sha256}
+            }' > "$HANDOFF_DIR/next-development-handoff.json"
+          echo "handoff_digest=$(sha256sum "$HANDOFF_DIR/next-development-handoff.json" | awk '{print $1}')" >> "$GITHUB_OUTPUT"
+
+      - name: Upload next-development handoff
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: node-delegated-next-development-handoff
+          path: |
+            ${{ runner.temp }}/node-delegated-release-handoff/next-development.bundle
+            ${{ runner.temp }}/node-delegated-release-handoff/next-development-handoff.json
+          if-no-files-found: error
+          retention-days: 14
+
+  finalize-delegated-release:
+    name: Finalize delegated release (next dev + sync PR)
+    needs: [release-core, publish-npm-delegated, prepare-delegated-next-development]
+    if: >-
+      vars.RELEASE_LIFECYCLE == 'delegated' &&
+      needs.release-core.result == 'success' &&
+      needs.publish-npm-delegated.result == 'success' &&
+      needs.prepare-delegated-next-development.result == 'success'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    permissions:
+      contents: read
+    steps:
+      - name: Create GitHub App token
+        id: app-token
+        uses: actions/create-github-app-token@bcd2ba49218906704ab6c1aa796996da409d3eb1 # v3.2.0
+        with:
+          client-id: ${{ vars.APP_CLIENT_ID }}
+          private-key: ${{ secrets.APP_PRIVATE_KEY }}
+          permission-contents: write
+          permission-pull-requests: write
+
+      - name: Check out release branch
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+          ref: ${{ github.event.pull_request.base.ref || github.ref_name }}
+          token: ${{ steps.app-token.outputs.token }}
+
+      - name: Download immutable next-development handoff
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          name: node-delegated-next-development-handoff
+          path: ${{ runner.temp }}/node-delegated-next-development-handoff
+
+      - name: Verify and promote next development source
+        env:
+          APP_SLUG: ${{ steps.app-token.outputs.app-slug }}
+          BASELINE_BRANCH: ${{ github.event.pull_request.base.ref || github.ref_name }}
+          DEVELOPMENT_FLOW: ${{ vars.DEVELOPMENT_FLOW }}
+          EXPECTED_HANDOFF_DIGEST: ${{ needs.prepare-delegated-next-development.outputs.handoff_digest }}
+          GH_TOKEN: ${{ steps.app-token.outputs.token }}
+          HANDOFF_DIR: ${{ runner.temp }}/node-delegated-next-development-handoff
+          RELEASE_HANDOFF_DIGEST: ${{ needs.release-core.outputs.handoff_digest }}
+          RELEASES: ${{ needs.release-core.outputs.releases }}
+          RELEASE_COMMIT: ${{ needs.release-core.outputs.release_commit }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          metadata="$HANDOFF_DIR/next-development-handoff.json"
+          source_bundle="$HANDOFF_DIR/next-development.bundle"
+          if [[ ! -f "$metadata" || ! -f "$source_bundle" ]] \
+            || [[ "$(sha256sum "$metadata" | awk '{print $1}')" != "$EXPECTED_HANDOFF_DIGEST" ]]; then
+            echo "::error title=Tampered next-development handoff::The run-bound next-development metadata is missing or changed."
+            exit 1
+          fi
+          jq -e \
+            --arg repository "$GITHUB_REPOSITORY" \
+            --arg run_id "$GITHUB_RUN_ID" \
+            --arg run_attempt "$GITHUB_RUN_ATTEMPT" \
+            --arg release_commit "$RELEASE_COMMIT" \
+            --arg release_handoff_digest "$RELEASE_HANDOFF_DIGEST" \
+            '
+              .schema_version == 1 and
+              .repository == $repository and
+              .run_id == $run_id and
+              .run_attempt == $run_attempt and
+              .release_commit == $release_commit and
+              .release_handoff_digest == $release_handoff_digest and
+              (.next_development_commit | test("^[0-9a-f]{40}$")) and
+              (.source_bundle.file == "next-development.bundle") and
+              (.source_bundle.sha256 | test("^[0-9a-f]{64}$"))
+            ' "$metadata" > /dev/null
+          if [[ "$(sha256sum "$source_bundle" | awk '{print $1}')" != "$(jq -r '.source_bundle.sha256' "$metadata")" ]]; then
+            echo "::error title=Tampered next-development handoff::The next-development source bundle digest does not match metadata."
+            exit 1
           fi
 
-      - name: Comment in PR / Release creation failed
-        if: ${{ steps.github-release.outcome == 'failure' }}
+          rm -rf "$HANDOFF_DIR/source"
+          git clone --quiet --no-checkout "$source_bundle" "$HANDOFF_DIR/source"
+          source="$HANDOFF_DIR/source"
+          next_development_commit="$(jq -r '.next_development_commit' "$metadata")"
+          git -C "$source" rev-parse --verify --quiet "${next_development_commit}^{commit}" > /dev/null
+          if ! git -C "$source" merge-base --is-ancestor "$RELEASE_COMMIT" "$next_development_commit"; then
+            echo "::error title=Invalid next-development provenance::The next-development source is not descended from the published release."
+            exit 1
+          fi
+
+          gh auth setup-git
+          git -C "$source" remote set-url origin "$GITHUB_SERVER_URL/$GITHUB_REPOSITORY.git"
+          expected_ref="refs/heads/$BASELINE_BRANCH"
+          if [[ "$(git ls-remote origin "$expected_ref" | cut -f1)" != "$RELEASE_COMMIT" ]]; then
+            echo "::error title=Release baseline moved::The protected release branch no longer points to the published release."
+            exit 1
+          fi
+          git -C "$source" push origin "$next_development_commit:$expected_ref"
+
+          if [[ "$DEVELOPMENT_FLOW" != "git-flow" ]]; then
+            echo "::notice title=Sync skipped::Sync-to-develop applies only to git-flow."
+            exit 0
+          fi
+
+          version="$(jq -r '.[0].version' <<< "$RELEASES")"
+          develop_branch="${BASELINE_BRANCH/main/develop}"
+          if [[ -z "$(git ls-remote --heads origin "$develop_branch")" ]]; then
+            echo "::notice title=Sync skipped::$develop_branch does not exist."
+            exit 0
+          fi
+          sync_branch="automated/sync-release-${version}-to-${develop_branch}"
+          git fetch --no-tags origin "$BASELINE_BRANCH"
+          git switch --force-create "$sync_branch" "origin/$BASELINE_BRANCH"
+          git push --force-with-lease --set-upstream origin "$sync_branch"
+
+          if [[ -z "$(gh pr list --repo "$GITHUB_REPOSITORY" --head "$sync_branch" --base "$develop_branch" --state open --json number --jq '.[0].number // empty')" ]]; then
+            gh pr create --repo "$GITHUB_REPOSITORY" \
+              --base "$develop_branch" --head "$sync_branch" \
+              --title "Sync release $version to $develop_branch" \
+              --body "**Automated pull request** syncing the release cut on \`$BASELINE_BRANCH\` back into \`$develop_branch\`."
+          fi
+
+  github-release:
+    name: Create GitHub Release ${{ matrix.release.tag }}
+    needs: [release-core, publish-npm, publish-npm-delegated]
+    if: >-
+      !cancelled() &&
+      needs.release-core.result == 'success' &&
+      (needs.publish-npm.result == 'success' || needs.publish-npm.result == 'skipped') &&
+      (needs.publish-npm-delegated.result == 'success' || needs.publish-npm-delegated.result == 'skipped')
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    permissions:
+      contents: read
+    strategy:
+      fail-fast: false
+      matrix:
+        release: ${{ fromJSON(needs.release-core.outputs.releases) }}
+    steps:
+      - name: Create GitHub App token
+        id: app-token
+        uses: actions/create-github-app-token@bcd2ba49218906704ab6c1aa796996da409d3eb1 # v3.2.0
+        with:
+          client-id: ${{ vars.APP_CLIENT_ID }}
+          private-key: ${{ secrets.APP_PRIVATE_KEY }}
+          permission-contents: write
+
+      - name: Download release distributions
+        if: vars.RELEASE_LIFECYCLE != 'delegated'
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          name: npm-distributions-${{ matrix.release.tag }}
+          path: dist
+
+      - name: Create or update GitHub Release
         env:
-          GITHUB_TOKEN: ${{ steps.app-token.outputs.token }}
-        run: >
-          gh pr comment ${{ github.event.number }} --body "An error occurred creating the GitHub Release.
-          Don't panic! Your artifacts were successfully uploaded to the InditexTech npmjs registry and the new release tag was created.
-          You can manually complete the release by creating it in the [releases](https://github.com/${{ github.repository }}/releases)
-          page."
+          GH_TOKEN: ${{ steps.app-token.outputs.token }}
+          RELEASE_TAG: ${{ matrix.release.tag }}
+          RELEASE_VERSION: ${{ matrix.release.version }}
+          RELEASE_LIFECYCLE: ${{ vars.RELEASE_LIFECYCLE }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          shopt -s nullglob
+          assets=(dist/*.tgz)
+          if [[ "$RELEASE_LIFECYCLE" != "delegated" && ${#assets[@]} -eq 0 ]]; then
+            echo "::error title=Missing distributions::The release artifact is empty."
+            exit 1
+          fi
+
+          if gh release view "$RELEASE_TAG" --repo "$GITHUB_REPOSITORY" > /dev/null 2>&1; then
+            if [[ ${#assets[@]} -gt 0 ]]; then
+              gh release upload "$RELEASE_TAG" "${assets[@]}" \
+                --repo "$GITHUB_REPOSITORY" \
+                --clobber
+            fi
+          else
+            gh release create "$RELEASE_TAG" "${assets[@]}" \
+              --repo "$GITHUB_REPOSITORY" \
+              --title "$RELEASE_VERSION" \
+              --generate-notes
+          fi
