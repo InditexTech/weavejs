@@ -34,7 +34,7 @@ export async function create(options: Options): Promise<void> {
       throw new Error('The output directory cannot contain traversal or drive segments');
     }
   }
-  const projectName = segments[segments.length - 1] ?? '';
+  const projectName = segments.at(-1) ?? '';
   const dest = path.resolve(cwd, ...segments);
 
   function defaultRename(file: string): string {
