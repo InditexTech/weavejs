@@ -1,0 +1,23 @@
+code/packages/create-backend-app/src/create-app.ts
+  s_c3b2d8dfc58894::t_6ed158047d4677 37
+code/packages/create-frontend-app/src/create-app.ts
+  s_c3b2d8dfc58894::t_303d904d0b2d0c 37
+code/sonar-project.properties
+  s_c3b2d8dfc58894::t_370d9012c40b23 32-38
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "2237489a875997c147b98e57b1d8df3fce1f9cae",
+  "prompts": {},
+  "sessions": {
+    "s_c3b2d8dfc58894": {
+      "agent_id": {
+        "tool": "github-copilot",
+        "id": "s_c3b2d8dfc58894",
+        "model": "unknown"
+      },
+      "human_author": "ivanasabi <ivanasabi@ext.inditex.com>"
+    }
+  }
+}
