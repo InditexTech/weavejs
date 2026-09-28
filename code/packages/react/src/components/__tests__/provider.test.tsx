@@ -42,7 +42,9 @@ beforeEach(() => {
     start: vi.fn(),
     destroy: vi.fn(),
   };
-  MockWeave.mockImplementation(() => mockInstance);
+  MockWeave.mockImplementation(function () {
+    return mockInstance;
+  });
 
   mockContainer = document.createElement('div');
   vi.spyOn(mockContainer, 'getBoundingClientRect').mockReturnValue({

@@ -23,7 +23,9 @@ const { MockWebSocket } = vi.hoisted(() => {
     readyState: 1,
     emit: vi.fn(),
   };
-  const MockWebSocket = vi.fn().mockImplementation(() => mockWs);
+  const MockWebSocket = vi.fn().mockImplementation(function () {
+    return mockWs;
+  });
   (MockWebSocket as typeof MockWebSocket & { OPEN: number; CLOSED: number }).OPEN = 1;
   (MockWebSocket as typeof MockWebSocket & { OPEN: number; CLOSED: number }).CLOSED = 3;
   return { MockWebSocket };
@@ -47,9 +49,9 @@ type ConnLike = {
 
 type WsInstance = {
   addEventListener: (...args: unknown[]) => unknown;
-  send: ReturnType<typeof vi.fn>;
-  close: ReturnType<typeof vi.fn>;
-  emit: ReturnType<typeof vi.fn>;
+  send: ReturnType<typeof vi.fn<(...args: unknown[]) => unknown>>;
+  close: ReturnType<typeof vi.fn<(...args: unknown[]) => unknown>>;
+  emit: ReturnType<typeof vi.fn<(...args: unknown[]) => unknown>>;
   readyState: number;
   handlers: Record<string, (event: unknown) => void>;
 };
@@ -150,7 +152,9 @@ async function waitForSocketSetup(ws: WsInstance) {
 }
 
 async function connectHost(host: WeaveStoreAzureWebPubSubSyncHost, ws: WsInstance) {
-  MockWebSocket.mockImplementationOnce(() => ws as never);
+  MockWebSocket.mockImplementationOnce(function () {
+    return ws as never;
+  });
   const createPromise = host.createWebSocket();
   await waitForSocketSetup(ws);
   ws.handlers.open({ type: 'open' });
@@ -163,7 +167,9 @@ describe('WeaveStoreAzureWebPubSubSyncHost', () => {
     MockWebSocket.mockReset();
     (MockWebSocket as unknown as { OPEN: number }).OPEN = 1;
     (MockWebSocket as unknown as { CLOSED: number }).CLOSED = 3;
-    MockWebSocket.mockImplementation(() => createWsInstance() as never);
+    MockWebSocket.mockImplementation(function () {
+      return createWsInstance() as never;
+    });
   });
 
   afterEach(() => {
@@ -233,7 +239,9 @@ describe('WeaveStoreAzureWebPubSubSyncHost', () => {
     });
     const ws = createWsInstance();
 
-    MockWebSocket.mockImplementationOnce(() => ws as never);
+    MockWebSocket.mockImplementationOnce(function () {
+    return ws as never;
+  });
     const createPromise = host.createWebSocket();
     await waitForSocketSetup(ws);
 
@@ -613,7 +621,9 @@ describe('WeaveStoreAzureWebPubSubSyncHost', () => {
     host.doc?.getMap('weave').set('status', 'ok');
 
     expect(syncHandler.persistRoomTask).toHaveBeenCalledWith('room-123');
-    const [smallPayload] = ws.send.mock.calls.slice(-1).map(([payload]) => JSON.parse(payload));
+    const [smallPayload] = ws.send.mock.calls
+      .slice(-1)
+      .map(([payload]) => JSON.parse(payload as string));
     expect(smallPayload).toMatchObject({
       type: MessageType.SendToGroup,
       group: 'room-123',

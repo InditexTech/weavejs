@@ -41,7 +41,7 @@ describe('stage-minimap.worker — onmessage handler', () => {
 
     vi.stubGlobal(
       'OffscreenCanvas',
-      vi.fn().mockImplementation((w: number, h: number) => {
+      vi.fn().mockImplementation(function (w: number, h: number) {
         const inst = makeOffscreenCanvas(w, h);
         offscreenCanvasInstances.push(inst);
         return inst;

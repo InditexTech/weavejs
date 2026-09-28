@@ -4,7 +4,7 @@
 
 // @vitest-environment jsdom
 
-import { describe, it, expect, beforeAll, beforeEach, vi } from 'vitest';
+import { describe, it, expect, beforeAll, beforeEach, afterEach, vi } from 'vitest';
 import Konva from 'konva';
 import { WeaveVideoNode } from '../video';
 import { WEAVE_VIDEO_DEFAULT_CONFIG, WEAVE_VIDEO_NODE_TYPE } from '../constants';
@@ -217,6 +217,12 @@ beforeEach(() => {
   vi.spyOn(Konva.Util, 'createImageElement').mockImplementation(
     () => makeMockImageElement()
   );
+});
+
+afterEach(() => {
+  // Restore any vi.spyOn() spies (e.g. document.createElement) so call
+  // history from one test doesn't leak into the next.
+  vi.restoreAllMocks();
 });
 
 // ===========================================================================

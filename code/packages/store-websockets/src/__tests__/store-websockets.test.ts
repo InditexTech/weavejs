@@ -32,7 +32,9 @@ const mockProvider = {
 };
 
 vi.mock('y-websocket', () => ({
-  WebsocketProvider: vi.fn().mockImplementation(() => mockProvider),
+  WebsocketProvider: vi.fn().mockImplementation(function () {
+    return mockProvider;
+  }),
 }));
 
 // ---------------------------------------------------------------------------

@@ -7,16 +7,18 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
 vi.mock('konva', () => {
-  const Rect = vi.fn().mockImplementation((config: Record<string, unknown>) => ({
-    _config: config,
-    strokeWidth: vi.fn().mockReturnThis(),
-    dash: vi.fn().mockReturnThis(),
-    width: vi.fn().mockReturnThis(),
-    height: vi.fn().mockReturnThis(),
-    setAttrs: vi.fn().mockReturnThis(),
-    visible: vi.fn().mockReturnValue(true),
-    getClientRect: vi.fn().mockReturnValue({ x: 10, y: 10, width: 100, height: 80 }),
-  }));
+  const Rect = vi.fn().mockImplementation(function (config: Record<string, unknown>) {
+    return {
+      _config: config,
+      strokeWidth: vi.fn().mockReturnThis(),
+      dash: vi.fn().mockReturnThis(),
+      width: vi.fn().mockReturnThis(),
+      height: vi.fn().mockReturnThis(),
+      setAttrs: vi.fn().mockReturnThis(),
+      visible: vi.fn().mockReturnValue(true),
+      getClientRect: vi.fn().mockReturnValue({ x: 10, y: 10, width: 100, height: 80 }),
+    };
+  });
   return { default: { Rect } };
 });
 

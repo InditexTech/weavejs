@@ -31,9 +31,15 @@ const { MockGroup, MockLine, MockCircle } = vi.hoisted(() => {
     destroy: vi.fn(),
   });
 
-  const MockGroup = vi.fn().mockImplementation(() => makeGroupInstance());
-  const MockLine = vi.fn().mockImplementation(() => makeLineInstance());
-  const MockCircle = vi.fn().mockImplementation(() => makeCircleInstance());
+  const MockGroup = vi.fn().mockImplementation(function () {
+    return makeGroupInstance();
+  });
+  const MockLine = vi.fn().mockImplementation(function () {
+    return makeLineInstance();
+  });
+  const MockCircle = vi.fn().mockImplementation(function () {
+    return makeCircleInstance();
+  });
 
   return { MockGroup, MockLine, MockCircle };
 });

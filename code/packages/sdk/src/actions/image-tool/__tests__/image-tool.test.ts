@@ -8,10 +8,12 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 
 // ── Hoisted Konva.Image mock ───────────────────────────────────────────────────
 const { MockImage } = vi.hoisted(() => {
-  const MockImage = vi.fn().mockImplementation(() => ({
-    setAttrs: vi.fn(),
-    destroy: vi.fn(),
-  }));
+  const MockImage = vi.fn().mockImplementation(function () {
+    return {
+      setAttrs: vi.fn(),
+      destroy: vi.fn(),
+    };
+  });
   return { MockImage };
 });
 
@@ -1294,7 +1296,12 @@ describe('WeaveImageToolAction', () => {
         result: 'data:image/png;base64,abc',
         readAsDataURL: vi.fn(),
       };
-      vi.stubGlobal('FileReader', vi.fn().mockImplementation(() => mockReader));
+      vi.stubGlobal(
+        'FileReader',
+        vi.fn().mockImplementation(function () {
+          return mockReader;
+        })
+      );
       const promise = action.getDataURL(new Blob(['test']));
       mockReader.onloadend();
       const result = await promise;
@@ -1308,7 +1315,12 @@ describe('WeaveImageToolAction', () => {
         result: null,
         readAsDataURL: vi.fn(),
       };
-      vi.stubGlobal('FileReader', vi.fn().mockImplementation(() => mockReader));
+      vi.stubGlobal(
+        'FileReader',
+        vi.fn().mockImplementation(function () {
+          return mockReader;
+        })
+      );
       const promise = action.getDataURL(new Blob(['test']));
       mockReader.onerror();
       await expect(promise).rejects.toThrow('Failed to generate dataURL from file');

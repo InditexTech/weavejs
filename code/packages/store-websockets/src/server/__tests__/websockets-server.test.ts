@@ -11,7 +11,7 @@ import EventEmitter from 'node:events';
 
 // Mock ioredis so Redis constructor never opens a real connection
 vi.mock('ioredis', () => {
-  const Redis = vi.fn().mockImplementation(() => {
+  const Redis = vi.fn().mockImplementation(function () {
     const emitter = new EventEmitter();
     return {
       on: emitter.on.bind(emitter),
@@ -37,11 +37,13 @@ const mockHandleUpgrade = vi.fn((_req: unknown, _socket: unknown, _head: unknown
 });
 
 vi.mock('ws', () => ({
-  WebSocketServer: vi.fn().mockImplementation(() => ({
-    on: mockWssOn,
-    emit: mockWssEmit,
-    handleUpgrade: mockHandleUpgrade,
-  })),
+  WebSocketServer: vi.fn().mockImplementation(function () {
+    return {
+      on: mockWssOn,
+      emit: mockWssEmit,
+      handleUpgrade: mockHandleUpgrade,
+    };
+  }),
 }));
 
 // Mock websockets-utils so getYDoc and setServer can be inspected

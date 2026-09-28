@@ -13,15 +13,17 @@ vi.mock('@azure/identity', () => ({
   DefaultAzureCredential: vi.fn(),
 }));
 vi.mock('../server/azure-web-pubsub-sync-handler', () => ({
-  default: vi.fn().mockImplementation(() => ({
-    getKoaMiddleware: vi.fn(),
-    getExpressJsMiddleware: vi.fn(),
-    getRoomDocument: vi.fn(),
-    clientConnect: vi.fn(),
-    clientDisconnect: vi.fn(),
-    clientTransportConnect: vi.fn(),
-    clientTransportDisconnect: vi.fn(),
-  })),
+  default: vi.fn().mockImplementation(function () {
+    return {
+      getKoaMiddleware: vi.fn(),
+      getExpressJsMiddleware: vi.fn(),
+      getRoomDocument: vi.fn(),
+      clientConnect: vi.fn(),
+      clientDisconnect: vi.fn(),
+      clientTransportConnect: vi.fn(),
+      clientTransportDisconnect: vi.fn(),
+    };
+  }),
 }));
 vi.mock('@inditextech/weave-sdk/server', () => ({
   defaultInitialState: vi.fn(),

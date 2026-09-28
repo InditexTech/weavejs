@@ -24,7 +24,9 @@ const { MockLine } = vi.hoisted(() => {
     });
     return inst;
   };
-  const MockLine = vi.fn().mockImplementation(() => makeLineInstance());
+  const MockLine = vi.fn().mockImplementation(function () {
+    return makeLineInstance();
+  });
   return { MockLine };
 });
 
@@ -34,9 +36,11 @@ vi.mock('@/plugins/nodes-selection/nodes-selection', () => ({
 }));
 vi.mock('konva', () => ({ default: { Line: MockLine } }));
 vi.mock('@/internal-utils/greedy-snapper', () => ({
-  GreedySnapper: vi.fn().mockImplementation(() => ({
-    apply: vi.fn().mockImplementation((angle: number) => angle),
-  })),
+  GreedySnapper: vi.fn().mockImplementation(function () {
+    return {
+      apply: vi.fn().mockImplementation((angle: number) => angle),
+    };
+  }),
 }));
 vi.mock('uuid', () => ({ v4: vi.fn().mockReturnValue('test-uuid') }));
 

@@ -20,7 +20,7 @@ let mockLayerInstances: MockLayer[] = [];
 
 vi.mock('konva', () => ({
   default: {
-    Layer: vi.fn(() => {
+    Layer: vi.fn(function () {
       const instance: MockLayer = {
         add: vi.fn(),
         setZIndex: vi.fn(),

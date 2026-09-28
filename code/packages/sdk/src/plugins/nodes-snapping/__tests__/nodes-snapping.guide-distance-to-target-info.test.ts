@@ -10,37 +10,45 @@ import { describe, it, expect, vi } from 'vitest';
 
 vi.mock('konva', () => ({
   default: {
-    Rect: vi.fn().mockImplementation(() => ({
-      destroy: vi.fn(),
-      x: vi.fn().mockReturnThis(),
-      y: vi.fn().mockReturnThis(),
-      width: vi.fn().mockReturnThis(),
-      height: vi.fn().mockReturnThis(),
-      moveToTop: vi.fn(),
-      moveToBottom: vi.fn(),
-    })),
-    Line: vi.fn().mockImplementation(() => ({
-      destroy: vi.fn(),
-      points: vi.fn().mockReturnThis(),
-      x: vi.fn().mockReturnValue(0),
-      y: vi.fn().mockReturnValue(0),
-      width: vi.fn().mockReturnValue(0),
-      height: vi.fn().mockReturnValue(0),
-      moveToTop: vi.fn(),
-    })),
-    Group: vi.fn().mockImplementation(() => ({
-      add: vi.fn(),
-      destroy: vi.fn(),
-      x: vi.fn().mockReturnThis(),
-      y: vi.fn().mockReturnThis(),
-      moveToTop: vi.fn(),
-    })),
-    Text: vi.fn().mockImplementation(() => ({
-      text: vi.fn().mockReturnThis(),
-      x: vi.fn().mockReturnThis(),
-      y: vi.fn().mockReturnThis(),
-      measureSize: vi.fn().mockReturnValue({ width: 40, height: 14 }),
-    })),
+    Rect: vi.fn().mockImplementation(function () {
+      return {
+        destroy: vi.fn(),
+        x: vi.fn().mockReturnThis(),
+        y: vi.fn().mockReturnThis(),
+        width: vi.fn().mockReturnThis(),
+        height: vi.fn().mockReturnThis(),
+        moveToTop: vi.fn(),
+        moveToBottom: vi.fn(),
+      };
+    }),
+    Line: vi.fn().mockImplementation(function () {
+      return {
+        destroy: vi.fn(),
+        points: vi.fn().mockReturnThis(),
+        x: vi.fn().mockReturnValue(0),
+        y: vi.fn().mockReturnValue(0),
+        width: vi.fn().mockReturnValue(0),
+        height: vi.fn().mockReturnValue(0),
+        moveToTop: vi.fn(),
+      };
+    }),
+    Group: vi.fn().mockImplementation(function () {
+      return {
+        add: vi.fn(),
+        destroy: vi.fn(),
+        x: vi.fn().mockReturnThis(),
+        y: vi.fn().mockReturnThis(),
+        moveToTop: vi.fn(),
+      };
+    }),
+    Text: vi.fn().mockImplementation(function () {
+      return {
+        text: vi.fn().mockReturnThis(),
+        x: vi.fn().mockReturnThis(),
+        y: vi.fn().mockReturnThis(),
+        measureSize: vi.fn().mockReturnValue({ width: 40, height: 14 }),
+      };
+    }),
   },
 }));
 

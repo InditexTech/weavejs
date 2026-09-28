@@ -10,48 +10,56 @@ import { describe, it, expect, vi } from 'vitest';
 
 vi.mock('konva', () => ({
   default: {
-    Layer: vi.fn().mockImplementation(() => ({
-      add: vi.fn(),
-      batchDraw: vi.fn(),
-      getZIndex: vi.fn().mockReturnValue(0),
-      zIndex: vi.fn(),
-      find: vi.fn().mockReturnValue([]),
-      findOne: vi.fn().mockReturnValue(null),
-      id: vi.fn().mockReturnValue('mainLayer'),
-    })),
+    Layer: vi.fn().mockImplementation(function () {
+      return {
+        add: vi.fn(),
+        batchDraw: vi.fn(),
+        getZIndex: vi.fn().mockReturnValue(0),
+        zIndex: vi.fn(),
+        find: vi.fn().mockReturnValue([]),
+        findOne: vi.fn().mockReturnValue(null),
+        id: vi.fn().mockReturnValue('mainLayer'),
+      };
+    }),
   },
 }));
 
 vi.mock('@/weave', () => ({ Weave: class Weave {} }));
 
 vi.mock('../nodes-snapping.custom-guides', () => ({
-  WeaveNodesSnappingCustomGuides: vi.fn().mockImplementation(() => ({
-    initialize: vi.fn().mockResolvedValue(undefined),
-    isCustomGuidesVisible: vi.fn().mockReturnValue(false),
-    hideCustomGuides: vi.fn(),
-    renderCustomGuides: vi.fn(),
-    getCustomGuides: vi.fn().mockReturnValue([]),
-    getGuidesManager: vi.fn().mockReturnThis(),
-    getSelectedGuide: vi.fn().mockReturnValue(null),
-  })),
+  WeaveNodesSnappingCustomGuides: vi.fn().mockImplementation(function () {
+    return {
+      initialize: vi.fn().mockResolvedValue(undefined),
+      isCustomGuidesVisible: vi.fn().mockReturnValue(false),
+      hideCustomGuides: vi.fn(),
+      renderCustomGuides: vi.fn(),
+      getCustomGuides: vi.fn().mockReturnValue([]),
+      getGuidesManager: vi.fn().mockReturnThis(),
+      getSelectedGuide: vi.fn().mockReturnValue(null),
+    };
+  }),
 }));
 
 vi.mock('../nodes-snapping.guides', () => ({
-  WeaveNodesSnappingGuides: vi.fn().mockImplementation(() => ({
-    performSnapping: vi.fn(),
-    clearSnapGuides: vi.fn(),
-    getGuidesFromOtherNodes: vi.fn().mockReturnValue([]),
-    renderSnapGuides: vi.fn(),
-    copyContainerGuidesToClipboard: vi.fn().mockResolvedValue(undefined),
-    pasteGuidesFromClipboard: vi.fn().mockResolvedValue(undefined),
-  })),
+  WeaveNodesSnappingGuides: vi.fn().mockImplementation(function () {
+    return {
+      performSnapping: vi.fn(),
+      clearSnapGuides: vi.fn(),
+      getGuidesFromOtherNodes: vi.fn().mockReturnValue([]),
+      renderSnapGuides: vi.fn(),
+      copyContainerGuidesToClipboard: vi.fn().mockResolvedValue(undefined),
+      pasteGuidesFromClipboard: vi.fn().mockResolvedValue(undefined),
+    };
+  }),
 }));
 
 vi.mock('../nodes-snapping.distance', () => ({
-  WeaveNodesSnappingDistance: vi.fn().mockImplementation(() => ({
-    performDistanceSnapping: vi.fn(),
-    clearSnapDistanceGuides: vi.fn(),
-  })),
+  WeaveNodesSnappingDistance: vi.fn().mockImplementation(function () {
+    return {
+      performDistanceSnapping: vi.fn(),
+      clearSnapDistanceGuides: vi.fn(),
+    };
+  }),
 }));
 
 vi.mock('@/utils/utils', () => ({

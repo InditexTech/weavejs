@@ -33,7 +33,7 @@ let capturedUrlFactory: (() => Promise<string>) | null = null;
 
 vi.mock('reconnecting-websocket', () => {
   return {
-    default: vi.fn().mockImplementation((urlFactory: () => Promise<string>) => {
+    default: vi.fn().mockImplementation(function (urlFactory: () => Promise<string>) {
       capturedUrlFactory = urlFactory;
       mockWsInstance = {
         send: vi.fn(),
