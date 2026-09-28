@@ -42,10 +42,11 @@ export async function create(options: Options): Promise<void> {
     return file;
   }
 
+  const copy = makeCopier(dest, defaultRename);
+
   await copy(
     path.join(sourceDir, `template/${options.template}`),
-    dest,
-    defaultRename
+    dest
   );
 
   // update tsconfig.json for src dir
@@ -91,25 +92,31 @@ async function getReadme(dest: string, projectName: string): Promise<string> {
   return `# ${projectName}\n\n${template}`;
 }
 
-async function copy(
-  from: string,
-  to: string,
+function makeCopier(
+  root: string,
   rename: (s: string) => string = (s) => s
-): Promise<void> {
-  const stats = await fs.stat(from);
+): (from: string, to: string) => Promise<void> {
+  const copy = async (from: string, to: string): Promise<void> => {
+    if (path.relative(root, to).startsWith('..')) {
+      throw new Error('The output file must be inside the output directory');
+    }
+    const stats = await fs.stat(from);
 
-  if (stats.isDirectory()) {
-    const files = await fs.readdir(from);
+    if (stats.isDirectory()) {
+      const files = await fs.readdir(from);
 
-    await Promise.all(
-      files.map((file) =>
-        copy(path.join(from, file), rename(path.join(to, file)))
-      )
-    );
-  } else {
-    await fs.mkdir(path.dirname(to), { recursive: true });
-    await fs.copyFile(from, to);
-  }
+      await Promise.all(
+        files.map((file) =>
+          copy(path.join(from, file), rename(path.join(to, file)))
+        )
+      );
+    } else {
+      await fs.mkdir(path.dirname(to), { recursive: true });
+      await fs.copyFile(from, to);
+    }
+  };
+
+  return copy;
 }
 
 function createPackageJson(projectName: string, options: Options): object {
