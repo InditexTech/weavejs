@@ -19,7 +19,7 @@ type MockRedisInstance = {
 const mockRedisInstances: MockRedisInstance[] = [];
 
 vi.mock('ioredis', () => {
-  const Redis = vi.fn().mockImplementation(() => {
+  const Redis = vi.fn().mockImplementation(function () {
     const emitter = new EventEmitter();
     const instance: MockRedisInstance = {
       on: (event: string, handler: (...args: unknown[]) => void) => {

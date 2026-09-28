@@ -16,7 +16,7 @@ vi.mock('uuid', () => ({ v4: vi.fn().mockReturnValue('test-uuid') }));
 
 // Hoist Konva.Rect mock
 const { MockRect } = vi.hoisted(() => {
-  const MockRect = vi.fn().mockImplementation((attrs: Record<string, unknown>) => {
+  const MockRect = vi.fn().mockImplementation(function (attrs: Record<string, unknown>) {
     const inst = {
       _attrs: { ...attrs },
       setAttrs: vi.fn().mockImplementation(function (

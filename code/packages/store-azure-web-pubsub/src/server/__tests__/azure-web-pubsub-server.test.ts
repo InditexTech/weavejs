@@ -22,13 +22,19 @@ const {
     clientTransportConnect: vi.fn().mockResolvedValue(undefined),
     clientTransportDisconnect: vi.fn(),
   },
-  mockWebPubSubServiceClient: vi.fn().mockImplementation((endpoint, credential, hubName) => ({
-    endpoint,
-    credential,
-    hubName,
-  })),
-  mockAzureKeyCredential: vi.fn().mockImplementation((key: string) => ({ key })),
-  mockDefaultAzureCredential: vi.fn().mockImplementation(() => ({ type: 'default-credential' })),
+  mockWebPubSubServiceClient: vi.fn().mockImplementation(function (
+    endpoint: unknown,
+    credential: unknown,
+    hubName: unknown
+  ) {
+    return { endpoint, credential, hubName };
+  }),
+  mockAzureKeyCredential: vi.fn().mockImplementation(function (key: string) {
+    return { key };
+  }),
+  mockDefaultAzureCredential: vi.fn().mockImplementation(function () {
+    return { type: 'default-credential' };
+  }),
   mockDefaultInitialState: vi.fn(),
 }));
 
@@ -42,7 +48,9 @@ vi.mock('@azure/identity', () => ({
 }));
 
 vi.mock('../azure-web-pubsub-sync-handler', () => ({
-  default: vi.fn().mockImplementation(() => mockSyncHandler),
+  default: vi.fn().mockImplementation(function () {
+    return mockSyncHandler;
+  }),
 }));
 
 vi.mock('@inditextech/weave-sdk/server', () => ({

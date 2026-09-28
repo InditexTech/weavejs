@@ -152,7 +152,9 @@ describe('WeaveFontsManager', () => {
 
     beforeEach(() => {
       mockFontFaceInstance = { load: vi.fn().mockResolvedValue(undefined) };
-      MockFontFaceClass = vi.fn().mockImplementation(() => mockFontFaceInstance);
+      MockFontFaceClass = vi.fn().mockImplementation(function () {
+        return mockFontFaceInstance;
+      });
       documentFontsAdd = vi.fn();
       vi.stubGlobal('FontFace', MockFontFaceClass);
       vi.stubGlobal('document', { fonts: { add: documentFontsAdd } });

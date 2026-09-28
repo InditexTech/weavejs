@@ -31,16 +31,16 @@ function makeMockGroupInstance() {
 vi.mock('konva', () => {
   return {
     default: {
-      Layer: vi.fn(() => {
+      Layer: vi.fn(function () {
         mockLayerInstance = makeMockLayerInstance();
         return mockLayerInstance;
       }),
-      Group: vi.fn(() => {
+      Group: vi.fn(function () {
         const g = makeMockGroupInstance();
         mockGroupInstances.push(g);
         return g;
       }),
-      Rect: vi.fn((attrs: Record<string, unknown>) => {
+      Rect: vi.fn(function (attrs: Record<string, unknown>) {
         const r = { ...attrs };
         mockRectInstances.push(r);
         return r;

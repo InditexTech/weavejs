@@ -1232,8 +1232,10 @@ describe('WeaveCommentNode', () => {
       const TweenSpy = vi
         // @ts-expect-error — keyof typeof Konva is too wide for vi.spyOn
         .spyOn(Konva, 'Tween' as keyof typeof Konva)
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        .mockImplementation(() => tweenInstance as any);
+        .mockImplementation(function () {
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          return tweenInstance as any;
+        });
 
       node.focusOn('target');
 
@@ -1265,8 +1267,10 @@ describe('WeaveCommentNode', () => {
       const TweenSpy = vi
         // @ts-expect-error — keyof typeof Konva is too wide for vi.spyOn
         .spyOn(Konva, 'Tween' as keyof typeof Konva)
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        .mockImplementation(() => tweenInstance as any);
+        .mockImplementation(function () {
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          return tweenInstance as any;
+        });
 
       expect(() => node.focusOn(group.id())).not.toThrow();
 

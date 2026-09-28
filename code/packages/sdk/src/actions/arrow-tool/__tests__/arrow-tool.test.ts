@@ -40,9 +40,15 @@ vi.mock('konva', () => {
 
   return {
     default: {
-      Line: vi.fn((attrs: Record<string, unknown>) => makeShape(attrs)),
-      Arrow: vi.fn((attrs: Record<string, unknown>) => makeShape(attrs)),
-      Circle: vi.fn((attrs: Record<string, unknown>) => makeShape(attrs)),
+      Line: vi.fn(function (attrs: Record<string, unknown>) {
+        return makeShape(attrs);
+      }),
+      Arrow: vi.fn(function (attrs: Record<string, unknown>) {
+        return makeShape(attrs);
+      }),
+      Circle: vi.fn(function (attrs: Record<string, unknown>) {
+        return makeShape(attrs);
+      }),
     },
   };
 });

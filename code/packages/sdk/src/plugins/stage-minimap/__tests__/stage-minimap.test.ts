@@ -29,7 +29,7 @@ vi.mock('lodash/throttle', () => ({ default: (fn: (...a: unknown[]) => unknown) 
 
 vi.mock('konva', () => ({
   default: {
-    Stage: vi.fn().mockImplementation((cfg: Record<string, unknown>) => {
+    Stage: vi.fn().mockImplementation(function (cfg: Record<string, unknown>) {
       const inst = {
         _cfg: cfg,
         add: vi.fn(),
@@ -41,17 +41,17 @@ vi.mock('konva', () => ({
       konvaState.stageInsts.push(inst);
       return inst;
     }),
-    Layer: vi.fn().mockImplementation(() => {
+    Layer: vi.fn().mockImplementation(function () {
       const inst = { add: vi.fn(), moveToBottom: vi.fn() };
       konvaState.layerInsts.push(inst);
       return inst;
     }),
-    Rect: vi.fn().mockImplementation((cfg: Record<string, unknown>) => {
+    Rect: vi.fn().mockImplementation(function (cfg: Record<string, unknown>) {
       const inst = { setAttrs: vi.fn(), ...cfg };
       konvaState.rectInsts.push(inst);
       return inst;
     }),
-    Image: vi.fn().mockImplementation((cfg: Record<string, unknown>) => {
+    Image: vi.fn().mockImplementation(function (cfg: Record<string, unknown>) {
       const inst = { moveToBottom: vi.fn(), destroy: vi.fn(), ...cfg };
       konvaState.imageInsts.push(inst);
       return inst;
@@ -410,7 +410,12 @@ describe('WeaveStageMinimapPlugin — updateMinimapContent() branches', () => {
 
   it('7.5 offscreenWorker.postMessage() called when worker is set', async () => {
     const postMessage = vi.fn();
-    vi.stubGlobal('Worker', vi.fn().mockReturnValue({ postMessage, onmessage: null }));
+    vi.stubGlobal(
+      'Worker',
+      vi.fn().mockImplementation(function () {
+        return { postMessage, onmessage: null };
+      })
+    );
     const { plugin } = makePlugin();
     plugin.onInit();
     await plugin.setupMinimap();
@@ -504,7 +509,9 @@ describe('WeaveStageMinimapPlugin — onInit()', () => {
   });
 
   it('9.3 does NOT create a Worker when isServerSide() returns true', () => {
-    const workerCtor = vi.fn().mockReturnValue({ postMessage: vi.fn(), onmessage: null });
+    const workerCtor = vi.fn().mockImplementation(function () {
+      return { postMessage: vi.fn(), onmessage: null };
+    });
     vi.stubGlobal('Worker', workerCtor);
     const { plugin } = makePlugin({ isServerSide: true });
     plugin.onInit();
@@ -512,7 +519,9 @@ describe('WeaveStageMinimapPlugin — onInit()', () => {
   });
 
   it('9.4 creates a Worker with type:module when isServerSide() returns false', () => {
-    const workerCtor = vi.fn().mockReturnValue({ postMessage: vi.fn(), onmessage: null });
+    const workerCtor = vi.fn().mockImplementation(function () {
+      return { postMessage: vi.fn(), onmessage: null };
+    });
     vi.stubGlobal('Worker', workerCtor);
     const { plugin } = makePlugin({ isServerSide: false });
     plugin.onInit();

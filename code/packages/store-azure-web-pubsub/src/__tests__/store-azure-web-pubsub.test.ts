@@ -68,7 +68,7 @@ const mockState = vi.hoisted(() => {
 
   const WeaveStoreAzureWebPubSubSyncClient = vi
     .fn()
-    .mockImplementation(() => {
+    .mockImplementation(function () {
       const provider = createProvider();
       providers.push(provider);
       return provider;
@@ -80,7 +80,9 @@ const mockState = vi.hoisted(() => {
 
   const IndexeddbPersistence = vi
     .fn()
-    .mockImplementation(() => mockIndexedDbPersistence);
+    .mockImplementation(function () {
+      return mockIndexedDbPersistence;
+    });
 
   return {
     providers,
@@ -758,14 +760,17 @@ describe('WeaveStoreAzureWebPubsub', () => {
     });
 
     it('resolves false when the IndexedDB doc is empty', async () => {
-      mockState.IndexeddbPersistence.mockImplementationOnce(
-        (_: string, _doc: Y.Doc) => ({
+      mockState.IndexeddbPersistence.mockImplementationOnce(function (
+        _: string,
+        _doc: Y.Doc
+      ) {
+        return {
           on: (event: string, cb: () => void) => {
             if (event === 'synced') cb();
           },
           destroy: vi.fn(),
-        })
-      );
+        };
+      });
 
       const result = await WeaveStoreAzureWebPubsub.roomHasIndexedDbData('empty-db');
 
@@ -773,8 +778,11 @@ describe('WeaveStoreAzureWebPubsub', () => {
     });
 
     it('resolves true when the IndexedDB doc has content', async () => {
-      mockState.IndexeddbPersistence.mockImplementationOnce(
-        (_: string, doc: Y.Doc) => ({
+      mockState.IndexeddbPersistence.mockImplementationOnce(function (
+        _: string,
+        doc: Y.Doc
+      ) {
+        return {
           on: (event: string, cb: () => void) => {
             if (event === 'synced') {
               doc.getMap('weave').set('cached', true);
@@ -782,8 +790,8 @@ describe('WeaveStoreAzureWebPubsub', () => {
             }
           },
           destroy: vi.fn(),
-        })
-      );
+        };
+      });
 
       const result = await WeaveStoreAzureWebPubsub.roomHasIndexedDbData('non-empty-db');
 

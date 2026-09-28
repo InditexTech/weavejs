@@ -28,8 +28,12 @@ const { MockLine, MockCircle } = vi.hoisted(() => {
     destroy: vi.fn(),
     moveToTop: vi.fn(),
   });
-  const MockLine = vi.fn().mockImplementation(() => makeLineInstance());
-  const MockCircle = vi.fn().mockImplementation(() => makeCircleInstance());
+  const MockLine = vi.fn().mockImplementation(function () {
+    return makeLineInstance();
+  });
+  const MockCircle = vi.fn().mockImplementation(function () {
+    return makeCircleInstance();
+  });
   return { MockLine, MockCircle };
 });
 

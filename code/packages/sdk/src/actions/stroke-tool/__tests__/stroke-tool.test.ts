@@ -12,9 +12,11 @@ vi.mock('@/plugins/nodes-selection/nodes-selection', () => ({
 }));
 vi.mock('konva', () => ({ default: {} }));
 vi.mock('@/internal-utils/greedy-snapper', () => ({
-  GreedySnapper: vi.fn().mockImplementation(() => ({
-    apply: vi.fn().mockImplementation((angle: number) => angle),
-  })),
+  GreedySnapper: vi.fn().mockImplementation(function () {
+    return {
+      apply: vi.fn().mockImplementation((angle: number) => angle),
+    };
+  }),
 }));
 vi.mock('uuid', () => ({ v4: vi.fn().mockReturnValue('test-uuid') }));
 

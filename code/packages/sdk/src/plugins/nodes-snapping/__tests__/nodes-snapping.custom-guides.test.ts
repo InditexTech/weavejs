@@ -10,16 +10,18 @@ import { describe, it, expect, vi } from 'vitest';
 
 vi.mock('konva', () => ({
   default: {
-    Line: vi.fn().mockImplementation(() => ({
-      on: vi.fn(),
-      x: vi.fn().mockReturnThis(),
-      y: vi.fn().mockReturnThis(),
-      getClientRect: vi.fn().mockReturnValue({ x: 0, y: 0, width: 0, height: 0 }),
-      getAttr: vi.fn(),
-      setAttrs: vi.fn(),
-      destroy: vi.fn(),
-      moveToTop: vi.fn(),
-    })),
+    Line: vi.fn().mockImplementation(function () {
+      return {
+        on: vi.fn(),
+        x: vi.fn().mockReturnThis(),
+        y: vi.fn().mockReturnThis(),
+        getClientRect: vi.fn().mockReturnValue({ x: 0, y: 0, width: 0, height: 0 }),
+        getAttr: vi.fn(),
+        setAttrs: vi.fn(),
+        destroy: vi.fn(),
+        moveToTop: vi.fn(),
+      };
+    }),
   },
 }));
 
@@ -1401,7 +1403,9 @@ describe('createGuideNode event handlers', () => {
       getClientRect: vi.fn().mockReturnValue({ x: 100, y: 100, width: 0, height: 0 }),
     };
     (Konva as unknown as { Line: ReturnType<typeof vi.fn> }).Line.mockImplementationOnce(
-      () => guideNodeMock
+      function () {
+        return guideNodeMock;
+      }
     );
     stage.findOne = vi.fn().mockReturnValue(null);
     layer.find = vi.fn().mockReturnValue([]);
