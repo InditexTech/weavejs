@@ -8,25 +8,33 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 
 // ── Hoisted Konva shape mocks ──────────────────────────────────────────────────
 const { MockGroup, MockImage, MockText, MockRect } = vi.hoisted(() => {
-  const MockGroup = vi.fn().mockImplementation(() => ({
-    setAttrs: vi.fn(),
-    destroy: vi.fn(),
-    add: vi.fn(),
-  }));
-  const MockImage = vi.fn().mockImplementation(() => ({
-    moveToBottom: vi.fn(),
-  }));
-  const MockText = vi.fn().mockImplementation(() => ({
-    measureSize: vi.fn().mockReturnValue({ height: 20 }),
-    y: vi.fn().mockReturnValue(5),
-    x: vi.fn().mockReturnValue(10),
-    width: vi.fn().mockReturnValue(100),
-    height: vi.fn().mockReturnValue(20),
-    moveToTop: vi.fn(),
-  }));
-  const MockRect = vi.fn().mockImplementation(() => ({
-    moveToBottom: vi.fn(),
-  }));
+  const MockGroup = vi.fn().mockImplementation(function () {
+    return {
+      setAttrs: vi.fn(),
+      destroy: vi.fn(),
+      add: vi.fn(),
+    };
+  });
+  const MockImage = vi.fn().mockImplementation(function () {
+    return {
+      moveToBottom: vi.fn(),
+    };
+  });
+  const MockText = vi.fn().mockImplementation(function () {
+    return {
+      measureSize: vi.fn().mockReturnValue({ height: 20 }),
+      y: vi.fn().mockReturnValue(5),
+      x: vi.fn().mockReturnValue(10),
+      width: vi.fn().mockReturnValue(100),
+      height: vi.fn().mockReturnValue(20),
+      moveToTop: vi.fn(),
+    };
+  });
+  const MockRect = vi.fn().mockImplementation(function () {
+    return {
+      moveToBottom: vi.fn(),
+    };
+  });
   return { MockGroup, MockImage, MockText, MockRect };
 });
 

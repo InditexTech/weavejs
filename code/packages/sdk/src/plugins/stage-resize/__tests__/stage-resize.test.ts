@@ -11,7 +11,9 @@ import { WeaveStageResizePlugin } from '../stage-resize';
 beforeEach(() => {
   vi.stubGlobal(
     'ResizeObserver',
-    vi.fn(() => ({ observe: vi.fn(), disconnect: vi.fn() }))
+    vi.fn(function () {
+      return { observe: vi.fn(), disconnect: vi.fn() };
+    })
   );
 });
 
@@ -195,7 +197,7 @@ describe('WeaveStageResizePlugin - onInit() ResizeObserver', () => {
   beforeEach(() => {
     vi.stubGlobal(
       'ResizeObserver',
-      vi.fn((cb: () => void) => {
+      vi.fn(function (cb: () => void) {
         observeCallback = cb;
         return { observe: vi.fn(), disconnect: vi.fn() };
       })

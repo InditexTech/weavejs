@@ -616,7 +616,12 @@ describe('WeaveExportManager', () => {
           Promise.resolve().then(() => this.onloadend?.());
         }),
       };
-      vi.stubGlobal('FileReader', vi.fn().mockReturnValue(mockReader));
+      vi.stubGlobal(
+        'FileReader',
+        vi.fn().mockImplementation(function () {
+          return mockReader;
+        })
+      );
 
       const result = await manager.blobToDataURL(MOCK_BLOB);
       expect(result).toBe('data:image/png;base64,abc');
@@ -631,7 +636,12 @@ describe('WeaveExportManager', () => {
           Promise.resolve().then(() => this.onerror?.());
         }),
       };
-      vi.stubGlobal('FileReader', vi.fn().mockReturnValue(mockReader));
+      vi.stubGlobal(
+        'FileReader',
+        vi.fn().mockImplementation(function () {
+          return mockReader;
+        })
+      );
 
       await expect(manager.blobToDataURL(MOCK_BLOB)).rejects.toThrow(
         'Failed to convert blob to data URL'

@@ -31,9 +31,9 @@ const mockedState = vi.hoisted(() => ({
 
 vi.mock('../azure-web-pubsub-host', () => {
   return {
-    WeaveStoreAzureWebPubSubSyncHost: vi
-      .fn()
-      .mockImplementation(() => mockedState.mockHostInstance),
+    WeaveStoreAzureWebPubSubSyncHost: vi.fn().mockImplementation(function () {
+      return mockedState.mockHostInstance;
+    }),
   };
 });
 

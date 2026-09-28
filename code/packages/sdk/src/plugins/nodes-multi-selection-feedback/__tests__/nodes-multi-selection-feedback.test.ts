@@ -69,13 +69,13 @@ function makeRectInstance(attrs: Record<string, unknown>): MockRect {
 vi.mock('konva', () => {
   return {
     default: {
-      Layer: vi.fn((attrs: Record<string, unknown>) => {
+      Layer: vi.fn(function (attrs: Record<string, unknown>) {
         const instance = { id: attrs?.id as string };
         mockKonvaLayerCtorInstances.push(instance);
         mockLayerInstance = makeLayerInstance();
         return mockLayerInstance;
       }),
-      Rect: vi.fn((attrs: Record<string, unknown>) => {
+      Rect: vi.fn(function (attrs: Record<string, unknown>) {
         const r = makeRectInstance(attrs);
         mockRectInstances.push(r);
         return r;

@@ -32,7 +32,7 @@ vi.mock('@/index.node', () => ({
 }));
 vi.mock('konva', () => ({
   default: {
-    Layer: vi.fn().mockImplementation(() => {
+    Layer: vi.fn().mockImplementation(function () {
       const inst = {
         add: vi.fn(),
         destroyChildren: vi.fn(),
@@ -43,13 +43,13 @@ vi.mock('konva', () => ({
       konvaState.layerInsts.push(inst);
       return inst;
     }),
-    Line: vi.fn().mockImplementation((cfg: Record<string, unknown>) => {
+    Line: vi.fn().mockImplementation(function (cfg: Record<string, unknown>) {
       const inst = { ...cfg };
       konvaState.lineInsts.push(inst);
       return inst;
     }),
     Shape: vi.fn().mockImplementation(
-      (cfg: { sceneFunc?: (ctx: Record<string, unknown>, shape: unknown) => void }) => {
+      function (cfg: { sceneFunc?: (ctx: Record<string, unknown>, shape: unknown) => void }) {
         const inst = { sceneFunc: cfg?.sceneFunc };
         konvaState.shapeInsts.push(inst);
         return inst;

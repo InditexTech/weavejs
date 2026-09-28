@@ -6,10 +6,12 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { WebPubSubEventHandler } from '../web-pubsub-event-handler';
 
 vi.mock('../cloud-events-dispatcher', () => ({
-  CloudEventsDispatcher: vi.fn().mockImplementation(() => ({
-    handlePreflight: vi.fn().mockReturnValue(true),
-    handleRequest: vi.fn().mockResolvedValue(true),
-  })),
+  CloudEventsDispatcher: vi.fn().mockImplementation(function () {
+    return {
+      handlePreflight: vi.fn().mockReturnValue(true),
+      handleRequest: vi.fn().mockResolvedValue(true),
+    };
+  }),
 }));
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -89,10 +91,12 @@ describe('WebPubSubEventHandler', () => {
     it('calls next if preflight returns false', async () => {
       const { CloudEventsDispatcher } = await import('../cloud-events-dispatcher');
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      (CloudEventsDispatcher as any).mockImplementationOnce(() => ({
+      (CloudEventsDispatcher as any).mockImplementationOnce(function () {
+        return {
         handlePreflight: vi.fn().mockReturnValue(false),
         handleRequest: vi.fn().mockResolvedValue(true),
-      }));
+        };
+      });
       const h = new WebPubSubEventHandler('myhub');
       const m = h.getKoaMiddleware();
       const ctx = makeKoaCtx('OPTIONS', '/api/webpubsub/hubs/myhub/');
@@ -111,10 +115,12 @@ describe('WebPubSubEventHandler', () => {
     it('calls next if POST handleRequest returns false', async () => {
       const { CloudEventsDispatcher } = await import('../cloud-events-dispatcher');
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      (CloudEventsDispatcher as any).mockImplementationOnce(() => ({
+      (CloudEventsDispatcher as any).mockImplementationOnce(function () {
+        return {
         handlePreflight: vi.fn().mockReturnValue(true),
         handleRequest: vi.fn().mockResolvedValue(false),
-      }));
+        };
+      });
       const h = new WebPubSubEventHandler('myhub');
       const m = h.getKoaMiddleware();
       const ctx = makeKoaCtx('POST', '/api/webpubsub/hubs/myhub/');
@@ -166,10 +172,12 @@ describe('WebPubSubEventHandler', () => {
     it('calls next if preflight returns false for Express', async () => {
       const { CloudEventsDispatcher } = await import('../cloud-events-dispatcher');
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      (CloudEventsDispatcher as any).mockImplementationOnce(() => ({
+      (CloudEventsDispatcher as any).mockImplementationOnce(function () {
+        return {
         handlePreflight: vi.fn().mockReturnValue(false),
         handleRequest: vi.fn().mockResolvedValue(true),
-      }));
+        };
+      });
       const h = new WebPubSubEventHandler('myhub');
       const m = h.getExpressJsMiddleware();
       const req = makeExpressReq('OPTIONS', '/api/webpubsub/hubs', '/myhub/');
@@ -190,10 +198,12 @@ describe('WebPubSubEventHandler', () => {
     it('calls next if POST handleRequest returns false', async () => {
       const { CloudEventsDispatcher } = await import('../cloud-events-dispatcher');
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      (CloudEventsDispatcher as any).mockImplementationOnce(() => ({
+      (CloudEventsDispatcher as any).mockImplementationOnce(function () {
+        return {
         handlePreflight: vi.fn().mockReturnValue(true),
         handleRequest: vi.fn().mockResolvedValue(false),
-      }));
+        };
+      });
       const h = new WebPubSubEventHandler('myhub');
       const m = h.getExpressJsMiddleware();
       const req = makeExpressReq('POST', '/api/webpubsub/hubs', '/myhub/');
@@ -207,10 +217,12 @@ describe('WebPubSubEventHandler', () => {
       const { CloudEventsDispatcher } = await import('../cloud-events-dispatcher');
       const error = new Error('boom');
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      (CloudEventsDispatcher as any).mockImplementationOnce(() => ({
+      (CloudEventsDispatcher as any).mockImplementationOnce(function () {
+        return {
         handlePreflight: vi.fn().mockReturnValue(true),
         handleRequest: vi.fn().mockRejectedValue(error),
-      }));
+        };
+      });
       const h = new WebPubSubEventHandler('myhub');
       const m = h.getExpressJsMiddleware();
       const req = makeExpressReq('POST', '/api/webpubsub/hubs', '/myhub/');

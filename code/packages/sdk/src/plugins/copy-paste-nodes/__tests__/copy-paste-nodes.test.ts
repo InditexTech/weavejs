@@ -220,7 +220,9 @@ function setup(opts: {
 beforeEach(() => {
   vi.stubGlobal(
     'ClipboardItem',
-    vi.fn().mockImplementation((items: Record<string, unknown>) => ({ items }))
+    vi.fn().mockImplementation(function (items: Record<string, unknown>) {
+      return { items };
+    })
   );
   vi.stubGlobal('fetch', vi.fn().mockResolvedValue({
     blob: vi.fn().mockResolvedValue({ type: 'image/png' }),

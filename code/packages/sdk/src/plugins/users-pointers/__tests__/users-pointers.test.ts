@@ -48,26 +48,26 @@ function makeMockTextInstance(attrs: Record<string, unknown> = {}) {
 vi.mock('konva', () => {
   return {
     default: {
-      Layer: vi.fn(() => {
+      Layer: vi.fn(function () {
         mockLayerInstance = makeMockLayerInstance();
         return mockLayerInstance;
       }),
-      Group: vi.fn((attrs: Record<string, unknown>) => {
+      Group: vi.fn(function (attrs: Record<string, unknown>) {
         const g = makeMockGroupInstance(attrs);
         mockGroupInstances.push(g);
         return g;
       }),
-      Circle: vi.fn((attrs: Record<string, unknown>) => {
+      Circle: vi.fn(function (attrs: Record<string, unknown>) {
         const c = { ...attrs, setAttrs: vi.fn() };
         mockCircleInstances.push(c);
         return c;
       }),
-      Text: vi.fn((attrs: Record<string, unknown>) => {
+      Text: vi.fn(function (attrs: Record<string, unknown>) {
         const t = makeMockTextInstance(attrs);
         mockTextInstances.push(t);
         return t;
       }),
-      Rect: vi.fn((attrs: Record<string, unknown>) => {
+      Rect: vi.fn(function (attrs: Record<string, unknown>) {
         const r = { ...attrs, y: vi.fn().mockReturnValue(0), height: vi.fn().mockReturnValue(16) };
         mockRectInstances.push(r);
         return r;

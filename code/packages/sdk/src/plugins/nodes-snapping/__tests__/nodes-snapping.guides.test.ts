@@ -16,7 +16,7 @@ const konvaState = vi.hoisted(() => ({
 
 vi.mock('konva', () => ({
   default: {
-    Line: vi.fn().mockImplementation((cfg: Record<string, unknown>) => {
+    Line: vi.fn().mockImplementation(function (cfg: Record<string, unknown>) {
       const inst = { ...cfg, destroy: vi.fn() };
       konvaState.lineInsts.push(inst);
       return inst;

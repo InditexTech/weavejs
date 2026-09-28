@@ -17,12 +17,14 @@ vi.mock('@/plugins/nodes-snapping/nodes-snapping', () => ({
 
 // Hoist Konva.Line mock so vi.mock factory can reference it
 const { MockLine } = vi.hoisted(() => {
-  const MockLine = vi.fn().mockImplementation((attrs: unknown) => ({
-    _attrs: attrs,
-    points: vi.fn(),
-    destroy: vi.fn(),
-    getClientRect: vi.fn().mockReturnValue({ x: 50, y: 0, width: 0, height: 600 }),
-  }));
+  const MockLine = vi.fn().mockImplementation(function (attrs: unknown) {
+    return {
+      _attrs: attrs,
+      points: vi.fn(),
+      destroy: vi.fn(),
+      getClientRect: vi.fn().mockReturnValue({ x: 50, y: 0, width: 0, height: 600 }),
+    };
+  });
   return { MockLine };
 });
 
@@ -31,12 +33,14 @@ vi.mock('konva', () => ({ default: { Line: MockLine } }));
 vi.mock('nanoid', () => ({ nanoid: vi.fn().mockReturnValue('test-guide-id') }));
 
 vi.mock('@/plugins/nodes-snapping/nodes-snapping.guide-distance-to-target-info', () => ({
-  WeaveNodesSnappingGuideDistanceToTargetInfo: vi.fn().mockImplementation(() => ({
-    handleTarget: vi.fn(),
-    cleanup: vi.fn(),
-    cleanupTarget: vi.fn(),
-    handleDistanceLine: vi.fn(),
-  })),
+  WeaveNodesSnappingGuideDistanceToTargetInfo: vi.fn().mockImplementation(function () {
+    return {
+      handleTarget: vi.fn(),
+      cleanup: vi.fn(),
+      cleanupTarget: vi.fn(),
+      handleDistanceLine: vi.fn(),
+    };
+  }),
 }));
 
 // In node environment, window is not defined — alias to globalThis
