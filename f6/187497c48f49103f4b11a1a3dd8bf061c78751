@@ -1,0 +1,43 @@
+code/package-lock.json
+  s_8b3a376b400840::t_7af350283c66c3 32,4575-4581,5647-5649,5654-5655,5658-5662,5668-5669,5678-5680,5684,5686-5689,5696-5698,5702,5704,5711,5723-5725,5729,5736-5738,5742-5743,5750-5752,5756-5758,5766-5768,5776-5778,5782,5784,5786-5788,5794,5798-5800,5804-5806,6517-6519,7097-7099,11950-11952,11956-11958,15465-15467,15608-15610,16022-16024,17025-17027,17032-17042,17044-17045,17047-17050,17057,17064-17071,17073-17074,17080,17086-17098,17109-17111,17142-17145,17785-17786,17795,17828-17829,17837,17868-17869,17877,17912-17913,17925,17980-17981,17995,18034-18035,18041,18085-18086,18096,18129-18130,18137
+code/packages/sdk/src/actions/arrow-tool/__tests__/arrow-tool.test.ts
+  s_79396db8566a2a::t_700668eadfbca4 43-51
+code/packages/sdk/src/actions/guide-tool/__tests__/guide-tool.test.ts
+  s_79396db8566a2a::t_9005f91f9e1e1e 20-27,36-43
+code/packages/sdk/src/actions/pen-tool/__tests__/pen-tool.test.ts
+  s_79396db8566a2a::t_df6d1da280518d 31-36
+code/packages/sdk/src/managers/export/__tests__/export.test.ts
+  s_8b3a376b400840::t_d345f0546b2be4 619-624,639-644
+code/packages/sdk/src/nodes/comment/__tests__/comment.test.ts
+  s_8b3a376b400840::t_3424d761f43241 1235-1238,1270-1273
+code/packages/sdk/src/plugins/stage-grid/__tests__/stage-grid.test.ts
+  s_79396db8566a2a::t_89c85be7d64e7e 35,46,52
+code/packages/sdk/src/plugins/stage-minimap/__tests__/stage-minimap.test.ts
+  s_8b3a376b400840::t_6c1e8b59f5679b 32,44,49,54,413-418,512-514,522-524
+code/packages/store-azure-web-pubsub/src/server/__tests__/azure-web-pubsub-server.test.ts
+  s_79396db8566a2a::t_d5a349d3af34a8 25-37,51-53
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "f6187497c48f49103f4b11a1a3dd8bf061c78751",
+  "prompts": {},
+  "sessions": {
+    "s_79396db8566a2a": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "ses_f190e5283ffeqo43Sm3oFu9H3X",
+        "model": "claude-sonnet-5"
+      },
+      "human_author": "Jesus Manuel Piñeiro Cid <jesusmpc@inditex.com>"
+    },
+    "s_8b3a376b400840": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "ses_f18d71ed3ffedJzwGrkAsVTlGS",
+        "model": "claude-sonnet-5"
+      },
+      "human_author": "Jesus Manuel Piñeiro Cid <jesusmpc@inditex.com>"
+    }
+  }
+}
