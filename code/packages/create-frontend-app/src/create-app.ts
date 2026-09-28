@@ -30,6 +30,10 @@ export async function create(options: Options): Promise<void> {
   } = options;
   const projectName = path.basename(options.outputDir);
   const dest = path.resolve(cwd, options.outputDir);
+  const relative = path.relative(cwd, dest);
+  if (relative.startsWith('..') || path.isAbsolute(relative)) {
+    throw new Error('The output directory must be inside the current working directory');
+  }
 
   function defaultRename(file: string): string {
     file = file.replace('example.gitignore', '.gitignore');
