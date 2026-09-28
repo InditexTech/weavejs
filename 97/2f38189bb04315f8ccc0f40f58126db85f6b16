@@ -1,0 +1,19 @@
+sonar-project.properties
+  s_15d30df7427baa::t_36119f37f2aa09 1-17
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "972f38189bb04315f8ccc0f40f58126db85f6b16",
+  "prompts": {},
+  "sessions": {
+    "s_15d30df7427baa": {
+      "agent_id": {
+        "tool": "github-copilot",
+        "id": "s_15d30df7427baa",
+        "model": "unknown"
+      },
+      "human_author": "ivanasabi <ivanasabi@ext.inditex.com>"
+    }
+  }
+}
