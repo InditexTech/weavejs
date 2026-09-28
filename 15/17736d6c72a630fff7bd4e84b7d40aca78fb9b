@@ -1,0 +1,45 @@
+code/packages/create-backend-app/src/auto-install.ts
+  s_fd060d07b3e35f::t_c5d5d3a9efa5aa 1-4
+code/packages/create-backend-app/src/constants.ts
+  s_fd060d07b3e35f::t_aa91d68d05a836 1-4
+code/packages/create-backend-app/src/create-app.ts
+  s_fd060d07b3e35f::t_2289c52bbfc104 1-4
+code/packages/create-backend-app/src/git.ts
+  s_fd060d07b3e35f::t_3d8c47109bf854 1-4
+code/packages/create-backend-app/src/index.ts
+  s_fd060d07b3e35f::t_dbbb4557acfbbf 2-5
+code/packages/create-backend-app/src/versions.d.ts
+  s_fd060d07b3e35f::t_10c8382d8ec0c9 1-4
+code/packages/create-backend-app/tsdown.config.ts
+  s_fd060d07b3e35f::t_7542d6ec94a33c 1-4
+code/packages/create-frontend-app/src/auto-install.ts
+  s_fd060d07b3e35f::t_8b50e72b548da8 1-4
+code/packages/create-frontend-app/src/constants.ts
+  s_fd060d07b3e35f::t_ca15e07c625930 1-4
+code/packages/create-frontend-app/src/create-app.ts
+  s_fd060d07b3e35f::t_5f4af9adc14019 1-4
+code/packages/create-frontend-app/src/git.ts
+  s_fd060d07b3e35f::t_fc7c7145ca7e7d 1-4
+code/packages/create-frontend-app/src/index.ts
+  s_fd060d07b3e35f::t_42de5bc8249e0d 2-5
+code/packages/create-frontend-app/src/versions.d.ts
+  s_fd060d07b3e35f::t_763fca4651afc4 1-4
+code/packages/create-frontend-app/tsdown.config.ts
+  s_fd060d07b3e35f::t_a5097ec97f6c80 1-4
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "1517736d6c72a630fff7bd4e84b7d40aca78fb9b",
+  "prompts": {},
+  "sessions": {
+    "s_fd060d07b3e35f": {
+      "agent_id": {
+        "tool": "github-copilot",
+        "id": "s_fd060d07b3e35f",
+        "model": "unknown"
+      },
+      "human_author": "ivanasabi <ivanasabi@ext.inditex.com>"
+    }
+  }
+}
