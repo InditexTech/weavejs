@@ -1,0 +1,19 @@
+code/sonar-project.properties
+  s_3e02ab231b1319::t_6816604c68a121 35,38
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "fcfa20864ab2a43dc568b7d20e1923409b8c7414",
+  "prompts": {},
+  "sessions": {
+    "s_3e02ab231b1319": {
+      "agent_id": {
+        "tool": "github-copilot",
+        "id": "s_3e02ab231b1319",
+        "model": "unknown"
+      },
+      "human_author": "ivanasabi <ivanasabi@ext.inditex.com>"
+    }
+  }
+}
