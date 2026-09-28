@@ -28,12 +28,14 @@ export async function create(options: Options): Promise<void> {
     initializeGit = true,
     log = console.log,
   } = options;
-  const projectName = path.basename(options.outputDir);
-  const dest = path.resolve(cwd, options.outputDir);
-  const relative = path.relative(cwd, dest);
-  if (relative.startsWith('..') || path.isAbsolute(relative)) {
-    throw new Error('The output directory must be inside the current working directory');
+  const segments = options.outputDir.split(/[\\/]+/).filter(Boolean);
+  for (const segment of segments) {
+    if (segment === '..' || /^[A-Za-z]:$/.test(segment)) {
+      throw new Error('The output directory cannot contain traversal or drive segments');
+    }
   }
+  const projectName = segments[segments.length - 1] ?? '';
+  const dest = path.resolve(cwd, ...segments);
 
   function defaultRename(file: string): string {
     file = file.replace('example.gitignore', '.gitignore');
