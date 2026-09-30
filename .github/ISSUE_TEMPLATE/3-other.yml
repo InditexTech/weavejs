@@ -1,0 +1,37 @@
+# SPDX-FileCopyrightText: 2026 INDUSTRIA DE DISEÑO TEXTIL S.A. (INDITEX S.A.)
+# SPDX-License-Identifier: Apache-2.0
+name: Other
+description: Use this for anything that doesn't fit the other templates
+title: '[Other] '
+labels: ['discussion']
+assignees: []
+
+body:
+  - type: textarea
+    id: context
+    attributes:
+      label: Context or topic
+      description: Briefly explain what this is about — question, idea, feedback, etc.
+    validations:
+      required: true
+
+  - type: textarea
+    id: details
+    attributes:
+      label: Details or background
+      description: Add any supporting info, links, logs, or notes that may be useful.
+      placeholder: |
+        Example:
+        - I'm wondering if we should improve X
+        - This tool might be useful for Y
+        - We discussed this in meeting Z
+
+  - type: dropdown
+    id: nextstep
+    attributes:
+      label: What are you hoping to do next?
+      options:
+        - Just opening this for awareness
+        - Looking for input before starting work
+        - Need help or advice
+        - Happy to open a PR based on feedback

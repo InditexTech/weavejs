@@ -154,7 +154,12 @@
       "rule": {
         "type": "file-starts-with",
         "options": {
-          "globsAll": ["./**/*.ts", "./**/*.tsx"],
+          "globsAll": [
+            "./**/*.ts",
+            "./**/*.tsx",
+            "!code/packages/create-frontend-app/template/**",
+            "!code/packages/create-backend-app/template/**"
+          ],
           "lineCount": 5,
           "patterns": ["Copyright", "License"],
           "flags": "i"
@@ -190,7 +195,7 @@
       "rule": {
         "type": "file-existence",
         "options": {
-          "globsAny": ["package.json"]
+          "globsAny": ["package.json", "code/package.json"]
         }
       }
     },

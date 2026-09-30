@@ -1,0 +1,82 @@
+{
+  "configuration": {
+    "development_flow": "trunk-based",
+    "outputs": [
+      "gh-release",
+      "publish"
+    ],
+    "parameters": {
+      "project_type": "workspaces",
+      "release": {
+        "package_paths": {
+          "@inditextech/weave-react": "react",
+          "@inditextech/weave-renderer-konva-base": "renderer-konva-base",
+          "@inditextech/weave-renderer-konva-react-reconciler": "renderer-konva-react-reconciler",
+          "@inditextech/weave-sdk": "sdk",
+          "@inditextech/weave-store-azure-web-pubsub": "store-azure-web-pubsub",
+          "@inditextech/weave-store-standalone": "store-standalone",
+          "@inditextech/weave-store-websockets": "store-websockets",
+          "@inditextech/weave-types": "types",
+          "create-weave-backend-app": "create-backend-app",
+          "create-weave-frontend-app": "create-frontend-app"
+        },
+        "packages": [
+          "@inditextech/weave-sdk",
+          "@inditextech/weave-react",
+          "@inditextech/weave-types",
+          "@inditextech/weave-renderer-konva-base",
+          "@inditextech/weave-renderer-konva-react-reconciler",
+          "@inditextech/weave-store-standalone",
+          "@inditextech/weave-store-websockets",
+          "@inditextech/weave-store-azure-web-pubsub",
+          "create-weave-backend-app",
+          "create-weave-frontend-app"
+        ],
+        "strategy": "independent"
+      },
+      "working_directory": "code"
+    }
+  },
+  "creation_year": 2026,
+  "integrity": {
+    "algorithm": "hmac-sha256",
+    "signature": "39486fb2f43c932ed01d0f9528b066fc00c758c55f5aebd043d5107b4efbf441"
+  },
+  "managed_by": "InditexTech CI governance",
+  "managed_paths": {
+    ".github/ISSUE_TEMPLATE/1-bug.yml": "cd4dad3f32fe707e06324790a2fe2c25829c55566de2b459d744e785b36e1205",
+    ".github/ISSUE_TEMPLATE/2-feature.yml": "ebb92730d6c01641d055f97ac094cbe07f88fac24be9b689ddf26e47e7bda863",
+    ".github/ISSUE_TEMPLATE/3-other.yml": "5a839b39a98704036210dee498146f51bd5a6c057228685680e02004ff063a9a",
+    ".github/ISSUE_TEMPLATE/config.yml": "10e5dee4d49aa9e7792ceb4c986160c61f95da1ba00a64bf06e5f1f636cd17ec",
+    ".github/PULL_REQUEST_TEMPLATE.md": "23a0b0ac79a9020ccac9c013582a01f86e2df2ae7f914673583b9a3368313041",
+    ".github/inditextech-ci-node.json": "a1a5d98df769af656ff780a7193fae8fdec68f69f3423a1e2beae59f800a59eb",
+    ".github/workflows/code-npm_node-PR_verify.yml": "2d4430d765f4a7539ae64fc75cb8254cc09fdcaa7a2a805faada3865887262ce",
+    ".github/workflows/code-npm_node-publish-release-and-snapshot.yml": "ad2241467f491c6d158a1dcb85f41f31a76d2cf786f4ea5b198c75e4b8fa8a11",
+    ".github/workflows/code-npm_node-release-core.yml": "da11bed8544814e98d34ce4a20aeec3818fa3e2ab4f738027a64163d9de19709",
+    ".github/workflows/code-npm_node-sonarcloud-analysis.yml": "d2fb005c98eb0b68081dcce9611b4cf70e905847119839316fa9034bcac73213",
+    ".github/workflows/code-release_preview.yml": "4e2e95d60a498eb12d97ba5c8330b1173f04b02c807140beddad06a6e225b166",
+    ".github/workflows/codeql.yml": "94084661946332025fbc91374dba51e0c82ab53f95de717c491ba63f384fad75",
+    ".github/workflows/pr-verify.yml": "5628d1d93c09cb761602fcfc3857c325e2dc542cadc159a1edad58d1818d0de0",
+    ".github/workflows/push-verify.yml": "643f6905fa30284af4a2eabac752293b2e785a5e82449bb6d97950624386829c",
+    ".github/workflows/scorecard-analysis.yml": "b45c2a0f87801796cefb4363d9f1414891b0734bc07de3f50d4a880e22faea10",
+    "code/.tool-versions": "5e7b05edf5d8df174df5dd99d012e57666ec9923ac8506df7dc7753ba41815fd"
+  },
+  "managed_variables": {
+    "DEVELOPMENT_FLOW": "trunk-based-development",
+    "PROJECT_TYPE": "workspaces",
+    "WORKING_DIRECTORY": "code"
+  },
+  "profile": "node",
+  "repository_id": 934947920,
+  "retained_paths": {
+    "CODE_OF_CONDUCT.md": "b0598d923163be66d29d754569224cbdd865ebd31fa5e8e02600832040731cb2",
+    "CONTRIBUTING.md": "11f866a2f2037aac2136421c8f9e11d3e4ed903da5ec8d57a0fcf48e28acc22b",
+    "SECURITY.md": "cdfeaf0a5ab51486b93492cab5dbe1331cdc43e70f54469e101fded5741fae1a",
+    "repolinter.json": "cd36f2efecbd72ce9b58a858db18d08db7d9547f0d85b8184c9cf68f037f5ab9"
+  },
+  "schema_version": 2,
+  "source_digests": {
+    "base": "486c4e7dc91e24e2e222717910fbc815d8f2c1ccff90d5aba680d4ec8275731e",
+    "node": "da5aefad643c8b4ce2a07646e6216366993ab6296603af9bc9165b195f193c95"
+  }
+}
