@@ -17,19 +17,6 @@ For a deep dive, refer to xref:main:architecture.adoc[Architecture overview].
 * *Real-time collaboration* powered by xref:main:architecture.adoc#yjs[Yjs] & xref:main:architecture.adoc#syncedstore[SyncedStore]
 * *Works with any UI framework* (React helpers included)
 
-== Live showcase
-
-image::showcase.png[Enter room page of the Weave.js showcase,role="zoom-in"]
-
-Explore our live whiteboard application:
-
-👉 https://weavejs.cloud.inditex.com[weavejs.cloud.inditex.com]
-
-Built using:
-
-* *Frontend:* https://tanstack.com/[TanStack Start]
-* *Backend:* https://expressjs.com/[Express] & https://nodejs.org/es[Node.js]
-
 == FAQ
 
 Here are some common questions developers often ask.
