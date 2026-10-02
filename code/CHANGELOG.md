@@ -13,6 +13,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [5.5.0] - 2026-10-02
+
 ## [5.4.1] - 2026-09-16
 
 ### Fixed
@@ -1934,7 +1936,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - [#24](https://github.com/InditexTech/weavejs/issues/24) Bug when loading rooms with text or images
 - [#18](https://github.com/InditexTech/weavejs/issues/18) Fix awareness not working on store-azure-web-pubsub
 
-[Unreleased]: https://github.com/InditexTech/weavejs/compare/5.4.1...HEAD
+[Unreleased]: https://github.com/InditexTech/weavejs/compare/5.5.0...HEAD
+
+[5.5.0]: https://github.com/InditexTech/weavejs/compare/5.4.1...5.5.0
 
 [5.4.1]: https://github.com/InditexTech/weavejs/compare/5.4.0...5.4.1
 
