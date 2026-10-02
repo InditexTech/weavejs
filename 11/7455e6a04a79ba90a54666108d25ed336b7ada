@@ -1,0 +1,19 @@
+README.md
+  s_ebf5a09de3678a::t_23eda6b5375a2b 42
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "117455e6a04a79ba90a54666108d25ed336b7ada",
+  "prompts": {},
+  "sessions": {
+    "s_ebf5a09de3678a": {
+      "agent_id": {
+        "tool": "github-copilot-cli",
+        "id": "44e3114f-e1bb-489a-ac3a-e4a1df8f3bf6",
+        "model": "unknown"
+      },
+      "human_author": "Alejandro Montes <alejandromogarcia@ext.inditex.com>"
+    }
+  }
+}
