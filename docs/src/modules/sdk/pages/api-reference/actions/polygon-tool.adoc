@@ -5,6 +5,7 @@
 
 The https://github.com/InditexTech/weavejs/blob/main/code/packages/sdk/src/actions/polygon-tool/polygon-tool.ts[WeavePolygonToolAction]
 class allows users to place a polygon node on the canvas by clicking or touching it.
+Users can also drag to set its size.
 
 The shape is selected via a *preset* — one of the six built-in polygon definitions shipped
 with the SDK. The preset can be set at construction time, changed programmatically, or
@@ -12,6 +13,8 @@ overridden per-trigger via the `presetId` trigger parameter.
 
 Each interaction results in the creation of a xref:sdk:api-reference/nodes/polygon.adoc[WeavePolygonNode],
 added to the shared state and synchronized across all users.
+
+While dragging, hold `Shift` to preserve the preset's default proportions, `Alt`/`Option` to draw from the initial point as the center, or both to combine the behaviors.
 
 The class extends the xref:sdk:api-reference/actions/action.adoc[WeaveAction] class.
 
