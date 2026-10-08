@@ -14,6 +14,10 @@ import { RECTANGLE_TOOL_ACTION_NAME, RECTANGLE_TOOL_STATE } from './constants';
 import { WeaveNodesSelectionPlugin } from '@/plugins/nodes-selection/nodes-selection';
 import { SELECTION_TOOL_ACTION_NAME } from '../selection-tool/constants';
 import type { WeaveRectangleNode } from '@/nodes/rectangle/rectangle';
+import {
+  getShapeDragBounds,
+  type ShapeDragModifiers,
+} from '../shared/shape-geometry';
 
 export class WeaveRectangleToolAction extends WeaveAction {
   protected initialized: boolean = false;
@@ -83,6 +87,26 @@ export class WeaveRectangleToolAction extends WeaveAction {
           this.cancelAction();
           return;
         }
+        if (
+          (e.key === 'Shift' || e.key === 'Alt') &&
+          this.state === RECTANGLE_TOOL_STATE.DEFINING_SIZE &&
+          this.moved
+        ) {
+          this.handleMovement(e);
+        }
+      },
+      { signal: this.instance.getEventsController().signal }
+    );
+    window.addEventListener(
+      'keyup',
+      (e) => {
+        if (
+          (e.key === 'Shift' || e.key === 'Alt') &&
+          this.state === RECTANGLE_TOOL_STATE.DEFINING_SIZE &&
+          this.moved
+        ) {
+          this.handleMovement(e);
+        }
       },
       { signal: this.instance.getEventsController().signal }
     );
@@ -132,7 +156,7 @@ export class WeaveRectangleToolAction extends WeaveAction {
       }
 
       if (this.state === RECTANGLE_TOOL_STATE.DEFINING_SIZE) {
-        this.handleMovement();
+        this.handleMovement(e.evt);
       }
     });
 
@@ -146,7 +170,7 @@ export class WeaveRectangleToolAction extends WeaveAction {
       }
 
       if (this.state === RECTANGLE_TOOL_STATE.DEFINING_SIZE) {
-        this.handleSettingSize();
+        this.handleSettingSize(e.evt);
       }
     });
 
@@ -195,7 +219,7 @@ export class WeaveRectangleToolAction extends WeaveAction {
     this.setState(RECTANGLE_TOOL_STATE.DEFINING_SIZE);
   }
 
-  private handleSettingSize() {
+  private handleSettingSize(modifiers: ShapeDragModifiers = {}) {
     if (this.rectId && this.tempRectNode && this.clickPoint && this.container) {
       const { mousePoint } = this.instance.getMousePointerRelativeToContainer(
         this.container
@@ -208,10 +232,14 @@ export class WeaveRectangleToolAction extends WeaveAction {
       let rectWidth = this.props.width;
       let rectHeight = this.props.height;
       if (this.moved) {
-        rectPos.x = Math.min(this.clickPoint.x, mousePoint.x);
-        rectPos.y = Math.min(this.clickPoint.y, mousePoint.y);
-        rectWidth = Math.abs(this.clickPoint.x - mousePoint.x);
-        rectHeight = Math.abs(this.clickPoint.y - mousePoint.y);
+        const bounds = getShapeDragBounds(this.clickPoint, mousePoint, {
+          centered: modifiers.altKey,
+          constrained: modifiers.shiftKey,
+        });
+        rectPos.x = bounds.x;
+        rectPos.y = bounds.y;
+        rectWidth = bounds.width;
+        rectHeight = bounds.height;
       }
 
       this.tempRectNode.setAttrs({
@@ -260,7 +288,7 @@ export class WeaveRectangleToolAction extends WeaveAction {
     this.cancelAction();
   }
 
-  private handleMovement() {
+  private handleMovement(modifiers: ShapeDragModifiers = {}) {
     if (this.state !== RECTANGLE_TOOL_STATE.DEFINING_SIZE) {
       return;
     }
@@ -277,12 +305,16 @@ export class WeaveRectangleToolAction extends WeaveAction {
         this.measureContainer
       );
 
-      const deltaX = mousePoint.x - this.clickPoint?.x;
-      const deltaY = mousePoint.y - this.clickPoint?.y;
+      const bounds = getShapeDragBounds(this.clickPoint, mousePoint, {
+        centered: modifiers.altKey,
+        constrained: modifiers.shiftKey,
+      });
 
       this.tempRectNode.setAttrs({
-        width: deltaX,
-        height: deltaY,
+        x: bounds.x,
+        y: bounds.y,
+        width: bounds.width,
+        height: bounds.height,
       });
     }
   }

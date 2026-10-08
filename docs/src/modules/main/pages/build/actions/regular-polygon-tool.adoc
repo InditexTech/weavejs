@@ -80,6 +80,7 @@ When active the user can:
 * *Click* on the canvas, it will create a regular polygon with a default size.
 * *Touch* on the canvas, it will create a regular polygon with a default size.
 * *Click & drag* to create a regular polygon and define its radius.
+* Hold *Alt/Option* while dragging to draw outward from the initial click, which stays at the polygon's center. Regular polygons keep their equal proportions by default.
 
 Once clicked or click-drag finishes, the regular polygon is added to the canvas as a fully functional
 node—ready. This action integrates seamlessly with Weave.js's real-time state system,
