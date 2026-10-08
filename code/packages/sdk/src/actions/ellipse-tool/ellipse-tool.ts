@@ -15,6 +15,10 @@ import { ELLIPSE_TOOL_ACTION_NAME, ELLIPSE_TOOL_STATE } from './constants';
 import { WeaveNodesSelectionPlugin } from '@/plugins/nodes-selection/nodes-selection';
 import { SELECTION_TOOL_ACTION_NAME } from '../selection-tool/constants';
 import type { WeaveEllipseNode } from '@/nodes/ellipse/ellipse';
+import {
+  getShapeDragBounds,
+  type ShapeDragModifiers,
+} from '../shared/shape-geometry';
 
 export class WeaveEllipseToolAction extends WeaveAction {
   protected initialized: boolean = false;
@@ -83,6 +87,26 @@ export class WeaveEllipseToolAction extends WeaveAction {
           this.cancelAction();
           return;
         }
+        if (
+          (e.key === 'Shift' || e.key === 'Alt') &&
+          this.state === ELLIPSE_TOOL_STATE.DEFINING_SIZE &&
+          this.moved
+        ) {
+          this.handleMovement(e);
+        }
+      },
+      { signal: this.instance.getEventsController().signal }
+    );
+    window.addEventListener(
+      'keyup',
+      (e) => {
+        if (
+          (e.key === 'Shift' || e.key === 'Alt') &&
+          this.state === ELLIPSE_TOOL_STATE.DEFINING_SIZE &&
+          this.moved
+        ) {
+          this.handleMovement(e);
+        }
       },
       { signal: this.instance.getEventsController().signal }
     );
@@ -130,7 +154,7 @@ export class WeaveEllipseToolAction extends WeaveAction {
       if (this.state === ELLIPSE_TOOL_STATE.DEFINING_SIZE) {
         this.moved = true;
 
-        this.handleMovement();
+        this.handleMovement(e.evt);
       }
     });
 
@@ -146,7 +170,7 @@ export class WeaveEllipseToolAction extends WeaveAction {
       if (this.state === ELLIPSE_TOOL_STATE.DEFINING_SIZE) {
         this.creating = false;
 
-        this.handleSettingSize();
+        this.handleSettingSize(e.evt);
       }
     });
 
@@ -183,8 +207,8 @@ export class WeaveEllipseToolAction extends WeaveAction {
     if (nodeHandler) {
       const node = nodeHandler.create(this.ellipseId, {
         ...this.props,
-        x: this.clickPoint?.x ?? 0 + this.props.radiusX,
-        y: this.clickPoint?.y ?? 0 + this.props.radiusY,
+        x: this.clickPoint?.x ?? 0,
+        y: this.clickPoint?.y ?? 0,
         radiusX: 1,
         radiusY: 1,
       });
@@ -195,7 +219,7 @@ export class WeaveEllipseToolAction extends WeaveAction {
     this.setState(ELLIPSE_TOOL_STATE.DEFINING_SIZE);
   }
 
-  private handleSettingSize() {
+  private handleSettingSize(modifiers: ShapeDragModifiers = {}) {
     const ellipse = this.instance.getStage().findOne(`#${this.ellipseId}`);
 
     if (this.ellipseId && this.clickPoint && this.container && ellipse) {
@@ -206,17 +230,20 @@ export class WeaveEllipseToolAction extends WeaveAction {
       const nodeHandler =
         this.instance.getNodeHandler<WeaveEllipseNode>('ellipse');
 
-      const ellipsePos: Konva.Vector2d = {
+      let ellipsePos: Konva.Vector2d = {
         x: this.clickPoint.x,
         y: this.clickPoint.y,
       };
-      let ellipseRadiusX = this.props.radiusY;
+      let ellipseRadiusX = this.props.radiusX;
       let ellipseRadiusY = this.props.radiusY;
       if (this.moved) {
-        ellipsePos.x = Math.min(this.clickPoint.x, mousePoint.x);
-        ellipsePos.y = Math.min(this.clickPoint.y, mousePoint.y);
-        ellipseRadiusX = Math.abs(this.clickPoint.x - mousePoint.x);
-        ellipseRadiusY = Math.abs(this.clickPoint.y - mousePoint.y);
+        const bounds = getShapeDragBounds(this.clickPoint, mousePoint, {
+          centered: modifiers.altKey,
+          constrained: modifiers.shiftKey,
+        });
+        ellipsePos = { x: bounds.x, y: bounds.y };
+        ellipseRadiusX = bounds.width;
+        ellipseRadiusY = bounds.height;
       }
 
       ellipse.setAttrs({
@@ -241,7 +268,7 @@ export class WeaveEllipseToolAction extends WeaveAction {
     this.cancelAction();
   }
 
-  private handleMovement() {
+  private handleMovement(modifiers: ShapeDragModifiers = {}) {
     if (this.state !== ELLIPSE_TOOL_STATE.DEFINING_SIZE) {
       return;
     }
@@ -253,17 +280,10 @@ export class WeaveEllipseToolAction extends WeaveAction {
         this.container
       );
 
-      const deltaX = Math.abs(mousePoint.x - this.clickPoint?.x);
-      const deltaY = Math.abs(mousePoint.y - this.clickPoint?.y);
-
-      const ellipsePos: Konva.Vector2d = {
-        x: this.clickPoint.x,
-        y: this.clickPoint.y,
-      };
-      if (this.moved) {
-        ellipsePos.x = Math.min(this.clickPoint.x, mousePoint.x);
-        ellipsePos.y = Math.min(this.clickPoint.y, mousePoint.y);
-      }
+      const bounds = getShapeDragBounds(this.clickPoint, mousePoint, {
+        centered: modifiers.altKey,
+        constrained: modifiers.shiftKey,
+      });
 
       const nodeHandler =
         this.instance.getNodeHandler<WeaveEllipseNode>('ellipse');
@@ -272,8 +292,10 @@ export class WeaveEllipseToolAction extends WeaveAction {
         nodeHandler.onUpdate(ellipse as WeaveElementInstance, {
           ...this.props,
           id: this.ellipseId,
-          radiusX: deltaX / 2,
-          radiusY: deltaY / 2,
+          x: bounds.x,
+          y: bounds.y,
+          radiusX: bounds.width / 2,
+          radiusY: bounds.height / 2,
         });
       }
     }

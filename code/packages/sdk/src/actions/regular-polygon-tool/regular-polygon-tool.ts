@@ -18,6 +18,10 @@ import {
 import { WeaveNodesSelectionPlugin } from '@/plugins/nodes-selection/nodes-selection';
 import { SELECTION_TOOL_ACTION_NAME } from '../selection-tool/constants';
 import type { WeaveRegularPolygonNode } from '@/nodes/regular-polygon/regular-polygon';
+import {
+  getShapeDragBounds,
+  type ShapeDragModifiers,
+} from '../shared/shape-geometry';
 
 export class WeaveRegularPolygonToolAction extends WeaveAction {
   protected initialized: boolean = false;
@@ -85,6 +89,26 @@ export class WeaveRegularPolygonToolAction extends WeaveAction {
           this.cancelAction();
           return;
         }
+        if (
+          (e.key === 'Shift' || e.key === 'Alt') &&
+          this.state === REGULAR_POLYGON_TOOL_STATE.DEFINING_SIZE &&
+          this.moved
+        ) {
+          this.handleMovement(e);
+        }
+      },
+      { signal: this.instance.getEventsController().signal }
+    );
+    window.addEventListener(
+      'keyup',
+      (e) => {
+        if (
+          (e.key === 'Shift' || e.key === 'Alt') &&
+          this.state === REGULAR_POLYGON_TOOL_STATE.DEFINING_SIZE &&
+          this.moved
+        ) {
+          this.handleMovement(e);
+        }
       },
       { signal: this.instance.getEventsController().signal }
     );
@@ -132,7 +156,7 @@ export class WeaveRegularPolygonToolAction extends WeaveAction {
       if (this.state === REGULAR_POLYGON_TOOL_STATE.DEFINING_SIZE) {
         this.moved = true;
 
-        this.handleMovement();
+        this.handleMovement(e.evt);
       }
     });
 
@@ -148,7 +172,7 @@ export class WeaveRegularPolygonToolAction extends WeaveAction {
       if (this.state === REGULAR_POLYGON_TOOL_STATE.DEFINING_SIZE) {
         this.creating = false;
 
-        this.handleSettingSize();
+        this.handleSettingSize(e.evt);
       }
     });
 
@@ -195,7 +219,7 @@ export class WeaveRegularPolygonToolAction extends WeaveAction {
     this.setState(REGULAR_POLYGON_TOOL_STATE.DEFINING_SIZE);
   }
 
-  private handleSettingSize() {
+  private handleSettingSize(modifiers: ShapeDragModifiers = {}) {
     const regularPolygon = this.instance
       .getStage()
       .findOne(`#${this.regularPolygonId}`);
@@ -215,15 +239,18 @@ export class WeaveRegularPolygonToolAction extends WeaveAction {
           'regular-polygon'
         );
 
-      const starPos: Konva.Vector2d = {
+      let starPos: Konva.Vector2d = {
         x: this.clickPoint.x,
         y: this.clickPoint.y,
       };
       let newRadius = this.props.radius;
       if (this.moved) {
-        starPos.x = Math.min(this.clickPoint.x, mousePoint.x);
-        starPos.y = Math.min(this.clickPoint.y, mousePoint.y);
-        newRadius = Math.abs(this.clickPoint.x - mousePoint.x);
+        const bounds = getShapeDragBounds(this.clickPoint, mousePoint, {
+          centered: modifiers.altKey,
+          constrained: true,
+        });
+        starPos = { x: bounds.x, y: bounds.y };
+        newRadius = bounds.width;
       }
 
       regularPolygon.setAttrs({
@@ -247,7 +274,7 @@ export class WeaveRegularPolygonToolAction extends WeaveAction {
     this.cancelAction();
   }
 
-  private handleMovement() {
+  private handleMovement(modifiers: ShapeDragModifiers = {}) {
     if (this.state !== REGULAR_POLYGON_TOOL_STATE.DEFINING_SIZE) {
       return;
     }
@@ -266,16 +293,10 @@ export class WeaveRegularPolygonToolAction extends WeaveAction {
         this.container
       );
 
-      const deltaX = Math.abs(mousePoint.x - this.clickPoint?.x);
-
-      const starPos: Konva.Vector2d = {
-        x: this.clickPoint.x,
-        y: this.clickPoint.y,
-      };
-      if (this.moved) {
-        starPos.x = Math.min(this.clickPoint.x, mousePoint.x);
-        starPos.y = Math.min(this.clickPoint.y, mousePoint.y);
-      }
+      const bounds = getShapeDragBounds(this.clickPoint, mousePoint, {
+        centered: modifiers.altKey,
+        constrained: true,
+      });
 
       const nodeHandler =
         this.instance.getNodeHandler<WeaveRegularPolygonNode>(
@@ -286,7 +307,9 @@ export class WeaveRegularPolygonToolAction extends WeaveAction {
         nodeHandler.onUpdate(regularPolygon as WeaveElementInstance, {
           ...this.props,
           id: this.regularPolygonId,
-          radius: deltaX / 2,
+          x: bounds.x,
+          y: bounds.y,
+          radius: bounds.width / 2,
         });
       }
     }
