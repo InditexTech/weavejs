@@ -36,7 +36,8 @@
     "verdaccio:setup": "node ./verdaccio.setup.js",
     "verify": "npm ci && nx run-many -t verify --no-tui",
     "version:development": "export BUMP_DEVELOP_VERSION=$(npm version $(npm version minor)-SNAPSHOT) && nx release version --git-tag=false --git-commit=false $BUMP_DEVELOP_VERSION && npm version $(npm version minor)-SNAPSHOT && npm install",
-    "version:release": "npm ci && nx release version --git-tag=false --git-commit=false $RELEASE_VERSION && npm version $RELEASE_VERSION"
+    "version:release": "npm ci && nx release version --git-tag=false --git-commit=false $RELEASE_VERSION && npm version $RELEASE_VERSION",
+    "pretest": "npm rebuild canvas"
   },
   "keywords": [
     "weave",
