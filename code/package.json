@@ -1,6 +1,6 @@
 {
   "name": "@inditextech/weave",
-  "version": "5.5.0-SNAPSHOT",
+  "version": "5.6.0-SNAPSHOT",
   "description": "Weave.js framework",
   "packageManager": "npm@10.2.4",
   "workspaces": [
@@ -89,8 +89,11 @@
   "overrides": {
     "@babel/preset-env": "7.29.5",
     "axios": "1.20.0",
+    "nx": {
+      "brace-expansion": "5.0.12"
+    },
     "esbuild": "0.25.0",
-    "fast-uri": "3.1.6",
+    "fast-uri": "3.1.7",
     "follow-redirects": "1.16.0",
     "konva": "10.0.2",
     "lodash": "4.18.1",
