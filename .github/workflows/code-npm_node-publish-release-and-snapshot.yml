@@ -647,6 +647,7 @@ jobs:
         working-directory: code
         run: |
           npm run version:development
+          npm ci --dry-run
 
       - name: Next Development Iteration / Commit Changes
         env:

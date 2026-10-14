@@ -13,6 +13,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- [#1142](https://github.com/InditexTech/weavejs/issues/1142) Restore missing lockfile shadow entries for `@emnapi` packages and harden development release script against uncontrolled lockfile rewrites
+
 ## [5.5.0] - 2026-10-02
 
 ## [5.4.1] - 2026-09-16
