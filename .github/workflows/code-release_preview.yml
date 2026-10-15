@@ -100,7 +100,9 @@ jobs:
           keep-unreleased-section: true
           tag-prefix: ""
 
+      # Fork PRs get a read-only GITHUB_TOKEN, so `gh pr comment` cannot post.
       - name: Add PR comment with release preview
+        if: ${{ github.event.pull_request.head.repo.full_name == github.repository }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
@@ -135,7 +137,8 @@ jobs:
   release-preview-no-code-changes:
     name: Add PR comment with configuration management information
     needs: check-changes-in-paths
-    if: ${{ (contains(join(github.event.pull_request.labels.*.name, ', '), 'release-type') || (contains(join(github.event.pull_request.labels.*.name, ', '), 'release-preview'))) && needs.check-changes-in-paths.outputs.detected == 'false' }}
+    # Comment-only job: skipped on fork PRs, whose read-only GITHUB_TOKEN cannot comment.
+    if: ${{ (contains(join(github.event.pull_request.labels.*.name, ', '), 'release-type') || (contains(join(github.event.pull_request.labels.*.name, ', '), 'release-preview'))) && needs.check-changes-in-paths.outputs.detected == 'false' && github.event.pull_request.head.repo.full_name == github.repository }}
     runs-on: ubuntu-24.04
     env:
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -157,7 +160,8 @@ jobs:
   release-preview-no-release-labels:
     name: Add PR comment with release information
     needs: check-changes-in-paths
-    if: ${{ !contains(join(github.event.pull_request.labels.*.name, ', '), 'release-type') && needs.check-changes-in-paths.outputs.detected == 'true' && github.event.pull_request.draft == false && vars.DEVELOPMENT_FLOW != 'trunk-based-development' }}
+    # Comment-only job: skipped on fork PRs, whose read-only GITHUB_TOKEN cannot comment.
+    if: ${{ !contains(join(github.event.pull_request.labels.*.name, ', '), 'release-type') && needs.check-changes-in-paths.outputs.detected == 'true' && github.event.pull_request.draft == false && vars.DEVELOPMENT_FLOW != 'trunk-based-development' && github.event.pull_request.head.repo.full_name == github.repository }}
     runs-on: ubuntu-24.04
     env:
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
