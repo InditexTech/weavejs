@@ -1,0 +1,16 @@
+.github/workflows/code-npm_node-PR_verify.yml
+  h_d02e6d3453c4a9 14-20,30,34,37,45
+.github/workflows/code-release_preview.yml
+  h_d02e6d3453c4a9 103,105,140-141,163-164
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "4705550a57d90fef20e32e991d035b2f1e555297",
+  "prompts": {},
+  "humans": {
+    "h_d02e6d3453c4a9": {
+      "author": "ivanasabi <ivanasabi@ext.inditex.com>"
+    }
+  }
+}
