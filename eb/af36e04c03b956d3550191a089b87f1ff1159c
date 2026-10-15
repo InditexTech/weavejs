@@ -1,0 +1,21 @@
+docs/src/modules/ROOT/pages/index-2-cols.adoc
+  s_5a8e0a7791877c::t_48a475c27fae12 6-7
+docs/src/modules/ROOT/pages/index.adoc
+  s_5a8e0a7791877c::t_798de80ec5fb0f 6-7
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "ebaf36e04c03b956d3550191a089b87f1ff1159c",
+  "prompts": {},
+  "sessions": {
+    "s_5a8e0a7791877c": {
+      "agent_id": {
+        "tool": "github-copilot-cli",
+        "id": "a55a2355-d948-40d6-9726-3c49a2fc5473",
+        "model": "unknown"
+      },
+      "human_author": "Alejandro Montes <alejandromogarcia@ext.inditex.com>"
+    }
+  }
+}

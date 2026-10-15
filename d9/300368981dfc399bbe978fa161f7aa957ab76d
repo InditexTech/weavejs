@@ -1,0 +1,14 @@
+docs/package-lock.json
+  h_9876611f59032e 1150-1152
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "d9300368981dfc399bbe978fa161f7aa957ab76d",
+  "prompts": {},
+  "humans": {
+    "h_9876611f59032e": {
+      "author": "Alejandro Montes <alejandromogarcia@ext.inditex.com>"
+    }
+  }
+}
