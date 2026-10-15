@@ -35,7 +35,7 @@
     "unpublish": "nx run-many --skip-nx-cache -t unpublish --no-tui",
     "verdaccio:setup": "node ./verdaccio.setup.js",
     "verify": "npm ci && nx run-many -t verify --no-tui",
-    "version:development": "npm ci && export BUMP_DEVELOP_VERSION=$(npm version $(npm version minor)-SNAPSHOT) && nx release version --git-tag=false --git-commit=false $BUMP_DEVELOP_VERSION && npm version $(npm version minor)-SNAPSHOT && npm install --package-lock-only",
+    "version:development": "export BUMP_DEVELOP_VERSION=$(npm version $(npm version minor)-SNAPSHOT) && nx release version --git-tag=false --git-commit=false $BUMP_DEVELOP_VERSION && npm version $(npm version minor)-SNAPSHOT && npm install",
     "version:release": "npm ci && nx release version --git-tag=false --git-commit=false $RELEASE_VERSION && npm version $RELEASE_VERSION"
   },
   "keywords": [
@@ -87,6 +87,9 @@
   },
   "overrides": {
     "@babel/preset-env": "7.29.5",
+    "@emnapi/core": "1.11.2",
+    "@emnapi/runtime": "1.11.2",
+    "@emnapi/wasi-threads": "1.2.2",
     "axios": "1.20.0",
     "nx": {
       "brace-expansion": "5.0.12"
