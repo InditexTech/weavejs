@@ -13,6 +13,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- [#1177](https://github.com/InditexTech/weavejs/issues/1177) Shift and Alt/Option modifiers when drawing shapes (proportions and center-based drawing)
+
 ## [5.5.0] - 2026-10-02
 
 ## [5.4.1] - 2026-09-16
