@@ -87,6 +87,9 @@
   },
   "overrides": {
     "@babel/preset-env": "7.29.5",
+    "@emnapi/core": "1.11.2",
+    "@emnapi/runtime": "1.11.2",
+    "@emnapi/wasi-threads": "1.2.2",
     "axios": "1.20.0",
     "nx": {
       "brace-expansion": "5.0.12"
