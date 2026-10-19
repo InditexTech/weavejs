@@ -15,8 +15,9 @@
     }
   ],
   "exports": {
+    "types": "./dist/react.d.ts",
     "import": "./dist/react.js",
-    "require": "./dist/react.cjs"
+    "default": "./dist/react.js"
   },
   "types": "dist/react.d.ts",
   "files": [
