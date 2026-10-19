@@ -17,7 +17,10 @@ import { type Logger } from 'pino';
 import { WeaveNodesSelectionPlugin } from '@/plugins/nodes-selection/nodes-selection';
 import Konva from 'konva';
 import { WeaveCopyPasteNodesPlugin } from '@/plugins/copy-paste-nodes/copy-paste-nodes';
-import type { WeaveNodesSelectionPluginOnNodesChangeEvent } from '@/plugins/nodes-selection/types';
+import type {
+  WeaveNodesSelectionPluginOnNodesChangeEvent,
+  WeaveNodesSelectionPluginOnSelectionStateEvent,
+} from '@/plugins/nodes-selection/types';
 import {
   clearContainerTargets,
   containerOverCursor,
@@ -36,6 +39,13 @@ import type { WeaveNodeChangedContainerEvent } from './types';
 import type { WeaveUsersPresencePlugin } from '@/plugins/users-presence/users-presence';
 import { WEAVE_USERS_PRESENCE_PLUGIN_KEY } from '@/plugins/users-presence/constants';
 import { DEFAULT_THROTTLE_MS } from '@/constants';
+
+// Weave instance listeners registered on behalf of each Konva node, so they can
+// be replaced when the node events are set up again and removed on destroy.
+const nodeInstanceListeners = new WeakMap<
+  Konva.Node,
+  Map<string, (payload: never) => void>
+>();
 
 export const augmentKonvaNodeClass = (
   config?: WeaveNodeConfiguration
@@ -406,10 +416,7 @@ export abstract class WeaveNode implements WeaveNodeBase {
     const isLocked = node.getAttrs().locked ?? false;
 
     if (isLocked) {
-      this.instance.removeEventListener<WeaveNodesSelectionPluginOnNodesChangeEvent>(
-        'onNodesChange',
-        handleNodesChange
-      );
+      this.removeNodeInstanceListeners(node, false);
 
       node.off('transformstart');
       node.off('transform');
@@ -420,7 +427,8 @@ export abstract class WeaveNode implements WeaveNodeBase {
       node.off('pointerover');
       node.off('pointerleave');
     } else {
-      this.instance.addEventListener<WeaveNodesSelectionPluginOnNodesChangeEvent>(
+      this.setNodeInstanceListener<WeaveNodesSelectionPluginOnNodesChangeEvent>(
+        node,
         'onNodesChange',
         handleNodesChange
       );
@@ -530,17 +538,21 @@ export abstract class WeaveNode implements WeaveNodeBase {
 
       let originalPosition: Konva.Vector2d | null = null;
 
-      this.instance.addEventListener('onSelectionState', (state) => {
-        const nodesSelectionPlugin = this.getSelectionPlugin();
-        const selectedNodes = nodesSelectionPlugin?.getSelectedNodes() ?? [];
+      this.setNodeInstanceListener<WeaveNodesSelectionPluginOnSelectionStateEvent>(
+        node,
+        'onSelectionState',
+        (state) => {
+          const nodesSelectionPlugin = this.getSelectionPlugin();
+          const selectedNodes = nodesSelectionPlugin?.getSelectedNodes() ?? [];
 
-        if (
-          !state &&
-          selectedNodes?.some((n) => n.getAttrs().id === node.getAttrs().id)
-        ) {
-          originalPosition = node.getAbsolutePosition();
+          if (
+            !state &&
+            selectedNodes?.some((n) => n.getAttrs().id === node.getAttrs().id)
+          ) {
+            originalPosition = node.getAbsolutePosition();
+          }
         }
-      });
+      );
 
       node.on('mousedown', (e) => {
         const nodeTarget = e.target;
@@ -1171,7 +1183,50 @@ export abstract class WeaveNode implements WeaveNodeBase {
   ): void;
 
   onDestroy(nodeInstance: WeaveElementInstance): void {
+    this.removeNodeInstanceListeners(nodeInstance);
     nodeInstance.destroy();
+  }
+
+  protected setNodeInstanceListener<T>(
+    node: Konva.Node,
+    event: string,
+    callback: (payload: T) => void
+  ): void {
+    let listeners = nodeInstanceListeners.get(node);
+    if (!listeners) {
+      listeners = new Map();
+      nodeInstanceListeners.set(node, listeners);
+    }
+
+    const previous = listeners.get(event);
+    if (previous) {
+      this.instance.removeEventListener(event, previous);
+    }
+
+    listeners.set(event, callback as (payload: never) => void);
+    this.instance.addEventListener<T>(event, callback);
+  }
+
+  protected removeNodeInstanceListeners(
+    node: Konva.Node,
+    includeDescendants: boolean = true
+  ): void {
+    const nodes =
+      includeDescendants && node instanceof Konva.Container
+        ? [node, ...node.find(() => true)]
+        : [node];
+
+    for (const actNode of nodes) {
+      const listeners = nodeInstanceListeners.get(actNode);
+      if (!listeners) {
+        continue;
+      }
+
+      for (const [event, callback] of listeners) {
+        this.instance.removeEventListener(event, callback);
+      }
+      nodeInstanceListeners.delete(actNode);
+    }
   }
 
   onDestroyInstance() {
