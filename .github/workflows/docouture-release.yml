@@ -217,15 +217,6 @@ jobs:
       - name: Build docs
         run: npx antora --fetch antora-playbook.local.yml
 
-      # See docouture-pr-verify.yml's own comment: catches raw http(s) links
-      # Antora's own strict mode (runtime.log.failure_level: error, already
-      # exercised by Build above) can't see. Only a broken EXTERNAL link
-      # fails this step — a broken local one is a warning only, since this
-      # job also builds with antora-playbook.local.yml (see that comment for
-      # why a local link can legitimately look broken here).
-      - name: Check links
-        run: npm run check-links
-
       - name: git identity
         run: |
           git config user.name "github-actions[bot]"

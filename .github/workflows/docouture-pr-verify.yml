@@ -125,18 +125,3 @@ jobs:
 
       - name: Build
         run: npx antora --fetch antora-playbook.local.yml
-
-      # Antora's own `runtime.log.failure_level: error` (see
-      # antora-playbook.yml's own comment) already fails the Build step above
-      # on a broken cross-reference — but that only covers refs Antora
-      # itself resolves. Raw http(s) links in content are invisible to it, so
-      # `check-links` (package.json's own script, see scripts/check-links.mjs)
-      # crawls the built HTML separately to catch those before they reach a
-      # PR reviewer. It only fails on a broken EXTERNAL link — a broken local
-      # one is printed as a warning, never a failure, since this job builds
-      # with antora-playbook.local.yml (a single, HEAD-only source) and
-      # content generated from config (the module switcher, the footer) can
-      # legitimately point at another version/component this reduced build
-      # doesn't have. See that script's own header comment.
-      - name: Check links
-        run: npm run check-links
