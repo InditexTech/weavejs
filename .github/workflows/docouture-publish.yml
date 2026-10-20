@@ -97,15 +97,6 @@ jobs:
       - name: Build
         run: npm run build
 
-      # See docouture-pr-verify.yml's own comment: Antora's strict mode already
-      # catches broken cross-references during Build above; check-links
-      # (package.json's own script, see scripts/check-links.mjs) covers what
-      # it can't — raw http(s) links in content — before this site actually
-      # gets published. Only a broken EXTERNAL link fails this step; a
-      # broken local one is a warning only.
-      - name: Check links
-        run: npm run check-links
-
       # Mints an installation token for a GitHub App that's on this repo's
       # branch-ruleset bypass list, if `gh-pages` is protected by one
       # (branch rulesets requiring PRs / status checks) — see issue #157 in
