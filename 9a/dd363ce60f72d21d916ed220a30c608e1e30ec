@@ -1,0 +1,51 @@
+.github/workflows/code-npm_node-publish-release-and-snapshot.yml
+  s_e99becc203f744::t_d628abc8dba67c 12-19,21,39,44-45,69-71,73-74,76,79,303,305-329,339-340,368-371,374,376,382
+.github/workflows/docouture-kroki-cache-warm.yml
+  s_e99becc203f744::t_2e8822b70fed41 24-28,41,59-61,70,72-73,84-86,89,117-118,126,136-137
+.github/workflows/docouture-pr-verify.yml
+  s_e99becc203f744::t_f6a18d70bd7557 36-38,47,49-50,61-63,66,107,123-124
+.github/workflows/docouture-publish-prerelease.yml
+  s_e99becc203f744::t_09975f3a752e82 20-23,41-45,50,59-62,66-70,72,75,77-80,83-97,103-107,121-124,126,140-142,144,146-147
+.github/workflows/docouture-publish.yml
+  s_e99becc203f744::t_5d67cc70407bca 28-40,42-46,49-50,58-59,61,72,78,81,86-88,93-96,108-110,113,117-119,121-124
+.github/workflows/docouture-release-preview.yml
+  s_e99becc203f744::t_bb0debf56d7b45 5,21-24,30-31,33-34,41-42,45-50,56-66,72-73,75-76,87-89,137-141,145-146,148,151,156,164-166,173,187,204,210-211,213,216-219,221,229-230,232,235-238,240
+.github/workflows/docouture-release.yml
+  s_e99becc203f744::t_4fb1c5042f4b66 58-66,77-88,106,115-126,139-140,151,165-166,168,172,189,194-197,238,242-244,280-302,481,496,499-620,638-644,646-647
+.github/workflows/docs/code-npm_node-publish-release-and-snapshot.md
+  s_e99becc203f744::t_f09744ed8dff1b 7,9,31,35-37,47-48,52,68
+AGENTS.md
+  s_e99becc203f744::t_a33930ae673c39 58-61
+code/CHANGELOG.md
+  s_e99becc203f744::t_6bd99ce147948a 20-24
+code/package-lock.json
+  s_e99becc203f744::t_0ab149416cabdb 21,28,305,2426,2450,2456-2458,2461,2463,2468-2470,2473,2479-2481,3335-3337,3352-3354,3368-3369,3419-3421,3433-3435,3447-3449,3461-3463,3475-3477,3489-3491,3503-3505,3517-3519,3531-3533,3545-3547,3559-3561,3565,3568,4595,4653,4869,4880,4986,5249,5272,5403,6184,6879,7112,7456,7550,7902,8418,9274-9290,9308-9317,9835,11510-11511,12162,12213,12276,12398-12400,12404,12406-12407,12455-12457,12510,12536-12545,12560-12589,13125,13227,13795,13838,14360,14453,15390,15511-15513,16471,16539,16968,17044,17583
+code/package.json
+  s_e99becc203f744::t_93351b77076383 71,78,90-92
+code/packages/create-frontend-app/template/package.json
+  s_e99becc203f744::t_db01950d1f3a75 38
+docs/antora-playbook.local.yml
+  s_e99becc203f744::t_bf0b42ec4806de 77
+docs/antora-playbook.yml
+  s_e99becc203f744::t_8944fd14acff77 117
+docs/package-lock.json
+  s_e99becc203f744::t_e3723468fff3d6 12-17,323-325,332,343-345,357-359,374-376,387-389,893-895,2003-2005,2009,2572-2574,3023
+docs/package.json
+  s_e99becc203f744::t_e4ce34e0700b1f 15,18-23
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "9add363ce60f72d21d916ed220a30c608e1e30ec",
+  "prompts": {},
+  "sessions": {
+    "s_e99becc203f744": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "ses_ea5de6f5affeOpmA8OTItz90BI",
+        "model": "claude-sonnet-5.5"
+      },
+      "human_author": "Jesus Manuel Piñeiro Cid <jesusmpc@inditex.com>"
+    }
+  }
+}
