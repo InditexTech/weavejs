@@ -1,0 +1,23 @@
+.github/workflows/code-npm_node-publish-release-and-snapshot.yml
+  s_5f173cb513538a::t_e31dbd3b2c2ca2 12-19,21,39,44-45,69-71,73-74,76,79,303,305-329,339-340,368-371,374,376,382
+.github/workflows/docs/code-npm_node-publish-release-and-snapshot.md
+  s_5f173cb513538a::t_6124a31009517a 7,9,31,35-37,47-48,52,68
+code/CHANGELOG.md
+  s_5f173cb513538a::t_48f7710b3c8026 18
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "bcf302c55a2f1c6823480dc76e1377834679f9bc",
+  "prompts": {},
+  "sessions": {
+    "s_5f173cb513538a": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "ses_ea624165dffeWnY7ygQW2rI63f",
+        "model": "claude-sonnet-5.5"
+      },
+      "human_author": "Jesus Manuel Piñeiro Cid <jesusmpc@inditex.com>"
+    }
+  }
+}
