@@ -15,6 +15,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- [#1208](https://github.com/InditexTech/weavejs/issues/1208) Publish snapshots via `workflow_dispatch` (`ACTION=snapshot`) instead of the `/publish-snapshot` comment, since npm trusted publishing rejects `issue_comment` tokens
 - [#1142](https://github.com/InditexTech/weavejs/issues/1142) Override `@emnapi` packages to v1.11.2 / 1.2.2 to unify monorepo dependency resolution and prevent lockfile stripping during release versioning
 
 ## [5.5.0] - 2026-10-02
