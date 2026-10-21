@@ -1187,6 +1187,12 @@ export abstract class WeaveNode implements WeaveNodeBase {
     nodeInstance.destroy();
   }
 
+  /**
+   * Registers a Weave instance listener on behalf of a node. Only one listener
+   * is kept per node and event: registering the same event again for the same
+   * node replaces the previous listener, including the ones registered by
+   * setupDefaultNodeEvents (onNodesChange, onSelectionState).
+   */
   protected setNodeInstanceListener<T>(
     node: Konva.Node,
     event: string,
@@ -1207,6 +1213,10 @@ export abstract class WeaveNode implements WeaveNodeBase {
     this.instance.addEventListener<T>(event, callback);
   }
 
+  /**
+   * Removes the listeners registered with setNodeInstanceListener for the node
+   * and, unless disabled, for its descendants.
+   */
   protected removeNodeInstanceListeners(
     node: Konva.Node,
     includeDescendants: boolean = true
