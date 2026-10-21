@@ -3,16 +3,22 @@ name: code-npm-publish-release-and-snapshot
 run-name: "Publish workflow: ${{ github.event_name }}"
 
 on:
-  issue_comment:
-    types: [created]
   pull_request:
     types: [closed]
     branches: ["main", "main-*"]
     paths: ["code/**", ".github/workflows/code**"]
   workflow_dispatch:
     inputs:
+      ACTION:
+        description: "Action to perform"
+        required: true
+        default: "release"
+        type: choice
+        options:
+          - "release"
+          - "snapshot"
       BASELINE:
-        description: "Baseline branch"
+        description: "Branch to build from (baseline for release, any branch for snapshot)"
         required: true
         default: "main"
       RELEASE_TYPE:
@@ -30,16 +36,13 @@ on:
 jobs:
   publish-snapshot:
     name: Publish Snapshot
-    concurrency: code-publish-snapshot-${{ github.ref }}
+    concurrency: code-publish-snapshot-${{ github.event.inputs.BASELINE }}
     permissions:
       id-token: write
       contents: read
-      issues: write
-      pull-requests: write
     if: >
-      github.event_name == 'issue_comment' &&
-      github.event.issue.pull_request != null &&
-      github.event.comment.body == '/publish-snapshot'
+      github.event_name == 'workflow_dispatch' &&
+      github.event.inputs.ACTION == 'snapshot'
     runs-on: ubuntu-24.04
     env:
       ASDF_BRANCH_VERSION: 0.18.0
@@ -63,17 +66,17 @@ jobs:
             }
 
       - name: Get input parameters
+        env:
+          INPUT_RELEASE_TYPE: ${{ github.event.inputs.RELEASE_TYPE }}
+          INPUT_BASELINE: ${{ github.event.inputs.BASELINE }}
         run: |
-          RELEASE_LABELS="${{ join(github.event.issue.labels.*.name, ', ') }}"
-          if [[ $RELEASE_LABELS != *release-type/* ]]; then
-            RELEASE_LABELS="$RELEASE_LABELS, release-type/minor"
-          fi
-          echo "RELEASE_LABELS=$RELEASE_LABELS" >> "$GITHUB_ENV"
+          echo "RELEASE_LABELS=$INPUT_RELEASE_TYPE" >> "$GITHUB_ENV"
+          echo "BASELINE_BRANCH=${INPUT_BASELINE#refs/heads/}" >> "$GITHUB_ENV"
 
-      - name: Checkout PR branch
+      - name: Checkout baseline branch
         uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
         with:
-          ref: refs/pull/${{ github.event.issue.number }}/head
+          ref: ${{ env.BASELINE_BRANCH }}
           fetch-depth: 0
           persist-credentials: false
 
@@ -297,36 +300,33 @@ jobs:
           export NPM_CONFIG_USERCONFIG="$TEMP_NPMRC"
           npm run publish:snapshot
 
-      - name: Result / Comment on PR
+      - name: Result / Job summary
         if: always()
-        uses: actions/github-script@f28e40c7f34bde8b3046d885e986cb6290c5673b # v7
-        with:
-          script: |
-            const status = '${{ job.status }}';
-            const authMethod = '${{ env.HAS_NEW_PACKAGES }}' === 'true'
-              ? 'NPM_TOKEN (new packages detected)'
-              : 'OIDC trusted publishing (provenance)';
-
-            const body = status === 'success'
-              ? [
-                  "### :rocket: NPM snapshot published",
-                  "",
-                  `- Version: \`${process.env.SNAPSHOT_VERSION}\``,
-                  "- Tag: `next`",
-                  `- Auth: ${authMethod}`
-                ]
-              : [
-                  "### :x: NPM snapshot publication failed",
-                  "",
-                  "Please check the workflow logs for details."
-                ]
-
-            await github.rest.issues.createComment({
-              issue_number: context.issue.number,
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              body: body.join("\n")
-            });
+        env:
+          JOB_STATUS: ${{ job.status }}
+          AUTH_NEW_PACKAGES: ${{ env.HAS_NEW_PACKAGES }}
+        run: |
+          if [[ "$AUTH_NEW_PACKAGES" == "true" ]]; then
+            AUTH_METHOD="NPM_TOKEN (new packages detected)"
+          else
+            AUTH_METHOD="OIDC trusted publishing (provenance)"
+          fi
+          if [[ "$JOB_STATUS" == "success" ]]; then
+            {
+              echo "### :rocket: NPM snapshot published"
+              echo ""
+              echo "- Version: \`${SNAPSHOT_VERSION}\`"
+              echo "- Tag: \`next\`"
+              echo "- Branch: \`${BASELINE_BRANCH}\`"
+              echo "- Auth: ${AUTH_METHOD}"
+            } >> "$GITHUB_STEP_SUMMARY"
+          else
+            {
+              echo "### :x: NPM snapshot publication failed"
+              echo ""
+              echo "Please check the workflow logs for details."
+            } >> "$GITHUB_STEP_SUMMARY"
+          fi
 
   release:
     name: Release
@@ -336,7 +336,8 @@ jobs:
       contents: write
       issues: write
       pull-requests: write
-    if: github.event_name == 'workflow_dispatch'
+    if:
+      (github.event_name == 'workflow_dispatch' && github.event.inputs.ACTION == 'release')
       || (github.event_name == 'pull_request' && github.event.pull_request.merged == true
       && !contains(join(github.event.pull_request.labels.*.name, ', '), 'skip-release')
       && (contains(join(github.event.pull_request.labels.*.name, ', '), 'release-type')
@@ -364,18 +365,21 @@ jobs:
             }
 
       - name: Get input parameters
+        env:
+          INPUT_RELEASE_TYPE: ${{ github.event.inputs.RELEASE_TYPE }}
+          INPUT_BASELINE: ${{ github.event.inputs.BASELINE || github.ref }}
+          PR_LABELS: ${{ join(github.event.pull_request.labels.*.name, ', ') }}
         run: |
           if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
-            RELEASE_LABELS="${{ github.event.inputs.RELEASE_TYPE }}"
+            RELEASE_LABELS="$INPUT_RELEASE_TYPE"
           else
-            RELEASE_LABELS="${{ join(github.event.pull_request.labels.*.name, ', ') }}"
+            RELEASE_LABELS="$PR_LABELS"
             if [[ $RELEASE_LABELS != *release-type/* ]]; then
               RELEASE_LABELS="$RELEASE_LABELS, release-type/minor"
             fi
           fi
           echo "RELEASE_LABELS=$RELEASE_LABELS" >> "$GITHUB_ENV"
-          BASELINE_BRANCH=${{ github.event.inputs.BASELINE || github.ref }}
-          echo "BASELINE_BRANCH=${BASELINE_BRANCH#refs/heads/}" >> "$GITHUB_ENV"
+          echo "BASELINE_BRANCH=${INPUT_BASELINE#refs/heads/}" >> "$GITHUB_ENV"
 
       - uses: actions/create-github-app-token@v3
         id: app-token

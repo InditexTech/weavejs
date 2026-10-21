@@ -55,9 +55,10 @@ go through the `docouture` CLI.
 
 - Every page lives at `docs/src/modules/<module>/pages/*.adoc` and must have an `xref:`
   entry in that module's `nav.adoc`, or it builds but is unreachable from the navigation.
-- A build failure on a warning is expected behaviour here, not a bug — `antora-playbook.yml`
-  sets `runtime.log.failure_level: warn`. A broken `xref:`, a missing include target or an
-  unknown attribute reference fails the build.
+- A build failure on an error is expected behaviour here, not a bug — `antora-playbook.yml`
+  sets `runtime.log.failure_level: error`. A broken `xref:`, a missing include target or an
+  authoring mistake reported by a docouture extension fails the build. Warnings (an
+  undefined attribute reference, an out-of-sequence section level) are logged but do not.
 - Run `docouture doctor` after any structural change (renaming the component, moving
   `antora.yml`, editing `package.json`'s `name`) — it's the fast way to catch the four names
   drifting out of agreement.
