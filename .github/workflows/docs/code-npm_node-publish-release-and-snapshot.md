@@ -4,9 +4,9 @@
 
 ## Triggers
 
-- An `issue_comment` with `/publish-snapshot` on an open pull request (snapshot job).
+- A manual dispatch (`workflow_dispatch`) with `ACTION=snapshot` (snapshot job). `BASELINE` selects the branch to build from. npm trusted publishing rejects OIDC tokens from `issue_comment` events, so the former `/publish-snapshot` comment trigger was removed.
 - Any `closed` pull request to `main` branch on `code` path, if no `skip-release` label AND if a `release-type/*` label is added if using Gitflow development flow (release job).
-- A manual dispatch (`workflow_dispatch`) invoked from the GitHub UI (release job).
+- A manual dispatch (`workflow_dispatch`) with `ACTION=release` (default) (release job).
 
 ## Where does it run?
 
@@ -28,13 +28,13 @@ This workflow relies on asdf to automatically load any tool version defined on t
 
 - ### `publish-snapshot`
 
-  Triggered by a `/publish-snapshot` comment on a pull request. Publishes a pre-release snapshot version tagged as `next`.
+  Triggered by a manual dispatch with `ACTION=snapshot`. Publishes a pre-release snapshot version tagged as `next`.
 
   - **Steps**
 
-    - Validate the commenter has admin permissions.
-    - Get the release labels from the PR.
-    - Checkout the PR branch.
+    - Validate the actor has admin permissions.
+    - Get the release type (`RELEASE_TYPE`) and branch (`BASELINE`) inputs.
+    - Checkout the `BASELINE` branch.
     - Setup NPM and asdf caches.
     - Configure asdf environment with the tools in the `.tool-versions` file.
     - Ensure minimum npm version (`>=11.5.1`) for OIDC support, upgrading only if needed.
@@ -44,12 +44,12 @@ This workflow relies on asdf to automatically load any tool version defined on t
     - Update CHANGELOG.md and calculate next version using `release-flow/keep-a-changelog-action` action.
     - Define the snapshot version (`<version>-SNAPSHOT.<run_number>.<run_attempt>`).
     - Prepare the snapshot with `version:release` and `release:prepare` node scripts.
-    - Publish the snapshot with `publish:snapshot` node script (`NPM_CONFIG_PROVENANCE` set to `false`).
-    - Comment on the PR with the result (success with version info, or failure).
+    - Publish the snapshot with `publish:snapshot` node script (`NPM_CONFIG_PROVENANCE` set to `true`).
+    - Write a job summary with the result (snapshot version, tag, branch and auth method, or failure).
 
 - ### `release`
 
-  Triggered by a merged pull request or manual workflow dispatch. Publishes a release version and creates a GitHub release.
+  Triggered by a merged pull request or a manual workflow dispatch with `ACTION=release`. Publishes a release version and creates a GitHub release.
 
   - **Steps**
 
@@ -65,7 +65,7 @@ This workflow relies on asdf to automatically load any tool version defined on t
     - Prepare committer information and configure GPG signing (gpg-agent with loopback-pinentry and preset-passphrase).
     - Update CHANGELOG.md and calculate next version using `release-flow/keep-a-changelog-action` action.
     - Prepare the release with `version:release` and `release:prepare` node scripts.
-    - Publish the artifact with `release:perform` node script (`NPM_CONFIG_PROVENANCE` set to `false`).
+    - Publish the artifact with `release:perform` node script (`NPM_CONFIG_PROVENANCE` set to `true`).
     - Commit and push CHANGELOG.md, `package.json`, `package-lock.json`, and `packages/*/package.json` with the released version.
     - Create an annotated, signed git tag.
     - Set the new SNAPSHOT version with `version:development` node script.
