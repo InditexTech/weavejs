@@ -8,6 +8,30 @@ This package is dependant on:
 * xref:sdk:index.adoc[Weave.js SDK] package
 * xref:types:index.adoc[Weave.js types] package
 
+=== Server-side rendering backends
+
+On the server, Konva renders through a native canvas implementation. The `@inditextech/weave-sdk/server` entry point offers two backends, and each one needs its own native package:
+
+[cols="1,1"]
+|===
+|Backend setup |Required package
+
+|`setupCanvasBackend()`
+|`canvas`
+
+|`setupSkiaBackend()`
+|`skia-canvas`
+|===
+
+Both packages are optional peer dependencies of the SDK: npm doesn't install them, and it doesn't warn when they are missing. Install only the one for the backend you use, with the version that `@inditextech/weave-sdk` requires, for example:
+
+[source,shell]
+----
+npm install canvas
+----
+
+If the package is missing, the setup function throws an error that names the package to install. Browser applications don't need either package.
+
 == Installation
 
 [source,shell]
