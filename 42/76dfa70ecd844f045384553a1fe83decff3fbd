@@ -1,0 +1,21 @@
+docs/package-lock.json
+  s_8f12594a44cb7a::t_4959b46a9c6835 12-16,323-325,332,335,344-346,358-360,375-377,388-390
+docs/package.json
+  s_8f12594a44cb7a::t_425dce24cbc977 18-22
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "4276dfa70ecd844f045384553a1fe83decff3fbd",
+  "prompts": {},
+  "sessions": {
+    "s_8f12594a44cb7a": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "ses_ea2b7d05bffeJ674BaN6QKxXSA",
+        "model": "claude-sonnet-5.5"
+      },
+      "human_author": "Jesus Manuel Piñeiro Cid <jesusmpc@inditex.com>"
+    }
+  }
+}
