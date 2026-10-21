@@ -1,0 +1,45 @@
+.github/workflows/code-npm_node-publish-release-and-snapshot.yml
+  s_3982c5af47289d::t_42934355c15166 12-19,21,39,44-45,69-71,73-74,76,79,303,305-329,339-340,368-371,374,376,382
+.github/workflows/docouture-kroki-cache-warm.yml
+  s_3982c5af47289d::t_9742dcc3800139 24-28,41,59-61,70,72-73,84-86,89,117-118,126,136-137
+.github/workflows/docouture-pr-verify.yml
+  s_3982c5af47289d::t_390506eb7286ea 36-38,47,49-50,61-63,66,107,123-124
+.github/workflows/docouture-publish-prerelease.yml
+  s_3982c5af47289d::t_9cbc65e1b170d8 20-23,41-45,50,59-62,66-70,72,75,77-80,83-97,103-107,121-124,126,140-142,144,146-147
+.github/workflows/docouture-publish.yml
+  s_3982c5af47289d::t_ac470690893b4e 28-40,42-46,49-50,58-59,61,72,78,81,86-88,93-96,108-110,113,117-119,121-124
+.github/workflows/docouture-release-preview.yml
+  s_3982c5af47289d::t_d994b37539a971 5,21-24,30-31,33-34,41-42,45-50,56-66,72-73,75-76,87-89,137-141,145-146,148,151,156,164-166,173,187,204,210-211,213,216-219,221,229-230,232,235-238,240
+.github/workflows/docouture-release.yml
+  s_3982c5af47289d::t_5e234963221976 58-66,77-88,106,115-126,139-140,151,165-166,168,172,189,194-197,238,242-244,280-302,481,496,499-620,638-644,646-647
+.github/workflows/docs/code-npm_node-publish-release-and-snapshot.md
+  s_3982c5af47289d::t_e157aa8c26a968 7,9,31,35-37,47-48,52,68
+AGENTS.md
+  s_3982c5af47289d::t_04e2ce0266a5ed 58-61
+code/CHANGELOG.md
+  s_3982c5af47289d::t_cbbfb305991e26 19
+docs/antora-playbook.local.yml
+  s_3982c5af47289d::t_9db350e73af637 77
+docs/antora-playbook.yml
+  s_3982c5af47289d::t_9d96c6015626ef 117
+docs/package-lock.json
+  s_3982c5af47289d::t_8315e87938e744 12-17,323-325,332,335,344-346,358-360,375-377,388-390,894-896,2573-2575,3024
+docs/package.json
+  s_3982c5af47289d::t_af1d0aaf676f81 15,18-23
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "b2055c55579edd9408384929511f28be1698fb2a",
+  "prompts": {},
+  "sessions": {
+    "s_3982c5af47289d": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "ses_ea21356e7ffeCaVDtvPjyLiLSy",
+        "model": "claude-sonnet-5.5"
+      },
+      "human_author": "Jesus Manuel Piñeiro Cid <jesusmpc@inditex.com>"
+    }
+  }
+}
