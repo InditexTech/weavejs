@@ -14,3 +14,8 @@ This package is dependant on:
 ----
 npm install @inditextech/weave-sdk
 ----
+
+[NOTE]
+====
+All Weave.js packages are published as ES modules only. Use `import` to load them. Loading them with `require()` from CommonJS code needs Node.js 20.19+ or 22.12+, the versions that support `require()` of ES modules.
+====
