@@ -40,6 +40,15 @@ export function getShapeDragBounds(
     }
   }
 
+  if (constrained && aspectRatio > 0 && width > 0 && height > 0) {
+    const minimumSizeScale = Math.max(1, 1 / width, 1 / height);
+    width *= minimumSizeScale;
+    height *= minimumSizeScale;
+  } else {
+    width = Math.max(1, width);
+    height = Math.max(1, height);
+  }
+
   if (centered) {
     width *= 2;
     height *= 2;

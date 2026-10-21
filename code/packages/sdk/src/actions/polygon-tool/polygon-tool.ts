@@ -5,7 +5,10 @@
 import { v4 as uuidv4 } from 'uuid';
 import Konva from 'konva';
 import { WeaveAction } from '@/actions/action';
-import { type WeaveElementInstance } from '@inditextech/weave-types';
+import {
+  type WeaveElementInstance,
+  type WeaveStateElement,
+} from '@inditextech/weave-types';
 import {
   type WeavePolygonToolActionState,
   type WeavePolygonToolActionTriggerParams,
@@ -24,6 +27,9 @@ import {
   getShapeDragBounds,
   type ShapeDragModifiers,
 } from '../shared/shape-geometry';
+import { bindShapeDragKeyboardHandlers } from '../shared/shape-keyboard';
+
+const MIN_POLYGON_DRAG_DISTANCE = 3;
 
 export class WeavePolygonToolAction extends WeaveAction {
   protected initialized: boolean = false;
@@ -33,6 +39,8 @@ export class WeavePolygonToolAction extends WeaveAction {
   protected clickPoint!: Konva.Vector2d | null;
   protected container!: Konva.Layer | Konva.Node | undefined;
   protected moved!: boolean;
+  protected placementCommitted!: boolean;
+  protected polygonNode!: WeaveStateElement | null;
   protected cancelAction!: () => void;
   protected preset: string;
   onPropsChange = undefined;
@@ -52,6 +60,8 @@ export class WeavePolygonToolAction extends WeaveAction {
     this.clickPoint = null;
     this.container = undefined;
     this.moved = false;
+    this.placementCommitted = false;
+    this.polygonNode = null;
     this.props = this.initProps();
   }
 
@@ -83,38 +93,13 @@ export class WeavePolygonToolAction extends WeaveAction {
   private setupEvents() {
     const stage = this.instance.getStage();
 
-    window.addEventListener(
-      'keydown',
-      (e) => {
-        if (
-          (e.code === 'Enter' || e.code === 'Escape') &&
-          this.instance.getActiveAction() === POLYGON_TOOL_ACTION_NAME
-        ) {
-          this.cancelAction();
-          return;
-        }
-        if (
-          (e.key === 'Shift' || e.key === 'Alt') &&
-          this.state === POLYGON_TOOL_STATE.DEFINING_SIZE &&
-          this.moved
-        ) {
-          this.handleMovement(e);
-        }
-      },
-      { signal: this.instance.getEventsController().signal }
-    );
-    window.addEventListener(
-      'keyup',
-      (e) => {
-        if (
-          (e.key === 'Shift' || e.key === 'Alt') &&
-          this.state === POLYGON_TOOL_STATE.DEFINING_SIZE &&
-          this.moved
-        ) {
-          this.handleMovement(e);
-        }
-      },
-      { signal: this.instance.getEventsController().signal }
+    bindShapeDragKeyboardHandlers(
+      this.instance.getEventsController().signal,
+      () => this.instance.getActiveAction() === POLYGON_TOOL_ACTION_NAME,
+      () => this.state === POLYGON_TOOL_STATE.DEFINING_SIZE,
+      () => this.state === POLYGON_TOOL_STATE.DEFINING_SIZE && this.moved,
+      () => this.cancelAction(),
+      (modifiers) => this.handleMovement(modifiers)
     );
 
     stage.on('pointermove', () => {
@@ -140,6 +125,16 @@ export class WeavePolygonToolAction extends WeaveAction {
       this.setCursor();
       if (!this.isPressed(e) || !this.pointers.has(e.evt.pointerId)) return;
       if (this.state === POLYGON_TOOL_STATE.DEFINING_SIZE) {
+        const pointerStart = this.pointers.get(e.evt.pointerId);
+        if (
+          !pointerStart ||
+          Math.hypot(
+            e.evt.clientX - pointerStart.x,
+            e.evt.clientY - pointerStart.y
+          ) < MIN_POLYGON_DRAG_DISTANCE
+        ) {
+          return;
+        }
         this.moved = true;
         this.handleMovement(e.evt);
       }
@@ -151,6 +146,15 @@ export class WeavePolygonToolAction extends WeaveAction {
       if (isTap) this.moved = false;
       if (this.state === POLYGON_TOOL_STATE.DEFINING_SIZE) {
         this.handleSettingSize(e.evt);
+      }
+    });
+
+    stage.on('pointercancel', (e) => {
+      if (!this.pointers.has(e.evt.pointerId)) return;
+
+      this.pointers.delete(e.evt.pointerId);
+      if (this.state === POLYGON_TOOL_STATE.DEFINING_SIZE) {
+        this.cancelAction();
       }
     });
 
@@ -177,6 +181,7 @@ export class WeavePolygonToolAction extends WeaveAction {
     this.container = container;
 
     this.polygonId = uuidv4();
+    this.polygonNode = null;
 
     const presetDef = WEAVE_POLYGON_PRESETS[this.preset];
     const scaleFactor = (this.props.scaleFactor as number | undefined) ?? 1;
@@ -201,6 +206,7 @@ export class WeavePolygonToolAction extends WeaveAction {
         points,
         innerRect,
       });
+      this.polygonNode = node;
       this.instance.addNode(node, container?.getAttrs().id);
     }
 
@@ -261,8 +267,9 @@ export class WeavePolygonToolAction extends WeaveAction {
       this.instance.updateNode(
         nodeHandler.serialize(polygon as WeaveElementInstance)
       );
+      this.placementCommitted = true;
+      this.instance.emitEvent<undefined>('onAddedPolygon');
     }
-    this.instance.emitEvent<undefined>('onAddedPolygon');
 
     this.cancelAction();
   }
@@ -280,6 +287,7 @@ export class WeavePolygonToolAction extends WeaveAction {
     }
 
     this.preset = params?.presetId ?? 'pentagon';
+    this.placementCommitted = false;
 
     const stage = this.instance.getStage();
     stage.container().tabIndex = 1;
@@ -301,10 +309,20 @@ export class WeavePolygonToolAction extends WeaveAction {
     const stage = this.instance.getStage();
     stage.container().style.cursor = 'default';
 
+    const isCancelledPlacement =
+      this.state === POLYGON_TOOL_STATE.DEFINING_SIZE &&
+      this.polygonId !== null &&
+      !this.placementCommitted;
+    if (isCancelledPlacement && this.polygonNode) {
+      this.instance.removeNode(this.polygonNode);
+    }
+
     const selectionPlugin =
       this.instance.getPlugin<WeaveNodesSelectionPlugin>('nodesSelection');
     if (selectionPlugin) {
-      const node = stage.findOne(`#${this.polygonId}`);
+      const node = isCancelledPlacement
+        ? undefined
+        : stage.findOne(`#${this.polygonId}`);
       if (node) {
         selectionPlugin.setSelectedNodes([node]);
       }
@@ -316,6 +334,8 @@ export class WeavePolygonToolAction extends WeaveAction {
     this.clickPoint = null;
     this.container = undefined;
     this.moved = false;
+    this.placementCommitted = false;
+    this.polygonNode = null;
     this.setState(POLYGON_TOOL_STATE.IDLE);
   }
 

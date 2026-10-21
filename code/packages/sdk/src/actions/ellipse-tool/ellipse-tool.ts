@@ -19,6 +19,7 @@ import {
   getShapeDragBounds,
   type ShapeDragModifiers,
 } from '../shared/shape-geometry';
+import { bindShapeDragKeyboardHandlers } from '../shared/shape-keyboard';
 
 export class WeaveEllipseToolAction extends WeaveAction {
   protected initialized: boolean = false;
@@ -70,45 +71,13 @@ export class WeaveEllipseToolAction extends WeaveAction {
   private setupEvents() {
     const stage = this.instance.getStage();
 
-    window.addEventListener(
-      'keydown',
-      (e) => {
-        if (
-          e.code === 'Enter' &&
-          this.instance.getActiveAction() === ELLIPSE_TOOL_ACTION_NAME
-        ) {
-          this.cancelAction();
-          return;
-        }
-        if (
-          e.code === 'Escape' &&
-          this.instance.getActiveAction() === ELLIPSE_TOOL_ACTION_NAME
-        ) {
-          this.cancelAction();
-          return;
-        }
-        if (
-          (e.key === 'Shift' || e.key === 'Alt') &&
-          this.state === ELLIPSE_TOOL_STATE.DEFINING_SIZE &&
-          this.moved
-        ) {
-          this.handleMovement(e);
-        }
-      },
-      { signal: this.instance.getEventsController().signal }
-    );
-    window.addEventListener(
-      'keyup',
-      (e) => {
-        if (
-          (e.key === 'Shift' || e.key === 'Alt') &&
-          this.state === ELLIPSE_TOOL_STATE.DEFINING_SIZE &&
-          this.moved
-        ) {
-          this.handleMovement(e);
-        }
-      },
-      { signal: this.instance.getEventsController().signal }
+    bindShapeDragKeyboardHandlers(
+      this.instance.getEventsController().signal,
+      () => this.instance.getActiveAction() === ELLIPSE_TOOL_ACTION_NAME,
+      () => this.state === ELLIPSE_TOOL_STATE.DEFINING_SIZE,
+      () => this.state === ELLIPSE_TOOL_STATE.DEFINING_SIZE && this.moved,
+      () => this.cancelAction(),
+      (modifiers) => this.handleMovement(modifiers)
     );
 
     stage.on('pointerdown', (e) => {

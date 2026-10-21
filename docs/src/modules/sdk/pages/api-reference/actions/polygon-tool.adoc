@@ -68,7 +68,7 @@ type WeavePolygonToolActionTriggerParams = {
 | Event | Payload | Description
 
 | `onAddingPolygon` | `undefined` | Fired when the action enters the adding state (user is about to place the polygon).
-| `onAddedPolygon` | `undefined` | Fired after the polygon node has been placed on the canvas.
+| `onAddedPolygon` | `undefined` | Fired once after the pointer is released and the polygon's dragged size has been committed. It is not fired when the placement is cancelled before pointer release.
 |===
 
 == Methods
