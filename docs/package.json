@@ -15,11 +15,11 @@
     "git:pre-push": "antora --fetch antora-playbook.local.yml"
   },
   "devDependencies": {
-    "@inditextech/docouture-cli": "1.3.0",
-    "@inditextech/docouture-ui-bundle": "1.3.0",
-    "@inditextech/docouture-asciidoc-extensions": "1.3.0",
-    "@inditextech/docouture-antora-extensions": "1.3.0",
-    "@inditextech/docouture-publish-gh-pages": "1.3.0",
+    "@inditextech/docouture-cli": "1.3.1",
+    "@inditextech/docouture-ui-bundle": "1.3.1",
+    "@inditextech/docouture-asciidoc-extensions": "1.3.1",
+    "@inditextech/docouture-antora-extensions": "1.3.1",
+    "@inditextech/docouture-publish-gh-pages": "1.3.1",
     "antora": "3.2.0"
   },
   "docouture": {
