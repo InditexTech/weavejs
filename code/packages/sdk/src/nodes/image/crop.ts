@@ -52,9 +52,24 @@ export class WeaveImageCrop {
     this.handleHide = this.hide.bind(this);
   }
 
-  private setupCropImage(imageAttrs: WeaveElementAttributes, visible: boolean) {
-    this.cropGroup.destroyChildren();
+  /**
+   * Mirrors the start of a segment inside a container along one axis:
+   * the segment [start, start + length] inside [0, size] becomes
+   * [size - start - length, size - start]. Used to convert between visual
+   * space (what the user sees on a flipped image) and source space (where
+   * the crop information is stored). It is its own inverse.
+   */
+  static mirrorOffset(start: number, length: number, size: number): number {
+    return size - start - length;
+  }
 
+  /**
+   * Returns the offset (in uncropped display units) of the visible crop
+   * window inside the visually rendered uncropped image, along with the real
+   * scale. When the image is flipped the stored crop (source space) is
+   * mirrored to match what the user sees.
+   */
+  private getVisualCropOffset(imageAttrs: WeaveElementAttributes) {
     const actualScale =
       imageAttrs.uncroppedImage.width / imageAttrs.imageInfo.width;
     const cropScale = imageAttrs.cropInfo
@@ -62,13 +77,47 @@ export class WeaveImageCrop {
       : actualScale;
     const realScale = actualScale / cropScale;
 
+    let x = 0;
+    let y = 0;
+    if (imageAttrs.cropInfo) {
+      x = imageAttrs.cropInfo.x * realScale;
+      y = imageAttrs.cropInfo.y * realScale;
+      if (imageAttrs.flipX === true) {
+        x = WeaveImageCrop.mirrorOffset(
+          x,
+          imageAttrs.cropInfo.width * realScale,
+          imageAttrs.uncroppedImage.width
+        );
+      }
+      if (imageAttrs.flipY === true) {
+        y = WeaveImageCrop.mirrorOffset(
+          y,
+          imageAttrs.cropInfo.height * realScale,
+          imageAttrs.uncroppedImage.height
+        );
+      }
+    }
+
+    return { x, y, realScale };
+  }
+
+  private setupCropImage(imageAttrs: WeaveElementAttributes, visible: boolean) {
+    this.cropGroup.destroyChildren();
+
+    const { x, y, realScale } = this.getVisualCropOffset(imageAttrs);
+
+    const flipX = imageAttrs.flipX === true;
+    const flipY = imageAttrs.flipY === true;
+
     this.cropImage = new Konva.Image({
-      x: imageAttrs.cropInfo ? -imageAttrs.cropInfo.x * realScale : 0,
-      y: imageAttrs.cropInfo ? -imageAttrs.cropInfo.y * realScale : 0,
+      x: -x,
+      y: -y,
       width: imageAttrs.uncroppedImage.width,
       height: imageAttrs.uncroppedImage.height,
-      scaleX: 1,
-      scaleY: 1,
+      scaleX: flipX ? -1 : 1,
+      scaleY: flipY ? -1 : 1,
+      offsetX: flipX ? imageAttrs.uncroppedImage.width : 0,
+      offsetY: flipY ? imageAttrs.uncroppedImage.height : 0,
       image: this.internalImage.image(),
       crop: undefined,
       visible,
@@ -76,7 +125,7 @@ export class WeaveImageCrop {
       draggable: false,
     });
 
-    return { realScale };
+    return { realScale, offsetX: x, offsetY: y };
   }
 
   show(onClose: () => void, options: WeaveImageTriggerCropOptions): void {
@@ -96,14 +145,13 @@ export class WeaveImageCrop {
 
     this.internalImage.hide();
 
-    const { realScale } = this.setupCropImage(imageAttrs, true);
+    const { realScale, offsetX, offsetY } = this.setupCropImage(
+      imageAttrs,
+      true
+    );
 
-    this.imageOffsetX = imageAttrs.cropInfo
-      ? imageAttrs.cropInfo.x * realScale
-      : 0;
-    this.imageOffsetY = imageAttrs.cropInfo
-      ? imageAttrs.cropInfo.y * realScale
-      : 0;
+    this.imageOffsetX = offsetX;
+    this.imageOffsetY = offsetY;
 
     const cropModeConfiguration = this.node.getConfiguration().cropMode;
 
@@ -164,7 +212,12 @@ export class WeaveImageCrop {
         const center = this.cropImage.getAbsolutePosition();
         const width = this.cropImage.width() * stage.scaleX();
         const height = this.cropImage.height() * stage.scaleY();
-        const offset = this.cropImage.offset();
+        // a flipped crop image uses scale -1 plus an offset equal to its size,
+        // so it still covers [origin, origin + size]: no offset to apply
+        const offset = {
+          x: this.cropImage.scaleX() < 0 ? 0 : this.cropImage.offsetX(),
+          y: this.cropImage.scaleY() < 0 ? 0 : this.cropImage.offsetY(),
+        };
 
         const corners = [
           { x: -offset.x, y: -offset.y }, // top-left
@@ -638,11 +691,30 @@ export class WeaveImageCrop {
     const actualScale =
       imageAttrs.uncroppedImage.width / imageAttrs.imageInfo.width;
 
+    // the crop window is expressed in visual space, the crop info is stored in
+    // source space: undo the flip mirroring on each flipped axis
+    let sourceX = clipRectGroup.x + this.imageOffsetX;
+    let sourceY = clipRectGroup.y + this.imageOffsetY;
+    if (imageAttrs.flipX === true) {
+      sourceX = WeaveImageCrop.mirrorOffset(
+        sourceX,
+        clipRectGroup.width,
+        imageAttrs.uncroppedImage.width
+      );
+    }
+    if (imageAttrs.flipY === true) {
+      sourceY = WeaveImageCrop.mirrorOffset(
+        sourceY,
+        clipRectGroup.height,
+        imageAttrs.uncroppedImage.height
+      );
+    }
+
     const realClipRect = {
       scaleX: actualScale,
       scaleY: actualScale,
-      x: WeaveImageCrop.roundTo6Decimals(clipRectGroup.x + this.imageOffsetX),
-      y: WeaveImageCrop.roundTo6Decimals(clipRectGroup.y + this.imageOffsetY),
+      x: WeaveImageCrop.roundTo6Decimals(sourceX),
+      y: WeaveImageCrop.roundTo6Decimals(sourceY),
       width: WeaveImageCrop.roundTo6Decimals(clipRectGroup.width),
       height: WeaveImageCrop.roundTo6Decimals(clipRectGroup.height),
     };
@@ -714,26 +786,35 @@ export class WeaveImageCrop {
     const imageAttrs = this.image.getAttrs();
     const actualScale =
       imageAttrs.uncroppedImage.width / imageAttrs.imageInfo.width;
-    const cropScale = imageAttrs.cropInfo
-      ? imageAttrs.cropInfo.scaleX
-      : actualScale;
-    const realScale = actualScale / cropScale;
-
-    const imageOffsetX = imageAttrs.cropInfo
-      ? imageAttrs.cropInfo.x * realScale
-      : 0;
-    const imageOffsetY = imageAttrs.cropInfo
-      ? imageAttrs.cropInfo.y * realScale
-      : 0;
+    const { x: imageOffsetX, y: imageOffsetY } =
+      this.getVisualCropOffset(imageAttrs);
 
     const diffX = intersectionRect.x - imageRect.x;
     const diffY = intersectionRect.y - imageRect.y;
 
+    // visual space -> source space (see handleClipEnd)
+    let sourceX = diffX + imageOffsetX;
+    let sourceY = diffY + imageOffsetY;
+    if (imageAttrs.flipX === true) {
+      sourceX = WeaveImageCrop.mirrorOffset(
+        sourceX,
+        intersectionRect.width,
+        imageAttrs.uncroppedImage.width
+      );
+    }
+    if (imageAttrs.flipY === true) {
+      sourceY = WeaveImageCrop.mirrorOffset(
+        sourceY,
+        intersectionRect.height,
+        imageAttrs.uncroppedImage.height
+      );
+    }
+
     const realClipRect = {
       scaleX: actualScale,
       scaleY: actualScale,
-      x: WeaveImageCrop.roundTo6Decimals(diffX + imageOffsetX),
-      y: WeaveImageCrop.roundTo6Decimals(diffY + imageOffsetY),
+      x: WeaveImageCrop.roundTo6Decimals(sourceX),
+      y: WeaveImageCrop.roundTo6Decimals(sourceY),
       width: WeaveImageCrop.roundTo6Decimals(intersectionRect.width),
       height: WeaveImageCrop.roundTo6Decimals(intersectionRect.height),
     };

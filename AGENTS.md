@@ -110,5 +110,8 @@ npx skills@latest add InditexTech/docouture --all
 | sdk:api-reference/actions/ellipse-tool.adoc | `code/packages/sdk/src/actions/ellipse-tool/ellipse-tool.ts`, `code/packages/sdk/src/actions/shared/shape-geometry.ts` | updated for unreleased changes |
 | sdk:api-reference/actions/polygon-tool.adoc | `code/packages/sdk/src/actions/polygon-tool/polygon-tool.ts`, `code/packages/sdk/src/nodes/polygon/presets.ts`, `code/packages/sdk/src/actions/shared/shape-geometry.ts` | updated for unreleased changes |
 | sdk:api-reference/actions/regular-polygon-tool.adoc | `code/packages/sdk/src/actions/regular-polygon-tool/regular-polygon-tool.ts`, `code/packages/sdk/src/actions/shared/shape-geometry.ts` | updated for unreleased changes |
+| main:build/nodes/image.adoc | `code/packages/sdk/src/nodes/image/{image,types,crop}.ts` | updated for unreleased changes |
+| sdk:api-reference/nodes/image.adoc | `code/packages/sdk/src/nodes/image/{image,types,crop}.ts` | updated for unreleased changes |
+| sdk:api-reference/weave/index.adoc | `code/packages/sdk/src/weave.ts` (`flipImage`) | updated for unreleased changes |
 | sdk:api-reference/nodes/stroke.adoc | `code/packages/sdk/src/nodes/stroke/{types,constants}.ts` | updated for unreleased changes |
 | sdk:api-reference/actions/brush-tool.adoc | `code/packages/sdk/src/actions/brush-tool/{types,constants}.ts` | updated for unreleased changes |

@@ -976,4 +976,158 @@ describe('WeaveImageCrop', () => {
       expect(snap(20)).toBe(20);
     });
   });
+
+  describe('12 — flipped images', () => {
+    it('12.1 mirrorOffset is its own inverse', () => {
+      const m = WeaveImageCrop.mirrorOffset(10, 100, 200);
+      expect(m).toBe(90);
+      expect(WeaveImageCrop.mirrorOffset(m, 100, 200)).toBe(10);
+    });
+
+    it('12.2 unflipped image keeps source offset and no mirroring', () => {
+      const { crop } = createCrop({ withCropInfo: true });
+      crop.show(vi.fn(), { cmdCtrl: { triggered: false } });
+      const { cropImage } = getCropPrivate(crop);
+      expect(cropImage.x()).toBe(-10);
+      expect(cropImage.scaleX()).toBe(1);
+      expect(cropImage.offsetX()).toBe(0);
+    });
+
+    it('12.3 flipX mirrors the crop offset and the crop image', () => {
+      const { crop, image } = createCrop({ withCropInfo: true });
+      image.setAttrs({ flipX: true });
+      crop.show(vi.fn(), { cmdCtrl: { triggered: false } });
+      const { cropImage } = getCropPrivate(crop);
+      // source x=10,w=100 in W=200 -> visual x=90
+      expect(cropImage.x()).toBe(-90);
+      expect(cropImage.scaleX()).toBe(-1);
+      expect(cropImage.offsetX()).toBe(200);
+      expect(cropImage.y()).toBe(-10);
+      expect(cropImage.scaleY()).toBe(1);
+    });
+
+    it('12.4 flipY mirrors the vertical crop offset', () => {
+      const { crop, image } = createCrop({ withCropInfo: true });
+      image.setAttrs({ flipY: true });
+      crop.show(vi.fn(), { cmdCtrl: { triggered: false } });
+      const { cropImage } = getCropPrivate(crop);
+      // source y=10,h=80 in H=150 -> visual y=60
+      expect(cropImage.y()).toBe(-60);
+      expect(cropImage.scaleY()).toBe(-1);
+      expect(cropImage.offsetY()).toBe(150);
+      expect(cropImage.x()).toBe(-10);
+    });
+
+    it('12.5 uncropped flipped image starts at origin and is mirrored', () => {
+      const { crop, image } = createCrop();
+      image.setAttrs({ flipX: true, flipY: true });
+      crop.show(vi.fn(), { cmdCtrl: { triggered: false } });
+      const { cropImage } = getCropPrivate(crop);
+      expect(cropImage.x()).toBeCloseTo(0);
+      expect(cropImage.y()).toBeCloseTo(0);
+      expect(cropImage.scaleX()).toBe(-1);
+      expect(cropImage.scaleY()).toBe(-1);
+    });
+
+    function confirmWindow(
+      flip: { flipX?: boolean; flipY?: boolean },
+      window: { x: number; y: number; width: number; height: number },
+      withCropInfo: boolean
+    ) {
+      const ctx = createCrop({ withCropInfo });
+      ctx.image.setAttrs(flip);
+      const cropPrivate = getCropPrivate(ctx.crop);
+      ctx.crop.show(vi.fn(), { cmdCtrl: { triggered: false } });
+      vi.spyOn(cropPrivate, 'getIntersectionRect').mockReturnValue(window);
+      vi.spyOn(cropPrivate.cropRect, 'getClientRect').mockReturnValue(window);
+      vi.spyOn(cropPrivate.cropRect, 'getAbsolutePosition').mockReturnValue({
+        x: 0,
+        y: 0,
+      });
+      ctx.crop.handleClipEnd();
+      return ctx.image.getAttrs().cropInfo;
+    }
+
+    it('12.6 confirming without moving keeps the stored crop (flipX)', () => {
+      const info = confirmWindow(
+        { flipX: true },
+        { x: 0, y: 0, width: 100, height: 80 },
+        true
+      );
+      expect(info).toMatchObject({ x: 10, y: 10, width: 100, height: 80 });
+    });
+
+    it('12.7 confirming without moving keeps the stored crop (flipX + flipY)', () => {
+      const info = confirmWindow(
+        { flipX: true, flipY: true },
+        { x: 0, y: 0, width: 100, height: 80 },
+        true
+      );
+      expect(info).toMatchObject({ x: 10, y: 10, width: 100, height: 80 });
+    });
+
+    it('12.8 a visual window is stored in source space (flipX)', () => {
+      // flipped, no crop yet: visual window at x=20 (left side of the mirrored
+      // image), width 50 => source x = 200 - 20 - 50 = 130
+      const info = confirmWindow(
+        { flipX: true },
+        { x: 20, y: 5, width: 50, height: 40 },
+        false
+      );
+      expect(info).toMatchObject({ x: 130, y: 5, width: 50, height: 40 });
+    });
+
+    it('12.9 a visual window is stored in source space (flipY)', () => {
+      const info = confirmWindow(
+        { flipY: true },
+        { x: 20, y: 5, width: 50, height: 40 },
+        false
+      );
+      // y = 150 - 5 - 40 = 105
+      expect(info).toMatchObject({ x: 20, y: 105, width: 50, height: 40 });
+    });
+
+    it('12.10 unflipped window is stored unchanged', () => {
+      const info = confirmWindow(
+        {},
+        { x: 20, y: 5, width: 50, height: 40 },
+        false
+      );
+      expect(info).toMatchObject({ x: 20, y: 5, width: 50, height: 40 });
+    });
+
+    it('12.11 rotated flipped image stores the same source crop', () => {
+      const ctx = createCrop({ withCropInfo: true });
+      ctx.image.setAttrs({ flipX: true, flipY: true, rotation: 30 });
+      const cropPrivate = getCropPrivate(ctx.crop);
+      ctx.crop.show(vi.fn(), { cmdCtrl: { triggered: false } });
+      const win = { x: 0, y: 0, width: 100, height: 80 };
+      vi.spyOn(cropPrivate, 'getIntersectionRect').mockReturnValue(win);
+      vi.spyOn(cropPrivate.cropRect, 'getClientRect').mockReturnValue(win);
+      vi.spyOn(cropPrivate.cropRect, 'getAbsolutePosition').mockReturnValue({
+        x: 0,
+        y: 0,
+      });
+      ctx.crop.handleClipEnd();
+      expect(ctx.image.getAttrs().cropInfo).toMatchObject({
+        x: 10,
+        y: 10,
+        width: 100,
+        height: 80,
+      });
+      // the temporary rotation used while intersecting is restored
+      expect(cropPrivate.cropImage.rotation()).toBe(0);
+    });
+
+    it('12.12 repeated flip + crop round trips to the original crop', () => {
+      const first = confirmWindow(
+        { flipX: true },
+        { x: 20, y: 5, width: 50, height: 40 },
+        false
+      );
+      // source x=130 -> visual x=200-130-50=20 again
+      expect(first.x).toBe(130);
+      expect(WeaveImageCrop.mirrorOffset(first.x, first.width, 200)).toBe(20);
+    });
+  });
 });

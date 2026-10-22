@@ -42,3 +42,27 @@ xref:main:build/plugins/index.adoc[Plugins] or even other xref:main:build/nodes/
 
 We provide an action named xref:main:build/actions/image-tool.adoc[Image Tool] that allows
 users to add Image (one-by-one) nodes to the application.
+
+== Flip an image
+
+Image nodes can be flipped horizontally and vertically without generating a new asset:
+
+[source,ts]
+----
+const imageNode = instance.getStage().findOne("#imageId") as Konva.Group;
+
+instance.flipImage(imageNode, { axis: "horizontal" });
+instance.flipImage(imageNode, { axis: "vertical" });
+
+// or directly on the node
+imageNode.flipHorizontal();
+imageNode.flipVertical();
+----
+
+* Both axes are independent: the state persists them as the `flipX` and `flipY` booleans.
+* Flipping the same axis twice restores the original image.
+* Position, size, rotation and stacking order are not changed, and each flip is a single undo / redo step.
+* The flip is kept when resizing, rotating, cropping, grouping, copy / pasting and when rendering on the server.
+* Calling it while the image is being cropped has no effect.
+
+See the xref:sdk:api-reference/nodes/image.adoc[WeaveImageNode API reference] for details.

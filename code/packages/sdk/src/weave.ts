@@ -1111,6 +1111,19 @@ export class Weave {
     return getBoundingBox(nodes, config);
   }
 
+  flipImage(
+    node: Konva.Group,
+    options: { axis: 'horizontal' | 'vertical' }
+  ): void {
+    const handler = this.getNodeHandler<{
+      flipImage: (
+        node: Konva.Group,
+        options: { axis: 'horizontal' | 'vertical' }
+      ) => void;
+    }>('image');
+    handler?.flipImage(node, options);
+  }
+
   stateTransactional(callback: () => void, origin?: string): void {
     this.stateManager.stateTransactional(callback, origin);
   }
