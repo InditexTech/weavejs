@@ -1,0 +1,79 @@
+AGENTS.md
+  s_236fa6c66b1306::t_68e4d31385ad7c 118-119
+code/packages/sdk/src/index.common.ts
+  s_236fa6c66b1306::t_79b4a3111967e7 59-64
+code/packages/sdk/src/nodes/text-v2/__tests__/bench.test.ts
+  s_236fa6c66b1306::t_0acab478b94dec 1-168
+code/packages/sdk/src/nodes/text-v2/__tests__/edit-model.test.ts
+  s_236fa6c66b1306::t_dd632a83ef49aa 1-155
+code/packages/sdk/src/nodes/text-v2/__tests__/edit-session.test.ts
+  s_236fa6c66b1306::t_aedad3f41b76e6 1-315
+code/packages/sdk/src/nodes/text-v2/__tests__/layout.test.ts
+  s_236fa6c66b1306::t_af206f014de723 1-171
+code/packages/sdk/src/nodes/text-v2/__tests__/model.test.ts
+  s_236fa6c66b1306::t_b4a9f4c22c4c9b 1-60
+code/packages/sdk/src/nodes/text-v2/__tests__/server-skia.test.ts
+  s_236fa6c66b1306::t_65e8519eaccc6b 1-83
+code/packages/sdk/src/nodes/text-v2/__tests__/server.test.ts
+  s_236fa6c66b1306::t_fb891f410e6d42 1-37
+code/packages/sdk/src/nodes/text-v2/__tests__/shape.test.ts
+  s_236fa6c66b1306::t_f12d4218109160 1-141
+code/packages/sdk/src/nodes/text-v2/__tests__/text-v2-edit.test.ts
+  s_236fa6c66b1306::t_56f57677773abb 1-312
+code/packages/sdk/src/nodes/text-v2/__tests__/text-v2.test.ts
+  s_236fa6c66b1306::t_3cb3f542b3bd47 1-320
+code/packages/sdk/src/nodes/text-v2/constants.ts
+  s_236fa6c66b1306::t_2977843f0bf3b2 1-16
+code/packages/sdk/src/nodes/text-v2/edit/geometry.ts
+  s_236fa6c66b1306::t_07c87e82248f03 1-233
+code/packages/sdk/src/nodes/text-v2/edit/model.ts
+  s_236fa6c66b1306::t_ec39b1ed0f3fd3 1-182
+code/packages/sdk/src/nodes/text-v2/edit/session.ts
+  s_236fa6c66b1306::t_414c02a305bd0d 1-617
+code/packages/sdk/src/nodes/text-v2/index.ts
+  s_236fa6c66b1306::t_6e6c64c076bf8c 1-22
+code/packages/sdk/src/nodes/text-v2/layout/engine.ts
+  s_236fa6c66b1306::t_f3765cb95a7719 1-477
+code/packages/sdk/src/nodes/text-v2/model.ts
+  s_236fa6c66b1306::t_a50481106616c4 1-180
+code/packages/sdk/src/nodes/text-v2/shape.ts
+  s_236fa6c66b1306::t_85402591cbf74c 1-461
+code/packages/sdk/src/nodes/text-v2/text-v2.ts
+  s_236fa6c66b1306::t_ded5cdc002951a 1-771
+code/packages/sdk/src/nodes/text-v2/types.ts
+  s_236fa6c66b1306::t_c9d6da8c454832 1-31
+docs/src/modules/main/pages/build/nodes/text.adoc
+  s_236fa6c66b1306::t_e14c355b3b2996 55-70
+docs/src/modules/sdk/pages/api-reference/nodes/text.adoc
+  s_236fa6c66b1306::t_ff0805f29284e6 202-271
+openspec/changes/text-node-native-editing/.openspec.yaml
+  s_236fa6c66b1306::t_fb103d8d291be1 1-2
+openspec/changes/text-node-native-editing/design.md
+  s_236fa6c66b1306::t_bd5e585baf953f 1-51
+openspec/changes/text-node-native-editing/proposal.md
+  s_236fa6c66b1306::t_64f3eb90266f46 1-34
+openspec/changes/text-node-native-editing/specs/text-v2/editing/spec.md
+  s_236fa6c66b1306::t_7e637d968c33f9 1-64
+openspec/changes/text-node-native-editing/specs/text-v2/layout/spec.md
+  s_236fa6c66b1306::t_8a2572bc3e7710 1-50
+openspec/changes/text-node-native-editing/specs/text-v2/model/spec.md
+  s_236fa6c66b1306::t_6ad2f510426a9e 1-36
+openspec/changes/text-node-native-editing/tasks.md
+  s_236fa6c66b1306::t_c7ad69b629cf01 1-56
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "f46b9e1856276f7564ba6eaaa59e077cdc69bc80",
+  "prompts": {},
+  "sessions": {
+    "s_236fa6c66b1306": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "ses_e9c68953effe7Km6dHutRPYIH1",
+        "model": "claude-sonnet-5.5"
+      },
+      "human_author": "Jesus Manuel Piñeiro Cid <jesusmpc@inditex.com>"
+    }
+  }
+}
