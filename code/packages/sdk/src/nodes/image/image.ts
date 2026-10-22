@@ -132,7 +132,7 @@ export class WeaveImageNode extends WeaveNode {
 
   preloadCursors() {
     return new Promise<void>((resolve) => {
-      (async () => {
+      void (async () => {
         await doPreloadCursors(
           this.config.style.cursor,
           (state, cursor) => {
