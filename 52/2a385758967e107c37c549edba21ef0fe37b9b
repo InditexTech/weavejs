@@ -1,0 +1,37 @@
+code/package-lock.json
+  s_ed7562a1ffb8de::t_da9032c48e2820 32,5636-5638,5643,5657-5658,5667-5669,5675-5676,5685-5687,5691,5712-5714,5725-5727,5731,5739-5741,5745-5746,5755-5757,5765-5767,5771,5783,5787-5789,5793,7079-7081,15626-15628,16034-16036,17039-17041,17046-17052,17080-17085,17799-17800,17809,17842-17843,17851,17890-17891,17899,17942-17943,17956,18019-18020,18034,18073-18074,18080,18124-18125,18135,18168-18169,18176
+code/package.json
+  s_ed7562a1ffb8de::t_bc42255519c916 82
+code/packages/react/package.json
+  s_ed7562a1ffb8de::t_822d70ff6f5705 60-61,70
+code/packages/renderer-konva-base/package.json
+  s_ed7562a1ffb8de::t_900ec2fd71d4e0 68-69,77
+code/packages/renderer-konva-react-reconciler/package.json
+  s_ed7562a1ffb8de::t_5307770beed95a 70-71,79
+code/packages/sdk/package.json
+  s_ed7562a1ffb8de::t_1563aebf7c4920 72-73,86
+code/packages/store-azure-web-pubsub/package.json
+  s_ed7562a1ffb8de::t_759a8bd3d0ae80 78-79,93
+code/packages/store-standalone/package.json
+  s_ed7562a1ffb8de::t_1d4e000a1e2f14 63-64,70
+code/packages/store-websockets/package.json
+  s_ed7562a1ffb8de::t_310d08167ded50 71-72,82
+code/packages/types/package.json
+  s_ed7562a1ffb8de::t_9ae4bb1c21029b 55-56,63
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "522a385758967e107c37c549edba21ef0fe37b9b",
+  "prompts": {},
+  "sessions": {
+    "s_ed7562a1ffb8de": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "ses_e9d509ce4ffeipyjAk4uf4CTol",
+        "model": "claude-sonnet-5.5"
+      },
+      "human_author": "Jesus Manuel Piñeiro Cid <jesusmpc@inditex.com>"
+    }
+  }
+}
