@@ -162,7 +162,9 @@ describe.skipIf(!process.env.WEAVE_BENCH)(
       const text = Array.from({ length: 2000 }, (_, i) =>
         para(50 + (i % 7))
       ).join('\n');
-      out({ synth_100k_ms: +time(() => synthesizeBlocks(text)).toFixed(2) });
+      const ms = time(() => synthesizeBlocks(text));
+      out({ synth_100k_ms: +ms.toFixed(2) });
+      expect(ms).toBeLessThan(1000);
     });
   }
 );

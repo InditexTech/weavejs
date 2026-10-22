@@ -135,6 +135,61 @@ type ParagraphEntry = {
   lines: ParagraphLine[];
 };
 
+function flattenBlock(block: WeaveTextBlock) {
+  const graphemes: string[] = [];
+  const runOf: number[] = [];
+  for (let ri = 0; ri < block.runs.length; ri++) {
+    for (const g of splitGraphemes(block.runs[ri].t)) {
+      graphemes.push(g);
+      runOf.push(ri);
+    }
+  }
+  return { graphemes, runOf };
+}
+
+function trimTrailingSpace(graphemes: string[], start: number, end: number) {
+  let e = end;
+  while (e > start && WS.test(graphemes[e - 1])) e--;
+  return e;
+}
+
+function skipSpace(graphemes: string[], from: number) {
+  let i = from;
+  while (i < graphemes.length && WS.test(graphemes[i])) i++;
+  return i;
+}
+
+const isNum = (v: number | undefined): v is number =>
+  v !== undefined && !Number.isNaN(v);
+
+/** Konva's word wrap: break after the last space/dash that fits (0 = no break). */
+function wordWrapIndex(
+  graphemes: string[],
+  start: number,
+  matchLen: number,
+  matchWidth: number,
+  maxWidth: number
+): number {
+  const nextChar = graphemes[start + matchLen];
+  const nextIsSpaceOrDash = nextChar === ' ' || nextChar === '-';
+  if (nextIsSpaceOrDash && matchWidth <= maxWidth) return matchLen;
+  const seg = graphemes.slice(start, start + matchLen);
+  return Math.max(seg.lastIndexOf(' '), seg.lastIndexOf('-')) + 1;
+}
+
+function applyAlign(
+  lines: LayoutLine[],
+  align: TextAlign,
+  width: number,
+  padding: number
+) {
+  if (align === 'left') return;
+  for (const line of lines) {
+    const free = width - line.width - padding * 2;
+    line.offsetX = align === 'center' ? free / 2 : free;
+  }
+}
+
 export class TextLayoutEngine {
   private readonly measure: TextMeasurer;
   private readonly cache = new Map<string, number>();
@@ -222,10 +277,8 @@ export class TextLayoutEngine {
   ): TextLayout {
     const font = fontString(style);
     const padding = bounds.padding;
-    const fixedWidth =
-      bounds.width !== undefined && !Number.isNaN(bounds.width);
-    const fixedHeight =
-      bounds.height !== undefined && !Number.isNaN(bounds.height);
+    const fixedWidth = isNum(bounds.width);
+    const fixedHeight = isNum(bounds.height);
     const maxWidth = (bounds.width ?? 0) - padding * 2;
     const maxHeightPx = (bounds.height ?? 0) - padding * 2;
     const lineHeightPx = style.lineHeight * style.fontSize;
@@ -238,10 +291,9 @@ export class TextLayoutEngine {
     let relaid = 0;
     const lines: LayoutLine[] = [];
     let textWidth = 0;
-    let currentHeightPx = 0;
     let offset = 0;
 
-    outer: for (let p = 0; p < blocks.length; p++) {
+    for (let p = 0; p < blocks.length; p++) {
       const block = blocks[p];
       const sig = `${sigBase}|${JSON.stringify(block.runs)}`;
       let entry: ParagraphEntry | undefined =
@@ -259,30 +311,14 @@ export class TextLayoutEngine {
       }
       next.push(entry);
 
-      for (const pl of entry.lines) {
-        const text = entry.graphemes.slice(pl.startG, pl.endG).join('');
-        const segments = this.buildSegments(entry, block, pl, font, style);
-        const width = segments.reduce((a, s) => a + s.width, 0);
-        const startChar = entry.graphemes.slice(0, pl.startG).join('').length;
-        lines.push({
-          paragraph: p,
-          start: offset + startChar,
-          end: offset + startChar + text.length,
-          text,
-          width,
-          measuredWidth: pl.measuredWidth,
-          offsetX: 0,
-          y: lines.length * lineHeightPx,
-          segments,
-          lastInParagraph: pl.lastInParagraph,
-        });
-        textWidth = Math.max(textWidth, pl.measuredWidth);
-        currentHeightPx += lineHeightPx;
-        // Konva stops emitting lines once the fixed height is full.
-        if (fixedHeight && currentHeightPx + lineHeightPx > maxHeightPx) {
-          break outer;
-        }
-      }
+      const emitted = this.emitLines(entry, block, p, offset, lines, {
+        font,
+        style,
+        lineHeightPx,
+        maxHeightPx: fixedHeight ? maxHeightPx : undefined,
+      });
+      textWidth = Math.max(textWidth, emitted.maxWidth);
+      if (emitted.stopped) break;
       offset += blockText(block).length + 1;
     }
 
@@ -297,12 +333,7 @@ export class TextLayoutEngine {
       ? (bounds.height as number)
       : lines.length * lineHeightPx + padding * 2;
 
-    if (style.align !== 'left') {
-      for (const line of lines) {
-        const free = width - line.width - padding * 2;
-        line.offsetX = style.align === 'center' ? free / 2 : free;
-      }
-    }
+    applyAlign(lines, style.align, width, padding);
 
     return {
       lines,
@@ -314,9 +345,52 @@ export class TextLayoutEngine {
     };
   }
 
+  /** Append a paragraph's lines to `lines`; stops once a fixed height is full. */
+  private emitLines(
+    entry: ParagraphEntry,
+    block: WeaveTextBlock,
+    paragraph: number,
+    offset: number,
+    lines: LayoutLine[],
+    opts: {
+      font: string;
+      style: TextLayoutStyle;
+      lineHeightPx: number;
+      maxHeightPx: number | undefined;
+    }
+  ): { stopped: boolean; maxWidth: number } {
+    const { font, style, lineHeightPx, maxHeightPx } = opts;
+    let maxWidth = 0;
+    for (const pl of entry.lines) {
+      const text = entry.graphemes.slice(pl.startG, pl.endG).join('');
+      const segments = this.buildSegments(entry, block, pl, font, style);
+      const startChar = entry.graphemes.slice(0, pl.startG).join('').length;
+      lines.push({
+        paragraph,
+        start: offset + startChar,
+        end: offset + startChar + text.length,
+        text,
+        width: segments.reduce((a, s) => a + s.width, 0),
+        measuredWidth: pl.measuredWidth,
+        offsetX: 0,
+        y: lines.length * lineHeightPx,
+        segments,
+        lastInParagraph: pl.lastInParagraph,
+      });
+      maxWidth = Math.max(maxWidth, pl.measuredWidth);
+      // Konva stops emitting lines once the fixed height is full.
+      if (
+        maxHeightPx !== undefined &&
+        (lines.length + 1) * lineHeightPx > maxHeightPx
+      ) {
+        return { stopped: true, maxWidth };
+      }
+    }
+    return { stopped: false, maxWidth };
+  }
+
   private rangeWidth(
     entry: Pick<ParagraphEntry, 'graphemes' | 'runOf'>,
-    runs: WeaveTextBlock['runs'],
     from: number,
     to: number,
     font: string,
@@ -328,7 +402,6 @@ export class TextLayoutEngine {
       const run = entry.runOf[i];
       let j = i;
       while (j < to && entry.runOf[j] === run) j++;
-      void runs;
       width += this.measureChunk(
         font,
         entry.graphemes.slice(i, j).join(''),
@@ -339,6 +412,45 @@ export class TextLayoutEngine {
     return width;
   }
 
+  /**
+   * Longest prefix of graphemes[start..n) that fits `maxWidth`, found with an
+   * exponential probe (bounds the work to about one line) plus a binary
+   * search, like Konva. Always consumes at least one grapheme.
+   */
+  private longestFit(
+    start: number,
+    n: number,
+    maxWidth: number,
+    width: (a: number, b: number) => number
+  ): { matchLen: number; matchWidth: number } {
+    let low = 0;
+    let high = n - start;
+    let probe = Math.min(high, 32);
+    while (probe < high && width(start, start + probe) <= maxWidth) {
+      probe = Math.min(high, probe * 2);
+    }
+    high = probe;
+    let matchLen = 0;
+    let matchWidth = 0;
+    while (low < high) {
+      const mid = (low + high) >>> 1;
+      const w = width(start, start + mid + 1);
+      if (w <= maxWidth) {
+        low = mid + 1;
+        matchLen = mid + 1;
+        matchWidth = w;
+      } else {
+        high = mid;
+      }
+    }
+    // Deviation from Konva (which drops the rest): always consume 1 char.
+    if (matchLen === 0) {
+      matchLen = 1;
+      matchWidth = width(start, start + 1);
+    }
+    return { matchLen, matchWidth };
+  }
+
   private layoutParagraph(
     block: WeaveTextBlock,
     sig: string,
@@ -347,19 +459,12 @@ export class TextLayoutEngine {
     fixedWidth: boolean,
     maxWidth: number
   ): ParagraphEntry {
-    const graphemes: string[] = [];
-    const runOf: number[] = [];
-    block.runs.forEach((run, ri) => {
-      for (const g of splitGraphemes(run.t)) {
-        graphemes.push(g);
-        runOf.push(ri);
-      }
-    });
+    const { graphemes, runOf } = flattenBlock(block);
     const entry: ParagraphEntry = { sig, graphemes, runOf, lines: [] };
     const n = graphemes.length;
     const spacing = style.letterSpacing;
     const width = (a: number, b: number) =>
-      this.rangeWidth(entry, block.runs, a, b, font, spacing);
+      this.rangeWidth(entry, a, b, font, spacing);
 
     const shouldWrap = style.wrap !== 'none';
     const wrapAtWord = style.wrap !== 'char' && shouldWrap;
@@ -377,33 +482,7 @@ export class TextLayoutEngine {
 
     let start = 0;
     while (start < n) {
-      let low = 0;
-      let high = n - start;
-      // Exponential probe: bound the search window to roughly one line so
-      // very long paragraphs don't measure the whole remaining text.
-      let probe = Math.min(high, 32);
-      while (probe < high && width(start, start + probe) <= maxWidth) {
-        probe = Math.min(high, probe * 2);
-      }
-      high = probe;
-      let matchLen = 0;
-      let matchWidth = 0;
-      while (low < high) {
-        const mid = (low + high) >>> 1;
-        const w = width(start, start + mid + 1);
-        if (w <= maxWidth) {
-          low = mid + 1;
-          matchLen = mid + 1;
-          matchWidth = w;
-        } else {
-          high = mid;
-        }
-      }
-      // Deviation from Konva (which drops the rest): always consume 1 char.
-      if (matchLen === 0) {
-        matchLen = 1;
-        matchWidth = width(start, start + 1);
-      }
+      let { matchLen, matchWidth } = this.longestFit(start, n, maxWidth, width);
 
       // The whole remainder fits: it is the final line (no word-wrap step).
       if (start + matchLen >= n) {
@@ -417,37 +496,30 @@ export class TextLayoutEngine {
       }
 
       if (wrapAtWord) {
-        const nextChar = graphemes[start + matchLen];
-        const nextIsSpaceOrDash = nextChar === ' ' || nextChar === '-';
-        let wrapIndex: number;
-        if (nextIsSpaceOrDash && matchWidth <= maxWidth) {
-          wrapIndex = matchLen;
-        } else {
-          const seg = graphemes.slice(start, start + matchLen);
-          wrapIndex = Math.max(seg.lastIndexOf(' '), seg.lastIndexOf('-')) + 1;
-        }
-        if (wrapIndex > 0) {
-          matchLen = wrapIndex;
+        const wrapped = wordWrapIndex(
+          graphemes,
+          start,
+          matchLen,
+          matchWidth,
+          maxWidth
+        );
+        if (wrapped > 0) {
+          matchLen = wrapped;
           matchWidth = width(start, start + matchLen);
         }
       }
 
-      let end = start + matchLen;
-      let trimmedEnd = end;
-      while (trimmedEnd > start && WS.test(graphemes[trimmedEnd - 1])) {
-        trimmedEnd--;
-      }
+      const end = start + matchLen;
       entry.lines.push({
         startG: start,
-        endG: trimmedEnd,
+        endG: trimTrailingSpace(graphemes, start, end),
         measuredWidth: matchWidth,
         lastInParagraph: false,
       });
 
-      while (end < n && WS.test(graphemes[end])) end++;
-      start = end;
+      start = skipSpace(graphemes, end);
     }
-    const last = entry.lines[entry.lines.length - 1];
+    const last = entry.lines.at(-1);
     if (last) last.lastInParagraph = true;
     return entry;
   }

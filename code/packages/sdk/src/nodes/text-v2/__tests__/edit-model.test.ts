@@ -148,7 +148,7 @@ describe('edit geometry', () => {
     expect(l.lines).toHaveLength(3);
     expect(caretRect(l, 3, measure).line).toBe(1);
     const rects = selectionRects(l, 1, 5, measure);
-    expect(rects.length).toBe(3);
+    expect(rects).toHaveLength(3);
     expect(rects[0].x).toBe(10);
     expect(selectionRects(l, 2, 2, measure)).toEqual([]);
   });

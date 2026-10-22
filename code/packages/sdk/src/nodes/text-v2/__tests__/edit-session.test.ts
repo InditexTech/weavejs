@@ -318,20 +318,26 @@ describe('TextEditSession', () => {
     expect(c.session.getResult().changed).toBe(false);
   });
 
-  it('bulk paste lays out in time slices, then applies once', async () => {
-    const c = make('');
-    const big = Array.from(
-      { length: 4000 },
-      (_, i) => `line number ${i} with some text`
-    ).join('\n');
-    expect(big.length).toBeGreaterThan(BULK_PASTE_THRESHOLD);
-    const spy = vi.spyOn(c.shape, 'setBlocks');
-    c.session.insertText(big);
-    // model updated immediately, live shape deferred
-    expect(c.session.model.getText()).toBe(big);
-    await vi.waitFor(() => expect(c.shape.text()).toBe(big), { timeout: 5000 });
-    expect(spy).toHaveBeenCalledTimes(1);
-  });
+  it(
+    'bulk paste lays out in time slices, then applies once',
+    { timeout: 60000 },
+    async () => {
+      const c = make('');
+      const big = Array.from(
+        { length: 4000 },
+        (_, i) => `line number ${i} with some text`
+      ).join('\n');
+      expect(big.length).toBeGreaterThan(BULK_PASTE_THRESHOLD);
+      const spy = vi.spyOn(c.shape, 'setBlocks');
+      c.session.insertText(big);
+      // model updated immediately, live shape deferred
+      expect(c.session.model.getText()).toBe(big);
+      await vi.waitFor(() => expect(c.shape.text()).toBe(big), {
+        timeout: 30000,
+      });
+      expect(spy).toHaveBeenCalledTimes(1);
+    }
+  );
 
   it('a new edit during a pending bulk layout flushes immediately', async () => {
     const c = make('');

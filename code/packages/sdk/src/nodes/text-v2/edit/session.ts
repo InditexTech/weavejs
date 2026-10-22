@@ -87,7 +87,7 @@ export class TextEditSession {
   private pendingTimer: ReturnType<typeof setTimeout> | undefined;
   private pendingFlush = false;
   private destroyed = false;
-  private initialJson: string;
+  private readonly initialJson: string;
 
   constructor(
     target: TextEditTarget,
@@ -140,7 +140,7 @@ export class TextEditSession {
     });
 
     (window as WeaveWindow).weaveTextEditing = {
-      ...((window as WeaveWindow).weaveTextEditing ?? {}),
+      ...(window as WeaveWindow).weaveTextEditing,
       [this.id]: this.id,
     };
 
@@ -267,41 +267,29 @@ export class TextEditSession {
 
   // ---- keyboard ------------------------------------------------------------
 
-  private onKeyDown = (e: KeyboardEvent) => {
-    // The app listens for keys on `document` (e.g. undo): the editor must be
-    // the only consumer while it has focus.
-    e.stopPropagation();
+  /** Keys the session handles itself; everything else stays native. */
+  private handleSessionKey(e: KeyboardEvent): boolean {
     const mod = e.ctrlKey || e.metaKey;
     const key = e.key.toLowerCase();
+    const isUndo = mod && key === 'z' && !e.shiftKey;
+    const isRedo = mod && (key === 'y' || (key === 'z' && e.shiftKey));
 
-    if (e.key === 'Escape') {
-      e.preventDefault();
-      this.host.onRequestExit('escape');
-      return;
-    }
-    if (mod && key === 'z' && !e.shiftKey) {
-      e.preventDefault();
-      this.undo();
-      return;
-    }
-    if (mod && (key === 'y' || (key === 'z' && e.shiftKey))) {
-      e.preventDefault();
-      this.redo();
-      return;
-    }
-    if (e.key === 'Tab') {
-      e.preventDefault();
-      return;
-    }
-    if (this.composing) return;
+    if (e.key === 'Escape') this.host.onRequestExit('escape');
+    else if (isUndo) this.undo();
+    else if (isRedo) this.redo();
+    else if (e.key === 'Tab') return true;
+    else return false;
+    return true;
+  }
 
-    if ((e.key === 'ArrowUp' || e.key === 'ArrowDown') && !mod && !e.altKey) {
-      e.preventDefault();
+  private handleNavigationKey(e: KeyboardEvent): boolean {
+    const mod = e.ctrlKey || e.metaKey;
+    if (mod) return false;
+    if ((e.key === 'ArrowUp' || e.key === 'ArrowDown') && !e.altKey) {
       this.moveVertically(e.key === 'ArrowUp' ? -1 : 1, e.shiftKey);
-      return;
+      return true;
     }
-    if ((e.key === 'Home' || e.key === 'End') && !mod) {
-      e.preventDefault();
+    if (e.key === 'Home' || e.key === 'End') {
       const layout = this.target.getLayout();
       const to =
         e.key === 'Home'
@@ -309,6 +297,23 @@ export class TextEditSession {
           : lineEnd(layout, this.model.focus);
       this.model.moveTo(to, e.shiftKey);
       this.afterSelectionChange();
+      return true;
+    }
+    return false;
+  }
+
+  private onKeyDown = (e: KeyboardEvent) => {
+    // The app listens for keys on `document` (e.g. undo): the editor must be
+    // the only consumer while it has focus.
+    e.stopPropagation();
+
+    if (this.handleSessionKey(e)) {
+      e.preventDefault();
+      return;
+    }
+    if (this.composing) return;
+    if (this.handleNavigationKey(e)) {
+      e.preventDefault();
       return;
     }
     // Everything else (typing, left/right, word moves, select-all, copy,
@@ -330,13 +335,11 @@ export class TextEditSession {
 
   private moveVertically(dir: -1 | 1, extend: boolean) {
     const layout = this.target.getLayout();
-    if (this.model.desiredX === null) {
-      this.model.desiredX = caretRect(
-        layout,
-        this.model.focus,
-        this.target.measure
-      ).x;
-    }
+    this.model.desiredX ??= caretRect(
+      layout,
+      this.model.focus,
+      this.target.measure
+    ).x;
     const to = moveVertical(
       layout,
       this.model.focus,
@@ -369,14 +372,7 @@ export class TextEditSession {
     }
     const inserted = newText.slice(p, newText.length - s);
     const inputType = (e as InputEvent).inputType ?? '';
-    const kind: EditKind =
-      this.composing || inputType.includes('Composition')
-        ? 'ime'
-        : inputType.startsWith('delete')
-        ? 'delete'
-        : inputType === 'insertFromPaste'
-        ? 'paste'
-        : 'type';
+    const kind = this.editKindFor(inputType);
 
     this.model.replaceRange(p, oldText.length - s, inserted, kind);
     // Keep the caret the browser computed (mid-composition, mid-text).
@@ -386,6 +382,13 @@ export class TextEditSession {
     );
     this.afterContentChange(inserted.length);
   };
+
+  private editKindFor(inputType: string): EditKind {
+    if (this.composing || inputType.includes('Composition')) return 'ime';
+    if (inputType.startsWith('delete')) return 'delete';
+    if (inputType === 'insertFromPaste') return 'paste';
+    return 'type';
+  }
 
   private onPaste = (e: ClipboardEvent) => {
     e.stopPropagation();

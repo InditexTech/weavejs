@@ -8,11 +8,14 @@ import {
   canvasMeasurer,
   fontString,
   type TextAlign,
+  type LayoutLine,
   type TextLayout,
   type TextLayoutStyle,
   type TextWrap,
 } from './layout/engine';
 import { blocksToText, resolveBlocks, type WeaveTextBlock } from './model';
+
+export type TextVerticalAlign = 'top' | 'middle' | 'bottom';
 
 const LAYOUT_ATTRS = [
   'text',
@@ -42,7 +45,7 @@ export type TextV2ShapeConfig = Konva.ShapeConfig & {
   letterSpacing?: number;
   wrap?: TextWrap;
   align?: TextAlign;
-  verticalAlign?: 'top' | 'middle' | 'bottom';
+  verticalAlign?: TextVerticalAlign;
   padding?: number;
   textDecoration?: string;
   link?: string;
@@ -148,11 +151,9 @@ export class WeaveTextV2Shape extends Konva.Shape {
   align(v?: TextAlign): TextAlign | this {
     return this.accessor('align', 'left' as TextAlign, v);
   }
-  verticalAlign(): 'top' | 'middle' | 'bottom';
-  verticalAlign(v: 'top' | 'middle' | 'bottom'): this;
-  verticalAlign(
-    v?: 'top' | 'middle' | 'bottom'
-  ): 'top' | 'middle' | 'bottom' | this {
+  verticalAlign(): TextVerticalAlign;
+  verticalAlign(v: TextVerticalAlign): this;
+  verticalAlign(v?: TextVerticalAlign): TextVerticalAlign | this {
     return this.accessor('verticalAlign', 'top' as const, v);
   }
   wrap(): TextWrap;
@@ -314,14 +315,8 @@ export class WeaveTextV2Shape extends Konva.Shape {
     const layout = self.ensureLayout();
     if (layout.lines.length === 0) return;
 
-    const fontSize = self.fontSize();
     const padding = self.padding();
     const lineHeightPx = layout.lineHeightPx;
-    const decoration = self.textDecoration();
-    const underline = decoration.includes('underline');
-    const lineThrough = decoration.includes('line-through');
-    const spacing = self.letterSpacing();
-    const fill = self.fill();
 
     let baseline: CanvasTextBaseline = 'middle';
     let translateY = lineHeightPx / 2;
@@ -335,76 +330,85 @@ export class WeaveTextV2Shape extends Konva.Shape {
     ctx.setAttr('textBaseline', baseline);
     ctx.setAttr('textAlign', 'left');
 
-    let alignY = 0;
-    const va = self.verticalAlign();
-    const used = layout.lines.length * lineHeightPx + padding * 2;
-    if (va === 'middle') alignY = (self.getHeight() - used) / 2;
-    else if (va === 'bottom') alignY = self.getHeight() - used;
+    const alignY = self.verticalOffset(layout);
     ctx.translate(padding, alignY + padding);
 
     const range = self.visibleRange();
-    const paintSelf = self as unknown as {
+    const top = alignY + padding;
+    for (let n = 0; n < layout.lines.length; n++) {
+      const lineTop = top + n * lineHeightPx;
+      // line-level culling (local coords, with one line of slack)
+      if (
+        range &&
+        (lineTop + lineHeightPx < range.y1 - lineHeightPx ||
+          lineTop > range.y2 + lineHeightPx)
+      ) {
+        continue;
+      }
+      self.paintLine(ctx, layout.lines[n], translateY + n * lineHeightPx);
+    }
+  };
+
+  /** Vertical offset of the text block inside the box (verticalAlign). */
+  private verticalOffset(layout: TextLayout): number {
+    const used = layout.lines.length * layout.lineHeightPx + this.padding() * 2;
+    const va = this.verticalAlign();
+    if (va === 'middle') return (this.getHeight() - used) / 2;
+    if (va === 'bottom') return this.getHeight() - used;
+    return 0;
+  }
+
+  private paintLine(ctx: Konva.Context, line: LayoutLine, y: number) {
+    const decoration = this.textDecoration();
+    const fontSize = this.fontSize();
+    ctx.save();
+    if (decoration.includes('underline')) {
+      this.strokeDecoration(ctx, line, y + Math.round(fontSize / 4));
+    }
+    for (const seg of line.segments) {
+      this.paintSegment(ctx, seg.t, line.offsetX + seg.x, y);
+    }
+    if (decoration.includes('line-through')) {
+      this.strokeDecoration(ctx, line, y - Math.round(fontSize / 4));
+    }
+    ctx.restore();
+  }
+
+  private strokeDecoration(ctx: Konva.Context, line: LayoutLine, y: number) {
+    ctx.save();
+    ctx.beginPath();
+    ctx.moveTo(line.offsetX, y);
+    ctx.lineTo(line.offsetX + Math.round(line.width), y);
+    ctx.lineWidth = this.fontSize() / 15;
+    ctx.strokeStyle = this.fill() as string;
+    ctx.stroke();
+    ctx.restore();
+  }
+
+  private paintSegment(ctx: Konva.Context, text: string, x: number, y: number) {
+    const spacing = this.letterSpacing();
+    if (spacing === 0) {
+      this.fillText(ctx, text, x, y);
+      return;
+    }
+    let cx = x;
+    for (const ch of Array.from(text)) {
+      this.fillText(ctx, ch, cx, y);
+      cx += this.measureSize(ch).width + spacing;
+    }
+  }
+
+  private fillText(ctx: Konva.Context, text: string, x: number, y: number) {
+    const self = this as unknown as {
       _partialText: string;
       _partialTextX: number;
       _partialTextY: number;
     };
-
-    for (let n = 0; n < layout.lines.length; n++) {
-      const line = layout.lines[n];
-      const y = translateY + n * lineHeightPx;
-      // line-level culling (local coords, with one line of slack)
-      if (
-        range &&
-        (alignY + padding + n * lineHeightPx + lineHeightPx <
-          range.y1 - lineHeightPx ||
-          alignY + padding + n * lineHeightPx > range.y2 + lineHeightPx)
-      ) {
-        continue;
-      }
-      ctx.save();
-      const baseX = line.offsetX;
-      if (underline) {
-        ctx.save();
-        ctx.beginPath();
-        const uy = y + Math.round(fontSize / 4);
-        ctx.moveTo(baseX, uy);
-        ctx.lineTo(baseX + Math.round(line.width), uy);
-        ctx.lineWidth = fontSize / 15;
-        ctx.strokeStyle = fill as string;
-        ctx.stroke();
-        ctx.restore();
-      }
-      for (const seg of line.segments) {
-        let x = baseX + seg.x;
-        if (spacing !== 0) {
-          for (const ch of Array.from(seg.t)) {
-            paintSelf._partialText = ch;
-            paintSelf._partialTextX = x;
-            paintSelf._partialTextY = y;
-            ctx.fillStrokeShape(self);
-            x += self.measureSize(ch).width + spacing;
-          }
-        } else {
-          paintSelf._partialText = seg.t;
-          paintSelf._partialTextX = x;
-          paintSelf._partialTextY = y;
-          ctx.fillStrokeShape(self);
-        }
-      }
-      if (lineThrough) {
-        ctx.save();
-        ctx.beginPath();
-        const ly = y - Math.round(fontSize / 4);
-        ctx.moveTo(baseX, ly);
-        ctx.lineTo(baseX + Math.round(line.width), ly);
-        ctx.lineWidth = fontSize / 15;
-        ctx.strokeStyle = fill as string;
-        ctx.stroke();
-        ctx.restore();
-      }
-      ctx.restore();
-    }
-  };
+    self._partialText = text;
+    self._partialTextX = x;
+    self._partialTextY = y;
+    ctx.fillStrokeShape(this);
+  }
 
   _hitFunc = (ctx: Konva.Context, shape: Konva.Shape) => {
     ctx.beginPath();

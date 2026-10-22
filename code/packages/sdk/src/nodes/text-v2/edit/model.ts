@@ -27,7 +27,7 @@ export class TextEditModel {
   /** x kept while moving vertically; reset by any other move. */
   desiredX: number | null = null;
 
-  private undoStack: Snapshot[] = [];
+  private readonly undoStack: Snapshot[] = [];
   private redoStack: Snapshot[] = [];
   private lastKind: EditKind | null = null;
   private lastEditEnd = -1;

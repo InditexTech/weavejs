@@ -37,6 +37,8 @@ import type {
 
 const CORNER_ANCHORS = ['top-left', 'top-right', 'bottom-left', 'bottom-right'];
 const SIDE_ANCHORS = ['middle-right', 'middle-left'];
+const CORNER_ANCHOR_SET = new Set(CORNER_ANCHORS);
+const SIDE_ANCHOR_SET = new Set(SIDE_ANCHORS);
 
 /**
  * Drop-in replacement for `WeaveTextNode`. Same `nodeType` (`'text'`), so
@@ -45,7 +47,7 @@ const SIDE_ANCHORS = ['middle-right', 'middle-left'];
  * (blocks/runs model + layout engine) instead of `Konva.Text`.
  */
 export class WeaveTextV2Node extends WeaveNode {
-  private config: WeaveTextV2Properties;
+  private readonly config: WeaveTextV2Properties;
   protected nodeType: string = WEAVE_TEXT_NODE_TYPE;
   private createNode = false;
   private editing = false;
@@ -459,8 +461,8 @@ export class WeaveTextV2Node extends WeaveNode {
 
   private setupTransform(text: WeaveTextV2Shape) {
     let actualAnchor: string | null | undefined = undefined;
-    const isSide = () => SIDE_ANCHORS.includes(actualAnchor ?? '');
-    const isCorner = () => CORNER_ANCHORS.includes(actualAnchor ?? '');
+    const isSide = () => SIDE_ANCHOR_SET.has(actualAnchor ?? '');
+    const isCorner = () => CORNER_ANCHOR_SET.has(actualAnchor ?? '');
     const autoWidthLayout = () =>
       [TEXT_LAYOUT.AUTO_HEIGHT, TEXT_LAYOUT.SMART].includes(
         text.getAttrs().layout

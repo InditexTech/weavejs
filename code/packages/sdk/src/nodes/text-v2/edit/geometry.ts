@@ -103,12 +103,7 @@ export function lineIndexAt(layout: TextLayout, offset: number): number {
     if (offset >= l.start && offset <= l.end) {
       const next = lines[i + 1];
       // A soft-wrap boundary belongs to the start of the next line.
-      if (
-        offset === l.end &&
-        !l.lastInParagraph &&
-        next &&
-        next.start === offset
-      ) {
+      if (offset === l.end && !l.lastInParagraph && next?.start === offset) {
         continue;
       }
       return i;
@@ -183,8 +178,7 @@ export function moveVertical(
   const j = i + dir;
   if (j < 0) return 0;
   if (j >= layout.lines.length) {
-    const last = layout.lines[layout.lines.length - 1];
-    return last ? last.end : 0;
+    return layout.lines.at(-1)?.end ?? 0;
   }
   return offsetInLine(layout.lines[j], desiredX, measure);
 }

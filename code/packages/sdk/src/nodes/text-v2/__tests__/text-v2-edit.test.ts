@@ -178,7 +178,10 @@ describe('WeaveTextV2Node edit outline config', () => {
 
   it('edition.borderSize is not part of the text-v2 config type', () => {
     // @ts-expect-error borderSize was removed from WeaveTextV2Properties
-    new WeaveTextV2Node({ config: { edition: { borderSize: 4 } } });
+    const node = new WeaveTextV2Node({
+      config: { edition: { borderSize: 4 } },
+    });
+    expect(node).toBeInstanceOf(WeaveTextV2Node);
   });
 });
 
@@ -345,7 +348,7 @@ describe('WeaveTextV2Node edit lifecycle', () => {
     const warns = t.events.filter(([n]) => n === 'onTextSizeWarning');
     expect(warns).toHaveLength(1);
     expect((warns[0][1] as { threshold: number }).threshold).toBe(200);
-    expect(t.shape.text().length).toBe(500); // never truncated
+    expect(t.shape.text()).toHaveLength(500); // never truncated
     t.esc();
   });
 

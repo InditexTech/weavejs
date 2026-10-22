@@ -35,7 +35,7 @@ export function normalizeRuns(runs: WeaveTextRun[]): WeaveTextRun[] {
   const out: WeaveTextRun[] = [];
   for (const run of runs) {
     if (run.t === '') continue;
-    const last = out[out.length - 1];
+    const last = out.at(-1);
     if (last && sameMarks(last.m, run.m)) {
       last.t += run.t;
     } else {
@@ -139,7 +139,7 @@ export function replaceRange(
   let inheritedMarks: WeaveTextMarks | undefined;
   let pos = 0;
 
-  blocks.forEach((block, i) => {
+  blocks.forEach((block) => {
     const len = blockText(block).length;
     const bStart = pos;
     const bEnd = pos + len; // newline sits at bEnd (if not last)
@@ -159,7 +159,6 @@ export function replaceRange(
         after = sliceRuns(block.runs, end - bStart, len);
       }
     }
-    void i;
   });
 
   const lines = insert.split('\n');
