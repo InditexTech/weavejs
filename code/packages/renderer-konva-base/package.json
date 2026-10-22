@@ -14,18 +14,18 @@
       "email": "jesusmpc@inditex.com"
     }
   ],
-  "main": "./dist/renderer-konva-base.cjs",
+  "main": "./dist/renderer-konva-base.js",
   "module": "./dist/renderer-konva-base.js",
   "exports": {
     ".": {
       "types": "./dist/types.d.ts",
       "import": "./dist/renderer-konva-base.js",
-      "require": "./dist/renderer-konva-base.cjs"
+      "default": "./dist/renderer-konva-base.js"
     },
     "./server": {
       "types": "./dist/types.d.ts",
       "import": "./dist/renderer-konva-base.node.js",
-      "require": "./dist/renderer-konva-base.node.cjs"
+      "default": "./dist/renderer-konva-base.node.js"
     }
   },
   "files": [
@@ -82,6 +82,14 @@
     "canvas": "3.2.0",
     "konva": "10.0.2",
     "skia-canvas": "3.0.8"
+  },
+  "peerDependenciesMeta": {
+    "canvas": {
+      "optional": true
+    },
+    "skia-canvas": {
+      "optional": true
+    }
   },
   "engines": {
     "node": ">=18.12",

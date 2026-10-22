@@ -15,8 +15,9 @@
     }
   ],
   "exports": {
+    "types": "./dist/types.d.ts",
     "import": "./dist/types.js",
-    "require": "./dist/types.cjs"
+    "default": "./dist/types.js"
   },
   "types": "dist/types.d.ts",
   "files": [
