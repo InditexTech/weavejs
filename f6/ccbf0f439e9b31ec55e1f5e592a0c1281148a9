@@ -1,0 +1,49 @@
+code/CHANGELOG.md
+  s_ed7562a1ffb8de::t_c5581daee809e7 18-19
+code/package-lock.json
+  s_ed7562a1ffb8de::t_7f1d8cca569e80 6763,6775,7066,7115,7674,7697,7868,9150,9489,9610,9845,10359,12117,12175,12227,12279,12292,13537,13792,13808,13815,14021,15392,15413,15650,15937,15950,16318,16901,17863-17870,17914-17921,17944,17970-17977
+code/packages/create-backend-app/src/create-app.ts
+  s_ed7562a1ffb8de::t_f2788f13eb9159 119,130,191,202
+code/packages/create-backend-app/template/package.json
+  s_ed7562a1ffb8de::t_e5000b42ccbdec 16,27
+code/packages/react/package.json
+  s_ed7562a1ffb8de::t_57573c6c3c0a3a 18,20
+code/packages/renderer-konva-base/package.json
+  s_ed7562a1ffb8de::t_674e7a140d2b87 17,23,28,86-93
+code/packages/renderer-konva-react-reconciler/package.json
+  s_ed7562a1ffb8de::t_a41e0b0048925f 17,23,28,91-98
+code/packages/sdk/package.json
+  s_ed7562a1ffb8de::t_31c77f9ee02707 17,23,28,74,97-104
+code/packages/sdk/src/__tests__/backend.test.ts
+  s_ed7562a1ffb8de::t_2add07cec2bb17 9,37-88
+code/packages/sdk/src/backend.ts
+  s_ed7562a1ffb8de::t_8d363f48d72a4c 6,10-14,19-23
+code/packages/sdk/src/utils/native-backend.ts
+  s_ed7562a1ffb8de::t_e0d6e1b1caf54b 1-32
+code/packages/store-azure-web-pubsub/package.json
+  s_ed7562a1ffb8de::t_4ea19838f1b27f 21,26
+code/packages/store-standalone/package.json
+  s_ed7562a1ffb8de::t_adb2ac66ce72c0 21,26
+code/packages/store-websockets/package.json
+  s_ed7562a1ffb8de::t_4cf17d73a04f4e 21,26
+code/packages/types/package.json
+  s_ed7562a1ffb8de::t_bcf7f65c3023b1 18,20
+docs/src/modules/sdk/pages/setup.adoc
+  s_ed7562a1ffb8de::t_81ab6e0f8bf4b7 11-34,41-45
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "f6ccbf0f439e9b31ec55e1f5e592a0c1281148a9",
+  "prompts": {},
+  "sessions": {
+    "s_ed7562a1ffb8de": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "ses_e9d509ce4ffeipyjAk4uf4CTol",
+        "model": "claude-sonnet-5.5"
+      },
+      "human_author": "Jesus Manuel Piñeiro Cid <jesusmpc@inditex.com>"
+    }
+  }
+}
