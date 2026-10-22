@@ -1,0 +1,69 @@
+AGENTS.md
+  s_45c935df38c80e::t_87c7b312e8b553 105-112
+code/CHANGELOG.md
+  s_45c935df38c80e::t_2a55c8605f5ed3 19,23-26
+code/packages/sdk/src/actions/ellipse-tool/__tests__/ellipse-tool.test.ts
+  s_45c935df38c80e::t_4b49a247202023 260-329
+code/packages/sdk/src/actions/ellipse-tool/ellipse-tool.ts
+  s_45c935df38c80e::t_4c4bd1049bb01f 18-22,74-80,126,142,179-180,191,202,206,209-215,240,252-255,264-267
+code/packages/sdk/src/actions/polygon-tool/__tests__/polygon-tool.test.ts
+  s_45c935df38c80e::t_3f0865df7abebd 50-56,69-72,82-84,90,167-170,213,230,235,239-242,246-277,286-287,297,305-306,315-353,376-440
+code/packages/sdk/src/actions/polygon-tool/constants.ts
+  s_45c935df38c80e::t_80c998ea75892a 10
+code/packages/sdk/src/actions/polygon-tool/polygon-tool.ts
+  s_45c935df38c80e::t_a35964aa0c7422 6,8-11,26-32,38-43,59-64,96-102,113-116,123-160,172,180-182,184,209,213-227,229-272,290,312-319,323-325,333-338
+code/packages/sdk/src/actions/rectangle-tool/__tests__/rectangle-tool.test.ts
+  s_45c935df38c80e::t_9aceff80580b61 789-794
+code/packages/sdk/src/actions/rectangle-tool/rectangle-tool.ts
+  s_45c935df38c80e::t_ce87b435076d0e 17-21,74-80,128,142,191,204-211,260,277-280,283-286
+code/packages/sdk/src/actions/regular-polygon-tool/__tests__/regular-polygon-tool.test.ts
+  s_45c935df38c80e::t_09d898aec57b22 752-825
+code/packages/sdk/src/actions/regular-polygon-tool/regular-polygon-tool.ts
+  s_45c935df38c80e::t_809c6444b4fd40 21-25,76-84,130,146,193,213,219-224,248,267-270,281-283
+code/packages/sdk/src/actions/shared/__tests__/shape-geometry.test.ts
+  s_45c935df38c80e::t_40b8fcfeae7f94 1-90
+code/packages/sdk/src/actions/shared/shape-geometry.ts
+  s_45c935df38c80e::t_0ceaa1cddcb6d0 1-71
+code/packages/sdk/src/actions/shared/shape-keyboard.ts
+  s_45c935df38c80e::t_7b157b0a84f19e 1-55
+code/packages/sdk/src/nodes/__tests__/node.events.test.ts
+  s_45c935df38c80e::t_8d829d73f2cffc 17,338,340-343,345,348,351,1380-1462
+code/packages/sdk/src/nodes/comment/comment.ts
+  s_45c935df38c80e::t_ca2cda4b60d6c0 630
+code/packages/sdk/src/nodes/image/image.ts
+  s_45c935df38c80e::t_ba9288d8309ca4 1613
+code/packages/sdk/src/nodes/node.ts
+  s_45c935df38c80e::t_4c6999240a13c8 20-23,43-49,419,430-431,541-546,548-553,555,1186,1190-1241
+docs/src/modules/main/pages/build/actions/ellipse-tool.adoc
+  s_45c935df38c80e::t_bb7f1b69f20619 77-80
+docs/src/modules/main/pages/build/actions/polygon-tool.adoc
+  s_45c935df38c80e::t_c299ac68739488 6,91-94
+docs/src/modules/main/pages/build/actions/rectangle-tool.adoc
+  s_45c935df38c80e::t_26432ca3a9c61b 77-79
+docs/src/modules/main/pages/build/actions/regular-polygon-tool.adoc
+  s_45c935df38c80e::t_154683e8a7ad9c 83
+docs/src/modules/sdk/pages/api-reference/actions/ellipse-tool.adoc
+  s_45c935df38c80e::t_999da34a09fa8e 15-16
+docs/src/modules/sdk/pages/api-reference/actions/polygon-tool.adoc
+  s_45c935df38c80e::t_727728873f80ad 8,17-18,71
+docs/src/modules/sdk/pages/api-reference/actions/rectangle-tool.adoc
+  s_45c935df38c80e::t_e019b4cd7dcfa2 15-16
+docs/src/modules/sdk/pages/api-reference/actions/regular-polygon-tool.adoc
+  s_45c935df38c80e::t_141ad97dae6f45 20-21
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "36eecb3223aed2601ef48e7c439c01414f2deea7",
+  "prompts": {},
+  "sessions": {
+    "s_45c935df38c80e": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "ses_e9d779e0dffefPQ6jGlZN6eSL7",
+        "model": "claude-sonnet-5.5"
+      },
+      "human_author": "Jesus Manuel Piñeiro Cid <jesusmpc@inditex.com>"
+    }
+  }
+}
