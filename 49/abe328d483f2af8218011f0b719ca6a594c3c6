@@ -1,0 +1,23 @@
+code/packages/sdk/src/nodes/text-v2/__tests__/text-v2.test.ts
+  s_236fa6c66b1306::t_4f7895e05a7997 167-182
+code/packages/sdk/src/nodes/text-v2/shape.ts
+  s_236fa6c66b1306::t_e79e7b4e58d8c1 309-312,409
+code/packages/sdk/src/nodes/text-v2/text-v2.ts
+  s_236fa6c66b1306::t_f998545b0b92d6 617-620
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.6",
+  "base_commit_sha": "49abe328d483f2af8218011f0b719ca6a594c3c6",
+  "prompts": {},
+  "sessions": {
+    "s_236fa6c66b1306": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "ses_e9c68953effe7Km6dHutRPYIH1",
+        "model": "claude-sonnet-5.5"
+      },
+      "human_author": "Jesus Manuel Piñeiro Cid <jesusmpc@inditex.com>"
+    }
+  }
+}
