@@ -199,3 +199,73 @@ removeLink(nodeInstance: WeaveElementInstance): void
 
 Removes the link from a text node. The node's original `fill`/`textDecoration` reappear
 immediately, since they were never altered while the link was set.
+
+== WeaveTextV2Node (native on-canvas editing)
+
+[NOTE]
+====
+mono:[WeaveTextV2Node] is a drop-in replacement for mono:[WeaveTextNode]. It is opt-in and the
+existing class is unchanged.
+====
+
+mono:[WeaveTextV2Node] keeps `nodeType` `text`, so existing documents load and render without
+migration. Register it *instead of* mono:[WeaveTextNode]; a Weave instance holds one handler per node
+type, so both cannot be registered together.
+
+[source,ts]
+----
+import { WeaveTextV2Node } from "@inditextech/weave-sdk";
+
+const nodes = [new WeaveTextV2Node()];
+----
+
+=== Differences from WeaveTextNode
+
+* Renders through mono:[WeaveTextV2Shape] (a mono:[Konva.Shape]) with its own layout engine, with
+  Konva.Text-compatible getters (mono:[text()], mono:[fontSize()], mono:[getTextWidth()], ...).
+  The mono:[onEnterTextNodeEditMode] and mono:[onExitTextNodeEditMode] payload `node` is a
+  mono:[WeaveTextV2Shape], not a mono:[Konva.Text].
+* Editing happens on the canvas: a hidden proxy textarea handles typing, IME and clipboard, and
+  the caret and selection are painted on the utility layer. There is no DOM overlay.
+* Selection supports click, drag, double-click (word), triple-click (paragraph), arrows,
+  kbd:[Home]/kbd:[End] and kbd:[Up]/kbd:[Down] on visual lines.
+* Undo/redo is local to the edit session (typing, deletion, paste and IME composition each
+  coalesce into one step). Leaving edit mode commits a single mono:[updateNode], skipped when the
+  text is unchanged. While editing, keydown does not propagate to the page, so app-level undo
+  does not fire; `window.weaveTextEditing` holds the editing node id.
+* Clipboard is plain text only. Large pastes are laid out in time slices.
+* All four layouts (`smart`, `auto-all`, `auto-height`, `fixed`) keep their behavior.
+  Auto-sized layouts measure from the engine and no longer depend on the zoom level.
+
+=== Content model
+
+Content is stored as `blocks` (paragraphs) of `runs` (`{ t, m }`: text and marks). The `text`
+prop stays as a derived mirror. A node without `blocks` is synthesized from `text` on load
+without rewriting the document; a whole-text `link` becomes a full-range `link` mark. Existing
+marks are rendered and preserved on edit, but cannot be created from the editor (rich formatting
+is out of scope).
+
+=== Configuration
+
+Same properties as mono:[WeaveTextNode], plus:
+
+[cols="1,1,3"]
+|===
+|Property |Default |Description
+
+|mono:[sizeWarning.threshold]
+|`200000`
+|Serialized size of `blocks` (characters) above which the mono:[onTextSizeWarning] event is emitted
+(payload mono:[{ node, size, threshold }]). Content is never truncated.
+|===
+
+=== Exports
+
+mono:[WeaveTextV2Node], mono:[WeaveTextV2Shape], mono:[TextLayoutEngine], mono:[TextEditSession],
+mono:[TextEditModel] and the related types. mono:[TextEditSession] works on a mono:[TextEditTarget]
+and mono:[TextEditHost], so other shapes can reuse the layout engine and editor.
+
+=== Server side
+
+Measurement and painting work on the node-canvas backend (`setupCanvasBackend()`). Layout and painting were also verified on the skia-canvas backend (`setupSkiaBackend()`). Register
+fonts in your app; they are not registered by the SDK.

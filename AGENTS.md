@@ -115,3 +115,5 @@ npx skills@latest add InditexTech/docouture --all
 | sdk:api-reference/weave/index.adoc | `code/packages/sdk/src/weave.ts` (`flipImage`) | updated for unreleased changes |
 | sdk:api-reference/nodes/stroke.adoc | `code/packages/sdk/src/nodes/stroke/{types,constants}.ts` | updated for unreleased changes |
 | sdk:api-reference/actions/brush-tool.adoc | `code/packages/sdk/src/actions/brush-tool/{types,constants}.ts` | updated for unreleased changes |
+| main:build/nodes/text.adoc | `code/packages/sdk/src/nodes/text-v2/*` | updated for unreleased changes |
+| sdk:api-reference/nodes/text.adoc | `code/packages/sdk/src/nodes/text-v2/*` | updated for unreleased changes |
