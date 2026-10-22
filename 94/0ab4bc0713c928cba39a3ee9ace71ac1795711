@@ -1,0 +1,29 @@
+code/packages/sdk/src/nodes/image/__tests__/flip.integration.test.ts
+  s_b00cb69d45d2ee::t_e6e8990cf18712 1-213
+code/packages/sdk/src/nodes/image/__tests__/flip.render.test.ts
+  s_b00cb69d45d2ee::t_2cf29bdb9f593e 1-86
+code/packages/sdk/src/nodes/image/__tests__/flip.test.ts
+  s_b00cb69d45d2ee::t_41b0e6c80e1119 163,169-170,173-181
+code/packages/sdk/src/nodes/image/image.ts
+  s_b00cb69d45d2ee::t_83b603e2b1d2dd 1897,1901
+openspec/changes/add-image-flip/design.md
+  s_b00cb69d45d2ee::t_a86872adc7dc8b 19
+openspec/changes/add-image-flip/tasks.md
+  s_b00cb69d45d2ee::t_d5780d22abb612 10
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "940ab4bc0713c928cba39a3ee9ace71ac1795711",
+  "prompts": {},
+  "sessions": {
+    "s_b00cb69d45d2ee": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "ses_e9d41592affePyiOpSHae98947",
+        "model": "claude-sonnet-5.5"
+      },
+      "human_author": "Jesus Manuel Piñeiro Cid <jesusmpc@inditex.com>"
+    }
+  }
+}
