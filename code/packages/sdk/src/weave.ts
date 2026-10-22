@@ -417,7 +417,7 @@ export class Weave {
 
   emitEvent<T>(event: string, payload?: T): void {
     this.moduleLogger.debug({ payload }, `Emitted event [${event}]`);
-    this.emitter.emit(event, payload);
+    void this.emitter.emit(event, payload);
   }
 
   addEventListener<T>(event: string, callback: (payload: T) => void): void {
@@ -427,7 +427,7 @@ export class Weave {
 
   addOnceEventListener<T>(event: string, callback: (payload: T) => void): void {
     this.moduleLogger.debug(`Listening once event [${event}]`);
-    this.emitter.once(event).then(callback);
+    void this.emitter.once(event).then(callback);
   }
 
   removeEventListener<T>(event: string, callback: (payload: T) => void): void {
@@ -628,7 +628,7 @@ export class Weave {
   }
 
   registerNodeHandler(node: WeaveNode): void {
-    this.registerManager.registerNodeHandler(node);
+    void this.registerManager.registerNodeHandler(node);
   }
 
   registerActionHandler(action: WeaveAction): void {
@@ -942,7 +942,7 @@ export class Weave {
     }
 
     if (nodeInstance) {
-      this.getHooks().callHook('weave:onRemoveNode', nodeInstance);
+      void this.getHooks().callHook('weave:onRemoveNode', nodeInstance);
     }
 
     this.runPhaseHooks<{
@@ -1109,6 +1109,19 @@ export class Weave {
     height: number;
   } {
     return getBoundingBox(nodes, config);
+  }
+
+  flipImage(
+    node: Konva.Group,
+    options: { axis: 'horizontal' | 'vertical' }
+  ): void {
+    const handler = this.getNodeHandler<{
+      flipImage: (
+        node: Konva.Group,
+        options: { axis: 'horizontal' | 'vertical' }
+      ) => void;
+    }>('image');
+    handler?.flipImage(node, options);
   }
 
   stateTransactional(callback: () => void, origin?: string): void {

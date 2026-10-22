@@ -67,6 +67,8 @@ export const augmentKonvaNodeClass = (
   Konva.Node.prototype.triggerCrop = function () {};
   Konva.Node.prototype.closeCrop = function () {};
   Konva.Node.prototype.resetCrop = function () {};
+  Konva.Node.prototype.flipHorizontal = function () {};
+  Konva.Node.prototype.flipVertical = function () {};
   Konva.Node.prototype.dblClick = function () {};
   Konva.Node.prototype.click = function () {};
   Konva.Node.prototype.allowedAnchors = function () {
@@ -169,6 +171,8 @@ export abstract class WeaveNode implements WeaveNodeBase {
     };
     node.updatePosition = function () {};
     node.resetCrop = function () {};
+    node.flipHorizontal = function () {};
+    node.flipVertical = function () {};
     node.handleMouseover = function () {};
     node.handleMouseout = function () {};
     node.handleSelectNode = function () {};

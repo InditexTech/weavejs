@@ -15,6 +15,7 @@ import {
   type WeaveImageCropAnchorPosition,
   type WeaveImageCropEndType,
   type WeaveImageCursors,
+  type WeaveImageFlipOptions,
   type WeaveImageNodeParams,
   type WeaveImageOnCropEndEvent,
   type WeaveImageOnCropStartEvent,
@@ -131,7 +132,7 @@ export class WeaveImageNode extends WeaveNode {
 
   preloadCursors() {
     return new Promise<void>((resolve) => {
-      (async () => {
+      void (async () => {
         await doPreloadCursors(
           this.config.style.cursor,
           (state, cursor) => {
@@ -286,6 +287,45 @@ export class WeaveImageNode extends WeaveNode {
     imageCrop.unCrop();
   };
 
+  flipImage = (
+    imageNode: Konva.Group,
+    options: WeaveImageFlipOptions
+  ): void => {
+    if (imageNode.getAttrs().cropping) {
+      return;
+    }
+
+    const prop = options.axis === 'horizontal' ? 'flipX' : 'flipY';
+
+    this.instance.stateTransactional(() => {
+      imageNode.setAttrs({ [prop]: !(imageNode.getAttrs()[prop] ?? false) });
+      this.applyFlip(imageNode);
+      this.cacheNode(imageNode as WeaveElementInstance);
+      this.instance.updateNode(
+        this.serialize(imageNode as WeaveElementInstance)
+      );
+    });
+  };
+
+  applyFlip(image: Konva.Group): void {
+    const attrs = image.getAttrs();
+    const internalImage = image.findOne(`#${attrs.id}-image`) as
+      | Konva.Image
+      | undefined;
+
+    if (!internalImage) {
+      return;
+    }
+
+    const flipX = attrs.flipX === true;
+    const flipY = attrs.flipY === true;
+
+    internalImage.scaleX(flipX ? -1 : 1);
+    internalImage.scaleY(flipY ? -1 : 1);
+    internalImage.offsetX(flipX ? internalImage.width() : 0);
+    internalImage.offsetY(flipY ? internalImage.height() : 0);
+  }
+
   loadAsyncElement(nodeId: string) {
     this.instance.loadAsyncElement(nodeId, WEAVE_IMAGE_NODE_TYPE);
   }
@@ -373,6 +413,14 @@ export class WeaveImageNode extends WeaveNode {
         imageCrop.unCrop();
       };
     }
+
+    image.flipHorizontal = () => {
+      this.flipImage(image, { axis: 'horizontal' });
+    };
+
+    image.flipVertical = () => {
+      this.flipImage(image, { axis: 'vertical' });
+    };
 
     const defaultTransformerProperties = this.defaultGetTransformerProperties(
       this.config.transform
@@ -1398,6 +1446,11 @@ export class WeaveImageNode extends WeaveNode {
   }
 
   updateImageCrop(image: Konva.Group): void {
+    this.updateImageCropGeometry(image);
+    this.applyFlip(image);
+  }
+
+  private updateImageCropGeometry(image: Konva.Group): void {
     const imageAttrs = image.getAttrs();
 
     const internalImage = image?.findOne(`#${imageAttrs.id}-image`) as
@@ -1533,11 +1586,14 @@ export class WeaveImageNode extends WeaveNode {
     }
 
     if (internalImage) {
+      // the sign of the internal image scale only carries the flip: bake the
+      // magnitude, updateImageCrop reapplies the flip afterwards
+      internalImage.offset({ x: 0, y: 0 });
       internalImage.width(
-        Math.max(5, internalImage.width() * internalImage.scaleX())
+        Math.max(5, internalImage.width() * Math.abs(internalImage.scaleX()))
       );
       internalImage.height(
-        Math.max(5, internalImage.height() * internalImage.scaleY())
+        Math.max(5, internalImage.height() * Math.abs(internalImage.scaleY()))
       );
       internalImage.scale({ x: 1, y: 1 });
     }
@@ -1735,6 +1791,8 @@ export class WeaveImageNode extends WeaveNode {
           height: props.uncroppedImage.height,
         },
         cropping: props.cropping,
+        ...(props.flipX !== undefined && { flipX: props.flipX }),
+        ...(props.flipY !== undefined && { flipY: props.flipY }),
       },
     });
   }
@@ -1770,6 +1828,8 @@ export class WeaveImageNode extends WeaveNode {
           },
         }),
         cropping: nextProps.cropping,
+        ...(nextProps.flipX !== undefined && { flipX: nextProps.flipX }),
+        ...(nextProps.flipY !== undefined && { flipY: nextProps.flipY }),
       },
     });
   }
@@ -1832,6 +1892,14 @@ export class WeaveImageNode extends WeaveNode {
           .boolean()
           .default(false)
           .describe('Whether the image is currently being cropped'),
+        flipX: z
+          .boolean()
+          .optional()
+          .describe('Whether the image is flipped horizontally'),
+        flipY: z
+          .boolean()
+          .optional()
+          .describe('Whether the image is flipped vertically'),
       }),
     });
 

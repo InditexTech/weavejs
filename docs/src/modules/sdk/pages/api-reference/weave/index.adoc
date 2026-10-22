@@ -446,6 +446,24 @@ unGroup(group: WeaveStateElement): void
 This method un-groups the nodes defined in a group, this destroys the groups and now all nodes
 can be selected again. The nodes maintain their position, rotation and scale when the group is destroyed.
 
+=== Image management
+
+==== flipImage
+
+[source,ts]
+----
+flipImage(node: Konva.Group, options: { axis: "horizontal" | "vertical" }): void
+----
+
+This method flips an image node on the given axis, `horizontal` toggles the `flipX` property of the node and
+`vertical` toggles `flipY`. Both axes are independent and composable, and calling it twice on the same axis restores the
+original orientation. Position, size, rotation and stacking order are not changed, and each call is a single
+undo / redo step.
+
+It has no effect while the image is being cropped, and it needs the
+xref:sdk:api-reference/nodes/image.adoc[WeaveImageNode] registered, if not registered nothing is done.
+Equivalent to calling `flipImage` on the node handler, or `flipHorizontal` / `flipVertical` on the node instance.
+
 === Targeting management
 
 ==== pointIntersectsContainerElement

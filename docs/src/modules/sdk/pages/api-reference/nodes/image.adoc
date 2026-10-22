@@ -51,6 +51,14 @@ type ImageProps = WeaveElementAttributes & {
     width: number;
     height: number;
   };
+  flipX?: boolean;
+  flipY?: boolean;
+};
+
+type WeaveImageFlipAxis = "horizontal" | "vertical";
+
+type WeaveImageFlipOptions = {
+  axis: WeaveImageFlipAxis;
 };
 
 type WeaveImageState = {
@@ -159,6 +167,22 @@ type WeaveImageTriggerCropOptions = {
       };
 };
 ----
+
+== Serialized properties
+
+Besides the common properties, the image node state can contain the following flip properties:
+
+[cols="4*"]
+|===
+| Property | Type | Default | Description
+
+| mono:[flipX] | mono:[boolean] | mono:[false] | The image is flipped horizontally.
+| mono:[flipY] | mono:[boolean] | mono:[false] | The image is flipped vertically.
+|===
+
+The flip is never stored as negative `width`, `height` or scale. The properties are only added to the node state
+when a flip is applied, so images created before this capability are treated as not flipped and are unchanged.
+The crop information (`cropInfo`) is always stored in the unflipped source image space.
 
 == Parameters
 
@@ -290,6 +314,22 @@ resetCrop(imageNode: Konva.Group): void
 
 Function that when is called reset the image cropping to its original size.
 
+=== flipImage
+
+[source,ts]
+----
+flipImage(imageNode: Konva.Group, options: WeaveImageFlipOptions): void
+----
+
+Toggles the flip of the image on the given axis (`horizontal` toggles `flipX`, `vertical` toggles `flipY`).
+Both axes are independent and composable, and flipping the same axis twice restores the original orientation.
+The flip is applied on the image local axes, so position, center, size, rotation, z-order and styles are
+unchanged. Each call is a single state update, so it is one undo / redo step.
+
+The call has no effect while the image is in crop mode.
+
+The same operation is available at Weave level through `weave.flipImage(imageNode, options)`.
+
 === forceLoadFallbackImage
 
 [source,ts]
@@ -315,6 +355,26 @@ triggerCrop(): void
 ----
 
 Function that when is called triggers the image cropping.
+
+
+=== flipHorizontal
+
+[source,ts]
+----
+flipHorizontal(): void
+----
+
+Function that when is called toggles the horizontal flip of the image (see `flipImage`).
+
+
+=== flipVertical
+
+[source,ts]
+----
+flipVertical(): void
+----
+
+Function that when is called toggles the vertical flip of the image (see `flipImage`).
 
 
 === dblClick

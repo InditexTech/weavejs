@@ -24,6 +24,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - [#1177](https://github.com/InditexTech/weavejs/issues/1177) Shift and Alt/Option modifiers when drawing shapes (proportions and center-based drawing)
+- [#1205](https://github.com/InditexTech/weavejs/issues/1205) Native horizontal and vertical image flipping (`weave.flipImage`, `flipX` / `flipY` image node properties), consistent with crop, resize, rotation and server-side rendering
 
 ## [5.5.0] - 2026-10-02
 
