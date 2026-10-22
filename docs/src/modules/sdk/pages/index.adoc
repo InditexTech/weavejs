@@ -102,7 +102,7 @@ const nodes = [
   new WeaveGroupNode(),
   new WeaveRectangleNode(),
   new WeaveLineNode(),
-  new WeaveTextNode(),
+  new WeaveTextNode(), // or new WeaveTextV2Node() for native on-canvas editing
   new WeaveImageNode(),
   new WeaveFrameNode(),
 ];

@@ -9,7 +9,9 @@ provides a fast and intuitive way to add labels, notes, annotations, or any text
 content within a collaborative visual environment.
 
 Each interaction results in the creation of a xref:sdk:api-reference/nodes/text.adoc[WeaveTextNode],
-ready for direct editing and synchronized in real time with all connected users.
+ready for direct editing and synchronized in real time with all connected users. The action looks the
+node up by its type (`text`), so it works the same with xref:sdk:api-reference/nodes/text-v2.adoc[WeaveTextV2Node],
+whichever of the two is registered.
 
 The class extends the xref:sdk:api-reference/actions/action.adoc[WeaveAction] class.
 
