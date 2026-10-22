@@ -98,6 +98,9 @@ export * from './nodes/measure/constants';
 export { WeaveConnectorNode } from './nodes/connector/connector';
 export * from './nodes/connector/constants';
 export * from './nodes/connector/types';
+export { WeaveStickyNoteNode } from './nodes/sticky-note/sticky-note';
+export * from './nodes/sticky-note/constants';
+export * from './nodes/sticky-note/types';
 
 // Shared shape label utilities
 export * from './nodes/shared/shape-label.types';
@@ -186,6 +189,9 @@ export * from './actions/connector-tool/types';
 export { WeaveGuideToolAction } from './actions/guide-tool/guide-tool';
 export * from './actions/guide-tool/constants';
 export * from './actions/guide-tool/types';
+export { WeaveStickyNoteToolAction } from './actions/sticky-note-tool/sticky-note-tool';
+export * from './actions/sticky-note-tool/constants';
+export * from './actions/sticky-note-tool/types';
 
 // Provided Plugins
 export { WeaveStageGridPlugin } from './plugins/stage-grid/stage-grid';
