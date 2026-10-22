@@ -79,7 +79,7 @@
     "prettier": "2.8.8",
     "shx": "^0.4.0",
     "typescript": "5.7.3",
-    "vitest": "^4.1.11"
+    "vitest": "^4.1.12"
   },
   "engines": {
     "node": ">= 22.17.1",
