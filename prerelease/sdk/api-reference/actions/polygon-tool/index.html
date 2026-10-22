@@ -1145,7 +1145,8 @@
 <div class="sectionbody">
 <div class="paragraph">
 <p>The <a href="https://github.com/InditexTech/weavejs/blob/main/code/packages/sdk/src/actions/polygon-tool/polygon-tool.ts">WeavePolygonToolAction</a>
-class allows users to place a polygon node on the canvas by clicking or touching it.</p>
+class allows users to place a polygon node on the canvas by clicking or touching it.
+Users can also drag to set its size.</p>
 </div>
 <div class="paragraph">
 <p>The shape is selected via a <strong>preset</strong> — one of the six built-in polygon definitions shipped
@@ -1155,6 +1156,9 @@ overridden per-trigger via the <code>presetId</code> trigger parameter.</p>
 <div class="paragraph">
 <p>Each interaction results in the creation of a <a href="../../nodes/polygon/" class="xref page">WeavePolygonNode</a>,
 added to the shared state and synchronized across all users.</p>
+</div>
+<div class="paragraph">
+<p>While dragging, hold <code>Shift</code> to preserve the preset&#8217;s default proportions, <code>Alt</code>/<code>Option</code> to draw from the initial point as the center, or both to combine the behaviors.</p>
 </div>
 <div class="paragraph">
 <p>The class extends the <a href="../action/" class="xref page">WeaveAction</a> class.</p>
@@ -1280,7 +1284,7 @@ added to the shared state and synchronized across all users.</p>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>onAddedPolygon</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>undefined</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Fired after the polygon node has been placed on the canvas.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Fired once after the pointer is released and the polygon&#8217;s dragged size has been committed. It is not fired when the placement is cancelled before pointer release.</p></td>
 </tr>
 </tbody>
 </table></div></div>
