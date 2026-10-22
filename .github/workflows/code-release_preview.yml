@@ -2,7 +2,9 @@
 name: code-release-preview
 
 concurrency:
-  group: release-preview
+  # Scoped per-PR, not just per-workflow, so a label change on one pull
+  # request never cancels the preview of another.
+  group: release-preview-${{ github.event.pull_request.number }}
   cancel-in-progress: true
 
 on:

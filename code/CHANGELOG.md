@@ -13,6 +13,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- [#1227](https://github.com/InditexTech/weavejs/issues/1227) Harden the SonarCloud, release preview and OSS compliance workflows
+
 ## [5.6.0] - 2026-10-22
 
 ### Fixed
