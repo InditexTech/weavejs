@@ -1,0 +1,47 @@
+AGENTS.md
+  s_236fa6c66b1306::t_8ec0af51d91a00 118-119
+docs/src/modules/main/nav.adoc
+  s_236fa6c66b1306::t_28a069a113a6e0 32
+docs/src/modules/main/pages/build/actions/text-tool.adoc
+  s_236fa6c66b1306::t_b8fac8d1895baf 20
+docs/src/modules/main/pages/build/nodes/index.adoc
+  s_236fa6c66b1306::t_78b9e1023d5889 76-79
+docs/src/modules/main/pages/build/nodes/text-v2.adoc
+  s_236fa6c66b1306::t_97ec3c8c67a14c 1-73
+docs/src/modules/main/pages/build/nodes/text.adoc
+  s_236fa6c66b1306::t_ce7a6aa0de818c 56,58-59
+docs/src/modules/sdk/nav.adoc
+  s_236fa6c66b1306::t_d2a346bb47f2a2 24
+docs/src/modules/sdk/pages/api-reference/actions/text-tool.adoc
+  s_236fa6c66b1306::t_170e2d8cc22d5c 12-14
+docs/src/modules/sdk/pages/api-reference/nodes/index.adoc
+  s_236fa6c66b1306::t_ae0c53cdb65064 84-87
+docs/src/modules/sdk/pages/api-reference/nodes/text-v2.adoc
+  s_236fa6c66b1306::t_615caecea45aba 1-156
+docs/src/modules/sdk/pages/api-reference/nodes/text.adoc
+  s_236fa6c66b1306::t_e3d97d852e435f 203,205-207
+docs/src/modules/sdk/pages/index.adoc
+  s_236fa6c66b1306::t_be04cfa3df41c0 105
+openspec/specs/text-v2/editing/spec.md
+  s_236fa6c66b1306::t_2dce1d39b5df9f 1-90
+openspec/specs/text-v2/layout/spec.md
+  s_236fa6c66b1306::t_c49195cd860a9c 1-54
+openspec/specs/text-v2/model/spec.md
+  s_236fa6c66b1306::t_1aab785bfafae1 1-40
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.6",
+  "base_commit_sha": "dcce9f499f307a1aaedfc484123f8fe4fc182562",
+  "prompts": {},
+  "sessions": {
+    "s_236fa6c66b1306": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "ses_e9c68953effe7Km6dHutRPYIH1",
+        "model": "claude-sonnet-5.5"
+      },
+      "human_author": "Jesus Manuel Piñeiro Cid <jesusmpc@inditex.com>"
+    }
+  }
+}
