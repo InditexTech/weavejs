@@ -20,6 +20,8 @@ export type WeaveTextV2OutlineProperties = {
   color: string;
   /** Stroke width in screen pixels (constant across zoom levels). */
   width: number;
+  /** Gap between the box and the outline, in screen pixels (default 0). */
+  padding: number;
 };
 
 /**

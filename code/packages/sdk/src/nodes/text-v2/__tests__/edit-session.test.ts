@@ -57,6 +57,7 @@ function setup(text = 'Hello world', extra: Konva.ShapeConfig = {}) {
     selectionColor: 'rgba(0,0,255,0.3)',
     outlineColor: '#ff0000',
     outlineWidth: 2,
+    outlinePadding: 10,
     onRequestExit: (r) => exits.push(r),
   };
   const session = new TextEditSession(target, host, 'n1');
@@ -271,9 +272,11 @@ describe('TextEditSession', () => {
     const c = make('Hi', { width: 200, height: 100 });
     c.utility.draw();
     const d = c.utility.getCanvas()._canvas.getContext('2d')!;
-    // top edge of the box at stage (10,10)..(210,10): red pixels on it
-    const px = d.getImageData(100, 10, 1, 1).data;
-    const bottom = d.getImageData(100, 110, 1, 1).data;
+    // box is (10,10)-(210,110); padded by 10px => edges at y=0 and y=120
+    const px = d.getImageData(100, 0, 1, 2).data;
+    const bottom = d.getImageData(100, 120, 1, 2).data;
+    // nothing on the unpadded edge
+    expect(d.getImageData(100, 10, 1, 1).data[3]).toBe(0);
     expect(px[3]).toBeGreaterThan(0);
     expect(bottom[3]).toBeGreaterThan(0);
   });

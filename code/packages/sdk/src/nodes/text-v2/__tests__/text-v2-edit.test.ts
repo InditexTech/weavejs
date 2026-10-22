@@ -139,7 +139,11 @@ function setup(config?: object) {
 }
 
 describe('WeaveTextV2Node edit outline config', () => {
-  type Host = { outlineColor?: string; outlineWidth?: number };
+  type Host = {
+    outlineColor?: string;
+    outlineWidth?: number;
+    outlinePadding?: number;
+  };
   const hostOf = (t: ReturnType<typeof setup>) => {
     t.edit();
     const host = (t.node as unknown as { session: { host: Host } }).session
@@ -152,12 +156,18 @@ describe('WeaveTextV2Node edit outline config', () => {
     expect(hostOf(setup())).toMatchObject({
       outlineColor: '#0074ff',
       outlineWidth: 1,
+      outlinePadding: 0,
     });
   });
 
   it('partial override keeps the other defaults', () => {
     const h = hostOf(setup({ edition: { outline: { color: '#ff0000' } } }));
     expect(h).toMatchObject({ outlineColor: '#ff0000', outlineWidth: 1 });
+  });
+
+  it('padding is configurable', () => {
+    const h = hostOf(setup({ edition: { outline: { padding: 6 } } }));
+    expect(h.outlinePadding).toBe(6);
   });
 
   it('enabled:false draws no outline', () => {

@@ -272,6 +272,10 @@ size). Passing it is a type error. Use mono:[edition.outline] instead.
 |`1`
 |Outline width in screen pixels (constant across zoom levels).
 
+|mono:[edition.outline.padding]
+|`0`
+|Gap between the text box and the outline, in screen pixels.
+
 |mono:[sizeWarning.threshold]
 |`200000`
 |Serialized size of `blocks` (characters) above which the mono:[onTextSizeWarning] event is emitted

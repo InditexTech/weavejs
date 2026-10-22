@@ -353,6 +353,7 @@ export class WeaveTextV2Node extends WeaveNode {
         ...(this.config.edition.outline.enabled && {
           outlineColor: this.config.edition.outline.color,
           outlineWidth: this.config.edition.outline.width,
+          outlinePadding: this.config.edition.outline.padding,
         }),
         signal: this.instance.getEventsController().signal,
         onChange: (blocks) => this.checkSize(shape, blocks),

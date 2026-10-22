@@ -64,7 +64,7 @@ The system SHALL emit `onTextSizeWarning` when serialized content exceeds a conf
 - **THEN** a session can edit it
 
 ### Requirement: Configurable edit outline
-While editing, the node SHALL draw an outline of the text box on the utility layer, configurable through `edition.outline` (`enabled`, `color`, `width` in screen pixels; defaults `true`, `#0074ff`, `1`). `edition.borderSize` SHALL NOT exist in the text-v2 config.
+While editing, the node SHALL draw an outline of the text box on the utility layer, configurable through `edition.outline` (`enabled`, `color`, `width` and `padding` in screen pixels; defaults `true`, `#0074ff`, `1`, `0`). `edition.borderSize` SHALL NOT exist in the text-v2 config.
 
 #### Scenario: Defaults
 - **WHEN** a session starts with no outline config
@@ -73,3 +73,7 @@ While editing, the node SHALL draw an outline of the text box on the utility lay
 #### Scenario: Disabled
 - **WHEN** `edition.outline.enabled` is `false`
 - **THEN** no outline is drawn
+
+#### Scenario: Padding
+- **WHEN** `edition.outline.padding` is `6`
+- **THEN** the outline is drawn 6 screen pixels outside the box on every side, at any zoom

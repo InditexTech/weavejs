@@ -52,6 +52,8 @@ export interface TextEditHost {
   /** Outline of the text box while editing (screen px width). Omit to hide. */
   outlineColor?: string;
   outlineWidth?: number;
+  /** Gap between box and outline (screen px). Default 0. */
+  outlinePadding?: number;
   /** Aborts the session listeners (e.g. instance teardown). */
   signal?: AbortSignal;
   /** Content changed (live; not yet committed). */
@@ -583,7 +585,8 @@ export class TextEditSession {
       ctx.setAttr('strokeStyle', this.host.outlineColor);
       ctx.setAttr('lineWidth', lw);
       ctx.beginPath();
-      ctx.rect(0, 0, width, height);
+      const pad = (this.host.outlinePadding ?? 0) / scale;
+      ctx.rect(-pad, -pad, width + pad * 2, height + pad * 2);
       ctx.stroke();
     }
     ctx.translate(o.x, o.y);
