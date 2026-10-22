@@ -72,7 +72,7 @@
 
 <title>WeaveImageNode | Weave.js</title>
 
-    <link rel="canonical" href="https://inditextech.github.io/weavejs/5.4.2/sdk/api-reference/nodes/image/">
+    <link rel="canonical" href="https://inditextech.github.io/weavejs/5.6.0/sdk/api-reference/nodes/image/">
     <link rel="prev" href="../group/">
     <link rel="next" href="../node/">
     <meta name="description" content="Image node API Reference">
@@ -100,7 +100,7 @@
           <span class="dt-button__icon dt-button__icon-icon"><svg class="dt-icon" aria-hidden="true" focusable="false"><use href="../../../../../_/img/icons.svg#icon-menu"></use></svg></span>
         </span>
       </button>
-      <a class="header-toolbar__brand" href="../../../../../5.4.2/">
+      <a class="header-toolbar__brand" href="../../../../../5.6.0/">
         <img class="header-toolbar__logo" src="../../../../../_/product-logo.png" width="24" height="24" alt="">
         <span class="header-toolbar__product-name dt-text dt-text--label-l-high">Weave.js</span>
       </a>
@@ -124,10 +124,13 @@
       <span class="version__label">prerelease</span>
       <span class="dt-label dt-label--orange"><span class="dt-label__content">Prerelease</span></span>
     </span>
-    <a class="version" href="../../../../../5.4.2/sdk/api-reference/nodes/image/">
-      <span class="version__label">5.4.2</span>
+    <a class="version" href="../../../../../5.6.0/sdk/api-reference/nodes/image/">
+      <span class="version__label">5.6.0</span>
       <span class="dt-label dt-label--green"><span class="dt-label__content">Latest</span></span>
           </a>
+    <a class="version" href="../../../../../5.4.2/sdk/api-reference/nodes/image/">
+      <span class="version__label">5.4.2</span>
+    </a>
     <a class="version" href="../../../../../5.4.1/sdk/api-reference/nodes/image/">
       <span class="version__label">5.4.1</span>
     </a>
@@ -255,7 +258,7 @@
   </div>
 
 <div class="side-menu__brand">
-  <a class="side-menu__brand-link" href="../../../../../5.4.2/">
+  <a class="side-menu__brand-link" href="../../../../../5.6.0/">
     <img class="side-menu__brand-logo" src="../../../../../_/product-logo.png" width="40" height="40" alt="">
     <span class="side-menu__brand-title dt-text dt-text--title-m">Weave.js</span>
   </a>
@@ -1083,10 +1086,13 @@
       <span class="version__label">prerelease</span>
       <span class="dt-label dt-label--orange"><span class="dt-label__content">Prerelease</span></span>
     </span>
-    <a class="version" href="../../../../../5.4.2/sdk/api-reference/nodes/image/">
-      <span class="version__label">5.4.2</span>
+    <a class="version" href="../../../../../5.6.0/sdk/api-reference/nodes/image/">
+      <span class="version__label">5.6.0</span>
       <span class="dt-label dt-label--green"><span class="dt-label__content">Latest</span></span>
           </a>
+    <a class="version" href="../../../../../5.4.2/sdk/api-reference/nodes/image/">
+      <span class="version__label">5.4.2</span>
+    </a>
     <a class="version" href="../../../../../5.4.1/sdk/api-reference/nodes/image/">
       <span class="version__label">5.4.1</span>
     </a>
@@ -1217,6 +1223,14 @@ collaborative experience even when working with dynamic media content.</p>
 <span class="line"><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">    width</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">: </span><span style="--shiki-light:#4EC9B0;--shiki-dark:#4EC9B0">number</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">;</span></span>
 <span class="line"><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">    height</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">: </span><span style="--shiki-light:#4EC9B0;--shiki-dark:#4EC9B0">number</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">;</span></span>
 <span class="line"><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">  };</span></span>
+<span class="line"><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">  flipX</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">?: </span><span style="--shiki-light:#4EC9B0;--shiki-dark:#4EC9B0">boolean</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">;</span></span>
+<span class="line"><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">  flipY</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">?: </span><span style="--shiki-light:#4EC9B0;--shiki-dark:#4EC9B0">boolean</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">;</span></span>
+<span class="line"><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">};</span></span>
+<span class="line"></span>
+<span class="line"><span style="--shiki-light:#569CD6;--shiki-dark:#569CD6">type</span><span style="--shiki-light:#4EC9B0;--shiki-dark:#4EC9B0"> WeaveImageFlipAxis</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4"> = </span><span style="--shiki-light:#CE9178;--shiki-dark:#CE9178">"horizontal"</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4"> | </span><span style="--shiki-light:#CE9178;--shiki-dark:#CE9178">"vertical"</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="--shiki-light:#569CD6;--shiki-dark:#569CD6">type</span><span style="--shiki-light:#4EC9B0;--shiki-dark:#4EC9B0"> WeaveImageFlipOptions</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4"> = {</span></span>
+<span class="line"><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">  axis</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">: </span><span style="--shiki-light:#4EC9B0;--shiki-dark:#4EC9B0">WeaveImageFlipAxis</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">;</span></span>
 <span class="line"><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">};</span></span>
 <span class="line"></span>
 <span class="line"><span style="--shiki-light:#569CD6;--shiki-dark:#569CD6">type</span><span style="--shiki-light:#4EC9B0;--shiki-dark:#4EC9B0"> WeaveImageState</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4"> = {</span></span>
@@ -1325,6 +1339,49 @@ collaborative experience even when working with dynamic media content.</p>
 <span class="line"><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">      };</span></span>
 <span class="line"><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">};</span></span></span></code></pre>
 </div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="serialized-properties"><a class="anchor" href="#serialized-properties"></a>Serialized properties</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Besides the common properties, the image node state can contain the following flip properties:</p>
+</div>
+<div class="tableblock-wrap"><div class="tablecontainer"><table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 25%;">
+<col style="width: 25%;">
+<col style="width: 25%;">
+<col style="width: 25%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Property</th>
+<th class="tableblock halign-left valign-top">Type</th>
+<th class="tableblock halign-left valign-top">Default</th>
+<th class="tableblock halign-left valign-top">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code class="dt-mono">flipX</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code class="dt-mono">boolean</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code class="dt-mono">false</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The image is flipped horizontally.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code class="dt-mono">flipY</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code class="dt-mono">boolean</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code class="dt-mono">false</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The image is flipped vertically.</p></td>
+</tr>
+</tbody>
+</table></div></div>
+<div class="paragraph">
+<p>The flip is never stored as negative <code>width</code>, <code>height</code> or scale. The properties are only added to the node state
+when a flip is applied, so images created before this capability are treated as not flipped and are unchanged.
+The crop information (<code>cropInfo</code>) is always stored in the unflipped source image space.</p>
 </div>
 </div>
 </div>
@@ -1601,6 +1658,26 @@ collaborative experience even when working with dynamic media content.</p>
 </div>
 </div>
 <div class="sect2">
+<h3 id="flipimage"><a class="anchor" href="#flipimage"></a>flipImage</h3>
+<div class="listingblock">
+<div class="content">
+<pre class="shiki highlight"><code data-lang="ts"><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4;--shiki-light-bg:#1E1E1E;--shiki-dark-bg:#1E1E1E"><span class="line"><span style="--shiki-light:#DCDCAA;--shiki-dark:#DCDCAA">flipImage</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">(</span><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">imageNode</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">: </span><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">Konva</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">.</span><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">Group</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">, </span><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">options</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">: </span><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">WeaveImageFlipOptions</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">): </span><span style="--shiki-light:#569CD6;--shiki-dark:#569CD6">void</span></span></span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Toggles the flip of the image on the given axis (<code>horizontal</code> toggles <code>flipX</code>, <code>vertical</code> toggles <code>flipY</code>).
+Both axes are independent and composable, and flipping the same axis twice restores the original orientation.
+The flip is applied on the image local axes, so position, center, size, rotation, z-order and styles are
+unchanged. Each call is a single state update, so it is one undo / redo step.</p>
+</div>
+<div class="paragraph">
+<p>The call has no effect while the image is in crop mode.</p>
+</div>
+<div class="paragraph">
+<p>The same operation is available at Weave level through <code>weave.flipImage(imageNode, options)</code>.</p>
+</div>
+</div>
+<div class="sect2">
 <h3 id="forceloadfallbackimage"><a class="anchor" href="#forceloadfallbackimage"></a>forceLoadFallbackImage</h3>
 <div class="listingblock">
 <div class="content">
@@ -1631,6 +1708,28 @@ failed to load from its remote URL.</p>
 </div>
 <div class="paragraph">
 <p>Function that when is called triggers the image cropping.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="fliphorizontal"><a class="anchor" href="#fliphorizontal"></a>flipHorizontal</h3>
+<div class="listingblock">
+<div class="content">
+<pre class="shiki highlight"><code data-lang="ts"><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4;--shiki-light-bg:#1E1E1E;--shiki-dark-bg:#1E1E1E"><span class="line"><span style="--shiki-light:#DCDCAA;--shiki-dark:#DCDCAA">flipHorizontal</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">(): </span><span style="--shiki-light:#569CD6;--shiki-dark:#569CD6">void</span></span></span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Function that when is called toggles the horizontal flip of the image (see <code>flipImage</code>).</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="flipvertical"><a class="anchor" href="#flipvertical"></a>flipVertical</h3>
+<div class="listingblock">
+<div class="content">
+<pre class="shiki highlight"><code data-lang="ts"><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4;--shiki-light-bg:#1E1E1E;--shiki-dark-bg:#1E1E1E"><span class="line"><span style="--shiki-light:#DCDCAA;--shiki-dark:#DCDCAA">flipVertical</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">(): </span><span style="--shiki-light:#569CD6;--shiki-dark:#569CD6">void</span></span></span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Function that when is called toggles the vertical flip of the image (see <code>flipImage</code>).</p>
 </div>
 </div>
 <div class="sect2">
@@ -1783,7 +1882,7 @@ When calling the method it can raise errors with the following causes:</p>
 <footer class="site-footer">
   <div class="dt-grid-layout dt-grid-layout--with-margin site-footer__grid">
     <div class="dt-grid-layout__item site-footer__col site-footer__brand">
-      <a class="site-footer__brand-link" href="../../../../../5.4.2/">
+      <a class="site-footer__brand-link" href="../../../../../5.6.0/">
         <img class="site-footer__logo" src="../../../../../_/product-logo.png" width="24" height="24" alt="">
         <span class="dt-text dt-text--label-l-high">Weave.js</span>
       </a>

@@ -72,7 +72,7 @@
 
 <title>Image | Weave.js</title>
 
-    <link rel="canonical" href="https://inditextech.github.io/weavejs/5.4.2/main/build/nodes/image/">
+    <link rel="canonical" href="https://inditextech.github.io/weavejs/5.6.0/main/build/nodes/image/">
     <link rel="prev" href="../group/">
     <link rel="next" href="../layer/">
     <meta name="description" content="Render images on the canvas">
@@ -116,7 +116,7 @@
 
 <div class="page-versions">
   <button type="button" class="dt-tag dt-tag--solid dt-tag--selected header-toolbar__version header-toolbar__version--latest version-menu-toggle" title="Show other versions of page" aria-expanded="false">
-    <span class="dt-tag__label">5.4.2</span>
+    <span class="dt-tag__label">5.6.0</span>
     <span class="dt-tag__icon"><svg class="dt-icon" aria-hidden="true" focusable="false"><use href="../../../../../_/img/icons.svg#icon-chevron-down"></use></svg></span>
   </button>
   <div class="version-menu">
@@ -125,9 +125,12 @@
       <span class="dt-label dt-label--orange"><span class="dt-label__content">Prerelease</span></span>
     </a>
     <span class="version is-current" aria-current="page">
-      <span class="version__label">5.4.2</span>
+      <span class="version__label">5.6.0</span>
       <span class="dt-label dt-label--green"><span class="dt-label__content">Latest</span></span>
           </span>
+    <a class="version" href="../../../../../5.4.2/main/build/nodes/image/">
+      <span class="version__label">5.4.2</span>
+    </a>
     <a class="version" href="../../../../../5.4.1/main/build/nodes/image/">
       <span class="version__label">5.4.1</span>
     </a>
@@ -162,7 +165,7 @@
   </div>
 </header>
 
-<dialog id="search-dialog" class="search-dialog" aria-label="Search" data-search-index="ROOT-5.4.2.json">
+<dialog id="search-dialog" class="search-dialog" aria-label="Search" data-search-index="ROOT-5.6.0.json">
   <div class="dt-overlay dt-overlay--visible search-dialog__overlay">
     <div class="dt-overlay__content"></div>
     <div class="dt-modal dt-modal--small search-dialog__panel">
@@ -245,7 +248,7 @@
 
 <div class="body">
 
-<div id="side-menu" class="side-menu" data-component="ROOT" data-version="5.4.2" data-module="main">
+<div id="side-menu" class="side-menu" data-component="ROOT" data-version="5.6.0" data-module="main">
   <div class="side-menu__header">
     <div class="side-menu__header-start">
       <img class="side-menu__header-logo" src="../../../../../_/product-logo.png" width="24" height="24" alt="">
@@ -1230,7 +1233,7 @@
 
 <div class="page-versions">
   <button type="button" class="dt-tag dt-tag--solid dt-tag--selected header-toolbar__version header-toolbar__version--latest version-menu-toggle" title="Show other versions of page" aria-expanded="false">
-    <span class="dt-tag__label">5.4.2</span>
+    <span class="dt-tag__label">5.6.0</span>
     <span class="dt-tag__icon"><svg class="dt-icon" aria-hidden="true" focusable="false"><use href="../../../../../_/img/icons.svg#icon-chevron-down"></use></svg></span>
   </button>
   <div class="version-menu">
@@ -1239,9 +1242,12 @@
       <span class="dt-label dt-label--orange"><span class="dt-label__content">Prerelease</span></span>
     </a>
     <span class="version is-current" aria-current="page">
-      <span class="version__label">5.4.2</span>
+      <span class="version__label">5.6.0</span>
       <span class="dt-label dt-label--green"><span class="dt-label__content">Latest</span></span>
           </span>
+    <a class="version" href="../../../../../5.4.2/main/build/nodes/image/">
+      <span class="version__label">5.4.2</span>
+    </a>
     <a class="version" href="../../../../../5.4.1/main/build/nodes/image/">
       <span class="version__label">5.4.1</span>
     </a>
@@ -1366,6 +1372,48 @@ users to add Image (one-by-one) nodes to the application.</p>
 </div>
 </div>
 </div>
+<div class="sect1">
+<h2 id="flip-an-image"><a class="anchor" href="#flip-an-image"></a>Flip an image</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Image nodes can be flipped horizontally and vertically without generating a new asset:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="shiki highlight"><code data-lang="ts"><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4;--shiki-light-bg:#1E1E1E;--shiki-dark-bg:#1E1E1E"><span class="line"><span style="--shiki-light:#569CD6;--shiki-dark:#569CD6">const</span><span style="--shiki-light:#4FC1FF;--shiki-dark:#4FC1FF"> imageNode</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4"> = </span><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">instance</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">.</span><span style="--shiki-light:#DCDCAA;--shiki-dark:#DCDCAA">getStage</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">().</span><span style="--shiki-light:#DCDCAA;--shiki-dark:#DCDCAA">findOne</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">(</span><span style="--shiki-light:#CE9178;--shiki-dark:#CE9178">"#imageId"</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">) </span><span style="--shiki-light:#C586C0;--shiki-dark:#C586C0">as</span><span style="--shiki-light:#4EC9B0;--shiki-dark:#4EC9B0"> Konva</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">.</span><span style="--shiki-light:#4EC9B0;--shiki-dark:#4EC9B0">Group</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">instance</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">.</span><span style="--shiki-light:#DCDCAA;--shiki-dark:#DCDCAA">flipImage</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">(</span><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">imageNode</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">, { </span><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">axis:</span><span style="--shiki-light:#CE9178;--shiki-dark:#CE9178"> "horizontal"</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4"> });</span></span>
+<span class="line"><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">instance</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">.</span><span style="--shiki-light:#DCDCAA;--shiki-dark:#DCDCAA">flipImage</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">(</span><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">imageNode</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">, { </span><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">axis:</span><span style="--shiki-light:#CE9178;--shiki-dark:#CE9178"> "vertical"</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4"> });</span></span>
+<span class="line"></span>
+<span class="line"><span style="--shiki-light:#6A9955;--shiki-dark:#6A9955">// or directly on the node</span></span>
+<span class="line"><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">imageNode</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">.</span><span style="--shiki-light:#DCDCAA;--shiki-dark:#DCDCAA">flipHorizontal</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">();</span></span>
+<span class="line"><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">imageNode</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">.</span><span style="--shiki-light:#DCDCAA;--shiki-dark:#DCDCAA">flipVertical</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">();</span></span></span></code></pre>
+</div>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Both axes are independent: the state persists them as the <code>flipX</code> and <code>flipY</code> booleans.</p>
+</li>
+<li>
+<p>Flipping the same axis twice restores the original image.</p>
+</li>
+<li>
+<p>Position, size, rotation and stacking order are not changed, and each flip is a single undo / redo step.</p>
+</li>
+<li>
+<p>The flip is kept when resizing, rotating, cropping, grouping, copy / pasting and when rendering on the server.</p>
+</li>
+<li>
+<p>Calling it while the image is being cropped has no effect.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>See the <a href="../../../../sdk/api-reference/nodes/image/" class="xref page">WeaveImageNode API reference</a> for details.</p>
+</div>
+</div>
+</div>
 </article>
   </div>
 </main>
@@ -1404,7 +1452,7 @@ users to add Image (one-by-one) nodes to the application.</p>
       </div>
       <div class="page-footer__contribute-buttons">
 
-<a class="dt-button dt-button--ghost dt-button--icon-and-label dt-button--icon-action page-footer__propose-change" href="https://github.com/InditexTech/weavejs/blob/docs/v5.4.2/docs/src/modules/main/pages/build/nodes/image.adoc">
+<a class="dt-button dt-button--ghost dt-button--icon-and-label dt-button--icon-action page-footer__propose-change" href="https://github.com/InditexTech/weavejs/blob/docs/v5.6.0/docs/src/modules/main/pages/build/nodes/image.adoc">
   <span class="dt-button__content">
     Propose a change
     <span class="dt-button__icon dt-button__icon-action"><svg class="dt-icon" aria-hidden="true" focusable="false"><use href="../../../../../_/img/icons.svg#icon-external-link"></use></svg></span>

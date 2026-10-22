@@ -72,7 +72,7 @@
 
 <title>Changelog | Weave.js</title>
 
-    <link rel="canonical" href="https://inditextech.github.io/weavejs/5.4.2/main/changelog/">
+    <link rel="canonical" href="https://inditextech.github.io/weavejs/5.6.0/main/changelog/">
     <link rel="prev" href="../release-notes/1.0.0/">
     <link rel="next" href="../roadmap/">
     <meta name="description" content="Check out the latest changes to Weave.js.">
@@ -100,7 +100,7 @@
           <span class="dt-button__icon dt-button__icon-icon"><svg class="dt-icon" aria-hidden="true" focusable="false"><use href="../../../_/img/icons.svg#icon-menu"></use></svg></span>
         </span>
       </button>
-      <a class="header-toolbar__brand" href="../../../5.4.2/">
+      <a class="header-toolbar__brand" href="../../../5.6.0/">
         <img class="header-toolbar__logo" src="../../../_/product-logo.png" width="24" height="24" alt="">
         <span class="header-toolbar__product-name dt-text dt-text--label-l-high">Weave.js</span>
       </a>
@@ -124,10 +124,13 @@
       <span class="version__label">prerelease</span>
       <span class="dt-label dt-label--orange"><span class="dt-label__content">Prerelease</span></span>
     </a>
-    <a class="version" href="../../../5.4.2/main/changelog/">
-      <span class="version__label">5.4.2</span>
+    <a class="version" href="../../../5.6.0/main/changelog/">
+      <span class="version__label">5.6.0</span>
       <span class="dt-label dt-label--green"><span class="dt-label__content">Latest</span></span>
           </a>
+    <a class="version" href="../../../5.4.2/main/changelog/">
+      <span class="version__label">5.4.2</span>
+    </a>
     <a class="version" href="../../../5.4.1/main/changelog/">
       <span class="version__label">5.4.1</span>
     </a>
@@ -255,7 +258,7 @@
   </div>
 
 <div class="side-menu__brand">
-  <a class="side-menu__brand-link" href="../../../5.4.2/">
+  <a class="side-menu__brand-link" href="../../../5.6.0/">
     <img class="side-menu__brand-logo" src="../../../_/product-logo.png" width="40" height="40" alt="">
     <span class="side-menu__brand-title dt-text dt-text--title-m">Weave.js</span>
   </a>
@@ -1238,10 +1241,13 @@
       <span class="version__label">prerelease</span>
       <span class="dt-label dt-label--orange"><span class="dt-label__content">Prerelease</span></span>
     </a>
-    <a class="version" href="../../../5.4.2/main/changelog/">
-      <span class="version__label">5.4.2</span>
+    <a class="version" href="../../../5.6.0/main/changelog/">
+      <span class="version__label">5.6.0</span>
       <span class="dt-label dt-label--green"><span class="dt-label__content">Latest</span></span>
           </a>
+    <a class="version" href="../../../5.4.2/main/changelog/">
+      <span class="version__label">5.4.2</span>
+    </a>
     <a class="version" href="../../../5.4.1/main/changelog/">
       <span class="version__label">5.4.1</span>
     </a>
@@ -1333,6 +1339,46 @@ generated straight from that same file at build time, so it can&#8217;t drift fr
 </div>
 </div>
 <div class="sect1">
+<h2 id="v5-6-0-2026-10-22"><a class="anchor" href="#v5-6-0-2026-10-22"></a>v5.6.0 — 2026-10-22</h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="fixed"><a class="anchor" href="#fixed"></a>Fixed</h3>
+<div class="ulist">
+<ul>
+<li>
+<p><a href="https://github.com/InditexTech/weavejs/issues/1200">#1200</a> Published packages declare CommonJS entry points that do not exist. The packages are ESM only: loading them with <code>require()</code> needs Node.js 20.19+ or 22.12+</p>
+</li>
+<li>
+<p><a href="https://github.com/InditexTech/weavejs/issues/1202">#1202</a> Native canvas and skia-canvas peers are installed in every consumer, including browser apps</p>
+</li>
+<li>
+<p><a href="https://github.com/InditexTech/weavejs/issues/1198">#1198</a> Node event listeners leak on every render and are never removed on destroy</p>
+</li>
+<li>
+<p><a href="https://github.com/InditexTech/weavejs/issues/1208">#1208</a> Publish snapshots via <code>workflow_dispatch</code> (<code>ACTION=snapshot</code>) instead of the <code>/publish-snapshot</code> comment, since npm trusted publishing rejects <code>issue_comment</code> tokens</p>
+</li>
+<li>
+<p><a href="https://github.com/InditexTech/weavejs/issues/1142">#1142</a> Override <code>@emnapi</code> packages to v1.11.2 / 1.2.2 to unify monorepo dependency resolution and prevent lockfile stripping during release versioning</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect2">
+<h3 id="added"><a class="anchor" href="#added"></a>Added</h3>
+<div class="ulist">
+<ul>
+<li>
+<p><a href="https://github.com/InditexTech/weavejs/issues/1177">#1177</a> Shift and Alt/Option modifiers when drawing shapes (proportions and center-based drawing)</p>
+</li>
+<li>
+<p><a href="https://github.com/InditexTech/weavejs/issues/1205">#1205</a> Native horizontal and vertical image flipping (<code>weave.flipImage</code>, <code>flipX</code> / <code>flipY</code> image node properties), consistent with crop, resize, rotation and server-side rendering</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
 <h2 id="v5-5-0-2026-10-02"><a class="anchor" href="#v5-5-0-2026-10-02"></a>v5.5.0 — 2026-10-02</h2>
 <div class="sectionbody">
 
@@ -1342,7 +1388,7 @@ generated straight from that same file at build time, so it can&#8217;t drift fr
 <h2 id="v5-4-1-2026-09-16"><a class="anchor" href="#v5-4-1-2026-09-16"></a>v5.4.1 — 2026-09-16</h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="fixed"><a class="anchor" href="#fixed"></a>Fixed</h3>
+<h3 id="fixed-2"><a class="anchor" href="#fixed-2"></a>Fixed</h3>
 <div class="ulist">
 <ul>
 <li>
@@ -1357,7 +1403,7 @@ generated straight from that same file at build time, so it can&#8217;t drift fr
 <h2 id="v5-4-0-2026-09-09"><a class="anchor" href="#v5-4-0-2026-09-09"></a>v5.4.0 — 2026-09-09</h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="added"><a class="anchor" href="#added"></a>Added</h3>
+<h3 id="added-2"><a class="anchor" href="#added-2"></a>Added</h3>
 <div class="ulist">
 <ul>
 <li>
@@ -1372,7 +1418,7 @@ generated straight from that same file at build time, so it can&#8217;t drift fr
 <h2 id="v5-3-0-2026-09-07"><a class="anchor" href="#v5-3-0-2026-09-07"></a>v5.3.0 — 2026-09-07</h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="added-2"><a class="anchor" href="#added-2"></a>Added</h3>
+<h3 id="added-3"><a class="anchor" href="#added-3"></a>Added</h3>
 <div class="ulist">
 <ul>
 <li>
@@ -1387,7 +1433,7 @@ generated straight from that same file at build time, so it can&#8217;t drift fr
 <h2 id="v5-2-2-2026-09-02"><a class="anchor" href="#v5-2-2-2026-09-02"></a>v5.2.2 — 2026-09-02</h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="fixed-2"><a class="anchor" href="#fixed-2"></a>Fixed</h3>
+<h3 id="fixed-3"><a class="anchor" href="#fixed-3"></a>Fixed</h3>
 <div class="ulist">
 <ul>
 <li>
@@ -1402,7 +1448,7 @@ generated straight from that same file at build time, so it can&#8217;t drift fr
 <h2 id="v5-2-1-2026-08-06"><a class="anchor" href="#v5-2-1-2026-08-06"></a>v5.2.1 — 2026-08-06</h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="fixed-3"><a class="anchor" href="#fixed-3"></a>Fixed</h3>
+<h3 id="fixed-4"><a class="anchor" href="#fixed-4"></a>Fixed</h3>
 <div class="ulist">
 <ul>
 <li>
@@ -1438,7 +1484,7 @@ generated straight from that same file at build time, so it can&#8217;t drift fr
 <h2 id="v5-1-5-2026-07-14"><a class="anchor" href="#v5-1-5-2026-07-14"></a>v5.1.5 — 2026-07-14</h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="fixed-4"><a class="anchor" href="#fixed-4"></a>Fixed</h3>
+<h3 id="fixed-5"><a class="anchor" href="#fixed-5"></a>Fixed</h3>
 <div class="ulist">
 <ul>
 <li>
@@ -1456,7 +1502,7 @@ generated straight from that same file at build time, so it can&#8217;t drift fr
 <h2 id="v5-1-4-2026-07-13"><a class="anchor" href="#v5-1-4-2026-07-13"></a>v5.1.4 — 2026-07-13</h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="fixed-5"><a class="anchor" href="#fixed-5"></a>Fixed</h3>
+<h3 id="fixed-6"><a class="anchor" href="#fixed-6"></a>Fixed</h3>
 <div class="ulist">
 <ul>
 <li>
@@ -1471,7 +1517,7 @@ generated straight from that same file at build time, so it can&#8217;t drift fr
 <h2 id="v5-1-3-2026-07-06"><a class="anchor" href="#v5-1-3-2026-07-06"></a>v5.1.3 — 2026-07-06</h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="fixed-6"><a class="anchor" href="#fixed-6"></a>Fixed</h3>
+<h3 id="fixed-7"><a class="anchor" href="#fixed-7"></a>Fixed</h3>
 <div class="ulist">
 <ul>
 <li>
@@ -1486,7 +1532,7 @@ generated straight from that same file at build time, so it can&#8217;t drift fr
 <h2 id="v5-1-2-2026-07-02"><a class="anchor" href="#v5-1-2-2026-07-02"></a>v5.1.2 — 2026-07-02</h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="fixed-7"><a class="anchor" href="#fixed-7"></a>Fixed</h3>
+<h3 id="fixed-8"><a class="anchor" href="#fixed-8"></a>Fixed</h3>
 <div class="ulist">
 <ul>
 <li>
@@ -1504,7 +1550,7 @@ generated straight from that same file at build time, so it can&#8217;t drift fr
 <h2 id="v5-1-1-2026-06-22"><a class="anchor" href="#v5-1-1-2026-06-22"></a>v5.1.1 — 2026-06-22</h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="fixed-8"><a class="anchor" href="#fixed-8"></a>Fixed</h3>
+<h3 id="fixed-9"><a class="anchor" href="#fixed-9"></a>Fixed</h3>
 <div class="ulist">
 <ul>
 <li>
@@ -1540,7 +1586,7 @@ generated straight from that same file at build time, so it can&#8217;t drift fr
 <h2 id="v5-0-0-2026-06-18"><a class="anchor" href="#v5-0-0-2026-06-18"></a>v5.0.0 — 2026-06-18</h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="added-3"><a class="anchor" href="#added-3"></a>Added</h3>
+<h3 id="added-4"><a class="anchor" href="#added-4"></a>Added</h3>
 <div class="ulist">
 <ul>
 <li>
@@ -1578,7 +1624,7 @@ generated straight from that same file at build time, so it can&#8217;t drift fr
 </div>
 </div>
 <div class="sect2">
-<h3 id="fixed-9"><a class="anchor" href="#fixed-9"></a>Fixed</h3>
+<h3 id="fixed-10"><a class="anchor" href="#fixed-10"></a>Fixed</h3>
 <div class="ulist">
 <ul>
 <li>
@@ -1596,7 +1642,7 @@ generated straight from that same file at build time, so it can&#8217;t drift fr
 <h2 id="v4-1-1-2026-05-29"><a class="anchor" href="#v4-1-1-2026-05-29"></a>v4.1.1 — 2026-05-29</h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="fixed-10"><a class="anchor" href="#fixed-10"></a>Fixed</h3>
+<h3 id="fixed-11"><a class="anchor" href="#fixed-11"></a>Fixed</h3>
 <div class="ulist">
 <ul>
 <li>
@@ -1626,7 +1672,7 @@ generated straight from that same file at build time, so it can&#8217;t drift fr
 <h2 id="v4-0-1-2026-05-18"><a class="anchor" href="#v4-0-1-2026-05-18"></a>v4.0.1 — 2026-05-18</h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="fixed-11"><a class="anchor" href="#fixed-11"></a>Fixed</h3>
+<h3 id="fixed-12"><a class="anchor" href="#fixed-12"></a>Fixed</h3>
 <div class="ulist">
 <ul>
 <li>
@@ -1656,7 +1702,7 @@ generated straight from that same file at build time, so it can&#8217;t drift fr
 <h2 id="v4-0-0-2026-05-15"><a class="anchor" href="#v4-0-0-2026-05-15"></a>v4.0.0 — 2026-05-15</h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="added-4"><a class="anchor" href="#added-4"></a>Added</h3>
+<h3 id="added-5"><a class="anchor" href="#added-5"></a>Added</h3>
 <div class="ulist">
 <ul>
 <li>
@@ -1671,7 +1717,7 @@ generated straight from that same file at build time, so it can&#8217;t drift fr
 <h2 id="v3-9-1-2026-05-13"><a class="anchor" href="#v3-9-1-2026-05-13"></a>v3.9.1 — 2026-05-13</h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="fixed-12"><a class="anchor" href="#fixed-12"></a>Fixed</h3>
+<h3 id="fixed-13"><a class="anchor" href="#fixed-13"></a>Fixed</h3>
 <div class="ulist">
 <ul>
 <li>
@@ -1686,7 +1732,7 @@ generated straight from that same file at build time, so it can&#8217;t drift fr
 <h2 id="v3-9-0-2026-05-13"><a class="anchor" href="#v3-9-0-2026-05-13"></a>v3.9.0 — 2026-05-13</h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="added-5"><a class="anchor" href="#added-5"></a>Added</h3>
+<h3 id="added-6"><a class="anchor" href="#added-6"></a>Added</h3>
 <div class="ulist">
 <ul>
 <li>
@@ -1696,7 +1742,7 @@ generated straight from that same file at build time, so it can&#8217;t drift fr
 </div>
 </div>
 <div class="sect2">
-<h3 id="fixed-13"><a class="anchor" href="#fixed-13"></a>Fixed</h3>
+<h3 id="fixed-14"><a class="anchor" href="#fixed-14"></a>Fixed</h3>
 <div class="ulist">
 <ul>
 <li>
@@ -1711,7 +1757,7 @@ generated straight from that same file at build time, so it can&#8217;t drift fr
 <h2 id="v3-8-4-2026-05-12"><a class="anchor" href="#v3-8-4-2026-05-12"></a>v3.8.4 — 2026-05-12</h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="fixed-14"><a class="anchor" href="#fixed-14"></a>Fixed</h3>
+<h3 id="fixed-15"><a class="anchor" href="#fixed-15"></a>Fixed</h3>
 <div class="ulist">
 <ul>
 <li>
@@ -1726,7 +1772,7 @@ generated straight from that same file at build time, so it can&#8217;t drift fr
 <h2 id="v3-8-3-2026-05-12"><a class="anchor" href="#v3-8-3-2026-05-12"></a>v3.8.3 — 2026-05-12</h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="fixed-15"><a class="anchor" href="#fixed-15"></a>Fixed</h3>
+<h3 id="fixed-16"><a class="anchor" href="#fixed-16"></a>Fixed</h3>
 <div class="ulist">
 <ul>
 <li>
@@ -1744,7 +1790,7 @@ generated straight from that same file at build time, so it can&#8217;t drift fr
 <h2 id="v3-8-2-2026-05-11"><a class="anchor" href="#v3-8-2-2026-05-11"></a>v3.8.2 — 2026-05-11</h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="fixed-16"><a class="anchor" href="#fixed-16"></a>Fixed</h3>
+<h3 id="fixed-17"><a class="anchor" href="#fixed-17"></a>Fixed</h3>
 <div class="ulist">
 <ul>
 <li>
@@ -1759,7 +1805,7 @@ generated straight from that same file at build time, so it can&#8217;t drift fr
 <h2 id="v3-8-1-2026-05-11"><a class="anchor" href="#v3-8-1-2026-05-11"></a>v3.8.1 — 2026-05-11</h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="fixed-17"><a class="anchor" href="#fixed-17"></a>Fixed</h3>
+<h3 id="fixed-18"><a class="anchor" href="#fixed-18"></a>Fixed</h3>
 <div class="ulist">
 <ul>
 <li>
@@ -1783,7 +1829,7 @@ generated straight from that same file at build time, so it can&#8217;t drift fr
 <h2 id="v3-8-0-2026-04-24"><a class="anchor" href="#v3-8-0-2026-04-24"></a>v3.8.0 — 2026-04-24</h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="added-6"><a class="anchor" href="#added-6"></a>Added</h3>
+<h3 id="added-7"><a class="anchor" href="#added-7"></a>Added</h3>
 <div class="ulist">
 <ul>
 <li>
@@ -1796,7 +1842,7 @@ generated straight from that same file at build time, so it can&#8217;t drift fr
 </div>
 </div>
 <div class="sect2">
-<h3 id="fixed-18"><a class="anchor" href="#fixed-18"></a>Fixed</h3>
+<h3 id="fixed-19"><a class="anchor" href="#fixed-19"></a>Fixed</h3>
 <div class="ulist">
 <ul>
 <li>
@@ -1811,7 +1857,7 @@ generated straight from that same file at build time, so it can&#8217;t drift fr
 <h2 id="v3-7-2-2026-04-22"><a class="anchor" href="#v3-7-2-2026-04-22"></a>v3.7.2 — 2026-04-22</h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="fixed-19"><a class="anchor" href="#fixed-19"></a>Fixed</h3>
+<h3 id="fixed-20"><a class="anchor" href="#fixed-20"></a>Fixed</h3>
 <div class="ulist">
 <ul>
 <li>
@@ -1829,7 +1875,7 @@ generated straight from that same file at build time, so it can&#8217;t drift fr
 <h2 id="v3-7-1-2026-04-21"><a class="anchor" href="#v3-7-1-2026-04-21"></a>v3.7.1 — 2026-04-21</h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="fixed-20"><a class="anchor" href="#fixed-20"></a>Fixed</h3>
+<h3 id="fixed-21"><a class="anchor" href="#fixed-21"></a>Fixed</h3>
 <div class="ulist">
 <ul>
 <li>
@@ -1844,7 +1890,7 @@ generated straight from that same file at build time, so it can&#8217;t drift fr
 <h2 id="v3-7-0-2026-04-17"><a class="anchor" href="#v3-7-0-2026-04-17"></a>v3.7.0 — 2026-04-17</h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="added-7"><a class="anchor" href="#added-7"></a>Added</h3>
+<h3 id="added-8"><a class="anchor" href="#added-8"></a>Added</h3>
 <div class="ulist">
 <ul>
 <li>
@@ -1857,7 +1903,7 @@ generated straight from that same file at build time, so it can&#8217;t drift fr
 </div>
 </div>
 <div class="sect2">
-<h3 id="fixed-21"><a class="anchor" href="#fixed-21"></a>Fixed</h3>
+<h3 id="fixed-22"><a class="anchor" href="#fixed-22"></a>Fixed</h3>
 <div class="ulist">
 <ul>
 <li>
@@ -1875,7 +1921,7 @@ generated straight from that same file at build time, so it can&#8217;t drift fr
 <h2 id="v3-6-0-2026-04-07"><a class="anchor" href="#v3-6-0-2026-04-07"></a>v3.6.0 — 2026-04-07</h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="added-8"><a class="anchor" href="#added-8"></a>Added</h3>
+<h3 id="added-9"><a class="anchor" href="#added-9"></a>Added</h3>
 <div class="ulist">
 <ul>
 <li>
@@ -1905,7 +1951,7 @@ generated straight from that same file at build time, so it can&#8217;t drift fr
 <h2 id="v3-4-0-2026-04-06"><a class="anchor" href="#v3-4-0-2026-04-06"></a>v3.4.0 — 2026-04-06</h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="added-9"><a class="anchor" href="#added-9"></a>Added</h3>
+<h3 id="added-10"><a class="anchor" href="#added-10"></a>Added</h3>
 <div class="ulist">
 <ul>
 <li>
@@ -1925,7 +1971,7 @@ generated straight from that same file at build time, so it can&#8217;t drift fr
 </div>
 </div>
 <div class="sect2">
-<h3 id="fixed-22"><a class="anchor" href="#fixed-22"></a>Fixed</h3>
+<h3 id="fixed-23"><a class="anchor" href="#fixed-23"></a>Fixed</h3>
 <div class="ulist">
 <ul>
 <li>
@@ -1940,7 +1986,7 @@ generated straight from that same file at build time, so it can&#8217;t drift fr
 <h2 id="v3-3-1-2026-03-27"><a class="anchor" href="#v3-3-1-2026-03-27"></a>v3.3.1 — 2026-03-27</h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="fixed-23"><a class="anchor" href="#fixed-23"></a>Fixed</h3>
+<h3 id="fixed-24"><a class="anchor" href="#fixed-24"></a>Fixed</h3>
 <div class="ulist">
 <ul>
 <li>
@@ -1958,7 +2004,7 @@ generated straight from that same file at build time, so it can&#8217;t drift fr
 <h2 id="v3-3-0-2026-03-18"><a class="anchor" href="#v3-3-0-2026-03-18"></a>v3.3.0 — 2026-03-18</h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="added-10"><a class="anchor" href="#added-10"></a>Added</h3>
+<h3 id="added-11"><a class="anchor" href="#added-11"></a>Added</h3>
 <div class="ulist">
 <ul>
 <li>
@@ -1973,7 +2019,7 @@ generated straight from that same file at build time, so it can&#8217;t drift fr
 <h2 id="v3-2-5-2026-03-18"><a class="anchor" href="#v3-2-5-2026-03-18"></a>v3.2.5 — 2026-03-18</h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="fixed-24"><a class="anchor" href="#fixed-24"></a>Fixed</h3>
+<h3 id="fixed-25"><a class="anchor" href="#fixed-25"></a>Fixed</h3>
 <div class="ulist">
 <ul>
 <li>
@@ -1988,7 +2034,7 @@ generated straight from that same file at build time, so it can&#8217;t drift fr
 <h2 id="v3-2-4-2026-03-18"><a class="anchor" href="#v3-2-4-2026-03-18"></a>v3.2.4 — 2026-03-18</h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="fixed-25"><a class="anchor" href="#fixed-25"></a>Fixed</h3>
+<h3 id="fixed-26"><a class="anchor" href="#fixed-26"></a>Fixed</h3>
 <div class="ulist">
 <ul>
 <li>
@@ -2003,7 +2049,7 @@ generated straight from that same file at build time, so it can&#8217;t drift fr
 <h2 id="v3-2-3-2026-03-17"><a class="anchor" href="#v3-2-3-2026-03-17"></a>v3.2.3 — 2026-03-17</h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="fixed-26"><a class="anchor" href="#fixed-26"></a>Fixed</h3>
+<h3 id="fixed-27"><a class="anchor" href="#fixed-27"></a>Fixed</h3>
 <div class="ulist">
 <ul>
 <li>
@@ -2018,7 +2064,7 @@ generated straight from that same file at build time, so it can&#8217;t drift fr
 <h2 id="v3-2-2-2026-03-17"><a class="anchor" href="#v3-2-2-2026-03-17"></a>v3.2.2 — 2026-03-17</h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="fixed-27"><a class="anchor" href="#fixed-27"></a>Fixed</h3>
+<h3 id="fixed-28"><a class="anchor" href="#fixed-28"></a>Fixed</h3>
 <div class="ulist">
 <ul>
 <li>
@@ -2036,7 +2082,7 @@ generated straight from that same file at build time, so it can&#8217;t drift fr
 <h2 id="v3-2-1-2026-03-16"><a class="anchor" href="#v3-2-1-2026-03-16"></a>v3.2.1 — 2026-03-16</h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="fixed-28"><a class="anchor" href="#fixed-28"></a>Fixed</h3>
+<h3 id="fixed-29"><a class="anchor" href="#fixed-29"></a>Fixed</h3>
 <div class="ulist">
 <ul>
 <li>
@@ -2051,7 +2097,7 @@ generated straight from that same file at build time, so it can&#8217;t drift fr
 <h2 id="v3-2-0-2026-03-16"><a class="anchor" href="#v3-2-0-2026-03-16"></a>v3.2.0 — 2026-03-16</h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="added-11"><a class="anchor" href="#added-11"></a>Added</h3>
+<h3 id="added-12"><a class="anchor" href="#added-12"></a>Added</h3>
 <div class="ulist">
 <ul>
 <li>
@@ -2071,7 +2117,7 @@ generated straight from that same file at build time, so it can&#8217;t drift fr
 </div>
 </div>
 <div class="sect2">
-<h3 id="fixed-29"><a class="anchor" href="#fixed-29"></a>Fixed</h3>
+<h3 id="fixed-30"><a class="anchor" href="#fixed-30"></a>Fixed</h3>
 <div class="ulist">
 <ul>
 <li>
@@ -2086,7 +2132,7 @@ generated straight from that same file at build time, so it can&#8217;t drift fr
 <h2 id="v3-1-0-2026-03-06"><a class="anchor" href="#v3-1-0-2026-03-06"></a>v3.1.0 — 2026-03-06</h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="added-12"><a class="anchor" href="#added-12"></a>Added</h3>
+<h3 id="added-13"><a class="anchor" href="#added-13"></a>Added</h3>
 <div class="ulist">
 <ul>
 <li>
@@ -2096,7 +2142,7 @@ generated straight from that same file at build time, so it can&#8217;t drift fr
 </div>
 </div>
 <div class="sect2">
-<h3 id="fixed-30"><a class="anchor" href="#fixed-30"></a>Fixed</h3>
+<h3 id="fixed-31"><a class="anchor" href="#fixed-31"></a>Fixed</h3>
 <div class="ulist">
 <ul>
 <li>
@@ -2147,7 +2193,7 @@ generated straight from that same file at build time, so it can&#8217;t drift fr
 <h2 id="v2-23-0-2026-02-25"><a class="anchor" href="#v2-23-0-2026-02-25"></a>v2.23.0 — 2026-02-25</h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="added-13"><a class="anchor" href="#added-13"></a>Added</h3>
+<h3 id="added-14"><a class="anchor" href="#added-14"></a>Added</h3>
 <div class="ulist">
 <ul>
 <li>
@@ -2165,7 +2211,7 @@ generated straight from that same file at build time, so it can&#8217;t drift fr
 <h2 id="v2-22-0-2026-02-24"><a class="anchor" href="#v2-22-0-2026-02-24"></a>v2.22.0 — 2026-02-24</h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="added-14"><a class="anchor" href="#added-14"></a>Added</h3>
+<h3 id="added-15"><a class="anchor" href="#added-15"></a>Added</h3>
 <div class="ulist">
 <ul>
 <li>
@@ -2186,7 +2232,7 @@ generated straight from that same file at build time, so it can&#8217;t drift fr
 <h2 id="v2-21-1-2026-02-24"><a class="anchor" href="#v2-21-1-2026-02-24"></a>v2.21.1 — 2026-02-24</h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="fixed-31"><a class="anchor" href="#fixed-31"></a>Fixed</h3>
+<h3 id="fixed-32"><a class="anchor" href="#fixed-32"></a>Fixed</h3>
 <div class="ulist">
 <ul>
 <li>
@@ -2201,7 +2247,7 @@ generated straight from that same file at build time, so it can&#8217;t drift fr
 <h2 id="v2-21-0-2026-02-24"><a class="anchor" href="#v2-21-0-2026-02-24"></a>v2.21.0 — 2026-02-24</h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="added-15"><a class="anchor" href="#added-15"></a>Added</h3>
+<h3 id="added-16"><a class="anchor" href="#added-16"></a>Added</h3>
 <div class="ulist">
 <ul>
 <li>
@@ -2222,7 +2268,7 @@ generated straight from that same file at build time, so it can&#8217;t drift fr
 <h2 id="v2-20-2-2026-02-19"><a class="anchor" href="#v2-20-2-2026-02-19"></a>v2.20.2 — 2026-02-19</h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="fixed-32"><a class="anchor" href="#fixed-32"></a>Fixed</h3>
+<h3 id="fixed-33"><a class="anchor" href="#fixed-33"></a>Fixed</h3>
 <div class="ulist">
 <ul>
 <li>
@@ -2240,7 +2286,7 @@ generated straight from that same file at build time, so it can&#8217;t drift fr
 <h2 id="v2-20-1-2026-02-13"><a class="anchor" href="#v2-20-1-2026-02-13"></a>v2.20.1 — 2026-02-13</h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="fixed-33"><a class="anchor" href="#fixed-33"></a>Fixed</h3>
+<h3 id="fixed-34"><a class="anchor" href="#fixed-34"></a>Fixed</h3>
 <div class="ulist">
 <ul>
 <li>
@@ -2258,7 +2304,7 @@ generated straight from that same file at build time, so it can&#8217;t drift fr
 <h2 id="v2-20-0-2026-02-12"><a class="anchor" href="#v2-20-0-2026-02-12"></a>v2.20.0 — 2026-02-12</h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="added-16"><a class="anchor" href="#added-16"></a>Added</h3>
+<h3 id="added-17"><a class="anchor" href="#added-17"></a>Added</h3>
 <div class="ulist">
 <ul>
 <li>
@@ -2268,7 +2314,7 @@ generated straight from that same file at build time, so it can&#8217;t drift fr
 </div>
 </div>
 <div class="sect2">
-<h3 id="fixed-34"><a class="anchor" href="#fixed-34"></a>Fixed</h3>
+<h3 id="fixed-35"><a class="anchor" href="#fixed-35"></a>Fixed</h3>
 <div class="ulist">
 <ul>
 <li>
@@ -2283,7 +2329,7 @@ generated straight from that same file at build time, so it can&#8217;t drift fr
 <h2 id="v2-19-0-2026-02-11"><a class="anchor" href="#v2-19-0-2026-02-11"></a>v2.19.0 — 2026-02-11</h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="added-17"><a class="anchor" href="#added-17"></a>Added</h3>
+<h3 id="added-18"><a class="anchor" href="#added-18"></a>Added</h3>
 <div class="ulist">
 <ul>
 <li>
@@ -2298,7 +2344,7 @@ generated straight from that same file at build time, so it can&#8217;t drift fr
 <h2 id="v2-18-1-2026-02-10"><a class="anchor" href="#v2-18-1-2026-02-10"></a>v2.18.1 — 2026-02-10</h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="fixed-35"><a class="anchor" href="#fixed-35"></a>Fixed</h3>
+<h3 id="fixed-36"><a class="anchor" href="#fixed-36"></a>Fixed</h3>
 <div class="ulist">
 <ul>
 <li>
@@ -2313,7 +2359,7 @@ generated straight from that same file at build time, so it can&#8217;t drift fr
 <h2 id="v2-18-0-2026-02-06"><a class="anchor" href="#v2-18-0-2026-02-06"></a>v2.18.0 — 2026-02-06</h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="added-18"><a class="anchor" href="#added-18"></a>Added</h3>
+<h3 id="added-19"><a class="anchor" href="#added-19"></a>Added</h3>
 <div class="ulist">
 <ul>
 <li>
@@ -2331,7 +2377,7 @@ generated straight from that same file at build time, so it can&#8217;t drift fr
 <h2 id="v2-17-0-2026-02-05"><a class="anchor" href="#v2-17-0-2026-02-05"></a>v2.17.0 — 2026-02-05</h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="added-19"><a class="anchor" href="#added-19"></a>Added</h3>
+<h3 id="added-20"><a class="anchor" href="#added-20"></a>Added</h3>
 <div class="ulist">
 <ul>
 <li>
@@ -2346,7 +2392,7 @@ generated straight from that same file at build time, so it can&#8217;t drift fr
 <h2 id="v2-16-0-2026-02-05"><a class="anchor" href="#v2-16-0-2026-02-05"></a>v2.16.0 — 2026-02-05</h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="fixed-36"><a class="anchor" href="#fixed-36"></a>Fixed</h3>
+<h3 id="fixed-37"><a class="anchor" href="#fixed-37"></a>Fixed</h3>
 <div class="ulist">
 <ul>
 <li>
@@ -2361,7 +2407,7 @@ generated straight from that same file at build time, so it can&#8217;t drift fr
 <h2 id="v2-15-3-2026-02-02"><a class="anchor" href="#v2-15-3-2026-02-02"></a>v2.15.3 — 2026-02-02</h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="fixed-37"><a class="anchor" href="#fixed-37"></a>Fixed</h3>
+<h3 id="fixed-38"><a class="anchor" href="#fixed-38"></a>Fixed</h3>
 <div class="ulist">
 <ul>
 <li>
@@ -2382,7 +2428,7 @@ generated straight from that same file at build time, so it can&#8217;t drift fr
 <h2 id="v2-15-2-2026-01-21"><a class="anchor" href="#v2-15-2-2026-01-21"></a>v2.15.2 — 2026-01-21</h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="fixed-38"><a class="anchor" href="#fixed-38"></a>Fixed</h3>
+<h3 id="fixed-39"><a class="anchor" href="#fixed-39"></a>Fixed</h3>
 <div class="ulist">
 <ul>
 <li>
@@ -2397,7 +2443,7 @@ generated straight from that same file at build time, so it can&#8217;t drift fr
 <h2 id="v2-15-1-2026-01-20"><a class="anchor" href="#v2-15-1-2026-01-20"></a>v2.15.1 — 2026-01-20</h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="fixed-39"><a class="anchor" href="#fixed-39"></a>Fixed</h3>
+<h3 id="fixed-40"><a class="anchor" href="#fixed-40"></a>Fixed</h3>
 <div class="ulist">
 <ul>
 <li>
@@ -2412,7 +2458,7 @@ generated straight from that same file at build time, so it can&#8217;t drift fr
 <h2 id="v2-15-0-2026-01-19"><a class="anchor" href="#v2-15-0-2026-01-19"></a>v2.15.0 — 2026-01-19</h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="added-20"><a class="anchor" href="#added-20"></a>Added</h3>
+<h3 id="added-21"><a class="anchor" href="#added-21"></a>Added</h3>
 <div class="ulist">
 <ul>
 <li>
@@ -2427,7 +2473,7 @@ generated straight from that same file at build time, so it can&#8217;t drift fr
 <h2 id="v2-14-0-2026-01-15"><a class="anchor" href="#v2-14-0-2026-01-15"></a>v2.14.0 — 2026-01-15</h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="added-21"><a class="anchor" href="#added-21"></a>Added</h3>
+<h3 id="added-22"><a class="anchor" href="#added-22"></a>Added</h3>
 <div class="ulist">
 <ul>
 <li>
@@ -2437,7 +2483,7 @@ generated straight from that same file at build time, so it can&#8217;t drift fr
 </div>
 </div>
 <div class="sect2">
-<h3 id="fixed-40"><a class="anchor" href="#fixed-40"></a>Fixed</h3>
+<h3 id="fixed-41"><a class="anchor" href="#fixed-41"></a>Fixed</h3>
 <div class="ulist">
 <ul>
 <li>
@@ -2455,7 +2501,7 @@ generated straight from that same file at build time, so it can&#8217;t drift fr
 <h2 id="v2-13-1-2026-01-14"><a class="anchor" href="#v2-13-1-2026-01-14"></a>v2.13.1 — 2026-01-14</h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="fixed-41"><a class="anchor" href="#fixed-41"></a>Fixed</h3>
+<h3 id="fixed-42"><a class="anchor" href="#fixed-42"></a>Fixed</h3>
 <div class="ulist">
 <ul>
 <li>
@@ -2470,7 +2516,7 @@ generated straight from that same file at build time, so it can&#8217;t drift fr
 <h2 id="v2-13-0-2026-01-14"><a class="anchor" href="#v2-13-0-2026-01-14"></a>v2.13.0 — 2026-01-14</h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="added-22"><a class="anchor" href="#added-22"></a>Added</h3>
+<h3 id="added-23"><a class="anchor" href="#added-23"></a>Added</h3>
 <div class="ulist">
 <ul>
 <li>
@@ -2488,7 +2534,7 @@ generated straight from that same file at build time, so it can&#8217;t drift fr
 <h2 id="v2-12-1-2026-01-08"><a class="anchor" href="#v2-12-1-2026-01-08"></a>v2.12.1 — 2026-01-08</h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="fixed-42"><a class="anchor" href="#fixed-42"></a>Fixed</h3>
+<h3 id="fixed-43"><a class="anchor" href="#fixed-43"></a>Fixed</h3>
 <div class="ulist">
 <ul>
 <li>
@@ -2503,7 +2549,7 @@ generated straight from that same file at build time, so it can&#8217;t drift fr
 <h2 id="v2-12-0-2025-12-19"><a class="anchor" href="#v2-12-0-2025-12-19"></a>v2.12.0 — 2025-12-19</h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="added-23"><a class="anchor" href="#added-23"></a>Added</h3>
+<h3 id="added-24"><a class="anchor" href="#added-24"></a>Added</h3>
 <div class="ulist">
 <ul>
 <li>
@@ -2543,7 +2589,7 @@ generated straight from that same file at build time, so it can&#8217;t drift fr
 <h2 id="v2-11-0-2025-12-15"><a class="anchor" href="#v2-11-0-2025-12-15"></a>v2.11.0 — 2025-12-15</h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="added-24"><a class="anchor" href="#added-24"></a>Added</h3>
+<h3 id="added-25"><a class="anchor" href="#added-25"></a>Added</h3>
 <div class="ulist">
 <ul>
 <li>
@@ -2553,7 +2599,7 @@ generated straight from that same file at build time, so it can&#8217;t drift fr
 </div>
 </div>
 <div class="sect2">
-<h3 id="fixed-43"><a class="anchor" href="#fixed-43"></a>Fixed</h3>
+<h3 id="fixed-44"><a class="anchor" href="#fixed-44"></a>Fixed</h3>
 <div class="ulist">
 <ul>
 <li>
@@ -2568,7 +2614,7 @@ generated straight from that same file at build time, so it can&#8217;t drift fr
 <h2 id="v2-10-0-2025-12-11"><a class="anchor" href="#v2-10-0-2025-12-11"></a>v2.10.0 — 2025-12-11</h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="added-25"><a class="anchor" href="#added-25"></a>Added</h3>
+<h3 id="added-26"><a class="anchor" href="#added-26"></a>Added</h3>
 <div class="ulist">
 <ul>
 <li>
@@ -2583,7 +2629,7 @@ generated straight from that same file at build time, so it can&#8217;t drift fr
 <h2 id="v2-9-5-2025-12-05"><a class="anchor" href="#v2-9-5-2025-12-05"></a>v2.9.5 — 2025-12-05</h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="fixed-44"><a class="anchor" href="#fixed-44"></a>Fixed</h3>
+<h3 id="fixed-45"><a class="anchor" href="#fixed-45"></a>Fixed</h3>
 <div class="ulist">
 <ul>
 <li>
@@ -2598,7 +2644,7 @@ generated straight from that same file at build time, so it can&#8217;t drift fr
 <h2 id="v2-9-4-2025-12-05"><a class="anchor" href="#v2-9-4-2025-12-05"></a>v2.9.4 — 2025-12-05</h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="fixed-45"><a class="anchor" href="#fixed-45"></a>Fixed</h3>
+<h3 id="fixed-46"><a class="anchor" href="#fixed-46"></a>Fixed</h3>
 <div class="ulist">
 <ul>
 <li>
@@ -2613,7 +2659,7 @@ generated straight from that same file at build time, so it can&#8217;t drift fr
 <h2 id="v2-9-3-2025-12-05"><a class="anchor" href="#v2-9-3-2025-12-05"></a>v2.9.3 — 2025-12-05</h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="fixed-46"><a class="anchor" href="#fixed-46"></a>Fixed</h3>
+<h3 id="fixed-47"><a class="anchor" href="#fixed-47"></a>Fixed</h3>
 <div class="ulist">
 <ul>
 <li>
@@ -2628,7 +2674,7 @@ generated straight from that same file at build time, so it can&#8217;t drift fr
 <h2 id="v2-9-2-2025-12-04"><a class="anchor" href="#v2-9-2-2025-12-04"></a>v2.9.2 — 2025-12-04</h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="fixed-47"><a class="anchor" href="#fixed-47"></a>Fixed</h3>
+<h3 id="fixed-48"><a class="anchor" href="#fixed-48"></a>Fixed</h3>
 <div class="ulist">
 <ul>
 <li>
@@ -2643,7 +2689,7 @@ generated straight from that same file at build time, so it can&#8217;t drift fr
 <h2 id="v2-9-1-2025-12-04"><a class="anchor" href="#v2-9-1-2025-12-04"></a>v2.9.1 — 2025-12-04</h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="fixed-48"><a class="anchor" href="#fixed-48"></a>Fixed</h3>
+<h3 id="fixed-49"><a class="anchor" href="#fixed-49"></a>Fixed</h3>
 <div class="ulist">
 <ul>
 <li>
@@ -2658,7 +2704,7 @@ generated straight from that same file at build time, so it can&#8217;t drift fr
 <h2 id="v2-9-0-2025-12-03"><a class="anchor" href="#v2-9-0-2025-12-03"></a>v2.9.0 — 2025-12-03</h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="added-26"><a class="anchor" href="#added-26"></a>Added</h3>
+<h3 id="added-27"><a class="anchor" href="#added-27"></a>Added</h3>
 <div class="ulist">
 <ul>
 <li>
@@ -2684,7 +2730,7 @@ generated straight from that same file at build time, so it can&#8217;t drift fr
 </div>
 </div>
 <div class="sect2">
-<h3 id="fixed-49"><a class="anchor" href="#fixed-49"></a>Fixed</h3>
+<h3 id="fixed-50"><a class="anchor" href="#fixed-50"></a>Fixed</h3>
 <div class="ulist">
 <ul>
 <li>
@@ -2717,7 +2763,7 @@ generated straight from that same file at build time, so it can&#8217;t drift fr
 <h2 id="v2-8-0-2025-11-27"><a class="anchor" href="#v2-8-0-2025-11-27"></a>v2.8.0 — 2025-11-27</h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="fixed-50"><a class="anchor" href="#fixed-50"></a>Fixed</h3>
+<h3 id="fixed-51"><a class="anchor" href="#fixed-51"></a>Fixed</h3>
 <div class="ulist">
 <ul>
 <li>
@@ -2732,7 +2778,7 @@ generated straight from that same file at build time, so it can&#8217;t drift fr
 <h2 id="v2-7-1-2025-11-27"><a class="anchor" href="#v2-7-1-2025-11-27"></a>v2.7.1 — 2025-11-27</h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="fixed-51"><a class="anchor" href="#fixed-51"></a>Fixed</h3>
+<h3 id="fixed-52"><a class="anchor" href="#fixed-52"></a>Fixed</h3>
 <div class="ulist">
 <ul>
 <li>
@@ -2747,7 +2793,7 @@ generated straight from that same file at build time, so it can&#8217;t drift fr
 <h2 id="v2-7-0-2025-11-24"><a class="anchor" href="#v2-7-0-2025-11-24"></a>v2.7.0 — 2025-11-24</h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="added-27"><a class="anchor" href="#added-27"></a>Added</h3>
+<h3 id="added-28"><a class="anchor" href="#added-28"></a>Added</h3>
 <div class="ulist">
 <ul>
 <li>
@@ -2770,7 +2816,7 @@ generated straight from that same file at build time, so it can&#8217;t drift fr
 </div>
 </div>
 <div class="sect2">
-<h3 id="fixed-52"><a class="anchor" href="#fixed-52"></a>Fixed</h3>
+<h3 id="fixed-53"><a class="anchor" href="#fixed-53"></a>Fixed</h3>
 <div class="ulist">
 <ul>
 <li>
@@ -2785,7 +2831,7 @@ generated straight from that same file at build time, so it can&#8217;t drift fr
 <h2 id="v2-6-0-2025-11-20"><a class="anchor" href="#v2-6-0-2025-11-20"></a>v2.6.0 — 2025-11-20</h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="fixed-53"><a class="anchor" href="#fixed-53"></a>Fixed</h3>
+<h3 id="fixed-54"><a class="anchor" href="#fixed-54"></a>Fixed</h3>
 <div class="ulist">
 <ul>
 <li>
@@ -2800,7 +2846,7 @@ generated straight from that same file at build time, so it can&#8217;t drift fr
 <h2 id="v2-5-0-2025-11-19"><a class="anchor" href="#v2-5-0-2025-11-19"></a>v2.5.0 — 2025-11-19</h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="added-28"><a class="anchor" href="#added-28"></a>Added</h3>
+<h3 id="added-29"><a class="anchor" href="#added-29"></a>Added</h3>
 <div class="ulist">
 <ul>
 <li>
@@ -2815,7 +2861,7 @@ generated straight from that same file at build time, so it can&#8217;t drift fr
 <h2 id="v2-4-0-2025-11-19"><a class="anchor" href="#v2-4-0-2025-11-19"></a>v2.4.0 — 2025-11-19</h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="added-29"><a class="anchor" href="#added-29"></a>Added</h3>
+<h3 id="added-30"><a class="anchor" href="#added-30"></a>Added</h3>
 <div class="ulist">
 <ul>
 <li>
@@ -2830,7 +2876,7 @@ generated straight from that same file at build time, so it can&#8217;t drift fr
 <h2 id="v2-3-3-2025-11-18"><a class="anchor" href="#v2-3-3-2025-11-18"></a>v2.3.3 — 2025-11-18</h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="fixed-54"><a class="anchor" href="#fixed-54"></a>Fixed</h3>
+<h3 id="fixed-55"><a class="anchor" href="#fixed-55"></a>Fixed</h3>
 <div class="ulist">
 <ul>
 <li>
@@ -2845,7 +2891,7 @@ generated straight from that same file at build time, so it can&#8217;t drift fr
 <h2 id="v2-3-2-2025-11-18"><a class="anchor" href="#v2-3-2-2025-11-18"></a>v2.3.2 — 2025-11-18</h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="fixed-55"><a class="anchor" href="#fixed-55"></a>Fixed</h3>
+<h3 id="fixed-56"><a class="anchor" href="#fixed-56"></a>Fixed</h3>
 <div class="ulist">
 <ul>
 <li>
@@ -2860,7 +2906,7 @@ generated straight from that same file at build time, so it can&#8217;t drift fr
 <h2 id="v2-3-1-2025-11-18"><a class="anchor" href="#v2-3-1-2025-11-18"></a>v2.3.1 — 2025-11-18</h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="fixed-56"><a class="anchor" href="#fixed-56"></a>Fixed</h3>
+<h3 id="fixed-57"><a class="anchor" href="#fixed-57"></a>Fixed</h3>
 <div class="ulist">
 <ul>
 <li>
@@ -2875,7 +2921,7 @@ generated straight from that same file at build time, so it can&#8217;t drift fr
 <h2 id="v2-3-0-2025-11-17"><a class="anchor" href="#v2-3-0-2025-11-17"></a>v2.3.0 — 2025-11-17</h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="added-30"><a class="anchor" href="#added-30"></a>Added</h3>
+<h3 id="added-31"><a class="anchor" href="#added-31"></a>Added</h3>
 <div class="ulist">
 <ul>
 <li>
@@ -2890,7 +2936,7 @@ generated straight from that same file at build time, so it can&#8217;t drift fr
 <h2 id="v2-2-0-2025-11-06"><a class="anchor" href="#v2-2-0-2025-11-06"></a>v2.2.0 — 2025-11-06</h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="added-31"><a class="anchor" href="#added-31"></a>Added</h3>
+<h3 id="added-32"><a class="anchor" href="#added-32"></a>Added</h3>
 <div class="ulist">
 <ul>
 <li>
@@ -2915,7 +2961,7 @@ generated straight from that same file at build time, so it can&#8217;t drift fr
 <h2 id="v2-1-1-2025-11-06"><a class="anchor" href="#v2-1-1-2025-11-06"></a>v2.1.1 — 2025-11-06</h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="fixed-57"><a class="anchor" href="#fixed-57"></a>Fixed</h3>
+<h3 id="fixed-58"><a class="anchor" href="#fixed-58"></a>Fixed</h3>
 <div class="ulist">
 <ul>
 <li>
@@ -2945,7 +2991,7 @@ generated straight from that same file at build time, so it can&#8217;t drift fr
 <h2 id="v2-0-3-2025-11-04"><a class="anchor" href="#v2-0-3-2025-11-04"></a>v2.0.3 — 2025-11-04</h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="fixed-58"><a class="anchor" href="#fixed-58"></a>Fixed</h3>
+<h3 id="fixed-59"><a class="anchor" href="#fixed-59"></a>Fixed</h3>
 <div class="ulist">
 <ul>
 <li>
@@ -2963,7 +3009,7 @@ generated straight from that same file at build time, so it can&#8217;t drift fr
 <h2 id="v2-0-2-2025-10-31"><a class="anchor" href="#v2-0-2-2025-10-31"></a>v2.0.2 — 2025-10-31</h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="fixed-59"><a class="anchor" href="#fixed-59"></a>Fixed</h3>
+<h3 id="fixed-60"><a class="anchor" href="#fixed-60"></a>Fixed</h3>
 <div class="ulist">
 <ul>
 <li>
@@ -3005,7 +3051,7 @@ generated straight from that same file at build time, so it can&#8217;t drift fr
 <h2 id="v1-3-1-2025-10-27"><a class="anchor" href="#v1-3-1-2025-10-27"></a>v1.3.1 — 2025-10-27</h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="fixed-60"><a class="anchor" href="#fixed-60"></a>Fixed</h3>
+<h3 id="fixed-61"><a class="anchor" href="#fixed-61"></a>Fixed</h3>
 <div class="ulist">
 <ul>
 <li>
@@ -3023,7 +3069,7 @@ generated straight from that same file at build time, so it can&#8217;t drift fr
 <h2 id="v1-3-0-2025-10-23"><a class="anchor" href="#v1-3-0-2025-10-23"></a>v1.3.0 — 2025-10-23</h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="added-32"><a class="anchor" href="#added-32"></a>Added</h3>
+<h3 id="added-33"><a class="anchor" href="#added-33"></a>Added</h3>
 <div class="ulist">
 <ul>
 <li>
@@ -3038,7 +3084,7 @@ generated straight from that same file at build time, so it can&#8217;t drift fr
 <h2 id="v1-2-2-2025-10-23"><a class="anchor" href="#v1-2-2-2025-10-23"></a>v1.2.2 — 2025-10-23</h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="fixed-61"><a class="anchor" href="#fixed-61"></a>Fixed</h3>
+<h3 id="fixed-62"><a class="anchor" href="#fixed-62"></a>Fixed</h3>
 <div class="ulist">
 <ul>
 <li>
@@ -3053,7 +3099,7 @@ generated straight from that same file at build time, so it can&#8217;t drift fr
 <h2 id="v1-2-1-2025-10-22"><a class="anchor" href="#v1-2-1-2025-10-22"></a>v1.2.1 — 2025-10-22</h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="fixed-62"><a class="anchor" href="#fixed-62"></a>Fixed</h3>
+<h3 id="fixed-63"><a class="anchor" href="#fixed-63"></a>Fixed</h3>
 <div class="ulist">
 <ul>
 <li>
@@ -3083,7 +3129,7 @@ generated straight from that same file at build time, so it can&#8217;t drift fr
 <h2 id="v1-1-3-2025-10-21"><a class="anchor" href="#v1-1-3-2025-10-21"></a>v1.1.3 — 2025-10-21</h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="fixed-63"><a class="anchor" href="#fixed-63"></a>Fixed</h3>
+<h3 id="fixed-64"><a class="anchor" href="#fixed-64"></a>Fixed</h3>
 <div class="ulist">
 <ul>
 <li>
@@ -3098,7 +3144,7 @@ generated straight from that same file at build time, so it can&#8217;t drift fr
 <h2 id="v1-1-2-2025-10-21"><a class="anchor" href="#v1-1-2-2025-10-21"></a>v1.1.2 — 2025-10-21</h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="fixed-64"><a class="anchor" href="#fixed-64"></a>Fixed</h3>
+<h3 id="fixed-65"><a class="anchor" href="#fixed-65"></a>Fixed</h3>
 <div class="ulist">
 <ul>
 <li>
@@ -3113,7 +3159,7 @@ generated straight from that same file at build time, so it can&#8217;t drift fr
 <h2 id="v1-1-1-2025-10-21"><a class="anchor" href="#v1-1-1-2025-10-21"></a>v1.1.1 — 2025-10-21</h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="fixed-65"><a class="anchor" href="#fixed-65"></a>Fixed</h3>
+<h3 id="fixed-66"><a class="anchor" href="#fixed-66"></a>Fixed</h3>
 <div class="ulist">
 <ul>
 <li>
@@ -3143,7 +3189,7 @@ generated straight from that same file at build time, so it can&#8217;t drift fr
 <h2 id="v1-0-4-2025-10-20"><a class="anchor" href="#v1-0-4-2025-10-20"></a>v1.0.4 — 2025-10-20</h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="fixed-66"><a class="anchor" href="#fixed-66"></a>Fixed</h3>
+<h3 id="fixed-67"><a class="anchor" href="#fixed-67"></a>Fixed</h3>
 <div class="ulist">
 <ul>
 <li>
@@ -3158,7 +3204,7 @@ generated straight from that same file at build time, so it can&#8217;t drift fr
 <h2 id="v1-0-3-2025-10-17"><a class="anchor" href="#v1-0-3-2025-10-17"></a>v1.0.3 — 2025-10-17</h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="fixed-67"><a class="anchor" href="#fixed-67"></a>Fixed</h3>
+<h3 id="fixed-68"><a class="anchor" href="#fixed-68"></a>Fixed</h3>
 <div class="ulist">
 <ul>
 <li>
@@ -3173,7 +3219,7 @@ generated straight from that same file at build time, so it can&#8217;t drift fr
 <h2 id="v1-0-2-2025-10-17"><a class="anchor" href="#v1-0-2-2025-10-17"></a>v1.0.2 — 2025-10-17</h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="fixed-68"><a class="anchor" href="#fixed-68"></a>Fixed</h3>
+<h3 id="fixed-69"><a class="anchor" href="#fixed-69"></a>Fixed</h3>
 <div class="ulist">
 <ul>
 <li>
@@ -3188,7 +3234,7 @@ generated straight from that same file at build time, so it can&#8217;t drift fr
 <h2 id="v1-0-1-2025-10-17"><a class="anchor" href="#v1-0-1-2025-10-17"></a>v1.0.1 — 2025-10-17</h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="fixed-69"><a class="anchor" href="#fixed-69"></a>Fixed</h3>
+<h3 id="fixed-70"><a class="anchor" href="#fixed-70"></a>Fixed</h3>
 <div class="ulist">
 <ul>
 <li>
@@ -3203,7 +3249,7 @@ generated straight from that same file at build time, so it can&#8217;t drift fr
 <h2 id="v1-0-0-2025-10-17"><a class="anchor" href="#v1-0-0-2025-10-17"></a>v1.0.0 — 2025-10-17</h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="added-33"><a class="anchor" href="#added-33"></a>Added</h3>
+<h3 id="added-34"><a class="anchor" href="#added-34"></a>Added</h3>
 <div class="ulist">
 <ul>
 <li>
@@ -3218,7 +3264,7 @@ generated straight from that same file at build time, so it can&#8217;t drift fr
 <h2 id="v0-77-5-2025-10-22"><a class="anchor" href="#v0-77-5-2025-10-22"></a>v0.77.5 — 2025-10-22</h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="fixed-70"><a class="anchor" href="#fixed-70"></a>Fixed</h3>
+<h3 id="fixed-71"><a class="anchor" href="#fixed-71"></a>Fixed</h3>
 <div class="ulist">
 <ul>
 <li>
@@ -3233,7 +3279,7 @@ generated straight from that same file at build time, so it can&#8217;t drift fr
 <h2 id="v0-77-4-2025-10-21"><a class="anchor" href="#v0-77-4-2025-10-21"></a>v0.77.4 — 2025-10-21</h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="fixed-71"><a class="anchor" href="#fixed-71"></a>Fixed</h3>
+<h3 id="fixed-72"><a class="anchor" href="#fixed-72"></a>Fixed</h3>
 <div class="ulist">
 <ul>
 <li>
@@ -3248,7 +3294,7 @@ generated straight from that same file at build time, so it can&#8217;t drift fr
 <h2 id="v0-77-3-2025-10-21"><a class="anchor" href="#v0-77-3-2025-10-21"></a>v0.77.3 — 2025-10-21</h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="fixed-72"><a class="anchor" href="#fixed-72"></a>Fixed</h3>
+<h3 id="fixed-73"><a class="anchor" href="#fixed-73"></a>Fixed</h3>
 <div class="ulist">
 <ul>
 <li>
@@ -3263,7 +3309,7 @@ generated straight from that same file at build time, so it can&#8217;t drift fr
 <h2 id="v0-77-2-2025-10-21"><a class="anchor" href="#v0-77-2-2025-10-21"></a>v0.77.2 — 2025-10-21</h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="fixed-73"><a class="anchor" href="#fixed-73"></a>Fixed</h3>
+<h3 id="fixed-74"><a class="anchor" href="#fixed-74"></a>Fixed</h3>
 <div class="ulist">
 <ul>
 <li>
@@ -3278,7 +3324,7 @@ generated straight from that same file at build time, so it can&#8217;t drift fr
 <h2 id="v0-77-1-2025-10-20"><a class="anchor" href="#v0-77-1-2025-10-20"></a>v0.77.1 — 2025-10-20</h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="fixed-74"><a class="anchor" href="#fixed-74"></a>Fixed</h3>
+<h3 id="fixed-75"><a class="anchor" href="#fixed-75"></a>Fixed</h3>
 <div class="ulist">
 <ul>
 <li>
@@ -3293,7 +3339,7 @@ generated straight from that same file at build time, so it can&#8217;t drift fr
 <h2 id="v0-77-0-2025-10-16"><a class="anchor" href="#v0-77-0-2025-10-16"></a>v0.77.0 — 2025-10-16</h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="added-34"><a class="anchor" href="#added-34"></a>Added</h3>
+<h3 id="added-35"><a class="anchor" href="#added-35"></a>Added</h3>
 <div class="ulist">
 <ul>
 <li>
@@ -3308,7 +3354,7 @@ generated straight from that same file at build time, so it can&#8217;t drift fr
 <h2 id="v0-76-3-2025-10-16"><a class="anchor" href="#v0-76-3-2025-10-16"></a>v0.76.3 — 2025-10-16</h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="fixed-75"><a class="anchor" href="#fixed-75"></a>Fixed</h3>
+<h3 id="fixed-76"><a class="anchor" href="#fixed-76"></a>Fixed</h3>
 <div class="ulist">
 <ul>
 <li>
@@ -3323,7 +3369,7 @@ generated straight from that same file at build time, so it can&#8217;t drift fr
 <h2 id="v0-76-2-2025-10-15"><a class="anchor" href="#v0-76-2-2025-10-15"></a>v0.76.2 — 2025-10-15</h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="fixed-76"><a class="anchor" href="#fixed-76"></a>Fixed</h3>
+<h3 id="fixed-77"><a class="anchor" href="#fixed-77"></a>Fixed</h3>
 <div class="ulist">
 <ul>
 <li>
@@ -3341,7 +3387,7 @@ generated straight from that same file at build time, so it can&#8217;t drift fr
 <h2 id="v0-76-1-2025-10-14"><a class="anchor" href="#v0-76-1-2025-10-14"></a>v0.76.1 — 2025-10-14</h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="fixed-77"><a class="anchor" href="#fixed-77"></a>Fixed</h3>
+<h3 id="fixed-78"><a class="anchor" href="#fixed-78"></a>Fixed</h3>
 <div class="ulist">
 <ul>
 <li>
@@ -3386,7 +3432,7 @@ generated straight from that same file at build time, so it can&#8217;t drift fr
 <h2 id="v0-74-3-2025-10-10"><a class="anchor" href="#v0-74-3-2025-10-10"></a>v0.74.3 — 2025-10-10</h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="fixed-78"><a class="anchor" href="#fixed-78"></a>Fixed</h3>
+<h3 id="fixed-79"><a class="anchor" href="#fixed-79"></a>Fixed</h3>
 <div class="ulist">
 <ul>
 <li>
@@ -3401,7 +3447,7 @@ generated straight from that same file at build time, so it can&#8217;t drift fr
 <h2 id="v0-74-2-2025-10-10"><a class="anchor" href="#v0-74-2-2025-10-10"></a>v0.74.2 — 2025-10-10</h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="fixed-79"><a class="anchor" href="#fixed-79"></a>Fixed</h3>
+<h3 id="fixed-80"><a class="anchor" href="#fixed-80"></a>Fixed</h3>
 <div class="ulist">
 <ul>
 <li>
@@ -3416,7 +3462,7 @@ generated straight from that same file at build time, so it can&#8217;t drift fr
 <h2 id="v0-74-1-2025-10-10"><a class="anchor" href="#v0-74-1-2025-10-10"></a>v0.74.1 — 2025-10-10</h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="fixed-80"><a class="anchor" href="#fixed-80"></a>Fixed</h3>
+<h3 id="fixed-81"><a class="anchor" href="#fixed-81"></a>Fixed</h3>
 <div class="ulist">
 <ul>
 <li>
@@ -3434,7 +3480,7 @@ generated straight from that same file at build time, so it can&#8217;t drift fr
 <h2 id="v0-74-0-2025-10-09"><a class="anchor" href="#v0-74-0-2025-10-09"></a>v0.74.0 — 2025-10-09</h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="added-35"><a class="anchor" href="#added-35"></a>Added</h3>
+<h3 id="added-36"><a class="anchor" href="#added-36"></a>Added</h3>
 <div class="ulist">
 <ul>
 <li>
@@ -3449,7 +3495,7 @@ generated straight from that same file at build time, so it can&#8217;t drift fr
 <h2 id="v0-73-1-2025-10-09"><a class="anchor" href="#v0-73-1-2025-10-09"></a>v0.73.1 — 2025-10-09</h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="fixed-81"><a class="anchor" href="#fixed-81"></a>Fixed</h3>
+<h3 id="fixed-82"><a class="anchor" href="#fixed-82"></a>Fixed</h3>
 <div class="ulist">
 <ul>
 <li>
@@ -3464,7 +3510,7 @@ generated straight from that same file at build time, so it can&#8217;t drift fr
 <h2 id="v0-73-0-2025-10-08"><a class="anchor" href="#v0-73-0-2025-10-08"></a>v0.73.0 — 2025-10-08</h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="added-36"><a class="anchor" href="#added-36"></a>Added</h3>
+<h3 id="added-37"><a class="anchor" href="#added-37"></a>Added</h3>
 <div class="ulist">
 <ul>
 <li>
@@ -3479,7 +3525,7 @@ generated straight from that same file at build time, so it can&#8217;t drift fr
 <h2 id="v0-72-1-2025-10-07"><a class="anchor" href="#v0-72-1-2025-10-07"></a>v0.72.1 — 2025-10-07</h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="fixed-82"><a class="anchor" href="#fixed-82"></a>Fixed</h3>
+<h3 id="fixed-83"><a class="anchor" href="#fixed-83"></a>Fixed</h3>
 <div class="ulist">
 <ul>
 <li>
@@ -3494,7 +3540,7 @@ generated straight from that same file at build time, so it can&#8217;t drift fr
 <h2 id="v0-72-0-2025-10-03"><a class="anchor" href="#v0-72-0-2025-10-03"></a>v0.72.0 — 2025-10-03</h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="added-37"><a class="anchor" href="#added-37"></a>Added</h3>
+<h3 id="added-38"><a class="anchor" href="#added-38"></a>Added</h3>
 <div class="ulist">
 <ul>
 <li>
@@ -3507,7 +3553,7 @@ generated straight from that same file at build time, so it can&#8217;t drift fr
 </div>
 </div>
 <div class="sect2">
-<h3 id="fixed-83"><a class="anchor" href="#fixed-83"></a>Fixed</h3>
+<h3 id="fixed-84"><a class="anchor" href="#fixed-84"></a>Fixed</h3>
 <div class="ulist">
 <ul>
 <li>
@@ -3555,7 +3601,7 @@ generated straight from that same file at build time, so it can&#8217;t drift fr
 <h2 id="v0-69-2-2025-09-29"><a class="anchor" href="#v0-69-2-2025-09-29"></a>v0.69.2 — 2025-09-29</h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="fixed-84"><a class="anchor" href="#fixed-84"></a>Fixed</h3>
+<h3 id="fixed-85"><a class="anchor" href="#fixed-85"></a>Fixed</h3>
 <div class="ulist">
 <ul>
 <li>
@@ -3573,7 +3619,7 @@ generated straight from that same file at build time, so it can&#8217;t drift fr
 <h2 id="v0-69-1-2025-09-29"><a class="anchor" href="#v0-69-1-2025-09-29"></a>v0.69.1 — 2025-09-29</h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="fixed-85"><a class="anchor" href="#fixed-85"></a>Fixed</h3>
+<h3 id="fixed-86"><a class="anchor" href="#fixed-86"></a>Fixed</h3>
 <div class="ulist">
 <ul>
 <li>
@@ -3624,7 +3670,7 @@ generated straight from that same file at build time, so it can&#8217;t drift fr
 <h2 id="v0-68-0-2025-09-07"><a class="anchor" href="#v0-68-0-2025-09-07"></a>v0.68.0 — 2025-09-07</h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="added-38"><a class="anchor" href="#added-38"></a>Added</h3>
+<h3 id="added-39"><a class="anchor" href="#added-39"></a>Added</h3>
 <div class="ulist">
 <ul>
 <li>
@@ -3639,7 +3685,7 @@ generated straight from that same file at build time, so it can&#8217;t drift fr
 <h2 id="v0-67-5-2025-09-07"><a class="anchor" href="#v0-67-5-2025-09-07"></a>v0.67.5 — 2025-09-07</h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="fixed-86"><a class="anchor" href="#fixed-86"></a>Fixed</h3>
+<h3 id="fixed-87"><a class="anchor" href="#fixed-87"></a>Fixed</h3>
 <div class="ulist">
 <ul>
 <li>
@@ -3654,7 +3700,7 @@ generated straight from that same file at build time, so it can&#8217;t drift fr
 <h2 id="v0-67-4-2025-09-07"><a class="anchor" href="#v0-67-4-2025-09-07"></a>v0.67.4 — 2025-09-07</h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="fixed-87"><a class="anchor" href="#fixed-87"></a>Fixed</h3>
+<h3 id="fixed-88"><a class="anchor" href="#fixed-88"></a>Fixed</h3>
 <div class="ulist">
 <ul>
 <li>
@@ -3669,7 +3715,7 @@ generated straight from that same file at build time, so it can&#8217;t drift fr
 <h2 id="v0-67-3-2025-09-06"><a class="anchor" href="#v0-67-3-2025-09-06"></a>v0.67.3 — 2025-09-06</h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="fixed-88"><a class="anchor" href="#fixed-88"></a>Fixed</h3>
+<h3 id="fixed-89"><a class="anchor" href="#fixed-89"></a>Fixed</h3>
 <div class="ulist">
 <ul>
 <li>
@@ -3684,7 +3730,7 @@ generated straight from that same file at build time, so it can&#8217;t drift fr
 <h2 id="v0-67-2-2025-09-06"><a class="anchor" href="#v0-67-2-2025-09-06"></a>v0.67.2 — 2025-09-06</h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="fixed-89"><a class="anchor" href="#fixed-89"></a>Fixed</h3>
+<h3 id="fixed-90"><a class="anchor" href="#fixed-90"></a>Fixed</h3>
 <div class="ulist">
 <ul>
 <li>
@@ -3699,7 +3745,7 @@ generated straight from that same file at build time, so it can&#8217;t drift fr
 <h2 id="v0-67-1-2025-09-06"><a class="anchor" href="#v0-67-1-2025-09-06"></a>v0.67.1 — 2025-09-06</h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="fixed-90"><a class="anchor" href="#fixed-90"></a>Fixed</h3>
+<h3 id="fixed-91"><a class="anchor" href="#fixed-91"></a>Fixed</h3>
 <div class="ulist">
 <ul>
 <li>
@@ -3714,7 +3760,7 @@ generated straight from that same file at build time, so it can&#8217;t drift fr
 <h2 id="v0-67-0-2025-09-06"><a class="anchor" href="#v0-67-0-2025-09-06"></a>v0.67.0 — 2025-09-06</h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="added-39"><a class="anchor" href="#added-39"></a>Added</h3>
+<h3 id="added-40"><a class="anchor" href="#added-40"></a>Added</h3>
 <div class="ulist">
 <ul>
 <li>
@@ -3729,7 +3775,7 @@ generated straight from that same file at build time, so it can&#8217;t drift fr
 <h2 id="v0-66-0-2025-09-05"><a class="anchor" href="#v0-66-0-2025-09-05"></a>v0.66.0 — 2025-09-05</h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="added-40"><a class="anchor" href="#added-40"></a>Added</h3>
+<h3 id="added-41"><a class="anchor" href="#added-41"></a>Added</h3>
 <div class="ulist">
 <ul>
 <li>
@@ -3744,7 +3790,7 @@ generated straight from that same file at build time, so it can&#8217;t drift fr
 <h2 id="v0-64-1-2025-09-04"><a class="anchor" href="#v0-64-1-2025-09-04"></a>v0.64.1 — 2025-09-04</h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="fixed-91"><a class="anchor" href="#fixed-91"></a>Fixed</h3>
+<h3 id="fixed-92"><a class="anchor" href="#fixed-92"></a>Fixed</h3>
 <div class="ulist">
 <ul>
 <li>
@@ -3759,7 +3805,7 @@ generated straight from that same file at build time, so it can&#8217;t drift fr
 <h2 id="v0-64-0-2025-09-04"><a class="anchor" href="#v0-64-0-2025-09-04"></a>v0.64.0 — 2025-09-04</h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="added-41"><a class="anchor" href="#added-41"></a>Added</h3>
+<h3 id="added-42"><a class="anchor" href="#added-42"></a>Added</h3>
 <div class="ulist">
 <ul>
 <li>
@@ -3774,7 +3820,7 @@ generated straight from that same file at build time, so it can&#8217;t drift fr
 <h2 id="v0-62-4-2025-09-04"><a class="anchor" href="#v0-62-4-2025-09-04"></a>v0.62.4 — 2025-09-04</h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="fixed-92"><a class="anchor" href="#fixed-92"></a>Fixed</h3>
+<h3 id="fixed-93"><a class="anchor" href="#fixed-93"></a>Fixed</h3>
 <div class="ulist">
 <ul>
 <li>
@@ -3789,7 +3835,7 @@ generated straight from that same file at build time, so it can&#8217;t drift fr
 <h2 id="v0-62-3-2025-09-01"><a class="anchor" href="#v0-62-3-2025-09-01"></a>v0.62.3 — 2025-09-01</h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="fixed-93"><a class="anchor" href="#fixed-93"></a>Fixed</h3>
+<h3 id="fixed-94"><a class="anchor" href="#fixed-94"></a>Fixed</h3>
 <div class="ulist">
 <ul>
 <li>
@@ -3804,7 +3850,7 @@ generated straight from that same file at build time, so it can&#8217;t drift fr
 <h2 id="v0-62-2-2025-09-01"><a class="anchor" href="#v0-62-2-2025-09-01"></a>v0.62.2 — 2025-09-01</h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="fixed-94"><a class="anchor" href="#fixed-94"></a>Fixed</h3>
+<h3 id="fixed-95"><a class="anchor" href="#fixed-95"></a>Fixed</h3>
 <div class="ulist">
 <ul>
 <li>
@@ -3819,7 +3865,7 @@ generated straight from that same file at build time, so it can&#8217;t drift fr
 <h2 id="v0-62-1-2025-09-01"><a class="anchor" href="#v0-62-1-2025-09-01"></a>v0.62.1 — 2025-09-01</h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="fixed-95"><a class="anchor" href="#fixed-95"></a>Fixed</h3>
+<h3 id="fixed-96"><a class="anchor" href="#fixed-96"></a>Fixed</h3>
 <div class="ulist">
 <ul>
 <li>
@@ -3834,7 +3880,7 @@ generated straight from that same file at build time, so it can&#8217;t drift fr
 <h2 id="v0-62-0-2025-08-29"><a class="anchor" href="#v0-62-0-2025-08-29"></a>v0.62.0 — 2025-08-29</h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="added-42"><a class="anchor" href="#added-42"></a>Added</h3>
+<h3 id="added-43"><a class="anchor" href="#added-43"></a>Added</h3>
 <div class="ulist">
 <ul>
 <li>
@@ -3852,7 +3898,7 @@ generated straight from that same file at build time, so it can&#8217;t drift fr
 <h2 id="v0-61-0-2025-08-28"><a class="anchor" href="#v0-61-0-2025-08-28"></a>v0.61.0 — 2025-08-28</h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="added-43"><a class="anchor" href="#added-43"></a>Added</h3>
+<h3 id="added-44"><a class="anchor" href="#added-44"></a>Added</h3>
 <div class="ulist">
 <ul>
 <li>
@@ -3867,7 +3913,7 @@ generated straight from that same file at build time, so it can&#8217;t drift fr
 <h2 id="v0-60-0-2025-08-28"><a class="anchor" href="#v0-60-0-2025-08-28"></a>v0.60.0 — 2025-08-28</h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="added-44"><a class="anchor" href="#added-44"></a>Added</h3>
+<h3 id="added-45"><a class="anchor" href="#added-45"></a>Added</h3>
 <div class="ulist">
 <ul>
 <li>
@@ -3892,7 +3938,7 @@ generated straight from that same file at build time, so it can&#8217;t drift fr
 <h2 id="v0-59-0-2025-08-19"><a class="anchor" href="#v0-59-0-2025-08-19"></a>v0.59.0 — 2025-08-19</h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="added-45"><a class="anchor" href="#added-45"></a>Added</h3>
+<h3 id="added-46"><a class="anchor" href="#added-46"></a>Added</h3>
 <div class="ulist">
 <ul>
 <li>
@@ -3907,7 +3953,7 @@ generated straight from that same file at build time, so it can&#8217;t drift fr
 <h2 id="v0-58-0-2025-08-13"><a class="anchor" href="#v0-58-0-2025-08-13"></a>v0.58.0 — 2025-08-13</h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="added-46"><a class="anchor" href="#added-46"></a>Added</h3>
+<h3 id="added-47"><a class="anchor" href="#added-47"></a>Added</h3>
 <div class="ulist">
 <ul>
 <li>
@@ -3917,7 +3963,7 @@ generated straight from that same file at build time, so it can&#8217;t drift fr
 </div>
 </div>
 <div class="sect2">
-<h3 id="fixed-96"><a class="anchor" href="#fixed-96"></a>Fixed</h3>
+<h3 id="fixed-97"><a class="anchor" href="#fixed-97"></a>Fixed</h3>
 <div class="ulist">
 <ul>
 <li>
@@ -3968,7 +4014,7 @@ generated straight from that same file at build time, so it can&#8217;t drift fr
 <h2 id="v0-56-2-2025-08-12"><a class="anchor" href="#v0-56-2-2025-08-12"></a>v0.56.2 — 2025-08-12</h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="fixed-97"><a class="anchor" href="#fixed-97"></a>Fixed</h3>
+<h3 id="fixed-98"><a class="anchor" href="#fixed-98"></a>Fixed</h3>
 <div class="ulist">
 <ul>
 <li>
@@ -3983,7 +4029,7 @@ generated straight from that same file at build time, so it can&#8217;t drift fr
 <h2 id="v0-56-1-2025-08-11"><a class="anchor" href="#v0-56-1-2025-08-11"></a>v0.56.1 — 2025-08-11</h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="fixed-98"><a class="anchor" href="#fixed-98"></a>Fixed</h3>
+<h3 id="fixed-99"><a class="anchor" href="#fixed-99"></a>Fixed</h3>
 <div class="ulist">
 <ul>
 <li>
@@ -4011,7 +4057,7 @@ generated straight from that same file at build time, so it can&#8217;t drift fr
 </div>
 </div>
 <div class="sect2">
-<h3 id="fixed-99"><a class="anchor" href="#fixed-99"></a>Fixed</h3>
+<h3 id="fixed-100"><a class="anchor" href="#fixed-100"></a>Fixed</h3>
 <div class="ulist">
 <ul>
 <li>
@@ -4041,7 +4087,7 @@ generated straight from that same file at build time, so it can&#8217;t drift fr
 <h2 id="v0-55-1-2025-08-08"><a class="anchor" href="#v0-55-1-2025-08-08"></a>v0.55.1 — 2025-08-08</h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="fixed-100"><a class="anchor" href="#fixed-100"></a>Fixed</h3>
+<h3 id="fixed-101"><a class="anchor" href="#fixed-101"></a>Fixed</h3>
 <div class="ulist">
 <ul>
 <li>
@@ -4069,7 +4115,7 @@ generated straight from that same file at build time, so it can&#8217;t drift fr
 </div>
 </div>
 <div class="sect2">
-<h3 id="fixed-101"><a class="anchor" href="#fixed-101"></a>Fixed</h3>
+<h3 id="fixed-102"><a class="anchor" href="#fixed-102"></a>Fixed</h3>
 <div class="ulist">
 <ul>
 <li>
@@ -4084,7 +4130,7 @@ generated straight from that same file at build time, so it can&#8217;t drift fr
 <h2 id="v0-54-1-2025-08-07"><a class="anchor" href="#v0-54-1-2025-08-07"></a>v0.54.1 — 2025-08-07</h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="fixed-102"><a class="anchor" href="#fixed-102"></a>Fixed</h3>
+<h3 id="fixed-103"><a class="anchor" href="#fixed-103"></a>Fixed</h3>
 <div class="ulist">
 <ul>
 <li>
@@ -4099,7 +4145,7 @@ generated straight from that same file at build time, so it can&#8217;t drift fr
 <h2 id="v0-54-0-2025-08-07"><a class="anchor" href="#v0-54-0-2025-08-07"></a>v0.54.0 — 2025-08-07</h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="added-47"><a class="anchor" href="#added-47"></a>Added</h3>
+<h3 id="added-48"><a class="anchor" href="#added-48"></a>Added</h3>
 <div class="ulist">
 <ul>
 <li>
@@ -4114,7 +4160,7 @@ generated straight from that same file at build time, so it can&#8217;t drift fr
 <h2 id="v0-53-0-2025-08-06"><a class="anchor" href="#v0-53-0-2025-08-06"></a>v0.53.0 — 2025-08-06</h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="added-48"><a class="anchor" href="#added-48"></a>Added</h3>
+<h3 id="added-49"><a class="anchor" href="#added-49"></a>Added</h3>
 <div class="ulist">
 <ul>
 <li>
@@ -4127,7 +4173,7 @@ generated straight from that same file at build time, so it can&#8217;t drift fr
 </div>
 </div>
 <div class="sect2">
-<h3 id="fixed-103"><a class="anchor" href="#fixed-103"></a>Fixed</h3>
+<h3 id="fixed-104"><a class="anchor" href="#fixed-104"></a>Fixed</h3>
 <div class="ulist">
 <ul>
 <li>
@@ -4142,7 +4188,7 @@ generated straight from that same file at build time, so it can&#8217;t drift fr
 <h2 id="v0-52-3-2025-08-06"><a class="anchor" href="#v0-52-3-2025-08-06"></a>v0.52.3 — 2025-08-06</h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="fixed-104"><a class="anchor" href="#fixed-104"></a>Fixed</h3>
+<h3 id="fixed-105"><a class="anchor" href="#fixed-105"></a>Fixed</h3>
 <div class="ulist">
 <ul>
 <li>
@@ -4157,7 +4203,7 @@ generated straight from that same file at build time, so it can&#8217;t drift fr
 <h2 id="v0-52-2-2025-08-05"><a class="anchor" href="#v0-52-2-2025-08-05"></a>v0.52.2 — 2025-08-05</h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="fixed-105"><a class="anchor" href="#fixed-105"></a>Fixed</h3>
+<h3 id="fixed-106"><a class="anchor" href="#fixed-106"></a>Fixed</h3>
 <div class="ulist">
 <ul>
 <li>
@@ -4175,7 +4221,7 @@ generated straight from that same file at build time, so it can&#8217;t drift fr
 <h2 id="v0-52-1-2025-08-04"><a class="anchor" href="#v0-52-1-2025-08-04"></a>v0.52.1 — 2025-08-04</h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="fixed-106"><a class="anchor" href="#fixed-106"></a>Fixed</h3>
+<h3 id="fixed-107"><a class="anchor" href="#fixed-107"></a>Fixed</h3>
 <div class="ulist">
 <ul>
 <li>
@@ -4211,7 +4257,7 @@ generated straight from that same file at build time, so it can&#8217;t drift fr
 <h2 id="v0-51-0-2025-08-01"><a class="anchor" href="#v0-51-0-2025-08-01"></a>v0.51.0 — 2025-08-01</h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="added-49"><a class="anchor" href="#added-49"></a>Added</h3>
+<h3 id="added-50"><a class="anchor" href="#added-50"></a>Added</h3>
 <div class="ulist">
 <ul>
 <li>
@@ -4226,7 +4272,7 @@ generated straight from that same file at build time, so it can&#8217;t drift fr
 <h2 id="v0-50-0-2025-08-01"><a class="anchor" href="#v0-50-0-2025-08-01"></a>v0.50.0 — 2025-08-01</h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="added-50"><a class="anchor" href="#added-50"></a>Added</h3>
+<h3 id="added-51"><a class="anchor" href="#added-51"></a>Added</h3>
 <div class="ulist">
 <ul>
 <li>
@@ -4266,7 +4312,7 @@ generated straight from that same file at build time, so it can&#8217;t drift fr
 </div>
 </div>
 <div class="sect2">
-<h3 id="fixed-107"><a class="anchor" href="#fixed-107"></a>Fixed</h3>
+<h3 id="fixed-108"><a class="anchor" href="#fixed-108"></a>Fixed</h3>
 <div class="ulist">
 <ul>
 <li>
@@ -4306,7 +4352,7 @@ generated straight from that same file at build time, so it can&#8217;t drift fr
 </div>
 </div>
 <div class="sect2">
-<h3 id="fixed-108"><a class="anchor" href="#fixed-108"></a>Fixed</h3>
+<h3 id="fixed-109"><a class="anchor" href="#fixed-109"></a>Fixed</h3>
 <div class="ulist">
 <ul>
 <li>
@@ -4321,7 +4367,7 @@ generated straight from that same file at build time, so it can&#8217;t drift fr
 <h2 id="v0-46-1-2025-07-30"><a class="anchor" href="#v0-46-1-2025-07-30"></a>v0.46.1 — 2025-07-30</h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="fixed-109"><a class="anchor" href="#fixed-109"></a>Fixed</h3>
+<h3 id="fixed-110"><a class="anchor" href="#fixed-110"></a>Fixed</h3>
 <div class="ulist">
 <ul>
 <li>
@@ -4336,7 +4382,7 @@ generated straight from that same file at build time, so it can&#8217;t drift fr
 <h2 id="v0-46-0-2025-07-29"><a class="anchor" href="#v0-46-0-2025-07-29"></a>v0.46.0 — 2025-07-29</h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="added-51"><a class="anchor" href="#added-51"></a>Added</h3>
+<h3 id="added-52"><a class="anchor" href="#added-52"></a>Added</h3>
 <div class="ulist">
 <ul>
 <li>
@@ -4351,7 +4397,7 @@ generated straight from that same file at build time, so it can&#8217;t drift fr
 <h2 id="v0-45-0-2025-07-29"><a class="anchor" href="#v0-45-0-2025-07-29"></a>v0.45.0 — 2025-07-29</h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="added-52"><a class="anchor" href="#added-52"></a>Added</h3>
+<h3 id="added-53"><a class="anchor" href="#added-53"></a>Added</h3>
 <div class="ulist">
 <ul>
 <li>
@@ -4369,7 +4415,7 @@ generated straight from that same file at build time, so it can&#8217;t drift fr
 <h2 id="v0-44-0-2025-07-28"><a class="anchor" href="#v0-44-0-2025-07-28"></a>v0.44.0 — 2025-07-28</h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="added-53"><a class="anchor" href="#added-53"></a>Added</h3>
+<h3 id="added-54"><a class="anchor" href="#added-54"></a>Added</h3>
 <div class="ulist">
 <ul>
 <li>
@@ -4387,7 +4433,7 @@ generated straight from that same file at build time, so it can&#8217;t drift fr
 <h2 id="v0-43-0-2025-07-24"><a class="anchor" href="#v0-43-0-2025-07-24"></a>v0.43.0 — 2025-07-24</h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="added-54"><a class="anchor" href="#added-54"></a>Added</h3>
+<h3 id="added-55"><a class="anchor" href="#added-55"></a>Added</h3>
 <div class="ulist">
 <ul>
 <li>
@@ -4405,7 +4451,7 @@ generated straight from that same file at build time, so it can&#8217;t drift fr
 <h2 id="v0-42-2-2025-07-24"><a class="anchor" href="#v0-42-2-2025-07-24"></a>v0.42.2 — 2025-07-24</h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="fixed-110"><a class="anchor" href="#fixed-110"></a>Fixed</h3>
+<h3 id="fixed-111"><a class="anchor" href="#fixed-111"></a>Fixed</h3>
 <div class="ulist">
 <ul>
 <li>
@@ -4420,7 +4466,7 @@ generated straight from that same file at build time, so it can&#8217;t drift fr
 <h2 id="v0-42-1-2025-07-24"><a class="anchor" href="#v0-42-1-2025-07-24"></a>v0.42.1 — 2025-07-24</h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="fixed-111"><a class="anchor" href="#fixed-111"></a>Fixed</h3>
+<h3 id="fixed-112"><a class="anchor" href="#fixed-112"></a>Fixed</h3>
 <div class="ulist">
 <ul>
 <li>
@@ -4435,7 +4481,7 @@ generated straight from that same file at build time, so it can&#8217;t drift fr
 <h2 id="v0-42-0-2025-07-24"><a class="anchor" href="#v0-42-0-2025-07-24"></a>v0.42.0 — 2025-07-24</h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="added-55"><a class="anchor" href="#added-55"></a>Added</h3>
+<h3 id="added-56"><a class="anchor" href="#added-56"></a>Added</h3>
 <div class="ulist">
 <ul>
 <li>
@@ -4450,7 +4496,7 @@ generated straight from that same file at build time, so it can&#8217;t drift fr
 <h2 id="v0-41-0-2025-07-23"><a class="anchor" href="#v0-41-0-2025-07-23"></a>v0.41.0 — 2025-07-23</h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="added-56"><a class="anchor" href="#added-56"></a>Added</h3>
+<h3 id="added-57"><a class="anchor" href="#added-57"></a>Added</h3>
 <div class="ulist">
 <ul>
 <li>
@@ -4465,7 +4511,7 @@ generated straight from that same file at build time, so it can&#8217;t drift fr
 <h2 id="v0-40-2-2025-07-23"><a class="anchor" href="#v0-40-2-2025-07-23"></a>v0.40.2 — 2025-07-23</h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="fixed-112"><a class="anchor" href="#fixed-112"></a>Fixed</h3>
+<h3 id="fixed-113"><a class="anchor" href="#fixed-113"></a>Fixed</h3>
 <div class="ulist">
 <ul>
 <li>
@@ -4480,7 +4526,7 @@ generated straight from that same file at build time, so it can&#8217;t drift fr
 <h2 id="v0-40-1-2025-07-23"><a class="anchor" href="#v0-40-1-2025-07-23"></a>v0.40.1 — 2025-07-23</h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="added-57"><a class="anchor" href="#added-57"></a>Added</h3>
+<h3 id="added-58"><a class="anchor" href="#added-58"></a>Added</h3>
 <div class="ulist">
 <ul>
 <li>
@@ -4495,7 +4541,7 @@ generated straight from that same file at build time, so it can&#8217;t drift fr
 <h2 id="v0-40-0-2025-07-22"><a class="anchor" href="#v0-40-0-2025-07-22"></a>v0.40.0 — 2025-07-22</h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="added-58"><a class="anchor" href="#added-58"></a>Added</h3>
+<h3 id="added-59"><a class="anchor" href="#added-59"></a>Added</h3>
 <div class="ulist">
 <ul>
 <li>
@@ -4510,7 +4556,7 @@ generated straight from that same file at build time, so it can&#8217;t drift fr
 <h2 id="v0-39-3-2025-07-18"><a class="anchor" href="#v0-39-3-2025-07-18"></a>v0.39.3 — 2025-07-18</h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="fixed-113"><a class="anchor" href="#fixed-113"></a>Fixed</h3>
+<h3 id="fixed-114"><a class="anchor" href="#fixed-114"></a>Fixed</h3>
 <div class="ulist">
 <ul>
 <li>
@@ -4525,7 +4571,7 @@ generated straight from that same file at build time, so it can&#8217;t drift fr
 <h2 id="v0-39-2-2025-07-18"><a class="anchor" href="#v0-39-2-2025-07-18"></a>v0.39.2 — 2025-07-18</h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="fixed-114"><a class="anchor" href="#fixed-114"></a>Fixed</h3>
+<h3 id="fixed-115"><a class="anchor" href="#fixed-115"></a>Fixed</h3>
 <div class="ulist">
 <ul>
 <li>
@@ -4540,7 +4586,7 @@ generated straight from that same file at build time, so it can&#8217;t drift fr
 <h2 id="v0-39-1-2025-07-17"><a class="anchor" href="#v0-39-1-2025-07-17"></a>v0.39.1 — 2025-07-17</h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="fixed-115"><a class="anchor" href="#fixed-115"></a>Fixed</h3>
+<h3 id="fixed-116"><a class="anchor" href="#fixed-116"></a>Fixed</h3>
 <div class="ulist">
 <ul>
 <li>
@@ -4555,7 +4601,7 @@ generated straight from that same file at build time, so it can&#8217;t drift fr
 <h2 id="v0-39-0-2025-07-17"><a class="anchor" href="#v0-39-0-2025-07-17"></a>v0.39.0 — 2025-07-17</h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="added-59"><a class="anchor" href="#added-59"></a>Added</h3>
+<h3 id="added-60"><a class="anchor" href="#added-60"></a>Added</h3>
 <div class="ulist">
 <ul>
 <li>
@@ -4568,7 +4614,7 @@ generated straight from that same file at build time, so it can&#8217;t drift fr
 </div>
 </div>
 <div class="sect2">
-<h3 id="fixed-116"><a class="anchor" href="#fixed-116"></a>Fixed</h3>
+<h3 id="fixed-117"><a class="anchor" href="#fixed-117"></a>Fixed</h3>
 <div class="ulist">
 <ul>
 <li>
@@ -4586,7 +4632,7 @@ generated straight from that same file at build time, so it can&#8217;t drift fr
 <h2 id="v0-38-0-2025-07-14"><a class="anchor" href="#v0-38-0-2025-07-14"></a>v0.38.0 — 2025-07-14</h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="added-60"><a class="anchor" href="#added-60"></a>Added</h3>
+<h3 id="added-61"><a class="anchor" href="#added-61"></a>Added</h3>
 <div class="ulist">
 <ul>
 <li>
@@ -4607,7 +4653,7 @@ generated straight from that same file at build time, so it can&#8217;t drift fr
 <h2 id="v0-37-0-2025-07-07"><a class="anchor" href="#v0-37-0-2025-07-07"></a>v0.37.0 — 2025-07-07</h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="added-61"><a class="anchor" href="#added-61"></a>Added</h3>
+<h3 id="added-62"><a class="anchor" href="#added-62"></a>Added</h3>
 <div class="ulist">
 <ul>
 <li>
@@ -4622,7 +4668,7 @@ generated straight from that same file at build time, so it can&#8217;t drift fr
 <h2 id="v0-36-0-2025-07-04"><a class="anchor" href="#v0-36-0-2025-07-04"></a>v0.36.0 — 2025-07-04</h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="added-62"><a class="anchor" href="#added-62"></a>Added</h3>
+<h3 id="added-63"><a class="anchor" href="#added-63"></a>Added</h3>
 <div class="ulist">
 <ul>
 <li>
@@ -4637,7 +4683,7 @@ generated straight from that same file at build time, so it can&#8217;t drift fr
 <h2 id="v0-35-0-2025-07-04"><a class="anchor" href="#v0-35-0-2025-07-04"></a>v0.35.0 — 2025-07-04</h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="added-63"><a class="anchor" href="#added-63"></a>Added</h3>
+<h3 id="added-64"><a class="anchor" href="#added-64"></a>Added</h3>
 <div class="ulist">
 <ul>
 <li>
@@ -4647,7 +4693,7 @@ generated straight from that same file at build time, so it can&#8217;t drift fr
 </div>
 </div>
 <div class="sect2">
-<h3 id="fixed-117"><a class="anchor" href="#fixed-117"></a>Fixed</h3>
+<h3 id="fixed-118"><a class="anchor" href="#fixed-118"></a>Fixed</h3>
 <div class="ulist">
 <ul>
 <li>
@@ -4665,7 +4711,7 @@ generated straight from that same file at build time, so it can&#8217;t drift fr
 <h2 id="v0-34-0-2025-07-03"><a class="anchor" href="#v0-34-0-2025-07-03"></a>v0.34.0 — 2025-07-03</h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="added-64"><a class="anchor" href="#added-64"></a>Added</h3>
+<h3 id="added-65"><a class="anchor" href="#added-65"></a>Added</h3>
 <div class="ulist">
 <ul>
 <li>
@@ -4686,7 +4732,7 @@ generated straight from that same file at build time, so it can&#8217;t drift fr
 <h2 id="v0-33-0-2025-07-02"><a class="anchor" href="#v0-33-0-2025-07-02"></a>v0.33.0 — 2025-07-02</h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="added-65"><a class="anchor" href="#added-65"></a>Added</h3>
+<h3 id="added-66"><a class="anchor" href="#added-66"></a>Added</h3>
 <div class="ulist">
 <ul>
 <li>
@@ -4704,7 +4750,7 @@ generated straight from that same file at build time, so it can&#8217;t drift fr
 <h2 id="v0-32-0-2025-06-30"><a class="anchor" href="#v0-32-0-2025-06-30"></a>v0.32.0 — 2025-06-30</h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="added-66"><a class="anchor" href="#added-66"></a>Added</h3>
+<h3 id="added-67"><a class="anchor" href="#added-67"></a>Added</h3>
 <div class="ulist">
 <ul>
 <li>
@@ -4719,7 +4765,7 @@ generated straight from that same file at build time, so it can&#8217;t drift fr
 <h2 id="v0-31-1-2025-06-30"><a class="anchor" href="#v0-31-1-2025-06-30"></a>v0.31.1 — 2025-06-30</h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="fixed-118"><a class="anchor" href="#fixed-118"></a>Fixed</h3>
+<h3 id="fixed-119"><a class="anchor" href="#fixed-119"></a>Fixed</h3>
 <div class="ulist">
 <ul>
 <li>
@@ -4756,7 +4802,7 @@ generated straight from that same file at build time, so it can&#8217;t drift fr
 </div>
 </div>
 <div class="sect2">
-<h3 id="fixed-119"><a class="anchor" href="#fixed-119"></a>Fixed</h3>
+<h3 id="fixed-120"><a class="anchor" href="#fixed-120"></a>Fixed</h3>
 <div class="ulist">
 <ul>
 <li>
@@ -4774,7 +4820,7 @@ generated straight from that same file at build time, so it can&#8217;t drift fr
 <h2 id="v0-30-1-2025-06-20"><a class="anchor" href="#v0-30-1-2025-06-20"></a>v0.30.1 — 2025-06-20</h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="fixed-120"><a class="anchor" href="#fixed-120"></a>Fixed</h3>
+<h3 id="fixed-121"><a class="anchor" href="#fixed-121"></a>Fixed</h3>
 <div class="ulist">
 <ul>
 <li>
@@ -4792,7 +4838,7 @@ generated straight from that same file at build time, so it can&#8217;t drift fr
 <h2 id="v0-30-0-2025-06-19"><a class="anchor" href="#v0-30-0-2025-06-19"></a>v0.30.0 — 2025-06-19</h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="added-67"><a class="anchor" href="#added-67"></a>Added</h3>
+<h3 id="added-68"><a class="anchor" href="#added-68"></a>Added</h3>
 <div class="ulist">
 <ul>
 <li>
@@ -4815,7 +4861,7 @@ generated straight from that same file at build time, so it can&#8217;t drift fr
 </div>
 </div>
 <div class="sect2">
-<h3 id="fixed-121"><a class="anchor" href="#fixed-121"></a>Fixed</h3>
+<h3 id="fixed-122"><a class="anchor" href="#fixed-122"></a>Fixed</h3>
 <div class="ulist">
 <ul>
 <li>
@@ -4830,7 +4876,7 @@ generated straight from that same file at build time, so it can&#8217;t drift fr
 <h2 id="v0-29-1-2025-06-19"><a class="anchor" href="#v0-29-1-2025-06-19"></a>v0.29.1 — 2025-06-19</h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="fixed-122"><a class="anchor" href="#fixed-122"></a>Fixed</h3>
+<h3 id="fixed-123"><a class="anchor" href="#fixed-123"></a>Fixed</h3>
 <div class="ulist">
 <ul>
 <li>
@@ -4845,7 +4891,7 @@ generated straight from that same file at build time, so it can&#8217;t drift fr
 <h2 id="v0-29-0-2025-06-18"><a class="anchor" href="#v0-29-0-2025-06-18"></a>v0.29.0 — 2025-06-18</h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="added-68"><a class="anchor" href="#added-68"></a>Added</h3>
+<h3 id="added-69"><a class="anchor" href="#added-69"></a>Added</h3>
 <div class="ulist">
 <ul>
 <li>
@@ -4865,7 +4911,7 @@ generated straight from that same file at build time, so it can&#8217;t drift fr
 </div>
 </div>
 <div class="sect2">
-<h3 id="fixed-123"><a class="anchor" href="#fixed-123"></a>Fixed</h3>
+<h3 id="fixed-124"><a class="anchor" href="#fixed-124"></a>Fixed</h3>
 <div class="ulist">
 <ul>
 <li>
@@ -4880,7 +4926,7 @@ generated straight from that same file at build time, so it can&#8217;t drift fr
 <h2 id="v0-28-0-2025-06-18"><a class="anchor" href="#v0-28-0-2025-06-18"></a>v0.28.0 — 2025-06-18</h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="added-69"><a class="anchor" href="#added-69"></a>Added</h3>
+<h3 id="added-70"><a class="anchor" href="#added-70"></a>Added</h3>
 <div class="ulist">
 <ul>
 <li>
@@ -4900,7 +4946,7 @@ generated straight from that same file at build time, so it can&#8217;t drift fr
 </div>
 </div>
 <div class="sect2">
-<h3 id="fixed-124"><a class="anchor" href="#fixed-124"></a>Fixed</h3>
+<h3 id="fixed-125"><a class="anchor" href="#fixed-125"></a>Fixed</h3>
 <div class="ulist">
 <ul>
 <li>
@@ -4915,7 +4961,7 @@ generated straight from that same file at build time, so it can&#8217;t drift fr
 <h2 id="v0-27-4-2025-06-18"><a class="anchor" href="#v0-27-4-2025-06-18"></a>v0.27.4 — 2025-06-18</h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="fixed-125"><a class="anchor" href="#fixed-125"></a>Fixed</h3>
+<h3 id="fixed-126"><a class="anchor" href="#fixed-126"></a>Fixed</h3>
 <div class="ulist">
 <ul>
 <li>
@@ -4930,7 +4976,7 @@ generated straight from that same file at build time, so it can&#8217;t drift fr
 <h2 id="v0-27-3-2025-06-17"><a class="anchor" href="#v0-27-3-2025-06-17"></a>v0.27.3 — 2025-06-17</h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="fixed-126"><a class="anchor" href="#fixed-126"></a>Fixed</h3>
+<h3 id="fixed-127"><a class="anchor" href="#fixed-127"></a>Fixed</h3>
 <div class="ulist">
 <ul>
 <li>
@@ -4945,7 +4991,7 @@ generated straight from that same file at build time, so it can&#8217;t drift fr
 <h2 id="v0-27-2-2025-06-17"><a class="anchor" href="#v0-27-2-2025-06-17"></a>v0.27.2 — 2025-06-17</h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="fixed-127"><a class="anchor" href="#fixed-127"></a>Fixed</h3>
+<h3 id="fixed-128"><a class="anchor" href="#fixed-128"></a>Fixed</h3>
 <div class="ulist">
 <ul>
 <li>
@@ -4960,7 +5006,7 @@ generated straight from that same file at build time, so it can&#8217;t drift fr
 <h2 id="v0-27-1-2025-06-16"><a class="anchor" href="#v0-27-1-2025-06-16"></a>v0.27.1 — 2025-06-16</h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="fixed-128"><a class="anchor" href="#fixed-128"></a>Fixed</h3>
+<h3 id="fixed-129"><a class="anchor" href="#fixed-129"></a>Fixed</h3>
 <div class="ulist">
 <ul>
 <li>
@@ -4975,7 +5021,7 @@ generated straight from that same file at build time, so it can&#8217;t drift fr
 <h2 id="v0-27-0-2025-06-16"><a class="anchor" href="#v0-27-0-2025-06-16"></a>v0.27.0 — 2025-06-16</h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="added-70"><a class="anchor" href="#added-70"></a>Added</h3>
+<h3 id="added-71"><a class="anchor" href="#added-71"></a>Added</h3>
 <div class="ulist">
 <ul>
 <li>
@@ -4985,7 +5031,7 @@ generated straight from that same file at build time, so it can&#8217;t drift fr
 </div>
 </div>
 <div class="sect2">
-<h3 id="fixed-129"><a class="anchor" href="#fixed-129"></a>Fixed</h3>
+<h3 id="fixed-130"><a class="anchor" href="#fixed-130"></a>Fixed</h3>
 <div class="ulist">
 <ul>
 <li>
@@ -5000,7 +5046,7 @@ generated straight from that same file at build time, so it can&#8217;t drift fr
 <h2 id="v0-26-2-2025-06-13"><a class="anchor" href="#v0-26-2-2025-06-13"></a>v0.26.2 — 2025-06-13</h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="added-71"><a class="anchor" href="#added-71"></a>Added</h3>
+<h3 id="added-72"><a class="anchor" href="#added-72"></a>Added</h3>
 <div class="ulist">
 <ul>
 <li>
@@ -5015,7 +5061,7 @@ generated straight from that same file at build time, so it can&#8217;t drift fr
 <h2 id="v0-26-1-2025-06-13"><a class="anchor" href="#v0-26-1-2025-06-13"></a>v0.26.1 — 2025-06-13</h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="fixed-130"><a class="anchor" href="#fixed-130"></a>Fixed</h3>
+<h3 id="fixed-131"><a class="anchor" href="#fixed-131"></a>Fixed</h3>
 <div class="ulist">
 <ul>
 <li>
@@ -5030,7 +5076,7 @@ generated straight from that same file at build time, so it can&#8217;t drift fr
 <h2 id="v0-26-0-2025-06-12"><a class="anchor" href="#v0-26-0-2025-06-12"></a>v0.26.0 — 2025-06-12</h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="added-72"><a class="anchor" href="#added-72"></a>Added</h3>
+<h3 id="added-73"><a class="anchor" href="#added-73"></a>Added</h3>
 <div class="ulist">
 <ul>
 <li>
@@ -5050,7 +5096,7 @@ generated straight from that same file at build time, so it can&#8217;t drift fr
 </div>
 </div>
 <div class="sect2">
-<h3 id="fixed-131"><a class="anchor" href="#fixed-131"></a>Fixed</h3>
+<h3 id="fixed-132"><a class="anchor" href="#fixed-132"></a>Fixed</h3>
 <div class="ulist">
 <ul>
 <li>
@@ -5065,7 +5111,7 @@ generated straight from that same file at build time, so it can&#8217;t drift fr
 <h2 id="v0-25-0-2025-06-12"><a class="anchor" href="#v0-25-0-2025-06-12"></a>v0.25.0 — 2025-06-12</h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="added-73"><a class="anchor" href="#added-73"></a>Added</h3>
+<h3 id="added-74"><a class="anchor" href="#added-74"></a>Added</h3>
 <div class="ulist">
 <ul>
 <li>
@@ -5080,7 +5126,7 @@ generated straight from that same file at build time, so it can&#8217;t drift fr
 <h2 id="v0-24-1-2025-06-10"><a class="anchor" href="#v0-24-1-2025-06-10"></a>v0.24.1 — 2025-06-10</h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="fixed-132"><a class="anchor" href="#fixed-132"></a>Fixed</h3>
+<h3 id="fixed-133"><a class="anchor" href="#fixed-133"></a>Fixed</h3>
 <div class="ulist">
 <ul>
 <li>
@@ -5108,7 +5154,7 @@ generated straight from that same file at build time, so it can&#8217;t drift fr
 </div>
 </div>
 <div class="sect2">
-<h3 id="fixed-133"><a class="anchor" href="#fixed-133"></a>Fixed</h3>
+<h3 id="fixed-134"><a class="anchor" href="#fixed-134"></a>Fixed</h3>
 <div class="ulist">
 <ul>
 <li>
@@ -5126,7 +5172,7 @@ generated straight from that same file at build time, so it can&#8217;t drift fr
 <h2 id="v0-23-1-2025-06-06"><a class="anchor" href="#v0-23-1-2025-06-06"></a>v0.23.1 — 2025-06-06</h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="fixed-134"><a class="anchor" href="#fixed-134"></a>Fixed</h3>
+<h3 id="fixed-135"><a class="anchor" href="#fixed-135"></a>Fixed</h3>
 <div class="ulist">
 <ul>
 <li>
@@ -5141,7 +5187,7 @@ generated straight from that same file at build time, so it can&#8217;t drift fr
 <h2 id="v0-23-0-2025-06-06"><a class="anchor" href="#v0-23-0-2025-06-06"></a>v0.23.0 — 2025-06-06</h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="added-74"><a class="anchor" href="#added-74"></a>Added</h3>
+<h3 id="added-75"><a class="anchor" href="#added-75"></a>Added</h3>
 <div class="ulist">
 <ul>
 <li>
@@ -5156,7 +5202,7 @@ generated straight from that same file at build time, so it can&#8217;t drift fr
 <h2 id="v0-22-1-2025-06-05"><a class="anchor" href="#v0-22-1-2025-06-05"></a>v0.22.1 — 2025-06-05</h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="fixed-135"><a class="anchor" href="#fixed-135"></a>Fixed</h3>
+<h3 id="fixed-136"><a class="anchor" href="#fixed-136"></a>Fixed</h3>
 <div class="ulist">
 <ul>
 <li>
@@ -5171,7 +5217,7 @@ generated straight from that same file at build time, so it can&#8217;t drift fr
 <h2 id="v0-22-0-2025-06-05"><a class="anchor" href="#v0-22-0-2025-06-05"></a>v0.22.0 — 2025-06-05</h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="added-75"><a class="anchor" href="#added-75"></a>Added</h3>
+<h3 id="added-76"><a class="anchor" href="#added-76"></a>Added</h3>
 <div class="ulist">
 <ul>
 <li>
@@ -5187,7 +5233,7 @@ generated straight from that same file at build time, so it can&#8217;t drift fr
 </div>
 </div>
 <div class="sect2">
-<h3 id="fixed-136"><a class="anchor" href="#fixed-136"></a>Fixed</h3>
+<h3 id="fixed-137"><a class="anchor" href="#fixed-137"></a>Fixed</h3>
 <div class="ulist">
 <ul>
 <li>
@@ -5202,7 +5248,7 @@ generated straight from that same file at build time, so it can&#8217;t drift fr
 <h2 id="v0-21-2-2025-06-04"><a class="anchor" href="#v0-21-2-2025-06-04"></a>v0.21.2 — 2025-06-04</h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="fixed-137"><a class="anchor" href="#fixed-137"></a>Fixed</h3>
+<h3 id="fixed-138"><a class="anchor" href="#fixed-138"></a>Fixed</h3>
 <div class="ulist">
 <ul>
 <li>
@@ -5220,7 +5266,7 @@ generated straight from that same file at build time, so it can&#8217;t drift fr
 <h2 id="v0-21-1-2025-06-04"><a class="anchor" href="#v0-21-1-2025-06-04"></a>v0.21.1 — 2025-06-04</h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="fixed-138"><a class="anchor" href="#fixed-138"></a>Fixed</h3>
+<h3 id="fixed-139"><a class="anchor" href="#fixed-139"></a>Fixed</h3>
 <div class="ulist">
 <ul>
 <li>
@@ -5251,7 +5297,7 @@ generated straight from that same file at build time, so it can&#8217;t drift fr
 </div>
 </div>
 <div class="sect2">
-<h3 id="fixed-139"><a class="anchor" href="#fixed-139"></a>Fixed</h3>
+<h3 id="fixed-140"><a class="anchor" href="#fixed-140"></a>Fixed</h3>
 <div class="ulist">
 <ul>
 <li>
@@ -5279,7 +5325,7 @@ generated straight from that same file at build time, so it can&#8217;t drift fr
 </div>
 </div>
 <div class="sect2">
-<h3 id="fixed-140"><a class="anchor" href="#fixed-140"></a>Fixed</h3>
+<h3 id="fixed-141"><a class="anchor" href="#fixed-141"></a>Fixed</h3>
 <div class="ulist">
 <ul>
 <li>
@@ -5294,7 +5340,7 @@ generated straight from that same file at build time, so it can&#8217;t drift fr
 <h2 id="v0-20-3-2025-06-03"><a class="anchor" href="#v0-20-3-2025-06-03"></a>v0.20.3 — 2025-06-03</h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="fixed-141"><a class="anchor" href="#fixed-141"></a>Fixed</h3>
+<h3 id="fixed-142"><a class="anchor" href="#fixed-142"></a>Fixed</h3>
 <div class="ulist">
 <ul>
 <li>
@@ -5309,7 +5355,7 @@ generated straight from that same file at build time, so it can&#8217;t drift fr
 <h2 id="v0-20-2-2025-06-03"><a class="anchor" href="#v0-20-2-2025-06-03"></a>v0.20.2 — 2025-06-03</h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="fixed-142"><a class="anchor" href="#fixed-142"></a>Fixed</h3>
+<h3 id="fixed-143"><a class="anchor" href="#fixed-143"></a>Fixed</h3>
 <div class="ulist">
 <ul>
 <li>
@@ -5324,7 +5370,7 @@ generated straight from that same file at build time, so it can&#8217;t drift fr
 <h2 id="v0-20-1-2025-05-30"><a class="anchor" href="#v0-20-1-2025-05-30"></a>v0.20.1 — 2025-05-30</h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="fixed-143"><a class="anchor" href="#fixed-143"></a>Fixed</h3>
+<h3 id="fixed-144"><a class="anchor" href="#fixed-144"></a>Fixed</h3>
 <div class="ulist">
 <ul>
 <li>
@@ -5339,7 +5385,7 @@ generated straight from that same file at build time, so it can&#8217;t drift fr
 <h2 id="v0-20-0-2025-05-30"><a class="anchor" href="#v0-20-0-2025-05-30"></a>v0.20.0 — 2025-05-30</h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="added-76"><a class="anchor" href="#added-76"></a>Added</h3>
+<h3 id="added-77"><a class="anchor" href="#added-77"></a>Added</h3>
 <div class="ulist">
 <ul>
 <li>
@@ -5365,7 +5411,7 @@ generated straight from that same file at build time, so it can&#8217;t drift fr
 </div>
 </div>
 <div class="sect2">
-<h3 id="fixed-144"><a class="anchor" href="#fixed-144"></a>Fixed</h3>
+<h3 id="fixed-145"><a class="anchor" href="#fixed-145"></a>Fixed</h3>
 <div class="ulist">
 <ul>
 <li>
@@ -5389,7 +5435,7 @@ generated straight from that same file at build time, so it can&#8217;t drift fr
 <h2 id="v0-19-0-2025-05-28"><a class="anchor" href="#v0-19-0-2025-05-28"></a>v0.19.0 — 2025-05-28</h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="added-77"><a class="anchor" href="#added-77"></a>Added</h3>
+<h3 id="added-78"><a class="anchor" href="#added-78"></a>Added</h3>
 <div class="ulist">
 <ul>
 <li>
@@ -5399,7 +5445,7 @@ generated straight from that same file at build time, so it can&#8217;t drift fr
 </div>
 </div>
 <div class="sect2">
-<h3 id="fixed-145"><a class="anchor" href="#fixed-145"></a>Fixed</h3>
+<h3 id="fixed-146"><a class="anchor" href="#fixed-146"></a>Fixed</h3>
 <div class="ulist">
 <ul>
 <li>
@@ -5447,7 +5493,7 @@ generated straight from that same file at build time, so it can&#8217;t drift fr
 <h2 id="v0-16-2-2025-05-26"><a class="anchor" href="#v0-16-2-2025-05-26"></a>v0.16.2 — 2025-05-26</h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="fixed-146"><a class="anchor" href="#fixed-146"></a>Fixed</h3>
+<h3 id="fixed-147"><a class="anchor" href="#fixed-147"></a>Fixed</h3>
 <div class="ulist">
 <ul>
 <li>
@@ -5462,7 +5508,7 @@ generated straight from that same file at build time, so it can&#8217;t drift fr
 <h2 id="v0-16-1-2025-05-26"><a class="anchor" href="#v0-16-1-2025-05-26"></a>v0.16.1 — 2025-05-26</h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="fixed-147"><a class="anchor" href="#fixed-147"></a>Fixed</h3>
+<h3 id="fixed-148"><a class="anchor" href="#fixed-148"></a>Fixed</h3>
 <div class="ulist">
 <ul>
 <li>
@@ -5477,7 +5523,7 @@ generated straight from that same file at build time, so it can&#8217;t drift fr
 <h2 id="v0-16-0-2025-05-23"><a class="anchor" href="#v0-16-0-2025-05-23"></a>v0.16.0 — 2025-05-23</h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="added-78"><a class="anchor" href="#added-78"></a>Added</h3>
+<h3 id="added-79"><a class="anchor" href="#added-79"></a>Added</h3>
 <div class="ulist">
 <ul>
 <li>
@@ -5500,7 +5546,7 @@ generated straight from that same file at build time, so it can&#8217;t drift fr
 </div>
 </div>
 <div class="sect2">
-<h3 id="fixed-148"><a class="anchor" href="#fixed-148"></a>Fixed</h3>
+<h3 id="fixed-149"><a class="anchor" href="#fixed-149"></a>Fixed</h3>
 <div class="ulist">
 <ul>
 <li>
@@ -5531,7 +5577,7 @@ generated straight from that same file at build time, so it can&#8217;t drift fr
 </div>
 </div>
 <div class="sect2">
-<h3 id="fixed-149"><a class="anchor" href="#fixed-149"></a>Fixed</h3>
+<h3 id="fixed-150"><a class="anchor" href="#fixed-150"></a>Fixed</h3>
 <div class="ulist">
 <ul>
 <li>
@@ -5546,7 +5592,7 @@ generated straight from that same file at build time, so it can&#8217;t drift fr
 <h2 id="v0-14-3-2025-05-21"><a class="anchor" href="#v0-14-3-2025-05-21"></a>v0.14.3 — 2025-05-21</h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="fixed-150"><a class="anchor" href="#fixed-150"></a>Fixed</h3>
+<h3 id="fixed-151"><a class="anchor" href="#fixed-151"></a>Fixed</h3>
 <div class="ulist">
 <ul>
 <li>
@@ -5567,7 +5613,7 @@ generated straight from that same file at build time, so it can&#8217;t drift fr
 <h2 id="v0-14-2-2025-05-20"><a class="anchor" href="#v0-14-2-2025-05-20"></a>v0.14.2 — 2025-05-20</h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="fixed-151"><a class="anchor" href="#fixed-151"></a>Fixed</h3>
+<h3 id="fixed-152"><a class="anchor" href="#fixed-152"></a>Fixed</h3>
 <div class="ulist">
 <ul>
 <li>
@@ -5582,7 +5628,7 @@ generated straight from that same file at build time, so it can&#8217;t drift fr
 <h2 id="v0-14-1-2025-05-20"><a class="anchor" href="#v0-14-1-2025-05-20"></a>v0.14.1 — 2025-05-20</h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="fixed-152"><a class="anchor" href="#fixed-152"></a>Fixed</h3>
+<h3 id="fixed-153"><a class="anchor" href="#fixed-153"></a>Fixed</h3>
 <div class="ulist">
 <ul>
 <li>
@@ -5600,7 +5646,7 @@ generated straight from that same file at build time, so it can&#8217;t drift fr
 <h2 id="v0-14-0-2025-05-20"><a class="anchor" href="#v0-14-0-2025-05-20"></a>v0.14.0 — 2025-05-20</h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="added-79"><a class="anchor" href="#added-79"></a>Added</h3>
+<h3 id="added-80"><a class="anchor" href="#added-80"></a>Added</h3>
 <div class="ulist">
 <ul>
 <li>
@@ -5620,7 +5666,7 @@ generated straight from that same file at build time, so it can&#8217;t drift fr
 </div>
 </div>
 <div class="sect2">
-<h3 id="fixed-153"><a class="anchor" href="#fixed-153"></a>Fixed</h3>
+<h3 id="fixed-154"><a class="anchor" href="#fixed-154"></a>Fixed</h3>
 <div class="ulist">
 <ul>
 <li>
@@ -5665,7 +5711,7 @@ generated straight from that same file at build time, so it can&#8217;t drift fr
 <h2 id="v0-12-1-2025-05-19"><a class="anchor" href="#v0-12-1-2025-05-19"></a>v0.12.1 — 2025-05-19</h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="fixed-154"><a class="anchor" href="#fixed-154"></a>Fixed</h3>
+<h3 id="fixed-155"><a class="anchor" href="#fixed-155"></a>Fixed</h3>
 <div class="ulist">
 <ul>
 <li>
@@ -5686,7 +5732,7 @@ generated straight from that same file at build time, so it can&#8217;t drift fr
 <h2 id="v0-12-0-2025-05-16"><a class="anchor" href="#v0-12-0-2025-05-16"></a>v0.12.0 — 2025-05-16</h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="added-80"><a class="anchor" href="#added-80"></a>Added</h3>
+<h3 id="added-81"><a class="anchor" href="#added-81"></a>Added</h3>
 <div class="ulist">
 <ul>
 <li>
@@ -5696,7 +5742,7 @@ generated straight from that same file at build time, so it can&#8217;t drift fr
 </div>
 </div>
 <div class="sect2">
-<h3 id="fixed-155"><a class="anchor" href="#fixed-155"></a>Fixed</h3>
+<h3 id="fixed-156"><a class="anchor" href="#fixed-156"></a>Fixed</h3>
 <div class="ulist">
 <ul>
 <li>
@@ -5714,7 +5760,7 @@ generated straight from that same file at build time, so it can&#8217;t drift fr
 <h2 id="v0-11-0-2025-05-15"><a class="anchor" href="#v0-11-0-2025-05-15"></a>v0.11.0 — 2025-05-15</h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="added-81"><a class="anchor" href="#added-81"></a>Added</h3>
+<h3 id="added-82"><a class="anchor" href="#added-82"></a>Added</h3>
 <div class="ulist">
 <ul>
 <li>
@@ -5730,7 +5776,7 @@ generated straight from that same file at build time, so it can&#8217;t drift fr
 </div>
 </div>
 <div class="sect2">
-<h3 id="fixed-156"><a class="anchor" href="#fixed-156"></a>Fixed</h3>
+<h3 id="fixed-157"><a class="anchor" href="#fixed-157"></a>Fixed</h3>
 <div class="ulist">
 <ul>
 <li>
@@ -5748,7 +5794,7 @@ generated straight from that same file at build time, so it can&#8217;t drift fr
 <h2 id="v0-10-3-2025-05-13"><a class="anchor" href="#v0-10-3-2025-05-13"></a>v0.10.3 — 2025-05-13</h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="fixed-157"><a class="anchor" href="#fixed-157"></a>Fixed</h3>
+<h3 id="fixed-158"><a class="anchor" href="#fixed-158"></a>Fixed</h3>
 <div class="ulist">
 <ul>
 <li>
@@ -5763,7 +5809,7 @@ generated straight from that same file at build time, so it can&#8217;t drift fr
 <h2 id="v0-10-2-2025-05-13"><a class="anchor" href="#v0-10-2-2025-05-13"></a>v0.10.2 — 2025-05-13</h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="added-82"><a class="anchor" href="#added-82"></a>Added</h3>
+<h3 id="added-83"><a class="anchor" href="#added-83"></a>Added</h3>
 <div class="ulist">
 <ul>
 <li>
@@ -5778,7 +5824,7 @@ generated straight from that same file at build time, so it can&#8217;t drift fr
 <h2 id="v0-10-1-2025-05-13"><a class="anchor" href="#v0-10-1-2025-05-13"></a>v0.10.1 — 2025-05-13</h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="added-83"><a class="anchor" href="#added-83"></a>Added</h3>
+<h3 id="added-84"><a class="anchor" href="#added-84"></a>Added</h3>
 <div class="ulist">
 <ul>
 <li>
@@ -5793,7 +5839,7 @@ generated straight from that same file at build time, so it can&#8217;t drift fr
 <h2 id="v0-10-0-2025-05-13"><a class="anchor" href="#v0-10-0-2025-05-13"></a>v0.10.0 — 2025-05-13</h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="added-84"><a class="anchor" href="#added-84"></a>Added</h3>
+<h3 id="added-85"><a class="anchor" href="#added-85"></a>Added</h3>
 <div class="ulist">
 <ul>
 <li>
@@ -5811,7 +5857,7 @@ generated straight from that same file at build time, so it can&#8217;t drift fr
 <h2 id="v0-9-3-2025-05-13"><a class="anchor" href="#v0-9-3-2025-05-13"></a>v0.9.3 — 2025-05-13</h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="fixed-158"><a class="anchor" href="#fixed-158"></a>Fixed</h3>
+<h3 id="fixed-159"><a class="anchor" href="#fixed-159"></a>Fixed</h3>
 <div class="ulist">
 <ul>
 <li>
@@ -5826,7 +5872,7 @@ generated straight from that same file at build time, so it can&#8217;t drift fr
 <h2 id="v0-9-2-2025-05-09"><a class="anchor" href="#v0-9-2-2025-05-09"></a>v0.9.2 — 2025-05-09</h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="fixed-159"><a class="anchor" href="#fixed-159"></a>Fixed</h3>
+<h3 id="fixed-160"><a class="anchor" href="#fixed-160"></a>Fixed</h3>
 <div class="ulist">
 <ul>
 <li>
@@ -5856,7 +5902,7 @@ generated straight from that same file at build time, so it can&#8217;t drift fr
 <h2 id="v0-9-0-2025-05-09"><a class="anchor" href="#v0-9-0-2025-05-09"></a>v0.9.0 — 2025-05-09</h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="added-85"><a class="anchor" href="#added-85"></a>Added</h3>
+<h3 id="added-86"><a class="anchor" href="#added-86"></a>Added</h3>
 <div class="ulist">
 <ul>
 <li>
@@ -5871,7 +5917,7 @@ generated straight from that same file at build time, so it can&#8217;t drift fr
 <h2 id="v0-8-0-2025-05-07"><a class="anchor" href="#v0-8-0-2025-05-07"></a>v0.8.0 — 2025-05-07</h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="added-86"><a class="anchor" href="#added-86"></a>Added</h3>
+<h3 id="added-87"><a class="anchor" href="#added-87"></a>Added</h3>
 <div class="ulist">
 <ul>
 <li>
@@ -5886,7 +5932,7 @@ generated straight from that same file at build time, so it can&#8217;t drift fr
 <h2 id="v0-7-1-2025-05-07"><a class="anchor" href="#v0-7-1-2025-05-07"></a>v0.7.1 — 2025-05-07</h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="fixed-160"><a class="anchor" href="#fixed-160"></a>Fixed</h3>
+<h3 id="fixed-161"><a class="anchor" href="#fixed-161"></a>Fixed</h3>
 <div class="ulist">
 <ul>
 <li>
@@ -5901,7 +5947,7 @@ generated straight from that same file at build time, so it can&#8217;t drift fr
 <h2 id="v0-7-0-2025-05-06"><a class="anchor" href="#v0-7-0-2025-05-06"></a>v0.7.0 — 2025-05-06</h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="fixed-161"><a class="anchor" href="#fixed-161"></a>Fixed</h3>
+<h3 id="fixed-162"><a class="anchor" href="#fixed-162"></a>Fixed</h3>
 <div class="ulist">
 <ul>
 <li>
@@ -5916,7 +5962,7 @@ generated straight from that same file at build time, so it can&#8217;t drift fr
 <h2 id="v0-6-0-2025-05-06"><a class="anchor" href="#v0-6-0-2025-05-06"></a>v0.6.0 — 2025-05-06</h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="added-87"><a class="anchor" href="#added-87"></a>Added</h3>
+<h3 id="added-88"><a class="anchor" href="#added-88"></a>Added</h3>
 <div class="ulist">
 <ul>
 <li>
@@ -5931,7 +5977,7 @@ generated straight from that same file at build time, so it can&#8217;t drift fr
 <h2 id="v0-5-0-2025-05-06"><a class="anchor" href="#v0-5-0-2025-05-06"></a>v0.5.0 — 2025-05-06</h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="added-88"><a class="anchor" href="#added-88"></a>Added</h3>
+<h3 id="added-89"><a class="anchor" href="#added-89"></a>Added</h3>
 <div class="ulist">
 <ul>
 <li>
@@ -5952,7 +5998,7 @@ generated straight from that same file at build time, so it can&#8217;t drift fr
 <h2 id="v0-4-0-2025-05-05"><a class="anchor" href="#v0-4-0-2025-05-05"></a>v0.4.0 — 2025-05-05</h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="added-89"><a class="anchor" href="#added-89"></a>Added</h3>
+<h3 id="added-90"><a class="anchor" href="#added-90"></a>Added</h3>
 <div class="ulist">
 <ul>
 <li>
@@ -5970,7 +6016,7 @@ generated straight from that same file at build time, so it can&#8217;t drift fr
 <h2 id="v0-3-3-2025-04-30"><a class="anchor" href="#v0-3-3-2025-04-30"></a>v0.3.3 — 2025-04-30</h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="fixed-162"><a class="anchor" href="#fixed-162"></a>Fixed</h3>
+<h3 id="fixed-163"><a class="anchor" href="#fixed-163"></a>Fixed</h3>
 <div class="ulist">
 <ul>
 <li>
@@ -5985,7 +6031,7 @@ generated straight from that same file at build time, so it can&#8217;t drift fr
 <h2 id="v0-3-2-2025-04-30"><a class="anchor" href="#v0-3-2-2025-04-30"></a>v0.3.2 — 2025-04-30</h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="fixed-163"><a class="anchor" href="#fixed-163"></a>Fixed</h3>
+<h3 id="fixed-164"><a class="anchor" href="#fixed-164"></a>Fixed</h3>
 <div class="ulist">
 <ul>
 <li>
@@ -6000,7 +6046,7 @@ generated straight from that same file at build time, so it can&#8217;t drift fr
 <h2 id="v0-3-1-2025-04-30"><a class="anchor" href="#v0-3-1-2025-04-30"></a>v0.3.1 — 2025-04-30</h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="fixed-164"><a class="anchor" href="#fixed-164"></a>Fixed</h3>
+<h3 id="fixed-165"><a class="anchor" href="#fixed-165"></a>Fixed</h3>
 <div class="ulist">
 <ul>
 <li>
@@ -6036,7 +6082,7 @@ generated straight from that same file at build time, so it can&#8217;t drift fr
 <h2 id="v0-2-1-2025-04-30"><a class="anchor" href="#v0-2-1-2025-04-30"></a>v0.2.1 — 2025-04-30</h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="fixed-165"><a class="anchor" href="#fixed-165"></a>Fixed</h3>
+<h3 id="fixed-166"><a class="anchor" href="#fixed-166"></a>Fixed</h3>
 <div class="ulist">
 <ul>
 <li>
@@ -6051,7 +6097,7 @@ generated straight from that same file at build time, so it can&#8217;t drift fr
 <h2 id="v0-2-0-2025-04-30"><a class="anchor" href="#v0-2-0-2025-04-30"></a>v0.2.0 — 2025-04-30</h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="added-90"><a class="anchor" href="#added-90"></a>Added</h3>
+<h3 id="added-91"><a class="anchor" href="#added-91"></a>Added</h3>
 <div class="ulist">
 <ul>
 <li>
@@ -6066,7 +6112,7 @@ generated straight from that same file at build time, so it can&#8217;t drift fr
 <h2 id="v0-1-1-2025-04-25"><a class="anchor" href="#v0-1-1-2025-04-25"></a>v0.1.1 — 2025-04-25</h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="fixed-166"><a class="anchor" href="#fixed-166"></a>Fixed</h3>
+<h3 id="fixed-167"><a class="anchor" href="#fixed-167"></a>Fixed</h3>
 <div class="ulist">
 <ul>
 <li>
@@ -6081,7 +6127,7 @@ generated straight from that same file at build time, so it can&#8217;t drift fr
 <h2 id="v0-1-0-2025-04-25"><a class="anchor" href="#v0-1-0-2025-04-25"></a>v0.1.0 — 2025-04-25</h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="added-91"><a class="anchor" href="#added-91"></a>Added</h3>
+<h3 id="added-92"><a class="anchor" href="#added-92"></a>Added</h3>
 <div class="ulist">
 <ul>
 <li>
@@ -6199,7 +6245,7 @@ generated straight from that same file at build time, so it can&#8217;t drift fr
 </div>
 </div>
 <div class="sect2">
-<h3 id="fixed-167"><a class="anchor" href="#fixed-167"></a>Fixed</h3>
+<h3 id="fixed-168"><a class="anchor" href="#fixed-168"></a>Fixed</h3>
 <div class="ulist">
 <ul>
 <li>
@@ -6277,7 +6323,7 @@ generated straight from that same file at build time, so it can&#8217;t drift fr
 <footer class="site-footer">
   <div class="dt-grid-layout dt-grid-layout--with-margin site-footer__grid">
     <div class="dt-grid-layout__item site-footer__col site-footer__brand">
-      <a class="site-footer__brand-link" href="../../../5.4.2/">
+      <a class="site-footer__brand-link" href="../../../5.6.0/">
         <img class="site-footer__logo" src="../../../_/product-logo.png" width="24" height="24" alt="">
         <span class="dt-text dt-text--label-l-high">Weave.js</span>
       </a>

@@ -72,7 +72,7 @@
 
 <title>Weave | Weave.js</title>
 
-    <link rel="canonical" href="https://inditextech.github.io/weavejs/5.4.2/sdk/api-reference/weave/">
+    <link rel="canonical" href="https://inditextech.github.io/weavejs/5.6.0/sdk/api-reference/weave/">
     <link rel="prev" href="../../setup/">
     <link rel="next" href="events/">
     <meta name="description" content="API reference for Weave class">
@@ -116,7 +116,7 @@
 
 <div class="page-versions">
   <button type="button" class="dt-tag dt-tag--solid dt-tag--selected header-toolbar__version header-toolbar__version--latest version-menu-toggle" title="Show other versions of page" aria-expanded="false">
-    <span class="dt-tag__label">5.4.2</span>
+    <span class="dt-tag__label">5.6.0</span>
     <span class="dt-tag__icon"><svg class="dt-icon" aria-hidden="true" focusable="false"><use href="../../../../_/img/icons.svg#icon-chevron-down"></use></svg></span>
   </button>
   <div class="version-menu">
@@ -125,9 +125,12 @@
       <span class="dt-label dt-label--orange"><span class="dt-label__content">Prerelease</span></span>
     </a>
     <span class="version is-current" aria-current="page">
-      <span class="version__label">5.4.2</span>
+      <span class="version__label">5.6.0</span>
       <span class="dt-label dt-label--green"><span class="dt-label__content">Latest</span></span>
           </span>
+    <a class="version" href="../../../../5.4.2/sdk/api-reference/weave/">
+      <span class="version__label">5.4.2</span>
+    </a>
     <a class="version" href="../../../../5.4.1/sdk/api-reference/weave/">
       <span class="version__label">5.4.1</span>
     </a>
@@ -162,7 +165,7 @@
   </div>
 </header>
 
-<dialog id="search-dialog" class="search-dialog" aria-label="Search" data-search-index="ROOT-5.4.2.json">
+<dialog id="search-dialog" class="search-dialog" aria-label="Search" data-search-index="ROOT-5.6.0.json">
   <div class="dt-overlay dt-overlay--visible search-dialog__overlay">
     <div class="dt-overlay__content"></div>
     <div class="dt-modal dt-modal--small search-dialog__panel">
@@ -245,7 +248,7 @@
 
 <div class="body">
 
-<div id="side-menu" class="side-menu" data-component="ROOT" data-version="5.4.2" data-module="sdk">
+<div id="side-menu" class="side-menu" data-component="ROOT" data-version="5.6.0" data-module="sdk">
   <div class="side-menu__header">
     <div class="side-menu__header-start">
       <img class="side-menu__header-logo" src="../../../../_/product-logo.png" width="24" height="24" alt="">
@@ -1075,7 +1078,7 @@
 
 <div class="page-versions">
   <button type="button" class="dt-tag dt-tag--solid dt-tag--selected header-toolbar__version header-toolbar__version--latest version-menu-toggle" title="Show other versions of page" aria-expanded="false">
-    <span class="dt-tag__label">5.4.2</span>
+    <span class="dt-tag__label">5.6.0</span>
     <span class="dt-tag__icon"><svg class="dt-icon" aria-hidden="true" focusable="false"><use href="../../../../_/img/icons.svg#icon-chevron-down"></use></svg></span>
   </button>
   <div class="version-menu">
@@ -1084,9 +1087,12 @@
       <span class="dt-label dt-label--orange"><span class="dt-label__content">Prerelease</span></span>
     </a>
     <span class="version is-current" aria-current="page">
-      <span class="version__label">5.4.2</span>
+      <span class="version__label">5.6.0</span>
       <span class="dt-label dt-label--green"><span class="dt-label__content">Latest</span></span>
           </span>
+    <a class="version" href="../../../../5.4.2/sdk/api-reference/weave/">
+      <span class="version__label">5.4.2</span>
+    </a>
     <a class="version" href="../../../../5.4.1/sdk/api-reference/weave/">
       <span class="version__label">5.4.1</span>
     </a>
@@ -1762,6 +1768,28 @@ whole group instead of the nodes that the group contains.</p>
 <div class="paragraph">
 <p>This method un-groups the nodes defined in a group, this destroys the groups and now all nodes
 can be selected again. The nodes maintain their position, rotation and scale when the group is destroyed.</p>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="image-management"><a class="anchor" href="#image-management"></a>Image management</h3>
+<div class="sect3">
+<h4 id="flipimage"><a class="anchor" href="#flipimage"></a>flipImage</h4>
+<div class="listingblock">
+<div class="content">
+<pre class="shiki highlight"><code data-lang="ts"><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4;--shiki-light-bg:#1E1E1E;--shiki-dark-bg:#1E1E1E"><span class="line"><span style="--shiki-light:#DCDCAA;--shiki-dark:#DCDCAA">flipImage</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">(</span><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">node</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">: </span><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">Konva</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">.</span><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">Group</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">, </span><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">options</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">: { </span><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">axis:</span><span style="--shiki-light:#CE9178;--shiki-dark:#CE9178"> "horizontal"</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4"> | </span><span style="--shiki-light:#CE9178;--shiki-dark:#CE9178">"vertical"</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4"> }): </span><span style="--shiki-light:#569CD6;--shiki-dark:#569CD6">void</span></span></span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>This method flips an image node on the given axis, <code>horizontal</code> toggles the <code>flipX</code> property of the node and
+<code>vertical</code> toggles <code>flipY</code>. Both axes are independent and composable, and calling it twice on the same axis restores the
+original orientation. Position, size, rotation and stacking order are not changed, and each call is a single
+undo / redo step.</p>
+</div>
+<div class="paragraph">
+<p>It has no effect while the image is being cropped, and it needs the
+<a href="../nodes/image/" class="xref page">WeaveImageNode</a> registered, if not registered nothing is done.
+Equivalent to calling <code>flipImage</code> on the node handler, or <code>flipHorizontal</code> / <code>flipVertical</code> on the node instance.</p>
 </div>
 </div>
 </div>
@@ -2484,7 +2512,7 @@ the room.</p>
       </div>
       <div class="page-footer__contribute-buttons">
 
-<a class="dt-button dt-button--ghost dt-button--icon-and-label dt-button--icon-action page-footer__propose-change" href="https://github.com/InditexTech/weavejs/blob/docs/v5.4.2/docs/src/modules/sdk/pages/api-reference/weave/index.adoc">
+<a class="dt-button dt-button--ghost dt-button--icon-and-label dt-button--icon-action page-footer__propose-change" href="https://github.com/InditexTech/weavejs/blob/docs/v5.6.0/docs/src/modules/sdk/pages/api-reference/weave/index.adoc">
   <span class="dt-button__content">
     Propose a change
     <span class="dt-button__icon dt-button__icon-action"><svg class="dt-icon" aria-hidden="true" focusable="false"><use href="../../../../_/img/icons.svg#icon-external-link"></use></svg></span>

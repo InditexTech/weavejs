@@ -72,7 +72,7 @@
 
 <title>Polygon Tool | Weave.js</title>
 
-    <link rel="canonical" href="https://inditextech.github.io/weavejs/5.4.2/main/build/actions/polygon-tool/">
+    <link rel="canonical" href="https://inditextech.github.io/weavejs/5.6.0/main/build/actions/polygon-tool/">
     <link rel="prev" href="../move-tool/">
     <link rel="next" href="../rectangle-tool/">
     <meta name="description" content="Add a polygon to the canvas using a preset shape">
@@ -116,7 +116,7 @@
 
 <div class="page-versions">
   <button type="button" class="dt-tag dt-tag--solid dt-tag--selected header-toolbar__version header-toolbar__version--latest version-menu-toggle" title="Show other versions of page" aria-expanded="false">
-    <span class="dt-tag__label">5.4.2</span>
+    <span class="dt-tag__label">5.6.0</span>
     <span class="dt-tag__icon"><svg class="dt-icon" aria-hidden="true" focusable="false"><use href="../../../../../_/img/icons.svg#icon-chevron-down"></use></svg></span>
   </button>
   <div class="version-menu">
@@ -125,9 +125,12 @@
       <span class="dt-label dt-label--orange"><span class="dt-label__content">Prerelease</span></span>
     </a>
     <span class="version is-current" aria-current="page">
-      <span class="version__label">5.4.2</span>
+      <span class="version__label">5.6.0</span>
       <span class="dt-label dt-label--green"><span class="dt-label__content">Latest</span></span>
           </span>
+    <a class="version" href="../../../../../5.4.2/main/build/actions/polygon-tool/">
+      <span class="version__label">5.4.2</span>
+    </a>
     <a class="version" href="../../../../../5.4.1/main/build/actions/polygon-tool/">
       <span class="version__label">5.4.1</span>
     </a>
@@ -162,7 +165,7 @@
   </div>
 </header>
 
-<dialog id="search-dialog" class="search-dialog" aria-label="Search" data-search-index="ROOT-5.4.2.json">
+<dialog id="search-dialog" class="search-dialog" aria-label="Search" data-search-index="ROOT-5.6.0.json">
   <div class="dt-overlay dt-overlay--visible search-dialog__overlay">
     <div class="dt-overlay__content"></div>
     <div class="dt-modal dt-modal--small search-dialog__panel">
@@ -245,7 +248,7 @@
 
 <div class="body">
 
-<div id="side-menu" class="side-menu" data-component="ROOT" data-version="5.4.2" data-module="main">
+<div id="side-menu" class="side-menu" data-component="ROOT" data-version="5.6.0" data-module="main">
   <div class="side-menu__header">
     <div class="side-menu__header-start">
       <img class="side-menu__header-logo" src="../../../../../_/product-logo.png" width="24" height="24" alt="">
@@ -1230,7 +1233,7 @@
 
 <div class="page-versions">
   <button type="button" class="dt-tag dt-tag--solid dt-tag--selected header-toolbar__version header-toolbar__version--latest version-menu-toggle" title="Show other versions of page" aria-expanded="false">
-    <span class="dt-tag__label">5.4.2</span>
+    <span class="dt-tag__label">5.6.0</span>
     <span class="dt-tag__icon"><svg class="dt-icon" aria-hidden="true" focusable="false"><use href="../../../../../_/img/icons.svg#icon-chevron-down"></use></svg></span>
   </button>
   <div class="version-menu">
@@ -1239,9 +1242,12 @@
       <span class="dt-label dt-label--orange"><span class="dt-label__content">Prerelease</span></span>
     </a>
     <span class="version is-current" aria-current="page">
-      <span class="version__label">5.4.2</span>
+      <span class="version__label">5.6.0</span>
       <span class="dt-label dt-label--green"><span class="dt-label__content">Latest</span></span>
           </span>
+    <a class="version" href="../../../../../5.4.2/main/build/actions/polygon-tool/">
+      <span class="version__label">5.4.2</span>
+    </a>
     <a class="version" href="../../../../../5.4.1/main/build/actions/polygon-tool/">
       <span class="version__label">5.4.1</span>
     </a>
@@ -1299,7 +1305,7 @@
 <h2 id="introduction"><a class="anchor" href="#introduction"></a>Introduction</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>This action enables users to create new polygon nodes on the canvas by clicking or touching it.
+<p>This action enables users to create new polygon nodes on the canvas by clicking, touching, or dragging.
 The shape drawn is determined by a <strong>preset</strong> — one of the six built-in polygon shapes.</p>
 </div>
 </div>
@@ -1423,6 +1429,18 @@ The shape drawn is determined by a <strong>preset</strong> — one of the six bu
 <li>
 <p><strong>Touch</strong> on the canvas, it will place the selected preset polygon at the touch position with its default size.</p>
 </li>
+<li>
+<p><strong>Click &amp; drag</strong> to set the polygon&#8217;s size.</p>
+</li>
+<li>
+<p>Hold <strong>Shift</strong> while dragging to preserve the preset&#8217;s default proportions.</p>
+</li>
+<li>
+<p>Hold <strong>Alt/Option</strong> while dragging to draw outward from the initial click, which stays at the polygon&#8217;s center.</p>
+</li>
+<li>
+<p>Hold <strong>Shift + Alt/Option</strong> to combine centered drawing with the preset&#8217;s proportions.</p>
+</li>
 </ul>
 </div>
 <div class="paragraph">
@@ -1471,7 +1489,7 @@ all connected users.</p>
       </div>
       <div class="page-footer__contribute-buttons">
 
-<a class="dt-button dt-button--ghost dt-button--icon-and-label dt-button--icon-action page-footer__propose-change" href="https://github.com/InditexTech/weavejs/blob/docs/v5.4.2/docs/src/modules/main/pages/build/actions/polygon-tool.adoc">
+<a class="dt-button dt-button--ghost dt-button--icon-and-label dt-button--icon-action page-footer__propose-change" href="https://github.com/InditexTech/weavejs/blob/docs/v5.6.0/docs/src/modules/main/pages/build/actions/polygon-tool.adoc">
   <span class="dt-button__content">
     Propose a change
     <span class="dt-button__icon dt-button__icon-action"><svg class="dt-icon" aria-hidden="true" focusable="false"><use href="../../../../../_/img/icons.svg#icon-external-link"></use></svg></span>
