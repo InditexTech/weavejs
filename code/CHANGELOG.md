@@ -15,6 +15,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- [#1200](https://github.com/InditexTech/weavejs/issues/1200) Published packages declare CommonJS entry points that do not exist. The packages are ESM only: loading them with `require()` needs Node.js 20.19+ or 22.12+
 - [#1202](https://github.com/InditexTech/weavejs/issues/1202) Native canvas and skia-canvas peers are installed in every consumer, including browser apps
 - [#1198](https://github.com/InditexTech/weavejs/issues/1198) Node event listeners leak on every render and are never removed on destroy
 - [#1208](https://github.com/InditexTech/weavejs/issues/1208) Publish snapshots via `workflow_dispatch` (`ACTION=snapshot`) instead of the `/publish-snapshot` comment, since npm trusted publishing rejects `issue_comment` tokens

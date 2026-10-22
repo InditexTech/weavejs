@@ -14,18 +14,18 @@
       "email": "jesusmpc@inditex.com"
     }
   ],
-  "main": "./dist/sdk.cjs",
+  "main": "./dist/sdk.js",
   "module": "./dist/sdk.js",
   "exports": {
     ".": {
       "types": "./dist/types.d.ts",
       "import": "./dist/sdk.js",
-      "require": "./dist/sdk.cjs"
+      "default": "./dist/sdk.js"
     },
     "./server": {
       "types": "./dist/types.d.ts",
       "import": "./dist/sdk.node.js",
-      "require": "./dist/sdk.node.cjs"
+      "default": "./dist/sdk.node.js"
     }
   },
   "types": "dist/types.d.ts",
