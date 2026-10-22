@@ -1,0 +1,99 @@
+AGENTS.md
+  s_ed7562a1ffb8de::t_55d5f7971dafb3 105-112
+code/CHANGELOG.md
+  s_ed7562a1ffb8de::t_86feed6fc6a0bc 18-20,24-27
+code/package-lock.json
+  s_ed7562a1ffb8de::t_a2c6ea83f40480 6763,6775,7066,7115,7674,7697,7868,9150,9489,9610,9845,10359,12117,12175,12227,12279,12292,13537,13792,13808,13815,14021,15392,15413,15650,15937,15950,16318,16901,17863-17870,17914-17921,17944,17970-17977
+code/packages/create-backend-app/src/create-app.ts
+  s_ed7562a1ffb8de::t_09a901616883a0 119,130,191,202
+code/packages/create-backend-app/template/package.json
+  s_ed7562a1ffb8de::t_6992b9668947b2 16,27
+code/packages/react/package.json
+  s_ed7562a1ffb8de::t_f3bde0e815bd5b 18,20
+code/packages/renderer-konva-base/package.json
+  s_ed7562a1ffb8de::t_fbe73e915198f9 17,23,28,86-93
+code/packages/renderer-konva-react-reconciler/package.json
+  s_ed7562a1ffb8de::t_d62213ba48f777 17,23,28,91-98
+code/packages/sdk/package.json
+  s_ed7562a1ffb8de::t_faf15d70e56fda 17,23,28,74,97-104
+code/packages/sdk/src/__tests__/backend.test.ts
+  s_ed7562a1ffb8de::t_0e7678f9c4dafd 9,37-88
+code/packages/sdk/src/actions/ellipse-tool/__tests__/ellipse-tool.test.ts
+  s_ed7562a1ffb8de::t_6b961e4b8019f3 260-329
+code/packages/sdk/src/actions/ellipse-tool/ellipse-tool.ts
+  s_ed7562a1ffb8de::t_06f2c0113193c6 18-22,74-80,126,142,179-180,191,202,206,209-215,240,252-255,264-267
+code/packages/sdk/src/actions/polygon-tool/__tests__/polygon-tool.test.ts
+  s_ed7562a1ffb8de::t_3c6b17f526c21b 50-56,69-72,82-84,90,167-170,213,230,235,239-242,246-277,286-287,297,305-306,315-353,376-440
+code/packages/sdk/src/actions/polygon-tool/constants.ts
+  s_ed7562a1ffb8de::t_53cac1fb73f476 10
+code/packages/sdk/src/actions/polygon-tool/polygon-tool.ts
+  s_ed7562a1ffb8de::t_ec211a28f5baad 6,8-11,26-32,38-43,59-64,96-102,113-116,123-160,172,180-182,184,209,213-227,229-272,290,312-319,323-325,333-338
+code/packages/sdk/src/actions/rectangle-tool/__tests__/rectangle-tool.test.ts
+  s_ed7562a1ffb8de::t_8793915c9e9b58 789-794
+code/packages/sdk/src/actions/rectangle-tool/rectangle-tool.ts
+  s_ed7562a1ffb8de::t_78dbe96d1bcaa5 17-21,74-80,128,142,191,204-211,260,277-280,283-286
+code/packages/sdk/src/actions/regular-polygon-tool/__tests__/regular-polygon-tool.test.ts
+  s_ed7562a1ffb8de::t_bbb15ebc310e7a 752-825
+code/packages/sdk/src/actions/regular-polygon-tool/regular-polygon-tool.ts
+  s_ed7562a1ffb8de::t_3c1460b95ea0da 21-25,76-84,130,146,193,213,219-224,248,267-270,281-283
+code/packages/sdk/src/actions/shared/__tests__/shape-geometry.test.ts
+  s_ed7562a1ffb8de::t_4753982ca101d8 1-90
+code/packages/sdk/src/actions/shared/shape-geometry.ts
+  s_ed7562a1ffb8de::t_7bc4834be6956f 1-71
+code/packages/sdk/src/actions/shared/shape-keyboard.ts
+  s_ed7562a1ffb8de::t_497c8ef567cc1d 1-55
+code/packages/sdk/src/backend.ts
+  s_ed7562a1ffb8de::t_eca5c7101c88ae 6,10-14,19-23
+code/packages/sdk/src/nodes/__tests__/node.events.test.ts
+  s_ed7562a1ffb8de::t_cfcd26c6c17ecc 17,338,340-343,345,348,351,1380-1462
+code/packages/sdk/src/nodes/comment/comment.ts
+  s_ed7562a1ffb8de::t_4ce8544df7dc45 630
+code/packages/sdk/src/nodes/image/image.ts
+  s_ed7562a1ffb8de::t_817b2ac5941ece 1613
+code/packages/sdk/src/nodes/node.ts
+  s_ed7562a1ffb8de::t_fa4bb8f8382ad5 20-23,43-49,419,430-431,541-546,548-553,555,1186,1190-1241
+code/packages/sdk/src/utils/native-backend.ts
+  s_ed7562a1ffb8de::t_84dd6112ff0cb8 1-32
+code/packages/store-azure-web-pubsub/package.json
+  s_ed7562a1ffb8de::t_3a05c68ac76018 21,26
+code/packages/store-standalone/package.json
+  s_ed7562a1ffb8de::t_11c9da526fa07b 21,26
+code/packages/store-websockets/package.json
+  s_ed7562a1ffb8de::t_c68327e18b75d7 21,26
+code/packages/types/package.json
+  s_ed7562a1ffb8de::t_8a3aadc9fea9a9 18,20
+docs/src/modules/main/pages/build/actions/ellipse-tool.adoc
+  s_ed7562a1ffb8de::t_da3144073b47b5 77-80
+docs/src/modules/main/pages/build/actions/polygon-tool.adoc
+  s_ed7562a1ffb8de::t_dcb3c1b3373211 6,91-94
+docs/src/modules/main/pages/build/actions/rectangle-tool.adoc
+  s_ed7562a1ffb8de::t_ffba722d5f57a1 77-79
+docs/src/modules/main/pages/build/actions/regular-polygon-tool.adoc
+  s_ed7562a1ffb8de::t_6de66b622ab41d 83
+docs/src/modules/sdk/pages/api-reference/actions/ellipse-tool.adoc
+  s_ed7562a1ffb8de::t_d2588f077d067d 15-16
+docs/src/modules/sdk/pages/api-reference/actions/polygon-tool.adoc
+  s_ed7562a1ffb8de::t_b10e828987dfb9 8,17-18,71
+docs/src/modules/sdk/pages/api-reference/actions/rectangle-tool.adoc
+  s_ed7562a1ffb8de::t_5f27209226d485 15-16
+docs/src/modules/sdk/pages/api-reference/actions/regular-polygon-tool.adoc
+  s_ed7562a1ffb8de::t_22fc8f3288658a 20-21
+docs/src/modules/sdk/pages/setup.adoc
+  s_ed7562a1ffb8de::t_4919617fe8f180 11-34,41-45
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "bbcd2a0e1a33211d0e0b722372603e5e406e19c5",
+  "prompts": {},
+  "sessions": {
+    "s_ed7562a1ffb8de": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "ses_e9d509ce4ffeipyjAk4uf4CTol",
+        "model": "claude-sonnet-5.5"
+      },
+      "human_author": "Jesus Manuel Piñeiro Cid <jesusmpc@inditex.com>"
+    }
+  }
+}
