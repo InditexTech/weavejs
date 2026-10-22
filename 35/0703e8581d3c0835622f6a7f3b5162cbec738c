@@ -1,0 +1,39 @@
+code/packages/sdk/src/nodes/text-v2/__tests__/bench.test.ts
+  s_236fa6c66b1306::t_22c2d404fd9754 165-167
+code/packages/sdk/src/nodes/text-v2/__tests__/edit-model.test.ts
+  s_236fa6c66b1306::t_a9133ed4dd9c07 151
+code/packages/sdk/src/nodes/text-v2/__tests__/edit-session.test.ts
+  s_236fa6c66b1306::t_159958b0fdb779 321-340
+code/packages/sdk/src/nodes/text-v2/__tests__/text-v2-edit.test.ts
+  s_236fa6c66b1306::t_a3c787bf428dea 181-184,351
+code/packages/sdk/src/nodes/text-v2/edit/geometry.ts
+  s_236fa6c66b1306::t_53fa083e50281f 106,181
+code/packages/sdk/src/nodes/text-v2/edit/model.ts
+  s_236fa6c66b1306::t_af32f40c81b1ff 30
+code/packages/sdk/src/nodes/text-v2/edit/session.ts
+  s_236fa6c66b1306::t_d809c86dc5af9a 90,143,270-271,274-283,285-288,290,292,300-316,338-342,375,386-392
+code/packages/sdk/src/nodes/text-v2/layout/engine.ts
+  s_236fa6c66b1306::t_8a7a9d10660d90 138-192,280-281,296,314-321,336,348-391,415-453,462,467,485,499-507,512,515,520,522
+code/packages/sdk/src/nodes/text-v2/model.ts
+  s_236fa6c66b1306::t_62c5888762f99d 38,142
+code/packages/sdk/src/nodes/text-v2/shape.ts
+  s_236fa6c66b1306::t_5efb789a1b5380 11,18-19,48,154-156,333,337,339,343-344,348,352-412
+code/packages/sdk/src/nodes/text-v2/text-v2.ts
+  s_236fa6c66b1306::t_be60ff9f65688a 40-41,50,464-465
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.6",
+  "base_commit_sha": "350703e8581d3c0835622f6a7f3b5162cbec738c",
+  "prompts": {},
+  "sessions": {
+    "s_236fa6c66b1306": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "ses_e9c68953effe7Km6dHutRPYIH1",
+        "model": "claude-sonnet-5.5"
+      },
+      "human_author": "Jesus Manuel Piñeiro Cid <jesusmpc@inditex.com>"
+    }
+  }
+}
