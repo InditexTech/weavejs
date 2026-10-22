@@ -4,7 +4,7 @@
 
 // @vitest-environment jsdom
 
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
 import Konva from 'konva';
 import { WeaveTextV2Shape } from '../shape';
 
@@ -137,5 +137,48 @@ describe('WeaveTextV2Shape facade', () => {
     layer.draw();
     expect(painted.length).toBeGreaterThan(0);
     expect(painted.length).toBeLessThan(8);
+  });
+
+  describe('culling uses the paint context, not the stage', () => {
+    const lines = Array.from({ length: 20 }, (_, i) => `line ${i}`);
+
+    const build = () => {
+      const s = new WeaveTextV2Shape({ text: lines.join('\n'), ...cfg });
+      const stage = new Konva.Stage({
+        container: document.createElement('div'),
+        width: 100,
+        height: 40,
+      });
+      const layer = new Konva.Layer();
+      stage.add(layer);
+      layer.add(s);
+      return { s, layer };
+    };
+
+    const spyFillText = () => {
+      const proto = Object.getPrototypeOf(
+        document.createElement('canvas').getContext('2d')
+      ) as CanvasRenderingContext2D;
+      return vi.spyOn(proto, 'fillText');
+    };
+
+    it('culls on the live stage using the layer canvas size', () => {
+      const { layer } = build();
+      const spy = spyFillText();
+      layer.draw();
+      expect(spy.mock.calls.length).toBeGreaterThan(0);
+      expect(spy.mock.calls.length).toBeLessThan(lines.length);
+      spy.mockRestore();
+    });
+
+    it('paints every line when exported from a node outside the stage viewport', () => {
+      const { s } = build();
+      // far outside the 100x40 stage: stage-based culling dropped lines here
+      s.position({ x: -500, y: -300 });
+      const spy = spyFillText();
+      s.toCanvas({ pixelRatio: 1 });
+      expect(spy.mock.calls.length).toBe(lines.length);
+      spy.mockRestore();
+    });
   });
 });

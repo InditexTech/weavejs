@@ -286,23 +286,41 @@ export class WeaveTextV2Shape extends Konva.Shape {
     this.viewport = range;
   }
 
-  private visibleRange(): { y1: number; y2: number } | null {
+  /**
+   * Visible y-range in local coordinates, derived from the context being
+   * painted (current transform + backing canvas size) instead of the stage.
+   * The stage is not the paint target during export (off-screen canvases,
+   * tiles, server-side), so using it culled visible lines. Returns null (paint
+   * everything) when the transform cannot be read.
+   */
+  private visibleRange(ctx: Konva.Context): { y1: number; y2: number } | null {
     if (this.viewport) return this.viewport;
-    const stage = this.getStage();
-    if (!stage) return null;
-    const inv = this.getAbsoluteTransform().copy().invert();
-    const w = stage.width();
-    const h = stage.height();
-    const pts = [
-      inv.point({ x: 0, y: 0 }),
-      inv.point({ x: w, y: 0 }),
-      inv.point({ x: 0, y: h }),
-      inv.point({ x: w, y: h }),
-    ];
-    return {
-      y1: Math.min(...pts.map((p) => p.y)),
-      y2: Math.max(...pts.map((p) => p.y)),
+    const native = ctx._context as unknown as {
+      getTransform?: () => DOMMatrix;
+      currentTransform?: DOMMatrix;
     };
+    const m = native.getTransform?.() ?? native.currentTransform;
+    if (!m) return null;
+    const det = m.a * m.d - m.b * m.c;
+    if (!det || !Number.isFinite(det)) return null;
+    const canvas = ctx.getCanvas();
+    const w = canvas.getWidth();
+    const h = canvas.getHeight();
+    if (!(w > 0) || !(h > 0)) return null;
+    // device px -> local coords (inverse of the current matrix)
+    let y1 = Infinity;
+    let y2 = -Infinity;
+    for (const [px, py] of [
+      [0, 0],
+      [w, 0],
+      [0, h],
+      [w, h],
+    ]) {
+      const y = (m.a * (py - m.f) - m.b * (px - m.e)) / det;
+      if (y < y1) y1 = y;
+      if (y > y2) y2 = y;
+    }
+    return { y1, y2 };
   }
 
   // ---- painting ------------------------------------------------------------
@@ -331,9 +349,10 @@ export class WeaveTextV2Shape extends Konva.Shape {
     ctx.setAttr('textAlign', 'left');
 
     const alignY = self.verticalOffset(layout);
+    // must run before the translate below: range is in node-local coords
+    const range = self.visibleRange(ctx);
     ctx.translate(padding, alignY + padding);
 
-    const range = self.visibleRange();
     const top = alignY + padding;
     for (let n = 0; n < layout.lines.length; n++) {
       const lineTop = top + n * lineHeightPx;
