@@ -348,6 +348,8 @@ export class WeaveTextV2Node extends WeaveNode {
           const sy = r.height ? r.height / stage.height() : 1;
           return { x: p.x * sx, y: p.y * sy };
         },
+        // Figma-like: entering edit on existing text selects it all.
+        selectAllOnStart: !create,
         caretColor: this.config.cursor.color,
         selectionColor: WEAVE_TEXT_V2_SELECTION_COLOR,
         ...(this.config.edition.outline.enabled && {

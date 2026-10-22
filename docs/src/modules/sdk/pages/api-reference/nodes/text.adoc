@@ -228,6 +228,8 @@ const nodes = [new WeaveTextV2Node()];
 * Editing happens on the canvas: a hidden proxy textarea handles typing, IME and clipboard, and
   the caret and selection are painted on the utility layer, together with an outline of the text
   box (useful with fixed width or height; width from mono:[edition.borderSize]). There is no DOM overlay.
+* Entering edit mode on existing text selects all of it (like Figma), so typing replaces it; a
+  newly created node starts with the caret.
 * Selection supports click, drag, double-click (word), triple-click (paragraph), arrows,
   kbd:[Home]/kbd:[End] and kbd:[Up]/kbd:[Down] on visual lines.
 * Undo/redo is local to the edit session (typing, deletion, paste and IME composition each

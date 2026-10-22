@@ -116,6 +116,34 @@ describe('TextEditSession', () => {
     ).toContain('n1');
   });
 
+  it('selectAllOnStart selects everything; typing replaces it', () => {
+    const c = make('Hello world');
+    c.session.destroy();
+    const host = {
+      utilityLayer: c.utility,
+      container: c.container,
+      clientToStage: (x: number, y: number) => ({ x, y }),
+      stageToContainer: (p: { x: number; y: number }) => p,
+      caretColor: '#000',
+      selectionColor: 'rgba(0,0,255,0.3)',
+      selectAllOnStart: true,
+      onRequestExit: () => {},
+    };
+    const target = (c.session as unknown as { target: TextEditTarget }).target;
+    const s = new TextEditSession(target, host, 'n2');
+    s.start();
+    expect(s.model.getSelection()).toEqual({ start: 0, end: 11 });
+    const ta = c.container.querySelector('textarea') as HTMLTextAreaElement;
+    expect([ta.selectionStart, ta.selectionEnd]).toEqual([0, 11]);
+    ta.value = 'X';
+    ta.setSelectionRange(1, 1);
+    ta.dispatchEvent(
+      new InputEvent('input', { inputType: 'insertText', bubbles: true })
+    );
+    expect(c.shape.text()).toBe('X');
+    s.destroy();
+  });
+
   it('typing updates the shape live and coalesces into one undo step', () => {
     const c = make('ab');
     type(c, 'abc');

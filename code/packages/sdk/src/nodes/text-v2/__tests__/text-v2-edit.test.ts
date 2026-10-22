@@ -204,6 +204,27 @@ describe('WeaveTextV2Node edit lifecycle', () => {
     t.esc();
   });
 
+  it('existing node: selects all on enter; created node: caret only', () => {
+    const t = setup();
+    t.edit();
+    const sess = (
+      t.node as unknown as {
+        session: { model: { getSelection(): { start: number; end: number } } };
+      }
+    ).session;
+    expect(sess.model.getSelection()).toEqual({ start: 0, end: 5 });
+    t.esc();
+    const c = setup();
+    c.edit(true);
+    const s2 = (
+      c.node as unknown as {
+        session: { model: { getSelection(): { start: number; end: number } } };
+      }
+    ).session;
+    expect(s2.model.getSelection()).toEqual({ start: 5, end: 5 });
+    c.esc();
+  });
+
   it('does not start when the mutex is not acquired', () => {
     const t = setup();
     t.instance.setMutexLock.mockReturnValue(false);

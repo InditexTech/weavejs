@@ -54,6 +54,8 @@ export interface TextEditHost {
   outlineWidth?: number;
   /** Gap between box and outline (screen px). Default 0. */
   outlinePadding?: number;
+  /** Select all content when the session starts (Figma-like). Default false. */
+  selectAllOnStart?: boolean;
   /** Aborts the session listeners (e.g. instance teardown). */
   signal?: AbortSignal;
   /** Content changed (live; not yet committed). */
@@ -142,6 +144,7 @@ export class TextEditSession {
       [this.id]: this.id,
     };
 
+    if (this.host.selectAllOnStart) this.model.selectAll();
     this.syncTextarea();
     ta.focus();
     this.positionTextarea();

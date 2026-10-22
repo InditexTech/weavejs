@@ -77,3 +77,10 @@ While editing, the node SHALL draw an outline of the text box on the utility lay
 #### Scenario: Padding
 - **WHEN** `edition.outline.padding` is `6`
 - **THEN** the outline is drawn 6 screen pixels outside the box on every side, at any zoom
+
+### Requirement: Select all on enter
+Entering edit mode on an existing node SHALL select all its content; a newly created node SHALL start with the caret.
+
+#### Scenario: Edit existing text
+- **WHEN** the user enters edit mode on a node with text
+- **THEN** all text is selected and typing replaces it
