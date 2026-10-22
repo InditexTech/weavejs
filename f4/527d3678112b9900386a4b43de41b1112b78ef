@@ -1,0 +1,19 @@
+code/package.json
+  s_b00cb69d45d2ee::t_2bdc3249d61fcc 13,38-39
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "f4527d3678112b9900386a4b43de41b1112b78ef",
+  "prompts": {},
+  "sessions": {
+    "s_b00cb69d45d2ee": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "ses_e9d41592affePyiOpSHae98947",
+        "model": "claude-sonnet-5.5"
+      },
+      "human_author": "Jesus Manuel Piñeiro Cid <jesusmpc@inditex.com>"
+    }
+  }
+}
