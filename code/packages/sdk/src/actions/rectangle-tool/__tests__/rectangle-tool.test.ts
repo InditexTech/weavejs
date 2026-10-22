@@ -786,7 +786,12 @@ describe('WeaveRectangleToolAction', () => {
       // mousePoint={x:120,y:140} → deltaX=70, deltaY=65
       (action as unknown as R)['handleMovement']();
       expect((action as unknown as R)['moved']).toBe(true);
-      expect(tempRect.setAttrs).toHaveBeenCalledWith({ width: 70, height: 65 });
+      expect(tempRect.setAttrs).toHaveBeenCalledWith({
+        x: 50,
+        y: 75,
+        width: 70,
+        height: 65,
+      });
     });
 
     it('17.3 rectId=null → no setAttrs', () => {

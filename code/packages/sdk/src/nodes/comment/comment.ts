@@ -627,7 +627,7 @@ export class WeaveCommentNode<T> extends WeaveNode {
   }
 
   onDestroy(nodeInstance: WeaveElementInstance) {
-    nodeInstance.destroy();
+    super.onDestroy(nodeInstance);
   }
 
   private expandNode(commentNode: Konva.Group) {

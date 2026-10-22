@@ -1610,7 +1610,7 @@ export class WeaveImageNode extends WeaveNode {
       delete this.imageTryoutIds[nodeId];
     }
 
-    nodeInstance.destroy();
+    super.onDestroy(nodeInstance);
   }
 
   private loadImageTryout(imageId: string): void {

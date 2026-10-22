@@ -749,4 +749,78 @@ describe('WeaveRegularPolygonToolAction', () => {
       expect((action as unknown as R)['state']).toBe(REGULAR_POLYGON_TOOL_STATE.IDLE);
     });
   });
+
+  describe('shape modifier keyboard events during a drag', () => {
+    it('Shift and Alt keydown/keyup reapply the current regular-polygon geometry', () => {
+      const nodeHandler = makeNodeHandler();
+      mockWeave.getNodeHandler.mockReturnValue(nodeHandler);
+      mockWeave._stage.findOne.mockReturnValue(mockWeave._mockPolygon);
+      mockWeave.getMousePointer.mockReturnValue({
+        mousePoint: { x: 10, y: 20 },
+        container: mockWeave._defaultContainer,
+      });
+      mockWeave.getMousePointerRelativeToContainer.mockReturnValue({
+        mousePoint: { x: 50, y: 40 },
+      });
+
+      triggerAction();
+      const handlers = mockWeave._stageHandlers;
+      handlers['pointerdown']?.(makePointerEvent({ clientX: 10, clientY: 20 }));
+      handlers['pointermove']?.(makePointerEvent({ clientX: 50, clientY: 40 }));
+
+      const updatesBeforeModifiers = nodeHandler.onUpdate.mock.calls.length;
+      windowHandlers['keydown']?.({
+        key: 'Shift',
+        shiftKey: true,
+        altKey: false,
+      } as KeyboardEvent);
+      const shifted = nodeHandler.onUpdate.mock.calls.at(-1)?.[1] as Record<
+        string,
+        number
+      >;
+      expect(nodeHandler.onUpdate).toHaveBeenCalledTimes(
+        updatesBeforeModifiers + 1
+      );
+      expect(shifted.radius).toBe(20);
+
+      windowHandlers['keyup']?.({
+        key: 'Shift',
+        shiftKey: false,
+        altKey: false,
+      } as KeyboardEvent);
+      const unshifted = nodeHandler.onUpdate.mock.calls.at(-1)?.[1] as Record<
+        string,
+        number
+      >;
+      expect(unshifted.radius).toBe(20);
+
+      const preventAltDefault = vi.fn();
+      windowHandlers['keydown']?.({
+        type: 'keydown',
+        key: 'Alt',
+        shiftKey: false,
+        altKey: true,
+        preventDefault: preventAltDefault,
+      } as unknown as KeyboardEvent);
+      expect(preventAltDefault).toHaveBeenCalled();
+      const centered = nodeHandler.onUpdate.mock.calls.at(-1)?.[1] as Record<
+        string,
+        number
+      >;
+      expect(centered.x + centered.radius).toBe(10);
+      expect(centered.y + centered.radius).toBe(20);
+
+      windowHandlers['keyup']?.({
+        key: 'Alt',
+        shiftKey: false,
+        altKey: false,
+      } as KeyboardEvent);
+      const cornerBased = nodeHandler.onUpdate.mock.calls.at(-1)?.[1] as Record<
+        string,
+        number
+      >;
+      expect(cornerBased.x).toBe(10);
+      expect(cornerBased.y).toBe(20);
+    });
+  });
 });

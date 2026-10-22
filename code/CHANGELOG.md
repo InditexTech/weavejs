@@ -15,8 +15,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- [#1198](https://github.com/InditexTech/weavejs/issues/1198) Node event listeners leak on every render and are never removed on destroy
 - [#1208](https://github.com/InditexTech/weavejs/issues/1208) Publish snapshots via `workflow_dispatch` (`ACTION=snapshot`) instead of the `/publish-snapshot` comment, since npm trusted publishing rejects `issue_comment` tokens
 - [#1142](https://github.com/InditexTech/weavejs/issues/1142) Override `@emnapi` packages to v1.11.2 / 1.2.2 to unify monorepo dependency resolution and prevent lockfile stripping during release versioning
+
+### Added
+
+- [#1177](https://github.com/InditexTech/weavejs/issues/1177) Shift and Alt/Option modifiers when drawing shapes (proportions and center-based drawing)
 
 ## [5.5.0] - 2026-10-02
 
