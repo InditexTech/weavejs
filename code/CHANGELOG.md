@@ -13,6 +13,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- [#1229](https://github.com/InditexTech/weavejs/issues/1229) Nx caches the publish and unpublish targets, so a cache hit skips the actual publish
+
 ## [5.6.0] - 2026-10-22
 
 ### Fixed

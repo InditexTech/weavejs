@@ -18,7 +18,7 @@
     },
     "publish:snapshot": {
       "dependsOn": ["^publish:snapshot"],
-      "cache": true
+      "cache": false
     },
     "release:prepare": {
       "dependsOn": ["^release:prepare"],
@@ -26,7 +26,7 @@
     },
     "release:perform": {
       "dependsOn": ["^release:perform"],
-      "cache": true
+      "cache": false
     },
     "test": {
       "dependsOn": ["^test"],
@@ -34,7 +34,7 @@
     },
     "unpublish": {
       "dependsOn": ["^unpublish"],
-      "cache": true
+      "cache": false
     },
     "verify": {
       "dependsOn": ["^verify"],
