@@ -614,6 +614,10 @@ export class WeaveTextV2Node extends WeaveNode {
     const attrs = instance.getAttrs();
 
     const cleanedAttrs = { ...attrs };
+    // Shared state only holds plain data: never leak functions into it.
+    for (const key of Object.keys(cleanedAttrs)) {
+      if (typeof cleanedAttrs[key] === 'function') delete cleanedAttrs[key];
+    }
     delete cleanedAttrs.mutexLocked;
     delete cleanedAttrs.mutexUserId;
     delete cleanedAttrs.draggable;

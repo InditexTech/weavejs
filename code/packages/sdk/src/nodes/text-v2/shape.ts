@@ -67,8 +67,6 @@ export class WeaveTextV2Shape extends Konva.Shape {
     this.on(LAYOUT_ATTRS.map((a) => `${a}Change.konva`).join(' '), () => {
       this.layoutCache = null;
     });
-    this.sceneFunc(this._paint);
-    this.hitFunc(this._hit);
   }
 
   // ---- Konva.Text compatible facade ---------------------------------------
@@ -308,7 +306,10 @@ export class WeaveTextV2Shape extends Konva.Shape {
 
   // ---- painting ------------------------------------------------------------
 
-  private _paint = (ctx: Konva.Context, shape: Konva.Shape) => {
+  // Konva looks up `_sceneFunc`/`_hitFunc` on the instance when `attrs.sceneFunc`
+  // is unset. Do NOT call `sceneFunc()`/`hitFunc()`: that would store functions
+  // in `attrs`, which are copied into shared (Yjs) state on serialize.
+  _sceneFunc = (ctx: Konva.Context, shape: Konva.Shape) => {
     const self = shape as WeaveTextV2Shape;
     const layout = self.ensureLayout();
     if (layout.lines.length === 0) return;
@@ -405,7 +406,7 @@ export class WeaveTextV2Shape extends Konva.Shape {
     }
   };
 
-  private _hit = (ctx: Konva.Context, shape: Konva.Shape) => {
+  _hitFunc = (ctx: Konva.Context, shape: Konva.Shape) => {
     ctx.beginPath();
     const self = shape as WeaveTextV2Shape;
     ctx.rect(0, 0, self.getWidth(), self.getHeight());

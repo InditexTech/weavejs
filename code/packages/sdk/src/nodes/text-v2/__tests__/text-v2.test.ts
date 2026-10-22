@@ -164,6 +164,22 @@ beforeAll(() => {
 });
 
 describe('WeaveTextV2Node (read-only)', () => {
+  it('serialized props are plain data (no functions) so they fit Yjs state', () => {
+    const { node } = makeNode();
+    const shape = node.onRender(defaultProps()) as WeaveTextV2Shape;
+    expect(typeof shape.attrs.sceneFunc).toBe('undefined');
+    expect(typeof shape.attrs.hitFunc).toBe('undefined');
+    const out = node.serialize(shape);
+    const walk = (v: unknown, path: string) => {
+      expect(typeof v, path).not.toBe('function');
+      if (v && typeof v === 'object') {
+        for (const [k, c] of Object.entries(v)) walk(c, `${path}.${k}`);
+      }
+    };
+    walk(out.props, 'props');
+    expect(() => JSON.stringify(out.props)).not.toThrow();
+  });
+
   it('keeps nodeType text (drop-in for existing documents)', () => {
     const { node } = makeNode();
     expect(node.getNodeType()).toBe('text');
