@@ -13,6 +13,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [5.6.0] - 2026-10-22
+
 ### Fixed
 
 - [#1200](https://github.com/InditexTech/weavejs/issues/1200) Published packages declare CommonJS entry points that do not exist. The packages are ESM only: loading them with `require()` needs Node.js 20.19+ or 22.12+
@@ -1949,7 +1951,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - [#24](https://github.com/InditexTech/weavejs/issues/24) Bug when loading rooms with text or images
 - [#18](https://github.com/InditexTech/weavejs/issues/18) Fix awareness not working on store-azure-web-pubsub
 
-[Unreleased]: https://github.com/InditexTech/weavejs/compare/5.5.0...HEAD
+[Unreleased]: https://github.com/InditexTech/weavejs/compare/5.6.0...HEAD
+
+[5.6.0]: https://github.com/InditexTech/weavejs/compare/5.5.0...5.6.0
 
 [5.5.0]: https://github.com/InditexTech/weavejs/compare/5.4.1...5.5.0
 
