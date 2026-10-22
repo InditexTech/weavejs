@@ -47,7 +47,13 @@ function makeMockWeave() {
   const stage = {
     container: vi.fn().mockReturnValue(stageContainer),
     on: vi.fn((event: string, handler: (e?: unknown) => void) => {
-      stageHandlers[event] = handler;
+      const previous = stageHandlers[event];
+      stageHandlers[event] = previous
+        ? (e) => {
+            previous(e);
+            handler(e);
+          }
+        : handler;
     }),
     findOne: vi.fn().mockReturnValue(mockNode),
   };
@@ -60,7 +66,10 @@ function makeMockWeave() {
 
   const nodeHandlerMock = {
     create: vi.fn().mockReturnValue(mockNode),
-    serialize: vi.fn().mockReturnValue({ id: 'test-uuid', type: 'polygon', props: {} }),
+    onUpdate: vi.fn(),
+    serialize: vi
+      .fn()
+      .mockReturnValue({ id: 'test-uuid', type: 'polygon', props: {} }),
   };
 
   return {
@@ -70,11 +79,15 @@ function makeMockWeave() {
       mousePoint: { x: 50, y: 75 },
       container: defaultContainer,
     }),
+    getMousePointerRelativeToContainer: vi.fn().mockReturnValue({
+      mousePoint: { x: 120, y: 140 },
+    }),
     getNodeHandler: vi.fn().mockReturnValue(nodeHandlerMock),
     getEventsController: vi.fn().mockReturnValue(new AbortController()),
     getActiveAction: vi.fn().mockReturnValue(POLYGON_TOOL_ACTION_NAME),
     emitEvent: vi.fn(),
     addNode: vi.fn(),
+    removeNode: vi.fn(),
     updateNode: vi.fn(),
     triggerAction: vi.fn(),
     getChildLogger: vi.fn().mockReturnValue({ debug: vi.fn() }),
@@ -151,7 +164,10 @@ describe('WeavePolygonToolAction', () => {
 
   describe('initProps', () => {
     it('3.1 returns expected defaults', () => {
-      const props = (action as unknown as R)['initProps']() as Record<string, unknown>;
+      const props = (action as unknown as R)['initProps']() as Record<
+        string,
+        unknown
+      >;
       expect(props.opacity).toBe(1);
       expect(props.fill).toBe('#ffffffff');
       expect(props.stroke).toBe('#000000ff');
@@ -194,7 +210,7 @@ describe('WeavePolygonToolAction', () => {
     });
   });
 
-  // ── Suite 5: pointerdown creates node ─────────────────────────────────────
+  // ── Suite 5: pointer interaction creates and sizes node ───────────────────
 
   describe('pointerdown creates polygon', () => {
     it('5.1 calls addNode with the created node', () => {
@@ -211,19 +227,54 @@ describe('WeavePolygonToolAction', () => {
       expect(mockWeave.addNode).toHaveBeenCalled();
     });
 
-    it('5.2 emits onAddingPolygon and onAddedPolygon', () => {
+    it('5.2 emits onAddingPolygon on pointerdown and onAddedPolygon on pointerup', () => {
       action.trigger(vi.fn());
       const handlers = mockWeave._stageHandlers;
 
       handlers['pointerdown']?.({
-        evt: { pointerId: 1, clientX: 50, clientY: 75, buttons: 0 },
+        evt: { pointerId: 1, clientX: 50, clientY: 75, buttons: 1 },
       });
 
       expect(mockWeave.emitEvent).toHaveBeenCalledWith('onAddingPolygon');
+      expect(mockWeave.emitEvent).not.toHaveBeenCalledWith('onAddedPolygon');
+      handlers['pointerup']?.({
+        evt: { pointerId: 1, clientX: 50, clientY: 75, buttons: 0 },
+      });
       expect(mockWeave.emitEvent).toHaveBeenCalledWith('onAddedPolygon');
     });
 
-    it('5.3 uses scaleFactor from updateProps when set', () => {
+    it('5.3 combines Shift and Alt while dragging from the initial center', () => {
+      action.trigger(vi.fn());
+      const handlers = mockWeave._stageHandlers;
+      handlers['pointerdown']?.({
+        evt: { pointerId: 1, clientX: 50, clientY: 75, buttons: 1 },
+      });
+      handlers['pointermove']?.({
+        evt: {
+          pointerId: 1,
+          clientX: 80,
+          clientY: 100,
+          buttons: 1,
+          shiftKey: true,
+          altKey: true,
+        },
+      });
+
+      const updateCall = mockWeave._nodeHandler.onUpdate.mock.calls[0];
+      const updatedPolygon = updateCall?.[1] as Record<string, number>;
+      const defaultGeometry = instantiatePreset(
+        WEAVE_POLYGON_PRESETS.pentagon,
+        WEAVE_POLYGON_PRESETS.pentagon.defaultWidth,
+        WEAVE_POLYGON_PRESETS.pentagon.defaultHeight
+      );
+      expect(updatedPolygon.x + updatedPolygon.width / 2).toBeCloseTo(50);
+      expect(updatedPolygon.y + updatedPolygon.height / 2).toBeCloseTo(75);
+      expect(updatedPolygon.width / updatedPolygon.height).toBeCloseTo(
+        defaultGeometry.width / defaultGeometry.height
+      );
+    });
+
+    it('5.4 uses scaleFactor from updateProps when set', () => {
       action.trigger(vi.fn());
       action.updateProps({ scaleFactor: 2 });
 
@@ -232,7 +283,8 @@ describe('WeavePolygonToolAction', () => {
         evt: { pointerId: 1, clientX: 50, clientY: 75, buttons: 0 },
       });
 
-      const createCall = mockWeave._nodeHandler.create.mock.calls[0]?.[1] as Record<string, unknown>;
+      const createCall = mockWeave._nodeHandler.create.mock
+        .calls[0]?.[1] as Record<string, unknown>;
       const expected = instantiatePreset(
         WEAVE_POLYGON_PRESETS.pentagon,
         WEAVE_POLYGON_PRESETS.pentagon.defaultWidth * 2,
@@ -242,7 +294,7 @@ describe('WeavePolygonToolAction', () => {
       expect(createCall?.height).toBe(expected.height);
     });
 
-    it('5.4 uses preset defaults (scaleFactor=1) when not set', () => {
+    it('5.5 uses preset defaults (scaleFactor=1) when not set', () => {
       action.trigger(vi.fn());
 
       const handlers = mockWeave._stageHandlers;
@@ -250,7 +302,8 @@ describe('WeavePolygonToolAction', () => {
         evt: { pointerId: 1, clientX: 50, clientY: 75, buttons: 0 },
       });
 
-      const createCall = mockWeave._nodeHandler.create.mock.calls[0]?.[1] as Record<string, unknown>;
+      const createCall = mockWeave._nodeHandler.create.mock
+        .calls[0]?.[1] as Record<string, unknown>;
       const expected = instantiatePreset(
         WEAVE_POLYGON_PRESETS.pentagon,
         WEAVE_POLYGON_PRESETS.pentagon.defaultWidth,
@@ -258,6 +311,45 @@ describe('WeavePolygonToolAction', () => {
       );
       expect(createCall?.width).toBe(expected.width);
       expect(createCall?.height).toBe(expected.height);
+    });
+
+    it('5.6 clamps a horizontal drag to a non-zero polygon height', () => {
+      action.trigger(vi.fn(), {});
+      mockWeave.getMousePointerRelativeToContainer.mockReturnValue({
+        mousePoint: { x: 150, y: 75 },
+      });
+
+      const handlers = mockWeave._stageHandlers;
+      handlers['pointerdown']?.({
+        evt: { pointerId: 1, clientX: 50, clientY: 75, buttons: 1 },
+      });
+      handlers['pointermove']?.({
+        evt: { pointerId: 1, clientX: 150, clientY: 75, buttons: 1 },
+      });
+
+      const updated = mockWeave._nodeHandler.onUpdate.mock
+        .calls[0]?.[1] as Record<string, number>;
+      expect(updated.height).toBeGreaterThanOrEqual(1);
+    });
+
+    it('5.7 ignores sub-threshold pointer jitter and keeps the default polygon size', () => {
+      action.trigger(vi.fn(), {});
+      const handlers = mockWeave._stageHandlers;
+      handlers['pointerdown']?.({
+        evt: { pointerId: 1, clientX: 50, clientY: 75, buttons: 1 },
+      });
+      handlers['pointermove']?.({
+        evt: { pointerId: 1, clientX: 52, clientY: 76, buttons: 1 },
+      });
+
+      expect(mockWeave._nodeHandler.onUpdate).not.toHaveBeenCalled();
+
+      handlers['pointerup']?.({
+        evt: { pointerId: 1, clientX: 52, clientY: 76, buttons: 0 },
+      });
+
+      expect(mockWeave.updateNode).toHaveBeenCalled();
+      expect(mockWeave.emitEvent).toHaveBeenCalledWith('onAddedPolygon');
     });
   });
 
@@ -280,6 +372,71 @@ describe('WeavePolygonToolAction', () => {
       windowHandlers['keydown']?.({ code: 'Enter' } as KeyboardEvent);
 
       expect(cancelFn).toHaveBeenCalled();
+    });
+
+    it.each(['Escape', 'Enter'])(
+      '6.3 %s mid-drag removes the uncommitted polygon',
+      (code) => {
+        const cancel = vi.fn(() => action.cleanup());
+        action.trigger(cancel, {});
+        const handlers = mockWeave._stageHandlers;
+        handlers['pointerdown']?.({
+          evt: { pointerId: 1, clientX: 50, clientY: 75, buttons: 1 },
+        });
+        handlers['pointermove']?.({
+          evt: { pointerId: 1, clientX: 80, clientY: 100, buttons: 1 },
+        });
+
+        windowHandlers['keydown']?.({ code, key: code } as KeyboardEvent);
+
+        expect(mockWeave.removeNode).toHaveBeenCalledWith(
+          mockWeave._nodeHandler.create.mock.results[0]?.value
+        );
+        expect(mockWeave.updateNode).not.toHaveBeenCalled();
+        expect(mockWeave.emitEvent).not.toHaveBeenCalledWith('onAddedPolygon');
+        expect((action as unknown as R)['state']).toBe(POLYGON_TOOL_STATE.IDLE);
+      }
+    );
+
+    it('6.4 pointercancel removes the uncommitted polygon', () => {
+      const cancel = vi.fn(() => action.cleanup());
+      action.trigger(cancel, {});
+      const handlers = mockWeave._stageHandlers;
+      handlers['pointerdown']?.({
+        evt: { pointerId: 1, clientX: 50, clientY: 75, buttons: 1 },
+      });
+      handlers['pointermove']?.({
+        evt: { pointerId: 1, clientX: 80, clientY: 100, buttons: 1 },
+      });
+
+      handlers['pointercancel']?.({
+        evt: { pointerId: 1 },
+      });
+
+      expect(cancel).toHaveBeenCalled();
+      expect(mockWeave.removeNode).toHaveBeenCalled();
+      expect(mockWeave.emitEvent).not.toHaveBeenCalledWith('onAddedPolygon');
+    });
+
+    it('6.5 pointerup commits the polygon before cleanup', () => {
+      const cancel = vi.fn(() => action.cleanup());
+      action.trigger(cancel, {});
+      const handlers = mockWeave._stageHandlers;
+      handlers['pointerdown']?.({
+        evt: { pointerId: 1, clientX: 50, clientY: 75, buttons: 1 },
+      });
+      handlers['pointermove']?.({
+        evt: { pointerId: 1, clientX: 80, clientY: 100, buttons: 1 },
+      });
+
+      handlers['pointerup']?.({
+        evt: { pointerId: 1, clientX: 80, clientY: 100, buttons: 0 },
+      });
+
+      expect(mockWeave.updateNode).toHaveBeenCalled();
+      expect(mockWeave.removeNode).not.toHaveBeenCalled();
+      expect(mockWeave.emitEvent).toHaveBeenCalledWith('onAddedPolygon');
+      expect((action as unknown as R)['state']).toBe(POLYGON_TOOL_STATE.IDLE);
     });
   });
 

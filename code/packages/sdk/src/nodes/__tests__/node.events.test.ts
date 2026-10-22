@@ -14,6 +14,7 @@ import {
   vi,
 } from 'vitest';
 import Konva from 'konva';
+import Emittery from 'emittery';
 import { WeaveNode, augmentKonvaNodeClass } from '../node';
 import { SELECTION_TOOL_ACTION_NAME } from '@/actions/selection-tool/constants';
 import { WEAVE_STAGE_DEFAULT_MODE } from '../stage/constants';
@@ -334,15 +335,20 @@ describe('WeaveNode setupDefaultNodeEvents', () => {
       expect(offSpy).toHaveBeenCalledWith('pointerleave');
     });
 
-    it('1.2 locked node removes onNodesChange listener', () => {
+    it('1.2 locked node removes the onNodesChange listener added while unlocked', () => {
       const { node, mock } = makeNode();
-      const group = createGroup({ locked: true });
+      const group = createGroup();
 
       node.setupDefaultNodeEvents(group);
+      const added = getAddedListener(mock, 'onNodesChange');
 
+      group.setAttrs({ locked: true });
+      node.setupDefaultNodeEvents(group);
+
+      expect(added).toBeDefined();
       expect(mock.removeEventListener).toHaveBeenCalledWith(
         'onNodesChange',
-        expect.any(Function)
+        added
       );
     });
   });
@@ -1369,5 +1375,88 @@ describe('WeaveNode setupDefaultNodeEvents', () => {
       expect(group.handleDeselectNode).not.toHaveBeenCalled();
       expect(group.handleSelectNode).not.toHaveBeenCalled();
     });
+  });
+});
+
+describe('WeaveNode instance listeners lifecycle', () => {
+  const NODE_EVENTS = ['onNodesChange', 'onSelectionState'];
+
+  function attachEmitter(mock: MockInstance) {
+    const emitter = new Emittery();
+    mock.addEventListener.mockImplementation(
+      (event: string, callback: (payload: unknown) => void) =>
+        emitter.on(event, callback)
+    );
+    mock.removeEventListener.mockImplementation(
+      (event: string, callback: (payload: unknown) => void) =>
+        emitter.off(event, callback)
+    );
+    return emitter;
+  }
+
+  function listenerCounts(emitter: Emittery) {
+    return NODE_EVENTS.map((event) => emitter.listenerCount(event));
+  }
+
+  it('keeps a single listener per event when node events are set up again', () => {
+    const { node, mock } = makeNode();
+    const emitter = attachEmitter(mock);
+    const group = createGroup();
+
+    for (let i = 0; i < 5; i++) {
+      node.setupDefaultNodeEvents(group);
+    }
+
+    expect(listenerCounts(emitter)).toEqual([1, 1]);
+  });
+
+  it('removes the listeners when the node gets locked', () => {
+    const { node, mock } = makeNode();
+    const emitter = attachEmitter(mock);
+    const group = createGroup();
+
+    node.setupDefaultNodeEvents(group);
+    group.setAttrs({ locked: true });
+    node.setupDefaultNodeEvents(group);
+
+    expect(listenerCounts(emitter)).toEqual([0, 0]);
+  });
+
+  it('removes the listeners when the node is destroyed', () => {
+    const { node, mock } = makeNode();
+    const emitter = attachEmitter(mock);
+    const group = createGroup();
+
+    node.setupDefaultNodeEvents(group);
+    node.onDestroy(group as unknown as WeaveElementInstance);
+
+    expect(listenerCounts(emitter)).toEqual([0, 0]);
+  });
+
+  it('removes the listeners of descendant nodes when a container is destroyed', () => {
+    const { node, mock } = makeNode();
+    const emitter = attachEmitter(mock);
+    const parent = createGroup({ id: 'parent' });
+    const child = createGroup({ id: 'child' });
+    parent.add(child);
+
+    node.setupDefaultNodeEvents(parent);
+    node.setupDefaultNodeEvents(child);
+    node.onDestroy(parent as unknown as WeaveElementInstance);
+
+    expect(listenerCounts(emitter)).toEqual([0, 0]);
+  });
+
+  it('keeps the listeners of other nodes when a node is destroyed', () => {
+    const { node, mock } = makeNode();
+    const emitter = attachEmitter(mock);
+    const first = createGroup({ id: 'first' });
+    const second = createGroup({ id: 'second' });
+
+    node.setupDefaultNodeEvents(first);
+    node.setupDefaultNodeEvents(second);
+    node.onDestroy(first as unknown as WeaveElementInstance);
+
+    expect(listenerCounts(emitter)).toEqual([1, 1]);
   });
 });
