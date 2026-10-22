@@ -7,7 +7,7 @@
 - [x] 1.5 Implement `flipImage(node, { axis })` on `WeaveImageNode` using `stateTransactional`; no-op when `cropping: true`
 - [x] 1.6 Add `flipHorizontal`/`flipVertical` prototype stubs in `nodes/node.ts` and image-instance implementations
 - [x] 1.7 Add `weave.flipImage(node, { axis })` facade in `weave.ts`
-- [x] 1.8 Tests: both axes, combined, double flip, resize via `scaleReset`, rotation, serialize/clone, state helpers, legacy state (automated); fallback image, cached node, undo/redo as one step (validated manually)
+- [x] 1.8 Tests: both axes, combined, double flip, resize via `scaleReset`, rotation, serialize/clone, state helpers, legacy state, undo/redo as one step (real Yjs UndoManager), state round trip for copy/paste, group/ungroup and reload, and rendered pixels on the node canvas backend (automated); fallback image and cached node (validated manually)
 - [x] 1.9 Checkpoint: user tests slice 1; revise plan if needed
 
 ## 2. Slice 2: Crop-mode mirroring

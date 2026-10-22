@@ -1894,11 +1894,11 @@ export class WeaveImageNode extends WeaveNode {
           .describe('Whether the image is currently being cropped'),
         flipX: z
           .boolean()
-          .default(false)
+          .optional()
           .describe('Whether the image is flipped horizontally'),
         flipY: z
           .boolean()
-          .default(false)
+          .optional()
           .describe('Whether the image is flipped vertically'),
       }),
     });

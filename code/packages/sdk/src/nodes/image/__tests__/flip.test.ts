@@ -160,14 +160,23 @@ describe('image flip', () => {
     expect(upd.props.flipY).toBe(true);
   });
 
-  it('schema defaults flip to false for legacy state', () => {
+  it('schema keeps legacy state without flip props', () => {
     const r = WeaveImageNode.getSchema().safeParse(
       WeaveImageNode.defaultState('a')
     );
     expect(r.success).toBe(true);
     if (r.success) {
-      expect(r.data.props.flipX).toBe(false);
-      expect(r.data.props.flipY).toBe(false);
+      expect('flipX' in r.data.props).toBe(false);
+      expect('flipY' in r.data.props).toBe(false);
     }
+  });
+
+  it('schema accepts flip booleans', () => {
+    const base = WeaveImageNode.defaultState('a');
+    const r = WeaveImageNode.getSchema().safeParse({
+      ...base,
+      props: { ...base.props, flipX: true, flipY: false },
+    });
+    expect(r.success).toBe(true);
   });
 });

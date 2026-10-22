@@ -16,7 +16,7 @@
 
 ## Decisions
 
-1. **State as group booleans.** `flipX`/`flipY` live on the group attrs, omitted from `defaultState` until set. Zod schema: optional boolean, default `false`. Rejected: negative scale on the group (fights `scaleReset`).
+1. **State as group booleans.** `flipX`/`flipY` live on the group attrs, omitted from `defaultState` until set. Zod schema: optional boolean with no default, so parsing never adds flip props to legacy state. Rejected: negative scale on the group (fights `scaleReset`).
 2. **Render on `internalImage`.** `applyFlip(group)` sets `scaleX = flipX ? -1 : 1`, `offsetX = flipX ? width : 0` (same for Y). It always sets both scale and offset, so turning a flip off resets them. It must run after the size is set, because the offset depends on it. It is called at the end of `updateImageCrop`, which `onRender`, `loadImage` success, `onUpdate` and `scaleReset` all reach, and `flipImage` calls it directly before `cacheNode`.
 3. **Crop data in source space (ii).** `cropInfo` is never mutated by a flip. Flip is applied after crop sizing in `updateImageCrop`, so the crop window mirrors in place.
 4. **API.** `WeaveImageNode.flipImage(node, { axis })` toggles the attr, calls `applyFlip` and `cacheNode`, then `updateNode(serialize(node))` inside `stateTransactional`. `weave.flipImage(node, { axis })` delegates to the registered image handler. Node-level `flipHorizontal()`/`flipVertical()` are added as no-op stubs on the Konva prototype (like `triggerCrop`, `nodes/node.ts`) and implemented on image instances.
