@@ -49,6 +49,9 @@ export interface TextEditHost {
   stageToContainer(point: Point): Point;
   caretColor: string;
   selectionColor: string;
+  /** Outline of the text box while editing (screen px width). Omit to hide. */
+  outlineColor?: string;
+  outlineWidth?: number;
   /** Aborts the session listeners (e.g. instance teardown). */
   signal?: AbortSignal;
   /** Content changed (live; not yet committed). */
@@ -572,6 +575,17 @@ export class TextEditSession {
 
     ctx.save();
     ctx.transform(rel.m[0], rel.m[1], rel.m[2], rel.m[3], rel.m[4], rel.m[5]);
+
+    if (this.host.outlineColor) {
+      const scale = Math.hypot(abs.m[0], abs.m[1]) || 1;
+      const lw = (this.host.outlineWidth ?? 1) / scale;
+      const { width, height } = this.target.getSize();
+      ctx.setAttr('strokeStyle', this.host.outlineColor);
+      ctx.setAttr('lineWidth', lw);
+      ctx.beginPath();
+      ctx.rect(0, 0, width, height);
+      ctx.stroke();
+    }
     ctx.translate(o.x, o.y);
 
     const { start, end } = this.model.getSelection();

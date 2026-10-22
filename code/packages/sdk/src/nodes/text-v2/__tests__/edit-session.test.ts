@@ -55,6 +55,8 @@ function setup(text = 'Hello world', extra: Konva.ShapeConfig = {}) {
     stageToContainer: (p) => p,
     caretColor: '#000000',
     selectionColor: 'rgba(0,0,255,0.3)',
+    outlineColor: '#ff0000',
+    outlineWidth: 2,
     onRequestExit: (r) => exits.push(r),
   };
   const session = new TextEditSession(target, host, 'n1');
@@ -262,7 +264,18 @@ describe('TextEditSession', () => {
     const caretPx = px();
     expect(caretPx).toBeGreaterThan(5);
     c.session.model.setSelection(0, 5);
-    expect(px()).toBeGreaterThan(caretPx * 5);
+    expect(px()).toBeGreaterThan(caretPx + 500);
+  });
+
+  it('draws an outline of the box (fixed size) on the utility layer', () => {
+    const c = make('Hi', { width: 200, height: 100 });
+    c.utility.draw();
+    const d = c.utility.getCanvas()._canvas.getContext('2d')!;
+    // top edge of the box at stage (10,10)..(210,10): red pixels on it
+    const px = d.getImageData(100, 10, 1, 1).data;
+    const bottom = d.getImageData(100, 110, 1, 1).data;
+    expect(px[3]).toBeGreaterThan(0);
+    expect(bottom[3]).toBeGreaterThan(0);
   });
 
   it('result reports unchanged when content returns to the original', () => {
