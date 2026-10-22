@@ -31,6 +31,7 @@
 - [x] 5.1 Hidden proxy textarea (typing, IME), stop keydown propagation
 - [x] 5.2 Caret and selection painting on `utilityLayer`, zoom/pan sync
 - [x] 5.3 Click/drag/double/triple selection; arrows, home/end, up/down
+- [x] 5.4 Configurable edit outline (`edition.outline`); drop `edition.borderSize` from the text-v2 config
 
 ## 6. Clipboard and undo
 

@@ -138,6 +138,40 @@ function setup(config?: object) {
   };
 }
 
+describe('WeaveTextV2Node edit outline config', () => {
+  type Host = { outlineColor?: string; outlineWidth?: number };
+  const hostOf = (t: ReturnType<typeof setup>) => {
+    t.edit();
+    const host = (t.node as unknown as { session: { host: Host } }).session
+      .host;
+    t.esc();
+    return host;
+  };
+
+  it('defaults: enabled, #0074ff, width 1', () => {
+    expect(hostOf(setup())).toMatchObject({
+      outlineColor: '#0074ff',
+      outlineWidth: 1,
+    });
+  });
+
+  it('partial override keeps the other defaults', () => {
+    const h = hostOf(setup({ edition: { outline: { color: '#ff0000' } } }));
+    expect(h).toMatchObject({ outlineColor: '#ff0000', outlineWidth: 1 });
+  });
+
+  it('enabled:false draws no outline', () => {
+    const h = hostOf(setup({ edition: { outline: { enabled: false } } }));
+    expect(h.outlineColor).toBeUndefined();
+    expect(h.outlineWidth).toBeUndefined();
+  });
+
+  it('edition.borderSize is not part of the text-v2 config type', () => {
+    // @ts-expect-error borderSize was removed from WeaveTextV2Properties
+    new WeaveTextV2Node({ config: { edition: { borderSize: 4 } } });
+  });
+});
+
 describe('WeaveTextV2Node edit lifecycle', () => {
   it('enter: mutex, edition mode, plugin off, proxy input, event', () => {
     const t = setup();

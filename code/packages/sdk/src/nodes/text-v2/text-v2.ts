@@ -25,7 +25,6 @@ import { TextEditSession, type TextEditTarget } from './edit/session';
 import { blocksToText, type WeaveTextBlock } from './model';
 import {
   WEAVE_TEXT_V2_DEFAULT_CONFIG,
-  WEAVE_TEXT_V2_OUTLINE_COLOR,
   WEAVE_TEXT_V2_SELECTION_COLOR,
 } from './constants';
 import type {
@@ -351,8 +350,10 @@ export class WeaveTextV2Node extends WeaveNode {
         },
         caretColor: this.config.cursor.color,
         selectionColor: WEAVE_TEXT_V2_SELECTION_COLOR,
-        outlineColor: WEAVE_TEXT_V2_OUTLINE_COLOR,
-        outlineWidth: this.config.edition.borderSize,
+        ...(this.config.edition.outline.enabled && {
+          outlineColor: this.config.edition.outline.color,
+          outlineWidth: this.config.edition.outline.width,
+        }),
         signal: this.instance.getEventsController().signal,
         onChange: (blocks) => this.checkSize(shape, blocks),
         onRequestExit: () => this.exitEditMode(shape),

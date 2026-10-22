@@ -14,7 +14,24 @@ export type WeaveTextV2SizeWarningProperties = {
   threshold: number;
 };
 
-export type WeaveTextV2Properties = WeaveTextProperties & {
+export type WeaveTextV2OutlineProperties = {
+  /** Draw an outline of the text box while editing. */
+  enabled: boolean;
+  color: string;
+  /** Stroke width in screen pixels (constant across zoom levels). */
+  width: number;
+};
+
+/**
+ * Unlike `WeaveTextNode`, `edition` has no `borderSize` (there is no DOM
+ * textarea border to size): the edit box outline is `edition.outline`.
+ */
+export type WeaveTextV2EditionProperties = {
+  outline: WeaveTextV2OutlineProperties;
+};
+
+export type WeaveTextV2Properties = Omit<WeaveTextProperties, 'edition'> & {
+  edition: WeaveTextV2EditionProperties;
   sizeWarning: WeaveTextV2SizeWarningProperties;
 };
 
