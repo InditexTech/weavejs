@@ -74,6 +74,9 @@ When active the user can:
 * *Click* on the canvas, it will create a rectangle with a default size.
 * *Touch* on the canvas, it will create a rectangle with a default size.
 * *Click & drag* to create a rectangle and define its size.
+* Hold *Shift* while dragging to constrain it to a square.
+* Hold *Alt/Option* while dragging to draw outward from the initial click, which stays at the rectangle's center.
+* Hold *Shift + Alt/Option* to draw a centered square.
 
 Once clicked or click-drag finishes, the rectangle is added to the canvas as a fully functional
 node—ready. This action integrates seamlessly with Weave.js's real-time state system,

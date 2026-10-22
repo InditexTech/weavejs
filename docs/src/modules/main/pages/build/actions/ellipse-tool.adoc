@@ -74,7 +74,10 @@ When active the user can:
 * *Click* on the canvas, it will create a ellipse with a default size.
 * *Touch* on the canvas, it will create a ellipse with a default size.
 * *Click & drag* to create a ellipse and define its radius on both axis (X axis control
-the x-radius and y axis controls the y-radius, if both radius are the same you have a circle).
+  the x-radius and y axis controls the y-radius, if both radius are the same you have a circle).
+* Hold *Shift* while dragging to constrain it to a circle.
+* Hold *Alt/Option* while dragging to draw outward from the initial click, which stays at the ellipse's center.
+* Hold *Shift + Alt/Option* to draw a centered circle.
 
 Once clicked or click-drag finishes, the ellipse is added to the canvas as a fully functional
 node—ready. This action integrates seamlessly with Weave.js's real-time state system,

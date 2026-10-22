@@ -12,6 +12,8 @@ mockups, and more.
 Each interaction results in the creation of a xref:sdk:api-reference/nodes/ellipse.adoc[WeaveEllipseNode],
 added to the shared state and synchronized across all users.
 
+While dragging, hold `Shift` to draw a circle, `Alt`/`Option` to draw from the initial point as the center, or both to combine the behaviors.
+
 The class extends the xref:sdk:api-reference/actions/action.adoc[WeaveAction] class.
 
 == Name
