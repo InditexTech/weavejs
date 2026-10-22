@@ -53,18 +53,7 @@ that it contains.
 The width is fixed and defined by the end user.
 * `fixed`: makes the node fixed on both its width & height.
 
-== Native on-canvas editing (opt-in)
+== Native on-canvas editing
 
-By default, editing uses a DOM textarea overlay. To edit directly on the canvas, register
-mono:[WeaveTextV2Node] instead of mono:[WeaveTextNode]. It keeps the same `text` node type, so existing
-documents work unchanged.
-
-[source,ts]
-----
-import { WeaveTextV2Node } from "@inditextech/weave-sdk";
-
-const nodes = [new WeaveTextV2Node()];
-----
-
-See xref:sdk:api-reference/nodes/text.adoc#_weavetextv2node_native_on_canvas_editing[WeaveTextV2Node]
-for the differences, configuration and the mono:[onTextSizeWarning] event.
+This node edits through a DOM textarea overlay. To edit directly on the canvas, use
+xref:main:build/nodes/text-v2.adoc[Text (native editing)], a drop-in replacement for this node.

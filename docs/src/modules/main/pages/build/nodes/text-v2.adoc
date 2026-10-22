@@ -1,0 +1,73 @@
+= Text (native editing)
+:description: Text node with editing drawn natively on the canvas
+
+The Text (native editing) node is a drop-in replacement for the xref:main:build/nodes/text.adoc[Text]
+node. Instead of overlaying a DOM textarea while you edit, it draws the caret and the selection
+directly on the canvas, so the text looks the same while editing and while idle, at any zoom level.
+
+It keeps the same node type (`text`), so existing documents work unchanged.
+
+== Usage
+
+=== Import the Node
+Start by importing the node:
+
+[source,ts]
+----
+import { WeaveTextV2Node } from "@inditextech/weave-sdk";
+----
+
+=== Register the Node
+Register it on the xref:sdk:api-reference/weave/index.adoc[Weave] class instance *instead of*
+`WeaveTextNode`. Both use the `text` node type, so only one of them can be registered.
+
+[source,ts]
+----
+const instance = new Weave({
+  ...
+  nodes: [
+    ...,
+    new WeaveTextV2Node(), // <.>
+  ]
+})
+----
+<.> Replaces `new WeaveTextNode()`.
+
+The xref:main:build/actions/text-tool.adoc[Text Tool] works with either node.
+
+== What editing feels like
+
+* Entering edit mode on existing text selects all of it, as in Figma, so typing replaces it. A node
+you just created starts with the caret.
+* An outline of the text box is drawn while editing. It is especially useful when the width or the
+height are fixed.
+* Click, drag, double-click (word), triple-click (paragraph), the arrow keys, kbd:[Home],
+kbd:[End] and kbd:[Up] / kbd:[Down] move and select as expected, and IME composition works.
+* kbd:[Ctrl]/kbd:[Cmd] + kbd:[Z] undoes your typing while you edit, without touching the rest of the
+canvas history. Leaving edit mode (kbd:[Esc] or clicking outside) saves everything as one undoable
+step.
+* Copy and paste use plain text.
+
+== Customize the outline
+
+[source,ts]
+----
+new WeaveTextV2Node({
+  config: {
+    edition: {
+      outline: { enabled: true, color: "#0074ff", width: 1, padding: 0 },
+    },
+  },
+});
+----
+
+NOTE: `edition.borderSize` from the Text node does not exist here. Use `edition.outline`.
+
+== Large texts
+
+There is no size limit. When the serialized content passes `sizeWarning.threshold` (200000 characters
+by default) the `onTextSizeWarning` event is emitted, so your application can warn users or decide
+what to do.
+
+See xref:sdk:api-reference/nodes/text-v2.adoc[WeaveTextV2Node] for the full reference: configuration,
+events and the content model.

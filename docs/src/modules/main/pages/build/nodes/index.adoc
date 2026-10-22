@@ -73,6 +73,10 @@ The Stroke node represents a customizable single-segment line on the canvas. It 
 .xref:main:build/nodes/text.adoc[Text]
 The Text node is used to display editable or static text on the canvas. It supports rich styling options including font size, family, color, alignment, and line height.
 
+[card,subheader="Drawing",labels="new"]
+.xref:main:build/nodes/text-v2.adoc[Text (native editing)]
+A drop-in replacement for the Text node with editing drawn natively on the canvas: caret and selection, select-all on edit, session undo and an outline of the text box.
+
 [card,subheader="Drawing"]
 .xref:main:build/nodes/star.adoc[Star]
 The Star node is a simple, versatile primitive shape used to render star elements on the canvas. It supports customizable properties such as position, inner and outer radius, fill color, stroke and more.
