@@ -1,0 +1,33 @@
+code/packages/sdk/src/nodes/text-v2/__tests__/text-v2-edit.test.ts
+  s_236fa6c66b1306::t_381aa889f57bce 141-174
+code/packages/sdk/src/nodes/text-v2/constants.ts
+  s_236fa6c66b1306::t_530390aab3717d 15
+code/packages/sdk/src/nodes/text-v2/text-v2.ts
+  s_236fa6c66b1306::t_b2209dc34e88bd 353-356
+code/packages/sdk/src/nodes/text-v2/types.ts
+  s_236fa6c66b1306::t_38b9092d324584 17-34
+docs/src/modules/sdk/pages/api-reference/nodes/text.adoc
+  s_236fa6c66b1306::t_76d5c8f73d195f 251-257,263-274
+openspec/changes/text-node-native-editing/design.md
+  s_236fa6c66b1306::t_ce80fc6b3e11bd 52
+openspec/changes/text-node-native-editing/specs/text-v2/editing/spec.md
+  s_236fa6c66b1306::t_28e109c5e5713e 65-75
+openspec/changes/text-node-native-editing/tasks.md
+  s_236fa6c66b1306::t_e97c0eeb2ea90c 34
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.6",
+  "base_commit_sha": "e3123596fb01dffb7c3f04283b574f289f8f919a",
+  "prompts": {},
+  "sessions": {
+    "s_236fa6c66b1306": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "ses_e9c68953effe7Km6dHutRPYIH1",
+        "model": "claude-sonnet-5.5"
+      },
+      "human_author": "Jesus Manuel Piñeiro Cid <jesusmpc@inditex.com>"
+    }
+  }
+}
