@@ -1155,6 +1155,45 @@
 </li>
 </ul>
 </div>
+<div class="sect2">
+<h3 id="server-side-rendering-backends"><a class="anchor" href="#server-side-rendering-backends"></a>Server-side rendering backends</h3>
+<div class="paragraph">
+<p>On the server, Konva renders through a native canvas implementation. The <code>@inditextech/weave-sdk/server</code> entry point offers two backends, and each one needs its own native package:</p>
+</div>
+<div class="tableblock-wrap"><div class="tablecontainer"><table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Backend setup</th>
+<th class="tableblock halign-left valign-top">Required package</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>setupCanvasBackend()</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>canvas</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>setupSkiaBackend()</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>skia-canvas</code></p></td>
+</tr>
+</tbody>
+</table></div></div>
+<div class="paragraph">
+<p>Both packages are optional peer dependencies of the SDK: npm doesn&#8217;t install them, and it doesn&#8217;t warn when they are missing. Install only the one for the backend you use, with the version that <code>@inditextech/weave-sdk</code> requires, for example:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="shiki highlight"><code data-lang="shell"><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4;--shiki-light-bg:#1E1E1E;--shiki-dark-bg:#1E1E1E"><span class="line"><span style="--shiki-light:#DCDCAA;--shiki-dark:#DCDCAA">npm</span><span style="--shiki-light:#CE9178;--shiki-dark:#CE9178"> install</span><span style="--shiki-light:#CE9178;--shiki-dark:#CE9178"> canvas</span></span></span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>If the package is missing, the setup function throws an error that names the package to install. Browser applications don&#8217;t need either package.</p>
+</div>
+</div>
 </div>
 </div>
 <div class="sect1">
