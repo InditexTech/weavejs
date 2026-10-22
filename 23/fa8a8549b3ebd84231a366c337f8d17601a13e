@@ -1,0 +1,53 @@
+AGENTS.md
+  s_b00cb69d45d2ee::t_b8d4704a8f894e 113-115
+code/CHANGELOG.md
+  s_b00cb69d45d2ee::t_c8ee83900e8e42 27
+code/packages/sdk/src/nodes/extensions.d.ts
+  s_b00cb69d45d2ee::t_93d977a2aca594 46-47
+code/packages/sdk/src/nodes/image/__tests__/crop.test.ts
+  s_b00cb69d45d2ee::t_a0ee2654f4d7cd 979-1132
+code/packages/sdk/src/nodes/image/__tests__/flip.test.ts
+  s_b00cb69d45d2ee::t_5e772fae27a7b8 1-173
+code/packages/sdk/src/nodes/image/crop.ts
+  s_b00cb69d45d2ee::t_3e8cec6b234780 55-64,66-72,80-111,113-114,117-120,128,148-151,153-154,215-220,694-712,716-717,789-790,795-812,816-817
+code/packages/sdk/src/nodes/image/image.ts
+  s_b00cb69d45d2ee::t_fcf63fc3a97545 18,290-328,417-424,1449-1453,1589-1591,1593,1596,1794-1795,1831-1832,1895-1902
+code/packages/sdk/src/nodes/image/types.ts
+  s_b00cb69d45d2ee::t_e5e58ad241faad 28-35
+code/packages/sdk/src/nodes/node.ts
+  s_b00cb69d45d2ee::t_e5dd6a7f08c3e1 70-71,174-175
+code/packages/sdk/src/weave.ts
+  s_b00cb69d45d2ee::t_b3ebca013fc784 1114-1126
+docs/src/modules/main/pages/build/nodes/image.adoc
+  s_b00cb69d45d2ee::t_e27e58427b204e 45-68
+docs/src/modules/sdk/pages/api-reference/nodes/image.adoc
+  s_b00cb69d45d2ee::t_e2d2e4e37c0dc5 54-61,171-186,317-332,360-379
+docs/src/modules/sdk/pages/api-reference/weave/index.adoc
+  s_b00cb69d45d2ee::t_a1f4f69b447681 449-466
+openspec/changes/add-image-flip/.openspec.yaml
+  s_b00cb69d45d2ee::t_6bf55a0a80bfb5 1-2
+openspec/changes/add-image-flip/design.md
+  s_b00cb69d45d2ee::t_b47c25f193d053 1-32
+openspec/changes/add-image-flip/proposal.md
+  s_b00cb69d45d2ee::t_e61afd3ebe1589 1-27
+openspec/changes/add-image-flip/specs/image-node/flip/spec.md
+  s_b00cb69d45d2ee::t_6bc660ad9826e5 1-95
+openspec/changes/add-image-flip/tasks.md
+  s_b00cb69d45d2ee::t_b3c7d947d38ff1 1-24
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "23fa8a8549b3ebd84231a366c337f8d17601a13e",
+  "prompts": {},
+  "sessions": {
+    "s_b00cb69d45d2ee": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "ses_e9d41592affePyiOpSHae98947",
+        "model": "claude-sonnet-5.5"
+      },
+      "human_author": "Jesus Manuel Piñeiro Cid <jesusmpc@inditex.com>"
+    }
+  }
+}
