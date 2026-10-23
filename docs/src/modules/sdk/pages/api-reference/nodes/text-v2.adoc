@@ -61,6 +61,12 @@ const node = new WeaveTextV2Node({
   unchanged. While editing, keydown does not propagate to the page, so app-level undo does not fire;
   `window.weaveTextEditing` holds the editing node id.
 * Clipboard is plain text only. Large pastes are laid out in time slices.
+* While editing, the stage pans to keep the caret in view; the margin is mono:[edition.followPadding].
+* A pointer press inside an element with the attribute mono:[data-weave-text-edit-keep] does not end
+  the edit session, so an app toolbar or sidebar can apply formatting commands to the live selection.
+  Mouse-down on such an element keeps focus on the editor, except on form fields (`input`,
+  `textarea`, `select`, `contenteditable`), which take focus normally. Portaled popups (for example a
+  font picker) need the attribute too.
 * All four layouts (`smart`, `auto-all`, `auto-height`, `fixed`) keep their behavior. Auto-sized
   layouts measure from the engine and no longer depend on the zoom level.
 * xref:sdk:api-reference/actions/text-tool.adoc[WeaveTextToolAction] works with it unchanged.

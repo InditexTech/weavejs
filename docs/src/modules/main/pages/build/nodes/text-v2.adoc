@@ -47,6 +47,12 @@ kbd:[End] and kbd:[Up] / kbd:[Down] move and select as expected, and IME composi
 canvas history. Leaving edit mode (kbd:[Esc] or clicking outside) saves everything as one undoable
 step.
 * Copy and paste use plain text; pasted text takes the formatting at the caret.
+* The canvas pans to follow the caret when you type past the edge of the view. Configure the margin
+with `edition.followPadding` (default 40 px per side), for example to keep the caret clear of your
+toolbars.
+* To build a formatting toolbar that keeps the editor open, add the attribute
+`data-weave-text-edit-keep` to the toolbar element (and to any portaled popup it opens). Clicks on it
+then no longer end editing and rich text commands apply to the current selection.
 
 == Customize the outline
 
