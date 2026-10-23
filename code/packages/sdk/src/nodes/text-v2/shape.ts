@@ -377,8 +377,13 @@ export class WeaveTextV2Shape extends Konva.Shape {
     const det = m.a * m.d - m.b * m.c;
     if (!det || !Number.isFinite(det)) return null;
     const canvas = ctx.getCanvas();
-    const w = canvas.getWidth();
-    const h = canvas.getHeight();
+    // The native transform maps to device px (it includes the pixel ratio),
+    // so use the backing store size, not the CSS size from getWidth().
+    const backing = (canvas as unknown as {
+      _canvas?: { width: number; height: number };
+    })._canvas;
+    const w = backing?.width ?? canvas.getWidth() * canvas.getPixelRatio();
+    const h = backing?.height ?? canvas.getHeight() * canvas.getPixelRatio();
     if (!(w > 0) || !(h > 0)) return null;
     // device px -> local coords (inverse of the current matrix)
     let y1 = Infinity;
