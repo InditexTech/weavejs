@@ -263,6 +263,25 @@ describe('TextEditSession', () => {
     expect(c.session.model.getSelectedText()).toBe('hello brave world');
   });
 
+  it('double click selects a word even when pointerdown detail is 0', () => {
+    const c = make('hello brave world');
+    const x = 10 + c.shape.measureText('hello bra') + 1;
+    const fire = () =>
+      window.dispatchEvent(
+        new MouseEvent('pointerdown', {
+          clientX: x,
+          clientY: 15,
+          detail: 0,
+          button: 0,
+          bubbles: true,
+          cancelable: true,
+        })
+      );
+    fire();
+    fire();
+    expect(c.session.model.getSelectedText()).toBe('brave');
+  });
+
   it('pointer outside the node requests exit', () => {
     const c = make('hi');
     window.dispatchEvent(
@@ -276,6 +295,32 @@ describe('TextEditSession', () => {
     expect(c.exits).toEqual(['outside']);
     key(c, 'Escape');
     expect(c.exits).toEqual(['outside', 'escape']);
+  });
+
+  it('pointer inside a data-weave-text-edit-keep element does not exit', () => {
+    const c = make('hi');
+    const bar = document.createElement('div');
+    bar.setAttribute('data-weave-text-edit-keep', '');
+    const btn = document.createElement('button');
+    const input = document.createElement('input');
+    bar.append(btn, input);
+    document.body.appendChild(bar);
+    const fire = (type: string, target: Element) => {
+      const ev = new MouseEvent(type, {
+        clientX: 390,
+        clientY: 190,
+        button: 0,
+        bubbles: true,
+        cancelable: true,
+      });
+      target.dispatchEvent(ev);
+      return ev;
+    };
+    fire('pointerdown', btn);
+    expect(c.exits).toEqual([]);
+    expect(fire('mousedown', btn).defaultPrevented).toBe(true);
+    expect(fire('mousedown', input).defaultPrevented).toBe(false);
+    bar.remove();
   });
 
   it('paints caret and selection on the utility layer', () => {

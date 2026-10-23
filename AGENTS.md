@@ -117,3 +117,5 @@ npx skills@latest add InditexTech/docouture --all
 | sdk:api-reference/actions/brush-tool.adoc | `code/packages/sdk/src/actions/brush-tool/{types,constants}.ts` | updated for unreleased changes |
 | main:build/nodes/text-v2.adoc | `code/packages/sdk/src/nodes/text-v2/*` | updated for unreleased changes |
 | sdk:api-reference/nodes/text-v2.adoc | `code/packages/sdk/src/nodes/text-v2/*` | updated for unreleased changes |
+| main:build/actions/text-tool.adoc | `code/packages/sdk/src/actions/text-tool/text-tool.ts` | updated for unreleased changes |
+| sdk:api-reference/actions/text-tool.adoc | `code/packages/sdk/src/actions/text-tool/text-tool.ts` | updated for unreleased changes |

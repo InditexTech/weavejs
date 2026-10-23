@@ -7,6 +7,7 @@ import { WeaveAction } from '@/actions/action';
 import { type WeaveTextToolActionState } from './types';
 import { TEXT_TOOL_ACTION_NAME, TEXT_TOOL_STATE } from './constants';
 import Konva from 'konva';
+import type { WeaveElementAttributes } from '@inditextech/weave-types';
 import { WeaveNodesSelectionPlugin } from '@/plugins/nodes-selection/nodes-selection';
 import type { WeaveTextNode } from '@/nodes/text/text';
 import { SELECTION_TOOL_ACTION_NAME } from '../selection-tool/constants';
@@ -22,9 +23,18 @@ export class WeaveTextToolAction extends WeaveAction {
   protected cancelAction!: () => void;
   onPropsChange = undefined;
   onInit = undefined;
+  private readonly toolName: string;
+  private readonly initialProps: WeaveElementAttributes;
 
-  constructor() {
+  /**
+   * `name` and `props` let an app register several text tools, e.g. a
+   * plain one and one creating rich text nodes (`props: { richText: true }`).
+   */
+  constructor(params?: { name?: string; props?: WeaveElementAttributes }) {
     super();
+
+    this.toolName = params?.name ?? TEXT_TOOL_ACTION_NAME;
+    this.initialProps = params?.props ?? {};
 
     this.initialize();
   }
@@ -39,7 +49,7 @@ export class WeaveTextToolAction extends WeaveAction {
   }
 
   getName(): string {
-    return TEXT_TOOL_ACTION_NAME;
+    return this.toolName;
   }
 
   initProps() {
@@ -53,6 +63,7 @@ export class WeaveTextToolAction extends WeaveAction {
       lineHeight: 1,
       verticalAlign: 'top',
       strokeEnabled: false,
+      ...this.initialProps,
     };
   }
 

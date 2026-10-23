@@ -80,4 +80,54 @@ describe.skipIf(!hasSkia)('WeaveTextV2Shape on the skia-canvas backend', () => {
     for (let i = 3; i < data.length; i += 4) if (data[i] > 0) ink++;
     expect(ink).toBeGreaterThan(100);
   });
+  it('renders rich runs and lists server-side (export parity)', async () => {
+    await import('konva/skia-backend');
+    const { default: Konva } = await import('konva');
+    const { WeaveTextV2Shape } = await import('../shape');
+
+    const stage = new Konva.Stage({ width: 300, height: 120 });
+    const layer = new Konva.Layer();
+    stage.add(layer);
+    const shape = new WeaveTextV2Shape({
+      fontSize: 18,
+      fontFamily: 'sans-serif',
+      fill: '#000000',
+      width: 280,
+    });
+    shape.setBlocks([
+      {
+        kind: 'ul',
+        runs: [
+          { t: 'plain ' },
+          {
+            t: 'bold red',
+            m: { bold: true, color: '#ff0000', underline: true },
+          },
+          { t: ' big', m: { size: 1.5 } },
+        ],
+      },
+      { kind: 'ol', runs: [{ t: 'second' }] },
+    ]);
+    layer.add(shape);
+    layer.draw();
+
+    const lines = shape.ensureLayout().lines;
+    expect(lines[0].segments).toHaveLength(3);
+    expect(lines[0].marker?.text).toBe('\u2022');
+    expect(lines[1].marker?.text).toBe('1.');
+    const data = (
+      layer.getCanvas()._canvas as unknown as {
+        getContext(t: string): {
+          getImageData(...a: number[]): { data: Uint8ClampedArray };
+        };
+      }
+    )
+      .getContext('2d')
+      .getImageData(0, 0, 300, 120).data;
+    let red = 0;
+    for (let i = 0; i < data.length; i += 4) {
+      if (data[i] > 200 && data[i + 1] < 80 && data[i + 3] > 0) red++;
+    }
+    expect(red).toBeGreaterThan(20);
+  });
 });

@@ -4,7 +4,13 @@
 
 import Konva from 'konva';
 import type { TextLayout } from '../layout/engine';
-import type { WeaveTextBlock } from '../model';
+import {
+  getSelectionFormat,
+  type WeaveTextBlock,
+  type WeaveTextListKind,
+  type WeaveTextMarkKey,
+  type WeaveTextSelectionFormat,
+} from '../model';
 import { TextEditModel, type EditKind } from './model';
 import {
   caretRect,
@@ -28,7 +34,7 @@ export interface TextEditTarget {
   setBlocks(blocks: WeaveTextBlock[]): void;
   getLayout(): TextLayout;
   /** Rendered width of a string (letter spacing included). */
-  measure(text: string): number;
+  measure(text: string, font?: string): number;
   /** Local -> stage (container px) transform of the text box. */
   getAbsoluteTransform(): Konva.Transform;
   /** Offset of the first line inside the box (padding + vertical align). */
@@ -47,6 +53,8 @@ export interface TextEditHost {
   container: HTMLElement;
   clientToStage(clientX: number, clientY: number): Point;
   stageToContainer(point: Point): Point;
+  /** Called with the caret in container px so the host can pan it into view. */
+  revealCaret?(point: Point): void;
   caretColor: string;
   selectionColor: string;
   /** Outline of the text box while editing (screen px width). Omit to hide. */
@@ -58,6 +66,12 @@ export interface TextEditHost {
   selectAllOnStart?: boolean;
   /** Aborts the session listeners (e.g. instance teardown). */
   signal?: AbortSignal;
+  /** Rich text commands, shortcuts and list key rules are active. */
+  richText?: boolean;
+  /** Selection, caret or content changed (not throttled). */
+  onSelectionChange?(): void;
+  /** A format command, undo or redo ran. */
+  onFormatChange?(reason: 'command' | 'undo' | 'redo'): void;
   /** Content changed (live; not yet committed). */
   onChange?(blocks: WeaveTextBlock[]): void;
   /** User asked to leave edit mode. */
@@ -146,7 +160,7 @@ export class TextEditSession {
 
     if (this.host.selectAllOnStart) this.model.selectAll();
     this.syncTextarea();
-    ta.focus();
+    ta.focus({ preventScroll: true });
     this.positionTextarea();
     this.startBlink();
     this.repaint();
@@ -180,7 +194,7 @@ export class TextEditSession {
   }
 
   focus() {
-    this.textarea?.focus();
+    this.textarea?.focus({ preventScroll: true });
   }
 
   // ---- proxy textarea ------------------------------------------------------
@@ -237,8 +251,15 @@ export class TextEditSession {
     if (!ta) return;
     const c = this.caretStagePoint();
     const p = this.host.stageToContainer(c);
-    ta.style.left = `${p.x}px`;
-    ta.style.top = `${p.y}px`;
+    this.host.revealCaret?.(p);
+    // Keep the proxy inside the container: a focused textarea outside it makes
+    // the browser scroll the container to reveal it, shifting the whole canvas
+    // when the caret leaves the viewport.
+    const box = this.host.container;
+    const maxX = Math.max(0, (box.clientWidth || Infinity) - 2);
+    const maxY = Math.max(0, (box.clientHeight || Infinity) - 20);
+    ta.style.left = `${Math.min(Math.max(p.x, 0), maxX)}px`;
+    ta.style.top = `${Math.min(Math.max(p.y, 0), maxY)}px`;
   }
 
   private caretStagePoint(): Point {
@@ -277,9 +298,41 @@ export class TextEditSession {
     if (e.key === 'Escape') this.host.onRequestExit('escape');
     else if (isUndo) this.undo();
     else if (isRedo) this.redo();
+    else if (this.handleRichKey(e, mod, key)) return true;
     else if (e.key === 'Tab') return true;
     else return false;
     return true;
+  }
+
+  /** Format shortcuts and list key rules; only when rich text is enabled. */
+  private handleRichKey(e: KeyboardEvent, mod: boolean, key: string): boolean {
+    if (!this.host.richText) return false;
+    if (mod && !e.shiftKey && !e.altKey) {
+      const marks: Record<string, WeaveTextMarkKey> = {
+        b: 'bold',
+        i: 'italic',
+        u: 'underline',
+      };
+      if (marks[key]) {
+        this.toggleMark(marks[key]);
+        return true;
+      }
+    }
+    if (mod || this.composing) return false;
+    if (e.key === 'Tab') {
+      if (e.shiftKey) this.outdent();
+      else this.indent();
+      return true;
+    }
+    if (e.key === 'Enter') {
+      if (this.model.enter()) this.afterFormat('command', true);
+      return true;
+    }
+    if (e.key === 'Backspace' && this.model.backspaceInList()) {
+      this.afterFormat('command', true);
+      return true;
+    }
+    return false;
   }
 
   private handleNavigationKey(e: KeyboardEvent): boolean {
@@ -422,6 +475,7 @@ export class TextEditSession {
     if (this.model.undo()) {
       this.syncTextarea();
       this.afterContentChange(0, true);
+      this.host.onFormatChange?.('undo');
     }
   }
 
@@ -430,7 +484,54 @@ export class TextEditSession {
     if (this.model.redo()) {
       this.syncTextarea();
       this.afterContentChange(0, true);
+      this.host.onFormatChange?.('redo');
     }
+  }
+
+  // ---- format commands -----------------------------------------------------
+
+  private afterFormat(reason: 'command', content = false) {
+    this.flushPending();
+    this.syncTextarea();
+    if (content) this.afterContentChange(0, true);
+    else this.applyContent();
+    this.afterSelectionChange();
+    this.host.onFormatChange?.(reason);
+  }
+
+  toggleMark(key: WeaveTextMarkKey) {
+    if (this.model.toggleMark(key)) this.afterFormat('command');
+  }
+
+  setMark(key: WeaveTextMarkKey, value: unknown) {
+    if (this.model.setMark(key, value)) this.afterFormat('command');
+  }
+
+  toggleList(kind: WeaveTextListKind) {
+    if (this.model.toggleList(kind)) this.afterFormat('command');
+  }
+
+  indent() {
+    if (this.model.indent()) this.afterFormat('command');
+  }
+
+  outdent() {
+    if (this.model.outdent()) this.afterFormat('command');
+  }
+
+  getSelection(): { start: number; end: number } {
+    return this.model.getSelection();
+  }
+
+  getFormat(): WeaveTextSelectionFormat {
+    const { start, end } = this.model.getSelection();
+    return getSelectionFormat(
+      this.model.getBlocks(),
+      start,
+      end,
+      this.target.getFontSize(),
+      this.model.storedMarks
+    );
   }
 
   // ---- pointer -------------------------------------------------------------
@@ -454,13 +555,35 @@ export class TextEditSession {
     );
   }
 
+  /**
+   * True for pointer targets inside an element the app marked with
+   * `data-weave-text-edit-keep` (e.g. a formatting toolbar): they neither
+   * end the session nor, unless they are form fields, steal focus.
+   */
+  private isKeepTarget(e: Event): boolean {
+    const t = e.target;
+    return (
+      typeof Element !== 'undefined' &&
+      t instanceof Element &&
+      !!t.closest('[data-weave-text-edit-keep]')
+    );
+  }
+
   private onMouseDown = (e: MouseEvent) => {
+    if (this.isKeepTarget(e)) {
+      const t = e.target as Element;
+      if (!t.closest('input, textarea, select, [contenteditable="true"]')) {
+        e.preventDefault(); // keep focus on the proxy textarea
+      }
+      return;
+    }
     if (this.isInside(this.toLocal(e))) e.preventDefault(); // keep focus
   };
 
   private onPointerDown = (e: PointerEvent) => {
     if (e.button !== 0 && e.pointerType === 'mouse') return;
     if (this.textarea && e.target === this.textarea) return;
+    if (this.isKeepTarget(e)) return;
     const local = this.toLocal(e);
     if (!this.isInside(local)) {
       e.stopPropagation();
@@ -472,10 +595,11 @@ export class TextEditSession {
     const layout = this.target.getLayout();
     const offset = offsetFromPoint(layout, local, this.target.measure);
     const text = this.model.getText();
-    if (e.detail >= 3) {
+    const clicks = this.countClicks(e);
+    if (clicks >= 3) {
       const [s, en] = paragraphRangeAt(text, offset);
       this.model.setSelection(s, en);
-    } else if (e.detail === 2) {
+    } else if (clicks === 2) {
       const [s, en] = wordRangeAt(text, offset);
       this.model.setSelection(s, en);
     } else {
@@ -484,8 +608,26 @@ export class TextEditSession {
     }
     this.syncTextarea();
     this.afterSelectionChange();
-    this.textarea?.focus();
+    this.textarea?.focus({ preventScroll: true });
   };
+
+  private lastClick = { t: 0, x: 0, y: 0, n: 0 };
+
+  /**
+   * Browsers report `detail` as 0 on pointerdown, so multi-click is counted
+   * here (same spot, within 500 ms). A real `detail` still wins.
+   */
+  private countClicks(e: PointerEvent): number {
+    const now = e.timeStamp || Date.now();
+    const l = this.lastClick;
+    const near =
+      now - l.t < 500 &&
+      Math.hypot(e.clientX - l.x, e.clientY - l.y) < 5 &&
+      l.n > 0;
+    const n = Math.max(e.detail, near ? l.n + 1 : 1);
+    this.lastClick = { t: now, x: e.clientX, y: e.clientY, n: n >= 3 ? 0 : n };
+    return n;
+  }
 
   private onPointerMove = (e: PointerEvent) => {
     if (!this.dragging) return;
@@ -503,7 +645,7 @@ export class TextEditSession {
   private onPointerUp = () => {
     if (!this.dragging) return;
     this.dragging = false;
-    this.textarea?.focus();
+    this.textarea?.focus({ preventScroll: true });
   };
 
   // ---- change propagation --------------------------------------------------
@@ -513,6 +655,7 @@ export class TextEditSession {
     this.positionTextarea();
     this.resetBlink();
     this.repaint();
+    this.host.onSelectionChange?.();
   }
 
   private afterContentChange(insertedLength: number, immediate = false) {
@@ -554,6 +697,7 @@ export class TextEditSession {
   private applyContent() {
     this.target.setBlocks(this.model.getBlocks());
     this.host.onChange?.(this.model.getBlocks());
+    this.host.onSelectionChange?.();
     this.positionTextarea();
     this.target.requestRedraw();
     this.repaint();

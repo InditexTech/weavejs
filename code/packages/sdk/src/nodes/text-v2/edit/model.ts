@@ -2,7 +2,22 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-import { blocksToText, replaceRange, type WeaveTextBlock } from '../model';
+import {
+  applyMark,
+  blockText,
+  blocksToText,
+  cleanMarks,
+  indentBlocks,
+  marksAtOffset,
+  outdentBlocks,
+  queryMark,
+  replaceRange,
+  toggleList,
+  type WeaveTextBlock,
+  type WeaveTextListKind,
+  type WeaveTextMarkKey,
+  type WeaveTextMarks,
+} from '../model';
 import {
   nextGrapheme,
   nextWordBoundary,
@@ -10,7 +25,7 @@ import {
   prevWordBoundary,
 } from './geometry';
 
-export type EditKind = 'type' | 'delete' | 'paste' | 'ime' | 'other';
+export type EditKind = 'type' | 'delete' | 'paste' | 'ime' | 'other' | 'format';
 
 type Snapshot = { blocks: WeaveTextBlock[]; anchor: number; focus: number };
 
@@ -26,6 +41,11 @@ export class TextEditModel {
   focus = 0;
   /** x kept while moving vertically; reset by any other move. */
   desiredX: number | null = null;
+  /**
+   * Marks the next typed text takes at a collapsed caret (e.g. bold toggled
+   * with nothing selected). Cleared when the selection moves.
+   */
+  storedMarks: WeaveTextMarks | null = null;
 
   private readonly undoStack: Snapshot[] = [];
   private redoStack: Snapshot[] = [];
@@ -66,6 +86,7 @@ export class TextEditModel {
     const len = this.getText().length;
     this.anchor = Math.max(0, Math.min(anchor, len));
     this.focus = Math.max(0, Math.min(focus, len));
+    this.storedMarks = null;
     this.breakCoalescing();
   }
 
@@ -73,6 +94,7 @@ export class TextEditModel {
     const len = this.getText().length;
     const o = Math.max(0, Math.min(offset, len));
     this.focus = o;
+    this.storedMarks = null;
     if (!extend) this.anchor = o;
     if (!keepDesiredX) this.desiredX = null;
     this.breakCoalescing();
@@ -81,6 +103,7 @@ export class TextEditModel {
   selectAll() {
     this.anchor = 0;
     this.focus = this.getText().length;
+    this.storedMarks = null;
     this.breakCoalescing();
   }
 
@@ -122,7 +145,14 @@ export class TextEditModel {
     end = Math.max(start, Math.min(end, len));
     if (start === end && text === '') return false;
     this.record(kind, start);
-    this.blocks = replaceRange(this.blocks, start, end, text);
+    this.blocks = replaceRange(
+      this.blocks,
+      start,
+      end,
+      text,
+      this.storedMarks ?? undefined
+    );
+    this.storedMarks = null;
     this.anchor = this.focus = start + text.length;
     this.lastEditEnd = this.focus;
     this.desiredX = null;
@@ -172,11 +202,112 @@ export class TextEditModel {
     return true;
   }
 
+  // ---- rich formatting -----------------------------------------------------
+
+  /** Current marks at the caret / selection start (stored marks win). */
+  caretMarks(): WeaveTextMarks | undefined {
+    return (
+      this.storedMarks ?? marksAtOffset(this.blocks, this.getSelection().start)
+    );
+  }
+
+  /** Always one new undo entry, never coalesced. */
+  private commitFormat(next: WeaveTextBlock[]): boolean {
+    if (JSON.stringify(next) === JSON.stringify(this.blocks)) return false;
+    this.lastKind = null;
+    this.record('format', -1);
+    this.lastKind = null;
+    this.blocks = next;
+    return true;
+  }
+
+  /** Set (`undefined` clears) one mark on the selection or the stored marks. */
+  setMark(key: WeaveTextMarkKey, value: unknown): boolean {
+    const { start, end } = this.getSelection();
+    if (start === end) {
+      const base: Record<string, unknown> = { ...(this.caretMarks() ?? {}) };
+      if (value === undefined || value === false) delete base[key];
+      else base[key] = value;
+      this.storedMarks = cleanMarks(base) ?? {};
+      return true;
+    }
+    return this.commitFormat(applyMark(this.blocks, start, end, key, value));
+  }
+
+  /** Toggle a boolean mark: on unless the whole selection already has it. */
+  toggleMark(key: WeaveTextMarkKey): boolean {
+    const { start, end } = this.getSelection();
+    const q = queryMark(this.blocks, start, end, key, this.storedMarks);
+    return this.setMark(key, q.state === 'all' ? undefined : true);
+  }
+
+  toggleList(kind: WeaveTextListKind): boolean {
+    const { start, end } = this.getSelection();
+    return this.commitFormat(toggleList(this.blocks, start, end, kind));
+  }
+
+  indent(): boolean {
+    const { start, end } = this.getSelection();
+    return this.commitFormat(indentBlocks(this.blocks, start, end));
+  }
+
+  outdent(): boolean {
+    const { start, end } = this.getSelection();
+    return this.commitFormat(outdentBlocks(this.blocks, start, end));
+  }
+
+  private blockAt(offset: number) {
+    let pos = 0;
+    for (let i = 0; i < this.blocks.length; i++) {
+      const len = blockText(this.blocks[i]).length;
+      if (offset <= pos + len) return { index: i, start: pos, length: len };
+      pos += len + 1;
+    }
+    return undefined;
+  }
+
+  /**
+   * Enter in a list: an empty item exits the list; otherwise the item
+   * continues (the block split carries `kind` and `depth`).
+   */
+  enter(): boolean {
+    const { start, end } = this.getSelection();
+    const b = start === end ? this.blockAt(start) : undefined;
+    if (b && this.blocks[b.index].kind && b.length === 0) {
+      return this.commitFormat(outdentToPlain(this.blocks, b.index));
+    }
+    return this.replaceRange(start, end, '\n', 'other');
+  }
+
+  /**
+   * Backspace at the start of a list item outdents it, or removes the
+   * marker at depth 0. Returns false when the key is not handled here.
+   */
+  backspaceInList(): boolean {
+    const { start, end } = this.getSelection();
+    if (start !== end) return false;
+    const b = this.blockAt(start);
+    if (!b || b.start !== start || !this.blocks[b.index].kind) return false;
+    return this.commitFormat(outdentBlocks(this.blocks, start, start));
+  }
+
   private restore(s: Snapshot) {
     this.blocks = s.blocks;
+    this.storedMarks = null;
     this.anchor = s.anchor;
     this.focus = s.focus;
     this.lastKind = null;
     this.desiredX = null;
   }
+}
+
+function outdentToPlain(
+  blocks: WeaveTextBlock[],
+  index: number
+): WeaveTextBlock[] {
+  return blocks.map((b, i) => {
+    if (i !== index) return b;
+    const { kind: _k, depth: _d, start: _s, ...rest } = b;
+    return rest;
+  });
 }

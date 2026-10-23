@@ -11,7 +11,8 @@ import type { TextLayout, LayoutLine } from '../layout/engine';
  * included) so this module has no Konva/DOM dependency.
  */
 
-export type Measure = (text: string) => number;
+/** Rendered width of a string; `font` overrides the node font (rich runs). */
+export type Measure = (text: string, font?: string) => number;
 export type Point = { x: number; y: number };
 
 const graphemeSeg: Intl.Segmenter | null =
@@ -112,9 +113,29 @@ export function lineIndexAt(layout: TextLayout, offset: number): number {
   return fallback;
 }
 
+/** Width of the first `k` UTF-16 units of a line, run by run. */
+function prefixWidth(line: LayoutLine, k: number, measure: Measure): number {
+  if (k <= 0) return 0;
+  if (line.segments.length === 0) return measure(line.text.slice(0, k));
+  let width = 0;
+  let pos = 0;
+  for (const seg of line.segments) {
+    const end = pos + seg.t.length;
+    if (k >= end) {
+      width += seg.width;
+    } else {
+      width += measure(seg.t.slice(0, k - pos), seg.font);
+      break;
+    }
+    pos = end;
+    if (k === end) break;
+  }
+  return width;
+}
+
 function lineX(line: LayoutLine, offset: number, measure: Measure): number {
   const k = Math.max(0, Math.min(offset - line.start, line.text.length));
-  return line.offsetX + (k === 0 ? 0 : measure(line.text.slice(0, k)));
+  return line.offsetX + prefixWidth(line, k, measure);
 }
 
 /** Caret rectangle in text-local coordinates (before padding/valign offset). */
@@ -128,10 +149,19 @@ export function caretRect(
   if (!line) return { x: 0, y: 0, height: layout.lineHeightPx, line: 0 };
   return {
     x: lineX(line, offset, measure),
-    y: i * layout.lineHeightPx,
-    height: layout.lineHeightPx,
+    y: line.y,
+    height: line.height,
     line: i,
   };
+}
+
+/** Index of the line containing a local y (clamped). */
+export function lineIndexAtY(layout: TextLayout, y: number): number {
+  const lines = layout.lines;
+  for (let i = 0; i < lines.length; i++) {
+    if (y < lines[i].y + lines[i].height) return i;
+  }
+  return Math.max(0, lines.length - 1);
 }
 
 /** Offset closest to a point in text-local coordinates. */
@@ -142,10 +172,7 @@ export function offsetFromPoint(
 ): number {
   const lines = layout.lines;
   if (lines.length === 0) return 0;
-  const i = Math.max(
-    0,
-    Math.min(lines.length - 1, Math.floor(point.y / layout.lineHeightPx))
-  );
+  const i = lineIndexAtY(layout, point.y);
   return offsetInLine(lines[i], point.x, measure);
 }
 
@@ -159,7 +186,7 @@ export function offsetInLine(
   const b = boundaries(line.text, graphemeSeg);
   let prevW = 0;
   for (let k = 1; k < b.length; k++) {
-    const w = measure(line.text.slice(0, b[k]));
+    const w = prefixWidth(line, b[k], measure);
     if (rel < (prevW + w) / 2) return line.start + b[k - 1];
     prevW = w;
   }
@@ -201,7 +228,7 @@ export function selectionRects(
   if (from > to) [from, to] = [to, from];
   if (from === to) return [];
   const out: { x: number; y: number; width: number; height: number }[] = [];
-  layout.lines.forEach((line, i) => {
+  layout.lines.forEach((line) => {
     const hasNewline = line.lastInParagraph;
     // newline char sits at line.end for the last line of a paragraph
     const lineFrom = Math.max(from, line.start);
@@ -218,9 +245,9 @@ export function selectionRects(
     if (x2 <= x1) return;
     out.push({
       x: x1,
-      y: i * layout.lineHeightPx,
+      y: line.y,
       width: x2 - x1,
-      height: layout.lineHeightPx,
+      height: line.height,
     });
   });
   return out;
