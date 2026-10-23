@@ -193,6 +193,12 @@ size. Passing it is a type error. Use mono:[edition.outline] instead.
 |`0`
 |Gap between the text box and the outline, in screen pixels.
 
+|mono:[edition.followPadding]
+|`{ top: 40, right: 40, bottom: 40, left: 40 }`
+|While editing, the stage pans to keep the caret inside the container. This is the margin kept
+between the caret and each edge, in screen pixels. Raise a side when app UI (toolbars, sidebars)
+covers that edge.
+
 |mono:[richText.enabled]
 |`false`
 |Default for nodes without a `richText` attribute: formatting commands, shortcuts and list key rules.
