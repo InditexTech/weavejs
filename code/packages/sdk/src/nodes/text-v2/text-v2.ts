@@ -373,6 +373,19 @@ export class WeaveTextV2Node extends WeaveNode {
           const sy = r.height ? r.height / stage.height() : 1;
           return { x: p.x * sx, y: p.y * sy };
         },
+        revealCaret: (p) => {
+          const box = container;
+          const w = box.clientWidth;
+          const h = box.clientHeight;
+          if (!w || !h) return;
+          const m = 40;
+          const dx = p.x < m ? m - p.x : p.x > w - m ? w - m - p.x : 0;
+          const dy = p.y < m ? m - p.y : p.y > h - m ? h - m - p.y : 0;
+          if (!dx && !dy) return;
+          stage.x(stage.x() + dx);
+          stage.y(stage.y() + dy);
+          this.instance.emitEvent('onStageMove');
+        },
         // Figma-like: entering edit on existing text selects it all.
         selectAllOnStart: !create,
         richText: this.isRich(shape),

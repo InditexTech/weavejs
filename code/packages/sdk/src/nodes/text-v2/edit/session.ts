@@ -53,6 +53,8 @@ export interface TextEditHost {
   container: HTMLElement;
   clientToStage(clientX: number, clientY: number): Point;
   stageToContainer(point: Point): Point;
+  /** Called with the caret in container px so the host can pan it into view. */
+  revealCaret?(point: Point): void;
   caretColor: string;
   selectionColor: string;
   /** Outline of the text box while editing (screen px width). Omit to hide. */
@@ -249,6 +251,7 @@ export class TextEditSession {
     if (!ta) return;
     const c = this.caretStagePoint();
     const p = this.host.stageToContainer(c);
+    this.host.revealCaret?.(p);
     // Keep the proxy inside the container: a focused textarea outside it makes
     // the browser scroll the container to reveal it, shifting the whole canvas
     // when the caret leaves the viewport.
