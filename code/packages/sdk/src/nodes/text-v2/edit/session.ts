@@ -158,7 +158,7 @@ export class TextEditSession {
 
     if (this.host.selectAllOnStart) this.model.selectAll();
     this.syncTextarea();
-    ta.focus();
+    ta.focus({ preventScroll: true });
     this.positionTextarea();
     this.startBlink();
     this.repaint();
@@ -192,7 +192,7 @@ export class TextEditSession {
   }
 
   focus() {
-    this.textarea?.focus();
+    this.textarea?.focus({ preventScroll: true });
   }
 
   // ---- proxy textarea ------------------------------------------------------
@@ -249,8 +249,14 @@ export class TextEditSession {
     if (!ta) return;
     const c = this.caretStagePoint();
     const p = this.host.stageToContainer(c);
-    ta.style.left = `${p.x}px`;
-    ta.style.top = `${p.y}px`;
+    // Keep the proxy inside the container: a focused textarea outside it makes
+    // the browser scroll the container to reveal it, shifting the whole canvas
+    // when the caret leaves the viewport.
+    const box = this.host.container;
+    const maxX = Math.max(0, (box.clientWidth || Infinity) - 2);
+    const maxY = Math.max(0, (box.clientHeight || Infinity) - 20);
+    ta.style.left = `${Math.min(Math.max(p.x, 0), maxX)}px`;
+    ta.style.top = `${Math.min(Math.max(p.y, 0), maxY)}px`;
   }
 
   private caretStagePoint(): Point {
@@ -599,7 +605,7 @@ export class TextEditSession {
     }
     this.syncTextarea();
     this.afterSelectionChange();
-    this.textarea?.focus();
+    this.textarea?.focus({ preventScroll: true });
   };
 
   private lastClick = { t: 0, x: 0, y: 0, n: 0 };
@@ -636,7 +642,7 @@ export class TextEditSession {
   private onPointerUp = () => {
     if (!this.dragging) return;
     this.dragging = false;
-    this.textarea?.focus();
+    this.textarea?.focus({ preventScroll: true });
   };
 
   // ---- change propagation --------------------------------------------------
