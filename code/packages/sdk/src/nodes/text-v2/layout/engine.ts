@@ -3,7 +3,13 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import Konva from 'konva';
-import { blockText, type WeaveTextBlock, type WeaveTextMarks } from '../model';
+import {
+  blockText,
+  listMarkers,
+  runRatio,
+  type WeaveTextBlock,
+  type WeaveTextMarks,
+} from '../model';
 
 /**
  * Text layout engine. Independent of `WeaveTextNode` and of any Konva node:
@@ -25,7 +31,13 @@ export type TextLayoutStyle = {
   letterSpacing: number;
   wrap: TextWrap;
   align: TextAlign;
+  /** List indent per depth, as a multiple of `fontSize` (default 1.5). */
+  indentStep?: number;
 };
+
+export const DEFAULT_INDENT_STEP = 1.5;
+/** Width always left for text next to a list indent, in `fontSize` units. */
+export const MIN_TEXT_WIDTH_RATIO = 4;
 
 /** Bounds supplied by the target. `undefined` width/height means "auto". */
 export type TextLayoutBounds = {
@@ -42,6 +54,20 @@ export type LayoutSegment = {
   /** x offset relative to the line start. */
   x: number;
   width: number;
+  /** Run index inside its paragraph (hit testing / hover). */
+  run: number;
+  /** Resolved canvas font and size (px) of the run. */
+  font: string;
+  fontSize: number;
+};
+
+export type LayoutMarker = {
+  text: string;
+  /** x relative to the content box (before padding). */
+  x: number;
+  font: string;
+  fontSize: number;
+  color?: string;
 };
 
 export type LayoutLine = {
@@ -57,6 +83,12 @@ export type LayoutLine = {
   /** Alignment x offset (0 for left). */
   offsetX: number;
   y: number;
+  /** Line box height and baseline offset from the line top. */
+  height: number;
+  baseline: number;
+  /** Indent of the text (list blocks), already included in `offsetX`. */
+  indent: number;
+  marker?: LayoutMarker;
   segments: LayoutSegment[];
   lastInParagraph: boolean;
 };
@@ -68,6 +100,8 @@ export type TextLayout = {
   /** Font size, like `Konva.Text.getTextHeight()`. */
   textHeight: number;
   lineHeightPx: number;
+  /** Sum of line heights (without padding). */
+  contentHeight: number;
   /** Resolved node size, like `Konva.Text.width()/height()`. */
   width: number;
   height: number;
@@ -90,6 +124,57 @@ export function fontString(s: TextLayoutStyle): string {
   return `${s.fontStyle} ${s.fontVariant} ${s.fontSize}px ${normalizeFontFamily(
     s.fontFamily
   )}`;
+}
+
+/** Style of a run: node style overridden by the run marks. */
+export function runStyle(
+  style: TextLayoutStyle,
+  m: WeaveTextMarks | undefined
+): TextLayoutStyle {
+  if (!m) return style;
+  let fontStyle = style.fontStyle;
+  if (m.bold || m.italic) {
+    const tokens = new Set(fontStyle.split(/\s+/).filter(Boolean));
+    tokens.delete('normal');
+    if (m.italic) tokens.add('italic');
+    if (m.bold) tokens.add('bold');
+    fontStyle = tokens.size === 0 ? 'normal' : Array.from(tokens).join(' ');
+  }
+  return {
+    ...style,
+    fontStyle,
+    fontSize: style.fontSize * runRatio(m),
+    fontFamily:
+      typeof m.family === 'string' && m.family ? m.family : style.fontFamily,
+  };
+}
+
+export type FontMetrics = { ascent: number; descent: number };
+export type MetricsProvider = (font: string, size: number) => FontMetrics;
+
+/** Pure fallback (same constants as Konva.Text when the browser has none). */
+export const approxMetrics: MetricsProvider = (_font, size) => ({
+  ascent: 0.91 * size,
+  descent: 0.21 * size,
+});
+const metricsCache = new Map<string, FontMetrics>();
+
+/** Ascent/descent used for baseline placement (parity with Konva.Text). */
+export function fontMetrics(font: string, size: number): FontMetrics {
+  if (Konva.legacyTextRendering) return { ascent: 0, descent: 0 };
+  const hit = metricsCache.get(font);
+  if (hit) return hit;
+  const ctx = Konva.Util.createCanvasElement().getContext('2d')!;
+  ctx.font = font;
+  const m = ctx.measureText('M');
+  const scale = size / 100;
+  const out = {
+    ascent: m.fontBoundingBoxAscent ?? 91 * scale,
+    descent: m.fontBoundingBoxDescent ?? 21 * scale,
+  };
+  if (metricsCache.size > 2000) metricsCache.clear();
+  metricsCache.set(font, out);
+  return out;
 }
 
 let sharedContext: CanvasRenderingContext2D | null = null;
@@ -126,12 +211,16 @@ type ParagraphLine = {
   endG: number; // trimmed end (grapheme index, exclusive)
   measuredWidth: number;
   lastInParagraph: boolean;
+  height: number;
+  baseline: number;
 };
 
 type ParagraphEntry = {
   sig: string;
   graphemes: string[];
   runOf: number[]; // run index per grapheme
+  fonts: string[]; // canvas font per run
+  sizes: number[]; // px size per run
   lines: ParagraphLine[];
 };
 
@@ -183,10 +272,13 @@ function applyAlign(
   width: number,
   padding: number
 ) {
-  if (align === 'left') return;
   for (const line of lines) {
-    const free = width - line.width - padding * 2;
-    line.offsetX = align === 'center' ? free / 2 : free;
+    if (align === 'left') {
+      line.offsetX = line.indent;
+      continue;
+    }
+    const free = width - line.indent - line.width - padding * 2;
+    line.offsetX = line.indent + (align === 'center' ? free / 2 : free);
   }
 }
 
@@ -198,8 +290,14 @@ export class TextLayoutEngine {
   private pool = new Map<string, ParagraphEntry>();
   private lastParagraphsRelaid = 0;
 
-  constructor(measurer: TextMeasurer = canvasMeasurer) {
+  private readonly metrics: MetricsProvider;
+
+  constructor(
+    measurer: TextMeasurer = canvasMeasurer,
+    metrics: MetricsProvider = approxMetrics
+  ) {
     this.measure = measurer;
+    this.metrics = metrics;
   }
 
   /** Number of paragraphs recomputed by the last `layout()` call. */
@@ -213,17 +311,38 @@ export class TextLayoutEngine {
     this.pool.clear();
   }
 
-  private paragraphSig(
+  /** Text indent of a block in px (0 for plain paragraphs). */
+  private indentFor(
     block: WeaveTextBlock,
     style: TextLayoutStyle,
-    bounds: TextLayoutBounds
+    fixedWidth: boolean,
+    maxWidth: number
+  ): number {
+    if (!block.kind) return 0;
+    const step =
+      typeof style.indentStep === 'number' &&
+      Number.isFinite(style.indentStep) &&
+      style.indentStep > 0
+        ? style.indentStep
+        : DEFAULT_INDENT_STEP;
+    const stepPx = step * style.fontSize;
+    const depth = Math.max(0, Math.floor(block.depth ?? 0));
+    const wanted = (depth + 1) * stepPx;
+    if (!fixedWidth) return wanted;
+    const limit = Math.max(0, maxWidth - MIN_TEXT_WIDTH_RATIO * style.fontSize);
+    return Math.min(wanted, limit);
+  }
+
+  private sigFor(
+    block: WeaveTextBlock,
+    style: TextLayoutStyle,
+    fixedWidth: boolean,
+    maxWidth: number,
+    indent: number
   ): string {
-    const fixedWidth =
-      bounds.width !== undefined && !Number.isNaN(bounds.width);
-    const maxWidth = (bounds.width ?? 0) - bounds.padding * 2;
-    return `${fontString(style)}|${style.letterSpacing}|${style.wrap}|${
-      fixedWidth ? maxWidth : 'auto'
-    }|${JSON.stringify(block.runs)}`;
+    return `${fontString(style)}|${style.lineHeight}|${style.letterSpacing}|${
+      style.wrap
+    }|${fixedWidth ? maxWidth - indent : 'auto'}|${JSON.stringify(block.runs)}`;
   }
 
   /**
@@ -237,17 +356,16 @@ export class TextLayoutEngine {
     bounds: TextLayoutBounds,
     budgetMs: number
   ): boolean {
-    const font = fontString(style);
-    const fixedWidth =
-      bounds.width !== undefined && !Number.isNaN(bounds.width);
+    const fixedWidth = isNum(bounds.width);
     const maxWidth = (bounds.width ?? 0) - bounds.padding * 2;
     const deadline = now() + budgetMs;
     for (const block of blocks) {
-      const sig = this.paragraphSig(block, style, bounds);
+      const indent = this.indentFor(block, style, fixedWidth, maxWidth);
+      const sig = this.sigFor(block, style, fixedWidth, maxWidth, indent);
       if (this.pool.has(sig)) continue;
       this.pool.set(
         sig,
-        this.layoutParagraph(block, sig, font, style, fixedWidth, maxWidth)
+        this.layoutParagraph(block, sig, style, fixedWidth, maxWidth - indent)
       );
       if (now() >= deadline) return false;
     }
@@ -275,16 +393,13 @@ export class TextLayoutEngine {
     style: TextLayoutStyle,
     bounds: TextLayoutBounds
   ): TextLayout {
-    const font = fontString(style);
     const padding = bounds.padding;
     const fixedWidth = isNum(bounds.width);
     const fixedHeight = isNum(bounds.height);
     const maxWidth = (bounds.width ?? 0) - padding * 2;
     const maxHeightPx = (bounds.height ?? 0) - padding * 2;
     const lineHeightPx = style.lineHeight * style.fontSize;
-    const sigBase = `${font}|${style.letterSpacing}|${style.wrap}|${
-      fixedWidth ? maxWidth : 'auto'
-    }`;
+    const markers = listMarkers(blocks);
 
     const prev = this.paragraphs;
     const next: ParagraphEntry[] = [];
@@ -292,31 +407,35 @@ export class TextLayoutEngine {
     const lines: LayoutLine[] = [];
     let textWidth = 0;
     let offset = 0;
+    let contentHeight = 0;
 
     for (let p = 0; p < blocks.length; p++) {
       const block = blocks[p];
-      const sig = `${sigBase}|${JSON.stringify(block.runs)}`;
+      const indent = this.indentFor(block, style, fixedWidth, maxWidth);
+      const sig = this.sigFor(block, style, fixedWidth, maxWidth, indent);
       let entry: ParagraphEntry | undefined =
         prev[p]?.sig === sig ? prev[p] : this.pool.get(sig);
       if (!entry) {
         entry = this.layoutParagraph(
           block,
           sig,
-          font,
           style,
           fixedWidth,
-          maxWidth
+          maxWidth - indent
         );
         relaid++;
       }
       next.push(entry);
 
       const emitted = this.emitLines(entry, block, p, offset, lines, {
-        font,
         style,
+        indent,
+        marker: markers[p],
+        y: contentHeight,
         lineHeightPx,
         maxHeightPx: fixedHeight ? maxHeightPx : undefined,
       });
+      contentHeight = emitted.y;
       textWidth = Math.max(textWidth, emitted.maxWidth);
       if (emitted.stopped) break;
       offset += blockText(block).length + 1;
@@ -331,7 +450,7 @@ export class TextLayoutEngine {
       : textWidth + padding * 2;
     const height = fixedHeight
       ? (bounds.height as number)
-      : lines.length * lineHeightPx + padding * 2;
+      : contentHeight + padding * 2;
 
     applyAlign(lines, style.align, width, padding);
 
@@ -340,6 +459,7 @@ export class TextLayoutEngine {
       textWidth,
       textHeight: style.fontSize,
       lineHeightPx,
+      contentHeight,
       width,
       height,
     };
@@ -353,18 +473,36 @@ export class TextLayoutEngine {
     offset: number,
     lines: LayoutLine[],
     opts: {
-      font: string;
       style: TextLayoutStyle;
+      indent: number;
+      marker: string | null;
+      y: number;
       lineHeightPx: number;
       maxHeightPx: number | undefined;
     }
-  ): { stopped: boolean; maxWidth: number } {
-    const { font, style, lineHeightPx, maxHeightPx } = opts;
+  ): { stopped: boolean; maxWidth: number; y: number } {
+    const { style, indent, lineHeightPx, maxHeightPx } = opts;
+    let { y } = opts;
     let maxWidth = 0;
+    let first = true;
     for (const pl of entry.lines) {
       const text = entry.graphemes.slice(pl.startG, pl.endG).join('');
-      const segments = this.buildSegments(entry, block, pl, font, style);
+      const segments = this.buildSegments(entry, block, pl, style);
       const startChar = entry.graphemes.slice(0, pl.startG).join('').length;
+      let marker: LayoutMarker | undefined;
+      if (first && opts.marker) {
+        const m0 = block.runs[0]?.m;
+        const rs = runStyle(style, m0);
+        const stepPx = Math.min(indent, this.stepPx(style));
+        marker = {
+          text: opts.marker,
+          x: Math.max(0, indent - stepPx),
+          font: fontString(rs),
+          fontSize: rs.fontSize,
+          color: typeof m0?.color === 'string' ? m0.color : undefined,
+        };
+      }
+      first = false;
       lines.push({
         paragraph,
         start: offset + startChar,
@@ -372,28 +510,39 @@ export class TextLayoutEngine {
         text,
         width: segments.reduce((a, s) => a + s.width, 0),
         measuredWidth: pl.measuredWidth,
-        offsetX: 0,
-        y: lines.length * lineHeightPx,
+        offsetX: indent,
+        y,
+        height: pl.height,
+        baseline: pl.baseline,
+        indent,
+        marker,
         segments,
         lastInParagraph: pl.lastInParagraph,
       });
-      maxWidth = Math.max(maxWidth, pl.measuredWidth);
+      y += pl.height;
+      maxWidth = Math.max(maxWidth, pl.measuredWidth + indent);
       // Konva stops emitting lines once the fixed height is full.
-      if (
-        maxHeightPx !== undefined &&
-        (lines.length + 1) * lineHeightPx > maxHeightPx
-      ) {
-        return { stopped: true, maxWidth };
+      if (maxHeightPx !== undefined && y + lineHeightPx > maxHeightPx) {
+        return { stopped: true, maxWidth, y };
       }
     }
-    return { stopped: false, maxWidth };
+    return { stopped: false, maxWidth, y };
+  }
+
+  private stepPx(style: TextLayoutStyle): number {
+    const step =
+      typeof style.indentStep === 'number' &&
+      Number.isFinite(style.indentStep) &&
+      style.indentStep > 0
+        ? style.indentStep
+        : DEFAULT_INDENT_STEP;
+    return step * style.fontSize;
   }
 
   private rangeWidth(
-    entry: Pick<ParagraphEntry, 'graphemes' | 'runOf'>,
+    entry: Pick<ParagraphEntry, 'graphemes' | 'runOf' | 'fonts'>,
     from: number,
     to: number,
-    font: string,
     spacing: number
   ): number {
     let width = 0;
@@ -403,7 +552,7 @@ export class TextLayoutEngine {
       let j = i;
       while (j < to && entry.runOf[j] === run) j++;
       width += this.measureChunk(
-        font,
+        entry.fonts[run],
         entry.graphemes.slice(i, j).join(''),
         spacing
       );
@@ -454,17 +603,68 @@ export class TextLayoutEngine {
   private layoutParagraph(
     block: WeaveTextBlock,
     sig: string,
-    font: string,
+    style: TextLayoutStyle,
+    fixedWidth: boolean,
+    maxWidth: number
+  ): ParagraphEntry {
+    const entry = this.wrapParagraph(block, sig, style, fixedWidth, maxWidth);
+    this.measureLines(entry, style);
+    return entry;
+  }
+
+  /** Per-line box height and baseline from the runs on each line. */
+  private measureLines(entry: ParagraphEntry, style: TextLayoutStyle) {
+    const baseFont = fontString(style);
+    for (const line of entry.lines) {
+      let size = 0;
+      let asc = 0;
+      let desc = 0;
+      const seen = new Set<number>();
+      for (let g = line.startG; g < line.endG; g++) {
+        const r = entry.runOf[g];
+        if (seen.has(r)) continue;
+        seen.add(r);
+        size = Math.max(size, entry.sizes[r]);
+        const m = this.metrics(entry.fonts[r], entry.sizes[r]);
+        asc = Math.max(asc, m.ascent);
+        desc = Math.max(desc, m.descent);
+      }
+      if (seen.size === 0) {
+        size = style.fontSize;
+        const m = this.metrics(baseFont, style.fontSize);
+        asc = m.ascent;
+        desc = m.descent;
+      }
+      line.height = style.lineHeight * size;
+      line.baseline = (asc - desc) / 2 + line.height / 2;
+    }
+  }
+
+  private wrapParagraph(
+    block: WeaveTextBlock,
+    sig: string,
     style: TextLayoutStyle,
     fixedWidth: boolean,
     maxWidth: number
   ): ParagraphEntry {
     const { graphemes, runOf } = flattenBlock(block);
-    const entry: ParagraphEntry = { sig, graphemes, runOf, lines: [] };
+    const baseFont = fontString(style);
+    const fonts = block.runs.map((r) =>
+      r.m ? fontString(runStyle(style, r.m)) : baseFont
+    );
+    const sizes = block.runs.map((r) => style.fontSize * runRatio(r.m));
+    const entry: ParagraphEntry = {
+      sig,
+      graphemes,
+      runOf,
+      fonts,
+      sizes,
+      lines: [],
+    };
     const n = graphemes.length;
     const spacing = style.letterSpacing;
     const width = (a: number, b: number) =>
-      this.rangeWidth(entry, a, b, font, spacing);
+      this.rangeWidth(entry, a, b, spacing);
 
     const shouldWrap = style.wrap !== 'none';
     const wrapAtWord = style.wrap !== 'char' && shouldWrap;
@@ -476,6 +676,8 @@ export class TextLayoutEngine {
         endG: n,
         measuredWidth: whole,
         lastInParagraph: true,
+        height: 0,
+        baseline: 0,
       });
       return entry;
     }
@@ -491,6 +693,8 @@ export class TextLayoutEngine {
           endG: n,
           measuredWidth: matchWidth,
           lastInParagraph: true,
+          height: 0,
+          baseline: 0,
         });
         return entry;
       }
@@ -515,6 +719,8 @@ export class TextLayoutEngine {
         endG: trimTrailingSpace(graphemes, start, end),
         measuredWidth: matchWidth,
         lastInParagraph: false,
+        height: 0,
+        baseline: 0,
       });
 
       start = skipSpace(graphemes, end);
@@ -528,7 +734,6 @@ export class TextLayoutEngine {
     entry: ParagraphEntry,
     block: WeaveTextBlock,
     pl: ParagraphLine,
-    font: string,
     style: TextLayoutStyle
   ): LayoutSegment[] {
     const segments: LayoutSegment[] = [];
@@ -539,8 +744,17 @@ export class TextLayoutEngine {
       let j = i;
       while (j < pl.endG && entry.runOf[j] === run) j++;
       const t = entry.graphemes.slice(i, j).join('');
+      const font = entry.fonts[run];
       const width = this.measureChunk(font, t, style.letterSpacing);
-      segments.push({ t, m: block.runs[run].m, x, width });
+      segments.push({
+        t,
+        m: block.runs[run].m,
+        run,
+        x,
+        width,
+        font,
+        fontSize: entry.sizes[run],
+      });
       x += width;
       i = j;
     }

@@ -8,6 +8,9 @@ import type { WeaveTextV2Properties } from './types';
 /** Default threshold for `onTextSizeWarning` (chars of serialized blocks). */
 export const WEAVE_TEXT_V2_SIZE_WARNING_THRESHOLD = 200_000;
 
+/** Default list indent per depth, as a multiple of the node `fontSize`. */
+export const WEAVE_TEXT_V2_DEFAULT_INDENT_STEP = 1.5;
+
 export const WEAVE_TEXT_V2_SELECTION_COLOR = 'rgba(66, 133, 244, 0.35)';
 
 export const WEAVE_TEXT_V2_DEFAULT_CONFIG: WeaveTextV2Properties = {
@@ -15,5 +18,6 @@ export const WEAVE_TEXT_V2_DEFAULT_CONFIG: WeaveTextV2Properties = {
   edition: {
     outline: { enabled: true, color: '#0074ff', width: 1, padding: 0 },
   },
+  richText: { enabled: false, indentStep: WEAVE_TEXT_V2_DEFAULT_INDENT_STEP },
   sizeWarning: { threshold: WEAVE_TEXT_V2_SIZE_WARNING_THRESHOLD },
 };

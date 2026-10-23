@@ -11,6 +11,7 @@ export type {
   TextLayout,
   LayoutLine,
   LayoutSegment,
+  LayoutMarker,
   TextLayoutStyle,
   TextLayoutBounds,
   TextMeasurer,

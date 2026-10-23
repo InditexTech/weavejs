@@ -46,7 +46,7 @@ kbd:[End] and kbd:[Up] / kbd:[Down] move and select as expected, and IME composi
 * kbd:[Ctrl]/kbd:[Cmd] + kbd:[Z] undoes your typing while you edit, without touching the rest of the
 canvas history. Leaving edit mode (kbd:[Esc] or clicking outside) saves everything as one undoable
 step.
-* Copy and paste use plain text.
+* Copy and paste use plain text; pasted text takes the formatting at the caret.
 
 == Customize the outline
 
@@ -62,6 +62,30 @@ new WeaveTextV2Node({
 ----
 
 NOTE: `edition.borderSize` from the Text node does not exist here. Use `edition.outline`.
+
+== Rich text
+
+Turn on formatting per selection (bold, italic, underline, strikethrough, colour, size, font
+family and links) and bulleted or numbered lists with nesting:
+
+[source,ts]
+----
+new WeaveTextV2Node({
+  config: { richText: { enabled: true, indentStep: 1.5 } },
+});
+----
+
+While editing, kbd:[Ctrl]/kbd:[Cmd] + kbd:[B], kbd:[I] and kbd:[U] work, kbd:[Enter] continues a list
+and kbd:[Tab] / kbd:[Shift]+kbd:[Tab] change its depth. The toolbar is yours: call the node
+commands (for example from a modal; `setRunLink` adds a URL to a range) and listen to `onTextSelectionChange` and `onTextFormatChange`.
+Formatting survives move, resize, copy, duplicate, undo and image export.
+
+Rich text is decided per node (the `richText` attribute); `richText.enabled` is only the default for
+nodes without it. To offer a plain and a rich Text Tool, see xref:main:build/actions/text-tool.adoc[Text Tool].
+
+Lists and marks already in a document render for everyone, even when rich text is off.
+
+See xref:sdk:api-reference/nodes/text-v2.adoc#_rich_text[the reference] for the commands.
 
 == Large texts
 

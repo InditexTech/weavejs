@@ -4,6 +4,7 @@
 
 import Konva from 'konva';
 import merge from 'lodash/merge';
+import { z } from 'zod';
 import {
   type WeaveElementAttributes,
   type WeaveElementInstance,
@@ -22,7 +23,20 @@ import {
 import { WeaveTextNode, isValidTextLink } from '../text/text';
 import { WeaveTextV2Shape } from './shape';
 import { TextEditSession, type TextEditTarget } from './edit/session';
-import { blocksToText, type WeaveTextBlock } from './model';
+import {
+  applyMark,
+  blocksToText,
+  getSelectionFormat,
+  indentBlocks,
+  outdentBlocks,
+  sizeToRatio,
+  toggleList,
+  toggleMark,
+  type WeaveTextBlock,
+  type WeaveTextListKind,
+  type WeaveTextMarkKey,
+  type WeaveTextSelectionFormat,
+} from './model';
 import {
   WEAVE_TEXT_V2_DEFAULT_CONFIG,
   WEAVE_TEXT_V2_SELECTION_COLOR,
@@ -30,7 +44,10 @@ import {
 import type {
   WeaveTextV2NodeParams,
   WeaveTextV2OnEnterTextNodeEditMode,
+  WeaveTextV2FormatChangeReason,
   WeaveTextV2OnExitTextNodeEditMode,
+  WeaveTextV2OnTextFormatChange,
+  WeaveTextV2OnTextSelectionChange,
   WeaveTextV2OnTextSizeWarning,
   WeaveTextV2Properties,
 } from './types';
@@ -54,6 +71,7 @@ export class WeaveTextV2Node extends WeaveNode {
   private editingNodeId: string | null = null;
   private session: TextEditSession | null = null;
   private sizeWarned = false;
+  private selectionTimer: ReturnType<typeof setTimeout> | undefined;
   private nodeRenderedAddedRegistered = false;
   private keyPressHandler: ((e: KeyboardEvent) => void) | undefined;
 
@@ -154,6 +172,11 @@ export class WeaveTextV2Node extends WeaveNode {
       }),
     });
 
+    text.setIndentStep(this.indentStep());
+    text.setLinkStyle({
+      color: this.config.link.defaultColor,
+      hoverColor: this.config.link.hoverColor,
+    });
     this.setupDefaultNodeAugmentation(text);
 
     const defaultTransformerProperties = this.defaultGetTransformerProperties(
@@ -298,7 +321,7 @@ export class WeaveTextV2Node extends WeaveNode {
         this.applySize(shape);
       },
       getLayout: () => shape.ensureLayout(),
-      measure: (t) => shape.measureText(t),
+      measure: (t, f) => shape.measureText(t, f),
       getAbsoluteTransform: () => shape.getAbsoluteTransform(),
       getContentOffset: () => shape.getContentOffset(),
       getSize: () => ({ width: shape.getWidth(), height: shape.getHeight() }),
@@ -352,6 +375,9 @@ export class WeaveTextV2Node extends WeaveNode {
         },
         // Figma-like: entering edit on existing text selects it all.
         selectAllOnStart: !create,
+        richText: this.isRich(shape),
+        onSelectionChange: () => this.scheduleSelectionEvent(shape),
+        onFormatChange: (reason) => this.emitFormatChange(shape, reason),
         caretColor: this.config.cursor.color,
         selectionColor: WEAVE_TEXT_V2_SELECTION_COLOR,
         ...(this.config.edition.outline.enabled && {
@@ -401,6 +427,7 @@ export class WeaveTextV2Node extends WeaveNode {
     const session = this.session;
     if (!session || !this.editing) return;
 
+    clearTimeout(this.selectionTimer);
     const { changed } = session.getResult();
     session.destroy();
     this.session = null;
@@ -587,6 +614,7 @@ export class WeaveTextV2Node extends WeaveNode {
     const { linkPreviousFill, linkPreviousTextDecoration } =
       this.linkOverrides(nextProps);
 
+    shape.setIndentStep(this.indentStep());
     shape.setAttrs({
       ...nextProps,
       ...this.outlineProps(),
@@ -670,10 +698,27 @@ export class WeaveTextV2Node extends WeaveNode {
     };
 
     text.handleMouseout = () => {
+      text.setHoveredRun(null);
       if (!text.getAttrs().link) return;
       text.fill(this.config.link.defaultColor);
       text.getLayer()?.batchDraw();
     };
+
+    // Per-run links: hover and cursor follow the pointer over the run.
+    let overRunLink = false;
+    text.on('pointermove', () => {
+      if (this.editing || text.getAttrs().link) return;
+      const hit = text.linkAtPoint(this.localPointer(text));
+      text.setHoveredRun(hit?.key ?? null);
+      const container = this.instance.getStage().container();
+      if (hit) {
+        container.style.cursor = 'pointer';
+        overRunLink = true;
+      } else if (overRunLink) {
+        overRunLink = false;
+        container.style.cursor = this.isNodeSelected(text) ? 'grab' : 'pointer';
+      }
+    });
 
     text.defineMousePointer = () =>
       text.getAttrs().link ? 'pointer' : 'default';
@@ -693,11 +738,16 @@ export class WeaveTextV2Node extends WeaveNode {
     };
 
     text.click = ({ wasSelected, ctrlOrMetaPressed }) => {
-      if (!text.getAttrs().link) return;
+      const runLink = text.getAttrs().link
+        ? null
+        : text.linkAtPoint(this.localPointer(text));
+      if (!text.getAttrs().link && !runLink) return;
+      const open = () =>
+        runLink ? this.openUrl(runLink.url) : this.openTextLink(text);
 
       if (ctrlOrMetaPressed) {
         clearLinkClickTimeout();
-        this.openTextLink(text);
+        open();
         return;
       }
 
@@ -705,17 +755,24 @@ export class WeaveTextV2Node extends WeaveNode {
         clearLinkClickTimeout();
         linkClickTimeout = setTimeout(() => {
           linkClickTimeout = undefined;
-          this.openTextLink(text);
+          open();
         }, Konva.dblClickWindow);
       }
     };
   }
 
-  private openTextLink(textNode: WeaveTextV2Shape): void {
+  private localPointer(text: WeaveTextV2Shape): { x: number; y: number } {
+    return text.getRelativePointerPosition() ?? { x: -1, y: -1 };
+  }
+
+  private openUrl(link: unknown): void {
     if (this.instance.isServerSide()) return;
-    const link = textNode.getAttrs().link;
     if (typeof link !== 'string' || !isValidTextLink(link)) return;
     window.open(link, '_blank', 'noopener,noreferrer');
+  }
+
+  private openTextLink(textNode: WeaveTextV2Shape): void {
+    this.openUrl(textNode.getAttrs().link);
   }
 
   getLink(nodeInstance: WeaveElementInstance): string | undefined {
@@ -739,6 +796,227 @@ export class WeaveTextV2Node extends WeaveNode {
     delete serialized.props.linkPreviousFill;
     delete serialized.props.linkPreviousTextDecoration;
     this.instance.updateNode(serialized);
+  }
+
+  // ---- rich text -----------------------------------------------------------
+
+  private indentStep(): number {
+    const step = this.config.richText.indentStep;
+    return Number.isFinite(step) && step > 0 ? step : 1.5;
+  }
+
+  /**
+   * Rich text is on for a node when its `richText` attribute says so;
+   * nodes without the attribute follow `config.richText.enabled`.
+   */
+  isRich(nodeInstance: WeaveElementInstance): boolean {
+    const own = nodeInstance.getAttrs().richText;
+    return typeof own === 'boolean' ? own : this.config.richText.enabled;
+  }
+
+  isRichTextEnabled(nodeInstance?: WeaveElementInstance): boolean {
+    return nodeInstance
+      ? this.isRich(nodeInstance)
+      : this.config.richText.enabled;
+  }
+
+  private activeSession(shape: WeaveTextV2Shape): TextEditSession | null {
+    return this.editing && this.editingNodeId === shape.id()
+      ? this.session
+      : null;
+  }
+
+  private emitFormatChange(
+    shape: WeaveTextV2Shape,
+    reason: WeaveTextV2FormatChangeReason
+  ) {
+    this.instance.emitEvent<WeaveTextV2OnTextFormatChange>(
+      'onTextFormatChange',
+      { node: shape, format: this.getSelectionFormat(shape), reason }
+    );
+  }
+
+  /** Selection events fire often while dragging: coalesce them. */
+  private scheduleSelectionEvent(shape: WeaveTextV2Shape) {
+    if (this.selectionTimer) return;
+    this.selectionTimer = setTimeout(() => {
+      this.selectionTimer = undefined;
+      const session = this.activeSession(shape);
+      if (!session) return;
+      const { start, end } = session.getSelection();
+      this.instance.emitEvent<WeaveTextV2OnTextSelectionChange>(
+        'onTextSelectionChange',
+        { node: shape, start, end, format: session.getFormat() }
+      );
+    }, 50);
+  }
+
+  /**
+   * Format of the active selection while editing, otherwise of `range`
+   * (default: the whole text). Sizes are px.
+   */
+  getSelectionFormat(
+    nodeInstance: WeaveElementInstance,
+    range?: { start: number; end: number }
+  ): WeaveTextSelectionFormat {
+    const shape = nodeInstance as WeaveTextV2Shape;
+    const session = this.activeSession(shape);
+    if (session) return session.getFormat();
+    const blocks = shape.getBlocks();
+    const r = range ?? { start: 0, end: blocksToText(blocks).length };
+    return getSelectionFormat(blocks, r.start, r.end, shape.fontSize());
+  }
+
+  /**
+   * Run a block transform on a non-editing node: one `updateNode`, so one
+   * Weave undo step. Returns false when rich text is disabled.
+   */
+  private commandOnNode(
+    shape: WeaveTextV2Shape,
+    range: { start: number; end: number } | undefined,
+    fn: (
+      blocks: WeaveTextBlock[],
+      start: number,
+      end: number
+    ) => WeaveTextBlock[]
+  ): boolean {
+    const blocks = shape.getBlocks();
+    const start = range?.start ?? 0;
+    const end = range?.end ?? blocksToText(blocks).length;
+    const next = fn(blocks, start, end);
+    if (JSON.stringify(next) === JSON.stringify(blocks)) return false;
+    shape.setBlocks(next);
+    this.applySize(shape);
+    this.instance.updateNode(this.serialize(shape));
+    this.emitFormatChange(shape, 'command');
+    return true;
+  }
+
+  /**
+   * Set a mark (`undefined` clears it). `size` is in px. While the node is
+   * being edited it applies to the editor selection, otherwise to `range`
+   * (default: the whole text).
+   */
+  applyMark(
+    nodeInstance: WeaveElementInstance,
+    key: WeaveTextMarkKey,
+    value: unknown,
+    range?: { start: number; end: number }
+  ): boolean {
+    const shape = nodeInstance as WeaveTextV2Shape;
+    if (!this.isRich(shape)) return false;
+    let v = value;
+    if (key === 'link' && v !== undefined && !isValidTextLink(String(v))) {
+      return false;
+    }
+    if (key === 'size' && typeof value === 'number') {
+      v = sizeToRatio(value, shape.fontSize());
+    }
+    const session = this.activeSession(shape);
+    if (session) {
+      session.setMark(key, v);
+      return true;
+    }
+    return this.commandOnNode(shape, range, (b, s, e) =>
+      applyMark(b, s, e, key, v)
+    );
+  }
+
+  /** Link a range (or the editor selection) to an http(s) URL. */
+  setRunLink(
+    nodeInstance: WeaveElementInstance,
+    url: string,
+    range?: { start: number; end: number }
+  ): boolean {
+    if (typeof url !== 'string' || !isValidTextLink(url)) return false;
+    return this.applyMark(nodeInstance, 'link', url, range);
+  }
+
+  removeRunLink(
+    nodeInstance: WeaveElementInstance,
+    range?: { start: number; end: number }
+  ): boolean {
+    return this.applyMark(nodeInstance, 'link', undefined, range);
+  }
+
+  toggleMark(
+    nodeInstance: WeaveElementInstance,
+    key: WeaveTextMarkKey,
+    range?: { start: number; end: number }
+  ): boolean {
+    const shape = nodeInstance as WeaveTextV2Shape;
+    if (!this.isRich(shape)) return false;
+    const session = this.activeSession(shape);
+    if (session) {
+      session.toggleMark(key);
+      return true;
+    }
+    return this.commandOnNode(shape, range, (b, s, e) =>
+      toggleMark(b, s, e, key)
+    );
+  }
+
+  toggleList(
+    nodeInstance: WeaveElementInstance,
+    kind: WeaveTextListKind,
+    range?: { start: number; end: number }
+  ): boolean {
+    const shape = nodeInstance as WeaveTextV2Shape;
+    if (!this.isRich(shape)) return false;
+    const session = this.activeSession(shape);
+    if (session) {
+      session.toggleList(kind);
+      return true;
+    }
+    return this.commandOnNode(shape, range, (b, s, e) =>
+      toggleList(b, s, e, kind)
+    );
+  }
+
+  indent(
+    nodeInstance: WeaveElementInstance,
+    range?: { start: number; end: number }
+  ): boolean {
+    const shape = nodeInstance as WeaveTextV2Shape;
+    if (!this.isRich(shape)) return false;
+    const session = this.activeSession(shape);
+    if (session) {
+      session.indent();
+      return true;
+    }
+    return this.commandOnNode(shape, range, indentBlocks);
+  }
+
+  outdent(
+    nodeInstance: WeaveElementInstance,
+    range?: { start: number; end: number }
+  ): boolean {
+    const shape = nodeInstance as WeaveTextV2Shape;
+    if (!this.isRich(shape)) return false;
+    const session = this.activeSession(shape);
+    if (session) {
+      session.outdent();
+      return true;
+    }
+    return this.commandOnNode(shape, range, outdentBlocks);
+  }
+
+  /**
+   * Scale the whole text: sets the node `fontSize` (px); size marks are
+   * ratios of it, so every run scales with it.
+   */
+  setBaseFontSize(nodeInstance: WeaveElementInstance, px: number): boolean {
+    const shape = nodeInstance as WeaveTextV2Shape;
+    if (!this.isRich(shape)) return false;
+    if (!Number.isFinite(px) || px <= 0) return false;
+    if (shape.fontSize() === px) return false;
+    shape.fontSize(px);
+    this.applySize(shape);
+    if (!this.activeSession(shape)) {
+      this.instance.updateNode(this.serialize(shape));
+    }
+    this.emitFormatChange(shape, 'base-size');
+    return true;
   }
 
   resetSmartLayout(textNode: WeaveTextV2Shape) {
@@ -779,6 +1057,49 @@ export class WeaveTextV2Node extends WeaveNode {
   }
 
   static getSchema() {
-    return WeaveTextNode.getSchema();
+    const base = WeaveTextNode.getSchema();
+    const marks = z
+      .object({
+        bold: z.boolean().optional(),
+        italic: z.boolean().optional(),
+        underline: z.boolean().optional(),
+        strike: z.boolean().optional(),
+        color: z.string().optional(),
+        size: z
+          .number()
+          .positive()
+          .optional()
+          .describe('Ratio of the node fontSize (1 is omitted).'),
+        family: z.string().optional(),
+        link: z
+          .string()
+          .url()
+          .refine((value) => isValidTextLink(value), {
+            message: 'Link must be an absolute http:// or https:// URL.',
+          })
+          .optional(),
+      })
+      .passthrough();
+    const block = z.object({
+      runs: z.array(z.object({ t: z.string(), m: marks.optional() })),
+      kind: z.enum(['ul', 'ol']).optional(),
+      depth: z.number().int().min(0).optional(),
+      start: z.number().int().min(1).optional(),
+    });
+    return base.extend({
+      props: base.shape.props.extend({
+        richText: z
+          .boolean()
+          .optional()
+          .describe('Enables rich text commands for this node.'),
+        blocks: z
+          .array(block)
+          .optional()
+          .describe(
+            'Rich content: paragraphs of runs with marks and optional list ' +
+              'fields. `text` is the derived plain mirror.'
+          ),
+      }),
+    });
   }
 }

@@ -378,3 +378,70 @@ describe('WeaveTextV2Node edit lifecycle', () => {
     expect(t.instance.addNode).toHaveBeenCalled();
   });
 });
+
+describe('WeaveTextV2Node rich text in a session', () => {
+  const rich = { richText: { enabled: true } };
+
+  it('many format commands produce one Weave undo step on exit', () => {
+    const t = setup(rich);
+    t.edit(); // selects all
+    t.ta().dispatchEvent(
+      new KeyboardEvent('keydown', {
+        key: 'b',
+        ctrlKey: true,
+        bubbles: true,
+        cancelable: true,
+      })
+    );
+    t.node.toggleList(t.shape, 'ul');
+    t.node.applyMark(t.shape, 'color', '#ff0000');
+    t.esc();
+    expect(t.instance.updateNode).toHaveBeenCalledTimes(1);
+    const props = t.instance.updateNode.mock.calls[0][0].props;
+    expect(props.blocks[0]).toMatchObject({
+      kind: 'ul',
+      runs: [{ t: 'Hello', m: { bold: true, color: '#ff0000' } }],
+    });
+    expect(props.text).toBe('Hello');
+  });
+
+  it('emits format and (throttled) selection events', () => {
+    vi.useFakeTimers();
+    const t = setup(rich);
+    t.edit();
+    t.node.toggleMark(t.shape, 'italic');
+    vi.advanceTimersByTime(100);
+    vi.useRealTimers();
+    const names = t.events.map(([n]) => n);
+    expect(names).toContain('onTextFormatChange');
+    expect(names).toContain('onTextSelectionChange');
+    const sel = t.events.filter(([n]) => n === 'onTextSelectionChange');
+    expect(sel.length).toBeLessThanOrEqual(2);
+    t.esc();
+  });
+
+  it('disabled: commands do nothing and Ctrl+B stays inert', () => {
+    const t = setup();
+    t.edit();
+    expect(t.node.toggleMark(t.shape, 'bold')).toBe(false);
+    t.ta().dispatchEvent(
+      new KeyboardEvent('keydown', {
+        key: 'b',
+        ctrlKey: true,
+        bubbles: true,
+        cancelable: true,
+      })
+    );
+    t.esc();
+    expect(t.instance.updateNode).not.toHaveBeenCalled();
+  });
+
+  it('resize scales every run through the base font size', () => {
+    const t = setup(rich);
+    t.node.applyMark(t.shape, 'size', 40, { start: 0, end: 2 });
+    const before = t.shape.ensureLayout().lines[0].segments[0].fontSize;
+    t.shape.fontSize(t.shape.fontSize() * 2); // what the transformer does
+    const after = t.shape.ensureLayout().lines[0].segments[0].fontSize;
+    expect(after).toBe(before * 2);
+  });
+});

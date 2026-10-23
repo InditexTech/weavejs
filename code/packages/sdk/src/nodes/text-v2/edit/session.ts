@@ -4,7 +4,13 @@
 
 import Konva from 'konva';
 import type { TextLayout } from '../layout/engine';
-import type { WeaveTextBlock } from '../model';
+import {
+  getSelectionFormat,
+  type WeaveTextBlock,
+  type WeaveTextListKind,
+  type WeaveTextMarkKey,
+  type WeaveTextSelectionFormat,
+} from '../model';
 import { TextEditModel, type EditKind } from './model';
 import {
   caretRect,
@@ -28,7 +34,7 @@ export interface TextEditTarget {
   setBlocks(blocks: WeaveTextBlock[]): void;
   getLayout(): TextLayout;
   /** Rendered width of a string (letter spacing included). */
-  measure(text: string): number;
+  measure(text: string, font?: string): number;
   /** Local -> stage (container px) transform of the text box. */
   getAbsoluteTransform(): Konva.Transform;
   /** Offset of the first line inside the box (padding + vertical align). */
@@ -58,6 +64,12 @@ export interface TextEditHost {
   selectAllOnStart?: boolean;
   /** Aborts the session listeners (e.g. instance teardown). */
   signal?: AbortSignal;
+  /** Rich text commands, shortcuts and list key rules are active. */
+  richText?: boolean;
+  /** Selection, caret or content changed (not throttled). */
+  onSelectionChange?(): void;
+  /** A format command, undo or redo ran. */
+  onFormatChange?(reason: 'command' | 'undo' | 'redo'): void;
   /** Content changed (live; not yet committed). */
   onChange?(blocks: WeaveTextBlock[]): void;
   /** User asked to leave edit mode. */
@@ -277,9 +289,41 @@ export class TextEditSession {
     if (e.key === 'Escape') this.host.onRequestExit('escape');
     else if (isUndo) this.undo();
     else if (isRedo) this.redo();
+    else if (this.handleRichKey(e, mod, key)) return true;
     else if (e.key === 'Tab') return true;
     else return false;
     return true;
+  }
+
+  /** Format shortcuts and list key rules; only when rich text is enabled. */
+  private handleRichKey(e: KeyboardEvent, mod: boolean, key: string): boolean {
+    if (!this.host.richText) return false;
+    if (mod && !e.shiftKey && !e.altKey) {
+      const marks: Record<string, WeaveTextMarkKey> = {
+        b: 'bold',
+        i: 'italic',
+        u: 'underline',
+      };
+      if (marks[key]) {
+        this.toggleMark(marks[key]);
+        return true;
+      }
+    }
+    if (mod || this.composing) return false;
+    if (e.key === 'Tab') {
+      if (e.shiftKey) this.outdent();
+      else this.indent();
+      return true;
+    }
+    if (e.key === 'Enter') {
+      if (this.model.enter()) this.afterFormat('command', true);
+      return true;
+    }
+    if (e.key === 'Backspace' && this.model.backspaceInList()) {
+      this.afterFormat('command', true);
+      return true;
+    }
+    return false;
   }
 
   private handleNavigationKey(e: KeyboardEvent): boolean {
@@ -422,6 +466,7 @@ export class TextEditSession {
     if (this.model.undo()) {
       this.syncTextarea();
       this.afterContentChange(0, true);
+      this.host.onFormatChange?.('undo');
     }
   }
 
@@ -430,7 +475,54 @@ export class TextEditSession {
     if (this.model.redo()) {
       this.syncTextarea();
       this.afterContentChange(0, true);
+      this.host.onFormatChange?.('redo');
     }
+  }
+
+  // ---- format commands -----------------------------------------------------
+
+  private afterFormat(reason: 'command', content = false) {
+    this.flushPending();
+    this.syncTextarea();
+    if (content) this.afterContentChange(0, true);
+    else this.applyContent();
+    this.afterSelectionChange();
+    this.host.onFormatChange?.(reason);
+  }
+
+  toggleMark(key: WeaveTextMarkKey) {
+    if (this.model.toggleMark(key)) this.afterFormat('command');
+  }
+
+  setMark(key: WeaveTextMarkKey, value: unknown) {
+    if (this.model.setMark(key, value)) this.afterFormat('command');
+  }
+
+  toggleList(kind: WeaveTextListKind) {
+    if (this.model.toggleList(kind)) this.afterFormat('command');
+  }
+
+  indent() {
+    if (this.model.indent()) this.afterFormat('command');
+  }
+
+  outdent() {
+    if (this.model.outdent()) this.afterFormat('command');
+  }
+
+  getSelection(): { start: number; end: number } {
+    return this.model.getSelection();
+  }
+
+  getFormat(): WeaveTextSelectionFormat {
+    const { start, end } = this.model.getSelection();
+    return getSelectionFormat(
+      this.model.getBlocks(),
+      start,
+      end,
+      this.target.getFontSize(),
+      this.model.storedMarks
+    );
   }
 
   // ---- pointer -------------------------------------------------------------
@@ -513,6 +605,7 @@ export class TextEditSession {
     this.positionTextarea();
     this.resetBlink();
     this.repaint();
+    this.host.onSelectionChange?.();
   }
 
   private afterContentChange(insertedLength: number, immediate = false) {
@@ -554,6 +647,7 @@ export class TextEditSession {
   private applyContent() {
     this.target.setBlocks(this.model.getBlocks());
     this.host.onChange?.(this.model.getBlocks());
+    this.host.onSelectionChange?.();
     this.positionTextarea();
     this.target.requestRedraw();
     this.repaint();

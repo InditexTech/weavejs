@@ -6,14 +6,21 @@ import Konva from 'konva';
 import {
   TextLayoutEngine,
   canvasMeasurer,
+  fontMetrics,
   fontString,
   type TextAlign,
   type LayoutLine,
+  type LayoutSegment,
   type TextLayout,
   type TextLayoutStyle,
   type TextWrap,
 } from './layout/engine';
-import { blocksToText, resolveBlocks, type WeaveTextBlock } from './model';
+import {
+  blocksToText,
+  isSafeLink,
+  resolveBlocks,
+  type WeaveTextBlock,
+} from './model';
 
 export type TextVerticalAlign = 'top' | 'middle' | 'bottom';
 
@@ -57,12 +64,18 @@ export type TextV2ShapeConfig = Konva.ShapeConfig & {
  * code written against `Konva.Text` keeps working.
  */
 export class WeaveTextV2Shape extends Konva.Shape {
-  private readonly engine = new TextLayoutEngine();
-  private readonly naturalEngine = new TextLayoutEngine();
+  private readonly engine = new TextLayoutEngine(canvasMeasurer, fontMetrics);
+  private readonly naturalEngine = new TextLayoutEngine(
+    canvasMeasurer,
+    fontMetrics
+  );
   private layoutCache: TextLayout | null = null;
   private blocksKey: { b?: unknown; t?: string; l?: string } = {};
   private blocksCache: WeaveTextBlock[] = [];
   private viewport: { y1: number; y2: number } | null = null;
+  private indentStepValue: number | undefined;
+  private linkStyle = { color: '#1155ccff', hoverColor: '#3d7be0ff' };
+  private hoveredRun: string | null = null;
 
   constructor(config?: TextV2ShapeConfig) {
     super(config);
@@ -91,6 +104,65 @@ export class WeaveTextV2Shape extends Konva.Shape {
     this._setAttr('blocks', undefined);
     this._setAttr('text', value == null ? '' : String(value));
     return this;
+  }
+
+  /**
+   * List indent per depth, as a multiple of `fontSize`. Not a node attr: it
+   * comes from the node config and must not be serialized into the document.
+   */
+  setIndentStep(step: number | undefined): this {
+    if (this.indentStepValue !== step) {
+      this.indentStepValue = step;
+      this.layoutCache = null;
+    }
+    return this;
+  }
+
+  /** Link run colours (from the node config; not serialized). */
+  setLinkStyle(style: { color: string; hoverColor: string }): this {
+    this.linkStyle = style;
+    return this;
+  }
+
+  /** Run under the pointer (`paragraph:run`), repainted with the hover colour. */
+  setHoveredRun(key: string | null): this {
+    if (this.hoveredRun !== key) {
+      this.hoveredRun = key;
+      this.getLayer()?.batchDraw();
+    }
+    return this;
+  }
+
+  getHoveredRun(): string | null {
+    return this.hoveredRun;
+  }
+
+  /**
+   * Link run at a point in node-local coordinates (the legacy node-level
+   * `link` wins: runs are then not links).
+   */
+  linkAtPoint(point: {
+    x: number;
+    y: number;
+  }): { key: string; url: string } | null {
+    if (this.attrs.link) return null;
+    const layout = this.ensureLayout();
+    const o = this.getContentOffset();
+    const x = point.x - o.x;
+    const y = point.y - o.y;
+    for (const line of layout.lines) {
+      if (y < line.y || y >= line.y + line.height) continue;
+      for (const seg of line.segments) {
+        const sx = line.offsetX + seg.x;
+        if (x >= sx && x <= sx + seg.width && isSafeLink(seg.m?.link)) {
+          return {
+            key: `${line.paragraph}:${seg.run}`,
+            url: seg.m!.link as string,
+          };
+        }
+      }
+    }
+    return null;
   }
 
   /** Resolved blocks: stored or lazily synthesized (never written back). */
@@ -216,6 +288,7 @@ export class WeaveTextV2Shape extends Konva.Shape {
       letterSpacing: this.letterSpacing(),
       wrap: this.wrap(),
       align: this.align(),
+      indentStep: this.indentStepValue,
     };
   }
 
@@ -246,9 +319,9 @@ export class WeaveTextV2Shape extends Konva.Shape {
   }
 
   /** Rendered width of a string with this shape's font and letter spacing. */
-  measureText(text: string): number {
+  measureText(text: string, font?: string): number {
     return (
-      canvasMeasurer(fontString(this.style()), text) +
+      canvasMeasurer(font ?? fontString(this.style()), text) +
       text.length * this.letterSpacing()
     );
   }
@@ -257,7 +330,7 @@ export class WeaveTextV2Shape extends Konva.Shape {
   getContentOffset(): { x: number; y: number } {
     const padding = this.padding();
     const layout = this.ensureLayout();
-    const used = layout.lines.length * layout.lineHeightPx + padding * 2;
+    const used = layout.contentHeight + padding * 2;
     const va = this.verticalAlign();
     let alignY = 0;
     if (va === 'middle') alignY = (this.getHeight() - used) / 2;
@@ -337,12 +410,7 @@ export class WeaveTextV2Shape extends Konva.Shape {
     const lineHeightPx = layout.lineHeightPx;
 
     let baseline: CanvasTextBaseline = 'middle';
-    let translateY = lineHeightPx / 2;
-    if (!Konva.legacyTextRendering) {
-      const m = self.measureMetrics();
-      baseline = 'alphabetic';
-      translateY = (m.ascent - m.descent) / 2 + lineHeightPx / 2;
-    }
+    if (!Konva.legacyTextRendering) baseline = 'alphabetic';
 
     ctx.setAttr('font', fontString(self.style()));
     ctx.setAttr('textBaseline', baseline);
@@ -353,24 +421,22 @@ export class WeaveTextV2Shape extends Konva.Shape {
     const range = self.visibleRange(ctx);
     ctx.translate(padding, alignY + padding);
 
-    const top = alignY + padding;
-    for (let n = 0; n < layout.lines.length; n++) {
-      const lineTop = top + n * lineHeightPx;
+    for (const line of layout.lines) {
       // line-level culling (local coords, with one line of slack)
       if (
         range &&
-        (lineTop + lineHeightPx < range.y1 - lineHeightPx ||
-          lineTop > range.y2 + lineHeightPx)
+        (alignY + padding + line.y + line.height < range.y1 - lineHeightPx ||
+          alignY + padding + line.y > range.y2 + lineHeightPx)
       ) {
         continue;
       }
-      self.paintLine(ctx, layout.lines[n], translateY + n * lineHeightPx);
+      self.paintLine(ctx, line, line.y + line.baseline);
     }
   };
 
   /** Vertical offset of the text block inside the box (verticalAlign). */
   private verticalOffset(layout: TextLayout): number {
-    const used = layout.lines.length * layout.lineHeightPx + this.padding() * 2;
+    const used = layout.contentHeight + this.padding() * 2;
     const va = this.verticalAlign();
     if (va === 'middle') return (this.getHeight() - used) / 2;
     if (va === 'bottom') return this.getHeight() - used;
@@ -384,8 +450,42 @@ export class WeaveTextV2Shape extends Konva.Shape {
     if (decoration.includes('underline')) {
       this.strokeDecoration(ctx, line, y + Math.round(fontSize / 4));
     }
+    if (line.marker) {
+      const mk = line.marker;
+      ctx.setAttr('font', mk.font);
+      this.fillText(ctx, mk.text, mk.x, y, mk.color);
+    }
     for (const seg of line.segments) {
-      this.paintSegment(ctx, seg.t, line.offsetX + seg.x, y);
+      ctx.setAttr('font', seg.font);
+      const x = line.offsetX + seg.x;
+      const isLink = !this.attrs.link && isSafeLink(seg.m?.link);
+      let color =
+        typeof seg.m?.color === 'string' ? (seg.m.color as string) : undefined;
+      if (isLink) {
+        color =
+          this.hoveredRun === `${line.paragraph}:${seg.run}`
+            ? this.linkStyle.hoverColor
+            : this.linkStyle.color;
+      }
+      this.paintSegment(ctx, seg, x, y, color);
+      if (seg.m?.underline || isLink) {
+        this.strokeSegment(
+          ctx,
+          seg,
+          x,
+          y + Math.round(seg.fontSize / 4),
+          color
+        );
+      }
+      if (seg.m?.strike) {
+        this.strokeSegment(
+          ctx,
+          seg,
+          x,
+          y - Math.round(seg.fontSize / 4),
+          color
+        );
+      }
     }
     if (decoration.includes('line-through')) {
       this.strokeDecoration(ctx, line, y - Math.round(fontSize / 4));
@@ -404,20 +504,49 @@ export class WeaveTextV2Shape extends Konva.Shape {
     ctx.restore();
   }
 
-  private paintSegment(ctx: Konva.Context, text: string, x: number, y: number) {
+  private strokeSegment(
+    ctx: Konva.Context,
+    seg: LayoutSegment,
+    x: number,
+    y: number,
+    color: string | undefined
+  ) {
+    ctx.save();
+    ctx.beginPath();
+    ctx.moveTo(x, y);
+    ctx.lineTo(x + Math.round(seg.width), y);
+    ctx.lineWidth = seg.fontSize / 15;
+    ctx.strokeStyle = color ?? (this.fill() as string);
+    ctx.stroke();
+    ctx.restore();
+  }
+
+  private paintSegment(
+    ctx: Konva.Context,
+    seg: LayoutSegment,
+    x: number,
+    y: number,
+    color: string | undefined
+  ) {
     const spacing = this.letterSpacing();
     if (spacing === 0) {
-      this.fillText(ctx, text, x, y);
+      this.fillText(ctx, seg.t, x, y, color);
       return;
     }
     let cx = x;
-    for (const ch of Array.from(text)) {
-      this.fillText(ctx, ch, cx, y);
-      cx += this.measureSize(ch).width + spacing;
+    for (const ch of Array.from(seg.t)) {
+      this.fillText(ctx, ch, cx, y, color);
+      cx += canvasMeasurer(seg.font, ch) + spacing;
     }
   }
 
-  private fillText(ctx: Konva.Context, text: string, x: number, y: number) {
+  private fillText(
+    ctx: Konva.Context,
+    text: string,
+    x: number,
+    y: number,
+    color?: string
+  ) {
     const self = this as unknown as {
       _partialText: string;
       _partialTextX: number;
@@ -426,7 +555,18 @@ export class WeaveTextV2Shape extends Konva.Shape {
     self._partialText = text;
     self._partialTextX = x;
     self._partialTextY = y;
-    ctx.fillStrokeShape(this);
+    if (color === undefined) {
+      ctx.fillStrokeShape(this);
+      return;
+    }
+    // Konva reads the fill from attrs: swap it without firing change events.
+    const prev = this.attrs.fill;
+    this.attrs.fill = color;
+    try {
+      ctx.fillStrokeShape(this);
+    } finally {
+      this.attrs.fill = prev;
+    }
   }
 
   _hitFunc = (ctx: Konva.Context, shape: Konva.Shape) => {

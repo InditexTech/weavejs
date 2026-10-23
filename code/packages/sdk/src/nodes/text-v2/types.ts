@@ -5,6 +5,7 @@
 import type { DeepPartial } from '@inditextech/weave-types';
 import type { WeaveTextProperties } from '../text/types';
 import type { WeaveTextV2Shape } from './shape';
+import type { WeaveTextSelectionFormat } from './model';
 
 export type WeaveTextV2SizeWarningProperties = {
   /**
@@ -32,7 +33,21 @@ export type WeaveTextV2EditionProperties = {
   outline: WeaveTextV2OutlineProperties;
 };
 
+export type WeaveTextV2RichTextProperties = {
+  /**
+   * Enables formatting commands, shortcuts and list key rules. Marks and
+   * lists already in a document always render, whatever this value.
+   */
+  enabled: boolean;
+  /**
+   * List indent per depth as a multiple of the node `fontSize` (default
+   * 1.5). Must be the same on every client, or wrapping differs.
+   */
+  indentStep: number;
+};
+
 export type WeaveTextV2Properties = Omit<WeaveTextProperties, 'edition'> & {
+  richText: WeaveTextV2RichTextProperties;
   edition: WeaveTextV2EditionProperties;
   sizeWarning: WeaveTextV2SizeWarningProperties;
 };
@@ -47,4 +62,24 @@ export type WeaveTextV2OnTextSizeWarning = {
   node: WeaveTextV2Shape;
   size: number;
   threshold: number;
+};
+
+export type WeaveTextV2FormatChangeReason =
+  | 'command'
+  | 'undo'
+  | 'redo'
+  | 'base-size';
+
+export type WeaveTextV2OnTextSelectionChange = {
+  node: WeaveTextV2Shape;
+  /** UTF-16 offsets into the plain `text`. */
+  start: number;
+  end: number;
+  format: WeaveTextSelectionFormat;
+};
+
+export type WeaveTextV2OnTextFormatChange = {
+  node: WeaveTextV2Shape;
+  format: WeaveTextSelectionFormat;
+  reason: WeaveTextV2FormatChangeReason;
 };
