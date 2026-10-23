@@ -263,6 +263,25 @@ describe('TextEditSession', () => {
     expect(c.session.model.getSelectedText()).toBe('hello brave world');
   });
 
+  it('double click selects a word even when pointerdown detail is 0', () => {
+    const c = make('hello brave world');
+    const x = 10 + c.shape.measureText('hello bra') + 1;
+    const fire = () =>
+      window.dispatchEvent(
+        new MouseEvent('pointerdown', {
+          clientX: x,
+          clientY: 15,
+          detail: 0,
+          button: 0,
+          bubbles: true,
+          cancelable: true,
+        })
+      );
+    fire();
+    fire();
+    expect(c.session.model.getSelectedText()).toBe('brave');
+  });
+
   it('pointer outside the node requests exit', () => {
     const c = make('hi');
     window.dispatchEvent(

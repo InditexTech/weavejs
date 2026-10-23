@@ -586,10 +586,11 @@ export class TextEditSession {
     const layout = this.target.getLayout();
     const offset = offsetFromPoint(layout, local, this.target.measure);
     const text = this.model.getText();
-    if (e.detail >= 3) {
+    const clicks = this.countClicks(e);
+    if (clicks >= 3) {
       const [s, en] = paragraphRangeAt(text, offset);
       this.model.setSelection(s, en);
-    } else if (e.detail === 2) {
+    } else if (clicks === 2) {
       const [s, en] = wordRangeAt(text, offset);
       this.model.setSelection(s, en);
     } else {
@@ -600,6 +601,24 @@ export class TextEditSession {
     this.afterSelectionChange();
     this.textarea?.focus();
   };
+
+  private lastClick = { t: 0, x: 0, y: 0, n: 0 };
+
+  /**
+   * Browsers report `detail` as 0 on pointerdown, so multi-click is counted
+   * here (same spot, within 500 ms). A real `detail` still wins.
+   */
+  private countClicks(e: PointerEvent): number {
+    const now = e.timeStamp || Date.now();
+    const l = this.lastClick;
+    const near =
+      now - l.t < 500 &&
+      Math.hypot(e.clientX - l.x, e.clientY - l.y) < 5 &&
+      l.n > 0;
+    const n = Math.max(e.detail, near ? l.n + 1 : 1);
+    this.lastClick = { t: now, x: e.clientX, y: e.clientY, n: n >= 3 ? 0 : n };
+    return n;
+  }
 
   private onPointerMove = (e: PointerEvent) => {
     if (!this.dragging) return;
