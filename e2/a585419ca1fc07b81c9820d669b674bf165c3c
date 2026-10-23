@@ -1,0 +1,20 @@
+code/packages/sdk/src/nodes/text-v2/edit/session.ts
+  s_36b8948f363f64::t_69f9c83bde218b 252-259
+  s_36b8948f363f64::t_bf07517591319d 161,195,608,645
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.6",
+  "base_commit_sha": "e2a585419ca1fc07b81c9820d669b674bf165c3c",
+  "prompts": {},
+  "sessions": {
+    "s_36b8948f363f64": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "ses_e9c2f4fa7ffeKg61TdnwvEG2it",
+        "model": "claude-sonnet-5.5"
+      },
+      "human_author": "Jesus Manuel Piñeiro Cid <jesusmpc@inditex.com>"
+    }
+  }
+}
