@@ -278,6 +278,32 @@ describe('TextEditSession', () => {
     expect(c.exits).toEqual(['outside', 'escape']);
   });
 
+  it('pointer inside a data-weave-text-edit-keep element does not exit', () => {
+    const c = make('hi');
+    const bar = document.createElement('div');
+    bar.setAttribute('data-weave-text-edit-keep', '');
+    const btn = document.createElement('button');
+    const input = document.createElement('input');
+    bar.append(btn, input);
+    document.body.appendChild(bar);
+    const fire = (type: string, target: Element) => {
+      const ev = new MouseEvent(type, {
+        clientX: 390,
+        clientY: 190,
+        button: 0,
+        bubbles: true,
+        cancelable: true,
+      });
+      target.dispatchEvent(ev);
+      return ev;
+    };
+    fire('pointerdown', btn);
+    expect(c.exits).toEqual([]);
+    expect(fire('mousedown', btn).defaultPrevented).toBe(true);
+    expect(fire('mousedown', input).defaultPrevented).toBe(false);
+    bar.remove();
+  });
+
   it('paints caret and selection on the utility layer', () => {
     const c = make('Hello');
     const px = () => {

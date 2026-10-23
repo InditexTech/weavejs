@@ -546,13 +546,35 @@ export class TextEditSession {
     );
   }
 
+  /**
+   * True for pointer targets inside an element the app marked with
+   * `data-weave-text-edit-keep` (e.g. a formatting toolbar): they neither
+   * end the session nor, unless they are form fields, steal focus.
+   */
+  private isKeepTarget(e: Event): boolean {
+    const t = e.target;
+    return (
+      typeof Element !== 'undefined' &&
+      t instanceof Element &&
+      !!t.closest('[data-weave-text-edit-keep]')
+    );
+  }
+
   private onMouseDown = (e: MouseEvent) => {
+    if (this.isKeepTarget(e)) {
+      const t = e.target as Element;
+      if (!t.closest('input, textarea, select, [contenteditable="true"]')) {
+        e.preventDefault(); // keep focus on the proxy textarea
+      }
+      return;
+    }
     if (this.isInside(this.toLocal(e))) e.preventDefault(); // keep focus
   };
 
   private onPointerDown = (e: PointerEvent) => {
     if (e.button !== 0 && e.pointerType === 'mouse') return;
     if (this.textarea && e.target === this.textarea) return;
+    if (this.isKeepTarget(e)) return;
     const local = this.toLocal(e);
     if (!this.isInside(local)) {
       e.stopPropagation();
