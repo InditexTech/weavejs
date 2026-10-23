@@ -1,0 +1,81 @@
+AGENTS.md
+  s_04c0657600bfd3::t_96405c68a6e4fc 120-121
+code/packages/sdk/src/actions/text-tool/__tests__/rich-params.test.ts
+  s_04c0657600bfd3::t_f79640cda1b1b2 1-37
+code/packages/sdk/src/actions/text-tool/text-tool.ts
+  s_04c0657600bfd3::t_f80c7260c1a84d 10,26-33,36-38,52,66
+code/packages/sdk/src/nodes/text-v2/__tests__/rich-api.test.ts
+  s_04c0657600bfd3::t_0999f265519bc9 1-398
+code/packages/sdk/src/nodes/text-v2/__tests__/rich-layout.test.ts
+  s_04c0657600bfd3::t_36f67d7cfc3871 1-137
+code/packages/sdk/src/nodes/text-v2/__tests__/rich-model.test.ts
+  s_04c0657600bfd3::t_e8f7929d363acf 1-147
+code/packages/sdk/src/nodes/text-v2/__tests__/rich-paint.test.ts
+  s_04c0657600bfd3::t_6cdc2e7ff39af9 1-83
+code/packages/sdk/src/nodes/text-v2/__tests__/rich-session.test.ts
+  s_04c0657600bfd3::t_2f0ae333485be0 1-175
+code/packages/sdk/src/nodes/text-v2/__tests__/server-skia.test.ts
+  s_04c0657600bfd3::t_f37278c1dd1b13 83-132
+code/packages/sdk/src/nodes/text-v2/__tests__/text-v2-edit.test.ts
+  s_04c0657600bfd3::t_277b30a9904e92 381-447
+code/packages/sdk/src/nodes/text-v2/constants.ts
+  s_04c0657600bfd3::t_ac7ef6a6e182ce 11-13,21
+code/packages/sdk/src/nodes/text-v2/edit/geometry.ts
+  s_04c0657600bfd3::t_a05d0f642ca362 14-15,116-135,138,152-153,158-166,175,189,231,248,250
+code/packages/sdk/src/nodes/text-v2/edit/model.ts
+  s_04c0657600bfd3::t_21c018ab259828 5-20,28,44-48,89,97,106,148-155,205-293,296,303-313
+code/packages/sdk/src/nodes/text-v2/edit/session.ts
+  s_04c0657600bfd3::t_81b058aebd681c 7-13,37,67-72,292,298-328,469,478,482-527,608,650
+code/packages/sdk/src/nodes/text-v2/index.ts
+  s_04c0657600bfd3::t_4275eae40b3f96 14
+code/packages/sdk/src/nodes/text-v2/layout/engine.ts
+  s_04c0657600bfd3::t_408c9ff4bbb497 6-12,34-35,38-41,57-70,86-91,103-104,129-179,214-215,222-223,276-281,293-298,300,314-315,318-341,343-345,359,363-364,368,402,410,414-415,424,432-434,438,453,462,477-479,483-485,487,490,492-505,513-518,522-523,525-526,529-539,543,555,606-645,651-663,667,679-680,696-697,722-723,747,749-757
+code/packages/sdk/src/nodes/text-v2/model.ts
+  s_04c0657600bfd3::t_94214c7c423e29 11-18,23-34,36-61,174-175,186,203,212,224-227,232-645
+code/packages/sdk/src/nodes/text-v2/shape.ts
+  s_04c0657600bfd3::t_ef80a89e10d620 9,13,18-23,67-71,76-78,109-167,291,322,324,333,413,424,428-429,433,439,453-457,459-488,507-530,533,537-539,543-549,558-569
+code/packages/sdk/src/nodes/text-v2/text-v2.ts
+  s_04c0657600bfd3::t_9966953c31fb29 7,26-39,47,49-50,74,175-179,324,378-380,430,617,701,707-722,741-746,750,758,764-768,774-777,801-1021,1060-1103
+code/packages/sdk/src/nodes/text-v2/types.ts
+  s_04c0657600bfd3::t_fd4f7bdfaaa926 8,36-48,50,66-85
+docs/src/modules/main/pages/build/actions/text-tool.adoc
+  s_04c0657600bfd3::t_1e06e1ae6934ce 47-57
+docs/src/modules/main/pages/build/nodes/text-v2.adoc
+  s_04c0657600bfd3::t_9e965089246fc7 49,66-89
+docs/src/modules/sdk/pages/api-reference/actions/text-tool.adoc
+  s_04c0657600bfd3::t_fda716aa202487 35-54
+docs/src/modules/sdk/pages/api-reference/nodes/text-v2.adoc
+  s_04c0657600bfd3::t_e822c4404320fd 12,74-155,196-204,225-232
+openspec/changes/text-v2-rich-text/.openspec.yaml
+  s_04c0657600bfd3::t_430908e08d9220 1-2
+openspec/changes/text-v2-rich-text/design.md
+  s_04c0657600bfd3::t_df45c2878b734a 1-39
+openspec/changes/text-v2-rich-text/proposal.md
+  s_04c0657600bfd3::t_0f905de00833c4 1-32
+openspec/changes/text-v2-rich-text/specs/text-v2/editing/spec.md
+  s_04c0657600bfd3::t_1f7245365da42b 1-36
+openspec/changes/text-v2-rich-text/specs/text-v2/layout/spec.md
+  s_04c0657600bfd3::t_85867b75e7ad9d 1-53
+openspec/changes/text-v2-rich-text/specs/text-v2/model/spec.md
+  s_04c0657600bfd3::t_bbff0c49feb5dc 1-42
+openspec/changes/text-v2-rich-text/specs/text-v2/rich-text-api/spec.md
+  s_04c0657600bfd3::t_94287da060dbd8 1-55
+openspec/changes/text-v2-rich-text/tasks.md
+  s_04c0657600bfd3::t_49d3df4a6e99cc 1-50
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.6",
+  "base_commit_sha": "96838de56f73b1e54483319c53b746aabf85f63c",
+  "prompts": {},
+  "sessions": {
+    "s_04c0657600bfd3": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "ses_e9bc5058dffeuO0Rfa8MiDOdnh",
+        "model": "claude-sonnet-5.5"
+      },
+      "human_author": "Jesus Manuel Piñeiro Cid <jesusmpc@inditex.com>"
+    }
+  }
+}
