@@ -29,8 +29,21 @@ export type WeaveTextV2OutlineProperties = {
  * Unlike `WeaveTextNode`, `edition` has no `borderSize` (there is no DOM
  * textarea border to size): the edit box outline is `edition.outline`.
  */
+export type WeaveTextV2FollowPadding = {
+  top: number;
+  right: number;
+  bottom: number;
+  left: number;
+};
+
 export type WeaveTextV2EditionProperties = {
   outline: WeaveTextV2OutlineProperties;
+  /**
+   * Margin, in screen pixels per side, kept between the caret and the stage
+   * edges when the stage pans to follow it while editing. Raise a side when
+   * app UI (toolbars, sidebars) covers that edge. Default 40 on every side.
+   */
+  followPadding: WeaveTextV2FollowPadding;
 };
 
 export type WeaveTextV2RichTextProperties = {

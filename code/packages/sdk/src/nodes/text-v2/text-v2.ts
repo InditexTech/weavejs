@@ -378,9 +378,19 @@ export class WeaveTextV2Node extends WeaveNode {
           const w = box.clientWidth;
           const h = box.clientHeight;
           if (!w || !h) return;
-          const m = 40;
-          const dx = p.x < m ? m - p.x : p.x > w - m ? w - m - p.x : 0;
-          const dy = p.y < m ? m - p.y : p.y > h - m ? h - m - p.y : 0;
+          const f = this.config.edition.followPadding;
+          const dx =
+            p.x < f.left
+              ? f.left - p.x
+              : p.x > w - f.right
+                ? w - f.right - p.x
+                : 0;
+          const dy =
+            p.y < f.top
+              ? f.top - p.y
+              : p.y > h - f.bottom
+                ? h - f.bottom - p.y
+                : 0;
           if (!dx && !dy) return;
           stage.x(stage.x() + dx);
           stage.y(stage.y() + dy);
