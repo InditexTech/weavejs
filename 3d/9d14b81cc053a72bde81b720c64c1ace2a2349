@@ -1,0 +1,19 @@
+openspec/changes/shape-label-native-engine/.openspec.yaml
+  s_726a777adee655::t_69cf557a377fc3 1-2
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.6",
+  "base_commit_sha": "3d9d14b81cc053a72bde81b720c64c1ace2a2349",
+  "prompts": {},
+  "sessions": {
+    "s_726a777adee655": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "ses_e87984a5cffefKErydf4xdv3Cm",
+        "model": "claude-sonnet-5.5"
+      },
+      "human_author": "Jesus Manuel Piñeiro Cid <jesusmpc@inditex.com>"
+    }
+  }
+}
