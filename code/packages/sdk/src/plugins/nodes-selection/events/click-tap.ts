@@ -172,11 +172,9 @@ export function handleClickOrTap(
   // regardless of selection state. Skipped on shift-click, which is a
   // multi-select gesture, not a per-node interaction.
   if (!e.evt.shiftKey) {
-    const wasSelectedBeforeThisClick =
-      tr
-        .nodes()
-        .findIndex((node) => node.getAttrs().id === nodeTargeted.getAttrs().id) !==
-      -1;
+    const wasSelectedBeforeThisClick = tr
+      .nodes()
+      .some((node) => node.getAttrs().id === nodeTargeted.getAttrs().id);
     nodeTargeted.click({
       wasSelected: wasSelectedBeforeThisClick,
       ctrlOrMetaPressed: isCtrlOrCmdPressed,
@@ -201,6 +199,16 @@ export function handleClickOrTap(
     if (canMove && e.evt) {
       nodeTargeted.draggable(true);
       ctx.armDrag(nodeTargeted, e.evt.pointerId);
+
+      // handleBehaviors is skipped on this path, so apply the node's border
+      // preference here (e.g. measure has no border, anchors or rotater).
+      const nodeTrProps = nodeTargeted.getTransformerProperties?.() ?? {};
+      const nodeAnchors = nodeTargeted.allowedAnchors?.();
+      tr.setAttrs({
+        ...nodeTrProps,
+        ...(nodeAnchors ? { enabledAnchors: nodeAnchors } : {}),
+        ...(nodeAnchors?.length === 0 ? { resizeEnabled: false } : {}),
+      });
 
       // A plain click still just selects, so emit onNodesChange now instead of
       // waiting for a drag to start. We intentionally skip handleBehaviors here

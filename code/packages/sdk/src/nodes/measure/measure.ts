@@ -256,7 +256,8 @@ export class WeaveMeasureNode extends WeaveNode {
       };
     };
 
-    this.instance.addEventListener<WeaveStageZoomPluginOnZoomChangeEvent>(
+    this.setNodeInstanceListener<WeaveStageZoomPluginOnZoomChangeEvent>(
+      measure,
       'onZoomChange',
       () => {
         const selectionPlugin =
@@ -273,7 +274,8 @@ export class WeaveMeasureNode extends WeaveNode {
       }
     );
 
-    this.instance.addEventListener<WeaveNodesSelectionPluginOnNodesChangeEvent>(
+    this.setNodeInstanceListener<WeaveNodesSelectionPluginOnNodesChangeEvent>(
+      measure,
       'onNodesChange',
       () => {
         let isSelected = false;
@@ -295,11 +297,13 @@ export class WeaveMeasureNode extends WeaveNode {
         if (!isSelected) {
           this.destroySelectionHandlers(measure);
         }
-      }
+      },
+      'measure:onNodesChange'
     );
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    this.instance.addEventListener<any>(
+    this.setNodeInstanceListener<any>(
+      measure,
       'onMeasureReferenceChange',
       ({ unit, unitPerPixel }: { unit: string; unitPerPixel: number }) => {
         measure.setAttrs({
@@ -311,6 +315,10 @@ export class WeaveMeasureNode extends WeaveNode {
         );
       }
     );
+
+    measure.canBeHovered = function () {
+      return false;
+    };
 
     measure.allowedAnchors = function () {
       return [];
@@ -363,6 +371,7 @@ export class WeaveMeasureNode extends WeaveNode {
 
     const moveFromCircle = new Konva.Circle({
       id: `moveFromCircle-${props.id}`,
+      ownsDrag: true,
       edgeDistanceDisableOnDrag: true,
       edgeSnappingDisableOnDrag: true,
       x: fromPoint.x,
@@ -383,6 +392,7 @@ export class WeaveMeasureNode extends WeaveNode {
 
     const moveToCircle = new Konva.Circle({
       id: `moveToCircle-${props.id}`,
+      ownsDrag: true,
       edgeDistanceDisableOnDrag: true,
       edgeSnappingDisableOnDrag: true,
       x: toPoint.x,
@@ -438,6 +448,7 @@ export class WeaveMeasureNode extends WeaveNode {
 
     const moveSeparationRect = new Konva.Rect({
       id: `moveSeparationRect-${props.id}`,
+      ownsDrag: true,
       edgeDistanceDisableOnDrag: true,
       edgeSnappingDisableOnDrag: true,
       x: separatorPoint.left.x,

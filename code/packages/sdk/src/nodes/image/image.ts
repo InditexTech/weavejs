@@ -579,7 +579,8 @@ export class WeaveImageNode extends WeaveNode {
 
     image.setAttr('imageURL', imageProps.imageURL);
 
-    this.instance.addEventListener(
+    this.setNodeInstanceListener(
+      image,
       'onNodeRenderedAdded',
       (node: Konva.Node) => {
         if (
@@ -1112,7 +1113,7 @@ export class WeaveImageNode extends WeaveNode {
       );
     };
 
-    this.imageFallback[imageId].onload = async () => {
+    this.imageFallback[imageId].onload = () => {
       if (this.imageFallback[imageId].width === 0) {
         this.imageState[imageId] = {
           status: 'error-fallback',
@@ -1188,7 +1189,7 @@ export class WeaveImageNode extends WeaveNode {
       );
     };
 
-    this.imageSource[imageId].onload = async () => {
+    this.imageSource[imageId].onload = () => {
       if (this.imageSource[imageId].width === 0) {
         onError(
           new Error(`Invalid image provided`, {
@@ -1277,7 +1278,7 @@ export class WeaveImageNode extends WeaveNode {
       id,
       realImageURL ?? '',
       {
-        onLoad: async () => {
+        onLoad: () => {
           if (useFallback) {
             this.imageTryoutIds[id] = setTimeout(() => {
               const node = this.instance.getStage().findOne(`#${id}`);

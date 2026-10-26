@@ -2,6 +2,7 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
+import { addNodeInstanceListener } from '../node';
 import Konva from 'konva';
 import type {
   WeaveAnchorSnap,
@@ -157,7 +158,7 @@ export const showConnectorAnchors = (
       listening: true,
     });
 
-    instance.addEventListener('onZoomChange', () => {
+    addNodeInstanceListener(instance, circle!, 'onZoomChange', () => {
       circle!.setAttrs({
         radius: radius / instance.getStage().scaleX(),
       });

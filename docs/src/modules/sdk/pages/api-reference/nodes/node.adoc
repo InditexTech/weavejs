@@ -215,7 +215,31 @@ This method updates a rendered instance of Konva, that represents a node.
 onDestroy(nodeInstance: WeaveElementInstance): void
 ----
 
-This method destroys the Konva instance rendered, that represents a node.
+This method destroys the Konva instance rendered, that represents a node. It also removes the instance
+listeners registered for the node and its descendants with `setNodeInstanceListener`.
+
+=== setNodeInstanceListener
+
+[source,ts]
+----
+protected setNodeInstanceListener<T>(
+  node: Konva.Node,
+  event: string,
+  callback: (payload: T) => void,
+  key: string = event
+): void
+----
+
+Registers a Weave.js instance listener on behalf of a rendered node. Custom nodes that listen to instance
+events (for example `onZoomChange` or `onNodesChange`) from `onRender` should use it instead of
+`instance.addEventListener`, which leaves the listener registered after the node is re-rendered or destroyed.
+
+* Only one listener is kept per node and `key`: registering again with the same key replaces the previous
+listener.
+* `key` defaults to the event name. Pass an explicit key to keep several listeners for the same event, or to
+avoid replacing the `onNodesChange` and `onSelectionState` listeners that `setupDefaultNodeEvents` registers.
+* The listeners are removed when the node is destroyed, including the nodes destroyed with a container.
+Locking a node removes only the default `onNodesChange` and `onSelectionState` listeners.
 
 === onDestroyInstance
 

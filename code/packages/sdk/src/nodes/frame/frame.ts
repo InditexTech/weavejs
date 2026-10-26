@@ -27,7 +27,7 @@ import { mergeExceptArrays } from '@/utils/utils';
 import { GroupFrame } from './group-frame';
 
 export class WeaveFrameNode extends WeaveNode {
-  private config: WeaveFrameProperties;
+  private readonly config: WeaveFrameProperties;
   protected nodeType: string = WEAVE_FRAME_NODE_TYPE;
   initialize = undefined;
 
@@ -305,7 +305,7 @@ export class WeaveFrameNode extends WeaveNode {
 
     this.setupDefaultNodeEvents(frame);
 
-    this.instance.addEventListener('onZoomChange', () => {
+    this.setNodeInstanceListener(frame, 'onZoomChange', () => {
       selectionArea.hitFunc(function (ctx, shape) {
         ctx.beginPath();
         ctx.rect(
@@ -328,6 +328,10 @@ export class WeaveFrameNode extends WeaveNode {
         fill:
           frameParams.frameBackground ?? WEAVE_FRAME_DEFAULT_BACKGROUND_COLOR,
       });
+      backgroundBorder.setAttrs({
+        onTargetEnter: false,
+        stroke: borderColor,
+      });
     });
 
     frame.on(WEAVE_NODE_CUSTOM_EVENTS.onTargetEnter, () => {
@@ -336,6 +340,10 @@ export class WeaveFrameNode extends WeaveNode {
         stroke: onTargetEnterBorderColor,
         // strokeWidth: borderWidth,
         fill: onTargetEnterFill,
+      });
+      backgroundBorder.setAttrs({
+        onTargetEnter: true,
+        stroke: onTargetEnterBorderColor,
       });
     });
 

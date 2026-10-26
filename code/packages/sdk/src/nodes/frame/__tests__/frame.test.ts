@@ -6,6 +6,7 @@
 import 'vitest-canvas-mock';
 import { describe, it, expect, vi, beforeAll, beforeEach } from 'vitest';
 import Konva from 'konva';
+import type { WeaveElementInstance } from '@inditextech/weave-types';
 import { WeaveFrameNode } from '../frame';
 import { GroupFrame } from '../group-frame';
 import {
@@ -437,6 +438,22 @@ describe('WeaveFrameNode', () => {
       frame.fire('onTargetEnter');
       expect(bg.fill()).toBe(WEAVE_FRAME_NODE_DEFAULT_CONFIG.onTargetEnter.fill);
       expect(bg.getAttr('onTargetEnter')).toBe(true);
+    });
+
+    it('8.2b onTargetEnter colors the visible border and onTargetLeave restores it', () => {
+      const { node } = makeNode();
+      const frame = node.onRender(defaultProps()) as GroupFrame;
+      const border = frame.findOne('#frame-id-bg-border') as Konva.Rect;
+      const original = border.stroke();
+
+      frame.fire('onTargetEnter');
+      expect(border.stroke()).toBe(
+        WEAVE_FRAME_NODE_DEFAULT_CONFIG.onTargetEnter.borderColor
+      );
+      expect(border.strokeWidth()).toBeGreaterThan(0);
+
+      frame.fire('onTargetLeave');
+      expect(border.stroke()).toBe(original);
     });
 
     it('8.3 onZoomChange listener is registered and executes without error', () => {
@@ -919,5 +936,33 @@ describe('WeaveFrameNode', () => {
       }) as unknown as { props: Record<string, unknown> };
       expect(result.props.children).toEqual([]);
     });
+  });
+});
+
+describe('WeaveFrameNode instance listeners lifecycle', () => {
+  it('does not leak Weave instance listeners across render and destroy cycles', async () => {
+    const { default: Emittery } = await import('emittery');
+    const { node, mock } = makeNode();
+    const emitter = new Emittery();
+    mock.addEventListener.mockImplementation(
+      (event: string, cb: (payload: unknown) => void) => emitter.on(event, cb)
+    );
+    mock.removeEventListener.mockImplementation(
+      (event: string, cb: (payload: unknown) => void) => emitter.off(event, cb)
+    );
+    const events = ['onZoomChange'];
+    const counts = () => events.map((e) => emitter.listenerCount(e));
+    const render = (i: number) =>
+      node.onRender(defaultProps({ id: `leak-${i}` })) as unknown as WeaveElementInstance;
+
+    const first = render(0);
+    const alive = counts();
+    for (let i = 1; i < 5; i++) {
+      node.onDestroy(render(i));
+    }
+
+    expect(counts()).toEqual(alive);
+    node.onDestroy(first);
+    expect(counts()).toEqual(events.map(() => 0));
   });
 });

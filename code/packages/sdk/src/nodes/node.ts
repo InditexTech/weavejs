@@ -48,16 +48,54 @@ const nodeInstanceListeners = new WeakMap<
   Map<string, NodeInstanceListener>
 >();
 
-const removeListenersOfKonvaNode = (node: Konva.Node): void => {
+const removeListenersOfKonvaNode = (
+  node: Konva.Node,
+  keys?: string[]
+): void => {
   const listeners = nodeInstanceListeners.get(node);
   if (!listeners) {
     return;
   }
-  for (const listener of listeners.values()) {
+  for (const [key, listener] of listeners.entries()) {
+    if (keys && !keys.includes(key)) {
+      continue;
+    }
     listener.remove();
+    listeners.delete(key);
   }
-  nodeInstanceListeners.delete(node);
+  if (listeners.size === 0) {
+    nodeInstanceListeners.delete(node);
+  }
 };
+
+/**
+ * Registers a Weave instance listener on behalf of a Konva node. The listener
+ * is replaced when the same (node, key) is registered again and removed when
+ * the node is destroyed.
+ */
+export const addNodeInstanceListener = <T>(
+  instance: Weave,
+  node: Konva.Node,
+  event: string,
+  callback: (payload: T) => void,
+  key: string = event
+): void => {
+  let listeners = nodeInstanceListeners.get(node);
+  if (!listeners) {
+    listeners = new Map();
+    nodeInstanceListeners.set(node, listeners);
+  }
+
+  listeners.get(key)?.remove();
+
+  listeners.set(key, {
+    remove: () => instance.removeEventListener(event, callback),
+  });
+  instance.addEventListener<T>(event, callback);
+};
+
+// Keys of the listeners registered by setupDefaultNodeEvents.
+const DEFAULT_NODE_LISTENER_KEYS = ['onNodesChange', 'onSelectionState'];
 
 // Konva calls destroy() on every descendant of a destroyed container, so
 // hooking it guarantees the listeners are removed even when the nodes are
@@ -453,7 +491,7 @@ export abstract class WeaveNode implements WeaveNodeBase {
     const isLocked = node.getAttrs().locked ?? false;
 
     if (isLocked) {
-      this.removeNodeInstanceListeners(node, false);
+      this.removeNodeInstanceListeners(node, false, DEFAULT_NODE_LISTENER_KEYS);
 
       node.off('transformstart');
       node.off('transform');
@@ -1206,8 +1244,8 @@ export abstract class WeaveNode implements WeaveNodeBase {
     };
   }
 
-  async onRegister(): Promise<void> {
-    return;
+  onRegister(): Promise<void> {
+    return Promise.resolve();
   }
 
   abstract initialize?(): void;
@@ -1231,35 +1269,28 @@ export abstract class WeaveNode implements WeaveNodeBase {
    * Registers a Weave instance listener on behalf of a node. Only one listener
    * is kept per node and event: registering the same event again for the same
    * node replaces the previous listener, including the ones registered by
-   * setupDefaultNodeEvents (onNodesChange, onSelectionState).
+   * setupDefaultNodeEvents (onNodesChange, onSelectionState). Pass an explicit
+   * key (defaults to the event name) to keep several listeners for the same
+   * event, or to avoid replacing the default ones.
    */
   protected setNodeInstanceListener<T>(
     node: Konva.Node,
     event: string,
-    callback: (payload: T) => void
+    callback: (payload: T) => void,
+    key: string = event
   ): void {
-    let listeners = nodeInstanceListeners.get(node);
-    if (!listeners) {
-      listeners = new Map();
-      nodeInstanceListeners.set(node, listeners);
-    }
-
-    listeners.get(event)?.remove();
-
-    const instance = this.instance;
-    listeners.set(event, {
-      remove: () => instance.removeEventListener(event, callback),
-    });
-    instance.addEventListener<T>(event, callback);
+    addNodeInstanceListener(this.instance, node, event, callback, key);
   }
 
   /**
    * Removes the listeners registered with setNodeInstanceListener for the node
-   * and, unless disabled, for its descendants.
+   * and, unless disabled, for its descendants. When keys are given only the
+   * listeners registered with those keys are removed.
    */
   protected removeNodeInstanceListeners(
     node: Konva.Node,
-    includeDescendants: boolean = true
+    includeDescendants: boolean = true,
+    keys?: string[]
   ): void {
     const nodes =
       includeDescendants && node instanceof Konva.Container
@@ -1267,7 +1298,7 @@ export abstract class WeaveNode implements WeaveNodeBase {
         : [node];
 
     for (const actNode of nodes) {
-      removeListenersOfKonvaNode(actNode);
+      removeListenersOfKonvaNode(actNode, keys);
     }
   }
 

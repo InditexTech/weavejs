@@ -1484,4 +1484,77 @@ describe('WeaveNode instance listeners lifecycle', () => {
 
     expect(listenerCounts(emitter)).toEqual([1, 1]);
   });
+
+  describe('keyed instance listeners', () => {
+    const register = (
+      node: unknown,
+      group: Konva.Node,
+      event: string,
+      cb: () => void,
+      key?: string
+    ) =>
+      (
+        node as {
+          setNodeInstanceListener: (
+            n: Konva.Node,
+            e: string,
+            c: () => void,
+            k?: string
+          ) => void;
+        }
+      ).setNodeInstanceListener(group, event, cb, key);
+
+    it('keeps listeners with different keys for the same event', () => {
+      const { node, mock } = makeNode();
+      const emitter = attachEmitter(mock);
+      const group = createGroup();
+
+      node.setupDefaultNodeEvents(group);
+      register(node, group, 'onNodesChange', () => {}, 'custom:onNodesChange');
+
+      expect(emitter.listenerCount('onNodesChange')).toBe(2);
+    });
+
+    it('replaces the listener registered with the same key', () => {
+      const { node, mock } = makeNode();
+      const emitter = attachEmitter(mock);
+      const group = createGroup();
+
+      for (let i = 0; i < 5; i++) {
+        register(node, group, 'onZoomChange', () => {});
+      }
+
+      expect(emitter.listenerCount('onZoomChange')).toBe(1);
+    });
+
+    it('keeps keyed custom listeners when the node gets locked', () => {
+      const { node, mock } = makeNode();
+      const emitter = attachEmitter(mock);
+      const group = createGroup();
+
+      node.setupDefaultNodeEvents(group);
+      register(node, group, 'onNodesChange', () => {}, 'custom:onNodesChange');
+      register(node, group, 'onZoomChange', () => {});
+      group.setAttrs({ locked: true });
+      node.setupDefaultNodeEvents(group);
+
+      expect(emitter.listenerCount('onNodesChange')).toBe(1);
+      expect(emitter.listenerCount('onSelectionState')).toBe(0);
+      expect(emitter.listenerCount('onZoomChange')).toBe(1);
+    });
+
+    it('removes keyed custom listeners when the node is destroyed', () => {
+      const { node, mock } = makeNode();
+      const emitter = attachEmitter(mock);
+      const group = createGroup();
+
+      node.setupDefaultNodeEvents(group);
+      register(node, group, 'onNodesChange', () => {}, 'custom:onNodesChange');
+      register(node, group, 'onZoomChange', () => {});
+      group.destroy();
+
+      expect(emitter.listenerCount('onNodesChange')).toBe(0);
+      expect(emitter.listenerCount('onZoomChange')).toBe(0);
+    });
+  });
 });

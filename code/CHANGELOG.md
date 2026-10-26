@@ -15,11 +15,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- [#1226](https://github.com/InditexTech/weavejs/issues/1226) Shape label: opt-in `native` label engine (`config.label.engine`) for rectangle, ellipse and polygon, using the native-canvas text engine and editor session with rich text (optional `labelBlocks` prop). The `legacy` engine stays the default
+- [#1226](https://github.com/InditexTech/weavejs/issues/1226) Shape label: use the native-canvas text engine and editor session
 - [#1225](https://github.com/InditexTech/weavejs/issues/1225) Text node: rich text formatting, enabled via node config
+- [#1224](https://github.com/InditexTech/weavejs/issues/1224) Text node: native on-canvas editing (replace DOM textarea overlay)
 
 ### Fixed
 
+- [#1215](https://github.com/InditexTech/weavejs/issues/1215) Some node types register per-render event listeners that are never removed
 - [#1214](https://github.com/InditexTech/weavejs/issues/1214) Grouping and ungrouping leak the event listeners of the moved nodes' descendants
 - [#1229](https://github.com/InditexTech/weavejs/issues/1229) Nx caches the publish and unpublish targets, so a cache hit skips the actual publish
 - [#1227](https://github.com/InditexTech/weavejs/issues/1227) Harden the SonarCloud, release preview and OSS compliance workflows
