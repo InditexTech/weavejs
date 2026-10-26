@@ -328,6 +328,10 @@ export class WeaveFrameNode extends WeaveNode {
         fill:
           frameParams.frameBackground ?? WEAVE_FRAME_DEFAULT_BACKGROUND_COLOR,
       });
+      backgroundBorder.setAttrs({
+        onTargetEnter: false,
+        stroke: borderColor,
+      });
     });
 
     frame.on(WEAVE_NODE_CUSTOM_EVENTS.onTargetEnter, () => {
@@ -336,6 +340,10 @@ export class WeaveFrameNode extends WeaveNode {
         stroke: onTargetEnterBorderColor,
         // strokeWidth: borderWidth,
         fill: onTargetEnterFill,
+      });
+      backgroundBorder.setAttrs({
+        onTargetEnter: true,
+        stroke: onTargetEnterBorderColor,
       });
     });
 

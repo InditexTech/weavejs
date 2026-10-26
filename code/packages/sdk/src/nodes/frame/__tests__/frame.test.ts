@@ -440,6 +440,22 @@ describe('WeaveFrameNode', () => {
       expect(bg.getAttr('onTargetEnter')).toBe(true);
     });
 
+    it('8.2b onTargetEnter colors the visible border and onTargetLeave restores it', () => {
+      const { node } = makeNode();
+      const frame = node.onRender(defaultProps()) as GroupFrame;
+      const border = frame.findOne('#frame-id-bg-border') as Konva.Rect;
+      const original = border.stroke();
+
+      frame.fire('onTargetEnter');
+      expect(border.stroke()).toBe(
+        WEAVE_FRAME_NODE_DEFAULT_CONFIG.onTargetEnter.borderColor
+      );
+      expect(border.strokeWidth()).toBeGreaterThan(0);
+
+      frame.fire('onTargetLeave');
+      expect(border.stroke()).toBe(original);
+    });
+
     it('8.3 onZoomChange listener is registered and executes without error', () => {
       let capturedListener: (() => void) | undefined;
       const { node, mock } = makeNode();
