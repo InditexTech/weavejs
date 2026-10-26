@@ -1,0 +1,25 @@
+openspec/specs/text-v2/editing/spec.md
+  s_8c598f55ab476e::t_71888f889f6b86 91-125
+openspec/specs/text-v2/layout/spec.md
+  s_8c598f55ab476e::t_fb97498d59e152 29,33,55-115
+openspec/specs/text-v2/model/spec.md
+  s_8c598f55ab476e::t_15984eab98632a 29,35-38,45-86
+openspec/specs/text-v2/rich-text-api/spec.md
+  s_8c598f55ab476e::t_95a75f4fb6e39e 1-66
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.6",
+  "base_commit_sha": "8a0d46728b019b3f8ed814086de2408a2a69dba9",
+  "prompts": {},
+  "sessions": {
+    "s_8c598f55ab476e": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "ses_e87a94d6fffexx7Nl5dhOe44A8",
+        "model": "claude-sonnet-5.5"
+      },
+      "human_author": "Jesus Manuel Piñeiro Cid <jesusmpc@inditex.com>"
+    }
+  }
+}
