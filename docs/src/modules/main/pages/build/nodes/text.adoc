@@ -1,5 +1,5 @@
 = Text
-:description: Draw & edit text on the canvas
+:description: Draw and edit text on the canvas
 
 image::nodes/text.png[Text on Weave.js showcase,role="zoom-in"]
 
