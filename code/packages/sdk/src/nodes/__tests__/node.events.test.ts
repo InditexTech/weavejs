@@ -1447,6 +1447,31 @@ describe('WeaveNode instance listeners lifecycle', () => {
     expect(listenerCounts(emitter)).toEqual([0, 0]);
   });
 
+  it('removes the listeners of descendants when a container is destroyed directly', () => {
+    const { node, mock } = makeNode();
+    const emitter = attachEmitter(mock);
+    const parent = createGroup({ id: 'parent' });
+    const child = createGroup({ id: 'child' });
+    parent.add(child);
+
+    node.setupDefaultNodeEvents(parent);
+    node.setupDefaultNodeEvents(child);
+    parent.destroy();
+
+    expect(listenerCounts(emitter)).toEqual([0, 0]);
+  });
+
+  it('does not throw when a node is destroyed twice', () => {
+    const { node, mock } = makeNode();
+    attachEmitter(mock);
+    const group = createGroup();
+
+    node.setupDefaultNodeEvents(group);
+    group.destroy();
+
+    expect(() => group.destroy()).not.toThrow();
+  });
+
   it('keeps the listeners of other nodes when a node is destroyed', () => {
     const { node, mock } = makeNode();
     const emitter = attachEmitter(mock);
