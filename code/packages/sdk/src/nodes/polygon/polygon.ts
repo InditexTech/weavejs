@@ -14,7 +14,13 @@ import { WEAVE_POLYGON_NODE_TYPE } from './constants';
 import type { WeaveNodesSelectionPlugin } from '@/plugins/nodes-selection/nodes-selection';
 import type { WeavePolygonNodeParams, WeavePolygonProperties, WeavePolygonPoint, WeavePolygonInnerRect } from './types';
 import { mergeExceptArrays } from '@/utils/utils';
-import { WeaveShapeLabelEditor } from '@/nodes/shared/shape-label-editor';
+import {
+  applyLabelBlocksState,
+  getShapeLabelSchemaFields,
+} from '@/nodes/shared/shape-label.utils';
+import { commitShapeLabel } from '@/nodes/shared/shape-label.edit-shared';
+import { createShapeLabelEngine } from '@/nodes/shared/shape-label.engine';
+import type { WeaveShapeLabelEngine } from '@/nodes/shared/shape-label.types';
 import {
   labelId,
   WEAVE_SHAPE_LABEL_DEFAULTS,
@@ -123,11 +129,11 @@ export class WeavePolygonNode extends WeaveNode {
   private readonly config: WeavePolygonProperties;
   protected nodeType: string = WEAVE_POLYGON_NODE_TYPE;
   initialize = undefined;
-  private _shapeLabelEditor: WeaveShapeLabelEditor | undefined;
+  private _shapeLabelEditor: WeaveShapeLabelEngine | undefined;
   private _transforming = false;
 
-  private get shapeLabelEditor(): WeaveShapeLabelEditor {
-    this._shapeLabelEditor ??= new WeaveShapeLabelEditor(this.instance);
+  private get shapeLabelEditor(): WeaveShapeLabelEngine {
+    this._shapeLabelEditor ??= createShapeLabelEngine(this.instance, this.config.label);
     return this._shapeLabelEditor;
   }
 
@@ -138,6 +144,7 @@ export class WeavePolygonNode extends WeaveNode {
 
     this.config = {
       transform: { ...config?.transform },
+      label: { ...config?.label },
     };
   }
 
@@ -248,15 +255,17 @@ export class WeavePolygonNode extends WeaveNode {
     polygon: Konva.Group,
     props: WeaveElementAttributes
   ): void {
-    const onCommit = (labelText: string) => {
-      const updatedGroup = this.instance
-        .getStage()
-        .findOne<Konva.Group>(`#${props.id}`);
-      if (!updatedGroup) return;
-      const serialized = this.serialize(updatedGroup);
-      serialized.props.labelText = labelText;
-      this.instance.updateNode(serialized);
-    };
+    const onCommit = (
+      labelText: string,
+      labelBlocks?: WeaveElementAttributes['labelBlocks']
+    ) =>
+      commitShapeLabel(
+        this.instance,
+        (g) => this.serialize(g),
+        `${props.id}`,
+        labelText,
+        labelBlocks
+      );
 
     const currentLabelTextBounds = this.getLabelTextBounds(polygon);
 
@@ -605,6 +614,9 @@ export class WeavePolygonNode extends WeaveNode {
           strokeWidth: props.strokeWidth,
         }),
         ...(props.labelText !== undefined && { labelText: props.labelText }),
+        ...(props.labelBlocks !== undefined && {
+          labelBlocks: props.labelBlocks,
+        }),
         ...(props.labelFontFamily !== undefined && {
           labelFontFamily: props.labelFontFamily,
         }),
@@ -642,7 +654,7 @@ export class WeavePolygonNode extends WeaveNode {
     prevNodeState: WeaveStateElement,
     nextProps: WeaveElementAttributes
   ): WeaveStateElement {
-    return mergeExceptArrays(prevNodeState, {
+    const next = mergeExceptArrays(prevNodeState, {
       props: {
         x: nextProps.x,
         y: nextProps.y,
@@ -659,6 +671,9 @@ export class WeavePolygonNode extends WeaveNode {
         }),
         ...(nextProps.labelText !== undefined && {
           labelText: nextProps.labelText,
+        }),
+        ...(nextProps.labelBlocks !== undefined && {
+          labelBlocks: nextProps.labelBlocks,
         }),
         ...(nextProps.labelFontFamily !== undefined && {
           labelFontFamily: nextProps.labelFontFamily,
@@ -695,6 +710,7 @@ export class WeavePolygonNode extends WeaveNode {
         }),
       },
     });
+    return applyLabelBlocksState(next, nextProps);
   }
 
   static getSchema() {
@@ -768,6 +784,7 @@ export class WeavePolygonNode extends WeaveNode {
             'Whether the polygon stroke width should scale when the node is scaled. Defaults to false.'
           ),
 
+        labelBlocks: getShapeLabelSchemaFields().labelBlocks,
         labelText: z
           .string()
           .optional()

@@ -2,6 +2,7 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
+import { createStageCoordinateMapper } from './edit/stage-coordinates';
 import Konva from 'konva';
 import merge from 'lodash/merge';
 import { z } from 'zod';
@@ -275,11 +276,29 @@ export class WeaveTextV2Node extends WeaveNode {
 
   // ---- edit mode -----------------------------------------------------------
 
+  /**
+   * Enter typed into another editor (a shape label session or any text
+   * field) must keep its default action (a new line).
+   */
+  private isEditingElsewhere(e: KeyboardEvent): boolean {
+    const sessions = (window as Window & {
+      weaveTextEditing?: Record<string, string>;
+    }).weaveTextEditing;
+    if (sessions && Object.keys(sessions).length > 0) return true;
+    const t = e.target;
+    return (
+      t instanceof HTMLTextAreaElement ||
+      t instanceof HTMLInputElement ||
+      (t instanceof HTMLElement && t.isContentEditable)
+    );
+  }
+
   private readonly handleKeyPress = (e: KeyboardEvent) => {
     if (
       e.code !== 'Enter' ||
       this.instance.getActiveAction() !== SELECTION_TOOL_ACTION_NAME ||
-      this.editing
+      this.editing ||
+      this.isEditingElsewhere(e)
     ) {
       return;
     }
@@ -363,25 +382,13 @@ export class WeaveTextV2Node extends WeaveNode {
 
     const stage = this.instance.getStage();
     const container = stage.container();
-    const rect = () => container.getBoundingClientRect();
 
     this.session = new TextEditSession(
       this.editTarget(shape),
       {
         utilityLayer: this.instance.getUtilityLayer(),
         container,
-        clientToStage: (cx, cy) => {
-          const r = rect();
-          const sx = r.width ? stage.width() / r.width : 1;
-          const sy = r.height ? stage.height() / r.height : 1;
-          return { x: (cx - r.left) * sx, y: (cy - r.top) * sy };
-        },
-        stageToContainer: (p) => {
-          const r = rect();
-          const sx = r.width ? r.width / stage.width() : 1;
-          const sy = r.height ? r.height / stage.height() : 1;
-          return { x: p.x * sx, y: p.y * sy };
-        },
+        ...createStageCoordinateMapper(stage),
         revealCaret: (p) => {
           const box = container;
           const w = box.clientWidth;

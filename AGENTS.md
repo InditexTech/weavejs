@@ -119,3 +119,6 @@ npx skills@latest add InditexTech/docouture --all
 | sdk:api-reference/nodes/text-v2.adoc | `code/packages/sdk/src/nodes/text-v2/*` | updated for unreleased changes |
 | main:build/actions/text-tool.adoc | `code/packages/sdk/src/actions/text-tool/text-tool.ts` | updated for unreleased changes |
 | sdk:api-reference/actions/text-tool.adoc | `code/packages/sdk/src/actions/text-tool/text-tool.ts` | updated for unreleased changes |
+| sdk:api-reference/nodes/rectangle.adoc | `code/packages/sdk/src/nodes/rectangle/types.ts`, `code/packages/sdk/src/nodes/shared/shape-label*.ts` | updated for unreleased changes |
+| sdk:api-reference/nodes/ellipse.adoc | `code/packages/sdk/src/nodes/ellipse/types.ts`, `code/packages/sdk/src/nodes/shared/shape-label*.ts` | updated for unreleased changes |
+| sdk:api-reference/nodes/polygon.adoc | `code/packages/sdk/src/nodes/polygon/types.ts`, `code/packages/sdk/src/nodes/shared/shape-label*.ts` | updated for unreleased changes |
