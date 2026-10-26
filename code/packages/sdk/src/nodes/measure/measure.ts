@@ -312,6 +312,10 @@ export class WeaveMeasureNode extends WeaveNode {
       }
     );
 
+    measure.canBeHovered = function () {
+      return false;
+    };
+
     measure.allowedAnchors = function () {
       return [];
     };
@@ -363,6 +367,7 @@ export class WeaveMeasureNode extends WeaveNode {
 
     const moveFromCircle = new Konva.Circle({
       id: `moveFromCircle-${props.id}`,
+      ownsDrag: true,
       edgeDistanceDisableOnDrag: true,
       edgeSnappingDisableOnDrag: true,
       x: fromPoint.x,
@@ -383,6 +388,7 @@ export class WeaveMeasureNode extends WeaveNode {
 
     const moveToCircle = new Konva.Circle({
       id: `moveToCircle-${props.id}`,
+      ownsDrag: true,
       edgeDistanceDisableOnDrag: true,
       edgeSnappingDisableOnDrag: true,
       x: toPoint.x,
@@ -438,6 +444,7 @@ export class WeaveMeasureNode extends WeaveNode {
 
     const moveSeparationRect = new Konva.Rect({
       id: `moveSeparationRect-${props.id}`,
+      ownsDrag: true,
       edgeDistanceDisableOnDrag: true,
       edgeSnappingDisableOnDrag: true,
       x: separatorPoint.left.x,

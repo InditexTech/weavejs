@@ -202,6 +202,16 @@ export function handleClickOrTap(
       nodeTargeted.draggable(true);
       ctx.armDrag(nodeTargeted, e.evt.pointerId);
 
+      // handleBehaviors is skipped on this path, so apply the node's border
+      // preference here (e.g. measure has no border, anchors or rotater).
+      const nodeTrProps = nodeTargeted.getTransformerProperties?.() ?? {};
+      const nodeAnchors = nodeTargeted.allowedAnchors?.();
+      tr.setAttrs({
+        ...nodeTrProps,
+        ...(nodeAnchors ? { enabledAnchors: nodeAnchors } : {}),
+        ...(nodeAnchors?.length === 0 ? { resizeEnabled: false } : {}),
+      });
+
       // A plain click still just selects, so emit onNodesChange now instead of
       // waiting for a drag to start. We intentionally skip handleBehaviors here
       // to avoid clearing the transformer's `listening` state during the
