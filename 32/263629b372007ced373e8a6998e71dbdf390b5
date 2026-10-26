@@ -1,0 +1,109 @@
+AGENTS.md
+  s_3fab6e7905a2e1::t_385b643a54868a 118-119
+code/CHANGELOG.md
+  s_3fab6e7905a2e1::t_12d5197031aff6 18
+code/packages/sdk/src/__tests__/backend.failure.test.ts
+  s_3fab6e7905a2e1::t_f5efdb7e066564 1-38
+code/packages/sdk/src/backend.ts
+  s_3fab6e7905a2e1::t_6c4a13d07b00c1 14,23
+code/packages/sdk/src/index.common.ts
+  s_3fab6e7905a2e1::t_da6ebf598ce8c4 59-64
+code/packages/sdk/src/nodes/text-v2/__tests__/bench.test.ts
+  s_3fab6e7905a2e1::t_d5d521b9dcb5aa 1-170
+code/packages/sdk/src/nodes/text-v2/__tests__/edit-model.test.ts
+  s_3fab6e7905a2e1::t_bdebecd10e8807 1-155
+code/packages/sdk/src/nodes/text-v2/__tests__/edit-session.test.ts
+  s_3fab6e7905a2e1::t_bc7a57a8a29710 1-365
+code/packages/sdk/src/nodes/text-v2/__tests__/layout.test.ts
+  s_3fab6e7905a2e1::t_c0fcac14cb2a05 1-171
+code/packages/sdk/src/nodes/text-v2/__tests__/model.test.ts
+  s_3fab6e7905a2e1::t_851c8178b296c3 1-60
+code/packages/sdk/src/nodes/text-v2/__tests__/server-skia.test.ts
+  s_3fab6e7905a2e1::t_60f9655c0c54be 1-83
+code/packages/sdk/src/nodes/text-v2/__tests__/server.test.ts
+  s_3fab6e7905a2e1::t_5b9c5f4cd8ac67 1-37
+code/packages/sdk/src/nodes/text-v2/__tests__/shape.test.ts
+  s_3fab6e7905a2e1::t_115abe5fb18a56 1-184
+code/packages/sdk/src/nodes/text-v2/__tests__/text-v2-edit.test.ts
+  s_3fab6e7905a2e1::t_03ccfafea11bd1 1-380
+code/packages/sdk/src/nodes/text-v2/__tests__/text-v2.test.ts
+  s_3fab6e7905a2e1::t_4fcaa536056760 1-336
+code/packages/sdk/src/nodes/text-v2/constants.ts
+  s_3fab6e7905a2e1::t_a72870d4a008b2 1-19
+code/packages/sdk/src/nodes/text-v2/edit/geometry.ts
+  s_3fab6e7905a2e1::t_4a6ac6557f1a56 1-227
+code/packages/sdk/src/nodes/text-v2/edit/model.ts
+  s_3fab6e7905a2e1::t_03b81b5e0779f6 1-182
+code/packages/sdk/src/nodes/text-v2/edit/session.ts
+  s_3fab6e7905a2e1::t_3559d16fbfd560 1-640
+code/packages/sdk/src/nodes/text-v2/index.ts
+  s_3fab6e7905a2e1::t_15e4ae0623a280 1-22
+code/packages/sdk/src/nodes/text-v2/layout/engine.ts
+  s_3fab6e7905a2e1::t_9a9e3cc91e70ca 1-549
+code/packages/sdk/src/nodes/text-v2/model.ts
+  s_3fab6e7905a2e1::t_21a7a108c1b7f8 1-179
+code/packages/sdk/src/nodes/text-v2/shape.ts
+  s_3fab6e7905a2e1::t_a1557331eb0b50 1-485
+code/packages/sdk/src/nodes/text-v2/text-v2.ts
+  s_3fab6e7905a2e1::t_31366168e9e3f2 1-784
+code/packages/sdk/src/nodes/text-v2/types.ts
+  s_3fab6e7905a2e1::t_42173a4fe035a8 1-50
+docs/src/modules/main/nav.adoc
+  s_3fab6e7905a2e1::t_0bcee4c0f29f9a 32
+docs/src/modules/main/pages/build/actions/text-tool.adoc
+  s_3fab6e7905a2e1::t_72ae364f5a890d 20
+docs/src/modules/main/pages/build/nodes/index.adoc
+  s_3fab6e7905a2e1::t_b9847f48f254d1 76-79
+docs/src/modules/main/pages/build/nodes/text-v2.adoc
+  s_3fab6e7905a2e1::t_5612d0c32d9ac7 1-73
+docs/src/modules/main/pages/build/nodes/text.adoc
+  s_3fab6e7905a2e1::t_e1ab0691e0a1ba 55-59
+docs/src/modules/sdk/nav.adoc
+  s_3fab6e7905a2e1::t_854beceb7a4a42 24
+docs/src/modules/sdk/pages/api-reference/actions/text-tool.adoc
+  s_3fab6e7905a2e1::t_e71f7269227c55 12-14
+docs/src/modules/sdk/pages/api-reference/nodes/index.adoc
+  s_3fab6e7905a2e1::t_8a77353bf9a96e 84-87
+docs/src/modules/sdk/pages/api-reference/nodes/text-v2.adoc
+  s_3fab6e7905a2e1::t_e47df967eb2f87 1-156
+docs/src/modules/sdk/pages/api-reference/nodes/text.adoc
+  s_3fab6e7905a2e1::t_d1001941a50ad8 202-207
+docs/src/modules/sdk/pages/index.adoc
+  s_3fab6e7905a2e1::t_2853682e870371 105
+openspec/changes/archive/2026-10-22-text-node-native-editing/.openspec.yaml
+  s_3fab6e7905a2e1::t_0172effe4dcfe4 1-2
+openspec/changes/archive/2026-10-22-text-node-native-editing/design.md
+  s_3fab6e7905a2e1::t_d69535034b3c3c 1-52
+openspec/changes/archive/2026-10-22-text-node-native-editing/proposal.md
+  s_3fab6e7905a2e1::t_e8bf287a281f8e 1-34
+openspec/changes/archive/2026-10-22-text-node-native-editing/specs/text-v2/editing/spec.md
+  s_3fab6e7905a2e1::t_427c1d91bedc2b 1-86
+openspec/changes/archive/2026-10-22-text-node-native-editing/specs/text-v2/layout/spec.md
+  s_3fab6e7905a2e1::t_d93851e9c9d40a 1-50
+openspec/changes/archive/2026-10-22-text-node-native-editing/specs/text-v2/model/spec.md
+  s_3fab6e7905a2e1::t_6674069be08125 1-36
+openspec/changes/archive/2026-10-22-text-node-native-editing/tasks.md
+  s_3fab6e7905a2e1::t_d2519fa108f427 1-57
+openspec/specs/text-v2/editing/spec.md
+  s_3fab6e7905a2e1::t_beecc6c8753dac 1-90
+openspec/specs/text-v2/layout/spec.md
+  s_3fab6e7905a2e1::t_857b19cbbf4e89 1-54
+openspec/specs/text-v2/model/spec.md
+  s_3fab6e7905a2e1::t_87e96137fb16a4 1-40
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.6",
+  "base_commit_sha": "32263629b372007ced373e8a6998e71dbdf390b5",
+  "prompts": {},
+  "sessions": {
+    "s_3fab6e7905a2e1": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "ses_e87b7fe91ffeKIR13PwYJcEFBA",
+        "model": "claude-sonnet-5.5"
+      },
+      "human_author": "Jesus Manuel Piñeiro Cid <jesusmpc@inditex.com>"
+    }
+  }
+}
