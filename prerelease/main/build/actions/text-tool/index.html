@@ -1389,6 +1389,21 @@ across all connected users in real time.</p>
 </div>
 </div>
 <div class="sect2">
+<h3 id="plain-and-rich-text-tools"><a class="anchor" href="#plain-and-rich-text-tools"></a>Plain and rich text tools</h3>
+<div class="paragraph">
+<p>With <a href="../../nodes/text-v2/" class="xref page">Text (native editing)</a> you can register a second tool whose
+nodes have rich text enabled. Give it another name and the <code>richText</code> prop:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="shiki highlight"><code data-lang="ts"><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4;--shiki-light-bg:#1E1E1E;--shiki-dark-bg:#1E1E1E"><span class="line"><span style="--shiki-light:#569CD6;--shiki-dark:#569CD6">new</span><span style="--shiki-light:#DCDCAA;--shiki-dark:#DCDCAA"> WeaveTextToolAction</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">({ </span><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">name:</span><span style="--shiki-light:#CE9178;--shiki-dark:#CE9178"> "richTextTool"</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">, </span><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">props:</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4"> { </span><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">richText:</span><span style="--shiki-light:#569CD6;--shiki-dark:#569CD6"> true</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4"> } })</span></span></span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Trigger it with <code>instance.triggerAction("richTextTool")</code>.</p>
+</div>
+</div>
+<div class="sect2">
 <h3 id="setup-the-action-trigger"><a class="anchor" href="#setup-the-action-trigger"></a>Setup the action trigger</h3>
 <div class="paragraph">
 <p>Setup on a button or any element on the UI the user can interact with on the action event:</p>

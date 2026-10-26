@@ -1376,6 +1376,9 @@ directly on the canvas, so the text looks the same while editing and while idle,
 you just created starts with the caret.</p>
 </li>
 <li>
+<p>The mouse pointer is a text cursor (I-beam) over the text box while editing, and the default one outside it.</p>
+</li>
+<li>
 <p>An outline of the text box is drawn while editing. It is especially useful when the width or the
 height are fixed.</p>
 </li>
@@ -1389,7 +1392,17 @@ canvas history. Leaving edit mode (<kbd>Esc</kbd> or clicking outside) saves eve
 step.</p>
 </li>
 <li>
-<p>Copy and paste use plain text.</p>
+<p>Copy and paste use plain text; pasted text takes the formatting at the caret.</p>
+</li>
+<li>
+<p>The canvas pans to follow the caret when you type past the edge of the view. Configure the margin
+with <code>edition.followPadding</code> (default 40 px per side), for example to keep the caret clear of your
+toolbars.</p>
+</li>
+<li>
+<p>To build a formatting toolbar that keeps the editor open, add the attribute
+<code>data-weave-text-edit-keep</code> to the toolbar element (and to any portaled popup it opens). Clicks on it
+then no longer end editing and rich text commands apply to the current selection.</p>
 </li>
 </ul>
 </div>
@@ -1420,6 +1433,145 @@ step.</p>
 </td>
 </tr>
 </table>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="rich-text"><a class="anchor" href="#rich-text"></a>Rich text</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Turn on formatting per selection (bold, italic, underline, strikethrough, colour, size, line height, font
+family and links), per-paragraph alignment and bulleted or numbered lists with nesting:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="shiki highlight"><code data-lang="ts"><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4;--shiki-light-bg:#1E1E1E;--shiki-dark-bg:#1E1E1E"><span class="line"><span style="--shiki-light:#569CD6;--shiki-dark:#569CD6">new</span><span style="--shiki-light:#DCDCAA;--shiki-dark:#DCDCAA"> WeaveTextV2Node</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">({</span></span>
+<span class="line"><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">  config:</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4"> { </span><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">richText:</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4"> { </span><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">enabled:</span><span style="--shiki-light:#569CD6;--shiki-dark:#569CD6"> true</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">, </span><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">indentStep:</span><span style="--shiki-light:#B5CEA8;--shiki-dark:#B5CEA8"> 1.5</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4"> } },</span></span>
+<span class="line"><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">});</span></span></span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>While editing, <kbd>Ctrl</kbd>/<kbd>Cmd</kbd> + <kbd>B</kbd>, <kbd>I</kbd> and <kbd>U</kbd> work, <kbd>Enter</kbd> continues a list
+and <kbd>Tab</kbd> / <kbd>Shift</kbd>+<kbd>Tab</kbd> change its depth. The toolbar is yours: call the node
+commands (for example from a modal; <code>setRunLink</code> adds a URL to a range) and listen to <code>onTextSelectionChange</code> and <code>onTextFormatChange</code>.
+Formatting survives move, resize, copy, duplicate, undo and image export.</p>
+</div>
+<div class="paragraph">
+<p>Rich text is decided per node (the <code>richText</code> attribute); <code>richText.enabled</code> is only the default for
+nodes without it. To offer a plain and a rich Text Tool, see <a href="../../actions/text-tool/" class="xref page">Text Tool</a>.</p>
+</div>
+<div class="paragraph">
+<p>Per-paragraph alignment (<code>setAlign</code>), per-selection line height and links per range (<code>setRunLink</code>) are
+also commands. On a server render (skia-canvas or node-canvas) italic text in fonts without an italic
+file is slanted like in the browser; see the reference.</p>
+</div>
+<div class="paragraph">
+<p>Lists and marks already in a document render for everyone, even when rich text is off.</p>
+</div>
+<div class="paragraph">
+<p>See <a href="../../../../sdk/api-reference/nodes/text-v2/#_rich_text" class="xref page">the reference</a> for the commands.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="plain-and-rich-text-nodes-together"><a class="anchor" href="#plain-and-rich-text-nodes-together"></a>Plain and rich text nodes together</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>You do not have to choose one or the other. A single registered <code class="dt-mono">WeaveTextV2Node</code> handles both,
+because whether a node is rich is a property of the node (the boolean attribute <code>richText</code>), not of
+the handler. Both kinds use the same <code>text</code> node type, live in the same document and can sit side by
+side on the same canvas.</p>
+</div>
+<div class="tableblock-wrap"><div class="tablecontainer"><table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 20%;">
+<col style="width: 40%;">
+<col style="width: 40%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top"></th>
+<th class="tableblock halign-left valign-top">Plain node</th>
+<th class="tableblock halign-left valign-top">Rich node</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>richText</code> attribute</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">absent or <code>false</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>true</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Formatting commands, shortcuts and list key rules</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">off</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">on</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Whole-node style (font, size, colour, alignment)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">yes</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">yes</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Marks, lists and links already in the document</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">rendered</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">rendered</p></td>
+</tr>
+</tbody>
+</table></div></div>
+<div class="paragraph">
+<p>The simplest way to offer both is two Text Tools. Register the node once and the action twice, with
+different names, and give the second one the <code>richText</code> prop:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="shiki highlight"><code data-lang="ts"><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4;--shiki-light-bg:#1E1E1E;--shiki-dark-bg:#1E1E1E"><span class="line"><span style="--shiki-light:#569CD6;--shiki-dark:#569CD6">const</span><span style="--shiki-light:#4FC1FF;--shiki-dark:#4FC1FF"> instance</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4"> = </span><span style="--shiki-light:#569CD6;--shiki-dark:#569CD6">new</span><span style="--shiki-light:#DCDCAA;--shiki-dark:#DCDCAA"> Weave</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">({</span></span>
+<span class="line"><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">  ...</span></span>
+<span class="line"><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">  nodes</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">: [..., </span><span style="--shiki-light:#569CD6;--shiki-dark:#569CD6">new</span><span style="--shiki-light:#DCDCAA;--shiki-dark:#DCDCAA"> WeaveTextV2Node</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">()],</span></span>
+<span class="line"><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">  actions:</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4"> [</span></span>
+<span class="line"><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">    ...,</span></span>
+<span class="line"><span style="--shiki-light:#569CD6;--shiki-dark:#569CD6">    new</span><span style="--shiki-light:#DCDCAA;--shiki-dark:#DCDCAA"> WeaveTextToolAction</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">(), </span></span><i class="conum" data-value="1"></i><b>(1)</b>
+<span class="line"><span style="--shiki-light:#569CD6;--shiki-dark:#569CD6">    new</span><span style="--shiki-light:#DCDCAA;--shiki-dark:#DCDCAA"> WeaveTextToolAction</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">({ </span><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">name:</span><span style="--shiki-light:#CE9178;--shiki-dark:#CE9178"> "richTextTool"</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">, </span><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">props:</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4"> { </span><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">richText:</span><span style="--shiki-light:#569CD6;--shiki-dark:#569CD6"> true</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4"> } }), </span></span><i class="conum" data-value="2"></i><b>(2)</b>
+<span class="line"><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">  ],</span></span>
+<span class="line"><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">});</span></span>
+<span class="line"></span>
+<span class="line"><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">instance</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">.</span><span style="--shiki-light:#DCDCAA;--shiki-dark:#DCDCAA">triggerAction</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">(</span><span style="--shiki-light:#CE9178;--shiki-dark:#CE9178">"textTool"</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">);     </span><span style="--shiki-light:#6A9955;--shiki-dark:#6A9955">// creates a plain node</span></span>
+<span class="line"><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">instance</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">.</span><span style="--shiki-light:#DCDCAA;--shiki-dark:#DCDCAA">triggerAction</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">(</span><span style="--shiki-light:#CE9178;--shiki-dark:#CE9178">"richTextTool"</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">); </span><span style="--shiki-light:#6A9955;--shiki-dark:#6A9955">// creates a rich node</span></span></span></code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>The existing tool: plain nodes.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>A second tool whose nodes are created with <code>richText: true</code>.</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>Notes:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>config.richText.enabled</code> is only the default for nodes that have no <code>richText</code> attribute, such as
+documents created before this feature. Leave it <code>false</code> if you want plain nodes by default.</p>
+</li>
+<li>
+<p>Your toolbar can read <code>handler.isRich(node)</code> to show formatting controls only for rich nodes. On a
+plain node every formatting command returns <code>false</code> and does nothing.</p>
+</li>
+<li>
+<p>Switching a node&#8217;s <code>richText</code> to <code>false</code> does not remove its formatting: marks and lists stay and
+still render, only the commands go away. Switching it to <code>true</code> makes an existing plain node
+editable with the formatting commands.</p>
+</li>
+<li>
+<p><code>richText.indentStep</code> is read by the handler, not the node, so use the same value on every client.</p>
+</li>
+</ul>
 </div>
 </div>
 </div>

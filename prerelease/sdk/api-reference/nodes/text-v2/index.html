@@ -1165,7 +1165,7 @@ instead of a DOM textarea overlay. It is a drop-in replacement for
 </div>
 <div class="paragraph">
 <p>Built on a <code class="dt-mono">Konva.Shape</code> with its own layout engine, it keeps the editing and idle appearance
-identical, and is the foundation for rich text.</p>
+identical, and supports opt-in rich text.</p>
 </div>
 <div class="paragraph">
 <p>The class extends the <a href="../node/" class="xref page">WeaveNode</a> class</p>
@@ -1252,7 +1252,22 @@ unchanged. While editing, keydown does not propagate to the page, so app-level u
 <code>window.weaveTextEditing</code> holds the editing node id.</p>
 </li>
 <li>
+<p>The pointer is a text cursor (I-beam) over the text box while editing and the default cursor
+outside it, also while dragging a selection. Elements with <code class="dt-mono">data-weave-text-edit-keep</code> and touch
+pointers keep their own cursor. It is restored when the session ends.</p>
+</li>
+<li>
 <p>Clipboard is plain text only. Large pastes are laid out in time slices.</p>
+</li>
+<li>
+<p>While editing, the stage pans to keep the caret in view; the margin is <code class="dt-mono">edition.followPadding</code>.</p>
+</li>
+<li>
+<p>A pointer press inside an element with the attribute <code class="dt-mono">data-weave-text-edit-keep</code> does not end
+the edit session, so an app toolbar or sidebar can apply formatting commands to the live selection.
+Mouse-down on such an element keeps focus on the editor, except on form fields (<code>input</code>,
+<code>textarea</code>, <code>select</code>, <code>contenteditable</code>), which take focus normally. Portaled popups (for example a
+font picker) need the attribute too.</p>
 </li>
 <li>
 <p>All four layouts (<code>smart</code>, <code>auto-all</code>, <code>auto-height</code>, <code>fixed</code>) keep their behavior. Auto-sized
@@ -1274,8 +1289,139 @@ stays as a derived mirror. A node without <code>blocks</code> is synthesized fro
 rewriting the document; a whole-text <code>link</code> becomes a full-range <code>link</code> mark.</p>
 </div>
 <div class="paragraph">
-<p>Marks already present in a document are preserved when the text is edited, but they are not
-rendered yet and cannot be created from the editor: rich formatting is out of scope for now.</p>
+<p>Marks are <code>bold</code>, <code>italic</code>, <code>underline</code>, <code>strike</code>, <code>color</code>, <code>size</code> and <code>family</code> <code>lineHeight</code> (a multiplier of the run font size, clamped to 0.5 to 4) and <code>link</code> (a per-run URL). <code>size</code> is a ratio of the node <code>fontSize</code>, so resizing the node
+or calling <code class="dt-mono">setBaseFontSize</code> scales every run. Blocks may carry <code>kind</code> (<code>ul</code> or <code>ol</code>), <code>depth</code>
+and <code>start</code> to form lists, and <code>align</code> (<code>left</code>, <code>center</code> or <code>right</code>) for the paragraph. Documents without marks and lists are byte-identical to before.</p>
+</div>
+<div class="paragraph">
+<p>Marks and lists already present in a document always render and are preserved when the text is
+edited, whatever <code>richText.enabled</code> is, so every client shows the same document.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="rich-text"><a class="anchor" href="#rich-text"></a>Rich text</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Rich text is switched on <strong>per node</strong> with the boolean attribute <code class="dt-mono">richText</code>. Nodes without the
+attribute follow <code class="dt-mono">config.richText.enabled</code> (default <code>false</code>), so you can offer a plain and a rich
+text tool in the same app (see <a href="../../actions/text-tool/" class="xref page">WeaveTextToolAction</a>).
+Turning it off for a node only removes the commands: marks and lists already in it still render. The toolbar is yours: the node only
+exposes commands, a format query and events.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="shiki highlight"><code data-lang="ts"><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4;--shiki-light-bg:#1E1E1E;--shiki-dark-bg:#1E1E1E"><span class="line"><span style="--shiki-light:#569CD6;--shiki-dark:#569CD6">const</span><span style="--shiki-light:#4FC1FF;--shiki-dark:#4FC1FF"> handler</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4"> = </span><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">instance</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">.</span><span style="--shiki-light:#DCDCAA;--shiki-dark:#DCDCAA">getNodeHandler</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">&#x3C;</span><span style="--shiki-light:#4EC9B0;--shiki-dark:#4EC9B0">WeaveTextV2Node</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">>(</span><span style="--shiki-light:#CE9178;--shiki-dark:#CE9178">"text"</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">);</span></span>
+<span class="line"></span>
+<span class="line"><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">handler</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">.</span><span style="--shiki-light:#DCDCAA;--shiki-dark:#DCDCAA">toggleMark</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">(</span><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">node</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">, </span><span style="--shiki-light:#CE9178;--shiki-dark:#CE9178">"bold"</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">);                       </span><span style="--shiki-light:#6A9955;--shiki-dark:#6A9955">// whole text, or the editor selection</span></span>
+<span class="line"><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">handler</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">.</span><span style="--shiki-light:#DCDCAA;--shiki-dark:#DCDCAA">applyMark</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">(</span><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">node</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">, </span><span style="--shiki-light:#CE9178;--shiki-dark:#CE9178">"color"</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">, </span><span style="--shiki-light:#CE9178;--shiki-dark:#CE9178">"#ff0000"</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">, { </span><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">start:</span><span style="--shiki-light:#B5CEA8;--shiki-dark:#B5CEA8"> 0</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">, </span><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">end:</span><span style="--shiki-light:#B5CEA8;--shiki-dark:#B5CEA8"> 5</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4"> });</span></span>
+<span class="line"><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">handler</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">.</span><span style="--shiki-light:#DCDCAA;--shiki-dark:#DCDCAA">applyMark</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">(</span><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">node</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">, </span><span style="--shiki-light:#CE9178;--shiki-dark:#CE9178">"size"</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">, </span><span style="--shiki-light:#B5CEA8;--shiki-dark:#B5CEA8">24</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">);                    </span><span style="--shiki-light:#6A9955;--shiki-dark:#6A9955">// px</span></span>
+<span class="line"><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">handler</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">.</span><span style="--shiki-light:#DCDCAA;--shiki-dark:#DCDCAA">toggleList</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">(</span><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">node</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">, </span><span style="--shiki-light:#CE9178;--shiki-dark:#CE9178">"ul"</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">);</span></span>
+<span class="line"><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">handler</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">.</span><span style="--shiki-light:#DCDCAA;--shiki-dark:#DCDCAA">indent</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">(</span><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">node</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">);</span></span>
+<span class="line"><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">handler</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">.</span><span style="--shiki-light:#DCDCAA;--shiki-dark:#DCDCAA">setBaseFontSize</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">(</span><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">node</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">, </span><span style="--shiki-light:#B5CEA8;--shiki-dark:#B5CEA8">32</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">);                      </span><span style="--shiki-light:#6A9955;--shiki-dark:#6A9955">// scales every run</span></span>
+<span class="line"><span style="--shiki-light:#569CD6;--shiki-dark:#569CD6">const</span><span style="--shiki-light:#4FC1FF;--shiki-dark:#4FC1FF"> format</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4"> = </span><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">handler</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">.</span><span style="--shiki-light:#DCDCAA;--shiki-dark:#DCDCAA">getSelectionFormat</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">(</span><span style="--shiki-light:#9CDCFE;--shiki-dark:#9CDCFE">node</span><span style="--shiki-light:#D4D4D4;--shiki-dark:#D4D4D4">);</span></span></span></code></pre>
+</div>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>While the node is being edited the commands act on the editor selection (the <code>range</code> argument is
+ignored) and each one is a single session-undo entry. At a collapsed caret, mark commands set the
+marks of the next typed text.</p>
+</li>
+<li>
+<p>On a selected node that is not being edited they act on <code>range</code> (UTF-16 offsets into <code>text</code>,
+default: the whole text) and are one <code class="dt-mono">updateNode</code>, so one Weave undo step. This lets an
+application edit text from a modal.</p>
+</li>
+<li>
+<p>When rich text is off for the node every command returns <code>false</code> and does nothing. <code class="dt-mono">isRich(node)</code>
+reports it, so a toolbar can show or hide itself. <code class="dt-mono">isRichTextEnabled()</code> without arguments returns
+the handler default (<code>config.richText.enabled</code>).</p>
+</li>
+</ul>
+</div>
+<div class="tableblock-wrap"><div class="tablecontainer"><table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 25%;">
+<col style="width: 75%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Method</th>
+<th class="tableblock halign-left valign-top">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code class="dt-mono">applyMark(node</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Set a mark (<code>undefined</code> clears it). <code>size</code> is in px and stored as a ratio.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code class="dt-mono">toggleMark(node</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Toggle a boolean mark (<code>bold</code>, <code>italic</code>, <code>underline</code>, <code>strike</code>): off when the whole range has it.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code class="dt-mono">setAlign(node</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Align every paragraph the range touches (<code>undefined</code> goes back to the node <code>align</code>). Alignment is per
+paragraph, never per line.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code class="dt-mono">toggleList(node</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Toggle <code>ul</code> / <code>ol</code> on the blocks of the range.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code class="dt-mono">indent(node</code> / <code class="dt-mono">outdent(node</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Change list depth. Outdent at depth 0 removes the list marker.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code class="dt-mono">setRunLink(node</code> / <code class="dt-mono">removeRunLink(node</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Link a range to an absolute http(s) URL (others return <code>false</code>), or remove it. Same as
+<code class="dt-mono">applyMark</code> with <code>link</code>.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code class="dt-mono">setBaseFontSize(node</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Set the node <code>fontSize</code>. Event reason <code>base-size</code>.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code class="dt-mono">getSelectionFormat(node</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Per mark (including <code>lineHeight</code> and <code>align</code>) `{ state: 'all'</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">'none'</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">'some', value? }`, <code>size</code> in px, and <code>list: { kind, depth? }</code>.</p></td>
+</tr>
+</tbody>
+</table></div></div>
+<div class="paragraph">
+<p>When editing with rich text enabled: <kbd>Ctrl</kbd>/<kbd>Cmd</kbd> + <kbd>B</kbd>, <kbd>I</kbd>, <kbd>U</kbd> toggle marks;
+<kbd>Enter</kbd> continues a list item (and the formatting of the text before it) and exits on an empty one; <kbd>Backspace</kbd> at the start of an item
+outdents it or removes the marker; <kbd>Tab</kbd> / <kbd>Shift</kbd>+<kbd>Tab</kbd> change the depth. Pasting inserts
+plain text with the marks at the caret. With it disabled, <kbd>Enter</kbd> in a list item still creates
+an item with the same <code>kind</code> and <code>depth</code>.</p>
+</div>
+<div class="paragraph">
+<p>Link runs are drawn with <code>link.defaultColor</code> and an underline; the hovered run uses <code>link.hoverColor</code>
+and the cursor becomes a pointer only over the run. <kbd>Ctrl</kbd>/<kbd>Cmd</kbd> + click opens it, as does a
+click on an already-selected node. Only http(s) URLs render and open. A node-level <code>link</code> (see
+<a href="../text/#hyperlinks" class="xref page">Hyperlinks</a>) takes precedence. Links render
+whatever <code>richText.enabled</code> is; creating and removing them is a command.</p>
+</div>
+<div class="paragraph">
+<p>A line is as tall as its tallest run: the <code>lineHeight</code> mark of a run, or the node <code>lineHeight</code>,
+times the run font size. Only the lines that contain the marked text change height, and a smaller
+value next to a taller run on the same line has no visible effect. Empty paragraphs use the node
+<code>lineHeight</code>. The node <code>align</code> and <code>lineHeight</code> are defaults: changing them does not clear paragraph
+or run values. Vertical alignment (<code>verticalAlign</code>) stays a setting of the whole node.</p>
+</div>
+<div class="paragraph">
+<p>Lists show markers in a gutter (<code>disc</code>, <code>circle</code>, <code>square</code>; <code>1.</code>, <code>a.</code>, <code>i.</code> by depth). Numbering is
+continuous across consecutive same-depth items and restarts after a plain paragraph or a shallower
+item; <code>start</code> sets the first number. Markers are not part of <code>text</code>.</p>
+</div>
+<div class="paragraph">
+<p>Images export with the formatting. Exporting to PDF rasterizes each frame, so it follows the image.
+Register every font family you use in runs on the server as well.</p>
 </div>
 </div>
 </div>
@@ -1367,6 +1513,24 @@ size. Passing it is a type error. Use <code class="dt-mono">edition.outline</cod
 <td class="tableblock halign-left valign-top"><p class="tableblock">Gap between the text box and the outline, in screen pixels.</p></td>
 </tr>
 <tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code class="dt-mono">edition.followPadding</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>{ top: 40, right: 40, bottom: 40, left: 40 }</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">While editing, the stage pans to keep the caret inside the container. This is the margin kept
+between the caret and each edge, in screen pixels. Raise a side when app UI (toolbars, sidebars)
+covers that edge.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code class="dt-mono">richText.enabled</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>false</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Default for nodes without a <code>richText</code> attribute: formatting commands, shortcuts and list key rules.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code class="dt-mono">richText.indentStep</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>1.5</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">List indent per depth, as a multiple of <code>fontSize</code>. The total indent is limited so at least 4 times
+<code>fontSize</code> stays for text in fixed-width nodes. Must be the same on every client.</p></td>
+</tr>
+<tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code class="dt-mono">sizeWarning.threshold</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>200000</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Serialized size of <code>blocks</code> (characters) above which the <code class="dt-mono">onTextSizeWarning</code> event is emitted.
@@ -1404,6 +1568,21 @@ Content is never truncated.</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">An edit session ended and its content was committed.</p></td>
 </tr>
 <tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code class="dt-mono">onTextSelectionChange</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>{ node, start, end, format }</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The selection, caret or content changed while editing (throttled).</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code class="dt-mono">onTextFormatChange</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">`+{ node, format, reason: 'command'</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">'undo'</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">'redo'</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">'base-size' }+`</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">A format command, undo, redo or base size change ran.</p></td>
+</tr>
+<tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code class="dt-mono">onTextSizeWarning</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>{ node: WeaveTextV2Shape, size: number, threshold: number }</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">The serialized <code>blocks</code> grew past <code>sizeWarning.threshold</code>. Emitted once per crossing.</p></td>
@@ -1417,7 +1596,9 @@ Content is never truncated.</p></td>
 <div class="sectionbody">
 <div class="paragraph">
 <p>Same behavior and methods as <a href="../text/#hyperlinks" class="xref page">WeaveTextNode</a>:
-<code class="dt-mono">getLink</code>, <code class="dt-mono">setLink</code> and <code class="dt-mono">removeLink</code>.</p>
+<code class="dt-mono">getLink</code>, <code class="dt-mono">setLink</code> and <code class="dt-mono">removeLink</code>. Removing the link also removes the link
+underline. Link hover colour and the pointer cursor only show while <kbd>Ctrl</kbd>/<kbd>Cmd</kbd> is held, and
+<kbd>Ctrl</kbd>/<kbd>Cmd</kbd> + click opens the URL. While it is held the blue hover halo of the node is hidden.</p>
 </div>
 </div>
 </div>
@@ -1427,7 +1608,9 @@ Content is never truncated.</p></td>
 <div class="paragraph">
 <p><code class="dt-mono">WeaveTextV2Node</code>, <code class="dt-mono">WeaveTextV2Shape</code>, <code class="dt-mono">TextLayoutEngine</code>, <code class="dt-mono">TextEditSession</code>,
 <code class="dt-mono">TextEditModel</code> and the related types. <code class="dt-mono">TextEditSession</code> works on a <code class="dt-mono">TextEditTarget</code>
-and a <code class="dt-mono">TextEditHost</code>, so other shapes can reuse the layout engine and the editor.</p>
+and a <code class="dt-mono">TextEditHost</code>, so other shapes can reuse the layout engine and the editor. The pure model
+functions (<code class="dt-mono">applyMark</code>, <code class="dt-mono">toggleList</code>, <code class="dt-mono">listMarkers</code>, <code class="dt-mono">getSelectionFormat</code>, &#8230;&#8203;) and
+<code class="dt-mono">clearSyntheticItalicCache</code> are exported too.</p>
 </div>
 </div>
 </div>
@@ -1438,6 +1621,34 @@ and a <code class="dt-mono">TextEditHost</code>, so other shapes can reuse the l
 <p>Measurement and painting work on the node-canvas backend (<code>setupCanvasBackend()</code>) and were also
 verified on the skia-canvas backend (<code>setupSkiaBackend()</code>). Register fonts in your app; they are not
 registered by the SDK.</p>
+</div>
+<div class="sect2">
+<h3 id="italic-on-the-server"><a class="anchor" href="#italic-on-the-server"></a>Italic on the server</h3>
+<div class="paragraph">
+<p>Browsers slant (synthesize) italic text when a font family has no italic file. skia-canvas and
+node-canvas do not: the text comes out upright. <code class="dt-mono">WeaveTextV2Shape</code> detects this on the server by
+rendering a small probe with the run&#8217;s font, and when the italic does not render slanted it applies
+the same slant browsers use (a shear of about 14 degrees, on the glyphs only). Families that have a
+real italic file are drawn with it, unchanged. It works the same on both backends and never runs in a
+browser. Layout is not affected: wrapping and line breaks are identical to the canvas.</p>
+</div>
+<div class="paragraph">
+<p>The result is cached per font. If you register fonts after the first render, call
+<code class="dt-mono">clearSyntheticItalicCache()</code> so it is probed again.</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+The slant is close to, but not pixel-identical with, the one Chrome draws. Server images of
+text with italic runs in families without an italic file now come out slanted instead of upright.
+</td>
+</tr>
+</table>
+</div>
 </div>
 </div>
 </div>
