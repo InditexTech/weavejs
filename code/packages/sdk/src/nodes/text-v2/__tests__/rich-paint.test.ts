@@ -81,3 +81,38 @@ describe('painter', () => {
     expect(norm(calls.find((c) => c.text === ' plain')?.fill)).toBe('#000000');
   });
 });
+
+describe('outline while transforming', () => {
+  it('never resets the canvas transform to stroke (strokeScaleEnabled off)', () => {
+    const stage = new Konva.Stage({
+      container: document.createElement('div'),
+      width: 300,
+      height: 200,
+    });
+    const layer = new Konva.Layer();
+    stage.add(layer);
+    const shape = new WeaveTextV2Shape({
+      fontSize: 20,
+      fontFamily: 'sans-serif',
+      fill: '#000000',
+      stroke: '#d6d6d6',
+      strokeWidth: 2,
+      strokeEnabled: true,
+      fillAfterStrokeEnabled: true,
+      strokeScaleEnabled: false, // what Weave sets on transformstart
+      width: 280,
+    });
+    shape.setBlocks([{ runs: [{ t: 'outlined text' }] }]);
+    layer.add(shape);
+    const native = layer.getContext()._context as unknown as {
+      strokeText: (...a: unknown[]) => void;
+      setTransform: (...a: unknown[]) => void;
+    };
+    const strokes = vi.spyOn(native, 'strokeText');
+    const resets = vi.spyOn(native, 'setTransform');
+    layer.draw();
+    expect(strokes).toHaveBeenCalled();
+    expect(resets).not.toHaveBeenCalled();
+    expect(shape.getStrokeScaleEnabled()).toBe(true);
+  });
+});

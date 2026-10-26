@@ -715,38 +715,123 @@ export class WeaveTextV2Node extends WeaveNode {
 
   // ---- link ----------------------------------------------------------------
 
+  private linkCtxMenuGuardRegistered = false;
+  private linkHoverText: WeaveTextV2Shape | null = null;
+  private linkModifier = false;
+  private linkHoverRefresh: (() => void) | null = null;
+
+  // True when the pointer is over a link of `text` (whole-node or per-run).
+  private linkHitAt(
+    text: WeaveTextV2Shape
+  ): { url: string; key?: string } | null {
+    const link = text.getAttrs().link;
+    if (link) {
+      const p = this.localPointer(text);
+      const inside =
+        p.x >= 0 && p.y >= 0 && p.x <= text.width() && p.y <= text.height();
+      return inside ? { url: link } : null;
+    }
+    return text.linkAtPoint(this.localPointer(text));
+  }
+
+  // macOS turns Ctrl+click into a context-menu gesture (no click event is
+  // raised). On a link Ctrl/Cmd+click means "open the link", so the context
+  // menu is swallowed. The listener is a DOM capture listener on the stage
+  // container: when the node is selected the Konva target is the transformer,
+  // not the text, so node level listeners never see the event.
+  private registerLinkContextMenuGuard(): void {
+    if (this.linkCtxMenuGuardRegistered || this.instance.isServerSide()) return;
+    this.linkCtxMenuGuardRegistered = true;
+
+    const stage = this.instance.getStage();
+    const signal = this.instance.getEventsController().signal;
+
+    // Links only react (hover, cursor) while Ctrl/Cmd is held.
+    const syncModifier = (e: KeyboardEvent) => {
+      const next = e.ctrlKey || e.metaKey;
+      if (next === this.linkModifier) return;
+      this.linkModifier = next;
+      this.linkHoverRefresh?.();
+    };
+    window.addEventListener('keydown', syncModifier, { signal });
+    window.addEventListener('keyup', syncModifier, { signal });
+    window.addEventListener(
+      'blur',
+      () => {
+        this.linkModifier = false;
+        this.linkHoverRefresh?.();
+      },
+      { signal }
+    );
+
+    stage.container().addEventListener(
+      'contextmenu',
+      (e: MouseEvent) => {
+        if (this.editing || !e.ctrlKey) return;
+        const text = this.linkHoverText;
+        if (!text) return;
+        stage.setPointersPositions(e);
+        const hit = this.linkHitAt(text);
+        if (!hit) return;
+        e.preventDefault();
+        e.stopPropagation();
+        this.openUrl(hit.url);
+      },
+      { capture: true, signal: this.instance.getEventsController().signal }
+    );
+  }
+
   private setupLinkBehavior(text: WeaveTextV2Shape): void {
-    text.handleMouseover = () => {
-      if (!text.getAttrs().link) return;
-      text.fill(this.config.link.hoverColor);
-      text.getLayer()?.batchDraw();
+    this.registerLinkContextMenuGuard();
+
+    const container = () => this.instance.getStage().container();
+    // Same as the base node: grab when selected, pointer while hovering.
+    const idleCursor = () => (this.isNodeSelected(text) ? 'grab' : 'pointer');
+
+    // Single place where hover feedback is computed. It is called from
+    // `pointermove` (node not selected) and from `handleMouseover`, which the
+    // selection transformer invokes on every mouse move while the node is
+    // selected (the transformer overlay swallows the node's own events).
+    const applyHover = () => {
+      if (this.editing) return;
+      this.linkHoverText = text;
+      const hit = this.linkModifier ? this.linkHitAt(text) : null;
+      if (!text.getAttrs().link) {
+        text.setHoveredRun(hit?.key ?? null);
+      } else {
+        text.fill(
+          hit ? this.config.link.hoverColor : this.config.link.defaultColor
+        );
+        text.getLayer()?.batchDraw();
+      }
+      container().style.cursor = hit ? 'pointer' : idleCursor();
+    };
+
+    const updateHover = (e?: { evt?: MouseEvent | PointerEvent }) => {
+      if (e?.evt) this.linkModifier = e.evt.ctrlKey || e.evt.metaKey;
+      this.linkHoverRefresh = applyHover;
+      applyHover();
+    };
+
+    text.handleMouseover = (e?: never) => {
+      updateHover(e);
     };
 
     text.handleMouseout = () => {
+      if (this.linkHoverText === text) {
+        this.linkHoverText = null;
+        this.linkHoverRefresh = null;
+      }
       text.setHoveredRun(null);
       if (!text.getAttrs().link) return;
       text.fill(this.config.link.defaultColor);
       text.getLayer()?.batchDraw();
     };
 
-    // Per-run links: hover and cursor follow the pointer over the run.
-    let overRunLink = false;
-    text.on('pointermove', () => {
-      if (this.editing || text.getAttrs().link) return;
-      const hit = text.linkAtPoint(this.localPointer(text));
-      text.setHoveredRun(hit?.key ?? null);
-      const container = this.instance.getStage().container();
-      if (hit) {
-        container.style.cursor = 'pointer';
-        overRunLink = true;
-      } else if (overRunLink) {
-        overRunLink = false;
-        container.style.cursor = this.isNodeSelected(text) ? 'grab' : 'pointer';
-      }
-    });
+    text.on('pointermove', updateHover);
 
     text.defineMousePointer = () =>
-      text.getAttrs().link ? 'pointer' : 'default';
+      this.linkModifier && text.getAttrs().link ? 'pointer' : idleCursor();
 
     let linkClickTimeout: ReturnType<typeof setTimeout> | undefined;
     const clearLinkClickTimeout = () => {
@@ -790,9 +875,15 @@ export class WeaveTextV2Node extends WeaveNode {
     return text.getRelativePointerPosition() ?? { x: -1, y: -1 };
   }
 
+  private lastLinkOpen = 0;
+
   private openUrl(link: unknown): void {
     if (this.instance.isServerSide()) return;
     if (typeof link !== 'string' || !isValidTextLink(link)) return;
+    // Ctrl+click can raise both `contextmenu` and `click`: open only once.
+    const now = Date.now();
+    if (now - this.lastLinkOpen < 500) return;
+    this.lastLinkOpen = now;
     window.open(link, '_blank', 'noopener,noreferrer');
   }
 

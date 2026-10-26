@@ -239,6 +239,17 @@ export class WeaveTextV2Shape extends Konva.Shape {
     return this.accessor('textDecoration', '', v);
   }
 
+  /**
+   * Always stroke under the node transform. Weave turns `strokeScaleEnabled`
+   * off while a node is transformed; Konva then resets the canvas transform
+   * before stroking, which only works for path shapes. `strokeText` is not a
+   * path, so the outline was painted at local coordinates on the canvas
+   * origin at stage scale 1 (visible over other nodes while resizing).
+   */
+  getStrokeScaleEnabled(): boolean {
+    return true;
+  }
+
   private accessor<T>(name: string, fallback: T, value?: T): T | this {
     if (value === undefined) {
       return (this.attrs[name] ?? fallback) as T;

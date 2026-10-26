@@ -1030,6 +1030,8 @@ export abstract class WeaveNode implements WeaveNodeBase {
     const isCtrlOrMetaPressed = e.evt.ctrlKey || e.evt.metaKey;
 
     if (isCtrlOrMetaPressed) {
+      // Ctrl/Cmd means "interact without selecting": no hover halo.
+      this.hideHoverState();
       return false;
     }
 
@@ -1147,6 +1149,7 @@ export abstract class WeaveNode implements WeaveNodeBase {
     const isCtrlOrMetaPressed = e.evt?.ctrlKey || e.evt?.metaKey;
 
     if (isCtrlOrMetaPressed) {
+      this.hideHoverState();
       return false;
     }
 
