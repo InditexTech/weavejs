@@ -338,7 +338,8 @@ export class WeaveVideoNode extends WeaveNode {
         rotation: 0,
       });
 
-      this.instance.addEventListener<WeaveStageZoomPluginOnZoomChangeEvent>(
+      this.setNodeInstanceListener<WeaveStageZoomPluginOnZoomChangeEvent>(
+        videoProgress,
         'onZoomChange',
         () => {
           videoProgress.height(

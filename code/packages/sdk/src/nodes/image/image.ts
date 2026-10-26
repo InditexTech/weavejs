@@ -579,7 +579,8 @@ export class WeaveImageNode extends WeaveNode {
 
     image.setAttr('imageURL', imageProps.imageURL);
 
-    this.instance.addEventListener(
+    this.setNodeInstanceListener(
+      image,
       'onNodeRenderedAdded',
       (node: Konva.Node) => {
         if (

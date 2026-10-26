@@ -958,3 +958,31 @@ describe('WeaveMeasureNode', () => {
     });
   });
 });
+
+describe('WeaveMeasureNode instance listeners lifecycle', () => {
+  it('does not leak Weave instance listeners across render and destroy cycles', async () => {
+    const { default: Emittery } = await import('emittery');
+    const { node, mock } = makeNode();
+    const emitter = new Emittery();
+    mock.addEventListener.mockImplementation(
+      (event: string, cb: (payload: unknown) => void) => emitter.on(event, cb)
+    );
+    mock.removeEventListener.mockImplementation(
+      (event: string, cb: (payload: unknown) => void) => emitter.off(event, cb)
+    );
+    const events = ['onZoomChange', 'onNodesChange', 'onMeasureReferenceChange'];
+    const counts = () => events.map((e) => emitter.listenerCount(e));
+    const render = (i: number) =>
+      node.onRender(defaultProps({ id: `leak-${i}` })) as unknown as WeaveElementInstance;
+
+    const first = render(0);
+    const alive = counts();
+    for (let i = 1; i < 5; i++) {
+      node.onDestroy(render(i));
+    }
+
+    expect(counts()).toEqual(alive);
+    node.onDestroy(first);
+    expect(counts()).toEqual(events.map(() => 0));
+  });
+});

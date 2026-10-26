@@ -305,7 +305,7 @@ export class WeaveFrameNode extends WeaveNode {
 
     this.setupDefaultNodeEvents(frame);
 
-    this.instance.addEventListener('onZoomChange', () => {
+    this.setNodeInstanceListener(frame, 'onZoomChange', () => {
       selectionArea.hitFunc(function (ctx, shape) {
         ctx.beginPath();
         ctx.rect(

@@ -256,7 +256,8 @@ export class WeaveMeasureNode extends WeaveNode {
       };
     };
 
-    this.instance.addEventListener<WeaveStageZoomPluginOnZoomChangeEvent>(
+    this.setNodeInstanceListener<WeaveStageZoomPluginOnZoomChangeEvent>(
+      measure,
       'onZoomChange',
       () => {
         const selectionPlugin =
@@ -273,7 +274,8 @@ export class WeaveMeasureNode extends WeaveNode {
       }
     );
 
-    this.instance.addEventListener<WeaveNodesSelectionPluginOnNodesChangeEvent>(
+    this.setNodeInstanceListener<WeaveNodesSelectionPluginOnNodesChangeEvent>(
+      measure,
       'onNodesChange',
       () => {
         let isSelected = false;
@@ -295,11 +297,13 @@ export class WeaveMeasureNode extends WeaveNode {
         if (!isSelected) {
           this.destroySelectionHandlers(measure);
         }
-      }
+      },
+      'measure:onNodesChange'
     );
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    this.instance.addEventListener<any>(
+    this.setNodeInstanceListener<any>(
+      measure,
       'onMeasureReferenceChange',
       ({ unit, unitPerPixel }: { unit: string; unitPerPixel: number }) => {
         measure.setAttrs({
