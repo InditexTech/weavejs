@@ -60,6 +60,9 @@ const node = new WeaveTextV2Node({
   into one step). Leaving edit mode commits a single mono:[updateNode], skipped when the text is
   unchanged. While editing, keydown does not propagate to the page, so app-level undo does not fire;
   `window.weaveTextEditing` holds the editing node id.
+* The pointer is a text cursor (I-beam) over the text box while editing and the default cursor
+  outside it, also while dragging a selection. Elements with mono:[data-weave-text-edit-keep] and touch
+  pointers keep their own cursor. It is restored when the session ends.
 * Clipboard is plain text only. Large pastes are laid out in time slices.
 * While editing, the stage pans to keep the caret in view; the margin is mono:[edition.followPadding].
 * A pointer press inside an element with the attribute mono:[data-weave-text-edit-keep] does not end
@@ -112,7 +115,8 @@ marks of the next typed text.
 default: the whole text) and are one mono:[updateNode], so one Weave undo step. This lets an
 application edit text from a modal.
 * When rich text is off for the node every command returns `false` and does nothing. mono:[isRich(node)]
-reports it, so a toolbar can show or hide itself.
+reports it, so a toolbar can show or hide itself. mono:[isRichTextEnabled()] without arguments returns
+the handler default (`config.richText.enabled`).
 
 [cols="1,3"]
 |===
@@ -146,7 +150,7 @@ mono:[applyMark] with `link`.
 |===
 
 When editing with rich text enabled: kbd:[Ctrl]/kbd:[Cmd] + kbd:[B], kbd:[I], kbd:[U] toggle marks;
-kbd:[Enter] continues a list item and exits on an empty one; kbd:[Backspace] at the start of an item
+kbd:[Enter] continues a list item (and the formatting of the text before it) and exits on an empty one; kbd:[Backspace] at the start of an item
 outdents it or removes the marker; kbd:[Tab] / kbd:[Shift]+kbd:[Tab] change the depth. Pasting inserts
 plain text with the marks at the caret. With it disabled, kbd:[Enter] in a list item still creates
 an item with the same `kind` and `depth`.
@@ -260,13 +264,17 @@ Content is never truncated.
 == Hyperlinks
 
 Same behavior and methods as xref:sdk:api-reference/nodes/text.adoc#hyperlinks[WeaveTextNode]:
-mono:[getLink], mono:[setLink] and mono:[removeLink].
+mono:[getLink], mono:[setLink] and mono:[removeLink]. Removing the link also removes the link
+underline. Link hover colour and the pointer cursor only show while kbd:[Ctrl]/kbd:[Cmd] is held, and
+kbd:[Ctrl]/kbd:[Cmd] + click opens the URL. While it is held the blue hover halo of the node is hidden.
 
 == Exports
 
 mono:[WeaveTextV2Node], mono:[WeaveTextV2Shape], mono:[TextLayoutEngine], mono:[TextEditSession],
 mono:[TextEditModel] and the related types. mono:[TextEditSession] works on a mono:[TextEditTarget]
-and a mono:[TextEditHost], so other shapes can reuse the layout engine and the editor.
+and a mono:[TextEditHost], so other shapes can reuse the layout engine and the editor. The pure model
+functions (mono:[applyMark], mono:[toggleList], mono:[listMarkers], mono:[getSelectionFormat], ...) and
+mono:[clearSyntheticItalicCache] are exported too.
 
 == Server side
 

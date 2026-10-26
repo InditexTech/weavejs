@@ -90,6 +90,10 @@ Formatting survives move, resize, copy, duplicate, undo and image export.
 Rich text is decided per node (the `richText` attribute); `richText.enabled` is only the default for
 nodes without it. To offer a plain and a rich Text Tool, see xref:main:build/actions/text-tool.adoc[Text Tool].
 
+Per-paragraph alignment (`setAlign`), per-selection line height and links per range (`setRunLink`) are
+also commands. On a server render (skia-canvas or node-canvas) italic text in fonts without an italic
+file is slanted like in the browser; see the reference.
+
 Lists and marks already in a document render for everyone, even when rich text is off.
 
 See xref:sdk:api-reference/nodes/text-v2.adoc#_rich_text[the reference] for the commands.
