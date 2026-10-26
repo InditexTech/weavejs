@@ -1,0 +1,23 @@
+docs/src/modules/main/pages/build/nodes/text.adoc
+  s_04c0657600bfd3::t_5127808fd7e6cc 2
+docs/src/modules/main/pages/build/plugins/copy-paste-nodes.adoc
+  s_04c0657600bfd3::t_aa82e7afe11d30 2
+docs/src/modules/sdk/pages/api-reference/plugins/copy-paste-nodes.adoc
+  s_04c0657600bfd3::t_b1579e00f17bad 2
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.6",
+  "base_commit_sha": "9c3fd3ef7980938aaa07b738cd0db6ba6c73dab0",
+  "prompts": {},
+  "sessions": {
+    "s_04c0657600bfd3": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "ses_e9bc5058dffeuO0Rfa8MiDOdnh",
+        "model": "claude-sonnet-5.5"
+      },
+      "human_author": "Jesus Manuel Piñeiro Cid <jesusmpc@inditex.com>"
+    }
+  }
+}
