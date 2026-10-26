@@ -14,10 +14,14 @@
       "email": "jesusmpc@inditex.com"
     }
   ],
+  "main": "./dist/types.js",
+  "module": "./dist/types.js",
   "exports": {
-    "types": "./dist/types.d.ts",
-    "import": "./dist/types.js",
-    "default": "./dist/types.js"
+    ".": {
+      "types": "./dist/types.d.ts",
+      "import": "./dist/types.js",
+      "default": "./dist/types.js"
+    }
   },
   "types": "dist/types.d.ts",
   "files": [
