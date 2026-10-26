@@ -15,21 +15,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- [#1225](https://github.com/InditexTech/weavejs/issues/1225) Rich text for the native text node (`WeaveTextV2Node`), enabled per node with the `richText` attribute (`config.richText.enabled` is the default for nodes without it):
-  - Marks per selection: bold, italic, underline, strikethrough, colour, font size (a ratio of the node font size, so resize scales every run), line height and font family
-  - Per-paragraph alignment, bulleted and numbered lists with nesting (marker styles by depth, continuous numbering, configurable `richText.indentStep`) and links per text range
-  - Commands for app toolbars that work while editing and on a selected node (`applyMark`, `toggleMark`, `toggleList`, `indent`, `outdent`, `setAlign`, `setRunLink`, `removeRunLink`, `setBaseFontSize`, `getSelectionFormat`, `isRich`) and the `onTextSelectionChange` / `onTextFormatChange` events
-  - `WeaveTextToolAction` accepts `{ name, props }` so an app can offer a plain and a rich text tool
-  - Formatting survives move, resize, copy, duplicate, undo and image export
-- [#1225](https://github.com/InditexTech/weavejs/issues/1225) Edit-mode improvements for the native text node: text cursor over the box, stage follows the caret (`edition.followPadding`) and `data-weave-text-edit-keep` elements that keep the editor open
-- [#1225](https://github.com/InditexTech/weavejs/issues/1225) Server rendering (skia-canvas and node-canvas) slants italic text in font families without an italic file, like browsers do. **Note:** server images of such text now come out slanted instead of upright. Call `clearSyntheticItalicCache()` after registering fonts late
-
-### Fixed
-
-- [#1225](https://github.com/InditexTech/weavejs/issues/1225) Text nodes keep the link underline after the link is removed (native and legacy text node)
-- [#1225](https://github.com/InditexTech/weavejs/issues/1225) Native text node: stray outline while resizing, flicker when resizing the width on a fixed layout, and the Enter key losing list structure or formatting
-- [#1225](https://github.com/InditexTech/weavejs/issues/1225) Hover halo and pointer cursor: hide the halo while Ctrl/Cmd is held, and use the same pointer and grab cursors as other nodes
-- [#1225](https://github.com/InditexTech/weavejs/issues/1225) Custom guides of a dragged container stayed at the old position until the drop
+- [#1225](https://github.com/InditexTech/weavejs/issues/1225) Text node: rich text formatting, enabled via node config
 
 ## [5.6.0] - 2026-10-22
 
