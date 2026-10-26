@@ -561,9 +561,9 @@ export class WeaveTextV2Node extends WeaveNode {
         this.isNodeSelected(text) &&
         (layout !== TEXT_LAYOUT.SMART || !isCorner())
       ) {
-        text.width(text.width() * text.scaleX());
+        // `resetScale` applies scaleX/scaleY to width/height itself: scaling the
+        // width here as well applied it twice per frame (flicker while resizing).
         resetScale(text);
-        text.fontSize(text.fontSize() * text.scaleY());
       }
 
       text.setAttr('shouldUpdateOnTransform', false);

@@ -445,3 +445,22 @@ describe('WeaveTextV2Node rich text in a session', () => {
     expect(after).toBe(before * 2);
   });
 });
+
+describe('WeaveTextV2Node resize', () => {
+  it('fixed layout applies the width scale once per transform frame', () => {
+    const t = setup();
+    t.shape.setAttrs({ layout: TEXT_LAYOUT.FIXED, width: 200, height: 100 });
+    t.selection.getSelectedNodes.mockReturnValue([t.shape]);
+    (t.node as unknown as { isSelecting: () => boolean }).isSelecting = () =>
+      true;
+    (t.node as unknown as { isNodeSelected: () => boolean }).isNodeSelected =
+      () => true;
+    const evt = { evt: { ctrlKey: false, metaKey: false }, target: t.shape };
+    t.shape.fire('transformstart', evt, true);
+    t.shape.scaleX(1.5);
+    t.shape.fire('transform', evt, true);
+    expect(t.shape.width()).toBe(300);
+    expect(t.shape.scaleX()).toBe(1);
+    expect(t.shape.height()).toBe(100);
+  });
+});
