@@ -1355,10 +1355,13 @@ generated straight from that same file at build time, so it can&#8217;t drift fr
 <div class="ulist">
 <ul>
 <li>
-<p><a href="https://github.com/InditexTech/weavejs/issues/1226">#1226</a> Shape label: opt-in <code>native</code> label engine (<code>config.label.engine</code>) for rectangle, ellipse and polygon, using the native-canvas text engine and editor session with rich text (optional <code>labelBlocks</code> prop). The <code>legacy</code> engine stays the default</p>
+<p><a href="https://github.com/InditexTech/weavejs/issues/1226">#1226</a> Shape label: use the native-canvas text engine and editor session</p>
 </li>
 <li>
 <p><a href="https://github.com/InditexTech/weavejs/issues/1225">#1225</a> Text node: rich text formatting, enabled via node config</p>
+</li>
+<li>
+<p><a href="https://github.com/InditexTech/weavejs/issues/1224">#1224</a> Text node: native on-canvas editing (replace DOM textarea overlay)</p>
 </li>
 </ul>
 </div>
@@ -1367,6 +1370,12 @@ generated straight from that same file at build time, so it can&#8217;t drift fr
 <h3 id="fixed"><a class="anchor" href="#fixed"></a>Fixed</h3>
 <div class="ulist">
 <ul>
+<li>
+<p><a href="https://github.com/InditexTech/weavejs/issues/1215">#1215</a> Some node types register per-render event listeners that are never removed</p>
+</li>
+<li>
+<p><a href="https://github.com/InditexTech/weavejs/issues/1214">#1214</a> Grouping and ungrouping leak the event listeners of the moved nodes' descendants</p>
+</li>
 <li>
 <p><a href="https://github.com/InditexTech/weavejs/issues/1229">#1229</a> Nx caches the publish and unpublish targets, so a cache hit skips the actual publish</p>
 </li>
