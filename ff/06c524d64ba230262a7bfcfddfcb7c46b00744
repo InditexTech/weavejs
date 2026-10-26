@@ -1,0 +1,23 @@
+code/packages/sdk/src/nodes/measure/measure.ts
+  s_4dca8408c69d3d::t_cdddb0f3d62798 315-318,370,391,447
+code/packages/sdk/src/plugins/nodes-selection/events/click-tap.ts
+  s_4dca8408c69d3d::t_84484c6784e819 205-214
+code/packages/sdk/src/plugins/nodes-selection/events/pointer-down.ts
+  s_4dca8408c69d3d::t_7748ac2fd7f9e2 106-114
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.6",
+  "base_commit_sha": "ff06c524d64ba230262a7bfcfddfcb7c46b00744",
+  "prompts": {},
+  "sessions": {
+    "s_4dca8408c69d3d": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "ses_e8729c66bffeCiFqgByZpUgfcS",
+        "model": "claude-sonnet-5.5"
+      },
+      "human_author": "Jesus Manuel Piñeiro Cid <jesusmpc@inditex.com>"
+    }
+  }
+}
