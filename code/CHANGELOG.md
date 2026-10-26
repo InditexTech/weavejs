@@ -16,6 +16,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 - [#1227](https://github.com/InditexTech/weavejs/issues/1227) Harden the SonarCloud, release preview and OSS compliance workflows
+- [#1222](https://github.com/InditexTech/weavejs/issues/1222) Server backend setup sets the backend flag even when the native backend fails to load
 
 ## [5.6.0] - 2026-10-22
 

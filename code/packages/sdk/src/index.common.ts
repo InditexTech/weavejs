@@ -56,6 +56,12 @@ export * from './nodes/line/types';
 export { WeaveTextNode } from './nodes/text/text';
 export * from './nodes/text/constants';
 export * from './nodes/text/types';
+export {
+  WeaveTextV2Node,
+  WeaveTextV2Shape,
+  TextLayoutEngine,
+} from './nodes/text-v2';
+export type { TextV2ShapeConfig } from './nodes/text-v2';
 export { WeaveImageNode } from './nodes/image/image';
 export * from './nodes/image/constants';
 export * from './nodes/image/types';
