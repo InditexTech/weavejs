@@ -1,0 +1,33 @@
+code/packages/sdk/src/nodes/ellipse/ellipse.ts
+  s_726a777adee655::t_2549d3dbacaf4a 17,197-204
+code/packages/sdk/src/nodes/polygon/polygon.ts
+  s_726a777adee655::t_08bc5bff6cebbc 21,259-268
+code/packages/sdk/src/nodes/rectangle/rectangle.ts
+  s_726a777adee655::t_d1467ae833983c 20,151-158
+code/packages/sdk/src/nodes/shared/shape-label-editor.ts
+  s_726a777adee655::t_816cc573302b32 11-14,179,205
+code/packages/sdk/src/nodes/shared/shape-label-native-editor.ts
+  s_726a777adee655::t_298424557fd8e2 5,19-24,142,176,187,195,343
+code/packages/sdk/src/nodes/shared/shape-label.edit-shared.ts
+  s_726a777adee655::t_96e3703d34a5da 1-96
+code/packages/sdk/src/nodes/text-v2/edit/stage-coordinates.ts
+  s_726a777adee655::t_1095b24a92ec50 1-28
+code/packages/sdk/src/nodes/text-v2/text-v2.ts
+  s_726a777adee655::t_4462834c89b363 5,391
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.6",
+  "base_commit_sha": "b618c9f79e157634cd5c5b4c363a13fd5da11610",
+  "prompts": {},
+  "sessions": {
+    "s_726a777adee655": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "ses_e87984a5cffefKErydf4xdv3Cm",
+        "model": "claude-sonnet-5.5"
+      },
+      "human_author": "Jesus Manuel Piñeiro Cid <jesusmpc@inditex.com>"
+    }
+  }
+}
