@@ -1,0 +1,37 @@
+code/packages/sdk/src/nodes/text-v2/__tests__/rich-session.test.ts
+  s_04c0657600bfd3::t_575b2a0789baa7 221-295
+code/packages/sdk/src/nodes/text-v2/__tests__/server-skia.test.ts
+  s_04c0657600bfd3::t_d719eb59958023 203-273
+code/packages/sdk/src/nodes/text-v2/__tests__/server.test.ts
+  s_04c0657600bfd3::t_99da1af528ee49 111-179
+code/packages/sdk/src/nodes/text-v2/__tests__/synthetic-italic.test.ts
+  s_04c0657600bfd3::t_aa982836420be7 1-26
+code/packages/sdk/src/nodes/text-v2/edit/session.ts
+  s_04c0657600bfd3::t_0462cdd6980410 151-153,188-190,658-674,676
+code/packages/sdk/src/nodes/text-v2/index.ts
+  s_04c0657600bfd3::t_c7a0d7df4afaee 10
+code/packages/sdk/src/nodes/text-v2/layout/synthetic-italic.ts
+  s_04c0657600bfd3::t_362b6ce14de7e2 1-88
+code/packages/sdk/src/nodes/text-v2/shape.ts
+  s_04c0657600bfd3::t_3ff9381f167ea5 18-21,512,519-544
+docs/src/modules/main/pages/build/nodes/text-v2.adoc
+  s_04c0657600bfd3::t_384f57fb6d4794 42
+docs/src/modules/sdk/pages/api-reference/nodes/text-v2.adoc
+  s_04c0657600bfd3::t_249596ac210911 276-290
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.6",
+  "base_commit_sha": "536587dba3a4cf6980841719f14f4ccd4d4cd796",
+  "prompts": {},
+  "sessions": {
+    "s_04c0657600bfd3": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "ses_e9bc5058dffeuO0Rfa8MiDOdnh",
+        "model": "claude-sonnet-5.5"
+      },
+      "human_author": "Jesus Manuel Piñeiro Cid <jesusmpc@inditex.com>"
+    }
+  }
+}
