@@ -14,10 +14,14 @@
       "email": "jesusmpc@inditex.com"
     }
   ],
+  "main": "./dist/react.js",
+  "module": "./dist/react.js",
   "exports": {
-    "types": "./dist/react.d.ts",
-    "import": "./dist/react.js",
-    "default": "./dist/react.js"
+    ".": {
+      "types": "./dist/react.d.ts",
+      "import": "./dist/react.js",
+      "default": "./dist/react.js"
+    }
   },
   "types": "dist/react.d.ts",
   "files": [
