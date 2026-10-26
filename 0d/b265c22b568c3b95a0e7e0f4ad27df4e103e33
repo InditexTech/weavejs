@@ -1,0 +1,25 @@
+.github/workflows/code-npm_node-sonarcloud-analysis.yml
+  s_d22a0e66ed9e11::t_eb7e7026ec341d 157-165,169-174,176,183-186
+.github/workflows/code-release_preview.yml
+  s_d22a0e66ed9e11::t_12acae2e73b2d1 5-7
+.github/workflows/oss-compliance.yml
+  s_d22a0e66ed9e11::t_cb4aad4dd3438e 17,24,44
+code/CHANGELOG.md
+  s_d22a0e66ed9e11::t_46d924bc25bab9 19
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.6",
+  "base_commit_sha": "0db265c22b568c3b95a0e7e0f4ad27df4e103e33",
+  "prompts": {},
+  "sessions": {
+    "s_d22a0e66ed9e11": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "ses_e87b30e16ffeHLXRINU2om5PAD",
+        "model": "claude-sonnet-5.5"
+      },
+      "human_author": "Jesus Manuel Piñeiro Cid <jesusmpc@inditex.com>"
+    }
+  }
+}
